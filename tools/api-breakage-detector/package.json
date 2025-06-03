@@ -10,29 +10,33 @@
   },
   "scripts": {
     "build": "tsup",
+    "clean": "rimraf dist",
     "cleanup": "node ./dist/cli.js cleanup",
     "detect": "node ./dist/cli.js detect",
     "dev": "tsup --watch",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "health:storage": "node dist/cli.js storage health",
     "init": "node ./dist/cli.js init",
     "lint": "eslint src",
+    "setup:gcs": "node scripts/setup-gcs.js",
+    "storage:stats": "node dist/cli.js storage stats",
     "suppress": "node ./dist/cli.js suppress",
     "test": "vitest run",
     "test:watch": "vitest watch"
   },
   "dependencies": {
-    "@microsoft/api-extractor": "^7.47.6",
+    "@microsoft/api-extractor": "^7.47.9",
     "@microsoft/api-extractor-model": "^7.29.4",
     "@octokit/rest": "^21.0.0",
     "chalk": "^5.3.0",
-    "commander": "^12.0.0",
+    "commander": "^12.1.0",
     "diff": "^7.0.0",
     "fs-extra": "^11.2.0",
-    "globby": "^14.0.0",
+    "globby": "^14.0.2",
     "semver": "^7.6.0",
     "yaml": "^2.4.0",
-    "zod": "^3.22.0"
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/diff": "^5.2.0",
@@ -44,7 +48,10 @@
     "typescript": "catalog:repo",
     "vitest": "^2.0.0"
   },
+  "optionalDependencies": {
+    "@google-cloud/storage": "^7.16.0"
+  },
   "engines": {
-    "node": ">=18.17.0"
+    "node": ">=22.0.0"
   }
 }

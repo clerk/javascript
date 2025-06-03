@@ -245,9 +245,131 @@ program
     }
   });
 
+// Add storage commands
+program
+  .command('storage')
+  .description('Storage management commands')
+  .addCommand(
+    new Command('health')
+      .description('Check storage backend health')
+      .option('-c, --config <path>', 'Configuration file path', '.api-breakage.config.json')
+      .action(async options => {
+        try {
+          const configPath = path.resolve(process.cwd(), options.config);
+          const config = await loadConfig(configPath);
+
+          if (!config.storage) {
+            console.log('❌ No storage configuration found');
+            process.exit(1);
+          }
+
+          const { StorageManager } = await import('./storage/storage-manager.js');
+          const storageManager = new StorageManager(config.storage as any);
+
+          console.log('🔍 Checking storage health...\n');
+
+          const healthStatus = await storageManager.getHealthStatus();
+
+          for (const health of healthStatus) {
+            const status = health.healthy ? '✅' : '❌';
+            const latency = health.latency ? ` (${health.latency}ms)` : '';
+            console.log(`${status} ${health.backend}${latency}`);
+
+            if (health.error) {
+              console.log(`   Error: ${health.error}`);
+            }
+
+            if (health.lastCheck) {
+              console.log(`   Last check: ${health.lastCheck.toISOString()}`);
+            }
+          }
+
+          await storageManager.shutdown();
+        } catch (error) {
+          console.error('❌ Storage health check failed:', error);
+          process.exit(1);
+        }
+      }),
+  )
+  .addCommand(
+    new Command('stats')
+      .description('Get storage statistics')
+      .option('-c, --config <path>', 'Configuration file path', '.api-breakage.config.json')
+      .action(async options => {
+        try {
+          const configPath = path.resolve(process.cwd(), options.config);
+          const config = await loadConfig(configPath);
+
+          if (!config.storage) {
+            console.log('❌ No storage configuration found');
+            process.exit(1);
+          }
+
+          const { StorageManager } = await import('./storage/storage-manager.js');
+          const storageManager = new StorageManager(config.storage as any);
+
+          console.log('📊 Getting storage statistics...\n');
+
+          const stats = await storageManager.getStats();
+
+          console.log(`Total Size: ${formatBytes(stats.totalSize)}`);
+          console.log(`Snapshot Count: ${stats.snapshotCount}`);
+          console.log(`Oldest Snapshot: ${stats.oldestSnapshot || 'N/A'}`);
+          console.log(`Newest Snapshot: ${stats.newestSnapshot || 'N/A'}\n`);
+
+          console.log('Backend Details:');
+          for (const backend of stats.backendStats) {
+            const status = backend.healthy ? '✅' : '❌';
+            console.log(`${status} ${backend.backend}`);
+
+            if (backend.stats) {
+              console.log(`   Size: ${formatBytes(backend.stats.totalSize)}`);
+              console.log(`   Count: ${backend.stats.snapshotCount}`);
+            }
+          }
+
+          await storageManager.shutdown();
+        } catch (error) {
+          console.error('❌ Failed to get storage stats:', error);
+          process.exit(1);
+        }
+      }),
+  )
+  .addCommand(
+    new Command('cleanup')
+      .description('Clean up old snapshots')
+      .option('-c, --config <path>', 'Configuration file path', '.api-breakage.config.json')
+      .option('-d, --days <days>', 'Retention period in days', '30')
+      .action(async options => {
+        try {
+          const configPath = path.resolve(process.cwd(), options.config);
+          const config = await loadConfig(configPath);
+
+          if (!config.storage) {
+            console.log('❌ No storage configuration found');
+            process.exit(1);
+          }
+
+          const { StorageManager } = await import('./storage/storage-manager.js');
+          const storageManager = new StorageManager(config.storage as any);
+
+          const days = parseInt(options.days);
+          console.log(`🧹 Cleaning up snapshots older than ${days} days...`);
+
+          await storageManager.cleanup(days);
+
+          console.log('✅ Cleanup completed');
+          await storageManager.shutdown();
+        } catch (error) {
+          console.error('❌ Cleanup failed:', error);
+          process.exit(1);
+        }
+      }),
+  );
+
 async function loadConfig(
   configPath: string,
-  cliOptions: {
+  cliOptions?: {
     mainBranch?: string;
     noVersionCheck?: boolean;
   },
@@ -261,11 +383,11 @@ async function loadConfig(
     config = { ...fileConfig };
   }
 
-  // Override with CLI options
-  if (cliOptions.mainBranch) {
+  // Override with CLI options if provided
+  if (cliOptions?.mainBranch) {
     config.mainBranch = cliOptions.mainBranch;
   }
-  if (cliOptions.noVersionCheck) {
+  if (cliOptions?.noVersionCheck) {
     config.checkVersionBump = false;
   }
 
@@ -289,6 +411,19 @@ async function loadConfig(
   } catch (error) {
     throw new Error(`Invalid configuration: ${error instanceof Error ? error.message : error}`);
   }
+}
+
+function formatBytes(bytes: number): string {
+  const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+  let size = bytes;
+  let unitIndex = 0;
+
+  while (size >= 1024 && unitIndex < units.length - 1) {
+    size /= 1024;
+    unitIndex++;
+  }
+
+  return `${size.toFixed(1)} ${units[unitIndex]}`;
 }
 
 // Run the CLI

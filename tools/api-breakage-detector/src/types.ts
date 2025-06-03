@@ -21,15 +21,7 @@ export const ConfigSchema = z.object({
   enableLLMAnalysis: z.boolean().default(false),
   llmProvider: z.enum(['openai', 'anthropic']).default('openai'),
   llmApiKey: z.string().optional(),
-  ci: z
-    .object({
-      enableStatusChecks: z.boolean().default(true),
-      failOnBreakingChanges: z.boolean().default(true),
-      baselineStorage: z.enum(['git', 'cache', 'artifacts', 'turborepo']).default('cache'),
-      baselinePath: z.string().optional(),
-      artifactRetentionDays: z.number().default(7),
-    })
-    .optional(),
+  storage: z.any().optional(), // Storage configuration
   turborepo: z
     .object({
       enabled: z.boolean().default(false),
@@ -48,9 +40,20 @@ export const ConfigSchema = z.object({
         .optional(),
     })
     .optional(),
+  ci: z
+    .object({
+      enableStatusChecks: z.boolean().default(true),
+      failOnBreakingChanges: z.boolean().default(true),
+      baselineStorage: z.enum(['gcs', 'turborepo']).default('turborepo'),
+      baselinePath: z.string().optional(),
+      artifactRetentionDays: z.number().default(7),
+    })
+    .optional(),
 });
 
-export type Config = z.infer<typeof ConfigSchema>;
+export type Config = z.infer<typeof ConfigSchema> & {
+  storage?: import('./storage/storage-manager.js').StorageManagerConfig;
+};
 
 // Package information
 export interface PackageInfo {

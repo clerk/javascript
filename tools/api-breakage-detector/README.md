@@ -1,92 +1,127 @@
 # API Breakage Detector
 
-A comprehensive tool for detecting breaking changes in TypeScript package APIs within monorepos. Uses Microsoft API Extractor to generate API snapshots and provides intelligent change detection with human-readable reports.
+A comprehensive tool for detecting breaking changes in TypeScript package APIs, designed for production use with robust cloud storage integration.
 
-## Features
+## 🚀 Features
 
-- 🔍 **Automatic Package Discovery**: Discovers packages based on `exports` field in `package.json`
-- 📸 **API Snapshot Generation**: Uses API Extractor to generate `.api.json` files
-- 🔄 **Intelligent Change Detection**: Categorizes changes as breaking, non-breaking, or additions
-- 📊 **Version Bump Validation**: Ensures version bumps match the severity of changes
-- 🚫 **Change Suppression**: Configurable system to suppress false positives
-- 📝 **Rich Markdown Reports**: Human-readable reports for GitHub PR comments
-- 🤖 **GitHub Actions Integration**: Ready-to-use CI/CD workflow
-- 🧠 **LLM Integration**: Optional AI-powered change analysis and explanations
+### Core Functionality
 
-## Quick Start
+- **API Snapshot Generation**: Uses Microsoft API Extractor to create detailed API snapshots
+- **Breaking Change Detection**: Intelligent analysis of API changes with severity classification
+- **Version Bump Validation**: Ensures semantic versioning compliance
+- **Suppression Management**: Flexible system for managing false positives
+- **Rich Reporting**: Markdown reports with code diffs and actionable insights
 
-### Installation
+### Production Storage Solutions
+
+- **Google Cloud Storage (GCS)**: Primary production storage with lifecycle management
+- **Multi-Backend Support**: Automatic failover between storage backends
+- **Health Monitoring**: Real-time storage backend health checks
+- **Cost Optimization**: Intelligent storage class transitions and cleanup
+- **Batch Operations**: Efficient bulk snapshot operations
+
+### CI/CD Integration
+
+- **GitHub Actions**: Automated PR checking and status updates
+- **Turborepo Integration**: Leverages existing cache infrastructure
+- **Parallel Processing**: Concurrent package analysis for speed
+- **Artifact Management**: Efficient storage and retrieval of snapshots
+
+## 📦 Installation
 
 ```bash
-# In your monorepo root
-pnpm add -D @clerk/api-breakage-detector
+# Install the tool
+pnpm install @clerk/api-breakage-detector
+
+# Install optional cloud storage dependencies
+pnpm install @google-cloud/storage  # For GCS support
+pnpm install @aws-sdk/client-s3     # For S3 support
+pnpm install @azure/storage-blob    # For Azure support
 ```
 
-### Initialize Configuration
+## 🔧 Configuration
 
-```bash
-npx api-breakage-detector init
-```
+### Basic Configuration
 
-This creates a `.api-breakage.config.json` file:
+Create `.api-breakage.config.json` in your repository root:
 
 ```json
 {
-  "excludePackages": [],
+  "packages": ["@your-org/package1", "@your-org/package2"],
+  "excludePackages": ["@your-org/testing"],
+  "snapshotsDir": ".api-snapshots",
+  "mainBranch": "main",
+  "checkVersionBump": true,
+  "suppressedChanges": []
+}
+```
+
+### Production GCS Configuration
+
+```json
+{
+  "packages": ["@your-org/package1", "@your-org/package2"],
+  "excludePackages": ["@your-org/testing"],
   "snapshotsDir": ".api-snapshots",
   "mainBranch": "main",
   "checkVersionBump": true,
   "suppressedChanges": [],
-  "enableLLMAnalysis": false,
-  "llmProvider": "openai"
+  "storage": {
+    "primary": {
+      "type": "gcs",
+      "options": {
+        "projectId": "your-gcp-project",
+        "bucket": "your-api-snapshots-bucket",
+        "prefix": "api-snapshots",
+        "multiRegion": true,
+        "enableVersioning": true,
+        "lifecycle": {
+          "enabled": true,
+          "deleteAfterDays": 365,
+          "archiveAfterDays": 90
+        },
+        "storageClass": "STANDARD"
+      }
+    },
+    "fallback": [
+      {
+        "type": "git-lfs",
+        "options": {
+          "repositoryUrl": "https://github.com/your-org/api-snapshots.git",
+          "branch": "main",
+          "snapshotsPath": "snapshots"
+        }
+      }
+    ],
+    "healthCheckInterval": 10,
+    "retryAttempts": 3,
+    "retryDelay": 1000
+  }
 }
 ```
 
-### Run Detection
-
-```bash
-npx api-breakage-detector detect
-```
-
-## Usage
+## 🛠️ Usage
 
 ### CLI Commands
 
-#### `detect`
-
-Runs the API breaking changes detection:
-
 ```bash
-npx api-breakage-detector detect [options]
+# Initialize configuration
+api-breakage-detector init
 
-Options:
-  -c, --config <path>      Path to configuration file (default: ".api-breakage.config.json")
-  -o, --output <path>      Output path for report
-  --format <format>        Output format: markdown|json (default: "markdown")
-  --workspace <path>       Workspace root path (default: current directory)
-  --main-branch <branch>   Main branch name (default: "main")
-  --no-version-check       Skip version bump validation
-  --fail-on-breaking      Exit with error code if breaking changes detected
-```
+# Generate API snapshots
+api-breakage-detector snapshot
 
-#### `suppress`
+# Detect breaking changes
+api-breakage-detector detect
 
-Add a suppression for a specific change:
+# Storage management
+api-breakage-detector storage health
+api-breakage-detector storage stats
+api-breakage-detector storage cleanup --days 30
 
-```bash
-npx api-breakage-detector suppress \
-  --package "@clerk/react" \
-  --change-id "a1b2c3d4" \
-  --reason "Internal refactoring, not a breaking change" \
-  --days 30
-```
-
-#### `cleanup`
-
-Clean up expired suppressions and temporary files:
-
-```bash
-npx api-breakage-detector cleanup
+# Suppression management
+api-breakage-detector suppress -p @your-org/package -i change-id -r "Reason"
+api-breakage-detector cleanup
 ```
 
 ### Programmatic Usage
@@ -97,297 +132,240 @@ import { BreakingChangesDetector } from '@clerk/api-breakage-detector';
 const detector = new BreakingChangesDetector({
   workspaceRoot: process.cwd(),
   config: {
-    excludePackages: ['@clerk/testing'],
+    packages: ['@your-org/package'],
+    excludePackages: [],
+    snapshotsDir: '.api-snapshots',
     mainBranch: 'main',
     checkVersionBump: true,
     suppressedChanges: [],
+    storage: {
+      primary: {
+        type: 'gcs',
+        options: {
+          projectId: 'your-project',
+          bucket: 'your-bucket',
+        },
+      },
+    },
   },
 });
 
 const result = await detector.detectBreakingChanges();
-const report = await detector.generateReport(result, 'markdown');
-
-console.log(report);
+console.log(result);
 ```
 
-## Configuration
+## ☁️ Google Cloud Storage Setup
 
-### Basic Configuration
+### Prerequisites
 
-```json
-{
-  "packages": ["@clerk/*"],
-  "excludePackages": ["@clerk/testing", "@clerk/localizations"],
-  "snapshotsDir": ".api-snapshots",
-  "mainBranch": "main",
-  "checkVersionBump": true
-}
-```
+1. Google Cloud Project with billing enabled
+2. Cloud Storage API enabled
+3. Service account with Storage Object Admin permissions
 
-### Suppression System
-
-Suppressions allow you to ignore specific changes that aren't actually breaking:
-
-```json
-{
-  "suppressedChanges": [
-    {
-      "package": "@clerk/react",
-      "changeId": "a1b2c3d4",
-      "reason": "Internal refactoring, maintains backward compatibility",
-      "expires": "2024-12-31T23:59:59.999Z"
-    }
-  ]
-}
-```
-
-### LLM Integration
-
-Enable AI-powered change analysis:
-
-```json
-{
-  "enableLLMAnalysis": true,
-  "llmProvider": "openai",
-  "llmApiKey": "your-api-key"
-}
-```
-
-Set via environment variables:
+### Quick Setup
 
 ```bash
-export OPENAI_API_KEY="your-openai-key"
-# or
-export ANTHROPIC_API_KEY="your-anthropic-key"
+# Set up GCS bucket
+export PROJECT_ID="your-project-id"
+export BUCKET_NAME="your-api-snapshots"
+
+gsutil mb -p $PROJECT_ID -c STANDARD -l us-central1 gs://$BUCKET_NAME
+gsutil versioning set on gs://$BUCKET_NAME
+
+# Create service account
+gcloud iam service-accounts create api-breakage-detector \
+  --display-name="API Breakage Detector"
+
+# Generate key
+gcloud iam service-accounts keys create sa-key.json \
+  --iam-account=api-breakage-detector@$PROJECT_ID.iam.gserviceaccount.com
+
+# Set permissions
+gsutil iam ch serviceAccount:api-breakage-detector@$PROJECT_ID.iam.gserviceaccount.com:objectAdmin gs://$BUCKET_NAME
 ```
 
-## GitHub Actions Integration
+### Environment Variables
 
-Add the workflow to `.github/workflows/api-breakage-check.yml`:
+```bash
+export GOOGLE_APPLICATION_CREDENTIALS="/path/to/sa-key.json"
+export GOOGLE_CLOUD_PROJECT="your-project-id"
+export GCS_BUCKET="your-api-snapshots"
+```
+
+## 🔄 GitHub Actions Integration
 
 ```yaml
-name: API Breakage Detection
+name: API Breakage Check
 
 on:
   pull_request:
     branches: [main]
-    paths: ['packages/**']
-
-permissions:
-  contents: read
-  pull-requests: write
-  checks: write
 
 jobs:
-  detect-api-changes:
+  api-breakage-check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
-          cache: 'pnpm'
+          node-version: '18'
 
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm build:declarations
-
-      - name: Run API breakage detection
+      - name: Setup GCS credentials
         run: |
-          npx api-breakage-detector detect \
-            --format markdown \
-            --output /tmp/api-report.md \
-            --fail-on-breaking
+          echo '${{ secrets.GCS_SERVICE_ACCOUNT_KEY }}' > /tmp/gcs-key.json
+          echo "GOOGLE_APPLICATION_CREDENTIALS=/tmp/gcs-key.json" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Check API breaking changes
+        run: |
+          pnpm api-breakage-detector detect \
+            --fail-on-breaking \
+            --output api-breakage-report.md
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GOOGLE_CLOUD_PROJECT: ${{ secrets.GCS_PROJECT_ID }}
+          GCS_BUCKET: ${{ secrets.GCS_BUCKET }}
+
+      - name: Comment PR
+        uses: actions/github-script@v7
+        if: always()
+        with:
+          script: |
+            const fs = require('fs');
+            if (fs.existsSync('api-breakage-report.md')) {
+              const report = fs.readFileSync('api-breakage-report.md', 'utf8');
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: report
+              });
+            }
 ```
 
-## Example Reports
+## 📊 Storage Features
 
-### Breaking Changes Detected
+### Cost Optimization
 
-````markdown
-# 💥 Breaking Changes Detected
+- **Lifecycle Management**: Automatic transition to cheaper storage classes
+- **Compression**: Automatic gzip compression for files > 1KB
+- **Cleanup**: Configurable retention policies
+- **Monitoring**: Built-in cost tracking and alerts
 
-![CI Status](https://img.shields.io/badge/CI-FAIL-red) ![Breaking Changes](https://img.shields.io/badge/Breaking%20Changes-3-red)
+### Reliability
 
-## Summary
+- **Multi-Regional**: Global availability and redundancy
+- **Versioning**: Object versioning for data protection
+- **Health Checks**: Continuous monitoring and failover
+- **Retry Logic**: Exponential backoff for transient failures
 
-📊 **2** out of **5** packages have API changes:
+### Performance
 
-- 💥 **3** breaking changes
-- 🔄 **1** non-breaking changes
-- ✨ **2** new additions
+- **Parallel Operations**: Concurrent uploads and downloads
+- **Caching**: Intelligent baseline caching
+- **Batch Processing**: Efficient bulk operations
+- **Edge Caching**: Global CDN integration
 
-### Version Bump Recommendations
+## 🔍 Monitoring and Observability
 
-⚠️ The following packages need version bumps:
-
-- **@clerk/react**: 5.31.8 → recommended **major** bump
-
-## Package Details
-
-### 💥 @clerk/react
-
-**Version:** 5.31.8 → 5.32.0 (minor bump)
-
-⚠️ **Version bump required:** This package needs a **major** version bump
-
-#### 💥 Breaking Changes
-
-- **function** `Function 'useAuth' signature changed`
-  <details>
-  <summary>Show diff</summary>
-
-  ```diff
-  - useAuth(): AuthData
-  + useAuth(options?: AuthOptions): AuthData
-  ```
-````
-
-  </details>
-
-- **interface** `Interface 'UserResource' removed member 'internalId'`
-
-#### ✨ New Additions
-
-- **function** `Added function 'useAuthContext'`
-
-````
-
-### No Changes Detected
-
-```markdown
-# ✅ No API Changes
-
-![CI Status](https://img.shields.io/badge/CI-PASS-green)
-
-## Summary
-
-✅ No API changes detected in any packages.
-
-All public APIs remain stable and backward compatible.
-
-## Next Steps
-
-✅ No API changes detected.
-
-**Safe to merge.**
-````
-
-## Architecture
-
-### Folder Structure
-
-```
-tools/api-breakage-detector/
-├── src/
-│   ├── core/
-│   │   └── detector.ts          # Main orchestrator
-│   │   ├── utils/
-│   │   │   ├── package-discovery.ts # Package discovery logic
-│   │   │   ├── api-extractor.ts     # API Extractor integration
-│   │   │   ├── git-manager.ts       # Git operations
-│   │   │   └── suppression-manager.ts # Suppression handling
-│   │   ├── analyzers/
-│   │   │   ├── api-diff.ts          # API comparison logic
-│   │   │   └── version-analyzer.ts  # Version bump validation
-│   │   ├── reporters/
-│   │   │   └── markdown-reporter.ts # Report generation
-│   │   ├── types.ts                 # Type definitions
-│   │   ├── cli.ts                   # CLI interface
-│   │   └── index.ts                 # Public API
-│   ├── bin/
-│   │   └── cli.js                   # CLI entry point
-│   └── package.json
-```
-
-### Snapshot Storage
-
-```
-.api-snapshots/
-├── baseline/                    # Cached snapshots from main branch
-│   ├── @clerk__react.api.json
-│   └── @clerk__nextjs.api.json
-├── current/                     # Current branch snapshots (temporary)
-│   ├── @clerk__react.api.json
-│   └── @clerk__nextjs.api.json
-└── .baseline-cache.json         # Cache metadata
-```
-
-## Advanced Features
-
-### Custom Analyzers
-
-Extend the analyzer system:
-
-```typescript
-import { ApiDiffAnalyzer, ApiChange } from '@clerk/api-breakage-detector';
-
-class CustomAnalyzer extends ApiDiffAnalyzer {
-  protected compareCustomItems(current: ApiItem, previous: ApiItem): ApiChange[] {
-    // Custom analysis logic
-    return [];
-  }
-}
-```
-
-### LLM-Powered Analysis
-
-When enabled, the tool can use AI to:
-
-- Generate natural language explanations of changes
-- Suggest whether changes are truly breaking
-- Auto-generate changelog entries
-- Provide migration guidance
-
-### Monorepo Integration
-
-The tool integrates seamlessly with:
-
-- **pnpm workspaces**
-- **Turbo** (respects build dependencies)
-- **Changesets** (validates version bumps)
-- **GitHub Actions** (automated PR comments)
-
-## Troubleshooting
-
-### Common Issues
-
-**API Extractor fails to generate snapshots:**
-
-- Ensure TypeScript declarations are built first
-- Check that `tsconfig.json` is properly configured
-- Verify package exports are correctly defined
-
-**False positive breaking changes:**
-
-- Use suppressions for legitimate non-breaking changes
-- Review API Extractor configuration
-- Consider if the change affects public API surface
-
-**Performance issues:**
-
-- Enable baseline caching (automatic)
-- Exclude non-public packages
-- Run on specific packages only
-
-### Debug Mode
+### Health Checks
 
 ```bash
-DEBUG=api-breakage-detector:* npx api-breakage-detector detect
+# Check storage backend health
+api-breakage-detector storage health
+
+# Get storage statistics
+api-breakage-detector storage stats
+
+# Monitor costs and usage
+gsutil du -sh gs://your-bucket
 ```
 
-## Contributing
+### Metrics
 
-1. Clone the repository
-2. Install dependencies: `pnpm install`
-3. Build the tool: `cd tools/api-breakage-detector && pnpm build`
-4. Run tests: `pnpm test`
-5. Test locally: `pnpm run detect --workspace ../..`
+- Storage usage and costs
+- API request rates and errors
+- Upload/download latency
+- Health check failures
+- Snapshot generation times
 
-## License
+## 🛡️ Security
 
-MIT License - see LICENSE file for details.
+### Best Practices
+
+- **Least Privilege**: Minimal IAM permissions
+- **Encryption**: Automatic encryption at rest
+- **Audit Logging**: Comprehensive access logs
+- **Private Access**: No public bucket access
+- **Key Management**: Secure credential handling
+
+### Compliance
+
+- **Data Retention**: Configurable retention policies
+- **Access Control**: Fine-grained permissions
+- **Audit Trail**: Complete operation logging
+- **Backup**: Multi-region redundancy
+
+## 📚 Documentation
+
+- [GCS Production Setup Guide](./docs/GCS_PRODUCTION_SETUP.md)
+- [Configuration Reference](./docs/CONFIGURATION.md)
+- [Troubleshooting Guide](./docs/TROUBLESHOOTING.md)
+- [API Reference](./docs/API.md)
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Submit a pull request
+
+## 📄 License
+
+MIT License - see [LICENSE](./LICENSE) for details.
+
+## 🆘 Support
+
+- [GitHub Issues](https://github.com/your-org/api-breakage-detector/issues)
+- [Documentation](./docs/)
+- [GCS Support](https://cloud.google.com/support)
+
+---
+
+Built with ❤️ for reliable API evolution in production environments.
+
+## 🔐 Environment Variables
+
+The API Breakage Detector uses the following environment variables for authentication:
+
+### Google Cloud Storage Configuration
+
+| Variable         | Description          | Required | Example              |
+| ---------------- | -------------------- | -------- | -------------------- |
+| `GCS_PROJECT_ID` | Your GCP project ID  | **Yes**  | `'my-gcp-project'`   |
+| `GCS_BUCKET`     | Your GCS bucket name | **Yes**  | `'my-api-snapshots'` |
+
+### Google Cloud Storage Authentication (choose one)
+
+| Variable                         | Description                          | Example                                 |
+| -------------------------------- | ------------------------------------ | --------------------------------------- |
+| `GOOGLE_SERVICE_ACCOUNT_KEY`     | JSON service account key content     | `'{"type":"service_account",...}'`      |
+| `GOOGLE_APPLICATION_CREDENTIALS` | Path to service account key file     | `'/path/to/key.json'`                   |
+| _(none)_                         | Uses default application credentials | `gcloud auth application-default login` |
+
+### GitHub Integration (for CI/CD)
+
+| Variable            | Description                     | Example              |
+| ------------------- | ------------------------------- | -------------------- |
+| `GITHUB_TOKEN`      | GitHub API token                | `'ghp_...'`          |
+| `GITHUB_REPOSITORY` | Repository in owner/repo format | `'clerk/javascript'` |
+
+For detailed setup instructions, see [`docs/GCS_ENV_SETUP.md`](./docs/GCS_ENV_SETUP.md).
+
+## �� Storage Backends

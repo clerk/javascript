@@ -8,6 +8,7 @@ import { VersionAnalyzer } from '../analyzers/version-analyzer.js';
 import { ReportGenerator } from '../reporters/markdown-reporter.js';
 import { SuppressionManager } from '../utils/suppression-manager.js';
 import type { Config, PackageInfo, AnalysisResult, PackageAnalysis } from '../types.js';
+import { StorageManager, type StorageManagerConfig } from '../storage/storage-manager.js';
 
 export interface DetectorOptions {
   workspaceRoot: string;
@@ -29,6 +30,7 @@ export class BreakingChangesDetector {
   private reportGenerator: ReportGenerator;
   private suppressionManager: SuppressionManager;
   private snapshotsDir: string;
+  private storageManager?: StorageManager;
 
   constructor(private options: DetectorOptions) {
     this.packageDiscovery = new PackageDiscovery(options.workspaceRoot);
@@ -39,6 +41,11 @@ export class BreakingChangesDetector {
     this.reportGenerator = new ReportGenerator();
     this.suppressionManager = new SuppressionManager(options.config.suppressedChanges);
     this.snapshotsDir = path.resolve(options.workspaceRoot, options.config.snapshotsDir);
+
+    // Initialize storage manager if storage config is provided
+    if (this.options.config.storage) {
+      this.storageManager = new StorageManager(this.options.config.storage as StorageManagerConfig);
+    }
   }
 
   async detectBreakingChanges(): Promise<AnalysisResult> {
@@ -104,9 +111,9 @@ export class BreakingChangesDetector {
   }
 
   private async getBaselineSnapshots(packages: PackageInfo[]): Promise<Map<string, string>> {
-    // Check if we should use Git-stored baselines (for CI)
-    if (this.options.config.ci?.baselineStorage === 'git') {
-      return this.loadGitStoredBaseline(packages);
+    // Check if we should use storage-based baselines (for CI)
+    if (this.storageManager && this.options.config.ci?.baselineStorage) {
+      return this.loadStorageBaseline(packages);
     }
 
     // Check if cache is valid first
@@ -150,6 +157,32 @@ export class BreakingChangesDetector {
     } finally {
       // Switch back to original branch
       await this.gitManager.checkoutBranch(currentBranch);
+    }
+
+    return snapshots;
+  }
+
+  private async loadStorageBaseline(packages: PackageInfo[]): Promise<Map<string, string>> {
+    console.log('  📦 Loading storage-based baseline snapshots...');
+    const snapshots = new Map<string, string>();
+
+    if (!this.storageManager) {
+      console.warn('  ⚠️ Storage manager not configured, falling back to local baseline');
+      return this.loadGitStoredBaseline(packages);
+    }
+
+    for (const pkg of packages) {
+      try {
+        const baseline = await this.storageManager.getBaseline(pkg.name, this.options.config.mainBranch);
+        if (baseline) {
+          snapshots.set(pkg.name, baseline.filePath);
+          console.log(`    ✅ Found baseline for ${pkg.name}`);
+        } else {
+          console.log(`    ⚠️ No baseline found for ${pkg.name} (new package?)`);
+        }
+      } catch (error) {
+        console.warn(`    ⚠️ Failed to load baseline for ${pkg.name}:`, error);
+      }
     }
 
     return snapshots;
@@ -366,8 +399,41 @@ export class BreakingChangesDetector {
       } else {
         console.log('  No current snapshots directory to clean up');
       }
+
+      if (this.storageManager) {
+        console.log('🧹 Cleaning up snapshots older than 30 days...');
+        await this.storageManager.cleanup(30);
+      }
     } catch (error) {
       console.warn('⚠️ Cleanup failed:', error);
+    }
+  }
+
+  /**
+   * Get storage health and statistics
+   */
+  async getStorageInfo(): Promise<{
+    health: any[];
+    stats: any;
+  }> {
+    if (!this.storageManager) {
+      return {
+        health: [],
+        stats: { totalSize: 0, snapshotCount: 0, oldestSnapshot: '', newestSnapshot: '' },
+      };
+    }
+
+    const [health, stats] = await Promise.all([this.storageManager.getHealthStatus(), this.storageManager.getStats()]);
+
+    return { health, stats };
+  }
+
+  /**
+   * Shutdown and cleanup resources
+   */
+  async shutdown(): Promise<void> {
+    if (this.storageManager) {
+      await this.storageManager.shutdown();
     }
   }
 }

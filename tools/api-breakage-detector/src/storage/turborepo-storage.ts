@@ -2,205 +2,306 @@ import fs from 'fs-extra';
 import path from 'path';
 import { exec } from 'child_process';
 import { promisify } from 'util';
-import type { PackageInfo } from '../types.js';
+import {
+  BaseStorageBackend,
+  type SnapshotMetadata,
+  type BaselineSnapshot,
+  type StorageConfig,
+} from './base-storage.js';
 
 const execAsync = promisify(exec);
 
 export interface TurborepoStorageOptions {
-  workspaceRoot: string;
-  remoteCache?: {
-    enabled: boolean;
-    teamId?: string;
-    token?: string;
-  };
+  cacheDir?: string;
+  teamId?: string;
+  token?: string;
+  remoteCache?: boolean;
+  namespace?: string;
 }
 
 /**
- * Storage adapter that uses Turborepo's remote caching to store API snapshots
+ * Turborepo Cache Storage Backend
+ *
+ * Leverages Turborepo's caching system for storing API snapshots.
+ * Integrates with existing build cache infrastructure and supports
+ * both local and remote caching.
+ *
+ * Features:
+ * - Integration with Turborepo cache
+ * - Local and remote cache support
+ * - Automatic cache key generation
+ * - Built-in deduplication
+ * - Fast retrieval and storage
  */
-export class TurborepoStorage {
-  constructor(private options: TurborepoStorageOptions) {}
+export class TurborepoStorageBackend extends BaseStorageBackend {
+  private options: TurborepoStorageOptions;
+  private cacheDir: string;
 
-  /**
-   * Generate and cache API snapshots using Turborepo
-   */
-  async generateSnapshots(packages: PackageInfo[]): Promise<Map<string, string>> {
-    console.log('📦 Generating API snapshots with Turborepo cache...');
+  constructor(config: StorageConfig) {
+    super(config);
+    this.options = config.options as TurborepoStorageOptions;
+    this.cacheDir = this.options.cacheDir || path.join(process.cwd(), 'node_modules/.cache/turbo');
+  }
+
+  async store(packageName: string, snapshotPath: string, metadata: SnapshotMetadata): Promise<string> {
+    this.validateMetadata(metadata);
+
+    const cacheKey = this.generateCacheKey(packageName, metadata.commitHash);
+    const cacheDir = path.join(this.cacheDir, this.getCacheNamespace(), cacheKey);
 
     try {
-      // Run the api:snapshot task for all packages
-      const { stdout, stderr } = await execAsync('npx turbo run api:snapshot --filter="@clerk/*"', {
-        cwd: this.options.workspaceRoot,
-      });
+      await fs.ensureDir(cacheDir);
 
-      console.log('Turborepo output:', stdout);
-      if (stderr) console.warn('Turborepo warnings:', stderr);
+      // Store the snapshot file
+      const snapshotFile = path.join(cacheDir, 'snapshot.api.json');
+      await fs.copy(snapshotPath, snapshotFile);
 
-      // Collect generated snapshots
-      return this.collectSnapshots(packages);
+      // Store metadata
+      const metadataFile = path.join(cacheDir, 'metadata.json');
+      await fs.writeJson(metadataFile, metadata, { spaces: 2 });
+
+      console.log(`✅ Stored snapshot for ${packageName} in Turborepo cache`);
+      return cacheKey;
     } catch (error) {
-      console.error('Failed to generate snapshots with Turborepo:', error);
-      throw error;
+      throw new Error(`Failed to store snapshot in Turborepo cache: ${error}`);
     }
   }
 
-  /**
-   * Load baseline snapshots from Turborepo cache or generate them
-   */
-  async loadBaseline(packages: PackageInfo[], commitSha?: string): Promise<Map<string, string>> {
-    console.log('🌿 Loading baseline snapshots from Turborepo cache...');
-
-    // Try to restore from cache first
-    const cacheKey = await this.getCacheKey(commitSha);
-    const restored = await this.restoreFromCache(cacheKey);
-
-    if (restored) {
-      console.log('✅ Restored baseline from Turborepo cache');
-      return this.collectSnapshots(packages, 'baseline');
-    }
-
-    // Generate baseline if not in cache
-    console.log('🔄 Generating fresh baseline snapshots...');
-    const snapshots = await this.generateBaseline(packages, commitSha);
-
-    // Cache the baseline for future use
-    await this.cacheBaseline(cacheKey);
-
-    return snapshots;
-  }
-
-  /**
-   * Generate baseline snapshots from a specific commit
-   */
-  private async generateBaseline(packages: PackageInfo[], commitSha?: string): Promise<Map<string, string>> {
-    const originalHead = await this.getCurrentCommit();
+  async retrieve(packageName: string, commitHash: string): Promise<string | null> {
+    const cacheKey = this.generateCacheKey(packageName, commitHash);
+    const cacheDir = path.join(this.cacheDir, this.getCacheNamespace(), cacheKey);
+    const snapshotFile = path.join(cacheDir, 'snapshot.api.json');
 
     try {
-      if (commitSha) {
-        await execAsync(`git checkout ${commitSha}`, { cwd: this.options.workspaceRoot });
+      if (!(await fs.pathExists(snapshotFile))) {
+        return null;
       }
 
-      // Generate snapshots at this commit
-      await execAsync('npx turbo run api:snapshot --filter="@clerk/*" --force', { cwd: this.options.workspaceRoot });
+      // Copy to a temporary location for retrieval
+      const tempDir = path.join(process.cwd(), '.tmp', 'retrieved-snapshots');
+      await fs.ensureDir(tempDir);
 
-      // Move current snapshots to baseline
-      const snapshotsDir = path.join(this.options.workspaceRoot, '.api-snapshots');
-      const currentDir = path.join(snapshotsDir, 'current');
-      const baselineDir = path.join(snapshotsDir, 'baseline');
+      const localPath = path.join(tempDir, `${packageName.replace(/[@/]/g, '_')}_${commitHash}.api.json`);
+      await fs.copy(snapshotFile, localPath);
 
-      if (await fs.pathExists(currentDir)) {
-        await fs.remove(baselineDir);
-        await fs.move(currentDir, baselineDir);
-      }
-
-      return this.collectSnapshots(packages, 'baseline');
-    } finally {
-      // Always return to original commit
-      await execAsync(`git checkout ${originalHead}`, { cwd: this.options.workspaceRoot });
+      return localPath;
+    } catch (error) {
+      console.warn(`Failed to retrieve snapshot from Turborepo cache:`, error);
+      return null;
     }
   }
 
-  /**
-   * Collect snapshot file paths for packages
-   */
-  private async collectSnapshots(
-    packages: PackageInfo[],
-    type: 'current' | 'baseline' = 'current',
-  ): Promise<Map<string, string>> {
-    const snapshots = new Map<string, string>();
-    const snapshotsDir = path.join(this.options.workspaceRoot, '.api-snapshots', type);
-
-    for (const pkg of packages) {
-      const snapshotPath = path.join(snapshotsDir, `${pkg.name.replace('/', '__')}.api.json`);
-      if (await fs.pathExists(snapshotPath)) {
-        snapshots.set(pkg.name, snapshotPath);
-      }
-    }
-
-    return snapshots;
-  }
-
-  /**
-   * Generate cache key based on commit SHA and package contents
-   */
-  private async getCacheKey(commitSha?: string): Promise<string> {
-    if (!commitSha) {
-      commitSha = await this.getCurrentCommit();
-    }
-
-    // Turborepo will handle the actual cache key generation based on inputs
-    return `api-snapshots-${commitSha}`;
-  }
-
-  /**
-   * Try to restore snapshots from Turborepo cache
-   */
-  private async restoreFromCache(cacheKey: string): Promise<boolean> {
+  async getBaseline(packageName: string, branch: string = 'main'): Promise<BaselineSnapshot | null> {
     try {
-      // Check if cache exists (Turborepo will automatically restore if available)
-      const { stdout } = await execAsync('npx turbo run api:snapshot --filter="@clerk/*" --dry-run', {
-        cwd: this.options.workspaceRoot,
-      });
+      // Find the most recent snapshot for this package on the main branch
+      const snapshots = await this.listSnapshots(packageName, { branch, limit: 1 });
 
-      return stdout.includes('cache hit');
-    } catch {
+      if (snapshots.length === 0) {
+        return null;
+      }
+
+      const latest = snapshots[0];
+      const localPath = await this.retrieve(packageName, latest.commitHash);
+
+      if (!localPath) {
+        return null;
+      }
+
+      return {
+        packageName,
+        filePath: localPath,
+        metadata: latest,
+      };
+    } catch (error) {
+      console.warn(`Failed to get baseline from Turborepo cache:`, error);
+      return null;
+    }
+  }
+
+  async listSnapshots(packageName: string, options?: { limit?: number; branch?: string }): Promise<SnapshotMetadata[]> {
+    const namespaceDir = path.join(this.cacheDir, this.getCacheNamespace());
+
+    try {
+      if (!(await fs.pathExists(namespaceDir))) {
+        return [];
+      }
+
+      const entries = await fs.readdir(namespaceDir);
+      const snapshots: SnapshotMetadata[] = [];
+
+      // Filter cache entries that match this package
+      const packagePrefix = packageName.replace(/[@/]/g, '_');
+      const matchingEntries = entries.filter(entry => entry.startsWith(`${packagePrefix}_`));
+
+      for (const entry of matchingEntries) {
+        try {
+          const metadataFile = path.join(namespaceDir, entry, 'metadata.json');
+
+          if (await fs.pathExists(metadataFile)) {
+            const metadata: SnapshotMetadata = await fs.readJson(metadataFile);
+
+            // Filter by branch if specified
+            if (!options?.branch || metadata.branch === options.branch) {
+              snapshots.push(metadata);
+            }
+          }
+        } catch (error) {
+          console.warn(`Failed to read metadata for ${entry}:`, error);
+        }
+      }
+
+      // Sort by timestamp (newest first) and apply limit
+      const sortedSnapshots = snapshots.sort(
+        (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+      );
+
+      return options?.limit ? sortedSnapshots.slice(0, options.limit) : sortedSnapshots;
+    } catch (error) {
+      console.warn(`Failed to list snapshots from Turborepo cache:`, error);
+      return [];
+    }
+  }
+
+  async cleanup(retentionDays: number): Promise<void> {
+    const cutoffDate = new Date(Date.now() - retentionDays * 24 * 60 * 60 * 1000);
+    const namespaceDir = path.join(this.cacheDir, this.getCacheNamespace());
+    let cleanedCount = 0;
+
+    try {
+      if (!(await fs.pathExists(namespaceDir))) {
+        return;
+      }
+
+      const entries = await fs.readdir(namespaceDir);
+
+      for (const entry of entries) {
+        try {
+          const entryDir = path.join(namespaceDir, entry);
+          const metadataFile = path.join(entryDir, 'metadata.json');
+
+          if (await fs.pathExists(metadataFile)) {
+            const metadata: SnapshotMetadata = await fs.readJson(metadataFile);
+            const snapshotDate = new Date(metadata.timestamp);
+
+            if (snapshotDate < cutoffDate) {
+              await fs.remove(entryDir);
+              cleanedCount++;
+            }
+          }
+        } catch (error) {
+          console.warn(`Failed to process cache entry ${entry}:`, error);
+        }
+      }
+
+      console.log(`✅ Cleaned up ${cleanedCount} old snapshots from Turborepo cache`);
+    } catch (error) {
+      console.warn(`Failed to cleanup Turborepo cache:`, error);
+    }
+  }
+
+  async healthCheck(): Promise<boolean> {
+    try {
+      // Check if we can access the cache directory
+      await fs.ensureDir(this.cacheDir);
+
+      // Test write/read operations
+      const testDir = path.join(this.cacheDir, this.getCacheNamespace(), 'health-check');
+      const testFile = path.join(testDir, 'test.json');
+
+      await fs.ensureDir(testDir);
+      await fs.writeJson(testFile, { test: true });
+      await fs.readJson(testFile);
+      await fs.remove(testDir);
+
+      // Check Turborepo availability if remote cache is enabled
+      if (this.options.remoteCache) {
+        try {
+          await execAsync('npx turbo --version', { timeout: 5000 });
+        } catch (error) {
+          console.warn('Turborepo CLI not available, remote cache may not work');
+        }
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Turborepo cache health check failed:', error);
       return false;
     }
   }
 
-  /**
-   * Cache current baseline snapshots
-   */
-  private async cacheBaseline(cacheKey: string): Promise<void> {
-    // Turborepo automatically caches outputs based on turbo.json configuration
-    console.log(`📦 Baseline snapshots cached with key: ${cacheKey}`);
-  }
+  async getStats(): Promise<{
+    totalSize: number;
+    snapshotCount: number;
+    oldestSnapshot: string;
+    newestSnapshot: string;
+  }> {
+    const namespaceDir = path.join(this.cacheDir, this.getCacheNamespace());
 
-  /**
-   * Get current git commit SHA
-   */
-  private async getCurrentCommit(): Promise<string> {
-    const { stdout } = await execAsync('git rev-parse HEAD', { cwd: this.options.workspaceRoot });
-    return stdout.trim();
-  }
-
-  /**
-   * Configure Turborepo remote cache
-   */
-  async configureRemoteCache(): Promise<void> {
-    if (!this.options.remoteCache?.enabled) {
-      return;
-    }
-
-    const { teamId, token } = this.options.remoteCache;
-
-    if (teamId && token) {
-      await execAsync(`npx turbo login --team=${teamId} --token=${token}`, {
-        cwd: this.options.workspaceRoot,
-      });
-      console.log('✅ Turborepo remote cache configured');
-    }
-  }
-
-  /**
-   * Generate package-specific snapshots using Turborepo
-   */
-  async generatePackageSnapshot(pkg: PackageInfo): Promise<string | null> {
     try {
-      const { stdout } = await execAsync(`npx turbo run api:snapshot --filter="${pkg.name}"`, {
-        cwd: this.options.workspaceRoot,
-      });
+      if (!(await fs.pathExists(namespaceDir))) {
+        return {
+          totalSize: 0,
+          snapshotCount: 0,
+          oldestSnapshot: '',
+          newestSnapshot: '',
+        };
+      }
 
-      const snapshotPath = path.join(
-        this.options.workspaceRoot,
-        '.api-snapshots/current',
-        `${pkg.name.replace('/', '__')}.api.json`,
-      );
+      const entries = await fs.readdir(namespaceDir);
+      let totalSize = 0;
+      let snapshotCount = 0;
+      let oldestDate = new Date();
+      let newestDate = new Date(0);
 
-      return (await fs.pathExists(snapshotPath)) ? snapshotPath : null;
+      for (const entry of entries) {
+        try {
+          const entryDir = path.join(namespaceDir, entry);
+          const metadataFile = path.join(entryDir, 'metadata.json');
+          const snapshotFile = path.join(entryDir, 'snapshot.api.json');
+
+          if ((await fs.pathExists(metadataFile)) && (await fs.pathExists(snapshotFile))) {
+            const metadata: SnapshotMetadata = await fs.readJson(metadataFile);
+            const stats = await fs.stat(snapshotFile);
+            const snapshotDate = new Date(metadata.timestamp);
+
+            totalSize += stats.size;
+            snapshotCount++;
+
+            if (snapshotDate < oldestDate) {
+              oldestDate = snapshotDate;
+            }
+            if (snapshotDate > newestDate) {
+              newestDate = snapshotDate;
+            }
+          }
+        } catch (error) {
+          console.warn(`Failed to process cache entry ${entry}:`, error);
+        }
+      }
+
+      return {
+        totalSize,
+        snapshotCount,
+        oldestSnapshot: snapshotCount > 0 ? oldestDate.toISOString() : '',
+        newestSnapshot: snapshotCount > 0 ? newestDate.toISOString() : '',
+      };
     } catch (error) {
-      console.warn(`Failed to generate snapshot for ${pkg.name}:`, error);
-      return null;
+      console.warn(`Failed to get Turborepo cache stats:`, error);
+      return {
+        totalSize: 0,
+        snapshotCount: 0,
+        oldestSnapshot: '',
+        newestSnapshot: '',
+      };
     }
+  }
+
+  private generateCacheKey(packageName: string, commitHash: string): string {
+    const safeName = packageName.replace(/[@/]/g, '_');
+    return `${safeName}_${commitHash}`;
+  }
+
+  private getCacheNamespace(): string {
+    return this.options.namespace || 'api-snapshots';
   }
 }
