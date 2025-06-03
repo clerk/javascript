@@ -1,9 +1,16 @@
 import { useUser } from '@clerk/shared/react';
 import { useState } from 'react';
 
+import { ApplicationLogo } from '@/ui/elements/ApplicationLogo';
+import { Avatar } from '@/ui/elements/Avatar';
+import { Card } from '@/ui/elements/Card';
+import { withCardStateProvider } from '@/ui/elements/contexts';
+import { Header } from '@/ui/elements/Header';
+import { Modal } from '@/ui/elements/Modal';
+import { Tooltip } from '@/ui/elements/Tooltip';
+
 import { useEnvironment, useOAuthConsentContext } from '../../contexts';
 import { Box, Button, Flex, Flow, Grid, Icon, Text } from '../../customizables';
-import { ApplicationLogo, Avatar, Card, Header, Modal, Tooltip, withCardStateProvider } from '../../elements';
 import { LockDottedCircle } from '../../icons';
 import { Textarea } from '../../primitives';
 import type { ThemableCssProp } from '../../styledSystem';
