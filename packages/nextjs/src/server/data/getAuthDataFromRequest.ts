@@ -4,10 +4,10 @@ import {
   authenticatedMachineObject,
   AuthStatus,
   constants,
+  getAuthObjectFromJwt,
   getMachineTokenType,
   isMachineToken,
   isTokenTypeAccepted,
-  signedInAuthObject,
   signedOutAuthObject,
   TokenType,
   unauthenticatedMachineObject,
@@ -66,12 +66,7 @@ export const getAuthDataFromRequestSync = (
 
     opts.logger?.debug('jwt', jwt.raw);
 
-    // @ts-expect-error -- Restrict parameter type of options to only list what's needed
-    authObject = signedInAuthObject(options, jwt.raw.text, jwt.payload);
-  }
-
-  if (treatPendingAsSignedOut && authObject.sessionStatus === 'pending') {
-    authObject = signedOutAuthObject(options, authObject.sessionStatus);
+    return getAuthObjectFromJwt(jwt, options);
   }
 
   return authObject;
