@@ -649,6 +649,7 @@ export interface CommerceInitializedPaymentSourceJSON extends ClerkResourceJSON 
   object: 'commerce_payment_source_initialize';
   external_client_secret: string;
   external_gateway_id: string;
+  payment_method_order: string[];
 }
 
 export interface CommerceStatementJSON extends ClerkResourceJSON {
