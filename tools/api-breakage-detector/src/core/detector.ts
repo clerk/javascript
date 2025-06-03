@@ -322,7 +322,7 @@ export class BreakingChangesDetector {
     return this.reportGenerator.generateMarkdownReport(result);
   }
 
-  private async cleanup(): Promise<void> {
+  async cleanup(): Promise<void> {
     try {
       await this.apiExtractor.cleanup();
       // Clean up current snapshots (keep baseline for caching)

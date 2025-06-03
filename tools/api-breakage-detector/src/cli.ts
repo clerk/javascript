@@ -102,6 +102,9 @@ program
       // Generate snapshots only
       const snapshots = await detector.generateCurrentSnapshots(packages);
 
+      // Clean up temporary files
+      await detector.cleanup();
+
       console.log(chalk.green(`✅ Generated ${snapshots.size} API snapshots`));
 
       // List what was created
