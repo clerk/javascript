@@ -32,45 +32,6 @@ export function OAuthConsentInternal() {
     <Flow.Root flow='oauthConsent'>
       <Card.Root>
         <Card.Content>
-          <Box
-            sx={t => ({
-              marginBlockStart: `calc(${t.space.$8} * -1)`,
-              marginInline: `calc(${t.space.$10} * -1)`,
-              backgroundImage: `linear-gradient(to bottom, ${t.colors.$warningAlpha200}, transparent)`,
-              paddingBlockStart: t.space.$4,
-              paddingInline: t.space.$10,
-            })}
-          >
-            <Text
-              colorScheme='warning'
-              variant='caption'
-            >
-              Make sure that you trust {oAuthApplicationName} {''}
-              <Tooltip.Root>
-                <Tooltip.Trigger>
-                  <Text
-                    as='span'
-                    role='button'
-                    tabIndex={0}
-                    aria-label='View full URL'
-                    variant='caption'
-                    sx={{
-                      textDecoration: 'underline',
-                      textDecorationStyle: 'dotted',
-                      cursor: 'pointer',
-                      outline: 'none',
-                      display: 'inline-block',
-                    }}
-                    onClick={() => setIsUriModalOpen(true)}
-                  >
-                    ({getRootDomain()})
-                  </Text>
-                </Tooltip.Trigger>
-                <Tooltip.Content text={`View full URL`} />
-              </Tooltip.Root>
-              {''}. You may be sharing sensitive data with this site or app.
-            </Text>
-          </Box>
           <Header.Root>
             {/* both have avatars */}
             {oAuthApplicationLogoUrl && logoImageUrl && (
@@ -162,7 +123,7 @@ export function OAuthConsentInternal() {
             >
               <Text
                 variant='subtitle'
-                localizationKey='This app wants to access your account'
+                localizationKey={`This will allow ${oAuthApplicationName} access to:`}
               />
             </Box>
             <Box
@@ -196,11 +157,48 @@ export function OAuthConsentInternal() {
                 >
                   <Text
                     variant='subtitle'
-                    localizationKey={item.description || ''}
+                    localizationKey={item.description || item.scope || ''}
                   />
                 </Box>
               ))}
             </Box>
+          </Box>
+          <Box
+            sx={t => ({
+              background: 'rgba(243, 107, 22, 0.12)',
+              padding: t.space.$4,
+              borderRadius: t.radii.$lg,
+            })}
+          >
+            <Text
+              colorScheme='warning'
+              variant='caption'
+            >
+              Make sure that you trust {oAuthApplicationName} {''}
+              <Tooltip.Root>
+                <Tooltip.Trigger>
+                  <Text
+                    as='span'
+                    role='button'
+                    tabIndex={0}
+                    aria-label='View full URL'
+                    variant='caption'
+                    sx={{
+                      textDecoration: 'underline',
+                      textDecorationStyle: 'dotted',
+                      cursor: 'pointer',
+                      outline: 'none',
+                      display: 'inline-block',
+                    }}
+                    onClick={() => setIsUriModalOpen(true)}
+                  >
+                    ({getRootDomain()})
+                  </Text>
+                </Tooltip.Trigger>
+                <Tooltip.Content text={`View full URL`} />
+              </Tooltip.Root>
+              {''}. You may be sharing sensitive data with this site or app.
+            </Text>
           </Box>
           <Grid
             columns={2}
