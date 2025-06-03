@@ -319,7 +319,7 @@ export const deDE: LocalizationResource = {
       },
     },
     navbar: {
-      apiKeys: undefined,
+      apiKeys: 'API-Keys',
       billing: 'Abrechnung',
       description: 'Verwalten Sie ihre Organisation.',
       general: 'Allgemein',
