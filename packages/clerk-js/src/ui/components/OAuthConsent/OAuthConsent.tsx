@@ -283,7 +283,7 @@ function RedirectUriModal({ onOpen, onClose, isOpen, redirectUri, oAuthApplicati
           <Header.Root>
             <Header.Title localizationKey={`Redirect URL`} />
             <Header.Subtitle
-              localizationKey={`Make sure you trust ${oAuthApplicationName} and that this url belongs to ${oAuthApplicationName}.`}
+              localizationKey={`Make sure you trust ${oAuthApplicationName} and that this URL belongs to ${oAuthApplicationName}.`}
             />
           </Header.Root>
           <Textarea
