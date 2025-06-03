@@ -8,7 +8,7 @@ import type {
   SignUpFallbackRedirectUrl,
   SignUpForceRedirectUrl,
 } from '@clerk/types';
-import type { LoaderFunction, UNSAFE_DataWithResponseInit } from 'react-router';
+import type { LoaderFunction, LoaderFunctionArgs, UNSAFE_DataWithResponseInit } from 'react-router';
 
 export type GetAuthReturn = Promise<SignedInAuthObject | SignedOutAuthObject>;
 
@@ -73,8 +73,6 @@ type RootAuthLoaderCallbackReturn =
   | UNSAFE_DataWithResponseInit<unknown>
   | Promise<UNSAFE_DataWithResponseInit<unknown>>;
 
-// TODO: Figure out how to use the Route.LoaderArgs from userland code
-export type LoaderFunctionArgs = Parameters<LoaderFunction>[0];
 export type LoaderFunctionReturn = ReturnType<LoaderFunction>;
 
 export type LoaderFunctionArgsWithAuth<Options extends RootAuthLoaderOptions = any> = LoaderFunctionArgs & {
