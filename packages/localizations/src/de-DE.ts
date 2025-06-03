@@ -851,7 +851,7 @@ export const deDE: LocalizationResource = {
   },
   userProfile: {
     apiKeysPage: {
-      title: undefined,
+      title: 'API-Keys',
     },
     backupCodePage: {
       actionLabel__copied: 'Kopiert!',
