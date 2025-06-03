@@ -3,4 +3,4 @@
 '@clerk/types': patch
 ---
 
-Introduce types and locales for `<APIKeys />` component
+Add TypeScript types and en-US localization for upcoming `<APIKeys />` component. This component will initially be in early access.
