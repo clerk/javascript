@@ -8,7 +8,7 @@ type WithOptionalOrgType<T> = T & {
 };
 
 export interface CommerceBillingNamespace {
-  getPlans: () => Promise<CommercePlanResource[]>;
+  getPlans: (params?: GetPlansParams) => Promise<CommercePlanResource[]>;
   getSubscriptions: (params: GetSubscriptionsParams) => Promise<ClerkPaginatedResponse<CommerceSubscriptionResource>>;
   getStatements: (params: GetStatementsParams) => Promise<ClerkPaginatedResponse<CommerceStatementResource>>;
   startCheckout: (params: CreateCheckoutParams) => Promise<CommerceCheckoutResource>;
@@ -96,6 +96,7 @@ export interface CommercePaymentSourceResource extends ClerkResource {
   paymentMethod: string;
   cardType: string;
   isDefault: boolean;
+  isRemovable: boolean;
   status: CommercePaymentSourceStatus;
   walletType: string | undefined;
   remove: (params?: RemovePaymentSourceParams) => Promise<DeletedObjectResource>;
@@ -105,6 +106,7 @@ export interface CommercePaymentSourceResource extends ClerkResource {
 export interface CommerceInitializedPaymentSourceResource extends ClerkResource {
   externalClientSecret: string;
   externalGatewayId: string;
+  paymentMethodOrder: string[];
 }
 
 export type GetStatementsParams = WithOptionalOrgType<ClerkPaginationParams>;
@@ -168,6 +170,7 @@ export interface CommerceCheckoutTotals {
   taxTotal: CommerceMoney;
   totalDueNow: CommerceMoney;
   credit: CommerceMoney;
+  pastDue: CommerceMoney;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

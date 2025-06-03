@@ -6,7 +6,7 @@ catalogs:
   react:
     react: 18.3.1
     react-dom: 18.3.1
-    '@types/react': 18.3.21
+    '@types/react': 18.3.23
     '@types/react-dom': 18.3.7
 
   # Can be referenced through "catalog:peer-react"

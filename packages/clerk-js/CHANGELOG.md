@@ -1,5 +1,79 @@
 # Change Log
 
+## 5.67.5
+
+### Patch Changes
+
+- Fixes a bug where the session cookie was getting incorrectly set from tabs that do not reflect the active session. ([#5989](https://github.com/clerk/javascript/pull/5989)) by [@brkalow](https://github.com/brkalow)
+
+- Fix an issue where clerk-js was incorrectly emitting the new session's token during session switching. This impacts some applications that rely on Clerk's multi-session behavior. ([#5986](https://github.com/clerk/javascript/pull/5986)) by [@brkalow](https://github.com/brkalow)
+
+- Fix issue where the combined flow wouldn't trigger if a phone number was used as an identifier while set as an optional field. ([#5992](https://github.com/clerk/javascript/pull/5992)) by [@dstaley](https://github.com/dstaley)
+
+- Add "Past Due" amount on checkout flow when applicable ([#6014](https://github.com/clerk/javascript/pull/6014)) by [@octoper](https://github.com/octoper)
+
+- Handle missing `publicUserData` in `OrganizationMembership` ([#6016](https://github.com/clerk/javascript/pull/6016)) by [@tmilewski](https://github.com/tmilewski)
+
+- Add support for the signup_rate_limit_exceeded error on OAuth flows ([#6028](https://github.com/clerk/javascript/pull/6028)) by [@anagstef](https://github.com/anagstef)
+
+- Updated dependencies [[`f897773`](https://github.com/clerk/javascript/commit/f89777379da63cf45039c1570b51ba10a400817c), [`2c6a0cc`](https://github.com/clerk/javascript/commit/2c6a0cca6e824bafc6b0d0501784517a5b1f75ea), [`71e6a1f`](https://github.com/clerk/javascript/commit/71e6a1f1024d65b7a09cdc8fa81ce0164e0a34cb)]:
+  - @clerk/shared@3.9.5
+  - @clerk/localizations@3.16.3
+  - @clerk/types@4.59.3
+
+## 5.67.4
+
+### Patch Changes
+
+- Replaces `useFetch` with `useSWR` or `useSWRMutation` in all commerce related components. ([#5939](https://github.com/clerk/javascript/pull/5939)) by [@panteliselef](https://github.com/panteliselef)
+
+- Fix logic for allowing removal of all payment methods if there are no paid subscriptions ([#5975](https://github.com/clerk/javascript/pull/5975)) by [@aeliox](https://github.com/aeliox)
+
+- Pass the full statement id to the list item to ensure the full value is copied to clipboard. ([#5984](https://github.com/clerk/javascript/pull/5984)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Refactors checkout success highlight animation to fix an issue where background colors other that white, would not properly mask the highlight glow. ([#5991](https://github.com/clerk/javascript/pull/5991)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Drop throttling for multisession apps to fix edge cases when quickly switching between tabs with different sessions, in apps that have multisession support enabled. ([#5990](https://github.com/clerk/javascript/pull/5990)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`6ed3dfc`](https://github.com/clerk/javascript/commit/6ed3dfc1bc742ac9d9a2307fe8e4733411cbc0d7), [`f6a4a7b`](https://github.com/clerk/javascript/commit/f6a4a7b89b9728703ca1ec5bb63fdf2ae736e39c)]:
+  - @clerk/types@4.59.2
+  - @clerk/localizations@3.16.2
+  - @clerk/shared@3.9.4
+
+## 5.67.3
+
+### Patch Changes
+
+- Bug fix: Remove cancel subscription option when implicitly subscribed to the default free plan. ([#5946](https://github.com/clerk/javascript/pull/5946)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Maintain \_ _clerk_ticket and _ \_clerk_status query params through sign up verification flow ([#5965](https://github.com/clerk/javascript/pull/5965)) by [@jacekradko](https://github.com/jacekradko)
+
+- Maintain selected identifier when going through combined flow ([#5972](https://github.com/clerk/javascript/pull/5972)) by [@jacekradko](https://github.com/jacekradko)
+
+- Remove 'sms' channel parameter from phone code requests ([#5966](https://github.com/clerk/javascript/pull/5966)) by [@anagstef](https://github.com/anagstef)
+
+- Updated dependencies [[`f237d76`](https://github.com/clerk/javascript/commit/f237d7617e5398ca0ba981e4336cac2191505b00)]:
+  - @clerk/shared@3.9.3
+
+## 5.67.2
+
+### Patch Changes
+
+- Add support for country-specific alternative phone code channels ([#5937](https://github.com/clerk/javascript/pull/5937)) by [@anagstef](https://github.com/anagstef)
+
+- Allow removal of all payment methods when there are no active subscriptions ([#5963](https://github.com/clerk/javascript/pull/5963)) by [@aeliox](https://github.com/aeliox)
+
+- Removes z-index from keyless prompt to prevent overlay issues with drawers. ([#5951](https://github.com/clerk/javascript/pull/5951)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add checkout success animation highlight. ([#5940](https://github.com/clerk/javascript/pull/5940)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fixes issue where min/max username lengths errors were not properly interpolated within profile component. ([#5948](https://github.com/clerk/javascript/pull/5948)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`c305b31`](https://github.com/clerk/javascript/commit/c305b310e351e9ce2012f805b35e464c3e43e310), [`6bb480e`](https://github.com/clerk/javascript/commit/6bb480ef663a6dfa219bc9546aca087d5d9624d0)]:
+  - @clerk/localizations@3.16.1
+  - @clerk/types@4.59.1
+  - @clerk/shared@3.9.2
+
 ## 5.67.1
 
 ### Patch Changes

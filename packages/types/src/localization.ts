@@ -79,6 +79,7 @@ type _LocalizationResource = {
   signInEnterPasswordTitle: LocalizationValue;
   backButton: LocalizationValue;
   footerActionLink__useAnotherMethod: LocalizationValue;
+  footerActionLink__alternativePhoneCodeProvider: LocalizationValue;
   badge__primary: LocalizationValue;
   badge__thisDevice: LocalizationValue;
   badge__userDevice: LocalizationValue;
@@ -130,6 +131,7 @@ type _LocalizationResource = {
     subtotal: LocalizationValue;
     creditRemainder: LocalizationValue;
     totalDueToday: LocalizationValue;
+    pastDue: LocalizationValue;
     paymentMethods: LocalizationValue;
     addPaymentMethod: LocalizationValue;
     pay: LocalizationValue;

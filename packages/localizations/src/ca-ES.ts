@@ -71,6 +71,7 @@ export const caES: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     monthly: undefined,
+    pastDue: undefined,
     pay: undefined,
     paymentMethods: undefined,
     paymentSource: {
@@ -119,6 +120,7 @@ export const caES: LocalizationResource = {
     sameDay: "Avui a les {{ date | timeString('en-US') }}",
   },
   dividerText: 'o',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'Utilitza un altre mètode',
   footerPageLink__help: 'Ajuda',
   footerPageLink__privacy: 'Privacitat',

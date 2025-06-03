@@ -4,7 +4,7 @@ import { waitFor } from '@testing-library/dom';
 
 import { render } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
-import { CreateOrganization } from '../CreateOrganization';
+import { CreateOrganization } from '../';
 
 const { createFixtures } = bindCreateFixtures('CreateOrganization');
 

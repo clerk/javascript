@@ -21,12 +21,13 @@ import { useLoadingStatus } from '../../hooks';
 import { useRouter } from '../../router';
 import type { FormControlState } from '../../utils';
 import { buildRequest, createPasswordError, createUsernameError, handleError, useFormControl } from '../../utils';
-import { SignUpAlternativePhoneCodePhoneNumberCard } from './SignUpAlternativePhoneCodePhoneNumberCard';
+import { getPreferredAlternativePhoneChannel } from '../SignIn/utils';
 import { SignUpForm } from './SignUpForm';
 import type { ActiveIdentifier } from './signUpFormHelpers';
 import { determineActiveFields, emailOrPhone, getInitialActiveIdentifier, showFormFields } from './signUpFormHelpers';
 import { SignUpRestrictedAccess } from './SignUpRestrictedAccess';
 import { SignUpSocialButtons } from './SignUpSocialButtons';
+import { SignUpStartAlternativePhoneCodePhoneNumberCard } from './SignUpStartAlternativePhoneCodePhoneNumberCard';
 import { completeSignUpFlow } from './util';
 
 function SignUpStartInternal(): JSX.Element {
@@ -35,7 +36,7 @@ function SignUpStartInternal(): JSX.Element {
   const status = useLoadingStatus();
   const signUp = useCoreSignUp();
   const { showOptionalFields } = useAppearance().parsedLayout;
-  const { userSettings } = useEnvironment();
+  const { userSettings, authConfig } = useEnvironment();
   const { navigate } = useRouter();
   const { attributes } = userSettings;
   const { setActive } = useClerk();
@@ -43,8 +44,17 @@ function SignUpStartInternal(): JSX.Element {
   const isWithinSignInContext = !!React.useContext(SignInContext);
   const { afterSignUpUrl, signInUrl, unsafeMetadata } = ctx;
   const isCombinedFlow = !!(ctx.isCombinedFlow && !!isWithinSignInContext);
-  const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
-    getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
+  const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(() =>
+    getInitialActiveIdentifier(attributes, userSettings.signUp.progressive, {
+      phoneNumber: ctx.initialValues?.phoneNumber === null ? undefined : ctx.initialValues?.phoneNumber,
+      emailAddress: ctx.initialValues?.emailAddress === null ? undefined : ctx.initialValues?.emailAddress,
+      ...(isCombinedFlow
+        ? {
+            emailAddress: signUp.emailAddress,
+            phoneNumber: signUp.phoneNumber,
+          }
+        : {}),
+    }),
   );
   const { t, locale } = useLocalizations();
   const initialValues = ctx.initialValues || {};
@@ -184,6 +194,7 @@ function SignUpStartInternal(): JSX.Element {
           case ERROR_CODES.CAPTCHA_INVALID:
           case ERROR_CODES.FRAUD_DEVICE_BLOCKED:
           case ERROR_CODES.FRAUD_ACTION_BLOCKED:
+          case ERROR_CODES.SIGNUP_RATE_LIMIT_EXCEEDED:
             card.setError(error);
             break;
           default:
@@ -207,8 +218,6 @@ function SignUpStartInternal(): JSX.Element {
     }
     setActiveCommIdentifierType(type);
   };
-
-  const alternativePhoneCodeProviderFields: FormControlState[] = [];
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -236,8 +245,30 @@ function SignUpStartInternal(): JSX.Element {
       } as any);
     }
 
-    if (alternativePhoneCodeProviderFields.length) {
-      fieldsToSubmit.push(...alternativePhoneCodeProviderFields);
+    // If the user has already selected an alternative phone code provider, we use that.
+    const preferredAlternativePhoneChannel =
+      alternativePhoneCodeProvider?.channel ||
+      getPreferredAlternativePhoneChannel(fieldsToSubmit, authConfig.preferredChannels, 'phoneNumber');
+    if (preferredAlternativePhoneChannel) {
+      // We need to send the alternative phone code provider channel in the sign up request
+      // together with the phone_code strategy, in order for FAPI to create a Verification upon this first request.
+      const noop = () => {};
+      fieldsToSubmit.push({
+        id: 'strategy',
+        value: 'phone_code',
+        clearFeedback: noop,
+        setValue: noop,
+        onChange: noop,
+        setError: noop,
+      } as any);
+      fieldsToSubmit.push({
+        id: 'channel',
+        value: preferredAlternativePhoneChannel,
+        clearFeedback: noop,
+        setValue: noop,
+        onChange: noop,
+        setError: noop,
+      } as any);
     }
 
     // In case of emailOrPhone (both email & phone are optional) and neither of them is provided,
@@ -278,30 +309,6 @@ function SignUpStartInternal(): JSX.Element {
       )
       .catch(err => handleError(err, fieldsToSubmit, card.setError))
       .finally(() => card.setIdle());
-  };
-
-  // We need to send the alternative phone code provider channel in the sign up request
-  // together with the phone_code strategy, in order for FAPI to create a Verification upon this first request.
-  const handleAlternativePhoneCodeSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    const noop = () => {};
-    alternativePhoneCodeProviderFields.push({
-      id: 'strategy',
-      value: 'phone_code',
-      clearFeedback: noop,
-      setValue: noop,
-      onChange: noop,
-      setError: noop,
-    } as any);
-    alternativePhoneCodeProviderFields.push({
-      id: 'channel',
-      value: alternativePhoneCodeProvider?.channel,
-      clearFeedback: noop,
-      setValue: noop,
-      onChange: noop,
-      setError: noop,
-    } as any);
-
-    return handleSubmit(e);
   };
 
   if (status.isLoading) {
@@ -393,8 +400,8 @@ function SignUpStartInternal(): JSX.Element {
           </Card.Footer>
         </Card.Root>
       ) : (
-        <SignUpAlternativePhoneCodePhoneNumberCard
-          handleSubmit={handleAlternativePhoneCodeSubmit}
+        <SignUpStartAlternativePhoneCodePhoneNumberCard
+          handleSubmit={handleSubmit}
           fields={fields}
           formState={formState}
           onUseAnotherMethod={onAlternativePhoneCodeUseAnotherMethod}

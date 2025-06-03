@@ -1,20 +1,21 @@
 import { useClerk, useOrganization } from '@clerk/shared/react';
 import type { CommercePaymentSourceResource } from '@clerk/types';
 import type { SetupIntent } from '@stripe/stripe-js';
-import { Fragment, useMemo, useRef } from 'react';
+import { Fragment, useCallback, useMemo, useRef } from 'react';
 
 import { RemoveResourceForm } from '../../common';
-import { useSubscriberTypeContext } from '../../contexts';
+import { DevOnly } from '../../common/DevOnly';
+import { usePaymentSources, useSubscriberTypeContext } from '../../contexts';
 import { localizationKeys } from '../../customizables';
 import { FullHeightLoader, ProfileSection, ThreeDotsMenu, useCardState, withCardStateProvider } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
-import { useFetch } from '../../hooks';
 import { handleError } from '../../utils';
-import { AddPaymentSource } from './AddPaymentSource';
+import * as AddPaymentSource from './AddPaymentSource';
 import { PaymentSourceRow } from './PaymentSourceRow';
+import { TestPaymentSource } from './TestPaymentSource';
 
-const AddScreen = ({ onSuccess }: { onSuccess: () => void }) => {
+const AddScreen = withCardStateProvider(({ onSuccess }: { onSuccess: () => void }) => {
   const { close } = useActionContext();
   const clerk = useClerk();
   const subscriberType = useSubscriberTypeContext();
@@ -31,12 +32,20 @@ const AddScreen = ({ onSuccess }: { onSuccess: () => void }) => {
   };
 
   return (
-    <AddPaymentSource
+    <AddPaymentSource.Root
       onSuccess={onAddPaymentSourceSuccess}
       cancelAction={close}
-    />
+    >
+      <AddPaymentSource.FormHeader text={localizationKeys('userProfile.billingPage.paymentSourcesSection.add')} />
+      <AddPaymentSource.FormSubtitle
+        text={localizationKeys('userProfile.billingPage.paymentSourcesSection.addSubtitle')}
+      />
+      <DevOnly>
+        <TestPaymentSource />
+      </DevOnly>
+    </AddPaymentSource.Root>
   );
-};
+});
 
 const RemoveScreen = ({
   paymentSource,
@@ -89,18 +98,16 @@ export const PaymentSources = withCardStateProvider(() => {
 
   const resource = subscriberType === 'org' ? clerk?.organization : clerk.user;
 
-  const { data, revalidate, isLoading } = useFetch(
-    resource?.getPaymentSources,
-    {},
-    undefined,
-    `commerce-payment-sources-${resource?.id}`,
-  );
+  const { data, isLoading, mutate: mutatePaymentSources } = usePaymentSources();
+
   const { data: paymentSources = [] } = data || {};
 
   const sortedPaymentSources = useMemo(
     () => paymentSources.sort((a, b) => (a.isDefault && !b.isDefault ? -1 : 1)),
     [paymentSources],
   );
+
+  const revalidatePaymentSources = useCallback(() => void mutatePaymentSources(), [mutatePaymentSources]);
 
   if (!resource) {
     return null;
@@ -133,7 +140,7 @@ export const PaymentSources = withCardStateProvider(() => {
                     <PaymentSourceRow paymentSource={paymentSource} />
                     <PaymentSourceMenu
                       paymentSource={paymentSource}
-                      revalidate={revalidate}
+                      revalidate={revalidatePaymentSources}
                     />
                   </ProfileSection.Item>
 
@@ -141,7 +148,7 @@ export const PaymentSources = withCardStateProvider(() => {
                     <Action.Card variant='destructive'>
                       <RemoveScreen
                         paymentSource={paymentSource}
-                        revalidate={revalidate}
+                        revalidate={revalidatePaymentSources}
                       />
                     </Action.Card>
                   </Action.Open>
@@ -155,7 +162,7 @@ export const PaymentSources = withCardStateProvider(() => {
               </Action.Trigger>
               <Action.Open value='add'>
                 <Action.Card>
-                  <AddScreen onSuccess={revalidate} />
+                  <AddScreen onSuccess={revalidatePaymentSources} />
                 </Action.Card>
               </Action.Open>
             </>
@@ -183,7 +190,7 @@ const PaymentSourceMenu = ({
       label: localizationKeys('userProfile.billingPage.paymentSourcesSection.actionLabel__remove'),
       isDestructive: true,
       onClick: () => open(`remove-${paymentSource.id}`),
-      isDisabled: paymentSource.isDefault,
+      isDisabled: !paymentSource.isRemovable,
     },
   ];
 

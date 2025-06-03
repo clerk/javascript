@@ -214,6 +214,9 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await u.po.checkout.confirmAndContinue();
       await u.po.pricingTable.startCheckout({ planSlug: 'free_user', shouldSwitch: true });
       await u.po.checkout.waitForSubscribeButton();
+      await expect(
+        page.locator('.cl-checkout-root').getByRole('button', { name: /^pay with test card$/i }),
+      ).toBeHidden();
 
       await fakeUser.deleteIfExists();
     });
@@ -242,6 +245,41 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await u.po.checkout.confirmAndContinue();
       await u.po.pricingTable.startCheckout({ planSlug: 'pro', period: 'monthly' });
       await expect(u.po.page.getByText('- $9.99')).toBeVisible();
+
+      await fakeUser.deleteIfExists();
+    });
+
+    test('adds payment source via checkout and resets stripe setup intent after failed payment', async ({
+      page,
+      context,
+    }) => {
+      const u = createTestUtils({ app, page, context });
+
+      const fakeUser = u.services.users.createFakeUser();
+      await u.services.users.createBapiUser(fakeUser);
+
+      await u.po.signIn.goTo();
+      await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+      await u.po.page.goToRelative('/user');
+
+      await u.po.userProfile.waitForMounted();
+      await u.po.userProfile.switchToBillingTab();
+      await u.po.page.getByRole('button', { name: 'Switch plans' }).click();
+      await u.po.pricingTable.startCheckout({ planSlug: 'pro', period: 'monthly' });
+      await u.po.checkout.waitForMounted();
+      await u.po.checkout.fillCard({
+        number: '4100000000000019', // fraud card - always declines
+        expiration: '1234',
+        cvc: '123',
+        country: 'United States',
+        zip: '12345',
+      });
+      await u.po.checkout.clickPayOrSubscribe();
+      await expect(u.po.page.locator('.cl-checkout-root').getByText('The card was declined.').first()).toBeVisible();
+      await u.po.checkout.waitForStipeElements();
+      await u.po.checkout.fillTestCard();
+      await u.po.checkout.clickPayOrSubscribe();
+      await expect(u.po.page.locator('.cl-checkout-root').getByText('Payment was successful!')).toBeVisible();
 
       await fakeUser.deleteIfExists();
     });

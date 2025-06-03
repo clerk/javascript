@@ -76,7 +76,7 @@ const MemberRow = (props: {
   const card = useCardState();
   const { user } = useUser();
 
-  const isCurrentUser = user?.id === membership.publicUserData.userId;
+  const isCurrentUser = user?.id === membership.publicUserData?.userId;
   const unlocalizedRoleLabel = options?.find(a => a.value === membership.role)?.label;
 
   return (
@@ -85,7 +85,7 @@ const MemberRow = (props: {
         <UserPreview
           sx={{ maxWidth: '30ch' }}
           user={membership.publicUserData}
-          subtitle={membership.publicUserData.identifier}
+          subtitle={membership.publicUserData?.identifier}
           badge={isCurrentUser && <Badge localizationKey={localizationKeys('badge__you')} />}
         />
       </Td>
@@ -110,6 +110,7 @@ const MemberRow = (props: {
           <RoleSelect
             isDisabled={card.isLoading || !onRoleChange}
             value={membership.role}
+            fallbackLabel={membership.roleName}
             onChange={onRoleChange}
             roles={options}
           />

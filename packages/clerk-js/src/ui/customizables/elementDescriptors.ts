@@ -89,7 +89,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'checkoutFormElementsRoot',
 
   'checkoutSuccessRoot',
-  'checkoutSuccessRing',
+  'checkoutSuccessRings',
   'checkoutSuccessBadge',
   'checkoutSuccessTitle',
   'checkoutSuccessDescription',
@@ -288,11 +288,12 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'pricingTableMatrixFooter',
 
   'planDetailHeader',
-  'planDetailAvatarBadgeContainer',
   'planDetailAvatar',
+  'planDetailBadgeAvatarTitleDescriptionContainer',
   'planDetailBadgeContainer',
   'planDetailBadge',
   'planDetailTitle',
+  'planDetailTitleDescriptionContainer',
   'planDetailDescription',
   'planDetailAction',
   'planDetailFeeContainer',

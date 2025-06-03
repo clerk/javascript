@@ -71,6 +71,7 @@ export const bgBG: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     monthly: undefined,
+    pastDue: undefined,
     pay: undefined,
     paymentMethods: undefined,
     paymentSource: {
@@ -119,6 +120,7 @@ export const bgBG: LocalizationResource = {
     sameDay: "Днес в {{ date | timeString('bg-BG') }}",
   },
   dividerText: 'или',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'Използвайте друг метод',
   footerPageLink__help: 'Помощ',
   footerPageLink__privacy: 'Поверителност',

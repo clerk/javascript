@@ -305,6 +305,7 @@ export interface AuthConfigJSON extends ClerkResourceJSON {
   single_session_mode: boolean;
   claimed_at: number | null;
   reverification: boolean;
+  preferred_channels?: Record<string, PhoneCodeChannel>;
 }
 
 export interface VerificationJSON extends ClerkResourceJSON {
@@ -389,8 +390,9 @@ export interface OrganizationMembershipJSON extends ClerkResourceJSON {
   organization: OrganizationJSON;
   permissions: OrganizationPermissionKey[];
   public_metadata: OrganizationMembershipPublicMetadata;
-  public_user_data: PublicUserDataJSON;
+  public_user_data?: PublicUserDataJSON;
   role: OrganizationCustomRoleKey;
+  role_name: string;
   created_at: number;
   updated_at: number;
 }
@@ -403,6 +405,7 @@ export interface OrganizationInvitationJSON extends ClerkResourceJSON {
   public_metadata: OrganizationInvitationPublicMetadata;
   status: OrganizationInvitationStatus;
   role: OrganizationCustomRoleKey;
+  role_name: string;
   created_at: number;
   updated_at: number;
 }
@@ -637,6 +640,7 @@ export interface CommercePaymentSourceJSON extends ClerkResourceJSON {
   payment_method: string;
   card_type: string;
   is_default: boolean;
+  is_removable: boolean;
   status: CommercePaymentSourceStatus;
   wallet_type: string | null;
 }
@@ -645,6 +649,7 @@ export interface CommerceInitializedPaymentSourceJSON extends ClerkResourceJSON 
   object: 'commerce_payment_source_initialize';
   external_client_secret: string;
   external_gateway_id: string;
+  payment_method_order: string[];
 }
 
 export interface CommerceStatementJSON extends ClerkResourceJSON {

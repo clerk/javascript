@@ -41,7 +41,11 @@ import { handleCombinedFlowTransfer } from './handleCombinedFlowTransfer';
 import { useHandleAuthenticateWithPasskey } from './shared';
 import { SignInAlternativePhoneCodePhoneNumberCard } from './SignInAlternativePhoneCodePhoneNumberCard';
 import { SignInSocialButtons } from './SignInSocialButtons';
-import { getSignUpAttributeFromIdentifier } from './utils';
+import {
+  getPreferredAlternativePhoneChannel,
+  getPreferredAlternativePhoneChannelForCombinedFlow,
+  getSignUpAttributeFromIdentifier,
+} from './utils';
 
 const useAutoFillPasskey = () => {
   const [isSupported, setIsSupported] = useState(false);
@@ -76,7 +80,7 @@ function SignInStartInternal(): JSX.Element {
   const card = useCardState();
   const clerk = useClerk();
   const status = useLoadingStatus();
-  const { displayConfig, userSettings } = useEnvironment();
+  const { displayConfig, userSettings, authConfig } = useEnvironment();
   const signIn = useCoreSignIn();
   const { navigate } = useRouter();
   const ctx = useSignInContext();
@@ -271,6 +275,7 @@ function SignInStartInternal(): JSX.Element {
           case ERROR_CODES.CAPTCHA_INVALID:
           case ERROR_CODES.FRAUD_DEVICE_BLOCKED:
           case ERROR_CODES.FRAUD_ACTION_BLOCKED:
+          case ERROR_CODES.SIGNUP_RATE_LIMIT_EXCEEDED:
             card.setError(error);
             break;
           default:
@@ -325,7 +330,11 @@ function SignInStartInternal(): JSX.Element {
   };
 
   const signInWithFields = async (...fields: Array<FormControlState<string>>) => {
-    if (alternativePhoneCodeProvider) {
+    // If the user has already selected an alternative phone code provider, we use that.
+    const preferredAlternativePhoneChannel =
+      alternativePhoneCodeProvider?.channel ||
+      getPreferredAlternativePhoneChannel(fields, authConfig.preferredChannels, 'identifier');
+    if (preferredAlternativePhoneChannel) {
       // We need to send the alternative phone code provider channel in the sign in request
       // together with the phone_code strategy, in order for FAPI to create a Verification upon this first request.
       const noop = () => {};
@@ -339,7 +348,7 @@ function SignInStartInternal(): JSX.Element {
       } as any);
       fields.push({
         id: 'channel',
-        value: alternativePhoneCodeProvider?.channel,
+        value: preferredAlternativePhoneChannel,
         clearFeedback: noop,
         setValue: noop,
         onChange: noop,
@@ -449,7 +458,13 @@ function SignInStartInternal(): JSX.Element {
         redirectUrl,
         redirectUrlComplete,
         passwordEnabled: userSettings.attributes.password?.required ?? false,
-        alternativePhoneCodeProvider,
+        alternativePhoneCodeChannel:
+          alternativePhoneCodeProvider?.channel ||
+          getPreferredAlternativePhoneChannelForCombinedFlow(
+            authConfig.preferredChannels,
+            attribute,
+            identifierField.value,
+          ),
       });
     } else {
       handleError(e, [identifierField, instantPasswordField], card.setError);
