@@ -74,6 +74,47 @@ program
   );
 
 program
+  .command('snapshot')
+  .description('Generate API snapshots without comparison')
+  .option('-c, --config <path>', 'Path to configuration file', '.api-breakage.config.json')
+  .option('-o, --output <path>', 'Output directory for snapshots')
+  .option('--workspace <path>', 'Workspace root path', process.cwd())
+  .action(async (options: { config: string; output?: string; workspace: string }) => {
+    try {
+      const config = await loadConfig(options.config, {});
+
+      // Override snapshots directory if provided
+      if (options.output) {
+        config.snapshotsDir = options.output;
+      }
+
+      const detector = new BreakingChangesDetector({
+        workspaceRoot: options.workspace,
+        config,
+      });
+
+      console.log(chalk.blue('📸 Starting API snapshot generation...'));
+
+      // Discover packages
+      const packages = await detector.discoverPackages();
+      console.log(chalk.blue(`📦 Found ${packages.length} packages to snapshot`));
+
+      // Generate snapshots only
+      const snapshots = await detector.generateCurrentSnapshots(packages);
+
+      console.log(chalk.green(`✅ Generated ${snapshots.size} API snapshots`));
+
+      // List what was created
+      for (const [packageName, snapshotPath] of snapshots) {
+        console.log(chalk.gray(`  📄 ${packageName}: ${snapshotPath}`));
+      }
+    } catch (error) {
+      console.error(chalk.red('❌ Error:'), error instanceof Error ? error.message : error);
+      process.exit(1);
+    }
+  });
+
+program
   .command('init')
   .description('Initialize configuration file')
   .option('-o, --output <path>', 'Output path for config file', '.api-breakage.config.json')

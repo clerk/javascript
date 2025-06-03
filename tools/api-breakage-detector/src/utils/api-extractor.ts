@@ -17,7 +17,7 @@ export class ApiExtractorRunner {
   private tempConfigDir: string;
 
   constructor(private workspaceRoot: string) {
-    this.tempConfigDir = path.join(workspaceRoot, '.temp-api-extractor');
+    this.tempConfigDir = path.join(workspaceRoot, '.tmp/api-extractor');
   }
 
   async generateApiSnapshot(options: ExtractorOptions): Promise<ApiSnapshot> {

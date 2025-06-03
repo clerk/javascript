@@ -113,22 +113,27 @@ export class PackageDiscovery {
     // Priority 1: exports field (modern approach)
     if (packageJson.exports) {
       const exportEntrypoints = this.extractFromExports(packageJson.exports, packagePath);
-      entrypoints.push(...exportEntrypoints);
+      // Filter to ensure only strings are added
+      entrypoints.push(...exportEntrypoints.filter(ep => typeof ep === 'string'));
     }
 
     // Priority 2: traditional fields (fallback)
     if (entrypoints.length === 0) {
       const traditionalEntrypoints = await this.extractTraditionalEntrypoints(packagePath, packageJson);
-      entrypoints.push(...traditionalEntrypoints);
+      // Filter to ensure only strings are added
+      entrypoints.push(...traditionalEntrypoints.filter(ep => typeof ep === 'string'));
     }
 
     // Filter for TypeScript source files and validate they exist
     const validEntrypoints: string[] = [];
 
     for (const entrypoint of entrypoints) {
-      const tsPath = await this.findTypeScriptSource(packagePath, entrypoint);
-      if (tsPath) {
-        validEntrypoints.push(tsPath);
+      // Double-check that entrypoint is a string
+      if (typeof entrypoint === 'string') {
+        const tsPath = await this.findTypeScriptSource(packagePath, entrypoint);
+        if (tsPath) {
+          validEntrypoints.push(tsPath);
+        }
       }
     }
 
@@ -143,13 +148,20 @@ export class PackageDiscovery {
         entrypoints.push(value);
       } else if (typeof value === 'object' && value !== null) {
         // Handle conditional exports
-        if (value.types) entrypoints.push(value.types);
-        if (value.import) entrypoints.push(value.import);
-        if (value.require) entrypoints.push(value.require);
-        if (value.default) entrypoints.push(value.default);
+        if (typeof value.types === 'string') entrypoints.push(value.types);
+        if (typeof value.import === 'string') entrypoints.push(value.import);
+        if (typeof value.require === 'string') entrypoints.push(value.require);
+        if (typeof value.default === 'string') entrypoints.push(value.default);
 
-        // Recursively process nested objects
-        Object.values(value).forEach(processExportValue);
+        // For nested objects like { import: { types: "...", default: "..." } }
+        if (typeof value.import === 'object' && value.import !== null) {
+          if (typeof value.import.types === 'string') entrypoints.push(value.import.types);
+          if (typeof value.import.default === 'string') entrypoints.push(value.import.default);
+        }
+        if (typeof value.require === 'object' && value.require !== null) {
+          if (typeof value.require.types === 'string') entrypoints.push(value.require.types);
+          if (typeof value.require.default === 'string') entrypoints.push(value.require.default);
+        }
       }
     };
 
@@ -175,6 +187,12 @@ export class PackageDiscovery {
   }
 
   private async findTypeScriptSource(packagePath: string, entrypoint: string): Promise<string | null> {
+    // Ensure entrypoint is a string (safety check)
+    if (typeof entrypoint !== 'string') {
+      console.warn(`Warning: Non-string entrypoint passed to findTypeScriptSource: ${typeof entrypoint}`, entrypoint);
+      return null;
+    }
+
     // Remove leading ./
     const cleanPath = entrypoint.replace(/^\.\//, '');
 

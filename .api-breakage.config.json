@@ -1,6 +1,6 @@
 {
   "excludePackages": [],
-  "snapshotsDir": ".api-snapshots",
+  "snapshotsDir": ".tmp/api-snapshots",
   "mainBranch": "main",
   "checkVersionBump": true,
   "suppressedChanges": [],

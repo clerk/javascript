@@ -77,11 +77,11 @@ export class BreakingChangesDetector {
     }
   }
 
-  private async discoverPackages(): Promise<PackageInfo[]> {
+  async discoverPackages(): Promise<PackageInfo[]> {
     return this.packageDiscovery.discoverPackages(this.options.config.packages, this.options.config.excludePackages);
   }
 
-  private async generateCurrentSnapshots(packages: PackageInfo[]): Promise<Map<string, string>> {
+  async generateCurrentSnapshots(packages: PackageInfo[]): Promise<Map<string, string>> {
     const snapshots = new Map<string, string>();
     const currentDir = path.join(this.snapshotsDir, 'current');
     await fs.ensureDir(currentDir);
