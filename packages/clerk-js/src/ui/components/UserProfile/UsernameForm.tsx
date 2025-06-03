@@ -1,9 +1,13 @@
 import { useReverification, useUser } from '@clerk/shared/react';
 
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { Form } from '@/ui/elements/Form';
+import { FormButtons } from '@/ui/elements/FormButtons';
+import type { FormProps } from '@/ui/elements/FormContainer';
+import { FormContainer } from '@/ui/elements/FormContainer';
+
 import { useEnvironment } from '../../contexts';
 import { localizationKeys, useLocalizations } from '../../customizables';
-import type { FormProps } from '../../elements';
-import { Form, FormButtons, FormContainer, useCardState, withCardStateProvider } from '../../elements';
 import { createUsernameError, handleError, useFormControl } from '../../utils';
 
 type UsernameFormProps = FormProps;

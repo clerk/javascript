@@ -1,5 +1,6 @@
+import { Header } from '@/ui/elements/Header';
+
 import { PricingTableContext, SubscriberTypeContext } from '../../contexts';
-import { Header } from '../../elements';
 import { localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
 import { PricingTable } from '../PricingTable/PricingTable';

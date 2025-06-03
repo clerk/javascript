@@ -1,5 +1,7 @@
 import type { CommerceSubscriptionResource } from '@clerk/types';
 
+import { ProfileSection } from '@/ui/elements/Section';
+
 import { useProtect } from '../../common';
 import { usePlansContext, useSubscriberTypeContext, useSubscriptions } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
@@ -19,7 +21,6 @@ import {
   Thead,
   Tr,
 } from '../../customizables';
-import { ProfileSection } from '../../elements';
 import { ArrowsUpDown, CogFilled, Plans, Plus } from '../../icons';
 import { useRouter } from '../../router';
 

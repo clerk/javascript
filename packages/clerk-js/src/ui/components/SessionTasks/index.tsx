@@ -3,9 +3,12 @@ import { eventComponentMounted } from '@clerk/shared/telemetry';
 import type { SessionTask } from '@clerk/types';
 import { useCallback, useContext, useEffect } from 'react';
 
+import { Card } from '@/ui/elements/Card';
+import { withCardStateProvider } from '@/ui/elements/contexts';
+import { LoadingCardContainer } from '@/ui/elements/LoadingCard';
+
 import { SESSION_TASK_ROUTE_BY_KEY } from '../../../core/sessionTasks';
 import { OrganizationListContext, SignInContext, SignUpContext } from '../../../ui/contexts';
-import { Card, LoadingCardContainer, withCardStateProvider } from '../../../ui/elements';
 import {
   SessionTasksContext as SessionTasksContext,
   useSessionTasksContext,

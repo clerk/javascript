@@ -2,6 +2,8 @@ import type { ClerkOptions, ClientJSON, EnvironmentJSON, LoadedClerk } from '@cl
 import { jest } from '@jest/globals';
 import React from 'react';
 
+import { FlowMetadataProvider } from '@/ui/elements/contexts';
+
 import { Clerk as ClerkCtor } from '../../../core/clerk';
 import { Client, Environment } from '../../../core/resources';
 import {
@@ -11,7 +13,6 @@ import {
   OptionsProvider,
 } from '../../contexts';
 import { AppearanceProvider } from '../../customizables';
-import { FlowMetadataProvider } from '../../elements';
 import { RouteContext } from '../../router';
 import { InternalThemeProvider } from '../../styledSystem';
 import type { AvailableComponentName, AvailableComponentProps } from '../../types';

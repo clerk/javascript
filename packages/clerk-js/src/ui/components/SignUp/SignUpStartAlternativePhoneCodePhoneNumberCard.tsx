@@ -1,7 +1,12 @@
 import type { PhoneCodeChannelData } from '@clerk/types';
 
+import { Card } from '@/ui/elements/Card';
+import { useCardState } from '@/ui/elements/contexts';
+import { Form } from '@/ui/elements/Form';
+import { Header } from '@/ui/elements/Header';
+import { LegalCheckbox } from '@/ui/elements/LegalConsentCheckbox';
+
 import { Button, Col, descriptors, Flex, Image, localizationKeys } from '../../customizables';
-import { Card, Form, Header, LegalCheckbox, useCardState } from '../../elements';
 import { CaptchaElement } from '../../elements/CaptchaElement';
 import { useEnabledThirdPartyProviders } from '../../hooks';
 import type { FormControlState } from '../../utils';

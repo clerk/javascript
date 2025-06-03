@@ -1,8 +1,10 @@
 import { getAlternativePhoneCodeProviderData } from '@clerk/shared/alternativePhoneCode';
 
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { LoadingCard } from '@/ui/elements/LoadingCard';
+
 import { useCoreSignUp } from '../../contexts';
 import { Flow, localizationKeys } from '../../customizables';
-import { LoadingCard, useCardState, withCardStateProvider } from '../../elements';
 import { useFetch } from '../../hooks';
 import { handleError } from '../../utils';
 import { SignUpVerificationCodeForm } from './SignUpVerificationCodeForm';

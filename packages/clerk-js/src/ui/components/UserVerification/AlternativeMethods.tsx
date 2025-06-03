@@ -1,9 +1,13 @@
 import type { SessionVerificationFirstFactor, SignInFactor } from '@clerk/types';
 import React from 'react';
 
+import { ArrowBlockButton } from '@/ui/elements/ArrowBlockButton';
+import { BackLink } from '@/ui/elements/BackLink';
+import { Card } from '@/ui/elements/Card';
+import { Header } from '@/ui/elements/Header';
+
 import type { LocalizationKey } from '../../customizables';
 import { Col, descriptors, Flex, Flow, localizationKeys } from '../../customizables';
-import { ArrowBlockButton, BackLink, Card, Header } from '../../elements';
 import { useCardState } from '../../elements/contexts';
 import { ChatAltIcon, Email, Fingerprint, LockClosedIcon } from '../../icons';
 import { formatSafeIdentifier } from '../../utils';

@@ -1,6 +1,7 @@
+import { Header } from '@/ui/elements/Header';
+
 import { useStatements, useStatementsContext } from '../../contexts';
 import { Box, descriptors, Spinner, Text } from '../../customizables';
-import { Header } from '../../elements';
 import { Plus, RotateLeftRight } from '../../icons';
 import { useRouter } from '../../router';
 import { Statement } from './Statement';

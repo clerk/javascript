@@ -1,8 +1,11 @@
 import { useReverification } from '@clerk/shared/react';
 
 import { localizationKeys, Text } from '../customizables';
-import type { FormProps } from '../elements';
-import { Form, FormButtons, FormContainer, useCardState, withCardStateProvider } from '../elements';
+import { useCardState, withCardStateProvider } from '../elements/contexts';
+import { Form } from '../elements/Form';
+import { FormButtons } from '../elements/FormButtons';
+import type { FormProps } from '../elements/FormContainer';
+import { FormContainer } from '../elements/FormContainer';
 import type { LocalizationKey } from '../localization';
 import { handleError } from '../utils';
 

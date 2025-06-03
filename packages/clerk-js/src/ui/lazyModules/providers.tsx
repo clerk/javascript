@@ -2,7 +2,8 @@ import { deprecated } from '@clerk/shared/deprecated';
 import type { Appearance } from '@clerk/types';
 import React, { lazy, Suspense } from 'react';
 
-import type { Drawer, FlowMetadata } from '../elements';
+import type { FlowMetadata } from '../elements/contexts';
+import type { Drawer } from '../elements/Drawer';
 import type { ThemableCssProp } from '../styledSystem';
 import type { ClerkComponentName } from './components';
 import { ClerkComponents } from './components';

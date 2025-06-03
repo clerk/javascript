@@ -1,7 +1,7 @@
 import type { OrganizationResource } from '@clerk/types';
 
-import { Avatar } from '../elements';
 import type { PropsOfComponent } from '../styledSystem';
+import { Avatar } from './Avatar';
 
 type OrganizationAvatarProps = PropsOfComponent<typeof Avatar> &
   Partial<Pick<OrganizationResource, 'name' | 'imageUrl'>>;
