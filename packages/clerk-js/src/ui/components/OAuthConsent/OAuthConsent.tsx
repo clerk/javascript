@@ -99,7 +99,7 @@ export function OAuthConsentInternal() {
             )}
             <Header.Title localizationKey={oAuthApplicationName} />
             <Header.Subtitle
-              localizationKey={`wants to access to ${applicationName} on behalf of ${primaryEmailAddress}`}
+              localizationKey={`wants to access ${applicationName} on behalf of ${primaryEmailAddress}`}
             />
           </Header.Root>
           <Box
