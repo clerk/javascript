@@ -170,6 +170,9 @@ function SignUpStartInternal(): JSX.Element {
         handleError(err, [], card.setError);
       })
       .finally(() => {
+        // Keep the card in loading state during SSO redirect to prevent UI flicker
+        // This is necessary because there's a brief delay between initiating the SSO flow
+        // and the actual redirect to the external Identity Provider
         const isRedirectingToSSOProvider = signUp.missingFields.some(mf => mf === 'saml' || mf === 'enterprise_sso');
         if (isRedirectingToSSOProvider) return;
 

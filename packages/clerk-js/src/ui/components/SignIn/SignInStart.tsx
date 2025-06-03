@@ -245,6 +245,9 @@ function SignInStartInternal(): JSX.Element {
         return attemptToRecoverFromSignInError(err);
       })
       .finally(() => {
+        // Keep the card in loading state during SSO redirect to prevent UI flicker
+        // This is necessary because there's a brief delay between initiating the SSO flow
+        // and the actual redirect to the external Identity Provider
         const isRedirectingToSSOProvider = hasOnlyEnterpriseSSOFirstFactors(signIn);
         if (isRedirectingToSSOProvider) return;
 
@@ -612,11 +615,11 @@ function SignInStartInternal(): JSX.Element {
 }
 
 const hasOnlyEnterpriseSSOFirstFactors = (signIn: SignInResource): boolean => {
-  if (!signIn?.supportedFirstFactors?.length) {
+  if (!signIn.supportedFirstFactors?.length) {
     return false;
   }
 
-  return signIn.supportedFirstFactors.every(ff => ff.strategy === 'saml' || ff.strategy === 'enterprise_sso');
+  return signIn.supportedFirstFactors.every(ff => ff.strategy === 'enterprise_sso');
 };
 
 const InstantPasswordRow = ({ field }: { field?: FormControlState<'password'> }) => {
