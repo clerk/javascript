@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useEnvironment, useOAuthConsentContext } from '../../contexts';
 import { Box, Button, Flex, Flow, Grid, Icon, Text } from '../../customizables';
 import { ApplicationLogo, Avatar, Card, Header, Modal, Tooltip, withCardStateProvider } from '../../elements';
-import { Connections } from '../../icons';
+import { LockDottedCircle } from '../../icons';
 import { Textarea } from '../../primitives';
 import type { ThemableCssProp } from '../../styledSystem';
 import { common } from '../../styledSystem';
@@ -344,7 +344,7 @@ function ConnectionIcon({ size = 'md', sx }: { size?: 'sm' | 'md'; sx?: Themable
       ]}
     >
       <Icon
-        icon={Connections}
+        icon={LockDottedCircle}
         sx={t => ({
           color: t.colors.$primary500,
         })}

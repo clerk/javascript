@@ -43,6 +43,7 @@ export { default as GenericPayment } from './generic-pay.svg';
 export { default as InformationCircle } from './information-circle.svg';
 export { default as LinkIcon } from './link.svg';
 export { default as LockClosedIcon } from './lock-closed.svg';
+export { default as LockDottedCircle } from './lock-dotted-circle.svg';
 export { default as LogoMark } from './logo-mark-new.svg';
 export { default as MagnifyingGlass } from './magnifying-glass.svg';
 export { default as Menu } from './menu.svg';
