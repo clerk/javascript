@@ -4,4 +4,4 @@
 '@clerk/clerk-react': minor
 ---
 
-Introduce early access `<APIKeys />` component.
+Add `<APIKeys />` component. This component will initially be in early access and not recommended for production usage just yet.
