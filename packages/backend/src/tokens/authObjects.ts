@@ -334,12 +334,12 @@ const createGetToken: CreateGetToken = params => {
  */
 export const getAuthObjectFromJwt = (
   jwt: Jwt,
-  { treatPendingAsSignedOut, ...options }: PendingSessionOptions & Partial<AuthenticateContext>,
+  { treatPendingAsSignedOut = true, ...options }: PendingSessionOptions & Partial<AuthenticateContext>,
 ) => {
   const authObject = signedInAuthObject(options, jwt.raw.text, jwt.payload);
 
   if (treatPendingAsSignedOut && authObject.sessionStatus === 'pending') {
-    return signedOutAuthObject(options);
+    return signedOutAuthObject(options, authObject.sessionStatus);
   }
 
   return authObject;
