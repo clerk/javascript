@@ -41,6 +41,7 @@ const usePaymentSourceUtils = () => {
 
   const externalGatewayId = initializedPaymentSource?.externalGatewayId;
   const externalClientSecret = initializedPaymentSource?.externalClientSecret;
+  const paymentMethodOrder = initializedPaymentSource?.paymentMethodOrder;
   const stripePublishableKey = commerceSettings.billing.stripePublishableKey;
 
   const { data: stripe } = useSWR(
@@ -65,13 +66,14 @@ const usePaymentSourceUtils = () => {
     stripe,
     initializePaymentSource,
     externalClientSecret,
+    paymentMethodOrder,
   };
 };
 
 const [AddPaymentSourceContext, useAddPaymentSourceContext] = createContextAndHook<any>('AddPaymentSourceRoot');
 
 const AddPaymentSourceRoot = ({ children, ...rest }: PropsWithChildren<AddPaymentSourceProps>) => {
-  const { initializePaymentSource, externalClientSecret, stripe } = usePaymentSourceUtils();
+  const { initializePaymentSource, externalClientSecret, stripe, paymentMethodOrder } = usePaymentSourceUtils();
   const [headerTitle, setHeaderTitle] = useState<LocalizationKey | undefined>(undefined);
   const [headerSubtitle, setHeaderSubtitle] = useState<LocalizationKey | undefined>(undefined);
   const [submitLabel, setSubmitLabel] = useState<LocalizationKey | undefined>(undefined);
@@ -93,6 +95,7 @@ const AddPaymentSourceRoot = ({ children, ...rest }: PropsWithChildren<AddPaymen
           initializePaymentSource,
           externalClientSecret,
           stripe,
+          paymentMethodOrder,
           ...rest,
         },
       }}
@@ -212,8 +215,16 @@ const FormButton = ({ text }: { text: LocalizationKey }) => {
 };
 
 const AddPaymentSourceForm = ({ children }: PropsWithChildren) => {
-  const { headerTitle, headerSubtitle, submitLabel, checkout, initializePaymentSource, onSuccess, cancelAction } =
-    useAddPaymentSourceContext();
+  const {
+    headerTitle,
+    headerSubtitle,
+    submitLabel,
+    checkout,
+    initializePaymentSource,
+    onSuccess,
+    cancelAction,
+    paymentMethodOrder,
+  } = useAddPaymentSourceContext();
   const [isPaymentElementReady, setIsPaymentElementReady] = useState(false);
   const stripe = useStripe();
   const card = useCardState();
@@ -273,7 +284,7 @@ const AddPaymentSourceForm = ({ children }: PropsWithChildren) => {
               defaultCollapsed: false,
             },
             // TODO(@COMMERCE): Should this be fetched from the fapi?
-            paymentMethodOrder: ['card', 'apple_pay', 'google_pay'],
+            paymentMethodOrder: paymentMethodOrder || ['card'],
             applePay: checkout
               ? {
                   recurringPaymentRequest: {
