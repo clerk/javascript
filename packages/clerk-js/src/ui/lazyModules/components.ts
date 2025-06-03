@@ -21,7 +21,7 @@ const componentImportPaths = {
   Checkout: () => import(/* webpackChunkName: "checkout" */ '../components/Checkout'),
   SessionTasks: () => import(/* webpackChunkName: "sessionTasks" */ '../components/SessionTasks'),
   PlanDetails: () => import(/* webpackChunkName: "planDetails" */ '../components/Plans'),
-  OAuthConsent: () => import(/* webpackChunkName: "oauthConsent" */ '../components/OAuthConsent'),
+  OAuthConsent: () => import(/* webpackChunkName: "oauthConsent" */ '../components/OAuthConsent/OAuthConsent'),
 } as const;
 
 export const SignIn = lazy(() => componentImportPaths.SignIn().then(module => ({ default: module.SignIn })));
