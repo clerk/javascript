@@ -1,9 +1,6 @@
 import type { ClerkProviderProps } from '@clerk/clerk-react';
 import type { InitialState, Without } from '@clerk/types';
 import type React from 'react';
-import type { GetAnnotations } from 'react-router/internal';
-
-export type ReactRouterComponentProps = GetAnnotations<any>['ComponentProps'];
 
 export type ClerkState = {
   __type: 'clerkState';

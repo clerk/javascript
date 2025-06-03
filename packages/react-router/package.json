@@ -95,7 +95,7 @@
   "peerDependencies": {
     "react": "catalog:peer-react",
     "react-dom": "catalog:peer-react",
-    "react-router": "^7.6.1"
+    "react-router": "^7.1.2"
   },
   "engines": {
     "node": ">=20.0.0"

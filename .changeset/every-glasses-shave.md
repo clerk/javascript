@@ -1,13 +1,5 @@
 ---
-'@clerk/react-router': major
+'@clerk/react-router': patch
 ---
 
-**Important:** This release only changes the required `react-router` version from `7.1.2` to `7.6.1`. No other changes were applied in this release.
-
-You can upgrade like so:
-
-```shell
-npm install react-router@latest @clerk/react-router@latest
-```
-
-The reason for this change is that `@clerk/react-router` internally uses exports from `react-router` that were changed in [7.6.1](https://github.com/remix-run/react-router/blob/main/CHANGELOG.md#v761). These changes are breaking and `@clerk/react-router` can't add backward-compatible support for older and newer versions.
+In this release the TypeScript types for `rootAuthLoader()` and `<ClerkProvider>` were adjusted but should still work as before. Previously, these types relied on internal, unstable React Router types that changed in their recent 7.6.1 release. We simplified our TypeScript types and no longer rely on internal exports from React Router.
