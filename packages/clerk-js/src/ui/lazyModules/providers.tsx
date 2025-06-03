@@ -19,10 +19,12 @@ const StyleCacheProvider = lazy(() =>
 );
 const Portal = lazy(() => import('./../portal').then(m => ({ default: m.Portal })));
 const VirtualBodyRootPortal = lazy(() => import('./../portal').then(m => ({ default: m.VirtualBodyRootPortal })));
-const FlowMetadataProvider = lazy(() => import('./../elements').then(m => ({ default: m.FlowMetadataProvider })));
-const Modal = lazy(() => import('./../elements').then(m => ({ default: m.Modal })));
-const DrawerRoot = lazy(() => import('./../elements').then(m => ({ default: m.Drawer.Root })));
-const DrawerOverlay = lazy(() => import('./../elements').then(m => ({ default: m.Drawer.Overlay })));
+const FlowMetadataProvider = lazy(() =>
+  import('./../elements/contexts').then(m => ({ default: m.FlowMetadataProvider })),
+);
+const Modal = lazy(() => import('./../elements/Modal').then(m => ({ default: m.Modal })));
+const DrawerRoot = lazy(() => import('./../elements/Drawer').then(m => ({ default: m.Drawer.Root })));
+const DrawerOverlay = lazy(() => import('./../elements/Drawer').then(m => ({ default: m.Drawer.Overlay })));
 const OrganizationSwitcherPrefetch = lazy(() =>
   import(/* webpackChunkName: "prefetchorganizationlist" */ '../components/prefetch-organization-list').then(m => ({
     default: m.OrganizationSwitcherPrefetch,
