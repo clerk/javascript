@@ -170,6 +170,9 @@ function SignUpStartInternal(): JSX.Element {
         handleError(err, [], card.setError);
       })
       .finally(() => {
+        const isRedirectingToSSOProvider = signUp.missingFields.some(mf => mf === 'saml' || mf === 'enterprise_sso');
+        if (isRedirectingToSSOProvider) return;
+
         status.setIdle();
         card.setIdle();
       });

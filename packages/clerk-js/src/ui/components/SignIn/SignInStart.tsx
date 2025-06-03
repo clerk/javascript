@@ -222,7 +222,7 @@ function SignInStartInternal(): JSX.Element {
       .then(res => {
         switch (res.status) {
           case 'needs_first_factor':
-            if (res.supportedFirstFactors?.every(ff => ff.strategy === 'enterprise_sso')) {
+            if (hasOnlyEnterpriseSSOFirstFactors(res)) {
               return authenticateWithEnterpriseSSO();
             }
 
@@ -245,6 +245,9 @@ function SignInStartInternal(): JSX.Element {
         return attemptToRecoverFromSignInError(err);
       })
       .finally(() => {
+        const isRedirectingToSSOProvider = hasOnlyEnterpriseSSOFirstFactors(signIn);
+        if (isRedirectingToSSOProvider) return;
+
         status.setIdle();
         card.setIdle();
       });
@@ -368,7 +371,7 @@ function SignInStartInternal(): JSX.Element {
           }
           break;
         case 'needs_first_factor':
-          if (res.supportedFirstFactors?.every(ff => ff.strategy === 'enterprise_sso')) {
+          if (hasOnlyEnterpriseSSOFirstFactors(res)) {
             await authenticateWithEnterpriseSSO();
             break;
           }
@@ -607,6 +610,14 @@ function SignInStartInternal(): JSX.Element {
     </Flow.Part>
   );
 }
+
+const hasOnlyEnterpriseSSOFirstFactors = (signIn: SignInResource): boolean => {
+  if (!signIn?.supportedFirstFactors?.length) {
+    return false;
+  }
+
+  return signIn.supportedFirstFactors.every(ff => ff.strategy === 'saml' || ff.strategy === 'enterprise_sso');
+};
 
 const InstantPasswordRow = ({ field }: { field?: FormControlState<'password'> }) => {
   const [autofilled, setAutofilled] = useState(false);
