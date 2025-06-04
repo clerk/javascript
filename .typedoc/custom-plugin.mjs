@@ -52,6 +52,7 @@ const LINK_REPLACEMENTS = [
   ['phone-number', '/docs/references/backend/types/backend-phone-number'],
   ['saml-account', '/docs/references/backend/types/backend-saml-account'],
   ['web3-wallet', '/docs/references/backend/types/backend-web3-wallet'],
+  ['verify-token-options', '#verify-token-options'],
 ];
 
 /**

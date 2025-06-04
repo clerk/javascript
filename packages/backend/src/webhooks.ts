@@ -28,6 +28,8 @@ export * from './api/resources/Webhooks';
  * @param request - The request object.
  * @param options - Optional configuration object.
  *
+ * @displayFunctionSignature
+ *
  * @example
  * See the [guide on syncing data](https://clerk.com/docs/webhooks/sync-data) for more comprehensive and framework-specific examples that you can copy and paste into your app.
  *
