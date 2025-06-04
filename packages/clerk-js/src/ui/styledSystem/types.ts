@@ -35,6 +35,7 @@ type ElementProps = {
   dt: React.JSX.IntrinsicElements['dt'];
   dd: React.JSX.IntrinsicElements['dd'];
   hr: React.JSX.IntrinsicElements['hr'];
+  textarea: React.JSX.IntrinsicElements['textarea'];
 };
 
 /**
