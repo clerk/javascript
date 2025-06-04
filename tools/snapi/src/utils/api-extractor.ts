@@ -92,6 +92,7 @@ export class ApiExtractorRunner {
 
     // Get the declaration file path - this is the path to our generated .d.ts
     const mainEntryDtsPath = await this.ensureDeclarationFile(packageInfo, mainSourceEntrypoint);
+    console.log(`[SNAPI Debug] Temp DTS Path from declarations: ${mainEntryDtsPath}`);
     console.log(`[SNAPI Debug] Main Entry DTS Path for API Extractor: ${mainEntryDtsPath}`);
 
     // Ensure the path is correctly formatted for API Extractor
@@ -127,6 +128,28 @@ export class ApiExtractorRunner {
     const apiJsonOutputName = `${packageInfo.name.replace(/\//g, '__')}.api.json`;
     const apiJsonTempPathInPackage = path.join('temp', apiJsonOutputName); // Relative to packageInfo.path
 
+    // Customize the message reporting based on the package name
+    // For nextjs, we need to ignore wrong-input-file-type errors
+    const extractorMessageReporting: Record<string, { logLevel: ExtractorLogLevel; addToApiReportFile?: boolean }> = {
+      default: { logLevel: ExtractorLogLevel.Warning },
+      'ae-missing-release-tag': { logLevel: ExtractorLogLevel.None },
+      'ae-unresolved-link': { logLevel: ExtractorLogLevel.None },
+    };
+
+    // For nextjs package, suppress wrong-input-file-type errors
+    if (packageInfo.name === '@clerk/nextjs') {
+      console.log(`[SNAPI Debug] Adding special handling for @clerk/nextjs package`);
+      extractorMessageReporting['ae-wrong-input-file-type'] = {
+        logLevel: ExtractorLogLevel.None,
+        addToApiReportFile: false,
+      };
+    } else {
+      extractorMessageReporting['ae-wrong-input-file-type'] = {
+        logLevel: ExtractorLogLevel.Error,
+        addToApiReportFile: true,
+      };
+    }
+
     const config = {
       $schema: 'https://developer.microsoft.com/json-schemas/api-extractor/v7/api-extractor.schema.json',
       projectFolder: packageInfo.path,
@@ -160,17 +183,7 @@ export class ApiExtractorRunner {
             logLevel: 'warning',
           },
         },
-        extractorMessageReporting: {
-          default: {
-            logLevel: 'warning',
-          },
-          'ae-missing-release-tag': {
-            logLevel: 'none', // Too noisy for our use case
-          },
-          'ae-unresolved-link': {
-            logLevel: 'none', // Common in monorepos
-          },
-        },
+        extractorMessageReporting: extractorMessageReporting,
         tsdocMessageReporting: {
           default: {
             logLevel: 'none', // Focus on API changes, not docs
