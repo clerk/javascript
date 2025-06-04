@@ -27,7 +27,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Need full history for comparison
+          fetch-depth: 0  # Need full history
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
@@ -41,10 +41,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build packages
-        run: pnpm build
-
-      # Setup Turborepo remote cache (optional)
       - name: Setup Turborepo Remote Cache
         if: env.TURBO_TEAM_ID && env.TURBO_TOKEN
         env:
@@ -53,36 +49,34 @@ jobs:
         run: |
           npx turbo login --team=${{ env.TURBO_TEAM_ID }} --token=${{ env.TURBO_TOKEN }}
 
-      # For PRs: Run API breakage detection with Turborepo
+      - name: Build packages
+        run: pnpm build
+
+      - name: Build Brkr-Brkr
+        run: pnpm turbo build --filter=api-breakage-detector
+
       - name: Run API breakage detection (PR)
         if: github.event_name == 'pull_request'
         id: api-check-pr
         run: |
-          echo "🔍 Running API breakage detection for PR..."
+          pnpm turbo snapshot --filter=api-breakage-detector
           
-          # Generate current snapshots with Turborepo caching
-          pnpm api:snapshot
-          
-          # Run comparison (this will use cached baseline if available)
-          if pnpm api:check --no-version-check --format markdown --output api-changes-report.md; then
+          # Run breaking changes detection
+          echo "🔍 Detecting API changes..."
+          if pnpm turbo detect --filter=api-breakage-detector -- --format markdown --output api-changes-report.md; then
             echo "api_check_passed=true" >> $GITHUB_OUTPUT
           else
             echo "api_check_passed=false" >> $GITHUB_OUTPUT
           fi
 
-      # For main branch: Update cached baselines
       - name: Update baseline cache (main branch)
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: |
-          echo "📸 Updating baseline snapshots cache..."
-          
-          # Generate and cache baseline snapshots
-          pnpm api:snapshot --force
+          pnpm turbo snapshot --filter=api-breakage-detector -- --force
           
           # Store as artifacts for backup
           echo "COMMIT_SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
 
-      # Backup baselines to artifacts (main branch)
       - name: Upload baseline snapshots (main branch)
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         uses: actions/upload-artifact@v4
@@ -91,7 +85,6 @@ jobs:
           path: .api-snapshots/
           retention-days: 90
 
-      # Comment on PR with results
       - name: Comment on PR
         if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
@@ -144,7 +137,6 @@ jobs:
               });
             }
 
-      # Set commit status
       - name: Set commit status
         if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
@@ -164,7 +156,6 @@ jobs:
               context: 'api-breakage-detector'
             });
 
-      # Upload debug artifacts
       - name: Upload API snapshots and reports
         if: always()
         uses: actions/upload-artifact@v4
