@@ -48,6 +48,8 @@ export class GcsStorageBackend extends BaseStorageBackend {
   private options: GcsStorageOptions;
   private projectId: string;
   private bucketName: string;
+  private prefix: string = '';
+  private readonly LATEST_POINTER = 'latest.json';
 
   constructor(config: StorageConfig) {
     super(config);
@@ -69,28 +71,37 @@ export class GcsStorageBackend extends BaseStorageBackend {
   }
 
   async store(packageName: string, snapshotPath: string, metadata: SnapshotMetadata): Promise<string> {
-    this.validateMetadata(metadata);
     await this.ensureStorage();
 
     const key = this.generateKey(packageName, metadata.commitHash);
     const metadataKey = this.generateMetadataKey(packageName, metadata.commitHash);
-
-    // Calculate file stats
-    const stats = await fs.stat(snapshotPath);
-    metadata.fileSize = stats.size;
-    metadata.checksum = await this.calculateChecksum(snapshotPath);
+    const latestPointerKey = this.generateLatestPointerKey(packageName);
 
     try {
-      // Upload files in parallel for better performance
-      const [snapshotResult, _metadataResult] = await Promise.all([
-        this.uploadFile(key, snapshotPath, metadata),
-        this.uploadMetadata(metadataKey, metadata),
-      ]);
+      // Upload the snapshot file
+      const fullKey = `${this.getPackagePrefix(packageName)}/${key}`;
+      await this.bucket.upload(snapshotPath, {
+        destination: fullKey,
+        metadata: {
+          contentType: 'application/json',
+        },
+      });
 
-      console.log(`✅ Stored snapshot for ${packageName} in GCS (${this.formatFileSize(metadata.fileSize)})`);
-      return snapshotResult.name;
+      // Upload metadata
+      const fullMetadataKey = `${this.getPackagePrefix(packageName)}/${metadataKey}`;
+      await this.bucket.file(fullMetadataKey).save(JSON.stringify(metadata, null, 2), {
+        contentType: 'application/json',
+      });
+
+      // Update latest pointer
+      await this.bucket.file(latestPointerKey).save(JSON.stringify(metadata, null, 2), {
+        contentType: 'application/json',
+      });
+
+      return key;
     } catch (error) {
-      throw new Error(`Failed to store snapshot in GCS: ${error}`);
+      console.warn(`Failed to store snapshot in GCS:`, error);
+      throw error;
     }
   }
 
@@ -123,21 +134,60 @@ export class GcsStorageBackend extends BaseStorageBackend {
     }
   }
 
+  /**
+   * Delete a snapshot file and its metadata
+   */
+  async delete(key: string): Promise<void> {
+    await this.ensureStorage();
+
+    try {
+      // Extract package name from the key (format: packageName_commitHash.api.json)
+      const packageName = key.split('_')[0];
+      const fullKey = `${this.getPackagePrefix(packageName)}/${key}`;
+      const file = this.bucket.file(fullKey);
+      const metadataKey = fullKey.replace('.api.json', '.metadata.json');
+
+      // Delete the snapshot file
+      await file.delete();
+
+      // Delete metadata if it exists
+      const metadataFile = this.bucket.file(metadataKey);
+      const [exists] = await metadataFile.exists();
+      if (exists) {
+        await metadataFile.delete();
+      }
+
+      console.log(`✅ Deleted snapshot ${key} from GCS`);
+    } catch (error) {
+      console.warn(`Failed to delete snapshot from GCS:`, error);
+      throw error;
+    }
+  }
+
   async getBaseline(packageName: string, branch: string = 'main'): Promise<BaselineSnapshot | null> {
     await this.ensureStorage();
 
     try {
-      // List all snapshots for the package from the main branch
-      const snapshots = await this.listSnapshots(packageName, { limit: 50, branch });
+      // Get the latest pointer
+      const latestPointerKey = this.generateLatestPointerKey(packageName);
+      const latestFile = this.bucket.file(latestPointerKey);
 
-      if (snapshots.length === 0) {
+      const [exists] = await latestFile.exists();
+      if (!exists) {
         return null;
       }
 
-      // Get the most recent snapshot
-      const latest = snapshots[0]; // Already sorted by timestamp in listSnapshots
-      const localPath = await this.retrieve(packageName, latest.commitHash);
+      // Download the latest pointer
+      const [content] = await latestFile.download();
+      const metadata: SnapshotMetadata = JSON.parse(content.toString());
 
+      // Filter by branch if specified
+      if (branch && metadata.branch !== branch) {
+        return null;
+      }
+
+      // Get the actual snapshot file
+      const localPath = await this.retrieve(packageName, metadata.commitHash);
       if (!localPath) {
         return null;
       }
@@ -145,7 +195,7 @@ export class GcsStorageBackend extends BaseStorageBackend {
       return {
         packageName,
         filePath: localPath,
-        metadata: latest,
+        metadata,
       };
     } catch (error) {
       console.warn(`Failed to get baseline from GCS:`, error);
@@ -573,5 +623,10 @@ export class GcsStorageBackend extends BaseStorageBackend {
 
     const results = await Promise.all(uploadPromises);
     return results.filter(Boolean) as string[];
+  }
+
+  private generateLatestPointerKey(packageName: string): string {
+    const safeName = packageName.replace(/[@/]/g, '_');
+    return `${this.getPackagePrefix(packageName)}/${safeName}_${this.LATEST_POINTER}`;
   }
 }

@@ -11,6 +11,7 @@ on:
     paths:
       - 'packages/**'
       - 'tools/snapi/**'
+  workflow_dispatch:
 
 concurrency:
   group: api-breakage-${{ github.ref }}
@@ -45,19 +46,25 @@ jobs:
       - name: Build packages
         run: pnpm build
 
-      - name: Build Brkr-Brkr
+      - name: Build Snapi
         run: pnpm turbo build --filter=@clerk/snapi
+
+      - name: Check storage health
+        env:
+          GCS_PROJECT_ID: ${{ secrets.GCS_PROJECT_ID }}
+          GCS_BUCKET: ${{ secrets.GCS_BUCKET }}
+        run: pnpm snapi storage health --ci
 
       - name: Run API breakage detection (PR)
         if: github.event_name == 'pull_request'
         id: api-check-pr
         run: |
           # Generate current snapshots
-          node tools/snapi/dist/cli.js snapshot --config snapi.config.json
+          pnpm snapi:snapshot --config snapi.config.json
           
           # Run breaking changes detection
           echo "🔍 Detecting API changes..."
-          if node tools/snapi/dist/cli.js detect --config snapi.config.json --format markdown --output api-changes-report.md; then
+          if pnpm snapi:check --config snapi.config.json --format markdown --output api-changes-report.md; then
             echo "api_check_passed=true" >> $GITHUB_OUTPUT
           else
             echo "api_check_passed=false" >> $GITHUB_OUTPUT
@@ -66,7 +73,7 @@ jobs:
       - name: Update baseline cache (main branch)
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: |
-          node tools/snapi/dist/cli.js snapshot --config snapi.config.json --force
+          pnpm snapi:snapshot --config snapi.config.json --force
           
           # Store as artifacts for backup
           echo "COMMIT_SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV

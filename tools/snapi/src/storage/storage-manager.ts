@@ -113,6 +113,29 @@ export class StorageManager {
   }
 
   /**
+   * Delete a snapshot with automatic failover
+   */
+  async delete(key: string): Promise<void> {
+    const backends = [this.primaryBackend, ...this.fallbackBackends];
+
+    for (const backend of backends) {
+      if (await this.isBackendHealthy(backend)) {
+        try {
+          await this.executeWithRetry(() => backend.delete(key), `delete ${key}`);
+
+          this.updateHealthStatus(backend, true);
+          return;
+        } catch (error) {
+          console.warn(`Failed to delete ${key}:`, error);
+          this.updateHealthStatus(backend, false, error as Error);
+        }
+      }
+    }
+
+    throw new Error(`All storage backends failed to delete ${key}`);
+  }
+
+  /**
    * Get baseline snapshot with smart backend selection
    */
   async getBaseline(packageName: string, branch?: string): Promise<BaselineSnapshot | null> {
@@ -477,6 +500,14 @@ export class StorageManager {
     if (backend instanceof GcsStorageBackend) return 'gcs';
     if (backend instanceof TurborepoStorageBackend) return 'turborepo';
     return 'unknown';
+  }
+
+  /**
+   * Generate a storage key for a package snapshot
+   */
+  generateKey(packageName: string, commitHash: string): string {
+    const safeName = packageName.replace(/[@/]/g, '_');
+    return `${safeName}_${commitHash}.api.json`;
   }
 
   private startHealthMonitoring(): void {

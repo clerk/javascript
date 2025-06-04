@@ -112,65 +112,13 @@ export class BreakingChangesDetector {
   }
 
   private async getBaselineSnapshots(packages: PackageInfo[]): Promise<Map<string, string>> {
-    // Check if we should use storage-based baselines (for CI)
-    if (this.storageManager && this.options.config.ci?.baselineStorage) {
-      return this.loadStorageBaseline(packages);
+    // Always use storage-based baselines
+    if (!this.storageManager) {
+      throw new Error('Storage manager must be configured to use baseline snapshots');
     }
 
-    // Check if cache is valid first
-    if (await this.isBaselineCacheValid()) {
-      console.log('  📦 Using cached baseline snapshots...');
-      return this.loadCachedBaseline(packages);
-    }
-
-    console.log(`  🔄 Generating fresh baseline snapshots from ${this.options.config.mainBranch}...`);
-
-    const snapshots = new Map<string, string>();
-    const baselineDir = path.join(this.snapshotsDir, 'baseline');
-
-    // Generate fresh baseline snapshots from main branch
-    console.log(`  Checking out ${this.options.config.mainBranch} branch...`);
-    const currentBranch = await this.gitManager.getCurrentBranch();
-
-    try {
-      await this.gitManager.checkoutBranch(this.options.config.mainBranch);
-
-      // Discover packages in main branch (they might be different)
-      const mainPackages = await this.discoverPackages();
-
-      await fs.ensureDir(baselineDir);
-
-      for (const pkg of mainPackages) {
-        try {
-          console.log(`  Generating baseline snapshot for ${pkg.name}...`);
-          const snapshot = await this.apiExtractor.generateApiSnapshot({
-            packageInfo: pkg,
-            outputDir: baselineDir,
-          });
-          snapshots.set(pkg.name, snapshot.apiJsonPath);
-        } catch (error) {
-          console.warn(`  ⚠️ Failed to generate baseline snapshot for ${pkg.name}:`, error);
-        }
-      }
-
-      // Cache the baseline metadata
-      await this.cacheBaselineMetadata();
-    } finally {
-      // Switch back to original branch
-      await this.gitManager.checkoutBranch(currentBranch);
-    }
-
-    return snapshots;
-  }
-
-  private async loadStorageBaseline(packages: PackageInfo[]): Promise<Map<string, string>> {
     console.log('  📦 Loading storage-based baseline snapshots...');
     const snapshots = new Map<string, string>();
-
-    if (!this.storageManager) {
-      console.warn('  ⚠️ Storage manager not configured, falling back to local baseline');
-      return this.loadGitStoredBaseline(packages);
-    }
 
     for (const pkg of packages) {
       try {
@@ -183,24 +131,6 @@ export class BreakingChangesDetector {
         }
       } catch (error) {
         console.warn(`    ⚠️ Failed to load baseline for ${pkg.name}:`, error);
-      }
-    }
-
-    return snapshots;
-  }
-
-  private async loadGitStoredBaseline(packages: PackageInfo[]): Promise<Map<string, string>> {
-    console.log('  📦 Loading Git-stored baseline snapshots...');
-    const snapshots = new Map<string, string>();
-    const baselineDir = this.options.config.ci?.baselinePath || path.join(this.snapshotsDir, 'baseline');
-
-    for (const pkg of packages) {
-      const snapshotPath = path.join(baselineDir, `${pkg.name.replace('/', '__')}.api.json`);
-      if (await fs.pathExists(snapshotPath)) {
-        snapshots.set(pkg.name, snapshotPath);
-        console.log(`    ✅ Found baseline for ${pkg.name}`);
-      } else {
-        console.log(`    ⚠️ No baseline found for ${pkg.name} (new package?)`);
       }
     }
 
@@ -328,48 +258,6 @@ export class BreakingChangesDetector {
     }
 
     return { current, previous };
-  }
-
-  private async isBaselineCacheValid(): Promise<boolean> {
-    const cacheFile = path.join(this.snapshotsDir, '.baseline-cache.json');
-
-    if (!(await fs.pathExists(cacheFile))) {
-      return false;
-    }
-
-    try {
-      const cache = await fs.readJson(cacheFile);
-      const lastCommit = await this.gitManager.getLastCommit(this.options.config.mainBranch);
-
-      return cache.lastCommit === lastCommit && cache.timestamp > Date.now() - 24 * 60 * 60 * 1000; // 24 hours
-    } catch {
-      return false;
-    }
-  }
-
-  private async loadCachedBaseline(packages: PackageInfo[]): Promise<Map<string, string>> {
-    const snapshots = new Map<string, string>();
-    const baselineDir = path.join(this.snapshotsDir, 'baseline');
-
-    for (const pkg of packages) {
-      const snapshotPath = path.join(baselineDir, `${pkg.name.replace('/', '__')}.api.json`);
-      if (await fs.pathExists(snapshotPath)) {
-        snapshots.set(pkg.name, snapshotPath);
-      }
-    }
-
-    return snapshots;
-  }
-
-  private async cacheBaselineMetadata(): Promise<void> {
-    const cacheFile = path.join(this.snapshotsDir, '.baseline-cache.json');
-    const lastCommit = await this.gitManager.getLastCommit(this.options.config.mainBranch);
-
-    await fs.writeJson(cacheFile, {
-      lastCommit,
-      timestamp: Date.now(),
-      branch: this.options.config.mainBranch,
-    });
   }
 
   async generateReport(result: AnalysisResult, format: 'markdown' | 'json' = 'markdown'): Promise<string> {

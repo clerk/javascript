@@ -32,6 +32,11 @@ export interface SnapshotStorageBackend {
   retrieve(packageName: string, commitHash: string): Promise<string | null>;
 
   /**
+   * Delete a snapshot file and its metadata
+   */
+  delete(key: string): Promise<void>;
+
+  /**
    * Get the baseline snapshot for a package from the main branch
    */
   getBaseline(packageName: string, branch?: string): Promise<BaselineSnapshot | null>;
@@ -74,6 +79,7 @@ export abstract class BaseStorageBackend implements SnapshotStorageBackend {
 
   abstract store(packageName: string, snapshotPath: string, metadata: SnapshotMetadata): Promise<string>;
   abstract retrieve(packageName: string, commitHash: string): Promise<string | null>;
+  abstract delete(key: string): Promise<void>;
   abstract getBaseline(packageName: string, branch?: string): Promise<BaselineSnapshot | null>;
   abstract listSnapshots(
     packageName: string,

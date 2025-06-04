@@ -285,6 +285,8 @@ program
     new Command('health')
       .description('Check storage backend health')
       .option('-c, --config <path>', 'Configuration file path', 'snapi.config.json')
+      .option('-v, --verbose', 'Show detailed health information')
+      .option('--ci', 'Run in CI mode with minimal output')
       .action(async options => {
         try {
           const configPath = path.resolve(process.cwd(), options.config);
@@ -298,27 +300,147 @@ program
           const { StorageManager } = await import('./storage/storage-manager.js');
           const storageManager = new StorageManager(config.storage);
 
-          console.log('🔍 Checking storage health...\n');
+          if (!options.ci) {
+            console.log('🔍 Checking storage health...\n');
+          }
 
-          const healthStatus = await storageManager.getHealthStatus();
+          // Get basic health status
+          const [healthStatus, stats] = await Promise.all([
+            storageManager.getHealthStatus(),
+            storageManager.getStats(),
+          ]);
 
-          for (const health of healthStatus) {
-            const status = health.healthy ? '✅' : '❌';
-            const latency = health.latency ? ` (${health.latency}ms)` : '';
-            console.log(`${status} ${health.backend}${latency}`);
+          // Check if any backend is unhealthy
+          const unhealthyBackends = healthStatus.filter(h => !h.healthy);
+          if (unhealthyBackends.length > 0) {
+            if (options.ci) {
+              console.log('FAILED: Unhealthy storage backends detected');
+              for (const health of unhealthyBackends) {
+                console.log(`ERROR: ${health.backend} - ${health.error || 'Unknown error'}`);
+              }
+            } else {
+              for (const health of healthStatus) {
+                const status = health.healthy ? '✅' : '❌';
+                const latency = health.latency ? ` (${health.latency}ms)` : '';
+                console.log(`${status} ${health.backend}${latency}`);
+                if (health.error) {
+                  console.log(`   Error: ${health.error}`);
+                }
+                if (health.lastCheck) {
+                  console.log(`   Last check: ${health.lastCheck.toISOString()}`);
+                }
+              }
+            }
+            process.exit(1);
+          }
 
-            if (health.error) {
-              console.log(`   Error: ${health.error}`);
+          // Perform read-write-delete test
+          if (!options.ci) {
+            console.log('\n🧪 Performing read-write-delete test...');
+          }
+          const testKey = `health-test_test.api.json`;
+          const testData = { timestamp: new Date().toISOString(), test: true };
+          const testMetadata = {
+            commitHash: 'test',
+            timestamp: new Date().toISOString(),
+            branch: 'test',
+            packageName: 'health-test',
+            version: '0.0.0',
+            fileSize: 0,
+            checksum: 'test',
+          };
+
+          try {
+            // Write test
+            if (!options.ci) {
+              console.log('  Writing test file...');
+            }
+            const tempPath = path.join(process.cwd(), '.tmp', 'health-test', testKey);
+            await fs.ensureDir(path.dirname(tempPath));
+            await fs.writeJson(tempPath, testData);
+            await storageManager.store('health-test', tempPath, testMetadata);
+            if (!options.ci) {
+              console.log('  ✅ Write successful');
             }
 
-            if (health.lastCheck) {
-              console.log(`   Last check: ${health.lastCheck.toISOString()}`);
+            // Read test
+            if (!options.ci) {
+              console.log('  Reading test file...');
             }
+            const readData = await storageManager.retrieve('health-test', 'test');
+            if (!readData) {
+              throw new Error('Read failed - no data returned');
+            }
+            const parsedData = await fs.readJson(readData);
+            if (parsedData.test !== testData.test) {
+              throw new Error('Read data mismatch');
+            }
+            if (!options.ci) {
+              console.log('  ✅ Read successful');
+            }
+
+            // Delete test
+            if (!options.ci) {
+              console.log('  Deleting test file...');
+            }
+            await storageManager.delete(testKey);
+            if (!options.ci) {
+              console.log('  ✅ Delete successful');
+            }
+
+            // Clean up temp files
+            await fs.remove(path.dirname(tempPath));
+
+            if (!options.ci) {
+              console.log('\n✅ All storage operations successful');
+            }
+          } catch (error) {
+            if (options.ci) {
+              console.log(`FAILED: Storage operation failed - ${error instanceof Error ? error.message : error}`);
+            } else {
+              console.log(`\n❌ Storage operation failed: ${error instanceof Error ? error.message : error}`);
+            }
+            process.exit(1);
+          }
+
+          // Print storage stats
+          if (!options.ci) {
+            console.log('\n📊 Storage Statistics:');
+            console.log(`Total Size: ${formatBytes(stats.totalSize)}`);
+            console.log(`Snapshot Count: ${stats.snapshotCount}`);
+            console.log(`Oldest Snapshot: ${stats.oldestSnapshot || 'N/A'}`);
+            console.log(`Newest Snapshot: ${stats.newestSnapshot || 'N/A'}`);
+
+            // Print detailed backend information if verbose
+            if (options.verbose) {
+              console.log('\n🔧 Backend Details:');
+              for (const backend of stats.backendStats) {
+                const status = backend.healthy ? '✅' : '❌';
+                console.log(`\n${status} ${backend.backend}`);
+
+                if (backend.stats) {
+                  console.log(`   Size: ${formatBytes(backend.stats.totalSize)}`);
+                  console.log(`   Count: ${backend.stats.snapshotCount}`);
+                  console.log(`   Oldest: ${backend.stats.oldestSnapshot || 'N/A'}`);
+                  console.log(`   Newest: ${backend.stats.newestSnapshot || 'N/A'}`);
+                }
+
+                if (!backend.healthy) {
+                  console.log('   Status: Unhealthy');
+                }
+              }
+            }
+          } else {
+            console.log('PASSED: Storage health check completed successfully');
           }
 
           await storageManager.shutdown();
         } catch (error) {
-          console.error('❌ Storage health check failed:', error);
+          if (options.ci) {
+            console.log(`FAILED: ${error instanceof Error ? error.message : error}`);
+          } else {
+            console.error('❌ Storage health check failed:', error);
+          }
           process.exit(1);
         }
       }),
