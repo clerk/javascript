@@ -60,6 +60,9 @@ export type AuthenticateRequestOptions = {
   acceptsToken?: TokenType | TokenType[] | 'any';
 } & VerifyTokenOptions;
 
+/**
+ * @inline
+ */
 export type OrganizationSyncOptions = {
   /**
    * Specifies URL patterns that are organization-specific, containing an organization ID or slug as a path parameter. If a request matches this path, the organization identifier will be used to set that org as active.
@@ -68,8 +71,7 @@ export type OrganizationSyncOptions = {
    *
    * Patterns must have a path parameter named either `:id` (to match a Clerk organization ID) or `:slug` (to match a Clerk organization slug).
    *
-   * > [!WARNING]
-   * > If the organization can't be activated—either because it doesn't exist or the user lacks access—the previously active organization will remain unchanged. Components must detect this case and provide an appropriate error and/or resolution pathway, such as calling `notFound()` or displaying an [`<OrganizationSwitcher />`](https://clerk.com/docs/components/organization/organization-switcher).
+   * If the organization can't be activated—either because it doesn't exist or the user lacks access—the previously active organization will remain unchanged. Components must detect this case and provide an appropriate error and/or resolution pathway, such as calling `notFound()` or displaying an [`<OrganizationSwitcher />`](https://clerk.com/docs/components/organization/organization-switcher).
    *
    * @example
    * ["/orgs/:slug", "/orgs/:slug/(.*)"]
