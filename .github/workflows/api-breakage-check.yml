@@ -42,18 +42,8 @@ jobs:
           echo "GCS_PROJECT_ID is set: $([ ! -z "$GCS_PROJECT_ID" ] && echo 'yes' || echo 'no')"
           echo "GCS_BUCKET is set: $([ ! -z "$GCS_BUCKET" ] && echo 'yes' || echo 'no')"
           
-          # Debug: Verify GCS configuration
-          echo "Verifying GCS configuration..."
+          # Set GCS project
           gcloud config set project $GCS_PROJECT_ID
-          
-          # Debug: Check bucket access
-          echo "Checking bucket access..."
-          gsutil ls gs://$GCS_BUCKET || echo "Failed to list bucket contents"
-          
-          # Debug: Check bucket configuration
-          echo "Checking bucket configuration..."
-          gsutil bucketpolicyonly get gs://$GCS_BUCKET || echo "Failed to get bucket policy"
-          gsutil lifecycle get gs://$GCS_BUCKET || echo "Failed to get bucket lifecycle"
 
       - name: Setup
         id: config
