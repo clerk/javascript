@@ -10,6 +10,7 @@ on:
       - main
     paths:
       - 'packages/**'
+      - 'tools/snapi/**'
 
 concurrency:
   group: api-breakage-${{ github.ref }}
