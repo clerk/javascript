@@ -1,9 +1,10 @@
 import { stripPrivateDataFromObject } from '@clerk/backend/internal';
+import type { LoaderFunctionArgs } from 'react-router';
 
 import { noLoaderArgsPassedInGetAuth } from '../utils/errors';
 import { authenticateRequest } from './authenticateRequest';
 import { loadOptions } from './loadOptions';
-import type { GetAuthReturn, LoaderFunctionArgs, RootAuthLoaderOptions } from './types';
+import type { GetAuthReturn, RootAuthLoaderOptions } from './types';
 
 type GetAuthOptions = Pick<RootAuthLoaderOptions, 'secretKey'>;
 
