@@ -1,4 +1,4 @@
-name: API Breakage Detection
+name: API Breakage Check
 
 on:
   pull_request:
@@ -11,6 +11,7 @@ on:
     paths:
       - 'packages/**'
       - 'tools/snapi/**'
+  workflow_dispatch:
 
 concurrency:
   group: api-breakage-${{ github.ref }}
@@ -49,10 +50,15 @@ jobs:
         run: pnpm turbo build --filter=@clerk/snapi
 
       - name: Check storage health
+        id: storage-health
         env:
           GCS_PROJECT_ID: ${{ secrets.GCS_PROJECT_ID }}
           GCS_BUCKET: ${{ secrets.GCS_BUCKET }}
-        run: pnpm snapi storage health --ci
+        run: |
+          if ! pnpm snapi storage health --ci; then
+            echo "::error::Storage health check failed"
+            exit 1
+          fi
 
       - name: Run API breakage detection (PR)
         if: github.event_name == 'pull_request'
