@@ -7,7 +7,14 @@ export { createAuthenticateRequest } from './tokens/factory';
 
 export { debugRequestState } from './tokens/request';
 
-export type { AuthenticateRequestOptions, OrganizationSyncOptions } from './tokens/types';
+export type {
+  AuthenticateRequestOptions,
+  OrganizationSyncOptions,
+  InferAuthObjectFromToken,
+  InferAuthObjectFromTokenArray,
+  SessionAuthObject,
+  MachineAuthObject,
+} from './tokens/types';
 
 export { TokenType } from './tokens/tokenTypes';
 export type { SessionTokenType, MachineTokenType } from './tokens/tokenTypes';

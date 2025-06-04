@@ -1,7 +1,14 @@
 import type { MatchFunction } from '@clerk/shared/pathToRegexp';
 
 import type { ApiClient, APIKey, IdPOAuthAccessToken, MachineToken } from '../api';
-import type { TokenType } from './tokenTypes';
+import type {
+  AuthenticatedMachineObject,
+  AuthObject,
+  SignedInAuthObject,
+  SignedOutAuthObject,
+  UnauthenticatedMachineObject,
+} from './authObjects';
+import type { SessionTokenType, TokenType } from './tokenTypes';
 import type { VerifyTokenOptions } from './verify';
 
 /**
@@ -141,3 +148,34 @@ export type OrganizationSyncTargetMatchers = {
 export type OrganizationSyncTarget =
   | { type: 'personalAccount' }
   | { type: 'organization'; organizationId?: string; organizationSlug?: string };
+
+/**
+ * Infers auth object type from an array of token types.
+ * - Session token only -> SessionType
+ * - Mixed tokens -> SessionType | MachineType
+ * - Machine tokens only -> MachineType
+ */
+export type InferAuthObjectFromTokenArray<
+  T extends readonly TokenType[],
+  SessionType extends AuthObject,
+  MachineType extends AuthObject,
+> = SessionTokenType extends T[number]
+  ? T[number] extends SessionTokenType
+    ? SessionType
+    : SessionType | (MachineType & { tokenType: T[number] })
+  : MachineType & { tokenType: T[number] };
+
+/**
+ * Infers auth object type from a single token type.
+ * Returns SessionType for session tokens, or MachineType for machine tokens.
+ */
+export type InferAuthObjectFromToken<
+  T extends TokenType,
+  SessionType extends AuthObject,
+  MachineType extends AuthObject,
+> = T extends SessionTokenType ? SessionType : MachineType & { tokenType: T };
+
+export type SessionAuthObject = SignedInAuthObject | SignedOutAuthObject;
+export type MachineAuthObject<T extends TokenType> = (AuthenticatedMachineObject | UnauthenticatedMachineObject) & {
+  tokenType: T;
+};

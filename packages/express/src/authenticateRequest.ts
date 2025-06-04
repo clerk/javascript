@@ -13,7 +13,7 @@ import { incomingMessageToRequest, loadApiEnv, loadClientEnv } from './utils';
 
 export const authenticateRequest = (opts: AuthenticateRequestParams) => {
   const { clerkClient, request, options } = opts;
-  const { jwtKey, authorizedParties, audience } = options || {};
+  const { jwtKey, authorizedParties, audience, acceptsToken } = options || {};
 
   const clerkRequest = createClerkRequest(incomingMessageToRequest(request));
   const env = { ...loadApiEnv(), ...loadClientEnv() };
@@ -47,6 +47,7 @@ export const authenticateRequest = (opts: AuthenticateRequestParams) => {
     isSatellite,
     domain,
     signInUrl,
+    acceptsToken,
   });
 };
 
