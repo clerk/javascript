@@ -33,16 +33,16 @@ export const ptBR: LocalizationResource = {
   badge__you: 'Você',
   commerce: {
     addPaymentMethod: 'Adicionar método de pagamento',
-    alwaysFree: 'Sempre gratuito',
+    alwaysFree: 'Gratuito',
     annually: 'Anualmente',
     availableFeatures: 'Recursos disponíveis',
     billedAnnually: 'Cobrança anual',
-    billedMonthlyOnly: 'Apenas mensal',
+    billedMonthlyOnly: 'Apenas cobrança mensal',
     cancelSubscription: 'Cancelar assinatura',
     cancelSubscriptionAccessUntil:
       "Você pode continuar usando os recursos de {{plan}} até {{ date | longDate('pt-BR') }}, após o qual você não terá mais acesso.",
     cancelSubscriptionNoCharge: 'Você não será cobrado por esta assinatura.',
-    cancelSubscriptionTitle: 'Cancelar {{plan}}?',
+    cancelSubscriptionTitle: 'Cancelar assinatura do plano {{plan}}?',
     cannotSubscribeMonthly:
       'Você não pode assinar este plano pagando mensalmente. Para assinar este plano, você precisa escolher pagar anualmente.',
     checkout: {
@@ -52,12 +52,12 @@ export const ptBR: LocalizationResource = {
         'Você manterá sua assinatura atual e seus recursos até o final do ciclo de faturamento, após o qual você será transferido para este plano.',
       emailForm: {
         subtitle:
-          'Antes de concluir sua compra, você deve adicionar um endereço de e-mail onde os recibos serão enviados.',
+          'Antes de concluir sua compra, você deve adicionar um endereço de e-mail para o qual os recibos serão enviados.',
         title: 'Adicionar endereço de e-mail',
       },
       lineItems: {
         title__paymentMethod: 'Método de pagamento',
-        title__statementId: 'ID do extrato',
+        title__statementId: 'ID da declaração',
         title__subscriptionBegins: 'Assinatura começa',
         title__totalPaid: 'Total pago',
       },
