@@ -1,6 +1,6 @@
 import { getEnvVariable } from '@clerk/shared/getEnvVariable';
 import { errorThrower } from 'src/util/shared';
-import { Webhook } from 'svix';
+import crypto from 'crypto';
 
 import type { WebhookEvent } from './api/resources/Webhooks';
 
@@ -69,12 +69,24 @@ export async function verifyWebhook(request: Request, options: VerifyWebhookOpti
     return errorThrower.throw(`Missing required Svix headers: ${missingHeaders.join(', ')}`);
   }
 
-  const sivx = new Webhook(secret);
   const body = await request.text();
 
-  return sivx.verify(body, {
-    [SVIX_ID_HEADER]: svixId,
-    [SVIX_TIMESTAMP_HEADER]: svixTimestamp,
-    [SVIX_SIGNATURE_HEADER]: svixSignature,
-  }) as WebhookEvent;
+  const signedContent = `${svixId}.${svixTimestamp}.${body}`;
+
+  const secretBytes = Buffer.from(secret.split('_')[1], 'base64');
+
+  const constructedSignature = crypto.createHmac('sha256', secretBytes).update(signedContent).digest('base64');
+
+  // svixSignature can be a string with one or more space separated signatures
+  if (svixSignature.split(' ').includes(constructedSignature)) {
+    return errorThrower.throw('Incoming webhook does not have a valid signature');
+  }
+
+  const payload = JSON.parse(body);
+
+  return {
+    type: payload.type,
+    object: 'event',
+    data: payload.data,
+  } as WebhookEvent;
 }
