@@ -82,6 +82,37 @@ jobs:
           if_no_artifact_found: warn # Don't fail if not found, just warn
           github_token: ${{ secrets.GITHUB_TOKEN }} 
 
+      - name: Generate and store initial snapshots if needed
+        if: github.event_name == 'pull_request'
+        id: initial-snapshots
+        run: |
+          # Check if baseline directory is empty
+          if [ ! "$(ls -A .api-snapshots/baseline)" ]; then
+            echo "No baseline snapshots found. Generating initial snapshots..."
+            # Generate current snapshots
+            pnpm snapi:snapshot --config snapi.config.json
+            
+            # Copy current snapshots to baseline
+            mkdir -p .api-snapshots/baseline
+            cp -r .api-snapshots/current/* .api-snapshots/baseline/
+            
+            # Upload initial snapshots as artifacts
+            echo "COMMIT_SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
+            echo "initial_snapshots_generated=true" >> $GITHUB_OUTPUT
+            echo "Uploading initial snapshots as artifacts..."
+          else
+            echo "Baseline snapshots found, skipping initial snapshot generation."
+            echo "initial_snapshots_generated=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload initial snapshots (if generated)
+        if: github.event_name == 'pull_request' && steps.initial-snapshots.outputs.initial_snapshots_generated == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-baseline-${{ env.COMMIT_SHA }}
+          path: .api-snapshots/
+          retention-days: 90
+
       - name: Run API breakage detection (PR)
         if: github.event_name == 'pull_request'
         id: api-check-pr
