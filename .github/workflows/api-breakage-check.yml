@@ -41,13 +41,13 @@ jobs:
         run: pnpm build
 
       - name: Build Brkr-Brkr
-        run: pnpm turbo build --filter=snapi
+        run: pnpm turbo build --filter=@clerk/snapi
 
       - name: Run API breakage detection (PR)
         if: github.event_name == 'pull_request'
         id: api-check-pr
         run: |
-          pnpm turbo snapshot --filter=snapi
+          pnpm turbo snapshot --filter=@clerk/snapi
           
           # Run breaking changes detection
           echo "🔍 Detecting API changes..."
