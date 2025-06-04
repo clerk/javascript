@@ -32,7 +32,7 @@ export class VersionAnalyzer {
     };
   }
 
-  private calculateRecommendedBump(changes: ApiChange[]): ChangeSeverity {
+  public calculateRecommendedBump(changes: ApiChange[]): ChangeSeverity {
     // No changes = patch bump (or no bump)
     if (changes.length === 0) {
       return ChangeSeverity.PATCH;

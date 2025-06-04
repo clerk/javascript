@@ -2,20 +2,27 @@ import fs from 'fs-extra';
 import path from 'path';
 
 import { ApiDiffAnalyzer } from '../analyzers/api-diff.js';
-import { VersionAnalyzer } from '../analyzers/version-analyzer.js';
+import { VersionAnalyzer, type VersionBumpAnalysis } from '../analyzers/version-analyzer.js';
 import { ReportGenerator } from '../reporters/markdown-reporter.js';
-import { StorageManager, type StorageManagerConfig } from '../storage/storage-manager.js';
-import type { AnalysisResult, Config, PackageAnalysis, PackageInfo } from '../types.js';
+import type { BaselineSnapshot, SnapshotMetadata } from '../storage/base-storage.js';
+import { StorageManager } from '../storage/storage-manager.js';
+import {
+  type AnalysisResult,
+  type ApiChange,
+  type ApiSnapshot,
+  ChangeSeverity,
+  type Config,
+  type PackageAnalysis,
+  type PackageInfo,
+} from '../types.js';
 import { ApiExtractorRunner } from '../utils/api-extractor.js';
 import { GitManager } from '../utils/git-manager.js';
 import { PackageDiscovery } from '../utils/package-discovery.js';
 import { SuppressionManager } from '../utils/suppression-manager.js';
 
-export interface DetectorOptions {
+export interface BreakingChangesDetectorOptions {
   workspaceRoot: string;
   config: Config;
-  prBranch?: string;
-  baseBranch?: string;
   skipCleanup?: boolean;
 }
 
@@ -24,64 +31,55 @@ export interface DetectorOptions {
  */
 export class BreakingChangesDetector {
   private packageDiscovery: PackageDiscovery;
-  private apiExtractor: ApiExtractorRunner;
+  private extractorRunner: ApiExtractorRunner;
   private diffAnalyzer: ApiDiffAnalyzer;
-  private gitManager: GitManager;
   private versionAnalyzer: VersionAnalyzer;
-  private reportGenerator: ReportGenerator;
   private suppressionManager: SuppressionManager;
-  private snapshotsDir: string;
+  private gitManager: GitManager;
   private storageManager?: StorageManager;
+  private options: BreakingChangesDetectorOptions;
+  private reportGenerator: ReportGenerator;
 
-  constructor(private options: DetectorOptions) {
+  constructor(options: BreakingChangesDetectorOptions) {
+    this.options = options;
     this.packageDiscovery = new PackageDiscovery(options.workspaceRoot);
-    this.apiExtractor = new ApiExtractorRunner(options.workspaceRoot);
+    this.extractorRunner = new ApiExtractorRunner(options.workspaceRoot);
     this.diffAnalyzer = new ApiDiffAnalyzer();
-    this.gitManager = new GitManager(options.workspaceRoot);
     this.versionAnalyzer = new VersionAnalyzer();
+    this.suppressionManager = new SuppressionManager(options.config.suppressedChanges || []);
+    this.gitManager = new GitManager(options.workspaceRoot);
     this.reportGenerator = new ReportGenerator();
-    this.suppressionManager = new SuppressionManager(options.config.suppressedChanges);
-    this.snapshotsDir = path.resolve(options.workspaceRoot, options.config.snapshotsDir);
 
-    // Initialize storage manager if storage config is provided
-    if (this.options.config.storage) {
-      this.storageManager = new StorageManager(this.options.config.storage as StorageManagerConfig);
+    if (options.config.storage) {
+      this.storageManager = new StorageManager(options.config.storage);
     }
   }
 
   async detectBreakingChanges(): Promise<AnalysisResult> {
-    console.log('🔍 Starting API breaking changes detection...');
+    console.log('[SNAPI] 🔍 Starting API breaking changes detection...');
 
     try {
-      // 1. Discover packages in the monorepo
       const packages = await this.discoverPackages();
-      console.log(`📦 Found ${packages.length} packages to analyze`);
+      console.log(`[SNAPI] 📦 Found ${packages.length} packages to analyze`);
 
-      // 2. Generate current API snapshots
-      console.log('📸 Generating current API snapshots...');
+      console.log('[SNAPI] 📸 Generating current API snapshots...');
       const currentSnapshots = await this.generateCurrentSnapshots(packages);
 
-      // 3. Get baseline snapshots from main branch
-      console.log('🌿 Fetching baseline snapshots from main branch...');
+      console.log('[SNAPI] 🌿 Fetching baseline snapshots...');
       const baselineSnapshots = await this.getBaselineSnapshots(packages);
 
-      // 4. Compare snapshots and detect changes
-      console.log('🔄 Analyzing API changes...');
+      console.log('[SNAPI] 🔄 Analyzing API changes...');
       const packageAnalyses = await this.analyzePackageChanges(packages, currentSnapshots, baselineSnapshots);
 
-      // 5. Apply suppressions
       const suppressedAnalyses = this.applySuppressions(packageAnalyses);
-
-      // 6. Generate final result
       const result = this.buildAnalysisResult(suppressedAnalyses);
 
-      console.log('✅ API breaking changes detection completed');
+      console.log('[SNAPI] ✅ API breaking changes detection completed');
       return result;
     } catch (error) {
-      console.error('❌ API breaking changes detection failed:', error);
+      console.error('[SNAPI] ❌ API breaking changes detection failed:', error);
       throw error;
     } finally {
-      // Cleanup temporary files
       await this.cleanup();
     }
   }
@@ -91,210 +89,270 @@ export class BreakingChangesDetector {
   }
 
   async generateCurrentSnapshots(packages: PackageInfo[]): Promise<Map<string, string>> {
+    const snapshotsDir = path.join(
+      this.options.workspaceRoot,
+      this.options.config.snapshotsDir || '.api-snapshots',
+      'current',
+    );
+    await fs.ensureDir(snapshotsDir);
     const snapshots = new Map<string, string>();
-    const currentDir = path.join(this.snapshotsDir, 'current');
-    await fs.ensureDir(currentDir);
 
     for (const pkg of packages) {
       try {
-        console.log(`  Generating snapshot for ${pkg.name}...`);
-        const snapshot = await this.apiExtractor.generateApiSnapshot({
+        const snapshotResult: ApiSnapshot = await this.extractorRunner.generateApiSnapshot({
           packageInfo: pkg,
-          outputDir: currentDir,
+          outputDir: snapshotsDir,
         });
-        snapshots.set(pkg.name, snapshot.apiJsonPath);
+        snapshots.set(pkg.name, snapshotResult.apiJsonPath);
+        console.log(`[SNAPI] Generated current snapshot for ${pkg.name} at ${snapshotResult.apiJsonPath}`);
       } catch (error) {
-        console.warn(`  ⚠️ Failed to generate snapshot for ${pkg.name}:`, error);
+        console.warn(
+          `[SNAPI] Failed to generate snapshot for ${pkg.name}: ${error instanceof Error ? error.message : String(error)}`,
+        );
       }
     }
-
     return snapshots;
   }
 
-  private async getBaselineSnapshots(packages: PackageInfo[]): Promise<Map<string, string>> {
-    // Always use storage-based baselines
-    if (!this.storageManager) {
-      throw new Error('Storage manager must be configured to use baseline snapshots');
-    }
-
-    console.log('  📦 Loading storage-based baseline snapshots...');
-    const snapshots = new Map<string, string>();
+  async getBaselineSnapshots(packages: PackageInfo[]): Promise<Map<string, BaselineSnapshot>> {
+    const baselineSnapshots = new Map<string, BaselineSnapshot>();
+    console.log('[SNAPI] Loading baseline snapshots...');
 
     for (const pkg of packages) {
-      try {
-        const baseline = await this.storageManager.getBaseline(pkg.name, this.options.config.mainBranch);
-        if (baseline) {
-          snapshots.set(pkg.name, baseline.filePath);
-          console.log(`    ✅ Found baseline for ${pkg.name}`);
-        } else {
-          console.log(`    ⚠️ No baseline found for ${pkg.name} (new package?)`);
+      let baseline: BaselineSnapshot | null = null;
+
+      if (this.storageManager) {
+        try {
+          console.log(`[SNAPI] Attempting to load baseline for ${pkg.name} from StorageManager...`);
+          baseline = await this.storageManager.getBaseline(pkg.name, this.options.config.mainBranch);
+          if (baseline) {
+            console.log(`[SNAPI] Successfully loaded baseline for ${pkg.name} from StorageManager.`);
+          } else {
+            console.log(`[SNAPI] StorageManager returned no baseline for ${pkg.name}.`);
+          }
+        } catch (error) {
+          console.warn(
+            `[SNAPI] Failed to get baseline for ${pkg.name} from StorageManager: ${error instanceof Error ? error.message : String(error)}`,
+          );
         }
-      } catch (error) {
-        console.warn(`    ⚠️ Failed to load baseline for ${pkg.name}:`, error);
+      }
+
+      if (!baseline) {
+        console.log(
+          `[SNAPI] Attempting to load baseline for ${pkg.name} directly from filesystem: ${path.join(
+            this.options.config.snapshotsDir || '.api-snapshots',
+            'baseline',
+          )}`,
+        );
+        const safePackageName = pkg.name.startsWith('@')
+          ? `@${pkg.name.substring(1).replace(/\//g, '__')}`
+          : pkg.name.replace(/\//g, '__');
+        const baselinePath = path.join(
+          this.options.workspaceRoot,
+          this.options.config.snapshotsDir || '.api-snapshots',
+          'baseline',
+          `${safePackageName}.api.json`,
+        );
+
+        if (await fs.pathExists(baselinePath)) {
+          try {
+            const metadataPath = baselinePath.replace('.api.json', '.metadata.json');
+            let metadata: SnapshotMetadata;
+
+            if (await fs.pathExists(metadataPath)) {
+              metadata = await fs.readJson(metadataPath);
+            } else {
+              console.warn(`[SNAPI] No .metadata.json found for ${baselinePath}, creating placeholder metadata.`);
+              const fileStats = await fs.stat(baselinePath);
+              metadata = {
+                packageName: pkg.name,
+                commitHash: 'unknown-artifact-baseline',
+                timestamp: fileStats.mtime.toISOString(),
+                branch: this.options.config.mainBranch || 'main',
+                version: pkg.version,
+                fileSize: fileStats.size,
+                checksum: '',
+              };
+            }
+
+            baseline = {
+              packageName: pkg.name,
+              filePath: baselinePath,
+              metadata,
+            };
+            console.log(`[SNAPI] Successfully loaded baseline for ${pkg.name} from filesystem: ${baselinePath}`);
+          } catch (error) {
+            console.warn(
+              `[SNAPI] Error loading baseline or metadata for ${pkg.name} from filesystem path ${baselinePath}: ${error instanceof Error ? error.message : String(error)}`,
+            );
+          }
+        } else {
+          console.warn(`[SNAPI] No baseline snapshot found for ${pkg.name} at filesystem path: ${baselinePath}`);
+        }
+      }
+
+      if (baseline) {
+        baselineSnapshots.set(pkg.name, baseline);
+        console.log(`[SNAPI] Baseline for ${pkg.name} (commit: ${baseline.metadata.commitHash}) ready.`);
+      } else {
+        console.warn(
+          `[SNAPI] No baseline found for ${pkg.name} using any method. It will be treated as a new package or all its APIs as new.`,
+        );
       }
     }
 
-    return snapshots;
+    if (baselineSnapshots.size === 0 && packages.length > 0) {
+      console.warn(
+        '[SNAPI] No baseline snapshots could be loaded for any package. All packages will be treated as new, or all APIs as new.',
+      );
+    }
+    return baselineSnapshots;
   }
 
   private async analyzePackageChanges(
     packages: PackageInfo[],
     currentSnapshots: Map<string, string>,
-    baselineSnapshots: Map<string, string>,
+    baselineSnapshots: Map<string, BaselineSnapshot>,
   ): Promise<PackageAnalysis[]> {
     const analyses: PackageAnalysis[] = [];
-
     for (const pkg of packages) {
-      const currentSnapshot = currentSnapshots.get(pkg.name);
-      const baselineSnapshot = baselineSnapshots.get(pkg.name);
+      const currentSnapshotPath = currentSnapshots.get(pkg.name);
+      const baseline = baselineSnapshots.get(pkg.name);
 
-      if (!currentSnapshot) {
-        console.warn(`  ⚠️ No current snapshot for ${pkg.name}, skipping`);
+      if (!currentSnapshotPath) {
+        console.warn(`[SNAPI] Current snapshot missing for package: ${pkg.name}. Skipping analysis.`);
         continue;
       }
 
-      try {
-        console.log(`  Analyzing changes for ${pkg.name}...`);
+      let changes: ApiChange[] = [];
+      let versionAnalysisResult: VersionBumpAnalysis;
 
-        // Compare API snapshots
-        const changes = baselineSnapshot
-          ? await this.diffAnalyzer.compareApiModels(currentSnapshot, baselineSnapshot, pkg.name)
-          : []; // New package - no baseline to compare
-
-        // Get version information
-        const versionInfo = await this.getVersionInfo(pkg);
-
-        // Analyze version bump validity
-        const analysis = await this.versionAnalyzer.analyzeVersionBump(
-          changes,
-          versionInfo.current,
-          versionInfo.previous,
+      if (baseline) {
+        changes = await this.diffAnalyzer.compareApiModels(currentSnapshotPath, baseline.filePath, pkg.name);
+        if (this.options.config.checkVersionBump && baseline.metadata.version) {
+          versionAnalysisResult = await this.versionAnalyzer.analyzeVersionBump(
+            changes,
+            pkg.version,
+            baseline.metadata.version,
+          );
+        } else {
+          versionAnalysisResult = {
+            recommendedBump: this.versionAnalyzer.calculateRecommendedBump(changes),
+            actualBump: undefined,
+            isValid: true,
+            reasons: ['Version bump check skipped or baseline version unavailable'],
+          };
+        }
+      } else {
+        console.warn(
+          `[SNAPI] No baseline for ${pkg.name}, treating as new. Change detection for new packages may be incomplete.`,
         );
-
-        analyses.push({
-          packageName: pkg.name,
-          version: versionInfo,
-          changes,
-          hasBreakingChanges: changes.some(c => c.type === 'breaking'),
-          recommendedVersionBump: analysis.recommendedBump,
-          actualVersionBump: analysis.actualBump,
-          isValidBump: analysis.isValid,
-        });
-      } catch (error) {
-        console.warn(`  ⚠️ Failed to analyze changes for ${pkg.name}:`, error);
+        changes = [];
+        versionAnalysisResult = {
+          recommendedBump: ChangeSeverity.MINOR,
+          actualBump: undefined,
+          isValid: true,
+          reasons: ['New package, defaulting to minor bump recommendation'],
+        };
       }
-    }
 
+      const hasBreakingChanges = changes.some(c => c.severity === ChangeSeverity.MAJOR && !c.isSuppressed);
+
+      analyses.push({
+        packageName: pkg.name,
+        version: {
+          current: pkg.version,
+          previous: baseline?.metadata.version || 'N/A',
+        },
+        changes,
+        hasBreakingChanges,
+        recommendedVersionBump: versionAnalysisResult.recommendedBump,
+        actualVersionBump: versionAnalysisResult.actualBump,
+        isValidBump: versionAnalysisResult.isValid,
+      });
+    }
     return analyses;
   }
 
-  private applySuppressions(analyses: PackageAnalysis[]): PackageAnalysis[] {
-    return analyses.map(analysis => ({
-      ...analysis,
-      changes: analysis.changes.map(change => {
+  applySuppressions(packageAnalyses: PackageAnalysis[]): PackageAnalysis[] {
+    return packageAnalyses.map(analysis => {
+      const newChanges = analysis.changes.map(change => {
         const suppression = this.suppressionManager.getSuppression(analysis.packageName, change.id);
-
         if (suppression) {
-          return {
-            ...change,
-            isSuppressed: true,
-            suppressionReason: suppression.reason,
-          };
+          return { ...change, isSuppressed: true, suppressionReason: suppression.reason };
         }
-
         return change;
-      }),
-    }));
+      });
+      return {
+        ...analysis,
+        changes: newChanges,
+        hasBreakingChanges: newChanges.some(c => c.severity === ChangeSeverity.MAJOR && !c.isSuppressed),
+      };
+    });
   }
 
-  private buildAnalysisResult(analyses: PackageAnalysis[]): AnalysisResult {
-    const packagesWithChanges = analyses.filter(a => a.changes.length > 0);
-    const unsuppressedChanges = analyses.flatMap(a => a.changes.filter(c => !c.isSuppressed));
+  buildAnalysisResult(packageAnalyses: PackageAnalysis[]): AnalysisResult {
+    let totalBreakingChanges = 0;
+    let totalNonBreakingChanges = 0;
+    let totalAdditions = 0;
+    let packagesWithChanges = 0;
 
-    const breakingChanges = unsuppressedChanges.filter(c => c.type === 'breaking');
-    const nonBreakingChanges = unsuppressedChanges.filter(c => c.type === 'non-breaking');
-    const additions = unsuppressedChanges.filter(c => c.type === 'addition');
-
-    const hasBreakingChanges = breakingChanges.length > 0;
-
-    // Determine if CI should fail
-    const ciShouldFail =
-      this.options.config.checkVersionBump &&
-      hasBreakingChanges &&
-      analyses.some(a => a.hasBreakingChanges && !a.isValidBump);
-
-    return {
-      packages: analyses,
-      hasBreakingChanges,
-      ciShouldFail,
-      summary: {
-        totalPackages: analyses.length,
-        packagesWithChanges: packagesWithChanges.length,
-        breakingChanges: breakingChanges.length,
-        nonBreakingChanges: nonBreakingChanges.length,
-        additions: additions.length,
-      },
-    };
-  }
-
-  private async getVersionInfo(pkg: PackageInfo): Promise<{ current: string; previous: string }> {
-    // Get current version from package.json
-    const current = pkg.version;
-
-    // Get previous version from main branch
-    const currentBranch = await this.gitManager.getCurrentBranch();
-    let previous = current;
-
-    try {
-      await this.gitManager.checkoutBranch(this.options.config.mainBranch);
-      const mainPackageJson = path.join(pkg.path, 'package.json');
-
-      if (await fs.pathExists(mainPackageJson)) {
-        const mainPkg = await fs.readJson(mainPackageJson);
-        previous = mainPkg.version || current;
+    for (const analysis of packageAnalyses) {
+      if (analysis.changes.length > 0) packagesWithChanges++;
+      for (const change of analysis.changes) {
+        if (change.isSuppressed) continue;
+        if (change.severity === ChangeSeverity.MAJOR) totalBreakingChanges++;
+        else if (change.type === 'addition') totalAdditions++;
+        else totalNonBreakingChanges++;
       }
-    } finally {
-      await this.gitManager.checkoutBranch(currentBranch);
     }
 
-    return { current, previous };
+    const overallHasBreakingChanges = packageAnalyses.some(p => p.hasBreakingChanges);
+    const ciShouldFail =
+      (this.options.config.ci?.failOnBreakingChanges && overallHasBreakingChanges) ||
+      packageAnalyses.some(p => this.options.config.checkVersionBump && p.isValidBump === false);
+
+    return {
+      packages: packageAnalyses,
+      hasBreakingChanges: overallHasBreakingChanges,
+      ciShouldFail,
+      summary: {
+        totalPackages: packageAnalyses.length,
+        packagesWithChanges,
+        breakingChanges: totalBreakingChanges,
+        nonBreakingChanges: totalNonBreakingChanges,
+        additions: totalAdditions,
+      },
+    };
   }
 
   async generateReport(result: AnalysisResult, format: 'markdown' | 'json' = 'markdown'): Promise<string> {
     if (format === 'json') {
       return JSON.stringify(result, null, 2);
     }
-
     return this.reportGenerator.generateMarkdownReport(result);
   }
 
   async cleanup(): Promise<void> {
     if (this.options.skipCleanup) {
-      console.log('🧹 Cleanup skipped due to --no-cleanup flag');
+      console.log('[SNAPI] Skipping cleanup of temporary files.');
       return;
     }
+    const currentSnapshotsDir = path.join(
+      this.options.workspaceRoot,
+      this.options.config.snapshotsDir || '.api-snapshots',
+      'current',
+    );
 
     try {
-      console.log('🧹 Starting cleanup...');
-      await this.apiExtractor.cleanup();
-      console.log('  API extractor cleanup completed');
-
-      // Clean up current snapshots (keep baseline for caching)
-      const currentDir = path.join(this.snapshotsDir, 'current');
-      if (await fs.pathExists(currentDir)) {
-        console.log(`  Removing current snapshots directory: ${currentDir}`);
-        await fs.remove(currentDir);
-        console.log('  Current snapshots directory removed');
-      } else {
-        console.log('  No current snapshots directory to clean up');
+      console.log(`[SNAPI] Attempting to remove current snapshots directory: ${currentSnapshotsDir}`);
+      await fs.remove(currentSnapshotsDir);
+      if (typeof this.extractorRunner.cleanup === 'function') {
+        await this.extractorRunner.cleanup();
       }
-
-      if (this.storageManager) {
-        console.log('🧹 Cleaning up snapshots older than 30 days...');
-        await this.storageManager.cleanup(30);
-      }
+      console.log('[SNAPI] Temporary files and current snapshots cleaned up.');
     } catch (error) {
-      console.warn('⚠️ Cleanup failed:', error);
+      console.warn(`[SNAPI] Error during cleanup: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
