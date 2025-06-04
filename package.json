@@ -4,6 +4,10 @@
   "private": true,
   "license": "MIT",
   "scripts": {
+    "api:check": "pnpm --filter=snapi run build && pnpm --filter=snapi run detect",
+    "api:init": "pnpm --filter=snapi run build && pnpm --filter=snapi run init --output snapi.config.json",
+    "api:snapshot": "pnpm --filter=snapi run build && pnpm --filter=snapi run snapshot",
+    "api:suppress": "pnpm --filter=snapi run build && pnpm --filter=snapi run suppress",
     "build": "FORCE_COLOR=1 turbo build --concurrency=${TURBO_CONCURRENCY:-80%}",
     "build:declarations": "FORCE_COLOR=1 turbo build:declarations --concurrency=${TURBO_CONCURRENCY:-80%} --filter=@clerk/nextjs --filter=@clerk/clerk-react --filter=@clerk/shared --filter=@clerk/types",
     "bundlewatch": "turbo bundlewatch",

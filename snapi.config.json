@@ -1,0 +1,74 @@
+{
+  "packages": [
+    "@clerk/backend",
+    "@clerk/clerk-js",
+    "@clerk/nextjs",
+    "@clerk/react",
+    "@clerk/clerk-react",
+    "@clerk/shared",
+    "@clerk/types"
+  ],
+  "excludePackages": ["@clerk/testing", "@clerk/eslint-config"],
+  "snapshotsDir": ".api-snapshots",
+  "mainBranch": "main",
+  "checkVersionBump": true,
+  "suppressedChanges": [],
+  "enableLLMAnalysis": false,
+  "llmProvider": "openai",
+  "storage": {
+    "primary": {
+      "type": "gcs",
+      "options": {
+        "prefix": "api-snapshots",
+        "multiRegion": true,
+        "enableVersioning": true,
+        "lifecycle": {
+          "enabled": true,
+          "deleteAfterDays": 90,
+          "archiveAfterDays": 30
+        },
+        "storageClass": "STANDARD"
+      }
+    },
+    "fallback": [
+      {
+        "type": "turborepo",
+        "options": {
+          "cacheDir": "node_modules/.cache/turbo",
+          "remoteCache": false,
+          "namespace": "api-snapshots"
+        }
+      }
+    ],
+    "healthCheckInterval": 10,
+    "retryAttempts": 3,
+    "retryDelay": 1000
+  },
+  "ci": {
+    "enableStatusChecks": true,
+    "failOnBreakingChanges": true,
+    "baselineStorage": "gcs",
+    "artifactRetentionDays": 7,
+    "parallelSnapshots": true,
+    "batchSize": 5
+  },
+  "github": {
+    "token": "${GITHUB_TOKEN}",
+    "repository": "${GITHUB_REPOSITORY}",
+    "commentOnPR": true,
+    "addStatusChecks": true,
+    "createAnnotations": true
+  },
+  "reporting": {
+    "format": "markdown",
+    "includeCodeDiffs": true,
+    "includeSuggestions": true,
+    "maxChangesPerPackage": 50
+  },
+  "performance": {
+    "maxConcurrentPackages": 3,
+    "timeoutMs": 300000,
+    "cacheBaseline": true,
+    "cacheExpirationDays": 1
+  }
+}
