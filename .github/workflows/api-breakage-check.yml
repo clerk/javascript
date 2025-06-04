@@ -29,25 +29,13 @@ jobs:
         with:
           fetch-depth: 0  # Need full history
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup
+        id: config
+        uses: ./.github/actions/init-blacksmith
         with:
-          node-version: '22'
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Setup Turborepo Remote Cache
-        if: env.TURBO_TEAM_ID && env.TURBO_TOKEN
-        env:
-          TURBO_TEAM_ID: ${{ vars.TURBO_TEAM_ID }}
-          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-        run: |
-          npx turbo login --team=${{ env.TURBO_TEAM_ID }} --token=${{ env.TURBO_TOKEN }}
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Build packages
         run: pnpm build
