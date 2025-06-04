@@ -163,6 +163,21 @@ export class TurborepoStorageBackend extends BaseStorageBackend {
     }
   }
 
+  async delete(key: string): Promise<void> {
+    const cacheDir = path.join(this.cacheDir, this.getCacheNamespace(), key);
+
+    try {
+      if (await fs.pathExists(cacheDir)) {
+        await fs.remove(cacheDir);
+        console.log(`✅ Deleted snapshot ${key} from Turborepo cache`);
+      } else {
+        console.warn(`Snapshot ${key} not found in Turborepo cache for deletion`);
+      }
+    } catch (error) {
+      throw new Error(`Failed to delete snapshot ${key} from Turborepo cache: ${error}`);
+    }
+  }
+
   async cleanup(retentionDays: number): Promise<void> {
     const cutoffDate = new Date(Date.now() - retentionDays * 24 * 60 * 60 * 1000);
     const namespaceDir = path.join(this.cacheDir, this.getCacheNamespace());
