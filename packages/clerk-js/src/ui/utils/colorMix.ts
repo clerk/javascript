@@ -11,8 +11,8 @@ type Percentage = `${number}%`;
  * @param colorTint - The color to mix the color with
  * @returns The mixed color
  */
-export function colorMix(color: string, percentage: Percentage, colorTint: string) {
-  return `color-mix(in oklch, ${color} ${percentage}, ${colorTint})`;
+export function colorMix(colorOne: string, colorTwo: string) {
+  return `color-mix(in oklch, ${colorOne}, ${colorTwo})`;
 }
 
 /**
@@ -22,7 +22,7 @@ export function colorMix(color: string, percentage: Percentage, colorTint: strin
  * @returns The transparentized color
  */
 export function transparentize(color: string, percentage: Percentage) {
-  return colorMix(color, percentage, 'transparent');
+  return colorMix(`${color} ${percentage}`, 'transparent');
 }
 
 /**
@@ -32,7 +32,7 @@ export function transparentize(color: string, percentage: Percentage) {
  * @returns The lightened color
  */
 export function lighten(color: string, percentage: Percentage) {
-  return colorMix(color, percentage, 'white');
+  return colorMix(`${color} ${percentage}`, 'white');
 }
 
 /**
@@ -42,7 +42,7 @@ export function lighten(color: string, percentage: Percentage) {
  * @returns The darkened color
  */
 export function darken(color: string, percentage: Percentage) {
-  return colorMix(color, percentage, 'black');
+  return colorMix(`${color} ${percentage}`, 'black');
 }
 
 /**

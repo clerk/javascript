@@ -1,10 +1,12 @@
 import React from 'react';
 
+import { colorMix } from '@/ui/utils/colorMix';
+
 import { useEnvironment } from '../../contexts';
 import { descriptors, Flex, Link, localizationKeys, useAppearance } from '../../customizables';
 import { useDevMode } from '../../hooks/useDevMode';
 import type { InternalTheme, PropsOfComponent } from '../../styledSystem';
-import { common, mqu } from '../../styledSystem';
+import { mqu } from '../../styledSystem';
 import { Card } from '.';
 
 type CardFooterProps = PropsOfComponent<typeof Flex> & {
@@ -49,7 +51,7 @@ export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>((pro
         t => ({
           marginTop: `-${t.space.$2}`,
           paddingTop: t.space.$2,
-          background: common.mergedColorsBackground(t.colors.$colorBackground, t.colors.$neutralAlpha50),
+          backgroundColor: colorMix(t.colors.$colorBackground, t.colors.$neutralAlpha50),
           '&:empty': {
             padding: 0,
             marginTop: 0,

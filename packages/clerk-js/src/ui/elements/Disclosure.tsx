@@ -5,7 +5,7 @@ import { Box, descriptors, Icon, SimpleButton, Span, useAppearance } from '../cu
 import { usePrefersReducedMotion } from '../hooks';
 import { ChevronDown } from '../icons';
 import type { ThemableCssProp } from '../styledSystem';
-import { common } from '../styledSystem';
+import { colorMix } from '../utils/colorMix';
 
 /* -------------------------------------------------------------------------------------------------
  * Disclosure Context
@@ -167,7 +167,7 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
             borderWidth: t.borderWidths.$normal,
             borderStyle: t.borderStyles.$solid,
             borderColor: t.colors.$neutralAlpha100,
-            background: common.mergedColorsBackground(t.colors.$colorBackground, t.colors.$neutralAlpha50),
+            backgroundColor: colorMix(t.colors.$colorBackground, t.colors.$neutralAlpha50),
           })}
         >
           {children}
