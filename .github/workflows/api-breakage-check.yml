@@ -47,11 +47,12 @@ jobs:
         if: github.event_name == 'pull_request'
         id: api-check-pr
         run: |
-          pnpm turbo snapshot --filter=@clerk/snapi
+          # Generate current snapshots
+          node tools/snapi/dist/cli.js snapshot --config snapi.config.json
           
           # Run breaking changes detection
           echo "🔍 Detecting API changes..."
-          if pnpm turbo detect --filter=@clerk/snapi-- --format markdown --output api-changes-report.md; then
+          if node tools/snapi/dist/cli.js detect --config snapi.config.json --format markdown --output api-changes-report.md; then
             echo "api_check_passed=true" >> $GITHUB_OUTPUT
           else
             echo "api_check_passed=false" >> $GITHUB_OUTPUT
@@ -60,7 +61,7 @@ jobs:
       - name: Update baseline cache (main branch)
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: |
-          pnpm turbo snapshot --filter=@clerk/snapi-- --force
+          node tools/snapi/dist/cli.js snapshot --config snapi.config.json --force
           
           # Store as artifacts for backup
           echo "COMMIT_SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
