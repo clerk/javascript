@@ -1,5 +1,20 @@
 # @clerk/testing
 
+## 1.8.0
+
+### Minor Changes
+
+- Add `waitToBeActive({ planSlug })` and `getPlanCardCTA({ planSlug })` to pricingTable object. ([#6051](https://github.com/clerk/javascript/pull/6051)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Update checkoutObject with `waitForStipeElements` method and `root` property. ([#5980](https://github.com/clerk/javascript/pull/5980)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`ea622ba`](https://github.com/clerk/javascript/commit/ea622bae90e18ae2ea8dbc6c94cad857557539c9), [`d8fa5d9`](https://github.com/clerk/javascript/commit/d8fa5d9d3d8dc575260d8d2b7c7eeeb0052d0b0d), [`be2e89c`](https://github.com/clerk/javascript/commit/be2e89ca11aa43d48f74c57a5a34e20d85b4003c), [`c656270`](https://github.com/clerk/javascript/commit/c656270f9e05fd1f44fc4c81851be0b1111cb933), [`5644d94`](https://github.com/clerk/javascript/commit/5644d94f711a0733e4970c3f15c24d56cafc8743), [`b578225`](https://github.com/clerk/javascript/commit/b5782258242474c9b0987a3f8349836cd763f24b), [`918e2e0`](https://github.com/clerk/javascript/commit/918e2e085bf88c3cfaa5fcb0f1ae8c31b3f7053e), [`795d09a`](https://github.com/clerk/javascript/commit/795d09a652f791e1e409406e335e0860aceda110), [`4f93634`](https://github.com/clerk/javascript/commit/4f93634ed6bcd45f21bddcb39a33434b1cb560fe), [`8838120`](https://github.com/clerk/javascript/commit/8838120596830b88fec1c6c853371dabfec74a0d)]:
+  - @clerk/backend@2.0.0
+  - @clerk/types@4.60.0
+  - @clerk/shared@3.9.6
+
 ## 1.7.5
 
 ### Patch Changes

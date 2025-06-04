@@ -1,5 +1,17 @@
 # Change Log
 
+## 5.31.9
+
+### Patch Changes
+
+- Initialize isomorphic clerk with `useRef`. Avoid memoizing the singleton, instead use a reference to store it, and then destroy it. ([#6024](https://github.com/clerk/javascript/pull/6024)) by [@panteliselef](https://github.com/panteliselef)
+
+- Introduce internal `<OAuthConsent />` component to be used internally in the machine auth OAuth flow in account portal. ([#6021](https://github.com/clerk/javascript/pull/6021)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`d8fa5d9`](https://github.com/clerk/javascript/commit/d8fa5d9d3d8dc575260d8d2b7c7eeeb0052d0b0d), [`be2e89c`](https://github.com/clerk/javascript/commit/be2e89ca11aa43d48f74c57a5a34e20d85b4003c), [`5644d94`](https://github.com/clerk/javascript/commit/5644d94f711a0733e4970c3f15c24d56cafc8743), [`b578225`](https://github.com/clerk/javascript/commit/b5782258242474c9b0987a3f8349836cd763f24b), [`8838120`](https://github.com/clerk/javascript/commit/8838120596830b88fec1c6c853371dabfec74a0d)]:
+  - @clerk/types@4.60.0
+  - @clerk/shared@3.9.6
+
 ## 5.31.8
 
 ### Patch Changes
