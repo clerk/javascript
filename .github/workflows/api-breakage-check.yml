@@ -20,6 +20,7 @@ concurrency:
 jobs:
   detect-api-changes:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: read
       pull-requests: write
