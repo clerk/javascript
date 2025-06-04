@@ -76,10 +76,9 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
       const u = createTestUtils({ app, page, context });
       const r = await u.po.signIn.goTo();
 
-      expect(r.headers()).toContain({
-        'x-clerk-auth-reason': 'session-token-and-uat-missing',
-        'x-clerk-auth-status': 'signed-out',
-      });
+      const headers = r.headers();
+      expect(headers['x-clerk-auth-reason']).toBe('session-token-and-uat-missing');
+      expect(headers['x-clerk-auth-status']).toBe('signed-out');
     });
   },
 );
