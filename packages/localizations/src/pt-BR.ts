@@ -97,7 +97,7 @@ export const ptBR: LocalizationResource = {
       billingCycle: 'Ciclo de faturamento',
       included: 'Incluso',
     },
-    reSubscribe: 'Reinscrever',
+    reSubscribe: 'Assinar novamente',
     seeAllFeatures: 'Ver todos os recursos',
     subscribe: 'Assinar',
     subtotal: 'Subtotal',
