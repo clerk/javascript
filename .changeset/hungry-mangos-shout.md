@@ -9,9 +9,9 @@
 '@clerk/tanstack-react-start': minor
 ---
 
-- Refactored the `verifyWebhook()` function to manually verify a incoming Clerk webhook request. This change removes the need to install the `svix` package. There are no changes to the usage of the function.
+The `svix` dependency is no longer needed when using the `verifyWebhook()` function. `verifyWebhook()` was refactored to not rely on `svix` anymore while keeping the same functionality and behavior.
 
-If you installed `svix` for the previous versions of `verifyWebhook()` you can uninstall it.
+If you previously installed `svix` to use `verifyWebhook()` you can uninstall it now:
 
 ```shell
 npm uninstall svix
