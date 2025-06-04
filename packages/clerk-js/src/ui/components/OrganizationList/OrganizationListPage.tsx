@@ -1,10 +1,14 @@
 import { useOrganizationList, useUser } from '@clerk/shared/react';
 import { useContext, useState } from 'react';
 
+import { Action, Actions } from '@/ui/elements/Actions';
+import { Card } from '@/ui/elements/Card';
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { Header } from '@/ui/elements/Header';
+
 import { useEnvironment, useOrganizationListContext } from '../../contexts';
 import { SessionTasksContext } from '../../contexts/components/SessionTasks';
 import { Box, Col, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
-import { Action, Actions, Card, Header, useCardState, withCardStateProvider } from '../../elements';
 import { useInView } from '../../hooks';
 import { Add } from '../../icons';
 import { CreateOrganizationForm } from '../CreateOrganization/CreateOrganizationForm';

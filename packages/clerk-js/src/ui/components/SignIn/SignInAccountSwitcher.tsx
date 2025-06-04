@@ -1,8 +1,13 @@
+import { Action, Actions } from '@/ui/elements/Actions';
+import { Card } from '@/ui/elements/Card';
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { Header } from '@/ui/elements/Header';
+import { PreviewButton } from '@/ui/elements/PreviewButton';
+import { UserPreview } from '@/ui/elements/UserPreview';
+
 import { withRedirectToAfterSignIn } from '../../common';
 import { useEnvironment, useSignInContext, useSignOutContext } from '../../contexts';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
-import { Action, Actions, Card, Header, PreviewButton, UserPreview, withCardStateProvider } from '../../elements';
-import { useCardState } from '../../elements/contexts';
 import { Add, SwitchArrowRight } from '../../icons';
 import { SignOutAllActions } from '../UserButton/SessionActions';
 import { useMultisessionActions } from '../UserButton/useMultisessionActions';

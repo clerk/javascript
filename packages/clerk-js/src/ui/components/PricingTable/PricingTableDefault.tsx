@@ -2,6 +2,9 @@ import { useClerk, useSession } from '@clerk/shared/react';
 import type { CommercePlanResource, CommerceSubscriptionPlanPeriod, PricingTableProps } from '@clerk/types';
 import * as React from 'react';
 
+import { Switch } from '@/ui/elements/Switch';
+import { Tooltip } from '@/ui/elements/Tooltip';
+
 import { useProtect } from '../../common';
 import { usePlansContext, usePricingTableContext, useSubscriberTypeContext } from '../../contexts';
 import {
@@ -18,7 +21,6 @@ import {
   Span,
   Text,
 } from '../../customizables';
-import { Switch, Tooltip } from '../../elements';
 import { Check, Plus } from '../../icons';
 import { common, InternalThemeProvider } from '../../styledSystem';
 import { colors, getClosestProfileScrollBox } from '../../utils';

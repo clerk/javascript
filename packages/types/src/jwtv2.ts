@@ -194,6 +194,6 @@ export interface ActClaim {
 }
 
 /**
- * Session status
+ * The current state of the session which can only be `active` or `pending`.
  */
 export type SessionStatusClaim = Extract<SessionStatus, 'active' | 'pending'>;

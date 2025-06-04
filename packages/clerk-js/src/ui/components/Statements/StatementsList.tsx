@@ -1,10 +1,11 @@
 import type { CommerceStatementResource } from '@clerk/types';
 import React from 'react';
 
+import { Pagination } from '@/ui/elements/Pagination';
+
 import { useStatements } from '../../../ui/contexts';
 import type { LocalizationKey } from '../../customizables';
 import { Col, descriptors, Flex, Spinner, Table, Tbody, Td, Text, Th, Thead, Tr } from '../../customizables';
-import { Pagination } from '../../elements';
 import { useRouter } from '../../router';
 import type { PropsOfComponent } from '../../styledSystem';
 import { truncateWithEndVisible } from '../../utils/truncateTextWithEndVisible';

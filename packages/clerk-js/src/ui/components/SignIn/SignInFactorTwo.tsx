@@ -1,9 +1,11 @@
 import type { SignInFactor } from '@clerk/types';
 import React from 'react';
 
+import { withCardStateProvider } from '@/ui/elements/contexts';
+import { LoadingCard } from '@/ui/elements/LoadingCard';
+
 import { withRedirectToAfterSignIn } from '../../common';
 import { useCoreSignIn } from '../../contexts';
-import { LoadingCard, withCardStateProvider } from '../../elements';
 import { SignInFactorTwoAlternativeMethods } from './SignInFactorTwoAlternativeMethods';
 import { SignInFactorTwoBackupCodeCard } from './SignInFactorTwoBackupCodeCard';
 import { SignInFactorTwoPhoneCodeCard } from './SignInFactorTwoPhoneCodeCard';

@@ -1,17 +1,11 @@
+import { Card } from '@/ui/elements/Card';
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { Header } from '@/ui/elements/Header';
+import { Tab, TabPanel, TabPanels, Tabs, TabsList } from '@/ui/elements/Tabs';
+
 import { Protect } from '../../common';
 import { SubscriberTypeContext } from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
-import {
-  Card,
-  Header,
-  Tab,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  TabsList,
-  useCardState,
-  withCardStateProvider,
-} from '../../elements';
 import { useTabState } from '../../hooks/useTabState';
 import { PaymentSources } from '../PaymentSources';
 import { StatementsList } from '../Statements';

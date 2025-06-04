@@ -3,20 +3,18 @@ import { useClerk } from '@clerk/shared/react';
 import type { PhoneCodeChannel, PhoneCodeChannelData, SignUpResource } from '@clerk/types';
 import React from 'react';
 
+import { Card } from '@/ui/elements/Card';
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { Header } from '@/ui/elements/Header';
+import { LoadingCard } from '@/ui/elements/LoadingCard';
+import { SocialButtonsReversibleContainerWithDivider } from '@/ui/elements/ReversibleContainer';
+
 import { ERROR_CODES, SIGN_UP_MODES } from '../../../core/constants';
 import { getClerkQueryParam, removeClerkQueryParam } from '../../../utils/getClerkQueryParam';
 import { withRedirectToAfterSignUp } from '../../common';
 import { SignInContext, useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys, useAppearance, useLocalizations } from '../../customizables';
-import {
-  Card,
-  Header,
-  LoadingCard,
-  SocialButtonsReversibleContainerWithDivider,
-  withCardStateProvider,
-} from '../../elements';
 import { CaptchaElement } from '../../elements/CaptchaElement';
-import { useCardState } from '../../elements/contexts';
 import { useLoadingStatus } from '../../hooks';
 import { useRouter } from '../../router';
 import type { FormControlState } from '../../utils';

@@ -1,7 +1,10 @@
+import { withCardStateProvider } from '@/ui/elements/contexts';
+import { Header } from '@/ui/elements/Header';
+import { ProfileSection } from '@/ui/elements/Section';
+
 import { Protect } from '../../common';
 import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
 import { Col, Flex, localizationKeys, Text } from '../../customizables';
-import { Header, ProfileSection, withCardStateProvider } from '../../elements';
 import { mqu } from '../../styledSystem';
 import { DomainList } from './DomainList';
 import { InvitedMembersList } from './InvitedMembersList';

@@ -1,7 +1,10 @@
+import { withCardStateProvider } from '@/ui/elements/contexts';
+import { FormButtonContainer } from '@/ui/elements/FormButtons';
+import type { FormProps } from '@/ui/elements/FormContainer';
+import { FormContainer } from '@/ui/elements/FormContainer';
+
 import { useWizard, Wizard } from '../../common';
 import { Button, descriptors, localizationKeys, Text } from '../../customizables';
-import type { FormProps } from '../../elements';
-import { FormButtonContainer, FormContainer, withCardStateProvider } from '../../elements';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { MfaBackupCodeCreateForm } from './MfaBackupCodeCreateForm';
 

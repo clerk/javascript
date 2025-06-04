@@ -3,7 +3,7 @@ import React from 'react';
 import type { LocalizationKey } from '../customizables';
 import { Col, descriptors, Flow, localizationKeys, Text } from '../customizables';
 import { useRouter } from '../router';
-import { Card } from '.';
+import { Card } from './Card';
 import { useCardState } from './contexts';
 import { Header } from './Header';
 import { IdentityPreview } from './IdentityPreview';

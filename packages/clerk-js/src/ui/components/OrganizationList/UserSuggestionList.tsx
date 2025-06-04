@@ -1,8 +1,9 @@
 import { useOrganizationList } from '@clerk/shared/react';
 import type { OrganizationSuggestionResource } from '@clerk/types';
 
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+
 import { localizationKeys, Text } from '../../customizables';
-import { useCardState, withCardStateProvider } from '../../elements';
 import { handleError } from '../../utils';
 import { populateCacheUpdateItem } from '../OrganizationSwitcher/utils';
 import { PreviewListItem, PreviewListItemButton } from './shared';

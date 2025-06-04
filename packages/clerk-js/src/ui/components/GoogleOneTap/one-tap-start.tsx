@@ -1,11 +1,12 @@
 import { useClerk, useUser } from '@clerk/shared/react';
 import { useEffect, useRef } from 'react';
 
+import { withCardStateProvider } from '@/ui/elements/contexts';
+
 import { clerkUnsupportedEnvironmentWarning } from '../../../core/errors';
 import type { GISCredentialResponse } from '../../../utils/one-tap';
 import { loadGIS } from '../../../utils/one-tap';
 import { useEnvironment, useGoogleOneTapContext } from '../../contexts';
-import { withCardStateProvider } from '../../elements';
 import { useFetch } from '../../hooks';
 import { useRouter } from '../../router';
 

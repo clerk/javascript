@@ -1,8 +1,12 @@
 import type { EmailAddressResource, PhoneNumberResource } from '@clerk/types';
 import React from 'react';
 
+import { useFieldOTP } from '@/ui/elements/CodeControl';
+import { useCardState } from '@/ui/elements/contexts';
+import { Form } from '@/ui/elements/Form';
+import { FormButtonContainer } from '@/ui/elements/FormButtons';
+
 import { Button, descriptors, localizationKeys } from '../../customizables';
-import { Form, FormButtonContainer, useCardState, useFieldOTP } from '../../elements';
 import { handleError } from '../../utils';
 
 type VerifyWithCodeProps = {

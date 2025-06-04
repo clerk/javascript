@@ -8,7 +8,7 @@ import {
   warnForSsr,
 } from '../utils/assert';
 import { ClerkReactRouterOptionsProvider } from './ReactRouterOptionsContext';
-import type { ClerkState, ReactRouterClerkProviderProps, ReactRouterComponentProps } from './types';
+import type { ClerkState, ReactRouterClerkProviderProps } from './types';
 import { useAwaitableNavigate } from './useAwaitableNavigate';
 
 export * from '@clerk/clerk-react';
@@ -119,9 +119,9 @@ type ClerkReactRouterOptions = Partial<
   Omit<ReactRouterClerkProviderProps, 'routerPush' | 'routerReplace' | 'clerkState'>
 >;
 
-// TODO: Remove "any" on loaderData type
+// TODO: Remove "any" on loaderData type and use Route.ComponentProps from userland code
 type ClerkProviderProps = ClerkReactRouterOptions & {
-  loaderData?: ReactRouterComponentProps['loaderData'];
+  loaderData?: any;
 };
 
 export const ClerkProvider = ({ children, loaderData, ...opts }: ClerkProviderProps) => {

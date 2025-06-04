@@ -2,8 +2,11 @@ import { useReverification, useUser } from '@clerk/shared/react';
 import type { PhoneNumberResource, UserResource } from '@clerk/types';
 import { Fragment } from 'react';
 
+import { useCardState } from '@/ui/elements/contexts';
+import { ProfileSection } from '@/ui/elements/Section';
+import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
+
 import { Badge, Box, Flex, localizationKeys, Text } from '../../customizables';
-import { ProfileSection, ThreeDotsMenu, useCardState } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import type { PropsOfComponent } from '../../styledSystem';

@@ -1,11 +1,12 @@
 import { useClerk } from '@clerk/shared/react';
 import type { SignUpResource } from '@clerk/types';
 
+import type { VerificationCodeCardProps } from '@/ui/elements/VerificationCodeCard';
+import { VerificationCodeCard } from '@/ui/elements/VerificationCodeCard';
+
 import { forwardClerkQueryParams } from '../../../utils/getClerkQueryParam';
 import { useSignUpContext } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
-import type { VerificationCodeCardProps } from '../../elements';
-import { VerificationCodeCard } from '../../elements';
 import { useRouter } from '../../router';
 import { completeSignUpFlow } from './util';
 

@@ -1,9 +1,12 @@
 import { useOrganization } from '@clerk/shared/react';
 
+import { Header } from '@/ui/elements/Header';
+import { OrganizationPreview } from '@/ui/elements/OrganizationPreview';
+import { ProfileSection } from '@/ui/elements/Section';
+
 import { Protect, useProtect } from '../../common';
 import { useEnvironment } from '../../contexts';
 import { Col, descriptors, localizationKeys, Text } from '../../customizables';
-import { Header, OrganizationPreview, ProfileSection } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { DeleteOrganizationForm, LeaveOrganizationForm } from './ActionConfirmationPage';

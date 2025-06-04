@@ -1,5 +1,5 @@
 import type { SignedInAuthObject, SignedOutAuthObject } from '@clerk/backend/internal';
-import { AuthStatus, signedInAuthObject, signedOutAuthObject } from '@clerk/backend/internal';
+import { AuthStatus, getAuthObjectFromJwt, signedOutAuthObject } from '@clerk/backend/internal';
 import { decodeJwt } from '@clerk/backend/jwt';
 import type { PendingSessionOptions } from '@clerk/types';
 import type { APIContext } from 'astro';
@@ -40,15 +40,7 @@ export const createGetAuth = ({ noAuthStatusMessage }: { noAuthStatusMessage: st
       return signedOutAuthObject(options);
     }
 
-    const jwt = decodeJwt(authToken as string);
-    // @ts-expect-error - TODO: Align types
-    const authObject = signedInAuthObject(options, jwt.raw.text, jwt.payload);
-
-    if (treatPendingAsSignedOut && authObject.sessionStatus === 'pending') {
-      return signedOutAuthObject(options);
-    }
-
-    return authObject;
+    return getAuthObjectFromJwt(decodeJwt(authToken as string), { ...options, treatPendingAsSignedOut });
   };
 };
 

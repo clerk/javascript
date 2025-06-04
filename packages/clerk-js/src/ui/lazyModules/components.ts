@@ -21,6 +21,7 @@ const componentImportPaths = {
   Checkout: () => import(/* webpackChunkName: "checkout" */ '../components/Checkout'),
   SessionTasks: () => import(/* webpackChunkName: "sessionTasks" */ '../components/SessionTasks'),
   PlanDetails: () => import(/* webpackChunkName: "planDetails" */ '../components/Plans'),
+  OAuthConsent: () => import(/* webpackChunkName: "oauthConsent" */ '../components/OAuthConsent/OAuthConsent'),
 } as const;
 
 export const SignIn = lazy(() => componentImportPaths.SignIn().then(module => ({ default: module.SignIn })));
@@ -102,6 +103,10 @@ export const PlanDetails = lazy(() =>
   componentImportPaths.PlanDetails().then(module => ({ default: module.PlanDetails })),
 );
 
+export const OAuthConsent = lazy(() =>
+  componentImportPaths.OAuthConsent().then(module => ({ default: module.OAuthConsent })),
+);
+
 export const SessionTasks = lazy(() =>
   componentImportPaths.SessionTasks().then(module => ({ default: module.SessionTask })),
 );
@@ -133,6 +138,7 @@ export const ClerkComponents = {
   PricingTable,
   Checkout,
   PlanDetails,
+  OAuthConsent,
 };
 
 export type ClerkComponentName = keyof typeof ClerkComponents;

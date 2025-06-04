@@ -1,8 +1,10 @@
 import { useClerk } from '@clerk/shared/react';
 
+import { Card } from '@/ui/elements/Card';
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+
 import { useCreateOrganizationContext } from '../../contexts';
 import { localizationKeys } from '../../customizables';
-import { Card, useCardState, withCardStateProvider } from '../../elements';
 import { useDevMode } from '../../hooks/useDevMode';
 import { CreateOrganizationForm } from './CreateOrganizationForm';
 

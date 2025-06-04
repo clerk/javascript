@@ -25,6 +25,7 @@ export {
   signedInAuthObject,
   authenticatedMachineObject,
   unauthenticatedMachineObject,
+  getAuthObjectFromJwt,
 } from './tokens/authObjects';
 
 export { AuthStatus } from './tokens/authStatus';
