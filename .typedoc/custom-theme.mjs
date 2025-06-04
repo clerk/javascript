@@ -319,6 +319,10 @@ ${tabs}
 
         return `<code>${output}</code>`;
       },
+      /**
+       * Hide "Extends" and "Extended by" sections
+       */
+      hierarchy: () => '',
     };
   }
 }
