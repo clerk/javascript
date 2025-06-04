@@ -11,6 +11,7 @@ on:
     paths:
       - 'packages/**'
       - 'tools/snapi/**'
+  workflow_dispatch: # Keep workflow_dispatch
 
 concurrency:
   group: snapi-${{ github.ref }}
@@ -18,19 +19,19 @@ concurrency:
 
 jobs:
   detect-api-changes:
-    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
-    defaults:
-      run:
-        shell: bash
-    timeout-minutes: 10
+    runs-on: ubuntu-latest # Changed from blacksmith runner for simplicity, adjust if needed
+    timeout-minutes: 15 # Adjusted timeout
     permissions:
       contents: read
       pull-requests: write
       statuses: write
+      # id-token: write # Not needed if not using WIF for GCS
 
-    env:
-      GCS_PROJECT_ID: ${{ secrets.GCS_PROJECT_ID }}
-      GCS_BUCKET: ${{ secrets.GCS_BUCKET }}
+    # env: # GCS env vars removed
+      # GCS_PROJECT_ID: ${{ secrets.GCS_PROJECT_ID }}
+      # GCS_BUCKET: ${{ secrets.GCS_BUCKET }}
+      # TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+      # TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
 
     steps:
       - name: Checkout code
@@ -43,8 +44,15 @@ jobs:
         uses: ./.github/actions/init-blacksmith
         with:
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-          turbo-team: ${{ vars.TURBO_TEAM }}
-          turbo-token: ${{ secrets.TURBO_TOKEN }}
+          turbo-team: ${{ vars.TURBO_TEAM }} # Keep turbo if init-blacksmith needs it
+          turbo-token: ${{ secrets.TURBO_TOKEN }} # Keep turbo if init-blacksmith needs it
+
+      # GCS Auth step removed
+      # - name: Authenticate to Google Cloud
+      #   uses: 'google-github-actions/auth@v2'
+      #   with:
+      #     workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+      #     service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
 
       - name: Build packages
         run: pnpm build
@@ -52,21 +60,34 @@ jobs:
       - name: Build Snapi
         run: pnpm turbo build --filter=@clerk/snapi
 
-      - name: Check storage health
-        id: storage-health
-        env:
-          GCS_PROJECT_ID: ${{ secrets.GCS_PROJECT_ID }}
-          GCS_BUCKET: ${{ secrets.GCS_BUCKET }}
-        run: |
-          if ! pnpm snapi storage health --ci; then
-            echo "::error::Storage health check failed"
-            exit 1
-          fi
+      # Storage health check removed
+      # - name: Check storage health
+      #   id: storage-health
+      #   run: |
+      #     echo "GCS_PROJECT_ID: $GCS_PROJECT_ID"
+      #     echo "GCS_BUCKET: $GCS_BUCKET"
+      #     if ! pnpm snapi storage health --ci; then
+      #       echo "::error::Storage health check failed"
+      #       exit 1
+      #     fi
+
+      - name: Download LATEST baseline from main (for PRs)
+        if: github.event_name == 'pull_request'
+        uses: dawidd6/action-download-artifact@v6 # Using v6, check for latest stable
+        with:
+          workflow: ${{ github.workflow_id }} # Use workflow_id for more robust self-referencing
+          branch: main 
+          name: api-baseline-latest-main
+          path: .api-snapshots/baseline # Download to a 'baseline' subdirectory
+          if_no_artifact_found: warn # Don't fail if not found, just warn
+          github_token: ${{ secrets.GITHUB_TOKEN }} 
 
       - name: Run API breakage detection (PR)
         if: github.event_name == 'pull_request'
         id: api-check-pr
         run: |
+          # Ensure baseline directory exists if artifact wasn't downloaded, to prevent errors if SNAPI expects it
+          mkdir -p .api-snapshots/baseline 
           # Generate current snapshots
           pnpm snapi:snapshot --config snapi.config.json
           
@@ -78,21 +99,27 @@ jobs:
             echo "api_check_passed=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Update baseline cache (main branch)
+      - name: Update baseline cache and upload LATEST (main branch)
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: |
           pnpm snapi:snapshot --config snapi.config.json --force
-          
-          # Store as artifacts for backup
           echo "COMMIT_SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
 
-      - name: Upload baseline snapshots (main branch)
+      - name: Upload commit-specific baseline snapshots (main branch)
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         uses: actions/upload-artifact@v4
         with:
           name: api-baseline-${{ env.COMMIT_SHA }}
           path: .api-snapshots/
           retention-days: 90
+
+      - name: Upload LATEST baseline snapshot (main branch)
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-baseline-latest-main
+          path: .api-snapshots/ # This should contain the generated snapshots
+          retention-days: 90 # Adjust as needed, this will be overwritten frequently
 
       - name: Comment on PR
         if: github.event_name == 'pull_request'
@@ -165,8 +192,8 @@ jobs:
               context: 'snapi'
             });
 
-      - name: Upload API snapshots and reports
-        if: always()
+      - name: Upload API snapshots and reports (debug)
+        if: always() # Keep this for debugging all runs
         uses: actions/upload-artifact@v4
         with:
           name: api-debug-${{ github.run_id }}
