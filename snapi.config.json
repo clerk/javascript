@@ -15,39 +15,9 @@
   "suppressedChanges": [],
   "enableLLMAnalysis": false,
   "llmProvider": "openai",
-  "storage": {
-    "primary": {
-      "type": "gcs",
-      "options": {
-        "prefix": "api-snapshots",
-        "multiRegion": true,
-        "enableVersioning": true,
-        "lifecycle": {
-          "enabled": true,
-          "deleteAfterDays": 90,
-          "archiveAfterDays": 30
-        },
-        "storageClass": "STANDARD"
-      }
-    },
-    "fallback": [
-      {
-        "type": "turborepo",
-        "options": {
-          "cacheDir": "node_modules/.cache/turbo",
-          "remoteCache": false,
-          "namespace": "api-snapshots"
-        }
-      }
-    ],
-    "healthCheckInterval": 10,
-    "retryAttempts": 3,
-    "retryDelay": 1000
-  },
   "ci": {
     "enableStatusChecks": true,
     "failOnBreakingChanges": true,
-    "baselineStorage": "gcs",
     "artifactRetentionDays": 7,
     "parallelSnapshots": true,
     "batchSize": 5
