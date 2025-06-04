@@ -1,6 +1,7 @@
 import fs from 'fs-extra';
-import path from 'path';
 import { globby } from 'globby';
+import path from 'path';
+
 import type { PackageInfo } from '../types.js';
 
 interface PackageJson {

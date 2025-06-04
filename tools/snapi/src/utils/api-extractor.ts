@@ -1,8 +1,9 @@
+import { Extractor, ExtractorConfig, ExtractorLogLevel } from '@microsoft/api-extractor';
 import fs from 'fs-extra';
-import path from 'path';
-import { ExtractorConfig, Extractor, ExtractorLogLevel } from '@microsoft/api-extractor';
 import { globby } from 'globby';
-import type { PackageInfo, ApiSnapshot } from '../types.js';
+import path from 'path';
+
+import type { ApiSnapshot, PackageInfo } from '../types.js';
 
 export interface ExtractorOptions {
   packageInfo: PackageInfo;

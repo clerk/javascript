@@ -1,14 +1,15 @@
 import fs from 'fs-extra';
 import path from 'path';
-import { PackageDiscovery } from '../utils/package-discovery.js';
-import { ApiExtractorRunner } from '../utils/api-extractor.js';
+
 import { ApiDiffAnalyzer } from '../analyzers/api-diff.js';
-import { GitManager } from '../utils/git-manager.js';
 import { VersionAnalyzer } from '../analyzers/version-analyzer.js';
 import { ReportGenerator } from '../reporters/markdown-reporter.js';
-import { SuppressionManager } from '../utils/suppression-manager.js';
-import type { Config, PackageInfo, AnalysisResult, PackageAnalysis } from '../types.js';
 import { StorageManager, type StorageManagerConfig } from '../storage/storage-manager.js';
+import type { AnalysisResult, Config, PackageAnalysis, PackageInfo } from '../types.js';
+import { ApiExtractorRunner } from '../utils/api-extractor.js';
+import { GitManager } from '../utils/git-manager.js';
+import { PackageDiscovery } from '../utils/package-discovery.js';
+import { SuppressionManager } from '../utils/suppression-manager.js';
 
 export interface DetectorOptions {
   workspaceRoot: string;

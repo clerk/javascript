@@ -1,17 +1,17 @@
-import fs from 'fs-extra';
-import {
-  ApiModel,
-  ApiItem,
-  ApiItemKind,
-  ApiFunction,
-  ApiInterface,
+import type {
   ApiClass,
   ApiEnum,
+  ApiFunction,
+  ApiInterface,
+  ApiItem,
   ExcerptToken,
 } from '@microsoft/api-extractor-model';
-import { ChangeType, ChangeSeverity } from '../types.js';
-import type { ApiChange } from '../types.js';
+import { ApiItemKind, ApiModel } from '@microsoft/api-extractor-model';
 import { createHash } from 'crypto';
+import fs from 'fs-extra';
+
+import type { ApiChange } from '../types.js';
+import { ChangeSeverity, ChangeType } from '../types.js';
 
 interface ComparisonContext {
   currentModel: ApiModel;

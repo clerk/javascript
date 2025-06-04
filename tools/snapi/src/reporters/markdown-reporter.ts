@@ -1,4 +1,4 @@
-import type { AnalysisResult, PackageAnalysis, ApiChange } from '../types.js';
+import type { AnalysisResult, ApiChange, PackageAnalysis } from '../types.js';
 
 /**
  * Generates human-readable Markdown reports for GitHub PR comments

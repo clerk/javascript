@@ -1,11 +1,12 @@
+import { exec } from 'child_process';
 import fs from 'fs-extra';
 import path from 'path';
-import { exec } from 'child_process';
 import { promisify } from 'util';
+
 import {
+  type BaselineSnapshot,
   BaseStorageBackend,
   type SnapshotMetadata,
-  type BaselineSnapshot,
   type StorageConfig,
 } from './base-storage.js';
 
@@ -217,7 +218,7 @@ export class TurborepoStorageBackend extends BaseStorageBackend {
       if (this.options.remoteCache) {
         try {
           await execAsync('npx turbo --version', { timeout: 5000 });
-        } catch (error) {
+        } catch {
           console.warn('Turborepo CLI not available, remote cache may not work');
         }
       }

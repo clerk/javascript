@@ -1,6 +1,7 @@
 import semver from 'semver';
-import { ChangeSeverity } from '../types.js';
+
 import type { ApiChange } from '../types.js';
+import { ChangeSeverity } from '../types.js';
 
 export interface VersionBumpAnalysis {
   recommendedBump: ChangeSeverity;
