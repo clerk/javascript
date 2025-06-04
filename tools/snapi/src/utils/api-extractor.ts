@@ -1,4 +1,5 @@
 import { Extractor, ExtractorConfig, ExtractorLogLevel } from '@microsoft/api-extractor';
+import type { ExecSyncOptionsWithStringEncoding } from 'child_process';
 import fs from 'fs-extra';
 import { globby } from 'globby';
 import path from 'path';
@@ -81,26 +82,55 @@ export class ApiExtractorRunner {
   }
 
   private async createExtractorConfig(packageInfo: PackageInfo): Promise<string> {
-    const configFileName = `api-extractor-${packageInfo.name.replace('/', '__')}.json`;
+    const configFileName = `api-extractor-${packageInfo.name.replace(/\//g, '__')}.json`;
     const configPath = path.join(this.tempConfigDir, configFileName);
 
-    // Find the main entrypoint (prioritize index.ts or the first entrypoint)
-    const mainEntrypoint = this.findMainEntrypoint(packageInfo.entrypoints);
-
-    if (!mainEntrypoint) {
-      throw new Error(`No valid entrypoint found for ${packageInfo.name}`);
+    const mainSourceEntrypoint = this.findMainEntrypoint(packageInfo.entrypoints);
+    if (!mainSourceEntrypoint) {
+      throw new Error(`No valid source entrypoint found for ${packageInfo.name}: ${mainSourceEntrypoint}`);
     }
 
-    // Generate TypeScript declaration first if needed
-    const dtsPath = await this.ensureDeclarationFile(packageInfo, mainEntrypoint);
+    // Get the declaration file path - this is the path to our generated .d.ts
+    const mainEntryDtsPath = await this.ensureDeclarationFile(packageInfo, mainSourceEntrypoint);
+    console.log(`[SNAPI Debug] Main Entry DTS Path for API Extractor: ${mainEntryDtsPath}`);
+
+    // Ensure the path is correctly formatted for API Extractor
+    // This is a full replacement of the normalization logic to address persistent issues
+    // First, ensure the path is absolute and normalized
+    const absolutePath = path.isAbsolute(mainEntryDtsPath)
+      ? mainEntryDtsPath
+      : path.join(packageInfo.path, mainEntryDtsPath);
+
+    // Remove all extensions and add a single .d.ts
+    let pathWithoutExt = absolutePath;
+    const exts = ['.d.ts', '.ts', '.tsx', '.js', '.jsx'];
+
+    // Remove any extensions we recognize
+    for (const ext of exts) {
+      if (pathWithoutExt.endsWith(ext)) {
+        pathWithoutExt = pathWithoutExt.slice(0, -ext.length);
+        break; // Stop after removing the first extension
+      }
+    }
+
+    // Add a single .d.ts extension
+    const normalizedPath = `${pathWithoutExt}.d.ts`;
+
+    console.log(`[SNAPI Debug] Path without extension: ${pathWithoutExt}`);
+    console.log(`[SNAPI Debug] Normalized Main Entry DTS Path: ${normalizedPath}`);
+
+    // Check if we fixed the issue
+    if (normalizedPath.includes('.d.d.ts')) {
+      console.error(`[SNAPI Error] Failed to fix double .d.ts extension: ${normalizedPath}`);
+    }
+
+    const apiJsonOutputName = `${packageInfo.name.replace(/\//g, '__')}.api.json`;
+    const apiJsonTempPathInPackage = path.join('temp', apiJsonOutputName); // Relative to packageInfo.path
 
     const config = {
       $schema: 'https://developer.microsoft.com/json-schemas/api-extractor/v7/api-extractor.schema.json',
-
       projectFolder: packageInfo.path,
-
-      mainEntryPointFilePath: dtsPath,
-
+      mainEntryPointFilePath: normalizedPath,
       bundledPackages: [],
 
       compiler: {
@@ -113,7 +143,7 @@ export class ApiExtractorRunner {
 
       docModel: {
         enabled: true,
-        apiJsonFilePath: path.join(packageInfo.path, 'temp', `${path.basename(packageInfo.name)}.api.json`),
+        apiJsonFilePath: apiJsonTempPathInPackage,
       },
 
       dtsRollup: {
@@ -165,43 +195,86 @@ export class ApiExtractorRunner {
     return entrypoints[0] || null;
   }
 
-  private async ensureDeclarationFile(packageInfo: PackageInfo, entrypoint: string): Promise<string> {
-    // Check if we already have a .d.ts file
-    const dtsFile = entrypoint.replace(/\.tsx?$/, '.d.ts');
-    if (await fs.pathExists(dtsFile)) {
-      return dtsFile;
-    }
-
-    // For source files, we'll need to generate declarations
-    // This is a simplified approach - in practice, you might want to run tsc
-    const relativePath = path.relative(packageInfo.path, entrypoint);
-    const tempDtsPath = path.join(packageInfo.path, 'temp', relativePath.replace(/\.tsx?$/, '.d.ts'));
-
-    await fs.ensureDir(path.dirname(tempDtsPath));
-
-    // Generate a minimal .d.ts file by running TypeScript compiler
-    await this.generateDeclarations(packageInfo.path, entrypoint, tempDtsPath);
-
+  private async ensureDeclarationFile(packageInfo: PackageInfo, sourceEntrypoint: string): Promise<string> {
+    const tempDtsPath = await this.generateDeclarations(packageInfo, sourceEntrypoint);
+    console.log(`[SNAPI Debug] Temp DTS Path from declarations: ${tempDtsPath}`);
     return tempDtsPath;
   }
 
-  private async generateDeclarations(packagePath: string, sourceFile: string, outputFile: string): Promise<void> {
+  private async generateDeclarations(packageInfo: PackageInfo, sourceEntrypoint: string): Promise<string> {
     const { execSync } = await import('child_process');
+    // tempDtsRoot is where all .d.ts files for the package will be generated.
+    // e.g., /abs/path/to/workspace/packages/my-package/temp/dts
+    const tempDtsRoot = path.join(packageInfo.path, 'temp', 'dts');
+    await fs.ensureDir(tempDtsRoot);
 
+    // Handle case where sourceEntrypoint is an absolute path
+    // If it's absolute, make it relative to the package path
+    const relativeEntrypoint = path.isAbsolute(sourceEntrypoint)
+      ? path.relative(packageInfo.path, sourceEntrypoint)
+      : sourceEntrypoint;
+
+    // Calculate the expected absolute path of the main entrypoint's .d.ts file within tempDtsRoot.
+    // We normalize the path to ensure consistent extensions
+    const sourceWithoutExtension = relativeEntrypoint.replace(/\.(tsx?|d\.ts)$/i, '');
+    const outputEntryDtsPath = path.join(tempDtsRoot, sourceWithoutExtension + '.d.ts');
+    await fs.ensureDir(path.dirname(outputEntryDtsPath)); // Ensures .../temp/dts/src (or similar) exists
+
+    console.log(`[SNAPI Debug] Source Entrypoint: ${sourceEntrypoint}`);
+    console.log(`[SNAPI Debug] Relative Entrypoint: ${relativeEntrypoint}`);
+    console.log(`[SNAPI Debug] Source Without Extension: ${sourceWithoutExtension}`);
+    console.log(`[SNAPI Debug] Package Path: ${packageInfo.path}`);
+    console.log(`[SNAPI Debug] Output Entry DTS Path: ${outputEntryDtsPath}`);
+
+    const execOptions: ExecSyncOptionsWithStringEncoding = {
+      cwd: packageInfo.path,
+      stdio: 'pipe', // Capture stdout/stderr
+      encoding: 'utf-8',
+      timeout: 90000, // 90 seconds
+    };
+
+    // Attempt 1: Full package compilation to temp/dts
     try {
       // Run TypeScript compiler to generate declarations
-      const tsconfigPath = await this.findTsConfig(packagePath);
-      const command = `npx tsc --declaration --emitDeclarationOnly --outDir ${path.dirname(outputFile)} ${sourceFile} --project ${tsconfigPath}`;
+      const tsconfigPath = await this.findTsConfig(packageInfo.path);
+      const command = `npx tsc --declaration --emitDeclarationOnly --outDir ${path.dirname(outputEntryDtsPath)} ${sourceEntrypoint} --project ${tsconfigPath}`;
 
-      execSync(command, {
-        cwd: packagePath,
-        stdio: 'pipe', // Suppress output unless there's an error
-      });
-    } catch {
-      // Fallback: create a basic declaration file
-      console.warn(`Failed to generate declarations for ${sourceFile}, creating fallback`);
-      await fs.writeFile(outputFile, `// Generated declaration file\nexport * from '${sourceFile}';\n`);
+      execSync(command, execOptions);
+    } catch (error) {
+      const errorOutput = error instanceof Error ? error.message : String(error);
+      console.warn(`[SNAPI] Full DTS generation failed for ${packageInfo.name}: ${errorOutput}. Falling back.`);
+
+      // Attempt 2: Fallback - Compile only the entrypoint file.
+      // This is less reliable as it might miss related local files' declarations.
+      try {
+        // Run TypeScript compiler to generate declarations
+        const command = `npx tsc --declaration --emitDeclarationOnly --outDir ${path.dirname(outputEntryDtsPath)} ${sourceEntrypoint}`;
+
+        execSync(command, execOptions);
+      } catch (error) {
+        const errorOutput = error instanceof Error ? error.message : String(error);
+        console.warn(
+          `[SNAPI] Single file DTS generation failed for ${packageInfo.name}: ${errorOutput}. Falling back to stub.`,
+        );
+
+        // Attempt 3: Fallback to basic stub .d.ts file
+        console.warn(
+          `[SNAPI] Creating basic fallback stub declaration for ${packageInfo.name} at ${outputEntryDtsPath}`,
+        );
+        await this.generateStubDtsFile(outputEntryDtsPath, sourceEntrypoint, packageInfo);
+
+        if (await fs.pathExists(outputEntryDtsPath)) {
+          console.log(`[SNAPI] ✅ Stub DTS created for ${packageInfo.name} at ${outputEntryDtsPath}`);
+          return outputEntryDtsPath;
+        }
+
+        throw new Error(
+          `[SNAPI] Failed to generate or stub any declaration file for ${packageInfo.name}. Target ${outputEntryDtsPath} could not be created.`,
+        );
+      }
     }
+
+    return outputEntryDtsPath;
   }
 
   private async findTsConfig(packagePath: string): Promise<string> {
@@ -256,5 +329,43 @@ export class ApiExtractorRunner {
     for (const tempDir of tempDirs) {
       await fs.remove(tempDir);
     }
+  }
+
+  private async generateStubDtsFile(
+    outputPath: string,
+    sourceEntrypoint: string,
+    packageInfo: PackageInfo,
+  ): Promise<void> {
+    // Ensure we're using a clean path with proper extension
+    let finalOutputPath = outputPath;
+
+    // Remove any existing .d.ts extension
+    const exts = ['.d.ts', '.ts', '.tsx', '.js', '.jsx'];
+    for (const ext of exts) {
+      if (finalOutputPath.endsWith(ext)) {
+        finalOutputPath = finalOutputPath.slice(0, -ext.length);
+        break; // Stop after removing the first extension
+      }
+    }
+
+    // Add a single .d.ts extension
+    finalOutputPath += '.d.ts';
+
+    console.log(`[SNAPI Debug] Creating stub declaration: ${finalOutputPath}`);
+    await fs.ensureDir(path.dirname(finalOutputPath));
+
+    // For the import, use a simpler approach that will work in most cases
+    // Extract just the filename without any extension
+    const sourceFileName = path.basename(sourceEntrypoint).replace(/\.(d\.ts|tsx?|jsx?)$/i, '');
+
+    // Create a stub that doesn't rely on complex relative paths
+    const stubContent = `// Fallback SNAPI generated declaration file for ${packageInfo.name}
+// This is a minimal stub created because TypeScript declaration generation failed
+export * from './${sourceFileName}';
+export {}; // Ensures it's treated as a module
+`;
+
+    await fs.writeFile(finalOutputPath, stubContent);
+    console.log(`[SNAPI Debug] Generated stub with content:\n${stubContent}`);
   }
 }
