@@ -119,11 +119,6 @@
     "npm-run-all": "^4.1.5",
     "vitest-environment-miniflare": "2.14.4"
   },
-  "peerDependenciesMeta": {
-    "svix": {
-      "optional": true
-    }
-  },
   "engines": {
     "node": ">=18.17.0"
   },
