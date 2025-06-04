@@ -5,7 +5,6 @@ import { descriptors, Flex, Link, localizationKeys, useAppearance } from '../../
 import { useDevMode } from '../../hooks/useDevMode';
 import type { InternalTheme, PropsOfComponent } from '../../styledSystem';
 import { common, mqu } from '../../styledSystem';
-import { colors } from '../../utils';
 import { Card } from '.';
 
 type CardFooterProps = PropsOfComponent<typeof Flex> & {
@@ -50,10 +49,7 @@ export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>((pro
         t => ({
           marginTop: `-${t.space.$2}`,
           paddingTop: t.space.$2,
-          background: common.mergedColorsBackground(
-            colors.setAlpha(t.colors.$colorBackground, 1),
-            t.colors.$neutralAlpha50,
-          ),
+          background: common.mergedColorsBackground(t.colors.$colorBackground, t.colors.$neutralAlpha50),
           '&:empty': {
             padding: 0,
             marginTop: 0,

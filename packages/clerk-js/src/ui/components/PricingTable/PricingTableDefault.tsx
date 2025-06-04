@@ -23,7 +23,7 @@ import {
 } from '../../customizables';
 import { Check, Plus } from '../../icons';
 import { common, InternalThemeProvider } from '../../styledSystem';
-import { colors, getClosestProfileScrollBox } from '../../utils';
+import { getClosestProfileScrollBox } from '../../utils';
 
 interface PricingTableDefaultProps {
   plans?: CommercePlanResource[] | null;
@@ -167,10 +167,7 @@ function Card(props: CardProps) {
         gap: 0,
         gridTemplateRows: 'subgrid',
         gridRow: 'span 5',
-        background: common.mergedColorsBackground(
-          colors.setAlpha(t.colors.$colorBackground, 1),
-          t.colors.$neutralAlpha50,
-        ),
+        background: common.mergedColorsBackground(t.colors.$colorBackground, t.colors.$neutralAlpha50),
         borderWidth: t.borderWidths.$normal,
         borderStyle: t.borderStyles.$solid,
         borderColor: t.colors.$neutralAlpha100,

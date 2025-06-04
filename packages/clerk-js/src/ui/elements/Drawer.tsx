@@ -20,7 +20,7 @@ import { useDirection, usePrefersReducedMotion, useScrollLock } from '../hooks';
 import { Close as CloseIcon } from '../icons';
 import type { ThemableCssProp } from '../styledSystem';
 import { common } from '../styledSystem';
-import { colors } from '../utils';
+import { transparentize } from '../utils/colorMix';
 import { IconButton } from './IconButton';
 
 type FloatingPortalProps = React.ComponentProps<typeof FloatingPortal>;
@@ -151,7 +151,7 @@ export const FloatingOverlay = React.forwardRef(function FloatingOverlay(
       sx={[
         t => ({
           inset: 0,
-          backgroundColor: colors.setAlpha(t.colors.$colorBackground, 0.28),
+          backgroundColor: transparentize(t.colors.$colorBackground, '28%'),
         }),
         props.sx,
       ]}
@@ -298,10 +298,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>(({ title, children,
       sx={[
         t => ({
           display: 'flex',
-          background: common.mergedColorsBackground(
-            colors.setAlpha(t.colors.$colorBackground, 1),
-            t.colors.$neutralAlpha50,
-          ),
+          background: common.mergedColorsBackground(t.colors.$colorBackground, t.colors.$neutralAlpha50),
           borderBlockEndWidth: t.borderWidths.$normal,
           borderBlockEndStyle: t.borderStyles.$solid,
           borderBlockEndColor: t.colors.$neutralAlpha100,
@@ -378,10 +375,7 @@ const Footer = React.forwardRef<HTMLDivElement, FooterProps>(({ children, sx, ..
         t => ({
           display: 'flex',
           flexDirection: 'column',
-          background: common.mergedColorsBackground(
-            colors.setAlpha(t.colors.$colorBackground, 1),
-            t.colors.$neutralAlpha50,
-          ),
+          background: common.mergedColorsBackground(t.colors.$colorBackground, t.colors.$neutralAlpha50),
           borderBlockStartWidth: t.borderWidths.$normal,
           borderBlockStartStyle: t.borderStyles.$solid,
           borderBlockStartColor: t.colors.$neutralAlpha100,
@@ -496,7 +490,7 @@ const Confirmation = React.forwardRef<HTMLDivElement, ConfirmationProps>(
           sx={t => ({
             position: 'absolute',
             inset: 0,
-            backgroundImage: `linear-gradient(to bottom, ${colors.setAlpha(t.colors.$colorBackground, 0.28)}, ${t.colors.$colorBackground})`,
+            backgroundImage: `linear-gradient(to bottom, ${transparentize(t.colors.$colorBackground, '28%')}, ${t.colors.$colorBackground})`,
           })}
         />
 
@@ -521,10 +515,7 @@ const Confirmation = React.forwardRef<HTMLDivElement, ConfirmationProps>(
               bottom: 0,
               left: 0,
               right: 0,
-              background: common.mergedColorsBackground(
-                colors.setAlpha(t.colors.$colorBackground, 1),
-                t.colors.$neutralAlpha50,
-              ),
+              background: common.mergedColorsBackground(t.colors.$colorBackground, t.colors.$neutralAlpha50),
               padding: t.space.$4,
               borderStartStartRadius: t.radii.$md,
               borderStartEndRadius: t.radii.$md,

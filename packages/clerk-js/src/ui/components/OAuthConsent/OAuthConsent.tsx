@@ -14,7 +14,6 @@ import { LockDottedCircle } from '@/ui/icons';
 import { Textarea } from '@/ui/primitives';
 import type { ThemableCssProp } from '@/ui/styledSystem';
 import { common } from '@/ui/styledSystem';
-import * as utils from '@/ui/utils';
 
 export function OAuthConsentInternal() {
   const { scopes, oAuthApplicationName, oAuthApplicationLogoUrl, redirectUrl, onDeny, onAllow } =
@@ -121,10 +120,7 @@ export function OAuthConsentInternal() {
             <Box
               sx={t => ({
                 padding: t.space.$3,
-                background: common.mergedColorsBackground(
-                  utils.colors.setAlpha(t.colors.$colorBackground, 1),
-                  t.colors.$neutralAlpha50,
-                ),
+                background: common.mergedColorsBackground(t.colors.$colorBackground, t.colors.$neutralAlpha50),
               })}
             >
               <Text
@@ -333,10 +329,7 @@ function ConnectionIcon({ size = 'md', sx }: { size?: 'sm' | 'md'; sx?: Themable
     <Box
       sx={t => [
         {
-          background: common.mergedColorsBackground(
-            utils.colors.setAlpha(t.colors.$colorBackground, 1),
-            t.colors.$neutralAlpha50,
-          ),
+          background: common.mergedColorsBackground(t.colors.$colorBackground, t.colors.$neutralAlpha50),
           borderRadius: t.radii.$circle,
           borderWidth: t.borderWidths.$normal,
           borderStyle: t.borderStyles.$solid,
