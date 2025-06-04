@@ -1,0 +1,36 @@
+{
+  "packages": ["@clerk/backend", "@clerk/nextjs", "@clerk/react", "@clerk/shared"],
+  "excludePackages": ["@clerk/testing", "@clerk/eslint-config"],
+  "snapshotsDir": ".api-snapshots",
+  "mainBranch": "main",
+  "checkVersionBump": true,
+  "suppressedChanges": [],
+  "enableLLMAnalysis": false,
+  "llmProvider": "openai",
+  "ci": {
+    "enableStatusChecks": true,
+    "failOnBreakingChanges": true,
+    "artifactRetentionDays": 7,
+    "parallelSnapshots": true,
+    "batchSize": 5
+  },
+  "github": {
+    "token": "${GITHUB_TOKEN}",
+    "repository": "${GITHUB_REPOSITORY}",
+    "commentOnPR": true,
+    "addStatusChecks": true,
+    "createAnnotations": true
+  },
+  "reporting": {
+    "format": "markdown",
+    "includeCodeDiffs": true,
+    "includeSuggestions": true,
+    "maxChangesPerPackage": 50
+  },
+  "performance": {
+    "maxConcurrentPackages": 3,
+    "timeoutMs": 300000,
+    "cacheBaseline": true,
+    "cacheExpirationDays": 1
+  }
+}
