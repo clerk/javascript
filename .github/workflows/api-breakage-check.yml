@@ -89,8 +89,8 @@ jobs:
           # Check if baseline directory is empty
           if [ ! "$(ls -A .api-snapshots/baseline)" ]; then
             echo "No baseline snapshots found. Generating initial snapshots..."
-            # Generate current snapshots
-            pnpm snapi:snapshot --config snapi.config.json
+            # Generate current snapshots with --no-cleanup to prevent premature deletion
+            pnpm snapi:snapshot --config snapi.config.json --no-cleanup
             
             # Copy current snapshots to baseline
             mkdir -p .api-snapshots/baseline
