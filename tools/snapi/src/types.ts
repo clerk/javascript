@@ -52,6 +52,7 @@ export const ConfigSchema = z.object({
 });
 
 export type Config = z.infer<typeof ConfigSchema> & {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-imports
   storage?: import('./storage/storage-manager.js').StorageManagerConfig;
 };
 

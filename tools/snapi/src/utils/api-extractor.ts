@@ -197,7 +197,7 @@ export class ApiExtractorRunner {
         cwd: packagePath,
         stdio: 'pipe', // Suppress output unless there's an error
       });
-    } catch (error) {
+    } catch {
       // Fallback: create a basic declaration file
       console.warn(`Failed to generate declarations for ${sourceFile}, creating fallback`);
       await fs.writeFile(outputFile, `// Generated declaration file\nexport * from '${sourceFile}';\n`);
