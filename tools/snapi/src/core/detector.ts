@@ -16,7 +16,6 @@ import {
   type PackageInfo,
 } from '../types.js';
 import { ApiExtractorRunner } from '../utils/api-extractor.js';
-import { GitManager } from '../utils/git-manager.js';
 import { PackageDiscovery } from '../utils/package-discovery.js';
 import { SuppressionManager } from '../utils/suppression-manager.js';
 
@@ -35,7 +34,6 @@ export class BreakingChangesDetector {
   private diffAnalyzer: ApiDiffAnalyzer;
   private versionAnalyzer: VersionAnalyzer;
   private suppressionManager: SuppressionManager;
-  private gitManager: GitManager;
   private storageManager?: StorageManager;
   private options: BreakingChangesDetectorOptions;
   private reportGenerator: ReportGenerator;
@@ -47,7 +45,6 @@ export class BreakingChangesDetector {
     this.diffAnalyzer = new ApiDiffAnalyzer();
     this.versionAnalyzer = new VersionAnalyzer();
     this.suppressionManager = new SuppressionManager(options.config.suppressedChanges || []);
-    this.gitManager = new GitManager(options.workspaceRoot);
     this.reportGenerator = new ReportGenerator();
 
     if (options.config.storage) {
