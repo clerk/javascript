@@ -157,6 +157,7 @@ exports[`Typedoc output > should have a deliberate file structure 1`] = `
   "backend/organization-invitation.mdx",
   "backend/organization-membership-public-user-data.mdx",
   "backend/organization-membership.mdx",
+  "backend/organization-sync-options.mdx",
   "backend/organization-sync-target.mdx",
   "backend/organization.mdx",
   "backend/paginated-resource-response.mdx",
