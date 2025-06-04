@@ -24,6 +24,10 @@ jobs:
       pull-requests: write
       statuses: write
 
+    env:
+      GCS_PROJECT_ID: ${{ secrets.GCS_PROJECT_ID }}
+      GCS_BUCKET: ${{ secrets.GCS_BUCKET }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
