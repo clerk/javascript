@@ -3,7 +3,16 @@ import { createWorkerTimers } from '@clerk/shared/workerTimers';
 import { SafeLock } from './safeLock';
 
 const REFRESH_SESSION_TOKEN_LOCK_KEY = 'clerk.lock.refreshSessionToken';
-const INTERVAL_IN_MS = 5 * 1_000;
+
+/**
+ * Returns an interval in milliseconds with random jitter.
+ * Uses a base interval of 5 seconds and adds up to 1.5 seconds of random jitter.
+ * This randomization helps prevent synchronized polling requests across multiple clients.
+ */
+const getIntervalInMs = () => {
+  const jitter = Math.random() * 1500;
+  return 5 * 1_000 + jitter;
+};
 
 export class SessionCookiePoller {
   private lock = SafeLock(REFRESH_SESSION_TOKEN_LOCK_KEY);
@@ -20,7 +29,7 @@ export class SessionCookiePoller {
     const run = async () => {
       this.initiated = true;
       await this.lock.acquireLockAndRun(cb);
-      this.timerId = this.workerTimers.setTimeout(run, INTERVAL_IN_MS);
+      this.timerId = this.workerTimers.setTimeout(run, getIntervalInMs());
     };
 
     void run();
