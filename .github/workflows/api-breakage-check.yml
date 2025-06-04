@@ -51,7 +51,7 @@ jobs:
           
           # Run breaking changes detection
           echo "🔍 Detecting API changes..."
-          if pnpm turbo detect --filter=snapi -- --format markdown --output api-changes-report.md; then
+          if pnpm turbo detect --filter=@clerk/snapi-- --format markdown --output api-changes-report.md; then
             echo "api_check_passed=true" >> $GITHUB_OUTPUT
           else
             echo "api_check_passed=false" >> $GITHUB_OUTPUT
@@ -60,7 +60,7 @@ jobs:
       - name: Update baseline cache (main branch)
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: |
-          pnpm turbo snapshot --filter=snapi -- --force
+          pnpm turbo snapshot --filter=@clerk/snapi-- --force
           
           # Store as artifacts for backup
           echo "COMMIT_SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
