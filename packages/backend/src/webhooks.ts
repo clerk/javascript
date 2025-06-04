@@ -1,6 +1,6 @@
 import { getEnvVariable } from '@clerk/shared/getEnvVariable';
-import { errorThrower } from 'src/util/shared';
 import crypto from 'crypto';
+import { errorThrower } from 'src/util/shared';
 
 import type { WebhookEvent } from './api/resources/Webhooks';
 
