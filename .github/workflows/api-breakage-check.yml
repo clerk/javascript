@@ -27,12 +27,39 @@ jobs:
     env:
       GCS_PROJECT_ID: ${{ secrets.GCS_PROJECT_ID }}
       GCS_BUCKET: ${{ secrets.GCS_BUCKET }}
+      GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcs-credentials.json
+      TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Need full history
+
+      - name: Setup GCS credentials
+        run: |
+          echo '${{ secrets.GCS_SERVICE_ACCOUNT_KEY }}' > $GOOGLE_APPLICATION_CREDENTIALS
+          chmod 600 $GOOGLE_APPLICATION_CREDENTIALS
+          
+          # Debug: Print environment variables (without sensitive values)
+          echo "GCS_PROJECT_ID is set: $([ ! -z "$GCS_PROJECT_ID" ] && echo 'yes' || echo 'no')"
+          echo "GCS_BUCKET is set: $([ ! -z "$GCS_BUCKET" ] && echo 'yes' || echo 'no')"
+          echo "GOOGLE_APPLICATION_CREDENTIALS exists: $([ -f "$GOOGLE_APPLICATION_CREDENTIALS" ] && echo 'yes' || echo 'no')"
+          
+          # Debug: Verify GCS credentials
+          echo "Verifying GCS credentials..."
+          gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
+          gcloud config set project $GCS_PROJECT_ID
+          
+          # Debug: Check bucket access
+          echo "Checking bucket access..."
+          gsutil ls gs://$GCS_BUCKET || echo "Failed to list bucket contents"
+          
+          # Debug: Check bucket configuration
+          echo "Checking bucket configuration..."
+          gsutil bucketpolicyonly get gs://$GCS_BUCKET || echo "Failed to get bucket policy"
+          gsutil lifecycle get gs://$GCS_BUCKET || echo "Failed to get bucket lifecycle"
 
       - name: Setup
         id: config
@@ -47,6 +74,17 @@ jobs:
 
       - name: Build Brkr-Brkr
         run: pnpm turbo build --filter=@clerk/snapi
+
+      - name: Debug SNAPI storage configuration
+        run: |
+          echo "Checking SNAPI storage configuration..."
+          node tools/snapi/dist/cli.js storage health
+          
+          echo "Listing current snapshots..."
+          node tools/snapi/dist/cli.js storage list
+          
+          echo "Checking GCS connectivity..."
+          node tools/snapi/dist/cli.js storage test-gcs
 
       - name: Run API breakage detection (PR)
         if: github.event_name == 'pull_request'
