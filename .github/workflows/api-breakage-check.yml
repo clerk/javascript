@@ -27,7 +27,6 @@ jobs:
     env:
       GCS_PROJECT_ID: ${{ secrets.GCS_PROJECT_ID }}
       GCS_BUCKET: ${{ secrets.GCS_BUCKET }}
-      GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcs-credentials.json
       TURBO_TEAM: ${{ vars.TURBO_TEAM }}
       TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
 
@@ -39,29 +38,12 @@ jobs:
 
       - name: Setup GCS credentials
         run: |
-          # Write service account key to file
-          if [ -z "${{ secrets.GCS_SERVICE_ACCOUNT_KEY }}" ]; then
-            echo "❌ Error: GCS_SERVICE_ACCOUNT_KEY secret is not set"
-            exit 1
-          fi
-          
-          echo '${{ secrets.GCS_SERVICE_ACCOUNT_KEY }}' > $GOOGLE_APPLICATION_CREDENTIALS
-          chmod 600 $GOOGLE_APPLICATION_CREDENTIALS
-          
-          # Verify the credentials file is valid JSON
-          if ! jq . $GOOGLE_APPLICATION_CREDENTIALS > /dev/null 2>&1; then
-            echo "❌ Error: Invalid JSON in GCS credentials file"
-            exit 1
-          fi
-          
           # Debug: Print environment variables (without sensitive values)
           echo "GCS_PROJECT_ID is set: $([ ! -z "$GCS_PROJECT_ID" ] && echo 'yes' || echo 'no')"
           echo "GCS_BUCKET is set: $([ ! -z "$GCS_BUCKET" ] && echo 'yes' || echo 'no')"
-          echo "GOOGLE_APPLICATION_CREDENTIALS exists: $([ -f "$GOOGLE_APPLICATION_CREDENTIALS" ] && echo 'yes' || echo 'no')"
           
-          # Debug: Verify GCS credentials
-          echo "Verifying GCS credentials..."
-          gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
+          # Debug: Verify GCS configuration
+          echo "Verifying GCS configuration..."
           gcloud config set project $GCS_PROJECT_ID
           
           # Debug: Check bucket access
