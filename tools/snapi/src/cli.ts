@@ -10,6 +10,37 @@ import { type Config, ConfigSchema } from './types.js';
 
 const program = new Command();
 
+// Helper to find the workspace root
+function findWorkspaceRoot(startPath: string = process.cwd()): string {
+  let currentPath = startPath;
+
+  while (currentPath !== path.dirname(currentPath)) {
+    // Check for pnpm-workspace.yaml or package.json with workspaces
+    const pnpmWorkspace = path.join(currentPath, 'pnpm-workspace.yaml');
+    const packageJson = path.join(currentPath, 'package.json');
+
+    if (fs.existsSync(pnpmWorkspace)) {
+      return currentPath;
+    }
+
+    if (fs.existsSync(packageJson)) {
+      try {
+        const pkg = fs.readJsonSync(packageJson);
+        if (pkg.workspaces) {
+          return currentPath;
+        }
+      } catch {
+        // Continue searching
+      }
+    }
+
+    currentPath = path.dirname(currentPath);
+  }
+
+  // Fallback to current directory
+  return process.cwd();
+}
+
 program
   .name('snapi')
   .description('Snapshot API (SNAPI) - Detect breaking changes in TypeScript package APIs')
@@ -21,7 +52,7 @@ program
   .option('-c, --config <path>', 'Path to configuration file', 'snapi.config.json')
   .option('-o, --output <path>', 'Output path for report')
   .option('--format <format>', 'Output format (markdown|json)', 'markdown')
-  .option('--workspace <path>', 'Workspace root path', process.cwd())
+  .option('--workspace <path>', 'Workspace root path', findWorkspaceRoot())
   .option('--main-branch <branch>', 'Main branch name', 'main')
   .option('--no-version-check', 'Skip version bump validation')
   .option('--fail-on-breaking', 'Exit with error code if breaking changes detected')
@@ -79,7 +110,7 @@ program
   .description('Generate API snapshots without comparison')
   .option('-c, --config <path>', 'Path to configuration file', 'snapi.config.json')
   .option('-o, --output <path>', 'Output directory for snapshots')
-  .option('--workspace <path>', 'Workspace root path', process.cwd())
+  .option('--workspace <path>', 'Workspace root path', findWorkspaceRoot())
   .option('--no-cleanup', 'Skip cleanup of temporary files (useful for caching)')
   .action(async (options: { config: string; output?: string; workspace: string; cleanup?: boolean }) => {
     try {
@@ -205,7 +236,7 @@ program
   .command('cleanup')
   .description('Clean up expired suppressions and temporary files')
   .option('-c, --config <path>', 'Path to configuration file', 'snapi.config.json')
-  .option('--workspace <path>', 'Workspace root path', process.cwd())
+  .option('--workspace <path>', 'Workspace root path', findWorkspaceRoot())
   .action(async (options: { config: string; workspace: string }) => {
     try {
       const configPath = path.resolve(options.config);
