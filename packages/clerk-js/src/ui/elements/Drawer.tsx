@@ -19,8 +19,7 @@ import { Box, descriptors, Flex, Heading, Icon, Span, useAppearance } from '../c
 import { useDirection, usePrefersReducedMotion, useScrollLock } from '../hooks';
 import { Close as CloseIcon } from '../icons';
 import type { ThemableCssProp } from '../styledSystem';
-import { common } from '../styledSystem';
-import { transparentize } from '../utils/colorMix';
+import { colorMix, transparentize } from '../utils/colorMix';
 import { IconButton } from './IconButton';
 
 type FloatingPortalProps = React.ComponentProps<typeof FloatingPortal>;
@@ -298,7 +297,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>(({ title, children,
       sx={[
         t => ({
           display: 'flex',
-          background: common.mergedColorsBackground(t.colors.$colorBackground, t.colors.$neutralAlpha50),
+          backgroundColor: colorMix(t.colors.$colorBackground, t.colors.$neutralAlpha50),
           borderBlockEndWidth: t.borderWidths.$normal,
           borderBlockEndStyle: t.borderStyles.$solid,
           borderBlockEndColor: t.colors.$neutralAlpha100,
@@ -375,7 +374,7 @@ const Footer = React.forwardRef<HTMLDivElement, FooterProps>(({ children, sx, ..
         t => ({
           display: 'flex',
           flexDirection: 'column',
-          background: common.mergedColorsBackground(t.colors.$colorBackground, t.colors.$neutralAlpha50),
+          backgroundColor: colorMix(t.colors.$colorBackground, t.colors.$neutralAlpha50),
           borderBlockStartWidth: t.borderWidths.$normal,
           borderBlockStartStyle: t.borderStyles.$solid,
           borderBlockStartColor: t.colors.$neutralAlpha100,
@@ -515,7 +514,7 @@ const Confirmation = React.forwardRef<HTMLDivElement, ConfirmationProps>(
               bottom: 0,
               left: 0,
               right: 0,
-              background: common.mergedColorsBackground(t.colors.$colorBackground, t.colors.$neutralAlpha50),
+              backgroundColor: colorMix(t.colors.$colorBackground, t.colors.$neutralAlpha50),
               padding: t.space.$4,
               borderStartStartRadius: t.radii.$md,
               borderStartEndRadius: t.radii.$md,

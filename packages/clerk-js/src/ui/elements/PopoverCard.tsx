@@ -4,7 +4,8 @@ import { useEnvironment } from '../contexts';
 import { Col, descriptors, Flex, Flow, useAppearance } from '../customizables';
 import type { ElementDescriptor } from '../customizables/elementDescriptors';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
-import { animations, common } from '../styledSystem';
+import { animations } from '../styledSystem';
+import { colorMix } from '../utils/colorMix';
 import { Card } from './Card';
 
 const PopoverCardRoot = React.forwardRef<
@@ -80,7 +81,7 @@ const PopoverCardFooter = (props: PropsOfComponent<typeof Flex>) => {
       justify='between'
       sx={[
         t => ({
-          background: common.mergedColorsBackground(t.colors.$colorBackground, t.colors.$neutralAlpha50),
+          backgroundColor: colorMix(t.colors.$colorBackground, t.colors.$neutralAlpha50),
           marginTop: `-${t.space.$2}`,
           paddingTop: t.space.$2,
           '&:empty': {
