@@ -432,7 +432,10 @@ export default tseslint.config([
       ...pluginJsDoc.configs['flat/recommended-typescript'].rules,
       'jsdoc/check-examples': 'off',
       'jsdoc/informative-docs': 'warn',
-      'jsdoc/check-tag-names': ['warn', { definedTags: ['inline', 'unionReturnHeadings'], typed: false }],
+      'jsdoc/check-tag-names': [
+        'warn',
+        { definedTags: ['inline', 'unionReturnHeadings', 'displayFunctionSignature', 'paramExtension'], typed: false },
+      ],
       'jsdoc/require-hyphen-before-param-description': 'warn',
       'jsdoc/require-description': 'warn',
       'jsdoc/require-description-complete-sentence': 'warn',
