@@ -1,12 +1,13 @@
 {
-  "name": "@clerk/api-breakage-detector",
+  "name": "@clerk/snapi",
   "version": "1.0.0",
-  "private": true,
-  "description": "Tool to detect breaking changes in TypeScript package APIs",
+  "description": "Snapshot API (SNAPI) - Detect breaking changes in TypeScript package APIs",
   "type": "module",
+  "exports": "./dist/index.js",
   "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "bin": {
-    "api-breakage-detector": "./bin/cli.js"
+    "snapi": "./bin/cli.js"
   },
   "scripts": {
     "build": "tsup",

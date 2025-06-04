@@ -4,7 +4,7 @@ on:
   pull_request:
     paths:
       - 'packages/**'
-      - 'tools/api-breakage-detector/**'
+      - 'tools/snapi/**'
   push:
     branches:
       - main
@@ -53,17 +53,17 @@ jobs:
         run: pnpm build
 
       - name: Build Brkr-Brkr
-        run: pnpm turbo build --filter=api-breakage-detector
+        run: pnpm turbo build --filter=snapi
 
       - name: Run API breakage detection (PR)
         if: github.event_name == 'pull_request'
         id: api-check-pr
         run: |
-          pnpm turbo snapshot --filter=api-breakage-detector
+          pnpm turbo snapshot --filter=snapi
           
           # Run breaking changes detection
           echo "🔍 Detecting API changes..."
-          if pnpm turbo detect --filter=api-breakage-detector -- --format markdown --output api-changes-report.md; then
+          if pnpm turbo detect --filter=snapi -- --format markdown --output api-changes-report.md; then
             echo "api_check_passed=true" >> $GITHUB_OUTPUT
           else
             echo "api_check_passed=false" >> $GITHUB_OUTPUT
@@ -72,7 +72,7 @@ jobs:
       - name: Update baseline cache (main branch)
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: |
-          pnpm turbo snapshot --filter=api-breakage-detector -- --force
+          pnpm turbo snapshot --filter=snapi -- --force
           
           # Store as artifacts for backup
           echo "COMMIT_SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
@@ -153,7 +153,7 @@ jobs:
               description: apiCheckPassed ? 
                 'No breaking API changes detected' : 
                 'Breaking API changes detected - review required',
-              context: 'api-breakage-detector'
+              context: 'snapi'
             });
 
       - name: Upload API snapshots and reports

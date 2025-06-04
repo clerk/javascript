@@ -306,7 +306,7 @@
         "package.json",
         "tsconfig.json",
         "api-extractor.json",
-        "../../.api-breakage.config.json"
+        "../../snapi.config.json"
       ],
       "outputs": ["../../.api-snapshots/current/**"],
       "cache": true,

@@ -1,23 +1,24 @@
 #!/usr/bin/env node
 
+import chalk from 'chalk';
 import { Command } from 'commander';
 import fs from 'fs-extra';
 import * as path from 'path';
-import chalk from 'chalk';
+
 import { BreakingChangesDetector } from './core/detector.js';
-import { ConfigSchema, type Config } from './types.js';
+import { type Config, ConfigSchema } from './types.js';
 
 const program = new Command();
 
 program
-  .name('api-breakage-detector')
-  .description('Detect breaking changes in TypeScript package APIs')
+  .name('snapi')
+  .description('Snapshot API (SNAPI) - Detect breaking changes in TypeScript package APIs')
   .version('1.0.0');
 
 program
   .command('detect')
   .description('Detect API breaking changes')
-  .option('-c, --config <path>', 'Path to configuration file', '.api-breakage.config.json')
+  .option('-c, --config <path>', 'Path to configuration file', 'snapi.config.json')
   .option('-o, --output <path>', 'Output path for report')
   .option('--format <format>', 'Output format (markdown|json)', 'markdown')
   .option('--workspace <path>', 'Workspace root path', process.cwd())
@@ -76,7 +77,7 @@ program
 program
   .command('snapshot')
   .description('Generate API snapshots without comparison')
-  .option('-c, --config <path>', 'Path to configuration file', '.api-breakage.config.json')
+  .option('-c, --config <path>', 'Path to configuration file', 'snapi.config.json')
   .option('-o, --output <path>', 'Output directory for snapshots')
   .option('--workspace <path>', 'Workspace root path', process.cwd())
   .option('--no-cleanup', 'Skip cleanup of temporary files (useful for caching)')
@@ -130,7 +131,7 @@ program
 program
   .command('init')
   .description('Initialize configuration file')
-  .option('-o, --output <path>', 'Output path for config file', '.api-breakage.config.json')
+  .option('-o, --output <path>', 'Output path for config file', 'snapi.config.json')
   .action(async (options: { output: string }) => {
     try {
       const defaultConfig: Config = {
@@ -158,7 +159,7 @@ program
   .requiredOption('-i, --change-id <id>', 'Change ID to suppress')
   .requiredOption('-r, --reason <reason>', 'Reason for suppression')
   .option('-d, --days <days>', 'Days until suppression expires', '0')
-  .option('-c, --config <path>', 'Path to configuration file', '.api-breakage.config.json')
+  .option('-c, --config <path>', 'Path to configuration file', 'snapi.config.json')
   .action(async (options: { package: string; changeId: string; reason: string; days: string; config: string }) => {
     try {
       const configPath = path.resolve(options.config);
@@ -203,7 +204,7 @@ program
 program
   .command('cleanup')
   .description('Clean up expired suppressions and temporary files')
-  .option('-c, --config <path>', 'Path to configuration file', '.api-breakage.config.json')
+  .option('-c, --config <path>', 'Path to configuration file', 'snapi.config.json')
   .option('--workspace <path>', 'Workspace root path', process.cwd())
   .action(async (options: { config: string; workspace: string }) => {
     try {
@@ -252,7 +253,7 @@ program
   .addCommand(
     new Command('health')
       .description('Check storage backend health')
-      .option('-c, --config <path>', 'Configuration file path', '.api-breakage.config.json')
+      .option('-c, --config <path>', 'Configuration file path', 'snapi.config.json')
       .action(async options => {
         try {
           const configPath = path.resolve(process.cwd(), options.config);
@@ -264,7 +265,7 @@ program
           }
 
           const { StorageManager } = await import('./storage/storage-manager.js');
-          const storageManager = new StorageManager(config.storage as any);
+          const storageManager = new StorageManager(config.storage);
 
           console.log('🔍 Checking storage health...\n');
 
@@ -294,7 +295,7 @@ program
   .addCommand(
     new Command('stats')
       .description('Get storage statistics')
-      .option('-c, --config <path>', 'Configuration file path', '.api-breakage.config.json')
+      .option('-c, --config <path>', 'Configuration file path', 'snapi.config.json')
       .action(async options => {
         try {
           const configPath = path.resolve(process.cwd(), options.config);
@@ -306,7 +307,7 @@ program
           }
 
           const { StorageManager } = await import('./storage/storage-manager.js');
-          const storageManager = new StorageManager(config.storage as any);
+          const storageManager = new StorageManager(config.storage);
 
           console.log('📊 Getting storage statistics...\n');
 
@@ -338,7 +339,7 @@ program
   .addCommand(
     new Command('cleanup')
       .description('Clean up old snapshots')
-      .option('-c, --config <path>', 'Configuration file path', '.api-breakage.config.json')
+      .option('-c, --config <path>', 'Configuration file path', 'snapi.config.json')
       .option('-d, --days <days>', 'Retention period in days', '30')
       .action(async options => {
         try {
@@ -351,7 +352,7 @@ program
           }
 
           const { StorageManager } = await import('./storage/storage-manager.js');
-          const storageManager = new StorageManager(config.storage as any);
+          const storageManager = new StorageManager(config.storage);
 
           const days = parseInt(options.days);
           console.log(`🧹 Cleaning up snapshots older than ${days} days...`);

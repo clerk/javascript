@@ -1,4 +1,4 @@
-# API Breakage Detector
+# SNAPI (Snapshot API)
 
 A comprehensive tool for detecting breaking changes in TypeScript package APIs, designed for production use with robust cloud storage integration.
 
@@ -31,7 +31,7 @@ A comprehensive tool for detecting breaking changes in TypeScript package APIs, 
 
 ```bash
 # Install the tool
-pnpm install @clerk/api-breakage-detector
+pnpm install @clerk/snapi
 
 # Install optional cloud storage dependencies
 pnpm install @google-cloud/storage  # For GCS support
@@ -43,7 +43,7 @@ pnpm install @azure/storage-blob    # For Azure support
 
 ### Basic Configuration
 
-Create `.api-breakage.config.json` in your repository root:
+Create `snapi.config.json` in your repository root:
 
 ```json
 {
@@ -106,28 +106,28 @@ Create `.api-breakage.config.json` in your repository root:
 
 ```bash
 # Initialize configuration
-api-breakage-detector init
+snapi init
 
 # Generate API snapshots
-api-breakage-detector snapshot
+snapi snapshot
 
 # Detect breaking changes
-api-breakage-detector detect
+snapi detect
 
 # Storage management
-api-breakage-detector storage health
-api-breakage-detector storage stats
-api-breakage-detector storage cleanup --days 30
+snapi storage health
+snapi storage stats
+snapi storage cleanup --days 30
 
 # Suppression management
-api-breakage-detector suppress -p @your-org/package -i change-id -r "Reason"
-api-breakage-detector cleanup
+snapi suppress -p @your-org/package -i change-id -r "Reason"
+snapi cleanup
 ```
 
 ### Programmatic Usage
 
 ```typescript
-import { BreakingChangesDetector } from '@clerk/api-breakage-detector';
+import { BreakingChangesDetector } from '@clerk/snapi';
 
 const detector = new BreakingChangesDetector({
   workspaceRoot: process.cwd(),
@@ -173,15 +173,15 @@ gsutil mb -p $PROJECT_ID -c STANDARD -l us-central1 gs://$BUCKET_NAME
 gsutil versioning set on gs://$BUCKET_NAME
 
 # Create service account
-gcloud iam service-accounts create api-breakage-detector \
-  --display-name="API Breakage Detector"
+gcloud iam service-accounts create snapi \
+  --display-name="SNAPI (Snapshot API)"
 
 # Generate key
 gcloud iam service-accounts keys create sa-key.json \
-  --iam-account=api-breakage-detector@$PROJECT_ID.iam.gserviceaccount.com
+  --iam-account=snapi@$PROJECT_ID.iam.gserviceaccount.com
 
 # Set permissions
-gsutil iam ch serviceAccount:api-breakage-detector@$PROJECT_ID.iam.gserviceaccount.com:objectAdmin gs://$BUCKET_NAME
+gsutil iam ch serviceAccount:snapi@$PROJECT_ID.iam.gserviceaccount.com:objectAdmin gs://$BUCKET_NAME
 ```
 
 ### Environment Variables
@@ -224,7 +224,7 @@ jobs:
 
       - name: Check API breaking changes
         run: |
-          pnpm api-breakage-detector detect \
+          snapi detect \
             --fail-on-breaking \
             --output api-breakage-report.md
         env:
@@ -277,10 +277,10 @@ jobs:
 
 ```bash
 # Check storage backend health
-api-breakage-detector storage health
+snapi storage health
 
 # Get storage statistics
-api-breakage-detector storage stats
+snapi storage stats
 
 # Monitor costs and usage
 gsutil du -sh gs://your-bucket

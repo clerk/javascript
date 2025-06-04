@@ -55,7 +55,7 @@ export class GitManager {
 
   async stashChanges(): Promise<string> {
     try {
-      const stashName = `api-breakage-detector-${Date.now()}`;
+      const stashName = `snapi-${Date.now()}`;
       execSync(`git stash push -m "${stashName}"`, {
         cwd: this.workspaceRoot,
         stdio: 'pipe',
