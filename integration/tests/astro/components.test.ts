@@ -486,9 +486,10 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
     const u = createTestUtils({ app, page, context });
 
     await u.page.goToRelative('/server-islands');
-    // NOTE: It is rare for Astro server islands to be used with our Protect component.
-    // This scenario will only occur if a loading state (fallback slot) is explicitly specified by the user.
-    // The following test is commented out for now to unblock development and will be revisited later.
+    // The loading slot for server islands will appear very quickly.
+    // Wait for next state (default slot) to be ready
+    // This is being investigated upstream with the Astro team. The test is commented out for now
+    // to unblock development and will be revisited once the root cause is resolved.
     // await expect(u.page.getByText('Loading')).toBeHidden();
     await expect(u.page.getByText('Not an admin')).toBeVisible();
 
@@ -505,6 +506,8 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
 
     // Visit page again
     await u.page.goToRelative('/server-islands');
+    // This is being investigated upstream with the Astro team. The test is commented out for now
+    // to unblock development and will be revisited once the root cause is resolved.
     // await expect(u.page.getByText('Loading')).toBeHidden();
     await expect(u.page.getByText("I'm an admin")).toBeVisible();
   });
