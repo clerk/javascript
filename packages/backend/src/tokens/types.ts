@@ -194,7 +194,7 @@ type MaybePromise<T, IsPromise extends boolean> = IsPromise extends true ? Promi
 export interface GetAuthFn<RequestType, ReturnsPromise extends boolean = false> {
   /**
    * @example
-   * const authObject = await getAuth(req, { acceptsToken: ['session_token', 'api_key'] })
+   * const auth = await getAuth(req, { acceptsToken: ['session_token', 'api_key'] })
    */
   <T extends TokenType[]>(
     req: RequestType,
@@ -203,7 +203,7 @@ export interface GetAuthFn<RequestType, ReturnsPromise extends boolean = false> 
 
   /**
    * @example
-   * const authObject = await getAuth(req, { acceptsToken: 'session_token' })
+   * const auth = await getAuth(req, { acceptsToken: 'session_token' })
    */
   <T extends TokenType>(
     req: RequestType,
@@ -212,13 +212,13 @@ export interface GetAuthFn<RequestType, ReturnsPromise extends boolean = false> 
 
   /**
    * @example
-   * const authObject = await getAuth(req, { acceptsToken: 'any' })
+   * const auth = await getAuth(req, { acceptsToken: 'any' })
    */
   (req: RequestType, options: AuthOptions & { acceptsToken: 'any' }): MaybePromise<AuthObject, ReturnsPromise>;
 
   /**
    * @example
-   * const authObject = await getAuth(req)
+   * const auth = await getAuth(req)
    */
   (req: RequestType, options?: PendingSessionOptions): MaybePromise<SessionAuthObject, ReturnsPromise>;
 }
