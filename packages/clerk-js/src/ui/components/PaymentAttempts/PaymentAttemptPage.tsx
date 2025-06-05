@@ -1,7 +1,19 @@
 import { Header } from '@/ui/elements/Header';
+import { LineItems } from '@/ui/elements/LineItems';
 
 import { usePaymentAttemptsContext, useStatements } from '../../contexts';
-import { Badge, Box, Button, descriptors, Heading, Icon, Span, Spinner, Text } from '../../customizables';
+import {
+  Badge,
+  Box,
+  Button,
+  descriptors,
+  Heading,
+  Icon,
+  localizationKeys,
+  Span,
+  Spinner,
+  Text,
+} from '../../customizables';
 import { useClipboard } from '../../hooks';
 import { Check, Copy } from '../../icons';
 import { useRouter } from '../../router';
@@ -13,6 +25,7 @@ export const PaymentAttemptPage = () => {
   const { getPaymentAttemptById } = usePaymentAttemptsContext();
 
   const paymentAttempt = params.paymentAttemptId ? getPaymentAttemptById(params.paymentAttemptId) : null;
+  const subscriptionItem = paymentAttempt?.subscriptionItem;
 
   if (isLoading) {
     return (
@@ -111,7 +124,41 @@ export const PaymentAttemptPage = () => {
             {paymentAttempt.status}
           </Badge>
         </Box>
-        <Box elementDescriptor={descriptors.statementBody}>(CONTENT)</Box>
+        <Box
+          elementDescriptor={descriptors.statementBody}
+          sx={t => ({
+            padding: t.space.$4,
+          })}
+        >
+          {subscriptionItem && (
+            <LineItems.Root>
+              <LineItems.Group>
+                <LineItems.Title title={subscriptionItem.plan.name} />
+                <LineItems.Description
+                  prefix={subscriptionItem.planPeriod === 'annual' ? 'x12' : undefined}
+                  text={`${subscriptionItem.plan.currencySymbol}${subscriptionItem.planPeriod === 'month' ? subscriptionItem.plan.amountFormatted : subscriptionItem.plan.annualMonthlyAmountFormatted}`}
+                />
+              </LineItems.Group>
+              <LineItems.Group
+                borderTop
+                variant='tertiary'
+              >
+                <LineItems.Title title={localizationKeys('commerce.subtotal')} />
+                <LineItems.Description
+                  text={`${subscriptionItem.amount?.currencySymbol}${subscriptionItem.amount?.amountFormatted}`}
+                />
+              </LineItems.Group>
+              {subscriptionItem.credit && subscriptionItem.credit.amount.amount > 0 && (
+                <LineItems.Group variant='tertiary'>
+                  <LineItems.Title title={localizationKeys('commerce.credit')} />
+                  <LineItems.Description
+                    text={`- ${subscriptionItem.credit.amount.currencySymbol}${subscriptionItem.credit.amount.amountFormatted}`}
+                  />
+                </LineItems.Group>
+              )}
+            </LineItems.Root>
+          )}
+        </Box>
         <Box
           elementDescriptor={descriptors.statementFooter}
           as='footer'

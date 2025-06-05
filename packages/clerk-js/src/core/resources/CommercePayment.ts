@@ -17,6 +17,7 @@ export class CommercePayment extends BaseResource implements CommercePaymentReso
   updatedAt!: number;
   paymentSource!: CommercePaymentSource;
   subscription!: CommerceSubscription;
+  subscriptionItem!: CommerceSubscription;
   chargeType!: CommercePaymentChargeType;
   status!: CommercePaymentStatus;
 
@@ -37,6 +38,7 @@ export class CommercePayment extends BaseResource implements CommercePaymentReso
     this.updatedAt = data.updated_at;
     this.paymentSource = new CommercePaymentSource(data.payment_source);
     this.subscription = new CommerceSubscription(data.subscription);
+    this.subscriptionItem = new CommerceSubscription(data.subscription_item);
     this.chargeType = data.charge_type;
     this.status = data.status;
     return this;

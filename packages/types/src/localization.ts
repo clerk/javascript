@@ -129,6 +129,7 @@ type _LocalizationResource = {
     seeAllFeatures: LocalizationValue;
     availableFeatures: LocalizationValue;
     subtotal: LocalizationValue;
+    credit: LocalizationValue;
     creditRemainder: LocalizationValue;
     totalDueToday: LocalizationValue;
     pastDue: LocalizationValue;

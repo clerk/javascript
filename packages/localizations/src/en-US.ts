@@ -53,6 +53,7 @@ export const enUS: LocalizationResource = {
       title__paymentSuccessful: 'Payment was successful!',
       title__subscriptionSuccessful: 'Success!',
     },
+    credit: 'Credit',
     creditRemainder: 'Credit for the remainder of your current subscription.',
     defaultFreePlanActive: "You're currently on the Free plan",
     free: 'Free',
