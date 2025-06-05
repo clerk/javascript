@@ -755,6 +755,7 @@ type _LocalizationResource = {
     billingPage: {
       title: LocalizationValue;
       start: {
+        headerTitle__paymentHistory: LocalizationValue;
         headerTitle__plans: LocalizationValue;
         headerTitle__subscriptions: LocalizationValue;
         headerTitle__statements: LocalizationValue;
@@ -959,6 +960,7 @@ type _LocalizationResource = {
     billingPage: {
       title: LocalizationValue;
       start: {
+        headerTitle__paymentHistory: LocalizationValue;
         headerTitle__plans: LocalizationValue;
         headerTitle__subscriptions: LocalizationValue;
         headerTitle__statements: LocalizationValue;

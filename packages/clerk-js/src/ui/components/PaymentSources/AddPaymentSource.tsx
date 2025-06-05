@@ -255,13 +255,16 @@ const AddPaymentSourceForm = ({ children }: PropsWithChildren) => {
         redirect: 'if_required',
       });
       if (error) {
+        console.log('error', error);
         return; // just return, since stripe will handle the error
       }
 
       await onSuccess({ stripeSetupIntent: setupIntent });
     } catch (error) {
+      console.log('catch', error);
       void handleError(error, [], card.setError);
     } finally {
+      console.log('finally');
       card.setIdle();
       initializePaymentSource(); // resets the payment intent
     }
