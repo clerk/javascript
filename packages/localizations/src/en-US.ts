@@ -305,7 +305,7 @@ export const enUS: LocalizationResource = {
       },
     },
     navbar: {
-      apiKeys: 'API keys',
+      apiKeys: 'API Keys',
       billing: 'Billing',
       description: 'Manage your organization.',
       general: 'General',
