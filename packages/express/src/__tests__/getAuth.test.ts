@@ -2,17 +2,22 @@ import { getAuth } from '../getAuth';
 import { mockRequest, mockRequestWithAuth } from './helpers';
 
 describe('getAuth', () => {
-  it('throws error if clerkMiddleware is not executed before getAuth', async () => {
+  it('throws error if clerkMiddleware is not executed before getAuth', () => {
     expect(() => getAuth(mockRequest())).toThrow(/The "clerkMiddleware" should be registered before using "getAuth"/);
   });
 
-  it('returns auth from request for signed-out request', async () => {
-    expect(getAuth(mockRequestWithAuth({ userId: null }))).toHaveProperty('userId', null);
+  it('returns auth from request for signed-out request', () => {
+    const req = mockRequestWithAuth({ userId: null, tokenType: 'session_token' });
+    const auth = getAuth(req);
+    expect(auth.userId).toBeNull();
+    expect(auth.tokenType).toBe('session_token');
   });
 
-  it('returns auth from request', async () => {
-    const req = mockRequestWithAuth({ userId: 'user_12345' });
-    expect(getAuth(req)).toHaveProperty('userId', 'user_12345');
+  it('returns auth from request', () => {
+    const req = mockRequestWithAuth({ userId: 'user_12345', tokenType: 'session_token' });
+    const auth = getAuth(req);
+    expect(auth.userId).toBe('user_12345');
+    expect(auth.tokenType).toBe('session_token');
   });
 
   it('returns the actual auth object when its tokenType matches acceptsToken', () => {

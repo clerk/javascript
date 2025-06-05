@@ -3,4 +3,4 @@
 '@clerk/nextjs': patch
 ---
 
-Export and reuse internal machine auth helpers
+Re-organize internal types for the recently added "machine authentication" feature. 

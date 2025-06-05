@@ -10,10 +10,10 @@ import type {
   SessionStatusClaim,
   SharedSignedInAuthObjectProperties,
 } from '@clerk/types';
-import { isTokenTypeAccepted } from 'src/internal';
 
 import type { APIKey, CreateBackendApiOptions, MachineToken } from '../api';
 import { createBackendApiClient } from '../api';
+import { isTokenTypeAccepted } from '../internal';
 import type { AuthenticateContext } from './authenticateContext';
 import type { MachineTokenType, SessionTokenType } from './tokenTypes';
 import { TokenType } from './tokenTypes';
