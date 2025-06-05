@@ -5,12 +5,11 @@ import type {
   SignedOutAuthObject,
 } from '@clerk/backend/internal';
 import { getAuthObjectForAcceptedToken } from '@clerk/backend/internal';
-import type { PendingSessionOptions } from '@clerk/types';
 import type { FastifyRequest } from 'fastify';
 
 import { pluginRegistrationRequired } from './errors';
 
-type GetAuthOptions = PendingSessionOptions & { acceptsToken?: AuthenticateRequestOptions['acceptsToken'] };
+type GetAuthOptions = { acceptsToken?: AuthenticateRequestOptions['acceptsToken'] };
 
 export const getAuth: GetAuthFn<FastifyRequest> = ((req: FastifyRequest, options?: GetAuthOptions) => {
   const authReq = req as FastifyRequest & { auth: SignedInAuthObject | SignedOutAuthObject };
