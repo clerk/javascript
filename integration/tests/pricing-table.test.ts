@@ -50,6 +50,20 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     await expect(u.po.page.getByText('Checkout')).toBeVisible();
   });
 
+  test('when signed in, shows free plan as active', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.po.signIn.goTo();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+    await u.po.page.goToRelative('/pricing-table');
+
+    await u.po.pricingTable.waitForMounted();
+    await u.po.pricingTable.startCheckout({ planSlug: 'plus' });
+    await u.po.pricingTable.waitToBeActive({ planSlug: 'free_user' });
+    await expect(u.po.pricingTable.getPlanCardCTA({ planSlug: 'free_user' })).toBeHidden();
+    await u.po.checkout.waitForMounted();
+    await expect(u.po.page.getByText('Checkout')).toBeVisible();
+  });
+
   test('can subscribe to a plan', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
@@ -192,7 +206,10 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await expect(u.po.page.getByRole('heading', { name: 'Pro' })).toBeVisible();
     });
 
-    test('can subscribe to a plan and revalidate payment sources', async ({ page, context }) => {
+    test('can subscribe to a plan, revalidates payment sources on complete and then downgrades to free', async ({
+      page,
+      context,
+    }) => {
       const u = createTestUtils({ app, page, context });
 
       const fakeUser = u.services.users.createFakeUser();
@@ -204,6 +221,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
 
       await u.po.userProfile.waitForMounted();
       await u.po.userProfile.switchToBillingTab();
+      await expect(u.po.page.getByText(/Free/i)).toBeVisible();
       await u.po.page.getByRole('button', { name: 'Switch plans' }).click();
       await u.po.pricingTable.startCheckout({ planSlug: 'plus' });
       await u.po.checkout.waitForMounted();
@@ -217,6 +235,21 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await expect(
         page.locator('.cl-checkout-root').getByRole('button', { name: /^pay with test card$/i }),
       ).toBeHidden();
+
+      await u.po.checkout.waitForMounted();
+      await u.po.checkout.clickPayOrSubscribe();
+      await u.po.checkout.confirmAndContinue();
+
+      await u.po.page.locator('.cl-headerBackLink').getByText('Plans').click();
+
+      // Verify the Free plan with Upcoming status exists
+      await expect(
+        u.po.page
+          .locator('.cl-profileSectionContent__subscriptionsList')
+          .getByText('Free')
+          .locator('xpath=..')
+          .getByText('Upcoming'),
+      ).toBeVisible();
 
       await fakeUser.deleteIfExists();
     });

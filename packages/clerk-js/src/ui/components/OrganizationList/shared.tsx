@@ -2,8 +2,10 @@ import type { UserOrganizationInvitationResource } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
 import { forwardRef } from 'react';
 
+import { OrganizationPreview } from '@/ui/elements/OrganizationPreview';
+import { PreviewButton } from '@/ui/elements/PreviewButton';
+
 import { Box, Button, Col, descriptors, Flex, Spinner } from '../../customizables';
-import { OrganizationPreview, PreviewButton } from '../../elements';
 import { SwitchArrowRight } from '../../icons';
 import type { ThemableCssProp } from '../../styledSystem';
 import { common } from '../../styledSystem';

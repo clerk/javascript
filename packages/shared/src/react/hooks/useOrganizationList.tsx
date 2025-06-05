@@ -1,3 +1,4 @@
+/* eslint-disable jsdoc/require-description-complete-sentence */
 import type {
   ClerkPaginatedResponse,
   CreateOrganizationParams,

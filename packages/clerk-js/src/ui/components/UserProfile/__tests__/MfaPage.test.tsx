@@ -8,8 +8,9 @@ import type {
 import { describe, it } from '@jest/globals';
 import { act, waitFor } from '@testing-library/react';
 
+import { CardStateProvider } from '@/ui/elements/contexts';
+
 import { render, runFakeTimers, screen } from '../../../../testUtils';
-import { CardStateProvider } from '../../../elements';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { MfaSection } from '../MfaSection';
 

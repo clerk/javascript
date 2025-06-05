@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 
+import { Drawer, useDrawerContext } from '@/ui/elements/Drawer';
+import { LineItems } from '@/ui/elements/LineItems';
+
 import { useCheckoutContext } from '../../contexts';
 import { Box, Button, descriptors, Heading, localizationKeys, Span, Text, useAppearance } from '../../customizables';
-import { Drawer, LineItems, useDrawerContext } from '../../elements';
 import { transitionDurationValues, transitionTiming } from '../../foundations/transitions';
 import { usePrefersReducedMotion } from '../../hooks';
 import { useRouter } from '../../router';

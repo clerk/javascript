@@ -1,7 +1,9 @@
 import type { SessionVerificationResource, SessionVerificationSecondFactor, SignInFactor } from '@clerk/types';
 import React, { useEffect, useMemo } from 'react';
 
-import { LoadingCard, withCardStateProvider } from '../../elements';
+import { withCardStateProvider } from '@/ui/elements/contexts';
+import { LoadingCard } from '@/ui/elements/LoadingCard';
+
 import { useRouter } from '../../router';
 import { determineStartingSignInSecondFactor } from '../SignIn/utils';
 import { secondFactorsAreEqual } from './useReverificationAlternativeStrategies';

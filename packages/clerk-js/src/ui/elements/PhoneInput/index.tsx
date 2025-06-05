@@ -2,11 +2,11 @@ import { useClerk } from '@clerk/shared/react';
 import React, { forwardRef, memo, useEffect, useMemo, useRef } from 'react';
 
 import { descriptors, Flex, Icon, Input, Text } from '../../customizables';
-import { Select, SelectButton, SelectOptionList } from '../../elements';
 import { Check, ChevronUpDown } from '../../icons';
 import { common, type PropsOfComponent } from '../../styledSystem';
 import type { FeedbackType } from '../../utils';
 import { mergeRefs } from '../../utils';
+import { Select, SelectButton, SelectOptionList } from '../Select';
 import type { CountryEntry, CountryIso } from './countryCodeData';
 import { IsoToCountryMap } from './countryCodeData';
 import { useFormattedPhoneNumber } from './useFormattedPhoneNumber';

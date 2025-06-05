@@ -1,6 +1,6 @@
 {
   "name": "@clerk/remix",
-  "version": "4.7.8",
+  "version": "4.8.0",
   "description": "Clerk SDK for Remix",
   "keywords": [
     "clerk",
@@ -83,8 +83,8 @@
     "tslib": "catalog:repo"
   },
   "devDependencies": {
-    "@remix-run/react": "^2.16.6",
-    "@remix-run/server-runtime": "^2.16.6",
+    "@remix-run/react": "^2.16.7",
+    "@remix-run/server-runtime": "^2.16.7",
     "@types/cookie": "^0.6.0"
   },
   "peerDependencies": {

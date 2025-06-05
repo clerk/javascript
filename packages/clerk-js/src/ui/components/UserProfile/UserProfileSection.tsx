@@ -1,7 +1,9 @@
 import { useUser } from '@clerk/shared/react';
 
+import { ProfileSection } from '@/ui/elements/Section';
+import { UserPreview } from '@/ui/elements/UserPreview';
+
 import { localizationKeys } from '../../customizables';
-import { ProfileSection, UserPreview } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { mqu } from '../../styledSystem';

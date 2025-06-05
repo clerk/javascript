@@ -4,8 +4,9 @@ import { Box, descriptors, Icon } from '../../customizables';
 import { Close } from '../../icons';
 import type { PropsOfComponent } from '../../styledSystem';
 import { mqu } from '../../styledSystem';
-import { IconButton, useUnsafeModalContext } from '..';
 import { Card } from '../Card';
+import { IconButton } from '../IconButton';
+import { useUnsafeModalContext } from '../Modal';
 
 export const ProfileCardRoot = React.forwardRef<HTMLDivElement, PropsOfComponent<typeof Card.Root>>((props, ref) => {
   const { sx, children, ...rest } = props;

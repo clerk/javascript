@@ -14,6 +14,17 @@ export const createPricingTablePageObject = (testArgs: { page: EnhancedPage }) =
     clickResubscribe: async () => {
       await page.getByText('Re-subscribe').click();
     },
+    waitToBeActive: async ({ planSlug }: { planSlug: string }) => {
+      return page
+        .locator(`.cl-pricingTableCard__${planSlug} .cl-badge`)
+        .getByText('Active')
+        .waitFor({ state: 'visible' });
+    },
+    getPlanCardCTA: ({ planSlug }: { planSlug: string }) => {
+      return page.locator(`.cl-pricingTableCard__${planSlug} .cl-pricingTableCardFooter`).getByRole('button', {
+        name: /get|switch|subscribe/i,
+      });
+    },
     startCheckout: async ({
       planSlug,
       shouldSwitch,

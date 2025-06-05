@@ -6,7 +6,7 @@ import type { ElementDescriptor } from '../customizables/elementDescriptors';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { animations, common } from '../styledSystem';
 import { colors } from '../utils';
-import { Card } from '.';
+import { Card } from './Card';
 
 const PopoverCardRoot = React.forwardRef<
   HTMLDivElement,

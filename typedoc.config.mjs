@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import { OptionDefaults } from 'typedoc';
 
 const IGNORE_LIST = ['.DS_Store', 'dev-cli', 'expo-passkeys', 'testing', 'themes', 'upgrade'];
-const CUSTOM_TAGS = ['@unionReturnHeadings'];
+const CUSTOM_BLOCK_TAGS = ['@unionReturnHeadings', '@displayFunctionSignature', '@paramExtension'];
 
 /**
  * Return an array of relative paths to all folders in the "packages" folder to be used for the "entryPoints" option.
@@ -31,6 +31,9 @@ const typedocPluginMarkdownOptions = {
   useHTMLAnchors: false,
   tableColumnSettings: {
     hideSources: true,
+    hideModifiers: true,
+    hideDefaults: true,
+    hideInherited: true,
   },
   fileExtension: '.mdx',
   excludeScopesInPaths: true,
@@ -87,7 +90,7 @@ const config = {
   theme: 'clerkTheme',
   router: 'clerk-router',
   readme: 'none',
-  notRenderedTags: [...OptionDefaults.notRenderedTags, ...CUSTOM_TAGS],
+  notRenderedTags: [...OptionDefaults.notRenderedTags, ...CUSTOM_BLOCK_TAGS],
   packageOptions: {
     includeVersion: false,
     excludePrivate: true,
@@ -97,7 +100,7 @@ const config = {
     excludeInternal: true,
     excludeNotDocumented: true,
     gitRevision: 'main',
-    blockTags: [...OptionDefaults.blockTags, ...CUSTOM_TAGS],
+    blockTags: [...OptionDefaults.blockTags, ...CUSTOM_BLOCK_TAGS],
     modifierTags: [...OptionDefaults.modifierTags],
     exclude: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
     readme: 'none',
