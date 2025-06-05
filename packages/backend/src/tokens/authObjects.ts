@@ -2,7 +2,9 @@ import { createCheckAuthorization } from '@clerk/shared/authorization';
 import { __experimental_JWTPayloadToAuthObjectProperties } from '@clerk/shared/jwtPayloadParser';
 import type {
   CheckAuthorizationFromSessionClaims,
+  Jwt,
   JwtPayload,
+  PendingSessionOptions,
   ServerGetToken,
   ServerGetTokenOptions,
   SessionStatusClaim,
@@ -16,7 +18,13 @@ import type { MachineTokenType, SessionTokenType } from './tokenTypes';
 import { TokenType } from './tokenTypes';
 import type { MachineAuthType } from './types';
 
+/**
+ * @inline
+ */
 type AuthObjectDebugData = Record<string, any>;
+/**
+ * @inline
+ */
 type AuthObjectDebug = () => AuthObjectDebugData;
 
 type Claims = Record<string, any>;
@@ -32,9 +40,21 @@ export type SignedInAuthObjectOptions = CreateBackendApiOptions & {
  * @internal
  */
 export type SignedInAuthObject = SharedSignedInAuthObjectProperties & {
+  /**
+   * The allowed token type.
+   */
   tokenType: SessionTokenType;
+  /**
+   * A function that gets the current user's [session token](https://clerk.com/docs/backend-requests/resources/session-tokens) or a [custom JWT template](https://clerk.com/docs/backend-requests/jwt-templates).
+   */
   getToken: ServerGetToken;
+  /**
+   * A function that checks if the user has an organization role or custom permission.
+   */
   has: CheckAuthorizationFromSessionClaims;
+  /**
+   * Used to help debug issues when using Clerk in development.
+   */
   debug: AuthObjectDebug;
 };
 
@@ -52,11 +72,6 @@ export type SignedOutAuthObject = {
   orgRole: null;
   orgSlug: null;
   orgPermissions: null;
-  /**
-   * Factor Verification Age
-   * Each item represents the minutes that have passed since the last time a first or second factor were verified.
-   * [fistFactorAge, secondFactorAge]
-   */
   factorVerificationAge: null;
   getToken: ServerGetToken;
   has: CheckAuthorizationFromSessionClaims;
@@ -112,6 +127,9 @@ export type UnauthenticatedMachineObject<T extends MachineTokenType = MachineTok
   tokenType: T;
 } & MachineObjectExtendedProperties<false>[T];
 
+/**
+ * @interface
+ */
 export type AuthObject =
   | SignedInAuthObject
   | SignedOutAuthObject
@@ -131,7 +149,7 @@ const createDebug = (data: AuthObjectDebugData | undefined) => {
  * @internal
  */
 export function signedInAuthObject(
-  authenticateContext: AuthenticateContext,
+  authenticateContext: Partial<AuthenticateContext>,
   sessionToken: string,
   sessionClaims: JwtPayload,
 ): SignedInAuthObject {
@@ -298,6 +316,7 @@ export function unauthenticatedMachineObject<T extends MachineTokenType>(
  * Some frameworks like Remix or Next (/pages dir only) handle this serialization by simply
  * ignoring any non-serializable keys, however Nextjs /app directory is stricter and
  * throws an error if a non-serializable value is found.
+ *
  * @internal
  */
 export const makeAuthObjectSerializable = <T extends Record<string, unknown>>(obj: T): T => {
@@ -325,4 +344,20 @@ const createGetToken: CreateGetToken = params => {
 
     return sessionToken;
   };
+};
+
+/**
+ * @internal
+ */
+export const getAuthObjectFromJwt = (
+  jwt: Jwt,
+  { treatPendingAsSignedOut = true, ...options }: PendingSessionOptions & Partial<AuthenticateContext>,
+) => {
+  const authObject = signedInAuthObject(options, jwt.raw.text, jwt.payload);
+
+  if (treatPendingAsSignedOut && authObject.sessionStatus === 'pending') {
+    return signedOutAuthObject(options, authObject.sessionStatus);
+  }
+
+  return authObject;
 };

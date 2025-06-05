@@ -51,14 +51,29 @@ export type CheckAuthorizationWithCustomPermissions =
   CheckAuthorizationFn<CheckAuthorizationParamsWithCustomPermissions>;
 
 type WithReverification<T> = T & {
+  /**
+   * The reverification configuration to check for. This feature is currently in public beta. **It is not recommended for production use.**
+   */
   reverification?: ReverificationConfig;
 };
 
 export type CheckAuthorizationParamsWithCustomPermissions = WithReverification<
   | {
+      /**
+       * The [role](https://clerk.com/docs/organizations/roles-permissions) to check for.
+       */
       role: OrganizationCustomRoleKey;
+      /**
+       * The [permission](https://clerk.com/docs/organizations/roles-permissions) to check for.
+       */
       permission?: never;
+      /**
+       * The [feature](https://clerk.com/docs/billing/overview) to check for.
+       */
       feature?: never;
+      /**
+       * The [plan](https://clerk.com/docs/billing/overview) to check for.
+       */
       plan?: never;
     }
   | {
@@ -86,9 +101,21 @@ export type CheckAuthorization = CheckAuthorizationFn<CheckAuthorizationParams>;
 
 type CheckAuthorizationParams = WithReverification<
   | {
+      /**
+       * The [role](https://clerk.com/docs/organizations/roles-permissions) to check for.
+       */
       role: OrganizationCustomRoleKey;
+      /**
+       * The [permission](https://clerk.com/docs/organizations/roles-permissions) to check for.
+       */
       permission?: never;
+      /**
+       * The [feature](https://clerk.com/docs/billing/overview) to check for.
+       */
       feature?: never;
+      /**
+       * The [plan](https://clerk.com/docs/billing/overview) to check for.
+       */
       plan?: never;
     }
   | {
@@ -121,11 +148,26 @@ export type CheckAuthorizationFromSessionClaims = <P extends OrganizationCustomP
   isAuthorizedParams: CheckAuthorizationParamsFromSessionClaims<P>,
 ) => boolean;
 
+/**
+ * @interface
+ */
 export type CheckAuthorizationParamsFromSessionClaims<P extends OrganizationCustomPermissionKey> = WithReverification<
   | {
+      /**
+       * The [role](https://clerk.com/docs/organizations/roles-permissions) to check for.
+       */
       role: OrganizationCustomRoleKey;
+      /**
+       * The [permission](https://clerk.com/docs/organizations/roles-permissions) to check for.
+       */
       permission?: never;
+      /**
+       * The [feature](https://clerk.com/docs/billing/overview) to check for.
+       */
       feature?: never;
+      /**
+       * The [plan](https://clerk.com/docs/billing/overview) to check for.
+       */
       plan?: never;
     }
   | {

@@ -17,6 +17,7 @@ import { allSettled, handleValueOrFn, noop } from '@clerk/shared/utils';
 import type {
   __internal_CheckoutProps,
   __internal_ComponentNavigationContext,
+  __internal_OAuthConsentProps,
   __internal_PlanDetailsProps,
   __internal_UserVerificationModalProps,
   APIKeyResource,
@@ -1043,31 +1044,43 @@ export class Clerk implements ClerkInterface {
     );
   };
 
-  public mountApiKeys = (node: HTMLDivElement, props?: APIKeysProps): void => {
+  public __internal_mountOAuthConsent = (node: HTMLDivElement, props?: __internal_OAuthConsentProps) => {
     this.assertComponentsReady(this.#componentControls);
-
-    logger.warnOnce('Clerk: <APIKeys /> component is in early access and not yet recommended for production use.');
-
-    void this.#componentControls.ensureMounted({ preloadHint: 'APIKeys' }).then(controls =>
+    void this.#componentControls.ensureMounted({ preloadHint: 'OAuthConsent' }).then(controls =>
       controls.mountComponent({
-        name: 'APIKeys',
-        appearanceKey: 'apiKeys',
+        name: 'OAuthConsent',
+        appearanceKey: '__internal_oauthConsent',
         node,
         props,
       }),
     );
-
-    this.telemetry?.record(eventPrebuiltComponentMounted('APIKeys', props));
   };
 
-  public unmountApiKeys = (node: HTMLDivElement): void => {
+  public __internal_unmountOAuthConsent = (node: HTMLDivElement) => {
     this.assertComponentsReady(this.#componentControls);
-    void this.#componentControls.ensureMounted().then(controls =>
-      controls.unmountComponent({
-        node,
-      }),
-    );
+    void this.#componentControls.ensureMounted().then(controls => controls.unmountComponent({ node }));
   };
+
+  /**
+   * @experimental
+   * This API is in early access and may change in future releases.
+   *
+   * Mount a api keys component at the target element.
+   * @param targetNode Target to mount the APIKeys component.
+   * @param props Configuration parameters.
+   */
+  mountApiKeys: (targetNode: HTMLDivElement, props?: APIKeysProps) => void;
+
+  /**
+   * @experimental
+   * This API is in early access and may change in future releases.
+   *
+   * Unmount a api keys component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @param targetNode Target node to unmount the ApiKeys component from.
+   */
+  unmountApiKeys: (targetNode: HTMLDivElement) => void;
 
   /**
    * `setActive` can be used to set the active session and/or organization.
