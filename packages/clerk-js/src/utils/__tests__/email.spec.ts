@@ -1,3 +1,5 @@
+import { test, expect } from 'vitest';
+
 import { buildEmailAddress } from '../email';
 
 test.each([

@@ -47,10 +47,11 @@
     "lint": "eslint src",
     "lint:attw": "attw --pack . --profile node16 --ignore-rules named-exports",
     "lint:publint": "publint || true",
-    "test": "jest",
+    "test": "jest && vitest --watch=false",
     "test:cache:clear": "jest --clearCache --useStderr",
     "test:ci": "jest --maxWorkers=70%",
     "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html",
+    "test:vitest": "vitest",
     "watch": "rspack build --config rspack.config.js --env production --watch"
   },
   "browserslist": "last 2 years",
