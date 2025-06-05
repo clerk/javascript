@@ -482,7 +482,7 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
     await u.po.userButton.waitForMounted();
   });
 
-  test.skip('server islands protect component shows correct states', async ({ page, context }) => {
+  test('server islands protect component shows correct states', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
 
     await u.page.goToRelative('/server-islands');
