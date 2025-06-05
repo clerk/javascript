@@ -10,13 +10,14 @@ import type {
   SessionStatusClaim,
   SharedSignedInAuthObjectProperties,
 } from '@clerk/types';
+import { isTokenTypeAccepted } from 'src/internal';
 
 import type { APIKey, CreateBackendApiOptions, MachineToken } from '../api';
 import { createBackendApiClient } from '../api';
 import type { AuthenticateContext } from './authenticateContext';
 import type { MachineTokenType, SessionTokenType } from './tokenTypes';
 import { TokenType } from './tokenTypes';
-import type { MachineAuthType } from './types';
+import type { AuthenticateRequestOptions, MachineAuthType } from './types';
 
 /**
  * @inline
@@ -361,3 +362,27 @@ export const getAuthObjectFromJwt = (
 
   return authObject;
 };
+
+/**
+ * @internal
+ */
+export function getAuthObjectForAcceptedToken({
+  authObject,
+  acceptsToken = TokenType.SessionToken,
+}: {
+  authObject: AuthObject;
+  acceptsToken: AuthenticateRequestOptions['acceptsToken'];
+}): AuthObject {
+  if (acceptsToken === 'any') {
+    return authObject;
+  }
+
+  if (!isTokenTypeAccepted(authObject.tokenType, acceptsToken)) {
+    if (authObject.tokenType === TokenType.SessionToken) {
+      return signedOutAuthObject(authObject.debug);
+    }
+    return unauthenticatedMachineObject(authObject.tokenType, authObject.debug);
+  }
+
+  return authObject;
+}

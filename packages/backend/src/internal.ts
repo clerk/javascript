@@ -34,6 +34,7 @@ export {
   authenticatedMachineObject,
   unauthenticatedMachineObject,
   getAuthObjectFromJwt,
+  getAuthObjectForAcceptedToken,
 } from './tokens/authObjects';
 
 export { AuthStatus } from './tokens/authStatus';
