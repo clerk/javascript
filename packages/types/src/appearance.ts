@@ -903,6 +903,7 @@ export type Appearance<T = Theme> = T &
      * Theme overrides that only apply to the `<APIKeys />` component
      */
     apiKeys?: T;
+    /**
      * Theme overrides that only apply to the `<OAuthConsent />` component
      */
     __internal_oauthConsent?: T;

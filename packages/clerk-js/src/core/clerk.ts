@@ -1069,7 +1069,17 @@ export class Clerk implements ClerkInterface {
    * @param targetNode Target to mount the APIKeys component.
    * @param props Configuration parameters.
    */
-  mountApiKeys: (targetNode: HTMLDivElement, props?: APIKeysProps) => void;
+  public mountApiKeys = (node: HTMLDivElement, props?: APIKeysProps) => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted({ preloadHint: 'APIKeys' }).then(controls =>
+      controls.mountComponent({
+        name: 'APIKeys',
+        appearanceKey: 'apiKeys',
+        node,
+        props,
+      }),
+    );
+  };
 
   /**
    * @experimental
@@ -1080,7 +1090,10 @@ export class Clerk implements ClerkInterface {
    *
    * @param targetNode Target node to unmount the ApiKeys component from.
    */
-  unmountApiKeys: (targetNode: HTMLDivElement) => void;
+  public unmountApiKeys = (node: HTMLDivElement) => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted().then(controls => controls.unmountComponent({ node }));
+  };
 
   /**
    * `setActive` can be used to set the active session and/or organization.

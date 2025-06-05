@@ -1,4 +1,10 @@
-import type { __internal_OAuthConsentProps, APIKeysProps, PricingTableProps, UserButtonProps, WaitlistProps } from '@clerk/types';
+import type {
+  __internal_OAuthConsentProps,
+  APIKeysProps,
+  PricingTableProps,
+  UserButtonProps,
+  WaitlistProps,
+} from '@clerk/types';
 import type { ReactNode } from 'react';
 
 import type { AvailableComponentName, AvailableComponentProps } from '../types';

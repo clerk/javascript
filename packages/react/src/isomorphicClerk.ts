@@ -617,7 +617,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.mountPricingTable(node, props);
     });
 
-
     this.premountApiKeysNodes.forEach((props, node) => {
       clerkjs.mountApiKeys(node, props);
     });
