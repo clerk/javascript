@@ -42,6 +42,7 @@ export function mockRequestWithAuth(
       getToken: async () => '',
       has: () => false,
       debug: () => ({}),
+      tokenType: 'session_token',
       ...auth,
     }),
   } as unknown as ExpressRequestWithAuth;
