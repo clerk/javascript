@@ -491,7 +491,7 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
     await expect(u.page.getByText('Not an admin')).toBeVisible({ timeout: 5000 });
     await expect(u.page.getByText('Loading')).toBeHidden({ timeout: 5000 });
 
-    // Sign in as admin user
+    // Sign in as admin user.
     await u.page.goToRelative('/sign-in');
     await u.po.signIn.waitForMounted();
     await u.po.signIn.signInWithEmailAndInstantPassword({
