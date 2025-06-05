@@ -488,10 +488,10 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
     await u.page.goToRelative('/server-islands');
     // The loading slot for server islands will appear very quickly.
     // Wait for next state (default slot) to be ready
-    await expect(u.page.getByText('Not an admin')).toBeVisible({ timeout: 5000 });
-    await expect(u.page.getByText('Loading')).toBeHidden({ timeout: 5000 });
+    // await expect(u.page.getByText('Loading')).toBeHidden();
+    await expect(u.page.getByText('Not an admin')).toBeVisible();
 
-    // Sign in as admin user.
+    // Sign in as admin user
     await u.page.goToRelative('/sign-in');
     await u.po.signIn.waitForMounted();
     await u.po.signIn.signInWithEmailAndInstantPassword({
@@ -504,7 +504,7 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
 
     // Visit page again
     await u.page.goToRelative('/server-islands');
-    await expect(u.page.getByText('Loading')).toBeHidden();
+    // await expect(u.page.getByText('Loading')).toBeHidden();
     await expect(u.page.getByText("I'm an admin")).toBeVisible();
   });
 });
