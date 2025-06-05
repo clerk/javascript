@@ -5,7 +5,12 @@ import type {
   InferAuthObjectFromTokenArray,
   MachineAuthObject,
   SessionAuthObject,
+} from '@clerk/backend/internal';
+import {
+  isTokenTypeAccepted,
+  signedOutAuthObject,
   TokenType,
+  unauthenticatedMachineObject,
 } from '@clerk/backend/internal';
 import type { PendingSessionOptions } from '@clerk/types';
 import type { Request as ExpressRequest } from 'express';
@@ -59,5 +64,20 @@ export const getAuth: GetAuthFn = (req: ExpressRequest, options?: AuthOptions) =
     throw new Error(middlewareRequired('getAuth'));
   }
 
-  return req.auth(options);
+  const authObject = req.auth(options);
+
+  const acceptsToken = options?.acceptsToken ?? TokenType.SessionToken;
+
+  if (acceptsToken === 'any') {
+    return authObject;
+  }
+
+  if (!isTokenTypeAccepted(authObject.tokenType, acceptsToken)) {
+    if (authObject.tokenType === TokenType.SessionToken) {
+      return signedOutAuthObject();
+    }
+    return unauthenticatedMachineObject(authObject.tokenType);
+  }
+
+  return authObject;
 };
