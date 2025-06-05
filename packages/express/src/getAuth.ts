@@ -23,7 +23,7 @@ type AuthOptions = PendingSessionOptions & { acceptsToken?: AuthenticateRequestO
 interface GetAuthFn {
   /**
    * @example
-   * const authObject = await getAuth({ acceptsToken: ['session_token', 'api_key'] })
+   * const authObject = await getAuth(req, { acceptsToken: ['session_token', 'api_key'] })
    */
   <T extends TokenType[]>(
     req: ExpressRequest,
