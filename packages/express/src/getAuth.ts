@@ -1,11 +1,4 @@
-import type { AuthObject } from '@clerk/backend';
-import type {
-  AuthenticateRequestOptions,
-  InferAuthObjectFromToken,
-  InferAuthObjectFromTokenArray,
-  MachineAuthObject,
-  SessionAuthObject,
-} from '@clerk/backend/internal';
+import type { AuthenticateRequestOptions, GetAuthFn } from '@clerk/backend/internal';
 import {
   isTokenTypeAccepted,
   signedOutAuthObject,
@@ -18,39 +11,7 @@ import type { Request as ExpressRequest } from 'express';
 import { middlewareRequired } from './errors';
 import { requestHasAuthObject } from './utils';
 
-type AuthOptions = PendingSessionOptions & { acceptsToken?: AuthenticateRequestOptions['acceptsToken'] };
-
-interface GetAuthFn {
-  /**
-   * @example
-   * const authObject = await getAuth(req, { acceptsToken: ['session_token', 'api_key'] })
-   */
-  <T extends TokenType[]>(
-    req: ExpressRequest,
-    options: AuthOptions & { acceptsToken: T },
-  ): InferAuthObjectFromTokenArray<T, SessionAuthObject, MachineAuthObject<T[number]>>;
-
-  /**
-   * @example
-   * const authObject = await getAuth(req, { acceptsToken: 'session_token' })
-   */
-  <T extends TokenType>(
-    req: ExpressRequest,
-    options: AuthOptions & { acceptsToken: T },
-  ): InferAuthObjectFromToken<T, SessionAuthObject, MachineAuthObject<T>>;
-
-  /**
-   * @example
-   * const authObject = await getAuth(req, { acceptsToken: 'any' })
-   */
-  (req: ExpressRequest, options: AuthOptions & { acceptsToken: 'any' }): AuthObject;
-
-  /**
-   * @example
-   * const authObject = await getAuth(req)
-   */
-  (req: ExpressRequest, options?: PendingSessionOptions): SessionAuthObject;
-}
+type GetAuthOptions = PendingSessionOptions & { acceptsToken?: AuthenticateRequestOptions['acceptsToken'] };
 
 /**
  * Retrieves the Clerk AuthObject using the current request object.
@@ -59,7 +20,7 @@ interface GetAuthFn {
  * @returns {AuthObject} Object with information about the request state and claims.
  * @throws {Error} `clerkMiddleware` or `requireAuth` is required to be set in the middleware chain before this util is used.
  */
-export const getAuth: GetAuthFn = (req: ExpressRequest, options?: AuthOptions) => {
+export const getAuth: GetAuthFn<ExpressRequest> = (req: ExpressRequest, options?: GetAuthOptions) => {
   if (!requestHasAuthObject(req)) {
     throw new Error(middlewareRequired('getAuth'));
   }
@@ -74,9 +35,9 @@ export const getAuth: GetAuthFn = (req: ExpressRequest, options?: AuthOptions) =
 
   if (!isTokenTypeAccepted(authObject.tokenType, acceptsToken)) {
     if (authObject.tokenType === TokenType.SessionToken) {
-      return signedOutAuthObject();
+      return signedOutAuthObject(authObject.debug);
     }
-    return unauthenticatedMachineObject(authObject.tokenType);
+    return unauthenticatedMachineObject(authObject.tokenType, authObject.debug);
   }
 
   return authObject;

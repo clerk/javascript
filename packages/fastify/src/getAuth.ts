@@ -1,10 +1,6 @@
-import type { AuthObject } from '@clerk/backend';
 import type {
   AuthenticateRequestOptions,
-  InferAuthObjectFromToken,
-  InferAuthObjectFromTokenArray,
-  MachineAuthObject,
-  SessionAuthObject,
+  GetAuthFn,
   SignedInAuthObject,
   SignedOutAuthObject,
 } from '@clerk/backend/internal';
@@ -14,48 +10,15 @@ import {
   TokenType,
   unauthenticatedMachineObject,
 } from '@clerk/backend/internal';
+import type { PendingSessionOptions } from '@clerk/types';
 import type { FastifyRequest } from 'fastify';
 
 import { pluginRegistrationRequired } from './errors';
 
-type FastifyRequestWithAuth = FastifyRequest & { auth: SignedInAuthObject | SignedOutAuthObject };
+type GetAuthOptions = PendingSessionOptions & { acceptsToken?: AuthenticateRequestOptions['acceptsToken'] };
 
-type AuthOptions = { acceptsToken?: AuthenticateRequestOptions['acceptsToken'] };
-
-interface GetAuthFn {
-  /**
-   * @example
-   * const authObject = await getAuth(req, { acceptsToken: ['session_token', 'api_key'] })
-   */
-  <T extends TokenType[]>(
-    req: FastifyRequest,
-    options: AuthOptions & { acceptsToken: T },
-  ): InferAuthObjectFromTokenArray<T, SessionAuthObject, MachineAuthObject<T[number]>>;
-
-  /**
-   * @example
-   * const authObject = await getAuth(req, { acceptsToken: 'session_token' })
-   */
-  <T extends TokenType>(
-    req: FastifyRequest,
-    options: AuthOptions & { acceptsToken: T },
-  ): InferAuthObjectFromToken<T, SessionAuthObject, MachineAuthObject<T>>;
-
-  /**
-   * @example
-   * const authObject = await getAuth(req, { acceptsToken: 'any' })
-   */
-  (req: FastifyRequest, options: AuthOptions & { acceptsToken: 'any' }): AuthObject;
-
-  /**
-   * @example
-   * const authObject = await getAuth(req)
-   */
-  (req: FastifyRequest): SessionAuthObject;
-}
-
-export const getAuth: GetAuthFn = (req: FastifyRequest, options?: AuthOptions) => {
-  const authReq = req as FastifyRequestWithAuth;
+export const getAuth: GetAuthFn<FastifyRequest> = (req: FastifyRequest, options?: GetAuthOptions) => {
+  const authReq = req as FastifyRequest & { auth: SignedInAuthObject | SignedOutAuthObject };
 
   if (!authReq.auth) {
     throw new Error(pluginRegistrationRequired);

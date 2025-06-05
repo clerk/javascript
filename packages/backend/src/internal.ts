@@ -14,6 +14,7 @@ export type {
   InferAuthObjectFromTokenArray,
   SessionAuthObject,
   MachineAuthObject,
+  GetAuthFn,
 } from './tokens/types';
 
 export { TokenType } from './tokens/tokenTypes';

@@ -12,7 +12,7 @@ export async function authenticateRequest(
 ): Promise<SignedInState | SignedOutState> {
   const { audience, authorizedParties } = opts;
 
-  const { apiUrl, secretKey, jwtKey, proxyUrl, isSatellite, domain, publishableKey } = opts;
+  const { apiUrl, secretKey, jwtKey, proxyUrl, isSatellite, domain, publishableKey, acceptsToken } = opts;
   const { signInUrl, signUpUrl, afterSignInUrl, afterSignUpUrl } = opts;
 
   const requestState = await createClerkClient({
@@ -31,6 +31,7 @@ export async function authenticateRequest(
     signUpUrl,
     afterSignInUrl,
     afterSignUpUrl,
+    acceptsToken,
   });
 
   const locationHeader = requestState.headers.get(constants.Headers.Location);

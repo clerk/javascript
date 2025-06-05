@@ -1,5 +1,11 @@
-import type { SignedInAuthObject, SignedOutAuthObject } from '@clerk/backend/internal';
-import { stripPrivateDataFromObject } from '@clerk/backend/internal';
+import type { AuthenticateRequestOptions, GetAuthFn } from '@clerk/backend/internal';
+import {
+  isTokenTypeAccepted,
+  signedOutAuthObject,
+  TokenType,
+  unauthenticatedMachineObject,
+} from '@clerk/backend/internal';
+import type { PendingSessionOptions } from '@clerk/types';
 
 import { errorThrower } from '../utils';
 import { noFetchFnCtxPassedInGetAuth } from '../utils/errors';
@@ -7,18 +13,37 @@ import { authenticateRequest } from './authenticateRequest';
 import { loadOptions } from './loadOptions';
 import type { LoaderOptions } from './types';
 
-type GetAuthReturn = Promise<SignedInAuthObject | SignedOutAuthObject>;
+type GetAuthOptions = PendingSessionOptions & { acceptsToken?: AuthenticateRequestOptions['acceptsToken'] } & Pick<
+    LoaderOptions,
+    'secretKey'
+  >;
 
-type GetAuthOptions = Pick<LoaderOptions, 'secretKey'>;
-
-export async function getAuth(request: Request, opts?: GetAuthOptions): GetAuthReturn {
+export const getAuth: GetAuthFn<Request, true> = async (request: Request, opts?: GetAuthOptions) => {
   if (!request) {
     return errorThrower.throw(noFetchFnCtxPassedInGetAuth);
   }
 
-  const loadedOptions = loadOptions(request, opts);
+  const { acceptsToken = TokenType.SessionToken, ...restOptions } = opts || {};
 
-  const requestState = await authenticateRequest(request, loadedOptions);
+  const loadedOptions = loadOptions(request, restOptions);
 
-  return stripPrivateDataFromObject(requestState.toAuth());
-}
+  const requestState = await authenticateRequest(request, {
+    ...loadedOptions,
+    acceptsToken: 'any',
+  });
+
+  const authObject = requestState.toAuth({ treatPendingAsSignedOut: opts?.treatPendingAsSignedOut });
+
+  if (acceptsToken === 'any') {
+    return authObject;
+  }
+
+  if (!isTokenTypeAccepted(authObject.tokenType, acceptsToken)) {
+    if (authObject.tokenType === TokenType.SessionToken) {
+      return signedOutAuthObject(authObject.debug);
+    }
+    return unauthenticatedMachineObject(authObject.tokenType, authObject.debug);
+  }
+
+  return authObject;
+};

@@ -1,4 +1,5 @@
 import type { MatchFunction } from '@clerk/shared/pathToRegexp';
+import type { PendingSessionOptions } from '@clerk/types';
 
 import type { ApiClient, APIKey, IdPOAuthAccessToken, MachineToken } from '../api';
 import type {
@@ -179,3 +180,45 @@ export type SessionAuthObject = SignedInAuthObject | SignedOutAuthObject;
 export type MachineAuthObject<T extends TokenType> = (AuthenticatedMachineObject | UnauthenticatedMachineObject) & {
   tokenType: T;
 };
+
+type AuthOptions = PendingSessionOptions & { acceptsToken?: AuthenticateRequestOptions['acceptsToken'] };
+
+type MaybePromise<T, IsPromise extends boolean> = IsPromise extends true ? Promise<T> : T;
+
+/**
+ * Shared generic overload type for getAuth() helpers across SDKs.
+ *
+ * - Parameterized by the request type (RequestType).
+ * - Handles different accepted token types and their corresponding return types.
+ */
+export interface GetAuthFn<RequestType, ReturnsPromise extends boolean = false> {
+  /**
+   * @example
+   * const authObject = await getAuth(req, { acceptsToken: ['session_token', 'api_key'] })
+   */
+  <T extends TokenType[]>(
+    req: RequestType,
+    options: AuthOptions & { acceptsToken: T },
+  ): MaybePromise<InferAuthObjectFromTokenArray<T, SessionAuthObject, MachineAuthObject<T[number]>>, ReturnsPromise>;
+
+  /**
+   * @example
+   * const authObject = await getAuth(req, { acceptsToken: 'session_token' })
+   */
+  <T extends TokenType>(
+    req: RequestType,
+    options: AuthOptions & { acceptsToken: T },
+  ): MaybePromise<InferAuthObjectFromToken<T, SessionAuthObject, MachineAuthObject<T>>, ReturnsPromise>;
+
+  /**
+   * @example
+   * const authObject = await getAuth(req, { acceptsToken: 'any' })
+   */
+  (req: RequestType, options: AuthOptions & { acceptsToken: 'any' }): MaybePromise<AuthObject, ReturnsPromise>;
+
+  /**
+   * @example
+   * const authObject = await getAuth(req)
+   */
+  (req: RequestType, options?: PendingSessionOptions): MaybePromise<SessionAuthObject, ReturnsPromise>;
+}
