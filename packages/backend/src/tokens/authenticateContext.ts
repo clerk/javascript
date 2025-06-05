@@ -10,7 +10,7 @@ import type { AuthenticateRequestOptions } from './types';
 
 interface AuthenticateContext extends AuthenticateRequestOptions {
   // header-based values
-  sessionTokenInHeader: string | undefined;
+  tokenInHeader: string | undefined;
   origin: string | undefined;
   host: string | undefined;
   forwardedHost: string | undefined;
@@ -25,8 +25,10 @@ interface AuthenticateContext extends AuthenticateRequestOptions {
   clientUat: number;
   // handshake-related values
   devBrowserToken: string | undefined;
+  handshakeNonce: string | undefined;
   handshakeToken: string | undefined;
   handshakeRedirectLoopCounter: number;
+
   // url derived from headers
   clerkUrl: URL;
   // enforce existence of the following props
@@ -48,7 +50,7 @@ class AuthenticateContext implements AuthenticateContext {
    * @returns {string | undefined} The session token if available, otherwise undefined.
    */
   public get sessionToken(): string | undefined {
-    return this.sessionTokenInCookie || this.sessionTokenInHeader;
+    return this.sessionTokenInCookie || this.tokenInHeader;
   }
 
   public constructor(
@@ -165,13 +167,14 @@ class AuthenticateContext implements AuthenticateContext {
       fatal: true,
       proxyUrl: options.proxyUrl,
       domain: options.domain,
+      isSatellite: options.isSatellite,
     });
     this.instanceType = pk.instanceType;
     this.frontendApi = pk.frontendApi;
   }
 
   private initHeaderValues() {
-    this.sessionTokenInHeader = this.parseAuthorizationHeader(this.getHeader(constants.Headers.Authorization));
+    this.tokenInHeader = this.parseAuthorizationHeader(this.getHeader(constants.Headers.Authorization));
     this.origin = this.getHeader(constants.Headers.Origin);
     this.host = this.getHeader(constants.Headers.Host);
     this.forwardedHost = this.getHeader(constants.Headers.ForwardedHost);
@@ -198,6 +201,8 @@ class AuthenticateContext implements AuthenticateContext {
     this.handshakeToken =
       this.getQueryParam(constants.QueryParameters.Handshake) || this.getCookie(constants.Cookies.Handshake);
     this.handshakeRedirectLoopCounter = Number(this.getCookie(constants.Cookies.RedirectCount)) || 0;
+    this.handshakeNonce =
+      this.getQueryParam(constants.QueryParameters.HandshakeNonce) || this.getCookie(constants.Cookies.HandshakeNonce);
   }
 
   private getQueryParam(name: string) {

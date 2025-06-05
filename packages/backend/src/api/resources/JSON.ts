@@ -1,3 +1,5 @@
+import type { SignUpStatus } from '@clerk/types';
+
 import type {
   ActorTokenStatus,
   AllowlistIdentifierType,
@@ -10,7 +12,7 @@ import type {
   OrganizationInvitationStatus,
   OrganizationMembershipRole,
   SignInStatus,
-  SignUpStatus,
+  SignUpVerificationNextAction,
   WaitlistEntryStatus,
 } from './Enums';
 
@@ -18,6 +20,7 @@ export const ObjectType = {
   AccountlessApplication: 'accountless_application',
   ActorToken: 'actor_token',
   AllowlistIdentifier: 'allowlist_identifier',
+  ApiKey: 'api_key',
   BlocklistIdentifier: 'blocklist_identifier',
   Client: 'client',
   Cookies: 'cookies',
@@ -31,8 +34,10 @@ export const ObjectType = {
   InstanceRestrictions: 'instance_restrictions',
   InstanceSettings: 'instance_settings',
   Invitation: 'invitation',
+  MachineToken: 'machine_to_machine_token',
   JwtTemplate: 'jwt_template',
   OauthAccessToken: 'oauth_access_token',
+  IdpOAuthAccessToken: 'clerk_idp_oauth_access_token',
   OAuthApplication: 'oauth_application',
   Organization: 'organization',
   OrganizationDomain: 'organization_domain',
@@ -43,6 +48,7 @@ export const ObjectType = {
   ProxyCheck: 'proxy_check',
   RedirectUrl: 'redirect_url',
   SamlAccount: 'saml_account',
+  SamlConnection: 'saml_connection',
   Session: 'session',
   SignInAttempt: 'sign_in_attempt',
   SignInToken: 'sign_in_token',
@@ -61,7 +67,13 @@ export const ObjectType = {
 export type ObjectType = (typeof ObjectType)[keyof typeof ObjectType];
 
 export interface ClerkResourceJSON {
+  /**
+   * The type of the resource.
+   */
   object: ObjectType;
+  /**
+   * The unique identifier for the resource.
+   */
   id: string;
 }
 
@@ -290,6 +302,7 @@ export interface OauthAccessTokenJSON {
   scopes?: string[];
   // Only set in OAuth 1.0 tokens
   token_secret?: string;
+  expires_at?: number;
 }
 
 export interface OAuthApplicationJSON extends ClerkResourceJSON {
@@ -364,10 +377,25 @@ export interface OrganizationInvitationJSON extends ClerkResourceJSON {
   expires_at: number;
 }
 
+/**
+ * @interface
+ */
 export interface PublicOrganizationDataJSON extends ClerkResourceJSON {
+  /**
+   * The name of the organization.
+   */
   name: string;
+  /**
+   * The slug of the organization.
+   */
   slug: string;
+  /**
+   * Holds the default organization profile image. Compatible with Clerk's [Image Optimization](https://clerk.com/docs/guides/image-optimization).
+   */
   image_url?: string;
+  /**
+   * Whether the organization has a profile image.
+   */
   has_image: boolean;
 }
 
@@ -466,18 +494,45 @@ export interface SignInTokenJSON extends ClerkResourceJSON {
 
 export interface SignUpJSON extends ClerkResourceJSON {
   object: typeof ObjectType.SignUpAttempt;
+  id: string;
   status: SignUpStatus;
+  required_fields: string[];
+  optional_fields: string[];
+  missing_fields: string[];
+  unverified_fields: string[];
+  verifications: SignUpVerificationsJSON;
   username: string | null;
   email_address: string | null;
   phone_number: string | null;
   web3_wallet: string | null;
-  web3_wallet_verification: VerificationJSON | null;
-  external_account: any;
-  has_password: boolean;
-  name_full: string | null;
+  password_enabled: boolean;
+  first_name: string | null;
+  last_name: string | null;
+  public_metadata?: Record<string, unknown> | null;
+  unsafe_metadata?: Record<string, unknown> | null;
+  custom_action: boolean;
+  external_id: string | null;
   created_session_id: string | null;
   created_user_id: string | null;
   abandon_at: number | null;
+  legal_accepted_at: number | null;
+
+  /**
+   * @deprecated Please use `verifications.external_account` instead
+   */
+  external_account: object | null;
+}
+
+export interface SignUpVerificationsJSON {
+  email_address: SignUpVerificationJSON;
+  phone_number: SignUpVerificationJSON;
+  web3_wallet: SignUpVerificationJSON;
+  external_account: VerificationJSON;
+}
+
+export interface SignUpVerificationJSON {
+  next_action: SignUpVerificationNextAction;
+  supported_strategies: string[];
 }
 
 export interface SMSMessageJSON extends ClerkResourceJSON {
@@ -573,6 +628,7 @@ export interface PaginatedResponseJSON {
 }
 
 export interface SamlConnectionJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.SamlConnection;
   name: string;
   domain: string;
   organization_id: string | null;
@@ -638,6 +694,54 @@ export interface SamlAccountConnectionJSON extends ClerkResourceJSON {
   allow_subdomains: boolean;
   allow_idp_initiated: boolean;
   disable_additional_identifications: boolean;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface MachineTokenJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.MachineToken;
+  name: string;
+  subject: string;
+  scopes: string[];
+  claims: Record<string, any> | null;
+  revoked: boolean;
+  revocation_reason: string | null;
+  expired: boolean;
+  expiration: number | null;
+  created_by: string | null;
+  creation_reason: string | null;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface APIKeyJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.ApiKey;
+  type: string;
+  name: string;
+  subject: string;
+  scopes: string[];
+  claims: Record<string, any> | null;
+  revoked: boolean;
+  revocation_reason: string | null;
+  expired: boolean;
+  expiration: number | null;
+  created_by: string | null;
+  description: string | null;
+  last_used_at: number | null;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface IdPOAuthAccessTokenJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.IdpOAuthAccessToken;
+  client_id: string;
+  type: string;
+  subject: string;
+  scopes: string[];
+  revoked: boolean;
+  revocation_reason: string | null;
+  expired: boolean;
+  expiration: number | null;
   created_at: number;
   updated_at: number;
 }

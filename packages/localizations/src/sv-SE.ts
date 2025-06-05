@@ -14,24 +14,96 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const svSE: LocalizationResource = {
   locale: 'sv-SE',
-  __experimental_commerce: {
-    billedAnnually: undefined,
-    free: undefined,
-    getStarted: undefined,
-    manageMembership: undefined,
-    month: undefined,
-    switchPlan: undefined,
-  },
   backButton: 'Tillbaka',
+  badge__activePlan: undefined,
+  badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Standard',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
   badge__otherImpersonatorDevice: 'Annans imitatörenhet',
   badge__primary: 'Primär',
+  badge__renewsAt: undefined,
   badge__requiresAction: 'Kräver åtgärd',
+  badge__startsAt: undefined,
   badge__thisDevice: 'Den här enheten',
   badge__unverified: 'Overifierad',
+  badge__upcomingPlan: undefined,
   badge__userDevice: 'Användarens enhet',
   badge__you: 'Du',
+  commerce: {
+    addPaymentMethod: undefined,
+    alwaysFree: undefined,
+    annually: undefined,
+    availableFeatures: undefined,
+    billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
+    cancelSubscription: undefined,
+    cancelSubscriptionAccessUntil: undefined,
+    cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionTitle: undefined,
+    cannotSubscribeMonthly: undefined,
+    checkout: {
+      description__paymentSuccessful: undefined,
+      description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      lineItems: {
+        title__paymentMethod: undefined,
+        title__statementId: undefined,
+        title__subscriptionBegins: undefined,
+        title__totalPaid: undefined,
+      },
+      perMonth: undefined,
+      title: undefined,
+      title__paymentSuccessful: undefined,
+      title__subscriptionSuccessful: undefined,
+    },
+    creditRemainder: undefined,
+    defaultFreePlanActive: undefined,
+    free: undefined,
+    getStarted: undefined,
+    keepSubscription: undefined,
+    manage: undefined,
+    manageSubscription: undefined,
+    month: undefined,
+    monthly: undefined,
+    pastDue: undefined,
+    pay: undefined,
+    paymentMethods: undefined,
+    paymentSource: {
+      applePayDescription: {
+        annual: undefined,
+        monthly: undefined,
+      },
+      dev: {
+        anyNumbers: undefined,
+        cardNumber: undefined,
+        cvcZip: undefined,
+        developmentMode: undefined,
+        expirationDate: undefined,
+        testCardInfo: undefined,
+      },
+    },
+    popular: undefined,
+    pricingTable: {
+      billingCycle: undefined,
+      included: undefined,
+    },
+    reSubscribe: undefined,
+    seeAllFeatures: undefined,
+    subscribe: undefined,
+    subtotal: undefined,
+    switchPlan: undefined,
+    switchToAnnual: undefined,
+    switchToMonthly: undefined,
+    totalDueToday: undefined,
+    viewFeatures: undefined,
+    year: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'Skapa organisation',
     invitePage: {
@@ -48,6 +120,7 @@ export const svSE: LocalizationResource = {
     sameDay: "Idag klockan {{ date | timeString('sv-SE') }}",
   },
   dividerText: 'eller',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'Använd en annan metod',
   footerPageLink__help: 'Hjälp',
   footerPageLink__privacy: 'Integritet',
@@ -123,6 +196,42 @@ export const svSE: LocalizationResource = {
     badge__automaticSuggestion: 'Automatiska förslag',
     badge__manualInvitation: 'Ingen automatisk registrering',
     badge__unverified: 'Overifierad',
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Lägg till domänen för att verifiera. Användare med e-postadresser i denna domän kan gå med i organisationen automatiskt eller begära att få gå med.',
@@ -179,10 +288,17 @@ export const svSE: LocalizationResource = {
       },
     },
     navbar: {
+      billing: undefined,
       description: 'Hantera din organisation.',
       general: 'Allmänna inställningar',
       members: 'Medlemar',
       title: 'Organisation',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -369,6 +485,12 @@ export const svSE: LocalizationResource = {
       subtitle: 'Har du problem? Du kan använda någon av dessa metoder för att logga in.',
       title: 'Använd en annan metod',
     },
+    alternativePhoneCodeProvider: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     backupCodeMfa: {
       subtitle: 'för att fortsätta till {{applicationName}}',
       title: 'Ange en reservkod',
@@ -477,6 +599,12 @@ export const svSE: LocalizationResource = {
       actionLink__use_username: 'Använd användarnamn',
       actionText: 'Har du inget konto?',
       actionText__join_waitlist: undefined,
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'för att fortsätta till {{applicationName}}',
       subtitleCombined: undefined,
       title: 'Logga in',
@@ -490,6 +618,11 @@ export const svSE: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Ange ditt lösenord',
   signUp: {
+    alternativePhoneCodeProvider: {
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     continue: {
       actionLink: 'Logga in',
       actionText: 'Har du redan ett konto?',
@@ -559,6 +692,12 @@ export const svSE: LocalizationResource = {
       actionLink__use_email: 'Använd e-post istället',
       actionLink__use_phone: 'Använd telefon istället',
       actionText: 'Har du redan ett konto?',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'för att fortsätta till {{applicationName}}',
       subtitleCombined: 'för att fortsätta till {{applicationName}}',
       title: 'Skapa ditt konto',
@@ -577,7 +716,7 @@ export const svSE: LocalizationResource = {
     form_identifier_exists__email_address: 'Denna e-postadress är taget. Vänligen prova ett annat.',
     form_identifier_exists__phone_number: 'Detta telefonnummer är taget. Vänligen prova ett annat.',
     form_identifier_exists__username: 'Detta användarnamn är taget. Vänligen prova ett annat.',
-    form_identifier_not_found: 'Identifieraren hittades inte.',
+    form_identifier_not_found: 'Vi kunde inte hitta ett konto med dessa uppgifter.',
     form_param_format_invalid: 'Formatet är ogiltigt.',
     form_param_format_invalid__email_address: 'E-postadressen måste vara en giltig e-postadress.',
     form_param_format_invalid__phone_number: 'Telefonnumret måste vara i ett giltigt internationellt format.',
@@ -597,7 +736,8 @@ export const svSE: LocalizationResource = {
     form_username_invalid_character: 'Användarnamnet innehåller ogiltiga tecken.',
     form_username_invalid_length: 'Användarnamnets längd är ogiltig.',
     identification_deletion_failed: 'Du kan inte ta bort din sista identifiering.',
-    not_allowed_access: 'Åtkomst nekad.',
+    not_allowed_access:
+      "Adressen eller telefonnumret du använder för registrering är inte tillåtet. Detta kan bero på att du använder '+', '=', '#' eller '.' i din e-postadress, använder en domän som är kopplad till en tidsbegränsad e-posttjänst eller har ett explicit blockerat.",
     organization_domain_blocked: 'Domänen är blockerad.',
     organization_domain_common: 'Domänen är vanlig.',
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -618,6 +758,7 @@ export const svSE: LocalizationResource = {
       sentencePrefix: 'Lösenordet måste innehålla',
     },
     phone_number_exists: 'Detta telefonnummer är taget. Vänligen prova ett annat.',
+    session_exists: 'Du är redan inloggad.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Ditt lösenord fungerar, men kunde vara starkare. Försök lägga till fler tecken.',
@@ -666,14 +807,6 @@ export const svSE: LocalizationResource = {
     action__signOutAll: 'Logga ut från alla konton',
   },
   userProfile: {
-    __experimental_billingPage: {
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
-        headerTitle__plans: undefined,
-      },
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Kopierat!',
       actionLabel__copy: 'Kopiera alla',
@@ -689,6 +822,42 @@ export const svSE: LocalizationResource = {
         'Du kan använda en av dessa för att logga in på ditt konto om du förlorar åtkomsten till din autentiseringsenhet.',
       title: 'Lägg till backupkodverifiering',
       title__codelist: 'Backupkoder',
+    },
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Välj en leverantör för att ansluta ditt konto.',
@@ -832,6 +1001,9 @@ export const svSE: LocalizationResource = {
       title: 'Lägg till telefonnummer',
       verifySubtitle: 'Ange verifieringskoden som skickats till {{identifier}}',
       verifyTitle: 'Verifiera telefonnummer',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: 'Ladda upp en JPG, PNG, GIF, eller WEBP bild som är mindre än 10 MB',

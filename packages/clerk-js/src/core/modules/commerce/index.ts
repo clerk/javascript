@@ -1,2 +1,2 @@
-export * from './Commerce';
 export * from './CommerceBilling';
+export * from './payment-source-methods';

@@ -1,6 +1,12 @@
-import type { ApiClient } from '../api';
+import type { MatchFunction } from '@clerk/shared/pathToRegexp';
+
+import type { ApiClient, APIKey, IdPOAuthAccessToken, MachineToken } from '../api';
+import type { TokenType } from './tokenTypes';
 import type { VerifyTokenOptions } from './verify';
 
+/**
+ * @interface
+ */
 export type AuthenticateRequestOptions = {
   /**
    * The Clerk Publishable Key from the [**API keys**](https://dashboard.clerk.com/last-active?path=api-keys) page in the Clerk Dashboard.
@@ -47,10 +53,15 @@ export type AuthenticateRequestOptions = {
    * @internal
    */
   apiClient?: ApiClient;
+  /**
+   * The type of token to accept.
+   * @default 'session_token'
+   */
+  acceptsToken?: TokenType | TokenType[] | 'any';
 } & VerifyTokenOptions;
 
 /**
- * @expand
+ * @inline
  */
 export type OrganizationSyncOptions = {
   /**
@@ -60,8 +71,7 @@ export type OrganizationSyncOptions = {
    *
    * Patterns must have a path parameter named either `:id` (to match a Clerk organization ID) or `:slug` (to match a Clerk organization slug).
    *
-   * > [!WARNING]
-   * > If the organization can't be activated—either because it doesn't exist or the user lacks access—the previously active organization will remain unchanged. Components must detect this case and provide an appropriate error and/or resolution pathway, such as calling `notFound()` or displaying an [`<OrganizationSwitcher />`](https://clerk.com/docs/components/organization/organization-switcher).
+   * If the organization can't be activated—either because it doesn't exist or the user lacks access—the previously active organization will remain unchanged. Components must detect this case and provide an appropriate error and/or resolution pathway, such as calling `notFound()` or displaying an [`<OrganizationSwitcher />`](https://clerk.com/docs/components/organization/organization-switcher).
    *
    * @example
    * ["/orgs/:slug", "/orgs/:slug/(.*)"]
@@ -116,3 +126,18 @@ export type OrganizationSyncOptions = {
  * ```
  */
 type Pattern = string;
+
+export type MachineAuthType = MachineToken | APIKey | IdPOAuthAccessToken;
+
+export type OrganizationSyncTargetMatchers = {
+  OrganizationMatcher: MatchFunction<Partial<Record<string, string | string[]>>> | null;
+  PersonalAccountMatcher: MatchFunction<Partial<Record<string, string | string[]>>> | null;
+};
+
+/**
+ * Represents an organization or a personal account - e.g. an
+ * entity that can be activated by the handshake API.
+ */
+export type OrganizationSyncTarget =
+  | { type: 'personalAccount' }
+  | { type: 'organization'; organizationId?: string; organizationSlug?: string };

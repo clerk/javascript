@@ -7,6 +7,7 @@ const config = {
   globals: {
     __PKG_NAME__: '@clerk/clerk-js',
     __PKG_VERSION__: 'test',
+    __BUILD_VARIANT_CHIPS__: false,
   },
 
   testEnvironment: '<rootDir>/jest.jsdom-with-timezone.ts',
@@ -36,9 +37,23 @@ const config = {
   // ],
   transformIgnorePatterns: ['[/\\\\]node_modules[/\\\\](?!(@formkit/auto-animate/react)).+\\.(js|jsx|mjs|cjs|ts|tsx)$'],
   moduleDirectories: ['node_modules', '<rootDir>/src'],
+  moduleNameMapper: {
+    '@/(.*)': '<rootDir>/src/$1',
+  },
   transform: {
-    '^.+\\.m?tsx?$': ['ts-jest', { tsconfig: 'tsconfig.test.json', diagnostics: false }],
-    // '^.+\\.m?tsx?$': ['@swc/jest'],
+    '^.+\\.m?tsx?$': [
+      '@swc/jest',
+      {
+        jsc: {
+          transform: {
+            react: {
+              runtime: 'automatic',
+              importSource: '@emotion/react',
+            },
+          },
+        },
+      },
+    ],
     '^.+\\.svg$': '<rootDir>/svgTransform.js',
   },
 };

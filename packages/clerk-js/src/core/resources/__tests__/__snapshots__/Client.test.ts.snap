@@ -229,6 +229,7 @@ Client {
     "createdSessionId": null,
     "firstFactorVerification": Verification {
       "attempts": null,
+      "channel": undefined,
       "error": {
         "code": "",
         "longMessage": undefined,
@@ -243,6 +244,7 @@ Client {
       },
       "expireAt": 2024-12-11T13:42:26.849Z,
       "externalVerificationRedirectURL": null,
+      "id": undefined,
       "message": null,
       "nonce": null,
       "pathRoot": "",
@@ -259,6 +261,7 @@ Client {
     "resetPassword": [Function],
     "secondFactorVerification": Verification {
       "attempts": null,
+      "channel": undefined,
       "error": {
         "code": "",
         "longMessage": undefined,
@@ -273,6 +276,7 @@ Client {
       },
       "expireAt": 2024-12-11T13:42:26.849Z,
       "externalVerificationRedirectURL": null,
+      "id": undefined,
       "message": null,
       "nonce": null,
       "pathRoot": "",
@@ -311,6 +315,7 @@ Client {
     "createdSessionId": null,
     "createdUserId": null,
     "emailAddress": null,
+    "externalAccount": undefined,
     "firstName": null,
     "hasPassword": false,
     "id": "",
@@ -335,6 +340,7 @@ Client {
     "verifications": SignUpVerifications {
       "emailAddress": SignUpVerification {
         "attempts": null,
+        "channel": undefined,
         "error": {
           "code": "",
           "longMessage": undefined,
@@ -349,6 +355,7 @@ Client {
         },
         "expireAt": 2024-12-11T13:42:26.849Z,
         "externalVerificationRedirectURL": null,
+        "id": undefined,
         "message": null,
         "nextAction": "",
         "nonce": null,
@@ -361,6 +368,7 @@ Client {
       },
       "externalAccount": Verification {
         "attempts": null,
+        "channel": undefined,
         "error": {
           "code": "",
           "longMessage": undefined,
@@ -375,6 +383,7 @@ Client {
         },
         "expireAt": 2024-12-11T13:42:26.849Z,
         "externalVerificationRedirectURL": null,
+        "id": undefined,
         "message": null,
         "nonce": null,
         "pathRoot": "",
@@ -385,6 +394,7 @@ Client {
       },
       "phoneNumber": SignUpVerification {
         "attempts": null,
+        "channel": undefined,
         "error": {
           "code": "",
           "longMessage": undefined,
@@ -399,6 +409,7 @@ Client {
         },
         "expireAt": 2024-12-11T13:42:26.849Z,
         "externalVerificationRedirectURL": null,
+        "id": undefined,
         "message": null,
         "nextAction": "",
         "nonce": null,
@@ -411,6 +422,7 @@ Client {
       },
       "web3Wallet": SignUpVerification {
         "attempts": null,
+        "channel": undefined,
         "error": {
           "code": "",
           "longMessage": undefined,
@@ -425,6 +437,7 @@ Client {
         },
         "expireAt": 2024-12-11T13:42:26.849Z,
         "externalVerificationRedirectURL": null,
+        "id": undefined,
         "message": null,
         "nextAction": "",
         "nonce": null,

@@ -1,12 +1,27 @@
+import { isClerkAPIResponseError } from '@clerk/shared/error';
 import type { JwtPayload } from '@clerk/types';
 
-import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from '../errors';
+import type { APIKey, IdPOAuthAccessToken, MachineToken } from '../api';
+import { createBackendApiClient } from '../api/factory';
+import {
+  MachineTokenVerificationError,
+  MachineTokenVerificationErrorCode,
+  TokenVerificationError,
+  TokenVerificationErrorAction,
+  TokenVerificationErrorReason,
+} from '../errors';
 import type { VerifyJwtOptions } from '../jwt';
-import type { JwtReturnType } from '../jwt/types';
+import type { JwtReturnType, MachineTokenReturnType } from '../jwt/types';
 import { decodeJwt, verifyJwt } from '../jwt/verifyJwt';
 import type { LoadClerkJWKFromRemoteOptions } from './keys';
 import { loadClerkJWKFromLocal, loadClerkJWKFromRemote } from './keys';
+import { API_KEY_PREFIX, M2M_TOKEN_PREFIX, OAUTH_TOKEN_PREFIX } from './machine';
+import type { MachineTokenType } from './tokenTypes';
+import { TokenType } from './tokenTypes';
 
+/**
+ * @interface
+ */
 export type VerifyTokenOptions = Omit<VerifyJwtOptions, 'key'> &
   Omit<LoadClerkJWKFromRemoteOptions, 'kid'> & {
     /**
@@ -15,6 +30,83 @@ export type VerifyTokenOptions = Omit<VerifyJwtOptions, 'key'> &
     jwtKey?: string;
   };
 
+/**
+ * > [!WARNING]
+ * > This is a lower-level method intended for more advanced use-cases. It's recommended to use [`authenticateRequest()`](https://clerk.com/docs/references/backend/authenticate-request), which fully authenticates a token passed from the `request` object.
+ *
+ * Verifies a Clerk-generated token signature. Networkless if the `jwtKey` is provided. Otherwise, performs a network call to retrieve the JWKS from the [Backend API](https://clerk.com/docs/reference/backend-api/tag/JWKS#operation/GetJWKS){{ target: '_blank' }}.
+ *
+ * @param token - The token to verify.
+ * @param options - Options for verifying the token.
+ *
+ * @displayFunctionSignature
+ *
+ * @paramExtension
+ *
+ * ### `VerifyTokenOptions`
+ *
+ * It is recommended to set these options as [environment variables](/docs/deployments/clerk-environment-variables#api-and-sdk-configuration) where possible, and then pass them to the function. For example, you can set the `secretKey` option using the `CLERK_SECRET_KEY` environment variable, and then pass it to the function like this: `createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY })`.
+ *
+ * > [!WARNING]
+ * You must provide either `jwtKey` or `secretKey`.
+ *
+ * <Typedoc src="backend/verify-token-options" />
+ *
+ * @example
+ *
+ * The following example demonstrates how to use the [JavaScript Backend SDK](https://clerk.com/docs/references/backend/overview) to verify the token signature.
+ *
+ * In the following example:
+ *
+ * 1. The **JWKS Public Key** from the Clerk Dashboard is set in the environment variable `CLERK_JWT_KEY`.
+ * 1. The session token is retrieved from the `__session` cookie or the Authorization header.
+ * 1. The token is verified in a networkless manner by passing the `jwtKey` prop.
+ * 1. The `authorizedParties` prop is passed to verify that the session token is generated from the expected frontend application.
+ * 1. If the token is valid, the response contains the verified token.
+ *
+ * ```ts
+ * import { verifyToken } from '@clerk/backend'
+ * import { cookies } from 'next/headers'
+ *
+ * export async function GET(request: Request) {
+ *   const cookieStore = cookies()
+ *   const sessToken = cookieStore.get('__session')?.value
+ *   const bearerToken = request.headers.get('Authorization')?.replace('Bearer ', '')
+ *   const token = sessToken || bearerToken
+ *
+ *   if (!token) {
+ *     return Response.json({ error: 'Token not found. User must sign in.' }, { status: 401 })
+ *   }
+ *
+ *   try {
+ *     const verifiedToken = await verifyToken(token, {
+ *       jwtKey: process.env.CLERK_JWT_KEY,
+ *       authorizedParties: ['http://localhost:3001', 'api.example.com'], // Replace with your authorized parties
+ *     })
+ *
+ *     return Response.json({ verifiedToken })
+ *   } catch (error) {
+ *     return Response.json({ error: 'Token not verified.' }, { status: 401 })
+ *   }
+ * }
+ * ```
+ *
+ * If the token is valid, the response will contain a JSON object that looks something like this:
+ *
+ * ```json
+ * {
+ *   "verifiedToken": {
+ *     "azp": "http://localhost:3000",
+ *     "exp": 1687906422,
+ *     "iat": 1687906362,
+ *     "iss": "https://magical-marmoset-51.clerk.accounts.dev",
+ *     "nbf": 1687906352,
+ *     "sid": "sess_2Ro7e2IxrffdqBboq8KfB6eGbIy",
+ *     "sub": "user_2RfWKJREkjKbHZy0Wqa5qrHeAnb"
+ *   }
+ * }
+ * ```
+ */
 export async function verifyToken(
   token: string,
   options: VerifyTokenOptions,
@@ -51,4 +143,118 @@ export async function verifyToken(
   } catch (error) {
     return { errors: [error as TokenVerificationError] };
   }
+}
+
+/**
+ * Handles errors from Clerk API responses for machine tokens
+ * @param tokenType - The type of machine token
+ * @param err - The error from the Clerk API
+ * @param notFoundMessage - Custom message for 404 errors
+ */
+function handleClerkAPIError(
+  tokenType: MachineTokenType,
+  err: any,
+  notFoundMessage: string,
+): MachineTokenReturnType<any, MachineTokenVerificationError> {
+  if (isClerkAPIResponseError(err)) {
+    let code: MachineTokenVerificationErrorCode;
+    let message: string;
+
+    switch (err.status) {
+      case 401:
+        code = MachineTokenVerificationErrorCode.InvalidSecretKey;
+        message = err.errors[0]?.message || 'Invalid secret key';
+        break;
+      case 404:
+        code = MachineTokenVerificationErrorCode.TokenInvalid;
+        message = notFoundMessage;
+        break;
+      default:
+        code = MachineTokenVerificationErrorCode.UnexpectedError;
+        message = 'Unexpected error';
+    }
+
+    return {
+      data: undefined,
+      tokenType,
+      errors: [
+        new MachineTokenVerificationError({
+          message,
+          code,
+          status: err.status,
+        }),
+      ],
+    };
+  }
+
+  return {
+    data: undefined,
+    tokenType,
+    errors: [
+      new MachineTokenVerificationError({
+        message: 'Unexpected error',
+        code: MachineTokenVerificationErrorCode.UnexpectedError,
+        status: err.status,
+      }),
+    ],
+  };
+}
+
+async function verifyMachineToken(
+  secret: string,
+  options: VerifyTokenOptions,
+): Promise<MachineTokenReturnType<MachineToken, MachineTokenVerificationError>> {
+  try {
+    const client = createBackendApiClient(options);
+    const verifiedToken = await client.machineTokens.verifySecret(secret);
+    return { data: verifiedToken, tokenType: TokenType.MachineToken, errors: undefined };
+  } catch (err: any) {
+    return handleClerkAPIError(TokenType.MachineToken, err, 'Machine token not found');
+  }
+}
+
+async function verifyOAuthToken(
+  secret: string,
+  options: VerifyTokenOptions,
+): Promise<MachineTokenReturnType<IdPOAuthAccessToken, MachineTokenVerificationError>> {
+  try {
+    const client = createBackendApiClient(options);
+    const verifiedToken = await client.idPOAuthAccessToken.verifySecret(secret);
+    return { data: verifiedToken, tokenType: TokenType.OAuthToken, errors: undefined };
+  } catch (err: any) {
+    return handleClerkAPIError(TokenType.OAuthToken, err, 'OAuth token not found');
+  }
+}
+
+async function verifyAPIKey(
+  secret: string,
+  options: VerifyTokenOptions,
+): Promise<MachineTokenReturnType<APIKey, MachineTokenVerificationError>> {
+  try {
+    const client = createBackendApiClient(options);
+    const verifiedToken = await client.apiKeys.verifySecret(secret);
+    return { data: verifiedToken, tokenType: TokenType.ApiKey, errors: undefined };
+  } catch (err: any) {
+    return handleClerkAPIError(TokenType.ApiKey, err, 'API key not found');
+  }
+}
+
+/**
+ * Verifies any type of machine token by detecting its type from the prefix.
+ *
+ * @param token - The token to verify (e.g. starts with "m2m_", "oauth_", "api_key_", etc.)
+ * @param options - Options including secretKey for BAPI authorization
+ */
+export async function verifyMachineAuthToken(token: string, options: VerifyTokenOptions) {
+  if (token.startsWith(M2M_TOKEN_PREFIX)) {
+    return verifyMachineToken(token, options);
+  }
+  if (token.startsWith(OAUTH_TOKEN_PREFIX)) {
+    return verifyOAuthToken(token, options);
+  }
+  if (token.startsWith(API_KEY_PREFIX)) {
+    return verifyAPIKey(token, options);
+  }
+
+  throw new Error('Unknown machine token type');
 }

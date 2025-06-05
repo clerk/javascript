@@ -2,9 +2,11 @@ import type {
   Appearance,
   CheckoutTheme,
   CreateOrganizationTheme,
+  OAuthConsentTheme,
   OrganizationListTheme,
   OrganizationProfileTheme,
   OrganizationSwitcherTheme,
+  PlanDetailTheme,
   PricingTableTheme,
   SignInTheme,
   SignUpTheme,
@@ -15,9 +17,10 @@ import type {
 } from './appearance';
 import type { ClientResource } from './client';
 import type {
-  __experimental_CommerceNamespace,
-  __experimental_CommerceSubscriberType,
-  __experimental_CommerceSubscriptionPlanPeriod,
+  CommerceBillingNamespace,
+  CommercePlanResource,
+  CommerceSubscriberType,
+  CommerceSubscriptionPlanPeriod,
 } from './commerce';
 import type { CustomMenuItem } from './customMenuItems';
 import type { CustomPage } from './customPages';
@@ -31,6 +34,7 @@ import type {
   AfterMultiSessionSingleSignOutUrl,
   AfterSignOutUrl,
   LegacyRedirectProps,
+  NewSubscriptionRedirectUrl,
   RedirectOptions,
   RedirectUrlProp,
   SignInFallbackRedirectUrl,
@@ -94,6 +98,19 @@ export interface SignOut {
   (signOutCallback?: SignOutCallback, options?: SignOutOptions): Promise<void>;
 }
 
+type ClerkEvent = keyof ClerkEventPayload;
+type EventHandler<E extends ClerkEvent> = (payload: ClerkEventPayload[E]) => void;
+export type ClerkEventPayload = {
+  status: ClerkStatus;
+};
+type OnEventListener = <E extends ClerkEvent>(event: E, handler: EventHandler<E>, opt?: { notify: boolean }) => void;
+type OffEventListener = <E extends ClerkEvent>(event: E, handler: EventHandler<E>) => void;
+
+/**
+ * @inline
+ */
+export type ClerkStatus = 'degraded' | 'error' | 'loading' | 'ready';
+
 /**
  * Main Clerk SDK object.
  */
@@ -113,6 +130,15 @@ export interface Clerk {
    * If true the bootstrapping of Clerk.load() has completed successfully.
    */
   loaded: boolean;
+
+  /**
+   * Describes the state the clerk singleton operates in:
+   * - `"error"`: Clerk failed to initialize.
+   * - `"loading"`: Clerk is still attempting to load.
+   * - `"ready"`: Clerk singleton is fully operational.
+   * - `"degraded"`: Clerk singleton is partially operational.
+   */
+  status: ClerkStatus;
 
   /**
    * @internal
@@ -156,8 +182,8 @@ export interface Clerk {
   /** Current User. */
   user: UserResource | null | undefined;
 
-  /** Commerce Object */
-  __experimental_commerce: __experimental_CommerceNamespace;
+  /** Billing Object */
+  billing: CommerceBillingNamespace;
 
   telemetry: TelemetryCollector | undefined;
 
@@ -186,7 +212,7 @@ export interface Clerk {
    * Opens the Clerk Checkout component in a drawer.
    * @param props Optional checkout configuration parameters.
    */
-  __internal_openCheckout: (props?: __experimental_CheckoutProps) => void;
+  __internal_openCheckout: (props?: __internal_CheckoutProps) => void;
 
   /**
    * Closes the Clerk Checkout drawer.
@@ -194,7 +220,17 @@ export interface Clerk {
   __internal_closeCheckout: () => void;
 
   /**
-   * Opens the Clerk UserVerification component in a modal.
+   * Opens the Clerk PlanDetails drawer component in a drawer.
+   * @param props Optional subscription details drawer configuration parameters.
+   */
+  __internal_openPlanDetails: (props?: __internal_PlanDetailsProps) => void;
+
+  /**
+   * Closes the Clerk PlanDetails drawer.
+   */
+  __internal_closePlanDetails: () => void;
+
+  /** Opens the Clerk UserVerification component in a modal.
    * @param props Optional user verification configuration parameters.
    */
   __internal_openReverification: (props?: __internal_UserVerificationModalProps) => void;
@@ -413,7 +449,7 @@ export interface Clerk {
    * @param targetNode Target node to mount the PricingTable component.
    * @param props configuration parameters.
    */
-  __experimental_mountPricingTable: (targetNode: HTMLDivElement, props?: __experimental_PricingTableProps) => void;
+  mountPricingTable: (targetNode: HTMLDivElement, props?: PricingTableProps) => void;
 
   /**
    * Unmount a pricing table component from the target element.
@@ -421,7 +457,20 @@ export interface Clerk {
    *
    * @param targetNode Target node to unmount the PricingTable component from.
    */
-  __experimental_unmountPricingTable: (targetNode: HTMLDivElement) => void;
+  unmountPricingTable: (targetNode: HTMLDivElement) => void;
+
+  /**
+   * Mounts a OAuth consent component at the target element.
+   * @param targetNode Target node to mount the OAuth consent component.
+   * @param oauthConsentProps OAuth consent configuration parameters.
+   */
+  __internal_mountOAuthConsent: (targetNode: HTMLDivElement, oauthConsentProps?: __internal_OAuthConsentProps) => void;
+
+  /**
+   * Unmounts a OAuth consent component from the target element.
+   * @param targetNode Target node to unmount the OAuth consent component from.
+   */
+  __internal_unmountOAuthConsent: (targetNode: HTMLDivElement) => void;
 
   /**
    * Register a listener that triggers a callback each time important Clerk resources are changed.
@@ -436,6 +485,22 @@ export interface Clerk {
    * @returns - Unsubscribe callback
    */
   addListener: (callback: ListenerCallback) => UnsubscribeCallback;
+
+  /**
+   * Registers an event handler for a specific Clerk event.
+   * @param event - The event name to subscribe to
+   * @param handler - The callback function to execute when the event is dispatched
+   * @param opt - Optional configuration object
+   * @param opt.notify - If true and the event was previously dispatched, handler will be called immediately with the latest payload
+   */
+  on: OnEventListener;
+
+  /**
+   * Removes an event handler for a specific Clerk event.
+   * @param event - The event name to unsubscribe from
+   * @param handler - The callback function to remove
+   */
+  off: OffEventListener;
 
   /**
    * Registers an internal listener that triggers a callback each time `Clerk.navigate` is called.
@@ -514,6 +579,11 @@ export interface Clerk {
    * Returns the configured afterSignOutUrl of the instance.
    */
   buildAfterSignOutUrl(): string;
+
+  /**
+   * Returns the configured newSubscriptionRedirectUrl of the instance.
+   */
+  buildNewSubscriptionRedirectUrl(): string;
 
   /**
    * Returns the configured afterMultiSessionSingleSignOutUrl of the instance.
@@ -656,10 +726,10 @@ export interface Clerk {
   /**
    * Navigates to the next task or redirects to completion URL.
    * If the current session has pending tasks, it navigates to the next task.
-   * If all tasks are complete, it navigates to the provided completion URL.
+   * If all tasks are complete, it navigates to the provided completion URL or defaults to the origin redirect URL (either from sign-in or sign-up).
    * @experimental
    */
-  __experimental_nextTask: (params?: NextTaskParams) => Promise<void>;
+  __experimental_navigateToTask: (params?: NextTaskParams) => Promise<void>;
 
   /**
    * This is an optional function.
@@ -764,6 +834,7 @@ export type ClerkOptions = PendingSessionOptions &
   SignInFallbackRedirectUrl &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
+  NewSubscriptionRedirectUrl &
   LegacyRedirectProps &
   AfterSignOutUrl &
   AfterMultiSessionSingleSignOutUrl & {
@@ -1060,6 +1131,10 @@ export type SignInProps = RoutingOptions & {
    * Control whether OAuth flows use redirects or popups.
    */
   oauthFlow?: 'auto' | 'redirect' | 'popup';
+  /**
+   * Optional for `oauth_<provider>` or `enterprise_sso` strategies. The value to pass to the [OIDC prompt parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.) in the generated OAuth redirect URL.
+   */
+  oidcPrompt?: string;
 } & TransferableOption &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
@@ -1197,6 +1272,10 @@ export type SignUpProps = RoutingOptions & {
    * Control whether OAuth flows use redirects or popups.
    */
   oauthFlow?: 'auto' | 'redirect' | 'popup';
+  /**
+   * Optional for `oauth_<provider>` or `enterprise_sso` strategies. The value to pass to the [OIDC prompt parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.) in the generated OAuth redirect URL.
+   */
+  oidcPrompt?: string;
 } & SignInFallbackRedirectUrl &
   SignInForceRedirectUrl &
   LegacyRedirectProps &
@@ -1245,6 +1324,11 @@ export type OrganizationProfileProps = RoutingOptions & {
    * Provide custom pages and links to be rendered inside the OrganizationProfile.
    */
   customPages?: CustomPage[];
+  /**
+   * Specify on which page the organization profile modal will open.
+   * @experimental
+   **/
+  __experimental_startPath?: string;
 };
 
 export type OrganizationProfileModalProps = WithoutRouting<OrganizationProfileProps>;
@@ -1510,36 +1594,103 @@ export type WaitlistProps = {
 
 export type WaitlistModalProps = WaitlistProps;
 
-type __experimental_PricingTableDefaultProps = {
-  layout?: 'default';
+type PricingTableDefaultProps = {
+  /**
+   * The position of the CTA button.
+   * @default 'bottom'
+   */
   ctaPosition?: 'top' | 'bottom';
+  /**
+   * Whether to collapse features on the pricing table.
+   * @default false
+   */
   collapseFeatures?: boolean;
+  /**
+   * Full URL or path to navigate to after checkout is complete and the user clicks the "Continue" button.
+   * @default undefined
+   */
+  newSubscriptionRedirectUrl?: string;
 };
 
-type __experimental_PricingTableMatrixProps = {
-  layout?: 'matrix';
-  highlightPlan?: string;
-};
-
-type __experimental_PricingTableBaseProps = {
+type PricingTableBaseProps = {
+  /**
+   * Whether to show pricing table for organizations.
+   * @default false
+   */
+  forOrganizations?: boolean;
+  /**
+   * Customisation options to fully match the Clerk components to your own brand.
+   * These options serve as overrides and will be merged with the global `appearance`
+   * prop of ClerkProvider (if one is provided)
+   */
   appearance?: PricingTableTheme;
-  checkoutProps?: Pick<__experimental_CheckoutProps, 'appearance'>;
+  /*
+   * Specify options for the underlying <Checkout /> component.
+   * e.g. <PricingTable checkoutProps={{appearance: {variables: {colorText: 'blue'}}}} />
+   */
+  checkoutProps?: Pick<__internal_CheckoutProps, 'appearance'>;
 };
 
-export type __experimental_PricingTableProps = __experimental_PricingTableBaseProps &
-  (__experimental_PricingTableDefaultProps | __experimental_PricingTableMatrixProps);
+type PortalRoot = HTMLElement | null | undefined;
 
-export type __experimental_CheckoutProps = {
+export type PricingTableProps = PricingTableBaseProps & PricingTableDefaultProps;
+
+export type __internal_CheckoutProps = {
   appearance?: CheckoutTheme;
   planId?: string;
-  planPeriod?: __experimental_CommerceSubscriptionPlanPeriod;
-  subscriberType?: __experimental_CommerceSubscriberType;
+  planPeriod?: CommerceSubscriptionPlanPeriod;
+  subscriberType?: CommerceSubscriberType;
   onSubscriptionComplete?: () => void;
   portalId?: string;
+  portalRoot?: PortalRoot;
+  /**
+   * Full URL or path to navigate to after checkout is complete and the user clicks the "Continue" button.
+   * @default undefined
+   */
+  newSubscriptionRedirectUrl?: string;
+  onClose?: () => void;
 };
 
-export type __experimental_PaymentSourcesProps = {
-  subscriberType?: __experimental_CommerceSubscriberType;
+export type __internal_PlanDetailsProps = {
+  appearance?: PlanDetailTheme;
+  plan?: CommercePlanResource;
+  subscriberType?: CommerceSubscriberType;
+  initialPlanPeriod?: CommerceSubscriptionPlanPeriod;
+  onSubscriptionCancel?: () => void;
+  portalId?: string;
+  portalRoot?: PortalRoot;
+};
+
+export type __internal_OAuthConsentProps = {
+  appearance?: OAuthConsentTheme;
+  /**
+   * Name of the OAuth application.
+   */
+  oAuthApplicationName: string;
+  /**
+   * Logo URL of the OAuth application.
+   */
+  oAuthApplicationLogoUrl?: string;
+  /**
+   * Scopes requested by the OAuth application.
+   */
+  scopes: {
+    scope: string;
+    description: string | null;
+    requires_consent: boolean;
+  }[];
+  /**
+   * Full URL or path to navigate to after the user allows access.
+   */
+  redirectUrl: string;
+  /**
+   * Called when user allows access.
+   */
+  onAllow: () => void;
+  /**
+   * Called when user denies access.
+   */
+  onDeny: () => void;
 };
 
 export interface HandleEmailLinkVerificationParams {

@@ -2,17 +2,15 @@ import { useClerk, useReverification, useUser } from '@clerk/shared/react';
 import type { PasskeyResource } from '@clerk/types';
 import React, { Fragment, useState } from 'react';
 
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { Form } from '@/ui/elements/Form';
+import { FormButtons } from '@/ui/elements/FormButtons';
+import type { FormProps } from '@/ui/elements/FormContainer';
+import { FormContainer } from '@/ui/elements/FormContainer';
+import { ProfileSection } from '@/ui/elements/Section';
+import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
+
 import { Col, Flex, localizationKeys, Text, useLocalizations } from '../../customizables';
-import {
-  Form,
-  FormButtons,
-  FormContainer,
-  type FormProps,
-  ProfileSection,
-  ThreeDotsMenu,
-  useCardState,
-  withCardStateProvider,
-} from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import type { PropsOfComponent } from '../../styledSystem';

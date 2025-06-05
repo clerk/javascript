@@ -1,7 +1,8 @@
 import React from 'react';
 
-import type { FlowMetadata } from '../elements';
-import { FlowMetadataProvider, InvisibleRootBox, useFlowMetadata } from '../elements';
+import type { FlowMetadata } from '../elements/contexts';
+import { FlowMetadataProvider, useFlowMetadata } from '../elements/contexts';
+import { InvisibleRootBox } from '../elements/InvisibleRootBox';
 import type { ThemableCssProp } from '../styledSystem';
 import { InternalThemeProvider } from '../styledSystem';
 import { generateFlowClassname } from './classGeneration';

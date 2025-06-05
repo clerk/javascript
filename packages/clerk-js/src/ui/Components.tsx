@@ -1,6 +1,7 @@
 import { createDeferredPromise } from '@clerk/shared/utils';
 import type {
-  __experimental_CheckoutProps,
+  __internal_CheckoutProps,
+  __internal_PlanDetailsProps,
   __internal_UserVerificationProps,
   Appearance,
   Clerk,
@@ -18,13 +19,12 @@ import React, { Suspense } from 'react';
 
 import { clerkUIErrorDOMElementNotFound } from '../core/errors';
 import { buildVirtualRouterUrl } from '../utils';
-import type { AppearanceCascade } from './customizables/parseAppearance';
-// NOTE: Using `./hooks` instead of `./hooks/useClerkModalStateParams` will increase the bundle size
+import { disambiguateRedirectOptions } from '../utils/disambiguateRedirectOptions';
+import type { AppearanceCascade } from './customizables/parseAppearance'; // NOTE: Using `./hooks` instead of `./hooks/useClerkModalStateParams` will increase the bundle size
 import { useClerkModalStateParams } from './hooks/useClerkModalStateParams';
 import type { ClerkComponentName } from './lazyModules/components';
 import {
   BlankCaptchaModal,
-  Checkout,
   CreateOrganizationModal,
   ImpersonationFab,
   KeylessPrompt,
@@ -36,9 +36,9 @@ import {
   UserVerificationModal,
   WaitlistModal,
 } from './lazyModules/components';
+import { MountedCheckoutDrawer, MountedPlanDetailDrawer } from './lazyModules/drawers';
 import {
   LazyComponentRenderer,
-  LazyDrawerRenderer,
   LazyImpersonationFabProvider,
   LazyModalRenderer,
   LazyOneTapRenderer,
@@ -106,12 +106,16 @@ export type ComponentControls = {
       notify?: boolean;
     },
   ) => void;
-  openDrawer: <T extends 'checkout'>(
+  openDrawer: <T extends 'checkout' | 'planDetails'>(
     drawer: T,
-    props: T extends 'checkout' ? __experimental_CheckoutProps : never,
+    props: T extends 'checkout'
+      ? __internal_CheckoutProps
+      : T extends 'planDetails'
+        ? __internal_PlanDetailsProps
+        : never,
   ) => void;
   closeDrawer: (
-    drawer: 'checkout',
+    drawer: 'checkout' | 'planDetails',
     options?: {
       notify?: boolean;
     },
@@ -150,7 +154,11 @@ interface ComponentsState {
   waitlistModal: null | WaitlistProps;
   checkoutDrawer: {
     open: false;
-    props: null | __experimental_CheckoutProps;
+    props: null | __internal_CheckoutProps;
+  };
+  planDetailsDrawer: {
+    open: false;
+    props: null | __internal_PlanDetailsProps;
   };
   nodes: Map<HTMLDivElement, HtmlNodeOptions>;
   impersonationFab: boolean;
@@ -237,6 +245,10 @@ const Components = (props: ComponentsProps) => {
       open: false,
       props: null,
     },
+    planDetailsDrawer: {
+      open: false,
+      props: null,
+    },
     nodes: new Map(),
     impersonationFab: false,
   });
@@ -252,6 +264,7 @@ const Components = (props: ComponentsProps) => {
     waitlistModal,
     blankCaptchaModal,
     checkoutDrawer,
+    planDetailsDrawer,
     nodes,
   } = state;
 
@@ -359,13 +372,18 @@ const Components = (props: ComponentsProps) => {
     };
 
     componentsControls.closeDrawer = name => {
-      setState(s => ({
-        ...s,
-        [`${name}Drawer`]: {
-          ...s[`${name}Drawer`],
-          open: false,
-        },
-      }));
+      setState(s => {
+        const currentItem = s[`${name}Drawer`];
+        // @ts-expect-error `__internal_PlanDetailsProps` does not accept `onClose`
+        currentItem?.props?.onClose?.();
+        return {
+          ...s,
+          [`${name}Drawer`]: {
+            ...s[`${name}Drawer`],
+            open: false,
+          },
+        };
+      });
     };
 
     componentsControls.prefetch = component => {
@@ -396,7 +414,7 @@ const Components = (props: ComponentsProps) => {
       componentName={'SignInModal'}
     >
       <SignInModal {...signInModal} />
-      <SignUpModal {...signInModal} />
+      <SignUpModal {...disambiguateRedirectOptions(signInModal, 'signin')} />
       <WaitlistModal {...waitlistModal} />
     </LazyModalRenderer>
   );
@@ -412,7 +430,7 @@ const Components = (props: ComponentsProps) => {
       startPath={buildVirtualRouterUrl({ base: '/sign-up', path: urlStateParam?.path })}
       componentName={'SignUpModal'}
     >
-      <SignInModal {...signUpModal} />
+      <SignInModal {...disambiguateRedirectOptions(signUpModal, 'signup')} />
       <SignUpModal {...signUpModal} />
       <WaitlistModal {...waitlistModal} />
     </LazyModalRenderer>
@@ -464,7 +482,7 @@ const Components = (props: ComponentsProps) => {
       onExternalNavigate={() => componentsControls.closeModal('organizationProfile')}
       startPath={buildVirtualRouterUrl({
         base: '/organizationProfile',
-        path: urlStateParam?.path,
+        path: organizationProfileModal?.__experimental_startPath || urlStateParam?.path,
       })}
       componentName={'OrganizationProfileModal'}
       modalContainerSx={{ alignItems: 'center' }}
@@ -527,26 +545,6 @@ const Components = (props: ComponentsProps) => {
     </LazyModalRenderer>
   );
 
-  const mountedCheckoutDrawer = checkoutDrawer.props && (
-    <LazyDrawerRenderer
-      globalAppearance={state.appearance}
-      appearanceKey={'checkout' as any}
-      componentAppearance={{}}
-      flowName={'checkout'}
-      open={checkoutDrawer.open}
-      onOpenChange={() => componentsControls.closeDrawer('checkout')}
-      componentName={'Checkout'}
-      portalId={checkoutDrawer.props.portalId}
-    >
-      <Checkout
-        planId={checkoutDrawer.props.planId}
-        planPeriod={checkoutDrawer.props.planPeriod}
-        subscriberType={checkoutDrawer.props.subscriberType}
-        onSubscriptionComplete={checkoutDrawer.props.onSubscriptionComplete}
-      />
-    </LazyDrawerRenderer>
-  );
-
   return (
     <Suspense fallback={''}>
       <LazyProviders
@@ -577,7 +575,18 @@ const Components = (props: ComponentsProps) => {
         {createOrganizationModal && mountedCreateOrganizationModal}
         {waitlistModal && mountedWaitlistModal}
         {blankCaptchaModal && mountedBlankCaptchaModal}
-        {mountedCheckoutDrawer}
+
+        <MountedCheckoutDrawer
+          appearance={state.appearance}
+          checkoutDrawer={checkoutDrawer}
+          onOpenChange={() => componentsControls.closeDrawer('checkout')}
+        />
+
+        <MountedPlanDetailDrawer
+          appearance={state.appearance}
+          planDetailsDrawer={planDetailsDrawer}
+          onOpenChange={() => componentsControls.closeDrawer('planDetails')}
+        />
 
         {state.impersonationFab && (
           <LazyImpersonationFabProvider globalAppearance={state.appearance}>

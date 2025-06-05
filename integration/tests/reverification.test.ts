@@ -37,10 +37,15 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
     });
 
     test.afterAll(async () => {
-      await fakeOrganization.delete();
-      await fakeViewer.deleteIfExists();
-      await fakeAdmin.deleteIfExists();
-      await app.teardown();
+      try {
+        await fakeOrganization.delete();
+        await fakeViewer.deleteIfExists();
+        await fakeAdmin.deleteIfExists();
+      } catch (error) {
+        console.error(error);
+      } finally {
+        await app.teardown();
+      }
     });
 
     test('reverification prompt on adding new email address', async ({ page, context }) => {
@@ -222,11 +227,13 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
         await u.page.getByRole('button', { name: /LogUserId/i }).click();
         await expect(u.page.getByText(/\{\s*"userId"\s*:\s*"user_[^"]+"\s*\}/i)).toBeVisible();
 
-        const total = 1000 * 120;
-        await page.waitForTimeout(total / 3);
-        await page.waitForTimeout(total / 3);
-        await u.po.userProfile.goTo();
-        await page.waitForTimeout(total / 3);
+        // Hack to reset fva
+        await u.po.expect.toBeSignedIn();
+        await page.evaluate(async () => {
+          return window.Clerk.session.startVerification({
+            level: 'first_factor',
+          });
+        });
         await u.page.goToRelative(`/requires-re-verification`);
         await u.page.getByRole('button', { name: /LogUserId/i }).click();
         await expect(
@@ -237,7 +244,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
       });
 
       test(`reverification recovery from ${capitalize(type)}`, async ({ page, context }) => {
-        test.setTimeout(270_000);
         const u = createTestUtils({ app, page, context });
 
         await u.po.signIn.goTo();
@@ -253,11 +259,14 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
         await u.page.getByRole('button', { name: /LogUserId/i }).click();
         await expect(u.page.getByText(/\{\s*"userId"\s*:\s*"user_[^"]+"\s*\}/i)).toBeVisible();
 
-        const total = 1000 * 120;
-        await page.waitForTimeout(total / 3);
-        await page.waitForTimeout(total / 3);
-        await u.po.userProfile.goTo();
-        await page.waitForTimeout(total / 3);
+        // Hack to reset fva
+        await u.po.expect.toBeSignedIn();
+        await page.evaluate(async () => {
+          return window.Clerk.session.startVerification({
+            level: 'first_factor',
+          });
+        });
+
         await u.page.goToRelative(`/action-with-use-reverification`);
         await u.po.expect.toBeSignedIn();
         await u.page.getByRole('button', { name: /LogUserId/i }).click();

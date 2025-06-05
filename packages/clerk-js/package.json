@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "5.61.0",
+  "version": "5.68.0",
   "description": "Clerk JS library",
   "keywords": [
     "clerk",
@@ -42,6 +42,7 @@
     "clean": "rimraf ./dist",
     "dev": "rspack serve --config rspack.config.js",
     "dev:headless": "rspack serve --config rspack.config.js --env variant=\"clerk.headless.browser\"",
+    "dev:origin": "rspack serve --config rspack.config.js --env devOrigin=http://localhost:4000",
     "dev:sandbox": "rspack serve --config rspack.config.js --env devOrigin=http://localhost:4000 --env sandbox=1",
     "lint": "eslint src",
     "lint:attw": "attw --pack . --profile node16 --ignore-rules named-exports",
@@ -52,7 +53,7 @@
     "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html",
     "watch": "rspack build --config rspack.config.js --env production --watch"
   },
-  "browserslist": "last 2 years, Safari > 12, iOS > 12",
+  "browserslist": "last 2 years",
   "dependencies": {
     "@clerk/localizations": "workspace:^",
     "@clerk/shared": "workspace:^",
@@ -70,11 +71,12 @@
     "@zxcvbn-ts/language-common": "3.0.4",
     "browser-tabs-lock": "1.2.15",
     "copy-to-clipboard": "3.3.3",
-    "core-js": "3.26.1",
+    "core-js": "3.41.0",
     "crypto-js": "^4.2.0",
     "dequal": "2.0.3",
-    "qrcode.react": "3.1.0",
-    "regenerator-runtime": "0.13.11"
+    "qrcode.react": "4.2.0",
+    "regenerator-runtime": "0.13.11",
+    "swr": "2.3.3"
   },
   "devDependencies": {
     "@rsdoctor/rspack-plugin": "^0.4.13",
@@ -82,6 +84,8 @@
     "@rspack/core": "^1.2.8",
     "@rspack/plugin-react-refresh": "^1.0.1",
     "@svgr/webpack": "^6.5.1",
+    "@swc/jest": "^0.2.38",
+    "@types/cloudflare-turnstile": "^0.2.2",
     "@types/webpack-env": "^1.18.8",
     "webpack-merge": "^5.10.0"
   },
@@ -94,5 +98,6 @@
   },
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "browserslistLegacy": "Chrome > 73, Firefox > 66, Safari > 12, iOS > 12, Edge > 18, Opera > 58"
 }

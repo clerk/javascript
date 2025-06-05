@@ -130,15 +130,21 @@ const borderColor = (t: InternalTheme, props?: any) => {
   } as const;
 };
 
+const focusRingStyles = (t: InternalTheme) => {
+  return {
+    '&::-moz-focus-inner': { border: '0' },
+    WebkitTapHighlightColor: 'transparent',
+    boxShadow: t.shadows.$focusRing.replace('{{color}}', t.colors.$neutralAlpha200),
+    transitionProperty: t.transitionProperty.$common,
+    transitionTimingFunction: t.transitionTiming.$common,
+    transitionDuration: t.transitionDuration.$focusRing,
+  } as const;
+};
+
 const focusRing = (t: InternalTheme) => {
   return {
     '&:focus': {
-      '&::-moz-focus-inner': { border: '0' },
-      WebkitTapHighlightColor: 'transparent',
-      boxShadow: t.shadows.$focusRing.replace('{{color}}', t.colors.$neutralAlpha200),
-      transitionProperty: t.transitionProperty.$common,
-      transitionTimingFunction: t.transitionTiming.$common,
-      transitionDuration: t.transitionDuration.$focusRing,
+      ...focusRingStyles(t),
     },
   } as const;
 };
@@ -184,9 +190,21 @@ const mergedColorsBackground = (colorBack: string, colorFront: string) => {
   return `linear-gradient(${colorFront},${colorFront}), linear-gradient(${colorBack}, ${colorBack})`;
 };
 
+const visuallyHidden = () =>
+  ({
+    clip: 'rect(0 0 0 0)',
+    clipPath: 'inset(50%)',
+    height: '1px',
+    overflow: 'hidden',
+    position: 'absolute',
+    whiteSpace: 'nowrap',
+    width: '1px',
+  }) as const;
+
 export const common = {
   textVariants,
   borderVariants,
+  focusRingStyles,
   focusRing,
   disabled,
   borderColor,
@@ -194,4 +212,5 @@ export const common = {
   maxHeightScroller,
   unstyledScrollbar,
   mergedColorsBackground,
+  visuallyHidden,
 };

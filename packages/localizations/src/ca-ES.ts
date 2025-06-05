@@ -14,24 +14,96 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const caES: LocalizationResource = {
   locale: 'ca-ES',
-  __experimental_commerce: {
-    billedAnnually: undefined,
-    free: undefined,
-    getStarted: undefined,
-    manageMembership: undefined,
-    month: undefined,
-    switchPlan: undefined,
-  },
   backButton: 'Enrere',
+  badge__activePlan: undefined,
+  badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Per defecte',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
   badge__otherImpersonatorDevice: 'Un altre dispositiu impostor',
   badge__primary: 'Principal',
+  badge__renewsAt: undefined,
   badge__requiresAction: 'Requereix acció',
+  badge__startsAt: undefined,
   badge__thisDevice: 'Aquest dispositiu',
   badge__unverified: 'No verificat',
+  badge__upcomingPlan: undefined,
   badge__userDevice: "Dispositiu de l'usuari",
   badge__you: 'Tu',
+  commerce: {
+    addPaymentMethod: undefined,
+    alwaysFree: undefined,
+    annually: undefined,
+    availableFeatures: undefined,
+    billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
+    cancelSubscription: undefined,
+    cancelSubscriptionAccessUntil: undefined,
+    cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionTitle: undefined,
+    cannotSubscribeMonthly: undefined,
+    checkout: {
+      description__paymentSuccessful: undefined,
+      description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      lineItems: {
+        title__paymentMethod: undefined,
+        title__statementId: undefined,
+        title__subscriptionBegins: undefined,
+        title__totalPaid: undefined,
+      },
+      perMonth: undefined,
+      title: undefined,
+      title__paymentSuccessful: undefined,
+      title__subscriptionSuccessful: undefined,
+    },
+    creditRemainder: undefined,
+    defaultFreePlanActive: undefined,
+    free: undefined,
+    getStarted: undefined,
+    keepSubscription: undefined,
+    manage: undefined,
+    manageSubscription: undefined,
+    month: undefined,
+    monthly: undefined,
+    pastDue: undefined,
+    pay: undefined,
+    paymentMethods: undefined,
+    paymentSource: {
+      applePayDescription: {
+        annual: undefined,
+        monthly: undefined,
+      },
+      dev: {
+        anyNumbers: undefined,
+        cardNumber: undefined,
+        cvcZip: undefined,
+        developmentMode: undefined,
+        expirationDate: undefined,
+        testCardInfo: undefined,
+      },
+    },
+    popular: undefined,
+    pricingTable: {
+      billingCycle: undefined,
+      included: undefined,
+    },
+    reSubscribe: undefined,
+    seeAllFeatures: undefined,
+    subscribe: undefined,
+    subtotal: undefined,
+    switchPlan: undefined,
+    switchToAnnual: undefined,
+    switchToMonthly: undefined,
+    totalDueToday: undefined,
+    viewFeatures: undefined,
+    year: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'Crea organització',
     invitePage: {
@@ -48,6 +120,7 @@ export const caES: LocalizationResource = {
     sameDay: "Avui a les {{ date | timeString('en-US') }}",
   },
   dividerText: 'o',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'Utilitza un altre mètode',
   footerPageLink__help: 'Ajuda',
   footerPageLink__privacy: 'Privacitat',
@@ -122,6 +195,42 @@ export const caES: LocalizationResource = {
     badge__automaticSuggestion: 'Suggeriments automàtics',
     badge__manualInvitation: 'Sense inscripció automàtica',
     badge__unverified: 'No verificat',
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         "Afegeix el domini per verificar. Els usuaris amb adreces de correu electrònic en aquest domini poden unir-se a l'organització automàticament o sol·licitar unir-se.",
@@ -179,10 +288,17 @@ export const caES: LocalizationResource = {
       },
     },
     navbar: {
+      billing: undefined,
       description: 'Gestiona la teva organització.',
       general: 'General',
       members: 'Membres',
       title: 'Organització',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -368,6 +484,12 @@ export const caES: LocalizationResource = {
       subtitle: "Tens problemes? Pots utilitzar qualsevol d'aquests mètodes per iniciar sessió.",
       title: 'Utilitza un altre mètode',
     },
+    alternativePhoneCodeProvider: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     backupCodeMfa: {
       subtitle: "El teu codi de seguretat és el que vas obtenir quan vas configurar l'autenticació de dos passos.",
       title: 'Introdueix un codi de seguretat',
@@ -475,6 +597,12 @@ export const caES: LocalizationResource = {
       actionLink__use_username: "Utilitza nom d'usuari",
       actionText: 'No tens un compte?',
       actionText__join_waitlist: undefined,
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'Benvingut de nou! Si us plau, inicia sessió per continuar',
       subtitleCombined: undefined,
       title: 'Inicia sessió a {{applicationName}}',
@@ -488,6 +616,11 @@ export const caES: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Introdueix la teva contrasenya',
   signUp: {
+    alternativePhoneCodeProvider: {
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     continue: {
       actionLink: 'Inicia sessió',
       actionText: 'Ja tens un compte?',
@@ -555,6 +688,12 @@ export const caES: LocalizationResource = {
       actionLink__use_email: undefined,
       actionLink__use_phone: undefined,
       actionText: 'Ja tens un compte?',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'Benvingut! Si us plau, completa els detalls per començar.',
       subtitleCombined: 'Benvingut! Si us plau, completa els detalls per començar.',
       title: 'Crea el teu compte',
@@ -573,7 +712,7 @@ export const caES: LocalizationResource = {
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
-    form_identifier_not_found: "No s'ha trobat cap identificador coincident. Si us plau, comprova el valor introduït.",
+    form_identifier_not_found: 'No hem trobat cap compte amb aquests detalls.',
     form_param_format_invalid: 'Format de paràmetre no vàlid.',
     form_param_format_invalid__email_address: "L'adreça de correu electrònic ha de ser una adreça vàlida.",
     form_param_format_invalid__phone_number: 'El número de telèfon ha de tenir un format internacional vàlid.',
@@ -594,7 +733,8 @@ export const caES: LocalizationResource = {
     form_username_invalid_character: "El nom d'usuari conté caràcters no vàlids.",
     form_username_invalid_length: "El nom d'usuari ha de tenir entre 3 i 50 caràcters.",
     identification_deletion_failed: 'No pots eliminar la teva última identificació.',
-    not_allowed_access: "No tens permís per accedir a aquesta pàgina. Si us plau, posa't en contacte amb el suport.",
+    not_allowed_access:
+      "L'adreça de correu electrònic o el número de telèfon no es permet registrar-se. Això podria ser degut a l'ús de '+', '=', '#' o '.' a la vostra adreça de correu electrònic, utilitzant un domini connectat amb un servei de correu electrònic temporal o bloquejant-se explícitament. Si creieu que es tracta d'un error, poseu-vos en contacte amb el servei d'assistència.",
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -615,6 +755,7 @@ export const caES: LocalizationResource = {
       sentencePrefix: 'La teva contrasenya ha de contenir',
     },
     phone_number_exists: "Aquest número de telèfon ja està en ús. Si us plau, prova'n un altre.",
+    session_exists: 'Ja estàs connectat.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'La teva contrasenya funciona, però podria ser més forta. Prova afegint més caràcters.',
@@ -664,14 +805,6 @@ export const caES: LocalizationResource = {
     action__signOutAll: 'Tanca sessió de tots els comptes',
   },
   userProfile: {
-    __experimental_billingPage: {
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
-        headerTitle__plans: undefined,
-      },
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Copiat!',
       actionLabel__copy: 'Copia tot',
@@ -687,6 +820,42 @@ export const caES: LocalizationResource = {
         "Pots utilitzar un d'aquests per iniciar sessió al teu compte, si perds l'accés al teu dispositiu d'autenticació.",
       title: 'Afegeix verificació amb codi de seguretat',
       title__codelist: 'Codis de seguretat',
+    },
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Selecciona un proveïdor per connectar el teu compte.',
@@ -835,6 +1004,9 @@ export const caES: LocalizationResource = {
       title: 'Afegeix número de telèfon',
       verifySubtitle: 'Introdueix el codi de verificació enviat a { { identifier } } ',
       verifyTitle: 'Verifica número de telèfon',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: 'Mida recomanada 1:1, fins a 10MB.',

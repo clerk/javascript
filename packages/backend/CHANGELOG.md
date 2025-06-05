@@ -1,5 +1,372 @@
 # Change Log
 
+## 2.0.0
+
+### Major Changes
+
+- Introduces machine authentication, supporting four token types: `api_key`, `oauth_token`, `machine_token`, and `session_token`. For backwards compatibility, `session_token` remains the default when no token type is specified. This enables machine-to-machine authentication and use cases such as API keys and OAuth integrations. Existing applications continue to work without modification. ([#5689](https://github.com/clerk/javascript/pull/5689)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  You can specify which token types are allowed by using the `acceptsToken` option in the `authenticateRequest()` function. This option can be set to a specific type, an array of types, or `'any'` to accept all supported tokens.
+
+  Example usage:
+
+  ```ts
+  import express from 'express';
+  import { clerkClient } from '@clerk/backend';
+
+  const app = express();
+
+  app.use(async (req, res, next) => {
+    const requestState = await clerkClient.authenticateRequest(req, {
+      acceptsToken: 'any',
+    });
+
+    if (!requestState.isAuthenticated) {
+      // do something for unauthenticated requests
+    }
+
+    const authObject = requestState.toAuth();
+
+    if (authObject.tokenType === 'session_token') {
+      console.log('this is session token from a user');
+    } else {
+      console.log('this is some other type of machine token');
+      console.log('more specifically, a ' + authObject.tokenType);
+    }
+
+    // Attach the auth object to locals so downstream handlers
+    // and middleware can access it
+    res.locals.auth = authObject;
+    next();
+  });
+  ```
+
+### Minor Changes
+
+- The `svix` dependency is no longer needed when using the `verifyWebhook()` function. `verifyWebhook()` was refactored to not rely on `svix` anymore while keeping the same functionality and behavior. ([#6059](https://github.com/clerk/javascript/pull/6059)) by [@royanger](https://github.com/royanger)
+
+  If you previously installed `svix` to use `verifyWebhook()` you can uninstall it now:
+
+  ```shell
+  npm uninstall svix
+  ```
+
+### Patch Changes
+
+- Improve JSDoc comments for verifyWebhook and verifyToken ([#6060](https://github.com/clerk/javascript/pull/6060)) by [@LekoArts](https://github.com/LekoArts)
+
+- Improve JSDoc comments ([#6049](https://github.com/clerk/javascript/pull/6049)) by [@LekoArts](https://github.com/LekoArts)
+
+- Introduce `getAuthObjectFromJwt` as internal utility function that centralizes the logic for generating auth objects from session JWTs. ([#6053](https://github.com/clerk/javascript/pull/6053)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`d8fa5d9`](https://github.com/clerk/javascript/commit/d8fa5d9d3d8dc575260d8d2b7c7eeeb0052d0b0d), [`be2e89c`](https://github.com/clerk/javascript/commit/be2e89ca11aa43d48f74c57a5a34e20d85b4003c), [`5644d94`](https://github.com/clerk/javascript/commit/5644d94f711a0733e4970c3f15c24d56cafc8743), [`b578225`](https://github.com/clerk/javascript/commit/b5782258242474c9b0987a3f8349836cd763f24b), [`8838120`](https://github.com/clerk/javascript/commit/8838120596830b88fec1c6c853371dabfec74a0d)]:
+  - @clerk/types@4.60.0
+  - @clerk/shared@3.9.6
+
+## 1.34.0
+
+### Minor Changes
+
+- Adds `clerkClient.organizations.getInstanceOrganizationMembershipList` ([#6022](https://github.com/clerk/javascript/pull/6022)) by [@tmilewski](https://github.com/tmilewski)
+
+### Patch Changes
+
+- Add `notifyPrimaryEmailAddressChanged` to `client.users.updateUser(...)` ([#6023](https://github.com/clerk/javascript/pull/6023)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`f897773`](https://github.com/clerk/javascript/commit/f89777379da63cf45039c1570b51ba10a400817c), [`2c6a0cc`](https://github.com/clerk/javascript/commit/2c6a0cca6e824bafc6b0d0501784517a5b1f75ea), [`71e6a1f`](https://github.com/clerk/javascript/commit/71e6a1f1024d65b7a09cdc8fa81ce0164e0a34cb)]:
+  - @clerk/shared@3.9.5
+  - @clerk/types@4.59.3
+
+## 1.33.1
+
+### Patch Changes
+
+- Ensure SAMLConnection API responses are explicitly deserialized ([#5993](https://github.com/clerk/javascript/pull/5993)) by [@tmilewski](https://github.com/tmilewski)
+
+- Add missing request params to `getOrganizationMembershipList` ([#5987](https://github.com/clerk/javascript/pull/5987)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`6ed3dfc`](https://github.com/clerk/javascript/commit/6ed3dfc1bc742ac9d9a2307fe8e4733411cbc0d7)]:
+  - @clerk/types@4.59.2
+  - @clerk/shared@3.9.4
+
+## 1.33.0
+
+### Minor Changes
+
+- Introduce `treatPendingAsSignedOut` option to `getAuth` ([#5842](https://github.com/clerk/javascript/pull/5842)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  ```ts
+  // `pending` sessions will be treated as signed-out by default
+  const { userId } = getAuth(req);
+  ```
+
+  ```ts
+  // Both `active` and `pending` sessions will be treated as authenticated when `treatPendingAsSignedOut` is false
+  const { userId } = getAuth(req, { treatPendingAsSignedOut: false });
+  ```
+
+### Patch Changes
+
+- Fixes an issue with infinite redirect detection in the handshake flow. ([#5981](https://github.com/clerk/javascript/pull/5981)) by [@brkalow](https://github.com/brkalow)
+
+- Updated dependencies [[`f237d76`](https://github.com/clerk/javascript/commit/f237d7617e5398ca0ba981e4336cac2191505b00)]:
+  - @clerk/shared@3.9.3
+
+## 1.32.3
+
+### Patch Changes
+
+- Introduces `createOrganizationInvitationBulk` - it creates new organization invitations in bulk and sends out emails to the provided email addresses with a link to accept the invitation and join the organization. ([#5962](https://github.com/clerk/javascript/pull/5962)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  ```ts
+  const organizationId = 'org_123';
+  const params = [
+    {
+      inviterUserId: 'user_1',
+      emailAddress: 'testclerk1@clerk.dev',
+      role: 'org:admin',
+    },
+    {
+      inviterUserId: 'user_2',
+      emailAddress: 'testclerk2@clerk.dev',
+      role: 'org:member',
+    },
+  ];
+
+  const response = await clerkClient.organizations.createOrganizationInvitationBulk(organizationId, params);
+  ```
+
+- Use domain in AuthenticateRequest only for satellite domains ([#5919](https://github.com/clerk/javascript/pull/5919)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`c305b31`](https://github.com/clerk/javascript/commit/c305b310e351e9ce2012f805b35e464c3e43e310), [`6bb480e`](https://github.com/clerk/javascript/commit/6bb480ef663a6dfa219bc9546aca087d5d9624d0)]:
+  - @clerk/types@4.59.1
+  - @clerk/shared@3.9.2
+
+## 1.32.2
+
+### Patch Changes
+
+- Updated dependencies [[`b1337df`](https://github.com/clerk/javascript/commit/b1337dfeae8ccf8622efcf095e3201f9bbf1cefa), [`65f0878`](https://github.com/clerk/javascript/commit/65f08788ee5e56242eee2194c73ba90965c75c97), [`df6fefd`](https://github.com/clerk/javascript/commit/df6fefd05fd2df93f5286d97e546b48911adea7c), [`4282bfa`](https://github.com/clerk/javascript/commit/4282bfa09491225bde7d619fe9a3561062703f69), [`5491491`](https://github.com/clerk/javascript/commit/5491491711e0a8ee37828451c1f603a409de32cf)]:
+  - @clerk/types@4.59.0
+  - @clerk/shared@3.9.1
+
+## 1.32.1
+
+### Patch Changes
+
+- Updated dependencies [[`1ff6d6e`](https://github.com/clerk/javascript/commit/1ff6d6efbe838b3f7f6977b2b5215c2cafd715f6), [`fbf3cf4`](https://github.com/clerk/javascript/commit/fbf3cf4916469c4e118870bf12efca2d0f77d9d8)]:
+  - @clerk/shared@3.9.0
+  - @clerk/types@4.58.1
+
+## 1.32.0
+
+### Minor Changes
+
+- Add handling of new Handshake nonce flow when authenticating requests ([#5865](https://github.com/clerk/javascript/pull/5865)) by [@jacekradko](https://github.com/jacekradko)
+
+### Patch Changes
+
+- Updated dependencies [[`0f5145e`](https://github.com/clerk/javascript/commit/0f5145e164f3d3d5faf57e58162b05e7110d2403), [`afdfd18`](https://github.com/clerk/javascript/commit/afdfd18d645608dec37e52a291a91ba5f42dcbe7), [`b7c51ba`](https://github.com/clerk/javascript/commit/b7c51baac6df1129b468274c9a7f63ca303f16ce), [`437b53b`](https://github.com/clerk/javascript/commit/437b53b67e281d076b5b3f927e11c1d64666d154), [`5217155`](https://github.com/clerk/javascript/commit/52171554250c5c58f4f497b6d3c7416e79ac77da)]:
+  - @clerk/types@4.58.0
+  - @clerk/shared@3.8.2
+
+## 1.31.4
+
+### Patch Changes
+
+- Updated dependencies [[`4db96e0`](https://github.com/clerk/javascript/commit/4db96e0ff2ab44c7bdd8540e09ec70b84b19d3eb), [`36fb43f`](https://github.com/clerk/javascript/commit/36fb43f8b35866bdc20680fac58020f036d30d1f), [`e5ac444`](https://github.com/clerk/javascript/commit/e5ac4447f52bb6887ad686feab308fe9daf76e33), [`4db96e0`](https://github.com/clerk/javascript/commit/4db96e0ff2ab44c7bdd8540e09ec70b84b19d3eb), [`d227805`](https://github.com/clerk/javascript/commit/d22780599a5e29545a3d8309cc411c2e8659beac)]:
+  - @clerk/types@4.57.1
+  - @clerk/shared@3.8.1
+
+## 1.31.3
+
+### Patch Changes
+
+- Updated dependencies [[`db0138f`](https://github.com/clerk/javascript/commit/db0138f3f72aea8cb68a5684a90123f733848f63), [`aa97231`](https://github.com/clerk/javascript/commit/aa97231962e3f472a46135e376159c6ddcf1157b), [`c792f37`](https://github.com/clerk/javascript/commit/c792f37129fd6475d5af95146e9ef0f1c8eff730), [`3bf08a9`](https://github.com/clerk/javascript/commit/3bf08a9e0a9e65496edac5fc3bb22ad7b561df26), [`74cf3b2`](https://github.com/clerk/javascript/commit/74cf3b28cdf622a942aaf99caabfba74b7e856fd), [`037b113`](https://github.com/clerk/javascript/commit/037b113aaedd53d4647d88f1659eb9c14cf6f275), [`c15a412`](https://github.com/clerk/javascript/commit/c15a412169058e2304a51c9e92ffaa7f6bb2a898), [`7726a03`](https://github.com/clerk/javascript/commit/7726a03a7fec4d292b6de2587b84ed4371984c23), [`ed10566`](https://github.com/clerk/javascript/commit/ed1056637624eec5bfd50333407c1e63e34c193b), [`b846a9a`](https://github.com/clerk/javascript/commit/b846a9ab96db6b1d8344a4b693051618865508a8), [`e66c800`](https://github.com/clerk/javascript/commit/e66c8002b82b2902f77e852e16482f5cfb062d2c), [`45e8298`](https://github.com/clerk/javascript/commit/45e829890ec9ac66f07e0d7076cd283f14c893ed), [`9c41091`](https://github.com/clerk/javascript/commit/9c41091eb795bce8ffeeeca0264ae841fe07b426), [`29462b4`](https://github.com/clerk/javascript/commit/29462b433eb411ce614e4768e5844cacd00c1975), [`322c43f`](https://github.com/clerk/javascript/commit/322c43f6807a932c3cfaaef1b587b472c80180d2), [`17397f9`](https://github.com/clerk/javascript/commit/17397f95b715bd4fefd7f63c1d351abcf1c8ee16), [`45e8298`](https://github.com/clerk/javascript/commit/45e829890ec9ac66f07e0d7076cd283f14c893ed)]:
+  - @clerk/types@4.57.0
+  - @clerk/shared@3.8.0
+
+## 1.31.2
+
+### Patch Changes
+
+- Updated dependencies [[`9ec0a73`](https://github.com/clerk/javascript/commit/9ec0a7353e9f6ea661c3d7b9542423b6eb1d29e9), [`d9222fc`](https://github.com/clerk/javascript/commit/d9222fc3c21da2bcae30b06f0b1897f526935582)]:
+  - @clerk/types@4.56.3
+  - @clerk/shared@3.7.8
+
+## 1.31.1
+
+### Patch Changes
+
+- Updated dependencies [[`225b9ca`](https://github.com/clerk/javascript/commit/225b9ca21aba44930872a85d6b112ee2a1b606b9)]:
+  - @clerk/types@4.56.2
+  - @clerk/shared@3.7.7
+
+## 1.31.0
+
+### Minor Changes
+
+- Initial stub of the new handshake payload flow with nonce ([#5750](https://github.com/clerk/javascript/pull/5750)) by [@jacekradko](https://github.com/jacekradko)
+
+### Patch Changes
+
+- Fix an issue where the handshake redirect was not respecting the supported Clerk API version specified in `@clerk/backend`. ([#5780](https://github.com/clerk/javascript/pull/5780)) by [@brkalow](https://github.com/brkalow)
+
+## 1.30.2
+
+### Patch Changes
+
+- Improve JSDoc comments ([#5751](https://github.com/clerk/javascript/pull/5751)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`387bf62`](https://github.com/clerk/javascript/commit/387bf623406306e0c5c08da937f4930a7ec5e4a5), [`2716622`](https://github.com/clerk/javascript/commit/27166224e12af582298460d438bd7f83ea8e04bf), [`294da82`](https://github.com/clerk/javascript/commit/294da82336e7a345900d7ef9b28f56a7c8864c52)]:
+  - @clerk/types@4.56.1
+  - @clerk/shared@3.7.6
+
+## 1.30.1
+
+### Patch Changes
+
+- Updated dependencies [[`b02e766`](https://github.com/clerk/javascript/commit/b02e76627e47aec314573586451fa345a089115a), [`5d78b28`](https://github.com/clerk/javascript/commit/5d78b286b63e35fbcf44aac1f7657cbeaba4d659), [`d7f4438`](https://github.com/clerk/javascript/commit/d7f4438fa4bfd04474d5cdb9212ba908568ad6d2), [`5866855`](https://github.com/clerk/javascript/commit/58668550ec91d5511cf775972c54dc485185cc58), [`0007106`](https://github.com/clerk/javascript/commit/00071065998a3676c51e396b4c0afcbf930a9898), [`462b5b2`](https://github.com/clerk/javascript/commit/462b5b271d4e120d58a85818a358b60a6b3c8100), [`447d7a9`](https://github.com/clerk/javascript/commit/447d7a9e133c2a0e7db014bd5837e6ffff08f572), [`2beea29`](https://github.com/clerk/javascript/commit/2beea2957c67bc62446fe24d36332b0a4e850d7d), [`115601d`](https://github.com/clerk/javascript/commit/115601d12fd65dbf3011c0cda368525a2b95bfeb)]:
+  - @clerk/types@4.56.0
+  - @clerk/shared@3.7.5
+
+## 1.30.0
+
+### Minor Changes
+
+- Adding reportTo and reportOnly configuration options to the contentSecurityPolicy config for clerkMiddleware ([#5702](https://github.com/clerk/javascript/pull/5702)) by [@jacekradko](https://github.com/jacekradko)
+
+### Patch Changes
+
+- Updated dependencies [[`8b25035`](https://github.com/clerk/javascript/commit/8b25035aa49382fe1cd1c6f30ec80e86bcf9d66e)]:
+  - @clerk/types@4.55.1
+  - @clerk/shared@3.7.4
+
+## 1.29.2
+
+### Patch Changes
+
+- Updated dependencies [[`33201bf`](https://github.com/clerk/javascript/commit/33201bf972d6a980617d47ebd776bef76f871833), [`4334598`](https://github.com/clerk/javascript/commit/4334598108ff2cfa3c25b5a46117c1c9c65b7974), [`0ae0403`](https://github.com/clerk/javascript/commit/0ae040303d239b75a3221436354a2c2ecdb85aae)]:
+  - @clerk/types@4.55.0
+  - @clerk/shared@3.7.3
+
+## 1.29.1
+
+### Patch Changes
+
+- Improve JSDoc comments ([#5643](https://github.com/clerk/javascript/pull/5643)) by [@alexisintech](https://github.com/alexisintech)
+
+- Updated dependencies [[`45486ac`](https://github.com/clerk/javascript/commit/45486acebf4d133efb09a3622a738cdbf4e51d66), [`837692a`](https://github.com/clerk/javascript/commit/837692aa40197b1574783ad36d0d017a771c08e1), [`0c00e59`](https://github.com/clerk/javascript/commit/0c00e59ff4714491650ac9480ae3b327c626d30d), [`6a5f644`](https://github.com/clerk/javascript/commit/6a5f6447a36a635d6201f8bb7619fb844ab21b79)]:
+  - @clerk/types@4.54.2
+  - @clerk/shared@3.7.2
+
+## 1.29.0
+
+### Minor Changes
+
+- Adds the following functionality for Instances to the Backend API client. ([#5600](https://github.com/clerk/javascript/pull/5600)) by [@tmilewski](https://github.com/tmilewski)
+
+  ```ts
+    import { createClerkClient } from '@clerk/backend';
+
+    const clerkClient = createClerkClient(...);
+
+    await clerkClient.instance.get();
+    await clerkClient.instance.update({...});
+    await clerkClient.instance.updateRestrictions({...});
+    await clerkClient.instance.updateOrganizationSettings({...});
+  ```
+
+- Adds the ability to perform CRUD operations on OAuth Applications to the Backend API client. ([#5599](https://github.com/clerk/javascript/pull/5599)) by [@tmilewski](https://github.com/tmilewski)
+
+  ```ts
+    import { createClerkClient } from '@clerk/backend';
+
+    const clerkClient = createClerkClient(...);
+
+    await clerkClient.oauthApplications.list({...});
+    await clerkClient.oauthApplications.get('templateId');
+    await clerkClient.oauthApplications.create({...});
+    await clerkClient.oauthApplications.update({...});
+    await clerkClient.oauthApplications.delete('templateId');
+    await clerkClient.oauthApplications.rotateSecret('templateId');
+  ```
+
+- Adds domain endpoints to the Backend API client. ([#5621](https://github.com/clerk/javascript/pull/5621)) by [@tmilewski](https://github.com/tmilewski)
+
+  ```ts
+    import { createClerkClient } from '@clerk/backend';
+
+    const clerkClient = createClerkClient(...);
+    await clerkClient.domains.list();
+    await clerkClient.domains.add({...});
+    await clerkClient.domains.update({...});
+    await clerkClient.domains.delete('satelliteDomainId');
+  ```
+
+- Adds the ability to retrieve and update Sign Up Attempts to the Backend API client. ([#5625](https://github.com/clerk/javascript/pull/5625)) by [@tmilewski](https://github.com/tmilewski)
+
+  ```ts
+    import { createClerkClient } from '@clerk/backend';
+
+    const clerkClient = createClerkClient(...);
+
+    await clerkClient.signUps.get('signUpAttemptId');
+    await clerkClient.signUps.update({...});
+  ```
+
+- Adds the ability to change production domains [beta] to the Backend API client. ([#5633](https://github.com/clerk/javascript/pull/5633)) by [@tmilewski](https://github.com/tmilewski)
+
+  ```ts
+    import { createClerkClient } from '@clerk/backend';
+
+    const clerkClient = createClerkClient(...);
+
+    await clerkClient.betaFeatures.changeDomain({
+      homeUrl: 'https://www.example.com',
+      isSecondary: false,
+    });
+  ```
+
+### Patch Changes
+
+- Append expired status to invitation types ([#5646](https://github.com/clerk/javascript/pull/5646)) by [@tmilewski](https://github.com/tmilewski)
+
+- Improve JSDoc comments ([#5630](https://github.com/clerk/javascript/pull/5630)) by [@LekoArts](https://github.com/LekoArts)
+
+- Include `expiresAt` in OAuth access token resource ([#5631](https://github.com/clerk/javascript/pull/5631)) by [@Nikpolik](https://github.com/Nikpolik)
+
+- Update typing of Organization.slug ([#5636](https://github.com/clerk/javascript/pull/5636)) by [@tmilewski](https://github.com/tmilewski)
+
+- Adds the ability to list and create waitlist entries to the Backend API client. ([#5591](https://github.com/clerk/javascript/pull/5591)) by [@tmilewski](https://github.com/tmilewski)
+
+  ```ts
+    import { createClerkClient } from '@clerk/backend';
+
+    const clerkClient = createClerkClient(...);
+
+    await clerkClient.waitlistEntries.list({...});
+    await clerkClient.waitlistEntries.create({
+      emailAddress: 'you@yourdomain.com',
+      notify: true
+    });
+  ```
+
+- Adds the ability to create and revoke actor tokens to the Backend API client. ([#5585](https://github.com/clerk/javascript/pull/5585)) by [@tmilewski](https://github.com/tmilewski)
+
+  ```ts
+    import { createClerkClient } from '@clerk/backend';
+
+    const clerkClient = createClerkClient(...);
+
+    const { id } = await clerkClient.actorTokens.create({...});
+    await clerkClient.actorTokens.revoke(id);
+  ```
+
+- Updated dependencies [[`ab939fd`](https://github.com/clerk/javascript/commit/ab939fdb29150c376280b42f861a188a33f57dcc), [`03284da`](https://github.com/clerk/javascript/commit/03284da6a93a790ce3e3ebbd871c06e19f5a8803), [`7389ba3`](https://github.com/clerk/javascript/commit/7389ba3164ca0d848fb0a9de5d7e9716925fadcc), [`f6ef841`](https://github.com/clerk/javascript/commit/f6ef841125ff21ca8cae731d1f47f3a101d887e1), [`e634830`](https://github.com/clerk/javascript/commit/e6348301ab56a7868f24c1b9a4dd9e1d60f6027b), [`f8887b2`](https://github.com/clerk/javascript/commit/f8887b2cbd145e8e49bec890e8b6e02e34178d6a)]:
+  - @clerk/types@4.54.1
+  - @clerk/shared@3.7.1
+
 ## 1.28.0
 
 ### Minor Changes

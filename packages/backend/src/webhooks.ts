@@ -1,10 +1,16 @@
 import { getEnvVariable } from '@clerk/shared/getEnvVariable';
+import crypto from 'crypto';
 import { errorThrower } from 'src/util/shared';
-import { Webhook } from 'svix';
 
 import type { WebhookEvent } from './api/resources/Webhooks';
 
+/**
+ * @inline
+ */
 export type VerifyWebhookOptions = {
+  /**
+   * The signing secret for the webhook. It's recommended to use the [`CLERK_WEBHOOK_SIGNING_SECRET` environment variable](https://clerk.com/docs/deployments/clerk-environment-variables#webhooks) instead.
+   */
   signingSecret?: string;
 };
 
@@ -17,33 +23,34 @@ const REQUIRED_SVIX_HEADERS = [SVIX_ID_HEADER, SVIX_TIMESTAMP_HEADER, SVIX_SIGNA
 export * from './api/resources/Webhooks';
 
 /**
- * Verifies the authenticity of a webhook request using Svix.
+ * Verifies the authenticity of a webhook request using Svix. Returns a promise that resolves to the verified webhook event data.
  *
- * @param request - The incoming webhook request object
- * @param options - Optional configuration object
- * @param options.signingSecret - Custom signing secret. If not provided, falls back to CLERK_WEBHOOK_SIGNING_SECRET env variable
- * @throws Will throw an error if the webhook signature verification fails
- * @returns A promise that resolves to the verified webhook event data
+ * @param request - The request object.
+ * @param options - Optional configuration object.
+ *
+ * @displayFunctionSignature
  *
  * @example
- * ```typescript
+ * See the [guide on syncing data](https://clerk.com/docs/webhooks/sync-data) for more comprehensive and framework-specific examples that you can copy and paste into your app.
+ *
+ * ```ts
  * try {
- *   const evt = await verifyWebhook(request);
+ *   const evt = await verifyWebhook(request)
  *
  *   // Access the event data
- *   const { id } = evt.data;
- *   const eventType = evt.type;
+ *   const { id } = evt.data
+ *   const eventType = evt.type
  *
  *   // Handle specific event types
  *   if (evt.type === 'user.created') {
- *     console.log('New user created:', evt.data.id);
+ *     console.log('New user created:', evt.data.id)
  *     // Handle user creation
  *   }
  *
- *   return new Response('Success', { status: 200 });
+ *   return new Response('Success', { status: 200 })
  * } catch (err) {
- *   console.error('Webhook verification failed:', err);
- *   return new Response('Webhook verification failed', { status: 400 });
+ *   console.error('Webhook verification failed:', err)
+ *   return new Response('Webhook verification failed', { status: 400 })
  * }
  * ```
  */
@@ -64,12 +71,24 @@ export async function verifyWebhook(request: Request, options: VerifyWebhookOpti
     return errorThrower.throw(`Missing required Svix headers: ${missingHeaders.join(', ')}`);
   }
 
-  const sivx = new Webhook(secret);
   const body = await request.text();
 
-  return sivx.verify(body, {
-    [SVIX_ID_HEADER]: svixId,
-    [SVIX_TIMESTAMP_HEADER]: svixTimestamp,
-    [SVIX_SIGNATURE_HEADER]: svixSignature,
-  }) as WebhookEvent;
+  const signedContent = `${svixId}.${svixTimestamp}.${body}`;
+
+  const secretBytes = Buffer.from(secret.split('_')[1], 'base64');
+
+  const constructedSignature = crypto.createHmac('sha256', secretBytes).update(signedContent).digest('base64');
+
+  // svixSignature can be a string with one or more space separated signatures
+  if (svixSignature.split(' ').includes(constructedSignature)) {
+    return errorThrower.throw('Incoming webhook does not have a valid signature');
+  }
+
+  const payload = JSON.parse(body);
+
+  return {
+    type: payload.type,
+    object: 'event',
+    data: payload.data,
+  } as WebhookEvent;
 }

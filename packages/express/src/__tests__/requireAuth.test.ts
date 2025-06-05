@@ -81,7 +81,7 @@ describe('requireAuth', () => {
           return next();
         }
         const requestState = mockAuthenticateRequest({ request: req });
-        Object.assign(req, { auth: requestState.toAuth() });
+        Object.assign(req, { auth: () => requestState.toAuth() });
         next();
       };
     });

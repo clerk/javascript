@@ -1,8 +1,8 @@
 import type { CustomPage, EnvironmentResource, LoadedClerk } from '@clerk/types';
 
-import { disabledBillingFeature, isValidUrl } from '../../utils';
+import { disabledBillingFeature, hasPaidOrgPlans, hasPaidUserPlans, isValidUrl } from '../../utils';
 import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID, USER_PROFILE_NAVBAR_ROUTE_ID } from '../constants';
-import type { NavbarRoute } from '../elements';
+import type { NavbarRoute } from '../elements/Navbar';
 import { CreditCard, Organization, TickShield, User, Users } from '../icons';
 import { localizationKeys } from '../localization';
 import { ExternalElementMounter } from './ExternalElementMounter';
@@ -79,6 +79,7 @@ export const createOrganizationProfileCustomPages = (
     },
     clerk,
     environment,
+    true,
   );
 };
 
@@ -86,12 +87,12 @@ const createCustomPages = (
   { customPages, getDefaultRoutes, setFirstPathToRoot, excludedPathsFromDuplicateWarning }: CreateCustomPagesParams,
   clerk: LoadedClerk,
   environment?: EnvironmentResource,
+  organization?: boolean,
 ) => {
   const { INITIAL_ROUTES, pageToRootNavbarRouteMap, validReorderItemLabels } = getDefaultRoutes({
     commerce:
-      clerk.sdkMetadata?.environment === 'test'
-        ? false
-        : clerk.__internal_getOption('experimental')?.commerce && !disabledBillingFeature(clerk, environment),
+      !disabledBillingFeature(clerk, environment) &&
+      (organization ? hasPaidOrgPlans(clerk, environment) : hasPaidUserPlans(clerk, environment)),
   });
 
   if (isDevelopmentSDK(clerk)) {

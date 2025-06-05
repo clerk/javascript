@@ -1,6 +1,6 @@
 {
   "name": "@clerk/shared",
-  "version": "3.7.0",
+  "version": "3.9.6",
   "description": "Internal package utils used by the Clerk SDKs",
   "repository": {
     "type": "git",
@@ -119,7 +119,10 @@
     "pathMatcher",
     "organization",
     "jwtPayloadParser",
-    "eventBus"
+    "eventBus",
+    "netlifyCacheHandler",
+    "clerkEventBus",
+    "phoneCodeChannel"
   ],
   "scripts": {
     "build": "tsup",
@@ -143,7 +146,7 @@
     "dequal": "2.0.3",
     "glob-to-regexp": "0.4.1",
     "js-cookie": "3.0.5",
-    "std-env": "^3.8.1",
+    "std-env": "^3.9.0",
     "swr": "^2.3.3"
   },
   "devDependencies": {

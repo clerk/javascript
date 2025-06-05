@@ -166,7 +166,7 @@ describe('Clerk singleton', () => {
         getToken: jest.fn(),
         lastActiveToken: { getRawString: () => 'mocked-token' },
       };
-      let eventBusSpy;
+      let eventBusSpy: jest.SpyInstance;
 
       beforeEach(() => {
         eventBusSpy = jest.spyOn(eventBus, 'emit');
@@ -2284,7 +2284,7 @@ describe('Clerk singleton', () => {
         await sut.load(mockedLoadOptions);
 
         await sut.setActive({ session: mockResource as any as PendingSessionResource });
-        await sut.__experimental_nextTask();
+        await sut.__experimental_navigateToTask();
 
         expect(mockNavigate.mock.calls[0][0]).toBe('/sign-in#/tasks/add-organization');
       });
@@ -2328,7 +2328,7 @@ describe('Clerk singleton', () => {
         await sut.setActive({ session: mockSession as any as ActiveSessionResource });
 
         const redirectUrlComplete = '/welcome-to-app';
-        await sut.__experimental_nextTask({ redirectUrlComplete });
+        await sut.__experimental_navigateToTask({ redirectUrlComplete });
 
         console.log(mockNavigate.mock.calls);
 

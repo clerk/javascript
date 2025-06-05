@@ -7,16 +7,27 @@ on:
       - main
       - release/v4
 
+permissions:
+  contents: read
+
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
 jobs:
   # Check triggering actor permissions to prevent PRs from forks accessing secrets by default, preventing them from exfiltrating secrets for malicious purposes
   check-permissions:
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    defaults:
+      run:
+        shell: bash
+    name: Check Permissions
     steps:
+      - name: Skip permission check for same‑repo PRs
+        if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
+        run: echo "Permission check not required."
       - name: Get User Permission
+        if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository }}
         id: checkAccess
         uses: actions-cool/check-user-permission@v2
         with:
@@ -25,17 +36,64 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Check User Permission
-        if: steps.checkAccess.outputs.require-result == 'false'
+        if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository && steps.checkAccess.outputs.require-result == 'false' }}
         run: |
           echo "${{ github.triggering_actor }} does not have permissions on this repo."
           echo "Current permission level is ${{ steps.checkAccess.outputs.user-permission }}"
           echo "Job originally triggered by ${{ github.actor }}"
           exit 1
 
-  formatting-linting:
+  pre-checks:
     needs: [check-permissions]
-    name: Formatting, linting & changeset checks
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
+    name: Formatting | Dedupe | Changeset
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    defaults:
+      run:
+        shell: bash
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 5 }}
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          show-progress: false
+
+      - name: Setup
+        id: config
+        uses: ./.github/actions/init-blacksmith
+        with:
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
+
+      - name: Verify lockfile is deduped
+        run: pnpm dedupe --check
+
+      - name: Check Formatting
+        run: pnpm format:check
+
+      - name: Require Changeset
+        if: ${{ !(github.event_name == 'merge_group') }}
+        run: |
+          if [[ "${{ github.event.pull_request.user.login }}" = "clerk-cookie" || "${{ github.event.pull_request.user.login }}" = "renovate[bot]" ]]; then
+            echo 'Skipping';
+            exit 0;
+          else
+            pnpm changeset status --since=origin/main;
+          fi
+
+  build-packages:
+    needs: [check-permissions]
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
+    name: Build Packages
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    permissions:
+      contents: read
+    defaults:
+      run:
+        shell: bash
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
 
     env:
@@ -57,33 +115,52 @@ jobs:
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
-      - name: Deduplicate lockfile
-        run: pnpm dedupe
-
-      - name: Check for changed lockfile
-        run: |
-          if [ -n "$(git status --porcelain pnpm-lock.yaml)" ]; then
-            echo "pnpm-lock.yaml is not deduped. Please run 'pnpm dedupe' locally and commit."
-            git diff pnpm-lock.yaml
-            exit 1
-          fi
-
-      - name: Require Changeset
-        if: ${{ !(github.event_name == 'merge_group') }}
-        run: if [[ "${{ github.event.pull_request.user.login }}" = "clerk-cookie" || "${{ github.event.pull_request.user.login }}" = "renovate[bot]" ]]; then echo 'Skipping' && exit 0; else pnpm changeset status --since=origin/main; fi
-
-      # - name: Lint GitHub Actions Workflows
-      #   run: pnpm eslint .github
-      #   shell: bash
-
-      - name: Check Formatting
-        run: pnpm format:check
-
-      - name: Build Packages
+      - name: Turbo Build
         run: pnpm turbo build $TURBO_ARGS --only
 
+      - name: Upload Turbo Summary
+        uses: actions/upload-artifact@v4
+        if: ${{ env.TURBO_SUMMARIZE == 'true' }}
+        continue-on-error: true
+        with:
+          name: turbo-summary-report-build-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .turbo/runs
+          retention-days: 5
+
+  static-analysis:
+    needs: [check-permissions, build-packages]
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
+    name: Static analysis
+    permissions:
+      contents: read
+      actions: write   # needed for actions/upload-artifact
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    defaults:
+      run:
+        shell: bash
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
+
+    env:
+      TURBO_SUMMARIZE: false
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          show-progress: false
+
+      - name: Setup
+        id: config
+        uses: ./.github/actions/init-blacksmith
+        with:
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
+
       - name: Check size using bundlewatch
-        run: pnpm turbo bundlewatch $TURBO_ARGS --only
+        run: pnpm turbo bundlewatch $TURBO_ARGS
         env:
           BUNDLEWATCH_GITHUB_TOKEN: ${{ secrets.BUNDLEWATCH_GITHUB_TOKEN }}
           CI_REPO_OWNER: ${{ vars.REPO_OWNER }}
@@ -93,13 +170,13 @@ jobs:
           CI_BRANCH_BASE: refs/heads/main
 
       - name: Lint packages using publint
-        run: pnpm turbo lint:publint $TURBO_ARGS --only
+        run: pnpm turbo lint:publint $TURBO_ARGS
 
       - name: Lint types using attw
-        run: pnpm turbo lint:attw $TURBO_ARGS --only
+        run: pnpm turbo lint:attw $TURBO_ARGS
 
       - name: Run lint
-        run: pnpm turbo lint $TURBO_ARGS --only -- --quiet
+        run: pnpm turbo lint $TURBO_ARGS
 
       - name: Upload Turbo Summary
         uses: actions/upload-artifact@v4
@@ -111,17 +188,29 @@ jobs:
           retention-days: 5
 
   unit-tests:
-    needs: [check-permissions]
+    needs: [check-permissions, build-packages]
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     name: Unit Tests
+    permissions:
+      contents: read
+      actions: write   # needed for actions/upload-artifact
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    defaults:
+      run:
+        shell: bash
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
 
     env:
       TURBO_SUMMARIZE: false
 
     strategy:
+      fail-fast: true
       matrix:
-        node-version: [18,22]
+        include:
+          - node-version: 18
+            test-filter: "--filter=@clerk/astro --filter=@clerk/backend --filter=@clerk/express --filter=@clerk/nextjs --filter=@clerk/clerk-react --filter=@clerk/shared --filter=@clerk/remix --filter=@clerk/tanstack-react-start --filter=@clerk/elements --filter=@clerk/vue --filter=@clerk/nuxt --filter=@clerk/clerk-expo"
+          - node-version: 22
+            test-filter: "**"
 
     steps:
       - name: Checkout Repo
@@ -143,12 +232,12 @@ jobs:
 
       - name: Run tests in packages
         run: |
-          if [ "${{ matrix.node-version }}" == "18" ]; then
-            echo "Running tests on Node 18 only for packages with LTS support."
-            pnpm turbo test $TURBO_ARGS --filter="@clerk/astro" --filter="@clerk/backend" --filter="@clerk/express" --filter="@clerk/nextjs" --filter="@clerk/clerk-react" --filter="@clerk/shared" --filter="@clerk/remix" --filter="@clerk/tanstack-react-start" --filter="@clerk/elements" --filter="@clerk/vue" --filter="@clerk/nuxt" --filter="@clerk/clerk-expo"
-          else
-            echo "Running tests for all packages on Node 22."
+          if [ "${{ matrix.test-filter }}" = "**" ]; then
+            echo "Running full test suite on Node ${{ matrix.node-version }}."
             pnpm turbo test $TURBO_ARGS
+          else
+            echo "Running LTS subset on Node ${{ matrix.node-version }}."
+            pnpm turbo test $TURBO_ARGS ${{ matrix.test-filter }}
           fi
         env:
           NODE_VERSION: ${{ matrix.node-version }}
@@ -172,15 +261,22 @@ jobs:
           retention-days: 5
 
   integration-tests:
-    needs: [check-permissions]
+    needs: [check-permissions, build-packages]
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     name: Integration Tests
+    permissions:
+      contents: read
+      actions: write   # needed for actions/upload-artifact
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    defaults:
+      run:
+        shell: bash
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_LONG && fromJSON(vars.TIMEOUT_MINUTES_LONG) || 15 }}
 
     strategy:
       fail-fast: false
       matrix:
-        test-name: [ 'generic', 'express', 'quickstart', 'ap-flows', 'elements', 'localhost', 'sessions', 'astro', 'expo-web', 'tanstack-react-start', 'tanstack-react-router', 'vue', 'nuxt', 'react-router']
+        test-name: ['generic', 'express', 'quickstart', 'ap-flows', 'elements', 'localhost', 'sessions', 'astro', 'expo-web', 'tanstack-react-start', 'tanstack-react-router', 'vue', 'nuxt', 'react-router', 'billing']
         test-project: ['chrome']
         include:
           - test-name: 'nextjs'
@@ -273,6 +369,7 @@ jobs:
       - name: Run Integration Tests
         if: ${{ steps.task-status.outputs.affected == '1' }}
         id: integration-tests
+        timeout-minutes: 25
         run: pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS
         env:
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
@@ -292,3 +389,35 @@ jobs:
           name: playwright-traces-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.test-name }}
           path: integration/test-results
           retention-days: 1
+
+  pkg-pr-new:
+    name: Publish with pkg-pr-new
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
+    needs: [check-permissions, build-packages]
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    defaults:
+      run:
+        shell: bash
+
+    env:
+      TURBO_SUMMARIZE: false
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          show-progress: false
+
+      - name: Setup Node
+        uses: ./.github/actions/init-blacksmith
+        with:
+          turbo-enabled: true
+          node-version: 22
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
+
+      - name: Publish with pkg-pr-new
+        run: pnpm run build && pnpx pkg-pr-new@${{ vars.PKG_PR_NEW_VERSION || '0.0.49' }} publish --compact --pnpm './packages/*'

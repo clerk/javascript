@@ -12,6 +12,8 @@ exports[`Environment __internal_toSnapshot() 1`] = `
   "commerce_settings": {
     "billing": {
       "enabled": false,
+      "has_paid_org_plans": false,
+      "has_paid_user_plans": false,
       "stripe_publishable_key": "",
     },
   },
@@ -273,18 +275,23 @@ exports[`Environment __internal_toSnapshot() 1`] = `
 
 exports[`Environment defaults values when instantiated without arguments 1`] = `
 Environment {
-  "__experimental_commerceSettings": __experimental_CommerceSettings {
-    "billing": {
-      "enabled": false,
-      "stripePublishableKey": "",
-    },
-    "pathRoot": "",
-  },
   "authConfig": AuthConfig {
     "claimedAt": null,
+    "id": undefined,
     "pathRoot": "",
+    "preferredChannels": null,
     "reverification": false,
     "singleSessionMode": false,
+  },
+  "commerceSettings": CommerceSettings {
+    "billing": {
+      "enabled": false,
+      "hasPaidOrgPlans": false,
+      "hasPaidUserPlans": false,
+      "stripePublishableKey": "",
+    },
+    "id": undefined,
+    "pathRoot": "",
   },
   "displayConfig": DisplayConfig {
     "afterCreateOrganizationUrl": "",
@@ -300,6 +307,7 @@ Environment {
     "backendHost": "",
     "branded": false,
     "captchaHeartbeat": false,
+    "captchaHeartbeatIntervalMs": undefined,
     "captchaOauthBypass": [
       "oauth_google",
       "oauth_microsoft",
@@ -309,8 +317,11 @@ Environment {
     "captchaPublicKey": null,
     "captchaPublicKeyInvisible": null,
     "captchaWidgetType": null,
+    "clerkJSVersion": undefined,
     "createOrganizationUrl": "",
+    "experimental__forceOauthFirst": undefined,
     "faviconImageUrl": "",
+    "googleOneTapClientId": undefined,
     "homeUrl": "",
     "id": "",
     "instanceEnvironmentType": "",
@@ -328,6 +339,7 @@ Environment {
     "userProfileUrl": "",
     "waitlistUrl": "",
   },
+  "id": undefined,
   "isDevelopmentOrStaging": [Function],
   "isProduction": [Function],
   "isSingleSession": [Function],
@@ -343,6 +355,8 @@ Environment {
       "enrollmentModes": [],
     },
     "enabled": false,
+    "forceOrganizationSelection": undefined,
+    "id": undefined,
     "maxAllowedMemberships": 1,
     "pathRoot": "",
   },
@@ -502,18 +516,23 @@ Environment {
 
 exports[`Environment has the same initial properties 1`] = `
 Environment {
-  "__experimental_commerceSettings": __experimental_CommerceSettings {
-    "billing": {
-      "enabled": false,
-      "stripePublishableKey": "",
-    },
-    "pathRoot": "",
-  },
   "authConfig": AuthConfig {
     "claimedAt": null,
+    "id": undefined,
     "pathRoot": "",
+    "preferredChannels": null,
     "reverification": true,
     "singleSessionMode": true,
+  },
+  "commerceSettings": CommerceSettings {
+    "billing": {
+      "enabled": false,
+      "hasPaidOrgPlans": false,
+      "hasPaidUserPlans": false,
+      "stripePublishableKey": "",
+    },
+    "id": undefined,
+    "pathRoot": "",
   },
   "displayConfig": DisplayConfig {
     "afterCreateOrganizationUrl": "",
@@ -537,6 +556,7 @@ Environment {
     "captchaWidgetType": null,
     "clerkJSVersion": "5",
     "createOrganizationUrl": "",
+    "experimental__forceOauthFirst": undefined,
     "faviconImageUrl": "",
     "googleOneTapClientId": undefined,
     "homeUrl": "",
@@ -575,6 +595,7 @@ Environment {
     "userProfileUrl": "",
     "waitlistUrl": "",
   },
+  "id": undefined,
   "isDevelopmentOrStaging": [Function],
   "isProduction": [Function],
   "isSingleSession": [Function],
@@ -591,6 +612,7 @@ Environment {
     },
     "enabled": false,
     "forceOrganizationSelection": false,
+    "id": undefined,
     "maxAllowedMemberships": 5,
     "pathRoot": "",
   },

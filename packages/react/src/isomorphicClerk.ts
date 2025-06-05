@@ -1,10 +1,11 @@
 import { inBrowser } from '@clerk/shared/browser';
+import { clerkEvents, createClerkEventBus } from '@clerk/shared/clerkEventBus';
 import { loadClerkJsScript } from '@clerk/shared/loadClerkJsScript';
 import { handleValueOrFn } from '@clerk/shared/utils';
 import type {
-  __experimental_CheckoutProps,
-  __experimental_CommerceNamespace,
-  __experimental_PricingTableProps,
+  __internal_CheckoutProps,
+  __internal_OAuthConsentProps,
+  __internal_PlanDetailsProps,
   __internal_UserVerificationModalProps,
   __internal_UserVerificationProps,
   AuthenticateWithCoinbaseWalletParams,
@@ -14,7 +15,9 @@ import type {
   Clerk,
   ClerkAuthenticateWithWeb3Params,
   ClerkOptions,
+  ClerkStatus,
   ClientResource,
+  CommerceBillingNamespace,
   CreateOrganizationParams,
   CreateOrganizationProps,
   DomainOrProxyUrl,
@@ -29,6 +32,7 @@ import type {
   OrganizationProfileProps,
   OrganizationResource,
   OrganizationSwitcherProps,
+  PricingTableProps,
   RedirectOptions,
   SetActiveParams,
   SignInProps,
@@ -94,12 +98,12 @@ type IsomorphicLoadedClerk = Without<
   | '__internal_addNavigationListener'
   | '__internal_getCachedResources'
   | '__internal_reloadInitialResources'
-  | '__experimental_commerce'
+  | 'billing'
   | '__internal_setComponentNavigationContext'
   | '__internal_setActiveInProgress'
 > & {
   client: ClientResource | undefined;
-  __experimental_commerce: __experimental_CommerceNamespace | undefined;
+  billing: CommerceBillingNamespace | undefined;
 };
 
 export class IsomorphicClerk implements IsomorphicLoadedClerk {
@@ -110,7 +114,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private preopenOneTap?: null | GoogleOneTapProps = null;
   private preopenUserVerification?: null | __internal_UserVerificationProps = null;
   private preopenSignIn?: null | SignInProps = null;
-  private preopenCheckout?: null | __experimental_CheckoutProps = null;
+  private preopenCheckout?: null | __internal_CheckoutProps = null;
+  private preopenPlanDetails?: null | __internal_PlanDetailsProps = null;
   private preopenSignUp?: null | SignUpProps = null;
   private preopenUserProfile?: null | UserProfileProps = null;
   private preopenOrganizationProfile?: null | OrganizationProfileProps = null;
@@ -126,7 +131,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountOrganizationListNodes = new Map<HTMLDivElement, OrganizationListProps | undefined>();
   private premountMethodCalls = new Map<MethodName<BrowserClerk>, MethodCallback>();
   private premountWaitlistNodes = new Map<HTMLDivElement, WaitlistProps | undefined>();
-  private premountPricingTableNodes = new Map<HTMLDivElement, __experimental_PricingTableProps | undefined>();
+  private premountPricingTableNodes = new Map<HTMLDivElement, PricingTableProps | undefined>();
+  private premountOAuthConsentNodes = new Map<HTMLDivElement, __internal_OAuthConsentProps | undefined>();
   // A separate Map of `addListener` method calls to handle multiple listeners.
   private premountAddListenerCalls = new Map<
     ListenerCallback,
@@ -137,17 +143,37 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   >();
   private loadedListeners: Array<() => void> = [];
 
-  #loaded = false;
+  #status: ClerkStatus = 'loading';
   #domain: DomainOrProxyUrl['domain'];
   #proxyUrl: DomainOrProxyUrl['proxyUrl'];
   #publishableKey: string;
+  #eventBus = createClerkEventBus();
 
   get publishableKey(): string {
     return this.#publishableKey;
   }
 
   get loaded(): boolean {
-    return this.#loaded;
+    return this.clerkjs?.loaded || false;
+  }
+
+  get status(): ClerkStatus {
+    /**
+     * If clerk-js is not available the returned value can either be "loading" or "error".
+     */
+    if (!this.clerkjs) {
+      return this.#status;
+    }
+    return (
+      this.clerkjs?.status ||
+      /**
+       * Support older clerk-js versions.
+       * If clerk-js is available but `.status` is missing it we need to fallback to `.loaded`.
+       * Since "degraded" an "error" did not exist before,
+       * map "loaded" to "ready" and "not loaded" to "loading".
+       */
+      (this.clerkjs.loaded ? 'ready' : 'loading')
+    );
   }
 
   static #instance: IsomorphicClerk | null | undefined;
@@ -218,6 +244,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     if (!this.options.sdkMetadata) {
       this.options.sdkMetadata = SDK_METADATA;
     }
+    this.#eventBus.emit(clerkEvents.Status, 'loading');
+    this.#eventBus.prioritizedOn(clerkEvents.Status, status => (this.#status = status));
 
     if (this.#publishableKey) {
       void this.loadClerkJS();
@@ -254,7 +282,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   buildSignInUrl = (opts?: RedirectOptions): string | void => {
     const callback = () => this.clerkjs?.buildSignInUrl(opts) || '';
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       return callback();
     } else {
       this.premountMethodCalls.set('buildSignInUrl', callback);
@@ -263,7 +291,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   buildSignUpUrl = (opts?: RedirectOptions): string | void => {
     const callback = () => this.clerkjs?.buildSignUpUrl(opts) || '';
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       return callback();
     } else {
       this.premountMethodCalls.set('buildSignUpUrl', callback);
@@ -272,7 +300,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   buildAfterSignInUrl = (...args: Parameters<Clerk['buildAfterSignInUrl']>): string | void => {
     const callback = () => this.clerkjs?.buildAfterSignInUrl(...args) || '';
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       return callback();
     } else {
       this.premountMethodCalls.set('buildAfterSignInUrl', callback);
@@ -281,7 +309,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   buildAfterSignUpUrl = (...args: Parameters<Clerk['buildAfterSignUpUrl']>): string | void => {
     const callback = () => this.clerkjs?.buildAfterSignUpUrl(...args) || '';
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       return callback();
     } else {
       this.premountMethodCalls.set('buildAfterSignUpUrl', callback);
@@ -290,16 +318,25 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   buildAfterSignOutUrl = (): string | void => {
     const callback = () => this.clerkjs?.buildAfterSignOutUrl() || '';
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       return callback();
     } else {
       this.premountMethodCalls.set('buildAfterSignOutUrl', callback);
     }
   };
 
+  buildNewSubscriptionRedirectUrl = (): string | void => {
+    const callback = () => this.clerkjs?.buildNewSubscriptionRedirectUrl() || '';
+    if (this.clerkjs && this.loaded) {
+      return callback();
+    } else {
+      this.premountMethodCalls.set('buildNewSubscriptionRedirectUrl', callback);
+    }
+  };
+
   buildAfterMultiSessionSingleSignOutUrl = (): string | void => {
     const callback = () => this.clerkjs?.buildAfterMultiSessionSingleSignOutUrl() || '';
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       return callback();
     } else {
       this.premountMethodCalls.set('buildAfterMultiSessionSingleSignOutUrl', callback);
@@ -308,7 +345,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   buildUserProfileUrl = (): string | void => {
     const callback = () => this.clerkjs?.buildUserProfileUrl() || '';
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       return callback();
     } else {
       this.premountMethodCalls.set('buildUserProfileUrl', callback);
@@ -317,7 +354,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   buildCreateOrganizationUrl = (): string | void => {
     const callback = () => this.clerkjs?.buildCreateOrganizationUrl() || '';
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       return callback();
     } else {
       this.premountMethodCalls.set('buildCreateOrganizationUrl', callback);
@@ -326,7 +363,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   buildOrganizationProfileUrl = (): string | void => {
     const callback = () => this.clerkjs?.buildOrganizationProfileUrl() || '';
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       return callback();
     } else {
       this.premountMethodCalls.set('buildOrganizationProfileUrl', callback);
@@ -335,7 +372,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   buildWaitlistUrl = (): string | void => {
     const callback = () => this.clerkjs?.buildWaitlistUrl() || '';
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       return callback();
     } else {
       this.premountMethodCalls.set('buildWaitlistUrl', callback);
@@ -344,7 +381,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   buildUrlWithAuth = (to: string): string | void => {
     const callback = () => this.clerkjs?.buildUrlWithAuth(to) || '';
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       return callback();
     } else {
       this.premountMethodCalls.set('buildUrlWithAuth', callback);
@@ -353,7 +390,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   handleUnauthenticated = async () => {
     const callback = () => this.clerkjs?.handleUnauthenticated();
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       void callback();
     } else {
       this.premountMethodCalls.set('handleUnauthenticated', callback);
@@ -368,7 +405,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   }
 
   async loadClerkJS(): Promise<HeadlessBrowserClerk | BrowserClerk | undefined> {
-    if (this.mode !== 'browser' || this.#loaded) {
+    if (this.mode !== 'browser' || this.loaded) {
       return;
     }
 
@@ -400,12 +437,13 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
             domain: this.domain,
           } as any);
 
+          this.beforeLoad(c);
           await c.load(this.options);
         } else {
           // Otherwise use the instantiated Clerk object
           c = this.Clerk;
-
           if (!c.loaded) {
+            this.beforeLoad(c);
             await c.load(this.options);
           }
         }
@@ -427,6 +465,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
           throw new Error('Failed to download latest ClerkJS. Contact support@clerk.com.');
         }
 
+        this.beforeLoad(global.Clerk);
         await global.Clerk.load(this.options);
       }
 
@@ -436,18 +475,33 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return;
     } catch (err) {
       const error = err as Error;
-      // In Next.js we can throw a full screen error in development mode.
-      // However, in production throwing an error results in an infinite loop.
-      // More info at: https://github.com/vercel/next.js/issues/6973
-      if (process.env.NODE_ENV === 'production') {
-        console.error(error.stack || error.message || error);
-      } else {
-        throw err;
-      }
+      this.#eventBus.emit(clerkEvents.Status, 'error');
+      console.error(error.stack || error.message || error);
       return;
     }
   }
 
+  public on: Clerk['on'] = (...args) => {
+    // Support older clerk-js versions.
+    if (this.clerkjs?.on) {
+      return this.clerkjs.on(...args);
+    } else {
+      this.#eventBus.on(...args);
+    }
+  };
+
+  public off: Clerk['off'] = (...args) => {
+    // Support older clerk-js versions.
+    if (this.clerkjs?.off) {
+      return this.clerkjs.off(...args);
+    } else {
+      this.#eventBus.off(...args);
+    }
+  };
+
+  /**
+   * @deprecated Please use `addStatusListener`. This api will be removed in the next major.
+   */
   public addOnLoaded = (cb: () => void) => {
     this.loadedListeners.push(cb);
     /**
@@ -458,9 +512,18 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
+  /**
+   * @deprecated Please use `__internal_setStatus`. This api will be removed in the next major.
+   */
   public emitLoaded = () => {
     this.loadedListeners.forEach(cb => cb());
     this.loadedListeners = [];
+  };
+
+  private beforeLoad = (clerkjs: BrowserClerk | HeadlessBrowserClerk | undefined) => {
+    if (!clerkjs) {
+      throw new Error('Failed to hydrate latest Clerk JS');
+    }
   };
 
   private hydrateClerkJS = (clerkjs: BrowserClerk | HeadlessBrowserClerk | undefined) => {
@@ -475,12 +538,21 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       listenerHandlers.nativeUnsubscribe = clerkjs.addListener(listener);
     });
 
+    this.#eventBus.internal.retrieveListeners('status')?.forEach(listener => {
+      // Since clerkjs exists it will call `this.clerkjs.on('status', listener)`
+      this.on('status', listener, { notify: true });
+    });
+
     if (this.preopenSignIn !== null) {
       clerkjs.openSignIn(this.preopenSignIn);
     }
 
     if (this.preopenCheckout !== null) {
       clerkjs.__internal_openCheckout(this.preopenCheckout);
+    }
+
+    if (this.preopenPlanDetails !== null) {
+      clerkjs.__internal_openPlanDetails(this.preopenPlanDetails);
     }
 
     if (this.preopenSignUp !== null) {
@@ -536,10 +608,20 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     });
 
     this.premountPricingTableNodes.forEach((props, node) => {
-      clerkjs.__experimental_mountPricingTable(node, props);
+      clerkjs.mountPricingTable(node, props);
     });
 
-    this.#loaded = true;
+    this.premountOAuthConsentNodes.forEach((props, node) => {
+      clerkjs.__internal_mountOAuthConsent(node, props);
+    });
+
+    /**
+     * Only update status in case `clerk.status` is missing. In any other case, `clerk-js` should be the orchestrator.
+     */
+    if (typeof this.clerkjs.status === 'undefined') {
+      this.#eventBus.emit(clerkEvents.Status, 'ready');
+    }
+
     this.emitLoaded();
     return this.clerkjs;
   };
@@ -606,8 +688,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   }
 
-  get __experimental_commerce(): __experimental_CommerceNamespace | undefined {
-    return this.clerkjs?.__experimental_commerce;
+  get billing(): CommerceBillingNamespace | undefined {
+    return this.clerkjs?.billing;
   }
 
   __unstable__setEnvironment(...args: any): void {
@@ -626,9 +708,9 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  __experimental_nextTask = async (params?: NextTaskParams): Promise<void> => {
+  __experimental_navigateToTask = async (params?: NextTaskParams): Promise<void> => {
     if (this.clerkjs) {
-      return this.clerkjs.__experimental_nextTask(params);
+      return this.clerkjs.__experimental_navigateToTask(params);
     } else {
       return Promise.reject();
     }
@@ -646,7 +728,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   openSignIn = (props?: SignInProps) => {
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       this.clerkjs.openSignIn(props);
     } else {
       this.preopenSignIn = props;
@@ -654,15 +736,15 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   closeSignIn = () => {
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       this.clerkjs.closeSignIn();
     } else {
       this.preopenSignIn = null;
     }
   };
 
-  __internal_openCheckout = (props?: __experimental_CheckoutProps) => {
-    if (this.clerkjs && this.#loaded) {
+  __internal_openCheckout = (props?: __internal_CheckoutProps) => {
+    if (this.clerkjs && this.loaded) {
       this.clerkjs.__internal_openCheckout(props);
     } else {
       this.preopenCheckout = props;
@@ -670,15 +752,31 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   __internal_closeCheckout = () => {
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       this.clerkjs.__internal_closeCheckout();
     } else {
       this.preopenCheckout = null;
     }
   };
 
+  __internal_openPlanDetails = (props?: __internal_PlanDetailsProps) => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.__internal_openPlanDetails(props);
+    } else {
+      this.preopenPlanDetails = props;
+    }
+  };
+
+  __internal_closePlanDetails = () => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.__internal_closePlanDetails();
+    } else {
+      this.preopenPlanDetails = null;
+    }
+  };
+
   __internal_openReverification = (props?: __internal_UserVerificationModalProps) => {
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       this.clerkjs.__internal_openReverification(props);
     } else {
       this.preopenUserVerification = props;
@@ -686,7 +784,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   __internal_closeReverification = () => {
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       this.clerkjs.__internal_closeReverification();
     } else {
       this.preopenUserVerification = null;
@@ -694,7 +792,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   openGoogleOneTap = (props?: GoogleOneTapProps) => {
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       this.clerkjs.openGoogleOneTap(props);
     } else {
       this.preopenOneTap = props;
@@ -702,7 +800,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   closeGoogleOneTap = () => {
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       this.clerkjs.closeGoogleOneTap();
     } else {
       this.preopenOneTap = null;
@@ -710,7 +808,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   openUserProfile = (props?: UserProfileProps) => {
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       this.clerkjs.openUserProfile(props);
     } else {
       this.preopenUserProfile = props;
@@ -718,7 +816,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   closeUserProfile = () => {
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       this.clerkjs.closeUserProfile();
     } else {
       this.preopenUserProfile = null;
@@ -726,7 +824,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   openOrganizationProfile = (props?: OrganizationProfileProps) => {
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       this.clerkjs.openOrganizationProfile(props);
     } else {
       this.preopenOrganizationProfile = props;
@@ -734,7 +832,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   closeOrganizationProfile = () => {
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       this.clerkjs.closeOrganizationProfile();
     } else {
       this.preopenOrganizationProfile = null;
@@ -742,7 +840,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   openCreateOrganization = (props?: CreateOrganizationProps) => {
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       this.clerkjs.openCreateOrganization(props);
     } else {
       this.preopenCreateOrganization = props;
@@ -750,7 +848,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   closeCreateOrganization = () => {
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       this.clerkjs.closeCreateOrganization();
     } else {
       this.preopenCreateOrganization = null;
@@ -758,7 +856,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   openWaitlist = (props?: WaitlistProps) => {
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       this.clerkjs.openWaitlist(props);
     } else {
       this.preOpenWaitlist = props;
@@ -766,7 +864,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   closeWaitlist = () => {
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       this.clerkjs.closeWaitlist();
     } else {
       this.preOpenWaitlist = null;
@@ -774,7 +872,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   openSignUp = (props?: SignUpProps) => {
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       this.clerkjs.openSignUp(props);
     } else {
       this.preopenSignUp = props;
@@ -782,7 +880,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   closeSignUp = () => {
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       this.clerkjs.closeSignUp();
     } else {
       this.preopenSignUp = null;
@@ -790,7 +888,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   mountSignIn = (node: HTMLDivElement, props?: SignInProps) => {
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       this.clerkjs.mountSignIn(node, props);
     } else {
       this.premountSignInNodes.set(node, props);
@@ -798,31 +896,15 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   unmountSignIn = (node: HTMLDivElement) => {
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       this.clerkjs.unmountSignIn(node);
     } else {
       this.premountSignInNodes.delete(node);
     }
   };
 
-  __experimental_mountPricingTable = (node: HTMLDivElement, props?: __experimental_PricingTableProps) => {
-    if (this.clerkjs && this.#loaded) {
-      this.clerkjs.__experimental_mountPricingTable(node, props);
-    } else {
-      this.premountPricingTableNodes.set(node, props);
-    }
-  };
-
-  __experimental_unmountPricingTable = (node: HTMLDivElement) => {
-    if (this.clerkjs && this.#loaded) {
-      this.clerkjs.__experimental_unmountPricingTable(node);
-    } else {
-      this.premountPricingTableNodes.delete(node);
-    }
-  };
-
   mountSignUp = (node: HTMLDivElement, props?: SignUpProps) => {
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       this.clerkjs.mountSignUp(node, props);
     } else {
       this.premountSignUpNodes.set(node, props);
@@ -830,7 +912,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   unmountSignUp = (node: HTMLDivElement) => {
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       this.clerkjs.unmountSignUp(node);
     } else {
       this.premountSignUpNodes.delete(node);
@@ -838,7 +920,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   mountUserProfile = (node: HTMLDivElement, props?: UserProfileProps) => {
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       this.clerkjs.mountUserProfile(node, props);
     } else {
       this.premountUserProfileNodes.set(node, props);
@@ -846,7 +928,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   unmountUserProfile = (node: HTMLDivElement) => {
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       this.clerkjs.unmountUserProfile(node);
     } else {
       this.premountUserProfileNodes.delete(node);
@@ -854,7 +936,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   mountOrganizationProfile = (node: HTMLDivElement, props?: OrganizationProfileProps) => {
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       this.clerkjs.mountOrganizationProfile(node, props);
     } else {
       this.premountOrganizationProfileNodes.set(node, props);
@@ -862,7 +944,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   unmountOrganizationProfile = (node: HTMLDivElement) => {
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       this.clerkjs.unmountOrganizationProfile(node);
     } else {
       this.premountOrganizationProfileNodes.delete(node);
@@ -870,7 +952,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   mountCreateOrganization = (node: HTMLDivElement, props?: CreateOrganizationProps) => {
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       this.clerkjs.mountCreateOrganization(node, props);
     } else {
       this.premountCreateOrganizationNodes.set(node, props);
@@ -878,7 +960,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   unmountCreateOrganization = (node: HTMLDivElement) => {
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       this.clerkjs.unmountCreateOrganization(node);
     } else {
       this.premountCreateOrganizationNodes.delete(node);
@@ -886,7 +968,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   mountOrganizationSwitcher = (node: HTMLDivElement, props?: OrganizationSwitcherProps) => {
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       this.clerkjs.mountOrganizationSwitcher(node, props);
     } else {
       this.premountOrganizationSwitcherNodes.set(node, props);
@@ -894,7 +976,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   unmountOrganizationSwitcher = (node: HTMLDivElement) => {
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       this.clerkjs.unmountOrganizationSwitcher(node);
     } else {
       this.premountOrganizationSwitcherNodes.delete(node);
@@ -903,7 +985,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   __experimental_prefetchOrganizationSwitcher = () => {
     const callback = () => this.clerkjs?.__experimental_prefetchOrganizationSwitcher();
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       void callback();
     } else {
       this.premountMethodCalls.set('__experimental_prefetchOrganizationSwitcher', callback);
@@ -911,7 +993,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   mountOrganizationList = (node: HTMLDivElement, props?: OrganizationListProps) => {
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       this.clerkjs.mountOrganizationList(node, props);
     } else {
       this.premountOrganizationListNodes.set(node, props);
@@ -919,7 +1001,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   unmountOrganizationList = (node: HTMLDivElement) => {
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       this.clerkjs.unmountOrganizationList(node);
     } else {
       this.premountOrganizationListNodes.delete(node);
@@ -927,7 +1009,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   mountUserButton = (node: HTMLDivElement, userButtonProps?: UserButtonProps) => {
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       this.clerkjs.mountUserButton(node, userButtonProps);
     } else {
       this.premountUserButtonNodes.set(node, userButtonProps);
@@ -935,7 +1017,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   unmountUserButton = (node: HTMLDivElement) => {
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       this.clerkjs.unmountUserButton(node);
     } else {
       this.premountUserButtonNodes.delete(node);
@@ -943,7 +1025,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   mountWaitlist = (node: HTMLDivElement, props?: WaitlistProps) => {
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       this.clerkjs.mountWaitlist(node, props);
     } else {
       this.premountWaitlistNodes.set(node, props);
@@ -951,10 +1033,42 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   unmountWaitlist = (node: HTMLDivElement) => {
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       this.clerkjs.unmountWaitlist(node);
     } else {
       this.premountWaitlistNodes.delete(node);
+    }
+  };
+
+  mountPricingTable = (node: HTMLDivElement, props?: PricingTableProps) => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.mountPricingTable(node, props);
+    } else {
+      this.premountPricingTableNodes.set(node, props);
+    }
+  };
+
+  unmountPricingTable = (node: HTMLDivElement) => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.unmountPricingTable(node);
+    } else {
+      this.premountPricingTableNodes.delete(node);
+    }
+  };
+
+  __internal_mountOAuthConsent = (node: HTMLDivElement, props?: __internal_OAuthConsentProps) => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.__internal_mountOAuthConsent(node, props);
+    } else {
+      this.premountOAuthConsentNodes.set(node, props);
+    }
+  };
+
+  __internal_unmountOAuthConsent = (node: HTMLDivElement) => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.__internal_unmountOAuthConsent(node);
+    } else {
+      this.premountOAuthConsentNodes.delete(node);
     }
   };
 
@@ -976,7 +1090,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   navigate = (to: string) => {
     const callback = () => this.clerkjs?.navigate(to);
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       void callback();
     } else {
       this.premountMethodCalls.set('navigate', callback);
@@ -985,7 +1099,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   redirectWithAuth = async (...args: Parameters<Clerk['redirectWithAuth']>) => {
     const callback = () => this.clerkjs?.redirectWithAuth(...args);
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       return callback();
     } else {
       this.premountMethodCalls.set('redirectWithAuth', callback);
@@ -995,7 +1109,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   redirectToSignIn = async (opts?: SignInRedirectOptions) => {
     const callback = () => this.clerkjs?.redirectToSignIn(opts as any);
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       return callback();
     } else {
       this.premountMethodCalls.set('redirectToSignIn', callback);
@@ -1005,7 +1119,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   redirectToSignUp = async (opts?: SignUpRedirectOptions) => {
     const callback = () => this.clerkjs?.redirectToSignUp(opts as any);
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       return callback();
     } else {
       this.premountMethodCalls.set('redirectToSignUp', callback);
@@ -1015,7 +1129,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   redirectToUserProfile = async () => {
     const callback = () => this.clerkjs?.redirectToUserProfile();
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       return callback();
     } else {
       this.premountMethodCalls.set('redirectToUserProfile', callback);
@@ -1025,7 +1139,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   redirectToAfterSignUp = (): void => {
     const callback = () => this.clerkjs?.redirectToAfterSignUp();
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       return callback();
     } else {
       this.premountMethodCalls.set('redirectToAfterSignUp', callback);
@@ -1034,7 +1148,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   redirectToAfterSignIn = () => {
     const callback = () => this.clerkjs?.redirectToAfterSignIn();
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       callback();
     } else {
       this.premountMethodCalls.set('redirectToAfterSignIn', callback);
@@ -1043,7 +1157,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   redirectToAfterSignOut = () => {
     const callback = () => this.clerkjs?.redirectToAfterSignOut();
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       callback();
     } else {
       this.premountMethodCalls.set('redirectToAfterSignOut', callback);
@@ -1052,7 +1166,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   redirectToOrganizationProfile = async () => {
     const callback = () => this.clerkjs?.redirectToOrganizationProfile();
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       return callback();
     } else {
       this.premountMethodCalls.set('redirectToOrganizationProfile', callback);
@@ -1062,7 +1176,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   redirectToCreateOrganization = async () => {
     const callback = () => this.clerkjs?.redirectToCreateOrganization();
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       return callback();
     } else {
       this.premountMethodCalls.set('redirectToCreateOrganization', callback);
@@ -1072,7 +1186,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   redirectToWaitlist = async () => {
     const callback = () => this.clerkjs?.redirectToWaitlist();
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       return callback();
     } else {
       this.premountMethodCalls.set('redirectToWaitlist', callback);
@@ -1082,7 +1196,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   handleRedirectCallback = async (params: HandleOAuthCallbackParams): Promise<void> => {
     const callback = () => this.clerkjs?.handleRedirectCallback(params);
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       void callback()?.catch(() => {
         // This error is caused when the host app is using React18
         // and strictMode is enabled. This useEffects runs twice because
@@ -1102,7 +1216,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     params: HandleOAuthCallbackParams,
   ): Promise<void> => {
     const callback = () => this.clerkjs?.handleGoogleOneTapCallback(signInOrUp, params);
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       void callback()?.catch(() => {
         // This error is caused when the host app is using React18
         // and strictMode is enabled. This useEffects runs twice because
@@ -1119,7 +1233,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   handleEmailLinkVerification = async (params: HandleEmailLinkVerificationParams) => {
     const callback = () => this.clerkjs?.handleEmailLinkVerification(params);
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       return callback() as Promise<void>;
     } else {
       this.premountMethodCalls.set('handleEmailLinkVerification', callback);
@@ -1128,7 +1242,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   authenticateWithMetamask = async (params?: AuthenticateWithMetamaskParams) => {
     const callback = () => this.clerkjs?.authenticateWithMetamask(params);
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       return callback() as Promise<void>;
     } else {
       this.premountMethodCalls.set('authenticateWithMetamask', callback);
@@ -1137,7 +1251,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   authenticateWithCoinbaseWallet = async (params?: AuthenticateWithCoinbaseWalletParams) => {
     const callback = () => this.clerkjs?.authenticateWithCoinbaseWallet(params);
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       return callback() as Promise<void>;
     } else {
       this.premountMethodCalls.set('authenticateWithCoinbaseWallet', callback);
@@ -1146,7 +1260,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   authenticateWithOKXWallet = async (params?: AuthenticateWithOKXWalletParams) => {
     const callback = () => this.clerkjs?.authenticateWithOKXWallet(params);
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       return callback() as Promise<void>;
     } else {
       this.premountMethodCalls.set('authenticateWithOKXWallet', callback);
@@ -1155,7 +1269,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   authenticateWithWeb3 = async (params: ClerkAuthenticateWithWeb3Params) => {
     const callback = () => this.clerkjs?.authenticateWithWeb3(params);
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       return callback() as Promise<void>;
     } else {
       this.premountMethodCalls.set('authenticateWithWeb3', callback);
@@ -1169,7 +1283,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   createOrganization = async (params: CreateOrganizationParams): Promise<OrganizationResource | void> => {
     const callback = () => this.clerkjs?.createOrganization(params);
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       return callback() as Promise<OrganizationResource>;
     } else {
       this.premountMethodCalls.set('createOrganization', callback);
@@ -1178,7 +1292,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   getOrganization = async (organizationId: string): Promise<OrganizationResource | void> => {
     const callback = () => this.clerkjs?.getOrganization(organizationId);
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       return callback() as Promise<OrganizationResource>;
     } else {
       this.premountMethodCalls.set('getOrganization', callback);
@@ -1187,7 +1301,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   joinWaitlist = async (params: JoinWaitlistParams): Promise<WaitlistResource | void> => {
     const callback = () => this.clerkjs?.joinWaitlist(params);
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       return callback() as Promise<WaitlistResource>;
     } else {
       this.premountMethodCalls.set('joinWaitlist', callback);
@@ -1196,7 +1310,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   signOut = async (...args: Parameters<Clerk['signOut']>) => {
     const callback = () => this.clerkjs?.signOut(...args);
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       return callback() as Promise<void>;
     } else {
       this.premountMethodCalls.set('signOut', callback);

@@ -1,3 +1,5 @@
+import type { PhoneCodeChannel } from 'phoneCodeChannel';
+
 import type { ClerkResourceJSON } from './json';
 import type { ClerkResource } from './resource';
 import type { UserSettingsJSONSnapshot } from './snapshots';
@@ -35,6 +37,7 @@ export type AttributeDataJSON = {
   used_for_second_factor: boolean;
   second_factors: VerificationStrategy[];
   verify_at_sign_up: boolean;
+  channels?: PhoneCodeChannel[];
 };
 
 export type AttributeData = AttributeDataJSON & {
@@ -146,6 +149,7 @@ export interface UserSettingsResource extends ClerkResource {
   socialProviderStrategies: OAuthStrategy[];
   authenticatableSocialStrategies: OAuthStrategy[];
   web3FirstFactors: Web3Strategy[];
+  alternativePhoneCodeChannels: PhoneCodeChannel[];
   enabledFirstFactorIdentifiers: Attribute[];
   instanceIsPasswordBased: boolean;
   hasValidAuthFactor: boolean;

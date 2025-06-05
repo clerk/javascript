@@ -2,18 +2,16 @@ import { useOrganization, useOrganizationList } from '@clerk/shared/react';
 import type { CreateOrganizationParams, OrganizationResource } from '@clerk/types';
 import React from 'react';
 
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { Form } from '@/ui/elements/Form';
+import { FormButtonContainer } from '@/ui/elements/FormButtons';
+import { FormContainer } from '@/ui/elements/FormContainer';
+import { Header } from '@/ui/elements/Header';
+import { IconButton } from '@/ui/elements/IconButton';
+import { SuccessPage } from '@/ui/elements/SuccessPage';
+
 import { useWizard, Wizard } from '../../common';
 import { Col, Icon } from '../../customizables';
-import {
-  Form,
-  FormButtonContainer,
-  FormContainer,
-  Header,
-  IconButton,
-  SuccessPage,
-  useCardState,
-  withCardStateProvider,
-} from '../../elements';
 import { Upload } from '../../icons';
 import type { LocalizationKey } from '../../localization';
 import { localizationKeys } from '../../localization';

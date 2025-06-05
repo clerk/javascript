@@ -2,10 +2,11 @@ import { useOrganization } from '@clerk/shared/react';
 import type { OrganizationDomainResource } from '@clerk/types';
 import React from 'react';
 
+import type { FormProps } from '@/ui/elements/FormContainer';
+
 import { RemoveResourceForm } from '../../common';
 import { useEnvironment } from '../../contexts';
 import { descriptors, Flex, Spinner } from '../../customizables';
-import type { FormProps } from '../../elements';
 import { useFetch } from '../../hooks';
 import { localizationKeys } from '../../localization';
 

@@ -1,21 +1,24 @@
-import { __experimental_PaymentSourcesContext, __experimental_PricingTableContext } from '../../contexts';
-import { Col, descriptors, localizationKeys } from '../../customizables';
-import {
-  Card,
-  Header,
-  Tab,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  TabsList,
-  useCardState,
-  withCardStateProvider,
-} from '../../elements';
-import { __experimental_PaymentSources } from '../PaymentSources';
-import { __experimental_PricingTable } from '../PricingTable';
+import { Card } from '@/ui/elements/Card';
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { Header } from '@/ui/elements/Header';
+import { Tab, TabPanel, TabPanels, Tabs, TabsList } from '@/ui/elements/Tabs';
 
-export const BillingPage = withCardStateProvider(() => {
+import { SubscriberTypeContext } from '../../contexts';
+import { Col, descriptors, localizationKeys } from '../../customizables';
+import { useTabState } from '../../hooks/useTabState';
+import { PaymentSources } from '../PaymentSources';
+import { StatementsList } from '../Statements';
+import { SubscriptionsList } from '../Subscriptions';
+
+const tabMap = {
+  0: 'plans',
+  1: 'statements',
+  2: 'payment-methods',
+} as const;
+
+const BillingPageInternal = withCardStateProvider(() => {
   const card = useCardState();
+  const { selectedTab, handleTabChange } = useTabState(tabMap);
 
   return (
     <Col
@@ -29,38 +32,36 @@ export const BillingPage = withCardStateProvider(() => {
       >
         <Header.Root>
           <Header.Title
-            localizationKey={localizationKeys('userProfile.__experimental_billingPage.title')}
+            localizationKey={localizationKeys('userProfile.billingPage.title')}
             textVariant='h2'
           />
         </Header.Root>
 
         <Card.Alert>{card.error}</Card.Alert>
 
-        <Tabs>
+        <Tabs
+          value={selectedTab}
+          onChange={handleTabChange}
+        >
           <TabsList sx={t => ({ gap: t.space.$6 })}>
-            <Tab
-              localizationKey={localizationKeys('userProfile.__experimental_billingPage.start.headerTitle__plans')}
-            />
-            <Tab
-              localizationKey={localizationKeys('userProfile.__experimental_billingPage.start.headerTitle__invoices')}
-            />
-            <Tab
-              localizationKey={localizationKeys(
-                'userProfile.__experimental_billingPage.start.headerTitle__paymentSources',
-              )}
-            />
+            <Tab localizationKey={localizationKeys('userProfile.billingPage.start.headerTitle__subscriptions')} />
+            <Tab localizationKey={localizationKeys('userProfile.billingPage.start.headerTitle__statements')} />
           </TabsList>
           <TabPanels>
-            <TabPanel sx={{ width: '100%' }}>
-              <__experimental_PricingTableContext.Provider value={{ componentName: 'PricingTable', mode: 'modal' }}>
-                <__experimental_PricingTable />
-              </__experimental_PricingTableContext.Provider>
+            <TabPanel sx={_ => ({ width: '100%', flexDirection: 'column' })}>
+              <SubscriptionsList
+                title={localizationKeys('userProfile.billingPage.subscriptionsListSection.title')}
+                arrowButtonText={localizationKeys(
+                  'userProfile.billingPage.subscriptionsListSection.actionLabel__switchPlan',
+                )}
+                arrowButtonEmptyText={localizationKeys(
+                  'userProfile.billingPage.subscriptionsListSection.actionLabel__newSubscription',
+                )}
+              />
+              <PaymentSources />
             </TabPanel>
-            <TabPanel sx={{ width: '100%' }}>Invoices</TabPanel>
             <TabPanel sx={{ width: '100%' }}>
-              <__experimental_PaymentSourcesContext.Provider value={{ componentName: 'PaymentSources' }}>
-                <__experimental_PaymentSources />
-              </__experimental_PaymentSourcesContext.Provider>
+              <StatementsList />
             </TabPanel>
           </TabPanels>
         </Tabs>
@@ -68,3 +69,11 @@ export const BillingPage = withCardStateProvider(() => {
     </Col>
   );
 });
+
+export const BillingPage = () => {
+  return (
+    <SubscriberTypeContext.Provider value='user'>
+      <BillingPageInternal />
+    </SubscriberTypeContext.Provider>
+  );
+};

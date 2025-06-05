@@ -2,7 +2,7 @@ import { forwardRef, useId } from 'react';
 
 import type { LocalizationKey } from '../customizables';
 import { descriptors, Flex, FormLabel, RadioInput, Text } from '../customizables';
-import { sanitizeInputProps, useFormField } from '../primitives/hooks';
+import { sanitizeInputProps, useFormField } from '../primitives/hooks/useFormField';
 
 const RadioIndicator = forwardRef<HTMLInputElement, { value: string; id: string }>((props, ref) => {
   const formField = useFormField();
