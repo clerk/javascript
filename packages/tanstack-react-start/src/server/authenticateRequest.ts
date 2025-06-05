@@ -1,5 +1,5 @@
 import { createClerkClient } from '@clerk/backend';
-import type { AuthenticateRequestOptions, SignedInState, SignedOutState } from '@clerk/backend/internal';
+import type { AuthenticatedState, AuthenticateRequestOptions, UnauthenticatedState } from '@clerk/backend/internal';
 import { AuthStatus, constants } from '@clerk/backend/internal';
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
 
@@ -9,7 +9,7 @@ import { patchRequest } from './utils';
 export async function authenticateRequest(
   request: Request,
   opts: AuthenticateRequestOptions,
-): Promise<SignedInState | SignedOutState> {
+): Promise<AuthenticatedState | UnauthenticatedState> {
   const { audience, authorizedParties } = opts;
 
   const { apiUrl, secretKey, jwtKey, proxyUrl, isSatellite, domain, publishableKey, acceptsToken } = opts;
