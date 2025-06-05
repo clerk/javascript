@@ -83,7 +83,7 @@ export type OrganizationSyncOptions = {
   organizationPatterns?: Pattern[];
 
   /**
-   * URL patterns for resources that exist within the context of a [Clerk Personal Account](https://clerk.com/docs/organizations/organization-workspaces#organization-workspaces-in-the-clerk-dashboard:~:text=Personal%20account) (user-specific, outside any organization).
+   * URL patterns for resources that exist within the context of a [Clerk Personal Account](https://clerk.com/docs/organizations/organization-workspaces) (user-specific, outside any organization).
    *
    * If the route also matches the `organizationPattern` prop, the `organizationPattern` prop takes precedence.
    *
