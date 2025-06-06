@@ -50,6 +50,7 @@ export function createClerkClient(options: ClerkOptions): ClerkClient {
  */
 export type { OrganizationMembershipRole } from './api/resources';
 export type { VerifyTokenOptions } from './tokens/verify';
+export type { LoadClerkJWKFromRemoteOptions } from './tokens/keys';
 /**
  * JSON types
  */

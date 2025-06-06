@@ -1,5 +1,4 @@
 import { Extractor, ExtractorConfig, ExtractorLogLevel } from '@microsoft/api-extractor';
-import type { ExecSyncOptionsWithStringEncoding } from 'child_process';
 import fs from 'fs-extra';
 import { globby } from 'globby';
 import path from 'path';
@@ -215,79 +214,62 @@ export class ApiExtractorRunner {
   }
 
   private async generateDeclarations(packageInfo: PackageInfo, sourceEntrypoint: string): Promise<string> {
-    const { execSync } = await import('child_process');
-    // tempDtsRoot is where all .d.ts files for the package will be generated.
-    // e.g., /abs/path/to/workspace/packages/my-package/temp/dts
+    // First, try to find existing declarations in the dist directory
+    const distDir = path.join(packageInfo.path, 'dist');
+    const typesDir = path.join(packageInfo.path, 'dist', 'types');
+
+    // Look for declarations in both dist and dist/types
+    const possibleDirs = [distDir, typesDir];
+
+    for (const dir of possibleDirs) {
+      if (await fs.pathExists(dir)) {
+        // Convert source entrypoint to a relative path if it's absolute
+        const relativeEntrypoint = path.isAbsolute(sourceEntrypoint)
+          ? path.relative(packageInfo.path, sourceEntrypoint)
+          : sourceEntrypoint;
+
+        // Remove any extensions to find the base name
+        const baseName = relativeEntrypoint.replace(/\.(tsx?|d\.ts)$/i, '');
+
+        // Look for the declaration file in the dist directory
+        const possiblePaths = [
+          path.join(dir, baseName + '.d.ts'),
+          path.join(dir, baseName, 'index.d.ts'),
+          path.join(dir, 'index.d.ts'),
+        ];
+
+        for (const possiblePath of possiblePaths) {
+          if (await fs.pathExists(possiblePath)) {
+            console.log(`[SNAPI] Found existing declaration file at: ${possiblePath}`);
+            return possiblePath;
+          }
+        }
+      }
+    }
+
+    // If no existing declarations are found, create a stub
+    console.warn(`[SNAPI] No existing declaration files found for ${packageInfo.name}. Creating stub.`);
+
     const tempDtsRoot = path.join(packageInfo.path, 'temp', 'dts');
     await fs.ensureDir(tempDtsRoot);
 
-    // Handle case where sourceEntrypoint is an absolute path
-    // If it's absolute, make it relative to the package path
     const relativeEntrypoint = path.isAbsolute(sourceEntrypoint)
       ? path.relative(packageInfo.path, sourceEntrypoint)
       : sourceEntrypoint;
 
-    // Calculate the expected absolute path of the main entrypoint's .d.ts file within tempDtsRoot.
-    // We normalize the path to ensure consistent extensions
     const sourceWithoutExtension = relativeEntrypoint.replace(/\.(tsx?|d\.ts)$/i, '');
     const outputEntryDtsPath = path.join(tempDtsRoot, sourceWithoutExtension + '.d.ts');
-    await fs.ensureDir(path.dirname(outputEntryDtsPath)); // Ensures .../temp/dts/src (or similar) exists
 
-    console.log(`[SNAPI Debug] Source Entrypoint: ${sourceEntrypoint}`);
-    console.log(`[SNAPI Debug] Relative Entrypoint: ${relativeEntrypoint}`);
-    console.log(`[SNAPI Debug] Source Without Extension: ${sourceWithoutExtension}`);
-    console.log(`[SNAPI Debug] Package Path: ${packageInfo.path}`);
-    console.log(`[SNAPI Debug] Output Entry DTS Path: ${outputEntryDtsPath}`);
+    await this.generateStubDtsFile(outputEntryDtsPath, sourceEntrypoint, packageInfo);
 
-    const execOptions: ExecSyncOptionsWithStringEncoding = {
-      cwd: packageInfo.path,
-      stdio: 'pipe', // Capture stdout/stderr
-      encoding: 'utf-8',
-      timeout: 90000, // 90 seconds
-    };
-
-    // Attempt 1: Full package compilation to temp/dts
-    try {
-      // Run TypeScript compiler to generate declarations
-      const tsconfigPath = await this.findTsConfig(packageInfo.path);
-      const command = `npx tsc --declaration --emitDeclarationOnly --outDir ${path.dirname(outputEntryDtsPath)} ${sourceEntrypoint} --project ${tsconfigPath}`;
-
-      execSync(command, execOptions);
-    } catch (error) {
-      const errorOutput = error instanceof Error ? error.message : String(error);
-      console.warn(`[SNAPI] Full DTS generation failed for ${packageInfo.name}: ${errorOutput}. Falling back.`);
-
-      // Attempt 2: Fallback - Compile only the entrypoint file.
-      // This is less reliable as it might miss related local files' declarations.
-      try {
-        // Run TypeScript compiler to generate declarations
-        const command = `npx tsc --declaration --emitDeclarationOnly --outDir ${path.dirname(outputEntryDtsPath)} ${sourceEntrypoint}`;
-
-        execSync(command, execOptions);
-      } catch (error) {
-        const errorOutput = error instanceof Error ? error.message : String(error);
-        console.warn(
-          `[SNAPI] Single file DTS generation failed for ${packageInfo.name}: ${errorOutput}. Falling back to stub.`,
-        );
-
-        // Attempt 3: Fallback to basic stub .d.ts file
-        console.warn(
-          `[SNAPI] Creating basic fallback stub declaration for ${packageInfo.name} at ${outputEntryDtsPath}`,
-        );
-        await this.generateStubDtsFile(outputEntryDtsPath, sourceEntrypoint, packageInfo);
-
-        if (await fs.pathExists(outputEntryDtsPath)) {
-          console.log(`[SNAPI] ✅ Stub DTS created for ${packageInfo.name} at ${outputEntryDtsPath}`);
-          return outputEntryDtsPath;
-        }
-
-        throw new Error(
-          `[SNAPI] Failed to generate or stub any declaration file for ${packageInfo.name}. Target ${outputEntryDtsPath} could not be created.`,
-        );
-      }
+    if (await fs.pathExists(outputEntryDtsPath)) {
+      console.log(`[SNAPI] ✅ Stub DTS created for ${packageInfo.name} at ${outputEntryDtsPath}`);
+      return outputEntryDtsPath;
     }
 
-    return outputEntryDtsPath;
+    throw new Error(
+      `[SNAPI] Failed to find or create declaration file for ${packageInfo.name}. Target ${outputEntryDtsPath} could not be created.`,
+    );
   }
 
   private async findTsConfig(packagePath: string): Promise<string> {

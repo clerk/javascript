@@ -1,5 +1,5 @@
 {
-  "packages": ["@clerk/backend", "@clerk/nextjs", "@clerk/react", "@clerk/shared"],
+  "packages": ["@clerk/backend"],
   "excludePackages": ["@clerk/testing", "@clerk/eslint-config"],
   "snapshotsDir": ".api-snapshots",
   "mainBranch": "main",
