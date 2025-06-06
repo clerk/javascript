@@ -105,28 +105,32 @@ type MachineObjectExtendedProperties<TAuthenticated extends boolean> = {
 /**
  * @internal
  */
-export type AuthenticatedMachineObject<T extends MachineTokenType = MachineTokenType> = {
-  id: string;
-  subject: string;
-  scopes: string[];
-  getToken: () => Promise<string>;
-  has: CheckAuthorizationFromSessionClaims;
-  debug: AuthObjectDebug;
-  tokenType: T;
-} & MachineObjectExtendedProperties<true>[T];
+export type AuthenticatedMachineObject<T extends MachineTokenType = MachineTokenType> = T extends any
+  ? {
+      id: string;
+      subject: string;
+      scopes: string[];
+      getToken: () => Promise<string>;
+      has: CheckAuthorizationFromSessionClaims;
+      debug: AuthObjectDebug;
+      tokenType: T;
+    } & MachineObjectExtendedProperties<true>[T]
+  : never;
 
 /**
  * @internal
  */
-export type UnauthenticatedMachineObject<T extends MachineTokenType = MachineTokenType> = {
-  id: null;
-  subject: null;
-  scopes: null;
-  getToken: () => Promise<null>;
-  has: CheckAuthorizationFromSessionClaims;
-  debug: AuthObjectDebug;
-  tokenType: T;
-} & MachineObjectExtendedProperties<false>[T];
+export type UnauthenticatedMachineObject<T extends MachineTokenType = MachineTokenType> = T extends any
+  ? {
+      id: null;
+      subject: null;
+      scopes: null;
+      getToken: () => Promise<null>;
+      has: CheckAuthorizationFromSessionClaims;
+      debug: AuthObjectDebug;
+      tokenType: T;
+    } & MachineObjectExtendedProperties<false>[T]
+  : never;
 
 /**
  * @interface
@@ -243,7 +247,7 @@ export function authenticatedMachineObject<T extends MachineTokenType>(
         name: result.name,
         claims: result.claims,
         scopes: result.scopes,
-      };
+      } as unknown as AuthenticatedMachineObject<T>;
     }
     case TokenType.MachineToken: {
       const result = verificationResult as MachineToken;
@@ -253,7 +257,7 @@ export function authenticatedMachineObject<T extends MachineTokenType>(
         name: result.name,
         claims: result.claims,
         scopes: result.scopes,
-      };
+      } as unknown as AuthenticatedMachineObject<T>;
     }
     case TokenType.OAuthToken: {
       return {
@@ -290,7 +294,7 @@ export function unauthenticatedMachineObject<T extends MachineTokenType>(
         tokenType,
         name: null,
         claims: null,
-      };
+      } as unknown as UnauthenticatedMachineObject<T>;
     }
     case TokenType.MachineToken: {
       return {
@@ -298,7 +302,7 @@ export function unauthenticatedMachineObject<T extends MachineTokenType>(
         tokenType,
         name: null,
         claims: null,
-      };
+      } as unknown as UnauthenticatedMachineObject<T>;
     }
     case TokenType.OAuthToken: {
       return {

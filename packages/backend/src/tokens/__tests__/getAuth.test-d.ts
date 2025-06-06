@@ -64,3 +64,44 @@ test('verifies correct properties exist for each token type', () => {
   // @ts-expect-error oauth_token does not have claims property
   void oauthTokenAuth.claims;
 });
+
+test('verifies discriminated union works correctly with acceptsToken: any', () => {
+  const request = new Request('https://example.com');
+
+  const auth = getAuth(request, { acceptsToken: 'any' });
+
+  if (auth.tokenType === 'session_token') {
+    // Should be SessionAuthObject - has userId
+    assertType<string | null>(auth.userId);
+    // Should NOT have machine token properties
+    // @ts-expect-error session_token does not have id property
+    void auth.id;
+  } else if (auth.tokenType === 'api_key') {
+    // Should be AuthenticatedMachineObject<'api_key'> - has id, name, claims
+    assertType<string | null>(auth.id);
+    assertType<string | null>(auth.name);
+    assertType<Record<string, any> | null>(auth.claims);
+    // Should NOT have session token properties
+    // @ts-expect-error api_key does not have userId property
+    void auth.userId;
+  } else if (auth.tokenType === 'machine_token') {
+    // Should be AuthenticatedMachineObject<'machine_token'> - has id, name, claims
+    assertType<string | null>(auth.id);
+    assertType<string | null>(auth.name);
+    assertType<Record<string, any> | null>(auth.claims);
+    // Should NOT have session token properties
+    // @ts-expect-error machine_token does not have userId property
+    void auth.userId;
+  } else if (auth.tokenType === 'oauth_token') {
+    // Should be AuthenticatedMachineObject<'oauth_token'> - has id but NOT name/claims
+    assertType<string | null>(auth.id);
+    // Should NOT have name or claims
+    // @ts-expect-error oauth_token does not have name property
+    void auth.name;
+    // @ts-expect-error oauth_token does not have claims property
+    void auth.claims;
+    // Should NOT have session token properties
+    // @ts-expect-error oauth_token does not have userId property
+    void auth.userId;
+  }
+});
