@@ -208,7 +208,7 @@ export const enUS: LocalizationResource = {
         title: 'Payment methods',
       },
       start: {
-        headerTitle__paymentHistory: 'Payment history',
+        headerTitle__payments: 'Payments',
         headerTitle__plans: 'Plans',
         headerTitle__statements: 'Statements',
         headerTitle__subscriptions: 'Subscriptions',
@@ -836,7 +836,7 @@ export const enUS: LocalizationResource = {
         title: 'Payment methods',
       },
       start: {
-        headerTitle__paymentHistory: 'Payment history',
+        headerTitle__payments: 'Payments',
         headerTitle__plans: 'Plans',
         headerTitle__statements: 'Statements',
         headerTitle__subscriptions: 'Subscription',

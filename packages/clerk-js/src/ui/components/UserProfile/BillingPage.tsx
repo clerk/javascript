@@ -14,7 +14,7 @@ import { SubscriptionsList } from '../Subscriptions';
 const tabMap = {
   0: 'subscriptions',
   1: 'statements',
-  2: 'payment-history',
+  2: 'payments',
 } as const;
 
 const BillingPageInternal = withCardStateProvider(() => {
@@ -47,7 +47,7 @@ const BillingPageInternal = withCardStateProvider(() => {
           <TabsList sx={t => ({ gap: t.space.$6 })}>
             <Tab localizationKey={localizationKeys('userProfile.billingPage.start.headerTitle__subscriptions')} />
             <Tab localizationKey={localizationKeys('userProfile.billingPage.start.headerTitle__statements')} />
-            <Tab localizationKey={localizationKeys('userProfile.billingPage.start.headerTitle__paymentHistory')} />
+            <Tab localizationKey={localizationKeys('userProfile.billingPage.start.headerTitle__payments')} />
           </TabsList>
           <TabPanels>
             <TabPanel sx={_ => ({ width: '100%', flexDirection: 'column' })}>

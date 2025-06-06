@@ -54,11 +54,9 @@ export const PaymentAttemptPage = () => {
           paddingBlockEnd: t.space.$4,
         })}
       >
-        <Header.BackLink
-          onClick={() => void navigate('../../', { searchParams: new URLSearchParams('tab=payment-history') })}
-        >
+        <Header.BackLink onClick={() => void navigate('../../', { searchParams: new URLSearchParams('tab=payments') })}>
           <Header.Title
-            localizationKey='Payment history'
+            localizationKey={localizationKeys('organizationProfile.billingPage.start.headerTitle__payments')}
             textVariant='h2'
           />
         </Header.BackLink>
