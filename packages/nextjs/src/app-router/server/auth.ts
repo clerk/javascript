@@ -1,11 +1,9 @@
-import type { AuthObject } from '@clerk/backend';
+import type { AuthObject, MachineAuthObject, SessionAuthObject } from '@clerk/backend';
 import type {
   AuthenticateRequestOptions,
   InferAuthObjectFromToken,
   InferAuthObjectFromTokenArray,
-  MachineAuthObject,
   RedirectFun,
-  SessionAuthObject,
 } from '@clerk/backend/internal';
 import { constants, createClerkRequest, createRedirect, TokenType } from '@clerk/backend/internal';
 import type { PendingSessionOptions } from '@clerk/types';
