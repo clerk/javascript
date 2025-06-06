@@ -13,10 +13,11 @@ import type {
 
 import type { APIKey, CreateBackendApiOptions, MachineToken } from '../api';
 import { createBackendApiClient } from '../api';
+import { isTokenTypeAccepted } from '../internal';
 import type { AuthenticateContext } from './authenticateContext';
 import type { MachineTokenType, SessionTokenType } from './tokenTypes';
 import { TokenType } from './tokenTypes';
-import type { MachineAuthType } from './types';
+import type { AuthenticateRequestOptions, MachineAuthType } from './types';
 
 /**
  * @inline
@@ -361,3 +362,63 @@ export const getAuthObjectFromJwt = (
 
   return authObject;
 };
+
+/**
+ * @internal
+ * Filters and coerces an AuthObject based on the accepted token type(s).
+ *
+ * This function is used after authentication to ensure that the returned auth object
+ * matches the expected token type(s) specified by `acceptsToken`. If the token type
+ * of the provided `authObject` does not match any of the types in `acceptsToken`,
+ * it returns an unauthenticated or signed-out version of the object, depending on the token type.
+ *
+ * - If `acceptsToken` is `'any'`, the original auth object is returned.
+ * - If `acceptsToken` is a single token type or an array of token types, the function checks if
+ *   `authObject.tokenType` matches any of them.
+ * - If the token type does not match and is a session token, a signed-out object is returned.
+ * - If the token type does not match and is a machine token, an unauthenticated machine object is returned.
+ * - If the token type matches, the original auth object is returned.
+ *
+ * @param {Object} params
+ * @param {AuthObject} params.authObject - The authenticated object to filter.
+ * @param {AuthenticateRequestOptions['acceptsToken']} [params.acceptsToken=TokenType.SessionToken] - The accepted token type(s). Can be a string, array of strings, or 'any'.
+ * @returns {AuthObject} The filtered or coerced auth object.
+ *
+ * @example
+ * // Accept only 'api_key' tokens
+ * const authObject = { tokenType: 'session_token', userId: 'user_123' };
+ * const result = getAuthObjectForAcceptedToken({ authObject, acceptsToken: 'api_key' });
+ * // result will be a signed-out object (since tokenType is 'session_token' and does not match)
+ *
+ * @example
+ * // Accept 'api_key' or 'machine_token'
+ * const authObject = { tokenType: 'machine_token', id: 'mt_123' };
+ * const result = getAuthObjectForAcceptedToken({ authObject, acceptsToken: ['api_key', 'machine_token'] });
+ * // result will be the original authObject (since tokenType matches one in the array)
+ *
+ * @example
+ * // Accept any token type
+ * const authObject = { tokenType: 'api_key', id: 'ak_123' };
+ * const result = getAuthObjectForAcceptedToken({ authObject, acceptsToken: 'any' });
+ * // result will be the original authObject
+ */
+export function getAuthObjectForAcceptedToken({
+  authObject,
+  acceptsToken = TokenType.SessionToken,
+}: {
+  authObject: AuthObject;
+  acceptsToken: AuthenticateRequestOptions['acceptsToken'];
+}): AuthObject {
+  if (acceptsToken === 'any') {
+    return authObject;
+  }
+
+  if (!isTokenTypeAccepted(authObject.tokenType, acceptsToken)) {
+    if (authObject.tokenType === TokenType.SessionToken) {
+      return signedOutAuthObject(authObject.debug);
+    }
+    return unauthenticatedMachineObject(authObject.tokenType, authObject.debug);
+  }
+
+  return authObject;
+}

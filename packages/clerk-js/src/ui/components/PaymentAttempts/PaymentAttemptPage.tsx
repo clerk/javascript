@@ -65,7 +65,7 @@ export const PaymentAttemptPage = () => {
       </Header.Root>
 
       <Box
-        elementDescriptor={descriptors.statementRoot}
+        elementDescriptor={descriptors.paymentAttemptRoot}
         as='article'
         sx={t => ({
           borderWidth: t.borderWidths.$normal,
@@ -76,7 +76,7 @@ export const PaymentAttemptPage = () => {
         })}
       >
         <Box
-          elementDescriptor={descriptors.statementHeader}
+          elementDescriptor={descriptors.paymentAttemptHeader}
           as='header'
           sx={t => ({
             padding: t.space.$4,
@@ -86,9 +86,9 @@ export const PaymentAttemptPage = () => {
             alignItems: 'flex-start',
           })}
         >
-          <Span elementDescriptor={descriptors.statementHeaderTitleContainer}>
+          <Span elementDescriptor={descriptors.paymentAttemptHeaderTitleContainer}>
             <Heading
-              elementDescriptor={descriptors.statementHeaderTitle}
+              elementDescriptor={descriptors.paymentAttemptHeaderTitle}
               textVariant='h2'
               localizationKey={new Date(
                 paymentAttempt.paidAt || paymentAttempt.failedAt || paymentAttempt.updatedAt,
@@ -115,7 +115,7 @@ export const PaymentAttemptPage = () => {
             </Span>
           </Span>
           <Badge
-            elementDescriptor={descriptors.statementHeaderBadge}
+            elementDescriptor={descriptors.paymentAttemptHeaderBadge}
             colorScheme={
               paymentAttempt.status === 'paid' ? 'success' : paymentAttempt.status === 'failed' ? 'danger' : 'primary'
             }
@@ -125,7 +125,7 @@ export const PaymentAttemptPage = () => {
           </Badge>
         </Box>
         <Box
-          elementDescriptor={descriptors.statementBody}
+          elementDescriptor={descriptors.paymentAttemptBody}
           sx={t => ({
             padding: t.space.$4,
           })}
@@ -160,7 +160,7 @@ export const PaymentAttemptPage = () => {
           )}
         </Box>
         <Box
-          elementDescriptor={descriptors.statementFooter}
+          elementDescriptor={descriptors.paymentAttemptFooter}
           as='footer'
           sx={t => ({
             paddingInline: t.space.$4,
@@ -176,10 +176,10 @@ export const PaymentAttemptPage = () => {
           <Text
             variant='h3'
             localizationKey={'Total due'}
-            elementDescriptor={descriptors.statementFooterLabel}
+            elementDescriptor={descriptors.paymentAttemptFooterLabel}
           />
           <Span
-            elementDescriptor={descriptors.statementFooterValueContainer}
+            elementDescriptor={descriptors.paymentAttemptFooterValueContainer}
             sx={t => ({
               display: 'flex',
               alignItems: 'center',
@@ -189,13 +189,13 @@ export const PaymentAttemptPage = () => {
             <Text
               variant='caption'
               colorScheme='secondary'
-              elementDescriptor={descriptors.statementFooterCurrency}
+              elementDescriptor={descriptors.paymentAttemptFooterCurrency}
             >
               USD
             </Text>
             <Text
               variant='h3'
-              elementDescriptor={descriptors.statementFooterValue}
+              elementDescriptor={descriptors.paymentAttemptFooterValue}
             >
               {paymentAttempt.amount.currencySymbol}
               {paymentAttempt.amount.amountFormatted}
@@ -212,7 +212,7 @@ function CopyButton({ text, copyLabel = 'Copy' }: { text: string; copyLabel?: st
 
   return (
     <Button
-      elementDescriptor={descriptors.statementCopyButton}
+      elementDescriptor={descriptors.paymentAttemptCopyButton}
       variant='unstyled'
       onClick={onCopy}
       sx={t => ({

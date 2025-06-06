@@ -246,19 +246,18 @@ const AddPaymentSourceForm = ({ children }: PropsWithChildren) => {
     card.setLoading();
     card.setError(undefined);
 
-    try {
-      const { setupIntent, error } = await stripe.confirmSetup({
-        elements,
-        confirmParams: {
-          return_url: '', // TODO(@COMMERCE): need to figure this out
-        },
-        redirect: 'if_required',
-      });
-      if (error) {
-        console.log('error', error);
-        return; // just return, since stripe will handle the error
-      }
+    const { setupIntent, error } = await stripe.confirmSetup({
+      elements,
+      confirmParams: {
+        return_url: '', // TODO(@COMMERCE): need to figure this out
+      },
+      redirect: 'if_required',
+    });
+    if (error) {
+      return; // just return, since stripe will handle the error
+    }
 
+    try {
       await onSuccess({ stripeSetupIntent: setupIntent });
     } catch (error) {
       console.log('catch', error);
