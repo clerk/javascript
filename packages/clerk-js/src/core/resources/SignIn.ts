@@ -39,6 +39,8 @@ import type {
   Web3SignatureConfig,
   Web3SignatureFactor,
 } from '@clerk/types';
+import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
 
 import {
   generateSignatureWithCoinbaseWallet,
@@ -68,6 +70,22 @@ import {
 } from '../errors';
 import { BaseResource, UserData, Verification } from './internal';
 
+type SignInUIState = {
+  status: SignInStatus | null;
+  setStatus: (status: SignInStatus | null) => void;
+};
+
+const createSignInStore = () =>
+  create<SignInUIState>()(
+    devtools(
+      set => ({
+        status: null,
+        setStatus: status => set({ status }),
+      }),
+      { name: 'SignInStore' },
+    ),
+  );
+
 export class SignIn extends BaseResource implements SignInResource {
   pathRoot = '/client/sign_ins';
 
@@ -81,6 +99,12 @@ export class SignIn extends BaseResource implements SignInResource {
   identifier: string | null = null;
   createdSessionId: string | null = null;
   userData: UserData = new UserData(null);
+
+  private _signInStore = createSignInStore();
+
+  public get signInStore() {
+    return this._signInStore;
+  }
 
   constructor(data: SignInJSON | SignInJSONSnapshot | null = null) {
     super();
@@ -160,7 +184,10 @@ export class SignIn extends BaseResource implements SignInResource {
     });
   };
 
-  attemptFirstFactor = (attemptFactor: AttemptFirstFactorParams): Promise<SignInResource> => {
+  attemptFirstFactor = async (attemptFactor: AttemptFirstFactorParams): Promise<SignInResource> => {
+    this.store.getState().setFetchStatus('fetching');
+    this.store.getState().setError(null);
+
     let config;
     switch (attemptFactor.strategy) {
       case 'passkey':
@@ -172,10 +199,18 @@ export class SignIn extends BaseResource implements SignInResource {
         config = { ...attemptFactor };
     }
 
-    return this._basePost({
-      body: { ...config, strategy: attemptFactor.strategy },
-      action: 'attempt_first_factor',
-    });
+    try {
+      const result = await this._basePost({
+        body: { ...config, strategy: attemptFactor.strategy },
+        action: 'attempt_first_factor',
+      });
+
+      this.signInStore.getState().setStatus(result.status);
+      return result;
+    } catch (err: any) {
+      this.store.getState().setError(err);
+      throw err;
+    }
   };
 
   createEmailLinkFlow = (): CreateEmailLinkFlowReturn<SignInStartEmailLinkFlowParams, SignInResource> => {

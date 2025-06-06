@@ -1,6 +1,8 @@
 import { isValidBrowserOnline } from '@clerk/shared/browser';
 import { isProductionFromPublishableKey } from '@clerk/shared/keys';
 import type { ClerkAPIErrorJSON, ClerkResourceJSON, ClerkResourceReloadParams, DeletedObjectJSON } from '@clerk/types';
+import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
 
 import { clerkMissingFapiClientInResources } from '../errors';
 import type { FapiClient, FapiRequestInit, FapiResponse, FapiResponseJSON, HTTPMethod } from '../fapiClient';
@@ -44,10 +46,36 @@ function assertProductionKeysOnDev(statusCode: number, payloadErrors?: ClerkAPIE
   }
 }
 
+type ResourceUIState = {
+  fetchStatus: 'idle' | 'fetching';
+  error: ClerkAPIError | null;
+  setFetchStatus: (status: 'idle' | 'fetching') => void;
+  setError: (error: ClerkAPIError | null) => void;
+};
+
+const createResourceStore = () =>
+  create<ResourceUIState>()(
+    devtools(
+      set => ({
+        fetchStatus: 'idle',
+        error: null,
+        setFetchStatus: fetchStatus => set({ fetchStatus }),
+        setError: error => set({ error }),
+      }),
+      { name: 'ResourceStore' },
+    ),
+  );
+
 export abstract class BaseResource {
   static clerk: Clerk;
   id?: string;
   pathRoot = '';
+
+  private _store = createResourceStore();
+
+  public get store() {
+    return this._store;
+  }
 
   static get fapiClient(): FapiClient {
     return BaseResource.clerk.getFapiClient();
@@ -187,22 +215,43 @@ export abstract class BaseResource {
   }
 
   protected async _baseGet<J extends ClerkResourceJSON | null>(opts: BaseFetchOptions = {}): Promise<this> {
-    const json = await BaseResource._fetch<J>(
-      {
-        method: 'GET',
-        path: this.path(),
-        rotatingTokenNonce: opts.rotatingTokenNonce,
-      },
-      opts,
-    );
+    this._store.getState().setFetchStatus('fetching');
+    this._store.getState().setError(null);
 
-    return this.fromJSON((json?.response || json) as J);
+    try {
+      const json = await BaseResource._fetch<J>(
+        {
+          method: 'GET',
+          path: this.path(),
+          rotatingTokenNonce: opts.rotatingTokenNonce,
+        },
+        opts,
+      );
+
+      this._store.getState().setFetchStatus('idle');
+      return this.fromJSON((json?.response || json) as J);
+    } catch (error) {
+      this._store.getState().setFetchStatus('idle');
+      this._store.getState().setError(error as ClerkAPIError);
+      throw error;
+    }
   }
 
   protected async _baseMutate<J extends ClerkResourceJSON | null>(params: BaseMutateParams): Promise<this> {
-    const { action, body, method, path } = params;
-    const json = await BaseResource._fetch<J>({ method, path: path || this.path(action), body });
-    return this.fromJSON((json?.response || json) as J);
+    this._store.getState().setFetchStatus('fetching');
+    this._store.getState().setError(null);
+
+    try {
+      const { action, body, method, path } = params;
+      const json = await BaseResource._fetch<J>({ method, path: path || this.path(action), body });
+
+      this._store.getState().setFetchStatus('idle');
+      return this.fromJSON((json?.response || json) as J);
+    } catch (error) {
+      this._store.getState().setFetchStatus('idle');
+      this._store.getState().setError(error as ClerkAPIError);
+      throw error;
+    }
   }
 
   protected async _baseMutateBypass<J extends ClerkResourceJSON | null>(params: BaseMutateParams): Promise<this> {

@@ -1,3 +1,6 @@
+import type { SignInResource } from '@clerk/types';
+import type { StoreApi } from 'zustand';
+
 import * as l from '../../localizations';
 import type { Clerk as ClerkType } from '../';
 
@@ -34,6 +37,7 @@ const AVAILABLE_COMPONENTS = [
   'waitlist',
   'pricingTable',
   'oauthConsent',
+  'signInObservable',
 ] as const;
 
 const COMPONENT_PROPS_NAMESPACE = 'clerk-js-sandbox';
@@ -93,6 +97,7 @@ const componentControls: Record<(typeof AVAILABLE_COMPONENTS)[number], Component
   waitlist: buildComponentControls('waitlist'),
   pricingTable: buildComponentControls('pricingTable'),
   oauthConsent: buildComponentControls('oauthConsent'),
+  signInObservable: buildComponentControls('signInObservable'),
 };
 
 declare global {
@@ -257,6 +262,296 @@ function otherOptions() {
   return { updateOtherOptions };
 }
 
+function mountSignInObservable(element: HTMLDivElement) {
+  assertClerkIsLoaded(Clerk);
+
+  // Create container for status display
+  const statusContainer = document.createElement('div');
+  statusContainer.className = 'p-4 border border-gray-200 rounded-md mb-4';
+  element.appendChild(statusContainer);
+
+  // Create controls container
+  const controlsContainer = document.createElement('div');
+  controlsContainer.className = 'mb-4 space-y-4';
+
+  // Create store manipulation buttons
+  const storeControls = document.createElement('div');
+  storeControls.className = 'flex gap-2';
+
+  const simulateLoadingBtn = document.createElement('button');
+  simulateLoadingBtn.textContent = 'Simulate Loading';
+  simulateLoadingBtn.className = 'px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200';
+
+  const simulateErrorBtn = document.createElement('button');
+  simulateErrorBtn.textContent = 'Simulate Error';
+  simulateErrorBtn.className = 'px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200';
+
+  const resetStoreBtn = document.createElement('button');
+  resetStoreBtn.textContent = 'Reset Store';
+  resetStoreBtn.className = 'px-3 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200';
+
+  storeControls.appendChild(simulateLoadingBtn);
+  storeControls.appendChild(simulateErrorBtn);
+  storeControls.appendChild(resetStoreBtn);
+  controlsContainer.appendChild(storeControls);
+
+  // Create store state display
+  const storeStateDisplay = document.createElement('div');
+  storeStateDisplay.className = 'p-2 bg-gray-50 rounded text-sm font-mono';
+  controlsContainer.appendChild(storeStateDisplay);
+
+  element.appendChild(controlsContainer);
+
+  // Create sign in form
+  const form = document.createElement('form');
+  form.className = 'space-y-4';
+
+  const emailInput = document.createElement('input');
+  emailInput.type = 'email';
+  emailInput.placeholder = 'Email';
+  emailInput.className = 'w-full p-2 border rounded';
+
+  const passwordInput = document.createElement('input');
+  passwordInput.type = 'password';
+  passwordInput.placeholder = 'Password';
+  passwordInput.className = 'w-full p-2 border rounded';
+
+  const submitButton = document.createElement('button');
+  submitButton.type = 'submit';
+  submitButton.textContent = 'Sign In';
+  submitButton.className = 'w-full p-2 bg-blue-500 text-white rounded';
+
+  form.appendChild(emailInput);
+  form.appendChild(passwordInput);
+  form.appendChild(submitButton);
+  element.appendChild(form);
+
+  let signIn: SignInResource & {
+    store: StoreApi<{ fetchStatus: string; error: any }>;
+    signInStore: StoreApi<{ status: string }>;
+  };
+
+  let unsubscribeFetch: (() => void) | undefined;
+  let unsubscribeStatus: (() => void) | undefined;
+  let isInitialized = false;
+
+  // Initialize SignIn instance
+  const initializeSignIn = async () => {
+    try {
+      // Show loading state
+      statusContainer.innerHTML = `
+        <div class="text-blue-500">
+          <strong>Status:</strong> Initializing...
+        </div>
+      `;
+
+      // Wait for Clerk to be loaded and client to be ready
+      const waitForClerk = async () => {
+        if (!Clerk.loaded) {
+          await new Promise<void>(resolve => {
+            const checkLoaded = () => {
+              if (Clerk.loaded) {
+                resolve();
+              } else {
+                setTimeout(checkLoaded, 100);
+              }
+            };
+            checkLoaded();
+          });
+        }
+
+        // Wait for client to be ready
+        if (!Clerk.client) {
+          await new Promise<void>(resolve => {
+            const checkClient = () => {
+              if (Clerk.client) {
+                resolve();
+              } else {
+                setTimeout(checkClient, 100);
+              }
+            };
+            checkClient();
+          });
+        }
+      };
+
+      await waitForClerk();
+
+      // Create a temporary store for demonstration
+      const tempStore = {
+        fetchStatus: 'idle',
+        error: null,
+        status: '',
+      };
+
+      // Create store manipulation functions
+      const updateStore = (newState: Partial<typeof tempStore>) => {
+        Object.assign(tempStore, newState);
+        updateStatus();
+      };
+
+      // Handle store control buttons
+      simulateLoadingBtn.addEventListener('click', () => {
+        updateStore({ fetchStatus: 'loading', error: null });
+      });
+
+      simulateErrorBtn.addEventListener('click', () => {
+        updateStore({
+          fetchStatus: 'error',
+          error: new Error('Simulated error'),
+        });
+      });
+
+      resetStoreBtn.addEventListener('click', () => {
+        updateStore({
+          fetchStatus: 'idle',
+          error: null,
+          status: '',
+        });
+      });
+
+      // Subscribe to store updates
+      const updateStatus = () => {
+        const fetchStatus = tempStore.fetchStatus;
+        const error = tempStore.error;
+        const status = tempStore.status;
+
+        // Update status container with animation
+        statusContainer.innerHTML = `
+          <div class="space-y-2 transition-all duration-300">
+            <div class="flex items-center gap-2">
+              <strong>Fetch Status:</strong>
+              <span class="px-2 py-0.5 rounded text-sm ${
+                fetchStatus === 'loading'
+                  ? 'bg-blue-100 text-blue-700'
+                  : fetchStatus === 'error'
+                    ? 'bg-red-100 text-red-700'
+                    : 'bg-green-100 text-green-700'
+              }">${fetchStatus}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <strong>Sign In Status:</strong>
+              <span class="px-2 py-0.5 rounded text-sm ${
+                status === 'needs_first_factor'
+                  ? 'bg-yellow-100 text-yellow-700'
+                  : status === 'complete'
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-gray-100 text-gray-700'
+              }">${status || 'null'}</span>
+            </div>
+            ${error ? `<div class="text-red-500"><strong>Error:</strong> ${error.message}</div>` : ''}
+          </div>
+        `;
+
+        // Update store state display
+        storeStateDisplay.innerHTML = `
+          <div class="space-y-1">
+            <div>Store State:</div>
+            <pre class="whitespace-pre-wrap">${JSON.stringify(
+              {
+                fetchStatus,
+                status,
+                error: error ? error.message : null,
+              },
+              null,
+              2,
+            )}</pre>
+          </div>
+        `;
+      };
+
+      // Enable buttons
+      simulateLoadingBtn.disabled = false;
+      simulateErrorBtn.disabled = false;
+      resetStoreBtn.disabled = false;
+
+      isInitialized = true;
+
+      // Initial update
+      updateStatus();
+
+      // Update status to show initialization complete
+      statusContainer.innerHTML = `
+        <div class="text-green-500">
+          <strong>Status:</strong> Ready to sign in
+        </div>
+      `;
+    } catch (error) {
+      console.error('Failed to initialize:', error);
+      statusContainer.innerHTML = `
+        <div class="text-red-500">
+          <strong>Error:</strong> ${error instanceof Error ? error.message : 'Failed to initialize'}
+        </div>
+      `;
+      isInitialized = false;
+    }
+  };
+
+  // Handle form submission
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+
+    try {
+      if (!isInitialized || !Clerk.client) {
+        throw new Error('System not initialized. Please wait...');
+      }
+
+      // Show loading state
+      statusContainer.innerHTML = `
+        <div class="text-blue-500">
+          <strong>Status:</strong> Processing sign in...
+        </div>
+      `;
+
+      // Create SignIn instance with the provided email
+      signIn = (await Clerk.client.signIn.create({
+        identifier: emailInput.value,
+        strategy: 'email_code',
+      })) as SignInResource & {
+        store: StoreApi<{ fetchStatus: string; error: any }>;
+        signInStore: StoreApi<{ status: string }>;
+      };
+
+      if (!signIn) {
+        throw new Error('Failed to create SignIn instance');
+      }
+
+      // Subscribe to store changes
+      unsubscribeFetch = signIn.store.subscribe(updateStatus);
+      unsubscribeStatus = signIn.signInStore.subscribe(updateStatus);
+
+      // Initial update
+      updateStatus();
+
+      await signIn.prepareFirstFactor({
+        strategy: 'email_code',
+        emailAddressId: emailInput.value,
+      });
+
+      await signIn.attemptFirstFactor({
+        strategy: 'email_code',
+        code: passwordInput.value,
+      });
+    } catch (error) {
+      console.error('Sign in error:', error);
+      statusContainer.innerHTML = `
+        <div class="text-red-500">
+          <strong>Error:</strong> ${error instanceof Error ? error.message : 'An error occurred'}
+        </div>
+      `;
+    }
+  });
+
+  // Initialize on mount
+  void initializeSignIn();
+
+  // Cleanup function
+  return () => {
+    unsubscribeFetch?.();
+    unsubscribeStatus?.();
+  };
+}
+
 void (async () => {
   assertClerkIsLoaded(Clerk);
   fillLocalizationSelect();
@@ -333,6 +628,22 @@ void (async () => {
     '/open-sign-up': () => {
       mountOpenSignUpButton(app, componentControls.signUp.getProps() ?? {});
     },
+    '/sign-in-observable': async () => {
+      // Wait for Clerk to be fully loaded before mounting the component
+      if (!Clerk.loaded) {
+        await new Promise<void>(resolve => {
+          const checkLoaded = () => {
+            if (Clerk.loaded) {
+              resolve();
+            } else {
+              setTimeout(checkLoaded, 100);
+            }
+          };
+          checkLoaded();
+        });
+      }
+      mountSignInObservable(app);
+    },
   };
 
   const route = window.location.pathname as keyof typeof routes;
@@ -344,7 +655,7 @@ void (async () => {
       signInUrl: '/sign-in',
       signUpUrl: '/sign-up',
     });
-    renderCurrentRoute();
+    await renderCurrentRoute();
     updateVariables();
     updateOtherOptions();
   } else {
