@@ -104,6 +104,11 @@ type MachineObjectExtendedProperties<TAuthenticated extends boolean> = {
 
 /**
  * @internal
+ *
+ * Uses `T extends any` to create a distributive conditional type.
+ * This ensures that union types like `'api_key' | 'oauth_token'` are processed
+ * individually, creating proper discriminated unions where each token type
+ * gets its own distinct properties (e.g., oauth_token won't have claims).
  */
 export type AuthenticatedMachineObject<T extends MachineTokenType = MachineTokenType> = T extends any
   ? {
@@ -119,6 +124,11 @@ export type AuthenticatedMachineObject<T extends MachineTokenType = MachineToken
 
 /**
  * @internal
+ *
+ * Uses `T extends any` to create a distributive conditional type.
+ * This ensures that union types like `'api_key' | 'oauth_token'` are processed
+ * individually, creating proper discriminated unions where each token type
+ * gets its own distinct properties (e.g., oauth_token won't have claims).
  */
 export type UnauthenticatedMachineObject<T extends MachineTokenType = MachineTokenType> = T extends any
   ? {
