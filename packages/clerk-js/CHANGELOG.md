@@ -1,5 +1,18 @@
 # Change Log
 
+## 5.68.1
+
+### Patch Changes
+
+- Add payment history tab to UserProfile and OrgProfile ([#6075](https://github.com/clerk/javascript/pull/6075)) by [@aeliox](https://github.com/aeliox)
+
+- Fix Stripe Elements error handling ([#6074](https://github.com/clerk/javascript/pull/6074)) by [@aeliox](https://github.com/aeliox)
+
+- Updated dependencies [[`19e9e11`](https://github.com/clerk/javascript/commit/19e9e11af04f13fd12975fbf7016fe0583202056)]:
+  - @clerk/localizations@3.16.5
+  - @clerk/types@4.60.1
+  - @clerk/shared@3.9.7
+
 ## 5.68.0
 
 ### Minor Changes

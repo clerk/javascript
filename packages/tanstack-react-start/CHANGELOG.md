@@ -1,5 +1,43 @@
 # @clerk/tanstack-react-start
 
+## 0.17.0
+
+### Minor Changes
+
+- Introduces machine authentication, supporting four token types: `api_key`, `oauth_token`, `machine_token`, and `session_token`. For backwards compatibility, `session_token` remains the default when no token type is specified. This enables machine-to-machine authentication and use cases such as API keys and OAuth integrations. Existing applications continue to work without modification. ([#6067](https://github.com/clerk/javascript/pull/6067)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  You can specify which token types are allowed by using the `acceptsToken` option in the `getAuth()` function. This option can be set to a specific type, an array of types, or `'any'` to accept all supported tokens.
+
+  Example usage:
+
+  ```ts
+  import { createServerFn } from '@tanstack/react-start';
+  import { getAuth } from '@clerk/tanstack-react-start/server';
+  import { getWebRequest } from '@tanstack/react-start/server';
+
+  const authStateFn = createServerFn({ method: 'GET' }).handler(async () => {
+    const request = getWebRequest();
+    const auth = await getAuth(request, { acceptsToken: 'any' });
+
+    if (authObject.tokenType === 'session_token') {
+      console.log('this is session token from a user');
+    } else {
+      console.log('this is some other type of machine token');
+      console.log('more specifically, a ' + authObject.tokenType);
+    }
+
+    return {};
+  });
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`19e9e11`](https://github.com/clerk/javascript/commit/19e9e11af04f13fd12975fbf7016fe0583202056), [`2148166`](https://github.com/clerk/javascript/commit/214816654850272297056eebad3d846b7f8125c9), [`183e382`](https://github.com/clerk/javascript/commit/183e3823e4ff70e856b00a347369c38a4264105a)]:
+  - @clerk/types@4.60.1
+  - @clerk/backend@2.0.1
+  - @clerk/clerk-react@5.31.10
+  - @clerk/shared@3.9.7
+
 ## 0.16.0
 
 ### Minor Changes

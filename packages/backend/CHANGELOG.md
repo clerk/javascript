@@ -1,5 +1,17 @@
 # Change Log
 
+## 2.0.1
+
+### Patch Changes
+
+- Re-organize internal types for the recently added "machine authentication" feature. ([#6067](https://github.com/clerk/javascript/pull/6067)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Resolve machine token property mixing in discriminated unions ([#6079](https://github.com/clerk/javascript/pull/6079)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`19e9e11`](https://github.com/clerk/javascript/commit/19e9e11af04f13fd12975fbf7016fe0583202056)]:
+  - @clerk/types@4.60.1
+  - @clerk/shared@3.9.7
+
 ## 2.0.0
 
 ### Major Changes
