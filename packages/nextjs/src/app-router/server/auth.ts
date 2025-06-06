@@ -1,11 +1,11 @@
 import type { AuthObject } from '@clerk/backend';
 import type {
-  AuthenticatedMachineObject,
   AuthenticateRequestOptions,
+  InferAuthObjectFromToken,
+  InferAuthObjectFromTokenArray,
+  MachineAuthObject,
   RedirectFun,
-  SignedInAuthObject,
-  SignedOutAuthObject,
-  UnauthenticatedMachineObject,
+  SessionAuthObject,
 } from '@clerk/backend/internal';
 import { constants, createClerkRequest, createRedirect, TokenType } from '@clerk/backend/internal';
 import type { PendingSessionOptions } from '@clerk/types';
@@ -18,7 +18,6 @@ import { getAuthKeyFromRequest, getHeader } from '../../server/headers-utils';
 import { unauthorized } from '../../server/nextErrors';
 import type { AuthProtect } from '../../server/protect';
 import { createProtect } from '../../server/protect';
-import type { InferAuthObjectFromToken, InferAuthObjectFromTokenArray } from '../../server/types';
 import { decryptClerkRequestData } from '../../server/utils';
 import { isNextWithUnstableServerActions } from '../../utils/sdk-versions';
 import { buildRequestLike } from './utils';
@@ -26,7 +25,7 @@ import { buildRequestLike } from './utils';
 /**
  * `Auth` object of the currently active user and the `redirectToSignIn()` method.
  */
-type SessionAuth<TRedirect> = (SignedInAuthObject | SignedOutAuthObject) & {
+type SessionAuthWithRedirect<TRedirect> = SessionAuthObject & {
   /**
    * The `auth()` helper returns the `redirectToSignIn()` method, which you can use to redirect the user to the sign-in page.
    *
@@ -48,10 +47,6 @@ type SessionAuth<TRedirect> = (SignedInAuthObject | SignedOutAuthObject) & {
   redirectToSignUp: RedirectFun<TRedirect>;
 };
 
-type MachineAuth<T extends TokenType> = (AuthenticatedMachineObject | UnauthenticatedMachineObject) & {
-  tokenType: T;
-};
-
 export type AuthOptions = PendingSessionOptions & { acceptsToken?: AuthenticateRequestOptions['acceptsToken'] };
 
 export interface AuthFn<TRedirect = ReturnType<typeof redirect>> {
@@ -61,7 +56,7 @@ export interface AuthFn<TRedirect = ReturnType<typeof redirect>> {
    */
   <T extends TokenType[]>(
     options: AuthOptions & { acceptsToken: T },
-  ): Promise<InferAuthObjectFromTokenArray<T, SessionAuth<TRedirect>, MachineAuth<T[number]>>>;
+  ): Promise<InferAuthObjectFromTokenArray<T, SessionAuthWithRedirect<TRedirect>, MachineAuthObject<T[number]>>>;
 
   /**
    * @example
@@ -69,7 +64,7 @@ export interface AuthFn<TRedirect = ReturnType<typeof redirect>> {
    */
   <T extends TokenType>(
     options: AuthOptions & { acceptsToken: T },
-  ): Promise<InferAuthObjectFromToken<T, SessionAuth<TRedirect>, MachineAuth<T>>>;
+  ): Promise<InferAuthObjectFromToken<T, SessionAuthWithRedirect<TRedirect>, MachineAuthObject<T>>>;
 
   /**
    * @example
@@ -81,7 +76,7 @@ export interface AuthFn<TRedirect = ReturnType<typeof redirect>> {
    * @example
    * const authObject = await auth()
    */
-  (options?: PendingSessionOptions): Promise<SessionAuth<TRedirect>>;
+  (options?: PendingSessionOptions): Promise<SessionAuthWithRedirect<TRedirect>>;
 
   /**
    * `auth` includes a single property, the `protect()` method, which you can use in two ways:
