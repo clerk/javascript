@@ -177,7 +177,10 @@ export type InferAuthObjectFromToken<
 > = T extends SessionTokenType ? SessionType : MachineType & { tokenType: Exclude<T, SessionTokenType> };
 
 export type SessionAuthObject = SignedInAuthObject | SignedOutAuthObject;
-export type MachineAuthObject<T extends TokenType> = (AuthenticatedMachineObject | UnauthenticatedMachineObject) & {
+export type MachineAuthObject<T extends Exclude<TokenType, SessionTokenType>> = (
+  | AuthenticatedMachineObject
+  | UnauthenticatedMachineObject
+) & {
   tokenType: Exclude<T, SessionTokenType>;
 };
 
