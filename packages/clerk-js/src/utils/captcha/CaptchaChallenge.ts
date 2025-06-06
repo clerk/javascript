@@ -62,9 +62,9 @@ export class CaptchaChallenge {
       return opts?.action === 'verify' ? { ...captchaResult, captchaAction: 'verify' } : captchaResult;
     }
 
-    // if captcha action is signup, we return an empty object, because it means that the bot protection is disabled
+    // if captcha action is signup, we return undefined, because it means that the bot protection is disabled
     // and the user should be able to sign up without solving a captcha
-    return opts?.action === 'verify' ? { captchaError: 'captcha_unavailable', captchaAction: opts?.action } : {};
+    return opts?.action === 'verify' ? { captchaError: 'captcha_unavailable', captchaAction: opts?.action } : undefined;
   }
 
   /**
