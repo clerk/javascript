@@ -121,10 +121,7 @@ describe('Session', () => {
           }),
         },
       ]);
-      expect(dispatchSpy.mock.calls[1]).toEqual([
-        'session:tokenResolved',
-        null,
-      ]);
+      expect(dispatchSpy.mock.calls[1]).toEqual(['session:tokenResolved', null]);
     });
 
     it('does not dispatch token:update if template is provided', async () => {

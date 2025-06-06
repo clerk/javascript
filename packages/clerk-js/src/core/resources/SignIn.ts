@@ -90,6 +90,7 @@ export class SignIn extends BaseResource implements SignInResource {
 
   id?: string;
   status: SignInStatus | null = null;
+  signInError: { global: string | null; fields: Record<string, string> } = { global: null, fields: {} };
   supportedIdentifiers: SignInIdentifier[] = [];
   supportedFirstFactors: SignInFirstFactor[] | null = [];
   supportedSecondFactors: SignInSecondFactor[] | null = null;
@@ -110,11 +111,26 @@ export class SignIn extends BaseResource implements SignInResource {
     this.fromJSON(data);
   }
 
-  create = (params: SignInCreateParams): Promise<this> => {
-    return this._basePost({
-      path: this.pathRoot,
-      body: params,
-    });
+  private updateError(globalError: string | null, fieldErrors: Record<string, string> = {}) {
+    this.signInError = { global: globalError, fields: fieldErrors };
+  }
+
+  private updateStatus(newStatus: SignInStatus | null) {
+    this.status = newStatus;
+  }
+
+  create = async (params: SignInCreateParams): Promise<SignInResource> => {
+    try {
+      const result = await this._basePost({
+        path: this.pathRoot,
+        body: params,
+      });
+      this.updateStatus(result.status);
+      return result;
+    } catch (error) {
+      this.updateError(error.message);
+      throw error;
+    }
   };
 
   resetPassword = (params: ResetPasswordParams): Promise<SignInResource> => {
@@ -184,24 +200,32 @@ export class SignIn extends BaseResource implements SignInResource {
   };
 
   attemptFirstFactor = async (attemptFactor: AttemptFirstFactorParams): Promise<SignInResource> => {
-    let config;
-    switch (attemptFactor.strategy) {
-      case 'passkey':
-        config = {
-          publicKeyCredential: JSON.stringify(serializePublicKeyCredentialAssertion(attemptFactor.publicKeyCredential)),
-        };
-        break;
-      default:
-        config = { ...attemptFactor };
+    try {
+      let config;
+      switch (attemptFactor.strategy) {
+        case 'passkey':
+          config = {
+            publicKeyCredential: JSON.stringify(
+              serializePublicKeyCredentialAssertion(attemptFactor.publicKeyCredential),
+            ),
+          };
+          break;
+        default:
+          config = { ...attemptFactor };
+      }
+
+      const result = await this._basePost({
+        body: { ...config, strategy: attemptFactor.strategy },
+        action: 'attempt_first_factor',
+      });
+
+      this.updateStatus(result.status);
+      this.signInStore.getState().setStatus(result.status);
+      return result;
+    } catch (error) {
+      this.updateError(error.message);
+      throw error;
     }
-
-    const result = await this._basePost({
-      body: { ...config, strategy: attemptFactor.strategy },
-      action: 'attempt_first_factor',
-    });
-
-    this.signInStore.getState().setStatus(result.status);
-    return result;
   };
 
   createEmailLinkFlow = (): CreateEmailLinkFlowReturn<SignInStartEmailLinkFlowParams, SignInResource> => {
