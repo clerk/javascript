@@ -1,5 +1,19 @@
 # Change Log
 
+## 6.21.1
+
+### Patch Changes
+
+- Re-organize internal types for the recently added "machine authentication" feature. ([#6067](https://github.com/clerk/javascript/pull/6067)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Resolve machine token property mixing in discriminated unions ([#6079](https://github.com/clerk/javascript/pull/6079)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`19e9e11`](https://github.com/clerk/javascript/commit/19e9e11af04f13fd12975fbf7016fe0583202056), [`2148166`](https://github.com/clerk/javascript/commit/214816654850272297056eebad3d846b7f8125c9), [`183e382`](https://github.com/clerk/javascript/commit/183e3823e4ff70e856b00a347369c38a4264105a)]:
+  - @clerk/types@4.60.1
+  - @clerk/backend@2.0.1
+  - @clerk/clerk-react@5.31.10
+  - @clerk/shared@3.9.7
+
 ## 6.21.0
 
 ### Minor Changes

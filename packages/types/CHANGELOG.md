@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.60.1
+
+### Patch Changes
+
+- Add payment history tab to UserProfile and OrgProfile ([#6075](https://github.com/clerk/javascript/pull/6075)) by [@aeliox](https://github.com/aeliox)
+
 ## 4.60.0
 
 ### Minor Changes
