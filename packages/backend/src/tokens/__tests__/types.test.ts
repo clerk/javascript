@@ -1,5 +1,6 @@
 import { expectTypeOf, test } from 'vitest';
 
+import type { AuthObject } from '../authObjects';
 import type { GetAuthFn, MachineAuthObject, SessionAuthObject } from '../types';
 
 test('infers the correct AuthObject type for each accepted token type', () => {
@@ -23,4 +24,7 @@ test('infers the correct AuthObject type for each accepted token type', () => {
   expectTypeOf(getAuth(request, { acceptsToken: ['session_token', 'oauth_token'] })).toEqualTypeOf<
     SessionAuthObject | MachineAuthObject<'oauth_token'>
   >();
+
+  // Any token type
+  expectTypeOf(getAuth(request, { acceptsToken: 'any' })).toEqualTypeOf<AuthObject>();
 });
