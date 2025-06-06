@@ -493,6 +493,7 @@ function mountSignInObservable(element: HTMLDivElement) {
   };
 
   // Handle form submission
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   form.addEventListener('submit', async e => {
     e.preventDefault();
 
@@ -523,7 +524,6 @@ function mountSignInObservable(element: HTMLDivElement) {
 
       // Subscribe to store changes
       unsubscribeFetch = signIn.store.subscribe(() => {
-        // @ts-expect-error - Clerk's store types don't match our strict types
         updateStatus({
           // @ts-expect-error - Clerk's store types don't match our strict types
           fetchStatus: signIn.store.getState().fetchStatus,
@@ -533,7 +533,6 @@ function mountSignInObservable(element: HTMLDivElement) {
       });
 
       unsubscribeStatus = signIn.signInStore.subscribe(() => {
-        // @ts-expect-error - Clerk's store types don't match our strict types
         updateStatus({
           // @ts-expect-error - Clerk's store types don't match our strict types
           fetchStatus: signIn.store.getState().fetchStatus,
@@ -543,7 +542,6 @@ function mountSignInObservable(element: HTMLDivElement) {
       });
 
       // Initial update
-      // @ts-expect-error - Clerk's store types don't match our strict types
       updateStatus({
         // @ts-expect-error - Clerk's store types don't match our strict types
         fetchStatus: signIn.store.getState().fetchStatus,

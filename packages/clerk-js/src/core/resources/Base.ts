@@ -2,16 +2,18 @@ import { isValidBrowserOnline } from '@clerk/shared/browser';
 import { isProductionFromPublishableKey } from '@clerk/shared/keys';
 import type { ClerkAPIErrorJSON, ClerkResourceJSON, ClerkResourceReloadParams, DeletedObjectJSON } from '@clerk/types';
 import type { StoreApi } from 'zustand';
-import { create } from 'zustand';
-import { devtools } from 'zustand/middleware';
 
 import { clerkMissingFapiClientInResources } from '../errors';
 import type { FapiClient, FapiRequestInit, FapiResponse, FapiResponseJSON, HTTPMethod } from '../fapiClient';
 import { FraudProtection } from '../fraudProtection';
 import type { Clerk } from './internal';
 import { ClerkAPIResponseError, ClerkRuntimeError, Client } from './internal';
+import { createResourceStore, type ResourceStore } from './state';
 
 export type BaseFetchOptions = ClerkResourceReloadParams & {
+  action?: string;
+  search?: URLSearchParams;
+  headers?: HeadersInit;
   forceUpdateClient?: boolean;
   fetchMaxTries?: number;
 };
@@ -47,43 +49,39 @@ function assertProductionKeysOnDev(statusCode: number, payloadErrors?: ClerkAPIE
   }
 }
 
-type ResourceUIState = {
-  fetchStatus: 'idle' | 'fetching';
-  // @ts-expect-error - ClerkAPIError type is not available
-  error: ClerkAPIError | null;
-  setFetchStatus: (status: 'idle' | 'fetching') => void;
-  // @ts-expect-error - ClerkAPIError type is not available
-  setError: (error: ClerkAPIError | null) => void;
-};
-
-const createResourceStore = () =>
-  create<ResourceUIState>()(
-    devtools(
-      set => ({
-        fetchStatus: 'idle',
-        // @ts-ignore - ClerkAPIError type is not available
-        error: null,
-        setFetchStatus: fetchStatus => set({ fetchStatus }),
-        // @ts-ignore - ClerkAPIError type is not available
-        setError: error => set({ error }),
-      }),
-      { name: 'ResourceStore' },
-    ),
-  );
-
 export abstract class BaseResource {
   static clerk: Clerk;
   id?: string;
-  pathRoot = '';
+  protected _pathRoot = '';
 
-  protected _store: StoreApi<ResourceUIState>;
+  protected _store: StoreApi<ResourceStore<this>>;
 
   constructor() {
-    this._store = createResourceStore();
+    this._store = createResourceStore<this>();
   }
 
   public get store() {
     return this._store;
+  }
+
+  public get pathRoot() {
+    return this._pathRoot;
+  }
+
+  public get isLoading(): boolean {
+    return this._store.getState().isLoading();
+  }
+
+  public get hasError(): boolean {
+    return this._store.getState().hasError();
+  }
+
+  public get error(): ClerkAPIErrorJSON | null {
+    return this._store.getState().getError();
+  }
+
+  public get data(): this | null {
+    return this._store.getState().getData();
   }
 
   static get fapiClient(): FapiClient {
@@ -224,43 +222,43 @@ export abstract class BaseResource {
   }
 
   protected async _baseGet<J extends ClerkResourceJSON | null>(opts: BaseFetchOptions = {}): Promise<this> {
-    this._store.getState().setFetchStatus('fetching');
-    this._store.getState().setError(null);
+    this._store.getState().dispatch({ type: 'FETCH_START' });
 
     try {
-      const json = await BaseResource._fetch<J>(
-        {
-          method: 'GET',
-          path: this.path(),
-          rotatingTokenNonce: opts.rotatingTokenNonce,
-        },
-        opts,
-      );
+      const { forceUpdateClient, fetchMaxTries, ...fetchOpts } = opts;
+      const json = await BaseResource._fetch<J>({
+        method: 'GET',
+        path: this.path(opts.action),
+        ...fetchOpts,
+      });
 
-      this._store.getState().setFetchStatus('idle');
-      return this.fromJSON((json?.response || json) as J);
+      const data = this.fromJSON((json?.response || json) as J);
+      this._store.getState().dispatch({ type: 'FETCH_SUCCESS', data });
+      return data;
     } catch (error) {
-      this._store.getState().setFetchStatus('idle');
-      // @ts-expect-error - ClerkAPIError type is not available
-      this._store.getState().setError(error as ClerkAPIError);
+      this._store.getState().dispatch({
+        type: 'FETCH_ERROR',
+        error: error as ClerkAPIErrorJSON,
+      });
       throw error;
     }
   }
 
   protected async _baseMutate<J extends ClerkResourceJSON | null>(params: BaseMutateParams): Promise<this> {
-    this._store.getState().setFetchStatus('fetching');
-    this._store.getState().setError(null);
+    this._store.getState().dispatch({ type: 'FETCH_START' });
 
     try {
       const { action, body, method, path } = params;
       const json = await BaseResource._fetch<J>({ method, path: path || this.path(action), body });
 
-      this._store.getState().setFetchStatus('idle');
-      return this.fromJSON((json?.response || json) as J);
+      const data = this.fromJSON((json?.response || json) as J);
+      this._store.getState().dispatch({ type: 'FETCH_SUCCESS', data });
+      return data;
     } catch (error) {
-      this._store.getState().setFetchStatus('idle');
-      // @ts-expect-error - ClerkAPIError type is not available
-      this._store.getState().setError(error as ClerkAPIError);
+      this._store.getState().dispatch({
+        type: 'FETCH_ERROR',
+        error: error as ClerkAPIErrorJSON,
+      });
       throw error;
     }
   }
@@ -294,5 +292,9 @@ export abstract class BaseResource {
   private static shouldRethrowOfflineNetworkErrors(): boolean {
     const experimental = BaseResource.clerk?.__internal_getOption?.('experimental');
     return experimental?.rethrowOfflineNetworkErrors || false;
+  }
+
+  public reset(): void {
+    this._store.getState().dispatch({ type: 'RESET' });
   }
 }
