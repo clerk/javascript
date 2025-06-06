@@ -335,6 +335,61 @@ function mountSignInObservable(element: HTMLDivElement) {
   let unsubscribeStatus: (() => void) | undefined;
   let isInitialized = false;
 
+  // Define the store state type
+  type StoreState = {
+    fetchStatus: 'idle' | 'loading' | 'error';
+    error: Error | null;
+    status: string;
+  };
+
+  // Create updateStatus function in the outer scope
+  const updateStatus = (state: StoreState) => {
+    const { fetchStatus, error, status } = state;
+
+    // Update status container with animation
+    statusContainer.innerHTML = `
+      <div class="space-y-2 transition-all duration-300">
+        <div class="flex items-center gap-2">
+          <strong>Fetch Status:</strong>
+          <span class="px-2 py-0.5 rounded text-sm ${
+            fetchStatus === 'loading'
+              ? 'bg-blue-100 text-blue-700'
+              : fetchStatus === 'error'
+                ? 'bg-red-100 text-red-700'
+                : 'bg-green-100 text-green-700'
+          }">${fetchStatus}</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <strong>Sign In Status:</strong>
+          <span class="px-2 py-0.5 rounded text-sm ${
+            status === 'needs_first_factor'
+              ? 'bg-yellow-100 text-yellow-700'
+              : status === 'complete'
+                ? 'bg-green-100 text-green-700'
+                : 'bg-gray-100 text-gray-700'
+          }">${status || 'null'}</span>
+        </div>
+        ${error ? `<div class="text-red-500"><strong>Error:</strong> ${error.message}</div>` : ''}
+      </div>
+    `;
+
+    // Update store state display
+    storeStateDisplay.innerHTML = `
+      <div class="space-y-1">
+        <div>Store State:</div>
+        <pre class="whitespace-pre-wrap">${JSON.stringify(
+          {
+            fetchStatus,
+            status,
+            error: error ? error.message : null,
+          },
+          null,
+          2,
+        )}</pre>
+      </div>
+    `;
+  };
+
   // Initialize SignIn instance
   const initializeSignIn = async () => {
     try {
@@ -378,16 +433,16 @@ function mountSignInObservable(element: HTMLDivElement) {
       await waitForClerk();
 
       // Create a temporary store for demonstration
-      const tempStore = {
+      const tempStore: StoreState = {
         fetchStatus: 'idle',
         error: null,
         status: '',
       };
 
       // Create store manipulation functions
-      const updateStore = (newState: Partial<typeof tempStore>) => {
+      const updateStore = (newState: Partial<StoreState>) => {
         Object.assign(tempStore, newState);
-        updateStatus();
+        updateStatus(tempStore);
       };
 
       // Handle store control buttons
@@ -410,56 +465,6 @@ function mountSignInObservable(element: HTMLDivElement) {
         });
       });
 
-      // Subscribe to store updates
-      const updateStatus = () => {
-        const fetchStatus = tempStore.fetchStatus;
-        const error = tempStore.error;
-        const status = tempStore.status;
-
-        // Update status container with animation
-        statusContainer.innerHTML = `
-          <div class="space-y-2 transition-all duration-300">
-            <div class="flex items-center gap-2">
-              <strong>Fetch Status:</strong>
-              <span class="px-2 py-0.5 rounded text-sm ${
-                fetchStatus === 'loading'
-                  ? 'bg-blue-100 text-blue-700'
-                  : fetchStatus === 'error'
-                    ? 'bg-red-100 text-red-700'
-                    : 'bg-green-100 text-green-700'
-              }">${fetchStatus}</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <strong>Sign In Status:</strong>
-              <span class="px-2 py-0.5 rounded text-sm ${
-                status === 'needs_first_factor'
-                  ? 'bg-yellow-100 text-yellow-700'
-                  : status === 'complete'
-                    ? 'bg-green-100 text-green-700'
-                    : 'bg-gray-100 text-gray-700'
-              }">${status || 'null'}</span>
-            </div>
-            ${error ? `<div class="text-red-500"><strong>Error:</strong> ${error.message}</div>` : ''}
-          </div>
-        `;
-
-        // Update store state display
-        storeStateDisplay.innerHTML = `
-          <div class="space-y-1">
-            <div>Store State:</div>
-            <pre class="whitespace-pre-wrap">${JSON.stringify(
-              {
-                fetchStatus,
-                status,
-                error: error ? error.message : null,
-              },
-              null,
-              2,
-            )}</pre>
-          </div>
-        `;
-      };
-
       // Enable buttons
       simulateLoadingBtn.disabled = false;
       simulateErrorBtn.disabled = false;
@@ -468,7 +473,7 @@ function mountSignInObservable(element: HTMLDivElement) {
       isInitialized = true;
 
       // Initial update
-      updateStatus();
+      updateStatus(tempStore);
 
       // Update status to show initialization complete
       statusContainer.innerHTML = `
@@ -517,11 +522,34 @@ function mountSignInObservable(element: HTMLDivElement) {
       }
 
       // Subscribe to store changes
-      unsubscribeFetch = signIn.store.subscribe(updateStatus);
-      unsubscribeStatus = signIn.signInStore.subscribe(updateStatus);
+      unsubscribeFetch = signIn.store.subscribe(() => {
+        // @ts-expect-error - Clerk's store types don't match our strict types
+        updateStatus({
+          // @ts-expect-error - Clerk's store types don't match our strict types
+          fetchStatus: signIn.store.getState().fetchStatus,
+          error: signIn.store.getState().error,
+          status: signIn.signInStore.getState().status,
+        });
+      });
+
+      unsubscribeStatus = signIn.signInStore.subscribe(() => {
+        // @ts-expect-error - Clerk's store types don't match our strict types
+        updateStatus({
+          // @ts-expect-error - Clerk's store types don't match our strict types
+          fetchStatus: signIn.store.getState().fetchStatus,
+          error: signIn.store.getState().error,
+          status: signIn.signInStore.getState().status,
+        });
+      });
 
       // Initial update
-      updateStatus();
+      // @ts-expect-error - Clerk's store types don't match our strict types
+      updateStatus({
+        // @ts-expect-error - Clerk's store types don't match our strict types
+        fetchStatus: signIn.store.getState().fetchStatus,
+        error: signIn.store.getState().error,
+        status: signIn.signInStore.getState().status,
+      });
 
       await signIn.prepareFirstFactor({
         strategy: 'email_code',

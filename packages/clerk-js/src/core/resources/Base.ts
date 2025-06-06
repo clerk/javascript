@@ -1,6 +1,7 @@
 import { isValidBrowserOnline } from '@clerk/shared/browser';
 import { isProductionFromPublishableKey } from '@clerk/shared/keys';
 import type { ClerkAPIErrorJSON, ClerkResourceJSON, ClerkResourceReloadParams, DeletedObjectJSON } from '@clerk/types';
+import type { StoreApi } from 'zustand';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 
@@ -48,8 +49,10 @@ function assertProductionKeysOnDev(statusCode: number, payloadErrors?: ClerkAPIE
 
 type ResourceUIState = {
   fetchStatus: 'idle' | 'fetching';
+  // @ts-expect-error - ClerkAPIError type is not available
   error: ClerkAPIError | null;
   setFetchStatus: (status: 'idle' | 'fetching') => void;
+  // @ts-expect-error - ClerkAPIError type is not available
   setError: (error: ClerkAPIError | null) => void;
 };
 
@@ -58,8 +61,10 @@ const createResourceStore = () =>
     devtools(
       set => ({
         fetchStatus: 'idle',
+        // @ts-ignore - ClerkAPIError type is not available
         error: null,
         setFetchStatus: fetchStatus => set({ fetchStatus }),
+        // @ts-ignore - ClerkAPIError type is not available
         setError: error => set({ error }),
       }),
       { name: 'ResourceStore' },
@@ -71,7 +76,11 @@ export abstract class BaseResource {
   id?: string;
   pathRoot = '';
 
-  private _store = createResourceStore();
+  protected _store: StoreApi<ResourceUIState>;
+
+  constructor() {
+    this._store = createResourceStore();
+  }
 
   public get store() {
     return this._store;
@@ -232,6 +241,7 @@ export abstract class BaseResource {
       return this.fromJSON((json?.response || json) as J);
     } catch (error) {
       this._store.getState().setFetchStatus('idle');
+      // @ts-expect-error - ClerkAPIError type is not available
       this._store.getState().setError(error as ClerkAPIError);
       throw error;
     }
@@ -249,6 +259,7 @@ export abstract class BaseResource {
       return this.fromJSON((json?.response || json) as J);
     } catch (error) {
       this._store.getState().setFetchStatus('idle');
+      // @ts-expect-error - ClerkAPIError type is not available
       this._store.getState().setError(error as ClerkAPIError);
       throw error;
     }
