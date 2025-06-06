@@ -277,6 +277,7 @@ exports[`Environment defaults values when instantiated without arguments 1`] = `
 Environment {
   "authConfig": AuthConfig {
     "claimedAt": null,
+    "id": undefined,
     "pathRoot": "",
     "preferredChannels": null,
     "reverification": false,
@@ -289,6 +290,7 @@ Environment {
       "hasPaidUserPlans": false,
       "stripePublishableKey": "",
     },
+    "id": undefined,
     "pathRoot": "",
   },
   "displayConfig": DisplayConfig {
@@ -305,6 +307,7 @@ Environment {
     "backendHost": "",
     "branded": false,
     "captchaHeartbeat": false,
+    "captchaHeartbeatIntervalMs": undefined,
     "captchaOauthBypass": [
       "oauth_google",
       "oauth_microsoft",
@@ -314,8 +317,11 @@ Environment {
     "captchaPublicKey": null,
     "captchaPublicKeyInvisible": null,
     "captchaWidgetType": null,
+    "clerkJSVersion": undefined,
     "createOrganizationUrl": "",
+    "experimental__forceOauthFirst": undefined,
     "faviconImageUrl": "",
+    "googleOneTapClientId": undefined,
     "homeUrl": "",
     "id": "",
     "instanceEnvironmentType": "",
@@ -333,6 +339,7 @@ Environment {
     "userProfileUrl": "",
     "waitlistUrl": "",
   },
+  "id": undefined,
   "isDevelopmentOrStaging": [Function],
   "isProduction": [Function],
   "isSingleSession": [Function],
@@ -348,6 +355,8 @@ Environment {
       "enrollmentModes": [],
     },
     "enabled": false,
+    "forceOrganizationSelection": undefined,
+    "id": undefined,
     "maxAllowedMemberships": 1,
     "pathRoot": "",
   },
@@ -509,6 +518,7 @@ exports[`Environment has the same initial properties 1`] = `
 Environment {
   "authConfig": AuthConfig {
     "claimedAt": null,
+    "id": undefined,
     "pathRoot": "",
     "preferredChannels": null,
     "reverification": true,
@@ -521,6 +531,7 @@ Environment {
       "hasPaidUserPlans": false,
       "stripePublishableKey": "",
     },
+    "id": undefined,
     "pathRoot": "",
   },
   "displayConfig": DisplayConfig {
@@ -545,6 +556,7 @@ Environment {
     "captchaWidgetType": null,
     "clerkJSVersion": "5",
     "createOrganizationUrl": "",
+    "experimental__forceOauthFirst": undefined,
     "faviconImageUrl": "",
     "googleOneTapClientId": undefined,
     "homeUrl": "",
@@ -583,6 +595,7 @@ Environment {
     "userProfileUrl": "",
     "waitlistUrl": "",
   },
+  "id": undefined,
   "isDevelopmentOrStaging": [Function],
   "isProduction": [Function],
   "isSingleSession": [Function],
@@ -599,6 +612,7 @@ Environment {
     },
     "enabled": false,
     "forceOrganizationSelection": false,
+    "id": undefined,
     "maxAllowedMemberships": 5,
     "pathRoot": "",
   },
