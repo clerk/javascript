@@ -1071,6 +1071,10 @@ export class Clerk implements ClerkInterface {
         );
       }
 
+      if (organization === null && this.environment?.organizationSettings?.forceOrganizationSelection) {
+        throw new Error('setActive requires an organization parameter when organization selection is forced.');
+      }
+
       const onBeforeSetActive: SetActiveHook =
         typeof window !== 'undefined' && typeof window.__unstable__onBeforeSetActive === 'function'
           ? window.__unstable__onBeforeSetActive
