@@ -25,7 +25,9 @@ describe('withClerkMiddleware(options)', () => {
   test('handles signin with Authorization Bearer', async () => {
     authenticateRequestMock.mockResolvedValueOnce({
       headers: new Headers(),
-      toAuth: () => 'mockedAuth',
+      toAuth: () => ({
+        tokenType: 'session_token',
+      }),
     });
     const fastify = Fastify();
     await fastify.register(clerkPlugin);
@@ -50,7 +52,7 @@ describe('withClerkMiddleware(options)', () => {
     });
 
     expect(response.statusCode).toEqual(200);
-    expect(response.body).toEqual(JSON.stringify({ auth: 'mockedAuth' }));
+    expect(response.body).toEqual(JSON.stringify({ auth: { tokenType: 'session_token' } }));
     expect(authenticateRequestMock).toBeCalledWith(
       expect.any(Request),
       expect.objectContaining({
@@ -62,7 +64,9 @@ describe('withClerkMiddleware(options)', () => {
   test('handles signin with cookie', async () => {
     authenticateRequestMock.mockResolvedValueOnce({
       headers: new Headers(),
-      toAuth: () => 'mockedAuth',
+      toAuth: () => ({
+        tokenType: 'session_token',
+      }),
     });
     const fastify = Fastify();
     await fastify.register(clerkPlugin);
@@ -87,7 +91,7 @@ describe('withClerkMiddleware(options)', () => {
     });
 
     expect(response.statusCode).toEqual(200);
-    expect(response.body).toEqual(JSON.stringify({ auth: 'mockedAuth' }));
+    expect(response.body).toEqual(JSON.stringify({ auth: { tokenType: 'session_token' } }));
     expect(authenticateRequestMock).toBeCalledWith(
       expect.any(Request),
       expect.objectContaining({
@@ -107,7 +111,9 @@ describe('withClerkMiddleware(options)', () => {
         'x-clerk-auth-reason': 'auth-reason',
         'x-clerk-auth-status': 'handshake',
       }),
-      toAuth: () => 'mockedAuth',
+      toAuth: () => ({
+        tokenType: 'session_token',
+      }),
     });
     const fastify = Fastify();
     await fastify.register(clerkPlugin);
@@ -137,7 +143,9 @@ describe('withClerkMiddleware(options)', () => {
   test('handles signout case by populating the req.auth', async () => {
     authenticateRequestMock.mockResolvedValueOnce({
       headers: new Headers(),
-      toAuth: () => 'mockedAuth',
+      toAuth: () => ({
+        tokenType: 'session_token',
+      }),
     });
     const fastify = Fastify();
     await fastify.register(clerkPlugin);
@@ -154,7 +162,7 @@ describe('withClerkMiddleware(options)', () => {
     });
 
     expect(response.statusCode).toEqual(200);
-    expect(response.body).toEqual(JSON.stringify({ auth: 'mockedAuth' }));
+    expect(response.body).toEqual(JSON.stringify({ auth: { tokenType: 'session_token' } }));
     expect(authenticateRequestMock).toBeCalledWith(
       expect.any(Request),
       expect.objectContaining({
