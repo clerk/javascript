@@ -51,6 +51,8 @@ export type FakeUser = {
   deleteIfExists: () => Promise<void>;
 };
 
+export type FakeUserWithEmail = FakeUser & { email: string };
+
 export type FakeOrganization = {
   name: string;
   organization: { id: string };
