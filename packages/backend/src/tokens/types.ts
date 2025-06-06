@@ -163,8 +163,8 @@ export type InferAuthObjectFromTokenArray<
 > = SessionTokenType extends T[number]
   ? T[number] extends SessionTokenType
     ? SessionType
-    : SessionType | (MachineType & { tokenType: T[number] })
-  : MachineType & { tokenType: T[number] };
+    : SessionType | (MachineType & { tokenType: Exclude<T[number], SessionTokenType> })
+  : MachineType & { tokenType: Exclude<T[number], SessionTokenType> };
 
 /**
  * Infers auth object type from a single token type.
@@ -174,11 +174,11 @@ export type InferAuthObjectFromToken<
   T extends TokenType,
   SessionType extends AuthObject,
   MachineType extends AuthObject,
-> = T extends SessionTokenType ? SessionType : MachineType & { tokenType: T };
+> = T extends SessionTokenType ? SessionType : MachineType & { tokenType: Exclude<T, SessionTokenType> };
 
 export type SessionAuthObject = SignedInAuthObject | SignedOutAuthObject;
 export type MachineAuthObject<T extends TokenType> = (AuthenticatedMachineObject | UnauthenticatedMachineObject) & {
-  tokenType: T;
+  tokenType: Exclude<T, SessionTokenType>;
 };
 
 type AuthOptions = PendingSessionOptions & { acceptsToken?: AuthenticateRequestOptions['acceptsToken'] };
