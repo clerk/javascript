@@ -21,7 +21,21 @@ describe('OrganizationDomain', () => {
       total_pending_suggestions: 0,
     });
 
-    expect(organization).toMatchSnapshot();
+    expect(organization).toMatchObject({
+      id: 'test_domain_id',
+      name: 'clerk.com',
+      organizationId: 'test_org_id',
+      enrollmentMode: 'manual_invitation',
+      affiliationEmailAddress: 'some@clerk.com',
+      totalPendingInvitations: 0,
+      totalPendingSuggestions: 0,
+      verification: {
+        attempts: 1,
+        expiresAt: expect.any(Date),
+        status: 'verified',
+        strategy: 'email_code',
+      },
+    });
   });
 
   it('has the same initial nullable properties', () => {
@@ -39,6 +53,15 @@ describe('OrganizationDomain', () => {
       total_pending_suggestions: 0,
     });
 
-    expect(organization).toMatchSnapshot();
+    expect(organization).toMatchObject({
+      id: 'test_domain_id',
+      name: 'clerk.com',
+      organizationId: 'test_org_id',
+      enrollmentMode: 'manual_invitation',
+      affiliationEmailAddress: null,
+      totalPendingInvitations: 0,
+      totalPendingSuggestions: 0,
+      verification: null,
+    });
   });
 });

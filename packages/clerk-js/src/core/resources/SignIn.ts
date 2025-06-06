@@ -86,7 +86,7 @@ const createSignInStore = () =>
   );
 
 export class SignIn extends BaseResource implements SignInResource {
-  protected _pathRoot = '/client/sign_ins';
+  pathRoot = '/client/sign_ins';
 
   id?: string;
   status: SignInStatus | null = null;
@@ -112,7 +112,7 @@ export class SignIn extends BaseResource implements SignInResource {
 
   create = (params: SignInCreateParams): Promise<this> => {
     return this._basePost({
-      path: this._pathRoot,
+      path: this.pathRoot,
       body: params,
     });
   };

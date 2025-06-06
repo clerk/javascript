@@ -52,7 +52,7 @@ function assertProductionKeysOnDev(statusCode: number, payloadErrors?: ClerkAPIE
 export abstract class BaseResource {
   static clerk: Clerk;
   id?: string;
-  protected _pathRoot = '';
+  pathRoot = '';
 
   protected _store: StoreApi<ResourceStore<this>>;
 
@@ -62,10 +62,6 @@ export abstract class BaseResource {
 
   public get store() {
     return this._store;
-  }
-
-  public get pathRoot() {
-    return this._pathRoot;
   }
 
   public get isLoading(): boolean {

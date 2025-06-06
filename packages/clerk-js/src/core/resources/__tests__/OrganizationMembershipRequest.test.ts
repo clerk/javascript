@@ -20,6 +20,19 @@ describe('OrganizationMembership', () => {
       },
     });
 
-    expect(organizationMembershipRequest).toMatchSnapshot();
+    expect(organizationMembershipRequest).toMatchObject({
+      id: 'test_id',
+      organizationId: 'test_org_id',
+      status: 'pending',
+      createdAt: expect.any(Date),
+      updatedAt: expect.any(Date),
+      publicUserData: expect.objectContaining({
+        firstName: 'test_first_name',
+        lastName: 'test_last_name',
+        hasImage: true,
+        identifier: 'test@identifier.gr',
+        imageUrl: 'https://clerk.com',
+      }),
+    });
   });
 });
