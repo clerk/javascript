@@ -163,8 +163,8 @@ export type InferAuthObjectFromTokenArray<
 > = SessionTokenType extends T[number]
   ? T[number] extends SessionTokenType
     ? SessionType
-    : SessionType | (MachineType & { tokenType: T[number] })
-  : MachineType & { tokenType: T[number] };
+    : SessionType | (MachineType & { tokenType: Exclude<T[number], SessionTokenType> })
+  : MachineType & { tokenType: Exclude<T[number], SessionTokenType> };
 
 /**
  * Infers auth object type from a single token type.
@@ -174,12 +174,12 @@ export type InferAuthObjectFromToken<
   T extends TokenType,
   SessionType extends AuthObject,
   MachineType extends AuthObject,
-> = T extends SessionTokenType ? SessionType : MachineType & { tokenType: T };
+> = T extends SessionTokenType ? SessionType : MachineType & { tokenType: Exclude<T, SessionTokenType> };
 
 export type SessionAuthObject = SignedInAuthObject | SignedOutAuthObject;
-export type MachineAuthObject<T extends TokenType> = (AuthenticatedMachineObject | UnauthenticatedMachineObject) & {
-  tokenType: T;
-};
+export type MachineAuthObject<T extends Exclude<TokenType, SessionTokenType>> = T extends any
+  ? AuthenticatedMachineObject<T> | UnauthenticatedMachineObject<T>
+  : never;
 
 type AuthOptions = PendingSessionOptions & { acceptsToken?: AuthenticateRequestOptions['acceptsToken'] };
 
@@ -199,7 +199,10 @@ export interface GetAuthFn<RequestType, ReturnsPromise extends boolean = false> 
   <T extends TokenType[]>(
     req: RequestType,
     options: AuthOptions & { acceptsToken: T },
-  ): MaybePromise<InferAuthObjectFromTokenArray<T, SessionAuthObject, MachineAuthObject<T[number]>>, ReturnsPromise>;
+  ): MaybePromise<
+    InferAuthObjectFromTokenArray<T, SessionAuthObject, MachineAuthObject<Exclude<T[number], SessionTokenType>>>,
+    ReturnsPromise
+  >;
 
   /**
    * @example
@@ -208,7 +211,10 @@ export interface GetAuthFn<RequestType, ReturnsPromise extends boolean = false> 
   <T extends TokenType>(
     req: RequestType,
     options: AuthOptions & { acceptsToken: T },
-  ): MaybePromise<InferAuthObjectFromToken<T, SessionAuthObject, MachineAuthObject<T>>, ReturnsPromise>;
+  ): MaybePromise<
+    InferAuthObjectFromToken<T, SessionAuthObject, MachineAuthObject<Exclude<T, SessionTokenType>>>,
+    ReturnsPromise
+  >;
 
   /**
    * @example
