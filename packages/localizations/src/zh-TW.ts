@@ -14,6 +14,20 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const zhTW: LocalizationResource = {
   locale: 'zh-TW',
+  apiKeys: {
+    action__add: undefined,
+    action__search: undefined,
+    detailsTitle__emptyRow: undefined,
+    formButtonPrimary__add: undefined,
+    formHint: undefined,
+    formTitle: undefined,
+    menuAction__revoke: undefined,
+    revokeConfirmation: {
+      formButtonPrimary__revoke: undefined,
+      formHint: undefined,
+      formTitle: undefined,
+    },
+  },
   backButton: '返回',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
@@ -133,6 +147,9 @@ export const zhTW: LocalizationResource = {
   formFieldError__verificationLinkExpired: '驗證連結已過期。請請求新的連結。',
   formFieldHintText__optional: '選填',
   formFieldHintText__slug: 'slug 是人類可讀的 ID，必須是唯一的。它經常在 URL 中使用。',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: undefined,
   formFieldInputPlaceholder__confirmDeletionUserAccount: '刪除帳戶',
   formFieldInputPlaceholder__emailAddress: undefined,
@@ -147,6 +164,10 @@ export const zhTW: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyExpirationDate: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: '為該網域啟用自動邀請',
   formFieldLabel__backupCode: '備用代碼',
   formFieldLabel__confirmDeletion: '確定',
@@ -190,6 +211,9 @@ export const zhTW: LocalizationResource = {
     titleWithoutPersonal: '選擇一個組織',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: '自動邀請',
     badge__automaticSuggestion: '自動建議',
     badge__manualInvitation: '不自動註冊',
@@ -284,6 +308,7 @@ export const zhTW: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: '管理您的組織。',
       general: '一般的',
@@ -790,6 +815,9 @@ export const zhTW: LocalizationResource = {
     action__signOutAll: '退出所有帳戶',
   },
   userProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: '已複製！',
       actionLabel__copy: '複製全部',
@@ -938,6 +966,7 @@ export const zhTW: LocalizationResource = {
     mobileButton__menu: '菜單',
     navbar: {
       account: '輪廓',
+      apiKeys: undefined,
       billing: undefined,
       description: '管理您的帳戶資訊。',
       security: '安全',

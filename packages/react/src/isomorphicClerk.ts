@@ -8,6 +8,8 @@ import type {
   __internal_PlanDetailsProps,
   __internal_UserVerificationModalProps,
   __internal_UserVerificationProps,
+  APIKeyResource,
+  APIKeysProps,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
@@ -18,9 +20,11 @@ import type {
   ClerkStatus,
   ClientResource,
   CommerceBillingNamespace,
+  CreateAPIKeyParams,
   CreateOrganizationParams,
   CreateOrganizationProps,
   DomainOrProxyUrl,
+  GetAPIKeysParams,
   GoogleOneTapProps,
   HandleEmailLinkVerificationParams,
   HandleOAuthCallbackParams,
@@ -34,6 +38,7 @@ import type {
   OrganizationSwitcherProps,
   PricingTableProps,
   RedirectOptions,
+  RevokeAPIKeyParams,
   SetActiveParams,
   SignInProps,
   SignInRedirectOptions,
@@ -132,6 +137,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountMethodCalls = new Map<MethodName<BrowserClerk>, MethodCallback>();
   private premountWaitlistNodes = new Map<HTMLDivElement, WaitlistProps | undefined>();
   private premountPricingTableNodes = new Map<HTMLDivElement, PricingTableProps | undefined>();
+  private premountApiKeysNodes = new Map<HTMLDivElement, APIKeysProps | undefined>();
   private premountOAuthConsentNodes = new Map<HTMLDivElement, __internal_OAuthConsentProps | undefined>();
   // A separate Map of `addListener` method calls to handle multiple listeners.
   private premountAddListenerCalls = new Map<
@@ -611,6 +617,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.mountPricingTable(node, props);
     });
 
+    this.premountApiKeysNodes.forEach((props, node) => {
+      clerkjs.mountApiKeys(node, props);
+    });
+
     this.premountOAuthConsentNodes.forEach((props, node) => {
       clerkjs.__internal_mountOAuthConsent(node, props);
     });
@@ -1056,6 +1066,22 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
+  mountApiKeys = (node: HTMLDivElement, props?: APIKeysProps): void => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.mountApiKeys(node, props);
+    } else {
+      this.premountApiKeysNodes.set(node, props);
+    }
+  };
+
+  unmountApiKeys = (node: HTMLDivElement): void => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.unmountApiKeys(node);
+    } else {
+      this.premountApiKeysNodes.delete(node);
+    }
+  };
+
   __internal_mountOAuthConsent = (node: HTMLDivElement, props?: __internal_OAuthConsentProps) => {
     if (this.clerkjs && this.loaded) {
       this.clerkjs.__internal_mountOAuthConsent(node, props);
@@ -1305,6 +1331,42 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return callback() as Promise<WaitlistResource>;
     } else {
       this.premountMethodCalls.set('joinWaitlist', callback);
+    }
+  };
+
+  getApiKeys = async (params?: GetAPIKeysParams): Promise<APIKeyResource[] | void> => {
+    const callback = () => this.clerkjs?.getApiKeys(params);
+    if (this.clerkjs && this.loaded) {
+      return callback() as Promise<APIKeyResource[]>;
+    } else {
+      this.premountMethodCalls.set('getApiKeys', callback);
+    }
+  };
+
+  getApiKeySecret = async (apiKeyId: string): Promise<string | void> => {
+    const callback = () => this.clerkjs?.getApiKeySecret(apiKeyId);
+    if (this.clerkjs && this.loaded) {
+      return callback() as Promise<string>;
+    } else {
+      this.premountMethodCalls.set('getApiKeySecret', callback);
+    }
+  };
+
+  createApiKey = async (params: CreateAPIKeyParams): Promise<APIKeyResource | void> => {
+    const callback = () => this.clerkjs?.createApiKey(params);
+    if (this.clerkjs && this.loaded) {
+      return callback() as Promise<APIKeyResource>;
+    } else {
+      this.premountMethodCalls.set('createApiKey', callback);
+    }
+  };
+
+  revokeApiKey = async (params: RevokeAPIKeyParams): Promise<APIKeyResource | void> => {
+    const callback = () => this.clerkjs?.revokeApiKey(params);
+    if (this.clerkjs && this.loaded) {
+      return callback() as Promise<APIKeyResource>;
+    } else {
+      this.premountMethodCalls.set('revokeApiKey', callback);
     }
   };
 

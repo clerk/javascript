@@ -129,6 +129,7 @@ exports[`Typedoc output > should have a deliberate file structure 1`] = `
   "nextjs/create-sync-get-auth.mdx",
   "nextjs/current-user.mdx",
   "nextjs/get-auth.mdx",
+  "clerk-react/api-keys.mdx",
   "clerk-react/clerk-provider-props.mdx",
   "clerk-react/protect.mdx",
   "clerk-react/redirect-to-create-organization.mdx",

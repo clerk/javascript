@@ -14,6 +14,20 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const caES: LocalizationResource = {
   locale: 'ca-ES',
+  apiKeys: {
+    action__add: undefined,
+    action__search: undefined,
+    detailsTitle__emptyRow: undefined,
+    formButtonPrimary__add: undefined,
+    formHint: undefined,
+    formTitle: undefined,
+    menuAction__revoke: undefined,
+    revokeConfirmation: {
+      formButtonPrimary__revoke: undefined,
+      formHint: undefined,
+      formTitle: undefined,
+    },
+  },
   backButton: 'Enrere',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
@@ -133,6 +147,9 @@ export const caES: LocalizationResource = {
   formFieldError__verificationLinkExpired: "L'enllaç de verificació ha caducat. Si us plau, sol·licita un nou enllaç.",
   formFieldHintText__optional: 'Opcional',
   formFieldHintText__slug: "Un slug és un ID llegible per humans que ha de ser únic. Sovint s'utilitza en URL.",
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'Codi de seguretat',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Eliminar compte',
   formFieldInputPlaceholder__emailAddress: 'exemple@correu.com',
@@ -147,6 +164,10 @@ export const caES: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Contrasenya',
   formFieldInputPlaceholder__phoneNumber: 'Número de telèfon',
   formFieldInputPlaceholder__username: "Nom d'usuari",
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyExpirationDate: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Activa invitacions automàtiques per a aquest domini',
   formFieldLabel__backupCode: 'Codi de seguretat',
   formFieldLabel__confirmDeletion: 'Confirmació',
@@ -191,6 +212,9 @@ export const caES: LocalizationResource = {
     titleWithoutPersonal: 'Trieu una organització',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: 'Invitacions automàtiques',
     badge__automaticSuggestion: 'Suggeriments automàtics',
     badge__manualInvitation: 'Sense inscripció automàtica',
@@ -288,6 +312,7 @@ export const caES: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: 'Gestiona la teva organització.',
       general: 'General',
@@ -805,6 +830,9 @@ export const caES: LocalizationResource = {
     action__signOutAll: 'Tanca sessió de tots els comptes',
   },
   userProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Copiat!',
       actionLabel__copy: 'Copia tot',
@@ -967,6 +995,7 @@ export const caES: LocalizationResource = {
     mobileButton__menu: 'Menú',
     navbar: {
       account: 'Perfil',
+      apiKeys: undefined,
       billing: undefined,
       description: 'Gestiona la informació del teu compte.',
       security: 'Seguretat',

@@ -14,6 +14,20 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const deDE: LocalizationResource = {
   locale: 'de-DE',
+  apiKeys: {
+    action__add: 'Neuen API-Key hinzufügen',
+    action__search: 'Suche',
+    detailsTitle__emptyRow: 'Keine API-Keys gefunden',
+    formButtonPrimary__add: 'API-Key erstellen',
+    formHint: 'Geben Sie einen Namen an, um einen API-Key zu erstellen. Sie können ihn jederzeit widerrufen.',
+    formTitle: 'Neuen API-Key hinzufügen',
+    menuAction__revoke: 'API-Key widerrufen',
+    revokeConfirmation: {
+      formButtonPrimary__revoke: 'API-Key widerrufen',
+      formHint: 'Sind Sie sicher, dass Sie diesen API-Key löschen wollen?',
+      formTitle: 'API-Key "{{apiKeyName}}" widerrufen?',
+    },
+  },
   backButton: 'Zurück',
   badge__activePlan: 'Aktiv',
   badge__canceledEndsAt: "Storniert • Endet am {{ date | shortDate('de-DE') }}",
@@ -138,6 +152,9 @@ export const deDE: LocalizationResource = {
   formFieldHintText__optional: 'Optional',
   formFieldHintText__slug:
     'Der Slug ist eine für Menschen lesbare ID. Sie muss einzigartig sein und wird oft in URLs verwendet.',
+  formFieldInputPlaceholder__apiKeyDescription: 'Geben Sie eine Beschreibung an',
+  formFieldInputPlaceholder__apiKeyExpirationDate: 'Geben Sie ein Ablaufdatum an',
+  formFieldInputPlaceholder__apiKeyName: 'Geben Sie einen Namen an',
   formFieldInputPlaceholder__backupCode: 'Sicherheitscode eingeben',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Konto löschen',
   formFieldInputPlaceholder__emailAddress: 'E-Mail-Adresse eingeben',
@@ -152,6 +169,10 @@ export const deDE: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Passwort eingeben',
   formFieldInputPlaceholder__phoneNumber: 'Telefonnummer eingeben',
   formFieldInputPlaceholder__username: 'Benutzername eingeben',
+  formFieldLabel__apiKeyDescription: 'Beschreibung',
+  formFieldLabel__apiKeyExpiration: 'Ablaufdatum',
+  formFieldLabel__apiKeyExpirationDate: 'Datum auswählen',
+  formFieldLabel__apiKeyName: 'Name',
   formFieldLabel__automaticInvitations: 'Aktivieren Sie automatische Einladungen für diese Domain',
   formFieldLabel__backupCode: 'Sicherungscode',
   formFieldLabel__confirmDeletion: 'Bestätigung',
@@ -197,6 +218,9 @@ export const deDE: LocalizationResource = {
     titleWithoutPersonal: 'Organisation auswählen',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: 'API-Keys',
+    },
     badge__automaticInvitation: 'Automatische Einladungen',
     badge__automaticSuggestion: 'Automatische Vorschläge',
     badge__manualInvitation: 'Keine automatische Aufnahme',
@@ -295,6 +319,7 @@ export const deDE: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: 'API-Keys',
       billing: 'Abrechnung',
       description: 'Verwalten Sie ihre Organisation.',
       general: 'Allgemein',
@@ -825,6 +850,9 @@ export const deDE: LocalizationResource = {
     action__signOutAll: 'Melden Sie sich von allen Konten ab',
   },
   userProfile: {
+    apiKeysPage: {
+      title: 'API-Keys',
+    },
     backupCodePage: {
       actionLabel__copied: 'Kopiert!',
       actionLabel__copy: 'Kopiere alle',
@@ -987,6 +1015,7 @@ export const deDE: LocalizationResource = {
     mobileButton__menu: 'Menü',
     navbar: {
       account: 'Profil',
+      apiKeys: 'API-Keys',
       billing: 'Abrechnung',
       description: 'Verwalten Sie Ihre Kontoinformationen.',
       security: 'Sicherheit',

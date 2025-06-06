@@ -14,6 +14,20 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const svSE: LocalizationResource = {
   locale: 'sv-SE',
+  apiKeys: {
+    action__add: undefined,
+    action__search: undefined,
+    detailsTitle__emptyRow: undefined,
+    formButtonPrimary__add: undefined,
+    formHint: undefined,
+    formTitle: undefined,
+    menuAction__revoke: undefined,
+    revokeConfirmation: {
+      formButtonPrimary__revoke: undefined,
+      formHint: undefined,
+      formTitle: undefined,
+    },
+  },
   backButton: 'Tillbaka',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
@@ -133,6 +147,9 @@ export const svSE: LocalizationResource = {
   formFieldError__verificationLinkExpired: 'Verifieringslänken har löpt ut. Vänligen begär en ny länk.',
   formFieldHintText__optional: 'Valfritt',
   formFieldHintText__slug: 'En slug är ett läsbart ID som måste vara unikt. Det används ofta i URL:er.',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'Ange din reservkod',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Radera konto',
   formFieldInputPlaceholder__emailAddress: 'Ange din e-postadress',
@@ -148,6 +165,10 @@ export const svSE: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Ange ditt lösenord',
   formFieldInputPlaceholder__phoneNumber: 'Ange ditt telefonnummer',
   formFieldInputPlaceholder__username: 'Ange ditt användarnamn',
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyExpirationDate: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Aktivera automatiska inbjudningar för denna domän',
   formFieldLabel__backupCode: 'Reserv-kod',
   formFieldLabel__confirmDeletion: 'Radera konto',
@@ -192,6 +213,9 @@ export const svSE: LocalizationResource = {
     titleWithoutPersonal: 'Välj en organisation',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: 'Automatiska inbjudningar',
     badge__automaticSuggestion: 'Automatiska förslag',
     badge__manualInvitation: 'Ingen automatisk registrering',
@@ -288,6 +312,7 @@ export const svSE: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: 'Hantera din organisation.',
       general: 'Allmänna inställningar',
@@ -807,6 +832,9 @@ export const svSE: LocalizationResource = {
     action__signOutAll: 'Logga ut från alla konton',
   },
   userProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Kopierat!',
       actionLabel__copy: 'Kopiera alla',
@@ -965,6 +993,7 @@ export const svSE: LocalizationResource = {
     mobileButton__menu: 'Meny',
     navbar: {
       account: 'Profil',
+      apiKeys: undefined,
       billing: undefined,
       description: 'Hantera din kontoinformation.',
       security: 'Säkerhet',

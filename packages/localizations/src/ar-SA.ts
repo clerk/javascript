@@ -14,6 +14,20 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const arSA: LocalizationResource = {
   locale: 'ar-SA',
+  apiKeys: {
+    action__add: undefined,
+    action__search: undefined,
+    detailsTitle__emptyRow: undefined,
+    formButtonPrimary__add: undefined,
+    formHint: undefined,
+    formTitle: undefined,
+    menuAction__revoke: undefined,
+    revokeConfirmation: {
+      formButtonPrimary__revoke: undefined,
+      formHint: undefined,
+      formTitle: undefined,
+    },
+  },
   backButton: 'الرجوع',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
@@ -134,6 +148,9 @@ export const arSA: LocalizationResource = {
   formFieldHintText__optional: 'إختياري',
   formFieldHintText__slug:
     '(slug) هو معرف يمكن قراءته بواسطة الإنسان ويجب أن يكون فريدًا. غالبًا ما يتم استخدامه في الروابط الإلكترونية.',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: undefined,
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'حذف الحساب',
   formFieldInputPlaceholder__emailAddress: undefined,
@@ -148,6 +165,10 @@ export const arSA: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyExpirationDate: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'تمكين الدعوة الأوتماتكية لهذا النطاق',
   formFieldLabel__backupCode: 'الرمز الأحتياطي',
   formFieldLabel__confirmDeletion: 'تأكيد',
@@ -192,6 +213,9 @@ export const arSA: LocalizationResource = {
     titleWithoutPersonal: 'أختر منظمة',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: 'دعوات تلقائية',
     badge__automaticSuggestion: 'أقتراحات تلقائية',
     badge__manualInvitation: 'ليس هناك تسجيل تلقائي',
@@ -288,6 +312,7 @@ export const arSA: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: 'إدارة منظمتك.',
       general: 'عام',
@@ -802,6 +827,9 @@ export const arSA: LocalizationResource = {
     action__signOutAll: 'تسجيل الخروج من جميع الحسابات',
   },
   userProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'تم النسخ',
       actionLabel__copy: 'نسخ الكل',
@@ -957,6 +985,7 @@ export const arSA: LocalizationResource = {
     mobileButton__menu: 'القائمة',
     navbar: {
       account: 'الملف الشخصي',
+      apiKeys: undefined,
       billing: undefined,
       description: 'إدارة معلومات ملفك الشخصي.',
       security: 'حماية',

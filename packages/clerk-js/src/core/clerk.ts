@@ -20,6 +20,8 @@ import type {
   __internal_OAuthConsentProps,
   __internal_PlanDetailsProps,
   __internal_UserVerificationModalProps,
+  APIKeyResource,
+  APIKeysProps,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
@@ -31,6 +33,7 @@ import type {
   ClientJSONSnapshot,
   ClientResource,
   CommerceBillingNamespace,
+  CreateAPIKeyParams,
   CreateOrganizationParams,
   CreateOrganizationProps,
   CredentialReturn,
@@ -38,6 +41,7 @@ import type {
   EnvironmentJSON,
   EnvironmentJSONSnapshot,
   EnvironmentResource,
+  GetAPIKeysParams,
   GoogleOneTapProps,
   HandleEmailLinkVerificationParams,
   HandleOAuthCallbackParams,
@@ -58,6 +62,7 @@ import type {
   PublicKeyCredentialWithAuthenticatorAttestationResponse,
   RedirectOptions,
   Resources,
+  RevokeAPIKeyParams,
   SDKMetadata,
   SetActiveParams,
   SignedInSessionResource,
@@ -134,6 +139,7 @@ import { createFapiClient } from './fapiClient';
 import { createClientFromJwt } from './jwt-client';
 import { CommerceBilling } from './modules/commerce';
 import {
+  APIKey,
   BaseResource,
   Client,
   EmailLinkError,
@@ -1051,6 +1057,40 @@ export class Clerk implements ClerkInterface {
   };
 
   public __internal_unmountOAuthConsent = (node: HTMLDivElement) => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted().then(controls => controls.unmountComponent({ node }));
+  };
+
+  /**
+   * @experimental
+   * This API is in early access and may change in future releases.
+   *
+   * Mount a api keys component at the target element.
+   * @param targetNode Target to mount the APIKeys component.
+   * @param props Configuration parameters.
+   */
+  public mountApiKeys = (node: HTMLDivElement, props?: APIKeysProps) => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted({ preloadHint: 'APIKeys' }).then(controls =>
+      controls.mountComponent({
+        name: 'APIKeys',
+        appearanceKey: 'apiKeys',
+        node,
+        props,
+      }),
+    );
+  };
+
+  /**
+   * @experimental
+   * This API is in early access and may change in future releases.
+   *
+   * Unmount a api keys component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @param targetNode Target node to unmount the ApiKeys component from.
+   */
+  public unmountApiKeys = (node: HTMLDivElement) => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls.ensureMounted().then(controls => controls.unmountComponent({ node }));
   };
@@ -2040,6 +2080,14 @@ export class Clerk implements ClerkInterface {
   public updateEnvironment(environment: EnvironmentResource): asserts this is { environment: EnvironmentResource } {
     this.environment = environment;
   }
+
+  public getApiKeys = (params?: GetAPIKeysParams): Promise<APIKeyResource[]> => APIKey.getAll(params);
+
+  public getApiKeySecret = (apiKeyID: string): Promise<string> => APIKey.getSecret(apiKeyID);
+
+  public createApiKey = (params: CreateAPIKeyParams): Promise<APIKeyResource> => APIKey.create(params);
+
+  public revokeApiKey = (params: RevokeAPIKeyParams): Promise<APIKeyResource> => APIKey.revoke(params);
 
   __internal_setCountry = (country: string | null) => {
     if (!this.__internal_country) {
