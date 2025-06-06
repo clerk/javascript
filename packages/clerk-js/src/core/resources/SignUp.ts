@@ -84,25 +84,24 @@ export class SignUp extends BaseResource implements SignUpResource {
   }
 
   create = async (_params: SignUpCreateParams): Promise<SignUpResource> => {
-    let params: Record<string, unknown> = _params;
+    const params: Record<string, unknown> = _params;
 
-    if (!__BUILD_DISABLE_RHC__ && !this.clientBypass() && !this.shouldBypassCaptchaForAttempt(params)) {
-      const captchaChallenge = new CaptchaChallenge(SignUp.clerk);
-      const captchaParams = await captchaChallenge.managedOrInvisible({ action: 'signup' });
-      if (!captchaParams) {
-        throw new ClerkRuntimeError('', { code: 'captcha_unavailable' });
-      }
-      params = { ...params, ...captchaParams };
-    }
-
+    // This is a legacy flow, where we allowed specific OAuth providers to bypass the captcha
+    // This is no longer supported, but we need to keep it for backwards compatibility
     if (params.transfer && this.shouldBypassCaptchaForAttempt(params)) {
       params.strategy = SignUp.clerk.client?.signIn.firstFactorVerification.strategy;
     }
 
-    return this._basePost({
+    await this._basePost({
       path: this.pathRoot,
       body: normalizeUnsafeMetadata(params),
     });
+
+    if (!this.shouldBypassCaptchaForAttempt(params)) {
+      return this.solveChallenge();
+    }
+
+    return this;
   };
 
   prepareVerification = (params: PrepareVerificationParams): Promise<this> => {
@@ -438,12 +437,36 @@ export class SignUp extends BaseResource implements SignUpResource {
     };
   }
 
+  private solveChallenge = async (): Promise<SignUpResource> => {
+    const params = await this.getCaptchaParams();
+    if (params) {
+      return this.update(params);
+    }
+
+    return this;
+  };
+
+  private getCaptchaParams = async (): Promise<Record<string, unknown> | undefined> => {
+    let params: Record<string, unknown> | undefined;
+
+    if (!__BUILD_DISABLE_RHC__ && !this.clientBypass()) {
+      const captchaChallenge = new CaptchaChallenge(SignUp.clerk);
+      params = await captchaChallenge.managedOrInvisible({ action: 'signup' });
+      if (!params) {
+        throw new ClerkRuntimeError('', { code: 'captcha_unavailable' });
+      }
+    }
+
+    return params;
+  };
+
   private clientBypass() {
     return SignUp.clerk.client?.captchaBypass;
   }
 
   /**
    * We delegate bot detection to the following providers, instead of relying on turnstile exclusively
+   * This is a legacy flow, where we allowed specific OAuth providers to bypass the captcha
    */
   protected shouldBypassCaptchaForAttempt(params: SignUpCreateParams) {
     if (!params.strategy) {
