@@ -272,33 +272,99 @@ function mountSignInObservable(element: HTMLDivElement) {
 
   // Create controls container
   const controlsContainer = document.createElement('div');
-  controlsContainer.className = 'mb-4 space-y-4';
+  controlsContainer.style.marginBottom = '1rem';
+  controlsContainer.style.display = 'flex';
+  controlsContainer.style.flexDirection = 'column';
 
   // Create store manipulation buttons
   const storeControls = document.createElement('div');
   storeControls.className = 'flex gap-2';
 
+  const updateStore = (newState: any) => {
+    if (signIn?.store) {
+      if (newState.fetchStatus === 'fetching') {
+        signIn.store.getState().dispatch({ type: 'FETCH_START' });
+      } else if (newState.error) {
+        signIn.store.getState().dispatch({
+          type: 'FETCH_ERROR',
+          error: newState.error,
+        });
+      } else if (newState.status === 'complete') {
+        signIn.store.getState().dispatch({
+          type: 'FETCH_SUCCESS',
+          data: { id: 'test_id', status: 'complete' },
+        });
+      } else {
+        signIn.store.getState().dispatch({ type: 'RESET' });
+      }
+    }
+  };
+
   const simulateLoadingBtn = document.createElement('button');
   simulateLoadingBtn.textContent = 'Simulate Loading';
-  simulateLoadingBtn.className = 'px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200';
+  simulateLoadingBtn.disabled = true;
+  simulateLoadingBtn.onclick = () => {
+    if (signIn?.store) {
+      signIn.store.getState().dispatch({ type: 'FETCH_START' });
+    }
+  };
 
   const simulateErrorBtn = document.createElement('button');
   simulateErrorBtn.textContent = 'Simulate Error';
-  simulateErrorBtn.className = 'px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200';
+  simulateErrorBtn.disabled = true;
+  simulateErrorBtn.onclick = () => {
+    if (signIn?.store) {
+      signIn.store.getState().dispatch({
+        type: 'FETCH_ERROR',
+        error: { code: 'test_error', message: 'This is a simulated error' },
+      });
+    }
+  };
 
-  const resetStoreBtn = document.createElement('button');
-  resetStoreBtn.textContent = 'Reset Store';
-  resetStoreBtn.className = 'px-3 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200';
+  const simulateSuccessBtn = document.createElement('button');
+  simulateSuccessBtn.textContent = 'Simulate Success';
+  simulateSuccessBtn.disabled = true;
+  simulateSuccessBtn.onclick = () => {
+    if (signIn?.store) {
+      signIn.store.getState().dispatch({
+        type: 'FETCH_SUCCESS',
+        data: { id: 'test_id', status: 'complete' },
+      });
+    }
+  };
+
+  const resetBtn = document.createElement('button');
+  resetBtn.textContent = 'Reset';
+  resetBtn.disabled = true;
+  resetBtn.onclick = () => {
+    if (signIn?.store) {
+      signIn.store.getState().dispatch({ type: 'RESET' });
+    }
+  };
+
+  simulateLoadingBtn.className = 'px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200';
+  simulateErrorBtn.className = 'px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200';
+  simulateSuccessBtn.className = 'px-3 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200';
+  resetBtn.className = 'px-3 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200';
 
   storeControls.appendChild(simulateLoadingBtn);
   storeControls.appendChild(simulateErrorBtn);
-  storeControls.appendChild(resetStoreBtn);
-  controlsContainer.appendChild(storeControls);
+  storeControls.appendChild(simulateSuccessBtn);
+  storeControls.appendChild(resetBtn);
 
   // Create store state display
   const storeStateDisplay = document.createElement('div');
   storeStateDisplay.className = 'p-2 bg-gray-50 rounded text-sm font-mono';
-  controlsContainer.appendChild(storeStateDisplay);
+
+  // Append store controls to controlsContainer
+  controlsContainer.appendChild(storeControls);
+
+  // Create a new line for store state display
+  const storeStateLine = document.createElement('div');
+  storeStateLine.className = 'mt-2';
+  storeStateLine.style.display = 'block';
+  storeStateLine.appendChild(storeStateDisplay);
+  controlsContainer.appendChild(storeStateLine);
 
   element.appendChild(controlsContainer);
 
@@ -457,7 +523,15 @@ function mountSignInObservable(element: HTMLDivElement) {
         });
       });
 
-      resetStoreBtn.addEventListener('click', () => {
+      simulateSuccessBtn.addEventListener('click', () => {
+        updateStore({
+          fetchStatus: 'idle',
+          error: null,
+          status: 'complete',
+        });
+      });
+
+      resetBtn.addEventListener('click', () => {
         updateStore({
           fetchStatus: 'idle',
           error: null,
@@ -468,7 +542,8 @@ function mountSignInObservable(element: HTMLDivElement) {
       // Enable buttons
       simulateLoadingBtn.disabled = false;
       simulateErrorBtn.disabled = false;
-      resetStoreBtn.disabled = false;
+      simulateSuccessBtn.disabled = false;
+      resetBtn.disabled = false;
 
       isInitialized = true;
 

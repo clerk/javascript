@@ -17,7 +17,6 @@ import type {
   EmailLinkConfig,
   EnterpriseSSOConfig,
   PassKeyConfig,
-  PasskeyFactor,
   PhoneCodeConfig,
   PrepareFirstFactorParams,
   PrepareSecondFactorParams,
@@ -87,7 +86,7 @@ const createSignInStore = () =>
   );
 
 export class SignIn extends BaseResource implements SignInResource {
-  pathRoot = '/client/sign_ins';
+  protected _pathRoot = '/client/sign_ins';
 
   id?: string;
   status: SignInStatus | null = null;
@@ -113,7 +112,7 @@ export class SignIn extends BaseResource implements SignInResource {
 
   create = (params: SignInCreateParams): Promise<this> => {
     return this._basePost({
-      path: this.pathRoot,
+      path: this._pathRoot,
       body: params,
     });
   };
@@ -185,9 +184,6 @@ export class SignIn extends BaseResource implements SignInResource {
   };
 
   attemptFirstFactor = async (attemptFactor: AttemptFirstFactorParams): Promise<SignInResource> => {
-    this.store.getState().setFetchStatus('fetching');
-    this.store.getState().setError(null);
-
     let config;
     switch (attemptFactor.strategy) {
       case 'passkey':
@@ -199,18 +195,13 @@ export class SignIn extends BaseResource implements SignInResource {
         config = { ...attemptFactor };
     }
 
-    try {
-      const result = await this._basePost({
-        body: { ...config, strategy: attemptFactor.strategy },
-        action: 'attempt_first_factor',
-      });
+    const result = await this._basePost({
+      body: { ...config, strategy: attemptFactor.strategy },
+      action: 'attempt_first_factor',
+    });
 
-      this.signInStore.getState().setStatus(result.status);
-      return result;
-    } catch (err: any) {
-      this.store.getState().setError(err);
-      throw err;
-    }
+    this.signInStore.getState().setStatus(result.status);
+    return result;
   };
 
   createEmailLinkFlow = (): CreateEmailLinkFlowReturn<SignInStartEmailLinkFlowParams, SignInResource> => {
@@ -421,19 +412,13 @@ export class SignIn extends BaseResource implements SignInResource {
     }
 
     if (flow === 'autofill' || flow === 'discoverable') {
-      // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
       await this.create({ strategy: 'passkey' });
     } else {
-      // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
-      const passKeyFactor = this.supportedFirstFactors.find(
-        // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
-        f => f.strategy === 'passkey',
-      ) as PasskeyFactor;
+      const passKeyFactor = this.supportedFirstFactors?.find(f => f.strategy === 'passkey');
 
       if (!passKeyFactor) {
         clerkVerifyPasskeyCalledBeforeCreate();
       }
-      // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
       await this.prepareFirstFactor(passKeyFactor);
     }
 
