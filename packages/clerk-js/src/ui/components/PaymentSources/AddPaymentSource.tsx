@@ -260,8 +260,10 @@ const AddPaymentSourceForm = ({ children }: PropsWithChildren) => {
     try {
       await onSuccess({ stripeSetupIntent: setupIntent });
     } catch (error) {
+      console.log('catch', error);
       void handleError(error, [], card.setError);
     } finally {
+      console.log('finally');
       card.setIdle();
       initializePaymentSource(); // resets the payment intent
     }
