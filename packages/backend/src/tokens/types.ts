@@ -202,7 +202,10 @@ export interface GetAuthFn<RequestType, ReturnsPromise extends boolean = false> 
   <T extends TokenType[]>(
     req: RequestType,
     options: AuthOptions & { acceptsToken: T },
-  ): MaybePromise<InferAuthObjectFromTokenArray<T, SessionAuthObject, MachineAuthObject<T[number]>>, ReturnsPromise>;
+  ): MaybePromise<
+    InferAuthObjectFromTokenArray<T, SessionAuthObject, MachineAuthObject<Exclude<T[number], SessionTokenType>>>,
+    ReturnsPromise
+  >;
 
   /**
    * @example
@@ -211,7 +214,10 @@ export interface GetAuthFn<RequestType, ReturnsPromise extends boolean = false> 
   <T extends TokenType>(
     req: RequestType,
     options: AuthOptions & { acceptsToken: T },
-  ): MaybePromise<InferAuthObjectFromToken<T, SessionAuthObject, MachineAuthObject<T>>, ReturnsPromise>;
+  ): MaybePromise<
+    InferAuthObjectFromToken<T, SessionAuthObject, MachineAuthObject<Exclude<T, SessionTokenType>>>,
+    ReturnsPromise
+  >;
 
   /**
    * @example
