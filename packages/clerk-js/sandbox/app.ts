@@ -280,26 +280,6 @@ function mountSignInObservable(element: HTMLDivElement) {
   const storeControls = document.createElement('div');
   storeControls.className = 'flex gap-2';
 
-  const updateStore = (newState: any) => {
-    if (signIn?.store) {
-      if (newState.fetchStatus === 'fetching') {
-        signIn.store.getState().dispatch({ type: 'FETCH_START' });
-      } else if (newState.error) {
-        signIn.store.getState().dispatch({
-          type: 'FETCH_ERROR',
-          error: newState.error,
-        });
-      } else if (newState.status === 'complete') {
-        signIn.store.getState().dispatch({
-          type: 'FETCH_SUCCESS',
-          data: { id: 'test_id', status: 'complete' },
-        });
-      } else {
-        signIn.store.getState().dispatch({ type: 'RESET' });
-      }
-    }
-  };
-
   const simulateLoadingBtn = document.createElement('button');
   simulateLoadingBtn.textContent = 'Simulate Loading';
   simulateLoadingBtn.disabled = true;
