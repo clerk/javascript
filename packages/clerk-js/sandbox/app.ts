@@ -1,5 +1,4 @@
 import type { SignInResource } from '@clerk/types';
-import type { StoreApi } from 'zustand';
 
 import * as l from '../../localizations';
 import type { Clerk as ClerkType } from '../';
@@ -276,75 +275,12 @@ function mountSignInObservable(element: HTMLDivElement) {
   controlsContainer.style.display = 'flex';
   controlsContainer.style.flexDirection = 'column';
 
-  // Create store manipulation buttons
-  const storeControls = document.createElement('div');
-  storeControls.className = 'flex gap-2';
-
-  const simulateLoadingBtn = document.createElement('button');
-  simulateLoadingBtn.textContent = 'Simulate Loading';
-  simulateLoadingBtn.disabled = true;
-  simulateLoadingBtn.onclick = () => {
-    if (signIn?.store) {
-      signIn.store.getState().dispatch({ type: 'FETCH_START' });
-    }
-  };
-
-  const simulateErrorBtn = document.createElement('button');
-  simulateErrorBtn.textContent = 'Simulate Error';
-  simulateErrorBtn.disabled = true;
-  simulateErrorBtn.onclick = () => {
-    if (signIn?.store) {
-      signIn.store.getState().dispatch({
-        type: 'FETCH_ERROR',
-        error: { code: 'test_error', message: 'This is a simulated error' },
-      });
-    }
-  };
-
-  const simulateSuccessBtn = document.createElement('button');
-  simulateSuccessBtn.textContent = 'Simulate Success';
-  simulateSuccessBtn.disabled = true;
-  simulateSuccessBtn.onclick = () => {
-    if (signIn?.store) {
-      signIn.store.getState().dispatch({
-        type: 'FETCH_SUCCESS',
-        data: { id: 'test_id', status: 'complete' },
-      });
-    }
-  };
-
-  const resetBtn = document.createElement('button');
-  resetBtn.textContent = 'Reset';
-  resetBtn.disabled = true;
-  resetBtn.onclick = () => {
-    if (signIn?.store) {
-      signIn.store.getState().dispatch({ type: 'RESET' });
-    }
-  };
-
-  simulateLoadingBtn.className = 'px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200';
-  simulateErrorBtn.className = 'px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200';
-  simulateSuccessBtn.className = 'px-3 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200';
-  resetBtn.className = 'px-3 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200';
-
-  storeControls.appendChild(simulateLoadingBtn);
-  storeControls.appendChild(simulateErrorBtn);
-  storeControls.appendChild(simulateSuccessBtn);
-  storeControls.appendChild(resetBtn);
-
   // Create store state display
   const storeStateDisplay = document.createElement('div');
   storeStateDisplay.className = 'p-2 bg-gray-50 rounded text-sm font-mono';
 
-  // Append store controls to controlsContainer
-  controlsContainer.appendChild(storeControls);
-
-  // Create a new line for store state display
-  const storeStateLine = document.createElement('div');
-  storeStateLine.className = 'mt-2';
-  storeStateLine.style.display = 'block';
-  storeStateLine.appendChild(storeStateDisplay);
-  controlsContainer.appendChild(storeStateLine);
+  // Append store state display to controlsContainer
+  controlsContainer.appendChild(storeStateDisplay);
 
   element.appendChild(controlsContainer);
 
@@ -372,25 +308,19 @@ function mountSignInObservable(element: HTMLDivElement) {
   form.appendChild(submitButton);
   element.appendChild(form);
 
-  let signIn: SignInResource & {
-    store: StoreApi<{ fetchStatus: string; error: any }>;
-    signInStore: StoreApi<{ status: string }>;
-  };
+  let signIn: SignInResource;
 
-  let unsubscribeFetch: (() => void) | undefined;
-  let unsubscribeStatus: (() => void) | undefined;
   let isInitialized = false;
 
-  // Define the store state type
-  type StoreState = {
-    fetchStatus: 'idle' | 'loading' | 'error';
-    error: Error | null;
-    status: string;
-  };
-
   // Create updateStatus function in the outer scope
-  const updateStatus = (state: StoreState) => {
-    const { fetchStatus, error, status } = state;
+  const updateStatus = () => {
+    if (!signIn) {
+      console.error('SignIn object is not initialized');
+      return;
+    }
+    const fetchStatus = signIn.fetchStatus;
+    const error = signIn.signInError.global;
+    const status = signIn.status;
 
     // Update status container with animation
     statusContainer.innerHTML = `
@@ -398,7 +328,7 @@ function mountSignInObservable(element: HTMLDivElement) {
         <div class="flex items-center gap-2">
           <strong>Fetch Status:</strong>
           <span class="px-2 py-0.5 rounded text-sm ${
-            fetchStatus === 'loading'
+            fetchStatus === 'fetching'
               ? 'bg-blue-100 text-blue-700'
               : fetchStatus === 'error'
                 ? 'bg-red-100 text-red-700'
@@ -415,7 +345,7 @@ function mountSignInObservable(element: HTMLDivElement) {
                 : 'bg-gray-100 text-gray-700'
           }">${status || 'null'}</span>
         </div>
-        ${error ? `<div class="text-red-500"><strong>Error:</strong> ${error.message}</div>` : ''}
+        ${error ? `<div class="text-red-500"><strong>Error:</strong> ${error}</div>` : ''}
       </div>
     `;
 
@@ -427,7 +357,7 @@ function mountSignInObservable(element: HTMLDivElement) {
           {
             fetchStatus,
             status,
-            error: error ? error.message : null,
+            error: error || null,
           },
           null,
           2,
@@ -478,57 +408,8 @@ function mountSignInObservable(element: HTMLDivElement) {
 
       await waitForClerk();
 
-      // Create a temporary store for demonstration
-      const tempStore: StoreState = {
-        fetchStatus: 'idle',
-        error: null,
-        status: '',
-      };
-
-      // Create store manipulation functions
-      const updateStore = (newState: Partial<StoreState>) => {
-        Object.assign(tempStore, newState);
-        updateStatus(tempStore);
-      };
-
-      // Handle store control buttons
-      simulateLoadingBtn.addEventListener('click', () => {
-        updateStore({ fetchStatus: 'loading', error: null });
-      });
-
-      simulateErrorBtn.addEventListener('click', () => {
-        updateStore({
-          fetchStatus: 'error',
-          error: new Error('Simulated error'),
-        });
-      });
-
-      simulateSuccessBtn.addEventListener('click', () => {
-        updateStore({
-          fetchStatus: 'idle',
-          error: null,
-          status: 'complete',
-        });
-      });
-
-      resetBtn.addEventListener('click', () => {
-        updateStore({
-          fetchStatus: 'idle',
-          error: null,
-          status: '',
-        });
-      });
-
-      // Enable buttons
-      simulateLoadingBtn.disabled = false;
-      simulateErrorBtn.disabled = false;
-      simulateSuccessBtn.disabled = false;
-      resetBtn.disabled = false;
-
-      isInitialized = true;
-
       // Initial update
-      updateStatus(tempStore);
+      updateStatus();
 
       // Update status to show initialization complete
       statusContainer.innerHTML = `
@@ -565,44 +446,17 @@ function mountSignInObservable(element: HTMLDivElement) {
       `;
 
       // Create SignIn instance with the provided email
-      signIn = (await Clerk.client.signIn.create({
+      signIn = await Clerk.client.signIn.create({
         identifier: emailInput.value,
         strategy: 'email_code',
-      })) as SignInResource & {
-        store: StoreApi<{ fetchStatus: string; error: any }>;
-        signInStore: StoreApi<{ status: string }>;
-      };
+      });
 
       if (!signIn) {
         throw new Error('Failed to create SignIn instance');
       }
 
-      // Subscribe to store changes
-      unsubscribeFetch = signIn.store.subscribe(() => {
-        updateStatus({
-          // @ts-expect-error - Clerk's store types don't match our strict types
-          fetchStatus: signIn.store.getState().fetchStatus,
-          error: signIn.store.getState().error,
-          status: signIn.signInStore.getState().status,
-        });
-      });
-
-      unsubscribeStatus = signIn.signInStore.subscribe(() => {
-        updateStatus({
-          // @ts-expect-error - Clerk's store types don't match our strict types
-          fetchStatus: signIn.store.getState().fetchStatus,
-          error: signIn.store.getState().error,
-          status: signIn.signInStore.getState().status,
-        });
-      });
-
-      // Initial update
-      updateStatus({
-        // @ts-expect-error - Clerk's store types don't match our strict types
-        fetchStatus: signIn.store.getState().fetchStatus,
-        error: signIn.store.getState().error,
-        status: signIn.signInStore.getState().status,
-      });
+      // Initial update using getters
+      updateStatus();
 
       await signIn.prepareFirstFactor({
         strategy: 'email_code',
@@ -613,6 +467,9 @@ function mountSignInObservable(element: HTMLDivElement) {
         strategy: 'email_code',
         code: passwordInput.value,
       });
+
+      // Update status after sign-in attempt
+      updateStatus();
     } catch (error) {
       console.error('Sign in error:', error);
       statusContainer.innerHTML = `
@@ -625,12 +482,6 @@ function mountSignInObservable(element: HTMLDivElement) {
 
   // Initialize on mount
   void initializeSignIn();
-
-  // Cleanup function
-  return () => {
-    unsubscribeFetch?.();
-    unsubscribeStatus?.();
-  };
 }
 
 void (async () => {

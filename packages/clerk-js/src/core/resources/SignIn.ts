@@ -72,6 +72,7 @@ import { BaseResource, UserData, Verification } from './internal';
 type SignInUIState = {
   status: SignInStatus | null;
   setStatus: (status: SignInStatus | null) => void;
+  type: 'idle' | 'loading' | 'error' | 'success';
 };
 
 const createSignInStore = () =>
@@ -80,6 +81,7 @@ const createSignInStore = () =>
       set => ({
         status: null,
         setStatus: status => set({ status }),
+        type: 'idle',
       }),
       { name: 'SignInStore' },
     ),
@@ -518,5 +520,21 @@ export class SignIn extends BaseResource implements SignInResource {
       created_session_id: this.createdSessionId,
       user_data: this.userData.__internal_toSnapshot(),
     };
+  }
+
+  public get fetchStatus(): 'idle' | 'fetching' | 'fetched' | 'error' {
+    const stateType = this._signInStore.getState().type;
+    switch (stateType) {
+      case 'idle':
+        return 'idle';
+      case 'loading':
+        return 'fetching';
+      case 'success':
+        return 'fetched';
+      case 'error':
+        return 'error';
+      default:
+        return 'idle';
+    }
   }
 }
