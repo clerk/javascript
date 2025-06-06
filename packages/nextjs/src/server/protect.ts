@@ -75,6 +75,12 @@ export interface AuthProtect {
 
   /**
    * @example
+   * auth.protect({ token: 'any' });
+   */
+  (options?: AuthProtectOptions & { token: 'any' }): Promise<SignedInAuthObject | AuthenticatedMachineObject>;
+
+  /**
+   * @example
    * auth.protect();
    */
   (options?: AuthProtectOptions): Promise<SignedInAuthObject>;
