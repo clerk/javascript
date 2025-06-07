@@ -521,20 +521,4 @@ export class SignIn extends BaseResource implements SignInResource {
       user_data: this.userData.__internal_toSnapshot(),
     };
   }
-
-  public get fetchStatus(): 'idle' | 'fetching' | 'fetched' | 'error' {
-    const stateType = this._signInStore.getState().type;
-    switch (stateType) {
-      case 'idle':
-        return 'idle';
-      case 'loading':
-        return 'fetching';
-      case 'success':
-        return 'fetched';
-      case 'error':
-        return 'error';
-      default:
-        return 'idle';
-    }
-  }
 }
