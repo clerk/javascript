@@ -47,6 +47,7 @@ describe('subpath /internal exports', () => {
         "createRedirect",
         "debugRequestState",
         "decorateObjectWithResources",
+        "getAuthObjectForAcceptedToken",
         "getAuthObjectFromJwt",
         "getMachineTokenType",
         "isMachineToken",
