@@ -89,6 +89,7 @@ export interface SignInResource extends ClerkResource {
   identifier: string | null;
   createdSessionId: string | null;
   userData: UserData;
+  signInError: { global: string | null; fields: Record<string, string> };
 
   create: (params: SignInCreateParams) => Promise<SignInResource>;
 

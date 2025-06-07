@@ -18,4 +18,5 @@ export interface ClerkResource {
    * Reload the resource and return the resource itself.
    */
   reload(p?: ClerkResourceReloadParams): Promise<this>;
+  fetchStatus: 'idle' | 'fetching' | 'fetched' | 'error';
 }

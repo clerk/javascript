@@ -1,6 +1,7 @@
 import { errorToJSON, parseError } from '@clerk/shared/error';
 import type {
   ClerkAPIError,
+  ClerkAPIErrorJSON,
   PasskeyVerificationResource,
   PhoneCodeChannel,
   PublicKeyCredentialCreationOptionsJSON,
@@ -31,7 +32,6 @@ export class Verification extends BaseResource implements VerificationResource {
   externalVerificationRedirectURL: URL | null = null;
   attempts: number | null = null;
   expireAt: Date | null = null;
-  error: ClerkAPIError | null = null;
   verifiedAtClient: string | null = null;
   channel?: PhoneCodeChannel;
 
@@ -43,6 +43,11 @@ export class Verification extends BaseResource implements VerificationResource {
   verifiedFromTheSameClient = (): boolean => {
     return this.verifiedAtClient === BaseResource.clerk?.client?.id;
   };
+
+  private updateError(error: ClerkAPIError | null) {
+    const errorJSON = error ? errorToJSON(error) : ({} as ClerkAPIErrorJSON);
+    this._store.getState().dispatch({ type: 'FETCH_ERROR', error: errorJSON });
+  }
 
   protected fromJSON(data: VerificationJSON | VerificationJSONSnapshot | null): this {
     if (data) {
@@ -58,7 +63,7 @@ export class Verification extends BaseResource implements VerificationResource {
       }
       this.attempts = data.attempts;
       this.expireAt = unixEpochToDate(data.expire_at || undefined);
-      this.error = data.error ? parseError(data.error) : null;
+      this.updateError(data.error ? parseError(data.error) : null);
       this.channel = data.channel || undefined;
     }
     return this;

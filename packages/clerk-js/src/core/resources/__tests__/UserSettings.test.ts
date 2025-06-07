@@ -4,7 +4,24 @@ import { UserSettings } from '../internal';
 
 describe('UserSettings', () => {
   it('defaults values when instantiated with no arguments', function () {
-    expect(new UserSettings()).toMatchSnapshot();
+    expect(new UserSettings()).toMatchObject({
+      actions: {
+        create_organization: false,
+        delete_self: false,
+      },
+      attributes: expect.objectContaining({
+        email_address: expect.objectContaining({
+          enabled: true,
+          required: true,
+          used_for_first_factor: true,
+          verify_at_sign_up: true,
+        }),
+        password: expect.objectContaining({
+          enabled: true,
+          required: true,
+        }),
+      }),
+    });
   });
 
   it('returns enabled web3 first factors', function () {
