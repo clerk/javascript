@@ -11,20 +11,18 @@ import { APIKey, BaseResource } from '../../resources/internal';
 
 export class APIKeys implements APIKeysNamespace {
   /**
-   * @internal
    * Returns the base options for the FAPI proxy requests.
-   *
-   * - `pathPrefix` is set to an empty string because API versioning is handled via the `clerk-api-version` header, not in the URL. The proxy does not include the version in the path.
-   * - `credentials` is set to `same-origin` to ensure cookies and credentials are sent with requests, avoiding CORS issues.
-   * - The session token is retrieved and passed as a Bearer token in the `Authorization` header for authentication.
    */
   private async getBaseFapiProxyOptions() {
     return {
+      // Set to an empty string because FAPI Proxy does not include the version in the path.
       pathPrefix: '',
+      // Set the session token as a Bearer token in the Authorization header for authentication.
       headers: {
         Authorization: `Bearer ${await BaseResource.clerk.session?.getToken()}`,
         'Content-Type': 'application/json',
       },
+      // Set to `same-origin` to ensure cookies and credentials are sent with requests, avoiding CORS issues.
       credentials: 'same-origin' as const,
     };
   }
