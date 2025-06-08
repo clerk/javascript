@@ -1,4 +1,4 @@
-import type { APIKeyResource } from './apiKeys';
+import type { APIKeysNamespace } from './apiKeys';
 import type {
   APIKeysTheme,
   Appearance,
@@ -776,36 +776,11 @@ export interface Clerk {
   __internal_setActiveInProgress: boolean;
 
   /**
+   * API Keys Object
    * @experimental
    * This API is in early access and may change in future releases.
-   *
-   * Retrieves all API keys for the current user or organization.
    */
-  getApiKeys: (params?: GetAPIKeysParams) => Promise<APIKeyResource[]>;
-
-  /**
-   * @experimental
-   * This API is in early access and may change in future releases.
-   *
-   * Retrieves the secret for a given API key ID.
-   */
-  getApiKeySecret: (apiKeyID: string) => Promise<string>;
-
-  /**
-   * @experimental
-   * This API is in early access and may change in future releases.
-   *
-   * Creates a new API key.
-   */
-  createApiKey: (params: CreateAPIKeyParams) => Promise<APIKeyResource>;
-
-  /**
-   * @experimental
-   * This API is in early access and may change in future releases.
-   *
-   * Revokes a given API key by ID.
-   */
-  revokeApiKey: (params: RevokeAPIKeyParams) => Promise<APIKeyResource>;
+  apiKeys: APIKeysNamespace;
 }
 
 export type HandleOAuthCallbackParams = TransferableOption &

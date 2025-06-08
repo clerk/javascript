@@ -1,10 +1,4 @@
-import type {
-  ApiKeyJSON,
-  APIKeyResource,
-  CreateAPIKeyParams,
-  GetAPIKeysParams,
-  RevokeAPIKeyParams,
-} from '@clerk/types';
+import type { ApiKeyJSON, APIKeyResource } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
 import { BaseResource } from './internal';
@@ -54,90 +48,5 @@ export class APIKey extends BaseResource implements APIKeyResource {
     this.updatedAt = unixEpochToDate(data.updated_at);
     this.createdAt = unixEpochToDate(data.created_at);
     return this;
-  }
-
-  static async getAll(params?: GetAPIKeysParams): Promise<APIKeyResource[]> {
-    return this.clerk
-      .getFapiClient()
-      .request<{ api_keys: ApiKeyJSON[] }>({
-        method: 'GET',
-        path: '/api_keys',
-        pathPrefix: '',
-        search: {
-          subject: params?.subject ?? this.clerk.organization?.id ?? this.clerk.user?.id ?? '',
-        },
-        headers: {
-          Authorization: `Bearer ${await this.clerk.session?.getToken()}`,
-        },
-        credentials: 'same-origin',
-      })
-      .then(res => {
-        const apiKeysJSON = res.payload as unknown as { api_keys: ApiKeyJSON[] };
-        return apiKeysJSON.api_keys.map(json => new APIKey(json));
-      })
-      .catch(() => []);
-  }
-
-  static async getSecret(id: string): Promise<string> {
-    return this.clerk
-      .getFapiClient()
-      .request<{ secret: string }>({
-        method: 'GET',
-        path: `/api_keys/${id}/secret`,
-        credentials: 'same-origin',
-        pathPrefix: '',
-        headers: {
-          Authorization: `Bearer ${await this.clerk.session?.getToken()}`,
-        },
-      })
-      .then(res => {
-        const { secret } = res.payload as unknown as { secret: string };
-        return secret;
-      })
-      .catch(() => '');
-  }
-
-  static async create(params: CreateAPIKeyParams): Promise<APIKeyResource> {
-    const json = (
-      await BaseResource._fetch<ApiKeyJSON>({
-        path: '/api_keys',
-        method: 'POST',
-        pathPrefix: '',
-        headers: {
-          Authorization: `Bearer ${await this.clerk.session?.getToken()}`,
-          'Content-Type': 'application/json',
-        },
-        credentials: 'same-origin',
-        body: JSON.stringify({
-          type: params.type ?? 'api_key',
-          name: params.name,
-          subject: params.subject ?? this.clerk.organization?.id ?? this.clerk.user?.id ?? '',
-          description: params.description,
-          seconds_until_expiration: params.secondsUntilExpiration,
-        }),
-      })
-    )?.response as ApiKeyJSON;
-
-    return new APIKey(json);
-  }
-
-  static async revoke(params: RevokeAPIKeyParams): Promise<APIKeyResource> {
-    const json = (
-      await BaseResource._fetch<ApiKeyJSON>({
-        path: `/api_keys/${params.apiKeyID}/revoke`,
-        method: 'POST',
-        pathPrefix: '',
-        headers: {
-          Authorization: `Bearer ${await this.clerk.session?.getToken()}`,
-          'Content-Type': 'application/json',
-        },
-        credentials: 'same-origin',
-        body: JSON.stringify({
-          revocation_reason: params.revocationReason,
-        }),
-      })
-    )?.response as ApiKeyJSON;
-
-    return new APIKey(json);
   }
 }

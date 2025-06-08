@@ -29,7 +29,7 @@ import { timeAgo } from '@/utils/date';
 const useApiKeySecret = ({ apiKeyID, enabled }: { apiKeyID: string; enabled: boolean }) => {
   const clerk = useClerk();
 
-  return useSWR(enabled ? ['api-key-secret', apiKeyID] : null, () => clerk.getApiKeySecret(apiKeyID));
+  return useSWR(enabled ? ['api-key-secret', apiKeyID] : null, () => clerk.apiKeys.getSecret(apiKeyID));
 };
 
 const CopySecretButton = ({ apiKeyID }: { apiKeyID: string }) => {
