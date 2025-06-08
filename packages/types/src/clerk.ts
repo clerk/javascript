@@ -777,6 +777,8 @@ export interface Clerk {
 
   /**
    * API Keys Object
+   * @experimental
+   * This API is in early access and may change in future releases.
    */
   apiKeys: APIKeysNamespace;
 }
