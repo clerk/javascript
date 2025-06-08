@@ -67,6 +67,7 @@ export const enUS: LocalizationResource = {
       title__paymentSuccessful: 'Payment was successful!',
       title__subscriptionSuccessful: 'Success!',
     },
+    credit: 'Credit',
     creditRemainder: 'Credit for the remainder of your current subscription.',
     defaultFreePlanActive: "You're currently on the Free plan",
     free: 'Free',
@@ -231,6 +232,7 @@ export const enUS: LocalizationResource = {
         title: 'Payment methods',
       },
       start: {
+        headerTitle__payments: 'Payments',
         headerTitle__plans: 'Plans',
         headerTitle__statements: 'Statements',
         headerTitle__subscriptions: 'Subscriptions',
@@ -862,6 +864,7 @@ export const enUS: LocalizationResource = {
         title: 'Payment methods',
       },
       start: {
+        headerTitle__payments: 'Payments',
         headerTitle__plans: 'Plans',
         headerTitle__statements: 'Statements',
         headerTitle__subscriptions: 'Subscription',

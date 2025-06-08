@@ -6,6 +6,7 @@ import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
 import { Route, Switch } from '../../router';
 import { OrganizationGeneralPage } from './OrganizationGeneralPage';
 import { OrganizationMembers } from './OrganizationMembers';
+import { OrganizationPaymentAttemptPage } from './OrganizationPaymentAttemptPage';
 import { OrganizationPlansPage } from './OrganizationPlansPage';
 import { OrganizationStatementPage } from './OrganizationStatementPage';
 
@@ -90,6 +91,12 @@ export const OrganizationProfileRoutes = () => {
                   {/* TODO(@commerce): Should this be lazy loaded ? */}
                   <Suspense fallback={''}>
                     <OrganizationStatementPage />
+                  </Suspense>
+                </Route>
+                <Route path='payment-attempt/:paymentAttemptId'>
+                  {/* TODO(@commerce): Should this be lazy loaded ? */}
+                  <Suspense fallback={''}>
+                    <OrganizationPaymentAttemptPage />
                   </Suspense>
                 </Route>
               </Switch>

@@ -39,6 +39,25 @@ export const usePaymentSources = () => {
   return useSWR(cacheKey, () => (subscriberType === 'org' ? organization : user)?.getPaymentSources({}), dedupeOptions);
 };
 
+export const usePaymentAttemptsCacheKey = () => {
+  const { organization } = useOrganization();
+  const { user } = useUser();
+  const subscriberType = useSubscriberTypeContext();
+
+  return {
+    key: `commerce-payment-history`,
+    userId: user?.id,
+    args: { orgId: subscriberType === 'org' ? organization?.id : undefined },
+  };
+};
+
+export const usePaymentAttempts = () => {
+  const { billing } = useClerk();
+  const cacheKey = usePaymentAttemptsCacheKey();
+
+  return useSWR(cacheKey, ({ args, userId }) => (userId ? billing.getPaymentAttempts(args) : undefined), dedupeOptions);
+};
+
 export const useStatementsCacheKey = () => {
   const { organization } = useOrganization();
   const { user } = useUser();

@@ -12,8 +12,6 @@ export type {
   OrganizationSyncOptions,
   InferAuthObjectFromToken,
   InferAuthObjectFromTokenArray,
-  SessionAuthObject,
-  MachineAuthObject,
   GetAuthFn,
 } from './tokens/types';
 

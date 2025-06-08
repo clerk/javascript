@@ -4,6 +4,7 @@ import { CustomPageContentContainer } from '../../common/CustomPageContentContai
 import { USER_PROFILE_NAVBAR_ROUTE_ID } from '../../constants';
 import { useEnvironment, useUserProfileContext } from '../../contexts';
 import { Route, Switch } from '../../router';
+import { PaymentAttemptPage } from '../PaymentAttempts';
 import { StatementPage } from '../Statements';
 import { AccountPage } from './AccountPage';
 import { PlansPage } from './PlansPage';
@@ -82,6 +83,12 @@ export const UserProfileRoutes = () => {
                 {/* TODO(@commerce): Should this be lazy loaded ? */}
                 <Suspense fallback={''}>
                   <StatementPage />
+                </Suspense>
+              </Route>
+              <Route path='payment-attempt/:paymentAttemptId'>
+                {/* TODO(@commerce): Should this be lazy loaded ? */}
+                <Suspense fallback={''}>
+                  <PaymentAttemptPage />
                 </Suspense>
               </Route>
             </Switch>

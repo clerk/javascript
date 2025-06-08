@@ -1,11 +1,10 @@
-import type { AuthObject } from '@clerk/backend';
+import type { AuthObject, MachineAuthObject, SessionAuthObject } from '@clerk/backend';
 import type {
   AuthenticateRequestOptions,
   InferAuthObjectFromToken,
   InferAuthObjectFromTokenArray,
-  MachineAuthObject,
   RedirectFun,
-  SessionAuthObject,
+  SessionTokenType,
 } from '@clerk/backend/internal';
 import { constants, createClerkRequest, createRedirect, TokenType } from '@clerk/backend/internal';
 import type { PendingSessionOptions } from '@clerk/types';
@@ -56,7 +55,13 @@ export interface AuthFn<TRedirect = ReturnType<typeof redirect>> {
    */
   <T extends TokenType[]>(
     options: AuthOptions & { acceptsToken: T },
-  ): Promise<InferAuthObjectFromTokenArray<T, SessionAuthWithRedirect<TRedirect>, MachineAuthObject<T[number]>>>;
+  ): Promise<
+    InferAuthObjectFromTokenArray<
+      T,
+      SessionAuthWithRedirect<TRedirect>,
+      MachineAuthObject<Exclude<T[number], SessionTokenType>>
+    >
+  >;
 
   /**
    * @example
@@ -64,7 +69,9 @@ export interface AuthFn<TRedirect = ReturnType<typeof redirect>> {
    */
   <T extends TokenType>(
     options: AuthOptions & { acceptsToken: T },
-  ): Promise<InferAuthObjectFromToken<T, SessionAuthWithRedirect<TRedirect>, MachineAuthObject<T>>>;
+  ): Promise<
+    InferAuthObjectFromToken<T, SessionAuthWithRedirect<TRedirect>, MachineAuthObject<Exclude<T, SessionTokenType>>>
+  >;
 
   /**
    * @example
