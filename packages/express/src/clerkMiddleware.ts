@@ -19,7 +19,10 @@ import type { ClerkMiddlewareOptions } from './types';
  * app.use(clerkMiddleware());
  */
 export const clerkMiddleware = (options: ClerkMiddlewareOptions = {}): RequestHandler => {
-  const authMiddleware = authenticateAndDecorateRequest(options);
+  const authMiddleware = authenticateAndDecorateRequest({
+    ...options,
+    acceptsToken: 'any',
+  });
 
   return (request, response, next) => {
     authMiddleware(request, response, next);

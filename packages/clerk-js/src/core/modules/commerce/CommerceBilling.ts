@@ -2,6 +2,8 @@ import type {
   ClerkPaginatedResponse,
   CommerceBillingNamespace,
   CommerceCheckoutJSON,
+  CommercePaymentJSON,
+  CommercePaymentResource,
   CommercePlanResource,
   CommerceProductJSON,
   CommerceStatementJSON,
@@ -9,6 +11,7 @@ import type {
   CommerceSubscriptionJSON,
   CommerceSubscriptionResource,
   CreateCheckoutParams,
+  GetPaymentAttemptsParams,
   GetPlansParams,
   GetStatementsParams,
   GetSubscriptionsParams,
@@ -18,6 +21,7 @@ import { convertPageToOffsetSearchParams } from '../../../utils/convertPageToOff
 import {
   BaseResource,
   CommerceCheckout,
+  CommercePayment,
   CommercePlan,
   CommerceStatement,
   CommerceSubscription,
@@ -69,6 +73,25 @@ export class CommerceBilling implements CommerceBillingNamespace {
       return {
         total_count,
         data: statements.map(statement => new CommerceStatement(statement)),
+      };
+    });
+  };
+
+  getPaymentAttempts = async (
+    params: GetPaymentAttemptsParams,
+  ): Promise<ClerkPaginatedResponse<CommercePaymentResource>> => {
+    const { orgId, ...rest } = params;
+
+    return await BaseResource._fetch({
+      path: orgId ? `/organizations/${orgId}/commerce/payment_attempts` : `/me/commerce/payment_attempts`,
+      method: 'GET',
+      search: convertPageToOffsetSearchParams(rest),
+    }).then(res => {
+      const { data: payments, total_count } = res as unknown as ClerkPaginatedResponse<CommercePaymentJSON>;
+
+      return {
+        total_count,
+        data: payments.map(payment => new CommercePayment(payment)),
       };
     });
   };

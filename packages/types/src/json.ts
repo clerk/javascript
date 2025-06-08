@@ -671,8 +671,12 @@ export interface CommercePaymentJSON extends ClerkResourceJSON {
   object: 'commerce_payment';
   id: string;
   amount: CommerceMoneyJSON;
+  paid_at?: number;
+  failed_at?: number;
+  updated_at: number;
   payment_source: CommercePaymentSourceJSON;
   subscription: CommerceSubscriptionJSON;
+  subscription_item: CommerceSubscriptionJSON;
   charge_type: CommercePaymentChargeType;
   status: CommercePaymentStatus;
 }
