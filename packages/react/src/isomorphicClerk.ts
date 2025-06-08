@@ -8,7 +8,7 @@ import type {
   __internal_PlanDetailsProps,
   __internal_UserVerificationModalProps,
   __internal_UserVerificationProps,
-  APIKeyResource,
+  APIKeysNamespace,
   APIKeysProps,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
@@ -20,11 +20,9 @@ import type {
   ClerkStatus,
   ClientResource,
   CommerceBillingNamespace,
-  CreateAPIKeyParams,
   CreateOrganizationParams,
   CreateOrganizationProps,
   DomainOrProxyUrl,
-  GetAPIKeysParams,
   GoogleOneTapProps,
   HandleEmailLinkVerificationParams,
   HandleOAuthCallbackParams,
@@ -38,7 +36,6 @@ import type {
   OrganizationSwitcherProps,
   PricingTableProps,
   RedirectOptions,
-  RevokeAPIKeyParams,
   SetActiveParams,
   SignInProps,
   SignInRedirectOptions,
@@ -104,11 +101,13 @@ type IsomorphicLoadedClerk = Without<
   | '__internal_getCachedResources'
   | '__internal_reloadInitialResources'
   | 'billing'
+  | 'apiKeys'
   | '__internal_setComponentNavigationContext'
   | '__internal_setActiveInProgress'
 > & {
   client: ClientResource | undefined;
   billing: CommerceBillingNamespace | undefined;
+  apiKeys: APIKeysNamespace | undefined;
 };
 
 export class IsomorphicClerk implements IsomorphicLoadedClerk {
@@ -700,6 +699,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   get billing(): CommerceBillingNamespace | undefined {
     return this.clerkjs?.billing;
+  }
+
+  get apiKeys(): APIKeysNamespace | undefined {
+    return this.clerkjs?.apiKeys;
   }
 
   __unstable__setEnvironment(...args: any): void {
@@ -1331,42 +1334,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return callback() as Promise<WaitlistResource>;
     } else {
       this.premountMethodCalls.set('joinWaitlist', callback);
-    }
-  };
-
-  getApiKeys = async (params?: GetAPIKeysParams): Promise<APIKeyResource[] | void> => {
-    const callback = () => this.clerkjs?.getApiKeys(params);
-    if (this.clerkjs && this.loaded) {
-      return callback() as Promise<APIKeyResource[]>;
-    } else {
-      this.premountMethodCalls.set('getApiKeys', callback);
-    }
-  };
-
-  getApiKeySecret = async (apiKeyId: string): Promise<string | void> => {
-    const callback = () => this.clerkjs?.getApiKeySecret(apiKeyId);
-    if (this.clerkjs && this.loaded) {
-      return callback() as Promise<string>;
-    } else {
-      this.premountMethodCalls.set('getApiKeySecret', callback);
-    }
-  };
-
-  createApiKey = async (params: CreateAPIKeyParams): Promise<APIKeyResource | void> => {
-    const callback = () => this.clerkjs?.createApiKey(params);
-    if (this.clerkjs && this.loaded) {
-      return callback() as Promise<APIKeyResource>;
-    } else {
-      this.premountMethodCalls.set('createApiKey', callback);
-    }
-  };
-
-  revokeApiKey = async (params: RevokeAPIKeyParams): Promise<APIKeyResource | void> => {
-    const callback = () => this.clerkjs?.revokeApiKey(params);
-    if (this.clerkjs && this.loaded) {
-      return callback() as Promise<APIKeyResource>;
-    } else {
-      this.premountMethodCalls.set('revokeApiKey', callback);
     }
   };
 

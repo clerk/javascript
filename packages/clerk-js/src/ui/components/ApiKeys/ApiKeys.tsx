@@ -46,7 +46,7 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
   } = useApiKeys({ subject, perPage });
   const card = useCardState();
   const { trigger: createApiKey, isMutating } = useSWRMutation(cacheKey, (_, { arg }: { arg: CreateAPIKeyParams }) =>
-    clerk.createApiKey(arg),
+    clerk.apiKeys.create(arg),
   );
   const { t } = useLocalizations();
   const clerk = useClerk();

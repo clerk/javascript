@@ -20,7 +20,7 @@ import type {
   __internal_OAuthConsentProps,
   __internal_PlanDetailsProps,
   __internal_UserVerificationModalProps,
-  APIKeyResource,
+  APIKeysNamespace,
   APIKeysProps,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
@@ -33,7 +33,6 @@ import type {
   ClientJSONSnapshot,
   ClientResource,
   CommerceBillingNamespace,
-  CreateAPIKeyParams,
   CreateOrganizationParams,
   CreateOrganizationProps,
   CredentialReturn,
@@ -41,7 +40,6 @@ import type {
   EnvironmentJSON,
   EnvironmentJSONSnapshot,
   EnvironmentResource,
-  GetAPIKeysParams,
   GoogleOneTapProps,
   HandleEmailLinkVerificationParams,
   HandleOAuthCallbackParams,
@@ -62,7 +60,6 @@ import type {
   PublicKeyCredentialWithAuthenticatorAttestationResponse,
   RedirectOptions,
   Resources,
-  RevokeAPIKeyParams,
   SDKMetadata,
   SetActiveParams,
   SignedInSessionResource,
@@ -137,9 +134,9 @@ import { eventBus, events } from './events';
 import type { FapiClient, FapiRequestCallback } from './fapiClient';
 import { createFapiClient } from './fapiClient';
 import { createClientFromJwt } from './jwt-client';
+import { APIKeys } from './modules/apiKeys';
 import { CommerceBilling } from './modules/commerce';
 import {
-  APIKey,
   BaseResource,
   Client,
   EmailLinkError,
@@ -195,6 +192,7 @@ export class Clerk implements ClerkInterface {
     environment: process.env.NODE_ENV || 'production',
   };
   private static _billing: CommerceBillingNamespace;
+  private static _apiKeys: APIKeysNamespace;
 
   public client: ClientResource | undefined;
   public session: SignedInSessionResource | null | undefined;
@@ -328,6 +326,13 @@ export class Clerk implements ClerkInterface {
       Clerk._billing = new CommerceBilling();
     }
     return Clerk._billing;
+  }
+
+  get apiKeys(): APIKeysNamespace {
+    if (!Clerk._apiKeys) {
+      Clerk._apiKeys = new APIKeys();
+    }
+    return Clerk._apiKeys;
   }
 
   public __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K] {
@@ -2080,14 +2085,6 @@ export class Clerk implements ClerkInterface {
   public updateEnvironment(environment: EnvironmentResource): asserts this is { environment: EnvironmentResource } {
     this.environment = environment;
   }
-
-  public getApiKeys = (params?: GetAPIKeysParams): Promise<APIKeyResource[]> => APIKey.getAll(params);
-
-  public getApiKeySecret = (apiKeyID: string): Promise<string> => APIKey.getSecret(apiKeyID);
-
-  public createApiKey = (params: CreateAPIKeyParams): Promise<APIKeyResource> => APIKey.create(params);
-
-  public revokeApiKey = (params: RevokeAPIKeyParams): Promise<APIKeyResource> => APIKey.revoke(params);
 
   __internal_setCountry = (country: string | null) => {
     if (!this.__internal_country) {

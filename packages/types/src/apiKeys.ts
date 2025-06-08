@@ -1,3 +1,4 @@
+import type { CreateAPIKeyParams, GetAPIKeysParams, RevokeAPIKeyParams } from './clerk';
 import type { ClerkResource } from './resource';
 
 export interface APIKeyResource extends ClerkResource {
@@ -16,4 +17,11 @@ export interface APIKeyResource extends ClerkResource {
   lastUsedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface APIKeysNamespace {
+  getAll(params?: GetAPIKeysParams): Promise<APIKeyResource[]>;
+  getSecret(id: string): Promise<string>;
+  create(params: CreateAPIKeyParams): Promise<APIKeyResource>;
+  revoke(params: RevokeAPIKeyParams): Promise<APIKeyResource>;
 }

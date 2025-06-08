@@ -33,7 +33,7 @@ export const RevokeAPIKeyConfirmationModal = ({
     e.preventDefault();
     if (!apiKeyId) return;
 
-    await clerk.revokeApiKey({ apiKeyID: apiKeyId });
+    await clerk.apiKeys.revoke({ apiKeyID: apiKeyId });
     void mutate({ key: 'api-keys', subject: clerk.organization?.id ?? clerk.session?.user.id });
     onClose();
   };
