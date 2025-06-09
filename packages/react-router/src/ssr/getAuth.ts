@@ -1,21 +1,38 @@
-import { stripPrivateDataFromObject } from '@clerk/backend/internal';
+import {
+  type AuthenticateRequestOptions,
+  type GetAuthFn,
+  getAuthObjectForAcceptedToken,
+} from '@clerk/backend/internal';
 import type { LoaderFunctionArgs } from 'react-router';
 
 import { noLoaderArgsPassedInGetAuth } from '../utils/errors';
 import { authenticateRequest } from './authenticateRequest';
 import { loadOptions } from './loadOptions';
-import type { GetAuthReturn, RootAuthLoaderOptions } from './types';
+import type { RootAuthLoaderOptions } from './types';
 
-type GetAuthOptions = Pick<RootAuthLoaderOptions, 'secretKey'>;
+type GetAuthOptions = { acceptsToken?: AuthenticateRequestOptions['acceptsToken'] } & Pick<
+  RootAuthLoaderOptions,
+  'secretKey'
+>;
 
-export async function getAuth(args: LoaderFunctionArgs, opts?: GetAuthOptions): GetAuthReturn {
+export const getAuth: GetAuthFn<LoaderFunctionArgs, true> = (async (
+  args: LoaderFunctionArgs,
+  opts?: GetAuthOptions,
+) => {
   if (!args || (args && (!args.request || !args.context))) {
     throw new Error(noLoaderArgsPassedInGetAuth);
   }
 
-  const loadedOptions = loadOptions(args, opts);
-  // Note: authenticateRequest() will throw a redirect if the auth state is determined to be handshake
-  const requestState = await authenticateRequest(args, loadedOptions);
+  const { acceptsToken, ...restOptions } = opts || {};
 
-  return stripPrivateDataFromObject(requestState.toAuth());
-}
+  const loadedOptions = loadOptions(args, restOptions);
+  // Note: authenticateRequest() will throw a redirect if the auth state is determined to be handshake
+  const requestState = await authenticateRequest(args, {
+    ...loadedOptions,
+    acceptsToken: 'any',
+  });
+
+  const authObject = requestState.toAuth();
+
+  return getAuthObjectForAcceptedToken({ authObject, acceptsToken });
+}) as GetAuthFn<LoaderFunctionArgs, true>;
