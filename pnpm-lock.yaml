@@ -435,8 +435,8 @@ importers:
         specifier: workspace:^
         version: link:../types
       '@coinbase/wallet-sdk':
-        specifier: 4.3.3
-        version: 4.3.3
+        specifier: 4.3.0
+        version: 4.3.0
       '@emotion/cache':
         specifier: 11.14.0
         version: 11.14.0
@@ -474,8 +474,8 @@ importers:
         specifier: 3.3.3
         version: 3.3.3
       core-js:
-        specifier: 3.42.0
-        version: 3.42.0
+        specifier: 3.41.0
+        version: 3.41.0
       crypto-js:
         specifier: ^4.2.0
         version: 4.2.0
@@ -2008,8 +2008,8 @@ packages:
   '@cloudflare/workers-types@4.20241022.0':
     resolution: {integrity: sha512-1zOAw5QIDKItzGatzCrEpfLOB1AuMTwVqKmbw9B9eBfCUGRFNfJYMrJxIwcse9EmKahsQt2GruqU00pY/GyXgg==}
 
-  '@coinbase/wallet-sdk@4.3.3':
-    resolution: {integrity: sha512-h8gMLQNvP5TIJVXFOyQZaxbi1Mg5alFR4Z2/PEIngdyXZEoQGcVhzyQGuDa3t9zpllxvqfAaKfzDhsfCo+nhSQ==}
+  '@coinbase/wallet-sdk@4.3.0':
+    resolution: {integrity: sha512-T3+SNmiCw4HzDm4we9wCHCxlP0pqCiwKe4sOwPH3YAK2KSKjxPRydKu6UQJrdONFVLG7ujXvbd/6ZqmvJb8rkw==}
 
   '@colors/colors@1.5.0':
     resolution: {integrity: sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==}
@@ -6928,8 +6928,8 @@ packages:
   core-js@3.37.1:
     resolution: {integrity: sha512-Xn6qmxrQZyB0FFY8E3bgRXei3lWDJHhvI+u0q9TKIYM49G8pAr0FgnnrFRAmsbptZL1yxRADVXn+x5AGsbBfyw==}
 
-  core-js@3.42.0:
-    resolution: {integrity: sha512-Sz4PP4ZA+Rq4II21qkNqOEDTDrCvcANId3xpIgB34NDkWc3UduWj2dqEtN9yZIq8Dk3HyPI33x9sqqU5C8sr0g==}
+  core-js@3.41.0:
+    resolution: {integrity: sha512-SJ4/EHwS36QMJd6h/Rg+GyR4A5xE0FSI3eZ+iBVpfqf1x0eTSg1smWLHrA+2jQThZSh97fmSgFSU8B61nxosxA==}
 
   core-util-is@1.0.2:
     resolution: {integrity: sha512-3lqz5YjWTYnW6dlDa5TLaTCcShfar1e40rmcJVwCBJC6mWlFuj0eCHIElmG1g5kyuJ/GD+8Wn4FFCcz4gJPfaQ==}
@@ -15935,7 +15935,7 @@ snapshots:
 
   '@cloudflare/workers-types@4.20241022.0': {}
 
-  '@coinbase/wallet-sdk@4.3.3':
+  '@coinbase/wallet-sdk@4.3.0':
     dependencies:
       '@noble/hashes': 1.7.1
       clsx: 1.2.1
@@ -22172,7 +22172,7 @@ snapshots:
 
   core-js@3.37.1: {}
 
-  core-js@3.42.0: {}
+  core-js@3.41.0: {}
 
   core-util-is@1.0.2: {}
 
