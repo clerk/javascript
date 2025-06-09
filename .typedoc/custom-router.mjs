@@ -1,5 +1,13 @@
 // @ts-check
+import { PageKind, Reflection, ReflectionKind } from 'typedoc';
 import { MemberRouter } from 'typedoc-plugin-markdown';
+
+/**
+ * @param {import('typedoc').Reflection} reflection
+ */
+function isMethod(reflection) {
+  return reflection.kind === ReflectionKind.Method;
+}
 
 /**
  * From a filepath divided by `/` only keep the first and last part
@@ -32,6 +40,42 @@ export function load(app) {
  * @extends MemberRouter
  */
 class ClerkRouter extends MemberRouter {
+  directories = new Map([
+    [ReflectionKind.Class, 'classes'],
+    [ReflectionKind.Interface, 'interfaces'],
+    [ReflectionKind.Enum, 'enumerations'],
+    [ReflectionKind.Namespace, 'namespaces'],
+    [ReflectionKind.TypeAlias, 'type-aliases'],
+    [ReflectionKind.Function, 'functions'],
+    [ReflectionKind.Variable, 'variables'],
+    [ReflectionKind.Document, 'documents'],
+    [ReflectionKind.Method, 'methods'], // Added to include methods in the output
+  ]);
+
+  kindsToString = new Map([
+    [ReflectionKind.Module, 'Module'],
+    [ReflectionKind.Namespace, 'Namespace'],
+    [ReflectionKind.Document, 'Document'],
+    [ReflectionKind.Class, 'Class'],
+    [ReflectionKind.Interface, 'Interface'],
+    [ReflectionKind.Enum, 'Enum'],
+    [ReflectionKind.TypeAlias, 'TypeAlias'],
+    [ReflectionKind.Function, 'Function'],
+    [ReflectionKind.Variable, 'Variable'],
+    [ReflectionKind.Method, 'Method'], // Added to include methods in the output
+  ]);
+
+  // @ts-ignore - test
+  membersWithOwnFile = [
+    'Enum',
+    'Variable',
+    'Function',
+    'Class',
+    'Interface',
+    'TypeAlias',
+    'Method', // Added to include methods in the output
+  ];
+
   /**
    * @param {import('typedoc').ProjectReflection} project
    */
@@ -61,6 +105,8 @@ class ClerkRouter extends MemberRouter {
     // Convert URLs (by default camelCase) to kebab-case
     let filePath = toKebabCase(original);
 
+    console.log(filePath);
+
     /**
      * By default, the paths are deeply nested, e.g.:
      * - clerk-react/functions/use-clerk
@@ -73,5 +119,40 @@ class ClerkRouter extends MemberRouter {
     filePath = flattenDirName(filePath);
 
     return filePath;
+  }
+
+  /**
+   * @param {import('typedoc').RouterTarget} target
+   * @return {import('typedoc').PageKind | undefined}
+   */
+  getPageKind(target) {
+    if (!(target instanceof Reflection)) {
+      return undefined;
+    }
+
+    const pageReflectionKinds =
+      ReflectionKind.Class |
+      ReflectionKind.Interface |
+      ReflectionKind.Enum |
+      ReflectionKind.Module |
+      ReflectionKind.Namespace |
+      ReflectionKind.TypeAlias |
+      ReflectionKind.Function |
+      ReflectionKind.Variable |
+      /**
+       * This is the addition to the original source code to output methods, too
+       */
+      ReflectionKind.Method;
+    const documentReflectionKinds = ReflectionKind.Document;
+
+    if (target.kindOf(pageReflectionKinds)) {
+      return PageKind.Reflection;
+    }
+
+    if (target.kindOf(documentReflectionKinds)) {
+      return PageKind.Document;
+    }
+
+    return undefined;
   }
 }
