@@ -1,5 +1,6 @@
-import { unixEpochToDate } from '../date';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+
+import { unixEpochToDate } from '../date';
 
 describe('date utilities', () => {
   beforeAll(() => {

@@ -3,8 +3,8 @@ import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vite
 
 import { eventBus } from '../../events';
 import { createFapiClient } from '../../fapiClient';
-import { clerkMock, createUser, mockJwt, mockNetworkFailedFetch } from '../../vitest/fixtures';
 import { SessionTokenCache } from '../../tokenCache';
+import { clerkMock, createUser, mockJwt, mockNetworkFailedFetch } from '../../vitest/fixtures';
 import { BaseResource, Organization, Session } from '../internal';
 
 const baseFapiClientOptions = {

@@ -1,7 +1,7 @@
 // import { jest } from '@jest/globals';
 import type { LoadedClerk } from '@clerk/types';
 import type { ActiveSessionResource } from '@clerk/types';
-import { vi, type Mocked } from 'vitest';
+import { type Mocked, vi } from 'vitest';
 
 import type { RouteContextValue } from '../../router';
 

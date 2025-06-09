@@ -1,5 +1,6 @@
-import { BaseResource, ExternalAccount } from '../internal';
 import { describe, expect, it, vi } from 'vitest';
+
+import { BaseResource, ExternalAccount } from '../internal';
 
 describe('External account', () => {
   it('reauthorize', async () => {
