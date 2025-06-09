@@ -93,6 +93,3 @@ if (typeof window !== 'undefined') {
 //   },
 //   // ... other chrome namespaces needed
 // };
-
-// Add any other global setup needed for your tests
-console.log('ClerkJS Vitest setup complete.');
