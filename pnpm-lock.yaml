@@ -438,11 +438,11 @@ importers:
         specifier: 4.3.0
         version: 4.3.0
       '@emotion/cache':
-        specifier: 11.14.0
-        version: 11.14.0
+        specifier: 11.11.0
+        version: 11.11.0
       '@emotion/react':
-        specifier: 11.14.0
-        version: 11.14.0(@types/react@18.3.23)(react@18.3.1)
+        specifier: 11.11.1
+        version: 11.11.1(@types/react@18.3.23)(react@18.3.1)
       '@floating-ui/react':
         specifier: 0.27.12
         version: 0.27.12(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -2153,8 +2153,8 @@ packages:
   '@emotion/babel-plugin@11.13.5':
     resolution: {integrity: sha512-pxHCpT2ex+0q+HH91/zsdHkw/lXd468DIN2zvfvLtPKLLMo6gQj7oLObq8PhkrxOZb/gGCq03S3Z7PDhS8pduQ==}
 
-  '@emotion/cache@11.14.0':
-    resolution: {integrity: sha512-L/B1lc/TViYk4DcpGxtAVbx0ZyiKM5ktoIyafGkH6zg/tj+mA+NE//aPYKG0k8kCHSHVJrpLpcAlOBEXQ3SavA==}
+  '@emotion/cache@11.11.0':
+    resolution: {integrity: sha512-P34z9ssTCBi3e9EI1ZsWpNHcfY1r09ZO0rZbRO2ob3ZQMnFI35jB536qoXbkdesr5EUhYi22anuEJuyxifaqAQ==}
 
   '@emotion/css-prettifier@1.2.0':
     resolution: {integrity: sha512-p+9m/5fp61i90CGUT+516glGBXWoEHgSelybqR+5vlX6Kb+Z0rkOfEMFqTBwYMRxXZTitibZERl32n2yPma7Dw==}
@@ -2173,11 +2173,14 @@ packages:
       enzyme-to-json:
         optional: true
 
+  '@emotion/memoize@0.8.1':
+    resolution: {integrity: sha512-W2P2c/VRW1/1tLox0mVUalvnWXxavmv/Oum2aPsRcoDJuob75FC3Y8FbpfLwUegRcxINtGUMPq0tFCvYNTBXNA==}
+
   '@emotion/memoize@0.9.0':
     resolution: {integrity: sha512-30FAj7/EoJ5mwVPOWhAyCX+FPfMDrVecJAM+Iw9NRoSl4BBAQeqj4cApHHUXOVvIPgLVDsCFoz/hGD+5QQD1GQ==}
 
-  '@emotion/react@11.14.0':
-    resolution: {integrity: sha512-O000MLDBDdk/EohJPFUqvnp4qnHeYkVP5B0xEG0D/L7cOKP9kefu2DXn8dj74cQfsEzUqh+sr1RzFqiL1o+PpA==}
+  '@emotion/react@11.11.1':
+    resolution: {integrity: sha512-5mlW1DquU5HaxjLkfkGN1GA/fvVGdyHURRiX/0FHl2cfIfRxSOfmxEH5YS43edp0OldZrZ+dkBKbngxcNCdZvA==}
     peerDependencies:
       '@types/react': '*'
       react: '>=16.8.0'
@@ -2202,8 +2205,8 @@ packages:
   '@emotion/utils@1.4.2':
     resolution: {integrity: sha512-3vLclRofFziIa3J2wDh9jjbkUz9qk5Vi3IZ/FSTKViB0k+ef0fPV7dYrUIugbgupYDx7v9ud/SjrtEP8Y4xLoA==}
 
-  '@emotion/weak-memoize@0.4.0':
-    resolution: {integrity: sha512-snKqtPW01tN0ui7yu9rGv69aJXr/a/Ywvl11sUjNtEcRc+ng/mQriFL0wLXMef74iHa/EkftbDzU9F8iFbH+zg==}
+  '@emotion/weak-memoize@0.3.1':
+    resolution: {integrity: sha512-EsBwpc7hBUJWAsNPBmJy4hxWx12v6bshQsldrVmjxJoc3isbxhOrF2IcCpaXxfvq03NwkI7sbsOLXbYuqF/8Ww==}
 
   '@es-joy/jsdoccomment@0.50.2':
     resolution: {integrity: sha512-YAdE/IJSpwbOTiaURNCKECdAwqrJuFiZhylmesBcIRawtYKnBR2wxPhoIewMg+Yu+QuYvHfJNReWpoxGBKOChA==}
@@ -16160,12 +16163,12 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@emotion/cache@11.14.0':
+  '@emotion/cache@11.11.0':
     dependencies:
-      '@emotion/memoize': 0.9.0
+      '@emotion/memoize': 0.8.1
       '@emotion/sheet': 1.4.0
       '@emotion/utils': 1.4.2
-      '@emotion/weak-memoize': 0.4.0
+      '@emotion/weak-memoize': 0.3.1
       stylis: 4.2.0
 
   '@emotion/css-prettifier@1.2.0':
@@ -16185,17 +16188,19 @@ snapshots:
     optionalDependencies:
       '@types/jest': 29.5.12
 
+  '@emotion/memoize@0.8.1': {}
+
   '@emotion/memoize@0.9.0': {}
 
-  '@emotion/react@11.14.0(@types/react@18.3.23)(react@18.3.1)':
+  '@emotion/react@11.11.1(@types/react@18.3.23)(react@18.3.1)':
     dependencies:
       '@babel/runtime': 7.26.0
       '@emotion/babel-plugin': 11.13.5
-      '@emotion/cache': 11.14.0
+      '@emotion/cache': 11.11.0
       '@emotion/serialize': 1.3.3
       '@emotion/use-insertion-effect-with-fallbacks': 1.2.0(react@18.3.1)
       '@emotion/utils': 1.4.2
-      '@emotion/weak-memoize': 0.4.0
+      '@emotion/weak-memoize': 0.3.1
       hoist-non-react-statics: 3.3.2
       react: 18.3.1
     optionalDependencies:
@@ -16221,7 +16226,7 @@ snapshots:
 
   '@emotion/utils@1.4.2': {}
 
-  '@emotion/weak-memoize@0.4.0': {}
+  '@emotion/weak-memoize@0.3.1': {}
 
   '@es-joy/jsdoccomment@0.50.2':
     dependencies:
