@@ -8,10 +8,15 @@ import { useEffect, useRef, useState } from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
+import { Card } from '@/ui/elements/Card';
+import { useCardState } from '@/ui/elements/contexts';
+import { Form } from '@/ui/elements/Form';
+import { FormButtons } from '@/ui/elements/FormButtons';
+import { FormContainer } from '@/ui/elements/FormContainer';
+
 import { clerkUnsupportedEnvironmentWarning } from '../../../core/errors';
 import { useEnvironment, useSubscriberTypeContext } from '../../contexts';
 import { descriptors, Flex, localizationKeys, Spinner, useAppearance, useLocalizations } from '../../customizables';
-import { Card, Form, FormButtons, FormContainer, useCardState } from '../../elements';
 import type { LocalizationKey } from '../../localization';
 import { handleError, normalizeColorString } from '../../utils';
 
@@ -241,22 +246,24 @@ const AddPaymentSourceForm = ({ children }: PropsWithChildren) => {
     card.setLoading();
     card.setError(undefined);
 
-    try {
-      const { setupIntent, error } = await stripe.confirmSetup({
-        elements,
-        confirmParams: {
-          return_url: '', // TODO(@COMMERCE): need to figure this out
-        },
-        redirect: 'if_required',
-      });
-      if (error) {
-        return; // just return, since stripe will handle the error
-      }
+    const { setupIntent, error } = await stripe.confirmSetup({
+      elements,
+      confirmParams: {
+        return_url: '', // TODO(@COMMERCE): need to figure this out
+      },
+      redirect: 'if_required',
+    });
+    if (error) {
+      return; // just return, since stripe will handle the error
+    }
 
+    try {
       await onSuccess({ stripeSetupIntent: setupIntent });
     } catch (error) {
+      console.log('catch', error);
       void handleError(error, [], card.setError);
     } finally {
+      console.log('finally');
       card.setIdle();
       initializePaymentSource(); // resets the payment intent
     }

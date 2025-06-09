@@ -2,11 +2,12 @@ import React from 'react';
 
 import type { Flex } from '../customizables';
 import { Button, Col, descriptors, Text } from '../customizables';
-import { FormButtonContainer, Header } from '../elements';
 import { useNavigateToFlowStart } from '../hooks';
 import type { LocalizationKey } from '../localization';
 import { localizationKeys } from '../localization';
 import type { PropsOfComponent } from '../styledSystem';
+import { FormButtonContainer } from './FormButtons';
+import { Header } from './Header';
 
 type SuccessPageProps = Omit<PropsOfComponent<typeof Flex>, 'headerTitle' | 'title'> & {
   title?: LocalizationKey;

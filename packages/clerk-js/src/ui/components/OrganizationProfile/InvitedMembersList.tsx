@@ -1,8 +1,11 @@
 import { useOrganization } from '@clerk/shared/react';
 import type { OrganizationInvitationResource } from '@clerk/types';
 
+import { useCardState } from '@/ui/elements/contexts';
+import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
+import { UserPreview } from '@/ui/elements/UserPreview';
+
 import { Box, descriptors, localizationKeys, Td, Text } from '../../customizables';
-import { ThreeDotsMenu, useCardState, UserPreview } from '../../elements';
 import { useFetchRoles, useLocalizeCustomRoles } from '../../hooks/useFetchRoles';
 import { handleError } from '../../utils';
 import { DataTable, RowContainer } from './MemberListTable';

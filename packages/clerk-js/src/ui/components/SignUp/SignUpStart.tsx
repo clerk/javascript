@@ -3,20 +3,18 @@ import { useClerk } from '@clerk/shared/react';
 import type { PhoneCodeChannel, PhoneCodeChannelData, SignUpResource } from '@clerk/types';
 import React from 'react';
 
+import { Card } from '@/ui/elements/Card';
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { Header } from '@/ui/elements/Header';
+import { LoadingCard } from '@/ui/elements/LoadingCard';
+import { SocialButtonsReversibleContainerWithDivider } from '@/ui/elements/ReversibleContainer';
+
 import { ERROR_CODES, SIGN_UP_MODES } from '../../../core/constants';
 import { getClerkQueryParam, removeClerkQueryParam } from '../../../utils/getClerkQueryParam';
 import { withRedirectToAfterSignUp } from '../../common';
 import { SignInContext, useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys, useAppearance, useLocalizations } from '../../customizables';
-import {
-  Card,
-  Header,
-  LoadingCard,
-  SocialButtonsReversibleContainerWithDivider,
-  withCardStateProvider,
-} from '../../elements';
 import { CaptchaElement } from '../../elements/CaptchaElement';
-import { useCardState } from '../../elements/contexts';
 import { useLoadingStatus } from '../../hooks';
 import { useRouter } from '../../router';
 import type { FormControlState } from '../../utils';
@@ -121,6 +119,7 @@ function SignUpStartInternal(): JSX.Element {
   const hasEmail = !!formState.emailAddress.value;
   const isProgressiveSignUp = userSettings.signUp.progressive;
   const isLegalConsentEnabled = userSettings.signUp.legal_consent_enabled;
+  const oidcPrompt = ctx.oidcPrompt;
 
   const fields = determineActiveFields({
     attributes,
@@ -147,8 +146,13 @@ function SignUpStartInternal(): JSX.Element {
           setMissingRequirementsWithTicket(true);
         }
 
+        const redirectUrl = ctx.ssoCallbackUrl;
+        const redirectUrlComplete = ctx.afterSignUpUrl || '/';
+
         return completeSignUpFlow({
           signUp,
+          redirectUrl,
+          redirectUrlComplete,
           verifyEmailPath: 'verify-email-address',
           verifyPhonePath: 'verify-phone-number',
           handleComplete: () => {
@@ -157,6 +161,7 @@ function SignUpStartInternal(): JSX.Element {
             return setActive({ session: signUp.createdSessionId, redirectUrl: afterSignUpUrl });
           },
           navigate,
+          oidcPrompt,
         });
       })
       .catch(err => {
@@ -165,6 +170,12 @@ function SignUpStartInternal(): JSX.Element {
         handleError(err, [], card.setError);
       })
       .finally(() => {
+        // Keep the card in loading state during SSO redirect to prevent UI flicker
+        // This is necessary because there's a brief delay between initiating the SSO flow
+        // and the actual redirect to the external Identity Provider
+        const isRedirectingToSSOProvider = signUp.missingFields.some(mf => mf === 'saml' || mf === 'enterprise_sso');
+        if (isRedirectingToSSOProvider) return;
+
         status.setIdle();
         card.setIdle();
       });
@@ -304,7 +315,7 @@ function SignUpStartInternal(): JSX.Element {
           navigate,
           redirectUrl,
           redirectUrlComplete,
-          oidcPrompt: ctx.oidcPrompt,
+          oidcPrompt,
         }),
       )
       .catch(err => handleError(err, fieldsToSubmit, card.setError))

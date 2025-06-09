@@ -1,5 +1,8 @@
 import React, { memo, useMemo } from 'react';
 
+import { Pagination } from '@/ui/elements/Pagination';
+import { Select, SelectButton, SelectOptionList } from '@/ui/elements/Select';
+
 import type { LocalizationKey } from '../../customizables';
 import {
   Col,
@@ -16,7 +19,6 @@ import {
   Tr,
   useLocalizations,
 } from '../../customizables';
-import { Pagination, Select, SelectButton, SelectOptionList } from '../../elements';
 import { useLocalizeCustomRoles } from '../../hooks/useFetchRoles';
 import type { PropsOfComponent, ThemableCssProp } from '../../styledSystem';
 

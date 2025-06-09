@@ -2,8 +2,10 @@ import { useSession } from '@clerk/shared/react';
 import type { EmailCodeFactor, PhoneCodeFactor } from '@clerk/types';
 import React from 'react';
 
-import type { VerificationCodeCardProps } from '../../elements';
-import { useCardState, VerificationCodeCard } from '../../elements';
+import { useCardState } from '@/ui/elements/contexts';
+import type { VerificationCodeCardProps } from '@/ui/elements/VerificationCodeCard';
+import { VerificationCodeCard } from '@/ui/elements/VerificationCodeCard';
+
 import type { LocalizationKey } from '../../localization';
 import { handleError } from '../../utils';
 import { useAfterVerification } from './use-after-verification';

@@ -1,10 +1,14 @@
 import { useClerk } from '@clerk/shared/react';
 import type { JoinWaitlistParams } from '@clerk/types';
 
+import { Card } from '@/ui/elements/Card';
+import { useCardState } from '@/ui/elements/contexts';
+import { Form } from '@/ui/elements/Form';
+import { Header } from '@/ui/elements/Header';
+
 import { useWizard, Wizard } from '../../common';
 import { useWaitlistContext } from '../../contexts';
 import { Col, descriptors, Flex, Icon, localizationKeys, Text } from '../../customizables';
-import { Card, Form, Header, useCardState } from '../../elements';
 import { useLoadingStatus } from '../../hooks';
 import { SpinnerJumbo } from '../../icons';
 import { useRouter } from '../../router';

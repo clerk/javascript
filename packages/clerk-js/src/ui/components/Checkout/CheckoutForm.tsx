@@ -8,20 +8,16 @@ import type {
 import type { SetupIntent } from '@stripe/stripe-js';
 import { useMemo, useState } from 'react';
 
+import { Card } from '@/ui/elements/Card';
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { Drawer } from '@/ui/elements/Drawer';
+import { LineItems } from '@/ui/elements/LineItems';
+import { SegmentedControl } from '@/ui/elements/SegmentedControl';
+import { Select, SelectButton, SelectOptionList } from '@/ui/elements/Select';
+
 import { DevOnly } from '../../common/DevOnly';
 import { useCheckoutContext, usePaymentSources } from '../../contexts';
 import { Box, Button, Col, descriptors, Flex, Form, localizationKeys, Text } from '../../customizables';
-import {
-  Card,
-  Drawer,
-  LineItems,
-  SegmentedControl,
-  Select,
-  SelectButton,
-  SelectOptionList,
-  useCardState,
-  withCardStateProvider,
-} from '../../elements';
 import { ChevronUpDown } from '../../icons';
 import { handleError } from '../../utils';
 import * as AddPaymentSource from '../PaymentSources/AddPaymentSource';

@@ -41,8 +41,19 @@ const config = {
     '@/(.*)': '<rootDir>/src/$1',
   },
   transform: {
-    '^.+\\.m?tsx?$': ['ts-jest', { tsconfig: 'tsconfig.test.json', diagnostics: false }],
-    // '^.+\\.m?tsx?$': ['@swc/jest'],
+    '^.+\\.m?tsx?$': [
+      '@swc/jest',
+      {
+        jsc: {
+          transform: {
+            react: {
+              runtime: 'automatic',
+              importSource: '@emotion/react',
+            },
+          },
+        },
+      },
+    ],
     '^.+\\.svg$': '<rootDir>/svgTransform.js',
   },
 };

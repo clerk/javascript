@@ -510,6 +510,19 @@ export type ElementsConfig = {
   menuList: WithOptions<MenuId>;
   menuItem: WithOptions<MenuId>;
 
+  paymentAttemptRoot: WithOptions;
+  paymentAttemptHeader: WithOptions;
+  paymentAttemptHeaderTitleContainer: WithOptions;
+  paymentAttemptHeaderTitle: WithOptions;
+  paymentAttemptHeaderBadge: WithOptions;
+  paymentAttemptBody: WithOptions;
+  paymentAttemptFooter: WithOptions;
+  paymentAttemptFooterLabel: WithOptions;
+  paymentAttemptFooterValueContainer: WithOptions;
+  paymentAttemptFooterCurrency: WithOptions;
+  paymentAttemptFooterValue: WithOptions;
+  paymentAttemptCopyButton: WithOptions;
+
   modalBackdrop: WithOptions;
   modalContent: WithOptions;
   modalCloseButton: WithOptions;
@@ -833,6 +846,7 @@ export type WaitlistTheme = Theme;
 export type PricingTableTheme = Theme;
 export type CheckoutTheme = Theme;
 export type PlanDetailTheme = Theme;
+export type OAuthConsentTheme = Theme;
 
 type GlobalAppearanceOptions = {
   /**
@@ -897,4 +911,8 @@ export type Appearance<T = Theme> = T &
      * Theme overrides that only apply to the `<Checkout />` component
      */
     checkout?: T;
+    /**
+     * Theme overrides that only apply to the `<OAuthConsent />` component
+     */
+    __internal_oauthConsent?: T;
   };

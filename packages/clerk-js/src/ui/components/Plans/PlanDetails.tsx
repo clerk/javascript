@@ -10,10 +10,14 @@ import type {
 import * as React from 'react';
 import { useMemo, useState } from 'react';
 
+import { Alert } from '@/ui/elements/Alert';
+import { Avatar } from '@/ui/elements/Avatar';
+import { Drawer, useDrawerContext } from '@/ui/elements/Drawer';
+import { Switch } from '@/ui/elements/Switch';
+
 import { useProtect } from '../../common';
 import { SubscriberTypeContext, usePlansContext, useSubscriberTypeContext, useSubscriptions } from '../../contexts';
 import { Badge, Box, Button, Col, descriptors, Flex, Heading, localizationKeys, Span, Text } from '../../customizables';
-import { Alert, Avatar, Drawer, Switch, useDrawerContext } from '../../elements';
 import { handleError } from '../../utils';
 
 export const PlanDetails = (props: __internal_PlanDetailsProps) => {

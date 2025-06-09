@@ -1,7 +1,8 @@
 import { describe, it } from '@jest/globals';
 
+import { CardStateProvider } from '@/ui/elements/contexts';
+
 import { fireEvent, render, screen, waitFor } from '../../../../testUtils';
-import { CardStateProvider } from '../../../elements';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { runFakeTimers } from '../../../utils/test/runFakeTimers';
 import { PasswordSection } from '../PasswordSection';

@@ -2,9 +2,10 @@ import { useUser } from '@clerk/shared/react';
 import type { PasskeyResource } from '@clerk/types';
 import React from 'react';
 
+import type { FormProps } from '@/ui/elements/FormContainer';
+
 import { RemoveResourceForm } from '../../common';
 import { localizationKeys } from '../../customizables';
-import type { FormProps } from '../../elements';
 import { useEnabledThirdPartyProviders } from '../../hooks';
 
 type RemoveEmailFormProps = FormProps & {

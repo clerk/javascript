@@ -1,8 +1,9 @@
 import type { __internal_CheckoutProps } from '@clerk/types';
 
+import { Drawer } from '@/ui/elements/Drawer';
+
 import { CheckoutContext, SubscriberTypeContext } from '../../contexts';
 import { Flow, localizationKeys, Spinner } from '../../customizables';
-import { Drawer } from '../../elements';
 import { CheckoutComplete } from './CheckoutComplete';
 import { CheckoutForm } from './CheckoutForm';
 import * as CheckoutPage from './CheckoutPage';

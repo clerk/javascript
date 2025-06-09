@@ -1,9 +1,12 @@
 import { useOrganization, useUser } from '@clerk/shared/react';
 import type { OrganizationMembershipResource } from '@clerk/types';
 
+import { useCardState } from '@/ui/elements/contexts';
+import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
+import { UserPreview } from '@/ui/elements/UserPreview';
+
 import { Protect } from '../../common/Gate';
 import { Badge, Box, descriptors, localizationKeys, Td, Text } from '../../customizables';
-import { ThreeDotsMenu, useCardState, UserPreview } from '../../elements';
 import { useFetchRoles, useLocalizeCustomRoles } from '../../hooks/useFetchRoles';
 import { handleError } from '../../utils';
 import { DataTable, RoleSelect, RowContainer } from './MemberListTable';

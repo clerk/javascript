@@ -1,10 +1,11 @@
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
 import type { SignUpResource } from '@clerk/types';
 
+import { CardStateProvider } from '@/ui/elements/contexts';
+
 import { render, screen, waitFor } from '../../../../testUtils';
 import { OptionsProvider } from '../../../contexts';
 import { AppearanceProvider } from '../../../customizables';
-import { CardStateProvider } from '../../../elements';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { SignUpStart } from '../SignUpStart';
 

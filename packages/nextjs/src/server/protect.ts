@@ -2,6 +2,8 @@ import type { AuthObject } from '@clerk/backend';
 import type {
   AuthenticatedMachineObject,
   AuthenticateRequestOptions,
+  InferAuthObjectFromToken,
+  InferAuthObjectFromTokenArray,
   RedirectFun,
   SignedInAuthObject,
 } from '@clerk/backend/internal';
@@ -16,7 +18,6 @@ import type {
 
 import { constants as nextConstants } from '../constants';
 import { isNextFetcher } from './nextFetcher';
-import type { InferAuthObjectFromToken, InferAuthObjectFromTokenArray } from './types';
 
 type AuthProtectOptions = {
   /**
@@ -71,6 +72,12 @@ export interface AuthProtect {
   <T extends TokenType[]>(
     options?: AuthProtectOptions & { token: T },
   ): Promise<InferAuthObjectFromTokenArray<T, SignedInAuthObject, AuthenticatedMachineObject>>;
+
+  /**
+   * @example
+   * auth.protect({ token: 'any' });
+   */
+  (options?: AuthProtectOptions & { token: 'any' }): Promise<SignedInAuthObject | AuthenticatedMachineObject>;
 
   /**
    * @example

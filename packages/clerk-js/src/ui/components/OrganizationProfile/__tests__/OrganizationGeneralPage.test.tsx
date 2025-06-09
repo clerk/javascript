@@ -2,8 +2,9 @@ import type { ClerkPaginatedResponse, OrganizationDomainResource, OrganizationMe
 import { describe, it } from '@jest/globals';
 import userEvent from '@testing-library/user-event';
 
+import { CardStateProvider } from '@/ui/elements/contexts';
+
 import { act, render, waitFor } from '../../../../testUtils';
-import { CardStateProvider } from '../../../elements';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { OrganizationGeneralPage } from '../OrganizationGeneralPage';
 import { createFakeDomain, createFakeMember } from './utils';

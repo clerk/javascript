@@ -3,18 +3,16 @@ import { useReverification, useUser } from '@clerk/shared/react';
 import type { TOTPResource } from '@clerk/types';
 import React from 'react';
 
+import { ClipboardInput } from '@/ui/elements/ClipboardInput';
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { FormButtonContainer } from '@/ui/elements/FormButtons';
+import type { FormProps } from '@/ui/elements/FormContainer';
+import { FormContainer } from '@/ui/elements/FormContainer';
+import { FullHeightLoader } from '@/ui/elements/FullHeightLoader';
+
 import { QRCode } from '../../common';
 import type { LocalizationKey } from '../../customizables';
 import { Button, Col, descriptors, Flex, localizationKeys, Text } from '../../customizables';
-import type { FormProps } from '../../elements';
-import {
-  ClipboardInput,
-  FormButtonContainer,
-  FormContainer,
-  FullHeightLoader,
-  useCardState,
-  withCardStateProvider,
-} from '../../elements';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { handleError } from '../../utils';
 

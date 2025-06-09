@@ -2,7 +2,9 @@ import { createCheckAuthorization } from '@clerk/shared/authorization';
 import { __experimental_JWTPayloadToAuthObjectProperties } from '@clerk/shared/jwtPayloadParser';
 import type {
   CheckAuthorizationFromSessionClaims,
+  Jwt,
   JwtPayload,
+  PendingSessionOptions,
   ServerGetToken,
   ServerGetTokenOptions,
   SessionStatusClaim,
@@ -11,12 +13,19 @@ import type {
 
 import type { APIKey, CreateBackendApiOptions, MachineToken } from '../api';
 import { createBackendApiClient } from '../api';
+import { isTokenTypeAccepted } from '../internal';
 import type { AuthenticateContext } from './authenticateContext';
 import type { MachineTokenType, SessionTokenType } from './tokenTypes';
 import { TokenType } from './tokenTypes';
-import type { MachineAuthType } from './types';
+import type { AuthenticateRequestOptions, MachineAuthType } from './types';
 
+/**
+ * @inline
+ */
 type AuthObjectDebugData = Record<string, any>;
+/**
+ * @inline
+ */
 type AuthObjectDebug = () => AuthObjectDebugData;
 
 type Claims = Record<string, any>;
@@ -32,9 +41,21 @@ export type SignedInAuthObjectOptions = CreateBackendApiOptions & {
  * @internal
  */
 export type SignedInAuthObject = SharedSignedInAuthObjectProperties & {
+  /**
+   * The allowed token type.
+   */
   tokenType: SessionTokenType;
+  /**
+   * A function that gets the current user's [session token](https://clerk.com/docs/backend-requests/resources/session-tokens) or a [custom JWT template](https://clerk.com/docs/backend-requests/jwt-templates).
+   */
   getToken: ServerGetToken;
+  /**
+   * A function that checks if the user has an organization role or custom permission.
+   */
   has: CheckAuthorizationFromSessionClaims;
+  /**
+   * Used to help debug issues when using Clerk in development.
+   */
   debug: AuthObjectDebug;
 };
 
@@ -52,11 +73,6 @@ export type SignedOutAuthObject = {
   orgRole: null;
   orgSlug: null;
   orgPermissions: null;
-  /**
-   * Factor Verification Age
-   * Each item represents the minutes that have passed since the last time a first or second factor were verified.
-   * [fistFactorAge, secondFactorAge]
-   */
   factorVerificationAge: null;
   getToken: ServerGetToken;
   has: CheckAuthorizationFromSessionClaims;
@@ -88,30 +104,47 @@ type MachineObjectExtendedProperties<TAuthenticated extends boolean> = {
 
 /**
  * @internal
+ *
+ * Uses `T extends any` to create a distributive conditional type.
+ * This ensures that union types like `'api_key' | 'oauth_token'` are processed
+ * individually, creating proper discriminated unions where each token type
+ * gets its own distinct properties (e.g., oauth_token won't have claims).
  */
-export type AuthenticatedMachineObject<T extends MachineTokenType = MachineTokenType> = {
-  id: string;
-  subject: string;
-  scopes: string[];
-  getToken: () => Promise<string>;
-  has: CheckAuthorizationFromSessionClaims;
-  debug: AuthObjectDebug;
-  tokenType: T;
-} & MachineObjectExtendedProperties<true>[T];
+export type AuthenticatedMachineObject<T extends MachineTokenType = MachineTokenType> = T extends any
+  ? {
+      id: string;
+      subject: string;
+      scopes: string[];
+      getToken: () => Promise<string>;
+      has: CheckAuthorizationFromSessionClaims;
+      debug: AuthObjectDebug;
+      tokenType: T;
+    } & MachineObjectExtendedProperties<true>[T]
+  : never;
 
 /**
  * @internal
+ *
+ * Uses `T extends any` to create a distributive conditional type.
+ * This ensures that union types like `'api_key' | 'oauth_token'` are processed
+ * individually, creating proper discriminated unions where each token type
+ * gets its own distinct properties (e.g., oauth_token won't have claims).
  */
-export type UnauthenticatedMachineObject<T extends MachineTokenType = MachineTokenType> = {
-  id: null;
-  subject: null;
-  scopes: null;
-  getToken: () => Promise<null>;
-  has: CheckAuthorizationFromSessionClaims;
-  debug: AuthObjectDebug;
-  tokenType: T;
-} & MachineObjectExtendedProperties<false>[T];
+export type UnauthenticatedMachineObject<T extends MachineTokenType = MachineTokenType> = T extends any
+  ? {
+      id: null;
+      subject: null;
+      scopes: null;
+      getToken: () => Promise<null>;
+      has: CheckAuthorizationFromSessionClaims;
+      debug: AuthObjectDebug;
+      tokenType: T;
+    } & MachineObjectExtendedProperties<false>[T]
+  : never;
 
+/**
+ * @interface
+ */
 export type AuthObject =
   | SignedInAuthObject
   | SignedOutAuthObject
@@ -131,7 +164,7 @@ const createDebug = (data: AuthObjectDebugData | undefined) => {
  * @internal
  */
 export function signedInAuthObject(
-  authenticateContext: AuthenticateContext,
+  authenticateContext: Partial<AuthenticateContext>,
   sessionToken: string,
   sessionClaims: JwtPayload,
 ): SignedInAuthObject {
@@ -224,7 +257,7 @@ export function authenticatedMachineObject<T extends MachineTokenType>(
         name: result.name,
         claims: result.claims,
         scopes: result.scopes,
-      };
+      } as unknown as AuthenticatedMachineObject<T>;
     }
     case TokenType.MachineToken: {
       const result = verificationResult as MachineToken;
@@ -234,7 +267,7 @@ export function authenticatedMachineObject<T extends MachineTokenType>(
         name: result.name,
         claims: result.claims,
         scopes: result.scopes,
-      };
+      } as unknown as AuthenticatedMachineObject<T>;
     }
     case TokenType.OAuthToken: {
       return {
@@ -271,7 +304,7 @@ export function unauthenticatedMachineObject<T extends MachineTokenType>(
         tokenType,
         name: null,
         claims: null,
-      };
+      } as unknown as UnauthenticatedMachineObject<T>;
     }
     case TokenType.MachineToken: {
       return {
@@ -279,7 +312,7 @@ export function unauthenticatedMachineObject<T extends MachineTokenType>(
         tokenType,
         name: null,
         claims: null,
-      };
+      } as unknown as UnauthenticatedMachineObject<T>;
     }
     case TokenType.OAuthToken: {
       return {
@@ -298,6 +331,7 @@ export function unauthenticatedMachineObject<T extends MachineTokenType>(
  * Some frameworks like Remix or Next (/pages dir only) handle this serialization by simply
  * ignoring any non-serializable keys, however Nextjs /app directory is stricter and
  * throws an error if a non-serializable value is found.
+ *
  * @internal
  */
 export const makeAuthObjectSerializable = <T extends Record<string, unknown>>(obj: T): T => {
@@ -326,3 +360,79 @@ const createGetToken: CreateGetToken = params => {
     return sessionToken;
   };
 };
+
+/**
+ * @internal
+ */
+export const getAuthObjectFromJwt = (
+  jwt: Jwt,
+  { treatPendingAsSignedOut = true, ...options }: PendingSessionOptions & Partial<AuthenticateContext>,
+) => {
+  const authObject = signedInAuthObject(options, jwt.raw.text, jwt.payload);
+
+  if (treatPendingAsSignedOut && authObject.sessionStatus === 'pending') {
+    return signedOutAuthObject(options, authObject.sessionStatus);
+  }
+
+  return authObject;
+};
+
+/**
+ * @internal
+ * Filters and coerces an AuthObject based on the accepted token type(s).
+ *
+ * This function is used after authentication to ensure that the returned auth object
+ * matches the expected token type(s) specified by `acceptsToken`. If the token type
+ * of the provided `authObject` does not match any of the types in `acceptsToken`,
+ * it returns an unauthenticated or signed-out version of the object, depending on the token type.
+ *
+ * - If `acceptsToken` is `'any'`, the original auth object is returned.
+ * - If `acceptsToken` is a single token type or an array of token types, the function checks if
+ *   `authObject.tokenType` matches any of them.
+ * - If the token type does not match and is a session token, a signed-out object is returned.
+ * - If the token type does not match and is a machine token, an unauthenticated machine object is returned.
+ * - If the token type matches, the original auth object is returned.
+ *
+ * @param {Object} params
+ * @param {AuthObject} params.authObject - The authenticated object to filter.
+ * @param {AuthenticateRequestOptions['acceptsToken']} [params.acceptsToken=TokenType.SessionToken] - The accepted token type(s). Can be a string, array of strings, or 'any'.
+ * @returns {AuthObject} The filtered or coerced auth object.
+ *
+ * @example
+ * // Accept only 'api_key' tokens
+ * const authObject = { tokenType: 'session_token', userId: 'user_123' };
+ * const result = getAuthObjectForAcceptedToken({ authObject, acceptsToken: 'api_key' });
+ * // result will be a signed-out object (since tokenType is 'session_token' and does not match)
+ *
+ * @example
+ * // Accept 'api_key' or 'machine_token'
+ * const authObject = { tokenType: 'machine_token', id: 'mt_123' };
+ * const result = getAuthObjectForAcceptedToken({ authObject, acceptsToken: ['api_key', 'machine_token'] });
+ * // result will be the original authObject (since tokenType matches one in the array)
+ *
+ * @example
+ * // Accept any token type
+ * const authObject = { tokenType: 'api_key', id: 'ak_123' };
+ * const result = getAuthObjectForAcceptedToken({ authObject, acceptsToken: 'any' });
+ * // result will be the original authObject
+ */
+export function getAuthObjectForAcceptedToken({
+  authObject,
+  acceptsToken = TokenType.SessionToken,
+}: {
+  authObject: AuthObject;
+  acceptsToken: AuthenticateRequestOptions['acceptsToken'];
+}): AuthObject {
+  if (acceptsToken === 'any') {
+    return authObject;
+  }
+
+  if (!isTokenTypeAccepted(authObject.tokenType, acceptsToken)) {
+    if (authObject.tokenType === TokenType.SessionToken) {
+      return signedOutAuthObject(authObject.debug);
+    }
+    return unauthenticatedMachineObject(authObject.tokenType, authObject.debug);
+  }
+
+  return authObject;
+}

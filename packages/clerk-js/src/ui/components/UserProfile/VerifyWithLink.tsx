@@ -1,11 +1,14 @@
 import type { EmailAddressResource } from '@clerk/types';
 import React from 'react';
 
+import { useCardState } from '@/ui/elements/contexts';
+import { FormButtonContainer } from '@/ui/elements/FormButtons';
+import { VerificationLink } from '@/ui/elements/VerificationLinkCard';
+
 import { EmailLinkStatusCard } from '../../common';
 import { buildVerificationRedirectUrl } from '../../common/redirects';
 import { useEnvironment, useUserProfileContext } from '../../contexts';
 import { Button, descriptors, localizationKeys } from '../../customizables';
-import { FormButtonContainer, useCardState, VerificationLink } from '../../elements';
 import { useEmailLink } from '../../hooks';
 import { handleError } from '../../utils';
 
