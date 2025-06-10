@@ -35,5 +35,5 @@ export const hasPaidUserPlans: ComponentGuard = (_, environment) => {
 };
 
 export const disabledAPIKeysFeature: ComponentGuard = (_, environment) => {
-  return !environment?.apiKeysSettings.enabled;
+  return !environment?.apiKeysSettings?.enabled;
 };

@@ -11,6 +11,11 @@ export const APIKeysPage = () => {
   const { user } = useUser();
   const { contentRef } = useUnsafeNavbarContext();
 
+  if (!user) {
+    // We should never reach this point, but we'll return null to make TS happy
+    return null;
+  }
+
   return (
     <Col gap={4}>
       <Header.Root>
@@ -21,7 +26,7 @@ export const APIKeysPage = () => {
       </Header.Root>
       <ApiKeysContext.Provider value={{ componentName: 'APIKeys' }}>
         <APIKeysPageInternal
-          subject={user?.id ?? ''}
+          subject={user.id}
           revokeModalRoot={contentRef}
         />
       </ApiKeysContext.Provider>
