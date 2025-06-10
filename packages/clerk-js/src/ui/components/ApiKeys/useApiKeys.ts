@@ -8,6 +8,7 @@ export const useApiKeys = ({ subject, perPage = 5 }: { subject: string; perPage?
     key: 'api-keys',
     subject,
   };
+
   const { data: apiKeys, isLoading, mutate } = useSWR(cacheKey, () => clerk.apiKeys.getAll({ subject }));
   const [search, setSearch] = useState('');
   const filteredApiKeys = (apiKeys ?? []).filter(key => key.name.toLowerCase().includes(search.toLowerCase()));

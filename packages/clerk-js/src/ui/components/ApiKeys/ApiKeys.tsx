@@ -141,6 +141,7 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
         />
       )}
       <RevokeAPIKeyConfirmationModal
+        subject={subject}
         isOpen={isRevokeModalOpen}
         onOpen={() => setIsRevokeModalOpen(true)}
         onClose={() => {
