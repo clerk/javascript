@@ -181,7 +181,7 @@ export type MachineAuthObject<T extends Exclude<TokenType, SessionTokenType>> = 
   ? AuthenticatedMachineObject<T> | UnauthenticatedMachineObject<T>
   : never;
 
-export type AuthOptions = PendingSessionOptions & { acceptsToken?: AuthenticateRequestOptions['acceptsToken'] };
+type AuthOptions = PendingSessionOptions & { acceptsToken?: AuthenticateRequestOptions['acceptsToken'] };
 
 type MaybePromise<T, IsPromise extends boolean> = IsPromise extends true ? Promise<T> : T;
 
