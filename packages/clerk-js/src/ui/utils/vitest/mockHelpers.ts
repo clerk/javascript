@@ -22,8 +22,8 @@ type MockMap<T = any> = {
 
 const mockProp = <T>(obj: T, k: keyof T, mocks?: MockMap<T>) => {
   if (typeof obj[k] === 'function') {
-    // @ts-ignore - Assume it's assignable for mocking
-    obj[k] = mocks?.[k] ?? vi.fn();
+    const mockFn = mocks?.[k] ?? vi.fn();
+    (obj[k] as unknown as ReturnType<typeof vi.fn>) = mockFn;
   }
 };
 
