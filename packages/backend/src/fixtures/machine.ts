@@ -39,7 +39,7 @@ export const mockVerificationResults = {
   machine_token: {
     id: 'm2m_ey966f1b1xf93586b2debdcadb0b3bd1',
     name: 'my-machine-token',
-    subject: 'user_2vYVtestTESTtestTESTtestTESTtest',
+    subject: 'mch_2vYVtestTESTtestTESTtestTESTtest',
     scopes: ['read:foo', 'write:bar'],
     claims: { foo: 'bar' },
     revoked: false,

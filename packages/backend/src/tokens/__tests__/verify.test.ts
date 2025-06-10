@@ -121,7 +121,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
     const data = result.data as MachineToken;
     expect(data.id).toBe('m2m_ey966f1b1xf93586b2debdcadb0b3bd1');
     expect(data.name).toBe('my-machine-token');
-    expect(data.subject).toBe('user_2vYVtestTESTtestTESTtestTESTtest');
+    expect(data.subject).toBe('mch_2vYVtestTESTtestTESTtestTESTtest');
     expect(data.scopes).toEqual(['read:foo', 'write:bar']);
     expect(data.claims).toEqual({ foo: 'bar' });
   });
