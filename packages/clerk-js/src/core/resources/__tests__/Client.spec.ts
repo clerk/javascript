@@ -1,8 +1,19 @@
 import type { ClientJSON, ClientJSONSnapshot } from '@clerk/types';
-import { describe, expect, it, vi } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { createSession, createSignIn, createSignUp, createUser } from '../../vitest/fixtures';
 import { BaseResource, Client } from '../internal';
+
+const FIXED_DATE = new Date('2025-01-01T00:00:00Z');
+
+beforeAll(() => {
+  vi.useFakeTimers();
+  vi.setSystemTime(FIXED_DATE);
+});
+
+afterAll(() => {
+  vi.useRealTimers();
+});
 
 describe('Client Singleton', () => {
   describe('__internal_sendCaptchaToken', () => {

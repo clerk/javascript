@@ -21,16 +21,16 @@ const createFakeTimersHelpers = () => {
 type FakeTimersHelpers = ReturnType<typeof createFakeTimersHelpers>;
 type RunFakeTimersCallback = (timers: FakeTimersHelpers) => void | Promise<void>;
 
-export const runFakeTimers = <T extends RunFakeTimersCallback, R extends ReturnType<T>>(
-  cb: T,
-): R extends Promise<any> ? Promise<void> : void => {
+export async function runFakeTimers(cb: (timers: FakeTimersHelpers) => void): Promise<void>;
+export async function runFakeTimers(cb: (timers: FakeTimersHelpers) => Promise<void>): Promise<void>;
+export async function runFakeTimers(cb: RunFakeTimersCallback): Promise<void> {
   vi.useFakeTimers();
-  const res = cb(createFakeTimersHelpers());
-  if (res && 'then' in res) {
-    // @ts-expect-error
-    return res.finally(() => vi.useRealTimers());
+  try {
+    const result = cb(createFakeTimersHelpers());
+    if (result instanceof Promise) {
+      await result;
+    }
+  } finally {
+    vi.useRealTimers();
   }
-  vi.useRealTimers();
-  // @ts-ignore
-  return;
-};
+}
