@@ -1,7 +1,7 @@
 export const mockTokens = {
   api_key: 'ak_LCWGdaM8mv8K4PC/57IICZQXAeWfCgF30DZaFXHoGn9=',
   oauth_token: 'oat_8XOIucKvqHVr5tYP123456789abcdefghij',
-  machine_token: 'm2m_8XOIucKvqHVr5tYP123456789abcdefghij',
+  machine_token: 'mt_8XOIucKvqHVr5tYP123456789abcdefghij',
 } as const;
 
 export const mockVerificationResults = {

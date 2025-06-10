@@ -98,7 +98,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
   });
 
   it('verifies provided Machine token', async () => {
-    const token = 'm2m_8XOIucKvqHVr5tYP123456789abcdefghij';
+    const token = 'mt_8XOIucKvqHVr5tYP123456789abcdefghij';
 
     server.use(
       http.post(
@@ -199,7 +199,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
 
   describe('handles API errors for M2M tokens', () => {
     it('handles invalid token', async () => {
-      const token = 'm2m_invalid_token';
+      const token = 'mt_invalid_token';
 
       server.use(
         http.post('https://api.clerk.test/m2m_tokens/verify', () => {
@@ -220,7 +220,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
     });
 
     it('handles unexpected error', async () => {
-      const token = 'm2m_ey966f1b1xf93586b2debdcadb0b3bd1';
+      const token = 'mt_ey966f1b1xf93586b2debdcadb0b3bd1';
 
       server.use(
         http.post('https://api.clerk.test/m2m_tokens/verify', () => {

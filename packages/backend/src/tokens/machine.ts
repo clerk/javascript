@@ -2,7 +2,7 @@ import type { AuthenticateRequestOptions } from '../tokens/types';
 import type { MachineTokenType } from './tokenTypes';
 import { TokenType } from './tokenTypes';
 
-export const M2M_TOKEN_PREFIX = 'm2m_';
+export const M2M_TOKEN_PREFIX = 'mt_';
 export const OAUTH_TOKEN_PREFIX = 'oat_';
 export const API_KEY_PREFIX = 'ak_';
 
