@@ -83,8 +83,8 @@
     "tslib": "catalog:repo"
   },
   "devDependencies": {
-    "@remix-run/react": "^2.16.7",
-    "@remix-run/server-runtime": "^2.16.7",
+    "@remix-run/react": "^2.16.8",
+    "@remix-run/server-runtime": "^2.16.8",
     "@types/cookie": "^0.6.0"
   },
   "peerDependencies": {
