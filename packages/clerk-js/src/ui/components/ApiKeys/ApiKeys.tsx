@@ -131,7 +131,7 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
         isLoading={isLoading}
         onRevoke={handleRevoke}
       />
-      {itemCount > 5 && (
+      {itemCount > (perPage ?? 5) && (
         <Pagination
           count={pageCount}
           page={page}
