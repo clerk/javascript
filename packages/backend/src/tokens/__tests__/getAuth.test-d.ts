@@ -1,4 +1,4 @@
-import { assertType, test } from 'vitest';
+import { assertType, expectTypeOf, test } from 'vitest';
 
 import type { AuthObject } from '../authObjects';
 import type { GetAuthFn, MachineAuthObject, SessionAuthObject } from '../types';
@@ -12,24 +12,24 @@ test('infers the correct AuthObject type for each accepted token type', () => {
   const request = new Request('https://example.com');
 
   // Session token by default
-  assertType<SessionAuthObject>(getAuth(request));
+  expectTypeOf(getAuth(request)).toMatchTypeOf<SessionAuthObject>();
 
   // Individual token types
-  assertType<SessionAuthObject>(getAuth(request, { acceptsToken: 'session_token' }));
-  assertType<MachineAuthObject<'api_key'>>(getAuth(request, { acceptsToken: 'api_key' }));
-  assertType<MachineAuthObject<'machine_token'>>(getAuth(request, { acceptsToken: 'machine_token' }));
-  assertType<MachineAuthObject<'oauth_token'>>(getAuth(request, { acceptsToken: 'oauth_token' }));
+  expectTypeOf(getAuth(request, { acceptsToken: 'session_token' })).toMatchTypeOf<SessionAuthObject>();
+  expectTypeOf(getAuth(request, { acceptsToken: 'api_key' })).toMatchTypeOf<MachineAuthObject<'api_key'>>();
+  expectTypeOf(getAuth(request, { acceptsToken: 'machine_token' })).toMatchTypeOf<MachineAuthObject<'machine_token'>>();
+  expectTypeOf(getAuth(request, { acceptsToken: 'oauth_token' })).toMatchTypeOf<MachineAuthObject<'oauth_token'>>();
 
   // Array of token types
-  assertType<SessionAuthObject | MachineAuthObject<'machine_token'>>(
-    getAuth(request, { acceptsToken: ['session_token', 'machine_token'] }),
-  );
-  assertType<MachineAuthObject<'machine_token' | 'oauth_token'>>(
-    getAuth(request, { acceptsToken: ['machine_token', 'oauth_token'] }),
-  );
+  expectTypeOf(getAuth(request, { acceptsToken: ['session_token', 'machine_token'] })).toMatchTypeOf<
+    SessionAuthObject | MachineAuthObject<'machine_token'>
+  >();
+  expectTypeOf(getAuth(request, { acceptsToken: ['machine_token', 'oauth_token'] })).toMatchTypeOf<
+    MachineAuthObject<'machine_token' | 'oauth_token'>
+  >();
 
   // Any token type
-  assertType<AuthObject>(getAuth(request, { acceptsToken: 'any' }));
+  expectTypeOf(getAuth(request, { acceptsToken: 'any' })).toMatchTypeOf<AuthObject>();
 });
 
 test('verifies correct properties exist for each token type', () => {
@@ -37,32 +37,32 @@ test('verifies correct properties exist for each token type', () => {
 
   // Session token should have userId
   const sessionAuth = getAuth(request, { acceptsToken: 'session_token' });
-  assertType<string | null>(sessionAuth.userId);
+  expectTypeOf(sessionAuth.userId).toMatchTypeOf<string | null>();
 
   // All machine tokens should have id and subject
   const apiKeyAuth = getAuth(request, { acceptsToken: 'api_key' });
   const machineTokenAuth = getAuth(request, { acceptsToken: 'machine_token' });
   const oauthTokenAuth = getAuth(request, { acceptsToken: 'oauth_token' });
 
-  assertType<string | null>(apiKeyAuth.id);
-  assertType<string | null>(machineTokenAuth.id);
-  assertType<string | null>(oauthTokenAuth.id);
-  assertType<string | null>(apiKeyAuth.subject);
-  assertType<string | null>(machineTokenAuth.subject);
-  assertType<string | null>(oauthTokenAuth.subject);
+  expectTypeOf(apiKeyAuth.id).toMatchTypeOf<string | null>();
+  expectTypeOf(machineTokenAuth.id).toMatchTypeOf<string | null>();
+  expectTypeOf(oauthTokenAuth.id).toMatchTypeOf<string | null>();
+  expectTypeOf(apiKeyAuth.subject).toMatchTypeOf<string | null>();
+  expectTypeOf(machineTokenAuth.subject).toMatchTypeOf<string | null>();
+  expectTypeOf(oauthTokenAuth.subject).toMatchTypeOf<string | null>();
 
   // Only api_key and machine_token should have name and claims
-  assertType<string | null>(apiKeyAuth.name);
-  assertType<Record<string, any> | null>(apiKeyAuth.claims);
+  expectTypeOf(apiKeyAuth.name).toMatchTypeOf<string | null>();
+  expectTypeOf(apiKeyAuth.claims).toMatchTypeOf<Record<string, any> | null>();
 
-  assertType<string | null>(machineTokenAuth.name);
-  assertType<Record<string, any> | null>(machineTokenAuth.claims);
+  expectTypeOf(machineTokenAuth.name).toMatchTypeOf<string | null>();
+  expectTypeOf(machineTokenAuth.claims).toMatchTypeOf<Record<string, any> | null>();
 
   // oauth_token should NOT have name and claims
   // @ts-expect-error oauth_token does not have name property
-  void oauthTokenAuth.name;
+  assertType<string | null>(oauthTokenAuth.name);
   // @ts-expect-error oauth_token does not have claims property
-  void oauthTokenAuth.claims;
+  assertType<Record<string, any> | null>(oauthTokenAuth.claims);
 });
 
 test('verifies discriminated union works correctly with acceptsToken: any', () => {
@@ -72,36 +72,36 @@ test('verifies discriminated union works correctly with acceptsToken: any', () =
 
   if (auth.tokenType === 'session_token') {
     // Should be SessionAuthObject - has userId
-    assertType<string | null>(auth.userId);
+    expectTypeOf(auth.userId).toMatchTypeOf<string | null>();
     // Should NOT have machine token properties
     // @ts-expect-error session_token does not have id property
-    void auth.id;
+    assertType<string | null>(auth.id);
   } else if (auth.tokenType === 'api_key') {
     // Should be AuthenticatedMachineObject<'api_key'> - has id, name, claims
-    assertType<string | null>(auth.id);
-    assertType<string | null>(auth.name);
-    assertType<Record<string, any> | null>(auth.claims);
+    expectTypeOf(auth.id).toMatchTypeOf<string | null>();
+    expectTypeOf(auth.name).toMatchTypeOf<string | null>();
+    expectTypeOf(auth.claims).toMatchTypeOf<Record<string, any> | null>();
     // Should NOT have session token properties
     // @ts-expect-error api_key does not have userId property
-    void auth.userId;
+    assertType<string | null>(auth.userId);
   } else if (auth.tokenType === 'machine_token') {
     // Should be AuthenticatedMachineObject<'machine_token'> - has id, name, claims
-    assertType<string | null>(auth.id);
-    assertType<string | null>(auth.name);
-    assertType<Record<string, any> | null>(auth.claims);
+    expectTypeOf(auth.id).toMatchTypeOf<string | null>();
+    expectTypeOf(auth.name).toMatchTypeOf<string | null>();
+    expectTypeOf(auth.claims).toMatchTypeOf<Record<string, any> | null>();
     // Should NOT have session token properties
     // @ts-expect-error machine_token does not have userId property
-    void auth.userId;
+    assertType<string | null>(auth.userId);
   } else if (auth.tokenType === 'oauth_token') {
     // Should be AuthenticatedMachineObject<'oauth_token'> - has id but NOT name/claims
-    assertType<string | null>(auth.id);
+    expectTypeOf(auth.id).toMatchTypeOf<string | null>();
     // Should NOT have name or claims
     // @ts-expect-error oauth_token does not have name property
-    void auth.name;
+    assertType<string | null>(auth.name);
     // @ts-expect-error oauth_token does not have claims property
-    void auth.claims;
+    assertType<Record<string, any> | null>(auth.claims);
     // Should NOT have session token properties
     // @ts-expect-error oauth_token does not have userId property
-    void auth.userId;
+    assertType<string | null>(auth.userId);
   }
 });
