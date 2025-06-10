@@ -1,5 +1,8 @@
+import type { SignInResource } from '@clerk/types';
+
 import * as l from '../../localizations';
 import type { Clerk as ClerkType } from '../';
+import { mountSignInDemo } from './SignIn';
 
 const AVAILABLE_LOCALES = Object.keys(l) as (keyof typeof l)[];
 
@@ -34,6 +37,7 @@ const AVAILABLE_COMPONENTS = [
   'waitlist',
   'pricingTable',
   'oauthConsent',
+  'signInObservable',
 ] as const;
 
 const COMPONENT_PROPS_NAMESPACE = 'clerk-js-sandbox';
@@ -93,6 +97,7 @@ const componentControls: Record<(typeof AVAILABLE_COMPONENTS)[number], Component
   waitlist: buildComponentControls('waitlist'),
   pricingTable: buildComponentControls('pricingTable'),
   oauthConsent: buildComponentControls('oauthConsent'),
+  signInObservable: buildComponentControls('signInObservable'),
 };
 
 declare global {
@@ -257,7 +262,243 @@ function otherOptions() {
   return { updateOtherOptions };
 }
 
+function mountSignInObservable(element: HTMLDivElement) {
+  assertClerkIsLoaded(Clerk);
+
+  // Create container for status display
+  const statusContainer = document.createElement('div');
+  statusContainer.className = 'p-4 border border-gray-200 rounded-md mb-4';
+  element.appendChild(statusContainer);
+
+  // Create controls container
+  const controlsContainer = document.createElement('div');
+  controlsContainer.style.marginBottom = '1rem';
+  controlsContainer.style.display = 'flex';
+  controlsContainer.style.flexDirection = 'column';
+
+  // Create store state display
+  const storeStateDisplay = document.createElement('div');
+  storeStateDisplay.className = 'p-2 bg-gray-50 rounded text-sm font-mono';
+
+  // Append store state display to controlsContainer
+  controlsContainer.appendChild(storeStateDisplay);
+
+  element.appendChild(controlsContainer);
+
+  // Create sign in form
+  const form = document.createElement('form');
+  form.className = 'space-y-4';
+
+  const emailInput = document.createElement('input');
+  emailInput.type = 'email';
+  emailInput.placeholder = 'Email';
+  emailInput.className = 'w-full p-2 border rounded';
+
+  const passwordInput = document.createElement('input');
+  passwordInput.type = 'password';
+  passwordInput.placeholder = 'Password';
+  passwordInput.className = 'w-full p-2 border rounded';
+
+  const submitButton = document.createElement('button');
+  submitButton.type = 'submit';
+  submitButton.textContent = 'Sign In';
+  submitButton.className = 'w-full p-2 bg-blue-500 text-white rounded';
+
+  form.appendChild(emailInput);
+  form.appendChild(passwordInput);
+  form.appendChild(submitButton);
+  element.appendChild(form);
+
+  let signIn: SignInResource;
+
+  let isInitialized = false;
+
+  // Create updateStatus function in the outer scope
+  const updateStatus = () => {
+    if (!signIn) {
+      console.error('SignIn object is not initialized');
+      return;
+    }
+    const fetchStatus = signIn.fetchStatus;
+    const error = signIn.signInError.global;
+    const status = signIn.status;
+
+    // Update status container with animation
+    statusContainer.innerHTML = `
+      <div class="space-y-2 transition-all duration-300">
+        <div class="flex items-center gap-2">
+          <strong>Fetch Status:</strong>
+          <span class="px-2 py-0.5 rounded text-sm ${
+            fetchStatus === 'fetching'
+              ? 'bg-blue-100 text-blue-700'
+              : fetchStatus === 'error'
+                ? 'bg-red-100 text-red-700'
+                : 'bg-green-100 text-green-700'
+          }">${fetchStatus}</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <strong>Sign In Status:</strong>
+          <span class="px-2 py-0.5 rounded text-sm ${
+            status === 'needs_first_factor'
+              ? 'bg-yellow-100 text-yellow-700'
+              : status === 'complete'
+                ? 'bg-green-100 text-green-700'
+                : 'bg-gray-100 text-gray-700'
+          }">${status || 'null'}</span>
+        </div>
+        ${error ? `<div class="text-red-500"><strong>Error:</strong> ${error}</div>` : ''}
+      </div>
+    `;
+
+    // Update store state display
+    storeStateDisplay.innerHTML = `
+      <div class="space-y-1">
+        <div>Store State:</div>
+        <pre class="whitespace-pre-wrap">${JSON.stringify(
+          {
+            fetchStatus,
+            status,
+            error: error || null,
+          },
+          null,
+          2,
+        )}</pre>
+      </div>
+    `;
+  };
+
+  // Initialize SignIn instance
+  const initializeSignIn = async () => {
+    try {
+      // Show loading state
+      statusContainer.innerHTML = `
+        <div class="text-blue-500">
+          <strong>Status:</strong> Initializing...
+        </div>
+      `;
+
+      // Wait for Clerk to be loaded and client to be ready
+      const waitForClerk = async () => {
+        if (!Clerk.loaded) {
+          await new Promise<void>(resolve => {
+            const checkLoaded = () => {
+              if (Clerk.loaded) {
+                resolve();
+              } else {
+                setTimeout(checkLoaded, 100);
+              }
+            };
+            checkLoaded();
+          });
+        }
+
+        // Wait for client to be ready
+        if (!Clerk.client) {
+          await new Promise<void>(resolve => {
+            const checkClient = () => {
+              if (Clerk.client) {
+                resolve();
+              } else {
+                setTimeout(checkClient, 100);
+              }
+            };
+            checkClient();
+          });
+        }
+      };
+
+      await waitForClerk();
+
+      // Initial update
+      updateStatus();
+
+      // Update status to show initialization complete
+      statusContainer.innerHTML = `
+        <div class="text-green-500">
+          <strong>Status:</strong> Ready to sign in
+        </div>
+      `;
+    } catch (error) {
+      console.error('Failed to initialize:', error);
+      statusContainer.innerHTML = `
+        <div class="text-red-500">
+          <strong>Error:</strong> ${error instanceof Error ? error.message : 'Failed to initialize'}
+        </div>
+      `;
+      isInitialized = false;
+    }
+  };
+
+  // Handle form submission
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+
+    try {
+      if (!isInitialized || !Clerk.client) {
+        throw new Error('System not initialized. Please wait...');
+      }
+
+      // Show loading state
+      statusContainer.innerHTML = `
+        <div class="text-blue-500">
+          <strong>Status:</strong> Processing sign in...
+        </div>
+      `;
+
+      // Create SignIn instance with the provided email
+      signIn = await Clerk.client.signIn.create({
+        identifier: emailInput.value,
+        strategy: 'email_code',
+      });
+
+      if (!signIn) {
+        throw new Error('Failed to create SignIn instance');
+      }
+
+      // Initial update using getters
+      updateStatus();
+
+      await signIn.prepareFirstFactor({
+        strategy: 'email_code',
+        emailAddressId: emailInput.value,
+      });
+
+      await signIn.attemptFirstFactor({
+        strategy: 'email_code',
+        code: passwordInput.value,
+      });
+
+      // Update status after sign-in attempt
+      updateStatus();
+    } catch (error) {
+      console.error('Sign in error:', error);
+      statusContainer.innerHTML = `
+        <div class="text-red-500">
+          <strong>Error:</strong> ${error instanceof Error ? error.message : 'An error occurred'}
+        </div>
+      `;
+    }
+  });
+
+  // Initialize on mount
+  void initializeSignIn();
+}
+
 void (async () => {
+  // Handle demo route first (doesn't need Clerk to be loaded)
+  const currentPath = window.location.pathname;
+  console.log('Current path:', currentPath);
+  if (currentPath === '/sign-in-demo') {
+    console.log('Mounting sign in demo...');
+    addCurrentRouteIndicator(currentPath);
+    mountSignInDemo(app);
+    console.log('Demo mounted, returning early');
+    return;
+  }
+
+  console.log('Not demo route, continuing with Clerk initialization...');
+
   assertClerkIsLoaded(Clerk);
   fillLocalizationSelect();
   const { updateVariables } = appearanceVariableOptions();
@@ -333,6 +574,22 @@ void (async () => {
     '/open-sign-up': () => {
       mountOpenSignUpButton(app, componentControls.signUp.getProps() ?? {});
     },
+    '/sign-in-observable': async () => {
+      // Wait for Clerk to be fully loaded before mounting the component
+      if (!Clerk.loaded) {
+        await new Promise<void>(resolve => {
+          const checkLoaded = () => {
+            if (Clerk.loaded) {
+              resolve();
+            } else {
+              setTimeout(checkLoaded, 100);
+            }
+          };
+          checkLoaded();
+        });
+      }
+      mountSignInObservable(app);
+    },
   };
 
   const route = window.location.pathname as keyof typeof routes;
@@ -344,7 +601,7 @@ void (async () => {
       signInUrl: '/sign-in',
       signUpUrl: '/sign-up',
     });
-    renderCurrentRoute();
+    await renderCurrentRoute();
     updateVariables();
     updateOtherOptions();
   } else {

@@ -77,7 +77,8 @@
     "dequal": "2.0.3",
     "qrcode.react": "4.2.0",
     "regenerator-runtime": "0.14.1",
-    "swr": "2.3.3"
+    "swr": "2.3.3",
+    "zustand": "5.0.5"
   },
   "devDependencies": {
     "@rsdoctor/rspack-plugin": "^0.4.13",
