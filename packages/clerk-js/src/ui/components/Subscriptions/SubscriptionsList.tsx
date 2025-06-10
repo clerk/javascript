@@ -35,6 +35,7 @@ export function SubscriptionsList({
 }) {
   const { handleSelectPlan, captionForSubscription, canManageSubscription } = usePlansContext();
   const subscriberType = useSubscriberTypeContext();
+  const localizationRoot = subscriberType === 'user' ? 'userProfile' : 'organizationProfile';
   const { data: subscriptions } = useSubscriptions();
   const canManageBilling = useProtect(
     has => has({ permission: 'org:sys_billing:manage' }) || subscriberType === 'user',
@@ -79,9 +80,21 @@ export function SubscriptionsList({
         <Table tableHeadVisuallyHidden>
           <Thead>
             <Tr>
-              <Th>Plan</Th>
-              <Th>Start date</Th>
-              <Th>Edit</Th>
+              <Th
+                localizationKey={localizationKeys(
+                  `${localizationRoot}.billingPage.subscriptionsListSection.tableHeaders__plan`,
+                )}
+              />
+              <Th
+                localizationKey={localizationKeys(
+                  `${localizationRoot}.billingPage.subscriptionsListSection.tableHeaders__startDate`,
+                )}
+              />
+              <Th
+                localizationKey={localizationKeys(
+                  `${localizationRoot}.billingPage.subscriptionsListSection.tableHeaders__edit`,
+                )}
+              />
             </Tr>
           </Thead>
           <Tbody>

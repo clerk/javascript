@@ -3,9 +3,23 @@ import React from 'react';
 
 import { Pagination } from '@/ui/elements/Pagination';
 
-import { usePaymentAttempts } from '../../../ui/contexts';
+import { usePaymentAttempts, useSubscriberTypeContext } from '../../../ui/contexts';
 import type { LocalizationKey } from '../../customizables';
-import { Badge, Col, descriptors, Flex, Spinner, Table, Tbody, Td, Text, Th, Thead, Tr } from '../../customizables';
+import {
+  Badge,
+  Col,
+  descriptors,
+  Flex,
+  localizationKeys,
+  Spinner,
+  Table,
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Thead,
+  Tr,
+} from '../../customizables';
 import { useRouter } from '../../router';
 import type { PropsOfComponent } from '../../styledSystem';
 import { truncateWithEndVisible } from '../../utils/truncateTextWithEndVisible';
@@ -16,6 +30,8 @@ import { truncateWithEndVisible } from '../../utils/truncateTextWithEndVisible';
 
 export const PaymentAttemptsList = () => {
   const { data: paymentAttempts, isLoading } = usePaymentAttempts();
+  const subscriberType = useSubscriberTypeContext();
+  const localizationRoot = subscriberType === 'user' ? 'userProfile' : 'organizationProfile';
 
   return (
     <DataTable
@@ -25,8 +41,12 @@ export const PaymentAttemptsList = () => {
       pageCount={1}
       itemsPerPage={10}
       isLoading={isLoading}
-      emptyStateLocalizationKey='No payment history'
-      headers={['Date', 'Amount', 'Status']}
+      emptyStateLocalizationKey={localizationKeys(`${localizationRoot}.billingPage.paymentHistorySection.empty`)}
+      headers={[
+        localizationKeys(`${localizationRoot}.billingPage.paymentHistorySection.tableHeaders__date`),
+        localizationKeys(`${localizationRoot}.billingPage.paymentHistorySection.tableHeaders__amount`),
+        localizationKeys(`${localizationRoot}.billingPage.paymentHistorySection.tableHeaders__status`),
+      ]}
       rows={(paymentAttempts?.data || []).map(i => (
         <PaymentAttemptsListRow
           key={i.id}

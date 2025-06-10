@@ -3,9 +3,22 @@ import React from 'react';
 
 import { Pagination } from '@/ui/elements/Pagination';
 
-import { useStatements } from '../../../ui/contexts';
+import { useStatements, useSubscriberTypeContext } from '../../../ui/contexts';
 import type { LocalizationKey } from '../../customizables';
-import { Col, descriptors, Flex, Spinner, Table, Tbody, Td, Text, Th, Thead, Tr } from '../../customizables';
+import {
+  Col,
+  descriptors,
+  Flex,
+  localizationKeys,
+  Spinner,
+  Table,
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Thead,
+  Tr,
+} from '../../customizables';
 import { useRouter } from '../../router';
 import type { PropsOfComponent } from '../../styledSystem';
 import { truncateWithEndVisible } from '../../utils/truncateTextWithEndVisible';
@@ -16,6 +29,8 @@ import { truncateWithEndVisible } from '../../utils/truncateTextWithEndVisible';
 
 export const StatementsList = () => {
   const { data: statements, isLoading } = useStatements();
+  const subscriberType = useSubscriberTypeContext();
+  const localizationRoot = subscriberType === 'user' ? 'userProfile' : 'organizationProfile';
 
   return (
     <DataTable
@@ -25,8 +40,11 @@ export const StatementsList = () => {
       pageCount={1}
       itemsPerPage={10}
       isLoading={isLoading}
-      emptyStateLocalizationKey='No statements to display'
-      headers={['Date', 'Amount']}
+      emptyStateLocalizationKey={localizationKeys(`${localizationRoot}.billingPage.statementsSection.empty`)}
+      headers={[
+        localizationKeys(`${localizationRoot}.billingPage.statementsSection.tableHeaders__date`),
+        localizationKeys(`${localizationRoot}.billingPage.statementsSection.tableHeaders__amount`),
+      ]}
       rows={(statements?.data || []).map(i => (
         <StatementsListRow
           key={i.id}

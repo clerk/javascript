@@ -1,7 +1,7 @@
 import { Header } from '@/ui/elements/Header';
 import { LineItems } from '@/ui/elements/LineItems';
 
-import { usePaymentAttemptsContext, useStatements } from '../../contexts';
+import { usePaymentAttemptsContext, useStatements, useSubscriberTypeContext } from '../../contexts';
 import {
   Badge,
   Box,
@@ -23,6 +23,8 @@ export const PaymentAttemptPage = () => {
   const { params, navigate } = useRouter();
   const { isLoading } = useStatements();
   const { getPaymentAttemptById } = usePaymentAttemptsContext();
+  const subscriberType = useSubscriberTypeContext();
+  const localizationRoot = subscriberType === 'user' ? 'userProfile' : 'organizationProfile';
 
   const paymentAttempt = params.paymentAttemptId ? getPaymentAttemptById(params.paymentAttemptId) : null;
   const subscriptionItem = paymentAttempt?.subscriptionItem;
@@ -40,7 +42,9 @@ export const PaymentAttemptPage = () => {
   }
 
   if (!paymentAttempt) {
-    return <Text>Payment attempt not found</Text>;
+    return (
+      <Text localizationKey={localizationKeys(`${localizationRoot}.billingPage.paymentHistorySection.notFound`)} />
+    );
   }
 
   return (
@@ -56,7 +60,7 @@ export const PaymentAttemptPage = () => {
       >
         <Header.BackLink onClick={() => void navigate('../../', { searchParams: new URLSearchParams('tab=payments') })}>
           <Header.Title
-            localizationKey={localizationKeys('organizationProfile.billingPage.start.headerTitle__payments')}
+            localizationKey={localizationKeys(`${localizationRoot}.billingPage.start.headerTitle__payments`)}
             textVariant='h2'
           />
         </Header.BackLink>
@@ -173,7 +177,7 @@ export const PaymentAttemptPage = () => {
         >
           <Text
             variant='h3'
-            localizationKey={'Total due'}
+            localizationKey={localizationKeys('commerce.totalDue')}
             elementDescriptor={descriptors.paymentAttemptFooterLabel}
           />
           <Span

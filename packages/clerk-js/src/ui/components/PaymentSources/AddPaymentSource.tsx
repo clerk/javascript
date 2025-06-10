@@ -236,6 +236,8 @@ const AddPaymentSourceForm = ({ children }: PropsWithChildren) => {
   const elements = useElements();
   const { displayConfig } = useEnvironment();
   const { t } = useLocalizations();
+  const subscriberType = useSubscriberTypeContext();
+  const localizationRoot = subscriberType === 'user' ? 'userProfile' : 'organizationProfile';
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -260,10 +262,8 @@ const AddPaymentSourceForm = ({ children }: PropsWithChildren) => {
     try {
       await onSuccess({ stripeSetupIntent: setupIntent });
     } catch (error) {
-      console.log('catch', error);
       void handleError(error, [], card.setError);
     } finally {
-      console.log('finally');
       card.setIdle();
       initializePaymentSource(); // resets the payment intent
     }
@@ -311,7 +311,8 @@ const AddPaymentSourceForm = ({ children }: PropsWithChildren) => {
         <FormButtons
           isDisabled={!isPaymentElementReady}
           submitLabel={
-            submitLabel ?? localizationKeys('userProfile.billingPage.paymentSourcesSection.formButtonPrimary__add')
+            submitLabel ??
+            localizationKeys(`${localizationRoot}.billingPage.paymentSourcesSection.formButtonPrimary__add`)
           }
           onReset={cancelAction}
           hideReset={!cancelAction}

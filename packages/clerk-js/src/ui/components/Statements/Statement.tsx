@@ -212,6 +212,9 @@ function SectionContentDetailsHeader({
           colorScheme='secondary'
           elementDescriptor={descriptors.statementSectionContentDetailsHeaderDescription}
           localizationKey={description}
+          sx={() => ({
+            textTransform: 'lowercase',
+          })}
         />
       </Box>
       <Box

@@ -1,7 +1,7 @@
 import { Header } from '@/ui/elements/Header';
 
-import { useStatements, useStatementsContext } from '../../contexts';
-import { Box, descriptors, Spinner, Text } from '../../customizables';
+import { useStatements, useStatementsContext, useSubscriberTypeContext } from '../../contexts';
+import { Box, descriptors, localizationKeys, Spinner, Text, useLocalizations } from '../../customizables';
 import { Plus, RotateLeftRight } from '../../icons';
 import { useRouter } from '../../router';
 import { Statement } from './Statement';
@@ -10,7 +10,9 @@ export const StatementPage = () => {
   const { params, navigate } = useRouter();
   const { isLoading } = useStatements();
   const { getStatementById } = useStatementsContext();
-
+  const subscriberType = useSubscriberTypeContext();
+  const { t } = useLocalizations();
+  const localizationRoot = subscriberType === 'user' ? 'userProfile' : 'organizationProfile';
   const statement = params.statementId ? getStatementById(params.statementId) : null;
 
   if (isLoading) {
@@ -26,7 +28,7 @@ export const StatementPage = () => {
   }
 
   if (!statement) {
-    return <Text>Statement not found</Text>;
+    return <Text localizationKey={localizationKeys(`${localizationRoot}.billingPage.statementsSection.notFound`)} />;
   }
 
   return (
@@ -44,7 +46,7 @@ export const StatementPage = () => {
           onClick={() => void navigate('../../', { searchParams: new URLSearchParams('tab=statements') })}
         >
           <Header.Title
-            localizationKey='Statements'
+            localizationKey={localizationKeys(`${localizationRoot}.billingPage.statementsSection.title`)}
             textVariant='h2'
           />
         </Header.BackLink>
@@ -70,7 +72,7 @@ export const StatementPage = () => {
                   <Statement.SectionContentItem key={item.id}>
                     <Statement.SectionContentDetailsHeader
                       title={item.subscription.plan.name}
-                      description={`${item.subscription.amount?.currencySymbol}${item.subscription.amount?.amountFormatted} / ${item.subscription.planPeriod === 'month' ? 'month' : 'year'}`}
+                      description={`${item.subscription.amount?.currencySymbol}${item.subscription.amount?.amountFormatted} / ${item.subscription.planPeriod === 'month' ? t(localizationKeys('commerce.month')) : t(localizationKeys('commerce.year'))}`}
                       secondaryTitle={`${item.amount.currencySymbol}${item.amount.amountFormatted}`}
                       secondaryDescription={``}
                     />
@@ -78,8 +80,20 @@ export const StatementPage = () => {
                       <Statement.SectionContentDetailsListItem
                         label={
                           item.chargeType === 'recurring'
-                            ? `Paid for ${item.subscription.plan.name} ${item.subscription.planPeriod} plan`
-                            : `Subscribed and paid for ${item.subscription.plan.name} ${item.subscription.planPeriod} plan`
+                            ? localizationKeys(
+                                `${localizationRoot}.billingPage.statementsSection.itemCaption__paidForPlan`,
+                                {
+                                  plan: item.subscription.plan.name,
+                                  period: item.subscription.planPeriod,
+                                },
+                              )
+                            : localizationKeys(
+                                `${localizationRoot}.billingPage.statementsSection.itemCaption__subscribedAndPaidForPlan`,
+                                {
+                                  plan: item.subscription.plan.name,
+                                  period: item.subscription.planPeriod,
+                                },
+                              )
                         }
                         labelIcon={item.chargeType === 'recurring' ? RotateLeftRight : Plus}
                         value={item.id}
@@ -88,7 +102,9 @@ export const StatementPage = () => {
                       />
                       {item.subscription.credit && item.subscription.credit.amount.amount > 0 ? (
                         <Statement.SectionContentDetailsListItem
-                          label='Prorated credit for partial usage of previous subscription '
+                          label={localizationKeys(
+                            `${localizationRoot}.billingPage.statementsSection.itemCaption__proratedCredit`,
+                          )}
                           value={`(${item.subscription.credit.amount.currencySymbol}${item.subscription.credit.amount.amountFormatted})`}
                         />
                       ) : null}
