@@ -44,8 +44,12 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
 
     const superPartials = this.partials;
 
+    this.options.setValue('disableSources', true);
+    this.options.setValue('disableGit', true);
+
     this.partials = {
       ...superPartials,
+
       /**
        * This hides the "Type parameters" section and the signature title from the output (by default). Shows the signature title if the `@displayFunctionSignature` tag is present.
        * @param {import('typedoc').SignatureReflection} model

@@ -79,6 +79,7 @@ const typedocPluginReplaceTextOptions = {
 /** @type {import("typedoc").TypeDocOptions} */
 const config = {
   out: './.typedoc/docs',
+  json: './.typedoc/docs.json',
   entryPointStrategy: 'packages',
   plugin: [
     'typedoc-plugin-replace-text',
@@ -104,8 +105,6 @@ const config = {
     modifierTags: [...OptionDefaults.modifierTags],
     exclude: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
     readme: 'none',
-    disableGit: true,
-    disableSources: true,
     ...typedocPluginReplaceTextOptions,
   },
   entryPoints: ['packages/backend', 'packages/nextjs', 'packages/react', 'packages/shared', 'packages/types'], // getPackages(),
