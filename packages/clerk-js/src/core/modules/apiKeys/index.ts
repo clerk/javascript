@@ -43,8 +43,7 @@ export class APIKeys implements APIKeysNamespace {
       .then(res => {
         const apiKeysJSON = res.payload as unknown as { api_keys: ApiKeyJSON[] };
         return apiKeysJSON.api_keys.map(json => new APIKey(json));
-      })
-      .catch(() => []);
+      });
   }
 
   async getSecret(id: string): Promise<string> {
@@ -58,8 +57,7 @@ export class APIKeys implements APIKeysNamespace {
       .then(res => {
         const { secret } = res.payload as unknown as { secret: string };
         return secret;
-      })
-      .catch(() => '');
+      });
   }
 
   async create(params: CreateAPIKeyParams): Promise<APIKeyResource> {
