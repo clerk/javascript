@@ -1,6 +1,6 @@
 import type { ClerkAPIErrorJSON } from '@clerk/types';
-import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
+import { createStore } from 'zustand/vanilla';
 
 /**
  * Represents the possible states of a resource.
@@ -59,7 +59,7 @@ const createSelectors = <T>() => ({
 export const createResourceStore = <T>() => {
   const selectors = createSelectors<T>();
 
-  return create<ResourceStore<T>>()(
+  return createStore<ResourceStore<T>>()(
     devtools(
       (set, get) => ({
         state: { type: 'idle', data: null, error: null },
