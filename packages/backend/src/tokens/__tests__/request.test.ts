@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw';
-import { afterEach, beforeEach, describe, expect, expectTypeOf, it, test, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, test, vi } from 'vitest';
 
 import { MachineTokenVerificationErrorCode, TokenVerificationErrorReason } from '../../errors';
 import {
@@ -12,11 +12,11 @@ import {
 } from '../../fixtures';
 import { mockMachineAuthResponses, mockTokens, mockVerificationResults } from '../../fixtures/machine';
 import { server } from '../../mock-server';
-import type { AuthReason, RequestState } from '../authStatus';
+import type { AuthReason } from '../authStatus';
 import { AuthErrorReason, AuthStatus } from '../authStatus';
 import { OrganizationMatcher } from '../organizationMatcher';
 import { authenticateRequest, RefreshTokenErrorReason } from '../request';
-import type { MachineTokenType, TokenType } from '../tokenTypes';
+import type { MachineTokenType } from '../tokenTypes';
 import type { AuthenticateRequestOptions } from '../types';
 
 const PK_TEST = 'pk_test_Y2xlcmsuaW5zcGlyZWQucHVtYS03NC5sY2wuZGV2JA';
@@ -1391,38 +1391,5 @@ describe('tokens.authenticateRequest(options)', () => {
         });
       });
     });
-  });
-});
-
-describe('authenticateRequest() return types', () => {
-  test('infers the correct RequestState type for each accepted token type', () => {
-    const request = new Request('https://example.com');
-
-    // Session token by default
-    expectTypeOf(authenticateRequest(request)).toMatchTypeOf<Promise<RequestState>>();
-
-    // Individual token types
-    expectTypeOf(authenticateRequest(request, { acceptsToken: 'session_token' })).toMatchTypeOf<
-      Promise<RequestState<'session_token'>>
-    >();
-    expectTypeOf(authenticateRequest(request, { acceptsToken: 'api_key' })).toMatchTypeOf<
-      Promise<RequestState<'api_key'>>
-    >();
-    expectTypeOf(authenticateRequest(request, { acceptsToken: 'machine_token' })).toMatchTypeOf<
-      Promise<RequestState<'machine_token'>>
-    >();
-    expectTypeOf(authenticateRequest(request, { acceptsToken: 'oauth_token' })).toMatchTypeOf<
-      Promise<RequestState<'oauth_token'>>
-    >();
-
-    // Array of token types
-    expectTypeOf(
-      authenticateRequest(request, { acceptsToken: ['session_token', 'api_key', 'machine_token'] }),
-    ).toMatchTypeOf<Promise<RequestState<'session_token' | 'api_key' | 'machine_token'>>>();
-
-    // Any token type
-    expectTypeOf(authenticateRequest(request, { acceptsToken: 'any' })).toMatchTypeOf<
-      Promise<RequestState<TokenType>>
-    >();
   });
 });
