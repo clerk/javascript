@@ -1,7 +1,7 @@
 export const mockTokens = {
   api_key: 'ak_LCWGdaM8mv8K4PC/57IICZQXAeWfCgF30DZaFXHoGn9=',
   oauth_token: 'oat_8XOIucKvqHVr5tYP123456789abcdefghij',
-  machine_token: 'mt_8XOIucKvqHVr5tYP123456789abcdefghij',
+  machine_token: 'm2m_8XOIucKvqHVr5tYP123456789abcdefghij',
 } as const;
 
 export const mockVerificationResults = {
@@ -37,7 +37,7 @@ export const mockVerificationResults = {
     updatedAt: 1744928754551,
   },
   machine_token: {
-    id: 'mt_ey966f1b1xf93586b2debdcadb0b3bd1',
+    id: 'm2m_ey966f1b1xf93586b2debdcadb0b3bd1',
     name: 'my-machine-token',
     subject: 'user_2vYVtestTESTtestTESTtestTESTtest',
     scopes: ['read:foo', 'write:bar'],

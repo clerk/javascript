@@ -24,10 +24,10 @@ describe('getAuth(req)', () => {
   });
 
   it('returns the actual auth object if its tokenType is included in the acceptsToken array', () => {
-    const req = { auth: { tokenType: 'machine_token', id: 'mt_1234' } } as unknown as FastifyRequest;
+    const req = { auth: { tokenType: 'machine_token', id: 'm2m_1234' } } as unknown as FastifyRequest;
     const result = getAuth(req, { acceptsToken: ['machine_token', 'api_key'] });
     expect(result.tokenType).toBe('machine_token');
-    expect(result.id).toBe('mt_1234');
+    expect(result.id).toBe('m2m_1234');
     expect(result.subject).toBeUndefined();
   });
 
