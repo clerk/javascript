@@ -17,6 +17,16 @@ export const deDE: LocalizationResource = {
   apiKeys: {
     action__add: 'Neuen API-Key hinzufügen',
     action__search: 'Suche',
+    dates: {
+      lastUsed: {
+        days: undefined,
+        hours: undefined,
+        minutes: undefined,
+        months: undefined,
+        seconds: undefined,
+        years: undefined,
+      },
+    },
     detailsTitle__emptyRow: 'Keine API-Keys gefunden',
     formButtonPrimary__add: 'API-Key erstellen',
     formHint: 'Geben Sie einen Namen an, um einen API-Key zu erstellen. Sie können ihn jederzeit widerrufen.',
@@ -79,6 +89,7 @@ export const deDE: LocalizationResource = {
       title__paymentSuccessful: 'Zahlung erfolgreich!',
       title__subscriptionSuccessful: 'Geschafft!',
     },
+    credit: undefined,
     creditRemainder: 'Verbleibendes Guthaben für den restlichen Abrechnungszeitraum.',
     defaultFreePlanActive: 'Sie nutzen aktuell den kostenlosen Plan.',
     free: 'Kostenlos',
@@ -245,6 +256,7 @@ export const deDE: LocalizationResource = {
         title: 'Zahlungsmethoden',
       },
       start: {
+        headerTitle__payments: undefined,
         headerTitle__plans: 'Pläne',
         headerTitle__statements: 'Abrechnungen',
         headerTitle__subscriptions: 'Abonnements',
@@ -889,6 +901,7 @@ export const deDE: LocalizationResource = {
         title: 'Zahlungsmethoden',
       },
       start: {
+        headerTitle__payments: undefined,
         headerTitle__plans: 'Pläne',
         headerTitle__statements: 'Abrechnungen',
         headerTitle__subscriptions: 'Abonnements',

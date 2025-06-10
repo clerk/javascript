@@ -17,6 +17,16 @@ export const zhTW: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    dates: {
+      lastUsed: {
+        days: undefined,
+        hours: undefined,
+        minutes: undefined,
+        months: undefined,
+        seconds: undefined,
+        years: undefined,
+      },
+    },
     detailsTitle__emptyRow: undefined,
     formButtonPrimary__add: undefined,
     formHint: undefined,
@@ -76,6 +86,7 @@ export const zhTW: LocalizationResource = {
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
     },
+    credit: undefined,
     creditRemainder: undefined,
     defaultFreePlanActive: undefined,
     free: undefined,
@@ -237,6 +248,7 @@ export const zhTW: LocalizationResource = {
         title: undefined,
       },
       start: {
+        headerTitle__payments: undefined,
         headerTitle__plans: undefined,
         headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
@@ -851,6 +863,7 @@ export const zhTW: LocalizationResource = {
         title: undefined,
       },
       start: {
+        headerTitle__payments: undefined,
         headerTitle__plans: undefined,
         headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
@@ -882,7 +895,7 @@ export const zhTW: LocalizationResource = {
       title: '添加已連接的帳戶',
     },
     deletePage: {
-      actionDescription: '請在下方輸入“Delete account”以繼續。',
+      actionDescription: '請在下方輸入"Delete account"以繼續。',
       confirm: '移除帳戶',
       messageLine1: '您確定要刪除您的帳戶嗎？',
       messageLine2: '這個動作是永久性且無法還原的。',

@@ -5,6 +5,16 @@ export const enUS: LocalizationResource = {
   apiKeys: {
     action__add: 'Add new key',
     action__search: 'Search keys',
+    dates: {
+      lastUsed: {
+        days: '{{date}}d ago',
+        hours: '{{date}}h ago',
+        minutes: '{{date}}m ago',
+        months: '{{date}}mo ago',
+        seconds: '{{date}}s ago',
+        years: '{{date}}y ago',
+      },
+    },
     detailsTitle__emptyRow: 'No API keys found',
     formButtonPrimary__add: 'Create key',
     formHint: 'Provide a name to generate a new key. You’ll be able to revoke it anytime.',

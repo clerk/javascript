@@ -24,7 +24,7 @@ import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
 import { useClipboard } from '@/ui/hooks';
 import { Check, ClipboardOutline, Eye, EyeSlash } from '@/ui/icons';
 import { common, mqu } from '@/ui/styledSystem';
-import { timeAgo } from '@/utils/date';
+import { timeAgo } from '@/ui/utils/timeAgo';
 
 const useApiKeySecret = ({ apiKeyID, enabled }: { apiKeyID: string; enabled: boolean }) => {
   const clerk = useClerk();
@@ -171,7 +171,7 @@ export const ApiKeysTable = ({
                       },
                     }}
                   >
-                    <Text>{apiKey.lastUsedAt ? timeAgo(apiKey.lastUsedAt) : '-'}</Text>
+                    <Text localizationKey={apiKey.lastUsedAt ? timeAgo(apiKey.lastUsedAt) : '-'} />
                   </Box>
                 </Td>
                 <Td>

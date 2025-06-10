@@ -7,13 +7,15 @@ import type {
   RevokeAPIKeyParams,
 } from '@clerk/types';
 
+import type { FapiRequestInit } from '@/core/fapiClient';
+
 import { APIKey, BaseResource } from '../../resources/internal';
 
 export class APIKeys implements APIKeysNamespace {
   /**
    * Returns the base options for the FAPI proxy requests.
    */
-  private async getBaseFapiProxyOptions() {
+  private async getBaseFapiProxyOptions(): Promise<FapiRequestInit> {
     return {
       // Set to an empty string because FAPI Proxy does not include the version in the path.
       pathPrefix: '',
@@ -23,7 +25,7 @@ export class APIKeys implements APIKeysNamespace {
         'Content-Type': 'application/json',
       },
       // Set to `same-origin` to ensure cookies and credentials are sent with requests, avoiding CORS issues.
-      credentials: 'same-origin' as const,
+      credentials: 'same-origin',
     };
   }
 

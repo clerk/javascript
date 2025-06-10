@@ -17,6 +17,16 @@ export const srRS: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    dates: {
+      lastUsed: {
+        days: undefined,
+        hours: undefined,
+        minutes: undefined,
+        months: undefined,
+        seconds: undefined,
+        years: undefined,
+      },
+    },
     detailsTitle__emptyRow: undefined,
     formButtonPrimary__add: undefined,
     formHint: undefined,
@@ -76,6 +86,7 @@ export const srRS: LocalizationResource = {
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
     },
+    credit: undefined,
     creditRemainder: undefined,
     defaultFreePlanActive: undefined,
     free: undefined,
@@ -238,6 +249,7 @@ export const srRS: LocalizationResource = {
         title: undefined,
       },
       start: {
+        headerTitle__payments: undefined,
         headerTitle__plans: undefined,
         headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
@@ -867,6 +879,7 @@ export const srRS: LocalizationResource = {
         title: undefined,
       },
       start: {
+        headerTitle__payments: undefined,
         headerTitle__plans: undefined,
         headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,

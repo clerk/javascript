@@ -1073,6 +1073,16 @@ type _LocalizationResource = {
       formHint: LocalizationValue;
       formButtonPrimary__revoke: LocalizationValue;
     };
+    dates: {
+      lastUsed: {
+        seconds: LocalizationValue;
+        minutes: LocalizationValue;
+        hours: LocalizationValue;
+        days: LocalizationValue;
+        months: LocalizationValue;
+        years: LocalizationValue;
+      };
+    };
   };
 };
 
