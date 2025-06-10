@@ -146,7 +146,7 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
         onRevoke={handleRevoke}
         elementDescriptor={descriptors.apiKeysTable}
       />
-      {itemCount > 5 && (
+      {itemCount > (perPage ?? 5) && (
         <Pagination
           count={pageCount}
           page={page}
@@ -156,6 +156,7 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
         />
       )}
       <RevokeAPIKeyConfirmationModal
+        subject={subject}
         isOpen={isRevokeModalOpen}
         onOpen={() => setIsRevokeModalOpen(true)}
         onClose={() => {
