@@ -14,30 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const beBY: LocalizationResource = {
   locale: 'be-BY',
-  apiKeys: {
-    action__add: undefined,
-    action__search: undefined,
-    dates: {
-      lastUsed: {
-        days: undefined,
-        hours: undefined,
-        minutes: undefined,
-        months: undefined,
-        seconds: undefined,
-        years: undefined,
-      },
-    },
-    detailsTitle__emptyRow: undefined,
-    formButtonPrimary__add: undefined,
-    formHint: undefined,
-    formTitle: undefined,
-    menuAction__revoke: undefined,
-    revokeConfirmation: {
-      formButtonPrimary__revoke: undefined,
-      formHint: undefined,
-      formTitle: undefined,
-    },
-  },
   backButton: 'Назад',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
@@ -86,7 +62,6 @@ export const beBY: LocalizationResource = {
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
     },
-    credit: undefined,
     creditRemainder: undefined,
     defaultFreePlanActive: undefined,
     free: undefined,
@@ -159,9 +134,6 @@ export const beBY: LocalizationResource = {
   formFieldHintText__optional: 'Неабавязкова',
   formFieldHintText__slug:
     'Slug — гэта чытальны ідэнтыфікатар, які павінен быць унікальным. Часто выкарыстоўваецца ў URL-ах.',
-  formFieldInputPlaceholder__apiKeyDescription: undefined,
-  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
-  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'Увядзіце рэзервовы код',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Пацвердзіць выдаленне ўліковага запісу',
   formFieldInputPlaceholder__emailAddress: 'Увядзіце ваш адрас электроннай пошты',
@@ -177,10 +149,6 @@ export const beBY: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Увядзіце ваш пароль',
   formFieldInputPlaceholder__phoneNumber: 'Увядзіце ваш нумар тэлефона',
   formFieldInputPlaceholder__username: 'Увядзіце імя карыстальніка',
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyExpirationDate: undefined,
-  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Уключыць аўтаматычныя запрашэнні для гэтага дамена',
   formFieldLabel__backupCode: 'Код аднаўлення',
   formFieldLabel__confirmDeletion: 'Пацверджанне',
@@ -225,9 +193,6 @@ export const beBY: LocalizationResource = {
     titleWithoutPersonal: 'Выберыце арганізацыю',
   },
   organizationProfile: {
-    apiKeysPage: {
-      title: undefined,
-    },
     badge__automaticInvitation: 'Automatic invitations',
     badge__automaticSuggestion: 'Automatic suggestions',
     badge__manualInvitation: 'No automatic enrollment',
@@ -251,7 +216,6 @@ export const beBY: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__payments: undefined,
         headerTitle__plans: undefined,
         headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
@@ -325,7 +289,6 @@ export const beBY: LocalizationResource = {
       },
     },
     navbar: {
-      apiKeys: undefined,
       billing: undefined,
       description: 'Manage your organization.',
       general: 'General',
@@ -847,9 +810,6 @@ export const beBY: LocalizationResource = {
     action__signOutAll: 'Выйсці з усіх уліковых запісаў',
   },
   userProfile: {
-    apiKeysPage: {
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Скапіравана!',
       actionLabel__copy: 'Скапіраваць усё',
@@ -885,7 +845,6 @@ export const beBY: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__payments: undefined,
         headerTitle__plans: undefined,
         headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
@@ -1012,7 +971,6 @@ export const beBY: LocalizationResource = {
     mobileButton__menu: 'Меню',
     navbar: {
       account: 'Профіль',
-      apiKeys: undefined,
       billing: undefined,
       description: 'Кіруйце інфармацыяй аб вашым уліковым запісе.',
       security: 'Бяспека',

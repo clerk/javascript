@@ -14,30 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const esMX: LocalizationResource = {
   locale: 'es-MX',
-  apiKeys: {
-    action__add: undefined,
-    action__search: undefined,
-    dates: {
-      lastUsed: {
-        days: undefined,
-        hours: undefined,
-        minutes: undefined,
-        months: undefined,
-        seconds: undefined,
-        years: undefined,
-      },
-    },
-    detailsTitle__emptyRow: undefined,
-    formButtonPrimary__add: undefined,
-    formHint: undefined,
-    formTitle: undefined,
-    menuAction__revoke: undefined,
-    revokeConfirmation: {
-      formButtonPrimary__revoke: undefined,
-      formHint: undefined,
-      formTitle: undefined,
-    },
-  },
   backButton: 'Atrás',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
@@ -86,7 +62,6 @@ export const esMX: LocalizationResource = {
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
     },
-    credit: undefined,
     creditRemainder: undefined,
     defaultFreePlanActive: undefined,
     free: undefined,
@@ -159,9 +134,6 @@ export const esMX: LocalizationResource = {
   formFieldHintText__optional: 'Opcional',
   formFieldHintText__slug:
     'Un slug es una identificación legible por humanos que debe ser única. Se utiliza a menudo en URL.',
-  formFieldInputPlaceholder__apiKeyDescription: undefined,
-  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
-  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: undefined,
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Eliminar cuenta',
   formFieldInputPlaceholder__emailAddress: 'Ingresa tu correo electrónico',
@@ -177,10 +149,6 @@ export const esMX: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Ingresa tu contraseña',
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyExpirationDate: undefined,
-  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Activar invitaciones automaticas para este dominio',
   formFieldLabel__backupCode: 'Código de respaldo',
   formFieldLabel__confirmDeletion: 'Confirmarción',
@@ -225,9 +193,6 @@ export const esMX: LocalizationResource = {
     titleWithoutPersonal: 'Elige una organización',
   },
   organizationProfile: {
-    apiKeysPage: {
-      title: undefined,
-    },
     badge__automaticInvitation: 'Invitaciones automaticas',
     badge__automaticSuggestion: 'Sugerencias automaticas',
     badge__manualInvitation: 'Sin inscripciónes automaticas',
@@ -251,7 +216,6 @@ export const esMX: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__payments: undefined,
         headerTitle__plans: undefined,
         headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
@@ -326,7 +290,6 @@ export const esMX: LocalizationResource = {
       },
     },
     navbar: {
-      apiKeys: undefined,
       billing: undefined,
       description: 'Gestiona tu organización.',
       general: 'General',
@@ -845,9 +808,6 @@ export const esMX: LocalizationResource = {
     action__signOutAll: 'Salir de todas las cuentas',
   },
   userProfile: {
-    apiKeysPage: {
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Copiado!',
       actionLabel__copy: 'Copiar todo',
@@ -883,7 +843,6 @@ export const esMX: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__payments: undefined,
         headerTitle__plans: undefined,
         headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
@@ -1010,7 +969,6 @@ export const esMX: LocalizationResource = {
     mobileButton__menu: 'Menú',
     navbar: {
       account: 'Perfil',
-      apiKeys: undefined,
       billing: undefined,
       description: 'Administra tu información de cuenta.',
       security: 'Seguridad',

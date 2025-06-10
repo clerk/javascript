@@ -14,30 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const frFR: LocalizationResource = {
   locale: 'fr-FR',
-  apiKeys: {
-    action__add: undefined,
-    action__search: undefined,
-    dates: {
-      lastUsed: {
-        days: undefined,
-        hours: undefined,
-        minutes: undefined,
-        months: undefined,
-        seconds: undefined,
-        years: undefined,
-      },
-    },
-    detailsTitle__emptyRow: undefined,
-    formButtonPrimary__add: undefined,
-    formHint: undefined,
-    formTitle: undefined,
-    menuAction__revoke: undefined,
-    revokeConfirmation: {
-      formButtonPrimary__revoke: undefined,
-      formHint: undefined,
-      formTitle: undefined,
-    },
-  },
   backButton: 'Retour',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
@@ -86,7 +62,6 @@ export const frFR: LocalizationResource = {
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
     },
-    credit: undefined,
     creditRemainder: undefined,
     defaultFreePlanActive: undefined,
     free: undefined,
@@ -159,9 +134,6 @@ export const frFR: LocalizationResource = {
   formFieldHintText__optional: 'Optionnel',
   formFieldHintText__slug:
     'Un slug est un identifiant lisible qui doit être unique. Il est souvent utilisé dans les URL.',
-  formFieldInputPlaceholder__apiKeyDescription: undefined,
-  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
-  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'Code de sauvegarde',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Supprimer le compte',
   formFieldInputPlaceholder__emailAddress: 'Adresse e-mail',
@@ -177,10 +149,6 @@ export const frFR: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Mot de passe',
   formFieldInputPlaceholder__phoneNumber: 'Numéro de téléphone',
   formFieldInputPlaceholder__username: "Nom d'utilisateur",
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyExpirationDate: undefined,
-  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Autoriser les invitations automatiques pour ce domaine',
   formFieldLabel__backupCode: 'Code de récupération',
   formFieldLabel__confirmDeletion: 'Confirmation',
@@ -225,9 +193,6 @@ export const frFR: LocalizationResource = {
     titleWithoutPersonal: 'Choisissez une organisation',
   },
   organizationProfile: {
-    apiKeysPage: {
-      title: undefined,
-    },
     badge__automaticInvitation: 'Invitations automatiques',
     badge__automaticSuggestion: 'Suggestions automatiques',
     badge__manualInvitation: "Pas d'inscription automatique",
@@ -251,7 +216,6 @@ export const frFR: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__payments: undefined,
         headerTitle__plans: undefined,
         headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
@@ -326,7 +290,6 @@ export const frFR: LocalizationResource = {
       },
     },
     navbar: {
-      apiKeys: undefined,
       billing: undefined,
       description: 'Gérer votre organisation.',
       general: 'Général',
@@ -847,9 +810,6 @@ export const frFR: LocalizationResource = {
     action__signOutAll: 'Se déconnecter de tous les comptes',
   },
   userProfile: {
-    apiKeysPage: {
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Copié !',
       actionLabel__copy: 'Copier tous les codes',
@@ -885,7 +845,6 @@ export const frFR: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__payments: undefined,
         headerTitle__plans: undefined,
         headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
@@ -1011,7 +970,6 @@ export const frFR: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Compte',
-      apiKeys: undefined,
       billing: undefined,
       description: 'Gérer votre compte.',
       security: 'Sécurité',

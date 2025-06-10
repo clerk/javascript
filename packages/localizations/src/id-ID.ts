@@ -14,30 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const idID: LocalizationResource = {
   locale: 'id-ID',
-  apiKeys: {
-    action__add: undefined,
-    action__search: undefined,
-    dates: {
-      lastUsed: {
-        days: undefined,
-        hours: undefined,
-        minutes: undefined,
-        months: undefined,
-        seconds: undefined,
-        years: undefined,
-      },
-    },
-    detailsTitle__emptyRow: undefined,
-    formButtonPrimary__add: undefined,
-    formHint: undefined,
-    formTitle: undefined,
-    menuAction__revoke: undefined,
-    revokeConfirmation: {
-      formButtonPrimary__revoke: undefined,
-      formHint: undefined,
-      formTitle: undefined,
-    },
-  },
   backButton: 'Kembali',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
@@ -86,7 +62,6 @@ export const idID: LocalizationResource = {
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
     },
-    credit: undefined,
     creditRemainder: undefined,
     defaultFreePlanActive: undefined,
     free: undefined,
@@ -158,9 +133,6 @@ export const idID: LocalizationResource = {
   formFieldError__verificationLinkExpired: 'Tautan verifikasi telah kedaluwarsa. Silakan minta tautan baru.',
   formFieldHintText__optional: 'Opsional',
   formFieldHintText__slug: 'Slug adalah ID yang mudah dibaca dan harus unik. Biasanya digunakan dalam URL.',
-  formFieldInputPlaceholder__apiKeyDescription: undefined,
-  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
-  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: undefined,
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Hapus akun',
   formFieldInputPlaceholder__emailAddress: undefined,
@@ -175,10 +147,6 @@ export const idID: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyExpirationDate: undefined,
-  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Aktifkan undangan otomatis untuk domain ini',
   formFieldLabel__backupCode: 'Kode cadangan',
   formFieldLabel__confirmDeletion: 'Konfirmasi',
@@ -224,9 +192,6 @@ export const idID: LocalizationResource = {
     titleWithoutPersonal: 'Pilih organisasi',
   },
   organizationProfile: {
-    apiKeysPage: {
-      title: undefined,
-    },
     badge__automaticInvitation: 'Undangan otomatis',
     badge__automaticSuggestion: 'Saran otomatis',
     badge__manualInvitation: 'Tanpa pendaftaran otomatis',
@@ -250,7 +215,6 @@ export const idID: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__payments: undefined,
         headerTitle__plans: undefined,
         headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
@@ -325,7 +289,6 @@ export const idID: LocalizationResource = {
       },
     },
     navbar: {
-      apiKeys: undefined,
       billing: undefined,
       description: 'Kelola organisasi Anda.',
       general: 'Umum',
@@ -851,9 +814,6 @@ export const idID: LocalizationResource = {
     action__signOutAll: 'Keluar dari semua akun',
   },
   userProfile: {
-    apiKeysPage: {
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Disalin!',
       actionLabel__copy: 'Salin semua',
@@ -889,7 +849,6 @@ export const idID: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__payments: undefined,
         headerTitle__plans: undefined,
         headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
@@ -1006,7 +965,6 @@ export const idID: LocalizationResource = {
     mobileButton__menu: undefined,
     navbar: {
       account: 'Profil',
-      apiKeys: undefined,
       billing: undefined,
       description: 'Kelola info akun Anda.',
       security: 'Keamanan',

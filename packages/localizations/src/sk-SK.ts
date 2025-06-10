@@ -14,30 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const skSK: LocalizationResource = {
   locale: 'sk-SK',
-  apiKeys: {
-    action__add: undefined,
-    action__search: undefined,
-    dates: {
-      lastUsed: {
-        days: undefined,
-        hours: undefined,
-        minutes: undefined,
-        months: undefined,
-        seconds: undefined,
-        years: undefined,
-      },
-    },
-    detailsTitle__emptyRow: undefined,
-    formButtonPrimary__add: undefined,
-    formHint: undefined,
-    formTitle: undefined,
-    menuAction__revoke: undefined,
-    revokeConfirmation: {
-      formButtonPrimary__revoke: undefined,
-      formHint: undefined,
-      formTitle: undefined,
-    },
-  },
   backButton: 'Späť',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
@@ -86,7 +62,6 @@ export const skSK: LocalizationResource = {
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
     },
-    credit: undefined,
     creditRemainder: undefined,
     defaultFreePlanActive: undefined,
     free: undefined,
@@ -158,9 +133,6 @@ export const skSK: LocalizationResource = {
   formFieldError__verificationLinkExpired: 'The verification link expired. Please request a new link.',
   formFieldHintText__optional: 'Voliteľné',
   formFieldHintText__slug: 'A slug is a human-readable ID that must be unique. It’s often used in URLs.',
-  formFieldInputPlaceholder__apiKeyDescription: undefined,
-  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
-  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: undefined,
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Delete account',
   formFieldInputPlaceholder__emailAddress: undefined,
@@ -176,10 +148,6 @@ export const skSK: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyExpirationDate: undefined,
-  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Enable automatic invitations for this domain',
   formFieldLabel__backupCode: 'Záložný kód',
   formFieldLabel__confirmDeletion: 'Confirmation',
@@ -224,9 +192,6 @@ export const skSK: LocalizationResource = {
     titleWithoutPersonal: 'Choose an organization',
   },
   organizationProfile: {
-    apiKeysPage: {
-      title: undefined,
-    },
     badge__automaticInvitation: 'Automatic invitations',
     badge__automaticSuggestion: 'Automatic suggestions',
     badge__manualInvitation: 'No automatic enrollment',
@@ -250,7 +215,6 @@ export const skSK: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__payments: undefined,
         headerTitle__plans: undefined,
         headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
@@ -324,7 +288,6 @@ export const skSK: LocalizationResource = {
       },
     },
     navbar: {
-      apiKeys: undefined,
       billing: undefined,
       description: 'Manage your organization.',
       general: 'General',
@@ -838,9 +801,6 @@ export const skSK: LocalizationResource = {
     action__signOutAll: 'Odhlásiť sa zo všetkých účtov',
   },
   userProfile: {
-    apiKeysPage: {
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Skopírované!',
       actionLabel__copy: 'Kopírovať všetko',
@@ -876,7 +836,6 @@ export const skSK: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__payments: undefined,
         headerTitle__plans: undefined,
         headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
@@ -1001,7 +960,6 @@ export const skSK: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profile',
-      apiKeys: undefined,
       billing: undefined,
       description: 'Manage your account info.',
       security: 'Security',

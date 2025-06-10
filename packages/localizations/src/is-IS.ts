@@ -14,30 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const isIS: LocalizationResource = {
   locale: 'is-IS',
-  apiKeys: {
-    action__add: undefined,
-    action__search: undefined,
-    dates: {
-      lastUsed: {
-        days: undefined,
-        hours: undefined,
-        minutes: undefined,
-        months: undefined,
-        seconds: undefined,
-        years: undefined,
-      },
-    },
-    detailsTitle__emptyRow: undefined,
-    formButtonPrimary__add: undefined,
-    formHint: undefined,
-    formTitle: undefined,
-    menuAction__revoke: undefined,
-    revokeConfirmation: {
-      formButtonPrimary__revoke: undefined,
-      formHint: undefined,
-      formTitle: undefined,
-    },
-  },
   backButton: 'Til baka',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
@@ -86,7 +62,6 @@ export const isIS: LocalizationResource = {
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
     },
-    credit: undefined,
     creditRemainder: undefined,
     defaultFreePlanActive: undefined,
     free: undefined,
@@ -159,9 +134,6 @@ export const isIS: LocalizationResource = {
   formFieldHintText__optional: 'Valfrjálst',
   formFieldHintText__slug:
     'Stubbur (e. slug) er auðlesanlegt auðkenni sem verður að vera einstakt. Það er oft notað í vefslóðum.',
-  formFieldInputPlaceholder__apiKeyDescription: undefined,
-  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
-  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: undefined,
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Eyða aðgangi',
   formFieldInputPlaceholder__emailAddress: undefined,
@@ -176,10 +148,6 @@ export const isIS: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyExpirationDate: undefined,
-  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Virkja sjálfvirk boð fyrir þetta lén',
   formFieldLabel__backupCode: 'Öryggiskóði',
   formFieldLabel__confirmDeletion: 'Staðfesting',
@@ -224,9 +192,6 @@ export const isIS: LocalizationResource = {
     titleWithoutPersonal: 'Veldu samtök',
   },
   organizationProfile: {
-    apiKeysPage: {
-      title: undefined,
-    },
     badge__automaticInvitation: 'Sjálfvirk boð',
     badge__automaticSuggestion: 'Sjálfvirkar tillögur',
     badge__manualInvitation: 'Engin sjálfvirk skráning',
@@ -250,7 +215,6 @@ export const isIS: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__payments: undefined,
         headerTitle__plans: undefined,
         headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
@@ -325,7 +289,6 @@ export const isIS: LocalizationResource = {
       },
     },
     navbar: {
-      apiKeys: undefined,
       billing: undefined,
       description: 'Stjórna samtökunum þínum.',
       general: 'Almennt',
@@ -845,9 +808,6 @@ export const isIS: LocalizationResource = {
     action__signOutAll: 'Skrá út af öllum reikningum',
   },
   userProfile: {
-    apiKeysPage: {
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Afritað!',
       actionLabel__copy: 'Afrita allt',
@@ -883,7 +843,6 @@ export const isIS: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__payments: undefined,
         headerTitle__plans: undefined,
         headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
@@ -1009,7 +968,6 @@ export const isIS: LocalizationResource = {
     mobileButton__menu: 'Valmynd',
     navbar: {
       account: 'Prófíll',
-      apiKeys: undefined,
       billing: undefined,
       description: 'Stjórna reikningsupplýsingum þínum.',
       security: 'Öryggi',

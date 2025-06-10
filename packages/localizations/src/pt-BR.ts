@@ -14,30 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const ptBR: LocalizationResource = {
   locale: 'pt-BR',
-  apiKeys: {
-    action__add: undefined,
-    action__search: undefined,
-    dates: {
-      lastUsed: {
-        days: undefined,
-        hours: undefined,
-        minutes: undefined,
-        months: undefined,
-        seconds: undefined,
-        years: undefined,
-      },
-    },
-    detailsTitle__emptyRow: undefined,
-    formButtonPrimary__add: undefined,
-    formHint: undefined,
-    formTitle: undefined,
-    menuAction__revoke: undefined,
-    revokeConfirmation: {
-      formButtonPrimary__revoke: undefined,
-      formHint: undefined,
-      formTitle: undefined,
-    },
-  },
   backButton: 'Voltar',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
@@ -86,7 +62,6 @@ export const ptBR: LocalizationResource = {
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
     },
-    credit: undefined,
     creditRemainder: undefined,
     defaultFreePlanActive: undefined,
     free: undefined,
@@ -159,9 +134,6 @@ export const ptBR: LocalizationResource = {
   formFieldHintText__optional: 'Opcional',
   formFieldHintText__slug:
     'Um rótulo é um identificador legível por humanos que deve ser único. É comumente usado em URLs.',
-  formFieldInputPlaceholder__apiKeyDescription: undefined,
-  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
-  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'Insira o código de backup',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Excluir conta',
   formFieldInputPlaceholder__emailAddress: 'Digite o endereço de e-mail',
@@ -176,10 +148,6 @@ export const ptBR: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Digite sua senha',
   formFieldInputPlaceholder__phoneNumber: 'Digite seu número de telefone',
   formFieldInputPlaceholder__username: 'Digite seu nome de usuário',
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyExpirationDate: undefined,
-  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Ativar convites automáticos para este domínio',
   formFieldLabel__backupCode: 'Código de backup',
   formFieldLabel__confirmDeletion: 'Confirmar exclusão',
@@ -224,9 +192,6 @@ export const ptBR: LocalizationResource = {
     titleWithoutPersonal: 'Selecione uma organização',
   },
   organizationProfile: {
-    apiKeysPage: {
-      title: undefined,
-    },
     badge__automaticInvitation: 'Convites automáticos',
     badge__automaticSuggestion: 'Sugestões automáticas',
     badge__manualInvitation: 'Sem inscrição automática',
@@ -250,7 +215,6 @@ export const ptBR: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__payments: undefined,
         headerTitle__plans: undefined,
         headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
@@ -324,7 +288,6 @@ export const ptBR: LocalizationResource = {
       },
     },
     navbar: {
-      apiKeys: undefined,
       billing: undefined,
       description: 'Gerencie sua organização.',
       general: 'Geral',
@@ -846,9 +809,6 @@ export const ptBR: LocalizationResource = {
     action__signOutAll: 'Sair de todas as contas',
   },
   userProfile: {
-    apiKeysPage: {
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Copiado!',
       actionLabel__copy: 'Copiar tudo',
@@ -884,7 +844,6 @@ export const ptBR: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__payments: undefined,
         headerTitle__plans: undefined,
         headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
@@ -1011,7 +970,6 @@ export const ptBR: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Perfil',
-      apiKeys: undefined,
       billing: undefined,
       description: 'Gerencie seus dados de perfil.',
       security: 'Segurança',

@@ -14,30 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const jaJP: LocalizationResource = {
   locale: 'ja-JP',
-  apiKeys: {
-    action__add: undefined,
-    action__search: undefined,
-    dates: {
-      lastUsed: {
-        days: undefined,
-        hours: undefined,
-        minutes: undefined,
-        months: undefined,
-        seconds: undefined,
-        years: undefined,
-      },
-    },
-    detailsTitle__emptyRow: undefined,
-    formButtonPrimary__add: undefined,
-    formHint: undefined,
-    formTitle: undefined,
-    menuAction__revoke: undefined,
-    revokeConfirmation: {
-      formButtonPrimary__revoke: undefined,
-      formHint: undefined,
-      formTitle: undefined,
-    },
-  },
   backButton: '戻る',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
@@ -86,7 +62,6 @@ export const jaJP: LocalizationResource = {
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
     },
-    credit: undefined,
     creditRemainder: undefined,
     defaultFreePlanActive: undefined,
     free: undefined,
@@ -158,9 +133,6 @@ export const jaJP: LocalizationResource = {
   formFieldError__verificationLinkExpired: '検証リンクの有効期限が切れています。新しいリンクをリクエストしてください。',
   formFieldHintText__optional: '任意',
   formFieldHintText__slug: 'スラグは人間が読めるユニークなIDです。URLで良く使われます。',
-  formFieldInputPlaceholder__apiKeyDescription: undefined,
-  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
-  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'バックアップコード',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'アカウント削除',
   formFieldInputPlaceholder__emailAddress: 'メールアドレス',
@@ -176,10 +148,6 @@ export const jaJP: LocalizationResource = {
   formFieldInputPlaceholder__password: 'パスワード',
   formFieldInputPlaceholder__phoneNumber: '電話番号',
   formFieldInputPlaceholder__username: 'ユーザー名',
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyExpirationDate: undefined,
-  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'このドメインの自動招待を有効にする',
   formFieldLabel__backupCode: 'バックアップコード',
   formFieldLabel__confirmDeletion: '削除の確認',
@@ -224,9 +192,6 @@ export const jaJP: LocalizationResource = {
     titleWithoutPersonal: '組織を選択',
   },
   organizationProfile: {
-    apiKeysPage: {
-      title: undefined,
-    },
     badge__automaticInvitation: '自動招待',
     badge__automaticSuggestion: '自動サジェスト',
     badge__manualInvitation: '自動登録なし',
@@ -250,7 +215,6 @@ export const jaJP: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__payments: undefined,
         headerTitle__plans: undefined,
         headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
@@ -324,7 +288,6 @@ export const jaJP: LocalizationResource = {
       },
     },
     navbar: {
-      apiKeys: undefined,
       billing: undefined,
       description: '組織を管理します。',
       general: '一般',
@@ -841,9 +804,6 @@ export const jaJP: LocalizationResource = {
     action__signOutAll: '全てのアカウントからサインアウト',
   },
   userProfile: {
-    apiKeysPage: {
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'コピー済み！',
       actionLabel__copy: 'すべてコピー',
@@ -878,7 +838,6 @@ export const jaJP: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__payments: undefined,
         headerTitle__plans: undefined,
         headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
@@ -1000,7 +959,6 @@ export const jaJP: LocalizationResource = {
     mobileButton__menu: 'メニュー',
     navbar: {
       account: 'プロファイル',
-      apiKeys: undefined,
       billing: undefined,
       description: 'アカウント情報管理',
       security: 'セキュリティ',

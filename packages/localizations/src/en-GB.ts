@@ -14,30 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const enGB: LocalizationResource = {
   locale: 'en-GB',
-  apiKeys: {
-    action__add: undefined,
-    action__search: undefined,
-    dates: {
-      lastUsed: {
-        days: undefined,
-        hours: undefined,
-        minutes: undefined,
-        months: undefined,
-        seconds: undefined,
-        years: undefined,
-      },
-    },
-    detailsTitle__emptyRow: undefined,
-    formButtonPrimary__add: undefined,
-    formHint: undefined,
-    formTitle: undefined,
-    menuAction__revoke: undefined,
-    revokeConfirmation: {
-      formButtonPrimary__revoke: undefined,
-      formHint: undefined,
-      formTitle: undefined,
-    },
-  },
   backButton: 'Back',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
@@ -86,7 +62,6 @@ export const enGB: LocalizationResource = {
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
     },
-    credit: undefined,
     creditRemainder: undefined,
     defaultFreePlanActive: undefined,
     free: undefined,
@@ -158,9 +133,6 @@ export const enGB: LocalizationResource = {
   formFieldError__verificationLinkExpired: 'The verification link expired. Please request a new link.',
   formFieldHintText__optional: 'Optional',
   formFieldHintText__slug: 'A slug is a human-readable ID that must be unique. It’s often used in URLs.',
-  formFieldInputPlaceholder__apiKeyDescription: undefined,
-  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
-  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'Enter backup code',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Confirm account deletion',
   formFieldInputPlaceholder__emailAddress: 'Enter your email address',
@@ -175,10 +147,6 @@ export const enGB: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Enter your password',
   formFieldInputPlaceholder__phoneNumber: 'Enter your phone number',
   formFieldInputPlaceholder__username: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyExpirationDate: undefined,
-  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Enable automatic invitations for this domain',
   formFieldLabel__backupCode: 'Backup code',
   formFieldLabel__confirmDeletion: 'Confirmation',
@@ -224,9 +192,6 @@ export const enGB: LocalizationResource = {
     titleWithoutPersonal: 'Choose an organisation',
   },
   organizationProfile: {
-    apiKeysPage: {
-      title: undefined,
-    },
     badge__automaticInvitation: 'Automatic invitations',
     badge__automaticSuggestion: 'Automatic suggestions',
     badge__manualInvitation: 'No automatic enrollment',
@@ -250,7 +215,6 @@ export const enGB: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__payments: undefined,
         headerTitle__plans: undefined,
         headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
@@ -325,7 +289,6 @@ export const enGB: LocalizationResource = {
       },
     },
     navbar: {
-      apiKeys: undefined,
       billing: undefined,
       description: 'Manage your organisation.',
       general: 'General',
@@ -847,9 +810,6 @@ export const enGB: LocalizationResource = {
     action__signOutAll: 'Sign out of all accounts',
   },
   userProfile: {
-    apiKeysPage: {
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Copied!',
       actionLabel__copy: 'Copy all',
@@ -885,7 +845,6 @@ export const enGB: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__payments: undefined,
         headerTitle__plans: undefined,
         headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
@@ -1010,7 +969,6 @@ export const enGB: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profile',
-      apiKeys: undefined,
       billing: undefined,
       description: 'Manage your account info.',
       security: 'Security',

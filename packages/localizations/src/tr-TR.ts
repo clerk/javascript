@@ -14,30 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const trTR: LocalizationResource = {
   locale: 'tr-TR',
-  apiKeys: {
-    action__add: undefined,
-    action__search: undefined,
-    dates: {
-      lastUsed: {
-        days: undefined,
-        hours: undefined,
-        minutes: undefined,
-        months: undefined,
-        seconds: undefined,
-        years: undefined,
-      },
-    },
-    detailsTitle__emptyRow: undefined,
-    formButtonPrimary__add: undefined,
-    formHint: undefined,
-    formTitle: undefined,
-    menuAction__revoke: undefined,
-    revokeConfirmation: {
-      formButtonPrimary__revoke: undefined,
-      formHint: undefined,
-      formTitle: undefined,
-    },
-  },
   backButton: 'Geri',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
@@ -86,7 +62,6 @@ export const trTR: LocalizationResource = {
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
     },
-    credit: undefined,
     creditRemainder: undefined,
     defaultFreePlanActive: undefined,
     free: undefined,
@@ -158,9 +133,6 @@ export const trTR: LocalizationResource = {
   formFieldError__verificationLinkExpired: 'Doğrulama bağlantısının süresi doldu. Lütfen yeni bir bağlantı isteyin.',
   formFieldHintText__optional: 'İsteğe bağlı',
   formFieldHintText__slug: "Slug, okunabilir bir ID'dir ve benzersiz olmalıdır. Genellikle URL'lerde kullanılır.",
-  formFieldInputPlaceholder__apiKeyDescription: undefined,
-  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
-  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'Yedek kodu girin',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Hesabı sil',
   formFieldInputPlaceholder__emailAddress: 'email@example.com',
@@ -175,10 +147,6 @@ export const trTR: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Şifrenizi girin',
   formFieldInputPlaceholder__phoneNumber: 'Telefon numaranızı girin',
   formFieldInputPlaceholder__username: 'Kullanıcı adınızı girin',
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyExpirationDate: undefined,
-  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Bu alan adı için otomatik davetleri etkinleştir',
   formFieldLabel__backupCode: 'Yedekleme kodu',
   formFieldLabel__confirmDeletion: 'Onayla',
@@ -223,9 +191,6 @@ export const trTR: LocalizationResource = {
     titleWithoutPersonal: 'Bir organizasyon seçin',
   },
   organizationProfile: {
-    apiKeysPage: {
-      title: undefined,
-    },
     badge__automaticInvitation: 'Otomatik davetler',
     badge__automaticSuggestion: 'Otomatik öneriler',
     badge__manualInvitation: 'Davetler',
@@ -249,7 +214,6 @@ export const trTR: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__payments: undefined,
         headerTitle__plans: undefined,
         headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
@@ -324,7 +288,6 @@ export const trTR: LocalizationResource = {
       },
     },
     navbar: {
-      apiKeys: undefined,
       billing: undefined,
       description: 'Organizasyonunuzu yönetin.',
       general: 'Genel',
@@ -844,9 +807,6 @@ export const trTR: LocalizationResource = {
     action__signOutAll: 'Tüm hesaplardan çıkış yap',
   },
   userProfile: {
-    apiKeysPage: {
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Kopyalandı!',
       actionLabel__copy: 'Hepsini kopyala',
@@ -882,7 +842,6 @@ export const trTR: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__payments: undefined,
         headerTitle__plans: undefined,
         headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
@@ -1007,7 +966,6 @@ export const trTR: LocalizationResource = {
     mobileButton__menu: 'Menü',
     navbar: {
       account: 'Profil',
-      apiKeys: undefined,
       billing: undefined,
       description: 'Hesap bilgilerinizi yönetin.',
       security: 'Güvenlik',

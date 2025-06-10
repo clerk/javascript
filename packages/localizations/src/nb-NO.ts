@@ -14,30 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const nbNO: LocalizationResource = {
   locale: 'nb-NO',
-  apiKeys: {
-    action__add: undefined,
-    action__search: undefined,
-    dates: {
-      lastUsed: {
-        days: undefined,
-        hours: undefined,
-        minutes: undefined,
-        months: undefined,
-        seconds: undefined,
-        years: undefined,
-      },
-    },
-    detailsTitle__emptyRow: undefined,
-    formButtonPrimary__add: undefined,
-    formHint: undefined,
-    formTitle: undefined,
-    menuAction__revoke: undefined,
-    revokeConfirmation: {
-      formButtonPrimary__revoke: undefined,
-      formHint: undefined,
-      formTitle: undefined,
-    },
-  },
   backButton: 'Tilbake',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
@@ -86,7 +62,6 @@ export const nbNO: LocalizationResource = {
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
     },
-    credit: undefined,
     creditRemainder: undefined,
     defaultFreePlanActive: undefined,
     free: undefined,
@@ -158,9 +133,6 @@ export const nbNO: LocalizationResource = {
   formFieldError__verificationLinkExpired: 'Verifikasjonslenken har utløpt. Vennligst be om en ny lenke.',
   formFieldHintText__optional: 'Valgfritt',
   formFieldHintText__slug: 'En slug er en menneskelesbar ID som må være unik. Den brukes ofte i URL-er.',
-  formFieldInputPlaceholder__apiKeyDescription: undefined,
-  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
-  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: undefined,
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Slett konto',
   formFieldInputPlaceholder__emailAddress: undefined,
@@ -176,10 +148,6 @@ export const nbNO: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyExpirationDate: undefined,
-  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Skru på automatiske invitasjoner for dette domenet',
   formFieldLabel__backupCode: 'Sikkerhetskode',
   formFieldLabel__confirmDeletion: 'Bekreftelse',
@@ -224,9 +192,6 @@ export const nbNO: LocalizationResource = {
     titleWithoutPersonal: 'Velg en organiasjon',
   },
   organizationProfile: {
-    apiKeysPage: {
-      title: undefined,
-    },
     badge__automaticInvitation: 'Automatisk invitasjon',
     badge__automaticSuggestion: 'Automatisk forslag',
     badge__manualInvitation: 'Ingen automatisk registrering',
@@ -250,7 +215,6 @@ export const nbNO: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__payments: undefined,
         headerTitle__plans: undefined,
         headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
@@ -324,7 +288,6 @@ export const nbNO: LocalizationResource = {
       },
     },
     navbar: {
-      apiKeys: undefined,
       billing: undefined,
       description: 'Administrer organisasjonen din.',
       general: 'Generelt',
@@ -841,9 +804,6 @@ export const nbNO: LocalizationResource = {
     action__signOutAll: 'Logg ut av alle kontoer',
   },
   userProfile: {
-    apiKeysPage: {
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Kopiert!',
       actionLabel__copy: 'Kopier alle',
@@ -879,7 +839,6 @@ export const nbNO: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__payments: undefined,
         headerTitle__plans: undefined,
         headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
@@ -1005,7 +964,6 @@ export const nbNO: LocalizationResource = {
     mobileButton__menu: 'Meny',
     navbar: {
       account: 'Profil',
-      apiKeys: undefined,
       billing: undefined,
       description: 'Administrer kontoinformasjonen din.',
       security: 'Sikkerhet',

@@ -14,30 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const nlNL: LocalizationResource = {
   locale: 'nl-NL',
-  apiKeys: {
-    action__add: undefined,
-    action__search: undefined,
-    dates: {
-      lastUsed: {
-        days: undefined,
-        hours: undefined,
-        minutes: undefined,
-        months: undefined,
-        seconds: undefined,
-        years: undefined,
-      },
-    },
-    detailsTitle__emptyRow: undefined,
-    formButtonPrimary__add: undefined,
-    formHint: undefined,
-    formTitle: undefined,
-    menuAction__revoke: undefined,
-    revokeConfirmation: {
-      formButtonPrimary__revoke: undefined,
-      formHint: undefined,
-      formTitle: undefined,
-    },
-  },
   backButton: 'Terug',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
@@ -86,7 +62,6 @@ export const nlNL: LocalizationResource = {
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
     },
-    credit: undefined,
     creditRemainder: undefined,
     defaultFreePlanActive: undefined,
     free: undefined,
@@ -158,9 +133,6 @@ export const nlNL: LocalizationResource = {
   formFieldError__verificationLinkExpired: 'De verificatielink is verlopen. Vraag een nieuwe link aan.',
   formFieldHintText__optional: 'Optioneel',
   formFieldHintText__slug: 'Een slug is een leesbare ID die uniek moet zijn. Het wordt vaak gebruikt in URL’s.',
-  formFieldInputPlaceholder__apiKeyDescription: undefined,
-  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
-  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'Voer een back-upcode in',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Verwijder account',
   formFieldInputPlaceholder__emailAddress: 'jouw@email.com',
@@ -175,10 +147,6 @@ export const nlNL: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Wachtwoord',
   formFieldInputPlaceholder__phoneNumber: 'Telefoonnummer',
   formFieldInputPlaceholder__username: 'Gebruikersnaam',
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyExpirationDate: undefined,
-  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Automatische uitnodigingen inschakelen voor dit domein',
   formFieldLabel__backupCode: 'Backupcode',
   formFieldLabel__confirmDeletion: 'Bevestiging',
@@ -223,9 +191,6 @@ export const nlNL: LocalizationResource = {
     titleWithoutPersonal: 'Kies een organisatie',
   },
   organizationProfile: {
-    apiKeysPage: {
-      title: undefined,
-    },
     badge__automaticInvitation: 'Automatische Uitnodiging',
     badge__automaticSuggestion: 'Automatische Suggesties',
     badge__manualInvitation: 'Geen automatische inschrijving',
@@ -249,7 +214,6 @@ export const nlNL: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__payments: undefined,
         headerTitle__plans: undefined,
         headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
@@ -324,7 +288,6 @@ export const nlNL: LocalizationResource = {
       },
     },
     navbar: {
-      apiKeys: undefined,
       billing: undefined,
       description: 'Beheer je organisatie.',
       general: 'Algemeen',
@@ -840,9 +803,6 @@ export const nlNL: LocalizationResource = {
     action__signOutAll: 'Uitloggen uit alle accounts',
   },
   userProfile: {
-    apiKeysPage: {
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Gekopieerd!',
       actionLabel__copy: 'Kopieer',
@@ -878,7 +838,6 @@ export const nlNL: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__payments: undefined,
         headerTitle__plans: undefined,
         headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
@@ -1002,7 +961,6 @@ export const nlNL: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profiel',
-      apiKeys: undefined,
       billing: undefined,
       description: 'Beheer je account informatie.',
       security: 'Beveiliging',

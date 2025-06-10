@@ -14,30 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const esES: LocalizationResource = {
   locale: 'es-ES',
-  apiKeys: {
-    action__add: undefined,
-    action__search: undefined,
-    dates: {
-      lastUsed: {
-        days: undefined,
-        hours: undefined,
-        minutes: undefined,
-        months: undefined,
-        seconds: undefined,
-        years: undefined,
-      },
-    },
-    detailsTitle__emptyRow: undefined,
-    formButtonPrimary__add: undefined,
-    formHint: undefined,
-    formTitle: undefined,
-    menuAction__revoke: undefined,
-    revokeConfirmation: {
-      formButtonPrimary__revoke: undefined,
-      formHint: undefined,
-      formTitle: undefined,
-    },
-  },
   backButton: 'Atrás',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
@@ -86,7 +62,6 @@ export const esES: LocalizationResource = {
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
     },
-    credit: undefined,
     creditRemainder: undefined,
     defaultFreePlanActive: undefined,
     free: undefined,
@@ -158,9 +133,6 @@ export const esES: LocalizationResource = {
   formFieldError__verificationLinkExpired: 'El enlace de verificación ha expirado. Por favor solicite uno nuevo.',
   formFieldHintText__optional: 'Opcional',
   formFieldHintText__slug: 'Un slug es un ID legible que debe ser único. Es comúnmente usado en URLs.',
-  formFieldInputPlaceholder__apiKeyDescription: undefined,
-  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
-  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'Ingrese su código de respaldo',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Eliminar cuenta',
   formFieldInputPlaceholder__emailAddress: 'Ingrese su dirección de correo electrónico',
@@ -176,10 +148,6 @@ export const esES: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Ingrese su contraseña',
   formFieldInputPlaceholder__phoneNumber: 'Ingrese su número telefónico',
   formFieldInputPlaceholder__username: 'Ingrese su nombre de usuario',
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyExpirationDate: undefined,
-  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Activar invitaciones automáticas para este dominio',
   formFieldLabel__backupCode: 'Código de respaldo',
   formFieldLabel__confirmDeletion: 'Confirmación',
@@ -224,9 +192,6 @@ export const esES: LocalizationResource = {
     titleWithoutPersonal: 'Escoja una organización',
   },
   organizationProfile: {
-    apiKeysPage: {
-      title: undefined,
-    },
     badge__automaticInvitation: 'Invitaciones automáticas',
     badge__automaticSuggestion: 'Sugerencias automáticas',
     badge__manualInvitation: 'Sin inscripción automática',
@@ -250,7 +215,6 @@ export const esES: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__payments: undefined,
         headerTitle__plans: undefined,
         headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
@@ -325,7 +289,6 @@ export const esES: LocalizationResource = {
       },
     },
     navbar: {
-      apiKeys: undefined,
       billing: undefined,
       description: 'Gestione su organización.',
       general: 'General',
@@ -844,9 +807,6 @@ export const esES: LocalizationResource = {
     action__signOutAll: 'Salir de todas las cuentas',
   },
   userProfile: {
-    apiKeysPage: {
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: '¡Copiado!',
       actionLabel__copy: 'Copiar todo',
@@ -882,7 +842,6 @@ export const esES: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__payments: undefined,
         headerTitle__plans: undefined,
         headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
@@ -1009,7 +968,6 @@ export const esES: LocalizationResource = {
     mobileButton__menu: 'Menú',
     navbar: {
       account: 'Perfil',
-      apiKeys: undefined,
       billing: undefined,
       description: 'Gestiona la información de tu cuenta.',
       security: 'Seguridad',

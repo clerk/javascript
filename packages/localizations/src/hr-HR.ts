@@ -14,30 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const hrHR: LocalizationResource = {
   locale: 'hr-HR',
-  apiKeys: {
-    action__add: undefined,
-    action__search: undefined,
-    dates: {
-      lastUsed: {
-        days: undefined,
-        hours: undefined,
-        minutes: undefined,
-        months: undefined,
-        seconds: undefined,
-        years: undefined,
-      },
-    },
-    detailsTitle__emptyRow: undefined,
-    formButtonPrimary__add: undefined,
-    formHint: undefined,
-    formTitle: undefined,
-    menuAction__revoke: undefined,
-    revokeConfirmation: {
-      formButtonPrimary__revoke: undefined,
-      formHint: undefined,
-      formTitle: undefined,
-    },
-  },
   backButton: 'Natrag',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
@@ -86,7 +62,6 @@ export const hrHR: LocalizationResource = {
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
     },
-    credit: undefined,
     creditRemainder: undefined,
     defaultFreePlanActive: undefined,
     free: undefined,
@@ -158,9 +133,6 @@ export const hrHR: LocalizationResource = {
   formFieldError__verificationLinkExpired: 'Verifikacijska poveznica je istekla. Molimo zatražite novu poveznicu.',
   formFieldHintText__optional: 'Neobavezno',
   formFieldHintText__slug: 'Slug je čitljiv ID koji mora biti jedinstven. Često se koristi u URL-ovima.',
-  formFieldInputPlaceholder__apiKeyDescription: undefined,
-  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
-  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: undefined,
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Izbriši račun',
   formFieldInputPlaceholder__emailAddress: undefined,
@@ -175,10 +147,6 @@ export const hrHR: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyExpirationDate: undefined,
-  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Omogući automatske pozivnice za ovu domenu',
   formFieldLabel__backupCode: 'Rezervni kod',
   formFieldLabel__confirmDeletion: 'Potvrda',
@@ -223,9 +191,6 @@ export const hrHR: LocalizationResource = {
     titleWithoutPersonal: 'Odaberite organizaciju',
   },
   organizationProfile: {
-    apiKeysPage: {
-      title: undefined,
-    },
     badge__automaticInvitation: 'Automatske pozivnice',
     badge__automaticSuggestion: 'Automatski prijedlozi',
     badge__manualInvitation: 'Bez automatskog učlanjenja',
@@ -249,7 +214,6 @@ export const hrHR: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__payments: undefined,
         headerTitle__plans: undefined,
         headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
@@ -324,7 +288,6 @@ export const hrHR: LocalizationResource = {
       },
     },
     navbar: {
-      apiKeys: undefined,
       billing: undefined,
       description: 'Upravljajte svojom organizacijom.',
       general: 'Općenito',
@@ -847,9 +810,6 @@ export const hrHR: LocalizationResource = {
     action__signOutAll: 'Odjavi se sa svih računa',
   },
   userProfile: {
-    apiKeysPage: {
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Kopirano!',
       actionLabel__copy: 'Kopiraj sve',
@@ -885,7 +845,6 @@ export const hrHR: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__payments: undefined,
         headerTitle__plans: undefined,
         headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
@@ -1009,7 +968,6 @@ export const hrHR: LocalizationResource = {
     mobileButton__menu: 'Izbornik',
     navbar: {
       account: 'Profil',
-      apiKeys: undefined,
       billing: undefined,
       description: 'Upravljajte informacijama vašeg računa.',
       security: 'Sigurnost',

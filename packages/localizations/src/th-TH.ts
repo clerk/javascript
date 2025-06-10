@@ -14,30 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const thTH: LocalizationResource = {
   locale: 'th-TH',
-  apiKeys: {
-    action__add: undefined,
-    action__search: undefined,
-    dates: {
-      lastUsed: {
-        days: undefined,
-        hours: undefined,
-        minutes: undefined,
-        months: undefined,
-        seconds: undefined,
-        years: undefined,
-      },
-    },
-    detailsTitle__emptyRow: undefined,
-    formButtonPrimary__add: undefined,
-    formHint: undefined,
-    formTitle: undefined,
-    menuAction__revoke: undefined,
-    revokeConfirmation: {
-      formButtonPrimary__revoke: undefined,
-      formHint: undefined,
-      formTitle: undefined,
-    },
-  },
   backButton: 'กลับ',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
@@ -86,7 +62,6 @@ export const thTH: LocalizationResource = {
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
     },
-    credit: undefined,
     creditRemainder: undefined,
     defaultFreePlanActive: undefined,
     free: undefined,
@@ -158,9 +133,6 @@ export const thTH: LocalizationResource = {
   formFieldError__verificationLinkExpired: 'ลิงก์การตรวจสอบหมดอายุแล้ว โปรดขอลิงก์ใหม่',
   formFieldHintText__optional: 'ไม่จำเป็น',
   formFieldHintText__slug: 'Slug เป็น ID ที่อ่านได้และต้องไม่ซ้ำกัน มักใช้ใน URLs',
-  formFieldInputPlaceholder__apiKeyDescription: undefined,
-  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
-  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'ใส่รหัสสำรอง',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'ลบบัญชี',
   formFieldInputPlaceholder__emailAddress: 'ใส่ที่อยู่อีเมลของคุณ',
@@ -175,10 +147,6 @@ export const thTH: LocalizationResource = {
   formFieldInputPlaceholder__password: 'ใส่รหัสผ่านของคุณ',
   formFieldInputPlaceholder__phoneNumber: 'ใส่หมายเลขโทรศัพท์ของคุณ',
   formFieldInputPlaceholder__username: 'ใส่ชื่อผู้ใช้ของคุณ',
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyExpirationDate: undefined,
-  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'เปิดใช้งานคำเชิญอัตโนมัติสำหรับโดเมนนี้',
   formFieldLabel__backupCode: 'รหัสสำรอง',
   formFieldLabel__confirmDeletion: 'การยืนยัน',
@@ -223,9 +191,6 @@ export const thTH: LocalizationResource = {
     titleWithoutPersonal: 'เลือกองค์กร',
   },
   organizationProfile: {
-    apiKeysPage: {
-      title: undefined,
-    },
     badge__automaticInvitation: 'คำเชิญอัตโนมัติ',
     badge__automaticSuggestion: 'ข้อเสนอแนะอัตโนมัติ',
     badge__manualInvitation: 'ไม่มีการลงทะเบียนอัตโนมัติ',
@@ -249,7 +214,6 @@ export const thTH: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__payments: undefined,
         headerTitle__plans: undefined,
         headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
@@ -324,7 +288,6 @@ export const thTH: LocalizationResource = {
       },
     },
     navbar: {
-      apiKeys: undefined,
       billing: undefined,
       description: 'จัดการองค์กรของคุณ',
       general: 'ทั่วไป',
@@ -840,9 +803,6 @@ export const thTH: LocalizationResource = {
     action__signOutAll: 'ออกจากระบบทุกบัญชี',
   },
   userProfile: {
-    apiKeysPage: {
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'คัดลอกแล้ว!',
       actionLabel__copy: 'คัดลอกทั้งหมด',
@@ -877,7 +837,6 @@ export const thTH: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__payments: undefined,
         headerTitle__plans: undefined,
         headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
@@ -999,7 +958,6 @@ export const thTH: LocalizationResource = {
     mobileButton__menu: 'เมนู',
     navbar: {
       account: 'โปรไฟล์',
-      apiKeys: undefined,
       billing: undefined,
       description: 'จัดการข้อมูลบัญชีของคุณ',
       security: 'ความปลอดภัย',
