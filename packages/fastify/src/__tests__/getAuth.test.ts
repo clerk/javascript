@@ -16,11 +16,14 @@ describe('getAuth(req)', () => {
   });
 
   it('returns the actual auth object when its tokenType matches acceptsToken', () => {
-    const req = { auth: { tokenType: 'api_key', id: 'ak_1234', subject: 'api_key_1234' } } as unknown as FastifyRequest;
+    const req = {
+      auth: { tokenType: 'api_key', id: 'ak_1234', userId: 'user_12345', orgId: null },
+    } as unknown as FastifyRequest;
     const result = getAuth(req, { acceptsToken: 'api_key' });
     expect(result.tokenType).toBe('api_key');
     expect(result.id).toBe('ak_1234');
-    expect(result.subject).toBe('api_key_1234');
+    expect(result.userId).toBe('user_12345');
+    expect(result.orgId).toBeNull();
   });
 
   it('returns the actual auth object if its tokenType is included in the acceptsToken array', () => {
@@ -35,8 +38,7 @@ describe('getAuth(req)', () => {
     const req = { auth: { tokenType: 'session_token', userId: 'user_12345' } } as unknown as FastifyRequest;
     const result = getAuth(req, { acceptsToken: 'api_key' });
     expect(result.tokenType).toBe('session_token'); // reflects the actual token found
-    // Properties specific to authenticated objects should be null or undefined
-    // @ts-expect-error - userId is not a property of the unauthenticated object
     expect(result.userId).toBeNull();
+    expect(result.orgId).toBeNull();
   });
 });
