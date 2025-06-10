@@ -280,6 +280,7 @@ exports[`Environment defaults values when instantiated without arguments 1`] = `
 Environment {
   "apiKeysSettings": APIKeySettings {
     "enabled": false,
+    "id": undefined,
     "pathRoot": "",
   },
   "authConfig": AuthConfig {
@@ -525,6 +526,7 @@ exports[`Environment has the same initial properties 1`] = `
 Environment {
   "apiKeysSettings": APIKeySettings {
     "enabled": false,
+    "id": undefined,
     "pathRoot": "",
   },
   "authConfig": AuthConfig {
