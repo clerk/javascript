@@ -38,8 +38,8 @@ import type {
   Web3SignatureConfig,
   Web3SignatureFactor,
 } from '@clerk/types';
-import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
+import { createStore } from 'zustand/vanilla';
 
 import {
   generateSignatureWithCoinbaseWallet,
@@ -76,7 +76,7 @@ type SignInUIState = {
 };
 
 const createSignInStore = () =>
-  create<SignInUIState>()(
+  createStore<SignInUIState>()(
     devtools(
       set => ({
         status: null,
