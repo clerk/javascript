@@ -11,6 +11,11 @@ export const OrganizationAPIKeysPage = () => {
   const { organization } = useOrganization();
   const { contentRef } = useUnsafeNavbarContext();
 
+  if (!organization) {
+    // We should never reach this point, but we'll return null to make TS happy
+    return null;
+  }
+
   return (
     <Col gap={4}>
       <Header.Root>
@@ -21,7 +26,7 @@ export const OrganizationAPIKeysPage = () => {
       </Header.Root>
       <ApiKeysContext.Provider value={{ componentName: 'APIKeys' }}>
         <APIKeysPage
-          subject={organization?.id ?? ''}
+          subject={organization.id}
           revokeModalRoot={contentRef}
         />
       </ApiKeysContext.Provider>
