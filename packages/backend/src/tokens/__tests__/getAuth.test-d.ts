@@ -1,4 +1,4 @@
-import { expectTypeOf, test } from 'vitest';
+import { assertType, expectTypeOf, test } from 'vitest';
 
 import type { AuthObject } from '../authObjects';
 import type { GetAuthFn, MachineAuthObject, SessionAuthObject } from '../types';
