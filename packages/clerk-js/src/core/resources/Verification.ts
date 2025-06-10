@@ -45,8 +45,12 @@ export class Verification extends BaseResource implements VerificationResource {
   };
 
   private updateError(error: ClerkAPIError | null) {
-    const parsedError = error ? errorToJSON(parseError(error)) : null;
-    this._store.getState().dispatch({ type: 'FETCH_ERROR', error: parsedError });
+    if (error) {
+      const parsedError = errorToJSON(parseError(error));
+      this._store.getState().resource.dispatch({ type: 'FETCH_ERROR', error: parsedError });
+    } else {
+      this._store.getState().resource.dispatch({ type: 'RESET' });
+    }
   }
 
   protected fromJSON(data: VerificationJSON | VerificationJSONSnapshot | null): this {

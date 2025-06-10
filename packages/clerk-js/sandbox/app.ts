@@ -264,6 +264,20 @@ function otherOptions() {
 function mountSignInObservable(element: HTMLDivElement) {
   assertClerkIsLoaded(Clerk);
 
+  // Add global error handler to catch store-related errors
+  const originalError = console.error;
+  console.error = function (...args) {
+    if (args.some(arg => typeof arg === 'string' && arg.includes('dispatch is not a function'))) {
+      console.log('=== Store Dispatch Error Detected ===');
+      console.log('Arguments:', args);
+      console.log('Current signIn:', signIn);
+      if (signIn?.store) {
+        console.log('SignIn store state:', signIn.store.getState());
+      }
+    }
+    originalError.apply(console, args);
+  };
+
   // Create main container
   const mainContainer = document.createElement('div');
   mainContainer.className = 'space-y-6';
@@ -283,34 +297,6 @@ function mountSignInObservable(element: HTMLDivElement) {
   // Create combined store display
   const combinedStoreDisplay = document.createElement('div');
   combinedStoreDisplay.className = 'grid grid-cols-1 gap-4 mb-4';
-
-  // Store relationship explanation
-  const explanationSection = document.createElement('div');
-  explanationSection.className = 'p-4 bg-yellow-50 border border-yellow-200 rounded-lg';
-  explanationSection.innerHTML = `
-    <h3 class="font-semibold text-yellow-800 mb-2">Store Architecture (Zustand Slices Pattern - Flattened & Consistent)</h3>
-    <div class="text-sm text-yellow-700 space-y-2">
-      <p>• <strong>Consistent Store Property:</strong> <code>signIn.store</code> contains the combined store with all slices</p>
-      
-      <div class="border-l-2 border-blue-300 pl-3 my-2">
-        <p><strong>Resource Slice (under 'resource' namespace):</strong></p>
-        <p>• <code>signIn.store.getState().resource.status</code>: 'idle' | 'loading' | 'error' | 'success'</p>
-        <p>• <code>signIn.store.getState().resource.data</code>: The resource data (SignIn instance)</p>
-        <p>• <code>signIn.store.getState().resource.error</code>: Any error from API calls</p>
-        <p>• Methods: <code>dispatch</code>, <code>getData</code>, <code>getError</code>, <code>hasError</code>, <code>getStatus</code></p>
-        <p>• Purpose: Generic resource management (loading, success, error states)</p>
-      </div>
-      
-      <div class="border-l-2 border-green-300 pl-3 my-2">
-        <p><strong>SignIn Slice (under 'signin' namespace):</strong></p>
-        <p>• <code>signIn.store.getState().signin.signInStatus</code>: SignIn flow status</p>
-        <p>• Method: <code>signIn.store.getState().signin.setSignInStatus</code></p>
-        <p>• Purpose: Domain-specific SignIn business logic</p>
-      </div>
-      
-      <p><strong>Benefits:</strong> Consistent depth (1 level), flattened structure, clear boundaries.</p>
-    </div>
-  `;
 
   // Combined store display section
   const combinedStoreSection = document.createElement('div');
@@ -342,12 +328,6 @@ function mountSignInObservable(element: HTMLDivElement) {
   signInStoreDisplay.className = 'p-2 bg-white rounded text-sm font-mono';
   signInSliceSection.appendChild(signInStoreDisplay);
 
-  combinedStoreDisplay.appendChild(explanationSection);
-  combinedStoreDisplay.appendChild(combinedStoreSection);
-  combinedStoreDisplay.appendChild(resourceSliceSection);
-  combinedStoreDisplay.appendChild(signInSliceSection);
-  mainContainer.appendChild(combinedStoreDisplay);
-
   // Create controls container
   const controlsContainer = document.createElement('div');
   controlsContainer.className = 'space-y-4';
@@ -378,8 +358,8 @@ function mountSignInObservable(element: HTMLDivElement) {
 
   const emailInput = document.createElement('input');
   emailInput.type = 'email';
-  emailInput.placeholder = 'Email';
-  emailInput.value = 'test@example.com'; // Pre-fill for testing
+  emailInput.placeholder = 'Email (must exist in your Clerk app)';
+  emailInput.value = ''; // Don't pre-fill with non-existent email
   emailInput.className = 'w-full p-2 border rounded';
 
   const passwordInput = document.createElement('input');
@@ -397,6 +377,41 @@ function mountSignInObservable(element: HTMLDivElement) {
   form.appendChild(passwordInput);
   form.appendChild(submitButton);
   mainContainer.appendChild(form);
+
+  // Store relationship explanation (moved below form)
+  const explanationSection = document.createElement('div');
+  explanationSection.className = 'p-4 bg-yellow-50 border border-yellow-200 rounded-lg mt-4';
+  explanationSection.innerHTML = `
+    <h3 class="font-semibold text-yellow-800 mb-2">Store Architecture (Zustand Slices Pattern - Flattened & Consistent)</h3>
+    <div class="text-sm text-yellow-700 space-y-2">
+      <p>• <strong>Consistent Store Property:</strong> <code>signIn.store</code> contains the combined store with all slices</p>
+      
+      <div class="border-l-2 border-blue-300 pl-3 my-2">
+        <p><strong>Resource Slice (under 'resource' namespace):</strong></p>
+        <p>• <code>signIn.store.getState().resource.status</code>: 'idle' | 'loading' | 'error' | 'success'</p>
+        <p>• <code>signIn.store.getState().resource.data</code>: The resource data (SignIn instance)</p>
+        <p>• <code>signIn.store.getState().resource.error</code>: Any error from API calls</p>
+        <p>• Methods: <code>dispatch</code>, <code>getData</code>, <code>getError</code>, <code>hasError</code>, <code>getStatus</code></p>
+        <p>• Purpose: Generic resource management (loading, success, error states)</p>
+      </div>
+      
+      <div class="border-l-2 border-green-300 pl-3 my-2">
+        <p><strong>SignIn Slice (under 'signin' namespace):</strong></p>
+        <p>• <code>signIn.store.getState().signin.signInStatus</code>: SignIn flow status</p>
+        <p>• Method: <code>signIn.store.getState().signin.setSignInStatus</code></p>
+        <p>• Purpose: Domain-specific SignIn business logic</p>
+      </div>
+      
+      <p><strong>Benefits:</strong> Consistent depth (1 level), flattened structure, clear boundaries.</p>
+    </div>
+  `;
+
+  // Add the combined store display section after the form and explanation
+  combinedStoreDisplay.appendChild(explanationSection);
+  combinedStoreDisplay.appendChild(combinedStoreSection);
+  combinedStoreDisplay.appendChild(resourceSliceSection);
+  combinedStoreDisplay.appendChild(signInSliceSection);
+  mainContainer.appendChild(combinedStoreDisplay);
 
   let signIn: SignInResource & { signInStore?: any };
   let storeUnsubscribe: (() => void) | null = null;
@@ -420,6 +435,9 @@ function mountSignInObservable(element: HTMLDivElement) {
     const identifier = signIn.identifier;
     const error = signIn.signInError?.global;
 
+    // Additional debugging info
+    const firstFactorStrategies = signIn.supportedFirstFactors?.map(f => f.strategy).join(', ') || 'none';
+
     // Update status container
     statusContainer.innerHTML = `
       <div class="space-y-2 transition-all duration-300">
@@ -438,6 +456,10 @@ function mountSignInObservable(element: HTMLDivElement) {
         <div class="flex items-center gap-2">
           <strong>Identifier:</strong>
           <span class="text-sm">${identifier || 'none'}</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <strong>Available Factors:</strong>
+          <span class="text-sm">${firstFactorStrategies}</span>
         </div>
         ${error ? `<div class="text-red-500"><strong>Error:</strong> ${error}</div>` : ''}
       </div>
@@ -548,6 +570,133 @@ function mountSignInObservable(element: HTMLDivElement) {
     }
   });
 
+  const attemptPasswordButton = createTestButton('Attempt Password', async () => {
+    if (signIn && passwordInput.value) {
+      try {
+        statusContainer.innerHTML = `
+          <div class="text-blue-500">
+            <strong>Status:</strong> Attempting password authentication...
+          </div>
+        `;
+        await signIn.attemptFirstFactor({
+          strategy: 'password',
+          password: passwordInput.value,
+        });
+        updateStatus();
+      } catch (error) {
+        console.log('Password attempt completed (may have expected errors):', error);
+        updateStatus();
+      }
+    }
+  });
+
+  const forceRefreshButton = createTestButton('Force Refresh Status', () => {
+    console.log('=== Force Refresh Debug ===');
+    console.log('Current signIn:', signIn);
+    console.log('signIn.status:', signIn?.status);
+    console.log('signIn.identifier:', signIn?.identifier);
+    console.log('signIn.supportedFirstFactors:', signIn?.supportedFirstFactors);
+    console.log('signIn.store:', signIn?.store);
+    if (signIn?.store) {
+      console.log('Store state:', signIn.store.getState());
+    }
+    updateStatus();
+  });
+
+  const resetDemoButton = createTestButton('Reset Demo State', () => {
+    console.log('=== Resetting Demo State ===');
+
+    // Unsubscribe from old store
+    if (storeUnsubscribe) {
+      storeUnsubscribe();
+      storeUnsubscribe = null;
+    }
+
+    // Reset to the current client SignIn state
+    if (Clerk.client) {
+      signIn = Clerk.client.signIn as SignInResource & { signInStore?: any };
+
+      // Subscribe to the current client SignIn store
+      if (signIn?.store) {
+        storeUnsubscribe = signIn.store.subscribe(() => {
+          updateStatus();
+        });
+      }
+
+      console.log('Reset to client.signIn:', signIn);
+      console.log('New status:', signIn?.status);
+      console.log('New identifier:', signIn?.identifier);
+
+      statusContainer.innerHTML = `
+        <div class="text-blue-500">
+          <strong>Status:</strong> Demo reset to current client state
+        </div>
+      `;
+
+      setTimeout(updateStatus, 100);
+    }
+  });
+
+  const clearSignInButton = createTestButton('Clear SignIn Attempt', async () => {
+    console.log('=== Clearing SignIn Attempt ===');
+
+    try {
+      // Unsubscribe from old store
+      if (storeUnsubscribe) {
+        storeUnsubscribe();
+        storeUnsubscribe = null;
+      }
+
+      statusContainer.innerHTML = `
+        <div class="text-blue-500">
+          <strong>Status:</strong> Clearing SignIn attempt...
+        </div>
+      `;
+
+      // Create a completely fresh SignIn attempt
+      if (Clerk.client) {
+        // First, try to abandon the current SignIn if it exists
+        if (Clerk.client.signIn && typeof (Clerk.client.signIn as any).abandon === 'function') {
+          try {
+            await (Clerk.client.signIn as any).abandon();
+            console.log('Abandoned existing SignIn attempt');
+          } catch (abandonError) {
+            console.log('Could not abandon SignIn (might not be needed):', abandonError);
+          }
+        }
+
+        // Get the fresh SignIn instance
+        signIn = Clerk.client.signIn as SignInResource & { signInStore?: any };
+
+        // Subscribe to the fresh store
+        if (signIn?.store) {
+          storeUnsubscribe = signIn.store.subscribe(() => {
+            updateStatus();
+          });
+        }
+
+        console.log('Fresh SignIn:', signIn);
+        console.log('Fresh status:', signIn?.status);
+        console.log('Fresh identifier:', signIn?.identifier);
+
+        statusContainer.innerHTML = `
+          <div class="text-green-500">
+            <strong>Status:</strong> SignIn attempt cleared - Fresh state
+          </div>
+        `;
+
+        setTimeout(updateStatus, 100);
+      }
+    } catch (error) {
+      console.error('Error clearing SignIn:', error);
+      statusContainer.innerHTML = `
+        <div class="text-red-500">
+          <strong>Error:</strong> Could not clear SignIn attempt
+        </div>
+      `;
+    }
+  });
+
   const inspectStoreButton = createTestButton('Inspect Store Details', () => {
     if (signIn?.store) {
       const storeState = signIn.store.getState();
@@ -613,6 +762,10 @@ function mountSignInObservable(element: HTMLDivElement) {
   buttonsContainer.appendChild(loadingButton);
   buttonsContainer.appendChild(errorButton);
   buttonsContainer.appendChild(signInStatusButton);
+  buttonsContainer.appendChild(attemptPasswordButton);
+  buttonsContainer.appendChild(forceRefreshButton);
+  buttonsContainer.appendChild(resetDemoButton);
+  buttonsContainer.appendChild(clearSignInButton);
   buttonsContainer.appendChild(inspectStoreButton);
 
   // Initialize SignIn instance
@@ -669,15 +822,16 @@ function mountSignInObservable(element: HTMLDivElement) {
         // Initial update
         updateStatus();
 
-        // Update status to show initialization complete
+        // Update status to show initialization complete - explain the initial state
         statusContainer.innerHTML = `
-          <div class="text-green-500">
-            <strong>Status:</strong> SignIn initialized - Store ready for demo
+          <div class="text-blue-500">
+            <strong>Status:</strong> SignIn initialized - Ready for demo<br/>
+            <small class="text-xs">Note: Initial state shows "needs_identifier" until you submit the form to create a SignIn with an identifier.</small>
           </div>
         `;
 
         // Update displays after a brief delay to show the initialized state
-        setTimeout(updateStatus, 100);
+        setTimeout(updateStatus, 200);
       }
     } catch (error) {
       console.error('Failed to initialize:', error);
@@ -698,35 +852,119 @@ function mountSignInObservable(element: HTMLDivElement) {
         throw new Error('Clerk client not ready');
       }
 
-      // Create new SignIn instance
-      signIn = (await Clerk.client.signIn.create({
-        identifier: emailInput.value,
-      })) as SignInResource & { signInStore?: any };
+      // Update status to show we're creating SignIn
+      statusContainer.innerHTML = `
+        <div class="text-blue-500">
+          <strong>Status:</strong> Creating SignIn with identifier: ${emailInput.value}
+        </div>
+      `;
 
-      // Subscribe to the new store
+      console.log('Creating SignIn with identifier:', emailInput.value);
+      console.log('Current Clerk.client:', Clerk.client);
+      console.log('Current signIn before create:', signIn);
+
+      // Create new SignIn instance
+      const newSignIn = await Clerk.client.signIn.create({
+        identifier: emailInput.value,
+      });
+
+      console.log('New SignIn created:', newSignIn);
+      console.log('New SignIn status:', newSignIn.status);
+      console.log('New SignIn identifier:', newSignIn.identifier);
+      console.log('New SignIn store:', newSignIn.store);
+
+      // Debug store structure in detail
+      if (newSignIn.store) {
+        const storeState = newSignIn.store.getState();
+        console.log('=== Store Structure Debug ===');
+        console.log('Store state:', storeState);
+        console.log('Store state keys:', Object.keys(storeState));
+
+        if (storeState.resource) {
+          console.log('Resource slice:', storeState.resource);
+          console.log('Resource dispatch available:', typeof storeState.resource.dispatch);
+        } else {
+          console.error('❌ Resource slice missing from store!');
+        }
+
+        if (storeState.signin) {
+          console.log('SignIn slice:', storeState.signin);
+        } else {
+          console.error('❌ SignIn slice missing from store!');
+        }
+
+        // Check if verification has its own store reference
+        if (newSignIn.firstFactorVerification) {
+          console.log('First factor verification:', newSignIn.firstFactorVerification);
+          console.log('Verification _store:', (newSignIn.firstFactorVerification as any)._store);
+          if ((newSignIn.firstFactorVerification as any)._store) {
+            const verificationStore = (newSignIn.firstFactorVerification as any)._store;
+            console.log('Verification store state:', verificationStore.getState?.());
+          }
+        }
+      }
+
+      signIn = newSignIn as SignInResource & { signInStore?: any };
+
+      // Subscribe to the new store - use consistent .store property
       if (storeUnsubscribe) {
         storeUnsubscribe();
       }
-      if (signIn.signInStore?.subscribe) {
-        storeUnsubscribe = signIn.signInStore.subscribe(() => {
+      if (signIn.store?.subscribe) {
+        storeUnsubscribe = signIn.store.subscribe(() => {
+          console.log('Store updated, calling updateStatus');
           updateStatus();
         });
+        console.log('Subscribed to store updates');
+      } else {
+        console.warn('No store available on SignIn instance');
       }
 
+      // Force an immediate update
+      console.log('Calling updateStatus immediately');
       updateStatus();
 
-      // Try to prepare first factor
-      if (signIn.supportedFirstFactors && signIn.supportedFirstFactors.length > 0) {
-        // Note: This is just for demo purposes, proper factor preparation would need more setup
-        // const firstFactor = signIn.supportedFirstFactors[0];
-        // await signIn.prepareFirstFactor(firstFactor);
+      // Log current state after update
+      setTimeout(() => {
+        console.log('Final state check:');
+        console.log('signIn.status:', signIn?.status);
+        console.log('signIn.identifier:', signIn?.identifier);
+        console.log('signIn.supportedFirstFactors:', signIn?.supportedFirstFactors);
         updateStatus();
-      }
+      }, 100);
     } catch (error) {
-      console.error('Sign in error:', error);
-      if (signIn) {
-        updateStatus(); // This will show the error state
+      console.error('Sign in error details:', error);
+      console.error('Error type:', typeof error);
+      if (error && typeof error === 'object' && 'constructor' in error) {
+        console.error('Error constructor:', (error as any).constructor?.name);
       }
+
+      // Handle specific Clerk errors
+      let errorMessage = 'Failed to create SignIn';
+      if (error instanceof Error) {
+        if (error.message.includes("Couldn't find your account")) {
+          errorMessage = `Account not found: ${emailInput.value} doesn't exist in this Clerk application`;
+        } else {
+          errorMessage = error.message;
+        }
+      }
+
+      statusContainer.innerHTML = `
+        <div class="text-red-500 space-y-2">
+          <div><strong>SignIn Creation Failed:</strong></div>
+          <div class="text-sm">${errorMessage}</div>
+          <div class="text-xs text-gray-600">
+            ${
+              error instanceof Error && error.message.includes("Couldn't find your account")
+                ? 'Try using an email that exists in your Clerk application, or enable sign-up to create new accounts.'
+                : 'Check browser console for detailed error information'
+            }
+          </div>
+        </div>
+      `;
+
+      // Don't call updateStatus since signIn wasn't updated
+      console.log('SignIn creation failed, keeping original signIn instance');
     }
   });
 
@@ -742,6 +980,37 @@ function mountSignInObservable(element: HTMLDivElement) {
 
   // Initialize on mount
   void initializeSignIn();
+
+  // Debug initial Clerk state when everything loads
+  setTimeout(() => {
+    console.log('=== Initial Clerk State Debug ===');
+    console.log('Clerk loaded:', Clerk.loaded);
+    console.log('Clerk client:', Clerk.client);
+    if (Clerk.client?.signIn) {
+      console.log('Initial client.signIn:', Clerk.client.signIn);
+      console.log('Initial signIn.store:', Clerk.client.signIn.store);
+      if (Clerk.client.signIn.store) {
+        const initialState = Clerk.client.signIn.store.getState();
+        console.log('Initial store state:', initialState);
+        console.log('Initial store keys:', Object.keys(initialState));
+
+        // Check resource slice structure
+        if (initialState.resource) {
+          console.log('Initial resource slice:', initialState.resource);
+          console.log('Resource dispatch type:', typeof initialState.resource.dispatch);
+          console.log(
+            'Resource methods:',
+            Object.keys(initialState.resource).filter(key => typeof initialState.resource[key] === 'function'),
+          );
+        }
+
+        // Check signin slice structure
+        if (initialState.signin) {
+          console.log('Initial signin slice:', initialState.signin);
+        }
+      }
+    }
+  }, 1000);
 }
 
 void (async () => {
