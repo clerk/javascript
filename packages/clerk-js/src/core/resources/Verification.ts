@@ -26,6 +26,7 @@ export class Verification extends BaseResource implements VerificationResource {
 
   attempts: number | null = null;
   channel?: PhoneCodeChannel;
+  error: ClerkAPIError | null = null;
   expireAt: Date | null = null;
   externalVerificationRedirectURL: URL | null = null;
   message: string | null = null;

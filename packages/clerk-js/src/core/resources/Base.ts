@@ -64,38 +64,6 @@ export abstract class BaseResource {
     return this._store;
   }
 
-  public get isLoading(): boolean {
-    return this._store.getState().isLoading();
-  }
-
-  public get hasError(): boolean {
-    return this._store.getState().hasError();
-  }
-
-  public get error(): ClerkAPIErrorJSON | null {
-    return this._store.getState().getError();
-  }
-
-  public get data(): this | null {
-    return this._store.getState().getData();
-  }
-
-  public get fetchStatus(): 'idle' | 'fetching' | 'fetched' | 'error' {
-    const stateType = this._store.getState().state.type;
-    switch (stateType) {
-      case 'idle':
-        return 'idle';
-      case 'loading':
-        return 'fetching';
-      case 'success':
-        return 'fetched';
-      case 'error':
-        return 'error';
-      default:
-        return 'idle';
-    }
-  }
-
   static get fapiClient(): FapiClient {
     return BaseResource.clerk.getFapiClient();
   }

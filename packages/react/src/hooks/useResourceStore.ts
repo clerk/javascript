@@ -1,11 +1,20 @@
+import type { StoreApi } from 'zustand';
 import { useStore } from 'zustand';
-import type { createResourceStore } from '@clerk/clerk-js/src/core/resources/state';
+
+interface ResourceStore<T> {
+  state: any;
+  dispatch: (action: any) => void;
+  getData: () => T | null;
+  getError: () => any;
+  status: () => 'idle' | 'loading' | 'error' | 'success';
+  hasError: () => boolean;
+}
 
 /**
  * React hooks for using the resource store in React components.
  * This provides React-specific integration for the framework-agnostic resource store.
  */
-export const createResourceStoreHooks = <T>(store: ReturnType<typeof createResourceStore<T>>) => {
+export const createResourceStoreHooks = <T>(store: StoreApi<ResourceStore<T>>) => {
   /**
    * Hook to get the entire store state
    */
@@ -32,19 +41,14 @@ export const createResourceStoreHooks = <T>(store: ReturnType<typeof createResou
   const useResourceError = () => useStore(store, state => state.getError());
 
   /**
-   * Hook to check if the resource is loading
+   * Hook to get the current status
    */
-  const useResourceIsLoading = () => useStore(store, state => state.isLoading());
+  const useResourceStatus = () => useStore(store, state => state.status());
 
   /**
    * Hook to check if the resource has an error
    */
   const useResourceHasError = () => useStore(store, state => state.hasError());
-
-  /**
-   * Hook to check if the resource can be fetched
-   */
-  const useResourceCanFetch = () => useStore(store, state => state.canFetch());
 
   return {
     useResourceStore,
@@ -52,8 +56,7 @@ export const createResourceStoreHooks = <T>(store: ReturnType<typeof createResou
     useResourceDispatch,
     useResourceData,
     useResourceError,
-    useResourceIsLoading,
+    useResourceStatus,
     useResourceHasError,
-    useResourceCanFetch,
   };
 };

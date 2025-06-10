@@ -195,9 +195,9 @@ function SignInStartInternal(): JSX.Element {
   }, [identifierField.value, identifierAttributes]);
 
   const signInStatus = signIn.status;
-  const signInFetchStatus = signIn.fetchStatus;
+  const signInFetchStatus = signIn.store.getState().status;
 
-  useEffect(() => {
+  useEffect(() => { 
     console.log('Component mounted');
     console.log('Initial organizationTicket:', organizationTicket);
     console.log('Initial signInFetchStatus:', signInFetchStatus);
@@ -517,7 +517,6 @@ function SignInStartInternal(): JSX.Element {
     return components[identifierField.type as keyof typeof components];
   }, [identifierField.type]);
 
-  
   if (clerkStatus === 'sign_up') {
     // clerkStatus being sign_up will trigger a navigation to the sign up flow, so show a loading card instead of
     // rendering the sign in flow.
