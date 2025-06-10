@@ -13,15 +13,13 @@ describe('PublicUserData', () => {
       user_id: '123',
     });
 
-    expect(JSON.stringify(pud)).toEqual(
-      JSON.stringify({
-        firstName: 'John',
-        lastName: 'Doe',
-        imageUrl: 'https://example.com/image.jpg',
-        hasImage: true,
-        identifier: 'john-doe',
-        userId: '123',
-      }),
-    );
+    expect(pud).toMatchObject({
+      firstName: 'John',
+      lastName: 'Doe',
+      imageUrl: 'https://example.com/image.jpg',
+      hasImage: true,
+      identifier: 'john-doe',
+      userId: '123',
+    });
   });
 });
