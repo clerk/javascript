@@ -585,6 +585,27 @@ export type ElementsConfig = {
   notificationBadge: WithOptions;
   buttonArrowIcon: WithOptions;
   spinner: WithOptions;
+
+  apiKeys: WithOptions;
+  apiKeysHeader: WithOptions;
+  apiKeysSearchInput: WithOptions;
+  apiKeysAddButton: WithOptions;
+  apiKeysTable: WithOptions;
+  apiKeysTableRow: WithOptions<string>;
+  apiKeysTableCellName: WithOptions<string>;
+  apiKeysTableCellLastUsed: WithOptions<string>;
+  apiKeysTableCellKey: WithOptions<string>;
+  apiKeysTableCellActions: WithOptions<string>;
+  apiKeysCopyButton: WithOptions<string>;
+  apiKeysRevealButton: WithOptions<string>;
+  apiKeysCreateForm: WithOptions;
+  apiKeysCreateFormNameInput: WithOptions;
+  apiKeysCreateFormDescriptionInput: WithOptions;
+  apiKeysCreateFormExpirationInput: WithOptions;
+  apiKeysCreateFormSubmitButton: WithOptions;
+  apiKeysRevokeModal: WithOptions;
+  apiKeysRevokeModalInput: WithOptions;
+  apiKeysRevokeModalSubmitButton: WithOptions;
 };
 
 export type Elements = {

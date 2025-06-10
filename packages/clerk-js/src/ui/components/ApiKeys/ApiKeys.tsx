@@ -5,7 +5,17 @@ import { lazy, useState } from 'react';
 import useSWRMutation from 'swr/mutation';
 
 import { useApiKeysContext, withCoreUserGuard } from '@/ui/contexts';
-import { Box, Button, Col, Flex, Flow, Icon, localizationKeys, useLocalizations } from '@/ui/customizables';
+import {
+  Box,
+  Button,
+  Col,
+  descriptors,
+  Flex,
+  Flow,
+  Icon,
+  localizationKeys,
+  useLocalizations,
+} from '@/ui/customizables';
 import { Action } from '@/ui/elements/Action';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { InputWithIcon } from '@/ui/elements/InputWithIcon';
@@ -81,6 +91,7 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
     <Col
       gap={4}
       sx={{ width: '100%' }}
+      elementDescriptor={descriptors.apiKeys}
     >
       <Action.Root>
         <Flex
@@ -93,6 +104,7 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
               alignItems: 'stretch',
             },
           }}
+          elementDescriptor={descriptors.apiKeysHeader}
         >
           <Box>
             <InputWithIcon
@@ -103,6 +115,7 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
                 setSearch(e.target.value);
                 setPage(1);
               }}
+              elementDescriptor={descriptors.apiKeysSearchInput}
             />
           </Box>
           <Action.Trigger
@@ -112,6 +125,7 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
             <Button
               variant='solid'
               localizationKey={localizationKeys('apiKeys.action__add')}
+              elementDescriptor={descriptors.apiKeysAddButton}
             />
           </Action.Trigger>
         </Flex>
@@ -130,6 +144,7 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
         rows={apiKeys}
         isLoading={isLoading}
         onRevoke={handleRevoke}
+        elementDescriptor={descriptors.apiKeysTable}
       />
       {itemCount > 5 && (
         <Pagination
