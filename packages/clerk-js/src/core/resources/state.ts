@@ -44,38 +44,48 @@ const createSelectors = <T>() => ({
 });
 
 /**
- * Creates a new resource store with state management capabilities.
- * @returns A Zustand store instance with resource state management
+ * Creates a resource slice following the Zustand slices pattern.
+ * This slice handles the common resource state management (loading, error, success states).
  */
-export const createResourceStore = <T>() => {
+export const createResourceSlice = <T>(set: any, get: any): ResourceStore<T> => {
   const selectors = createSelectors<T>();
 
+  return {
+    state: { status: 'idle', data: null, error: null } as ResourceState<T>,
+    dispatch: (action: ResourceAction<T>) => {
+      switch (action.type) {
+        case 'FETCH_START':
+          set((state: any) => ({ ...state, state: { status: 'loading', data: null, error: null } }));
+          break;
+        case 'FETCH_SUCCESS':
+          set((state: any) => ({ ...state, state: { status: 'success', data: action.data, error: null } }));
+          break;
+        case 'FETCH_ERROR':
+          set((state: any) => ({ ...state, state: { status: 'error', data: null, error: action.error } }));
+          break;
+        case 'RESET':
+          set((state: any) => ({ ...state, state: { status: 'idle', data: null, error: null } }));
+          break;
+      }
+    },
+    getData: () => selectors.getData(get().state),
+    getError: () => selectors.getError(get().state),
+    hasError: () => selectors.hasError(get().state),
+    status: () => selectors.getStatus(get().state),
+  };
+};
+
+/**
+ * Creates a basic resource store using just the resource slice.
+ * This is used by BaseResource for backward compatibility.
+ */
+export const createResourceStore = <T>(name = 'ResourceStore') => {
   return createStore<ResourceStore<T>>()(
     devtools(
       (set, get) => ({
-        state: { type: 'idle', data: null, error: null },
-        dispatch: action => {
-          switch (action.type) {
-            case 'FETCH_START':
-              set({ state: { status: 'loading', data: null, error: null } });
-              break;
-            case 'FETCH_SUCCESS':
-              set({ state: { status: 'success', data: action.data, error: null } });
-              break;
-            case 'FETCH_ERROR':
-              set({ state: { status: 'error', data: null, error: action.error } });
-              break;
-            case 'RESET':
-              set({ state: { status: 'idle', data: null, error: null } });
-              break;
-          }
-        },
-        getData: () => selectors.getData(get().state),
-        getError: () => selectors.getError(get().state),
-        hasError: () => selectors.hasError(get().state),
-        status: () => selectors.getStatus(get().state),
+        ...createResourceSlice<T>(set, get),
       }),
-      { name: 'ResourceStore' },
+      { name },
     ),
   );
 };

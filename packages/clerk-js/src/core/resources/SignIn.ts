@@ -68,24 +68,25 @@ import {
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from '../errors';
 import { BaseResource, UserData, Verification } from './internal';
+import { createResourceSlice, type ResourceStore } from './state';
 
-type SignInUIState = {
-  status: SignInStatus | null;
-  setStatus: (status: SignInStatus | null) => void;
-  type: 'idle' | 'loading' | 'error' | 'success';
+type SignInSliceState = {
+  signInStatus: SignInStatus | null;
+  setSignInStatus: (status: SignInStatus | null) => void;
 };
 
-const createSignInStore = () =>
-  createStore<SignInUIState>()(
-    devtools(
-      set => ({
-        status: null,
-        setStatus: status => set({ status }),
-        type: 'idle',
-      }),
-      { name: 'SignInStore' },
-    ),
-  );
+/**
+ * Creates a SignIn slice following the Zustand slices pattern.
+ * This slice handles SignIn-specific state management.
+ */
+const createSignInSlice = (set: any, _get: any): SignInSliceState => ({
+  signInStatus: null,
+  setSignInStatus: (status: SignInStatus | null) => {
+    set((state: any) => ({ ...state, signInStatus: status }));
+  },
+});
+
+type CombinedSignInStore = ResourceStore<SignIn> & SignInSliceState;
 
 export class SignIn extends BaseResource implements SignInResource {
   pathRoot = '/client/sign_ins';
@@ -102,14 +103,29 @@ export class SignIn extends BaseResource implements SignInResource {
   supportedSecondFactors: SignInSecondFactor[] | null = null;
   userData: UserData = new UserData(null);
 
-  private _signInStore = createSignInStore();
+  private _combinedStore: any;
 
   public get signInStore() {
-    return this._signInStore;
+    return this._combinedStore as { getState(): CombinedSignInStore; setState: any; subscribe: any; destroy: any };
+  }
+
+  // Override the store getter to return the combined store
+  public get store() {
+    return this._combinedStore;
   }
 
   constructor(data: SignInJSON | SignInJSONSnapshot | null = null) {
     super();
+    // Create combined store using slices pattern
+    this._combinedStore = createStore<CombinedSignInStore>()(
+      devtools(
+        (set, get) => ({
+          ...createResourceSlice<SignIn>(set, get),
+          ...createSignInSlice(set, get),
+        }),
+        { name: 'SignInStore' },
+      ),
+    );
     this.fromJSON(data);
   }
 
@@ -119,6 +135,8 @@ export class SignIn extends BaseResource implements SignInResource {
 
   private updateStatus(newStatus: SignInStatus | null) {
     this.status = newStatus;
+    // Update the combined store's signInStatus
+    this.signInStore.getState().setSignInStatus(newStatus);
   }
 
   create = async (params: SignInCreateParams): Promise<SignInResource> => {
@@ -222,7 +240,6 @@ export class SignIn extends BaseResource implements SignInResource {
       });
 
       this.updateStatus(result.status);
-      this.signInStore.getState().setStatus(result.status);
       return result;
     } catch (error) {
       this.updateError(error.message);
