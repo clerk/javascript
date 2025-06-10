@@ -5,6 +5,39 @@
 type Percentage = `${number}%`;
 
 /**
+ * A default key for a shade of a color/lightness/etc
+ * @example '25'
+ */
+type DefaultShadeKey =
+  | '25'
+  | '50'
+  | '100'
+  | '150'
+  | '200'
+  | '300'
+  | '400'
+  | '500'
+  | '600'
+  | '700'
+  | '750'
+  | '800'
+  | '850'
+  | '900'
+  | '950';
+
+/**
+ * A key for a shade of an alpha color
+ * @example '25'
+ */
+type AlphaShadeKey = DefaultShadeKey;
+
+/**
+ * A key for a shade of a lightness color
+ * @example '25'
+ */
+type LightnessShadeKey = DefaultShadeKey;
+
+/**
  * Mix a color with a color tint
  * @param color - The color to mix
  * @param percentage - The percentage to mix the color with
@@ -48,7 +81,7 @@ export function darken(color: string, percentage: Percentage) {
 /**
  * A map of alpha shades to percentages
  */
-const ALPHA_SHADES_MAP: Record<string, string> = {
+const ALPHA_SHADES_MAP: Record<AlphaShadeKey, Percentage> = {
   '25': '2%',
   '50': '3%',
   '100': '7%',
@@ -64,7 +97,7 @@ const ALPHA_SHADES_MAP: Record<string, string> = {
   '850': '84%',
   '900': '87%',
   '950': '92%',
-};
+} as const;
 
 /**
  * Create an alpha scale with transparentize
@@ -75,19 +108,16 @@ const ALPHA_SHADES_MAP: Record<string, string> = {
 export function createAlphaScaleWithTransparentize<P extends string>(
   baseColor: string,
   prefix: P,
-): Record<`${P}${keyof typeof ALPHA_SHADES_MAP}`, string> {
-  const scale = {} as Record<`${P}${keyof typeof ALPHA_SHADES_MAP}`, string>;
-  for (const shadeKey in ALPHA_SHADES_MAP) {
-    if (Object.prototype.hasOwnProperty.call(ALPHA_SHADES_MAP, shadeKey)) {
-      const percentage = ALPHA_SHADES_MAP[shadeKey];
-      // @ts-expect-error - TODO: align percentage type
-      scale[`${prefix}${shadeKey}`] = transparentize(baseColor, percentage);
-    }
-  }
-  return scale;
+): Record<`${P}${AlphaShadeKey}`, string> {
+  return Object.fromEntries(
+    Object.entries(ALPHA_SHADES_MAP).map(([shadeKey, percentage]) => [
+      `${prefix}${shadeKey}`,
+      transparentize(baseColor, percentage),
+    ]),
+  ) as Record<`${P}${AlphaShadeKey}`, string>;
 }
 
-const LIGHTNESS_SHADES_DEF: Record<string, { type: 'lighten' | 'darken' | 'base'; amount: Percentage }> = {
+const LIGHTNESS_SHADES_DEF: Record<LightnessShadeKey, { type: 'lighten' | 'darken' | 'base'; amount: Percentage }> = {
   '25': { type: 'lighten', amount: '92%' },
   '50': { type: 'lighten', amount: '85%' },
   '100': { type: 'lighten', amount: '70%' },
@@ -105,7 +135,7 @@ const LIGHTNESS_SHADES_DEF: Record<string, { type: 'lighten' | 'darken' | 'base'
   '950': { type: 'darken', amount: '92%' },
 };
 
-const ALL_LIGHTNESS_SHADE_KEYS = Object.keys(LIGHTNESS_SHADES_DEF);
+const ALL_LIGHTNESS_SHADE_KEYS = Object.keys(LIGHTNESS_SHADES_DEF) as LightnessShadeKey[];
 
 /**
  * Creates a full lightness color scale (shades 25-950) using color-mix lighten/darken.
@@ -114,15 +144,15 @@ const ALL_LIGHTNESS_SHADE_KEYS = Object.keys(LIGHTNESS_SHADES_DEF);
  * @returns A prefixed color scale object, or undefined if colorOption is undefined.
  */
 export function createColorMixLightnessScale<P extends string>(
-  colorOption: string | Partial<Record<keyof typeof LIGHTNESS_SHADES_DEF, string>> | undefined,
+  colorOption: string | Partial<Record<LightnessShadeKey, string>> | undefined,
   prefix: P,
-): Record<`${P}${keyof typeof LIGHTNESS_SHADES_DEF}`, string> | undefined {
+): Record<`${P}${LightnessShadeKey}`, string> | undefined {
   if (!colorOption) {
     return undefined;
   }
 
   let baseFor500: string;
-  const userProvidedShades: Partial<Record<keyof typeof LIGHTNESS_SHADES_DEF, string>> = {};
+  const userProvidedShades: Partial<Record<LightnessShadeKey, string>> = {};
 
   if (typeof colorOption === 'string') {
     baseFor500 = colorOption;
@@ -140,7 +170,7 @@ export function createColorMixLightnessScale<P extends string>(
     }
   }
 
-  const generatedScale: Partial<Record<keyof typeof LIGHTNESS_SHADES_DEF, string>> = {};
+  const generatedScale: Partial<Record<LightnessShadeKey, string>> = {};
   for (const shadeKey of ALL_LIGHTNESS_SHADE_KEYS) {
     const definition = LIGHTNESS_SHADES_DEF[shadeKey];
     switch (definition.type) {
@@ -158,7 +188,7 @@ export function createColorMixLightnessScale<P extends string>(
 
   const mergedScale = { ...generatedScale, ...userProvidedShades };
 
-  const resultScale = {} as Record<`${P}${keyof typeof LIGHTNESS_SHADES_DEF}`, string>;
+  const resultScale = {} as Record<`${P}${LightnessShadeKey}`, string>;
   for (const key of ALL_LIGHTNESS_SHADE_KEYS) {
     if (mergedScale[key]) {
       resultScale[`${prefix}${key}`] = mergedScale[key];

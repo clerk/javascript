@@ -1,42 +1,50 @@
 import { createAlphaScaleWithTransparentize, transparentize } from '../utils/colorMix';
 
-export const whiteAlpha = Object.freeze({
-  whiteAlpha25: transparentize('white', '2%'),
-  whiteAlpha50: transparentize('white', '3%'),
-  whiteAlpha100: transparentize('white', '7%'),
-  whiteAlpha150: transparentize('white', '11%'),
-  whiteAlpha200: transparentize('white', '15%'),
-  whiteAlpha300: transparentize('white', '28%'),
-  whiteAlpha400: transparentize('white', '41%'),
-  whiteAlpha500: transparentize('white', '53%'),
-  whiteAlpha600: transparentize('white', '62%'),
-  whiteAlpha700: transparentize('white', '73%'),
-  whiteAlpha750: transparentize('white', '78%'),
-  whiteAlpha800: transparentize('white', '81%'),
-  whiteAlpha850: transparentize('white', '84%'),
-  whiteAlpha900: transparentize('white', '87%'),
-  whiteAlpha950: transparentize('white', '92%'),
-} as const);
+type ColorScale<Prefix extends string> = {
+  [K in `${Prefix}${'50' | '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900' | '950'}`]: string;
+};
 
-export const neutralAlpha = Object.freeze({
-  neutralAlpha25: transparentize('black', '2%'),
-  neutralAlpha50: transparentize('black', '3%'),
-  neutralAlpha100: transparentize('black', '7%'),
-  neutralAlpha150: transparentize('black', '11%'),
-  neutralAlpha200: transparentize('black', '15%'),
-  neutralAlpha300: transparentize('black', '28%'),
-  neutralAlpha400: transparentize('black', '41%'),
-  neutralAlpha500: transparentize('black', '53%'),
-  neutralAlpha600: transparentize('black', '62%'),
-  neutralAlpha700: transparentize('black', '73%'),
-  neutralAlpha750: transparentize('black', '78%'),
-  neutralAlpha800: transparentize('black', '81%'),
-  neutralAlpha850: transparentize('black', '84%'),
-  neutralAlpha900: transparentize('black', '87%'),
-  neutralAlpha950: transparentize('black', '92%'),
-} as const);
+// Create alpha scales separately to preserve types
+export const whiteAlpha = createAlphaScaleWithTransparentize('white', 'whiteAlpha');
+export const neutralAlpha = createAlphaScaleWithTransparentize('black', 'neutralAlpha');
 
-export const colors = Object.freeze({
+const primaryAlpha = createAlphaScaleWithTransparentize('#2F3037', 'primaryAlpha');
+const dangerAlpha = createAlphaScaleWithTransparentize('#EF4444', 'dangerAlpha');
+const warningAlpha = createAlphaScaleWithTransparentize('#F36B16', 'warningAlpha');
+const successAlpha = createAlphaScaleWithTransparentize('#22C543', 'successAlpha');
+
+// Define the base colors object type
+type BaseColors = {
+  avatarBorder: string;
+  avatarBackground: string;
+  modalBackdrop: string;
+  colorBackground: string;
+  colorInputBackground: string;
+  colorText: string;
+  colorTextSecondary: string;
+  colorInputText: string;
+  colorTextOnPrimaryBackground: string;
+  colorShimmer: string;
+  transparent: string;
+  white: string;
+  black: string;
+  primaryHover: string;
+};
+
+// Combine all types
+type Colors = BaseColors &
+  ColorScale<'primary'> &
+  ColorScale<'danger'> &
+  ColorScale<'warning'> &
+  ColorScale<'success'> &
+  typeof neutralAlpha &
+  typeof whiteAlpha &
+  typeof primaryAlpha &
+  typeof dangerAlpha &
+  typeof warningAlpha &
+  typeof successAlpha;
+
+export const colors: Colors = Object.freeze({
   avatarBorder: neutralAlpha.neutralAlpha200,
   avatarBackground: neutralAlpha.neutralAlpha400,
   modalBackdrop: neutralAlpha.neutralAlpha700,
@@ -63,8 +71,9 @@ export const colors = Object.freeze({
   primary700: '#25232A',
   primary800: '#201D23',
   primary900: '#1B171C',
-  primaryHover: '#3B3C45', //primary 500 adjusted for lightness
-  ...createAlphaScaleWithTransparentize('#2F3037', 'primaryAlpha'),
+  primary950: '#0F0D12',
+  primaryHover: '#3B3C45', // primary 500 adjusted for lightness
+  ...primaryAlpha,
   danger50: '#FEF2F2',
   danger100: '#FEE5E5',
   danger200: '#FECACA',
@@ -76,7 +85,7 @@ export const colors = Object.freeze({
   danger800: '#991B1B',
   danger900: '#7F1D1D',
   danger950: '#450A0A',
-  ...createAlphaScaleWithTransparentize('#EF4444', 'dangerAlpha'),
+  ...dangerAlpha,
   warning50: '#FFF6ED',
   warning100: '#FFEBD5',
   warning200: '#FED1AA',
@@ -88,7 +97,7 @@ export const colors = Object.freeze({
   warning800: '#9A2F12',
   warning900: '#7C2912',
   warning950: '#431207',
-  ...createAlphaScaleWithTransparentize('#F36B16', 'warningAlpha'),
+  ...warningAlpha,
   success50: '#F0FDF2',
   success100: '#DCFCE2',
   success200: '#BBF7C6',
@@ -100,5 +109,5 @@ export const colors = Object.freeze({
   success800: '#166527',
   success900: '#145323',
   success950: '#052E0F',
-  ...createAlphaScaleWithTransparentize('#22C543', 'successAlpha'),
+  ...successAlpha,
 } as const);

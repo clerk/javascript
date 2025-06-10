@@ -256,7 +256,7 @@ const hslaColorToHslaString = ({ h, s, l, a }: HslaColor): HslaColorString => {
 
 const parse = (str: string): ParsedResult => {
   // TODO(Colors): This is a temporary fix to allow for custom colors to be passed in as variables
-  return str;
+  return str as unknown as ParsedResult;
   const prefix = str.substr(0, 3).toLowerCase();
   let res;
   if (prefix === 'hsl') {

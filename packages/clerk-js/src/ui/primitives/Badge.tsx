@@ -54,7 +54,6 @@ const { applyVariants, filterProps } = createVariants(theme => ({
   },
 }));
 
-// @ts-ignore
 export type BadgeProps = PropsOfComponent<typeof Flex> & StyleVariants<typeof applyVariants>;
 
 export const Badge = (props: BadgeProps) => {
