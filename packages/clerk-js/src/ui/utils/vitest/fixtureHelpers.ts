@@ -340,7 +340,7 @@ const createOrganizationSettingsFixtureHelpers = (environment: EnvironmentJSON) 
 
   const withOrganizationDomains = (modes?: OrganizationEnrollmentMode[], defaultRole?: string) => {
     os.domains.enabled = true;
-    os.domains.enrollment_modes = modes || ['automatic_invitation', 'automatic_invitation', 'manual_invitation'];
+    os.domains.enrollment_modes = modes || ['automatic_invitation', 'manual_invitation'];
     os.domains.default_role = defaultRole ?? null;
   };
   return { withOrganizations, withMaxAllowedMemberships, withOrganizationDomains, withForceOrganizationSelection };

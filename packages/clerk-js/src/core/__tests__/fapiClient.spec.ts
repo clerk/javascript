@@ -25,6 +25,8 @@ type RecursivePartial<T> = {
   [P in keyof T]?: RecursivePartial<T[P]>;
 };
 
+const originalFetch = global.fetch;
+
 // @ts-ignore -- We don't need to fully satisfy the fetch types for the sake of this mock
 global.fetch = vi.fn(() =>
   Promise.resolve<RecursivePartial<Response>>({
@@ -61,6 +63,7 @@ beforeEach(() => {
 afterAll(() => {
   window.location = oldWindowLocation;
   delete window.Clerk;
+  global.fetch = originalFetch;
 });
 
 describe('buildUrl(options)', () => {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildSSOCallbackURL, buildVerificationRedirectUrl, buildVerificationRedirectUrl } from '../redirects';
+import { buildSSOCallbackURL, buildVerificationRedirectUrl } from '../redirects';
 
 describe('buildVerificationRedirectUrl(routing, baseUrl)', () => {
   it('defaults to hash based routing strategy on empty routing', function () {
