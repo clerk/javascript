@@ -17,7 +17,6 @@ import type {
   EmailLinkConfig,
   EnterpriseSSOConfig,
   PassKeyConfig,
-  PasskeyFactor,
   PhoneCodeConfig,
   PrepareFirstFactorParams,
   PrepareSecondFactorParams,
@@ -39,6 +38,8 @@ import type {
   Web3SignatureConfig,
   Web3SignatureFactor,
 } from '@clerk/types';
+import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
 
 import {
   generateSignatureWithCoinbaseWallet,
@@ -68,30 +69,70 @@ import {
 } from '../errors';
 import { BaseResource, UserData, Verification } from './internal';
 
+type SignInUIState = {
+  status: SignInStatus | null;
+  setStatus: (status: SignInStatus | null) => void;
+  type: 'idle' | 'loading' | 'error' | 'success';
+};
+
+const createSignInStore = () =>
+  create<SignInUIState>()(
+    devtools(
+      set => ({
+        status: null,
+        setStatus: status => set({ status }),
+        type: 'idle',
+      }),
+      { name: 'SignInStore' },
+    ),
+  );
+
 export class SignIn extends BaseResource implements SignInResource {
   pathRoot = '/client/sign_ins';
 
-  id?: string;
-  status: SignInStatus | null = null;
-  supportedIdentifiers: SignInIdentifier[] = [];
-  supportedFirstFactors: SignInFirstFactor[] | null = [];
-  supportedSecondFactors: SignInSecondFactor[] | null = null;
-  firstFactorVerification: VerificationResource = new Verification(null);
-  secondFactorVerification: VerificationResource = new Verification(null);
-  identifier: string | null = null;
   createdSessionId: string | null = null;
+  firstFactorVerification: VerificationResource = new Verification(null);
+  id?: string;
+  identifier: string | null = null;
+  secondFactorVerification: VerificationResource = new Verification(null);
+  signInError: { global: string | null; fields: Record<string, string> } = { global: null, fields: {} };
+  status: SignInStatus | null = null;
+  supportedFirstFactors: SignInFirstFactor[] | null = [];
+  supportedIdentifiers: SignInIdentifier[] = [];
+  supportedSecondFactors: SignInSecondFactor[] | null = null;
   userData: UserData = new UserData(null);
+
+  private _signInStore = createSignInStore();
+
+  public get signInStore() {
+    return this._signInStore;
+  }
 
   constructor(data: SignInJSON | SignInJSONSnapshot | null = null) {
     super();
     this.fromJSON(data);
   }
 
-  create = (params: SignInCreateParams): Promise<this> => {
-    return this._basePost({
-      path: this.pathRoot,
-      body: params,
-    });
+  private updateError(globalError: string | null, fieldErrors: Record<string, string> = {}) {
+    this.signInError = { global: globalError, fields: fieldErrors };
+  }
+
+  private updateStatus(newStatus: SignInStatus | null) {
+    this.status = newStatus;
+  }
+
+  create = async (params: SignInCreateParams): Promise<SignInResource> => {
+    try {
+      const result = await this._basePost({
+        path: this.pathRoot,
+        body: params,
+      });
+      this.updateStatus(result.status);
+      return result;
+    } catch (error) {
+      this.updateError(error.message);
+      throw error;
+    }
   };
 
   resetPassword = (params: ResetPasswordParams): Promise<SignInResource> => {
@@ -160,22 +201,33 @@ export class SignIn extends BaseResource implements SignInResource {
     });
   };
 
-  attemptFirstFactor = (attemptFactor: AttemptFirstFactorParams): Promise<SignInResource> => {
-    let config;
-    switch (attemptFactor.strategy) {
-      case 'passkey':
-        config = {
-          publicKeyCredential: JSON.stringify(serializePublicKeyCredentialAssertion(attemptFactor.publicKeyCredential)),
-        };
-        break;
-      default:
-        config = { ...attemptFactor };
-    }
+  attemptFirstFactor = async (attemptFactor: AttemptFirstFactorParams): Promise<SignInResource> => {
+    try {
+      let config;
+      switch (attemptFactor.strategy) {
+        case 'passkey':
+          config = {
+            publicKeyCredential: JSON.stringify(
+              serializePublicKeyCredentialAssertion(attemptFactor.publicKeyCredential),
+            ),
+          };
+          break;
+        default:
+          config = { ...attemptFactor };
+      }
 
-    return this._basePost({
-      body: { ...config, strategy: attemptFactor.strategy },
-      action: 'attempt_first_factor',
-    });
+      const result = await this._basePost({
+        body: { ...config, strategy: attemptFactor.strategy },
+        action: 'attempt_first_factor',
+      });
+
+      this.updateStatus(result.status);
+      this.signInStore.getState().setStatus(result.status);
+      return result;
+    } catch (error) {
+      this.updateError(error.message);
+      throw error;
+    }
   };
 
   createEmailLinkFlow = (): CreateEmailLinkFlowReturn<SignInStartEmailLinkFlowParams, SignInResource> => {
@@ -386,19 +438,13 @@ export class SignIn extends BaseResource implements SignInResource {
     }
 
     if (flow === 'autofill' || flow === 'discoverable') {
-      // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
       await this.create({ strategy: 'passkey' });
     } else {
-      // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
-      const passKeyFactor = this.supportedFirstFactors.find(
-        // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
-        f => f.strategy === 'passkey',
-      ) as PasskeyFactor;
+      const passKeyFactor = this.supportedFirstFactors?.find(f => f.strategy === 'passkey');
 
       if (!passKeyFactor) {
         clerkVerifyPasskeyCalledBeforeCreate();
       }
-      // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
       await this.prepareFirstFactor(passKeyFactor);
     }
 

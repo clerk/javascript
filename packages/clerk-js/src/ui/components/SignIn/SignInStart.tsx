@@ -30,7 +30,6 @@ import {
 import { useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import { CaptchaElement } from '../../elements/CaptchaElement';
-import { useLoadingStatus } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router';
 import type { FormControlState } from '../../utils';
@@ -77,7 +76,6 @@ const useAutoFillPasskey = () => {
 function SignInStartInternal(): JSX.Element {
   const card = useCardState();
   const clerk = useClerk();
-  const status = useLoadingStatus();
   const { displayConfig, userSettings, authConfig } = useEnvironment();
   const signIn = useCoreSignIn();
   const { navigate } = useRouter();
@@ -196,8 +194,24 @@ function SignInStartInternal(): JSX.Element {
     }
   }, [identifierField.value, identifierAttributes]);
 
+  const signInStatus = signIn.status;
+  const signInFetchStatus = signIn.fetchStatus;
+
   useEffect(() => {
-    if (!organizationTicket) {
+    console.log('Component mounted');
+    console.log('Initial organizationTicket:', organizationTicket);
+    console.log('Initial signInFetchStatus:', signInFetchStatus);
+    console.log('Initial signInStatus:', signInStatus);
+  }, []);
+
+  useEffect(() => {
+    console.log('useEffect triggered');
+    console.log('organizationTicket:', organizationTicket);
+    console.log('signInFetchStatus:', signInFetchStatus);
+    console.log('signInStatus:', signInStatus);
+
+    if (!organizationTicket || signInFetchStatus === 'fetching' || signInStatus === 'complete') {
+      console.log('Early return from useEffect');
       return;
     }
 
@@ -206,13 +220,12 @@ function SignInStartInternal(): JSX.Element {
       if (organizationTicket) {
         paramsToForward.set('__clerk_ticket', organizationTicket);
       }
-      // We explicitly navigate to 'create' in the combined flow to trigger a client-side navigation. Navigating to
-      // signUpUrl triggers a full page reload when used with the hash router.
+      console.log('Navigating to signUpUrl with params:', paramsToForward.toString());
       void navigate(isCombinedFlow ? `create` : signUpUrl, { searchParams: paramsToForward });
       return;
     }
 
-    status.setLoading();
+    console.log('Setting card to loading state');
     card.setLoading();
     signIn
       .create({
@@ -220,51 +233,57 @@ function SignInStartInternal(): JSX.Element {
         ticket: organizationTicket,
       })
       .then(res => {
+        console.log('API response:', res);
         switch (res.status) {
           case 'needs_first_factor':
+            console.log('Status: needs_first_factor');
             if (hasOnlyEnterpriseSSOFirstFactors(res)) {
+              console.log('Authenticating with Enterprise SSO');
               return authenticateWithEnterpriseSSO();
             }
 
             return navigate('factor-one');
           case 'needs_second_factor':
+            console.log('Status: needs_second_factor');
             return navigate('factor-two');
           case 'complete':
+            console.log('Status: complete');
             removeClerkQueryParam('__clerk_ticket');
             return clerk.setActive({
               session: res.createdSessionId,
               redirectUrl: afterSignInUrl,
             });
           default: {
+            console.error('Invalid API response status:', res.status);
             console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
             return;
           }
         }
       })
       .catch(err => {
+        console.error('Error during signIn.create:', err);
         return attemptToRecoverFromSignInError(err);
       })
       .finally(() => {
-        // Keep the card in loading state during SSO redirect to prevent UI flicker
-        // This is necessary because there's a brief delay between initiating the SSO flow
-        // and the actual redirect to the external Identity Provider
         const isRedirectingToSSOProvider = hasOnlyEnterpriseSSOFirstFactors(signIn);
         if (isRedirectingToSSOProvider) return;
 
-        status.setIdle();
+        console.log('Setting card to idle state');
         card.setIdle();
       });
-  }, []);
+  }, [organizationTicket, signInFetchStatus, signInStatus]);
 
   useEffect(() => {
+    console.log('OAuth error handling useEffect triggered');
     async function handleOauthError() {
       const defaultErrorHandler = () => {
-        // Error from server may be too much information for the end user, so set a generic error
+        console.error('Default error handler triggered');
         card.setError('Unable to complete action at this time. If the problem persists please contact support.');
       };
 
       const error = signIn?.firstFactorVerification?.error;
       if (error) {
+        console.log('OAuth error detected:', error);
         switch (error.code) {
           case ERROR_CODES.NOT_ALLOWED_TO_SIGN_UP:
           case ERROR_CODES.OAUTH_ACCESS_DENIED:
@@ -292,6 +311,7 @@ function SignInStartInternal(): JSX.Element {
 
         // TODO: This is a workaround in order to reset the sign in attempt
         // so that the oauth error does not persist on full page reloads.
+        console.log('Resetting sign-in attempt');
         void (await signIn.create({}));
       }
     }
@@ -368,6 +388,8 @@ function SignInStartInternal(): JSX.Element {
 
       switch (res.status) {
         case 'needs_identifier':
+          console.log('needs_identifier');
+          console.log('res.supportedFirstFactors:', res.supportedFirstFactors);
           // Check if we need to initiate an enterprise sso flow
           if (res.supportedFirstFactors?.some(ff => ff.strategy === 'saml' || ff.strategy === 'enterprise_sso')) {
             await authenticateWithEnterpriseSSO();
@@ -495,10 +517,15 @@ function SignInStartInternal(): JSX.Element {
     return components[identifierField.type as keyof typeof components];
   }, [identifierField.type]);
 
-  if (status.isLoading || clerkStatus === 'sign_up') {
+  
+  if (clerkStatus === 'sign_up') {
     // clerkStatus being sign_up will trigger a navigation to the sign up flow, so show a loading card instead of
     // rendering the sign in flow.
     return <LoadingCard />;
+  }
+
+  if (signInStatus === 'complete') {
+    return <div>Sign-in complete!</div>;
   }
 
   // @ts-expect-error `action` is not typed

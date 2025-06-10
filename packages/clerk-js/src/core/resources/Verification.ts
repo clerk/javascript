@@ -24,16 +24,15 @@ import { BaseResource } from './internal';
 export class Verification extends BaseResource implements VerificationResource {
   pathRoot = '';
 
+  attempts: number | null = null;
+  channel?: PhoneCodeChannel;
+  expireAt: Date | null = null;
+  externalVerificationRedirectURL: URL | null = null;
+  message: string | null = null;
+  nonce: string | null = null;
   status: VerificationStatus | null = null;
   strategy: string | null = null;
-  nonce: string | null = null;
-  message: string | null = null;
-  externalVerificationRedirectURL: URL | null = null;
-  attempts: number | null = null;
-  expireAt: Date | null = null;
-  error: ClerkAPIError | null = null;
   verifiedAtClient: string | null = null;
-  channel?: PhoneCodeChannel;
 
   constructor(data: VerificationJSON | VerificationJSONSnapshot | null) {
     super();
@@ -44,23 +43,31 @@ export class Verification extends BaseResource implements VerificationResource {
     return this.verifiedAtClient === BaseResource.clerk?.client?.id;
   };
 
+  private updateError(error: ClerkAPIError | null) {
+    const parsedError = error ? errorToJSON(parseError(error)) : null;
+    this._store.getState().dispatch({ type: 'FETCH_ERROR', error: parsedError });
+  }
+
   protected fromJSON(data: VerificationJSON | VerificationJSONSnapshot | null): this {
-    if (data) {
-      this.status = data.status;
-      this.verifiedAtClient = data.verified_at_client;
-      this.strategy = data.strategy;
-      this.nonce = data.nonce || null;
-      this.message = data.message || null;
-      if (data.external_verification_redirect_url) {
-        this.externalVerificationRedirectURL = new URL(data.external_verification_redirect_url);
-      } else {
-        this.externalVerificationRedirectURL = null;
-      }
-      this.attempts = data.attempts;
-      this.expireAt = unixEpochToDate(data.expire_at || undefined);
-      this.error = data.error ? parseError(data.error) : null;
-      this.channel = data.channel || undefined;
+    if (!data) {
+      return this;
     }
+
+    this.status = data.status;
+    this.verifiedAtClient = data.verified_at_client;
+    this.strategy = data.strategy;
+    this.nonce = data.nonce || null;
+    this.message = data.message || null;
+    if (data.external_verification_redirect_url) {
+      this.externalVerificationRedirectURL = new URL(data.external_verification_redirect_url);
+    } else {
+      this.externalVerificationRedirectURL = null;
+    }
+    this.attempts = data.attempts;
+    this.expireAt = unixEpochToDate(data.expire_at || undefined);
+    this.updateError(data.error);
+    this.channel = data.channel || undefined;
+
     return this;
   }
 
@@ -86,7 +93,6 @@ export class PasskeyVerification extends Verification implements PasskeyVerifica
 
   constructor(data: VerificationJSON | VerificationJSONSnapshot | null) {
     super(data);
-    this.fromJSON(data);
   }
 
   /**
@@ -94,11 +100,14 @@ export class PasskeyVerification extends Verification implements PasskeyVerifica
    */
   protected fromJSON(data: VerificationJSON | VerificationJSONSnapshot | null): this {
     super.fromJSON(data);
-    if (data?.nonce) {
+    if (!data?.nonce) {
+      this.publicKey = null;
+    } else {
       this.publicKey = convertJSONToPublicKeyCreateOptions(
         JSON.parse(data.nonce) as PublicKeyCredentialCreationOptionsJSON,
       );
     }
+
     return this;
   }
 }
@@ -110,17 +119,10 @@ export class SignUpVerifications implements SignUpVerificationsResource {
   externalAccount: VerificationResource;
 
   constructor(data: SignUpVerificationsJSON | SignUpVerificationsJSONSnapshot | null) {
-    if (data) {
-      this.emailAddress = new SignUpVerification(data.email_address);
-      this.phoneNumber = new SignUpVerification(data.phone_number);
-      this.web3Wallet = new SignUpVerification(data.web3_wallet);
-      this.externalAccount = new Verification(data.external_account);
-    } else {
-      this.emailAddress = new SignUpVerification(null);
-      this.phoneNumber = new SignUpVerification(null);
-      this.web3Wallet = new SignUpVerification(null);
-      this.externalAccount = new Verification(null);
-    }
+    this.emailAddress = new SignUpVerification(data?.email_address ?? null);
+    this.phoneNumber = new SignUpVerification(data?.phone_number ?? null);
+    this.web3Wallet = new SignUpVerification(data?.web3_wallet ?? null);
+    this.externalAccount = new Verification(data?.external_account ?? null);
   }
 
   public __internal_toSnapshot(): SignUpVerificationsJSONSnapshot {
@@ -139,13 +141,8 @@ export class SignUpVerification extends Verification {
 
   constructor(data: SignUpVerificationJSON | SignUpVerificationJSONSnapshot | null) {
     super(data);
-    if (data) {
-      this.nextAction = data.next_action;
-      this.supportedStrategies = data.supported_strategies;
-    } else {
-      this.nextAction = '';
-      this.supportedStrategies = [];
-    }
+    this.nextAction = data?.next_action ?? '';
+    this.supportedStrategies = data?.supported_strategies ?? [];
   }
 
   public __internal_toSnapshot(): SignUpVerificationJSONSnapshot {
