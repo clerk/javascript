@@ -12,66 +12,106 @@ export type ResourceState<T> =
   | { status: 'success'; data: T; error: null };
 
 /**
- * Represents the actions that can be dispatched to change the resource state.
+ * Resource actions for the Zustand store
  */
 export type ResourceAction<T> =
   | { type: 'FETCH_START' }
   | { type: 'FETCH_SUCCESS'; data: T }
-  | { type: 'FETCH_ERROR'; error: ClerkAPIErrorJSON | null }
+  | { type: 'FETCH_ERROR'; error: ClerkAPIErrorJSON }
   | { type: 'RESET' };
 
 /**
- * Represents the store interface for a resource.
+ * Resource store shape using Zustand slices pattern
  */
 export type ResourceStore<T> = {
-  state: ResourceState<T>;
-  dispatch: (action: ResourceAction<T>) => void;
-  getData: () => T | null;
-  getError: () => ClerkAPIErrorJSON | null;
-  hasError: () => boolean;
-  status: () => 'idle' | 'loading' | 'error' | 'success';
+  resource: {
+    status: 'idle' | 'loading' | 'error' | 'success';
+    data: T | null;
+    error: ClerkAPIErrorJSON | null;
+    dispatch: (action: ResourceAction<T>) => void;
+    getData: () => T | null;
+    getError: () => ClerkAPIErrorJSON | null;
+    hasError: () => boolean;
+    getStatus: () => 'idle' | 'loading' | 'error' | 'success';
+  };
 };
 
 /**
- * Creates selectors for accessing resource state.
- * @returns An object containing selector functions
- */
-const createSelectors = <T>() => ({
-  getData: (state: ResourceState<T>): T | null => (state.status === 'success' ? state.data : null),
-  getError: (state: ResourceState<T>): ClerkAPIErrorJSON | null => (state.status === 'error' ? state.error : null),
-  hasError: (state: ResourceState<T>): boolean => state.status === 'error',
-  getStatus: (state: ResourceState<T>): 'idle' | 'loading' | 'error' | 'success' => state.status,
-});
-
-/**
  * Creates a resource slice following the Zustand slices pattern.
- * This slice handles the common resource state management (loading, error, success states).
+ * This slice handles generic resource state management (loading, success, error states).
+ * All resource state is namespaced under the 'resource' key and flattened (no nested 'state' object).
  */
-export const createResourceSlice = <T>(set: any, get: any): ResourceStore<T> => {
-  const selectors = createSelectors<T>();
+const createResourceSlice = <T>(set: any, get: any): ResourceStore<T> => {
+  const dispatch = (action: ResourceAction<T>) => {
+    set((state: any) => {
+      let newResourceState;
 
-  return {
-    state: { status: 'idle', data: null, error: null } as ResourceState<T>,
-    dispatch: (action: ResourceAction<T>) => {
       switch (action.type) {
         case 'FETCH_START':
-          set((state: any) => ({ ...state, state: { status: 'loading', data: null, error: null } }));
+          newResourceState = {
+            status: 'loading' as const,
+            data: state.resource.data, // Keep existing data during loading
+            error: null,
+          };
           break;
         case 'FETCH_SUCCESS':
-          set((state: any) => ({ ...state, state: { status: 'success', data: action.data, error: null } }));
+          newResourceState = {
+            status: 'success' as const,
+            data: action.data,
+            error: null,
+          };
           break;
         case 'FETCH_ERROR':
-          set((state: any) => ({ ...state, state: { status: 'error', data: null, error: action.error } }));
+          newResourceState = {
+            status: 'error' as const,
+            data: state.resource.data, // Keep existing data on error
+            error: action.error,
+          };
           break;
         case 'RESET':
-          set((state: any) => ({ ...state, state: { status: 'idle', data: null, error: null } }));
+          newResourceState = {
+            status: 'idle' as const,
+            data: null,
+            error: null,
+          };
           break;
+        default:
+          return state;
       }
+
+      return {
+        ...state,
+        resource: {
+          ...state.resource,
+          ...newResourceState,
+        },
+      };
+    });
+  };
+
+  return {
+    resource: {
+      status: 'idle' as const,
+      data: null,
+      error: null,
+      dispatch,
+      getData: () => {
+        const state = get();
+        return state.resource.data;
+      },
+      getError: () => {
+        const state = get();
+        return state.resource.error;
+      },
+      hasError: () => {
+        const state = get();
+        return state.resource.status === 'error';
+      },
+      getStatus: () => {
+        const state = get();
+        return state.resource.status;
+      },
     },
-    getData: () => selectors.getData(get().state),
-    getError: () => selectors.getError(get().state),
-    hasError: () => selectors.hasError(get().state),
-    status: () => selectors.getStatus(get().state),
   };
 };
 
@@ -89,3 +129,5 @@ export const createResourceStore = <T>(name = 'ResourceStore') => {
     ),
   );
 };
+
+export { createResourceSlice };

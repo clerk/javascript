@@ -202,7 +202,7 @@ export abstract class BaseResource {
   }
 
   protected async _baseGet<J extends ClerkResourceJSON | null>(opts: BaseFetchOptions = {}): Promise<this> {
-    this._store.getState().dispatch({ type: 'FETCH_START' });
+    this.store.getState().resource.dispatch({ type: 'FETCH_START' });
 
     try {
       const { forceUpdateClient, fetchMaxTries, ...fetchOpts } = opts;
@@ -213,10 +213,10 @@ export abstract class BaseResource {
       });
 
       const data = this.fromJSON((json?.response || json) as J);
-      this._store.getState().dispatch({ type: 'FETCH_SUCCESS', data });
+      this.store.getState().resource.dispatch({ type: 'FETCH_SUCCESS', data });
       return data;
     } catch (error) {
-      this._store.getState().dispatch({
+      this.store.getState().resource.dispatch({
         type: 'FETCH_ERROR',
         error: error as ClerkAPIErrorJSON,
       });
@@ -225,17 +225,17 @@ export abstract class BaseResource {
   }
 
   protected async _baseMutate<J extends ClerkResourceJSON | null>(params: BaseMutateParams): Promise<this> {
-    this._store.getState().dispatch({ type: 'FETCH_START' });
+    this.store.getState().resource.dispatch({ type: 'FETCH_START' });
 
     try {
       const { action, body, method, path } = params;
       const json = await BaseResource._fetch<J>({ method, path: path || this.path(action), body });
 
       const data = this.fromJSON((json?.response || json) as J);
-      this._store.getState().dispatch({ type: 'FETCH_SUCCESS', data });
+      this.store.getState().resource.dispatch({ type: 'FETCH_SUCCESS', data });
       return data;
     } catch (error) {
-      this._store.getState().dispatch({
+      this.store.getState().resource.dispatch({
         type: 'FETCH_ERROR',
         error: error as ClerkAPIErrorJSON,
       });
@@ -275,6 +275,6 @@ export abstract class BaseResource {
   }
 
   public reset(): void {
-    this._store.getState().dispatch({ type: 'RESET' });
+    this.store.getState().resource.dispatch({ type: 'RESET' });
   }
 }

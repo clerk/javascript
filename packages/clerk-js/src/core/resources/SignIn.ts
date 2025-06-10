@@ -71,18 +71,29 @@ import { BaseResource, UserData, Verification } from './internal';
 import { createResourceSlice, type ResourceStore } from './state';
 
 type SignInSliceState = {
-  signInStatus: SignInStatus | null;
-  setSignInStatus: (status: SignInStatus | null) => void;
+  signin: {
+    signInStatus: SignInStatus | null;
+    setSignInStatus: (status: SignInStatus | null) => void;
+  };
 };
 
 /**
  * Creates a SignIn slice following the Zustand slices pattern.
  * This slice handles SignIn-specific state management.
+ * All SignIn state is namespaced under the 'signin' key.
  */
 const createSignInSlice = (set: any, _get: any): SignInSliceState => ({
-  signInStatus: null,
-  setSignInStatus: (status: SignInStatus | null) => {
-    set((state: any) => ({ ...state, signInStatus: status }));
+  signin: {
+    signInStatus: null,
+    setSignInStatus: (status: SignInStatus | null) => {
+      set((state: any) => ({
+        ...state,
+        signin: {
+          ...state.signin,
+          signInStatus: status,
+        },
+      }));
+    },
   },
 });
 
@@ -103,21 +114,10 @@ export class SignIn extends BaseResource implements SignInResource {
   supportedSecondFactors: SignInSecondFactor[] | null = null;
   userData: UserData = new UserData(null);
 
-  private _combinedStore: any;
-
-  public get signInStore() {
-    return this._combinedStore as { getState(): CombinedSignInStore; setState: any; subscribe: any; destroy: any };
-  }
-
-  // Override the store getter to return the combined store
-  public get store() {
-    return this._combinedStore;
-  }
-
   constructor(data: SignInJSON | SignInJSONSnapshot | null = null) {
     super();
-    // Create combined store using slices pattern
-    this._combinedStore = createStore<CombinedSignInStore>()(
+    // Override the base _store with our combined store using slices pattern with namespacing
+    this._store = createStore<CombinedSignInStore>()(
       devtools(
         (set, get) => ({
           ...createResourceSlice<SignIn>(set, get),
@@ -125,7 +125,7 @@ export class SignIn extends BaseResource implements SignInResource {
         }),
         { name: 'SignInStore' },
       ),
-    );
+    ) as any;
     this.fromJSON(data);
   }
 
@@ -136,7 +136,7 @@ export class SignIn extends BaseResource implements SignInResource {
   private updateStatus(newStatus: SignInStatus | null) {
     this.status = newStatus;
     // Update the combined store's signInStatus
-    this.signInStore.getState().setSignInStatus(newStatus);
+    (this.store.getState() as CombinedSignInStore).signin.setSignInStatus(newStatus);
   }
 
   create = async (params: SignInCreateParams): Promise<SignInResource> => {
