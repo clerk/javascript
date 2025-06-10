@@ -294,7 +294,7 @@ function mountSignInObservable(element: HTMLDivElement) {
   statusContainer.className = 'p-4 border border-gray-200 rounded-md mb-4';
   mainContainer.appendChild(statusContainer);
 
-  // Create combined store display
+  // Create combined store display (above form)
   const combinedStoreDisplay = document.createElement('div');
   combinedStoreDisplay.className = 'grid grid-cols-1 gap-4 mb-4';
 
@@ -327,6 +327,12 @@ function mountSignInObservable(element: HTMLDivElement) {
   const signInStoreDisplay = document.createElement('div');
   signInStoreDisplay.className = 'p-2 bg-white rounded text-sm font-mono';
   signInSliceSection.appendChild(signInStoreDisplay);
+
+  // Add store state displays to container and main container (above form)
+  combinedStoreDisplay.appendChild(combinedStoreSection);
+  combinedStoreDisplay.appendChild(resourceSliceSection);
+  combinedStoreDisplay.appendChild(signInSliceSection);
+  mainContainer.appendChild(combinedStoreDisplay);
 
   // Create controls container
   const controlsContainer = document.createElement('div');
@@ -378,7 +384,7 @@ function mountSignInObservable(element: HTMLDivElement) {
   form.appendChild(submitButton);
   mainContainer.appendChild(form);
 
-  // Store relationship explanation (moved below form)
+  // Store relationship explanation (below form)
   const explanationSection = document.createElement('div');
   explanationSection.className = 'p-4 bg-yellow-50 border border-yellow-200 rounded-lg mt-4';
   explanationSection.innerHTML = `
@@ -405,13 +411,7 @@ function mountSignInObservable(element: HTMLDivElement) {
       <p><strong>Benefits:</strong> Consistent depth (1 level), flattened structure, clear boundaries.</p>
     </div>
   `;
-
-  // Add the combined store display section after the form and explanation
-  combinedStoreDisplay.appendChild(explanationSection);
-  combinedStoreDisplay.appendChild(combinedStoreSection);
-  combinedStoreDisplay.appendChild(resourceSliceSection);
-  combinedStoreDisplay.appendChild(signInSliceSection);
-  mainContainer.appendChild(combinedStoreDisplay);
+  mainContainer.appendChild(explanationSection);
 
   let signIn: SignInResource & { signInStore?: any };
   let storeUnsubscribe: (() => void) | null = null;
