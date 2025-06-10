@@ -151,11 +151,19 @@ const createBaseUserSettings = (): UserSettingsJSON => {
         verify_at_sign_up: false,
       },
     ]),
-  ) as any as UserSettingsJSON['attributes'];
+  ) as UserSettingsJSON['attributes'];
 
-  const socialConfig = Object.fromEntries(
-    socials.map(social => [social, { enabled: false, required: false, authenticatable: false, strategy: social }]),
-  ) as any as UserSettingsJSON['social'];
+  const socialConfig: UserSettingsJSON['social'] = Object.fromEntries(
+    socials.map(social => [
+      social,
+      {
+        enabled: false,
+        required: false,
+        authenticatable: false,
+        strategy: social,
+      },
+    ]),
+  );
 
   const passwordSettingsConfig = {
     allowed_special_characters: '',
