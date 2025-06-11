@@ -1,6 +1,5 @@
-import * as React from 'react';
+import { SignedIn, UserButton, SignOutButton, SignedOut, SignIn } from '@clerk/tanstack-react-start';
 import { createFileRoute } from '@tanstack/react-router';
-import { SignedIn, SignedOut, SignIn, SignOutButton, UserButton } from '@clerk/tanstack-react-start';
 
 export const Route = createFileRoute('/')({
   component: Home,
