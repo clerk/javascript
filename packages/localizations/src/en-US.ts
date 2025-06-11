@@ -38,6 +38,7 @@ export const enUS: LocalizationResource = {
       description__subscriptionSuccessful: 'Your new subscription is all set.',
       downgradeNotice:
         'You will keep your current subscription and its features until the end of the billing cycle, then you will be switched to this subscription.',
+      pastDueNotice: 'Your previous subscription was past due, with no payment.',
       emailForm: {
         subtitle: 'Before you can complete your purchase you must add an email address where receipts will be sent.',
         title: 'Add an email address',

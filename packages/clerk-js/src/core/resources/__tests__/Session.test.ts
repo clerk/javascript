@@ -47,8 +47,19 @@ describe('Session', () => {
       await session.getToken();
 
       expect(dispatchSpy).toHaveBeenCalledTimes(2);
-      expect(dispatchSpy.mock.calls[0]).toMatchSnapshot();
-      expect(dispatchSpy.mock.calls[1]).toMatchSnapshot();
+      expect(dispatchSpy.mock.calls[0]).toEqual([
+        'token:update',
+        {
+          token: expect.objectContaining({
+            jwt: expect.objectContaining({
+              claims: expect.objectContaining({
+                sid: expect.any(String),
+                sub: expect.any(String),
+              }),
+            }),
+          }),
+        },
+      ]);
     });
 
     it('hydrates token cache from lastActiveToken', async () => {
@@ -97,8 +108,20 @@ describe('Session', () => {
       await session.getToken();
 
       expect(dispatchSpy).toHaveBeenCalledTimes(2);
-      expect(dispatchSpy.mock.calls[0]).toMatchSnapshot();
-      expect(dispatchSpy.mock.calls[1]).toMatchSnapshot();
+      expect(dispatchSpy.mock.calls[0]).toEqual([
+        'token:update',
+        {
+          token: expect.objectContaining({
+            jwt: expect.objectContaining({
+              claims: expect.objectContaining({
+                sid: expect.any(String),
+                sub: expect.any(String),
+              }),
+            }),
+          }),
+        },
+      ]);
+      expect(dispatchSpy.mock.calls[1]).toEqual(['session:tokenResolved', null]);
     });
 
     it('does not dispatch token:update if template is provided', async () => {
