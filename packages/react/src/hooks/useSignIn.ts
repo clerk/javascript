@@ -1,6 +1,7 @@
 import { useClientContext } from '@clerk/shared/react';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
 import type { SetActive, SignInResource } from '@clerk/types';
+import { useCallback, useSyncExternalStore } from 'react';
 
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvider';
@@ -11,6 +12,86 @@ type QueuedCall = {
   args: any[];
   resolve: (value: any) => void;
   reject: (error: any) => void;
+};
+
+/**
+ * Enhanced SignInResource with observable capabilities for React.
+ */
+type ObservableSignInResource = SignInResource & {
+  /**
+   * A React hook that subscribes to the SignIn store and triggers re-renders
+   * when the store state changes. This allows React components to reactively
+   * respond to changes in the SignIn flow state.
+   * 
+   * @example
+   * ```tsx
+   * function MyComponent() {
+   *   const { signIn } = useSignIn();
+   *   const storeState = signIn.observable();
+   *   
+   *   // Re-renders when SignIn store state changes
+   *   return (
+   *     <div>
+   *       <p>Status: {storeState.signin.status}</p>
+   *       <p>Error: {storeState.signin.error.global}</p>
+   *       <p>Resource Status: {storeState.resource.status}</p>
+   *     </div>
+   *   );
+   * }
+   * ```
+   */
+  observable: () => any;
+};
+
+/**
+ * Creates a React hook that subscribes to a Zustand store and returns its state.
+ * This enables React components to re-render when the store state changes.
+ */
+const createStoreObservable = (signInResource: SignInResource) => {
+  return () => {
+    const store = (signInResource as any).store;
+    
+    if (!store) {
+      // Return empty state if store is not available
+      return {};
+    }
+
+    const subscribe = useCallback(
+      (callback: () => void) => {
+        return store.subscribe(callback);
+      },
+      [store]
+    );
+
+    const getState = useCallback(() => {
+      return store.getState();
+    }, [store]);
+
+    // Use React's useSyncExternalStore to subscribe to the Zustand store
+    return useSyncExternalStore(subscribe, getState, getState);
+  };
+};
+
+/**
+ * Wraps a SignInResource with observable capabilities for React.
+ */
+const wrapSignInWithObservable = (signIn: SignInResource): ObservableSignInResource => {
+  const observable = createStoreObservable(signIn);
+  
+  return new Proxy(signIn, {
+    get(target, prop) {
+      if (prop === 'observable') {
+        return observable;
+      }
+      return (target as any)[prop];
+    },
+    has(target, prop) {
+      if (prop === 'observable') {
+        return true;
+      }
+      return prop in target;
+    }
+  }) as ObservableSignInResource;
 };
 
 export const useSignIn = () => {
@@ -44,7 +125,7 @@ export const useSignIn = () => {
 
     return {
       isLoaded: true,
-      signIn: client.signIn,
+      signIn: wrapSignInWithObservable(client.signIn) as ObservableSignInResource,
       setActive: isomorphicClerk.setActive,
     };
   }
@@ -54,6 +135,11 @@ export const useSignIn = () => {
       {},
       {
         get(_, prop) {
+          // Handle the observable property for the proxy as well
+          if (prop === 'observable') {
+            return () => ({});
+          }
+          
           // Prevent React from treating this proxy as a Promise by returning undefined for 'then'
           if (prop === 'then') {
             return undefined;
@@ -84,6 +170,10 @@ export const useSignIn = () => {
           };
         },
         has(_, prop) {
+          // Return true for observable
+          if (prop === 'observable') {
+            return true;
+          }
           // Return false for 'then' to prevent Promise-like behavior
           if (prop === 'then') {
             return false;
@@ -97,7 +187,7 @@ export const useSignIn = () => {
 
   return {
     isLoaded: true,
-    signIn: createProxy<SignInResource>('signIn'),
+    signIn: createProxy<ObservableSignInResource>('signIn'),
     setActive: createProxy<SetActive>('setActive'),
   };
 };

@@ -175,7 +175,7 @@ export class SignIn extends BaseResource implements SignInResource {
       });
       return result;
     } catch (error) {
-      this.updateError(error.message);
+      this.updateError(error instanceof Error ? error.message : 'An unexpected error occurred');
       throw error;
     }
   };
@@ -268,7 +268,7 @@ export class SignIn extends BaseResource implements SignInResource {
 
       return result;
     } catch (error) {
-      this.updateError(error.message);
+      this.updateError(error instanceof Error ? error.message : 'An unexpected error occurred');
       throw error;
     }
   };
@@ -406,7 +406,7 @@ export class SignIn extends BaseResource implements SignInResource {
       //
       // error code 4001 means the user rejected the request
       // Reference: https://docs.cdp.coinbase.com/wallet-sdk/docs/errors
-      if (provider === 'coinbase_wallet' && err.code === 4001) {
+      if (provider === 'coinbase_wallet' && err instanceof Error && 'code' in err && err.code === 4001) {
         signature = await generateSignature({ identifier, nonce: message, provider });
       } else {
         throw err;
