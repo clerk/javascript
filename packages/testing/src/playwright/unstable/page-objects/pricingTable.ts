@@ -17,24 +17,38 @@ export const createPricingTablePageObject = (testArgs: { page: EnhancedPage }) =
     const maxAttempts = 3;
     let attempts = 0;
 
-    async function isToggleStateMatchingPeriod(period: BillingPeriod): Promise<boolean> {
-      // Wait for the indicator to be visible and stable
-      await locators.indicator(planSlug).waitFor({ state: 'visible' });
-      const isChecked = (await locators.indicator(planSlug).getAttribute('data-checked')) === 'true';
-
-      console.log(
-        'await locators.indicator(planSlug).getAttribute("data-checked")',
-        await locators.indicator(planSlug).getAttribute('data-checked'),
+    async function waitForAttribute(selector: string, attribute: string, value: string, timeout = 5000): Promise<void> {
+      await page.waitForFunction(
+        ({ sel, attr, val }) => {
+          const element = document.querySelector(sel);
+          return element?.getAttribute(attr) === val;
+        },
+        { sel: selector, attr: attribute, val: value },
+        { timeout },
       );
+    }
 
-      console.log('period', period);
-      console.log('attempts', attempts);
+    async function isToggleStateMatchingPeriod(period: BillingPeriod): Promise<boolean> {
+      await locators.indicator(planSlug).waitFor({ state: 'visible' });
+      const expectedValue = period === 'annually' ? 'true' : 'false';
+      let isMatching = false;
+      await waitForAttribute(
+        `.cl-pricingTableCard__${planSlug} .cl-switchIndicator`,
+        'data-checked',
+        expectedValue,
+        500,
+      )
+        .then(() => {
+          isMatching = true;
+        })
+        .catch(() => {
+          isMatching = false;
+        });
 
-      return (isChecked && period === 'monthly') || (!isChecked && period === 'annually');
+      return isMatching;
     }
 
     while (!(await isToggleStateMatchingPeriod(period)) && attempts < maxAttempts) {
-      // Wait for toggle to be ready for interaction
       await locators.toggle(planSlug).waitFor({ state: 'visible' });
       await locators.toggle(planSlug).click();
       attempts++;
