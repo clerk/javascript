@@ -16,6 +16,18 @@ describe('OrganizationInvitation', () => {
       status: 'pending',
     });
 
-    expect(organizationInvitation).toMatchSnapshot();
+    expect(organizationInvitation).toMatchObject({
+      id: 'test_id',
+      emailAddress: 'test_email',
+      organizationId: 'test_organization_id',
+      role: 'basic_member',
+      roleName: undefined,
+      status: 'pending',
+      createdAt: expect.any(Date),
+      updatedAt: expect.any(Date),
+      publicMetadata: {
+        public: 'metadata',
+      },
+    });
   });
 });
