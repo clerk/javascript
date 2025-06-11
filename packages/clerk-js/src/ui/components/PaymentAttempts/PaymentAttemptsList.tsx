@@ -3,7 +3,7 @@ import React from 'react';
 
 import { Pagination } from '@/ui/elements/Pagination';
 
-import { usePaymentAttempts, useSubscriberTypeContext } from '../../../ui/contexts';
+import { usePaymentAttempts, useSubscriberTypeLocalizationRoot } from '../../../ui/contexts';
 import type { LocalizationKey } from '../../customizables';
 import {
   Badge,
@@ -30,8 +30,7 @@ import { truncateWithEndVisible } from '../../utils/truncateTextWithEndVisible';
 
 export const PaymentAttemptsList = () => {
   const { data: paymentAttempts, isLoading } = usePaymentAttempts();
-  const subscriberType = useSubscriberTypeContext();
-  const localizationRoot = subscriberType === 'user' ? 'userProfile' : 'organizationProfile';
+  const localizationRoot = useSubscriberTypeLocalizationRoot();
 
   return (
     <DataTable

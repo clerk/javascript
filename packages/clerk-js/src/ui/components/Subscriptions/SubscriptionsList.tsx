@@ -3,7 +3,12 @@ import type { CommerceSubscriptionResource } from '@clerk/types';
 import { ProfileSection } from '@/ui/elements/Section';
 
 import { useProtect } from '../../common';
-import { usePlansContext, useSubscriberTypeContext, useSubscriptions } from '../../contexts';
+import {
+  usePlansContext,
+  useSubscriberTypeContext,
+  useSubscriberTypeLocalizationRoot,
+  useSubscriptions,
+} from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import {
   Badge,
@@ -34,8 +39,8 @@ export function SubscriptionsList({
   arrowButtonEmptyText: LocalizationKey;
 }) {
   const { handleSelectPlan, captionForSubscription, canManageSubscription } = usePlansContext();
+  const localizationRoot = useSubscriberTypeLocalizationRoot();
   const subscriberType = useSubscriberTypeContext();
-  const localizationRoot = subscriberType === 'user' ? 'userProfile' : 'organizationProfile';
   const { data: subscriptions } = useSubscriptions();
   const canManageBilling = useProtect(
     has => has({ permission: 'org:sys_billing:manage' }) || subscriberType === 'user',

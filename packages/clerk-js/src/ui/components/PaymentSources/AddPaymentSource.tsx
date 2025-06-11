@@ -15,7 +15,7 @@ import { FormButtons } from '@/ui/elements/FormButtons';
 import { FormContainer } from '@/ui/elements/FormContainer';
 
 import { clerkUnsupportedEnvironmentWarning } from '../../../core/errors';
-import { useEnvironment, useSubscriberTypeContext } from '../../contexts';
+import { useEnvironment, useSubscriberTypeContext, useSubscriberTypeLocalizationRoot } from '../../contexts';
 import { descriptors, Flex, localizationKeys, Spinner, useAppearance, useLocalizations } from '../../customizables';
 import type { LocalizationKey } from '../../localization';
 import { handleError, normalizeColorString } from '../../utils';
@@ -236,8 +236,7 @@ const AddPaymentSourceForm = ({ children }: PropsWithChildren) => {
   const elements = useElements();
   const { displayConfig } = useEnvironment();
   const { t } = useLocalizations();
-  const subscriberType = useSubscriberTypeContext();
-  const localizationRoot = subscriberType === 'user' ? 'userProfile' : 'organizationProfile';
+  const localizationRoot = useSubscriberTypeLocalizationRoot();
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

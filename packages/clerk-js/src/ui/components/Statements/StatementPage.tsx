@@ -1,6 +1,6 @@
 import { Header } from '@/ui/elements/Header';
 
-import { useStatements, useStatementsContext, useSubscriberTypeContext } from '../../contexts';
+import { useStatements, useStatementsContext, useSubscriberTypeLocalizationRoot } from '../../contexts';
 import { Box, descriptors, localizationKeys, Spinner, Text, useLocalizations } from '../../customizables';
 import { Plus, RotateLeftRight } from '../../icons';
 import { useRouter } from '../../router';
@@ -10,9 +10,8 @@ export const StatementPage = () => {
   const { params, navigate } = useRouter();
   const { isLoading } = useStatements();
   const { getStatementById } = useStatementsContext();
-  const subscriberType = useSubscriberTypeContext();
+  const localizationRoot = useSubscriberTypeLocalizationRoot();
   const { t } = useLocalizations();
-  const localizationRoot = subscriberType === 'user' ? 'userProfile' : 'organizationProfile';
   const statement = params.statementId ? getStatementById(params.statementId) : null;
 
   if (isLoading) {

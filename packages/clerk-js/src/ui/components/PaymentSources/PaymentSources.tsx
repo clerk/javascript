@@ -10,7 +10,7 @@ import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
 
 import { RemoveResourceForm } from '../../common';
 import { DevOnly } from '../../common/DevOnly';
-import { usePaymentSources, useSubscriberTypeContext } from '../../contexts';
+import { usePaymentSources, useSubscriberTypeContext, useSubscriberTypeLocalizationRoot } from '../../contexts';
 import { localizationKeys } from '../../customizables';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
@@ -23,7 +23,7 @@ const AddScreen = withCardStateProvider(({ onSuccess }: { onSuccess: () => void 
   const { close } = useActionContext();
   const clerk = useClerk();
   const subscriberType = useSubscriberTypeContext();
-  const localizationRoot = subscriberType === 'user' ? 'userProfile' : 'organizationProfile';
+  const localizationRoot = useSubscriberTypeLocalizationRoot();
 
   const onAddPaymentSourceSuccess = async (context: { stripeSetupIntent?: SetupIntent }) => {
     const resource = subscriberType === 'org' ? clerk?.organization : clerk.user;
@@ -65,7 +65,7 @@ const RemoveScreen = ({
   const card = useCardState();
   const subscriberType = useSubscriberTypeContext();
   const { organization } = useOrganization();
-  const localizationRoot = subscriberType === 'user' ? 'userProfile' : 'organizationProfile';
+  const localizationRoot = useSubscriberTypeLocalizationRoot();
   const ref = useRef(
     `${paymentSource.paymentMethod === 'card' ? paymentSource.cardType : paymentSource.paymentMethod} ${paymentSource.paymentMethod === 'card' ? `⋯ ${paymentSource.last4}` : '-'}`,
   );
@@ -111,7 +111,7 @@ const RemoveScreen = ({
 export const PaymentSources = withCardStateProvider(() => {
   const clerk = useClerk();
   const subscriberType = useSubscriberTypeContext();
-  const localizationRoot = subscriberType === 'user' ? 'userProfile' : 'organizationProfile';
+  const localizationRoot = useSubscriberTypeLocalizationRoot();
   const resource = subscriberType === 'org' ? clerk?.organization : clerk.user;
 
   const { data, isLoading, mutate: mutatePaymentSources } = usePaymentSources();
@@ -200,7 +200,7 @@ const PaymentSourceMenu = ({
   const card = useCardState();
   const { organization } = useOrganization();
   const subscriberType = useSubscriberTypeContext();
-  const localizationRoot = subscriberType === 'user' ? 'userProfile' : 'organizationProfile';
+  const localizationRoot = useSubscriberTypeLocalizationRoot();
 
   const actions = [
     {

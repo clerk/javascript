@@ -3,7 +3,7 @@ import React from 'react';
 
 import { Pagination } from '@/ui/elements/Pagination';
 
-import { useStatements, useSubscriberTypeContext } from '../../../ui/contexts';
+import { useStatements, useSubscriberTypeLocalizationRoot } from '../../../ui/contexts';
 import type { LocalizationKey } from '../../customizables';
 import {
   Col,
@@ -29,8 +29,7 @@ import { truncateWithEndVisible } from '../../utils/truncateTextWithEndVisible';
 
 export const StatementsList = () => {
   const { data: statements, isLoading } = useStatements();
-  const subscriberType = useSubscriberTypeContext();
-  const localizationRoot = subscriberType === 'user' ? 'userProfile' : 'organizationProfile';
+  const localizationRoot = useSubscriberTypeLocalizationRoot();
 
   return (
     <DataTable

@@ -1,7 +1,8 @@
 import { Header } from '@/ui/elements/Header';
 import { LineItems } from '@/ui/elements/LineItems';
 
-import { usePaymentAttemptsContext, useStatements, useSubscriberTypeContext } from '../../contexts';
+import { usePaymentAttemptsContext, useStatements } from '../../contexts';
+import { useSubscriberTypeLocalizationRoot } from '../../contexts/components';
 import {
   Badge,
   Box,
@@ -23,8 +24,7 @@ export const PaymentAttemptPage = () => {
   const { params, navigate } = useRouter();
   const { isLoading } = useStatements();
   const { getPaymentAttemptById } = usePaymentAttemptsContext();
-  const subscriberType = useSubscriberTypeContext();
-  const localizationRoot = subscriberType === 'user' ? 'userProfile' : 'organizationProfile';
+  const localizationRoot = useSubscriberTypeLocalizationRoot();
 
   const paymentAttempt = params.paymentAttemptId ? getPaymentAttemptById(params.paymentAttemptId) : null;
   const subscriptionItem = paymentAttempt?.subscriptionItem;
