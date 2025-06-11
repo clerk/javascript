@@ -123,7 +123,9 @@ export type UseAuthReturn =
  */
 export type UseSignInReturn = {
   /**
-   * Always `true`. Clerk loads before the hook mounts.
+   * Always `true`. The hook returns proxy objects that queue method calls until Clerk initializes.
+   * Method calls are buffered and executed once initialization completes, allowing immediate usage
+   * without waiting for the loading state to resolve.
    */
   isLoaded: true;
   /**
