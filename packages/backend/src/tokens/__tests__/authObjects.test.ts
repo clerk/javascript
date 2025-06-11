@@ -280,13 +280,34 @@ describe('authenticatedMachineObject', () => {
       expect(authObject.has({})).toBe(false);
     });
 
-    it('properly initializes properties', () => {
+    it('properly initializes properties (user)', () => {
       const authObject = authenticatedMachineObject('api_key', token, verificationResult, debugData);
       expect(authObject.tokenType).toBe('api_key');
-      expect(authObject.name).toBe('my-api-key');
+      expect(authObject.id).toBe('ak_ey966f1b1xf93586b2debdcadb0b3bd1');
       expect(authObject.subject).toBe('user_2vYVtestTESTtestTESTtestTESTtest');
       expect(authObject.scopes).toEqual(['read:foo', 'write:bar']);
       expect(authObject.claims).toEqual({ foo: 'bar' });
+      expect(authObject.userId).toBe('user_2vYVtestTESTtestTESTtestTESTtest');
+      expect(authObject.orgId).toBeNull();
+    });
+
+    it('properly initializes properties (org)', () => {
+      const authObject = authenticatedMachineObject(
+        'api_key',
+        token,
+        {
+          ...verificationResult,
+          subject: 'org_2vYVtestTESTtestTESTtestTESTtest',
+        },
+        debugData,
+      );
+      expect(authObject.tokenType).toBe('api_key');
+      expect(authObject.id).toBe('ak_ey966f1b1xf93586b2debdcadb0b3bd1');
+      expect(authObject.subject).toBe('org_2vYVtestTESTtestTESTtestTESTtest');
+      expect(authObject.scopes).toEqual(['read:foo', 'write:bar']);
+      expect(authObject.claims).toEqual({ foo: 'bar' });
+      expect(authObject.userId).toBeNull();
+      expect(authObject.orgId).toBe('org_2vYVtestTESTtestTESTtestTESTtest');
     });
   });
 
@@ -308,8 +329,11 @@ describe('authenticatedMachineObject', () => {
     it('properly initializes properties', () => {
       const authObject = authenticatedMachineObject('oauth_token', token, verificationResult, debugData);
       expect(authObject.tokenType).toBe('oauth_token');
+      expect(authObject.id).toBe('oat_2VTWUzvGC5UhdJCNx6xG1D98edc');
       expect(authObject.subject).toBe('user_2vYVtestTESTtestTESTtestTESTtest');
       expect(authObject.scopes).toEqual(['read:foo', 'write:bar']);
+      expect(authObject.userId).toBe('user_2vYVtestTESTtestTESTtestTESTtest');
+      expect(authObject.clientId).toBe('client_2VTWUzvGC5UhdJCNx6xG1D98edc');
     });
   });
 
@@ -332,10 +356,11 @@ describe('authenticatedMachineObject', () => {
     it('properly initializes properties', () => {
       const authObject = authenticatedMachineObject('machine_token', token, verificationResult, debugData);
       expect(authObject.tokenType).toBe('machine_token');
-      expect(authObject.name).toBe('my-machine-token');
-      expect(authObject.subject).toBe('user_2vYVtestTESTtestTESTtestTESTtest');
+      expect(authObject.id).toBe('m2m_ey966f1b1xf93586b2debdcadb0b3bd1');
+      expect(authObject.subject).toBe('mch_2vYVtestTESTtestTESTtestTESTtest');
       expect(authObject.scopes).toEqual(['read:foo', 'write:bar']);
       expect(authObject.claims).toEqual({ foo: 'bar' });
+      expect(authObject.machineId).toBe('mch_2vYVtestTESTtestTESTtestTESTtest');
     });
   });
 });

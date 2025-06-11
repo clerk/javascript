@@ -121,6 +121,16 @@ function getCatchAllReplacements() {
         '[`OrganizationInvitationPublicMetadata`](/docs/references/javascript/types/metadata#organization-invitation-public-metadata)',
     },
     {
+      pattern: /`OrganizationMembershipPrivateMetadata`/g,
+      replace:
+        '[`OrganizationMembershipPrivateMetadata`](/docs/references/javascript/types/metadata#organization-membership-private-metadata)',
+    },
+    {
+      pattern: /`OrganizationMembershipPublicMetadata`/g,
+      replace:
+        '[`OrganizationMembershipPublicMetadata`](/docs/references/javascript/types/metadata#organization-membership-public-metadata)',
+    },
+    {
       /**
        * By default, `@deprecated` is output with `**Deprecated**`. We want to add a full stop to it.
        */

@@ -11,7 +11,7 @@ import type {
   SharedSignedInAuthObjectProperties,
 } from '@clerk/types';
 
-import type { APIKey, CreateBackendApiOptions, MachineToken } from '../api';
+import type { APIKey, CreateBackendApiOptions, IdPOAuthAccessToken, MachineToken } from '../api';
 import { createBackendApiClient } from '../api';
 import { isTokenTypeAccepted } from '../internal';
 import type { AuthenticateContext } from './authenticateContext';
@@ -84,22 +84,23 @@ export type SignedOutAuthObject = {
  * While all machine token types share common properties (id, name, subject, etc),
  * this type defines the additional properties that are unique to each token type.
  *
- * @example
- * api_key & machine_token: adds `claims` property
- * oauth_token: adds no additional properties (empty object)
- *
  * @template TAuthenticated - Whether the machine object is authenticated or not
  */
 type MachineObjectExtendedProperties<TAuthenticated extends boolean> = {
-  api_key: {
-    name: TAuthenticated extends true ? string : null;
-    claims: TAuthenticated extends true ? Claims | null : null;
-  };
+  api_key: TAuthenticated extends true
+    ?
+        | { name: string; claims: Claims | null; userId: string; orgId: null }
+        | { name: string; claims: Claims | null; userId: null; orgId: string }
+    : { name: null; claims: null; userId: null; orgId: null };
   machine_token: {
     name: TAuthenticated extends true ? string : null;
     claims: TAuthenticated extends true ? Claims | null : null;
+    machineId: TAuthenticated extends true ? string : null;
   };
-  oauth_token: object;
+  oauth_token: {
+    userId: TAuthenticated extends true ? string : null;
+    clientId: TAuthenticated extends true ? string : null;
+  };
 };
 
 /**
@@ -257,6 +258,8 @@ export function authenticatedMachineObject<T extends MachineTokenType>(
         name: result.name,
         claims: result.claims,
         scopes: result.scopes,
+        userId: result.subject.startsWith('user_') ? result.subject : null,
+        orgId: result.subject.startsWith('org_') ? result.subject : null,
       } as unknown as AuthenticatedMachineObject<T>;
     }
     case TokenType.MachineToken: {
@@ -267,14 +270,18 @@ export function authenticatedMachineObject<T extends MachineTokenType>(
         name: result.name,
         claims: result.claims,
         scopes: result.scopes,
+        machineId: result.subject,
       } as unknown as AuthenticatedMachineObject<T>;
     }
     case TokenType.OAuthToken: {
+      const result = verificationResult as IdPOAuthAccessToken;
       return {
         ...baseObject,
         tokenType,
-        scopes: verificationResult.scopes,
-      } as AuthenticatedMachineObject<T>;
+        scopes: result.scopes,
+        userId: result.subject,
+        clientId: result.clientId,
+      } as unknown as AuthenticatedMachineObject<T>;
     }
     default:
       throw new Error(`Invalid token type: ${tokenType}`);
@@ -304,6 +311,9 @@ export function unauthenticatedMachineObject<T extends MachineTokenType>(
         tokenType,
         name: null,
         claims: null,
+        scopes: null,
+        userId: null,
+        orgId: null,
       } as unknown as UnauthenticatedMachineObject<T>;
     }
     case TokenType.MachineToken: {
@@ -312,13 +322,18 @@ export function unauthenticatedMachineObject<T extends MachineTokenType>(
         tokenType,
         name: null,
         claims: null,
+        scopes: null,
+        machineId: null,
       } as unknown as UnauthenticatedMachineObject<T>;
     }
     case TokenType.OAuthToken: {
       return {
         ...baseObject,
         tokenType,
-      } as UnauthenticatedMachineObject<T>;
+        scopes: null,
+        userId: null,
+        clientId: null,
+      } as unknown as UnauthenticatedMachineObject<T>;
     }
     default:
       throw new Error(`Invalid token type: ${tokenType}`);
@@ -406,7 +421,7 @@ export const getAuthObjectFromJwt = (
  *
  * @example
  * // Accept 'api_key' or 'machine_token'
- * const authObject = { tokenType: 'machine_token', id: 'mt_123' };
+ * const authObject = { tokenType: 'machine_token', id: 'm2m_123' };
  * const result = getAuthObjectForAcceptedToken({ authObject, acceptsToken: ['api_key', 'machine_token'] });
  * // result will be the original authObject (since tokenType matches one in the array)
  *

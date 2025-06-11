@@ -185,18 +185,30 @@ export class User {
     return res;
   }
 
+  /**
+   * The primary email address of the user.
+   */
   get primaryEmailAddress() {
     return this.emailAddresses.find(({ id }) => id === this.primaryEmailAddressId) ?? null;
   }
 
+  /**
+   * The primary phone number of the user.
+   */
   get primaryPhoneNumber() {
     return this.phoneNumbers.find(({ id }) => id === this.primaryPhoneNumberId) ?? null;
   }
 
+  /**
+   * The primary web3 wallet of the user.
+   */
   get primaryWeb3Wallet() {
     return this.web3Wallets.find(({ id }) => id === this.primaryWeb3WalletId) ?? null;
   }
 
+  /**
+   * The full name of the user.
+   */
   get fullName() {
     return [this.firstName, this.lastName].join(' ').trim() || null;
   }

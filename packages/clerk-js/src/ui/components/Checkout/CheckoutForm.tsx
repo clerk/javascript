@@ -14,11 +14,12 @@ import { Drawer } from '@/ui/elements/Drawer';
 import { LineItems } from '@/ui/elements/LineItems';
 import { SegmentedControl } from '@/ui/elements/SegmentedControl';
 import { Select, SelectButton, SelectOptionList } from '@/ui/elements/Select';
+import { Tooltip } from '@/ui/elements/Tooltip';
 
 import { DevOnly } from '../../common/DevOnly';
 import { useCheckoutContext, usePaymentSources } from '../../contexts';
 import { Box, Button, Col, descriptors, Flex, Form, localizationKeys, Text } from '../../customizables';
-import { ChevronUpDown } from '../../icons';
+import { ChevronUpDown, InformationCircle } from '../../icons';
 import { handleError } from '../../utils';
 import * as AddPaymentSource from '../PaymentSources/AddPaymentSource';
 import { PaymentSourceRow } from '../PaymentSources/PaymentSourceRow';
@@ -79,7 +80,15 @@ export const CheckoutForm = withCardStateProvider(() => {
           )}
           {showPastDue && (
             <LineItems.Group variant='tertiary'>
-              <LineItems.Title title={localizationKeys('commerce.pastDue')} />
+              <Tooltip.Root>
+                <Tooltip.Trigger>
+                  <LineItems.Title
+                    title={localizationKeys('commerce.pastDue')}
+                    icon={InformationCircle}
+                  />
+                </Tooltip.Trigger>
+                <Tooltip.Content text={localizationKeys('commerce.checkout.pastDueNotice')} />
+              </Tooltip.Root>
               <LineItems.Description text={`${totals.pastDue?.currencySymbol}${totals.pastDue?.amountFormatted}`} />
             </LineItems.Group>
           )}

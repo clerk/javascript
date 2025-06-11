@@ -48,7 +48,7 @@ describe('getAuthDataFromRequestAsync', () => {
 
   it('returns authenticated machine object when token type matches', async () => {
     vi.mocked(verifyMachineAuthToken).mockResolvedValueOnce({
-      data: { id: 'ak_123' } as any,
+      data: { id: 'ak_123', subject: 'user_12345' } as any,
       tokenType: 'api_key',
       errors: undefined,
     });

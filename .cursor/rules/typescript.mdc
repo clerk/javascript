@@ -1,0 +1,315 @@
+---
+description: 
+globs: *.ts, *.tsx
+alwaysApply: false
+---
+Working with Typescript
+
+Type Safety and Definitions
+
+Core Principles
+- Always define explicit return types for functions, especially public APIs
+- Use proper type annotations for variables and parameters where inference isn't clear
+- Avoid `any` type - prefer `unknown` when type is uncertain, then narrow with type guards
+- Enable strict mode in tsconfig.json with `"strict": true`
+
+Type Guards and Narrowing
+```typescript
+// Good: Type guard for unknown types
+function isString(value: unknown): value is string {
+  return typeof value === 'string';
+}
+
+// Good: Narrowing with type guards
+function processValue(value: unknown): string {
+  if (isString(value)) {
+    return value.toUpperCase(); // TypeScript knows it's a string
+  }
+  throw new Error('Expected string');
+}
+```
+
+Interface and Type Definitions
+- Use `interface` for object shapes that might be extended
+- Use `type` for unions, primitives, and computed types
+- Prefer `readonly` properties for immutable data structures
+
+Object-Oriented Programming
+
+Access Modifiers and Encapsulation
+- Use `private` for internal implementation details
+- Use `protected` for inheritance hierarchies
+- Use `public` explicitly for clarity in public APIs
+- Prefer `readonly` for properties that shouldn't change after construction
+
+SOLID Principles in TypeScript
+```typescript
+// Single Responsibility: Each class has one reason to change
+class UserValidator {
+  validate(user: User): ValidationResult { /* ... */ }
+}
+
+// Open/Closed: Open for extension, closed for modification
+interface PaymentProcessor {
+  process(amount: number): Promise<PaymentResult>;
+}
+
+// Dependency Inversion: Depend on abstractions, not concretions
+class OrderService {
+  constructor(private paymentProcessor: PaymentProcessor) {}
+}
+```
+
+Composition Over Inheritance
+- Prefer composition and interfaces over deep inheritance chains
+- Use mixins for shared behavior across unrelated classes
+- Implement dependency injection for loose coupling
+
+Modern TypeScript Features
+
+Generics and Utility Types
+```typescript
+// Generic constraints for better type safety
+interface Repository<T extends { id: string }> {
+  findById(id: string): Promise<T | null>;
+  save(entity: T): Promise<T>;
+}
+
+// Utility types for data transformation
+type CreateUserRequest = Omit<User, 'id' | 'createdAt'>;
+type UpdateUserRequest = Partial<Pick<User, 'name' | 'email'>>;
+```
+
+Discriminated Unions
+```typescript
+// Better than boolean flags
+type ApiResponse<T> = 
+  | { success: true; data: T }
+  | { success: false; error: string };
+
+// Type-safe state management
+type LoadingState = 
+  | { status: 'idle' }
+  | { status: 'loading' }
+  | { status: 'success'; data: any }
+  | { status: 'error'; error: string };
+```
+
+Mapped and Conditional Types
+- Use mapped types for transforming object types
+- Use conditional types for type-level logic
+- Leverage template literal types for string manipulation
+
+Code Organization and Structure
+
+Module System
+- Use ES6 imports/exports consistently
+- Avoid barrel files (index.ts re-exports) as they can cause circular dependencies
+- Group related functionality in modules
+- Use default exports sparingly, prefer named exports
+
+File Naming and Organization
+```
+src/
+├── components/           # React components
+├── services/            # Business logic
+├── types/               # Type definitions
+├── utils/               # Pure utility functions
+├── hooks/               # Custom React hooks (if applicable)
+└── __tests__/           # Test files
+```
+
+Documentation Standards
+```typescript
+/**
+ * Calculates the total price including tax
+ * @param basePrice - The base price before tax
+ * @param taxRate - Tax rate as decimal (0.1 for 10%)
+ * @returns The total price including tax
+ * @throws {Error} When taxRate is negative
+ * @example
+ * ```typescript
+ * const total = calculateTotal(100, 0.1); // 110
+ * ```
+ */
+function calculateTotal(basePrice: number, taxRate: number): number {
+  if (taxRate < 0) throw new Error('Tax rate cannot be negative');
+  return basePrice * (1 + taxRate);
+}
+```
+
+Error Handling
+
+Custom Error Classes
+```typescript
+class ValidationError extends Error {
+  constructor(
+    message: string,
+    public readonly field: string,
+    public readonly value: unknown
+  ) {
+    super(message);
+    this.name = 'ValidationError';
+  }
+}
+
+class NotFoundError extends Error {
+  constructor(resource: string, id: string) {
+    super(`${resource} with id ${id} not found`);
+    this.name = 'NotFoundError';
+  }
+}
+```
+
+Safe Error Handling Patterns
+```typescript
+// Result pattern for error handling
+type Result<T, E = Error> = 
+  | { success: true; data: T }
+  | { success: false; error: E };
+
+// Optional chaining and nullish coalescing
+const userName = user?.profile?.name ?? 'Anonymous';
+const config = userConfig ?? defaultConfig;
+```
+
+Performance and Best Practices
+
+Type Inference Optimization
+- Let TypeScript infer when types are obvious
+- Use `const assertions` for literal types: `as const`
+- Use `satisfies` operator for type checking without widening
+
+Immutability Patterns
+```typescript
+// Readonly arrays and objects
+type ReadonlyUser = {
+  readonly id: string;
+  readonly name: string;
+  readonly permissions: readonly string[];
+};
+
+// Immutable updates
+const updatedUser = { ...user, name: 'New Name' };
+const updatedPermissions = [...user.permissions, 'new-permission'];
+```
+
+Performance Considerations
+- Use lazy loading for large types
+- Prefer `unknown` over `any` for performance
+- Use type-only imports: `import type { User } from './types'`
+- Enable `--incremental` and `--tsBuildInfoFile` for faster builds
+
+Testing and Type Safety
+
+Type-Safe Testing with Vitest
+```typescript
+import { describe, it, expect, vi } from 'vitest';
+import type { MockedFunction } from 'vitest';
+
+// Mock with proper typing
+const mockRepository = {
+  findById: vi.fn() as MockedFunction<Repository['findById']>,
+  save: vi.fn() as MockedFunction<Repository['save']>,
+};
+
+// Type assertions in tests
+expect(result).toSatisfy<User>((user) => 
+  user.id.length > 0 && user.email.includes('@')
+);
+```
+
+Test Utilities and Helpers
+- Create type-safe test builders/factories
+- Use branded types for test isolation
+- Implement proper mock types that match interfaces
+
+Configuration and Tooling
+
+Essential tsconfig.json Settings
+```json
+{
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "allowUnusedLabels": false,
+    "allowUnreachableCode": false,
+    "forceConsistentCasingInFileNames": true,
+    "verbatimModuleSyntax": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
+```
+
+Path Aliases
+```json
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@/components/*": ["src/components/*"],
+      "@/services/*": ["src/services/*"],
+      "@/types/*": ["src/types/*"]
+    }
+  }
+}
+```
+
+Recommended Tooling
+- ESLint: Use `@typescript-eslint/recommended` rules
+- Prettier: For consistent formatting
+- lint-staged: Run linting on staged files
+- Husky: Git hooks for pre-commit checks
+- Type Coverage: Use `type-coverage` to measure type safety
+
+Advanced Patterns
+
+Builder Pattern with Fluent Interface
+```typescript
+class QueryBuilder<T> {
+  private conditions: string[] = [];
+  
+  where(condition: keyof T, value: any): this {
+    this.conditions.push(`${String(condition)} = ${value}`);
+    return this;
+  }
+  
+  build(): string {
+    return this.conditions.join(' AND ');
+  }
+}
+```
+
+Branded Types for Domain Safety
+```typescript
+type UserId = string & { readonly brand: unique symbol };
+type Email = string & { readonly brand: unique symbol };
+
+function createUserId(id: string): UserId {
+  return id as UserId;
+}
+```
+
+Code Review Guidelines
+
+Type Safety Checklist
+- No `any` types without justification
+- Proper error handling with typed errors
+- Consistent use of `readonly` for immutable data
+- Proper generic constraints
+- No unused type parameters
+- Proper use of utility types instead of manual type construction
+
+Performance Checklist
+- Type-only imports where possible
+- Proper tree-shaking friendly exports
+- No circular dependencies
+- Efficient type computations (avoid deep recursion)
+
+Remember: TypeScript is a tool for developer experience and code safety. These rules should enhance productivity while maintaining type safety and code quality.
