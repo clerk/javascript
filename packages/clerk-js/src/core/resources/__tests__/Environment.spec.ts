@@ -52,10 +52,10 @@ describe('Environment', () => {
     const environmentJSON = {
       object: 'environment',
       id: '',
-      apiKeysSettings: {
+      api_keys_settings: {
         enabled: false,
         id: undefined,
-        pathRoot: '',
+        path_root: '',
       },
       auth_config: {
         object: 'auth_config',
