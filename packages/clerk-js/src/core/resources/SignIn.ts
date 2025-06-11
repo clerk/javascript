@@ -72,8 +72,8 @@ import { createResourceSlice, type ResourceStore } from './state';
 
 type SignInSliceState = {
   signin: {
-    signInStatus: SignInStatus | null;
-    setSignInStatus: (status: SignInStatus | null) => void;
+    status: SignInStatus | null;
+    setStatus: (status: SignInStatus | null) => void;
   };
 };
 
@@ -84,13 +84,13 @@ type SignInSliceState = {
  */
 const createSignInSlice = (set: any, _get: any): SignInSliceState => ({
   signin: {
-    signInStatus: null,
-    setSignInStatus: (status: SignInStatus | null) => {
+    status: null,
+    setStatus: (status: SignInStatus | null) => {
       set((state: any) => ({
         ...state,
         signin: {
           ...state.signin,
-          signInStatus: status,
+          status: status,
         },
       }));
     },
@@ -108,7 +108,6 @@ export class SignIn extends BaseResource implements SignInResource {
   identifier: string | null = null;
   secondFactorVerification: VerificationResource = new Verification(null);
   signInError: { global: string | null; fields: Record<string, string> } = { global: null, fields: {} };
-  status: SignInStatus | null = null;
   supportedFirstFactors: SignInFirstFactor[] | null = [];
   supportedIdentifiers: SignInIdentifier[] = [];
   supportedSecondFactors: SignInSecondFactor[] | null = null;
@@ -129,13 +128,20 @@ export class SignIn extends BaseResource implements SignInResource {
     this.fromJSON(data);
   }
 
-  private updateError(globalError: string | null, fieldErrors: Record<string, string> = {}) {
-    this.signInError = { global: globalError, fields: fieldErrors };
+  /**
+   * Reactive status property backed by the store.
+   * Reading and writing goes directly to/from the store.
+   */
+  get status(): SignInStatus | null {
+    return (this.store.getState() as CombinedSignInStore).signin.status;
   }
 
-  private updateStatus(newStatus: SignInStatus | null) {
-    this.status = newStatus;
-    (this.store.getState() as CombinedSignInStore).signin.setSignInStatus(newStatus);
+  set status(newStatus: SignInStatus | null) {
+    (this.store.getState() as CombinedSignInStore).signin.setStatus(newStatus);
+  }
+
+  private updateError(globalError: string | null, fieldErrors: Record<string, string> = {}) {
+    this.signInError = { global: globalError, fields: fieldErrors };
   }
 
   create = async (params: SignInCreateParams): Promise<SignInResource> => {
@@ -507,17 +513,16 @@ export class SignIn extends BaseResource implements SignInResource {
   protected fromJSON(data: SignInJSON | SignInJSONSnapshot | null): this {
     if (!data) return this;
 
-    this.id = data.id;
-    this.supportedIdentifiers = data.supported_identifiers;
-    this.identifier = data.identifier;
-    this.supportedFirstFactors = deepSnakeToCamel(data.supported_first_factors) as SignInFirstFactor[] | null;
-    this.supportedSecondFactors = deepSnakeToCamel(data.supported_second_factors) as SignInSecondFactor[] | null;
-    this.firstFactorVerification = new Verification(data.first_factor_verification);
-    this.secondFactorVerification = new Verification(data.second_factor_verification);
     this.createdSessionId = data.created_session_id;
+    this.firstFactorVerification = new Verification(data.first_factor_verification);
+    this.id = data.id;
+    this.identifier = data.identifier;
+    this.secondFactorVerification = new Verification(data.second_factor_verification);
+    this.status = data.status;
+    this.supportedFirstFactors = deepSnakeToCamel(data.supported_first_factors) as SignInFirstFactor[] | null;
+    this.supportedIdentifiers = data.supported_identifiers;
+    this.supportedSecondFactors = deepSnakeToCamel(data.supported_second_factors) as SignInSecondFactor[] | null;
     this.userData = new UserData(data.user_data);
-
-    this.updateStatus(data.status);
 
     return this;
   }

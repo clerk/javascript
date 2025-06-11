@@ -403,8 +403,8 @@ function mountSignInObservable(element: HTMLDivElement) {
       
       <div class="border-l-2 border-green-300 pl-3 my-2">
         <p><strong>SignIn Slice (under 'signin' namespace):</strong></p>
-        <p>• <code>signIn.store.getState().signin.signInStatus</code>: SignIn flow status</p>
-        <p>• Method: <code>signIn.store.getState().signin.setSignInStatus</code></p>
+        <p>• <code>signIn.store.getState().signin.status</code>: SignIn flow status</p>
+        <p>• Method: <code>signIn.store.getState().signin.setStatus</code></p>
         <p>• Purpose: Domain-specific SignIn business logic</p>
       </div>
       
@@ -518,11 +518,11 @@ function mountSignInObservable(element: HTMLDivElement) {
     try {
       const signInSliceProps = {
         // SignIn slice properties (namespaced under 'signin')
-        signInStatus: fullStoreState.signin?.signInStatus,
-        setSignInStatus: typeof fullStoreState.signin?.setSignInStatus,
+        status: fullStoreState.signin?.status,
+        setStatus: typeof fullStoreState.signin?.setStatus,
 
         // Show current value
-        currentSignInStatus: fullStoreState.signin?.signInStatus,
+        currentStatus: fullStoreState.signin?.status,
       };
 
       signInStoreDisplay.innerHTML = `
@@ -565,7 +565,7 @@ function mountSignInObservable(element: HTMLDivElement) {
     if (signIn?.store) {
       const statuses = ['needs_first_factor', 'needs_second_factor', 'complete'];
       const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
-      signIn.store.getState().signin.setSignInStatus(randomStatus as any);
+      signIn.store.getState().signin.setStatus(randomStatus as any);
       updateStatus();
     }
   });
@@ -736,8 +736,8 @@ function mountSignInObservable(element: HTMLDivElement) {
       console.log('   - No naming conflicts');
       console.log('');
       console.log('🔶 SignIn Slice (signIn.store.getState().signin):');
-      console.log('   - Simple properties: signin.signInStatus');
-      console.log('   - Direct updates via signin.setSignInStatus');
+      console.log('   - Simple properties: signin.status');
+      console.log('   - Direct updates via signin.setStatus');
       console.log('   - Domain-specific to SignIn flow');
       console.log('   - Can easily add more signin.* properties');
       console.log('');
