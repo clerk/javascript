@@ -70,7 +70,7 @@
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "lint": "eslint src",
-    "lint:oxlint": "oxlint --quiet src"
+    "lint:oxlint": "oxlint src"
   },
   "dependencies": {
     "@clerk/backend": "workspace:^",

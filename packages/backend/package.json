@@ -95,7 +95,7 @@
     "dev:publish": "pnpm dev -- --env.publish",
     "lint": "eslint src",
     "lint:attw": "attw --pack . --profile node16 --ignore-rules false-cjs",
-    "lint:oxlint": "oxlint --quiet src",
+    "lint:oxlint": "oxlint src",
     "lint:publint": "publint",
     "publish:local": "pnpm yalc push --replace --sig",
     "test": "run-s test:node test:edge-runtime test:cloudflare-miniflare",

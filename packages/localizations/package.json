@@ -102,7 +102,7 @@
     "generate": "tsc src/utils/generate.ts && node src/utils/generate.js && prettier --write src/*.ts",
     "lint": "eslint src",
     "lint:attw": "attw --pack . --profile node16",
-    "lint:oxlint": "oxlint --quiet src"
+    "lint:oxlint": "oxlint src"
   },
   "dependencies": {
     "@clerk/types": "workspace:^"

@@ -36,7 +36,7 @@
     "dev": "tsc -p tsconfig.build.json --watch",
     "lint": "eslint src",
     "lint:attw": "attw --pack . --profile node16",
-    "lint:oxlint": "oxlint --quiet src"
+    "lint:oxlint": "oxlint src"
   },
   "dependencies": {
     "@clerk/types": "workspace:^",

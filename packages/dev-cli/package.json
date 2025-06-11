@@ -20,7 +20,7 @@
   },
   "scripts": {
     "lint": "eslint src",
-    "lint:oxlint": "oxlint --quiet src"
+    "lint:oxlint": "oxlint src"
   },
   "dependencies": {
     "commander": "^12.1.0",
