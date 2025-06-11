@@ -6,7 +6,7 @@ import type { ToComputedRefs } from '../utils';
 import { toComputedRefs } from '../utils';
 import { useClerkContext } from './useClerkContext';
 
-type UseSignIn = () => ToComputedRefs<UseSignInReturn>;
+type UseSignIn = () => ToComputedRefs<UseSignInReturn> | ToComputedRefs<DeferredUseSignInReturn>;
 
 /**
  * A deferred proxy type that represents a resource that is not yet available
@@ -77,8 +77,18 @@ export const useSignIn: UseSignIn = () => {
                   if (clerk.value && clientCtx.value) {
                     const targetObj = target === 'setActive' ? clerk.value.setActive : clientCtx.value.signIn;
                     try {
-                      const result = (targetObj as any)[prop](...args);
-                      resolve(result);
+                      // Type-safe method call by checking if the property exists and is callable
+                      if (targetObj && typeof targetObj === 'object' && prop in targetObj) {
+                        const method = (targetObj as any)[prop];
+                        if (typeof method === 'function') {
+                          const result = method.apply(targetObj, args);
+                          resolve(result);
+                        } else {
+                          reject(new Error(`Property ${prop} is not a function on ${target}`));
+                        }
+                      } else {
+                        reject(new Error(`Method ${prop} not found on ${target}`));
+                      }
                     } catch (error) {
                       reject(error);
                     }
@@ -114,5 +124,5 @@ export const useSignIn: UseSignIn = () => {
     } satisfies UseSignInReturn;
   });
 
-  return toComputedRefs(result as any);
+  return toComputedRefs(result);
 };
