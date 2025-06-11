@@ -18,17 +18,23 @@ export const createPricingTablePageObject = (testArgs: { page: EnhancedPage }) =
     let attempts = 0;
 
     async function isToggleStateMatchingPeriod(period: BillingPeriod): Promise<boolean> {
+      // Wait for the indicator to be visible and stable
+      await locators.indicator(planSlug).waitFor({ state: 'visible' });
       const isChecked = (await locators.indicator(planSlug).getAttribute('data-checked')) === 'true';
       return (isChecked && period === 'monthly') || (!isChecked && period === 'annually');
     }
 
     while (!(await isToggleStateMatchingPeriod(period)) && attempts < maxAttempts) {
+      // Wait for toggle to be ready for interaction
+      await locators.toggle(planSlug).waitFor({ state: 'visible' });
       await locators.toggle(planSlug).click();
       attempts++;
     }
 
-    if (attempts >= maxAttempts) {
-      throw new Error(`Failed to set pricing period to ${period} after ${maxAttempts} attempts`);
+    // Final verification that we're in the correct state
+    const finalState = await isToggleStateMatchingPeriod(period);
+    if (!finalState) {
+      throw new Error(`Pricing period toggle ended in incorrect state for ${period}`);
     }
   };
 
