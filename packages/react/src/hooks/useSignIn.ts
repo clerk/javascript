@@ -1,7 +1,7 @@
 import { useClientContext } from '@clerk/shared/react';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
 import type { SetActive, SignInResource } from '@clerk/types';
-import { useCallback, useSyncExternalStore } from 'react';
+import { useStore } from 'zustand';
 
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvider';
@@ -56,19 +56,8 @@ const createStoreObservable = (signInResource: SignInResource) => {
       return {};
     }
 
-    const subscribe = useCallback(
-      (callback: () => void) => {
-        return store.subscribe(callback);
-      },
-      [store]
-    );
-
-    const getState = useCallback(() => {
-      return store.getState();
-    }, [store]);
-
-    // Use React's useSyncExternalStore to subscribe to the Zustand store
-    return useSyncExternalStore(subscribe, getState, getState);
+    // Use Zustand's built-in React integration instead of manual useSyncExternalStore
+    return useStore(store);
   };
 };
 
@@ -125,7 +114,7 @@ export const useSignIn = () => {
 
     return {
       isLoaded: true,
-      signIn: wrapSignInWithObservable(client.signIn) as ObservableSignInResource,
+      signIn: wrapSignInWithObservable(client.signIn),
       setActive: isomorphicClerk.setActive,
     };
   }
