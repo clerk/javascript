@@ -21,6 +21,15 @@ export const createPricingTablePageObject = (testArgs: { page: EnhancedPage }) =
       // Wait for the indicator to be visible and stable
       await locators.indicator(planSlug).waitFor({ state: 'visible' });
       const isChecked = (await locators.indicator(planSlug).getAttribute('data-checked')) === 'true';
+
+      console.log(
+        'await locators.indicator(planSlug).getAttribute("data-checked")',
+        await locators.indicator(planSlug).getAttribute('data-checked'),
+      );
+
+      console.log('period', period);
+      console.log('attempts', attempts);
+
       return (isChecked && period === 'monthly') || (!isChecked && period === 'annually');
     }
 
