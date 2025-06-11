@@ -1,6 +1,6 @@
 import { errorToJSON, parseError } from '@clerk/shared/error';
 import type {
-  ClerkAPIError,
+  ClerkAPIErrorJSON,
   PasskeyVerificationResource,
   PhoneCodeChannel,
   PublicKeyCredentialCreationOptionsJSON,
@@ -16,17 +16,66 @@ import type {
   VerificationResource,
   VerificationStatus,
 } from '@clerk/types';
+import { devtools } from 'zustand/middleware';
+import { createStore } from 'zustand/vanilla';
 
 import { unixEpochToDate } from '../../utils/date';
 import { convertJSONToPublicKeyCreateOptions } from '../../utils/passkeys';
 import { BaseResource } from './internal';
+import { createResourceSlice, type ResourceStore } from './state';
+
+/**
+ * Verification slice state type
+ */
+type VerificationSliceState = {
+  verification: {
+    error: ClerkAPIErrorJSON | null;
+    setError: (error: ClerkAPIErrorJSON | null) => void;
+    clearError: () => void;
+    hasError: () => boolean;
+  };
+};
+
+/**
+ * Creates a verification slice following the Zustand slices pattern.
+ * This slice handles verification-specific state management.
+ * All verification state is namespaced under the 'verification' key.
+ */
+const createVerificationSlice = (set: any, get: any): VerificationSliceState => ({
+  verification: {
+    error: null,
+    setError: (error: ClerkAPIErrorJSON | null) => {
+      set((state: any) => ({
+        ...state,
+        verification: {
+          ...state.verification,
+          error: error,
+        },
+      }));
+    },
+    clearError: () => {
+      set((state: any) => ({
+        ...state,
+        verification: {
+          ...state.verification,
+          error: null,
+        },
+      }));
+    },
+    hasError: () => {
+      const state = get();
+      return state.verification.error !== null;
+    },
+  },
+});
+
+type CombinedVerificationStore = ResourceStore<Verification> & VerificationSliceState;
 
 export class Verification extends BaseResource implements VerificationResource {
   pathRoot = '';
 
   attempts: number | null = null;
   channel?: PhoneCodeChannel;
-  error: ClerkAPIError | null = null;
   expireAt: Date | null = null;
   externalVerificationRedirectURL: URL | null = null;
   message: string | null = null;
@@ -37,21 +86,30 @@ export class Verification extends BaseResource implements VerificationResource {
 
   constructor(data: VerificationJSON | VerificationJSONSnapshot | null) {
     super();
+    // Override the base _store with our combined store using slices pattern with namespacing
+    this._store = createStore<CombinedVerificationStore>()(
+      devtools(
+        (set, get) => ({
+          ...createResourceSlice<Verification>(set, get),
+          ...createVerificationSlice(set, get),
+        }),
+        { name: 'VerificationStore' },
+      ),
+    ) as any;
     this.fromJSON(data);
+  }
+
+  /**
+   * Reactive error property backed by the store.
+   * Reading goes directly from the store.
+   */
+  get error(): ClerkAPIErrorJSON | null {
+    return (this._store.getState() as CombinedVerificationStore).verification.error;
   }
 
   verifiedFromTheSameClient = (): boolean => {
     return this.verifiedAtClient === BaseResource.clerk?.client?.id;
   };
-
-  private updateError(error: ClerkAPIError | null) {
-    if (error) {
-      const parsedError = errorToJSON(parseError(error));
-      this._store.getState().resource.dispatch({ type: 'FETCH_ERROR', error: parsedError });
-    } else {
-      this._store.getState().resource.dispatch({ type: 'RESET' });
-    }
-  }
 
   protected fromJSON(data: VerificationJSON | VerificationJSONSnapshot | null): this {
     if (!data) {
@@ -70,7 +128,15 @@ export class Verification extends BaseResource implements VerificationResource {
     }
     this.attempts = data.attempts;
     this.expireAt = unixEpochToDate(data.expire_at || undefined);
-    this.updateError(data.error);
+
+    // Set error state directly in the verification slice
+    if (data.error) {
+      const parsedError = errorToJSON(parseError(data.error));
+      (this._store.getState() as CombinedVerificationStore).verification.setError(parsedError);
+    } else {
+      (this._store.getState() as CombinedVerificationStore).verification.clearError();
+    }
+
     this.channel = data.channel || undefined;
 
     return this;
@@ -87,7 +153,7 @@ export class Verification extends BaseResource implements VerificationResource {
       external_verification_redirect_url: this.externalVerificationRedirectURL?.toString() || null,
       attempts: this.attempts,
       expire_at: this.expireAt?.getTime() || null,
-      error: errorToJSON(this.error),
+      error: this.error || { code: '', message: '' },
       verified_at_client: this.verifiedAtClient,
     };
   }
