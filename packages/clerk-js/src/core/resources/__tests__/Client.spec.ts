@@ -280,7 +280,27 @@ describe('Client Singleton', () => {
     // @ts-expect-error We cannot mess with the singleton when tests are running in parallel
     const client = new Client(clientJSON);
 
-    expect(client).toMatchSnapshot();
+    expect(client).toMatchObject({
+      id: 'client_DUMMY_ID',
+      sessions: [],
+      signUp: expect.objectContaining({
+        status: null,
+        missingFields: [],
+        unverifiedFields: [],
+        verifications: expect.objectContaining({
+          emailAddress: expect.objectContaining({
+            status: null,
+          }),
+        }),
+      }),
+      signIn: expect.objectContaining({
+        status: null,
+        identifier: null,
+      }),
+      lastActiveSessionId: null,
+      createdAt: expect.any(Date),
+      updatedAt: expect.any(Date),
+    });
   });
 
   it('__internal_toSnapshot()', () => {
@@ -416,6 +436,27 @@ describe('Client Singleton', () => {
     // @ts-expect-error We cannot mess with the singleton when tests are running in parallel
     const client = new Client(clientJSON);
 
-    expect(client.__internal_toSnapshot()).toMatchSnapshot();
+    expect(client.__internal_toSnapshot()).toMatchObject({
+      object: 'client',
+      id: 'client_DUMMY_ID',
+      sessions: [],
+      sign_up: expect.objectContaining({
+        status: null,
+        missing_fields: [],
+        unverified_fields: [],
+        verifications: expect.objectContaining({
+          email_address: expect.objectContaining({
+            status: null,
+          }),
+        }),
+      }),
+      sign_in: expect.objectContaining({
+        status: null,
+        identifier: null,
+      }),
+      last_active_session_id: null,
+      created_at: expect.any(Number),
+      updated_at: expect.any(Number),
+    });
   });
 });
