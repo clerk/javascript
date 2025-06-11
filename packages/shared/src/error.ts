@@ -270,9 +270,6 @@ export interface ErrorThrower {
   throw(message: string): never;
 }
 
-/**
- *
- */
 export function buildErrorThrower({ packageName, customMessages }: ErrorThrowerOptions): ErrorThrower {
   let pkg = packageName;
 
