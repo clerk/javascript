@@ -33,22 +33,22 @@ export const createResourceStoreHooks = <T>(store: StoreApi<ResourceStore<T>>) =
   /**
    * Hook to get the current data
    */
-  const useResourceData = () => useStore(store, state => state.getData());
+  const useResourceData = () => useStore(store, state => state.state.data);
 
   /**
    * Hook to get the current error
    */
-  const useResourceError = () => useStore(store, state => state.getError());
+  const useResourceError = () => useStore(store, state => state.state.error);
 
   /**
    * Hook to get the current status
    */
-  const useResourceStatus = () => useStore(store, state => state.status());
+  const useResourceStatus = () => useStore(store, state => state.state.status);
 
   /**
    * Hook to check if the resource has an error
    */
-  const useResourceHasError = () => useStore(store, state => state.hasError());
+  const useResourceHasError = () => useStore(store, state => !!state.state.error);
 
   return {
     useResourceStore,
