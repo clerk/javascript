@@ -46,6 +46,7 @@ type ObservableSignInResource = SignInResource & {
 /**
  * Creates a React hook that subscribes to a Zustand store and returns its state.
  * This enables React components to re-render when the store state changes.
+ * This implementation is SSR-safe and prevents hydration mismatches.
  */
 const createStoreObservable = (signInResource: SignInResource) => {
   return () => {
@@ -56,7 +57,13 @@ const createStoreObservable = (signInResource: SignInResource) => {
       return {};
     }
 
-    // Use Zustand's built-in React integration instead of manual useSyncExternalStore
+    // During SSR, return the current state without subscribing
+    // This prevents hydration mismatches
+    if (typeof window === 'undefined') {
+      return store.getState();
+    }
+
+    // On client, use Zustand's built-in React integration
     return useStore(store);
   };
 };
@@ -84,12 +91,13 @@ const wrapSignInWithObservable = (signIn: SignInResource): ObservableSignInResou
 };
 
 export const useSignIn = () => {
-  useAssertWrappedByClerkProvider('useSignIn');
-
   const isomorphicClerk = useIsomorphicClerkContext();
   const client = useClientContext();
 
-  isomorphicClerk.telemetry?.record(eventMethodCalled('useSignIn'));
+  // Assert provider is available - this is required for proper Clerk integration
+  useAssertWrappedByClerkProvider('useSignIn');
+
+  isomorphicClerk?.telemetry?.record(eventMethodCalled('useSignIn'));
 
   const callQueue: QueuedCall[] = [];
 
