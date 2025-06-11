@@ -40,11 +40,8 @@ export const InvalidPlanScreen = () => {
   const { errors } = useCheckoutContextRoot();
 
   const planFromError = useMemo(() => {
-    const error = errors?.[0];
-    if (error?.code === 'invalid_plan_change') {
-      return error?.meta?.plan;
-    }
-    return undefined;
+    const error = errors?.find(e => e.code === 'invalid_plan_change');
+    return error?.meta?.plan;
   }, [errors]);
 
   const { planPeriod } = useCheckoutContext();
