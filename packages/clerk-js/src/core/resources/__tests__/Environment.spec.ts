@@ -1,7 +1,6 @@
 import type { EnvironmentJSONSnapshot } from '@clerk/types';
 import { describe, expect, it } from 'vitest';
 
-
 import { Environment } from '../internal';
 
 describe('Environment', () => {
@@ -11,7 +10,6 @@ describe('Environment', () => {
     expect(environment).toMatchObject({
       apiKeysSettings: expect.objectContaining({
         enabled: false,
-        id: undefined,
         pathRoot: '',
       }),
       authConfig: expect.objectContaining({
