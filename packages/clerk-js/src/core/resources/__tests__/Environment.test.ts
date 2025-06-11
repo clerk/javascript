@@ -7,6 +7,11 @@ describe('Environment', () => {
     const environment = new Environment();
 
     expect(environment).toMatchObject({
+      apiKeysSettings: expect.objectContaining({
+        enabled: false,
+        id: undefined,
+        pathRoot: '',
+      }),
       authConfig: expect.objectContaining({
         singleSessionMode: false,
         reverification: false,
@@ -47,6 +52,11 @@ describe('Environment', () => {
     const environmentJSON = {
       object: 'environment',
       id: '',
+      apiKeysSettings: {
+        enabled: false,
+        id: undefined,
+        pathRoot: '',
+      },
       auth_config: {
         object: 'auth_config',
         id: '',
@@ -567,6 +577,9 @@ describe('Environment', () => {
 
     expect(environment.__internal_toSnapshot()).toMatchObject({
       object: 'environment',
+      api_keys_settings: expect.objectContaining({
+        enabled: false,
+      }),
       auth_config: expect.objectContaining({
         single_session_mode: true,
         reverification: true,
