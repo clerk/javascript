@@ -43,6 +43,7 @@ export const useSignIn = () => {
     processQueue(client.signIn, isomorphicClerk.setActive);
 
     return {
+      isLoaded: true,
       signIn: client.signIn,
       setActive: isomorphicClerk.setActive,
     };
@@ -77,7 +78,7 @@ export const useSignIn = () => {
   };
 
   return {
-    isLoaded: true,
+    isLoaded: false,
     signIn: createProxy('signIn') as SignInResource,
     setActive: createProxy('setActive') as SetActive,
   };
