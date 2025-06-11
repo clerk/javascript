@@ -14,50 +14,37 @@ export const createPricingTablePageObject = (testArgs: { page: EnhancedPage }) =
   };
 
   const ensurePricingPeriod = async (planSlug: string, period: BillingPeriod): Promise<void> => {
-    const maxAttempts = 3;
-    let attempts = 0;
-
-    async function waitForAttribute(selector: string, attribute: string, value: string, timeout = 5000): Promise<void> {
-      await page.waitForFunction(
-        ({ sel, attr, val }) => {
-          const element = document.querySelector(sel);
-          return element?.getAttribute(attr) === val;
-        },
-        { sel: selector, attr: attribute, val: value },
-        { timeout },
-      );
-    }
-
-    async function isToggleStateMatchingPeriod(period: BillingPeriod): Promise<boolean> {
-      await locators.indicator(planSlug).waitFor({ state: 'visible' });
-      const expectedValue = period === 'annually' ? 'true' : 'false';
-      let isMatching = false;
-      await waitForAttribute(
-        `.cl-pricingTableCard__${planSlug} .cl-switchIndicator`,
-        'data-checked',
-        expectedValue,
-        500,
-      )
+    async function waitForAttribute(selector: string, attribute: string, value: string, timeout = 5000) {
+      return page
+        .waitForFunction(
+          ({ sel, attr, val }) => {
+            const element = document.querySelector(sel);
+            return element?.getAttribute(attr) === val;
+          },
+          { sel: selector, attr: attribute, val: value },
+          { timeout },
+        )
         .then(() => {
-          isMatching = true;
+          return true;
         })
         .catch(() => {
-          isMatching = false;
+          return false;
         });
-
-      return isMatching;
     }
 
-    while (!(await isToggleStateMatchingPeriod(period)) && attempts < maxAttempts) {
-      await locators.toggle(planSlug).waitFor({ state: 'visible' });
+    const isAnnually = await waitForAttribute(
+      `.cl-pricingTableCard__${planSlug} .cl-switchIndicator`,
+      'data-checked',
+      'true',
+      500,
+    );
+
+    if (isAnnually && period === 'monthly') {
       await locators.toggle(planSlug).click();
-      attempts++;
     }
 
-    // Final verification that we're in the correct state
-    const finalState = await isToggleStateMatchingPeriod(period);
-    if (!finalState) {
-      throw new Error(`Pricing period toggle ended in incorrect state for ${period}`);
+    if (!isAnnually && period === 'annually') {
+      await locators.toggle(planSlug).click();
     }
   };
 
