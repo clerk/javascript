@@ -91,7 +91,6 @@
     "@types/cloudflare-turnstile": "^0.2.2",
     "@types/webpack-env": "^1.18.8",
     "jsdom": "^24.1.1",
-    "vite-plugin-svgr": "^4.2.0",
     "webpack-merge": "^5.10.0"
   },
   "peerDependencies": {

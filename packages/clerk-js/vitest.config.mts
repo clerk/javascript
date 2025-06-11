@@ -1,6 +1,5 @@
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
-import svgr from 'vite-plugin-svgr';
 import { defineConfig } from 'vitest/config';
 
 function viteSvgMockPlugin() {
@@ -23,7 +22,7 @@ function viteSvgMockPlugin() {
 }
 
 export default defineConfig({
-  plugins: [react({ jsxRuntime: 'automatic', jsxImportSource: '@emotion/react' }), svgr(), viteSvgMockPlugin()],
+  plugins: [react({ jsxRuntime: 'automatic', jsxImportSource: '@emotion/react' }), viteSvgMockPlugin()],
   define: {
     __BUILD_VARIANT_CHIPS__: JSON.stringify(false),
     __PKG_NAME__: JSON.stringify('@clerk/clerk-js'),
