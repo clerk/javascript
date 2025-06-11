@@ -74,6 +74,8 @@ type SignInSliceState = {
   signin: {
     status: SignInStatus | null;
     setStatus: (status: SignInStatus | null) => void;
+    error: { global: string | null; fields: Record<string, string> };
+    setError: (error: { global: string | null; fields: Record<string, string> }) => void;
   };
 };
 
@@ -94,6 +96,16 @@ const createSignInSlice = (set: any, _get: any): SignInSliceState => ({
         },
       }));
     },
+    error: { global: null, fields: {} },
+    setError: (error: { global: string | null; fields: Record<string, string> }) => {
+      set((state: any) => ({
+        ...state,
+        signin: {
+          ...state.signin,
+          error: error,
+        },
+      }));
+    },
   },
 });
 
@@ -107,7 +119,6 @@ export class SignIn extends BaseResource implements SignInResource {
   id?: string;
   identifier: string | null = null;
   secondFactorVerification: VerificationResource = new Verification(null);
-  signInError: { global: string | null; fields: Record<string, string> } = { global: null, fields: {} };
   supportedFirstFactors: SignInFirstFactor[] | null = [];
   supportedIdentifiers: SignInIdentifier[] = [];
   supportedSecondFactors: SignInSecondFactor[] | null = null;
@@ -133,11 +144,23 @@ export class SignIn extends BaseResource implements SignInResource {
    * Reading and writing goes directly to/from the store.
    */
   get status(): SignInStatus | null {
-    return (this.store.getState() as CombinedSignInStore).signin.status;
+    return (this._store.getState() as unknown as CombinedSignInStore).signin.status;
   }
 
   set status(newStatus: SignInStatus | null) {
-    (this.store.getState() as CombinedSignInStore).signin.setStatus(newStatus);
+    (this._store.getState() as unknown as CombinedSignInStore).signin.setStatus(newStatus);
+  }
+
+  /**
+   * Reactive signInError property backed by the store.
+   * Reading and writing goes directly to/from the store.
+   */
+  get signInError(): { global: string | null; fields: Record<string, string> } {
+    return (this._store.getState() as unknown as CombinedSignInStore).signin.error;
+  }
+
+  set signInError(newError: { global: string | null; fields: Record<string, string> }) {
+    (this._store.getState() as unknown as CombinedSignInStore).signin.setError(newError);
   }
 
   private updateError(globalError: string | null, fieldErrors: Record<string, string> = {}) {
