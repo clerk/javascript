@@ -75,18 +75,50 @@ const createStoreObservable = (signInResource: SignInResource) => {
 const wrapSignInWithObservable = (signIn: SignInResource): ObservableSignInResource => {
   const observable = createStoreObservable(signIn);
   
-  return new Proxy(signIn, {
+  // Create a new object that extends the signIn resource with the observable method
+  const wrappedSignIn = Object.create(signIn);
+  
+  // Add the observable method directly to the object
+  Object.defineProperty(wrappedSignIn, 'observable', {
+    value: observable,
+    writable: false,
+    enumerable: true,
+    configurable: false
+  });
+  
+  // Also use a Proxy to ensure all other properties are properly forwarded
+  return new Proxy(wrappedSignIn, {
     get(target, prop) {
       if (prop === 'observable') {
         return observable;
       }
-      return (target as any)[prop];
+      // Forward to the original signIn object for all other properties
+      return (target)[prop] ?? (signIn as any)[prop];
     },
     has(target, prop) {
       if (prop === 'observable') {
         return true;
       }
-      return prop in target;
+      return prop in target || prop in signIn;
+    },
+    ownKeys(target) {
+      // Include 'observable' in the list of own keys
+      const keys = [...Object.getOwnPropertyNames(target), ...Object.getOwnPropertyNames(signIn)];
+      if (!keys.includes('observable')) {
+        keys.push('observable');
+      }
+      return keys;
+    },
+    getOwnPropertyDescriptor(target, prop) {
+      if (prop === 'observable') {
+        return {
+          value: observable,
+          writable: false,
+          enumerable: true,
+          configurable: false
+        };
+      }
+      return Object.getOwnPropertyDescriptor(target, prop) || Object.getOwnPropertyDescriptor(signIn, prop);
     }
   }) as ObservableSignInResource;
 };
@@ -134,8 +166,10 @@ export const useSignIn = () => {
   }
 
   const createProxy = <T>(target: 'signIn' | 'setActive'): T => {
+    const proxyTarget = target === 'signIn' ? { observable: () => ({}) } : {};
+    
     return new Proxy(
-      {},
+      proxyTarget,
       {
         get(_, prop) {
           // Handle the observable property for the proxy as well
@@ -186,6 +220,24 @@ export const useSignIn = () => {
           // Return true for all other properties to indicate they exist on the proxy
           return true;
         },
+        ownKeys(_) {
+          // For signIn proxy, include 'observable' in enumerable keys
+          if (target === 'signIn') {
+            return ['observable'];
+          }
+          return [];
+        },
+        getOwnPropertyDescriptor(_, prop) {
+          if (prop === 'observable' && target === 'signIn') {
+            return {
+              value: () => ({}),
+              writable: false,
+              enumerable: true,
+              configurable: false
+            };
+          }
+          return undefined;
+        }
       },
     ) as T;
   };
