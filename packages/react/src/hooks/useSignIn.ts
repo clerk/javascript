@@ -1,6 +1,7 @@
-import { useClientContext } from '@clerk/shared/react';
+import { ClerkInstanceContext,useClientContext } from '@clerk/shared/react';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
 import type { SetActive, SignInResource } from '@clerk/types';
+import { useContext } from 'react';
 import { useStore } from 'zustand';
 
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
@@ -91,11 +92,16 @@ const wrapSignInWithObservable = (signIn: SignInResource): ObservableSignInResou
 };
 
 export const useSignIn = () => {
+  // Check if ClerkProvider context is available first
+  const clerkInstanceContext = useContext(ClerkInstanceContext);
+  
   const isomorphicClerk = useIsomorphicClerkContext();
   const client = useClientContext();
 
-  // Assert provider is available - this is required for proper Clerk integration
-  useAssertWrappedByClerkProvider('useSignIn');
+  // Only assert ClerkProvider if we have some context - this allows proxy fallback
+  if (clerkInstanceContext) {
+    useAssertWrappedByClerkProvider('useSignIn');
+  }
 
   isomorphicClerk?.telemetry?.record(eventMethodCalled('useSignIn'));
 
@@ -158,9 +164,11 @@ export const useSignIn = () => {
               });
 
               setTimeout(() => {
+                // Re-check context when the queued call executes
                 const currentClient = useClientContext();
+                const currentIsomorphicClerk = useIsomorphicClerkContext();
                 if (currentClient) {
-                  processQueue(currentClient.signIn, isomorphicClerk.setActive);
+                  processQueue(currentClient.signIn, currentIsomorphicClerk.setActive);
                 }
               }, 0);
             });
