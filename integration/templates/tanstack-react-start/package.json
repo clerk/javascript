@@ -8,13 +8,9 @@
     "start": "vinxi start --port=$PORT"
   },
   "dependencies": {
-    "@tanstack/react-start-plugin": "1.114.6",
-    "@tanstack/react-router": "1.114.6",
-    "@tanstack/router-generator": "1.114.6",
-    "@tanstack/react-router-devtools": "1.114.6",
-    "@tanstack/react-start": "1.114.6",
-    "@tanstack/react-start-config": "1.114.6",
-    "@tanstack/router-plugin": "1.114.6",
+    "@tanstack/react-router": "1.115.0",
+    "@tanstack/react-router-devtools": "1.115.0",
+    "@tanstack/react-start": "1.115.0",
     "@typescript-eslint/parser": "^7.18.0",
     "isbot": "^5.1.17",
     "react": "18.3.1",
