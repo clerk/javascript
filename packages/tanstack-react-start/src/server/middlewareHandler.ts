@@ -21,7 +21,7 @@ export function createClerkHandler<TRouter extends AnyRouter>(
 
         // Merging the TanStack router context with the Clerk context and loading the router
         router.update({
-          context: { ...router.options.context, ...clerkInitialState },
+          context: { ...router.options.context, clerkInitialState },
         });
 
         headers.forEach((value, key) => {
