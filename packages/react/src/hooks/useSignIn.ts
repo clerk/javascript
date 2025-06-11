@@ -51,9 +51,21 @@ type ObservableSignInResource = SignInResource & {
  */
 const createStoreObservable = (signInResource: SignInResource) => {
   return () => {
-    const store = (signInResource as any).store;
+    // Try both 'store' and '_store' properties
+    const store = (signInResource as any).store || (signInResource as any)._store;
+    
+    // Debug logging
+    console.log('createStoreObservable debug:', {
+      hasStore: !!store,
+      hasPublicStore: !!((signInResource as any).store),
+      hasPrivateStore: !!((signInResource as any)._store),
+      storeType: typeof store,
+      signInResourceKeys: Object.keys(signInResource),
+      isSSR: typeof window === 'undefined'
+    });
     
     if (!store) {
+      console.log('No store found, returning empty object');
       // Return empty state if store is not available
       return {};
     }
@@ -61,11 +73,15 @@ const createStoreObservable = (signInResource: SignInResource) => {
     // During SSR, return the current state without subscribing
     // This prevents hydration mismatches
     if (typeof window === 'undefined') {
-      return store.getState();
+      const serverState = store.getState();
+      console.log('SSR mode, returning server state:', serverState);
+      return serverState;
     }
 
     // On client, use Zustand's built-in React integration
-    return useStore(store);
+    const clientState = useStore(store);
+    console.log('Client mode, returning client state:', clientState);
+    return clientState;
   };
 };
 
