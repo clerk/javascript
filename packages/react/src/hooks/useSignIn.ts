@@ -49,11 +49,21 @@ export const useSignIn = () => {
     };
   }
 
-  const createProxy = (target: 'signIn' | 'setActive') => {
+  const createProxy = <T>(target: 'signIn' | 'setActive'): T => {
     return new Proxy(
       {},
       {
         get(_, prop) {
+          // Prevent React from treating this proxy as a Promise by returning undefined for 'then'
+          if (prop === 'then') {
+            return undefined;
+          }
+          
+          // Handle Symbol properties and other non-method properties
+          if (typeof prop === 'symbol' || typeof prop !== 'string') {
+            return undefined;
+          }
+
           return (...args: any[]) => {
             return new Promise((resolve, reject) => {
               callQueue.push({
@@ -73,13 +83,21 @@ export const useSignIn = () => {
             });
           };
         },
+        has(_, prop) {
+          // Return false for 'then' to prevent Promise-like behavior
+          if (prop === 'then') {
+            return false;
+          }
+          // Return true for all other properties to indicate they exist on the proxy
+          return true;
+        },
       },
-    );
+    ) as T;
   };
 
   return {
     isLoaded: true,
-    signIn: createProxy('signIn') as SignInResource,
-    setActive: createProxy('setActive') as SetActive,
+    signIn: createProxy<SignInResource>('signIn'),
+    setActive: createProxy<SetActive>('setActive'),
   };
 };
