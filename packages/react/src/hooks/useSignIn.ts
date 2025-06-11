@@ -78,12 +78,12 @@ const wrapSignInWithObservable = (signIn: SignInResource): ObservableSignInResou
   // Create a new object that extends the signIn resource with the observable method
   const wrappedSignIn = Object.create(signIn);
   
-  // Add the observable method directly to the object
+  // Add the observable method directly to the object with proper descriptor
   Object.defineProperty(wrappedSignIn, 'observable', {
     value: observable,
     writable: false,
     enumerable: true,
-    configurable: false
+    configurable: true
   });
   
   // Also use a Proxy to ensure all other properties are properly forwarded
@@ -102,21 +102,16 @@ const wrapSignInWithObservable = (signIn: SignInResource): ObservableSignInResou
       return prop in target || prop in signIn;
     },
     ownKeys(target) {
-      // Include 'observable' in the list of own keys
-      const keys = [...Object.getOwnPropertyNames(target), ...Object.getOwnPropertyNames(signIn)];
-      if (!keys.includes('observable')) {
-        keys.push('observable');
-      }
-      return keys;
+      // Get keys from both target and original signIn, avoiding duplicates
+      const targetKeys = Object.getOwnPropertyNames(target);
+      const signInKeys = Object.getOwnPropertyNames(signIn);
+      const allKeys = new Set([...targetKeys, ...signInKeys]);
+      return Array.from(allKeys);
     },
     getOwnPropertyDescriptor(target, prop) {
       if (prop === 'observable') {
-        return {
-          value: observable,
-          writable: false,
-          enumerable: true,
-          configurable: false
-        };
+        // Return the actual descriptor from the target
+        return Object.getOwnPropertyDescriptor(target, prop);
       }
       return Object.getOwnPropertyDescriptor(target, prop) || Object.getOwnPropertyDescriptor(signIn, prop);
     }
@@ -166,15 +161,25 @@ export const useSignIn = () => {
   }
 
   const createProxy = <T>(target: 'signIn' | 'setActive'): T => {
-    const proxyTarget = target === 'signIn' ? { observable: () => ({}) } : {};
+    const proxyTarget: any = {};
+    
+    // For signIn proxy, add the observable method to the target
+    if (target === 'signIn') {
+      Object.defineProperty(proxyTarget, 'observable', {
+        value: () => ({}),
+        writable: false,
+        enumerable: true,
+        configurable: true
+      });
+    }
     
     return new Proxy(
       proxyTarget,
       {
         get(_, prop) {
           // Handle the observable property for the proxy as well
-          if (prop === 'observable') {
-            return () => ({});
+          if (prop === 'observable' && target === 'signIn') {
+            return proxyTarget.observable;
           }
           
           // Prevent React from treating this proxy as a Promise by returning undefined for 'then'
@@ -210,7 +215,7 @@ export const useSignIn = () => {
         },
         has(_, prop) {
           // Return true for observable
-          if (prop === 'observable') {
+          if (prop === 'observable' && target === 'signIn') {
             return true;
           }
           // Return false for 'then' to prevent Promise-like behavior
@@ -221,22 +226,12 @@ export const useSignIn = () => {
           return true;
         },
         ownKeys(_) {
-          // For signIn proxy, include 'observable' in enumerable keys
-          if (target === 'signIn') {
-            return ['observable'];
-          }
-          return [];
+          // Return the actual keys from the target
+          return Object.getOwnPropertyNames(proxyTarget);
         },
         getOwnPropertyDescriptor(_, prop) {
-          if (prop === 'observable' && target === 'signIn') {
-            return {
-              value: () => ({}),
-              writable: false,
-              enumerable: true,
-              configurable: false
-            };
-          }
-          return undefined;
+          // Return the actual descriptor from the target
+          return Object.getOwnPropertyDescriptor(proxyTarget, prop);
         }
       },
     ) as T;
