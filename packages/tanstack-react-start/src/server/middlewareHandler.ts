@@ -17,11 +17,15 @@ export function createClerkHandler<TRouter extends AnyRouter>(
 
         const requestState = await authenticateRequest(request, loadedOptions);
 
-        const clerkInitialState = getResponseClerkState(requestState, loadedOptions);
+        const { clerkInitialState, headers } = getResponseClerkState(requestState, loadedOptions);
 
         // Merging the TanStack router context with the Clerk context and loading the router
         router.update({
           context: { ...router.options.context, ...clerkInitialState },
+        });
+
+        headers.forEach((value, key) => {
+          responseHeaders.set(key, value);
         });
 
         await router.load();
