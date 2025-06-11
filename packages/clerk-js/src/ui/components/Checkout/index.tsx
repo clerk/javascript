@@ -23,7 +23,7 @@ export const Checkout = (props: __internal_CheckoutProps) => {
             <Drawer.Content>
               <Drawer.Header title={localizationKeys('commerce.checkout.title')} />
               <CheckoutPage.Root>
-                <CheckoutPage.Stage name='pending'>
+                <CheckoutPage.Stage name='initializing'>
                   <Spinner
                     sx={{
                       margin: 'auto',
@@ -47,7 +47,7 @@ export const Checkout = (props: __internal_CheckoutProps) => {
                   <AddEmailForm />
                 </CheckoutPage.Stage>
 
-                <CheckoutPage.Stage name='ready'>
+                <CheckoutPage.Stage name='initialized'>
                   <CheckoutForm />
                 </CheckoutPage.Stage>
               </CheckoutPage.Root>

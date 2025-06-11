@@ -9,7 +9,7 @@ import { EmailForm } from '../UserProfile/EmailForm';
 import { useCheckoutContextRoot } from './CheckoutPage';
 
 export const GenericError = () => {
-  const { errors } = useCheckoutContextRoot();
+  const { error } = useCheckoutContextRoot();
   const { translateError } = useLocalizations();
   const { t } = useLocalizations();
   return (
@@ -27,7 +27,9 @@ export const GenericError = () => {
           variant='danger'
           colorScheme='danger'
         >
-          {errors ? translateError(errors[0]) : t(localizationKeys('unstable__errors.form_param_value_invalid'))}
+          {error?.errors
+            ? translateError(error.errors[0])
+            : t(localizationKeys('unstable__errors.form_param_value_invalid'))}
         </Alert>
       </Flex>
     </Drawer.Body>
@@ -84,7 +86,7 @@ export const InvalidPlanError = () => {
 };
 
 export const AddEmailForm = () => {
-  const { startCheckout } = useCheckoutContextRoot();
+  const { start } = useCheckoutContextRoot();
   const { setIsOpen } = useDrawerContext();
   return (
     <Drawer.Body>
@@ -97,7 +99,7 @@ export const AddEmailForm = () => {
         <EmailForm
           title={localizationKeys('commerce.checkout.emailForm.title')}
           subtitle={localizationKeys('commerce.checkout.emailForm.subtitle')}
-          onSuccess={startCheckout}
+          onSuccess={start}
           onReset={() => setIsOpen(false)}
           disableAutoFocus
         />
