@@ -77,6 +77,7 @@ export const useSignIn = () => {
   };
 
   return {
+    isLoaded: true,
     signIn: createProxy('signIn') as SignInResource,
     setActive: createProxy('setActive') as SetActive,
   };
