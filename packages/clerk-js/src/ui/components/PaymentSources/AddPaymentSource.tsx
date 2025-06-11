@@ -290,7 +290,6 @@ const AddPaymentSourceForm = ({ children }: PropsWithChildren) => {
               type: 'tabs',
               defaultCollapsed: false,
             },
-            // TODO(@COMMERCE): Should this be fetched from the fapi?
             paymentMethodOrder: paymentMethodOrder || ['card'],
             applePay: checkout
               ? {

@@ -116,7 +116,7 @@ export const StatementPage = () => {
           ))}
         </Statement.Body>
         <Statement.Footer
-          label='Total paid'
+          label={localizationKeys(`${localizationRoot}.billingPage.statementsSection.totalPaid`)}
           value={`${statement.totals.grandTotal.currencySymbol}${statement.totals.grandTotal.amountFormatted}`}
         />
       </Statement.Root>
