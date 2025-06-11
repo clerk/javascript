@@ -32,6 +32,7 @@
     "eslint.config.mjs",
     "typedoc.config.mjs",
     "vitest.workspace.mjs",
+    "packages/*/jest.config.js",
     "packages/astro/src/astro-components/**/*.ts",
     "packages/backend/src/runtime/**/*",
     "packages/clerk-js/rspack.config.js",

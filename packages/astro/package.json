@@ -82,7 +82,7 @@
     "dev": "tsup --watch --onSuccess \"pnpm build:dts\"",
     "lint": "eslint src env.d.ts",
     "lint:attw": "attw --pack . --profile esm-only --ignore-rules internal-resolution-error",
-    "lint:oxlint": "oxlint src env.d.ts",
+    "lint:oxlint": "oxlint --quiet src env.d.ts",
     "lint:publint": "pnpm copy:components && publint",
     "publish:local": "pnpm yalc push --replace --sig"
   },

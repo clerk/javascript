@@ -40,7 +40,7 @@ export class OrganizationMembership extends BaseResource implements Organization
     }).then(res => {
       // TODO: Fix typing
       const { data: suggestions, total_count } =
-        res?.response as unknown as ClerkPaginatedResponse<OrganizationMembershipJSON>;
+        res?.response as unknown as ClerkPaginatedResponse<OrganizationMembershipJSON>; // oxlint-disable-line no-unsafe-optional-chaining
 
       return {
         total_count,

@@ -244,6 +244,7 @@ export function relativeToAbsoluteUrl(url: string, origin: string | URL): URL {
 
 // Regular expression to detect disallowed patterns
 const disallowedPatterns = [
+  // oxlint-disable-next-line no-control-regex
   /\0/, // Null bytes
   /^\/\//, // Protocol-relative
   // eslint-disable-next-line no-control-regex
@@ -258,6 +259,12 @@ export function isProblematicUrl(url: URL): boolean {
   if (hasBannedProtocol(url)) {
     return true;
   }
+
+  // Check for null bytes in pathname
+  if (url.pathname.includes('\0')) {
+    return true;
+  }
+
   // Check against disallowed patterns
   for (const pattern of disallowedPatterns) {
     if (pattern.test(url.pathname)) {

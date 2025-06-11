@@ -50,7 +50,7 @@ export class CommerceBilling implements CommerceBillingNamespace {
       search: convertPageToOffsetSearchParams(rest),
     }).then(res => {
       const { data: subscriptions, total_count } =
-        res?.response as unknown as ClerkPaginatedResponse<CommerceSubscriptionJSON>;
+        res?.response as unknown as ClerkPaginatedResponse<CommerceSubscriptionJSON>; // oxlint-disable-line no-unsafe-optional-chaining
 
       return {
         total_count,
@@ -68,7 +68,7 @@ export class CommerceBilling implements CommerceBillingNamespace {
       search: convertPageToOffsetSearchParams(rest),
     }).then(res => {
       const { data: statements, total_count } =
-        res?.response as unknown as ClerkPaginatedResponse<CommerceStatementJSON>;
+        res?.response as unknown as ClerkPaginatedResponse<CommerceStatementJSON>; // oxlint-disable-line no-unsafe-optional-chaining
 
       return {
         total_count,
@@ -87,6 +87,7 @@ export class CommerceBilling implements CommerceBillingNamespace {
       method: 'GET',
       search: convertPageToOffsetSearchParams(rest),
     }).then(res => {
+      // oxlint-disable-next-line no-unsafe-optional-chaining
       const { data: payments, total_count } = res as unknown as ClerkPaginatedResponse<CommercePaymentJSON>;
 
       return {
