@@ -185,6 +185,7 @@ type _LocalizationResource = {
         subtitle: LocalizationValue;
       };
       downgradeNotice: LocalizationValue;
+      pastDueNotice: LocalizationValue;
       perMonth: LocalizationValue;
     };
   };

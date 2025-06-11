@@ -6,7 +6,41 @@ describe('Environment', () => {
   it('defaults values when instantiated without arguments', () => {
     const environment = new Environment();
 
-    expect(environment).toMatchSnapshot();
+    expect(environment).toMatchObject({
+      authConfig: expect.objectContaining({
+        singleSessionMode: false,
+        reverification: false,
+      }),
+      displayConfig: expect.objectContaining({
+        instanceEnvironmentType: '',
+        preferredSignInStrategy: 'password',
+        branded: false,
+        showDevModeWarning: false,
+      }),
+      userSettings: expect.objectContaining({
+        attributes: expect.objectContaining({
+          email_address: expect.objectContaining({
+            enabled: true,
+            required: true,
+            used_for_first_factor: true,
+            verify_at_sign_up: true,
+          }),
+          password: expect.objectContaining({
+            enabled: true,
+            required: true,
+          }),
+        }),
+        actions: expect.objectContaining({
+          delete_self: false,
+          create_organization: false,
+        }),
+      }),
+      organizationSettings: expect.objectContaining({
+        enabled: false,
+        maxAllowedMemberships: 1,
+      }),
+      maintenanceMode: false,
+    });
   });
 
   it('has the same initial properties', () => {
@@ -246,7 +280,53 @@ describe('Environment', () => {
 
     const environment = new Environment(environmentJSON);
 
-    expect(environment).toMatchSnapshot();
+    expect(environment).toMatchObject({
+      authConfig: expect.objectContaining({
+        singleSessionMode: true,
+        reverification: true,
+      }),
+      displayConfig: expect.objectContaining({
+        instanceEnvironmentType: 'development',
+        applicationName: '',
+        branded: true,
+        showDevModeWarning: true,
+        preferredSignInStrategy: 'password',
+        theme: expect.objectContaining({
+          general: expect.objectContaining({
+            color: '#6c47ff',
+          }),
+        }),
+      }),
+      userSettings: expect.objectContaining({
+        attributes: expect.objectContaining({
+          email_address: expect.objectContaining({
+            enabled: true,
+            required: true,
+            used_for_first_factor: true,
+            verify_at_sign_up: true,
+          }),
+          password: expect.objectContaining({
+            enabled: true,
+            required: true,
+          }),
+        }),
+        actions: expect.objectContaining({
+          delete_self: true,
+          create_organization: true,
+        }),
+        social: expect.objectContaining({
+          oauth_google: expect.objectContaining({
+            enabled: true,
+            authenticatable: true,
+          }),
+        }),
+      }),
+      organizationSettings: expect.objectContaining({
+        enabled: false,
+        maxAllowedMemberships: 5,
+      }),
+      maintenanceMode: false,
+    });
   });
 
   it('__internal_toSnapshot()', () => {
@@ -485,6 +565,42 @@ describe('Environment', () => {
 
     const environment = new Environment(environmentJSON);
 
-    expect(environment.__internal_toSnapshot()).toMatchSnapshot();
+    expect(environment.__internal_toSnapshot()).toMatchObject({
+      object: 'environment',
+      auth_config: expect.objectContaining({
+        single_session_mode: true,
+        reverification: true,
+      }),
+      display_config: expect.objectContaining({
+        instance_environment_type: 'development',
+        application_name: '',
+        branded: true,
+        show_devmode_warning: true,
+        preferred_sign_in_strategy: 'password',
+      }),
+      user_settings: expect.objectContaining({
+        attributes: expect.objectContaining({
+          email_address: expect.objectContaining({
+            enabled: true,
+            required: true,
+            used_for_first_factor: true,
+            verify_at_sign_up: true,
+          }),
+          password: expect.objectContaining({
+            enabled: true,
+            required: true,
+          }),
+        }),
+        actions: expect.objectContaining({
+          delete_self: true,
+          create_organization: true,
+        }),
+      }),
+      organization_settings: expect.objectContaining({
+        enabled: false,
+        max_allowed_memberships: 5,
+      }),
+      maintenance_mode: false,
+    });
   });
 });
