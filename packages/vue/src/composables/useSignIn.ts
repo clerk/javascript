@@ -20,11 +20,7 @@ type UseSignIn = () => ToComputedRefs<UseSignInReturn>;
  * </script>
  *
  * <template>
- *   <div v-if="!isLoaded">
- *     <!-- Handle loading state -->
- *   </div>
- *
- *   <div v-else>
+ *   <div>
  *     The current sign in attempt status is {{ signIn.status }}.
  *   </div>
  * </template>
@@ -41,7 +37,37 @@ export const useSignIn: UseSignIn = () => {
 
   const result = computed<UseSignInReturn>(() => {
     if (!clerk.value || !clientCtx.value) {
-      return { isLoaded: false, signIn: undefined, setActive: undefined };
+      // Create proxy objects that queue calls until clerk loads
+      const createProxy = (target: 'signIn' | 'setActive') => {
+        return new Proxy({}, {
+          get(_, prop) {
+            return (...args: any[]) => {
+              return new Promise((resolve, reject) => {
+                // Wait for next tick and try again
+                setTimeout(() => {
+                  if (clerk.value && clientCtx.value) {
+                    const targetObj = target === 'setActive' ? clerk.value.setActive : clientCtx.value.signIn;
+                    try {
+                      const result = (targetObj as any)[prop](...args);
+                      resolve(result);
+                    } catch (error) {
+                      reject(error);
+                    }
+                  } else {
+                    reject(new Error('Clerk not loaded'));
+                  }
+                }, 0);
+              });
+            };
+          },
+        });
+      };
+
+      return {
+        isLoaded: true,
+        signIn: createProxy('signIn') as any,
+        setActive: createProxy('setActive') as any,
+      };
     }
 
     return {
