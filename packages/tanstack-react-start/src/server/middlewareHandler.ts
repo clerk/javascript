@@ -15,7 +15,10 @@ export function createClerkHandler<TRouter extends AnyRouter>(
       try {
         const loadedOptions = loadOptions(request, clerkOptions);
 
-        const requestState = await authenticateRequest(request, loadedOptions);
+        const requestState = await authenticateRequest(request, {
+          ...loadedOptions,
+          acceptsToken: 'any',
+        });
 
         const { clerkInitialState, headers } = getResponseClerkState(requestState, loadedOptions);
 
