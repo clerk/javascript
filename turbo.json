@@ -102,6 +102,27 @@
       "cache": false
     },
     "lint": {
+      "dependsOn": ["lint:oxlint"],
+      "inputs": [
+        "**/*.js",
+        "**/*.jsx",
+        "**/*.ts",
+        "**/*.tsx",
+        "**/*.json",
+        "**/*.md",
+        "**/*.mdx",
+        ".github/**",
+        "!*/package.json",
+        "!**/__snapshots__/**",
+        "!CHANGELOG.md",
+        "!coverage/**",
+        "!dist/**",
+        "!examples/**",
+        "!node_modules/**"
+      ],
+      "outputs": []
+    },
+    "lint:oxlint": {
       "dependsOn": ["^build"],
       "inputs": [
         "**/*.js",
