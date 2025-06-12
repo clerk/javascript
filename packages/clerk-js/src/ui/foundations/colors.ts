@@ -68,7 +68,7 @@ export const colors: Colors = Object.freeze({
   colorTextSecondary: clerkCssVar('secondary-foreground', '#747686'),
   colorInputText: clerkCssVar('input-foreground', '#131316'),
   colorTextOnPrimaryBackground: clerkCssVar('primary-foreground', 'white'),
-  colorShimmer: transparentize(clerkCssVar('shimmer', 'white'), '36%'),
+  colorShimmer: clerkCssVar('shimmer', transparentize('white', '36%')),
   transparent: 'transparent',
   white: 'white',
   black: 'black',

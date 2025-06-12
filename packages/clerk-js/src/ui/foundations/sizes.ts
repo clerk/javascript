@@ -69,15 +69,15 @@ const space = Object.freeze({
 
 const sizes = Object.freeze({ ...space } as const);
 
-const radiiDefaultVar = clerkCssVar('border-radius', '0.375rem');
+const radiiDefaultVar = clerkCssVar('radius', '0.375rem');
 const radii = Object.freeze({
   none: '0px',
   circle: '50%',
-  avatar: clerkCssVar('border-radius-avatar', radiiDefaultVar), // 0.375rem
-  sm: clerkCssVar('border-radius-sm', `calc(${radiiDefaultVar} * 0.666)`), // 0.25rem
-  md: clerkCssVar('border-radius-md', radiiDefaultVar), // 0.375rem
-  lg: clerkCssVar('border-radius-lg', `calc(${radiiDefaultVar} * 1.333)`), // 0.5rem
-  xl: clerkCssVar('border-radius-xl', `calc(${radiiDefaultVar} * 2)`), // 0.75rem
+  avatar: clerkCssVar('radius-avatar', radiiDefaultVar), // 0.375rem
+  sm: clerkCssVar('radius-sm', `calc(${radiiDefaultVar} * 0.666)`), // 0.25rem
+  md: clerkCssVar('radius-md', radiiDefaultVar), // 0.375rem
+  lg: clerkCssVar('radius-lg', `calc(${radiiDefaultVar} * 1.333)`), // 0.5rem
+  xl: clerkCssVar('radius-xl', `calc(${radiiDefaultVar} * 2)`), // 0.75rem
   halfHeight: '99999px',
 } as const);
 
