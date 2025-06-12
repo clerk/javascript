@@ -1,7 +1,7 @@
-import { ClerkInstanceContext,useClientContext } from '@clerk/shared/react';
+import { ClerkInstanceContext, useClientContext } from '@clerk/shared/react';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
 import type { SetActive, SignInResource } from '@clerk/types';
-import { useContext, useMemo } from 'react';
+import { useCallback,useContext, useMemo } from 'react';
 import { useStore } from 'zustand';
 
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
@@ -20,33 +20,28 @@ type QueuedCall = {
  */
 type ObservableSignInResource = SignInResource & {
   /**
-   * A React hook that subscribes to the SignIn store and triggers re-renders
-   * when the store state changes. This allows React components to reactively
-   * respond to changes in the SignIn flow state.
-   * 
-   * @example
-   * ```tsx
-   * function MyComponent() {
-   *   const { signIn } = useSignIn();
-   *   const storeState = signIn.observable();
-   *   
-   *   // Re-renders when SignIn store state changes
-   *   return (
-   *     <div>
-   *       <p>Status: {storeState.signin.status}</p>
-   *       <p>Error: {storeState.signin.error.global}</p>
-   *       <p>Resource Status: {storeState.resource.status}</p>
-   *     </div>
-   *   );
-   * }
-   * ```
+   * The observable store state. This is not a function but the actual state.
+   * Components using this should access it directly from the useSignIn hook result.
    */
-  observable: () => any;
+  observableState?: any;
+};
+
+/**
+ * Return type for the useSignIn hook
+ */
+type UseSignInReturn = {
+  isLoaded: boolean;
+  signIn: ObservableSignInResource;
+  setActive: SetActive;
+  /**
+   * The observable store state. Use this to access the SignIn store state.
+   * This value will trigger re-renders when the store state changes.
+   */
+  signInStore: any;
 };
 
 /**
  * A stable fallback store that maintains consistent behavior when no real store exists.
- * This prevents hook call inconsistencies by ensuring useStore always has a valid store.
  */
 const FALLBACK_STORE = {
   getState: () => ({}),
@@ -55,94 +50,7 @@ const FALLBACK_STORE = {
   destroy: () => {}
 };
 
-/**
- * A stable hook that can be used to observe SignIn store state.
- * This hook always calls the same internal hooks in the same order to prevent
- * "Rendered more hooks than during the previous render" errors.
- */
-function useSignInObservable(signInResource: SignInResource | null) {
-  // CRITICAL: We must always call useStore with a stable store reference
-  // to prevent "Rendered more hooks than during the previous render" errors
-  
-  // Memoize the store selection to prevent unnecessary re-renders
-  const store = useMemo(() => {
-    if (!signInResource) return FALLBACK_STORE;
-    
-    // Try both 'store' and '_store' properties, but default to fallback
-    return (signInResource as any).store || (signInResource as any)._store || FALLBACK_STORE;
-  }, [signInResource]);
-  
-  // Always call useStore with a consistent store reference
-  const storeState = useStore(store);
-  
-  // Determine if we have a real store
-  const hasRealStore = store !== FALLBACK_STORE;
-  
-  // Return memoized result to prevent unnecessary re-renders
-  return useMemo(() => {
-    // If we're using the fallback store, return empty state
-    if (!hasRealStore) {
-      console.log('No real store found, returning empty object');
-      return {};
-    }
-
-    // Return the actual store state
-    console.log('Returning store state:', storeState);
-    return storeState;
-  }, [hasRealStore, storeState]);
-}
-
-/**
- * Wraps a SignInResource with observable capabilities for React.
- */
-const wrapSignInWithObservable = (signIn: SignInResource): ObservableSignInResource => {
-  // Create a stable observable function that captures the signIn resource
-  const observable = () => useSignInObservable(signIn);
-  
-  // Create a new object that extends the signIn resource with the observable method
-  const wrappedSignIn = Object.create(signIn);
-  
-  // Add the observable method directly to the object with proper descriptor
-  Object.defineProperty(wrappedSignIn, 'observable', {
-    value: observable,
-    writable: false,
-    enumerable: true,
-    configurable: true
-  });
-  
-  // Also use a Proxy to ensure all other properties are properly forwarded
-  return new Proxy(wrappedSignIn, {
-    get(target, prop) {
-      if (prop === 'observable') {
-        return observable;
-      }
-      // Forward to the original signIn object for all other properties
-      return (target)[prop] ?? (signIn as any)[prop];
-    },
-    has(target, prop) {
-      if (prop === 'observable') {
-        return true;
-      }
-      return prop in target || prop in signIn;
-    },
-    ownKeys(target) {
-      // Get keys from both target and original signIn, avoiding duplicates
-      const targetKeys = Object.getOwnPropertyNames(target);
-      const signInKeys = Object.getOwnPropertyNames(signIn);
-      const allKeys = new Set([...targetKeys, ...signInKeys]);
-      return Array.from(allKeys);
-    },
-    getOwnPropertyDescriptor(target, prop) {
-      if (prop === 'observable') {
-        // Return the actual descriptor from the target
-        return Object.getOwnPropertyDescriptor(target, prop);
-      }
-      return Object.getOwnPropertyDescriptor(target, prop) || Object.getOwnPropertyDescriptor(signIn, prop);
-    }
-  }) as ObservableSignInResource;
-};
-
-export const useSignIn = () => {
+export const useSignIn = (): UseSignInReturn => {
   // Check if ClerkProvider context is available first
   const clerkInstanceContext = useContext(ClerkInstanceContext);
   
@@ -156,9 +64,31 @@ export const useSignIn = () => {
 
   isomorphicClerk?.telemetry?.record(eventMethodCalled('useSignIn'));
 
+  // Get the store reference - this must be done at the top level
+  const store = useMemo(() => {
+    if (!client?.signIn) return FALLBACK_STORE;
+    
+    // Try both 'store' and '_store' properties, but default to fallback
+    return (client.signIn as any).store || (client.signIn as any)._store || FALLBACK_STORE;
+  }, [client?.signIn]);
+
+  // Always call useStore at the top level with a consistent store reference
+  const storeState = useStore(store);
+
+  // Determine if we have a real store
+  const hasRealStore = store !== FALLBACK_STORE;
+
+  // Compute the final store state
+  const signInStore = useMemo(() => {
+    if (!hasRealStore) {
+      return {};
+    }
+    return storeState;
+  }, [hasRealStore, storeState]);
+
   const callQueue: QueuedCall[] = [];
 
-  const processQueue = (signIn: SignInResource, setActive: SetActive) => {
+  const processQueue = useCallback((signIn: SignInResource, setActive: SetActive) => {
     while (callQueue.length > 0) {
       const queuedCall = callQueue.shift();
       if (!queuedCall) continue;
@@ -172,43 +102,15 @@ export const useSignIn = () => {
         reject(error);
       }
     }
-  };
+  }, []);
 
-  if (client) {
-    processQueue(client.signIn, isomorphicClerk.setActive);
-
-    return {
-      isLoaded: true,
-      signIn: wrapSignInWithObservable(client.signIn),
-      setActive: isomorphicClerk.setActive,
-    };
-  }
-
-  const createProxy = <T>(target: 'signIn' | 'setActive'): T => {
+  const createProxy = useCallback(<T extends any>(target: 'signIn' | 'setActive'): T => {
     const proxyTarget: any = {};
-    
-    // For signIn proxy, add the observable method to the target
-    if (target === 'signIn') {
-      // Create a stable observable function that always returns empty state for proxy
-      const observableFunction = () => useSignInObservable(null);
-      
-      Object.defineProperty(proxyTarget, 'observable', {
-        value: observableFunction,
-        writable: false,
-        enumerable: true,
-        configurable: true
-      });
-    }
     
     return new Proxy(
       proxyTarget,
       {
         get(_, prop) {
-          // Handle the observable property for the proxy as well
-          if (prop === 'observable' && target === 'signIn') {
-            return proxyTarget.observable;
-          }
-          
           // Prevent React from treating this proxy as a Promise by returning undefined for 'then'
           if (prop === 'then') {
             return undefined;
@@ -216,6 +118,11 @@ export const useSignIn = () => {
           
           // Handle Symbol properties and other non-method properties
           if (typeof prop === 'symbol' || typeof prop !== 'string') {
+            return undefined;
+          }
+
+          // For observableState property, return undefined in proxy mode
+          if (prop === 'observableState' && target === 'signIn') {
             return undefined;
           }
 
@@ -228,18 +135,10 @@ export const useSignIn = () => {
                 resolve,
                 reject,
               });
-
-              // Note: We're in the proxy fallback context where client is null
-              // The queue will be processed when the client becomes available
-              // and the component re-renders with the actual SignIn resource
             });
           };
         },
         has(_, prop) {
-          // Return true for observable
-          if (prop === 'observable' && target === 'signIn') {
-            return true;
-          }
           // Return false for 'then' to prevent Promise-like behavior
           if (prop === 'then') {
             return false;
@@ -248,20 +147,42 @@ export const useSignIn = () => {
           return true;
         },
         ownKeys(_) {
-          // Return the actual keys from the target
           return Object.getOwnPropertyNames(proxyTarget);
         },
         getOwnPropertyDescriptor(_, prop) {
-          // Return the actual descriptor from the target
           return Object.getOwnPropertyDescriptor(proxyTarget, prop);
         }
       },
     ) as T;
-  };
+  }, []);
 
-  return {
-    isLoaded: true,
-    signIn: createProxy<ObservableSignInResource>('signIn'),
-    setActive: createProxy<SetActive>('setActive'),
-  };
+  // Memoize the result to prevent unnecessary re-renders
+  return useMemo(() => {
+    if (client) {
+      processQueue(client.signIn, isomorphicClerk.setActive);
+
+      // Create an enhanced signIn object that includes the observable state
+      const enhancedSignIn: ObservableSignInResource = Object.create(client.signIn);
+      Object.defineProperty(enhancedSignIn, 'observableState', {
+        value: signInStore,
+        writable: false,
+        enumerable: true,
+        configurable: true
+      });
+
+      return {
+        isLoaded: true,
+        signIn: enhancedSignIn,
+        setActive: isomorphicClerk.setActive,
+        signInStore,
+      };
+    }
+
+    return {
+      isLoaded: true,
+      signIn: createProxy<ObservableSignInResource>('signIn'),
+      setActive: createProxy<SetActive>('setActive'),
+      signInStore: {},
+    };
+  }, [client, isomorphicClerk?.setActive, signInStore, processQueue, createProxy]);
 };
