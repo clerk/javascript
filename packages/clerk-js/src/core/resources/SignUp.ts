@@ -14,6 +14,7 @@ import type {
   PrepareVerificationParams,
   PrepareWeb3WalletVerificationParams,
   SignUpAuthenticateWithWeb3Params,
+  SignUpCreateOptions,
   SignUpCreateParams,
   SignUpField,
   SignUpIdentificationField,
@@ -83,7 +84,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     this.fromJSON(data);
   }
 
-  create = async (_params: SignUpCreateParams): Promise<SignUpResource> => {
+  create = async (_params: SignUpCreateParams, options?: SignUpCreateOptions): Promise<SignUpResource> => {
     const params: Record<string, unknown> = _params;
 
     // This is a legacy flow, where we allowed specific OAuth providers to bypass the captcha
@@ -97,7 +98,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       body: normalizeUnsafeMetadata(params),
     });
 
-    if (!this.shouldBypassCaptchaForAttempt(params)) {
+    if (!this.shouldBypassCaptchaForAttempt(params) && !options?.skipChallenge) {
       return this.solveChallenge();
     }
 

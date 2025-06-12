@@ -202,8 +202,8 @@ function SignUpStartInternal(): JSX.Element {
 
         // TODO: This is a hack to reset the sign in attempt so that the oauth error
         // does not persist on full page reloads.
-        // We will revise this strategy as part of the Clerk DX epic.
-        void (await signUp.create({}));
+        // This will be handled by the backend (FAPI) in the future.
+        void (await signUp.create({}, { skipChallenge: true }));
       }
     }
 
