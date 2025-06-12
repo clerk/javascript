@@ -229,6 +229,8 @@ function SignInStartInternal(): JSX.Element {
             return navigate('factor-one');
           case 'needs_second_factor':
             return navigate('factor-two');
+          case 'needs_new_password':
+            return navigate('../reset-password');
           case 'complete':
             removeClerkQueryParam('__clerk_ticket');
             return clerk.setActive({
