@@ -1078,6 +1078,9 @@ export class Clerk implements ClerkInterface {
    */
   public mountApiKeys = (node: HTMLDivElement, props?: APIKeysProps) => {
     this.assertComponentsReady(this.#componentControls);
+
+    logger.warnOnce('Clerk: <APIKeys /> component is in early access and not yet recommended for production use.');
+
     if (disabledAPIKeysFeature(this, this.environment)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderAPIKeysComponent, {
