@@ -46,6 +46,7 @@ type UseSignInReturn = {
 const FALLBACK_STATE = {};
 const FALLBACK_STORE = {
   getState: () => FALLBACK_STATE,
+  getInitialState: () => FALLBACK_STATE,
   subscribe: () => () => {}, // Return unsubscribe function
   setState: () => {},
   destroy: () => {}
