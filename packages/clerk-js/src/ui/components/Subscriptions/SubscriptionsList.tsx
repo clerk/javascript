@@ -87,17 +87,17 @@ export function SubscriptionsList({
             <Tr>
               <Th
                 localizationKey={localizationKeys(
-                  `${localizationRoot}.billingPage.subscriptionsListSection.tableHeaders__plan`,
+                  `${localizationRoot}.billingPage.subscriptionsListSection.tableHeader__plan`,
                 )}
               />
               <Th
                 localizationKey={localizationKeys(
-                  `${localizationRoot}.billingPage.subscriptionsListSection.tableHeaders__startDate`,
+                  `${localizationRoot}.billingPage.subscriptionsListSection.tableHeader__startDate`,
                 )}
               />
               <Th
                 localizationKey={localizationKeys(
-                  `${localizationRoot}.billingPage.subscriptionsListSection.tableHeaders__edit`,
+                  `${localizationRoot}.billingPage.subscriptionsListSection.tableHeader__edit`,
                 )}
               />
             </Tr>

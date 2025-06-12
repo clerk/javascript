@@ -18,7 +18,7 @@ import {
 import { useClipboard } from '../../hooks';
 import { Check, Copy } from '../../icons';
 import { useRouter } from '../../router';
-import { truncateWithEndVisible } from '../../utils/truncateTextWithEndVisible';
+import { formatDate, truncateWithEndVisible } from '../../utils';
 
 export const PaymentAttemptPage = () => {
   const { params, navigate } = useRouter();
@@ -92,9 +92,10 @@ export const PaymentAttemptPage = () => {
             <Heading
               elementDescriptor={descriptors.paymentAttemptHeaderTitle}
               textVariant='h2'
-              localizationKey={new Date(
-                paymentAttempt.paidAt || paymentAttempt.failedAt || paymentAttempt.updatedAt,
-              ).toLocaleString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+              localizationKey={formatDate(
+                new Date(paymentAttempt.paidAt || paymentAttempt.failedAt || paymentAttempt.updatedAt),
+                'long',
+              )}
             />
             <Span
               sx={t => ({
@@ -192,8 +193,9 @@ export const PaymentAttemptPage = () => {
               variant='caption'
               colorScheme='secondary'
               elementDescriptor={descriptors.paymentAttemptFooterCurrency}
+              sx={{ textTransform: 'uppercase' }}
             >
-              USD
+              {paymentAttempt.amount.currency}
             </Text>
             <Text
               variant='h3'

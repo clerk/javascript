@@ -768,8 +768,8 @@ type _LocalizationResource = {
         itemCaption__proratedCredit: LocalizationValue;
         itemCaption__subscribedAndPaidForPlan: LocalizationValue;
         notFound: LocalizationValue;
-        tableHeaders__date: LocalizationValue;
-        tableHeaders__amount: LocalizationValue;
+        tableHeader__date: LocalizationValue;
+        tableHeader__amount: LocalizationValue;
         title: LocalizationValue;
         totalPaid: LocalizationValue;
       };
@@ -777,9 +777,9 @@ type _LocalizationResource = {
         title: LocalizationValue;
       };
       subscriptionsListSection: {
-        tableHeaders__plan: LocalizationValue;
-        tableHeaders__startDate: LocalizationValue;
-        tableHeaders__edit: LocalizationValue;
+        tableHeader__plan: LocalizationValue;
+        tableHeader__startDate: LocalizationValue;
+        tableHeader__edit: LocalizationValue;
         title: LocalizationValue;
         actionLabel__newSubscription: LocalizationValue;
         actionLabel__switchPlan: LocalizationValue;
@@ -787,9 +787,9 @@ type _LocalizationResource = {
       paymentHistorySection: {
         empty: LocalizationValue;
         notFound: LocalizationValue;
-        tableHeaders__date: LocalizationValue;
-        tableHeaders__amount: LocalizationValue;
-        tableHeaders__status: LocalizationValue;
+        tableHeader__date: LocalizationValue;
+        tableHeader__amount: LocalizationValue;
+        tableHeader__status: LocalizationValue;
       };
       paymentSourcesSection: {
         title: LocalizationValue;
@@ -994,8 +994,8 @@ type _LocalizationResource = {
         itemCaption__proratedCredit: LocalizationValue;
         itemCaption__subscribedAndPaidForPlan: LocalizationValue;
         notFound: LocalizationValue;
-        tableHeaders__date: LocalizationValue;
-        tableHeaders__amount: LocalizationValue;
+        tableHeader__date: LocalizationValue;
+        tableHeader__amount: LocalizationValue;
         title: LocalizationValue;
         totalPaid: LocalizationValue;
       };
@@ -1003,9 +1003,9 @@ type _LocalizationResource = {
         title: LocalizationValue;
       };
       subscriptionsListSection: {
-        tableHeaders__plan: LocalizationValue;
-        tableHeaders__startDate: LocalizationValue;
-        tableHeaders__edit: LocalizationValue;
+        tableHeader__plan: LocalizationValue;
+        tableHeader__startDate: LocalizationValue;
+        tableHeader__edit: LocalizationValue;
         title: LocalizationValue;
         actionLabel__newSubscription: LocalizationValue;
         actionLabel__switchPlan: LocalizationValue;
@@ -1013,9 +1013,9 @@ type _LocalizationResource = {
       paymentHistorySection: {
         empty: LocalizationValue;
         notFound: LocalizationValue;
-        tableHeaders__date: LocalizationValue;
-        tableHeaders__amount: LocalizationValue;
-        tableHeaders__status: LocalizationValue;
+        tableHeader__date: LocalizationValue;
+        tableHeader__amount: LocalizationValue;
+        tableHeader__status: LocalizationValue;
       };
       paymentSourcesSection: {
         title: LocalizationValue;

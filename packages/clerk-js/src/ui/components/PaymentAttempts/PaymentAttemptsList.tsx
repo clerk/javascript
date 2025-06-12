@@ -3,7 +3,7 @@ import React from 'react';
 
 import { Pagination } from '@/ui/elements/Pagination';
 
-import { usePaymentAttempts, useSubscriberTypeLocalizationRoot } from '../../../ui/contexts';
+import { usePaymentAttempts, useSubscriberTypeLocalizationRoot } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import {
   Badge,
@@ -22,7 +22,7 @@ import {
 } from '../../customizables';
 import { useRouter } from '../../router';
 import type { PropsOfComponent } from '../../styledSystem';
-import { truncateWithEndVisible } from '../../utils/truncateTextWithEndVisible';
+import { formatDate, truncateWithEndVisible } from '../../utils';
 
 /* -------------------------------------------------------------------------------------------------
  * PaymentAttemptsList
@@ -42,9 +42,9 @@ export const PaymentAttemptsList = () => {
       isLoading={isLoading}
       emptyStateLocalizationKey={localizationKeys(`${localizationRoot}.billingPage.paymentHistorySection.empty`)}
       headers={[
-        localizationKeys(`${localizationRoot}.billingPage.paymentHistorySection.tableHeaders__date`),
-        localizationKeys(`${localizationRoot}.billingPage.paymentHistorySection.tableHeaders__amount`),
-        localizationKeys(`${localizationRoot}.billingPage.paymentHistorySection.tableHeaders__status`),
+        localizationKeys(`${localizationRoot}.billingPage.paymentHistorySection.tableHeader__date`),
+        localizationKeys(`${localizationRoot}.billingPage.paymentHistorySection.tableHeader__amount`),
+        localizationKeys(`${localizationRoot}.billingPage.paymentHistorySection.tableHeader__status`),
       ]}
       rows={(paymentAttempts?.data || []).map(i => (
         <PaymentAttemptsListRow
@@ -69,13 +69,7 @@ const PaymentAttemptsListRow = ({ paymentAttempt }: { paymentAttempt: CommercePa
           cursor: 'pointer',
         }}
       >
-        <Text variant='subtitle'>
-          {new Date(paidAt || failedAt || updatedAt).toLocaleString('en-US', {
-            month: 'long',
-            day: 'numeric',
-            year: 'numeric',
-          })}
-        </Text>
+        <Text variant='subtitle'>{formatDate(new Date(paidAt || failedAt || updatedAt), 'long')}</Text>
         <Text
           colorScheme='secondary'
           variant='caption'

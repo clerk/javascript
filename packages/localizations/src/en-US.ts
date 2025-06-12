@@ -192,9 +192,9 @@ export const enUS: LocalizationResource = {
     billingPage: {
       paymentHistorySection: {
         empty: 'No payment history',
-        tableHeaders__date: 'Date',
-        tableHeaders__amount: 'Amount',
-        tableHeaders__status: 'Status',
+        tableHeader__date: 'Date',
+        tableHeader__amount: 'Amount',
+        tableHeader__status: 'Status',
         notFound: 'Payment attempt not found',
       },
       paymentSourcesSection: {
@@ -227,17 +227,17 @@ export const enUS: LocalizationResource = {
         itemCaption__proratedCredit: 'Prorated credit for partial usage of previous subscription',
         itemCaption__subscribedAndPaidForPlan: 'Subscribed and paid for {{plan}} {{period}} plan',
         notFound: 'Statement not found',
-        tableHeaders__date: 'Date',
-        tableHeaders__amount: 'Amount',
+        tableHeader__date: 'Date',
+        tableHeader__amount: 'Amount',
         title: 'Statements',
         totalPaid: 'Total paid',
       },
       subscriptionsListSection: {
         actionLabel__newSubscription: 'Subscribe to a plan',
         actionLabel__switchPlan: 'Switch plans',
-        tableHeaders__plan: 'Plan',
-        tableHeaders__startDate: 'Start date',
-        tableHeaders__edit: 'Edit',
+        tableHeader__plan: 'Plan',
+        tableHeader__startDate: 'Start date',
+        tableHeader__edit: 'Edit',
         title: 'Subscription',
       },
       subscriptionsSection: {
@@ -841,9 +841,9 @@ export const enUS: LocalizationResource = {
     billingPage: {
       paymentHistorySection: {
         empty: 'No payment history',
-        tableHeaders__date: 'Date',
-        tableHeaders__amount: 'Amount',
-        tableHeaders__status: 'Status',
+        tableHeader__date: 'Date',
+        tableHeader__amount: 'Amount',
+        tableHeader__status: 'Status',
         notFound: 'Payment attempt not found',
       },
       paymentSourcesSection: {
@@ -876,17 +876,17 @@ export const enUS: LocalizationResource = {
         itemCaption__proratedCredit: 'Prorated credit for partial usage of previous subscription',
         itemCaption__subscribedAndPaidForPlan: 'Subscribed and paid for {{plan}} {{period}} plan',
         notFound: 'Statement not found',
-        tableHeaders__date: 'Date',
-        tableHeaders__amount: 'Amount',
+        tableHeader__date: 'Date',
+        tableHeader__amount: 'Amount',
         title: 'Statements',
         totalPaid: 'Total paid',
       },
       subscriptionsListSection: {
         actionLabel__newSubscription: 'Subscribe to a plan',
         actionLabel__switchPlan: 'Switch plans',
-        tableHeaders__plan: 'Plan',
-        tableHeaders__startDate: 'Start date',
-        tableHeaders__edit: 'Edit',
+        tableHeader__plan: 'Plan',
+        tableHeader__startDate: 'Start date',
+        tableHeader__edit: 'Edit',
         title: 'Subscription',
       },
       subscriptionsSection: {

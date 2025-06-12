@@ -41,8 +41,8 @@ export const StatementsList = () => {
       isLoading={isLoading}
       emptyStateLocalizationKey={localizationKeys(`${localizationRoot}.billingPage.statementsSection.empty`)}
       headers={[
-        localizationKeys(`${localizationRoot}.billingPage.statementsSection.tableHeaders__date`),
-        localizationKeys(`${localizationRoot}.billingPage.statementsSection.tableHeaders__amount`),
+        localizationKeys(`${localizationRoot}.billingPage.statementsSection.tableHeader__date`),
+        localizationKeys(`${localizationRoot}.billingPage.statementsSection.tableHeader__amount`),
       ]}
       rows={(statements?.data || []).map(i => (
         <StatementsListRow
