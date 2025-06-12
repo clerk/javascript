@@ -17,7 +17,6 @@ import type {
   EmailLinkConfig,
   EnterpriseSSOConfig,
   PassKeyConfig,
-  PasskeyFactor,
   PhoneCodeConfig,
   PrepareFirstFactorParams,
   PrepareSecondFactorParams,
@@ -39,6 +38,8 @@ import type {
   Web3SignatureConfig,
   Web3SignatureFactor,
 } from '@clerk/types';
+import { devtools } from 'zustand/middleware';
+import { createStore } from 'zustand/vanilla';
 
 import {
   generateSignatureWithCoinbaseWallet,
@@ -67,31 +68,116 @@ import {
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from '../errors';
 import { BaseResource, UserData, Verification } from './internal';
+import { createResourceSlice, type ResourceStore } from './state';
+
+type SignInSliceState = {
+  signin: {
+    status: SignInStatus | null;
+    setStatus: (status: SignInStatus | null) => void;
+    error: { global: string | null; fields: Record<string, string> };
+    setError: (error: { global: string | null; fields: Record<string, string> }) => void;
+  };
+};
+
+/**
+ * Creates a SignIn slice following the Zustand slices pattern.
+ * This slice handles SignIn-specific state management.
+ * All SignIn state is namespaced under the 'signin' key.
+ */
+const createSignInSlice = (set: any, _get: any): SignInSliceState => ({
+  signin: {
+    status: null,
+    setStatus: (status: SignInStatus | null) => {
+      set((state: any) => ({
+        ...state,
+        signin: {
+          ...state.signin,
+          status: status,
+        },
+      }));
+    },
+    error: { global: null, fields: {} },
+    setError: (error: { global: string | null; fields: Record<string, string> }) => {
+      set((state: any) => ({
+        ...state,
+        signin: {
+          ...state.signin,
+          error: error,
+        },
+      }));
+    },
+  },
+});
+
+type CombinedSignInStore = ResourceStore<SignIn> & SignInSliceState;
 
 export class SignIn extends BaseResource implements SignInResource {
   pathRoot = '/client/sign_ins';
 
-  id?: string;
-  status: SignInStatus | null = null;
-  supportedIdentifiers: SignInIdentifier[] = [];
-  supportedFirstFactors: SignInFirstFactor[] | null = [];
-  supportedSecondFactors: SignInSecondFactor[] | null = null;
-  firstFactorVerification: VerificationResource = new Verification(null);
-  secondFactorVerification: VerificationResource = new Verification(null);
-  identifier: string | null = null;
   createdSessionId: string | null = null;
+  firstFactorVerification: VerificationResource = new Verification(null);
+  id?: string;
+  identifier: string | null = null;
+  secondFactorVerification: VerificationResource = new Verification(null);
+  supportedFirstFactors: SignInFirstFactor[] | null = [];
+  supportedIdentifiers: SignInIdentifier[] = [];
+  supportedSecondFactors: SignInSecondFactor[] | null = null;
   userData: UserData = new UserData(null);
 
   constructor(data: SignInJSON | SignInJSONSnapshot | null = null) {
     super();
+    // Override the base _store with our combined store using slices pattern with namespacing
+    this._store = createStore<CombinedSignInStore>()(
+      devtools(
+        (set, get) => ({
+          ...createResourceSlice<SignIn>(set, get),
+          ...createSignInSlice(set, get),
+        }),
+        { name: 'SignInStore' },
+      ),
+    ) as any;
     this.fromJSON(data);
   }
 
-  create = (params: SignInCreateParams): Promise<this> => {
-    return this._basePost({
-      path: this.pathRoot,
-      body: params,
-    });
+  /**
+   * Reactive status property backed by the store.
+   * Reading and writing goes directly to/from the store.
+   */
+  get status(): SignInStatus | null {
+    return (this._store.getState() as unknown as CombinedSignInStore).signin.status;
+  }
+
+  set status(newStatus: SignInStatus | null) {
+    (this._store.getState() as unknown as CombinedSignInStore).signin.setStatus(newStatus);
+  }
+
+  /**
+   * Reactive signInError property backed by the store.
+   * Reading and writing goes directly to/from the store.
+   */
+  get signInError(): { global: string | null; fields: Record<string, string> } {
+    return (this._store.getState() as unknown as CombinedSignInStore).signin.error;
+  }
+
+  set signInError(newError: { global: string | null; fields: Record<string, string> }) {
+    (this._store.getState() as unknown as CombinedSignInStore).signin.setError(newError);
+  }
+
+  private updateError(globalError: string | null, fieldErrors: Record<string, string> = {}) {
+    this.signInError = { global: globalError, fields: fieldErrors };
+  }
+
+  create = async (params: SignInCreateParams): Promise<SignInResource> => {
+    try {
+      const result = await this._basePost({
+        path: this.pathRoot,
+        body: params,
+      });
+      return result;
+    } catch (error) {
+      this.updateError(error instanceof Error ? error.message : 'An unexpected error occurred');
+      throw error;
+    }
   };
 
   resetPassword = (params: ResetPasswordParams): Promise<SignInResource> => {
@@ -160,22 +246,31 @@ export class SignIn extends BaseResource implements SignInResource {
     });
   };
 
-  attemptFirstFactor = (attemptFactor: AttemptFirstFactorParams): Promise<SignInResource> => {
-    let config;
-    switch (attemptFactor.strategy) {
-      case 'passkey':
-        config = {
-          publicKeyCredential: JSON.stringify(serializePublicKeyCredentialAssertion(attemptFactor.publicKeyCredential)),
-        };
-        break;
-      default:
-        config = { ...attemptFactor };
-    }
+  attemptFirstFactor = async (attemptFactor: AttemptFirstFactorParams): Promise<SignInResource> => {
+    try {
+      let config;
+      switch (attemptFactor.strategy) {
+        case 'passkey':
+          config = {
+            publicKeyCredential: JSON.stringify(
+              serializePublicKeyCredentialAssertion(attemptFactor.publicKeyCredential),
+            ),
+          };
+          break;
+        default:
+          config = { ...attemptFactor };
+      }
 
-    return this._basePost({
-      body: { ...config, strategy: attemptFactor.strategy },
-      action: 'attempt_first_factor',
-    });
+      const result = await this._basePost({
+        body: { ...config, strategy: attemptFactor.strategy },
+        action: 'attempt_first_factor',
+      });
+
+      return result;
+    } catch (error) {
+      this.updateError(error instanceof Error ? error.message : 'An unexpected error occurred');
+      throw error;
+    }
   };
 
   createEmailLinkFlow = (): CreateEmailLinkFlowReturn<SignInStartEmailLinkFlowParams, SignInResource> => {
@@ -311,7 +406,7 @@ export class SignIn extends BaseResource implements SignInResource {
       //
       // error code 4001 means the user rejected the request
       // Reference: https://docs.cdp.coinbase.com/wallet-sdk/docs/errors
-      if (provider === 'coinbase_wallet' && err.code === 4001) {
+      if (provider === 'coinbase_wallet' && err instanceof Error && 'code' in err && err.code === 4001) {
         signature = await generateSignature({ identifier, nonce: message, provider });
       } else {
         throw err;
@@ -386,19 +481,13 @@ export class SignIn extends BaseResource implements SignInResource {
     }
 
     if (flow === 'autofill' || flow === 'discoverable') {
-      // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
       await this.create({ strategy: 'passkey' });
     } else {
-      // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
-      const passKeyFactor = this.supportedFirstFactors.find(
-        // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
-        f => f.strategy === 'passkey',
-      ) as PasskeyFactor;
+      const passKeyFactor = this.supportedFirstFactors?.find(f => f.strategy === 'passkey');
 
       if (!passKeyFactor) {
         clerkVerifyPasskeyCalledBeforeCreate();
       }
-      // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
       await this.prepareFirstFactor(passKeyFactor);
     }
 
@@ -445,18 +534,19 @@ export class SignIn extends BaseResource implements SignInResource {
   };
 
   protected fromJSON(data: SignInJSON | SignInJSONSnapshot | null): this {
-    if (data) {
-      this.id = data.id;
-      this.status = data.status;
-      this.supportedIdentifiers = data.supported_identifiers;
-      this.identifier = data.identifier;
-      this.supportedFirstFactors = deepSnakeToCamel(data.supported_first_factors) as SignInFirstFactor[] | null;
-      this.supportedSecondFactors = deepSnakeToCamel(data.supported_second_factors) as SignInSecondFactor[] | null;
-      this.firstFactorVerification = new Verification(data.first_factor_verification);
-      this.secondFactorVerification = new Verification(data.second_factor_verification);
-      this.createdSessionId = data.created_session_id;
-      this.userData = new UserData(data.user_data);
-    }
+    if (!data) return this;
+
+    this.createdSessionId = data.created_session_id;
+    this.firstFactorVerification = new Verification(data.first_factor_verification);
+    this.id = data.id;
+    this.identifier = data.identifier;
+    this.secondFactorVerification = new Verification(data.second_factor_verification);
+    this.status = data.status;
+    this.supportedFirstFactors = deepSnakeToCamel(data.supported_first_factors) as SignInFirstFactor[] | null;
+    this.supportedIdentifiers = data.supported_identifiers;
+    this.supportedSecondFactors = deepSnakeToCamel(data.supported_second_factors) as SignInSecondFactor[] | null;
+    this.userData = new UserData(data.user_data);
+
     return this;
   }
 

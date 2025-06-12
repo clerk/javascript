@@ -81,13 +81,14 @@ export interface SignInResource extends ClerkResource {
   /**
    * @deprecated This attribute will be removed in the next major version.
    */
-  supportedIdentifiers: SignInIdentifier[];
-  supportedFirstFactors: SignInFirstFactor[] | null;
-  supportedSecondFactors: SignInSecondFactor[] | null;
-  firstFactorVerification: VerificationResource;
-  secondFactorVerification: VerificationResource;
-  identifier: string | null;
   createdSessionId: string | null;
+  firstFactorVerification: VerificationResource;
+  identifier: string | null;
+  secondFactorVerification: VerificationResource;
+  signInError: { global: string | null; fields: Record<string, string> };
+  supportedFirstFactors: SignInFirstFactor[] | null;
+  supportedIdentifiers: SignInIdentifier[];
+  supportedSecondFactors: SignInSecondFactor[] | null;
   userData: UserData;
 
   create: (params: SignInCreateParams) => Promise<SignInResource>;

@@ -1,6 +1,6 @@
 import { errorToJSON, parseError } from '@clerk/shared/error';
 import type {
-  ClerkAPIError,
+  ClerkAPIErrorJSON,
   PasskeyVerificationResource,
   PhoneCodeChannel,
   PublicKeyCredentialCreationOptionsJSON,
@@ -16,28 +16,95 @@ import type {
   VerificationResource,
   VerificationStatus,
 } from '@clerk/types';
+import { devtools } from 'zustand/middleware';
+import { createStore } from 'zustand/vanilla';
 
 import { unixEpochToDate } from '../../utils/date';
 import { convertJSONToPublicKeyCreateOptions } from '../../utils/passkeys';
 import { BaseResource } from './internal';
+import { createResourceSlice, type ResourceStore } from './state';
+
+/**
+ * Verification slice state type
+ */
+type VerificationSliceState = {
+  verification: {
+    error: ClerkAPIErrorJSON | null;
+    setError: (error: ClerkAPIErrorJSON | null) => void;
+    clearError: () => void;
+    hasError: () => boolean;
+  };
+};
+
+/**
+ * Creates a verification slice following the Zustand slices pattern.
+ * This slice handles verification-specific state management.
+ * All verification state is namespaced under the 'verification' key.
+ */
+const createVerificationSlice = (set: any, get: any): VerificationSliceState => ({
+  verification: {
+    error: null,
+    setError: (error: ClerkAPIErrorJSON | null) => {
+      set((state: any) => ({
+        ...state,
+        verification: {
+          ...state.verification,
+          error: error,
+        },
+      }));
+    },
+    clearError: () => {
+      set((state: any) => ({
+        ...state,
+        verification: {
+          ...state.verification,
+          error: null,
+        },
+      }));
+    },
+    hasError: () => {
+      const state = get();
+      return state.verification.error !== null;
+    },
+  },
+});
+
+type CombinedVerificationStore = ResourceStore<Verification> & VerificationSliceState;
 
 export class Verification extends BaseResource implements VerificationResource {
   pathRoot = '';
 
+  attempts: number | null = null;
+  channel?: PhoneCodeChannel;
+  expireAt: Date | null = null;
+  externalVerificationRedirectURL: URL | null = null;
+  message: string | null = null;
+  nonce: string | null = null;
   status: VerificationStatus | null = null;
   strategy: string | null = null;
-  nonce: string | null = null;
-  message: string | null = null;
-  externalVerificationRedirectURL: URL | null = null;
-  attempts: number | null = null;
-  expireAt: Date | null = null;
-  error: ClerkAPIError | null = null;
   verifiedAtClient: string | null = null;
-  channel?: PhoneCodeChannel;
 
   constructor(data: VerificationJSON | VerificationJSONSnapshot | null) {
     super();
+    // Override the base _store with our combined store using slices pattern with namespacing
+    this._store = createStore<CombinedVerificationStore>()(
+      devtools(
+        (set, get) => ({
+          ...createResourceSlice<Verification>(set, get),
+          ...createVerificationSlice(set, get),
+        }),
+        { name: 'VerificationStore' },
+      ),
+    ) as any;
     this.fromJSON(data);
+  }
+
+  /**
+   * Reactive error property backed by the store.
+   * Reading goes directly from the store.
+   */
+  get error(): ClerkAPIErrorJSON | null {
+    return (this._store.getState() as CombinedVerificationStore).verification.error;
   }
 
   verifiedFromTheSameClient = (): boolean => {
@@ -45,22 +112,33 @@ export class Verification extends BaseResource implements VerificationResource {
   };
 
   protected fromJSON(data: VerificationJSON | VerificationJSONSnapshot | null): this {
-    if (data) {
-      this.status = data.status;
-      this.verifiedAtClient = data.verified_at_client;
-      this.strategy = data.strategy;
-      this.nonce = data.nonce || null;
-      this.message = data.message || null;
-      if (data.external_verification_redirect_url) {
-        this.externalVerificationRedirectURL = new URL(data.external_verification_redirect_url);
-      } else {
-        this.externalVerificationRedirectURL = null;
-      }
-      this.attempts = data.attempts;
-      this.expireAt = unixEpochToDate(data.expire_at || undefined);
-      this.error = data.error ? parseError(data.error) : null;
-      this.channel = data.channel || undefined;
+    if (!data) {
+      return this;
     }
+
+    this.status = data.status;
+    this.verifiedAtClient = data.verified_at_client;
+    this.strategy = data.strategy;
+    this.nonce = data.nonce || null;
+    this.message = data.message || null;
+    if (data.external_verification_redirect_url) {
+      this.externalVerificationRedirectURL = new URL(data.external_verification_redirect_url);
+    } else {
+      this.externalVerificationRedirectURL = null;
+    }
+    this.attempts = data.attempts;
+    this.expireAt = unixEpochToDate(data.expire_at || undefined);
+
+    // Set error state directly in the verification slice
+    if (data.error) {
+      const parsedError = errorToJSON(parseError(data.error));
+      (this._store.getState() as CombinedVerificationStore).verification.setError(parsedError);
+    } else {
+      (this._store.getState() as CombinedVerificationStore).verification.clearError();
+    }
+
+    this.channel = data.channel || undefined;
+
     return this;
   }
 
@@ -75,7 +153,7 @@ export class Verification extends BaseResource implements VerificationResource {
       external_verification_redirect_url: this.externalVerificationRedirectURL?.toString() || null,
       attempts: this.attempts,
       expire_at: this.expireAt?.getTime() || null,
-      error: errorToJSON(this.error),
+      error: this.error || { code: '', message: '' },
       verified_at_client: this.verifiedAtClient,
     };
   }
@@ -86,7 +164,6 @@ export class PasskeyVerification extends Verification implements PasskeyVerifica
 
   constructor(data: VerificationJSON | VerificationJSONSnapshot | null) {
     super(data);
-    this.fromJSON(data);
   }
 
   /**
@@ -94,11 +171,14 @@ export class PasskeyVerification extends Verification implements PasskeyVerifica
    */
   protected fromJSON(data: VerificationJSON | VerificationJSONSnapshot | null): this {
     super.fromJSON(data);
-    if (data?.nonce) {
+    if (!data?.nonce) {
+      this.publicKey = null;
+    } else {
       this.publicKey = convertJSONToPublicKeyCreateOptions(
         JSON.parse(data.nonce) as PublicKeyCredentialCreationOptionsJSON,
       );
     }
+
     return this;
   }
 }
@@ -110,17 +190,10 @@ export class SignUpVerifications implements SignUpVerificationsResource {
   externalAccount: VerificationResource;
 
   constructor(data: SignUpVerificationsJSON | SignUpVerificationsJSONSnapshot | null) {
-    if (data) {
-      this.emailAddress = new SignUpVerification(data.email_address);
-      this.phoneNumber = new SignUpVerification(data.phone_number);
-      this.web3Wallet = new SignUpVerification(data.web3_wallet);
-      this.externalAccount = new Verification(data.external_account);
-    } else {
-      this.emailAddress = new SignUpVerification(null);
-      this.phoneNumber = new SignUpVerification(null);
-      this.web3Wallet = new SignUpVerification(null);
-      this.externalAccount = new Verification(null);
-    }
+    this.emailAddress = new SignUpVerification(data?.email_address ?? null);
+    this.phoneNumber = new SignUpVerification(data?.phone_number ?? null);
+    this.web3Wallet = new SignUpVerification(data?.web3_wallet ?? null);
+    this.externalAccount = new Verification(data?.external_account ?? null);
   }
 
   public __internal_toSnapshot(): SignUpVerificationsJSONSnapshot {
@@ -139,13 +212,8 @@ export class SignUpVerification extends Verification {
 
   constructor(data: SignUpVerificationJSON | SignUpVerificationJSONSnapshot | null) {
     super(data);
-    if (data) {
-      this.nextAction = data.next_action;
-      this.supportedStrategies = data.supported_strategies;
-    } else {
-      this.nextAction = '';
-      this.supportedStrategies = [];
-    }
+    this.nextAction = data?.next_action ?? '';
+    this.supportedStrategies = data?.supported_strategies ?? [];
   }
 
   public __internal_toSnapshot(): SignUpVerificationJSONSnapshot {

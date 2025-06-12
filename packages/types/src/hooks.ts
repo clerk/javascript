@@ -121,26 +121,22 @@ export type UseAuthReturn =
 /**
  * @inline
  */
-export type UseSignInReturn =
-  | {
-      /**
-       * A boolean that indicates whether Clerk has completed initialization. Initially `false`, becomes `true` once Clerk loads.
-       */
-      isLoaded: false;
-      /**
-       * An object that contains the current sign-in attempt status and methods to create a new sign-in attempt.
-       */
-      signIn: undefined;
-      /**
-       * A function that sets the active session.
-       */
-      setActive: undefined;
-    }
-  | {
-      isLoaded: true;
-      signIn: SignInResource;
-      setActive: SetActive;
-    };
+export type UseSignInReturn = {
+  /**
+   * Always `true`. The hook returns proxy objects that queue method calls until Clerk initializes.
+   * Method calls are buffered and executed once initialization completes, allowing immediate usage
+   * without waiting for the loading state to resolve.
+   */
+  isLoaded: true;
+  /**
+   * An object that contains the current sign-in attempt status and methods to create a new sign-in attempt.
+   */
+  signIn: SignInResource;
+  /**
+   * A function that sets the active session.
+   */
+  setActive: SetActive;
+};
 
 /**
  * @inline

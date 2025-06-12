@@ -78,7 +78,8 @@
   "dependencies": {
     "@clerk/shared": "workspace:^",
     "@clerk/types": "workspace:^",
-    "tslib": "catalog:repo"
+    "tslib": "catalog:repo",
+    "zustand": "5.0.5"
   },
   "devDependencies": {
     "@clerk/localizations": "workspace:*",
