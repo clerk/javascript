@@ -10,9 +10,9 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { TranslationResource } from '@clerk/types';
 
-export const itIT: LocalizationResource = {
+export const itIT: TranslationResource = {
   locale: 'it-IT',
   backButton: 'Indietro',
   badge__activePlan: undefined,

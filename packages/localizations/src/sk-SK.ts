@@ -10,9 +10,9 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { TranslationResource } from '@clerk/types';
 
-export const skSK: LocalizationResource = {
+export const skSK: TranslationResource = {
   locale: 'sk-SK',
   backButton: 'Späť',
   badge__activePlan: undefined,

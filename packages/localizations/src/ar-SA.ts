@@ -10,9 +10,9 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { TranslationResource } from '@clerk/types';
 
-export const arSA: LocalizationResource = {
+export const arSA: TranslationResource = {
   locale: 'ar-SA',
   backButton: 'الرجوع',
   badge__activePlan: undefined,

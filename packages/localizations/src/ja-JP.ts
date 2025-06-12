@@ -10,9 +10,9 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { TranslationResource } from '@clerk/types';
 
-export const jaJP: LocalizationResource = {
+export const jaJP: TranslationResource = {
   locale: 'ja-JP',
   backButton: '戻る',
   badge__activePlan: undefined,

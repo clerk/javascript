@@ -10,9 +10,9 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { TranslationResource } from '@clerk/types';
 
-export const caES: LocalizationResource = {
+export const caES: TranslationResource = {
   locale: 'ca-ES',
   backButton: 'Enrere',
   badge__activePlan: undefined,

@@ -10,9 +10,9 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { TranslationResource } from '@clerk/types';
 
-export const bgBG: LocalizationResource = {
+export const bgBG: TranslationResource = {
   locale: 'bg-BG',
   backButton: 'Назад',
   badge__activePlan: undefined,

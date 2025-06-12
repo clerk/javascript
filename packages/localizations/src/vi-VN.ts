@@ -10,9 +10,9 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { TranslationResource } from '@clerk/types';
 
-export const viVN: LocalizationResource = {
+export const viVN: TranslationResource = {
   locale: 'vi-VN',
   backButton: 'Quay lại',
   badge__activePlan: undefined,

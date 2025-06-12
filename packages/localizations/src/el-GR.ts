@@ -10,9 +10,9 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { TranslationResource } from '@clerk/types';
 
-export const elGR: LocalizationResource = {
+export const elGR: TranslationResource = {
   locale: 'el-GR',
   backButton: 'Πίσω',
   badge__activePlan: undefined,

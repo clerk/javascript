@@ -69,9 +69,9 @@ const disclaimer = `
  `;
 const initialText = (locale: string) => `
 
-import type { LocalizationResource } from '@clerk/types';
+import type { TranslationResource } from '@clerk/types';
 
-export const ${locale}: LocalizationResource = `;
+export const ${locale}: TranslationResource = `;
 
 function alignKeys(source: any, target: any) {
   // Add or update keys from the source to the target

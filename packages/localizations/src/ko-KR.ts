@@ -10,9 +10,9 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { TranslationResource } from '@clerk/types';
 
-export const koKR: LocalizationResource = {
+export const koKR: TranslationResource = {
   locale: 'ko-KR',
   backButton: '돌아가기',
   badge__activePlan: undefined,

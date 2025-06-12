@@ -10,9 +10,9 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { TranslationResource } from '@clerk/types';
 
-export const ptBR: LocalizationResource = {
+export const ptBR: TranslationResource = {
   locale: 'pt-BR',
   backButton: 'Voltar',
   badge__activePlan: undefined,

@@ -10,9 +10,9 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { TranslationResource } from '@clerk/types';
 
-export const esMX: LocalizationResource = {
+export const esMX: TranslationResource = {
   locale: 'es-MX',
   backButton: 'Atrás',
   badge__activePlan: undefined,

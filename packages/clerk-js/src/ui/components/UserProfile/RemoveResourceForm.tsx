@@ -100,11 +100,11 @@ export const RemoveConnectedAccountForm = (props: ConnectedAccountFormProps) => 
     <RemoveResourceForm
       title={localizationKeys('userProfile.connectedAccountPage.removeResource.title')}
       messageLine1={localizationKeys('userProfile.connectedAccountPage.removeResource.messageLine1', {
-        identifier: providerToDisplayData[ref.current]?.name,
+        identifier: providerToDisplayData[ref.current]?.name || '',
       })}
       messageLine2={localizationKeys('userProfile.connectedAccountPage.removeResource.messageLine2')}
       successMessage={localizationKeys('userProfile.connectedAccountPage.removeResource.successMessage', {
-        connectedAccount: providerToDisplayData[ref.current]?.name,
+        connectedAccount: providerToDisplayData[ref.current]?.name || '',
       })}
       deleteResource={() => Promise.resolve(resource?.destroy())}
       onSuccess={onSuccess}
@@ -212,7 +212,8 @@ export const RemovePasskeyForm = (props: RemovePasskeyFormProps) => {
     <RemoveResourceForm
       title={localizationKeys('userProfile.passkeyScreen.removeResource.title')}
       messageLine1={localizationKeys('userProfile.passkeyScreen.removeResource.messageLine1', {
-        name: passkey.name,
+        // Is it possible for passkey.name to be null ?
+        name: passkey.name || '',
       })}
       deleteResource={passkey.delete}
       onSuccess={onSuccess}

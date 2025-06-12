@@ -10,9 +10,9 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { TranslationResource } from '@clerk/types';
 
-export const deDE: LocalizationResource = {
+export const deDE: TranslationResource = {
   locale: 'de-DE',
   backButton: 'Zurück',
   badge__activePlan: 'Aktiv',

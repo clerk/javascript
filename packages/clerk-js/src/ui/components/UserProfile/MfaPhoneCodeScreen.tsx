@@ -151,7 +151,7 @@ export const MFAVerifyPhone = (props: MFAVerifyPhoneProps) => {
     <FormContainer
       headerTitle={title}
       headerSubtitle={localizationKeys('userProfile.phoneNumberPage.verifySubtitle', {
-        identifier: resourceRef.current?.phoneNumber,
+        identifier: resourceRef.current?.phoneNumber || '',
       })}
     >
       <VerifyWithCode

@@ -10,9 +10,9 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { TranslationResource } from '@clerk/types';
 
-export const zhCN: LocalizationResource = {
+export const zhCN: TranslationResource = {
   locale: 'zh-CN',
   backButton: '返回',
   badge__activePlan: undefined,

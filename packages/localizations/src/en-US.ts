@@ -1,6 +1,6 @@
-import type { LocalizationResource } from '@clerk/types';
+import type { TranslationResource } from '@clerk/types';
 
-export const enUS: LocalizationResource = {
+export const enUS: TranslationResource = {
   locale: 'en-US',
   backButton: 'Back',
   badge__activePlan: 'Active',

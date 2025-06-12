@@ -87,7 +87,7 @@ const RemoveScreen = ({
       })}
       messageLine2={localizationKeys('userProfile.billingPage.paymentSourcesSection.removeResource.messageLine2')}
       successMessage={localizationKeys('userProfile.billingPage.paymentSourcesSection.removeResource.successMessage', {
-        emailAddress: ref.current,
+        paymentSource: ref.current,
       })}
       deleteResource={removePaymentSource}
       onSuccess={close}

@@ -10,9 +10,9 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { TranslationResource } from '@clerk/types';
 
-export const plPL: LocalizationResource = {
+export const plPL: TranslationResource = {
   locale: 'pl-PL',
   backButton: 'Powrót',
   badge__activePlan: undefined,

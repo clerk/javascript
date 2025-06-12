@@ -149,11 +149,16 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
             const localizedText =
               strategies.length === SOCIAL_BUTTON_PRE_TEXT_THRESHOLD
                 ? localizationKeys('socialButtonsBlockButton', {
-                    provider: strategyToDisplayData[strategy].name,
+                    provider: strategyToDisplayData[strategy].name || '',
                   })
-                : localizationKeys('socialButtonsBlockButtonManyInView', {
-                    provider: strategyToDisplayData[strategy].name,
-                  });
+                : localizationKeys(
+                    'socialButtonsBlockButtonManyInView',
+                    // @ts-expect-error
+                    {
+                      // TODO: THIS IS A SPECIAL CASE HANDLE LATER
+                      provider: strategyToDisplayData[strategy].name || '',
+                    },
+                  );
 
             const imageOrInitial = strategyToDisplayData[strategy].iconUrl ? (
               <Image

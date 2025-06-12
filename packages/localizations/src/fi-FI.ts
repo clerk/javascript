@@ -10,9 +10,9 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { TranslationResource } from '@clerk/types';
 
-export const fiFI: LocalizationResource = {
+export const fiFI: TranslationResource = {
   locale: 'fi-FI',
   backButton: 'Takaisin',
   badge__activePlan: undefined,

@@ -251,7 +251,10 @@ function Card(props: CardProps) {
               <Text
                 elementDescriptor={descriptors.pricingTableCardFooterNotice}
                 variant={isCompact ? 'buttonSmall' : 'buttonLarge'}
-                localizationKey={localizationKeys('badge__startsAt', { date: subscription?.periodStart })}
+                localizationKey={localizationKeys('badge__startsAt', {
+                  // TODO: Is it  correct to be undefined ?
+                  date: subscription?.periodStart || '',
+                })}
                 colorScheme='secondary'
                 sx={t => ({
                   paddingBlock: t.space.$1x5,

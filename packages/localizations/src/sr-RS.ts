@@ -10,9 +10,9 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { TranslationResource } from '@clerk/types';
 
-export const srRS: LocalizationResource = {
+export const srRS: TranslationResource = {
   locale: 'sr-RS',
   backButton: 'Nazad',
   badge__activePlan: undefined,

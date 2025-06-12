@@ -10,9 +10,9 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { TranslationResource } from '@clerk/types';
 
-export const idID: LocalizationResource = {
+export const idID: TranslationResource = {
   locale: 'id-ID',
   backButton: 'Kembali',
   badge__activePlan: undefined,

@@ -10,9 +10,9 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { TranslationResource } from '@clerk/types';
 
-export const daDK: LocalizationResource = {
+export const daDK: TranslationResource = {
   locale: 'da-DK',
   backButton: 'Tilbage',
   badge__activePlan: undefined,
