@@ -1094,6 +1094,8 @@ export class Clerk implements ClerkInterface {
         props,
       }),
     );
+
+    this.telemetry?.record(eventPrebuiltComponentMounted('APIKeys', props));
   };
 
   /**
