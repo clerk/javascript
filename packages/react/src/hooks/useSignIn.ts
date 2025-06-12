@@ -1,7 +1,7 @@
 import { ClerkInstanceContext,useClientContext } from '@clerk/shared/react';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
 import type { SetActive, SignInResource } from '@clerk/types';
-import { useContext } from 'react';
+import { useContext, useMemo } from 'react';
 import { useStore } from 'zustand';
 
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
@@ -45,86 +45,59 @@ type ObservableSignInResource = SignInResource & {
 };
 
 /**
- * Creates a React hook that subscribes to a Zustand store and returns its state.
- * This enables React components to re-render when the store state changes.
- * This implementation is SSR-safe and prevents hydration mismatches.
+ * A stable fallback store that maintains consistent behavior when no real store exists.
+ * This prevents hook call inconsistencies by ensuring useStore always has a valid store.
  */
-const createStoreObservable = (signInResource: SignInResource) => {
-  // Return a React hook function that can be called within React components
-  return function useSignInObservable() {
-    // Try both 'store' and '_store' properties
-    const store = (signInResource as any).store || (signInResource as any)._store;
+const FALLBACK_STORE = {
+  getState: () => ({}),
+  subscribe: () => () => {}, // Return unsubscribe function
+  setState: () => {},
+  destroy: () => {}
+};
+
+/**
+ * A stable hook that can be used to observe SignIn store state.
+ * This hook always calls the same internal hooks in the same order to prevent
+ * "Rendered more hooks than during the previous render" errors.
+ */
+function useSignInObservable(signInResource: SignInResource | null) {
+  // CRITICAL: We must always call useStore with a stable store reference
+  // to prevent "Rendered more hooks than during the previous render" errors
+  
+  // Memoize the store selection to prevent unnecessary re-renders
+  const store = useMemo(() => {
+    if (!signInResource) return FALLBACK_STORE;
     
-    // CRITICAL: Always call useStore to maintain hook call consistency
-    // We create a fallback store that returns empty state if no real store exists
-    const fallbackStore = {
-      getState: () => ({}),
-      subscribe: () => () => {}, // Return unsubscribe function
-      setState: () => {},
-      destroy: () => {}
-    };
-    
-    const storeToUse = store || fallbackStore;
-    
-    // Always call useStore - this ensures consistent hook call order
-    const storeState = useStore(storeToUse);
-    
-    // Debug logging with more detailed property inspection
-    console.log('createStoreObservable debug:', {
-      hasStore: !!store,
-      hasPublicStore: !!((signInResource as any).store),
-      hasPrivateStore: !!((signInResource as any)._store),
-      storeType: typeof store,
-      signInResourceKeys: Object.keys(signInResource),
-      storePropertyDescriptor: Object.getOwnPropertyDescriptor(signInResource, 'store'),
-      storePropertyDescriptorProto: Object.getOwnPropertyDescriptor(Object.getPrototypeOf(signInResource), 'store'),
-      prototypeChain: Object.getPrototypeOf(signInResource)?.constructor?.name,
-      isSSR: typeof window === 'undefined',
-      usingFallbackStore: !store
-    });
-    
-    // Try to access store via different methods if no store was found
-    if (!store) {
-      console.log('Trying alternative store access methods...');
-      
-      // Try calling store as a method (in case it's a getter)
-      try {
-        const storeViaCall = (signInResource as any).store?.();
-        console.log('Store via call:', !!storeViaCall);
-      } catch (e) {
-        console.log('Store call failed:', e);
-      }
-      
-      // Check if store exists on prototype
-      const proto = Object.getPrototypeOf(signInResource);
-      console.log('Store on prototype:', !!(proto && (proto).store));
-    }
-    
-    // If no real store exists, return empty state
-    if (!store) {
-      console.log('No store found, returning empty object');
+    // Try both 'store' and '_store' properties, but default to fallback
+    return (signInResource as any).store || (signInResource as any)._store || FALLBACK_STORE;
+  }, [signInResource]);
+  
+  // Always call useStore with a consistent store reference
+  const storeState = useStore(store);
+  
+  // Determine if we have a real store
+  const hasRealStore = store !== FALLBACK_STORE;
+  
+  // Return memoized result to prevent unnecessary re-renders
+  return useMemo(() => {
+    // If we're using the fallback store, return empty state
+    if (!hasRealStore) {
+      console.log('No real store found, returning empty object');
       return {};
     }
 
-    // During SSR, return the current state from the store directly
-    // This prevents hydration mismatches while still using the subscription
-    if (typeof window === 'undefined') {
-      const serverState = store.getState();
-      console.log('SSR mode, returning server state:', serverState);
-      return serverState;
-    }
-
-    // On client, return the subscribed state from useStore
-    console.log('Client mode, returning subscribed state:', storeState);
+    // Return the actual store state
+    console.log('Returning store state:', storeState);
     return storeState;
-  };
-};
+  }, [hasRealStore, storeState]);
+}
 
 /**
  * Wraps a SignInResource with observable capabilities for React.
  */
 const wrapSignInWithObservable = (signIn: SignInResource): ObservableSignInResource => {
-  const observable = createStoreObservable(signIn);
+  // Create a stable observable function that captures the signIn resource
+  const observable = () => useSignInObservable(signIn);
   
   // Create a new object that extends the signIn resource with the observable method
   const wrappedSignIn = Object.create(signIn);
@@ -216,8 +189,11 @@ export const useSignIn = () => {
     
     // For signIn proxy, add the observable method to the target
     if (target === 'signIn') {
+      // Create a stable observable function that always returns empty state for proxy
+      const observableFunction = () => useSignInObservable(null);
+      
       Object.defineProperty(proxyTarget, 'observable', {
-        value: () => ({}),
+        value: observableFunction,
         writable: false,
         enumerable: true,
         configurable: true
