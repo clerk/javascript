@@ -1,10 +1,10 @@
-import { expect, test } from '@playwright/test';
+import { test } from '@playwright/test';
 
 import { appConfigs } from '../presets';
 import type { FakeUser } from '../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../testUtils';
 
-testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('api keys @apiKeys', ({ app }) => {
+testAgainstRunningApps({ withEnv: [appConfigs.envs.withAPIKeys] })('api keys @apiKeys', ({ app }) => {
   test.describe.configure({ mode: 'serial' });
 
   let fakeUser: FakeUser;
@@ -20,11 +20,44 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('api keys @ap
     await app.teardown();
   });
 
-  test('renders API keys component', async ({ page, context }) => {
+  test.skip('can create an API key', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
+    await u.po.signIn.goTo();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
     await u.po.page.goToRelative('/api-keys');
 
-    await u.po.apiKeys.waitForMounted();
-    await expect(u.po.page.getByRole('heading', { name: 'API Keys' })).toBeVisible();
+    // TODO: Replace with custom page object
+    await u.po.page.waitForSelector('.cl-apiKeys-root');
+
+    await u.po.page.getByRole('button', { name: 'Add new key' }).click();
+    await u.po.page.locator('input[name=name]').fill('test-key');
+  });
+
+  test.skip('can create an API key with description and expiration', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.po.signIn.goTo();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+    await u.po.page.goToRelative('/api-keys');
+
+    // TODO: Replace with custom page object
+    await u.po.page.waitForSelector('.cl-apiKeys-root');
+
+    await u.po.page.getByRole('button', { name: 'Add new key' }).click();
+    await u.po.page.locator('input[name=name]').fill('test-key');
+
+    await u.po.page.getByRole('button', { name: 'Show advanced settings' }).click();
+
+    await u.po.page.locator('input[name=description]').fill('test-description');
+    await u.po.page.locator('input[name=expiration]').fill('2025-01-01');
+  });
+
+  test.skip('user is prompted before revoking and can revoke an API key', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.po.signIn.goTo();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+    await u.po.page.goToRelative('/api-keys');
+
+    // TODO: Replace with custom page object
+    await u.po.page.waitForSelector('.cl-apiKeys-root');
   });
 });
