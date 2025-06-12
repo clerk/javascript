@@ -51,6 +51,7 @@
     "test:cache:clear": "jest --clearCache --useStderr",
     "test:ci": "jest --maxWorkers=70%",
     "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html",
+    "test:jest": "jest",
     "test:vitest": "vitest",
     "watch": "rspack build --config rspack.config.js --env production --watch"
   },
@@ -81,6 +82,7 @@
     "zustand": "5.0.5"
   },
   "devDependencies": {
+    "@emotion/jest": "^11.13.0",
     "@rsdoctor/rspack-plugin": "^0.4.13",
     "@rspack/cli": "^1.2.8",
     "@rspack/core": "^1.2.8",
@@ -89,6 +91,7 @@
     "@swc/jest": "^0.2.38",
     "@types/cloudflare-turnstile": "^0.2.2",
     "@types/webpack-env": "^1.18.8",
+    "jsdom": "^24.1.1",
     "webpack-merge": "^5.10.0"
   },
   "peerDependencies": {
