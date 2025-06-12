@@ -43,8 +43,9 @@ type UseSignInReturn = {
 /**
  * A stable fallback store that maintains consistent behavior when no real store exists.
  */
+const FALLBACK_STATE = {};
 const FALLBACK_STORE = {
-  getState: () => ({}),
+  getState: () => FALLBACK_STATE,
   subscribe: () => () => {}, // Return unsubscribe function
   setState: () => {},
   destroy: () => {}
@@ -104,7 +105,7 @@ export const useSignIn = (): UseSignInReturn => {
     }
   }, []);
 
-  const createProxy = useCallback(<T extends any>(target: 'signIn' | 'setActive'): T => {
+  const createProxy = useCallback(<T>(target: 'signIn' | 'setActive'): T => {
     const proxyTarget: any = {};
     
     return new Proxy(
