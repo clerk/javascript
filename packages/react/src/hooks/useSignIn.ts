@@ -55,6 +55,20 @@ const createStoreObservable = (signInResource: SignInResource) => {
     // Try both 'store' and '_store' properties
     const store = (signInResource as any).store || (signInResource as any)._store;
     
+    // CRITICAL: Always call useStore to maintain hook call consistency
+    // We create a fallback store that returns empty state if no real store exists
+    const fallbackStore = {
+      getState: () => ({}),
+      subscribe: () => () => {}, // Return unsubscribe function
+      setState: () => {},
+      destroy: () => {}
+    };
+    
+    const storeToUse = store || fallbackStore;
+    
+    // Always call useStore - this ensures consistent hook call order
+    const storeState = useStore(storeToUse);
+    
     // Debug logging with more detailed property inspection
     console.log('createStoreObservable debug:', {
       hasStore: !!store,
@@ -65,10 +79,11 @@ const createStoreObservable = (signInResource: SignInResource) => {
       storePropertyDescriptor: Object.getOwnPropertyDescriptor(signInResource, 'store'),
       storePropertyDescriptorProto: Object.getOwnPropertyDescriptor(Object.getPrototypeOf(signInResource), 'store'),
       prototypeChain: Object.getPrototypeOf(signInResource)?.constructor?.name,
-      isSSR: typeof window === 'undefined'
+      isSSR: typeof window === 'undefined',
+      usingFallbackStore: !store
     });
     
-    // Try to access store via different methods
+    // Try to access store via different methods if no store was found
     if (!store) {
       console.log('Trying alternative store access methods...');
       
@@ -85,25 +100,23 @@ const createStoreObservable = (signInResource: SignInResource) => {
       console.log('Store on prototype:', !!(proto && (proto).store));
     }
     
+    // If no real store exists, return empty state
     if (!store) {
       console.log('No store found, returning empty object');
-      // Return empty state if store is not available
       return {};
     }
 
-    // During SSR, return the current state without subscribing
-    // This prevents hydration mismatches
+    // During SSR, return the current state from the store directly
+    // This prevents hydration mismatches while still using the subscription
     if (typeof window === 'undefined') {
       const serverState = store.getState();
       console.log('SSR mode, returning server state:', serverState);
       return serverState;
     }
 
-    // On client, use Zustand's built-in React integration
-    // This is now safe because we're inside a React hook
-    const clientState = useStore(store);
-    console.log('Client mode, returning client state:', clientState);
-    return clientState;
+    // On client, return the subscribed state from useStore
+    console.log('Client mode, returning subscribed state:', storeState);
+    return storeState;
   };
 };
 
