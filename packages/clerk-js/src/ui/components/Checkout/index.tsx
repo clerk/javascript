@@ -7,7 +7,7 @@ import { Flow, localizationKeys, Spinner } from '../../customizables';
 import { CheckoutComplete } from './CheckoutComplete';
 import { CheckoutForm } from './CheckoutForm';
 import * as CheckoutPage from './CheckoutPage';
-import { AddEmailForm, GenericError, InvalidPlanError } from './parts';
+import { AddEmailForm, GenericError, InvalidPlanScreen } from './parts';
 
 export const Checkout = (props: __internal_CheckoutProps) => {
   return (
@@ -40,7 +40,7 @@ export const Checkout = (props: __internal_CheckoutProps) => {
                 </CheckoutPage.Stage>
 
                 <CheckoutPage.Stage name='invalid_plan_change'>
-                  <InvalidPlanError />
+                  <InvalidPlanScreen />
                 </CheckoutPage.Stage>
 
                 <CheckoutPage.Stage name='missing_payer_email'>
