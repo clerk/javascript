@@ -8,7 +8,6 @@ import type {
 import { useCallback, useMemo } from 'react';
 import useSWR from 'swr';
 
-import { CommerceSubscription } from '../../../core/resources/internal';
 import type { LocalizationKey } from '../../localization';
 import { localizationKeys } from '../../localization';
 import { getClosestProfileScrollBox } from '../../utils';
@@ -80,11 +79,10 @@ export const useStatements = () => {
 export const useSubscriptions = () => {
   const { billing } = useClerk();
   const { organization } = useOrganization();
-  const { user, isSignedIn } = useUser();
+  const { user } = useUser();
   const subscriberType = useSubscriberTypeContext();
-  const { data: plans } = usePlans();
 
-  const { data: _subscriptions, ...rest } = useSWR(
+  return useSWR(
     {
       key: `commerce-subscriptions`,
       userId: user?.id,
@@ -93,42 +91,6 @@ export const useSubscriptions = () => {
     ({ args, userId }) => (userId ? billing.getSubscriptions(args) : undefined),
     dedupeOptions,
   );
-
-  const subscriptions = useMemo(() => {
-    if (!_subscriptions) {
-      return [];
-    }
-    const defaultFreePlan = plans?.find(plan => plan.hasBaseFee === false && plan.amount === 0);
-
-    // are we signed in, is there a default free plan, and should it be shown as active or upcoming? then add an implicit subscription
-    if (
-      isSignedIn &&
-      defaultFreePlan &&
-      (_subscriptions.data.length === 0 || !_subscriptions.data.some(subscription => !subscription.canceledAt))
-    ) {
-      const canceledSubscription = _subscriptions.data.find(subscription => subscription.canceledAt);
-      return [
-        ..._subscriptions.data,
-        new CommerceSubscription({
-          object: 'commerce_subscription',
-          id: '__implicit_default_plan_subscription__',
-          payment_source_id: '',
-          plan: defaultFreePlan.__internal_toSnapshot(),
-          plan_period: 'month',
-          canceled_at: null,
-          status: _subscriptions.data.length === 0 ? 'active' : 'upcoming',
-          period_start: canceledSubscription?.periodEnd || 0,
-          period_end: 0,
-        }),
-      ];
-    }
-    return _subscriptions.data;
-  }, [_subscriptions, plans, isSignedIn]);
-
-  return {
-    data: subscriptions,
-    ...rest,
-  };
 };
 
 export const usePlans = () => {
@@ -172,7 +134,8 @@ export const usePlansContext = () => {
     return false;
   }, [clerk, subscriberType]);
 
-  const { data: subscriptions, mutate: mutateSubscriptions } = useSubscriptions();
+  const { data, mutate: mutateSubscriptions } = useSubscriptions();
+  const { data: subscriptions = [] } = data || {};
 
   // Invalidates cache but does not fetch immediately
   const { data: plans, mutate: mutatePlans } = useSWR<Awaited<ReturnType<typeof clerk.billing.getPlans>>>({
@@ -250,13 +213,6 @@ export const usePlansContext = () => {
     },
     [activeOrUpcomingSubscription],
   );
-
-  // should the default plan be shown as active
-  const upcomingSubscriptionsExist = useMemo(() => {
-    return (
-      subscriptions.some(subscription => subscription.status === 'upcoming') || isDefaultPlanImplicitlyActiveOrUpcoming
-    );
-  }, [subscriptions, isDefaultPlanImplicitlyActiveOrUpcoming]);
 
   // return the CTA button props for a plan
   const buttonPropsForPlan = useCallback(
@@ -411,7 +367,6 @@ export const usePlansContext = () => {
     buttonPropsForPlan,
     canManageSubscription,
     captionForSubscription,
-    upcomingSubscriptionsExist,
     defaultFreePlan,
     revalidateAll,
   };
