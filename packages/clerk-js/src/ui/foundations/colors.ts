@@ -1,4 +1,10 @@
-import { createAlphaScaleWithTransparentize, transparentize } from '../utils/colorMix';
+import {
+  createAlphaScaleWithTransparentize,
+  createColorMixLightnessScale,
+  lighten,
+  transparentize,
+} from '../utils/colorMix';
+import { clerkCssVar } from '../utils/css';
 
 type ColorScale<Prefix extends string> = {
   [K in `${Prefix}${'50' | '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900' | '950'}`]: string;
@@ -6,12 +12,17 @@ type ColorScale<Prefix extends string> = {
 
 // Create alpha scales separately to preserve types
 export const whiteAlpha = createAlphaScaleWithTransparentize('white', 'whiteAlpha');
-export const neutralAlpha = createAlphaScaleWithTransparentize('black', 'neutralAlpha');
+export const neutralAlpha = createAlphaScaleWithTransparentize(clerkCssVar('neutral', 'black'), 'neutralAlpha');
 
-const primaryAlpha = createAlphaScaleWithTransparentize('#2F3037', 'primaryAlpha');
-const dangerAlpha = createAlphaScaleWithTransparentize('#EF4444', 'dangerAlpha');
-const warningAlpha = createAlphaScaleWithTransparentize('#F36B16', 'warningAlpha');
-const successAlpha = createAlphaScaleWithTransparentize('#22C543', 'successAlpha');
+const primaryAlpha = createAlphaScaleWithTransparentize(clerkCssVar('primary', '#2F3037'), 'primaryAlpha');
+const dangerAlpha = createAlphaScaleWithTransparentize(clerkCssVar('danger', '#EF4444'), 'dangerAlpha');
+const warningAlpha = createAlphaScaleWithTransparentize(clerkCssVar('warning', '#F36B16'), 'warningAlpha');
+const successAlpha = createAlphaScaleWithTransparentize(clerkCssVar('success', '#22C543'), 'successAlpha');
+
+const primaryScale = createColorMixLightnessScale(clerkCssVar('primary', '#2F3037'), 'primary');
+const dangerScale = createColorMixLightnessScale(clerkCssVar('danger', '#EF4444'), 'danger');
+const warningScale = createColorMixLightnessScale(clerkCssVar('warning', '#F36B16'), 'warning');
+const successScale = createColorMixLightnessScale(clerkCssVar('success', '#22C543'), 'success');
 
 // Define the base colors object type
 type BaseColors = {
@@ -51,63 +62,24 @@ export const colors: Colors = Object.freeze({
   // Themable colors
   ...neutralAlpha,
   ...whiteAlpha,
-  colorBackground: 'white',
-  colorInputBackground: 'white',
-  colorText: '#212126',
-  colorTextSecondary: '#747686',
-  colorInputText: '#131316',
-  colorTextOnPrimaryBackground: 'white',
-  colorShimmer: transparentize('white', '36%'),
+  colorBackground: clerkCssVar('background', 'white'),
+  colorInputBackground: clerkCssVar('input', 'white'),
+  colorText: clerkCssVar('foreground', '#212126'),
+  colorTextSecondary: clerkCssVar('secondary-foreground', '#747686'),
+  colorInputText: clerkCssVar('input-foreground', '#131316'),
+  colorTextOnPrimaryBackground: clerkCssVar('primary-foreground', 'white'),
+  colorShimmer: transparentize(clerkCssVar('shimmer', 'white'), '36%'),
   transparent: 'transparent',
   white: 'white',
   black: 'black',
-  primary50: '#B9BDBC',
-  primary100: '#9EA1A2',
-  primary200: '#828687',
-  primary300: '#66696D',
-  primary400: '#4B4D52',
-  primary500: '#2F3037',
-  primary600: '#2A2930',
-  primary700: '#25232A',
-  primary800: '#201D23',
-  primary900: '#1B171C',
-  primary950: '#0F0D12',
-  primaryHover: '#3B3C45', // primary 500 adjusted for lightness
+  ...primaryScale,
+  // TODO(Colors): We are not adjusting the lightness based on the colorPrimary lightness
+  primaryHover: lighten(clerkCssVar('primary', '#2F3037'), '25%'), // primary 500 adjusted for lightness
   ...primaryAlpha,
-  danger50: '#FEF2F2',
-  danger100: '#FEE5E5',
-  danger200: '#FECACA',
-  danger300: '#FCA5A5',
-  danger400: '#F87171',
-  danger500: '#EF4444',
-  danger600: '#DC2626',
-  danger700: '#B91C1C',
-  danger800: '#991B1B',
-  danger900: '#7F1D1D',
-  danger950: '#450A0A',
+  ...dangerScale,
   ...dangerAlpha,
-  warning50: '#FFF6ED',
-  warning100: '#FFEBD5',
-  warning200: '#FED1AA',
-  warning300: '#FDB674',
-  warning400: '#F98C49',
-  warning500: '#F36B16',
-  warning600: '#EA520C',
-  warning700: '#C23A0C',
-  warning800: '#9A2F12',
-  warning900: '#7C2912',
-  warning950: '#431207',
+  ...warningScale,
   ...warningAlpha,
-  success50: '#F0FDF2',
-  success100: '#DCFCE2',
-  success200: '#BBF7C6',
-  success300: '#86EF9B',
-  success400: '#4ADE68',
-  success500: '#22C543',
-  success600: '#16A332',
-  success700: '#15802A',
-  success800: '#166527',
-  success900: '#145323',
-  success950: '#052E0F',
+  ...successScale,
   ...successAlpha,
 } as const);

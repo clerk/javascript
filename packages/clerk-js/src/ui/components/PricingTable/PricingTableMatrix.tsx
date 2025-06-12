@@ -3,6 +3,7 @@ import * as React from 'react';
 
 import { Avatar } from '@/ui/elements/Avatar';
 import { SegmentedControl } from '@/ui/elements/SegmentedControl';
+import { colorMix } from '@/ui/utils/colorMix';
 
 import { usePlansContext } from '../../contexts';
 import {
@@ -21,7 +22,7 @@ import {
 } from '../../customizables';
 import { usePrefersReducedMotion } from '../../hooks';
 import { Check, InformationCircle } from '../../icons';
-import { common, InternalThemeProvider, mqu, type ThemableCssProp } from '../../styledSystem';
+import { InternalThemeProvider, mqu, type ThemableCssProp } from '../../styledSystem';
 
 interface PricingTableMatrixProps {
   plans: CommercePlanResource[] | undefined;
@@ -54,7 +55,7 @@ export function PricingTableMatrix({
   });
 
   const highlightBackgroundColor: ThemableCssProp = t => ({
-    background: common.mergedColorsBackground(t.colors.$colorBackground, t.colors.$neutralAlpha25),
+    background: colorMix(t.colors.$colorBackground, t.colors.$neutralAlpha25),
   });
 
   const gridTemplateColumns = React.useMemo(() => `repeat(${plans.length + 1}, minmax(9.375rem,1fr))`, [plans.length]);

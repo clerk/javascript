@@ -144,6 +144,14 @@ const ALL_LIGHTNESS_SHADE_KEYS = Object.keys(LIGHTNESS_SHADES_DEF) as LightnessS
  * @returns A prefixed color scale object, or undefined if colorOption is undefined.
  */
 export function createColorMixLightnessScale<P extends string>(
+  colorOption: string | Partial<Record<LightnessShadeKey, string>>,
+  prefix: P,
+): Record<`${P}${LightnessShadeKey}`, string>;
+export function createColorMixLightnessScale<P extends string>(
+  colorOption: string | Partial<Record<LightnessShadeKey, string>> | undefined,
+  prefix: P,
+): Record<`${P}${LightnessShadeKey}`, string> | undefined;
+export function createColorMixLightnessScale<P extends string>(
   colorOption: string | Partial<Record<LightnessShadeKey, string>> | undefined,
   prefix: P,
 ): Record<`${P}${LightnessShadeKey}`, string> | undefined {

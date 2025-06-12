@@ -345,7 +345,7 @@ void (async () => {
       signUpUrl: '/sign-up',
     });
     renderCurrentRoute();
-    updateVariables();
+    // updateVariables(); // Commented out as it overrides css variables
     updateOtherOptions();
   } else {
     console.error(`Unknown route: "${route}".`);

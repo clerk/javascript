@@ -1,40 +1,42 @@
+import { clerkCssVar } from '../utils/css';
+
 const fontWeights = Object.freeze({
-  normal: 400,
-  medium: 500,
-  semibold: 600,
-  bold: 700,
+  normal: clerkCssVar('font-weight-normal', clerkCssVar('font-weight', '400')),
+  medium: clerkCssVar('font-weight-medium', '500'),
+  semibold: clerkCssVar('font-weight-semibold', '600'),
+  bold: clerkCssVar('font-weight-bold', '700'),
 } as const);
 
 const lineHeights = Object.freeze({
-  normal: 'normal',
-  extraSmall: '1.33333',
-  small: '1.38462',
-  medium: '1.41176',
-  large: '1.45455',
+  normal: clerkCssVar('line-height-normal', clerkCssVar('line-height', 'normal')),
+  extraSmall: clerkCssVar('line-height-extra-small', `calc(${clerkCssVar('line-height', 'normal')} * 1.33333)`), // 1.33333
+  small: clerkCssVar('line-height-small', `calc(${clerkCssVar('line-height', 'normal')} * 1.38462)`), // 1.38462
+  medium: clerkCssVar('line-height-medium', `calc(${clerkCssVar('line-height', 'normal')} * 1.41176)`), // 1.41176
+  large: clerkCssVar('line-height-large', `calc(${clerkCssVar('line-height', 'normal')} * 1.45455)`), // 1.45455
 } as const);
 
 const letterSpacings = Object.freeze({
-  normal: 'normal',
+  normal: clerkCssVar('letter-spacing-normal', clerkCssVar('letter-spacing', 'normal')),
 } as const);
 
 // We want to achieve the md size to be 13px for root font size of 16px
 // This is directly related to the createFontSizeScale function in the theme
 // ref: src/ui/customizables/parseVariables.ts
 const fontSizes = Object.freeze({
-  xs: '0.6875rem',
-  sm: '0.75rem',
-  md: '0.8125rem',
-  lg: '1.0625rem',
-  xl: '1.5rem',
+  xs: clerkCssVar('font-size-xs', `calc(${clerkCssVar('font-size', '0.8125rem')} * 0.8)`), // 0.6875rem
+  sm: clerkCssVar('font-size-sm', `calc(${clerkCssVar('font-size', '0.8125rem')} * 0.9)`), // 0.75rem
+  md: clerkCssVar('font-size-md', clerkCssVar('font-size', '0.8125rem')),
+  lg: clerkCssVar('font-size-lg', `calc(${clerkCssVar('font-size', '0.8125rem')} * 1.3)`), // 1.0625rem
+  xl: clerkCssVar('font-size-xl', `calc(${clerkCssVar('font-size', '0.8125rem')} * 1.85)`), // 1.5rem
 } as const);
 
 const fontStyles = Object.freeze({
-  normal: 'normal',
+  normal: clerkCssVar('font-style-normal', clerkCssVar('font-style', 'normal')),
 } as const);
 
 const fonts = Object.freeze({
-  main: 'inherit',
-  buttons: 'inherit',
+  main: clerkCssVar('font-family', 'inherit'),
+  buttons: clerkCssVar('font-family-buttons', clerkCssVar('font-family', 'inherit')),
 } as const);
 
 export { fontSizes, fontWeights, letterSpacings, lineHeights, fonts, fontStyles };

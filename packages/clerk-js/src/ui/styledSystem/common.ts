@@ -100,7 +100,7 @@ const borderVariants = (t: InternalTheme, props?: any) => {
               hoverBoxShadow,
               t.shadows.$focusRing.replace(
                 '{{color}}',
-                !props?.hasError ? t.colors.$neutralAlpha150 : (t.colors.$dangerAlpha200 as string),
+                !props?.hasError ? t.colors.$neutralAlpha150 : t.colors.$dangerAlpha200,
               ),
             ].toString(),
           },
@@ -186,10 +186,6 @@ const maxHeightScroller = (t: InternalTheme) =>
     ...unstyledScrollbar(t),
   }) as const;
 
-const mergedColorsBackground = (colorBack: string, colorFront: string) => {
-  return `linear-gradient(${colorFront},${colorFront}), linear-gradient(${colorBack}, ${colorBack})`;
-};
-
 const visuallyHidden = () =>
   ({
     clip: 'rect(0 0 0 0)',
@@ -211,6 +207,5 @@ export const common = {
   centeredFlex,
   maxHeightScroller,
   unstyledScrollbar,
-  mergedColorsBackground,
   visuallyHidden,
 };
