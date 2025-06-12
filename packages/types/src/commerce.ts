@@ -8,6 +8,7 @@ type WithOptionalOrgType<T> = T & {
 };
 
 export interface CommerceBillingNamespace {
+  getPaymentAttempts: (params: GetPaymentAttemptsParams) => Promise<ClerkPaginatedResponse<CommercePaymentResource>>;
   getPlans: (params?: GetPlansParams) => Promise<CommercePlanResource[]>;
   getSubscriptions: (params: GetSubscriptionsParams) => Promise<ClerkPaginatedResponse<CommerceSubscriptionResource>>;
   getStatements: (params: GetStatementsParams) => Promise<ClerkPaginatedResponse<CommerceStatementResource>>;
@@ -106,7 +107,26 @@ export interface CommercePaymentSourceResource extends ClerkResource {
 export interface CommerceInitializedPaymentSourceResource extends ClerkResource {
   externalClientSecret: string;
   externalGatewayId: string;
+  paymentMethodOrder: string[];
 }
+
+export type CommercePaymentChargeType = 'checkout' | 'recurring';
+export type CommercePaymentStatus = 'pending' | 'paid' | 'failed';
+
+export interface CommercePaymentResource extends ClerkResource {
+  id: string;
+  amount: CommerceMoney;
+  paidAt?: number;
+  failedAt?: number;
+  updatedAt: number;
+  paymentSource: CommercePaymentSourceResource;
+  subscription: CommerceSubscriptionResource;
+  subscriptionItem: CommerceSubscriptionResource;
+  chargeType: CommercePaymentChargeType;
+  status: CommercePaymentStatus;
+}
+
+export type GetPaymentAttemptsParams = WithOptionalOrgType<ClerkPaginationParams>;
 
 export type GetStatementsParams = WithOptionalOrgType<ClerkPaginationParams>;
 
@@ -122,19 +142,7 @@ export interface CommerceStatementResource extends ClerkResource {
 
 export interface CommerceStatementGroup {
   timestamp: number;
-  items: CommercePayment[];
-}
-
-export type CommercePaymentChargeType = 'checkout' | 'recurring';
-export type CommercePaymentStatus = 'pending' | 'paid' | 'failed';
-
-export interface CommercePayment {
-  id: string;
-  amount: CommerceMoney;
-  paymentSource: CommercePaymentSourceResource;
-  subscription: CommerceSubscriptionResource;
-  chargeType: CommercePaymentChargeType;
-  status: CommercePaymentStatus;
+  items: CommercePaymentResource[];
 }
 
 export type GetSubscriptionsParams = WithOptionalOrgType<ClerkPaginationParams>;

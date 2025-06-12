@@ -1,11 +1,13 @@
 import { useReverification, useUser } from '@clerk/shared/react';
 import type { OAuthProvider, OAuthStrategy } from '@clerk/types';
 
+import { useCardState } from '@/ui/elements/contexts';
+import { ProfileSection } from '@/ui/elements/Section';
+
 import { appendModalState } from '../../../utils';
 import { ProviderInitialIcon } from '../../common';
 import { useUserProfileContext } from '../../contexts';
 import { descriptors, Image, localizationKeys } from '../../customizables';
-import { ProfileSection, useCardState } from '../../elements';
 import { useEnabledThirdPartyProviders } from '../../hooks';
 import { useRouter } from '../../router';
 import { handleError, sleep } from '../../utils';

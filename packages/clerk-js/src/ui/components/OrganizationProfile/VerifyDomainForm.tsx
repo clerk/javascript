@@ -1,19 +1,17 @@
 import { useOrganization } from '@clerk/shared/react';
 import React, { useRef } from 'react';
 
+import { useFieldOTP } from '@/ui/elements/CodeControl';
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { Form } from '@/ui/elements/Form';
+import { FormButtonContainer, FormButtons } from '@/ui/elements/FormButtons';
+import type { FormProps } from '@/ui/elements/FormContainer';
+import { FormContainer } from '@/ui/elements/FormContainer';
+import type { VerificationCodeCardProps } from '@/ui/elements/VerificationCodeCard';
+
 import { useWizard, Wizard } from '../../common';
 import { useEnvironment } from '../../contexts';
 import { Button, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
-import type { FormProps, VerificationCodeCardProps } from '../../elements';
-import {
-  Form,
-  FormButtonContainer,
-  FormButtons,
-  FormContainer,
-  useCardState,
-  useFieldOTP,
-  withCardStateProvider,
-} from '../../elements';
 import { useFetch } from '../../hooks';
 import { handleError, useFormControl } from '../../utils';
 import { VerifiedDomainForm } from './VerifiedDomainForm';

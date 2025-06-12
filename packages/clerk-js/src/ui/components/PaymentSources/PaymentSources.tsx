@@ -3,17 +3,23 @@ import type { CommercePaymentSourceResource } from '@clerk/types';
 import type { SetupIntent } from '@stripe/stripe-js';
 import { Fragment, useCallback, useMemo, useRef } from 'react';
 
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { FullHeightLoader } from '@/ui/elements/FullHeightLoader';
+import { ProfileSection } from '@/ui/elements/Section';
+import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
+
 import { RemoveResourceForm } from '../../common';
+import { DevOnly } from '../../common/DevOnly';
 import { usePaymentSources, useSubscriberTypeContext } from '../../contexts';
 import { localizationKeys } from '../../customizables';
-import { FullHeightLoader, ProfileSection, ThreeDotsMenu, useCardState, withCardStateProvider } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { handleError } from '../../utils';
-import { AddPaymentSource } from './AddPaymentSource';
+import * as AddPaymentSource from './AddPaymentSource';
 import { PaymentSourceRow } from './PaymentSourceRow';
+import { TestPaymentSource } from './TestPaymentSource';
 
-const AddScreen = ({ onSuccess }: { onSuccess: () => void }) => {
+const AddScreen = withCardStateProvider(({ onSuccess }: { onSuccess: () => void }) => {
   const { close } = useActionContext();
   const clerk = useClerk();
   const subscriberType = useSubscriberTypeContext();
@@ -30,12 +36,20 @@ const AddScreen = ({ onSuccess }: { onSuccess: () => void }) => {
   };
 
   return (
-    <AddPaymentSource
+    <AddPaymentSource.Root
       onSuccess={onAddPaymentSourceSuccess}
       cancelAction={close}
-    />
+    >
+      <AddPaymentSource.FormHeader text={localizationKeys('userProfile.billingPage.paymentSourcesSection.add')} />
+      <AddPaymentSource.FormSubtitle
+        text={localizationKeys('userProfile.billingPage.paymentSourcesSection.addSubtitle')}
+      />
+      <DevOnly>
+        <TestPaymentSource />
+      </DevOnly>
+    </AddPaymentSource.Root>
   );
-};
+});
 
 const RemoveScreen = ({
   paymentSource,

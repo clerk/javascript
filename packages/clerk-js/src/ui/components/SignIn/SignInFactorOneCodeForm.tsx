@@ -2,10 +2,12 @@ import { isUserLockedError } from '@clerk/shared/error';
 import { useClerk } from '@clerk/shared/react';
 import type { EmailCodeFactor, PhoneCodeFactor, ResetPasswordCodeFactor } from '@clerk/types';
 
+import { useCardState } from '@/ui/elements/contexts';
+import type { VerificationCodeCardProps } from '@/ui/elements/VerificationCodeCard';
+import { VerificationCodeCard } from '@/ui/elements/VerificationCodeCard';
+
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { useCoreSignIn, useSignInContext } from '../../contexts';
-import type { VerificationCodeCardProps } from '../../elements';
-import { useCardState, VerificationCodeCard } from '../../elements';
 import { useFetch } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { type LocalizationKey } from '../../localization';

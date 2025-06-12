@@ -33,6 +33,7 @@ const AVAILABLE_COMPONENTS = [
   'organizationSwitcher',
   'waitlist',
   'pricingTable',
+  'oauthConsent',
 ] as const;
 
 const COMPONENT_PROPS_NAMESPACE = 'clerk-js-sandbox';
@@ -91,6 +92,7 @@ const componentControls: Record<(typeof AVAILABLE_COMPONENTS)[number], Component
   organizationSwitcher: buildComponentControls('organizationSwitcher'),
   waitlist: buildComponentControls('waitlist'),
   pricingTable: buildComponentControls('pricingTable'),
+  oauthConsent: buildComponentControls('oauthConsent'),
 };
 
 declare global {
@@ -309,6 +311,21 @@ void (async () => {
     },
     '/pricing-table': () => {
       Clerk.mountPricingTable(app, componentControls.pricingTable.getProps() ?? {});
+    },
+    '/oauth-consent': () => {
+      const searchParams = new URLSearchParams(window.location.search);
+      const scopes = (searchParams.get('scopes')?.split(',') ?? []).map(scope => ({
+        scope,
+        description: `Grants access to your ${scope}`,
+      }));
+      Clerk.__internal_mountOAuthConsent(
+        app,
+        componentControls.oauthConsent.getProps() ?? {
+          scopes,
+          oAuthApplicationName: searchParams.get('oauth-application-name'),
+          redirectUrl: searchParams.get('redirect_uri'),
+        },
+      );
     },
     '/open-sign-in': () => {
       mountOpenSignInButton(app, componentControls.signIn.getProps() ?? {});

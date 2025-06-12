@@ -1,8 +1,10 @@
 import { cloneElement, type ReactElement, useId } from 'react';
 
+import { withCardStateProvider, withFloatingTree } from '@/ui/elements/contexts';
+import { Popover } from '@/ui/elements/Popover';
+
 import { useUserButtonContext, withCoreUserGuard } from '../../contexts';
 import { Flow } from '../../customizables';
-import { Popover, withCardStateProvider, withFloatingTree } from '../../elements';
 import { usePopover } from '../../hooks';
 import { UserButtonPopover } from './UserButtonPopover';
 import { UserButtonTrigger } from './UserButtonTrigger';

@@ -2,18 +2,16 @@ import { useClerk, useOrganization, useOrganizationList, useUser } from '@clerk/
 import type { OrganizationResource } from '@clerk/types';
 import React from 'react';
 
+import { Actions, SmallAction } from '@/ui/elements/Actions';
+import { useCardState } from '@/ui/elements/contexts';
+import { OrganizationPreview } from '@/ui/elements/OrganizationPreview';
+import { PersonalWorkspacePreview } from '@/ui/elements/PersonalWorkspacePreview';
+import { PopoverCard } from '@/ui/elements/PopoverCard';
+
 import { runIfFunctionOrReturn } from '../../../utils';
 import { NotificationCountBadge, withProtect } from '../../common';
 import { useEnvironment, useOrganizationSwitcherContext } from '../../contexts';
 import { descriptors, Flex, localizationKeys } from '../../customizables';
-import {
-  Actions,
-  OrganizationPreview,
-  PersonalWorkspacePreview,
-  PopoverCard,
-  SmallAction,
-  useCardState,
-} from '../../elements';
 import { RootBox } from '../../elements/RootBox';
 import { Billing, CogFilled } from '../../icons';
 import { useRouter } from '../../router';

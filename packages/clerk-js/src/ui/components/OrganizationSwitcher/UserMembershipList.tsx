@@ -2,10 +2,13 @@ import { useOrganization, useOrganizationList, useUser } from '@clerk/shared/rea
 import type { OrganizationResource } from '@clerk/types';
 import React from 'react';
 
+import { OrganizationPreview } from '@/ui/elements/OrganizationPreview';
+import { PersonalWorkspacePreview } from '@/ui/elements/PersonalWorkspacePreview';
+import { PreviewButton } from '@/ui/elements/PreviewButton';
+
 import { InfiniteListSpinner } from '../../common';
 import { useOrganizationSwitcherContext } from '../../contexts';
 import { Box, descriptors, localizationKeys } from '../../customizables';
-import { OrganizationPreview, PersonalWorkspacePreview, PreviewButton } from '../../elements';
 import { useInView } from '../../hooks';
 import { SwitchArrowRight } from '../../icons';
 import { common } from '../../styledSystem';

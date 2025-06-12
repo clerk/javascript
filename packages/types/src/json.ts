@@ -349,6 +349,13 @@ export interface ClerkAPIErrorJSON {
         message: string;
       }[];
     };
+    plan?: {
+      amount_formatted: string;
+      annual_monthly_amount_formatted: string;
+      currency_symbol: string;
+      id: string;
+      name: string;
+    };
   };
 }
 
@@ -649,6 +656,7 @@ export interface CommerceInitializedPaymentSourceJSON extends ClerkResourceJSON 
   object: 'commerce_payment_source_initialize';
   external_client_secret: string;
   external_gateway_id: string;
+  payment_method_order: string[];
 }
 
 export interface CommerceStatementJSON extends ClerkResourceJSON {
@@ -670,8 +678,12 @@ export interface CommercePaymentJSON extends ClerkResourceJSON {
   object: 'commerce_payment';
   id: string;
   amount: CommerceMoneyJSON;
+  paid_at?: number;
+  failed_at?: number;
+  updated_at: number;
   payment_source: CommercePaymentSourceJSON;
   subscription: CommerceSubscriptionJSON;
+  subscription_item: CommerceSubscriptionJSON;
   charge_type: CommercePaymentChargeType;
   status: CommercePaymentStatus;
 }

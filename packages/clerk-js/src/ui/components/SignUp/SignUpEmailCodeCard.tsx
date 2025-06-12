@@ -1,6 +1,7 @@
+import { useCardState } from '@/ui/elements/contexts';
+
 import { useCoreSignUp } from '../../contexts';
 import { Flow, localizationKeys } from '../../customizables';
-import { useCardState } from '../../elements';
 import { useFetch } from '../../hooks';
 import { handleError } from '../../utils';
 import { SignUpVerificationCodeForm } from './SignUpVerificationCodeForm';

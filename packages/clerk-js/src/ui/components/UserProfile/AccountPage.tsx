@@ -1,8 +1,11 @@
 import { useUser } from '@clerk/shared/react';
 
+import { Card } from '@/ui/elements/Card';
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { Header } from '@/ui/elements/Header';
+
 import { useEnvironment } from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
-import { Card, Header, useCardState, withCardStateProvider } from '../../elements';
 import { ConnectedAccountsSection } from './ConnectedAccountsSection';
 import { EmailsSection } from './EmailsSection';
 import { EnterpriseAccountsSection } from './EnterpriseAccountsSection';

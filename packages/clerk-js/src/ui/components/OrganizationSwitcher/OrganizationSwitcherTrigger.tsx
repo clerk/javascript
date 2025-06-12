@@ -1,10 +1,13 @@
 import { useOrganization, useOrganizationList, useUser } from '@clerk/shared/react';
 import { forwardRef } from 'react';
 
+import { OrganizationPreview } from '@/ui/elements/OrganizationPreview';
+import { PersonalWorkspacePreview } from '@/ui/elements/PersonalWorkspacePreview';
+import { withAvatarShimmer } from '@/ui/elements/withAvatarShimmer';
+
 import { NotificationCountBadge, useProtect } from '../../common';
 import { useEnvironment, useOrganizationSwitcherContext } from '../../contexts';
 import { Button, descriptors, Icon, localizationKeys } from '../../customizables';
-import { OrganizationPreview, PersonalWorkspacePreview, withAvatarShimmer } from '../../elements';
 import { ChevronDown } from '../../icons';
 import type { PropsOfComponent } from '../../styledSystem';
 import { organizationListParams } from './utils';

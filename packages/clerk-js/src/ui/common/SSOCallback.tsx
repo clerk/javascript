@@ -3,8 +3,10 @@ import type { HandleOAuthCallbackParams, HandleSamlCallbackParams } from '@clerk
 import React from 'react';
 
 import { Flow } from '../customizables';
-import { Card, LoadingCardContainer, useCardState, withCardStateProvider } from '../elements';
 import { CaptchaElement } from '../elements/CaptchaElement';
+import { Card } from '../elements/Card';
+import { useCardState, withCardStateProvider } from '../elements/contexts';
+import { LoadingCardContainer } from '../elements/LoadingCard';
 import { useRouter } from '../router';
 import { handleError } from '../utils';
 

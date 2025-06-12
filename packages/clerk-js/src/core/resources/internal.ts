@@ -7,6 +7,7 @@ export * from './Client';
 export * from './CommerceCheckout';
 export * from './CommerceFeature';
 export * from './CommerceStatement';
+export * from './CommercePayment';
 export * from './CommercePaymentSource';
 export * from './CommercePlan';
 export * from './CommerceProduct';

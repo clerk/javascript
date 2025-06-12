@@ -17,6 +17,7 @@ import { allSettled, handleValueOrFn, noop } from '@clerk/shared/utils';
 import type {
   __internal_CheckoutProps,
   __internal_ComponentNavigationContext,
+  __internal_OAuthConsentProps,
   __internal_PlanDetailsProps,
   __internal_UserVerificationModalProps,
   AuthenticateWithCoinbaseWalletParams,
@@ -1037,6 +1038,23 @@ export class Clerk implements ClerkInterface {
     );
   };
 
+  public __internal_mountOAuthConsent = (node: HTMLDivElement, props?: __internal_OAuthConsentProps) => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted({ preloadHint: 'OAuthConsent' }).then(controls =>
+      controls.mountComponent({
+        name: 'OAuthConsent',
+        appearanceKey: '__internal_oauthConsent',
+        node,
+        props,
+      }),
+    );
+  };
+
+  public __internal_unmountOAuthConsent = (node: HTMLDivElement) => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted().then(controls => controls.unmountComponent({ node }));
+  };
+
   /**
    * `setActive` can be used to set the active session and/or organization.
    */
@@ -1085,7 +1103,16 @@ export class Clerk implements ClerkInterface {
           const matchingOrganization = newSession.user.organizationMemberships.find(
             mem => mem.organization.slug === organizationIdOrSlug,
           );
-          newSession.lastActiveOrganizationId = matchingOrganization?.organization.id || null;
+
+          const newLastActiveOrganizationId = matchingOrganization?.organization.id || null;
+          const isPersonalWorkspace = newLastActiveOrganizationId === null;
+
+          // Do not update in-memory to personal workspace if force organization selection is enabled
+          if (this.environment?.organizationSettings?.forceOrganizationSelection && isPersonalWorkspace) {
+            return;
+          }
+
+          newSession.lastActiveOrganizationId = newLastActiveOrganizationId;
         }
       }
 

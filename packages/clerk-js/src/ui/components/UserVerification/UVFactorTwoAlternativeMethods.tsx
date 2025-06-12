@@ -1,9 +1,12 @@
 import type { SessionVerificationSecondFactor } from '@clerk/types';
 import React from 'react';
 
+import { ArrowBlockButton } from '@/ui/elements/ArrowBlockButton';
+import { Card } from '@/ui/elements/Card';
+import { Header } from '@/ui/elements/Header';
+
 import type { LocalizationKey } from '../../customizables';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
-import { ArrowBlockButton, Card, Header } from '../../elements';
 import { useCardState } from '../../elements/contexts';
 import { backupCodePrefFactorComparator, formatSafeIdentifier } from '../../utils';
 import { HavingTrouble } from './HavingTrouble';

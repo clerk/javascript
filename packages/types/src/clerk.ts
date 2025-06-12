@@ -2,6 +2,7 @@ import type {
   Appearance,
   CheckoutTheme,
   CreateOrganizationTheme,
+  OAuthConsentTheme,
   OrganizationListTheme,
   OrganizationProfileTheme,
   OrganizationSwitcherTheme,
@@ -457,6 +458,19 @@ export interface Clerk {
    * @param targetNode Target node to unmount the PricingTable component from.
    */
   unmountPricingTable: (targetNode: HTMLDivElement) => void;
+
+  /**
+   * Mounts a OAuth consent component at the target element.
+   * @param targetNode Target node to mount the OAuth consent component.
+   * @param oauthConsentProps OAuth consent configuration parameters.
+   */
+  __internal_mountOAuthConsent: (targetNode: HTMLDivElement, oauthConsentProps?: __internal_OAuthConsentProps) => void;
+
+  /**
+   * Unmounts a OAuth consent component from the target element.
+   * @param targetNode Target node to unmount the OAuth consent component from.
+   */
+  __internal_unmountOAuthConsent: (targetNode: HTMLDivElement) => void;
 
   /**
    * Register a listener that triggers a callback each time important Clerk resources are changed.
@@ -1645,6 +1659,38 @@ export type __internal_PlanDetailsProps = {
   onSubscriptionCancel?: () => void;
   portalId?: string;
   portalRoot?: PortalRoot;
+};
+
+export type __internal_OAuthConsentProps = {
+  appearance?: OAuthConsentTheme;
+  /**
+   * Name of the OAuth application.
+   */
+  oAuthApplicationName: string;
+  /**
+   * Logo URL of the OAuth application.
+   */
+  oAuthApplicationLogoUrl?: string;
+  /**
+   * Scopes requested by the OAuth application.
+   */
+  scopes: {
+    scope: string;
+    description: string | null;
+    requires_consent: boolean;
+  }[];
+  /**
+   * Full URL or path to navigate to after the user allows access.
+   */
+  redirectUrl: string;
+  /**
+   * Called when user allows access.
+   */
+  onAllow: () => void;
+  /**
+   * Called when user denies access.
+   */
+  onDeny: () => void;
 };
 
 export interface HandleEmailLinkVerificationParams {

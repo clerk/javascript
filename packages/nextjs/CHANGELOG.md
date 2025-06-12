@@ -1,5 +1,82 @@
 # Change Log
 
+## 6.21.0
+
+### Minor Changes
+
+- Introduces machine authentication, supporting four token types: `api_key`, `oauth_token`, `machine_token`, and `session_token`. For backwards compatibility, `session_token` remains the default when no token type is specified. This enables machine-to-machine authentication and use cases such as API keys and OAuth integrations. Existing applications continue to work without modification. ([#5689](https://github.com/clerk/javascript/pull/5689)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  You can specify which token types are allowed for a given route or handler using the `acceptsToken` property in the `auth()` helper, or the `token` property in the `auth.protect()` helper. Each can be set to a specific type, an array of types, or `'any'` to accept all supported tokens.
+
+  Example usage in Nextjs middleware:
+
+  ```ts
+  import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
+
+  const isOAuthAccessible = createRouteMatcher(['/oauth(.*)']);
+  const isApiKeyAccessible = createRouteMatcher(['/api(.*)']);
+  const isMachineTokenAccessible = createRouteMatcher(['/m2m(.*)']);
+  const isUserAccessible = createRouteMatcher(['/user(.*)']);
+  const isAccessibleToAnyValidToken = createRouteMatcher(['/any(.*)']);
+
+  export default clerkMiddleware(async (auth, req) => {
+    if (isOAuthAccessible(req)) await auth.protect({ token: 'oauth_token' });
+    if (isApiKeyAccessible(req)) await auth.protect({ token: 'api_key' });
+    if (isMachineTokenAccessible(req)) await auth.protect({ token: 'machine_token' });
+    if (isUserAccessible(req)) await auth.protect({ token: 'session_token' });
+
+    if (isAccessibleToAnyValidToken(req)) await auth.protect({ token: 'any' });
+  });
+
+  export const config = {
+    matcher: [
+      '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+      '/(api|trpc)(.*)',
+    ],
+  };
+  ```
+
+  Leaf node route protection:
+
+  ```ts
+  import { auth } from '@clerk/nextjs/server';
+
+  // In this example, we allow users and oauth tokens with the "profile" scope
+  // to access the data. Other types of tokens are rejected.
+  function POST(req, res) {
+    const authObject = await auth({ acceptsToken: ['session_token', 'oauth_token'] });
+
+    if (authObject.tokenType === 'oauth_token' && !authObject.scopes?.includes('profile')) {
+      throw new Error('Unauthorized: OAuth token missing the "profile" scope');
+    }
+
+    // get data from db using userId
+    const data = db.select().from(user).where(eq(user.id, authObject.userId));
+
+    return { data };
+  }
+  ```
+
+- The `svix` dependency is no longer needed when using the `verifyWebhook()` function. `verifyWebhook()` was refactored to not rely on `svix` anymore while keeping the same functionality and behavior. ([#6059](https://github.com/clerk/javascript/pull/6059)) by [@royanger](https://github.com/royanger)
+
+  If you previously installed `svix` to use `verifyWebhook()` you can uninstall it now:
+
+  ```shell
+  npm uninstall svix
+  ```
+
+### Patch Changes
+
+- Updated URL for 'auth() was called but Clerk can't detect usage of clerkMiddleware()' ([#6035](https://github.com/clerk/javascript/pull/6035)) by [@royanger](https://github.com/royanger)
+
+- Introduce `getAuthObjectFromJwt` as internal utility function that centralizes the logic for generating auth objects from session JWTs. ([#6053](https://github.com/clerk/javascript/pull/6053)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`ea622ba`](https://github.com/clerk/javascript/commit/ea622bae90e18ae2ea8dbc6c94cad857557539c9), [`d8fa5d9`](https://github.com/clerk/javascript/commit/d8fa5d9d3d8dc575260d8d2b7c7eeeb0052d0b0d), [`be2e89c`](https://github.com/clerk/javascript/commit/be2e89ca11aa43d48f74c57a5a34e20d85b4003c), [`c656270`](https://github.com/clerk/javascript/commit/c656270f9e05fd1f44fc4c81851be0b1111cb933), [`5644d94`](https://github.com/clerk/javascript/commit/5644d94f711a0733e4970c3f15c24d56cafc8743), [`a3232c7`](https://github.com/clerk/javascript/commit/a3232c7ee8c1173d2ce70f8252fc083c7bf19374), [`b578225`](https://github.com/clerk/javascript/commit/b5782258242474c9b0987a3f8349836cd763f24b), [`918e2e0`](https://github.com/clerk/javascript/commit/918e2e085bf88c3cfaa5fcb0f1ae8c31b3f7053e), [`795d09a`](https://github.com/clerk/javascript/commit/795d09a652f791e1e409406e335e0860aceda110), [`4f93634`](https://github.com/clerk/javascript/commit/4f93634ed6bcd45f21bddcb39a33434b1cb560fe), [`8838120`](https://github.com/clerk/javascript/commit/8838120596830b88fec1c6c853371dabfec74a0d)]:
+  - @clerk/backend@2.0.0
+  - @clerk/types@4.60.0
+  - @clerk/clerk-react@5.31.9
+  - @clerk/shared@3.9.6
+
 ## 6.20.2
 
 ### Patch Changes

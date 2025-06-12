@@ -1,12 +1,15 @@
 import type { SignedInSessionResource } from '@clerk/types';
 
+import { Action, Actions, SmallAction, SmallActions } from '@/ui/elements/Actions';
+import { PreviewButton } from '@/ui/elements/PreviewButton';
+import { UserPreview } from '@/ui/elements/UserPreview';
+
 import type { ElementDescriptor, ElementId } from '../../../ui/customizables/elementDescriptors';
 import { useRouter } from '../../../ui/router';
 import { USER_BUTTON_ITEM_ID } from '../../constants';
 import { useUserButtonContext } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { descriptors, Flex, localizationKeys } from '../../customizables';
-import { Action, Actions, PreviewButton, SmallAction, SmallActions, UserPreview } from '../../elements';
 import { Add, CogFilled, SignOut, SwitchArrowRight } from '../../icons';
 import type { ThemableCssProp } from '../../styledSystem';
 import type { DefaultItemIds, MenuItem } from '../../utils/createCustomMenuItems';

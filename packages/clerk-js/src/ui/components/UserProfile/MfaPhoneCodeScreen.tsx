@@ -2,19 +2,17 @@ import { useReverification, useUser } from '@clerk/shared/react';
 import type { PhoneNumberResource } from '@clerk/types';
 import React from 'react';
 
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { FormButtonContainer } from '@/ui/elements/FormButtons';
+import type { FormProps } from '@/ui/elements/FormContainer';
+import { FormContainer } from '@/ui/elements/FormContainer';
+import { IconButton } from '@/ui/elements/IconButton';
+import { SuccessPage } from '@/ui/elements/SuccessPage';
+
 import { useWizard, Wizard } from '../../common';
 import { useEnvironment } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { Button, Col, Icon, localizationKeys, Text } from '../../customizables';
-import type { FormProps } from '../../elements';
-import {
-  FormButtonContainer,
-  FormContainer,
-  IconButton,
-  SuccessPage,
-  useCardState,
-  withCardStateProvider,
-} from '../../elements';
 import { Plus } from '../../icons';
 import { getCountryFromPhoneString, handleError, stringToFormattedPhoneString } from '../../utils';
 import { MfaBackupCodeList } from './MfaBackupCodeList';

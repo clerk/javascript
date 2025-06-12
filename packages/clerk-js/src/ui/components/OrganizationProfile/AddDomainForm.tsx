@@ -1,11 +1,15 @@
 import { useOrganization } from '@clerk/shared/react';
 import React, { useState } from 'react';
 
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { Form } from '@/ui/elements/Form';
+import { FormButtons } from '@/ui/elements/FormButtons';
+import type { FormProps } from '@/ui/elements/FormContainer';
+import { FormContainer } from '@/ui/elements/FormContainer';
+
 import { useWizard, Wizard } from '../../common';
 import { useEnvironment } from '../../contexts';
 import { localizationKeys } from '../../customizables';
-import type { FormProps } from '../../elements';
-import { Form, FormButtons, FormContainer, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
 import { VerifyDomainForm } from './VerifyDomainForm';
 

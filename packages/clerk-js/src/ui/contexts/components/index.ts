@@ -14,4 +14,6 @@ export * from './Waitlist';
 export * from './PricingTable';
 export * from './Checkout';
 export * from './Statements';
+export * from './PaymentAttempts';
 export * from './Plans';
+export * from './OAuthConsent';

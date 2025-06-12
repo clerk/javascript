@@ -1,6 +1,11 @@
+import { useMemo } from 'react';
+
+import { Alert } from '@/ui/elements/Alert';
+import { Drawer, useDrawerContext } from '@/ui/elements/Drawer';
+import { LineItems } from '@/ui/elements/LineItems';
+
 import { useCheckoutContext } from '../../contexts';
 import { Box, descriptors, Flex, localizationKeys, useLocalizations } from '../../customizables';
-import { Alert, Drawer, LineItems, useDrawerContext } from '../../elements';
 // TODO(@COMMERCE): Is this causing bundle size  issues ?
 import { EmailForm } from '../UserProfile/EmailForm';
 import { useCheckoutContextRoot } from './CheckoutPage';
@@ -31,11 +36,17 @@ export const GenericError = () => {
   );
 };
 
-export const InvalidPlanError = () => {
-  const { plan } = useCheckoutContextRoot();
+export const InvalidPlanScreen = () => {
+  const { errors } = useCheckoutContextRoot();
+
+  const planFromError = useMemo(() => {
+    const error = errors?.find(e => e.code === 'invalid_plan_change');
+    return error?.meta?.plan;
+  }, [errors]);
+
   const { planPeriod } = useCheckoutContext();
 
-  if (!plan) {
+  if (!planFromError) {
     return null;
   }
 
@@ -57,12 +68,12 @@ export const InvalidPlanError = () => {
           <LineItems.Root>
             <LineItems.Group>
               <LineItems.Title
-                title={plan.name}
+                title={planFromError.name}
                 description={planPeriod === 'annual' ? localizationKeys('commerce.billedAnnually') : undefined}
               />
               <LineItems.Description
                 prefix={planPeriod === 'annual' ? 'x12' : undefined}
-                text={`${plan.currencySymbol}${planPeriod === 'month' ? plan.amountFormatted : plan.annualMonthlyAmountFormatted}`}
+                text={`${planFromError.currency_symbol}${planPeriod === 'month' ? planFromError.amount_formatted : planFromError.annual_monthly_amount_formatted}`}
                 suffix={localizationKeys('commerce.checkout.perMonth')}
               />
             </LineItems.Group>

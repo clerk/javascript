@@ -1,10 +1,10 @@
 import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
-import type { ClerkAPIError, CommerceCheckoutResource, CommercePlanResource } from '@clerk/types';
+import type { ClerkAPIError, CommerceCheckoutResource } from '@clerk/types';
 import { createContext, useContext, useEffect, useMemo } from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
-import { useCheckoutContext, usePlans } from '../../contexts';
+import { useCheckoutContext } from '../../contexts';
 
 type CheckoutStatus = 'pending' | 'ready' | 'completed' | 'missing_payer_email' | 'invalid_plan_change' | 'error';
 
@@ -14,7 +14,6 @@ const CheckoutContextRoot = createContext<{
   updateCheckout: (checkout: CommerceCheckoutResource) => void;
   errors: ClerkAPIError[];
   startCheckout: () => void;
-  plan: CommercePlanResource | undefined;
   status: CheckoutStatus;
 } | null>(null);
 
@@ -27,7 +26,7 @@ export const useCheckoutContextRoot = () => {
 };
 
 const useCheckoutCreator = () => {
-  const { planId, planPeriod, subscriberType = 'user' } = useCheckoutContext();
+  const { planId, planPeriod, subscriberType = 'user', onSubscriptionComplete } = useCheckoutContext();
   const clerk = useClerk();
   const { organization } = useOrganization();
 
@@ -78,23 +77,20 @@ const useCheckoutCreator = () => {
   return {
     checkout: data,
     startCheckout,
-    updateCheckout: (checkout: CommerceCheckoutResource) => mutate(checkout, false),
+    updateCheckout: (checkout: CommerceCheckoutResource) => {
+      void mutate(checkout, false);
+      onSubscriptionComplete?.();
+    },
     isMutating,
     errors: error?.errors,
   };
 };
 
 const Root = ({ children }: { children: React.ReactNode }) => {
-  const { planId } = useCheckoutContext();
-  const { data: plans, isLoading: plansLoading } = usePlans();
   const { checkout, isMutating, updateCheckout, errors, startCheckout } = useCheckoutCreator();
 
-  const plan = plans?.find(p => p.id === planId);
-
-  const isLoading = isMutating || plansLoading;
-
   const status = useMemo(() => {
-    if (isLoading) return 'pending';
+    if (isMutating) return 'pending';
     const completedCode = 'completed';
     if (checkout?.status === completedCode) return completedCode;
     if (checkout) return 'ready';
@@ -103,19 +99,18 @@ const Root = ({ children }: { children: React.ReactNode }) => {
     const isMissingPayerEmail = !!errors?.some((e: ClerkAPIError) => e.code === missingCode);
     if (isMissingPayerEmail) return missingCode;
     const invalidChangeCode = 'invalid_plan_change';
-    if (errors?.[0]?.code === invalidChangeCode && plan) return invalidChangeCode;
+    if (errors?.[0]?.code === invalidChangeCode) return invalidChangeCode;
     return 'error';
-  }, [isLoading, errors, checkout, plan?.id, checkout?.status]);
+  }, [isMutating, errors, checkout, checkout?.status]);
 
   return (
     <CheckoutContextRoot.Provider
       value={{
         checkout,
-        isLoading,
+        isLoading: isMutating,
         updateCheckout,
         errors,
         startCheckout,
-        plan,
         status,
       }}
     >
