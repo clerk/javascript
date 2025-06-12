@@ -10,9 +10,9 @@
  * =====================================================================================
  */
 
-import type { TranslationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/types';
 
-export const ukUA: TranslationResource = {
+export const ukUA: LocalizationResource = {
   locale: 'uk-UA',
   backButton: 'Назад',
   badge__activePlan: undefined,

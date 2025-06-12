@@ -10,9 +10,9 @@
  * =====================================================================================
  */
 
-import type { TranslationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/types';
 
-export const csCZ: TranslationResource = {
+export const csCZ: LocalizationResource = {
   locale: 'cs-CZ',
   backButton: 'Zpět',
   badge__activePlan: undefined,

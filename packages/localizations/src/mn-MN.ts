@@ -10,9 +10,9 @@
  * =====================================================================================
  */
 
-import type { TranslationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/types';
 
-export const mnMN: TranslationResource = {
+export const mnMN: LocalizationResource = {
   locale: 'mn-MN',
   backButton: 'Буцах',
   badge__activePlan: undefined,

@@ -10,9 +10,9 @@
  * =====================================================================================
  */
 
-import type { TranslationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/types';
 
-export const svSE: TranslationResource = {
+export const svSE: LocalizationResource = {
   locale: 'sv-SE',
   backButton: 'Tillbaka',
   badge__activePlan: undefined,

@@ -1,4 +1,4 @@
-import type { Lala, PathValue, RecordToPath } from '@clerk/types';
+import type { __internal_LocalizationResource, PathValue, RecordToPath } from '@clerk/types';
 
 type Value = string | number | boolean | Date;
 type Whitespace = ' ' | '\t' | '\n' | '\r';
@@ -59,8 +59,8 @@ export type GetICUArgs<Text extends string, T extends RemovePipeUtils<Text>> = T
   T extends readonly string[] ? TupleFindBlocks<T> : FindBlocks<T>
 >;
 
-type DefaultLocalizationKey = RecordToPath<Lala>;
-type LocalizationKeyToValue<P extends DefaultLocalizationKey> = PathValue<Lala, P>;
+type DefaultLocalizationKey = RecordToPath<__internal_LocalizationResource>;
+type LocalizationKeyToValue<P extends DefaultLocalizationKey> = PathValue<__internal_LocalizationResource, P>;
 
 export type LocalizationKey = {
   key: string;

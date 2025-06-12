@@ -10,9 +10,9 @@
  * =====================================================================================
  */
 
-import type { TranslationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/types';
 
-export const beBY: TranslationResource = {
+export const beBY: LocalizationResource = {
   locale: 'be-BY',
   backButton: 'Назад',
   badge__activePlan: undefined,

@@ -10,9 +10,9 @@
  * =====================================================================================
  */
 
-import type { TranslationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/types';
 
-export const huHU: TranslationResource = {
+export const huHU: LocalizationResource = {
   locale: 'hu-HU',
   backButton: 'Vissza',
   badge__activePlan: undefined,

@@ -10,9 +10,9 @@
  * =====================================================================================
  */
 
-import type { TranslationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/types';
 
-export const isIS: TranslationResource = {
+export const isIS: LocalizationResource = {
   locale: 'is-IS',
   backButton: 'Til baka',
   badge__activePlan: undefined,

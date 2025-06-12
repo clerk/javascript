@@ -1,5 +1,5 @@
 import type { FieldId } from './elementIds';
-import type { CamelToSnake, DeepPartial } from './utils';
+import type { CamelToSnake } from './utils';
 
 export type ICUParams<T extends string> = {
   [K in T]: string | number | boolean | Date;
@@ -13,16 +13,6 @@ export type LocalizationValue<T extends string = never> = [T] extends [never]
 // Utility type to extract parameter types from LocalizationValue
 export type ExtractParams<T> = T extends LocalizationValue<infer P> ? ICUParams<P> : never;
 
-// export type LocalizationValue = string;
-
-// type DeepPartialLocal<T> = {
-//   [P in keyof T]?: T[P] extends LocalizationValue<any>
-//     ? T[P] | undefined
-//     : T[P] extends object
-//       ? DeepPartialLocal<T[P]>
-//       : T[P] | undefined;
-// };
-
 /**
  * A type containing all the possible localization keys the prebuilt Clerk components support.
  * Users aiming to customize a few strings can also peak at the `data-localization-key` attribute by inspecting
@@ -31,20 +21,18 @@ export type ExtractParams<T> = T extends LocalizationValue<infer P> ? ICUParams<
  * the default english resource object from {@link https://github.com/clerk/javascript Clerk's open source repo}
  * as a starting point.
  */
-export type LocalizationResource = DeepPartial<_LocalizationResource>;
+export type LocalizationResource = DeepLocalizationWithoutObjects<_LocalizationResource>;
 
-export type Lala = _LocalizationResource;
+export type __internal_LocalizationResource = _LocalizationResource;
 
 // Recursive utility for translation files
-export type DeepTranslationResource<T> = {
+export type DeepLocalizationWithoutObjects<T> = {
   [K in keyof T]?: T[K] extends LocalizationValue<any>
     ? string
     : T[K] extends object
-      ? DeepTranslationResource<T[K]>
+      ? DeepLocalizationWithoutObjects<T[K]>
       : string | undefined;
 };
-
-export type TranslationResource = DeepTranslationResource<_LocalizationResource>;
 
 type _LocalizationResource = {
   locale: string;

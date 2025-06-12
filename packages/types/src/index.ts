@@ -69,5 +69,3 @@ export * from './waitlist';
 export * from './snapshots';
 export * from './authObject';
 export * from './phoneCodeChannel';
-
-export type { LocalizationResource, TranslationResource, LocalizationValue, ICUParams } from './localization';

@@ -10,9 +10,9 @@
  * =====================================================================================
  */
 
-import type { TranslationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/types';
 
-export const nbNO: TranslationResource = {
+export const nbNO: LocalizationResource = {
   locale: 'nb-NO',
   backButton: 'Tilbake',
   badge__activePlan: undefined,

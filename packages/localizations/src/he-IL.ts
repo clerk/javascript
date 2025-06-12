@@ -10,9 +10,9 @@
  * =====================================================================================
  */
 
-import type { TranslationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/types';
 
-export const heIL: TranslationResource = {
+export const heIL: LocalizationResource = {
   locale: 'he-IL',
   backButton: 'חזור',
   badge__activePlan: undefined,

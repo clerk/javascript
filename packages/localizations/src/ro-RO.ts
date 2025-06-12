@@ -10,9 +10,9 @@
  * =====================================================================================
  */
 
-import type { TranslationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/types';
 
-export const roRO: TranslationResource = {
+export const roRO: LocalizationResource = {
   locale: 'ro-RO',
   backButton: 'Înapoi',
   badge__activePlan: undefined,
