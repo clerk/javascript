@@ -50,19 +50,40 @@ type ObservableSignInResource = SignInResource & {
  * This implementation is SSR-safe and prevents hydration mismatches.
  */
 const createStoreObservable = (signInResource: SignInResource) => {
-  return () => {
+  // Return a React hook function that can be called within React components
+  return function useSignInObservable() {
     // Try both 'store' and '_store' properties
     const store = (signInResource as any).store || (signInResource as any)._store;
     
-    // Debug logging
+    // Debug logging with more detailed property inspection
     console.log('createStoreObservable debug:', {
       hasStore: !!store,
       hasPublicStore: !!((signInResource as any).store),
       hasPrivateStore: !!((signInResource as any)._store),
       storeType: typeof store,
       signInResourceKeys: Object.keys(signInResource),
+      storePropertyDescriptor: Object.getOwnPropertyDescriptor(signInResource, 'store'),
+      storePropertyDescriptorProto: Object.getOwnPropertyDescriptor(Object.getPrototypeOf(signInResource), 'store'),
+      prototypeChain: Object.getPrototypeOf(signInResource)?.constructor?.name,
       isSSR: typeof window === 'undefined'
     });
+    
+    // Try to access store via different methods
+    if (!store) {
+      console.log('Trying alternative store access methods...');
+      
+      // Try calling store as a method (in case it's a getter)
+      try {
+        const storeViaCall = (signInResource as any).store?.();
+        console.log('Store via call:', !!storeViaCall);
+      } catch (e) {
+        console.log('Store call failed:', e);
+      }
+      
+      // Check if store exists on prototype
+      const proto = Object.getPrototypeOf(signInResource);
+      console.log('Store on prototype:', !!(proto && (proto).store));
+    }
     
     if (!store) {
       console.log('No store found, returning empty object');
@@ -79,6 +100,7 @@ const createStoreObservable = (signInResource: SignInResource) => {
     }
 
     // On client, use Zustand's built-in React integration
+    // This is now safe because we're inside a React hook
     const clientState = useStore(store);
     console.log('Client mode, returning client state:', clientState);
     return clientState;
@@ -218,14 +240,9 @@ export const useSignIn = () => {
                 reject,
               });
 
-              setTimeout(() => {
-                // Re-check context when the queued call executes
-                const currentClient = useClientContext();
-                const currentIsomorphicClerk = useIsomorphicClerkContext();
-                if (currentClient) {
-                  processQueue(currentClient.signIn, currentIsomorphicClerk.setActive);
-                }
-              }, 0);
+              // Note: We're in the proxy fallback context where client is null
+              // The queue will be processed when the client becomes available
+              // and the component re-renders with the actual SignIn resource
             });
           };
         },
