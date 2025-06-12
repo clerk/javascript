@@ -4,7 +4,6 @@ import { getEnvVariable } from '@clerk/shared/getEnvVariable';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps, isProxyUrlRelative } from '@clerk/shared/proxy';
 import { handleValueOrFn } from '@clerk/shared/utils';
-import { getEvent } from '@tanstack/react-start/server';
 
 import { errorThrower } from '../utils';
 import { getPublicEnvVariables } from '../utils/env';
@@ -15,7 +14,10 @@ import { patchRequest } from './utils';
 export const loadOptions = (request: Request, overrides: LoaderOptions = {}) => {
   const clerkRequest = createClerkRequest(patchRequest(request));
   const commonEnv = commonEnvs();
-  const event = getEvent();
+  // TODO: See https://github.com/clerkinc/tanstack-react-start/issues/100
+  const event = {
+    context: {},
+  };
   const secretKey = overrides.secretKey || commonEnv.SECRET_KEY;
   const publishableKey = overrides.publishableKey || commonEnv.PUBLISHABLE_KEY;
   const jwtKey = overrides.jwtKey || commonEnv.CLERK_JWT_KEY;

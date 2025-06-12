@@ -1,11 +1,13 @@
 import { apiUrlFromPublishableKey } from '@clerk/shared/apiUrlFromPublishableKey';
 import { getEnvVariable } from '@clerk/shared/getEnvVariable';
-import { getEvent } from '@tanstack/react-start/server';
 
 import { getPublicEnvVariables } from '../utils/env';
 
 export const commonEnvs = () => {
-  const event = getEvent();
+  // TODO: See https://github.com/clerkinc/tanstack-react-start/issues/100
+  const event = {
+    context: {},
+  };
   const publicEnvs = getPublicEnvVariables(event.context);
 
   return {

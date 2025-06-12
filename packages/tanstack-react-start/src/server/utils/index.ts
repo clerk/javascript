@@ -2,7 +2,6 @@ import type { RequestState } from '@clerk/backend/internal';
 import { debugRequestState } from '@clerk/backend/internal';
 import { getEnvVariable } from '@clerk/shared/getEnvVariable';
 import { isTruthy } from '@clerk/shared/underscore';
-import { getEvent } from '@tanstack/react-start/server';
 
 import type { AdditionalStateOptions } from '../types';
 
@@ -23,7 +22,10 @@ export const wrapWithClerkState = (data: any) => {
  */
 export function getResponseClerkState(requestState: RequestState, additionalStateOptions: AdditionalStateOptions = {}) {
   const { reason, message, isSignedIn, ...rest } = requestState;
-  const event = getEvent();
+  // TODO: See https://github.com/clerkinc/tanstack-react-start/issues/100
+  const event = {
+    context: {},
+  };
 
   const clerkInitialState = wrapWithClerkState({
     __clerk_ssr_state: rest.toAuth(),
