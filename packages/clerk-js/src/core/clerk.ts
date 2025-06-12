@@ -1071,10 +1071,6 @@ export class Clerk implements ClerkInterface {
         );
       }
 
-      if (organization === null && this.environment?.organizationSettings?.forceOrganizationSelection) {
-        throw new Error('setActive requires an organization parameter when organization selection is forced.');
-      }
-
       const onBeforeSetActive: SetActiveHook =
         typeof window !== 'undefined' && typeof window.__unstable__onBeforeSetActive === 'function'
           ? window.__unstable__onBeforeSetActive
@@ -1107,7 +1103,16 @@ export class Clerk implements ClerkInterface {
           const matchingOrganization = newSession.user.organizationMemberships.find(
             mem => mem.organization.slug === organizationIdOrSlug,
           );
-          newSession.lastActiveOrganizationId = matchingOrganization?.organization.id || null;
+
+          const newLastActiveOrganizationId = matchingOrganization?.organization.id || null;
+          const isPersonalWorkspace = newLastActiveOrganizationId === null;
+
+          // Do not update in-memory to personal workspace if force organization selection is enabled
+          if (this.environment?.organizationSettings?.forceOrganizationSelection && isPersonalWorkspace) {
+            return;
+          }
+
+          newSession.lastActiveOrganizationId = newLastActiveOrganizationId;
         }
       }
 

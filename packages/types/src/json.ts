@@ -349,6 +349,13 @@ export interface ClerkAPIErrorJSON {
         message: string;
       }[];
     };
+    plan?: {
+      amount_formatted: string;
+      annual_monthly_amount_formatted: string;
+      currency_symbol: string;
+      id: string;
+      name: string;
+    };
   };
 }
 
