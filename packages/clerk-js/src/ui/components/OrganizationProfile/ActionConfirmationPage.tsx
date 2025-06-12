@@ -101,7 +101,7 @@ type ActionConfirmationPageProps = FormProps & {
   title: LocalizationKey;
   messageLine1: LocalizationKey;
   messageLine2: LocalizationKey;
-  actionDescription?: LocalizationKey;
+  actionDescription: LocalizationKey;
   organizationName?: string;
   successMessage: LocalizationKey;
   submitLabel: LocalizationKey;
@@ -128,9 +128,7 @@ const ActionConfirmationPage = withCardStateProvider((props: ActionConfirmationP
 
   const confirmationField = useFormControl('deleteOrganizationConfirmation', '', {
     type: 'text',
-    label:
-      actionDescription ||
-      localizationKeys('organizationProfile.profilePage.dangerSection.leaveOrganization.actionDescription'),
+    label: actionDescription,
     isRequired: true,
     placeholder: organizationName,
   });

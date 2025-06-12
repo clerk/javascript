@@ -246,7 +246,7 @@ type _LocalizationResource = {
       title: LocalizationValue;
       subtitle: LocalizationValue;
       formTitle: LocalizationValue;
-      formSubtitle: LocalizationValue<'identifier'>;
+      formSubtitle: LocalizationValue;
       resendButton: LocalizationValue;
     };
     phoneCode: {
@@ -396,7 +396,7 @@ type _LocalizationResource = {
     alternativePhoneCodeProvider: {
       formTitle: LocalizationValue;
       resendButton: LocalizationValue;
-      subtitle: LocalizationValue<'provider'>;
+      subtitle: LocalizationValue;
       title: LocalizationValue<'provider'>;
     };
     phoneCodeMfa: {
@@ -415,7 +415,7 @@ type _LocalizationResource = {
       subtitle: LocalizationValue;
     };
     alternativeMethods: {
-      title: LocalizationValue<'provider'>;
+      title: LocalizationValue;
       subtitle: LocalizationValue;
       actionLink: LocalizationValue;
       actionText: LocalizationValue;

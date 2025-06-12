@@ -69,7 +69,7 @@ export type LocalizationKey = {
 
 export const localizationKeys = <Key extends DefaultLocalizationKey, Value extends LocalizationKeyToValue<Key>>(
   key: Key,
-  params?: Value extends { __params: any } ? Value['__params'] : never,
+  ...args: Value extends { __params: any } ? [params: Value['__params']] : []
 ): LocalizationKey => {
-  return { key, params } as LocalizationKey;
+  return { key, params: args[0] } as LocalizationKey;
 };
