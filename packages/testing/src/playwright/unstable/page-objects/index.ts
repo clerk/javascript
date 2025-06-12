@@ -1,5 +1,6 @@
 import type { Page } from '@playwright/test';
 
+import { createAPIKeysPageObject } from './apiKeys';
 import { createAppPageObject } from './app';
 import { createCheckoutPageObject } from './checkout';
 import { createClerkPageObject } from './clerk';
@@ -38,6 +39,7 @@ export const createPageObjects = ({
     keylessPopover: createKeylessPopoverPageObject(testArgs),
     organizationSwitcher: createOrganizationSwitcherComponentPageObject(testArgs),
     pricingTable: createPricingTablePageObject(testArgs),
+    apiKeys: createAPIKeysPageObject(testArgs),
     sessionTask: createSessionTaskComponentPageObject(testArgs),
     signIn: createSignInComponentPageObject(testArgs),
     signUp: createSignUpComponentPageObject(testArgs),
