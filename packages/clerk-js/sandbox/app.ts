@@ -285,7 +285,7 @@ function mountSignInObservable(element: HTMLDivElement) {
 
   // Create title
   const title = document.createElement('h2');
-  title.textContent = 'SignIn Store State Demo';
+  title.textContent = 'SignIn Observable Store Demo';
   title.className = 'text-2xl font-bold mb-4';
   mainContainer.appendChild(title);
 
@@ -294,15 +294,89 @@ function mountSignInObservable(element: HTMLDivElement) {
   statusContainer.className = 'p-4 border border-gray-200 rounded-md mb-4';
   mainContainer.appendChild(statusContainer);
 
-  // Create combined store display (above form)
+  // 1. SIGN IN FORM (First)
+  const form = document.createElement('form');
+  form.className = 'space-y-4 p-4 border rounded-lg bg-blue-50';
+
+  const formTitle = document.createElement('h3');
+  formTitle.textContent = '1. Test Sign In Flow';
+  formTitle.className = 'font-semibold mb-2 text-blue-800';
+  form.appendChild(formTitle);
+
+  const formDescription = document.createElement('p');
+  formDescription.textContent = 'Create a SignIn instance and observe store state changes in real-time';
+  formDescription.className = 'text-sm text-blue-600 mb-3';
+  form.appendChild(formDescription);
+
+  const emailInput = document.createElement('input');
+  emailInput.type = 'email';
+  emailInput.placeholder = 'Email (must exist in your Clerk app)';
+  emailInput.value = '';
+  emailInput.className = 'w-full p-2 border rounded';
+
+  const passwordInput = document.createElement('input');
+  passwordInput.type = 'password';
+  passwordInput.placeholder = 'Password or Code';
+  passwordInput.value = '123456';
+  passwordInput.className = 'w-full p-2 border rounded';
+
+  const submitButton = document.createElement('button');
+  submitButton.type = 'submit';
+  submitButton.textContent = 'Create SignIn & Observe Store';
+  submitButton.className = 'w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600';
+
+  form.appendChild(emailInput);
+  form.appendChild(passwordInput);
+  form.appendChild(submitButton);
+  mainContainer.appendChild(form);
+
+  // 2. SIMULATE BUTTONS (Second)
+  const buttonsContainer = document.createElement('div');
+  buttonsContainer.className = 'space-y-3 p-4 bg-gray-50 rounded-lg';
+
+  const buttonsTitle = document.createElement('h3');
+  buttonsTitle.textContent = '2. Store State Simulation Controls';
+  buttonsTitle.className = 'font-semibold mb-2 text-gray-800';
+  buttonsContainer.appendChild(buttonsTitle);
+
+  const buttonsDescription = document.createElement('p');
+  buttonsDescription.textContent = 'Manually trigger store actions to observe state changes';
+  buttonsDescription.className = 'text-sm text-gray-600 mb-3';
+  buttonsContainer.appendChild(buttonsDescription);
+
+  const buttonsRow = document.createElement('div');
+  buttonsRow.className = 'flex flex-wrap gap-2';
+
+  const createTestButton = (text: string, onClick: () => void, colorClass = 'bg-gray-500 hover:bg-gray-600') => {
+    const button = document.createElement('button');
+    button.textContent = text;
+    button.className = `px-3 py-1 ${colorClass} text-white rounded text-sm`;
+    button.onclick = onClick;
+    return button;
+  };
+
+  buttonsContainer.appendChild(buttonsRow);
+  mainContainer.appendChild(buttonsContainer);
+
+  // 3. STORE SLICES SECTIONS (Third)
   const combinedStoreDisplay = document.createElement('div');
-  combinedStoreDisplay.className = 'grid grid-cols-1 gap-4 mb-4';
+  combinedStoreDisplay.className = 'space-y-4';
+
+  const storeTitle = document.createElement('h3');
+  storeTitle.textContent = '3. Live Store State Inspection';
+  storeTitle.className = 'font-semibold mb-2 text-purple-800';
+  combinedStoreDisplay.appendChild(storeTitle);
+
+  const storeDescription = document.createElement('p');
+  storeDescription.textContent = 'Real-time view of the observable store structure and state changes';
+  storeDescription.className = 'text-sm text-purple-600 mb-4';
+  combinedStoreDisplay.appendChild(storeDescription);
 
   // Combined store display section
   const combinedStoreSection = document.createElement('div');
   combinedStoreSection.className = 'p-4 bg-purple-50 rounded-lg';
   combinedStoreSection.innerHTML =
-    '<h3 class="font-semibold text-purple-800 mb-2">Combined Store State (signIn.store === signIn.signInStore)</h3>';
+    '<h4 class="font-semibold text-purple-800 mb-2">Complete Store State (signIn.store.getState())</h4>';
 
   const combinedStoreStateDisplay = document.createElement('div');
   combinedStoreStateDisplay.className = 'p-2 bg-white rounded text-sm font-mono';
@@ -312,7 +386,7 @@ function mountSignInObservable(element: HTMLDivElement) {
   const resourceSliceSection = document.createElement('div');
   resourceSliceSection.className = 'p-4 bg-blue-50 rounded-lg';
   resourceSliceSection.innerHTML =
-    '<h3 class="font-semibold text-blue-800 mb-2">Resource Slice Methods (from BaseResource)</h3>';
+    '<h4 class="font-semibold text-blue-800 mb-2">Resource Slice (Inherited from BaseResource)</h4>';
 
   const resourceStoreDisplay = document.createElement('div');
   resourceStoreDisplay.className = 'p-2 bg-white rounded text-sm font-mono';
@@ -322,96 +396,111 @@ function mountSignInObservable(element: HTMLDivElement) {
   const signInSliceSection = document.createElement('div');
   signInSliceSection.className = 'p-4 bg-green-50 rounded-lg';
   signInSliceSection.innerHTML =
-    '<h3 class="font-semibold text-green-800 mb-2">SignIn Slice Methods (SignIn-specific)</h3>';
+    '<h4 class="font-semibold text-green-800 mb-2">SignIn Slice (Domain-Specific Logic)</h4>';
 
   const signInStoreDisplay = document.createElement('div');
   signInStoreDisplay.className = 'p-2 bg-white rounded text-sm font-mono';
   signInSliceSection.appendChild(signInStoreDisplay);
 
-  // Add store state displays to container and main container (above form)
+  // Add store state displays to container
   combinedStoreDisplay.appendChild(combinedStoreSection);
   combinedStoreDisplay.appendChild(resourceSliceSection);
   combinedStoreDisplay.appendChild(signInSliceSection);
   mainContainer.appendChild(combinedStoreDisplay);
 
-  // Create controls container
-  const controlsContainer = document.createElement('div');
-  controlsContainer.className = 'space-y-4';
-
-  // Create buttons to test different states
-  const buttonsContainer = document.createElement('div');
-  buttonsContainer.className = 'flex flex-wrap gap-2 mb-4';
-
-  const createTestButton = (text: string, onClick: () => void) => {
-    const button = document.createElement('button');
-    button.textContent = text;
-    button.className = 'px-3 py-1 bg-gray-500 text-white rounded hover:bg-gray-600 text-sm';
-    button.onclick = onClick;
-    return button;
-  };
-
-  controlsContainer.appendChild(buttonsContainer);
-  mainContainer.appendChild(controlsContainer);
-
-  // Create sign in form
-  const form = document.createElement('form');
-  form.className = 'space-y-4 p-4 border rounded-lg';
-
-  const formTitle = document.createElement('h3');
-  formTitle.textContent = 'Test Sign In Flow';
-  formTitle.className = 'font-semibold mb-2';
-  form.appendChild(formTitle);
-
-  const emailInput = document.createElement('input');
-  emailInput.type = 'email';
-  emailInput.placeholder = 'Email (must exist in your Clerk app)';
-  emailInput.value = ''; // Don't pre-fill with non-existent email
-  emailInput.className = 'w-full p-2 border rounded';
-
-  const passwordInput = document.createElement('input');
-  passwordInput.type = 'password';
-  passwordInput.placeholder = 'Password or Code';
-  passwordInput.value = '123456'; // Pre-fill for testing
-  passwordInput.className = 'w-full p-2 border rounded';
-
-  const submitButton = document.createElement('button');
-  submitButton.type = 'submit';
-  submitButton.textContent = 'Sign In';
-  submitButton.className = 'w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600';
-
-  form.appendChild(emailInput);
-  form.appendChild(passwordInput);
-  form.appendChild(submitButton);
-  mainContainer.appendChild(form);
-
-  // Store relationship explanation (below form)
-  const explanationSection = document.createElement('div');
-  explanationSection.className = 'p-4 bg-yellow-50 border border-yellow-200 rounded-lg mt-4';
-  explanationSection.innerHTML = `
-    <h3 class="font-semibold text-yellow-800 mb-2">Store Architecture (Zustand Slices Pattern - Flattened & Consistent)</h3>
-    <div class="text-sm text-yellow-700 space-y-2">
-      <p>• <strong>Consistent Store Property:</strong> <code>signIn.store</code> contains the combined store with all slices</p>
-      
-      <div class="border-l-2 border-blue-300 pl-3 my-2">
-        <p><strong>Resource Slice (under 'resource' namespace):</strong></p>
-        <p>• <code>signIn.store.getState().resource.status</code>: 'idle' | 'loading' | 'error' | 'success'</p>
-        <p>• <code>signIn.store.getState().resource.data</code>: The resource data (SignIn instance)</p>
-        <p>• <code>signIn.store.getState().resource.error</code>: Any error from API calls</p>
-        <p>• Methods: <code>dispatch</code>, <code>getData</code>, <code>getError</code>, <code>hasError</code>, <code>getStatus</code></p>
-        <p>• Purpose: Generic resource management (loading, success, error states)</p>
+  // 4. ARCHITECTURE DESCRIPTION (Fourth)
+  const architectureSection = document.createElement('div');
+  architectureSection.className = 'p-6 bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-lg mt-6';
+  architectureSection.innerHTML = `
+    <h3 class="font-bold text-yellow-800 mb-4 text-lg">4. Observable Store Architecture & Inheritance</h3>
+    
+    <div class="text-sm text-yellow-700 space-y-4">
+      <div class="bg-white p-4 rounded-lg border border-yellow-200">
+        <h4 class="font-semibold text-yellow-800 mb-2">🔍 Why Observable Stores?</h4>
+        <ul class="space-y-1 text-yellow-700">
+          <li>• <strong>Reactive UI Updates:</strong> Components automatically re-render when store state changes</li>
+          <li>• <strong>Predictable State Management:</strong> All state changes flow through centralized store</li>
+          <li>• <strong>Developer Experience:</strong> Real-time debugging and state inspection</li>
+          <li>• <strong>Separation of Concerns:</strong> Business logic separated from UI logic</li>
+          <li>• <strong>Testability:</strong> Store state can be easily mocked and tested</li>
+        </ul>
       </div>
-      
-      <div class="border-l-2 border-green-300 pl-3 my-2">
-        <p><strong>SignIn Slice (under 'signin' namespace):</strong></p>
-        <p>• <code>signIn.store.getState().signin.status</code>: SignIn flow status</p>
-        <p>• Method: <code>signIn.store.getState().signin.setStatus</code></p>
-        <p>• Purpose: Domain-specific SignIn business logic</p>
+
+      <div class="bg-white p-4 rounded-lg border border-blue-200">
+        <h4 class="font-semibold text-blue-800 mb-2">🏗️ Inheritance Architecture</h4>
+        <div class="font-mono text-xs bg-blue-50 p-3 rounded border space-y-1">
+          <div>BaseResource (Abstract)</div>
+          <div class="ml-2">├── Provides: store property (Zustand store)</div>
+          <div class="ml-2">├── Resource Slice: { status, data, error, dispatch, ... }</div>
+          <div class="ml-2">└── Generic resource lifecycle management</div>
+          <div class="ml-4">↓ extends</div>
+          <div>SignInResource (Concrete)</div>
+          <div class="ml-2">├── Inherits: store from BaseResource</div>
+          <div class="ml-2">├── Adds: SignIn Slice: { status, setStatus, ... }</div>
+          <div class="ml-2">└── Domain-specific SignIn business logic</div>
+        </div>
       </div>
-      
-      <p><strong>Benefits:</strong> Consistent depth (1 level), flattened structure, clear boundaries.</p>
+
+      <div class="bg-white p-4 rounded-lg border border-green-200">
+        <h4 class="font-semibold text-green-800 mb-2">🎯 Store Composition Pattern</h4>
+        <div class="space-y-2">
+          <div class="border-l-4 border-blue-400 pl-3">
+            <p><strong>Resource Slice:</strong> Generic, inherited from BaseResource</p>
+            <p class="text-xs font-mono">store.getState().resource.{ status, data, error, dispatch }</p>
+            <p class="text-xs">Handles: API calls, loading states, error handling</p>
+          </div>
+          
+          <div class="border-l-4 border-green-400 pl-3">
+            <p><strong>SignIn Slice:</strong> Domain-specific, added by SignInResource</p>
+            <p class="text-xs font-mono">store.getState().signin.{ status, setStatus }</p>
+            <p class="text-xs">Handles: SignIn flow logic, authentication steps</p>
+          </div>
+        </div>
+      </div>
+
+             <div class="bg-white p-4 rounded-lg border border-purple-200">
+         <h4 class="font-semibold text-purple-800 mb-2">⚡ Key Benefits of This Observable Pattern</h4>
+         <div class="space-y-4 text-sm">
+           <div class="border-l-4 border-purple-400 pl-4 bg-purple-50 rounded-r-lg p-3">
+             <p class="font-semibold text-purple-800 mb-2">🌐 Framework-Agnostic Reactive Integration</p>
+             <p class="text-purple-700 mb-2">The <code>.store</code> property is a vanilla JS Zustand store that any framework can integrate with:</p>
+             <ul class="text-xs text-purple-600 space-y-1 ml-3">
+               <li>• <strong>React:</strong> <code>const status = useStore(signIn.store, (state) => state.resource.status)</code></li>
+               <li>• <strong>Vue:</strong> <code>const status = computed(() => signIn.store.getState().resource.status)</code></li>
+               <li>• <strong>Svelte:</strong> <code>$: status = $signInStore.resource.status</code></li>
+               <li>• <strong>Angular:</strong> <code>signIn.store.subscribe(state => this.status = state.resource.status)</code></li>
+               <li>• <strong>Vanilla JS:</strong> Direct subscription and state access</li>
+             </ul>
+           </div>
+           
+           <div class="border-l-4 border-green-400 pl-4 bg-green-50 rounded-r-lg p-3">
+             <p class="font-semibold text-green-800 mb-2">🔄 Non-Breaking Progressive Enhancement</p>
+             <p class="text-green-700 mb-2">New <code>.store</code> property enables gradual adoption without version coupling:</p>
+             <ul class="text-xs text-green-600 space-y-1 ml-3">
+               <li>• Framework SDKs can detect: <code>if (signIn.store) { /* use reactive features */ }</code></li>
+               <li>• No breaking changes to existing APIs or workflows</li>
+               <li>• Framework SDKs work with any clerk-js version (old or new)</li>
+               <li>• Progressive enhancement: better experience when available, fallback when not</li>
+               <li>• Independent release cycles for framework integrations</li>
+             </ul>
+           </div>
+           
+           <div class="border-l-4 border-blue-400 pl-4 bg-blue-50 rounded-r-lg p-3">
+             <p class="font-semibold text-blue-800 mb-2">🔍 Internal Architecture Observability</p>
+             <p class="text-blue-700 mb-2">Observable store powers resource internals regardless of UI usage:</p>
+             <ul class="text-xs text-blue-600 space-y-1 ml-3">
+               <li>• <strong>Debug Visibility:</strong> Inspect resource state changes in real-time</li>
+               <li>• <strong>Internal Consistency:</strong> All resource mutations flow through observable store</li>
+               <li>• <strong>Development Tools:</strong> Store state can be logged, tracked, and debugged</li>
+               <li>• <strong>Testing Benefits:</strong> Mock and assert on store state for better test coverage</li>
+               <li>• <strong>Performance Monitoring:</strong> Track resource lifecycle and performance bottlenecks</li>
+             </ul>
+           </div>
+         </div>
+       </div>
     </div>
   `;
-  mainContainer.appendChild(explanationSection);
+  mainContainer.appendChild(architectureSection);
 
   let signIn: SignInResource & { signInStore?: any };
   let storeUnsubscribe: (() => void) | null = null;
@@ -542,14 +631,14 @@ function mountSignInObservable(element: HTMLDivElement) {
       (signIn as any).store.getState().resource.dispatch({ type: 'RESET' });
       updateStatus();
     }
-  });
+  }, 'bg-red-500 hover:bg-red-600');
 
   const loadingButton = createTestButton('Simulate Loading', () => {
     if ((signIn as any)?.store) {
       (signIn as any).store.getState().resource.dispatch({ type: 'FETCH_START' });
       updateStatus();
     }
-  });
+  }, 'bg-blue-500 hover:bg-blue-600');
 
   const errorButton = createTestButton('Simulate Error', () => {
     if ((signIn as any)?.store) {
@@ -559,7 +648,7 @@ function mountSignInObservable(element: HTMLDivElement) {
       });
       updateStatus();
     }
-  });
+  }, 'bg-red-500 hover:bg-red-600');
 
   const signInStatusButton = createTestButton('Set SignIn Status', () => {
     if (signIn?.store) {
@@ -568,7 +657,7 @@ function mountSignInObservable(element: HTMLDivElement) {
       signIn.store.getState().signin.setStatus(randomStatus as any);
       updateStatus();
     }
-  });
+  }, 'bg-green-500 hover:bg-green-600');
 
   const attemptPasswordButton = createTestButton('Attempt Password', async () => {
     if (signIn && passwordInput.value) {
@@ -588,9 +677,9 @@ function mountSignInObservable(element: HTMLDivElement) {
         updateStatus();
       }
     }
-  });
+  }, 'bg-purple-500 hover:bg-purple-600');
 
-  const forceRefreshButton = createTestButton('Force Refresh Status', () => {
+  const forceRefreshButton = createTestButton('Force Refresh', () => {
     console.log('=== Force Refresh Debug ===');
     console.log('Current signIn:', signIn);
     console.log('signIn.status:', signIn?.status);
@@ -601,9 +690,9 @@ function mountSignInObservable(element: HTMLDivElement) {
       console.log('Store state:', signIn.store.getState());
     }
     updateStatus();
-  });
+  }, 'bg-indigo-500 hover:bg-indigo-600');
 
-  const resetDemoButton = createTestButton('Reset Demo State', () => {
+  const resetDemoButton = createTestButton('Reset Demo', () => {
     console.log('=== Resetting Demo State ===');
 
     // Unsubscribe from old store
@@ -635,9 +724,9 @@ function mountSignInObservable(element: HTMLDivElement) {
 
       setTimeout(updateStatus, 100);
     }
-  });
+  }, 'bg-yellow-500 hover:bg-yellow-600');
 
-  const clearSignInButton = createTestButton('Clear SignIn Attempt', async () => {
+  const clearSignInButton = createTestButton('Clear SignIn', async () => {
     console.log('=== Clearing SignIn Attempt ===');
 
     try {
@@ -695,16 +784,16 @@ function mountSignInObservable(element: HTMLDivElement) {
         </div>
       `;
     }
-  });
+  }, 'bg-orange-500 hover:bg-orange-600');
 
-  const inspectStoreButton = createTestButton('Inspect Store Details', () => {
+  const inspectStoreButton = createTestButton('Inspect Store', () => {
     if (signIn?.store) {
       const storeState = signIn.store.getState();
-      console.log('=== Zustand Slices Pattern Analysis (Namespaced) ===');
+      console.log('=== Observable Store Analysis (Inheritance Pattern) ===');
       console.log('Combined Store State:', storeState);
       console.log('');
 
-      console.log('=== Resource Slice (under "resource" namespace) ===');
+      console.log('=== Resource Slice (Inherited from BaseResource) ===');
       console.log('Purpose: Generic resource fetch lifecycle management');
       console.log('Structure: Complex state object with atomic updates');
       console.log('Access: signIn.store.getState().resource.*');
@@ -716,7 +805,7 @@ function mountSignInObservable(element: HTMLDivElement) {
       }
       console.log('');
 
-      console.log('=== SignIn Slice (under "signin" namespace) ===');
+      console.log('=== SignIn Slice (Domain-Specific) ===');
       console.log('Purpose: Domain-specific SignIn business logic');
       console.log('Structure: Simple primitive values with direct updates');
       console.log('Access: signIn.store.getState().signin.*');
@@ -728,45 +817,42 @@ function mountSignInObservable(element: HTMLDivElement) {
       }
       console.log('');
 
-      console.log('=== Consistent Store API Benefits ===');
-      console.log('🔷 Resource Slice (signIn.store.getState().resource):');
-      console.log('   - Complex state object: { status, data, error }');
-      console.log('   - Atomic updates via resource.dispatch with actions');
-      console.log('   - Generic pattern for any resource type');
-      console.log('   - No naming conflicts');
+      console.log('=== Observable Store Benefits (Inheritance) ===');
+      console.log('🔷 BaseResource provides:');
+      console.log('   - Observable store foundation');
+      console.log('   - Generic resource lifecycle');
+      console.log('   - Consistent API across resources');
       console.log('');
-      console.log('🔶 SignIn Slice (signIn.store.getState().signin):');
-      console.log('   - Simple properties: signin.status');
-      console.log('   - Direct updates via signin.setStatus');
-      console.log('   - Domain-specific to SignIn flow');
-      console.log('   - Can easily add more signin.* properties');
+      console.log('🔶 SignInResource extends:');
+      console.log('   - Inherits observable capabilities');
+      console.log('   - Adds domain-specific logic');
+      console.log('   - Maintains reactive state');
       console.log('');
 
-      console.log('=== Consistent API Across Resources ===');
-      console.log('✅ signIn.store.getState().resource.* (same for all resources)');
-      console.log('✅ signIn.store.getState().signin.* (SignIn-specific)');
-      console.log('✅ signUp.store.getState().signup.* (SignUp-specific)');
-      console.log('✅ user.store.getState().user.* (User-specific)');
-      console.log('✅ Single .store property across all resources');
+      console.log('=== Consistent Observable API ===');
+      console.log('✅ All resources inherit from BaseResource');
+      console.log('✅ All have .store property for observability');
+      console.log('✅ Consistent slice structure across domains');
+      console.log('✅ Reactive updates for all UI components');
 
       // Update the display to show console inspection notice
       statusContainer.innerHTML = `
         <div class="text-blue-500">
-          <strong>Status:</strong> Consistent store API analysis logged to console (F12 → Console tab)
+          <strong>Status:</strong> Observable store analysis logged to console (F12 → Console tab)
         </div>
       `;
     }
-  });
+  }, 'bg-teal-500 hover:bg-teal-600');
 
-  buttonsContainer.appendChild(resetButton);
-  buttonsContainer.appendChild(loadingButton);
-  buttonsContainer.appendChild(errorButton);
-  buttonsContainer.appendChild(signInStatusButton);
-  buttonsContainer.appendChild(attemptPasswordButton);
-  buttonsContainer.appendChild(forceRefreshButton);
-  buttonsContainer.appendChild(resetDemoButton);
-  buttonsContainer.appendChild(clearSignInButton);
-  buttonsContainer.appendChild(inspectStoreButton);
+  buttonsRow.appendChild(resetButton);
+  buttonsRow.appendChild(loadingButton);
+  buttonsRow.appendChild(errorButton);
+  buttonsRow.appendChild(signInStatusButton);
+  buttonsRow.appendChild(attemptPasswordButton);
+  buttonsRow.appendChild(forceRefreshButton);
+  buttonsRow.appendChild(resetDemoButton);
+  buttonsRow.appendChild(clearSignInButton);
+  buttonsRow.appendChild(inspectStoreButton);
 
   // Initialize SignIn instance
   const initializeSignIn = async () => {
