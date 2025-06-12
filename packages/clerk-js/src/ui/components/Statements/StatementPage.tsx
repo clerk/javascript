@@ -26,10 +26,6 @@ export const StatementPage = () => {
     );
   }
 
-  if (!statement) {
-    return <Text localizationKey={localizationKeys(`${localizationRoot}.billingPage.statementsSection.notFound`)} />;
-  }
-
   return (
     <>
       <Header.Root
@@ -50,75 +46,82 @@ export const StatementPage = () => {
           />
         </Header.BackLink>
       </Header.Root>
-      <Statement.Root>
-        <Statement.Header
-          title={new Date(statement.timestamp).toLocaleString('en-US', { month: 'long', year: 'numeric' })}
-          id={statement.id}
-          status={statement.status}
+      {!statement ? (
+        <Text
+          localizationKey={localizationKeys(`${localizationRoot}.billingPage.statementsSection.notFound`)}
+          sx={{ textAlign: 'center' }}
         />
-        <Statement.Body>
-          {statement.groups.map(group => (
-            <Statement.Section key={group.timestamp}>
-              <Statement.SectionHeader
-                text={new Date(group.timestamp).toLocaleString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                  year: 'numeric',
-                })}
-              />
-              <Statement.SectionContent>
-                {group.items.map(item => (
-                  <Statement.SectionContentItem key={item.id}>
-                    <Statement.SectionContentDetailsHeader
-                      title={item.subscription.plan.name}
-                      description={`${item.subscription.amount?.currencySymbol}${item.subscription.amount?.amountFormatted} / ${item.subscription.planPeriod === 'month' ? t(localizationKeys('commerce.month')) : t(localizationKeys('commerce.year'))}`}
-                      secondaryTitle={`${item.amount.currencySymbol}${item.amount.amountFormatted}`}
-                      secondaryDescription={``}
-                    />
-                    <Statement.SectionContentDetailsList>
-                      <Statement.SectionContentDetailsListItem
-                        label={
-                          item.chargeType === 'recurring'
-                            ? localizationKeys(
-                                `${localizationRoot}.billingPage.statementsSection.itemCaption__paidForPlan`,
-                                {
-                                  plan: item.subscription.plan.name,
-                                  period: item.subscription.planPeriod,
-                                },
-                              )
-                            : localizationKeys(
-                                `${localizationRoot}.billingPage.statementsSection.itemCaption__subscribedAndPaidForPlan`,
-                                {
-                                  plan: item.subscription.plan.name,
-                                  period: item.subscription.planPeriod,
-                                },
-                              )
-                        }
-                        labelIcon={item.chargeType === 'recurring' ? RotateLeftRight : Plus}
-                        value={item.id}
-                        valueTruncated
-                        valueCopyable
+      ) : (
+        <Statement.Root>
+          <Statement.Header
+            title={new Date(statement.timestamp).toLocaleString('en-US', { month: 'long', year: 'numeric' })}
+            id={statement.id}
+            status={statement.status}
+          />
+          <Statement.Body>
+            {statement.groups.map(group => (
+              <Statement.Section key={group.timestamp}>
+                <Statement.SectionHeader
+                  text={new Date(group.timestamp).toLocaleString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                  })}
+                />
+                <Statement.SectionContent>
+                  {group.items.map(item => (
+                    <Statement.SectionContentItem key={item.id}>
+                      <Statement.SectionContentDetailsHeader
+                        title={item.subscription.plan.name}
+                        description={`${item.subscription.amount?.currencySymbol}${item.subscription.amount?.amountFormatted} / ${item.subscription.planPeriod === 'month' ? t(localizationKeys('commerce.month')) : t(localizationKeys('commerce.year'))}`}
+                        secondaryTitle={`${item.amount.currencySymbol}${item.amount.amountFormatted}`}
+                        secondaryDescription={``}
                       />
-                      {item.subscription.credit && item.subscription.credit.amount.amount > 0 ? (
+                      <Statement.SectionContentDetailsList>
                         <Statement.SectionContentDetailsListItem
-                          label={localizationKeys(
-                            `${localizationRoot}.billingPage.statementsSection.itemCaption__proratedCredit`,
-                          )}
-                          value={`(${item.subscription.credit.amount.currencySymbol}${item.subscription.credit.amount.amountFormatted})`}
+                          label={
+                            item.chargeType === 'recurring'
+                              ? localizationKeys(
+                                  `${localizationRoot}.billingPage.statementsSection.itemCaption__paidForPlan`,
+                                  {
+                                    plan: item.subscription.plan.name,
+                                    period: item.subscription.planPeriod,
+                                  },
+                                )
+                              : localizationKeys(
+                                  `${localizationRoot}.billingPage.statementsSection.itemCaption__subscribedAndPaidForPlan`,
+                                  {
+                                    plan: item.subscription.plan.name,
+                                    period: item.subscription.planPeriod,
+                                  },
+                                )
+                          }
+                          labelIcon={item.chargeType === 'recurring' ? RotateLeftRight : Plus}
+                          value={item.id}
+                          valueTruncated
+                          valueCopyable
                         />
-                      ) : null}
-                    </Statement.SectionContentDetailsList>
-                  </Statement.SectionContentItem>
-                ))}
-              </Statement.SectionContent>
-            </Statement.Section>
-          ))}
-        </Statement.Body>
-        <Statement.Footer
-          label={localizationKeys(`${localizationRoot}.billingPage.statementsSection.totalPaid`)}
-          value={`${statement.totals.grandTotal.currencySymbol}${statement.totals.grandTotal.amountFormatted}`}
-        />
-      </Statement.Root>
+                        {item.subscription.credit && item.subscription.credit.amount.amount > 0 ? (
+                          <Statement.SectionContentDetailsListItem
+                            label={localizationKeys(
+                              `${localizationRoot}.billingPage.statementsSection.itemCaption__proratedCredit`,
+                            )}
+                            value={`(${item.subscription.credit.amount.currencySymbol}${item.subscription.credit.amount.amountFormatted})`}
+                          />
+                        ) : null}
+                      </Statement.SectionContentDetailsList>
+                    </Statement.SectionContentItem>
+                  ))}
+                </Statement.SectionContent>
+              </Statement.Section>
+            ))}
+          </Statement.Body>
+          <Statement.Footer
+            label={localizationKeys(`${localizationRoot}.billingPage.statementsSection.totalPaid`)}
+            value={`${statement.totals.grandTotal.currencySymbol}${statement.totals.grandTotal.amountFormatted}`}
+          />
+        </Statement.Root>
+      )}
     </>
   );
 };
