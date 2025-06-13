@@ -23,11 +23,10 @@ export class CommerceSettings extends BaseResource implements CommerceSettingsRe
       return this;
     }
 
-    // TODO(@commerce): Remove `?.` once we launch.
-    this.billing.stripePublishableKey = data?.billing?.stripe_publishable_key || '';
-    this.billing.enabled = data?.billing?.enabled || false;
-    this.billing.hasPaidUserPlans = data?.billing?.has_paid_user_plans || false;
-    this.billing.hasPaidOrgPlans = data?.billing?.has_paid_org_plans || false;
+    this.billing.stripePublishableKey = data.billing.stripe_publishable_key || '';
+    this.billing.enabled = data.billing.enabled || false;
+    this.billing.hasPaidUserPlans = data.billing.has_paid_user_plans || false;
+    this.billing.hasPaidOrgPlans = data.billing.has_paid_org_plans || false;
 
     return this;
   }

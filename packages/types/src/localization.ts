@@ -138,6 +138,7 @@ type _LocalizationResource = {
     subtotal: LocalizationValue;
     credit: LocalizationValue;
     creditRemainder: LocalizationValue;
+    totalDue: LocalizationValue;
     totalDueToday: LocalizationValue;
     pastDue: LocalizationValue;
     paymentMethods: LocalizationValue;
@@ -774,13 +775,34 @@ type _LocalizationResource = {
         headerTitle__subscriptions: LocalizationValue;
         headerTitle__statements: LocalizationValue;
       };
+      statementsSection: {
+        empty: LocalizationValue;
+        itemCaption__paidForPlan: LocalizationValue;
+        itemCaption__proratedCredit: LocalizationValue;
+        itemCaption__subscribedAndPaidForPlan: LocalizationValue;
+        notFound: LocalizationValue;
+        tableHeader__date: LocalizationValue;
+        tableHeader__amount: LocalizationValue;
+        title: LocalizationValue;
+        totalPaid: LocalizationValue;
+      };
       switchPlansSection: {
         title: LocalizationValue;
       };
       subscriptionsListSection: {
+        tableHeader__plan: LocalizationValue;
+        tableHeader__startDate: LocalizationValue;
+        tableHeader__edit: LocalizationValue;
         title: LocalizationValue;
         actionLabel__newSubscription: LocalizationValue;
         actionLabel__switchPlan: LocalizationValue;
+      };
+      paymentHistorySection: {
+        empty: LocalizationValue;
+        notFound: LocalizationValue;
+        tableHeader__date: LocalizationValue;
+        tableHeader__amount: LocalizationValue;
+        tableHeader__status: LocalizationValue;
       };
       paymentSourcesSection: {
         title: LocalizationValue;
@@ -980,13 +1002,34 @@ type _LocalizationResource = {
         headerTitle__subscriptions: LocalizationValue;
         headerTitle__statements: LocalizationValue;
       };
+      statementsSection: {
+        empty: LocalizationValue;
+        itemCaption__paidForPlan: LocalizationValue;
+        itemCaption__proratedCredit: LocalizationValue;
+        itemCaption__subscribedAndPaidForPlan: LocalizationValue;
+        notFound: LocalizationValue;
+        tableHeader__date: LocalizationValue;
+        tableHeader__amount: LocalizationValue;
+        title: LocalizationValue;
+        totalPaid: LocalizationValue;
+      };
       switchPlansSection: {
         title: LocalizationValue;
       };
       subscriptionsListSection: {
+        tableHeader__plan: LocalizationValue;
+        tableHeader__startDate: LocalizationValue;
+        tableHeader__edit: LocalizationValue;
         title: LocalizationValue;
         actionLabel__newSubscription: LocalizationValue;
         actionLabel__switchPlan: LocalizationValue;
+      };
+      paymentHistorySection: {
+        empty: LocalizationValue;
+        notFound: LocalizationValue;
+        tableHeader__date: LocalizationValue;
+        tableHeader__amount: LocalizationValue;
+        tableHeader__status: LocalizationValue;
       };
       paymentSourcesSection: {
         title: LocalizationValue;
