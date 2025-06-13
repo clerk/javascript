@@ -87,6 +87,7 @@ export type FlowMetadata = {
     | 'checkout'
     | 'planDetails'
     | 'pricingTable'
+    | 'apiKeys'
     | 'oauthConsent';
   part?:
     | 'start'

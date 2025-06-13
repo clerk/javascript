@@ -21,7 +21,10 @@ export type FieldId =
   | 'enrollmentMode'
   | 'affiliationEmailAddress'
   | 'deleteExistingInvitationsSuggestions'
-  | 'legalAccepted';
+  | 'legalAccepted'
+  | 'apiKeyDescription'
+  | 'apiKeyExpirationDate'
+  | 'apiKeyRevokeConfirmation';
 export type ProfileSectionId =
   | 'profile'
   | 'username'
