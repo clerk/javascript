@@ -1,4 +1,5 @@
 import { Header } from '@/ui/elements/Header';
+import { formatDate } from '@/ui/utils/formatDate';
 
 import { useStatements, useStatementsContext, useSubscriberTypeLocalizationRoot } from '../../contexts';
 import { Box, descriptors, localizationKeys, Spinner, Text, useLocalizations } from '../../customizables';
@@ -54,20 +55,14 @@ export const StatementPage = () => {
       ) : (
         <Statement.Root>
           <Statement.Header
-            title={new Date(statement.timestamp).toLocaleString('en-US', { month: 'long', year: 'numeric' })}
+            title={formatDate(statement.timestamp, 'monthyear')}
             id={statement.id}
             status={statement.status}
           />
           <Statement.Body>
             {statement.groups.map(group => (
-              <Statement.Section key={group.timestamp}>
-                <Statement.SectionHeader
-                  text={new Date(group.timestamp).toLocaleString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric',
-                  })}
-                />
+              <Statement.Section key={group.timestamp.toISOString()}>
+                <Statement.SectionHeader text={formatDate(group.timestamp, 'long')} />
                 <Statement.SectionContent>
                   {group.items.map(item => (
                     <Statement.SectionContentItem key={item.id}>
@@ -75,7 +70,6 @@ export const StatementPage = () => {
                         title={item.subscription.plan.name}
                         description={`${item.subscription.amount?.currencySymbol}${item.subscription.amount?.amountFormatted} / ${item.subscription.planPeriod === 'month' ? t(localizationKeys('commerce.month')) : t(localizationKeys('commerce.year'))}`}
                         secondaryTitle={`${item.amount.currencySymbol}${item.amount.amountFormatted}`}
-                        secondaryDescription={``}
                       />
                       <Statement.SectionContentDetailsList>
                         <Statement.SectionContentDetailsListItem

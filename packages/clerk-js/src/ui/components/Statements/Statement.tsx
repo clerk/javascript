@@ -175,8 +175,8 @@ function SectionContentDetailsHeader({
 }: {
   title: string | LocalizationKey;
   description: string | LocalizationKey;
-  secondaryTitle: string | LocalizationKey;
-  secondaryDescription: string | LocalizationKey;
+  secondaryTitle?: string | LocalizationKey;
+  secondaryDescription?: string | LocalizationKey;
 }) {
   return (
     <Box

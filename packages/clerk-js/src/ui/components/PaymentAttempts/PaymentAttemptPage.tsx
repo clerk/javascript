@@ -92,7 +92,7 @@ export const PaymentAttemptPage = () => {
                 elementDescriptor={descriptors.paymentAttemptHeaderTitle}
                 textVariant='h2'
                 localizationKey={formatDate(
-                  new Date(paymentAttempt.paidAt || paymentAttempt.failedAt || paymentAttempt.updatedAt),
+                  paymentAttempt.paidAt || paymentAttempt.failedAt || paymentAttempt.updatedAt,
                   'long',
                 )}
               />

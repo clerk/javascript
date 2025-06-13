@@ -52,7 +52,7 @@ const PaymentAttemptsListRow = ({ paymentAttempt }: { paymentAttempt: CommercePa
           cursor: 'pointer',
         }}
       >
-        <Text variant='subtitle'>{formatDate(new Date(paidAt || failedAt || updatedAt), 'long')}</Text>
+        <Text variant='subtitle'>{formatDate(paidAt || failedAt || updatedAt, 'long')}</Text>
         <Text
           colorScheme='secondary'
           variant='caption'

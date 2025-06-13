@@ -289,7 +289,7 @@ const AddPaymentSourceForm = ({ children }: PropsWithChildren) => {
               type: 'tabs',
               defaultCollapsed: false,
             },
-            paymentMethodOrder: paymentMethodOrder,
+            paymentMethodOrder,
             applePay: checkout
               ? {
                   recurringPaymentRequest: {

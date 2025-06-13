@@ -1,6 +1,7 @@
 import type { CommerceStatementResource } from '@clerk/types';
 
 import { DataTable, DataTableRow } from '@/ui/elements/DataTable';
+import { formatDate } from '@/ui/utils/formatDate';
 
 import { useStatements, useSubscriberTypeLocalizationRoot } from '../../../ui/contexts';
 import { localizationKeys, Td, Text } from '../../customizables';
@@ -55,9 +56,7 @@ const StatementsListRow = ({ statement }: { statement: CommerceStatementResource
           cursor: 'pointer',
         }}
       >
-        <Text variant='subtitle'>
-          {new Date(timestamp).toLocaleString('en-US', { month: 'long', year: 'numeric' })}
-        </Text>
+        <Text variant='subtitle'>{formatDate(timestamp, 'monthyear')}</Text>
         <Text
           colorScheme='secondary'
           variant='caption'

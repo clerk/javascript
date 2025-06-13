@@ -1,9 +1,13 @@
-export function formatDate(date: Date, format: 'short' | 'long' = 'long', locale: string = 'en-US'): string {
+export function formatDate(
+  date: Date,
+  format: 'monthyear' | 'short' | 'long' = 'long',
+  locale: string = 'en-US',
+): string {
   const options: Intl.DateTimeFormatOptions = {
     month: format === 'short' ? 'short' : 'long',
-    day: 'numeric',
+    day: format === 'monthyear' ? undefined : 'numeric',
   };
-  if (format === 'long') {
+  if (format === 'long' || format === 'monthyear') {
     options.year = 'numeric';
   }
 
