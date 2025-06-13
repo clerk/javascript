@@ -49,13 +49,13 @@ export const LeaveOrganizationForm = (props: LeaveOrganizationFormProps) => {
 
   return (
     <ActionConfirmationPage
-      organizationName={organization?.name}
+      organizationName={organization.name}
       title={localizationKeys('organizationProfile.profilePage.dangerSection.leaveOrganization.title')}
       messageLine1={localizationKeys('organizationProfile.profilePage.dangerSection.leaveOrganization.messageLine1')}
       messageLine2={localizationKeys('organizationProfile.profilePage.dangerSection.leaveOrganization.messageLine2')}
       actionDescription={localizationKeys(
         'organizationProfile.profilePage.dangerSection.leaveOrganization.actionDescription',
-        { organizationName: organization?.name || '' },
+        { organizationName: organization.name },
       )}
       submitLabel={localizationKeys('organizationProfile.profilePage.dangerSection.leaveOrganization.title')}
       successMessage={localizationKeys(
@@ -79,13 +79,13 @@ export const DeleteOrganizationForm = (props: DeleteOrganizationFormProps) => {
 
   return (
     <ActionConfirmationPage
-      organizationName={organization?.name}
+      organizationName={organization.name}
       title={localizationKeys('organizationProfile.profilePage.dangerSection.deleteOrganization.title')}
       messageLine1={localizationKeys('organizationProfile.profilePage.dangerSection.deleteOrganization.messageLine1')}
       messageLine2={localizationKeys('organizationProfile.profilePage.dangerSection.deleteOrganization.messageLine2')}
       actionDescription={localizationKeys(
         'organizationProfile.profilePage.dangerSection.deleteOrganization.actionDescription',
-        { organizationName: organization?.name || '' },
+        { organizationName: organization.name },
       )}
       submitLabel={localizationKeys('organizationProfile.profilePage.dangerSection.deleteOrganization.title')}
       successMessage={localizationKeys(

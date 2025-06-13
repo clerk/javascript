@@ -46,7 +46,6 @@ export const VerifyWithCode = (props: VerifyWithCodeProps) => {
         {...otp}
         label={localizationKeys('userProfile.emailAddressPage.emailCode.formTitle')}
         description={localizationKeys('userProfile.emailAddressPage.emailCode.formSubtitle', {
-          // TODO: Is it correct to be undefined ?
           identifier: identifier || '',
         })}
         resendButton={localizationKeys('userProfile.emailAddressPage.emailCode.resendButton')}

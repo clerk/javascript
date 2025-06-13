@@ -179,7 +179,7 @@ const OrganizationListPageList = (props: { onCreateOrganizationClick: () => void
         />
         <Header.Subtitle
           localizationKey={localizationKeys('organizationList.subtitle', {
-            applicationName: environment.displayConfig.applicationName || '',
+            applicationName: environment.displayConfig.applicationName,
           })}
         />
       </Header.Root>
