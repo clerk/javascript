@@ -959,7 +959,6 @@ export type __internal_LocalizationResource = {
       title: LocalizationValue;
       subtitle: LocalizationValue;
       successMessage: LocalizationValue;
-      // IS this an array, does it work properly ?
       detailsTitle__inviteFailed: LocalizationValue<'email_addresses'>;
       formButtonPrimary__continue: LocalizationValue;
       selectDropdown__role: LocalizationValue;
@@ -1097,10 +1096,9 @@ export type __internal_LocalizationResource = {
   };
 };
 
-type WithParamName<T> = {
-  [K in keyof T]: T[K] extends object ? T[K] : T[K];
-} & Partial<Record<`${keyof T & string}__${CamelToSnake<Exclude<FieldId, 'role'>>}`, LocalizationValue>>;
-// @ts-ignore
+type WithParamName<T> = T &
+  Partial<Record<`${keyof T & string}__${CamelToSnake<Exclude<FieldId, 'role'>>}`, LocalizationValue>>;
+
 type UnstableErrors = WithParamName<{
   external_account_not_found: LocalizationValue;
   identification_deletion_failed: LocalizationValue;
@@ -1190,11 +1188,3 @@ type UnstableErrors = WithParamName<{
   organization_domain_exists_for_enterprise_connection: LocalizationValue;
   organization_membership_quota_exceeded: LocalizationValue;
 }>;
-
-// type Prettify<T> = {
-//   [K in keyof T]: T[K];
-// } & {};
-
-// const a: _LocalizationResource = {
-//   maintenanceMode: 'a string',
-// };
