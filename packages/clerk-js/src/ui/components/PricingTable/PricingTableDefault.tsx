@@ -4,6 +4,7 @@ import * as React from 'react';
 
 import { Switch } from '@/ui/elements/Switch';
 import { Tooltip } from '@/ui/elements/Tooltip';
+import { colorMix } from '@/ui/utils/colorMix';
 
 import { useProtect } from '../../common';
 import { usePlansContext, usePricingTableContext, useSubscriberTypeContext } from '../../contexts';
@@ -22,8 +23,8 @@ import {
   Text,
 } from '../../customizables';
 import { Check, Plus } from '../../icons';
-import { common, InternalThemeProvider } from '../../styledSystem';
-import { colors, getClosestProfileScrollBox } from '../../utils';
+import { InternalThemeProvider } from '../../styledSystem';
+import { getClosestProfileScrollBox } from '../../utils';
 
 interface PricingTableDefaultProps {
   plans?: CommercePlanResource[] | null;
@@ -167,10 +168,7 @@ function Card(props: CardProps) {
         gap: 0,
         gridTemplateRows: 'subgrid',
         gridRow: 'span 5',
-        background: common.mergedColorsBackground(
-          colors.setAlpha(t.colors.$colorBackground, 1),
-          t.colors.$neutralAlpha50,
-        ),
+        backgroundColor: colorMix(t.colors.$colorBackground, t.colors.$neutralAlpha50),
         borderWidth: t.borderWidths.$normal,
         borderStyle: t.borderStyles.$solid,
         borderColor: t.colors.$neutralAlpha100,
