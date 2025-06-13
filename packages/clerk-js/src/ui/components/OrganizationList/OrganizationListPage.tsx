@@ -1,4 +1,4 @@
-import { useOrganizationList, useUser } from '@clerk/shared/react';
+import { useOrganizationList, useSessionContext, useUser } from '@clerk/shared/react';
 import { useContext, useState } from 'react';
 
 import { Action, Actions } from '@/ui/elements/Actions';
@@ -117,6 +117,8 @@ const OrganizationListFlows = ({ showListInitially }: { showListInitially: boole
   const { navigateAfterCreateOrganization, skipInvitationScreen, hideSlug } = useOrganizationListContext();
   const [isCreateOrganizationFlow, setCreateOrganizationFlow] = useState(!showListInitially);
   const sessionTasksContext = useContext(SessionTasksContext);
+  const session = useSessionContext();
+
   return (
     <>
       {!isCreateOrganizationFlow && (
@@ -135,7 +137,18 @@ const OrganizationListFlows = ({ showListInitially }: { showListInitially: boole
             startPage={{ headerTitle: localizationKeys('organizationList.createOrganization') }}
             skipInvitationScreen={skipInvitationScreen}
             navigateAfterCreateOrganization={org =>
-              navigateAfterCreateOrganization(org).then(() => setCreateOrganizationFlow(false))
+              navigateAfterCreateOrganization(org).then(() => {
+                const isForceOrganizationSelectionFlow = sessionTasksContext && session?.currentTask.key === 'org';
+
+                // During a force organization selection flow, keep displaying the creation form in a loading state
+                // rather than showing the organization list. This allows the client-side navigation to complete
+                // before transitioning away from this view.
+                if (isForceOrganizationSelectionFlow) {
+                  return;
+                }
+
+                setCreateOrganizationFlow(false);
+              })
             }
             onCancel={
               showListInitially && isCreateOrganizationFlow ? () => setCreateOrganizationFlow(false) : undefined
