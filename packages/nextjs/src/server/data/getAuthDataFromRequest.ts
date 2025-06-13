@@ -109,12 +109,12 @@ export const getAuthDataFromRequestAsync = async (
 
     if (Array.isArray(acceptsToken)) {
       if (isMachine) {
-        if (!tokenType) {
-          return signedOutAuthObject(options);
-        }
-        return handleMachineToken({ bearerToken, tokenType, acceptsToken, options });
-      } else {
-        return signedOutAuthObject(options);
+        return handleMachineToken({
+          bearerToken,
+          tokenType: tokenType as MachineTokenType,
+          acceptsToken,
+          options,
+        });
       }
     } else {
       let intendedType: TokenType | undefined;
@@ -135,6 +135,13 @@ export const getAuthDataFromRequestAsync = async (
     }
   }
 
+  if (Array.isArray(acceptsToken)) {
+    if (!isTokenTypeAccepted(TokenType.SessionToken, acceptsToken)) {
+      return invalidTokenAuthObject();
+    }
+  }
+
+  // Fall through to session logic
   return getAuthDataFromRequestSync(req, opts);
 };
 
