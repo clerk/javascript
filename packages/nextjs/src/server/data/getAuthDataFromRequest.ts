@@ -138,11 +138,11 @@ export const getAuthDataFromRequestAsync = async (
 };
 
 const getAuthHeaders = (req: RequestLike) => {
-  const authStatus = getAuthKeyFromRequest(req, 'AuthStatus') ?? null;
-  const authToken = getAuthKeyFromRequest(req, 'AuthToken') ?? null;
-  const authMessage = getAuthKeyFromRequest(req, 'AuthMessage') ?? null;
-  const authReason = getAuthKeyFromRequest(req, 'AuthReason') ?? null;
-  const authSignature = getAuthKeyFromRequest(req, 'AuthSignature') ?? null;
+  const authStatus = getAuthKeyFromRequest(req, 'AuthStatus');
+  const authToken = getAuthKeyFromRequest(req, 'AuthToken');
+  const authMessage = getAuthKeyFromRequest(req, 'AuthMessage');
+  const authReason = getAuthKeyFromRequest(req, 'AuthReason');
+  const authSignature = getAuthKeyFromRequest(req, 'AuthSignature');
 
   return {
     authStatus,
