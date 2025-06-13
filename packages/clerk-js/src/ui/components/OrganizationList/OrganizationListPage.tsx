@@ -1,4 +1,5 @@
-import { useOrganizationList, useSessionContext, useUser } from '@clerk/shared/react';
+import { useOrganizationList, useUser } from '@clerk/shared/react';
+import type { PropsWithChildren } from 'react';
 import { useContext, useState } from 'react';
 
 import { Action, Actions } from '@/ui/elements/Actions';
@@ -77,47 +78,45 @@ const CreateOrganizationButton = ({
 };
 
 export const OrganizationListPage = withCardStateProvider(() => {
-  const card = useCardState();
   const { userMemberships, userSuggestions, userInvitations } = useOrganizationListInView();
   const isLoading = userMemberships?.isLoading || userInvitations?.isLoading || userSuggestions?.isLoading;
   const hasAnyData = !!(userMemberships?.count || userInvitations?.count || userSuggestions?.count);
 
   const { hidePersonal } = useOrganizationListContext();
 
-  return (
-    <Card.Root>
-      <Card.Content sx={t => ({ padding: `${t.space.$8} ${t.space.$none} ${t.space.$none}` })}>
-        <Card.Alert sx={t => ({ margin: `${t.space.$none} ${t.space.$5}` })}>{card.error}</Card.Alert>
-        {isLoading && (
-          <Flex
-            direction={'row'}
-            align={'center'}
-            justify={'center'}
-            sx={t => ({
-              height: '100%',
-              minHeight: t.sizes.$60,
-            })}
-          >
-            <Spinner
-              size={'lg'}
-              colorScheme={'primary'}
-              elementDescriptor={descriptors.spinner}
-            />
-          </Flex>
-        )}
+  const sessionTasksContext = useContext(SessionTasksContext);
+  if (sessionTasksContext) {
+    return <ForceOrganizationSelectionFlow />;
+  }
 
-        {!isLoading && <OrganizationListFlows showListInitially={!(hidePersonal && !hasAnyData)} />}
-      </Card.Content>
-      <Card.Footer />
-    </Card.Root>
+  return (
+    <FlowCard>
+      {isLoading && (
+        <Flex
+          direction={'row'}
+          align={'center'}
+          justify={'center'}
+          sx={t => ({
+            height: '100%',
+            minHeight: t.sizes.$60,
+          })}
+        >
+          <Spinner
+            size={'lg'}
+            colorScheme={'primary'}
+            elementDescriptor={descriptors.spinner}
+          />
+        </Flex>
+      )}
+
+      {!isLoading && <OrganizationListFlows showListInitially={!(hidePersonal && !hasAnyData)} />}
+    </FlowCard>
   );
 });
 
 const OrganizationListFlows = ({ showListInitially }: { showListInitially: boolean }) => {
   const { navigateAfterCreateOrganization, skipInvitationScreen, hideSlug } = useOrganizationListContext();
   const [isCreateOrganizationFlow, setCreateOrganizationFlow] = useState(!showListInitially);
-  const sessionTasksContext = useContext(SessionTasksContext);
-  const session = useSessionContext();
 
   return (
     <>
@@ -133,22 +132,10 @@ const OrganizationListFlows = ({ showListInitially }: { showListInitially: boole
         >
           <CreateOrganizationForm
             flow='organizationList'
-            onComplete={sessionTasksContext?.nextTask}
             startPage={{ headerTitle: localizationKeys('organizationList.createOrganization') }}
             skipInvitationScreen={skipInvitationScreen}
             navigateAfterCreateOrganization={org =>
-              navigateAfterCreateOrganization(org).then(() => {
-                const isForceOrganizationSelectionFlow = sessionTasksContext && session?.currentTask.key === 'org';
-
-                // During a force organization selection flow, keep displaying the creation form in a loading state
-                // rather than showing the organization list. This allows the client-side navigation to complete
-                // before transitioning away from this view.
-                if (isForceOrganizationSelectionFlow) {
-                  return;
-                }
-
-                setCreateOrganizationFlow(false);
-              })
+              navigateAfterCreateOrganization(org).then(() => setCreateOrganizationFlow(false))
             }
             onCancel={
               showListInitially && isCreateOrganizationFlow ? () => setCreateOrganizationFlow(false) : undefined
@@ -238,5 +225,78 @@ const OrganizationListPageList = (props: { onCreateOrganizationClick: () => void
         </PreviewListItems>
       </Col>
     </>
+  );
+};
+
+const ForceOrganizationSelectionFlow = () => {
+  const sessionTasksContext = useContext(SessionTasksContext);
+  const { navigateAfterCreateOrganization, hideSlug } = useOrganizationListContext();
+  const { userMemberships, userSuggestions, userInvitations } = useOrganizationListInView();
+
+  const [isNavigating, setIsNavigating] = useState(false);
+  const isLoading = isNavigating || !!(userMemberships?.count || userInvitations?.count || userSuggestions?.count);
+
+  const [isCreateOrganizationFlow, setIsCreateOrganizationFlow] = useState(!userMemberships?.data?.length);
+
+  if (isLoading) {
+    return (
+      <FlowCard>
+        <Flex
+          direction={'row'}
+          align={'center'}
+          justify={'center'}
+          sx={t => ({
+            height: '100%',
+            minHeight: t.sizes.$60,
+          })}
+        >
+          <Spinner
+            size={'lg'}
+            colorScheme={'primary'}
+            elementDescriptor={descriptors.spinner}
+          />
+        </Flex>
+      </FlowCard>
+    );
+  }
+
+  return (
+    <FlowCard>
+      {isCreateOrganizationFlow ? (
+        <Box
+          sx={t => ({
+            padding: `${t.space.$none} ${t.space.$5} ${t.space.$5}`,
+          })}
+        >
+          <CreateOrganizationForm
+            flow='organizationList'
+            onComplete={sessionTasksContext?.nextTask}
+            startPage={{ headerTitle: localizationKeys('organizationList.createOrganization') }}
+            skipInvitationScreen
+            navigateAfterCreateOrganization={org => {
+              setIsNavigating(true);
+              return navigateAfterCreateOrganization(org);
+            }}
+            hideSlug={hideSlug}
+          />
+        </Box>
+      ) : (
+        <OrganizationListPageList onCreateOrganizationClick={() => setIsCreateOrganizationFlow(true)} />
+      )}
+    </FlowCard>
+  );
+};
+
+const FlowCard = ({ children }: PropsWithChildren) => {
+  const card = useCardState();
+
+  return (
+    <Card.Root>
+      <Card.Content sx={t => ({ padding: `${t.space.$8} ${t.space.$none} ${t.space.$none}` })}>
+        <Card.Alert sx={t => ({ margin: `${t.space.$none} ${t.space.$5}` })}>{card.error}</Card.Alert>
+        {children}
+      </Card.Content>
+      <Card.Footer />
+    </Card.Root>
   );
 };
