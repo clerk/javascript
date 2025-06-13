@@ -22,7 +22,7 @@ export const wrapWithClerkState = (data: any) => {
  */
 export function getResponseClerkState(requestState: RequestState, additionalStateOptions: AdditionalStateOptions = {}) {
   const { reason, message, isSignedIn, ...rest } = requestState;
-  // TODO: See https://github.com/clerkinc/tanstack-react-start/issues/100
+  // TODO: See https://github.com/TanStack/router/issues/4409
   const event = {
     context: {},
   };

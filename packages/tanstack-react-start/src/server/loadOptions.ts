@@ -14,7 +14,7 @@ import { patchRequest } from './utils';
 export const loadOptions = (request: Request, overrides: LoaderOptions = {}) => {
   const clerkRequest = createClerkRequest(patchRequest(request));
   const commonEnv = commonEnvs();
-  // TODO: See https://github.com/clerkinc/tanstack-react-start/issues/100
+  // TODO: See https://github.com/TanStack/router/issues/4409
   const event = {
     context: {},
   };

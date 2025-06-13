@@ -4,7 +4,7 @@ import { getEnvVariable } from '@clerk/shared/getEnvVariable';
 import { getPublicEnvVariables } from '../utils/env';
 
 export const commonEnvs = () => {
-  // TODO: See https://github.com/clerkinc/tanstack-react-start/issues/100
+  // TODO: See https://github.com/TanStack/router/issues/4409
   const event = {
     context: {},
   };
