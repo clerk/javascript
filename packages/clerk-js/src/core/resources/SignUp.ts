@@ -47,7 +47,7 @@ import {
   clerkVerifyEmailAddressCalledBeforeCreate,
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from '../errors';
-import { BaseResource, ClerkRuntimeError, SignUpVerifications } from './internal';
+import { BaseResource, SignUpVerifications } from './internal';
 
 declare global {
   interface Window {
@@ -85,6 +85,38 @@ export class SignUp extends BaseResource implements SignUpResource {
   }
 
   create = async (_params: SignUpCreateParams, options?: SignUpCreateOptions): Promise<SignUpResource> => {
+    if (SignUp.clerk.__unstable__environment?.displayConfig?.twoStepSignUpCreateEnabled) {
+      return this.twoStepCreate(_params, options);
+    }
+
+    // This is the old flow and will be completely replaced by the two step flow when it's rolled out to everyone
+    return this.legacyCreate(_params);
+  };
+
+  private legacyCreate = async (_params: SignUpCreateParams): Promise<SignUpResource> => {
+    let params: Record<string, unknown> = _params;
+
+    if (!this.shouldBypassCaptchaForAttempt(params)) {
+      const captchaParams = await this.getCaptchaParams();
+      if (captchaParams) {
+        params = { ...params, ...captchaParams };
+      }
+    }
+
+    if (params.transfer && this.shouldBypassCaptchaForAttempt(params)) {
+      params.strategy = SignUp.clerk.client?.signIn.firstFactorVerification.strategy;
+    }
+
+    return this._basePost({
+      path: this.pathRoot,
+      body: normalizeUnsafeMetadata(params),
+    });
+  };
+
+  private twoStepCreate = async (
+    _params: SignUpCreateParams,
+    options?: SignUpCreateOptions,
+  ): Promise<SignUpResource> => {
     const params: Record<string, unknown> = _params;
 
     // This is a legacy flow, where we allowed specific OAuth providers to bypass the captcha
@@ -453,9 +485,6 @@ export class SignUp extends BaseResource implements SignUpResource {
     if (!__BUILD_DISABLE_RHC__ && !this.clientBypass()) {
       const captchaChallenge = new CaptchaChallenge(SignUp.clerk);
       params = await captchaChallenge.managedOrInvisible({ action: 'signup' });
-      if (!params) {
-        throw new ClerkRuntimeError('', { code: 'captcha_unavailable' });
-      }
     }
 
     return params;

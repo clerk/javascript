@@ -26,6 +26,7 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
   branded: boolean = false;
   captchaHeartbeat: boolean = false;
   captchaHeartbeatIntervalMs?: number;
+  twoStepSignUpCreateEnabled: boolean = false;
   captchaOauthBypass: OAuthStrategy[] = ['oauth_google', 'oauth_microsoft', 'oauth_apple'];
   captchaProvider: CaptchaProvider = 'turnstile';
   captchaPublicKey: string | null = null;
@@ -80,6 +81,10 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
     this.applicationName = this.withDefault(data.application_name, this.applicationName);
     this.branded = this.withDefault(data.branded, this.branded);
     this.captchaHeartbeat = this.withDefault(data.captcha_heartbeat, this.captchaHeartbeat);
+    this.twoStepSignUpCreateEnabled = this.withDefault(
+      data.two_step_sign_up_create_enabled,
+      this.twoStepSignUpCreateEnabled,
+    );
     this.captchaHeartbeatIntervalMs = this.withDefault(
       data.captcha_heartbeat_interval_ms,
       this.captchaHeartbeatIntervalMs,
@@ -130,6 +135,7 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
       branded: this.branded,
       captcha_heartbeat_interval_ms: this.captchaHeartbeatIntervalMs,
       captcha_heartbeat: this.captchaHeartbeat,
+      two_step_sign_up_create_enabled: this.twoStepSignUpCreateEnabled,
       captcha_oauth_bypass: this.captchaOauthBypass,
       captcha_provider: this.captchaProvider,
       captcha_public_key_invisible: this.captchaPublicKeyInvisible,
