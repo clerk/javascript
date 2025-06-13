@@ -15,38 +15,9 @@ type UnionToRecordWithPrimitives<T extends string> = {
   [K in T]: string | number | boolean | Date;
 };
 
-// type ExtractParamsFromString<S extends string> = S extends `${infer P}','${string}` ? P : S;
-// type ExtractConstraintFromString<S extends string> = S extends `${string}','${infer C}` ? C : string;
-
-// Doing `[T] extends [never]` forces TypeScript to evaluate the conditional type in a distributive way. This is a common TypeScript pattern to handle conditional types with never.
-// export type LocalizationValue<
-//   T extends string = never,
-//   Constraint extends string = string,
-// > = T extends `${string}','${string}`
-//   ? ExtractConstraintFromString<T> & { __params: UnionToRecordWithPrimitives<ExtractParamsFromString<T>> }
-//   : [T] extends [never]
-//     ? Constraint
-//     : Constraint & { __params: UnionToRecordWithPrimitives<T> };
-
 export type LocalizationValue<T extends string = never, Constraint extends string = string> = [T] extends [never]
   ? Constraint
   : Constraint & { __params: UnionToRecordWithPrimitives<T> };
-
-// Helper type to extract parameter name and template from a string like "param,template"
-// type ExtractParamAndTemplate<T extends string> = T extends `${infer Param},${infer Template}`
-//   ? { param: Param; template: Template }
-//   : never;
-
-// Doing `[T] extends [never]` forces TypeScript to evaluate the conditional type in a distributive way. This is a common TypeScript pattern to handle conditional types with never.
-// export type LocalizationValue<T extends string = never, Constraint extends string = string> = [T] extends [never]
-//   ? Constraint
-//   : ExtractParamAndTemplate<T> extends { param: infer P; template: infer Template }
-//     ? P extends string
-//       ? Template extends string
-//         ? Template & { __params: UnionToRecordWithPrimitives<P> }
-//         : never
-//       : never
-//     : Constraint & { __params: UnionToRecordWithPrimitives<T> };
 
 /**
  * Recursively transforms a type by replacing all LocalizationValue types with their string representation.
@@ -58,7 +29,7 @@ export type LocalizationValue<T extends string = never, Constraint extends strin
  *   a: LocalizationValue;                    // becomes string
  *   b: LocalizationValue<'one'>;             // becomes string
  *   c: {
- *     lala: LocalizationValue<'nice' | 'bla'>; // becomes string
+ *     lala: LocalizationValue<'two' | 'three'>; // becomes string
  *   };
  * };
  *
@@ -80,12 +51,6 @@ type DeepLocalizationWithoutObjects<T> = {
       ? DeepLocalizationWithoutObjects<T[K]>
       : T[K];
 };
-
-// type wow = LocalizationValue<`wow',${string}{{provider|titleize}}${string}`>;
-// type wow = LocalizationValue<'wow', `${string}{{provider|titleize}}${string}`>;
-
-// const b: wow = '{{provider|titleize}}';
-// console.log(b);
 
 /**
  * A type containing all the possible localization keys the prebuilt Clerk components support.
