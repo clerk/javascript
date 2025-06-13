@@ -50,6 +50,7 @@ describe('subpath /internal exports', () => {
         "getAuthObjectForAcceptedToken",
         "getAuthObjectFromJwt",
         "getMachineTokenType",
+        "invalidTokenAuthObject",
         "isMachineTokenByPrefix",
         "isMachineTokenType",
         "isTokenTypeAccepted",

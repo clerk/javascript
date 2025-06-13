@@ -52,14 +52,18 @@ export function getMachineTokenType(token: string): MachineTokenType {
 /**
  * Check if a token type is accepted given a requested token type or list of token types.
  *
- * @param tokenType - The token type to check
+ * @param tokenType - The token type to check (can be null if the token is invalid)
  * @param acceptsToken - The requested token type or list of token types
  * @returns true if the token type is accepted
  */
 export const isTokenTypeAccepted = (
-  tokenType: TokenType,
+  tokenType: TokenType | null,
   acceptsToken: NonNullable<AuthenticateRequestOptions['acceptsToken']>,
 ): boolean => {
+  if (!tokenType) {
+    return false;
+  }
+
   if (acceptsToken === 'any') {
     return true;
   }

@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 import { mockTokens, mockVerificationResults } from '../../fixtures/machine';
 import type { AuthenticateContext } from '../authenticateContext';
-import type { SignedOutAuthObject, UnauthenticatedMachineObject } from '../authObjects';
+import type { InvalidTokenAuthObject, UnauthenticatedMachineObject } from '../authObjects';
 import {
   authenticatedMachineObject,
   getAuthObjectForAcceptedToken,
@@ -405,19 +405,25 @@ describe('getAuthObjectForAcceptedToken', () => {
     expect(result).toBe(machineAuth);
   });
 
-  it('returns unauthenticated machine object for parsed type if acceptsToken is array and token type does not match', () => {
+  it('returns InvalidTokenAuthObject if acceptsToken is array and token type does not match', () => {
     const result = getAuthObjectForAcceptedToken({
       authObject: machineAuth,
       acceptsToken: ['machine_token', 'oauth_token'],
     });
-    expect((result as UnauthenticatedMachineObject<'api_key'>).tokenType).toBe('api_key');
-    expect((result as UnauthenticatedMachineObject<'api_key'>).id).toBeNull();
+    expect((result as InvalidTokenAuthObject).tokenType).toBeNull();
+    expect((result as InvalidTokenAuthObject).isAuthenticated).toBe(false);
+  });
+
+  it('returns InvalidTokenAuthObject if parsed type is not a machine token and does not match any in acceptsToken array', () => {
+    const result = getAuthObjectForAcceptedToken({ authObject: sessionAuth, acceptsToken: ['api_key', 'oauth_token'] });
+    expect((result as InvalidTokenAuthObject).tokenType).toBeNull();
+    expect((result as InvalidTokenAuthObject).isAuthenticated).toBe(false);
   });
 
   it('returns signed-out session object if parsed type is not a machine token and does not match', () => {
     const result = getAuthObjectForAcceptedToken({ authObject: sessionAuth, acceptsToken: ['api_key', 'oauth_token'] });
-    expect((result as SignedOutAuthObject).tokenType).toBe('session_token');
-    expect((result as SignedOutAuthObject).userId).toBeNull();
+    expect((result as InvalidTokenAuthObject).tokenType).toBeNull();
+    expect((result as InvalidTokenAuthObject).isAuthenticated).toBe(false);
   });
 
   it('returns unauthenticated object for requested type if acceptsToken is a single value and does not match', () => {

@@ -148,6 +148,14 @@ export type UnauthenticatedMachineObject<T extends MachineTokenType = MachineTok
     } & MachineObjectExtendedProperties<false>[T]
   : never;
 
+export type InvalidTokenAuthObject = {
+  isAuthenticated: false;
+  tokenType: null;
+  getToken: () => Promise<null>;
+  has: () => false;
+  debug: AuthObjectDebug;
+};
+
 /**
  * @interface
  */
@@ -155,7 +163,8 @@ export type AuthObject =
   | SignedInAuthObject
   | SignedOutAuthObject
   | AuthenticatedMachineObject
-  | UnauthenticatedMachineObject;
+  | UnauthenticatedMachineObject
+  | InvalidTokenAuthObject;
 
 const createDebug = (data: AuthObjectDebugData | undefined) => {
   return () => {
@@ -350,6 +359,19 @@ export function unauthenticatedMachineObject<T extends MachineTokenType>(
 }
 
 /**
+ * @internal
+ */
+export function invalidTokenAuthObject(): InvalidTokenAuthObject {
+  return {
+    isAuthenticated: false,
+    tokenType: null,
+    getToken: () => Promise.resolve(null),
+    has: () => false,
+    debug: () => ({}),
+  };
+}
+
+/**
  * Auth objects moving through the server -> client boundary need to be serializable
  * as we need to ensure that they can be transferred via the network as pure strings.
  * Some frameworks like Remix or Next (/pages dir only) handle this serialization by simply
@@ -424,10 +446,8 @@ export function getAuthObjectForAcceptedToken({
 
   if (Array.isArray(acceptsToken)) {
     if (!isTokenTypeAccepted(authObject.tokenType, acceptsToken)) {
-      if (isMachineTokenType(authObject.tokenType)) {
-        return unauthenticatedMachineObject(authObject.tokenType, authObject.debug);
-      }
-      return signedOutAuthObject(authObject.debug);
+      // If the token is not in the accepted array, return invalidTokenAuthObject
+      return invalidTokenAuthObject();
     }
     return authObject;
   }

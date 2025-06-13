@@ -31,6 +31,7 @@ export {
   signedInAuthObject,
   authenticatedMachineObject,
   unauthenticatedMachineObject,
+  invalidTokenAuthObject,
   getAuthObjectFromJwt,
   getAuthObjectForAcceptedToken,
 } from './tokens/authObjects';
