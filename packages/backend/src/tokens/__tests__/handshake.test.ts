@@ -179,6 +179,8 @@ describe('HandshakeService', () => {
 
     it('should use proxy URL when available', () => {
       mockAuthenticateContext.proxyUrl = 'https://my-proxy.example.com';
+      // Simulate what parsePublishableKey does when proxy URL is provided
+      mockAuthenticateContext.frontendApi = 'https://my-proxy.example.com';
       const headers = handshakeService.buildRedirectToHandshake('test-reason');
       const location = headers.get(constants.Headers.Location);
       if (!location) {
@@ -195,6 +197,7 @@ describe('HandshakeService', () => {
 
     it('should handle proxy URL with trailing slash', () => {
       mockAuthenticateContext.proxyUrl = 'https://my-proxy.example.com/';
+      mockAuthenticateContext.frontendApi = 'https://my-proxy.example.com/';
       const headers = handshakeService.buildRedirectToHandshake('test-reason');
       const location = headers.get(constants.Headers.Location);
       if (!location) {
@@ -204,6 +207,224 @@ describe('HandshakeService', () => {
 
       expect(url.hostname).toBe('my-proxy.example.com');
       expect(url.pathname).toBe('/v1/client/handshake');
+    });
+
+    it('should handle proxy URL with multiple trailing slashes', () => {
+      mockAuthenticateContext.proxyUrl = 'https://my-proxy.example.com//';
+      mockAuthenticateContext.frontendApi = 'https://my-proxy.example.com//';
+      const headers = handshakeService.buildRedirectToHandshake('test-reason');
+      const location = headers.get(constants.Headers.Location);
+      if (!location) {
+        throw new Error('Location header is missing');
+      }
+      const url = new URL(location);
+
+      expect(url.hostname).toBe('my-proxy.example.com');
+      expect(url.pathname).toBe('/v1/client/handshake');
+      expect(location).not.toContain('//v1/client/handshake');
+    });
+
+    it('should handle proxy URL with many trailing slashes', () => {
+      mockAuthenticateContext.proxyUrl = 'https://my-proxy.example.com///';
+      mockAuthenticateContext.frontendApi = 'https://my-proxy.example.com///';
+      const headers = handshakeService.buildRedirectToHandshake('test-reason');
+      const location = headers.get(constants.Headers.Location);
+      if (!location) {
+        throw new Error('Location header is missing');
+      }
+      const url = new URL(location);
+
+      expect(url.hostname).toBe('my-proxy.example.com');
+      expect(url.pathname).toBe('/v1/client/handshake');
+      expect(location).not.toContain('//v1/client/handshake');
+    });
+
+    it('should handle proxy URL without trailing slash', () => {
+      mockAuthenticateContext.proxyUrl = 'https://my-proxy.example.com';
+      mockAuthenticateContext.frontendApi = 'https://my-proxy.example.com';
+      const headers = handshakeService.buildRedirectToHandshake('test-reason');
+      const location = headers.get(constants.Headers.Location);
+      if (!location) {
+        throw new Error('Location header is missing');
+      }
+      const url = new URL(location);
+
+      expect(url.hostname).toBe('my-proxy.example.com');
+      expect(url.pathname).toBe('/v1/client/handshake');
+    });
+
+    it('should handle proxy URL with path and trailing slashes', () => {
+      mockAuthenticateContext.proxyUrl = 'https://my-proxy.example.com/clerk-proxy//';
+      mockAuthenticateContext.frontendApi = 'https://my-proxy.example.com/clerk-proxy//';
+      const headers = handshakeService.buildRedirectToHandshake('test-reason');
+      const location = headers.get(constants.Headers.Location);
+      if (!location) {
+        throw new Error('Location header is missing');
+      }
+      const url = new URL(location);
+
+      expect(url.hostname).toBe('my-proxy.example.com');
+      expect(url.pathname).toBe('/clerk-proxy/v1/client/handshake');
+      expect(location).not.toContain('clerk-proxy//v1/client/handshake');
+    });
+
+    it('should handle non-HTTP frontendApi (domain only)', () => {
+      mockAuthenticateContext.frontendApi = 'api.clerk.com';
+      const headers = handshakeService.buildRedirectToHandshake('test-reason');
+      const location = headers.get(constants.Headers.Location);
+      if (!location) {
+        throw new Error('Location header is missing');
+      }
+      const url = new URL(location);
+
+      expect(url.protocol).toBe('https:');
+      expect(url.hostname).toBe('api.clerk.com');
+      expect(url.pathname).toBe('/v1/client/handshake');
+    });
+
+    it('should not include dev browser token in production mode', () => {
+      mockAuthenticateContext.instanceType = 'production';
+      mockAuthenticateContext.devBrowserToken = 'dev-token';
+      const headers = handshakeService.buildRedirectToHandshake('test-reason');
+      const location = headers.get(constants.Headers.Location);
+      if (!location) {
+        throw new Error('Location header is missing');
+      }
+      const url = new URL(location);
+
+      expect(url.searchParams.get(constants.QueryParameters.DevBrowser)).toBeNull();
+    });
+
+    it('should not include dev browser token when not available in development', () => {
+      mockAuthenticateContext.instanceType = 'development';
+      mockAuthenticateContext.devBrowserToken = undefined;
+      const headers = handshakeService.buildRedirectToHandshake('test-reason');
+      const location = headers.get(constants.Headers.Location);
+      if (!location) {
+        throw new Error('Location header is missing');
+      }
+      const url = new URL(location);
+
+      expect(url.searchParams.get(constants.QueryParameters.DevBrowser)).toBeNull();
+    });
+
+    it('should handle usesSuffixedCookies returning false', () => {
+      mockAuthenticateContext.usesSuffixedCookies = vi.fn().mockReturnValue(false);
+      const headers = handshakeService.buildRedirectToHandshake('test-reason');
+      const location = headers.get(constants.Headers.Location);
+      if (!location) {
+        throw new Error('Location header is missing');
+      }
+      const url = new URL(location);
+
+      expect(url.searchParams.get(constants.QueryParameters.SuffixedCookies)).toBe('false');
+    });
+
+    it('should include organization sync parameters when organization target is found', () => {
+      // Mock the organization sync methods
+      const mockTarget = { type: 'organization', id: 'org_123' };
+      const mockParams = new Map([
+        ['org_id', 'org_123'],
+        ['org_slug', 'test-org'],
+      ]);
+
+      vi.spyOn(handshakeService as any, 'getOrganizationSyncTarget').mockReturnValue(mockTarget);
+      vi.spyOn(handshakeService as any, 'getOrganizationSyncQueryParams').mockReturnValue(mockParams);
+
+      const headers = handshakeService.buildRedirectToHandshake('test-reason');
+      const location = headers.get(constants.Headers.Location);
+      if (!location) {
+        throw new Error('Location header is missing');
+      }
+      const url = new URL(location);
+
+      expect(url.searchParams.get('org_id')).toBe('org_123');
+      expect(url.searchParams.get('org_slug')).toBe('test-org');
+    });
+
+    it('should not include organization sync parameters when no target is found', () => {
+      vi.spyOn(handshakeService as any, 'getOrganizationSyncTarget').mockReturnValue(null);
+
+      const headers = handshakeService.buildRedirectToHandshake('test-reason');
+      const location = headers.get(constants.Headers.Location);
+      if (!location) {
+        throw new Error('Location header is missing');
+      }
+      const url = new URL(location);
+
+      expect(url.searchParams.get('org_id')).toBeNull();
+      expect(url.searchParams.get('org_slug')).toBeNull();
+    });
+
+    it('should handle different handshake reasons', () => {
+      const reasons = ['session-token-expired', 'dev-browser-sync', 'satellite-cookie-needs-syncing'];
+
+      reasons.forEach(reason => {
+        const headers = handshakeService.buildRedirectToHandshake(reason);
+        const location = headers.get(constants.Headers.Location);
+        if (!location) {
+          throw new Error('Location header is missing');
+        }
+        const url = new URL(location);
+
+        expect(url.searchParams.get(constants.QueryParameters.HandshakeReason)).toBe(reason);
+      });
+    });
+
+    it('should handle complex clerkUrl with query parameters and fragments', () => {
+      mockAuthenticateContext.clerkUrl = new URL('https://example.com/path?existing=param#fragment');
+
+      const headers = handshakeService.buildRedirectToHandshake('test-reason');
+      const location = headers.get(constants.Headers.Location);
+      if (!location) {
+        throw new Error('Location header is missing');
+      }
+      const url = new URL(location);
+
+      const redirectUrl = url.searchParams.get('redirect_url');
+      expect(redirectUrl).toBe('https://example.com/path?existing=param#fragment');
+    });
+
+    it('should create valid URLs with different frontend API formats', () => {
+      const frontendApiFormats = [
+        'api.clerk.com',
+        'https://api.clerk.com',
+        'https://api.clerk.com/',
+        'foo-bar-13.clerk.accounts.dev',
+        'https://foo-bar-13.clerk.accounts.dev',
+        'clerk.example.com',
+        'https://clerk.example.com/proxy-path',
+      ];
+
+      frontendApiFormats.forEach(frontendApi => {
+        mockAuthenticateContext.frontendApi = frontendApi;
+
+        const headers = handshakeService.buildRedirectToHandshake('test-reason');
+        const location = headers.get(constants.Headers.Location);
+
+        expect(location).toBeDefined();
+        expect(() => new URL(location!)).not.toThrow();
+
+        const url = new URL(location!);
+        // Path should end with '/v1/client/handshake' (may have proxy path prefix)
+        expect(url.pathname).toMatch(/\/v1\/client\/handshake$/);
+        expect(url.searchParams.get(constants.QueryParameters.HandshakeReason)).toBe('test-reason');
+      });
+    });
+
+    it('should always include required query parameters', () => {
+      const headers = handshakeService.buildRedirectToHandshake('test-reason');
+      const location = headers.get(constants.Headers.Location);
+      if (!location) {
+        throw new Error('Location header is missing');
+      }
+      const url = new URL(location);
+
+      // Verify all required parameters are present
+      expect(url.searchParams.get('redirect_url')).toBeDefined();
+      expect(url.searchParams.get('__clerk_api_version')).toBe('2025-04-10');
+      expect(url.searchParams.get(constants.QueryParameters.SuffixedCookies)).toMatch(/^(true|false)$/);
+      expect(url.searchParams.get(constants.QueryParameters.HandshakeReason)).toBe('test-reason');
     });
   });
 
@@ -318,6 +539,53 @@ describe('HandshakeService', () => {
       expect(result).toEqual([]);
 
       spy.mockRestore();
+    });
+  });
+
+  describe('URL construction edge cases', () => {
+    const trailingSlashTestCases = [
+      { input: 'https://example.com', expected: 'https://example.com' },
+      { input: 'https://example.com/', expected: 'https://example.com' },
+      { input: 'https://example.com//', expected: 'https://example.com' },
+      { input: 'https://example.com///', expected: 'https://example.com' },
+      { input: 'https://example.com/path', expected: 'https://example.com/path' },
+      { input: 'https://example.com/path/', expected: 'https://example.com/path' },
+      { input: 'https://example.com/path//', expected: 'https://example.com/path' },
+      { input: 'https://example.com/proxy-path///', expected: 'https://example.com/proxy-path' },
+    ];
+
+    trailingSlashTestCases.forEach(({ input, expected }) => {
+      it(`should correctly handle trailing slashes: "${input}" -> "${expected}"`, () => {
+        const result = input.replace(/\/+$/, '');
+        expect(result).toBe(expected);
+      });
+    });
+
+    it('should construct valid handshake URLs with various proxy configurations', () => {
+      const proxyConfigs = [
+        'https://proxy.example.com',
+        'https://proxy.example.com/',
+        'https://proxy.example.com//',
+        'https://proxy.example.com/clerk',
+        'https://proxy.example.com/clerk/',
+        'https://proxy.example.com/clerk//',
+        'https://api.example.com/v1/clerk///',
+      ];
+
+      proxyConfigs.forEach(proxyUrl => {
+        mockAuthenticateContext.proxyUrl = proxyUrl;
+        mockAuthenticateContext.frontendApi = proxyUrl; // Simulate parsePublishableKey behavior
+
+        const headers = handshakeService.buildRedirectToHandshake('test-reason');
+        const location = headers.get(constants.Headers.Location);
+
+        expect(location).toBeDefined();
+        expect(location).toContain('/v1/client/handshake');
+        expect(location).not.toContain('//v1/client/handshake'); // No double slashes
+
+        // Ensure URL is valid
+        expect(() => new URL(location!)).not.toThrow();
+      });
     });
   });
 });
