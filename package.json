@@ -45,6 +45,7 @@
     "test:integration:quickstart": "E2E_APP_ID=quickstart.* pnpm test:integration:base --grep @quickstart",
     "test:integration:react-router": "E2E_APP_ID=react-router.* npm run test:integration:base -- --grep @react-router",
     "test:integration:sessions": "DISABLE_WEB_SECURITY=true pnpm test:integration:base --grep @sessions",
+    "test:integration:tanstack-react-router": "E2E_APP_ID=tanstack.react-router pnpm test:integration:base --grep @tanstack-react-router",
     "test:integration:tanstack-react-start": "E2E_APP_ID=tanstack.react-start pnpm test:integration:base --grep @tanstack-react-start",
     "test:integration:vue": "E2E_APP_ID=vue.vite pnpm test:integration:base --grep @vue",
     "test:typedoc": "pnpm typedoc:generate && cd ./.typedoc && vitest run",
