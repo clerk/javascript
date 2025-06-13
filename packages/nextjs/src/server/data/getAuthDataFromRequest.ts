@@ -6,6 +6,7 @@ import {
   constants,
   getAuthObjectFromJwt,
   getMachineTokenType,
+  invalidTokenAuthObject,
   isMachineTokenByPrefix,
   isMachineTokenType,
   isTokenTypeAccepted,
@@ -168,9 +169,13 @@ async function handleMachineToken({
   acceptsToken: AuthenticateRequestOptions['acceptsToken'];
   options: Record<string, any>;
 }) {
-  if (!tokenType) {
-    return signedOutAuthObject(options);
+  if (Array.isArray(acceptsToken)) {
+    // If the token is not in the accepted array, return invalid token auth object
+    if (!isTokenTypeAccepted(tokenType, acceptsToken)) {
+      return invalidTokenAuthObject();
+    }
   }
+
   if (!isTokenTypeAccepted(tokenType, acceptsToken ?? TokenType.SessionToken)) {
     return unauthenticatedMachineObject(tokenType, options);
   }
@@ -206,7 +211,7 @@ async function handleIntentBased({
     }
     if (!isTokenTypeAccepted(tokenType, acceptsToken ?? TokenType.SessionToken)) {
       if (intendedType && isMachineTokenType(intendedType)) {
-        return unauthenticatedMachineObject(intendedType as MachineTokenType, options);
+        return unauthenticatedMachineObject(intendedType, options);
       }
       return signedOutAuthObject(options);
     }

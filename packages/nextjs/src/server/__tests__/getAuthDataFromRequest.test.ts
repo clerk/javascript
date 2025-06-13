@@ -46,7 +46,7 @@ describe('getAuthDataFromRequestAsync', () => {
     expect((auth as AuthenticatedMachineObject<'machine_token'>).machineId).toBeNull();
   });
 
-  it('returns unauthenticated machine object for the actual parsed machine token type when token type does not match any in acceptsToken array', async () => {
+  it('returns invalid token auth object when token type does not match any in acceptsToken array', async () => {
     const req = mockRequest({
       url: '/api/protected',
       headers: new Headers({
@@ -58,8 +58,8 @@ describe('getAuthDataFromRequestAsync', () => {
       acceptsToken: ['machine_token', 'oauth_token', 'session_token'],
     });
 
-    expect(auth.tokenType).toBe('api_key');
-    expect((auth as AuthenticatedMachineObject<'api_key'>).userId).toBeNull();
+    expect(auth.tokenType).toBeNull();
+    expect(auth.isAuthenticated).toBe(false);
   });
 
   it('returns authenticated api_key object when array contains only api_key and token is ak_xxx and verification passes', async () => {

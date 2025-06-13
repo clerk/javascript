@@ -446,7 +446,7 @@ export function getAuthObjectForAcceptedToken({
 
   if (Array.isArray(acceptsToken)) {
     if (!isTokenTypeAccepted(authObject.tokenType, acceptsToken)) {
-      // If the token is not in the accepted array, return invalidTokenAuthObject
+      // If the token is not in the accepted array, return invalid token auth object
       return invalidTokenAuthObject();
     }
     return authObject;
