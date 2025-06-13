@@ -23,6 +23,6 @@ const reactStart = applicationConfig()
   .addDependency('@clerk/tanstack-react-start', linkPackage('tanstack-react-start'));
 
 export const tanstack = {
-  reactStart,
   reactRouter,
+  reactStart,
 } as const;
