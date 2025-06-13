@@ -1,6 +1,6 @@
 ---
-'@clerk/backend': patch
-'@clerk/nextjs': patch
+'@clerk/backend': minor
+'@clerk/nextjs': minor
 ---
 
 Respect `acceptsToken` when returning unauthenticated session or machine object.

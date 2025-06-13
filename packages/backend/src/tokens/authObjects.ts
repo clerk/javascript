@@ -58,6 +58,7 @@ export type SignedInAuthObject = SharedSignedInAuthObjectProperties & {
    * Used to help debug issues when using Clerk in development.
    */
   debug: AuthObjectDebug;
+  isAuthenticated: true;
 };
 
 /**
@@ -78,6 +79,7 @@ export type SignedOutAuthObject = {
   getToken: ServerGetToken;
   has: CheckAuthorizationFromSessionClaims;
   debug: AuthObjectDebug;
+  isAuthenticated: false;
 };
 
 /**
@@ -121,6 +123,7 @@ export type AuthenticatedMachineObject<T extends MachineTokenType = MachineToken
       has: CheckAuthorizationFromSessionClaims;
       debug: AuthObjectDebug;
       tokenType: T;
+      isAuthenticated: true;
     } & MachineObjectExtendedProperties<true>[T]
   : never;
 
@@ -141,6 +144,7 @@ export type UnauthenticatedMachineObject<T extends MachineTokenType = MachineTok
       has: CheckAuthorizationFromSessionClaims;
       debug: AuthObjectDebug;
       tokenType: T;
+      isAuthenticated: false;
     } & MachineObjectExtendedProperties<false>[T]
   : never;
 
@@ -201,6 +205,7 @@ export function signedInAuthObject(
       plans: (sessionClaims.pla as string) || '',
     }),
     debug: createDebug({ ...authenticateContext, sessionToken }),
+    isAuthenticated: true,
   };
 }
 
@@ -226,6 +231,7 @@ export function signedOutAuthObject(
     getToken: () => Promise.resolve(null),
     has: () => false,
     debug: createDebug(debugData),
+    isAuthenticated: false,
   };
 }
 
@@ -244,6 +250,7 @@ export function authenticatedMachineObject<T extends MachineTokenType>(
     getToken: () => Promise.resolve(token),
     has: () => false,
     debug: createDebug(debugData),
+    isAuthenticated: true,
   };
 
   // Type assertions are safe here since we know the verification result type matches the tokenType.
@@ -303,6 +310,7 @@ export function unauthenticatedMachineObject<T extends MachineTokenType>(
     has: () => false,
     getToken: () => Promise.resolve(null),
     debug: createDebug(debugData),
+    isAuthenticated: false,
   };
 
   switch (tokenType) {
