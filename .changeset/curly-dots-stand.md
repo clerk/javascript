@@ -1,5 +1,5 @@
 ---
-'@clerk/tanstack-react-start': major
+'@clerk/tanstack-react-start': minor
 ---
 
 Updated minimum required version of `@tanstack/react-start` to 1.121.0 (Devinxi), which removes the need for Vinxi.
