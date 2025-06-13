@@ -86,7 +86,7 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
       <FormContainer
         headerTitle={localizationKeys('userProfile.emailAddressPage.verifyTitle')}
         headerSubtitle={localizationKeys(`${translationKey}.formSubtitle`, {
-          identifier: emailAddressRef.current?.emailAddress,
+          identifier: emailAddressRef.current?.emailAddress || '',
         })}
       >
         {strategy === 'email_link' && (

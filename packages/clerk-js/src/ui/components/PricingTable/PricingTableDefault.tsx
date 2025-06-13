@@ -247,11 +247,13 @@ function Card(props: CardProps) {
               order: ctaPosition === 'top' ? -1 : undefined,
             })}
           >
-            {shouldShowFooterNotice ? (
+            {shouldShowFooterNotice && subscription ? (
               <Text
                 elementDescriptor={descriptors.pricingTableCardFooterNotice}
                 variant={isCompact ? 'buttonSmall' : 'buttonLarge'}
-                localizationKey={localizationKeys('badge__startsAt', { date: subscription?.periodStart })}
+                localizationKey={localizationKeys('badge__startsAt', {
+                  date: subscription?.periodStart,
+                })}
                 colorScheme='secondary'
                 sx={t => ({
                   paddingBlock: t.space.$1x5,

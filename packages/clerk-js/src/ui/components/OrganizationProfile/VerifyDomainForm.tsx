@@ -50,7 +50,7 @@ export const VerifyDomainForm = withCardStateProvider((props: VerifyDomainFormPr
   const subtitleVerificationCodeScreen = localizationKeys(
     'organizationProfile.verifyDomainPage.subtitleVerificationCodeScreen',
     {
-      emailAddress: affiliationEmailAddressRef.current,
+      emailAddress: affiliationEmailAddressRef.current || '',
     },
   );
 
