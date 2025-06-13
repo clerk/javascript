@@ -15,6 +15,7 @@ import type { APIKey, CreateBackendApiOptions, IdPOAuthAccessToken, MachineToken
 import { createBackendApiClient } from '../api';
 import { isTokenTypeAccepted } from '../internal';
 import type { AuthenticateContext } from './authenticateContext';
+import { isMachineTokenType } from './machine';
 import type { MachineTokenType, SessionTokenType } from './tokenTypes';
 import { TokenType } from './tokenTypes';
 import type { AuthenticateRequestOptions, MachineAuthType } from './types';
@@ -394,42 +395,13 @@ export const getAuthObjectFromJwt = (
 
 /**
  * @internal
- * Filters and coerces an AuthObject based on the accepted token type(s).
+ * Returns an auth object matching the requested token type(s).
  *
- * This function is used after authentication to ensure that the returned auth object
- * matches the expected token type(s) specified by `acceptsToken`. If the token type
- * of the provided `authObject` does not match any of the types in `acceptsToken`,
- * it returns an unauthenticated or signed-out version of the object, depending on the token type.
+ * If the parsed token type does not match any in acceptsToken, returns:
+ *   - an unauthenticated machine object for the first machine token type in acceptsToken (if present), or
+ *   - a signed-out session object otherwise.
  *
- * - If `acceptsToken` is `'any'`, the original auth object is returned.
- * - If `acceptsToken` is a single token type or an array of token types, the function checks if
- *   `authObject.tokenType` matches any of them.
- * - If the token type does not match and is a session token, a signed-out object is returned.
- * - If the token type does not match and is a machine token, an unauthenticated machine object is returned.
- * - If the token type matches, the original auth object is returned.
- *
- * @param {Object} params
- * @param {AuthObject} params.authObject - The authenticated object to filter.
- * @param {AuthenticateRequestOptions['acceptsToken']} [params.acceptsToken=TokenType.SessionToken] - The accepted token type(s). Can be a string, array of strings, or 'any'.
- * @returns {AuthObject} The filtered or coerced auth object.
- *
- * @example
- * // Accept only 'api_key' tokens
- * const authObject = { tokenType: 'session_token', userId: 'user_123' };
- * const result = getAuthObjectForAcceptedToken({ authObject, acceptsToken: 'api_key' });
- * // result will be a signed-out object (since tokenType is 'session_token' and does not match)
- *
- * @example
- * // Accept 'api_key' or 'machine_token'
- * const authObject = { tokenType: 'machine_token', id: 'm2m_123' };
- * const result = getAuthObjectForAcceptedToken({ authObject, acceptsToken: ['api_key', 'machine_token'] });
- * // result will be the original authObject (since tokenType matches one in the array)
- *
- * @example
- * // Accept any token type
- * const authObject = { tokenType: 'api_key', id: 'ak_123' };
- * const result = getAuthObjectForAcceptedToken({ authObject, acceptsToken: 'any' });
- * // result will be the original authObject
+ * This ensures the returned object always matches the developer's intent.
  */
 export function getAuthObjectForAcceptedToken({
   authObject,
@@ -442,11 +414,22 @@ export function getAuthObjectForAcceptedToken({
     return authObject;
   }
 
-  if (!isTokenTypeAccepted(authObject.tokenType, acceptsToken)) {
-    if (authObject.tokenType === TokenType.SessionToken) {
+  if (Array.isArray(acceptsToken)) {
+    if (!isTokenTypeAccepted(authObject.tokenType, acceptsToken)) {
+      if (isMachineTokenType(authObject.tokenType)) {
+        return unauthenticatedMachineObject(authObject.tokenType, authObject.debug);
+      }
       return signedOutAuthObject(authObject.debug);
     }
-    return unauthenticatedMachineObject(authObject.tokenType, authObject.debug);
+    return authObject;
+  }
+
+  // Single value: Intent based
+  if (!isTokenTypeAccepted(authObject.tokenType, acceptsToken)) {
+    if (isMachineTokenType(acceptsToken)) {
+      return unauthenticatedMachineObject(acceptsToken, authObject.debug);
+    }
+    return signedOutAuthObject(authObject.debug);
   }
 
   return authObject;

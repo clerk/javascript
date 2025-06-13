@@ -18,7 +18,7 @@ const MACHINE_TOKEN_PREFIXES = [M2M_TOKEN_PREFIX, OAUTH_TOKEN_PREFIX, API_KEY_PR
  * @param token - The token string to check
  * @returns true if the token starts with a recognized machine token prefix
  */
-export function isMachineToken(token: string): boolean {
+export function isMachineTokenByPrefix(token: string): boolean {
   return MACHINE_TOKEN_PREFIXES.some(prefix => token.startsWith(prefix));
 }
 
@@ -67,3 +67,13 @@ export const isTokenTypeAccepted = (
   const tokenTypes = Array.isArray(acceptsToken) ? acceptsToken : [acceptsToken];
   return tokenTypes.includes(tokenType);
 };
+
+/**
+ * Checks if a token type string is a machine token type (api_key, machine_token, or oauth_token).
+ *
+ * @param type - The token type string to check
+ * @returns true if the type is a machine token type
+ */
+export function isMachineTokenType(type: string): type is MachineTokenType {
+  return type === TokenType.ApiKey || type === TokenType.MachineToken || type === TokenType.OAuthToken;
+}

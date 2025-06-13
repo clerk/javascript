@@ -3,8 +3,10 @@ import { describe, expect, it } from 'vitest';
 
 import { mockTokens, mockVerificationResults } from '../../fixtures/machine';
 import type { AuthenticateContext } from '../authenticateContext';
+import type { SignedOutAuthObject, UnauthenticatedMachineObject } from '../authObjects';
 import {
   authenticatedMachineObject,
+  getAuthObjectForAcceptedToken,
   makeAuthObjectSerializable,
   signedInAuthObject,
   signedOutAuthObject,
@@ -385,5 +387,42 @@ describe('unauthenticatedMachineObject', () => {
     const authObject = unauthenticatedMachineObject('machine_token');
     const retrievedToken = await authObject.getToken();
     expect(retrievedToken).toBeNull();
+  });
+});
+
+describe('getAuthObjectForAcceptedToken', () => {
+  const debugData = { foo: 'bar' };
+  const sessionAuth = signedOutAuthObject(debugData);
+  const machineAuth = authenticatedMachineObject('api_key', 'ak_xxx', mockVerificationResults.api_key, debugData);
+
+  it('returns original object if acceptsToken is "any"', () => {
+    const result = getAuthObjectForAcceptedToken({ authObject: machineAuth, acceptsToken: 'any' });
+    expect(result).toBe(machineAuth);
+  });
+
+  it('returns original object if token type matches', () => {
+    const result = getAuthObjectForAcceptedToken({ authObject: machineAuth, acceptsToken: 'api_key' });
+    expect(result).toBe(machineAuth);
+  });
+
+  it('returns unauthenticated machine object for parsed type if acceptsToken is array and token type does not match', () => {
+    const result = getAuthObjectForAcceptedToken({
+      authObject: machineAuth,
+      acceptsToken: ['machine_token', 'oauth_token'],
+    });
+    expect((result as UnauthenticatedMachineObject<'api_key'>).tokenType).toBe('api_key');
+    expect((result as UnauthenticatedMachineObject<'api_key'>).id).toBeNull();
+  });
+
+  it('returns signed-out session object if parsed type is not a machine token and does not match', () => {
+    const result = getAuthObjectForAcceptedToken({ authObject: sessionAuth, acceptsToken: ['api_key', 'oauth_token'] });
+    expect((result as SignedOutAuthObject).tokenType).toBe('session_token');
+    expect((result as SignedOutAuthObject).userId).toBeNull();
+  });
+
+  it('returns unauthenticated object for requested type if acceptsToken is a single value and does not match', () => {
+    const result = getAuthObjectForAcceptedToken({ authObject: machineAuth, acceptsToken: 'machine_token' });
+    expect((result as UnauthenticatedMachineObject<'machine_token'>).tokenType).toBe('machine_token');
+    expect((result as UnauthenticatedMachineObject<'machine_token'>).id).toBeNull();
   });
 });
