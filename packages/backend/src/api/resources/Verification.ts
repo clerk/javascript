@@ -1,4 +1,4 @@
-import type { VerificationStatus, VerificationStrategy } from '@clerk/types';
+import type { VerificationStatus } from '@clerk/types';
 
 import type { OrganizationDomainVerificationJSON, VerificationJSON } from './JSON';
 
@@ -22,7 +22,7 @@ export class Verification {
     /**
      * The strategy pertaining to the parent sign-up or sign-in attempt.
      */
-    readonly strategy: VerificationStrategy,
+    readonly strategy: string,
     /**
      * The redirect URL for an external verification.
      */
