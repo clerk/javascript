@@ -176,6 +176,35 @@ describe('HandshakeService', () => {
         'Missing clerkUrl in authenticateContext',
       );
     });
+
+    it('should use proxy URL when available', () => {
+      mockAuthenticateContext.proxyUrl = 'https://my-proxy.example.com';
+      const headers = handshakeService.buildRedirectToHandshake('test-reason');
+      const location = headers.get(constants.Headers.Location);
+      if (!location) {
+        throw new Error('Location header is missing');
+      }
+      const url = new URL(location);
+
+      expect(url.hostname).toBe('my-proxy.example.com');
+      expect(url.pathname).toBe('/v1/client/handshake');
+      expect(url.searchParams.get('redirect_url')).toBe('https://example.com/');
+      expect(url.searchParams.get(constants.QueryParameters.SuffixedCookies)).toBe('true');
+      expect(url.searchParams.get(constants.QueryParameters.HandshakeReason)).toBe('test-reason');
+    });
+
+    it('should handle proxy URL with trailing slash', () => {
+      mockAuthenticateContext.proxyUrl = 'https://my-proxy.example.com/';
+      const headers = handshakeService.buildRedirectToHandshake('test-reason');
+      const location = headers.get(constants.Headers.Location);
+      if (!location) {
+        throw new Error('Location header is missing');
+      }
+      const url = new URL(location);
+
+      expect(url.hostname).toBe('my-proxy.example.com');
+      expect(url.pathname).toBe('/v1/client/handshake');
+    });
   });
 
   describe('handleTokenVerificationErrorInDevelopment', () => {
