@@ -1,6 +1,7 @@
 import { useClerk } from '@clerk/shared/react';
 import { useSWRConfig } from 'swr';
 
+import { descriptors } from '@/ui/customizables';
 import { Card } from '@/ui/elements/Card';
 import { Form } from '@/ui/elements/Form';
 import { FormButtons } from '@/ui/elements/FormButtons';
@@ -91,7 +92,10 @@ export const RevokeAPIKeyConfirmationModal = ({
             headerSubtitle={localizationKeys('apiKeys.revokeConfirmation.formHint')}
           >
             <Form.Root onSubmit={handleSubmit}>
-              <Form.ControlRow elementId={revokeField.id}>
+              <Form.ControlRow
+                elementId={revokeField.id}
+                elementDescriptor={descriptors.apiKeysRevokeModalInput}
+              >
                 <Form.PlainInput {...revokeField.props} />
               </Form.ControlRow>
               <FormButtons
@@ -99,6 +103,7 @@ export const RevokeAPIKeyConfirmationModal = ({
                 colorScheme='danger'
                 isDisabled={!canSubmit}
                 onReset={onClose}
+                elementDescriptor={descriptors.apiKeysRevokeModalSubmitButton}
               />
             </Form.Root>
           </FormContainer>
