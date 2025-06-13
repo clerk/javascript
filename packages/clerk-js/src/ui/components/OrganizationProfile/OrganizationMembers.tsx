@@ -1,21 +1,15 @@
 import { useOrganization } from '@clerk/shared/react';
 import { useState } from 'react';
 
+import { Animated } from '@/ui/elements/Animated';
+import { Card } from '@/ui/elements/Card';
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { Header } from '@/ui/elements/Header';
+import { Tab, TabPanel, TabPanels, Tabs, TabsList } from '@/ui/elements/Tabs';
+
 import { NotificationCountBadge, useProtect } from '../../common';
 import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
 import { Col, descriptors, Flex, localizationKeys } from '../../customizables';
-import {
-  Animated,
-  Card,
-  Header,
-  Tab,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  TabsList,
-  useCardState,
-  withCardStateProvider,
-} from '../../elements';
 import { Action } from '../../elements/Action';
 import { mqu } from '../../styledSystem';
 import { ActiveMembersList } from './ActiveMembersList';

@@ -14,24 +14,96 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const mnMN: LocalizationResource = {
   locale: 'mn-MN',
-  __experimental_commerce: {
-    billedAnnually: undefined,
-    free: undefined,
-    getStarted: undefined,
-    manageSubscription: undefined,
-    month: undefined,
-    switchPlan: undefined,
-  },
   backButton: 'Буцах',
+  badge__activePlan: undefined,
+  badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Анхдагч',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
   badge__otherImpersonatorDevice: 'Бусад дуурайгч төхөөрөмж',
   badge__primary: 'Үндсэн',
+  badge__renewsAt: undefined,
   badge__requiresAction: 'Үйлдэл шаардлагтай',
+  badge__startsAt: undefined,
   badge__thisDevice: 'Энэ төхөөрөмж',
   badge__unverified: 'Баталгаажаагүй',
+  badge__upcomingPlan: undefined,
   badge__userDevice: 'Хэрэглэгчийн төхөөрөмж',
   badge__you: 'Чи',
+  commerce: {
+    addPaymentMethod: undefined,
+    alwaysFree: undefined,
+    annually: undefined,
+    availableFeatures: undefined,
+    billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
+    cancelSubscription: undefined,
+    cancelSubscriptionAccessUntil: undefined,
+    cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionTitle: undefined,
+    cannotSubscribeMonthly: undefined,
+    checkout: {
+      description__paymentSuccessful: undefined,
+      description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      lineItems: {
+        title__paymentMethod: undefined,
+        title__statementId: undefined,
+        title__subscriptionBegins: undefined,
+        title__totalPaid: undefined,
+      },
+      perMonth: undefined,
+      title: undefined,
+      title__paymentSuccessful: undefined,
+      title__subscriptionSuccessful: undefined,
+    },
+    creditRemainder: undefined,
+    defaultFreePlanActive: undefined,
+    free: undefined,
+    getStarted: undefined,
+    keepSubscription: undefined,
+    manage: undefined,
+    manageSubscription: undefined,
+    month: undefined,
+    monthly: undefined,
+    pastDue: undefined,
+    pay: undefined,
+    paymentMethods: undefined,
+    paymentSource: {
+      applePayDescription: {
+        annual: undefined,
+        monthly: undefined,
+      },
+      dev: {
+        anyNumbers: undefined,
+        cardNumber: undefined,
+        cvcZip: undefined,
+        developmentMode: undefined,
+        expirationDate: undefined,
+        testCardInfo: undefined,
+      },
+    },
+    popular: undefined,
+    pricingTable: {
+      billingCycle: undefined,
+      included: undefined,
+    },
+    reSubscribe: undefined,
+    seeAllFeatures: undefined,
+    subscribe: undefined,
+    subtotal: undefined,
+    switchPlan: undefined,
+    switchToAnnual: undefined,
+    switchToMonthly: undefined,
+    totalDueToday: undefined,
+    viewFeatures: undefined,
+    year: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'Байгуулга үүсгэх',
     invitePage: {
@@ -48,6 +120,7 @@ export const mnMN: LocalizationResource = {
     sameDay: "Өнөөдөр {{ date | timeString('mn-MN') }} цагт",
   },
   dividerText: 'эсвэл',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'Өөр арга ашиглах',
   footerPageLink__help: 'Тусламж',
   footerPageLink__privacy: 'Нууцлал',
@@ -123,6 +196,42 @@ export const mnMN: LocalizationResource = {
     badge__automaticSuggestion: 'Автомат саналууд',
     badge__manualInvitation: 'Автомат бүртгэл байхгүй',
     badge__unverified: 'Баталгаажаагүй',
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Баталгаажуулахын тулд домэйн нэмнэ үү. Энэ домэйны имэйл хаягтай хэрэглэгчид байгууллагад автоматаар нэгдэх эсвэл элсэх хүсэлт гаргах боломжтой.',
@@ -180,10 +289,17 @@ export const mnMN: LocalizationResource = {
       },
     },
     navbar: {
+      billing: undefined,
       description: 'Байгууллагаа удирдих',
       general: 'Ерөнхий',
       members: 'Гишүүд',
       title: 'Байгууллага',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -369,6 +485,12 @@ export const mnMN: LocalizationResource = {
       subtitle: 'Асуудалтай тулгарч байна уу? Та нэвтрэхийн тулд эдгээр аргуудын аль нэгийг ашиглаж болно.',
       title: 'Өөр аргыг ашигла',
     },
+    alternativePhoneCodeProvider: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     backupCodeMfa: {
       subtitle: 'Таны нөөц код нь хоёр шатлалт баталгаажуулалтыг тохируулах үед авсан код юм.',
       title: 'Нөөц код оруулна уу',
@@ -476,6 +598,12 @@ export const mnMN: LocalizationResource = {
       actionLink__use_username: 'Хэрэглэгчийн нэрийг ашиглах',
       actionText: 'Бүртгэлгүй юу?',
       actionText__join_waitlist: undefined,
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'Тавтай морил! Үргэлжлүүлэхийн тулд нэвтэрнэ үү',
       subtitleCombined: undefined,
       title: '{{applicationName}} руу нэвтрэх',
@@ -489,6 +617,11 @@ export const mnMN: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Нууц үгээ оруулна уу',
   signUp: {
+    alternativePhoneCodeProvider: {
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     continue: {
       actionLink: 'Нэвтрэх',
       actionText: 'Бүртгэлтэй юу?',
@@ -556,6 +689,12 @@ export const mnMN: LocalizationResource = {
       actionLink__use_email: undefined,
       actionLink__use_phone: undefined,
       actionText: 'Бүртгэлтэй юу?',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'Тавтай морил! Эхлэхийн тулд дэлгэрэнгүй мэдээллийг бөглөнө үү.',
       subtitleCombined: 'Тавтай морил! Эхлэхийн тулд дэлгэрэнгүй мэдээллийг бөглөнө үү.',
       title: 'Бүртгэл үүсгэх',
@@ -595,7 +734,8 @@ export const mnMN: LocalizationResource = {
     form_username_invalid_character: 'Хэрэглэгчийн нэр буруу тэмдэгт агуулж байна.',
     form_username_invalid_length: 'Хэрэглэгчийн нэр буруу байна.',
     identification_deletion_failed: 'Та өөрийн сүүлчийн таниулбараа устгах боломжгүй.',
-    not_allowed_access: 'Хандалтыг зөвшөөрөгдөөгүй',
+    not_allowed_access:
+      "Имэйл хаяг эсвэл утасны дугаарыг бүртгүүлэхийг хориглоно. Энэ нь '+', '=', '#' эсвэл '.'-г ашигласантай холбоотой байж болно. түр зуурын цахим шуудангийн үйлчилгээтэй холбогдсон домэйн ашиглах, эсвэл шууд хаагдсан байх. Хэрэв та үүнийг алдаа гэж үзэж байгаа бол дэмжлэгтэй холбогдоно уу.",
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -616,6 +756,7 @@ export const mnMN: LocalizationResource = {
       sentencePrefix: 'таны нууц үг агуулсан байх ёстой',
     },
     phone_number_exists: 'Энэ утасны дугаарыг авсан. Өөр оролдоно уу.',
+    session_exists: 'Та аль хэдийн нэвтэрсэн байна.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Таны нууц үг ажилладаг, гэхдээ илүү хүчтэй байж болно. Илүү олон тэмдэгт нэмж үзээрэй.',
@@ -664,14 +805,6 @@ export const mnMN: LocalizationResource = {
     action__signOutAll: 'Бүх бүртгэлээс гарна уу',
   },
   userProfile: {
-    __experimental_billingPage: {
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
-        headerTitle__plans: undefined,
-      },
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Хуулсан!',
       actionLabel__copy: 'Бүгдийг хуулах',
@@ -687,6 +820,42 @@ export const mnMN: LocalizationResource = {
         'Хэрэв та баталгаажуулах төхөөрөмждөө хандах эрхээ алдсан тохиолдолд эдгээрийн аль нэгийг ашиглан бүртгэлдээ нэвтэрч болно.',
       title: 'Нөөц кодын баталгаажуулалтыг нэмэх',
       title__codelist: 'Нөөц кодууд',
+    },
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Бүртгэлээ холбох үйлчилгээ үзүүлэгчээ сонгоно уу.',
@@ -831,6 +1000,9 @@ export const mnMN: LocalizationResource = {
       title: 'Утасны дугаар нэмэх',
       verifySubtitle: '{{identifier}} руу илгээсэн баталгаажуулах кодыг оруулна уу',
       verifyTitle: 'Утасны дугаарыг баталгаажуулах',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: 'Санал болгож буй хэмжээ 1:1, 10MB хүртэл.',

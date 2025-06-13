@@ -1,5 +1,5 @@
-import type { AuthObject } from '@clerk/backend';
-import { stripPrivateDataFromObject } from '@clerk/backend/internal';
+import type { AuthenticateRequestOptions, GetAuthFn } from '@clerk/backend/internal';
+import { getAuthObjectForAcceptedToken } from '@clerk/backend/internal';
 
 import { errorThrower } from '../utils';
 import { noFetchFnCtxPassedInGetAuth } from '../utils/errors';
@@ -7,18 +7,23 @@ import { authenticateRequest } from './authenticateRequest';
 import { loadOptions } from './loadOptions';
 import type { LoaderOptions } from './types';
 
-type GetAuthReturn = Promise<AuthObject>;
+type GetAuthOptions = { acceptsToken?: AuthenticateRequestOptions['acceptsToken'] } & Pick<LoaderOptions, 'secretKey'>;
 
-type GetAuthOptions = Pick<LoaderOptions, 'secretKey'>;
-
-export async function getAuth(request: Request, opts?: GetAuthOptions): GetAuthReturn {
+export const getAuth: GetAuthFn<Request, true> = (async (request: Request, opts?: GetAuthOptions) => {
   if (!request) {
     return errorThrower.throw(noFetchFnCtxPassedInGetAuth);
   }
 
-  const loadedOptions = loadOptions(request, opts);
+  const { acceptsToken, ...restOptions } = opts || {};
 
-  const requestState = await authenticateRequest(request, loadedOptions);
+  const loadedOptions = loadOptions(request, restOptions);
 
-  return stripPrivateDataFromObject(requestState.toAuth());
-}
+  const requestState = await authenticateRequest(request, {
+    ...loadedOptions,
+    acceptsToken: 'any',
+  });
+
+  const authObject = requestState.toAuth();
+
+  return getAuthObjectForAcceptedToken({ authObject, acceptsToken });
+}) as GetAuthFn<Request, true>;

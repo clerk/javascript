@@ -2,11 +2,30 @@ import { IdentificationLink } from './IdentificationLink';
 import type { EmailAddressJSON } from './JSON';
 import { Verification } from './Verification';
 
+/**
+ * The Backend `EmailAddress` object is a model around an email address. Email addresses are one of the [identifiers](https://clerk.com/docs/authentication/configuration/sign-up-sign-in-options#identifiers) used to provide identification for users.
+ *
+ * Email addresses must be **verified** to ensure that they are assigned to their rightful owners. The `EmailAddress` object holds all necessary state around the verification process.
+ *
+ * For implementation examples for adding and verifying email addresses, see the [email link custom flow](https://clerk.com/docs/custom-flows/email-links) and [email code custom flow](https://clerk.com/docs/custom-flows/add-email) guides.
+ */
 export class EmailAddress {
   constructor(
+    /**
+     * The unique identifier for the email address.
+     */
     readonly id: string,
+    /**
+     * The value of the email address.
+     */
     readonly emailAddress: string,
+    /**
+     * An object holding information on the verification of the email address.
+     */
     readonly verification: Verification | null,
+    /**
+     * An array of objects containing information about any identifications that might be linked to the email address.
+     */
     readonly linkedTo: IdentificationLink[],
   ) {}
 

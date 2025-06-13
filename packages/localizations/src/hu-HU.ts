@@ -14,24 +14,96 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const huHU: LocalizationResource = {
   locale: 'hu-HU',
-  __experimental_commerce: {
-    billedAnnually: undefined,
-    free: undefined,
-    getStarted: undefined,
-    manageSubscription: undefined,
-    month: undefined,
-    switchPlan: undefined,
-  },
   backButton: 'Vissza',
+  badge__activePlan: undefined,
+  badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Alapértelmezett',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
   badge__otherImpersonatorDevice: 'Másik megszemélyesítő eszköz',
   badge__primary: 'Elsődleges',
+  badge__renewsAt: undefined,
   badge__requiresAction: 'Beavatkozás szükséges',
+  badge__startsAt: undefined,
   badge__thisDevice: 'Ez az eszköz',
   badge__unverified: 'Nem ellenőrzött',
+  badge__upcomingPlan: undefined,
   badge__userDevice: 'Felhasználói eszköz',
   badge__you: 'Te',
+  commerce: {
+    addPaymentMethod: undefined,
+    alwaysFree: undefined,
+    annually: undefined,
+    availableFeatures: undefined,
+    billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
+    cancelSubscription: undefined,
+    cancelSubscriptionAccessUntil: undefined,
+    cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionTitle: undefined,
+    cannotSubscribeMonthly: undefined,
+    checkout: {
+      description__paymentSuccessful: undefined,
+      description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      lineItems: {
+        title__paymentMethod: undefined,
+        title__statementId: undefined,
+        title__subscriptionBegins: undefined,
+        title__totalPaid: undefined,
+      },
+      perMonth: undefined,
+      title: undefined,
+      title__paymentSuccessful: undefined,
+      title__subscriptionSuccessful: undefined,
+    },
+    creditRemainder: undefined,
+    defaultFreePlanActive: undefined,
+    free: undefined,
+    getStarted: undefined,
+    keepSubscription: undefined,
+    manage: undefined,
+    manageSubscription: undefined,
+    month: undefined,
+    monthly: undefined,
+    pastDue: undefined,
+    pay: undefined,
+    paymentMethods: undefined,
+    paymentSource: {
+      applePayDescription: {
+        annual: undefined,
+        monthly: undefined,
+      },
+      dev: {
+        anyNumbers: undefined,
+        cardNumber: undefined,
+        cvcZip: undefined,
+        developmentMode: undefined,
+        expirationDate: undefined,
+        testCardInfo: undefined,
+      },
+    },
+    popular: undefined,
+    pricingTable: {
+      billingCycle: undefined,
+      included: undefined,
+    },
+    reSubscribe: undefined,
+    seeAllFeatures: undefined,
+    subscribe: undefined,
+    subtotal: undefined,
+    switchPlan: undefined,
+    switchToAnnual: undefined,
+    switchToMonthly: undefined,
+    totalDueToday: undefined,
+    viewFeatures: undefined,
+    year: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'Szervezet létrehozása',
     invitePage: {
@@ -48,6 +120,7 @@ export const huHU: LocalizationResource = {
     sameDay: "Ma {{ date | timeString('hu-HU') }}-kor",
   },
   dividerText: 'vagy',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'Másik módszer használata',
   footerPageLink__help: 'Súgó',
   footerPageLink__privacy: 'Adatvédelem',
@@ -122,6 +195,42 @@ export const huHU: LocalizationResource = {
     badge__automaticSuggestion: 'Automatikus javaslatok',
     badge__manualInvitation: 'Nincs automatikus felvétel',
     badge__unverified: 'Nincs visszaigazolva',
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Add meg a visszaigazolandó domain nevét. Minden email cím erről a tartományjól automatikusan tud csatlakozni a szervezethez.',
@@ -179,10 +288,17 @@ export const huHU: LocalizationResource = {
       },
     },
     navbar: {
+      billing: undefined,
       description: 'A szervezeted kezelése',
       general: 'Általános',
       members: 'Tagok',
       title: 'Szervezet',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -368,6 +484,12 @@ export const huHU: LocalizationResource = {
       subtitle: 'Problémád akadt? Ezek közül bármelyik bejelentkezési módot választhatod.',
       title: 'Bejelentkezés más módon',
     },
+    alternativePhoneCodeProvider: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     backupCodeMfa: {
       subtitle: 'A tartalék kód az, amit akkor kaptál, amikor beállítottad a kétlépcsős azonosítást',
       title: 'Írd be a tartalék kódot',
@@ -475,6 +597,12 @@ export const huHU: LocalizationResource = {
       actionLink__use_username: 'Felhasználónév használata',
       actionText: 'Nincs fiókod?',
       actionText__join_waitlist: undefined,
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'Üdv újra! A folytatáshoz kérlek jelentkezz be.',
       subtitleCombined: undefined,
       title: 'Bejelentkezés a(z) {{applicationName}} fiókba',
@@ -488,6 +616,11 @@ export const huHU: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Írd be a jelszavad',
   signUp: {
+    alternativePhoneCodeProvider: {
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     continue: {
       actionLink: 'Bejelentkezés',
       actionText: 'Van már fiókod?',
@@ -555,6 +688,12 @@ export const huHU: LocalizationResource = {
       actionLink__use_email: undefined,
       actionLink__use_phone: undefined,
       actionText: 'Van már fiókod?',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'Üdv! Kérlek add meg az adatokat, hogy elkezdhesd.',
       subtitleCombined: 'Üdv! Kérlek add meg az adatokat, hogy elkezdhesd.',
       title: 'Fiók létrehozása',
@@ -573,7 +712,7 @@ export const huHU: LocalizationResource = {
     form_identifier_exists__email_address: 'Ez az email cím már foglalt. Kérlek próbálj egy másikat.',
     form_identifier_exists__phone_number: 'Ez a telefonszám már foglalt. Kérlek próbálj egy másikat.',
     form_identifier_exists__username: 'Ez a felhasználónév már foglalt. Kérlek próbálj egy másikat.',
-    form_identifier_not_found: undefined,
+    form_identifier_not_found: 'Nem találtunk fiókot ezekkel a részletekkel.',
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Az email címnek érvényes email címnek kell lennie.',
     form_param_format_invalid__phone_number: 'A telefonszámnak érvényes telefonszámnak kell lennie.',
@@ -595,7 +734,8 @@ export const huHU: LocalizationResource = {
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
     identification_deletion_failed: 'Nem törölheted ki az utolsó azonosítód.',
-    not_allowed_access: undefined,
+    not_allowed_access:
+      "Az email címed vagy a telefonszámod nem használható regisztrációhoz. Ez lehet, mert az email címedben vagy a telefonszámodban szerepel a '+', '=', '#' vagy '.' karakter, vagy az email címedben vagy a telefonszámodban szerepel egy időzített email szolgáltató vagy kizárt tartomány. Ha úgy gondolja, hogy ez hiba, vegye fel velünk a kapcsolatot.",
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -616,6 +756,7 @@ export const huHU: LocalizationResource = {
       sentencePrefix: 'A jelszavadnak tartalmaznia kell',
     },
     phone_number_exists: 'Ez a telefonszám már foglalt. Kérlek próbálj meg egy másikat.',
+    session_exists: 'Már be vagy jelentkezve.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'A jelszavad, jó, de lehetne erősebb. Adj hozzá több karaktert.',
@@ -665,14 +806,6 @@ export const huHU: LocalizationResource = {
     action__signOutAll: 'Kijelentkezés minden fiókból',
   },
   userProfile: {
-    __experimental_billingPage: {
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
-        headerTitle__plans: undefined,
-      },
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Kimásolva!',
       actionLabel__copy: 'Az összes kimásolása',
@@ -687,6 +820,42 @@ export const huHU: LocalizationResource = {
       successSubtitle: 'Használhatod ezeket is, hogy belépj a fiókodba, ha nem férsz hozzá a hitelesítő eszközödhöz.',
       title: 'Tartalék kód megerősítés hozzáadása',
       title__codelist: 'Tartalék kódok',
+    },
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Válassz egy szolgáltatót, amit összekötsz a fiókoddal.',
@@ -833,6 +1002,9 @@ export const huHU: LocalizationResource = {
       title: 'Telefonszám hozzáadása',
       verifySubtitle: 'Írd be a visszaigazóló kódot, amit a(z) {{identifier}} számra küldtünk.',
       verifyTitle: 'Telefonszám visszaigazolása',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: 'Ajánlott méret 1:1, 10MB-ig.',

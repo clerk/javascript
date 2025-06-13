@@ -14,24 +14,96 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const itIT: LocalizationResource = {
   locale: 'it-IT',
-  __experimental_commerce: {
-    billedAnnually: undefined,
-    free: undefined,
-    getStarted: undefined,
-    manageSubscription: undefined,
-    month: undefined,
-    switchPlan: undefined,
-  },
   backButton: 'Indietro',
+  badge__activePlan: undefined,
+  badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Predefinito',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
   badge__otherImpersonatorDevice: 'Altro dispositivo impersonato',
   badge__primary: 'Primario',
+  badge__renewsAt: undefined,
   badge__requiresAction: 'Richiede azione',
+  badge__startsAt: undefined,
   badge__thisDevice: 'Questo dispositivo',
   badge__unverified: 'Non verificato',
+  badge__upcomingPlan: undefined,
   badge__userDevice: 'Dispositivo utente',
   badge__you: 'Tu',
+  commerce: {
+    addPaymentMethod: undefined,
+    alwaysFree: undefined,
+    annually: undefined,
+    availableFeatures: undefined,
+    billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
+    cancelSubscription: undefined,
+    cancelSubscriptionAccessUntil: undefined,
+    cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionTitle: undefined,
+    cannotSubscribeMonthly: undefined,
+    checkout: {
+      description__paymentSuccessful: undefined,
+      description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      lineItems: {
+        title__paymentMethod: undefined,
+        title__statementId: undefined,
+        title__subscriptionBegins: undefined,
+        title__totalPaid: undefined,
+      },
+      perMonth: undefined,
+      title: undefined,
+      title__paymentSuccessful: undefined,
+      title__subscriptionSuccessful: undefined,
+    },
+    creditRemainder: undefined,
+    defaultFreePlanActive: undefined,
+    free: undefined,
+    getStarted: undefined,
+    keepSubscription: undefined,
+    manage: undefined,
+    manageSubscription: undefined,
+    month: undefined,
+    monthly: undefined,
+    pastDue: undefined,
+    pay: undefined,
+    paymentMethods: undefined,
+    paymentSource: {
+      applePayDescription: {
+        annual: undefined,
+        monthly: undefined,
+      },
+      dev: {
+        anyNumbers: undefined,
+        cardNumber: undefined,
+        cvcZip: undefined,
+        developmentMode: undefined,
+        expirationDate: undefined,
+        testCardInfo: undefined,
+      },
+    },
+    popular: undefined,
+    pricingTable: {
+      billingCycle: undefined,
+      included: undefined,
+    },
+    reSubscribe: undefined,
+    seeAllFeatures: undefined,
+    subscribe: undefined,
+    subtotal: undefined,
+    switchPlan: undefined,
+    switchToAnnual: undefined,
+    switchToMonthly: undefined,
+    totalDueToday: undefined,
+    viewFeatures: undefined,
+    year: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'Crea organizzazione',
     invitePage: {
@@ -48,6 +120,7 @@ export const itIT: LocalizationResource = {
     sameDay: "Oggi alle {{ date | timeString('it-IT') }}",
   },
   dividerText: 'oppure',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'Utilizzo un altro metodo',
   footerPageLink__help: 'Aiuto',
   footerPageLink__privacy: 'Privacy',
@@ -124,6 +197,42 @@ export const itIT: LocalizationResource = {
     badge__automaticSuggestion: 'Suggerimenti automatici',
     badge__manualInvitation: 'Nessuna iscrizione automatica',
     badge__unverified: 'Non verificato',
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Aggiungi il dominio da verificare. Gli utenti con indirizzi email in questo dominio possono unirsi all’organizzazione automaticamente o richiedere di unirsi.',
@@ -180,10 +289,17 @@ export const itIT: LocalizationResource = {
       },
     },
     navbar: {
+      billing: undefined,
       description: 'Gestisci la tua organizzazione.',
       general: 'Generale',
       members: 'Membri',
       title: 'Organizzazione',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -369,6 +485,12 @@ export const itIT: LocalizationResource = {
       subtitle: 'Problemi di accesso? Puoi usare uno di questi metodi per accedere.',
       title: 'Usa un altro metodo',
     },
+    alternativePhoneCodeProvider: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     backupCodeMfa: {
       subtitle: 'per continuare su {{applicationName}}',
       title: 'Inserisci un codice di backup',
@@ -475,6 +597,12 @@ export const itIT: LocalizationResource = {
       actionLink__use_username: 'Usa username',
       actionText: 'Non hai un account?',
       actionText__join_waitlist: "Unisciti alla lista d'attesa",
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'per continuare su {{applicationName}}',
       subtitleCombined: undefined,
       title: 'Accedi',
@@ -488,6 +616,11 @@ export const itIT: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Inserisci la tua password',
   signUp: {
+    alternativePhoneCodeProvider: {
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     continue: {
       actionLink: 'Accedi',
       actionText: 'Hai un account?',
@@ -556,6 +689,12 @@ export const itIT: LocalizationResource = {
       actionLink__use_email: 'Usa email',
       actionLink__use_phone: 'Usa telefono',
       actionText: 'Hai già un account?',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'per continuare su {{applicationName}}',
       subtitleCombined: 'per continuare su {{applicationName}}',
       title: 'Crea il tuo account',
@@ -595,7 +734,8 @@ export const itIT: LocalizationResource = {
     form_username_invalid_character: 'Il nome utente contiene caratteri non validi.',
     form_username_invalid_length: 'Il nome utente deve avere una lunghezza compresa tra 3 e 32 caratteri.',
     identification_deletion_failed: 'Non puoi eliminare la tua ultima identificazione.',
-    not_allowed_access: 'Non hai accesso a questa risorsa.',
+    not_allowed_access:
+      "L'indirizzo email o il numero di telefono non è autorizzato per la registrazione. Questo può essere dovuto all'uso di '+', '=', '#' o '.' nell'indirizzo email, l'uso di un dominio collegato a un servizio email temporaneo o l'esclusione esplicita. Se ritieni che si tratti di un errore, contattaci.",
     organization_domain_blocked: "Il dominio dell'organizzazione è stato bloccato.",
     organization_domain_common: 'Questo dominio è troppo comune per essere utilizzato.',
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -615,7 +755,8 @@ export const itIT: LocalizationResource = {
       requireUppercase: undefined,
       sentencePrefix: undefined,
     },
-    phone_number_exists: undefined,
+    phone_number_exists: 'Questo numero di telefono è già in uso. Per favore, prova con un altro.',
+    session_exists: 'Sei già loggato.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: undefined,
@@ -664,14 +805,6 @@ export const itIT: LocalizationResource = {
     action__signOutAll: 'Disconnetti da tutti gli accounts',
   },
   userProfile: {
-    __experimental_billingPage: {
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
-        headerTitle__plans: undefined,
-      },
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Copiati!',
       actionLabel__copy: 'Copia tutti',
@@ -687,6 +820,42 @@ export const itIT: LocalizationResource = {
         'Puoi ora utilizzare questi codici di backup per accedere al tuo account, nel caso di perdita del proprio strumento di autenticazione.',
       title: 'Aggiungi verifica codici backup',
       title__codelist: 'Codici di backup',
+    },
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Seleziona un provider per collegare il tuo account.',
@@ -832,6 +1001,9 @@ export const itIT: LocalizationResource = {
       title: 'Aggiungi numero di telefono',
       verifySubtitle: 'Inserisci il codice di verifica inviato a {{identifier}}',
       verifyTitle: 'Verifica numero di telefono',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: 'Carica una immagine piú piccola di 10MB di tipo JPG, PNG, GIF, oppure WEBP',

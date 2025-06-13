@@ -2,7 +2,7 @@ import React from 'react';
 
 import type { PrimitiveProps, RequiredProp, StyleVariants } from '../styledSystem';
 import { common, createVariants, mqu } from '../styledSystem';
-import { sanitizeInputProps, useFormField } from './hooks';
+import { sanitizeInputProps, useFormField } from './hooks/useFormField';
 import { useInput } from './hooks/useInput';
 
 const { applyVariants, filterProps } = createVariants((theme, props) => ({
@@ -131,6 +131,27 @@ export const RadioInput = React.forwardRef<HTMLInputElement, InputProps>((props,
       {...props}
       type='radio'
       ref={ref}
+    />
+  );
+});
+
+export type TextareaProps = PrimitiveProps<'textarea'> & StyleVariants<typeof applyVariants> & OwnProps & RequiredProp;
+
+export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>((props, ref) => {
+  const { isDisabled, hasError, focusRing, isRequired, ...rest } = props;
+  const _disabled = isDisabled || props.isDisabled;
+  const _required = isRequired || props.isRequired;
+  const _hasError = hasError || props.hasError;
+
+  return (
+    <textarea
+      {...rest}
+      ref={ref}
+      disabled={_disabled}
+      required={_required}
+      aria-invalid={_hasError}
+      aria-required={_required}
+      css={applyVariants(props)}
     />
   );
 });

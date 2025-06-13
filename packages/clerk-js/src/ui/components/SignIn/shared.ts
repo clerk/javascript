@@ -2,10 +2,11 @@ import { isClerkRuntimeError, isUserLockedError } from '@clerk/shared/error';
 import { useClerk } from '@clerk/shared/react';
 import { useCallback, useEffect } from 'react';
 
+import { useCardState } from '@/ui/elements/contexts';
+
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { __internal_WebAuthnAbortService } from '../../../utils/passkeys';
 import { useCoreSignIn, useSignInContext } from '../../contexts';
-import { useCardState } from '../../elements';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { handleError } from '../../utils';
 

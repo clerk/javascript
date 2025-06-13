@@ -1,65 +1,78 @@
 import { useClerk } from '@clerk/shared/react';
-import type {
-  __experimental_CommercePlanResource,
-  __experimental_CommerceSubscriptionPlanPeriod,
-  __experimental_CommerceSubscriptionResource,
-  __experimental_PricingTableProps,
-} from '@clerk/types';
-import { useState } from 'react';
+import type { CommercePlanResource, CommerceSubscriptionPlanPeriod, PricingTableProps } from '@clerk/types';
+import { useEffect, useMemo, useState } from 'react';
 
-import { PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
-import { usePlansContext, usePricingTableContext } from '../../contexts';
-import { AppearanceProvider } from '../../customizables';
+import { usePaymentSources, usePlans, usePlansContext, usePricingTableContext, useSubscriptions } from '../../contexts';
+import { Flow } from '../../customizables';
 import { PricingTableDefault } from './PricingTableDefault';
 import { PricingTableMatrix } from './PricingTableMatrix';
-import { SubscriptionDetailDrawer } from './SubscriptionDetailDrawer';
 
-const PricingTable = (props: __experimental_PricingTableProps) => {
+const PricingTableRoot = (props: PricingTableProps) => {
   const clerk = useClerk();
-  const { mode = 'mounted', subscriberType } = usePricingTableContext();
+  const { mode = 'mounted' } = usePricingTableContext();
   const isCompact = mode === 'modal';
+  const { data: subscriptions } = useSubscriptions();
+  const { data: plans } = usePlans();
+  const { handleSelectPlan } = usePlansContext();
 
-  const { plans, revalidate, activeOrUpcomingSubscription } = usePlansContext();
+  const defaultPlanPeriod = useMemo(() => {
+    if (isCompact) {
+      const upcomingSubscription = subscriptions?.find(sub => sub.status === 'upcoming');
+      if (upcomingSubscription) {
+        return upcomingSubscription.planPeriod;
+      }
 
-  const [planPeriod, setPlanPeriod] = useState<__experimental_CommerceSubscriptionPlanPeriod>('month');
-  const [detailSubscription, setDetailSubscription] = useState<__experimental_CommerceSubscriptionResource>();
+      // don't pay attention to the default plan
+      const activeSubscription = subscriptions?.find(
+        sub => !sub.canceledAt && sub.status === 'active' && !sub.plan.isDefault,
+      );
+      if (activeSubscription) {
+        return activeSubscription.planPeriod;
+      }
+    }
 
-  const [showSubscriptionDetailDrawer, setShowSubscriptionDetailDrawer] = useState(false);
+    return 'annual';
+  }, [isCompact, subscriptions]);
 
-  const selectPlan = (plan: __experimental_CommercePlanResource) => {
+  const [planPeriod, setPlanPeriod] = useState<CommerceSubscriptionPlanPeriod>(defaultPlanPeriod);
+
+  useEffect(() => {
+    setPlanPeriod(defaultPlanPeriod);
+  }, [defaultPlanPeriod]);
+
+  const selectPlan = (plan: CommercePlanResource, event?: React.MouseEvent<HTMLElement>) => {
     if (!clerk.isSignedIn) {
-      void clerk.redirectToSignIn();
+      return clerk.redirectToSignIn();
     }
 
-    const subscription = activeOrUpcomingSubscription(plan);
-
-    if (subscription && !subscription.canceledAt) {
-      setDetailSubscription(subscription);
-      setShowSubscriptionDetailDrawer(true);
-    } else {
-      clerk.__internal_openCheckout({
-        planId: plan.id,
-        planPeriod,
-        subscriberType,
-        onSubscriptionComplete: onSubscriptionChange,
-        portalId: mode === 'modal' ? PROFILE_CARD_SCROLLBOX_ID : undefined,
-      });
-    }
+    handleSelectPlan({
+      mode,
+      plan,
+      planPeriod,
+      event,
+      appearance: props.checkoutProps?.appearance,
+      newSubscriptionRedirectUrl: props.newSubscriptionRedirectUrl,
+    });
+    return;
   };
 
-  const onSubscriptionChange = () => {
-    void revalidate();
-  };
+  // Pre-fetch payment sources
+  usePaymentSources();
 
   return (
-    <>
-      {mode !== 'modal' && props.layout === 'matrix' ? (
+    <Flow.Root
+      flow='pricingTable'
+      sx={{
+        width: '100%',
+      }}
+    >
+      {mode !== 'modal' && (props as any).layout === 'matrix' ? (
         <PricingTableMatrix
-          plans={plans || []}
+          plans={plans}
           planPeriod={planPeriod}
           setPlanPeriod={setPlanPeriod}
           onSelect={selectPlan}
-          highlightedPlan={props.highlightPlan}
+          highlightedPlan={(props as any).highlightPlan}
         />
       ) : (
         <PricingTableDefault
@@ -71,26 +84,23 @@ const PricingTable = (props: __experimental_PricingTableProps) => {
           props={props}
         />
       )}
-
-      <AppearanceProvider
-        appearanceKey='checkout'
-        appearance={props.checkoutProps?.appearance}
-      >
-        <SubscriptionDetailDrawer
-          isOpen={showSubscriptionDetailDrawer}
-          setIsOpen={setShowSubscriptionDetailDrawer}
-          subscription={detailSubscription}
-          subscriberType={subscriberType}
-          setPlanPeriod={setPlanPeriod}
-          strategy={mode === 'mounted' ? 'fixed' : 'absolute'}
-          portalProps={{
-            id: mode === 'modal' ? PROFILE_CARD_SCROLLBOX_ID : undefined,
-          }}
-          onSubscriptionCancel={onSubscriptionChange}
-        />
-      </AppearanceProvider>
-    </>
+    </Flow.Root>
   );
 };
 
-export const __experimental_PricingTable = PricingTable;
+// When used in a modal, we need to wrap the root in a div to avoid layout issues
+// within UserProfile and OrganizationProfile.
+const PricingTableModal = (props: PricingTableProps) => {
+  return (
+    // TODO: Used by InvisibleRootBox, can we simplify?
+    <div>
+      <PricingTableRoot {...props} />
+    </div>
+  );
+};
+
+export const PricingTable = (props: PricingTableProps) => {
+  const { mode = 'mounted' } = usePricingTableContext();
+
+  return mode === 'modal' ? <PricingTableModal {...props} /> : <PricingTableRoot {...props} />;
+};

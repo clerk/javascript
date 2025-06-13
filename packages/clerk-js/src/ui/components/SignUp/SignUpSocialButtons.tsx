@@ -1,15 +1,20 @@
 import { useClerk } from '@clerk/shared/react';
-import type { OAuthStrategy } from '@clerk/types';
+import type { OAuthStrategy, PhoneCodeChannel } from '@clerk/types';
 import React from 'react';
 
+import { useCardState } from '@/ui/elements/contexts';
+
 import { useCoreSignUp, useSignUpContext } from '../../contexts';
-import { useCardState } from '../../elements';
 import type { SocialButtonsProps } from '../../elements/SocialButtons';
 import { SocialButtons } from '../../elements/SocialButtons';
 import { useRouter } from '../../router';
 import { handleError, originPrefersPopup, web3CallbackErrorHandler } from '../../utils';
 
-export type SignUpSocialButtonsProps = SocialButtonsProps & { continueSignUp?: boolean; legalAccepted?: boolean };
+export type SignUpSocialButtonsProps = SocialButtonsProps & {
+  continueSignUp?: boolean;
+  legalAccepted?: boolean;
+  onAlternativePhoneCodeProviderClick?: (channel: PhoneCodeChannel) => void;
+};
 
 export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) => {
   const clerk = useClerk();
@@ -20,7 +25,7 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
   const redirectUrl = ctx.ssoCallbackUrl;
   const redirectUrlComplete = ctx.afterSignUpUrl || '/';
   const shouldUsePopup = ctx.oauthFlow === 'popup' || (ctx.oauthFlow === 'auto' && originPrefersPopup());
-  const { continueSignUp = false, ...rest } = props;
+  const { continueSignUp = false, onAlternativePhoneCodeProviderClick, ...rest } = props;
 
   return (
     <SocialButtons
@@ -48,6 +53,7 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
               continueSignUp,
               unsafeMetadata: ctx.unsafeMetadata,
               legalAccepted: props.legalAccepted,
+              oidcPrompt: ctx.oidcPrompt,
             })
             .catch(err => handleError(err, [], card.setError));
         }
@@ -60,6 +66,7 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
             strategy,
             unsafeMetadata: ctx.unsafeMetadata,
             legalAccepted: props.legalAccepted,
+            oidcPrompt: ctx.oidcPrompt,
           })
           .catch(err => handleError(err, [], card.setError));
       }}
@@ -74,6 +81,9 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
             legalAccepted: props.legalAccepted,
           })
           .catch(err => web3CallbackErrorHandler(err, card.setError));
+      }}
+      alternativePhoneCodeCallback={channel => {
+        onAlternativePhoneCodeProviderClick?.(channel);
       }}
     />
   );

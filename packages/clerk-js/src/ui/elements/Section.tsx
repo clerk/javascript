@@ -7,7 +7,9 @@ import type { ElementDescriptor, ElementId } from '../customizables/elementDescr
 import { Plus } from '../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { mqu } from '../styledSystem';
-import { Animated, ArrowBlockButton, Menu, MenuItem, MenuList, MenuTrigger } from '.';
+import { Animated } from './Animated';
+import { ArrowBlockButton } from './ArrowBlockButton';
+import { Menu, MenuItem, MenuList, MenuTrigger } from './Menu';
 
 type ProfileSectionProps = Omit<PropsOfComponent<typeof Flex>, 'title'> & {
   title: LocalizationKey;

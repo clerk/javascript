@@ -14,24 +14,96 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const arSA: LocalizationResource = {
   locale: 'ar-SA',
-  __experimental_commerce: {
-    billedAnnually: undefined,
-    free: undefined,
-    getStarted: undefined,
-    manageSubscription: undefined,
-    month: undefined,
-    switchPlan: undefined,
-  },
   backButton: 'الرجوع',
+  badge__activePlan: undefined,
+  badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'الأفتراضي',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
   badge__otherImpersonatorDevice: 'جهاز منتحل آخر',
   badge__primary: 'الرئيسي',
+  badge__renewsAt: undefined,
   badge__requiresAction: 'الإجراء المطلوب',
+  badge__startsAt: undefined,
   badge__thisDevice: 'هذا الجهاز',
   badge__unverified: 'لم يتم التحقق منه',
+  badge__upcomingPlan: undefined,
   badge__userDevice: 'جهاز المستخدم',
   badge__you: 'أنت',
+  commerce: {
+    addPaymentMethod: undefined,
+    alwaysFree: undefined,
+    annually: undefined,
+    availableFeatures: undefined,
+    billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
+    cancelSubscription: undefined,
+    cancelSubscriptionAccessUntil: undefined,
+    cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionTitle: undefined,
+    cannotSubscribeMonthly: undefined,
+    checkout: {
+      description__paymentSuccessful: undefined,
+      description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      lineItems: {
+        title__paymentMethod: undefined,
+        title__statementId: undefined,
+        title__subscriptionBegins: undefined,
+        title__totalPaid: undefined,
+      },
+      perMonth: undefined,
+      title: undefined,
+      title__paymentSuccessful: undefined,
+      title__subscriptionSuccessful: undefined,
+    },
+    creditRemainder: undefined,
+    defaultFreePlanActive: undefined,
+    free: undefined,
+    getStarted: undefined,
+    keepSubscription: undefined,
+    manage: undefined,
+    manageSubscription: undefined,
+    month: undefined,
+    monthly: undefined,
+    pastDue: undefined,
+    pay: undefined,
+    paymentMethods: undefined,
+    paymentSource: {
+      applePayDescription: {
+        annual: undefined,
+        monthly: undefined,
+      },
+      dev: {
+        anyNumbers: undefined,
+        cardNumber: undefined,
+        cvcZip: undefined,
+        developmentMode: undefined,
+        expirationDate: undefined,
+        testCardInfo: undefined,
+      },
+    },
+    popular: undefined,
+    pricingTable: {
+      billingCycle: undefined,
+      included: undefined,
+    },
+    reSubscribe: undefined,
+    seeAllFeatures: undefined,
+    subscribe: undefined,
+    subtotal: undefined,
+    switchPlan: undefined,
+    switchToAnnual: undefined,
+    switchToMonthly: undefined,
+    totalDueToday: undefined,
+    viewFeatures: undefined,
+    year: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'أنشاء منظمة',
     invitePage: {
@@ -48,6 +120,7 @@ export const arSA: LocalizationResource = {
     sameDay: "اليوم في {{ date | timeString('en-US') }}",
   },
   dividerText: 'أو',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'أختر طريقة أخرى',
   footerPageLink__help: 'المساعدة',
   footerPageLink__privacy: 'الخصوصية',
@@ -123,6 +196,42 @@ export const arSA: LocalizationResource = {
     badge__automaticSuggestion: 'أقتراحات تلقائية',
     badge__manualInvitation: 'ليس هناك تسجيل تلقائي',
     badge__unverified: 'لم يتم التحقق منها',
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'أضف النطاق للتحقق. المستخدمين الذين لديهم عناوين بريد إلكتروني على هذا النطاق يمكنهم تسجيل الدخول إلى المنظمة بشكل تلقائي أو طلب الأنضمام.',
@@ -179,10 +288,17 @@ export const arSA: LocalizationResource = {
       },
     },
     navbar: {
+      billing: undefined,
       description: 'إدارة منظمتك.',
       general: 'عام',
       members: 'الأعضاء',
       title: 'المنظمة',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -366,6 +482,12 @@ export const arSA: LocalizationResource = {
       subtitle: 'تواجه مشكلة؟ تستطيع استخدام أي من هذه الطرق لتسجيل الدخول',
       title: 'أستخدام طريقة أخرى',
     },
+    alternativePhoneCodeProvider: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     backupCodeMfa: {
       subtitle: 'للمتابعة إلى {{applicationName}}',
       title: 'أدخل الرمز الأحتياطي',
@@ -474,6 +596,12 @@ export const arSA: LocalizationResource = {
       actionLink__use_username: 'استخدم اسم المستخدم',
       actionText: 'ليس لديك حساب؟',
       actionText__join_waitlist: undefined,
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'للمتابعة إلى {{applicationName}}',
       subtitleCombined: 'للمتابعة إلى {{applicationName}}',
       title: 'تسجيل الدخول',
@@ -487,6 +615,11 @@ export const arSA: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'إدخل كلمة المرور',
   signUp: {
+    alternativePhoneCodeProvider: {
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     continue: {
       actionLink: 'تسجيل الدخول',
       actionText: 'ليس لديك حساب؟',
@@ -554,6 +687,12 @@ export const arSA: LocalizationResource = {
       actionLink__use_email: undefined,
       actionLink__use_phone: undefined,
       actionText: 'لديك حساب بالفعل؟',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'للمتابعة إلى {{applicationName}}',
       subtitleCombined: undefined,
       title: 'أنشاء حساب جديد',
@@ -572,7 +711,7 @@ export const arSA: LocalizationResource = {
     form_identifier_exists__email_address: 'تم إستخدام البريد الإلكتروني هذا. يرجى المحاولة مرة أخرى',
     form_identifier_exists__phone_number: 'تم إستخدام رقم الهاتف هذا. يرجى المحاولة مرة أخرى',
     form_identifier_exists__username: 'تم إستخدام اسم المستخدمد هذا. يرجى المحاولة مرة أخرى',
-    form_identifier_not_found: undefined,
+    form_identifier_not_found: 'لم يتم العثور على حساب بهذه التفاصيل',
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'يجب أستعمال بريد إلكتروني صالح',
     form_param_format_invalid__phone_number: 'Phone number must be in a valid international format',
@@ -592,7 +731,8 @@ export const arSA: LocalizationResource = {
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
     identification_deletion_failed: 'لا يمكن حذف هويتك الآخيرة ',
-    not_allowed_access: undefined,
+    not_allowed_access:
+      'لا يُسمح بالتسجيل باستخدام عنوان البريد الإلكتروني أو رقم الهاتف. قد يكون ذلك بسبب استخدام "+" أو "=" أو "#" أو "." في عنوان بريدك الإلكتروني، أو استخدام نطاق متصل بخدمة بريد إلكتروني مؤقتة، أو حظرك بشكل صريح. إذا كنت تعتقد أن هذا خطأ، يُرجى التواصل مع الدعم.',
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -613,6 +753,7 @@ export const arSA: LocalizationResource = {
       sentencePrefix: 'كلمة السر يجب أن تحتوي على',
     },
     phone_number_exists: 'هذا الرقم مأخوذ الرجاء أختيار رقم آخر',
+    session_exists: 'لقد قمت بتسجيل الدخول بالفعل',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'كلمة مرورك سليمة من الأفضل ان تكون اقوى. الرجاء أضافة حروف أكثر',
@@ -661,14 +802,6 @@ export const arSA: LocalizationResource = {
     action__signOutAll: 'تسجيل الخروج من جميع الحسابات',
   },
   userProfile: {
-    __experimental_billingPage: {
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
-        headerTitle__plans: undefined,
-      },
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'تم النسخ',
       actionLabel__copy: 'نسخ الكل',
@@ -684,6 +817,42 @@ export const arSA: LocalizationResource = {
         'يمكنك أستعمال واحدة من هذه الرموز لتسجيل الدخول إلى حسابك, اذا فقدت الوصول إلى جهاز المصادقة الخاص بك',
       title: 'إضافة التحقق عن طريق الرموز الأحتياطية',
       title__codelist: 'رموز النسخ الأحتياطي',
+    },
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'أختر موفر خدمة لتوصيل حسابك',
@@ -823,6 +992,9 @@ export const arSA: LocalizationResource = {
       title: 'إضافة رقم جوال',
       verifySubtitle: 'أدخل رمز التحقق المرسل إلى {{identifier}}',
       verifyTitle: 'التحقق من رقم الهاتف',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: 'أرفع صورة بصيغة JPG, PNG, GIF أو WEBP أقل من 10 ميغابايت',

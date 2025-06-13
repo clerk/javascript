@@ -1,12 +1,12 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { createCSPHeader, generateNonce } from '../content-security-policy';
+import { createContentSecurityPolicyHeaders, generateNonce } from '../content-security-policy';
 
 describe('CSP Header Utils', () => {
   describe('generateNonce', () => {
     it('should generate a base64 nonce of correct length', () => {
       const nonce = generateNonce();
-      expect(nonce).toMatch(/^[A-Za-z0-9+/=]+$/); // Base64 pattern
+      expect(nonce).toMatch(/^[A-Za-z0-9+/=]+$/);
       expect(Buffer.from(nonce, 'base64')).toHaveLength(16);
     });
 
@@ -17,13 +17,17 @@ describe('CSP Header Utils', () => {
     });
   });
 
-  describe('createCSPHeader', () => {
+  describe('createContentSecurityPolicyHeaders', () => {
     const testHost = 'clerk.example.com';
 
-    it('should create a standard CSP header with default directives', () => {
-      const result = createCSPHeader('standard', testHost);
+    it('should create standard CSP headers with default directives', () => {
+      const result = createContentSecurityPolicyHeaders(testHost, {});
 
-      const directives = result.header.split('; ');
+      expect(result.headers).toHaveLength(1);
+      const [headerName, headerValue] = result.headers[0];
+      expect(headerName).toBe('content-security-policy');
+
+      const directives = headerValue.split('; ');
 
       expect(directives).toContainEqual("default-src 'self'");
       expect(directives).toContainEqual(
@@ -50,16 +54,18 @@ describe('CSP Header Utils', () => {
       if (process.env.NODE_ENV !== 'production') {
         expect(scriptSrc).toContain("'unsafe-eval'");
       }
-
-      expect(result.nonce).toBeUndefined();
     });
 
-    it('should create a strict-dynamic CSP header with nonce', () => {
-      const result = createCSPHeader('strict-dynamic', testHost);
+    it('should create strict-dynamic CSP headers with nonce', () => {
+      const result = createContentSecurityPolicyHeaders(testHost, { strict: true });
 
-      // Extract the script-src directive and verify it contains the required values
-      const directives = result.header.split('; ');
-      const scriptSrcDirective = directives.find((d: string) => d.startsWith('script-src')) ?? '';
+      expect(result.headers).toHaveLength(2);
+      const [cspHeader, nonceHeader] = result.headers;
+      expect(cspHeader[0]).toBe('content-security-policy');
+      expect(nonceHeader[0]).toBe('x-nonce');
+
+      const directives = cspHeader[1].split('; ');
+      const scriptSrcDirective = directives.find(d => d.startsWith('script-src')) ?? '';
       expect(scriptSrcDirective).toBeDefined();
 
       const scriptSrcValues = scriptSrcDirective.replace('script-src ', '').split(' ');
@@ -68,51 +74,174 @@ describe('CSP Header Utils', () => {
       expect(scriptSrcValues).toContain("'strict-dynamic'");
       expect(scriptSrcValues.some(val => val.startsWith("'nonce-"))).toBe(true);
 
-      expect(result.nonce).toBeDefined();
-      expect(result.nonce).toMatch(/^[A-Za-z0-9+/=]+$/);
+      expect(nonceHeader[1]).toMatch(/^[A-Za-z0-9+/=]+$/);
+      expect(cspHeader[1]).toContain(`'nonce-${nonceHeader[1]}'`);
     });
 
-    it('should handle custom directives as an object', () => {
-      const customDirectives = {
-        'default-src': ['none'],
-        'img-src': ['self', 'https://example.com'],
-        'custom-directive': ['value'],
-      };
-      const result = createCSPHeader('standard', testHost, customDirectives);
+    it('should handle report-only mode', () => {
+      const result = createContentSecurityPolicyHeaders(testHost, { reportOnly: true });
 
-      expect(result.header).toContain("default-src 'none'");
-      // Check for the presence of all required values in the img-src directive
-      const directives = result.header.split('; ');
+      expect(result.headers).toHaveLength(1);
+      const [headerName, headerValue] = result.headers[0];
+      expect(headerName).toBe('content-security-policy-report-only');
+
+      const directives = headerValue.split('; ');
+      expect(directives).toContainEqual("default-src 'self'");
+      expect(directives).toContainEqual(
+        "connect-src 'self' https://clerk-telemetry.com https://*.clerk-telemetry.com https://api.stripe.com https://maps.googleapis.com clerk.example.com",
+      );
+      expect(directives).toContainEqual("form-action 'self'");
+      expect(directives).toContainEqual(
+        "frame-src 'self' https://challenges.cloudflare.com https://*.js.stripe.com https://js.stripe.com https://hooks.stripe.com",
+      );
+      expect(directives).toContainEqual("img-src 'self' https://img.clerk.com");
+      expect(directives).toContainEqual("style-src 'self' 'unsafe-inline'");
+      expect(directives).toContainEqual("worker-src 'self' blob:");
+    });
+
+    it('should handle report-to functionality', () => {
+      const result = createContentSecurityPolicyHeaders(testHost, { reportTo: 'https://example.com/reports' });
+
+      expect(result.headers).toHaveLength(2);
+
+      const cspHeader = result.headers.find(([name]) => name === 'content-security-policy');
+      const reportHeader = result.headers.find(([name]) => name === 'reporting-endpoints');
+
+      expect(cspHeader).toBeDefined();
+      if (!cspHeader) throw new Error('CSP header not found');
+      expect(cspHeader[1]).toContain('report-to csp-endpoint');
+
+      expect(reportHeader).toBeDefined();
+      if (!reportHeader) throw new Error('Report header not found');
+      expect(reportHeader[1]).toBe('csp-endpoint="https://example.com/reports"');
+    });
+
+    it('should handle custom directives', () => {
+      const result = createContentSecurityPolicyHeaders(testHost, {
+        directives: {
+          'default-src': ['none'],
+          'img-src': ['self', 'https://example.com'],
+          'frame-src': ['value'],
+        },
+      });
+
+      expect(result.headers).toHaveLength(1);
+      const [headerName, headerValue] = result.headers[0];
+      expect(headerName).toBe('content-security-policy');
+
+      const directives = headerValue.split('; ');
+      expect(directives).toContainEqual("default-src 'none'");
+
       const imgSrcDirective = directives.find(d => d.startsWith('img-src'));
       expect(imgSrcDirective).toBeDefined();
       expect(imgSrcDirective).toContain("'self'");
       expect(imgSrcDirective).toContain('https://img.clerk.com');
       expect(imgSrcDirective).toContain('https://example.com');
-      expect(result.header).toContain('custom-directive value');
+
+      const frameSrcDirective = directives.find(d => d.startsWith('frame-src'));
+      expect(frameSrcDirective).toBeDefined();
+      expect(frameSrcDirective).toContain('value');
     });
 
     it('should handle development environment specific directives', () => {
-      const result = createCSPHeader('standard', testHost);
-      const directives = result.header.split('; ');
+      vi.stubEnv('NODE_ENV', 'development');
+      const result = createContentSecurityPolicyHeaders(testHost, {});
+      const directives = result.headers[0][1].split('; ');
       const scriptSrcDirective = directives.find(d => d.startsWith('script-src'));
       expect(scriptSrcDirective).toBeDefined();
-      expect(scriptSrcDirective).toContain("'self'");
       expect(scriptSrcDirective).toContain("'unsafe-eval'");
-      expect(scriptSrcDirective).toContain("'unsafe-inline'");
+      expect(scriptSrcDirective).toContain("'self'");
       expect(scriptSrcDirective).toContain('https:');
       expect(scriptSrcDirective).toContain('http:');
-      expect(scriptSrcDirective).toContain('https://*.js.stripe.com');
-      expect(scriptSrcDirective).toContain('https://js.stripe.com');
-      expect(scriptSrcDirective).toContain('https://maps.googleapis.com');
+      expect(scriptSrcDirective).toContain("'unsafe-inline'");
+      vi.stubEnv('NODE_ENV', 'production');
     });
 
-    it('preserves all original CLERK_CSP_VALUES directives with special keywords quoted', () => {
-      const result = createCSPHeader('standard', testHost);
+    it('should handle multiple configurations together', () => {
+      const result = createContentSecurityPolicyHeaders(testHost, {
+        strict: true,
+        reportTo: 'https://example.com/reports',
+        directives: {
+          'script-src': ['self', 'https://custom-cdn.com'],
+        },
+      });
 
-      // Split the result into individual directives for precise testing
-      const directives = result.header.split('; ');
+      expect(result.headers).toHaveLength(3);
+      const cspHeader = result.headers.find(([name]) => name === 'content-security-policy');
+      const nonceHeader = result.headers.find(([name]) => name === 'x-nonce');
+      const reportHeader = result.headers.find(([name]) => name === 'reporting-endpoints');
 
-      // Check each directive individually with exact matches
+      expect(cspHeader).toBeDefined();
+      if (!cspHeader) throw new Error('CSP header not found');
+      expect(cspHeader[1]).toContain('report-to csp-endpoint');
+      expect(cspHeader[1]).toContain('https://custom-cdn.com');
+      expect(cspHeader[1]).toContain("'strict-dynamic'");
+
+      expect(nonceHeader).toBeDefined();
+      if (!nonceHeader) throw new Error('Nonce header not found');
+      expect(nonceHeader[1]).toMatch(/^[A-Za-z0-9+/=]+$/);
+
+      expect(reportHeader).toBeDefined();
+      if (!reportHeader) throw new Error('Report header not found');
+      expect(reportHeader[1]).toBe('csp-endpoint="https://example.com/reports"');
+    });
+
+    it('should handle special keywords in directives', () => {
+      const result = createContentSecurityPolicyHeaders(testHost, {
+        directives: {
+          'script-src': ['self', 'unsafe-inline', 'unsafe-eval', 'custom-domain.com'],
+          'frame-src': ['none'],
+        },
+      });
+
+      const directives = result.headers[0][1].split('; ');
+      const scriptSrcDirective = directives.find(d => d.startsWith('script-src'));
+      expect(scriptSrcDirective).toBeDefined();
+      if (!scriptSrcDirective) throw new Error('script-src directive not found');
+      const scriptSrcValues = scriptSrcDirective.replace('script-src ', '').split(' ');
+      expect(scriptSrcValues).toContain("'self'");
+      expect(scriptSrcValues).toContain("'unsafe-inline'");
+      expect(scriptSrcValues).toContain("'unsafe-eval'");
+      expect(scriptSrcValues).toContain('custom-domain.com');
+
+      const frameSrcDirective = directives.find(d => d.startsWith('frame-src'));
+      expect(frameSrcDirective).toBeDefined();
+      if (!frameSrcDirective) throw new Error('frame-src directive not found');
+      const frameSrcValues = frameSrcDirective.replace('frame-src ', '').split(' ');
+      expect(frameSrcValues).toContain("'none'");
+      expect(frameSrcValues).toHaveLength(1);
+    });
+
+    it('should merge clerk subdomain with existing CSP values', () => {
+      const result = createContentSecurityPolicyHeaders(testHost, {
+        directives: {
+          'connect-src': ['self', 'https://api.example.com'],
+          'img-src': ['self', 'https://images.example.com'],
+          'frame-src': ['self', 'https://frames.example.com'],
+        },
+      });
+
+      const directives = result.headers[0][1].split('; ');
+      expect(directives).toContainEqual(
+        `connect-src 'self' https://clerk-telemetry.com https://*.clerk-telemetry.com https://api.stripe.com https://maps.googleapis.com clerk.example.com https://api.example.com`,
+      );
+
+      const imgSrcDirective = directives.find(d => d.startsWith('img-src')) || '';
+      expect(imgSrcDirective).toBeDefined();
+      expect(imgSrcDirective).toContain("'self'");
+      expect(imgSrcDirective).toContain('https://img.clerk.com');
+      expect(imgSrcDirective).toContain('https://images.example.com');
+
+      expect(directives).toContainEqual(
+        `frame-src 'self' https://challenges.cloudflare.com https://*.js.stripe.com https://js.stripe.com https://hooks.stripe.com https://frames.example.com`,
+      );
+    });
+
+    it('should preserve all original CLERK_CSP_VALUES directives with special keywords quoted', () => {
+      const result = createContentSecurityPolicyHeaders(testHost, {});
+
+      const directives = result.headers[0][1].split('; ');
+
       expect(directives).toContainEqual(
         "connect-src 'self' https://clerk-telemetry.com https://*.clerk-telemetry.com https://api.stripe.com https://maps.googleapis.com clerk.example.com",
       );
@@ -125,29 +254,25 @@ describe('CSP Header Utils', () => {
       expect(directives).toContainEqual("style-src 'self' 'unsafe-inline'");
       expect(directives).toContainEqual("worker-src 'self' blob:");
 
-      // script-src varies based on NODE_ENV, so we check for common values
-      const scriptSrc = directives.find((d: string) => d.startsWith('script-src'));
+      const scriptSrc = directives.find(d => d.startsWith('script-src'));
       expect(scriptSrc).toBeDefined();
       expect(scriptSrc).toContain("'self'");
       expect(scriptSrc).toContain('https:');
       expect(scriptSrc).toContain('http:');
       expect(scriptSrc).toContain("'unsafe-inline'");
-      // 'unsafe-eval' depends on NODE_ENV, so we verify conditionally
       if (process.env.NODE_ENV !== 'production') {
         expect(scriptSrc).toContain("'unsafe-eval'");
       }
     });
 
-    it('includes script-src with development-specific values when NODE_ENV is not production', () => {
+    it('should include script-src with development-specific values when NODE_ENV is not production', () => {
       vi.stubEnv('NODE_ENV', 'development');
 
-      const result = createCSPHeader('standard', testHost);
-      const directives = result.header.split('; ');
+      const result = createContentSecurityPolicyHeaders(testHost, {});
+      const directives = result.headers[0][1].split('; ');
 
-      const scriptSrc = directives.find((d: string) => d.startsWith('script-src'));
+      const scriptSrc = directives.find(d => d.startsWith('script-src'));
       expect(scriptSrc).toBeDefined();
-
-      // In development, script-src should include 'unsafe-eval'
       expect(scriptSrc).toContain("'unsafe-eval'");
       expect(scriptSrc).toContain("'self'");
       expect(scriptSrc).toContain('https:');
@@ -157,14 +282,12 @@ describe('CSP Header Utils', () => {
       vi.stubEnv('NODE_ENV', 'production');
     });
 
-    it('properly converts host to clerk subdomain in CSP directives', () => {
+    it('should properly convert host to clerk subdomain in CSP directives', () => {
       const host = 'clerk.example.com';
-      const result = createCSPHeader('standard', host);
+      const result = createContentSecurityPolicyHeaders(host, {});
 
-      // Split the result into individual directives for precise testing
-      const directives = result.header.split('; ');
+      const directives = result.headers[0][1].split('; ');
 
-      // When full URL is provided, it should be parsed to clerk.domain.tld in all relevant directives
       expect(directives).toContainEqual(
         `connect-src 'self' https://clerk-telemetry.com https://*.clerk-telemetry.com https://api.stripe.com https://maps.googleapis.com clerk.example.com`,
       );
@@ -173,25 +296,24 @@ describe('CSP Header Utils', () => {
         `frame-src 'self' https://challenges.cloudflare.com https://*.js.stripe.com https://js.stripe.com https://hooks.stripe.com`,
       );
 
-      // Check that other directives are present but don't contain the clerk subdomain
       expect(directives).toContainEqual(`default-src 'self'`);
       expect(directives).toContainEqual(`form-action 'self'`);
       expect(directives).toContainEqual(`style-src 'self' 'unsafe-inline'`);
       expect(directives).toContainEqual(`worker-src 'self' blob:`);
     });
 
-    it('merges and deduplicates values for existing directives while preserving special keywords', () => {
-      const customDirectives = {
-        'script-src': ["'self'", 'new-value', 'another-value', "'unsafe-inline'", "'unsafe-eval'"],
-      };
-      const result = createCSPHeader('standard', testHost, customDirectives);
+    it('should merge and deduplicate values for existing directives while preserving special keywords', () => {
+      const result = createContentSecurityPolicyHeaders(testHost, {
+        directives: {
+          'script-src': ["'self'", 'new-value', 'another-value', "'unsafe-inline'", "'unsafe-eval'"],
+        },
+      });
 
-      // The script-src directive should contain both the default values and new values, with special keywords quoted
-      const resultDirectives = result.header.split('; ');
-      const scriptSrcDirective = resultDirectives.find((d: string) => d.startsWith('script-src')) ?? '';
+      const directives = result.headers[0][1].split('; ');
+      const scriptSrcDirective = directives.find(d => d.startsWith('script-src'));
       expect(scriptSrcDirective).toBeDefined();
+      if (!scriptSrcDirective) throw new Error('script-src directive not found');
 
-      // Verify it contains all expected values exactly once
       const values = new Set(scriptSrcDirective.replace('script-src ', '').split(' '));
       expect(values).toContain("'self'");
       expect(values).toContain("'unsafe-inline'");
@@ -199,61 +321,51 @@ describe('CSP Header Utils', () => {
       expect(values).toContain('another-value');
     });
 
-    it('correctly adds new directives from custom directives object and preserves special keyword quoting', () => {
-      const customDirectives = {
-        'object-src': ['self', 'value1', 'value2', 'unsafe-inline'],
-      };
-      const result = createCSPHeader('standard', testHost, customDirectives);
+    it('should correctly add new directives from custom directives object and preserve special keyword quoting', () => {
+      const result = createContentSecurityPolicyHeaders(testHost, {
+        directives: {
+          'frame-src': ['self', 'value1', 'value2', 'unsafe-inline'],
+        },
+      });
 
-      // The new directive should be added
-      const directives = result.header.split('; ');
-      const newDirective = directives.find((d: string) => d.startsWith('object-src')) ?? '';
-      expect(newDirective).toBeDefined();
+      const directives = result.headers[0][1].split('; ');
+      const frameSrcDirective = directives.find(d => d.startsWith('frame-src'));
+      expect(frameSrcDirective).toBeDefined();
+      if (!frameSrcDirective) throw new Error('frame-src directive not found');
 
-      const newDirectiveValues = newDirective.replace('object-src ', '').split(' ');
-      expect(newDirectiveValues).toContain("'self'");
-      expect(newDirectiveValues).toContain('value1');
-      expect(newDirectiveValues).toContain('value2');
-      expect(newDirectiveValues).toContain("'unsafe-inline'");
+      const frameSrcValues = frameSrcDirective.replace('frame-src ', '').split(' ');
+      expect(frameSrcValues).toContain("'self'");
+      expect(frameSrcValues).toContain('value1');
+      expect(frameSrcValues).toContain('value2');
+      expect(frameSrcValues).toContain("'unsafe-inline'");
     });
 
-    it('produces a complete CSP header with all expected directives and special keywords quoted', () => {
-      const customDirectives = {
-        'script-src': ['new-value', 'unsafe-inline'],
-        'object-src': ['self', 'value1', 'value2'],
-      };
-      const result = createCSPHeader('standard', testHost, customDirectives);
+    it('should produce a complete CSP header with all expected directives and special keywords quoted', () => {
+      const result = createContentSecurityPolicyHeaders(testHost, {
+        directives: {
+          'script-src': ['new-value', 'unsafe-inline'],
+          'frame-src': ['self', 'value1', 'value2'],
+        },
+      });
 
-      // Split the result into individual directives for precise testing
-      const directives = result.header.split('; ');
+      const directives = result.headers[0][1].split('; ');
 
-      // Verify all directives are present with their exact values, with special keywords quoted
       expect(directives).toContainEqual(
         "connect-src 'self' https://clerk-telemetry.com https://*.clerk-telemetry.com https://api.stripe.com https://maps.googleapis.com clerk.example.com",
       );
       expect(directives).toContainEqual("default-src 'self'");
       expect(directives).toContainEqual("form-action 'self'");
       expect(directives).toContainEqual(
-        "frame-src 'self' https://challenges.cloudflare.com https://*.js.stripe.com https://js.stripe.com https://hooks.stripe.com",
+        "frame-src 'self' https://challenges.cloudflare.com https://*.js.stripe.com https://js.stripe.com https://hooks.stripe.com value1 value2",
       );
       expect(directives).toContainEqual("img-src 'self' https://img.clerk.com");
       expect(directives).toContainEqual("style-src 'self' 'unsafe-inline'");
       expect(directives).toContainEqual("worker-src 'self' blob:");
 
-      // Verify the new directive exists and has expected values
-      const newDirective = directives.find((d: string) => d.startsWith('object-src')) ?? '';
-      expect(newDirective).toBeDefined();
-
-      const newDirectiveValues = newDirective.replace('object-src ', '').split(' ');
-      expect(newDirectiveValues).toContain("'self'");
-      expect(newDirectiveValues).toContain('value1');
-      expect(newDirectiveValues).toContain('value2');
-
-      // Extract the script-src directive and check for each expected value individually
-      const scriptSrcDirective = directives.find((d: string) => d.startsWith('script-src')) ?? '';
+      const scriptSrcDirective = directives.find(d => d.startsWith('script-src'));
       expect(scriptSrcDirective).toBeDefined();
+      if (!scriptSrcDirective) throw new Error('script-src directive not found');
 
-      // Verify it contains all expected values regardless of order
       const scriptSrcValues = scriptSrcDirective.replace('script-src ', '').split(' ');
       expect(scriptSrcValues).toContain("'self'");
       expect(scriptSrcValues).toContain("'unsafe-inline'");
@@ -261,103 +373,30 @@ describe('CSP Header Utils', () => {
       expect(scriptSrcValues).toContain('http:');
       expect(scriptSrcValues).toContain('new-value');
 
-      // Verify the header format (directives separated by semicolons)
-      expect(result.header).toMatch(/^[^;]+(; [^;]+)*$/);
+      expect(result.headers[0][1]).toMatch(/^[^;]+(; [^;]+)*$/);
     });
 
-    it('automatically quotes special keywords in CSP directives regardless of input format', () => {
-      vi.stubEnv('NODE_ENV', 'development');
-      const customDirectives = {
-        'script-src': ['self', 'unsafe-inline', 'unsafe-eval', 'custom-domain.com'],
-        'new-directive': ['none'],
-      };
-      const result = createCSPHeader('standard', testHost, customDirectives);
+    it('should properly accumulate multiple custom directives', () => {
+      const result = createContentSecurityPolicyHeaders(testHost, {
+        directives: {
+          'base-uri': ['value1', 'value2'],
+          'manifest-src': ['value3', 'value4'],
+        },
+      });
 
-      // Verify that special keywords are always quoted in output, regardless of input format
-      const resultDirectives = result.header.split('; ');
+      const directives = result.headers[0][1].split('; ');
 
-      // Verify script-src directive has properly quoted keywords
-      const scriptSrcDirective = resultDirectives.find((d: string) => d.startsWith('script-src')) ?? '';
-      expect(scriptSrcDirective).toBeDefined();
-      const scriptSrcValues = scriptSrcDirective.replace('script-src ', '').split(' ');
-      expect(scriptSrcValues).toContain("'self'");
-      expect(scriptSrcValues).toContain("'unsafe-inline'");
-      expect(scriptSrcValues).toContain("'unsafe-eval'");
-      expect(scriptSrcValues).toContain('custom-domain.com');
-      // Verify default values for standard mode
-      expect(scriptSrcValues).toContain('http:');
-      expect(scriptSrcValues).toContain('https:');
+      const baseUriDirective = directives.find(d => d.startsWith('base-uri'));
+      expect(baseUriDirective).toBeDefined();
+      if (!baseUriDirective) throw new Error('base-uri directive not found');
+      expect(baseUriDirective).toContain('value1');
+      expect(baseUriDirective).toContain('value2');
 
-      // Verify new-directive has properly quoted keywords and is the sole value
-      const newDirective = resultDirectives.find((d: string) => d.startsWith('new-directive')) ?? '';
-      expect(newDirective).toBeDefined();
-      const newDirectiveValues = newDirective.replace('new-directive ', '').split(' ');
-      expect(newDirectiveValues).toContain("'none'");
-      expect(newDirectiveValues).toHaveLength(1);
-
-      vi.stubEnv('NODE_ENV', 'production');
-    });
-
-    it('correctly merges clerk subdomain with existing CSP values', () => {
-      const customDirectives = {
-        'connect-src': ['self', 'https://api.example.com'],
-        'img-src': ['self', 'https://images.example.com'],
-        'frame-src': ['self', 'https://frames.example.com'],
-      };
-      const result = createCSPHeader('standard', testHost, customDirectives);
-
-      const directives = result.header.split('; ');
-
-      // Verify clerk subdomain is added while preserving existing values
-      expect(directives).toContainEqual(
-        `connect-src 'self' https://clerk-telemetry.com https://*.clerk-telemetry.com https://api.stripe.com https://maps.googleapis.com clerk.example.com https://api.example.com`,
-      );
-      // Verify all required domains are present in the img-src directive
-      const imgSrcDirective = directives.find(d => d.startsWith('img-src')) || '';
-      expect(imgSrcDirective).toBeDefined();
-      expect(imgSrcDirective).toContain("'self'");
-      expect(imgSrcDirective).toContain('https://img.clerk.com');
-      expect(imgSrcDirective).toContain('https://images.example.com');
-      expect(directives).toContainEqual(
-        `frame-src 'self' https://challenges.cloudflare.com https://*.js.stripe.com https://js.stripe.com https://hooks.stripe.com https://frames.example.com`,
-      );
-
-      // Verify other directives are present and unchanged
-      expect(directives).toContainEqual(`default-src 'self'`);
-      expect(directives).toContainEqual(`form-action 'self'`);
-      expect(directives).toContainEqual(`style-src 'self' 'unsafe-inline'`);
-      expect(directives).toContainEqual(`worker-src 'self' blob:`);
-    });
-
-    it('correctly implements strict-dynamic mode with nonce-based script-src', () => {
-      const result = createCSPHeader('strict-dynamic', testHost);
-      const directives = result.header.split('; ');
-
-      // Extract the script-src directive and check for specific values
-      const scriptSrcDirective = directives.find((d: string) => d.startsWith('script-src')) ?? '';
-      expect(scriptSrcDirective).toBeDefined();
-
-      // In strict-dynamic mode, script-src should contain 'strict-dynamic' and a nonce
-      const scriptSrcValues = scriptSrcDirective.replace('script-src ', '').split(' ');
-      expect(scriptSrcValues).toContain("'strict-dynamic'");
-      expect(scriptSrcValues.some(val => val.startsWith("'nonce-"))).toBe(true);
-
-      // Should not contain http: or https: in strict-dynamic mode
-      expect(scriptSrcValues).not.toContain('http:');
-      expect(scriptSrcValues).not.toContain('https:');
-
-      // Other directives should still be present
-      expect(directives).toContainEqual(
-        "connect-src 'self' https://clerk-telemetry.com https://*.clerk-telemetry.com https://api.stripe.com https://maps.googleapis.com clerk.example.com",
-      );
-      expect(directives).toContainEqual("default-src 'self'");
-      expect(directives).toContainEqual("form-action 'self'");
-      expect(directives).toContainEqual(
-        "frame-src 'self' https://challenges.cloudflare.com https://*.js.stripe.com https://js.stripe.com https://hooks.stripe.com",
-      );
-      expect(directives).toContainEqual("img-src 'self' https://img.clerk.com");
-      expect(directives).toContainEqual("style-src 'self' 'unsafe-inline'");
-      expect(directives).toContainEqual("worker-src 'self' blob:");
+      const manifestSrcDirective = directives.find(d => d.startsWith('manifest-src'));
+      expect(manifestSrcDirective).toBeDefined();
+      if (!manifestSrcDirective) throw new Error('manifest-src directive not found');
+      expect(manifestSrcDirective).toContain('value3');
+      expect(manifestSrcDirective).toContain('value4');
     });
   });
 });

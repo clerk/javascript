@@ -48,6 +48,7 @@ interface GroupProps {
    */
   borderTop?: boolean;
   variant?: GroupVariant;
+  expand?: boolean;
 }
 
 function Group({ children, borderTop = false, variant = 'primary' }: GroupProps) {
@@ -82,9 +83,10 @@ function Group({ children, borderTop = false, variant = 'primary' }: GroupProps)
 interface TitleProps {
   title: string | LocalizationKey;
   description?: string | LocalizationKey;
+  icon?: React.ComponentType;
 }
 
-function Title({ title, description }: TitleProps) {
+const Title = React.forwardRef<HTMLTableCellElement, TitleProps>(({ title, description, icon }, ref) => {
   const context = React.useContext(GroupContext);
   if (!context) {
     throw new Error('LineItems.Title must be used within LineItems.Group');
@@ -93,6 +95,7 @@ function Title({ title, description }: TitleProps) {
   const textVariant = variant === 'primary' ? 'subtitle' : 'caption';
   return (
     <Dt
+      ref={ref}
       elementDescriptor={descriptors.lineItemsTitle}
       elementId={descriptors.lineItemsTitle.setId(variant)}
       sx={t => ({
@@ -101,7 +104,22 @@ function Title({ title, description }: TitleProps) {
         ...common.textVariants(t)[textVariant],
       })}
     >
-      <Span localizationKey={title} />
+      <Span
+        sx={t => ({
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: t.space.$1,
+        })}
+      >
+        {icon ? (
+          <Icon
+            size='md'
+            icon={icon}
+            aria-hidden
+          />
+        ) : null}
+        <Span localizationKey={title} />
+      </Span>
       {description ? (
         <Span
           localizationKey={description}
@@ -114,7 +132,7 @@ function Title({ title, description }: TitleProps) {
       ) : null}
     </Dt>
   );
-}
+});
 
 /* -------------------------------------------------------------------------------------------------
  * LineItems.Description

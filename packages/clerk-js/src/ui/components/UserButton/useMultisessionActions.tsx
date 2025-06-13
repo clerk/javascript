@@ -1,8 +1,9 @@
 import { useClerk } from '@clerk/shared/react';
 import type { SignedInSessionResource, UserButtonProps, UserResource } from '@clerk/types';
 
+import { useCardState } from '@/ui/elements/contexts';
+
 import { windowNavigate } from '../../../utils/windowNavigate';
-import { useCardState } from '../../elements';
 import { useMultipleSessions } from '../../hooks/useMultipleSessions';
 import { useRouter } from '../../router';
 import { sleep } from '../../utils';

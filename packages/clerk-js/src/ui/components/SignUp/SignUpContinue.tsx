@@ -1,16 +1,14 @@
 import { useClerk } from '@clerk/shared/react';
 import React, { useEffect, useMemo } from 'react';
 
+import { Card } from '@/ui/elements/Card';
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { Header } from '@/ui/elements/Header';
+import { LoadingCard } from '@/ui/elements/LoadingCard';
+import { SocialButtonsReversibleContainerWithDivider } from '@/ui/elements/ReversibleContainer';
+
 import { SignInContext, useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys, useLocalizations } from '../../customizables';
-import {
-  Card,
-  Header,
-  LoadingCard,
-  SocialButtonsReversibleContainerWithDivider,
-  withCardStateProvider,
-} from '../../elements';
-import { useCardState } from '../../elements/contexts';
 import { useRouter } from '../../router';
 import type { FormControlState } from '../../utils';
 import { buildRequest, createUsernameError, handleError, useFormControl } from '../../utils';
@@ -46,6 +44,7 @@ function SignUpContinueInternal() {
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
     getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
   );
+  const ctx = useSignUpContext();
 
   // TODO: This form should be shared between SignUpStart and SignUpContinue
   const formState = {
@@ -179,6 +178,7 @@ function SignUpContinueInternal() {
           verifyPhonePath: './verify-phone-number',
           handleComplete: () => clerk.setActive({ session: res.createdSessionId, redirectUrl: afterSignUpUrl }),
           navigate,
+          oidcPrompt: ctx.oidcPrompt,
         }),
       )
       .catch(err => handleError(err, fieldsToSubmit, card.setError))
@@ -215,6 +215,7 @@ function SignUpContinueInternal() {
                 <SignUpSocialButtons
                   enableOAuthProviders={showOauthProviders}
                   enableWeb3Providers={false}
+                  enableAlternativePhoneCodeProviders={false}
                   continueSignUp
                 />
               )}

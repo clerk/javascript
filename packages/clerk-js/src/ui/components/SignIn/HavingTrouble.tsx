@@ -1,5 +1,6 @@
+import { ErrorCard } from '@/ui/elements/ErrorCard';
+
 import { localizationKeys } from '../../customizables';
-import { ErrorCard } from '../../elements';
 import type { PropsOfComponent } from '../../styledSystem';
 
 export const HavingTrouble = (props: PropsOfComponent<typeof ErrorCard>) => {

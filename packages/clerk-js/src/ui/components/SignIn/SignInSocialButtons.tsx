@@ -1,4 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
+import type { PhoneCodeChannel } from '@clerk/types';
 import React from 'react';
 
 import { buildSSOCallbackURL } from '../../common/redirects';
@@ -10,7 +11,11 @@ import { SocialButtons } from '../../elements/SocialButtons';
 import { useRouter } from '../../router';
 import { handleError, originPrefersPopup, web3CallbackErrorHandler } from '../../utils';
 
-export const SignInSocialButtons = React.memo((props: SocialButtonsProps) => {
+export type SignInSocialButtonsProps = SocialButtonsProps & {
+  onAlternativePhoneCodeProviderClick?: (channel: PhoneCodeChannel) => void;
+};
+
+export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) => {
   const clerk = useClerk();
   const { navigate } = useRouter();
   const card = useCardState();
@@ -20,10 +25,11 @@ export const SignInSocialButtons = React.memo((props: SocialButtonsProps) => {
   const redirectUrl = buildSSOCallbackURL(ctx, displayConfig.signInUrl);
   const redirectUrlComplete = ctx.afterSignInUrl || '/';
   const shouldUsePopup = ctx.oauthFlow === 'popup' || (ctx.oauthFlow === 'auto' && originPrefersPopup());
+  const { onAlternativePhoneCodeProviderClick, ...rest } = props;
 
   return (
     <SocialButtons
-      {...props}
+      {...rest}
       idleAfterDelay={!shouldUsePopup}
       oauthCallback={strategy => {
         if (shouldUsePopup) {
@@ -39,12 +45,12 @@ export const SignInSocialButtons = React.memo((props: SocialButtonsProps) => {
           }, 500);
 
           return signIn
-            .authenticateWithPopup({ strategy, redirectUrl, redirectUrlComplete, popup })
+            .authenticateWithPopup({ strategy, redirectUrl, redirectUrlComplete, popup, oidcPrompt: ctx.oidcPrompt })
             .catch(err => handleError(err, [], card.setError));
         }
 
         return signIn
-          .authenticateWithRedirect({ strategy, redirectUrl, redirectUrlComplete })
+          .authenticateWithRedirect({ strategy, redirectUrl, redirectUrlComplete, oidcPrompt: ctx.oidcPrompt })
           .catch(err => handleError(err, [], card.setError));
       }}
       web3Callback={strategy => {
@@ -57,6 +63,9 @@ export const SignInSocialButtons = React.memo((props: SocialButtonsProps) => {
             secondFactorUrl: 'factor-two',
           })
           .catch(err => web3CallbackErrorHandler(err, card.setError));
+      }}
+      alternativePhoneCodeCallback={channel => {
+        onAlternativePhoneCodeProviderClick?.(channel);
       }}
     />
   );

@@ -89,6 +89,8 @@ export type {
   SignInJSON,
   SignInTokenJSON,
   SignUpJSON,
+  SignUpVerificationJSON,
+  SignUpVerificationsJSON,
   SMSMessageJSON,
   UserJSON,
   VerificationJSON,
@@ -130,6 +132,7 @@ export type {
   PhoneNumber,
   Session,
   SignInToken,
+  SignUpAttempt,
   SMSMessage,
   Token,
   User,
@@ -159,3 +162,4 @@ export type {
  * Auth objects
  */
 export type { AuthObject } from './tokens/authObjects';
+export type { SessionAuthObject, MachineAuthObject } from './tokens/types';

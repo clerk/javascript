@@ -1,5 +1,5 @@
 // @ts-check
-import { ReflectionType, UnionType } from 'typedoc';
+import { ReflectionKind, ReflectionType, UnionType } from 'typedoc';
 import { MarkdownTheme, MarkdownThemeContext } from 'typedoc-plugin-markdown';
 
 /**
@@ -47,21 +47,110 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
     this.partials = {
       ...superPartials,
       /**
-       * This hides the "Type parameters" section and the signature title from the output
+       * This hides the "Type parameters" section and the signature title from the output (by default). Shows the signature title if the `@displayFunctionSignature` tag is present.
        * @param {import('typedoc').SignatureReflection} model
        * @param {{ headingLevel: number, nested?: boolean, accessor?: string, multipleSignatures?: boolean; hideTitle?: boolean }} options
        */
       signature: (model, options) => {
+        const displayFunctionSignatureTag = model.comment?.getTag('@displayFunctionSignature');
+        const paramExtensionTag = model.comment?.getTag('@paramExtension');
+        const delimiter = '\n\n';
+
         const customizedOptions = {
           ...options,
-          hideTitle: true,
+          // Hide the title by default, only show it if the `@displayFunctionSignature` tag is present
+          hideTitle: !displayFunctionSignatureTag,
         };
         const customizedModel = model;
         customizedModel.typeParameters = undefined;
 
-        const output = superPartials.signature(customizedModel, customizedOptions);
+        let output = superPartials.signature(customizedModel, customizedOptions);
+
+        // If there are extra tags, split the output by the delimiter and do the work
+        if (displayFunctionSignatureTag || paramExtensionTag) {
+          let splitOutput = output.split(delimiter);
+
+          if (displayFunctionSignatureTag) {
+            // Change position of the 0 index and 2 index of the output
+            // This way the function signature is below the description
+            splitOutput = swap(splitOutput, 0, 2);
+          }
+
+          if (paramExtensionTag) {
+            const stuff = this.helpers.getCommentParts(paramExtensionTag.content);
+
+            // Find the index of the item that contains '## Returns'
+            const index = splitOutput.findIndex(item => item.includes('## Returns'));
+
+            // If the index is found, insert the stuff before it
+            if (index !== -1) {
+              splitOutput.splice(index, 0, stuff);
+            }
+          }
+
+          // Join the output again
+          output = splitOutput.join(delimiter);
+        }
 
         return output;
+      },
+      /**
+       * If `signature` has @displayFunctionSignature tag, the function will run `signatureTitle`. We want to use a completely custom code block here.
+       * @param {import('typedoc').SignatureReflection} model
+       * @param {{ accessor?: string; includeType?: boolean }} [options]
+       * https://github.com/typedoc2md/typedoc-plugin-markdown/blob/c83cff97b72ab25b224463ceec118c34e940cb8a/packages/typedoc-plugin-markdown/src/theme/context/partials/member.signatureTitle.ts
+       */
+      signatureTitle: (model, options) => {
+        /**
+         * @type {string[]}
+         */
+        const md = [];
+
+        const keyword = this.helpers.getKeyword(model.parent.kind);
+
+        if (this.helpers.isGroupKind(model.parent) && keyword) {
+          md.push(keyword + ' ');
+        }
+
+        if (options?.accessor) {
+          md.push(options?.accessor + ' ');
+        }
+
+        if (model.parent) {
+          const flagsString = this.helpers.getReflectionFlags(model.parent?.flags);
+          if (flagsString.length) {
+            md.push(this.helpers.getReflectionFlags(model.parent.flags) + ' ');
+          }
+        }
+
+        if (!['__call', '__type'].includes(model.name)) {
+          /**
+           * @type {string[]}
+           */
+          const name = [];
+          if (model.kind === ReflectionKind.ConstructorSignature) {
+            name.push('new');
+          }
+          name.push(escapeChars(model.name));
+          md.push(name.join(' '));
+        }
+
+        if (model.typeParameters) {
+          md.push(
+            `${this.helpers.getAngleBracket('<')}${model.typeParameters
+              .map(typeParameter => typeParameter.name)
+              .join(', ')}${this.helpers.getAngleBracket('>')}`,
+          );
+        }
+
+        md.push(this.partials.signatureParameters(model.parameters || []));
+
+        if (model.type) {
+          md.push(`: ${this.partials.someType(model.type)}`);
+        }
+
+        const result = md.join('');
+        return codeBlock(result);
       },
       /**
        * This condenses the output if only a "simple" return type + `@returns` is given.
@@ -297,7 +386,9 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
         const items = headings.map(i => `'${i}'`).join(', ');
         const tabs = md.map(i => `<Tab>${i}</Tab>`).join('\n');
 
-        return `<Tabs items={[${items}]}>
+        return `This function returns a discriminated union type. There are multiple variants of this type available which you can select by clicking on one of the tabs.
+
+<Tabs items={[${items}]}>
 ${tabs}
 </Tabs>`;
       },
@@ -317,6 +408,85 @@ ${tabs}
 
         return `<code>${output}</code>`;
       },
+      /**
+       * Hide "Extends" and "Extended by" sections
+       */
+      hierarchy: () => '',
     };
   }
+}
+
+/**
+ * @param {string} str - The string to unescape
+ */
+function unEscapeChars(str) {
+  return str
+    .replace(/(`[^`]*?)\\*([^`]*?`)/g, (_match, p1, p2) => `${p1}${p2.replace(/\*/g, '\\*')}`)
+    .replace(/\\\\/g, '\\')
+    .replace(/(?<!\\)\*/g, '')
+    .replace(/\\</g, '<')
+    .replace(/\\>/g, '>')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/\\_/g, '_')
+    .replace(/\\{/g, '{')
+    .replace(/\\}/g, '}')
+    .replace(/``.*?``|(?<!\\)`/g, match => (match.startsWith('``') ? match : ''))
+    .replace(/`` /g, '')
+    .replace(/ ``/g, '')
+    .replace(/\\`/g, '`')
+    .replace(/\\\*/g, '*')
+    .replace(/\\\|/g, '|')
+    .replace(/\\\]/g, ']')
+    .replace(/\\\[/g, '[')
+    .replace(/\[([^[\]]*)\]\((.*?)\)/gm, '$1');
+}
+
+/**
+ * @param {string} content
+ */
+function codeBlock(content) {
+  /**
+   * @param {string} content
+   */
+  const trimLastLine = content => {
+    const lines = content.split('\n');
+    return lines.map((line, index) => (index === lines.length - 1 ? line.trim() : line)).join('\n');
+  };
+  const trimmedContent =
+    content.endsWith('}') || content.endsWith('};') || content.endsWith('>') || content.endsWith('>;')
+      ? trimLastLine(content)
+      : content;
+  return '```ts\n' + unEscapeChars(trimmedContent) + '\n```';
+}
+
+/**
+ * @param {string} str
+ */
+function escapeChars(str) {
+  return str
+    .replace(/>/g, '\\>')
+    .replace(/</g, '\\<')
+    .replace(/{/g, '\\{')
+    .replace(/}/g, '\\}')
+    .replace(/_/g, '\\_')
+    .replace(/`/g, '\\`')
+    .replace(/\|/g, '\\|')
+    .replace(/\[/g, '\\[')
+    .replace(/\]/g, '\\]')
+    .replace(/\*/g, '\\*');
+}
+
+/**
+ *
+ * @param {string[]} arr
+ * @param {number} i
+ * @param {number} j
+ * @returns
+ */
+function swap(arr, i, j) {
+  let t = arr[i];
+  arr[i] = arr[j];
+  arr[j] = t;
+  return arr;
 }

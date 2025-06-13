@@ -8,6 +8,7 @@ type ParsePublishableKeyOptions = {
   fatal?: boolean;
   domain?: string;
   proxyUrl?: string;
+  isSatellite?: boolean;
 };
 
 const PUBLISHABLE_KEY_LIVE_PREFIX = 'pk_live_';
@@ -34,7 +35,7 @@ export function parsePublishableKey(
 ): PublishableKey | null;
 export function parsePublishableKey(
   key: string | undefined,
-  options: { fatal?: boolean; domain?: string; proxyUrl?: string } = {},
+  options: { fatal?: boolean; domain?: string; proxyUrl?: string; isSatellite?: boolean } = {},
 ): PublishableKey | null {
   key = key || '';
 
@@ -59,7 +60,7 @@ export function parsePublishableKey(
 
   if (options.proxyUrl) {
     frontendApi = options.proxyUrl;
-  } else if (instanceType !== 'development' && options.domain) {
+  } else if (instanceType !== 'development' && options.domain && options.isSatellite) {
     frontendApi = `clerk.${options.domain}`;
   }
 

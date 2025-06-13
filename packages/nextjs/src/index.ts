@@ -6,6 +6,8 @@ export {
   AuthenticateWithRedirectCallback,
   ClerkLoaded,
   ClerkLoading,
+  ClerkDegraded,
+  ClerkFailed,
   RedirectToCreateOrganization,
   RedirectToOrganizationProfile,
   RedirectToSignIn,
@@ -32,6 +34,7 @@ export {
   UserProfile,
   GoogleOneTap,
   Waitlist,
+  PricingTable,
 } from './client-boundary/uiComponents';
 
 /**

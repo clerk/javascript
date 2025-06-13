@@ -1,7 +1,9 @@
 import type { UserResource } from '@clerk/types';
 
-import type { AvatarUploaderProps } from '../../elements';
-import { AvatarUploader, UserAvatar } from '../../elements';
+import type { AvatarUploaderProps } from '@/ui/elements/AvatarUploader';
+import { AvatarUploader } from '@/ui/elements/AvatarUploader';
+import { UserAvatar } from '@/ui/elements/UserAvatar';
+
 import { localizationKeys } from '../../localization';
 
 export const UserProfileAvatarUploader = (

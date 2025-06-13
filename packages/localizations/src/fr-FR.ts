@@ -14,24 +14,96 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const frFR: LocalizationResource = {
   locale: 'fr-FR',
-  __experimental_commerce: {
-    billedAnnually: undefined,
-    free: undefined,
-    getStarted: undefined,
-    manageSubscription: undefined,
-    month: undefined,
-    switchPlan: undefined,
-  },
   backButton: 'Retour',
+  badge__activePlan: undefined,
+  badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Défaut',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
   badge__otherImpersonatorDevice: "Autre dispositif d'imitation",
   badge__primary: 'Principal',
+  badge__renewsAt: undefined,
   badge__requiresAction: 'Nécessite une action',
+  badge__startsAt: undefined,
   badge__thisDevice: 'Cet appareil',
   badge__unverified: 'Non vérifié',
+  badge__upcomingPlan: undefined,
   badge__userDevice: 'Appareil utilisateur',
   badge__you: 'Vous',
+  commerce: {
+    addPaymentMethod: undefined,
+    alwaysFree: undefined,
+    annually: undefined,
+    availableFeatures: undefined,
+    billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
+    cancelSubscription: undefined,
+    cancelSubscriptionAccessUntil: undefined,
+    cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionTitle: undefined,
+    cannotSubscribeMonthly: undefined,
+    checkout: {
+      description__paymentSuccessful: undefined,
+      description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      lineItems: {
+        title__paymentMethod: undefined,
+        title__statementId: undefined,
+        title__subscriptionBegins: undefined,
+        title__totalPaid: undefined,
+      },
+      perMonth: undefined,
+      title: undefined,
+      title__paymentSuccessful: undefined,
+      title__subscriptionSuccessful: undefined,
+    },
+    creditRemainder: undefined,
+    defaultFreePlanActive: undefined,
+    free: undefined,
+    getStarted: undefined,
+    keepSubscription: undefined,
+    manage: undefined,
+    manageSubscription: undefined,
+    month: undefined,
+    monthly: undefined,
+    pastDue: undefined,
+    pay: undefined,
+    paymentMethods: undefined,
+    paymentSource: {
+      applePayDescription: {
+        annual: undefined,
+        monthly: undefined,
+      },
+      dev: {
+        anyNumbers: undefined,
+        cardNumber: undefined,
+        cvcZip: undefined,
+        developmentMode: undefined,
+        expirationDate: undefined,
+        testCardInfo: undefined,
+      },
+    },
+    popular: undefined,
+    pricingTable: {
+      billingCycle: undefined,
+      included: undefined,
+    },
+    reSubscribe: undefined,
+    seeAllFeatures: undefined,
+    subscribe: undefined,
+    subtotal: undefined,
+    switchPlan: undefined,
+    switchToAnnual: undefined,
+    switchToMonthly: undefined,
+    totalDueToday: undefined,
+    viewFeatures: undefined,
+    year: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'Créer l’organisation',
     invitePage: {
@@ -48,6 +120,7 @@ export const frFR: LocalizationResource = {
     sameDay: "Aujourd'hui à {{ date | timeString('fr-FR') }}",
   },
   dividerText: 'ou',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'Utiliser une autre méthode',
   footerPageLink__help: 'Aide',
   footerPageLink__privacy: 'Vie privée',
@@ -124,6 +197,42 @@ export const frFR: LocalizationResource = {
     badge__automaticSuggestion: 'Suggestions automatiques',
     badge__manualInvitation: "Pas d'inscription automatique",
     badge__unverified: 'Non vérifié',
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         "Ajoutez le domaine pour le vérifier. Les utilisateurs possédant une adresses e-mail sur ce domaine peuvent rejoindre l'organisation automatiquement ou faire une demande pour y adhérer.",
@@ -181,10 +290,17 @@ export const frFR: LocalizationResource = {
       },
     },
     navbar: {
+      billing: undefined,
       description: 'Gérer votre organisation.',
       general: 'Général',
       members: 'Membres',
       title: 'Organisation',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -372,6 +488,12 @@ export const frFR: LocalizationResource = {
       subtitle: "Vous rencontrez des problèmes ? Vous pouvez utiliser l'une de ces méthodes pour vous connecter.",
       title: 'Utiliser une autre méthode',
     },
+    alternativePhoneCodeProvider: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     backupCodeMfa: {
       subtitle: 'pour continuer vers {{applicationName}}',
       title: 'Entrez un code de récupération',
@@ -479,6 +601,12 @@ export const frFR: LocalizationResource = {
       actionLink__use_username: "Utiliser le nom d'utilisateur",
       actionText: "Vous n'avez pas encore de compte ?",
       actionText__join_waitlist: "Inscrivez-vous sur la liste d'attente",
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'pour continuer vers {{applicationName}}',
       subtitleCombined: undefined,
       title: "S'identifier",
@@ -492,6 +620,11 @@ export const frFR: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Tapez votre mot de passe',
   signUp: {
+    alternativePhoneCodeProvider: {
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     continue: {
       actionLink: "S'identifier",
       actionText: 'Vous avez déjà un compte ?',
@@ -531,7 +664,8 @@ export const frFR: LocalizationResource = {
       checkbox: {
         label__onlyPrivacyPolicy: "J'accepte la Politique de confidentialité.",
         label__onlyTermsOfService: "J'accepte les Conditions d'utilisation.",
-        label__termsOfServiceAndPrivacyPolicy: `J'accepte les {{ termsOfServiceLink || link("Conditions d'utilisation") }} et la {{ privacyPolicyLink || link("Politique de confidentialité") }}.`,
+        label__termsOfServiceAndPrivacyPolicy:
+          'J\'accepte les {{ termsOfServiceLink || link("Conditions d\'utilisation") }} et la {{ privacyPolicyLink || link("Politique de confidentialité") }}.',
       },
       continue: {
         subtitle: 'Lisez et acceptez les conditions pour continuer.',
@@ -559,6 +693,12 @@ export const frFR: LocalizationResource = {
       actionLink__use_email: 'Utiliser votre adresse e-mail',
       actionLink__use_phone: 'Utiliser votre téléphone',
       actionText: 'Vous avez déjà un compte ?',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'pour continuer vers {{applicationName}}',
       subtitleCombined: 'pour continuer vers {{applicationName}}',
       title: 'Créez votre compte',
@@ -577,7 +717,7 @@ export const frFR: LocalizationResource = {
     form_identifier_exists__email_address: 'Cette adresse e-mail existe déjà.',
     form_identifier_exists__phone_number: 'Ce numéro de téléphone existe déjà.',
     form_identifier_exists__username: "Ce nom d'utilisateur existe déjà.",
-    form_identifier_not_found: 'Identifiant introuvable',
+    form_identifier_not_found: "Nous n'avons pas trouvé de compte avec ces détails.",
     form_param_format_invalid: 'Le format est invalide',
     form_param_format_invalid__email_address: "L'adresse e-mail doit être une adresse e-mail valide.",
     form_param_format_invalid__phone_number: 'Le numéro de téléphone doit être au format international.',
@@ -598,7 +738,8 @@ export const frFR: LocalizationResource = {
     form_username_invalid_character: "L'identifiant contient des caractères invalides.",
     form_username_invalid_length: "Le nombre de caractères de l'identifiant est invalide.",
     identification_deletion_failed: 'Vous ne pouvez pas supprimer votre dernière identification.',
-    not_allowed_access: 'Accès non autorisé',
+    not_allowed_access:
+      "L'adresse e-mail ou le numéro de téléphone n'est pas autorisée à s'inscrire. Cela peut être dû à l'utilisation de '+', '=', '#' ou '.' dans votre adresse e-mail, l'utilisation d'un domaine connecté à un service de messagerie temporaire ou l'exclusion explicite. Si vous pensez que c'est une erreur, veuillez contacter le support.",
     organization_domain_blocked: "Ce domaine d'organisation est bloqué.",
     organization_domain_common: 'Ce domaine est trop courant pour une organisation.',
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -619,6 +760,7 @@ export const frFR: LocalizationResource = {
       sentencePrefix: 'Votre mot de passe doit contenir',
     },
     phone_number_exists: 'Ce numéro de téléphone est déjà utilisé. Veuillez essayer un autre.',
+    session_exists: 'Vous êtes déjà connecté.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: "Votre mot de passe fonctionne mais pourrait être plus sûr. Essayez d'ajouter des caractères.",
@@ -668,14 +810,6 @@ export const frFR: LocalizationResource = {
     action__signOutAll: 'Se déconnecter de tous les comptes',
   },
   userProfile: {
-    __experimental_billingPage: {
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
-        headerTitle__plans: undefined,
-      },
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Copié !',
       actionLabel__copy: 'Copier tous les codes',
@@ -691,6 +825,42 @@ export const frFR: LocalizationResource = {
         "Vous pouvez utiliser l'un d'entre eux pour vous connecter à votre compte, si vous perdez l'accès à votre dispositif d'authentification.",
       title: 'Ajouter la vérification du code de récupération',
       title__codelist: 'Codes de récupération',
+    },
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Sélectionnez un fournisseur pour connecter votre compte.',
@@ -836,6 +1006,9 @@ export const frFR: LocalizationResource = {
       title: 'Ajouter un numéro de téléphone',
       verifySubtitle: 'Saisissez le code de vérification envoyé à {{identifier}}',
       verifyTitle: 'Vérification du numéro de téléphone',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: 'Téléchargez une image JPG, PNG, GIF ou WEBP inférieure à 10 Mo',

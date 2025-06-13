@@ -3,9 +3,12 @@ import { eventComponentMounted } from '@clerk/shared/telemetry';
 import type { SessionTask } from '@clerk/types';
 import { useCallback, useContext, useEffect } from 'react';
 
+import { Card } from '@/ui/elements/Card';
+import { withCardStateProvider } from '@/ui/elements/contexts';
+import { LoadingCardContainer } from '@/ui/elements/LoadingCard';
+
 import { SESSION_TASK_ROUTE_BY_KEY } from '../../../core/sessionTasks';
 import { OrganizationListContext, SignInContext, SignUpContext } from '../../../ui/contexts';
-import { Card, LoadingCardContainer, withCardStateProvider } from '../../../ui/elements';
 import {
   SessionTasksContext as SessionTasksContext,
   useSessionTasksContext,
@@ -21,7 +24,7 @@ const SessionTasksStart = withCardStateProvider(() => {
   useEffect(() => {
     // Simulates additional latency to avoid a abrupt UI transition when navigating to the next task
     const timeoutId = setTimeout(() => {
-      void clerk.__experimental_nextTask({ redirectUrlComplete });
+      void clerk.__experimental_navigateToTask({ redirectUrlComplete });
     }, 500);
     return () => clearTimeout(timeoutId);
   }, [navigate, clerk, redirectUrlComplete]);
@@ -80,7 +83,7 @@ export function SessionTask(): JSX.Element {
   }, [clerk, navigate, redirectUrlComplete]);
 
   const nextTask = useCallback(
-    () => clerk.__experimental_nextTask({ redirectUrlComplete }),
+    () => clerk.__experimental_navigateToTask({ redirectUrlComplete }),
     [clerk, redirectUrlComplete],
   );
 

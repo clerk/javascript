@@ -20,6 +20,8 @@ const componentImportPaths = {
   PricingTable: () => import(/* webpackChunkName: "pricingTable" */ '../components/PricingTable'),
   Checkout: () => import(/* webpackChunkName: "checkout" */ '../components/Checkout'),
   SessionTasks: () => import(/* webpackChunkName: "sessionTasks" */ '../components/SessionTasks'),
+  PlanDetails: () => import(/* webpackChunkName: "planDetails" */ '../components/Plans'),
+  OAuthConsent: () => import(/* webpackChunkName: "oauthConsent" */ '../components/OAuthConsent/OAuthConsent'),
 } as const;
 
 export const SignIn = lazy(() => componentImportPaths.SignIn().then(module => ({ default: module.SignIn })));
@@ -92,11 +94,17 @@ export const KeylessPrompt = lazy(() =>
 );
 
 export const PricingTable = lazy(() =>
-  componentImportPaths.PricingTable().then(module => ({ default: module.__experimental_PricingTable })),
+  componentImportPaths.PricingTable().then(module => ({ default: module.PricingTable })),
 );
 
-export const Checkout = lazy(() =>
-  componentImportPaths.Checkout().then(module => ({ default: module.__experimental_Checkout })),
+export const Checkout = lazy(() => componentImportPaths.Checkout().then(module => ({ default: module.Checkout })));
+
+export const PlanDetails = lazy(() =>
+  componentImportPaths.PlanDetails().then(module => ({ default: module.PlanDetails })),
+);
+
+export const OAuthConsent = lazy(() =>
+  componentImportPaths.OAuthConsent().then(module => ({ default: module.OAuthConsent })),
 );
 
 export const SessionTasks = lazy(() =>
@@ -129,6 +137,8 @@ export const ClerkComponents = {
   BlankCaptchaModal,
   PricingTable,
   Checkout,
+  PlanDetails,
+  OAuthConsent,
 };
 
 export type ClerkComponentName = keyof typeof ClerkComponents;

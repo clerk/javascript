@@ -1,5 +1,8 @@
-import type { __experimental_CommercePlanResource, __experimental_CommerceSubscriptionPlanPeriod } from '@clerk/types';
+import type { CommercePlanResource, CommerceSubscriptionPlanPeriod } from '@clerk/types';
 import * as React from 'react';
+
+import { Avatar } from '@/ui/elements/Avatar';
+import { SegmentedControl } from '@/ui/elements/SegmentedControl';
 
 import { usePlansContext } from '../../contexts';
 import {
@@ -14,19 +17,19 @@ import {
   Span,
   Text,
   useAppearance,
+  useLocalizations,
 } from '../../customizables';
-import { Avatar, SegmentedControl } from '../../elements';
 import { usePrefersReducedMotion } from '../../hooks';
 import { Check, InformationCircle } from '../../icons';
 import { common, InternalThemeProvider, mqu, type ThemableCssProp } from '../../styledSystem';
 import { colors } from '../../utils';
 
 interface PricingTableMatrixProps {
-  plans: __experimental_CommercePlanResource[];
-  highlightedPlan?: __experimental_CommercePlanResource['slug'];
-  planPeriod: __experimental_CommerceSubscriptionPlanPeriod;
-  setPlanPeriod: (val: __experimental_CommerceSubscriptionPlanPeriod) => void;
-  onSelect: (plan: __experimental_CommercePlanResource) => void;
+  plans: CommercePlanResource[] | undefined;
+  highlightedPlan?: CommercePlanResource['slug'];
+  planPeriod: CommerceSubscriptionPlanPeriod;
+  setPlanPeriod: (val: CommerceSubscriptionPlanPeriod) => void;
+  onSelect: (plan: CommercePlanResource, event?: React.MouseEvent<HTMLElement>) => void;
 }
 
 export function PricingTableMatrix({
@@ -42,7 +45,8 @@ export function PricingTableMatrix({
   const pricingTableMatrixId = React.useId();
   const segmentedControlId = `${pricingTableMatrixId}-segmented-control`;
 
-  const { activeOrUpcomingSubscription } = usePlansContext();
+  const { buttonPropsForPlan } = usePlansContext();
+  const { t } = useLocalizations();
 
   const feePeriodNoticeAnimation: ThemableCssProp = t => ({
     transition: isMotionSafe
@@ -73,7 +77,7 @@ export function PricingTableMatrix({
   return (
     <InternalThemeProvider>
       <Box
-        elementDescriptor={descriptors.pricingTableMatrixRoot}
+        elementDescriptor={descriptors.pricingTableMatrix}
         sx={t => ({
           position: 'relative',
           minWidth: '100%',
@@ -129,23 +133,22 @@ export function PricingTableMatrix({
                       id={segmentedControlId}
                       colorScheme='secondary'
                       variant='caption'
+                      localizationKey={localizationKeys('commerce.pricingTable.billingCycle')}
                     >
                       Billing cycle
                     </Text>
                     <SegmentedControl.Root
                       aria-labelledby={segmentedControlId}
                       value={planPeriod}
-                      onChange={value => setPlanPeriod(value as __experimental_CommerceSubscriptionPlanPeriod)}
+                      onChange={value => setPlanPeriod(value as CommerceSubscriptionPlanPeriod)}
                     >
                       <SegmentedControl.Button
                         value='month'
-                        // TODO(@Commerce): needs localization
-                        text='Monthly'
+                        text={localizationKeys('commerce.monthly')}
                       />
                       <SegmentedControl.Button
                         value='annual'
-                        // TODO(@Commerce): needs localization
-                        text='Annually'
+                        text={localizationKeys('commerce.annually')}
                       />
                     </SegmentedControl.Root>
                   </>
@@ -159,8 +162,6 @@ export function PricingTableMatrix({
                     : planPeriod === 'annual'
                       ? plan.annualMonthlyAmountFormatted
                       : plan.amountFormatted;
-
-                const subscription = activeOrUpcomingSubscription(plan);
 
                 return (
                   <Box
@@ -206,14 +207,12 @@ export function PricingTableMatrix({
                               imageUrl={plan.avatarUrl}
                             />
                           ) : null}
-                          {/* TODO(@Commerce): needs localization */}
                           {highlight ? (
                             <Badge
                               elementDescriptor={descriptors.pricingTableMatrixBadge}
                               colorScheme='secondary'
-                            >
-                              Popular
-                            </Badge>
+                              localizationKey={localizationKeys('commerce.popular')}
+                            />
                           ) : null}
                         </Span>
                       ) : null}
@@ -252,7 +251,7 @@ export function PricingTableMatrix({
                                   marginInlineEnd: t.space.$1,
                                 },
                               })}
-                              localizationKey={localizationKeys('__experimental_commerce.month')}
+                              localizationKey={localizationKeys('commerce.month')}
                             />
                             {plan.annualMonthlyAmount > 0 ? (
                               <Box
@@ -292,9 +291,7 @@ export function PricingTableMatrix({
                                       size='sm'
                                       aria-hidden
                                     />{' '}
-                                    <Span
-                                      localizationKey={localizationKeys('__experimental_commerce.billedAnnually')}
-                                    />
+                                    <Span localizationKey={localizationKeys('commerce.billedAnnually')} />
                                   </Text>
                                 </Box>
                               </Box>
@@ -304,7 +301,7 @@ export function PricingTableMatrix({
                           <Text
                             elementDescriptor={descriptors.pricingTableMatrixFee}
                             variant='h2'
-                            localizationKey={localizationKeys('__experimental_commerce.free')}
+                            localizationKey={localizationKeys('commerce.free')}
                             colorScheme='body'
                           />
                         )}
@@ -323,20 +320,13 @@ export function PricingTableMatrix({
                       >
                         <Button
                           block
-                          variant='bordered'
-                          colorScheme={highlight ? 'primary' : 'secondary'}
                           textVariant='buttonSmall'
                           size='xs'
-                          onClick={() => {
-                            onSelect(plan);
+                          onClick={event => {
+                            onSelect(plan, event);
                           }}
-                          localizationKey={
-                            subscription?.status === 'active'
-                              ? subscription?.canceledAt
-                                ? localizationKeys('__experimental_commerce.reSubscribe')
-                                : localizationKeys('__experimental_commerce.manageSubscription')
-                              : localizationKeys('__experimental_commerce.getStarted')
-                          }
+                          {...buttonPropsForPlan({ plan, selectedPlanPeriod: planPeriod })}
+                          colorScheme={highlight ? 'primary' : 'secondary'}
                         />
                       </Box>
                     ) : null}
@@ -408,7 +398,7 @@ export function PricingTableMatrix({
                             icon={Check}
                             colorScheme='neutral'
                             size='sm'
-                            aria-label='Included'
+                            aria-label={t(localizationKeys('commerce.pricingTable.included'))}
                           />
                         )}
                       </Box>

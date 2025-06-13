@@ -70,6 +70,8 @@ const isValidMaxAge = (maxAge: any) => typeof maxAge === 'number' && maxAge > 0;
 const isValidLevel = (level: any) => ALLOWED_LEVELS.has(level);
 const isValidVerificationType = (type: any) => ALLOWED_TYPES.has(type);
 
+const prefixWithOrg = (value: string) => value.replace(/^(org:)*/, 'org:');
+
 /**
  * Checks if a user has the required organization-level authorization.
  * Verifies if the user has the specified role or permission within their organization.
@@ -86,11 +88,11 @@ const checkOrgAuthorization: CheckOrgAuthorization = (params, options) => {
   }
 
   if (params.permission) {
-    return orgPermissions.includes(params.permission);
+    return orgPermissions.includes(prefixWithOrg(params.permission));
   }
 
   if (params.role) {
-    return orgRole === params.role;
+    return prefixWithOrg(orgRole) === prefixWithOrg(params.role);
   }
   return null;
 };
@@ -234,7 +236,7 @@ type AuthStateOptions = {
 
 /**
  * Shared utility function that centralizes auth state resolution logic,
- * preventing duplication across different packages
+ * preventing duplication across different packages.
  * @internal
  */
 const resolveAuthState = ({

@@ -32,12 +32,19 @@ type FakeUserOptions = {
    * @default false
    **/
   withUsername?: boolean;
+
+  /**
+   * If true, the user will have an email otherwise will be set to undefined.
+   *
+   * @default true
+   **/
+  withEmail?: boolean;
 };
 
 export type FakeUser = {
   firstName: string;
   lastName: string;
-  email: string;
+  email?: string;
   password: string;
   username?: string;
   phoneNumber?: string;
@@ -53,7 +60,11 @@ export type FakeOrganization = {
 export type UserService = {
   createFakeUser: (options?: FakeUserOptions) => FakeUser;
   createBapiUser: (fakeUser: FakeUser) => Promise<User>;
-  deleteIfExists: (opts: { id?: string; email?: string }) => Promise<void>;
+  /**
+   * Creates a BAPI user if it doesn't exist, otherwise returns the existing user.
+   */
+  getOrCreateUser: (fakeUser: FakeUser) => Promise<User>;
+  deleteIfExists: (opts: { id?: string; email?: string; phoneNumber?: string }) => Promise<void>;
   createFakeOrganization: (userId: string) => Promise<FakeOrganization>;
   getUser: (opts: { id?: string; email?: string }) => Promise<User | undefined>;
 };
@@ -72,6 +83,7 @@ export const createUserService = (clerkClient: ClerkClient) => {
     createFakeUser: (options?: FakeUserOptions) => {
       const {
         fictionalEmail = true,
+        withEmail = true,
         withPassword = true,
         withPhoneNumber = false,
         withUsername = false,
@@ -80,20 +92,21 @@ export const createUserService = (clerkClient: ClerkClient) => {
       const email = fictionalEmail
         ? `${randomHash}+clerk_test@clerkcookie.com`
         : `clerkcookie+${randomHash}@mailsac.com`;
+      const phoneNumber = fakerPhoneNumber();
 
       return {
         firstName: faker.person.firstName(),
         lastName: faker.person.lastName(),
-        email,
+        email: withEmail ? email : undefined,
         username: withUsername ? `${randomHash}_clerk_cookie` : undefined,
         password: withPassword ? `${email}${randomHash}` : undefined,
-        phoneNumber: withPhoneNumber ? fakerPhoneNumber() : undefined,
-        deleteIfExists: () => self.deleteIfExists({ email }),
+        phoneNumber: withPhoneNumber ? phoneNumber : undefined,
+        deleteIfExists: () => self.deleteIfExists({ email, phoneNumber }),
       };
     },
     createBapiUser: async fakeUser => {
       return await clerkClient.users.createUser({
-        emailAddress: [fakeUser.email],
+        emailAddress: fakeUser.email !== undefined ? [fakeUser.email] : undefined,
         password: fakeUser.password,
         firstName: fakeUser.firstName,
         lastName: fakeUser.lastName,
@@ -102,16 +115,26 @@ export const createUserService = (clerkClient: ClerkClient) => {
         skipPasswordRequirement: fakeUser.password === undefined,
       });
     },
-    deleteIfExists: async (opts: { id?: string; email?: string }) => {
+    getOrCreateUser: async fakeUser => {
+      const existingUser = await self.getUser({ email: fakeUser.email });
+      if (existingUser) {
+        return existingUser;
+      }
+      return await self.createBapiUser(fakeUser);
+    },
+    deleteIfExists: async (opts: { id?: string; email?: string; phoneNumber?: string }) => {
       let id = opts.id;
 
       if (!id) {
-        const { data: users } = await clerkClient.users.getUserList({ emailAddress: [opts.email] });
+        const { data: users } = await clerkClient.users.getUserList({
+          emailAddress: [opts.email],
+          phoneNumber: [opts.phoneNumber],
+        });
         id = users[0]?.id;
       }
 
       if (!id) {
-        console.log(`User "${opts.email}" does not exist!`);
+        console.log(`User "${opts.email || opts.phoneNumber}" does not exist!`);
         return;
       }
 

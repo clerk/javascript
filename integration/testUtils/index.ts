@@ -1,25 +1,13 @@
 import { createClerkClient as backendCreateClerkClient } from '@clerk/backend';
-import { setupClerkTestingToken } from '@clerk/testing/playwright';
-import type { Browser, BrowserContext, Page, Response } from '@playwright/test';
-import { expect } from '@playwright/test';
+import { createAppPageObject, createPageObjects, type EnhancedPage } from '@clerk/testing/playwright/unstable';
+import type { Browser, BrowserContext, Page } from '@playwright/test';
 
 import type { Application } from '../models/application';
-import { createAppPageObject } from './appPageObject';
 import { createEmailService } from './emailService';
 import { createInvitationService } from './invitationsService';
-import { createKeylessPopoverPageObject } from './keylessPopoverPageObject';
 import { createOrganizationsService } from './organizationsService';
-import { createOrganizationSwitcherComponentPageObject } from './organizationSwitcherPageObject';
-import { createSessionTaskComponentPageObject } from './sessionTaskPageObject';
-import type { EnchancedPage, TestArgs } from './signInPageObject';
-import { createSignInComponentPageObject } from './signInPageObject';
-import { createSignUpComponentPageObject } from './signUpPageObject';
-import { createUserButtonPageObject } from './userButtonPageObject';
-import { createUserProfileComponentPageObject } from './userProfilePageObject';
 import type { FakeOrganization, FakeUser } from './usersService';
 import { createUserService } from './usersService';
-import { createUserVerificationComponentPageObject } from './userVerificationPageObject';
-import { createWaitlistComponentPageObject } from './waitlistPageObject';
 
 export type { FakeUser, FakeOrganization };
 const createClerkClient = (app: Application) => {
@@ -30,58 +18,6 @@ const createClerkClient = (app: Application) => {
   });
 };
 
-const createExpectPageObject = ({ page }: TestArgs) => {
-  return {
-    toBeHandshake: async (res: Response) => {
-      // Travel the redirect chain until we find the handshake header
-      // TODO: Loop through the redirects until we find a handshake header, or timeout trying
-      const redirect = await res.request().redirectedFrom().redirectedFrom().response();
-      expect(redirect.status()).toBe(307);
-      expect(redirect.headers()['x-clerk-auth-status']).toContain('handshake');
-    },
-    toBeSignedOut: (args?: { timeOut: number }) => {
-      return page.waitForFunction(
-        () => {
-          return !window.Clerk?.user;
-        },
-        null,
-        { timeout: args?.timeOut },
-      );
-    },
-    toBeSignedIn: async () => {
-      return page.waitForFunction(() => {
-        return !!window.Clerk?.user;
-      });
-    },
-    toHaveResolvedTask: async () => {
-      return page.waitForFunction(() => {
-        return !window.Clerk?.session?.currentTask;
-      });
-    },
-  };
-};
-
-const createClerkUtils = ({ page }: TestArgs) => {
-  return {
-    toBeLoaded: async () => {
-      return page.waitForFunction(() => {
-        return !!window.Clerk?.loaded;
-      });
-    },
-    getClientSideUser: () => {
-      return page.evaluate(() => {
-        return window.Clerk?.user;
-      });
-    },
-  };
-};
-
-const createTestingTokenUtils = ({ page }: TestArgs) => {
-  return {
-    setup: async () => setupClerkTestingToken({ page }),
-  };
-};
-
 export type CreateAppPageObjectArgs = { page: Page; context: BrowserContext; browser: Browser };
 
 export const createTestUtils = <
@@ -89,7 +25,7 @@ export const createTestUtils = <
   Services = typeof services,
   PO = typeof pageObjects,
   BH = typeof browserHelpers,
-  FullReturn = { services: Services; po: PO; tabs: BH; page: EnchancedPage; nextJsVersion: string },
+  FullReturn = { services: Services; po: PO; tabs: BH; page: EnhancedPage; nextJsVersion: string },
   OnlyAppReturn = { services: Services },
 >(
   params: Params,
@@ -109,37 +45,21 @@ export const createTestUtils = <
     return { services } as any;
   }
 
-  const page = createAppPageObject({ page: params.page, useTestingToken }, app);
-  const testArgs = { page, context, browser };
-
-  const pageObjects = {
-    clerk: createClerkUtils(testArgs),
-    expect: createExpectPageObject(testArgs),
-    keylessPopover: createKeylessPopoverPageObject(testArgs),
-    organizationSwitcher: createOrganizationSwitcherComponentPageObject(testArgs),
-    sessionTask: createSessionTaskComponentPageObject(testArgs),
-    signIn: createSignInComponentPageObject(testArgs),
-    signUp: createSignUpComponentPageObject(testArgs),
-    testingToken: createTestingTokenUtils(testArgs),
-    userButton: createUserButtonPageObject(testArgs),
-    userProfile: createUserProfileComponentPageObject(testArgs),
-    userVerification: createUserVerificationComponentPageObject(testArgs),
-    waitlist: createWaitlistComponentPageObject(testArgs),
-  };
+  const pageObjects = createPageObjects({ page: params.page, useTestingToken, baseURL: app.serverUrl });
 
   const browserHelpers = {
     runInNewTab: async (
-      cb: (u: { services: Services; po: PO; page: EnchancedPage }, context: BrowserContext) => Promise<unknown>,
+      cb: (u: { services: Services; po: PO; page: EnhancedPage }, context: BrowserContext) => Promise<unknown>,
     ) => {
       const u = createTestUtils({
         app,
-        page: createAppPageObject({ page: await context.newPage(), useTestingToken }, app),
+        page: createAppPageObject({ page: await context.newPage(), useTestingToken }, { baseURL: app.serverUrl }),
       });
       await cb(u as any, context);
       return u;
     },
     runInNewBrowser: async (
-      cb: (u: { services: Services; po: PO; page: EnchancedPage }, context: BrowserContext) => Promise<unknown>,
+      cb: (u: { services: Services; po: PO; page: EnhancedPage }, context: BrowserContext) => Promise<unknown>,
     ) => {
       if (!browser) {
         throw new Error('Browser is not defined. Did you forget to pass it to createPageObjects?');
@@ -147,7 +67,7 @@ export const createTestUtils = <
       const context = await browser.newContext();
       const u = createTestUtils({
         app,
-        page: createAppPageObject({ page: await context.newPage(), useTestingToken }, app),
+        page: createAppPageObject({ page: await context.newPage(), useTestingToken }, { baseURL: app.serverUrl }),
       });
       await cb(u as any, context);
       return u;
@@ -155,7 +75,7 @@ export const createTestUtils = <
   };
 
   return {
-    page,
+    page: pageObjects.page,
     services,
     po: pageObjects,
     tabs: browserHelpers,

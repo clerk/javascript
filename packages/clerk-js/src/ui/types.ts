@@ -1,16 +1,20 @@
 import type {
-  __experimental_CheckoutProps,
-  __experimental_CommercePlanResource,
-  __experimental_CommerceSubscriberType,
-  __experimental_CommerceSubscriptionResource,
-  __experimental_PricingTableProps,
+  __internal_CheckoutProps,
+  __internal_OAuthConsentProps,
+  __internal_PlanDetailsProps,
   __internal_UserVerificationProps,
   CreateOrganizationProps,
   GoogleOneTapProps,
+  NewSubscriptionRedirectUrl,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationSwitcherProps,
+  PricingTableProps,
+  SignInFallbackRedirectUrl,
+  SignInForceRedirectUrl,
   SignInProps,
+  SignUpFallbackRedirectUrl,
+  SignUpForceRedirectUrl,
   SignUpProps,
   UserButtonProps,
   UserProfileProps,
@@ -29,6 +33,7 @@ export type {
   OrganizationListProps,
   WaitlistProps,
   __internal_UserVerificationProps,
+  __internal_OAuthConsentProps,
 };
 
 export type AvailableComponentProps =
@@ -41,16 +46,18 @@ export type AvailableComponentProps =
   | CreateOrganizationProps
   | OrganizationListProps
   | WaitlistProps
-  | __experimental_PricingTableProps
-  | __experimental_CheckoutProps
-  | __internal_UserVerificationProps;
+  | PricingTableProps
+  | __internal_CheckoutProps
+  | __internal_UserVerificationProps
+  | __internal_PlanDetailsProps;
 
 type ComponentMode = 'modal' | 'mounted';
 
 export type SignInCtx = SignInProps & {
   componentName: 'SignIn';
   mode?: ComponentMode;
-};
+} & SignInFallbackRedirectUrl &
+  SignInForceRedirectUrl;
 
 export type UserVerificationCtx = __internal_UserVerificationProps & {
   componentName: 'UserVerification';
@@ -67,7 +74,8 @@ export type SignUpCtx = SignUpProps & {
   mode?: ComponentMode;
   emailLinkRedirectUrl?: string;
   ssoCallbackUrl?: string;
-};
+} & SignUpFallbackRedirectUrl &
+  SignUpForceRedirectUrl;
 
 export type UserButtonCtx = UserButtonProps & {
   componentName: 'UserButton';
@@ -103,37 +111,22 @@ export type WaitlistCtx = WaitlistProps & {
   mode?: ComponentMode;
 };
 
-export type __experimental_PricingTableCtx = __experimental_PricingTableProps & {
+export type PricingTableCtx = PricingTableProps & {
   componentName: 'PricingTable';
   mode?: ComponentMode;
-  subscriberType?: __experimental_CommerceSubscriberType;
 };
 
-export type __experimental_CheckoutCtx = __experimental_CheckoutProps & {
+export type CheckoutCtx = __internal_CheckoutProps & {
   componentName: 'Checkout';
-};
-
-export type __experimental_PaymentSourcesCtx = {
-  componentName: 'PaymentSources';
-  subscriberType?: __experimental_CommerceSubscriberType;
-};
-
-export type __experimental_PlansCtx = {
-  componentName: 'Plans';
-  subscriberType: __experimental_CommerceSubscriberType;
-  plans: __experimental_CommercePlanResource[];
-  subscriptions: __experimental_CommerceSubscriptionResource[];
-  isLoading: boolean;
-  revalidate: () => void;
-  activeOrUpcomingSubscription: (
-    plan: __experimental_CommercePlanResource,
-  ) => __experimental_CommerceSubscriptionResource | undefined;
-  isDefaultPlanImplicitlyActive: boolean;
-};
+} & NewSubscriptionRedirectUrl;
 
 export type SessionTasksCtx = {
   nextTask: () => Promise<void>;
   redirectUrlComplete?: string;
+};
+
+export type OAuthConsentCtx = __internal_OAuthConsentProps & {
+  componentName: 'OAuthConsent';
 };
 
 export type AvailableComponentCtx =
@@ -148,6 +141,7 @@ export type AvailableComponentCtx =
   | OrganizationListCtx
   | GoogleOneTapCtx
   | WaitlistCtx
-  | __experimental_PricingTableCtx
-  | __experimental_CheckoutCtx;
+  | PricingTableCtx
+  | CheckoutCtx
+  | OAuthConsentCtx;
 export type AvailableComponentName = AvailableComponentCtx['componentName'];

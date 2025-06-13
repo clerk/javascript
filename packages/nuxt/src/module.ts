@@ -1,4 +1,5 @@
-import type { LoadClerkJsScriptOptions } from '@clerk/shared/loadClerkJsScript';
+import type { Without } from '@clerk/types';
+import type { PluginOptions } from '@clerk/vue';
 import {
   addComponent,
   addImports,
@@ -11,7 +12,7 @@ import {
   updateRuntimeConfig,
 } from '@nuxt/kit';
 
-export type ModuleOptions = Omit<LoadClerkJsScriptOptions, 'routerPush' | 'routerReplace' | 'publishableKey'> & {
+export type ModuleOptions = Without<PluginOptions, 'routerPush' | 'routerReplace' | 'publishableKey'> & {
   publishableKey?: string;
   /**
    * Skip the automatic server middleware registration. When enabled, you'll need to
@@ -63,6 +64,7 @@ export default defineNuxtModule<ModuleOptions>({
           clerkJSUrl: options.clerkJSUrl,
           clerkJSVariant: options.clerkJSVariant,
           clerkJSVersion: options.clerkJSVersion,
+          isSatellite: options.isSatellite,
           // Backend specific variables that are safe to share.
           // We want them to be overridable like the other public keys (e.g NUXT_PUBLIC_CLERK_PROXY_URL)
           proxyUrl: options.proxyUrl,
@@ -104,10 +106,10 @@ export default defineNuxtModule<ModuleOptions>({
     addTypeTemplate(
       {
         filename: 'types/clerk.d.ts',
-        getContents: () => `import type { AuthObject } from '@clerk/backend';
+        getContents: () => `import type { SignedInAuthObject, SignedOutAuthObject } from '@clerk/backend/internal';
           declare module 'h3' {
-            type AuthObjectHandler = AuthObject & {
-              (): AuthObject;
+            type AuthObjectHandler = (SignedInAuthObject | SignedOutAuthObject) & {
+              (): SignedInAuthObject | SignedOutAuthObject;
             }
 
             interface H3EventContext {
@@ -162,6 +164,7 @@ export default defineNuxtModule<ModuleOptions>({
       'SignedIn',
       'SignedOut',
       'Waitlist',
+      'PricingTable',
     ];
     components.forEach(component => {
       void addComponent({

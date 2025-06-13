@@ -1,15 +1,17 @@
-import type {
-  __experimental_CommercePlanResource,
-  __experimental_CommerceSubscriptionPlanPeriod,
-  __experimental_PricingTableProps,
-} from '@clerk/types';
+import { useClerk, useSession } from '@clerk/shared/react';
+import type { CommercePlanResource, CommerceSubscriptionPlanPeriod, PricingTableProps } from '@clerk/types';
 import * as React from 'react';
 
-import { usePlansContext } from '../../contexts';
+import { Switch } from '@/ui/elements/Switch';
+import { Tooltip } from '@/ui/elements/Tooltip';
+
+import { useProtect } from '../../common';
+import { usePlansContext, usePricingTableContext, useSubscriberTypeContext } from '../../contexts';
 import {
   Badge,
   Box,
   Button,
+  Col,
   descriptors,
   Flex,
   Heading,
@@ -18,23 +20,19 @@ import {
   SimpleButton,
   Span,
   Text,
-  useAppearance,
 } from '../../customizables';
-import { Avatar, ReversibleContainer, SegmentedControl } from '../../elements';
-import { usePrefersReducedMotion } from '../../hooks';
-import { Check, InformationCircle, Minus, Plus } from '../../icons';
-import type { ThemableCssProp } from '../../styledSystem';
+import { Check, Plus } from '../../icons';
 import { common, InternalThemeProvider } from '../../styledSystem';
-import { colors } from '../../utils';
+import { colors, getClosestProfileScrollBox } from '../../utils';
 
 interface PricingTableDefaultProps {
-  plans?: __experimental_CommercePlanResource[] | null;
-  highlightedPlan?: __experimental_CommercePlanResource['slug'];
-  planPeriod: __experimental_CommerceSubscriptionPlanPeriod;
-  setPlanPeriod: (val: __experimental_CommerceSubscriptionPlanPeriod) => void;
-  onSelect: (plan: __experimental_CommercePlanResource) => void;
+  plans?: CommercePlanResource[] | null;
+  highlightedPlan?: CommercePlanResource['slug'];
+  planPeriod: CommerceSubscriptionPlanPeriod;
+  setPlanPeriod: (val: CommerceSubscriptionPlanPeriod) => void;
+  onSelect: (plan: CommercePlanResource) => void;
   isCompact?: boolean;
-  props: __experimental_PricingTableProps;
+  props: PricingTableProps;
 }
 
 export function PricingTableDefault({
@@ -62,8 +60,9 @@ export function PricingTableDefault({
           '--column-width': 'max(var(--max-column-width), min(var(--grid-min-size, 10rem), 100%))',
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(var(--column-width), 1fr))',
+          gridTemplateRows: 'auto 1fr',
           gap: `var(--grid-gap-y, var(--grid-gap, ${t.space.$4})) var(--grid-gap, ${t.space.$4})`,
-          alignItems: 'start',
+          alignItems: 'stretch',
           width: '100%',
           minWidth: '0',
         })}
@@ -90,24 +89,73 @@ export function PricingTableDefault({
  * -----------------------------------------------------------------------------------------------*/
 
 interface CardProps {
-  plan: __experimental_CommercePlanResource;
-  planPeriod: __experimental_CommerceSubscriptionPlanPeriod;
-  setPlanPeriod: (p: __experimental_CommerceSubscriptionPlanPeriod) => void;
-  onSelect: (plan: __experimental_CommercePlanResource) => void;
+  plan: CommercePlanResource;
+  planPeriod: CommerceSubscriptionPlanPeriod;
+  setPlanPeriod: (p: CommerceSubscriptionPlanPeriod) => void;
+  onSelect: (plan: CommercePlanResource, event?: React.MouseEvent<HTMLElement>) => void;
   isCompact?: boolean;
-  props: __experimental_PricingTableProps;
+  props: PricingTableProps;
 }
 
 function Card(props: CardProps) {
   const { plan, planPeriod, setPlanPeriod, onSelect, props: pricingTableProps, isCompact = false } = props;
-  const isDefaultLayout = pricingTableProps.layout === 'default';
-  const ctaPosition = (isDefaultLayout && pricingTableProps.ctaPosition) || 'top';
-  const collapseFeatures = (isDefaultLayout && pricingTableProps.collapseFeatures) || false;
-  const { id, slug, isDefault, features } = plan;
-  const totalFeatures = features.length;
-  const hasFeatures = totalFeatures > 0;
+  const clerk = useClerk();
+  const { isSignedIn } = useSession();
+  const { mode = 'mounted', ctaPosition: ctxCtaPosition } = usePricingTableContext();
+  const subscriberType = useSubscriberTypeContext();
 
-  const activeOrUpcomingSubscription = usePlansContext().activeOrUpcomingSubscription(plan);
+  const ctaPosition = pricingTableProps.ctaPosition || ctxCtaPosition || 'bottom';
+  const collapseFeatures = pricingTableProps.collapseFeatures || false;
+  const { id, slug } = plan;
+
+  const canManageBilling = useProtect(
+    has => has({ permission: 'org:sys_billing:manage' }) || subscriberType === 'user',
+  );
+  const { buttonPropsForPlan, activeOrUpcomingSubscriptionBasedOnPlanPeriod } = usePlansContext();
+
+  const showPlanDetails = (event?: React.MouseEvent<HTMLElement>) => {
+    const portalRoot = getClosestProfileScrollBox(mode, event);
+
+    clerk.__internal_openPlanDetails({
+      plan,
+      subscriberType,
+      initialPlanPeriod: planPeriod,
+      portalRoot,
+    });
+  };
+
+  const subscription = React.useMemo(
+    () => activeOrUpcomingSubscriptionBasedOnPlanPeriod(plan, planPeriod),
+    [plan, planPeriod, activeOrUpcomingSubscriptionBasedOnPlanPeriod],
+  );
+  const isPlanActive = subscription?.status === 'active';
+  const hasFeatures = plan.features.length > 0;
+  const showStatusRow = !!subscription;
+
+  let shouldShowFooter = false;
+  let shouldShowFooterNotice = false;
+
+  if (!subscription) {
+    shouldShowFooter = true;
+    shouldShowFooterNotice = false;
+  } else if (subscription.status === 'upcoming') {
+    shouldShowFooter = true;
+    shouldShowFooterNotice = true;
+  } else if (subscription.status === 'active') {
+    if (subscription.canceledAt) {
+      shouldShowFooter = true;
+      shouldShowFooterNotice = false;
+    } else if (planPeriod !== subscription.planPeriod && plan.annualMonthlyAmount > 0) {
+      shouldShowFooter = true;
+      shouldShowFooterNotice = false;
+    } else {
+      shouldShowFooter = false;
+      shouldShowFooterNotice = false;
+    }
+  } else {
+    shouldShowFooter = false;
+    shouldShowFooterNotice = false;
+  }
 
   return (
     <Box
@@ -115,8 +163,10 @@ function Card(props: CardProps) {
       elementDescriptor={descriptors.pricingTableCard}
       elementId={descriptors.pricingTableCard.setId(slug)}
       sx={t => ({
-        display: 'flex',
-        flexDirection: 'column',
+        display: 'grid',
+        gap: 0,
+        gridTemplateRows: 'subgrid',
+        gridRow: 'span 5',
         background: common.mergedColorsBackground(
           colors.setAlpha(t.colors.$colorBackground, 1),
           t.colors.$neutralAlpha50,
@@ -124,7 +174,7 @@ function Card(props: CardProps) {
         borderWidth: t.borderWidths.$normal,
         borderStyle: t.borderStyles.$solid,
         borderColor: t.colors.$neutralAlpha100,
-        boxShadow: !isCompact ? t.shadows.$cardBoxShadow : undefined,
+        boxShadow: !isCompact ? t.shadows.$cardBoxShadow : t.shadows.$tableBodyShadow,
         borderRadius: t.radii.$xl,
         overflow: 'hidden',
         textAlign: 'left',
@@ -136,18 +186,42 @@ function Card(props: CardProps) {
         isCompact={isCompact}
         planPeriod={planPeriod}
         setPlanPeriod={setPlanPeriod}
+        badge={
+          showStatusRow ? (
+            isPlanActive ? (
+              <Badge
+                colorScheme='secondary'
+                localizationKey={localizationKeys('badge__activePlan')}
+              />
+            ) : (
+              <Badge
+                colorScheme='primary'
+                localizationKey={localizationKeys('badge__upcomingPlan')}
+              />
+            )
+          ) : undefined
+        }
       />
-      <ReversibleContainer reverse={ctaPosition === 'top'}>
-        {!collapseFeatures && hasFeatures ? (
+      <Box
+        elementDescriptor={descriptors.pricingTableCardBody}
+        sx={{
+          display: 'grid',
+          gridTemplateRows: 'subgrid',
+          gridRow: 'span 2',
+          gap: 0,
+        }}
+      >
+        {(ctaPosition === 'bottom' && !collapseFeatures) || (ctaPosition === 'top' && hasFeatures) ? (
           <Box
             elementDescriptor={descriptors.pricingTableCardFeatures}
             sx={t => ({
+              // gridRow: shouldShowFooter ? 'auto' : 'span 2',
               display: 'flex',
               flexDirection: 'column',
               flex: '1',
               padding: isCompact ? t.space.$3 : t.space.$4,
-              backgroundColor: t.colors.$colorBackground,
-              borderTopWidth: t.borderWidths.$normal,
+              backgroundColor: hasFeatures ? t.colors.$colorBackground : 'transparent',
+              borderTopWidth: hasFeatures ? t.borderWidths.$normal : 0,
               borderTopStyle: t.borderStyles.$solid,
               borderTopColor: t.colors.$neutralAlpha100,
             })}
@@ -156,40 +230,63 @@ function Card(props: CardProps) {
             <CardFeaturesList
               plan={plan}
               isCompact={isCompact}
+              showPlanDetails={showPlanDetails}
             />
           </Box>
         ) : null}
-        {!isDefault ? (
+
+        {shouldShowFooter ? (
           <Box
-            elementDescriptor={descriptors.pricingTableCardAction}
+            elementDescriptor={descriptors.pricingTableCardFooter}
             sx={t => ({
               marginTop: 'auto',
               padding: isCompact ? t.space.$3 : t.space.$4,
               borderTopWidth: t.borderWidths.$normal,
               borderTopStyle: t.borderStyles.$solid,
               borderTopColor: t.colors.$neutralAlpha100,
-              background: collapseFeatures || !hasFeatures ? t.colors.$colorBackground : undefined,
+              order: ctaPosition === 'top' ? -1 : undefined,
             })}
           >
-            <Button
-              block
-              textVariant={isCompact ? 'buttonSmall' : 'buttonLarge'}
-              variant={isCompact || !!activeOrUpcomingSubscription ? 'bordered' : 'solid'}
-              colorScheme={isCompact || !!activeOrUpcomingSubscription ? 'secondary' : 'primary'}
-              localizationKey={
-                activeOrUpcomingSubscription
-                  ? activeOrUpcomingSubscription.canceledAt
-                    ? localizationKeys('__experimental_commerce.reSubscribe')
-                    : localizationKeys('__experimental_commerce.manageSubscription')
-                  : localizationKeys('__experimental_commerce.getStarted')
-              }
-              onClick={() => {
-                onSelect(plan);
-              }}
-            />
+            {shouldShowFooterNotice ? (
+              <Text
+                elementDescriptor={descriptors.pricingTableCardFooterNotice}
+                variant={isCompact ? 'buttonSmall' : 'buttonLarge'}
+                localizationKey={localizationKeys('badge__startsAt', { date: subscription?.periodStart })}
+                colorScheme='secondary'
+                sx={t => ({
+                  paddingBlock: t.space.$1x5,
+                  textAlign: 'center',
+                })}
+              />
+            ) : (
+              <Tooltip.Root>
+                <Tooltip.Trigger sx={{ width: '100%' }}>
+                  <Button
+                    elementDescriptor={descriptors.pricingTableCardFooterButton}
+                    block
+                    textVariant={isCompact ? 'buttonSmall' : 'buttonLarge'}
+                    {...buttonPropsForPlan({ plan, isCompact, selectedPlanPeriod: planPeriod })}
+                    onClick={event => {
+                      onSelect(plan, event);
+                    }}
+                  />
+                </Tooltip.Trigger>
+                {isSignedIn && !canManageBilling && (
+                  <Tooltip.Content
+                    text={localizationKeys('organizationProfile.plansPage.alerts.noPermissionsToManageBilling')}
+                  />
+                )}
+              </Tooltip.Root>
+            )}
           </Box>
-        ) : null}
-      </ReversibleContainer>
+        ) : (
+          <Box
+            sx={t => ({
+              backgroundColor: hasFeatures ? t.colors.$colorBackground : 'transparent',
+            })}
+          />
+        )}
+      </Box>
     </Box>
   );
 }
@@ -199,35 +296,23 @@ function Card(props: CardProps) {
  * -----------------------------------------------------------------------------------------------*/
 
 interface CardHeaderProps {
-  plan: __experimental_CommercePlanResource;
+  plan: CommercePlanResource;
   isCompact?: boolean;
-  planPeriod: __experimental_CommerceSubscriptionPlanPeriod;
-  setPlanPeriod: (val: __experimental_CommerceSubscriptionPlanPeriod) => void;
+  planPeriod: CommerceSubscriptionPlanPeriod;
+  setPlanPeriod: (val: CommerceSubscriptionPlanPeriod) => void;
+  badge?: React.ReactNode;
 }
 
 const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref) => {
-  const prefersReducedMotion = usePrefersReducedMotion();
-  const { animations: layoutAnimations } = useAppearance().parsedLayout;
-  const { plan, isCompact, planPeriod, setPlanPeriod } = props;
-  const { name, avatarUrl, annualMonthlyAmount } = plan;
-  const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
-  const pricingTableCardFeePeriodNoticeAnimation: ThemableCssProp = t => ({
-    transition: isMotionSafe
-      ? `grid-template-rows ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}`
-      : 'none',
-  });
+  const { plan, isCompact, planPeriod, setPlanPeriod, badge } = props;
+  const { name, annualMonthlyAmount } = plan;
+
   const getPlanFee = React.useMemo(() => {
     if (annualMonthlyAmount <= 0) {
       return plan.amountFormatted;
     }
     return planPeriod === 'annual' ? plan.annualMonthlyAmountFormatted : plan.amountFormatted;
   }, [annualMonthlyAmount, planPeriod, plan.amountFormatted, plan.annualMonthlyAmountFormatted]);
-
-  const { activeOrUpcomingSubscription, isDefaultPlanImplicitlyActive } = usePlansContext();
-  const subscription = activeOrUpcomingSubscription(plan);
-  const isImplicitlyActive = isDefaultPlanImplicitlyActive && plan.isDefault;
-
-  const showBadge = !!subscription || isImplicitlyActive;
 
   return (
     <Box
@@ -236,188 +321,108 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
       sx={t => ({
         width: '100%',
         padding: isCompact ? t.space.$3 : t.space.$4,
+        display: 'grid',
+        gap: t.space.$1,
+        gridRow: 'span 3',
+        gridTemplateRows: 'subgrid',
       })}
       data-variant={isCompact ? 'compact' : 'default'}
     >
-      {avatarUrl || showBadge ? (
+      <Box elementDescriptor={descriptors.pricingTableCardTitleContainer}>
         <Box
-          elementDescriptor={descriptors.pricingTableCardAvatarBadgeContainer}
           sx={t => ({
-            marginBlockEnd: t.space.$3,
             display: 'flex',
-            alignItems: 'flex-start',
             justifyContent: 'space-between',
-            flexWrap: 'wrap',
-            gap: t.space.$3,
-            float: !avatarUrl && !showBadge ? 'right' : undefined,
+            alignItems: 'flex-start',
+            gap: t.space.$0x25,
           })}
         >
-          {avatarUrl ? (
-            <Avatar
-              boxElementDescriptor={descriptors.pricingTableCardAvatar}
-              size={_ => 40}
-              title={name}
-              initials={name[0]}
-              rounded={false}
-              imageUrl={avatarUrl}
-            />
-          ) : null}
-          <ReversibleContainer reverse={!avatarUrl}>
-            {showBadge ? (
-              <Span
-                elementDescriptor={descriptors.pricingTableCardBadgeContainer}
-                sx={{
-                  flexBasis: avatarUrl ? '100%' : undefined,
-                }}
-              >
-                {isImplicitlyActive || subscription?.status === 'active' ? (
-                  <Badge
-                    elementDescriptor={descriptors.pricingTableCardBadge}
-                    localizationKey={localizationKeys('badge__currentPlan')}
-                    colorScheme={'secondary'}
-                  />
-                ) : (
-                  <Badge
-                    elementDescriptor={descriptors.pricingTableCardBadge}
-                    localizationKey={localizationKeys('badge__startsAt', {
-                      date: subscription?.periodStart,
-                    })}
-                    colorScheme={'primary'}
-                  />
-                )}
-              </Span>
-            ) : null}
-          </ReversibleContainer>
+          <Heading
+            elementDescriptor={descriptors.pricingTableCardTitle}
+            as='h2'
+            textVariant={isCompact ? 'h3' : 'h2'}
+          >
+            {name}
+          </Heading>
+          {badge && badge}
         </Box>
-      ) : null}
-      <Heading
-        elementDescriptor={descriptors.pricingTableCardTitle}
-        as='h2'
-        textVariant={isCompact ? 'h3' : 'h2'}
-      >
-        {plan.name}
-      </Heading>
-      {!isCompact && plan.description ? (
-        <Text
-          elementDescriptor={descriptors.pricingTableCardDescription}
-          variant='subtitle'
-          colorScheme='secondary'
-        >
-          {plan.description}
-        </Text>
-      ) : null}
+        {!isCompact && plan.description ? (
+          <Text
+            elementDescriptor={descriptors.pricingTableCardDescription}
+            variant='subtitle'
+            colorScheme='secondary'
+            sx={{
+              justifySelf: 'flex-start',
+            }}
+          >
+            {plan.description}
+          </Text>
+        ) : null}
+      </Box>
+
       <Flex
         elementDescriptor={descriptors.pricingTableCardFeeContainer}
         data-variant={isCompact ? 'compact' : 'default'}
         align='center'
         wrap='wrap'
         sx={t => ({
-          marginTop: isCompact ? t.space.$2 : t.space.$3,
-          columnGap: t.space.$1x5,
+          columnGap: t.space.$1,
+          marginTop: t.space.$1,
         })}
       >
-        {plan.hasBaseFee ? (
-          <>
-            <Text
-              elementDescriptor={descriptors.pricingTableCardFee}
-              variant={isCompact ? 'h2' : 'h1'}
-              colorScheme='body'
-            >
-              {plan.currencySymbol}
-              {getPlanFee}
-            </Text>
-            <Text
-              elementDescriptor={descriptors.pricingTableCardFeePeriod}
-              variant='caption'
-              colorScheme='secondary'
-              sx={t => ({
-                textTransform: 'lowercase',
-                ':before': {
-                  content: '"/"',
-                  marginInlineEnd: t.space.$1,
-                },
-              })}
-              localizationKey={localizationKeys('__experimental_commerce.month')}
-            />
-            {annualMonthlyAmount > 0 ? (
-              <Box
-                elementDescriptor={descriptors.pricingTableCardFeePeriodNotice}
-                sx={[
-                  _ => ({
-                    width: '100%',
-                    display: 'grid',
-                    gridTemplateRows: planPeriod === 'annual' ? '1fr' : '0fr',
-                  }),
-                  pricingTableCardFeePeriodNoticeAnimation,
-                ]}
-                // @ts-ignore - Needed until React 19 support
-                inert={planPeriod !== 'annual' ? 'true' : undefined}
-              >
-                <Box
-                  elementDescriptor={descriptors.pricingTableCardFeePeriodNoticeInner}
-                  sx={{
-                    overflow: 'hidden',
-                    minHeight: 0,
-                  }}
-                >
-                  <Text
-                    elementDescriptor={descriptors.pricingTableCardFeePeriodNoticeLabel}
-                    variant='caption'
-                    colorScheme='secondary'
-                    sx={t => ({
-                      width: '100%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      columnGap: t.space.$1,
-                    })}
-                  >
-                    <Icon
-                      icon={InformationCircle}
-                      colorScheme='neutral'
-                      size='sm'
-                      aria-hidden
-                    />{' '}
-                    <Span localizationKey={localizationKeys('__experimental_commerce.billedAnnually')} />
-                  </Text>
-                </Box>
-              </Box>
-            ) : null}
-          </>
-        ) : (
+        <Text
+          elementDescriptor={descriptors.pricingTableCardFee}
+          variant={isCompact ? 'h2' : 'h1'}
+          colorScheme='body'
+        >
+          {plan.currencySymbol}
+          {getPlanFee}
+        </Text>
+        {!plan.isDefault ? (
           <Text
-            elementDescriptor={descriptors.pricingTableCardFee}
-            variant={isCompact ? 'h2' : 'h1'}
-            localizationKey={localizationKeys('__experimental_commerce.free')}
-            colorScheme='body'
+            elementDescriptor={descriptors.pricingTableCardFeePeriod}
+            variant='caption'
+            colorScheme='secondary'
+            sx={t => ({
+              textTransform: 'lowercase',
+              ':before': {
+                content: '"/"',
+                marginInlineEnd: t.space.$0x25,
+              },
+            })}
+            localizationKey={localizationKeys('commerce.month')}
           />
-        )}
+        ) : null}
       </Flex>
-      {plan.hasBaseFee && annualMonthlyAmount > 0 && setPlanPeriod ? (
+
+      {annualMonthlyAmount > 0 && setPlanPeriod ? (
         <Box
           elementDescriptor={descriptors.pricingTableCardPeriodToggle}
           sx={t => ({
-            display: 'flex',
-            marginTop: t.space.$3,
+            marginTop: t.space.$1,
           })}
         >
-          <SegmentedControl.Root
-            aria-label='Set pay period'
-            value={planPeriod}
-            onChange={value => setPlanPeriod(value as __experimental_CommerceSubscriptionPlanPeriod)}
-          >
-            <SegmentedControl.Button
-              value='month'
-              // TODO(@Commerce): needs localization
-              text='Monthly'
-            />
-            <SegmentedControl.Button
-              value='annual'
-              // TODO(@Commerce): needs localization
-              text='Annually'
-            />
-          </SegmentedControl.Root>
+          <Switch
+            isChecked={planPeriod === 'annual'}
+            onChange={(checked: boolean) => setPlanPeriod(checked ? 'annual' : 'month')}
+            label={localizationKeys('commerce.billedAnnually')}
+          />
         </Box>
-      ) : null}
+      ) : (
+        <Text
+          elementDescriptor={descriptors.pricingTableCardFeePeriodNotice}
+          variant='caption'
+          colorScheme='secondary'
+          localizationKey={
+            plan.isDefault ? localizationKeys('commerce.alwaysFree') : localizationKeys('commerce.billedMonthlyOnly')
+          }
+          sx={t => ({
+            justifySelf: 'flex-start',
+            alignSelf: 'center',
+            marginTop: t.space.$1,
+          })}
+        />
+      )}
     </Box>
   );
 });
@@ -427,43 +432,43 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
  * -----------------------------------------------------------------------------------------------*/
 
 interface CardFeaturesListProps {
-  plan: __experimental_CommercePlanResource;
+  plan: CommercePlanResource;
   /**
    * @default false
    */
   isCompact?: boolean;
+  showPlanDetails: (event?: React.MouseEvent<HTMLElement>) => void;
 }
 
 const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>((props, ref) => {
-  const { plan, isCompact } = props;
+  const { plan, isCompact, showPlanDetails } = props;
+
   const totalFeatures = plan.features.length;
-  const [showAllFeatures, setShowAllFeatures] = React.useState(false);
-  const canToggleFeatures = isCompact && totalFeatures > 3;
-  const toggleFeatures = () => {
-    setShowAllFeatures(prev => !prev);
-  };
+  const hasMoreFeatures = isCompact ? totalFeatures > 3 : totalFeatures > 8;
+
   return (
     <Box
       ref={ref}
       elementDescriptor={descriptors.pricingTableCardFeatures}
       sx={t => ({
         display: 'grid',
-        flex: '1',
+        flex: 1,
         rowGap: isCompact ? t.space.$2 : t.space.$3,
       })}
     >
-      <Box
+      <Col
         elementDescriptor={descriptors.pricingTableCardFeaturesList}
         data-variant={isCompact ? 'compact' : 'default'}
         as='ul'
         role='list'
         sx={t => ({
-          display: 'grid',
           flex: '1',
           rowGap: isCompact ? t.space.$2 : t.space.$3,
+          margin: 0,
+          padding: 0,
         })}
       >
-        {plan.features.slice(0, showAllFeatures || !canToggleFeatures ? totalFeatures : 3).map(feature => (
+        {plan.features.slice(0, hasMoreFeatures ? (isCompact ? 3 : 8) : totalFeatures).map(feature => (
           <Box
             elementDescriptor={descriptors.pricingTableCardFeaturesListItem}
             elementId={descriptors.pricingTableCardFeaturesListItem.setId(feature.slug)}
@@ -473,6 +478,8 @@ const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>
               display: 'flex',
               alignItems: 'baseline',
               gap: t.space.$2,
+              margin: 0,
+              padding: 0,
             })}
           >
             <Icon
@@ -497,24 +504,24 @@ const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>
             </Span>
           </Box>
         ))}
-      </Box>
-      {canToggleFeatures && (
+      </Col>
+      {hasMoreFeatures && (
         <SimpleButton
-          onClick={toggleFeatures}
+          onClick={event => showPlanDetails(event)}
           variant='link'
           sx={t => ({
-            marginBlockStart: t.space.$2,
+            marginBlockStart: 'auto',
+            paddingBlock: t.space.$1,
             gap: t.space.$1,
           })}
         >
           <Icon
-            icon={showAllFeatures ? Minus : Plus}
+            icon={Plus}
             colorScheme='neutral'
             size='md'
             aria-hidden
           />
-          {/* TODO(@Commerce): needs localization */}
-          {showAllFeatures ? 'Hide features' : 'See all features'}
+          <Span localizationKey={localizationKeys('commerce.seeAllFeatures')} />
         </SimpleButton>
       )}
     </Box>

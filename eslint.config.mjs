@@ -11,6 +11,7 @@ import pluginSimpleImportSort from 'eslint-plugin-simple-import-sort';
 import pluginTurbo from 'eslint-plugin-turbo';
 import pluginUnusedImports from 'eslint-plugin-unused-imports';
 import pluginYml from 'eslint-plugin-yml';
+import pluginJsDoc from 'eslint-plugin-jsdoc';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
@@ -369,6 +370,14 @@ export default tseslint.config([
     },
   },
   {
+    name: 'packages/clerk-js - vitest',
+    files: ['packages/clerk-js/src/**/*.spec.{ts,tsx}'],
+    rules: {
+      'jest/unbound-method': 'off',
+      '@typescript-eslint/unbound-method': 'off',
+    },
+  },
+  {
     name: 'packages/expo-passkeys',
     files: ['packages/expo-passkeys/src/**/*'],
     rules: {
@@ -419,21 +428,35 @@ export default tseslint.config([
       'turbo/no-undeclared-env-vars': 'off',
     },
   },
-  ...pluginYml.configs['flat/recommended'],
   {
-    name: 'repo/.github',
-    // rules: {
-    // 'regex/invalid': [
-    //   'error',
-    //   [
-    //     {
-    //       regex: '^(?!.*\\$TURBO_ARGS( |$)).*turbo \\S+',
-    //       message: 'Invalid turbo CI command. Must contain `$TURBO_ARGS`',
-    //     },
-    //   ],
-    // ],
-    // },
+    name: 'repo/jsdoc',
+    ...pluginJsDoc.configs['flat/recommended-typescript'],
+    files: ['packages/shared/src/**/*.{ts,tsx}'],
+    ignores: ['**/__tests__/**'],
+    plugins: {
+      jsdoc: pluginJsDoc,
+    },
+    rules: {
+      ...pluginJsDoc.configs['flat/recommended-typescript'].rules,
+      'jsdoc/check-examples': 'off',
+      'jsdoc/informative-docs': 'warn',
+      'jsdoc/check-tag-names': [
+        'warn',
+        { definedTags: ['inline', 'unionReturnHeadings', 'displayFunctionSignature', 'paramExtension'], typed: false },
+      ],
+      'jsdoc/require-hyphen-before-param-description': 'warn',
+      'jsdoc/require-description': 'warn',
+      'jsdoc/require-description-complete-sentence': 'warn',
+      'jsdoc/require-param': ['warn', { ignoreWhenAllParamsMissing: true }],
+      'jsdoc/require-param-description': 'warn',
+      'jsdoc/require-returns': 'off',
+      'jsdoc/tag-lines': [
+        'warn',
+        'always',
+        { count: 1, applyToEndTag: false, startLines: 1, tags: { param: { lines: 'never' } } },
+      ],
+    },
   },
-
+  ...pluginYml.configs['flat/recommended'],
   configPrettier,
 ]);

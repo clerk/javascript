@@ -14,24 +14,96 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const nlBE: LocalizationResource = {
   locale: 'nl-NL',
-  __experimental_commerce: {
-    billedAnnually: undefined,
-    free: undefined,
-    getStarted: undefined,
-    manageSubscription: undefined,
-    month: undefined,
-    switchPlan: undefined,
-  },
   backButton: 'Terug',
+  badge__activePlan: undefined,
+  badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Standaard',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
   badge__otherImpersonatorDevice: 'Ander impersonatie apparaat',
   badge__primary: 'Primair',
+  badge__renewsAt: undefined,
   badge__requiresAction: 'Actie vereist',
+  badge__startsAt: undefined,
   badge__thisDevice: 'Dit apparaat',
   badge__unverified: 'Ongeverifieerd',
+  badge__upcomingPlan: undefined,
   badge__userDevice: 'Gebruikersapparaat',
   badge__you: 'Jij',
+  commerce: {
+    addPaymentMethod: undefined,
+    alwaysFree: undefined,
+    annually: undefined,
+    availableFeatures: undefined,
+    billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
+    cancelSubscription: undefined,
+    cancelSubscriptionAccessUntil: undefined,
+    cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionTitle: undefined,
+    cannotSubscribeMonthly: undefined,
+    checkout: {
+      description__paymentSuccessful: undefined,
+      description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      lineItems: {
+        title__paymentMethod: undefined,
+        title__statementId: undefined,
+        title__subscriptionBegins: undefined,
+        title__totalPaid: undefined,
+      },
+      perMonth: undefined,
+      title: undefined,
+      title__paymentSuccessful: undefined,
+      title__subscriptionSuccessful: undefined,
+    },
+    creditRemainder: undefined,
+    defaultFreePlanActive: undefined,
+    free: undefined,
+    getStarted: undefined,
+    keepSubscription: undefined,
+    manage: undefined,
+    manageSubscription: undefined,
+    month: undefined,
+    monthly: undefined,
+    pastDue: undefined,
+    pay: undefined,
+    paymentMethods: undefined,
+    paymentSource: {
+      applePayDescription: {
+        annual: undefined,
+        monthly: undefined,
+      },
+      dev: {
+        anyNumbers: undefined,
+        cardNumber: undefined,
+        cvcZip: undefined,
+        developmentMode: undefined,
+        expirationDate: undefined,
+        testCardInfo: undefined,
+      },
+    },
+    popular: undefined,
+    pricingTable: {
+      billingCycle: undefined,
+      included: undefined,
+    },
+    reSubscribe: undefined,
+    seeAllFeatures: undefined,
+    subscribe: undefined,
+    subtotal: undefined,
+    switchPlan: undefined,
+    switchToAnnual: undefined,
+    switchToMonthly: undefined,
+    totalDueToday: undefined,
+    viewFeatures: undefined,
+    year: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'Creëer organisatie',
     invitePage: {
@@ -48,6 +120,7 @@ export const nlBE: LocalizationResource = {
     sameDay: "Vandaag om {{ date | timeString('nl-NL') }}",
   },
   dividerText: 'of',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'Een andere methode gebruiken',
   footerPageLink__help: 'Helppagina',
   footerPageLink__privacy: 'Privacybeleid',
@@ -122,6 +195,42 @@ export const nlBE: LocalizationResource = {
     badge__automaticSuggestion: 'Automatische Suggesties',
     badge__manualInvitation: 'Geen automatische inschrijving',
     badge__unverified: 'Ongeverifieerd',
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Voeg het domein toe om te verifiëren. Gebruikers met e-mailadressen in dit domein kunnen de organisatie automatisch toegang krijgen of een verzoek om toegang te maken.',
@@ -179,10 +288,17 @@ export const nlBE: LocalizationResource = {
       },
     },
     navbar: {
+      billing: undefined,
       description: 'Beheer je organisatie.',
       general: 'Algemeen',
       members: 'Leden',
       title: 'Organisatie',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -369,6 +485,12 @@ export const nlBE: LocalizationResource = {
       subtitle: 'Problemen? Je kan een van deze methoden gebruiken om in te loggen.',
       title: 'Gebruik een andere methode',
     },
+    alternativePhoneCodeProvider: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     backupCodeMfa: {
       subtitle: 'om door te gaan naar {{applicationName}}',
       title: 'Voer een backupcode in',
@@ -475,6 +597,12 @@ export const nlBE: LocalizationResource = {
       actionLink__use_username: 'Gebruik gebruikersnaam',
       actionText: 'Geen account?',
       actionText__join_waitlist: 'Nog geen account?',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'om door te gaan naar {{applicationName}}',
       subtitleCombined: undefined,
       title: 'Inloggen',
@@ -488,6 +616,11 @@ export const nlBE: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Vul je wachtwoord in',
   signUp: {
+    alternativePhoneCodeProvider: {
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     continue: {
       actionLink: 'Inloggen',
       actionText: 'Heb je een account?',
@@ -555,6 +688,12 @@ export const nlBE: LocalizationResource = {
       actionLink__use_email: 'Gebruik e-mail',
       actionLink__use_phone: 'Gebruik telefoon',
       actionText: 'Heb je al een account?',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'om door te gaan naar {{applicationName}}',
       subtitleCombined: 'om door te gaan naar {{applicationName}}',
       title: 'Maak je account aan',
@@ -573,7 +712,7 @@ export const nlBE: LocalizationResource = {
     form_identifier_exists__email_address: 'Dit e-mailadres is al in gebruik.',
     form_identifier_exists__phone_number: 'Dit telefoonnummer is al in gebruik.',
     form_identifier_exists__username: 'Deze gebruikersnaam is al in gebruik.',
-    form_identifier_not_found: 'Dit identificerende gegeven kan niet worden gevonden.',
+    form_identifier_not_found: 'We konden geen account vinden met deze details.',
     form_param_format_invalid: 'Het formaat van het ingevoerde gegeven is ongeldig.',
     form_param_format_invalid__email_address: 'E-mailadres moet een geldig e-mailadres zijn.',
     form_param_format_invalid__phone_number: 'Telefoonnummer moet een geldig internationaal nummer zijn.',
@@ -593,7 +732,8 @@ export const nlBE: LocalizationResource = {
     form_username_invalid_character: 'De gebruikersnaam bevat ongeldige tekens.',
     form_username_invalid_length: 'De gebruikersnaam is te kort of te lang.',
     identification_deletion_failed: 'Je kunt je laatste identificatie niet verwijderen.',
-    not_allowed_access: 'Toegang niet toegestaan.',
+    not_allowed_access:
+      "Je e-mailadres of telefoonnummer is niet toegestaan voor registratie. Dit kan zijn omdat je '+', '=', '#' of '.' in je e-mailadres gebruikt, een domein dat is gekoppeld aan een tijdelijke e-mailservice gebruikt, of een expliciete uitsluiting heeft.",
     organization_domain_blocked: 'Het domein van de organisatie is geblokkeerd.',
     organization_domain_common: 'Het domein van de organisatie is te algemeen.',
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -614,6 +754,7 @@ export const nlBE: LocalizationResource = {
       sentencePrefix: 'Wachtwoord moet minstens 1 speciaal teken bevatten.',
     },
     phone_number_exists: 'Dit telefoonnummer is al in gebruik. Probeer een ander nummer.',
+    session_exists: 'Je bent al ingelogd.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Je wachtwoord werkt, maar kan sterker zijn. Probeer meer tekens toe te voegen.',
@@ -662,14 +803,6 @@ export const nlBE: LocalizationResource = {
     action__signOutAll: 'Uitloggen uit alle accounts',
   },
   userProfile: {
-    __experimental_billingPage: {
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
-        headerTitle__plans: undefined,
-      },
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Gekopieerd!',
       actionLabel__copy: 'Kopieer',
@@ -685,6 +818,42 @@ export const nlBE: LocalizationResource = {
         'Je kunt één van deze gebruiken om in te loggen op je account als je geen toegang meer hebt tot je authenticatieapparaat.',
       title: 'Voeg backup code verificatie toe',
       title__codelist: 'Backup codes',
+    },
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Kies een provider om je account te verbinden.',
@@ -828,6 +997,9 @@ export const nlBE: LocalizationResource = {
       title: 'Telefoonnummer toevoegen',
       verifySubtitle: 'Voer de verificatiecode in die verstuurd is naar {{phoneNumber}}',
       verifyTitle: 'Verifieer telefoonnummer',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: 'Upload een JPG, PNG, GIF, of WEBP afbeelding kleiner dan 10 MB',
