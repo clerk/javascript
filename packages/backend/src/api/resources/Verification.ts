@@ -1,3 +1,5 @@
+import type { VerificationStatus, VerificationStrategy } from '@clerk/types';
+
 import type { OrganizationDomainVerificationJSON, VerificationJSON } from './JSON';
 
 /**
@@ -16,11 +18,11 @@ export class Verification {
      *  <li>`expired`: The verification has expired.</li>
      * </ul>
      */
-    readonly status: string,
+    readonly status: VerificationStatus,
     /**
      * The strategy pertaining to the parent sign-up or sign-in attempt.
      */
-    readonly strategy: string,
+    readonly strategy: VerificationStrategy,
     /**
      * The redirect URL for an external verification.
      */
