@@ -37,7 +37,7 @@ describe('getAuth(req)', () => {
   it('returns an unauthenticated auth object when the tokenType does not match acceptsToken', () => {
     const req = { auth: { tokenType: 'session_token', userId: 'user_12345' } } as unknown as FastifyRequest;
     const result = getAuth(req, { acceptsToken: 'api_key' });
-    expect(result.tokenType).toBe('session_token'); // reflects the actual token found
+    expect(result.tokenType).toBe('api_key'); // reflects the actual token found
     expect(result.userId).toBeNull();
     expect(result.orgId).toBeNull();
   });

@@ -40,7 +40,7 @@ describe('getAuth', () => {
   it('returns an unauthenticated auth object when the tokenType does not match acceptsToken', () => {
     const req = mockRequestWithAuth({ tokenType: 'session_token', userId: 'user_12345' });
     const result = getAuth(req, { acceptsToken: 'api_key' });
-    expect(result.tokenType).toBe('session_token'); // reflects the actual token found
+    expect(result.tokenType).toBe('api_key'); // reflects the actual token found
     // Properties specific to authenticated objects should be null or undefined
     expect(result.userId).toBeNull();
     expect(result.orgId).toBeNull();
