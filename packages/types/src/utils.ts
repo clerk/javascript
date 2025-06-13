@@ -30,11 +30,7 @@ export type CamelToSnake<T> = T extends `${infer C0}${infer R}`
  * @internal
  */
 export type DeepPartial<T> = {
-  [P in keyof T]?: T[P] extends { __params: any }
-    ? T[P] | undefined
-    : T[P] extends object
-      ? DeepPartial<T[P]>
-      : T[P] | undefined;
+  [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
 };
 
 export type DeepRequired<T> = Required<{

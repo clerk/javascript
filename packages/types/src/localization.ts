@@ -1,17 +1,57 @@
 import type { FieldId } from './elementIds';
-import type { CamelToSnake } from './utils';
+import type { CamelToSnake, DeepPartial } from './utils';
 
-export type ICUParams<T extends string> = {
+/**
+ * @internal
+ * @example
+ * type PageTitle = LocalizationValue<'name', 'greeting'>;
+ *     // ?^
+ *      {
+ *        name: string | number | boolean | Date;
+ *        greeting: string | number | boolean | Date;
+ *      }
+ */
+type UnionToRecordWithPrimitives<T extends string> = {
   [K in T]: string | number | boolean | Date;
 };
 
 // Doing `[T] extends [never]` forces TypeScript to evaluate the conditional type in a distributive way. This is a common TypeScript pattern to handle conditional types with never.
 export type LocalizationValue<T extends string = never> = [T] extends [never]
   ? string
-  : string & { __params: ICUParams<T> };
+  : string & { __params: UnionToRecordWithPrimitives<T> };
 
-// Utility type to extract parameter types from LocalizationValue
-export type ExtractParams<T> = T extends LocalizationValue<infer P> ? ICUParams<P> : never;
+/**
+ * Recursively transforms a type by replacing all LocalizationValue types with their string representation.
+ * This is useful for creating type-safe localization objects where you want to ensure all values are strings.
+ *
+ * @example
+ * ```typescript
+ * type MyLocalization = {
+ *   a: LocalizationValue;                    // becomes string
+ *   b: LocalizationValue<'one'>;             // becomes string
+ *   c: {
+ *     lala: LocalizationValue<'nice' | 'bla'>; // becomes string
+ *   };
+ * };
+ *
+ * type StringifiedLocalization = DeepLocalizationWithoutObjects<MyLocalization>;
+ * // Result:
+ * // {
+ * //   a: string;
+ * //   b: string;
+ * //   c: {
+ * //     lala: string;
+ * //   };
+ * // }
+ * ```
+ */
+type DeepLocalizationWithoutObjects<T> = {
+  [K in keyof T]: T[K] extends LocalizationValue<any>
+    ? string
+    : T[K] extends object
+      ? DeepLocalizationWithoutObjects<T[K]>
+      : string;
+};
 
 /**
  * A type containing all the possible localization keys the prebuilt Clerk components support.
@@ -21,20 +61,9 @@ export type ExtractParams<T> = T extends LocalizationValue<infer P> ? ICUParams<
  * the default english resource object from {@link https://github.com/clerk/javascript Clerk's open source repo}
  * as a starting point.
  */
-export type LocalizationResource = DeepLocalizationWithoutObjects<_LocalizationResource>;
+export type LocalizationResource = DeepPartial<DeepLocalizationWithoutObjects<__internal_LocalizationResource>>;
 
-export type __internal_LocalizationResource = _LocalizationResource;
-
-// Recursive utility for translation files
-export type DeepLocalizationWithoutObjects<T> = {
-  [K in keyof T]?: T[K] extends LocalizationValue<any>
-    ? string
-    : T[K] extends object
-      ? DeepLocalizationWithoutObjects<T[K]>
-      : string | undefined;
-};
-
-type _LocalizationResource = {
+export type __internal_LocalizationResource = {
   locale: string;
   maintenanceMode: LocalizationValue;
   /**

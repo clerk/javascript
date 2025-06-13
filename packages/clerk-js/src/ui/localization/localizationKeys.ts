@@ -67,9 +67,11 @@ export type LocalizationKey = {
   params: Record<string, any> | undefined;
 };
 
+type ExtractArgsFromValue<Value> = Value extends { __params: any } ? [params: Value['__params']] : [];
+
 export const localizationKeys = <Key extends DefaultLocalizationKey, Value extends LocalizationKeyToValue<Key>>(
   key: Key,
-  ...args: Value extends { __params: any } ? [params: Value['__params']] : []
+  ...args: ExtractArgsFromValue<Value>
 ): LocalizationKey => {
   return { key, params: args[0] } as LocalizationKey;
 };
