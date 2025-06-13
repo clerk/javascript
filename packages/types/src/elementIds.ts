@@ -22,9 +22,9 @@ export type FieldId =
   | 'affiliationEmailAddress'
   | 'deleteExistingInvitationsSuggestions'
   | 'legalAccepted'
-  | 'description'
-  | 'expirationDate'
-  | 'revokeConfirmation';
+  | 'apiKeyDescription'
+  | 'apiKeyExpirationDate'
+  | 'apiKeyRevokeConfirmation';
 export type ProfileSectionId =
   | 'profile'
   | 'username'

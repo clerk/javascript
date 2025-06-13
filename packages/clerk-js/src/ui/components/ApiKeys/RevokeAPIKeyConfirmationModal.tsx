@@ -41,14 +41,14 @@ export const RevokeAPIKeyConfirmationModal = ({
     onClose();
   };
 
-  const revokeField = useFormControl('revokeConfirmation', '', {
+  const revokeField = useFormControl('apiKeyRevokeConfirmation', '', {
     type: 'text',
     label: `Type "Revoke" to confirm`,
     placeholder: 'Revoke',
     isRequired: true,
   });
 
-  // TODO: Maybe use secret key name for confirmation
+  // TODO: Make this locale-aware
   const canSubmit = revokeField.value === 'Revoke';
 
   if (!isOpen) {
