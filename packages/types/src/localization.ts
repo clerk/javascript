@@ -1075,14 +1075,12 @@ type _LocalizationResource = {
       formButtonPrimary__revoke: LocalizationValue;
     };
     dates: {
-      lastUsed: {
-        seconds: LocalizationValue;
-        minutes: LocalizationValue;
-        hours: LocalizationValue;
-        days: LocalizationValue;
-        months: LocalizationValue;
-        years: LocalizationValue;
-      };
+      lastUsed__seconds: LocalizationValue;
+      lastUsed__minutes: LocalizationValue;
+      lastUsed__hours: LocalizationValue;
+      lastUsed__days: LocalizationValue;
+      lastUsed__months: LocalizationValue;
+      lastUsed__years: LocalizationValue;
     };
   };
 };
