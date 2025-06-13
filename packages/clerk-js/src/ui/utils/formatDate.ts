@@ -5,11 +5,9 @@ export function formatDate(
 ): string {
   const options: Intl.DateTimeFormatOptions = {
     month: format === 'short' ? 'short' : 'long',
-    day: format === 'monthyear' ? undefined : 'numeric',
+    ...(format !== 'monthyear' && { day: 'numeric' }),
+    ...(format !== 'short' && { year: 'numeric' }),
   };
-  if (format === 'long' || format === 'monthyear') {
-    options.year = 'numeric';
-  }
 
   return new Intl.DateTimeFormat(locale, options).format(date);
 }
