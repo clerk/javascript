@@ -1,14 +1,19 @@
 import { isValidBrowserOnline } from '@clerk/shared/browser';
 import { isProductionFromPublishableKey } from '@clerk/shared/keys';
 import type { ClerkAPIErrorJSON, ClerkResourceJSON, ClerkResourceReloadParams, DeletedObjectJSON } from '@clerk/types';
+import type { StoreApi } from 'zustand';
 
 import { clerkMissingFapiClientInResources } from '../errors';
 import type { FapiClient, FapiRequestInit, FapiResponse, FapiResponseJSON, HTTPMethod } from '../fapiClient';
 import { FraudProtection } from '../fraudProtection';
 import type { Clerk } from './internal';
 import { ClerkAPIResponseError, ClerkRuntimeError, Client } from './internal';
+import { createResourceStore, type ResourceStore } from './state';
 
 export type BaseFetchOptions = ClerkResourceReloadParams & {
+  action?: string;
+  search?: URLSearchParams;
+  headers?: HeadersInit;
   forceUpdateClient?: boolean;
   fetchMaxTries?: number;
 };
@@ -48,6 +53,48 @@ export abstract class BaseResource {
   static clerk: Clerk;
   id?: string;
   pathRoot = '';
+
+  protected _store: StoreApi<ResourceStore<this>>;
+
+  constructor() {
+    this._store = createResourceStore<this>();
+  }
+
+  public get store() {
+    return this._store;
+  }
+
+  public get isLoading(): boolean {
+    return this._store.getState().isLoading();
+  }
+
+  public get hasError(): boolean {
+    return this._store.getState().hasError();
+  }
+
+  public get error(): ClerkAPIErrorJSON | null {
+    return this._store.getState().getError();
+  }
+
+  public get data(): this | null {
+    return this._store.getState().getData();
+  }
+
+  public get fetchStatus(): 'idle' | 'fetching' | 'fetched' | 'error' {
+    const stateType = this._store.getState().state.type;
+    switch (stateType) {
+      case 'idle':
+        return 'idle';
+      case 'loading':
+        return 'fetching';
+      case 'success':
+        return 'fetched';
+      case 'error':
+        return 'error';
+      default:
+        return 'idle';
+    }
+  }
 
   static get fapiClient(): FapiClient {
     return BaseResource.clerk.getFapiClient();
@@ -187,22 +234,45 @@ export abstract class BaseResource {
   }
 
   protected async _baseGet<J extends ClerkResourceJSON | null>(opts: BaseFetchOptions = {}): Promise<this> {
-    const json = await BaseResource._fetch<J>(
-      {
-        method: 'GET',
-        path: this.path(),
-        rotatingTokenNonce: opts.rotatingTokenNonce,
-      },
-      opts,
-    );
+    this._store.getState().dispatch({ type: 'FETCH_START' });
 
-    return this.fromJSON((json?.response || json) as J);
+    try {
+      const { forceUpdateClient, fetchMaxTries, ...fetchOpts } = opts;
+      const json = await BaseResource._fetch<J>({
+        method: 'GET',
+        path: this.path(opts.action),
+        ...fetchOpts,
+      });
+
+      const data = this.fromJSON((json?.response || json) as J);
+      this._store.getState().dispatch({ type: 'FETCH_SUCCESS', data });
+      return data;
+    } catch (error) {
+      this._store.getState().dispatch({
+        type: 'FETCH_ERROR',
+        error: error as ClerkAPIErrorJSON,
+      });
+      throw error;
+    }
   }
 
   protected async _baseMutate<J extends ClerkResourceJSON | null>(params: BaseMutateParams): Promise<this> {
-    const { action, body, method, path } = params;
-    const json = await BaseResource._fetch<J>({ method, path: path || this.path(action), body });
-    return this.fromJSON((json?.response || json) as J);
+    this._store.getState().dispatch({ type: 'FETCH_START' });
+
+    try {
+      const { action, body, method, path } = params;
+      const json = await BaseResource._fetch<J>({ method, path: path || this.path(action), body });
+
+      const data = this.fromJSON((json?.response || json) as J);
+      this._store.getState().dispatch({ type: 'FETCH_SUCCESS', data });
+      return data;
+    } catch (error) {
+      this._store.getState().dispatch({
+        type: 'FETCH_ERROR',
+        error: error as ClerkAPIErrorJSON,
+      });
+      throw error;
+    }
   }
 
   protected async _baseMutateBypass<J extends ClerkResourceJSON | null>(params: BaseMutateParams): Promise<this> {
@@ -234,5 +304,9 @@ export abstract class BaseResource {
   private static shouldRethrowOfflineNetworkErrors(): boolean {
     const experimental = BaseResource.clerk?.__internal_getOption?.('experimental');
     return experimental?.rethrowOfflineNetworkErrors || false;
+  }
+
+  public reset(): void {
+    this._store.getState().dispatch({ type: 'RESET' });
   }
 }
