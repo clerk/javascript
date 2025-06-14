@@ -14,7 +14,7 @@ import { AuthErrorReason, handshake, signedIn, signedOut } from './authStatus';
 import { createClerkRequest } from './clerkRequest';
 import { getCookieName, getCookieValue } from './cookie';
 import { HandshakeService } from './handshake';
-import { getMachineTokenType, isMachineToken, isTokenTypeAccepted } from './machine';
+import { getMachineTokenType, isMachineTokenByPrefix, isTokenTypeAccepted } from './machine';
 import { OrganizationMatcher } from './organizationMatcher';
 import type { MachineTokenType, SessionTokenType } from './tokenTypes';
 import { TokenType } from './tokenTypes';
@@ -653,7 +653,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
     }
 
     // Handle case where tokenType is any and the token is not a machine token
-    if (!isMachineToken(tokenInHeader)) {
+    if (!isMachineTokenByPrefix(tokenInHeader)) {
       return signedOut({
         tokenType: acceptsToken as MachineTokenType,
         authenticateContext,
@@ -688,7 +688,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
     }
 
     // Handle as a machine token
-    if (isMachineToken(tokenInHeader)) {
+    if (isMachineTokenByPrefix(tokenInHeader)) {
       const parsedTokenType = getMachineTokenType(tokenInHeader);
       const mismatchState = checkTokenTypeMismatch(parsedTokenType, acceptsToken, authenticateContext);
       if (mismatchState) {

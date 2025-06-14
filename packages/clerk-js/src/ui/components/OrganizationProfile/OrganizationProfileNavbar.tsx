@@ -45,7 +45,7 @@ export const OrganizationProfileNavbar = (
   }
 
   return (
-    <NavbarContextProvider>
+    <NavbarContextProvider contentRef={props.contentRef}>
       <NavBar
         title={localizationKeys('organizationProfile.navbar.title')}
         description={localizationKeys('organizationProfile.navbar.description')}

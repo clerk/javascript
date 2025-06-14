@@ -3,6 +3,7 @@ import React, { createContext, useContext, useState } from 'react';
 
 import type { LocalizationKey } from '../customizables';
 import { descriptors, Flex, SimpleButton } from '../customizables';
+import type { ThemableCssProp } from '../styledSystem';
 
 /* -------------------------------------------------------------------------------------------------
  * SegmentedControl Context
@@ -40,6 +41,7 @@ interface RootProps {
   onChange?: (value: string) => void;
   size?: SegmentedControlSize;
   fullWidth?: boolean;
+  sx?: ThemableCssProp;
 }
 
 const Root = React.forwardRef<HTMLDivElement, RootProps>(
@@ -53,6 +55,7 @@ const Root = React.forwardRef<HTMLDivElement, RootProps>(
       'aria-labelledby': ariaLabelledby,
       size = 'md',
       fullWidth = false,
+      sx,
     },
     ref,
   ) => {
@@ -79,14 +82,17 @@ const Root = React.forwardRef<HTMLDivElement, RootProps>(
               elementDescriptor={descriptors.segmentedControlRoot}
               aria-label={ariaLabel}
               aria-labelledby={ariaLabelledby}
-              sx={t => ({
-                backgroundColor: t.colors.$neutralAlpha50,
-                borderRadius: t.radii.$md,
-                borderWidth: t.borderWidths.$normal,
-                borderStyle: t.borderStyles.$solid,
-                borderColor: t.colors.$neutralAlpha100,
-                isolation: 'isolate',
-              })}
+              sx={[
+                t => ({
+                  backgroundColor: t.colors.$neutralAlpha50,
+                  borderRadius: t.radii.$md,
+                  borderWidth: t.borderWidths.$normal,
+                  borderStyle: t.borderStyles.$solid,
+                  borderColor: t.colors.$neutralAlpha100,
+                  isolation: 'isolate',
+                }),
+                sx,
+              ]}
             />
           }
         >

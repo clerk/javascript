@@ -54,6 +54,10 @@ type _LocalizationResource = {
   formFieldLabel__confirmDeletion: LocalizationValue;
   formFieldLabel__role: LocalizationValue;
   formFieldLabel__passkeyName: LocalizationValue;
+  formFieldLabel__apiKeyName: LocalizationValue;
+  formFieldLabel__apiKeyDescription: LocalizationValue;
+  formFieldLabel__apiKeyExpiration: LocalizationValue;
+  formFieldLabel__apiKeyExpirationDate: LocalizationValue;
   formFieldInputPlaceholder__emailAddress: LocalizationValue;
   formFieldInputPlaceholder__emailAddresses: LocalizationValue;
   formFieldInputPlaceholder__phoneNumber: LocalizationValue;
@@ -68,6 +72,9 @@ type _LocalizationResource = {
   formFieldInputPlaceholder__organizationDomain: LocalizationValue;
   formFieldInputPlaceholder__organizationDomainEmailAddress: LocalizationValue;
   formFieldInputPlaceholder__confirmDeletionUserAccount: LocalizationValue;
+  formFieldInputPlaceholder__apiKeyName: LocalizationValue;
+  formFieldInputPlaceholder__apiKeyDescription: LocalizationValue;
+  formFieldInputPlaceholder__apiKeyExpirationDate: LocalizationValue;
   formFieldError__notMatchingPasswords: LocalizationValue;
   formFieldError__matchingPasswords: LocalizationValue;
   formFieldError__verificationLinkExpired: LocalizationValue;
@@ -499,6 +506,7 @@ type _LocalizationResource = {
       account: LocalizationValue;
       security: LocalizationValue;
       billing: LocalizationValue;
+      apiKeys: LocalizationValue;
     };
     start: {
       headerTitle__account: LocalizationValue;
@@ -638,6 +646,10 @@ type _LocalizationResource = {
         messageLine2: LocalizationValue;
         successMessage: LocalizationValue;
       };
+    };
+    apiKeysPage: {
+      title: LocalizationValue;
+      detailsTitle__emptyRow: LocalizationValue;
     };
     passkeyScreen: {
       title__rename: LocalizationValue;
@@ -846,6 +858,7 @@ type _LocalizationResource = {
       general: LocalizationValue;
       members: LocalizationValue;
       billing: LocalizationValue;
+      apiKeys: LocalizationValue;
     };
     badge__unverified: LocalizationValue;
     badge__automaticInvitation: LocalizationValue;
@@ -1045,6 +1058,10 @@ type _LocalizationResource = {
         noPermissionsToManageBilling: LocalizationValue;
       };
     };
+    apiKeysPage: {
+      title: LocalizationValue;
+      detailsTitle__emptyRow: LocalizationValue;
+    };
   };
   createOrganization: {
     title: LocalizationValue;
@@ -1085,6 +1102,28 @@ type _LocalizationResource = {
       title: LocalizationValue;
       subtitle: LocalizationValue;
       message: LocalizationValue;
+    };
+  };
+  apiKeys: {
+    formTitle: LocalizationValue;
+    formHint: LocalizationValue;
+    formButtonPrimary__add: LocalizationValue;
+    menuAction__revoke: LocalizationValue;
+    action__search: LocalizationValue;
+    action__add: LocalizationValue;
+    detailsTitle__emptyRow: LocalizationValue;
+    revokeConfirmation: {
+      formTitle: LocalizationValue;
+      formHint: LocalizationValue;
+      formButtonPrimary__revoke: LocalizationValue;
+    };
+    dates: {
+      lastUsed__seconds: LocalizationValue;
+      lastUsed__minutes: LocalizationValue;
+      lastUsed__hours: LocalizationValue;
+      lastUsed__days: LocalizationValue;
+      lastUsed__months: LocalizationValue;
+      lastUsed__years: LocalizationValue;
     };
   };
 };

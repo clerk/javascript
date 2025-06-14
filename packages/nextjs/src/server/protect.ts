@@ -145,6 +145,10 @@ export function createProtect(opts: {
       return handleUnauthorized();
     }
 
+    if (authObject.tokenType === null) {
+      return handleUnauthorized();
+    }
+
     if (authObject.tokenType !== TokenType.SessionToken) {
       // For machine tokens, we only check if they're authenticated
       // They don't have session status or organization permissions
