@@ -22,7 +22,6 @@ import {
 import { usePrefersReducedMotion } from '../../hooks';
 import { Check, InformationCircle } from '../../icons';
 import { common, InternalThemeProvider, mqu, type ThemableCssProp } from '../../styledSystem';
-import { colors } from '../../utils';
 
 interface PricingTableMatrixProps {
   plans: CommercePlanResource[] | undefined;
@@ -55,7 +54,7 @@ export function PricingTableMatrix({
   });
 
   const highlightBackgroundColor: ThemableCssProp = t => ({
-    background: common.mergedColorsBackground(colors.setAlpha(t.colors.$colorBackground, 1), t.colors.$neutralAlpha25),
+    background: common.mergedColorsBackground(t.colors.$colorBackground, t.colors.$neutralAlpha25),
   });
 
   const gridTemplateColumns = React.useMemo(() => `repeat(${plans.length + 1}, minmax(9.375rem,1fr))`, [plans.length]);
