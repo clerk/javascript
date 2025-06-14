@@ -576,10 +576,15 @@ describe('HandshakeService', () => {
       ];
 
       proxyConfigs.forEach(proxyUrl => {
-        mockAuthenticateContext.proxyUrl = proxyUrl;
-        mockAuthenticateContext.frontendApi = proxyUrl; // Simulate parsePublishableKey behavior
+        const isolatedContext = {
+          ...mockAuthenticateContext,
+          proxyUrl: proxyUrl,
+          frontendApi: proxyUrl,
+        } as AuthenticateContext;
 
-        const headers = handshakeService.buildRedirectToHandshake('test-reason');
+        const isolatedHandshakeService = new HandshakeService(isolatedContext, mockOptions, mockOrganizationMatcher);
+
+        const headers = isolatedHandshakeService.buildRedirectToHandshake('test-reason');
         const location = headers.get(constants.Headers.Location);
 
         expect(location).toBeDefined();
