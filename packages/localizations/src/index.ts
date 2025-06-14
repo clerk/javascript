@@ -11,6 +11,7 @@ export { enGB } from './en-GB';
 export { esES } from './es-ES';
 export { esMX } from './es-MX';
 export { esUY } from './es-UY';
+import { faIR } from './fa-IR';
 export { fiFI } from './fi-FI';
 export { frFR } from './fr-FR';
 export { hrHR } from './hr-HR';
