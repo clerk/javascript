@@ -434,13 +434,13 @@ export const getAuthObjectFromJwt = (
  *
  * This ensures the returned object always matches the developer's intent.
  */
-export function getAuthObjectForAcceptedToken({
+export const getAuthObjectForAcceptedToken = ({
   authObject,
   acceptsToken = TokenType.SessionToken,
 }: {
   authObject: AuthObject;
   acceptsToken: AuthenticateRequestOptions['acceptsToken'];
-}): AuthObject {
+}): AuthObject => {
   // 1. any token: return as-is
   if (acceptsToken === 'any') {
     return authObject;
@@ -464,4 +464,4 @@ export function getAuthObjectForAcceptedToken({
 
   // 4. default: return as-is
   return authObject;
-}
+};

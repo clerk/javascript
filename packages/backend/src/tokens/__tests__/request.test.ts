@@ -1240,6 +1240,7 @@ describe('tokens.authenticateRequest(options)', () => {
         });
         expect(requestState.toAuth()).toBeMachineUnauthenticatedToAuth({
           tokenType,
+          isAuthenticated: false,
         });
       });
     });
@@ -1289,6 +1290,7 @@ describe('tokens.authenticateRequest(options)', () => {
         });
         expect(result.toAuth()).toBeMachineUnauthenticatedToAuth({
           tokenType: 'api_key',
+          isAuthenticated: false,
         });
       });
 
@@ -1303,6 +1305,7 @@ describe('tokens.authenticateRequest(options)', () => {
         });
         expect(result.toAuth()).toBeMachineUnauthenticatedToAuth({
           tokenType: 'oauth_token',
+          isAuthenticated: false,
         });
       });
 
@@ -1317,6 +1320,7 @@ describe('tokens.authenticateRequest(options)', () => {
         });
         expect(result.toAuth()).toBeMachineUnauthenticatedToAuth({
           tokenType: 'machine_token',
+          isAuthenticated: false,
         });
       });
 
@@ -1331,6 +1335,7 @@ describe('tokens.authenticateRequest(options)', () => {
         });
         expect(result.toAuth()).toBeMachineUnauthenticatedToAuth({
           tokenType: 'machine_token',
+          isAuthenticated: false,
         });
       });
     });
@@ -1360,12 +1365,13 @@ describe('tokens.authenticateRequest(options)', () => {
         );
 
         expect(requestState).toBeMachineUnauthenticated({
-          tokenType: 'machine_token',
+          tokenType: null,
           reason: AuthErrorReason.TokenTypeMismatch,
           message: '',
         });
         expect(requestState.toAuth()).toBeMachineUnauthenticatedToAuth({
-          tokenType: 'machine_token',
+          tokenType: null,
+          isAuthenticated: false,
         });
       });
     });
