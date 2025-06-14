@@ -31,6 +31,19 @@ const mockRequest = (params: MockRequestParams) => {
 
 describe('getAuthDataFromRequestAsync', () => {
   it('returns unauthenticated machine object when token type does not match', async () => {
+    vi.mocked(verifyMachineAuthToken).mockResolvedValueOnce({
+      data: undefined,
+      tokenType: 'machine_token',
+      errors: [
+        {
+          message: 'Token type mismatch',
+          code: 'token-invalid',
+          status: 401,
+          name: 'MachineTokenVerificationError',
+          getFullMessage: () => 'Token type mismatch',
+        },
+      ],
+    });
     const req = mockRequest({
       url: '/api/protected',
       headers: new Headers({
@@ -44,9 +57,23 @@ describe('getAuthDataFromRequestAsync', () => {
 
     expect(auth.tokenType).toBe('machine_token');
     expect((auth as AuthenticatedMachineObject<'machine_token'>).machineId).toBeNull();
+    expect(auth.isAuthenticated).toBe(false);
   });
 
   it('returns invalid token auth object when token type does not match any in acceptsToken array', async () => {
+    vi.mocked(verifyMachineAuthToken).mockResolvedValueOnce({
+      data: undefined,
+      tokenType: 'machine_token',
+      errors: [
+        {
+          message: 'Token type mismatch',
+          code: 'token-invalid',
+          status: 401,
+          name: 'MachineTokenVerificationError',
+          getFullMessage: () => 'Token type mismatch',
+        },
+      ],
+    });
     const req = mockRequest({
       url: '/api/protected',
       headers: new Headers({
@@ -82,6 +109,7 @@ describe('getAuthDataFromRequestAsync', () => {
 
     expect(auth.tokenType).toBe('api_key');
     expect((auth as AuthenticatedMachineObject<'api_key'>).id).toBe('ak_123');
+    expect(auth.isAuthenticated).toBe(true);
   });
 
   it('returns authenticated machine object when token type matches', async () => {
@@ -104,6 +132,7 @@ describe('getAuthDataFromRequestAsync', () => {
 
     expect(auth.tokenType).toBe('api_key');
     expect((auth as AuthenticatedMachineObject<'api_key'>).id).toBe('ak_123');
+    expect(auth.isAuthenticated).toBe(true);
   });
 
   it('falls back to session token handling', async () => {
@@ -117,6 +146,7 @@ describe('getAuthDataFromRequestAsync', () => {
     const auth = await getAuthDataFromRequestAsync(req);
     expect(auth.tokenType).toBe('session_token');
     expect((auth as SignedOutAuthObject).userId).toBeNull();
+    expect(auth.isAuthenticated).toBe(false);
   });
 });
 
@@ -135,5 +165,6 @@ describe('getAuthDataFromRequestSync', () => {
 
     expect(auth.tokenType).toBe('session_token');
     expect(auth.userId).toBeNull();
+    expect(auth.isAuthenticated).toBe(false);
   });
 });
