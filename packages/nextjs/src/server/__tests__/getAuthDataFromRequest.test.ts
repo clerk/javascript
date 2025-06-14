@@ -29,6 +29,16 @@ const mockRequest = (params: MockRequestParams) => {
   return new NextRequest(new URL(url, 'https://www.clerk.com').toString(), { method, headers: headersWithCookie });
 };
 
+const machineTokenErrorMock = [
+  {
+    message: 'Token type mismatch',
+    code: 'token-invalid',
+    status: 401,
+    name: 'MachineTokenVerificationError',
+    getFullMessage: () => 'Token type mismatch',
+  },
+];
+
 describe('getAuthDataFromRequestAsync', () => {
   it('returns unauthenticated machine object when token type does not match', async () => {
     vi.mocked(verifyMachineAuthToken).mockResolvedValueOnce({
@@ -89,7 +99,7 @@ describe('getAuthDataFromRequestAsync', () => {
     expect(auth.isAuthenticated).toBe(false);
   });
 
-  it('returns authenticated api_key object when array contains only api_key and token is ak_xxx and verification passes', async () => {
+  it('returns authenticated object when token type exists in acceptsToken array', async () => {
     vi.mocked(verifyMachineAuthToken).mockResolvedValueOnce({
       data: { id: 'ak_123', subject: 'user_12345' } as any,
       tokenType: 'api_key',
@@ -99,12 +109,12 @@ describe('getAuthDataFromRequestAsync', () => {
     const req = mockRequest({
       url: '/api/protected',
       headers: new Headers({
-        [constants.Headers.Authorization]: 'Bearer ak_xxx',
+        [constants.Headers.Authorization]: 'Bearer ak_123',
       }),
     });
 
     const auth = await getAuthDataFromRequestAsync(req, {
-      acceptsToken: ['api_key'],
+      acceptsToken: ['api_key', 'machine_token'],
     });
 
     expect(auth.tokenType).toBe('api_key');
@@ -112,27 +122,106 @@ describe('getAuthDataFromRequestAsync', () => {
     expect(auth.isAuthenticated).toBe(true);
   });
 
-  it('returns authenticated machine object when token type matches', async () => {
+  it('returns authenticated api_key object when token is valid and acceptsToken is api_key', async () => {
     vi.mocked(verifyMachineAuthToken).mockResolvedValueOnce({
       data: { id: 'ak_123', subject: 'user_12345' } as any,
       tokenType: 'api_key',
       errors: undefined,
     });
-
     const req = mockRequest({
       url: '/api/protected',
       headers: new Headers({
-        [constants.Headers.Authorization]: 'Bearer ak_xxx',
+        [constants.Headers.Authorization]: `Bearer ak_123`,
       }),
     });
-
-    const auth = await getAuthDataFromRequestAsync(req, {
-      acceptsToken: 'api_key',
-    });
-
+    const auth = await getAuthDataFromRequestAsync(req, { acceptsToken: 'api_key' });
     expect(auth.tokenType).toBe('api_key');
-    expect((auth as AuthenticatedMachineObject<'api_key'>).id).toBe('ak_123');
     expect(auth.isAuthenticated).toBe(true);
+  });
+
+  it('returns authenticated oauth_token object when token is valid and acceptsToken is oauth_token', async () => {
+    vi.mocked(verifyMachineAuthToken).mockResolvedValueOnce({
+      data: { id: 'oat_123', subject: 'user_12345' } as any,
+      tokenType: 'oauth_token',
+      errors: undefined,
+    });
+    const req = mockRequest({
+      url: '/api/protected',
+      headers: new Headers({
+        [constants.Headers.Authorization]: `Bearer oat_123`,
+      }),
+    });
+    const auth = await getAuthDataFromRequestAsync(req, { acceptsToken: 'oauth_token' });
+    expect(auth.tokenType).toBe('oauth_token');
+    expect(auth.isAuthenticated).toBe(true);
+  });
+
+  it('returns authenticated machine_token object when token is valid and acceptsToken is machine_token', async () => {
+    vi.mocked(verifyMachineAuthToken).mockResolvedValueOnce({
+      data: { id: 'm2m_123', subject: 'mch_123' } as any,
+      tokenType: 'machine_token',
+      errors: undefined,
+    });
+    const req = mockRequest({
+      url: '/api/protected',
+      headers: new Headers({
+        [constants.Headers.Authorization]: `Bearer mt_123`,
+      }),
+    });
+    const auth = await getAuthDataFromRequestAsync(req, { acceptsToken: 'machine_token' });
+    expect(auth.tokenType).toBe('machine_token');
+    expect(auth.isAuthenticated).toBe(true);
+  });
+
+  it('returns unauthenticated api_key object when token is invalid', async () => {
+    vi.mocked(verifyMachineAuthToken).mockResolvedValueOnce({
+      data: undefined,
+      tokenType: 'api_key',
+      errors: machineTokenErrorMock as any,
+    });
+    const req = mockRequest({
+      url: '/api/protected',
+      headers: new Headers({
+        [constants.Headers.Authorization]: `Bearer ak_123`,
+      }),
+    });
+    const auth = await getAuthDataFromRequestAsync(req, { acceptsToken: 'api_key' });
+    expect(auth.tokenType).toBe('api_key');
+    expect(auth.isAuthenticated).toBe(false);
+  });
+
+  it('returns unauthenticated oauth_token object when token is invalid', async () => {
+    vi.mocked(verifyMachineAuthToken).mockResolvedValueOnce({
+      data: undefined,
+      tokenType: 'oauth_token',
+      errors: machineTokenErrorMock as any,
+    });
+    const req = mockRequest({
+      url: '/api/protected',
+      headers: new Headers({
+        [constants.Headers.Authorization]: `Bearer oat_123`,
+      }),
+    });
+    const auth = await getAuthDataFromRequestAsync(req, { acceptsToken: 'oauth_token' });
+    expect(auth.tokenType).toBe('oauth_token');
+    expect(auth.isAuthenticated).toBe(false);
+  });
+
+  it('returns unauthenticated machine_token object when token is invalid', async () => {
+    vi.mocked(verifyMachineAuthToken).mockResolvedValueOnce({
+      data: undefined,
+      tokenType: 'machine_token',
+      errors: machineTokenErrorMock as any,
+    });
+    const req = mockRequest({
+      url: '/api/protected',
+      headers: new Headers({
+        [constants.Headers.Authorization]: `Bearer mt_123`,
+      }),
+    });
+    const auth = await getAuthDataFromRequestAsync(req, { acceptsToken: 'machine_token' });
+    expect(auth.tokenType).toBe('machine_token');
+    expect(auth.isAuthenticated).toBe(false);
   });
 
   it('falls back to session token handling', async () => {
@@ -155,7 +244,7 @@ describe('getAuthDataFromRequestSync', () => {
     const req = mockRequest({
       url: '/api/protected',
       headers: new Headers({
-        [constants.Headers.Authorization]: 'Bearer api_key_xxx',
+        [constants.Headers.Authorization]: 'Bearer ak_123',
       }),
     });
 
