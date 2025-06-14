@@ -59,6 +59,7 @@
     "dev:publish": "pnpm dev -- --env.publish",
     "lint": "eslint src",
     "lint:attw": "attw --pack . --profile node16",
+    "lint:oxlint": "oxlint src",
     "lint:publint": "publint",
     "publish:local": "pnpm yalc push --replace  --sig",
     "test": "jest",

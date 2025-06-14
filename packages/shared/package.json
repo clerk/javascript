@@ -134,6 +134,7 @@
     "postinstall": "node ./scripts/postinstall.mjs",
     "lint": "eslint src",
     "lint:attw": "attw --pack . --profile node16",
+    "lint:oxlint": "oxlint --quiet src",
     "lint:publint": "publint",
     "publish:local": "pnpm yalc push --replace  --sig",
     "test": "jest",

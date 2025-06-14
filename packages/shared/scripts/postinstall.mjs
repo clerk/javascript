@@ -49,7 +49,7 @@ async function notifyAboutTelemetry() {
   let config = {};
   try {
     config = JSON.parse(await fs.readFile(configFile, 'utf8'));
-  } catch (err) {
+  } catch {
     // File can't be read and parsed, continue
   }
 
