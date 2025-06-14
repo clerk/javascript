@@ -403,9 +403,12 @@ describe('HandshakeService', () => {
         const location = headers.get(constants.Headers.Location);
 
         expect(location).toBeDefined();
-        expect(() => new URL(location!)).not.toThrow();
+        if (!location) {
+          throw new Error('Location header should be defined');
+        }
+        expect(() => new URL(location)).not.toThrow();
 
-        const url = new URL(location!);
+        const url = new URL(location);
         // Path should end with '/v1/client/handshake' (may have proxy path prefix)
         expect(url.pathname).toMatch(/\/v1\/client\/handshake$/);
         expect(url.searchParams.get(constants.QueryParameters.HandshakeReason)).toBe('test-reason');
@@ -580,11 +583,14 @@ describe('HandshakeService', () => {
         const location = headers.get(constants.Headers.Location);
 
         expect(location).toBeDefined();
+        if (!location) {
+          throw new Error('Location header should be defined');
+        }
         expect(location).toContain('/v1/client/handshake');
         expect(location).not.toContain('//v1/client/handshake'); // No double slashes
 
         // Ensure URL is valid
-        expect(() => new URL(location!)).not.toThrow();
+        expect(() => new URL(location)).not.toThrow();
       });
     });
   });
