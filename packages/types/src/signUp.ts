@@ -71,7 +71,7 @@ export interface SignUpResource extends ClerkResource {
   abandonAt: number | null;
   legalAcceptedAt: number | null;
 
-  create: (params: SignUpCreateParams) => Promise<SignUpResource>;
+  create: (params: SignUpCreateParams, options?: SignUpCreateOptions) => Promise<SignUpResource>;
 
   update: (params: SignUpUpdateParams) => Promise<SignUpResource>;
 
@@ -198,6 +198,10 @@ export type SignUpCreateParams = Partial<
     channel: PhoneCodeChannel;
   } & Omit<SnakeToCamel<Record<SignUpAttributeField | SignUpVerifiableField, string>>, 'legalAccepted'>
 >;
+
+export type SignUpCreateOptions = Partial<{
+  skipChallenge: boolean;
+}>;
 
 export type SignUpUpdateParams = SignUpCreateParams;
 
