@@ -94,7 +94,7 @@ export const OrganizationListPage = withCardStateProvider(() => {
       {isLoading ? (
         <FlowLoadingState />
       ) : (
-        <OrganizationListFlows showListInitially={!hidePersonal && hasOrganizationResources} />
+        <OrganizationListFlows showListInitially={!hidePersonal || hasOrganizationResources} />
       )}
     </FlowCard>
   );
@@ -219,7 +219,7 @@ const ForceOrganizationSelectionFlow = ({ hasOrganizationResources }: { hasOrgan
   const { isLoading: isLoadingOrganizationResources } = useOrganizationListInView();
 
   const [isNavigatingAfterOrgCreation, setIsNavigatingAfterOrgCreation] = useState(false);
-  const [isCreateOrganizationFlow, setIsCreateOrganizationFlow] = useState(!hasOrganizationResources);
+  const [isCreateOrganizationFlow, setIsCreateOrganizationFlow] = useState(() => !hasOrganizationResources);
 
   const isLoading = isNavigatingAfterOrgCreation || isLoadingOrganizationResources;
   if (isLoading) {
