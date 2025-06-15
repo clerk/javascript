@@ -137,6 +137,8 @@ import { createFapiClient } from './fapiClient';
 import { createClientFromJwt } from './jwt-client';
 import { APIKeys } from './modules/apiKeys';
 import { CommerceBilling } from './modules/commerce';
+import { ClerkObservabilityLoader } from './observability/loader';
+import type { ObservabilityAPI, ObservabilityTriggerConfig } from './observability/types';
 import {
   BaseResource,
   Client,
@@ -148,6 +150,15 @@ import {
 } from './resources/internal';
 import { navigateToTask } from './sessionTasks';
 import { warnings } from './warnings';
+
+type ClerkOptionsWithObservability = ClerkOptions & {
+  observability?: ObservabilityTriggerConfig;
+  /**
+   * Completely disables the observability system, preventing it from loading under any circumstances.
+   * @default false
+   */
+  disableObservability?: boolean;
+};
 
 type SetActiveHook = (intent?: 'sign-out') => void | Promise<void>;
 
@@ -220,11 +231,12 @@ export class Clerk implements ClerkInterface {
   #status: ClerkInterface['status'] = 'loading';
   #listeners: Array<(emission: Resources) => void> = [];
   #navigationListeners: Array<() => void> = [];
-  #options: ClerkOptions = {};
+  #options: ClerkOptionsWithObservability = {};
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
   #componentNavigationContext: __internal_ComponentNavigationContext | null = null;
   #publicEventBus = createClerkEventBus();
+  #observabilityLoader?: ClerkObservabilityLoader;
 
   public __internal_getCachedResources:
     | (() => Promise<{ client: ClientJSONSnapshot | null; environment: EnvironmentJSONSnapshot | null }>)
@@ -337,6 +349,31 @@ export class Clerk implements ClerkInterface {
     return Clerk._apiKeys;
   }
 
+  get observability(): ObservabilityAPI {
+    if (!this.#observabilityLoader) {
+      return {
+        enable: () => console.warn('[Clerk] Observability is disabled'),
+        disable: () => {},
+        isEnabled: () => false,
+        getInstance: () => null,
+      };
+    }
+
+    return {
+      enable: () => this.#observabilityLoader?.enable(),
+      disable: () => this.#observabilityLoader?.disable(),
+      isEnabled: () => this.#observabilityLoader?.isEnabled() || false,
+      getInstance: () => this.#observabilityLoader?.getInstance() || null,
+    };
+  }
+
+  #getObservabilityBundleUrl(): string {
+    const version = this.version || 'latest';
+    const cdnUrl = this.frontendApi ? `https://${this.frontendApi}` : 'https://cdn.clerk.com';
+
+    return `${cdnUrl}/npm/@clerk/observability@${version}/dist/bundle.js`;
+  }
+
   public __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K] {
     return this.#options[key];
   }
@@ -405,6 +442,17 @@ export class Clerk implements ClerkInterface {
 
     this.#options = this.#initOptions(options);
 
+    // Initialize observability loader if not disabled and in browser environment
+    if (!this.#options.disableObservability && inBrowser()) {
+      this.#observabilityLoader = ClerkObservabilityLoader.init(this, {
+        cookieName: this.#options.observability?.cookieName,
+        sessionStorageKey: this.#options.observability?.sessionStorageKey,
+        headerName: this.#options.observability?.headerName,
+        bundleUrl: this.#options.observability?.bundleUrl || this.#getObservabilityBundleUrl(),
+        customTrigger: this.#options.observability?.customTrigger,
+      });
+    }
+
     /**
      * Listen to `Session.getToken` resolving to emit the updated session
      * with the new token to the state listeners.
@@ -447,6 +495,54 @@ export class Clerk implements ClerkInterface {
   }
 
   public signOut: SignOut = async (callbackOrOptions?: SignOutCallback | SignOutOptions, options?: SignOutOptions) => {
+    // Track signOut start
+    this.#observabilityLoader?.getInstance()?.track?.({
+      type: 'auth.signOut.started',
+      data: { sessionId: this.session?.id },
+      timestamp: Date.now(),
+    });
+
+    if (this.user && this.#broadcastChannel) {
+      this.#broadcastChannel.postMessage({ type: 'signout' });
+    }
+
+    let callback: SignOutCallback | undefined;
+    let opts: SignOutOptions | undefined;
+    if (typeof callbackOrOptions === 'function') {
+      callback = callbackOrOptions;
+      opts = options;
+    } else {
+      opts = callbackOrOptions;
+    }
+
+    try {
+      await this.#handleSignOut(opts);
+
+      // Track signOut success
+      this.#observabilityLoader?.getInstance()?.track?.({
+        type: 'auth.signOut.completed',
+        data: { success: true },
+        timestamp: Date.now(),
+      });
+
+      callback?.();
+    } catch (error) {
+      // Track signOut error
+      this.#observabilityLoader?.getInstance()?.track?.({
+        type: 'auth.signOut.error',
+        data: {
+          error: error instanceof Error ? error.message : 'Unknown error',
+          success: false,
+        },
+        severity: 'high',
+        timestamp: Date.now(),
+      });
+
+      throw error;
+    }
+  };
+
+  #handleSignOut = async (opts: SignOutOptions | undefined): Promise<void> => {
     if (!this.client || this.client.sessions.length === 0) {
       return;
     }
@@ -461,38 +557,7 @@ export class Clerk implements ClerkInterface {
         ? window.__unstable__onAfterSetActive
         : noop;
 
-    const opts = callbackOrOptions && typeof callbackOrOptions === 'object' ? callbackOrOptions : options || {};
-
     const redirectUrl = opts?.redirectUrl || this.buildAfterSignOutUrl();
-    const signOutCallback = typeof callbackOrOptions === 'function' ? callbackOrOptions : undefined;
-
-    const executeSignOut = async () => {
-      const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
-
-      // Notify other tabs that user is signing out.
-      eventBus.emit(events.UserSignOut, null);
-      // Clean up cookies
-      eventBus.emit(events.TokenUpdate, { token: null });
-
-      this.#setTransitiveState();
-
-      await tracker.track(async () => {
-        if (signOutCallback) {
-          await signOutCallback();
-        } else {
-          await this.navigate(redirectUrl);
-        }
-      });
-
-      if (tracker.isUnloading()) {
-        return;
-      }
-
-      this.#setAccessors();
-      this.#emit();
-
-      await onAfterSetActive();
-    };
 
     /**
      * Clears the router cache for `@clerk/nextjs` on all routes except the current one.
@@ -500,27 +565,29 @@ export class Clerk implements ClerkInterface {
      * Since we are calling `onBeforeSetActive` before signing out, we should NOT pass `"sign-out"`.
      */
     await onBeforeSetActive();
-    if (!opts.sessionId || this.client.signedInSessions.length === 1) {
+    if (!opts?.sessionId || this.client.signedInSessions.length === 1) {
       if (this.#options.experimental?.persistClient ?? true) {
         await this.client.removeSessions();
       } else {
         await this.client.destroy();
       }
 
-      await executeSignOut();
+      await this.navigate(redirectUrl);
 
       return;
     }
 
     // Multi-session handling
-    const session = this.client.signedInSessions.find(s => s.id === opts.sessionId);
+    const session = this.client.signedInSessions.find(s => s.id === opts?.sessionId);
     const shouldSignOutCurrent = session?.id && this.session?.id === session.id;
 
     await session?.remove();
 
     if (shouldSignOutCurrent) {
-      await executeSignOut();
+      await this.navigate(redirectUrl);
     }
+
+    await onAfterSetActive();
   };
 
   public openGoogleOneTap = (props?: GoogleOneTapProps): void => {
@@ -1119,6 +1186,17 @@ export class Clerk implements ClerkInterface {
    * `setActive` can be used to set the active session and/or organization.
    */
   public setActive = async ({ session, organization, beforeEmit, redirectUrl }: SetActiveParams): Promise<void> => {
+    // Track setActive start
+    this.#observabilityLoader?.getInstance()?.track?.({
+      type: 'state.setActive.started',
+      data: {
+        sessionId: typeof session === 'string' ? session : session?.id,
+        organizationId: typeof organization === 'string' ? organization : organization?.id,
+        hasRedirectUrl: !!redirectUrl,
+      },
+      timestamp: Date.now(),
+    });
+
     this.__internal_setActiveInProgress = true;
     try {
       if (!this.client) {
@@ -1242,6 +1320,30 @@ export class Clerk implements ClerkInterface {
       this.#setAccessors(newSession);
       this.#emit();
       await onAfterSetActive();
+
+      // Track setActive success
+      this.#observabilityLoader?.getInstance()?.track?.({
+        type: 'state.setActive.completed',
+        data: {
+          sessionId: newSession?.id,
+          organizationId: newSession?.lastActiveOrganizationId,
+          success: true,
+        },
+        timestamp: Date.now(),
+      });
+    } catch (error) {
+      // Track setActive error
+      this.#observabilityLoader?.getInstance()?.track?.({
+        type: 'state.setActive.failed',
+        data: {
+          error: error instanceof Error ? error.message : 'Unknown error',
+          sessionId: typeof session === 'string' ? session : session?.id,
+          organizationId: typeof organization === 'string' ? organization : organization?.id,
+        },
+        severity: 'high',
+        timestamp: Date.now(),
+      });
+      throw error;
     } finally {
       this.__internal_setActiveInProgress = false;
     }
