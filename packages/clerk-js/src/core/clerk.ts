@@ -442,7 +442,6 @@ export class Clerk implements ClerkInterface {
 
     this.#options = this.#initOptions(options);
 
-    // Initialize observability loader if not disabled and in browser environment
     if (!this.#options.disableObservability && inBrowser()) {
       this.#observabilityLoader = ClerkObservabilityLoader.init(this, {
         cookieName: this.#options.observability?.cookieName,
@@ -495,13 +494,6 @@ export class Clerk implements ClerkInterface {
   }
 
   public signOut: SignOut = async (callbackOrOptions?: SignOutCallback | SignOutOptions, options?: SignOutOptions) => {
-    // Track signOut start
-    this.#observabilityLoader?.getInstance()?.track?.({
-      type: 'auth.signOut.started',
-      data: { sessionId: this.session?.id },
-      timestamp: Date.now(),
-    });
-
     if (this.user && this.#broadcastChannel) {
       this.#broadcastChannel.postMessage({ type: 'signout' });
     }
@@ -515,31 +507,8 @@ export class Clerk implements ClerkInterface {
       opts = callbackOrOptions;
     }
 
-    try {
-      await this.#handleSignOut(opts);
-
-      // Track signOut success
-      this.#observabilityLoader?.getInstance()?.track?.({
-        type: 'auth.signOut.completed',
-        data: { success: true },
-        timestamp: Date.now(),
-      });
-
-      callback?.();
-    } catch (error) {
-      // Track signOut error
-      this.#observabilityLoader?.getInstance()?.track?.({
-        type: 'auth.signOut.error',
-        data: {
-          error: error instanceof Error ? error.message : 'Unknown error',
-          success: false,
-        },
-        severity: 'high',
-        timestamp: Date.now(),
-      });
-
-      throw error;
-    }
+    await this.#handleSignOut(opts);
+    callback?.();
   };
 
   #handleSignOut = async (opts: SignOutOptions | undefined): Promise<void> => {
@@ -1186,17 +1155,6 @@ export class Clerk implements ClerkInterface {
    * `setActive` can be used to set the active session and/or organization.
    */
   public setActive = async ({ session, organization, beforeEmit, redirectUrl }: SetActiveParams): Promise<void> => {
-    // Track setActive start
-    this.#observabilityLoader?.getInstance()?.track?.({
-      type: 'state.setActive.started',
-      data: {
-        sessionId: typeof session === 'string' ? session : session?.id,
-        organizationId: typeof organization === 'string' ? organization : organization?.id,
-        hasRedirectUrl: !!redirectUrl,
-      },
-      timestamp: Date.now(),
-    });
-
     this.__internal_setActiveInProgress = true;
     try {
       if (!this.client) {
@@ -1320,30 +1278,6 @@ export class Clerk implements ClerkInterface {
       this.#setAccessors(newSession);
       this.#emit();
       await onAfterSetActive();
-
-      // Track setActive success
-      this.#observabilityLoader?.getInstance()?.track?.({
-        type: 'state.setActive.completed',
-        data: {
-          sessionId: newSession?.id,
-          organizationId: newSession?.lastActiveOrganizationId,
-          success: true,
-        },
-        timestamp: Date.now(),
-      });
-    } catch (error) {
-      // Track setActive error
-      this.#observabilityLoader?.getInstance()?.track?.({
-        type: 'state.setActive.failed',
-        data: {
-          error: error instanceof Error ? error.message : 'Unknown error',
-          sessionId: typeof session === 'string' ? session : session?.id,
-          organizationId: typeof organization === 'string' ? organization : organization?.id,
-        },
-        severity: 'high',
-        timestamp: Date.now(),
-      });
-      throw error;
     } finally {
       this.__internal_setActiveInProgress = false;
     }
