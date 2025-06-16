@@ -4,11 +4,7 @@ import { getEnvVariable } from '@clerk/shared/getEnvVariable';
 import { getPublicEnvVariables } from '../utils/env';
 
 export const commonEnvs = () => {
-  // TODO: See https://github.com/TanStack/router/issues/4409
-  const event = {
-    context: {},
-  };
-  const publicEnvs = getPublicEnvVariables(event.context);
+  const publicEnvs = getPublicEnvVariables();
 
   return {
     // Public environment variables
@@ -24,16 +20,16 @@ export const commonEnvs = () => {
     TELEMETRY_DEBUG: publicEnvs.telemetryDebug,
 
     // Server-only environment variables
-    API_VERSION: getEnvVariable('CLERK_API_VERSION', event.context) || 'v1',
-    SECRET_KEY: getEnvVariable('CLERK_SECRET_KEY', event.context),
-    ENCRYPTION_KEY: getEnvVariable('CLERK_ENCRYPTION_KEY', event.context),
-    CLERK_JWT_KEY: getEnvVariable('CLERK_JWT_KEY', event.context),
-    API_URL: getEnvVariable('CLERK_API_URL', event.context) || apiUrlFromPublishableKey(publicEnvs.publishableKey),
+    API_VERSION: getEnvVariable('CLERK_API_VERSION') || 'v1',
+    SECRET_KEY: getEnvVariable('CLERK_SECRET_KEY'),
+    ENCRYPTION_KEY: getEnvVariable('CLERK_ENCRYPTION_KEY'),
+    CLERK_JWT_KEY: getEnvVariable('CLERK_JWT_KEY'),
+    API_URL: getEnvVariable('CLERK_API_URL') || apiUrlFromPublishableKey(publicEnvs.publishableKey),
 
     SDK_METADATA: {
       name: PACKAGE_NAME,
       version: PACKAGE_VERSION,
-      environment: getEnvVariable('NODE_ENV', event.context),
+      environment: getEnvVariable('NODE_ENV'),
     },
   } as const;
 };
