@@ -1,5 +1,123 @@
 # Change Log
 
+## 2.1.0
+
+### Minor Changes
+
+- Improve `subject` property handling for machine auth objects. ([#6099](https://github.com/clerk/javascript/pull/6099)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Usage:
+
+  ```ts
+  import { createClerkClient } from '@clerk/backend';
+
+  const clerkClient = createClerkClient({
+    secretKey: process.env.CLERK_SECRET_KEY,
+    publishableKey: process.env.CLERK_PUBLISHABLE_KEY,
+  });
+
+  const requestState = await clerkClient.authenticateRequest(request, {
+    acceptsToken: 'any',
+  });
+
+  const authObject = requestState.toAuth();
+
+  switch (authObject.tokenType) {
+    case 'api_key':
+      // authObject.userId
+      // authObject.orgId
+      break;
+    case 'machine_token':
+      // authObject.machineId
+      break;
+    case 'oauth_token':
+      // authObject.userId
+      // authObject.clientId
+      break;
+  }
+  ```
+
+- Respect `acceptsToken` when returning unauthenticated session or machine object. ([#6112](https://github.com/clerk/javascript/pull/6112)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Re-organize internal types for the recently added "machine authentication" feature. ([#6067](https://github.com/clerk/javascript/pull/6067)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fix calculation of handshake URL when proxy URL is set on the ClerkProvider ([#6119](https://github.com/clerk/javascript/pull/6119)) by [@jacekradko](https://github.com/jacekradko)
+
+- Add JSdoc comments for user methods. ([#6091](https://github.com/clerk/javascript/pull/6091)) by [@NWylynko](https://github.com/NWylynko)
+
+- Updating type of Verification.status ([#6110](https://github.com/clerk/javascript/pull/6110)) by [@jacekradko](https://github.com/jacekradko)
+
+- Resolve machine token property mixing in discriminated unions ([#6079](https://github.com/clerk/javascript/pull/6079)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`19e9e11`](https://github.com/clerk/javascript/commit/19e9e11af04f13fd12975fbf7016fe0583202056), [`18bcb64`](https://github.com/clerk/javascript/commit/18bcb64a3e8b6d352d7933ed094d68214e6e80fb), [`138f733`](https://github.com/clerk/javascript/commit/138f733f13121487268a4f96e6eb2cffedc6e238), [`48be55b`](https://github.com/clerk/javascript/commit/48be55b61a86e014dd407414764d24bb43fd26f3), [`2c6f805`](https://github.com/clerk/javascript/commit/2c6f805a9e6e4685990f9a8abc740b2d0859a453), [`97749d5`](https://github.com/clerk/javascript/commit/97749d570bc687c7e05cd800a50e0ae4180a371d)]:
+  - @clerk/types@4.60.1
+  - @clerk/shared@3.9.7
+
+## 2.0.0
+
+### Major Changes
+
+- Introduces machine authentication, supporting four token types: `api_key`, `oauth_token`, `machine_token`, and `session_token`. For backwards compatibility, `session_token` remains the default when no token type is specified. This enables machine-to-machine authentication and use cases such as API keys and OAuth integrations. Existing applications continue to work without modification. ([#5689](https://github.com/clerk/javascript/pull/5689)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  You can specify which token types are allowed by using the `acceptsToken` option in the `authenticateRequest()` function. This option can be set to a specific type, an array of types, or `'any'` to accept all supported tokens.
+
+  Example usage:
+
+  ```ts
+  import express from 'express';
+  import { clerkClient } from '@clerk/backend';
+
+  const app = express();
+
+  app.use(async (req, res, next) => {
+    const requestState = await clerkClient.authenticateRequest(req, {
+      acceptsToken: 'any',
+    });
+
+    if (!requestState.isAuthenticated) {
+      // do something for unauthenticated requests
+    }
+
+    const authObject = requestState.toAuth();
+
+    if (authObject.tokenType === 'session_token') {
+      console.log('this is session token from a user');
+    } else {
+      console.log('this is some other type of machine token');
+      console.log('more specifically, a ' + authObject.tokenType);
+    }
+
+    // Attach the auth object to locals so downstream handlers
+    // and middleware can access it
+    res.locals.auth = authObject;
+    next();
+  });
+  ```
+
+### Minor Changes
+
+- The `svix` dependency is no longer needed when using the `verifyWebhook()` function. `verifyWebhook()` was refactored to not rely on `svix` anymore while keeping the same functionality and behavior. ([#6059](https://github.com/clerk/javascript/pull/6059)) by [@royanger](https://github.com/royanger)
+
+  If you previously installed `svix` to use `verifyWebhook()` you can uninstall it now:
+
+  ```shell
+  npm uninstall svix
+  ```
+
+### Patch Changes
+
+- Improve JSDoc comments for verifyWebhook and verifyToken ([#6060](https://github.com/clerk/javascript/pull/6060)) by [@LekoArts](https://github.com/LekoArts)
+
+- Improve JSDoc comments ([#6049](https://github.com/clerk/javascript/pull/6049)) by [@LekoArts](https://github.com/LekoArts)
+
+- Introduce `getAuthObjectFromJwt` as internal utility function that centralizes the logic for generating auth objects from session JWTs. ([#6053](https://github.com/clerk/javascript/pull/6053)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`d8fa5d9`](https://github.com/clerk/javascript/commit/d8fa5d9d3d8dc575260d8d2b7c7eeeb0052d0b0d), [`be2e89c`](https://github.com/clerk/javascript/commit/be2e89ca11aa43d48f74c57a5a34e20d85b4003c), [`5644d94`](https://github.com/clerk/javascript/commit/5644d94f711a0733e4970c3f15c24d56cafc8743), [`b578225`](https://github.com/clerk/javascript/commit/b5782258242474c9b0987a3f8349836cd763f24b), [`8838120`](https://github.com/clerk/javascript/commit/8838120596830b88fec1c6c853371dabfec74a0d)]:
+  - @clerk/types@4.60.0
+  - @clerk/shared@3.9.6
+
 ## 1.34.0
 
 ### Minor Changes

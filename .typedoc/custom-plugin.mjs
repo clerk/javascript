@@ -52,6 +52,7 @@ const LINK_REPLACEMENTS = [
   ['phone-number', '/docs/references/backend/types/backend-phone-number'],
   ['saml-account', '/docs/references/backend/types/backend-saml-account'],
   ['web3-wallet', '/docs/references/backend/types/backend-web3-wallet'],
+  ['verify-token-options', '#verify-token-options'],
 ];
 
 /**
@@ -118,6 +119,16 @@ function getCatchAllReplacements() {
       pattern: /`OrganizationInvitationPublicMetadata`/g,
       replace:
         '[`OrganizationInvitationPublicMetadata`](/docs/references/javascript/types/metadata#organization-invitation-public-metadata)',
+    },
+    {
+      pattern: /`OrganizationMembershipPrivateMetadata`/g,
+      replace:
+        '[`OrganizationMembershipPrivateMetadata`](/docs/references/javascript/types/metadata#organization-membership-private-metadata)',
+    },
+    {
+      pattern: /`OrganizationMembershipPublicMetadata`/g,
+      replace:
+        '[`OrganizationMembershipPublicMetadata`](/docs/references/javascript/types/metadata#organization-membership-public-metadata)',
     },
     {
       /**

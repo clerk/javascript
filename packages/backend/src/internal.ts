@@ -7,7 +7,13 @@ export { createAuthenticateRequest } from './tokens/factory';
 
 export { debugRequestState } from './tokens/request';
 
-export type { AuthenticateRequestOptions, OrganizationSyncOptions } from './tokens/types';
+export type {
+  AuthenticateRequestOptions,
+  OrganizationSyncOptions,
+  InferAuthObjectFromToken,
+  InferAuthObjectFromTokenArray,
+  GetAuthFn,
+} from './tokens/types';
 
 export { TokenType } from './tokens/tokenTypes';
 export type { SessionTokenType, MachineTokenType } from './tokens/tokenTypes';
@@ -25,7 +31,9 @@ export {
   signedInAuthObject,
   authenticatedMachineObject,
   unauthenticatedMachineObject,
+  invalidTokenAuthObject,
   getAuthObjectFromJwt,
+  getAuthObjectForAcceptedToken,
 } from './tokens/authObjects';
 
 export { AuthStatus } from './tokens/authStatus';
@@ -46,4 +54,4 @@ export { reverificationError, reverificationErrorResponse } from '@clerk/shared/
 
 export { verifyMachineAuthToken } from './tokens/verify';
 
-export { isMachineToken, getMachineTokenType, isTokenTypeAccepted } from './tokens/machine';
+export { isMachineTokenByPrefix, isMachineTokenType, getMachineTokenType, isTokenTypeAccepted } from './tokens/machine';

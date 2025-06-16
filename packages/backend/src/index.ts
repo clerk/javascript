@@ -161,4 +161,5 @@ export type {
 /**
  * Auth objects
  */
-export type { AuthObject } from './tokens/authObjects';
+export type { AuthObject, InvalidTokenAuthObject } from './tokens/authObjects';
+export type { SessionAuthObject, MachineAuthObject } from './tokens/types';

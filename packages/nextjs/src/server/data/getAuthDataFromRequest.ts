@@ -1,13 +1,18 @@
 import type { AuthObject } from '@clerk/backend';
-import type { AuthenticateRequestOptions, SignedInAuthObject, SignedOutAuthObject } from '@clerk/backend/internal';
 import {
   authenticatedMachineObject,
+  type AuthenticateRequestOptions,
   AuthStatus,
   constants,
   getAuthObjectFromJwt,
   getMachineTokenType,
-  isMachineToken,
+  invalidTokenAuthObject,
+  isMachineTokenByPrefix,
+  isMachineTokenType,
   isTokenTypeAccepted,
+  type MachineTokenType,
+  type SignedInAuthObject,
+  type SignedOutAuthObject,
   signedOutAuthObject,
   TokenType,
   unauthenticatedMachineObject,
@@ -85,37 +90,58 @@ export const getAuthDataFromRequestAsync = async (
   opts: GetAuthDataFromRequestOptions = {},
 ): Promise<AuthObject> => {
   const { authStatus, authMessage, authReason } = getAuthHeaders(req);
-
   opts.logger?.debug('headers', { authStatus, authMessage, authReason });
 
   const bearerToken = getHeader(req, constants.Headers.Authorization)?.replace('Bearer ', '');
   const acceptsToken = opts.acceptsToken || TokenType.SessionToken;
+  const options = {
+    secretKey: opts?.secretKey || SECRET_KEY,
+    publishableKey: PUBLISHABLE_KEY,
+    apiUrl: API_URL,
+    authStatus,
+    authMessage,
+    authReason,
+  };
 
-  if (bearerToken && isMachineToken(bearerToken)) {
-    const tokenType = getMachineTokenType(bearerToken);
+  if (bearerToken) {
+    const isMachine = isMachineTokenByPrefix(bearerToken);
+    const tokenType = isMachine ? getMachineTokenType(bearerToken) : undefined;
 
-    const options = {
-      secretKey: opts?.secretKey || SECRET_KEY,
-      publishableKey: PUBLISHABLE_KEY,
-      apiUrl: API_URL,
-      authStatus,
-      authMessage,
-      authReason,
-    };
-
-    if (!isTokenTypeAccepted(tokenType, acceptsToken)) {
-      return unauthenticatedMachineObject(tokenType, options);
+    if (Array.isArray(acceptsToken)) {
+      if (isMachine) {
+        return handleMachineToken({
+          bearerToken,
+          tokenType: tokenType as MachineTokenType,
+          acceptsToken,
+          options,
+        });
+      }
+    } else {
+      let intendedType: TokenType | undefined;
+      if (isMachineTokenType(acceptsToken)) {
+        intendedType = acceptsToken;
+      }
+      const result = await handleIntentBased({
+        isMachine,
+        tokenType,
+        intendedType,
+        bearerToken,
+        acceptsToken,
+        options,
+      });
+      if (result) {
+        return result;
+      }
     }
-
-    // TODO(Rob): Cache the result of verifyMachineAuthToken
-    const { data, errors } = await verifyMachineAuthToken(bearerToken, options);
-    if (errors) {
-      return unauthenticatedMachineObject(tokenType, options);
-    }
-
-    return authenticatedMachineObject(tokenType, bearerToken, data);
   }
 
+  if (Array.isArray(acceptsToken)) {
+    if (!isTokenTypeAccepted(TokenType.SessionToken, acceptsToken)) {
+      return invalidTokenAuthObject();
+    }
+  }
+
+  // Fall through to session logic
   return getAuthDataFromRequestSync(req, opts);
 };
 
@@ -134,3 +160,76 @@ const getAuthHeaders = (req: RequestLike) => {
     authSignature,
   };
 };
+
+/**
+ * Handles verification and response shaping for machine tokens.
+ * Returns an authenticated or unauthenticated machine object based on verification and type acceptance.
+ */
+async function handleMachineToken({
+  bearerToken,
+  tokenType,
+  acceptsToken,
+  options,
+}: {
+  bearerToken: string;
+  tokenType: MachineTokenType;
+  acceptsToken: AuthenticateRequestOptions['acceptsToken'];
+  options: Record<string, any>;
+}) {
+  if (Array.isArray(acceptsToken)) {
+    // If the token is not in the accepted array, return invalid token auth object
+    if (!isTokenTypeAccepted(tokenType, acceptsToken)) {
+      return invalidTokenAuthObject();
+    }
+  }
+
+  if (!isTokenTypeAccepted(tokenType, acceptsToken ?? TokenType.SessionToken)) {
+    return unauthenticatedMachineObject(tokenType, options);
+  }
+  const { data, errors } = await verifyMachineAuthToken(bearerToken, options);
+  if (errors) {
+    return unauthenticatedMachineObject(tokenType, options);
+  }
+  return authenticatedMachineObject(tokenType, bearerToken, data);
+}
+
+/**
+ * Handles intent-based fallback for single-value acceptsToken.
+ * Returns an unauthenticated object for the intended type, or falls back to session logic if not applicable.
+ */
+async function handleIntentBased({
+  isMachine,
+  tokenType,
+  intendedType,
+  bearerToken,
+  acceptsToken,
+  options,
+}: {
+  isMachine: boolean;
+  tokenType: TokenType | undefined;
+  intendedType: TokenType | undefined;
+  bearerToken: string;
+  acceptsToken: AuthenticateRequestOptions['acceptsToken'];
+  options: Record<string, any>;
+}) {
+  if (isMachine) {
+    if (!tokenType) {
+      return signedOutAuthObject(options);
+    }
+    if (!isTokenTypeAccepted(tokenType, acceptsToken ?? TokenType.SessionToken)) {
+      if (intendedType && isMachineTokenType(intendedType)) {
+        return unauthenticatedMachineObject(intendedType, options);
+      }
+      return signedOutAuthObject(options);
+    }
+    const { data, errors } = await verifyMachineAuthToken(bearerToken, options);
+    if (errors) {
+      return unauthenticatedMachineObject(tokenType as MachineTokenType, options);
+    }
+    return authenticatedMachineObject(tokenType as MachineTokenType, bearerToken, data);
+  } else if (intendedType && isMachineTokenType(intendedType)) {
+    return unauthenticatedMachineObject(intendedType, options);
+  }
+  // else: fall through to session logic
+  return null;
+}

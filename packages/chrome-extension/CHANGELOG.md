@@ -1,5 +1,23 @@
 # Change Log
 
+## 2.4.12
+
+### Patch Changes
+
+- Updated dependencies [[`19e9e11`](https://github.com/clerk/javascript/commit/19e9e11af04f13fd12975fbf7016fe0583202056), [`b0e47f1`](https://github.com/clerk/javascript/commit/b0e47f1d782f8d6fb3799446ad9696d6617093bd), [`fa96943`](https://github.com/clerk/javascript/commit/fa9694353736751d93f16aeb3294e9647943224e), [`18bcb64`](https://github.com/clerk/javascript/commit/18bcb64a3e8b6d352d7933ed094d68214e6e80fb), [`684f3bd`](https://github.com/clerk/javascript/commit/684f3bdb265ac98d8164cb442e4bfa68df0e92c6), [`6e0f879`](https://github.com/clerk/javascript/commit/6e0f87974e44d0f0f4cd2ce3eff97a3233783760), [`48be55b`](https://github.com/clerk/javascript/commit/48be55b61a86e014dd407414764d24bb43fd26f3), [`48be55b`](https://github.com/clerk/javascript/commit/48be55b61a86e014dd407414764d24bb43fd26f3), [`2c6f805`](https://github.com/clerk/javascript/commit/2c6f805a9e6e4685990f9a8abc740b2d0859a453), [`97749d5`](https://github.com/clerk/javascript/commit/97749d570bc687c7e05cd800a50e0ae4180a371d)]:
+  - @clerk/clerk-js@5.69.0
+  - @clerk/clerk-react@5.32.0
+  - @clerk/shared@3.9.7
+
+## 2.4.11
+
+### Patch Changes
+
+- Updated dependencies [[`d8fa5d9`](https://github.com/clerk/javascript/commit/d8fa5d9d3d8dc575260d8d2b7c7eeeb0052d0b0d), [`be2e89c`](https://github.com/clerk/javascript/commit/be2e89ca11aa43d48f74c57a5a34e20d85b4003c), [`5644d94`](https://github.com/clerk/javascript/commit/5644d94f711a0733e4970c3f15c24d56cafc8743), [`30bac73`](https://github.com/clerk/javascript/commit/30bac734a4dd22a6e2eb8551cb640b14feac3ee6), [`32a5e11`](https://github.com/clerk/javascript/commit/32a5e11f3e342fd0aa047f64c17f691bfbd33c34), [`a3232c7`](https://github.com/clerk/javascript/commit/a3232c7ee8c1173d2ce70f8252fc083c7bf19374), [`b578225`](https://github.com/clerk/javascript/commit/b5782258242474c9b0987a3f8349836cd763f24b), [`8838120`](https://github.com/clerk/javascript/commit/8838120596830b88fec1c6c853371dabfec74a0d)]:
+  - @clerk/clerk-js@5.68.0
+  - @clerk/clerk-react@5.31.9
+  - @clerk/shared@3.9.6
+
 ## 2.4.10
 
 ### Patch Changes

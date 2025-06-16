@@ -119,6 +119,7 @@ function SignUpStartInternal(): JSX.Element {
   const hasEmail = !!formState.emailAddress.value;
   const isProgressiveSignUp = userSettings.signUp.progressive;
   const isLegalConsentEnabled = userSettings.signUp.legal_consent_enabled;
+  const oidcPrompt = ctx.oidcPrompt;
 
   const fields = determineActiveFields({
     attributes,
@@ -145,8 +146,13 @@ function SignUpStartInternal(): JSX.Element {
           setMissingRequirementsWithTicket(true);
         }
 
+        const redirectUrl = ctx.ssoCallbackUrl;
+        const redirectUrlComplete = ctx.afterSignUpUrl || '/';
+
         return completeSignUpFlow({
           signUp,
+          redirectUrl,
+          redirectUrlComplete,
           verifyEmailPath: 'verify-email-address',
           verifyPhonePath: 'verify-phone-number',
           handleComplete: () => {
@@ -155,6 +161,7 @@ function SignUpStartInternal(): JSX.Element {
             return setActive({ session: signUp.createdSessionId, redirectUrl: afterSignUpUrl });
           },
           navigate,
+          oidcPrompt,
         });
       })
       .catch(err => {
@@ -163,6 +170,12 @@ function SignUpStartInternal(): JSX.Element {
         handleError(err, [], card.setError);
       })
       .finally(() => {
+        // Keep the card in loading state during SSO redirect to prevent UI flicker
+        // This is necessary because there's a brief delay between initiating the SSO flow
+        // and the actual redirect to the external Identity Provider
+        const isRedirectingToSSOProvider = signUp.missingFields.some(mf => mf === 'saml' || mf === 'enterprise_sso');
+        if (isRedirectingToSSOProvider) return;
+
         status.setIdle();
         card.setIdle();
       });
@@ -302,7 +315,7 @@ function SignUpStartInternal(): JSX.Element {
           navigate,
           redirectUrl,
           redirectUrlComplete,
-          oidcPrompt: ctx.oidcPrompt,
+          oidcPrompt,
         }),
       )
       .catch(err => handleError(err, fieldsToSubmit, card.setError))

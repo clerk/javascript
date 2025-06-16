@@ -12,7 +12,7 @@ import {
   constants,
   createClerkRequest,
   createRedirect,
-  isMachineToken,
+  isMachineTokenByPrefix,
   isTokenTypeAccepted,
   signedOutAuthObject,
   TokenType,
@@ -288,7 +288,7 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       /**
        * In keyless mode, if the publishable key is missing, let the request through, to render `<ClerkProvider/>` that will resume the flow gracefully.
        */
-      if (isMissingPublishableKey && !isMachineToken(authHeader)) {
+      if (isMissingPublishableKey && !isMachineTokenByPrefix(authHeader)) {
         const res = NextResponse.next();
         setRequestHeadersOnNextResponse(res, request, {
           [constants.Headers.AuthStatus]: 'signed-out',

@@ -1,5 +1,40 @@
 # Change Log
 
+## 4.60.1
+
+### Patch Changes
+
+- Add payment history tab to UserProfile and OrgProfile ([#6075](https://github.com/clerk/javascript/pull/6075)) by [@aeliox](https://github.com/aeliox)
+
+- Add TypeScript types and en-US localization for upcoming `<APIKeys />` component. This component will initially be in early access. ([#5858](https://github.com/clerk/javascript/pull/5858)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Add missing semibold FontWeightScale type ([#6114](https://github.com/clerk/javascript/pull/6114)) by [@jacekradko](https://github.com/jacekradko)
+
+- Parse partial `plan` in `ClerkAPIError.meta` ([#6102](https://github.com/clerk/javascript/pull/6102)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add localizations for some commerce strings, general cleanups ([#6101](https://github.com/clerk/javascript/pull/6101)) by [@aeliox](https://github.com/aeliox)
+
+- Introduce `commerce.checkout.pastDueNotice` localization key. ([#6097](https://github.com/clerk/javascript/pull/6097)) by [@panteliselef](https://github.com/panteliselef)
+
+## 4.60.0
+
+### Minor Changes
+
+- Introduce `cssLayerName` option to allow users to opt Clerk styles into a native CSS layer. ([#5552](https://github.com/clerk/javascript/pull/5552)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Get `payment_method_order` for Stripe payment elements from backend ([#6034](https://github.com/clerk/javascript/pull/6034)) by [@aeliox](https://github.com/aeliox)
+
+- Use the `is_removable` flag on a payment source to determine if it can be removed. ([#6033](https://github.com/clerk/javascript/pull/6033)) by [@aeliox](https://github.com/aeliox)
+
+- Introduce internal `<OAuthConsent />` component to be used internally in the machine auth OAuth flow in account portal. ([#6021](https://github.com/clerk/javascript/pull/6021)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- feat(types,clerk-js): Update types; RoleSelect allows fallbackLabel ([#6037](https://github.com/clerk/javascript/pull/6037)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
+  - this updates OrganizationInvitation and OrganizationMembership resource+types to include `roleName` which is already present on frontend-api responses, as `role_name`.
+  - this updates RoleSelect to allow rendering a `fallbackLabel` in the event that `value` does not map to any of the supplied roles
+
 ## 4.59.3
 
 ### Patch Changes

@@ -1,5 +1,29 @@
 # Change Log
 
+## 3.16.5
+
+### Patch Changes
+
+- Add payment history tab to UserProfile and OrgProfile ([#6075](https://github.com/clerk/javascript/pull/6075)) by [@aeliox](https://github.com/aeliox)
+
+- Add TypeScript types and en-US localization for upcoming `<APIKeys />` component. This component will initially be in early access. ([#5858](https://github.com/clerk/javascript/pull/5858)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Add localizations for some commerce strings, general cleanups ([#6101](https://github.com/clerk/javascript/pull/6101)) by [@aeliox](https://github.com/aeliox)
+
+- Introduce `commerce.checkout.pastDueNotice` localization key. ([#6097](https://github.com/clerk/javascript/pull/6097)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`19e9e11`](https://github.com/clerk/javascript/commit/19e9e11af04f13fd12975fbf7016fe0583202056), [`18bcb64`](https://github.com/clerk/javascript/commit/18bcb64a3e8b6d352d7933ed094d68214e6e80fb), [`138f733`](https://github.com/clerk/javascript/commit/138f733f13121487268a4f96e6eb2cffedc6e238), [`48be55b`](https://github.com/clerk/javascript/commit/48be55b61a86e014dd407414764d24bb43fd26f3), [`2c6f805`](https://github.com/clerk/javascript/commit/2c6f805a9e6e4685990f9a8abc740b2d0859a453), [`97749d5`](https://github.com/clerk/javascript/commit/97749d570bc687c7e05cd800a50e0ae4180a371d)]:
+  - @clerk/types@4.60.1
+
+## 3.16.4
+
+### Patch Changes
+
+- Update Spanish (es-ES) password validation messages to match new English (en-US) format ([#6048](https://github.com/clerk/javascript/pull/6048)) by [@ReyserLyn](https://github.com/ReyserLyn)
+
+- Updated dependencies [[`d8fa5d9`](https://github.com/clerk/javascript/commit/d8fa5d9d3d8dc575260d8d2b7c7eeeb0052d0b0d), [`be2e89c`](https://github.com/clerk/javascript/commit/be2e89ca11aa43d48f74c57a5a34e20d85b4003c), [`5644d94`](https://github.com/clerk/javascript/commit/5644d94f711a0733e4970c3f15c24d56cafc8743), [`b578225`](https://github.com/clerk/javascript/commit/b5782258242474c9b0987a3f8349836cd763f24b), [`8838120`](https://github.com/clerk/javascript/commit/8838120596830b88fec1c6c853371dabfec74a0d)]:
+  - @clerk/types@4.60.0
+
 ## 3.16.3
 
 ### Patch Changes

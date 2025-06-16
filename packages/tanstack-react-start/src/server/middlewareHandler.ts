@@ -1,5 +1,5 @@
 import type { AnyRouter } from '@tanstack/react-router';
-import type { EventHandler } from '@tanstack/react-start/server';
+import { type EventHandler } from '@tanstack/react-start/server';
 
 import { authenticateRequest } from './authenticateRequest';
 import { loadOptions } from './loadOptions';
@@ -22,13 +22,21 @@ export function createClerkHandler<TRouter extends AnyRouter>(
       try {
         const loadedOptions = loadOptions(request, clerkOptions);
 
-        const requestState = await authenticateRequest(request, loadedOptions);
+        const requestState = await authenticateRequest(request, {
+          ...loadedOptions,
+          acceptsToken: 'any',
+        });
 
-        const clerkInitialState = getResponseClerkState(requestState, loadedOptions);
+        const { clerkInitialState, headers } = getResponseClerkState(requestState, loadedOptions);
 
         // Merging the TanStack router context with the Clerk context and loading the router
         router.update({
-          context: { ...router.options.context, ...clerkInitialState },
+          context: { ...router.options.context, clerkInitialState },
+        });
+
+        // Adding the Clerk response headers to the response
+        headers.forEach((value, key) => {
+          responseHeaders.set(key, value);
         });
 
         await router.load();

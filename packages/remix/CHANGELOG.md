@@ -1,5 +1,47 @@
 # Change Log
 
+## 4.8.1
+
+### Patch Changes
+
+- Updated dependencies [[`19e9e11`](https://github.com/clerk/javascript/commit/19e9e11af04f13fd12975fbf7016fe0583202056), [`18bcb64`](https://github.com/clerk/javascript/commit/18bcb64a3e8b6d352d7933ed094d68214e6e80fb), [`2148166`](https://github.com/clerk/javascript/commit/214816654850272297056eebad3d846b7f8125c9), [`4319257`](https://github.com/clerk/javascript/commit/4319257dc424f121231a26bef2068cef1e78afd4), [`607d333`](https://github.com/clerk/javascript/commit/607d3331f893bc98d1a8894f57b1cb9021e71b86), [`138f733`](https://github.com/clerk/javascript/commit/138f733f13121487268a4f96e6eb2cffedc6e238), [`4118ed7`](https://github.com/clerk/javascript/commit/4118ed7c8fb13ca602401f8d663e7bcd6f6abee4), [`18bcb64`](https://github.com/clerk/javascript/commit/18bcb64a3e8b6d352d7933ed094d68214e6e80fb), [`d832d91`](https://github.com/clerk/javascript/commit/d832d9179ff615f2799c832ec5fd9f3d79c6a940), [`6842ff1`](https://github.com/clerk/javascript/commit/6842ff1c903eaa0db161f533365a2e680995ce83), [`48be55b`](https://github.com/clerk/javascript/commit/48be55b61a86e014dd407414764d24bb43fd26f3), [`183e382`](https://github.com/clerk/javascript/commit/183e3823e4ff70e856b00a347369c38a4264105a), [`2c6f805`](https://github.com/clerk/javascript/commit/2c6f805a9e6e4685990f9a8abc740b2d0859a453), [`97749d5`](https://github.com/clerk/javascript/commit/97749d570bc687c7e05cd800a50e0ae4180a371d)]:
+  - @clerk/types@4.60.1
+  - @clerk/backend@2.1.0
+  - @clerk/clerk-react@5.32.0
+  - @clerk/shared@3.9.7
+
+## 4.8.0
+
+### Minor Changes
+
+- Machine authentication is now supported for advanced use cases via the backend SDK. You can use `clerkClient.authenticateRequest` to validate machine tokens (such as API keys, OAuth tokens, and machine-to-machine tokens). No new helpers are included in these packages yet. ([#5689](https://github.com/clerk/javascript/pull/5689)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Example (Astro):
+
+  ```ts
+  import { clerkClient } from '@clerk/astro/server';
+
+  export const GET: APIRoute = ({ request }) => {
+    const requestState = await clerkClient.authenticateRequest(request, {
+      acceptsToken: 'api_key',
+    });
+
+    if (!requestState.isAuthenticated) {
+      return new Response(401, { message: 'Unauthorized' });
+    }
+
+    return new Response(JSON.stringify(requestState.toAuth()));
+  };
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`ea622ba`](https://github.com/clerk/javascript/commit/ea622bae90e18ae2ea8dbc6c94cad857557539c9), [`d8fa5d9`](https://github.com/clerk/javascript/commit/d8fa5d9d3d8dc575260d8d2b7c7eeeb0052d0b0d), [`be2e89c`](https://github.com/clerk/javascript/commit/be2e89ca11aa43d48f74c57a5a34e20d85b4003c), [`c656270`](https://github.com/clerk/javascript/commit/c656270f9e05fd1f44fc4c81851be0b1111cb933), [`5644d94`](https://github.com/clerk/javascript/commit/5644d94f711a0733e4970c3f15c24d56cafc8743), [`a3232c7`](https://github.com/clerk/javascript/commit/a3232c7ee8c1173d2ce70f8252fc083c7bf19374), [`b578225`](https://github.com/clerk/javascript/commit/b5782258242474c9b0987a3f8349836cd763f24b), [`918e2e0`](https://github.com/clerk/javascript/commit/918e2e085bf88c3cfaa5fcb0f1ae8c31b3f7053e), [`795d09a`](https://github.com/clerk/javascript/commit/795d09a652f791e1e409406e335e0860aceda110), [`4f93634`](https://github.com/clerk/javascript/commit/4f93634ed6bcd45f21bddcb39a33434b1cb560fe), [`8838120`](https://github.com/clerk/javascript/commit/8838120596830b88fec1c6c853371dabfec74a0d)]:
+  - @clerk/backend@2.0.0
+  - @clerk/types@4.60.0
+  - @clerk/clerk-react@5.31.9
+  - @clerk/shared@3.9.6
+
 ## 4.7.8
 
 ### Patch Changes

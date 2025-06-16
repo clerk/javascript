@@ -1,5 +1,62 @@
 # Change Log
 
+## 5.69.0
+
+### Minor Changes
+
+- Add `<APIKeys />` component. This component will initially be in early access and not recommended for production usage just yet. ([#5858](https://github.com/clerk/javascript/pull/5858)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Add payment history tab to UserProfile and OrgProfile ([#6075](https://github.com/clerk/javascript/pull/6075)) by [@aeliox](https://github.com/aeliox)
+
+- Maintain current active organization when `setActive({ organization: null })` is called with force organization selection enabled ([#6103](https://github.com/clerk/javascript/pull/6103)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Add `.v0.dev` as prefered origin for oauth flows with popup. ([#6118](https://github.com/clerk/javascript/pull/6118)) by [@mwickett](https://github.com/mwickett)
+
+- Do not allow `setActive({ organization: null })` when organization selection is forced ([#6073](https://github.com/clerk/javascript/pull/6073)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Fix Stripe Elements error handling ([#6074](https://github.com/clerk/javascript/pull/6074)) by [@aeliox](https://github.com/aeliox)
+
+- Use error metadata for invalid change plan screen on `Checkout` component. ([#6102](https://github.com/clerk/javascript/pull/6102)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add localizations for some commerce strings, general cleanups ([#6101](https://github.com/clerk/javascript/pull/6101)) by [@aeliox](https://github.com/aeliox)
+
+- Display info tooltip for past due amounts at checkout. ([#6097](https://github.com/clerk/javascript/pull/6097)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`19e9e11`](https://github.com/clerk/javascript/commit/19e9e11af04f13fd12975fbf7016fe0583202056), [`18bcb64`](https://github.com/clerk/javascript/commit/18bcb64a3e8b6d352d7933ed094d68214e6e80fb), [`138f733`](https://github.com/clerk/javascript/commit/138f733f13121487268a4f96e6eb2cffedc6e238), [`48be55b`](https://github.com/clerk/javascript/commit/48be55b61a86e014dd407414764d24bb43fd26f3), [`2c6f805`](https://github.com/clerk/javascript/commit/2c6f805a9e6e4685990f9a8abc740b2d0859a453), [`97749d5`](https://github.com/clerk/javascript/commit/97749d570bc687c7e05cd800a50e0ae4180a371d)]:
+  - @clerk/localizations@3.16.5
+  - @clerk/types@4.60.1
+  - @clerk/shared@3.9.7
+
+## 5.68.0
+
+### Minor Changes
+
+- Introduce `cssLayerName` option to allow users to opt Clerk styles into a native CSS layer. ([#5552](https://github.com/clerk/javascript/pull/5552)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Get `payment_method_order` for Stripe payment elements from backend ([#6034](https://github.com/clerk/javascript/pull/6034)) by [@aeliox](https://github.com/aeliox)
+
+- Use the `is_removable` flag on a payment source to determine if it can be removed. ([#6033](https://github.com/clerk/javascript/pull/6033)) by [@aeliox](https://github.com/aeliox)
+
+- Clean up layout and logic of the `PlanDetails` drawer ([#5928](https://github.com/clerk/javascript/pull/5928)) by [@aeliox](https://github.com/aeliox)
+
+- Initiate enterprise SSO from ticket flows, such as organization invitations. ([#6009](https://github.com/clerk/javascript/pull/6009)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Introduce internal `<OAuthConsent />` component to be used internally in the machine auth OAuth flow in account portal. ([#6021](https://github.com/clerk/javascript/pull/6021)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- feat(types,clerk-js): Update types; RoleSelect allows fallbackLabel ([#6037](https://github.com/clerk/javascript/pull/6037)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
+  - this updates OrganizationInvitation and OrganizationMembership resource+types to include `roleName` which is already present on frontend-api responses, as `role_name`.
+  - this updates RoleSelect to allow rendering a `fallbackLabel` in the event that `value` does not map to any of the supplied roles
+
+- Updated dependencies [[`d8fa5d9`](https://github.com/clerk/javascript/commit/d8fa5d9d3d8dc575260d8d2b7c7eeeb0052d0b0d), [`be2e89c`](https://github.com/clerk/javascript/commit/be2e89ca11aa43d48f74c57a5a34e20d85b4003c), [`85f3db4`](https://github.com/clerk/javascript/commit/85f3db4305b78a71271526b5ef900a5d1b941805), [`5644d94`](https://github.com/clerk/javascript/commit/5644d94f711a0733e4970c3f15c24d56cafc8743), [`b578225`](https://github.com/clerk/javascript/commit/b5782258242474c9b0987a3f8349836cd763f24b), [`8838120`](https://github.com/clerk/javascript/commit/8838120596830b88fec1c6c853371dabfec74a0d)]:
+  - @clerk/types@4.60.0
+  - @clerk/localizations@3.16.4
+  - @clerk/shared@3.9.6
+
 ## 5.67.5
 
 ### Patch Changes
