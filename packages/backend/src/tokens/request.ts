@@ -88,10 +88,7 @@ function checkTokenTypeMismatch(
   return null;
 }
 
-function isTokenTypeInAcceptedArray(
-  acceptsToken: ReadonlyArray<TokenType>,
-  authenticateContext: AuthenticateContext,
-): boolean {
+function isTokenTypeInAcceptedArray(acceptsToken: TokenType[], authenticateContext: AuthenticateContext): boolean {
   let parsedTokenType: TokenType | null = null;
   const { tokenInHeader } = authenticateContext;
   if (tokenInHeader) {
@@ -102,7 +99,7 @@ function isTokenTypeInAcceptedArray(
     }
   }
   const typeToCheck = parsedTokenType ?? TokenType.SessionToken;
-  return isTokenTypeAccepted(typeToCheck, acceptsToken as TokenType[]);
+  return isTokenTypeAccepted(typeToCheck, acceptsToken);
 }
 
 export interface AuthenticateRequest {
@@ -672,7 +669,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
     // Handle case where tokenType is any and the token is not a machine token
     if (!isMachineTokenByPrefix(tokenInHeader)) {
       return signedOut({
-        tokenType: acceptsToken as MachineTokenType,
+        tokenType: acceptsToken as TokenType,
         authenticateContext,
         reason: AuthErrorReason.TokenTypeMismatch,
         message: '',
