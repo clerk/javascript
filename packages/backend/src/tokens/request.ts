@@ -669,6 +669,16 @@ export const authenticateRequest: AuthenticateRequest = (async (
       return handleSessionTokenError(new Error('Missing token in header'), 'header');
     }
 
+    // Handle case where tokenType is any and the token is not a machine token
+    if (!isMachineTokenByPrefix(tokenInHeader)) {
+      return signedOut({
+        tokenType: acceptsToken as MachineTokenType,
+        authenticateContext,
+        reason: AuthErrorReason.TokenTypeMismatch,
+        message: '',
+      });
+    }
+
     const parsedTokenType = getMachineTokenType(tokenInHeader);
     const mismatchState = checkTokenTypeMismatch(parsedTokenType, acceptsToken, authenticateContext);
     if (mismatchState) {

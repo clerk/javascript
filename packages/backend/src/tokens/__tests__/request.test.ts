@@ -236,7 +236,7 @@ expect.extend({
   toBeMachineUnauthenticated(
     received,
     expected: {
-      tokenType: MachineTokenType;
+      tokenType: MachineTokenType | null;
       reason: AuthReason;
       message: string;
     },
@@ -246,6 +246,7 @@ expect.extend({
       received.tokenType === expected.tokenType &&
       received.reason === expected.reason &&
       received.message === expected.message &&
+      !received.isAuthenticated &&
       !received.token;
 
     if (pass) {
@@ -264,15 +265,11 @@ expect.extend({
   toBeMachineUnauthenticatedToAuth(
     received,
     expected: {
-      tokenType: MachineTokenType;
+      tokenType: MachineTokenType | null;
     },
   ) {
     const pass =
-      received.tokenType === expected.tokenType &&
-      !received.claims &&
-      !received.subject &&
-      !received.name &&
-      !received.id;
+      received.tokenType === expected.tokenType && !received.isAuthenticated && !received.name && !received.id;
 
     if (pass) {
       return {
@@ -1332,6 +1329,7 @@ describe('tokens.authenticateRequest(options)', () => {
           tokenType: 'machine_token',
           reason: AuthErrorReason.TokenTypeMismatch,
           message: '',
+          isAuthenticated: false,
         });
         expect(result.toAuth()).toBeMachineUnauthenticatedToAuth({
           tokenType: 'machine_token',
