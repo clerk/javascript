@@ -1099,8 +1099,8 @@ importers:
         specifier: ^0.6.0
         version: 0.6.0(rollup@4.43.0)(typescript@5.8.3)(vue@3.5.16(typescript@5.8.3))
       unplugin-vue:
-        specifier: ^5.2.1
-        version: 5.2.1(@types/node@22.15.29)(jiti@2.4.2)(lightningcss@1.27.0)(terser@5.39.0)(tsx@4.19.2)(vue@3.5.16(typescript@5.8.3))(yaml@2.7.1)
+        specifier: ^6.2.0
+        version: 6.2.0(@types/node@22.15.29)(jiti@2.4.2)(lightningcss@1.27.0)(terser@5.39.0)(tsx@4.19.2)(vue@3.5.16(typescript@5.8.3))(yaml@2.7.1)
       vue:
         specifier: 3.5.16
         version: 3.5.16(typescript@5.8.3)
@@ -3008,7 +3008,7 @@ packages:
 
   '@expo/bunyan@4.0.1':
     resolution: {integrity: sha512-+Lla7nYSiHZirgK+U/uYzsLv/X+HaJienbD5AKX1UQZHYfWaP+9uuQluRB4GrEVWF0GZ7vEVp/jzaOT9k/SQlg==}
-    engines: {node: '>=0.10.0'}
+    engines: {'0': node >=0.10.0}
 
   '@expo/cli@0.22.26':
     resolution: {integrity: sha512-I689wc8Fn/AX7aUGiwrh3HnssiORMJtR2fpksX+JIe8Cj/EDleblYMSwRPd0025wrwOV9UN1KM/RuEt/QjCS3Q==}
@@ -14133,8 +14133,8 @@ packages:
       vue-router:
         optional: true
 
-  unplugin-vue@5.2.1:
-    resolution: {integrity: sha512-yHNruKlkP6HjH7uXdCYiEyvD3exfZl+Mu93y+lI9B2wDafk7RLBoTzKa4R24UD6v5YQwfadgBjAdv9e99gnrFw==}
+  unplugin-vue@6.2.0:
+    resolution: {integrity: sha512-/FRiRuBu8AFzeF9qetgMLrDJtBGvJTOn/TqA0DiURIYT8IMAttXajjMO7UM2oK07R5ZX3mFW+OGe/reYEq9wSQ==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       vue: ^3.2.25
@@ -31420,11 +31420,11 @@ snapshots:
     transitivePeerDependencies:
       - vue
 
-  unplugin-vue@5.2.1(@types/node@22.15.29)(jiti@2.4.2)(lightningcss@1.27.0)(terser@5.39.0)(tsx@4.19.2)(vue@3.5.16(typescript@5.8.3))(yaml@2.7.1):
+  unplugin-vue@6.2.0(@types/node@22.15.29)(jiti@2.4.2)(lightningcss@1.27.0)(terser@5.39.0)(tsx@4.19.2)(vue@3.5.16(typescript@5.8.3))(yaml@2.7.1):
     dependencies:
       '@vue/reactivity': 3.5.16
       debug: 4.4.1(supports-color@8.1.1)
-      unplugin: 1.16.1
+      unplugin: 2.3.5
       vite: 6.3.5(@types/node@22.15.29)(jiti@2.4.2)(lightningcss@1.27.0)(terser@5.39.0)(tsx@4.19.2)(yaml@2.7.1)
       vue: 3.5.16(typescript@5.8.3)
     transitivePeerDependencies:
