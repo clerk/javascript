@@ -60,7 +60,12 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
       name: 'signIn.prepareFirstFactor',
       factorKey,
     };
-  }, [props.factor]);
+  }, [
+    props.factor.strategy,
+    'emailAddressId' in props.factor ? props.factor.emailAddressId : undefined,
+    'phoneNumberId' in props.factor ? props.factor.phoneNumberId : undefined,
+    'channel' in props.factor ? props.factor.channel : undefined,
+  ]);
 
   const goBack = () => {
     return navigate('../');
