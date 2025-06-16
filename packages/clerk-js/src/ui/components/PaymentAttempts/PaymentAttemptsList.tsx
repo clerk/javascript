@@ -1,14 +1,11 @@
 import type { CommercePaymentResource } from '@clerk/types';
-import React from 'react';
 
-import { Pagination } from '@/ui/elements/Pagination';
+import { DataTable, DataTableRow } from '@/ui/elements/DataTable';
 
-import { usePaymentAttempts } from '../../../ui/contexts';
-import type { LocalizationKey } from '../../customizables';
-import { Badge, Col, descriptors, Flex, Spinner, Table, Tbody, Td, Text, Th, Thead, Tr } from '../../customizables';
+import { usePaymentAttempts, useSubscriberTypeLocalizationRoot } from '../../contexts';
+import { Badge, localizationKeys, Td, Text } from '../../customizables';
 import { useRouter } from '../../router';
-import type { PropsOfComponent } from '../../styledSystem';
-import { truncateWithEndVisible } from '../../utils/truncateTextWithEndVisible';
+import { formatDate, truncateWithEndVisible } from '../../utils';
 
 /* -------------------------------------------------------------------------------------------------
  * PaymentAttemptsList
@@ -16,6 +13,7 @@ import { truncateWithEndVisible } from '../../utils/truncateTextWithEndVisible';
 
 export const PaymentAttemptsList = () => {
   const { data: paymentAttempts, isLoading } = usePaymentAttempts();
+  const localizationRoot = useSubscriberTypeLocalizationRoot();
 
   return (
     <DataTable
@@ -25,8 +23,12 @@ export const PaymentAttemptsList = () => {
       pageCount={1}
       itemsPerPage={10}
       isLoading={isLoading}
-      emptyStateLocalizationKey='No payment history'
-      headers={['Date', 'Amount', 'Status']}
+      emptyStateLocalizationKey={localizationKeys(`${localizationRoot}.billingPage.paymentHistorySection.empty`)}
+      headers={[
+        localizationKeys(`${localizationRoot}.billingPage.paymentHistorySection.tableHeader__date`),
+        localizationKeys(`${localizationRoot}.billingPage.paymentHistorySection.tableHeader__amount`),
+        localizationKeys(`${localizationRoot}.billingPage.paymentHistorySection.tableHeader__status`),
+      ]}
       rows={(paymentAttempts?.data || []).map(i => (
         <PaymentAttemptsListRow
           key={i.id}
@@ -50,13 +52,7 @@ const PaymentAttemptsListRow = ({ paymentAttempt }: { paymentAttempt: CommercePa
           cursor: 'pointer',
         }}
       >
-        <Text variant='subtitle'>
-          {new Date(paidAt || failedAt || updatedAt).toLocaleString('en-US', {
-            month: 'long',
-            day: 'numeric',
-            year: 'numeric',
-          })}
-        </Text>
+        <Text variant='subtitle'>{formatDate(paidAt || failedAt || updatedAt, 'long')}</Text>
         <Text
           colorScheme='secondary'
           variant='caption'
@@ -85,121 +81,5 @@ const PaymentAttemptsListRow = ({ paymentAttempt }: { paymentAttempt: CommercePa
         </Badge>
       </Td>
     </DataTableRow>
-  );
-};
-
-/* -------------------------------------------------------------------------------------------------
- * DataTable
- * -----------------------------------------------------------------------------------------------*/
-
-type DataTableProps = {
-  headers: (LocalizationKey | string)[];
-  rows: React.ReactNode[];
-  isLoading?: boolean;
-  page: number;
-  onPageChange: (page: number) => void;
-  itemCount: number;
-  emptyStateLocalizationKey: LocalizationKey | string;
-  pageCount: number;
-  itemsPerPage: number;
-};
-
-const DataTable = (props: DataTableProps) => {
-  const {
-    headers,
-    page,
-    onPageChange,
-    rows,
-    isLoading,
-    itemCount,
-    itemsPerPage,
-    pageCount,
-    emptyStateLocalizationKey,
-  } = props;
-
-  const startingRow = itemCount > 0 ? Math.max(0, (page - 1) * itemsPerPage) + 1 : 0;
-  const endingRow = Math.min(page * itemsPerPage, itemCount);
-
-  return (
-    <Col
-      gap={4}
-      sx={{ width: '100%' }}
-    >
-      <Flex sx={t => ({ overflowX: 'auto', padding: t.space.$1 })}>
-        <Table sx={{ tableLayout: 'fixed' }}>
-          <Thead>
-            <Tr>
-              {headers.map((h, index) => (
-                <Th
-                  elementDescriptor={descriptors.tableHead}
-                  key={index}
-                  localizationKey={h}
-                  sx={{ width: index === 0 ? 'auto' : '25%' }}
-                />
-              ))}
-            </Tr>
-          </Thead>
-          <Tbody>
-            {isLoading ? (
-              <Tr>
-                <Td colSpan={4}>
-                  <Spinner
-                    colorScheme='primary'
-                    sx={{ margin: 'auto', display: 'block' }}
-                    elementDescriptor={descriptors.spinner}
-                  />
-                </Td>
-              </Tr>
-            ) : !rows.length ? (
-              <DataTableEmptyRow
-                key='empty'
-                localizationKey={emptyStateLocalizationKey}
-              />
-            ) : (
-              rows
-            )}
-          </Tbody>
-        </Table>
-      </Flex>
-      {pageCount > 1 && (
-        <Pagination
-          count={pageCount}
-          page={page}
-          onChange={onPageChange}
-          siblingCount={1}
-          rowInfo={{
-            allRowsCount: itemCount,
-            startingRow,
-            endingRow,
-          }}
-        />
-      )}
-    </Col>
-  );
-};
-
-const DataTableEmptyRow = (props: { localizationKey: LocalizationKey | string }) => {
-  return (
-    <Tr>
-      <Td colSpan={4}>
-        <Text
-          localizationKey={props.localizationKey}
-          sx={{
-            margin: 'auto',
-            display: 'block',
-            width: 'fit-content',
-          }}
-        />
-      </Td>
-    </Tr>
-  );
-};
-
-const DataTableRow = (props: PropsOfComponent<typeof Tr>) => {
-  return (
-    <Tr
-      {...props}
-      sx={t => ({ ':hover': { backgroundColor: t.colors.$neutralAlpha50 } })}
-    />
   );
 };

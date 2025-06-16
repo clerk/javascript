@@ -1,6 +1,6 @@
 import { expectTypeOf, test } from 'vitest';
 
-import type { AuthObject } from '../authObjects';
+import type { AuthObject, InvalidTokenAuthObject } from '../authObjects';
 import type { GetAuthFn, MachineAuthObject, SessionAuthObject } from '../types';
 
 // Across our SDKs, we have a getAuth() function
@@ -22,10 +22,10 @@ test('infers the correct AuthObject type for each accepted token type', () => {
 
   // Array of token types
   expectTypeOf(getAuth(request, { acceptsToken: ['session_token', 'machine_token'] })).toMatchTypeOf<
-    SessionAuthObject | MachineAuthObject<'machine_token'>
+    SessionAuthObject | MachineAuthObject<'machine_token'> | InvalidTokenAuthObject
   >();
   expectTypeOf(getAuth(request, { acceptsToken: ['machine_token', 'oauth_token'] })).toMatchTypeOf<
-    MachineAuthObject<'machine_token' | 'oauth_token'>
+    MachineAuthObject<'machine_token' | 'oauth_token'> | InvalidTokenAuthObject
   >();
 
   // Any token type
