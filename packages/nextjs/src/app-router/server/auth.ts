@@ -1,4 +1,4 @@
-import type { AuthObject, MachineAuthObject, SessionAuthObject } from '@clerk/backend';
+import type { AuthObject, InvalidTokenAuthObject, MachineAuthObject, SessionAuthObject } from '@clerk/backend';
 import type {
   AuthenticateRequestOptions,
   InferAuthObjectFromToken,
@@ -56,11 +56,12 @@ export interface AuthFn<TRedirect = ReturnType<typeof redirect>> {
   <T extends TokenType[]>(
     options: AuthOptions & { acceptsToken: T },
   ): Promise<
-    InferAuthObjectFromTokenArray<
-      T,
-      SessionAuthWithRedirect<TRedirect>,
-      MachineAuthObject<Exclude<T[number], SessionTokenType>>
-    >
+    | InferAuthObjectFromTokenArray<
+        T,
+        SessionAuthWithRedirect<TRedirect>,
+        MachineAuthObject<Exclude<T[number], SessionTokenType>>
+      >
+    | InvalidTokenAuthObject
   >;
 
   /**
