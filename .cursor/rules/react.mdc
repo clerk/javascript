@@ -42,7 +42,7 @@ Local State
 
 Global State
 - Use Context API for theme/authentication
-- Use Redux Toolkit for complex state
+- Consider state management solutions for complex state
 - Implement proper state selectors
 - Use proper state normalization
 - Implement proper state persistence
