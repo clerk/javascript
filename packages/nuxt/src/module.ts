@@ -12,7 +12,10 @@ import {
   updateRuntimeConfig,
 } from '@nuxt/kit';
 
-export type ModuleOptions = Without<PluginOptions, 'routerPush' | 'routerReplace' | 'publishableKey'> & {
+export type ModuleOptions = Without<
+  PluginOptions,
+  'routerPush' | 'routerReplace' | 'publishableKey' | 'initialState'
+> & {
   publishableKey?: string;
   /**
    * Skip the automatic server middleware registration. When enabled, you'll need to
@@ -106,10 +109,10 @@ export default defineNuxtModule<ModuleOptions>({
     addTypeTemplate(
       {
         filename: 'types/clerk.d.ts',
-        getContents: () => `import type { SignedInAuthObject, SignedOutAuthObject } from '@clerk/backend/internal';
+        getContents: () => `import type { SessionAuthObject } from '@clerk/backend';
           declare module 'h3' {
-            type AuthObjectHandler = (SignedInAuthObject | SignedOutAuthObject) & {
-              (): SignedInAuthObject | SignedOutAuthObject;
+            type AuthObjectHandler = SessionAuthObject & {
+              (): SessionAuthObject;
             }
 
             interface H3EventContext {
