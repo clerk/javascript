@@ -105,6 +105,11 @@ export const getAuthDataFromRequestAsync = async (
   const hasMachineToken = bearerToken && isMachineTokenByPrefix(bearerToken);
   if (hasMachineToken) {
     const machineTokenType = getMachineTokenType(bearerToken);
+
+    if (Array.isArray(acceptsToken) && !acceptsToken.includes(machineTokenType)) {
+      return invalidTokenAuthObject();
+    }
+
     const { data, errors } = await verifyMachineAuthToken(bearerToken, options);
     const authObject = errors
       ? unauthenticatedMachineObject(machineTokenType, options)
