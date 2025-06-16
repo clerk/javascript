@@ -2,4 +2,4 @@
 '@clerk/clerk-js': patch
 ---
 
-Switch to `subscription_items` endpoints
+Internal only: switch to `/subscription_items` endpoints
