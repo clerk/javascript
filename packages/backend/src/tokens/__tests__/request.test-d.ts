@@ -26,7 +26,7 @@ test('returns the correct `authenticateRequest()` return type for each accepted 
   // Array of token types
   expectTypeOf(
     authenticateRequest(request, { acceptsToken: ['session_token', 'api_key', 'machine_token'] }),
-  ).toMatchTypeOf<Promise<RequestState<'session_token' | 'api_key' | 'machine_token'>>>();
+  ).toMatchTypeOf<Promise<RequestState<'session_token' | 'api_key' | 'machine_token' | null>>>();
 
   // Any token type
   expectTypeOf(authenticateRequest(request, { acceptsToken: 'any' })).toMatchTypeOf<Promise<RequestState<TokenType>>>();
