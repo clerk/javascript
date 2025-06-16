@@ -246,7 +246,7 @@ export function handshake(
 
 export function signedOutInvalidToken(): UnauthenticatedState<null> {
   const authObject = invalidTokenAuthObject();
-  return {
+  return withDebugHeaders({
     status: AuthStatus.SignedOut,
     reason: AuthErrorReason.TokenTypeMismatch,
     message: '',
@@ -264,7 +264,7 @@ export function signedOutInvalidToken(): UnauthenticatedState<null> {
     toAuth: () => authObject,
     headers: new Headers(),
     token: null,
-  };
+  });
 }
 
 const withDebugHeaders = <T extends { headers: Headers; message?: string; reason?: AuthReason; status?: AuthStatus }>(
