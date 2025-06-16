@@ -106,6 +106,7 @@ export const getAuthDataFromRequestAsync = async (
   if (hasMachineToken) {
     const machineTokenType = getMachineTokenType(bearerToken);
 
+    // Early return if the token type is not accepted to save on the verify call
     if (Array.isArray(acceptsToken) && !acceptsToken.includes(machineTokenType)) {
       return invalidTokenAuthObject();
     }

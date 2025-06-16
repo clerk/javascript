@@ -16,7 +16,7 @@ import type { AuthReason } from '../authStatus';
 import { AuthErrorReason, AuthStatus } from '../authStatus';
 import { OrganizationMatcher } from '../organizationMatcher';
 import { authenticateRequest, RefreshTokenErrorReason } from '../request';
-import type { MachineTokenType } from '../tokenTypes';
+import { type MachineTokenType, TokenType } from '../tokenTypes';
 import type { AuthenticateRequestOptions } from '../types';
 
 const PK_TEST = 'pk_test_Y2xlcmsuaW5zcGlyZWQucHVtYS03NC5sY2wuZGV2JA';
@@ -1203,7 +1203,7 @@ describe('tokens.authenticateRequest(options)', () => {
     });
 
     // Test each token type with parameterized tests
-    const tokenTypes = ['api_key', 'oauth_token', 'machine_token'] as const;
+    const tokenTypes = [TokenType.ApiKey, TokenType.OAuthToken, TokenType.MachineToken];
 
     describe.each(tokenTypes)('%s Authentication', tokenType => {
       const mockToken = mockTokens[tokenType];
