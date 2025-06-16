@@ -39,10 +39,6 @@ const machineTokenErrorMock = [
   },
 ];
 
-beforeEach(() => {
-  vi.clearAllMocks();
-});
-
 describe('getAuthDataFromRequestAsync', () => {
   beforeEach(() => {
     vi.clearAllMocks();
