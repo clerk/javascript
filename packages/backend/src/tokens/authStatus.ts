@@ -124,12 +124,10 @@ export type AuthErrorReason = (typeof AuthErrorReason)[keyof typeof AuthErrorRea
 
 export type AuthReason = AuthErrorReason | TokenVerificationErrorReason;
 
-export type RequestState<T extends TokenType | null = SessionTokenType> = T extends any
-  ?
-      | AuthenticatedState<T extends null ? never : T>
-      | UnauthenticatedState<T>
-      | (T extends SessionTokenType ? HandshakeState : never)
-  : never;
+export type RequestState<T extends TokenType | null = SessionTokenType> =
+  | AuthenticatedState<T extends null ? never : T>
+  | UnauthenticatedState<T>
+  | (T extends SessionTokenType ? HandshakeState : never);
 
 type BaseSignedInParams = {
   authenticateContext: AuthenticateContext;
