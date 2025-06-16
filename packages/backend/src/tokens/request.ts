@@ -669,16 +669,6 @@ export const authenticateRequest: AuthenticateRequest = (async (
       return handleSessionTokenError(new Error('Missing token in header'), 'header');
     }
 
-    // Handle case where tokenType is any and the token is not a machine token
-    if (!isMachineTokenByPrefix(tokenInHeader)) {
-      return signedOut({
-        tokenType: acceptsToken as MachineTokenType,
-        authenticateContext,
-        reason: AuthErrorReason.TokenTypeMismatch,
-        message: '',
-      });
-    }
-
     const parsedTokenType = getMachineTokenType(tokenInHeader);
     const mismatchState = checkTokenTypeMismatch(parsedTokenType, acceptsToken, authenticateContext);
     if (mismatchState) {
@@ -739,7 +729,8 @@ export const authenticateRequest: AuthenticateRequest = (async (
     });
   }
 
-  // Check if the token type (or session fallback) is accepted
+  // If acceptsToken is an array, early check if the token is in the accepted array
+  // to avoid unnecessary verification calls
   if (Array.isArray(acceptsToken)) {
     if (!isTokenTypeInAcceptedArray(acceptsToken, authenticateContext)) {
       return signedOutInvalidToken();

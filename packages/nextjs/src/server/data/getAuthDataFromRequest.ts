@@ -10,6 +10,7 @@ import {
   invalidTokenAuthObject,
   isMachineTokenByPrefix,
   isTokenTypeAccepted,
+  type MachineTokenType,
   type SignedInAuthObject,
   type SignedOutAuthObject,
   signedOutAuthObject,
@@ -109,6 +110,11 @@ export const getAuthDataFromRequestAsync = async (
     // Early return if the token type is not accepted to save on the verify call
     if (Array.isArray(acceptsToken) && !acceptsToken.includes(machineTokenType)) {
       return invalidTokenAuthObject();
+    }
+    // Early return for scalar acceptsToken if it does not match the machine token type
+    if (!Array.isArray(acceptsToken) && acceptsToken !== 'any' && machineTokenType !== acceptsToken) {
+      const authObject = unauthenticatedMachineObject(acceptsToken as MachineTokenType, options);
+      return getAuthObjectForAcceptedToken({ authObject, acceptsToken });
     }
 
     const { data, errors } = await verifyMachineAuthToken(bearerToken, options);

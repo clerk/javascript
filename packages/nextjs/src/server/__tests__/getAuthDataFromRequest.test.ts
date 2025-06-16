@@ -60,6 +60,20 @@ describe('getAuthDataFromRequestAsync', () => {
     expect(auth.isAuthenticated).toBe(false);
   });
 
+  it('returns unauthenticated auth object when token type does not match single acceptsToken', async () => {
+    const req = mockRequest({
+      url: '/api/protected',
+      headers: new Headers({
+        [constants.Headers.Authorization]: 'Bearer ak_xxx',
+      }),
+    });
+
+    const auth = await getAuthDataFromRequestAsync(req, { acceptsToken: 'oauth_token' });
+
+    expect(auth.tokenType).toBe('oauth_token');
+    expect(auth.isAuthenticated).toBe(false);
+  });
+
   it('returns authenticated auth object for any valid token type', async () => {
     vi.mocked(verifyMachineAuthToken).mockResolvedValueOnce({
       data: { id: 'ak_id123', subject: 'user_12345' } as any,
