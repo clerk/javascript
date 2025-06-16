@@ -661,7 +661,8 @@ export const trTR: LocalizationResource = {
       checkbox: {
         label__onlyPrivacyPolicy: "Gizlilik Politikası'nı kabul ediyorum",
         label__onlyTermsOfService: "Hizmet Şartları'nı kabul ediyorum",
-        label__termsOfServiceAndPrivacyPolicy: "Hizmet Şartları ve Gizlilik Politikası'nı kabul ediyorum",
+        label__termsOfServiceAndPrivacyPolicy:
+          "{{ termsOfServiceLink || link('Hizmet Şartları') }} ve {{ privacyPolicyLink || link('Gizlilik Politikası') }}'nı kabul ediyorum",
       },
       continue: {
         subtitle: 'Devam etmek için lütfen gerekli adımları takip edin.',

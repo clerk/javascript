@@ -664,7 +664,8 @@ export const beBY: LocalizationResource = {
       checkbox: {
         label__onlyPrivacyPolicy: 'Я згаджаюся з палітыкай канфідэнцыяльнасці',
         label__onlyTermsOfService: 'Я згаджаюся з умовамі выкарыстання',
-        label__termsOfServiceAndPrivacyPolicy: 'Я згаджаюся з умовамі выкарыстання і палітыкай канфідэнцыяльнасці',
+        label__termsOfServiceAndPrivacyPolicy:
+          'Я згаджаюся з {{ termsOfServiceLink || link("умовамі выкарыстання") }} і {{ privacyPolicyLink || link("палітыкай канфідэнцыяльнасці") }}',
       },
       continue: {
         subtitle: 'Калі ласка, пагадзіцеся з умовамі, каб працягнуць.',
