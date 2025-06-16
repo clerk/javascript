@@ -64,7 +64,7 @@ describe('getAuthDataFromRequestAsync', () => {
     expect(auth.isAuthenticated).toBe(false);
   });
 
-  it('returns authenticated auth obkect for any valid token type', async () => {
+  it('returns authenticated auth object for any valid token type', async () => {
     vi.mocked(verifyMachineAuthToken).mockResolvedValueOnce({
       data: { id: 'ak_id123', subject: 'user_12345' } as any,
       tokenType: 'api_key',
