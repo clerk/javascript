@@ -11,28 +11,37 @@ import type {
 import * as React from 'react';
 import { useMemo, useState } from 'react';
 
-import { Alert } from '@/ui/elements/Alert';
 import { Avatar } from '@/ui/elements/Avatar';
 import { Drawer, useDrawerContext } from '@/ui/elements/Drawer';
 import { Switch } from '@/ui/elements/Switch';
+import { Icon } from '@/ui/primitives/Icon';
+import { truncateWithEndVisible } from '@/ui/utils/truncateTextWithEndVisible';
 
 import { useProtect } from '../../common';
-import { SubscriberTypeContext, usePlansContext, useSubscriberTypeContext, useSubscriptions } from '../../contexts';
-import { Badge, Box, Button, Col, descriptors, Flex, Heading, localizationKeys, Span, Text } from '../../customizables';
-import { handleError } from '../../utils';
+import { usePlansContext, useSubscriberTypeContext, useSubscriptions } from '../../contexts';
+import type { LocalizationKey } from '../../customizables';
+import {
+  Badge,
+  Box,
+  Col,
+  descriptors,
+  Flex,
+  Heading,
+  localizationKeys,
+  Span,
+  Spinner,
+  Text,
+} from '../../customizables';
 
 export const SubscriptionDetails = (props: __experimental_SubscriptionDetailsProps) => {
-  console.log('SubscriptionDetails', props);
   return (
-    <SubscriberTypeContext.Provider value={'user'}>
-      <Drawer.Content>
-        <PlanDetailsInternal {...props} />
-      </Drawer.Content>
-    </SubscriberTypeContext.Provider>
+    <Drawer.Content>
+      <SubscriptionDetailsInternal {...props} />
+    </Drawer.Content>
   );
 };
 
-const PlanDetailsInternal = ({
+const SubscriptionDetailsInternal = ({
   plan,
   onSubscriptionCancel,
   portalRoot,
@@ -46,22 +55,23 @@ const PlanDetailsInternal = ({
   const [planPeriod, setPlanPeriod] = useState<CommerceSubscriptionPlanPeriod>(initialPlanPeriod);
 
   const { setIsOpen } = useDrawerContext();
-  const {
-    activeOrUpcomingSubscriptionBasedOnPlanPeriod,
-    revalidateAll,
-    buttonPropsForPlan,
-    isDefaultPlanImplicitlyActiveOrUpcoming,
-  } = usePlansContext();
+  const { revalidateAll, buttonPropsForPlan, isDefaultPlanImplicitlyActiveOrUpcoming } = usePlansContext();
   const subscriberType = useSubscriberTypeContext();
   const canManageBilling = useProtect(
     has => has({ permission: 'org:sys_billing:manage' }) || subscriberType === 'user',
   );
 
-  if (!plan) {
-    return null;
-  }
+  const { data: subscriptions, isLoading } = useSubscriptions();
 
-  const subscription = activeOrUpcomingSubscriptionBasedOnPlanPeriod(plan, planPeriod);
+  if (isLoading) {
+    return (
+      <Spinner
+        sx={{
+          margin: 'auto',
+        }}
+      />
+    );
+  }
 
   const handleClose = () => {
     if (setIsOpen) {
@@ -69,27 +79,20 @@ const PlanDetailsInternal = ({
     }
   };
 
-  const features = plan.features;
-  const hasFeatures = features.length > 0;
   const cancelSubscription = async () => {
-    if (!subscription) {
-      return;
-    }
-
-    setCancelError(undefined);
-    setIsSubmitting(true);
-
-    await subscription
-      .cancel({ orgId: subscriberType === 'org' ? organization?.id : undefined })
-      .then(() => {
-        setIsSubmitting(false);
-        onSubscriptionCancel?.();
-        handleClose();
-      })
-      .catch(error => {
-        handleError(error, [], setCancelError);
-        setIsSubmitting(false);
-      });
+    // setCancelError(undefined);
+    // setIsSubmitting(true);
+    // await subscription
+    //   .cancel({ orgId: subscriberType === 'org' ? organization?.id : undefined })
+    //   .then(() => {
+    //     setIsSubmitting(false);
+    //     onSubscriptionCancel?.();
+    //     handleClose();
+    //   })
+    //   .catch(error => {
+    //     handleError(error, [], setCancelError);
+    //     setIsSubmitting(false);
+    //   });
   };
 
   type Open__internal_CheckoutProps = {
@@ -119,26 +122,75 @@ const PlanDetailsInternal = ({
   return (
     <>
       <Drawer.Header
-        sx={t =>
-          !hasFeatures
-            ? {
-                flex: 1,
-                borderBottomWidth: 0,
-                background: t.colors.$colorBackground,
-              }
-            : null
+        title={
+          'Subscription'
+          // localizationKeys('commerce.checkout.title')
         }
-      >
-        <Header
-          plan={plan}
-          subscription={subscription}
-          planPeriod={planPeriod}
-          setPlanPeriod={setPlanPeriod}
-          closeSlot={<Drawer.Close />}
-        />
-      </Drawer.Header>
+      />
 
-      {hasFeatures ? (
+      <Col
+        gap={4}
+        sx={t => ({
+          padding: t.space.$4,
+        })}
+      >
+        {subscriptions?.map(subscriptionItem => (
+          <Col
+            gap={3}
+            key={subscriptionItem.id}
+            sx={t => ({
+              padding: t.space.$3,
+              borderWidth: t.borderWidths.$normal,
+              borderStyle: t.borderStyles.$solid,
+              borderColor: t.colors.$neutralAlpha100,
+              borderRadius: t.radii.$md,
+            })}
+          >
+            <Flex>
+              <Text
+                sx={{
+                  marginRight: 'auto',
+                }}
+              >
+                {subscriptionItem.plan.name}
+              </Text>
+              <Badge
+                colorScheme={subscriptionItem.status === 'active' ? 'secondary' : 'primary'}
+                localizationKey={
+                  subscriptionItem.status === 'active'
+                    ? localizationKeys('badge__activePlan')
+                    : localizationKeys('badge__upcomingPlan')
+                }
+              />
+            </Flex>
+
+            <Box
+              elementDescriptor={descriptors.statementSectionContentDetailsList}
+              as='ul'
+              sx={t => ({
+                margin: 0,
+                padding: 0,
+                borderWidth: t.borderWidths.$normal,
+                borderStyle: t.borderStyles.$solid,
+                borderColor: t.colors.$neutralAlpha100,
+                borderRadius: t.radii.$md,
+                overflow: 'hidden',
+              })}
+            >
+              <PriceItem
+                label={'Monthly price'}
+                value={`${subscriptionItem.plan.currencySymbol}${subscriptionItem.plan.amountFormatted} / mo`}
+              />
+              <PriceItem
+                label={'Annual discount'}
+                value={`${subscriptionItem.plan.currencySymbol}${subscriptionItem.plan.annualMonthlyAmountFormatted} / mo`}
+              />
+            </Box>
+          </Col>
+        ))}
+      </Col>
+
+      {/* {hasFeatures ? (
         <Drawer.Body>
           <Text
             elementDescriptor={descriptors.planDetailCaption}
@@ -207,9 +259,9 @@ const PlanDetailsInternal = ({
             ))}
           </Box>
         </Drawer.Body>
-      ) : null}
+      ) : null} */}
 
-      {(!plan.isDefault && !isDefaultPlanImplicitlyActiveOrUpcoming) || !subscription ? (
+      {/* {(!plan.isDefault && !isDefaultPlanImplicitlyActiveOrUpcoming) || !subscription ? (
         <Drawer.Footer>
           {subscription ? (
             subscription.canceledAt ? (
@@ -266,9 +318,9 @@ const PlanDetailsInternal = ({
             />
           )}
         </Drawer.Footer>
-      ) : null}
+      ) : null} */}
 
-      {subscription ? (
+      {/* {subscription ? (
         <Drawer.Confirmation
           open={showConfirmation}
           onOpenChange={setShowConfirmation}
@@ -328,10 +380,94 @@ const PlanDetailsInternal = ({
             <Alert colorScheme='danger'>{typeof cancelError === 'string' ? cancelError : cancelError.message}</Alert>
           )}
         </Drawer.Confirmation>
-      ) : null}
+      ) : null} */}
     </>
   );
 };
+
+function PriceItem({
+  labelIcon,
+  label,
+  valueCopyable = false,
+  value,
+  valueTruncated = false,
+}: {
+  icon?: React.ReactNode;
+  label: string | LocalizationKey;
+  labelIcon?: React.ComponentType;
+  value: string | LocalizationKey;
+  valueTruncated?: boolean;
+  valueCopyable?: boolean;
+}) {
+  return (
+    <Box
+      elementDescriptor={descriptors.statementSectionContentDetailsListItem}
+      as='li'
+      sx={t => ({
+        margin: 0,
+        paddingInline: t.space.$2,
+        paddingBlock: t.space.$1x5,
+        display: 'flex',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        columnGap: t.space.$2,
+        rowGap: t.space.$0x5,
+        '&:not(:first-child)': {
+          borderBlockStartWidth: t.borderWidths.$normal,
+          borderBlockStartStyle: t.borderStyles.$solid,
+          borderBlockStartColor: t.colors.$neutralAlpha100,
+        },
+      })}
+    >
+      <Span
+        elementDescriptor={descriptors.statementSectionContentDetailsListItemLabelContainer}
+        sx={t => ({
+          display: 'flex',
+          alignItems: 'center',
+          gap: t.space.$1x5,
+        })}
+      >
+        {labelIcon ? (
+          <Icon
+            icon={labelIcon}
+            colorScheme='neutral'
+          />
+        ) : null}
+        <Text
+          variant='caption'
+          colorScheme='secondary'
+          elementDescriptor={descriptors.statementSectionContentDetailsListItemLabel}
+          localizationKey={label}
+        />
+      </Span>
+      <Span
+        sx={t => ({
+          display: 'flex',
+          alignItems: 'center',
+          gap: t.space.$0x25,
+          color: t.colors.$colorTextSecondary,
+        })}
+      >
+        {typeof value === 'string' ? (
+          <Text
+            colorScheme='secondary'
+            variant='caption'
+            elementDescriptor={descriptors.statementSectionContentDetailsListItemValue}
+          >
+            {valueTruncated ? truncateWithEndVisible(value) : value}
+          </Text>
+        ) : (
+          <Text
+            elementDescriptor={descriptors.statementSectionContentDetailsListItemValue}
+            colorScheme='secondary'
+            variant='caption'
+            localizationKey={value}
+          />
+        )}
+      </Span>
+    </Box>
+  );
+}
 
 /* -------------------------------------------------------------------------------------------------
  * Header

@@ -38,8 +38,7 @@ import {
   UserVerificationModal,
   WaitlistModal,
 } from './lazyModules/components';
-import { MountedCheckoutDrawer, MountedPlanDetailDrawer } from './lazyModules/drawers';
-import { MountedSubscriptionDetailDrawer } from './lazyModules/MountedSubscriptionDetailDrawer';
+import { MountedCheckoutDrawer, MountedPlanDetailDrawer, MountedSubscriptionDetailDrawer } from './lazyModules/drawers';
 import {
   LazyComponentRenderer,
   LazyImpersonationFabProvider,
