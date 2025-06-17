@@ -12,7 +12,7 @@ import { SessionTasksContext, useSessionTasksContext } from '../../contexts/comp
 import { Route, Switch, useRouter } from '../../router';
 import { ForceOrganizationSelectionTask } from './tasks/ForceOrganizationSelection';
 
-const SessionTasksStart = withCardStateProvider(() => {
+const SessionTasksStart = () => {
   const clerk = useClerk();
   const { navigate } = useRouter();
   const { redirectUrlComplete } = useSessionTasksContext();
@@ -33,7 +33,7 @@ const SessionTasksStart = withCardStateProvider(() => {
       <Card.Footer />
     </Card.Root>
   );
-});
+};
 
 function SessionTaskRoutes(): JSX.Element {
   return (
@@ -51,7 +51,7 @@ function SessionTaskRoutes(): JSX.Element {
 /**
  * @internal
  */
-export function SessionTask(): JSX.Element {
+export const SessionTask = withCardStateProvider(() => {
   const clerk = useClerk();
   const { navigate } = useRouter();
   const signInContext = useContext(SignInContext);
@@ -71,14 +71,24 @@ export function SessionTask(): JSX.Element {
     clerk.telemetry?.record(eventComponentMounted('SessionTask', { task: task.key }));
   }, [clerk, navigate, redirectUrlComplete]);
 
-  const nextTask = useCallback(
-    () => clerk.__experimental_navigateToTask({ redirectUrlComplete }),
-    [clerk, redirectUrlComplete],
-  );
+  const nextTask = useCallback(() => {
+    return clerk.__experimental_navigateToTask({ redirectUrlComplete });
+  }, [clerk, redirectUrlComplete]);
+
+  if (!clerk.session?.currentTask) {
+    return (
+      <Card.Root>
+        <Card.Content>
+          <LoadingCardContainer />
+        </Card.Content>
+        <Card.Footer />
+      </Card.Root>
+    );
+  }
 
   return (
     <SessionTasksContext.Provider value={{ nextTask, redirectUrlComplete }}>
       <SessionTaskRoutes />
     </SessionTasksContext.Provider>
   );
-}
+});

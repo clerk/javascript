@@ -1,7 +1,7 @@
 import type { OrganizationResource, UserResource } from '@clerk/types';
 import { createContext, useContext } from 'react';
 
-import { useEnvironment } from '..';
+import { useEnvironment } from '../../contexts';
 import { useRouter } from '../../router';
 import type { OrganizationListCtx } from '../../types';
 import { populateParamFromObject } from '../utils';
