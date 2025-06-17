@@ -15,7 +15,7 @@ type RevokeAPIKeyConfirmationModalProps = {
   onOpen: () => void;
   onClose: () => void;
   apiKeyId?: string;
-  apiKeyName?: string;
+  apiKeyName: string;
   modalRoot?: React.MutableRefObject<HTMLElement | null>;
 };
 
