@@ -81,7 +81,10 @@ export const RevokeAPIKeyConfirmationModal = ({
           : {},
       ]}
     >
-      <Card.Root role='alertdialog'>
+      <Card.Root
+        role='alertdialog'
+        elementDescriptor={descriptors.apiKeysRevokeModal}
+      >
         <Card.Content
           sx={t => ({
             textAlign: 'left',
