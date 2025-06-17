@@ -65,14 +65,14 @@ export const CreateApiKeyForm = ({ onCreate, isSubmitting }: CreateApiKeyFormPro
     isRequired: true,
   });
 
-  const descriptionField = useFormControl('description', '', {
+  const descriptionField = useFormControl('apiKeyDescription', '', {
     type: 'text',
     label: localizationKeys('formFieldLabel__apiKeyDescription'),
     placeholder: localizationKeys('formFieldInputPlaceholder__apiKeyDescription'),
     isRequired: false,
   });
 
-  const expirationDateField = useFormControl('expirationDate', '', {
+  const expirationDateField = useFormControl('apiKeyExpirationDate', '', {
     type: 'date',
     label: localizationKeys('formFieldLabel__apiKeyExpirationDate'),
     placeholder: localizationKeys('formFieldInputPlaceholder__apiKeyExpirationDate'),

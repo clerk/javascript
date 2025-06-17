@@ -11,6 +11,7 @@ import { localizationKeys } from '@/ui/localization';
 import { useFormControl } from '@/ui/utils';
 
 type RevokeAPIKeyConfirmationModalProps = {
+  subject: string;
   isOpen: boolean;
   onOpen: () => void;
   onClose: () => void;
@@ -20,6 +21,7 @@ type RevokeAPIKeyConfirmationModalProps = {
 };
 
 export const RevokeAPIKeyConfirmationModal = ({
+  subject,
   isOpen,
   onOpen,
   onClose,
@@ -35,18 +37,20 @@ export const RevokeAPIKeyConfirmationModal = ({
     if (!apiKeyId) return;
 
     await clerk.apiKeys.revoke({ apiKeyID: apiKeyId });
-    void mutate({ key: 'api-keys', subject: clerk.organization?.id ?? clerk.session?.user.id });
+    const cacheKey = { key: 'api-keys', subject };
+
+    void mutate(cacheKey);
     onClose();
   };
 
-  const revokeField = useFormControl('revokeConfirmation', '', {
+  const revokeField = useFormControl('apiKeyRevokeConfirmation', '', {
     type: 'text',
     label: `Type "Revoke" to confirm`,
     placeholder: 'Revoke',
     isRequired: true,
   });
 
-  // TODO: Maybe use secret key name for confirmation
+  // TODO: Make this locale-aware
   const canSubmit = revokeField.value === 'Revoke';
 
   if (!isOpen) {
