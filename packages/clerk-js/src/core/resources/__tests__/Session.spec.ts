@@ -251,6 +251,46 @@ describe('Session', () => {
     });
   });
 
+  describe('touch()', () => {
+    let dispatchSpy: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(() => {
+      dispatchSpy = vi.spyOn(eventBus, 'emit');
+      BaseResource.clerk = clerkMock() as any;
+    });
+
+    afterEach(() => {
+      dispatchSpy?.mockRestore();
+      BaseResource.clerk = null as any;
+    });
+
+    it.only('dispatches token:update event on touch', async () => {
+      const mockToken = { object: 'token', jwt: mockJwt };
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+        last_active_token: mockToken,
+      } as SessionJSON);
+
+      (BaseResource.clerk.getFapiClient().request as Mock).mockResolvedValue({
+        payload: session,
+      });
+
+      await session.touch();
+
+      expect(dispatchSpy).toHaveBeenCalledTimes(1);
+      expect(dispatchSpy).toHaveBeenCalledWith('token:update', {
+        token: session.lastActiveToken,
+      });
+    });
+  });
+
   describe('isAuthorized()', () => {
     it('user with permission to delete the organization should be able to delete the  organization', async () => {
       const session = new Session({
