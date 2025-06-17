@@ -589,6 +589,7 @@ export type ElementsConfig = {
 
   apiKeys: WithOptions;
   apiKeysHeader: WithOptions;
+  apiKeysSearchBox: WithOptions;
   apiKeysSearchInput: WithOptions;
   apiKeysAddButton: WithOptions;
   apiKeysTable: WithOptions;

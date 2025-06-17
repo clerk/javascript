@@ -106,7 +106,7 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
           }}
           elementDescriptor={descriptors.apiKeysHeader}
         >
-          <Box>
+          <Box elementDescriptor={descriptors.apiKeysSearchBox}>
             <InputWithIcon
               placeholder={t(localizationKeys('apiKeys.action__search'))}
               leftIcon={<Icon icon={MagnifyingGlass} />}
