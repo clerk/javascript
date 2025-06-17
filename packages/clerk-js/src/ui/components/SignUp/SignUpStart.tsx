@@ -116,7 +116,11 @@ function SignUpStartInternal(): JSX.Element {
   } as const;
 
   const hasTicket = !!formState.ticket.value;
-  const hasExistingSignUpWithTicket = !!(signUp.id && signUp.status !== null);
+  const hasExistingSignUpWithTicket = !!(
+    signUp.id &&
+    signUp.status !== null &&
+    (getClerkQueryParam('__clerk_ticket') || getClerkQueryParam('__clerk_invitation_token'))
+  );
   const hasEmail = !!formState.emailAddress.value;
   const isProgressiveSignUp = userSettings.signUp.progressive;
   const isLegalConsentEnabled = userSettings.signUp.legal_consent_enabled;
