@@ -660,7 +660,8 @@ export const bgBG: LocalizationResource = {
       checkbox: {
         label__onlyPrivacyPolicy: 'Съгласен съм само с политиката за конфиденциалност',
         label__onlyTermsOfService: 'Съгласен съм само с условията за ползване',
-        label__termsOfServiceAndPrivacyPolicy: 'Съгласен съм с условията за ползване и политиката за конфиденциалност',
+        label__termsOfServiceAndPrivacyPolicy:
+          'Съгласен съм с {{ termsOfServiceLink || link("условията за ползване") }} и {{ privacyPolicyLink || link("политиката за конфиденциалност") }}',
       },
       continue: {
         subtitle: 'Продължете, за да завършите процеса',

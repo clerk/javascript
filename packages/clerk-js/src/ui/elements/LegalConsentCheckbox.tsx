@@ -23,16 +23,16 @@ const LegalCheckboxLabel = (props: { termsUrl?: string; privacyPolicyUrl?: strin
 
   if (termsUrl && privacyPolicyUrl) {
     localizationKey = localizationKeys('signUp.legalConsent.checkbox.label__termsOfServiceAndPrivacyPolicy', {
-      termsOfServiceLink: props.termsUrl,
-      privacyPolicyLink: props.privacyPolicyUrl,
+      termsOfServiceLink: termsUrl,
+      privacyPolicyLink: privacyPolicyUrl,
     });
   } else if (termsUrl) {
     localizationKey = localizationKeys('signUp.legalConsent.checkbox.label__onlyTermsOfService', {
-      termsOfServiceLink: props.termsUrl,
+      termsOfServiceLink: termsUrl,
     });
   } else if (privacyPolicyUrl) {
     localizationKey = localizationKeys('signUp.legalConsent.checkbox.label__onlyPrivacyPolicy', {
-      privacyPolicyLink: props.privacyPolicyUrl,
+      privacyPolicyLink: privacyPolicyUrl,
     });
   }
 

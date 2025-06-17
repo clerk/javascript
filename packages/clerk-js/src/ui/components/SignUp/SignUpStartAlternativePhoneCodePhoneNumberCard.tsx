@@ -75,7 +75,9 @@ export const SignUpStartAlternativePhoneCodePhoneNumberCard = (props: SignUpForm
               <Form.ControlRow elementId='phoneNumber'>
                 <Form.PhoneInput
                   {...formState.phoneNumber.props}
-                  label={localizationKeys('signUp.start.alternativePhoneCodeProvider.label', { provider })}
+                  label={localizationKeys('signUp.start.alternativePhoneCodeProvider.label', {
+                    provider: provider || '',
+                  })}
                   isRequired
                   isOptional={false}
                   actionLabel={undefined}

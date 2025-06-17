@@ -6,6 +6,7 @@ import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
 import { Route, Switch } from '../../router';
 import { OrganizationGeneralPage } from './OrganizationGeneralPage';
 import { OrganizationMembers } from './OrganizationMembers';
+import { OrganizationPaymentAttemptPage } from './OrganizationPaymentAttemptPage';
 import { OrganizationPlansPage } from './OrganizationPlansPage';
 import { OrganizationStatementPage } from './OrganizationStatementPage';
 
@@ -15,9 +16,16 @@ const OrganizationBillingPage = lazy(() =>
   })),
 );
 
+const OrganizationAPIKeysPage = lazy(() =>
+  import(/* webpackChunkName: "op-api-keys-page"*/ './OrganizationApiKeysPage').then(module => ({
+    default: module.OrganizationAPIKeysPage,
+  })),
+);
+
 export const OrganizationProfileRoutes = () => {
-  const { pages, isMembersPageRoot, isGeneralPageRoot, isBillingPageRoot } = useOrganizationProfileContext();
-  const { commerceSettings } = useEnvironment();
+  const { pages, isMembersPageRoot, isGeneralPageRoot, isBillingPageRoot, isApiKeysPageRoot } =
+    useOrganizationProfileContext();
+  const { apiKeysSettings, commerceSettings } = useEnvironment();
 
   const customPageRoutesWithContents = pages.contents?.map((customPage, index) => {
     const shouldFirstCustomItemBeOnRoot = !isGeneralPageRoot && !isMembersPageRoot && index === 0;
@@ -85,9 +93,26 @@ export const OrganizationProfileRoutes = () => {
                     <OrganizationStatementPage />
                   </Suspense>
                 </Route>
+                <Route path='payment-attempt/:paymentAttemptId'>
+                  {/* TODO(@commerce): Should this be lazy loaded ? */}
+                  <Suspense fallback={''}>
+                    <OrganizationPaymentAttemptPage />
+                  </Suspense>
+                </Route>
               </Switch>
             </Route>
           </Protect>
+        )}
+        {apiKeysSettings.enabled && (
+          <Route path={isApiKeysPageRoot ? undefined : 'organization-api-keys'}>
+            <Switch>
+              <Route index>
+                <Suspense fallback={''}>
+                  <OrganizationAPIKeysPage />
+                </Suspense>
+              </Route>
+            </Switch>
+          </Route>
         )}
       </Route>
     </Switch>

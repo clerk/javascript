@@ -1,4 +1,6 @@
+import type { APIKeysNamespace } from './apiKeys';
 import type {
+  APIKeysTheme,
   Appearance,
   CheckoutTheme,
   CreateOrganizationTheme,
@@ -460,6 +462,27 @@ export interface Clerk {
   unmountPricingTable: (targetNode: HTMLDivElement) => void;
 
   /**
+   * @experimental
+   * This API is in early access and may change in future releases.
+   *
+   * Mount a api keys component at the target element.
+   * @param targetNode Target to mount the APIKeys component.
+   * @param props Configuration parameters.
+   */
+  mountApiKeys: (targetNode: HTMLDivElement, props?: APIKeysProps) => void;
+
+  /**
+   * @experimental
+   * This API is in early access and may change in future releases.
+   *
+   * Unmount a api keys component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @param targetNode Target node to unmount the ApiKeys component from.
+   */
+  unmountApiKeys: (targetNode: HTMLDivElement) => void;
+
+  /**
    * Mounts a OAuth consent component at the target element.
    * @param targetNode Target node to mount the OAuth consent component.
    * @param oauthConsentProps OAuth consent configuration parameters.
@@ -751,6 +774,13 @@ export interface Clerk {
    * initiated outside of the Clerk class.
    */
   __internal_setActiveInProgress: boolean;
+
+  /**
+   * API Keys Object
+   * @experimental
+   * This API is in early access and may change in future releases.
+   */
+  apiKeys: APIKeysNamespace;
 }
 
 export type HandleOAuthCallbackParams = TransferableOption &
@@ -1634,6 +1664,43 @@ type PricingTableBaseProps = {
 type PortalRoot = HTMLElement | null | undefined;
 
 export type PricingTableProps = PricingTableBaseProps & PricingTableDefaultProps;
+
+export type APIKeysProps = {
+  /**
+   * The type of API key to filter by.
+   * Currently, only 'api_key' is supported.
+   * @default 'api_key'
+   */
+  type?: 'api_key';
+  /**
+   * The number of API keys to show per page.
+   * @default 5
+   */
+  perPage?: number;
+  /**
+   * Customisation options to fully match the Clerk components to your own brand.
+   * These options serve as overrides and will be merged with the global `appearance`
+   * prop of ClerkProvider (if one is provided)
+   */
+  appearance?: APIKeysTheme;
+};
+
+export type GetAPIKeysParams = {
+  subject?: string;
+};
+
+export type CreateAPIKeyParams = {
+  type?: 'api_key';
+  name: string;
+  subject?: string;
+  secondsUntilExpiration?: number;
+  description?: string;
+};
+
+export type RevokeAPIKeyParams = {
+  apiKeyID: string;
+  revocationReason?: string;
+};
 
 export type __internal_CheckoutProps = {
   appearance?: CheckoutTheme;

@@ -95,6 +95,7 @@ export function parseError(error: ClerkAPIErrorJSON): ClerkAPIError {
       emailAddresses: error?.meta?.email_addresses,
       identifiers: error?.meta?.identifiers,
       zxcvbn: error?.meta?.zxcvbn,
+      plan: error?.meta?.plan,
     },
   };
 }
@@ -110,6 +111,7 @@ export function errorToJSON(error: ClerkAPIError | null): ClerkAPIErrorJSON {
       email_addresses: error?.meta?.emailAddresses,
       identifiers: error?.meta?.identifiers,
       zxcvbn: error?.meta?.zxcvbn,
+      plan: error?.meta?.plan,
     },
   };
 }

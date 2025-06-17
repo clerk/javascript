@@ -1,0 +1,205 @@
+---
+description: next.js
+globs: 
+alwaysApply: false
+---
+When working with Next.js applications:
+
+Router Architecture and File Conventions
+
+App Router vs Pages Router
+- Choose App Router for new projects - it's the recommended approach for Next.js 13+
+- Use Pages Router only for legacy projects or when specific features are needed
+- Don't mix routers - stick to one routing approach per project
+- Migrate Pages Router to App Router incrementally when possible
+
+App Router File Naming
+- Use page.tsx for route segments that render UI
+- Use layout.tsx for shared UI that wraps multiple pages
+- Use loading.tsx for instant loading states during navigation
+- Use error.tsx for error boundaries at route level
+- Use not-found.tsx for custom 404 pages
+- Use route.ts for API endpoints (GET, POST, etc.)
+- Use template.tsx when you need fresh instances on navigation
+- Use default.tsx for parallel routes fallbacks
+
+Route Organization
+- Group related routes using folder structure: `app/(dashboard)/analytics/page.tsx`
+- Use route groups with parentheses to organize without affecting URL structure
+- Place global files (favicon.ico, robots.txt) in app directory root
+- Use underscore prefix for private folders that shouldn't become routes: `_components`
+- Organize by feature rather than by file type for better maintainability
+
+Dynamic and Catch-All Routes
+- Use square brackets for dynamic segments: `[id]/page.tsx`
+- Use double brackets for catch-all routes: `[...slug]/page.tsx`
+- Use optional catch-all with double brackets: `[[...slug]]/page.tsx`
+- Validate dynamic parameters in your components before using
+- Provide meaningful 404 pages for invalid dynamic routes
+
+Server vs Client Components
+
+Server Components (Default)
+- Use Server Components by default - they're more performant and SEO-friendly
+- Keep Server Components for data fetching, accessing backend resources, and static content
+- Don't use browser APIs in Server Components (localStorage, window, etc.)
+- Don't use event handlers or state in Server Components
+- Import server-only utilities with 'server-only' package
+- Fetch data directly in Server Components without useEffect
+
+Client Components
+- Add 'use client' directive at the top of files that need client-side features
+- Use Client Components for interactivity, event handlers, browser APIs, and state
+- Minimize Client Components - push them as deep as possible in component tree
+- Pass data down from Server Components to Client Components via props
+- Use Client Components for hooks (useState, useEffect, custom hooks)
+- Avoid 'use client' in leaf components when possible
+
+Component Composition
+- Compose Server and Client Components carefully to maximize server rendering
+- Pass Server Components as children to Client Components when needed
+- Don't import Server Components inside Client Components
+- Use server actions for form submissions and mutations in Server Components
+- Separate data fetching from presentation logic
+
+Data Fetching Strategies
+
+App Router Data Fetching
+- Fetch data directly in Server Components using async/await
+- Use fetch() with caching for API calls - Next.js extends fetch with caching
+- Configure cache behavior with fetch options: `{ cache: 'force-cache' }` or `{ next: { revalidate: 60 } }`
+- Use parallel data fetching when requests are independent
+- Handle loading states with loading.tsx files
+- Use Suspense boundaries for granular loading states
+
+Pages Router Data Fetching
+- Use getStaticProps for static generation at build time
+- Use getServerSideProps for server-side rendering on each request
+- Use getStaticPaths with getStaticProps for dynamic static generation
+- Implement ISR (Incremental Static Regeneration) with revalidate option
+- Use SWR for client-side data fetching
+- Cache API responses appropriately based on data volatility
+
+Data Fetching Best Practices
+- Implement proper error handling for failed requests
+- Use TypeScript interfaces for API response types
+- Implement request deduplication for duplicate API calls
+- Use streaming for long-running requests when possible
+- Set appropriate cache headers for API responses
+- Implement retry logic for transient failures
+
+Metadata and SEO Optimization
+
+Metadata Configuration
+- Export metadata object from page components for static metadata
+- Use generateMetadata function for dynamic metadata based on params
+- Set viewport, charset, and base in root layout metadata
+- Include structured data (JSON-LD) for rich search results
+- Use proper Open Graph and Twitter Card metadata
+- Implement canonical URLs to prevent duplicate content issues
+
+SEO Best Practices
+- Use semantic HTML with proper heading hierarchy
+- Implement breadcrumb navigation for complex site structures
+- Add alt text to all images for accessibility and SEO
+- Use descriptive URLs that reflect content hierarchy
+- Implement XML sitemaps and submit to search engines
+- Use robots.txt to control search engine crawling
+- Optimize Core Web Vitals metrics for better search rankings
+
+Performance SEO
+- Minimize Cumulative Layout Shift with proper image dimensions
+- Optimize First Contentful Paint with efficient loading strategies
+- Reduce Time to Interactive by minimizing JavaScript bundles
+- Use resource hints (preload, prefetch) strategically
+- Implement proper caching strategies for static assets
+
+Image and Asset Optimization
+
+Next.js Image Component
+- Use Image component instead of HTML img tags for automatic optimization
+- Provide width and height props to prevent layout shift
+- Use fill prop for responsive images with unknown dimensions
+- Configure image domains in next.config.js for external images
+- Choose appropriate priority for above-the-fold images
+- Use placeholder (blur, empty) for better loading experience
+
+Asset Management
+- Place static assets in public directory with descriptive names
+- Optimize images before adding to project (WebP, AVIF formats)
+- Use responsive images with different sizes for different devices
+- Implement lazy loading for images below the fold
+- Configure image optimization settings in next.config.js
+- Use CDN for large-scale image delivery
+
+API Routes and Backend Integration
+
+API Route Structure
+- Organize API routes in app/api directory matching your URL structure
+- Use HTTP methods correctly (GET for reading, POST for creating, etc.)
+- Implement proper error handling with appropriate HTTP status codes
+- Validate request data using libraries like Zod
+- Use middleware for authentication and request validation
+- Document API endpoints with TypeScript interfaces
+
+API Best Practices
+- Implement rate limiting to prevent abuse
+- Use CORS headers appropriately for cross-origin requests
+- Sanitize inputs to prevent injection attacks
+- Implement proper logging for debugging and monitoring
+- Use environment variables for sensitive configuration
+- Version your APIs when making breaking changes
+
+Database Integration
+- Use connection pooling for database connections
+- Implement proper error handling for database operations
+- Use transactions for operations that must succeed together
+- Index frequently queried fields for better performance
+- Implement proper data validation at the API layer
+- Use ORMs or query builders for type-safe database operations
+
+Routing and Navigation
+
+Navigation Patterns
+- Use Link component for client-side navigation between pages
+- Use useRouter hook for programmatic navigation in Client Components
+- Use redirect function for server-side redirects in Server Components
+- Implement proper loading states during navigation
+- Use shallow routing when only changing query parameters
+- Prefetch critical routes using Link prefetch prop
+
+Route Protection
+- Implement middleware for route-level authentication
+- Use server actions for secure form submissions
+- Validate permissions on both client and server
+- Redirect unauthorized users to appropriate pages
+- Implement role-based access control when needed
+- Use session management libraries for authentication state
+
+URL Management
+- Use query parameters for filterable/searchable content
+- Implement proper URL encoding for special characters
+- Maintain URL state that reflects application state
+- Use meaningful URL structures that users can understand
+- Implement URL aliases for better SEO when needed
+
+Middleware and Request Handling
+
+Middleware Implementation
+- Place middleware.ts in project root or src directory
+- Use middleware for authentication, redirects, and request modifications
+- Keep middleware lightweight - avoid heavy computations
+- Use NextRequest/NextResponse for request/response manipulation
+- Implement proper error handling in middleware
+- Use matcher config to specify which routes should run middleware
+
+Request/Response Handling
+- Validate incoming requests before processing
+- Set appropriate response headers for security and caching
+- Use proper HTTP status codes for different scenarios
+- Implement request logging for debugging and analytics
+- Handle CORS preflight requests when needed
+- Use compression for large responses
+
+Performance Optimization
+

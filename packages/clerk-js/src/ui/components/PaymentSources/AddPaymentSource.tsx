@@ -15,7 +15,7 @@ import { FormButtons } from '@/ui/elements/FormButtons';
 import { FormContainer } from '@/ui/elements/FormContainer';
 
 import { clerkUnsupportedEnvironmentWarning } from '../../../core/errors';
-import { useEnvironment, useSubscriberTypeContext } from '../../contexts';
+import { useEnvironment, useSubscriberTypeContext, useSubscriberTypeLocalizationRoot } from '../../contexts';
 import { descriptors, Flex, localizationKeys, Spinner, useAppearance, useLocalizations } from '../../customizables';
 import type { LocalizationKey } from '../../localization';
 import { handleError, normalizeColorString } from '../../utils';
@@ -236,6 +236,7 @@ const AddPaymentSourceForm = ({ children }: PropsWithChildren) => {
   const elements = useElements();
   const { displayConfig } = useEnvironment();
   const { t } = useLocalizations();
+  const localizationRoot = useSubscriberTypeLocalizationRoot();
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -246,18 +247,18 @@ const AddPaymentSourceForm = ({ children }: PropsWithChildren) => {
     card.setLoading();
     card.setError(undefined);
 
-    try {
-      const { setupIntent, error } = await stripe.confirmSetup({
-        elements,
-        confirmParams: {
-          return_url: '', // TODO(@COMMERCE): need to figure this out
-        },
-        redirect: 'if_required',
-      });
-      if (error) {
-        return; // just return, since stripe will handle the error
-      }
+    const { setupIntent, error } = await stripe.confirmSetup({
+      elements,
+      confirmParams: {
+        return_url: '', // TODO(@COMMERCE): need to figure this out
+      },
+      redirect: 'if_required',
+    });
+    if (error) {
+      return; // just return, since stripe will handle the error
+    }
 
+    try {
       await onSuccess({ stripeSetupIntent: setupIntent });
     } catch (error) {
       void handleError(error, [], card.setError);
@@ -288,8 +289,7 @@ const AddPaymentSourceForm = ({ children }: PropsWithChildren) => {
               type: 'tabs',
               defaultCollapsed: false,
             },
-            // TODO(@COMMERCE): Should this be fetched from the fapi?
-            paymentMethodOrder: paymentMethodOrder || ['card'],
+            paymentMethodOrder,
             applePay: checkout
               ? {
                   recurringPaymentRequest: {
@@ -309,7 +309,8 @@ const AddPaymentSourceForm = ({ children }: PropsWithChildren) => {
         <FormButtons
           isDisabled={!isPaymentElementReady}
           submitLabel={
-            submitLabel ?? localizationKeys('userProfile.billingPage.paymentSourcesSection.formButtonPrimary__add')
+            submitLabel ??
+            localizationKeys(`${localizationRoot}.billingPage.paymentSourcesSection.formButtonPrimary__add`)
           }
           onReset={cancelAction}
           hideReset={!cancelAction}
