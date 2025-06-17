@@ -53,6 +53,7 @@ const getTimeLeftInSeconds = (expirationOption: Expiration) => {
 };
 
 const options: { value: Expiration; label: string }[] = [
+  { value: 'never', label: 'No Expiration' },
   { value: '1d', label: '1 Day' },
   { value: '7d', label: '7 Days' },
   { value: '30d', label: '30 Days' },
@@ -60,7 +61,6 @@ const options: { value: Expiration; label: string }[] = [
   { value: '90d', label: '90 Days' },
   { value: '180d', label: '180 Days' },
   { value: '1y', label: '1 Year' },
-  { value: 'never', label: 'Never' },
 ];
 
 const ExpirationSelector = ({
@@ -76,7 +76,6 @@ const ExpirationSelector = ({
       options={options}
       value={selectedExpiration.value}
       onChange={setSelectedExpiration}
-      portal
     >
       <SelectButton
         icon={ChevronUpDown}
@@ -92,6 +91,7 @@ const ExpirationSelector = ({
           paddingBlock: t.space.$1,
           color: t.colors.$colorText,
           flex: 1,
+          width: '271px',
         })}
       />
     </Select>
@@ -101,7 +101,7 @@ const ExpirationSelector = ({
 export const CreateApiKeyForm = ({ onCreate, isSubmitting }: CreateApiKeyFormProps) => {
   const [selectedExpiration, setSelectedExpiration] = useState<{ value: Expiration; label: string }>({
     value: 'never',
-    label: 'Never',
+    label: 'No expiration',
   });
   const { close: closeCardFn } = useActionContext();
   const { showDescription } = useApiKeysContext();
@@ -153,12 +153,20 @@ export const CreateApiKeyForm = ({ onCreate, isSubmitting }: CreateApiKeyFormPro
             sx={{ flex: 1 }}
             gap={2}
           >
-            <FormLabel>
+            <FormLabel
+              sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row' }}
+            >
               <Text
                 as='span'
                 variant='subtitle'
                 localizationKey={localizationKeys('formFieldLabel__apiKeyExpiration')}
               />
+              <Text
+                variant='caption'
+                colorScheme='secondary'
+              >
+                Optional
+              </Text>
             </FormLabel>
             <ExpirationSelector
               selectedExpiration={selectedExpiration}
@@ -169,6 +177,12 @@ export const CreateApiKeyForm = ({ onCreate, isSubmitting }: CreateApiKeyFormPro
               type='hidden'
               value={selectedExpiration.value}
             />
+            <Text
+              variant='caption'
+              colorScheme='secondary'
+            >
+              This key will never expire
+            </Text>
           </Col>
         </Flex>
         {showDescription && (
@@ -179,19 +193,13 @@ export const CreateApiKeyForm = ({ onCreate, isSubmitting }: CreateApiKeyFormPro
             <Form.PlainInput {...descriptionField.props} />
           </Form.ControlRow>
         )}
-        <Flex
-          justify='between'
-          align='center'
-          gap={4}
-        >
-          <FormButtons
-            submitLabel={localizationKeys('apiKeys.formButtonPrimary__add')}
-            isDisabled={!canSubmit}
-            onReset={closeCardFn}
-            isLoading={isSubmitting}
-            elementDescriptor={descriptors.apiKeysCreateFormSubmitButton}
-          />
-        </Flex>
+        <FormButtons
+          submitLabel={localizationKeys('apiKeys.formButtonPrimary__add')}
+          isDisabled={!canSubmit}
+          onReset={closeCardFn}
+          isLoading={isSubmitting}
+          elementDescriptor={descriptors.apiKeysCreateFormSubmitButton}
+        />
       </Form.Root>
     </FormContainer>
   );
