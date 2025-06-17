@@ -8,7 +8,8 @@ import { defineConfig, devices } from '@playwright/test';
 // import path from 'path';
 // dotenv.config({ path: path.resolve(__dirname, '.env') });
 
-const baseURL = `http://localhost:${process.env.PORT || 4001}`;
+const PORT = process.env.PORT || 4001;
+const baseURL = `http://localhost:${PORT}`;
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -44,8 +45,8 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'pnpm dev:sandbox:integration',
-    url: 'http://localhost:4001',
+    command: `PORT=${PORT} pnpm dev:sandbox:integration`,
+    url: `http://localhost:${PORT}`,
     reuseExistingServer: !process.env.CI,
   },
 });
