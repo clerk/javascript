@@ -45,7 +45,9 @@ export const VerifyWithCode = (props: VerifyWithCodeProps) => {
       <Form.OTPInput
         {...otp}
         label={localizationKeys('userProfile.emailAddressPage.emailCode.formTitle')}
-        description={localizationKeys('userProfile.emailAddressPage.emailCode.formSubtitle', { identifier })}
+        description={localizationKeys('userProfile.emailAddressPage.emailCode.formSubtitle', {
+          identifier: identifier || '',
+        })}
         resendButton={localizationKeys('userProfile.emailAddressPage.emailCode.resendButton')}
         centerAlign={false}
       />
