@@ -1,13 +1,16 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { deriveState } from '@clerk/shared/deriveState';
 import { loadClerkJsScript, type LoadClerkJsScriptOptions } from '@clerk/shared/loadClerkJsScript';
-import type { Clerk, ClientResource, MultiDomainAndOrProxy, Resources, Without } from '@clerk/types';
+import type { Clerk, ClientResource, InitialState, MultiDomainAndOrProxy, Resources, Without } from '@clerk/types';
 import type { Plugin } from 'vue';
 import { computed, ref, shallowRef, triggerRef } from 'vue';
 
 import { ClerkInjectionKey } from './keys';
 
-export type PluginOptions = Without<LoadClerkJsScriptOptions, 'domain' | 'proxyUrl'> & MultiDomainAndOrProxy;
+export type PluginOptions = Without<LoadClerkJsScriptOptions, 'domain' | 'proxyUrl'> &
+  MultiDomainAndOrProxy & {
+    initialState?: InitialState;
+  };
 
 const SDK_METADATA = {
   name: PACKAGE_NAME,
@@ -35,7 +38,6 @@ const SDK_METADATA = {
  */
 export const clerkPlugin: Plugin<[PluginOptions]> = {
   install(app, pluginOptions) {
-    // @ts-expect-error: Internal property for SSR frameworks like Nuxt
     const { initialState } = pluginOptions;
 
     const loaded = shallowRef(false);

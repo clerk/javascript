@@ -90,6 +90,7 @@ import {
   createAllowedRedirectOrigins,
   createBeforeUnloadTracker,
   createPageLifecycle,
+  disabledAPIKeysFeature,
   disabledBillingFeature,
   disabledOrganizationsFeature,
   errorThrower,
@@ -166,6 +167,7 @@ const CANNOT_RENDER_USER_MISSING_ERROR_CODE = 'cannot_render_user_missing';
 const CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE = 'cannot_render_organizations_disabled';
 const CANNOT_RENDER_ORGANIZATION_MISSING_ERROR_CODE = 'cannot_render_organization_missing';
 const CANNOT_RENDER_SINGLE_SESSION_ENABLED_ERROR_CODE = 'cannot_render_single_session_enabled';
+const CANNOT_RENDER_API_KEYS_DISABLED_ERROR_CODE = 'cannot_render_api_keys_disabled';
 const defaultOptions: ClerkOptions = {
   polling: true,
   standardBrowser: true,
@@ -1076,6 +1078,17 @@ export class Clerk implements ClerkInterface {
    */
   public mountApiKeys = (node: HTMLDivElement, props?: APIKeysProps) => {
     this.assertComponentsReady(this.#componentControls);
+
+    logger.warnOnce('Clerk: <APIKeys /> component is in early access and not yet recommended for production use.');
+
+    if (disabledAPIKeysFeature(this, this.environment)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderAPIKeysComponent, {
+          code: CANNOT_RENDER_API_KEYS_DISABLED_ERROR_CODE,
+        });
+      }
+      return;
+    }
     void this.#componentControls.ensureMounted({ preloadHint: 'APIKeys' }).then(controls =>
       controls.mountComponent({
         name: 'APIKeys',
@@ -1084,6 +1097,8 @@ export class Clerk implements ClerkInterface {
         props,
       }),
     );
+
+    this.telemetry?.record(eventPrebuiltComponentMounted('APIKeys', props));
   };
 
   /**
@@ -1114,10 +1129,6 @@ export class Clerk implements ClerkInterface {
         throw new Error(
           'setActive should either be called with a session param or there should be already an active session.',
         );
-      }
-
-      if (organization === null && this.environment?.organizationSettings?.forceOrganizationSelection) {
-        throw new Error('setActive requires an organization parameter when organization selection is forced.');
       }
 
       const onBeforeSetActive: SetActiveHook =
@@ -1152,7 +1163,16 @@ export class Clerk implements ClerkInterface {
           const matchingOrganization = newSession.user.organizationMemberships.find(
             mem => mem.organization.slug === organizationIdOrSlug,
           );
-          newSession.lastActiveOrganizationId = matchingOrganization?.organization.id || null;
+
+          const newLastActiveOrganizationId = matchingOrganization?.organization.id || null;
+          const isPersonalWorkspace = newLastActiveOrganizationId === null;
+
+          // Do not update in-memory to personal workspace if force organization selection is enabled
+          if (this.environment?.organizationSettings?.forceOrganizationSelection && isPersonalWorkspace) {
+            return;
+          }
+
+          newSession.lastActiveOrganizationId = newLastActiveOrganizationId;
         }
       }
 

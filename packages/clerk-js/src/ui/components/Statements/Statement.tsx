@@ -175,8 +175,8 @@ function SectionContentDetailsHeader({
 }: {
   title: string | LocalizationKey;
   description: string | LocalizationKey;
-  secondaryTitle: string | LocalizationKey;
-  secondaryDescription: string | LocalizationKey;
+  secondaryTitle?: string | LocalizationKey;
+  secondaryDescription?: string | LocalizationKey;
 }) {
   return (
     <Box
@@ -212,6 +212,7 @@ function SectionContentDetailsHeader({
           colorScheme='secondary'
           elementDescriptor={descriptors.statementSectionContentDetailsHeaderDescription}
           localizationKey={description}
+          sx={{ textTransform: 'lowercase' }}
         />
       </Box>
       <Box
@@ -220,17 +221,21 @@ function SectionContentDetailsHeader({
           textAlign: 'right',
         }}
       >
-        <Text
-          variant='h3'
-          elementDescriptor={descriptors.statementSectionContentDetailsHeaderSecondaryTitle}
-          localizationKey={secondaryTitle}
-        />
-        <Text
-          variant='caption'
-          colorScheme='secondary'
-          elementDescriptor={descriptors.statementSectionContentDetailsHeaderSecondaryDescription}
-          localizationKey={secondaryDescription}
-        />
+        {secondaryTitle && (
+          <Text
+            variant='h3'
+            elementDescriptor={descriptors.statementSectionContentDetailsHeaderSecondaryTitle}
+            localizationKey={secondaryTitle}
+          />
+        )}
+        {secondaryDescription && (
+          <Text
+            variant='caption'
+            colorScheme='secondary'
+            elementDescriptor={descriptors.statementSectionContentDetailsHeaderSecondaryDescription}
+            localizationKey={secondaryDescription}
+          />
+        )}
       </Box>
     </Box>
   );

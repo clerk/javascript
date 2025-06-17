@@ -10,16 +10,22 @@ const mockSuccessResponse = {
   object: 'event',
 } as any;
 
-const mockError = new Error('Missing required Svix headers: svix-id, svix-timestamp, svix-signature');
-
 vi.mock('@clerk/backend/webhooks', () => ({
-  verifyWebhook: vi.fn().mockImplementation((request: Request) => {
-    const svixId = request.headers.get('svix-id');
-    const svixTimestamp = request.headers.get('svix-timestamp');
-    const svixSignature = request.headers.get('svix-signature');
+  verifyWebhook: vi.fn().mockImplementation(async (request: any) => {
+    // Support both Fetch API Request and plain object
+    const getHeader = (key: string) => {
+      if (request instanceof Request) {
+        return request.headers.get(key);
+      }
+      return request.headers?.[key];
+    };
+
+    const svixId = getHeader('svix-id');
+    const svixTimestamp = getHeader('svix-timestamp');
+    const svixSignature = getHeader('svix-signature');
 
     if (!svixId || !svixTimestamp || !svixSignature) {
-      throw mockError;
+      throw new Error('Missing required Svix headers: svix-id, svix-timestamp, svix-signature');
     }
 
     return mockSuccessResponse;
@@ -88,7 +94,9 @@ describe('verifyWebhook', () => {
         aborted: false,
       } as unknown as NextApiRequest;
 
-      await expect(verifyWebhook(mockNextApiRequest)).rejects.toThrow(mockError);
+      await expect(verifyWebhook(mockNextApiRequest)).rejects.toThrow(
+        'Missing required Svix headers: svix-id, svix-timestamp, svix-signature',
+      );
     });
   });
 });

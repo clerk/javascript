@@ -5,17 +5,7 @@ import { lazy, useState } from 'react';
 import useSWRMutation from 'swr/mutation';
 
 import { useApiKeysContext, withCoreUserGuard } from '@/ui/contexts';
-import {
-  Box,
-  Button,
-  Col,
-  descriptors,
-  Flex,
-  Flow,
-  Icon,
-  localizationKeys,
-  useLocalizations,
-} from '@/ui/customizables';
+import { Box, Button, Col, Flex, Flow, Icon, localizationKeys, useLocalizations } from '@/ui/customizables';
 import { Action } from '@/ui/elements/Action';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { InputWithIcon } from '@/ui/elements/InputWithIcon';
@@ -156,6 +146,7 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
         />
       )}
       <RevokeAPIKeyConfirmationModal
+        subject={subject}
         isOpen={isRevokeModalOpen}
         onOpen={() => setIsRevokeModalOpen(true)}
         onClose={() => {

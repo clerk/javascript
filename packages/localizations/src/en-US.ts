@@ -62,6 +62,7 @@ export const enUS: LocalizationResource = {
       description__subscriptionSuccessful: 'Your new subscription is all set.',
       downgradeNotice:
         'You will keep your current subscription and its features until the end of the billing cycle, then you will be switched to this subscription.',
+      pastDueNotice: 'Your previous subscription was past due, with no payment.',
       emailForm: {
         subtitle: 'Before you can complete your purchase you must add an email address where receipts will be sent.',
         title: 'Add an email address',
@@ -116,6 +117,7 @@ export const enUS: LocalizationResource = {
     switchPlan: 'Switch to this plan',
     switchToAnnual: 'Switch to annual',
     switchToMonthly: 'Switch to monthly',
+    totalDue: 'Total due',
     totalDueToday: 'Total Due Today',
     viewFeatures: 'View features',
     year: 'Year',
@@ -223,6 +225,13 @@ export const enUS: LocalizationResource = {
     badge__manualInvitation: 'No automatic enrollment',
     badge__unverified: 'Unverified',
     billingPage: {
+      paymentHistorySection: {
+        empty: 'No payment history',
+        tableHeader__date: 'Date',
+        tableHeader__amount: 'Amount',
+        tableHeader__status: 'Status',
+        notFound: 'Payment attempt not found',
+      },
       paymentSourcesSection: {
         actionLabel__default: 'Make default',
         actionLabel__remove: 'Remove',
@@ -245,11 +254,25 @@ export const enUS: LocalizationResource = {
         headerTitle__payments: 'Payments',
         headerTitle__plans: 'Plans',
         headerTitle__statements: 'Statements',
-        headerTitle__subscriptions: 'Subscriptions',
+        headerTitle__subscriptions: 'Subscription',
+      },
+      statementsSection: {
+        empty: 'No statements to display',
+        itemCaption__paidForPlan: 'Paid for {{plan}} {{period}} plan',
+        itemCaption__proratedCredit: 'Prorated credit for partial usage of previous subscription',
+        itemCaption__subscribedAndPaidForPlan: 'Subscribed and paid for {{plan}} {{period}} plan',
+        notFound: 'Statement not found',
+        tableHeader__date: 'Date',
+        tableHeader__amount: 'Amount',
+        title: 'Statements',
+        totalPaid: 'Total paid',
       },
       subscriptionsListSection: {
         actionLabel__newSubscription: 'Subscribe to a plan',
         actionLabel__switchPlan: 'Switch plans',
+        tableHeader__plan: 'Plan',
+        tableHeader__startDate: 'Start date',
+        tableHeader__edit: 'Edit',
         title: 'Subscription',
       },
       subscriptionsSection: {
@@ -855,6 +878,13 @@ export const enUS: LocalizationResource = {
       title__codelist: 'Backup codes',
     },
     billingPage: {
+      paymentHistorySection: {
+        empty: 'No payment history',
+        tableHeader__date: 'Date',
+        tableHeader__amount: 'Amount',
+        tableHeader__status: 'Status',
+        notFound: 'Payment attempt not found',
+      },
       paymentSourcesSection: {
         actionLabel__default: 'Make default',
         actionLabel__remove: 'Remove',
@@ -879,9 +909,23 @@ export const enUS: LocalizationResource = {
         headerTitle__statements: 'Statements',
         headerTitle__subscriptions: 'Subscription',
       },
+      statementsSection: {
+        empty: 'No statements to display',
+        itemCaption__paidForPlan: 'Paid for {{plan}} {{period}} plan',
+        itemCaption__proratedCredit: 'Prorated credit for partial usage of previous subscription',
+        itemCaption__subscribedAndPaidForPlan: 'Subscribed and paid for {{plan}} {{period}} plan',
+        notFound: 'Statement not found',
+        tableHeader__date: 'Date',
+        tableHeader__amount: 'Amount',
+        title: 'Statements',
+        totalPaid: 'Total paid',
+      },
       subscriptionsListSection: {
         actionLabel__newSubscription: 'Subscribe to a plan',
         actionLabel__switchPlan: 'Switch plans',
+        tableHeader__plan: 'Plan',
+        tableHeader__startDate: 'Start date',
+        tableHeader__edit: 'Edit',
         title: 'Subscription',
       },
       subscriptionsSection: {
