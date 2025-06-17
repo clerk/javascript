@@ -264,7 +264,7 @@ describe('Session', () => {
       BaseResource.clerk = null as any;
     });
 
-    it.only('dispatches token:update event on touch', async () => {
+    it('dispatches token:update event on touch', async () => {
       const mockToken = { object: 'token', jwt: mockJwt };
       const session = new Session({
         status: 'active',
