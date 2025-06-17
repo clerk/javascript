@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 
-import { Box, Button, Col, descriptors, Flex, FormLabel, localizationKeys, Text } from '@/ui/customizables';
+import { useApiKeysContext } from '@/ui/contexts';
+import { Col, descriptors, Flex, FormLabel, localizationKeys, Text } from '@/ui/customizables';
 import { useActionContext } from '@/ui/elements/Action/ActionRoot';
 import { Form } from '@/ui/elements/Form';
 import { FormButtons } from '@/ui/elements/FormButtons';
 import { FormContainer } from '@/ui/elements/FormContainer';
-import { SegmentedControl } from '@/ui/elements/SegmentedControl';
-import { mqu } from '@/ui/styledSystem';
+import { Select, SelectButton, SelectOptionList } from '@/ui/elements/Select';
+import { ChevronUpDown } from '@/ui/icons';
 import { useFormControl } from '@/ui/utils/useFormControl';
 
 export type OnCreateParams = { name: string; description?: string; expiration: number | undefined };
@@ -16,15 +17,15 @@ interface CreateApiKeyFormProps {
   isSubmitting: boolean;
 }
 
-export type Expiration = 'never' | '30d' | '90d' | 'custom';
+export type Expiration = 'never' | '1d' | '7d' | '30d' | '60d' | '90d' | '180d' | '1y';
 
-const getTimeLeftInSeconds = (expirationOption: Expiration, customDate?: string) => {
+const getTimeLeftInSeconds = (expirationOption: Expiration) => {
   if (expirationOption === 'never') {
     return;
   }
 
   const now = new Date();
-  let future = new Date(now);
+  const future = new Date(now);
 
   switch (expirationOption) {
     case '30d':
@@ -33,8 +34,14 @@ const getTimeLeftInSeconds = (expirationOption: Expiration, customDate?: string)
     case '90d':
       future.setDate(future.getDate() + 90);
       break;
-    case 'custom':
-      future = new Date(customDate as string);
+    case '60d':
+      future.setDate(future.getDate() + 60);
+      break;
+    case '180d':
+      future.setDate(future.getDate() + 180);
+      break;
+    case '1y':
+      future.setFullYear(future.getFullYear() + 1);
       break;
     default:
       throw new Error('Invalid expiration option');
@@ -45,18 +52,59 @@ const getTimeLeftInSeconds = (expirationOption: Expiration, customDate?: string)
   return diffInSecs;
 };
 
-const getMinDate = () => {
-  const min = new Date();
-  min.setDate(min.getDate() + 1);
-  return min.toISOString().split('T')[0];
+const options: { value: Expiration; label: string }[] = [
+  { value: '1d', label: '1 Day' },
+  { value: '7d', label: '7 Days' },
+  { value: '30d', label: '30 Days' },
+  { value: '60d', label: '60 Days' },
+  { value: '90d', label: '90 Days' },
+  { value: '180d', label: '180 Days' },
+  { value: '1y', label: '1 Year' },
+  { value: 'never', label: 'Never' },
+];
+
+const ExpirationSelector = ({
+  selectedExpiration,
+  setSelectedExpiration,
+}: {
+  selectedExpiration: { value: Expiration; label: string };
+  setSelectedExpiration: (value: { value: Expiration; label: string }) => void;
+}) => {
+  return (
+    <Select
+      elementId='paymentSource'
+      options={options}
+      value={selectedExpiration.value}
+      onChange={setSelectedExpiration}
+      portal
+    >
+      <SelectButton
+        icon={ChevronUpDown}
+        sx={t => ({
+          justifyContent: 'space-between',
+          backgroundColor: t.colors.$colorBackground,
+        })}
+      >
+        <Text>{selectedExpiration.label}</Text>
+      </SelectButton>
+      <SelectOptionList
+        sx={t => ({
+          paddingBlock: t.space.$1,
+          color: t.colors.$colorText,
+          flex: 1,
+        })}
+      />
+    </Select>
+  );
 };
 
 export const CreateApiKeyForm = ({ onCreate, isSubmitting }: CreateApiKeyFormProps) => {
-  const [showAdvanced, setShowAdvanced] = useState(false);
-  const [expiration, setExpiration] = useState<Expiration>('never');
-  const createApiKeyFormId = React.useId();
-  const segmentedControlId = `${createApiKeyFormId}-segmented-control`;
+  const [selectedExpiration, setSelectedExpiration] = useState<{ value: Expiration; label: string }>({
+    value: 'never',
+    label: 'Never',
+  });
   const { close: closeCardFn } = useActionContext();
+  const { showDescription } = useApiKeysContext();
 
   const nameField = useFormControl('name', '', {
     type: 'text',
@@ -72,13 +120,6 @@ export const CreateApiKeyForm = ({ onCreate, isSubmitting }: CreateApiKeyFormPro
     isRequired: false,
   });
 
-  const expirationDateField = useFormControl('apiKeyExpirationDate', '', {
-    type: 'date',
-    label: localizationKeys('formFieldLabel__apiKeyExpirationDate'),
-    placeholder: localizationKeys('formFieldInputPlaceholder__apiKeyExpirationDate'),
-    isRequired: false,
-  });
-
   const canSubmit = nameField.value.length > 2;
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -87,7 +128,7 @@ export const CreateApiKeyForm = ({ onCreate, isSubmitting }: CreateApiKeyFormPro
       {
         name: nameField.value,
         description: descriptionField.value || undefined,
-        expiration: getTimeLeftInSeconds(expiration, expirationDateField.value),
+        expiration: getTimeLeftInSeconds(selectedExpiration.value),
       },
       closeCardFn,
     );
@@ -100,99 +141,49 @@ export const CreateApiKeyForm = ({ onCreate, isSubmitting }: CreateApiKeyFormPro
       elementDescriptor={descriptors.apiKeysCreateForm}
     >
       <Form.Root onSubmit={handleSubmit}>
-        <Form.ControlRow
-          elementId={nameField.id}
-          elementDescriptor={descriptors.apiKeysCreateFormNameInput}
-        >
-          <Form.PlainInput {...nameField.props} />
-        </Form.ControlRow>
-        {showAdvanced && (
-          <>
-            <Form.ControlRow
-              elementId={descriptionField.id}
-              elementDescriptor={descriptors.apiKeysCreateFormDescriptionInput}
-            >
-              <Form.PlainInput {...descriptionField.props} />
-            </Form.ControlRow>
-            <Flex
-              gap={4}
-              sx={{
-                [mqu.sm]: {
-                  flexDirection: 'column',
-                },
-              }}
-            >
-              <Col
-                gap={2}
-                sx={{ flex: 7 }}
-              >
-                <FormLabel htmlFor={segmentedControlId}>
-                  <Text
-                    as='span'
-                    variant='subtitle'
-                    localizationKey={localizationKeys('formFieldLabel__apiKeyExpiration')}
-                  />
-                </FormLabel>
-                <SegmentedControl.Root
-                  aria-labelledby={segmentedControlId}
-                  value={expiration}
-                  onChange={value => setExpiration(value as Expiration)}
-                  fullWidth
-                  sx={t => ({ height: t.sizes.$8 })}
-                >
-                  <SegmentedControl.Button
-                    value='never'
-                    text='Never'
-                  />
-                  <SegmentedControl.Button
-                    value='30d'
-                    text='30 days'
-                  />
-                  <SegmentedControl.Button
-                    value='90d'
-                    text='90 days'
-                  />
-                  <SegmentedControl.Button
-                    value='custom'
-                    text='Custom'
-                  />
-                </SegmentedControl.Root>
-              </Col>
-              {expiration === 'custom' ? (
-                <Form.ControlRow
-                  elementId={expirationDateField.id}
-                  sx={{ flex: 3 }}
-                  elementDescriptor={descriptors.apiKeysCreateFormExpirationInput}
-                >
-                  <Form.PlainInput
-                    type='date'
-                    {...expirationDateField.props}
-                    min={getMinDate()}
-                  />
-                </Form.ControlRow>
-              ) : (
-                <Box sx={{ flex: 3, visibility: 'hidden' }} />
-              )}
-            </Flex>
-          </>
+        <Flex gap={4}>
+          <Form.ControlRow
+            sx={{ flex: 1 }}
+            elementId={nameField.id}
+            elementDescriptor={descriptors.apiKeysCreateFormNameInput}
+          >
+            <Form.PlainInput {...nameField.props} />
+          </Form.ControlRow>
+          <Col
+            sx={{ flex: 1 }}
+            gap={2}
+          >
+            <FormLabel>
+              <Text
+                as='span'
+                variant='subtitle'
+                localizationKey={localizationKeys('formFieldLabel__apiKeyExpiration')}
+              />
+            </FormLabel>
+            <ExpirationSelector
+              selectedExpiration={selectedExpiration}
+              setSelectedExpiration={setSelectedExpiration}
+            />
+            <input
+              name='apiKeyExpiration'
+              type='hidden'
+              value={selectedExpiration.value}
+            />
+          </Col>
+        </Flex>
+        {showDescription && (
+          <Form.ControlRow
+            elementId={descriptionField.id}
+            elementDescriptor={descriptors.apiKeysCreateFormDescriptionInput}
+          >
+            <Form.PlainInput {...descriptionField.props} />
+          </Form.ControlRow>
         )}
         <Flex
           justify='between'
           align='center'
           gap={4}
-          sx={{
-            [mqu.sm]: {
-              flexDirection: 'column',
-              alignItems: 'stretch',
-            },
-          }}
         >
-          <Button
-            variant='outline'
-            onClick={() => setShowAdvanced(prev => !prev)}
-          >
-            {showAdvanced ? 'Hide' : 'Show'} advanced settings
-          </Button>
           <FormButtons
             submitLabel={localizationKeys('apiKeys.formButtonPrimary__add')}
             isDisabled={!canSubmit}
