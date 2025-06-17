@@ -11,6 +11,7 @@ declare module 'nuxt/schema' {
     clerk: {
       secretKey?: string;
       jwtKey?: string;
+      webhookSigningSecret?: string;
     };
   }
   interface PublicRuntimeConfig {

@@ -116,9 +116,9 @@ export type CommercePaymentStatus = 'pending' | 'paid' | 'failed';
 export interface CommercePaymentResource extends ClerkResource {
   id: string;
   amount: CommerceMoney;
-  paidAt?: number;
-  failedAt?: number;
-  updatedAt: number;
+  paidAt?: Date;
+  failedAt?: Date;
+  updatedAt: Date;
   paymentSource: CommercePaymentSourceResource;
   subscription: CommerceSubscriptionResource;
   subscriptionItem: CommerceSubscriptionResource;
@@ -136,12 +136,12 @@ export interface CommerceStatementResource extends ClerkResource {
   id: string;
   totals: CommerceStatementTotals;
   status: CommerceStatementStatus;
-  timestamp: number;
+  timestamp: Date;
   groups: CommerceStatementGroup[];
 }
 
 export interface CommerceStatementGroup {
-  timestamp: number;
+  timestamp: Date;
   items: CommercePaymentResource[];
 }
 
