@@ -1053,9 +1053,9 @@ export type __internal_LocalizationResource = {
       };
       statementsSection: {
         empty: LocalizationValue;
-        itemCaption__paidForPlan: LocalizationValue;
+        itemCaption__paidForPlan: LocalizationValue<'plan' | 'period'>;
         itemCaption__proratedCredit: LocalizationValue;
-        itemCaption__subscribedAndPaidForPlan: LocalizationValue;
+        itemCaption__subscribedAndPaidForPlan: LocalizationValue<'plan' | 'period'>;
         notFound: LocalizationValue;
         tableHeader__date: LocalizationValue;
         tableHeader__amount: LocalizationValue;
@@ -1162,17 +1162,17 @@ export type __internal_LocalizationResource = {
     action__add: LocalizationValue;
     detailsTitle__emptyRow: LocalizationValue;
     revokeConfirmation: {
-      formTitle: LocalizationValue;
+      formTitle: LocalizationValue<'apiKeyName'>;
       formHint: LocalizationValue;
       formButtonPrimary__revoke: LocalizationValue;
     };
     dates: {
-      lastUsed__seconds: LocalizationValue;
-      lastUsed__minutes: LocalizationValue;
-      lastUsed__hours: LocalizationValue;
-      lastUsed__days: LocalizationValue;
-      lastUsed__months: LocalizationValue;
-      lastUsed__years: LocalizationValue;
+      lastUsed__seconds: LocalizationValue<'seconds'>;
+      lastUsed__minutes: LocalizationValue<'minutes'>;
+      lastUsed__hours: LocalizationValue<'hours'>;
+      lastUsed__days: LocalizationValue<'days'>;
+      lastUsed__months: LocalizationValue<'months'>;
+      lastUsed__years: LocalizationValue<'years'>;
     };
   };
 };
