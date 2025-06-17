@@ -44,6 +44,7 @@
     "dev:headless": "rspack serve --config rspack.config.js --env variant=\"clerk.headless.browser\"",
     "dev:origin": "rspack serve --config rspack.config.js --env devOrigin=http://localhost:4000",
     "dev:sandbox": "rspack serve --config rspack.config.js --env devOrigin=http://localhost:4000 --env sandbox=1",
+    "dev:sandbox:integration": "rspack serve --config rspack.config.js --env devOrigin=http://localhost:4001 --env sandbox=1",
     "lint": "eslint src",
     "lint:attw": "attw --pack . --profile node16 --ignore-rules named-exports",
     "lint:publint": "publint || true",
@@ -52,6 +53,7 @@
     "test:ci": "jest --maxWorkers=70%",
     "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html",
     "test:jest": "jest",
+    "test:sandbox:integration": "playwright test --ui",
     "test:vitest": "vitest",
     "watch": "rspack build --config rspack.config.js --env production --watch"
   },
@@ -81,7 +83,9 @@
     "swr": "2.3.3"
   },
   "devDependencies": {
+    "@clerk/testing": "workspace:^",
     "@emotion/jest": "^11.13.0",
+    "@playwright/test": "^1",
     "@rsdoctor/rspack-plugin": "^0.4.13",
     "@rspack/cli": "^1.2.8",
     "@rspack/core": "^1.2.8",
@@ -89,6 +93,7 @@
     "@svgr/webpack": "^6.5.1",
     "@swc/jest": "^0.2.38",
     "@types/cloudflare-turnstile": "^0.2.2",
+    "@types/node": "^22.15.31",
     "@types/webpack-env": "^1.18.8",
     "jsdom": "^24.1.1",
     "webpack-merge": "^5.10.0"
