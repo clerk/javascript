@@ -85,7 +85,6 @@ export class Session extends BaseResource implements SessionResource {
       action: 'touch',
       body: { active_organization_id: this.lastActiveOrganizationId },
     }).then(res => {
-      console.log('touch', res);
       // touch() will potentially change the session state, and so we need to ensure we emit the updated token that comes back in the response. This avoids potential issues where the session cookie is out of sync with the current session state.
       if (res.lastActiveToken) {
         eventBus.emit(events.TokenUpdate, { token: res.lastActiveToken });
@@ -309,8 +308,6 @@ export class Session extends BaseResource implements SessionResource {
     if (data.public_user_data) {
       this.publicUserData = new PublicUserData(data.public_user_data);
     }
-
-    console.log('last_active_token', data);
 
     this.lastActiveToken = data.last_active_token ? new Token(data.last_active_token) : null;
 
