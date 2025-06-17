@@ -15,20 +15,6 @@ export async function waitForClerkLoaded(page: Page, selector: string) {
   await page.waitForSelector(selector, { state: 'attached' });
 }
 
-// export function createColorMixRunner(path: string, waitForClerkElement: string, fn: (page: Page) => Promise<void>) {
-//   return async (page: Page) => {
-//     await page.goto(path);
-//     await waitForClerkLoaded(page, waitForClerkElement);
-//     await fn(page);
-
-//     await disableColorMix(page);
-
-//     await page.reload();
-//     await waitForClerkLoaded(page, waitForClerkElement);
-//     await fn(page);
-//   };
-// }
-
 type ColorMixRunnerOptions = {
   path: string;
   waitForClerkElement: string;
