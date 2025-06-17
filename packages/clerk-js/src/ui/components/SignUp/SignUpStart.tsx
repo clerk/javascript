@@ -116,6 +116,7 @@ function SignUpStartInternal(): JSX.Element {
   } as const;
 
   const hasTicket = !!formState.ticket.value;
+  const hasExistingSignUpWithTicket = !!(signUp.id && signUp.status !== null);
   const hasEmail = !!formState.emailAddress.value;
   const isProgressiveSignUp = userSettings.signUp.progressive;
   const isLegalConsentEnabled = userSettings.signUp.legal_consent_enabled;
@@ -123,7 +124,7 @@ function SignUpStartInternal(): JSX.Element {
 
   const fields = determineActiveFields({
     attributes,
-    hasTicket,
+    hasTicket: hasTicket || hasExistingSignUpWithTicket,
     hasEmail,
     activeCommIdentifierType,
     isProgressiveSignUp,
@@ -243,7 +244,7 @@ function SignUpStartInternal(): JSX.Element {
       fieldsToSubmit.push({ id: 'unsafeMetadata', value: unsafeMetadata } as any);
     }
 
-    if (fields.ticket) {
+    if (fields.ticket || hasExistingSignUpWithTicket) {
       const noop = () => {};
       // fieldsToSubmit: Constructing a fake fields object for strategy.
       fieldsToSubmit.push({
@@ -254,6 +255,21 @@ function SignUpStartInternal(): JSX.Element {
         onChange: noop,
         setError: noop,
       } as any);
+
+      // Get ticket value from query params if it exists
+      if (!fields.ticket && hasExistingSignUpWithTicket) {
+        const ticketValue = getClerkQueryParam('__clerk_ticket') || getClerkQueryParam('__clerk_invitation_token');
+        if (ticketValue) {
+          fieldsToSubmit.push({
+            id: 'ticket',
+            value: ticketValue,
+            clearFeedback: noop,
+            setValue: noop,
+            onChange: noop,
+            setError: noop,
+          } as any);
+        }
+      }
     }
 
     // If the user has already selected an alternative phone code provider, we use that.
@@ -299,7 +315,7 @@ function SignUpStartInternal(): JSX.Element {
     const redirectUrlComplete = ctx.afterSignUpUrl || '/';
 
     let signUpAttempt: Promise<SignUpResource>;
-    if (!fields.ticket) {
+    if (!fields.ticket && !hasExistingSignUpWithTicket) {
       signUpAttempt = signUp.create(buildRequest(fieldsToSubmit));
     } else {
       signUpAttempt = signUp.upsert(buildRequest(fieldsToSubmit));
@@ -331,9 +347,11 @@ function SignUpStartInternal(): JSX.Element {
   const shouldShowForm = showFormFields(userSettings) && visibleFields.length > 0;
 
   const showOauthProviders =
-    (!hasTicket || missingRequirementsWithTicket) && userSettings.authenticatableSocialStrategies.length > 0;
-  const showWeb3Providers = !hasTicket && userSettings.web3FirstFactors.length > 0;
-  const showAlternativePhoneCodeProviders = !hasTicket && userSettings.alternativePhoneCodeChannels.length > 0;
+    (!(hasTicket || hasExistingSignUpWithTicket) || missingRequirementsWithTicket) &&
+    userSettings.authenticatableSocialStrategies.length > 0;
+  const showWeb3Providers = !(hasTicket || hasExistingSignUpWithTicket) && userSettings.web3FirstFactors.length > 0;
+  const showAlternativePhoneCodeProviders =
+    !(hasTicket || hasExistingSignUpWithTicket) && userSettings.alternativePhoneCodeChannels.length > 0;
 
   const onAlternativePhoneCodeUseAnotherMethod = () => {
     setAlternativePhoneCodeProvider(null);
@@ -344,7 +362,7 @@ function SignUpStartInternal(): JSX.Element {
     setAlternativePhoneCodeProvider(phoneCodeProvider);
   };
 
-  if (mode !== SIGN_UP_MODES.PUBLIC && !hasTicket) {
+  if (mode !== SIGN_UP_MODES.PUBLIC && !(hasTicket || hasExistingSignUpWithTicket)) {
     return <SignUpRestrictedAccess />;
   }
 
