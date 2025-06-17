@@ -363,10 +363,7 @@ export const usePlansContext = () => {
       const portalRoot = getClosestProfileScrollBox(mode, event);
 
       if (subscription && subscription.planPeriod === planPeriod && !subscription.canceledAt) {
-        clerk.__internal_openPlanDetails({
-          plan,
-          initialPlanPeriod: planPeriod,
-          subscriberType,
+        clerk.__experimental_openSubscriptionDetails({
           onSubscriptionCancel: () => {
             revalidateAll();
             onSubscriptionChange?.();
