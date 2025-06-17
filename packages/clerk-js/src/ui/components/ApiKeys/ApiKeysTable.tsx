@@ -52,7 +52,6 @@ const CopySecretButton = ({ apiKeyID }: { apiKeyID: string }) => {
       onClick={() => setEnabled(true)}
       focusRing={false}
       elementDescriptor={descriptors.apiKeysCopyButton}
-      elementId={descriptors.apiKeysCopyButton.setId(apiKeyID)}
     >
       <Icon
         size='sm'
@@ -96,7 +95,6 @@ const SecretInputWithToggle = ({ apiKeyID }: { apiKeyID: string }) => {
         focusRing={false}
         aria-label={'Show key'}
         elementDescriptor={descriptors.apiKeysRevealButton}
-        elementId={descriptors.apiKeysRevealButton.setId(apiKeyID)}
         onClick={() => setRevealed(!revealed)}
       >
         <Icon
@@ -151,12 +149,8 @@ export const ApiKeysTable = ({
               <Tr
                 key={apiKey.id}
                 elementDescriptor={descriptors.apiKeysTableRow}
-                elementId={descriptors.apiKeysTableRow.setId(apiKey.id)}
               >
-                <Td
-                  elementDescriptor={descriptors.apiKeysTableCellName}
-                  elementId={descriptors.apiKeysTableCellName.setId(apiKey.id)}
-                >
+                <Td elementDescriptor={descriptors.apiKeysTableCellName}>
                   <Flex
                     direction='col'
                     sx={{ minWidth: '25ch' }}
@@ -180,10 +174,7 @@ export const ApiKeysTable = ({
                     </Text>
                   </Flex>
                 </Td>
-                <Td
-                  elementDescriptor={descriptors.apiKeysTableCellLastUsed}
-                  elementId={descriptors.apiKeysTableCellLastUsed.setId(apiKey.id)}
-                >
+                <Td elementDescriptor={descriptors.apiKeysTableCellLastUsed}>
                   <Box
                     sx={{
                       [mqu.sm]: {
@@ -194,10 +185,7 @@ export const ApiKeysTable = ({
                     <Text localizationKey={apiKey.lastUsedAt ? timeAgo(apiKey.lastUsedAt) : '-'} />
                   </Box>
                 </Td>
-                <Td
-                  elementDescriptor={descriptors.apiKeysTableCellKey}
-                  elementId={descriptors.apiKeysTableCellKey.setId(apiKey.id)}
-                >
+                <Td elementDescriptor={descriptors.apiKeysTableCellKey}>
                   <Flex
                     direction='row'
                     gap={1}
@@ -211,10 +199,7 @@ export const ApiKeysTable = ({
                     <CopySecretButton apiKeyID={apiKey.id} />
                   </Flex>
                 </Td>
-                <Td
-                  elementDescriptor={descriptors.apiKeysTableCellActions}
-                  elementId={descriptors.apiKeysTableCellActions.setId(apiKey.id)}
-                >
+                <Td elementDescriptor={descriptors.apiKeysTableCellActions}>
                   <ThreeDotsMenu
                     actions={[
                       {
