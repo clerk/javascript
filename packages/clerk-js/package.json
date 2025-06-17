@@ -53,7 +53,9 @@
     "test:ci": "jest --maxWorkers=70%",
     "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html",
     "test:jest": "jest",
-    "test:sandbox:integration": "playwright test --ui",
+    "test:sandbox:integration": "playwright test",
+    "test:sandbox:integration:ui": "playwright test --ui",
+    "test:sandbox:integration:update-snapshots": "playwright test --update-snapshots",
     "test:vitest": "vitest",
     "watch": "rspack build --config rspack.config.js --env production --watch"
   },

@@ -549,7 +549,7 @@ const devConfig = ({ mode, env }) => {
   // By default we use https://js.lclclerk.com which is what our local dev proxy looks for.
   const devUrl = new URL(env.devOrigin || 'https://js.lclclerk.com');
   const isSandbox = !!env.sandbox;
-  const port = env.devOrigin?.split(':')[2] || 4000;
+  const port = Number(new URL(env.devOrigin ?? 'http://localhost:4000').port || 4000);
 
   /** @type {() => import('@rspack/core').Configuration} */
   const commonForDev = () => {
