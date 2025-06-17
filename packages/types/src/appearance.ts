@@ -459,6 +459,8 @@ export type ElementsConfig = {
   tabListContainer: WithOptions;
 
   tableHead: WithOptions;
+  tableBody: WithOptions;
+  tableRow: WithOptions;
 
   paginationButton: WithOptions;
   paginationButtonIcon: WithOptions;

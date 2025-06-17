@@ -333,6 +333,8 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'tabListContainer',
 
   'tableHead',
+  'tableBody',
+  'tableRow',
 
   'paginationButton',
   'paginationButtonIcon',
