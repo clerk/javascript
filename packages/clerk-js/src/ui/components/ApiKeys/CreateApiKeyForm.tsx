@@ -143,9 +143,7 @@ export const CreateApiKeyForm = ({ onCreate, isSubmitting }: CreateApiKeyFormPro
     label: 'Select date',
   });
   const { close: closeCardFn } = useActionContext();
-  const { showDescription = true } = useApiKeysContext();
-
-  console.log('showDescription', showDescription);
+  const { showDescription = false } = useApiKeysContext();
 
   const nameField = useFormControl('name', '', {
     type: 'text',

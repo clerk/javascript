@@ -1,6 +1,6 @@
 import { useUser } from '@clerk/shared/react';
 
-import { ApiKeysContext } from '@/ui/contexts';
+import { ApiKeysContext, useUserProfileContext } from '@/ui/contexts';
 import { Col, descriptors, localizationKeys } from '@/ui/customizables';
 import { Header } from '@/ui/elements/Header';
 import { useUnsafeNavbarContext } from '@/ui/elements/Navbar';
@@ -10,6 +10,7 @@ import { APIKeysPage as APIKeysPageInternal } from '../ApiKeys/ApiKeys';
 export const APIKeysPage = () => {
   const { user } = useUser();
   const { contentRef } = useUnsafeNavbarContext();
+  const { apiKeysProps } = useUserProfileContext();
 
   if (!user) {
     // We should never reach this point, but we'll return null to make TS happy
@@ -27,7 +28,7 @@ export const APIKeysPage = () => {
           textVariant='h2'
         />
       </Header.Root>
-      <ApiKeysContext.Provider value={{ componentName: 'APIKeys' }}>
+      <ApiKeysContext.Provider value={{ componentName: 'APIKeys', ...apiKeysProps }}>
         <APIKeysPageInternal
           subject={user.id}
           revokeModalRoot={contentRef}
