@@ -1,41 +1,31 @@
-// Mock the cssSupports module
-vi.mock('../cssSupports', () => ({
-  cssSupports: {
-    relativeColorSyntax: vi.fn(),
-    colorMix: vi.fn(),
-  },
-}));
-
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { getColorMix, getColorMixAlpha } from '../colorMix';
-import * as cssSupportsModule from '../cssSupports';
+import { cssSupports } from '../cssSupports';
+
+const mockRelativeColorSyntax = vi.spyOn(cssSupports, 'relativeColorSyntax');
+const mockColorMix = vi.spyOn(cssSupports, 'colorMix');
 
 describe('colorMix', () => {
   const testColor = '#3b82f6';
-  const mockCssSupports = cssSupportsModule.cssSupports as {
-    relativeColorSyntax: ReturnType<typeof vi.fn>;
-    colorMix: ReturnType<typeof vi.fn>;
-  };
 
   beforeEach(() => {
-    vi.resetAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('getColorMix', () => {
     test('should return original color for shade 500', () => {
       const result = getColorMix(testColor, 500);
-
       expect(result).toBe(testColor);
-      // Should not call any CSS feature detection for base shade
-      expect(mockCssSupports.relativeColorSyntax).not.toHaveBeenCalled();
-      expect(mockCssSupports.colorMix).not.toHaveBeenCalled();
+
+      expect(mockRelativeColorSyntax).not.toHaveBeenCalled();
+      expect(mockColorMix).not.toHaveBeenCalled();
     });
 
     describe('when relative color syntax is supported', () => {
       beforeEach(() => {
-        mockCssSupports.relativeColorSyntax.mockReturnValue(true);
-        mockCssSupports.colorMix.mockReturnValue(false);
+        mockRelativeColorSyntax.mockReturnValue(true);
+        mockColorMix.mockReturnValue(false);
       });
 
       test('should use relative color syntax for light shades', () => {
@@ -71,8 +61,8 @@ describe('colorMix', () => {
 
     describe('when color-mix is supported but not relative color syntax', () => {
       beforeEach(() => {
-        mockCssSupports.relativeColorSyntax.mockReturnValue(false);
-        mockCssSupports.colorMix.mockReturnValue(true);
+        mockRelativeColorSyntax.mockReturnValue(false);
+        mockColorMix.mockReturnValue(true);
       });
 
       test('should use color-mix syntax for all shades', () => {
@@ -89,7 +79,7 @@ describe('colorMix', () => {
         } as const;
 
         Object.entries(expectedResults).forEach(([shade, expected]) => {
-          const result = getColorMix(testColor, Number(shade) as any);
+          const result = getColorMix(testColor, Number(shade) as 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900);
           expect(result).toBe(expected);
         });
       });
@@ -97,8 +87,8 @@ describe('colorMix', () => {
 
     describe('when neither feature is supported', () => {
       beforeEach(() => {
-        mockCssSupports.relativeColorSyntax.mockReturnValue(false);
-        mockCssSupports.colorMix.mockReturnValue(false);
+        mockRelativeColorSyntax.mockReturnValue(false);
+        mockColorMix.mockReturnValue(false);
       });
 
       test('should return original color as fallback', () => {
@@ -112,7 +102,7 @@ describe('colorMix', () => {
     });
 
     test('should work with different color formats', () => {
-      mockCssSupports.relativeColorSyntax.mockReturnValue(true);
+      mockRelativeColorSyntax.mockReturnValue(true);
 
       const colors = ['#ff0000', 'rgb(255, 0, 0)', 'hsl(0, 100%, 50%)', 'red'];
 
@@ -138,13 +128,17 @@ describe('colorMix', () => {
       };
 
       Object.entries(expectedResults).forEach(([shade, expected]) => {
-        const result = getColorMixAlpha(testColor, Number(shade));
+        const result = getColorMixAlpha(
+          testColor,
+          Number(shade) as 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900,
+        );
         expect(result).toBe(expected);
       });
     });
 
     test('should return original color for unknown shade', () => {
-      const result = getColorMixAlpha(testColor, 999);
+      // Using a shade that doesn't exist in ColorShade type, we need to cast it
+      const result = getColorMixAlpha(testColor, 999 as any);
       expect(result).toBe(testColor);
     });
 
@@ -160,23 +154,23 @@ describe('colorMix', () => {
 
   describe('integration tests', () => {
     test('should prioritize relative color syntax over color-mix when both are supported', () => {
-      mockCssSupports.relativeColorSyntax.mockReturnValue(true);
-      mockCssSupports.colorMix.mockReturnValue(true);
+      mockRelativeColorSyntax.mockReturnValue(true);
+      mockColorMix.mockReturnValue(true);
 
       const result = getColorMix(testColor, 100);
 
       expect(result).toBe(`hsl(from ${testColor} h s calc(l + (5 * ((97 - l) / 7))))`);
-      expect(mockCssSupports.relativeColorSyntax).toHaveBeenCalled();
+      expect(mockRelativeColorSyntax).toHaveBeenCalled();
       // Should not call colorMix since relativeColorSyntax is supported
     });
 
     test('should create consistent color scales', () => {
-      mockCssSupports.relativeColorSyntax.mockReturnValue(true);
+      mockRelativeColorSyntax.mockReturnValue(true);
 
       const baseColor = '#3b82f6';
-      const colorScale = [100, 200, 300, 400, 500, 600, 700, 800, 900].map(shade => ({
+      const colorScale = ([100, 200, 300, 400, 500, 600, 700, 800, 900] as const).map(shade => ({
         shade,
-        color: getColorMix(baseColor, shade as any),
+        color: getColorMix(baseColor, shade),
       }));
 
       // Base shade should be original
@@ -196,7 +190,7 @@ describe('colorMix', () => {
     });
 
     test('should create alpha scale with increasing opacity', () => {
-      const alphaScale = [100, 200, 300, 400, 500, 600, 700, 800, 900].map(shade => ({
+      const alphaScale = ([100, 200, 300, 400, 500, 600, 700, 800, 900] as const).map(shade => ({
         shade,
         alpha: getColorMixAlpha(testColor, shade),
       }));
@@ -216,15 +210,15 @@ describe('colorMix', () => {
 
   describe('edge cases', () => {
     test('should handle empty color string', () => {
-      mockCssSupports.relativeColorSyntax.mockReturnValue(true);
+      mockRelativeColorSyntax.mockReturnValue(true);
 
       const result = getColorMix('', 100);
       expect(result).toBe('hsl(from  h s calc(l + (5 * ((97 - l) / 7))))');
     });
 
     test('should handle special CSS color values', () => {
-      mockCssSupports.colorMix.mockReturnValue(true);
-      mockCssSupports.relativeColorSyntax.mockReturnValue(false);
+      mockColorMix.mockReturnValue(true);
+      mockRelativeColorSyntax.mockReturnValue(false);
 
       const specialColors = ['transparent', 'currentColor', 'inherit'];
 
