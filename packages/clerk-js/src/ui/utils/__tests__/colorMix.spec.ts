@@ -1,8 +1,3 @@
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
-
-import { getColorMix, getColorMixAlpha } from '../colorMix';
-import * as cssSupportsModule from '../cssSupports';
-
 // Mock the cssSupports module
 vi.mock('../cssSupports', () => ({
   cssSupports: {
@@ -10,6 +5,11 @@ vi.mock('../cssSupports', () => ({
     colorMix: vi.fn(),
   },
 }));
+
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+
+import { getColorMix, getColorMixAlpha } from '../colorMix';
+import * as cssSupportsModule from '../cssSupports';
 
 describe('colorMix', () => {
   const testColor = '#3b82f6';
