@@ -5,7 +5,6 @@ import type {
   CommercePaymentSourceResource,
   ConfirmCheckoutParams,
 } from '@clerk/types';
-import type { SetupIntent } from '@stripe/stripe-js';
 import { useMemo, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';
@@ -158,11 +157,8 @@ const useCheckoutMutations = () => {
     });
   };
 
-  const addPaymentSourceAndPay = (ctx: { stripeSetupIntent?: SetupIntent }) => {
-    return confirmCheckout({
-      gateway: 'stripe',
-      paymentToken: ctx.stripeSetupIntent?.payment_method as string,
-    });
+  const addPaymentSourceAndPay = (ctx: { gateway: 'stripe'; paymentToken: string }) => {
+    return confirmCheckout(ctx);
   };
 
   const payWithTestCard = () =>
