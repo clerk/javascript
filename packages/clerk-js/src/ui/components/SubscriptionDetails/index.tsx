@@ -194,7 +194,8 @@ const SubscriptionDetailsInternal = ({ onSubscriptionCancel, portalRoot }: __exp
       {!subscription?.plan.isDefault ? (
         <Drawer.Footer>
           <Col gap={4}>
-            {subscription.planPeriod === 'month' && subscription.plan.annualMonthlyAmount > 0 && (
+            {((subscription.planPeriod === 'month' && subscription.plan.annualMonthlyAmount > 0) ||
+              subscription.planPeriod === 'annual') && (
               <Button
                 block
                 variant='bordered'
