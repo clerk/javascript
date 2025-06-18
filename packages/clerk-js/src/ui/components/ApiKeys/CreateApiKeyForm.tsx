@@ -99,6 +99,8 @@ const ExpirationSelector = ({
           justifyContent: 'space-between',
           backgroundColor: t.colors.$colorBackground,
         })}
+        aria-labelledby='expiration-field'
+        id='expiration-field'
       >
         <Text>{selectedExpiration.label}</Text>
       </SelectButton>
@@ -141,7 +143,9 @@ export const CreateApiKeyForm = ({ onCreate, isSubmitting }: CreateApiKeyFormPro
     label: 'Select date',
   });
   const { close: closeCardFn } = useActionContext();
-  const { showDescription } = useApiKeysContext();
+  const { showDescription = true } = useApiKeysContext();
+
+  console.log('showDescription', showDescription);
 
   const nameField = useFormControl('name', '', {
     type: 'text',
@@ -194,6 +198,7 @@ export const CreateApiKeyForm = ({ onCreate, isSubmitting }: CreateApiKeyFormPro
           >
             <FormLabel
               sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row' }}
+              htmlFor='expiration-field'
             >
               <Text
                 as='span'
@@ -224,14 +229,26 @@ export const CreateApiKeyForm = ({ onCreate, isSubmitting }: CreateApiKeyFormPro
             </Text>
           </Col>
         </Flex>
+
         {showDescription && (
-          <Form.ControlRow
-            elementId={descriptionField.id}
-            elementDescriptor={descriptors.apiKeysCreateFormDescriptionInput}
+          <Col
+            sx={t => ({
+              borderTopWidth: t.borderWidths.$normal,
+              borderTopStyle: t.borderStyles.$solid,
+              borderTopColor: t.colors.$neutralAlpha100,
+              paddingTop: t.space.$4,
+              paddingBottom: t.space.$4,
+            })}
           >
-            <Form.PlainInput {...descriptionField.props} />
-          </Form.ControlRow>
+            <Form.ControlRow
+              elementId={descriptionField.id}
+              elementDescriptor={descriptors.apiKeysCreateFormDescriptionInput}
+            >
+              <Form.PlainInput {...descriptionField.props} />
+            </Form.ControlRow>
+          </Col>
         )}
+
         <FormButtons
           submitLabel={localizationKeys('apiKeys.formButtonPrimary__add')}
           isDisabled={!canSubmit}

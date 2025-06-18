@@ -149,7 +149,7 @@ export const enUS: LocalizationResource = {
   formFieldError__verificationLinkExpired: 'The verification link expired. Please request a new link.',
   formFieldHintText__optional: 'Optional',
   formFieldHintText__slug: 'A slug is a human-readable ID that must be unique. It’s often used in URLs.',
-  formFieldInputPlaceholder__apiKeyDescription: 'Enter your secret key description',
+  formFieldInputPlaceholder__apiKeyDescription: 'Explain why you’re generating this key',
   formFieldInputPlaceholder__apiKeyExpirationDate: 'Select date',
   formFieldInputPlaceholder__apiKeyName: 'Enter your secret key name',
   formFieldInputPlaceholder__backupCode: 'Enter backup code',
@@ -216,7 +216,7 @@ export const enUS: LocalizationResource = {
   },
   organizationProfile: {
     apiKeysPage: {
-      title: 'API Keys',
+      title: 'API keys',
     },
     badge__automaticInvitation: 'Automatic invitations',
     badge__automaticSuggestion: 'Automatic suggestions',
@@ -338,7 +338,7 @@ export const enUS: LocalizationResource = {
       },
     },
     navbar: {
-      apiKeys: 'API Keys',
+      apiKeys: 'API keys',
       billing: 'Billing',
       description: 'Manage your organization.',
       general: 'General',
@@ -857,7 +857,7 @@ export const enUS: LocalizationResource = {
   },
   userProfile: {
     apiKeysPage: {
-      title: 'API Keys',
+      title: 'API keys',
     },
     backupCodePage: {
       actionLabel__copied: 'Copied!',

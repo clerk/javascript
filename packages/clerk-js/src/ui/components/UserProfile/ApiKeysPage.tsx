@@ -1,7 +1,7 @@
 import { useUser } from '@clerk/shared/react';
 
 import { ApiKeysContext } from '@/ui/contexts';
-import { Col, localizationKeys } from '@/ui/customizables';
+import { Col, descriptors, localizationKeys } from '@/ui/customizables';
 import { Header } from '@/ui/elements/Header';
 import { useUnsafeNavbarContext } from '@/ui/elements/Navbar';
 
@@ -17,7 +17,10 @@ export const APIKeysPage = () => {
   }
 
   return (
-    <Col gap={4}>
+    <Col
+      gap={4}
+      elementDescriptor={descriptors.page}
+    >
       <Header.Root>
         <Header.Title
           localizationKey={localizationKeys('userProfile.apiKeysPage.title')}
