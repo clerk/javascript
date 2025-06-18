@@ -130,6 +130,16 @@ for (const pkg of packageNames) {
    * @type {Array.<PackageRule>}
    */
   const pkgRules = [
+    // Disable @floating-ui/* updates for clerk-js package
+    ...(pkg === 'clerk-js'
+      ? [
+          {
+            matchFileNames: [`packages/${pkg}/package.json`],
+            matchPackagePatterns: ['^@floating-ui/'],
+            enabled: false,
+          },
+        ]
+      : []),
     {
       groupName: `[DEV] minor & patch dependencies`,
       groupSlug: `${pkg}-dev-minor`,
