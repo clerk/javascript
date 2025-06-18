@@ -21,7 +21,17 @@ type AddPaymentSourceProps = {
   cancelAction?: () => void;
 };
 
-const [AddPaymentSourceContext, useAddPaymentSourceContext] = createContextAndHook<any>('AddPaymentSourceRoot');
+const [AddPaymentSourceContext, useAddPaymentSourceContext] = createContextAndHook<
+  AddPaymentSourceProps & {
+    headerTitle: LocalizationKey | undefined;
+    headerSubtitle: LocalizationKey | undefined;
+    submitLabel: LocalizationKey | undefined;
+    setHeaderTitle: (title: LocalizationKey) => void;
+    setHeaderSubtitle: (subtitle: LocalizationKey) => void;
+    setSubmitLabel: (label: LocalizationKey) => void;
+    onSuccess: (context: { gateway: 'stripe'; paymentToken: string }) => Promise<void>;
+  }
+>('AddPaymentSourceRoot');
 
 const AddPaymentSourceRoot = ({ children, ...rest }: PropsWithChildren<AddPaymentSourceProps>) => {
   const [headerTitle, setHeaderTitle] = useState<LocalizationKey | undefined>(undefined);
@@ -42,7 +52,7 @@ const AddPaymentSourceRoot = ({ children, ...rest }: PropsWithChildren<AddPaymen
         },
       }}
     >
-      <PaymentElement.Root onSuccess={rest.onSuccess}>{children}</PaymentElement.Root>
+      <PaymentElement.Root>{children}</PaymentElement.Root>
     </AddPaymentSourceContext.Provider>
   );
 };
@@ -126,12 +136,11 @@ const FormButton = ({ text }: { text: LocalizationKey }) => {
 };
 
 const AddPaymentSourceForm = ({ children }: PropsWithChildren) => {
-  const { headerTitle, headerSubtitle, submitLabel, checkout, initializePaymentSource, onSuccess, cancelAction } =
-    useAddPaymentSourceContext();
+  const { headerTitle, headerSubtitle, submitLabel, checkout, onSuccess, cancelAction } = useAddPaymentSourceContext();
 
   const card = useCardState();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
-  const { isMounted, submit: submitPaymentElement } = PaymentElement.usePaymentElement();
+  const { isFormReady, submit: submitPaymentElement, reset } = PaymentElement.usePaymentElement();
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -143,6 +152,9 @@ const AddPaymentSourceForm = ({ children }: PropsWithChildren) => {
     if (error) {
       return;
     }
+    if (!data) {
+      return;
+    }
 
     try {
       await onSuccess(data);
@@ -150,7 +162,7 @@ const AddPaymentSourceForm = ({ children }: PropsWithChildren) => {
       void handleError(error, [], card.setError);
     } finally {
       card.setIdle();
-      initializePaymentSource(); // resets the payment intent
+      void reset(); // resets the payment intent
     }
   };
 
@@ -171,7 +183,7 @@ const AddPaymentSourceForm = ({ children }: PropsWithChildren) => {
         <PaymentElement.Form />
         <Card.Alert>{card.error}</Card.Alert>
         <FormButtons
-          isDisabled={!isMounted}
+          isDisabled={!isFormReady}
           submitLabel={
             submitLabel ??
             localizationKeys(`${localizationRoot}.billingPage.paymentSourcesSection.formButtonPrimary__add`)

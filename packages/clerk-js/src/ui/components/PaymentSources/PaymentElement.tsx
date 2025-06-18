@@ -1,10 +1,9 @@
 import { createContextAndHook, useOrganization, useUser } from '@clerk/shared/react';
 import type { CommerceCheckoutResource } from '@clerk/types';
 import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
-import type { Appearance as StripeAppearance } from '@stripe/stripe-js';
+import type { Appearance as StripeAppearance, Stripe, StripeElements } from '@stripe/stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import { type PropsWithChildren, useCallback, useEffect, useState } from 'react';
-import React from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
@@ -33,6 +32,7 @@ const usePaymentSourceUtils = () => {
   const { commerceSettings } = useEnvironment();
 
   useEffect(() => {
+    // TODO(@COMMERCE): Handle errors
     void initializePaymentSource();
   }, []);
 
@@ -95,17 +95,35 @@ const useStipeAppearance = () => {
 
 const [PaymentElementContext, usePaymentElementContext] = createContextAndHook<
   ReturnType<typeof usePaymentSourceUtils> & {
-    // onSuccess: (params: { gateway: 'stripe'; paymentToken: string }) => Promise<void>;
     setIsPaymentElementReady: (isPaymentElementReady: boolean) => void;
     isPaymentElementReady: boolean;
     checkout?: CommerceCheckoutResource;
   }
->('AddPaymentSourceRoot');
+>('PaymentElementContext');
+
+const [StipeUtilsContext, useStipeUtilsContext] = createContextAndHook<{
+  stripe: Stripe | undefined | null;
+  elements: StripeElements | undefined | null;
+}>('StipeUtilsContext');
+
+const ValidateStripeUtils = ({ children }: PropsWithChildren) => {
+  const stripe = useStripe();
+  const elements = useElements();
+
+  return <StipeUtilsContext.Provider value={{ value: { stripe, elements } }}>{children}</StipeUtilsContext.Provider>;
+};
+
+const DummyStripeUtils = ({ children }: PropsWithChildren) => {
+  return (
+    <StipeUtilsContext.Provider value={{ value: { stripe: undefined, elements: undefined } }}>
+      {children}
+    </StipeUtilsContext.Provider>
+  );
+};
 
 const PaymentElementRoot = (
   props: PropsWithChildren<{
     checkout?: CommerceCheckoutResource;
-    onSuccess: (params: { gateway: 'stripe'; paymentToken: string }) => Promise<void>;
   }>,
 ) => {
   const utils = usePaymentSourceUtils();
@@ -119,7 +137,6 @@ const PaymentElementRoot = (
         value={{
           value: {
             ...utils,
-            //   onSuccess: props.onSuccess,
             setIsPaymentElementReady,
             isPaymentElementReady,
             checkout: props.checkout,
@@ -132,7 +149,7 @@ const PaymentElementRoot = (
           stripe={stripe}
           options={{ clientSecret: externalClientSecret, appearance: elementsAppearance }}
         >
-          {props.children}
+          <ValidateStripeUtils>{props.children}</ValidateStripeUtils>
         </Elements>
       </PaymentElementContext.Provider>
     );
@@ -143,14 +160,13 @@ const PaymentElementRoot = (
       value={{
         value: {
           ...utils,
-          //   onSuccess: props.onSuccess,
           setIsPaymentElementReady,
           isPaymentElementReady,
           checkout: props.checkout,
         },
       }}
     >
-      <StripeErrorBoundary>{props.children}</StripeErrorBoundary>
+      <DummyStripeUtils>{props.children}</DummyStripeUtils>
     </PaymentElementContext.Provider>
   );
 };
@@ -193,144 +209,45 @@ const PaymentElementForm = () => {
 };
 
 const usePaymentElement = () => {
-  try {
-    const {
-      // onSuccess,
-      isPaymentElementReady,
-    } = usePaymentElementContext();
-    const stripe = useStripe();
-    const elements = useElements();
-    const { stripe: stripeFromContext, externalClientSecret } = usePaymentElementContext();
+  const { isPaymentElementReady, initializePaymentSource } = usePaymentElementContext();
+  const { stripe, elements } = useStipeUtilsContext();
+  const { stripe: stripeFromContext, externalClientSecret } = usePaymentElementContext();
 
+  const submit = useCallback(async () => {
     if (!stripe || !elements) {
-      throw new Error('Wait for initialization');
+      throw new Error('Stripe and Elements are not yet ready');
     }
 
-    const submit = useCallback(async () => {
-      const { setupIntent, error } = await stripe.confirmSetup({
-        elements,
-        confirmParams: {
-          return_url: '', // TODO(@COMMERCE): need to figure this out
-        },
-        redirect: 'if_required',
-      });
-      if (error || !setupIntent?.payment_method) {
-        return { data: undefined, error }; // just return, since stripe will handle the error
-      }
-      return { data: { gateway: 'stripe', paymentToken: setupIntent.payment_method as string }, error: undefined };
-    }, [stripe, elements]);
-
-    const isProviderReady = stripe && externalClientSecret;
-
-    return {
-      submit,
-      isPaymentElementReady,
-      provider: isProviderReady
-        ? {
-            name: 'stripe',
-            instance: stripeFromContext,
-          }
-        : undefined,
-      isProviderReady: isProviderReady,
-    };
-  } catch (error) {
-    const { stripe, externalClientSecret } = usePaymentElementContext();
-
-    const isProviderReady = stripe && externalClientSecret;
-
-    return {
-      submit: () => Promise.resolve({ data: undefined, error }),
-      isMounted: false,
-      provider: isProviderReady
-        ? {
-            name: 'stripe',
-            instance: stripe,
-          }
-        : undefined,
-      isProviderReady: isProviderReady,
-    };
-  }
-};
-
-// const usePaymentElementStatus = () => {
-//   const { stripe, externalClientSecret } = usePaymentElementContext();
-
-//   if (stripe && externalClientSecret) {
-//     return {
-//       provider: {
-//         name: 'stripe',
-//         instance: stripe,
-//       },
-//       isProviderReady: true,
-//     };
-//   }
-
-//   return {
-//     provider: undefined,
-//     isProviderReady: false,
-//   };
-// };
-
-// const usePaymentElementForm = () => {
-//   try {
-//     const { isPaymentElementReady } = usePaymentElementContext();
-//     const stripe = useStripe();
-//     const elements = useElements();
-
-//     if (!stripe || !elements) {
-//       throw new Error('Wait for initialization');
-//     }
-
-//     const submit = useCallback(async () => {
-//       const { setupIntent, error } = await stripe.confirmSetup({
-//         elements,
-//         confirmParams: {
-//           return_url: '', // TODO(@COMMERCE): need to figure this out
-//         },
-//         redirect: 'if_required',
-//       });
-//       if (error || !setupIntent?.payment_method) {
-//         return { data: undefined, error }; // just return, since stripe will handle the error
-//       }
-//       return { data: { gateway: 'stripe', paymentToken: setupIntent.payment_method as string }, error: undefined };
-//     }, [stripe, elements]);
-//     return {
-//       submit,
-//       isMounted: isPaymentElementReady,
-//     };
-//   } catch (error) {
-//     return {
-//       submit: () => Promise.resolve({ data: undefined, error }),
-//       isMounted: false,
-//     };
-//   }
-// };
-
-export {
-  PaymentElementRoot as Root,
-  PaymentElementForm as Form,
-  usePaymentElement,
-  //   usePaymentElementStatus,
-  //   usePaymentElementForm,
-};
-
-class StripeErrorBoundary extends React.Component {
-  constructor(props: any) {
-    super(props);
-    this.state = { hasError: false };
-  }
-
-  static getDerivedStateFromError(error: any) {
-    console.log('---lllllll', error);
-    return { hasError: true };
-  }
-
-  render() {
-    // @ts-expect-error things are typed as optional
-    if (this.state.hasError) {
-      return <div>Please ensure Stripe provider is configured</div>;
+    const { setupIntent, error } = await stripe.confirmSetup({
+      elements,
+      confirmParams: {
+        return_url: '', // TODO(@COMMERCE): need to figure this out
+      },
+      redirect: 'if_required',
+    });
+    if (error || !setupIntent?.payment_method) {
+      return { data: undefined, error }; // just return, since stripe will handle the error
     }
-    // @ts-expect-error things are typed as optional
-    return this.props.children;
-  }
-}
+    return {
+      data: { gateway: 'stripe', paymentToken: setupIntent.payment_method as string },
+      error: undefined,
+    } as const;
+  }, [stripe, elements]);
+
+  const isProviderReady = stripe && externalClientSecret;
+
+  return {
+    submit,
+    reset: initializePaymentSource,
+    isFormReady: isPaymentElementReady,
+    provider: isProviderReady
+      ? {
+          name: 'stripe',
+          instance: stripeFromContext,
+        }
+      : undefined,
+    isProviderReady: isProviderReady,
+  };
+};
+
+export { PaymentElementRoot as Root, PaymentElementForm as Form, usePaymentElement };
