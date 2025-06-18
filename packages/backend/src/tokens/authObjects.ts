@@ -387,10 +387,37 @@ export const makeAuthObjectSerializable = <T extends Record<string, unknown>>(ob
   return rest as unknown as T;
 };
 
-type TokenFetcher = (sessionId: string, template: string) => Promise<string>;
+/**
+ * A function that fetches a session token from the Clerk API.
+ *
+ * @param sessionId - The ID of the session
+ * @param template - The JWT template name to use for token generation
+ * @param expiresInSeconds - Optional expiration time in seconds for the token
+ * @returns A promise that resolves to the token string
+ */
+type TokenFetcher = (sessionId: string, template: string, expiresInSeconds?: number) => Promise<string>;
 
+/**
+ * Factory function type that creates a getToken function for auth objects.
+ *
+ * @param params - Configuration object containing session information and token fetcher
+ * @returns A ServerGetToken function that can be used to retrieve tokens
+ */
 type CreateGetToken = (params: { sessionId: string; sessionToken: string; fetcher: TokenFetcher }) => ServerGetToken;
 
+/**
+ * Creates a token retrieval function for authenticated sessions.
+ *
+ * This factory function returns a getToken function that can either return the raw session token
+ * or generate a JWT using a specified template with optional custom expiration.
+ *
+ * @param params - Configuration object
+ * @param params.sessionId - The session ID for token generation
+ * @param params.sessionToken - The raw session token to return when no template is specified
+ * @param params.fetcher - Function to fetch tokens from the Clerk API
+ *
+ * @returns A function that retrieves tokens based on the provided options
+ */
 const createGetToken: CreateGetToken = params => {
   const { fetcher, sessionToken, sessionId } = params || {};
 
@@ -400,7 +427,7 @@ const createGetToken: CreateGetToken = params => {
     }
 
     if (options.template) {
-      return fetcher(sessionId, options.template);
+      return fetcher(sessionId, options.template, options.expiresInSeconds);
     }
 
     return sessionToken;
