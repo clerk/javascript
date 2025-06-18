@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { Box, Button, Col, Flex, FormLabel, localizationKeys, Text } from '@/ui/customizables';
+import { Box, Button, Col, descriptors, Flex, FormLabel, localizationKeys, Text } from '@/ui/customizables';
 import { useActionContext } from '@/ui/elements/Action/ActionRoot';
 import { Form } from '@/ui/elements/Form';
 import { FormButtons } from '@/ui/elements/FormButtons';
@@ -97,14 +97,21 @@ export const CreateApiKeyForm = ({ onCreate, isSubmitting }: CreateApiKeyFormPro
     <FormContainer
       headerTitle={localizationKeys('apiKeys.formTitle')}
       headerSubtitle={localizationKeys('apiKeys.formHint')}
+      elementDescriptor={descriptors.apiKeysCreateForm}
     >
       <Form.Root onSubmit={handleSubmit}>
-        <Form.ControlRow elementId={nameField.id}>
+        <Form.ControlRow
+          elementId={nameField.id}
+          elementDescriptor={descriptors.apiKeysCreateFormNameInput}
+        >
           <Form.PlainInput {...nameField.props} />
         </Form.ControlRow>
         {showAdvanced && (
           <>
-            <Form.ControlRow elementId={descriptionField.id}>
+            <Form.ControlRow
+              elementId={descriptionField.id}
+              elementDescriptor={descriptors.apiKeysCreateFormDescriptionInput}
+            >
               <Form.PlainInput {...descriptionField.props} />
             </Form.ControlRow>
             <Flex
@@ -155,6 +162,7 @@ export const CreateApiKeyForm = ({ onCreate, isSubmitting }: CreateApiKeyFormPro
                 <Form.ControlRow
                   elementId={expirationDateField.id}
                   sx={{ flex: 3 }}
+                  elementDescriptor={descriptors.apiKeysCreateFormExpirationInput}
                 >
                   <Form.PlainInput
                     type='date'
@@ -190,6 +198,7 @@ export const CreateApiKeyForm = ({ onCreate, isSubmitting }: CreateApiKeyFormPro
             isDisabled={!canSubmit}
             onReset={closeCardFn}
             isLoading={isSubmitting}
+            elementDescriptor={descriptors.apiKeysCreateFormSubmitButton}
           />
         </Flex>
       </Form.Root>

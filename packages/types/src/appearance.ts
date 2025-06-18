@@ -459,6 +459,10 @@ export type ElementsConfig = {
   tabListContainer: WithOptions;
 
   tableHead: WithOptions;
+  tableBody: WithOptions;
+  tableRow: WithOptions;
+  tableHeaderCell: WithOptions;
+  tableBodyCell: WithOptions;
 
   paginationButton: WithOptions;
   paginationButtonIcon: WithOptions;
@@ -586,6 +590,23 @@ export type ElementsConfig = {
   notificationBadge: WithOptions;
   buttonArrowIcon: WithOptions;
   spinner: WithOptions;
+
+  apiKeys: WithOptions;
+  apiKeysHeader: WithOptions;
+  apiKeysSearchBox: WithOptions;
+  apiKeysSearchInput: WithOptions;
+  apiKeysAddButton: WithOptions;
+  apiKeysTable: WithOptions;
+  apiKeysCopyButton: WithOptions<string>;
+  apiKeysRevealButton: WithOptions<string>;
+  apiKeysCreateForm: WithOptions;
+  apiKeysCreateFormNameInput: WithOptions;
+  apiKeysCreateFormDescriptionInput: WithOptions;
+  apiKeysCreateFormExpirationInput: WithOptions;
+  apiKeysCreateFormSubmitButton: WithOptions;
+  apiKeysRevokeModal: WithOptions;
+  apiKeysRevokeModalInput: WithOptions;
+  apiKeysRevokeModalSubmitButton: WithOptions;
 };
 
 export type Elements = {
