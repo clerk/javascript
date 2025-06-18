@@ -19,11 +19,7 @@ describe('colorMix', () => {
   };
 
   beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  afterEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
   });
 
   describe('getColorMix', () => {
