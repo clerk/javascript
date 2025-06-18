@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
-import { getColorMix, getColorMixAlpha } from '../colorMix';
+import { getColorMix, getColorMixAlpha } from '../colors/utils';
 import { cssSupports } from '../cssSupports';
 
 const mockRelativeColorSyntax = vi.spyOn(cssSupports, 'relativeColorSyntax');

@@ -9,9 +9,48 @@ import {
   fromEntries,
   removeUndefinedProps,
 } from '../utils';
+import { generateAlphaScale } from '../utils/colors/alphaScale';
+import { generateLightnessScale } from '../utils/colors/lightnessScale';
+import { applyScalePrefix, colorMix } from '../utils/colors/utils';
+import { cssSupports } from '../utils/cssSupports';
 
 export const createColorScales = (theme: Theme) => {
   const variables = theme.variables || {};
+
+  if (cssSupports.relativeColorSyntax() || cssSupports.colorMix()) {
+    const primaryScale = applyScalePrefix(generateLightnessScale(variables.colorPrimary), 'primary');
+    const dangerScale = applyScalePrefix(generateLightnessScale(variables.colorDanger), 'danger');
+    const successScale = applyScalePrefix(generateLightnessScale(variables.colorSuccess), 'success');
+    const warningScale = applyScalePrefix(generateLightnessScale(variables.colorWarning), 'warning');
+
+    const primaryAlphaScale = applyScalePrefix(generateAlphaScale(primaryScale?.primary500), 'primaryAlpha');
+    const dangerAlphaScale = applyScalePrefix(generateAlphaScale(dangerScale?.danger500), 'dangerAlpha');
+    const successAlphaScale = applyScalePrefix(generateAlphaScale(successScale?.success500), 'successAlpha');
+    const warningAlphaScale = applyScalePrefix(generateAlphaScale(warningScale?.warning500), 'warningAlpha');
+    const neutralAlphaScale = applyScalePrefix(generateAlphaScale(variables.colorNeutral), 'neutralAlpha');
+
+    return removeUndefinedProps({
+      ...primaryScale,
+      ...dangerScale,
+      ...successScale,
+      ...warningScale,
+      ...primaryAlphaScale,
+      ...dangerAlphaScale,
+      ...successAlphaScale,
+      ...warningAlphaScale,
+      ...neutralAlphaScale,
+      primaryHover: primaryScale?.primary400,
+      colorTextOnPrimaryBackground: variables.colorTextOnPrimaryBackground,
+      colorText: variables.colorText,
+      colorTextSecondary:
+        variables.colorTextSecondary ||
+        (variables.colorText ? colorMix('transparent', `${variables.colorText} 65%`) : undefined),
+      colorInputText: variables.colorInputText,
+      colorBackground: variables.colorBackground,
+      colorInputBackground: variables.colorInputBackground,
+      colorShimmer: variables.colorShimmer,
+    });
+  }
 
   const primaryScale = colorOptionToHslaLightnessScale(variables.colorPrimary, 'primary');
   const primaryAlphaScale = colorOptionToHslaAlphaScale(primaryScale?.primary500, 'primaryAlpha');

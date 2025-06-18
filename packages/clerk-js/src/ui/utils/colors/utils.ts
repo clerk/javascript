@@ -1,4 +1,6 @@
-import { cssSupports } from './cssSupports';
+import type { ColorScale } from '@clerk/types';
+
+import { cssSupports } from '../cssSupports';
 
 const CONFIG = {
   TARGET_L_50_SHADE: 97,
@@ -7,7 +9,8 @@ const CONFIG = {
   DARK_SHADES_COUNT: 7,
 } as const;
 
-type ColorShade = 25 | 50 | 100 | 150 | 200 | 300 | 400 | 500 | 600 | 700 | 750 | 800 | 850 | 900 | 950;
+export const COLOR_SCALE = [25, 50, 100, 150, 200, 300, 400, 500, 600, 700, 750, 800, 850, 900, 950] as const;
+export type ColorShade = (typeof COLOR_SCALE)[number];
 
 const getColorMix = (color: string, shade: ColorShade): string => {
   if (shade === 500) return color;
@@ -23,7 +26,7 @@ const getColorMix = (color: string, shade: ColorShade): string => {
   return color;
 };
 
-const getRelativeColorSyntax = (color: string, shade: ColorShade): string => {
+export const getRelativeColorSyntax = (color: string, shade: ColorShade): string => {
   const { TARGET_L_50_SHADE, TARGET_L_900_SHADE, LIGHT_SHADES_COUNT, DARK_SHADES_COUNT } = CONFIG;
 
   const lightShadeMap: Record<number, number> = {
@@ -99,11 +102,11 @@ const createColorMix = (baseColor: string, mixColor: string, percentage: number)
   return `color-mix(in srgb, ${baseColor}, ${mixColor} ${percentage}%)`;
 };
 
-const getColorMixSyntax = (color: string, shade: ColorShade): string => {
+export const getColorMixSyntax = (color: string, shade: ColorShade): string => {
   const mixData = SHADE_MIX_DATA[shade];
 
   if (mixData.mixColor === null) {
-    return color; // Base color (500)
+    return color;
   }
 
   return createColorMix(color, mixData.mixColor, mixData.percentage);
@@ -119,4 +122,12 @@ const getColorMixAlpha = (color: string, shade: ColorShade): string => {
   return createColorMix('transparent', color, alphaPercentage);
 };
 
-export { getColorMix, getColorMixAlpha };
+const applyScalePrefix = (scale: ColorScale<string | undefined>, prefix: string) => {
+  return Object.fromEntries(Object.entries(scale).map(([shade, color]) => [prefix + shade, color]));
+};
+
+const colorMix = (colorOne: string, colorTwo: string): string => {
+  return `color-mix(in srgb, ${colorOne}, ${colorTwo})`;
+};
+
+export { getColorMix, getColorMixAlpha, colorMix, applyScalePrefix };
