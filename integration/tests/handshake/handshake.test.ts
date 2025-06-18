@@ -12,7 +12,7 @@ testAgainstRunningApps({ withPattern: ['next.appRouter.sessionsProd1'] })('hands
   test.describe.configure({ mode: 'serial' });
 
   test.describe('with Production instance', () => {
-    // TODO: change host name
+    // TODO: change host name (see integration/README.md#production-hosts)
     const host = 'multiple-apps-e2e.clerk.app:8443';
 
     let fakeUser: FakeUserWithEmail;
