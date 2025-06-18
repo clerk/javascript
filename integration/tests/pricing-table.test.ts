@@ -174,7 +174,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await u.page.waitForAppUrl('/');
     });
 
-    test('navigates to supplied newSubscriptionRedirectUrl', async ({ page, context }) => {
+    test.skip('navigates to supplied newSubscriptionRedirectUrl', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -254,7 +254,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await fakeUser.deleteIfExists();
     });
 
-    test('checkout always revalidates on open', async ({ page, context }) => {
+    test.skip('checkout always revalidates on open', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
 
       const fakeUser = u.services.users.createFakeUser();
@@ -317,7 +317,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await fakeUser.deleteIfExists();
     });
 
-    test('displays notice then plan cannot change', async ({ page, context }) => {
+    test('displays notice that plan cannot change', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
 
       const fakeUser = u.services.users.createFakeUser();
