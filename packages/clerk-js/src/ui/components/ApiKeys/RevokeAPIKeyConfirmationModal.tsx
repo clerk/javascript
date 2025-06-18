@@ -32,17 +32,6 @@ export const RevokeAPIKeyConfirmationModal = ({
   const clerk = useClerk();
   const { mutate } = useSWRConfig();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!apiKeyId) return;
-
-    await clerk.apiKeys.revoke({ apiKeyID: apiKeyId });
-    const cacheKey = { key: 'api-keys', subject };
-
-    void mutate(cacheKey);
-    onClose();
-  };
-
   const revokeField = useFormControl('apiKeyRevokeConfirmation', '', {
     type: 'text',
     label: `Type "Revoke" to confirm`,
@@ -52,6 +41,17 @@ export const RevokeAPIKeyConfirmationModal = ({
 
   // TODO: Make this locale-aware
   const canSubmit = revokeField.value === 'Revoke';
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!apiKeyId || !canSubmit) return;
+
+    await clerk.apiKeys.revoke({ apiKeyID: apiKeyId });
+    const cacheKey = { key: 'api-keys', subject };
+
+    void mutate(cacheKey);
+    onClose();
+  };
 
   if (!isOpen) {
     return null;
@@ -77,6 +77,7 @@ export const RevokeAPIKeyConfirmationModal = ({
               minHeight: '100%',
               height: '100%',
               width: '100%',
+              borderRadius: t.radii.$lg,
             })
           : {},
       ]}

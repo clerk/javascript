@@ -10,7 +10,7 @@ import { Select, SelectButton, SelectOptionList } from '@/ui/elements/Select';
 import { ChevronUpDown } from '@/ui/icons';
 import { useFormControl } from '@/ui/utils/useFormControl';
 
-export type OnCreateParams = { name: string; description?: string; expiration: number | undefined };
+export type OnCreateParams = { name: string; description?: string; secondsUntilExpiration: number | undefined };
 
 interface CreateApiKeyFormProps {
   onCreate: (params: OnCreateParams, closeCardFn: () => void) => void;
@@ -169,7 +169,7 @@ export const CreateApiKeyForm = ({ onCreate, isSubmitting }: CreateApiKeyFormPro
       {
         name: nameField.value,
         description: descriptionField.value || undefined,
-        expiration: getTimeLeftInSeconds(selectedExpiration.value),
+        secondsUntilExpiration: getTimeLeftInSeconds(selectedExpiration.value),
       },
       closeCardFn,
     );
