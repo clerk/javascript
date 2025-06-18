@@ -507,9 +507,6 @@ importers:
       '@emotion/jest':
         specifier: ^11.13.0
         version: 11.13.0(@types/jest@29.5.12)
-      '@playwright/test':
-        specifier: ^1
-        version: 1.44.1
       '@rsdoctor/rspack-plugin':
         specifier: ^0.4.13
         version: 0.4.13(@rspack/core@1.2.8(@swc/helpers@0.5.17))(webpack@5.94.0(@swc/core@1.11.29(@swc/helpers@0.5.17))(esbuild@0.25.0))
