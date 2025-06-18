@@ -1,5 +1,6 @@
 import { createContextAndHook } from '@clerk/shared/react';
 import type { SelectId } from '@clerk/types';
+import { useMergeRefs } from '@floating-ui/react';
 import type { PropsWithChildren, ReactElement, ReactNode } from 'react';
 import React, { useState } from 'react';
 
@@ -385,7 +386,7 @@ export const SelectButton = React.forwardRef<
 >((props, ref) => {
   const { sx, children, icon, iconSx, ...rest } = props;
   const { popoverCtx, onTriggerClick, buttonRenderOption, selectedOption, placeholder, elementId } = useSelectState();
-  const { reference } = popoverCtx;
+  const mergedRef = useMergeRefs([popoverCtx.reference, ref]);
 
   let show: React.ReactNode = children;
   if (!children) {
@@ -405,14 +406,7 @@ export const SelectButton = React.forwardRef<
     <Button
       elementDescriptor={descriptors.selectButton}
       elementId={descriptors.selectButton.setId(elementId)}
-      ref={buttonRef => {
-        reference(buttonRef);
-        if (typeof ref === 'function') {
-          ref(buttonRef);
-        } else if (ref) {
-          ref.current = buttonRef;
-        }
-      }}
+      ref={mergedRef}
       variant='outline'
       textVariant='buttonLarge'
       onClick={onTriggerClick}
