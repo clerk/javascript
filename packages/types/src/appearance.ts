@@ -461,6 +461,8 @@ export type ElementsConfig = {
   tableHead: WithOptions;
   tableBody: WithOptions;
   tableRow: WithOptions;
+  tableHeaderCell: WithOptions;
+  tableBodyCell: WithOptions;
 
   paginationButton: WithOptions;
   paginationButtonIcon: WithOptions;
