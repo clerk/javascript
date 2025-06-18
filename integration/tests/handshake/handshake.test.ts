@@ -66,13 +66,15 @@ testAgainstRunningApps({ withPattern: ['next.appRouter.sessionsProd1'] })('hands
       await u.po.expect.toBeSignedIn();
       // AND the user is on the protected page
       expect(u.page.url()).toBe(`https://${host}/protected`);
-      // AND the user has valid cookies (session, client_uat, etc)
+      // AND the user has valid cookies (session, client_uat, refresh, etc)
       const cookies = await u.page.context().cookies();
       const clientUatCookies = cookies.filter(c => c.name.startsWith('__client_uat'));
-      // TODO: should we be more specific about the number of cookies?
+      // TODO: should we be more specific about the number of cookies? (some are suffixed, some are not)
       expect(clientUatCookies.length).toBeGreaterThan(0);
       const sessionCookies = cookies.filter(c => c.name.startsWith('__session'));
       expect(sessionCookies.length).toBeGreaterThan(0);
+      const refreshCookies = cookies.filter(c => c.name.startsWith('__refresh'));
+      expect(refreshCookies.length).toBeGreaterThan(0);
       // AND the user does not have temporary cookies (e.g. __clerk_handshake, __clerk_handshake_nonce)
       const handshakeCookies = cookies.filter(c => c.name.includes('handshake'));
       expect(handshakeCookies.length).toBe(0);
