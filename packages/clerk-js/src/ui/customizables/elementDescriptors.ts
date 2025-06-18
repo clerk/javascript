@@ -333,6 +333,10 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'tabListContainer',
 
   'tableHead',
+  'tableBody',
+  'tableRow',
+  'tableHeaderCell',
+  'tableBodyCell',
 
   'paginationButton',
   'paginationButtonIcon',
@@ -465,11 +469,6 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'apiKeysSearchInput',
   'apiKeysAddButton',
   'apiKeysTable',
-  'apiKeysTableRow',
-  'apiKeysTableCellName',
-  'apiKeysTableCellLastUsed',
-  'apiKeysTableCellKey',
-  'apiKeysTableCellActions',
   'apiKeysCopyButton',
   'apiKeysRevealButton',
   'apiKeysCreateForm',

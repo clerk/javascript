@@ -459,6 +459,10 @@ export type ElementsConfig = {
   tabListContainer: WithOptions;
 
   tableHead: WithOptions;
+  tableBody: WithOptions;
+  tableRow: WithOptions;
+  tableHeaderCell: WithOptions;
+  tableBodyCell: WithOptions;
 
   paginationButton: WithOptions;
   paginationButtonIcon: WithOptions;
@@ -593,11 +597,6 @@ export type ElementsConfig = {
   apiKeysSearchInput: WithOptions;
   apiKeysAddButton: WithOptions;
   apiKeysTable: WithOptions;
-  apiKeysTableRow: WithOptions<string>;
-  apiKeysTableCellName: WithOptions<string>;
-  apiKeysTableCellLastUsed: WithOptions<string>;
-  apiKeysTableCellKey: WithOptions<string>;
-  apiKeysTableCellActions: WithOptions<string>;
   apiKeysCopyButton: WithOptions<string>;
   apiKeysRevealButton: WithOptions<string>;
   apiKeysCreateForm: WithOptions;

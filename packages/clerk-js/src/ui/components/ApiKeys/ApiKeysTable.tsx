@@ -146,11 +146,8 @@ export const ApiKeysTable = ({
             <EmptyRow />
           ) : (
             rows.map(apiKey => (
-              <Tr
-                key={apiKey.id}
-                elementDescriptor={descriptors.apiKeysTableRow}
-              >
-                <Td elementDescriptor={descriptors.apiKeysTableCellName}>
+              <Tr key={apiKey.id}>
+                <Td>
                   <Flex
                     direction='col'
                     sx={{ minWidth: '25ch' }}
@@ -174,7 +171,7 @@ export const ApiKeysTable = ({
                     </Text>
                   </Flex>
                 </Td>
-                <Td elementDescriptor={descriptors.apiKeysTableCellLastUsed}>
+                <Td>
                   <Box
                     sx={{
                       [mqu.sm]: {
@@ -185,7 +182,7 @@ export const ApiKeysTable = ({
                     <Text localizationKey={apiKey.lastUsedAt ? timeAgo(apiKey.lastUsedAt) : '-'} />
                   </Box>
                 </Td>
-                <Td elementDescriptor={descriptors.apiKeysTableCellKey}>
+                <Td>
                   <Flex
                     direction='row'
                     gap={1}
@@ -199,7 +196,7 @@ export const ApiKeysTable = ({
                     <CopySecretButton apiKeyID={apiKey.id} />
                   </Flex>
                 </Td>
-                <Td elementDescriptor={descriptors.apiKeysTableCellActions}>
+                <Td>
                   <ThreeDotsMenu
                     actions={[
                       {
