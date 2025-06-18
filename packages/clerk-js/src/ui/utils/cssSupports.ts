@@ -21,6 +21,12 @@ const testCSSFeature = (feature: CSSFeature, property: string = 'color'): boolea
     }
   }
 
+  // Fast-fail for non-browser environments
+  if (typeof CSS?.supports !== 'function') {
+    supportCache.set(feature, false);
+    return false;
+  }
+
   let isSupported = false;
 
   try {
