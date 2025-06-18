@@ -23,18 +23,18 @@ import type {
 } from '@clerk/types';
 
 export type {
-  __internal_OAuthConsentProps,
-  __internal_UserVerificationProps,
-  CreateOrganizationProps,
   GoogleOneTapProps,
-  OrganizationListProps,
-  OrganizationProfileProps,
-  OrganizationSwitcherProps,
   SignInProps,
   SignUpProps,
   UserButtonProps,
   UserProfileProps,
+  OrganizationSwitcherProps,
+  OrganizationProfileProps,
+  CreateOrganizationProps,
+  OrganizationListProps,
   WaitlistProps,
+  __internal_UserVerificationProps,
+  __internal_OAuthConsentProps,
 };
 
 export type AvailableComponentProps =

@@ -1301,8 +1301,6 @@ export class Clerk implements ClerkInterface {
     const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
     const defaultRedirectUrlComplete = this.client?.signUp ? this.buildAfterSignUpUrl() : this.buildAfterSignInUrl();
 
-    this.#setTransitiveState();
-
     await tracker.track(async () => {
       await this.navigate(redirectUrlComplete ?? defaultRedirectUrlComplete);
     });
