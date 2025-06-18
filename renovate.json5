@@ -1099,9 +1099,9 @@
     },
     {
       groupName: "[DEV] minor & patch dependencies",
-      groupSlug: "tanstack-start-dev-minor",
+      groupSlug: "tanstack-react-start-dev-minor",
       matchFileNames: [
-        "packages/tanstack-start/package.json",
+        "packages/tanstack-react-start/package.json",
       ],
       matchDepTypes: [
         "devDependencies",
@@ -1111,13 +1111,13 @@
         "minor",
       ],
       automerge: true,
-      semanticCommitScope: "tanstack-start",
+      semanticCommitScope: "tanstack-react-start",
     },
     {
       groupName: "[DEV] major dependencies",
-      groupSlug: "tanstack-start-dev-major",
+      groupSlug: "tanstack-react-start-dev-major",
       matchFileNames: [
-        "packages/tanstack-start/package.json",
+        "packages/tanstack-react-start/package.json",
       ],
       matchDepTypes: [
         "devDependencies",
@@ -1125,13 +1125,13 @@
       matchUpdateTypes: [
         "major",
       ],
-      semanticCommitScope: "tanstack-start",
+      semanticCommitScope: "tanstack-react-start",
     },
     {
       groupName: "minor & patch dependencies",
-      groupSlug: "tanstack-start-prod-minor",
+      groupSlug: "tanstack-react-start-prod-minor",
       matchFileNames: [
-        "packages/tanstack-start/package.json",
+        "packages/tanstack-react-start/package.json",
       ],
       matchDepTypes: [
         "dependencies",
@@ -1140,13 +1140,13 @@
         "patch",
         "minor",
       ],
-      semanticCommitScope: "tanstack-start",
+      semanticCommitScope: "tanstack-react-start",
     },
     {
       groupName: "major dependencies",
-      groupSlug: "tanstack-start-prod-major",
+      groupSlug: "tanstack-react-start-prod-major",
       matchFileNames: [
-        "packages/tanstack-start/package.json",
+        "packages/tanstack-react-start/package.json",
       ],
       matchDepTypes: [
         "dependencies",
@@ -1154,7 +1154,7 @@
       matchUpdateTypes: [
         "major",
       ],
-      semanticCommitScope: "tanstack-start",
+      semanticCommitScope: "tanstack-react-start",
     },
     {
       groupName: "[DEV] minor & patch dependencies",
