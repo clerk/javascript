@@ -76,15 +76,15 @@
     "@radix-ui/primitive": "^1.1.2",
     "@radix-ui/react-form": "^0.1.7",
     "@radix-ui/react-slot": "^1.2.3",
-    "@xstate/react": "^5.0.4",
+    "@xstate/react": "^5.0.5",
     "client-only": "^0.0.1",
     "tslib": "catalog:repo",
-    "xstate": "^5.19.3"
+    "xstate": "^5.19.4"
   },
   "devDependencies": {
     "@statelyai/inspect": "^0.4.0",
     "concurrently": "^8.2.2",
-    "next": "14.2.29",
+    "next": "14.2.30",
     "type-fest": "^4.41.0"
   },
   "peerDependencies": {

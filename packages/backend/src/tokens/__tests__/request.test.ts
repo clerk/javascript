@@ -16,7 +16,7 @@ import type { AuthReason } from '../authStatus';
 import { AuthErrorReason, AuthStatus } from '../authStatus';
 import { OrganizationMatcher } from '../organizationMatcher';
 import { authenticateRequest, RefreshTokenErrorReason } from '../request';
-import type { MachineTokenType } from '../tokenTypes';
+import { type MachineTokenType, TokenType } from '../tokenTypes';
 import type { AuthenticateRequestOptions } from '../types';
 
 const PK_TEST = 'pk_test_Y2xlcmsuaW5zcGlyZWQucHVtYS03NC5sY2wuZGV2JA';
@@ -236,7 +236,7 @@ expect.extend({
   toBeMachineUnauthenticated(
     received,
     expected: {
-      tokenType: MachineTokenType;
+      tokenType: MachineTokenType | null;
       reason: AuthReason;
       message: string;
     },
@@ -246,6 +246,7 @@ expect.extend({
       received.tokenType === expected.tokenType &&
       received.reason === expected.reason &&
       received.message === expected.message &&
+      !received.isAuthenticated &&
       !received.token;
 
     if (pass) {
@@ -264,15 +265,11 @@ expect.extend({
   toBeMachineUnauthenticatedToAuth(
     received,
     expected: {
-      tokenType: MachineTokenType;
+      tokenType: MachineTokenType | null;
     },
   ) {
     const pass =
-      received.tokenType === expected.tokenType &&
-      !received.claims &&
-      !received.subject &&
-      !received.name &&
-      !received.id;
+      received.tokenType === expected.tokenType && !received.isAuthenticated && !received.name && !received.id;
 
     if (pass) {
       return {
@@ -1203,7 +1200,7 @@ describe('tokens.authenticateRequest(options)', () => {
     });
 
     // Test each token type with parameterized tests
-    const tokenTypes = ['api_key', 'oauth_token', 'machine_token'] as const;
+    const tokenTypes = [TokenType.ApiKey, TokenType.OAuthToken, TokenType.MachineToken];
 
     describe.each(tokenTypes)('%s Authentication', tokenType => {
       const mockToken = mockTokens[tokenType];
@@ -1240,6 +1237,7 @@ describe('tokens.authenticateRequest(options)', () => {
         });
         expect(requestState.toAuth()).toBeMachineUnauthenticatedToAuth({
           tokenType,
+          isAuthenticated: false,
         });
       });
     });
@@ -1289,6 +1287,7 @@ describe('tokens.authenticateRequest(options)', () => {
         });
         expect(result.toAuth()).toBeMachineUnauthenticatedToAuth({
           tokenType: 'api_key',
+          isAuthenticated: false,
         });
       });
 
@@ -1303,6 +1302,7 @@ describe('tokens.authenticateRequest(options)', () => {
         });
         expect(result.toAuth()).toBeMachineUnauthenticatedToAuth({
           tokenType: 'oauth_token',
+          isAuthenticated: false,
         });
       });
 
@@ -1317,6 +1317,7 @@ describe('tokens.authenticateRequest(options)', () => {
         });
         expect(result.toAuth()).toBeMachineUnauthenticatedToAuth({
           tokenType: 'machine_token',
+          isAuthenticated: false,
         });
       });
 
@@ -1328,9 +1329,11 @@ describe('tokens.authenticateRequest(options)', () => {
           tokenType: 'machine_token',
           reason: AuthErrorReason.TokenTypeMismatch,
           message: '',
+          isAuthenticated: false,
         });
         expect(result.toAuth()).toBeMachineUnauthenticatedToAuth({
           tokenType: 'machine_token',
+          isAuthenticated: false,
         });
       });
     });
@@ -1360,12 +1363,13 @@ describe('tokens.authenticateRequest(options)', () => {
         );
 
         expect(requestState).toBeMachineUnauthenticated({
-          tokenType: 'machine_token',
+          tokenType: null,
           reason: AuthErrorReason.TokenTypeMismatch,
           message: '',
         });
         expect(requestState.toAuth()).toBeMachineUnauthenticatedToAuth({
-          tokenType: 'machine_token',
+          tokenType: null,
+          isAuthenticated: false,
         });
       });
     });

@@ -10,7 +10,7 @@ import type { AuthenticateContext } from './authenticateContext';
 import { createAuthenticateContext } from './authenticateContext';
 import type { SignedInAuthObject } from './authObjects';
 import type { HandshakeState, RequestState, SignedInState, SignedOutState, UnauthenticatedState } from './authStatus';
-import { AuthErrorReason, handshake, signedIn, signedOut } from './authStatus';
+import { AuthErrorReason, handshake, signedIn, signedOut, signedOutInvalidToken } from './authStatus';
 import { createClerkRequest } from './clerkRequest';
 import { getCookieName, getCookieValue } from './cookie';
 import { HandshakeService } from './handshake';
@@ -88,6 +88,20 @@ function checkTokenTypeMismatch(
   return null;
 }
 
+function isTokenTypeInAcceptedArray(acceptsToken: TokenType[], authenticateContext: AuthenticateContext): boolean {
+  let parsedTokenType: TokenType | null = null;
+  const { tokenInHeader } = authenticateContext;
+  if (tokenInHeader) {
+    if (isMachineTokenByPrefix(tokenInHeader)) {
+      parsedTokenType = getMachineTokenType(tokenInHeader);
+    } else {
+      parsedTokenType = TokenType.SessionToken;
+    }
+  }
+  const typeToCheck = parsedTokenType ?? TokenType.SessionToken;
+  return isTokenTypeAccepted(typeToCheck, acceptsToken);
+}
+
 export interface AuthenticateRequest {
   /**
    * @example
@@ -96,7 +110,7 @@ export interface AuthenticateRequest {
   <T extends readonly TokenType[]>(
     request: Request,
     options: AuthenticateRequestOptions & { acceptsToken: T },
-  ): Promise<RequestState<T[number]>>;
+  ): Promise<RequestState<T[number] | null>>;
 
   /**
    * @example
@@ -123,7 +137,7 @@ export interface AuthenticateRequest {
 export const authenticateRequest: AuthenticateRequest = (async (
   request: Request,
   options: AuthenticateRequestOptions,
-): Promise<RequestState<TokenType>> => {
+): Promise<RequestState<TokenType> | UnauthenticatedState<null>> => {
   const authenticateContext = await createAuthenticateContext(createClerkRequest(request), options);
   assertValidSecretKey(authenticateContext.secretKey);
 
@@ -655,7 +669,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
     // Handle case where tokenType is any and the token is not a machine token
     if (!isMachineTokenByPrefix(tokenInHeader)) {
       return signedOut({
-        tokenType: acceptsToken as MachineTokenType,
+        tokenType: acceptsToken as TokenType,
         authenticateContext,
         reason: AuthErrorReason.TokenTypeMismatch,
         message: '',
@@ -722,15 +736,21 @@ export const authenticateRequest: AuthenticateRequest = (async (
     });
   }
 
+  // If acceptsToken is an array, early check if the token is in the accepted array
+  // to avoid unnecessary verification calls
+  if (Array.isArray(acceptsToken)) {
+    if (!isTokenTypeInAcceptedArray(acceptsToken, authenticateContext)) {
+      return signedOutInvalidToken();
+    }
+  }
+
   if (authenticateContext.tokenInHeader) {
     if (acceptsToken === 'any') {
       return authenticateAnyRequestWithTokenInHeader();
     }
-
     if (acceptsToken === TokenType.SessionToken) {
       return authenticateRequestWithTokenInHeader();
     }
-
     return authenticateMachineRequestWithTokenInHeader();
   }
 

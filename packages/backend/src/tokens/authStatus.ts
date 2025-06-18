@@ -5,12 +5,14 @@ import type { TokenVerificationErrorReason } from '../errors';
 import type { AuthenticateContext } from './authenticateContext';
 import type {
   AuthenticatedMachineObject,
+  InvalidTokenAuthObject,
   SignedInAuthObject,
   SignedOutAuthObject,
   UnauthenticatedMachineObject,
 } from './authObjects';
 import {
   authenticatedMachineObject,
+  invalidTokenAuthObject,
   signedInAuthObject,
   signedOutAuthObject,
   unauthenticatedMachineObject,
@@ -27,13 +29,15 @@ export const AuthStatus = {
 
 export type AuthStatus = (typeof AuthStatus)[keyof typeof AuthStatus];
 
-type ToAuth<T extends TokenType, Authenticated extends boolean> = T extends SessionTokenType
-  ? Authenticated extends true
-    ? (opts?: PendingSessionOptions) => SignedInAuthObject
-    : () => SignedOutAuthObject
-  : Authenticated extends true
-    ? () => AuthenticatedMachineObject<Exclude<T, SessionTokenType>>
-    : () => UnauthenticatedMachineObject<Exclude<T, SessionTokenType>>;
+type ToAuth<T extends TokenType | null, Authenticated extends boolean> = T extends null
+  ? () => InvalidTokenAuthObject
+  : T extends SessionTokenType
+    ? Authenticated extends true
+      ? (opts?: PendingSessionOptions) => SignedInAuthObject
+      : () => SignedOutAuthObject
+    : Authenticated extends true
+      ? () => AuthenticatedMachineObject<Exclude<T, SessionTokenType | null>>
+      : () => UnauthenticatedMachineObject<Exclude<T, SessionTokenType | null>>;
 
 export type AuthenticatedState<T extends TokenType = SessionTokenType> = {
   status: typeof AuthStatus.SignedIn;
@@ -58,7 +62,7 @@ export type AuthenticatedState<T extends TokenType = SessionTokenType> = {
   toAuth: ToAuth<T, true>;
 };
 
-export type UnauthenticatedState<T extends TokenType = SessionTokenType> = {
+export type UnauthenticatedState<T extends TokenType | null = SessionTokenType> = {
   status: typeof AuthStatus.SignedOut;
   reason: AuthReason;
   message: string;
@@ -120,8 +124,8 @@ export type AuthErrorReason = (typeof AuthErrorReason)[keyof typeof AuthErrorRea
 
 export type AuthReason = AuthErrorReason | TokenVerificationErrorReason;
 
-export type RequestState<T extends TokenType = SessionTokenType> =
-  | AuthenticatedState<T>
+export type RequestState<T extends TokenType | null = SessionTokenType> =
+  | AuthenticatedState<T extends null ? never : T>
   | UnauthenticatedState<T>
   | (T extends SessionTokenType ? HandshakeState : never);
 
@@ -236,6 +240,29 @@ export function handshake(
     tokenType: TokenType.SessionToken,
     toAuth: () => null,
     headers,
+    token: null,
+  });
+}
+
+export function signedOutInvalidToken(): UnauthenticatedState<null> {
+  const authObject = invalidTokenAuthObject();
+  return withDebugHeaders({
+    status: AuthStatus.SignedOut,
+    reason: AuthErrorReason.TokenTypeMismatch,
+    message: '',
+    proxyUrl: '',
+    publishableKey: '',
+    isSatellite: false,
+    domain: '',
+    signInUrl: '',
+    signUpUrl: '',
+    afterSignInUrl: '',
+    afterSignUpUrl: '',
+    isSignedIn: false,
+    isAuthenticated: false,
+    tokenType: null,
+    toAuth: () => authObject,
+    headers: new Headers(),
     token: null,
   });
 }

@@ -428,31 +428,33 @@ export const getAuthObjectFromJwt = (
  * Returns an auth object matching the requested token type(s).
  *
  * If the parsed token type does not match any in acceptsToken, returns:
- *   - an unauthenticated machine object for the first machine token type in acceptsToken (if present), or
+ *   - an invalid token auth object if the token is not in the accepted array
+ *   - an unauthenticated machine object for machine tokens, or
  *   - a signed-out session object otherwise.
  *
  * This ensures the returned object always matches the developer's intent.
  */
-export function getAuthObjectForAcceptedToken({
+export const getAuthObjectForAcceptedToken = ({
   authObject,
   acceptsToken = TokenType.SessionToken,
 }: {
   authObject: AuthObject;
   acceptsToken: AuthenticateRequestOptions['acceptsToken'];
-}): AuthObject {
+}): AuthObject => {
+  // 1. any token: return as-is
   if (acceptsToken === 'any') {
     return authObject;
   }
 
+  // 2. array of tokens: must match one of the accepted types
   if (Array.isArray(acceptsToken)) {
     if (!isTokenTypeAccepted(authObject.tokenType, acceptsToken)) {
-      // If the token is not in the accepted array, return invalid token auth object
       return invalidTokenAuthObject();
     }
     return authObject;
   }
 
-  // Single value: Intent based
+  // 3. single token: must match exactly, else return appropriate unauthenticated object
   if (!isTokenTypeAccepted(authObject.tokenType, acceptsToken)) {
     if (isMachineTokenType(acceptsToken)) {
       return unauthenticatedMachineObject(acceptsToken, authObject.debug);
@@ -460,5 +462,6 @@ export function getAuthObjectForAcceptedToken({
     return signedOutAuthObject(authObject.debug);
   }
 
+  // 4. default: return as-is
   return authObject;
-}
+};
