@@ -658,9 +658,10 @@ export const jaJP: LocalizationResource = {
     },
     legalConsent: {
       checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
+        label__onlyPrivacyPolicy: '{{privacyPolicyLink || link("個人情報保護方針")}}に同意します',
+        label__onlyTermsOfService: '{{termsOfServiceLink || link("利用規約")}}に同意します',
+        label__termsOfServiceAndPrivacyPolicy:
+          '{{termsOfServiceLink || link("利用規約")}}と{{privacyPolicyLink || link("個人情報保護方針")}}に同意します',
       },
       continue: {
         subtitle: undefined,

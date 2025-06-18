@@ -1,17 +1,9 @@
-import {
-  SignedIn,
-  UserButton,
-  SignOutButton,
-  SignedOut,
-  SignInButton,
-  SignUpButton,
-  SignIn,
-} from '@clerk/tanstack-react-start'
-import { createFileRoute } from '@tanstack/react-router'
+import { SignedIn, UserButton, SignOutButton, SignedOut, SignIn } from '@clerk/tanstack-react-start';
+import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/')({
   component: Home,
-})
+});
 
 function Home() {
   return (
@@ -33,5 +25,5 @@ function Home() {
         <SignIn />
       </SignedOut>
     </div>
-  )
+  );
 }
