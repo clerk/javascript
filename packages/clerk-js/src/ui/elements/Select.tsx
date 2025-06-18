@@ -376,12 +376,13 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
   );
 };
 
-export const SelectButton = (
-  props: PropsOfComponent<typeof Button> & {
+export const SelectButton = React.forwardRef<
+  HTMLButtonElement,
+  PropsOfComponent<typeof Button> & {
     icon?: React.ReactElement | React.ComponentType;
     iconSx?: ThemableCssProp;
-  },
-) => {
+  }
+>((props, ref) => {
   const { sx, children, icon, iconSx, ...rest } = props;
   const { popoverCtx, onTriggerClick, buttonRenderOption, selectedOption, placeholder, elementId } = useSelectState();
   const { reference } = popoverCtx;
@@ -404,7 +405,14 @@ export const SelectButton = (
     <Button
       elementDescriptor={descriptors.selectButton}
       elementId={descriptors.selectButton.setId(elementId)}
-      ref={reference}
+      ref={buttonRef => {
+        reference(buttonRef);
+        if (typeof ref === 'function') {
+          ref(buttonRef);
+        } else if (ref) {
+          ref.current = buttonRef;
+        }
+      }}
       variant='outline'
       textVariant='buttonLarge'
       onClick={onTriggerClick}
@@ -431,4 +439,4 @@ export const SelectButton = (
       />
     </Button>
   );
-};
+});

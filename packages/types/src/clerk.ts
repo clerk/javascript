@@ -1683,6 +1683,11 @@ export type APIKeysProps = {
    * prop of ClerkProvider (if one is provided)
    */
   appearance?: APIKeysTheme;
+  /**
+   * Whether to show the description field in the API key creation form.
+   * @default false
+   */
+  showDescription?: boolean;
 };
 
 export type GetAPIKeysParams = {
