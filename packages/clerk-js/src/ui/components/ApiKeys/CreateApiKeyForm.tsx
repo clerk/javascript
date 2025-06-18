@@ -72,7 +72,7 @@ const ExpirationSelector = ({
 }) => {
   return (
     <Select
-      elementId='paymentSource'
+      elementId='apiKeyExpiration'
       options={options}
       value={selectedExpiration.value}
       onChange={setSelectedExpiration}
