@@ -130,7 +130,11 @@ export class SignUp extends BaseResource implements SignUpResource {
       body: normalizeUnsafeMetadata(params),
     });
 
-    if (!this.shouldBypassCaptchaForAttempt(params) && !options?.skipChallenge) {
+    const isChallengeMissingAndRequired =
+      this.missingFields.some(field => field === 'challenge') &&
+      this.requiredFields.some(field => field === 'challenge');
+
+    if (isChallengeMissingAndRequired && !this.shouldBypassCaptchaForAttempt(params) && !options?.skipChallenge) {
       return this.solveChallenge();
     }
 

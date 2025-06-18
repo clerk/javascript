@@ -1,6 +1,12 @@
 import type { PhoneCodeChannel } from 'phoneCodeChannel';
 
-import type { FirstNameAttribute, LastNameAttribute, LegalAcceptedAttribute, PasswordAttribute } from './attributes';
+import type {
+  ChallengeAttribute,
+  FirstNameAttribute,
+  LastNameAttribute,
+  LegalAcceptedAttribute,
+  PasswordAttribute,
+} from './attributes';
 import type { AttemptEmailAddressVerificationParams, PrepareEmailAddressVerificationParams } from './emailAddress';
 import type {
   EmailAddressIdentifier,
@@ -160,7 +166,12 @@ export type AttemptVerificationParams =
       signature: string;
     };
 
-export type SignUpAttributeField = FirstNameAttribute | LastNameAttribute | PasswordAttribute | LegalAcceptedAttribute;
+export type SignUpAttributeField =
+  | FirstNameAttribute
+  | LastNameAttribute
+  | PasswordAttribute
+  | LegalAcceptedAttribute
+  | ChallengeAttribute;
 
 // TODO: SignUpVerifiableField or SignUpIdentifier?
 export type SignUpVerifiableField =
