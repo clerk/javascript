@@ -6,7 +6,7 @@ vi.mock('../cssSupports', () => ({
   },
 }));
 
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { getColorMix, getColorMixAlpha } from '../colorMix';
 import * as cssSupportsModule from '../cssSupports';
