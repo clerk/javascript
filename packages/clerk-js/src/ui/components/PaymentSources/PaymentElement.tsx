@@ -193,90 +193,125 @@ const PaymentElementForm = () => {
 };
 
 const usePaymentElement = () => {
-  const {
-    // onSuccess,
-    isPaymentElementReady,
-  } = usePaymentElementContext();
-  const stripe = useStripe();
-  const elements = useElements();
+  try {
+    const {
+      // onSuccess,
+      isPaymentElementReady,
+    } = usePaymentElementContext();
+    const stripe = useStripe();
+    const elements = useElements();
+    const { stripe: stripeFromContext, externalClientSecret } = usePaymentElementContext();
 
-  if (!stripe || !elements) {
-    throw new Error('Wait for initialization');
-  }
-
-  const submit = useCallback(async () => {
-    const { setupIntent, error } = await stripe.confirmSetup({
-      elements,
-      confirmParams: {
-        return_url: '', // TODO(@COMMERCE): need to figure this out
-      },
-      redirect: 'if_required',
-    });
-    if (error || !setupIntent?.payment_method) {
-      return { data: undefined, error }; // just return, since stripe will handle the error
+    if (!stripe || !elements) {
+      throw new Error('Wait for initialization');
     }
-    return { data: { gateway: 'stripe', paymentToken: setupIntent.payment_method as string }, error: undefined };
-  }, [stripe, elements]);
 
-  return {
-    submit,
-    isPaymentElementReady,
-  };
-};
+    const submit = useCallback(async () => {
+      const { setupIntent, error } = await stripe.confirmSetup({
+        elements,
+        confirmParams: {
+          return_url: '', // TODO(@COMMERCE): need to figure this out
+        },
+        redirect: 'if_required',
+      });
+      if (error || !setupIntent?.payment_method) {
+        return { data: undefined, error }; // just return, since stripe will handle the error
+      }
+      return { data: { gateway: 'stripe', paymentToken: setupIntent.payment_method as string }, error: undefined };
+    }, [stripe, elements]);
 
-const usePaymentElementStatus = () => {
-  const { stripe, externalClientSecret } = usePaymentElementContext();
+    const isProviderReady = stripe && externalClientSecret;
 
-  if (stripe && externalClientSecret) {
     return {
-      provider: {
-        name: 'stripe',
-        instance: stripe,
-      },
-      isProviderReady: true,
+      submit,
+      isPaymentElementReady,
+      provider: isProviderReady
+        ? {
+            name: 'stripe',
+            instance: stripeFromContext,
+          }
+        : undefined,
+      isProviderReady: isProviderReady,
+    };
+  } catch (error) {
+    const { stripe, externalClientSecret } = usePaymentElementContext();
+
+    const isProviderReady = stripe && externalClientSecret;
+
+    return {
+      submit: () => Promise.resolve({ data: undefined, error }),
+      isMounted: false,
+      provider: isProviderReady
+        ? {
+            name: 'stripe',
+            instance: stripe,
+          }
+        : undefined,
+      isProviderReady: isProviderReady,
     };
   }
-
-  return {
-    provider: undefined,
-    isProviderReady: false,
-  };
 };
 
-const usePaymentElementForm = () => {
-  const { isPaymentElementReady } = usePaymentElementContext();
-  const stripe = useStripe();
-  const elements = useElements();
+// const usePaymentElementStatus = () => {
+//   const { stripe, externalClientSecret } = usePaymentElementContext();
 
-  if (!stripe || !elements) {
-    throw new Error('Wait for initialization');
-  }
+//   if (stripe && externalClientSecret) {
+//     return {
+//       provider: {
+//         name: 'stripe',
+//         instance: stripe,
+//       },
+//       isProviderReady: true,
+//     };
+//   }
 
-  const submit = useCallback(async () => {
-    const { setupIntent, error } = await stripe.confirmSetup({
-      elements,
-      confirmParams: {
-        return_url: '', // TODO(@COMMERCE): need to figure this out
-      },
-      redirect: 'if_required',
-    });
-    if (error || !setupIntent?.payment_method) {
-      return { data: undefined, error }; // just return, since stripe will handle the error
-    }
-    return { data: { gateway: 'stripe', paymentToken: setupIntent.payment_method as string }, error: undefined };
-  }, [stripe, elements]);
-  return {
-    submit,
-    isMounted: isPaymentElementReady,
-  };
-};
+//   return {
+//     provider: undefined,
+//     isProviderReady: false,
+//   };
+// };
+
+// const usePaymentElementForm = () => {
+//   try {
+//     const { isPaymentElementReady } = usePaymentElementContext();
+//     const stripe = useStripe();
+//     const elements = useElements();
+
+//     if (!stripe || !elements) {
+//       throw new Error('Wait for initialization');
+//     }
+
+//     const submit = useCallback(async () => {
+//       const { setupIntent, error } = await stripe.confirmSetup({
+//         elements,
+//         confirmParams: {
+//           return_url: '', // TODO(@COMMERCE): need to figure this out
+//         },
+//         redirect: 'if_required',
+//       });
+//       if (error || !setupIntent?.payment_method) {
+//         return { data: undefined, error }; // just return, since stripe will handle the error
+//       }
+//       return { data: { gateway: 'stripe', paymentToken: setupIntent.payment_method as string }, error: undefined };
+//     }, [stripe, elements]);
+//     return {
+//       submit,
+//       isMounted: isPaymentElementReady,
+//     };
+//   } catch (error) {
+//     return {
+//       submit: () => Promise.resolve({ data: undefined, error }),
+//       isMounted: false,
+//     };
+//   }
+// };
 
 export {
   PaymentElementRoot as Root,
   PaymentElementForm as Form,
   usePaymentElement,
-  usePaymentElementStatus,
-  usePaymentElementForm,
+  //   usePaymentElementStatus,
+  //   usePaymentElementForm,
 };
 
 class StripeErrorBoundary extends React.Component {

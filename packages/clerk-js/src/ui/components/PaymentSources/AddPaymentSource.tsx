@@ -10,7 +10,7 @@ import { FormButtons } from '@/ui/elements/FormButtons';
 import { FormContainer } from '@/ui/elements/FormContainer';
 
 import { useSubscriberTypeLocalizationRoot } from '../../contexts';
-import { localizationKeys } from '../../customizables';
+import { descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
 import type { LocalizationKey } from '../../localization';
 import { handleError } from '../../utils';
 import * as PaymentElement from './PaymentElement';
@@ -48,7 +48,7 @@ const AddPaymentSourceRoot = ({ children, ...rest }: PropsWithChildren<AddPaymen
 };
 
 const AddPaymentSourceLoading = (props: PropsWithChildren) => {
-  const { isProviderReady } = PaymentElement.usePaymentElementStatus();
+  const { isProviderReady } = PaymentElement.usePaymentElement();
 
   if (!isProviderReady) {
     return props.children;
@@ -58,7 +58,7 @@ const AddPaymentSourceLoading = (props: PropsWithChildren) => {
 };
 
 const AddPaymentSourceReady = (props: PropsWithChildren) => {
-  const { isProviderReady } = PaymentElement.usePaymentElementStatus();
+  const { isProviderReady } = PaymentElement.usePaymentElement();
 
   if (!isProviderReady) {
     return null;
@@ -72,7 +72,7 @@ const Root = (props: PropsWithChildren<AddPaymentSourceProps>) => {
 
   return (
     <AddPaymentSourceRoot {...rest}>
-      {/* <AddPaymentSourceLoading>
+      <AddPaymentSourceLoading>
         <Flex
           direction={'row'}
           align={'center'}
@@ -88,11 +88,11 @@ const Root = (props: PropsWithChildren<AddPaymentSourceProps>) => {
             elementDescriptor={descriptors.spinner}
           />
         </Flex>
-      </AddPaymentSourceLoading> */}
+      </AddPaymentSourceLoading>
 
-      {/* <AddPaymentSourceReady> */}
-      <AddPaymentSourceForm>{children}</AddPaymentSourceForm>
-      {/* </AddPaymentSourceReady> */}
+      <AddPaymentSourceReady>
+        <AddPaymentSourceForm>{children}</AddPaymentSourceForm>
+      </AddPaymentSourceReady>
     </AddPaymentSourceRoot>
   );
 };
@@ -131,7 +131,7 @@ const AddPaymentSourceForm = ({ children }: PropsWithChildren) => {
 
   const card = useCardState();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
-  const { isMounted, submit: submitPaymentElement } = PaymentElement.usePaymentElementForm();
+  const { isMounted, submit: submitPaymentElement } = PaymentElement.usePaymentElement();
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
