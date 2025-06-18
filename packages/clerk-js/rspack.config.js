@@ -557,7 +557,12 @@ const devConfig = ({ mode, env }) => {
         rules: [svgLoader(), ...typescriptLoaderDev()],
       },
       plugins: [
-        new ReactRefreshPlugin(/** @type {any} **/ ({ overlay: { sockHost: devUrl.host } })),
+        new ReactRefreshPlugin(
+          /** @type {any} **/ ({
+            overlay: false,
+            // { sockHost: devUrl.host }
+          }),
+        ),
         isSandbox &&
           new rspack.HtmlRspackPlugin({
             minify: false,
@@ -582,7 +587,14 @@ const devConfig = ({ mode, env }) => {
         port: 4000,
         hot: true,
         liveReload: false,
-        client: { webSocketURL: `auto://${devUrl.host}/ws` },
+        client: {
+          webSocketURL: `auto://${devUrl.host}/ws`,
+          overlay: {
+            errors: false,
+            warnings: false,
+            runtimeErrors: false,
+          },
+        },
         ...(isSandbox
           ? {
               historyApiFallback: true,

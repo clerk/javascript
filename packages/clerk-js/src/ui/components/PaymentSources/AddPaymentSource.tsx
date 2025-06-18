@@ -1,7 +1,7 @@
 import { createContextAndHook } from '@clerk/shared/react';
 import type { CommerceCheckoutResource } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';
 import { useCardState } from '@/ui/elements/contexts';

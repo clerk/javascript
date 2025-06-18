@@ -4,6 +4,7 @@ import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-
 import type { Appearance as StripeAppearance } from '@stripe/stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import { type PropsWithChildren, useCallback, useEffect, useState } from 'react';
+import React from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
@@ -149,7 +150,7 @@ const PaymentElementRoot = (
         },
       }}
     >
-      {props.children}
+      <StripeErrorBoundary>{props.children}</StripeErrorBoundary>
     </PaymentElementContext.Provider>
   );
 };
@@ -191,37 +192,37 @@ const PaymentElementForm = () => {
   );
 };
 
-// const usePaymentElement = () => {
-//   const {
-//     // onSuccess,
-//     isPaymentElementReady,
-//   } = usePaymentElementContext();
-//   const stripe = useStripe();
-//   const elements = useElements();
+const usePaymentElement = () => {
+  const {
+    // onSuccess,
+    isPaymentElementReady,
+  } = usePaymentElementContext();
+  const stripe = useStripe();
+  const elements = useElements();
 
-//   if (!stripe || !elements) {
-//     throw new Error('Wait for initialization');
-//   }
+  if (!stripe || !elements) {
+    throw new Error('Wait for initialization');
+  }
 
-//   const submit = useCallback(async () => {
-//     const { setupIntent, error } = await stripe.confirmSetup({
-//       elements,
-//       confirmParams: {
-//         return_url: '', // TODO(@COMMERCE): need to figure this out
-//       },
-//       redirect: 'if_required',
-//     });
-//     if (error || !setupIntent?.payment_method) {
-//       return { data: undefined, error }; // just return, since stripe will handle the error
-//     }
-//     return { data: { gateway: 'stripe', paymentToken: setupIntent.payment_method as string }, error: undefined };
-//   }, [stripe, elements]);
+  const submit = useCallback(async () => {
+    const { setupIntent, error } = await stripe.confirmSetup({
+      elements,
+      confirmParams: {
+        return_url: '', // TODO(@COMMERCE): need to figure this out
+      },
+      redirect: 'if_required',
+    });
+    if (error || !setupIntent?.payment_method) {
+      return { data: undefined, error }; // just return, since stripe will handle the error
+    }
+    return { data: { gateway: 'stripe', paymentToken: setupIntent.payment_method as string }, error: undefined };
+  }, [stripe, elements]);
 
-//   return {
-//     submit,
-//     isPaymentElementReady,
-//   };
-// };
+  return {
+    submit,
+    isPaymentElementReady,
+  };
+};
 
 const usePaymentElementStatus = () => {
   const { stripe, externalClientSecret } = usePaymentElementContext();
@@ -273,7 +274,28 @@ const usePaymentElementForm = () => {
 export {
   PaymentElementRoot as Root,
   PaymentElementForm as Form,
-  // usePaymentElement
+  usePaymentElement,
   usePaymentElementStatus,
   usePaymentElementForm,
 };
+
+class StripeErrorBoundary extends React.Component {
+  constructor(props: any) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error: any) {
+    console.log('---lllllll', error);
+    return { hasError: true };
+  }
+
+  render() {
+    // @ts-expect-error things are typed as optional
+    if (this.state.hasError) {
+      return <div>Please ensure Stripe provider is configured</div>;
+    }
+    // @ts-expect-error things are typed as optional
+    return this.props.children;
+  }
+}
