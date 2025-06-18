@@ -635,7 +635,6 @@ export class Clerk implements ClerkInterface {
 
   public __experimental_openSubscriptionDetails = (props?: __experimental_SubscriptionDetailsProps): void => {
     this.assertComponentsReady(this.#componentControls);
-    console.log('__experimental_openSubscriptionDetails', props);
     void this.#componentControls
       .ensureMounted({ preloadHint: 'SubscriptionDetails' })
       .then(controls => controls.openDrawer('subscriptionDetails', props || {}));

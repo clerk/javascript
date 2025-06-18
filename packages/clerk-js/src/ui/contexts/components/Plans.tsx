@@ -117,8 +117,9 @@ export const useSubscriptions = () => {
           plan_period: 'month',
           canceled_at: null,
           status: _subscriptions.data.length === 0 ? 'active' : 'upcoming',
-          period_start: canceledSubscription?.periodEnd || 0,
+          period_start: canceledSubscription?.periodEnd?.getTime() || 0,
           period_end: 0,
+          created_at: canceledSubscription?.periodEnd?.getTime() || 0,
         }),
       ];
     }
