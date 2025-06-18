@@ -1,6 +1,6 @@
 import { useOrganizationList } from '@clerk/shared/react/index';
-import type { ComponentProps, PropsWithChildren } from 'react';
-import { useEffect, useState } from 'react';
+import type { PropsWithChildren } from 'react';
+import { useState } from 'react';
 
 import { OrganizationListContext } from '@/ui/contexts';
 import { Card } from '@/ui/elements/Card';
@@ -11,8 +11,13 @@ import { CreateOrganizationForm } from '../../CreateOrganization/CreateOrganizat
 import { OrganizationListPageList } from '../../OrganizationList/OrganizationListPage';
 import { organizationListParams } from '../../OrganizationSwitcher/utils';
 
-const ForceOrganizationSelectionFlows = () => {
-  const { isLoading, hasData, currentFlow, setCurrentFlow } = useForceOrganizationSelectionFlows();
+/**
+ * @internal
+ */
+export const ForceOrganizationSelectionTask = withCardStateProvider(() => {
+  const { userMemberships, userInvitations, userSuggestions } = useOrganizationList(organizationListParams);
+  const isLoading = userMemberships?.isLoading || userInvitations?.isLoading || userSuggestions?.isLoading;
+  const hasData = !!(userMemberships?.count || userInvitations?.count || userSuggestions?.count);
 
   if (isLoading) {
     return (
@@ -22,25 +27,15 @@ const ForceOrganizationSelectionFlows = () => {
     );
   }
 
-  // Do not render the organization selection flow when organization memberships
-  // get invalidated after the create organization mutation
-  if (hasData && currentFlow !== 'create-organization') {
-    return <OrganizationSelectionPage setCurrentFlow={setCurrentFlow} />;
+  if (hasData) {
+    return <OrganizationSelectionPage />;
   }
 
-  return <CreateOrganizationPage setCurrentFlow={setCurrentFlow} />;
-};
+  return <CreateOrganizationPage />;
+});
 
-const OrganizationSelectionPage = ({ setCurrentFlow }: CommonPageProps) => {
+const OrganizationSelectionPage = () => {
   const [showCreateOrganizationForm, setShowCreateOrganizationForm] = useState(false);
-
-  useEffect(() => {
-    setCurrentFlow('organization-selection');
-  }, [setCurrentFlow]);
-
-  if (showCreateOrganizationForm) {
-    return <CreateOrganizationPage setCurrentFlow={setCurrentFlow} />;
-  }
 
   return (
     <OrganizationListContext.Provider
@@ -50,20 +45,28 @@ const OrganizationSelectionPage = ({ setCurrentFlow }: CommonPageProps) => {
       }}
     >
       <FlowCard>
-        <OrganizationListPageList onCreateOrganizationClick={() => setShowCreateOrganizationForm(true)} />
+        {showCreateOrganizationForm ? (
+          <Box
+            sx={t => ({
+              padding: `${t.space.$none} ${t.space.$5} ${t.space.$5}`,
+            })}
+          >
+            <CreateOrganizationForm
+              flow='default'
+              startPage={{ headerTitle: localizationKeys('organizationList.createOrganization') }}
+              skipInvitationScreen
+              onCancel={() => setShowCreateOrganizationForm(false)}
+            />
+          </Box>
+        ) : (
+          <OrganizationListPageList onCreateOrganizationClick={() => setShowCreateOrganizationForm(true)} />
+        )}
       </FlowCard>
     </OrganizationListContext.Provider>
   );
 };
 
-const CreateOrganizationPage = ({
-  onCancel,
-  setCurrentFlow,
-}: CommonPageProps & Pick<ComponentProps<typeof CreateOrganizationForm>, 'onCancel'>) => {
-  useEffect(() => {
-    setCurrentFlow('create-organization');
-  }, [setCurrentFlow]);
-
+const CreateOrganizationPage = () => {
   return (
     <FlowCard>
       <Box
@@ -75,7 +78,6 @@ const CreateOrganizationPage = ({
           flow='default'
           startPage={{ headerTitle: localizationKeys('organizationList.createOrganization') }}
           skipInvitationScreen
-          onCancel={onCancel}
         />
       </Box>
     </FlowCard>
@@ -112,29 +114,3 @@ const FlowLoadingState = () => (
     />
   </Flex>
 );
-
-type Flow = 'create-organization' | 'organization-selection';
-
-type CommonPageProps = {
-  setCurrentFlow: React.Dispatch<React.SetStateAction<Flow | undefined>>;
-};
-
-const useForceOrganizationSelectionFlows = () => {
-  const [currentFlow, setCurrentFlow] = useState<Flow | undefined>();
-  const { userMemberships, userInvitations, userSuggestions } = useOrganizationList(organizationListParams);
-
-  const isLoading = userMemberships?.isLoading || userInvitations?.isLoading || userSuggestions?.isLoading;
-  const hasData = !!(userMemberships?.count || userInvitations?.count || userSuggestions?.count);
-
-  return {
-    currentFlow,
-    setCurrentFlow,
-    hasData,
-    isLoading,
-  };
-};
-
-/**
- * @internal
- */
-export const ForceOrganizationSelectionTask = withCardStateProvider(ForceOrganizationSelectionFlows);
