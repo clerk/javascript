@@ -22,6 +22,8 @@ const ForceOrganizationSelectionFlows = () => {
     );
   }
 
+  // Do not render the organization selection flow when organization memberships
+  // get invalidated after the create organization mutation
   if (hasData && currentFlow !== 'create-organization') {
     return <OrganizationSelectionPage setCurrentFlow={setCurrentFlow} />;
   }

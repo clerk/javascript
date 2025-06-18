@@ -1,6 +1,6 @@
 import { useClerk } from '@clerk/shared/react';
 import { eventComponentMounted } from '@clerk/shared/telemetry';
-import { useCallback, useContext, useEffect } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';
 import { withCardStateProvider } from '@/ui/elements/contexts';
@@ -56,23 +56,34 @@ export const SessionTask = withCardStateProvider(() => {
   const { navigate } = useRouter();
   const signInContext = useContext(SignInContext);
   const signUpContext = useContext(SignUpContext);
+  const [isNavigatingToTask, setIsNavigatingToTask] = useState(false);
 
   const redirectUrlComplete =
     signInContext?.afterSignInUrl ?? signUpContext?.afterSignUpUrl ?? clerk?.buildAfterSignInUrl();
 
+  // If there are no pending tasks, navigate away from the tasks flow.
+  // This handles cases where a user with an active session returns to the tasks URL,
+  // for example by using browser back navigation. Since there are no pending tasks,
+  // we redirect them to their intended destination.
   useEffect(() => {
-    const task = clerk.session?.currentTask;
+    if (isNavigatingToTask) {
+      return;
+    }
 
-    if (!task) {
+    // Tasks can only exist on pending sessions, but we check both conditions
+    // here to be defensive and ensure proper redirection
+    const task = clerk.session?.currentTask;
+    if (!task || clerk.session?.status === 'active') {
       void navigate(redirectUrlComplete);
       return;
     }
 
     clerk.telemetry?.record(eventComponentMounted('SessionTask', { task: task.key }));
-  }, [clerk, navigate, redirectUrlComplete]);
+  }, [clerk, navigate, isNavigatingToTask, redirectUrlComplete]);
 
   const nextTask = useCallback(() => {
-    return clerk.__experimental_navigateToTask({ redirectUrlComplete });
+    setIsNavigatingToTask(true);
+    return clerk.__experimental_navigateToTask({ redirectUrlComplete }).finally(() => setIsNavigatingToTask(false));
   }, [clerk, redirectUrlComplete]);
 
   if (!clerk.session?.currentTask) {
