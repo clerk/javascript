@@ -20,6 +20,7 @@ import {
   Thead,
   Tr,
 } from '@/ui/customizables';
+import type { ElementDescriptor } from '@/ui/customizables/elementDescriptors';
 import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
 import { useClipboard } from '@/ui/hooks';
 import { Check, ClipboardOutline, Eye, EyeSlash } from '@/ui/icons';
@@ -50,6 +51,7 @@ const CopySecretButton = ({ apiKeyID }: { apiKeyID: string }) => {
       aria-label={hasCopied ? 'Copied API key to clipboard' : 'Copy API key'}
       onClick={() => setEnabled(true)}
       focusRing={false}
+      elementDescriptor={descriptors.apiKeysCopyButton}
     >
       <Icon
         size='sm'
@@ -92,6 +94,7 @@ const SecretInputWithToggle = ({ apiKeyID }: { apiKeyID: string }) => {
         })}
         focusRing={false}
         aria-label={'Show key'}
+        elementDescriptor={descriptors.apiKeysRevealButton}
         onClick={() => setRevealed(!revealed)}
       >
         <Icon
@@ -107,14 +110,19 @@ export const ApiKeysTable = ({
   rows,
   isLoading,
   onRevoke,
+  elementDescriptor,
 }: {
   rows: APIKeyResource[];
   isLoading: boolean;
   onRevoke: (id: string, name: string) => void;
+  elementDescriptor?: ElementDescriptor;
 }) => {
   return (
     <Flex sx={t => ({ width: '100%', [mqu.sm]: { overflowX: 'auto', padding: t.space.$0x25 } })}>
-      <Table sx={t => ({ background: t.colors.$colorBackground })}>
+      <Table
+        sx={t => ({ background: t.colors.$colorBackground })}
+        elementDescriptor={elementDescriptor}
+      >
         <Thead>
           <Tr>
             <Th>Name</Th>
