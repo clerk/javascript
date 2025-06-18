@@ -134,9 +134,14 @@ export class HandshakeService {
     }
 
     const redirectUrl = this.removeDevBrowserFromURL(this.authenticateContext.clerkUrl);
-    const frontendApiNoProtocol = this.authenticateContext.frontendApi.replace(/http(s)?:\/\//, '');
 
-    const url = new URL(`https://${frontendApiNoProtocol}/v1/client/handshake`);
+    let baseUrl = this.authenticateContext.frontendApi.startsWith('http')
+      ? this.authenticateContext.frontendApi
+      : `https://${this.authenticateContext.frontendApi}`;
+
+    baseUrl = baseUrl.replace(/\/+$/, '') + '/';
+
+    const url = new URL('v1/client/handshake', baseUrl);
     url.searchParams.append('redirect_url', redirectUrl?.href || '');
     url.searchParams.append('__clerk_api_version', SUPPORTED_BAPI_VERSION);
     url.searchParams.append(

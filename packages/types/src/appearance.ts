@@ -60,6 +60,7 @@ type FontWeightNumericValue = 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 90
 type FontWeightScale = {
   normal?: FontWeightNamedValue | FontWeightNumericValue;
   medium?: FontWeightNamedValue | FontWeightNumericValue;
+  semibold?: FontWeightNamedValue | FontWeightNumericValue;
   bold?: FontWeightNamedValue | FontWeightNumericValue;
 };
 
@@ -846,6 +847,7 @@ export type WaitlistTheme = Theme;
 export type PricingTableTheme = Theme;
 export type CheckoutTheme = Theme;
 export type PlanDetailTheme = Theme;
+export type APIKeysTheme = Theme;
 export type OAuthConsentTheme = Theme;
 
 type GlobalAppearanceOptions = {
@@ -911,6 +913,10 @@ export type Appearance<T = Theme> = T &
      * Theme overrides that only apply to the `<Checkout />` component
      */
     checkout?: T;
+    /**
+     * Theme overrides that only apply to the `<APIKeys />` component
+     */
+    apiKeys?: T;
     /**
      * Theme overrides that only apply to the `<OAuthConsent />` component
      */

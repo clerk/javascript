@@ -1,5 +1,6 @@
 // this file contains the types returned by the __internal_toSnapshot method of the resources
 
+import type { APIKeysSettingsJSON } from './apiKeysSettings';
 import type { CommerceSettingsJSON } from './commerceSettings';
 import type { DisplayConfigJSON } from './displayConfig';
 import type {
@@ -191,3 +192,5 @@ export type CommerceSettingsJSONSnapshot = CommerceSettingsJSON;
 export type CommercePlanJSONSnapshot = CommercePlanJSON;
 
 export type CommerceFeatureJSONSnapshot = CommerceFeatureJSON;
+
+export type APIKeysSettingsJSONSnapshot = APIKeysSettingsJSON;
