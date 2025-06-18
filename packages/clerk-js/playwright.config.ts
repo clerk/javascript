@@ -45,7 +45,7 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: `PORT=${PORT} pnpm dev:sandbox:integration`,
+    command: `PORT=${PORT} pnpm dev:sandbox`,
     url: `http://localhost:${PORT}`,
     reuseExistingServer: !process.env.CI,
   },
