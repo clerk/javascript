@@ -1,13 +1,14 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
 
 import { useApiKeysContext } from '@/ui/contexts';
-import { Col, descriptors, Flex, FormLabel, localizationKeys, Text, useLocalizations } from '@/ui/customizables';
+import { Box, Col, descriptors, FormLabel, localizationKeys, Text, useLocalizations } from '@/ui/customizables';
 import { useActionContext } from '@/ui/elements/Action/ActionRoot';
 import { Form } from '@/ui/elements/Form';
 import { FormButtons } from '@/ui/elements/FormButtons';
 import { FormContainer } from '@/ui/elements/FormContainer';
 import { Select, SelectButton, SelectOptionList } from '@/ui/elements/Select';
 import { ChevronUpDown } from '@/ui/icons';
+import { mqu } from '@/ui/styledSystem';
 import { useFormControl } from '@/ui/utils/useFormControl';
 
 type Expiration = null | '1d' | '7d' | '30d' | '60d' | '90d' | '180d' | '1y';
@@ -187,7 +188,16 @@ export const CreateApiKeyForm: React.FC<CreateApiKeyFormProps> = ({ onCreate, is
       elementDescriptor={descriptors.apiKeysCreateForm}
     >
       <Form.Root onSubmit={handleSubmit}>
-        <Flex gap={4}>
+        <Box
+          sx={t => ({
+            gap: t.space.$4,
+            display: 'flex',
+            flexDirection: 'row',
+            [mqu.sm]: {
+              flexDirection: 'column',
+            },
+          })}
+        >
           <Form.ControlRow
             sx={{ flex: 1 }}
             elementId={nameField.id}
@@ -226,7 +236,7 @@ export const CreateApiKeyForm: React.FC<CreateApiKeyFormProps> = ({ onCreate, is
               {expirationCaption}
             </Text>
           </Col>
-        </Flex>
+        </Box>
 
         {showDescription && (
           <Col
