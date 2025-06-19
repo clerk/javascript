@@ -76,6 +76,8 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
             return setActive({ session: res.createdSessionId, redirectUrl: afterSignInUrl });
           case 'needs_second_factor':
             return navigate('../factor-two');
+          case 'needs_new_password':
+            return navigate('../reset-password');
           default:
             return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
         }
