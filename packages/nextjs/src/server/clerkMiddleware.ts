@@ -465,7 +465,7 @@ const handleControlFlowErrors = (
   requestState: RequestState,
 ): Response => {
   if (isNextjsUnauthorizedError(e)) {
-    const response = NextResponse.next({ status: 401 });
+    const response = NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
 
     // RequestState.toAuth() returns a session_token type by default.
     // We need to cast it to the correct type to check for OAuth tokens.
