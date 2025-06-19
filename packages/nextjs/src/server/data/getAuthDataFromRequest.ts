@@ -1,13 +1,18 @@
 import type { AuthObject } from '@clerk/backend';
-import type { AuthenticateRequestOptions, SignedInAuthObject, SignedOutAuthObject } from '@clerk/backend/internal';
 import {
   authenticatedMachineObject,
+  type AuthenticateRequestOptions,
   AuthStatus,
   constants,
+  getAuthObjectForAcceptedToken,
   getAuthObjectFromJwt,
   getMachineTokenType,
-  isMachineToken,
+  invalidTokenAuthObject,
+  isMachineTokenByPrefix,
   isTokenTypeAccepted,
+  type MachineTokenType,
+  type SignedInAuthObject,
+  type SignedOutAuthObject,
   signedOutAuthObject,
   TokenType,
   unauthenticatedMachineObject,
@@ -28,6 +33,10 @@ export type GetAuthDataFromRequestOptions = {
   acceptsToken?: AuthenticateRequestOptions['acceptsToken'];
 } & PendingSessionOptions;
 
+/**
+ * Given a request object, builds an auth object from the request data. Used in server-side environments to get access
+ * to auth data for a given request.
+ */
 export const getAuthDataFromRequestSync = (
   req: RequestLike,
   { treatPendingAsSignedOut = true, ...opts }: GetAuthDataFromRequestOptions = {},
@@ -73,10 +82,6 @@ export const getAuthDataFromRequestSync = (
 };
 
 /**
- * Note: We intentionally avoid using interface/function overloads here since these functions
- * are used internally. The complex type overloads are more valuable at the public API level
- * (like in auth.protect(), auth()) where users interact directly with the types.
- *
  * Given a request object, builds an auth object from the request data. Used in server-side environments to get access
  * to auth data for a given request.
  */
@@ -85,38 +90,49 @@ export const getAuthDataFromRequestAsync = async (
   opts: GetAuthDataFromRequestOptions = {},
 ): Promise<AuthObject> => {
   const { authStatus, authMessage, authReason } = getAuthHeaders(req);
-
   opts.logger?.debug('headers', { authStatus, authMessage, authReason });
 
   const bearerToken = getHeader(req, constants.Headers.Authorization)?.replace('Bearer ', '');
   const acceptsToken = opts.acceptsToken || TokenType.SessionToken;
+  const options = {
+    secretKey: opts?.secretKey || SECRET_KEY,
+    publishableKey: PUBLISHABLE_KEY,
+    apiUrl: API_URL,
+    authStatus,
+    authMessage,
+    authReason,
+  };
 
-  if (bearerToken && isMachineToken(bearerToken)) {
-    const tokenType = getMachineTokenType(bearerToken);
+  const hasMachineToken = bearerToken && isMachineTokenByPrefix(bearerToken);
+  if (hasMachineToken) {
+    const machineTokenType = getMachineTokenType(bearerToken);
 
-    const options = {
-      secretKey: opts?.secretKey || SECRET_KEY,
-      publishableKey: PUBLISHABLE_KEY,
-      apiUrl: API_URL,
-      authStatus,
-      authMessage,
-      authReason,
-    };
-
-    if (!isTokenTypeAccepted(tokenType, acceptsToken)) {
-      return unauthenticatedMachineObject(tokenType, options);
+    // Early return if the token type is not accepted to save on the verify call
+    if (Array.isArray(acceptsToken) && !acceptsToken.includes(machineTokenType)) {
+      return invalidTokenAuthObject();
+    }
+    // Early return for scalar acceptsToken if it does not match the machine token type
+    if (!Array.isArray(acceptsToken) && acceptsToken !== 'any' && machineTokenType !== acceptsToken) {
+      const authObject = unauthenticatedMachineObject(acceptsToken as MachineTokenType, options);
+      return getAuthObjectForAcceptedToken({ authObject, acceptsToken });
     }
 
-    // TODO(Rob): Cache the result of verifyMachineAuthToken
     const { data, errors } = await verifyMachineAuthToken(bearerToken, options);
-    if (errors) {
-      return unauthenticatedMachineObject(tokenType, options);
-    }
-
-    return authenticatedMachineObject(tokenType, bearerToken, data);
+    const authObject = errors
+      ? unauthenticatedMachineObject(machineTokenType, options)
+      : authenticatedMachineObject(machineTokenType, bearerToken, data);
+    return getAuthObjectForAcceptedToken({ authObject, acceptsToken });
   }
 
-  return getAuthDataFromRequestSync(req, opts);
+  // If a random token is present and acceptsToken is an array that does NOT include session_token,
+  // return invalidTokenAuthObject.
+  if (bearerToken && Array.isArray(acceptsToken) && !acceptsToken.includes(TokenType.SessionToken)) {
+    return invalidTokenAuthObject();
+  }
+
+  // Fallback to session logic (sync version) for all other cases
+  const authObject = getAuthDataFromRequestSync(req, opts);
+  return getAuthObjectForAcceptedToken({ authObject, acceptsToken });
 };
 
 const getAuthHeaders = (req: RequestLike) => {

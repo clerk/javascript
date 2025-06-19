@@ -1,6 +1,7 @@
 import { isUserLockedError } from '@clerk/shared/error';
 import { useClerk } from '@clerk/shared/react';
 import type { EmailCodeFactor, PhoneCodeFactor, ResetPasswordCodeFactor } from '@clerk/types';
+import { useMemo } from 'react';
 
 import { useCardState } from '@/ui/elements/contexts';
 import type { VerificationCodeCardProps } from '@/ui/elements/VerificationCodeCard';
@@ -41,6 +42,31 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
 
   const shouldAvoidPrepare = signIn.firstFactorVerification.status === 'verified' && props.factorAlreadyPrepared;
 
+  const cacheKey = useMemo(() => {
+    const factor = props.factor;
+    let factorKey = factor.strategy;
+
+    if ('emailAddressId' in factor) {
+      factorKey += `_${factor.emailAddressId}`;
+    }
+    if ('phoneNumberId' in factor) {
+      factorKey += `_${factor.phoneNumberId}`;
+    }
+    if ('channel' in factor && factor.channel) {
+      factorKey += `_${factor.channel}`;
+    }
+
+    return {
+      name: 'signIn.prepareFirstFactor',
+      factorKey,
+    };
+  }, [
+    props.factor.strategy,
+    'emailAddressId' in props.factor ? props.factor.emailAddressId : undefined,
+    'phoneNumberId' in props.factor ? props.factor.phoneNumberId : undefined,
+    'channel' in props.factor ? props.factor.channel : undefined,
+  ]);
+
   const goBack = () => {
     return navigate('../');
   };
@@ -64,11 +90,7 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
             ?.prepareFirstFactor(props.factor)
             .then(() => props.onFactorPrepare())
             .catch(err => handleError(err, [], card.setError)),
-    {
-      name: 'signIn.prepareFirstFactor',
-      factor: props.factor,
-      id: signIn.id,
-    },
+    cacheKey,
     {
       staleTime: 100,
     },

@@ -29,3 +29,4 @@ export * from './web3CallbackErrorHandler';
 export * from './originPrefersPopup';
 export * from './normalizeColorString';
 export * from './formatDate';
+export * from './truncateTextWithEndVisible';

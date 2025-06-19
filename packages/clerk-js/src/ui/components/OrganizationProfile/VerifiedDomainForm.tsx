@@ -129,10 +129,10 @@ export const VerifiedDomainForm = withCardStateProvider((props: VerifiedDomainFo
   }, [domain?.id]);
 
   const title = localizationKeys('organizationProfile.verifiedDomainPage.title', {
-    domain: domain?.name,
+    domain: domain?.name || '',
   });
   const subtitle = localizationKeys('organizationProfile.verifiedDomainPage.subtitle', {
-    domain: domain?.name,
+    domain: domain?.name || '',
   });
 
   const calloutLabel = useCalloutLabel(domain, {

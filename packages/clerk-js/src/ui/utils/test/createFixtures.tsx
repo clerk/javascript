@@ -1,6 +1,5 @@
 import type { ClerkOptions, ClientJSON, EnvironmentJSON, LoadedClerk } from '@clerk/types';
 import { jest } from '@jest/globals';
-import React from 'react';
 
 import { FlowMetadataProvider } from '@/ui/elements/contexts';
 
