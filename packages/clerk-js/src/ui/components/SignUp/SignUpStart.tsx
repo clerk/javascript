@@ -216,7 +216,7 @@ function SignUpStartInternal(): JSX.Element {
         // TODO: This is a hack to reset the sign in attempt so that the oauth error
         // does not persist on full page reloads.
         // This will be handled by the backend (FAPI) in the future.
-        void (await signUp.create({}, { skipChallenge: true }));
+        void (await signUp.create({}, { skipCaptchaChallenge: true }));
       }
     }
 

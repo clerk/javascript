@@ -1,7 +1,7 @@
 import type { PhoneCodeChannel } from 'phoneCodeChannel';
 
 import type {
-  ChallengeAttribute,
+  CaptchaChallengeAttribute,
   FirstNameAttribute,
   LastNameAttribute,
   LegalAcceptedAttribute,
@@ -171,7 +171,7 @@ export type SignUpAttributeField =
   | LastNameAttribute
   | PasswordAttribute
   | LegalAcceptedAttribute
-  | ChallengeAttribute;
+  | CaptchaChallengeAttribute;
 
 // TODO: SignUpVerifiableField or SignUpIdentifier?
 export type SignUpVerifiableField =
@@ -211,7 +211,7 @@ export type SignUpCreateParams = Partial<
 >;
 
 export type SignUpCreateOptions = Partial<{
-  skipChallenge: boolean;
+  skipCaptchaChallenge: boolean;
 }>;
 
 export type SignUpUpdateParams = SignUpCreateParams;
