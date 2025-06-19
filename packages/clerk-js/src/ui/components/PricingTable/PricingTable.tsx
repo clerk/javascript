@@ -9,7 +9,7 @@ import { PricingTableMatrix } from './PricingTableMatrix';
 
 const PricingTableRoot = (props: PricingTableProps) => {
   const clerk = useClerk();
-  const { mode = 'mounted' } = usePricingTableContext();
+  const { mode = 'mounted', signInMode = 'redirect' } = usePricingTableContext();
   const isCompact = mode === 'modal';
   const { data: subscriptions } = useSubscriptions();
   const { data: plans } = usePlans();
@@ -42,6 +42,9 @@ const PricingTableRoot = (props: PricingTableProps) => {
 
   const selectPlan = (plan: CommercePlanResource, event?: React.MouseEvent<HTMLElement>) => {
     if (!clerk.isSignedIn) {
+      if (signInMode === 'modal') {
+        return clerk.openSignIn();
+      }
       return clerk.redirectToSignIn();
     }
 
