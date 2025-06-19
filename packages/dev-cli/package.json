@@ -19,7 +19,8 @@
     "clerk-dev": "bin/cli.js"
   },
   "scripts": {
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "lint:oxlint": "oxlint src"
   },
   "dependencies": {
     "commander": "^12.1.0",

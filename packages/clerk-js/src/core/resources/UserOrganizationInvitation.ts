@@ -30,7 +30,7 @@ export class UserOrganizationInvitation extends BaseResource implements UserOrga
       search: convertPageToOffsetSearchParams(params),
     }).then(res => {
       const { data: invites, total_count } =
-        res?.response as unknown as ClerkPaginatedResponse<UserOrganizationInvitationJSON>;
+        res?.response as unknown as ClerkPaginatedResponse<UserOrganizationInvitationJSON>; // oxlint-disable-line no-unsafe-optional-chaining
 
       return {
         total_count,
