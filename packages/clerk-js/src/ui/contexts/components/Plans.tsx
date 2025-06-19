@@ -2,6 +2,7 @@ import {
   __experimental_usePaymentAttempts,
   __experimental_usePaymentMethods,
   __experimental_useStatements,
+  __experimental_useSubscriptionItems,
   useClerk,
   useOrganization,
   useSession,
@@ -16,7 +17,6 @@ import type {
 import { useCallback, useMemo } from 'react';
 import useSWR from 'swr';
 
-import { CommerceSubscription } from '../../../core/resources/internal';
 import type { LocalizationKey } from '../../localization';
 import { localizationKeys } from '../../localization';
 import { getClosestProfileScrollBox } from '../../utils';
@@ -70,58 +70,15 @@ export const useStatements = (params?: { fetchOnMount: boolean }) => {
   });
 };
 
+// TODO(@COMMERCE): This removes the client side hack for default free subscriptions
 export const useSubscriptions = () => {
-  const { billing } = useClerk();
-  const { organization } = useOrganization();
-  const { user, isSignedIn } = useUser();
   const subscriberType = useSubscriberTypeContext();
-  const { data: plans } = usePlans();
-
-  const { data: _subscriptions, ...rest } = useSWR(
-    {
-      key: `commerce-subscriptions`,
-      userId: user?.id,
-      args: { orgId: subscriberType === 'org' ? organization?.id : undefined },
-    },
-    ({ args, userId }) => (userId ? billing.getSubscriptions(args) : undefined),
-    dedupeOptions,
-  );
-
-  const subscriptions = useMemo(() => {
-    if (!_subscriptions) {
-      return [];
-    }
-    const defaultFreePlan = plans?.find(plan => plan.hasBaseFee === false && plan.amount === 0);
-
-    // are we signed in, is there a default free plan, and should it be shown as active or upcoming? then add an implicit subscription
-    if (
-      isSignedIn &&
-      defaultFreePlan &&
-      (_subscriptions.data.length === 0 || !_subscriptions.data.some(subscription => !subscription.canceledAt))
-    ) {
-      const canceledSubscription = _subscriptions.data.find(subscription => subscription.canceledAt);
-      return [
-        ..._subscriptions.data,
-        new CommerceSubscription({
-          object: 'commerce_subscription',
-          id: '__implicit_default_plan_subscription__',
-          payment_source_id: '',
-          plan: defaultFreePlan.__internal_toSnapshot(),
-          plan_period: 'month',
-          canceled_at: null,
-          status: _subscriptions.data.length === 0 ? 'active' : 'upcoming',
-          period_start: canceledSubscription?.periodEnd || 0,
-          period_end: 0,
-        }),
-      ];
-    }
-    return _subscriptions.data;
-  }, [_subscriptions, plans, isSignedIn]);
-
-  return {
-    data: subscriptions,
-    ...rest,
-  };
+  return __experimental_useSubscriptionItems({
+    for: subscriberType === 'org' ? 'organization' : 'user',
+    initialPage: 1,
+    pageSize: 10,
+    keepPreviousData: true,
+  });
 };
 
 export const usePlans = () => {
@@ -165,7 +122,7 @@ export const usePlansContext = () => {
     return false;
   }, [clerk, subscriberType]);
 
-  const { data: subscriptions, mutate: mutateSubscriptions } = useSubscriptions();
+  const { data: subscriptions, revalidate: revalidateSubscriptions } = useSubscriptions();
 
   // Invalidates cache but does not fetch immediately
   const { data: plans, mutate: mutatePlans } = useSWR<Awaited<ReturnType<typeof clerk.billing.getPlans>>>({
@@ -180,11 +137,11 @@ export const usePlansContext = () => {
 
   const revalidateAll = useCallback(() => {
     // Revalidate the plans and subscriptions
-    void mutateSubscriptions();
+    void revalidateSubscriptions();
     void mutatePlans();
     void revalidateStatements();
     void revalidatePaymentSources();
-  }, [mutateSubscriptions, mutatePlans, revalidateStatements, revalidatePaymentSources]);
+  }, [revalidateSubscriptions, mutatePlans, revalidateStatements, revalidatePaymentSources]);
 
   // should the default plan be shown as active
   const isDefaultPlanImplicitlyActiveOrUpcoming = useMemo(() => {
