@@ -101,9 +101,13 @@ export const useAuth = (initialAuthStateOrOptions: UseAuthOptions = {}): UseAuth
   const authContextFromHook = useAuthContext();
   let authContext = authContextFromHook;
 
+  console.log('auth context from useAuth', { authContext });
+
   if (authContext.sessionId === undefined && authContext.userId === undefined) {
     authContext = initialAuthState != null ? initialAuthState : {};
   }
+
+  console.log('auth context after override', { authContext });
 
   const isomorphicClerk = useIsomorphicClerkContext();
   const getToken: GetToken = useCallback(createGetToken(isomorphicClerk), [isomorphicClerk]);
@@ -174,6 +178,8 @@ export function useDerivedAuth(
     },
     [has, userId, orgId, orgRole, orgPermissions, factorVerificationAge],
   );
+
+  console.log('useDerivedAuth authObject', { authObject });
 
   const payload = resolveAuthState({
     authObject: {
