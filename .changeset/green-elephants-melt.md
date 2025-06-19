@@ -4,4 +4,4 @@
 "@clerk/types": patch
 ---
 
-Replace expiration segmented list with dropdown and hide description field
+Replace expiration segmented list with dropdown and hide description field in `<APIKeys />` component
