@@ -232,6 +232,29 @@ export interface Clerk {
    */
   __internal_closePlanDetails: () => void;
 
+  /**
+   * Opens the Clerk PlanDetails drawer component in a drawer.
+   * @param props Optional subscription details drawer configuration parameters.
+   */
+  __experimental_openPlanDetails: (props?: __experimental_PlanDetailsProps) => void;
+
+  /**
+   * Closes the Clerk PlanDetails drawer.
+   */
+  __experimental_closePlanDetails: () => void;
+
+  /**
+   * Opens the Clerk PlanDetails drawer component in a drawer.
+   * @param props Optional subscription details drawer configuration parameters.
+   */
+  __experimental_openSubscriptionDetails: (props?: __experimental_SubscriptionDetailsProps) => void;
+
+  /**
+   * Closes the Clerk PlanDetails drawer.
+   */
+  __experimental_closeSubscriptionDetails: () => void;
+
+  /**
   /** Opens the Clerk UserVerification component in a modal.
    * @param props Optional user verification configuration parameters.
    */
@@ -1723,6 +1746,22 @@ export type __internal_PlanDetailsProps = {
   plan?: CommercePlanResource;
   subscriberType?: CommerceSubscriberType;
   initialPlanPeriod?: CommerceSubscriptionPlanPeriod;
+  onSubscriptionCancel?: () => void;
+  portalId?: string;
+  portalRoot?: PortalRoot;
+};
+
+export type __experimental_PlanDetailsProps = {
+  appearance?: PlanDetailTheme;
+  plan?: CommercePlanResource;
+  planId?: string;
+  initialPlanPeriod?: CommerceSubscriptionPlanPeriod;
+  portalId?: string;
+  portalRoot?: PortalRoot;
+};
+
+export type __experimental_SubscriptionDetailsProps = {
+  appearance?: PlanDetailTheme;
   onSubscriptionCancel?: () => void;
   portalId?: string;
   portalRoot?: PortalRoot;

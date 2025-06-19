@@ -117,8 +117,9 @@ export const useSubscriptions = () => {
           plan_period: 'month',
           canceled_at: null,
           status: _subscriptions.data.length === 0 ? 'active' : 'upcoming',
-          period_start: canceledSubscription?.periodEnd || 0,
+          period_start: canceledSubscription?.periodEnd?.getTime() || 0,
           period_end: 0,
+          created_at: canceledSubscription?.periodEnd?.getTime() || 0,
         }),
       ];
     }
@@ -363,10 +364,7 @@ export const usePlansContext = () => {
       const portalRoot = getClosestProfileScrollBox(mode, event);
 
       if (subscription && subscription.planPeriod === planPeriod && !subscription.canceledAt) {
-        clerk.__internal_openPlanDetails({
-          plan,
-          initialPlanPeriod: planPeriod,
-          subscriberType,
+        clerk.__experimental_openSubscriptionDetails({
           onSubscriptionCancel: () => {
             revalidateAll();
             onSubscriptionChange?.();

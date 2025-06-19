@@ -4,6 +4,7 @@ import type {
   CommerceCheckoutJSON,
   CommercePaymentJSON,
   CommercePaymentResource,
+  CommercePlanJSON,
   CommercePlanResource,
   CommerceProductJSON,
   CommerceStatementJSON,
@@ -37,6 +38,14 @@ export class CommerceBilling implements CommerceBillingNamespace {
 
     const defaultProduct = products.find(product => product.is_default);
     return defaultProduct?.plans.map(plan => new CommercePlan(plan)) || [];
+  };
+
+  getPlan = async (params: { id: string }): Promise<CommercePlanResource> => {
+    const plan = (await BaseResource._fetch({
+      path: `/commerce/plans/${params.id}`,
+      method: 'GET',
+    })) as unknown as CommercePlanJSON;
+    return new CommercePlan(plan);
   };
 
   getSubscriptions = async (
