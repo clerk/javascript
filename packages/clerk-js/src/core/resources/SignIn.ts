@@ -40,6 +40,7 @@ import type {
   Web3SignatureFactor,
 } from '@clerk/types';
 
+import { useSignInStore } from '../../store/signInStore';
 import {
   generateSignatureWithCoinbaseWallet,
   generateSignatureWithMetamask,
@@ -456,6 +457,15 @@ export class SignIn extends BaseResource implements SignInResource {
       this.secondFactorVerification = new Verification(data.second_factor_verification);
       this.createdSessionId = data.created_session_id;
       this.userData = new UserData(data.user_data);
+
+      // Update store with new data
+      useSignInStore.getState().set({
+        status: data.status,
+        identifier: data.identifier,
+        createdSessionId: data.created_session_id,
+        supportedFirstFactors: deepSnakeToCamel(data.supported_first_factors) as SignInFirstFactor[] | null,
+        supportedSecondFactors: deepSnakeToCamel(data.supported_second_factors) as SignInSecondFactor[] | null,
+      });
     }
     return this;
   }
