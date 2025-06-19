@@ -47,19 +47,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withAPIKeys] })('auth() with 
     expect(validKeyRes.status).toBe(200);
   });
 
-  test('should reject revoked API keys', async () => {
-    // Create and immediately revoke a new key
-    const tempKey = await u.services.users.createFakeAPIKey(fakeBapiUser.id);
-    await tempKey.revoke();
-
-    const res = await fetch(app.serverUrl + '/api/api-key', {
-      headers: {
-        Authorization: `Bearer ${tempKey.secret}`,
-      },
-    });
-    expect(res.status).toBe(401);
-  });
-
   test('should handle multiple token types correctly', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
 

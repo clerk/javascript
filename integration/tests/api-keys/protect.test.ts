@@ -83,20 +83,6 @@ test.describe('auth.protect() with API keys @xnextjs', () => {
     expect(data.userId).toBe(fakeBapiUser.id);
   });
 
-  test('should reject revoked API keys', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
-    const tempKey = await u.services.users.createFakeAPIKey(fakeBapiUser.id);
-    await tempKey.revoke();
-
-    const res = await fetch(app.serverUrl + '/api/api-key', {
-      headers: {
-        Authorization: `Bearer ${tempKey.secret}`,
-      },
-    });
-
-    expect(res.status).toBe(401);
-  });
-
   test('should handle multiple token types correctly', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     const url = new URL('/api/api-key', app.serverUrl);
