@@ -5,84 +5,98 @@ import { appConfigs } from '../../presets';
 import type { FakeAPIKey, FakeUser } from '../../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../../testUtils';
 
-testAgainstRunningApps({ withEnv: [appConfigs.envs.withAPIKeys] })('auth() with api keys @xnextjs', ({ app }) => {
+testAgainstRunningApps({ withEnv: [appConfigs.envs.withAPIKeys] })('auth() with API keys @xnextjs', ({ app }) => {
   test.describe.configure({ mode: 'serial' });
 
   let fakeUser: FakeUser;
   let fakeBapiUser: User;
-  let apiKey: FakeAPIKey;
+  let fakeAPIKey: FakeAPIKey;
   const u = createTestUtils({ app });
 
   test.beforeAll(async () => {
     fakeUser = u.services.users.createFakeUser();
     fakeBapiUser = await u.services.users.createBapiUser(fakeUser);
-    apiKey = await u.services.users.createFakeAPIKey(fakeBapiUser.id);
+    fakeAPIKey = await u.services.users.createFakeAPIKey(fakeBapiUser.id);
   });
 
   test.afterAll(async () => {
-    await apiKey.revoke();
+    await fakeAPIKey.revoke();
     await fakeUser.deleteIfExists();
     await app.teardown();
   });
 
-  test('should return 401 when no API key is provided', async () => {
-    const res = await fetch(app.serverUrl + '/api/api-key');
-    expect(res.status).toBe(401);
-  });
+  test('should validate API key authentication', async () => {
+    // No API key provided
+    const noKeyRes = await fetch(app.serverUrl + '/api/api-key');
+    expect(noKeyRes.status).toBe(401);
 
-  test('should return 401 when an invalid API key is provided', async () => {
-    const res = await fetch(app.serverUrl + '/api/api-key', {
+    // Invalid API key
+    const invalidKeyRes = await fetch(app.serverUrl + '/api/api-key', {
       headers: {
         Authorization: 'Bearer invalid_key',
       },
     });
-    expect(res.status).toBe(401);
+    expect(invalidKeyRes.status).toBe(401);
+
+    // Valid API key
+    const validKeyRes = await fetch(app.serverUrl + '/api/api-key', {
+      headers: {
+        Authorization: `Bearer ${fakeAPIKey.secret}`,
+      },
+    });
+    expect(validKeyRes.status).toBe(200);
   });
 
-  test('should return 401 when a malformed Authorization header is provided', async () => {
+  test('should reject revoked API keys', async () => {
+    // Create and immediately revoke a new key
+    const tempKey = await u.services.users.createFakeAPIKey(fakeBapiUser.id);
+    await tempKey.revoke();
+
     const res = await fetch(app.serverUrl + '/api/api-key', {
       headers: {
-        Authorization: 'malformed_header',
+        Authorization: `Bearer ${tempKey.secret}`,
       },
     });
     expect(res.status).toBe(401);
   });
 
-  test('should return 200 with a valid API key', async () => {
-    const res = await fetch(app.serverUrl + '/api/api-key', {
-      headers: {
-        Authorization: `Bearer ${apiKey.secret}`,
-      },
-    });
-
-    expect(res.status).toBe(200);
-  });
-
-  test('should return 401 when using a revoked API key', async ({ page, context }) => {
+  test('should handle multiple token types correctly', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
-    const revokedKey = await u.services.users.createFakeAPIKey(fakeBapiUser.id);
 
-    await revokedKey.revoke();
+    // Sign in to get a session token
+    await u.po.signIn.goTo();
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+    await u.po.expect.toBeSignedIn();
 
-    const res = await fetch(app.serverUrl + '/api/api-key', {
-      headers: {
-        Authorization: `Bearer ${revokedKey.secret}`,
-      },
-    });
+    // GET endpoint (only accepts api_key)
+    const getRes = await u.page.goToRelative('/api/api-key');
+    expect(getRes.status()).toBe(401);
 
-    expect(res.status).toBe(401);
-  });
+    const url = new URL('/api/api-key', app.serverUrl);
 
-  test('should accept API key if in accepted tokens array', async () => {
-    const res = await fetch(app.serverUrl + '/api/api-key', {
+    // POST endpoint (accepts both api_key and session_token)
+    // Test with session token
+    const sessionCookie = (await context.cookies()).find(c => c.name === '__session');
+    const postWithSessionRes = await fetch(url, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${apiKey.secret}`,
+        Authorization: `Bearer ${sessionCookie?.value}`,
       },
     });
+    const sessionData = await postWithSessionRes.json();
+    expect(postWithSessionRes.status).toBe(200);
+    expect(sessionData.userId).toBe(fakeBapiUser.id);
 
-    const data = await res.json();
-    expect(res.status).toBe(200);
-    expect(data.userId).toBe(fakeBapiUser.id);
+    // Test with API key
+    const postWithApiKeyRes = await fetch(url, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${fakeAPIKey.secret}`,
+      },
+    });
+    const apiKeyData = await postWithApiKeyRes.json();
+    expect(postWithApiKeyRes.status).toBe(200);
+    expect(apiKeyData.userId).toBe(fakeBapiUser.id);
   });
 });

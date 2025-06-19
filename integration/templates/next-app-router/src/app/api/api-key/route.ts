@@ -12,7 +12,7 @@ export async function GET() {
 }
 
 export async function POST() {
-  const { userId } = await auth.protect({ token: ['api_key', 'session_token'] });
+  const { userId } = await auth({ acceptsToken: ['api_key', 'session_token'] });
 
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

@@ -200,6 +200,27 @@ function handleClerkAPIError(
   };
 }
 
+function handleRevokedToken<T>(
+  tokenType: MachineTokenType,
+  verifiedToken: T & { revoked: boolean; revocationReason: string | null },
+): MachineTokenReturnType<T, MachineTokenVerificationError> | undefined {
+  if (verifiedToken.revoked) {
+    const reason = verifiedToken.revocationReason ? `: ${verifiedToken.revocationReason}` : '';
+    return {
+      data: undefined,
+      tokenType,
+      errors: [
+        new MachineTokenVerificationError({
+          message: `${tokenType} has been revoked${reason}`,
+          code: MachineTokenVerificationErrorCode.TokenInvalid,
+          status: 401,
+        }),
+      ],
+    };
+  }
+  return undefined;
+}
+
 async function verifyMachineToken(
   secret: string,
   options: VerifyTokenOptions,
@@ -207,6 +228,12 @@ async function verifyMachineToken(
   try {
     const client = createBackendApiClient(options);
     const verifiedToken = await client.machineTokens.verifySecret(secret);
+
+    const revokedResult = handleRevokedToken(TokenType.MachineToken, verifiedToken);
+    if (revokedResult) {
+      return revokedResult;
+    }
+
     return { data: verifiedToken, tokenType: TokenType.MachineToken, errors: undefined };
   } catch (err: any) {
     return handleClerkAPIError(TokenType.MachineToken, err, 'Machine token not found');
@@ -220,6 +247,12 @@ async function verifyOAuthToken(
   try {
     const client = createBackendApiClient(options);
     const verifiedToken = await client.idPOAuthAccessToken.verifyAccessToken(accessToken);
+
+    const revokedResult = handleRevokedToken(TokenType.OAuthToken, verifiedToken);
+    if (revokedResult) {
+      return revokedResult;
+    }
+
     return { data: verifiedToken, tokenType: TokenType.OAuthToken, errors: undefined };
   } catch (err: any) {
     return handleClerkAPIError(TokenType.OAuthToken, err, 'OAuth token not found');
@@ -233,6 +266,12 @@ async function verifyAPIKey(
   try {
     const client = createBackendApiClient(options);
     const verifiedToken = await client.apiKeys.verifySecret(secret);
+
+    const revokedResult = handleRevokedToken(TokenType.ApiKey, verifiedToken);
+    if (revokedResult) {
+      return revokedResult;
+    }
+
     return { data: verifiedToken, tokenType: TokenType.ApiKey, errors: undefined };
   } catch (err: any) {
     return handleClerkAPIError(TokenType.ApiKey, err, 'API key not found');
