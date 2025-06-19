@@ -414,6 +414,8 @@ export const getAuthObjectFromJwt = (
   jwt: Jwt,
   { treatPendingAsSignedOut = true, ...options }: PendingSessionOptions & Partial<AuthenticateContext>,
 ) => {
+  console.log('getAuthObjectFromJwt', { jwt });
+
   const authObject = signedInAuthObject(options, jwt.raw.text, jwt.payload);
 
   if (treatPendingAsSignedOut && authObject.sessionStatus === 'pending') {

@@ -78,6 +78,8 @@ export const getAuthDataFromRequestSync = (
     return getAuthObjectFromJwt(jwt, options);
   }
 
+  console.log('auth object from getAuthDataFromRequestSync', authObject);
+
   return authObject;
 };
 

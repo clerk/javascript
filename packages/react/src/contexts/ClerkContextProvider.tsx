@@ -31,6 +31,8 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
     return clerk.addListener(e => setState({ ...e }));
   }, []);
 
+  console.log({ initialState });
+
   const derivedState = deriveState(clerk.loaded, state, initialState);
   const clerkCtx = React.useMemo(
     () => ({ value: clerk }),
@@ -56,6 +58,8 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
     orgPermissions,
     factorVerificationAge,
   } = derivedState;
+
+  console.log({ session }, 'ClerkContextProvider');
 
   const authCtx = React.useMemo(() => {
     const value = {
