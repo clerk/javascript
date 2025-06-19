@@ -26,12 +26,13 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withAPIKeys] })('auth() with 
   });
 
   test('should validate API key authentication', async () => {
+    const url = new URL('/api/machine', app.serverUrl);
     // No API key provided
-    const noKeyRes = await fetch(app.serverUrl + '/api/api-key');
+    const noKeyRes = await fetch(url);
     expect(noKeyRes.status).toBe(401);
 
     // Invalid API key
-    const invalidKeyRes = await fetch(app.serverUrl + '/api/api-key', {
+    const invalidKeyRes = await fetch(url, {
       headers: {
         Authorization: 'Bearer invalid_key',
       },
@@ -39,12 +40,14 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withAPIKeys] })('auth() with 
     expect(invalidKeyRes.status).toBe(401);
 
     // Valid API key
-    const validKeyRes = await fetch(app.serverUrl + '/api/api-key', {
+    const validKeyRes = await fetch(url, {
       headers: {
         Authorization: `Bearer ${fakeAPIKey.secret}`,
       },
     });
+    const apiKeyData = await validKeyRes.json();
     expect(validKeyRes.status).toBe(200);
+    expect(apiKeyData.userId).toBe(fakeBapiUser.id);
   });
 
   test('should handle multiple token types correctly', async ({ page, context }) => {
@@ -57,10 +60,10 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withAPIKeys] })('auth() with 
     await u.po.expect.toBeSignedIn();
 
     // GET endpoint (only accepts api_key)
-    const getRes = await u.page.goToRelative('/api/api-key');
+    const getRes = await u.page.goToRelative('/api/machine');
     expect(getRes.status()).toBe(401);
 
-    const url = new URL('/api/api-key', app.serverUrl);
+    const url = new URL('/api/machine', app.serverUrl);
 
     // POST endpoint (accepts both api_key and session_token)
     // Test with session token

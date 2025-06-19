@@ -17,7 +17,7 @@ test.describe('auth.protect() with API keys @xnextjs', () => {
     app = await appConfigs.next.appRouter
       .clone()
       .addFile(
-        'src/app/api/api-key/route.ts',
+        'src/app/api/machine/route.ts',
         () => `
         import { NextResponse } from 'next/server';
         import { auth } from '@clerk/nextjs/server';
@@ -52,12 +52,13 @@ test.describe('auth.protect() with API keys @xnextjs', () => {
   });
 
   test('should validate API key protection', async () => {
+    const url = new URL('/api/machine', app.serverUrl);
     // No API key provided
-    const noKeyRes = await fetch(app.serverUrl + '/api/api-key');
+    const noKeyRes = await fetch(url);
     expect(noKeyRes.status).toBe(401);
 
     // Invalid API key
-    const invalidKeyRes = await fetch(app.serverUrl + '/api/api-key', {
+    const invalidKeyRes = await fetch(url, {
       headers: {
         Authorization: 'Bearer invalid_key',
       },
@@ -65,7 +66,7 @@ test.describe('auth.protect() with API keys @xnextjs', () => {
     expect(invalidKeyRes.status).toBe(401);
 
     // Malformed header
-    const malformedRes = await fetch(app.serverUrl + '/api/api-key', {
+    const malformedRes = await fetch(url, {
       headers: {
         Authorization: 'malformed_header',
       },
@@ -73,7 +74,7 @@ test.describe('auth.protect() with API keys @xnextjs', () => {
     expect(malformedRes.status).toBe(401);
 
     // Valid API key
-    const validKeyRes = await fetch(app.serverUrl + '/api/api-key', {
+    const validKeyRes = await fetch(url, {
       headers: {
         Authorization: `Bearer ${fakeAPIKey.secret}`,
       },
@@ -85,7 +86,7 @@ test.describe('auth.protect() with API keys @xnextjs', () => {
 
   test('should handle multiple token types correctly', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
-    const url = new URL('/api/api-key', app.serverUrl);
+    const url = new URL('/api/machine', app.serverUrl);
 
     // Sign in to get a session token
     await u.po.signIn.goTo();
