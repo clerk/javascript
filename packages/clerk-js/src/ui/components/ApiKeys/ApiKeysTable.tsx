@@ -162,21 +162,16 @@ export const ApiKeysTable = ({
                       variant='caption'
                       colorScheme='secondary'
                     >
-                      Created at{' '}
-                      {apiKey.createdAt.toLocaleDateString(undefined, {
-                        month: 'short',
-                        day: '2-digit',
-                        year: 'numeric',
-                      })}
+                      Created at {apiKey.createdAt.toLocaleDateString()}
+                      {' • '}
+                      Never expires
                     </Text>
                   </Flex>
                 </Td>
                 <Td>
                   <Box
                     sx={{
-                      [mqu.sm]: {
-                        minWidth: '10ch',
-                      },
+                      minWidth: '10ch',
                     }}
                   >
                     <Text localizationKey={apiKey.lastUsedAt ? timeAgo(apiKey.lastUsedAt) : '-'} />

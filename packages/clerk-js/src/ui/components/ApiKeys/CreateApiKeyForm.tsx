@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef, useState } from 'react';
+import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { useApiKeysContext } from '@/ui/contexts';
 import { Box, Col, descriptors, FormLabel, localizationKeys, Text, useLocalizations } from '@/ui/customizables';
@@ -11,7 +11,9 @@ import { ChevronUpDown } from '@/ui/icons';
 import { mqu } from '@/ui/styledSystem';
 import { useFormControl } from '@/ui/utils/useFormControl';
 
-type Expiration = null | '1d' | '7d' | '30d' | '60d' | '90d' | '180d' | '1y';
+const EXPIRATION_VALUES = [null, '1d', '7d', '30d', '60d', '90d', '180d', '1y'] as const;
+
+type Expiration = (typeof EXPIRATION_VALUES)[number];
 
 type ExpirationOption = {
   value: Expiration;
@@ -59,8 +61,6 @@ const getExpirationLocalizationKey = (expiration: Expiration) => {
       return 'apiKeys.formFieldOption__expiration__1y';
   }
 };
-
-const EXPIRATION_VALUES: Expiration[] = [null, '1d', '7d', '30d', '60d', '90d', '180d', '1y'];
 
 const getTimeLeftInSeconds = (expirationOption: Expiration): number | undefined => {
   if (!expirationOption) return undefined;
@@ -167,7 +167,10 @@ export const CreateApiKeyForm: React.FC<CreateApiKeyFormProps> = ({ onCreate, is
   });
 
   const canSubmit = nameField.value.length > 2;
-  const expirationCaption = getExpirationCaption(getTimeLeftInSeconds(selectedExpiration?.value ?? null));
+  const expirationCaption = useMemo(
+    () => getExpirationCaption(getTimeLeftInSeconds(selectedExpiration?.value ?? null)),
+    [selectedExpiration?.value],
+  );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
