@@ -11,6 +11,9 @@ import type {
   ValueOrSetter,
 } from '../types';
 
+/**
+ *
+ */
 function getDifferentKeys(obj1: Record<string, unknown>, obj2: Record<string, unknown>): Record<string, unknown> {
   const keysSet = new Set(Object.keys(obj2));
   const differentKeysObject: Record<string, unknown> = {};
@@ -61,15 +64,15 @@ type UsePagesOrInfinite = <
   TConfig extends PagesOrInfiniteConfig = PagesOrInfiniteConfig,
 >(
   /**
-   * The parameters will be passed to the fetcher
+   * The parameters will be passed to the fetcher.
    */
   params: Params,
   /**
-   * A Promise returning function to fetch your data
+   * A Promise returning function to fetch your data.
    */
   fetcher: ((p: Params) => FetcherReturnData | Promise<FetcherReturnData>) | undefined,
   /**
-   * Internal configuration of the hook
+   * Internal configuration of the hook.
    */
   config: TConfig,
   cacheKeys: CacheKeys,
@@ -83,6 +86,7 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, config, 
   const pageSizeRef = useRef(params.pageSize ?? 10);
 
   const enabled = config.enabled ?? true;
+  const fetchOnMount = config.fetchOnMount ?? true;
   const triggerInfinite = config.infinite ?? false;
   const keepPreviousData = config.keepPreviousData ?? false;
 
@@ -100,13 +104,22 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, config, 
     error: swrError,
     mutate: swrMutate,
   } = useSWR(
-    !triggerInfinite && !!fetcher && enabled ? pagesCacheKey : null,
-    cacheKeyParams => {
-      // @ts-ignore
-      const requestParams = getDifferentKeys(cacheKeyParams, cacheKeys);
-      // @ts-ignore
-      return fetcher?.(requestParams);
-    },
+    fetchOnMount
+      ? !triggerInfinite && !!fetcher && enabled
+        ? pagesCacheKey
+        : null
+      : !triggerInfinite && enabled
+        ? pagesCacheKey
+        : null,
+    fetchOnMount
+      ? cacheKeyParams => {
+          // @ts-ignore
+          const requestParams = getDifferentKeys(cacheKeyParams, cacheKeys);
+
+          // @ts-ignore
+          return fetcher?.({ ...params, ...requestParams });
+        }
+      : null,
     { keepPreviousData, ...cachingSWROptions },
   );
 
@@ -177,7 +190,7 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, config, 
   const error = (triggerInfinite ? swrInfiniteError : swrError) ?? null;
   const isError = !!error;
   /**
-   * Helpers
+   * Helpers.
    */
   const fetchNext = useCallback(() => {
     fetchPage(n => Math.max(0, n + 1));
