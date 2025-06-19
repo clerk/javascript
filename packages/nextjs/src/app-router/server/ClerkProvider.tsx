@@ -16,6 +16,8 @@ const getDynamicClerkState = React.cache(async function getDynamicClerkState() {
   const request = await buildRequestLike();
   const data = getDynamicAuthData(request);
 
+  console.log({ data }, 'initialState from server');
+
   return data;
 });
 
