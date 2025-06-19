@@ -56,6 +56,15 @@ export class APIKeysAPI extends AbstractAPI {
     });
   }
 
+  async getSecret(apiKeyId: string) {
+    this.requireId(apiKeyId);
+
+    return this.request<{ secret: string }>({
+      method: 'GET',
+      path: joinPaths(basePath, apiKeyId, 'secret'),
+    });
+  }
+
   async verifySecret(secret: string) {
     return this.request<APIKey>({
       method: 'POST',
