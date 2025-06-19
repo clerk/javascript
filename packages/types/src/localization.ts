@@ -106,7 +106,6 @@ export type __internal_LocalizationResource = {
   formFieldLabel__apiKeyName: LocalizationValue;
   formFieldLabel__apiKeyDescription: LocalizationValue;
   formFieldLabel__apiKeyExpiration: LocalizationValue;
-  formFieldLabel__apiKeyExpirationDate: LocalizationValue;
   formFieldInputPlaceholder__emailAddress: LocalizationValue;
   formFieldInputPlaceholder__emailAddresses: LocalizationValue;
   formFieldInputPlaceholder__phoneNumber: LocalizationValue;
@@ -1166,14 +1165,20 @@ export type __internal_LocalizationResource = {
       formHint: LocalizationValue;
       formButtonPrimary__revoke: LocalizationValue;
     };
-    dates: {
-      lastUsed__seconds: LocalizationValue<'seconds'>;
-      lastUsed__minutes: LocalizationValue<'minutes'>;
-      lastUsed__hours: LocalizationValue<'hours'>;
-      lastUsed__days: LocalizationValue<'days'>;
-      lastUsed__months: LocalizationValue<'months'>;
-      lastUsed__years: LocalizationValue<'years'>;
-    };
+    lastUsed__seconds: LocalizationValue<'seconds'>;
+    lastUsed__minutes: LocalizationValue<'minutes'>;
+    lastUsed__hours: LocalizationValue<'hours'>;
+    lastUsed__days: LocalizationValue<'days'>;
+    lastUsed__months: LocalizationValue<'months'>;
+    lastUsed__years: LocalizationValue<'years'>;
+    formFieldOption__expiration__1d: LocalizationValue;
+    formFieldOption__expiration__7d: LocalizationValue;
+    formFieldOption__expiration__30d: LocalizationValue;
+    formFieldOption__expiration__60d: LocalizationValue;
+    formFieldOption__expiration__90d: LocalizationValue;
+    formFieldOption__expiration__180d: LocalizationValue;
+    formFieldOption__expiration__1y: LocalizationValue;
+    formFieldOption__expiration__never: LocalizationValue;
   };
 };
 

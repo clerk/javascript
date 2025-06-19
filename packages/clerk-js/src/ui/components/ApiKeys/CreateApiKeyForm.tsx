@@ -1,7 +1,7 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
 
 import { useApiKeysContext } from '@/ui/contexts';
-import { Col, descriptors, Flex, FormLabel, localizationKeys, Text } from '@/ui/customizables';
+import { Col, descriptors, Flex, FormLabel, localizationKeys, Text, useLocalizations } from '@/ui/customizables';
 import { useActionContext } from '@/ui/elements/Action/ActionRoot';
 import { Form } from '@/ui/elements/Form';
 import { FormButtons } from '@/ui/elements/FormButtons';
@@ -10,118 +10,73 @@ import { Select, SelectButton, SelectOptionList } from '@/ui/elements/Select';
 import { ChevronUpDown } from '@/ui/icons';
 import { useFormControl } from '@/ui/utils/useFormControl';
 
-export type OnCreateParams = { name: string; description?: string; secondsUntilExpiration: number | undefined };
+type Expiration = null | '1d' | '7d' | '30d' | '60d' | '90d' | '180d' | '1y';
+
+type ExpirationOption = {
+  value: Expiration;
+  label: string;
+};
+
+export type OnCreateParams = {
+  name: string;
+  description?: string;
+  secondsUntilExpiration: number | undefined;
+};
 
 interface CreateApiKeyFormProps {
   onCreate: (params: OnCreateParams, closeCardFn: () => void) => void;
   isSubmitting: boolean;
 }
 
-export type Expiration = null | '1d' | '7d' | '30d' | '60d' | '90d' | '180d' | '1y';
+const EXPIRATION_DURATIONS: Record<Exclude<Expiration, null>, (date: Date) => void> = {
+  '1d': date => date.setDate(date.getDate() + 1),
+  '7d': date => date.setDate(date.getDate() + 7),
+  '30d': date => date.setDate(date.getDate() + 30),
+  '60d': date => date.setDate(date.getDate() + 60),
+  '90d': date => date.setDate(date.getDate() + 90),
+  '180d': date => date.setDate(date.getDate() + 180),
+  '1y': date => date.setFullYear(date.getFullYear() + 1),
+} as const;
 
-const getTimeLeftInSeconds = (expirationOption: Expiration) => {
-  if (expirationOption === null) {
-    return;
+const getExpirationLocalizationKey = (expiration: Expiration) => {
+  switch (expiration) {
+    case null:
+      return 'apiKeys.formFieldOption__expiration__never';
+    case '1d':
+      return 'apiKeys.formFieldOption__expiration__1d';
+    case '7d':
+      return 'apiKeys.formFieldOption__expiration__7d';
+    case '30d':
+      return 'apiKeys.formFieldOption__expiration__30d';
+    case '60d':
+      return 'apiKeys.formFieldOption__expiration__60d';
+    case '90d':
+      return 'apiKeys.formFieldOption__expiration__90d';
+    case '180d':
+      return 'apiKeys.formFieldOption__expiration__180d';
+    case '1y':
+      return 'apiKeys.formFieldOption__expiration__1y';
   }
+};
+
+const EXPIRATION_VALUES: Expiration[] = [null, '1d', '7d', '30d', '60d', '90d', '180d', '1y'];
+
+const getTimeLeftInSeconds = (expirationOption: Expiration): number | undefined => {
+  if (!expirationOption) return undefined;
 
   const now = new Date();
   const future = new Date(now);
 
-  switch (expirationOption) {
-    case '1d':
-      future.setDate(future.getDate() + 1);
-      break;
-    case '7d':
-      future.setDate(future.getDate() + 7);
-      break;
-    case '30d':
-      future.setDate(future.getDate() + 30);
-      break;
-    case '90d':
-      future.setDate(future.getDate() + 90);
-      break;
-    case '60d':
-      future.setDate(future.getDate() + 60);
-      break;
-    case '180d':
-      future.setDate(future.getDate() + 180);
-      break;
-    case '1y':
-      future.setFullYear(future.getFullYear() + 1);
-      break;
-    default:
-      throw new Error('Invalid expiration option');
-  }
-
-  const diffInMs = future.getTime() - now.getTime();
-  const diffInSecs = Math.floor(diffInMs / 1000);
-  return diffInSecs;
+  EXPIRATION_DURATIONS[expirationOption](future);
+  return Math.floor((future.getTime() - now.getTime()) / 1000);
 };
 
-const expirationOptions: { value: Expiration; label: string }[] = [
-  { value: null, label: 'Select date' },
-  { value: '1d', label: '1 Day' },
-  { value: '7d', label: '7 Days' },
-  { value: '30d', label: '30 Days' },
-  { value: '60d', label: '60 Days' },
-  { value: '90d', label: '90 Days' },
-  { value: '180d', label: '180 Days' },
-  { value: '1y', label: '1 Year' },
-];
-
-const ExpirationSelector = ({
-  selectedExpiration,
-  setSelectedExpiration,
-}: {
-  selectedExpiration: { value: Expiration; label: string };
-  setSelectedExpiration: (value: { value: Expiration; label: string }) => void;
-}) => {
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const [buttonWidth, setButtonWidth] = useState<number>();
-
-  useLayoutEffect(() => {
-    if (buttonRef.current) {
-      setButtonWidth(buttonRef.current.offsetWidth);
-    }
-  }, []);
-
-  return (
-    <Select
-      elementId='apiKeyExpiration'
-      options={expirationOptions}
-      value={selectedExpiration.value}
-      onChange={setSelectedExpiration}
-    >
-      <SelectButton
-        ref={buttonRef}
-        icon={ChevronUpDown}
-        sx={t => ({
-          justifyContent: 'space-between',
-          backgroundColor: t.colors.$colorBackground,
-        })}
-        aria-labelledby='expiration-field'
-        id='expiration-field'
-      >
-        <Text>{selectedExpiration.label}</Text>
-      </SelectButton>
-      <SelectOptionList
-        sx={t => ({
-          paddingBlock: t.space.$1,
-          color: t.colors.$colorText,
-          width: buttonWidth,
-        })}
-      />
-    </Select>
-  );
-};
-
-function getExpirationCaption(expirationSeconds?: number): string {
+const getExpirationCaption = (expirationSeconds?: number): string => {
   if (!expirationSeconds) {
     return 'This key will never expire';
   }
 
   const expirationDate = new Date(Date.now() + expirationSeconds * 1000);
-  // Example: "Expiring June 28, 2025 - 12:45:24 PM PDT"
   return (
     'Expiring ' +
     expirationDate.toLocaleString(undefined, {
@@ -135,13 +90,64 @@ function getExpirationCaption(expirationSeconds?: number): string {
       timeZoneName: 'short',
     })
   );
+};
+
+interface ExpirationSelectorProps {
+  selectedExpiration: ExpirationOption | null;
+  setSelectedExpiration: (value: ExpirationOption) => void;
 }
 
-export const CreateApiKeyForm = ({ onCreate, isSubmitting }: CreateApiKeyFormProps) => {
-  const [selectedExpiration, setSelectedExpiration] = useState<{ value: Expiration; label: string }>({
-    value: null,
-    label: 'Select date',
-  });
+const ExpirationSelector: React.FC<ExpirationSelectorProps> = ({ selectedExpiration, setSelectedExpiration }) => {
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const [buttonWidth, setButtonWidth] = useState<number>();
+  const { t } = useLocalizations();
+
+  useLayoutEffect(() => {
+    if (buttonRef.current) {
+      setButtonWidth(buttonRef.current.offsetWidth);
+    }
+  }, []);
+
+  const expirationOptions = EXPIRATION_VALUES.map(value => ({
+    value,
+    label: t(localizationKeys(getExpirationLocalizationKey(value))),
+  }));
+
+  return (
+    <Select
+      elementId='apiKeyExpiration'
+      options={expirationOptions}
+      value={selectedExpiration?.value ?? ''}
+      onChange={setSelectedExpiration}
+      placeholder={t(localizationKeys('formFieldInputPlaceholder__apiKeyExpirationDate'))}
+    >
+      <SelectButton
+        ref={buttonRef}
+        icon={ChevronUpDown}
+        sx={t => ({
+          justifyContent: 'space-between',
+          backgroundColor: t.colors.$colorBackground,
+        })}
+        aria-labelledby='expiration-field'
+        id='expiration-field'
+      >
+        <Text>
+          {selectedExpiration?.label || t(localizationKeys('formFieldInputPlaceholder__apiKeyExpirationDate'))}
+        </Text>
+      </SelectButton>
+      <SelectOptionList
+        sx={t => ({
+          paddingBlock: t.space.$1,
+          color: t.colors.$colorText,
+          width: buttonWidth,
+        })}
+      />
+    </Select>
+  );
+};
+
+export const CreateApiKeyForm: React.FC<CreateApiKeyFormProps> = ({ onCreate, isSubmitting }) => {
+  const [selectedExpiration, setSelectedExpiration] = useState<ExpirationOption | null>(null);
   const { close: closeCardFn } = useActionContext();
   const { showDescription = false } = useApiKeysContext();
 
@@ -160,8 +166,7 @@ export const CreateApiKeyForm = ({ onCreate, isSubmitting }: CreateApiKeyFormPro
   });
 
   const canSubmit = nameField.value.length > 2;
-
-  const expirationCaption = getExpirationCaption(getTimeLeftInSeconds(selectedExpiration.value));
+  const expirationCaption = getExpirationCaption(getTimeLeftInSeconds(selectedExpiration?.value ?? null));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -169,7 +174,7 @@ export const CreateApiKeyForm = ({ onCreate, isSubmitting }: CreateApiKeyFormPro
       {
         name: nameField.value,
         description: descriptionField.value || undefined,
-        secondsUntilExpiration: getTimeLeftInSeconds(selectedExpiration.value),
+        secondsUntilExpiration: getTimeLeftInSeconds(selectedExpiration?.value ?? null),
       },
       closeCardFn,
     );
@@ -214,11 +219,6 @@ export const CreateApiKeyForm = ({ onCreate, isSubmitting }: CreateApiKeyFormPro
               selectedExpiration={selectedExpiration}
               setSelectedExpiration={setSelectedExpiration}
             />
-            {/* <input
-              name='apiKeyExpiration'
-              type='hidden'
-              value={selectedExpiration.value || ''}
-            /> */}
             <Text
               variant='caption'
               colorScheme='secondary'
