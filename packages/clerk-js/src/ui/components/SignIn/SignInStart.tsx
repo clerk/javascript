@@ -405,6 +405,7 @@ function SignInStartInternal(): JSX.Element {
       redirectUrl,
       redirectUrlComplete,
       oidcPrompt: ctx.oidcPrompt,
+      continueSignIn: true,
     });
   };
 
