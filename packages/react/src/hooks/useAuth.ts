@@ -96,7 +96,7 @@ export const useAuth = (initialAuthStateOrOptions: UseAuthOptions = {}): UseAuth
   useAssertWrappedByClerkProvider('useAuth');
 
   const { treatPendingAsSignedOut, ...rest } = initialAuthStateOrOptions ?? {};
-  const initialAuthState = rest as any;
+  const initialAuthState = (rest as any) ?? {};
 
   const authContextFromHook = useAuthContext();
   let authContext = authContextFromHook;
