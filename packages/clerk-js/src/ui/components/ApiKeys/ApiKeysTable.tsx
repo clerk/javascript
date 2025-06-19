@@ -117,6 +117,18 @@ export const ApiKeysTable = ({
   onRevoke: (id: string, name: string) => void;
   elementDescriptor?: ElementDescriptor;
 }) => {
+  const getExpirationDisplay = (expiration: Date | null): string => {
+    if (!expiration) {
+      return 'Never expires';
+    }
+
+    return `Expires ${expiration.toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    })}`;
+  };
+
   return (
     <Flex sx={t => ({ width: '100%', [mqu.sm]: { overflowX: 'auto', padding: t.space.$0x25 } })}>
       <Table
@@ -164,7 +176,7 @@ export const ApiKeysTable = ({
                     >
                       Created at {apiKey.createdAt.toLocaleDateString()}
                       {' • '}
-                      Never expires
+                      {getExpirationDisplay(apiKey.expiration)}
                     </Text>
                   </Flex>
                 </Td>
