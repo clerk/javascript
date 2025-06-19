@@ -7,7 +7,7 @@ import { Form } from '@/ui/elements/Form';
 import { FormButtons } from '@/ui/elements/FormButtons';
 import { FormContainer } from '@/ui/elements/FormContainer';
 import { Modal } from '@/ui/elements/Modal';
-import { localizationKeys } from '@/ui/localization';
+import { localizationKeys, useLocalizations } from '@/ui/localization';
 import { useFormControl } from '@/ui/utils';
 
 type RevokeAPIKeyConfirmationModalProps = {
@@ -31,6 +31,7 @@ export const RevokeAPIKeyConfirmationModal = ({
 }: RevokeAPIKeyConfirmationModalProps) => {
   const clerk = useClerk();
   const { mutate } = useSWRConfig();
+  const { t } = useLocalizations();
 
   const revokeField = useFormControl('apiKeyRevokeConfirmation', '', {
     type: 'text',
@@ -39,8 +40,7 @@ export const RevokeAPIKeyConfirmationModal = ({
     isRequired: true,
   });
 
-  // TODO: Make this locale-aware
-  const canSubmit = revokeField.value === 'Revoke';
+  const canSubmit = revokeField.value === t(localizationKeys('apiKeys.revokeConfirmation.confirmationText'));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -26,6 +26,7 @@ export const deDE: LocalizationResource = {
       formButtonPrimary__revoke: 'API-Key widerrufen',
       formHint: 'Sind Sie sicher, dass Sie diesen API-Key löschen wollen?',
       formTitle: 'API-Key "{{apiKeyName}}" widerrufen?',
+      confirmationText: 'Widerrufen',
     },
     formFieldOption__expiration__1d: undefined,
     formFieldOption__expiration__7d: undefined,

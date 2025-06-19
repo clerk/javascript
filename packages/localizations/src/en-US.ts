@@ -28,6 +28,7 @@ export const enUS: LocalizationResource = {
       formButtonPrimary__revoke: 'Revoke key',
       formHint: 'Are you sure you want to delete this Secret key?',
       formTitle: 'Revoke "{{apiKeyName}}" secret key?',
+      confirmationText: 'Revoke',
     },
   },
   backButton: 'Back',

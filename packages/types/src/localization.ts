@@ -1164,6 +1164,7 @@ export type __internal_LocalizationResource = {
       formTitle: LocalizationValue<'apiKeyName'>;
       formHint: LocalizationValue;
       formButtonPrimary__revoke: LocalizationValue;
+      confirmationText: LocalizationValue;
     };
     lastUsed__seconds: LocalizationValue<'seconds'>;
     lastUsed__minutes: LocalizationValue<'minutes'>;
