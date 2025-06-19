@@ -1180,6 +1180,10 @@ export type __internal_LocalizationResource = {
     formFieldOption__expiration__180d: LocalizationValue;
     formFieldOption__expiration__1y: LocalizationValue;
     formFieldOption__expiration__never: LocalizationValue;
+    createdAndExpirationStatus__never: LocalizationValue<'createdDate'>;
+    createdAndExpirationStatus__expiresOn: LocalizationValue<'createdDate' | 'expiresDate'>;
+    formFieldCaption__expiration__never: LocalizationValue;
+    formFieldCaption__expiration__expiresOn: LocalizationValue;
   };
 };
 

@@ -63,34 +63,15 @@ const getExpirationLocalizationKey = (expiration: Expiration) => {
 };
 
 const getTimeLeftInSeconds = (expirationOption: Expiration): number | undefined => {
-  if (!expirationOption) return undefined;
+  if (!expirationOption) {
+    return;
+  }
 
   const now = new Date();
   const future = new Date(now);
 
   EXPIRATION_DURATIONS[expirationOption](future);
   return Math.floor((future.getTime() - now.getTime()) / 1000);
-};
-
-const getExpirationCaption = (expirationSeconds?: number): string => {
-  if (!expirationSeconds) {
-    return 'This key will never expire';
-  }
-
-  const expirationDate = new Date(Date.now() + expirationSeconds * 1000);
-  return (
-    'Expiring ' +
-    expirationDate.toLocaleString(undefined, {
-      year: 'numeric',
-      month: 'long',
-      day: '2-digit',
-      hour: 'numeric',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: true,
-      timeZoneName: 'short',
-    })
-  );
 };
 
 interface ExpirationSelectorProps {
@@ -151,6 +132,7 @@ export const CreateApiKeyForm: React.FC<CreateApiKeyFormProps> = ({ onCreate, is
   const [selectedExpiration, setSelectedExpiration] = useState<ExpirationOption | null>(null);
   const { close: closeCardFn } = useActionContext();
   const { showDescription = false } = useApiKeysContext();
+  const { t } = useLocalizations();
 
   const nameField = useFormControl('name', '', {
     type: 'text',
@@ -167,10 +149,29 @@ export const CreateApiKeyForm: React.FC<CreateApiKeyFormProps> = ({ onCreate, is
   });
 
   const canSubmit = nameField.value.length > 2;
-  const expirationCaption = useMemo(
-    () => getExpirationCaption(getTimeLeftInSeconds(selectedExpiration?.value ?? null)),
-    [selectedExpiration?.value],
-  );
+  const expirationCaption = useMemo(() => {
+    const timeLeftInSeconds = getTimeLeftInSeconds(selectedExpiration?.value ?? null);
+
+    if (!selectedExpiration?.value || !timeLeftInSeconds) {
+      return t(localizationKeys('apiKeys.formFieldCaption__expiration__never'));
+    }
+
+    const expirationDate = new Date(Date.now() + timeLeftInSeconds * 1000);
+    return (
+      t(localizationKeys('apiKeys.formFieldCaption__expiration__expiresOn')) +
+      ' ' +
+      expirationDate.toLocaleString(undefined, {
+        year: 'numeric',
+        month: 'long',
+        day: '2-digit',
+        hour: 'numeric',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true,
+        timeZoneName: 'short',
+      })
+    );
+  }, [selectedExpiration?.value]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -235,9 +236,8 @@ export const CreateApiKeyForm: React.FC<CreateApiKeyFormProps> = ({ onCreate, is
             <Text
               variant='caption'
               colorScheme='secondary'
-            >
-              {expirationCaption}
-            </Text>
+              localizationKey={expirationCaption}
+            />
           </Col>
         </Box>
 

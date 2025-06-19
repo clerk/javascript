@@ -30,6 +30,11 @@ export const enUS: LocalizationResource = {
       formTitle: 'Revoke "{{apiKeyName}}" secret key?',
       confirmationText: 'Revoke',
     },
+    createdAndExpirationStatus__never: "Created {{ createdDate | shortDate('en-US') }} • Never expires",
+    createdAndExpirationStatus__expiresOn:
+      "Created {{ createdDate | shortDate('en-US') }} • Expires {{ expiresDate | longDate('en-US') }}",
+    formFieldCaption__expiration__never: 'This key will never expire',
+    formFieldCaption__expiration__expiresOn: 'Expiring',
   },
   backButton: 'Back',
   badge__activePlan: 'Active',
