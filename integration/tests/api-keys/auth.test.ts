@@ -16,9 +16,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withAPIKeys] })('auth() with 
   test.beforeAll(async () => {
     fakeUser = u.services.users.createFakeUser();
     fakeBapiUser = await u.services.users.createBapiUser(fakeUser);
-    console.log('fakeBapiUser 2', fakeBapiUser);
     fakeAPIKey = await u.services.users.createFakeAPIKey(fakeBapiUser.id);
-    console.log('fakeAPIKey 2', fakeAPIKey);
   });
 
   test.afterAll(async () => {
@@ -32,6 +30,11 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withAPIKeys] })('auth() with 
 
     // No API key provided
     const noKeyRes = await fetch(url);
+    if (noKeyRes.status !== 401) {
+      console.log('Unexpected status for "noKeyRes". Status:', noKeyRes.status, noKeyRes.statusText);
+      const body = await noKeyRes.text();
+      console.log('Error body:', body);
+    }
     expect(noKeyRes.status).toBe(401);
 
     // Invalid API key
