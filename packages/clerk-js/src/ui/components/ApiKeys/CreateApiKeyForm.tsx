@@ -81,14 +81,7 @@ interface ExpirationSelectorProps {
 
 const ExpirationSelector: React.FC<ExpirationSelectorProps> = ({ selectedExpiration, setSelectedExpiration }) => {
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const [buttonWidth, setButtonWidth] = useState<number>();
   const { t } = useLocalizations();
-
-  useLayoutEffect(() => {
-    if (buttonRef.current) {
-      setButtonWidth(buttonRef.current.offsetWidth);
-    }
-  }, []);
 
   const expirationOptions = EXPIRATION_VALUES.map(value => ({
     value,
@@ -102,6 +95,7 @@ const ExpirationSelector: React.FC<ExpirationSelectorProps> = ({ selectedExpirat
       value={selectedExpiration?.value ?? ''}
       onChange={setSelectedExpiration}
       placeholder={t(localizationKeys('formFieldInputPlaceholder__apiKeyExpirationDate'))}
+      referenceElement={buttonRef}
     >
       <SelectButton
         ref={buttonRef}
@@ -120,8 +114,7 @@ const ExpirationSelector: React.FC<ExpirationSelectorProps> = ({ selectedExpirat
       <SelectOptionList
         sx={t => ({
           paddingBlock: t.space.$1,
-          color: t.colors.$colorText,
-          width: buttonWidth,
+          color: t.colors.$colorText
         })}
       />
     </Select>
