@@ -13,7 +13,14 @@ import type {
   WaitlistEntryJSON,
 } from './JSON';
 
-type Webhook<EvtType, Data> = { type: EvtType; object: 'event'; data: Data };
+type WebhookEventAttributes = {
+  http_request: {
+    client_ip: string;
+    user_agent: string;
+  };
+};
+
+type Webhook<EvtType, Data> = { type: EvtType; object: 'event'; data: Data; event_attributes: WebhookEventAttributes };
 
 export type UserWebhookEvent =
   | Webhook<'user.created' | 'user.updated', UserJSON>

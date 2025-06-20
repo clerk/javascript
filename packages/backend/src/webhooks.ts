@@ -90,5 +90,6 @@ export async function verifyWebhook(request: Request, options: VerifyWebhookOpti
     type: payload.type,
     object: 'event',
     data: payload.data,
+    event_attributes: payload.event_attributes,
   } as WebhookEvent;
 }
