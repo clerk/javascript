@@ -1,6 +1,12 @@
 import type { PhoneCodeChannel } from 'phoneCodeChannel';
 
-import type { FirstNameAttribute, LastNameAttribute, LegalAcceptedAttribute, PasswordAttribute } from './attributes';
+import type {
+  CaptchaChallengeAttribute,
+  FirstNameAttribute,
+  LastNameAttribute,
+  LegalAcceptedAttribute,
+  PasswordAttribute,
+} from './attributes';
 import type { AttemptEmailAddressVerificationParams, PrepareEmailAddressVerificationParams } from './emailAddress';
 import type {
   EmailAddressIdentifier,
@@ -71,7 +77,7 @@ export interface SignUpResource extends ClerkResource {
   abandonAt: number | null;
   legalAcceptedAt: number | null;
 
-  create: (params: SignUpCreateParams) => Promise<SignUpResource>;
+  create: (params: SignUpCreateParams, options?: SignUpCreateOptions) => Promise<SignUpResource>;
 
   update: (params: SignUpUpdateParams) => Promise<SignUpResource>;
 
@@ -160,7 +166,12 @@ export type AttemptVerificationParams =
       signature: string;
     };
 
-export type SignUpAttributeField = FirstNameAttribute | LastNameAttribute | PasswordAttribute | LegalAcceptedAttribute;
+export type SignUpAttributeField =
+  | FirstNameAttribute
+  | LastNameAttribute
+  | PasswordAttribute
+  | LegalAcceptedAttribute
+  | CaptchaChallengeAttribute;
 
 // TODO: SignUpVerifiableField or SignUpIdentifier?
 export type SignUpVerifiableField =
@@ -198,6 +209,10 @@ export type SignUpCreateParams = Partial<
     channel: PhoneCodeChannel;
   } & Omit<SnakeToCamel<Record<SignUpAttributeField | SignUpVerifiableField, string>>, 'legalAccepted'>
 >;
+
+export type SignUpCreateOptions = Partial<{
+  skipCaptchaChallenge: boolean;
+}>;
 
 export type SignUpUpdateParams = SignUpCreateParams;
 
