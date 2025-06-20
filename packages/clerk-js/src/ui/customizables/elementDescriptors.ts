@@ -476,6 +476,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'apiKeysCreateFormDescriptionInput',
   'apiKeysCreateFormExpirationInput',
   'apiKeysCreateFormSubmitButton',
+  'apiKeysCreateFormExpirationCaption',
   'apiKeysRevokeModal',
   'apiKeysRevokeModalInput',
   'apiKeysRevokeModalSubmitButton',
