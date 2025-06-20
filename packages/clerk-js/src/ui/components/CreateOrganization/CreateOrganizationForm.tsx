@@ -1,7 +1,8 @@
 import { useOrganization, useOrganizationList } from '@clerk/shared/react';
 import type { CreateOrganizationParams, OrganizationResource } from '@clerk/types';
-import React from 'react';
+import React, { useContext } from 'react';
 
+import { SessionTasksContext } from '@/ui/contexts/components/SessionTasks';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Form } from '@/ui/elements/Form';
 import { FormButtonContainer } from '@/ui/elements/FormButtons';
@@ -23,7 +24,7 @@ import { organizationListParams } from '../OrganizationSwitcher/utils';
 
 type CreateOrganizationFormProps = {
   skipInvitationScreen: boolean;
-  navigateAfterCreateOrganization: (organization: OrganizationResource) => Promise<unknown>;
+  navigateAfterCreateOrganization?: (organization: OrganizationResource) => Promise<unknown>;
   onCancel?: () => void;
   onComplete?: () => void;
   flow: 'default' | 'organizationList';
@@ -37,6 +38,7 @@ type CreateOrganizationFormProps = {
 export const CreateOrganizationForm = withCardStateProvider((props: CreateOrganizationFormProps) => {
   const card = useCardState();
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
+  const sessionTasksContext = useContext(SessionTasksContext);
 
   const lastCreatedOrganizationRef = React.useRef<OrganizationResource | null>(null);
   const { createOrganization, isLoaded, setActive, userMemberships } = useOrganizationList({
@@ -87,6 +89,11 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
 
       void userMemberships.revalidate?.();
 
+      if (sessionTasksContext) {
+        await sessionTasksContext.nextTask();
+        return;
+      }
+
       if (props.skipInvitationScreen ?? organization.maxAllowedMemberships === 1) {
         return completeFlow();
       }
@@ -100,7 +107,7 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
   const completeFlow = () => {
     // We are confident that lastCreatedOrganizationRef.current will never be null
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    void props.navigateAfterCreateOrganization(lastCreatedOrganizationRef.current!);
+    void props.navigateAfterCreateOrganization?.(lastCreatedOrganizationRef.current!);
 
     props.onComplete?.();
   };
