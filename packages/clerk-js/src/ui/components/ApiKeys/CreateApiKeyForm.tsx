@@ -62,8 +62,8 @@ const getExpirationLocalizationKey = (expiration: Expiration) => {
   }
 };
 
-const getTimeLeftInSeconds = (expirationOption: Expiration): number | undefined => {
-  if (expirationOption === 'never') {
+const getTimeLeftInSeconds = (expirationOption?: Expiration): number | undefined => {
+  if (expirationOption === 'never' || !expirationOption) {
     return;
   }
 
@@ -139,7 +139,7 @@ export const CreateApiKeyForm: React.FC<CreateApiKeyFormProps> = ({ onCreate, is
 
   const canSubmit = nameField.value.length > 2;
   const expirationCaption = useMemo(() => {
-    const timeLeftInSeconds = getTimeLeftInSeconds(selectedExpiration?.value ?? 'never');
+    const timeLeftInSeconds = getTimeLeftInSeconds(selectedExpiration?.value);
 
     if (!selectedExpiration?.value || !timeLeftInSeconds) {
       return t(localizationKeys('apiKeys.formFieldCaption__expiration__never'));
@@ -168,7 +168,7 @@ export const CreateApiKeyForm: React.FC<CreateApiKeyFormProps> = ({ onCreate, is
       {
         name: nameField.value,
         description: descriptionField.value || undefined,
-        secondsUntilExpiration: getTimeLeftInSeconds(selectedExpiration?.value ?? 'never'),
+        secondsUntilExpiration: getTimeLeftInSeconds(selectedExpiration?.value),
       },
       closeCardFn,
     );
@@ -215,9 +215,8 @@ export const CreateApiKeyForm: React.FC<CreateApiKeyFormProps> = ({ onCreate, is
               <Text
                 variant='caption'
                 colorScheme='secondary'
-              >
-                Optional
-              </Text>
+                localizationKey={localizationKeys('formFieldHintText__optional')}
+              />
             </FormLabel>
             <ExpirationSelector
               selectedExpiration={selectedExpiration}
