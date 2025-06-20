@@ -93,12 +93,11 @@ export const createRadiiUnits = (theme: Theme) => {
   }
 
   const md = borderRadius === 'none' ? '0' : borderRadius;
-  const { numericValue, unit = 'rem' } = splitCssUnit(md);
   return {
-    sm: (numericValue * 0.66).toString() + unit,
+    sm: `calc(${borderRadius} * 0.66)`,
     md,
-    lg: (numericValue * 1.33).toString() + unit,
-    xl: (numericValue * 2).toString() + unit,
+    lg: `calc(${borderRadius} * 1.33)`,
+    xl: `calc(${borderRadius} * 2)`,
   };
 };
 
@@ -107,12 +106,11 @@ export const createSpaceScale = (theme: Theme) => {
   if (spacingUnit === undefined) {
     return;
   }
-  const { numericValue, unit } = splitCssUnit(spacingUnit);
   return fromEntries(
     spaceScaleKeys.map(k => {
       const num = Number.parseFloat(k.replace('x', '.'));
-      const percentage = (num / 0.5) * 0.125;
-      return [k, `${numericValue * percentage}${unit}`];
+      const multiplier = num * 0.25;
+      return [k, `calc(${spacingUnit} * ${multiplier})`];
     }),
   );
 };
@@ -125,13 +123,12 @@ export const createFontSizeScale = (theme: Theme): Record<keyof typeof fontSizes
   if (fontSize === undefined) {
     return;
   }
-  const { numericValue, unit = 'rem' } = splitCssUnit(fontSize);
   return {
-    xs: (numericValue * 0.8).toString() + unit,
-    sm: (numericValue * 0.9).toString() + unit,
+    xs: `calc(${fontSize} * 0.8)`,
+    sm: `calc(${fontSize} * 0.9)`,
     md: fontSize,
-    lg: (numericValue * 1.3).toString() + unit,
-    xl: (numericValue * 1.85).toString() + unit,
+    lg: `calc(${fontSize} * 1.3)`,
+    xl: `calc(${fontSize} * 1.85)`,
   };
 };
 
@@ -143,10 +140,4 @@ export const createFontWeightScale = (theme: Theme): Record<keyof typeof fontWei
 export const createFonts = (theme: Theme) => {
   const { fontFamily, fontFamilyButtons } = theme.variables || {};
   return removeUndefinedProps({ main: fontFamily, buttons: fontFamilyButtons });
-};
-
-const splitCssUnit = (str: string) => {
-  const numericValue = Number.parseFloat(str);
-  const unit = str.replace(numericValue.toString(), '') || undefined;
-  return { numericValue, unit };
 };
