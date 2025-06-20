@@ -1,6 +1,7 @@
 import type { ImageJSON, ImageResource } from '@clerk/types';
 
 import { BaseResource } from './internal';
+import { parseJSON } from './parser';
 
 export class Image extends BaseResource implements ImageResource {
   id?: string;
@@ -49,12 +50,7 @@ export class Image extends BaseResource implements ImageResource {
   }
 
   protected fromJSON(data: ImageJSON | null): this {
-    if (!data) {
-      return this;
-    }
-    this.id = data.id;
-    this.name = data.name;
-    this.publicUrl = data.public_url;
+    Object.assign(this, parseJSON<Image>(data));
     return this;
   }
 }

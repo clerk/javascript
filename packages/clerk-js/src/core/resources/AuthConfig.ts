@@ -1,7 +1,7 @@
 import type { AuthConfigJSON, AuthConfigJSONSnapshot, AuthConfigResource, PhoneCodeChannel } from '@clerk/types';
 
-import { unixEpochToDate } from '../../utils/date';
 import { BaseResource } from './internal';
+import { parseJSON } from './parser';
 
 export class AuthConfig extends BaseResource implements AuthConfigResource {
   claimedAt: Date | null = null;
@@ -11,7 +11,6 @@ export class AuthConfig extends BaseResource implements AuthConfigResource {
 
   public constructor(data: Partial<AuthConfigJSON> | null = null) {
     super();
-
     this.fromJSON(data);
   }
 
@@ -19,10 +18,19 @@ export class AuthConfig extends BaseResource implements AuthConfigResource {
     if (!data) {
       return this;
     }
-    this.claimedAt = this.withDefault(data.claimed_at ? unixEpochToDate(data.claimed_at) : null, this.claimedAt);
-    this.reverification = this.withDefault(data.reverification, this.reverification);
-    this.singleSessionMode = this.withDefault(data.single_session_mode, this.singleSessionMode);
-    this.preferredChannels = this.withDefault(data.preferred_channels, this.preferredChannels);
+
+    Object.assign(
+      this,
+      parseJSON<AuthConfigResource>(data, {
+        dateFields: ['claimedAt'],
+        defaultValues: {
+          claimedAt: null,
+          reverification: false,
+          singleSessionMode: false,
+          preferredChannels: null,
+        },
+      }),
+    );
     return this;
   }
 

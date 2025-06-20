@@ -1,7 +1,7 @@
 import type { BackupCodeJSON, BackupCodeResource } from '@clerk/types';
 
-import { unixEpochToDate } from '../../utils/date';
 import { BaseResource } from './internal';
+import { parseJSON } from './parser';
 
 export class BackupCode extends BaseResource implements BackupCodeResource {
   pathRoot = '/me';
@@ -21,10 +21,12 @@ export class BackupCode extends BaseResource implements BackupCodeResource {
       return this;
     }
 
-    this.id = data.id;
-    this.codes = data.codes;
-    this.updatedAt = unixEpochToDate(data.updated_at);
-    this.createdAt = unixEpochToDate(data.created_at);
+    Object.assign(
+      this,
+      parseJSON<BackupCodeResource>(data, {
+        dateFields: ['updatedAt', 'createdAt'],
+      }),
+    );
     return this;
   }
 }

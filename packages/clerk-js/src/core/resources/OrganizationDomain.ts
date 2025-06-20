@@ -10,6 +10,7 @@ import type {
 
 import { unixEpochToDate } from '../../utils/date';
 import { BaseResource } from './Base';
+import { parseJSON } from './parser';
 
 export class OrganizationDomain extends BaseResource implements OrganizationDomainResource {
   id!: string;
@@ -73,25 +74,23 @@ export class OrganizationDomain extends BaseResource implements OrganizationDoma
   };
 
   protected fromJSON(data: OrganizationDomainJSON | null): this {
-    if (data) {
-      this.id = data.id;
-      this.name = data.name;
-      this.organizationId = data.organization_id;
-      this.enrollmentMode = data.enrollment_mode;
-      this.affiliationEmailAddress = data.affiliation_email_address;
-      this.totalPendingSuggestions = data.total_pending_suggestions;
-      this.totalPendingInvitations = data.total_pending_invitations;
-      if (data.verification) {
-        this.verification = {
-          status: data.verification.status,
-          strategy: data.verification.strategy,
-          attempts: data.verification.attempts,
-          expiresAt: unixEpochToDate(data.verification.expires_at),
-        };
-      } else {
-        this.verification = null;
-      }
-    }
+    Object.assign(
+      this,
+      parseJSON<OrganizationDomain>(data, {
+        dateFields: ['createdAt', 'updatedAt'],
+        customTransforms: {
+          verification: (value: any) =>
+            value
+              ? {
+                  status: value.status,
+                  strategy: value.strategy,
+                  attempts: value.attempts,
+                  expiresAt: unixEpochToDate(value.expires_at),
+                }
+              : null,
+        },
+      }),
+    );
     return this;
   }
 }

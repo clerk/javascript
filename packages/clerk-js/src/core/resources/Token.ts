@@ -2,6 +2,7 @@ import type { JWT, TokenJSON, TokenJSONSnapshot, TokenResource } from '@clerk/ty
 
 import { decode } from '../../utils';
 import { BaseResource } from './internal';
+import { parseJSON } from './parser';
 
 export class Token extends BaseResource implements TokenResource {
   pathRoot = 'tokens';
@@ -25,9 +26,7 @@ export class Token extends BaseResource implements TokenResource {
       this.pathRoot = pathRoot;
     }
 
-    if (data?.jwt) {
-      this.jwt = decode(data.jwt);
-    }
+    this.fromJSON(data);
   }
 
   getRawString = (): string => {
@@ -35,11 +34,14 @@ export class Token extends BaseResource implements TokenResource {
   };
 
   protected fromJSON(data: TokenJSON | TokenJSONSnapshot | null): this {
-    if (!data) {
-      return this;
-    }
-
-    this.jwt = decode(data.jwt);
+    Object.assign(
+      this,
+      parseJSON<Token>(data, {
+        customTransforms: {
+          jwt: (value: string) => (value ? decode(value) : undefined),
+        },
+      }),
+    );
     return this;
   }
 

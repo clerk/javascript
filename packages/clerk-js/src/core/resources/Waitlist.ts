@@ -1,7 +1,7 @@
 import type { JoinWaitlistParams, WaitlistJSON, WaitlistResource } from '@clerk/types';
 
-import { unixEpochToDate } from '../../utils/date';
 import { BaseResource } from './internal';
+import { parseJSON } from './parser';
 
 export class Waitlist extends BaseResource implements WaitlistResource {
   pathRoot = '/waitlist';
@@ -16,13 +16,17 @@ export class Waitlist extends BaseResource implements WaitlistResource {
   }
 
   protected fromJSON(data: WaitlistJSON | null): this {
-    if (!data) {
-      return this;
-    }
-
-    this.id = data.id;
-    this.updatedAt = unixEpochToDate(data.updated_at);
-    this.createdAt = unixEpochToDate(data.created_at);
+    Object.assign(
+      this,
+      parseJSON<Waitlist>(data, {
+        dateFields: ['updatedAt', 'createdAt'],
+        defaultValues: {
+          id: '',
+          updatedAt: null,
+          createdAt: null,
+        },
+      }),
+    );
     return this;
   }
 

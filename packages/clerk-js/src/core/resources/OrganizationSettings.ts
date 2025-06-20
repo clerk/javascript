@@ -1,26 +1,26 @@
 import type {
-  OrganizationEnrollmentMode,
   OrganizationSettingsJSON,
   OrganizationSettingsJSONSnapshot,
   OrganizationSettingsResource,
 } from '@clerk/types';
 
 import { BaseResource } from './internal';
+import { parseJSON } from './parser';
 
 export class OrganizationSettings extends BaseResource implements OrganizationSettingsResource {
-  actions: { adminDelete: boolean } = { adminDelete: false };
-  domains: {
-    enabled: boolean;
-    enrollmentModes: OrganizationEnrollmentMode[];
-    defaultRole: string | null;
-  } = {
+  actions = {
+    adminDelete: false,
+  };
+
+  domains = {
     enabled: false,
     enrollmentModes: [],
-    defaultRole: null,
+    defaultRole: '',
   };
-  enabled: boolean = false;
-  maxAllowedMemberships: number = 1;
-  forceOrganizationSelection!: boolean;
+
+  enabled = false;
+  maxAllowedMemberships = 1;
+  forceOrganizationSelection = false;
 
   public constructor(data: OrganizationSettingsJSON | OrganizationSettingsJSONSnapshot | null = null) {
     super();
@@ -32,28 +32,33 @@ export class OrganizationSettings extends BaseResource implements OrganizationSe
       return this;
     }
 
-    if (data.actions) {
-      this.actions.adminDelete = this.withDefault(data.actions.admin_delete, this.actions.adminDelete);
-    }
-
-    if (data.domains) {
-      this.domains.enabled = this.withDefault(data.domains.enabled, this.domains.enabled);
-      this.domains.enrollmentModes = this.withDefault(data.domains.enrollment_modes, this.domains.enrollmentModes);
-      this.domains.defaultRole = this.withDefault(data.domains.default_role, this.domains.defaultRole);
-    }
-
-    this.enabled = this.withDefault(data.enabled, this.enabled);
-    this.maxAllowedMemberships = this.withDefault(data.max_allowed_memberships, this.maxAllowedMemberships);
-    this.forceOrganizationSelection = this.withDefault(
-      data.force_organization_selection,
-      this.forceOrganizationSelection,
+    Object.assign(
+      this,
+      parseJSON<OrganizationSettingsResource>(data, {
+        defaultValues: {
+          enabled: false,
+          maxAllowedMemberships: 1,
+          forceOrganizationSelection: false,
+        },
+        customTransforms: {
+          actions: value => ({
+            adminDelete: value?.admin_delete || false,
+          }),
+          domains: value => ({
+            enabled: value?.enabled || false,
+            enrollmentModes: value?.enrollment_modes || [],
+            defaultRole: value?.default_role || '',
+          }),
+        },
+      }),
     );
-
     return this;
   }
 
   public __internal_toSnapshot(): OrganizationSettingsJSONSnapshot {
     return {
+      id: this.id || '',
+      object: 'organization_settings',
       actions: {
         admin_delete: this.actions.adminDelete,
       },
@@ -64,6 +69,7 @@ export class OrganizationSettings extends BaseResource implements OrganizationSe
       },
       enabled: this.enabled,
       max_allowed_memberships: this.maxAllowedMemberships,
+      force_organization_selection: this.forceOrganizationSelection,
     } as unknown as OrganizationSettingsJSONSnapshot;
   }
 }

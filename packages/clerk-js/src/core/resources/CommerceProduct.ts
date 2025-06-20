@@ -1,6 +1,8 @@
 import type { CommerceProductJSON, CommerceProductResource } from '@clerk/types';
 
-import { BaseResource, CommercePlan } from './internal';
+import { CommercePlan } from './CommercePlan';
+import { BaseResource } from './internal';
+import { parseJSON } from './parser';
 
 export class CommerceProduct extends BaseResource implements CommerceProductResource {
   id!: string;
@@ -19,12 +21,14 @@ export class CommerceProduct extends BaseResource implements CommerceProductReso
       return this;
     }
 
-    this.id = data.id;
-    this.slug = data.slug;
-    this.currency = data.currency;
-    this.isDefault = data.is_default;
-    this.plans = data.plans.map(plan => new CommercePlan(plan));
-
+    Object.assign(
+      this,
+      parseJSON<CommerceProductResource>(data, {
+        arrayFields: {
+          plans: CommercePlan,
+        },
+      }),
+    );
     return this;
   }
 }

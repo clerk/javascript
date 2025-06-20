@@ -1,7 +1,7 @@
 import type { ApiKeyJSON, APIKeyResource } from '@clerk/types';
 
-import { unixEpochToDate } from '../../utils/date';
 import { BaseResource } from './internal';
+import { parseJSON } from './parser';
 
 export class APIKey extends BaseResource implements APIKeyResource {
   pathRoot = '/api_keys';
@@ -28,25 +28,20 @@ export class APIKey extends BaseResource implements APIKeyResource {
   }
 
   protected fromJSON(data: ApiKeyJSON | null): this {
-    if (!data) {
-      return this;
-    }
-
-    this.id = data.id;
-    this.type = data.type;
-    this.name = data.name;
-    this.subject = data.subject;
-    this.scopes = data.scopes;
-    this.claims = data.claims;
-    this.revoked = data.revoked;
-    this.revocationReason = data.revocation_reason;
-    this.expired = data.expired;
-    this.expiration = data.expiration ? unixEpochToDate(data.expiration) : null;
-    this.createdBy = data.created_by;
-    this.description = data.description;
-    this.lastUsedAt = data.last_used_at ? unixEpochToDate(data.last_used_at) : null;
-    this.updatedAt = unixEpochToDate(data.updated_at);
-    this.createdAt = unixEpochToDate(data.created_at);
+    Object.assign(
+      this,
+      parseJSON<APIKey>(data, {
+        dateFields: ['expiration', 'lastUsedAt', 'createdAt', 'updatedAt'],
+        defaultValues: {
+          claims: null,
+          revocationReason: null,
+          expiration: null,
+          createdBy: null,
+          description: null,
+          lastUsedAt: null,
+        },
+      }),
+    );
     return this;
   }
 

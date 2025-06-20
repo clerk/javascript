@@ -3,14 +3,15 @@ import type {
   ClientJSON,
   ClientJSONSnapshot,
   ClientResource,
+  SessionJSON,
   SignedInSessionResource,
   SignInResource,
   SignUpResource,
 } from '@clerk/types';
 
-import { unixEpochToDate } from '../../utils/date';
 import { SessionTokenCache } from '../tokenCache';
 import { BaseResource, Session, SignIn, SignUp } from './internal';
+import { parseJSON } from './parser';
 
 export class Client extends BaseResource implements ClientResource {
   private static instance: Client | null | undefined;
@@ -122,18 +123,27 @@ export class Client extends BaseResource implements ClientResource {
   }
 
   fromJSON(data: ClientJSON | ClientJSONSnapshot | null): this {
-    if (data) {
-      this.id = data.id;
-      this.sessions = (data.sessions || []).map(s => new Session(s));
-      this.signUp = new SignUp(data.sign_up);
-      this.signIn = new SignIn(data.sign_in);
-      this.lastActiveSessionId = data.last_active_session_id;
-      this.captchaBypass = data.captcha_bypass || false;
-      this.cookieExpiresAt = data.cookie_expires_at ? unixEpochToDate(data.cookie_expires_at) : null;
-      this.createdAt = unixEpochToDate(data.created_at || undefined);
-      this.updatedAt = unixEpochToDate(data.updated_at || undefined);
-    }
-
+    Object.assign(
+      this,
+      parseJSON<Client>(data, {
+        dateFields: ['cookieExpiresAt', 'createdAt', 'updatedAt'],
+        customTransforms: {
+          sessions: (value: SessionJSON[] | null | undefined) => (value || []).map(s => new Session(s)),
+          signUp: value => new SignUp(value),
+          signIn: value => new SignIn(value),
+        },
+        defaultValues: {
+          sessions: [],
+          signUp: new SignUp(),
+          signIn: new SignIn(),
+          lastActiveSessionId: null,
+          captchaBypass: false,
+          cookieExpiresAt: null,
+          createdAt: null,
+          updatedAt: null,
+        },
+      }),
+    );
     return this;
   }
 

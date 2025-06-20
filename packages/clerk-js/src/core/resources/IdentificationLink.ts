@@ -1,6 +1,7 @@
 import type { IdentificationLinkJSON, IdentificationLinkJSONSnapshot, IdentificationLinkResource } from '@clerk/types';
 
 import { BaseResource } from './Base';
+import { parseJSON } from './parser';
 
 export class IdentificationLink extends BaseResource implements IdentificationLinkResource {
   id!: string;
@@ -16,8 +17,7 @@ export class IdentificationLink extends BaseResource implements IdentificationLi
       return this;
     }
 
-    this.id = data.id;
-    this.type = data.type;
+    Object.assign(this, parseJSON<IdentificationLinkResource>(data));
     return this;
   }
 

@@ -1,7 +1,7 @@
 import type { RoleJSON, RoleResource } from '@clerk/types';
 
-import { unixEpochToDate } from '../../utils/date';
 import { BaseResource } from './internal';
+import { parseJSON } from './parser';
 import { Permission } from './Permission';
 
 export class Role extends BaseResource implements RoleResource {
@@ -23,13 +23,15 @@ export class Role extends BaseResource implements RoleResource {
       return this;
     }
 
-    this.id = data.id;
-    this.key = data.key;
-    this.name = data.name;
-    this.description = data.description;
-    this.permissions = data.permissions.map(perm => new Permission(perm));
-    this.createdAt = unixEpochToDate(data.created_at);
-    this.updatedAt = unixEpochToDate(data.updated_at);
+    Object.assign(
+      this,
+      parseJSON<RoleResource>(data, {
+        dateFields: ['createdAt', 'updatedAt'],
+        arrayFields: {
+          permissions: Permission,
+        },
+      }),
+    );
     return this;
   }
 }

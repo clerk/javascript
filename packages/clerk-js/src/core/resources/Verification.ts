@@ -3,7 +3,6 @@ import type {
   ClerkAPIError,
   PasskeyVerificationResource,
   PhoneCodeChannel,
-  PublicKeyCredentialCreationOptionsJSON,
   PublicKeyCredentialCreationOptionsWithoutExtensions,
   SignUpVerificationJSON,
   SignUpVerificationJSONSnapshot,
@@ -17,9 +16,9 @@ import type {
   VerificationStatus,
 } from '@clerk/types';
 
-import { unixEpochToDate } from '../../utils/date';
 import { convertJSONToPublicKeyCreateOptions } from '../../utils/passkeys';
 import { BaseResource } from './internal';
+import { parseJSON } from './parser';
 
 export class Verification extends BaseResource implements VerificationResource {
   pathRoot = '';
@@ -45,22 +44,27 @@ export class Verification extends BaseResource implements VerificationResource {
   };
 
   protected fromJSON(data: VerificationJSON | VerificationJSONSnapshot | null): this {
-    if (data) {
-      this.status = data.status;
-      this.verifiedAtClient = data.verified_at_client;
-      this.strategy = data.strategy;
-      this.nonce = data.nonce || null;
-      this.message = data.message || null;
-      if (data.external_verification_redirect_url) {
-        this.externalVerificationRedirectURL = new URL(data.external_verification_redirect_url);
-      } else {
-        this.externalVerificationRedirectURL = null;
-      }
-      this.attempts = data.attempts;
-      this.expireAt = unixEpochToDate(data.expire_at || undefined);
-      this.error = data.error ? parseError(data.error) : null;
-      this.channel = data.channel || undefined;
-    }
+    Object.assign(
+      this,
+      parseJSON<Verification>(data, {
+        dateFields: ['expireAt'],
+        customTransforms: {
+          error: (value: any) => (value ? parseError(value) : null),
+          externalVerificationRedirectURL: (value: string | null) => (value ? new URL(value) : null),
+        },
+        defaultValues: {
+          status: null,
+          strategy: null,
+          nonce: null,
+          message: null,
+          externalVerificationRedirectURL: null,
+          attempts: null,
+          expireAt: null,
+          error: null,
+          verifiedAtClient: null,
+        },
+      }),
+    );
     return this;
   }
 
@@ -94,11 +98,18 @@ export class PasskeyVerification extends Verification implements PasskeyVerifica
    */
   protected fromJSON(data: VerificationJSON | VerificationJSONSnapshot | null): this {
     super.fromJSON(data);
-    if (data?.nonce) {
-      this.publicKey = convertJSONToPublicKeyCreateOptions(
-        JSON.parse(data.nonce) as PublicKeyCredentialCreationOptionsJSON,
-      );
-    }
+    Object.assign(
+      this,
+      parseJSON<PasskeyVerification>(data, {
+        customTransforms: {
+          publicKey: (value: string | null) =>
+            value && data?.nonce ? convertJSONToPublicKeyCreateOptions(JSON.parse(data.nonce)) : null,
+        },
+        defaultValues: {
+          publicKey: null,
+        },
+      }),
+    );
     return this;
   }
 }
@@ -134,18 +145,20 @@ export class SignUpVerifications implements SignUpVerificationsResource {
 }
 
 export class SignUpVerification extends Verification {
-  nextAction: string;
-  supportedStrategies: string[];
+  nextAction: string = '';
+  supportedStrategies: string[] = [];
 
   constructor(data: SignUpVerificationJSON | SignUpVerificationJSONSnapshot | null) {
     super(data);
-    if (data) {
-      this.nextAction = data.next_action;
-      this.supportedStrategies = data.supported_strategies;
-    } else {
-      this.nextAction = '';
-      this.supportedStrategies = [];
-    }
+    Object.assign(
+      this,
+      parseJSON<SignUpVerification>(data, {
+        defaultValues: {
+          nextAction: '',
+          supportedStrategies: [],
+        },
+      }),
+    );
   }
 
   public __internal_toSnapshot(): SignUpVerificationJSONSnapshot {

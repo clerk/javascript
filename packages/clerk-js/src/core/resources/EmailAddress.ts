@@ -14,6 +14,7 @@ import type {
 } from '@clerk/types';
 
 import { BaseResource, IdentificationLink, Verification } from './internal';
+import { parseJSON } from './parser';
 
 export class EmailAddress extends BaseResource implements EmailAddressResource {
   id!: string;
@@ -117,15 +118,21 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
   toString = (): string => this.emailAddress;
 
   protected fromJSON(data: EmailAddressJSON | EmailAddressJSONSnapshot | null): this {
-    if (!data) {
-      return this;
-    }
-
-    this.id = data.id;
-    this.emailAddress = data.email_address;
-    this.verification = new Verification(data.verification);
-    this.matchesSsoConnection = data.matches_sso_connection;
-    this.linkedTo = (data.linked_to || []).map(link => new IdentificationLink(link));
+    Object.assign(
+      this,
+      parseJSON<EmailAddress>(data, {
+        nestedFields: {
+          verification: Verification,
+        },
+        arrayFields: {
+          linkedTo: IdentificationLink,
+        },
+        defaultValues: {
+          linkedTo: [],
+          emailAddress: '',
+        },
+      }),
+    );
     return this;
   }
 

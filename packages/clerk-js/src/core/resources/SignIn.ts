@@ -1,6 +1,6 @@
 import { ClerkWebAuthnError } from '@clerk/shared/error';
 import { Poller } from '@clerk/shared/poller';
-import { deepCamelToSnake, deepSnakeToCamel } from '@clerk/shared/underscore';
+import { deepCamelToSnake } from '@clerk/shared/underscore';
 import {
   isWebAuthnAutofillSupported as isWebAuthnAutofillSupportedOnWindow,
   isWebAuthnSupported as isWebAuthnSupportedOnWindow,
@@ -67,6 +67,7 @@ import {
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from '../errors';
 import { BaseResource, UserData, Verification } from './internal';
+import { parseJSON } from './parser';
 
 export class SignIn extends BaseResource implements SignInResource {
   pathRoot = '/client/sign_ins';
@@ -445,18 +446,24 @@ export class SignIn extends BaseResource implements SignInResource {
   };
 
   protected fromJSON(data: SignInJSON | SignInJSONSnapshot | null): this {
-    if (data) {
-      this.id = data.id;
-      this.status = data.status;
-      this.supportedIdentifiers = data.supported_identifiers;
-      this.identifier = data.identifier;
-      this.supportedFirstFactors = deepSnakeToCamel(data.supported_first_factors) as SignInFirstFactor[] | null;
-      this.supportedSecondFactors = deepSnakeToCamel(data.supported_second_factors) as SignInSecondFactor[] | null;
-      this.firstFactorVerification = new Verification(data.first_factor_verification);
-      this.secondFactorVerification = new Verification(data.second_factor_verification);
-      this.createdSessionId = data.created_session_id;
-      this.userData = new UserData(data.user_data);
-    }
+    Object.assign(
+      this,
+      parseJSON<SignIn>(data, {
+        nestedFields: {
+          firstFactorVerification: Verification,
+          secondFactorVerification: Verification,
+          userData: UserData,
+        },
+        defaultValues: {
+          status: null,
+          supportedIdentifiers: [],
+          supportedFirstFactors: [],
+          supportedSecondFactors: null,
+          identifier: null,
+          createdSessionId: null,
+        },
+      }),
+    );
     return this;
   }
 

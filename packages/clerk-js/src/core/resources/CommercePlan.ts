@@ -1,6 +1,8 @@
 import type { CommercePlanJSON, CommercePlanJSONSnapshot, CommercePlanResource } from '@clerk/types';
 
-import { BaseResource, CommerceFeature } from './internal';
+import { CommerceFeature } from './CommerceFeature';
+import { BaseResource } from './internal';
+import { parseJSON } from './parser';
 
 export class CommercePlan extends BaseResource implements CommercePlanResource {
   id!: string;
@@ -33,26 +35,14 @@ export class CommercePlan extends BaseResource implements CommercePlanResource {
       return this;
     }
 
-    this.id = data.id;
-    this.name = data.name;
-    this.amount = data.amount;
-    this.amountFormatted = data.amount_formatted;
-    this.annualAmount = data.annual_amount;
-    this.annualAmountFormatted = data.annual_amount_formatted;
-    this.annualMonthlyAmount = data.annual_monthly_amount;
-    this.annualMonthlyAmountFormatted = data.annual_monthly_amount_formatted;
-    this.currencySymbol = data.currency_symbol;
-    this.currency = data.currency;
-    this.description = data.description;
-    this.isDefault = data.is_default;
-    this.isRecurring = data.is_recurring;
-    this.hasBaseFee = data.has_base_fee;
-    this.payerType = data.payer_type;
-    this.publiclyVisible = data.publicly_visible;
-    this.slug = data.slug;
-    this.avatarUrl = data.avatar_url;
-    this.features = (data.features || []).map(feature => new CommerceFeature(feature));
-
+    Object.assign(
+      this,
+      parseJSON<CommercePlanResource>(data, {
+        arrayFields: {
+          features: CommerceFeature,
+        },
+      }),
+    );
     return this;
   }
 

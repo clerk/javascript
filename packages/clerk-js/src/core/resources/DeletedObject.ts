@@ -1,5 +1,7 @@
 import type { DeletedObjectJSON, DeletedObjectResource } from '@clerk/types';
 
+import { parseJSON } from './parser';
+
 export class DeletedObject implements DeletedObjectResource {
   object = '';
   id?: string;
@@ -15,10 +17,7 @@ export class DeletedObject implements DeletedObjectResource {
       return this;
     }
 
-    this.object = data.object;
-    this.id = data.id;
-    this.slug = data.slug;
-    this.deleted = data.deleted;
+    Object.assign(this, parseJSON<DeletedObjectResource>(data));
     return this;
   }
 }

@@ -47,6 +47,7 @@ import {
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from '../errors';
 import { BaseResource, ClerkRuntimeError, SignUpVerifications } from './internal';
+import { parseJSON } from './parser';
 
 declare global {
   interface Window {
@@ -387,27 +388,33 @@ export class SignUp extends BaseResource implements SignUpResource {
   };
 
   protected fromJSON(data: SignUpJSON | SignUpJSONSnapshot | null): this {
-    if (data) {
-      this.id = data.id;
-      this.status = data.status;
-      this.requiredFields = data.required_fields;
-      this.optionalFields = data.optional_fields;
-      this.missingFields = data.missing_fields;
-      this.unverifiedFields = data.unverified_fields;
-      this.verifications = new SignUpVerifications(data.verifications);
-      this.username = data.username;
-      this.firstName = data.first_name;
-      this.lastName = data.last_name;
-      this.emailAddress = data.email_address;
-      this.phoneNumber = data.phone_number;
-      this.hasPassword = data.has_password;
-      this.unsafeMetadata = data.unsafe_metadata;
-      this.createdSessionId = data.created_session_id;
-      this.createdUserId = data.created_user_id;
-      this.abandonAt = data.abandon_at;
-      this.web3wallet = data.web3_wallet;
-      this.legalAcceptedAt = data.legal_accepted_at;
-    }
+    Object.assign(
+      this,
+      parseJSON<SignUp>(data, {
+        nestedFields: {
+          verifications: SignUpVerifications,
+        },
+        defaultValues: {
+          status: null,
+          requiredFields: [],
+          optionalFields: [],
+          missingFields: [],
+          unverifiedFields: [],
+          username: null,
+          firstName: null,
+          lastName: null,
+          emailAddress: null,
+          phoneNumber: null,
+          hasPassword: false,
+          unsafeMetadata: {},
+          createdSessionId: null,
+          createdUserId: null,
+          abandonAt: null,
+          web3wallet: null,
+          legalAcceptedAt: null,
+        },
+      }),
+    );
     return this;
   }
 

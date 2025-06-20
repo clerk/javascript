@@ -10,15 +10,17 @@ import type {
 } from '@clerk/types';
 
 import { convertPageToOffsetSearchParams } from '../../utils/convertPageToOffsetSearchParams';
-import { unixEpochToDate } from '../../utils/date';
 import { clerkUnsupportedReloadMethod } from '../errors';
-import { BaseResource, Organization, PublicUserData } from './internal';
+import { BaseResource } from './internal';
+import { Organization } from './Organization';
+import { parseJSON } from './parser';
+import { PublicUserData } from './PublicUserData';
 
 export class OrganizationMembership extends BaseResource implements OrganizationMembershipResource {
   id!: string;
+  organization!: Organization;
   publicMetadata: OrganizationMembershipPublicMetadata = {};
   publicUserData?: PublicUserData;
-  organization!: Organization;
   permissions: OrganizationPermissionKey[] = [];
   role!: OrganizationCustomRoleKey;
   roleName!: string;
@@ -70,17 +72,20 @@ export class OrganizationMembership extends BaseResource implements Organization
       return this;
     }
 
-    this.id = data.id;
-    this.organization = new Organization(data.organization);
-    this.publicMetadata = data.public_metadata || {};
-    if (data.public_user_data) {
-      this.publicUserData = new PublicUserData(data.public_user_data);
-    }
-    this.permissions = Array.isArray(data.permissions) ? [...data.permissions] : [];
-    this.role = data.role;
-    this.roleName = data.role_name;
-    this.createdAt = unixEpochToDate(data.created_at);
-    this.updatedAt = unixEpochToDate(data.updated_at);
+    Object.assign(
+      this,
+      parseJSON<OrganizationMembershipResource>(data, {
+        dateFields: ['createdAt', 'updatedAt'],
+        nestedFields: {
+          organization: Organization,
+          publicUserData: PublicUserData,
+        },
+        defaultValues: {
+          publicMetadata: {},
+          permissions: [],
+        },
+      }),
+    );
     return this;
   }
 
