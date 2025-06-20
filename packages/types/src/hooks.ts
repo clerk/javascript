@@ -94,7 +94,7 @@ export type UseAuthReturn =
       isSignedIn: true;
       userId: string;
       sessionId: string;
-      sessionClaims: JwtPayload;
+      sessionClaims?: JwtPayload | null;
       actor: ActClaim | null;
       orgId: null;
       orgRole: null;
@@ -108,7 +108,7 @@ export type UseAuthReturn =
       isSignedIn: true;
       userId: string;
       sessionId: string;
-      sessionClaims: JwtPayload;
+      sessionClaims?: JwtPayload | null;
       actor: ActClaim | null;
       orgId: string;
       orgRole: OrganizationCustomRoleKey;

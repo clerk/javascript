@@ -78,6 +78,8 @@ export const getAuthDataFromRequestSync = (
     return getAuthObjectFromJwt(jwt, options);
   }
 
+  console.log('auth object from auth data request', { authObject });
+
   return authObject;
 };
 
@@ -132,6 +134,9 @@ export const getAuthDataFromRequestAsync = async (
 
   // Fallback to session logic (sync version) for all other cases
   const authObject = getAuthDataFromRequestSync(req, opts);
+
+  console.log('auth data from request', { authObject });
+
   return getAuthObjectForAcceptedToken({ authObject, acceptsToken });
 };
 
