@@ -5,7 +5,7 @@ import { appConfigs } from '../../presets';
 import type { FakeAPIKey, FakeUser } from '../../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../../testUtils';
 
-testAgainstRunningApps({ withEnv: [appConfigs.envs.withAPIKeys] })('auth() with API keys @nextjs', ({ app }) => {
+testAgainstRunningApps({ withEnv: [appConfigs.envs.withAPIKeys] })('auth() with API keys @xnextjs', ({ app }) => {
   test.describe.configure({ mode: 'parallel' });
 
   let fakeUser: FakeUser;
@@ -30,11 +30,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withAPIKeys] })('auth() with 
 
     // No API key provided
     const noKeyRes = await fetch(url);
-    if (noKeyRes.status !== 401) {
-      console.log('Unexpected status for "noKeyRes". Status:', noKeyRes.status, noKeyRes.statusText);
-      const body = await noKeyRes.text();
-      console.log('Error body:', body);
-    }
     expect(noKeyRes.status).toBe(401);
 
     // Invalid API key

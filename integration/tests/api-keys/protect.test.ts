@@ -7,7 +7,7 @@ import type { FakeAPIKey, FakeUser } from '../../testUtils';
 import { createTestUtils } from '../../testUtils';
 
 test.describe('auth.protect() with API keys @nextjs', () => {
-  test.describe.configure({ mode: 'parallel' });
+  test.describe.configure({ mode: 'serial' });
   let app: Application;
   let fakeUser: FakeUser;
   let fakeBapiUser: User;
@@ -59,7 +59,7 @@ test.describe('auth.protect() with API keys @nextjs', () => {
     if (noKeyRes.status !== 401) {
       console.log('Unexpected status for "noKeyRes". Status:', noKeyRes.status, noKeyRes.statusText);
       const body = await noKeyRes.text();
-      console.log('Error body:', body);
+      console.log(`error body ${body} error body`);
     }
     expect(noKeyRes.status).toBe(401);
 
