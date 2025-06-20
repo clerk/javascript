@@ -189,7 +189,8 @@ export function signedInAuthObject(
   const getToken = createGetToken({
     sessionId,
     sessionToken,
-    fetcher: async (...args) => (await apiClient.sessions.getToken(...args)).jwt,
+    fetcher: async (sessionId, template, expiresInSeconds) =>
+      (await apiClient.sessions.getToken(sessionId, template || '', expiresInSeconds)).jwt,
   });
   return {
     tokenType: TokenType.SessionToken,
@@ -395,7 +396,7 @@ export const makeAuthObjectSerializable = <T extends Record<string, unknown>>(ob
  * @param expiresInSeconds - Optional expiration time in seconds for the token
  * @returns A promise that resolves to the token string
  */
-type TokenFetcher = (sessionId: string, template: string, expiresInSeconds?: number) => Promise<string>;
+type TokenFetcher = (sessionId: string, template?: string, expiresInSeconds?: number) => Promise<string>;
 
 /**
  * Factory function type that creates a getToken function for auth objects.
@@ -426,7 +427,7 @@ const createGetToken: CreateGetToken = params => {
       return null;
     }
 
-    if (options.template) {
+    if (options.template || options.expiresInSeconds !== undefined) {
       return fetcher(sessionId, options.template, options.expiresInSeconds);
     }
 
