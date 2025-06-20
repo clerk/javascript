@@ -27,8 +27,11 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withAPIKeys] })('auth() with 
 
   test('should validate API key', async () => {
     const url = new URL('/api/machine', app.serverUrl);
+
+    console.log(url);
+
     // No API key provided
-    const noKeyRes = await fetch(url);
+    const noKeyRes = await fetch(app.serverUrl + '/api/machine');
     expect(noKeyRes.status).toBe(401);
 
     // Invalid API key
