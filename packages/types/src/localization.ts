@@ -1183,7 +1183,7 @@ export type __internal_LocalizationResource = {
     createdAndExpirationStatus__never: LocalizationValue<'createdDate'>;
     createdAndExpirationStatus__expiresOn: LocalizationValue<'createdDate' | 'expiresDate'>;
     formFieldCaption__expiration__never: LocalizationValue;
-    formFieldCaption__expiration__expiresOn: LocalizationValue;
+    formFieldCaption__expiration__expiresOn: LocalizationValue<'date'>;
   };
 };
 

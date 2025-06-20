@@ -34,7 +34,7 @@ export const enUS: LocalizationResource = {
     createdAndExpirationStatus__expiresOn:
       "Created {{ createdDate | shortDate('en-US') }} • Expires {{ expiresDate | longDate('en-US') }}",
     formFieldCaption__expiration__never: 'This key will never expire',
-    formFieldCaption__expiration__expiresOn: 'Expiring',
+    formFieldCaption__expiration__expiresOn: 'Expiring {{ date }}',
   },
   backButton: 'Back',
   badge__activePlan: 'Active',

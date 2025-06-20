@@ -150,19 +150,19 @@ export const CreateApiKeyForm: React.FC<CreateApiKeyFormProps> = ({ onCreate, is
     }
 
     const expirationDate = new Date(Date.now() + timeLeftInSeconds * 1000);
-    return (
-      t(localizationKeys('apiKeys.formFieldCaption__expiration__expiresOn')) +
-      ' ' +
-      expirationDate.toLocaleString(undefined, {
-        year: 'numeric',
-        month: 'long',
-        day: '2-digit',
-        hour: 'numeric',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: true,
-        timeZoneName: 'short',
-      })
+    return t(
+      localizationKeys('apiKeys.formFieldCaption__expiration__expiresOn', {
+        date: expirationDate.toLocaleString(undefined, {
+          year: 'numeric',
+          month: 'long',
+          day: '2-digit',
+          hour: 'numeric',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: true,
+          timeZoneName: 'short',
+        }),
+      }),
     );
   }, [selectedExpiration?.value]);
 
