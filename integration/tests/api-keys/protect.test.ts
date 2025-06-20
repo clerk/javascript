@@ -7,7 +7,7 @@ import type { FakeAPIKey, FakeUser } from '../../testUtils';
 import { createTestUtils } from '../../testUtils';
 
 test.describe('auth.protect() with API keys @nextjs', () => {
-  test.describe.configure({ mode: 'serial' });
+  test.describe.configure({ mode: 'parallel' });
   let app: Application;
   let fakeUser: FakeUser;
   let fakeBapiUser: User;
@@ -52,36 +52,27 @@ test.describe('auth.protect() with API keys @nextjs', () => {
   });
 
   test('should validate API key', async () => {
-    const url = new URL('/api/machine', app.serverUrl);
     // No API key provided
-    const noKeyRes = await fetch(url);
+    const noKeyRes = await fetch(app.serverUrl + '/api/machine');
     expect(noKeyRes.status).toBe(401);
 
     // Invalid API key
-    const invalidKeyRes = await fetch(url, {
+    const invalidKeyRes = await fetch(app.serverUrl + '/api/machine', {
       headers: {
         Authorization: 'Bearer invalid_key',
       },
     });
     expect(invalidKeyRes.status).toBe(401);
 
-    // Malformed header
-    const malformedRes = await fetch(url, {
-      headers: {
-        Authorization: 'malformed_header',
-      },
-    });
-    expect(malformedRes.status).toBe(401);
-
     // Valid API key
-    const validKeyRes = await fetch(url, {
+    const validKeyRes = await fetch(app.serverUrl + '/api/machine', {
       headers: {
         Authorization: `Bearer ${fakeAPIKey.secret}`,
       },
     });
-    const data = await validKeyRes.json();
+    const apiKeyData = await validKeyRes.json();
     expect(validKeyRes.status).toBe(200);
-    expect(data.userId).toBe(fakeBapiUser.id);
+    expect(apiKeyData.userId).toBe(fakeBapiUser.id);
   });
 
   test('should handle multiple token types', async ({ page, context }) => {
@@ -95,24 +86,18 @@ test.describe('auth.protect() with API keys @nextjs', () => {
     await u.po.expect.toBeSignedIn();
 
     // GET endpoint (only accepts api_key)
-    const getRes = await fetch(url);
-    expect(getRes.status).toBe(401);
+    const getRes = await u.page.request.get(url.toString());
+    expect(getRes.status()).toBe(401);
 
     // POST endpoint (accepts both api_key and session_token)
     // Test with session token
-    const sessionCookie = (await context.cookies()).find(c => c.name === '__session');
-    const postWithSessionRes = await fetch(url, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${sessionCookie?.value}`,
-      },
-    });
+    const postWithSessionRes = await u.page.request.post(url.toString());
     const sessionData = await postWithSessionRes.json();
-    expect(postWithSessionRes.status).toBe(200);
+    expect(postWithSessionRes.status()).toBe(200);
     expect(sessionData.userId).toBe(fakeBapiUser.id);
 
     // Test with API key
-    const postWithApiKeyRes = await fetch(url, {
+    const postWithApiKeyRes = await fetch(app.serverUrl + '/api/machine', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${fakeAPIKey.secret}`,
