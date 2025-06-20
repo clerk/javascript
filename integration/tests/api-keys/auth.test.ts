@@ -25,33 +25,33 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withAPIKeys] })('auth() with 
     await app.teardown();
   });
 
-  test('should validate API key', async () => {
+  test('should validate API key', async ({ request }) => {
     const url = new URL('/api/machine', app.serverUrl);
 
     // No API key provided
-    const noKeyRes = await fetch(url);
-    expect(noKeyRes.status).toBe(401);
+    const noKeyRes = await request.get(url.toString());
+    expect(noKeyRes.status()).toBe(401);
 
     // Invalid API key
-    const invalidKeyRes = await fetch(url, {
+    const invalidKeyRes = await request.get(url.toString(), {
       headers: {
         Authorization: 'Bearer invalid_key',
       },
     });
-    expect(invalidKeyRes.status).toBe(401);
+    expect(invalidKeyRes.status()).toBe(401);
 
     // Valid API key
-    const validKeyRes = await fetch(url, {
+    const validKeyRes = await request.get(url.toString(), {
       headers: {
         Authorization: `Bearer ${fakeAPIKey.secret}`,
       },
     });
     const apiKeyData = await validKeyRes.json();
-    expect(validKeyRes.status).toBe(200);
+    expect(validKeyRes.status()).toBe(200);
     expect(apiKeyData.userId).toBe(fakeBapiUser.id);
   });
 
-  test('should handle multiple token types', async ({ page, context }) => {
+  test('should handle multiple token types', async ({ page, context, request }) => {
     const u = createTestUtils({ app, page, context });
     const url = new URL('/api/machine', app.serverUrl);
 
@@ -73,14 +73,13 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withAPIKeys] })('auth() with 
     expect(sessionData.userId).toBe(fakeBapiUser.id);
 
     // Test with API key
-    const postWithApiKeyRes = await fetch(url, {
-      method: 'POST',
+    const postWithApiKeyRes = await request.post(url.toString(), {
       headers: {
         Authorization: `Bearer ${fakeAPIKey.secret}`,
       },
     });
     const apiKeyData = await postWithApiKeyRes.json();
-    expect(postWithApiKeyRes.status).toBe(200);
+    expect(postWithApiKeyRes.status()).toBe(200);
     expect(apiKeyData.userId).toBe(fakeBapiUser.id);
   });
 });
