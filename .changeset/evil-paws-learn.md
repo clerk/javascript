@@ -1,6 +1,7 @@
 ---
-'@clerk/backend': patch
-'@clerk/types': patch
+'@clerk/backend': minor
+'@clerk/types': minor
 ---
 
-Add Support for expiresInSeconds body param
+Add support for `expiresInSeconds` parameter in session token generation. This allows setting custom expiration times for tokens both with and without templates via the backend API.
+
