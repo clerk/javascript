@@ -95,7 +95,7 @@ export const useLocalizations = () => {
       return '';
     }
 
-    const metaArgsAsVariables = { identifiers: identifiers?.[0], emailAddresses: emailAddresses?.[0] };
+    const metaArgsAsVariables = { identifiers: identifiers?.join(', '), emailAddresses: emailAddresses?.join(', ') };
 
     return (
       t(localizationKeys(`unstable__errors.${code}__${paramName}` as any, metaArgsAsVariables)) ||
