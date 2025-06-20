@@ -196,7 +196,13 @@ export const createUserService = (clerkClient: ClerkClient) => {
       return {
         apiKey,
         secret,
-        revoke: () => clerkClient.apiKeys.revoke({ apiKeyId: apiKey.id, revocationReason: 'For testing purposes' }),
+        revoke: async () => {
+          try {
+            return await clerkClient.apiKeys.revoke({ apiKeyId: apiKey.id, revocationReason: 'For testing purposes' });
+          } catch (err) {
+            console.log(`Error revoking API key "${apiKey.id}": ${err.message}`);
+          }
+        },
       } satisfies FakeAPIKey;
     },
   };
