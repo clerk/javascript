@@ -341,13 +341,6 @@ export class User extends BaseResource implements UserResource {
         enterpriseAccounts: EnterpriseAccount,
       },
       defaultValues: {
-        imageUrl: '',
-        hasImage: false,
-        passwordEnabled: false,
-        totpEnabled: false,
-        backupCodeEnabled: false,
-        twoFactorEnabled: false,
-        createOrganizationEnabled: false,
         publicMetadata: {},
         unsafeMetadata: {},
       },

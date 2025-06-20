@@ -15,18 +15,7 @@ export class APIKeySettings extends BaseResource implements APIKeysSettingsResou
   }
 
   protected fromJSON(data: APIKeysSettingsJSON | APIKeysSettingsJSONSnapshot | null): this {
-    if (!data) {
-      return this;
-    }
-
-    Object.assign(
-      this,
-      parseJSON<APIKeysSettingsResource>(data, {
-        defaultValues: {
-          enabled: false,
-        },
-      }),
-    );
+    Object.assign(this, parseJSON<APIKeysSettingsResource>(data));
     return this;
   }
 

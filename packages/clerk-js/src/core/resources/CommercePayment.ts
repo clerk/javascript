@@ -28,10 +28,6 @@ export class CommercePayment extends BaseResource implements CommercePaymentReso
   }
 
   protected fromJSON(data: CommercePaymentJSON | null): this {
-    if (!data) {
-      return this;
-    }
-
     Object.assign(
       this,
       parseJSON<CommercePaymentResource>(data, {

@@ -455,11 +455,6 @@ export class SignIn extends BaseResource implements SignInResource {
           userData: UserData,
         },
         defaultValues: {
-          status: null,
-          supportedIdentifiers: [],
-          supportedFirstFactors: [],
-          supportedSecondFactors: null,
-          identifier: null,
           createdSessionId: null,
         },
       }),

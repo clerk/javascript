@@ -137,11 +137,6 @@ export class Passkey extends BaseResource implements PasskeyResource {
         nestedFields: {
           verification: PasskeyVerification,
         },
-        defaultValues: {
-          name: null,
-          lastUsedAt: null,
-          verification: null,
-        },
       }),
     );
     return this;

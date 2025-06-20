@@ -13,10 +13,6 @@ export class DeletedObject implements DeletedObjectResource {
   }
 
   protected fromJSON(data: DeletedObjectJSON | null): this {
-    if (!data) {
-      return this;
-    }
-
     Object.assign(this, parseJSON<DeletedObjectResource>(data));
     return this;
   }

@@ -314,13 +314,7 @@ export class Organization extends BaseResource implements OrganizationResource {
       parseJSON<OrganizationResource>(data, {
         dateFields: ['createdAt', 'updatedAt'],
         defaultValues: {
-          imageUrl: '',
-          hasImage: false,
           publicMetadata: {},
-          membersCount: 0,
-          pendingInvitationsCount: 0,
-          maxAllowedMemberships: 0,
-          adminDeleteEnabled: false,
         },
       }),
     );

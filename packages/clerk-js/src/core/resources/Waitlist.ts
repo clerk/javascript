@@ -20,11 +20,6 @@ export class Waitlist extends BaseResource implements WaitlistResource {
       this,
       parseJSON<Waitlist>(data, {
         dateFields: ['updatedAt', 'createdAt'],
-        defaultValues: {
-          id: '',
-          updatedAt: null,
-          createdAt: null,
-        },
       }),
     );
     return this;

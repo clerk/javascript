@@ -17,10 +17,6 @@ export class CommerceProduct extends BaseResource implements CommerceProductReso
   }
 
   protected fromJSON(data: CommerceProductJSON | null): this {
-    if (!data) {
-      return this;
-    }
-
     Object.assign(
       this,
       parseJSON<CommerceProductResource>(data, {

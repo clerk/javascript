@@ -298,11 +298,7 @@ export class Session extends BaseResource implements SessionResource {
           lastActiveToken: Token,
         },
         defaultValues: {
-          factorVerificationAge: null,
-          tasks: null,
-          actor: null,
           lastActiveToken: null,
-          lastActiveOrganizationId: null,
         },
       }),
     );

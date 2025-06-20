@@ -39,9 +39,6 @@ export class CommerceCheckout extends BaseResource implements CommerceCheckoutRe
           plan: value => new CommercePlan(value),
           totals: value => commerceTotalsFromJSON(value),
         },
-        defaultValues: {
-          planPeriodStart: undefined,
-        },
       }),
     );
     return this;

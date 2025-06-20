@@ -82,12 +82,6 @@ export class PhoneNumber extends BaseResource implements PhoneNumberResource {
         arrayFields: {
           linkedTo: IdentificationLink,
         },
-        defaultValues: {
-          phoneNumber: '',
-          reservedForSecondFactor: false,
-          defaultSecondFactor: false,
-          linkedTo: [],
-        },
       }),
     );
     return this;

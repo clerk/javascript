@@ -18,10 +18,6 @@ export class Permission extends BaseResource implements PermissionResource {
   }
 
   protected fromJSON(data: PermissionJSON | null): this {
-    if (!data) {
-      return this;
-    }
-
     Object.assign(
       this,
       parseJSON<PermissionResource>(data, {

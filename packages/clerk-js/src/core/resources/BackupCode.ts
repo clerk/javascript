@@ -17,10 +17,6 @@ export class BackupCode extends BaseResource implements BackupCodeResource {
   }
 
   protected fromJSON(data: BackupCodeJSON | null): this {
-    if (!data) {
-      return this;
-    }
-
     Object.assign(
       this,
       parseJSON<BackupCodeResource>(data, {

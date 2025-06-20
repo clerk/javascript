@@ -16,10 +16,6 @@ export class CommerceFeature extends BaseResource implements CommerceFeatureReso
   }
 
   protected fromJSON(data: CommerceFeatureJSON | null): this {
-    if (!data) {
-      return this;
-    }
-
     Object.assign(this, parseJSON<CommerceFeatureResource>(data));
     return this;
   }

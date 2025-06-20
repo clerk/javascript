@@ -390,28 +390,10 @@ export class SignUp extends BaseResource implements SignUpResource {
   protected fromJSON(data: SignUpJSON | SignUpJSONSnapshot | null): this {
     Object.assign(
       this,
+      // TODO: Missing date fields probably
       parseJSON<SignUp>(data, {
         nestedFields: {
           verifications: SignUpVerifications,
-        },
-        defaultValues: {
-          status: null,
-          requiredFields: [],
-          optionalFields: [],
-          missingFields: [],
-          unverifiedFields: [],
-          username: null,
-          firstName: null,
-          lastName: null,
-          emailAddress: null,
-          phoneNumber: null,
-          hasPassword: false,
-          unsafeMetadata: {},
-          createdSessionId: null,
-          createdUserId: null,
-          abandonAt: null,
-          web3wallet: null,
-          legalAcceptedAt: null,
         },
       }),
     );

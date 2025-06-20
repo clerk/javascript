@@ -127,10 +127,6 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
         arrayFields: {
           linkedTo: IdentificationLink,
         },
-        defaultValues: {
-          linkedTo: [],
-          emailAddress: '',
-        },
       }),
     );
     return this;

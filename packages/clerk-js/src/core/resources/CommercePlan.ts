@@ -31,10 +31,6 @@ export class CommercePlan extends BaseResource implements CommercePlanResource {
   }
 
   protected fromJSON(data: CommercePlanJSON | null): this {
-    if (!data) {
-      return this;
-    }
-
     Object.assign(
       this,
       parseJSON<CommercePlanResource>(data, {
