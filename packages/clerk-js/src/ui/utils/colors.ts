@@ -10,6 +10,8 @@
 
 import type { HslaColor, HslaColorString } from '@clerk/types';
 
+import { cssSupports } from './cssSupports';
+
 const abbrRegex = /^#([a-f0-9]{3,4})$/i;
 const hexRegex = /^#([a-f0-9]{6})([a-f0-9]{2})?$/i;
 const rgbaRegex =
@@ -304,37 +306,61 @@ const changeHslaAlpha = (color: HslaColor, num: number): HslaColor => {
   return { ...color, a: color.a ? color.a - num : undefined };
 };
 
-const lighten = (color: string | undefined, percentage = 0): string | undefined => {
+/**
+ * Higher-order function that wraps color utilities with CSS support checks.
+ * If the browser supports relative color syntax or color-mix, returns the original color.
+ * Otherwise, applies the color transformation function.
+ */
+const withCssSupportsCheck = <TArgs extends any[], TReturn>(fn: (...args: TArgs) => TReturn) => {
+  return (...args: TArgs): TReturn => {
+    const color = args[0] as string | undefined;
+
+    // Early return for falsy colors
+    if (!color) {
+      return fn(...args);
+    }
+
+    // If CSS supports modern color functions, return original color
+    if (cssSupports.relativeColorSyntax() || cssSupports.colorMix()) {
+      return color as TReturn;
+    }
+
+    // Otherwise, apply the transformation
+    return fn(...args);
+  };
+};
+
+const lighten = withCssSupportsCheck((color: string | undefined, percentage = 0): string | undefined => {
   if (!color) {
     return undefined;
   }
   const hsla = toHslaColor(color);
   return toHslaString(changeHslaLightness(hsla, hsla.l * percentage));
-};
+});
 
-const makeSolid = (color: string | undefined): string | undefined => {
+const makeSolid = withCssSupportsCheck((color: string | undefined): string | undefined => {
   if (!color) {
     return undefined;
   }
   return toHslaString({ ...toHslaColor(color), a: 1 });
-};
+});
 
-const makeTransparent = (color: string | undefined, percentage = 0): string | undefined => {
+const makeTransparent = withCssSupportsCheck((color: string | undefined, percentage = 0): string | undefined => {
   if (!color || color.toString() === '') {
     return undefined;
   }
   const hsla = toHslaColor(color);
   return toHslaString(changeHslaAlpha(hsla, (hsla.a ?? 1) * percentage));
-};
+});
 
-const setAlpha = (color: string, alpha: number) => {
+const setAlpha = withCssSupportsCheck((color: string, alpha: number): string => {
   if (!color.toString()) {
     return color;
   }
   return toHslaString(setHslaAlpha(toHslaColor(color), alpha));
-};
+});
 
-const adjustForLightness = (color: string | undefined, lightness = 5) => {
+const adjustForLightness = withCssSupportsCheck((color: string | undefined, lightness = 5): string | undefined => {
   if (!color) {
     return undefined;
   }
@@ -352,7 +378,7 @@ const adjustForLightness = (color: string | undefined, lightness = 5) => {
   }
 
   return colors.toHslaString(hsla);
-};
+});
 
 export const colors = {
   toHslaColor,
