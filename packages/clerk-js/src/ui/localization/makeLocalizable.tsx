@@ -89,15 +89,17 @@ export const useLocalizations = () => {
     }
 
     const { code, message, longMessage, meta } = (error || {}) as ClerkAPIError;
-    const { paramName = '' } = meta || {};
+    const { paramName = '', identifiers, emailAddresses } = meta || {};
 
     if (!code) {
       return '';
     }
 
+    const metaArgsAsVariables = { identifiers: identifiers?.[0], emailAddresses: emailAddresses?.[0] };
+
     return (
-      t(localizationKeys(`unstable__errors.${code}__${paramName}` as any)) ||
-      t(localizationKeys(`unstable__errors.${code}` as any)) ||
+      t(localizationKeys(`unstable__errors.${code}__${paramName}` as any, metaArgsAsVariables)) ||
+      t(localizationKeys(`unstable__errors.${code}` as any, metaArgsAsVariables)) ||
       longMessage ||
       message
     );
