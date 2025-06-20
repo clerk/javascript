@@ -205,6 +205,7 @@ export const CreateApiKeyForm: React.FC<CreateApiKeyFormProps> = ({ onCreate, is
           <Col
             sx={{ flex: 1, width: '100%' }}
             gap={2}
+            elementDescriptor={descriptors.apiKeysCreateFormExpirationInput}
           >
             <FormLabel
               sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row' }}
@@ -230,6 +231,7 @@ export const CreateApiKeyForm: React.FC<CreateApiKeyFormProps> = ({ onCreate, is
               variant='caption'
               colorScheme='secondary'
               localizationKey={expirationCaption}
+              elementDescriptor={descriptors.apiKeysCreateFormExpirationCaption}
             />
           </Col>
         </Box>

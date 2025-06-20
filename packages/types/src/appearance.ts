@@ -604,6 +604,7 @@ export type ElementsConfig = {
   apiKeysCreateFormDescriptionInput: WithOptions;
   apiKeysCreateFormExpirationInput: WithOptions;
   apiKeysCreateFormSubmitButton: WithOptions;
+  apiKeysCreateFormExpirationCaption: WithOptions;
   apiKeysRevokeModal: WithOptions;
   apiKeysRevokeModalInput: WithOptions;
   apiKeysRevokeModalSubmitButton: WithOptions;
