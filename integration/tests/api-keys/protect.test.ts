@@ -52,12 +52,15 @@ test.describe('auth.protect() with API keys @nextjs', () => {
   });
 
   test('should validate API key', async () => {
+    const url = new URL('/api/machine', app.serverUrl);
+
     // No API key provided
-    const noKeyRes = await fetch(app.serverUrl + '/api/machine');
+    const noKeyRes = await fetch(url);
+    console.log('noKeyRes', noKeyRes);
     expect(noKeyRes.status).toBe(401);
 
     // Invalid API key
-    const invalidKeyRes = await fetch(app.serverUrl + '/api/machine', {
+    const invalidKeyRes = await fetch(url, {
       headers: {
         Authorization: 'Bearer invalid_key',
       },
@@ -65,7 +68,7 @@ test.describe('auth.protect() with API keys @nextjs', () => {
     expect(invalidKeyRes.status).toBe(401);
 
     // Valid API key
-    const validKeyRes = await fetch(app.serverUrl + '/api/machine', {
+    const validKeyRes = await fetch(url, {
       headers: {
         Authorization: `Bearer ${fakeAPIKey.secret}`,
       },
@@ -97,7 +100,7 @@ test.describe('auth.protect() with API keys @nextjs', () => {
     expect(sessionData.userId).toBe(fakeBapiUser.id);
 
     // Test with API key
-    const postWithApiKeyRes = await fetch(app.serverUrl + '/api/machine', {
+    const postWithApiKeyRes = await fetch(url, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${fakeAPIKey.secret}`,

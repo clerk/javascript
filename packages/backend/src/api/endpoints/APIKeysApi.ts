@@ -4,8 +4,20 @@ import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/api_keys';
 
+type ListAPIKeysParams = {
+  /**
+   * API key type. Currently, only 'api_key' is supported.
+   */
+  type?: 'api_key';
+  /**
+   * user or organization ID the API key is associated with
+   */
+  subject: string;
+  includeInvalid?: boolean;
+};
+
 type CreateAPIKeyParams = {
-  type: 'api_key';
+  type?: 'api_key';
   /**
    * API key name
    */
@@ -49,6 +61,18 @@ type RevokeAPIKeyParams = {
 };
 
 export class APIKeysAPI extends AbstractAPI {
+  async list(params: ListAPIKeysParams) {
+    return this.request<APIKey[]>({
+      method: 'GET',
+      path: basePath,
+      queryParams: {
+        type: params.type,
+        subject: params.subject,
+        include_invalid: params.includeInvalid,
+      },
+    });
+  }
+
   async create(params: CreateAPIKeyParams) {
     return this.request<APIKey>({
       method: 'POST',
