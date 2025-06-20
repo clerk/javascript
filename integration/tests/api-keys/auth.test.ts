@@ -25,7 +25,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withAPIKeys] })('auth() with 
     await app.teardown();
   });
 
-  test('should validate API key authentication', async () => {
+  test('should validate API key', async () => {
     const url = new URL('/api/machine', app.serverUrl);
     // No API key provided
     const noKeyRes = await fetch(url);
@@ -50,7 +50,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withAPIKeys] })('auth() with 
     expect(apiKeyData.userId).toBe(fakeBapiUser.id);
   });
 
-  test('should handle multiple token types correctly', async ({ page, context }) => {
+  test('should handle multiple token types', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
 
     // Sign in to get a session token

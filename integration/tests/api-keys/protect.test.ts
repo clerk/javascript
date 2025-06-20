@@ -51,7 +51,7 @@ test.describe('auth.protect() with API keys @nextjs', () => {
     await app.teardown();
   });
 
-  test('should validate API key protection', async () => {
+  test('should validate API key', async () => {
     const url = new URL('/api/machine', app.serverUrl);
     // No API key provided
     const noKeyRes = await fetch(url);
@@ -84,7 +84,7 @@ test.describe('auth.protect() with API keys @nextjs', () => {
     expect(data.userId).toBe(fakeBapiUser.id);
   });
 
-  test('should handle multiple token types correctly', async ({ page, context }) => {
+  test('should handle multiple token types', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     const url = new URL('/api/machine', app.serverUrl);
 
