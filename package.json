@@ -15,6 +15,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --cache --check .",
     "preinstall": "npx only-allow pnpm",
+    "integration:secrets": "node ./scripts/1password-keys.mjs",
     "lint": "node ./scripts/lint.mjs",
     "lint:attw": "FORCE_COLOR=1 turbo lint:attw",
     "lint:fix": "FORCE_COLOR=1 turbo lint -- --fix",
