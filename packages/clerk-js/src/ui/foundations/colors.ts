@@ -1,4 +1,7 @@
 import { colorOptionToHslaAlphaScale } from '../utils/colorOptionToHslaScale';
+import { generateAlphaScale } from '../utils/colors/alphaScale';
+import { applyScalePrefix } from '../utils/colors/utils';
+import { cssSupports } from '../utils/cssSupports';
 
 export const whiteAlpha = Object.freeze({
   whiteAlpha25: 'hsla(0, 0%, 100%, 0.02)',
@@ -36,6 +39,34 @@ export const neutralAlpha = Object.freeze({
   neutralAlpha950: 'hsla(0, 0%, 0%, 0.92)',
 } as const);
 
+const primaryAlphaScale = () => {
+  if (cssSupports.relativeColorSyntax() || cssSupports.colorMix()) {
+    return applyScalePrefix(generateAlphaScale('#2F3037'), 'primaryAlpha');
+  }
+  return colorOptionToHslaAlphaScale('#2F3037', 'primaryAlpha');
+};
+
+const dangerAlphaScale = () => {
+  if (cssSupports.relativeColorSyntax() || cssSupports.colorMix()) {
+    return applyScalePrefix(generateAlphaScale('#EF4444'), 'dangerAlpha');
+  }
+  return colorOptionToHslaAlphaScale('#EF4444', 'dangerAlpha');
+};
+
+const warningAlphaScale = () => {
+  if (cssSupports.relativeColorSyntax() || cssSupports.colorMix()) {
+    return applyScalePrefix(generateAlphaScale('#F36B16'), 'warningAlpha');
+  }
+  return colorOptionToHslaAlphaScale('#F36B16', 'warningAlpha');
+};
+
+const successAlphaScale = () => {
+  if (cssSupports.relativeColorSyntax() || cssSupports.colorMix()) {
+    return applyScalePrefix(generateAlphaScale('#22C543'), 'successAlpha');
+  }
+  return colorOptionToHslaAlphaScale('#22C543', 'successAlpha');
+};
+
 export const colors = Object.freeze({
   avatarBorder: neutralAlpha.neutralAlpha200,
   avatarBackground: neutralAlpha.neutralAlpha400,
@@ -64,8 +95,7 @@ export const colors = Object.freeze({
   primary800: '#201D23',
   primary900: '#1B171C',
   primaryHover: '#3B3C45', //primary 500 adjusted for lightness
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  ...colorOptionToHslaAlphaScale('#2F3037', 'primaryAlpha')!,
+  ...primaryAlphaScale(),
   danger50: '#FEF2F2',
   danger100: '#FEE5E5',
   danger200: '#FECACA',
@@ -77,8 +107,7 @@ export const colors = Object.freeze({
   danger800: '#991B1B',
   danger900: '#7F1D1D',
   danger950: '#450A0A',
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  ...colorOptionToHslaAlphaScale('#EF4444', 'dangerAlpha')!,
+  ...dangerAlphaScale(),
   warning50: '#FFF6ED',
   warning100: '#FFEBD5',
   warning200: '#FED1AA',
@@ -90,8 +119,7 @@ export const colors = Object.freeze({
   warning800: '#9A2F12',
   warning900: '#7C2912',
   warning950: '#431207',
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  ...colorOptionToHslaAlphaScale('#F36B16', 'warningAlpha')!,
+  ...warningAlphaScale(),
   success50: '#F0FDF2',
   success100: '#DCFCE2',
   success200: '#BBF7C6',
@@ -103,6 +131,5 @@ export const colors = Object.freeze({
   success800: '#166527',
   success900: '#145323',
   success950: '#052E0F',
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  ...colorOptionToHslaAlphaScale('#22C543', 'successAlpha')!,
+  ...successAlphaScale(),
 } as const);
