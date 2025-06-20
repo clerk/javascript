@@ -6,8 +6,8 @@ import { appConfigs } from '../../presets';
 import type { FakeAPIKey, FakeUser } from '../../testUtils';
 import { createTestUtils } from '../../testUtils';
 
-test.describe('auth.protect() with API keys @nextjs', () => {
-  test.describe.configure({ mode: 'serial' });
+test.describe('auth.protect() with API keys @xnextjs', () => {
+  test.describe.configure({ mode: 'parallel' });
   let app: Application;
   let fakeUser: FakeUser;
   let fakeBapiUser: User;

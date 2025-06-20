@@ -183,12 +183,12 @@ export const createUserService = (clerkClient: ClerkClient) => {
       } satisfies FakeOrganization;
     },
     createFakeAPIKey: async (userId: string) => {
-      const TEN_MINUTES = 10 * 60;
+      const THIRTY_MINUTES = 30 * 60;
 
       const apiKey = await clerkClient.apiKeys.create({
         subject: userId,
         name: faker.company.buzzPhrase(),
-        secondsUntilExpiration: TEN_MINUTES,
+        secondsUntilExpiration: THIRTY_MINUTES,
       });
 
       const { secret } = await clerkClient.apiKeys.getSecret(apiKey.id);

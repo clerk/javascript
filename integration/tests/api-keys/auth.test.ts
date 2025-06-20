@@ -5,7 +5,7 @@ import { appConfigs } from '../../presets';
 import type { FakeAPIKey, FakeUser } from '../../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../../testUtils';
 
-testAgainstRunningApps({ withEnv: [appConfigs.envs.withAPIKeys] })('auth() with API keys @xnextjs', ({ app }) => {
+testAgainstRunningApps({ withEnv: [appConfigs.envs.withAPIKeys] })('auth() with API keys @nextjs', ({ app }) => {
   test.describe.configure({ mode: 'parallel' });
 
   let fakeUser: FakeUser;
