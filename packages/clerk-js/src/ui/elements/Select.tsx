@@ -1,6 +1,5 @@
 import { createContextAndHook } from '@clerk/shared/react';
 import type { SelectId } from '@clerk/types';
-import { useMergeRefs } from '@floating-ui/react';
 import type { PropsWithChildren, ReactElement, ReactNode } from 'react';
 import React, { useState } from 'react';
 
@@ -377,16 +376,15 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
   );
 };
 
-export const SelectButton = React.forwardRef<
-  HTMLButtonElement,
-  PropsOfComponent<typeof Button> & {
+export const SelectButton = (
+  props: PropsOfComponent<typeof Button> & {
     icon?: React.ReactElement | React.ComponentType;
     iconSx?: ThemableCssProp;
-  }
->((props, ref) => {
+  },
+) => {
   const { sx, children, icon, iconSx, ...rest } = props;
   const { popoverCtx, onTriggerClick, buttonRenderOption, selectedOption, placeholder, elementId } = useSelectState();
-  const mergedRef = useMergeRefs([popoverCtx.reference, ref]);
+  const { reference } = popoverCtx;
 
   let show: React.ReactNode = children;
   if (!children) {
@@ -406,7 +404,7 @@ export const SelectButton = React.forwardRef<
     <Button
       elementDescriptor={descriptors.selectButton}
       elementId={descriptors.selectButton.setId(elementId)}
-      ref={mergedRef}
+      ref={reference}
       variant='outline'
       textVariant='buttonLarge'
       onClick={onTriggerClick}
@@ -433,4 +431,4 @@ export const SelectButton = React.forwardRef<
       />
     </Button>
   );
-});
+};

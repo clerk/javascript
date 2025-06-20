@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 
 import { useApiKeysContext } from '@/ui/contexts';
 import { Box, Col, descriptors, FormLabel, localizationKeys, Text, useLocalizations } from '@/ui/customizables';
@@ -114,7 +114,7 @@ const ExpirationSelector: React.FC<ExpirationSelectorProps> = ({ selectedExpirat
       <SelectOptionList
         sx={t => ({
           paddingBlock: t.space.$1,
-          color: t.colors.$colorText
+          color: t.colors.$colorText,
         })}
       />
     </Select>
