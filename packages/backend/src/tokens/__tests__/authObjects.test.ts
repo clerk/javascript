@@ -1,6 +1,7 @@
 import type { JwtPayload } from '@clerk/types';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
+import { createBackendApiClient } from '../../api/factory';
 import { mockTokens, mockVerificationResults } from '../../fixtures/machine';
 import type { AuthenticateContext } from '../authenticateContext';
 import type { InvalidTokenAuthObject, UnauthenticatedMachineObject } from '../authObjects';
@@ -12,6 +13,10 @@ import {
   signedOutAuthObject,
   unauthenticatedMachineObject,
 } from '../authObjects';
+
+vi.mock('../../api/factory', () => ({
+  createBackendApiClient: vi.fn(),
+}));
 
 describe('makeAuthObjectSerializable', () => {
   it('removes non-serializable props', () => {
@@ -430,5 +435,82 @@ describe('getAuthObjectForAcceptedToken', () => {
     const result = getAuthObjectForAcceptedToken({ authObject: machineAuth, acceptsToken: 'machine_token' });
     expect((result as UnauthenticatedMachineObject<'machine_token'>).tokenType).toBe('machine_token');
     expect((result as UnauthenticatedMachineObject<'machine_token'>).id).toBeNull();
+  });
+});
+
+describe('getToken with expiresInSeconds support', () => {
+  it('calls fetcher with expiresInSeconds when template is provided', async () => {
+    const mockGetToken = vi.fn().mockResolvedValue({ jwt: 'mocked-jwt-token' });
+    const mockApiClient = {
+      sessions: {
+        getToken: mockGetToken,
+      },
+    };
+
+    vi.mocked(createBackendApiClient).mockReturnValue(mockApiClient as any);
+
+    const mockAuthenticateContext = {
+      secretKey: 'sk_test_123',
+    } as AuthenticateContext;
+
+    const authObject = signedInAuthObject(mockAuthenticateContext, 'raw-session-token', {
+      sid: 'sess_123',
+      sub: 'user_123',
+    } as unknown as JwtPayload);
+
+    const result = await authObject.getToken({ template: 'custom-template', expiresInSeconds: 3600 });
+
+    expect(mockGetToken).toHaveBeenCalledWith('sess_123', 'custom-template', 3600);
+    expect(result).toBe('mocked-jwt-token');
+  });
+
+  it('calls fetcher without expiresInSeconds when template is provided but expiresInSeconds is undefined', async () => {
+    const mockGetToken = vi.fn().mockResolvedValue({ jwt: 'mocked-jwt-token' });
+    const mockApiClient = {
+      sessions: {
+        getToken: mockGetToken,
+      },
+    };
+
+    vi.mocked(createBackendApiClient).mockReturnValue(mockApiClient as any);
+
+    const mockAuthenticateContext = {
+      secretKey: 'sk_test_123',
+    } as AuthenticateContext;
+
+    const authObject = signedInAuthObject(mockAuthenticateContext, 'raw-session-token', {
+      sid: 'sess_123',
+      sub: 'user_123',
+    } as unknown as JwtPayload);
+
+    const result = await authObject.getToken({ template: 'custom-template' });
+
+    expect(mockGetToken).toHaveBeenCalledWith('sess_123', 'custom-template', undefined);
+    expect(result).toBe('mocked-jwt-token');
+  });
+
+  it('returns raw session token when no template is provided', async () => {
+    const mockGetToken = vi.fn();
+    const mockApiClient = {
+      sessions: {
+        getToken: mockGetToken,
+      },
+    };
+
+    vi.mocked(createBackendApiClient).mockReturnValue(mockApiClient as any);
+
+    const mockAuthenticateContext = {
+      secretKey: 'sk_test_123',
+    } as AuthenticateContext;
+
+    const authObject = signedInAuthObject(mockAuthenticateContext, 'raw-session-token', {
+      sid: 'sess_123',
+      sub: 'user_123',
+    } as unknown as JwtPayload);
+
+    const result = await authObject.getToken({});
+
+    expect(mockGetToken).not.toHaveBeenCalled();
+    expect(result).toBe('raw-session-token');
   });
 });
