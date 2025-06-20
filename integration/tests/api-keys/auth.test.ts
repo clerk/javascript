@@ -16,7 +16,9 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withAPIKeys] })('auth() with 
   test.beforeAll(async () => {
     fakeUser = u.services.users.createFakeUser();
     fakeBapiUser = await u.services.users.createBapiUser(fakeUser);
+    console.log('fakeBapiUser 2', fakeBapiUser);
     fakeAPIKey = await u.services.users.createFakeAPIKey(fakeBapiUser.id);
+    console.log('fakeAPIKey 2', fakeAPIKey);
   });
 
   test.afterAll(async () => {
@@ -28,17 +30,17 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withAPIKeys] })('auth() with 
   test('should validate API key', async () => {
     const url = new URL('/api/machine', app.serverUrl);
 
-    // // No API key provided
-    // const noKeyRes = await fetch(url);
-    // expect(noKeyRes.status).toBe(401);
+    // No API key provided
+    const noKeyRes = await fetch(url);
+    expect(noKeyRes.status).toBe(401);
 
-    // // Invalid API key
-    // const invalidKeyRes = await fetch(url, {
-    //   headers: {
-    //     Authorization: 'Bearer invalid_key',
-    //   },
-    // });
-    // expect(invalidKeyRes.status).toBe(401);
+    // Invalid API key
+    const invalidKeyRes = await fetch(url, {
+      headers: {
+        Authorization: 'Bearer invalid_key',
+      },
+    });
+    expect(invalidKeyRes.status).toBe(401);
 
     // Valid API key
     const validKeyRes = await fetch(url, {
