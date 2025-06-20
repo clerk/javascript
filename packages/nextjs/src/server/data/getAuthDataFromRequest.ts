@@ -10,6 +10,7 @@ import {
   invalidTokenAuthObject,
   isMachineTokenByPrefix,
   isTokenTypeAccepted,
+  type MachineTokenType,
   type SignedInAuthObject,
   type SignedOutAuthObject,
   signedOutAuthObject,
@@ -103,12 +104,7 @@ export const getAuthDataFromRequestAsync = async (
   };
 
   const hasMachineToken = bearerToken && isMachineTokenByPrefix(bearerToken);
-
-  const acceptsOnlySessionToken =
-    acceptsToken === TokenType.SessionToken ||
-    (Array.isArray(acceptsToken) && acceptsToken.length === 1 && acceptsToken[0] === TokenType.SessionToken);
-
-  if (hasMachineToken && !acceptsOnlySessionToken) {
+  if (hasMachineToken && acceptsToken !== TokenType.SessionToken) {
     const machineTokenType = getMachineTokenType(bearerToken);
 
     // Early return if the token type is not accepted to save on the verify call
@@ -117,7 +113,7 @@ export const getAuthDataFromRequestAsync = async (
     }
     // Early return for scalar acceptsToken if it does not match the machine token type
     if (!Array.isArray(acceptsToken) && acceptsToken !== 'any' && machineTokenType !== acceptsToken) {
-      const authObject = unauthenticatedMachineObject(acceptsToken, options);
+      const authObject = unauthenticatedMachineObject(acceptsToken as MachineTokenType, options);
       return getAuthObjectForAcceptedToken({ authObject, acceptsToken });
     }
 
@@ -126,6 +122,20 @@ export const getAuthDataFromRequestAsync = async (
       ? unauthenticatedMachineObject(machineTokenType, options)
       : authenticatedMachineObject(machineTokenType, bearerToken, data);
     return getAuthObjectForAcceptedToken({ authObject, acceptsToken });
+  }
+
+  const canAcceptSessionTokens =
+    acceptsToken === TokenType.SessionToken ||
+    (Array.isArray(acceptsToken) && acceptsToken.includes(TokenType.SessionToken)) ||
+    acceptsToken === 'any';
+
+  if (!canAcceptSessionTokens) {
+    // No machine token was provided, but one was required.
+    // Return unauthenticated, don't fall back to session logic.
+    if (Array.isArray(acceptsToken)) {
+      return invalidTokenAuthObject();
+    }
+    return unauthenticatedMachineObject(acceptsToken, options);
   }
 
   // If a random token is present and acceptsToken is an array that does NOT include session_token,
