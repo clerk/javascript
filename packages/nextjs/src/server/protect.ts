@@ -119,6 +119,7 @@ export function createProtect(opts: {
     const requestedToken = args[0]?.token || args[1]?.token || TokenType.SessionToken;
 
     const handleUnauthenticated = () => {
+      console.log('Handling unauthenticated for session token');
       if (unauthenticatedUrl) {
         return redirect(unauthenticatedUrl);
       }
@@ -132,9 +133,11 @@ export function createProtect(opts: {
     const handleUnauthorized = () => {
       // For machine tokens, return a 401 response
       if (authObject.tokenType !== TokenType.SessionToken) {
+        console.log('Handling unauthorized for machine token');
         return unauthorized();
       }
 
+      console.log('Handling unauthorized for session token');
       if (unauthorizedUrl) {
         return redirect(unauthorizedUrl);
       }

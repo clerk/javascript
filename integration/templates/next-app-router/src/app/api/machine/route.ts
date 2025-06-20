@@ -2,10 +2,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 
 export async function GET() {
-  const { userId, ...rest } = await auth({ acceptsToken: 'api_key' });
-
-  console.log('userId', userId);
-  console.log('rest', rest);
+  const { userId } = await auth({ acceptsToken: 'api_key' });
 
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

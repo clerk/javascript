@@ -198,6 +198,5 @@ auth.protect = async (...args: any[]) => {
     redirect,
     unauthorized,
   });
-
   return protect(...args);
 };
