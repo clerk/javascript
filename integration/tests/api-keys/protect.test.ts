@@ -43,6 +43,7 @@ test.describe('auth.protect() with API keys @nextjs', () => {
     fakeUser = u.services.users.createFakeUser();
     fakeBapiUser = await u.services.users.createBapiUser(fakeUser);
     fakeAPIKey = await u.services.users.createFakeAPIKey(fakeBapiUser.id);
+    console.log('fakeAPIKey', fakeAPIKey);
   });
 
   test.afterAll(async () => {
