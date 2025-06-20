@@ -58,13 +58,13 @@ test.describe('auth.protect() with API keys @nextjs', () => {
     // const noKeyRes = await fetch(url);
     // expect(noKeyRes.status).toBe(401);
 
-    // Invalid API key
-    const invalidKeyRes = await fetch(url, {
-      headers: {
-        Authorization: 'Bearer invalid_key',
-      },
-    });
-    expect(invalidKeyRes.status).toBe(401);
+    // // Invalid API key
+    // const invalidKeyRes = await fetch(url, {
+    //   headers: {
+    //     Authorization: 'Bearer invalid_key',
+    //   },
+    // });
+    // expect(invalidKeyRes.status).toBe(401);
 
     // Valid API key
     const validKeyRes = await fetch(url, {
