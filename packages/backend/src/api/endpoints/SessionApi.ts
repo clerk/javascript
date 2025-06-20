@@ -75,8 +75,7 @@ export class SessionAPI extends AbstractAPI {
    * Retrieves a session token or generates a JWT using a specified template.
    *
    * @param sessionId - The ID of the session for which to generate the token
-   * @param template - The name of the JWT template configured in the Clerk Dashboard.
-   *   Pass an empty string to get a session JWT without a template.
+   * @param template - Optional name of the JWT template configured in the Clerk Dashboard.
    * @param expiresInSeconds - Optional expiration time for the token in seconds.
    *   If not provided, uses the default expiration.
    *
@@ -84,7 +83,7 @@ export class SessionAPI extends AbstractAPI {
    *
    * @throws {Error} When sessionId is invalid or empty
    */
-  public async getToken(sessionId: string, template: string, expiresInSeconds?: number) {
+  public async getToken(sessionId: string, template?: string, expiresInSeconds?: number) {
     this.requireId(sessionId);
 
     const path = template
