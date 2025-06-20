@@ -5,7 +5,7 @@ import type {
 } from '@clerk/types';
 
 import { BaseResource } from './internal';
-import { parseJSON } from './parser';
+import { parseJSON, serializeToJSON } from './parser';
 
 export class OrganizationSettings extends BaseResource implements OrganizationSettingsResource {
   actions = {
@@ -52,19 +52,17 @@ export class OrganizationSettings extends BaseResource implements OrganizationSe
 
   public __internal_toSnapshot(): OrganizationSettingsJSONSnapshot {
     return {
-      id: this.id || '',
       object: 'organization_settings',
-      actions: {
-        admin_delete: this.actions.adminDelete,
-      },
-      domains: {
-        enabled: this.domains.enabled,
-        enrollment_modes: this.domains.enrollmentModes,
-        default_role: this.domains.defaultRole,
-      },
-      enabled: this.enabled,
-      max_allowed_memberships: this.maxAllowedMemberships,
-      force_organization_selection: this.forceOrganizationSelection,
-    } as unknown as OrganizationSettingsJSONSnapshot;
+      ...serializeToJSON(this, {
+        customTransforms: {
+          actions: value => ({ admin_delete: value.adminDelete }),
+          domains: value => ({
+            enabled: value.enabled,
+            enrollment_modes: value.enrollmentModes,
+            default_role: value.defaultRole,
+          }),
+        },
+      }),
+    } as OrganizationSettingsJSONSnapshot;
   }
 }

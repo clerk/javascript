@@ -1,6 +1,6 @@
 import type { UserData as IUserData, UserDataJSON, UserDataJSONSnapshot } from '@clerk/types';
 
-import { parseJSON } from './parser';
+import { parseJSON, serializeToJSON } from './parser';
 
 export class UserData implements IUserData {
   firstName?: string;
@@ -18,11 +18,6 @@ export class UserData implements IUserData {
   }
 
   public __internal_toSnapshot(): UserDataJSONSnapshot {
-    return {
-      first_name: this.firstName,
-      last_name: this.lastName,
-      image_url: this.imageUrl || null,
-      has_image: this.hasImage || null,
-    };
+    return serializeToJSON(this) as UserDataJSONSnapshot;
   }
 }

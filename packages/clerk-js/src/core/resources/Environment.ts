@@ -13,7 +13,7 @@ import { eventBus, events } from '../../core/events';
 import { APIKeySettings } from './APIKeySettings';
 import { AuthConfig, BaseResource, CommerceSettings, DisplayConfig, UserSettings } from './internal';
 import { OrganizationSettings } from './OrganizationSettings';
-import { parseJSON } from './parser';
+import { parseJSON, serializeToJSON } from './parser';
 
 export class Environment extends BaseResource implements EnvironmentResource {
   private static instance: Environment;
@@ -86,14 +86,16 @@ export class Environment extends BaseResource implements EnvironmentResource {
   public __internal_toSnapshot(): EnvironmentJSONSnapshot {
     return {
       object: 'environment',
-      auth_config: this.authConfig.__internal_toSnapshot(),
-      display_config: this.displayConfig.__internal_toSnapshot(),
-      id: this.id ?? '',
-      maintenance_mode: this.maintenanceMode,
-      organization_settings: this.organizationSettings.__internal_toSnapshot(),
-      user_settings: this.userSettings.__internal_toSnapshot(),
-      commerce_settings: this.commerceSettings.__internal_toSnapshot(),
-      api_keys_settings: this.apiKeysSettings.__internal_toSnapshot(),
-    };
+      ...serializeToJSON(this, {
+        nestedFields: [
+          'authConfig',
+          'displayConfig',
+          'organizationSettings',
+          'userSettings',
+          'commerceSettings',
+          'apiKeysSettings',
+        ],
+      }),
+    } as EnvironmentJSONSnapshot;
   }
 }

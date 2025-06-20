@@ -10,7 +10,7 @@ import type {
 } from '@clerk/types';
 
 import { BaseResource } from './Base';
-import { parseJSON } from './parser';
+import { parseJSON, serializeToJSON } from './parser';
 import { Verification } from './Verification';
 
 export class SamlAccount extends BaseResource implements SamlAccountResource {
@@ -57,16 +57,10 @@ export class SamlAccount extends BaseResource implements SamlAccountResource {
   public __internal_toSnapshot(): SamlAccountJSONSnapshot {
     return {
       object: 'saml_account',
-      id: this.id,
-      provider: this.provider,
-      provider_user_id: this.providerUserId,
-      active: this.active,
-      email_address: this.emailAddress,
-      first_name: this.firstName,
-      last_name: this.lastName,
-      verification: this.verification?.__internal_toSnapshot() || null,
-      saml_connection: this.samlConnection?.__internal_toSnapshot(),
-    };
+      ...serializeToJSON(this, {
+        nestedFields: ['verification', 'samlConnection'],
+      }),
+    } as SamlAccountJSONSnapshot;
   }
 }
 
@@ -100,17 +94,7 @@ export class SamlAccountConnection extends BaseResource implements SamlAccountCo
   public __internal_toSnapshot(): SamlAccountConnectionJSONSnapshot {
     return {
       object: 'saml_account_connection',
-      id: this.id,
-      name: this.name,
-      domain: this.domain,
-      active: this.active,
-      provider: this.provider,
-      sync_user_attributes: this.syncUserAttributes,
-      allow_subdomains: this.allowSubdomains,
-      allow_idp_initiated: this.allowIdpInitiated,
-      disable_additional_identifications: this.disableAdditionalIdentifications,
-      created_at: this.createdAt.getTime(),
-      updated_at: this.updatedAt.getTime(),
-    };
+      ...serializeToJSON(this),
+    } as SamlAccountConnectionJSONSnapshot;
   }
 }

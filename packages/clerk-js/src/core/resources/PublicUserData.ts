@@ -1,6 +1,6 @@
 import type { PublicUserData as IPublicUserData, PublicUserDataJSON, PublicUserDataJSONSnapshot } from '@clerk/types';
 
-import { parseJSON } from './parser';
+import { parseJSON, serializeToJSON } from './parser';
 
 export class PublicUserData implements IPublicUserData {
   firstName!: string | null;
@@ -24,13 +24,6 @@ export class PublicUserData implements IPublicUserData {
   }
 
   public __internal_toSnapshot(): PublicUserDataJSONSnapshot {
-    return {
-      first_name: this.firstName,
-      last_name: this.lastName,
-      image_url: this.imageUrl,
-      has_image: this.hasImage,
-      identifier: this.identifier,
-      user_id: this.userId,
-    };
+    return serializeToJSON(this) as PublicUserDataJSONSnapshot;
   }
 }

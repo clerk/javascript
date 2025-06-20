@@ -13,7 +13,7 @@ import { convertPageToOffsetSearchParams } from '../../utils/convertPageToOffset
 import { clerkUnsupportedReloadMethod } from '../errors';
 import { BaseResource } from './internal';
 import { Organization } from './Organization';
-import { parseJSON } from './parser';
+import { parseJSON, serializeToJSON } from './parser';
 import { PublicUserData } from './PublicUserData';
 
 export class OrganizationMembership extends BaseResource implements OrganizationMembershipResource {
@@ -92,16 +92,10 @@ export class OrganizationMembership extends BaseResource implements Organization
   public __internal_toSnapshot(): OrganizationMembershipJSONSnapshot {
     return {
       object: 'organization_membership',
-      id: this.id,
-      organization: this.organization.__internal_toSnapshot(),
-      public_metadata: this.publicMetadata,
-      public_user_data: this.publicUserData?.__internal_toSnapshot(),
-      permissions: this.permissions,
-      role: this.role,
-      role_name: this.roleName,
-      created_at: this.createdAt.getTime(),
-      updated_at: this.updatedAt.getTime(),
-    };
+      ...serializeToJSON(this, {
+        nestedFields: ['organization', 'publicUserData'],
+      }),
+    } as OrganizationMembershipJSONSnapshot;
   }
 
   public reload(_?: ClerkResourceReloadParams): Promise<this> {

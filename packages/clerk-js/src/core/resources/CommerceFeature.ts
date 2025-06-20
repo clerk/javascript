@@ -1,7 +1,7 @@
 import type { CommerceFeatureJSON, CommerceFeatureJSONSnapshot, CommerceFeatureResource } from '@clerk/types';
 
 import { BaseResource } from './internal';
-import { parseJSON } from './parser';
+import { parseJSON, serializeToJSON } from './parser';
 
 export class CommerceFeature extends BaseResource implements CommerceFeatureResource {
   id!: string;
@@ -23,11 +23,7 @@ export class CommerceFeature extends BaseResource implements CommerceFeatureReso
   public __internal_toSnapshot(): CommerceFeatureJSONSnapshot {
     return {
       object: 'commerce_feature',
-      id: this.id,
-      name: this.name,
-      description: this.description,
-      slug: this.slug,
-      avatar_url: this.avatarUrl,
-    };
+      ...serializeToJSON(this),
+    } as CommerceFeatureJSONSnapshot;
   }
 }

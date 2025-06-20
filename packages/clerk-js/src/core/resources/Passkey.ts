@@ -20,7 +20,7 @@ import {
 } from '../../utils/passkeys';
 import { clerkMissingWebAuthnPublicKeyOptions } from '../errors';
 import { BaseResource, DeletedObject, PasskeyVerification } from './internal';
-import { parseJSON } from './parser';
+import { parseJSON, serializeToJSON } from './parser';
 
 export class Passkey extends BaseResource implements PasskeyResource {
   id!: string;
@@ -145,12 +145,9 @@ export class Passkey extends BaseResource implements PasskeyResource {
   public __internal_toSnapshot(): PasskeyJSONSnapshot {
     return {
       object: 'passkey',
-      id: this.id,
-      name: this.name,
-      verification: this.verification?.__internal_toSnapshot() || null,
-      last_used_at: this.lastUsedAt?.getTime() || null,
-      created_at: this.createdAt.getTime(),
-      updated_at: this.updatedAt.getTime(),
-    };
+      ...serializeToJSON(this, {
+        nestedFields: ['verification'],
+      }),
+    } as PasskeyJSONSnapshot;
   }
 }

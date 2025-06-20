@@ -9,7 +9,7 @@ import type {
 } from '@clerk/types';
 
 import { BaseResource } from './Base';
-import { parseJSON } from './parser';
+import { parseJSON, serializeToJSON } from './parser';
 import { Verification } from './Verification';
 
 export class ExternalAccount extends BaseResource implements ExternalAccountResource {
@@ -66,21 +66,10 @@ export class ExternalAccount extends BaseResource implements ExternalAccountReso
   public __internal_toSnapshot(): ExternalAccountJSONSnapshot {
     return {
       object: 'external_account',
-      id: this.id,
-      identification_id: this.identificationId,
-      provider: this.provider,
-      provider_user_id: this.providerUserId,
-      email_address: this.emailAddress,
-      approved_scopes: this.approvedScopes,
-      first_name: this.firstName,
-      last_name: this.lastName,
-      image_url: this.imageUrl,
-      username: this.username,
-      phone_number: this.phoneNumber,
-      public_metadata: this.publicMetadata,
-      label: this.label,
-      verification: this.verification?.__internal_toSnapshot() || null,
-    };
+      ...serializeToJSON(this, {
+        nestedFields: ['verification'],
+      }),
+    } as ExternalAccountJSONSnapshot;
   }
 
   providerSlug(): OAuthProvider {
