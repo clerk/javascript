@@ -590,3 +590,17 @@ Before writing tests, it's important to understand how Playwright handles test i
 > - `VERCEL_PROJECT_ID`: Only required if you plan on running deployment tests locally. This is the Vercel project ID, and it points to an application created via the Vercel dashboard. The easiest way to get access to it is by linking a local app to the Vercel project using the Vercel CLI, and then copying the values from the `.vercel` directory.
 > - `VERCEL_ORG_ID`: The organization that owns the Vercel project. See above for more details.
 > - `VERCEL_TOKEN`: A personal access token. This corresponds to a real user running the deployment command. Attention: Be extra careful with this token as it can't be scoped to a single Vercel project, meaning that the token has access to every project in the account it belongs to.
+
+## Appendix
+
+### Production Hosts
+
+Production instances necessitate the use of DNS hostnames.
+For example, `multiple-apps-e2e.clerk.app` facilitates subdomain testing.
+During a test, a local proxy is established to direct requests from the DNS host to a local server.
+
+To incorporate a new hostname:
+
+- Provision a new `.clerk.app` host domain.
+- Establish and configure a new Clerk production application.
+- Update the local test certificates to encompass the new domain alongside existing ones.
