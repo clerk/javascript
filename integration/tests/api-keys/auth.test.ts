@@ -136,36 +136,27 @@ test.describe('auth.protect() with API keys @nextjs', () => {
     app = await appConfigs.next.appRouter
       .clone()
       .addFile(
-        'src/middleware.ts',
-        () => `
-        import { clerkMiddleware } from '@clerk/nextjs/server';
-
-        // @ts-ignore
-        export default clerkMiddleware({ acceptsToken: 'api_key' });
-
-        export const config = {
-          matcher: [
-            '/((?!.*\\..*|_next).*)', // Don't run middleware on static files
-            '/', // Run middleware on index page
-            '/(api|trpc)(.*)',
-          ], // Run middleware on API routes
-        };
-        `,
-      )
-      .addFile(
         'src/app/api/me/route.ts',
         () => `
         import { NextResponse } from 'next/server';
         import { auth } from '@clerk/nextjs/server';
 
         export async function GET() {
-          const { userId, tokenType } = await auth.protect({ token: 'api_key' });
-          return NextResponse.json({ userId, tokenType });
+          try {
+            const { userId, tokenType } = await auth.protect({ token: 'api_key' });
+            return NextResponse.json({ userId, tokenType });
+          } catch (error) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+          }
         }
 
         export async function POST() {
-          const { userId, tokenType } = await auth.protect({ token: ['api_key', 'session_token'] });
-          return NextResponse.json({ userId, tokenType });
+          try {
+            const { userId, tokenType } = await auth.protect({ token: ['api_key', 'session_token'] });
+            return NextResponse.json({ userId, tokenType });
+          } catch (error) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+          }
         }
         `,
       )
