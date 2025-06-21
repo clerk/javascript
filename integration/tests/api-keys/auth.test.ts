@@ -209,7 +209,11 @@ test.describe('auth.protect() with API keys @nextjs', () => {
     await u.po.expect.toBeSignedIn();
 
     // GET endpoint (only accepts api_key)
-    const getRes = await u.page.request.get(url.toString());
+    const getRes = await u.page.request.get(url.toString(), {
+      headers: {
+        'Sec-Fetch-Dest': 'document',
+      },
+    });
     expect(getRes.status()).toBe(401);
 
     // POST endpoint (accepts both api_key and session_token)
