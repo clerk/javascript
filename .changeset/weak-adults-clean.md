@@ -1,5 +1,5 @@
 ---
-"@clerk/backend": patch
+"@clerk/backend": minor
 "@clerk/nextjs": patch
 ---
 
