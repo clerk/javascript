@@ -24,19 +24,6 @@ type CreateAPIKeyParams = {
   secondsUntilExpiration?: number | null;
 };
 
-type UpdateAPIKeyParams = {
-  /**
-   * API key ID
-   */
-  apiKeyId: string;
-  /**
-   * API key description
-   */
-  description?: string | null;
-  claims?: Record<string, any> | null;
-  scopes?: string[];
-};
-
 type RevokeAPIKeyParams = {
   /**
    * API key ID
@@ -54,18 +41,6 @@ export class APIKeysAPI extends AbstractAPI {
       method: 'POST',
       path: basePath,
       bodyParams: params,
-    });
-  }
-
-  async update(params: UpdateAPIKeyParams) {
-    const { apiKeyId, ...bodyParams } = params;
-
-    this.requireId(apiKeyId);
-
-    return this.request<APIKey>({
-      method: 'POST',
-      path: basePath,
-      bodyParams,
     });
   }
 
