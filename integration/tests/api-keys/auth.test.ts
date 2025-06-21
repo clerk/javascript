@@ -126,7 +126,7 @@ test.describe('auth() with API keys @nextjs', () => {
   });
 });
 
-test.describe('auth.protect() with API keys @xnextjs', () => {
+test.describe('auth.protect() with API keys @nextjs', () => {
   test.describe.configure({ mode: 'parallel' });
   let app: Application;
   let fakeUser: FakeUser;
@@ -176,11 +176,6 @@ test.describe('auth.protect() with API keys @xnextjs', () => {
 
     // No API key provided
     const noKeyRes = await fetch(url);
-    if (noKeyRes.status !== 401) {
-      console.log('Unexpected status for "noKeyRes". Status:', noKeyRes.status, noKeyRes.statusText);
-      const body = await noKeyRes.text();
-      console.log(`error body ${body} error body`);
-    }
     expect(noKeyRes.status).toBe(401);
 
     // Invalid API key

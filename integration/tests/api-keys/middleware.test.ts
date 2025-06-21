@@ -6,7 +6,7 @@ import { appConfigs } from '../../presets';
 import type { FakeAPIKey, FakeUser } from '../../testUtils';
 import { createTestUtils } from '../../testUtils';
 
-test.describe('auth() and API key within clerkMiddleware() @nextjs', () => {
+test.describe('auth() and API key within clerkMiddleware() xnextjs', () => {
   test.describe.configure({ mode: 'parallel' });
   let app: Application;
   let fakeUser: FakeUser;
