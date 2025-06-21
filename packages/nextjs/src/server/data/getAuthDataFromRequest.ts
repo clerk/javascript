@@ -80,28 +80,11 @@ export const getAuthDataFromRequestSync = (
   return authObject;
 };
 
-/**
- * Given a request object, builds an auth object from the request data. Used in server-side environments to get access
- * to auth data for a given request.
- */
-export const getAuthDataFromRequestAsync = async (
-  req: RequestLike,
-  opts: GetAuthDataFromRequestOptions = {},
-): Promise<AuthObject> => {
-  const { authStatus, authMessage, authReason } = getAuthHeaders(req);
-  opts.logger?.debug('headers', { authStatus, authMessage, authReason });
-
-  const bearerToken = getHeader(req, constants.Headers.Authorization)?.replace('Bearer ', '');
-  const acceptsToken = opts.acceptsToken || TokenType.SessionToken;
-  const options = {
-    secretKey: opts?.secretKey || SECRET_KEY,
-    publishableKey: PUBLISHABLE_KEY,
-    apiUrl: API_URL,
-    authStatus,
-    authMessage,
-    authReason,
-  };
-
+const handleMachineToken = async (
+  bearerToken: string | undefined,
+  acceptsToken: NonNullable<AuthenticateRequestOptions['acceptsToken']>,
+  options: GetAuthDataFromRequestOptions,
+): Promise<AuthObject | null> => {
   const hasMachineToken = bearerToken && isMachineTokenByPrefix(bearerToken);
 
   const acceptsOnlySessionToken =
@@ -128,13 +111,44 @@ export const getAuthDataFromRequestAsync = async (
     return getAuthObjectForAcceptedToken({ authObject, acceptsToken });
   }
 
+  return null;
+};
+
+/**
+ * Given a request object, builds an auth object from the request data. Used in server-side environments to get access
+ * to auth data for a given request.
+ */
+export const getAuthDataFromRequestAsync = async (
+  req: RequestLike,
+  opts: GetAuthDataFromRequestOptions = {},
+): Promise<AuthObject> => {
+  const { authStatus, authMessage, authReason } = getAuthHeaders(req);
+  opts.logger?.debug('headers', { authStatus, authMessage, authReason });
+
+  const bearerToken = getHeader(req, constants.Headers.Authorization)?.replace('Bearer ', '');
+  const acceptsToken = opts.acceptsToken || TokenType.SessionToken;
+  const options = {
+    secretKey: opts?.secretKey || SECRET_KEY,
+    publishableKey: PUBLISHABLE_KEY,
+    apiUrl: API_URL,
+    authStatus,
+    authMessage,
+    authReason,
+  };
+
+  // If the request has a machine token in header, handle it first.
+  const machineAuthObject = await handleMachineToken(bearerToken, acceptsToken, options);
+  if (machineAuthObject) {
+    return machineAuthObject;
+  }
+
   // If a random token is present and acceptsToken is an array that does NOT include session_token,
-  // return invalidTokenAuthObject.
+  // return invalid token auth object.
   if (bearerToken && Array.isArray(acceptsToken) && !acceptsToken.includes(TokenType.SessionToken)) {
     return invalidTokenAuthObject();
   }
 
-  // Fallback to session logic (sync version) for all other cases
+  // Fallback to session logic for all other cases
   const authObject = getAuthDataFromRequestSync(req, opts);
   return getAuthObjectForAcceptedToken({ authObject, acceptsToken });
 };

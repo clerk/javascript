@@ -417,18 +417,16 @@ const createMiddlewareAuthHandler = (
   const authHandler = async (options?: GetAuthOptions) => {
     const acceptsToken = options?.acceptsToken ?? TokenType.SessionToken;
 
-    const authObjWithMethods = Object.assign(
-      authObject,
-      authObject.tokenType === TokenType.SessionToken ||
-        (Array.isArray(acceptsToken) && acceptsToken.includes(TokenType.SessionToken))
-        ? {
-            redirectToSignIn,
-            redirectToSignUp,
-          }
-        : {},
-    );
+    const parsedAuthObject = getAuthObjectForAcceptedToken({ authObject, acceptsToken });
 
-    return getAuthObjectForAcceptedToken({ authObject: authObjWithMethods, acceptsToken });
+    if (parsedAuthObject.tokenType === TokenType.SessionToken) {
+      return Object.assign(parsedAuthObject, {
+        redirectToSignIn,
+        redirectToSignUp,
+      });
+    }
+
+    return parsedAuthObject;
   };
 
   return authHandler as ClerkMiddlewareAuth;
@@ -448,7 +446,7 @@ const handleControlFlowErrors = (
   requestState: RequestState,
 ): Response => {
   if (isNextjsUnauthorizedError(e)) {
-    const response = NextResponse.next({ status: 401 });
+    const response = new NextResponse(null, { status: 401 });
 
     // RequestState.toAuth() returns a session_token type by default.
     // We need to cast it to the correct type to check for OAuth tokens.
