@@ -1,4 +1,4 @@
-import type { ClerkClient, Organization, User } from '@clerk/backend';
+import type { APIKey, ClerkClient, Organization, User } from '@clerk/backend';
 import { faker } from '@faker-js/faker';
 
 import { hash } from '../models/helpers';
@@ -57,6 +57,12 @@ export type FakeOrganization = {
   delete: () => Promise<Organization>;
 };
 
+export type FakeAPIKey = {
+  apiKey: APIKey;
+  secret: string;
+  revoke: () => Promise<APIKey>;
+};
+
 export type UserService = {
   createFakeUser: (options?: FakeUserOptions) => FakeUser;
   createBapiUser: (fakeUser: FakeUser) => Promise<User>;
@@ -67,6 +73,7 @@ export type UserService = {
   deleteIfExists: (opts: { id?: string; email?: string; phoneNumber?: string }) => Promise<void>;
   createFakeOrganization: (userId: string) => Promise<FakeOrganization>;
   getUser: (opts: { id?: string; email?: string }) => Promise<User | undefined>;
+  createFakeAPIKey: (userId: string) => Promise<FakeAPIKey>;
 };
 
 /**
@@ -174,6 +181,23 @@ export const createUserService = (clerkClient: ClerkClient) => {
         organization,
         delete: () => clerkClient.organizations.deleteOrganization(organization.id),
       } satisfies FakeOrganization;
+    },
+    createFakeAPIKey: async (userId: string) => {
+      const THIRTY_MINUTES = 30 * 60;
+
+      const apiKey = await clerkClient.apiKeys.create({
+        subject: userId,
+        name: faker.company.buzzPhrase(),
+        secondsUntilExpiration: THIRTY_MINUTES,
+      });
+
+      const { secret } = await clerkClient.apiKeys.getSecret(apiKey.id);
+
+      return {
+        apiKey,
+        secret,
+        revoke: () => clerkClient.apiKeys.revoke({ apiKeyId: apiKey.id, revocationReason: 'For testing purposes' }),
+      } satisfies FakeAPIKey;
     },
   };
 
