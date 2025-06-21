@@ -12,11 +12,9 @@ import {
   constants,
   createClerkRequest,
   createRedirect,
+  getAuthObjectForAcceptedToken,
   isMachineTokenByPrefix,
-  isTokenTypeAccepted,
-  signedOutAuthObject,
   TokenType,
-  unauthenticatedMachineObject,
 } from '@clerk/backend/internal';
 import { parsePublishableKey } from '@clerk/shared/keys';
 import { notFound as nextjsNotFound } from 'next/navigation';
@@ -207,7 +205,7 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       const redirectToSignUp = createMiddlewareRedirectToSignUp(clerkRequest);
       const protect = await createMiddlewareProtect(clerkRequest, authObject, redirectToSignIn);
 
-      const authHandler = createMiddlewareAuthHandler(requestState, redirectToSignIn, redirectToSignUp);
+      const authHandler = createMiddlewareAuthHandler(authObject, redirectToSignIn, redirectToSignUp);
       authHandler.protect = protect;
 
       let handlerResult: Response = NextResponse.next();
@@ -393,12 +391,14 @@ const createMiddlewareProtect = (
         redirectUrl: url,
       });
 
+    const transformedAuthObject = getAuthObjectForAcceptedToken({ authObject, acceptsToken: params?.token });
+
     return createProtect({
       request: clerkRequest,
       redirect,
       notFound,
       unauthorized,
-      authObject,
+      authObject: transformedAuthObject,
       redirectToSignIn,
     })(params, options);
   }) as unknown as Promise<AuthProtect>;
@@ -410,17 +410,17 @@ const createMiddlewareProtect = (
  * - For machine tokens: validates token type and returns appropriate auth object
  */
 const createMiddlewareAuthHandler = (
-  requestState: RequestState,
+  authObject: AuthObject,
   redirectToSignIn: RedirectFun<Response>,
   redirectToSignUp: RedirectFun<Response>,
 ): ClerkMiddlewareAuth => {
   const authHandler = async (options?: GetAuthOptions) => {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const authObject = requestState.toAuth(options)!;
+    const acceptsToken = options?.acceptsToken ?? TokenType.SessionToken;
 
     const authObjWithMethods = Object.assign(
       authObject,
-      authObject.tokenType === TokenType.SessionToken
+      authObject.tokenType === TokenType.SessionToken ||
+        (Array.isArray(acceptsToken) && acceptsToken.includes(TokenType.SessionToken))
         ? {
             redirectToSignIn,
             redirectToSignUp,
@@ -428,24 +428,7 @@ const createMiddlewareAuthHandler = (
         : {},
     );
 
-    const acceptsToken = options?.acceptsToken ?? TokenType.SessionToken;
-
-    if (acceptsToken === 'any') {
-      return authObjWithMethods;
-    }
-
-    if (!isTokenTypeAccepted(authObject.tokenType, acceptsToken)) {
-      if (authObject.tokenType === TokenType.SessionToken) {
-        return {
-          ...signedOutAuthObject(),
-          redirectToSignIn,
-          redirectToSignUp,
-        };
-      }
-      return unauthenticatedMachineObject(authObject.tokenType);
-    }
-
-    return authObjWithMethods;
+    return getAuthObjectForAcceptedToken({ authObject: authObjWithMethods, acceptsToken });
   };
 
   return authHandler as ClerkMiddlewareAuth;
@@ -465,7 +448,7 @@ const handleControlFlowErrors = (
   requestState: RequestState,
 ): Response => {
   if (isNextjsUnauthorizedError(e)) {
-    const response = NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    const response = NextResponse.next({ status: 401 });
 
     // RequestState.toAuth() returns a session_token type by default.
     // We need to cast it to the correct type to check for OAuth tokens.
