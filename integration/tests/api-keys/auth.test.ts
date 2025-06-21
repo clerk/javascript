@@ -173,11 +173,11 @@ test.describe('auth.protect() with API keys @nextjs', () => {
   test('should validate API key', async ({ request }) => {
     const url = new URL('/api/me', app.serverUrl);
 
-    // // No API key provided
+    // No API key provided
     const noKeyRes = await request.get(url.toString());
     expect(noKeyRes.status()).toBe(401);
 
-    // // Invalid API key
+    // Invalid API key
     const invalidKeyRes = await request.get(url.toString(), {
       headers: {
         Authorization: 'Bearer invalid_key',

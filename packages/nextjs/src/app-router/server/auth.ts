@@ -185,18 +185,22 @@ export const auth: AuthFn = (async (options?: AuthOptions) => {
 auth.protect = async (...args: any[]) => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   require('server-only');
+  try {
+    const request = await buildRequestLike();
+    const requestedToken = args?.[0]?.token || args?.[1]?.token || TokenType.SessionToken;
+    const authObject = await auth({ acceptsToken: requestedToken });
 
-  const request = await buildRequestLike();
-  const requestedToken = args?.[0]?.token || args?.[1]?.token || TokenType.SessionToken;
-  const authObject = await auth({ acceptsToken: requestedToken });
-
-  const protect = createProtect({
-    request,
-    authObject,
-    redirectToSignIn: authObject.redirectToSignIn,
-    notFound,
-    redirect,
-    unauthorized,
-  });
-  return protect(...args);
+    const protect = createProtect({
+      request,
+      authObject,
+      redirectToSignIn: authObject.redirectToSignIn,
+      notFound,
+      redirect,
+      unauthorized,
+    });
+    return protect(...args);
+  } catch (error) {
+    console.log('Caught an error in auth.protect()', error);
+    return 0 as any;
+  }
 };
