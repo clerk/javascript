@@ -351,12 +351,12 @@ export const createAuthenticateRequestOptions = (
   options: ClerkMiddlewareOptions,
 ): Parameters<AuthenticateRequest>[1] => {
   return {
+    acceptsToken: 'any',
     ...options,
     ...handleMultiDomainAndProxy(clerkRequest, options),
     // TODO: Leaving the acceptsToken as 'any' opens up the possibility of
     // an economic attack. We should revisit this and only verify a token
     // when auth() or auth.protect() is invoked.
-    acceptsToken: 'any',
   };
 };
 

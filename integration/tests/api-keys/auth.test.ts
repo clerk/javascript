@@ -136,6 +136,23 @@ test.describe('auth.protect() with API keys @nextjs', () => {
     app = await appConfigs.next.appRouter
       .clone()
       .addFile(
+        'src/middleware.ts',
+        () => `
+        import { clerkMiddleware } from '@clerk/nextjs/server';
+
+        // @ts-ignore
+        export default clerkMiddleware({ acceptsToken: 'api_key' });
+
+        export const config = {
+          matcher: [
+            '/((?!.*\\..*|_next).*)', // Don't run middleware on static files
+            '/', // Run middleware on index page
+            '/(api|trpc)(.*)',
+          ], // Run middleware on API routes
+        };
+        `,
+      )
+      .addFile(
         'src/app/api/me/route.ts',
         () => `
         import { NextResponse } from 'next/server';
@@ -209,11 +226,7 @@ test.describe('auth.protect() with API keys @nextjs', () => {
     await u.po.expect.toBeSignedIn();
 
     // GET endpoint (only accepts api_key)
-    const getRes = await u.page.request.get(url.toString(), {
-      headers: {
-        'Sec-Fetch-Dest': 'document',
-      },
-    });
+    const getRes = await u.page.request.get(url.toString());
     expect(getRes.status()).toBe(401);
 
     // POST endpoint (accepts both api_key and session_token)
