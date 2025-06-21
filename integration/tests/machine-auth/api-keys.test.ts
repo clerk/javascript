@@ -69,29 +69,41 @@ test.describe('Next.js API key auth within clerkMiddleware() @nextjs', () => {
     await app.teardown();
   });
 
-  test('should validate API key', async ({ request }) => {
+  test('should return 401 if no API key is provided', async ({ request }) => {
     const url = new URL('/api/me', app.serverUrl);
+    const res = await request.get(url.toString());
+    expect(res.status()).toBe(401);
+  });
 
-    // No API key provided
-    const noKeyRes = await request.get(url.toString());
-    expect(noKeyRes.status()).toBe(401);
-
-    // Invalid API key
-    const invalidKeyRes = await request.get(url.toString(), {
-      headers: {
-        Authorization: 'Bearer invalid_key',
-      },
+  test('should return 401 if API key is invalid', async ({ request }) => {
+    const url = new URL('/api/me', app.serverUrl);
+    const res = await request.get(url.toString(), {
+      headers: { Authorization: 'Bearer invalid_key' },
     });
-    expect(invalidKeyRes.status()).toBe(401);
+    expect(res.status()).toBe(401);
+  });
 
-    // Valid API key
-    const validKeyRes = await request.get(url.toString(), {
+  test('should return 401 if API key is revoked', async ({ request }) => {
+    const url = new URL('/api/me', app.serverUrl);
+    const u = createTestUtils({ app });
+    const tempApiKey = await u.services.users.createFakeAPIKey(fakeBapiUser.id);
+    await tempApiKey.revoke();
+
+    const res = await request.get(url.toString(), {
+      headers: { Authorization: `Bearer ${tempApiKey.secret}` },
+    });
+    expect(res.status()).toBe(401);
+  });
+
+  test('should return 200 with auth object if API key is valid', async ({ request }) => {
+    const url = new URL('/api/me', app.serverUrl);
+    const res = await request.get(url.toString(), {
       headers: {
         Authorization: `Bearer ${fakeAPIKey.secret}`,
       },
     });
-    const apiKeyData = await validKeyRes.json();
-    expect(validKeyRes.status()).toBe(200);
+    const apiKeyData = await res.json();
+    expect(res.status()).toBe(200);
     expect(apiKeyData.userId).toBe(fakeBapiUser.id);
     expect(apiKeyData.tokenType).toBe(TokenType.ApiKey);
   });
@@ -151,29 +163,41 @@ test.describe('Next.js API key auth within routes @nextjs', () => {
     await app.teardown();
   });
 
-  test('should validate API key', async ({ request }) => {
+  test('should return 401 if no API key is provided', async ({ request }) => {
     const url = new URL('/api/me', app.serverUrl);
+    const res = await request.get(url.toString());
+    expect(res.status()).toBe(401);
+  });
 
-    // No API key provided
-    const noKeyRes = await request.get(url.toString());
-    expect(noKeyRes.status()).toBe(401);
-
-    // Invalid API key
-    const invalidKeyRes = await request.get(url.toString(), {
-      headers: {
-        Authorization: 'Bearer invalid_key',
-      },
+  test('should return 401 if API key is invalid', async ({ request }) => {
+    const url = new URL('/api/me', app.serverUrl);
+    const res = await request.get(url.toString(), {
+      headers: { Authorization: 'Bearer invalid_key' },
     });
-    expect(invalidKeyRes.status()).toBe(401);
+    expect(res.status()).toBe(401);
+  });
 
-    // Valid API key
-    const validKeyRes = await request.get(url.toString(), {
+  test('should return 401 if API key is revoked', async ({ request }) => {
+    const url = new URL('/api/me', app.serverUrl);
+    const u = createTestUtils({ app });
+    const tempApiKey = await u.services.users.createFakeAPIKey(fakeBapiUser.id);
+    await tempApiKey.revoke();
+
+    const res = await request.get(url.toString(), {
+      headers: { Authorization: `Bearer ${tempApiKey.secret}` },
+    });
+    expect(res.status()).toBe(401);
+  });
+
+  test('should return 200 with auth object if API key is valid', async ({ request }) => {
+    const url = new URL('/api/me', app.serverUrl);
+    const res = await request.get(url.toString(), {
       headers: {
         Authorization: `Bearer ${fakeAPIKey.secret}`,
       },
     });
-    const apiKeyData = await validKeyRes.json();
-    expect(validKeyRes.status()).toBe(200);
+    const apiKeyData = await res.json();
+    expect(res.status()).toBe(200);
     expect(apiKeyData.userId).toBe(fakeBapiUser.id);
     expect(apiKeyData.tokenType).toBe(TokenType.ApiKey);
   });
