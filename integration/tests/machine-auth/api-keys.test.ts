@@ -2,10 +2,10 @@ import type { User } from '@clerk/backend';
 import { TokenType } from '@clerk/backend/internal';
 import { expect, test } from '@playwright/test';
 
-import type { Application } from '../models/application';
-import { appConfigs } from '../presets';
-import type { FakeAPIKey, FakeUser } from '../testUtils';
-import { createTestUtils } from '../testUtils';
+import type { Application } from '../../models/application';
+import { appConfigs } from '../../presets';
+import type { FakeAPIKey, FakeUser } from '../../testUtils';
+import { createTestUtils } from '../../testUtils';
 
 test.describe('Next.js API key auth within clerkMiddleware() @nextjs', () => {
   test.describe.configure({ mode: 'parallel' });
@@ -45,7 +45,8 @@ test.describe('Next.js API key auth within clerkMiddleware() @nextjs', () => {
         import { auth } from '@clerk/nextjs/server';
 
         export async function GET() {
-          const { userId, tokenType } = auth({ acceptsToken: 'api_key' });
+          const { userId, tokenType } = await auth({ acceptsToken: 'api_key' });
+
           return Response.json({ userId, tokenType });
         }
         `,
@@ -92,6 +93,7 @@ test.describe('Next.js API key auth within clerkMiddleware() @nextjs', () => {
     const apiKeyData = await validKeyRes.json();
     expect(validKeyRes.status()).toBe(200);
     expect(apiKeyData.userId).toBe(fakeBapiUser.id);
+    expect(apiKeyData.tokenType).toBe(TokenType.ApiKey);
   });
 });
 
