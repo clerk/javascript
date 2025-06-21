@@ -6,7 +6,7 @@ import { appConfigs } from '../../presets';
 import type { FakeAPIKey, FakeUser } from '../../testUtils';
 import { createTestUtils } from '../../testUtils';
 
-test.describe('auth() and API key within clerkMiddleware() xnextjs', () => {
+test.describe('auth() and API key within clerkMiddleware() nextjs', () => {
   test.describe.configure({ mode: 'parallel' });
   let app: Application;
   let fakeUser: FakeUser;
@@ -27,7 +27,7 @@ test.describe('auth() and API key within clerkMiddleware() xnextjs', () => {
           if (isProtectedRoute(req)) {
             await auth.protect({ token: 'api_key' });
           }
-        });
+        }, { debug: true });
 
         export const config = {
           matcher: [
