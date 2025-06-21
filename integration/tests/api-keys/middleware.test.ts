@@ -27,7 +27,7 @@ test.describe('auth() and API key within clerkMiddleware() nextjs', () => {
           if (isProtectedRoute(req)) {
             await auth.protect({ token: 'api_key' });
           }
-        }, { debug: true });
+        });
 
         export const config = {
           matcher: [
@@ -44,8 +44,8 @@ test.describe('auth() and API key within clerkMiddleware() nextjs', () => {
         import { auth } from '@clerk/nextjs/server';
 
         export async function GET() {
-          const { userId } = await auth({ acceptsToken: 'api_key' });
-          return Response.json({ userId });
+          const { userId, tokenType } = auth({ acceptsToken: 'api_key' });
+          return Response.json({ userId, tokenType });
         }
         `,
       )
