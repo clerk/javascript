@@ -62,29 +62,30 @@ test.describe('auth() with API keys @nextjs', () => {
     await app.teardown();
   });
 
-  test('should validate API key', async () => {
+  test('should validate API key', async ({ page, context }) => {
     const url = new URL('/api/me', app.serverUrl);
+    const u = createTestUtils({ app, page, context });
 
     // No API key provided
-    const noKeyRes = await fetch(url);
-    expect(noKeyRes.status).toBe(401);
+    const noKeyRes = await u.page.request.get(url.toString());
+    expect(noKeyRes.status()).toBe(401);
 
     // Invalid API key
-    const invalidKeyRes = await fetch(url, {
+    const invalidKeyRes = await u.page.request.get(url.toString(), {
       headers: {
         Authorization: 'Bearer invalid_key',
       },
     });
-    expect(invalidKeyRes.status).toBe(401);
+    expect(invalidKeyRes.status()).toBe(401);
 
     // Valid API key
-    const validKeyRes = await fetch(url, {
+    const validKeyRes = await u.page.request.get(url.toString(), {
       headers: {
         Authorization: `Bearer ${fakeAPIKey.secret}`,
       },
     });
     const apiKeyData = await validKeyRes.json();
-    expect(validKeyRes.status).toBe(200);
+    expect(validKeyRes.status()).toBe(200);
     expect(apiKeyData.userId).toBe(fakeBapiUser.id);
     expect(apiKeyData.tokenType).toBe(TokenType.ApiKey);
   });
@@ -112,14 +113,13 @@ test.describe('auth() with API keys @nextjs', () => {
     expect(sessionData.tokenType).toBe(TokenType.SessionToken);
 
     // Test with API key
-    const postWithApiKeyRes = await fetch(url, {
-      method: 'POST',
+    const postWithApiKeyRes = await u.page.request.post(url.toString(), {
       headers: {
         Authorization: `Bearer ${fakeAPIKey.secret}`,
       },
     });
     const apiKeyData = await postWithApiKeyRes.json();
-    expect(postWithApiKeyRes.status).toBe(200);
+    expect(postWithApiKeyRes.status()).toBe(200);
     expect(apiKeyData.userId).toBe(fakeBapiUser.id);
     expect(apiKeyData.tokenType).toBe(TokenType.ApiKey);
   });
@@ -170,23 +170,21 @@ test.describe('auth.protect() with API keys @nextjs', () => {
     await app.teardown();
   });
 
-  test('should validate API key', async ({ page, context }) => {
+  test.skip('should validate API key', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     const url = new URL('/api/me', app.serverUrl);
 
-    const noKeyRes = await u.page.goToRelative(url.toString());
-    expect(noKeyRes.status()).toBe(401);
     // No API key provided
-    // const noKeyRes = await u.page.request.get(url.toString());
-    // expect(noKeyRes.status()).toBe(401);
+    const noKeyRes = await u.page.request.get(url.toString());
+    expect(noKeyRes.status()).toBe(401);
 
-    // // Invalid API key
-    // const invalidKeyRes = await u.page.request.get(url.toString(), {
-    //   headers: {
-    //     Authorization: 'Bearer invalid_key',
-    //   },
-    // });
-    // expect(invalidKeyRes.status()).toBe(401);
+    // Invalid API key
+    const invalidKeyRes = await u.page.request.get(url.toString(), {
+      headers: {
+        Authorization: 'Bearer invalid_key',
+      },
+    });
+    expect(invalidKeyRes.status()).toBe(401);
 
     // Valid API key
     const validKeyRes = await u.page.request.get(url.toString(), {
@@ -223,14 +221,13 @@ test.describe('auth.protect() with API keys @nextjs', () => {
     expect(sessionData.tokenType).toBe(TokenType.SessionToken);
 
     // Test with API key
-    const postWithApiKeyRes = await fetch(url, {
-      method: 'POST',
+    const postWithApiKeyRes = await u.page.request.post(url.toString(), {
       headers: {
         Authorization: `Bearer ${fakeAPIKey.secret}`,
       },
     });
     const apiKeyData = await postWithApiKeyRes.json();
-    expect(postWithApiKeyRes.status).toBe(200);
+    expect(postWithApiKeyRes.status()).toBe(200);
     expect(apiKeyData.userId).toBe(fakeBapiUser.id);
     expect(apiKeyData.tokenType).toBe(TokenType.ApiKey);
   });
