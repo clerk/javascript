@@ -41,12 +41,11 @@ test.describe('auth() and API key within clerkMiddleware() nextjs', () => {
       .addFile(
         'src/app/api/me/route.ts',
         () => `
-        import { NextResponse } from 'next/server';
         import { auth } from '@clerk/nextjs/server';
 
         export async function GET() {
           const { userId } = await auth({ acceptsToken: 'api_key' });
-          return NextResponse.json({ userId });
+          return Response.json({ userId });
         }
         `,
       )

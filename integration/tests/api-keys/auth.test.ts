@@ -20,27 +20,26 @@ test.describe('auth() with API keys @nextjs', () => {
       .addFile(
         'src/app/api/me/route.ts',
         () => `
-        import { NextResponse } from 'next/server';
         import { auth } from '@clerk/nextjs/server';
 
         export async function GET() {
           const { userId, tokenType } = await auth({ acceptsToken: 'api_key' });
 
           if (!userId) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+            return Response.json({ error: 'Unauthorized' }, { status: 401 });
           }
 
-          return NextResponse.json({ userId, tokenType });
+          return Response.json({ userId, tokenType });
         }
 
         export async function POST() {
           const authObject = await auth({ acceptsToken: ['api_key', 'session_token'] });
 
           if (!authObject.isAuthenticated) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+            return Response.json({ error: 'Unauthorized' }, { status: 401 });
           }
 
-          return NextResponse.json({ userId: authObject.userId, tokenType: authObject.tokenType });
+          return Response.json({ userId: authObject.userId, tokenType: authObject.tokenType });
         }
         `,
       )
@@ -138,27 +137,16 @@ test.describe('auth.protect() with API keys @nextjs', () => {
       .addFile(
         'src/app/api/me/route.ts',
         () => `
-        import { NextResponse } from 'next/server';
         import { auth } from '@clerk/nextjs/server';
 
         export async function GET() {
-          try {
-            const { userId, tokenType } = await auth.protect({ token: 'api_key' });
-            return NextResponse.json({ userId, tokenType });
-          } catch (error) {
-            console.log('Caught an error in auth.protect()', error);
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-          }
+          const { userId, tokenType } = await auth.protect({ token: 'api_key' });
+          return Response.json({ userId, tokenType });
         }
 
         export async function POST() {
-          try {
-            const { userId, tokenType } = await auth.protect({ token: ['api_key', 'session_token'] });
-            return NextResponse.json({ userId, tokenType });
-          } catch (error) {
-            console.log('Caught an error in auth.protect()', error);
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-          }
+          const { userId, tokenType } = await auth.protect({ token: ['api_key', 'session_token'] });
+          return Response.json({ userId, tokenType });
         }
         `,
       )
