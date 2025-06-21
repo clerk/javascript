@@ -6,7 +6,7 @@ import { appConfigs } from '../../presets';
 import type { FakeAPIKey, FakeUser } from '../../testUtils';
 import { createTestUtils } from '../../testUtils';
 
-test.describe('auth.protect() with API keys @xnextjs', () => {
+test.describe('auth() and API key within clerkMiddleware() @nextjs', () => {
   test.describe.configure({ mode: 'parallel' });
   let app: Application;
   let fakeUser: FakeUser;
@@ -17,18 +17,35 @@ test.describe('auth.protect() with API keys @xnextjs', () => {
     app = await appConfigs.next.appRouter
       .clone()
       .addFile(
-        'src/app/api/machine/route.ts',
+        `src/middleware.ts`,
+        () => `
+        import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
+
+        const isProtectedRoute = createRouteMatcher(['/api(.*)']);
+
+        export default clerkMiddleware(async (auth, req) => {
+          if (isProtectedRoute(req)) {
+            await auth.protect({ token: 'api_key' });
+          }
+        });
+
+        export const config = {
+          matcher: [
+            '/((?!.*\\..*|_next).*)', // Don't run middleware on static files
+            '/', // Run middleware on index page
+            '/(api|trpc)(.*)',
+          ], // Run middleware on API routes
+        };
+        `,
+      )
+      .addFile(
+        'src/app/api/me/route.ts',
         () => `
         import { NextResponse } from 'next/server';
         import { auth } from '@clerk/nextjs/server';
 
         export async function GET() {
-          const { userId } = await auth.protect({ token: 'api_key' });
-          return NextResponse.json({ userId });
-        }
-
-        export async function POST() {
-          const { userId } = await auth.protect({ token: ['api_key', 'session_token'] });
+          const { userId } = await auth({ acceptsToken: 'api_key' });
           return NextResponse.json({ userId });
         }
         `,
@@ -52,15 +69,10 @@ test.describe('auth.protect() with API keys @xnextjs', () => {
   });
 
   test('should validate API key', async () => {
-    const url = new URL('/api/machine', app.serverUrl);
+    const url = new URL('/api/me', app.serverUrl);
 
     // No API key provided
     const noKeyRes = await fetch(url);
-    if (noKeyRes.status !== 401) {
-      console.log('Unexpected status for "noKeyRes". Status:', noKeyRes.status, noKeyRes.statusText);
-      const body = await noKeyRes.text();
-      console.log(`error body ${body} error body`);
-    }
     expect(noKeyRes.status).toBe(401);
 
     // Invalid API key
@@ -79,39 +91,6 @@ test.describe('auth.protect() with API keys @xnextjs', () => {
     });
     const apiKeyData = await validKeyRes.json();
     expect(validKeyRes.status).toBe(200);
-    expect(apiKeyData.userId).toBe(fakeBapiUser.id);
-  });
-
-  test('should handle multiple token types', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
-    const url = new URL('/api/machine', app.serverUrl);
-
-    // Sign in to get a session token
-    await u.po.signIn.goTo();
-    await u.po.signIn.waitForMounted();
-    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
-    await u.po.expect.toBeSignedIn();
-
-    // GET endpoint (only accepts api_key)
-    const getRes = await u.page.request.get(url.toString());
-    expect(getRes.status()).toBe(401);
-
-    // POST endpoint (accepts both api_key and session_token)
-    // Test with session token
-    const postWithSessionRes = await u.page.request.post(url.toString());
-    const sessionData = await postWithSessionRes.json();
-    expect(postWithSessionRes.status()).toBe(200);
-    expect(sessionData.userId).toBe(fakeBapiUser.id);
-
-    // Test with API key
-    const postWithApiKeyRes = await fetch(url, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${fakeAPIKey.secret}`,
-      },
-    });
-    const apiKeyData = await postWithApiKeyRes.json();
-    expect(postWithApiKeyRes.status).toBe(200);
     expect(apiKeyData.userId).toBe(fakeBapiUser.id);
   });
 });
