@@ -67,11 +67,6 @@ test.describe('auth() with API keys @nextjs', () => {
 
     // No API key provided
     const noKeyRes = await fetch(url);
-    if (noKeyRes.status !== 401) {
-      console.log('Unexpected status for "noKeyRes". Status:', noKeyRes.status, noKeyRes.statusText);
-      const body = await noKeyRes.text();
-      console.log(`error body ${body} error body`);
-    }
     expect(noKeyRes.status).toBe(401);
 
     // Invalid API key
@@ -114,7 +109,7 @@ test.describe('auth() with API keys @nextjs', () => {
     const sessionData = await postWithSessionRes.json();
     expect(postWithSessionRes.status()).toBe(200);
     expect(sessionData.userId).toBe(fakeBapiUser.id);
-    expect(sessionData.tokenType).toBe(TokenType.ApiKey);
+    expect(sessionData.tokenType).toBe(TokenType.SessionToken);
 
     // Test with API key
     const postWithApiKeyRes = await fetch(url, {
@@ -183,12 +178,12 @@ test.describe('auth.protect() with API keys @nextjs', () => {
     // expect(noKeyRes.status).toBe(401);
 
     // // Invalid API key
-    // const invalidKeyRes = await fetch(url, {
-    //   headers: {
-    //     Authorization: 'Bearer invalid_key',
-    //   },
-    // });
-    // expect(invalidKeyRes.status).toBe(401);
+    const invalidKeyRes = await fetch(url, {
+      headers: {
+        Authorization: 'Bearer invalid_key',
+      },
+    });
+    expect(invalidKeyRes.status).toBe(401);
 
     // Valid API key
     const validKeyRes = await fetch(url, {
@@ -222,7 +217,7 @@ test.describe('auth.protect() with API keys @nextjs', () => {
     const sessionData = await postWithSessionRes.json();
     expect(postWithSessionRes.status()).toBe(200);
     expect(sessionData.userId).toBe(fakeBapiUser.id);
-    expect(sessionData.tokenType).toBe(TokenType.ApiKey);
+    expect(sessionData.tokenType).toBe(TokenType.SessionToken);
 
     // Test with API key
     const postWithApiKeyRes = await fetch(url, {
