@@ -187,7 +187,7 @@ auth.protect = async (...args: any[]) => {
   require('server-only');
 
   const request = await buildRequestLike();
-  const requestedToken = args[0]?.token || args[1]?.token || TokenType.SessionToken;
+  const requestedToken = args?.[0]?.token || args?.[1]?.token || TokenType.SessionToken;
   const authObject = await auth({ acceptsToken: requestedToken });
 
   const protect = createProtect({
