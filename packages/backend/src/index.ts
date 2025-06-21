@@ -106,6 +106,7 @@ export type {
  * Resources
  */
 export type {
+  APIKey,
   ActorToken,
   AccountlessApplication,
   AllowlistIdentifier,
