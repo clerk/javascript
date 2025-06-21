@@ -146,6 +146,7 @@ test.describe('auth.protect() with API keys @nextjs', () => {
             const { userId, tokenType } = await auth.protect({ token: 'api_key' });
             return NextResponse.json({ userId, tokenType });
           } catch (error) {
+            console.log('Caught an error in auth.protect()', error);
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
           }
         }
@@ -155,6 +156,7 @@ test.describe('auth.protect() with API keys @nextjs', () => {
             const { userId, tokenType } = await auth.protect({ token: ['api_key', 'session_token'] });
             return NextResponse.json({ userId, tokenType });
           } catch (error) {
+            console.log('Caught an error in auth.protect()', error);
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
           }
         }
