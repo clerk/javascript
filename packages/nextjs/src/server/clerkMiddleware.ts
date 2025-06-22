@@ -14,6 +14,7 @@ import {
   createRedirect,
   getAuthObjectForAcceptedToken,
   isMachineTokenByPrefix,
+  isTokenTypeAccepted,
   TokenType,
 } from '@clerk/backend/internal';
 import { parsePublishableKey } from '@clerk/shared/keys';
@@ -380,7 +381,7 @@ const createMiddlewareRedirectToSignUp = (
 
 const createMiddlewareProtect = (
   clerkRequest: ClerkRequest,
-  authObject: AuthObject,
+  rawAuthObject: AuthObject,
   redirectToSignIn: RedirectFun<Response>,
 ) => {
   return (async (params: any, options: any) => {
@@ -391,14 +392,14 @@ const createMiddlewareProtect = (
         redirectUrl: url,
       });
 
-    const transformedAuthObject = getAuthObjectForAcceptedToken({ authObject, acceptsToken: params?.token });
+    const authObject = getAuthObjectForAcceptedToken({ authObject: rawAuthObject, acceptsToken: params?.token });
 
     return createProtect({
       request: clerkRequest,
       redirect,
       notFound,
       unauthorized,
-      authObject: transformedAuthObject,
+      authObject,
       redirectToSignIn,
     })(params, options);
   }) as unknown as Promise<AuthProtect>;
@@ -410,26 +411,23 @@ const createMiddlewareProtect = (
  * - For machine tokens: validates token type and returns appropriate auth object
  */
 const createMiddlewareAuthHandler = (
-  authObject: AuthObject,
+  rawAuthObject: AuthObject,
   redirectToSignIn: RedirectFun<Response>,
   redirectToSignUp: RedirectFun<Response>,
 ): ClerkMiddlewareAuth => {
   const authHandler = async (options?: GetAuthOptions) => {
     const acceptsToken = options?.acceptsToken ?? TokenType.SessionToken;
 
-    const parsedAuthObject = getAuthObjectForAcceptedToken({ authObject, acceptsToken });
+    const authObject = getAuthObjectForAcceptedToken({ authObject: rawAuthObject, acceptsToken });
 
-    if (
-      parsedAuthObject.tokenType === TokenType.SessionToken ||
-      (Array.isArray(acceptsToken) && acceptsToken.includes(TokenType.SessionToken))
-    ) {
-      return Object.assign(parsedAuthObject, {
+    if (authObject.tokenType === TokenType.SessionToken && isTokenTypeAccepted(TokenType.SessionToken, acceptsToken)) {
+      return Object.assign(authObject, {
         redirectToSignIn,
         redirectToSignUp,
       });
     }
 
-    return parsedAuthObject;
+    return authObject;
   };
 
   return authHandler as ClerkMiddlewareAuth;
