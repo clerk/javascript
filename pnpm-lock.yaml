@@ -361,8 +361,8 @@ importers:
         version: 0.11.3
     devDependencies:
       astro:
-        specifier: ^5.9.2
-        version: 5.9.3(@types/node@22.15.32)(db0@0.3.2)(ioredis@5.6.1)(jiti@2.4.2)(lightningcss@1.27.0)(rollup@4.43.0)(terser@5.39.0)(tsx@4.19.2)(typescript@5.8.3)(yaml@2.7.1)
+        specifier: ^5.9.4
+        version: 5.10.0(@types/node@22.15.32)(db0@0.3.2)(ioredis@5.6.1)(jiti@2.4.2)(lightningcss@1.27.0)(rollup@4.43.0)(terser@5.39.0)(tsx@4.19.2)(typescript@5.8.3)(yaml@2.7.1)
 
   packages/backend:
     dependencies:
@@ -5871,8 +5871,8 @@ packages:
     resolution: {integrity: sha512-Z7tMw1ytTXt5jqMcOP+OQteU1VuNK9Y02uuJtKQ1Sv69jXQKKg5cibLwGJow8yzZP+eAc18EmLGPal0bp36rvQ==}
     engines: {node: '>=8'}
 
-  astro@5.9.3:
-    resolution: {integrity: sha512-VReZrpUa/3rfeiVvsQ1A2M3ujDPI+pDGIYOMtXPEZwut8tZoEyealXXLjitgCsJ+3dunKGZbg4Eak6i+r0vniw==}
+  astro@5.10.0:
+    resolution: {integrity: sha512-g/t54kVzQnFVijs+GbbbX/NBAFTl/3yNAEA/AQYq4FumLLVv7n4BIF+jKhcPGn9iFGyT1Cjvr7KB/qYyNvHEIg==}
     engines: {node: 18.20.8 || ^20.3.0 || >=22.0.0, npm: '>=9.6.5', pnpm: '>=7.1.0'}
     hasBin: true
 
@@ -20896,7 +20896,7 @@ snapshots:
 
   astral-regex@2.0.0: {}
 
-  astro@5.9.3(@types/node@22.15.32)(db0@0.3.2)(ioredis@5.6.1)(jiti@2.4.2)(lightningcss@1.27.0)(rollup@4.43.0)(terser@5.39.0)(tsx@4.19.2)(typescript@5.8.3)(yaml@2.7.1):
+  astro@5.10.0(@types/node@22.15.32)(db0@0.3.2)(ioredis@5.6.1)(jiti@2.4.2)(lightningcss@1.27.0)(rollup@4.43.0)(terser@5.39.0)(tsx@4.19.2)(typescript@5.8.3)(yaml@2.7.1):
     dependencies:
       '@astrojs/compiler': 2.12.2
       '@astrojs/internal-helpers': 0.6.1
