@@ -22,7 +22,7 @@ export const esCR: LocalizationResource = {
     manageSubscription: 'Gestionar suscripción',
     cancelSubscription: 'Cancelar suscripción',
     keepSubscription: 'Mantener suscripción',
-    reSubscribe: 'Re-suscribirse',
+    reSubscribe: 'Volver a suscribirse',
     month: 'Mes',
     switchPlan: 'Cambiar a este plan',
     checkout: {
