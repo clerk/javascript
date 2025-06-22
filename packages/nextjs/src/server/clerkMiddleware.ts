@@ -392,7 +392,8 @@ const createMiddlewareProtect = (
         redirectUrl: url,
       });
 
-    const authObject = getAuthObjectForAcceptedToken({ authObject: rawAuthObject, acceptsToken: params?.token });
+    const requestedToken = params?.token || options?.token || TokenType.SessionToken;
+    const authObject = getAuthObjectForAcceptedToken({ authObject: rawAuthObject, acceptsToken: requestedToken });
 
     return createProtect({
       request: clerkRequest,
