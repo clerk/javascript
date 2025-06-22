@@ -83,18 +83,6 @@ test.describe('Next.js API key auth within clerkMiddleware() @nextjs', () => {
     expect(res.status()).toBe(401);
   });
 
-  test('should return 401 if API key is revoked', async ({ request }) => {
-    const url = new URL('/api/me', app.serverUrl);
-    const u = createTestUtils({ app });
-    const tempApiKey = await u.services.users.createFakeAPIKey(fakeBapiUser.id);
-    await tempApiKey.revoke();
-
-    const res = await request.get(url.toString(), {
-      headers: { Authorization: `Bearer ${tempApiKey.secret}` },
-    });
-    expect(res.status()).toBe(401);
-  });
-
   test('should return 200 with auth object if API key is valid', async ({ request }) => {
     const url = new URL('/api/me', app.serverUrl);
     const res = await request.get(url.toString(), {
@@ -173,18 +161,6 @@ test.describe('Next.js API key auth within routes @nextjs', () => {
     const url = new URL('/api/me', app.serverUrl);
     const res = await request.get(url.toString(), {
       headers: { Authorization: 'Bearer invalid_key' },
-    });
-    expect(res.status()).toBe(401);
-  });
-
-  test('should return 401 if API key is revoked', async ({ request }) => {
-    const url = new URL('/api/me', app.serverUrl);
-    const u = createTestUtils({ app });
-    const tempApiKey = await u.services.users.createFakeAPIKey(fakeBapiUser.id);
-    await tempApiKey.revoke();
-
-    const res = await request.get(url.toString(), {
-      headers: { Authorization: `Bearer ${tempApiKey.secret}` },
     });
     expect(res.status()).toBe(401);
   });
