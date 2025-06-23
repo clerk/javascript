@@ -50,6 +50,8 @@ exports[`Typedoc output > should have a deliberate file structure 1`] = `
   "types/reverification-config.mdx",
   "types/saml-strategy.mdx",
   "types/sdk-metadata.mdx",
+  "types/server-get-token-options.mdx",
+  "types/server-get-token.mdx",
   "types/session-resource.mdx",
   "types/session-status-claim.mdx",
   "types/session-verification-level.mdx",
