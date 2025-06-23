@@ -1,12 +1,13 @@
-import { createContextAndHook, useOrganization, useUser } from '@clerk/shared/react';
+import {
+  __experimental_PaymentElementForm as PaymentElementForm,
+  __experimental_PaymentElementRoot as PaymentElementRoot,
+  __experimental_usePaymentElement as usePaymentElement,
+  createContextAndHook,
+} from '@clerk/shared/react';
 import type { CommerceCheckoutResource } from '@clerk/types';
-import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
-import type { Appearance as StripeAppearance, SetupIntent } from '@stripe/stripe-js';
-import { loadStripe } from '@stripe/stripe-js';
+import { useElements, useStripe } from '@stripe/react-stripe-js';
 import type { PropsWithChildren } from 'react';
 import { useEffect, useRef, useState } from 'react';
-import useSWR from 'swr';
-import useSWRMutation from 'swr/mutation';
 
 import { Card } from '@/ui/elements/Card';
 import { useCardState } from '@/ui/elements/contexts';
@@ -16,77 +17,61 @@ import { FormContainer } from '@/ui/elements/FormContainer';
 import { handleError } from '@/ui/utils/errorHandler';
 import { normalizeColorString } from '@/ui/utils/normalizeColorString';
 
-import { clerkUnsupportedEnvironmentWarning } from '../../../core/errors';
-import { useEnvironment, useSubscriberTypeContext, useSubscriberTypeLocalizationRoot } from '../../contexts';
+import { useSubscriberTypeContext, useSubscriberTypeLocalizationRoot } from '../../contexts';
 import { descriptors, Flex, localizationKeys, Spinner, useAppearance, useLocalizations } from '../../customizables';
 import type { LocalizationKey } from '../../localization';
 
+const useStipeAppearance = () => {
+  const { colors, fontWeights, fontSizes, radii, space } = useAppearance().parsedInternalTheme;
+  const elementsAppearance = {
+    // variables: {
+    colorPrimary: normalizeColorString(colors.$primary500),
+    colorBackground: normalizeColorString(colors.$colorInputBackground),
+    colorText: normalizeColorString(colors.$colorText),
+    colorTextSecondary: normalizeColorString(colors.$colorTextSecondary),
+    colorSuccess: normalizeColorString(colors.$success500),
+    colorDanger: normalizeColorString(colors.$danger500),
+    colorWarning: normalizeColorString(colors.$warning500),
+    fontWeightNormal: fontWeights.$normal.toString(),
+    fontWeightMedium: fontWeights.$medium.toString(),
+    fontWeightBold: fontWeights.$bold.toString(),
+    fontSizeXl: fontSizes.$xl,
+    fontSizeLg: fontSizes.$lg,
+    fontSizeSm: fontSizes.$md,
+    fontSizeXs: fontSizes.$sm,
+    borderRadius: radii.$md,
+    spacingUnit: space.$1,
+    // },
+  };
+
+  return elementsAppearance;
+};
+
 type AddPaymentSourceProps = {
-  onSuccess: (context: { stripeSetupIntent?: SetupIntent }) => Promise<void>;
+  onSuccess: (context: { gateway: 'stripe'; paymentToken: string }) => Promise<void>;
   checkout?: CommerceCheckoutResource;
   cancelAction?: () => void;
 };
 
-const usePaymentSourceUtils = () => {
-  const { organization } = useOrganization();
-  const { user } = useUser();
+const [AddPaymentSourceContext, useAddPaymentSourceContext] = createContextAndHook<
+  AddPaymentSourceProps & {
+    headerTitle: LocalizationKey | undefined;
+    headerSubtitle: LocalizationKey | undefined;
+    submitLabel: LocalizationKey | undefined;
+    setHeaderTitle: (title: LocalizationKey) => void;
+    setHeaderSubtitle: (subtitle: LocalizationKey) => void;
+    setSubmitLabel: (label: LocalizationKey) => void;
+    onSuccess: (context: { gateway: 'stripe'; paymentToken: string }) => Promise<void>;
+  }
+>('AddPaymentSourceRoot');
+
+const AddPaymentSourceRoot = ({ children, checkout, ...rest }: PropsWithChildren<AddPaymentSourceProps>) => {
   const subscriberType = useSubscriberTypeContext();
-  const resource = subscriberType === 'org' ? organization : user;
-
-  const { data: initializedPaymentSource, trigger: initializePaymentSource } = useSWRMutation(
-    {
-      key: 'commerce-payment-source-initialize',
-      resourceId: resource?.id,
-    },
-    () =>
-      resource?.initializePaymentSource({
-        gateway: 'stripe',
-      }),
-  );
-  const { commerceSettings } = useEnvironment();
-
-  const externalGatewayId = initializedPaymentSource?.externalGatewayId;
-  const externalClientSecret = initializedPaymentSource?.externalClientSecret;
-  const paymentMethodOrder = initializedPaymentSource?.paymentMethodOrder;
-  const stripePublishableKey = commerceSettings.billing.stripePublishableKey;
-
-  const { data: stripe } = useSWR(
-    externalGatewayId && stripePublishableKey ? { key: 'stripe-sdk', externalGatewayId, stripePublishableKey } : null,
-    ({ stripePublishableKey, externalGatewayId }) => {
-      if (__BUILD_DISABLE_RHC__) {
-        clerkUnsupportedEnvironmentWarning('Stripe');
-        return;
-      }
-      return loadStripe(stripePublishableKey, {
-        stripeAccount: externalGatewayId,
-      });
-    },
-    {
-      keepPreviousData: true,
-      revalidateOnFocus: false,
-      dedupingInterval: 1_000 * 60, // 1 minute
-    },
-  );
-
-  return {
-    stripe,
-    initializePaymentSource,
-    externalClientSecret,
-    paymentMethodOrder,
-  };
-};
-
-const [AddPaymentSourceContext, useAddPaymentSourceContext] = createContextAndHook<any>('AddPaymentSourceRoot');
-
-const AddPaymentSourceRoot = ({ children, ...rest }: PropsWithChildren<AddPaymentSourceProps>) => {
-  const { initializePaymentSource, externalClientSecret, stripe, paymentMethodOrder } = usePaymentSourceUtils();
+  const { t } = useLocalizations();
   const [headerTitle, setHeaderTitle] = useState<LocalizationKey | undefined>(undefined);
   const [headerSubtitle, setHeaderSubtitle] = useState<LocalizationKey | undefined>(undefined);
   const [submitLabel, setSubmitLabel] = useState<LocalizationKey | undefined>(undefined);
-
-  useEffect(() => {
-    void initializePaymentSource();
-  }, []);
+  const stripeAppearance = useStipeAppearance();
 
   return (
     <AddPaymentSourceContext.Provider
@@ -98,23 +83,33 @@ const AddPaymentSourceRoot = ({ children, ...rest }: PropsWithChildren<AddPaymen
           setHeaderTitle,
           setHeaderSubtitle,
           setSubmitLabel,
-          initializePaymentSource,
-          externalClientSecret,
-          stripe,
-          paymentMethodOrder,
+          checkout,
           ...rest,
         },
       }}
     >
-      {children}
+      <PaymentElementRoot
+        checkout={checkout}
+        for={subscriberType}
+        stripeAppearance={stripeAppearance}
+        paymentDescription={t(
+          localizationKeys(
+            checkout?.planPeriod === 'month'
+              ? 'commerce.paymentSource.applePayDescription.monthly'
+              : 'commerce.paymentSource.applePayDescription.annual',
+          ),
+        )}
+      >
+        {children}
+      </PaymentElementRoot>
     </AddPaymentSourceContext.Provider>
   );
 };
 
 const AddPaymentSourceLoading = (props: PropsWithChildren) => {
-  const { stripe, externalClientSecret } = useAddPaymentSourceContext();
+  const { isProviderReady } = usePaymentElement();
 
-  if (!stripe || !externalClientSecret) {
+  if (!isProviderReady) {
     return props.children;
   }
 
@@ -122,44 +117,13 @@ const AddPaymentSourceLoading = (props: PropsWithChildren) => {
 };
 
 const AddPaymentSourceReady = (props: PropsWithChildren) => {
-  const { externalClientSecret, stripe } = useAddPaymentSourceContext();
+  const { isProviderReady } = usePaymentElement();
 
-  const { colors, fontWeights, fontSizes, radii, space } = useAppearance().parsedInternalTheme;
-  const elementsAppearance: StripeAppearance = {
-    variables: {
-      colorPrimary: normalizeColorString(colors.$primary500),
-      colorBackground: normalizeColorString(colors.$colorInputBackground),
-      colorText: normalizeColorString(colors.$colorText),
-      colorTextSecondary: normalizeColorString(colors.$colorTextSecondary),
-      colorSuccess: normalizeColorString(colors.$success500),
-      colorDanger: normalizeColorString(colors.$danger500),
-      colorWarning: normalizeColorString(colors.$warning500),
-      fontWeightNormal: fontWeights.$normal.toString(),
-      fontWeightMedium: fontWeights.$medium.toString(),
-      fontWeightBold: fontWeights.$bold.toString(),
-      fontSizeXl: fontSizes.$xl,
-      fontSizeLg: fontSizes.$lg,
-      fontSizeSm: fontSizes.$md,
-      fontSizeXs: fontSizes.$sm,
-      borderRadius: radii.$md,
-      spacingUnit: space.$1,
-    },
-  };
-
-  if (!stripe || !externalClientSecret) {
+  if (!isProviderReady) {
     return null;
   }
 
-  return (
-    <Elements
-      // This key is used to reset the payment intent, since Stripe doesn't not provide a way to reset the payment intent.
-      key={externalClientSecret}
-      stripe={stripe}
-      options={{ clientSecret: externalClientSecret, appearance: elementsAppearance }}
-    >
-      {props.children}
-    </Elements>
-  );
+  return <>{props.children}</>;
 };
 
 const Root = (props: PropsWithChildren<AddPaymentSourceProps>) => {
@@ -221,23 +185,13 @@ const FormButton = ({ text }: { text: LocalizationKey }) => {
 };
 
 const AddPaymentSourceForm = ({ children }: PropsWithChildren) => {
-  const {
-    headerTitle,
-    headerSubtitle,
-    submitLabel,
-    checkout,
-    initializePaymentSource,
-    onSuccess,
-    cancelAction,
-    paymentMethodOrder,
-  } = useAddPaymentSourceContext();
-  const [isPaymentElementReady, setIsPaymentElementReady] = useState(false);
+  const { headerTitle, headerSubtitle, submitLabel, checkout, onSuccess, cancelAction } = useAddPaymentSourceContext();
   const stripe = useStripe();
   const card = useCardState();
   const elements = useElements();
-  const { displayConfig } = useEnvironment();
-  const { t } = useLocalizations();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
+
+  const { isFormReady, submit: submitPaymentElement, reset } = usePaymentElement();
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -248,24 +202,22 @@ const AddPaymentSourceForm = ({ children }: PropsWithChildren) => {
     card.setLoading();
     card.setError(undefined);
 
-    const { setupIntent, error } = await stripe.confirmSetup({
-      elements,
-      confirmParams: {
-        return_url: '', // TODO(@COMMERCE): need to figure this out
-      },
-      redirect: 'if_required',
-    });
+    const { data, error } = await submitPaymentElement();
     if (error) {
       return; // just return, since stripe will handle the error
     }
+    // TODO: @COMMERCE:  why is this not infered as defined?
+    if (!data) {
+      return;
+    }
 
     try {
-      await onSuccess({ stripeSetupIntent: setupIntent });
+      await onSuccess(data);
     } catch (error) {
       void handleError(error, [], card.setError);
     } finally {
       card.setIdle();
-      initializePaymentSource(); // resets the payment intent
+      void reset(); // resets the payment intent
     }
   };
 
@@ -283,32 +235,10 @@ const AddPaymentSourceForm = ({ children }: PropsWithChildren) => {
         })}
       >
         {children}
-        <PaymentElement
-          onReady={() => setIsPaymentElementReady(true)}
-          options={{
-            layout: {
-              type: 'tabs',
-              defaultCollapsed: false,
-            },
-            paymentMethodOrder,
-            applePay: checkout
-              ? {
-                  recurringPaymentRequest: {
-                    paymentDescription: `${t(localizationKeys(checkout.planPeriod === 'month' ? 'commerce.paymentSource.applePayDescription.monthly' : 'commerce.paymentSource.applePayDescription.annual'))}`,
-                    managementURL: displayConfig.homeUrl, // TODO(@COMMERCE): is this the right URL?
-                    regularBilling: {
-                      amount: checkout.totals.totalDueNow?.amount || checkout.totals.grandTotal.amount,
-                      label: checkout.plan.name,
-                      recurringPaymentIntervalUnit: checkout.planPeriod === 'annual' ? 'year' : 'month',
-                    },
-                  },
-                }
-              : undefined,
-          }}
-        />
+        <PaymentElementForm />
         <Card.Alert>{card.error}</Card.Alert>
         <FormButtons
-          isDisabled={!isPaymentElementReady}
+          isDisabled={!isFormReady}
           submitLabel={
             submitLabel ??
             localizationKeys(`${localizationRoot}.billingPage.paymentSourcesSection.formButtonPrimary__add`)

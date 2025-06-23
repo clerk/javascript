@@ -10,9 +10,10 @@ const hasCloudflareContext = (context: any): context is CloudflareEnv => {
 
 /**
  * Retrieves an environment variable across runtime environments.
- * @param name - The environment variable name to retrieve
- * @param context - Optional context object that may contain environment values
- * @returns The environment variable value or empty string if not found
+ *
+ * @param name - The environment variable name to retrieve.
+ * @param context - Optional context object that may contain environment values.
+ * @returns The environment variable value or empty string if not found.
  */
 export const getEnvVariable = (name: string, context?: Record<string, any>): string => {
   // Node envs

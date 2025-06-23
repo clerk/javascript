@@ -81,6 +81,7 @@ const common = ({ mode, variant, disableRHC = false }) => {
      * Necessary to prevent the Stripe dependencies from being bundled into
      * SDKs such as Browser Extensions.
      */
+    // TODO: @COMMERCE:  Do we still need this?
     externals: disableRHC ? ['@stripe/stripe-js', '@stripe/react-stripe-js'] : undefined,
     optimization: {
       splitChunks: {
@@ -100,6 +101,11 @@ const common = ({ mode, variant, disableRHC = false }) => {
             name: 'coinbase-wallet-sdk',
             chunks: 'all',
           },
+          stripeVendor: {
+            test: /[\\/]node_modules[\\/](@stripe\/stripe-js|@stripe\/react-stripe-js)[\\/]/,
+            name: 'stripe-vendors',
+            chunks: 'all',
+          },
           /**
            * Sign up is shared between the SignUp component and the SignIn component.
            */
@@ -108,17 +114,11 @@ const common = ({ mode, variant, disableRHC = false }) => {
             name: 'signup',
             test: module => !!(module.resource && module.resource.includes('/ui/components/SignUp')),
           },
-          paymentSources: {
-            minChunks: 1,
-            name: 'paymentSources',
-            test: module =>
-              !!(
-                module.resource &&
-                (module.resource.includes('/ui/components/PaymentSources') ||
-                  // Include `@stripe/react-stripe-js` and `@stripe/stripe-js` in the checkout chunk
-                  module.resource.includes('/node_modules/@stripe'))
-              ),
-          },
+          // paymentSources: {
+          //   minChunks: 1,
+          //   name: 'paymentSources',
+          //   test: module => !!(module.resource && module.resource.includes('/ui/components/PaymentSources')),
+          // },
           common: {
             minChunks: 1,
             name: 'ui-common',

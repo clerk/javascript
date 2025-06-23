@@ -515,6 +515,15 @@ export interface Clerk {
   __internal_unmountOAuthConsent: (targetNode: HTMLDivElement) => void;
 
   /**
+   * @internal
+   * Loads Stripe libraries for commerce functionality
+   */
+  __internal_loadStripeLibs: () => {
+    javascript(): Promise<any>;
+    react(): Promise<any>;
+  };
+
+  /**
    * Register a listener that triggers a callback each time important Clerk resources are changed.
    * Allows to hook up at different steps in the sign up, sign in processes.
    *
