@@ -122,8 +122,15 @@ const getColorMixAlpha = (color: string, shade: ColorShade): string => {
   return createColorMix('transparent', color, alphaPercentage);
 };
 
-const applyScalePrefix = (scale: ColorScale<string | undefined>, prefix: string) => {
-  return Object.fromEntries(Object.entries(scale).map(([shade, color]) => [prefix + shade, color]));
+const applyScalePrefix = <Prefix extends string>(
+  scale: ColorScale<string | undefined>,
+  prefix: Prefix,
+): Record<`${Prefix}${keyof ColorScale<string>}`, string> => {
+  return Object.fromEntries(
+    Object.entries(scale)
+      .filter(([, color]) => color !== undefined)
+      .map(([shade, color]) => [prefix + shade, color]),
+  ) as Record<`${Prefix}${keyof ColorScale<string>}`, string>;
 };
 
 const colorMix = (colorOne: string, colorTwo: string): string => {
