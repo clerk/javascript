@@ -11,6 +11,9 @@ import type {
   ValueOrSetter,
 } from '../types';
 
+/**
+ *
+ */
 function getDifferentKeys(obj1: Record<string, unknown>, obj2: Record<string, unknown>): Record<string, unknown> {
   const keysSet = new Set(Object.keys(obj2));
   const differentKeysObject: Record<string, unknown> = {};
@@ -61,15 +64,15 @@ type UsePagesOrInfinite = <
   TConfig extends PagesOrInfiniteConfig = PagesOrInfiniteConfig,
 >(
   /**
-   * The parameters will be passed to the fetcher
+   * The parameters will be passed to the fetcher.
    */
   params: Params,
   /**
-   * A Promise returning function to fetch your data
+   * A Promise returning function to fetch your data.
    */
   fetcher: ((p: Params) => FetcherReturnData | Promise<FetcherReturnData>) | undefined,
   /**
-   * Internal configuration of the hook
+   * Internal configuration of the hook.
    */
   config: TConfig,
   cacheKeys: CacheKeys,
@@ -177,7 +180,7 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, config, 
   const error = (triggerInfinite ? swrInfiniteError : swrError) ?? null;
   const isError = !!error;
   /**
-   * Helpers
+   * Helpers.
    */
   const fetchNext = useCallback(() => {
     fetchPage(n => Math.max(0, n + 1));

@@ -645,6 +645,19 @@ export class Clerk implements ClerkInterface {
       .then(controls => controls.closeModal('blankCaptcha'));
   };
 
+  public __internal_loadStripeLibs = () => {
+    return {
+      async javascript(): Promise<unknown> {
+        const { loadStripe } = await import('@stripe/stripe-js');
+        return loadStripe;
+      },
+      async react(): Promise<unknown> {
+        const { Elements, PaymentElement, useElements, useStripe } = await import('@stripe/react-stripe-js');
+        return { Elements, PaymentElement, useElements, useStripe };
+      },
+    };
+  };
+
   public openSignUp = (props?: SignUpProps): void => {
     this.assertComponentsReady(this.#componentControls);
     if (sessionExistsAndSingleSessionModeEnabled(this, this.environment)) {
