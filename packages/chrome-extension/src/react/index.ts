@@ -1,2 +1,2 @@
 export { ClerkProvider } from './ClerkProvider';
-export { GoogleOneTap, PricingTable, SignInWithMetamaskButton } from './NotSupported';
+export { GoogleOneTap } from './NotSupported';
