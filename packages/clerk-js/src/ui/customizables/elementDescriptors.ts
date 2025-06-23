@@ -333,6 +333,10 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'tabListContainer',
 
   'tableHead',
+  'tableBody',
+  'tableRow',
+  'tableHeaderCell',
+  'tableBodyCell',
 
   'paginationButton',
   'paginationButtonIcon',
@@ -458,6 +462,24 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'notificationBadge',
   'buttonArrowIcon',
   'spinner',
+
+  'apiKeys',
+  'apiKeysHeader',
+  'apiKeysSearchBox',
+  'apiKeysSearchInput',
+  'apiKeysAddButton',
+  'apiKeysTable',
+  'apiKeysCopyButton',
+  'apiKeysRevealButton',
+  'apiKeysCreateForm',
+  'apiKeysCreateFormNameInput',
+  'apiKeysCreateFormDescriptionInput',
+  'apiKeysCreateFormExpirationInput',
+  'apiKeysCreateFormSubmitButton',
+  'apiKeysCreateFormExpirationCaption',
+  'apiKeysRevokeModal',
+  'apiKeysRevokeModalInput',
+  'apiKeysRevokeModalSubmitButton',
 ] as const).map(camelize) as (keyof ElementsConfig)[];
 
 type TargettableClassname<K extends keyof ElementsConfig> = `${typeof CLASS_PREFIX}${K}`;
