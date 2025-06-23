@@ -1,108 +1,85 @@
-import { colorOptionToHslaAlphaScale } from '../utils/colorOptionToHslaScale';
+import {
+  createAlphaScaleWithTransparentize,
+  createColorMixLightnessScale,
+  lighten,
+  transparentize,
+} from '../utils/colorMix';
+import { clerkCssVar } from '../utils/css';
 
-export const whiteAlpha = Object.freeze({
-  whiteAlpha25: 'hsla(0, 0%, 100%, 0.02)',
-  whiteAlpha50: 'hsla(0, 0%, 100%, 0.03)',
-  whiteAlpha100: 'hsla(0, 0%, 100%, 0.07)',
-  whiteAlpha150: 'hsla(0, 0%, 100%, 0.11)',
-  whiteAlpha200: 'hsla(0, 0%, 100%, 0.15)',
-  whiteAlpha300: 'hsla(0, 0%, 100%, 0.28)',
-  whiteAlpha400: 'hsla(0, 0%, 100%, 0.41)',
-  whiteAlpha500: 'hsla(0, 0%, 100%, 0.53)',
-  whiteAlpha600: 'hsla(0, 0%, 100%, 0.62)',
-  whiteAlpha700: 'hsla(0, 0%, 100%, 0.73)',
-  whiteAlpha750: 'hsla(0, 0%, 100%, 0.78)',
-  whiteAlpha800: 'hsla(0, 0%, 100%, 0.81)',
-  whiteAlpha850: 'hsla(0, 0%, 100%, 0.84)',
-  whiteAlpha900: 'hsla(0, 0%, 100%, 0.87)',
-  whiteAlpha950: 'hsla(0, 0%, 100%, 0.92)',
-} as const);
+type ColorScale<Prefix extends string> = {
+  [K in `${Prefix}${'50' | '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900' | '950'}`]: string;
+};
 
-export const neutralAlpha = Object.freeze({
-  neutralAlpha25: 'hsla(0, 0%, 0%, 0.02)',
-  neutralAlpha50: 'hsla(0, 0%, 0%, 0.03)',
-  neutralAlpha100: 'hsla(0, 0%, 0%, 0.07)',
-  neutralAlpha150: 'hsla(0, 0%, 0%, 0.11)',
-  neutralAlpha200: 'hsla(0, 0%, 0%, 0.15)',
-  neutralAlpha300: 'hsla(0, 0%, 0%, 0.28)',
-  neutralAlpha400: 'hsla(0, 0%, 0%, 0.41)',
-  neutralAlpha500: 'hsla(0, 0%, 0%, 0.53)',
-  neutralAlpha600: 'hsla(0, 0%, 0%, 0.62)',
-  neutralAlpha700: 'hsla(0, 0%, 0%, 0.73)',
-  neutralAlpha750: 'hsla(0, 0%, 0%, 0.78)',
-  neutralAlpha800: 'hsla(0, 0%, 0%, 0.81)',
-  neutralAlpha850: 'hsla(0, 0%, 0%, 0.84)',
-  neutralAlpha900: 'hsla(0, 0%, 0%, 0.87)',
-  neutralAlpha950: 'hsla(0, 0%, 0%, 0.92)',
-} as const);
+// Create alpha scales separately to preserve types
+export const whiteAlpha = createAlphaScaleWithTransparentize('white', 'whiteAlpha');
+export const neutralAlpha = createAlphaScaleWithTransparentize(clerkCssVar('neutral', 'black'), 'neutralAlpha');
 
-export const colors = Object.freeze({
+const primaryAlpha = createAlphaScaleWithTransparentize(clerkCssVar('primary', '#2F3037'), 'primaryAlpha');
+const dangerAlpha = createAlphaScaleWithTransparentize(clerkCssVar('danger', '#EF4444'), 'dangerAlpha');
+const warningAlpha = createAlphaScaleWithTransparentize(clerkCssVar('warning', '#F36B16'), 'warningAlpha');
+const successAlpha = createAlphaScaleWithTransparentize(clerkCssVar('success', '#22C543'), 'successAlpha');
+
+const primaryScale = createColorMixLightnessScale(clerkCssVar('primary', '#2F3037'), 'primary');
+const dangerScale = createColorMixLightnessScale(clerkCssVar('danger', '#EF4444'), 'danger');
+const warningScale = createColorMixLightnessScale(clerkCssVar('warning', '#F36B16'), 'warning');
+const successScale = createColorMixLightnessScale(clerkCssVar('success', '#22C543'), 'success');
+
+// Define the base colors object type
+type BaseColors = {
+  avatarBorder: string;
+  avatarBackground: string;
+  modalBackdrop: string;
+  colorBackground: string;
+  colorInputBackground: string;
+  colorText: string;
+  colorTextSecondary: string;
+  colorInputText: string;
+  colorTextOnPrimaryBackground: string;
+  colorShimmer: string;
+  transparent: string;
+  white: string;
+  black: string;
+  primaryHover: string;
+};
+
+// Combine all types
+type Colors = BaseColors &
+  ColorScale<'primary'> &
+  ColorScale<'danger'> &
+  ColorScale<'warning'> &
+  ColorScale<'success'> &
+  typeof neutralAlpha &
+  typeof whiteAlpha &
+  typeof primaryAlpha &
+  typeof dangerAlpha &
+  typeof warningAlpha &
+  typeof successAlpha;
+
+export const colors: Colors = Object.freeze({
   avatarBorder: neutralAlpha.neutralAlpha200,
   avatarBackground: neutralAlpha.neutralAlpha400,
   modalBackdrop: neutralAlpha.neutralAlpha700,
   // Themable colors
   ...neutralAlpha,
   ...whiteAlpha,
-  colorBackground: 'white',
-  colorInputBackground: 'white',
-  colorText: '#212126',
-  colorTextSecondary: '#747686',
-  colorInputText: '#131316',
-  colorTextOnPrimaryBackground: 'white',
-  colorShimmer: 'rgba(255, 255, 255, 0.36)',
+  colorBackground: clerkCssVar('background', 'white'),
+  colorInputBackground: clerkCssVar('input', 'white'),
+  colorText: clerkCssVar('foreground', '#212126'),
+  colorTextSecondary: clerkCssVar('secondary-foreground', '#747686'),
+  colorInputText: clerkCssVar('input-foreground', '#131316'),
+  colorTextOnPrimaryBackground: clerkCssVar('primary-foreground', 'white'),
+  colorShimmer: clerkCssVar('shimmer', transparentize('white', '36%')),
   transparent: 'transparent',
   white: 'white',
   black: 'black',
-  primary50: '#B9BDBC',
-  primary100: '#9EA1A2',
-  primary200: '#828687',
-  primary300: '#66696D',
-  primary400: '#4B4D52',
-  primary500: '#2F3037',
-  primary600: '#2A2930',
-  primary700: '#25232A',
-  primary800: '#201D23',
-  primary900: '#1B171C',
-  primaryHover: '#3B3C45', //primary 500 adjusted for lightness
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  ...colorOptionToHslaAlphaScale('#2F3037', 'primaryAlpha')!,
-  danger50: '#FEF2F2',
-  danger100: '#FEE5E5',
-  danger200: '#FECACA',
-  danger300: '#FCA5A5',
-  danger400: '#F87171',
-  danger500: '#EF4444',
-  danger600: '#DC2626',
-  danger700: '#B91C1C',
-  danger800: '#991B1B',
-  danger900: '#7F1D1D',
-  danger950: '#450A0A',
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  ...colorOptionToHslaAlphaScale('#EF4444', 'dangerAlpha')!,
-  warning50: '#FFF6ED',
-  warning100: '#FFEBD5',
-  warning200: '#FED1AA',
-  warning300: '#FDB674',
-  warning400: '#F98C49',
-  warning500: '#F36B16',
-  warning600: '#EA520C',
-  warning700: '#C23A0C',
-  warning800: '#9A2F12',
-  warning900: '#7C2912',
-  warning950: '#431207',
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  ...colorOptionToHslaAlphaScale('#F36B16', 'warningAlpha')!,
-  success50: '#F0FDF2',
-  success100: '#DCFCE2',
-  success200: '#BBF7C6',
-  success300: '#86EF9B',
-  success400: '#4ADE68',
-  success500: '#22C543',
-  success600: '#16A332',
-  success700: '#15802A',
-  success800: '#166527',
-  success900: '#145323',
-  success950: '#052E0F',
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  ...colorOptionToHslaAlphaScale('#22C543', 'successAlpha')!,
+  ...primaryScale,
+  // TODO(Colors): We are not adjusting the lightness based on the colorPrimary lightness
+  primaryHover: lighten(clerkCssVar('primary', '#2F3037'), '25%'), // primary 500 adjusted for lightness
+  ...primaryAlpha,
+  ...dangerScale,
+  ...dangerAlpha,
+  ...warningScale,
+  ...warningAlpha,
+  ...successScale,
+  ...successAlpha,
 } as const);

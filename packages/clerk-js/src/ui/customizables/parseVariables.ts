@@ -2,25 +2,33 @@ import type { Theme } from '@clerk/types';
 
 import { spaceScaleKeys } from '../foundations/sizes';
 import type { fontSizes, fontWeights } from '../foundations/typography';
+import { fromEntries, removeUndefinedProps } from '../utils';
 import {
-  colorOptionToHslaAlphaScale,
-  colorOptionToHslaLightnessScale,
-  colors,
-  fromEntries,
-  removeUndefinedProps,
-} from '../utils';
+  createAlphaScaleWithTransparentize,
+  createColorMixLightnessScale,
+  lighten,
+  transparentize,
+} from '../utils/colorMix';
 
 export const createColorScales = (theme: Theme) => {
   const variables = theme.variables || {};
 
-  const primaryScale = colorOptionToHslaLightnessScale(variables.colorPrimary, 'primary');
-  const primaryAlphaScale = colorOptionToHslaAlphaScale(primaryScale?.primary500, 'primaryAlpha');
-  const dangerScale = colorOptionToHslaLightnessScale(variables.colorDanger, 'danger');
-  const dangerAlphaScale = colorOptionToHslaAlphaScale(dangerScale?.danger500, 'dangerAlpha');
-  const successScale = colorOptionToHslaLightnessScale(variables.colorSuccess, 'success');
-  const successAlphaScale = colorOptionToHslaAlphaScale(successScale?.success500, 'successAlpha');
-  const warningScale = colorOptionToHslaLightnessScale(variables.colorWarning, 'warning');
-  const warningAlphaScale = colorOptionToHslaAlphaScale(warningScale?.warning500, 'warningAlpha');
+  const primaryScale = createColorMixLightnessScale(variables.colorPrimary, 'primary');
+  const primaryBase = primaryScale?.primary500;
+  const primaryAlphaScale = primaryBase ? createAlphaScaleWithTransparentize(primaryBase, 'primaryAlpha') : undefined;
+  const dangerScale = createColorMixLightnessScale(variables.colorDanger, 'danger');
+  const dangerBase = dangerScale?.danger500;
+  const dangerAlphaScale = dangerBase ? createAlphaScaleWithTransparentize(dangerBase, 'dangerAlpha') : undefined;
+  const successScale = createColorMixLightnessScale(variables.colorSuccess, 'success');
+  const successBase = successScale?.success500;
+  const successAlphaScale = successBase ? createAlphaScaleWithTransparentize(successBase, 'successAlpha') : undefined;
+  const warningScale = createColorMixLightnessScale(variables.colorWarning, 'warning');
+  const warningBase = warningScale?.warning500;
+  const warningAlphaScale = warningBase ? createAlphaScaleWithTransparentize(warningBase, 'warningAlpha') : undefined;
+  const neutralAlphaScales =
+    typeof variables.colorNeutral === 'string' && variables.colorNeutral
+      ? createAlphaScaleWithTransparentize(variables.colorNeutral, 'neutralAlpha')
+      : {};
 
   return removeUndefinedProps({
     ...primaryScale,
@@ -31,20 +39,18 @@ export const createColorScales = (theme: Theme) => {
     ...successAlphaScale,
     ...warningScale,
     ...warningAlphaScale,
-    ...colorOptionToHslaAlphaScale(variables.colorNeutral, 'neutralAlpha'),
-    primaryHover: colors.adjustForLightness(primaryScale?.primary500),
-    colorTextOnPrimaryBackground: toHSLA(variables.colorTextOnPrimaryBackground),
-    colorText: toHSLA(variables.colorText),
-    colorTextSecondary: toHSLA(variables.colorTextSecondary) || colors.makeTransparent(variables.colorText, 0.35),
-    colorInputText: toHSLA(variables.colorInputText),
-    colorBackground: toHSLA(variables.colorBackground),
-    colorInputBackground: toHSLA(variables.colorInputBackground),
-    colorShimmer: toHSLA(variables.colorShimmer),
+    ...neutralAlphaScales,
+    // TODO(Colors): We are not adjusting the lightness based on the colorPrimary lightness
+    primaryHover: primaryBase ? lighten(primaryBase, '90%') : undefined,
+    colorTextOnPrimaryBackground: variables.colorTextOnPrimaryBackground,
+    colorText: variables.colorText,
+    colorTextSecondary:
+      variables.colorTextSecondary || (variables.colorText ? transparentize(variables.colorText, '35%') : undefined),
+    colorInputText: variables.colorInputText,
+    colorBackground: variables.colorBackground,
+    colorInputBackground: variables.colorInputBackground,
+    colorShimmer: variables.colorShimmer,
   });
-};
-
-export const toHSLA = (str: string | undefined) => {
-  return str ? colors.toHslaString(str) : undefined;
 };
 
 export const createRadiiUnits = (theme: Theme) => {

@@ -2,7 +2,7 @@ import React from 'react';
 
 import type { PrimitiveProps, StyleVariants } from '../styledSystem';
 import { createVariants } from '../styledSystem';
-import { colors } from '../utils';
+import { transparentize } from '../utils/colorMix';
 import type { BoxProps } from './Box';
 import { Box } from './Box';
 
@@ -11,7 +11,7 @@ const { applyVariants, filterProps } = createVariants(theme => ({
     textAlign: 'left',
     fontSize: theme.fontSizes.$sm,
     fontWeight: theme.fontWeights.$normal,
-    color: colors.setAlpha(theme.colors.$colorText, 0.62),
+    color: transparentize(theme.colors.$colorText, '62%'),
     padding: `${theme.space.$2} ${theme.space.$4}`,
   },
   variants: {},

@@ -8,8 +8,9 @@ import { useNavigateToFlowStart, usePopover } from '../hooks';
 import { Menu } from '../icons';
 import { useRouter } from '../router';
 import type { PropsOfComponent } from '../styledSystem';
-import { animations, common, mqu } from '../styledSystem';
+import { animations, mqu } from '../styledSystem';
 import { colors } from '../utils';
+import { colorMix } from '../utils/colorMix';
 import { Card } from './Card';
 import { withFloatingTree } from './contexts';
 import { DevModeOverlay } from './DevModeNotice';
@@ -154,10 +155,7 @@ const NavbarContainer = (
         width: t.sizes.$57,
         position: 'relative',
         maxWidth: t.space.$57,
-        background: common.mergedColorsBackground(
-          colors.setAlpha(t.colors.$colorBackground, 1),
-          t.colors.$neutralAlpha50,
-        ),
+        backgroundColor: colorMix(t.colors.$colorBackground, t.colors.$neutralAlpha50),
         padding: `${t.space.$6} ${t.space.$5} ${t.space.$4} ${t.space.$3}`,
         marginRight: `-${t.space.$2}`,
         color: t.colors.$colorText,
@@ -327,10 +325,7 @@ export const NavbarMenuButtonRow = ({ navbarTitleLocalizationKey, ...props }: Na
       elementDescriptor={descriptors.navbarMobileMenuRow}
       sx={t => ({
         display: 'none',
-        background: common.mergedColorsBackground(
-          colors.setAlpha(t.colors.$colorBackground, 1),
-          t.colors.$neutralAlpha50,
-        ),
+        backgroundColor: colorMix(t.colors.$colorBackground, t.colors.$neutralAlpha50),
         padding: `${t.space.$2} ${t.space.$3} ${t.space.$4} ${t.space.$3}`,
         marginBottom: `-${t.space.$2}`,
         [mqu.md]: {
