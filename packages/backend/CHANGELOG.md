@@ -1,5 +1,25 @@
 # Change Log
 
+## 2.2.0
+
+### Minor Changes
+
+- Add support for `expiresInSeconds` parameter in session token generation. This allows setting custom expiration times for tokens both with and without templates via the backend API. ([#6150](https://github.com/clerk/javascript/pull/6150)) by [@jacekradko](https://github.com/jacekradko)
+
+- - Optimize `auth()` calls to avoid unnecessary verification calls when the provided token type is not in the `acceptsToken` array. ([#6123](https://github.com/clerk/javascript/pull/6123)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  - Add handling for invalid token types when `acceptsToken` is an array in `authenticateRequest()`: now returns a clear unauthenticated state (`tokenType: null`) if the token is not in the accepted list.
+
+- Introduce API keys Backend SDK methods ([#6169](https://github.com/clerk/javascript/pull/6169)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Add logic to ensure that we consider the proxy_url when creating the frontendApi url. ([#6120](https://github.com/clerk/javascript/pull/6120)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`b495279`](https://github.com/clerk/javascript/commit/b4952796e3c7dee4ab4726de63a17b7f4265ce37), [`c3fa15d`](https://github.com/clerk/javascript/commit/c3fa15d60642b4fcbcf26e21caaca0fc60975795), [`52d5e57`](https://github.com/clerk/javascript/commit/52d5e5768d54725b4d20d028135746493e05d44c), [`15a945c`](https://github.com/clerk/javascript/commit/15a945c02a9f6bc8d2f7d1e3534217100bf45936), [`72629b0`](https://github.com/clerk/javascript/commit/72629b06fb1fe720fa2a61462306a786a913e9a8)]:
+  - @clerk/types@4.61.0
+  - @clerk/shared@3.9.8
+
 ## 2.1.0
 
 ### Minor Changes
