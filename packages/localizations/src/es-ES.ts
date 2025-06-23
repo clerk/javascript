@@ -661,7 +661,8 @@ export const esES: LocalizationResource = {
       checkbox: {
         label__onlyPrivacyPolicy: 'He leído y acepto la Política de Privacidad',
         label__onlyTermsOfService: 'He leído y acepto los Términos de Servicio',
-        label__termsOfServiceAndPrivacyPolicy: 'He leído y acepto los Términos de Servicio y la Política de Privacidad',
+        label__termsOfServiceAndPrivacyPolicy:
+          'He leído y acepto los {{ termsOfServiceLink || link("Términos de Servicio") }} y la {{ privacyPolicyLink || link("Política de Privacidad") }}',
       },
       continue: {
         subtitle: 'Al continuar, aceptas las condiciones mencionadas.',

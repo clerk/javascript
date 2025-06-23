@@ -9,6 +9,10 @@ describe('Waitlist', () => {
       updated_at: 5678,
     });
 
-    expect(waitlist).toMatchSnapshot();
+    expect(waitlist).toMatchObject({
+      id: 'test_id',
+      createdAt: new Date(12345),
+      updatedAt: new Date(5678),
+    });
   });
 });

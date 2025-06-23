@@ -20,6 +20,8 @@ import type {
   __internal_OAuthConsentProps,
   __internal_PlanDetailsProps,
   __internal_UserVerificationModalProps,
+  APIKeysNamespace,
+  APIKeysProps,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
@@ -88,6 +90,7 @@ import {
   createAllowedRedirectOrigins,
   createBeforeUnloadTracker,
   createPageLifecycle,
+  disabledAPIKeysFeature,
   disabledBillingFeature,
   disabledOrganizationsFeature,
   errorThrower,
@@ -132,6 +135,7 @@ import { eventBus, events } from './events';
 import type { FapiClient, FapiRequestCallback } from './fapiClient';
 import { createFapiClient } from './fapiClient';
 import { createClientFromJwt } from './jwt-client';
+import { APIKeys } from './modules/apiKeys';
 import { CommerceBilling } from './modules/commerce';
 import {
   BaseResource,
@@ -163,6 +167,7 @@ const CANNOT_RENDER_USER_MISSING_ERROR_CODE = 'cannot_render_user_missing';
 const CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE = 'cannot_render_organizations_disabled';
 const CANNOT_RENDER_ORGANIZATION_MISSING_ERROR_CODE = 'cannot_render_organization_missing';
 const CANNOT_RENDER_SINGLE_SESSION_ENABLED_ERROR_CODE = 'cannot_render_single_session_enabled';
+const CANNOT_RENDER_API_KEYS_DISABLED_ERROR_CODE = 'cannot_render_api_keys_disabled';
 const defaultOptions: ClerkOptions = {
   polling: true,
   standardBrowser: true,
@@ -189,6 +194,7 @@ export class Clerk implements ClerkInterface {
     environment: process.env.NODE_ENV || 'production',
   };
   private static _billing: CommerceBillingNamespace;
+  private static _apiKeys: APIKeysNamespace;
 
   public client: ClientResource | undefined;
   public session: SignedInSessionResource | null | undefined;
@@ -322,6 +328,13 @@ export class Clerk implements ClerkInterface {
       Clerk._billing = new CommerceBilling();
     }
     return Clerk._billing;
+  }
+
+  get apiKeys(): APIKeysNamespace {
+    if (!Clerk._apiKeys) {
+      Clerk._apiKeys = new APIKeys();
+    }
+    return Clerk._apiKeys;
   }
 
   public __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K] {
@@ -1056,6 +1069,53 @@ export class Clerk implements ClerkInterface {
   };
 
   /**
+   * @experimental
+   * This API is in early access and may change in future releases.
+   *
+   * Mount a api keys component at the target element.
+   * @param targetNode Target to mount the APIKeys component.
+   * @param props Configuration parameters.
+   */
+  public mountApiKeys = (node: HTMLDivElement, props?: APIKeysProps) => {
+    this.assertComponentsReady(this.#componentControls);
+
+    logger.warnOnce('Clerk: <APIKeys /> component is in early access and not yet recommended for production use.');
+
+    if (disabledAPIKeysFeature(this, this.environment)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderAPIKeysComponent, {
+          code: CANNOT_RENDER_API_KEYS_DISABLED_ERROR_CODE,
+        });
+      }
+      return;
+    }
+    void this.#componentControls.ensureMounted({ preloadHint: 'APIKeys' }).then(controls =>
+      controls.mountComponent({
+        name: 'APIKeys',
+        appearanceKey: 'apiKeys',
+        node,
+        props,
+      }),
+    );
+
+    this.telemetry?.record(eventPrebuiltComponentMounted('APIKeys', props));
+  };
+
+  /**
+   * @experimental
+   * This API is in early access and may change in future releases.
+   *
+   * Unmount a api keys component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @param targetNode Target node to unmount the ApiKeys component from.
+   */
+  public unmountApiKeys = (node: HTMLDivElement) => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted().then(controls => controls.unmountComponent({ node }));
+  };
+
+  /**
    * `setActive` can be used to set the active session and/or organization.
    */
   public setActive = async ({ session, organization, beforeEmit, redirectUrl }: SetActiveParams): Promise<void> => {
@@ -1103,7 +1163,16 @@ export class Clerk implements ClerkInterface {
           const matchingOrganization = newSession.user.organizationMemberships.find(
             mem => mem.organization.slug === organizationIdOrSlug,
           );
-          newSession.lastActiveOrganizationId = matchingOrganization?.organization.id || null;
+
+          const newLastActiveOrganizationId = matchingOrganization?.organization.id || null;
+          const isPersonalWorkspace = newLastActiveOrganizationId === null;
+
+          // Do not update in-memory to personal workspace if force organization selection is enabled
+          if (this.environment?.organizationSettings?.forceOrganizationSelection && isPersonalWorkspace) {
+            return;
+          }
+
+          newSession.lastActiveOrganizationId = newLastActiveOrganizationId;
         }
       }
 
@@ -1214,7 +1283,16 @@ export class Clerk implements ClerkInterface {
   };
 
   public __experimental_navigateToTask = async ({ redirectUrlComplete }: NextTaskParams = {}): Promise<void> => {
-    const session = await this.session?.reload();
+    /**
+     * Invalidate previously cache pages with auth state before navigating
+     */
+    const onBeforeSetActive: SetActiveHook =
+      typeof window !== 'undefined' && typeof window.__unstable__onBeforeSetActive === 'function'
+        ? window.__unstable__onBeforeSetActive
+        : noop;
+    await onBeforeSetActive();
+
+    const session = this.session;
     if (!session || !this.environment) {
       return;
     }
@@ -1232,8 +1310,6 @@ export class Clerk implements ClerkInterface {
     const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
     const defaultRedirectUrlComplete = this.client?.signUp ? this.buildAfterSignUpUrl() : this.buildAfterSignInUrl();
 
-    this.#setTransitiveState();
-
     await tracker.track(async () => {
       await this.navigate(redirectUrlComplete ?? defaultRedirectUrlComplete);
     });
@@ -1244,6 +1320,17 @@ export class Clerk implements ClerkInterface {
 
     this.#setAccessors(session);
     this.#emit();
+
+    /**
+     * Invoke the Next.js middleware to synchronize server and client state after resolving a session task.
+     * This ensures that any server-side logic depending on the session status (like middleware-based
+     * redirects or protected routes) correctly reflects the updated client authentication state.
+     */
+    const onAfterSetActive: SetActiveHook =
+      typeof window !== 'undefined' && typeof window.__unstable__onAfterSetActive === 'function'
+        ? window.__unstable__onAfterSetActive
+        : noop;
+    await onAfterSetActive();
   };
 
   public addListener = (listener: ListenerCallback): UnsubscribeCallback => {

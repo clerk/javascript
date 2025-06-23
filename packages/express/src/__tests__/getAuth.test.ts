@@ -1,3 +1,5 @@
+import type { AuthenticatedMachineObject } from '@clerk/backend/internal';
+
 import { getAuth } from '../getAuth';
 import { mockRequest, mockRequestWithAuth } from './helpers';
 
@@ -21,27 +23,29 @@ describe('getAuth', () => {
   });
 
   it('returns the actual auth object when its tokenType matches acceptsToken', () => {
-    const req = mockRequestWithAuth({ tokenType: 'api_key', id: 'ak_1234', subject: 'api_key_1234' });
+    const req = mockRequestWithAuth({ tokenType: 'api_key', id: 'ak_1234', userId: 'user_12345', orgId: null });
     const result = getAuth(req, { acceptsToken: 'api_key' });
     expect(result.tokenType).toBe('api_key');
     expect(result.id).toBe('ak_1234');
-    expect(result.subject).toBe('api_key_1234');
+    expect(result.userId).toBe('user_12345');
+    expect(result.orgId).toBeNull();
   });
 
   it('returns the actual auth object if its tokenType is included in the acceptsToken array', () => {
-    const req = mockRequestWithAuth({ tokenType: 'machine_token', id: 'mt_1234' });
+    const req = mockRequestWithAuth({ tokenType: 'machine_token', id: 'm2m_1234' });
     const result = getAuth(req, { acceptsToken: ['machine_token', 'api_key'] });
     expect(result.tokenType).toBe('machine_token');
-    expect(result.id).toBe('mt_1234');
-    expect(result.subject).toBeUndefined();
+
+    expect((result as AuthenticatedMachineObject<'machine_token'>).id).toBe('m2m_1234');
+    expect((result as AuthenticatedMachineObject<'machine_token'>).subject).toBeUndefined();
   });
 
   it('returns an unauthenticated auth object when the tokenType does not match acceptsToken', () => {
     const req = mockRequestWithAuth({ tokenType: 'session_token', userId: 'user_12345' });
     const result = getAuth(req, { acceptsToken: 'api_key' });
-    expect(result.tokenType).toBe('session_token'); // reflects the actual token found
+    expect(result.tokenType).toBe('api_key'); // reflects the actual token found
     // Properties specific to authenticated objects should be null or undefined
-    // @ts-expect-error - userId is not a property of the unauthenticated object
     expect(result.userId).toBeNull();
+    expect(result.orgId).toBeNull();
   });
 });

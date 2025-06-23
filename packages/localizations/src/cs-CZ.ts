@@ -658,7 +658,8 @@ export const csCZ: LocalizationResource = {
       checkbox: {
         label__onlyPrivacyPolicy: 'Souhlasím s politikou ochrany osobních údajů',
         label__onlyTermsOfService: 'Souhlasím s podmínkami služby',
-        label__termsOfServiceAndPrivacyPolicy: 'Souhlasím s podmínkami služby a politikou ochrany osobních údajů',
+        label__termsOfServiceAndPrivacyPolicy:
+          'Souhlasím s {{ termsOfServiceLink || link("podmínkami služby") }} a {{ privacyPolicyLink || link("politikou ochrany osobních údajů") }}',
       },
       continue: {
         subtitle: 'Pokračujte pro dokončení registrace.',

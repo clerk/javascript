@@ -11,10 +11,11 @@ import type {
   SharedSignedInAuthObjectProperties,
 } from '@clerk/types';
 
-import type { APIKey, CreateBackendApiOptions, MachineToken } from '../api';
+import type { APIKey, CreateBackendApiOptions, IdPOAuthAccessToken, MachineToken } from '../api';
 import { createBackendApiClient } from '../api';
 import { isTokenTypeAccepted } from '../internal';
 import type { AuthenticateContext } from './authenticateContext';
+import { isMachineTokenType } from './machine';
 import type { MachineTokenType, SessionTokenType } from './tokenTypes';
 import { TokenType } from './tokenTypes';
 import type { AuthenticateRequestOptions, MachineAuthType } from './types';
@@ -57,6 +58,7 @@ export type SignedInAuthObject = SharedSignedInAuthObjectProperties & {
    * Used to help debug issues when using Clerk in development.
    */
   debug: AuthObjectDebug;
+  isAuthenticated: true;
 };
 
 /**
@@ -77,6 +79,7 @@ export type SignedOutAuthObject = {
   getToken: ServerGetToken;
   has: CheckAuthorizationFromSessionClaims;
   debug: AuthObjectDebug;
+  isAuthenticated: false;
 };
 
 /**
@@ -84,22 +87,23 @@ export type SignedOutAuthObject = {
  * While all machine token types share common properties (id, name, subject, etc),
  * this type defines the additional properties that are unique to each token type.
  *
- * @example
- * api_key & machine_token: adds `claims` property
- * oauth_token: adds no additional properties (empty object)
- *
  * @template TAuthenticated - Whether the machine object is authenticated or not
  */
 type MachineObjectExtendedProperties<TAuthenticated extends boolean> = {
-  api_key: {
-    name: TAuthenticated extends true ? string : null;
-    claims: TAuthenticated extends true ? Claims | null : null;
-  };
+  api_key: TAuthenticated extends true
+    ?
+        | { name: string; claims: Claims | null; userId: string; orgId: null }
+        | { name: string; claims: Claims | null; userId: null; orgId: string }
+    : { name: null; claims: null; userId: null; orgId: null };
   machine_token: {
     name: TAuthenticated extends true ? string : null;
     claims: TAuthenticated extends true ? Claims | null : null;
+    machineId: TAuthenticated extends true ? string : null;
   };
-  oauth_token: object;
+  oauth_token: {
+    userId: TAuthenticated extends true ? string : null;
+    clientId: TAuthenticated extends true ? string : null;
+  };
 };
 
 /**
@@ -119,6 +123,7 @@ export type AuthenticatedMachineObject<T extends MachineTokenType = MachineToken
       has: CheckAuthorizationFromSessionClaims;
       debug: AuthObjectDebug;
       tokenType: T;
+      isAuthenticated: true;
     } & MachineObjectExtendedProperties<true>[T]
   : never;
 
@@ -139,8 +144,17 @@ export type UnauthenticatedMachineObject<T extends MachineTokenType = MachineTok
       has: CheckAuthorizationFromSessionClaims;
       debug: AuthObjectDebug;
       tokenType: T;
+      isAuthenticated: false;
     } & MachineObjectExtendedProperties<false>[T]
   : never;
+
+export type InvalidTokenAuthObject = {
+  isAuthenticated: false;
+  tokenType: null;
+  getToken: () => Promise<null>;
+  has: () => false;
+  debug: AuthObjectDebug;
+};
 
 /**
  * @interface
@@ -149,7 +163,8 @@ export type AuthObject =
   | SignedInAuthObject
   | SignedOutAuthObject
   | AuthenticatedMachineObject
-  | UnauthenticatedMachineObject;
+  | UnauthenticatedMachineObject
+  | InvalidTokenAuthObject;
 
 const createDebug = (data: AuthObjectDebugData | undefined) => {
   return () => {
@@ -174,7 +189,8 @@ export function signedInAuthObject(
   const getToken = createGetToken({
     sessionId,
     sessionToken,
-    fetcher: async (...args) => (await apiClient.sessions.getToken(...args)).jwt,
+    fetcher: async (sessionId, template, expiresInSeconds) =>
+      (await apiClient.sessions.getToken(sessionId, template || '', expiresInSeconds)).jwt,
   });
   return {
     tokenType: TokenType.SessionToken,
@@ -199,6 +215,7 @@ export function signedInAuthObject(
       plans: (sessionClaims.pla as string) || '',
     }),
     debug: createDebug({ ...authenticateContext, sessionToken }),
+    isAuthenticated: true,
   };
 }
 
@@ -224,6 +241,7 @@ export function signedOutAuthObject(
     getToken: () => Promise.resolve(null),
     has: () => false,
     debug: createDebug(debugData),
+    isAuthenticated: false,
   };
 }
 
@@ -242,6 +260,7 @@ export function authenticatedMachineObject<T extends MachineTokenType>(
     getToken: () => Promise.resolve(token),
     has: () => false,
     debug: createDebug(debugData),
+    isAuthenticated: true,
   };
 
   // Type assertions are safe here since we know the verification result type matches the tokenType.
@@ -257,6 +276,8 @@ export function authenticatedMachineObject<T extends MachineTokenType>(
         name: result.name,
         claims: result.claims,
         scopes: result.scopes,
+        userId: result.subject.startsWith('user_') ? result.subject : null,
+        orgId: result.subject.startsWith('org_') ? result.subject : null,
       } as unknown as AuthenticatedMachineObject<T>;
     }
     case TokenType.MachineToken: {
@@ -267,14 +288,18 @@ export function authenticatedMachineObject<T extends MachineTokenType>(
         name: result.name,
         claims: result.claims,
         scopes: result.scopes,
+        machineId: result.subject,
       } as unknown as AuthenticatedMachineObject<T>;
     }
     case TokenType.OAuthToken: {
+      const result = verificationResult as IdPOAuthAccessToken;
       return {
         ...baseObject,
         tokenType,
-        scopes: verificationResult.scopes,
-      } as AuthenticatedMachineObject<T>;
+        scopes: result.scopes,
+        userId: result.subject,
+        clientId: result.clientId,
+      } as unknown as AuthenticatedMachineObject<T>;
     }
     default:
       throw new Error(`Invalid token type: ${tokenType}`);
@@ -295,6 +320,7 @@ export function unauthenticatedMachineObject<T extends MachineTokenType>(
     has: () => false,
     getToken: () => Promise.resolve(null),
     debug: createDebug(debugData),
+    isAuthenticated: false,
   };
 
   switch (tokenType) {
@@ -304,6 +330,9 @@ export function unauthenticatedMachineObject<T extends MachineTokenType>(
         tokenType,
         name: null,
         claims: null,
+        scopes: null,
+        userId: null,
+        orgId: null,
       } as unknown as UnauthenticatedMachineObject<T>;
     }
     case TokenType.MachineToken: {
@@ -312,17 +341,35 @@ export function unauthenticatedMachineObject<T extends MachineTokenType>(
         tokenType,
         name: null,
         claims: null,
+        scopes: null,
+        machineId: null,
       } as unknown as UnauthenticatedMachineObject<T>;
     }
     case TokenType.OAuthToken: {
       return {
         ...baseObject,
         tokenType,
-      } as UnauthenticatedMachineObject<T>;
+        scopes: null,
+        userId: null,
+        clientId: null,
+      } as unknown as UnauthenticatedMachineObject<T>;
     }
     default:
       throw new Error(`Invalid token type: ${tokenType}`);
   }
+}
+
+/**
+ * @internal
+ */
+export function invalidTokenAuthObject(): InvalidTokenAuthObject {
+  return {
+    isAuthenticated: false,
+    tokenType: null,
+    getToken: () => Promise.resolve(null),
+    has: () => false,
+    debug: () => ({}),
+  };
 }
 
 /**
@@ -341,10 +388,37 @@ export const makeAuthObjectSerializable = <T extends Record<string, unknown>>(ob
   return rest as unknown as T;
 };
 
-type TokenFetcher = (sessionId: string, template: string) => Promise<string>;
+/**
+ * A function that fetches a session token from the Clerk API.
+ *
+ * @param sessionId - The ID of the session
+ * @param template - The JWT template name to use for token generation
+ * @param expiresInSeconds - Optional expiration time in seconds for the token
+ * @returns A promise that resolves to the token string
+ */
+type TokenFetcher = (sessionId: string, template?: string, expiresInSeconds?: number) => Promise<string>;
 
+/**
+ * Factory function type that creates a getToken function for auth objects.
+ *
+ * @param params - Configuration object containing session information and token fetcher
+ * @returns A ServerGetToken function that can be used to retrieve tokens
+ */
 type CreateGetToken = (params: { sessionId: string; sessionToken: string; fetcher: TokenFetcher }) => ServerGetToken;
 
+/**
+ * Creates a token retrieval function for authenticated sessions.
+ *
+ * This factory function returns a getToken function that can either return the raw session token
+ * or generate a JWT using a specified template with optional custom expiration.
+ *
+ * @param params - Configuration object
+ * @param params.sessionId - The session ID for token generation
+ * @param params.sessionToken - The raw session token to return when no template is specified
+ * @param params.fetcher - Function to fetch tokens from the Clerk API
+ *
+ * @returns A function that retrieves tokens based on the provided options
+ */
 const createGetToken: CreateGetToken = params => {
   const { fetcher, sessionToken, sessionId } = params || {};
 
@@ -353,8 +427,8 @@ const createGetToken: CreateGetToken = params => {
       return null;
     }
 
-    if (options.template) {
-      return fetcher(sessionId, options.template);
+    if (options.template || options.expiresInSeconds !== undefined) {
+      return fetcher(sessionId, options.template, options.expiresInSeconds);
     }
 
     return sessionToken;
@@ -379,60 +453,43 @@ export const getAuthObjectFromJwt = (
 
 /**
  * @internal
- * Filters and coerces an AuthObject based on the accepted token type(s).
+ * Returns an auth object matching the requested token type(s).
  *
- * This function is used after authentication to ensure that the returned auth object
- * matches the expected token type(s) specified by `acceptsToken`. If the token type
- * of the provided `authObject` does not match any of the types in `acceptsToken`,
- * it returns an unauthenticated or signed-out version of the object, depending on the token type.
+ * If the parsed token type does not match any in acceptsToken, returns:
+ *   - an invalid token auth object if the token is not in the accepted array
+ *   - an unauthenticated machine object for machine tokens, or
+ *   - a signed-out session object otherwise.
  *
- * - If `acceptsToken` is `'any'`, the original auth object is returned.
- * - If `acceptsToken` is a single token type or an array of token types, the function checks if
- *   `authObject.tokenType` matches any of them.
- * - If the token type does not match and is a session token, a signed-out object is returned.
- * - If the token type does not match and is a machine token, an unauthenticated machine object is returned.
- * - If the token type matches, the original auth object is returned.
- *
- * @param {Object} params
- * @param {AuthObject} params.authObject - The authenticated object to filter.
- * @param {AuthenticateRequestOptions['acceptsToken']} [params.acceptsToken=TokenType.SessionToken] - The accepted token type(s). Can be a string, array of strings, or 'any'.
- * @returns {AuthObject} The filtered or coerced auth object.
- *
- * @example
- * // Accept only 'api_key' tokens
- * const authObject = { tokenType: 'session_token', userId: 'user_123' };
- * const result = getAuthObjectForAcceptedToken({ authObject, acceptsToken: 'api_key' });
- * // result will be a signed-out object (since tokenType is 'session_token' and does not match)
- *
- * @example
- * // Accept 'api_key' or 'machine_token'
- * const authObject = { tokenType: 'machine_token', id: 'mt_123' };
- * const result = getAuthObjectForAcceptedToken({ authObject, acceptsToken: ['api_key', 'machine_token'] });
- * // result will be the original authObject (since tokenType matches one in the array)
- *
- * @example
- * // Accept any token type
- * const authObject = { tokenType: 'api_key', id: 'ak_123' };
- * const result = getAuthObjectForAcceptedToken({ authObject, acceptsToken: 'any' });
- * // result will be the original authObject
+ * This ensures the returned object always matches the developer's intent.
  */
-export function getAuthObjectForAcceptedToken({
+export const getAuthObjectForAcceptedToken = ({
   authObject,
   acceptsToken = TokenType.SessionToken,
 }: {
   authObject: AuthObject;
   acceptsToken: AuthenticateRequestOptions['acceptsToken'];
-}): AuthObject {
+}): AuthObject => {
+  // 1. any token: return as-is
   if (acceptsToken === 'any') {
     return authObject;
   }
 
-  if (!isTokenTypeAccepted(authObject.tokenType, acceptsToken)) {
-    if (authObject.tokenType === TokenType.SessionToken) {
-      return signedOutAuthObject(authObject.debug);
+  // 2. array of tokens: must match one of the accepted types
+  if (Array.isArray(acceptsToken)) {
+    if (!isTokenTypeAccepted(authObject.tokenType, acceptsToken)) {
+      return invalidTokenAuthObject();
     }
-    return unauthenticatedMachineObject(authObject.tokenType, authObject.debug);
+    return authObject;
   }
 
+  // 3. single token: must match exactly, else return appropriate unauthenticated object
+  if (!isTokenTypeAccepted(authObject.tokenType, acceptsToken)) {
+    if (isMachineTokenType(acceptsToken)) {
+      return unauthenticatedMachineObject(acceptsToken, authObject.debug);
+    }
+    return signedOutAuthObject(authObject.debug);
+  }
+
+  // 4. default: return as-is
   return authObject;
-}
+};

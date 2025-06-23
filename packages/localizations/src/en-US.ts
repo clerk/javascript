@@ -2,6 +2,40 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const enUS: LocalizationResource = {
   locale: 'en-US',
+  apiKeys: {
+    action__add: 'Add new key',
+    action__search: 'Search keys',
+    formFieldOption__expiration__1d: '1 Day',
+    formFieldOption__expiration__7d: '7 Days',
+    formFieldOption__expiration__30d: '30 Days',
+    formFieldOption__expiration__60d: '60 Days',
+    formFieldOption__expiration__90d: '90 Days',
+    formFieldOption__expiration__180d: '180 Days',
+    formFieldOption__expiration__1y: '1 Year',
+    formFieldOption__expiration__never: 'Never',
+    lastUsed__seconds: '{{seconds}}s ago',
+    lastUsed__minutes: '{{minutes}}m ago',
+    lastUsed__hours: '{{hours}}h ago',
+    lastUsed__days: '{{days}}d ago',
+    lastUsed__months: '{{months}}mo ago',
+    lastUsed__years: '{{years}}y ago',
+    detailsTitle__emptyRow: 'No API keys found',
+    formButtonPrimary__add: 'Create key',
+    formHint: 'Provide a name to generate a new key. You’ll be able to revoke it anytime.',
+    formTitle: 'Add new API key',
+    menuAction__revoke: 'Revoke key',
+    revokeConfirmation: {
+      formButtonPrimary__revoke: 'Revoke key',
+      formHint: 'Are you sure you want to delete this Secret key?',
+      formTitle: 'Revoke "{{apiKeyName}}" secret key?',
+      confirmationText: 'Revoke',
+    },
+    createdAndExpirationStatus__never: "Created {{ createdDate | shortDate('en-US') }} • Never expires",
+    createdAndExpirationStatus__expiresOn:
+      "Created {{ createdDate | shortDate('en-US') }} • Expires {{ expiresDate | longDate('en-US') }}",
+    formFieldCaption__expiration__never: 'This key will never expire',
+    formFieldCaption__expiration__expiresOn: 'Expiring {{ date }}',
+  },
   backButton: 'Back',
   badge__activePlan: 'Active',
   badge__canceledEndsAt: "Canceled • Ends {{ date | shortDate('en-US') }}",
@@ -38,6 +72,7 @@ export const enUS: LocalizationResource = {
       description__subscriptionSuccessful: 'Your new subscription is all set.',
       downgradeNotice:
         'You will keep your current subscription and its features until the end of the billing cycle, then you will be switched to this subscription.',
+      pastDueNotice: 'Your previous subscription was past due, with no payment.',
       emailForm: {
         subtitle: 'Before you can complete your purchase you must add an email address where receipts will be sent.',
         title: 'Add an email address',
@@ -92,6 +127,7 @@ export const enUS: LocalizationResource = {
     switchPlan: 'Switch to this plan',
     switchToAnnual: 'Switch to annual',
     switchToMonthly: 'Switch to monthly',
+    totalDue: 'Total due',
     totalDueToday: 'Total Due Today',
     viewFeatures: 'View features',
     year: 'Year',
@@ -125,6 +161,9 @@ export const enUS: LocalizationResource = {
   formFieldError__verificationLinkExpired: 'The verification link expired. Please request a new link.',
   formFieldHintText__optional: 'Optional',
   formFieldHintText__slug: 'A slug is a human-readable ID that must be unique. It’s often used in URLs.',
+  formFieldInputPlaceholder__apiKeyName: 'Enter your secret key name',
+  formFieldInputPlaceholder__apiKeyExpirationDate: 'Select date',
+  formFieldInputPlaceholder__apiKeyDescription: 'Explain why you’re generating this key',
   formFieldInputPlaceholder__backupCode: 'Enter backup code',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Delete account',
   formFieldInputPlaceholder__emailAddress: 'Enter your email address',
@@ -139,6 +178,9 @@ export const enUS: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Enter your password',
   formFieldInputPlaceholder__phoneNumber: 'Enter your phone number',
   formFieldInputPlaceholder__username: undefined,
+  formFieldLabel__apiKeyDescription: 'Description',
+  formFieldLabel__apiKeyExpiration: 'Expiration',
+  formFieldLabel__apiKeyName: 'Secret key name',
   formFieldLabel__automaticInvitations: 'Enable automatic invitations for this domain',
   formFieldLabel__backupCode: 'Backup code',
   formFieldLabel__confirmDeletion: 'Confirmation',
@@ -184,11 +226,21 @@ export const enUS: LocalizationResource = {
     titleWithoutPersonal: 'Choose an organization',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: 'API keys',
+    },
     badge__automaticInvitation: 'Automatic invitations',
     badge__automaticSuggestion: 'Automatic suggestions',
     badge__manualInvitation: 'No automatic enrollment',
     badge__unverified: 'Unverified',
     billingPage: {
+      paymentHistorySection: {
+        empty: 'No payment history',
+        tableHeader__date: 'Date',
+        tableHeader__amount: 'Amount',
+        tableHeader__status: 'Status',
+        notFound: 'Payment attempt not found',
+      },
       paymentSourcesSection: {
         actionLabel__default: 'Make default',
         actionLabel__remove: 'Remove',
@@ -211,11 +263,25 @@ export const enUS: LocalizationResource = {
         headerTitle__payments: 'Payments',
         headerTitle__plans: 'Plans',
         headerTitle__statements: 'Statements',
-        headerTitle__subscriptions: 'Subscriptions',
+        headerTitle__subscriptions: 'Subscription',
+      },
+      statementsSection: {
+        empty: 'No statements to display',
+        itemCaption__paidForPlan: 'Paid for {{plan}} {{period}} plan',
+        itemCaption__proratedCredit: 'Prorated credit for partial usage of previous subscription',
+        itemCaption__subscribedAndPaidForPlan: 'Subscribed and paid for {{plan}} {{period}} plan',
+        notFound: 'Statement not found',
+        tableHeader__date: 'Date',
+        tableHeader__amount: 'Amount',
+        title: 'Statements',
+        totalPaid: 'Total paid',
       },
       subscriptionsListSection: {
         actionLabel__newSubscription: 'Subscribe to a plan',
         actionLabel__switchPlan: 'Switch plans',
+        tableHeader__plan: 'Plan',
+        tableHeader__startDate: 'Start date',
+        tableHeader__edit: 'Edit',
         title: 'Subscription',
       },
       subscriptionsSection: {
@@ -283,6 +349,7 @@ export const enUS: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: 'API keys',
       billing: 'Billing',
       description: 'Manage your organization.',
       general: 'General',
@@ -800,6 +867,9 @@ export const enUS: LocalizationResource = {
     action__signOutAll: 'Sign out of all accounts',
   },
   userProfile: {
+    apiKeysPage: {
+      title: 'API keys',
+    },
     backupCodePage: {
       actionLabel__copied: 'Copied!',
       actionLabel__copy: 'Copy all',
@@ -817,6 +887,13 @@ export const enUS: LocalizationResource = {
       title__codelist: 'Backup codes',
     },
     billingPage: {
+      paymentHistorySection: {
+        empty: 'No payment history',
+        tableHeader__date: 'Date',
+        tableHeader__amount: 'Amount',
+        tableHeader__status: 'Status',
+        notFound: 'Payment attempt not found',
+      },
       paymentSourcesSection: {
         actionLabel__default: 'Make default',
         actionLabel__remove: 'Remove',
@@ -841,9 +918,23 @@ export const enUS: LocalizationResource = {
         headerTitle__statements: 'Statements',
         headerTitle__subscriptions: 'Subscription',
       },
+      statementsSection: {
+        empty: 'No statements to display',
+        itemCaption__paidForPlan: 'Paid for {{plan}} {{period}} plan',
+        itemCaption__proratedCredit: 'Prorated credit for partial usage of previous subscription',
+        itemCaption__subscribedAndPaidForPlan: 'Subscribed and paid for {{plan}} {{period}} plan',
+        notFound: 'Statement not found',
+        tableHeader__date: 'Date',
+        tableHeader__amount: 'Amount',
+        title: 'Statements',
+        totalPaid: 'Total paid',
+      },
       subscriptionsListSection: {
         actionLabel__newSubscription: 'Subscribe to a plan',
         actionLabel__switchPlan: 'Switch plans',
+        tableHeader__plan: 'Plan',
+        tableHeader__startDate: 'Start date',
+        tableHeader__edit: 'Edit',
         title: 'Subscription',
       },
       subscriptionsSection: {
@@ -961,6 +1052,7 @@ export const enUS: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profile',
+      apiKeys: 'API keys',
       billing: 'Billing',
       description: 'Manage your account info.',
       security: 'Security',

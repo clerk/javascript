@@ -1,15 +1,22 @@
 import type { JwtPayload } from '@clerk/types';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
+import { createBackendApiClient } from '../../api/factory';
 import { mockTokens, mockVerificationResults } from '../../fixtures/machine';
 import type { AuthenticateContext } from '../authenticateContext';
+import type { InvalidTokenAuthObject, UnauthenticatedMachineObject } from '../authObjects';
 import {
   authenticatedMachineObject,
+  getAuthObjectForAcceptedToken,
   makeAuthObjectSerializable,
   signedInAuthObject,
   signedOutAuthObject,
   unauthenticatedMachineObject,
 } from '../authObjects';
+
+vi.mock('../../api/factory', () => ({
+  createBackendApiClient: vi.fn(),
+}));
 
 describe('makeAuthObjectSerializable', () => {
   it('removes non-serializable props', () => {
@@ -280,13 +287,34 @@ describe('authenticatedMachineObject', () => {
       expect(authObject.has({})).toBe(false);
     });
 
-    it('properly initializes properties', () => {
+    it('properly initializes properties (user)', () => {
       const authObject = authenticatedMachineObject('api_key', token, verificationResult, debugData);
       expect(authObject.tokenType).toBe('api_key');
-      expect(authObject.name).toBe('my-api-key');
+      expect(authObject.id).toBe('ak_ey966f1b1xf93586b2debdcadb0b3bd1');
       expect(authObject.subject).toBe('user_2vYVtestTESTtestTESTtestTESTtest');
       expect(authObject.scopes).toEqual(['read:foo', 'write:bar']);
       expect(authObject.claims).toEqual({ foo: 'bar' });
+      expect(authObject.userId).toBe('user_2vYVtestTESTtestTESTtestTESTtest');
+      expect(authObject.orgId).toBeNull();
+    });
+
+    it('properly initializes properties (org)', () => {
+      const authObject = authenticatedMachineObject(
+        'api_key',
+        token,
+        {
+          ...verificationResult,
+          subject: 'org_2vYVtestTESTtestTESTtestTESTtest',
+        },
+        debugData,
+      );
+      expect(authObject.tokenType).toBe('api_key');
+      expect(authObject.id).toBe('ak_ey966f1b1xf93586b2debdcadb0b3bd1');
+      expect(authObject.subject).toBe('org_2vYVtestTESTtestTESTtestTESTtest');
+      expect(authObject.scopes).toEqual(['read:foo', 'write:bar']);
+      expect(authObject.claims).toEqual({ foo: 'bar' });
+      expect(authObject.userId).toBeNull();
+      expect(authObject.orgId).toBe('org_2vYVtestTESTtestTESTtestTESTtest');
     });
   });
 
@@ -308,8 +336,11 @@ describe('authenticatedMachineObject', () => {
     it('properly initializes properties', () => {
       const authObject = authenticatedMachineObject('oauth_token', token, verificationResult, debugData);
       expect(authObject.tokenType).toBe('oauth_token');
+      expect(authObject.id).toBe('oat_2VTWUzvGC5UhdJCNx6xG1D98edc');
       expect(authObject.subject).toBe('user_2vYVtestTESTtestTESTtestTESTtest');
       expect(authObject.scopes).toEqual(['read:foo', 'write:bar']);
+      expect(authObject.userId).toBe('user_2vYVtestTESTtestTESTtestTESTtest');
+      expect(authObject.clientId).toBe('client_2VTWUzvGC5UhdJCNx6xG1D98edc');
     });
   });
 
@@ -332,10 +363,11 @@ describe('authenticatedMachineObject', () => {
     it('properly initializes properties', () => {
       const authObject = authenticatedMachineObject('machine_token', token, verificationResult, debugData);
       expect(authObject.tokenType).toBe('machine_token');
-      expect(authObject.name).toBe('my-machine-token');
-      expect(authObject.subject).toBe('user_2vYVtestTESTtestTESTtestTESTtest');
+      expect(authObject.id).toBe('m2m_ey966f1b1xf93586b2debdcadb0b3bd1');
+      expect(authObject.subject).toBe('mch_2vYVtestTESTtestTESTtestTESTtest');
       expect(authObject.scopes).toEqual(['read:foo', 'write:bar']);
       expect(authObject.claims).toEqual({ foo: 'bar' });
+      expect(authObject.machineId).toBe('mch_2vYVtestTESTtestTESTtestTESTtest');
     });
   });
 });
@@ -360,5 +392,125 @@ describe('unauthenticatedMachineObject', () => {
     const authObject = unauthenticatedMachineObject('machine_token');
     const retrievedToken = await authObject.getToken();
     expect(retrievedToken).toBeNull();
+  });
+});
+
+describe('getAuthObjectForAcceptedToken', () => {
+  const debugData = { foo: 'bar' };
+  const sessionAuth = signedOutAuthObject(debugData);
+  const machineAuth = authenticatedMachineObject('api_key', 'ak_xxx', mockVerificationResults.api_key, debugData);
+
+  it('returns original object if acceptsToken is "any"', () => {
+    const result = getAuthObjectForAcceptedToken({ authObject: machineAuth, acceptsToken: 'any' });
+    expect(result).toBe(machineAuth);
+  });
+
+  it('returns original object if token type matches', () => {
+    const result = getAuthObjectForAcceptedToken({ authObject: machineAuth, acceptsToken: 'api_key' });
+    expect(result).toBe(machineAuth);
+  });
+
+  it('returns InvalidTokenAuthObject if acceptsToken is array and token type does not match', () => {
+    const result = getAuthObjectForAcceptedToken({
+      authObject: machineAuth,
+      acceptsToken: ['machine_token', 'oauth_token'],
+    });
+    expect((result as InvalidTokenAuthObject).tokenType).toBeNull();
+    expect((result as InvalidTokenAuthObject).isAuthenticated).toBe(false);
+  });
+
+  it('returns InvalidTokenAuthObject if parsed type is not a machine token and does not match any in acceptsToken array', () => {
+    const result = getAuthObjectForAcceptedToken({ authObject: sessionAuth, acceptsToken: ['api_key', 'oauth_token'] });
+    expect((result as InvalidTokenAuthObject).tokenType).toBeNull();
+    expect((result as InvalidTokenAuthObject).isAuthenticated).toBe(false);
+  });
+
+  it('returns signed-out session object if parsed type is not a machine token and does not match', () => {
+    const result = getAuthObjectForAcceptedToken({ authObject: sessionAuth, acceptsToken: ['api_key', 'oauth_token'] });
+    expect((result as InvalidTokenAuthObject).tokenType).toBeNull();
+    expect((result as InvalidTokenAuthObject).isAuthenticated).toBe(false);
+  });
+
+  it('returns unauthenticated object for requested type if acceptsToken is a single value and does not match', () => {
+    const result = getAuthObjectForAcceptedToken({ authObject: machineAuth, acceptsToken: 'machine_token' });
+    expect((result as UnauthenticatedMachineObject<'machine_token'>).tokenType).toBe('machine_token');
+    expect((result as UnauthenticatedMachineObject<'machine_token'>).id).toBeNull();
+  });
+});
+
+describe('getToken with expiresInSeconds support', () => {
+  it('calls fetcher with expiresInSeconds when template is provided', async () => {
+    const mockGetToken = vi.fn().mockResolvedValue({ jwt: 'mocked-jwt-token' });
+    const mockApiClient = {
+      sessions: {
+        getToken: mockGetToken,
+      },
+    };
+
+    vi.mocked(createBackendApiClient).mockReturnValue(mockApiClient as any);
+
+    const mockAuthenticateContext = {
+      secretKey: 'sk_test_123',
+    } as AuthenticateContext;
+
+    const authObject = signedInAuthObject(mockAuthenticateContext, 'raw-session-token', {
+      sid: 'sess_123',
+      sub: 'user_123',
+    } as unknown as JwtPayload);
+
+    const result = await authObject.getToken({ template: 'custom-template', expiresInSeconds: 3600 });
+
+    expect(mockGetToken).toHaveBeenCalledWith('sess_123', 'custom-template', 3600);
+    expect(result).toBe('mocked-jwt-token');
+  });
+
+  it('calls fetcher without expiresInSeconds when template is provided but expiresInSeconds is undefined', async () => {
+    const mockGetToken = vi.fn().mockResolvedValue({ jwt: 'mocked-jwt-token' });
+    const mockApiClient = {
+      sessions: {
+        getToken: mockGetToken,
+      },
+    };
+
+    vi.mocked(createBackendApiClient).mockReturnValue(mockApiClient as any);
+
+    const mockAuthenticateContext = {
+      secretKey: 'sk_test_123',
+    } as AuthenticateContext;
+
+    const authObject = signedInAuthObject(mockAuthenticateContext, 'raw-session-token', {
+      sid: 'sess_123',
+      sub: 'user_123',
+    } as unknown as JwtPayload);
+
+    const result = await authObject.getToken({ template: 'custom-template' });
+
+    expect(mockGetToken).toHaveBeenCalledWith('sess_123', 'custom-template', undefined);
+    expect(result).toBe('mocked-jwt-token');
+  });
+
+  it('returns raw session token when no template is provided', async () => {
+    const mockGetToken = vi.fn();
+    const mockApiClient = {
+      sessions: {
+        getToken: mockGetToken,
+      },
+    };
+
+    vi.mocked(createBackendApiClient).mockReturnValue(mockApiClient as any);
+
+    const mockAuthenticateContext = {
+      secretKey: 'sk_test_123',
+    } as AuthenticateContext;
+
+    const authObject = signedInAuthObject(mockAuthenticateContext, 'raw-session-token', {
+      sid: 'sess_123',
+      sub: 'user_123',
+    } as unknown as JwtPayload);
+
+    const result = await authObject.getToken({});
+
+    expect(mockGetToken).not.toHaveBeenCalled();
+    expect(result).toBe('raw-session-token');
   });
 });

@@ -58,8 +58,10 @@ export const SignUpPhoneCodeCard = withCardStateProvider(() => {
 
   if (isAlternativePhoneCodeProvider) {
     const provider = getAlternativePhoneCodeProviderData(channel)?.name;
-    cardTitleKey = localizationKeys('signUp.alternativePhoneCodeProvider.title', { provider });
-    cardSubtitleKey = localizationKeys('signUp.alternativePhoneCodeProvider.subtitle', { provider });
+    cardTitleKey = localizationKeys('signUp.alternativePhoneCodeProvider.title', { provider: provider || '' });
+    cardSubtitleKey = localizationKeys('signUp.alternativePhoneCodeProvider.subtitle', {
+      provider: provider || '',
+    });
     resendButtonKey = localizationKeys('signUp.alternativePhoneCodeProvider.resendButton');
   }
 
