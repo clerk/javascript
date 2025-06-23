@@ -7,12 +7,23 @@ import type { Autocomplete } from './utils';
 interface Base {
   permission: string;
   role: string;
+  feature: string;
+  plan: string;
 }
 
 interface Placeholder {
   permission: unknown;
   role: unknown;
+  feature: unknown;
+  plan: unknown;
 }
+
+// interface StructuredClerkAuthorization {
+//   permission?: `org:${string}`;
+//   role?: `org:${string}`;
+//   feature: `org:${string}` | `user:${string}`;
+//   plan: `org:${string}` | `user:${string}`;
+// }
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-empty-object-type
@@ -79,6 +90,56 @@ export type OrganizationCustomRoleKey = ClerkAuthorization extends Placeholder
     ? ClerkAuthorization['role']
     : Base['role']
   : Base['role'];
+
+// type ExtractAfterPrefix<T extends string, P extends string> = T extends `${P}${infer Rest}` ? Rest : never;
+
+// type Util<T extends string> = T | ExtractAfterPrefix<T, 'user:'> | ExtractAfterPrefix<T, 'org:'>;
+
+// type ExtractAfterPrefix<T extends string, P extends string> = T extends `${P}${infer Rest}` ? Rest : never;
+
+// type DistributeUnion<T extends string> = T extends any ? T : never;
+
+// type Util<T extends string> = DistributeUnion<T | ExtractAfterPrefix<T, "user:"> | ExtractAfterPrefix<T, "org:">>;
+//
+// type Util<T extends string> = T | ExtractAfterPrefix<T, 'user:'> | ExtractAfterPrefix<T, 'org:'>;
+//
+// type InternalClerkCustomFeatureKey = ClerkAuthorization['feature']
+
+// type ExtractAfterPrefix<T extends string, P extends string> = T extends `${P}${infer Rest}` ? Rest : never;
+
+// type Util<T extends string> = T | ExtractAfterPrefix<T, 'user:'> | ExtractAfterPrefix<T, 'org:'>;
+
+// type InternalClerkCustomFeatureKey = Util<ClerkAuthorization['feature']>;
+
+type ValidPrefix = 'user:' | 'org:';
+type ValidFeaturePattern = `${ValidPrefix}${string}`;
+
+type ExtractAfterPrefix<T extends string, P extends string> = T extends `${P}${infer Rest}` ? Rest : never;
+
+type Util<T extends string> = T extends ValidFeaturePattern
+  ? T | ExtractAfterPrefix<T, 'user:'> | ExtractAfterPrefix<T, 'org:'>
+  : `Expected format: "user:<string>" | "org:<string>", but got "${T}"`;
+
+type ExtractMiddlePart<T extends string> = T extends `${'org:'}${infer Rest}:${string}` ? `org:${Rest}` : never;
+
+interface FakeClerkAuthorization {
+  // @ts-ignore
+  feature: Util<ClerkAuthorization['feature']> | Util<ExtractMiddlePart<ClerkAuthorization['permission']>>;
+  // @ts-ignore
+  plan: Util<ClerkAuthorization['plan']>;
+}
+
+export type ClerkCustomFeatureKey = ClerkAuthorization extends Placeholder
+  ? ClerkAuthorization['feature'] extends string
+    ? FakeClerkAuthorization['feature']
+    : Util<Base['feature']>
+  : Util<Base['feature']>;
+
+export type ClerkCustomPlanKey = ClerkAuthorization extends Placeholder
+  ? ClerkAuthorization['plan'] extends string
+    ? FakeClerkAuthorization['plan']
+    : Util<Base['plan']>
+  : Util<Base['plan']>;
 
 export type OrganizationSystemPermissionPrefix = 'org:sys_';
 export type OrganizationSystemPermissionKey =

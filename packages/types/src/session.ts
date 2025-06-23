@@ -12,6 +12,8 @@ import type {
 } from './factors';
 import type { ActClaim } from './jwtv2';
 import type {
+  ClerkCustomFeatureKey,
+  ClerkCustomPlanKey,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
   OrganizationPermissionKey,
@@ -26,7 +28,6 @@ import type {
 import type { SessionJSONSnapshot } from './snapshots';
 import type { TokenResource } from './token';
 import type { UserResource } from './user';
-import type { Autocomplete } from './utils';
 
 /**
  * @inline
@@ -85,14 +86,14 @@ export type CheckAuthorizationParamsWithCustomPermissions = WithReverification<
   | {
       role?: never;
       permission?: never;
-      feature: Autocomplete<`user:${string}` | `org:${string}`>;
+      feature: ClerkCustomFeatureKey;
       plan?: never;
     }
   | {
       role?: never;
       permission?: never;
       feature?: never;
-      plan: Autocomplete<`user:${string}` | `org:${string}`>;
+      plan: ClerkCustomPlanKey;
     }
   | { role?: never; permission?: never; feature?: never; plan?: never }
 >;
@@ -127,14 +128,14 @@ type CheckAuthorizationParams = WithReverification<
   | {
       role?: never;
       permission?: never;
-      feature: Autocomplete<`user:${string}` | `org:${string}`>;
+      feature: ClerkCustomFeatureKey;
       plan?: never;
     }
   | {
       role?: never;
       permission?: never;
       feature?: never;
-      plan: Autocomplete<`user:${string}` | `org:${string}`>;
+      plan: ClerkCustomPlanKey;
     }
   | { role?: never; permission?: never; feature?: never; plan?: never }
 >;
@@ -179,14 +180,14 @@ export type CheckAuthorizationParamsFromSessionClaims<P extends OrganizationCust
   | {
       role?: never;
       permission?: never;
-      feature: Autocomplete<`user:${string}` | `org:${string}`>;
+      feature: ClerkCustomFeatureKey;
       plan?: never;
     }
   | {
       role?: never;
       permission?: never;
       feature?: never;
-      plan: Autocomplete<`user:${string}` | `org:${string}`>;
+      plan: ClerkCustomPlanKey;
     }
   | { role?: never; permission?: never; feature?: never; plan?: never }
 >;
