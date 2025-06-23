@@ -14,7 +14,11 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const esCR: LocalizationResource = {
   locale: 'es-CR',
-  __experimental_commerce: {
+  commerce: {
+    addPaymentMethod: 'Añadir método de pago',
+    alwaysFree: 'Siempre gratis',
+    annually: 'Anualmente',
+    availableFeatures: 'Características disponibles',
     billedAnnually: 'Facturado anualmente',
     free: 'Gratis',
     getStarted: 'Empezar',
@@ -31,10 +35,10 @@ export const esCR: LocalizationResource = {
       description__paymentSuccessful: 'Tu nueva suscripción está lista.',
       description__subscriptionSuccessful: 'Tu nueva suscripción está lista.',
       lineItems: {
-        title__totalPaid: 'Total pagado',
         title__paymentMethod: 'Método de pago',
-        title__invoiceId: 'Número de factura',
+        title__statementId: 'Número de factura',
         title__subscriptionBegins: 'La suscripción empieza',
+        title__totalPaid: 'Total pagado',
       },
     },
   },
@@ -340,7 +344,8 @@ export const esCR: LocalizationResource = {
     },
     passkey: {
       blockButton__passkey: 'Utiliza tu llave de acceso',
-      subtitle: 'Utilizar tu llave de acceso confirma que eres tú. Tu dispositivo puede solicitar tu huella dactilar, rostro o pantalla de bloqueo.',
+      subtitle:
+        'Utilizar tu llave de acceso confirma que eres tú. Tu dispositivo puede solicitar tu huella dactilar, rostro o pantalla de bloqueo.',
       title: 'Utiliza tu llave de acceso',
     },
     password: {
@@ -422,7 +427,7 @@ export const esCR: LocalizationResource = {
         subtitle: 'Serás redireccionado pronto',
         title: 'Iniciando sesión...',
       },
-      resendButton: "¿No recibiste un enlace? Reenviar",
+      resendButton: '¿No recibiste un enlace? Reenviar',
       subtitle: 'para continuar con {{applicationName}}',
       title: 'Revisa tu correo electrónico',
       unusedTab: {
@@ -440,7 +445,7 @@ export const esCR: LocalizationResource = {
     },
     forgotPassword: {
       formTitle: 'Código para restablecer contraseña',
-      resendButton: "¿No recibiste un código? Reenviar",
+      resendButton: '¿No recibiste un código? Reenviar',
       subtitle: 'para restablecer tu contraseña',
       subtitle_email: 'Primero, ingresa el código enviado a tu correo electrónico',
       subtitle_phone: 'Primero, ingresa el código enviado a tu teléfono',
@@ -529,7 +534,8 @@ export const esCR: LocalizationResource = {
     },
     emailLink: {
       clientMismatch: {
-        subtitle: 'Para continuar, abre el enlace de verificación en el dispositivo o navegador desde el que estás intentando registrarte',
+        subtitle:
+          'Para continuar, abre el enlace de verificación en el dispositivo o navegador desde el que estás intentando registrarte',
         title: 'El enlace de verificación es inválido para este dispositivo',
       },
       formSubtitle: 'Utiliza el enlace de verificación enviado a tu dirección de correo electrónico',
@@ -573,7 +579,8 @@ export const esCR: LocalizationResource = {
       blockButton__emailSupport: 'Soporte por correo electrónico',
       blockButton__joinWaitlist: 'Unirse a la lista de espera',
       subtitle: 'Los registros están desactivados actualmente. Si crees que tienes acceso, contacta soporte',
-      subtitleWaitlist: 'Los registros están desactivados actualmente. Para ser el primero en saber cuando estemos listos, únete a la lista de espera',
+      subtitleWaitlist:
+        'Los registros están desactivados actualmente. Para ser el primero en saber cuando estemos listos, únete a la lista de espera',
       title: 'Acceso restringido',
     },
     start: {
@@ -613,7 +620,8 @@ export const esCR: LocalizationResource = {
     form_password_not_strong_enough: 'La contraseña no es suficientemente segura.',
     form_password_pwned:
       'Esta contraseña se encontró como parte de una brecha y no se puede utilizar, intenta con otra contraseña.',
-    form_password_pwned__sign_in: 'Esta contraseña se encontró como parte de una brecha y no se puede utilizar, por favor restablece tu contraseña.',
+    form_password_pwned__sign_in:
+      'Esta contraseña se encontró como parte de una brecha y no se puede utilizar, por favor restablece tu contraseña.',
     form_password_size_in_bytes_exceeded:
       'La contraseña excede el número máximo de bytes permitidos. Por favor, elimine algunos caracteres especiales o reduzca la longitud de la contraseña.',
     form_password_validation_failed: 'Contraseña incorrecta',
@@ -624,11 +632,13 @@ export const esCR: LocalizationResource = {
     organization_domain_blocked: 'Este correo electrónico del dominio está bloqueado, intenta con otro.',
     organization_domain_common: 'Este correo electrónico del dominio es muy común, intenta con otro.',
     organization_domain_exists_for_enterprise_connection: 'Este dominio ya esta en uso para tú organización',
-    organization_membership_quota_exceeded: 'Alcanzaste el limite de miembros en la organización, incluyendo las invitaciones enviadas.',
+    organization_membership_quota_exceeded:
+      'Alcanzaste el limite de miembros en la organización, incluyendo las invitaciones enviadas.',
     organization_minimum_permissions_needed: 'Debe existir al menos un miembro en la organización.',
     passkey_already_exists: 'Ya se ha registrado una llave de acceso en este dispositivo.',
     passkey_not_supported: 'Las llaves de acceso no son compatibles con este dispositivo.',
-    passkey_pa_not_supported: 'El registro requiere un autenticador de plataforma, pero el dispositivo no es compatible.',
+    passkey_pa_not_supported:
+      'El registro requiere un autenticador de plataforma, pero el dispositivo no es compatible.',
     passkey_registration_cancelled: 'El registro de la llave de acceso se ha cancelado o ha expirado.',
     passkey_retrieval_cancelled: 'La verificación de la llave de acceso se ha cancelado o ha expirado.',
     passwordComplexity: {
@@ -689,15 +699,15 @@ export const esCR: LocalizationResource = {
     action__signOutAll: 'Salir de todas las cuentas',
   },
   userProfile: {
-    __experimental_billingPage: {
+    billingPage: {
       start: {
-       headerTitle__invoices: 'Facturas',
-        headerTitle__paymentSources: 'Métodos de pago',
+        headerTitle__payments: 'Pagos',
         headerTitle__plans: 'Planes',
+        headerTitle__statements: 'Declaraciones',
         headerTitle__subscriptions: 'Suscripciones',
       },
       title: 'Facturación y Pagos',
-       paymentSourcesSection: {
+      paymentSourcesSection: {
         title: 'Opciones disponibles',
         add: 'Agregar un nuevo método de pago',
         addSubtitle: 'Agregar un nuevo método de pago a tu cuenta.',
