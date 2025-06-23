@@ -113,7 +113,6 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
            * On success resolve the pending promise
            * On cancel reject the pending promise
            */
-          // Do we need to log telemetry here as well ?
           params.openUIComponent?.({
             level: level,
             afterVerification: complete,
