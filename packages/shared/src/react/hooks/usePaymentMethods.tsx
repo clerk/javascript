@@ -4,12 +4,12 @@ import { useOrganizationContext, useUserContext } from '../contexts';
 import { createCommerceHook } from './createCommerceHook';
 
 /**
- * @interface
+ * @internal
  */
 export type UsePaymentMethodsParams = Parameters<ReturnType<typeof createCommerceHook>>[0];
 
 /**
- *
+ * @internal
  */
 export const usePaymentMethods = createCommerceHook<CommercePaymentSourceResource, GetPaymentSourcesParams>({
   hookName: 'usePaymentMethods',

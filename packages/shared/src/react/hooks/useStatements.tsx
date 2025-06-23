@@ -3,8 +3,14 @@ import type { CommerceStatementResource, GetStatementsParams } from '@clerk/type
 import { useClerkInstanceContext } from '../contexts';
 import { createCommerceHook } from './createCommerceHook';
 
+/**
+ * @internal
+ */
 export type UseStatementsParams = Parameters<ReturnType<typeof createCommerceHook>>[0];
 
+/**
+ * @internal
+ */
 export const useStatements = createCommerceHook<CommerceStatementResource, GetStatementsParams>({
   hookName: 'useStatements',
   resourceType: 'commerce-statements',

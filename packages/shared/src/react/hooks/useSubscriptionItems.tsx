@@ -4,12 +4,12 @@ import { useClerkInstanceContext } from '../contexts';
 import { createCommerceHook } from './createCommerceHook';
 
 /**
- * @interface
+ * @internal
  */
 export type UseSubscriptionItemsParams = Parameters<ReturnType<typeof createCommerceHook>>[0];
 
 /**
- *
+ * @internal
  */
 export const useSubscriptionItems = createCommerceHook<CommerceSubscriptionResource, GetSubscriptionsParams>({
   hookName: 'useSubscriptionItems',

@@ -4,12 +4,12 @@ import { useClerkInstanceContext } from '../contexts';
 import { createCommerceHook } from './createCommerceHook';
 
 /**
- * @interface
+ * @internal
  */
 export type UsePaymentAttemptsParams = Parameters<ReturnType<typeof createCommerceHook>>[0];
 
 /**
- *
+ * @internal
  */
 export const usePaymentAttempts = createCommerceHook<CommercePaymentResource, GetPaymentAttemptsParams>({
   hookName: 'usePaymentAttempts',
