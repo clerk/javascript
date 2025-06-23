@@ -181,7 +181,7 @@ export type GetUserOrganizationSuggestionsParams = ClerkPaginationParams<{
   status?: OrganizationSuggestionStatus | OrganizationSuggestionStatus[];
 }>;
 
-export type GetUserOrganizationMembershipParams = ClerkPaginationParams<{}>;
+export type GetUserOrganizationMembershipParams = ClerkPaginationParams;
 
 export type GetOrganizationMemberships = (
   params?: GetUserOrganizationMembershipParams,
