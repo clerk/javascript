@@ -327,4 +327,8 @@ const usePaymentElement = () => {
   };
 };
 
-export { PaymentElementRoot, PaymentElementForm, usePaymentElement };
+export {
+  PaymentElementRoot as __experimental_PaymentElementRoot,
+  PaymentElementForm as __experimental_PaymentElementForm,
+  usePaymentElement as __experimental_usePaymentElement,
+};

@@ -1,4 +1,9 @@
-import { createContextAndHook, PaymentElementForm, PaymentElementRoot, usePaymentElement } from '@clerk/shared/react';
+import {
+  __experimental_PaymentElementForm as PaymentElementForm,
+  __experimental_PaymentElementRoot as PaymentElementRoot,
+  __experimental_usePaymentElement as usePaymentElement,
+  createContextAndHook,
+} from '@clerk/shared/react';
 import type { CommerceCheckoutResource } from '@clerk/types';
 import { useElements, useStripe } from '@stripe/react-stripe-js';
 import type { PropsWithChildren } from 'react';
