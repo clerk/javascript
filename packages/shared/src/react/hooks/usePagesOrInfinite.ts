@@ -97,31 +97,25 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, config, 
     pageSize: pageSizeRef.current,
   };
 
+  const shouldFetch = !triggerInfinite && enabled && (fetchOnMount ? !!fetcher : true);
+  const swrKey = shouldFetch ? pagesCacheKey : null;
+  const swrFetcher =
+    fetchOnMount && !!fetcher
+      ? (cacheKeyParams: Record<string, unknown>) => {
+          // @ts-ignore
+          const requestParams = getDifferentKeys(cacheKeyParams, cacheKeys);
+          // @ts-ignore
+          return fetcher({ ...params, ...requestParams });
+        }
+      : null;
+
   const {
     data: swrData,
     isValidating: swrIsValidating,
     isLoading: swrIsLoading,
     error: swrError,
     mutate: swrMutate,
-  } = useSWR(
-    fetchOnMount
-      ? !triggerInfinite && !!fetcher && enabled
-        ? pagesCacheKey
-        : null
-      : !triggerInfinite && enabled
-        ? pagesCacheKey
-        : null,
-    fetchOnMount
-      ? cacheKeyParams => {
-          // @ts-ignore
-          const requestParams = getDifferentKeys(cacheKeyParams, cacheKeys);
-
-          // @ts-ignore
-          return fetcher?.({ ...params, ...requestParams });
-        }
-      : null,
-    { keepPreviousData, ...cachingSWROptions },
-  );
+  } = useSWR(swrKey, swrFetcher, { keepPreviousData, ...cachingSWROptions });
 
   const {
     data: swrInfiniteData,
