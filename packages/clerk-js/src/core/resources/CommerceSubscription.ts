@@ -9,6 +9,7 @@ import type {
 } from '@clerk/types';
 
 import { commerceMoneyFromJSON } from '../../utils';
+import { unixEpochToDate } from '../../utils/date';
 import { BaseResource, CommercePlan, DeletedObject } from './internal';
 
 export class CommerceSubscription extends BaseResource implements CommerceSubscriptionResource {
@@ -17,9 +18,10 @@ export class CommerceSubscription extends BaseResource implements CommerceSubscr
   plan!: CommercePlan;
   planPeriod!: CommerceSubscriptionPlanPeriod;
   status!: CommerceSubscriptionStatus;
-  periodStart!: number;
-  periodEnd!: number;
-  canceledAt!: number | null;
+  createdAt!: Date;
+  periodStart!: Date;
+  periodEnd!: Date;
+  canceledAt!: Date | null;
   amount?: CommerceMoney;
   credit?: {
     amount: CommerceMoney;
@@ -39,9 +41,10 @@ export class CommerceSubscription extends BaseResource implements CommerceSubscr
     this.plan = new CommercePlan(data.plan);
     this.planPeriod = data.plan_period;
     this.status = data.status;
-    this.periodStart = data.period_start;
-    this.periodEnd = data.period_end;
-    this.canceledAt = data.canceled_at;
+    this.createdAt = unixEpochToDate(data.created_at);
+    this.periodStart = unixEpochToDate(data.period_start);
+    this.periodEnd = unixEpochToDate(data.period_end);
+    this.canceledAt = data.canceled_at ? unixEpochToDate(data.canceled_at) : null;
     this.amount = data.amount ? commerceMoneyFromJSON(data.amount) : undefined;
     this.credit = data.credit && data.credit.amount ? { amount: commerceMoneyFromJSON(data.credit.amount) } : undefined;
     return this;
