@@ -12,7 +12,7 @@ export function validateHeaders<
   ResponseBodyType extends DefaultBodyType,
 >(
   resolver: HttpResponseResolver<Params, RequestBodyType, ResponseBodyType>,
-): HttpResponseResolver<Params, RequestBodyType, ResponseBodyType | Record<string, string>> {
+): HttpResponseResolver<Params, RequestBodyType, ResponseBodyType> {
   return async ({ request, requestId, params, cookies }) => {
     if (!request.headers.get('Authorization')) {
       return HttpResponse.json(
@@ -21,7 +21,7 @@ export function validateHeaders<
           message: 'Missing Authorization header',
         },
         { status: 401 },
-      );
+      ) as ReturnType<HttpResponseResolver<Params, RequestBodyType, ResponseBodyType>>;
     }
     if (!request.headers.get('Clerk-API-Version')) {
       return HttpResponse.json(
@@ -30,7 +30,7 @@ export function validateHeaders<
           message: 'Missing Clerk-API-Version header',
         },
         { status: 400 },
-      );
+      ) as ReturnType<HttpResponseResolver<Params, RequestBodyType, ResponseBodyType>>;
     }
     if (!request.headers.get('User-Agent') || request.headers.get('User-Agent') !== '@clerk/backend@0.0.0-test') {
       return HttpResponse.json(
@@ -39,7 +39,7 @@ export function validateHeaders<
           message: 'Missing or invalid User-Agent header',
         },
         { status: 400 },
-      );
+      ) as ReturnType<HttpResponseResolver<Params, RequestBodyType, ResponseBodyType>>;
     }
 
     return resolver({ request, requestId, params, cookies });
