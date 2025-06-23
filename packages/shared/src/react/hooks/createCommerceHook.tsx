@@ -48,7 +48,7 @@ export function createCommerceHook<TResource extends ClerkResource, TParams exte
       keepPreviousData: false,
       infinite: false,
       fetchOnMount: true,
-    } as T);
+    } as unknown as T);
 
     const clerk = useClerkInstanceContext();
     const user = useUserContext();
@@ -68,11 +68,6 @@ export function createCommerceHook<TResource extends ClerkResource, TParams exte
     const isClerkLoaded = !!(clerk.loaded && user);
 
     const isEnabled = !!hookParams && isClerkLoaded;
-
-    console.log('hookName', hookName);
-    console.log('isEnabled', isEnabled);
-    console.log('hookParams', hookParams);
-    console.log('fn', fetchFn);
 
     const result = usePagesOrInfinite<TParams, ClerkPaginatedResponse<TResource>>(
       (hookParams || {}) as TParams,

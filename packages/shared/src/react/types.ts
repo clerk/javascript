@@ -100,8 +100,6 @@ export type PaginatedHookConfig<T> = T & {
    * @default false
    */
   keepPreviousData?: boolean;
-
-  fetchOnMount?: boolean;
 };
 
 export type PagesOrInfiniteConfig = PaginatedHookConfig<{
@@ -111,6 +109,12 @@ export type PagesOrInfiniteConfig = PaginatedHookConfig<{
    * @default true
    */
   enabled?: boolean;
+  /**
+   * If `true`, a request will be triggered when the component mounts.
+   *
+   * @default false
+   */
+  fetchOnMount?: boolean;
 }>;
 
 /**
@@ -129,4 +133,10 @@ export type PagesOrInfiniteOptions = {
    * @default 10
    */
   pageSize?: number;
+  /**
+   * If `true`, a request will be triggered when the component mounts.
+   *
+   * @default false
+   */
+  fetchOnMount?: boolean;
 };
