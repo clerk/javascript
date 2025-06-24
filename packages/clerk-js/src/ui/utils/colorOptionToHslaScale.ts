@@ -1,18 +1,22 @@
 import type { ColorScale, CssColorOrAlphaScale, CssColorOrScale, HslaColor, HslaColorString } from '@clerk/types';
 
 import { colors } from './colors';
+import { generateAlphaScale } from './colors/alphaScale';
+import { generateLightnessScale as generateModernLightnessScale } from './colors/lightnessScale';
+import { applyScalePrefix } from './colors/utils';
+import { cssSupports } from './cssSupports';
 
 // Types
 type InternalColorScale<T> = ColorScale<T> & Partial<Record<20, T>>;
-type ColorShade = keyof InternalColorScale<any>;
+type ColorShadeKey = keyof InternalColorScale<any>;
 type WithPrefix<T extends Record<string, string>, Prefix extends string> = {
   [K in keyof T as `${Prefix}${K & string}`]: T[K];
 };
 
 // Constants
-const LIGHT_SHADES: ColorShade[] = ['25', '50', '100', '150', '200', '300', '400'];
-const DARK_SHADES: ColorShade[] = ['600', '700', '750', '800', '850', '900', '950'];
-const ALL_SHADES: ColorShade[] = [...LIGHT_SHADES.reverse(), '500', ...DARK_SHADES];
+const LIGHT_SHADES: ColorShadeKey[] = ['25', '50', '100', '150', '200', '300', '400'];
+const DARK_SHADES: ColorShadeKey[] = ['600', '700', '750', '800', '850', '900', '950'];
+const ALL_SHADES: ColorShadeKey[] = [...LIGHT_SHADES.reverse(), '500', ...DARK_SHADES];
 
 const TARGET_LIGHTNESS = {
   LIGHTEST: 97, // For 50 shade
@@ -85,7 +89,14 @@ function prefixAndStringifyScale<Prefix extends string>(
   return result;
 }
 
-function generateLightnessScale(baseColor: HslaColor): InternalColorScale<HslaColor> {
+// Modern CSS-based alpha scale generation
+function generateModernAlphaScale(baseColor: string): ColorScale<string> {
+  // Use the existing modern alpha scale utility
+  return generateAlphaScale(baseColor);
+}
+
+// Legacy HSLA-based scale generation
+function generateLegacyLightnessScale(baseColor: HslaColor): InternalColorScale<HslaColor> {
   const scale: Record<string, HslaColor> = {
     '500': baseColor,
   };
@@ -109,7 +120,7 @@ function generateLightnessScale(baseColor: HslaColor): InternalColorScale<HslaCo
   return scale as InternalColorScale<HslaColor>;
 }
 
-function generateAlphaScale(baseColor: HslaColor): InternalColorScale<HslaColor> {
+function generateLegacyAlphaScale(baseColor: HslaColor): InternalColorScale<HslaColor> {
   const scale: Record<string, HslaColor> = {};
   const baseWithoutAlpha = colors.setHslaAlpha(baseColor, 0);
 
@@ -131,8 +142,11 @@ function mergeUserDefinedWithGenerated(
     const userColor = userDefined[shade];
     const generatedColor = generated[shade];
     // At least one should exist, prefer user-defined
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    merged[shade] = userColor || generatedColor!;
+    if (userColor) {
+      merged[shade] = userColor;
+    } else if (generatedColor) {
+      merged[shade] = generatedColor;
+    }
   }
 
   return merged as InternalColorScale<HslaColor>;
@@ -157,6 +171,7 @@ function processColorInput(
   return convertToHslaScale(colorInput);
 }
 
+// Main exported functions
 export const colorOptionToHslaAlphaScale = <Prefix extends string>(
   colorOption: CssColorOrAlphaScale | undefined,
   prefix: Prefix,
@@ -168,17 +183,24 @@ export const colorOptionToHslaAlphaScale = <Prefix extends string>(
   // For alpha scales, we require all shades to be provided or generate from single color
   const userScale = processColorInput(colorOption, typeof colorOption === 'object');
 
-  let finalScale: InternalColorScale<HslaColor>;
-
   if (typeof colorOption === 'string') {
-    // Generate complete alpha scale from single color
-    finalScale = generateAlphaScale(userScale['500']);
+    // For single color input, check if we can use modern CSS
+    if (cssSupports.colorMix()) {
+      // Use modern CSS directly - no HSLA conversion needed
+      const modernScale = generateModernAlphaScale(colorOption);
+      return applyScalePrefix(modernScale, prefix) as unknown as WithPrefix<
+        InternalColorScale<HslaColorString>,
+        Prefix
+      >;
+    }
+
+    // Fall back to HSLA approach
+    const finalScale = generateLegacyAlphaScale(userScale['500']);
+    return prefixAndStringifyScale(finalScale, prefix);
   } else {
     // Use provided complete scale
-    finalScale = userScale;
+    return prefixAndStringifyScale(userScale, prefix);
   }
-
-  return prefixAndStringifyScale(finalScale, prefix);
 };
 
 export const colorOptionToHslaLightnessScale = <Prefix extends string>(
@@ -191,15 +213,38 @@ export const colorOptionToHslaLightnessScale = <Prefix extends string>(
 
   // For lightness scales, we can work with partial scales and fill missing shades
   const userScale = processColorInput(colorOption, false);
-  const baseColor = userScale['500'];
 
-  // Generate complete scale from base color
-  const generatedScale = generateLightnessScale(baseColor);
+  if (typeof colorOption === 'string') {
+    // For single color input, check if we can use modern CSS
+    if (cssSupports.colorMix() || cssSupports.relativeColorSyntax()) {
+      // Use modern CSS directly - no HSLA conversion needed
+      const modernScale = generateModernLightnessScale(colorOption);
+      console.log(applyScalePrefix(modernScale, prefix));
+      return applyScalePrefix(modernScale, prefix) as unknown as WithPrefix<
+        InternalColorScale<HslaColorString>,
+        Prefix
+      >;
+    }
 
-  // Merge user-provided shades with generated ones (user takes precedence)
-  const finalScale = mergeUserDefinedWithGenerated(generatedScale, userScale);
+    // Fall back to HSLA approach
+    const baseColor = userScale['500'];
+    const generatedScale = generateLegacyLightnessScale(baseColor);
+    const finalScale = mergeUserDefinedWithGenerated(generatedScale, userScale);
+    return prefixAndStringifyScale(finalScale, prefix);
+  } else {
+    // User provided partial or complete scale
+    const baseColor = userScale['500'];
 
-  console.log(prefix, colorOption, finalScale);
+    if (!baseColor) {
+      throw new Error('Base color (500 shade) is required for lightness scale generation');
+    }
 
-  return prefixAndStringifyScale(finalScale, prefix);
+    // Generate complete scale from base color using legacy HSLA approach
+    const generatedScale = generateLegacyLightnessScale(baseColor);
+
+    // Merge user-provided shades with generated ones (user takes precedence)
+    const finalScale = mergeUserDefinedWithGenerated(generatedScale, userScale);
+
+    return prefixAndStringifyScale(finalScale, prefix);
+  }
 };

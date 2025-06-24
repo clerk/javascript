@@ -9,6 +9,7 @@ import {
   fromEntries,
   removeUndefinedProps,
 } from '../utils';
+import { cssSupports } from '../utils/cssSupports';
 
 export const createColorScales = (theme: Theme) => {
   const variables = theme.variables || {};
@@ -34,10 +35,10 @@ export const createColorScales = (theme: Theme) => {
     ...primaryAlphaScale,
     ...successAlphaScale,
     ...warningAlphaScale,
-    primaryHover: colors.adjustForLightness(primaryScale?.primary500),
+    primaryHover: primaryScale?.primary400,
     colorTextOnPrimaryBackground: toHSLA(variables.colorTextOnPrimaryBackground),
     colorText: toHSLA(variables.colorText),
-    colorTextSecondary: toHSLA(variables.colorTextSecondary) || colors.makeTransparent(variables.colorText, 0.35),
+    colorTextSecondary: toHSLA(variables.colorTextSecondary) || toTransparent(variables.colorText, 35),
     colorInputText: toHSLA(variables.colorInputText),
     colorBackground: toHSLA(variables.colorBackground),
     colorInputBackground: toHSLA(variables.colorInputBackground),
@@ -46,7 +47,27 @@ export const createColorScales = (theme: Theme) => {
 };
 
 export const toHSLA = (str: string | undefined) => {
-  return str ? colors.toHslaString(str) : undefined;
+  if (!str) {
+    return undefined;
+  }
+
+  if (cssSupports.colorMix() || cssSupports.relativeColorSyntax()) {
+    return str;
+  }
+
+  return colors.toHslaString(str);
+};
+
+const toTransparent = (str: string | undefined, percentage: number) => {
+  if (!str) {
+    return undefined;
+  }
+
+  if (cssSupports.colorMix()) {
+    return `color-mix(in srgb, ${str}, transparent ${percentage}%)`;
+  }
+
+  return colors.makeTransparent(str, percentage / 100);
 };
 
 export const createRadiiUnits = (theme: Theme) => {
