@@ -1,50 +1,45 @@
 import type { ColorScale, CssColorOrScale } from '@clerk/types';
 
 import { cssSupports } from '../cssSupports';
-import { COLOR_SCALE, getColorMixSyntax, getRelativeColorSyntax } from './utils';
+import { COLOR_SCALE, createEmptyColorScale, getColorMix } from './utils';
 
-export const generateLightnessScale = (color: CssColorOrScale | undefined): ColorScale<string | undefined> => {
-  const output: ColorScale<string | undefined> = {
-    '25': undefined,
-    '50': undefined,
-    '100': undefined,
-    '150': undefined,
-    '200': undefined,
-    '300': undefined,
-    '400': undefined,
-    '500': undefined,
-    '600': undefined,
-    '700': undefined,
-    '750': undefined,
-    '800': undefined,
-    '850': undefined,
-    '900': undefined,
-    '950': undefined,
-  };
-
+/**
+ * Generates a lightness color scale using modern CSS when supported
+ * @param color - Base color string or existing color scale
+ * @returns Complete color scale with lightness variations
+ */
+export function generateLightnessScale(color: CssColorOrScale | undefined): ColorScale<string | undefined> {
+  // Return empty scale if no color provided
   if (!color) {
-    return output;
+    return createEmptyColorScale();
   }
 
+  // If already a color scale object, merge with empty scale
   if (typeof color !== 'string') {
-    return { ...output, ...color };
+    return { ...createEmptyColorScale(), ...color };
   }
 
-  if (cssSupports.relativeColorSyntax()) {
-    COLOR_SCALE.forEach(shade => {
-      output[shade] = getRelativeColorSyntax(color, shade);
-    });
-
-    return output;
+  // For string input, generate scale using modern CSS if supported
+  if (cssSupports.relativeColorSyntax() || cssSupports.colorMix()) {
+    return generateModernLightnessScale(color);
   }
 
-  if (cssSupports.colorMix()) {
-    COLOR_SCALE.forEach(shade => {
-      output[shade] = getColorMixSyntax(color, shade);
-    });
+  // Return empty scale if modern CSS not supported (fallback handled elsewhere)
+  return createEmptyColorScale();
+}
 
-    return output;
-  }
+/**
+ * Generates lightness scale using modern CSS (relative color syntax or color-mix)
+ * @param baseColor - Base color string
+ * @returns Color scale with lightness variations using modern CSS
+ */
+function generateModernLightnessScale(baseColor: string): ColorScale<string | undefined> {
+  const scale = createEmptyColorScale();
 
-  return output;
-};
+  // Generate lightness variations for each shade
+  COLOR_SCALE.forEach(shade => {
+    scale[shade] = getColorMix(baseColor, shade);
+  });
+
+  return scale;
+}

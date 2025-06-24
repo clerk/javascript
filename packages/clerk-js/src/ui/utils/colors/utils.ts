@@ -2,67 +2,22 @@ import type { ColorScale } from '@clerk/types';
 
 import { cssSupports } from '../cssSupports';
 
-const CONFIG = {
-  TARGET_L_50_SHADE: 97,
-  TARGET_L_900_SHADE: 12,
-  LIGHT_SHADES_COUNT: 7,
-  DARK_SHADES_COUNT: 7,
+// Types
+export type ColorShade = 25 | 50 | 100 | 150 | 200 | 300 | 400 | 500 | 600 | 700 | 750 | 800 | 850 | 900 | 950;
+
+// Constants
+export const COLOR_SCALE: readonly ColorShade[] = [
+  25, 50, 100, 150, 200, 300, 400, 500, 600, 700, 750, 800, 850, 900, 950,
+] as const;
+
+const LIGHTNESS_CONFIG = {
+  TARGET_LIGHT: 97, // Target lightness for 50 shade
+  TARGET_DARK: 12, // Target lightness for 900 shade
+  LIGHT_STEPS: 7, // Number of light shades
+  DARK_STEPS: 7, // Number of dark shades
 } as const;
 
-export const COLOR_SCALE = [25, 50, 100, 150, 200, 300, 400, 500, 600, 700, 750, 800, 850, 900, 950] as const;
-export type ColorShade = (typeof COLOR_SCALE)[number];
-
-const getColorMix = (color: string, shade: ColorShade): string => {
-  if (shade === 500) return color;
-
-  if (cssSupports.relativeColorSyntax()) {
-    return getRelativeColorSyntax(color, shade);
-  }
-
-  if (cssSupports.colorMix()) {
-    return getColorMixSyntax(color, shade);
-  }
-
-  return color;
-};
-
-export const getRelativeColorSyntax = (color: string, shade: ColorShade): string => {
-  const { TARGET_L_50_SHADE, TARGET_L_900_SHADE, LIGHT_SHADES_COUNT, DARK_SHADES_COUNT } = CONFIG;
-
-  const lightShadeMap: Record<number, number> = {
-    400: 1,
-    300: 2,
-    200: 3,
-    150: 4,
-    100: 5,
-    50: 6,
-    25: 7,
-  };
-
-  const darkShadeMap: Record<number, number> = {
-    600: 1,
-    700: 2,
-    750: 3,
-    800: 4,
-    850: 5,
-    900: 6,
-    950: 7,
-  };
-
-  if (shade in lightShadeMap) {
-    const steps = lightShadeMap[shade];
-    return `hsl(from ${color} h s calc(l + (${steps} * ((${TARGET_L_50_SHADE} - l) / ${LIGHT_SHADES_COUNT}))))`;
-  }
-
-  if (shade in darkShadeMap) {
-    const steps = darkShadeMap[shade];
-    return `hsl(from ${color} h s calc(l - (${steps} * ((l - ${TARGET_L_900_SHADE}) / ${DARK_SHADES_COUNT}))))`;
-  }
-
-  return color;
-};
-
-const SHADE_MIX_DATA = {
+const LIGHTNESS_MIX_DATA: Record<ColorShade, { mixColor: 'white' | 'black' | null; percentage: number }> = {
   25: { mixColor: 'white', percentage: 85 },
   50: { mixColor: 'white', percentage: 80 },
   100: { mixColor: 'white', percentage: 68 },
@@ -80,7 +35,7 @@ const SHADE_MIX_DATA = {
   950: { mixColor: 'black', percentage: 75 },
 } as const;
 
-const ALPHA_PERCENTAGES = {
+const ALPHA_PERCENTAGES: Record<ColorShade, number> = {
   25: 2,
   50: 3,
   100: 7,
@@ -98,43 +53,118 @@ const ALPHA_PERCENTAGES = {
   950: 92,
 } as const;
 
-const createColorMix = (baseColor: string, mixColor: string, percentage: number): string => {
+const RELATIVE_SHADE_STEPS: Record<number, number> = {
+  // Light shades (lighter than 500)
+  400: 1,
+  300: 2,
+  200: 3,
+  150: 4,
+  100: 5,
+  50: 6,
+  25: 7,
+  // Dark shades (darker than 500)
+  600: 1,
+  700: 2,
+  750: 3,
+  800: 4,
+  850: 5,
+  900: 6,
+  950: 7,
+} as const;
+
+// Core utility functions
+export function createColorMix(baseColor: string, mixColor: string, percentage: number): string {
   return `color-mix(in srgb, ${baseColor}, ${mixColor} ${percentage}%)`;
-};
+}
 
-export const getColorMixSyntax = (color: string, shade: ColorShade): string => {
-  const mixData = SHADE_MIX_DATA[shade];
+export function createAlphaColorMix(color: string, alphaPercentage: number): string {
+  return createColorMix('transparent', color, alphaPercentage);
+}
 
-  if (mixData.mixColor === null) {
-    return color;
+// Feature-specific generators
+export function generateRelativeColorSyntax(color: string, shade: ColorShade): string {
+  if (shade === 500) return color;
+
+  const steps = RELATIVE_SHADE_STEPS[shade];
+  if (!steps) return color;
+
+  const { TARGET_LIGHT, TARGET_DARK, LIGHT_STEPS, DARK_STEPS } = LIGHTNESS_CONFIG;
+
+  // Light shades (25-400)
+  if (shade < 500) {
+    return `hsl(from ${color} h s calc(l + (${steps} * ((${TARGET_LIGHT} - l) / ${LIGHT_STEPS}))))`;
   }
+
+  // Dark shades (600-950)
+  return `hsl(from ${color} h s calc(l - (${steps} * ((l - ${TARGET_DARK}) / ${DARK_STEPS}))))`;
+}
+
+export function generateColorMixSyntax(color: string, shade: ColorShade): string {
+  if (shade === 500) return color;
+
+  const mixData = LIGHTNESS_MIX_DATA[shade];
+  if (!mixData.mixColor) return color;
 
   return createColorMix(color, mixData.mixColor, mixData.percentage);
-};
+}
 
-const getColorMixAlpha = (color: string, shade: ColorShade): string => {
+export function generateAlphaColorMix(color: string, shade: ColorShade): string {
   const alphaPercentage = ALPHA_PERCENTAGES[shade];
+  return createAlphaColorMix(color, alphaPercentage);
+}
 
-  if (alphaPercentage === undefined) {
-    return color;
+// Feature detection and selection
+export function getColorMix(color: string, shade: ColorShade): string {
+  if (shade === 500) return color;
+
+  if (cssSupports.relativeColorSyntax()) {
+    return generateRelativeColorSyntax(color, shade);
   }
 
-  return createColorMix('transparent', color, alphaPercentage);
-};
+  if (cssSupports.colorMix()) {
+    return generateColorMixSyntax(color, shade);
+  }
 
-const applyScalePrefix = <Prefix extends string>(
+  return color;
+}
+
+// Scale utilities
+export function createEmptyColorScale(): ColorScale<string | undefined> {
+  return {
+    '25': undefined,
+    '50': undefined,
+    '100': undefined,
+    '150': undefined,
+    '200': undefined,
+    '300': undefined,
+    '400': undefined,
+    '500': undefined,
+    '600': undefined,
+    '700': undefined,
+    '750': undefined,
+    '800': undefined,
+    '850': undefined,
+    '900': undefined,
+    '950': undefined,
+  };
+}
+
+export function applyScalePrefix<Prefix extends string>(
   scale: ColorScale<string | undefined>,
   prefix: Prefix,
-): Record<`${Prefix}${keyof ColorScale<string>}`, string> => {
-  return Object.fromEntries(
-    Object.entries(scale)
-      .filter(([, color]) => color !== undefined)
-      .map(([shade, color]) => [prefix + shade, color]),
-  ) as Record<`${Prefix}${keyof ColorScale<string>}`, string>;
-};
+): Record<`${Prefix}${keyof ColorScale<string>}`, string> {
+  const result = {} as Record<`${Prefix}${keyof ColorScale<string>}`, string>;
 
-const colorMix = (colorOne: string, colorTwo: string): string => {
+  for (const [shade, color] of Object.entries(scale)) {
+    if (color !== undefined) {
+      (result as any)[prefix + shade] = color;
+    }
+  }
+
+  return result;
+}
+
+// Convenience functions for simple color mixing
+export function simpleColorMix(colorOne: string, colorTwo: string): string {
   return `color-mix(in srgb, ${colorOne}, ${colorTwo})`;
-};
-
-export { getColorMix, getColorMixAlpha, colorMix, applyScalePrefix };
+}

@@ -219,7 +219,6 @@ export const colorOptionToHslaLightnessScale = <Prefix extends string>(
     if (cssSupports.colorMix() || cssSupports.relativeColorSyntax()) {
       // Use modern CSS directly - no HSLA conversion needed
       const modernScale = generateModernLightnessScale(colorOption);
-      console.log(applyScalePrefix(modernScale, prefix));
       return applyScalePrefix(modernScale, prefix) as unknown as WithPrefix<
         InternalColorScale<HslaColorString>,
         Prefix
