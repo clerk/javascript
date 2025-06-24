@@ -103,7 +103,7 @@ type ExtractData<Type> = Type extends { data: infer Data } ? ArrayType<Data> : T
 type UsePagesOrInfinite = <
   Params extends PagesOrInfiniteOptions,
   FetcherReturnData extends Record<string, any>,
-  CacheKeys = Record<string, unknown>,
+  CacheKeys extends Record<string, unknown> = Record<string, unknown>,
   TConfig extends PagesOrInfiniteConfig = PagesOrInfiniteConfig,
 >(
   /**
@@ -163,7 +163,6 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, config, 
   const swrFetcher =
     !cacheMode && !!fetcher
       ? (cacheKeyParams: Record<string, unknown>) => {
-          // @ts-ignore
           const requestParams = getDifferentKeys(cacheKeyParams, cacheKeys);
           return fetcher({ ...params, ...requestParams });
         }
