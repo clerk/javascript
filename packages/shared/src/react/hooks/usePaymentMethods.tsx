@@ -6,11 +6,6 @@ import { createCommerceHook } from './createCommerceHook';
 /**
  * @internal
  */
-export type UsePaymentMethodsParams = Parameters<ReturnType<typeof createCommerceHook>>[0];
-
-/**
- * @internal
- */
 export const usePaymentMethods = createCommerceHook<CommercePaymentSourceResource, GetPaymentSourcesParams>({
   hookName: 'usePaymentMethods',
   resourceType: 'commerce-payment-methods',
