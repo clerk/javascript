@@ -631,6 +631,7 @@ export interface SamlConnectionJSON extends ClerkResourceJSON {
   object: typeof ObjectType.SamlConnection;
   name: string;
   domain: string;
+  domains: string[];
   organization_id: string | null;
   idp_entity_id: string;
   idp_sso_url: string;
@@ -688,6 +689,7 @@ export interface SamlAccountConnectionJSON extends ClerkResourceJSON {
   id: string;
   name: string;
   domain: string;
+  domains: string[];
   active: boolean;
   provider: string;
   sync_user_attributes: boolean;
