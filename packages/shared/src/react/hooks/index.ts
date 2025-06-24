@@ -8,3 +8,4 @@ export { useUser } from './useUser';
 export { useClerk } from './useClerk';
 export { useDeepEqualMemo, isDeeplyEqual } from './useDeepEqualMemo';
 export { useReverification } from './useReverification';
+export { useCheckout as __experimental_useCheckout } from './useCheckout';

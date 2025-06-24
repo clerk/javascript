@@ -11,7 +11,7 @@ import { EmailForm } from '../UserProfile/EmailForm';
 import { useCheckoutContextRoot } from './CheckoutPage';
 
 export const GenericError = () => {
-  const { errors } = useCheckoutContextRoot();
+  const { error } = useCheckoutContextRoot();
   const { translateError } = useLocalizations();
   const { t } = useLocalizations();
   return (
@@ -29,7 +29,7 @@ export const GenericError = () => {
           variant='danger'
           colorScheme='danger'
         >
-          {errors ? translateError(errors[0]) : t(localizationKeys('unstable__errors.form_param_value_invalid'))}
+          {error ? translateError(error.errors[0]) : t(localizationKeys('unstable__errors.form_param_value_invalid'))}
         </Alert>
       </Flex>
     </Drawer.Body>
@@ -37,12 +37,12 @@ export const GenericError = () => {
 };
 
 export const InvalidPlanScreen = () => {
-  const { errors } = useCheckoutContextRoot();
+  const { error } = useCheckoutContextRoot();
 
   const planFromError = useMemo(() => {
-    const error = errors?.find(e => e.code === 'invalid_plan_change');
-    return error?.meta?.plan;
-  }, [errors]);
+    const _error = error?.errors.find(e => e.code === 'invalid_plan_change');
+    return _error?.meta?.plan;
+  }, [error]);
 
   const { planPeriod } = useCheckoutContext();
 
@@ -92,7 +92,7 @@ export const InvalidPlanScreen = () => {
 };
 
 export const AddEmailForm = () => {
-  const { startCheckout } = useCheckoutContextRoot();
+  const { start } = useCheckoutContextRoot();
   const { setIsOpen } = useDrawerContext();
   return (
     <Drawer.Body>
@@ -105,7 +105,7 @@ export const AddEmailForm = () => {
         <EmailForm
           title={localizationKeys('commerce.checkout.emailForm.title')}
           subtitle={localizationKeys('commerce.checkout.emailForm.subtitle')}
-          onSuccess={startCheckout}
+          onSuccess={() => start().catch(() => null)}
           onReset={() => setIsOpen(false)}
           disableAutoFocus
         />

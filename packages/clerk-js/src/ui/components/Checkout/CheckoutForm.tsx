@@ -122,8 +122,8 @@ export const CheckoutForm = withCardStateProvider(() => {
 
 const useCheckoutMutations = () => {
   const { organization } = useOrganization();
-  const { subscriberType } = useCheckoutContext();
-  const { updateCheckout, checkout } = useCheckoutContextRoot();
+  const { subscriberType, onSubscriptionComplete } = useCheckoutContext();
+  const { confirm, checkout } = useCheckoutContextRoot();
   const card = useCardState();
 
   if (!checkout) {
@@ -134,11 +134,11 @@ const useCheckoutMutations = () => {
     card.setLoading();
     card.setError(undefined);
     try {
-      const newCheckout = await checkout.confirm({
+      await confirm({
         ...params,
         ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
       });
-      updateCheckout(newCheckout);
+      onSubscriptionComplete?.();
     } catch (error) {
       handleError(error, [], card.setError);
     } finally {
@@ -152,36 +152,25 @@ const useCheckoutMutations = () => {
     const data = new FormData(e.currentTarget);
     const paymentSourceId = data.get('payment_source_id') as string;
 
-    await confirmCheckout({
+    return confirmCheckout({
       paymentSourceId,
       ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
     });
   };
 
   const addPaymentSourceAndPay = async (ctx: { stripeSetupIntent?: SetupIntent }) => {
-    await confirmCheckout({
+    return confirmCheckout({
       gateway: 'stripe',
       paymentToken: ctx.stripeSetupIntent?.payment_method as string,
       ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
     });
   };
 
-  const payWithTestCard = async () => {
-    card.setLoading();
-    card.setError(undefined);
-    try {
-      const newCheckout = await checkout.confirm({
-        gateway: 'stripe',
-        useTestCard: true,
-        ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
-      });
-      updateCheckout(newCheckout);
-    } catch (error) {
-      handleError(error, [], card.setError);
-    } finally {
-      card.setIdle();
-    }
-  };
+  const payWithTestCard = () =>
+    confirmCheckout({
+      gateway: 'stripe',
+      useTestCard: true,
+    });
 
   return {
     payWithExistingPaymentSource,
