@@ -1,5 +1,8 @@
 /**
- * Color utilities for parsing, converting, and manipulating colors.
+ * Legacy color utilities for parsing, converting, and manipulating colors.
+ *
+ * DEPRECATED: This file contains the legacy HSLA-based color manipulation utilities.
+ * Use the unified API from index.ts which automatically chooses between modern and legacy implementations.
  *
  * These helpers have been extracted from the following libraries,
  * converted to TypeScript and adapted to our needs:
@@ -18,11 +21,11 @@ type ParsedColor = { model: 'hsl' | 'rgb' | 'hwb'; value: ColorTuple };
 const COLOR_REGEX = {
   hex: /^#([a-f0-9]{6})([a-f0-9]{2})?$/i,
   hexShort: /^#([a-f0-9]{3,4})$/i,
-  rgba: /^rgba?\(\s*([+-]?\d+)(?=[\s,])\s*(?:,\s*)?([+-]?\d+)(?=[\s,])\s*(?:,\s*)?([+-]?\d+)\s*(?:[,|\/]\s*([+-]?[\d\.]+)(%?)\s*)?\)$/,
+  rgba: /^rgba?\(\s*([+-]?\d+)(?=[\s,])\s*(?:,\s*)?([+-]?\d+)(?=[\s,])\s*(?:,\s*)?([+-]?\d+)\s*(?:[,|/]\s*([+-]?[\d.]+)(%?)\s*)?\)$/,
   rgbaPercent:
-    /^rgba?\(\s*([+-]?[\d\.]+)\%\s*,?\s*([+-]?[\d\.]+)\%\s*,?\s*([+-]?[\d\.]+)\%\s*(?:[,|\/]\s*([+-]?[\d\.]+)(%?)\s*)?\)$/,
-  hsl: /^hsla?\(\s*([+-]?(?:\d{0,3}\.)?\d+)(?:deg)?\s*,?\s*([+-]?[\d\.]+)%\s*,?\s*([+-]?[\d\.]+)%\s*(?:[,|\/]\s*([+-]?(?=\.\d|\d)(?:0|[1-9]\d*)?(?:\.\d*)?(?:[eE][+-]?\d+)?)\s*)?\)$/,
-  hwb: /^hwb\(\s*([+-]?\d{0,3}(?:\.\d+)?)(?:deg)?\s*,\s*([+-]?[\d\.]+)%\s*,\s*([+-]?[\d\.]+)%\s*(?:,\s*([+-]?(?=\.\d|\d)(?:0|[1-9]\d*)?(?:\.\d*)?(?:[eE][+-]?\d+)?)\s*)?\)$/,
+    /^rgba?\(\s*([+-]?[\d.]+)%\s*,?\s*([+-]?[\d.]+)%\s*,?\s*([+-]?[\d.]+)%\s*(?:[,|/]\s*([+-]?[\d.]+)(%?)\s*)?\)$/,
+  hsl: /^hsla?\(\s*([+-]?(?:\d{0,3}.)?\d+)(?:deg)?\s*,?\s*([+-]?[\d.]+)%\s*,?\s*([+-]?[\d.]+)%\s*(?:[,|/]\s*([+-]?(?=.\d|\d)(?:0|[1-9]\d*)?(?:.\d*)?(?:[eE][+-]?\d+)?)\s*)?\)$/,
+  hwb: /^hwb\(\s*([+-]?\d{0,3}(?:.\d+)?)(?:deg)?\s*,\s*([+-]?[\d.]+)%\s*,\s*([+-]?[\d.]+)%\s*(?:,\s*([+-]?(?=.\d|\d)(?:0|[1-9]\d*)?(?:.\d*)?(?:[eE][+-]?\d+)?)\s*)?\)$/,
 } as const;
 
 const CSS_KEYWORDS = {
@@ -398,8 +401,8 @@ export function toHslaString(input: HslaColor | string): HslaColorString {
   return hslaColorToString(input);
 }
 
-// Export the main colors object with all utilities
-export const colors = {
+// Export the legacy colors object with all utilities
+export const legacyColors = {
   // Core conversion functions
   toHslaColor,
   toHslaString,

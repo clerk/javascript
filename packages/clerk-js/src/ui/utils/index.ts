@@ -2,7 +2,7 @@ export * from './fromEntries';
 export * from './containsAllOf';
 export * from './createInfiniteAccessProxy';
 export * from './intl';
-export * from './colors';
+export { colors } from './colors/index';
 export * from './factorSorting';
 export * from './sleep';
 export * from './isMobileDevice';
