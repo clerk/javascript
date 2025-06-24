@@ -163,8 +163,3 @@ export function applyScalePrefix<Prefix extends string>(
 
   return result;
 }
-
-// Convenience functions for simple color mixing
-export function simpleColorMix(colorOne: string, colorTwo: string): string {
-  return `color-mix(in srgb, ${colorOne}, ${colorTwo})`;
-}
