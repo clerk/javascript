@@ -168,22 +168,22 @@ export const CheckoutComplete = () => {
                   y2='100%'
                 >
                   <stop
-                    offset={`${maskStart}%`}
+                    offset={`${maskStart + 5}%`}
                     stopColor='white'
                     stopOpacity='0'
                   />
                   <stop
-                    offset={`${maskStart + 5}%`}
+                    offset={`${maskStart + 35}%`}
+                    stopColor='white'
+                    stopOpacity='1'
+                  />
+                  <stop
+                    offset={`${maskEnd - 35}%`}
                     stopColor='white'
                     stopOpacity='1'
                   />
                   <stop
                     offset={`${maskEnd - 5}%`}
-                    stopColor='white'
-                    stopOpacity='1'
-                  />
-                  <stop
-                    offset={`${maskEnd}%`}
                     stopColor='white'
                     stopOpacity='0'
                   />
@@ -202,7 +202,7 @@ export const CheckoutComplete = () => {
                     r={r}
                     stroke={`url(#gradient-${id})`}
                     fill='none'
-                    strokeWidth='2'
+                    strokeWidth='1'
                   />
                 ))}
               </mask>
@@ -303,11 +303,13 @@ export const CheckoutComplete = () => {
               elementDescriptor={descriptors.checkoutSuccessTitle}
               as='h2'
               textVariant='h2'
-              // localizationKey={
-              //   checkout.totals.totalDueNow.amount > 0
-              //     ? localizationKeys('commerce.checkout.title__paymentSuccessful')
-              //     : localizationKeys('commerce.checkout.title__subscriptionSuccessful')
-              // }
+              localizationKey={
+                // checkout.totals.totalDueNow.amount > 0
+                //   ?
+                localizationKeys('commerce.checkout.title__paymentSuccessful')
+                // :
+                // localizationKeys('commerce.checkout.title__subscriptionSuccessful')
+              }
               sx={t => ({
                 opacity: 0,
                 animationName: 'slideUp',
@@ -358,11 +360,12 @@ export const CheckoutComplete = () => {
                   animation: 'none',
                 }),
               })}
-              // localizationKey={
-              //   checkout.totals.totalDueNow.amount > 0
-              //     ? localizationKeys('commerce.checkout.description__paymentSuccessful')
-              //     : localizationKeys('commerce.checkout.description__subscriptionSuccessful')
-              // }
+              localizationKey={
+                // checkout.totals.totalDueNow.amount > 0
+                // ?
+                localizationKeys('commerce.checkout.description__paymentSuccessful')
+                // : localizationKeys('commerce.checkout.description__subscriptionSuccessful')
+              }
             />
           </Span>
         </Span>
