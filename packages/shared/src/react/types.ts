@@ -111,7 +111,7 @@ export type PagesOrInfiniteConfig = PaginatedHookConfig<{
   enabled?: boolean;
   /**
    * @experimental
-   * If `true`, a request will be triggered when the hook is mounted.
+   * On `cache` mode, no request will be triggered when the hook is mounted and the data will be fetched from the cache.
    *
    * @default undefined
    */
@@ -136,7 +136,7 @@ export type PagesOrInfiniteOptions = {
   pageSize?: number;
   /**
    * @experimental
-   * If `true`, a request will be triggered when the hook is mounted.
+   * On `cache` mode, no request will be triggered when the hook is mounted and the data will be fetched from the cache.
    *
    * @default undefined
    */
