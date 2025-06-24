@@ -1,4 +1,4 @@
-import { useOrganization } from '@clerk/shared/react';
+import { __experimental_useCheckout as useCheckout, useOrganization } from '@clerk/shared/react';
 import type {
   CommerceCheckoutResource,
   CommerceMoney,
@@ -23,21 +23,24 @@ import { ChevronUpDown, InformationCircle } from '../../icons';
 import { handleError } from '../../utils';
 import * as AddPaymentSource from '../PaymentSources/AddPaymentSource';
 import { PaymentSourceRow } from '../PaymentSources/PaymentSourceRow';
-import { useCheckoutContextRoot } from './CheckoutPage';
 
 type PaymentMethodSource = 'existing' | 'new';
 
 const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
 
 export const CheckoutForm = withCardStateProvider(() => {
-  const ctx = useCheckoutContextRoot();
-  const { checkout } = ctx;
+  const { planId, planPeriod, subscriberType } = useCheckoutContext();
+  const { checkout } = useCheckout({
+    for: subscriberType === 'org' ? 'organization' : undefined,
+    planId: planId!,
+    planPeriod: planPeriod!,
+  });
 
   if (!checkout) {
     return null;
   }
 
-  const { plan, planPeriod, totals, isImmediatePlanChange } = checkout;
+  const { plan, totals, isImmediatePlanChange } = checkout;
   const showCredits = !!totals.credit?.amount && totals.credit.amount > 0;
   const showPastDue = !!totals.pastDue?.amount && totals.pastDue.amount > 0;
   const showDowngradeInfo = !isImmediatePlanChange;
@@ -122,8 +125,12 @@ export const CheckoutForm = withCardStateProvider(() => {
 
 const useCheckoutMutations = () => {
   const { organization } = useOrganization();
-  const { subscriberType, onSubscriptionComplete } = useCheckoutContext();
-  const { confirm, checkout } = useCheckoutContextRoot();
+  const { planId, planPeriod, subscriberType, onSubscriptionComplete } = useCheckoutContext();
+  const { checkout, confirm } = useCheckout({
+    for: subscriberType === 'org' ? 'organization' : undefined,
+    planId: planId!,
+    planPeriod: planPeriod!,
+  });
   const card = useCardState();
 
   if (!checkout) {
@@ -285,7 +292,12 @@ export const PayWithTestPaymentSource = () => {
 
 const AddPaymentSourceForCheckout = withCardStateProvider(() => {
   const { addPaymentSourceAndPay } = useCheckoutMutations();
-  const { checkout } = useCheckoutContextRoot();
+  const { planId, planPeriod, subscriberType } = useCheckoutContext();
+  const { checkout } = useCheckout({
+    for: subscriberType === 'org' ? 'organization' : undefined,
+    planId: planId!,
+    planPeriod: planPeriod!,
+  });
 
   if (!checkout) {
     return null;

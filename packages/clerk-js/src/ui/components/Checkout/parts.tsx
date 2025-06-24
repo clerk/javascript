@@ -1,3 +1,4 @@
+import { __experimental_useCheckout as useCheckout } from '@clerk/shared/react';
 import { useMemo } from 'react';
 
 import { Alert } from '@/ui/elements/Alert';
@@ -8,10 +9,15 @@ import { useCheckoutContext } from '../../contexts';
 import { Box, descriptors, Flex, localizationKeys, useLocalizations } from '../../customizables';
 // TODO(@COMMERCE): Is this causing bundle size  issues ?
 import { EmailForm } from '../UserProfile/EmailForm';
-import { useCheckoutContextRoot } from './CheckoutPage';
 
 export const GenericError = () => {
-  const { error } = useCheckoutContextRoot();
+  const { planId, planPeriod, subscriberType } = useCheckoutContext();
+  const { error } = useCheckout({
+    for: subscriberType === 'org' ? 'organization' : undefined,
+    planId: planId!,
+    planPeriod: planPeriod!,
+  });
+
   const { translateError } = useLocalizations();
   const { t } = useLocalizations();
   return (
@@ -37,14 +43,17 @@ export const GenericError = () => {
 };
 
 export const InvalidPlanScreen = () => {
-  const { error } = useCheckoutContextRoot();
+  const { planId, planPeriod, subscriberType } = useCheckoutContext();
+  const { error } = useCheckout({
+    for: subscriberType === 'org' ? 'organization' : undefined,
+    planId: planId!,
+    planPeriod: planPeriod!,
+  });
 
   const planFromError = useMemo(() => {
     const _error = error?.errors.find(e => e.code === 'invalid_plan_change');
     return _error?.meta?.plan;
   }, [error]);
-
-  const { planPeriod } = useCheckoutContext();
 
   if (!planFromError) {
     return null;
@@ -92,7 +101,12 @@ export const InvalidPlanScreen = () => {
 };
 
 export const AddEmailForm = () => {
-  const { start } = useCheckoutContextRoot();
+  const { planId, planPeriod, subscriberType } = useCheckoutContext();
+  const { start } = useCheckout({
+    for: subscriberType === 'org' ? 'organization' : undefined,
+    planId: planId!,
+    planPeriod: planPeriod!,
+  });
   const { setIsOpen } = useDrawerContext();
   return (
     <Drawer.Body>

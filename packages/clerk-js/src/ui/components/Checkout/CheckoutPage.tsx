@@ -1,17 +1,17 @@
 import { __experimental_useCheckout as useCheckout } from '@clerk/shared/react';
-import { createContext, useContext, useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import { useCheckoutContext } from '@/ui/contexts/components';
 
-const CheckoutContextRoot = createContext<ReturnType<typeof useCheckout> | null>(null);
+// const CheckoutContextRoot = createContext<ReturnType<typeof useCheckout> | null>(null);
 
-export const useCheckoutContextRoot = () => {
-  const ctx = useContext(CheckoutContextRoot);
-  if (!ctx) {
-    throw new Error('CheckoutContextRoot not found');
-  }
-  return ctx;
-};
+// export const useCheckoutContextRoot = () => {
+//   const ctx = useContext(CheckoutContextRoot);
+//   if (!ctx) {
+//     throw new Error('CheckoutContextRoot not found');
+//   }
+//   return ctx;
+// };
 
 const Root = ({ children }: { children: React.ReactNode }) => {
   const { planId, planPeriod, subscriberType } = useCheckoutContext();
@@ -26,12 +26,17 @@ const Root = ({ children }: { children: React.ReactNode }) => {
     return checkout.clear;
   }, []);
 
-  return <CheckoutContextRoot.Provider value={checkout}>{children}</CheckoutContextRoot.Provider>;
+  return <>{children}</>;
 };
 
 const Stage = ({ children, name }: { children: React.ReactNode; name: ReturnType<typeof useCheckout>['status'] }) => {
-  const ctx = useCheckoutContextRoot();
-  if (ctx.status !== name) {
+  const { planId, planPeriod, subscriberType } = useCheckoutContext();
+  const { status } = useCheckout({
+    for: subscriberType === 'org' ? 'organization' : undefined,
+    planId: planId!,
+    planPeriod: planPeriod!,
+  });
+  if (status !== name) {
     return null;
   }
   return children;
@@ -44,7 +49,12 @@ const FetchStatus = ({
   children: React.ReactNode;
   status: 'idle' | 'fetching' | 'error' | 'invalid_plan_change' | 'missing_payer_email';
 }) => {
-  const { fetchStatus, error } = useCheckoutContextRoot();
+  const { planId, planPeriod, subscriberType } = useCheckoutContext();
+  const { fetchStatus, error } = useCheckout({
+    for: subscriberType === 'org' ? 'organization' : undefined,
+    planId: planId!,
+    planPeriod: planPeriod!,
+  });
 
   const internalFetchStatus = useMemo(() => {
     if (fetchStatus === 'error' && error?.errors) {
