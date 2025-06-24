@@ -3,6 +3,7 @@ import { deriveState } from '@clerk/shared/deriveState';
 import type {
   CheckAuthorizationWithCustomPermissions,
   Clerk,
+  ClientResource,
   GetToken,
   JwtPayload,
   PendingSessionOptions,
@@ -161,8 +162,7 @@ function useAuthStore() {
         {
           user: null,
           session: null,
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          client: null!,
+          client: null as unknown as ClientResource,
           organization: null,
         },
         authAsyncStorage.getStore() as any,
