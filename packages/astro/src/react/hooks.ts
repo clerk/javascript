@@ -1,9 +1,10 @@
-import { resolveAuthState } from '@clerk/shared/authorization';
+import { createCheckAuthorization, resolveAuthState } from '@clerk/shared/authorization';
 import { deriveState } from '@clerk/shared/deriveState';
 import type {
   CheckAuthorizationWithCustomPermissions,
   Clerk,
   GetToken,
+  JwtPayload,
   PendingSessionOptions,
   SignOut,
   UseAuthReturn,
@@ -90,31 +91,21 @@ export const useAuth: UseAuth = ({ treatPendingAsSignedOut } = {}) => {
   const getToken: GetToken = useCallback(createGetToken(), []);
   const signOut: SignOut = useCallback(createSignOut(), []);
 
-  const { userId, orgId, orgRole, orgPermissions } = authContext;
+  const { userId, orgId, orgRole, orgPermissions, factorVerificationAge, sessionClaims } = authContext;
 
   const has = useCallback(
     (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => {
-      if (!params?.permission && !params?.role) {
-        throw new Error(
-          'Missing parameters. `has` from `useAuth` requires a permission or role key to be passed. Example usage: `has({permission: "org:posts:edit"`',
-        );
-      }
-
-      if (!orgId || !userId || !orgRole || !orgPermissions) {
-        return false;
-      }
-
-      if (params.permission) {
-        return orgPermissions.includes(params.permission);
-      }
-
-      if (params.role) {
-        return orgRole === params.role;
-      }
-
-      return false;
+      return createCheckAuthorization({
+        userId,
+        orgId,
+        orgRole,
+        orgPermissions,
+        factorVerificationAge,
+        features: ((sessionClaims as JwtPayload | undefined)?.fea as string) || '',
+        plans: ((sessionClaims as JwtPayload | undefined)?.pla as string) || '',
+      })(params);
     },
-    [orgId, orgRole, userId, orgPermissions],
+    [userId, orgId, orgRole, orgPermissions, factorVerificationAge, sessionClaims],
   );
 
   const payload = resolveAuthState({
