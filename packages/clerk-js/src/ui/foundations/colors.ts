@@ -1,4 +1,4 @@
-import { colorOptionToHslaAlphaScale } from '../utils/colorOptionToHslaScale';
+import { colorOptionToHslaAlphaScale } from '../utils/colors/colorOptionToHslaScale';
 
 export const whiteAlpha = Object.freeze({
   whiteAlpha25: 'hsla(0, 0%, 100%, 0.02)',

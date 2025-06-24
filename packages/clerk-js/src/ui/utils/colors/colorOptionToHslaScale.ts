@@ -1,8 +1,8 @@
 import type { ColorScale, CssColorOrAlphaScale, CssColorOrScale, HslaColor, HslaColorString } from '@clerk/types';
 
-import { colors, generateAlphaScale, generateLightnessScale } from './colors';
-import { applyScalePrefix } from './colors/utils';
-import { cssSupports } from './cssSupports';
+import { cssSupports } from '../cssSupports';
+import { colors, generateAlphaScale, generateLightnessScale } from './index';
+import { applyScalePrefix } from './utils';
 
 // Types
 type InternalColorScale<T> = ColorScale<T> & Partial<Record<20, T>>;

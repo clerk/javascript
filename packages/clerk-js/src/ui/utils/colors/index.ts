@@ -71,6 +71,11 @@ export { legacyColors };
 export { hasModernColorSupport };
 
 /**
+ * Export unified scale generators
+ */
+export { generateAlphaScale, generateLightnessScale, modernScales, legacyScales } from './scales';
+
+/**
  * Type exports
  */
 export type { HslaColor, HslaColorString };

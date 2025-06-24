@@ -22,7 +22,7 @@ export * from './createSlug';
 export * from './passwordUtils';
 export * from './createCustomPages';
 export * from './ExternalElementMounter';
-export * from './colorOptionToHslaScale';
+export * from './colors/colorOptionToHslaScale';
 export * from './createCustomMenuItems';
 export * from './usernameUtils';
 export * from './web3CallbackErrorHandler';
