@@ -180,11 +180,8 @@ export const colorOptionToHslaAlphaScale = <Prefix extends string>(
     return undefined;
   }
 
-  // For alpha scales, we require all shades to be provided or generate from single color
-  const userScale = processColorInput(colorOption, typeof colorOption === 'object');
-
   if (typeof colorOption === 'string') {
-    // For single color input, check if we can use modern CSS
+    // For single color input, check if we can use modern CSS first
     if (cssSupports.colorMix()) {
       // Use modern CSS directly - no HSLA conversion needed
       const modernScale = generateModernAlphaScale(colorOption);
@@ -194,11 +191,13 @@ export const colorOptionToHslaAlphaScale = <Prefix extends string>(
       >;
     }
 
-    // Fall back to HSLA approach
+    // Fall back to HSLA approach - only parse if modern CSS is not supported
+    const userScale = processColorInput(colorOption, false);
     const finalScale = generateLegacyAlphaScale(userScale['500']);
     return prefixAndStringifyScale(finalScale, prefix);
   } else {
-    // Use provided complete scale
+    // For alpha scales, we require all shades to be provided or generate from single color
+    const userScale = processColorInput(colorOption, true);
     return prefixAndStringifyScale(userScale, prefix);
   }
 };
@@ -211,11 +210,8 @@ export const colorOptionToHslaLightnessScale = <Prefix extends string>(
     return undefined;
   }
 
-  // For lightness scales, we can work with partial scales and fill missing shades
-  const userScale = processColorInput(colorOption, false);
-
   if (typeof colorOption === 'string') {
-    // For single color input, check if we can use modern CSS
+    // For single color input, check if we can use modern CSS first
     if (cssSupports.colorMix() || cssSupports.relativeColorSyntax()) {
       // Use modern CSS directly - no HSLA conversion needed
       const modernScale = generateModernLightnessScale(colorOption);
@@ -225,13 +221,15 @@ export const colorOptionToHslaLightnessScale = <Prefix extends string>(
       >;
     }
 
-    // Fall back to HSLA approach
+    // Fall back to HSLA approach - only parse if modern CSS is not supported
+    const userScale = processColorInput(colorOption, false);
     const baseColor = userScale['500'];
     const generatedScale = generateLegacyLightnessScale(baseColor);
     const finalScale = mergeUserDefinedWithGenerated(generatedScale, userScale);
     return prefixAndStringifyScale(finalScale, prefix);
   } else {
-    // User provided partial or complete scale
+    // User provided partial or complete scale - process normally
+    const userScale = processColorInput(colorOption, false);
     const baseColor = userScale['500'];
 
     if (!baseColor) {
