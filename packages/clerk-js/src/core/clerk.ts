@@ -136,6 +136,8 @@ import type { FapiClient, FapiRequestCallback } from './fapiClient';
 import { createFapiClient } from './fapiClient';
 import { createClientFromJwt } from './jwt-client';
 import { APIKeys } from './modules/apiKeys';
+import type { CheckoutFunction } from './modules/checkout';
+import { createCheckoutInstance } from './modules/checkout';
 import { CommerceBilling } from './modules/commerce';
 import {
   BaseResource,
@@ -195,6 +197,7 @@ export class Clerk implements ClerkInterface {
   };
   private static _billing: CommerceBillingNamespace;
   private static _apiKeys: APIKeysNamespace;
+  private _checkout: CheckoutFunction | undefined;
 
   public client: ClientResource | undefined;
   public session: SignedInSessionResource | null | undefined;
@@ -335,6 +338,13 @@ export class Clerk implements ClerkInterface {
       Clerk._apiKeys = new APIKeys();
     }
     return Clerk._apiKeys;
+  }
+
+  get checkout() {
+    if (!this._checkout) {
+      this._checkout = params => createCheckoutInstance(this, params);
+    }
+    return this._checkout;
   }
 
   public __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K] {

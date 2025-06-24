@@ -55,6 +55,26 @@ import type { UserResource } from './user';
 import type { Autocomplete, DeepPartial, DeepSnakeToCamel } from './utils';
 import type { WaitlistResource } from './waitlist';
 
+// type CheckoutStatus = 'awaiting_initialization' | 'awaiting_confirmation' | 'completed';
+
+// type CheckoutCacheState = {
+//   isStarting: boolean;
+//   isConfirming: boolean;
+//   error: ClerkAPIResponseError | null;
+//   checkout: CommerceCheckoutResource | null;
+//   fetchStatus: 'idle' | 'fetching' | 'error';
+//   status: CheckoutStatus;
+// };
+
+// export type CheckoutInstance = {
+//   confirm: (params: ConfirmCheckoutParams) => Promise<CommerceCheckoutResource>;
+//   start: () => Promise<CommerceCheckoutResource>;
+//   clear: () => void;
+//   finalize: (params: { redirectUrl?: string }) => void;
+//   subscribe: (listener: (state: CheckoutInstance) => void) => () => void;
+//   getState: () => CheckoutCacheState;
+// };
+
 /**
  * @inline
  */
@@ -780,6 +800,8 @@ export interface Clerk {
    * This API is in early access and may change in future releases.
    */
   apiKeys: APIKeysNamespace;
+
+  checkout: (options: { for?: 'organization'; planPeriod: CommerceSubscriptionPlanPeriod; planId: string }) => any;
 }
 
 export type HandleOAuthCallbackParams = TransferableOption &

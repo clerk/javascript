@@ -14,4 +14,5 @@ export {
   UserContext,
   useSessionContext,
   useUserContext,
+  CheckoutProvider,
 } from './contexts';
