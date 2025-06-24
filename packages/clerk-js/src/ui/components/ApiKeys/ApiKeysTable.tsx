@@ -161,22 +161,23 @@ export const ApiKeysTable = ({
                     <Text
                       variant='caption'
                       colorScheme='secondary'
-                    >
-                      Created at{' '}
-                      {apiKey.createdAt.toLocaleDateString(undefined, {
-                        month: 'short',
-                        day: '2-digit',
-                        year: 'numeric',
-                      })}
-                    </Text>
+                      localizationKey={
+                        apiKey.expiration
+                          ? localizationKeys('apiKeys.createdAndExpirationStatus__expiresOn', {
+                              createdDate: apiKey.createdAt,
+                              expiresDate: apiKey.expiration,
+                            })
+                          : localizationKeys('apiKeys.createdAndExpirationStatus__never', {
+                              createdDate: apiKey.createdAt,
+                            })
+                      }
+                    />
                   </Flex>
                 </Td>
                 <Td>
                   <Box
                     sx={{
-                      [mqu.sm]: {
-                        minWidth: '10ch',
-                      },
+                      minWidth: '10ch',
                     }}
                   >
                     <Text localizationKey={apiKey.lastUsedAt ? timeAgo(apiKey.lastUsedAt) : '-'} />
