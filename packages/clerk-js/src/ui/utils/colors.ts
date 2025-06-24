@@ -1,4 +1,3 @@
-/* eslint-disable no-useless-escape */
 /**
  * Color utilities for parsing, converting, and manipulating colors.
  *
