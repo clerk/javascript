@@ -1,5 +1,19 @@
 # Change Log
 
+## 4.61.0
+
+### Minor Changes
+
+- Expose `__internal_LocalizationResource` which now includes metadata for which keys require interpolation. ([#6108](https://github.com/clerk/javascript/pull/6108)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add support for `expiresInSeconds` parameter in session token generation. This allows setting custom expiration times for tokens both with and without templates via the backend API. ([#6150](https://github.com/clerk/javascript/pull/6150)) by [@jacekradko](https://github.com/jacekradko)
+
+### Patch Changes
+
+- Add element descriptors to `<APIKeys />` component ([#6095](https://github.com/clerk/javascript/pull/6095)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Replace expiration segmented list with dropdown and hide description field in `<APIKeys />` component ([#6153](https://github.com/clerk/javascript/pull/6153)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 4.60.1
 
 ### Patch Changes

@@ -24,16 +24,9 @@ Before you begin writing tests, you should already have:
 
 You'll only need to follow these instructions once when you setup the integration test suite.
 
-1. Navigate to the `integration` folder:
-   ```shell
-   cd integration
-   ```
-1. Make local duplicates of the sample files. They'll be automatically ignored by git:
-   ```shell
-   cp .env.local.sample .env.local
-   cp .keys.json.sample .keys.json
-   ```
-1. Open Clerk's 1Password and search for **JS SDKs integration tests**. Inside the secure note you'll find the secret keys that should go into `.env.local` and `.keys.json`. Copy them over.
+1. Make sure you have the [1Password CLI installed](https://developer.1password.com/docs/cli/get-started/) and have access to Clerk's "Shared" vault. You will also need to [enable the 1Password desktop app integration](https://developer.1password.com/docs/cli/get-started/#step-2-turn-on-the-1password-desktop-app-integration).
+
+1. Run `pnpm integration:secrets`.
 
 1. Generate the required session keys by running the following command in the `./certs` directory: `mkcert -cert-file sessions.pem -key-file sessions-key.pem "example.com" "*.example.com"`.
 
