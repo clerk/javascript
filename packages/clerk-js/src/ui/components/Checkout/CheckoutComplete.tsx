@@ -8,6 +8,7 @@ import { Box, Button, descriptors, Heading, localizationKeys, Span, Text, useApp
 import { transitionDurationValues, transitionTiming } from '../../foundations/transitions';
 import { usePrefersReducedMotion } from '../../hooks';
 import { useRouter } from '../../router';
+import { formatDate } from '../../utils';
 import { useCheckoutContextRoot } from './CheckoutPage';
 
 const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
@@ -76,9 +77,9 @@ export const CheckoutComplete = () => {
     }
   };
 
-  // if (!checkout) {
-  //   return null;
-  // }
+  if (!checkout) {
+    return null;
+  }
 
   return (
     <>
@@ -93,7 +94,7 @@ export const CheckoutComplete = () => {
             aspectRatio: '1/1',
             display: 'grid',
             width: '100%',
-            // padding: t.space.$4,
+            padding: t.space.$4,
             flexShrink: 0,
             transformOrigin: 'bottom center',
             animationName: 'scaleIn',
@@ -154,55 +155,22 @@ export const CheckoutComplete = () => {
               <filter id='clerk-checkout-success-blur-effect'>
                 <feGaussianBlur stdDeviation='10' />
               </filter>
-              {[
-                { r: 225, maskStart: 10, maskEnd: 90, id: 'mask-1' },
-                { r: 162.5, maskStart: 15, maskEnd: 85, id: 'mask-2' },
-                { r: 100, maskStart: 20, maskEnd: 80, id: 'mask-3' },
-              ].map(({ maskStart, maskEnd, id }) => (
-                <linearGradient
-                  key={id}
-                  id={`gradient-${id}`}
-                  x1='0%'
-                  y1='0%'
-                  x2='0%'
-                  y2='100%'
-                >
-                  <stop
-                    offset={`${maskStart}%`}
-                    stopColor='white'
-                    stopOpacity='0'
-                  />
-                  <stop
-                    offset={`${maskStart + 5}%`}
-                    stopColor='white'
-                    stopOpacity='1'
-                  />
-                  <stop
-                    offset={`${maskEnd - 5}%`}
-                    stopColor='white'
-                    stopOpacity='1'
-                  />
-                  <stop
-                    offset={`${maskEnd}%`}
-                    stopColor='white'
-                    stopOpacity='0'
-                  />
-                </linearGradient>
-              ))}
               <mask id='clerk-checkout-success-mask'>
                 {[
-                  { r: 225, id: 'mask-1' },
-                  { r: 162.5, id: 'mask-2' },
-                  { r: 100, id: 'mask-3' },
-                ].map(({ r, id }) => (
+                  { r: 225, maskStart: 10, maskEnd: 90 },
+                  { r: 162.5, maskStart: 15, maskEnd: 85 },
+                  { r: 100, maskStart: 20, maskEnd: 80 },
+                ].map(({ r, maskStart, maskEnd }) => (
                   <circle
-                    key={id}
+                    key={r}
                     cx='256'
                     cy='256'
                     r={r}
-                    stroke={`url(#gradient-${id})`}
+                    stroke='white'
                     fill='none'
-                    strokeWidth='2'
+                    style={{
+                      maskImage: `linear-gradient(to bottom, transparent ${maskStart}%, black, transparent ${maskEnd}%)`,
+                    }}
                   />
                 ))}
               </mask>
@@ -303,11 +271,11 @@ export const CheckoutComplete = () => {
               elementDescriptor={descriptors.checkoutSuccessTitle}
               as='h2'
               textVariant='h2'
-              // localizationKey={
-              //   checkout.totals.totalDueNow.amount > 0
-              //     ? localizationKeys('commerce.checkout.title__paymentSuccessful')
-              //     : localizationKeys('commerce.checkout.title__subscriptionSuccessful')
-              // }
+              localizationKey={
+                checkout.totals.totalDueNow.amount > 0
+                  ? localizationKeys('commerce.checkout.title__paymentSuccessful')
+                  : localizationKeys('commerce.checkout.title__subscriptionSuccessful')
+              }
               sx={t => ({
                 opacity: 0,
                 animationName: 'slideUp',
@@ -358,11 +326,11 @@ export const CheckoutComplete = () => {
                   animation: 'none',
                 }),
               })}
-              // localizationKey={
-              //   checkout.totals.totalDueNow.amount > 0
-              //     ? localizationKeys('commerce.checkout.description__paymentSuccessful')
-              //     : localizationKeys('commerce.checkout.description__subscriptionSuccessful')
-              // }
+              localizationKey={
+                checkout.totals.totalDueNow.amount > 0
+                  ? localizationKeys('commerce.checkout.description__paymentSuccessful')
+                  : localizationKeys('commerce.checkout.description__subscriptionSuccessful')
+              }
             />
           </Span>
         </Span>
@@ -391,11 +359,11 @@ export const CheckoutComplete = () => {
         <LineItems.Root>
           <LineItems.Group variant='secondary'>
             <LineItems.Title title={localizationKeys('commerce.checkout.lineItems.title__totalPaid')} />
-            {/* <LineItems.Description
+            <LineItems.Description
               text={`${checkout.totals.totalDueNow.currencySymbol}${checkout.totals.totalDueNow.amountFormatted}`}
-            /> */}
+            />
           </LineItems.Group>
-          {/* <LineItems.Group variant='secondary'>
+          <LineItems.Group variant='secondary'>
             <LineItems.Title
               title={
                 checkout.totals.totalDueNow.amount > 0
@@ -416,7 +384,7 @@ export const CheckoutComplete = () => {
                     : '–'
               }
             />
-          </LineItems.Group> */}
+          </LineItems.Group>
         </LineItems.Root>
         <Button
           onClick={handleClose}
