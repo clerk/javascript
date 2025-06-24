@@ -79,7 +79,7 @@ export interface SignUpResource extends ClerkResource {
 
   create: (params: SignUpCreateParams, options?: SignUpCreateOptions) => Promise<SignUpResource>;
 
-  update: (params: SignUpUpdateParams) => Promise<SignUpResource>;
+  update: (params: SignUpUpdateParams, options?: SignUpUpdateOptions) => Promise<SignUpResource>;
 
   upsert: (params: SignUpCreateParams | SignUpUpdateParams) => Promise<SignUpResource>;
 
@@ -212,6 +212,10 @@ export type SignUpCreateParams = Partial<
 
 export type SignUpCreateOptions = Partial<{
   skipCaptchaChallenge: boolean;
+}>;
+
+export type SignUpUpdateOptions = Partial<{
+  triggerCaptchaChallenge: boolean;
 }>;
 
 export type SignUpUpdateParams = SignUpCreateParams;

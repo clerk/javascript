@@ -22,6 +22,7 @@ import type {
   SignUpJSONSnapshot,
   SignUpResource,
   SignUpStatus,
+  SignUpUpdateOptions,
   SignUpUpdateParams,
   StartEmailLinkFlowParams,
   Web3Provider,
@@ -96,7 +97,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     let params: Record<string, unknown> = _params;
 
     if (!this.shouldBypassCaptchaForAttempt(params)) {
-      const captchaParams = await this.getCaptchaParams();
+      const captchaParams = await this.solveCaptchaChallenge();
       if (captchaParams) {
         params = { ...params, ...captchaParams };
       }
@@ -129,16 +130,8 @@ export class SignUp extends BaseResource implements SignUpResource {
       body: normalizeUnsafeMetadata(params),
     });
 
-    const isCaptchaChallengeMissingAndRequired =
-      this.missingFields.some(field => field === 'captcha_challenge') &&
-      this.requiredFields.some(field => field === 'captcha_challenge');
-
-    if (
-      isCaptchaChallengeMissingAndRequired &&
-      !this.shouldBypassCaptchaForAttempt(params) &&
-      !options?.skipCaptchaChallenge
-    ) {
-      return this.solveChallenge();
+    if (!this.shouldBypassCaptchaForAttempt(params) && !options?.skipCaptchaChallenge) {
+      return this.update(params, { triggerCaptchaChallenge: true });
     }
 
     return this;
@@ -386,7 +379,18 @@ export class SignUp extends BaseResource implements SignUpResource {
     });
   };
 
-  update = (params: SignUpUpdateParams): Promise<SignUpResource> => {
+  update = async (params: SignUpUpdateParams, options?: SignUpUpdateOptions): Promise<SignUpResource> => {
+    const isCaptchaChallengeMissingAndRequired =
+      this.missingFields.some(field => field === 'captcha_challenge') &&
+      this.requiredFields.some(field => field === 'captcha_challenge');
+
+    if (options?.triggerCaptchaChallenge && isCaptchaChallengeMissingAndRequired) {
+      const captchaParams = await this.solveCaptchaChallenge();
+      if (captchaParams) {
+        params = { ...params, ...captchaParams };
+      }
+    }
+
     return this._basePatch({
       body: normalizeUnsafeMetadata(params),
     });
@@ -457,16 +461,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     };
   }
 
-  private solveChallenge = async (): Promise<SignUpResource> => {
-    const params = await this.getCaptchaParams();
-    if (params) {
-      return this.update(params);
-    }
-
-    return this;
-  };
-
-  private getCaptchaParams = async (): Promise<Record<string, unknown> | undefined> => {
+  private solveCaptchaChallenge = async (): Promise<Record<string, unknown> | undefined> => {
     let params: Record<string, unknown> | undefined;
 
     if (!__BUILD_DISABLE_RHC__ && !this.clientBypass()) {
