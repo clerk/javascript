@@ -60,14 +60,14 @@ export const usePaymentAttempts = () => {
   });
 };
 
-export const useStatements = (params?: { fetchOnMount: boolean }) => {
+export const useStatements = (params?: { mode: 'cache' }) => {
   const subscriberType = useSubscriberTypeContext();
   return __experimental_useStatements({
     for: subscriberType === 'org' ? 'organization' : 'user',
     initialPage: 1,
     pageSize: 10,
     keepPreviousData: true,
-    fetchOnMount: params?.fetchOnMount,
+    __experimental_mode: params?.mode,
   });
 };
 
@@ -175,7 +175,7 @@ export const usePlansContext = () => {
   });
 
   // Invalidates cache but does not fetch immediately
-  const { revalidate: revalidateStatements } = useStatements({ fetchOnMount: false });
+  const { revalidate: revalidateStatements } = useStatements({ mode: 'cache' });
 
   const { revalidate: revalidatePaymentSources } = usePaymentMethods();
 

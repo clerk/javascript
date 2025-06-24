@@ -22,6 +22,17 @@ type CommerceHookConfig<TResource extends ClerkResource, TParams extends PagesOr
 };
 
 /**
+ * A hook factory that creates paginated data fetching hooks for commerce-related resources.
+ * It provides a standardized way to create hooks that can fetch either user or organization resources
+ * with built-in pagination support.
+ *
+ * The generated hooks handle:
+ * - Clerk authentication context
+ * - Resource-specific data fetching
+ * - Pagination (both traditional and infinite scroll)
+ * - Telemetry tracking
+ * - Type safety for the specific resource.
+ *
  * @internal
  */
 export function createCommerceHook<TResource extends ClerkResource, TParams extends PagesOrInfiniteOptions>({
@@ -47,7 +58,7 @@ export function createCommerceHook<TResource extends ClerkResource, TParams exte
       pageSize: 10,
       keepPreviousData: false,
       infinite: false,
-      fetchOnMount: true,
+      __experimental_mode: undefined,
     } as unknown as T);
 
     const clerk = useClerkInstanceContext();
@@ -75,8 +86,8 @@ export function createCommerceHook<TResource extends ClerkResource, TParams exte
       {
         keepPreviousData: safeValues.keepPreviousData,
         infinite: safeValues.infinite,
-        fetchOnMount: safeValues.fetchOnMount,
         enabled: isEnabled,
+        __experimental_mode: safeValues.__experimental_mode,
       },
       {
         type: resourceType,
