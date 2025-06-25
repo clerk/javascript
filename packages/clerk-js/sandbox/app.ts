@@ -348,7 +348,6 @@ void (async () => {
       ...(componentControls.clerk.getProps() ?? {}),
       signInUrl: '/sign-in',
       signUpUrl: '/sign-up',
-      appearance: {},
     });
     renderCurrentRoute();
     updateVariables();
