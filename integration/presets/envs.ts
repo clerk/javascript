@@ -170,6 +170,12 @@ const withWhatsappPhoneCode = base
   .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-whatsapp-phone-code').sk)
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-whatsapp-phone-code').pk);
 
+const withAPIKeys = base
+  .clone()
+  .setId('withAPIKeys')
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-api-keys').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-api-keys').pk);
+
 export const envs = {
   base,
   withKeyless,
@@ -195,4 +201,5 @@ export const envs = {
   withBilling,
   withWhatsappPhoneCode,
   sessionsProd1,
+  withAPIKeys,
 } as const;

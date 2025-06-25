@@ -2,14 +2,14 @@ import { useClerk } from '@clerk/shared/react';
 import type { CommercePlanResource, CommerceSubscriptionPlanPeriod, PricingTableProps } from '@clerk/types';
 import { useEffect, useMemo, useState } from 'react';
 
-import { usePaymentSources, usePlans, usePlansContext, usePricingTableContext, useSubscriptions } from '../../contexts';
+import { usePaymentMethods, usePlans, usePlansContext, usePricingTableContext, useSubscriptions } from '../../contexts';
 import { Flow } from '../../customizables';
 import { PricingTableDefault } from './PricingTableDefault';
 import { PricingTableMatrix } from './PricingTableMatrix';
 
 const PricingTableRoot = (props: PricingTableProps) => {
   const clerk = useClerk();
-  const { mode = 'mounted' } = usePricingTableContext();
+  const { mode = 'mounted', signInMode = 'redirect' } = usePricingTableContext();
   const isCompact = mode === 'modal';
   const { data: subscriptions } = useSubscriptions();
   const { data: plans } = usePlans();
@@ -42,6 +42,9 @@ const PricingTableRoot = (props: PricingTableProps) => {
 
   const selectPlan = (plan: CommercePlanResource, event?: React.MouseEvent<HTMLElement>) => {
     if (!clerk.isSignedIn) {
+      if (signInMode === 'modal') {
+        return clerk.openSignIn();
+      }
       return clerk.redirectToSignIn();
     }
 
@@ -57,7 +60,7 @@ const PricingTableRoot = (props: PricingTableProps) => {
   };
 
   // Pre-fetch payment sources
-  usePaymentSources();
+  usePaymentMethods();
 
   return (
     <Flow.Root

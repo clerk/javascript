@@ -119,7 +119,6 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
             afterVerificationCancelled: cancel,
           });
         } else {
-          params.telemetry?.record(eventMethodCalled('UserVerificationCustomUI'));
           params.onNeedsReverification({
             cancel,
             complete,
@@ -198,6 +197,12 @@ export const useReverification: UseReverification = (fetcher, options) => {
   const { __internal_openReverification, telemetry } = useClerk();
   const fetcherRef = useRef(fetcher);
   const optionsRef = useRef(options);
+
+  telemetry?.record(
+    eventMethodCalled('useReverification', {
+      onNeedsReverification: Boolean(options?.onNeedsReverification),
+    }),
+  );
 
   const handleReverification = useMemo(() => {
     const handler = createReverificationHandler({

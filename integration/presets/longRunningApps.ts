@@ -43,6 +43,7 @@ export const createLongRunningApps = () => {
       config: next.appRouter,
       env: envs.withSessionTasks,
     },
+    { id: 'next.appRouter.withAPIKeys', config: next.appRouter, env: envs.withAPIKeys },
     { id: 'withBillingStaging.next.appRouter', config: next.appRouter, env: envs.withBillingStaging },
     { id: 'withBilling.next.appRouter', config: next.appRouter, env: envs.withBilling },
     { id: 'withBillingStaging.vue.vite', config: vue.vite, env: envs.withBillingStaging },

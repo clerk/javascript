@@ -54,6 +54,7 @@ export type AvailableComponentProps =
   | APIKeysProps;
 
 type ComponentMode = 'modal' | 'mounted';
+type SignInMode = 'modal' | 'redirect';
 
 export type SignInCtx = SignInProps & {
   componentName: 'SignIn';
@@ -116,6 +117,7 @@ export type WaitlistCtx = WaitlistProps & {
 export type PricingTableCtx = PricingTableProps & {
   componentName: 'PricingTable';
   mode?: ComponentMode;
+  signInMode?: SignInMode;
 };
 
 export type APIKeysCtx = APIKeysProps & {
