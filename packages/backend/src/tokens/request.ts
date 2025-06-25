@@ -769,7 +769,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
       return authenticateAnyRequestWithTokenInHeader();
     }
     if (acceptsToken === TokenType.SessionToken) {
-      return authenticateRequestWithTokenInHeader();
+      return mergeHeaders(await authenticateRequestWithTokenInHeader());
     }
     return authenticateMachineRequestWithTokenInHeader();
   }
@@ -786,12 +786,6 @@ export const authenticateRequest: AuthenticateRequest = (async (
       reason: 'No token in header',
     });
   }
-
-  if (authenticateContext.sessionTokenInHeader) {
-    return mergeHeaders(await authenticateRequestWithTokenInHeader());
-  }
-
-  return mergeHeaders(await authenticateRequestWithTokenInCookie());
 }) as AuthenticateRequest;
 
 /**
