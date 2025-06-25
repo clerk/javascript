@@ -131,7 +131,10 @@ export class SignUp extends BaseResource implements SignUpResource {
     });
 
     if (!this.shouldBypassCaptchaForAttempt(params) && !options?.skipCaptchaChallenge) {
-      return this.update(params, { triggerCaptchaChallenge: true });
+      return this.update(
+        { strategy: params.strategy as SignUpUpdateParams['strategy'] },
+        { triggerCaptchaChallenge: true },
+      );
     }
 
     return this;
