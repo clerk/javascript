@@ -4,13 +4,13 @@ import React from 'react';
 import { useCardState } from '@/ui/elements/contexts';
 import { FormButtonContainer } from '@/ui/elements/FormButtons';
 import { VerificationLink } from '@/ui/elements/VerificationLinkCard';
+import { handleError } from '@/ui/utils/errorHandler';
 
 import { EmailLinkStatusCard } from '../../common';
 import { buildVerificationRedirectUrl } from '../../common/redirects';
 import { useEnvironment, useUserProfileContext } from '../../contexts';
 import { Button, descriptors, localizationKeys } from '../../customizables';
 import { useEmailLink } from '../../hooks';
-import { handleError } from '../../utils';
 
 type VerifyWithLinkProps = {
   email: EmailAddressResource;

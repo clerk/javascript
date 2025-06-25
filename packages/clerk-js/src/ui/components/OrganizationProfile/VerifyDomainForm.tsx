@@ -8,12 +8,13 @@ import { FormButtonContainer, FormButtons } from '@/ui/elements/FormButtons';
 import type { FormProps } from '@/ui/elements/FormContainer';
 import { FormContainer } from '@/ui/elements/FormContainer';
 import type { VerificationCodeCardProps } from '@/ui/elements/VerificationCodeCard';
+import { handleError } from '@/ui/utils/errorHandler';
+import { useFormControl } from '@/ui/utils/useFormControl';
 
 import { useWizard, Wizard } from '../../common';
 import { useEnvironment } from '../../contexts';
 import { Button, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
 import { useFetch } from '../../hooks';
-import { handleError, useFormControl } from '../../utils';
 import { VerifiedDomainForm } from './VerifiedDomainForm';
 
 type VerifyDomainFormProps = FormProps & {
