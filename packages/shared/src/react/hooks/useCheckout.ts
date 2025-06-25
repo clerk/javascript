@@ -235,7 +235,7 @@ export const useCheckout = (options?: UseCheckoutOptions): UseCheckoutReturn => 
   const manager = useMemo(() => createCheckoutManager(checkoutKey), [checkoutKey]);
 
   const managerState = useSyncExternalStore(
-    (...args) => manager.subscribe(...args),
+    cb => manager.subscribe(cb),
     () => manager.getCacheState(),
     () => manager.getCacheState(),
   );
