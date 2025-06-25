@@ -76,7 +76,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withAPIKeys] })('api keys @ge
     await row.waitFor({ state: 'attached' });
 
     // Revoke API key
-    await row.locator('.cl-tableBodyCell').nth(3).locator('.cl-menuButton').click();
+    await row.locator('.cl-menuButton').click();
     const revokeButton = u.page.getByRole('menuitem', { name: 'Revoke key' });
     await revokeButton.waitFor({ state: 'attached' });
     await revokeButton.click();
