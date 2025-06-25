@@ -88,7 +88,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withAPIKeys] })('api keys @ge
     await u.po.apiKeys.waitForRevokeModalClosed();
 
     // Check if record is removed from the table
-    await expect(table.locator('.cl-apiKeysTable .cl-tableRow', { hasText: apiKeyName })).toHaveCount(0);
+    await expect(table.locator('.cl-tableRow', { hasText: apiKeyName })).toHaveCount(0);
   });
 
   test('can copy api keys', async ({ page, context }) => {
