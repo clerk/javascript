@@ -76,9 +76,9 @@ export const CheckoutComplete = () => {
     }
   };
 
-  // if (!checkout) {
-  //   return null;
-  // }
+  if (!checkout) {
+    return null;
+  }
 
   return (
     <>
@@ -93,7 +93,6 @@ export const CheckoutComplete = () => {
             aspectRatio: '1/1',
             display: 'grid',
             width: '100%',
-            // padding: t.space.$4,
             flexShrink: 0,
             transformOrigin: 'bottom center',
             animationName: 'scaleIn',
@@ -304,11 +303,9 @@ export const CheckoutComplete = () => {
               as='h2'
               textVariant='h2'
               localizationKey={
-                // checkout.totals.totalDueNow.amount > 0
-                //   ?
-                localizationKeys('commerce.checkout.title__paymentSuccessful')
-                // :
-                // localizationKeys('commerce.checkout.title__subscriptionSuccessful')
+                checkout.totals.totalDueNow.amount > 0
+                  ? localizationKeys('commerce.checkout.title__paymentSuccessful')
+                  : localizationKeys('commerce.checkout.title__subscriptionSuccessful')
               }
               sx={t => ({
                 opacity: 0,
@@ -361,10 +358,9 @@ export const CheckoutComplete = () => {
                 }),
               })}
               localizationKey={
-                // checkout.totals.totalDueNow.amount > 0
-                // ?
-                localizationKeys('commerce.checkout.description__paymentSuccessful')
-                // : localizationKeys('commerce.checkout.description__subscriptionSuccessful')
+                checkout.totals.totalDueNow.amount > 0
+                  ? localizationKeys('commerce.checkout.description__paymentSuccessful')
+                  : localizationKeys('commerce.checkout.description__subscriptionSuccessful')
               }
             />
           </Span>
@@ -394,11 +390,11 @@ export const CheckoutComplete = () => {
         <LineItems.Root>
           <LineItems.Group variant='secondary'>
             <LineItems.Title title={localizationKeys('commerce.checkout.lineItems.title__totalPaid')} />
-            {/* <LineItems.Description
+            <LineItems.Description
               text={`${checkout.totals.totalDueNow.currencySymbol}${checkout.totals.totalDueNow.amountFormatted}`}
-            /> */}
+            />
           </LineItems.Group>
-          {/* <LineItems.Group variant='secondary'>
+          <LineItems.Group variant='secondary'>
             <LineItems.Title
               title={
                 checkout.totals.totalDueNow.amount > 0
@@ -419,7 +415,7 @@ export const CheckoutComplete = () => {
                     : '–'
               }
             />
-          </LineItems.Group> */}
+          </LineItems.Group>
         </LineItems.Root>
         <Button
           onClick={handleClose}
