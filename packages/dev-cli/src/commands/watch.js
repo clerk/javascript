@@ -4,8 +4,8 @@ import concurrently from 'concurrently';
 
 import { NULL_ROOT_ERROR } from '../utils/errors.js';
 import { getClerkPackages } from '../utils/getClerkPackages.js';
-import { getDependencies } from '../utils/getDependencies.js';
 import { getMonorepoRoot } from '../utils/getMonorepoRoot.js';
+import { getPackageJSON } from '../utils/getPackageJSON.js';
 
 /**
  * Starts long-running watchers for Clerk dependencies.
@@ -14,7 +14,7 @@ import { getMonorepoRoot } from '../utils/getMonorepoRoot.js';
  * @returns {Promise<import('concurrently').CloseEvent[]>}
  */
 export async function watch({ js }) {
-  const { dependencies, devDependencies } = await getDependencies(join(process.cwd(), 'package.json'));
+  const { dependencies, devDependencies } = await getPackageJSON(join(process.cwd(), 'package.json'));
   const clerkPackages = Object.keys(await getClerkPackages());
 
   const packagesInPackageJSON = [...Object.keys(dependencies ?? {}), ...Object.keys(devDependencies ?? {})];
