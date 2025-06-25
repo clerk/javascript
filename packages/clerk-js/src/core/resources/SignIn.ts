@@ -234,12 +234,19 @@ export class SignIn extends BaseResource implements SignInResource {
     const { strategy, redirectUrl, redirectUrlComplete, identifier, oidcPrompt, continueSignIn } = params || {};
 
     if (!this.id || !continueSignIn) {
-      await this.create({
+      const createParams: any = {
         strategy,
         identifier,
         redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectUrl),
         actionCompleteRedirectUrl: redirectUrlComplete,
-      });
+      };
+
+      // Add format=nonce if backend supports nonce handshakes
+      if (SignIn.clerk.__internal_supportsNonceHandshake()) {
+        createParams.format = 'nonce';
+      }
+
+      await this.create(createParams);
     }
 
     if (strategy === 'saml' || strategy === 'enterprise_sso') {

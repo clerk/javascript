@@ -196,6 +196,7 @@ export type SignInCreateParams = (
       oidcPrompt?: string;
       oidcLoginHint?: string;
       handshakeFormat?: 'nonce' | 'token';
+      format?: 'nonce';
     }
   | {
       strategy: TicketStrategy;
