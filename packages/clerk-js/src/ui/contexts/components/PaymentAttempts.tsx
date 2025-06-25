@@ -6,9 +6,9 @@ export const usePaymentAttemptsContext = () => {
   const { data: payments } = usePaymentAttempts();
   const getPaymentAttemptById = useCallback(
     (paymentAttemptId: string) => {
-      return payments?.data.find(payment => payment.id === paymentAttemptId);
+      return payments.find(payment => payment.id === paymentAttemptId);
     },
-    [payments?.data],
+    [payments],
   );
 
   return {
