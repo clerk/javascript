@@ -786,6 +786,8 @@ export const authenticateRequest: AuthenticateRequest = (async (
       reason: 'No token in header',
     });
   }
+
+  return mergeHeaders(await authenticateRequestWithTokenInCookie());
 }) as AuthenticateRequest;
 
 /**
