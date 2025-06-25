@@ -1,4 +1,4 @@
-import { __experimental_useCheckout as useCheckout } from '@clerk/shared/react';
+import { __experimental_useCheckout as useCheckout, CheckoutProvider } from '@clerk/shared/react';
 import { useEffect, useMemo } from 'react';
 
 import { useCheckoutContext } from '@/ui/contexts/components';
@@ -13,29 +13,33 @@ import { useCheckoutContext } from '@/ui/contexts/components';
 //   return ctx;
 // };
 
-const Root = ({ children }: { children: React.ReactNode }) => {
-  const { planId, planPeriod, subscriberType } = useCheckoutContext();
-  const checkout = useCheckout({
-    for: subscriberType === 'org' ? 'organization' : undefined,
-    planId: planId!,
-    planPeriod: planPeriod!,
-  });
+const Initiator = () => {
+  const checkout = useCheckout();
 
   useEffect(() => {
     checkout.start().catch(() => null);
     return checkout.clear;
   }, []);
+  return null;
+};
 
-  return <>{children}</>;
+const Root = ({ children }: { children: React.ReactNode }) => {
+  const { planId, planPeriod, subscriberType } = useCheckoutContext();
+
+  return (
+    <CheckoutProvider
+      for={subscriberType === 'org' ? 'organization' : undefined}
+      planId={planId!}
+      planPeriod={planPeriod!}
+    >
+      <Initiator />
+      {children}
+    </CheckoutProvider>
+  );
 };
 
 const Stage = ({ children, name }: { children: React.ReactNode; name: ReturnType<typeof useCheckout>['status'] }) => {
-  const { planId, planPeriod, subscriberType } = useCheckoutContext();
-  const { status } = useCheckout({
-    for: subscriberType === 'org' ? 'organization' : undefined,
-    planId: planId!,
-    planPeriod: planPeriod!,
-  });
+  const { status } = useCheckout();
   if (status !== name) {
     return null;
   }
@@ -49,12 +53,7 @@ const FetchStatus = ({
   children: React.ReactNode;
   status: 'idle' | 'fetching' | 'error' | 'invalid_plan_change' | 'missing_payer_email';
 }) => {
-  const { planId, planPeriod, subscriberType } = useCheckoutContext();
-  const { fetchStatus, error } = useCheckout({
-    for: subscriberType === 'org' ? 'organization' : undefined,
-    planId: planId!,
-    planPeriod: planPeriod!,
-  });
+  const { fetchStatus, error } = useCheckout();
 
   const internalFetchStatus = useMemo(() => {
     if (fetchStatus === 'error' && error?.errors) {

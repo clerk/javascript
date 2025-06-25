@@ -1,5 +1,11 @@
 import { deriveState } from '@clerk/shared/deriveState';
-import { ClientContext, OrganizationProvider, SessionContext, UserContext } from '@clerk/shared/react';
+import {
+  CheckoutProvider,
+  ClientContext,
+  OrganizationProvider,
+  SessionContext,
+  UserContext,
+} from '@clerk/shared/react';
 import type { ClientResource, InitialState, Resources } from '@clerk/types';
 import React from 'react';
 
@@ -89,7 +95,14 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
         <SessionContext.Provider value={sessionCtx}>
           <OrganizationProvider {...organizationCtx.value}>
             <AuthContext.Provider value={authCtx}>
-              <UserContext.Provider value={userCtx}>{children}</UserContext.Provider>
+              <UserContext.Provider value={userCtx}>
+                <CheckoutProvider
+                  // @ts-expect-error - value is not used
+                  value={undefined}
+                >
+                  {children}
+                </CheckoutProvider>
+              </UserContext.Provider>
             </AuthContext.Provider>
           </OrganizationProvider>
         </SessionContext.Provider>

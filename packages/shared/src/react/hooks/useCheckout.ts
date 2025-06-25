@@ -2,6 +2,7 @@ import type { CommerceCheckoutResource, CommerceSubscriptionPlanPeriod, ConfirmC
 import { useCallback, useMemo, useSyncExternalStore } from 'react';
 
 import type { ClerkAPIResponseError } from '../..';
+import { useCheckoutContext } from '../contexts';
 import { useClerk } from './useClerk';
 import { useOrganization } from './useOrganization';
 import { useSession } from './useSession';
@@ -175,11 +176,14 @@ function createCheckoutManager(cacheKey: CheckoutKey) {
 
       try {
         updateCacheState({ [isRunningField]: true, error: null });
+        console.log('dispatching operation', isRunningField, true);
         const result = await operationFn();
         updateCacheState({ [isRunningField]: false, error: null, checkout: result });
+        console.log('dispatching operation', isRunningField, false);
         return result;
       } catch (error) {
         const clerkError = error as ClerkAPIResponseError;
+        console.log('dispatching operation', isRunningField, false, clerkError);
         updateCacheState({ [isRunningField]: false, error: clerkError });
         throw error;
       } finally {
@@ -188,7 +192,10 @@ function createCheckoutManager(cacheKey: CheckoutKey) {
     },
 
     clearCheckout(): void {
-      updateCacheState(defaultCacheState);
+      // Only reset the state if there are no pending operations
+      if (pendingOperations.size === 0) {
+        updateCacheState(defaultCacheState);
+      }
     },
   };
 }
@@ -201,8 +208,10 @@ function cacheKey(options: { userId: string; orgId?: string; planId: string; pla
   return `${userId}-${orgId || 'user'}-${planId}-${planPeriod}`;
 }
 
-export const useCheckout = (options: UseCheckoutOptions): UseCheckoutReturn => {
-  const { for: forOrganization, planId, planPeriod } = options;
+export const useCheckout = (options?: UseCheckoutOptions): UseCheckoutReturn => {
+  const contextOptions = useCheckoutContext();
+  const { for: forOrganization, planId, planPeriod } = options || contextOptions;
+
   const clerk = useClerk();
   const { organization } = useOrganization();
   const { user } = useUser();

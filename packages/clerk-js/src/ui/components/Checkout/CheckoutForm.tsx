@@ -29,13 +29,8 @@ type PaymentMethodSource = 'existing' | 'new';
 const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
 
 export const CheckoutForm = withCardStateProvider(() => {
-  const { planId, planPeriod, subscriberType } = useCheckoutContext();
-  const checkout = useCheckout({
-    for: subscriberType === 'org' ? 'organization' : undefined,
-    planId: planId!,
-    planPeriod: planPeriod!,
-  });
-  const { id, plan, totals, isImmediatePlanChange, __internal_checkout } = checkout;
+  const checkout = useCheckout();
+  const { id, plan, totals, isImmediatePlanChange, __internal_checkout, planPeriod } = checkout;
 
   if (!id) {
     return null;
@@ -125,12 +120,8 @@ export const CheckoutForm = withCardStateProvider(() => {
 
 const useCheckoutMutations = () => {
   const { organization } = useOrganization();
-  const { planId, planPeriod, subscriberType, onSubscriptionComplete } = useCheckoutContext();
-  const { id, confirm } = useCheckout({
-    for: subscriberType === 'org' ? 'organization' : undefined,
-    planId: planId!,
-    planPeriod: planPeriod!,
-  });
+  const { subscriberType, onSubscriptionComplete } = useCheckoutContext();
+  const { id, confirm } = useCheckout();
   const card = useCardState();
 
   if (!id) {
@@ -292,12 +283,7 @@ export const PayWithTestPaymentSource = () => {
 
 const AddPaymentSourceForCheckout = withCardStateProvider(() => {
   const { addPaymentSourceAndPay } = useCheckoutMutations();
-  const { planId, planPeriod, subscriberType } = useCheckoutContext();
-  const { id, __internal_checkout, totals } = useCheckout({
-    for: subscriberType === 'org' ? 'organization' : undefined,
-    planId: planId!,
-    planPeriod: planPeriod!,
-  });
+  const { id, __internal_checkout, totals } = useCheckout();
 
   if (!id) {
     return null;

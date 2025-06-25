@@ -11,12 +11,7 @@ import { Box, descriptors, Flex, localizationKeys, useLocalizations } from '../.
 import { EmailForm } from '../UserProfile/EmailForm';
 
 export const GenericError = () => {
-  const { planId, planPeriod, subscriberType } = useCheckoutContext();
-  const { error } = useCheckout({
-    for: subscriberType === 'org' ? 'organization' : undefined,
-    planId: planId!,
-    planPeriod: planPeriod!,
-  });
+  const { error } = useCheckout();
 
   const { translateError } = useLocalizations();
   const { t } = useLocalizations();
@@ -43,12 +38,8 @@ export const GenericError = () => {
 };
 
 export const InvalidPlanScreen = () => {
-  const { planId, planPeriod, subscriberType } = useCheckoutContext();
-  const { error } = useCheckout({
-    for: subscriberType === 'org' ? 'organization' : undefined,
-    planId: planId!,
-    planPeriod: planPeriod!,
-  });
+  const { planPeriod } = useCheckoutContext();
+  const { error } = useCheckout();
 
   const planFromError = useMemo(() => {
     const _error = error?.errors.find(e => e.code === 'invalid_plan_change');
@@ -101,12 +92,7 @@ export const InvalidPlanScreen = () => {
 };
 
 export const AddEmailForm = () => {
-  const { planId, planPeriod, subscriberType } = useCheckoutContext();
-  const { start } = useCheckout({
-    for: subscriberType === 'org' ? 'organization' : undefined,
-    planId: planId!,
-    planPeriod: planPeriod!,
-  });
+  const { start } = useCheckout();
   const { setIsOpen } = useDrawerContext();
   return (
     <Drawer.Body>

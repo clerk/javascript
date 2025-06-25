@@ -18,12 +18,7 @@ export const CheckoutComplete = () => {
   const router = useRouter();
   const { setIsOpen } = useDrawerContext();
   const { newSubscriptionRedirectUrl } = useCheckoutContext();
-  const { planId, planPeriod, subscriberType } = useCheckoutContext();
-  const checkout = useCheckout({
-    for: subscriberType === 'org' ? 'organization' : undefined,
-    planId: planId!,
-    planPeriod: planPeriod!,
-  });
+  const checkout = useCheckout();
   const [mousePosition, setMousePosition] = useState({ x: 256, y: 256 });
   const [currentPosition, setCurrentPosition] = useState({ x: 256, y: 256 });
 
