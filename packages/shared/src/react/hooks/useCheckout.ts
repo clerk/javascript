@@ -9,8 +9,38 @@ import { useUser } from './useUser';
 
 type CheckoutStatus = 'awaiting_initialization' | 'awaiting_confirmation' | 'completed';
 
-type UseCheckoutReturn = {
-  checkout: CommerceCheckoutResource | undefined;
+/**
+ * Utility type that removes function properties from a type.
+ */
+type RemoveFunctions<T> = {
+  [K in keyof T as T[K] extends (...args: any[]) => any ? never : K]: T[K];
+};
+
+/**
+ * Utility type that makes all properties nullable.
+ */
+type Nullable<T> = {
+  [K in keyof T]: null;
+};
+
+type CheckoutProperties = Omit<
+  RemoveFunctions<CommerceCheckoutResource>,
+  'paymentSource' | 'plan' | 'pathRoot' | 'reload' | 'confirm'
+> & {
+  plan: RemoveFunctions<CommerceCheckoutResource['plan']>;
+  paymentSource: RemoveFunctions<CommerceCheckoutResource['paymentSource']>;
+  __internal_checkout: CommerceCheckoutResource;
+};
+type NullableCheckoutProperties = Nullable<
+  Omit<RemoveFunctions<CommerceCheckoutResource>, 'paymentSource' | 'plan' | 'pathRoot' | 'reload' | 'confirm'>
+> & {
+  plan: null;
+  paymentSource: null;
+  __internal_checkout: null;
+};
+
+type UseCheckoutReturn = (CheckoutProperties | NullableCheckoutProperties) & {
+  // checkout: CommerceCheckoutResource | undefined;
   confirm: (params: ConfirmCheckoutParams) => Promise<CommerceCheckoutResource>;
   start: () => Promise<CommerceCheckoutResource>;
   isStarting: boolean;
@@ -239,8 +269,29 @@ export const useCheckout = (options: UseCheckoutOptions): UseCheckoutReturn => {
     return 'awaiting_initialization';
   }, [managerState.checkout?.status]);
 
+  const properties = useMemo(() => {
+    if (!managerState.checkout) {
+      return {
+        id: null,
+        externalClientSecret: null,
+        externalGatewayId: null,
+        statement_id: null,
+        status: null,
+        totals: null,
+        isImmediatePlanChange: null,
+        planPeriod: null,
+        plan: null,
+        paymentSource: null,
+      };
+    }
+    const { reload, confirm, pathRoot, ...rest } = managerState.checkout;
+    return rest;
+  }, [managerState.checkout]);
+
   return {
-    checkout: managerState.checkout || undefined,
+    ...properties,
+    // @ts-expect-error
+    __internal_checkout: managerState.checkout,
     start,
     isStarting: managerState.isStarting,
     isConfirming: managerState.isConfirming,

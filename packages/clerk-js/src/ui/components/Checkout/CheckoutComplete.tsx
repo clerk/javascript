@@ -19,7 +19,7 @@ export const CheckoutComplete = () => {
   const { setIsOpen } = useDrawerContext();
   const { newSubscriptionRedirectUrl } = useCheckoutContext();
   const { planId, planPeriod, subscriberType } = useCheckoutContext();
-  const { checkout } = useCheckout({
+  const checkout = useCheckout({
     for: subscriberType === 'org' ? 'organization' : undefined,
     planId: planId!,
     planPeriod: planPeriod!,

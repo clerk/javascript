@@ -30,17 +30,17 @@ const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
 
 export const CheckoutForm = withCardStateProvider(() => {
   const { planId, planPeriod, subscriberType } = useCheckoutContext();
-  const { checkout } = useCheckout({
+  const checkout = useCheckout({
     for: subscriberType === 'org' ? 'organization' : undefined,
     planId: planId!,
     planPeriod: planPeriod!,
   });
+  const { id, plan, totals, isImmediatePlanChange, __internal_checkout } = checkout;
 
-  if (!checkout) {
+  if (!id) {
     return null;
   }
 
-  const { plan, totals, isImmediatePlanChange } = checkout;
   const showCredits = !!totals.credit?.amount && totals.credit.amount > 0;
   const showPastDue = !!totals.pastDue?.amount && totals.pastDue.amount > 0;
   const showDowngradeInfo = !isImmediatePlanChange;
@@ -118,7 +118,7 @@ export const CheckoutForm = withCardStateProvider(() => {
         </Box>
       )}
 
-      <CheckoutFormElements checkout={checkout} />
+      <CheckoutFormElements checkout={__internal_checkout} />
     </Drawer.Body>
   );
 });
@@ -126,14 +126,14 @@ export const CheckoutForm = withCardStateProvider(() => {
 const useCheckoutMutations = () => {
   const { organization } = useOrganization();
   const { planId, planPeriod, subscriberType, onSubscriptionComplete } = useCheckoutContext();
-  const { checkout, confirm } = useCheckout({
+  const { id, confirm } = useCheckout({
     for: subscriberType === 'org' ? 'organization' : undefined,
     planId: planId!,
     planPeriod: planPeriod!,
   });
   const card = useCardState();
 
-  if (!checkout) {
+  if (!id) {
     throw new Error('Checkout not found');
   }
 
@@ -293,29 +293,29 @@ export const PayWithTestPaymentSource = () => {
 const AddPaymentSourceForCheckout = withCardStateProvider(() => {
   const { addPaymentSourceAndPay } = useCheckoutMutations();
   const { planId, planPeriod, subscriberType } = useCheckoutContext();
-  const { checkout } = useCheckout({
+  const { id, __internal_checkout, totals } = useCheckout({
     for: subscriberType === 'org' ? 'organization' : undefined,
     planId: planId!,
     planPeriod: planPeriod!,
   });
 
-  if (!checkout) {
+  if (!id) {
     return null;
   }
 
   return (
     <AddPaymentSource.Root
       onSuccess={addPaymentSourceAndPay}
-      checkout={checkout}
+      checkout={__internal_checkout}
     >
       <DevOnly>
         <PayWithTestPaymentSource />
       </DevOnly>
 
-      {checkout.totals.totalDueNow.amount > 0 ? (
+      {totals.totalDueNow.amount > 0 ? (
         <AddPaymentSource.FormButton
           text={localizationKeys('commerce.pay', {
-            amount: `${checkout.totals.totalDueNow.currencySymbol}${checkout.totals.totalDueNow.amountFormatted}`,
+            amount: `${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`,
           })}
         />
       ) : (
