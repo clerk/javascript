@@ -3,6 +3,7 @@ import type { SignUpResource } from '@clerk/types';
 import React from 'react';
 
 import { VerificationLinkCard } from '@/ui/elements/VerificationLinkCard';
+import { handleError } from '@/ui/utils/errorHandler';
 
 import { EmailLinkStatusCard } from '../../common';
 import { useCoreSignUp, useSignUpContext } from '../../contexts';
@@ -10,7 +11,6 @@ import { Flow, localizationKeys, useLocalizations } from '../../customizables';
 import { useCardState } from '../../elements/contexts';
 import { useEmailLink } from '../../hooks/useEmailLink';
 import { useRouter } from '../../router';
-import { handleError } from '../../utils';
 import { completeSignUpFlow } from './util';
 
 export const SignUpEmailLinkCard = () => {

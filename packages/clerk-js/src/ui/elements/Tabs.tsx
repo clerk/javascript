@@ -4,7 +4,7 @@ import React from 'react';
 
 import { Button, descriptors, Flex, useLocalizations } from '../customizables';
 import type { PropsOfComponent } from '../styledSystem';
-import { getValidChildren } from '../utils';
+import { getValidChildren } from '../utils/getValidReactChildren';
 
 type TabsContextValue = {
   selectedIndex: number;
