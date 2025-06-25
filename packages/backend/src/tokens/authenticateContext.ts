@@ -222,7 +222,7 @@ class AuthenticateContext implements AuthenticateContext {
     this.handshakeFormat =
       (this.getQueryParam(constants.QueryParameters.HandshakeFormat) as 'nonce' | 'token') ||
       (this.getCookie(constants.Cookies.HandshakeFormat) as 'nonce' | 'token') ||
-      undefined;
+      'nonce';
   }
 
   private getQueryParam(name: string) {
