@@ -67,12 +67,27 @@ type CheckoutCacheState = {
   checkout: CommerceCheckoutResource | null;
 };
 
-// Global cache state
-const globalCheckoutCache = new Map<string, CheckoutCacheState>();
+const createManagerCache = <CacheKey, CacheState>() => {
+  // Global cache state
+  const cache = new Map<CacheKey, CacheState>();
+  // Global listeners and pending operations keyed by cacheKey
+  const listeners = new Map<CacheKey, Set<(newState: CacheState) => void>>();
+  const pendingOperations = new Map<CacheKey, Set<string>>();
 
-// Global listeners and pending operations keyed by cacheKey
-const globalListeners = new Map<CheckoutKey, Set<(newState: CheckoutCacheState) => void>>();
-const globalPendingOperations = new Map<CheckoutKey, Set<string>>();
+  return {
+    cache,
+    listeners,
+    pendingOperations,
+    safeGet<K extends CacheKey, V extends Set<any>>(key: K, map: Map<K, V>): NonNullable<V> {
+      if (!map.has(key)) {
+        map.set(key, new Set() as V);
+      }
+      // We know this is non-null because we just set it above if it didn't exist
+      return map.get(key) as NonNullable<V>;
+    },
+  };
+};
+const managerCache = createManagerCache<CheckoutKey, CheckoutCacheState>();
 
 const defaultCacheState: CheckoutCacheState = {
   isStarting: false,
@@ -88,30 +103,21 @@ const defaultCacheState: CheckoutCacheState = {
  */
 function createCheckoutManager(cacheKey: CheckoutKey) {
   // Get or create listeners for this cacheKey
-  if (!globalListeners.has(cacheKey)) {
-    globalListeners.set(cacheKey, new Set());
-  }
-  if (!globalPendingOperations.has(cacheKey)) {
-    globalPendingOperations.set(cacheKey, new Set());
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- it is handled above
-  const listeners = globalListeners.get(cacheKey)!;
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- it is handled above
-  const pendingOperations = globalPendingOperations.get(cacheKey)!;
+  const listeners = managerCache.safeGet(cacheKey, managerCache.listeners);
+  const pendingOperations = managerCache.safeGet(cacheKey, managerCache.pendingOperations);
 
   const notifyListeners = () => {
     listeners.forEach(listener => listener(getCacheState()));
   };
 
   const getCacheState = (): CheckoutCacheState => {
-    return globalCheckoutCache.get(cacheKey) || defaultCacheState;
+    return managerCache.cache.get(cacheKey) || defaultCacheState;
   };
 
   const updateCacheState = (updates: Partial<CheckoutCacheState>): void => {
     const currentState = getCacheState();
     const newState = { ...currentState, ...updates };
-    globalCheckoutCache.set(cacheKey, newState);
+    managerCache.cache.set(cacheKey, newState);
     notifyListeners();
   };
 
@@ -154,13 +160,13 @@ function createCheckoutManager(cacheKey: CheckoutKey) {
       }
     },
 
-    async startCheckout(startFn: () => Promise<CommerceCheckoutResource>): Promise<CommerceCheckoutResource> {
-      return this.executeOperation('start', startFn);
-    },
+    // async startCheckout(startFn: () => Promise<CommerceCheckoutResource>): Promise<CommerceCheckoutResource> {
+    //   return this.executeOperation('start', startFn);
+    // },
 
-    async confirmCheckout(confirmFn: () => Promise<CommerceCheckoutResource>): Promise<CommerceCheckoutResource> {
-      return this.executeOperation('confirm', confirmFn);
-    },
+    // async confirmCheckout(confirmFn: () => Promise<CommerceCheckoutResource>): Promise<CommerceCheckoutResource> {
+    //   return this.executeOperation('confirm', confirmFn);
+    // },
 
     clearCheckout(): void {
       updateCacheState(defaultCacheState);
@@ -207,7 +213,7 @@ export const useCheckout = (options: UseCheckoutOptions): UseCheckoutReturn => {
   );
 
   const start = useCallback(async (): Promise<CommerceCheckoutResource> => {
-    return manager.startCheckout(async () => {
+    return manager.executeOperation('start', async () => {
       const result = await clerk.billing?.startCheckout({
         ...(forOrganization === 'organization' ? { orgId: organization?.id } : {}),
         planId,
@@ -219,11 +225,13 @@ export const useCheckout = (options: UseCheckoutOptions): UseCheckoutReturn => {
 
   const confirm = useCallback(
     async (params: ConfirmCheckoutParams): Promise<CommerceCheckoutResource> => {
-      if (!manager.getCacheState().checkout) {
-        throw new Error('No checkout to confirm');
-      }
-      // @ts-ignore Handle this
-      return manager.confirmCheckout(() => manager.getCacheState().checkout.confirm(params));
+      return manager.executeOperation('confirm', async () => {
+        const checkout = manager.getCacheState().checkout;
+        if (!checkout) {
+          throw new Error('Clerk: Call `start` before `confirm`');
+        }
+        return checkout.confirm(params);
+      });
     },
     [manager],
   );
