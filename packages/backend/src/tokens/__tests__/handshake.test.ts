@@ -428,6 +428,42 @@ describe('HandshakeService', () => {
       expect(url.searchParams.get('__clerk_api_version')).toBe('2025-04-10');
       expect(url.searchParams.get(constants.QueryParameters.SuffixedCookies)).toMatch(/^(true|false)$/);
       expect(url.searchParams.get(constants.QueryParameters.HandshakeReason)).toBe('test-reason');
+      expect(url.searchParams.get(constants.QueryParameters.HandshakeFormat)).toBe('nonce');
+    });
+
+    it('should include handshake format parameter', () => {
+      const headers = handshakeService.buildRedirectToHandshake('test-reason');
+      const location = headers.get(constants.Headers.Location);
+      if (!location) {
+        throw new Error('Location header is missing');
+      }
+      const url = new URL(location);
+
+      // Verify the handshake format parameter is present
+      expect(url.searchParams.get(constants.QueryParameters.HandshakeFormat)).toBe('nonce');
+    });
+
+    it('should include handshake format parameter in development mode', () => {
+      const developmentContext = {
+        ...mockAuthenticateContext,
+        instanceType: 'development',
+        devBrowserToken: 'dev-browser-token',
+      } as AuthenticateContext;
+
+      const developmentHandshakeService = new HandshakeService(
+        developmentContext,
+        mockOptions,
+        mockOrganizationMatcher,
+      );
+      const headers = developmentHandshakeService.buildRedirectToHandshake('test-reason');
+      const location = headers.get(constants.Headers.Location);
+
+      if (!location) {
+        throw new Error('Location header is missing');
+      }
+      const url = new URL(location);
+
+      expect(url.searchParams.get(constants.QueryParameters.HandshakeFormat)).toBe('nonce');
     });
   });
 
