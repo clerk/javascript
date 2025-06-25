@@ -81,13 +81,12 @@ const defaultCacheState: CheckoutCacheState = {
   checkout: null,
 };
 
-// Factory function that creates a checkout manager for a specific cache key
 /**
+ * Factory function that creates a checkout manager for a specific cache key.
  *
+ * @internal
  */
 function createCheckoutManager(cacheKey: CheckoutKey) {
-  console.log('[createCheckoutManager] initializing', cacheKey);
-
   // Get or create listeners for this cacheKey
   if (!globalListeners.has(cacheKey)) {
     globalListeners.set(cacheKey, new Set());
@@ -126,54 +125,41 @@ function createCheckoutManager(cacheKey: CheckoutKey) {
 
     getCacheState,
 
-    async startCheckout(startFn: () => Promise<CommerceCheckoutResource>): Promise<CommerceCheckoutResource> {
-      const operationId = `${cacheKey}-start`;
+    // Shared operation handler to eliminate duplication
+    async executeOperation(
+      operationType: 'start' | 'confirm',
+      operationFn: () => Promise<CommerceCheckoutResource>,
+    ): Promise<CommerceCheckoutResource> {
+      const operationId = `${cacheKey}-${operationType}`;
+      const isRunningField = operationType === 'start' ? 'isStarting' : 'isConfirming';
 
       // Prevent duplicate operations
-      if (getCacheState().isStarting || pendingOperations.has(operationId)) {
-        // TODO: improve it
-        throw new Error('Checkout start already in progress');
+      if (getCacheState()[isRunningField] || pendingOperations.has(operationId)) {
+        throw new Error(`Checkout ${operationType} already in progress`);
       }
 
       pendingOperations.add(operationId);
 
       try {
-        updateCacheState({ isStarting: true, error: null });
-        const result = await startFn();
-        updateCacheState({ isStarting: false, error: null, checkout: result });
+        updateCacheState({ [isRunningField]: true, error: null });
+        const result = await operationFn();
+        updateCacheState({ [isRunningField]: false, error: null, checkout: result });
         return result;
       } catch (error) {
         const clerkError = error as ClerkAPIResponseError;
-        updateCacheState({ isStarting: false, error: clerkError });
+        updateCacheState({ [isRunningField]: false, error: clerkError });
         throw error;
       } finally {
         pendingOperations.delete(operationId);
       }
     },
 
+    async startCheckout(startFn: () => Promise<CommerceCheckoutResource>): Promise<CommerceCheckoutResource> {
+      return this.executeOperation('start', startFn);
+    },
+
     async confirmCheckout(confirmFn: () => Promise<CommerceCheckoutResource>): Promise<CommerceCheckoutResource> {
-      const operationId = `${cacheKey}-confirm`;
-
-      // Prevent duplicate operations
-      if (getCacheState().isConfirming || pendingOperations.has(operationId)) {
-        // TODO: improve it
-        throw new Error('Checkout confirm already in progress');
-      }
-
-      pendingOperations.add(operationId);
-
-      try {
-        updateCacheState({ isConfirming: true, error: null });
-        const result = await confirmFn();
-        updateCacheState({ isConfirming: false, error: null, checkout: result });
-        return result;
-      } catch (error) {
-        const clerkError = error as ClerkAPIResponseError;
-        updateCacheState({ isConfirming: false, error: clerkError });
-        throw error;
-      } finally {
-        pendingOperations.delete(operationId);
-      }
+      return this.executeOperation('confirm', confirmFn);
     },
 
     clearCheckout(): void {
@@ -183,16 +169,11 @@ function createCheckoutManager(cacheKey: CheckoutKey) {
 }
 
 /**
- *
+ * @internal
  */
-function generateCheckoutKey(options: {
-  userId?: string;
-  orgId?: string;
-  planId: string;
-  planPeriod: string;
-}): CheckoutKey {
+function cacheKey(options: { userId: string; orgId?: string; planId: string; planPeriod: string }): CheckoutKey {
   const { userId, orgId, planId, planPeriod } = options;
-  return `${userId || 'anonymous'}-${orgId || 'user'}-${planId}-${planPeriod}`;
+  return `${userId}-${orgId || 'user'}-${planId}-${planPeriod}`;
 }
 
 export const useCheckout = (options: UseCheckoutOptions): UseCheckoutReturn => {
@@ -206,7 +187,11 @@ export const useCheckout = (options: UseCheckoutOptions): UseCheckoutReturn => {
     throw new Error('Clerk: User is not authenticated');
   }
 
-  const checkoutKey = generateCheckoutKey({
+  if (forOrganization === 'organization' && !organization) {
+    throw new Error('Clerk: Use `setActive` to set the organization');
+  }
+
+  const checkoutKey = cacheKey({
     userId: user?.id,
     orgId: forOrganization === 'organization' ? organization?.id : undefined,
     planId,
