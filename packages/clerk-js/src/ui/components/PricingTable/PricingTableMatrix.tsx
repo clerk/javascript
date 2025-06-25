@@ -3,6 +3,7 @@ import * as React from 'react';
 
 import { Avatar } from '@/ui/elements/Avatar';
 import { SegmentedControl } from '@/ui/elements/SegmentedControl';
+import { colors } from '@/ui/utils/colors';
 
 import { usePlansContext } from '../../contexts';
 import {
@@ -22,7 +23,6 @@ import {
 import { usePrefersReducedMotion } from '../../hooks';
 import { Check, InformationCircle } from '../../icons';
 import { common, InternalThemeProvider, mqu, type ThemableCssProp } from '../../styledSystem';
-import { colors } from '../../utils';
 
 interface PricingTableMatrixProps {
   plans: CommercePlanResource[] | undefined;

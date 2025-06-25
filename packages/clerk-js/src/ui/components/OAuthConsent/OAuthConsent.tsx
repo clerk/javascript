@@ -14,7 +14,6 @@ import { LockDottedCircle } from '@/ui/icons';
 import { Textarea } from '@/ui/primitives';
 import type { ThemableCssProp } from '@/ui/styledSystem';
 import { common } from '@/ui/styledSystem';
-import * as utils from '@/ui/utils';
 
 export function OAuthConsentInternal() {
   const { scopes, oAuthApplicationName, oAuthApplicationLogoUrl, redirectUrl, onDeny, onAllow } =

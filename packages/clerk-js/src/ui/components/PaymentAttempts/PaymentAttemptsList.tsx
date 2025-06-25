@@ -1,11 +1,12 @@
 import type { CommercePaymentResource } from '@clerk/types';
 
 import { DataTable, DataTableRow } from '@/ui/elements/DataTable';
+import { formatDate } from '@/ui/utils/formatDate';
+import { truncateWithEndVisible } from '@/ui/utils/truncateTextWithEndVisible';
 
 import { usePaymentAttempts, useSubscriberTypeLocalizationRoot } from '../../contexts';
 import { Badge, localizationKeys, Td, Text } from '../../customizables';
 import { useRouter } from '../../router';
-import { formatDate, truncateWithEndVisible } from '../../utils';
 
 /* -------------------------------------------------------------------------------------------------
  * PaymentAttemptsList

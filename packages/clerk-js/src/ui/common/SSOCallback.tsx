@@ -8,7 +8,7 @@ import { Card } from '../elements/Card';
 import { useCardState, withCardStateProvider } from '../elements/contexts';
 import { LoadingCardContainer } from '../elements/LoadingCard';
 import { useRouter } from '../router';
-import { handleError } from '../utils';
+import { handleError } from '../utils/errorHandler';
 
 export const SSOCallback = withCardStateProvider<HandleOAuthCallbackParams | HandleSamlCallbackParams>(props => {
   return (
