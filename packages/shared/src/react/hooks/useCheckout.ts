@@ -40,7 +40,6 @@ type NullableCheckoutProperties = Nullable<
 };
 
 type UseCheckoutReturn = (CheckoutProperties | NullableCheckoutProperties) & {
-  // checkout: CommerceCheckoutResource | undefined;
   confirm: (params: ConfirmCheckoutParams) => Promise<CommerceCheckoutResource>;
   start: () => Promise<CommerceCheckoutResource>;
   isStarting: boolean;
@@ -65,12 +64,12 @@ type CheckoutCacheState = {
   isConfirming: boolean;
   error: ClerkAPIResponseError | null;
   checkout: CommerceCheckoutResource | null;
+  fetchStatus: 'idle' | 'fetching' | 'error';
+  status: CheckoutStatus;
 };
 
 const createManagerCache = <CacheKey, CacheState>() => {
-  // Global cache state
   const cache = new Map<CacheKey, CacheState>();
-  // Global listeners and pending operations keyed by cacheKey
   const listeners = new Map<CacheKey, Set<(newState: CacheState) => void>>();
   const pendingOperations = new Map<CacheKey, Set<string>>();
 
@@ -87,14 +86,41 @@ const createManagerCache = <CacheKey, CacheState>() => {
     },
   };
 };
+
 const managerCache = createManagerCache<CheckoutKey, CheckoutCacheState>();
 
-const defaultCacheState: CheckoutCacheState = {
+/**
+ * Derives the checkout state from the base state.
+ *
+ * @internal
+ */
+function deriveCheckoutState(baseState: Omit<CheckoutCacheState, 'fetchStatus' | 'status'>): CheckoutCacheState {
+  const fetchStatus = (() => {
+    if (baseState.isStarting || baseState.isConfirming) return 'fetching' as const;
+    if (baseState.error) return 'error' as const;
+    return 'idle' as const;
+  })();
+
+  const status = (() => {
+    const completedCode = 'completed';
+    if (baseState.checkout?.status === completedCode) return 'completed' as const;
+    if (baseState.checkout) return 'awaiting_confirmation' as const;
+    return 'awaiting_initialization' as const;
+  })();
+
+  return {
+    ...baseState,
+    fetchStatus,
+    status,
+  };
+}
+
+const defaultCacheState: CheckoutCacheState = deriveCheckoutState({
   isStarting: false,
   isConfirming: false,
   error: null,
   checkout: null,
-};
+});
 
 /**
  * Factory function that creates a checkout manager for a specific cache key.
@@ -114,9 +140,10 @@ function createCheckoutManager(cacheKey: CheckoutKey) {
     return managerCache.cache.get(cacheKey) || defaultCacheState;
   };
 
-  const updateCacheState = (updates: Partial<CheckoutCacheState>): void => {
+  const updateCacheState = (updates: Partial<Omit<CheckoutCacheState, 'fetchStatus' | 'status'>>): void => {
     const currentState = getCacheState();
-    const newState = { ...currentState, ...updates };
+    const baseState = { ...currentState, ...updates };
+    const newState = deriveCheckoutState(baseState);
     managerCache.cache.set(cacheKey, newState);
     notifyListeners();
   };
@@ -159,14 +186,6 @@ function createCheckoutManager(cacheKey: CheckoutKey) {
         pendingOperations.delete(operationId);
       }
     },
-
-    // async startCheckout(startFn: () => Promise<CommerceCheckoutResource>): Promise<CommerceCheckoutResource> {
-    //   return this.executeOperation('start', startFn);
-    // },
-
-    // async confirmCheckout(confirmFn: () => Promise<CommerceCheckoutResource>): Promise<CommerceCheckoutResource> {
-    //   return this.executeOperation('confirm', confirmFn);
-    // },
 
     clearCheckout(): void {
       updateCacheState(defaultCacheState);
@@ -236,12 +255,6 @@ export const useCheckout = (options: UseCheckoutOptions): UseCheckoutReturn => {
     [manager],
   );
 
-  const fetchStatus = useMemo(() => {
-    if (managerState.isStarting || managerState.isConfirming) return 'fetching';
-    if (managerState.error) return 'error';
-    return 'idle';
-  }, [managerState.isStarting, managerState.isConfirming, managerState.error]);
-
   const finalize = useCallback(
     ({ redirectUrl }: { redirectUrl?: string }) => {
       void clerk.setActive({ session: session?.id, redirectUrl });
@@ -252,15 +265,6 @@ export const useCheckout = (options: UseCheckoutOptions): UseCheckoutReturn => {
   const clear = useCallback(() => {
     manager.clearCheckout();
   }, [manager]);
-
-  const status = useMemo(() => {
-    const completedCode = 'completed';
-    if (managerState.checkout?.status === completedCode) return 'completed';
-    if (managerState.checkout) {
-      return 'awaiting_confirmation';
-    }
-    return 'awaiting_initialization';
-  }, [managerState.checkout?.status]);
 
   const properties = useMemo(() => {
     if (!managerState.checkout) {
@@ -277,20 +281,27 @@ export const useCheckout = (options: UseCheckoutOptions): UseCheckoutReturn => {
         paymentSource: null,
       };
     }
-    const { reload, confirm, pathRoot, ...rest } = managerState.checkout;
+    const {
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      reload,
+      confirm,
+      pathRoot,
+      // All the above need to be removed from the properties
+      ...rest
+    } = managerState.checkout;
     return rest;
   }, [managerState.checkout]);
 
   return {
     ...properties,
-    // @ts-expect-error
+    // @ts-expect-error - checkout can be null but UseCheckoutReturn expects it to be CommerceCheckoutResource | undefined
     __internal_checkout: managerState.checkout,
     start,
     isStarting: managerState.isStarting,
     isConfirming: managerState.isConfirming,
     error: managerState.error || undefined,
-    status,
-    fetchStatus,
+    status: managerState.status,
+    fetchStatus: managerState.fetchStatus,
     confirm,
     clear,
     finalize,
