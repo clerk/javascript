@@ -20,7 +20,6 @@ export const common: PlaywrightTestConfig = {
     ignoreHTTPSErrors: true,
     trace: 'retain-on-failure',
     bypassCSP: true, // We probably need to limit this to specific tests
-    permissions: ['clipboard-read'],
   },
 } as const;
 

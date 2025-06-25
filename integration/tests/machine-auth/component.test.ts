@@ -123,7 +123,9 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withAPIKeys] })('api keys @ge
 
     // Read clipboard contents
     const data = await (await responsePromise).json();
+    await context.grantPermissions(['clipboard-read']);
     const clipboardText = await page.evaluate('navigator.clipboard.readText()');
+    await context.clearPermissions();
     expect(clipboardText).toBe(data.secret);
   });
 });
