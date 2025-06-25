@@ -5,7 +5,7 @@ import type { ElementDescriptor, ElementId } from '../customizables/elementDescr
 import { CaretLeft, CaretRight } from '../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { mqu } from '../styledSystem';
-import { range } from '../utils';
+import { range } from '../utils/range';
 
 type UsePaginationProps = {
   defaultPage?: number;

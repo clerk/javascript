@@ -1,6 +1,7 @@
 import type { SignInResource } from '@clerk/types';
 
-import type { FormControlState } from '../../../utils';
+import type { FormControlState } from '@/ui/utils/useFormControl';
+
 import {
   determineSalutation,
   determineStartingSignInFactor,
