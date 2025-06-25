@@ -1,84 +1,17 @@
 import type { ColorScale } from '@clerk/types';
 
 import { cssSupports } from '../cssSupports';
+import { memoizedColorGenerators } from './cache';
+import type { ColorShade } from './constants';
+import { ALPHA_PERCENTAGES, LIGHTNESS_CONFIG, LIGHTNESS_MIX_DATA, RELATIVE_SHADE_STEPS } from './constants';
 
-// Types
-export type ColorShade = 25 | 50 | 100 | 150 | 200 | 300 | 400 | 500 | 600 | 700 | 750 | 800 | 850 | 900 | 950;
-
-// Constants
-export const COLOR_SCALE: readonly ColorShade[] = [
-  25, 50, 100, 150, 200, 300, 400, 500, 600, 700, 750, 800, 850, 900, 950,
-] as const;
-
-const LIGHTNESS_CONFIG = {
-  TARGET_LIGHT: 97, // Target lightness for 50 shade
-  TARGET_DARK: 12, // Target lightness for 900 shade
-  LIGHT_STEPS: 7, // Number of light shades
-  DARK_STEPS: 7, // Number of dark shades
-} as const;
-
-const LIGHTNESS_MIX_DATA: Record<ColorShade, { mixColor: 'white' | 'black' | null; percentage: number }> = {
-  25: { mixColor: 'white', percentage: 85 },
-  50: { mixColor: 'white', percentage: 80 },
-  100: { mixColor: 'white', percentage: 68 },
-  150: { mixColor: 'white', percentage: 55 },
-  200: { mixColor: 'white', percentage: 40 },
-  300: { mixColor: 'white', percentage: 26 },
-  400: { mixColor: 'white', percentage: 16 },
-  500: { mixColor: null, percentage: 0 },
-  600: { mixColor: 'black', percentage: 12 },
-  700: { mixColor: 'black', percentage: 22 },
-  750: { mixColor: 'black', percentage: 30 },
-  800: { mixColor: 'black', percentage: 44 },
-  850: { mixColor: 'black', percentage: 55 },
-  900: { mixColor: 'black', percentage: 65 },
-  950: { mixColor: 'black', percentage: 75 },
-} as const;
-
-const ALPHA_PERCENTAGES: Record<ColorShade, number> = {
-  25: 2,
-  50: 3,
-  100: 7,
-  150: 11,
-  200: 15,
-  300: 28,
-  400: 41,
-  500: 53,
-  600: 62,
-  700: 73,
-  750: 78,
-  800: 81,
-  850: 84,
-  900: 87,
-  950: 92,
-} as const;
-
-const RELATIVE_SHADE_STEPS: Record<number, number> = {
-  // Light shades (lighter than 500)
-  400: 1,
-  300: 2,
-  200: 3,
-  150: 4,
-  100: 5,
-  50: 6,
-  25: 7,
-  // Dark shades (darker than 500)
-  600: 1,
-  700: 2,
-  750: 3,
-  800: 4,
-  850: 5,
-  900: 6,
-  950: 7,
-} as const;
-
-// Core utility functions
+// Core utility functions (now using memoized versions for better performance)
 export function createColorMix(baseColor: string, mixColor: string, percentage: number): string {
-  return `color-mix(in srgb, ${baseColor}, ${mixColor} ${percentage}%)`;
+  return memoizedColorGenerators.colorMix(baseColor, mixColor, percentage);
 }
 
 export function createAlphaColorMix(color: string, alphaPercentage: number): string {
-  return createColorMix('transparent', color, alphaPercentage);
+  return memoizedColorGenerators.alphaColorMix(color, alphaPercentage);
 }
 
 // Feature-specific generators

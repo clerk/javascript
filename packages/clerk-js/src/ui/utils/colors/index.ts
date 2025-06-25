@@ -1,7 +1,8 @@
 import type { HslaColor, HslaColorString } from '@clerk/types';
 
+import { hasModernColorSupport } from './cache';
 import { legacyColors } from './legacy';
-import { hasModernColorSupport, modernColors } from './modern';
+import { modernColors } from './modern';
 
 /**
  * Unified colors API that automatically chooses between modern and legacy implementations
@@ -79,3 +80,8 @@ export { generateAlphaScale, generateLightnessScale, modernScales, legacyScales 
  * Type exports
  */
 export type { HslaColor, HslaColorString };
+
+/**
+ * Export cache utilities for advanced use cases
+ */
+export { clearMemoCache, getCacheStats } from './cache';

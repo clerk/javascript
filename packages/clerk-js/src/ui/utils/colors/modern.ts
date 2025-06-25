@@ -4,6 +4,7 @@
  */
 
 import { cssSupports } from '../cssSupports';
+import { hasModernColorSupport as hasModernColorSupportCached } from './cache';
 
 /**
  * Modern CSS-based color manipulation utilities
@@ -117,7 +118,8 @@ export const modernColors = {
 
 /**
  * Determines if modern CSS color manipulation is supported
+ * Now uses cached version for better performance
  */
 export function hasModernColorSupport(): boolean {
-  return cssSupports.colorMix() || cssSupports.relativeColorSyntax();
+  return hasModernColorSupportCached();
 }

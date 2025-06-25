@@ -1,17 +1,9 @@
 import type { ColorScale, CssColorOrScale } from '@clerk/types';
 
+import { hasModernColorSupport } from './cache';
+import { ALPHA_VALUES, COLOR_SCALE, DARK_SHADES, LIGHT_SHADES, LIGHTNESS_CONFIG } from './constants';
 import { legacyColors } from './legacy';
-import { hasModernColorSupport } from './modern';
-import { COLOR_SCALE, createEmptyColorScale, generateAlphaColorMix, getColorMix } from './utils';
-
-// Types
-type ColorShadeKey = keyof ColorScale<any>;
-
-// Constants for legacy scale generation
-const ALPHA_VALUES = [0.02, 0.03, 0.07, 0.11, 0.15, 0.28, 0.41, 0.53, 0.62, 0.73, 0.78, 0.81, 0.84, 0.87, 0.92];
-const TARGET_LIGHTNESS = { LIGHTEST: 97, DARKEST: 12 } as const;
-const LIGHT_SHADES: ColorShadeKey[] = ['25', '50', '100', '150', '200', '300', '400'];
-const DARK_SHADES: ColorShadeKey[] = ['600', '700', '750', '800', '850', '900', '950'];
+import { createEmptyColorScale, generateAlphaColorMix, getColorMix } from './utils';
 
 /**
  * Modern CSS alpha scale generation
@@ -67,8 +59,8 @@ function generateLegacyLightnessScale(baseColor: string): ColorScale<string> {
   scale['500'] = legacyColors.toHslaString(parsedColor);
 
   // Calculate lightness steps
-  const lightStep = (TARGET_LIGHTNESS.LIGHTEST - parsedColor.l) / LIGHT_SHADES.length;
-  const darkStep = (parsedColor.l - TARGET_LIGHTNESS.DARKEST) / DARK_SHADES.length;
+  const lightStep = (LIGHTNESS_CONFIG.TARGET_LIGHT - parsedColor.l) / LIGHT_SHADES.length;
+  const darkStep = (parsedColor.l - LIGHTNESS_CONFIG.TARGET_DARK) / DARK_SHADES.length;
 
   // Generate light shades (lighter than base)
   LIGHT_SHADES.forEach((shade, index) => {
