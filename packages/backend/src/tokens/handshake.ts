@@ -1,4 +1,4 @@
-import { constants, SUPPORTED_BAPI_VERSION, SUPPORTED_HANDSHAKE_FORMAT, SUPPORTS_HANDSHAKE_NONCE } from '../constants';
+import { constants, SUPPORTED_BAPI_VERSION, SUPPORTED_HANDSHAKE_FORMAT } from '../constants';
 import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from '../errors';
 import type { VerifyJwtOptions } from '../jwt';
 import { assertHeaderAlgorithm, assertHeaderType } from '../jwt/assertions';

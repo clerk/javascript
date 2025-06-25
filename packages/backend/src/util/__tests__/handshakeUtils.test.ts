@@ -73,7 +73,7 @@ describe('handshakeUtils', () => {
       const enhancedCallbackUrl = url.searchParams.get('redirect_url');
       expect(enhancedCallbackUrl).toBeDefined();
 
-      const callbackUrlObj = new URL(enhancedCallbackUrl!);
+      const callbackUrlObj = new URL(enhancedCallbackUrl as string);
       expect(callbackUrlObj.searchParams.get(constants.QueryParameters.HandshakeFormat)).toBe(
         SUPPORTED_HANDSHAKE_FORMAT,
       );
