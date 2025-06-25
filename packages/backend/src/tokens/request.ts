@@ -142,17 +142,45 @@ export const authenticateRequest: AuthenticateRequest = (async (
   assertValidSecretKey(authenticateContext.secretKey);
 
   /**
-   * Merges headers from the RequestState with a default handshake cookie.
-   * Creates a new Headers object with a nonce cookie and adds all headers from the result.
+   * Merges headers from the RequestState with a handshake format cookie.
+   * Creates a new Headers object with the configured handshake format and adds all headers from the result.
    *
    * @param result - The RequestState containing headers to merge
    * @returns The RequestState with merged headers
    */
   function mergeHeaders(result: RequestState): RequestState {
     const headers = new Headers();
+    const handshakeFormatValue = authenticateContext.handshakeFormat || 'nonce';
+
+    let domain = '';
+    try {
+      if (authenticateContext.frontendApi) {
+        const host = authenticateContext.frontendApi.startsWith('http')
+          ? new URL(authenticateContext.frontendApi).hostname
+          : authenticateContext.frontendApi;
+
+        if (host.startsWith('clerk.')) {
+          domain = host.replace(/^clerk\./, '');
+        } else if (host.includes('.clerk.')) {
+          domain = host.split('.clerk.')[1];
+        } else if (host.includes('.')) {
+          const parts = host.split('.');
+          if (parts.length >= 2) {
+            domain = parts.slice(-2).join('.');
+          }
+        }
+      }
+
+      if (!domain) {
+        domain = authenticateContext.domain || '';
+      }
+    } catch {
+      domain = authenticateContext.domain || '';
+    }
+
     headers.append(
       'Set-Cookie',
-      `${constants.Cookies.HandshakeFormat}=nonce; Path=/; SameSite=None; Secure; Domain=${authenticateContext.frontendApi.replace(/^clerk\./, '') || ''};`,
+      `${constants.Cookies.HandshakeFormat}=${handshakeFormatValue}; Path=/; SameSite=None; Secure; Domain=${domain};`,
     );
     for (const [key, value] of result.headers.entries()) {
       headers.append(key, value);
