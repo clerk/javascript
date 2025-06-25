@@ -91,7 +91,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withAPIKeys] })('api keys @ge
     await expect(table.locator('.cl-tableRow', { hasText: apiKeyName })).toHaveCount(0);
   });
 
-  test('can copy api keys', async ({ page, context }) => {
+  test('can copy api key secret', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
@@ -119,7 +119,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withAPIKeys] })('api keys @ge
     const table = u.page.locator('.cl-apiKeysTable');
     const row = table.locator('.cl-tableRow', { hasText: apiKeyName });
     await row.waitFor({ state: 'attached' });
-    await row.locator('.cl-tableBodyCell').nth(2).locator('.cl-apiKeysCopyButton').click();
+    await row.locator('.cl-apiKeysCopyButton').click();
 
     // Read clipboard contents
     const data = await (await responsePromise).json();
@@ -127,5 +127,46 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withAPIKeys] })('api keys @ge
     const clipboardText = await page.evaluate('navigator.clipboard.readText()');
     await context.clearPermissions();
     expect(clipboardText).toBe(data.secret);
+  });
+
+  test('can toggle api key secret visibility', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.po.signIn.goTo();
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+    await u.po.expect.toBeSignedIn();
+
+    await u.po.page.goToRelative('/api-keys');
+    await u.po.apiKeys.waitForMounted();
+
+    const apiKeyName = `${fakeUser.firstName}-${Date.now()}`;
+
+    // Create API key
+    await u.po.apiKeys.clickAddButton();
+    await u.po.apiKeys.waitForFormOpened();
+    await u.po.apiKeys.typeName(apiKeyName);
+    await u.po.apiKeys.selectExpiration('1d');
+    await u.po.apiKeys.clickSaveButton();
+    await u.po.apiKeys.waitForFormClosed();
+
+    const responsePromise = page.waitForResponse(
+      response => response.url().includes('/secret') && response.request().method() === 'GET',
+    );
+
+    // Toggle API key secret visibility
+    const table = u.page.locator('.cl-apiKeysTable');
+    const row = table.locator('.cl-tableRow', { hasText: apiKeyName });
+    await row.waitFor({ state: 'attached' });
+    await expect(row.locator('input')).toHaveAttribute('type', 'password');
+    await row.locator('.cl-apiKeysRevealButton').click();
+
+    // Verify if secret matches the input value
+    const data = await (await responsePromise).json();
+    await expect(row.locator('input')).toHaveAttribute('type', 'text');
+    await expect(row.locator('input')).toHaveValue(data.secret);
+
+    // Toggle visibility off
+    await row.locator('.cl-apiKeysRevealButton').click();
+    await expect(row.locator('input')).toHaveAttribute('type', 'password');
   });
 });
