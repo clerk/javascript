@@ -2,6 +2,8 @@ import { clerk } from '@clerk/testing/playwright';
 import { expect, test } from '@playwright/test';
 
 const rootElement = '.cl-userButton-root';
+const triggerElement = '.cl-userButtonTrigger';
+const popoverElement = '.cl-userButtonPopoverCard';
 
 test('user button', async ({ page }) => {
   await page.goto('/sign-in');
@@ -12,6 +14,7 @@ test('user button', async ({ page }) => {
   });
   await page.goto('/user-button');
   await page.waitForSelector(rootElement, { state: 'attached' });
-  await page.locator('.cl-userButtonTrigger').click();
-  await expect(page).toHaveScreenshot('user-button.png');
+  await page.locator(triggerElement).click();
+  await page.waitForSelector(popoverElement, { state: 'visible' });
+  await expect(page.locator(popoverElement)).toHaveScreenshot('user-button-popover.png');
 });
