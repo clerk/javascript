@@ -3,10 +3,9 @@ import type { ClerkPaginatedResponse, ClerkPaginationParams } from './pagination
 import type { ClerkResource } from './resource';
 import type { CommerceFeatureJSONSnapshot, CommercePlanJSONSnapshot } from './snapshots';
 
-type OptionalOrgId = {
+type WithOptionalOrgType<T> = T & {
   orgId?: string;
 };
-type WithOptionalOrgType<T> = T & OptionalOrgId;
 
 export interface CommerceBillingNamespace {
   getPaymentAttempts: (params: GetPaymentAttemptsParams) => Promise<ClerkPaginatedResponse<CommercePaymentResource>>;
@@ -129,7 +128,7 @@ export interface CommercePaymentResource extends ClerkResource {
 
 export type GetPaymentAttemptsParams = WithOptionalOrgType<ClerkPaginationParams>;
 
-export type GetStatementsParams = ClerkPaginationParams<OptionalOrgId>;
+export type GetStatementsParams = WithOptionalOrgType<ClerkPaginationParams>;
 
 export type CommerceStatementStatus = 'open' | 'closed';
 
