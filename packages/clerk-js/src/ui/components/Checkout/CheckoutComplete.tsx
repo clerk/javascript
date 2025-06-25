@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 
 import { Drawer, useDrawerContext } from '@/ui/elements/Drawer';
 import { LineItems } from '@/ui/elements/LineItems';
@@ -21,6 +21,11 @@ export const CheckoutComplete = () => {
   const { checkout } = useCheckoutContextRoot();
   const [mousePosition, setMousePosition] = useState({ x: 256, y: 256 });
   const [currentPosition, setCurrentPosition] = useState({ x: 256, y: 256 });
+
+  // Generate unique IDs for SVG elements to avoid conflicts with multiple component instances
+  const maskId1 = useId();
+  const maskId2 = useId();
+  const maskId3 = useId();
 
   const prefersReducedMotion = usePrefersReducedMotion();
   const { animations: layoutAnimations } = useAppearance().parsedLayout;
@@ -155,9 +160,9 @@ export const CheckoutComplete = () => {
                 <feGaussianBlur stdDeviation='10' />
               </filter>
               {[
-                { r: 225, maskStart: 10, maskEnd: 90, id: 'mask-1' },
-                { r: 162.5, maskStart: 15, maskEnd: 85, id: 'mask-2' },
-                { r: 100, maskStart: 20, maskEnd: 80, id: 'mask-3' },
+                { r: 225, maskStart: 10, maskEnd: 90, id: maskId1 },
+                { r: 162.5, maskStart: 15, maskEnd: 85, id: maskId2 },
+                { r: 100, maskStart: 20, maskEnd: 80, id: maskId3 },
               ].map(({ maskStart, maskEnd, id }) => (
                 <linearGradient
                   key={id}
@@ -191,9 +196,9 @@ export const CheckoutComplete = () => {
               ))}
               <mask id='clerk-checkout-success-mask'>
                 {[
-                  { r: 225, id: 'mask-1' },
-                  { r: 162.5, id: 'mask-2' },
-                  { r: 100, id: 'mask-3' },
+                  { r: 225, id: maskId1 },
+                  { r: 162.5, id: maskId2 },
+                  { r: 100, id: maskId3 },
                 ].map(({ r, id }) => (
                   <circle
                     key={id}
