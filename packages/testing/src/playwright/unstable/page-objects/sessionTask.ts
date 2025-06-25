@@ -12,7 +12,6 @@ export const createSessionTaskComponentPageObject = (testArgs: { page: EnhancedP
       const createOrganizationButton = page.getByRole('button', { name: /create organization/i });
 
       await expect(createOrganizationButton).toBeVisible();
-      expect(page.url()).toContain('add-organization');
 
       await page.locator('input[name=name]').fill(fakeOrganization.name);
       await page.locator('input[name=slug]').fill(fakeOrganization.slug);

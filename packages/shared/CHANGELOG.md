@@ -1,5 +1,19 @@
 # Change Log
 
+## 3.9.8
+
+### Patch Changes
+
+- Track usage of react hooks on development instances. ([#6158](https://github.com/clerk/javascript/pull/6158)) by [@panteliselef](https://github.com/panteliselef)
+
+  - `useReverification`
+  - `useSession`
+  - `useSessionList`
+  - `useUser`
+
+- Updated dependencies [[`b495279`](https://github.com/clerk/javascript/commit/b4952796e3c7dee4ab4726de63a17b7f4265ce37), [`c3fa15d`](https://github.com/clerk/javascript/commit/c3fa15d60642b4fcbcf26e21caaca0fc60975795), [`52d5e57`](https://github.com/clerk/javascript/commit/52d5e5768d54725b4d20d028135746493e05d44c), [`15a945c`](https://github.com/clerk/javascript/commit/15a945c02a9f6bc8d2f7d1e3534217100bf45936)]:
+  - @clerk/types@4.61.0
+
 ## 3.9.7
 
 ### Patch Changes

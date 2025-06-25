@@ -1,6 +1,7 @@
 import type { ElementObjectKey, ElementsConfig, IdSelectors, StateSelectors } from '@clerk/types';
 
-import { containsAllOfType, fromEntries } from '../utils';
+import { containsAllOfType } from '../utils/containsAllOf';
+import { fromEntries } from '../utils/fromEntries';
 
 export const CLASS_PREFIX = 'cl-';
 export const ID_CLASS_PREFIX = 'cl-id-';
@@ -476,6 +477,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'apiKeysCreateFormDescriptionInput',
   'apiKeysCreateFormExpirationInput',
   'apiKeysCreateFormSubmitButton',
+  'apiKeysCreateFormExpirationCaption',
   'apiKeysRevokeModal',
   'apiKeysRevokeModalInput',
   'apiKeysRevokeModalSubmitButton',

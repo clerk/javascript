@@ -4,12 +4,13 @@ import React from 'react';
 import { ArrowBlockButton } from '@/ui/elements/ArrowBlockButton';
 import { Card } from '@/ui/elements/Card';
 import { Header } from '@/ui/elements/Header';
+import { backupCodePrefFactorComparator } from '@/ui/utils/factorSorting';
+import { formatSafeIdentifier } from '@/ui/utils/formatSafeIdentifier';
 
 import { useCoreSignIn } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import { useCardState } from '../../elements/contexts';
-import { backupCodePrefFactorComparator, formatSafeIdentifier } from '../../utils';
 import { HavingTrouble } from './HavingTrouble';
 
 export type AlternativeMethodsProps = {

@@ -90,11 +90,13 @@ export type PaginatedResourcesWithDefault<T> = {
 export type PaginatedHookConfig<T> = T & {
   /**
    * If `true`, newly fetched data will be appended to the existing list rather than replacing it. Useful for implementing infinite scroll functionality.
+   *
    * @default false
    */
   infinite?: boolean;
   /**
    * If `true`, the previous data will be kept in the cache until new data is fetched.
+   *
    * @default false
    */
   keepPreviousData?: boolean;
@@ -102,10 +104,18 @@ export type PaginatedHookConfig<T> = T & {
 
 export type PagesOrInfiniteConfig = PaginatedHookConfig<{
   /**
-   * If `true`, a request will be triggered.
+   * If `true`, a request will be triggered when the hook is mounted.
+   *
    * @default true
    */
   enabled?: boolean;
+  /**
+   * @experimental
+   * On `cache` mode, no request will be triggered when the hook is mounted and the data will be fetched from the cache.
+   *
+   * @default undefined
+   */
+  __experimental_mode?: 'cache';
 }>;
 
 /**
@@ -114,12 +124,21 @@ export type PagesOrInfiniteConfig = PaginatedHookConfig<{
 export type PagesOrInfiniteOptions = {
   /**
    * A number that specifies which page to fetch. For example, if `initialPage` is set to 10, it will skip the first 9 pages and fetch the 10th page.
+   *
    * @default 1
    */
   initialPage?: number;
   /**
    * A number that specifies the maximum number of results to return per page.
+   *
    * @default 10
    */
   pageSize?: number;
+  /**
+   * @experimental
+   * On `cache` mode, no request will be triggered when the hook is mounted and the data will be fetched from the cache.
+   *
+   * @default undefined
+   */
+  __experimental_mode?: 'cache';
 };

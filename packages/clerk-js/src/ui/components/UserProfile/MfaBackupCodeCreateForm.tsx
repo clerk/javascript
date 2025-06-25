@@ -8,9 +8,9 @@ import { FormButtonContainer } from '@/ui/elements/FormButtons';
 import type { FormProps } from '@/ui/elements/FormContainer';
 import { FormContainer } from '@/ui/elements/FormContainer';
 import { FullHeightLoader } from '@/ui/elements/FullHeightLoader';
+import { handleError } from '@/ui/utils/errorHandler';
 
 import { Button, descriptors, localizationKeys, Text } from '../../customizables';
-import { handleError } from '../../utils';
 import { MfaBackupCodeList } from './MfaBackupCodeList';
 
 type MfaBackupCodeCreateFormProps = FormProps;

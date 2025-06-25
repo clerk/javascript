@@ -6,10 +6,11 @@ import { Form } from '@/ui/elements/Form';
 import { FormButtons } from '@/ui/elements/FormButtons';
 import type { FormProps } from '@/ui/elements/FormContainer';
 import { FormContainer } from '@/ui/elements/FormContainer';
+import { handleError } from '@/ui/utils/errorHandler';
+import { useFormControl } from '@/ui/utils/useFormControl';
 
 import { isDefaultImage } from '../../../utils';
 import { localizationKeys } from '../../customizables';
-import { handleError, useFormControl } from '../../utils';
 import { OrganizationProfileAvatarUploader } from './OrganizationProfileAvatarUploader';
 
 type ProfileFormProps = FormProps;

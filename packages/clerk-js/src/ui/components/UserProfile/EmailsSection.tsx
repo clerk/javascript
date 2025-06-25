@@ -5,13 +5,13 @@ import { Fragment } from 'react';
 import { useCardState } from '@/ui/elements/contexts';
 import { ProfileSection } from '@/ui/elements/Section';
 import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
+import { handleError } from '@/ui/utils/errorHandler';
 
 import { sortIdentificationBasedOnVerification } from '../../components/UserProfile/utils';
 import { Badge, Flex, localizationKeys, Text } from '../../customizables';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import type { PropsOfComponent } from '../../styledSystem';
-import { handleError } from '../../utils';
 import { EmailForm } from './EmailForm';
 import { RemoveEmailForm } from './RemoveResourceForm';
 
