@@ -27,8 +27,10 @@ const Cookies = {
 } as const;
 
 const QueryParameters = {
-  AuthToken: Attributes.AuthToken,
-  ClientUat: Cookies.ClientUat,
+  ClerkSynced: '__clerk_synced',
+  SuffixedCookies: 'suffixed_cookies',
+  ClerkRedirectUrl: '__clerk_redirect_url',
+  // use the reference to Cookies to indicate that it's the same value
   DevBrowser: Cookies.DevBrowser,
   Handshake: Cookies.Handshake,
   HandshakeHelp: '__clerk_help',
