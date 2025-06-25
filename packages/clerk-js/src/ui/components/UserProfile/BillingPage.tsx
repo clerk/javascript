@@ -1,41 +1,25 @@
-import {
-  PlansContextProvider,
-  StatementsContextProvider,
-  SubscriberTypeContext,
-  useSubscriptions,
-} from '../../contexts';
+import { Card } from '@/ui/elements/Card';
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { Header } from '@/ui/elements/Header';
+import { Tab, TabPanel, TabPanels, Tabs, TabsList } from '@/ui/elements/Tabs';
+
+import { SubscriberTypeContext } from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
-import {
-  Card,
-  Header,
-  Tab,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  TabsList,
-  useCardState,
-  withCardStateProvider,
-} from '../../elements';
 import { useTabState } from '../../hooks/useTabState';
+import { PaymentAttemptsList } from '../PaymentAttempts';
 import { PaymentSources } from '../PaymentSources';
 import { StatementsList } from '../Statements';
 import { SubscriptionsList } from '../Subscriptions';
 
 const tabMap = {
-  0: 'plans',
+  0: 'subscriptions',
   1: 'statements',
-  2: 'payment-methods',
+  2: 'payments',
 } as const;
 
 const BillingPageInternal = withCardStateProvider(() => {
   const card = useCardState();
-  const { data: subscriptions } = useSubscriptions();
-
   const { selectedTab, handleTabChange } = useTabState(tabMap);
-
-  if (!Array.isArray(subscriptions?.data)) {
-    return null;
-  }
 
   return (
     <Col
@@ -63,6 +47,7 @@ const BillingPageInternal = withCardStateProvider(() => {
           <TabsList sx={t => ({ gap: t.space.$6 })}>
             <Tab localizationKey={localizationKeys('userProfile.billingPage.start.headerTitle__subscriptions')} />
             <Tab localizationKey={localizationKeys('userProfile.billingPage.start.headerTitle__statements')} />
+            <Tab localizationKey={localizationKeys('userProfile.billingPage.start.headerTitle__payments')} />
           </TabsList>
           <TabPanels>
             <TabPanel sx={_ => ({ width: '100%', flexDirection: 'column' })}>
@@ -78,9 +63,10 @@ const BillingPageInternal = withCardStateProvider(() => {
               <PaymentSources />
             </TabPanel>
             <TabPanel sx={{ width: '100%' }}>
-              <StatementsContextProvider>
-                <StatementsList />
-              </StatementsContextProvider>
+              <StatementsList />
+            </TabPanel>
+            <TabPanel sx={{ width: '100%' }}>
+              <PaymentAttemptsList />
             </TabPanel>
           </TabPanels>
         </Tabs>
@@ -92,9 +78,7 @@ const BillingPageInternal = withCardStateProvider(() => {
 export const BillingPage = () => {
   return (
     <SubscriberTypeContext.Provider value='user'>
-      <PlansContextProvider>
-        <BillingPageInternal />
-      </PlansContextProvider>
+      <BillingPageInternal />
     </SubscriberTypeContext.Provider>
   );
 };

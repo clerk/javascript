@@ -71,6 +71,7 @@ export const ptPT: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     monthly: undefined,
+    pastDue: undefined,
     pay: undefined,
     paymentMethods: undefined,
     paymentSource: {
@@ -119,6 +120,7 @@ export const ptPT: LocalizationResource = {
     sameDay: "Hoje às {{ date | timeString('pt-PT') }}",
   },
   dividerText: 'ou',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'Utilize outro método',
   footerPageLink__help: 'Ajuda',
   footerPageLink__privacy: 'Privacidade',
@@ -656,7 +658,8 @@ export const ptPT: LocalizationResource = {
       checkbox: {
         label__onlyPrivacyPolicy: 'Aceito a Política de Privacidade',
         label__onlyTermsOfService: 'Aceito os Termos de Serviço',
-        label__termsOfServiceAndPrivacyPolicy: 'Aceito os Termos de Serviço e a Política de Privacidade',
+        label__termsOfServiceAndPrivacyPolicy:
+          'Aceito os {{ termsOfServiceLink || link("Termos de Serviço") }} e a {{ privacyPolicyLink || link("Política de Privacidade") }}',
       },
       continue: {
         subtitle: 'Ao continuar, você concorda com os termos acima.',

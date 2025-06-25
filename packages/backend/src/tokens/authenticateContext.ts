@@ -10,32 +10,34 @@ import type { AuthenticateRequestOptions } from './types';
 
 interface AuthenticateContext extends AuthenticateRequestOptions {
   // header-based values
-  sessionTokenInHeader: string | undefined;
-  origin: string | undefined;
-  host: string | undefined;
+  accept: string | undefined;
   forwardedHost: string | undefined;
   forwardedProto: string | undefined;
+  host: string | undefined;
+  origin: string | undefined;
   referrer: string | undefined;
-  userAgent: string | undefined;
   secFetchDest: string | undefined;
-  accept: string | undefined;
+  tokenInHeader: string | undefined;
+  userAgent: string | undefined;
+
   // cookie-based values
-  sessionTokenInCookie: string | undefined;
-  refreshTokenInCookie: string | undefined;
   clientUat: number;
+  refreshTokenInCookie: string | undefined;
+  sessionTokenInCookie: string | undefined;
+
   // handshake-related values
   devBrowserToken: string | undefined;
   handshakeFormat: 'nonce' | 'token' | undefined;
   handshakeNonce: string | undefined;
-  handshakeToken: string | undefined;
   handshakeRedirectLoopCounter: number;
+  handshakeToken: string | undefined;
 
   // url derived from headers
   clerkUrl: URL;
   // enforce existence of the following props
-  publishableKey: string;
-  instanceType: string;
   frontendApi: string;
+  instanceType: string;
+  publishableKey: string;
 }
 
 /**
@@ -46,12 +48,18 @@ interface AuthenticateContext extends AuthenticateRequestOptions {
  */
 class AuthenticateContext implements AuthenticateContext {
   /**
+   * The original Clerk frontend API URL, extracted from publishable key before proxy URL override.
+   * Used for backend operations like token validation and issuer checking.
+   */
+  private originalFrontendApi: string = '';
+
+  /**
    * Retrieves the session token from either the cookie or the header.
    *
    * @returns {string | undefined} The session token if available, otherwise undefined.
    */
   public get sessionToken(): string | undefined {
-    return this.sessionTokenInCookie || this.sessionTokenInHeader;
+    return this.sessionTokenInCookie || this.tokenInHeader;
   }
 
   public constructor(
@@ -164,17 +172,25 @@ class AuthenticateContext implements AuthenticateContext {
     assertValidPublishableKey(options.publishableKey);
     this.publishableKey = options.publishableKey;
 
+    const originalPk = parsePublishableKey(this.publishableKey, {
+      fatal: true,
+      domain: options.domain,
+      isSatellite: options.isSatellite,
+    });
+    this.originalFrontendApi = originalPk.frontendApi;
+
     const pk = parsePublishableKey(this.publishableKey, {
       fatal: true,
       proxyUrl: options.proxyUrl,
       domain: options.domain,
+      isSatellite: options.isSatellite,
     });
     this.instanceType = pk.instanceType;
     this.frontendApi = pk.frontendApi;
   }
 
   private initHeaderValues() {
-    this.sessionTokenInHeader = this.parseAuthorizationHeader(this.getHeader(constants.Headers.Authorization));
+    this.tokenInHeader = this.parseAuthorizationHeader(this.getHeader(constants.Headers.Authorization));
     this.origin = this.getHeader(constants.Headers.Origin);
     this.host = this.getHeader(constants.Headers.Host);
     this.forwardedHost = this.getHeader(constants.Headers.ForwardedHost);
@@ -266,7 +282,8 @@ class AuthenticateContext implements AuthenticateContext {
       return false;
     }
     const tokenIssuer = data.payload.iss.replace(/https?:\/\//gi, '');
-    return this.frontendApi === tokenIssuer;
+    // Use original frontend API for token validation since tokens are issued by the actual Clerk API, not proxy
+    return this.originalFrontendApi === tokenIssuer;
   }
 
   private sessionExpired(jwt: Jwt | undefined): boolean {

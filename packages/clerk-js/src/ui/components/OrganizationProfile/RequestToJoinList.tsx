@@ -1,8 +1,10 @@
 import { useOrganization } from '@clerk/shared/react';
 import type { OrganizationMembershipRequestResource } from '@clerk/types';
 
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { UserPreview } from '@/ui/elements/UserPreview';
+
 import { Box, Button, descriptors, Flex, localizationKeys, Td } from '../../customizables';
-import { useCardState, UserPreview, withCardStateProvider } from '../../elements';
 import { handleError } from '../../utils';
 import { DataTable, RowContainer } from './MemberListTable';
 

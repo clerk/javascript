@@ -1,9 +1,11 @@
 import { useUser } from '@clerk/shared/react';
 import { forwardRef } from 'react';
 
+import { UserAvatar } from '@/ui/elements/UserAvatar';
+import { withAvatarShimmer } from '@/ui/elements/withAvatarShimmer';
+
 import { useUserButtonContext } from '../../contexts';
 import { Button, descriptors, Flex } from '../../customizables';
-import { UserAvatar, withAvatarShimmer } from '../../elements';
 import type { PropsOfComponent } from '../../styledSystem';
 import { UserButtonTopLevelIdentifier } from './UserButtonTopLevelIdentifier';
 

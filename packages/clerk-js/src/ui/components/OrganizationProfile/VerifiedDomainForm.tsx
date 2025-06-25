@@ -6,12 +6,17 @@ import type {
 } from '@clerk/types';
 import { useEffect } from 'react';
 
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { Form } from '@/ui/elements/Form';
+import { FormButtons } from '@/ui/elements/FormButtons';
+import type { FormProps } from '@/ui/elements/FormContainer';
+import { FormContainer } from '@/ui/elements/FormContainer';
+import { Header } from '@/ui/elements/Header';
+
 import { CalloutWithAction } from '../../common';
 import { useEnvironment } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { Col, descriptors, Flex, localizationKeys, Spinner, Text } from '../../customizables';
-import type { FormProps } from '../../elements';
-import { Form, FormButtons, FormContainer, Header, useCardState, withCardStateProvider } from '../../elements';
 import { useFetch } from '../../hooks';
 import { InformationCircle } from '../../icons';
 import { handleError, useFormControl } from '../../utils';
@@ -124,10 +129,10 @@ export const VerifiedDomainForm = withCardStateProvider((props: VerifiedDomainFo
   }, [domain?.id]);
 
   const title = localizationKeys('organizationProfile.verifiedDomainPage.title', {
-    domain: domain?.name,
+    domain: domain?.name || '',
   });
   const subtitle = localizationKeys('organizationProfile.verifiedDomainPage.subtitle', {
-    domain: domain?.name,
+    domain: domain?.name || '',
   });
 
   const calloutLabel = useCalloutLabel(domain, {

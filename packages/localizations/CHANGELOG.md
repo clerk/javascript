@@ -1,5 +1,86 @@
 # Change Log
 
+## 3.17.0
+
+### Minor Changes
+
+- Add `es-CR` localizations ([#6178](https://github.com/clerk/javascript/pull/6178)) by [@LFCisneros](https://github.com/LFCisneros)
+
+### Patch Changes
+
+- Add legal consent related localization to `ja-JP` ([#5886](https://github.com/clerk/javascript/pull/5886)) by [@sdaigo](https://github.com/sdaigo)
+
+- Replace expiration segmented list with dropdown and hide description field in `<APIKeys />` component ([#6153](https://github.com/clerk/javascript/pull/6153)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fix errors in `es-CR` ([#6181](https://github.com/clerk/javascript/pull/6181)) by [@tmilewski](https://github.com/tmilewski)
+
+- Adds clickable Terms of Service and Privacy Policy links to the following localizations: `be-BY`, `bg-BG`, `cs-CZ`, `es-ES`, `it-IT`, `nl-BE`, `nl-NL`, `pt-PT`, and `tr-TR`. ([#6135](https://github.com/clerk/javascript/pull/6135)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`b495279`](https://github.com/clerk/javascript/commit/b4952796e3c7dee4ab4726de63a17b7f4265ce37), [`c3fa15d`](https://github.com/clerk/javascript/commit/c3fa15d60642b4fcbcf26e21caaca0fc60975795), [`52d5e57`](https://github.com/clerk/javascript/commit/52d5e5768d54725b4d20d028135746493e05d44c), [`15a945c`](https://github.com/clerk/javascript/commit/15a945c02a9f6bc8d2f7d1e3534217100bf45936)]:
+  - @clerk/types@4.61.0
+
+## 3.16.5
+
+### Patch Changes
+
+- Add payment history tab to UserProfile and OrgProfile ([#6075](https://github.com/clerk/javascript/pull/6075)) by [@aeliox](https://github.com/aeliox)
+
+- Add TypeScript types and en-US localization for upcoming `<APIKeys />` component. This component will initially be in early access. ([#5858](https://github.com/clerk/javascript/pull/5858)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Add localizations for some commerce strings, general cleanups ([#6101](https://github.com/clerk/javascript/pull/6101)) by [@aeliox](https://github.com/aeliox)
+
+- Introduce `commerce.checkout.pastDueNotice` localization key. ([#6097](https://github.com/clerk/javascript/pull/6097)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`19e9e11`](https://github.com/clerk/javascript/commit/19e9e11af04f13fd12975fbf7016fe0583202056), [`18bcb64`](https://github.com/clerk/javascript/commit/18bcb64a3e8b6d352d7933ed094d68214e6e80fb), [`138f733`](https://github.com/clerk/javascript/commit/138f733f13121487268a4f96e6eb2cffedc6e238), [`48be55b`](https://github.com/clerk/javascript/commit/48be55b61a86e014dd407414764d24bb43fd26f3), [`2c6f805`](https://github.com/clerk/javascript/commit/2c6f805a9e6e4685990f9a8abc740b2d0859a453), [`97749d5`](https://github.com/clerk/javascript/commit/97749d570bc687c7e05cd800a50e0ae4180a371d)]:
+  - @clerk/types@4.60.1
+
+## 3.16.4
+
+### Patch Changes
+
+- Update Spanish (es-ES) password validation messages to match new English (en-US) format ([#6048](https://github.com/clerk/javascript/pull/6048)) by [@ReyserLyn](https://github.com/ReyserLyn)
+
+- Updated dependencies [[`d8fa5d9`](https://github.com/clerk/javascript/commit/d8fa5d9d3d8dc575260d8d2b7c7eeeb0052d0b0d), [`be2e89c`](https://github.com/clerk/javascript/commit/be2e89ca11aa43d48f74c57a5a34e20d85b4003c), [`5644d94`](https://github.com/clerk/javascript/commit/5644d94f711a0733e4970c3f15c24d56cafc8743), [`b578225`](https://github.com/clerk/javascript/commit/b5782258242474c9b0987a3f8349836cd763f24b), [`8838120`](https://github.com/clerk/javascript/commit/8838120596830b88fec1c6c853371dabfec74a0d)]:
+  - @clerk/types@4.60.0
+
+## 3.16.3
+
+### Patch Changes
+
+- Add "Past Due" amount on checkout flow when applicable ([#6014](https://github.com/clerk/javascript/pull/6014)) by [@octoper](https://github.com/octoper)
+
+- Updated dependencies [[`2c6a0cc`](https://github.com/clerk/javascript/commit/2c6a0cca6e824bafc6b0d0501784517a5b1f75ea), [`71e6a1f`](https://github.com/clerk/javascript/commit/71e6a1f1024d65b7a09cdc8fa81ce0164e0a34cb)]:
+  - @clerk/types@4.59.3
+
+## 3.16.2
+
+### Patch Changes
+
+- Improve de-DE localizations for "Clerk Billing" ([#6011](https://github.com/clerk/javascript/pull/6011)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`6ed3dfc`](https://github.com/clerk/javascript/commit/6ed3dfc1bc742ac9d9a2307fe8e4733411cbc0d7)]:
+  - @clerk/types@4.59.2
+
+## 3.16.1
+
+### Patch Changes
+
+- Add support for country-specific alternative phone code channels ([#5937](https://github.com/clerk/javascript/pull/5937)) by [@anagstef](https://github.com/anagstef)
+
+- Updated dependencies [[`c305b31`](https://github.com/clerk/javascript/commit/c305b310e351e9ce2012f805b35e464c3e43e310)]:
+  - @clerk/types@4.59.1
+
+## 3.16.0
+
+### Minor Changes
+
+- Replaces strings with localizations throughout billing components. ([#5922](https://github.com/clerk/javascript/pull/5922)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Updated dependencies [[`b1337df`](https://github.com/clerk/javascript/commit/b1337dfeae8ccf8622efcf095e3201f9bbf1cefa), [`65f0878`](https://github.com/clerk/javascript/commit/65f08788ee5e56242eee2194c73ba90965c75c97), [`df6fefd`](https://github.com/clerk/javascript/commit/df6fefd05fd2df93f5286d97e546b48911adea7c), [`4282bfa`](https://github.com/clerk/javascript/commit/4282bfa09491225bde7d619fe9a3561062703f69), [`5491491`](https://github.com/clerk/javascript/commit/5491491711e0a8ee37828451c1f603a409de32cf)]:
+  - @clerk/types@4.59.0
+
 ## 3.15.3
 
 ### Patch Changes

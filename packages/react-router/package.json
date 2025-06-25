@@ -1,6 +1,6 @@
 {
   "name": "@clerk/react-router",
-  "version": "1.4.3",
+  "version": "1.6.1",
   "description": "Clerk SDK for React Router",
   "keywords": [
     "clerk",
@@ -90,7 +90,7 @@
   "devDependencies": {
     "@types/cookie": "^0.6.0",
     "esbuild-plugin-file-path-extensions": "^2.1.4",
-    "react-router": "7.5.2"
+    "react-router": "7.6.1"
   },
   "peerDependencies": {
     "react": "catalog:peer-react",

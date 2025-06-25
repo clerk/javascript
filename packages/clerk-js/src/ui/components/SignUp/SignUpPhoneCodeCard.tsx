@@ -1,8 +1,10 @@
 import { getAlternativePhoneCodeProviderData } from '@clerk/shared/alternativePhoneCode';
 
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { LoadingCard } from '@/ui/elements/LoadingCard';
+
 import { useCoreSignUp } from '../../contexts';
 import { Flow, localizationKeys } from '../../customizables';
-import { useCardState, withCardStateProvider } from '../../elements';
 import { useFetch } from '../../hooks';
 import { handleError } from '../../utils';
 import { SignUpVerificationCodeForm } from './SignUpVerificationCodeForm';
@@ -16,12 +18,15 @@ export const SignUpPhoneCodeCard = withCardStateProvider(() => {
   const shouldAvoidPrepare = !signUp.status || phoneVerificationStatus === 'verified';
   const isAlternativePhoneCodeProvider = !!channel && channel !== 'sms';
 
+  // If the channel is 'sms', we don't want to send the channel parameter
+  const channelToBeSent = isAlternativePhoneCodeProvider ? channel : undefined;
+
   const prepare = () => {
     if (shouldAvoidPrepare) {
       return;
     }
     return signUp
-      .preparePhoneNumberVerification({ strategy: 'phone_code', channel })
+      .preparePhoneNumberVerification({ strategy: 'phone_code', channel: channelToBeSent })
       .catch(err => handleError(err, [], card.setError));
   };
 
@@ -33,7 +38,7 @@ export const SignUpPhoneCodeCard = withCardStateProvider(() => {
       ? undefined
       : () =>
           signUp
-            .preparePhoneNumberVerification({ strategy: 'phone_code', channel })
+            .preparePhoneNumberVerification({ strategy: 'phone_code', channel: undefined })
             .catch(err => handleError(err, [], card.setError)),
     {
       name: 'signUp.preparePhoneNumberVerification',
@@ -53,9 +58,24 @@ export const SignUpPhoneCodeCard = withCardStateProvider(() => {
 
   if (isAlternativePhoneCodeProvider) {
     const provider = getAlternativePhoneCodeProviderData(channel)?.name;
-    cardTitleKey = localizationKeys('signUp.alternativePhoneCodeProvider.title', { provider });
-    cardSubtitleKey = localizationKeys('signUp.alternativePhoneCodeProvider.subtitle', { provider });
+    cardTitleKey = localizationKeys('signUp.alternativePhoneCodeProvider.title', { provider: provider || '' });
+    cardSubtitleKey = localizationKeys('signUp.alternativePhoneCodeProvider.subtitle', {
+      provider: provider || '',
+    });
     resendButtonKey = localizationKeys('signUp.alternativePhoneCodeProvider.resendButton');
+  }
+
+  const prepareWithSMS = () => {
+    card.setLoading();
+    card.setError(undefined);
+    void signUp
+      .preparePhoneNumberVerification({ strategy: 'phone_code', channel: undefined })
+      .catch(err => handleError(err, [], card.setError))
+      .finally(() => card.setIdle());
+  };
+
+  if (card.isLoading) {
+    return <LoadingCard />;
   }
 
   return (
@@ -67,6 +87,13 @@ export const SignUpPhoneCodeCard = withCardStateProvider(() => {
         prepare={prepare}
         attempt={attempt}
         safeIdentifier={signUp.phoneNumber}
+        alternativeMethodsLabel={
+          isAlternativePhoneCodeProvider
+            ? localizationKeys('footerActionLink__alternativePhoneCodeProvider')
+            : undefined
+        }
+        onShowAlternativeMethodsClicked={isAlternativePhoneCodeProvider ? prepareWithSMS : undefined}
+        showAlternativeMethods={isAlternativePhoneCodeProvider ? true : undefined}
       />
     </Flow.Part>
   );

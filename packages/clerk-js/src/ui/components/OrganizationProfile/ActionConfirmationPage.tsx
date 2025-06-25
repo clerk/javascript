@@ -1,18 +1,16 @@
 import { useOrganization, useOrganizationList, useUser } from '@clerk/shared/react';
 
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { Form } from '@/ui/elements/Form';
+import { FormButtonContainer } from '@/ui/elements/FormButtons';
+import type { FormProps } from '@/ui/elements/FormContainer';
+import { FormContainer } from '@/ui/elements/FormContainer';
+import { SuccessPage } from '@/ui/elements/SuccessPage';
+
 import { useWizard, Wizard } from '../../common';
 import { useOrganizationProfileContext } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { Col, localizationKeys, Text } from '../../customizables';
-import type { FormProps } from '../../elements';
-import {
-  Form,
-  FormButtonContainer,
-  FormContainer,
-  SuccessPage,
-  useCardState,
-  withCardStateProvider,
-} from '../../elements';
 import { handleError, useFormControl } from '../../utils';
 import { organizationListParams } from '../OrganizationSwitcher/utils';
 
@@ -51,13 +49,13 @@ export const LeaveOrganizationForm = (props: LeaveOrganizationFormProps) => {
 
   return (
     <ActionConfirmationPage
-      organizationName={organization?.name}
+      organizationName={organization.name}
       title={localizationKeys('organizationProfile.profilePage.dangerSection.leaveOrganization.title')}
       messageLine1={localizationKeys('organizationProfile.profilePage.dangerSection.leaveOrganization.messageLine1')}
       messageLine2={localizationKeys('organizationProfile.profilePage.dangerSection.leaveOrganization.messageLine2')}
       actionDescription={localizationKeys(
         'organizationProfile.profilePage.dangerSection.leaveOrganization.actionDescription',
-        { organizationName: organization?.name },
+        { organizationName: organization.name },
       )}
       submitLabel={localizationKeys('organizationProfile.profilePage.dangerSection.leaveOrganization.title')}
       successMessage={localizationKeys(
@@ -81,13 +79,13 @@ export const DeleteOrganizationForm = (props: DeleteOrganizationFormProps) => {
 
   return (
     <ActionConfirmationPage
-      organizationName={organization?.name}
+      organizationName={organization.name}
       title={localizationKeys('organizationProfile.profilePage.dangerSection.deleteOrganization.title')}
       messageLine1={localizationKeys('organizationProfile.profilePage.dangerSection.deleteOrganization.messageLine1')}
       messageLine2={localizationKeys('organizationProfile.profilePage.dangerSection.deleteOrganization.messageLine2')}
       actionDescription={localizationKeys(
         'organizationProfile.profilePage.dangerSection.deleteOrganization.actionDescription',
-        { organizationName: organization?.name },
+        { organizationName: organization.name },
       )}
       submitLabel={localizationKeys('organizationProfile.profilePage.dangerSection.deleteOrganization.title')}
       successMessage={localizationKeys(
@@ -103,7 +101,7 @@ type ActionConfirmationPageProps = FormProps & {
   title: LocalizationKey;
   messageLine1: LocalizationKey;
   messageLine2: LocalizationKey;
-  actionDescription?: LocalizationKey;
+  actionDescription: LocalizationKey;
   organizationName?: string;
   successMessage: LocalizationKey;
   submitLabel: LocalizationKey;
@@ -130,9 +128,7 @@ const ActionConfirmationPage = withCardStateProvider((props: ActionConfirmationP
 
   const confirmationField = useFormControl('deleteOrganizationConfirmation', '', {
     type: 'text',
-    label:
-      actionDescription ||
-      localizationKeys('organizationProfile.profilePage.dangerSection.leaveOrganization.actionDescription'),
+    label: actionDescription,
     isRequired: true,
     placeholder: organizationName,
   });

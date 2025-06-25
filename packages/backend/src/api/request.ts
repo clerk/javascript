@@ -12,7 +12,7 @@ export type ClerkBackendApiRequestOptions = {
   method: 'GET' | 'POST' | 'PATCH' | 'DELETE' | 'PUT';
   queryParams?: Record<string, unknown>;
   headerParams?: Record<string, string>;
-  bodyParams?: Record<string, unknown>;
+  bodyParams?: Record<string, unknown> | Array<Record<string, unknown>>;
   formData?: FormData;
 } & (
   | {
@@ -113,14 +113,24 @@ export function buildRequest(options: BuildRequestOptions) {
       } else {
         // Enforce application/json for all non form-data requests
         headers['Content-Type'] = 'application/json';
-        // Build body
-        const hasBody = method !== 'GET' && bodyParams && Object.keys(bodyParams).length > 0;
-        const body = hasBody ? { body: JSON.stringify(snakecaseKeys(bodyParams, { deep: false })) } : null;
+
+        const buildBody = () => {
+          const hasBody = method !== 'GET' && bodyParams && Object.keys(bodyParams).length > 0;
+          if (!hasBody) {
+            return null;
+          }
+
+          const formatKeys = (object: Parameters<typeof snakecaseKeys>[0]) => snakecaseKeys(object, { deep: false });
+
+          return {
+            body: JSON.stringify(Array.isArray(bodyParams) ? bodyParams.map(formatKeys) : formatKeys(bodyParams)),
+          };
+        };
 
         res = await runtime.fetch(finalUrl.href, {
           method,
           headers,
-          ...body,
+          ...buildBody(),
         });
       }
 

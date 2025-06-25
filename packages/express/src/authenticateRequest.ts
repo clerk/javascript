@@ -1,5 +1,6 @@
 import type { RequestState } from '@clerk/backend/internal';
 import { AuthStatus, createClerkRequest } from '@clerk/backend/internal';
+import { deprecated } from '@clerk/shared/deprecated';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps, isProxyUrlRelative, isValidProxyUrl } from '@clerk/shared/proxy';
 import { handleValueOrFn } from '@clerk/shared/utils';
@@ -12,7 +13,7 @@ import { incomingMessageToRequest, loadApiEnv, loadClientEnv } from './utils';
 
 export const authenticateRequest = (opts: AuthenticateRequestParams) => {
   const { clerkClient, request, options } = opts;
-  const { jwtKey, authorizedParties, audience } = options || {};
+  const { jwtKey, authorizedParties, audience, acceptsToken } = options || {};
 
   const clerkRequest = createClerkRequest(incomingMessageToRequest(request));
   const env = { ...loadApiEnv(), ...loadClientEnv() };
@@ -46,6 +47,7 @@ export const authenticateRequest = (opts: AuthenticateRequestParams) => {
     isSatellite,
     domain,
     signInUrl,
+    acceptsToken,
   });
 };
 
@@ -110,7 +112,21 @@ export const authenticateAndDecorateRequest = (options: ClerkMiddlewareOptions =
         }
       }
 
-      const auth = requestState.toAuth();
+      // TODO: For developers coming from the clerk-sdk-node package, we gave them examples
+      // to use `req.auth` without calling it as a function. We need to keep this for backwards compatibility.
+      const authHandler = (opts: Parameters<typeof requestState.toAuth>[0]) => requestState.toAuth(opts);
+      const authObject = requestState.toAuth();
+
+      const auth = new Proxy(authHandler, {
+        get(target, prop, receiver) {
+          deprecated('req.auth', 'Use `req.auth()` as a function instead.');
+          // If the property exists on the function, return it
+          if (prop in target) return Reflect.get(target, prop, receiver);
+          // Otherwise, get it from the authObject
+          return authObject?.[prop as keyof typeof authObject];
+        },
+      });
+
       Object.assign(request, { auth });
 
       next();

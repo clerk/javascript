@@ -4,9 +4,12 @@ import { loadClerkJsScript } from '@clerk/shared/loadClerkJsScript';
 import { handleValueOrFn } from '@clerk/shared/utils';
 import type {
   __internal_CheckoutProps,
+  __internal_OAuthConsentProps,
   __internal_PlanDetailsProps,
   __internal_UserVerificationModalProps,
   __internal_UserVerificationProps,
+  APIKeysNamespace,
+  APIKeysProps,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
@@ -98,11 +101,13 @@ type IsomorphicLoadedClerk = Without<
   | '__internal_getCachedResources'
   | '__internal_reloadInitialResources'
   | 'billing'
+  | 'apiKeys'
   | '__internal_setComponentNavigationContext'
   | '__internal_setActiveInProgress'
 > & {
   client: ClientResource | undefined;
   billing: CommerceBillingNamespace | undefined;
+  apiKeys: APIKeysNamespace | undefined;
 };
 
 export class IsomorphicClerk implements IsomorphicLoadedClerk {
@@ -131,6 +136,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountMethodCalls = new Map<MethodName<BrowserClerk>, MethodCallback>();
   private premountWaitlistNodes = new Map<HTMLDivElement, WaitlistProps | undefined>();
   private premountPricingTableNodes = new Map<HTMLDivElement, PricingTableProps | undefined>();
+  private premountApiKeysNodes = new Map<HTMLDivElement, APIKeysProps | undefined>();
+  private premountOAuthConsentNodes = new Map<HTMLDivElement, __internal_OAuthConsentProps | undefined>();
   // A separate Map of `addListener` method calls to handle multiple listeners.
   private premountAddListenerCalls = new Map<
     ListenerCallback,
@@ -609,6 +616,14 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.mountPricingTable(node, props);
     });
 
+    this.premountApiKeysNodes.forEach((props, node) => {
+      clerkjs.mountApiKeys(node, props);
+    });
+
+    this.premountOAuthConsentNodes.forEach((props, node) => {
+      clerkjs.__internal_mountOAuthConsent(node, props);
+    });
+
     /**
      * Only update status in case `clerk.status` is missing. In any other case, `clerk-js` should be the orchestrator.
      */
@@ -684,6 +699,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   get billing(): CommerceBillingNamespace | undefined {
     return this.clerkjs?.billing;
+  }
+
+  get apiKeys(): APIKeysNamespace | undefined {
+    return this.clerkjs?.apiKeys;
   }
 
   __unstable__setEnvironment(...args: any): void {
@@ -1047,6 +1066,38 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.clerkjs.unmountPricingTable(node);
     } else {
       this.premountPricingTableNodes.delete(node);
+    }
+  };
+
+  mountApiKeys = (node: HTMLDivElement, props?: APIKeysProps): void => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.mountApiKeys(node, props);
+    } else {
+      this.premountApiKeysNodes.set(node, props);
+    }
+  };
+
+  unmountApiKeys = (node: HTMLDivElement): void => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.unmountApiKeys(node);
+    } else {
+      this.premountApiKeysNodes.delete(node);
+    }
+  };
+
+  __internal_mountOAuthConsent = (node: HTMLDivElement, props?: __internal_OAuthConsentProps) => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.__internal_mountOAuthConsent(node, props);
+    } else {
+      this.premountOAuthConsentNodes.set(node, props);
+    }
+  };
+
+  __internal_unmountOAuthConsent = (node: HTMLDivElement) => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.__internal_unmountOAuthConsent(node);
+    } else {
+      this.premountOAuthConsentNodes.delete(node);
     }
   };
 

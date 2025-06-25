@@ -2,7 +2,8 @@ import { deprecated } from '@clerk/shared/deprecated';
 import type { Appearance } from '@clerk/types';
 import React, { lazy, Suspense } from 'react';
 
-import type { Drawer, FlowMetadata } from '../elements';
+import type { FlowMetadata } from '../elements/contexts';
+import type { Drawer } from '../elements/Drawer';
 import type { ThemableCssProp } from '../styledSystem';
 import type { ClerkComponentName } from './components';
 import { ClerkComponents } from './components';
@@ -18,10 +19,12 @@ const StyleCacheProvider = lazy(() =>
 );
 const Portal = lazy(() => import('./../portal').then(m => ({ default: m.Portal })));
 const VirtualBodyRootPortal = lazy(() => import('./../portal').then(m => ({ default: m.VirtualBodyRootPortal })));
-const FlowMetadataProvider = lazy(() => import('./../elements').then(m => ({ default: m.FlowMetadataProvider })));
-const Modal = lazy(() => import('./../elements').then(m => ({ default: m.Modal })));
-const DrawerRoot = lazy(() => import('./../elements').then(m => ({ default: m.Drawer.Root })));
-const DrawerOverlay = lazy(() => import('./../elements').then(m => ({ default: m.Drawer.Overlay })));
+const FlowMetadataProvider = lazy(() =>
+  import('./../elements/contexts').then(m => ({ default: m.FlowMetadataProvider })),
+);
+const Modal = lazy(() => import('./../elements/Modal').then(m => ({ default: m.Modal })));
+const DrawerRoot = lazy(() => import('./../elements/Drawer').then(m => ({ default: m.Drawer.Root })));
+const DrawerOverlay = lazy(() => import('./../elements/Drawer').then(m => ({ default: m.Drawer.Overlay })));
 const OrganizationSwitcherPrefetch = lazy(() =>
   import(/* webpackChunkName: "prefetchorganizationlist" */ '../components/prefetch-organization-list').then(m => ({
     default: m.OrganizationSwitcherPrefetch,
@@ -32,7 +35,10 @@ type LazyProvidersProps = React.PropsWithChildren<{ clerk: any; environment: any
 
 export const LazyProviders = (props: LazyProvidersProps) => {
   return (
-    <StyleCacheProvider nonce={props.options.nonce}>
+    <StyleCacheProvider
+      nonce={props.options.nonce}
+      cssLayerName={props.options.appearance?.cssLayerName}
+    >
       <CoreClerkContextWrapper clerk={props.clerk}>
         <EnvironmentProvider value={props.environment}>
           <OptionsProvider value={props.options}>{props.children}</OptionsProvider>

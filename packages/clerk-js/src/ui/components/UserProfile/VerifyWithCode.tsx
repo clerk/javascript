@@ -1,8 +1,12 @@
 import type { EmailAddressResource, PhoneNumberResource } from '@clerk/types';
 import React from 'react';
 
+import { useFieldOTP } from '@/ui/elements/CodeControl';
+import { useCardState } from '@/ui/elements/contexts';
+import { Form } from '@/ui/elements/Form';
+import { FormButtonContainer } from '@/ui/elements/FormButtons';
+
 import { Button, descriptors, localizationKeys } from '../../customizables';
-import { Form, FormButtonContainer, useCardState, useFieldOTP } from '../../elements';
 import { handleError } from '../../utils';
 
 type VerifyWithCodeProps = {
@@ -41,7 +45,9 @@ export const VerifyWithCode = (props: VerifyWithCodeProps) => {
       <Form.OTPInput
         {...otp}
         label={localizationKeys('userProfile.emailAddressPage.emailCode.formTitle')}
-        description={localizationKeys('userProfile.emailAddressPage.emailCode.formSubtitle', { identifier })}
+        description={localizationKeys('userProfile.emailAddressPage.emailCode.formSubtitle', {
+          identifier: identifier || '',
+        })}
         resendButton={localizationKeys('userProfile.emailAddressPage.emailCode.resendButton')}
         centerAlign={false}
       />

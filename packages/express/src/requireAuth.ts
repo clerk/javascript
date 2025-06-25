@@ -33,7 +33,10 @@ import type { ClerkMiddlewareOptions, ExpressRequestWithAuth } from './types';
  * router.get('/path', requireAuth(), hasPermission, getHandler)
  */
 export const requireAuth = (options: ClerkMiddlewareOptions = {}): RequestHandler => {
-  const authMiddleware = authenticateAndDecorateRequest(options);
+  const authMiddleware = authenticateAndDecorateRequest({
+    ...options,
+    acceptsToken: 'any',
+  });
 
   return (request, response, next) => {
     authMiddleware(request, response, err => {
@@ -43,7 +46,7 @@ export const requireAuth = (options: ClerkMiddlewareOptions = {}): RequestHandle
 
       const signInUrl = options.signInUrl || process.env.CLERK_SIGN_IN_URL || '/';
 
-      if (!(request as ExpressRequestWithAuth).auth?.userId) {
+      if (!(request as ExpressRequestWithAuth).auth()?.userId) {
         return response.redirect(signInUrl);
       }
 

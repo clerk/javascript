@@ -2,6 +2,7 @@
  * Currently representing API DTOs in their JSON form.
  */
 
+import type { APIKeysSettingsJSON } from './apiKeysSettings';
 import type {
   CommercePaymentChargeType,
   CommercePaymentSourceStatus,
@@ -70,6 +71,7 @@ export interface ImageJSON {
 
 export interface EnvironmentJSON extends ClerkResourceJSON {
   auth_config: AuthConfigJSON;
+  api_keys_settings: APIKeysSettingsJSON;
   commerce_settings: CommerceSettingsJSON;
   display_config: DisplayConfigJSON;
   user_settings: UserSettingsJSON;
@@ -305,6 +307,7 @@ export interface AuthConfigJSON extends ClerkResourceJSON {
   single_session_mode: boolean;
   claimed_at: number | null;
   reverification: boolean;
+  preferred_channels?: Record<string, PhoneCodeChannel>;
 }
 
 export interface VerificationJSON extends ClerkResourceJSON {
@@ -348,6 +351,13 @@ export interface ClerkAPIErrorJSON {
         message: string;
       }[];
     };
+    plan?: {
+      amount_formatted: string;
+      annual_monthly_amount_formatted: string;
+      currency_symbol: string;
+      id: string;
+      name: string;
+    };
   };
 }
 
@@ -389,8 +399,9 @@ export interface OrganizationMembershipJSON extends ClerkResourceJSON {
   organization: OrganizationJSON;
   permissions: OrganizationPermissionKey[];
   public_metadata: OrganizationMembershipPublicMetadata;
-  public_user_data: PublicUserDataJSON;
+  public_user_data?: PublicUserDataJSON;
   role: OrganizationCustomRoleKey;
+  role_name: string;
   created_at: number;
   updated_at: number;
 }
@@ -403,6 +414,7 @@ export interface OrganizationInvitationJSON extends ClerkResourceJSON {
   public_metadata: OrganizationInvitationPublicMetadata;
   status: OrganizationInvitationStatus;
   role: OrganizationCustomRoleKey;
+  role_name: string;
   created_at: number;
   updated_at: number;
 }
@@ -637,6 +649,7 @@ export interface CommercePaymentSourceJSON extends ClerkResourceJSON {
   payment_method: string;
   card_type: string;
   is_default: boolean;
+  is_removable: boolean;
   status: CommercePaymentSourceStatus;
   wallet_type: string | null;
 }
@@ -645,6 +658,7 @@ export interface CommerceInitializedPaymentSourceJSON extends ClerkResourceJSON 
   object: 'commerce_payment_source_initialize';
   external_client_secret: string;
   external_gateway_id: string;
+  payment_method_order: string[];
 }
 
 export interface CommerceStatementJSON extends ClerkResourceJSON {
@@ -666,8 +680,12 @@ export interface CommercePaymentJSON extends ClerkResourceJSON {
   object: 'commerce_payment';
   id: string;
   amount: CommerceMoneyJSON;
+  paid_at?: number;
+  failed_at?: number;
+  updated_at: number;
   payment_source: CommercePaymentSourceJSON;
   subscription: CommerceSubscriptionJSON;
+  subscription_item: CommerceSubscriptionJSON;
   charge_type: CommercePaymentChargeType;
   status: CommercePaymentStatus;
 }
@@ -719,4 +737,22 @@ export interface CommerceCheckoutJSON extends ClerkResourceJSON {
   status: string;
   totals: CommerceCheckoutTotalsJSON;
   is_immediate_plan_change: boolean;
+}
+
+export interface ApiKeyJSON extends ClerkResourceJSON {
+  id: string;
+  type: string;
+  name: string;
+  subject: string;
+  scopes: string[];
+  claims: Record<string, any> | null;
+  revoked: boolean;
+  revocation_reason: string | null;
+  expired: boolean;
+  expiration: number | null;
+  created_by: string | null;
+  description: string | null;
+  last_used_at: number | null;
+  created_at: number;
+  updated_at: number;
 }

@@ -1,7 +1,9 @@
 import type { LocalizationKey } from '../customizables';
 import { Col, descriptors } from '../customizables';
 import type { PropsOfComponent } from '../styledSystem';
-import { Card, Header, useCardState } from './index';
+import { Card } from './Card';
+import { useCardState } from './contexts';
+import { Header } from './Header';
 
 export type FormProps = {
   onSuccess: () => void;
@@ -38,14 +40,16 @@ export const FormContainer = (props: PageProps) => {
         <Header.Root>
           {headerTitle && (
             <Header.Title
-              localizationKey={headerTitle}
               textVariant={headerTitleTextVariant}
+              {...(typeof headerTitle === 'string' ? { children: headerTitle } : { localizationKey: headerTitle })}
             />
           )}
           {headerSubtitle && (
             <Header.Subtitle
-              localizationKey={headerSubtitle}
               variant={headerSubtitleTextVariant}
+              {...(typeof headerSubtitle === 'string'
+                ? { children: headerSubtitle }
+                : { localizationKey: headerSubtitle })}
             />
           )}
         </Header.Root>

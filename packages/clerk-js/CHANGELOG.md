@@ -1,5 +1,215 @@
 # Change Log
 
+## 5.69.1
+
+### Patch Changes
+
+- Add element descriptors to `<APIKeys />` component ([#6095](https://github.com/clerk/javascript/pull/6095)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fixed issues causing incorrect form fields or restricted access for users with existing sign-up tickets ([#6143](https://github.com/clerk/javascript/pull/6143)) by [@jacekradko](https://github.com/jacekradko)
+
+- Prevent organization list from displaying after creating an organization through the force organization selection flow ([#6117](https://github.com/clerk/javascript/pull/6117)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Replace expiration segmented list with dropdown and hide description field in `<APIKeys />` component ([#6153](https://github.com/clerk/javascript/pull/6153)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Add `signInMode` prop to `PricingTable` for configuring sign in behavior ([#6154](https://github.com/clerk/javascript/pull/6154)) by [@aeliox](https://github.com/aeliox)
+
+- Reworked the cache key creation logic in SignInFactorOneCodeForm.tsx not to rely on sign_in.id, which can change after host app re-renders ([#6134](https://github.com/clerk/javascript/pull/6134)) by [@jacekradko](https://github.com/jacekradko)
+
+- Bug fix: Drawers would always act as prefered-reduced-motion was turned on on the first render. ([#6149](https://github.com/clerk/javascript/pull/6149)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fixes a scenario where the session token would not immediately update after a call to `Clerk.session.touch()`. ([#6144](https://github.com/clerk/javascript/pull/6144)) by [@brkalow](https://github.com/brkalow)
+
+- Updated dependencies [[`86f32ab`](https://github.com/clerk/javascript/commit/86f32ab3e32a929504b6d6ccb005d097f005b28a), [`b495279`](https://github.com/clerk/javascript/commit/b4952796e3c7dee4ab4726de63a17b7f4265ce37), [`c3fa15d`](https://github.com/clerk/javascript/commit/c3fa15d60642b4fcbcf26e21caaca0fc60975795), [`52d5e57`](https://github.com/clerk/javascript/commit/52d5e5768d54725b4d20d028135746493e05d44c), [`15a945c`](https://github.com/clerk/javascript/commit/15a945c02a9f6bc8d2f7d1e3534217100bf45936), [`9487346`](https://github.com/clerk/javascript/commit/94873467057fd3948e4182406a928030dc073bf8), [`656851d`](https://github.com/clerk/javascript/commit/656851da4a2cd3ec987c1f815f1bc621fbf00b90), [`72629b0`](https://github.com/clerk/javascript/commit/72629b06fb1fe720fa2a61462306a786a913e9a8), [`0271fd3`](https://github.com/clerk/javascript/commit/0271fd30e1fb8fa838cf4ca56094c74404982eff)]:
+  - @clerk/localizations@3.17.0
+  - @clerk/types@4.61.0
+  - @clerk/shared@3.9.8
+
+## 5.69.0
+
+### Minor Changes
+
+- Add `<APIKeys />` component. This component will initially be in early access and not recommended for production usage just yet. ([#5858](https://github.com/clerk/javascript/pull/5858)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Add payment history tab to UserProfile and OrgProfile ([#6075](https://github.com/clerk/javascript/pull/6075)) by [@aeliox](https://github.com/aeliox)
+
+- Maintain current active organization when `setActive({ organization: null })` is called with force organization selection enabled ([#6103](https://github.com/clerk/javascript/pull/6103)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Add `.v0.dev` as prefered origin for oauth flows with popup. ([#6118](https://github.com/clerk/javascript/pull/6118)) by [@mwickett](https://github.com/mwickett)
+
+- Do not allow `setActive({ organization: null })` when organization selection is forced ([#6073](https://github.com/clerk/javascript/pull/6073)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Fix Stripe Elements error handling ([#6074](https://github.com/clerk/javascript/pull/6074)) by [@aeliox](https://github.com/aeliox)
+
+- Use error metadata for invalid change plan screen on `Checkout` component. ([#6102](https://github.com/clerk/javascript/pull/6102)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add localizations for some commerce strings, general cleanups ([#6101](https://github.com/clerk/javascript/pull/6101)) by [@aeliox](https://github.com/aeliox)
+
+- Display info tooltip for past due amounts at checkout. ([#6097](https://github.com/clerk/javascript/pull/6097)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`19e9e11`](https://github.com/clerk/javascript/commit/19e9e11af04f13fd12975fbf7016fe0583202056), [`18bcb64`](https://github.com/clerk/javascript/commit/18bcb64a3e8b6d352d7933ed094d68214e6e80fb), [`138f733`](https://github.com/clerk/javascript/commit/138f733f13121487268a4f96e6eb2cffedc6e238), [`48be55b`](https://github.com/clerk/javascript/commit/48be55b61a86e014dd407414764d24bb43fd26f3), [`2c6f805`](https://github.com/clerk/javascript/commit/2c6f805a9e6e4685990f9a8abc740b2d0859a453), [`97749d5`](https://github.com/clerk/javascript/commit/97749d570bc687c7e05cd800a50e0ae4180a371d)]:
+  - @clerk/localizations@3.16.5
+  - @clerk/types@4.60.1
+  - @clerk/shared@3.9.7
+
+## 5.68.0
+
+### Minor Changes
+
+- Introduce `cssLayerName` option to allow users to opt Clerk styles into a native CSS layer. ([#5552](https://github.com/clerk/javascript/pull/5552)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Get `payment_method_order` for Stripe payment elements from backend ([#6034](https://github.com/clerk/javascript/pull/6034)) by [@aeliox](https://github.com/aeliox)
+
+- Use the `is_removable` flag on a payment source to determine if it can be removed. ([#6033](https://github.com/clerk/javascript/pull/6033)) by [@aeliox](https://github.com/aeliox)
+
+- Clean up layout and logic of the `PlanDetails` drawer ([#5928](https://github.com/clerk/javascript/pull/5928)) by [@aeliox](https://github.com/aeliox)
+
+- Initiate enterprise SSO from ticket flows, such as organization invitations. ([#6009](https://github.com/clerk/javascript/pull/6009)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Introduce internal `<OAuthConsent />` component to be used internally in the machine auth OAuth flow in account portal. ([#6021](https://github.com/clerk/javascript/pull/6021)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- feat(types,clerk-js): Update types; RoleSelect allows fallbackLabel ([#6037](https://github.com/clerk/javascript/pull/6037)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
+  - this updates OrganizationInvitation and OrganizationMembership resource+types to include `roleName` which is already present on frontend-api responses, as `role_name`.
+  - this updates RoleSelect to allow rendering a `fallbackLabel` in the event that `value` does not map to any of the supplied roles
+
+- Updated dependencies [[`d8fa5d9`](https://github.com/clerk/javascript/commit/d8fa5d9d3d8dc575260d8d2b7c7eeeb0052d0b0d), [`be2e89c`](https://github.com/clerk/javascript/commit/be2e89ca11aa43d48f74c57a5a34e20d85b4003c), [`85f3db4`](https://github.com/clerk/javascript/commit/85f3db4305b78a71271526b5ef900a5d1b941805), [`5644d94`](https://github.com/clerk/javascript/commit/5644d94f711a0733e4970c3f15c24d56cafc8743), [`b578225`](https://github.com/clerk/javascript/commit/b5782258242474c9b0987a3f8349836cd763f24b), [`8838120`](https://github.com/clerk/javascript/commit/8838120596830b88fec1c6c853371dabfec74a0d)]:
+  - @clerk/types@4.60.0
+  - @clerk/localizations@3.16.4
+  - @clerk/shared@3.9.6
+
+## 5.67.5
+
+### Patch Changes
+
+- Fixes a bug where the session cookie was getting incorrectly set from tabs that do not reflect the active session. ([#5989](https://github.com/clerk/javascript/pull/5989)) by [@brkalow](https://github.com/brkalow)
+
+- Fix an issue where clerk-js was incorrectly emitting the new session's token during session switching. This impacts some applications that rely on Clerk's multi-session behavior. ([#5986](https://github.com/clerk/javascript/pull/5986)) by [@brkalow](https://github.com/brkalow)
+
+- Fix issue where the combined flow wouldn't trigger if a phone number was used as an identifier while set as an optional field. ([#5992](https://github.com/clerk/javascript/pull/5992)) by [@dstaley](https://github.com/dstaley)
+
+- Add "Past Due" amount on checkout flow when applicable ([#6014](https://github.com/clerk/javascript/pull/6014)) by [@octoper](https://github.com/octoper)
+
+- Handle missing `publicUserData` in `OrganizationMembership` ([#6016](https://github.com/clerk/javascript/pull/6016)) by [@tmilewski](https://github.com/tmilewski)
+
+- Add support for the signup_rate_limit_exceeded error on OAuth flows ([#6028](https://github.com/clerk/javascript/pull/6028)) by [@anagstef](https://github.com/anagstef)
+
+- Updated dependencies [[`f897773`](https://github.com/clerk/javascript/commit/f89777379da63cf45039c1570b51ba10a400817c), [`2c6a0cc`](https://github.com/clerk/javascript/commit/2c6a0cca6e824bafc6b0d0501784517a5b1f75ea), [`71e6a1f`](https://github.com/clerk/javascript/commit/71e6a1f1024d65b7a09cdc8fa81ce0164e0a34cb)]:
+  - @clerk/shared@3.9.5
+  - @clerk/localizations@3.16.3
+  - @clerk/types@4.59.3
+
+## 5.67.4
+
+### Patch Changes
+
+- Replaces `useFetch` with `useSWR` or `useSWRMutation` in all commerce related components. ([#5939](https://github.com/clerk/javascript/pull/5939)) by [@panteliselef](https://github.com/panteliselef)
+
+- Fix logic for allowing removal of all payment methods if there are no paid subscriptions ([#5975](https://github.com/clerk/javascript/pull/5975)) by [@aeliox](https://github.com/aeliox)
+
+- Pass the full statement id to the list item to ensure the full value is copied to clipboard. ([#5984](https://github.com/clerk/javascript/pull/5984)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Refactors checkout success highlight animation to fix an issue where background colors other that white, would not properly mask the highlight glow. ([#5991](https://github.com/clerk/javascript/pull/5991)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Drop throttling for multisession apps to fix edge cases when quickly switching between tabs with different sessions, in apps that have multisession support enabled. ([#5990](https://github.com/clerk/javascript/pull/5990)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`6ed3dfc`](https://github.com/clerk/javascript/commit/6ed3dfc1bc742ac9d9a2307fe8e4733411cbc0d7), [`f6a4a7b`](https://github.com/clerk/javascript/commit/f6a4a7b89b9728703ca1ec5bb63fdf2ae736e39c)]:
+  - @clerk/types@4.59.2
+  - @clerk/localizations@3.16.2
+  - @clerk/shared@3.9.4
+
+## 5.67.3
+
+### Patch Changes
+
+- Bug fix: Remove cancel subscription option when implicitly subscribed to the default free plan. ([#5946](https://github.com/clerk/javascript/pull/5946)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Maintain \_ _clerk_ticket and _ \_clerk_status query params through sign up verification flow ([#5965](https://github.com/clerk/javascript/pull/5965)) by [@jacekradko](https://github.com/jacekradko)
+
+- Maintain selected identifier when going through combined flow ([#5972](https://github.com/clerk/javascript/pull/5972)) by [@jacekradko](https://github.com/jacekradko)
+
+- Remove 'sms' channel parameter from phone code requests ([#5966](https://github.com/clerk/javascript/pull/5966)) by [@anagstef](https://github.com/anagstef)
+
+- Updated dependencies [[`f237d76`](https://github.com/clerk/javascript/commit/f237d7617e5398ca0ba981e4336cac2191505b00)]:
+  - @clerk/shared@3.9.3
+
+## 5.67.2
+
+### Patch Changes
+
+- Add support for country-specific alternative phone code channels ([#5937](https://github.com/clerk/javascript/pull/5937)) by [@anagstef](https://github.com/anagstef)
+
+- Allow removal of all payment methods when there are no active subscriptions ([#5963](https://github.com/clerk/javascript/pull/5963)) by [@aeliox](https://github.com/aeliox)
+
+- Removes z-index from keyless prompt to prevent overlay issues with drawers. ([#5951](https://github.com/clerk/javascript/pull/5951)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add checkout success animation highlight. ([#5940](https://github.com/clerk/javascript/pull/5940)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fixes issue where min/max username lengths errors were not properly interpolated within profile component. ([#5948](https://github.com/clerk/javascript/pull/5948)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`c305b31`](https://github.com/clerk/javascript/commit/c305b310e351e9ce2012f805b35e464c3e43e310), [`6bb480e`](https://github.com/clerk/javascript/commit/6bb480ef663a6dfa219bc9546aca087d5d9624d0)]:
+  - @clerk/localizations@3.16.1
+  - @clerk/types@4.59.1
+  - @clerk/shared@3.9.2
+
+## 5.67.1
+
+### Patch Changes
+
+- Fix showing alternative phone code provider when no other SSO exists. ([#5942](https://github.com/clerk/javascript/pull/5942)) by [@anagstef](https://github.com/anagstef)
+
+## 5.67.0
+
+### Minor Changes
+
+- Introduce `__experimental_startPath` option for `openOrganizationProfile`. ([#5926](https://github.com/clerk/javascript/pull/5926)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  Example usage:
+
+  ```ts
+  clerk.openOrganizationProfile({
+    __experimental_startPath: '/billing',
+  });
+  ```
+
+- Replaces strings with localizations throughout billing components. ([#5922](https://github.com/clerk/javascript/pull/5922)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Hide "Set as default" from the action menu of the default MFA method ([#5933](https://github.com/clerk/javascript/pull/5933)) by [@octoper](https://github.com/octoper)
+
+- Add `oidcPrompt` prop to `SignIn` and `SignUp` components and `authenticateWithRedirect` method to control the OIDC authentication prompt behavior during Enterprise SSO flows ([#5925](https://github.com/clerk/javascript/pull/5925)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  ```tsx
+  <SignUp oidcPrompt='select_account' />
+  <SignIn oidcPrompt='select_account' />
+  ```
+
+  ```ts
+  signUp.authenticateWithRedirect({ redirectUrl: '/sso-callback', oidcPrompt: 'select_account' });
+  ```
+
+- Replace `useFetch` with `useSWRMutate` on checkout. ([#5932](https://github.com/clerk/javascript/pull/5932)) by [@panteliselef](https://github.com/panteliselef)
+
+- Bug fix: Call `setActive` after closing Checkout to ensure RSCs re-render with the new auth context. ([#5916](https://github.com/clerk/javascript/pull/5916)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add `drawerRoot` descriptor and adjust z-index approach. ([#5924](https://github.com/clerk/javascript/pull/5924)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Only lock scroll when Drawer is using fixed strategy ([#5936](https://github.com/clerk/javascript/pull/5936)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fixing issues where checkout data being stale ([#5921](https://github.com/clerk/javascript/pull/5921)) by [@octoper](https://github.com/octoper)
+
+- Bug fix: Always invalidate checkout object when `<Checkout/>` unmounts. ([#5929](https://github.com/clerk/javascript/pull/5929)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`b1337df`](https://github.com/clerk/javascript/commit/b1337dfeae8ccf8622efcf095e3201f9bbf1cefa), [`65f0878`](https://github.com/clerk/javascript/commit/65f08788ee5e56242eee2194c73ba90965c75c97), [`df6fefd`](https://github.com/clerk/javascript/commit/df6fefd05fd2df93f5286d97e546b48911adea7c), [`4282bfa`](https://github.com/clerk/javascript/commit/4282bfa09491225bde7d619fe9a3561062703f69), [`5491491`](https://github.com/clerk/javascript/commit/5491491711e0a8ee37828451c1f603a409de32cf)]:
+  - @clerk/types@4.59.0
+  - @clerk/localizations@3.16.0
+  - @clerk/shared@3.9.1
+
 ## 5.66.0
 
 ### Minor Changes

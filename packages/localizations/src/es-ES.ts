@@ -71,6 +71,7 @@ export const esES: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     monthly: undefined,
+    pastDue: undefined,
     pay: undefined,
     paymentMethods: undefined,
     paymentSource: {
@@ -119,6 +120,7 @@ export const esES: LocalizationResource = {
     sameDay: "Hoy a las {{ date | timeString('es-ES') }}",
   },
   dividerText: 'o',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'Usar otro método',
   footerPageLink__help: 'Ayuda',
   footerPageLink__privacy: 'Privacidad',
@@ -659,7 +661,8 @@ export const esES: LocalizationResource = {
       checkbox: {
         label__onlyPrivacyPolicy: 'He leído y acepto la Política de Privacidad',
         label__onlyTermsOfService: 'He leído y acepto los Términos de Servicio',
-        label__termsOfServiceAndPrivacyPolicy: 'He leído y acepto los Términos de Servicio y la Política de Privacidad',
+        label__termsOfServiceAndPrivacyPolicy:
+          'He leído y acepto los {{ termsOfServiceLink || link("Términos de Servicio") }} y la {{ privacyPolicyLink || link("Política de Privacidad") }}',
       },
       continue: {
         subtitle: 'Al continuar, aceptas las condiciones mencionadas.',
@@ -747,13 +750,13 @@ export const esES: LocalizationResource = {
     passkey_registration_cancelled: 'El registro de la clave de acceso fue cancelado.',
     passkey_retrieval_cancelled: 'La recuperación de la clave de acceso fue cancelada.',
     passwordComplexity: {
-      maximumLength: 'La contraseña no debe exceder los {{maxLength}} caracteres.',
-      minimumLength: 'La contraseña debe tener al menos {{minLength}} caracteres.',
-      requireLowercase: 'La contraseña debe contener al menos una letra minúscula.',
-      requireNumbers: 'La contraseña debe contener al menos un número.',
-      requireSpecialCharacter: 'La contraseña debe contener al menos un carácter especial.',
-      requireUppercase: 'La contraseña debe contener al menos una letra mayúscula.',
-      sentencePrefix: 'Tu contraseña debe cumplir con los requisitos de complejidad.',
+      maximumLength: 'Menos de {{length}} caracteres',
+      minimumLength: '{{length}} caracteres o más',
+      requireLowercase: 'Al menos una letra minúscula',
+      requireNumbers: 'Al menos un número',
+      requireSpecialCharacter: 'Al menos un carácter especial',
+      requireUppercase: 'Al menos una letra mayúscula',
+      sentencePrefix: 'Tu contraseña debe contener:',
     },
     phone_number_exists: 'Este número de teléfono ya está en uso. Por favor, inténtelo con otro.',
     session_exists: 'Ya has iniciado sesión',

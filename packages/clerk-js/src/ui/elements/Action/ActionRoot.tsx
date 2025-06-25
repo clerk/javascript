@@ -2,7 +2,7 @@ import { createContextAndHook } from '@clerk/shared/react';
 import type { PropsWithChildren } from 'react';
 import { useCallback, useState } from 'react';
 
-import { Animated } from '..';
+import { Animated } from '../Animated';
 
 type ActionRootProps = PropsWithChildren<{
   animate?: boolean;

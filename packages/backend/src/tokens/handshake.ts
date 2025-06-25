@@ -9,6 +9,7 @@ import { AuthErrorReason, signedIn, signedOut } from './authStatus';
 import { getCookieName, getCookieValue } from './cookie';
 import { loadClerkJWKFromLocal, loadClerkJWKFromRemote } from './keys';
 import type { OrganizationMatcher } from './organizationMatcher';
+import { TokenType } from './tokenTypes';
 import type { OrganizationSyncOptions, OrganizationSyncTarget } from './types';
 import type { VerifyTokenOptions } from './verify';
 import { verifyToken } from './verify';
@@ -83,7 +84,6 @@ export async function verifyHandshakeToken(
 }
 
 export class HandshakeService {
-  private redirectLoopCounter: number;
   private readonly authenticateContext: AuthenticateContext;
   private readonly organizationMatcher: OrganizationMatcher;
   private readonly options: { organizationSyncOptions?: OrganizationSyncOptions };
@@ -96,7 +96,6 @@ export class HandshakeService {
     this.authenticateContext = authenticateContext;
     this.options = options;
     this.organizationMatcher = organizationMatcher;
-    this.redirectLoopCounter = 0;
   }
 
   /**
@@ -135,9 +134,14 @@ export class HandshakeService {
     }
 
     const redirectUrl = this.removeDevBrowserFromURL(this.authenticateContext.clerkUrl);
-    const frontendApiNoProtocol = this.authenticateContext.frontendApi.replace(/http(s)?:\/\//, '');
 
-    const url = new URL(`https://${frontendApiNoProtocol}/v1/client/handshake`);
+    let baseUrl = this.authenticateContext.frontendApi.startsWith('http')
+      ? this.authenticateContext.frontendApi
+      : `https://${this.authenticateContext.frontendApi}`;
+
+    baseUrl = baseUrl.replace(/\/+$/, '') + '/';
+
+    const url = new URL('v1/client/handshake', baseUrl);
     url.searchParams.append('redirect_url', redirectUrl?.href || '');
     url.searchParams.append('__clerk_api_version', SUPPORTED_BAPI_VERSION);
     url.searchParams.append(
@@ -227,12 +231,24 @@ export class HandshakeService {
     }
 
     if (sessionToken === '') {
-      return signedOut(this.authenticateContext, AuthErrorReason.SessionTokenMissing, '', headers);
+      return signedOut({
+        tokenType: TokenType.SessionToken,
+        authenticateContext: this.authenticateContext,
+        reason: AuthErrorReason.SessionTokenMissing,
+        message: '',
+        headers,
+      });
     }
 
     const { data, errors: [error] = [] } = await verifyToken(sessionToken, this.authenticateContext);
     if (data) {
-      return signedIn(this.authenticateContext, data, headers, sessionToken);
+      return signedIn({
+        tokenType: TokenType.SessionToken,
+        authenticateContext: this.authenticateContext,
+        sessionClaims: data,
+        headers,
+        token: sessionToken,
+      });
     }
 
     if (
@@ -265,7 +281,13 @@ ${developmentError.getFullMessage()}`,
         clockSkewInMs: 86_400_000,
       });
       if (retryResult) {
-        return signedIn(this.authenticateContext, retryResult, headers, sessionToken);
+        return signedIn({
+          tokenType: TokenType.SessionToken,
+          authenticateContext: this.authenticateContext,
+          sessionClaims: retryResult,
+          headers,
+          token: sessionToken,
+        });
       }
 
       throw new Error(retryError?.message || 'Clerk: Handshake retry failed.');
@@ -299,11 +321,11 @@ ${developmentError.getFullMessage()}`,
    * @returns boolean indicating if a redirect loop was detected (true) or if the request can proceed (false)
    */
   checkAndTrackRedirectLoop(headers: Headers): boolean {
-    if (this.redirectLoopCounter === 3) {
+    if (this.authenticateContext.handshakeRedirectLoopCounter === 3) {
       return true;
     }
 
-    const newCounterValue = this.redirectLoopCounter + 1;
+    const newCounterValue = this.authenticateContext.handshakeRedirectLoopCounter + 1;
     const cookieName = constants.Cookies.RedirectCount;
     headers.append('Set-Cookie', `${cookieName}=${newCounterValue}; SameSite=Lax; HttpOnly; Max-Age=3`);
     return false;

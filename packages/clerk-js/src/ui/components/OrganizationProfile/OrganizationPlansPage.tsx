@@ -1,7 +1,9 @@
+import { Alert } from '@/ui/elements/Alert';
+import { Header } from '@/ui/elements/Header';
+
 import { Protect } from '../../common';
-import { PlansContextProvider, PricingTableContext, SubscriberTypeContext } from '../../contexts';
+import { PricingTableContext, SubscriberTypeContext } from '../../contexts';
 import { Flex } from '../../customizables';
-import { Alert, Header } from '../../elements';
 import { localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
 import { PricingTable } from '../PricingTable/PricingTable';
@@ -20,7 +22,9 @@ const OrganizationPlansPageInternal = () => {
           paddingBlockEnd: t.space.$4,
         })}
       >
-        <Header.BackLink onClick={() => void navigate('../', { searchParams: new URLSearchParams('tab=plans') })}>
+        <Header.BackLink
+          onClick={() => void navigate('../', { searchParams: new URLSearchParams('tab=subscriptions') })}
+        >
           <Header.Title
             localizationKey={localizationKeys('organizationProfile.plansPage.title')}
             textVariant='h2'
@@ -50,9 +54,7 @@ const OrganizationPlansPageInternal = () => {
 export const OrganizationPlansPage = () => {
   return (
     <SubscriberTypeContext.Provider value='org'>
-      <PlansContextProvider>
-        <OrganizationPlansPageInternal />
-      </PlansContextProvider>
+      <OrganizationPlansPageInternal />
     </SubscriberTypeContext.Provider>
   );
 };

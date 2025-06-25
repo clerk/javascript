@@ -1,14 +1,21 @@
-import type { PricingTableProps, UserButtonProps, WaitlistProps } from '@clerk/types';
+import type {
+  __internal_OAuthConsentProps,
+  APIKeysProps,
+  PricingTableProps,
+  UserButtonProps,
+  WaitlistProps,
+} from '@clerk/types';
 import type { ReactNode } from 'react';
 
 import type { AvailableComponentName, AvailableComponentProps } from '../types';
 import {
+  ApiKeysContext,
   CreateOrganizationContext,
   GoogleOneTapContext,
+  OAuthConsentContext,
   OrganizationListContext,
   OrganizationProfileContext,
   OrganizationSwitcherContext,
-  PlansContextProvider,
   PricingTableContext,
   SignInContext,
   SignUpContext,
@@ -84,12 +91,22 @@ export function ComponentContextProvider({
     case 'PricingTable':
       return (
         <SubscriberTypeContext.Provider value={(props as PricingTableProps).forOrganizations ? 'org' : 'user'}>
-          <PlansContextProvider>
-            <PricingTableContext.Provider value={{ componentName, ...(props as PricingTableProps) }}>
-              {children}
-            </PricingTableContext.Provider>
-          </PlansContextProvider>
+          <PricingTableContext.Provider value={{ componentName, ...(props as PricingTableProps) }}>
+            {children}
+          </PricingTableContext.Provider>
         </SubscriberTypeContext.Provider>
+      );
+    case 'APIKeys':
+      return (
+        <ApiKeysContext.Provider value={{ componentName, ...(props as APIKeysProps) }}>
+          {children}
+        </ApiKeysContext.Provider>
+      );
+    case 'OAuthConsent':
+      return (
+        <OAuthConsentContext.Provider value={{ componentName, ...(props as __internal_OAuthConsentProps) }}>
+          {children}
+        </OAuthConsentContext.Provider>
       );
 
     default:

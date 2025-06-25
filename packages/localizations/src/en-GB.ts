@@ -71,6 +71,7 @@ export const enGB: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     monthly: undefined,
+    pastDue: undefined,
     pay: undefined,
     paymentMethods: undefined,
     paymentSource: {
@@ -119,6 +120,7 @@ export const enGB: LocalizationResource = {
     sameDay: "Today at {{ date | timeString('en-GB') }}",
   },
   dividerText: 'or',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'Use another method',
   footerPageLink__help: 'Help',
   footerPageLink__privacy: 'Privacy',

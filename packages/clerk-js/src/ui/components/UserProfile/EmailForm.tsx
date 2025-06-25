@@ -2,10 +2,14 @@ import { useReverification, useUser } from '@clerk/shared/react';
 import type { EmailAddressResource, EnvironmentResource, PrepareEmailAddressVerificationParams } from '@clerk/types';
 import React from 'react';
 
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { Form } from '@/ui/elements/Form';
+import { FormButtons } from '@/ui/elements/FormButtons';
+import type { FormProps } from '@/ui/elements/FormContainer';
+import { FormContainer } from '@/ui/elements/FormContainer';
+
 import { useWizard, Wizard } from '../../common';
 import { useEnvironment } from '../../contexts';
-import type { FormProps } from '../../elements';
-import { Form, FormButtons, FormContainer, useCardState, withCardStateProvider } from '../../elements';
 import type { LocalizationKey } from '../../localization';
 import { localizationKeys } from '../../localization';
 import { handleError, useFormControl } from '../../utils';
@@ -82,7 +86,7 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
       <FormContainer
         headerTitle={localizationKeys('userProfile.emailAddressPage.verifyTitle')}
         headerSubtitle={localizationKeys(`${translationKey}.formSubtitle`, {
-          identifier: emailAddressRef.current?.emailAddress,
+          identifier: emailAddressRef.current?.emailAddress || '',
         })}
       >
         {strategy === 'email_link' && (

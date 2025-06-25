@@ -1,5 +1,4 @@
 import { useEnvironment } from '../../ui/contexts';
-import { sanitizeInputProps, useFormField } from '../../ui/primitives/hooks';
 import type { LocalizationKey } from '../customizables';
 import {
   descriptors,
@@ -10,6 +9,7 @@ import {
   useAppearance,
   useLocalizations,
 } from '../customizables';
+import { sanitizeInputProps, useFormField } from '../primitives/hooks/useFormField';
 import type { PropsOfComponent } from '../styledSystem';
 import { Field } from './FieldControl';
 import { LinkRenderer } from './LinkRenderer';
@@ -23,16 +23,16 @@ const LegalCheckboxLabel = (props: { termsUrl?: string; privacyPolicyUrl?: strin
 
   if (termsUrl && privacyPolicyUrl) {
     localizationKey = localizationKeys('signUp.legalConsent.checkbox.label__termsOfServiceAndPrivacyPolicy', {
-      termsOfServiceLink: props.termsUrl,
-      privacyPolicyLink: props.privacyPolicyUrl,
+      termsOfServiceLink: termsUrl,
+      privacyPolicyLink: privacyPolicyUrl,
     });
   } else if (termsUrl) {
     localizationKey = localizationKeys('signUp.legalConsent.checkbox.label__onlyTermsOfService', {
-      termsOfServiceLink: props.termsUrl,
+      termsOfServiceLink: termsUrl,
     });
   } else if (privacyPolicyUrl) {
     localizationKey = localizationKeys('signUp.legalConsent.checkbox.label__onlyPrivacyPolicy', {
-      privacyPolicyLink: props.privacyPolicyUrl,
+      privacyPolicyLink: privacyPolicyUrl,
     });
   }
 

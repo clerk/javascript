@@ -2,6 +2,9 @@ import { useClerk, useSession } from '@clerk/shared/react';
 import type { CommercePlanResource, CommerceSubscriptionPlanPeriod, PricingTableProps } from '@clerk/types';
 import * as React from 'react';
 
+import { Switch } from '@/ui/elements/Switch';
+import { Tooltip } from '@/ui/elements/Tooltip';
+
 import { useProtect } from '../../common';
 import { usePlansContext, usePricingTableContext, useSubscriberTypeContext } from '../../contexts';
 import {
@@ -18,7 +21,6 @@ import {
   Span,
   Text,
 } from '../../customizables';
-import { Switch, Tooltip } from '../../elements';
 import { Check, Plus } from '../../icons';
 import { common, InternalThemeProvider } from '../../styledSystem';
 import { colors, getClosestProfileScrollBox } from '../../utils';
@@ -117,7 +119,7 @@ function Card(props: CardProps) {
     clerk.__internal_openPlanDetails({
       plan,
       subscriberType,
-      planPeriod,
+      initialPlanPeriod: planPeriod,
       portalRoot,
     });
   };
@@ -245,11 +247,13 @@ function Card(props: CardProps) {
               order: ctaPosition === 'top' ? -1 : undefined,
             })}
           >
-            {shouldShowFooterNotice ? (
+            {shouldShowFooterNotice && subscription ? (
               <Text
                 elementDescriptor={descriptors.pricingTableCardFooterNotice}
                 variant={isCompact ? 'buttonSmall' : 'buttonLarge'}
-                localizationKey={localizationKeys('badge__startsAt', { date: subscription?.periodStart })}
+                localizationKey={localizationKeys('badge__startsAt', {
+                  date: subscription?.periodStart,
+                })}
                 colorScheme='secondary'
                 sx={t => ({
                   paddingBlock: t.space.$1x5,
@@ -414,10 +418,11 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
           localizationKey={
             plan.isDefault ? localizationKeys('commerce.alwaysFree') : localizationKeys('commerce.billedMonthlyOnly')
           }
-          sx={{
+          sx={t => ({
             justifySelf: 'flex-start',
             alignSelf: 'center',
-          }}
+            marginTop: t.space.$1,
+          })}
         />
       )}
     </Box>

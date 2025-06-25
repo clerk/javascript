@@ -1,10 +1,25 @@
-import type { JwtPayload } from '@clerk/types';
+import type { JwtPayload, PendingSessionOptions } from '@clerk/types';
 
 import { constants } from '../constants';
 import type { TokenVerificationErrorReason } from '../errors';
 import type { AuthenticateContext } from './authenticateContext';
-import type { SignedInAuthObject, SignedOutAuthObject } from './authObjects';
-import { signedInAuthObject, signedOutAuthObject } from './authObjects';
+import type {
+  AuthenticatedMachineObject,
+  InvalidTokenAuthObject,
+  SignedInAuthObject,
+  SignedOutAuthObject,
+  UnauthenticatedMachineObject,
+} from './authObjects';
+import {
+  authenticatedMachineObject,
+  invalidTokenAuthObject,
+  signedInAuthObject,
+  signedOutAuthObject,
+  unauthenticatedMachineObject,
+} from './authObjects';
+import type { MachineTokenType, SessionTokenType } from './tokenTypes';
+import { TokenType } from './tokenTypes';
+import type { MachineAuthType } from './types';
 
 export const AuthStatus = {
   SignedIn: 'signed-in',
@@ -14,7 +29,17 @@ export const AuthStatus = {
 
 export type AuthStatus = (typeof AuthStatus)[keyof typeof AuthStatus];
 
-export type SignedInState = {
+type ToAuth<T extends TokenType | null, Authenticated extends boolean> = T extends null
+  ? () => InvalidTokenAuthObject
+  : T extends SessionTokenType
+    ? Authenticated extends true
+      ? (opts?: PendingSessionOptions) => SignedInAuthObject
+      : () => SignedOutAuthObject
+    : Authenticated extends true
+      ? () => AuthenticatedMachineObject<Exclude<T, SessionTokenType | null>>
+      : () => UnauthenticatedMachineObject<Exclude<T, SessionTokenType | null>>;
+
+export type AuthenticatedState<T extends TokenType = SessionTokenType> = {
   status: typeof AuthStatus.SignedIn;
   reason: null;
   message: null;
@@ -26,16 +51,21 @@ export type SignedInState = {
   signUpUrl: string;
   afterSignInUrl: string;
   afterSignUpUrl: string;
+  /**
+   * @deprecated Use `isAuthenticated` instead.
+   */
   isSignedIn: true;
-  toAuth: () => SignedInAuthObject;
+  isAuthenticated: true;
   headers: Headers;
   token: string;
+  tokenType: T;
+  toAuth: ToAuth<T, true>;
 };
 
-export type SignedOutState = {
+export type UnauthenticatedState<T extends TokenType | null = SessionTokenType> = {
   status: typeof AuthStatus.SignedOut;
-  message: string;
   reason: AuthReason;
+  message: string;
   proxyUrl?: string;
   publishableKey: string;
   isSatellite: boolean;
@@ -44,17 +74,33 @@ export type SignedOutState = {
   signUpUrl: string;
   afterSignInUrl: string;
   afterSignUpUrl: string;
+  /**
+   * @deprecated Use `isAuthenticated` instead.
+   */
   isSignedIn: false;
-  toAuth: () => SignedOutAuthObject;
+  isAuthenticated: false;
+  tokenType: T;
   headers: Headers;
   token: null;
+  toAuth: ToAuth<T, false>;
 };
 
-export type HandshakeState = Omit<SignedOutState, 'status' | 'toAuth'> & {
+export type HandshakeState = Omit<UnauthenticatedState<SessionTokenType>, 'status' | 'toAuth' | 'tokenType'> & {
+  tokenType: SessionTokenType;
   status: typeof AuthStatus.Handshake;
   headers: Headers;
   toAuth: () => null;
 };
+
+/**
+ * @deprecated Use AuthenticatedState instead
+ */
+export type SignedInState = AuthenticatedState<SessionTokenType>;
+
+/**
+ * @deprecated Use UnauthenticatedState instead
+ */
+export type SignedOutState = UnauthenticatedState<SessionTokenType>;
 
 export const AuthErrorReason = {
   ClientUATWithoutSessionToken: 'client-uat-but-no-session-token',
@@ -70,6 +116,7 @@ export const AuthErrorReason = {
   SessionTokenIatInTheFuture: 'session-token-iat-in-the-future',
   SessionTokenWithoutClientUAT: 'session-token-but-no-client-uat',
   ActiveOrganizationMismatch: 'active-organization-mismatch',
+  TokenTypeMismatch: 'token-type-mismatch',
   UnexpectedError: 'unexpected-error',
 } as const;
 
@@ -77,15 +124,41 @@ export type AuthErrorReason = (typeof AuthErrorReason)[keyof typeof AuthErrorRea
 
 export type AuthReason = AuthErrorReason | TokenVerificationErrorReason;
 
-export type RequestState = SignedInState | SignedOutState | HandshakeState;
+export type RequestState<T extends TokenType | null = SessionTokenType> =
+  | AuthenticatedState<T extends null ? never : T>
+  | UnauthenticatedState<T>
+  | (T extends SessionTokenType ? HandshakeState : never);
 
-export function signedIn(
-  authenticateContext: AuthenticateContext,
-  sessionClaims: JwtPayload,
-  headers: Headers = new Headers(),
-  token: string,
-): SignedInState {
-  const authObject = signedInAuthObject(authenticateContext, token, sessionClaims);
+type BaseSignedInParams = {
+  authenticateContext: AuthenticateContext;
+  headers?: Headers;
+  token: string;
+  tokenType: TokenType;
+};
+
+type SignedInParams =
+  | (BaseSignedInParams & { tokenType: SessionTokenType; sessionClaims: JwtPayload })
+  | (BaseSignedInParams & { tokenType: MachineTokenType; machineData: MachineAuthType });
+
+export function signedIn<T extends TokenType>(params: SignedInParams & { tokenType: T }): AuthenticatedState<T> {
+  const { authenticateContext, headers = new Headers(), token } = params;
+
+  const toAuth = (({ treatPendingAsSignedOut = true } = {}) => {
+    if (params.tokenType === TokenType.SessionToken) {
+      const { sessionClaims } = params as { sessionClaims: JwtPayload };
+      const authObject = signedInAuthObject(authenticateContext, token, sessionClaims);
+
+      if (treatPendingAsSignedOut && authObject.sessionStatus === 'pending') {
+        return signedOutAuthObject(undefined, authObject.sessionStatus);
+      }
+
+      return authObject;
+    }
+
+    const { machineData } = params as { machineData: MachineAuthType };
+    return authenticatedMachineObject(params.tokenType, token, machineData, authenticateContext);
+  }) as ToAuth<T, true>;
+
   return {
     status: AuthStatus.SignedIn,
     reason: null,
@@ -99,18 +172,30 @@ export function signedIn(
     afterSignInUrl: authenticateContext.afterSignInUrl || '',
     afterSignUpUrl: authenticateContext.afterSignUpUrl || '',
     isSignedIn: true,
-    toAuth: () => authObject,
+    isAuthenticated: true,
+    tokenType: params.tokenType,
+    toAuth,
     headers,
     token,
   };
 }
 
-export function signedOut(
-  authenticateContext: AuthenticateContext,
-  reason: AuthReason,
-  message = '',
-  headers: Headers = new Headers(),
-): SignedOutState {
+type SignedOutParams = Omit<BaseSignedInParams, 'token'> & {
+  reason: AuthReason;
+  message?: string;
+};
+
+export function signedOut<T extends TokenType>(params: SignedOutParams & { tokenType: T }): UnauthenticatedState<T> {
+  const { authenticateContext, headers = new Headers(), reason, message = '', tokenType } = params;
+
+  const toAuth = (() => {
+    if (tokenType === TokenType.SessionToken) {
+      return signedOutAuthObject({ ...authenticateContext, status: AuthStatus.SignedOut, reason, message });
+    }
+
+    return unauthenticatedMachineObject(tokenType, { reason, message, headers });
+  }) as ToAuth<T, false>;
+
   return withDebugHeaders({
     status: AuthStatus.SignedOut,
     reason,
@@ -124,8 +209,10 @@ export function signedOut(
     afterSignInUrl: authenticateContext.afterSignInUrl || '',
     afterSignUpUrl: authenticateContext.afterSignUpUrl || '',
     isSignedIn: false,
+    isAuthenticated: false,
+    tokenType,
+    toAuth,
     headers,
-    toAuth: () => signedOutAuthObject({ ...authenticateContext, status: AuthStatus.SignedOut, reason, message }),
     token: null,
   });
 }
@@ -149,13 +236,40 @@ export function handshake(
     afterSignInUrl: authenticateContext.afterSignInUrl || '',
     afterSignUpUrl: authenticateContext.afterSignUpUrl || '',
     isSignedIn: false,
-    headers,
+    isAuthenticated: false,
+    tokenType: TokenType.SessionToken,
     toAuth: () => null,
+    headers,
     token: null,
   });
 }
 
-const withDebugHeaders = <T extends RequestState>(requestState: T): T => {
+export function signedOutInvalidToken(): UnauthenticatedState<null> {
+  const authObject = invalidTokenAuthObject();
+  return withDebugHeaders({
+    status: AuthStatus.SignedOut,
+    reason: AuthErrorReason.TokenTypeMismatch,
+    message: '',
+    proxyUrl: '',
+    publishableKey: '',
+    isSatellite: false,
+    domain: '',
+    signInUrl: '',
+    signUpUrl: '',
+    afterSignInUrl: '',
+    afterSignUpUrl: '',
+    isSignedIn: false,
+    isAuthenticated: false,
+    tokenType: null,
+    toAuth: () => authObject,
+    headers: new Headers(),
+    token: null,
+  });
+}
+
+const withDebugHeaders = <T extends { headers: Headers; message?: string; reason?: AuthReason; status?: AuthStatus }>(
+  requestState: T,
+): T => {
   const headers = new Headers(requestState.headers || {});
 
   if (requestState.message) {

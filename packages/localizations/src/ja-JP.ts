@@ -71,6 +71,7 @@ export const jaJP: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     monthly: undefined,
+    pastDue: undefined,
     pay: undefined,
     paymentMethods: undefined,
     paymentSource: {
@@ -119,6 +120,7 @@ export const jaJP: LocalizationResource = {
     sameDay: "今日の{{ date | timeString('ja-JP') }}に",
   },
   dividerText: 'または',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: '別の方法を使用する',
   footerPageLink__help: 'ヘルプ',
   footerPageLink__privacy: 'プライバシー',
@@ -656,9 +658,10 @@ export const jaJP: LocalizationResource = {
     },
     legalConsent: {
       checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
+        label__onlyPrivacyPolicy: '{{privacyPolicyLink || link("個人情報保護方針")}}に同意します',
+        label__onlyTermsOfService: '{{termsOfServiceLink || link("利用規約")}}に同意します',
+        label__termsOfServiceAndPrivacyPolicy:
+          '{{termsOfServiceLink || link("利用規約")}}と{{privacyPolicyLink || link("個人情報保護方針")}}に同意します',
       },
       continue: {
         subtitle: undefined,

@@ -42,6 +42,13 @@ const withEmailCodes = base
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-email-codes').pk)
   .setEnvVariable('private', 'CLERK_ENCRYPTION_KEY', constants.E2E_CLERK_ENCRYPTION_KEY || 'a-key');
 
+const sessionsProd1 = base
+  .clone()
+  .setId('sessionsProd1')
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('sessions-prod-1').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('sessions-prod-1').pk)
+  .setEnvVariable('public', 'CLERK_JS_URL', '');
+
 const withEmailCodes_destroy_client = withEmailCodes
   .clone()
   .setEnvVariable('public', 'EXPERIMENTAL_PERSIST_CLIENT', 'false');
@@ -157,6 +164,18 @@ const withBilling = base
   .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-billing').sk)
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-billing').pk);
 
+const withWhatsappPhoneCode = base
+  .clone()
+  .setId('withWhatsappPhoneCode')
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-whatsapp-phone-code').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-whatsapp-phone-code').pk);
+
+const withAPIKeys = base
+  .clone()
+  .setId('withAPIKeys')
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-api-keys').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-api-keys').pk);
+
 export const envs = {
   base,
   withKeyless,
@@ -180,4 +199,7 @@ export const envs = {
   withSessionTasks,
   withBillingStaging,
   withBilling,
+  withWhatsappPhoneCode,
+  sessionsProd1,
+  withAPIKeys,
 } as const;

@@ -71,6 +71,7 @@ export const bgBG: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     monthly: undefined,
+    pastDue: undefined,
     pay: undefined,
     paymentMethods: undefined,
     paymentSource: {
@@ -119,6 +120,7 @@ export const bgBG: LocalizationResource = {
     sameDay: "Днес в {{ date | timeString('bg-BG') }}",
   },
   dividerText: 'или',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'Използвайте друг метод',
   footerPageLink__help: 'Помощ',
   footerPageLink__privacy: 'Поверителност',
@@ -658,7 +660,8 @@ export const bgBG: LocalizationResource = {
       checkbox: {
         label__onlyPrivacyPolicy: 'Съгласен съм само с политиката за конфиденциалност',
         label__onlyTermsOfService: 'Съгласен съм само с условията за ползване',
-        label__termsOfServiceAndPrivacyPolicy: 'Съгласен съм с условията за ползване и политиката за конфиденциалност',
+        label__termsOfServiceAndPrivacyPolicy:
+          'Съгласен съм с {{ termsOfServiceLink || link("условията за ползване") }} и {{ privacyPolicyLink || link("политиката за конфиденциалност") }}',
       },
       continue: {
         subtitle: 'Продължете, за да завършите процеса',

@@ -1,6 +1,9 @@
 import type { CommercePlanResource, CommerceSubscriptionPlanPeriod } from '@clerk/types';
 import * as React from 'react';
 
+import { Avatar } from '@/ui/elements/Avatar';
+import { SegmentedControl } from '@/ui/elements/SegmentedControl';
+
 import { usePlansContext } from '../../contexts';
 import {
   Badge,
@@ -16,14 +19,13 @@ import {
   useAppearance,
   useLocalizations,
 } from '../../customizables';
-import { Avatar, SegmentedControl } from '../../elements';
 import { usePrefersReducedMotion } from '../../hooks';
 import { Check, InformationCircle } from '../../icons';
 import { common, InternalThemeProvider, mqu, type ThemableCssProp } from '../../styledSystem';
 import { colors } from '../../utils';
 
 interface PricingTableMatrixProps {
-  plans: CommercePlanResource[];
+  plans: CommercePlanResource[] | undefined;
   highlightedPlan?: CommercePlanResource['slug'];
   planPeriod: CommerceSubscriptionPlanPeriod;
   setPlanPeriod: (val: CommerceSubscriptionPlanPeriod) => void;

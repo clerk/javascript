@@ -3,15 +3,13 @@ import { useReverification, useUser } from '@clerk/shared/react';
 import type { BackupCodeResource } from '@clerk/types';
 import React from 'react';
 
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { FormButtonContainer } from '@/ui/elements/FormButtons';
+import type { FormProps } from '@/ui/elements/FormContainer';
+import { FormContainer } from '@/ui/elements/FormContainer';
+import { FullHeightLoader } from '@/ui/elements/FullHeightLoader';
+
 import { Button, descriptors, localizationKeys, Text } from '../../customizables';
-import type { FormProps } from '../../elements';
-import {
-  FormButtonContainer,
-  FormContainer,
-  FullHeightLoader,
-  useCardState,
-  withCardStateProvider,
-} from '../../elements';
 import { handleError } from '../../utils';
 import { MfaBackupCodeList } from './MfaBackupCodeList';
 

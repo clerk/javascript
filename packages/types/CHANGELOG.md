@@ -1,5 +1,107 @@
 # Change Log
 
+## 4.61.0
+
+### Minor Changes
+
+- Expose `__internal_LocalizationResource` which now includes metadata for which keys require interpolation. ([#6108](https://github.com/clerk/javascript/pull/6108)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add support for `expiresInSeconds` parameter in session token generation. This allows setting custom expiration times for tokens both with and without templates via the backend API. ([#6150](https://github.com/clerk/javascript/pull/6150)) by [@jacekradko](https://github.com/jacekradko)
+
+### Patch Changes
+
+- Add element descriptors to `<APIKeys />` component ([#6095](https://github.com/clerk/javascript/pull/6095)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Replace expiration segmented list with dropdown and hide description field in `<APIKeys />` component ([#6153](https://github.com/clerk/javascript/pull/6153)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 4.60.1
+
+### Patch Changes
+
+- Add payment history tab to UserProfile and OrgProfile ([#6075](https://github.com/clerk/javascript/pull/6075)) by [@aeliox](https://github.com/aeliox)
+
+- Add TypeScript types and en-US localization for upcoming `<APIKeys />` component. This component will initially be in early access. ([#5858](https://github.com/clerk/javascript/pull/5858)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Add missing semibold FontWeightScale type ([#6114](https://github.com/clerk/javascript/pull/6114)) by [@jacekradko](https://github.com/jacekradko)
+
+- Parse partial `plan` in `ClerkAPIError.meta` ([#6102](https://github.com/clerk/javascript/pull/6102)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add localizations for some commerce strings, general cleanups ([#6101](https://github.com/clerk/javascript/pull/6101)) by [@aeliox](https://github.com/aeliox)
+
+- Introduce `commerce.checkout.pastDueNotice` localization key. ([#6097](https://github.com/clerk/javascript/pull/6097)) by [@panteliselef](https://github.com/panteliselef)
+
+## 4.60.0
+
+### Minor Changes
+
+- Introduce `cssLayerName` option to allow users to opt Clerk styles into a native CSS layer. ([#5552](https://github.com/clerk/javascript/pull/5552)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Get `payment_method_order` for Stripe payment elements from backend ([#6034](https://github.com/clerk/javascript/pull/6034)) by [@aeliox](https://github.com/aeliox)
+
+- Use the `is_removable` flag on a payment source to determine if it can be removed. ([#6033](https://github.com/clerk/javascript/pull/6033)) by [@aeliox](https://github.com/aeliox)
+
+- Introduce internal `<OAuthConsent />` component to be used internally in the machine auth OAuth flow in account portal. ([#6021](https://github.com/clerk/javascript/pull/6021)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- feat(types,clerk-js): Update types; RoleSelect allows fallbackLabel ([#6037](https://github.com/clerk/javascript/pull/6037)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
+  - this updates OrganizationInvitation and OrganizationMembership resource+types to include `roleName` which is already present on frontend-api responses, as `role_name`.
+  - this updates RoleSelect to allow rendering a `fallbackLabel` in the event that `value` does not map to any of the supplied roles
+
+## 4.59.3
+
+### Patch Changes
+
+- Add "Past Due" amount on checkout flow when applicable ([#6014](https://github.com/clerk/javascript/pull/6014)) by [@octoper](https://github.com/octoper)
+
+- Handle missing `publicUserData` in `OrganizationMembership` ([#6016](https://github.com/clerk/javascript/pull/6016)) by [@tmilewski](https://github.com/tmilewski)
+
+## 4.59.2
+
+### Patch Changes
+
+- Replaces `useFetch` with `useSWR` or `useSWRMutation` in all commerce related components. ([#5939](https://github.com/clerk/javascript/pull/5939)) by [@panteliselef](https://github.com/panteliselef)
+
+## 4.59.1
+
+### Patch Changes
+
+- Add support for country-specific alternative phone code channels ([#5937](https://github.com/clerk/javascript/pull/5937)) by [@anagstef](https://github.com/anagstef)
+
+## 4.59.0
+
+### Minor Changes
+
+- Introduce `__experimental_startPath` option for `openOrganizationProfile`. ([#5926](https://github.com/clerk/javascript/pull/5926)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  Example usage:
+
+  ```ts
+  clerk.openOrganizationProfile({
+    __experimental_startPath: '/billing',
+  });
+  ```
+
+- Add `onClose` to `__internal_CheckoutProps`. ([#5916](https://github.com/clerk/javascript/pull/5916)) by [@panteliselef](https://github.com/panteliselef)
+
+- Replaces strings with localizations throughout billing components. ([#5922](https://github.com/clerk/javascript/pull/5922)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Add `oidcPrompt` prop to `SignIn` and `SignUp` components and `authenticateWithRedirect` method to control the OIDC authentication prompt behavior during Enterprise SSO flows ([#5925](https://github.com/clerk/javascript/pull/5925)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  ```tsx
+  <SignUp oidcPrompt='select_account' />
+  <SignIn oidcPrompt='select_account' />
+  ```
+
+  ```ts
+  signUp.authenticateWithRedirect({ redirectUrl: '/sso-callback', oidcPrompt: 'select_account' });
+  ```
+
+- Add `drawerRoot` descriptor and adjust z-index approach. ([#5924](https://github.com/clerk/javascript/pull/5924)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 4.58.1
 
 ### Patch Changes

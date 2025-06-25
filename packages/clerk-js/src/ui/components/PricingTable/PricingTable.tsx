@@ -1,24 +1,19 @@
-import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
+import { useClerk } from '@clerk/shared/react';
 import type { CommercePlanResource, CommerceSubscriptionPlanPeriod, PricingTableProps } from '@clerk/types';
 import { useEffect, useMemo, useState } from 'react';
 
-import { usePlansContext, usePricingTableContext, useSubscriberTypeContext } from '../../contexts';
+import { usePaymentMethods, usePlans, usePlansContext, usePricingTableContext, useSubscriptions } from '../../contexts';
 import { Flow } from '../../customizables';
-import { useFetch } from '../../hooks/useFetch';
 import { PricingTableDefault } from './PricingTableDefault';
 import { PricingTableMatrix } from './PricingTableMatrix';
 
 const PricingTableRoot = (props: PricingTableProps) => {
   const clerk = useClerk();
-  const { mode = 'mounted' } = usePricingTableContext();
-  const subscriberType = useSubscriberTypeContext();
+  const { mode = 'mounted', signInMode = 'redirect' } = usePricingTableContext();
   const isCompact = mode === 'modal';
-  const { organization } = useOrganization();
-  const { user } = useUser();
-  const { subscriptions } = usePlansContext();
-  const { plans, handleSelectPlan } = usePlansContext();
-
-  const resource = subscriberType === 'org' ? organization : user;
+  const { data: subscriptions } = useSubscriptions();
+  const { data: plans } = usePlans();
+  const { handleSelectPlan } = usePlansContext();
 
   const defaultPlanPeriod = useMemo(() => {
     if (isCompact) {
@@ -47,6 +42,9 @@ const PricingTableRoot = (props: PricingTableProps) => {
 
   const selectPlan = (plan: CommercePlanResource, event?: React.MouseEvent<HTMLElement>) => {
     if (!clerk.isSignedIn) {
+      if (signInMode === 'modal') {
+        return clerk.openSignIn();
+      }
       return clerk.redirectToSignIn();
     }
 
@@ -61,7 +59,8 @@ const PricingTableRoot = (props: PricingTableProps) => {
     return;
   };
 
-  useFetch(resource?.getPaymentSources, {}, undefined, `commerce-payment-sources-${resource?.id}`);
+  // Pre-fetch payment sources
+  usePaymentMethods();
 
   return (
     <Flow.Root

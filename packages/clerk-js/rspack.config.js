@@ -41,6 +41,9 @@ const common = ({ mode, variant, disableRHC = false }) => {
   return {
     mode,
     resolve: {
+      alias: {
+        '@': path.resolve(__dirname, './src'),
+      },
       // Attempt to resolve these extensions in order
       // @see https://webpack.js.org/configuration/resolve/#resolveextensions
       extensions: ['.ts', '.tsx', '.mjs', '.js', '.jsx'],
@@ -546,6 +549,7 @@ const devConfig = ({ mode, env }) => {
   // By default we use https://js.lclclerk.com which is what our local dev proxy looks for.
   const devUrl = new URL(env.devOrigin || 'https://js.lclclerk.com');
   const isSandbox = !!env.sandbox;
+  const port = Number(new URL(env.devOrigin ?? 'http://localhost:4000').port || 4000);
 
   /** @type {() => import('@rspack/core').Configuration} */
   const commonForDev = () => {
@@ -576,7 +580,7 @@ const devConfig = ({ mode, env }) => {
         allowedHosts: ['all'],
         headers: { 'Access-Control-Allow-Origin': '*' },
         host: '0.0.0.0',
-        port: 4000,
+        port,
         hot: true,
         liveReload: false,
         client: { webSocketURL: `auto://${devUrl.host}/ws` },

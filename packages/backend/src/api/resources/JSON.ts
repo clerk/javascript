@@ -1,4 +1,4 @@
-import type { SignUpStatus } from '@clerk/types';
+import type { SignUpStatus, VerificationStatus } from '@clerk/types';
 
 import type {
   ActorTokenStatus,
@@ -20,6 +20,7 @@ export const ObjectType = {
   AccountlessApplication: 'accountless_application',
   ActorToken: 'actor_token',
   AllowlistIdentifier: 'allowlist_identifier',
+  ApiKey: 'api_key',
   BlocklistIdentifier: 'blocklist_identifier',
   Client: 'client',
   Cookies: 'cookies',
@@ -33,8 +34,10 @@ export const ObjectType = {
   InstanceRestrictions: 'instance_restrictions',
   InstanceSettings: 'instance_settings',
   Invitation: 'invitation',
+  MachineToken: 'machine_to_machine_token',
   JwtTemplate: 'jwt_template',
   OauthAccessToken: 'oauth_access_token',
+  IdpOAuthAccessToken: 'clerk_idp_oauth_access_token',
   OAuthApplication: 'oauth_application',
   Organization: 'organization',
   OrganizationDomain: 'organization_domain',
@@ -45,6 +48,7 @@ export const ObjectType = {
   ProxyCheck: 'proxy_check',
   RedirectUrl: 'redirect_url',
   SamlAccount: 'saml_account',
+  SamlConnection: 'saml_connection',
   Session: 'session',
   SignInAttempt: 'sign_in_attempt',
   SignInToken: 'sign_in_token',
@@ -63,7 +67,13 @@ export const ObjectType = {
 export type ObjectType = (typeof ObjectType)[keyof typeof ObjectType];
 
 export interface ClerkResourceJSON {
+  /**
+   * The type of the resource.
+   */
   object: ObjectType;
+  /**
+   * The unique identifier for the resource.
+   */
   id: string;
 }
 
@@ -367,10 +377,25 @@ export interface OrganizationInvitationJSON extends ClerkResourceJSON {
   expires_at: number;
 }
 
+/**
+ * @interface
+ */
 export interface PublicOrganizationDataJSON extends ClerkResourceJSON {
+  /**
+   * The name of the organization.
+   */
   name: string;
+  /**
+   * The slug of the organization.
+   */
   slug: string;
+  /**
+   * Holds the default organization profile image. Compatible with Clerk's [Image Optimization](https://clerk.com/docs/guides/image-optimization).
+   */
   image_url?: string;
+  /**
+   * Whether the organization has a profile image.
+   */
   has_image: boolean;
 }
 
@@ -563,7 +588,7 @@ export interface UserJSON extends ClerkResourceJSON {
 }
 
 export interface VerificationJSON extends ClerkResourceJSON {
-  status: string;
+  status: VerificationStatus;
   strategy: string;
   attempts: number | null;
   expire_at: number | null;
@@ -603,6 +628,7 @@ export interface PaginatedResponseJSON {
 }
 
 export interface SamlConnectionJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.SamlConnection;
   name: string;
   domain: string;
   organization_id: string | null;
@@ -668,6 +694,54 @@ export interface SamlAccountConnectionJSON extends ClerkResourceJSON {
   allow_subdomains: boolean;
   allow_idp_initiated: boolean;
   disable_additional_identifications: boolean;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface MachineTokenJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.MachineToken;
+  name: string;
+  subject: string;
+  scopes: string[];
+  claims: Record<string, any> | null;
+  revoked: boolean;
+  revocation_reason: string | null;
+  expired: boolean;
+  expiration: number | null;
+  created_by: string | null;
+  creation_reason: string | null;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface APIKeyJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.ApiKey;
+  type: string;
+  name: string;
+  subject: string;
+  scopes: string[];
+  claims: Record<string, any> | null;
+  revoked: boolean;
+  revocation_reason: string | null;
+  expired: boolean;
+  expiration: number | null;
+  created_by: string | null;
+  description: string | null;
+  last_used_at: number | null;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface IdPOAuthAccessTokenJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.IdpOAuthAccessToken;
+  client_id: string;
+  type: string;
+  subject: string;
+  scopes: string[];
+  revoked: boolean;
+  revocation_reason: string | null;
+  expired: boolean;
+  expiration: number | null;
   created_at: number;
   updated_at: number;
 }

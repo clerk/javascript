@@ -1,6 +1,7 @@
 import {
   ActorToken,
   AllowlistIdentifier,
+  APIKey,
   BlocklistIdentifier,
   Client,
   Cookies,
@@ -8,11 +9,13 @@ import {
   Domain,
   Email,
   EmailAddress,
+  IdPOAuthAccessToken,
   Instance,
   InstanceRestrictions,
   InstanceSettings,
   Invitation,
   JwtTemplate,
+  MachineToken,
   OauthAccessToken,
   OAuthApplication,
   Organization,
@@ -22,6 +25,7 @@ import {
   PhoneNumber,
   ProxyCheck,
   RedirectUrl,
+  SamlConnection,
   Session,
   SignInToken,
   SignUpAttempt,
@@ -35,10 +39,27 @@ import { ObjectType } from './JSON';
 import { WaitlistEntry } from './WaitlistEntry';
 
 type ResourceResponse<T> = {
+  /**
+   * An array that contains the fetched data.
+   */
   data: T;
 };
 
+/**
+ * An interface that describes the response of a method that returns a paginated list of resources.
+ *
+ * If the promise resolves, you will get back the [properties](#properties) listed below. `data` will be an array of the resource type you requested. You can use the `totalCount` property to determine how many total items exist remotely.
+ *
+ * Some methods that return this type allow pagination with the `limit` and `offset` parameters, in which case the first 10 items will be returned by default. For methods such as [`getAllowlistIdentifierList()`](https://clerk.com/docs/references/backend/allowlist/get-allowlist-identifier-list), which do not take a `limit` or `offset`, all items will be returned.
+ *
+ * If the promise is rejected, you will receive a `ClerkAPIResponseError` or network error.
+ *
+ * @interface
+ */
 export type PaginatedResourceResponse<T> = ResourceResponse<T> & {
+  /**
+   * The total count of data that exist remotely.
+   */
   totalCount: number;
 };
 
@@ -85,6 +106,8 @@ function jsonToObject(item: any): any {
       return ActorToken.fromJSON(item);
     case ObjectType.AllowlistIdentifier:
       return AllowlistIdentifier.fromJSON(item);
+    case ObjectType.ApiKey:
+      return APIKey.fromJSON(item);
     case ObjectType.BlocklistIdentifier:
       return BlocklistIdentifier.fromJSON(item);
     case ObjectType.Client:
@@ -97,6 +120,8 @@ function jsonToObject(item: any): any {
       return EmailAddress.fromJSON(item);
     case ObjectType.Email:
       return Email.fromJSON(item);
+    case ObjectType.IdpOAuthAccessToken:
+      return IdPOAuthAccessToken.fromJSON(item);
     case ObjectType.Instance:
       return Instance.fromJSON(item);
     case ObjectType.InstanceRestrictions:
@@ -107,6 +132,8 @@ function jsonToObject(item: any): any {
       return Invitation.fromJSON(item);
     case ObjectType.JwtTemplate:
       return JwtTemplate.fromJSON(item);
+    case ObjectType.MachineToken:
+      return MachineToken.fromJSON(item);
     case ObjectType.OauthAccessToken:
       return OauthAccessToken.fromJSON(item);
     case ObjectType.OAuthApplication:
@@ -125,6 +152,8 @@ function jsonToObject(item: any): any {
       return ProxyCheck.fromJSON(item);
     case ObjectType.RedirectUrl:
       return RedirectUrl.fromJSON(item);
+    case ObjectType.SamlConnection:
+      return SamlConnection.fromJSON(item);
     case ObjectType.SignInToken:
       return SignInToken.fromJSON(item);
     case ObjectType.SignUpAttempt:

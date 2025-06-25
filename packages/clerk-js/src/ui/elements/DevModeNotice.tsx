@@ -1,4 +1,4 @@
-import type { ThemableCssProp } from 'ui/styledSystem';
+import type { ThemableCssProp } from '@/ui/styledSystem';
 
 import { Box, Text } from '../customizables';
 import { useDevMode } from '../hooks/useDevMode';

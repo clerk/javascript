@@ -1,27 +1,39 @@
 import { createClerkClient } from '@clerk/backend';
+import { parsePublishableKey } from '@clerk/shared/keys';
+import { isStaging } from '@clerk/shared/utils';
 import { test as setup } from '@playwright/test';
 
 import { appConfigs } from '../presets/';
 
 setup('cleanup instances ', async () => {
   const entries = Array.from(appConfigs.secrets.instanceKeys.values())
-    .map(({ sk }) => {
+    .map(({ pk, sk }) => {
       const secretKey = sk;
       if (!secretKey) {
         return null;
       }
-      return { secretKey };
+      const parsedPk = parsePublishableKey(pk);
+      const apiUrl = isStaging(parsedPk.frontendApi) ? 'https://api.clerkstage.dev' : 'https://api.clerk.com';
+      return { secretKey, apiUrl };
     })
     .filter(Boolean);
 
   for (const entry of entries) {
-    console.log(`Cleanup for ${entry.secretKey.replace(/(sk_test_)(.+)(...)/, '$1***$3')}`);
-    const clerkClient = createClerkClient({ secretKey: entry.secretKey });
-    const { data: users } = await clerkClient.users.getUserList({
+    console.log(`Cleanup for ${entry.secretKey.replace(/(sk_(test|live)_)(.+)(...)/, '$1***$4')}`);
+    const clerkClient = createClerkClient({ secretKey: entry.secretKey, apiUrl: entry.apiUrl });
+    const { data: usersWithEmail } = await clerkClient.users.getUserList({
       orderBy: '-created_at',
       query: 'clerkcookie',
       limit: 150,
     });
+
+    const { data: usersWithPhoneNumber } = await clerkClient.users.getUserList({
+      orderBy: '-created_at',
+      query: '55501',
+      limit: 150,
+    });
+
+    const users = [...usersWithEmail, ...usersWithPhoneNumber];
 
     const { data: orgs } = await clerkClient.organizations
       .getOrganizationList({
@@ -37,11 +49,13 @@ setup('cleanup instances ', async () => {
       await Promise.all(
         batch.map(user => {
           console.log(
-            `Cleaning up user ${user.id} (${user.emailAddresses[0]?.emailAddress}) (${new Date(
+            `Cleaning up user ${user.id} (${user.emailAddresses?.[0]?.emailAddress || user.phoneNumbers?.[0]?.phoneNumber}) (${new Date(
               user.createdAt,
             ).toISOString()})`,
           );
-          return clerkClient.users.deleteUser(user.id);
+          return clerkClient.users.deleteUser(user.id).catch(error => {
+            console.error(`Error deleting user ${user.id}:`, error);
+          });
         }),
       );
       await new Promise(r => setTimeout(r, 1000));
@@ -52,7 +66,9 @@ setup('cleanup instances ', async () => {
       await Promise.all(
         batch.map(org => {
           console.log(`Cleaning up org ${org.id} (${org.name}) (${new Date(org.createdAt).toISOString()})`);
-          return clerkClient.organizations.deleteOrganization(org.id);
+          return clerkClient.organizations.deleteOrganization(org.id).catch(error => {
+            console.error(`Error deleting org ${org.id}:`, error);
+          });
         }),
       );
       await new Promise(r => setTimeout(r, 1000));

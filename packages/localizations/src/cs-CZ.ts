@@ -71,6 +71,7 @@ export const csCZ: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     monthly: undefined,
+    pastDue: undefined,
     pay: undefined,
     paymentMethods: undefined,
     paymentSource: {
@@ -119,6 +120,7 @@ export const csCZ: LocalizationResource = {
     sameDay: "Dnes v  {{ date | timeString('cs-CZ') }}",
   },
   dividerText: 'nebo',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'Použít jinou metodu',
   footerPageLink__help: 'Nápověda',
   footerPageLink__privacy: 'Ochrana soukromí',
@@ -656,7 +658,8 @@ export const csCZ: LocalizationResource = {
       checkbox: {
         label__onlyPrivacyPolicy: 'Souhlasím s politikou ochrany osobních údajů',
         label__onlyTermsOfService: 'Souhlasím s podmínkami služby',
-        label__termsOfServiceAndPrivacyPolicy: 'Souhlasím s podmínkami služby a politikou ochrany osobních údajů',
+        label__termsOfServiceAndPrivacyPolicy:
+          'Souhlasím s {{ termsOfServiceLink || link("podmínkami služby") }} a {{ privacyPolicyLink || link("politikou ochrany osobních údajů") }}',
       },
       continue: {
         subtitle: 'Pokračujte pro dokončení registrace.',

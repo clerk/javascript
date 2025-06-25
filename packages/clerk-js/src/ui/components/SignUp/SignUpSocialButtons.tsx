@@ -2,8 +2,9 @@ import { useClerk } from '@clerk/shared/react';
 import type { OAuthStrategy, PhoneCodeChannel } from '@clerk/types';
 import React from 'react';
 
+import { useCardState } from '@/ui/elements/contexts';
+
 import { useCoreSignUp, useSignUpContext } from '../../contexts';
-import { useCardState } from '../../elements';
 import type { SocialButtonsProps } from '../../elements/SocialButtons';
 import { SocialButtons } from '../../elements/SocialButtons';
 import { useRouter } from '../../router';

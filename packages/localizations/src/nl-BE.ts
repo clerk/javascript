@@ -71,6 +71,7 @@ export const nlBE: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     monthly: undefined,
+    pastDue: undefined,
     pay: undefined,
     paymentMethods: undefined,
     paymentSource: {
@@ -119,6 +120,7 @@ export const nlBE: LocalizationResource = {
     sameDay: "Vandaag om {{ date | timeString('nl-NL') }}",
   },
   dividerText: 'of',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'Een andere methode gebruiken',
   footerPageLink__help: 'Helppagina',
   footerPageLink__privacy: 'Privacybeleid',
@@ -658,7 +660,8 @@ export const nlBE: LocalizationResource = {
       checkbox: {
         label__onlyPrivacyPolicy: 'Ik accepteer het Privacybeleid',
         label__onlyTermsOfService: 'Ik accepteer de Algemene Voorwaarden',
-        label__termsOfServiceAndPrivacyPolicy: 'Ik accepteer de Algemene Voorwaarden en het Privacybeleid',
+        label__termsOfServiceAndPrivacyPolicy:
+          'Ik accepteer de {{ termsOfServiceLink || link("Algemene Voorwaarden") }} en het {{ privacyPolicyLink || link("Privacybeleid") }}',
       },
       continue: {
         subtitle: 'Door verder te gaan, ga je akkoord met de bovenstaande voorwaarden.',

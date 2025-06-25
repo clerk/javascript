@@ -1,11 +1,13 @@
 import type { EmailAddressResource } from '@clerk/types';
 import React from 'react';
 
+import { useCardState } from '@/ui/elements/contexts';
+import { FormButtonContainer } from '@/ui/elements/FormButtons';
+
 import { useRouter } from '../../../ui/router';
 import { appendModalState } from '../../../utils';
 import { useUserProfileContext } from '../../contexts';
 import { Button, descriptors, Flex, localizationKeys } from '../../customizables';
-import { FormButtonContainer, useCardState } from '../../elements';
 import { useEnterpriseSSOLink } from '../../hooks';
 import { handleError } from '../../utils';
 

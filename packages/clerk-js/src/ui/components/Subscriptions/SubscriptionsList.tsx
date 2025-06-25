@@ -1,7 +1,14 @@
 import type { CommerceSubscriptionResource } from '@clerk/types';
 
+import { ProfileSection } from '@/ui/elements/Section';
+
 import { useProtect } from '../../common';
-import { usePlansContext, useSubscriberTypeContext } from '../../contexts';
+import {
+  usePlansContext,
+  useSubscriberTypeContext,
+  useSubscriberTypeLocalizationRoot,
+  useSubscriptions,
+} from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import {
   Badge,
@@ -19,7 +26,6 @@ import {
   Thead,
   Tr,
 } from '../../customizables';
-import { ProfileSection } from '../../elements';
 import { ArrowsUpDown, CogFilled, Plans, Plus } from '../../icons';
 import { useRouter } from '../../router';
 
@@ -32,8 +38,10 @@ export function SubscriptionsList({
   arrowButtonText: LocalizationKey;
   arrowButtonEmptyText: LocalizationKey;
 }) {
-  const { subscriptions, handleSelectPlan, captionForSubscription, canManageSubscription } = usePlansContext();
+  const { handleSelectPlan, captionForSubscription, canManageSubscription } = usePlansContext();
+  const localizationRoot = useSubscriberTypeLocalizationRoot();
   const subscriberType = useSubscriberTypeContext();
+  const { data: subscriptions } = useSubscriptions();
   const canManageBilling = useProtect(
     has => has({ permission: 'org:sys_billing:manage' }) || subscriberType === 'user',
   );
@@ -77,9 +85,21 @@ export function SubscriptionsList({
         <Table tableHeadVisuallyHidden>
           <Thead>
             <Tr>
-              <Th>Plan</Th>
-              <Th>Start date</Th>
-              <Th>Edit</Th>
+              <Th
+                localizationKey={localizationKeys(
+                  `${localizationRoot}.billingPage.subscriptionsListSection.tableHeader__plan`,
+                )}
+              />
+              <Th
+                localizationKey={localizationKeys(
+                  `${localizationRoot}.billingPage.subscriptionsListSection.tableHeader__startDate`,
+                )}
+              />
+              <Th
+                localizationKey={localizationKeys(
+                  `${localizationRoot}.billingPage.subscriptionsListSection.tableHeader__edit`,
+                )}
+              />
             </Tr>
           </Thead>
           <Tbody>

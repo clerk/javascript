@@ -1,5 +1,189 @@
 # Change Log
 
+## 6.23.0
+
+### Minor Changes
+
+- Fix `auth.protect()` unauthorized error propagation within middleware ([#6169](https://github.com/clerk/javascript/pull/6169)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- - Optimize `auth()` calls to avoid unnecessary verification calls when the provided token type is not in the `acceptsToken` array. ([#6123](https://github.com/clerk/javascript/pull/6123)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  - Add handling for invalid token types when `acceptsToken` is an array in `authenticateRequest()`: now returns a clear unauthenticated state (`tokenType: null`) if the token is not in the accepted list.
+
+### Patch Changes
+
+- Updated dependencies [[`b495279`](https://github.com/clerk/javascript/commit/b4952796e3c7dee4ab4726de63a17b7f4265ce37), [`c3fa15d`](https://github.com/clerk/javascript/commit/c3fa15d60642b4fcbcf26e21caaca0fc60975795), [`628583a`](https://github.com/clerk/javascript/commit/628583a27ffd72521475e06f91e6f592ee87ba47), [`52d5e57`](https://github.com/clerk/javascript/commit/52d5e5768d54725b4d20d028135746493e05d44c), [`15a945c`](https://github.com/clerk/javascript/commit/15a945c02a9f6bc8d2f7d1e3534217100bf45936), [`10f3dda`](https://github.com/clerk/javascript/commit/10f3dda2beff0ce71a52c2f15c07094110078be2), [`72629b0`](https://github.com/clerk/javascript/commit/72629b06fb1fe720fa2a61462306a786a913e9a8), [`2692124`](https://github.com/clerk/javascript/commit/2692124a79369a9289ee18009667231d7e27b9ed)]:
+  - @clerk/types@4.61.0
+  - @clerk/backend@2.2.0
+  - @clerk/shared@3.9.8
+  - @clerk/clerk-react@5.32.1
+
+## 6.22.0
+
+### Minor Changes
+
+- Add `<APIKeys />` component. This component will initially be in early access and not recommended for production usage just yet. ([#5858](https://github.com/clerk/javascript/pull/5858)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Respect `acceptsToken` when returning unauthenticated session or machine object. ([#6112](https://github.com/clerk/javascript/pull/6112)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Re-organize internal types for the recently added "machine authentication" feature. ([#6067](https://github.com/clerk/javascript/pull/6067)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Resolve machine token property mixing in discriminated unions ([#6079](https://github.com/clerk/javascript/pull/6079)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`19e9e11`](https://github.com/clerk/javascript/commit/19e9e11af04f13fd12975fbf7016fe0583202056), [`18bcb64`](https://github.com/clerk/javascript/commit/18bcb64a3e8b6d352d7933ed094d68214e6e80fb), [`2148166`](https://github.com/clerk/javascript/commit/214816654850272297056eebad3d846b7f8125c9), [`4319257`](https://github.com/clerk/javascript/commit/4319257dc424f121231a26bef2068cef1e78afd4), [`607d333`](https://github.com/clerk/javascript/commit/607d3331f893bc98d1a8894f57b1cb9021e71b86), [`138f733`](https://github.com/clerk/javascript/commit/138f733f13121487268a4f96e6eb2cffedc6e238), [`4118ed7`](https://github.com/clerk/javascript/commit/4118ed7c8fb13ca602401f8d663e7bcd6f6abee4), [`18bcb64`](https://github.com/clerk/javascript/commit/18bcb64a3e8b6d352d7933ed094d68214e6e80fb), [`d832d91`](https://github.com/clerk/javascript/commit/d832d9179ff615f2799c832ec5fd9f3d79c6a940), [`6842ff1`](https://github.com/clerk/javascript/commit/6842ff1c903eaa0db161f533365a2e680995ce83), [`48be55b`](https://github.com/clerk/javascript/commit/48be55b61a86e014dd407414764d24bb43fd26f3), [`183e382`](https://github.com/clerk/javascript/commit/183e3823e4ff70e856b00a347369c38a4264105a), [`2c6f805`](https://github.com/clerk/javascript/commit/2c6f805a9e6e4685990f9a8abc740b2d0859a453), [`97749d5`](https://github.com/clerk/javascript/commit/97749d570bc687c7e05cd800a50e0ae4180a371d)]:
+  - @clerk/types@4.60.1
+  - @clerk/backend@2.1.0
+  - @clerk/clerk-react@5.32.0
+  - @clerk/shared@3.9.7
+
+## 6.21.0
+
+### Minor Changes
+
+- Introduces machine authentication, supporting four token types: `api_key`, `oauth_token`, `machine_token`, and `session_token`. For backwards compatibility, `session_token` remains the default when no token type is specified. This enables machine-to-machine authentication and use cases such as API keys and OAuth integrations. Existing applications continue to work without modification. ([#5689](https://github.com/clerk/javascript/pull/5689)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  You can specify which token types are allowed for a given route or handler using the `acceptsToken` property in the `auth()` helper, or the `token` property in the `auth.protect()` helper. Each can be set to a specific type, an array of types, or `'any'` to accept all supported tokens.
+
+  Example usage in Nextjs middleware:
+
+  ```ts
+  import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
+
+  const isOAuthAccessible = createRouteMatcher(['/oauth(.*)']);
+  const isApiKeyAccessible = createRouteMatcher(['/api(.*)']);
+  const isMachineTokenAccessible = createRouteMatcher(['/m2m(.*)']);
+  const isUserAccessible = createRouteMatcher(['/user(.*)']);
+  const isAccessibleToAnyValidToken = createRouteMatcher(['/any(.*)']);
+
+  export default clerkMiddleware(async (auth, req) => {
+    if (isOAuthAccessible(req)) await auth.protect({ token: 'oauth_token' });
+    if (isApiKeyAccessible(req)) await auth.protect({ token: 'api_key' });
+    if (isMachineTokenAccessible(req)) await auth.protect({ token: 'machine_token' });
+    if (isUserAccessible(req)) await auth.protect({ token: 'session_token' });
+
+    if (isAccessibleToAnyValidToken(req)) await auth.protect({ token: 'any' });
+  });
+
+  export const config = {
+    matcher: [
+      '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+      '/(api|trpc)(.*)',
+    ],
+  };
+  ```
+
+  Leaf node route protection:
+
+  ```ts
+  import { auth } from '@clerk/nextjs/server';
+
+  // In this example, we allow users and oauth tokens with the "profile" scope
+  // to access the data. Other types of tokens are rejected.
+  function POST(req, res) {
+    const authObject = await auth({ acceptsToken: ['session_token', 'oauth_token'] });
+
+    if (authObject.tokenType === 'oauth_token' && !authObject.scopes?.includes('profile')) {
+      throw new Error('Unauthorized: OAuth token missing the "profile" scope');
+    }
+
+    // get data from db using userId
+    const data = db.select().from(user).where(eq(user.id, authObject.userId));
+
+    return { data };
+  }
+  ```
+
+- The `svix` dependency is no longer needed when using the `verifyWebhook()` function. `verifyWebhook()` was refactored to not rely on `svix` anymore while keeping the same functionality and behavior. ([#6059](https://github.com/clerk/javascript/pull/6059)) by [@royanger](https://github.com/royanger)
+
+  If you previously installed `svix` to use `verifyWebhook()` you can uninstall it now:
+
+  ```shell
+  npm uninstall svix
+  ```
+
+### Patch Changes
+
+- Updated URL for 'auth() was called but Clerk can't detect usage of clerkMiddleware()' ([#6035](https://github.com/clerk/javascript/pull/6035)) by [@royanger](https://github.com/royanger)
+
+- Introduce `getAuthObjectFromJwt` as internal utility function that centralizes the logic for generating auth objects from session JWTs. ([#6053](https://github.com/clerk/javascript/pull/6053)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`ea622ba`](https://github.com/clerk/javascript/commit/ea622bae90e18ae2ea8dbc6c94cad857557539c9), [`d8fa5d9`](https://github.com/clerk/javascript/commit/d8fa5d9d3d8dc575260d8d2b7c7eeeb0052d0b0d), [`be2e89c`](https://github.com/clerk/javascript/commit/be2e89ca11aa43d48f74c57a5a34e20d85b4003c), [`c656270`](https://github.com/clerk/javascript/commit/c656270f9e05fd1f44fc4c81851be0b1111cb933), [`5644d94`](https://github.com/clerk/javascript/commit/5644d94f711a0733e4970c3f15c24d56cafc8743), [`a3232c7`](https://github.com/clerk/javascript/commit/a3232c7ee8c1173d2ce70f8252fc083c7bf19374), [`b578225`](https://github.com/clerk/javascript/commit/b5782258242474c9b0987a3f8349836cd763f24b), [`918e2e0`](https://github.com/clerk/javascript/commit/918e2e085bf88c3cfaa5fcb0f1ae8c31b3f7053e), [`795d09a`](https://github.com/clerk/javascript/commit/795d09a652f791e1e409406e335e0860aceda110), [`4f93634`](https://github.com/clerk/javascript/commit/4f93634ed6bcd45f21bddcb39a33434b1cb560fe), [`8838120`](https://github.com/clerk/javascript/commit/8838120596830b88fec1c6c853371dabfec74a0d)]:
+  - @clerk/backend@2.0.0
+  - @clerk/types@4.60.0
+  - @clerk/clerk-react@5.31.9
+  - @clerk/shared@3.9.6
+
+## 6.20.2
+
+### Patch Changes
+
+- Updated dependencies [[`5421421`](https://github.com/clerk/javascript/commit/5421421644b5c017d58ee6583c12d6c253e29c33), [`f897773`](https://github.com/clerk/javascript/commit/f89777379da63cf45039c1570b51ba10a400817c), [`1c97fd0`](https://github.com/clerk/javascript/commit/1c97fd06b28db9fde6c14dbeb0935e13696be539), [`2c6a0cc`](https://github.com/clerk/javascript/commit/2c6a0cca6e824bafc6b0d0501784517a5b1f75ea), [`71e6a1f`](https://github.com/clerk/javascript/commit/71e6a1f1024d65b7a09cdc8fa81ce0164e0a34cb)]:
+  - @clerk/backend@1.34.0
+  - @clerk/shared@3.9.5
+  - @clerk/types@4.59.3
+  - @clerk/clerk-react@5.31.8
+
+## 6.20.1
+
+### Patch Changes
+
+- Updated dependencies [[`6ed3dfc`](https://github.com/clerk/javascript/commit/6ed3dfc1bc742ac9d9a2307fe8e4733411cbc0d7), [`22c3363`](https://github.com/clerk/javascript/commit/22c33631f7f54b4f2179bf16f548fee1a237976e), [`ac6b231`](https://github.com/clerk/javascript/commit/ac6b23147e5e0aa21690cc20a109ed9a8c8f6e5b)]:
+  - @clerk/types@4.59.2
+  - @clerk/backend@1.33.1
+  - @clerk/clerk-react@5.31.7
+  - @clerk/shared@3.9.4
+
+## 6.20.0
+
+### Minor Changes
+
+- Introduce `treatPendingAsSignedOut` option to `getAuth` and `auth` from `clerkMiddleware` ([#5756](https://github.com/clerk/javascript/pull/5756)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  By default, `treatPendingAsSignedOut` is set to `true`, which means pending sessions are treated as signed-out. You can set this option to `false` to treat pending sessions as authenticated.
+
+  ```ts
+  const { userId } = auth({ treatPendingAsSignedOut: false });
+  ```
+
+  ```ts
+  const { userId } = getAuth(req, { treatPendingAsSignedOut: false });
+  ```
+
+  ```tsx
+  <SignedIn treatPendingAsSignedOut={false}>
+    User has a session that is either pending (requires tasks resolution) or active
+  </SignedIn>
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`ced8912`](https://github.com/clerk/javascript/commit/ced8912e8c9fb7eb7846de6ca9a872e794d9e15d), [`f237d76`](https://github.com/clerk/javascript/commit/f237d7617e5398ca0ba981e4336cac2191505b00), [`5f1375b`](https://github.com/clerk/javascript/commit/5f1375ba7cc50cccb11d5aee03bfd4c3d1bf462f)]:
+  - @clerk/backend@1.33.0
+  - @clerk/shared@3.9.3
+  - @clerk/clerk-react@5.31.6
+
+## 6.19.5
+
+### Patch Changes
+
+- Updated dependencies [[`c305b31`](https://github.com/clerk/javascript/commit/c305b310e351e9ce2012f805b35e464c3e43e310), [`b813cbe`](https://github.com/clerk/javascript/commit/b813cbe29252ab9710f355cecd4511172aea3548), [`6bb480e`](https://github.com/clerk/javascript/commit/6bb480ef663a6dfa219bc9546aca087d5d9624d0)]:
+  - @clerk/types@4.59.1
+  - @clerk/backend@1.32.3
+  - @clerk/shared@3.9.2
+  - @clerk/clerk-react@5.31.5
+
+## 6.19.4
+
+### Patch Changes
+
+- Updated dependencies [[`b1337df`](https://github.com/clerk/javascript/commit/b1337dfeae8ccf8622efcf095e3201f9bbf1cefa), [`65f0878`](https://github.com/clerk/javascript/commit/65f08788ee5e56242eee2194c73ba90965c75c97), [`df6fefd`](https://github.com/clerk/javascript/commit/df6fefd05fd2df93f5286d97e546b48911adea7c), [`4282bfa`](https://github.com/clerk/javascript/commit/4282bfa09491225bde7d619fe9a3561062703f69), [`5491491`](https://github.com/clerk/javascript/commit/5491491711e0a8ee37828451c1f603a409de32cf)]:
+  - @clerk/types@4.59.0
+  - @clerk/backend@1.32.2
+  - @clerk/clerk-react@5.31.4
+  - @clerk/shared@3.9.1
+
 ## 6.19.3
 
 ### Patch Changes

@@ -1,10 +1,9 @@
 import type {
   __internal_CheckoutProps,
+  __internal_OAuthConsentProps,
   __internal_PlanDetailsProps,
   __internal_UserVerificationProps,
-  CommercePlanResource,
-  CommerceStatementResource,
-  CommerceSubscriptionResource,
+  APIKeysProps,
   CreateOrganizationProps,
   GoogleOneTapProps,
   NewSubscriptionRedirectUrl,
@@ -35,6 +34,7 @@ export type {
   OrganizationListProps,
   WaitlistProps,
   __internal_UserVerificationProps,
+  __internal_OAuthConsentProps,
 };
 
 export type AvailableComponentProps =
@@ -50,9 +50,11 @@ export type AvailableComponentProps =
   | PricingTableProps
   | __internal_CheckoutProps
   | __internal_UserVerificationProps
-  | __internal_PlanDetailsProps;
+  | __internal_PlanDetailsProps
+  | APIKeysProps;
 
 type ComponentMode = 'modal' | 'mounted';
+type SignInMode = 'modal' | 'redirect';
 
 export type SignInCtx = SignInProps & {
   componentName: 'SignIn';
@@ -115,36 +117,25 @@ export type WaitlistCtx = WaitlistProps & {
 export type PricingTableCtx = PricingTableProps & {
   componentName: 'PricingTable';
   mode?: ComponentMode;
+  signInMode?: SignInMode;
+};
+
+export type APIKeysCtx = APIKeysProps & {
+  componentName: 'APIKeys';
+  mode?: ComponentMode;
 };
 
 export type CheckoutCtx = __internal_CheckoutProps & {
   componentName: 'Checkout';
 } & NewSubscriptionRedirectUrl;
 
-export type PaymentSourcesCtx = {
-  componentName: 'PaymentSources';
-};
-
-export type StatementsCtx = {
-  componentName: 'Statements';
-  statements: CommerceStatementResource[];
-  totalCount: number;
-  isLoading: boolean;
-  revalidate: () => void;
-  getStatementById: (statementId: string) => CommerceStatementResource | undefined;
-};
-
-export type PlansCtx = {
-  componentName: 'Plans';
-  plans: CommercePlanResource[];
-  subscriptions: CommerceSubscriptionResource[];
-  isLoading: boolean;
-  revalidate: () => void;
-};
-
 export type SessionTasksCtx = {
   nextTask: () => Promise<void>;
   redirectUrlComplete?: string;
+};
+
+export type OAuthConsentCtx = __internal_OAuthConsentProps & {
+  componentName: 'OAuthConsent';
 };
 
 export type AvailableComponentCtx =
@@ -160,5 +151,7 @@ export type AvailableComponentCtx =
   | GoogleOneTapCtx
   | WaitlistCtx
   | PricingTableCtx
-  | CheckoutCtx;
+  | CheckoutCtx
+  | APIKeysCtx
+  | OAuthConsentCtx;
 export type AvailableComponentName = AvailableComponentCtx['componentName'];
