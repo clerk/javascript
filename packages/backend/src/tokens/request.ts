@@ -4,6 +4,7 @@ import { constants } from '../constants';
 import type { TokenCarrier } from '../errors';
 import { MachineTokenVerificationError, TokenVerificationError, TokenVerificationErrorReason } from '../errors';
 import { decodeJwt } from '../jwt/verifyJwt';
+import { enhanceOAuthRedirectUrl } from '../util/handshakeUtils';
 import { assertValidSecretKey } from '../util/optionsAssertions';
 import { isDevelopmentFromSecretKey } from '../util/shared';
 import type { AuthenticateContext } from './authenticateContext';
@@ -144,6 +145,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
   /**
    * Merges headers from the RequestState with a handshake format cookie.
    * Creates a new Headers object with the configured handshake format and adds all headers from the result.
+   * Also modifies OAuth callback URLs to include the handshake format parameter.
    *
    * @param result - The RequestState containing headers to merge
    * @returns The RequestState with merged headers
@@ -182,7 +184,25 @@ export const authenticateRequest: AuthenticateRequest = (async (
       'Set-Cookie',
       `${constants.Cookies.HandshakeFormat}=${handshakeFormatValue}; Path=/; SameSite=None; Secure; Domain=${domain};`,
     );
+
+    // Check if this is a redirect response that might contain OAuth URLs in the Location header
+    const locationHeader = result.headers.get(constants.Headers.Location);
+    if (locationHeader) {
+      // Enhance OAuth redirect URLs to include the handshake format parameter
+      const enhancedUrl = enhanceOAuthRedirectUrl(locationHeader, authenticateContext);
+      if (enhancedUrl !== locationHeader) {
+        headers.set(constants.Headers.Location, enhancedUrl);
+      }
+    }
+
     for (const [key, value] of result.headers.entries()) {
+      // Don't duplicate the Location header if we already processed it above
+      if (key.toLowerCase() === 'location' && locationHeader) {
+        const enhancedUrl = enhanceOAuthRedirectUrl(locationHeader, authenticateContext);
+        if (enhancedUrl !== locationHeader) {
+          continue; // Skip since we already set the enhanced header
+        }
+      }
       headers.append(key, value);
     }
     result.headers = headers;
