@@ -359,8 +359,8 @@ function makeColorTransparent(color: string | undefined, percentage = 0): string
   return toHslaString(adjustAlpha(hsla, -alphaDelta));
 }
 
-function setColorAlpha(color: string, alpha: number): string {
-  if (!color.toString()) return color;
+function setColorAlpha(color: string | undefined, alpha: number): string | undefined {
+  if (!color || !color.toString()) return color;
   return toHslaString(setAlphaValue(toHslaColor(color), alpha));
 }
 

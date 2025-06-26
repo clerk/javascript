@@ -4,7 +4,6 @@ import { spaceScaleKeys } from '../foundations/sizes';
 import type { fontSizes, fontWeights } from '../foundations/typography';
 import { colors } from '../utils/colors';
 import { colorOptionToHslaAlphaScale, colorOptionToHslaLightnessScale } from '../utils/colors/colorOptionToHslaScale';
-import { cssSupports } from '../utils/cssSupports';
 import { fromEntries } from '../utils/fromEntries';
 import { removeUndefinedProps } from '../utils/removeUndefinedProps';
 
@@ -33,38 +32,15 @@ export const createColorScales = (theme: Theme) => {
     ...successAlphaScale,
     ...warningAlphaScale,
     primaryHover: primaryScale?.primary400,
-    colorTextOnPrimaryBackground: toHSLA(variables.colorTextOnPrimaryBackground),
-    colorText: toHSLA(variables.colorText),
-    colorTextSecondary: toHSLA(variables.colorTextSecondary) || toTransparent(variables.colorText, 35),
-    colorInputText: toHSLA(variables.colorInputText),
-    colorBackground: toHSLA(variables.colorBackground),
-    colorInputBackground: toHSLA(variables.colorInputBackground),
-    colorShimmer: toHSLA(variables.colorShimmer),
+    colorTextOnPrimaryBackground: colors.toHslaString(variables.colorTextOnPrimaryBackground),
+    colorText: colors.toHslaString(variables.colorText),
+    colorTextSecondary:
+      colors.toHslaString(variables.colorTextSecondary) || colors.makeTransparent(variables.colorText, 35),
+    colorInputText: colors.toHslaString(variables.colorInputText),
+    colorBackground: colors.toHslaString(variables.colorBackground),
+    colorInputBackground: colors.toHslaString(variables.colorInputBackground),
+    colorShimmer: colors.toHslaString(variables.colorShimmer),
   });
-};
-
-export const toHSLA = (str: string | undefined) => {
-  if (!str) {
-    return undefined;
-  }
-
-  if (cssSupports.colorMix() || cssSupports.relativeColorSyntax()) {
-    return str;
-  }
-
-  return colors.toHslaString(str);
-};
-
-const toTransparent = (str: string | undefined, percentage: number) => {
-  if (!str) {
-    return undefined;
-  }
-
-  if (cssSupports.colorMix()) {
-    return `color-mix(in srgb, ${str}, transparent ${percentage}%)`;
-  }
-
-  return colors.makeTransparent(str, percentage / 100);
 };
 
 export const createRadiiUnits = (theme: Theme) => {

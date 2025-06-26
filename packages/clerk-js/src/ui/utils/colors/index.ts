@@ -1,19 +1,25 @@
-import type { HslaColor, HslaColorString } from '@clerk/types';
+import type { HslaColor } from '@clerk/types';
 
 import { hasModernColorSupport } from './cache';
 import { legacyColors } from './legacy';
 import { modernColors } from './modern';
 
-/**
- * Unified colors API that automatically chooses between modern and legacy implementations
- * based on browser support. Maintains the same interface as the legacy colors object.
- */
 export const colors = {
-  // Core conversion functions (from legacy, but these might need modern equivalents)
-  toHslaColor: legacyColors.toHslaColor,
-  toHslaString: legacyColors.toHslaString,
+  toHslaColor: (color: string | undefined): string | HslaColor | undefined => {
+    if (!color) return undefined;
+    if (hasModernColorSupport()) {
+      return color;
+    }
+    return legacyColors.toHslaColor(color);
+  },
+  toHslaString: (color: HslaColor | string | undefined): string | undefined => {
+    if (!color) return undefined;
+    if (hasModernColorSupport() && typeof color === 'string') {
+      return color;
+    }
+    return legacyColors.toHslaString(color);
+  },
 
-  // Legacy HSLA manipulation (keep for backwards compatibility)
   changeHslaLightness: legacyColors.changeHslaLightness,
   setHslaAlpha: legacyColors.setHslaAlpha,
 
@@ -39,7 +45,7 @@ export const colors = {
     return legacyColors.makeSolid(color);
   },
 
-  setAlpha: (color: string, alpha: number): string => {
+  setAlpha: (color: string | undefined, alpha: number): string | undefined => {
     if (hasModernColorSupport()) {
       return modernColors.setAlpha(color, alpha);
     }
@@ -54,34 +60,6 @@ export const colors = {
   },
 };
 
-/**
- * Export modern color utilities for direct use when you want to force modern CSS
- * Useful for testing or when you know the target environment supports modern CSS
- */
-export { modernColors };
-
-/**
- * Export legacy color utilities for direct use when needed
- * Useful for testing or gradual migration
- */
-export { legacyColors };
-
-/**
- * Export browser support detection
- */
-export { hasModernColorSupport };
-
-/**
- * Export unified scale generators
- */
+export { modernColors, legacyColors, hasModernColorSupport };
 export { generateAlphaScale, generateLightnessScale, modernScales, legacyScales } from './scales';
-
-/**
- * Type exports
- */
-export type { HslaColor, HslaColorString };
-
-/**
- * Export cache utilities for advanced use cases
- */
-export { clearMemoCache, getCacheStats } from './cache';
+export { clearMemoCache } from './cache';
