@@ -124,13 +124,3 @@ export function clearMemoCache(): void {
   memoCache.clear();
   modernColorSupportCache = null;
 }
-
-/**
- * Get cache statistics for debugging
- */
-export function getCacheStats(): { size: number; modernSupport: boolean | null } {
-  return {
-    size: memoCache.size,
-    modernSupport: modernColorSupportCache,
-  };
-}
