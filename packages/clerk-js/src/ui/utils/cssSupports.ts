@@ -10,7 +10,7 @@ const supportCache = new Map<CSSFeature, boolean>();
 /**
  * CSS feature detection
  * @param feature - The CSS feature to test
- * @param property - CSS property to test (defaults to 'color' for most tests)
+ * @param property - CSS property to test (defaults to 'color')
  * @returns Whether the feature is supported
  */
 const testCSSFeature = (feature: CSSFeature, property: string = 'color'): boolean => {
@@ -57,21 +57,6 @@ const getPropertyForFeature = (feature: CSSFeature, defaultProperty: string): st
 };
 
 /**
- * Check multiple CSS features at once
- * @param features - Array of features to check
- * @returns Object with feature names as keys and support status as values
- */
-const checkCSSFeatures = (features: CSSFeature[]): Record<CSSFeature, boolean> => {
-  return features.reduce(
-    (acc, feature) => {
-      acc[feature] = testCSSFeature(feature);
-      return acc;
-    },
-    {} as Record<CSSFeature, boolean>,
-  );
-};
-
-/**
  * Individual feature check functions for convenience
  * These are pre-configured and cached automatically
  */
@@ -88,5 +73,5 @@ export const getCachedSupports = (): Record<string, boolean> => {
   return Object.fromEntries(supportCache.entries());
 };
 
-export { testCSSFeature, checkCSSFeatures };
+export { testCSSFeature };
 export type { CSSFeature };
