@@ -1,11 +1,12 @@
 import { useClerk } from '@clerk/shared/react';
 import React, { forwardRef, memo, useEffect, useMemo, useRef } from 'react';
 
+import { mergeRefs } from '@/ui/utils/mergeRefs';
+import type { FeedbackType } from '@/ui/utils/useFormControl';
+
 import { descriptors, Flex, Icon, Input, Text } from '../../customizables';
 import { Check, ChevronUpDown } from '../../icons';
 import { common, type PropsOfComponent } from '../../styledSystem';
-import type { FeedbackType } from '../../utils';
-import { mergeRefs } from '../../utils';
 import { Select, SelectButton, SelectOptionList } from '../Select';
 import type { CountryEntry, CountryIso } from './countryCodeData';
 import { IsoToCountryMap } from './countryCodeData';

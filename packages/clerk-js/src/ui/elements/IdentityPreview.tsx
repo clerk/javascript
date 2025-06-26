@@ -4,7 +4,8 @@ import React from 'react';
 import { Button, descriptors, Flex, Icon, Text } from '../customizables';
 import { PencilEdit } from '../icons';
 import type { PropsOfComponent } from '../styledSystem';
-import { formatSafeIdentifier, getFlagEmojiFromCountryIso, isMaskedIdentifier, parsePhoneString } from '../utils';
+import { formatSafeIdentifier, isMaskedIdentifier } from '../utils/formatSafeIdentifier';
+import { getFlagEmojiFromCountryIso, parsePhoneString } from '../utils/phoneUtils';
 
 type IdentityPreviewProps = {
   avatarUrl: string | null | undefined;

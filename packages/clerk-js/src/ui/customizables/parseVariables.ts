@@ -2,14 +2,10 @@ import type { Theme } from '@clerk/types';
 
 import { spaceScaleKeys } from '../foundations/sizes';
 import type { fontSizes, fontWeights } from '../foundations/typography';
-import {
-  colorOptionToHslaAlphaScale,
-  colorOptionToHslaLightnessScale,
-  colors,
-  fromEntries,
-  removeUndefinedProps,
-} from '../utils';
-import { cssSupports } from '../utils/cssSupports';
+import { colorOptionToHslaAlphaScale, colorOptionToHslaLightnessScale } from '../utils/colorOptionToHslaScale';
+import { colors } from '../utils/colors';
+import { fromEntries } from '../utils/fromEntries';
+import { removeUndefinedProps } from '../utils/removeUndefinedProps';
 
 export const createColorScales = (theme: Theme) => {
   const variables = theme.variables || {};

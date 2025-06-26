@@ -6,7 +6,7 @@ import { completeSignUpFlow } from '../../utils';
 import { useCoreSignUp } from '../contexts';
 import type { LocalizationKey } from '../localization';
 import { useRouter } from '../router';
-import { sleep } from '../utils';
+import { sleep } from '../utils/sleep';
 import type { EmailLinkUIStatus } from './EmailLinkStatusCard';
 import { EmailLinkStatusCard } from './EmailLinkStatusCard';
 

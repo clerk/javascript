@@ -3,12 +3,12 @@ import { useClerk } from '@clerk/shared/react';
 import { useCallback, useEffect } from 'react';
 
 import { useCardState } from '@/ui/elements/contexts';
+import { handleError } from '@/ui/utils/errorHandler';
 
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { __internal_WebAuthnAbortService } from '../../../utils/passkeys';
 import { useCoreSignIn, useSignInContext } from '../../contexts';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
-import { handleError } from '../../utils';
 
 function useHandleAuthenticateWithPasskey(onSecondFactor: () => Promise<unknown>) {
   const card = useCardState();

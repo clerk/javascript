@@ -1,6 +1,6 @@
 import { fastDeepMergeAndReplace } from '@clerk/shared/utils';
 
-import { createInfiniteAccessProxy } from '../utils';
+import { createInfiniteAccessProxy } from '../utils/createInfiniteAccessProxy';
 import type { InternalTheme, StyleRule } from './types';
 
 type UnwrapBooleanVariant<T> = T extends 'true' | 'false' ? boolean : T;
