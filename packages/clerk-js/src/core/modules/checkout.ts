@@ -34,7 +34,7 @@ type CheckoutCacheState = {
 const createManagerCache = <CacheKey, CacheState>() => {
   const cache = new Map<CacheKey, CacheState>();
   const listeners = new Map<CacheKey, Set<(newState: CacheState) => void>>();
-  const pendingOperations = new Map<CacheKey, Set<string>>();
+  const pendingOperations = new Map<CacheKey, Map<string, Promise<CommerceCheckoutResource>>>();
 
   return {
     cache,
@@ -45,6 +45,12 @@ const createManagerCache = <CacheKey, CacheState>() => {
         map.set(key, new Set() as V);
       }
       return map.get(key) as NonNullable<V>;
+    },
+    safeGetOperations<K extends CacheKey>(key: K): Map<string, Promise<CommerceCheckoutResource>> {
+      if (!this.pendingOperations.has(key)) {
+        this.pendingOperations.set(key, new Map<string, Promise<CommerceCheckoutResource>>());
+      }
+      return this.pendingOperations.get(key) as Map<string, Promise<CommerceCheckoutResource>>;
     },
   };
 };
@@ -87,7 +93,7 @@ const defaultCacheState: CheckoutCacheState = deriveCheckoutState({
  */
 function createCheckoutManager(cacheKey: CheckoutKey) {
   const listeners = managerCache.safeGet(cacheKey, managerCache.listeners);
-  const pendingOperations = managerCache.safeGet(cacheKey, managerCache.pendingOperations);
+  const pendingOperations = managerCache.safeGetOperations(cacheKey);
 
   const notifyListeners = () => {
     listeners.forEach(listener => listener(getCacheState()));
@@ -123,25 +129,32 @@ function createCheckoutManager(cacheKey: CheckoutKey) {
       const operationId = `${cacheKey}-${operationType}`;
       const isRunningField = operationType === 'start' ? 'isStarting' : 'isConfirming';
 
-      // Prevent duplicate operations
-      if (getCacheState()[isRunningField] || pendingOperations.has(operationId)) {
-        throw new Error(`Checkout ${operationType} already in progress`);
+      // Check if there's already a pending operation
+      const existingOperation = pendingOperations.get(operationId);
+      if (existingOperation) {
+        // Wait for the existing operation to complete and return its result
+        // If it fails, all callers should receive the same error
+        return await existingOperation;
       }
 
-      pendingOperations.add(operationId);
+      // Create and store the operation promise
+      const operationPromise = (async () => {
+        try {
+          updateCacheState({ [isRunningField]: true, error: null });
+          const result = await operationFn();
+          updateCacheState({ [isRunningField]: false, error: null, checkout: result });
+          return result;
+        } catch (error) {
+          const clerkError = error as ClerkAPIResponseError;
+          updateCacheState({ [isRunningField]: false, error: clerkError });
+          throw error;
+        } finally {
+          pendingOperations.delete(operationId);
+        }
+      })();
 
-      try {
-        updateCacheState({ [isRunningField]: true, error: null });
-        const result = await operationFn();
-        updateCacheState({ [isRunningField]: false, error: null, checkout: result });
-        return result;
-      } catch (error) {
-        const clerkError = error as ClerkAPIResponseError;
-        updateCacheState({ [isRunningField]: false, error: clerkError });
-        throw error;
-      } finally {
-        pendingOperations.delete(operationId);
-      }
+      pendingOperations.set(operationId, operationPromise);
+      return operationPromise;
     },
 
     clearCheckout(): void {
