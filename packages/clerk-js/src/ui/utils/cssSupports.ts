@@ -73,5 +73,4 @@ export const getCachedSupports = (): Record<string, boolean> => {
   return Object.fromEntries(supportCache.entries());
 };
 
-export { testCSSFeature };
 export type { CSSFeature };
