@@ -63,6 +63,12 @@ const getPropertyForFeature = (feature: CSSFeature, defaultProperty: string): st
 export const cssSupports = {
   relativeColorSyntax: () => testCSSFeature('relativeColorSyntax'),
   colorMix: () => testCSSFeature('colorMix'),
+
+  /**
+   * Check if the browser supports modern color syntax (color-mix or relative color syntax)
+   * @returns true if the browser supports modern color syntax
+   */
+  hasModernColorSupport: () => testCSSFeature('relativeColorSyntax') || testCSSFeature('colorMix'),
 } as const;
 
 export const clearCSSSupportsCache = (): void => {

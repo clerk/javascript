@@ -34,7 +34,7 @@ let modernColorSupportCache: boolean | null = null;
 
 export const hasModernColorSupport = (): boolean => {
   if (modernColorSupportCache === null) {
-    modernColorSupportCache = cssSupports.colorMix() || cssSupports.relativeColorSyntax();
+    modernColorSupportCache = cssSupports.hasModernColorSupport();
   }
   return modernColorSupportCache;
 };
@@ -117,7 +117,8 @@ export function batchGenerateColorScale<T>(
 }
 
 /**
- * Get cache statistics (useful for testing)
+ * Get cache statistics
+ * @internal - Test utility only
  */
 export function getCacheStats(): { size: number; modernSupport: boolean | null } {
   return {
@@ -127,7 +128,8 @@ export function getCacheStats(): { size: number; modernSupport: boolean | null }
 }
 
 /**
- * Clear memoization cache (useful for testing or memory management)
+ * Clear memoization cache
+ * @internal - Test utility only
  */
 export function clearMemoCache(): void {
   memoCache.clear();
