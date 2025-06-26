@@ -21,11 +21,11 @@ For large payloads, we:
 
 ## New Handshake Flow (for payloads >2KB)
 1. User visits `example.com`
-2. Trigger handshake → `307 /v1/client/handshake`
-3. Handshake resolves → `307 example.com` with `__clerk_handshake_nonce` cookie containing the nonce
-4. Client makes `GET BAPI/v1/clients/handshake_payload?nonce=<nonce_value>` request
+2. Client app middleware triggers handshake → `307 FAPI/v1/client/handshake`
+3. FAPI handshake resolves → `307 example.com` with `__clerk_handshake_nonce` cookie containing the nonce
+4. Client app middleware makes `GET BAPI/v1/clients/handshake_payload?nonce=<nonce_value>` request (BAPI)
 5. BAPI returns array of set-cookie header values
-6. Headers are applied to the response
+6. Client app middleware applies headers to the response
 
 ## Traditional Flow (for payloads ≤2KB)
 No changes. Continues to work as before with direct payload delivery in cookies for optimal performance.
