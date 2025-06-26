@@ -17,10 +17,10 @@ import { useCallback, useMemo } from 'react';
 import useSWR from 'swr';
 
 import { CommerceSubscription } from '@/core/resources/CommerceSubscription';
+import { getClosestProfileScrollBox } from '@/ui/utils/getClosestProfileScrollBox';
 
 import type { LocalizationKey } from '../../localization';
 import { localizationKeys } from '../../localization';
-import { getClosestProfileScrollBox } from '../../utils';
 import { useSubscriberTypeContext } from './SubscriberType';
 
 const dedupeOptions = {

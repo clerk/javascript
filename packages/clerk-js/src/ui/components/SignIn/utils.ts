@@ -8,9 +8,10 @@ import type {
   SignInStrategy,
 } from '@clerk/types';
 
+import { getPreferredPhoneCodeChannelByCountry } from '@/ui/utils/phoneUtils';
+import type { FormControlState } from '@/ui/utils/useFormControl';
+
 import { PREFERRED_SIGN_IN_STRATEGIES } from '../../common/constants';
-import { type FormControlState } from '../../utils';
-import { getPreferredPhoneCodeChannelByCountry } from '../../utils';
 import { otpPrefFactorComparator, passwordPrefFactorComparator } from '../../utils/factorSorting';
 
 const factorForIdentifier = (i: string | null) => (f: SignInFactor) => {

@@ -1,9 +1,9 @@
 import { useCardState } from '@/ui/elements/contexts';
+import { handleError } from '@/ui/utils/errorHandler';
 
 import { useCoreSignUp } from '../../contexts';
 import { Flow, localizationKeys } from '../../customizables';
 import { useFetch } from '../../hooks';
-import { handleError } from '../../utils';
 import { SignUpVerificationCodeForm } from './SignUpVerificationCodeForm';
 
 export const SignUpEmailCodeCard = () => {
