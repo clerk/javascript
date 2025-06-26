@@ -26,6 +26,50 @@ export const createEmptyColorScale = (): ColorScale<string | undefined> => {
 };
 
 /**
+ * Core color generation functions
+ */
+
+/**
+ * Create a color-mix string
+ * @param baseColor - The base color
+ * @param mixColor - The color to mix with
+ * @param percentage - The percentage of the mix
+ * @returns The color-mix string
+ */
+function createColorMixString(baseColor: string, mixColor: string, percentage: number): string {
+  return `color-mix(in srgb, ${baseColor}, ${mixColor} ${percentage}%)`;
+}
+
+/**
+ * Generate a relative color syntax string
+ * @param color - The base color
+ * @param hue - The hue component
+ * @param saturation - The saturation component
+ * @param lightness - The lightness component
+ * @param alpha - The alpha component (optional)
+ * @returns The relative color syntax string
+ */
+function createRelativeColorString(
+  color: string,
+  hue: string,
+  saturation: string,
+  lightness: string,
+  alpha?: string,
+): string {
+  return `hsl(from ${color} ${hue} ${saturation} ${lightness}${alpha ? ` / ${alpha}` : ''})`;
+}
+
+/**
+ * Create an alpha color-mix string
+ * @param color - The base color
+ * @param alphaPercentage - The alpha percentage
+ * @returns The alpha color-mix string
+ */
+function createAlphaColorMixString(color: string, alphaPercentage: number): string {
+  return `color-mix(in srgb, transparent, ${color} ${alphaPercentage}%)`;
+}
+
+/**
  * Memoized color string generators for better performance
  */
 export const colorGenerators = {
@@ -33,27 +77,19 @@ export const colorGenerators = {
    * Memoized color-mix generator
    */
   colorMix: memoize(
-    (baseColor: string, mixColor: string, percentage: number): string =>
-      `color-mix(in srgb, ${baseColor}, ${mixColor} ${percentage}%)`,
+    createColorMixString,
     (baseColor, mixColor, percentage) => `mix:${baseColor}:${mixColor}:${percentage}`,
   ),
 
   /**
    * Memoized relative color syntax generator
    */
-  relativeColor: memoize(
-    (color: string, hue: string, saturation: string, lightness: string, alpha?: string): string =>
-      `hsl(from ${color} ${hue} ${saturation} ${lightness}${alpha ? ` / ${alpha}` : ''})`,
-    (color, h, s, l, a) => `rel:${color}:${h}:${s}:${l}:${a || ''}`,
-  ),
+  relativeColor: memoize(createRelativeColorString, (color, h, s, l, a) => `rel:${color}:${h}:${s}:${l}:${a || ''}`),
 
   /**
    * Memoized alpha color-mix generator
    */
-  alphaColorMix: memoize(
-    (color: string, alphaPercentage: number): string => `color-mix(in srgb, transparent, ${color} ${alphaPercentage}%)`,
-    (color, alpha) => `alpha:${color}:${alpha}`,
-  ),
+  alphaColorMix: memoize(createAlphaColorMixString, (color, alpha) => `alpha:${color}:${alpha}`),
 };
 
 // Core utility functions (now using memoized versions for better performance)
