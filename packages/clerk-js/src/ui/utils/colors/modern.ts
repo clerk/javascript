@@ -12,7 +12,7 @@ import { hasModernColorSupport as hasModernColorSupportCached } from './cache';
  */
 export const modernColors = {
   /**
-   * Lightens a color by a percentage using modern CSS
+   * Lightens a color by a percentage
    */
   lighten: (color: string | undefined, percentage = 0): string | undefined => {
     if (!color) return undefined;
