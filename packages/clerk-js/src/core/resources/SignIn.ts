@@ -241,8 +241,11 @@ export class SignIn extends BaseResource implements SignInResource {
         actionCompleteRedirectUrl: redirectUrlComplete,
       };
 
-      // Add format=nonce if backend supports nonce handshakes
-      if (SignIn.clerk.__internal_supportsNonceHandshake()) {
+      // Add format=nonce only for OAuth strategies if backend supports nonce handshakes
+      const isOAuthStrategy =
+        strategy && (strategy.startsWith('oauth_') || strategy === 'saml' || strategy === 'enterprise_sso');
+
+      if (isOAuthStrategy && SignIn.clerk.__internal_supportsNonceHandshake()) {
         createParams.format = 'nonce';
       }
 

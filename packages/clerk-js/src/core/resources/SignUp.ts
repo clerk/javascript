@@ -299,8 +299,11 @@ export class SignUp extends BaseResource implements SignUpResource {
         oidcPrompt,
       };
 
-      // Add format=nonce if backend supports nonce handshakes
-      if (SignUp.clerk.__internal_supportsNonceHandshake()) {
+      // Add format=nonce only for OAuth strategies if backend supports nonce handshakes
+      const isOAuthStrategy =
+        strategy && (strategy.startsWith('oauth_') || strategy === 'saml' || strategy === 'enterprise_sso');
+
+      if (isOAuthStrategy && SignUp.clerk.__internal_supportsNonceHandshake()) {
         authParams.format = 'nonce';
       }
 
