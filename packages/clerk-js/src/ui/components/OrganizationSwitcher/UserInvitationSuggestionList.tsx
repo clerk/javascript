@@ -10,6 +10,7 @@ import { Actions } from '@/ui/elements/Actions';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { OrganizationPreview } from '@/ui/elements/OrganizationPreview';
 import { PreviewButton } from '@/ui/elements/PreviewButton';
+import { handleError } from '@/ui/utils/errorHandler';
 
 import { InfiniteListSpinner } from '../../common';
 import { useAcceptedInvitations } from '../../contexts';
@@ -18,7 +19,6 @@ import { useInView } from '../../hooks';
 import { SwitchArrowRight } from '../../icons';
 import type { PropsOfComponent } from '../../styledSystem';
 import { common } from '../../styledSystem';
-import { handleError } from '../../utils';
 import { organizationListParams, populateCacheUpdateItem } from './utils';
 
 const useFetchInvitations = () => {

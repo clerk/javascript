@@ -15,7 +15,7 @@ import type { ElementDescriptor } from '../customizables/elementDescriptors';
 import { usePrefersReducedMotion } from '../hooks';
 import type { ThemableCssProp } from '../styledSystem';
 import { animations } from '../styledSystem';
-import type { FeedbackType, useFormControlFeedback } from '../utils';
+import type { FeedbackType, useFormControlFeedback } from '../utils/useFormControl';
 
 export function useFormTextAnimation() {
   const prefersReducedMotion = usePrefersReducedMotion();

@@ -8,7 +8,7 @@ import { usePopover, useSearchInput } from '../hooks';
 import { ChevronDown } from '../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { animations } from '../styledSystem';
-import { colors } from '../utils';
+import { colors } from '../utils/colors';
 import { withFloatingTree } from './contexts';
 import type { InputWithIcon } from './InputWithIcon';
 import { Popover } from './Popover';

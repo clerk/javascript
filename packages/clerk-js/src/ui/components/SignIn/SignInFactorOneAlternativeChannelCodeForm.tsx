@@ -5,13 +5,13 @@ import type { PhoneCodeFactor, SignInFactor } from '@clerk/types';
 import { useCardState } from '@/ui/elements/contexts';
 import type { VerificationCodeCardProps } from '@/ui/elements/VerificationCodeCard';
 import { VerificationCodeCard } from '@/ui/elements/VerificationCodeCard';
+import { handleError } from '@/ui/utils/errorHandler';
 
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { useCoreSignIn, useSignInContext } from '../../contexts';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { type LocalizationKey, localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
-import { handleError } from '../../utils';
 
 export type SignInFactorOneAlternativeChannelCodeCard = Pick<
   VerificationCodeCardProps,

@@ -4,11 +4,11 @@ import { Card } from '@/ui/elements/Card';
 import { useCardState } from '@/ui/elements/contexts';
 import { Form } from '@/ui/elements/Form';
 import { Header } from '@/ui/elements/Header';
+import type { FormControlState } from '@/ui/utils/useFormControl';
 
 import { Button, Col, descriptors, Flex, Image, localizationKeys } from '../../customizables';
 import { CaptchaElement } from '../../elements/CaptchaElement';
 import { useEnabledThirdPartyProviders } from '../../hooks';
-import type { FormControlState } from '../../utils';
 
 type SignUpAlternativePhoneCodePhoneNumberCardProps = {
   handleSubmit: React.FormEventHandler;
