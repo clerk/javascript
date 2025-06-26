@@ -35,10 +35,9 @@ const QueryParameters = {
   Handshake: Cookies.Handshake,
   HandshakeHelp: '__clerk_help',
   LegacyDevBrowser: '__dev_session',
-  HandshakeReason: '__clerk_hs_reason',
   HandshakeFormat: 'format',
   HandshakeNonce: Cookies.HandshakeNonce,
-  HandshakeFormat: 'format',
+  HandshakeReason: '__clerk_hs_reason',
 } as const;
 
 const Headers = {
