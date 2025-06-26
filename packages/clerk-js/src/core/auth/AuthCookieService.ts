@@ -16,8 +16,7 @@ import { createSessionCookie } from './cookies/session';
 import { getCookieSuffix } from './cookieSuffix';
 import type { DevBrowser } from './devBrowser';
 import { createDevBrowser } from './devBrowser';
-import type { HandshakeFormatDetector } from './handshakeFormat';
-import { createHandshakeFormatDetector } from './handshakeFormat';
+
 import { SessionCookiePoller } from './SessionCookiePoller';
 
 // TODO(@dimkl): make AuthCookieService singleton since it handles updating cookies using a poller
@@ -44,7 +43,6 @@ export class AuthCookieService {
   private sessionCookie: SessionCookieHandler;
   private activeCookie: ReturnType<typeof createCookieHandler>;
   private devBrowser: DevBrowser;
-  private handshakeFormatDetector: HandshakeFormatDetector;
 
   public static async create(
     clerk: Clerk,
@@ -82,7 +80,6 @@ export class AuthCookieService {
       fapiClient,
       cookieSuffix,
     });
-    this.handshakeFormatDetector = createHandshakeFormatDetector(cookieSuffix);
   }
 
   public async setup() {
@@ -250,9 +247,5 @@ export class AuthCookieService {
 
   public getSessionCookie() {
     return this.sessionCookie.get();
-  }
-
-  public supportsNonceHandshake(): boolean {
-    return this.handshakeFormatDetector.supportsNonce();
   }
 }

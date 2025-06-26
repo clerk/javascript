@@ -814,12 +814,12 @@ export const authenticateRequest: AuthenticateRequest = (async (
 
   if (authenticateContext.tokenInHeader) {
     if (acceptsToken === 'any') {
-      return authenticateAnyRequestWithTokenInHeader();
+      return await authenticateAnyRequestWithTokenInHeader();
     }
     if (acceptsToken === TokenType.SessionToken) {
       return mergeHeaders(await authenticateRequestWithTokenInHeader());
     }
-    return authenticateMachineRequestWithTokenInHeader();
+    return await authenticateMachineRequestWithTokenInHeader();
   }
 
   // Machine requests cannot have the token in the cookie, it must be in header.

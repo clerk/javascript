@@ -1433,14 +1433,6 @@ export class Clerk implements ClerkInterface {
     return this.#authService.decorateUrlWithDevBrowserToken(toURL).href;
   }
 
-  /**
-   * @internal
-   * Checks if the backend supports nonce handshakes by reading the handshake format cookie
-   */
-  public __internal_supportsNonceHandshake(): boolean {
-    return this.#authService?.supportsNonceHandshake() || false;
-  }
-
   public buildSignInUrl(options?: SignInRedirectOptions): string {
     return this.#buildUrl(
       'signInUrl',

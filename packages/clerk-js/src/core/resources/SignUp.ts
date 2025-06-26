@@ -289,7 +289,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     } = params;
 
     const authenticateFn = () => {
-      const authParams: any = {
+      const authParams = {
         strategy,
         redirectUrl: SignUp.clerk.buildUrlWithAuth(redirectUrl),
         actionCompleteRedirectUrl: redirectUrlComplete,
@@ -298,15 +298,6 @@ export class SignUp extends BaseResource implements SignUpResource {
         legalAccepted,
         oidcPrompt,
       };
-
-      // Add format=nonce only for OAuth strategies if backend supports nonce handshakes
-      const isOAuthStrategy =
-        strategy && (strategy.startsWith('oauth_') || strategy === 'saml' || strategy === 'enterprise_sso');
-
-      if (isOAuthStrategy && SignUp.clerk.__internal_supportsNonceHandshake()) {
-        authParams.format = 'nonce';
-      }
-
       return continueSignUp && this.id ? this.update(authParams) : this.create(authParams);
     };
 
