@@ -10,7 +10,7 @@ import {
   generateAlphaColorMix,
   generateColorMixSyntax,
   generateRelativeColorSyntax,
-  getColorMix,
+  getSupportedColorVariant,
 } from '../utils';
 
 // Mock cssSupports
@@ -160,16 +160,16 @@ describe('Color Utils', () => {
     });
   });
 
-  describe('getColorMix', () => {
+  describe('getSupportedColorVariant', () => {
     it('should return original color for 500 shade', () => {
-      const result = getColorMix('red', 500);
+      const result = getSupportedColorVariant('red', 500);
       expect(result).toBe('red');
     });
 
     it('should use relative color syntax when supported', () => {
       mockRelativeColorSyntax.mockReturnValue(true);
 
-      const result = getColorMix('red', 400);
+      const result = getSupportedColorVariant('red', 400);
       expect(result).toMatch(/hsl\(from red h s calc\(l \+ \(1 \* \(\(97 - l\) \/ 7\)\)\)\)/);
     });
 
@@ -177,7 +177,7 @@ describe('Color Utils', () => {
       mockRelativeColorSyntax.mockReturnValue(false);
       mockColorMix.mockReturnValue(true);
 
-      const result = getColorMix('red', 400);
+      const result = getSupportedColorVariant('red', 400);
       expect(result).toBe('color-mix(in srgb, red, white 16%)');
     });
 
@@ -185,7 +185,7 @@ describe('Color Utils', () => {
       mockRelativeColorSyntax.mockReturnValue(false);
       mockColorMix.mockReturnValue(false);
 
-      const result = getColorMix('red', 400);
+      const result = getSupportedColorVariant('red', 400);
       expect(result).toBe('red');
     });
   });

@@ -134,12 +134,12 @@ export function generateAlphaColorMix(color: string, shade: ColorShade): string 
 }
 
 /**
- * Get a color-mix string
+ * Get the optimal color variant for the given shade
  * @param color - The base color
  * @param shade - The shade to generate the color for
- * @returns The color-mix string
+ * @returns The optimal color variant
  */
-export function getColorMix(color: string, shade: ColorShade): string {
+export function getSupportedColorVariant(color: string, shade: ColorShade): string {
   if (shade === 500) return color;
 
   if (cssSupports.relativeColorSyntax()) {

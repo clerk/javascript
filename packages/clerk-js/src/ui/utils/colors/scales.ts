@@ -3,7 +3,7 @@ import type { ColorScale, CssColorOrAlphaScale, CssColorOrScale, HslaColorString
 import { cssSupports } from '../cssSupports';
 import { ALPHA_VALUES, COLOR_SCALE, DARK_SHADES, LIGHT_SHADES, LIGHTNESS_CONFIG } from './constants';
 import { colors as legacyColors } from './legacy';
-import { createEmptyColorScale, generateAlphaColorMix, getColorMix } from './utils';
+import { createEmptyColorScale, generateAlphaColorMix, getSupportedColorVariant } from './utils';
 
 // Types for themed scales
 type InternalColorScale<T> = ColorScale<T> & Partial<Record<20, T>>;
@@ -69,7 +69,7 @@ function generateModernLightnessScale(baseColor: string): ColorScale<string> {
   const scale = createEmptyColorScale();
 
   COLOR_SCALE.forEach(shade => {
-    scale[shade] = getColorMix(baseColor, shade);
+    scale[shade] = getSupportedColorVariant(baseColor, shade);
   });
 
   return scale as ColorScale<string>;
