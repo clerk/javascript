@@ -22,7 +22,7 @@ For large payloads, we:
 **New Handshake Flow (for payloads >2KB):**
 1. User visits `example.com`
 2. Trigger handshake → `307 /v1/client/handshake`
-3. Handshake resolves → `307 ecxample.com` with `__clerk_handshake_nonce` cookie containing the nonce
+3. Handshake resolves → `307 example.com` with `__clerk_handshake_nonce` cookie containing the nonce
 4. Client makes `GET BAPI/v1/clients/handshake_payload?nonce=<nonce_value>` request
 5. BAPI returns array of set-cookie header values
 6. Headers are applied to the response
