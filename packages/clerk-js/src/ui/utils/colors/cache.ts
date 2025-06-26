@@ -5,7 +5,7 @@
 import type { ColorScale } from '@clerk/types';
 
 import { cssSupports } from '../cssSupports';
-import { COLOR_SCALE } from './constants';
+import { ALL_SHADES, COLOR_SCALE } from './constants';
 
 // Memoization cache for expensive operations
 const memoCache = new Map<string, any>();
@@ -42,23 +42,15 @@ export const hasModernColorSupport = (): boolean => {
 /**
  * Pre-computed empty color scale to avoid object creation
  */
-const EMPTY_COLOR_SCALE: ColorScale<string | undefined> = Object.freeze({
-  '25': undefined,
-  '50': undefined,
-  '100': undefined,
-  '150': undefined,
-  '200': undefined,
-  '300': undefined,
-  '400': undefined,
-  '500': undefined,
-  '600': undefined,
-  '700': undefined,
-  '750': undefined,
-  '800': undefined,
-  '850': undefined,
-  '900': undefined,
-  '950': undefined,
-});
+const EMPTY_COLOR_SCALE: ColorScale<string | undefined> = Object.freeze(
+  ALL_SHADES.reduce(
+    (scale, shade) => {
+      scale[shade] = undefined;
+      return scale;
+    },
+    {} as ColorScale<string | undefined>,
+  ),
+);
 
 /**
  * Fast empty color scale creation - returns pre-computed frozen object

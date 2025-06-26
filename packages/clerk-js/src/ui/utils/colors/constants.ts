@@ -87,3 +87,21 @@ export const RELATIVE_SHADE_STEPS: Record<number, number> = {
   900: 6,
   950: 7,
 } as const;
+
+// Color bounds for validation and clamping
+export const COLOR_BOUNDS = {
+  rgb: { min: 0, max: 255 },
+  alpha: { min: 0, max: 1 },
+  hue: { min: 0, max: 360 },
+  percentage: { min: 0, max: 100 },
+} as const;
+
+// Modern CSS utility constants
+export const MODERN_CSS_LIMITS = {
+  MAX_LIGHTNESS_MIX: 95, // Maximum percentage for color-mix with white
+  MIN_ALPHA_PERCENTAGE: 5, // Minimum opacity for transparent color-mix
+  MAX_LIGHTNESS_ADJUSTMENT: 30, // Maximum lightness adjustment in color-mix
+  MIN_LIGHTNESS_FLOOR: 95, // Minimum lightness floor for very light colors
+  LIGHTNESS_MULTIPLIER: 2, // Multiplier for lightness adjustments
+  MIX_MULTIPLIER: 4, // Multiplier for mix percentage calculations
+} as const;

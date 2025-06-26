@@ -5,6 +5,7 @@
 
 import { cssSupports } from '../cssSupports';
 import { hasModernColorSupport as hasModernColorSupportCached } from './cache';
+import { COLOR_BOUNDS, MODERN_CSS_LIMITS } from './constants';
 
 /**
  * Modern CSS-based color manipulation utilities
@@ -25,7 +26,7 @@ export const modernColors = {
 
     if (cssSupports.colorMix()) {
       // Use color-mix as fallback
-      const mixPercentage = Math.min(percentage * 100, 95); // Cap at 95%
+      const mixPercentage = Math.min(percentage * 100, MODERN_CSS_LIMITS.MAX_LIGHTNESS_MIX);
       return `color-mix(in srgb, ${color}, white ${mixPercentage}%)`;
     }
 
@@ -39,7 +40,7 @@ export const modernColors = {
     if (!color || color.toString() === '') return undefined;
 
     if (cssSupports.colorMix()) {
-      const alphaPercentage = Math.max((1 - percentage) * 100, 5); // Minimum 5% opacity
+      const alphaPercentage = Math.max((1 - percentage) * 100, MODERN_CSS_LIMITS.MIN_ALPHA_PERCENTAGE);
       return `color-mix(in srgb, transparent, ${color} ${alphaPercentage}%)`;
     }
 
@@ -73,7 +74,7 @@ export const modernColors = {
 
     if (!color.toString()) return color;
 
-    const clampedAlpha = Math.min(Math.max(alpha, 0), 1);
+    const clampedAlpha = Math.min(Math.max(alpha, COLOR_BOUNDS.alpha.min), COLOR_BOUNDS.alpha.max);
 
     if (cssSupports.relativeColorSyntax()) {
       // Use relative color syntax for precise alpha control
@@ -98,17 +99,18 @@ export const modernColors = {
     if (cssSupports.relativeColorSyntax()) {
       // Use relative color syntax for precise lightness adjustment
       // Special handling for very light colors:
-      // - Uses max() to ensure lightness never goes below 95%
-      // - Doubles the lightness adjustment (lightness * 2) for more noticeable effect
+      // - Uses max() to ensure lightness never goes below the minimum floor
+      // - Uses multiplier for more noticeable effect
       // - Prevents colors from becoming too dark when they're already very light
-      // - Example: A color at 92% lightness becomes max(92% + 10%, 95%) = 95%
-      // - Example: A color at 80% lightness becomes max(80% + 10%, 95%) = 90%
-      return `hsl(from ${color} h s calc(max(l + ${lightness * 2}%, 95%)))`;
+      return `hsl(from ${color} h s calc(max(l + ${lightness * MODERN_CSS_LIMITS.LIGHTNESS_MULTIPLIER}%, ${MODERN_CSS_LIMITS.MIN_LIGHTNESS_FLOOR}%)))`;
     }
 
     if (cssSupports.colorMix()) {
       // Use color-mix with white for lightness adjustment
-      const mixPercentage = Math.min(lightness * 4, 30); // Cap adjustment
+      const mixPercentage = Math.min(
+        lightness * MODERN_CSS_LIMITS.MIX_MULTIPLIER,
+        MODERN_CSS_LIMITS.MAX_LIGHTNESS_ADJUSTMENT,
+      );
       return `color-mix(in srgb, ${color}, white ${mixPercentage}%)`;
     }
 

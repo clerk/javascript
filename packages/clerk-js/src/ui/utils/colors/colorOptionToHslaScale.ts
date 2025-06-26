@@ -1,27 +1,14 @@
 import type { ColorScale, CssColorOrAlphaScale, CssColorOrScale, HslaColor, HslaColorString } from '@clerk/types';
 
-import { cssSupports } from '../cssSupports';
+import { ALL_SHADES, ALPHA_VALUES, DARK_SHADES, LIGHT_SHADES, LIGHTNESS_CONFIG } from './constants';
 import { colors, generateAlphaScale, generateLightnessScale, hasModernColorSupport } from './index';
 import { applyScalePrefix } from './utils';
 
 // Types
 type InternalColorScale<T> = ColorScale<T> & Partial<Record<20, T>>;
-type ColorShadeKey = keyof InternalColorScale<any>;
 type WithPrefix<T extends Record<string, string>, Prefix extends string> = {
   [K in keyof T as `${Prefix}${K & string}`]: T[K];
 };
-
-// Constants
-const LIGHT_SHADES: ColorShadeKey[] = ['25', '50', '100', '150', '200', '300', '400'];
-const DARK_SHADES: ColorShadeKey[] = ['600', '700', '750', '800', '850', '900', '950'];
-const ALL_SHADES: ColorShadeKey[] = [...LIGHT_SHADES.reverse(), '500', ...DARK_SHADES];
-
-const TARGET_LIGHTNESS = {
-  LIGHTEST: 97, // For 50 shade
-  DARKEST: 12, // For 900 shade
-} as const;
-
-const ALPHA_VALUES = [0.02, 0.03, 0.07, 0.11, 0.15, 0.28, 0.41, 0.53, 0.62, 0.73, 0.78, 0.81, 0.84, 0.87, 0.92];
 
 // Utility functions
 export function createEmptyColorScale<T = undefined>(): InternalColorScale<T | undefined> {
@@ -59,12 +46,15 @@ function validateBaseShade(scale: Record<string, any>): void {
   }
 }
 
-function convertToHslaScale(colorScale: Record<string, string>): InternalColorScale<HslaColor> {
+function convertToHslaScale(colorScale: Partial<Record<string, string>>): InternalColorScale<HslaColor> {
   const result: Record<string, HslaColor> = {};
 
   for (const shade of ALL_SHADES) {
     if (colorScale[shade]) {
-      result[shade] = colors.toHslaColor(colorScale[shade]);
+      const color = colors.toHslaColor(colorScale[shade]);
+      if (color && typeof color === 'object') {
+        result[shade] = color;
+      }
     }
   }
 
@@ -99,9 +89,9 @@ function generateLegacyLightnessScale(baseColor: HslaColor): InternalColorScale<
     '500': baseColor,
   };
 
-  // Calculate lightness steps for light and dark shades
-  const lightStep = (TARGET_LIGHTNESS.LIGHTEST - baseColor.l) / LIGHT_SHADES.length;
-  const darkStep = (baseColor.l - TARGET_LIGHTNESS.DARKEST) / DARK_SHADES.length;
+  // Calculate lightness steps for light and dark shades using constants
+  const lightStep = (LIGHTNESS_CONFIG.TARGET_LIGHT - baseColor.l) / LIGHTNESS_CONFIG.LIGHT_STEPS;
+  const darkStep = (baseColor.l - LIGHTNESS_CONFIG.TARGET_DARK) / LIGHTNESS_CONFIG.DARK_STEPS;
 
   // Generate light shades (lighter than base)
   LIGHT_SHADES.forEach((shade, index) => {
@@ -180,7 +170,7 @@ export const colorOptionToHslaAlphaScale = <Prefix extends string>(
 
   if (typeof colorOption === 'string') {
     // For single color input, check if we can use modern CSS first
-    if (cssSupports.colorMix()) {
+    if (hasModernColorSupport()) {
       // Use modern CSS directly - no HSLA conversion needed
       const modernScale = generateModernAlphaScale(colorOption);
       return applyScalePrefix(modernScale, prefix) as unknown as WithPrefix<
