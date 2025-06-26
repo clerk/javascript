@@ -1,7 +1,8 @@
 import type { ColorScale, CssColorOrAlphaScale, CssColorOrScale, HslaColor, HslaColorString } from '@clerk/types';
 
 import { ALL_SHADES, ALPHA_VALUES, DARK_SHADES, LIGHT_SHADES, LIGHTNESS_CONFIG } from './constants';
-import { colors, generateAlphaScale, generateLightnessScale, hasModernColorSupport } from './index';
+import { colors, hasModernColorSupport } from './index';
+import { generateAlphaScale, generateLightnessScale } from './scales';
 import { applyScalePrefix } from './utils';
 
 // Types

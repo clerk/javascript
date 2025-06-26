@@ -1,0 +1,356 @@
+import { describe, expect, it } from 'vitest';
+
+import { colors } from '../legacy';
+
+describe('Legacy Colors', () => {
+  describe('toHslaColor', () => {
+    describe('RGB and RGBA inputs', () => {
+      it('should parse hex colors without alpha', () => {
+        const result = colors.toHslaColor('#ff0000');
+        expect(result).toEqual({ h: 0, s: 100, l: 50, a: 1 });
+      });
+
+      it('should parse hex colors with alpha', () => {
+        const result = colors.toHslaColor('#ff000080');
+        expect(result).toEqual({ h: 0, s: 100, l: 50, a: 0.5019607843137255 });
+      });
+
+      it('should parse 3-digit hex colors', () => {
+        const result = colors.toHslaColor('#f00');
+        expect(result).toEqual({ h: 0, s: 100, l: 50, a: 1 });
+      });
+
+      it('should parse 4-digit hex colors with alpha', () => {
+        const result = colors.toHslaColor('#f008');
+        expect(result).toEqual({ h: 0, s: 100, l: 50, a: 0.5333333333333333 });
+      });
+
+      it('should parse rgb() colors', () => {
+        const result = colors.toHslaColor('rgb(255, 0, 0)');
+        expect(result).toEqual({ h: 0, s: 100, l: 50, a: 1 });
+      });
+
+      it('should parse rgba() colors', () => {
+        const result = colors.toHslaColor('rgba(255, 0, 0, 0.5)');
+        expect(result).toEqual({ h: 0, s: 100, l: 50, a: 0.5 });
+      });
+
+      it('should parse rgb() colors with percentages', () => {
+        const result = colors.toHslaColor('rgb(100%, 0%, 0%)');
+        expect(result).toEqual({ h: 0, s: 100, l: 50, a: 1 });
+      });
+
+      it('should parse rgba() colors with percentage alpha', () => {
+        const result = colors.toHslaColor('rgba(255, 0, 0, 50%)');
+        expect(result).toEqual({ h: 0, s: 100, l: 50, a: 0.5 });
+      });
+
+      it('should parse different RGB colors correctly', () => {
+        const blue = colors.toHslaColor('#0000ff');
+        expect(blue).toEqual({ h: 240, s: 100, l: 50, a: 1 });
+
+        const green = colors.toHslaColor('#00ff00');
+        expect(green).toEqual({ h: 120, s: 100, l: 50, a: 1 });
+
+        const yellow = colors.toHslaColor('#ffff00');
+        expect(yellow).toEqual({ h: 60, s: 100, l: 50, a: 1 });
+      });
+    });
+
+    describe('HSL and HSLA inputs', () => {
+      it('should parse hsl() colors', () => {
+        const result = colors.toHslaColor('hsl(0, 100%, 50%)');
+        expect(result).toEqual({ h: 0, s: 100, l: 50, a: 1 });
+      });
+
+      it('should parse hsla() colors', () => {
+        const result = colors.toHslaColor('hsla(0, 100%, 50%, 0.5)');
+        expect(result).toEqual({ h: 0, s: 100, l: 50, a: 0.5 });
+      });
+
+      it('should parse hsl() colors with deg unit', () => {
+        const result = colors.toHslaColor('hsl(180deg, 50%, 25%)');
+        expect(result).toEqual({ h: 180, s: 50, l: 25, a: 1 });
+      });
+
+      it('should handle hue values over 360', () => {
+        const result = colors.toHslaColor('hsl(450, 100%, 50%)');
+        expect(result).toEqual({ h: 90, s: 100, l: 50, a: 1 });
+      });
+
+      it('should handle negative hue values', () => {
+        const result = colors.toHslaColor('hsl(-90, 100%, 50%)');
+        expect(result).toEqual({ h: 270, s: 100, l: 50, a: 1 });
+      });
+    });
+
+    describe('HWB inputs', () => {
+      it('should parse hwb() colors', () => {
+        const result = colors.toHslaColor('hwb(0, 0%, 0%)');
+        expect(result).toEqual({ h: 0, s: 100, l: 50, a: 1 });
+      });
+
+      it('should parse hwb() colors with alpha', () => {
+        const result = colors.toHslaColor('hwb(0, 0%, 0%, 0.5)');
+        expect(result).toEqual({ h: 0, s: 100, l: 50, a: 0.5 });
+      });
+
+      it('should handle hwb colors with high whiteness and blackness', () => {
+        const result = colors.toHslaColor('hwb(0, 50%, 50%)');
+        expect(result.h).toBe(0);
+        expect(result.a).toBe(1);
+      });
+    });
+
+    describe('CSS keyword inputs', () => {
+      it('should parse named colors', () => {
+        expect(colors.toHslaColor('red')).toEqual({ h: 0, s: 100, l: 50, a: 1 });
+        expect(colors.toHslaColor('blue')).toEqual({ h: 240, s: 100, l: 50, a: 1 });
+        expect(colors.toHslaColor('green')).toEqual({ h: 120, s: 100, l: 25, a: 1 });
+        expect(colors.toHslaColor('white')).toEqual({ h: 0, s: 0, l: 100, a: 1 });
+        expect(colors.toHslaColor('black')).toEqual({ h: 0, s: 0, l: 0, a: 1 });
+        expect(colors.toHslaColor('transparent')).toEqual({ h: 0, s: 0, l: 0, a: 0 });
+      });
+
+      it('should handle gray and grey equivalents', () => {
+        const gray = colors.toHslaColor('gray');
+        const grey = colors.toHslaColor('grey');
+        expect(gray).toEqual(grey);
+        expect(gray).toEqual({ h: 0, s: 0, l: 50, a: 1 });
+      });
+    });
+
+    describe('error cases', () => {
+      it('should throw error for invalid color strings', () => {
+        expect(() => colors.toHslaColor('invalid')).toThrow();
+        expect(() => colors.toHslaColor('')).toThrow();
+        expect(() => colors.toHslaColor('not-a-color')).toThrow();
+      });
+
+      it('should throw error with helpful message', () => {
+        expect(() => colors.toHslaColor('invalid')).toThrow(/cannot be used as a color within 'variables'/);
+      });
+    });
+  });
+
+  describe('toHslaString', () => {
+    it('should convert HslaColor object to string', () => {
+      const hsla = { h: 0, s: 100, l: 50, a: 1 };
+      const result = colors.toHslaString(hsla);
+      expect(result).toBe('hsla(0, 100%, 50%, 1)');
+    });
+
+    it('should convert HslaColor object with alpha to string', () => {
+      const hsla = { h: 120, s: 50, l: 25, a: 0.8 };
+      const result = colors.toHslaString(hsla);
+      expect(result).toBe('hsla(120, 50%, 25%, 0.8)');
+    });
+
+    it('should convert color string to hsla string', () => {
+      const result = colors.toHslaString('#ff0000');
+      expect(result).toBe('hsla(0, 100%, 50%, 1)');
+    });
+
+    it('should handle undefined alpha', () => {
+      const hsla = { h: 0, s: 100, l: 50, a: undefined };
+      const result = colors.toHslaString(hsla);
+      expect(result).toBe('hsla(0, 100%, 50%, 1)');
+    });
+  });
+
+  describe('changeHslaLightness', () => {
+    it('should increase lightness', () => {
+      const hsla = { h: 0, s: 100, l: 50, a: 1 };
+      const result = colors.changeHslaLightness(hsla, 10);
+      expect(result).toEqual({ h: 0, s: 100, l: 60, a: 1 });
+    });
+
+    it('should decrease lightness', () => {
+      const hsla = { h: 0, s: 100, l: 50, a: 1 };
+      const result = colors.changeHslaLightness(hsla, -10);
+      expect(result).toEqual({ h: 0, s: 100, l: 40, a: 1 });
+    });
+
+    it('should preserve other properties', () => {
+      const hsla = { h: 240, s: 75, l: 30, a: 0.8 };
+      const result = colors.changeHslaLightness(hsla, 20);
+      expect(result).toEqual({ h: 240, s: 75, l: 50, a: 0.8 });
+    });
+  });
+
+  describe('setHslaAlpha', () => {
+    it('should set alpha value', () => {
+      const hsla = { h: 0, s: 100, l: 50, a: 1 };
+      const result = colors.setHslaAlpha(hsla, 0.5);
+      expect(result).toEqual({ h: 0, s: 100, l: 50, a: 0.5 });
+    });
+
+    it('should preserve other properties', () => {
+      const hsla = { h: 240, s: 75, l: 30, a: 0.8 };
+      const result = colors.setHslaAlpha(hsla, 0.2);
+      expect(result).toEqual({ h: 240, s: 75, l: 30, a: 0.2 });
+    });
+  });
+
+  describe('lighten', () => {
+    it('should return undefined for undefined color', () => {
+      expect(colors.lighten(undefined)).toBeUndefined();
+    });
+
+    it('should lighten color by percentage', () => {
+      const result = colors.lighten('hsl(0, 100%, 50%)', 0.2);
+      expect(result).toBe('hsla(0, 100%, 60%, 1)');
+    });
+
+    it('should handle zero percentage', () => {
+      const result = colors.lighten('hsl(0, 100%, 50%)', 0);
+      expect(result).toBe('hsla(0, 100%, 50%, 1)');
+    });
+
+    it('should handle different color formats', () => {
+      const result = colors.lighten('#ff0000', 0.1);
+      expect(result).toBe('hsla(0, 100%, 55%, 1)');
+    });
+  });
+
+  describe('makeSolid', () => {
+    it('should return undefined for undefined color', () => {
+      expect(colors.makeSolid(undefined)).toBeUndefined();
+    });
+
+    it('should make transparent color solid', () => {
+      const result = colors.makeSolid('rgba(255, 0, 0, 0.5)');
+      expect(result).toBe('hsla(0, 100%, 50%, 1)');
+    });
+
+    it('should keep solid color solid', () => {
+      const result = colors.makeSolid('rgb(255, 0, 0)');
+      expect(result).toBe('hsla(0, 100%, 50%, 1)');
+    });
+  });
+
+  describe('makeTransparent', () => {
+    it('should return undefined for undefined color', () => {
+      expect(colors.makeTransparent(undefined)).toBeUndefined();
+    });
+
+    it('should return undefined for empty string', () => {
+      expect(colors.makeTransparent('')).toBeUndefined();
+    });
+
+    it('should make color transparent by percentage', () => {
+      const result = colors.makeTransparent('rgb(255, 0, 0)', 0.5);
+      expect(result).toBe('hsla(0, 100%, 50%, 0.5)');
+    });
+
+    it('should handle zero percentage', () => {
+      const result = colors.makeTransparent('rgb(255, 0, 0)', 0);
+      expect(result).toBe('hsla(0, 100%, 50%, 1)');
+    });
+
+    it('should handle already transparent colors', () => {
+      const result = colors.makeTransparent('rgba(255, 0, 0, 0.8)', 0.5);
+      expect(result).toBe('hsla(0, 100%, 50%, 0.4)');
+    });
+  });
+
+  describe('setAlpha', () => {
+    it('should set alpha value', () => {
+      const result = colors.setAlpha('rgb(255, 0, 0)', 0.5);
+      expect(result).toBe('hsla(0, 100%, 50%, 0.5)');
+    });
+
+    it('should handle empty string', () => {
+      const result = colors.setAlpha('', 0.5);
+      expect(result).toBe('');
+    });
+
+    it('should replace existing alpha', () => {
+      const result = colors.setAlpha('rgba(255, 0, 0, 0.8)', 0.3);
+      expect(result).toBe('hsla(0, 100%, 50%, 0.3)');
+    });
+  });
+
+  describe('adjustForLightness', () => {
+    it('should return undefined for undefined color', () => {
+      expect(colors.adjustForLightness(undefined)).toBeUndefined();
+    });
+
+    it('should adjust lightness with default value', () => {
+      const result = colors.adjustForLightness('hsl(0, 100%, 50%)');
+      expect(result).toBe('hsla(0, 100%, 60%, 1)');
+    });
+
+    it('should adjust lightness with custom value', () => {
+      const result = colors.adjustForLightness('hsl(0, 100%, 50%)', 10);
+      expect(result).toBe('hsla(0, 100%, 70%, 1)');
+    });
+
+    it('should handle maximum lightness', () => {
+      const result = colors.adjustForLightness('hsl(0, 100%, 100%)', 5);
+      expect(result).toBe('hsla(0, 100%, 95%, 1)');
+    });
+
+    it('should cap lightness at 100%', () => {
+      const result = colors.adjustForLightness('hsl(0, 100%, 90%)', 10);
+      expect(result).toBe('hsla(0, 100%, 100%, 1)');
+    });
+
+    it('should handle different color formats', () => {
+      const result = colors.adjustForLightness('#ff0000', 5);
+      expect(result).toBe('hsla(0, 100%, 60%, 1)');
+    });
+  });
+
+  describe('edge cases and clamping', () => {
+    it('should clamp RGB values to valid range', () => {
+      const result = colors.toHslaColor('rgb(300, -50, 500)');
+      expect(result.h).toBeGreaterThanOrEqual(0);
+      expect(result.s).toBeGreaterThanOrEqual(0);
+      expect(result.l).toBeGreaterThanOrEqual(0);
+      expect(result.a).toBe(1);
+    });
+
+    it('should clamp alpha values to valid range', () => {
+      const result = colors.toHslaColor('rgba(255, 0, 0, 2)');
+      expect(result.a).toBe(1);
+    });
+
+    it('should throw error for whitespace in color strings', () => {
+      expect(() => colors.toHslaColor('  rgb(255, 0, 0)  ')).toThrow();
+    });
+
+    it('should throw error for uppercase RGB', () => {
+      expect(() => colors.toHslaColor('RGB(255, 0, 0)')).toThrow();
+    });
+  });
+
+  describe('complex color conversions', () => {
+    it('should handle grayscale colors correctly', () => {
+      const white = colors.toHslaColor('#ffffff');
+      expect(white).toEqual({ h: 0, s: 0, l: 100, a: 1 });
+
+      const black = colors.toHslaColor('#000000');
+      expect(black).toEqual({ h: 0, s: 0, l: 0, a: 1 });
+
+      const gray = colors.toHslaColor('#808080');
+      expect(gray.s).toBe(0);
+      expect(gray.l).toBe(50);
+    });
+
+    it('should handle bright colors correctly', () => {
+      const cyan = colors.toHslaColor('#00ffff');
+      expect(cyan).toEqual({ h: 180, s: 100, l: 50, a: 1 });
+
+      const magenta = colors.toHslaColor('#ff00ff');
+      expect(magenta).toEqual({ h: 300, s: 100, l: 50, a: 1 });
+    });
+
+    it('should handle dark colors correctly', () => {
+      const darkRed = colors.toHslaColor('#800000');
+      expect(darkRed.h).toBe(0);
+      expect(darkRed.s).toBe(100);
+      expect(darkRed.l).toBe(25);
+    });
+  });
+});

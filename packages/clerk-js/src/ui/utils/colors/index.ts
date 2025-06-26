@@ -63,4 +63,3 @@ export const colors = {
 };
 
 export { modernColors, legacyColors, hasModernColorSupport };
-export { generateAlphaScale, generateLightnessScale, modernScales, legacyScales } from './scales';

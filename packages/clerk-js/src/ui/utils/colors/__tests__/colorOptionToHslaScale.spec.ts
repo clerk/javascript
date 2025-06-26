@@ -20,7 +20,8 @@ vi.mock('../utils', () => ({
 }));
 
 // Import mocked modules
-const { colors, generateAlphaScale, generateLightnessScale, hasModernColorSupport } = await import('../index');
+const { colors, hasModernColorSupport } = await import('../index');
+const { generateAlphaScale, generateLightnessScale } = await import('../scales');
 const { applyScalePrefix } = await import('../utils');
 
 // Get the mocked functions
@@ -36,9 +37,10 @@ describe('colorOptionToHslaScale', () => {
     mockHasModernColorSupport.mockReturnValue(false);
 
     // Default mock implementations
-    mockColors.toHslaColor.mockImplementation((color: string) => {
+    mockColors.toHslaColor.mockImplementation((color: string | undefined) => {
       if (color === 'red') return { h: 0, s: 100, l: 50, a: 1 };
       if (color === 'blue') return { h: 240, s: 100, l: 50, a: 1 };
+      if (!color) return undefined;
       return { h: 0, s: 0, l: 0, a: 1 };
     });
 
@@ -70,9 +72,21 @@ describe('colorOptionToHslaScale', () => {
       mockHasModernColorSupport.mockReturnValue(true);
       mockGenerateAlphaScale.mockReturnValue({
         '25': 'color-mix(in srgb, transparent, red 2%)',
+        '50': 'color-mix(in srgb, transparent, red 3%)',
+        '100': 'color-mix(in srgb, transparent, red 7%)',
+        '150': 'color-mix(in srgb, transparent, red 11%)',
+        '200': 'color-mix(in srgb, transparent, red 15%)',
+        '300': 'color-mix(in srgb, transparent, red 28%)',
+        '400': 'color-mix(in srgb, transparent, red 41%)',
         '500': 'color-mix(in srgb, transparent, red 53%)',
+        '600': 'color-mix(in srgb, transparent, red 62%)',
+        '700': 'color-mix(in srgb, transparent, red 73%)',
+        '750': 'color-mix(in srgb, transparent, red 78%)',
+        '800': 'color-mix(in srgb, transparent, red 81%)',
+        '850': 'color-mix(in srgb, transparent, red 84%)',
+        '900': 'color-mix(in srgb, transparent, red 87%)',
         '950': 'color-mix(in srgb, transparent, red 92%)',
-      });
+      } as any);
       mockApplyScalePrefix.mockReturnValue({
         'bg-25': 'color-mix(in srgb, transparent, red 2%)',
         'bg-500': 'color-mix(in srgb, transparent, red 53%)',
@@ -136,9 +150,21 @@ describe('colorOptionToHslaScale', () => {
       mockHasModernColorSupport.mockReturnValue(true);
       mockGenerateLightnessScale.mockReturnValue({
         '25': 'hsl(from red h s calc(l + (7 * ((97 - l) / 7))))',
+        '50': 'hsl(from red h s calc(l + (6 * ((97 - l) / 7))))',
+        '100': 'hsl(from red h s calc(l + (5 * ((97 - l) / 7))))',
+        '150': 'hsl(from red h s calc(l + (4 * ((97 - l) / 7))))',
+        '200': 'hsl(from red h s calc(l + (3 * ((97 - l) / 7))))',
+        '300': 'hsl(from red h s calc(l + (2 * ((97 - l) / 7))))',
+        '400': 'hsl(from red h s calc(l + (1 * ((97 - l) / 7))))',
         '500': 'red',
+        '600': 'hsl(from red h s calc(l - (1 * ((l - 12) / 7))))',
+        '700': 'hsl(from red h s calc(l - (2 * ((l - 12) / 7))))',
+        '750': 'hsl(from red h s calc(l - (3 * ((l - 12) / 7))))',
+        '800': 'hsl(from red h s calc(l - (4 * ((l - 12) / 7))))',
+        '850': 'hsl(from red h s calc(l - (5 * ((l - 12) / 7))))',
+        '900': 'hsl(from red h s calc(l - (6 * ((l - 12) / 7))))',
         '950': 'hsl(from red h s calc(l - (7 * ((l - 12) / 7))))',
-      });
+      } as any);
       mockApplyScalePrefix.mockReturnValue({
         'bg-25': 'hsl(from red h s calc(l + (7 * ((97 - l) / 7))))',
         'bg-500': 'red',
@@ -178,7 +204,7 @@ describe('colorOptionToHslaScale', () => {
       const invalidScale = {
         '25': 'red-25',
         '950': 'red-950',
-      };
+      } as any;
 
       expect(() => {
         colorOptionToHslaLightnessScale(invalidScale, 'bg-');
@@ -221,7 +247,7 @@ describe('colorOptionToHslaScale', () => {
         '25': 'red-25',
         '500': 'red-500',
         // Missing other required shades
-      };
+      } as any;
 
       expect(() => {
         colorOptionToHslaAlphaScale(incompleteScale, 'bg-');
@@ -229,7 +255,7 @@ describe('colorOptionToHslaScale', () => {
     });
 
     it('should handle invalid color objects gracefully', () => {
-      mockColors.toHslaColor.mockReturnValue(null);
+      mockColors.toHslaColor.mockReturnValue(undefined);
 
       // When the base color is invalid (null), it should throw an error
       expect(() => {
