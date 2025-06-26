@@ -2,8 +2,8 @@ import type { Theme } from '@clerk/types';
 
 import { spaceScaleKeys } from '../foundations/sizes';
 import type { fontSizes, fontWeights } from '../foundations/typography';
-import { colorOptionToHslaAlphaScale, colorOptionToHslaLightnessScale } from '../utils/colorOptionToHslaScale';
 import { colors } from '../utils/colors';
+import { colorOptionToHslaAlphaScale, colorOptionToHslaLightnessScale } from '../utils/colors/colorOptionToHslaScale';
 import { cssSupports } from '../utils/cssSupports';
 import { fromEntries } from '../utils/fromEntries';
 import { removeUndefinedProps } from '../utils/removeUndefinedProps';
