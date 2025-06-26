@@ -6,7 +6,7 @@ import { cssSupports } from './cssSupports';
 
 // Types
 type InternalColorScale<T> = ColorScale<T> & Partial<Record<20, T>>;
-type ColorShadeKey = keyof InternalColorScale<any>;
+type ColorShadeKey = keyof InternalColorScale<unknown>;
 type WithPrefix<T extends Record<string, string>, Prefix extends string> = {
   [K in keyof T as `${Prefix}${K & string}`]: T[K];
 };
