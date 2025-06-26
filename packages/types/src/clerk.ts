@@ -498,10 +498,7 @@ export interface Clerk {
    * @internal
    * Loads Stripe libraries for commerce functionality
    */
-  __internal_loadStripeLibs: () => {
-    javascript(): Promise<any>;
-    react(): Promise<any>;
-  };
+  __internal_loadStripeJs: () => Promise<any>;
 
   /**
    * Register a listener that triggers a callback each time important Clerk resources are changed.

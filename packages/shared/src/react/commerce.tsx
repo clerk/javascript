@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/consistent-type-imports */
 import type { CommerceCheckoutResource, EnvironmentResource } from '@clerk/types';
 import type { Stripe, StripeElements } from '@stripe/stripe-js';
-import { type PropsWithChildren, useCallback, useEffect, useState } from 'react';
+import { type PropsWithChildren, ReactNode, useCallback, useEffect, useState } from 'react';
 import React from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
@@ -10,26 +10,20 @@ import { createContextAndHook } from './hooks/createContextAndHook';
 import { useClerk } from './hooks/useClerk';
 import { useOrganization } from './hooks/useOrganization';
 import { useUser } from './hooks/useUser';
+import { Elements, PaymentElement, useElements, useStripe } from './stripe-react';
 
 const [StripeLibsContext, useStripeLibsContext] = createContextAndHook<{
   loadStripe: typeof import('@stripe/stripe-js').loadStripe;
-  Elements: typeof import('@stripe/react-stripe-js').Elements;
-  PaymentElement: typeof import('@stripe/react-stripe-js').PaymentElement;
-  useElements: typeof import('@stripe/react-stripe-js').useElements;
-  useStripe: typeof import('@stripe/react-stripe-js').useStripe;
 } | null>('StripeLibsContext');
 
 const StripeLibsProvider = ({ children }: PropsWithChildren) => {
-  const { __internal_loadStripeLibs } = useClerk();
-
+  const clerk = useClerk();
+  const { isLoaded } = useUser();
   const { data: stripeClerkLibs } = useSWR(
-    'clerk-stripe-sdk',
+    isLoaded ? 'clerk-stripe-sdk' : null,
     async () => {
-      const [loadStripe, { Elements, PaymentElement, useElements, useStripe }] = await Promise.all([
-        __internal_loadStripeLibs().javascript(),
-        __internal_loadStripeLibs().react(),
-      ]);
-      return { loadStripe, Elements, PaymentElement, useElements, useStripe };
+      const [loadStripe] = await Promise.all([clerk.__internal_loadStripeJs()]);
+      return { loadStripe };
     },
     {
       keepPreviousData: true,
@@ -148,9 +142,8 @@ const [StipeUtilsContext, useStipeUtilsContext] = createContextAndHook<{
 }>('StipeUtilsContext');
 
 const ValidateStripeUtils = ({ children }: PropsWithChildren) => {
-  const stripeClerkLibs = useStripeLibsContext();
-  const stripe = stripeClerkLibs?.useStripe();
-  const elements = stripeClerkLibs?.useElements();
+  const stripe = useStripe();
+  const elements = useElements();
 
   return <StipeUtilsContext.Provider value={{ value: { stripe, elements } }}>{children}</StipeUtilsContext.Provider>;
 };
@@ -193,8 +186,6 @@ const PaymentElementInternalRoot = (
   }>,
 ) => {
   const utils = usePaymentSourceUtils(props.for);
-  const stripeClerkLibs = useStripeLibsContext();
-  const Elements = stripeClerkLibs?.Elements;
   const { stripe, externalClientSecret } = utils;
   const [isPaymentElementReady, setIsPaymentElementReady] = useState(false);
 
@@ -211,21 +202,20 @@ const PaymentElementInternalRoot = (
           },
         }}
       >
-        {Elements && (
-          <Elements
-            // This key is used to reset the payment intent, since Stripe doesn't not provide a way to reset the payment intent.
-            key={externalClientSecret}
-            stripe={stripe}
-            options={{
-              clientSecret: externalClientSecret,
-              appearance: {
-                variables: { ...props.stripeAppearance },
-              },
-            }}
-          >
-            <ValidateStripeUtils>{props.children}</ValidateStripeUtils>
-          </Elements>
-        )}
+        <Elements
+          // This key is used to reset the payment intent, since Stripe doesn't not provide a way to reset the payment intent.
+          key={externalClientSecret}
+          stripe={stripe}
+          options={{
+            loader: 'never',
+            clientSecret: externalClientSecret,
+            appearance: {
+              variables: { ...props.stripeAppearance },
+            },
+          }}
+        >
+          <ValidateStripeUtils>{props.children}</ValidateStripeUtils>
+        </Elements>
       </PaymentElementContext.Provider>
     );
   }
@@ -247,19 +237,18 @@ const PaymentElementInternalRoot = (
   );
 };
 
-const PaymentElementForm = () => {
+const PaymentElementForm = ({ fallback }: { fallback?: ReactNode }) => {
   const { setIsPaymentElementReady, paymentMethodOrder, checkout, stripe, externalClientSecret, paymentDescription } =
     usePaymentElementContext();
   const environment = useInternalEnvironment();
-  const stripeClerkLibs = useStripeLibsContext();
-  const PaymentElement = stripeClerkLibs?.PaymentElement;
 
-  if (!stripe || !externalClientSecret || !PaymentElement) {
-    return null;
+  if (!stripe || !externalClientSecret) {
+    return <>{fallback}</>;
   }
 
   return (
     <PaymentElement
+      fallback={fallback}
       onReady={() => setIsPaymentElementReady(true)}
       options={{
         layout: {
