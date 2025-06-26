@@ -39,15 +39,8 @@ export const modernColors = {
     if (!color || color.toString() === '') return undefined;
 
     if (cssSupports.colorMix()) {
-      // Use color-mix with transparent
       const alphaPercentage = Math.max((1 - percentage) * 100, 5); // Minimum 5% opacity
       return `color-mix(in srgb, transparent, ${color} ${alphaPercentage}%)`;
-    }
-
-    if (cssSupports.relativeColorSyntax()) {
-      // Use relative color syntax to adjust alpha
-      const alphaValue = Math.max(1 - percentage, 0.05); // Minimum 5% opacity
-      return `hsl(from ${color} h s l / ${alphaValue})`;
     }
 
     return color; // Return original if no modern CSS support
