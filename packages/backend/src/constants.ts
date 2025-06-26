@@ -37,7 +37,7 @@ const QueryParameters = {
   LegacyDevBrowser: '__dev_session',
   HandshakeReason: '__clerk_hs_reason',
   HandshakeFormat: 'format',
-  HandshakeNonce: '__nonce',
+  HandshakeNonce: Cookies.HandshakeNonce,
 } as const;
 
 const Headers = {
