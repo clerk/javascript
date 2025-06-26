@@ -1,5 +1,24 @@
 # Change Log
 
+## 5.69.2
+
+### Patch Changes
+
+- Fixes stale `SignIn` object on `authenticateWithRedirect` for `saml` and `enterprise_sso` custom flows ([#6160](https://github.com/clerk/javascript/pull/6160)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  Previously, the same connection identifier would be used on every `authenticateWithRedirect` call leading to redirecting to the wrong identity provider
+
+- Fix SVG masking cross-browser compatibility in checkout complete component ([#6190](https://github.com/clerk/javascript/pull/6190)) by [@panteliselef](https://github.com/panteliselef)
+
+- Use hooks exported from `@clerk/shared` to query commerce data. ([#6159](https://github.com/clerk/javascript/pull/6159)) by [@panteliselef](https://github.com/panteliselef)
+
+- Do not display create organization form after accepting organization invitation on after-auth flow ([#6191](https://github.com/clerk/javascript/pull/6191)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`65ca8f5`](https://github.com/clerk/javascript/commit/65ca8f5f6665597fc03f9f5e0bdb99fcab3d056c), [`f1be1fe`](https://github.com/clerk/javascript/commit/f1be1fe3d575c11acd04fc7aadcdec8f89829894), [`bffb42a`](https://github.com/clerk/javascript/commit/bffb42aaf266a188b9ae7d16ace3024d468a3bd4)]:
+  - @clerk/localizations@3.17.1
+  - @clerk/types@4.62.0
+  - @clerk/shared@3.10.0
+
 ## 5.69.1
 
 ### Patch Changes
