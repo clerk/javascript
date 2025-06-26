@@ -2,7 +2,7 @@ import React from 'react';
 
 import type { PrimitiveProps, StyleVariants } from '../styledSystem';
 import { createVariants } from '../styledSystem';
-import { colors } from '../utils';
+import { colors } from '../utils/colors';
 import type { BoxProps } from './Box';
 import { Box } from './Box';
 

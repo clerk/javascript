@@ -2,7 +2,7 @@ import type { ClerkAPIError, PasswordSettingsData } from '@clerk/types';
 
 import type { LocalizationKey } from '../localization';
 import { localizationKeys } from '../localization/localizationKeys';
-import { canUseListFormat } from '../utils';
+import { canUseListFormat } from './intl';
 
 // match FAPI error codes with localization keys
 export const mapComplexityErrors = (passwordSettings: Pick<PasswordSettingsData, 'max_length' | 'min_length'>) => {

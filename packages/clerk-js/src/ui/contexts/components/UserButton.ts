@@ -2,10 +2,11 @@ import { deprecatedObjectProperty } from '@clerk/shared/deprecated';
 import { useClerk } from '@clerk/shared/react';
 import { createContext, useContext, useMemo } from 'react';
 
+import { createUserButtonCustomMenuItems } from '@/ui/utils/createCustomMenuItems';
+
 import { useEnvironment, useOptions } from '../../contexts';
 import { useRouter } from '../../router';
 import type { UserButtonCtx } from '../../types';
-import { createUserButtonCustomMenuItems } from '../../utils';
 
 export const UserButtonContext = createContext<UserButtonCtx | null>(null);
 

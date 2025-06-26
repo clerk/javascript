@@ -3,11 +3,11 @@ import type { WaitlistModalProps } from '@clerk/types';
 
 import { Card } from '@/ui/elements/Card';
 import { withCardStateProvider } from '@/ui/elements/contexts';
+import { useFormControl } from '@/ui/utils/useFormControl';
 
 import { useWaitlistContext, WaitlistContext } from '../../contexts';
 import { Flow, localizationKeys } from '../../customizables';
 import { Route, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
-import { useFormControl } from '../../utils';
 import { WaitlistForm } from './WaitlistForm';
 
 const _Waitlist = () => {
