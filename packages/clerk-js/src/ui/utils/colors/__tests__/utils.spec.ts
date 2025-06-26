@@ -1,11 +1,7 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { cssSupports } from '../../cssSupports';
-import { clearMemoCache } from '../../memoize';
 import {
-  colorGenerators,
-  createAlphaColorMix,
-  createColorMix,
   createEmptyColorScale,
   generateAlphaColorMix,
   generateColorMixSyntax,
@@ -27,14 +23,9 @@ const mockColorMix = vi.mocked(cssSupports.colorMix);
 
 describe('Color Utils', () => {
   beforeEach(() => {
-    clearMemoCache();
     vi.clearAllMocks();
     mockRelativeColorSyntax.mockReturnValue(false);
     mockColorMix.mockReturnValue(false);
-  });
-
-  afterEach(() => {
-    clearMemoCache();
   });
 
   describe('createEmptyColorScale', () => {

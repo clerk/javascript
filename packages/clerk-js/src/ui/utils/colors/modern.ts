@@ -5,7 +5,7 @@
 
 import { cssSupports } from '../cssSupports';
 import { COLOR_BOUNDS, MODERN_CSS_LIMITS } from './constants';
-import { colorGenerators } from './utils';
+import { createAlphaColorMixString, createColorMixString, createRelativeColorString } from './utils';
 
 /**
  * Modern CSS-based color manipulation utilities
@@ -21,13 +21,13 @@ export const colors = {
     if (cssSupports.relativeColorSyntax()) {
       // Use relative color syntax for precise lightness control
       const lightnessIncrease = percentage * 100; // Convert to percentage
-      return colorGenerators.relativeColor(color, 'h', 's', `calc(l + ${lightnessIncrease}%)`);
+      return createRelativeColorString(color, 'h', 's', `calc(l + ${lightnessIncrease}%)`);
     }
 
     if (cssSupports.colorMix()) {
       // Use color-mix as fallback
       const mixPercentage = Math.min(percentage * 100, MODERN_CSS_LIMITS.MAX_LIGHTNESS_MIX);
-      return colorGenerators.colorMix(color, 'white', mixPercentage);
+      return createColorMixString(color, 'white', mixPercentage);
     }
 
     return color; // Return original if no modern CSS support
@@ -41,7 +41,7 @@ export const colors = {
 
     if (cssSupports.colorMix()) {
       const alphaPercentage = Math.max((1 - percentage) * 100, MODERN_CSS_LIMITS.MIN_ALPHA_PERCENTAGE);
-      return colorGenerators.alphaColorMix(color, alphaPercentage);
+      return createAlphaColorMixString(color, alphaPercentage);
     }
 
     return color; // Return original if no modern CSS support
@@ -55,7 +55,7 @@ export const colors = {
 
     if (cssSupports.relativeColorSyntax()) {
       // Set alpha to 1 using relative color syntax
-      return colorGenerators.relativeColor(color, 'h', 's', 'l', '1');
+      return createRelativeColorString(color, 'h', 's', 'l', '1');
     }
 
     if (cssSupports.colorMix()) {
@@ -74,13 +74,13 @@ export const colors = {
 
     if (cssSupports.relativeColorSyntax()) {
       // Use relative color syntax for precise alpha control
-      return colorGenerators.relativeColor(color, 'h', 's', 'l', clampedAlpha.toString());
+      return createRelativeColorString(color, 'h', 's', 'l', clampedAlpha.toString());
     }
 
     if (cssSupports.colorMix()) {
       // Use color-mix with transparent
       const percentage = clampedAlpha * 100;
-      return colorGenerators.alphaColorMix(color, percentage);
+      return createAlphaColorMixString(color, percentage);
     }
 
     return color; // Return original if no modern CSS support
@@ -98,7 +98,7 @@ export const colors = {
       // - Uses max() to ensure lightness never goes below the minimum floor
       // - Uses multiplier for more noticeable effect
       // - Prevents colors from becoming too dark when they're already very light
-      return colorGenerators.relativeColor(
+      return createRelativeColorString(
         color,
         'h',
         's',
@@ -112,7 +112,7 @@ export const colors = {
         lightness * MODERN_CSS_LIMITS.MIX_MULTIPLIER,
         MODERN_CSS_LIMITS.MAX_LIGHTNESS_ADJUSTMENT,
       );
-      return colorGenerators.colorMix(color, 'white', mixPercentage);
+      return createColorMixString(color, 'white', mixPercentage);
     }
 
     return color; // Return original if no modern CSS support

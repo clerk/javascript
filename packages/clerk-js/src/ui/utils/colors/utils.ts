@@ -1,7 +1,6 @@
 import type { ColorScale } from '@clerk/types';
 
 import { cssSupports } from '../cssSupports';
-import { memoize } from '../memoize';
 import type { ColorShade } from './constants';
 import { ALL_SHADES, ALPHA_PERCENTAGES, LIGHTNESS_CONFIG, LIGHTNESS_MIX_DATA, RELATIVE_SHADE_STEPS } from './constants';
 
@@ -36,7 +35,7 @@ export const createEmptyColorScale = (): ColorScale<string | undefined> => {
  * @param percentage - The percentage of the mix
  * @returns The color-mix string
  */
-function createColorMixString(baseColor: string, mixColor: string, percentage: number): string {
+export function createColorMixString(baseColor: string, mixColor: string, percentage: number): string {
   return `color-mix(in srgb, ${baseColor}, ${mixColor} ${percentage}%)`;
 }
 
@@ -49,7 +48,7 @@ function createColorMixString(baseColor: string, mixColor: string, percentage: n
  * @param alpha - The alpha component (optional)
  * @returns The relative color syntax string
  */
-function createRelativeColorString(
+export function createRelativeColorString(
   color: string,
   hue: string,
   saturation: string,
@@ -65,55 +64,8 @@ function createRelativeColorString(
  * @param alphaPercentage - The alpha percentage
  * @returns The alpha color-mix string
  */
-function createAlphaColorMixString(color: string, alphaPercentage: number): string {
+export function createAlphaColorMixString(color: string, alphaPercentage: number): string {
   return `color-mix(in srgb, transparent, ${color} ${alphaPercentage}%)`;
-}
-
-/**
- * Memoized color string generators for better performance
- */
-export const colorGenerators = {
-  /**
-   * Memoized color-mix generator
-   */
-  colorMix: memoize(
-    createColorMixString,
-    (baseColor, mixColor, percentage) => `mix:${baseColor}:${mixColor}:${percentage}`,
-  ),
-
-  /**
-   * Memoized relative color syntax generator
-   */
-  relativeColor: memoize(createRelativeColorString, (color, h, s, l, a) => `rel:${color}:${h}:${s}:${l}:${a || ''}`),
-
-  /**
-   * Memoized alpha color-mix generator
-   */
-  alphaColorMix: memoize(createAlphaColorMixString, (color, alpha) => `alpha:${color}:${alpha}`),
-};
-
-// Core utility functions (now using memoized versions for better performance)
-
-/**
- * Create a color-mix string
- * @param baseColor - The base color
- * @param mixColor - The color to mix with
- * @param percentage - The percentage of the mix
- * @returns The color-mix string
- */
-export function createColorMix(baseColor: string, mixColor: string, percentage: number): string {
-  return colorGenerators.colorMix(baseColor, mixColor, percentage);
-}
-
-/**
- * Create a color-mix string
- * @param color - The base color
- * @param mixColor - The color to mix with
- * @param percentage - The percentage of the mix
- * @returns The color-mix string
- */
-export function createAlphaColorMix(color: string, alphaPercentage: number): string {
-  return colorGenerators.alphaColorMix(color, alphaPercentage);
 }
 
 /**
@@ -132,7 +84,7 @@ export function generateRelativeColorSyntax(color: string, shade: ColorShade): s
 
   // Light shades (25-400)
   if (shade < 500) {
-    return colorGenerators.relativeColor(
+    return createRelativeColorString(
       color,
       'h',
       's',
@@ -141,12 +93,7 @@ export function generateRelativeColorSyntax(color: string, shade: ColorShade): s
   }
 
   // Dark shades (600-950)
-  return colorGenerators.relativeColor(
-    color,
-    'h',
-    's',
-    `calc(l - (${steps} * ((l - ${TARGET_DARK}) / ${DARK_STEPS})))`,
-  );
+  return createRelativeColorString(color, 'h', 's', `calc(l - (${steps} * ((l - ${TARGET_DARK}) / ${DARK_STEPS})))`);
 }
 
 /**
@@ -161,12 +108,12 @@ export function generateColorMixSyntax(color: string, shade: ColorShade): string
   const mixData = LIGHTNESS_MIX_DATA[shade];
   if (!mixData.mixColor) return color;
 
-  return createColorMix(color, mixData.mixColor, mixData.percentage);
+  return createColorMixString(color, mixData.mixColor, mixData.percentage);
 }
 
 export function generateAlphaColorMix(color: string, shade: ColorShade): string {
   const alphaPercentage = ALPHA_PERCENTAGES[shade];
-  return createAlphaColorMix(color, alphaPercentage);
+  return createAlphaColorMixString(color, alphaPercentage);
 }
 
 /**
