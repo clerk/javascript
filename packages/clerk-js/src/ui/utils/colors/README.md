@@ -57,7 +57,7 @@ modernColors.setAlpha('var(--primary)', 0.8);
 
 **Browser Support:**
 
-- **Relative Color Syntax**: Chrome 119+, Firefox 120+, Safari 16.4+
+- **Relative Color Syntax**: Chrome 119+, Firefox 128+, Safari 16.4+
 - **Color Mix**: Chrome 111+, Firefox 113+, Safari 16.2+
 
 ## 📜 Legacy Implementation (`legacy.ts`)
