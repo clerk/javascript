@@ -1,7 +1,7 @@
 import type { ColorScale, CssColorOrAlphaScale, CssColorOrScale, HslaColor, HslaColorString } from '@clerk/types';
 
 import { cssSupports } from '../cssSupports';
-import { colors, generateAlphaScale, generateLightnessScale } from './index';
+import { colors, generateAlphaScale, generateLightnessScale, hasModernColorSupport } from './index';
 import { applyScalePrefix } from './utils';
 
 // Types
@@ -210,7 +210,7 @@ export const colorOptionToHslaLightnessScale = <Prefix extends string>(
 
   if (typeof colorOption === 'string') {
     // For single color input, check if we can use modern CSS first
-    if (cssSupports.colorMix() || cssSupports.relativeColorSyntax()) {
+    if (hasModernColorSupport()) {
       // Use modern CSS directly - no HSLA conversion needed
       const modernScale = generateLightnessScale(colorOption);
       return applyScalePrefix(modernScale, prefix) as unknown as WithPrefix<
