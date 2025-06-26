@@ -75,13 +75,6 @@ legacyColors.toHslaColor('#ff0000');
 // → { h: 0, s: 100, l: 50, a: 1 }
 ```
 
-**Features:**
-
-- ✅ Universal browser support
-- ✅ Precise color parsing and conversion
-- ✅ Mathematical color space calculations
-- ⚠️ JavaScript overhead for parsing
-
 ## 🔧 Modern CSS Utilities (`utils.ts`)
 
 Core utilities for modern CSS color manipulation:
