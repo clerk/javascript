@@ -75,16 +75,16 @@ function prefixAndStringifyScale<Prefix extends string>(
   scale: InternalColorScale<HslaColor | undefined>,
   prefix: Prefix,
 ): WithPrefix<InternalColorScale<HslaColorString>, Prefix> {
-  const result = {} as WithPrefix<InternalColorScale<HslaColorString>, Prefix>;
+  const result = {} as Record<string, HslaColorString>;
 
   for (const shade of ALL_SHADES) {
     const color = scale[shade];
     if (color) {
-      (result as any)[prefix + shade] = colors.toHslaString(color);
+      result[`${prefix}${shade}`] = colors.toHslaString(color);
     }
   }
 
-  return result;
+  return result as WithPrefix<InternalColorScale<HslaColorString>, Prefix>;
 }
 
 // Modern CSS-based alpha scale generation
