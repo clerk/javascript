@@ -1,6 +1,5 @@
 /**
  * Caching and memoization utilities for color operations
- * Provides performance optimizations through intelligent caching
  */
 
 import type { ColorScale } from '@clerk/types';
