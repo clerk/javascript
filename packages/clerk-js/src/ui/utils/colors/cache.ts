@@ -117,6 +117,16 @@ export function batchGenerateColorScale<T>(
 }
 
 /**
+ * Get cache statistics (useful for testing)
+ */
+export function getCacheStats(): { size: number; modernSupport: boolean | null } {
+  return {
+    size: memoCache.size,
+    modernSupport: modernColorSupportCache,
+  };
+}
+
+/**
  * Clear memoization cache (useful for testing or memory management)
  */
 export function clearMemoCache(): void {
