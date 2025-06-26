@@ -1,5 +1,14 @@
 # Change Log
 
+## 3.17.1
+
+### Patch Changes
+
+- Add missing Portuguese pt-BR locales for the billing elements. ([#6058](https://github.com/clerk/javascript/pull/6058)) by [@lightapps-smart-blocks](https://github.com/lightapps-smart-blocks)
+
+- Updated dependencies [[`f1be1fe`](https://github.com/clerk/javascript/commit/f1be1fe3d575c11acd04fc7aadcdec8f89829894), [`bffb42a`](https://github.com/clerk/javascript/commit/bffb42aaf266a188b9ae7d16ace3024d468a3bd4)]:
+  - @clerk/types@4.62.0
+
 ## 3.17.0
 
 ### Minor Changes

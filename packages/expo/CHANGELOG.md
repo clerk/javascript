@@ -1,5 +1,19 @@
 # Change Log
 
+## 2.14.0
+
+### Minor Changes
+
+- Re-export useReverification hook from `@clerk/clerk-react` ([#6182](https://github.com/clerk/javascript/pull/6182)) by [@tmilewski](https://github.com/tmilewski)
+
+### Patch Changes
+
+- Updated dependencies [[`f1be1fe`](https://github.com/clerk/javascript/commit/f1be1fe3d575c11acd04fc7aadcdec8f89829894), [`58e9a2f`](https://github.com/clerk/javascript/commit/58e9a2f2962330d52682edf096dcba77fc082b9e), [`bffb42a`](https://github.com/clerk/javascript/commit/bffb42aaf266a188b9ae7d16ace3024d468a3bd4), [`bffb42a`](https://github.com/clerk/javascript/commit/bffb42aaf266a188b9ae7d16ace3024d468a3bd4), [`036a853`](https://github.com/clerk/javascript/commit/036a8533d020b465b40e51e10ba24345edd36102)]:
+  - @clerk/clerk-js@5.69.2
+  - @clerk/types@4.62.0
+  - @clerk/shared@3.10.0
+  - @clerk/clerk-react@5.32.2
+
 ## 2.13.2
 
 ### Patch Changes
