@@ -111,18 +111,6 @@ generateLightnessScale('#ff0000');
 // → { 25: 'hsl(from #ff0000 ...)', 50: '...', ..., 950: '...' }
 ```
 
-## 🚀 Performance Benefits
-
-### Modern CSS vs Legacy
-
-| Feature                 | Modern CSS               | Legacy HSLA            |
-| ----------------------- | ------------------------ | ---------------------- |
-| **Bundle Size**         | Minimal                  | +15KB (parsing)        |
-| **Runtime Performance** | Native browser           | JavaScript calculation |
-| **Color Accuracy**      | sRGB color space         | HSL approximation      |
-| **CSS Variables**       | ✅ Full support          | ❌ Parse required      |
-| **Future-Proof**        | ✅ Automatic improvement | ❌ Manual updates      |
-
 ## 🎛️ Browser Support Detection
 
 ```typescript
