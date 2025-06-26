@@ -116,7 +116,6 @@ export const modernColors = {
 
 /**
  * Determines if modern CSS color manipulation is supported
- * Now uses cached version for better performance
  */
 export function hasModernColorSupport(): boolean {
   return hasModernColorSupportCached();
