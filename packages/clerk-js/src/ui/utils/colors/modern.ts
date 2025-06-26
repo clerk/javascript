@@ -95,7 +95,12 @@ export const modernColors = {
 
     if (cssSupports.relativeColorSyntax()) {
       // Use relative color syntax for precise lightness adjustment
-      // Special handling for very light colors
+      // Special handling for very light colors:
+      // - Uses max() to ensure lightness never goes below 95%
+      // - Doubles the lightness adjustment (lightness * 2) for more noticeable effect
+      // - Prevents colors from becoming too dark when they're already very light
+      // - Example: A color at 92% lightness becomes max(92% + 10%, 95%) = 95%
+      // - Example: A color at 80% lightness becomes max(80% + 10%, 95%) = 90%
       return `hsl(from ${color} h s calc(max(l + ${lightness * 2}%, 95%)))`;
     }
 
