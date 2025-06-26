@@ -7,6 +7,7 @@ import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { FullHeightLoader } from '@/ui/elements/FullHeightLoader';
 import { ProfileSection } from '@/ui/elements/Section';
 import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
+import { handleError } from '@/ui/utils/errorHandler';
 
 import { RemoveResourceForm } from '../../common';
 import { DevOnly } from '../../common/DevOnly';
@@ -14,7 +15,6 @@ import { usePaymentMethods, useSubscriberTypeContext, useSubscriberTypeLocalizat
 import { localizationKeys } from '../../customizables';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
-import { handleError } from '../../utils';
 import * as AddPaymentSource from './AddPaymentSource';
 import { PaymentSourceRow } from './PaymentSourceRow';
 import { TestPaymentSource } from './TestPaymentSource';

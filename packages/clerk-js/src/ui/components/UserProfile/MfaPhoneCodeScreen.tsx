@@ -8,13 +8,14 @@ import type { FormProps } from '@/ui/elements/FormContainer';
 import { FormContainer } from '@/ui/elements/FormContainer';
 import { IconButton } from '@/ui/elements/IconButton';
 import { SuccessPage } from '@/ui/elements/SuccessPage';
+import { handleError } from '@/ui/utils/errorHandler';
+import { getCountryFromPhoneString, stringToFormattedPhoneString } from '@/ui/utils/phoneUtils';
 
 import { useWizard, Wizard } from '../../common';
 import { useEnvironment } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { Button, Col, Icon, localizationKeys, Text } from '../../customizables';
 import { Plus } from '../../icons';
-import { getCountryFromPhoneString, handleError, stringToFormattedPhoneString } from '../../utils';
 import { MfaBackupCodeList } from './MfaBackupCodeList';
 import { AddPhone } from './PhoneForm';
 import { VerifyWithCode } from './VerifyWithCode';
