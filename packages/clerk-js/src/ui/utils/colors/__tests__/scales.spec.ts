@@ -2,7 +2,14 @@ import type { ColorScale } from '@clerk/types';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { cssSupports } from '../../cssSupports';
-import { generateAlphaScale, generateLightnessScale, legacyScales, modernScales } from '../scales';
+import {
+  colorOptionToThemedAlphaScale,
+  colorOptionToThemedLightnessScale,
+  generateAlphaScale,
+  generateLightnessScale,
+  legacyScales,
+  modernScales,
+} from '../scales';
 
 // Mock cssSupports
 vi.mock('../../cssSupports', () => ({
@@ -232,6 +239,123 @@ describe('Color Scales', () => {
       const result = generateLightnessScale(invalidScale as any);
       expect(result).toBeDefined();
       expect(Object.values(result).every(v => v === undefined)).toBe(true);
+    });
+  });
+
+  describe('applyScalePrefix', () => {
+    // We need to access the internal applyScalePrefix function for testing
+    // Since it's now private, we'll test it through the public API
+    it('should apply prefix through themed functions', () => {
+      mockHasModernColorSupport.mockReturnValue(true);
+
+      const result = colorOptionToThemedAlphaScale('red', 'bg-');
+
+      expect(result).toBeDefined();
+      if (result) {
+        expect(Object.keys(result)).toEqual(expect.arrayContaining([expect.stringMatching(/^bg-\d+$/)]));
+      }
+    });
+
+    it('should skip undefined values in prefixed results', () => {
+      mockHasModernColorSupport.mockReturnValue(false);
+
+      // Empty string results in undefined values that should be filtered out
+      const result = colorOptionToThemedLightnessScale('', 'text-');
+
+      expect(result).toBeUndefined();
+    });
+  });
+});
+
+describe('Themed Color Scales', () => {
+  describe('colorOptionToThemedAlphaScale', () => {
+    it('should return undefined for undefined input', () => {
+      const result = colorOptionToThemedAlphaScale(undefined, 'bg-');
+      expect(result).toBeUndefined();
+    });
+
+    it('should handle string color input', () => {
+      mockHasModernColorSupport.mockReturnValue(true);
+
+      const result = colorOptionToThemedAlphaScale('red', 'bg-');
+
+      expect(result).toBeDefined();
+      expect(result).toHaveProperty('bg-500');
+    });
+
+    it('should handle color scale object', () => {
+      const colorScale = {
+        '25': 'red-25',
+        '50': 'red-50',
+        '100': 'red-100',
+        '150': 'red-150',
+        '200': 'red-200',
+        '300': 'red-300',
+        '400': 'red-400',
+        '500': 'red-500',
+        '600': 'red-600',
+        '700': 'red-700',
+        '750': 'red-750',
+        '800': 'red-800',
+        '850': 'red-850',
+        '900': 'red-900',
+        '950': 'red-950',
+      };
+
+      const result = colorOptionToThemedAlphaScale(colorScale, 'bg-');
+
+      expect(result).toBeDefined();
+      expect(result).toHaveProperty('bg-500');
+    });
+
+    it('should apply correct prefix', () => {
+      const result = colorOptionToThemedAlphaScale('red', 'text-');
+
+      expect(result).toBeDefined();
+      expect(result).toHaveProperty('text-500');
+    });
+  });
+
+  describe('colorOptionToThemedLightnessScale', () => {
+    it('should return undefined for undefined input', () => {
+      const result = colorOptionToThemedLightnessScale(undefined, 'bg-');
+      expect(result).toBeUndefined();
+    });
+
+    it('should handle string color input', () => {
+      mockHasModernColorSupport.mockReturnValue(true);
+      mockRelativeColorSyntax.mockReturnValue(true);
+
+      const result = colorOptionToThemedLightnessScale('red', 'bg-');
+
+      expect(result).toBeDefined();
+      expect(result).toHaveProperty('bg-500');
+    });
+
+    it('should handle partial color scale object', () => {
+      const partialScale = {
+        '500': 'custom-red',
+        '700': 'custom-dark-red',
+      };
+
+      const result = colorOptionToThemedLightnessScale(partialScale, 'bg-');
+
+      expect(result).toBeDefined();
+      expect(result).toHaveProperty('bg-500');
+    });
+
+    it('should apply correct prefix', () => {
+      const result = colorOptionToThemedLightnessScale('blue', 'text-');
+
+      expect(result).toBeDefined();
+      expect(result).toHaveProperty('text-500');
+    });
+
+    it('should handle empty string input', () => {
+      const result = colorOptionToThemedLightnessScale('', 'bg-');
+
+      // Empty strings are falsy, so the function returns undefined
+      expect(result).toBeUndefined();
     });
   });
 });

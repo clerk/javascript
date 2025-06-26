@@ -152,24 +152,3 @@ export function getColorMix(color: string, shade: ColorShade): string {
 
   return color;
 }
-
-/**
- * Apply a prefix to a color scale
- * @param scale - The color scale to apply the prefix to
- * @param prefix - The prefix to apply
- * @returns The color scale with the prefix applied
- */
-export function applyScalePrefix<Prefix extends string>(
-  scale: ColorScale<string | undefined>,
-  prefix: Prefix,
-): Record<`${Prefix}${keyof ColorScale<string>}`, string> {
-  const result: Record<string, string> = {};
-
-  for (const [shade, color] of Object.entries(scale)) {
-    if (color !== undefined) {
-      result[prefix + shade] = color;
-    }
-  }
-
-  return result as Record<`${Prefix}${keyof ColorScale<string>}`, string>;
-}

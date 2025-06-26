@@ -3,23 +3,23 @@ import type { Theme } from '@clerk/types';
 import { spaceScaleKeys } from '../foundations/sizes';
 import type { fontSizes, fontWeights } from '../foundations/typography';
 import { colors } from '../utils/colors';
-import { colorOptionToHslaAlphaScale, colorOptionToHslaLightnessScale } from '../utils/colors/colorOptionToHslaScale';
+import { colorOptionToThemedAlphaScale, colorOptionToThemedLightnessScale } from '../utils/colors/scales';
 import { fromEntries } from '../utils/fromEntries';
 import { removeUndefinedProps } from '../utils/removeUndefinedProps';
 
 export const createColorScales = (theme: Theme) => {
   const variables = theme.variables || {};
 
-  const dangerScale = colorOptionToHslaLightnessScale(variables.colorDanger, 'danger');
-  const primaryScale = colorOptionToHslaLightnessScale(variables.colorPrimary, 'primary');
-  const successScale = colorOptionToHslaLightnessScale(variables.colorSuccess, 'success');
-  const warningScale = colorOptionToHslaLightnessScale(variables.colorWarning, 'warning');
+  const dangerScale = colorOptionToThemedLightnessScale(variables.colorDanger, 'danger');
+  const primaryScale = colorOptionToThemedLightnessScale(variables.colorPrimary, 'primary');
+  const successScale = colorOptionToThemedLightnessScale(variables.colorSuccess, 'success');
+  const warningScale = colorOptionToThemedLightnessScale(variables.colorWarning, 'warning');
 
-  const dangerAlphaScale = colorOptionToHslaAlphaScale(dangerScale?.danger500, 'dangerAlpha');
-  const neutralAlphaScale = colorOptionToHslaAlphaScale(variables.colorNeutral, 'neutralAlpha');
-  const primaryAlphaScale = colorOptionToHslaAlphaScale(primaryScale?.primary500, 'primaryAlpha');
-  const successAlphaScale = colorOptionToHslaAlphaScale(successScale?.success500, 'successAlpha');
-  const warningAlphaScale = colorOptionToHslaAlphaScale(warningScale?.warning500, 'warningAlpha');
+  const dangerAlphaScale = colorOptionToThemedAlphaScale(dangerScale?.danger500, 'dangerAlpha');
+  const neutralAlphaScale = colorOptionToThemedAlphaScale(variables.colorNeutral, 'neutralAlpha');
+  const primaryAlphaScale = colorOptionToThemedAlphaScale(primaryScale?.primary500, 'primaryAlpha');
+  const successAlphaScale = colorOptionToThemedAlphaScale(successScale?.success500, 'successAlpha');
+  const warningAlphaScale = colorOptionToThemedAlphaScale(warningScale?.warning500, 'warningAlpha');
 
   return removeUndefinedProps({
     ...dangerScale,

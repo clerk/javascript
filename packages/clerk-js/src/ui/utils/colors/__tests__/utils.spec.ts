@@ -1,10 +1,8 @@
-import type { ColorScale } from '@clerk/types';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { cssSupports } from '../../cssSupports';
 import { clearMemoCache } from '../../memoize';
 import {
-  applyScalePrefix,
   colorGenerators,
   createAlphaColorMix,
   createColorMix,
@@ -189,40 +187,6 @@ describe('Color Utils', () => {
 
       const result = getColorMix('red', 400);
       expect(result).toBe('red');
-    });
-  });
-
-  describe('applyScalePrefix', () => {
-    it('should apply prefix to all scale properties', () => {
-      const scale: Partial<ColorScale<string>> = {
-        '25': 'red-25',
-        '500': 'red-500',
-        '950': 'red-950',
-      };
-
-      const result = applyScalePrefix(scale as ColorScale<string | undefined>, 'bg-');
-
-      expect(result).toEqual({
-        'bg-25': 'red-25',
-        'bg-500': 'red-500',
-        'bg-950': 'red-950',
-      });
-    });
-
-    it('should skip undefined values', () => {
-      const scale: Partial<ColorScale<string | undefined>> = {
-        '25': 'red-25',
-        '500': undefined,
-        '950': 'red-950',
-      };
-
-      const result = applyScalePrefix(scale as ColorScale<string | undefined>, 'text-');
-
-      expect(result).toEqual({
-        'text-25': 'red-25',
-        'text-950': 'red-950',
-      });
-      expect(result).not.toHaveProperty('text-500');
     });
   });
 });

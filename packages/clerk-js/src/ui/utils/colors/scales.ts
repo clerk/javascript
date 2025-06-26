@@ -1,9 +1,36 @@
-import type { ColorScale, CssColorOrScale } from '@clerk/types';
+import type { ColorScale, CssColorOrAlphaScale, CssColorOrScale, HslaColorString } from '@clerk/types';
 
 import { cssSupports } from '../cssSupports';
 import { ALPHA_VALUES, COLOR_SCALE, DARK_SHADES, LIGHT_SHADES, LIGHTNESS_CONFIG } from './constants';
 import { colors as legacyColors } from './legacy';
 import { createEmptyColorScale, generateAlphaColorMix, getColorMix } from './utils';
+
+// Types for themed scales
+type InternalColorScale<T> = ColorScale<T> & Partial<Record<20, T>>;
+type WithPrefix<T extends Record<string, string>, Prefix extends string> = {
+  [K in keyof T as `${Prefix}${K & string}`]: T[K];
+};
+
+/**
+ * Apply a prefix to a color scale
+ * @param scale - The color scale to apply the prefix to
+ * @param prefix - The prefix to apply
+ * @returns The color scale with the prefix applied
+ */
+function applyScalePrefix<Prefix extends string>(
+  scale: ColorScale<string | undefined>,
+  prefix: Prefix,
+): Record<`${Prefix}${keyof ColorScale<string>}`, string> {
+  const result: Record<string, string> = {};
+
+  for (const [shade, color] of Object.entries(scale)) {
+    if (color !== undefined) {
+      result[prefix + shade] = color;
+    }
+  }
+
+  return result as Record<`${Prefix}${keyof ColorScale<string>}`, string>;
+}
 
 /**
  * Modern CSS alpha scale generation
@@ -174,3 +201,76 @@ export const legacyScales = {
   generateAlphaScale: generateLegacyAlphaScale,
   generateLightnessScale: generateLegacyLightnessScale,
 } as const;
+
+/**
+ * Converts a color scale to CSS color strings
+ * Works with both modern CSS (color-mix, relative colors) and legacy HSLA
+ */
+function convertScaleToCssStrings(scale: ColorScale<string>): ColorScale<HslaColorString> {
+  const result: Partial<ColorScale<HslaColorString>> = {};
+
+  for (const [shade, color] of Object.entries(scale)) {
+    if (color && color !== undefined) {
+      // For modern CSS color-mix values, we keep them as-is since they're already valid CSS
+      // For legacy HSLA values, they're already in HSLA format
+      result[shade as keyof ColorScale<string>] = color as HslaColorString;
+    }
+  }
+
+  return result as ColorScale<HslaColorString>;
+}
+
+/**
+ * Applies prefix to a color scale and converts to CSS color strings
+ */
+function prefixAndConvertScale<Prefix extends string>(
+  scale: ColorScale<string>,
+  prefix: Prefix,
+): WithPrefix<InternalColorScale<HslaColorString>, Prefix> {
+  const cssScale = convertScaleToCssStrings(scale);
+  return applyScalePrefix(cssScale, prefix) as unknown as WithPrefix<InternalColorScale<HslaColorString>, Prefix>;
+}
+
+/**
+ * Converts a color option to a themed alpha scale with prefix
+ * Returns CSS color values (modern color-mix/relative colors or legacy HSLA)
+ * @param colorOption - Color input (string or alpha scale object)
+ * @param prefix - Prefix to apply to scale keys
+ * @returns Prefixed CSS color scale or undefined
+ */
+export const colorOptionToThemedAlphaScale = <Prefix extends string>(
+  colorOption: CssColorOrAlphaScale | undefined,
+  prefix: Prefix,
+): WithPrefix<InternalColorScale<HslaColorString>, Prefix> | undefined => {
+  if (!colorOption) {
+    return undefined;
+  }
+
+  // Generate alpha scale using the unified scale generator
+  const scale = generateAlphaScale(colorOption);
+
+  // Convert to CSS strings and apply prefix
+  return prefixAndConvertScale(scale, prefix);
+};
+
+/**
+ * Converts a color option to a themed lightness scale with prefix
+ * Returns CSS color values (modern color-mix/relative colors or legacy HSLA)
+ * @param colorOption - Color input (string or lightness scale object)
+ * @param prefix - Prefix to apply to scale keys
+ * @returns Prefixed CSS color scale or undefined
+ */
+export const colorOptionToThemedLightnessScale = <Prefix extends string>(
+  colorOption: CssColorOrScale | undefined,
+  prefix: Prefix,
+): WithPrefix<InternalColorScale<HslaColorString>, Prefix> | undefined => {
+  if (!colorOption) {
+    return undefined;
+  }
+
+  // Generate lightness scale using the unified scale generator
+  const scale = generateLightnessScale(colorOption);
+
+  // Convert to CSS strings and apply prefix
+  return prefixAndConvertScale(scale, prefix);
+};
