@@ -68,7 +68,9 @@ export const modernColors = {
   /**
    * Sets the alpha value of a color using modern CSS
    */
-  setAlpha: (color: string, alpha: number): string => {
+  setAlpha: (color: string | undefined, alpha: number): string | undefined => {
+    if (!color) return undefined;
+
     if (!color.toString()) return color;
 
     const clampedAlpha = Math.min(Math.max(alpha, 0), 1);
