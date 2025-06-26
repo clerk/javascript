@@ -254,8 +254,6 @@ function hwbToRgba(hwb: ColorTuple): ColorTuple {
   let red: number, green: number, blue: number;
 
   switch (sector) {
-    default:
-    case 6:
     case 0:
       [red, green, blue] = [value, neutral, w];
       break;
@@ -273,6 +271,10 @@ function hwbToRgba(hwb: ColorTuple): ColorTuple {
       break;
     case 5:
       [red, green, blue] = [value, w, neutral];
+      break;
+    case 6:
+    default:
+      [red, green, blue] = [value, neutral, w];
       break;
   }
 

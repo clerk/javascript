@@ -86,13 +86,13 @@ export function applyScalePrefix<Prefix extends string>(
   scale: ColorScale<string | undefined>,
   prefix: Prefix,
 ): Record<`${Prefix}${keyof ColorScale<string>}`, string> {
-  const result = {} as Record<`${Prefix}${keyof ColorScale<string>}`, string>;
+  const result: Record<string, string> = {};
 
   for (const [shade, color] of Object.entries(scale)) {
     if (color !== undefined) {
-      (result as any)[prefix + shade] = color;
+      result[prefix + shade] = color;
     }
   }
 
-  return result;
+  return result as Record<`${Prefix}${keyof ColorScale<string>}`, string>;
 }
