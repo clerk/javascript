@@ -4,14 +4,14 @@
  */
 
 import { cssSupports } from '../cssSupports';
-import { hasModernColorSupport as hasModernColorSupportCached } from './cache';
 import { COLOR_BOUNDS, MODERN_CSS_LIMITS } from './constants';
+import { colorGenerators } from './utils';
 
 /**
  * Modern CSS-based color manipulation utilities
  * Uses color-mix() and relative color syntax when supported
  */
-export const modernColors = {
+export const colors = {
   /**
    * Lightens a color by a percentage
    */
@@ -21,13 +21,13 @@ export const modernColors = {
     if (cssSupports.relativeColorSyntax()) {
       // Use relative color syntax for precise lightness control
       const lightnessIncrease = percentage * 100; // Convert to percentage
-      return `hsl(from ${color} h s calc(l + ${lightnessIncrease}%))`;
+      return colorGenerators.relativeColor(color, 'h', 's', `calc(l + ${lightnessIncrease}%)`);
     }
 
     if (cssSupports.colorMix()) {
       // Use color-mix as fallback
       const mixPercentage = Math.min(percentage * 100, MODERN_CSS_LIMITS.MAX_LIGHTNESS_MIX);
-      return `color-mix(in srgb, ${color}, white ${mixPercentage}%)`;
+      return colorGenerators.colorMix(color, 'white', mixPercentage);
     }
 
     return color; // Return original if no modern CSS support
@@ -41,7 +41,7 @@ export const modernColors = {
 
     if (cssSupports.colorMix()) {
       const alphaPercentage = Math.max((1 - percentage) * 100, MODERN_CSS_LIMITS.MIN_ALPHA_PERCENTAGE);
-      return `color-mix(in srgb, transparent, ${color} ${alphaPercentage}%)`;
+      return colorGenerators.alphaColorMix(color, alphaPercentage);
     }
 
     return color; // Return original if no modern CSS support
@@ -55,7 +55,7 @@ export const modernColors = {
 
     if (cssSupports.relativeColorSyntax()) {
       // Set alpha to 1 using relative color syntax
-      return `hsl(from ${color} h s l / 1)`;
+      return colorGenerators.relativeColor(color, 'h', 's', 'l', '1');
     }
 
     if (cssSupports.colorMix()) {
@@ -69,22 +69,18 @@ export const modernColors = {
   /**
    * Sets the alpha value of a color using modern CSS
    */
-  setAlpha: (color: string | undefined, alpha: number): string | undefined => {
-    if (!color) return undefined;
-
-    if (!color.toString()) return color;
-
+  setAlpha: (color: string, alpha: number): string => {
     const clampedAlpha = Math.min(Math.max(alpha, COLOR_BOUNDS.alpha.min), COLOR_BOUNDS.alpha.max);
 
     if (cssSupports.relativeColorSyntax()) {
       // Use relative color syntax for precise alpha control
-      return `hsl(from ${color} h s l / ${clampedAlpha})`;
+      return colorGenerators.relativeColor(color, 'h', 's', 'l', clampedAlpha.toString());
     }
 
     if (cssSupports.colorMix()) {
       // Use color-mix with transparent
       const percentage = clampedAlpha * 100;
-      return `color-mix(in srgb, transparent, ${color} ${percentage}%)`;
+      return colorGenerators.alphaColorMix(color, percentage);
     }
 
     return color; // Return original if no modern CSS support
@@ -102,7 +98,12 @@ export const modernColors = {
       // - Uses max() to ensure lightness never goes below the minimum floor
       // - Uses multiplier for more noticeable effect
       // - Prevents colors from becoming too dark when they're already very light
-      return `hsl(from ${color} h s calc(max(l + ${lightness * MODERN_CSS_LIMITS.LIGHTNESS_MULTIPLIER}%, ${MODERN_CSS_LIMITS.MIN_LIGHTNESS_FLOOR}%)))`;
+      return colorGenerators.relativeColor(
+        color,
+        'h',
+        's',
+        `calc(max(l + ${lightness * MODERN_CSS_LIMITS.LIGHTNESS_MULTIPLIER}%, ${MODERN_CSS_LIMITS.MIN_LIGHTNESS_FLOOR}%))`,
+      );
     }
 
     if (cssSupports.colorMix()) {
@@ -111,16 +112,9 @@ export const modernColors = {
         lightness * MODERN_CSS_LIMITS.MIX_MULTIPLIER,
         MODERN_CSS_LIMITS.MAX_LIGHTNESS_ADJUSTMENT,
       );
-      return `color-mix(in srgb, ${color}, white ${mixPercentage}%)`;
+      return colorGenerators.colorMix(color, 'white', mixPercentage);
     }
 
     return color; // Return original if no modern CSS support
   },
 };
-
-/**
- * Determines if modern CSS color manipulation is supported
- */
-export function hasModernColorSupport(): boolean {
-  return hasModernColorSupportCached();
-}

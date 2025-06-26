@@ -6,6 +6,8 @@ const CSS_FEATURE_TESTS: Record<CSSFeature, string> = {
 } as const;
 
 const supportCache = new Map<CSSFeature, boolean>();
+// Cache for composite checks
+let modernColorSupportCache: boolean | undefined;
 
 /**
  * CSS feature detection
@@ -68,11 +70,19 @@ export const cssSupports = {
    * Check if the browser supports modern color syntax (color-mix or relative color syntax)
    * @returns true if the browser supports modern color syntax
    */
-  hasModernColorSupport: () => testCSSFeature('relativeColorSyntax') || testCSSFeature('colorMix'),
+  hasModernColorSupport: () => {
+    if (modernColorSupportCache !== undefined) {
+      return modernColorSupportCache;
+    }
+
+    modernColorSupportCache = testCSSFeature('relativeColorSyntax') || testCSSFeature('colorMix');
+    return modernColorSupportCache;
+  },
 } as const;
 
 export const clearCSSSupportsCache = (): void => {
   supportCache.clear();
+  modernColorSupportCache = undefined;
 };
 
 export const getCachedSupports = (): Record<string, boolean> => {

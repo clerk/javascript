@@ -10,27 +10,6 @@ type WithPrefix<T extends Record<string, string>, Prefix extends string> = {
   [K in keyof T as `${Prefix}${K & string}`]: T[K];
 };
 
-// Utility functions
-export function createEmptyColorScale<T = undefined>(): InternalColorScale<T | undefined> {
-  return {
-    '25': undefined,
-    '50': undefined,
-    '100': undefined,
-    '150': undefined,
-    '200': undefined,
-    '300': undefined,
-    '400': undefined,
-    '500': undefined,
-    '600': undefined,
-    '700': undefined,
-    '750': undefined,
-    '800': undefined,
-    '850': undefined,
-    '900': undefined,
-    '950': undefined,
-  };
-}
-
 function validateCompleteScale(scale: Record<string, any>): void {
   const missingShades = ALL_SHADES.filter(shade => !(shade in scale));
   if (missingShades.length > 0) {

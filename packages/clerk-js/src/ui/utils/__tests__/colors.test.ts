@@ -1,6 +1,6 @@
 import type { HslaColor } from '@clerk/types';
 
-import { legacyColors as colors } from '../colors/legacy';
+import { colors } from '../colors/legacy';
 
 describe('colors.toHslaColor(color)', function () {
   const hsla = { h: 195, s: 100, l: 50, a: 1 };

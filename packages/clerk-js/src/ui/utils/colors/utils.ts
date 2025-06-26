@@ -1,20 +1,91 @@
 import type { ColorScale } from '@clerk/types';
 
 import { cssSupports } from '../cssSupports';
-import { memoizedColorGenerators } from './cache';
+import { memoize } from '../memoize';
 import type { ColorShade } from './constants';
-import { ALPHA_PERCENTAGES, LIGHTNESS_CONFIG, LIGHTNESS_MIX_DATA, RELATIVE_SHADE_STEPS } from './constants';
+import { ALL_SHADES, ALPHA_PERCENTAGES, LIGHTNESS_CONFIG, LIGHTNESS_MIX_DATA, RELATIVE_SHADE_STEPS } from './constants';
+
+/**
+ * Pre-computed empty color scale to avoid object creation
+ */
+const EMPTY_COLOR_SCALE: ColorScale<string | undefined> = Object.freeze(
+  ALL_SHADES.reduce(
+    (scale, shade) => {
+      scale[shade] = undefined;
+      return scale;
+    },
+    {} as ColorScale<string | undefined>,
+  ),
+);
+
+/**
+ * Fast empty color scale creation - returns pre-computed frozen object
+ */
+export const createEmptyColorScale = (): ColorScale<string | undefined> => {
+  return { ...EMPTY_COLOR_SCALE };
+};
+
+/**
+ * Memoized color string generators for better performance
+ */
+export const colorGenerators = {
+  /**
+   * Memoized color-mix generator
+   */
+  colorMix: memoize(
+    (baseColor: string, mixColor: string, percentage: number): string =>
+      `color-mix(in srgb, ${baseColor}, ${mixColor} ${percentage}%)`,
+    (baseColor, mixColor, percentage) => `mix:${baseColor}:${mixColor}:${percentage}`,
+  ),
+
+  /**
+   * Memoized relative color syntax generator
+   */
+  relativeColor: memoize(
+    (color: string, hue: string, saturation: string, lightness: string, alpha?: string): string =>
+      `hsl(from ${color} ${hue} ${saturation} ${lightness}${alpha ? ` / ${alpha}` : ''})`,
+    (color, h, s, l, a) => `rel:${color}:${h}:${s}:${l}:${a || ''}`,
+  ),
+
+  /**
+   * Memoized alpha color-mix generator
+   */
+  alphaColorMix: memoize(
+    (color: string, alphaPercentage: number): string => `color-mix(in srgb, transparent, ${color} ${alphaPercentage}%)`,
+    (color, alpha) => `alpha:${color}:${alpha}`,
+  ),
+};
 
 // Core utility functions (now using memoized versions for better performance)
+
+/**
+ * Create a color-mix string
+ * @param baseColor - The base color
+ * @param mixColor - The color to mix with
+ * @param percentage - The percentage of the mix
+ * @returns The color-mix string
+ */
 export function createColorMix(baseColor: string, mixColor: string, percentage: number): string {
-  return memoizedColorGenerators.colorMix(baseColor, mixColor, percentage);
+  return colorGenerators.colorMix(baseColor, mixColor, percentage);
 }
 
+/**
+ * Create a color-mix string
+ * @param color - The base color
+ * @param mixColor - The color to mix with
+ * @param percentage - The percentage of the mix
+ * @returns The color-mix string
+ */
 export function createAlphaColorMix(color: string, alphaPercentage: number): string {
-  return memoizedColorGenerators.alphaColorMix(color, alphaPercentage);
+  return colorGenerators.alphaColorMix(color, alphaPercentage);
 }
 
-// Feature-specific generators
+/**
+ * Generate a relative color syntax string
+ * @param color - The base color
+ * @param shade - The shade to generate the color for
+ * @returns The relative color syntax string
+ */
 export function generateRelativeColorSyntax(color: string, shade: ColorShade): string {
   if (shade === 500) return color;
 
@@ -25,13 +96,29 @@ export function generateRelativeColorSyntax(color: string, shade: ColorShade): s
 
   // Light shades (25-400)
   if (shade < 500) {
-    return `hsl(from ${color} h s calc(l + (${steps} * ((${TARGET_LIGHT} - l) / ${LIGHT_STEPS}))))`;
+    return colorGenerators.relativeColor(
+      color,
+      'h',
+      's',
+      `calc(l + (${steps} * ((${TARGET_LIGHT} - l) / ${LIGHT_STEPS})))`,
+    );
   }
 
   // Dark shades (600-950)
-  return `hsl(from ${color} h s calc(l - (${steps} * ((l - ${TARGET_DARK}) / ${DARK_STEPS}))))`;
+  return colorGenerators.relativeColor(
+    color,
+    'h',
+    's',
+    `calc(l - (${steps} * ((l - ${TARGET_DARK}) / ${DARK_STEPS})))`,
+  );
 }
 
+/**
+ * Generate a color-mix string
+ * @param color - The base color
+ * @param shade - The shade to generate the color for
+ * @returns The color-mix string
+ */
 export function generateColorMixSyntax(color: string, shade: ColorShade): string {
   if (shade === 500) return color;
 
@@ -46,7 +133,12 @@ export function generateAlphaColorMix(color: string, shade: ColorShade): string 
   return createAlphaColorMix(color, alphaPercentage);
 }
 
-// Feature detection and selection
+/**
+ * Get a color-mix string
+ * @param color - The base color
+ * @param shade - The shade to generate the color for
+ * @returns The color-mix string
+ */
 export function getColorMix(color: string, shade: ColorShade): string {
   if (shade === 500) return color;
 
@@ -61,27 +153,12 @@ export function getColorMix(color: string, shade: ColorShade): string {
   return color;
 }
 
-// Scale utilities
-export function createEmptyColorScale(): ColorScale<string | undefined> {
-  return {
-    '25': undefined,
-    '50': undefined,
-    '100': undefined,
-    '150': undefined,
-    '200': undefined,
-    '300': undefined,
-    '400': undefined,
-    '500': undefined,
-    '600': undefined,
-    '700': undefined,
-    '750': undefined,
-    '800': undefined,
-    '850': undefined,
-    '900': undefined,
-    '950': undefined,
-  };
-}
-
+/**
+ * Apply a prefix to a color scale
+ * @param scale - The color scale to apply the prefix to
+ * @param prefix - The prefix to apply
+ * @returns The color scale with the prefix applied
+ */
 export function applyScalePrefix<Prefix extends string>(
   scale: ColorScale<string | undefined>,
   prefix: Prefix,

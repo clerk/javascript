@@ -1,6 +1,5 @@
 /**
  * Shared constants for color utilities
- * Consolidates all color-related constants to eliminate duplication
  */
 
 import type { ColorScale } from '@clerk/types';

@@ -1,8 +1,8 @@
 import type { ColorScale, CssColorOrScale } from '@clerk/types';
 
-import { hasModernColorSupport } from './cache';
+import { cssSupports } from '../cssSupports';
 import { ALPHA_VALUES, COLOR_SCALE, DARK_SHADES, LIGHT_SHADES, LIGHTNESS_CONFIG } from './constants';
-import { legacyColors } from './legacy';
+import { colors as legacyColors } from './legacy';
 import { createEmptyColorScale, generateAlphaColorMix, getColorMix } from './utils';
 
 /**
@@ -127,7 +127,9 @@ export function generateAlphaScale(
   const { baseColor, userScale } = processed;
 
   // Generate scale using modern or legacy implementation
-  const generated = hasModernColorSupport() ? generateModernAlphaScale(baseColor) : generateLegacyAlphaScale(baseColor);
+  const generated = cssSupports.hasModernColorSupport()
+    ? generateModernAlphaScale(baseColor)
+    : generateLegacyAlphaScale(baseColor);
 
   // Merge with user-provided colors if any
   return mergeWithUserScale(generated, userScale);
@@ -149,7 +151,7 @@ export function generateLightnessScale(
   const { baseColor, userScale } = processed;
 
   // Generate scale using modern or legacy implementation
-  const generated = hasModernColorSupport()
+  const generated = cssSupports.hasModernColorSupport()
     ? generateModernLightnessScale(baseColor)
     : generateLegacyLightnessScale(baseColor);
 

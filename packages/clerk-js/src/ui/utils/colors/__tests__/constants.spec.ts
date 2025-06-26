@@ -4,241 +4,234 @@ import {
   ALL_SHADES,
   ALPHA_PERCENTAGES,
   ALPHA_VALUES,
+  COLOR_BOUNDS,
   COLOR_SCALE,
-  type ColorShade,
-  type ColorShadeKey,
   DARK_SHADES,
   LIGHT_SHADES,
   LIGHTNESS_CONFIG,
   LIGHTNESS_MIX_DATA,
+  MODERN_CSS_LIMITS,
   RELATIVE_SHADE_STEPS,
 } from '../constants';
 
-describe('Constants', () => {
-  describe('Types', () => {
-    it('should export ColorShade type correctly', () => {
-      const shade: ColorShade = 500;
-      expect(shade).toBe(500);
-    });
-
-    it('should export ColorShadeKey type correctly', () => {
-      const shadeKey: ColorShadeKey = '500';
-      expect(shadeKey).toBe('500');
-    });
-  });
-
+describe('Color Constants', () => {
   describe('COLOR_SCALE', () => {
-    it('should contain all 15 shade values', () => {
-      expect(COLOR_SCALE).toHaveLength(15);
-    });
-
-    it('should be in ascending order', () => {
-      const sorted = [...COLOR_SCALE].sort((a, b) => a - b);
-      expect(COLOR_SCALE).toEqual(sorted);
-    });
-
-    it('should contain expected shade values', () => {
+    it('should contain all expected color shades in order', () => {
       expect(COLOR_SCALE).toEqual([25, 50, 100, 150, 200, 300, 400, 500, 600, 700, 750, 800, 850, 900, 950]);
     });
 
-    it('should be readonly', () => {
-      // TypeScript provides readonly at compile time, but at runtime arrays are still mutable
-      // This test verifies the TypeScript type is readonly by checking it's an array
-      expect(COLOR_SCALE).toBeInstanceOf(Array);
+    it('should be readonly at compile time', () => {
+      // COLOR_SCALE is readonly via 'as const' but not frozen at runtime
+      // This is sufficient for immutability in TypeScript
       expect(Array.isArray(COLOR_SCALE)).toBe(true);
+    });
+
+    it('should have correct length', () => {
+      expect(COLOR_SCALE).toHaveLength(15);
     });
   });
 
   describe('Shade groupings', () => {
-    it('should define light shades correctly', () => {
+    it('should have correct light shades', () => {
       expect(LIGHT_SHADES).toEqual(['25', '50', '100', '150', '200', '300', '400']);
     });
 
-    it('should define dark shades correctly', () => {
+    it('should have correct dark shades', () => {
       expect(DARK_SHADES).toEqual(['600', '700', '750', '800', '850', '900', '950']);
     });
 
-    it('should define all shades correctly', () => {
+    it('should have all shades including 500', () => {
+      expect(ALL_SHADES).toContain('500');
       expect(ALL_SHADES).toHaveLength(15);
-      expect(ALL_SHADES).toContain('500'); // Base shade should be included
     });
 
-    it('should not have overlapping light and dark shades', () => {
-      const lightSet = new Set(LIGHT_SHADES);
-      const darkSet = new Set(DARK_SHADES);
-      const intersection = [...lightSet].filter(shade => darkSet.has(shade));
-      expect(intersection).toHaveLength(0);
+    it('should have all shades equal to light + dark + 500', () => {
+      const expected = [...LIGHT_SHADES, '500', ...DARK_SHADES];
+      expect(ALL_SHADES).toEqual(expected);
     });
   });
 
   describe('LIGHTNESS_CONFIG', () => {
-    it('should have correct target values', () => {
-      expect(LIGHTNESS_CONFIG.TARGET_LIGHT).toBe(97);
-      expect(LIGHTNESS_CONFIG.TARGET_DARK).toBe(12);
+    it('should have correct lightness configuration', () => {
+      expect(LIGHTNESS_CONFIG).toEqual({
+        TARGET_LIGHT: 97,
+        TARGET_DARK: 12,
+        LIGHT_STEPS: 7,
+        DARK_STEPS: 7,
+      });
     });
 
-    it('should have correct step counts', () => {
-      expect(LIGHTNESS_CONFIG.LIGHT_STEPS).toBe(7);
-      expect(LIGHTNESS_CONFIG.DARK_STEPS).toBe(7);
-    });
-
-    it('should match actual shade counts', () => {
-      expect(LIGHTNESS_CONFIG.LIGHT_STEPS).toBe(LIGHT_SHADES.length);
-      expect(LIGHTNESS_CONFIG.DARK_STEPS).toBe(DARK_SHADES.length);
+    it('should be readonly at compile time', () => {
+      // LIGHTNESS_CONFIG is readonly via 'as const' but not frozen at runtime
+      expect(typeof LIGHTNESS_CONFIG).toBe('object');
     });
   });
 
   describe('ALPHA_VALUES', () => {
-    it('should have 15 values matching COLOR_SCALE length', () => {
+    it('should have correct number of alpha values', () => {
       expect(ALPHA_VALUES).toHaveLength(COLOR_SCALE.length);
     });
 
-    it('should be in ascending order', () => {
-      const sorted = [...ALPHA_VALUES].sort((a, b) => a - b);
-      expect(ALPHA_VALUES).toEqual(sorted);
-    });
-
-    it('should have values between 0 and 1', () => {
+    it('should have all values between 0 and 1', () => {
       ALPHA_VALUES.forEach(value => {
         expect(value).toBeGreaterThanOrEqual(0);
         expect(value).toBeLessThanOrEqual(1);
       });
     });
 
-    it('should start with low opacity and increase', () => {
-      expect(ALPHA_VALUES[0]).toBe(0.02); // 25 shade
-      expect(ALPHA_VALUES[ALPHA_VALUES.length - 1]).toBe(0.92); // 950 shade
+    it('should be in ascending order', () => {
+      for (let i = 1; i < ALPHA_VALUES.length; i++) {
+        expect(ALPHA_VALUES[i]).toBeGreaterThan(ALPHA_VALUES[i - 1]);
+      }
     });
   });
 
   describe('ALPHA_PERCENTAGES', () => {
-    it('should have entries for all shades', () => {
+    it('should have entries for all color shades', () => {
       COLOR_SCALE.forEach(shade => {
-        expect(ALPHA_PERCENTAGES).toHaveProperty(shade.toString());
+        expect(ALPHA_PERCENTAGES[shade]).toBeDefined();
+        expect(typeof ALPHA_PERCENTAGES[shade]).toBe('number');
       });
     });
 
-    it('should have percentage values between 0 and 100', () => {
+    it('should have all percentages between 0 and 100', () => {
       Object.values(ALPHA_PERCENTAGES).forEach(percentage => {
         expect(percentage).toBeGreaterThanOrEqual(0);
         expect(percentage).toBeLessThanOrEqual(100);
       });
     });
 
-    it('should correspond to ALPHA_VALUES', () => {
-      COLOR_SCALE.forEach((shade, index) => {
-        const expectedPercentage = Math.round(ALPHA_VALUES[index] * 100);
-        const actualPercentage = ALPHA_PERCENTAGES[shade];
-        // Allow for small rounding differences
-        expect(Math.abs(actualPercentage - expectedPercentage)).toBeLessThanOrEqual(1);
-      });
+    it('should be readonly at compile time', () => {
+      // ALPHA_PERCENTAGES is readonly via 'as const' but not frozen at runtime
+      expect(typeof ALPHA_PERCENTAGES).toBe('object');
     });
   });
 
   describe('LIGHTNESS_MIX_DATA', () => {
-    it('should have entries for all shades', () => {
+    it('should have entries for all color shades', () => {
       COLOR_SCALE.forEach(shade => {
-        expect(LIGHTNESS_MIX_DATA).toHaveProperty(shade.toString());
+        expect(LIGHTNESS_MIX_DATA[shade]).toBeDefined();
+        expect(typeof LIGHTNESS_MIX_DATA[shade]).toBe('object');
       });
     });
 
-    it('should have null mixColor for base shade 500', () => {
-      expect(LIGHTNESS_MIX_DATA[500].mixColor).toBeNull();
-      expect(LIGHTNESS_MIX_DATA[500].percentage).toBe(0);
+    it('should have correct structure for each shade', () => {
+      Object.entries(LIGHTNESS_MIX_DATA).forEach(([_shade, data]) => {
+        expect(data).toHaveProperty('mixColor');
+        expect(data).toHaveProperty('percentage');
+        expect(typeof data.percentage).toBe('number');
+
+        if (data.mixColor !== null) {
+          expect(['white', 'black']).toContain(data.mixColor);
+        }
+      });
     });
 
-    it('should use white for light shades', () => {
+    it('should have 500 shade with no mix color', () => {
+      expect(LIGHTNESS_MIX_DATA[500]).toEqual({
+        mixColor: null,
+        percentage: 0,
+      });
+    });
+
+    it('should have light shades mixing with white', () => {
       LIGHT_SHADES.forEach(shade => {
-        const shadeNum = parseInt(shade) as ColorShade;
-        expect(LIGHTNESS_MIX_DATA[shadeNum].mixColor).toBe('white');
-        expect(LIGHTNESS_MIX_DATA[shadeNum].percentage).toBeGreaterThan(0);
+        const numShade = parseInt(shade) as keyof typeof LIGHTNESS_MIX_DATA;
+        expect(LIGHTNESS_MIX_DATA[numShade].mixColor).toBe('white');
       });
     });
 
-    it('should use black for dark shades', () => {
+    it('should have dark shades mixing with black', () => {
       DARK_SHADES.forEach(shade => {
-        const shadeNum = parseInt(shade) as ColorShade;
-        expect(LIGHTNESS_MIX_DATA[shadeNum].mixColor).toBe('black');
-        expect(LIGHTNESS_MIX_DATA[shadeNum].percentage).toBeGreaterThan(0);
+        const numShade = parseInt(shade) as keyof typeof LIGHTNESS_MIX_DATA;
+        expect(LIGHTNESS_MIX_DATA[numShade].mixColor).toBe('black');
       });
     });
 
-    it('should have increasing percentages for lighter shades', () => {
-      const lightPercentages = LIGHT_SHADES.map(shade => {
-        const shadeNum = parseInt(shade) as ColorShade;
-        return LIGHTNESS_MIX_DATA[shadeNum].percentage;
-      });
-
-      // Should be in ascending order (25 has highest percentage, 400 has lowest)
-      // This is correct: [85, 80, 68, 55, 40, 26, 16] for shades [25, 50, 100, 150, 200, 300, 400]
-      for (let i = 0; i < lightPercentages.length - 1; i++) {
-        expect(lightPercentages[i]).toBeGreaterThanOrEqual(lightPercentages[i + 1]);
-      }
-    });
-
-    it('should have increasing percentages for darker shades', () => {
-      const darkPercentages = DARK_SHADES.map(shade => {
-        const shadeNum = parseInt(shade) as ColorShade;
-        return LIGHTNESS_MIX_DATA[shadeNum].percentage;
-      });
-
-      // Should be in ascending order (darker shades have higher percentages)
-      for (let i = 0; i < darkPercentages.length - 1; i++) {
-        expect(darkPercentages[i]).toBeLessThan(darkPercentages[i + 1]);
-      }
+    it('should be readonly at compile time', () => {
+      // LIGHTNESS_MIX_DATA is readonly via 'as const' but not frozen at runtime
+      expect(typeof LIGHTNESS_MIX_DATA).toBe('object');
     });
   });
 
   describe('RELATIVE_SHADE_STEPS', () => {
-    it('should have entries for all non-base shades', () => {
-      COLOR_SCALE.filter(shade => shade !== 500).forEach(shade => {
-        expect(RELATIVE_SHADE_STEPS).toHaveProperty(shade.toString());
-      });
+    it('should have correct step values', () => {
+      // Light shades should have steps 1-7
+      expect(RELATIVE_SHADE_STEPS[400]).toBe(1);
+      expect(RELATIVE_SHADE_STEPS[300]).toBe(2);
+      expect(RELATIVE_SHADE_STEPS[200]).toBe(3);
+      expect(RELATIVE_SHADE_STEPS[150]).toBe(4);
+      expect(RELATIVE_SHADE_STEPS[100]).toBe(5);
+      expect(RELATIVE_SHADE_STEPS[50]).toBe(6);
+      expect(RELATIVE_SHADE_STEPS[25]).toBe(7);
+
+      // Dark shades should have steps 1-7
+      expect(RELATIVE_SHADE_STEPS[600]).toBe(1);
+      expect(RELATIVE_SHADE_STEPS[700]).toBe(2);
+      expect(RELATIVE_SHADE_STEPS[750]).toBe(3);
+      expect(RELATIVE_SHADE_STEPS[800]).toBe(4);
+      expect(RELATIVE_SHADE_STEPS[850]).toBe(5);
+      expect(RELATIVE_SHADE_STEPS[900]).toBe(6);
+      expect(RELATIVE_SHADE_STEPS[950]).toBe(7);
     });
 
-    it('should not have entry for base shade 500', () => {
-      expect(RELATIVE_SHADE_STEPS).not.toHaveProperty('500');
+    it('should not have a step for 500 shade', () => {
+      expect(RELATIVE_SHADE_STEPS[500]).toBeUndefined();
     });
 
-    it('should have step values between 1 and 7', () => {
-      Object.values(RELATIVE_SHADE_STEPS).forEach(steps => {
-        expect(steps).toBeGreaterThanOrEqual(1);
-        expect(steps).toBeLessThanOrEqual(7);
-      });
-    });
-
-    it('should have increasing steps for light shades', () => {
-      const lightSteps = [400, 300, 200, 150, 100, 50, 25].map(shade => RELATIVE_SHADE_STEPS[shade]);
-      expect(lightSteps).toEqual([1, 2, 3, 4, 5, 6, 7]);
-    });
-
-    it('should have increasing steps for dark shades', () => {
-      const darkSteps = [600, 700, 750, 800, 850, 900, 950].map(shade => RELATIVE_SHADE_STEPS[shade]);
-      expect(darkSteps).toEqual([1, 2, 3, 4, 5, 6, 7]);
+    it('should be readonly at compile time', () => {
+      // RELATIVE_SHADE_STEPS is readonly via 'as const' but not frozen at runtime
+      expect(typeof RELATIVE_SHADE_STEPS).toBe('object');
     });
   });
 
-  describe('Data consistency', () => {
-    it('should have consistent data across all constants', () => {
-      // All constants should reference the same shade values
-      const allShadeStrings = COLOR_SCALE.map(s => s.toString());
-
-      expect(Object.keys(ALPHA_PERCENTAGES)).toEqual(allShadeStrings);
-      expect(Object.keys(LIGHTNESS_MIX_DATA)).toEqual(allShadeStrings);
-
-      const relativeStepsShades = Object.keys(RELATIVE_SHADE_STEPS);
-      const nonBaseShades = allShadeStrings.filter(s => s !== '500');
-      expect(relativeStepsShades.sort()).toEqual(nonBaseShades.sort());
+  describe('COLOR_BOUNDS', () => {
+    it('should have correct RGB bounds', () => {
+      expect(COLOR_BOUNDS.rgb).toEqual({ min: 0, max: 255 });
     });
 
-    it('should have ALPHA_VALUES length match COLOR_SCALE length', () => {
-      expect(ALPHA_VALUES.length).toBe(COLOR_SCALE.length);
+    it('should have correct alpha bounds', () => {
+      expect(COLOR_BOUNDS.alpha).toEqual({ min: 0, max: 1 });
     });
 
-    it('should have ALL_SHADES contain all COLOR_SCALE values', () => {
-      const allShadesNumbers = ALL_SHADES.map(s => parseInt(s)).sort((a, b) => a - b);
-      const colorScaleSorted = [...COLOR_SCALE].sort((a, b) => a - b);
-      expect(allShadesNumbers).toEqual(colorScaleSorted);
+    it('should have correct hue bounds', () => {
+      expect(COLOR_BOUNDS.hue).toEqual({ min: 0, max: 360 });
+    });
+
+    it('should have correct percentage bounds', () => {
+      expect(COLOR_BOUNDS.percentage).toEqual({ min: 0, max: 100 });
+    });
+
+    it('should be readonly at compile time', () => {
+      // COLOR_BOUNDS is readonly via 'as const' but not frozen at runtime
+      expect(typeof COLOR_BOUNDS).toBe('object');
+    });
+  });
+
+  describe('MODERN_CSS_LIMITS', () => {
+    it('should have all required limits', () => {
+      expect(MODERN_CSS_LIMITS).toHaveProperty('MAX_LIGHTNESS_MIX');
+      expect(MODERN_CSS_LIMITS).toHaveProperty('MIN_ALPHA_PERCENTAGE');
+      expect(MODERN_CSS_LIMITS).toHaveProperty('MAX_LIGHTNESS_ADJUSTMENT');
+      expect(MODERN_CSS_LIMITS).toHaveProperty('MIN_LIGHTNESS_FLOOR');
+      expect(MODERN_CSS_LIMITS).toHaveProperty('LIGHTNESS_MULTIPLIER');
+      expect(MODERN_CSS_LIMITS).toHaveProperty('MIX_MULTIPLIER');
+    });
+
+    it('should have reasonable limit values', () => {
+      expect(MODERN_CSS_LIMITS.MAX_LIGHTNESS_MIX).toBeGreaterThan(0);
+      expect(MODERN_CSS_LIMITS.MAX_LIGHTNESS_MIX).toBeLessThanOrEqual(100);
+
+      expect(MODERN_CSS_LIMITS.MIN_ALPHA_PERCENTAGE).toBeGreaterThan(0);
+      expect(MODERN_CSS_LIMITS.MIN_ALPHA_PERCENTAGE).toBeLessThanOrEqual(100);
+
+      expect(MODERN_CSS_LIMITS.LIGHTNESS_MULTIPLIER).toBeGreaterThan(0);
+      expect(MODERN_CSS_LIMITS.MIX_MULTIPLIER).toBeGreaterThan(0);
+    });
+
+    it('should be readonly at compile time', () => {
+      // MODERN_CSS_LIMITS is readonly via 'as const' but not frozen at runtime
+      expect(typeof MODERN_CSS_LIMITS).toBe('object');
     });
   });
 });

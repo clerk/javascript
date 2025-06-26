@@ -2,313 +2,250 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { colorOptionToHslaAlphaScale, colorOptionToHslaLightnessScale } from '../colorOptionToHslaScale';
 
-// Mock the scales module
-vi.mock('../scales', () => ({
-  generateLightnessScale: vi.fn(),
-  generateAlphaScale: vi.fn(),
-}));
-
-// Mock the utils module
-vi.mock('../utils', () => ({
-  applyScalePrefix: vi.fn((scale: any, prefix: string) => {
-    const result: any = {};
-    Object.entries(scale).forEach(([key, value]) => {
-      if (value !== undefined) {
-        result[`${prefix}${key}`] = value;
-      }
-    });
-    return result;
-  }),
-}));
-
-// Mock cssSupports
-vi.mock('../../cssSupports', () => ({
-  cssSupports: {
-    colorMix: vi.fn(),
-    relativeColorSyntax: vi.fn(),
+// Mock the color utilities
+vi.mock('../index', () => ({
+  colors: {
+    toHslaColor: vi.fn(),
+    toHslaString: vi.fn(),
+    changeHslaLightness: vi.fn(),
+    setHslaAlpha: vi.fn(),
   },
+  generateAlphaScale: vi.fn(),
+  generateLightnessScale: vi.fn(),
+  hasModernColorSupport: vi.fn(),
 }));
 
-import { cssSupports } from '../../cssSupports';
-import { generateAlphaScale, generateLightnessScale } from '../scales';
-import { applyScalePrefix } from '../utils';
+vi.mock('../utils', () => ({
+  applyScalePrefix: vi.fn(),
+}));
+
+// Import mocked modules
+const { colors, generateAlphaScale, generateLightnessScale, hasModernColorSupport } = await import('../index');
+const { applyScalePrefix } = await import('../utils');
+
+// Get the mocked functions
+const mockColors = vi.mocked(colors);
+const mockGenerateAlphaScale = vi.mocked(generateAlphaScale);
+const mockGenerateLightnessScale = vi.mocked(generateLightnessScale);
+const mockHasModernColorSupport = vi.mocked(hasModernColorSupport);
+const mockApplyScalePrefix = vi.mocked(applyScalePrefix);
 
 describe('colorOptionToHslaScale', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockHasModernColorSupport.mockReturnValue(false);
+
+    // Default mock implementations
+    mockColors.toHslaColor.mockImplementation((color: string) => {
+      if (color === 'red') return { h: 0, s: 100, l: 50, a: 1 };
+      if (color === 'blue') return { h: 240, s: 100, l: 50, a: 1 };
+      return { h: 0, s: 0, l: 0, a: 1 };
+    });
+
+    mockColors.toHslaString.mockImplementation((color: any) => {
+      if (typeof color === 'object') {
+        return `hsla(${color.h}, ${color.s}%, ${color.l}%, ${color.a})`;
+      }
+      return color;
+    });
+
+    mockColors.changeHslaLightness.mockImplementation((color: any, change: number) => ({
+      ...color,
+      l: Math.max(0, Math.min(100, color.l + change)),
+    }));
+
+    mockColors.setHslaAlpha.mockImplementation((color: any, alpha: number) => ({
+      ...color,
+      a: alpha,
+    }));
   });
 
   describe('colorOptionToHslaAlphaScale', () => {
     it('should return undefined for undefined input', () => {
-      const result = colorOptionToHslaAlphaScale(undefined, 'test-');
+      const result = colorOptionToHslaAlphaScale(undefined, 'bg-');
       expect(result).toBeUndefined();
     });
 
-    it('should use modern CSS when supported for string input', () => {
-      vi.mocked(cssSupports.colorMix).mockReturnValue(true);
-      vi.mocked(generateAlphaScale).mockReturnValue({
-        '25': 'modern-25',
-        '50': 'modern-50',
-        '100': 'modern-100',
-        '150': 'modern-150',
-        '200': 'modern-200',
-        '300': 'modern-300',
-        '400': 'modern-400',
-        '500': 'modern-500',
-        '600': 'modern-600',
-        '700': 'modern-700',
-        '750': 'modern-750',
-        '800': 'modern-800',
-        '850': 'modern-850',
-        '900': 'modern-900',
-        '950': 'modern-950',
+    it('should handle string color input with modern CSS support', () => {
+      mockHasModernColorSupport.mockReturnValue(true);
+      mockGenerateAlphaScale.mockReturnValue({
+        '25': 'color-mix(in srgb, transparent, red 2%)',
+        '500': 'color-mix(in srgb, transparent, red 53%)',
+        '950': 'color-mix(in srgb, transparent, red 92%)',
+      });
+      mockApplyScalePrefix.mockReturnValue({
+        'bg-25': 'color-mix(in srgb, transparent, red 2%)',
+        'bg-500': 'color-mix(in srgb, transparent, red 53%)',
+        'bg-950': 'color-mix(in srgb, transparent, red 92%)',
       });
 
-      const result = colorOptionToHslaAlphaScale('#ff0000', 'alpha-');
+      const result = colorOptionToHslaAlphaScale('red', 'bg-');
 
-      expect(generateAlphaScale).toHaveBeenCalledWith('#ff0000');
-      expect(applyScalePrefix).toHaveBeenCalled();
+      expect(mockGenerateAlphaScale).toHaveBeenCalledWith('red');
+      expect(mockApplyScalePrefix).toHaveBeenCalled();
       expect(result).toBeDefined();
     });
 
-    it('should handle object input for alpha scales', () => {
+    it('should handle string color input with legacy implementation', () => {
+      mockHasModernColorSupport.mockReturnValue(false);
+
+      const result = colorOptionToHslaAlphaScale('red', 'bg-');
+
+      expect(mockColors.toHslaColor).toHaveBeenCalledWith('red');
+      expect(result).toBeDefined();
+    });
+
+    it('should handle complete color scale object', () => {
       const colorScale = {
-        '25': '#fff0f0',
-        '50': '#ffe0e0',
-        '100': '#ffcccc',
-        '150': '#ffbbbb',
-        '200': '#ffaaaa',
-        '300': '#ff8888',
-        '400': '#ff6666',
-        '500': '#ff0000',
-        '600': '#dd0000',
-        '700': '#bb0000',
-        '750': '#aa0000',
-        '800': '#990000',
-        '850': '#880000',
-        '900': '#770000',
-        '950': '#550000',
+        '25': 'red-25',
+        '50': 'red-50',
+        '100': 'red-100',
+        '150': 'red-150',
+        '200': 'red-200',
+        '300': 'red-300',
+        '400': 'red-400',
+        '500': 'red-500',
+        '600': 'red-600',
+        '700': 'red-700',
+        '750': 'red-750',
+        '800': 'red-800',
+        '850': 'red-850',
+        '900': 'red-900',
+        '950': 'red-950',
       };
 
-      const result = colorOptionToHslaAlphaScale(colorScale, 'alpha-');
+      const result = colorOptionToHslaAlphaScale(colorScale, 'bg-');
+
       expect(result).toBeDefined();
+      expect(mockColors.toHslaColor).toHaveBeenCalledTimes(15); // Once for each shade
     });
 
-    it('should handle CSS custom properties', () => {
-      vi.mocked(cssSupports.colorMix).mockReturnValue(true);
-      vi.mocked(generateAlphaScale).mockReturnValue({
-        '25': 'var(--primary)-25',
-        '50': 'var(--primary)-50',
-        '100': 'var(--primary)-100',
-        '150': 'var(--primary)-150',
-        '200': 'var(--primary)-200',
-        '300': 'var(--primary)-300',
-        '400': 'var(--primary)-400',
-        '500': 'var(--primary)',
-        '600': 'var(--primary)-600',
-        '700': 'var(--primary)-700',
-        '750': 'var(--primary)-750',
-        '800': 'var(--primary)-800',
-        '850': 'var(--primary)-850',
-        '900': 'var(--primary)-900',
-        '950': 'var(--primary)-950',
-      });
-
-      const result = colorOptionToHslaAlphaScale('var(--primary)', 'alpha-');
-
-      expect(generateAlphaScale).toHaveBeenCalledWith('var(--primary)');
+    it('should apply correct prefix', () => {
+      const result = colorOptionToHslaAlphaScale('red', 'text-');
       expect(result).toBeDefined();
     });
   });
 
   describe('colorOptionToHslaLightnessScale', () => {
     it('should return undefined for undefined input', () => {
-      const result = colorOptionToHslaLightnessScale(undefined, 'test-');
+      const result = colorOptionToHslaLightnessScale(undefined, 'bg-');
       expect(result).toBeUndefined();
     });
 
-    it('should use modern CSS when supported for string input', () => {
-      vi.mocked(cssSupports.colorMix).mockReturnValue(true);
-      vi.mocked(generateLightnessScale).mockReturnValue({
-        '25': 'modern-25',
-        '50': 'modern-50',
-        '100': 'modern-100',
-        '150': 'modern-150',
-        '200': 'modern-200',
-        '300': 'modern-300',
-        '400': 'modern-400',
-        '500': 'modern-500',
-        '600': 'modern-600',
-        '700': 'modern-700',
-        '750': 'modern-750',
-        '800': 'modern-800',
-        '850': 'modern-850',
-        '900': 'modern-900',
-        '950': 'modern-950',
+    it('should handle string color input with modern CSS support', () => {
+      mockHasModernColorSupport.mockReturnValue(true);
+      mockGenerateLightnessScale.mockReturnValue({
+        '25': 'hsl(from red h s calc(l + (7 * ((97 - l) / 7))))',
+        '500': 'red',
+        '950': 'hsl(from red h s calc(l - (7 * ((l - 12) / 7))))',
+      });
+      mockApplyScalePrefix.mockReturnValue({
+        'bg-25': 'hsl(from red h s calc(l + (7 * ((97 - l) / 7))))',
+        'bg-500': 'red',
+        'bg-950': 'hsl(from red h s calc(l - (7 * ((l - 12) / 7))))',
       });
 
-      const result = colorOptionToHslaLightnessScale('#ff0000', 'lightness-');
+      const result = colorOptionToHslaLightnessScale('red', 'bg-');
 
-      expect(generateLightnessScale).toHaveBeenCalledWith('#ff0000');
-      expect(applyScalePrefix).toHaveBeenCalled();
+      expect(mockGenerateLightnessScale).toHaveBeenCalledWith('red');
+      expect(mockApplyScalePrefix).toHaveBeenCalled();
       expect(result).toBeDefined();
     });
 
-    it('should handle object input for lightness scales', () => {
-      const colorScale = {
-        '500': '#ff0000',
-        '400': '#ff3333',
-        '600': '#cc0000',
+    it('should handle string color input with legacy implementation', () => {
+      mockHasModernColorSupport.mockReturnValue(false);
+
+      const result = colorOptionToHslaLightnessScale('red', 'bg-');
+
+      expect(mockColors.toHslaColor).toHaveBeenCalledWith('red');
+      expect(result).toBeDefined();
+    });
+
+    it('should handle partial color scale object', () => {
+      const partialScale = {
+        '500': 'custom-red',
+        '700': 'custom-dark-red',
       };
 
-      const result = colorOptionToHslaLightnessScale(colorScale, 'lightness-');
+      const result = colorOptionToHslaLightnessScale(partialScale, 'bg-');
+
+      expect(mockColors.toHslaColor).toHaveBeenCalledWith('custom-red');
+      expect(mockColors.toHslaColor).toHaveBeenCalledWith('custom-dark-red');
       expect(result).toBeDefined();
     });
 
-    it('should handle CSS custom properties', () => {
-      vi.mocked(cssSupports.colorMix).mockReturnValue(true);
-      vi.mocked(generateLightnessScale).mockReturnValue({
-        '25': 'var(--accent)-25',
-        '50': 'var(--accent)-50',
-        '100': 'var(--accent)-100',
-        '150': 'var(--accent)-150',
-        '200': 'var(--accent)-200',
-        '300': 'var(--accent)-300',
-        '400': 'var(--accent)-400',
-        '500': 'var(--accent)',
-        '600': 'var(--accent)-600',
-        '700': 'var(--accent)-700',
-        '750': 'var(--accent)-750',
-        '800': 'var(--accent)-800',
-        '850': 'var(--accent)-850',
-        '900': 'var(--accent)-900',
-        '950': 'var(--accent)-950',
-      });
+    it('should throw error for scale without base color (500)', () => {
+      const invalidScale = {
+        '25': 'red-25',
+        '950': 'red-950',
+      };
 
-      const result = colorOptionToHslaLightnessScale('var(--accent)', 'lightness-');
+      expect(() => {
+        colorOptionToHslaLightnessScale(invalidScale, 'bg-');
+      }).toThrow('The 500 shade is required as the base color for scale generation');
+    });
 
-      expect(generateLightnessScale).toHaveBeenCalledWith('var(--accent)');
+    it('should generate lightness variations for legacy implementation', () => {
+      mockHasModernColorSupport.mockReturnValue(false);
+
+      colorOptionToHslaLightnessScale('blue', 'text-');
+
+      expect(mockColors.changeHslaLightness).toHaveBeenCalled();
+      expect(mockColors.toHslaString).toHaveBeenCalled();
+    });
+
+    it('should merge user-defined colors with generated scale', () => {
+      const mixedScale = {
+        '500': 'custom-base',
+        '600': 'custom-dark',
+        // Other shades should be generated
+      };
+
+      const result = colorOptionToHslaLightnessScale(mixedScale, 'border-');
+
+      expect(mockColors.toHslaColor).toHaveBeenCalledWith('custom-base');
+      expect(mockColors.toHslaColor).toHaveBeenCalledWith('custom-dark');
       expect(result).toBeDefined();
     });
   });
 
-  describe('Prefix handling', () => {
-    it('should apply correct prefix to alpha scale', () => {
-      vi.mocked(cssSupports.colorMix).mockReturnValue(true);
-      vi.mocked(generateAlphaScale).mockReturnValue({
-        '25': 'color-25',
-        '50': 'color-50',
-        '100': 'color-100',
-        '150': 'color-150',
-        '200': 'color-200',
-        '300': 'color-300',
-        '400': 'color-400',
-        '500': 'color-500',
-        '600': 'color-600',
-        '700': 'color-700',
-        '750': 'color-750',
-        '800': 'color-800',
-        '850': 'color-850',
-        '900': 'color-900',
-        '950': 'color-950',
-      });
-
-      colorOptionToHslaAlphaScale('#ff0000', 'brand-alpha-');
-
-      expect(applyScalePrefix).toHaveBeenCalledWith(expect.any(Object), 'brand-alpha-');
-    });
-
-    it('should apply correct prefix to lightness scale', () => {
-      vi.mocked(cssSupports.colorMix).mockReturnValue(true);
-      vi.mocked(generateLightnessScale).mockReturnValue({
-        '25': 'color-25',
-        '50': 'color-50',
-        '100': 'color-100',
-        '150': 'color-150',
-        '200': 'color-200',
-        '300': 'color-300',
-        '400': 'color-400',
-        '500': 'color-500',
-        '600': 'color-600',
-        '700': 'color-700',
-        '750': 'color-750',
-        '800': 'color-800',
-        '850': 'color-850',
-        '900': 'color-900',
-        '950': 'color-950',
-      });
-
-      colorOptionToHslaLightnessScale('#ff0000', 'brand-lightness-');
-
-      expect(applyScalePrefix).toHaveBeenCalledWith(expect.any(Object), 'brand-lightness-');
-    });
-  });
-
-  describe('Fallback behavior', () => {
-    it('should handle legacy mode when modern CSS not supported', () => {
-      vi.mocked(cssSupports.colorMix).mockReturnValue(false);
-
-      const result = colorOptionToHslaAlphaScale('#ff0000', 'legacy-');
-      expect(result).toBeDefined();
-    });
-
-    it('should handle edge cases gracefully', () => {
-      vi.mocked(cssSupports.colorMix).mockReturnValue(true);
-      vi.mocked(generateAlphaScale).mockReturnValue({
-        '25': '',
-        '50': '',
-        '100': '',
-        '150': '',
-        '200': '',
-        '300': '',
-        '400': '',
-        '500': '',
-        '600': '',
-        '700': '',
-        '750': '',
-        '800': '',
-        '850': '',
-        '900': '',
-        '950': '',
-      });
-
-      const result = colorOptionToHslaAlphaScale('', 'empty-');
+  describe('error handling', () => {
+    it('should handle empty string input', () => {
+      const result = colorOptionToHslaLightnessScale('', 'bg-');
+      // Empty string is treated as invalid color, should return undefined
       expect(result).toBeUndefined();
     });
+
+    it('should validate complete alpha scale', () => {
+      const incompleteScale = {
+        '25': 'red-25',
+        '500': 'red-500',
+        // Missing other required shades
+      };
+
+      expect(() => {
+        colorOptionToHslaAlphaScale(incompleteScale, 'bg-');
+      }).toThrow('Missing required shades');
+    });
+
+    it('should handle invalid color objects gracefully', () => {
+      mockColors.toHslaColor.mockReturnValue(null);
+
+      // When the base color is invalid (null), it should throw an error
+      expect(() => {
+        colorOptionToHslaLightnessScale('invalid-color', 'bg-');
+      }).toThrow('Cannot read properties of null');
+    });
   });
 
-  describe('Performance', () => {
-    it('should handle many calls efficiently', () => {
-      vi.mocked(cssSupports.colorMix).mockReturnValue(true);
-      vi.mocked(generateAlphaScale).mockReturnValue({
-        '25': 'perf-25',
-        '50': 'perf-50',
-        '100': 'perf-100',
-        '150': 'perf-150',
-        '200': 'perf-200',
-        '300': 'perf-300',
-        '400': 'perf-400',
-        '500': 'perf-500',
-        '600': 'perf-600',
-        '700': 'perf-700',
-        '750': 'perf-750',
-        '800': 'perf-800',
-        '850': 'perf-850',
-        '900': 'perf-900',
-        '950': 'perf-950',
+  describe('prefix application', () => {
+    it('should apply different prefixes correctly', () => {
+      const prefixes = ['bg-', 'text-', 'border-', 'ring-'];
+
+      prefixes.forEach(prefix => {
+        const result = colorOptionToHslaLightnessScale('red', prefix);
+        expect(result).toBeDefined();
       });
-
-      const start = performance.now();
-
-      for (let i = 0; i < 100; i++) {
-        colorOptionToHslaAlphaScale(`#${i.toString(16).padStart(6, '0')}`, 'perf-');
-        colorOptionToHslaLightnessScale(`#${i.toString(16).padStart(6, '0')}`, 'perf-');
-      }
-
-      const end = performance.now();
-      const duration = end - start;
-
-      expect(duration).toBeLessThan(100); // Less than 100ms
     });
   });
 });

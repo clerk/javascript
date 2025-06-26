@@ -1,8 +1,10 @@
 import type { HslaColor } from '@clerk/types';
 
-import { hasModernColorSupport } from './cache';
-import { legacyColors } from './legacy';
-import { modernColors } from './modern';
+import { cssSupports } from '../cssSupports';
+import { colors as legacyColors } from './legacy';
+import { colors as modernColors } from './modern';
+
+const hasModernColorSupport = cssSupports.hasModernColorSupport;
 
 export const colors = {
   toHslaColor: (color: string | undefined): string | HslaColor | undefined => {
@@ -45,7 +47,7 @@ export const colors = {
     return legacyColors.makeSolid(color);
   },
 
-  setAlpha: (color: string | undefined, alpha: number): string | undefined => {
+  setAlpha: (color: string, alpha: number): string => {
     if (hasModernColorSupport()) {
       return modernColors.setAlpha(color, alpha);
     }
