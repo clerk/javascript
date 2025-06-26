@@ -2,7 +2,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { cssSupports } from '../../cssSupports';
 import {
+  createAlphaColorMixString,
+  createColorMixString,
   createEmptyColorScale,
+  createRelativeColorString,
   generateAlphaColorMix,
   generateColorMixSyntax,
   generateRelativeColorSyntax,
@@ -55,53 +58,31 @@ describe('Color Utils', () => {
     });
   });
 
-  describe('memoized color generators', () => {
-    describe('colorMix', () => {
+  describe('color string generators', () => {
+    describe('createColorMixString', () => {
       it('should generate color-mix syntax', () => {
-        const result = colorGenerators.colorMix('red', 'blue', 50);
+        const result = createColorMixString('red', 'blue', 50);
         expect(result).toBe('color-mix(in srgb, red, blue 50%)');
-      });
-
-      it('should memoize results', () => {
-        const result1 = colorGenerators.colorMix('red', 'blue', 50);
-        const result2 = colorGenerators.colorMix('red', 'blue', 50);
-
-        expect(result1).toBe(result2);
-        expect(result1).toBe('color-mix(in srgb, red, blue 50%)');
       });
     });
 
-    describe('relativeColor', () => {
+    describe('createRelativeColorString', () => {
       it('should generate relative color syntax without alpha', () => {
-        const result = colorGenerators.relativeColor('red', 'h', 's', 'calc(l + 10%)');
+        const result = createRelativeColorString('red', 'h', 's', 'calc(l + 10%)');
         expect(result).toBe('hsl(from red h s calc(l + 10%))');
       });
 
       it('should generate relative color syntax with alpha', () => {
-        const result = colorGenerators.relativeColor('red', 'h', 's', 'l', '0.5');
+        const result = createRelativeColorString('red', 'h', 's', 'l', '0.5');
         expect(result).toBe('hsl(from red h s l / 0.5)');
       });
     });
 
-    describe('alphaColorMix', () => {
+    describe('createAlphaColorMixString', () => {
       it('should generate alpha color-mix syntax', () => {
-        const result = colorGenerators.alphaColorMix('red', 50);
+        const result = createAlphaColorMixString('red', 50);
         expect(result).toBe('color-mix(in srgb, transparent, red 50%)');
       });
-    });
-  });
-
-  describe('createColorMix', () => {
-    it('should create color-mix string', () => {
-      const result = createColorMix('red', 'white', 25);
-      expect(result).toBe('color-mix(in srgb, red, white 25%)');
-    });
-  });
-
-  describe('createAlphaColorMix', () => {
-    it('should create alpha color-mix string', () => {
-      const result = createAlphaColorMix('red', 75);
-      expect(result).toBe('color-mix(in srgb, transparent, red 75%)');
     });
   });
 
