@@ -1,5 +1,5 @@
 import type { Clerk, SessionVerificationLevel } from '@clerk/types';
-import { useMemo, useRef } from 'react';
+import { useCallback, useRef } from 'react';
 
 import { validateReverificationConfig } from '../../authorization';
 import { isReverificationHint, reverificationError } from '../../authorization-errors';
@@ -14,7 +14,7 @@ const CLERK_API_REVERIFICATION_ERROR_CODE = 'session_reverification_required';
 async function resolveResult<T>(result: Promise<T> | T): Promise<T | ReturnType<typeof reverificationError>> {
   try {
     const r = await result;
-    if (r instanceof Response) {
+    if (typeof Response !== 'undefined' && r instanceof Response) {
       return r.json();
     }
     return r;
@@ -204,20 +204,21 @@ export const useReverification: UseReverification = (fetcher, options) => {
     }),
   );
 
-  const handleReverification = useMemo(() => {
-    const handler = createReverificationHandler({
-      openUIComponent: __internal_openReverification,
-      telemetry,
-      ...optionsRef.current,
-    })(fetcherRef.current);
-    return handler;
-  }, [__internal_openReverification, fetcherRef.current, optionsRef.current]);
-
   // Keep fetcher and options ref in sync
   useSafeLayoutEffect(() => {
     fetcherRef.current = fetcher;
     optionsRef.current = options;
   });
 
-  return handleReverification;
+  return useCallback(
+    (...args) => {
+      const handler = createReverificationHandler({
+        openUIComponent: __internal_openReverification,
+        telemetry,
+        ...optionsRef.current,
+      })(fetcherRef.current);
+      return handler(...args);
+    },
+    [__internal_openReverification, telemetry],
+  );
 };
