@@ -1314,9 +1314,9 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     return clerkjs.authenticateWithGoogleOneTap(params);
   };
 
-  __internal_loadStripeLibs = async () => {
+  __internal_loadStripeJs = async () => {
     const clerkjs = await this.#waitForClerkJS();
-    return clerkjs.__internal_loadStripeLibs();
+    return clerkjs.__internal_loadStripeJs();
   };
 
   createOrganization = async (params: CreateOrganizationParams): Promise<OrganizationResource | void> => {

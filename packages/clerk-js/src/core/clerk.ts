@@ -655,17 +655,9 @@ export class Clerk implements ClerkInterface {
       .then(controls => controls.closeModal('blankCaptcha'));
   };
 
-  public __internal_loadStripeLibs = () => {
-    return {
-      async javascript(): Promise<unknown> {
-        const { loadStripe } = await import('@stripe/stripe-js');
-        return loadStripe;
-      },
-      async react(): Promise<unknown> {
-        const { Elements, PaymentElement, useElements, useStripe } = await import('@stripe/react-stripe-js');
-        return { Elements, PaymentElement, useElements, useStripe };
-      },
-    };
+  public __internal_loadStripeJs = async () => {
+    const { loadStripe } = await import('@stripe/stripe-js');
+    return loadStripe;
   };
 
   public openSignUp = (props?: SignUpProps): void => {
@@ -1143,6 +1135,7 @@ export class Clerk implements ClerkInterface {
    */
   public setActive = async ({ session, organization, beforeEmit, redirectUrl }: SetActiveParams): Promise<void> => {
     this.__internal_setActiveInProgress = true;
+    console.log('session provided', session, redirectUrl);
     try {
       if (!this.client) {
         throw new Error('setActive is being called before the client is loaded. Wait for init.');
@@ -1169,6 +1162,7 @@ export class Clerk implements ClerkInterface {
       }
 
       let newSession = session === undefined ? this.session : session;
+      console.log('newSession', newSession?.id);
 
       // At this point, the `session` variable should contain either an `SignedInSessionResource`
       // ,`null` or `undefined`.
