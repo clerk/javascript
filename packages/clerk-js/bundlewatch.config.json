@@ -7,7 +7,7 @@
     { "path": "./dist/ui-common*.js", "maxSize": "111.7KB" },
     { "path": "./dist/vendors*.js", "maxSize": "40.2KB" },
     { "path": "./dist/coinbase*.js", "maxSize": "38KB" },
-    { "path": "./dist/stripe-vendors*.js", "maxSize": "5.54KB" },
+    { "path": "./dist/stripe-vendors*.js", "maxSize": "1KB" },
     { "path": "./dist/createorganization*.js", "maxSize": "5KB" },
     { "path": "./dist/impersonationfab*.js", "maxSize": "5KB" },
     { "path": "./dist/organizationprofile*.js", "maxSize": "12KB" },
