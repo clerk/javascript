@@ -39,6 +39,15 @@ type NullableCheckoutProperties = Nullable<
   __internal_checkout: null;
 };
 
+type CheckoutCacheState = {
+  isStarting: boolean;
+  isConfirming: boolean;
+  error: ClerkAPIResponseError | null;
+  checkout: CommerceCheckoutResource | null;
+  fetchStatus: 'idle' | 'fetching' | 'error';
+  status: CheckoutStatus;
+};
+
 type UseCheckoutReturn = (CheckoutProperties | NullableCheckoutProperties) & {
   confirm: (params: ConfirmCheckoutParams) => Promise<CommerceCheckoutResource>;
   start: () => Promise<CommerceCheckoutResource>;
@@ -49,6 +58,7 @@ type UseCheckoutReturn = (CheckoutProperties | NullableCheckoutProperties) & {
   clear: () => void;
   finalize: (params: { redirectUrl?: string }) => void;
   fetchStatus: 'idle' | 'fetching' | 'error';
+  getState: () => CheckoutCacheState;
 };
 
 type UseCheckoutOptions = {
@@ -111,6 +121,7 @@ export const useCheckout = (options?: UseCheckoutOptions): UseCheckoutReturn => 
 
   return {
     ...properties,
+    getState: manager.getState,
     checkout: null,
     __internal_checkout: managerProperties.checkout,
     start: manager.start,
