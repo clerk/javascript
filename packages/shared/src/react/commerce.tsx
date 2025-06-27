@@ -69,8 +69,9 @@ const usePaymentSourceUtils = (forResource: 'org' | 'user') => {
   const environment = useInternalEnvironment();
 
   useEffect(() => {
-    // TODO(@COMMERCE): Handle errors
-    void initializePaymentSource();
+    initializePaymentSource().catch(() => {
+      // ignore errors
+    });
   }, []);
 
   const externalGatewayId = initializedPaymentSource?.externalGatewayId;
@@ -83,11 +84,6 @@ const usePaymentSourceUtils = (forResource: 'org' | 'user') => {
       ? { key: 'stripe-sdk', externalGatewayId, stripePublishableKey }
       : null,
     ({ stripePublishableKey, externalGatewayId }) => {
-      // TODO(@COMMERCE): We need to figure out how to handle this
-      //   if (__BUILD_DISABLE_RHC__) {
-      //     clerkUnsupportedEnvironmentWarning('Stripe');
-      //     return;
-      //   }
       return stripeClerkLibs?.loadStripe(stripePublishableKey, {
         stripeAccount: externalGatewayId,
       });
@@ -131,8 +127,7 @@ const [PaymentElementContext, usePaymentElementContext] = createContextAndHook<
     setIsPaymentElementReady: (isPaymentElementReady: boolean) => void;
     isPaymentElementReady: boolean;
     checkout?: CommerceCheckoutResource;
-    // TODO(@COMMERCE): What can we do to remove this ?
-    paymentDescription: string;
+    paymentDescription?: string;
   }
 >('PaymentElementContext');
 
@@ -154,12 +149,10 @@ const DummyStripeUtils = ({ children }: PropsWithChildren) => {
 
 type PaymentElementConfig = {
   checkout?: CommerceCheckoutResource;
-  // TODO(@COMMERCE): What can we do to remove this ?
   stripeAppearance?: internalStripeAppearance;
   // TODO(@COMMERCE): What can we do to remove this ?
   for: 'org' | 'user';
-  // TODO(@COMMERCE): What can we do to remove this ?
-  paymentDescription: string;
+  paymentDescription?: string;
 };
 
 const PaymentElementProvider = (props: PropsWithChildren<PaymentElementConfig>) => {
@@ -193,7 +186,6 @@ const PaymentElementInternalRoot = (props: PropsWithChildren<PaymentElementConfi
           key={externalClientSecret}
           stripe={stripe}
           options={{
-            loader: 'never',
             clientSecret: externalClientSecret,
             appearance: {
               variables: { ...props.stripeAppearance },
@@ -245,7 +237,7 @@ const PaymentElement = ({ fallback }: { fallback?: ReactNode }) => {
         applePay: checkout
           ? {
               recurringPaymentRequest: {
-                paymentDescription,
+                paymentDescription: paymentDescription || '',
                 managementURL: environment?.displayConfig.homeUrl || '', // TODO(@COMMERCE): is this the right URL?
                 regularBilling: {
                   amount: checkout.totals.totalDueNow?.amount || checkout.totals.grandTotal.amount,

@@ -71,7 +71,6 @@ const AddPaymentSourceRoot = ({ children, checkout, ...rest }: PropsWithChildren
   const [headerSubtitle, setHeaderSubtitle] = useState<LocalizationKey | undefined>(undefined);
   const [submitLabel, setSubmitLabel] = useState<LocalizationKey | undefined>(undefined);
   const stripeAppearance = useStripeAppearance();
-  const [count, setCount] = useState(0);
 
   return (
     <AddPaymentSourceContext.Provider
@@ -88,7 +87,6 @@ const AddPaymentSourceRoot = ({ children, checkout, ...rest }: PropsWithChildren
         },
       }}
     >
-      <button onClick={() => setCount(prev => prev + 1)}>Click me {count}</button>
       <PaymentElementProvider
         checkout={checkout}
         for={subscriberType}
@@ -201,11 +199,6 @@ const AddPaymentSourceForm = ({ children }: PropsWithChildren) => {
     if (error) {
       return; // just return, since stripe will handle the error
     }
-    // TODO: @COMMERCE:  why is this not infered as defined?
-    if (!data) {
-      return;
-    }
-
     try {
       await onSuccess(data);
     } catch (error) {

@@ -115,11 +115,6 @@ const common = ({ mode, variant, disableRHC = false }) => {
             name: 'signup',
             test: module => !!(module.resource && module.resource.includes('/ui/components/SignUp')),
           },
-          // paymentSources: {
-          //   minChunks: 1,
-          //   name: 'paymentSources',
-          //   test: module => !!(module.resource && module.resource.includes('/ui/components/PaymentSources')),
-          // },
           common: {
             minChunks: 1,
             name: 'ui-common',

@@ -646,6 +646,11 @@ export class Clerk implements ClerkInterface {
   };
 
   public __internal_loadStripeJs = async () => {
+    if (__BUILD_DISABLE_RHC__) {
+      clerkUnsupportedEnvironmentWarning('Stripe');
+      return { loadStripe: () => Promise.resolve(null) };
+    }
+
     const { loadStripe } = await import('@stripe/stripe-js');
     return loadStripe;
   };
