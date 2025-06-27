@@ -136,9 +136,9 @@ describe('Legacy Colors', () => {
       afterEach(() => {
         vi.clearAllMocks();
         // @ts-ignore
-        delete global.window;
+        global.window = undefined;
         // @ts-ignore
-        delete global.document;
+        global.document = undefined;
       });
 
       it('should resolve CSS variables with hex values', () => {
@@ -196,7 +196,7 @@ describe('Legacy Colors', () => {
 
       it('should work in server environment without window', () => {
         // @ts-ignore
-        delete global.window;
+        global.window = undefined;
 
         expect(() => colors.toHslaColor('var(--brand, red)')).not.toThrow();
         const result = colors.toHslaColor('var(--brand, red)');
