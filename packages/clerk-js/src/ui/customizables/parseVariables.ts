@@ -2,46 +2,45 @@ import type { Theme } from '@clerk/types';
 
 import { spaceScaleKeys } from '../foundations/sizes';
 import type { fontSizes, fontWeights } from '../foundations/typography';
-import { colorOptionToHslaAlphaScale, colorOptionToHslaLightnessScale } from '../utils/colorOptionToHslaScale';
 import { colors } from '../utils/colors';
+import { colorOptionToThemedAlphaScale, colorOptionToThemedLightnessScale } from '../utils/colors/scales';
 import { fromEntries } from '../utils/fromEntries';
 import { removeUndefinedProps } from '../utils/removeUndefinedProps';
 
 export const createColorScales = (theme: Theme) => {
   const variables = theme.variables || {};
 
-  const primaryScale = colorOptionToHslaLightnessScale(variables.colorPrimary, 'primary');
-  const primaryAlphaScale = colorOptionToHslaAlphaScale(primaryScale?.primary500, 'primaryAlpha');
-  const dangerScale = colorOptionToHslaLightnessScale(variables.colorDanger, 'danger');
-  const dangerAlphaScale = colorOptionToHslaAlphaScale(dangerScale?.danger500, 'dangerAlpha');
-  const successScale = colorOptionToHslaLightnessScale(variables.colorSuccess, 'success');
-  const successAlphaScale = colorOptionToHslaAlphaScale(successScale?.success500, 'successAlpha');
-  const warningScale = colorOptionToHslaLightnessScale(variables.colorWarning, 'warning');
-  const warningAlphaScale = colorOptionToHslaAlphaScale(warningScale?.warning500, 'warningAlpha');
+  const dangerScale = colorOptionToThemedLightnessScale(variables.colorDanger, 'danger');
+  const primaryScale = colorOptionToThemedLightnessScale(variables.colorPrimary, 'primary');
+  const successScale = colorOptionToThemedLightnessScale(variables.colorSuccess, 'success');
+  const warningScale = colorOptionToThemedLightnessScale(variables.colorWarning, 'warning');
+
+  const dangerAlphaScale = colorOptionToThemedAlphaScale(dangerScale?.danger500, 'dangerAlpha');
+  const neutralAlphaScale = colorOptionToThemedAlphaScale(variables.colorNeutral, 'neutralAlpha');
+  const primaryAlphaScale = colorOptionToThemedAlphaScale(primaryScale?.primary500, 'primaryAlpha');
+  const successAlphaScale = colorOptionToThemedAlphaScale(successScale?.success500, 'successAlpha');
+  const warningAlphaScale = colorOptionToThemedAlphaScale(warningScale?.warning500, 'warningAlpha');
 
   return removeUndefinedProps({
-    ...primaryScale,
-    ...primaryAlphaScale,
     ...dangerScale,
-    ...dangerAlphaScale,
+    ...primaryScale,
     ...successScale,
-    ...successAlphaScale,
     ...warningScale,
+    ...dangerAlphaScale,
+    ...neutralAlphaScale,
+    ...primaryAlphaScale,
+    ...successAlphaScale,
     ...warningAlphaScale,
-    ...colorOptionToHslaAlphaScale(variables.colorNeutral, 'neutralAlpha'),
     primaryHover: colors.adjustForLightness(primaryScale?.primary500),
-    colorTextOnPrimaryBackground: toHSLA(variables.colorTextOnPrimaryBackground),
-    colorText: toHSLA(variables.colorText),
-    colorTextSecondary: toHSLA(variables.colorTextSecondary) || colors.makeTransparent(variables.colorText, 0.35),
-    colorInputText: toHSLA(variables.colorInputText),
-    colorBackground: toHSLA(variables.colorBackground),
-    colorInputBackground: toHSLA(variables.colorInputBackground),
-    colorShimmer: toHSLA(variables.colorShimmer),
+    colorTextOnPrimaryBackground: colors.toHslaString(variables.colorTextOnPrimaryBackground),
+    colorText: colors.toHslaString(variables.colorText),
+    colorTextSecondary:
+      colors.toHslaString(variables.colorTextSecondary) || colors.makeTransparent(variables.colorText, 35),
+    colorInputText: colors.toHslaString(variables.colorInputText),
+    colorBackground: colors.toHslaString(variables.colorBackground),
+    colorInputBackground: colors.toHslaString(variables.colorInputBackground),
+    colorShimmer: colors.toHslaString(variables.colorShimmer),
   });
-};
-
-export const toHSLA = (str: string | undefined) => {
-  return str ? colors.toHslaString(str) : undefined;
 };
 
 export const createRadiiUnits = (theme: Theme) => {
