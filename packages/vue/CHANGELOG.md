@@ -1,5 +1,15 @@
 # @clerk/vue
 
+## 1.8.11
+
+### Patch Changes
+
+- Extract internal `ProtectProps` type to shared types to eliminate duplication across SDKs ([#6197](https://github.com/clerk/javascript/pull/6197)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`edc0bfd`](https://github.com/clerk/javascript/commit/edc0bfdae929dad78a99dfd6275aad947d9ddd73)]:
+  - @clerk/types@4.62.1
+  - @clerk/shared@3.10.1
+
 ## 1.8.10
 
 ### Patch Changes

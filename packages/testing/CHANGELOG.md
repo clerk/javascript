@@ -1,5 +1,16 @@
 # @clerk/testing
 
+## 1.9.1
+
+### Patch Changes
+
+- Allow for `waitForStripeElements` helper to accept a `state` of `visible` or `hidden`. ([#6204](https://github.com/clerk/javascript/pull/6204)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`edc0bfd`](https://github.com/clerk/javascript/commit/edc0bfdae929dad78a99dfd6275aad947d9ddd73)]:
+  - @clerk/types@4.62.1
+  - @clerk/backend@2.3.1
+  - @clerk/shared@3.10.1
+
 ## 1.9.0
 
 ### Minor Changes
