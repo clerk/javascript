@@ -102,9 +102,10 @@ const common = ({ mode, variant, disableRHC = false }) => {
             chunks: 'all',
           },
           stripeVendor: {
-            test: /[\\/]node_modules[\\/](@stripe\/stripe-js|@stripe\/react-stripe-js)[\\/]/,
+            test: /[\\/]node_modules[\\/](@stripe\/stripe-js)[\\/]/,
             name: 'stripe-vendors',
             chunks: 'all',
+            enforce: true,
           },
           /**
            * Sign up is shared between the SignUp component and the SignIn component.

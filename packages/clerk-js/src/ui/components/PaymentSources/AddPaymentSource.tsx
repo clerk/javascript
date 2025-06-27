@@ -5,7 +5,6 @@ import {
   createContextAndHook,
 } from '@clerk/shared/react';
 import type { CommerceCheckoutResource } from '@clerk/types';
-import { useElements, useStripe } from '@stripe/react-stripe-js';
 import type { PropsWithChildren } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
@@ -186,19 +185,13 @@ const FormButton = ({ text }: { text: LocalizationKey }) => {
 
 const AddPaymentSourceForm = ({ children }: PropsWithChildren) => {
   const { headerTitle, headerSubtitle, submitLabel, checkout, onSuccess, cancelAction } = useAddPaymentSourceContext();
-  const stripe = useStripe();
   const card = useCardState();
-  const elements = useElements();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
 
   const { isFormReady, submit: submitPaymentElement, reset } = usePaymentElement();
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!stripe || !elements) {
-      return;
-    }
-
     card.setLoading();
     card.setError(undefined);
 
