@@ -1,3 +1,4 @@
+import { __experimental_useCheckout as useCheckout } from '@clerk/shared/react';
 import { useMemo } from 'react';
 
 import { Alert } from '@/ui/elements/Alert';
@@ -8,10 +9,10 @@ import { useCheckoutContext } from '../../contexts';
 import { Box, descriptors, Flex, localizationKeys, useLocalizations } from '../../customizables';
 // TODO(@COMMERCE): Is this causing bundle size  issues ?
 import { EmailForm } from '../UserProfile/EmailForm';
-import { useCheckoutContextRoot } from './CheckoutPage';
 
 export const GenericError = () => {
-  const { errors } = useCheckoutContextRoot();
+  const { error } = useCheckout();
+
   const { translateError } = useLocalizations();
   const { t } = useLocalizations();
   return (
@@ -29,7 +30,7 @@ export const GenericError = () => {
           variant='danger'
           colorScheme='danger'
         >
-          {errors ? translateError(errors[0]) : t(localizationKeys('unstable__errors.form_param_value_invalid'))}
+          {error ? translateError(error.errors[0]) : t(localizationKeys('unstable__errors.form_param_value_invalid'))}
         </Alert>
       </Flex>
     </Drawer.Body>
@@ -37,14 +38,13 @@ export const GenericError = () => {
 };
 
 export const InvalidPlanScreen = () => {
-  const { errors } = useCheckoutContextRoot();
+  const { planPeriod } = useCheckoutContext();
+  const { error } = useCheckout();
 
   const planFromError = useMemo(() => {
-    const error = errors?.find(e => e.code === 'invalid_plan_change');
-    return error?.meta?.plan;
-  }, [errors]);
-
-  const { planPeriod } = useCheckoutContext();
+    const _error = error?.errors.find(e => e.code === 'invalid_plan_change');
+    return _error?.meta?.plan;
+  }, [error]);
 
   if (!planFromError) {
     return null;
@@ -92,7 +92,7 @@ export const InvalidPlanScreen = () => {
 };
 
 export const AddEmailForm = () => {
-  const { startCheckout } = useCheckoutContextRoot();
+  const { start } = useCheckout();
   const { setIsOpen } = useDrawerContext();
   return (
     <Drawer.Body>
@@ -105,7 +105,7 @@ export const AddEmailForm = () => {
         <EmailForm
           title={localizationKeys('commerce.checkout.emailForm.title')}
           subtitle={localizationKeys('commerce.checkout.emailForm.subtitle')}
-          onSuccess={startCheckout}
+          onSuccess={() => start().catch(() => null)}
           onReset={() => setIsOpen(false)}
           disableAutoFocus
         />

@@ -1,4 +1,4 @@
-import { useOrganization } from '@clerk/shared/react';
+import { __experimental_useCheckout as useCheckout, useOrganization } from '@clerk/shared/react';
 import type {
   CommerceCheckoutResource,
   CommerceMoney,
@@ -23,21 +23,19 @@ import { Box, Button, Col, descriptors, Flex, Form, localizationKeys, Text } fro
 import { ChevronUpDown, InformationCircle } from '../../icons';
 import * as AddPaymentSource from '../PaymentSources/AddPaymentSource';
 import { PaymentSourceRow } from '../PaymentSources/PaymentSourceRow';
-import { useCheckoutContextRoot } from './CheckoutPage';
 
 type PaymentMethodSource = 'existing' | 'new';
 
 const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
 
 export const CheckoutForm = withCardStateProvider(() => {
-  const ctx = useCheckoutContextRoot();
-  const { checkout } = ctx;
+  const checkout = useCheckout();
+  const { id, plan, totals, isImmediatePlanChange, __internal_checkout, planPeriod } = checkout;
 
-  if (!checkout) {
+  if (!id) {
     return null;
   }
 
-  const { plan, planPeriod, totals, isImmediatePlanChange } = checkout;
   const showCredits = !!totals.credit?.amount && totals.credit.amount > 0;
   const showPastDue = !!totals.pastDue?.amount && totals.pastDue.amount > 0;
   const showDowngradeInfo = !isImmediatePlanChange;
@@ -115,18 +113,18 @@ export const CheckoutForm = withCardStateProvider(() => {
         </Box>
       )}
 
-      <CheckoutFormElements checkout={checkout} />
+      <CheckoutFormElements checkout={__internal_checkout} />
     </Drawer.Body>
   );
 });
 
 const useCheckoutMutations = () => {
   const { organization } = useOrganization();
-  const { subscriberType } = useCheckoutContext();
-  const { updateCheckout, checkout } = useCheckoutContextRoot();
+  const { subscriberType, onSubscriptionComplete } = useCheckoutContext();
+  const { id, confirm } = useCheckout();
   const card = useCardState();
 
-  if (!checkout) {
+  if (!id) {
     throw new Error('Checkout not found');
   }
 
@@ -134,11 +132,11 @@ const useCheckoutMutations = () => {
     card.setLoading();
     card.setError(undefined);
     try {
-      const newCheckout = await checkout.confirm({
+      await confirm({
         ...params,
         ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
       });
-      updateCheckout(newCheckout);
+      onSubscriptionComplete?.();
     } catch (error) {
       handleError(error, [], card.setError);
     } finally {
@@ -152,36 +150,25 @@ const useCheckoutMutations = () => {
     const data = new FormData(e.currentTarget);
     const paymentSourceId = data.get('payment_source_id') as string;
 
-    await confirmCheckout({
+    return confirmCheckout({
       paymentSourceId,
       ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
     });
   };
 
   const addPaymentSourceAndPay = async (ctx: { stripeSetupIntent?: SetupIntent }) => {
-    await confirmCheckout({
+    return confirmCheckout({
       gateway: 'stripe',
       paymentToken: ctx.stripeSetupIntent?.payment_method as string,
       ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
     });
   };
 
-  const payWithTestCard = async () => {
-    card.setLoading();
-    card.setError(undefined);
-    try {
-      const newCheckout = await checkout.confirm({
-        gateway: 'stripe',
-        useTestCard: true,
-        ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
-      });
-      updateCheckout(newCheckout);
-    } catch (error) {
-      handleError(error, [], card.setError);
-    } finally {
-      card.setIdle();
-    }
-  };
+  const payWithTestCard = () =>
+    confirmCheckout({
+      gateway: 'stripe',
+      useTestCard: true,
+    });
 
   return {
     payWithExistingPaymentSource,
@@ -295,25 +282,25 @@ export const PayWithTestPaymentSource = () => {
 
 const AddPaymentSourceForCheckout = withCardStateProvider(() => {
   const { addPaymentSourceAndPay } = useCheckoutMutations();
-  const { checkout } = useCheckoutContextRoot();
+  const { id, __internal_checkout, totals } = useCheckout();
 
-  if (!checkout) {
+  if (!id) {
     return null;
   }
 
   return (
     <AddPaymentSource.Root
       onSuccess={addPaymentSourceAndPay}
-      checkout={checkout}
+      checkout={__internal_checkout}
     >
       <DevOnly>
         <PayWithTestPaymentSource />
       </DevOnly>
 
-      {checkout.totals.totalDueNow.amount > 0 ? (
+      {totals.totalDueNow.amount > 0 ? (
         <AddPaymentSource.FormButton
           text={localizationKeys('commerce.pay', {
-            amount: `${checkout.totals.totalDueNow.currencySymbol}${checkout.totals.totalDueNow.amountFormatted}`,
+            amount: `${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`,
           })}
         />
       ) : (
