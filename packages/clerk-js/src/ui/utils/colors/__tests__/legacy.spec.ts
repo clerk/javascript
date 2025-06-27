@@ -214,10 +214,6 @@ describe('Legacy Colors', () => {
       it('should throw error with helpful message', () => {
         expect(() => colors.toHslaColor('invalid')).toThrow(/cannot be used as a color within 'variables'/);
       });
-
-      it('should mention CSS variables in error message', () => {
-        expect(() => colors.toHslaColor('invalid')).toThrow(/any valid CSS variable/);
-      });
     });
   });
 

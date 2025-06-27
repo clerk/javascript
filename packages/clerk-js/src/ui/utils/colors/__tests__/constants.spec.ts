@@ -101,6 +101,14 @@ describe('Color Constants', () => {
       });
     });
 
+    it('should be in ascending order following COLOR_SCALE order', () => {
+      for (let i = 1; i < COLOR_SCALE.length; i++) {
+        const currentShade = COLOR_SCALE[i];
+        const previousShade = COLOR_SCALE[i - 1];
+        expect(ALPHA_PERCENTAGES[currentShade]).toBeGreaterThan(ALPHA_PERCENTAGES[previousShade]);
+      }
+    });
+
     it('should be readonly at compile time', () => {
       // ALPHA_PERCENTAGES is readonly via 'as const' but not frozen at runtime
       expect(typeof ALPHA_PERCENTAGES).toBe('object');

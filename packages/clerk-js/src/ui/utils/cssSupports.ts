@@ -1,6 +1,6 @@
 const CSS_FEATURE_TESTS: Record<string, string> = {
-  relativeColorSyntax: 'hsl(from white h s l)',
-  colorMix: 'color-mix(in srgb, white, black)',
+  relativeColorSyntax: 'color: hsl(from white h s l)',
+  colorMix: 'color: color-mix(in srgb, white, black)',
 } as const;
 
 let SUPPORTS_RELATIVE_COLOR: boolean | undefined;

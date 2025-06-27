@@ -5,8 +5,8 @@ const originalCSSSupports = CSS.supports;
 
 beforeAll(() => {
   CSS.supports = jest.fn(feature => {
-    if (feature === 'hsl(from white h s l)') return true;
-    if (feature === 'color-mix(in srgb, white, black)') return false;
+    if (feature === 'color: hsl(from white h s l)') return true;
+    if (feature === 'color: color-mix(in srgb, white, black)') return false;
     return false;
   });
 });
