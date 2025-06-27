@@ -3,16 +3,6 @@ import { useEffect, useMemo } from 'react';
 
 import { useCheckoutContext } from '@/ui/contexts/components';
 
-// const CheckoutContextRoot = createContext<ReturnType<typeof useCheckout> | null>(null);
-
-// export const useCheckoutContextRoot = () => {
-//   const ctx = useContext(CheckoutContextRoot);
-//   if (!ctx) {
-//     throw new Error('CheckoutContextRoot not found');
-//   }
-//   return ctx;
-// };
-
 const Initiator = () => {
   const checkout = useCheckout();
 

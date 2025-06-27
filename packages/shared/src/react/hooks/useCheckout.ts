@@ -84,7 +84,7 @@ export const useCheckout = (options?: UseCheckoutOptions): UseCheckoutReturn => 
   }
 
   const manager = useMemo(
-    () => clerk.checkout({ planId, planPeriod, for: forOrganization }),
+    () => clerk.__experimental_checkout({ planId, planPeriod, for: forOrganization }),
     [user.id, organization?.id, planId, planPeriod, forOrganization],
   );
 

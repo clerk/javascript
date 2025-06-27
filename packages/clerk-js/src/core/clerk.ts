@@ -136,7 +136,7 @@ import type { FapiClient, FapiRequestCallback } from './fapiClient';
 import { createFapiClient } from './fapiClient';
 import { createClientFromJwt } from './jwt-client';
 import { APIKeys } from './modules/apiKeys';
-import type { CheckoutFunction } from './modules/checkout';
+import type { CheckoutFunction, CheckoutInstance, CheckoutOptions } from './modules/checkout';
 import { createCheckoutInstance } from './modules/checkout';
 import { CommerceBilling } from './modules/commerce';
 import {
@@ -340,11 +340,11 @@ export class Clerk implements ClerkInterface {
     return Clerk._apiKeys;
   }
 
-  get checkout() {
+  __experimental_checkout(options: CheckoutOptions): CheckoutInstance {
     if (!this._checkout) {
       this._checkout = params => createCheckoutInstance(this, params);
     }
-    return this._checkout;
+    return this._checkout(options);
   }
 
   public __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K] {

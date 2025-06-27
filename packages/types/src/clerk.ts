@@ -801,7 +801,11 @@ export interface Clerk {
    */
   apiKeys: APIKeysNamespace;
 
-  checkout: (options: { for?: 'organization'; planPeriod: CommerceSubscriptionPlanPeriod; planId: string }) => any;
+  __experimental_checkout: (options: {
+    for?: 'organization';
+    planPeriod: CommerceSubscriptionPlanPeriod;
+    planId: string;
+  }) => any;
 }
 
 export type HandleOAuthCallbackParams = TransferableOption &
