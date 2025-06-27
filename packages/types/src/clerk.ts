@@ -1,3 +1,4 @@
+import type { ClerkAPIResponseError } from './api';
 import type { APIKeysNamespace } from './apiKeys';
 import type {
   APIKeysTheme,
@@ -20,9 +21,11 @@ import type {
 import type { ClientResource } from './client';
 import type {
   CommerceBillingNamespace,
+  CommerceCheckoutResource,
   CommercePlanResource,
   CommerceSubscriberType,
   CommerceSubscriptionPlanPeriod,
+  ConfirmCheckoutParams,
 } from './commerce';
 import type { CustomMenuItem } from './customMenuItems';
 import type { CustomPage } from './customPages';
@@ -55,25 +58,33 @@ import type { UserResource } from './user';
 import type { Autocomplete, DeepPartial, DeepSnakeToCamel } from './utils';
 import type { WaitlistResource } from './waitlist';
 
-// type CheckoutStatus = 'awaiting_initialization' | 'awaiting_confirmation' | 'completed';
+type __experimental_CheckoutStatus = 'awaiting_initialization' | 'awaiting_confirmation' | 'completed';
 
-// type CheckoutCacheState = {
-//   isStarting: boolean;
-//   isConfirming: boolean;
-//   error: ClerkAPIResponseError | null;
-//   checkout: CommerceCheckoutResource | null;
-//   fetchStatus: 'idle' | 'fetching' | 'error';
-//   status: CheckoutStatus;
-// };
+export type __experimental_CheckoutCacheState = Readonly<{
+  isStarting: boolean;
+  isConfirming: boolean;
+  error: ClerkAPIResponseError | null;
+  checkout: CommerceCheckoutResource | null;
+  fetchStatus: 'idle' | 'fetching' | 'error';
+  status: __experimental_CheckoutStatus;
+}>;
 
-// export type CheckoutInstance = {
-//   confirm: (params: ConfirmCheckoutParams) => Promise<CommerceCheckoutResource>;
-//   start: () => Promise<CommerceCheckoutResource>;
-//   clear: () => void;
-//   finalize: (params: { redirectUrl?: string }) => void;
-//   subscribe: (listener: (state: CheckoutInstance) => void) => () => void;
-//   getState: () => CheckoutCacheState;
-// };
+export type __experimental_CheckoutOptions = {
+  for?: 'organization';
+  planPeriod: CommerceSubscriptionPlanPeriod;
+  planId: string;
+};
+
+export type __experimental_CheckoutInstance = {
+  confirm: (params: ConfirmCheckoutParams) => Promise<CommerceCheckoutResource>;
+  start: () => Promise<CommerceCheckoutResource>;
+  clear: () => void;
+  finalize: (params: { redirectUrl?: string }) => void;
+  subscribe: (listener: (state: __experimental_CheckoutCacheState) => void) => () => void;
+  getState: () => __experimental_CheckoutCacheState;
+};
+
+type __experimental_CheckoutFunction = (options: __experimental_CheckoutOptions) => __experimental_CheckoutInstance;
 
 /**
  * @inline
@@ -801,11 +812,12 @@ export interface Clerk {
    */
   apiKeys: APIKeysNamespace;
 
-  __experimental_checkout: (options: {
-    for?: 'organization';
-    planPeriod: CommerceSubscriptionPlanPeriod;
-    planId: string;
-  }) => any;
+  /**
+   * Checkout API
+   * @experimental
+   * This API is in early access and may change in future releases.
+   */
+  __experimental_checkout: __experimental_CheckoutFunction;
 }
 
 export type HandleOAuthCallbackParams = TransferableOption &

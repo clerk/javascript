@@ -1,17 +1,6 @@
-import type { ClerkAPIResponseError } from '@clerk/shared/error';
-import type { CommerceCheckoutResource } from '@clerk/types';
+import type { __experimental_CheckoutCacheState, ClerkAPIResponseError, CommerceCheckoutResource } from '@clerk/types';
 
-type CheckoutStatus = 'awaiting_initialization' | 'awaiting_confirmation' | 'completed';
 type CheckoutKey = string & { readonly __tag: 'CheckoutKey' };
-
-type CheckoutCacheState = Readonly<{
-  isStarting: boolean;
-  isConfirming: boolean;
-  error: ClerkAPIResponseError | null;
-  checkout: CommerceCheckoutResource | null;
-  fetchStatus: 'idle' | 'fetching' | 'error';
-  status: CheckoutStatus;
-}>;
 
 const createManagerCache = <CacheKey, CacheState>() => {
   const cache = new Map<CacheKey, CacheState>();
@@ -37,7 +26,7 @@ const createManagerCache = <CacheKey, CacheState>() => {
   };
 };
 
-const managerCache = createManagerCache<CheckoutKey, CheckoutCacheState>();
+const managerCache = createManagerCache<CheckoutKey, __experimental_CheckoutCacheState>();
 
 const CHECKOUT_STATUS = {
   AWAITING_INITIALIZATION: 'awaiting_initialization',
@@ -54,7 +43,9 @@ export const FETCH_STATUS = {
 /**
  * Derives the checkout state from the base state.
  */
-function deriveCheckoutState(baseState: Omit<CheckoutCacheState, 'fetchStatus' | 'status'>): CheckoutCacheState {
+function deriveCheckoutState(
+  baseState: Omit<__experimental_CheckoutCacheState, 'fetchStatus' | 'status'>,
+): __experimental_CheckoutCacheState {
   const fetchStatus = (() => {
     if (baseState.isStarting || baseState.isConfirming) return FETCH_STATUS.FETCHING;
     if (baseState.error) return FETCH_STATUS.ERROR;
@@ -74,7 +65,7 @@ function deriveCheckoutState(baseState: Omit<CheckoutCacheState, 'fetchStatus' |
   };
 }
 
-const defaultCacheState: CheckoutCacheState = Object.freeze(
+const defaultCacheState: __experimental_CheckoutCacheState = Object.freeze(
   deriveCheckoutState({
     isStarting: false,
     isConfirming: false,
@@ -103,11 +94,13 @@ function createCheckoutManager(cacheKey: CheckoutKey) {
     listeners.forEach(listener => listener(getCacheState()));
   };
 
-  const getCacheState = (): CheckoutCacheState => {
+  const getCacheState = (): __experimental_CheckoutCacheState => {
     return managerCache.cache.get(cacheKey) || defaultCacheState;
   };
 
-  const updateCacheState = (updates: Partial<Omit<CheckoutCacheState, 'fetchStatus' | 'status'>>): void => {
+  const updateCacheState = (
+    updates: Partial<Omit<__experimental_CheckoutCacheState, 'fetchStatus' | 'status'>>,
+  ): void => {
     const currentState = getCacheState();
     const baseState = { ...currentState, ...updates };
     const newState = deriveCheckoutState(baseState);
@@ -116,7 +109,7 @@ function createCheckoutManager(cacheKey: CheckoutKey) {
   };
 
   return {
-    subscribe(listener: (newState: CheckoutCacheState) => void): () => void {
+    subscribe(listener: (newState: __experimental_CheckoutCacheState) => void): () => void {
       listeners.add(listener);
       return () => {
         listeners.delete(listener);
@@ -181,4 +174,4 @@ function createCheckoutManager(cacheKey: CheckoutKey) {
   };
 }
 
-export { createCheckoutManager, type CheckoutCacheState, type CheckoutKey };
+export { createCheckoutManager, type CheckoutKey };

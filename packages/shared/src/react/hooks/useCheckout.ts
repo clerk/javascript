@@ -1,4 +1,9 @@
-import type { CommerceCheckoutResource, CommerceSubscriptionPlanPeriod, ConfirmCheckoutParams } from '@clerk/types';
+import type {
+  __experimental_CheckoutCacheState,
+  CommerceCheckoutResource,
+  CommerceSubscriptionPlanPeriod,
+  ConfirmCheckoutParams,
+} from '@clerk/types';
 import { useMemo, useSyncExternalStore } from 'react';
 
 import type { ClerkAPIResponseError } from '../..';
@@ -6,8 +11,6 @@ import { useCheckoutContext } from '../contexts';
 import { useClerk } from './useClerk';
 import { useOrganization } from './useOrganization';
 import { useUser } from './useUser';
-
-type CheckoutStatus = 'awaiting_initialization' | 'awaiting_confirmation' | 'completed';
 
 /**
  * Utility type that removes function properties from a type.
@@ -39,26 +42,17 @@ type NullableCheckoutProperties = Nullable<
   __internal_checkout: null;
 };
 
-type CheckoutCacheState = {
-  isStarting: boolean;
-  isConfirming: boolean;
-  error: ClerkAPIResponseError | null;
-  checkout: CommerceCheckoutResource | null;
-  fetchStatus: 'idle' | 'fetching' | 'error';
-  status: CheckoutStatus;
-};
-
 type UseCheckoutReturn = (CheckoutProperties | NullableCheckoutProperties) & {
   confirm: (params: ConfirmCheckoutParams) => Promise<CommerceCheckoutResource>;
   start: () => Promise<CommerceCheckoutResource>;
   isStarting: boolean;
   isConfirming: boolean;
   error: ClerkAPIResponseError | null;
-  status: CheckoutStatus;
+  status: __experimental_CheckoutCacheState['status'];
   clear: () => void;
   finalize: (params: { redirectUrl?: string }) => void;
   fetchStatus: 'idle' | 'fetching' | 'error';
-  getState: () => CheckoutCacheState;
+  getState: () => __experimental_CheckoutCacheState;
 };
 
 type UseCheckoutOptions = {
@@ -122,7 +116,9 @@ export const useCheckout = (options?: UseCheckoutOptions): UseCheckoutReturn => 
   return {
     ...properties,
     getState: manager.getState,
+    // @ts-expect-error - this is a temporary fix to allow the checkout to be null
     checkout: null,
+    // @ts-expect-error - this is a temporary fix to allow the checkout to be null
     __internal_checkout: managerProperties.checkout,
     start: manager.start,
     confirm: manager.confirm,

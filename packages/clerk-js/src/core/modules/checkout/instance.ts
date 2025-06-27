@@ -1,22 +1,13 @@
-import type { CommerceCheckoutResource, CommerceSubscriptionPlanPeriod, ConfirmCheckoutParams } from '@clerk/types';
+import type {
+  __experimental_CheckoutCacheState,
+  __experimental_CheckoutInstance,
+  __experimental_CheckoutOptions,
+  CommerceCheckoutResource,
+  ConfirmCheckoutParams,
+} from '@clerk/types';
 
 import type { Clerk } from '../../clerk';
-import { type CheckoutCacheState, type CheckoutKey, createCheckoutManager } from './manager';
-
-export type CheckoutOptions = {
-  for?: 'organization';
-  planPeriod: CommerceSubscriptionPlanPeriod;
-  planId: string;
-};
-
-export type CheckoutInstance = {
-  confirm: (params: ConfirmCheckoutParams) => Promise<CommerceCheckoutResource>;
-  start: () => Promise<CommerceCheckoutResource>;
-  clear: () => void;
-  finalize: (params: { redirectUrl?: string }) => void;
-  subscribe: (listener: (state: CheckoutCacheState) => void) => () => void;
-  getState: () => CheckoutCacheState;
-};
+import { type CheckoutKey, createCheckoutManager } from './manager';
 
 /**
  * Generate cache key for checkout instance
@@ -26,12 +17,13 @@ function cacheKey(options: { userId: string; orgId?: string; planId: string; pla
   return `${userId}-${orgId || 'user'}-${planId}-${planPeriod}` as CheckoutKey;
 }
 
-export type CheckoutFunction = (options: CheckoutOptions) => CheckoutInstance;
-
 /**
  * Create a checkout instance with the given options
  */
-function createCheckoutInstance(clerk: Clerk, options: CheckoutOptions): CheckoutInstance {
+function createCheckoutInstance(
+  clerk: Clerk,
+  options: __experimental_CheckoutOptions,
+): __experimental_CheckoutInstance {
   const { for: forOrganization, planId, planPeriod } = options;
 
   if (!clerk.user) {
@@ -78,7 +70,7 @@ function createCheckoutInstance(clerk: Clerk, options: CheckoutOptions): Checkou
 
   const clear = () => manager.clearCheckout();
 
-  const subscribe = (listener: (state: CheckoutCacheState) => void) => {
+  const subscribe = (listener: (state: __experimental_CheckoutCacheState) => void) => {
     return manager.subscribe(listener);
   };
 
