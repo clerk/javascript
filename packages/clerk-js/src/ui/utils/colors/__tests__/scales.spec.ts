@@ -14,13 +14,13 @@ import {
 // Mock cssSupports
 vi.mock('../../cssSupports', () => ({
   cssSupports: {
-    hasModernColorSupport: vi.fn(),
+    modernColor: vi.fn(),
     relativeColorSyntax: vi.fn(),
   },
 }));
 
 // Get the mocked functions
-const mockHasModernColorSupport = vi.mocked(cssSupports.hasModernColorSupport);
+const mockModernColorSupport = vi.mocked(cssSupports.modernColor);
 const mockRelativeColorSyntax = vi.mocked(cssSupports.relativeColorSyntax);
 
 vi.mock('../index', () => ({
@@ -33,13 +33,12 @@ vi.mock('../index', () => ({
     }),
     setHslaAlpha: (color: any, alpha: number) => ({ ...color, a: alpha }),
   },
-  hasModernColorSupport: mockHasModernColorSupport,
 }));
 
 describe('Color Scales', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockHasModernColorSupport.mockReturnValue(false);
+    mockModernColorSupport.mockReturnValue(false);
     mockRelativeColorSyntax.mockReturnValue(false);
   });
 
@@ -65,7 +64,7 @@ describe('Color Scales', () => {
     });
 
     it('should use modern CSS when supported', () => {
-      mockHasModernColorSupport.mockReturnValue(true);
+      mockModernColorSupport.mockReturnValue(true);
 
       const result = generateAlphaScale('blue');
       expect(result).toBeDefined();
@@ -73,7 +72,7 @@ describe('Color Scales', () => {
     });
 
     it('should use legacy implementation when modern CSS not supported', () => {
-      mockHasModernColorSupport.mockReturnValue(false);
+      mockModernColorSupport.mockReturnValue(false);
 
       const result = generateAlphaScale('blue');
       expect(result).toBeDefined();
@@ -121,7 +120,7 @@ describe('Color Scales', () => {
     });
 
     it('should use modern CSS when supported', () => {
-      mockHasModernColorSupport.mockReturnValue(true);
+      mockModernColorSupport.mockReturnValue(true);
       mockRelativeColorSyntax.mockReturnValue(true);
 
       const result = generateLightnessScale('green');
@@ -130,7 +129,7 @@ describe('Color Scales', () => {
     });
 
     it('should use legacy implementation when modern CSS not supported', () => {
-      mockHasModernColorSupport.mockReturnValue(false);
+      mockModernColorSupport.mockReturnValue(false);
 
       const result = generateLightnessScale('green');
       expect(result).toBeDefined();
@@ -246,7 +245,7 @@ describe('Color Scales', () => {
     // We need to access the internal applyScalePrefix function for testing
     // Since it's now private, we'll test it through the public API
     it('should apply prefix through themed functions', () => {
-      mockHasModernColorSupport.mockReturnValue(true);
+      mockModernColorSupport.mockReturnValue(true);
 
       const result = colorOptionToThemedAlphaScale('red', 'bg-');
 
@@ -257,7 +256,7 @@ describe('Color Scales', () => {
     });
 
     it('should skip undefined values in prefixed results', () => {
-      mockHasModernColorSupport.mockReturnValue(false);
+      mockModernColorSupport.mockReturnValue(false);
 
       // Empty string results in undefined values that should be filtered out
       const result = colorOptionToThemedLightnessScale('', 'text-');
@@ -275,7 +274,7 @@ describe('Themed Color Scales', () => {
     });
 
     it('should handle string color input', () => {
-      mockHasModernColorSupport.mockReturnValue(true);
+      mockModernColorSupport.mockReturnValue(true);
 
       const result = colorOptionToThemedAlphaScale('red', 'bg-');
 
@@ -323,7 +322,7 @@ describe('Themed Color Scales', () => {
     });
 
     it('should handle string color input', () => {
-      mockHasModernColorSupport.mockReturnValue(true);
+      mockModernColorSupport.mockReturnValue(true);
       mockRelativeColorSyntax.mockReturnValue(true);
 
       const result = colorOptionToThemedLightnessScale('red', 'bg-');

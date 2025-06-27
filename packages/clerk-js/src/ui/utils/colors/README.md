@@ -56,12 +56,3 @@ The system checks for these modern CSS features:
 - Relative color syntax (`hsl(from white h s l)`)
 
 If either is supported, modern handling is used. Otherwise, legacy handling kicks in.
-
-## File Structure
-
-- `index.ts` - Main API that chooses between legacy/modern
-- `legacy.ts` - JavaScript-based color manipulation
-- `modern.ts` - CSS-based color manipulation
-- `constants.ts` - Shared color values and limits
-- `utils.ts` - Helper functions
-- `scales.ts` - Color scale generation utilities

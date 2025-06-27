@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 // Mock cssSupports
 vi.mock('../../cssSupports', () => ({
   cssSupports: {
-    hasModernColorSupport: vi.fn(),
+    modernColor: vi.fn(),
   },
 }));
 
@@ -32,23 +32,17 @@ vi.mock('../modern', () => ({
 }));
 
 import { cssSupports } from '../../cssSupports';
-import { colors, hasModernColorSupport, legacyColors, modernColors } from '../index';
+import { colors, legacyColors, modernColors } from '../index';
 
 // Get the mocked functions
-const mockHasModernColorSupport = vi.mocked(cssSupports.hasModernColorSupport);
+const mockModernColorSupport = vi.mocked(cssSupports.modernColor);
 const mockLegacyColors = vi.mocked(legacyColors);
 const mockModernColors = vi.mocked(modernColors);
 
 describe('Colors Index', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockHasModernColorSupport.mockReturnValue(false);
-  });
-
-  describe('hasModernColorSupport', () => {
-    it('should re-export hasModernColorSupport function', () => {
-      expect(typeof hasModernColorSupport).toBe('function');
-    });
+    mockModernColorSupport.mockReturnValue(false);
   });
 
   describe('modernColors and legacyColors exports', () => {
@@ -67,14 +61,14 @@ describe('Colors Index', () => {
     });
 
     it('should return color string when modern CSS is supported', () => {
-      mockHasModernColorSupport.mockReturnValue(true);
+      mockModernColorSupport.mockReturnValue(true);
 
       const result = colors.toHslaColor('red');
       expect(result).toBe('red');
     });
 
     it('should call legacy toHslaColor when modern CSS not supported', () => {
-      mockHasModernColorSupport.mockReturnValue(false);
+      mockModernColorSupport.mockReturnValue(false);
       mockLegacyColors.toHslaColor.mockReturnValue({ h: 0, s: 100, l: 50, a: 1 });
 
       colors.toHslaColor('red');
@@ -88,14 +82,14 @@ describe('Colors Index', () => {
     });
 
     it('should return color string when modern CSS is supported and input is string', () => {
-      mockHasModernColorSupport.mockReturnValue(true);
+      mockModernColorSupport.mockReturnValue(true);
 
       const result = colors.toHslaString('red');
       expect(result).toBe('red');
     });
 
     it('should call legacy toHslaString when modern CSS not supported', () => {
-      mockHasModernColorSupport.mockReturnValue(false);
+      mockModernColorSupport.mockReturnValue(false);
       mockLegacyColors.toHslaString.mockReturnValue('hsla(0, 100%, 50%, 1)');
 
       const hslaColor = { h: 0, s: 100, l: 50, a: 1 };
@@ -104,7 +98,7 @@ describe('Colors Index', () => {
     });
 
     it('should call legacy toHslaString for string input when modern CSS not supported', () => {
-      mockHasModernColorSupport.mockReturnValue(false);
+      mockModernColorSupport.mockReturnValue(false);
       mockLegacyColors.toHslaString.mockReturnValue('hsla(0, 100%, 50%, 1)');
 
       colors.toHslaString('red');
@@ -134,7 +128,7 @@ describe('Colors Index', () => {
 
   describe('lighten', () => {
     it('should use modern implementation when supported', () => {
-      mockHasModernColorSupport.mockReturnValue(true);
+      mockModernColorSupport.mockReturnValue(true);
       mockModernColors.lighten.mockReturnValue('lightened-color');
 
       const result = colors.lighten('red', 0.1);
@@ -143,7 +137,7 @@ describe('Colors Index', () => {
     });
 
     it('should use legacy implementation when modern CSS not supported', () => {
-      mockHasModernColorSupport.mockReturnValue(false);
+      mockModernColorSupport.mockReturnValue(false);
       mockLegacyColors.lighten.mockReturnValue('legacy-lightened-color');
 
       const result = colors.lighten('red', 0.1);
@@ -152,7 +146,7 @@ describe('Colors Index', () => {
     });
 
     it('should handle default percentage', () => {
-      mockHasModernColorSupport.mockReturnValue(true);
+      mockModernColorSupport.mockReturnValue(true);
       mockModernColors.lighten.mockReturnValue('lightened-color');
 
       colors.lighten('red');
@@ -162,7 +156,7 @@ describe('Colors Index', () => {
 
   describe('makeTransparent', () => {
     it('should use modern implementation when supported', () => {
-      mockHasModernColorSupport.mockReturnValue(true);
+      mockModernColorSupport.mockReturnValue(true);
       mockModernColors.makeTransparent.mockReturnValue('transparent-color');
 
       const result = colors.makeTransparent('red', 0.5);
@@ -171,7 +165,7 @@ describe('Colors Index', () => {
     });
 
     it('should use legacy implementation when modern CSS not supported', () => {
-      mockHasModernColorSupport.mockReturnValue(false);
+      mockModernColorSupport.mockReturnValue(false);
       mockLegacyColors.makeTransparent.mockReturnValue('legacy-transparent-color');
 
       const result = colors.makeTransparent('red', 0.5);
@@ -182,7 +176,7 @@ describe('Colors Index', () => {
 
   describe('makeSolid', () => {
     it('should use modern implementation when supported', () => {
-      mockHasModernColorSupport.mockReturnValue(true);
+      mockModernColorSupport.mockReturnValue(true);
       mockModernColors.makeSolid.mockReturnValue('solid-color');
 
       const result = colors.makeSolid('rgba(255, 0, 0, 0.5)');
@@ -191,7 +185,7 @@ describe('Colors Index', () => {
     });
 
     it('should use legacy implementation when modern CSS not supported', () => {
-      mockHasModernColorSupport.mockReturnValue(false);
+      mockModernColorSupport.mockReturnValue(false);
       mockLegacyColors.makeSolid.mockReturnValue('legacy-solid-color');
 
       const result = colors.makeSolid('rgba(255, 0, 0, 0.5)');
@@ -202,7 +196,7 @@ describe('Colors Index', () => {
 
   describe('setAlpha', () => {
     it('should use modern implementation when supported', () => {
-      mockHasModernColorSupport.mockReturnValue(true);
+      mockModernColorSupport.mockReturnValue(true);
       mockModernColors.setAlpha.mockReturnValue('alpha-color');
 
       const result = colors.setAlpha('red', 0.5);
@@ -211,7 +205,7 @@ describe('Colors Index', () => {
     });
 
     it('should use legacy implementation when modern CSS not supported', () => {
-      mockHasModernColorSupport.mockReturnValue(false);
+      mockModernColorSupport.mockReturnValue(false);
       mockLegacyColors.setAlpha.mockReturnValue('legacy-alpha-color');
 
       const result = colors.setAlpha('red', 0.5);
@@ -222,7 +216,7 @@ describe('Colors Index', () => {
 
   describe('adjustForLightness', () => {
     it('should use modern implementation when supported', () => {
-      mockHasModernColorSupport.mockReturnValue(true);
+      mockModernColorSupport.mockReturnValue(true);
       mockModernColors.adjustForLightness.mockReturnValue('adjusted-color');
 
       const result = colors.adjustForLightness('red', 5);
@@ -231,7 +225,7 @@ describe('Colors Index', () => {
     });
 
     it('should use legacy implementation when modern CSS not supported', () => {
-      mockHasModernColorSupport.mockReturnValue(false);
+      mockModernColorSupport.mockReturnValue(false);
       mockLegacyColors.adjustForLightness.mockReturnValue('legacy-adjusted-color');
 
       const result = colors.adjustForLightness('red', 5);
@@ -240,7 +234,7 @@ describe('Colors Index', () => {
     });
 
     it('should handle default lightness value', () => {
-      mockHasModernColorSupport.mockReturnValue(true);
+      mockModernColorSupport.mockReturnValue(true);
       mockModernColors.adjustForLightness.mockReturnValue('adjusted-color');
 
       colors.adjustForLightness('red');

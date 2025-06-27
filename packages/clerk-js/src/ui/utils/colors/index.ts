@@ -4,8 +4,6 @@ import { cssSupports } from '../cssSupports';
 import { colors as legacyColors } from './legacy';
 import { colors as modernColors } from './modern';
 
-const hasModernColorSupport = cssSupports.hasModernColorSupport;
-
 export const colors = {
   /**
    * Changes the lightness value of an HSLA color object
@@ -34,7 +32,7 @@ export const colors = {
   /**
    * Converts a color string to either a string (modern CSS) or HSLA object (legacy)
    * Uses modern CSS features when supported, falls back to parsing the string into an HSLA object for older browsers
-   * @param color - CSS color string (hex, rgb, hsl, etc.) or undefined
+   * @param color - CSS color string (hex, rgb, hsl, `var(--color)`, etc.) or undefined
    * @returns Color string in modern browsers, HSLA object in legacy browsers, or undefined if input is undefined
    * @example
    * ```typescript
@@ -44,7 +42,7 @@ export const colors = {
    */
   toHslaColor: (color: string | undefined): string | HslaColor | undefined => {
     if (!color) return undefined;
-    return hasModernColorSupport() ? color : legacyColors.toHslaColor(color);
+    return cssSupports.modernColor() ? color : legacyColors.toHslaColor(color);
   },
 
   /**
@@ -59,7 +57,7 @@ export const colors = {
    */
   toHslaString: (color: string | HslaColor | undefined): string | undefined => {
     if (!color) return undefined;
-    if (hasModernColorSupport() && typeof color === 'string') return color;
+    if (cssSupports.modernColor() && typeof color === 'string') return color;
     return legacyColors.toHslaString(color);
   },
 
@@ -76,7 +74,7 @@ export const colors = {
    * ```
    */
   lighten: (color: string | undefined, percentage = 0): string | undefined => {
-    if (hasModernColorSupport()) {
+    if (cssSupports.modernColor()) {
       return modernColors.lighten(color, percentage);
     }
     return legacyColors.lighten(color, percentage);
@@ -95,7 +93,7 @@ export const colors = {
    * ```
    */
   makeTransparent: (color: string | undefined, percentage = 0): string | undefined => {
-    if (hasModernColorSupport()) {
+    if (cssSupports.modernColor()) {
       return modernColors.makeTransparent(color, percentage);
     }
     return legacyColors.makeTransparent(color, percentage);
@@ -113,7 +111,7 @@ export const colors = {
    * ```
    */
   makeSolid: (color: string | undefined): string | undefined => {
-    if (hasModernColorSupport()) {
+    if (cssSupports.modernColor()) {
       return modernColors.makeSolid(color);
     }
     return legacyColors.makeSolid(color);
@@ -133,7 +131,7 @@ export const colors = {
    * ```
    */
   setAlpha: (color: string, alpha: number): string => {
-    if (hasModernColorSupport()) {
+    if (cssSupports.modernColor()) {
       return modernColors.setAlpha(color, alpha);
     }
     return legacyColors.setAlpha(color, alpha);
@@ -152,11 +150,11 @@ export const colors = {
    * ```
    */
   adjustForLightness: (color: string | undefined, lightness = 5): string | undefined => {
-    if (hasModernColorSupport()) {
+    if (cssSupports.modernColor()) {
       return modernColors.adjustForLightness(color, lightness);
     }
     return legacyColors.adjustForLightness(color, lightness);
   },
 };
 
-export { modernColors, legacyColors, hasModernColorSupport };
+export { modernColors, legacyColors };

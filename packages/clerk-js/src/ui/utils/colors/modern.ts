@@ -1,5 +1,5 @@
 /**
- * Modern CSS-based color manipulation utilities
+ * CSS-based color manipulation utilities
  * Uses color-mix() and relative color syntax when supported
  */
 
@@ -8,7 +8,7 @@ import { COLOR_BOUNDS, MODERN_CSS_LIMITS } from './constants';
 import { createAlphaColorMixString, createColorMixString, createRelativeColorString } from './utils';
 
 /**
- * Modern CSS-based color manipulation utilities
+ * CSS-based color manipulation utilities
  * Uses color-mix() and relative color syntax when supported
  */
 export const colors = {
@@ -30,7 +30,7 @@ export const colors = {
       return createColorMixString(color, 'white', mixPercentage);
     }
 
-    return color; // Return original if no modern CSS support
+    return color; // Return original if no CSS support
   },
 
   /**
@@ -44,11 +44,11 @@ export const colors = {
       return createAlphaColorMixString(color, alphaPercentage);
     }
 
-    return color; // Return original if no modern CSS support
+    return color; // Return original if no CSS support
   },
 
   /**
-   * Makes a color completely opaque using modern CSS
+   * Makes a color completely opaque
    */
   makeSolid: (color: string | undefined): string | undefined => {
     if (!color) return undefined;
@@ -63,11 +63,11 @@ export const colors = {
       return `color-mix(in srgb, ${color}, ${color} 100%)`;
     }
 
-    return color; // Return original if no modern CSS support
+    return color; // Return original if no CSS support
   },
 
   /**
-   * Sets the alpha value of a color using modern CSS
+   * Sets the alpha value of a color
    */
   setAlpha: (color: string, alpha: number): string => {
     const clampedAlpha = Math.min(Math.max(alpha, COLOR_BOUNDS.alpha.min), COLOR_BOUNDS.alpha.max);
@@ -83,12 +83,11 @@ export const colors = {
       return createAlphaColorMixString(color, percentage);
     }
 
-    return color; // Return original if no modern CSS support
+    return color; // Return original if no CSS support
   },
 
   /**
-   * Adjusts color for better contrast/lightness using modern CSS
-   * Replicates core legacy behavior: add 2*lightness, capped at 100%
+   * Adjusts color for better contrast/lightness
    */
   adjustForLightness: (color: string | undefined, lightness = 5): string | undefined => {
     if (!color) return undefined;
@@ -109,6 +108,6 @@ export const colors = {
       return createRelativeColorString(color, 'h', 's', `calc(l + ${adjustment}%)`);
     }
 
-    return color; // Return original if no modern CSS support
+    return color; // Return original if no CSS support
   },
 };

@@ -26,9 +26,6 @@ export const LIGHTNESS_CONFIG = {
   DARK_STEPS: 7, // Number of dark shades
 } as const;
 
-// Alpha values for alpha scale generation (in same order as COLOR_SCALE)
-export const ALPHA_VALUES = [0.02, 0.03, 0.07, 0.11, 0.15, 0.28, 0.41, 0.53, 0.62, 0.73, 0.78, 0.81, 0.84, 0.87, 0.92];
-
 // Alpha percentages for color-mix generation
 export const ALPHA_PERCENTAGES: Record<ColorShade, number> = {
   25: 2,
@@ -47,6 +44,10 @@ export const ALPHA_PERCENTAGES: Record<ColorShade, number> = {
   900: 87,
   950: 92,
 } as const;
+
+export const ALPHA_VALUES = Object.values(ALPHA_PERCENTAGES)
+  .map(v => v / 100)
+  .sort();
 
 // Lightness mix data for color-mix generation
 export const LIGHTNESS_MIX_DATA: Record<ColorShade, { mixColor: 'white' | 'black' | null; percentage: number }> = {
