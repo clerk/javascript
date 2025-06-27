@@ -1,5 +1,16 @@
 # Change Log
 
+## 5.69.3
+
+### Patch Changes
+
+- Hide invitation in `OrganizationSwitcher` when user is already an active member of the organization ([#6208](https://github.com/clerk/javascript/pull/6208)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`edc0bfd`](https://github.com/clerk/javascript/commit/edc0bfdae929dad78a99dfd6275aad947d9ddd73)]:
+  - @clerk/types@4.62.1
+  - @clerk/localizations@3.17.2
+  - @clerk/shared@3.10.1
+
 ## 5.69.2
 
 ### Patch Changes
