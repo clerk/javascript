@@ -6,6 +6,7 @@ import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { ProfileSection } from '@/ui/elements/Section';
 import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
+import { handleError } from '@/ui/utils/errorHandler';
 
 import { appendModalState } from '../../../utils';
 import { ProviderInitialIcon } from '../../common';
@@ -16,7 +17,6 @@ import { useActionContext } from '../../elements/Action/ActionRoot';
 import { useEnabledThirdPartyProviders } from '../../hooks';
 import { useRouter } from '../../router';
 import type { PropsOfComponent } from '../../styledSystem';
-import { handleError } from '../../utils';
 import { AddConnectedAccount } from './ConnectedAccountsMenu';
 import { RemoveConnectedAccountForm } from './RemoveResourceForm';
 

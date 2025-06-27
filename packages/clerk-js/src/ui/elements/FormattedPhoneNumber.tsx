@@ -1,6 +1,6 @@
 import { descriptors, Flex, Text } from '../customizables';
 import type { PropsOfComponent } from '../styledSystem';
-import { getFlagEmojiFromCountryIso, parsePhoneString, stringToFormattedPhoneString } from '../utils';
+import { getFlagEmojiFromCountryIso, parsePhoneString, stringToFormattedPhoneString } from '../utils/phoneUtils';
 
 type FormattedPhoneProps = {
   value: string;

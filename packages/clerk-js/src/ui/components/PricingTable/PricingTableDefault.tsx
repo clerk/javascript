@@ -4,6 +4,8 @@ import * as React from 'react';
 
 import { Switch } from '@/ui/elements/Switch';
 import { Tooltip } from '@/ui/elements/Tooltip';
+import { colors } from '@/ui/utils/colors';
+import { getClosestProfileScrollBox } from '@/ui/utils/getClosestProfileScrollBox';
 
 import { useProtect } from '../../common';
 import { usePlansContext, usePricingTableContext, useSubscriberTypeContext } from '../../contexts';
@@ -23,7 +25,6 @@ import {
 } from '../../customizables';
 import { Check, Plus } from '../../icons';
 import { common, InternalThemeProvider } from '../../styledSystem';
-import { colors, getClosestProfileScrollBox } from '../../utils';
 
 interface PricingTableDefaultProps {
   plans?: CommercePlanResource[] | null;

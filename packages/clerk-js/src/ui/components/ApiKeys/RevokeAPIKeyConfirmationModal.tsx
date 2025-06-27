@@ -8,7 +8,7 @@ import { FormButtons } from '@/ui/elements/FormButtons';
 import { FormContainer } from '@/ui/elements/FormContainer';
 import { Modal } from '@/ui/elements/Modal';
 import { localizationKeys, useLocalizations } from '@/ui/localization';
-import { useFormControl } from '@/ui/utils';
+import { useFormControl } from '@/ui/utils/useFormControl';
 
 type RevokeAPIKeyConfirmationModalProps = {
   subject: string;

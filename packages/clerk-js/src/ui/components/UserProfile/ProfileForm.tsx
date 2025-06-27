@@ -7,11 +7,12 @@ import { FormButtons } from '@/ui/elements/FormButtons';
 import type { FormProps } from '@/ui/elements/FormContainer';
 import { FormContainer } from '@/ui/elements/FormContainer';
 import { InformationBox } from '@/ui/elements/InformationBox';
+import { handleError } from '@/ui/utils/errorHandler';
+import { useFormControl } from '@/ui/utils/useFormControl';
 
 import { isDefaultImage } from '../../../utils';
 import { useEnvironment } from '../../contexts';
 import { localizationKeys } from '../../customizables';
-import { handleError, useFormControl } from '../../utils';
 import { UserProfileAvatarUploader } from './UserProfileAvatarUploader';
 
 type ProfileFormProps = FormProps;

@@ -3,7 +3,7 @@ import type { ClerkAPIError, ClerkRuntimeError, LocalizationResource } from '@cl
 import React from 'react';
 
 import { useOptions } from '../contexts';
-import { readObjectPath } from '../utils';
+import { readObjectPath } from '../utils/readObjectPath';
 import type { GlobalTokens } from './applyTokensToString';
 import { applyTokensToString, useGlobalTokens } from './applyTokensToString';
 import { defaultResource } from './defaultEnglishResource';

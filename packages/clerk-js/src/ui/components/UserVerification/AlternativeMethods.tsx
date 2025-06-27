@@ -5,12 +5,12 @@ import { ArrowBlockButton } from '@/ui/elements/ArrowBlockButton';
 import { BackLink } from '@/ui/elements/BackLink';
 import { Card } from '@/ui/elements/Card';
 import { Header } from '@/ui/elements/Header';
+import { formatSafeIdentifier } from '@/ui/utils/formatSafeIdentifier';
 
 import type { LocalizationKey } from '../../customizables';
 import { Col, descriptors, Flex, Flow, localizationKeys } from '../../customizables';
 import { useCardState } from '../../elements/contexts';
 import { ChatAltIcon, Email, Fingerprint, LockClosedIcon } from '../../icons';
-import { formatSafeIdentifier } from '../../utils';
 import { useReverificationAlternativeStrategies } from './useReverificationAlternativeStrategies';
 import { useUserVerificationSession } from './useUserVerificationSession';
 import { withHavingTrouble } from './withHavingTrouble';

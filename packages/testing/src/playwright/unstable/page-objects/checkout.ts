@@ -28,7 +28,7 @@ export const createCheckoutPageObject = (testArgs: { page: EnhancedPage }) => {
       await frame.getByLabel('Country').selectOption(card.country);
       await frame.getByLabel('ZIP code').fill(card.zip);
     },
-    waitForStipeElements: async ({ state = 'visible' }: { state?: 'visible' | 'hidden' } = {}) => {
+    waitForStripeElements: async ({ state = 'visible' }: { state?: 'visible' | 'hidden' } = {}) => {
       return page.frameLocator('iframe[src*="elements-inner-payment"]').getByLabel('Card number').waitFor({ state });
     },
     clickPayOrSubscribe: async () => {

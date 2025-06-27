@@ -8,4 +8,8 @@ export { useUser } from './useUser';
 export { useClerk } from './useClerk';
 export { useDeepEqualMemo, isDeeplyEqual } from './useDeepEqualMemo';
 export { useReverification } from './useReverification';
+export { useStatements as __experimental_useStatements } from './useStatements';
+export { usePaymentAttempts as __experimental_usePaymentAttempts } from './usePaymentAttempts';
+export { usePaymentMethods as __experimental_usePaymentMethods } from './usePaymentMethods';
+export { useSubscriptionItems as __experimental_useSubscriptionItems } from './useSubscriptionItems';
 export { useCheckout as __experimental_useCheckout } from './useCheckout';

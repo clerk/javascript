@@ -7,6 +7,7 @@ import { FormattedPhoneNumberText } from '@/ui/elements/FormattedPhoneNumber';
 import type { ProfileSectionActionMenuItemProps } from '@/ui/elements/Section';
 import { ProfileSection } from '@/ui/elements/Section';
 import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
+import { handleError } from '@/ui/utils/errorHandler';
 
 import { useEnvironment } from '../../contexts';
 import { Badge, Flex, Icon, localizationKeys, Text } from '../../customizables';
@@ -14,7 +15,6 @@ import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { AuthApp, DotCircle, Mobile } from '../../icons';
 import type { PropsOfComponent } from '../../styledSystem';
-import { handleError } from '../../utils';
 import { MfaBackupCodeCreateScreen, MfaScreen, RemoveMfaPhoneCodeScreen, RemoveMfaTOTPScreen } from './MfaScreens';
 import { defaultFirst, getSecondFactors, getSecondFactorsAvailableToAdd } from './utils';
 

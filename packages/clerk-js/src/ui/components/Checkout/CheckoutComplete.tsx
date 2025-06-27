@@ -1,15 +1,15 @@
 import { __experimental_useCheckout as useCheckout } from '@clerk/shared/react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 
 import { Drawer, useDrawerContext } from '@/ui/elements/Drawer';
 import { LineItems } from '@/ui/elements/LineItems';
+import { formatDate } from '@/ui/utils/formatDate';
 
 import { useCheckoutContext } from '../../contexts';
 import { Box, Button, descriptors, Heading, localizationKeys, Span, Text, useAppearance } from '../../customizables';
 import { transitionDurationValues, transitionTiming } from '../../foundations/transitions';
 import { usePrefersReducedMotion } from '../../hooks';
 import { useRouter } from '../../router';
-import { formatDate } from '../../utils';
 
 const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
 const lerp = (start: number, end: number, amt: number) => start + (end - start) * amt;
@@ -21,6 +21,11 @@ export const CheckoutComplete = () => {
   const checkout = useCheckout();
   const [mousePosition, setMousePosition] = useState({ x: 256, y: 256 });
   const [currentPosition, setCurrentPosition] = useState({ x: 256, y: 256 });
+
+  // Generate unique IDs for SVG elements to avoid conflicts with multiple component instances
+  const maskId1 = useId();
+  const maskId2 = useId();
+  const maskId3 = useId();
 
   const prefersReducedMotion = usePrefersReducedMotion();
   const { animations: layoutAnimations } = useAppearance().parsedLayout;
@@ -94,7 +99,6 @@ export const CheckoutComplete = () => {
             aspectRatio: '1/1',
             display: 'grid',
             width: '100%',
-            padding: t.space.$4,
             flexShrink: 0,
             transformOrigin: 'bottom center',
             animationName: 'scaleIn',
@@ -155,22 +159,55 @@ export const CheckoutComplete = () => {
               <filter id='clerk-checkout-success-blur-effect'>
                 <feGaussianBlur stdDeviation='10' />
               </filter>
+              {[
+                { r: 225, maskStart: 10, maskEnd: 90, id: maskId1 },
+                { r: 162.5, maskStart: 15, maskEnd: 85, id: maskId2 },
+                { r: 100, maskStart: 20, maskEnd: 80, id: maskId3 },
+              ].map(({ maskStart, maskEnd, id }) => (
+                <linearGradient
+                  key={id}
+                  id={`gradient-${id}`}
+                  x1='0%'
+                  y1='0%'
+                  x2='0%'
+                  y2='100%'
+                >
+                  <stop
+                    offset={`${maskStart + 5}%`}
+                    stopColor='white'
+                    stopOpacity='0'
+                  />
+                  <stop
+                    offset={`${maskStart + 35}%`}
+                    stopColor='white'
+                    stopOpacity='1'
+                  />
+                  <stop
+                    offset={`${maskEnd - 35}%`}
+                    stopColor='white'
+                    stopOpacity='1'
+                  />
+                  <stop
+                    offset={`${maskEnd - 5}%`}
+                    stopColor='white'
+                    stopOpacity='0'
+                  />
+                </linearGradient>
+              ))}
               <mask id='clerk-checkout-success-mask'>
                 {[
-                  { r: 225, maskStart: 10, maskEnd: 90 },
-                  { r: 162.5, maskStart: 15, maskEnd: 85 },
-                  { r: 100, maskStart: 20, maskEnd: 80 },
-                ].map(({ r, maskStart, maskEnd }) => (
+                  { r: 225, id: maskId1 },
+                  { r: 162.5, id: maskId2 },
+                  { r: 100, id: maskId3 },
+                ].map(({ r, id }) => (
                   <circle
-                    key={r}
+                    key={id}
                     cx='256'
                     cy='256'
                     r={r}
-                    stroke='white'
+                    stroke={`url(#gradient-${id})`}
                     fill='none'
-                    style={{
-                      maskImage: `linear-gradient(to bottom, transparent ${maskStart}%, black, transparent ${maskEnd}%)`,
-                    }}
+                    strokeWidth='1'
                   />
                 ))}
               </mask>

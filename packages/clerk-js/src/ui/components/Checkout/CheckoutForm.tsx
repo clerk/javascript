@@ -15,12 +15,12 @@ import { LineItems } from '@/ui/elements/LineItems';
 import { SegmentedControl } from '@/ui/elements/SegmentedControl';
 import { Select, SelectButton, SelectOptionList } from '@/ui/elements/Select';
 import { Tooltip } from '@/ui/elements/Tooltip';
+import { handleError } from '@/ui/utils/errorHandler';
 
 import { DevOnly } from '../../common/DevOnly';
-import { useCheckoutContext, usePaymentSources } from '../../contexts';
+import { useCheckoutContext, usePaymentMethods } from '../../contexts';
 import { Box, Button, Col, descriptors, Flex, Form, localizationKeys, Text } from '../../customizables';
 import { ChevronUpDown, InformationCircle } from '../../icons';
-import { handleError } from '../../utils';
 import * as AddPaymentSource from '../PaymentSources/AddPaymentSource';
 import { PaymentSourceRow } from '../PaymentSources/PaymentSourceRow';
 
@@ -178,8 +178,7 @@ const useCheckoutMutations = () => {
 };
 
 const CheckoutFormElements = ({ checkout }: { checkout: CommerceCheckoutResource }) => {
-  const { data } = usePaymentSources();
-  const { data: paymentSources } = data || { data: [] };
+  const { data: paymentSources } = usePaymentMethods();
 
   const [paymentMethodSource, setPaymentMethodSource] = useState<PaymentMethodSource>(() =>
     paymentSources.length > 0 ? 'existing' : 'new',
