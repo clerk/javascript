@@ -177,38 +177,37 @@ describe('Modern CSS Colors', () => {
       expect(colors.adjustForLightness(undefined)).toBeUndefined();
     });
 
-    it('should use relative color syntax when supported', () => {
-      mockRelativeColorSyntax.mockReturnValue(true);
-
-      const result = colors.adjustForLightness('red', 5);
-      expect(result).toMatch(/hsl\(from red h s calc\(max\(l \+ 10%, 95%\)\)\)/);
-    });
-
-    it('should fall back to color-mix when relative color syntax not supported', () => {
-      mockRelativeColorSyntax.mockReturnValue(false);
+    it('should use color-mix when supported', () => {
       mockColorMix.mockReturnValue(true);
 
       const result = colors.adjustForLightness('red', 5);
       expect(result).toMatch(/color-mix\(in srgb, red, white 20%\)/);
     });
 
-    it('should return original color when no modern CSS support', () => {
-      mockRelativeColorSyntax.mockReturnValue(false);
+    it('should fall back to relative color syntax when color-mix not supported', () => {
       mockColorMix.mockReturnValue(false);
+      mockRelativeColorSyntax.mockReturnValue(true);
+
+      const result = colors.adjustForLightness('red', 5);
+      expect(result).toMatch(/hsl\(from red h s calc\(l \+ 10%\)\)/);
+    });
+
+    it('should return original color when no modern CSS support', () => {
+      mockColorMix.mockReturnValue(false);
+      mockRelativeColorSyntax.mockReturnValue(false);
 
       const result = colors.adjustForLightness('red', 5);
       expect(result).toBe('red');
     });
 
     it('should handle default lightness value', () => {
-      mockRelativeColorSyntax.mockReturnValue(true);
+      mockColorMix.mockReturnValue(true);
 
       const result = colors.adjustForLightness('red');
-      expect(result).toMatch(/hsl\(from red h s calc\(max\(l \+ 10%, 95%\)\)\)/);
+      expect(result).toMatch(/color-mix\(in srgb, red, white 20%\)/);
     });
 
     it('should limit color-mix percentage', () => {
-      mockRelativeColorSyntax.mockReturnValue(false);
       mockColorMix.mockReturnValue(true);
 
       const result = colors.adjustForLightness('red', 20); // High value

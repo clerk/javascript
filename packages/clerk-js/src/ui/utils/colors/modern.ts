@@ -88,31 +88,25 @@ export const colors = {
 
   /**
    * Adjusts color for better contrast/lightness using modern CSS
+   * Replicates core legacy behavior: add 2*lightness, capped at 100%
    */
   adjustForLightness: (color: string | undefined, lightness = 5): string | undefined => {
     if (!color) return undefined;
 
-    if (cssSupports.relativeColorSyntax()) {
-      // Use relative color syntax for precise lightness adjustment
-      // Special handling for very light colors:
-      // - Uses max() to ensure lightness never goes below the minimum floor
-      // - Uses multiplier for more noticeable effect
-      // - Prevents colors from becoming too dark when they're already very light
-      return createRelativeColorString(
-        color,
-        'h',
-        's',
-        `calc(max(l + ${lightness * MODERN_CSS_LIMITS.LIGHTNESS_MULTIPLIER}%, ${MODERN_CSS_LIMITS.MIN_LIGHTNESS_FLOOR}%))`,
-      );
-    }
-
     if (cssSupports.colorMix()) {
-      // Use color-mix with white for lightness adjustment
+      // Use color-mix with white for lightness adjustment - more conservative approach
       const mixPercentage = Math.min(
         lightness * MODERN_CSS_LIMITS.MIX_MULTIPLIER,
         MODERN_CSS_LIMITS.MAX_LIGHTNESS_ADJUSTMENT,
       );
       return createColorMixString(color, 'white', mixPercentage);
+    }
+
+    if (cssSupports.relativeColorSyntax()) {
+      // Fallback to relative color syntax
+      // Note: We can't cap at 100% or handle edge cases in CSS, but browsers will clamp automatically
+      const adjustment = lightness * MODERN_CSS_LIMITS.LIGHTNESS_MULTIPLIER; // 2 * lightness
+      return createRelativeColorString(color, 'h', 's', `calc(l + ${adjustment}%)`);
     }
 
     return color; // Return original if no modern CSS support

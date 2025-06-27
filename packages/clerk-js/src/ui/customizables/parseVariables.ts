@@ -31,7 +31,7 @@ export const createColorScales = (theme: Theme) => {
     ...primaryAlphaScale,
     ...successAlphaScale,
     ...warningAlphaScale,
-    primaryHover: primaryScale?.primary400,
+    primaryHover: colors.adjustForLightness(primaryScale?.primary500),
     colorTextOnPrimaryBackground: colors.toHslaString(variables.colorTextOnPrimaryBackground),
     colorText: colors.toHslaString(variables.colorText),
     colorTextSecondary:
