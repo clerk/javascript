@@ -6,7 +6,7 @@ const config = {
   displayName: name.replace('@clerk', ''),
   injectGlobals: true,
 
-  testEnvironment: 'jsdom',
+  testEnvironment: './customJSDOMEnvironment.ts',
   roots: ['<rootDir>/src'],
   setupFiles: ['./jest.setup.ts'],
 
