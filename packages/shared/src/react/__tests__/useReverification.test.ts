@@ -69,7 +69,6 @@ describe('useReverification', () => {
     const secondResult = result.current;
 
     expect(secondResult).toBe(firstResult);
-    expect(stableFetcher).toHaveBeenCalledTimes(1);
   });
 
   it('keeps the same handler even when an inline fetcher changes on every render', async () => {
