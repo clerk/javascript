@@ -30,7 +30,6 @@ The color system uses a **progressive enhancement** approach:
 
 - **Automatic detection** - No need to manually choose legacy vs modern
 - **Same API** - All functions work the same way regardless of browser
-- **Performance optimized** - Modern CSS is faster when available
 - **Fallback support** - Always works, even in older browsers
 
 ## Main Functions
