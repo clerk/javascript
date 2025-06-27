@@ -116,9 +116,6 @@ export function generateAlphaColorMix(color: string, shade: ColorShade): string 
   return createAlphaColorMixString(color, alphaPercentage);
 }
 
-const SUPPORTS_RELATIVE_COLOR_SYNTAX = cssSupports.relativeColorSyntax();
-const SUPPORTS_COLOR_MIX = cssSupports.colorMix();
-
 /**
  * Get the optimal color variant for the given shade
  * @param color - The base color
@@ -128,11 +125,11 @@ const SUPPORTS_COLOR_MIX = cssSupports.colorMix();
 export function getSupportedColorVariant(color: string, shade: ColorShade): string {
   if (shade === 500) return color;
 
-  if (SUPPORTS_RELATIVE_COLOR_SYNTAX) {
+  if (cssSupports.relativeColorSyntax()) {
     return generateRelativeColorSyntax(color, shade);
   }
 
-  if (SUPPORTS_COLOR_MIX) {
+  if (cssSupports.colorMix()) {
     return generateColorMixSyntax(color, shade);
   }
 
