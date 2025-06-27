@@ -1,4 +1,7 @@
-import { __experimental_useCheckout as useCheckout, CheckoutProvider } from '@clerk/shared/react';
+import {
+  __experimental_CheckoutProvider as CheckoutProvider,
+  __experimental_useCheckout as useCheckout,
+} from '@clerk/shared/react';
 import { useEffect, useMemo } from 'react';
 
 import { useCheckoutContext } from '@/ui/contexts/components';

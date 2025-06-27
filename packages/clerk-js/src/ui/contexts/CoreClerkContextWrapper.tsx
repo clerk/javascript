@@ -1,5 +1,5 @@
 import {
-  CheckoutProvider,
+  __experimental_CheckoutProvider as CheckoutProvider,
   ClerkInstanceContext,
   ClientContext,
   OrganizationProvider,

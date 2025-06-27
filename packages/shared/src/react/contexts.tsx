@@ -32,7 +32,7 @@ type UseCheckoutOptions = {
 
 const [CheckoutContext, useCheckoutContext] = createContextAndHook<UseCheckoutOptions>('CheckoutContext');
 
-const CheckoutProvider = ({ children, ...rest }: PropsWithChildren<UseCheckoutOptions>) => {
+const __experimental_CheckoutProvider = ({ children, ...rest }: PropsWithChildren<UseCheckoutOptions>) => {
   return <CheckoutContext.Provider value={{ value: rest }}>{children}</CheckoutContext.Provider>;
 };
 
@@ -115,6 +115,6 @@ export {
   ClerkInstanceContext,
   useClerkInstanceContext,
   useCheckoutContext,
-  CheckoutProvider,
+  __experimental_CheckoutProvider,
   useAssertWrappedByClerkProvider,
 };

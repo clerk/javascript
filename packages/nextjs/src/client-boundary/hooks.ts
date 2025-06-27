@@ -12,7 +12,7 @@ export {
   useUser,
   useReverification,
   __experimental_useCheckout,
-  CheckoutProvider,
+  __experimental_CheckoutProvider,
 } from '@clerk/clerk-react';
 
 export {

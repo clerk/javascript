@@ -11,5 +11,5 @@ export {
   useSession,
   useReverification,
   __experimental_useCheckout,
-  CheckoutProvider,
+  __experimental_CheckoutProvider,
 } from '@clerk/shared/react';

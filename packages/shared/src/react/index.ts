@@ -14,5 +14,5 @@ export {
   UserContext,
   useSessionContext,
   useUserContext,
-  CheckoutProvider,
+  __experimental_CheckoutProvider,
 } from './contexts';
