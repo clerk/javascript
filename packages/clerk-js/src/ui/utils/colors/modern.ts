@@ -34,7 +34,7 @@ export const colors = {
   },
 
   /**
-   * Makes a color transparent by a percentage using modern CSS
+   * Makes a color transparent by a percentage
    */
   makeTransparent: (color: string | undefined, percentage = 0): string | undefined => {
     if (!color || color.toString() === '') return undefined;
