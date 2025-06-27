@@ -310,8 +310,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await u.po.checkout.clickPayOrSubscribe();
       await expect(u.po.page.locator('.cl-checkout-root').getByText('The card was declined.').first()).toBeVisible();
       // It should unmount and remount the payment element
-      await u.po.checkout.waitForStipeElements({ state: 'hidden' });
-      await u.po.checkout.waitForStipeElements({ state: 'visible' });
+      await u.po.checkout.waitForStripeElements({ state: 'hidden' });
+      await u.po.checkout.waitForStripeElements({ state: 'visible' });
       await u.po.checkout.fillTestCard();
       await u.po.checkout.clickPayOrSubscribe();
       await expect(u.po.page.locator('.cl-checkout-root').getByText('Payment was successful!')).toBeVisible();
