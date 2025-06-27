@@ -1,11 +1,8 @@
 import { deprecated } from '@clerk/shared/deprecated';
 import type {
-  Autocomplete,
-  CheckAuthorizationWithCustomPermissions,
   HandleOAuthCallbackParams,
-  OrganizationCustomPermissionKey,
-  OrganizationCustomRoleKey,
   PendingSessionOptions,
+  ProtectProps as _ProtectProps,
   RedirectOptions,
 } from '@clerk/types';
 import { defineComponent } from 'vue';
@@ -107,51 +104,7 @@ export const AuthenticateWithRedirectCallback = defineComponent((props: HandleOA
   return () => null;
 });
 
-export type ProtectProps = (
-  | {
-      condition?: never;
-      role: OrganizationCustomRoleKey;
-      permission?: never;
-      feature?: never;
-      plan?: never;
-    }
-  | {
-      condition?: never;
-      role?: never;
-      feature?: never;
-      plan?: never;
-      permission: OrganizationCustomPermissionKey;
-    }
-  | {
-      condition: (has: CheckAuthorizationWithCustomPermissions) => boolean;
-      role?: never;
-      permission?: never;
-      feature?: never;
-      plan?: never;
-    }
-  | {
-      condition?: never;
-      role?: never;
-      permission?: never;
-      feature: Autocomplete<`user:${string}` | `org:${string}`>;
-      plan?: never;
-    }
-  | {
-      condition?: never;
-      role?: never;
-      permission?: never;
-      feature?: never;
-      plan: Autocomplete<`user:${string}` | `org:${string}`>;
-    }
-  | {
-      condition?: never;
-      role?: never;
-      permission?: never;
-      feature?: never;
-      plan?: never;
-    }
-) &
-  PendingSessionOptions;
+export type ProtectProps = _ProtectProps & PendingSessionOptions;
 
 export const Protect = defineComponent((props: ProtectProps, { slots }) => {
   const { isLoaded, has, userId } = useAuth({ treatPendingAsSignedOut: props.treatPendingAsSignedOut });

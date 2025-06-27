@@ -45,6 +45,7 @@ exports[`Typedoc output > should have a deliberate file structure 1`] = `
   "types/path-value.mdx",
   "types/pending-session-options.mdx",
   "types/pending-session-resource.mdx",
+  "types/protect-props.mdx",
   "types/record-to-path.mdx",
   "types/redirect-options.mdx",
   "types/reverification-config.mdx",
