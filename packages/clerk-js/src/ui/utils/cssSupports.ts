@@ -1,13 +1,25 @@
-type CSSFeature = 'relativeColorSyntax' | 'colorMix';
+type CSSFeature = 'relativeColorSyntax' | 'colorMix' | 'modernColorSupport';
 
-const CSS_FEATURE_TESTS: Record<CSSFeature, string> = {
+type CompositeOperation = 'or' | 'and';
+
+type CompositeFeatureDefinition = {
+  operation: CompositeOperation;
+  features: CSSFeature[];
+};
+
+const CSS_FEATURE_TESTS: Record<string, string> = {
   relativeColorSyntax: 'hsl(from white h s l)',
   colorMix: 'color-mix(in srgb, white, black)',
 } as const;
 
+const COMPOSITE_FEATURES: Record<string, CompositeFeatureDefinition> = {
+  modernColorSupport: {
+    operation: 'or',
+    features: ['relativeColorSyntax', 'colorMix'],
+  },
+} as const;
+
 const supportCache = new Map<CSSFeature, boolean>();
-// Cache for composite checks
-let modernColorSupportCache: boolean | undefined;
 
 /**
  * CSS feature detection
@@ -32,11 +44,14 @@ const testCSSFeature = (feature: CSSFeature, property: string = 'color'): boolea
   let isSupported = false;
 
   try {
-    const testValue = CSS_FEATURE_TESTS[feature];
-
-    const testProperty = getPropertyForFeature(feature, property);
-
-    isSupported = CSS.supports(testProperty, testValue);
+    // Check if this is a composite feature
+    if (feature in COMPOSITE_FEATURES) {
+      isSupported = evaluateCompositeFeature(feature);
+    } else {
+      const testValue = CSS_FEATURE_TESTS[feature];
+      const testProperty = getPropertyForFeature(feature, property);
+      isSupported = CSS.supports(testProperty, testValue);
+    }
   } catch {
     isSupported = false;
   }
@@ -44,6 +59,27 @@ const testCSSFeature = (feature: CSSFeature, property: string = 'color'): boolea
   supportCache.set(feature, isSupported);
 
   return isSupported;
+};
+
+/**
+ * Evaluate a composite feature based on its definition
+ */
+const evaluateCompositeFeature = (feature: string): boolean => {
+  const definition = COMPOSITE_FEATURES[feature];
+  if (!definition) {
+    return false;
+  }
+
+  const results = definition.features.map(f => testCSSFeature(f));
+
+  switch (definition.operation) {
+    case 'or':
+      return results.some(Boolean);
+    case 'and':
+      return results.every(Boolean);
+    default:
+      return false;
+  }
 };
 
 /**
@@ -70,19 +106,11 @@ export const cssSupports = {
    * Check if the browser supports modern color syntax (color-mix or relative color syntax)
    * @returns true if the browser supports modern color syntax
    */
-  hasModernColorSupport: () => {
-    if (modernColorSupportCache !== undefined) {
-      return modernColorSupportCache;
-    }
-
-    modernColorSupportCache = testCSSFeature('relativeColorSyntax') || testCSSFeature('colorMix');
-    return modernColorSupportCache;
-  },
+  hasModernColorSupport: () => testCSSFeature('modernColorSupport'),
 } as const;
 
 export const clearCSSSupportsCache = (): void => {
   supportCache.clear();
-  modernColorSupportCache = undefined;
 };
 
 export const getCachedSupports = (): Record<string, boolean> => {
