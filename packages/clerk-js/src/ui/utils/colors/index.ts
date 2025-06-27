@@ -49,7 +49,6 @@ export const colors = {
 
   /**
    * Converts a color (string or HSLA object) to a CSS string representation
-   * Uses modern CSS features when supported, falls back to legacy HSLA string conversion
    * @param color - CSS color string, HSLA object, or undefined
    * @returns CSS color string or undefined if input is undefined
    * @example
