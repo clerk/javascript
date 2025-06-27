@@ -14,7 +14,7 @@ const CLERK_API_REVERIFICATION_ERROR_CODE = 'session_reverification_required';
 async function resolveResult<T>(result: Promise<T> | T): Promise<T | ReturnType<typeof reverificationError>> {
   try {
     const r = await result;
-    if (typeof Response !== 'undefined' && r instanceof Response) {
+    if (r instanceof Response) {
       return r.json();
     }
     return r;
