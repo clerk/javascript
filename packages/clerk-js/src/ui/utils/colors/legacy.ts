@@ -307,7 +307,6 @@ const parse = (str: string): ParsedResult => {
 - any valid rgb or rgba color
 - any valid hex color
 - any valid hwb color
-- any valid CSS variable (var(--custom-property))
 - ${Object.keys(keywords).join(', ')}
 `);
   }
