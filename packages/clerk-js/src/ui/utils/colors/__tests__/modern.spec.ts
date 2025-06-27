@@ -184,14 +184,6 @@ describe('Modern CSS Colors', () => {
       expect(result).toMatch(/color-mix\(in srgb, red, white 20%\)/);
     });
 
-    it('should fall back to relative color syntax when color-mix not supported', () => {
-      mockColorMix.mockReturnValue(false);
-      mockRelativeColorSyntax.mockReturnValue(true);
-
-      const result = colors.adjustForLightness('red', 5);
-      expect(result).toMatch(/hsl\(from red h s calc\(l \+ 10%\)\)/);
-    });
-
     it('should return original color when no modern CSS support', () => {
       mockColorMix.mockReturnValue(false);
       mockRelativeColorSyntax.mockReturnValue(false);

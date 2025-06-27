@@ -101,13 +101,6 @@ export const colors = {
       return createColorMixString(color, 'white', mixPercentage);
     }
 
-    if (cssSupports.relativeColorSyntax()) {
-      // Fallback to relative color syntax
-      // Note: We can't cap at 100% or handle edge cases in CSS, but browsers will clamp automatically
-      const adjustment = lightness * MODERN_CSS_LIMITS.LIGHTNESS_MULTIPLIER;
-      return createRelativeColorString(color, 'h', 's', `calc(l + ${adjustment}%)`);
-    }
-
     return color; // Return original if no CSS support
   },
 };
