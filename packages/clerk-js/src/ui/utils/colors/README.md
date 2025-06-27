@@ -22,7 +22,7 @@ The color system uses a **progressive enhancement** approach:
 ### Modern Color Handling (`modern.ts`)
 
 - **When**: Used in browsers that support `color-mix()` or relative color syntax
-- **How**: Uses native CSS color functions for better performance
+- **How**: Uses native CSS color functions in order to support CSS variables
 - **Example**: `color-mix(in srgb, #ff0000 80%, white 20%)` for lightening
 - **Output**: Returns modern CSS color strings
 
