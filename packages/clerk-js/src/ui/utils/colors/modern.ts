@@ -105,7 +105,7 @@ export const colors = {
     if (cssSupports.relativeColorSyntax()) {
       // Fallback to relative color syntax
       // Note: We can't cap at 100% or handle edge cases in CSS, but browsers will clamp automatically
-      const adjustment = lightness * MODERN_CSS_LIMITS.LIGHTNESS_MULTIPLIER; // 2 * lightness
+      const adjustment = lightness * MODERN_CSS_LIMITS.LIGHTNESS_MULTIPLIER;
       return createRelativeColorString(color, 'h', 's', `calc(l + ${adjustment}%)`);
     }
 
