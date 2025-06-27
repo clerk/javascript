@@ -33,7 +33,7 @@ export const colors = {
 
   /**
    * Converts a color string to either a string (modern CSS) or HSLA object (legacy)
-   * Uses modern CSS features when supported, falls back to HSLA object parsing for older browsers
+   * Uses modern CSS features when supported, falls back to parsing the string into an HSLA object for older browsers
    * @param color - CSS color string (hex, rgb, hsl, etc.) or undefined
    * @returns Color string in modern browsers, HSLA object in legacy browsers, or undefined if input is undefined
    * @example
