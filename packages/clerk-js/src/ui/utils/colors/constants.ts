@@ -14,7 +14,7 @@ export const COLOR_SCALE: readonly ColorShade[] = [
 ] as const;
 
 // Shade groupings for scale generation
-export const LIGHT_SHADES: ColorShadeKey[] = ['25', '50', '100', '150', '200', '300', '400'];
+export const LIGHT_SHADES: ColorShadeKey[] = ['400', '300', '200', '150', '100', '50', '25'];
 export const DARK_SHADES: ColorShadeKey[] = ['600', '700', '750', '800', '850', '900', '950'];
 export const ALL_SHADES: ColorShadeKey[] = [...LIGHT_SHADES, '500', ...DARK_SHADES];
 

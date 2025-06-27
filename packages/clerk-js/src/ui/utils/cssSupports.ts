@@ -71,6 +71,7 @@ export const cssSupports = {
    * @returns true if the browser supports modern color syntax
    */
   hasModernColorSupport: () => {
+    return false;
     if (modernColorSupportCache !== undefined) {
       return modernColorSupportCache;
     }

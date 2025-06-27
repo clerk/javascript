@@ -285,21 +285,21 @@ describe('Themed Color Scales', () => {
 
     it('should handle color scale object', () => {
       const colorScale = {
-        '25': 'red-25',
-        '50': 'red-50',
-        '100': 'red-100',
-        '150': 'red-150',
-        '200': 'red-200',
-        '300': 'red-300',
-        '400': 'red-400',
-        '500': 'red-500',
-        '600': 'red-600',
-        '700': 'red-700',
-        '750': 'red-750',
-        '800': 'red-800',
-        '850': 'red-850',
-        '900': 'red-900',
-        '950': 'red-950',
+        '25': '#fef2f2',
+        '50': '#fee2e2',
+        '100': '#fecaca',
+        '150': '#fca5a5',
+        '200': '#f87171',
+        '300': '#ef4444',
+        '400': '#dc2626',
+        '500': '#b91c1c',
+        '600': '#991b1b',
+        '700': '#7f1d1d',
+        '750': '#6b1d1d',
+        '800': '#5a1616',
+        '850': '#4a1212',
+        '900': '#3a0e0e',
+        '950': '#2a0a0a',
       };
 
       const result = colorOptionToThemedAlphaScale(colorScale, 'bg-');
@@ -334,8 +334,8 @@ describe('Themed Color Scales', () => {
 
     it('should handle partial color scale object', () => {
       const partialScale = {
-        '500': 'custom-red',
-        '700': 'custom-dark-red',
+        '500': '#ef4444',
+        '700': '#7f1d1d',
       };
 
       const result = colorOptionToThemedLightnessScale(partialScale, 'bg-');
