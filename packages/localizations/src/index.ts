@@ -9,6 +9,7 @@ export { elGR } from './el-GR';
 export { enUS } from './en-US';
 export { enGB } from './en-GB';
 export { esES } from './es-ES';
+export { esCR } from './es-CR';
 export { esMX } from './es-MX';
 export { esUY } from './es-UY';
 export { fiFI } from './fi-FI';
