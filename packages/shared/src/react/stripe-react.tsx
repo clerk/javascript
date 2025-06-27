@@ -1,4 +1,14 @@
-// Must use `import *` or named imports for React's types
+/**
+ * Original source: https://github.com/stripe/react-stripe-js.
+ *
+ * The current version of this file is a fork of the original version.
+ * The main difference is that we have kept only the necessary parts of the file.
+ * This is because we don't need it and it's not used in the Clerk codebase.
+ *
+ * The original version of this file is licensed under the MIT license.
+ * Https://github.com/stripe/react-stripe-js/blob/master/LICENSE.
+ */
+
 import type { ElementProps, PaymentElementProps } from '@stripe/react-stripe-js';
 import type {
   Stripe,
@@ -8,8 +18,7 @@ import type {
   StripeElementType,
 } from '@stripe/stripe-js';
 import type { FunctionComponent, PropsWithChildren, ReactNode } from 'react';
-import { useState } from 'react';
-import React from 'react';
+import React, { useState } from 'react';
 
 import { useAttachEvent, usePrevious } from './use-previous';
 
@@ -135,11 +144,6 @@ const Elements: FunctionComponent<PropsWithChildren<ElementsProps>> = (({
     }
   }, [options, prevOptions, ctx.elements]);
 
-  //   // Attach react-stripe-js version to stripe.js instance
-  //   React.useEffect(() => {
-  //     registerWithStripeJs(ctx.stripe);
-  //   }, [ctx.stripe]);
-
   return <ElementsContext.Provider value={ctx}>{children}</ElementsContext.Provider>;
 }) as FunctionComponent<PropsWithChildren<ElementsProps>>;
 
@@ -148,27 +152,10 @@ const useElementsContextWithUseCase = (useCaseMessage: string): ElementsContextV
   return parseElementsContext(ctx, useCaseMessage);
 };
 
-/**
- * @docs https://stripe.com/docs/stripe-js/react#useelements-hook
- */
 const useElements = (): StripeElements | null => {
   const { elements } = useElementsContextWithUseCase('calls useElements()');
   return elements;
 };
-
-// interface ElementsConsumerProps {
-//   children: (props: ElementsContextValue) => ReactNode;
-// }
-
-// /**
-//  * @docs https://stripe.com/docs/stripe-js/react#elements-consumer
-//  */
-// const ElementsConsumer: FunctionComponent<ElementsConsumerProps> = ({ children }) => {
-//   const ctx = useElementsContextWithUseCase('mounts <ElementsConsumer>');
-
-//   // Assert to satisfy the busted React.FC return type (it should be ReactNode)
-//   return children(ctx) as ReactElement | null;
-// };
 
 const INVALID_STRIPE_ERROR =
   'Invalid prop `stripe` supplied to `Elements`. We recommend using the `loadStripe` utility from `@stripe/stripe-js`. See https://stripe.com/docs/stripe-js/react#elements-props-stripe for details.';
@@ -302,9 +289,6 @@ const isEqual = (left: unknown, right: unknown): boolean => {
   return allKeys.every(pred);
 };
 
-/**
- * @docs https://stripe.com/docs/stripe-js/react#usestripe-hook
- */
 const useStripe = (): Stripe | null => {
   const { stripe } = useElementsOrCheckoutSdkContextWithUseCase('calls useStripe()');
   return stripe;
