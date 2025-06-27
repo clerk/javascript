@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { colors } from '../legacy';
 
@@ -120,6 +120,90 @@ describe('Legacy Colors', () => {
       });
     });
 
+    describe('CSS variable inputs', () => {
+      // Mock DOM environment for testing CSS variables
+      const mockWindow = {
+        getComputedStyle: vi.fn(),
+      };
+
+      beforeEach(() => {
+        // @ts-ignore
+        global.window = mockWindow;
+        // @ts-ignore
+        global.document = { documentElement: {} };
+      });
+
+      afterEach(() => {
+        vi.clearAllMocks();
+        // @ts-ignore
+        delete global.window;
+        // @ts-ignore
+        delete global.document;
+      });
+
+      it('should resolve CSS variables with hex values', () => {
+        mockWindow.getComputedStyle.mockReturnValue({
+          getPropertyValue: vi.fn().mockReturnValue('#ff0000'),
+        });
+
+        const result = colors.toHslaColor('var(--brand)');
+        expect(result).toEqual({ h: 0, s: 100, l: 50, a: 1 });
+      });
+
+      it('should resolve CSS variables with rgb values', () => {
+        mockWindow.getComputedStyle.mockReturnValue({
+          getPropertyValue: vi.fn().mockReturnValue('rgb(255, 0, 0)'),
+        });
+
+        const result = colors.toHslaColor('var(--primary-color)');
+        expect(result).toEqual({ h: 0, s: 100, l: 50, a: 1 });
+      });
+
+      it('should resolve CSS variables with hsl values', () => {
+        mockWindow.getComputedStyle.mockReturnValue({
+          getPropertyValue: vi.fn().mockReturnValue('hsl(240, 100%, 50%)'),
+        });
+
+        const result = colors.toHslaColor('var(--accent)');
+        expect(result).toEqual({ h: 240, s: 100, l: 50, a: 1 });
+      });
+
+      it('should use fallback value when CSS variable is not defined', () => {
+        mockWindow.getComputedStyle.mockReturnValue({
+          getPropertyValue: vi.fn().mockReturnValue(''),
+        });
+
+        const result = colors.toHslaColor('var(--undefined-var, #00ff00)');
+        expect(result).toEqual({ h: 120, s: 100, l: 50, a: 1 });
+      });
+
+      it('should handle CSS variables with spaces', () => {
+        mockWindow.getComputedStyle.mockReturnValue({
+          getPropertyValue: vi.fn().mockReturnValue('hsl(180, 50%, 50%)'),
+        });
+
+        const result = colors.toHslaColor('var( --spaced-var )');
+        expect(result).toEqual({ h: 180, s: 50, l: 50, a: 1 });
+      });
+
+      it('should throw error when CSS variable cannot be resolved and no fallback', () => {
+        mockWindow.getComputedStyle.mockReturnValue({
+          getPropertyValue: vi.fn().mockReturnValue(''),
+        });
+
+        expect(() => colors.toHslaColor('var(--undefined-var)')).toThrow();
+      });
+
+      it('should work in server environment without window', () => {
+        // @ts-ignore
+        delete global.window;
+
+        expect(() => colors.toHslaColor('var(--brand, red)')).not.toThrow();
+        const result = colors.toHslaColor('var(--brand, red)');
+        expect(result).toEqual({ h: 0, s: 100, l: 50, a: 1 });
+      });
+    });
+
     describe('error cases', () => {
       it('should throw error for invalid color strings', () => {
         expect(() => colors.toHslaColor('invalid')).toThrow();
@@ -129,6 +213,10 @@ describe('Legacy Colors', () => {
 
       it('should throw error with helpful message', () => {
         expect(() => colors.toHslaColor('invalid')).toThrow(/cannot be used as a color within 'variables'/);
+      });
+
+      it('should mention CSS variables in error message', () => {
+        expect(() => colors.toHslaColor('invalid')).toThrow(/any valid CSS variable/);
       });
     });
   });

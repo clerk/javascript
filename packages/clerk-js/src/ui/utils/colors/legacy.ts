@@ -254,22 +254,60 @@ const hslaColorToHslaString = ({ h, s, l, a }: HslaColor): HslaColorString => {
   return `hsla(${h}, ${s}%, ${l}%, ${a ?? 1})` as HslaColorString;
 };
 
+const resolveCssVariable = (str: string): string | null => {
+  // Check if it's a CSS variable (starts with var()
+  const cssVarRegex = /^var\(\s*(--[^,\s)]+)\s*(?:,\s*([^)]+))?\s*\)$/;
+  const match = str.match(cssVarRegex);
+
+  if (!match) {
+    return null;
+  }
+
+  const [, variableName, fallbackValue] = match;
+
+  // Try to get the computed value from CSS custom property
+  if (typeof window !== 'undefined' && window.getComputedStyle) {
+    try {
+      const computedStyle = window.getComputedStyle(document.documentElement);
+      const resolvedValue = computedStyle.getPropertyValue(variableName).trim();
+
+      if (resolvedValue) {
+        return resolvedValue;
+      }
+    } catch {
+      // Silently fail and try fallback
+    }
+  }
+
+  // If we can't resolve the variable, try the fallback value
+  if (fallbackValue) {
+    return fallbackValue.trim();
+  }
+
+  return null;
+};
+
 const parse = (str: string): ParsedResult => {
-  const prefix = str.substr(0, 3).toLowerCase();
+  // First try to resolve CSS variables
+  const resolvedStr = resolveCssVariable(str);
+  const colorStr = resolvedStr || str;
+
+  const prefix = colorStr.substr(0, 3).toLowerCase();
   let res;
   if (prefix === 'hsl') {
-    res = { model: 'hsl', value: parseHsl(str) };
+    res = { model: 'hsl', value: parseHsl(colorStr) };
   } else if (prefix === 'hwb') {
-    res = { model: 'hwb', value: parseHwb(str) };
+    res = { model: 'hwb', value: parseHwb(colorStr) };
   } else {
-    res = { model: 'rgb', value: parseRgb(str) };
+    res = { model: 'rgb', value: parseRgb(colorStr) };
   }
   if (!res || !res.value) {
-    throw new Error(`Clerk: "${str}" cannot be used as a color within 'variables'. You can pass one of:
+    throw new Error(`Clerk: "${colorStr}" cannot be used as a color within 'variables'. You can pass one of:
 - any valid hsl or hsla color
 - any valid rgb or rgba color
 - any valid hex color
 - any valid hwb color
+- any valid CSS variable (var(--custom-property))
 - ${Object.keys(keywords).join(', ')}
 `);
   }
