@@ -2,7 +2,8 @@ import { fireEvent, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
-import { useFormControl } from '../../utils';
+import { useFormControl } from '@/ui/utils/useFormControl';
+
 import { bindCreateFixtures } from '../../utils/vitest/createFixtures';
 import { withCardStateProvider } from '../contexts';
 import { Form } from '../Form';

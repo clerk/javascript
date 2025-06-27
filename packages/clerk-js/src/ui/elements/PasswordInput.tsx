@@ -8,7 +8,7 @@ import { descriptors, Flex, Input, localizationKeys, useLocalizations } from '..
 import { usePassword } from '../hooks/usePassword';
 import { Eye, EyeSlash } from '../icons';
 import type { PropsOfComponent } from '../styledSystem';
-import { mergeRefs } from '../utils';
+import { mergeRefs } from '../utils/mergeRefs';
 import { IconButton } from './IconButton';
 
 type PasswordInputProps = PropsOfComponent<typeof Input> & {

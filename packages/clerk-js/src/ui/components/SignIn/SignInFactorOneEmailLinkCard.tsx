@@ -5,6 +5,7 @@ import React from 'react';
 
 import type { VerificationCodeCardProps } from '@/ui/elements/VerificationCodeCard';
 import { VerificationLinkCard } from '@/ui/elements/VerificationLinkCard';
+import { handleError } from '@/ui/utils/errorHandler';
 
 import { EmailLinkStatusCard } from '../../common';
 import { buildVerificationRedirectUrl } from '../../common/redirects';
@@ -13,7 +14,6 @@ import { Flow, localizationKeys, useLocalizations } from '../../customizables';
 import { useCardState } from '../../elements/contexts';
 import { useEmailLink } from '../../hooks/useEmailLink';
 import { useRouter } from '../../router/RouteContext';
-import { handleError } from '../../utils';
 
 type SignInFactorOneEmailLinkCardProps = Pick<VerificationCodeCardProps, 'onShowAlternativeMethodsClicked'> & {
   factor: EmailLinkFactor;

@@ -8,6 +8,7 @@ export {
   useSignIn,
   useSignUp,
   useUser,
+  useReverification,
 } from '@clerk/clerk-react';
 
 export * from './useSSO';

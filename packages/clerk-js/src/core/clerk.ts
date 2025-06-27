@@ -1999,11 +1999,6 @@ export class Clerk implements ClerkInterface {
   };
 
   public authenticateWithMetamask = async (props: AuthenticateWithMetamaskParams = {}): Promise<void> => {
-    if (__BUILD_DISABLE_RHC__) {
-      clerkUnsupportedEnvironmentWarning('Metamask');
-      return;
-    }
-
     await this.authenticateWithWeb3({
       ...props,
       strategy: 'web3_metamask_signature',
@@ -2011,11 +2006,6 @@ export class Clerk implements ClerkInterface {
   };
 
   public authenticateWithCoinbaseWallet = async (props: AuthenticateWithCoinbaseWalletParams = {}): Promise<void> => {
-    if (__BUILD_DISABLE_RHC__) {
-      clerkUnsupportedEnvironmentWarning('Coinbase Wallet');
-      return;
-    }
-
     await this.authenticateWithWeb3({
       ...props,
       strategy: 'web3_coinbase_wallet_signature',
@@ -2023,11 +2013,6 @@ export class Clerk implements ClerkInterface {
   };
 
   public authenticateWithOKXWallet = async (props: AuthenticateWithOKXWalletParams = {}): Promise<void> => {
-    if (__BUILD_DISABLE_RHC__) {
-      clerkUnsupportedEnvironmentWarning('OKX Wallet');
-      return;
-    }
-
     await this.authenticateWithWeb3({
       ...props,
       strategy: 'web3_okx_wallet_signature',
@@ -2043,11 +2028,6 @@ export class Clerk implements ClerkInterface {
     legalAccepted,
     secondFactorUrl,
   }: ClerkAuthenticateWithWeb3Params): Promise<void> => {
-    if (__BUILD_DISABLE_RHC__) {
-      clerkUnsupportedEnvironmentWarning('Web3');
-      return;
-    }
-
     if (!this.client || !this.environment) {
       return;
     }

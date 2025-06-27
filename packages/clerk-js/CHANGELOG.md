@@ -1,5 +1,49 @@
 # Change Log
 
+## 5.69.2
+
+### Patch Changes
+
+- Fixes stale `SignIn` object on `authenticateWithRedirect` for `saml` and `enterprise_sso` custom flows ([#6160](https://github.com/clerk/javascript/pull/6160)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  Previously, the same connection identifier would be used on every `authenticateWithRedirect` call leading to redirecting to the wrong identity provider
+
+- Fix SVG masking cross-browser compatibility in checkout complete component ([#6190](https://github.com/clerk/javascript/pull/6190)) by [@panteliselef](https://github.com/panteliselef)
+
+- Use hooks exported from `@clerk/shared` to query commerce data. ([#6159](https://github.com/clerk/javascript/pull/6159)) by [@panteliselef](https://github.com/panteliselef)
+
+- Do not display create organization form after accepting organization invitation on after-auth flow ([#6191](https://github.com/clerk/javascript/pull/6191)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`65ca8f5`](https://github.com/clerk/javascript/commit/65ca8f5f6665597fc03f9f5e0bdb99fcab3d056c), [`f1be1fe`](https://github.com/clerk/javascript/commit/f1be1fe3d575c11acd04fc7aadcdec8f89829894), [`bffb42a`](https://github.com/clerk/javascript/commit/bffb42aaf266a188b9ae7d16ace3024d468a3bd4)]:
+  - @clerk/localizations@3.17.1
+  - @clerk/types@4.62.0
+  - @clerk/shared@3.10.0
+
+## 5.69.1
+
+### Patch Changes
+
+- Add element descriptors to `<APIKeys />` component ([#6095](https://github.com/clerk/javascript/pull/6095)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fixed issues causing incorrect form fields or restricted access for users with existing sign-up tickets ([#6143](https://github.com/clerk/javascript/pull/6143)) by [@jacekradko](https://github.com/jacekradko)
+
+- Prevent organization list from displaying after creating an organization through the force organization selection flow ([#6117](https://github.com/clerk/javascript/pull/6117)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Replace expiration segmented list with dropdown and hide description field in `<APIKeys />` component ([#6153](https://github.com/clerk/javascript/pull/6153)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Add `signInMode` prop to `PricingTable` for configuring sign in behavior ([#6154](https://github.com/clerk/javascript/pull/6154)) by [@aeliox](https://github.com/aeliox)
+
+- Reworked the cache key creation logic in SignInFactorOneCodeForm.tsx not to rely on sign_in.id, which can change after host app re-renders ([#6134](https://github.com/clerk/javascript/pull/6134)) by [@jacekradko](https://github.com/jacekradko)
+
+- Bug fix: Drawers would always act as prefered-reduced-motion was turned on on the first render. ([#6149](https://github.com/clerk/javascript/pull/6149)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fixes a scenario where the session token would not immediately update after a call to `Clerk.session.touch()`. ([#6144](https://github.com/clerk/javascript/pull/6144)) by [@brkalow](https://github.com/brkalow)
+
+- Updated dependencies [[`86f32ab`](https://github.com/clerk/javascript/commit/86f32ab3e32a929504b6d6ccb005d097f005b28a), [`b495279`](https://github.com/clerk/javascript/commit/b4952796e3c7dee4ab4726de63a17b7f4265ce37), [`c3fa15d`](https://github.com/clerk/javascript/commit/c3fa15d60642b4fcbcf26e21caaca0fc60975795), [`52d5e57`](https://github.com/clerk/javascript/commit/52d5e5768d54725b4d20d028135746493e05d44c), [`15a945c`](https://github.com/clerk/javascript/commit/15a945c02a9f6bc8d2f7d1e3534217100bf45936), [`9487346`](https://github.com/clerk/javascript/commit/94873467057fd3948e4182406a928030dc073bf8), [`656851d`](https://github.com/clerk/javascript/commit/656851da4a2cd3ec987c1f815f1bc621fbf00b90), [`72629b0`](https://github.com/clerk/javascript/commit/72629b06fb1fe720fa2a61462306a786a913e9a8), [`0271fd3`](https://github.com/clerk/javascript/commit/0271fd30e1fb8fa838cf4ca56094c74404982eff)]:
+  - @clerk/localizations@3.17.0
+  - @clerk/types@4.61.0
+  - @clerk/shared@3.9.8
+
 ## 5.69.0
 
 ### Minor Changes

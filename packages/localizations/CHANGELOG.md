@@ -1,5 +1,33 @@
 # Change Log
 
+## 3.17.1
+
+### Patch Changes
+
+- Add missing Portuguese pt-BR locales for the billing elements. ([#6058](https://github.com/clerk/javascript/pull/6058)) by [@lightapps-smart-blocks](https://github.com/lightapps-smart-blocks)
+
+- Updated dependencies [[`f1be1fe`](https://github.com/clerk/javascript/commit/f1be1fe3d575c11acd04fc7aadcdec8f89829894), [`bffb42a`](https://github.com/clerk/javascript/commit/bffb42aaf266a188b9ae7d16ace3024d468a3bd4)]:
+  - @clerk/types@4.62.0
+
+## 3.17.0
+
+### Minor Changes
+
+- Add `es-CR` localizations ([#6178](https://github.com/clerk/javascript/pull/6178)) by [@LFCisneros](https://github.com/LFCisneros)
+
+### Patch Changes
+
+- Add legal consent related localization to `ja-JP` ([#5886](https://github.com/clerk/javascript/pull/5886)) by [@sdaigo](https://github.com/sdaigo)
+
+- Replace expiration segmented list with dropdown and hide description field in `<APIKeys />` component ([#6153](https://github.com/clerk/javascript/pull/6153)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fix errors in `es-CR` ([#6181](https://github.com/clerk/javascript/pull/6181)) by [@tmilewski](https://github.com/tmilewski)
+
+- Adds clickable Terms of Service and Privacy Policy links to the following localizations: `be-BY`, `bg-BG`, `cs-CZ`, `es-ES`, `it-IT`, `nl-BE`, `nl-NL`, `pt-PT`, and `tr-TR`. ([#6135](https://github.com/clerk/javascript/pull/6135)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`b495279`](https://github.com/clerk/javascript/commit/b4952796e3c7dee4ab4726de63a17b7f4265ce37), [`c3fa15d`](https://github.com/clerk/javascript/commit/c3fa15d60642b4fcbcf26e21caaca0fc60975795), [`52d5e57`](https://github.com/clerk/javascript/commit/52d5e5768d54725b4d20d028135746493e05d44c), [`15a945c`](https://github.com/clerk/javascript/commit/15a945c02a9f6bc8d2f7d1e3534217100bf45936)]:
+  - @clerk/types@4.61.0
+
 ## 3.16.5
 
 ### Patch Changes
