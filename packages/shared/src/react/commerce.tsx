@@ -12,17 +12,18 @@ import { useOrganization } from './hooks/useOrganization';
 import { useUser } from './hooks/useUser';
 import { Elements, PaymentElement, useElements, useStripe } from './stripe-react';
 
+type LoadStripeFn = typeof import('@stripe/stripe-js').loadStripe;
+
 const [StripeLibsContext, useStripeLibsContext] = createContextAndHook<{
-  loadStripe: typeof import('@stripe/stripe-js').loadStripe;
+  loadStripe: LoadStripeFn;
 } | null>('StripeLibsContext');
 
 const StripeLibsProvider = ({ children }: PropsWithChildren) => {
   const clerk = useClerk();
-  const { isLoaded } = useUser();
   const { data: stripeClerkLibs } = useSWR(
-    isLoaded ? 'clerk-stripe-sdk' : null,
+    'clerk-stripe-sdk',
     async () => {
-      const [loadStripe] = await Promise.all([clerk.__internal_loadStripeJs()]);
+      const loadStripe = (await clerk.__internal_loadStripeJs()) as LoadStripeFn;
       return { loadStripe };
     },
     {
