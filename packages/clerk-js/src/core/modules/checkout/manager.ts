@@ -1,25 +1,7 @@
-import type { CommerceCheckoutResource, CommerceSubscriptionPlanPeriod, ConfirmCheckoutParams } from '@clerk/types';
-
-import type { ClerkAPIResponseError } from '../..';
-import type { Clerk } from '../clerk';
+import type { ClerkAPIResponseError } from '@clerk/shared/error';
+import type { CommerceCheckoutResource } from '@clerk/types';
 
 type CheckoutStatus = 'awaiting_initialization' | 'awaiting_confirmation' | 'completed';
-
-export type CheckoutOptions = {
-  for?: 'organization';
-  planPeriod: CommerceSubscriptionPlanPeriod;
-  planId: string;
-};
-
-export type CheckoutInstance = {
-  confirm: (params: ConfirmCheckoutParams) => Promise<CommerceCheckoutResource>;
-  start: () => Promise<CommerceCheckoutResource>;
-  clear: () => void;
-  finalize: (params: { redirectUrl?: string }) => void;
-  subscribe: (listener: (state: CheckoutCacheState) => void) => () => void;
-  getState: () => CheckoutCacheState;
-};
-
 type CheckoutKey = string & { readonly __tag: 'CheckoutKey' };
 
 type CheckoutCacheState = Readonly<{
@@ -92,12 +74,14 @@ function deriveCheckoutState(baseState: Omit<CheckoutCacheState, 'fetchStatus' |
   };
 }
 
-const defaultCacheState: CheckoutCacheState = deriveCheckoutState({
-  isStarting: false,
-  isConfirming: false,
-  error: null,
-  checkout: null,
-});
+const defaultCacheState: CheckoutCacheState = Object.freeze(
+  deriveCheckoutState({
+    isStarting: false,
+    isConfirming: false,
+    error: null,
+    checkout: null,
+  }),
+);
 
 /**
  * Creates a checkout manager for handling checkout operations and state management.
@@ -161,7 +145,11 @@ function createCheckoutManager(cacheKey: CheckoutKey) {
       const operationPromise = (async () => {
         try {
           // Mark operation as in progress and clear any previous errors
-          updateCacheState({ [isRunningField]: true, error: null });
+          updateCacheState({
+            [isRunningField]: true,
+            error: null,
+            ...(operationType === 'start' ? { checkout: null } : {}),
+          });
 
           // Execute the checkout operation
           const result = await operationFn();
@@ -193,78 +181,4 @@ function createCheckoutManager(cacheKey: CheckoutKey) {
   };
 }
 
-/**
- * Generate cache key for checkout instance
- */
-function cacheKey(options: { userId: string; orgId?: string; planId: string; planPeriod: string }): CheckoutKey {
-  const { userId, orgId, planId, planPeriod } = options;
-  return `${userId}-${orgId || 'user'}-${planId}-${planPeriod}` as CheckoutKey;
-}
-
-export type CheckoutFunction = (options: CheckoutOptions) => CheckoutInstance;
-
-/**
- * Create a checkout instance with the given options
- */
-function createCheckoutInstance(clerk: Clerk, options: CheckoutOptions): CheckoutInstance {
-  const { for: forOrganization, planId, planPeriod } = options;
-
-  if (!clerk.user) {
-    throw new Error('Clerk: User is not authenticated');
-  }
-
-  if (forOrganization === 'organization' && !clerk.organization) {
-    throw new Error('Clerk: Use `setActive` to set the organization');
-  }
-
-  const checkoutKey = cacheKey({
-    userId: clerk.user.id,
-    orgId: forOrganization === 'organization' ? clerk.organization?.id : undefined,
-    planId,
-    planPeriod,
-  });
-
-  const manager = createCheckoutManager(checkoutKey);
-
-  const start = async (): Promise<CommerceCheckoutResource> => {
-    return manager.executeOperation('start', async () => {
-      const result = await clerk.billing?.startCheckout({
-        ...(forOrganization === 'organization' ? { orgId: clerk.organization?.id } : {}),
-        planId,
-        planPeriod,
-      });
-      return result;
-    });
-  };
-
-  const confirm = async (params: ConfirmCheckoutParams): Promise<CommerceCheckoutResource> => {
-    return manager.executeOperation('confirm', async () => {
-      const checkout = manager.getCacheState().checkout;
-      if (!checkout) {
-        throw new Error('Clerk: Call `start` before `confirm`');
-      }
-      return checkout.confirm(params);
-    });
-  };
-
-  const finalize = ({ redirectUrl }: { redirectUrl?: string }) => {
-    void clerk.setActive({ session: clerk.session?.id, redirectUrl });
-  };
-
-  const clear = () => manager.clearCheckout();
-
-  const subscribe = (listener: (state: CheckoutCacheState) => void) => {
-    return manager.subscribe(listener);
-  };
-
-  return {
-    start,
-    confirm,
-    finalize,
-    clear,
-    subscribe,
-    getState: manager.getCacheState,
-  };
-}
-
-export { createCheckoutInstance };
+export { createCheckoutManager, type CheckoutCacheState, type CheckoutKey };

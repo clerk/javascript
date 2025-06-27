@@ -136,8 +136,8 @@ import type { FapiClient, FapiRequestCallback } from './fapiClient';
 import { createFapiClient } from './fapiClient';
 import { createClientFromJwt } from './jwt-client';
 import { APIKeys } from './modules/apiKeys';
-import type { CheckoutFunction, CheckoutInstance, CheckoutOptions } from './modules/checkout';
-import { createCheckoutInstance } from './modules/checkout';
+import type { CheckoutFunction, CheckoutInstance, CheckoutOptions } from './modules/checkout/instance';
+import { createCheckoutInstance } from './modules/checkout/instance';
 import { CommerceBilling } from './modules/commerce';
 import {
   BaseResource,
