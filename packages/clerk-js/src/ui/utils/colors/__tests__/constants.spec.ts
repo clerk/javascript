@@ -33,7 +33,7 @@ describe('Color Constants', () => {
 
   describe('Shade groupings', () => {
     it('should have correct light shades', () => {
-      expect(LIGHT_SHADES).toEqual(['25', '50', '100', '150', '200', '300', '400']);
+      expect(LIGHT_SHADES).toEqual(['400', '300', '200', '150', '100', '50', '25']);
     });
 
     it('should have correct dark shades', () => {
