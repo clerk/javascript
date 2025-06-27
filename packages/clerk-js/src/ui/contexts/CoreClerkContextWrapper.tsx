@@ -1,4 +1,5 @@
 import {
+  CheckoutProvider,
   ClerkInstanceContext,
   ClientContext,
   OrganizationProvider,
@@ -54,7 +55,14 @@ export function CoreClerkContextWrapper(props: CoreClerkContextWrapperProps): JS
             {...organizationCtx.value}
             swrConfig={props.swrConfig}
           >
-            <UserContext.Provider value={userCtx}>{props.children}</UserContext.Provider>
+            <UserContext.Provider value={userCtx}>
+              <CheckoutProvider
+                // @ts-expect-error - value is not used
+                value={undefined}
+              >
+                {props.children}
+              </CheckoutProvider>
+            </UserContext.Provider>
           </OrganizationProvider>
         </SessionContext.Provider>
       </ClientContext.Provider>

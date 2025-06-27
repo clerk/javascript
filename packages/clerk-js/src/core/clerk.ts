@@ -136,6 +136,8 @@ import type { FapiClient, FapiRequestCallback } from './fapiClient';
 import { createFapiClient } from './fapiClient';
 import { createClientFromJwt } from './jwt-client';
 import { APIKeys } from './modules/apiKeys';
+import type { CheckoutFunction } from './modules/checkout';
+import { createCheckoutInstance } from './modules/checkout';
 import { CommerceBilling } from './modules/commerce';
 import {
   BaseResource,
@@ -195,6 +197,7 @@ export class Clerk implements ClerkInterface {
   };
   private static _billing: CommerceBillingNamespace;
   private static _apiKeys: APIKeysNamespace;
+  private _checkout: CheckoutFunction | undefined;
 
   public client: ClientResource | undefined;
   public session: SignedInSessionResource | null | undefined;
@@ -335,6 +338,13 @@ export class Clerk implements ClerkInterface {
       Clerk._apiKeys = new APIKeys();
     }
     return Clerk._apiKeys;
+  }
+
+  get checkout() {
+    if (!this._checkout) {
+      this._checkout = params => createCheckoutInstance(this, params);
+    }
+    return this._checkout;
   }
 
   public __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K] {
@@ -643,6 +653,11 @@ export class Clerk implements ClerkInterface {
     return this.#componentControls
       .ensureMounted({ preloadHint: 'BlankCaptchaModal' })
       .then(controls => controls.closeModal('blankCaptcha'));
+  };
+
+  public __internal_loadStripeJs = async () => {
+    const { loadStripe } = await import('@stripe/stripe-js');
+    return loadStripe;
   };
 
   public openSignUp = (props?: SignUpProps): void => {
@@ -1120,6 +1135,7 @@ export class Clerk implements ClerkInterface {
    */
   public setActive = async ({ session, organization, beforeEmit, redirectUrl }: SetActiveParams): Promise<void> => {
     this.__internal_setActiveInProgress = true;
+    console.log('session provided', session, redirectUrl);
     try {
       if (!this.client) {
         throw new Error('setActive is being called before the client is loaded. Wait for init.');
@@ -1146,6 +1162,7 @@ export class Clerk implements ClerkInterface {
       }
 
       let newSession = session === undefined ? this.session : session;
+      console.log('newSession', newSession?.id);
 
       // At this point, the `session` variable should contain either an `SignedInSessionResource`
       // ,`null` or `undefined`.

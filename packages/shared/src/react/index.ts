@@ -14,4 +14,7 @@ export {
   UserContext,
   useSessionContext,
   useUserContext,
+  CheckoutProvider,
 } from './contexts';
+
+export * from './commerce';
