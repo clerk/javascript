@@ -168,7 +168,10 @@ const InvitationPreview = withCardStateProvider(
     };
 
     if (status === 'accepted') {
-      if (acceptedOrganization?.id && activeOrganization?.id === acceptedOrganization.id) {
+      if (
+        invitation.publicOrganizationData.id === activeOrganization?.id ||
+        (acceptedOrganization?.id && activeOrganization?.id === acceptedOrganization.id)
+      ) {
         // Hide the Accepted invitation that looks like a membership when the organization is already active
         return null;
       }
