@@ -1,12 +1,12 @@
 import {
-  __experimental_PaymentElementForm as PaymentElementForm,
-  __experimental_PaymentElementRoot as PaymentElementRoot,
+  __experimental_PaymentElement as PaymentElement,
+  __experimental_PaymentElementProvider as PaymentElementProvider,
   __experimental_usePaymentElement as usePaymentElement,
   createContextAndHook,
 } from '@clerk/shared/react';
 import type { CommerceCheckoutResource } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';
 import { useCardState } from '@/ui/elements/contexts';
@@ -20,30 +20,30 @@ import { useSubscriberTypeContext, useSubscriberTypeLocalizationRoot } from '../
 import { descriptors, Flex, localizationKeys, Spinner, useAppearance, useLocalizations } from '../../customizables';
 import type { LocalizationKey } from '../../localization';
 
-const useStipeAppearance = () => {
-  const { colors, fontWeights, fontSizes, radii, space } = useAppearance().parsedInternalTheme;
-  const elementsAppearance = {
-    // variables: {
-    colorPrimary: normalizeColorString(colors.$primary500),
-    colorBackground: normalizeColorString(colors.$colorInputBackground),
-    colorText: normalizeColorString(colors.$colorText),
-    colorTextSecondary: normalizeColorString(colors.$colorTextSecondary),
-    colorSuccess: normalizeColorString(colors.$success500),
-    colorDanger: normalizeColorString(colors.$danger500),
-    colorWarning: normalizeColorString(colors.$warning500),
-    fontWeightNormal: fontWeights.$normal.toString(),
-    fontWeightMedium: fontWeights.$medium.toString(),
-    fontWeightBold: fontWeights.$bold.toString(),
-    fontSizeXl: fontSizes.$xl,
-    fontSizeLg: fontSizes.$lg,
-    fontSizeSm: fontSizes.$md,
-    fontSizeXs: fontSizes.$sm,
-    borderRadius: radii.$md,
-    spacingUnit: space.$1,
-    // },
-  };
+const useStripeAppearance = () => {
+  const theme = useAppearance().parsedInternalTheme;
 
-  return elementsAppearance;
+  return useMemo(() => {
+    const { colors, fontWeights, fontSizes, radii, space } = theme;
+    return {
+      colorPrimary: normalizeColorString(colors.$primary500),
+      colorBackground: normalizeColorString(colors.$colorInputBackground),
+      colorText: normalizeColorString(colors.$colorText),
+      colorTextSecondary: normalizeColorString(colors.$colorTextSecondary),
+      colorSuccess: normalizeColorString(colors.$success500),
+      colorDanger: normalizeColorString(colors.$danger500),
+      colorWarning: normalizeColorString(colors.$warning500),
+      fontWeightNormal: fontWeights.$normal.toString(),
+      fontWeightMedium: fontWeights.$medium.toString(),
+      fontWeightBold: fontWeights.$bold.toString(),
+      fontSizeXl: fontSizes.$xl,
+      fontSizeLg: fontSizes.$lg,
+      fontSizeSm: fontSizes.$md,
+      fontSizeXs: fontSizes.$sm,
+      borderRadius: radii.$md,
+      spacingUnit: space.$1,
+    };
+  }, [theme]);
 };
 
 type AddPaymentSourceProps = {
@@ -70,7 +70,8 @@ const AddPaymentSourceRoot = ({ children, checkout, ...rest }: PropsWithChildren
   const [headerTitle, setHeaderTitle] = useState<LocalizationKey | undefined>(undefined);
   const [headerSubtitle, setHeaderSubtitle] = useState<LocalizationKey | undefined>(undefined);
   const [submitLabel, setSubmitLabel] = useState<LocalizationKey | undefined>(undefined);
-  const stripeAppearance = useStipeAppearance();
+  const stripeAppearance = useStripeAppearance();
+  const [count, setCount] = useState(0);
 
   return (
     <AddPaymentSourceContext.Provider
@@ -87,7 +88,8 @@ const AddPaymentSourceRoot = ({ children, checkout, ...rest }: PropsWithChildren
         },
       }}
     >
-      <PaymentElementRoot
+      <button onClick={() => setCount(prev => prev + 1)}>Click me {count}</button>
+      <PaymentElementProvider
         checkout={checkout}
         for={subscriberType}
         stripeAppearance={stripeAppearance}
@@ -100,7 +102,7 @@ const AddPaymentSourceRoot = ({ children, checkout, ...rest }: PropsWithChildren
         )}
       >
         {children}
-      </PaymentElementRoot>
+      </PaymentElementProvider>
     </AddPaymentSourceContext.Provider>
   );
 };
@@ -228,7 +230,7 @@ const AddPaymentSourceForm = ({ children }: PropsWithChildren) => {
         })}
       >
         {children}
-        <PaymentElementForm />
+        <PaymentElement />
         <Card.Alert>{card.error}</Card.Alert>
         <FormButtons
           isDisabled={!isFormReady}

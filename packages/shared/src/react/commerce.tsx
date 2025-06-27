@@ -10,7 +10,7 @@ import { createContextAndHook } from './hooks/createContextAndHook';
 import { useClerk } from './hooks/useClerk';
 import { useOrganization } from './hooks/useOrganization';
 import { useUser } from './hooks/useUser';
-import { Elements, PaymentElement, useElements, useStripe } from './stripe-react';
+import { Elements, PaymentElement as StripePaymentElement, useElements, useStripe } from './stripe-react';
 
 type LoadStripeFn = typeof import('@stripe/stripe-js').loadStripe;
 
@@ -53,7 +53,6 @@ const useInternalEnvironment = () => {
 const usePaymentSourceUtils = (forResource: 'org' | 'user') => {
   const { organization } = useOrganization();
   const { user } = useUser();
-  // const subscriberType = useSubscriberTypeContext();
   const resource = forResource === 'org' ? organization : user;
   const stripeClerkLibs = useStripeLibsContext();
 
@@ -137,37 +136,33 @@ const [PaymentElementContext, usePaymentElementContext] = createContextAndHook<
   }
 >('PaymentElementContext');
 
-const [StipeUtilsContext, useStipeUtilsContext] = createContextAndHook<{
+const [StripeUtilsContext, useStripeUtilsContext] = createContextAndHook<{
   stripe: Stripe | undefined | null;
   elements: StripeElements | undefined | null;
-}>('StipeUtilsContext');
+}>('StripeUtilsContext');
 
 const ValidateStripeUtils = ({ children }: PropsWithChildren) => {
   const stripe = useStripe();
   const elements = useElements();
 
-  return <StipeUtilsContext.Provider value={{ value: { stripe, elements } }}>{children}</StipeUtilsContext.Provider>;
+  return <StripeUtilsContext.Provider value={{ value: { stripe, elements } }}>{children}</StripeUtilsContext.Provider>;
 };
 
 const DummyStripeUtils = ({ children }: PropsWithChildren) => {
-  return (
-    <StipeUtilsContext.Provider value={{ value: { stripe: undefined, elements: undefined } }}>
-      {children}
-    </StipeUtilsContext.Provider>
-  );
+  return <StripeUtilsContext.Provider value={{ value: {} as any }}>{children}</StripeUtilsContext.Provider>;
 };
 
-const PaymentElementRoot = (
-  props: PropsWithChildren<{
-    checkout?: CommerceCheckoutResource;
-    // TODO(@COMMERCE): What can we do to remove this ?
-    stripeAppearance?: internalStripeAppearance;
-    // TODO(@COMMERCE): What can we do to remove this ?
-    for: 'org' | 'user';
-    // TODO(@COMMERCE): What can we do to remove this ?
-    paymentDescription: string;
-  }>,
-) => {
+type PaymentElementConfig = {
+  checkout?: CommerceCheckoutResource;
+  // TODO(@COMMERCE): What can we do to remove this ?
+  stripeAppearance?: internalStripeAppearance;
+  // TODO(@COMMERCE): What can we do to remove this ?
+  for: 'org' | 'user';
+  // TODO(@COMMERCE): What can we do to remove this ?
+  paymentDescription: string;
+};
+
+const PaymentElementProvider = (props: PropsWithChildren<PaymentElementConfig>) => {
   return (
     <StripeLibsProvider>
       <PaymentElementInternalRoot {...props} />
@@ -175,17 +170,7 @@ const PaymentElementRoot = (
   );
 };
 
-const PaymentElementInternalRoot = (
-  props: PropsWithChildren<{
-    checkout?: CommerceCheckoutResource;
-    // TODO(@COMMERCE): What can we do to remove this ?
-    stripeAppearance?: internalStripeAppearance;
-    // TODO(@COMMERCE): What can we do to remove this ?
-    for: 'org' | 'user';
-    // TODO(@COMMERCE): What can we do to remove this ?
-    paymentDescription: string;
-  }>,
-) => {
+const PaymentElementInternalRoot = (props: PropsWithChildren<PaymentElementConfig>) => {
   const utils = usePaymentSourceUtils(props.for);
   const { stripe, externalClientSecret } = utils;
   const [isPaymentElementReady, setIsPaymentElementReady] = useState(false);
@@ -204,7 +189,7 @@ const PaymentElementInternalRoot = (
         }}
       >
         <Elements
-          // This key is used to reset the payment intent, since Stripe doesn't not provide a way to reset the payment intent.
+          // This key is used to reset the payment intent, since Stripe doesn't provide a way to reset the payment intent.
           key={externalClientSecret}
           stripe={stripe}
           options={{
@@ -238,7 +223,7 @@ const PaymentElementInternalRoot = (
   );
 };
 
-const PaymentElementForm = ({ fallback }: { fallback?: ReactNode }) => {
+const PaymentElement = ({ fallback }: { fallback?: ReactNode }) => {
   const { setIsPaymentElementReady, paymentMethodOrder, checkout, stripe, externalClientSecret, paymentDescription } =
     usePaymentElementContext();
   const environment = useInternalEnvironment();
@@ -248,7 +233,7 @@ const PaymentElementForm = ({ fallback }: { fallback?: ReactNode }) => {
   }
 
   return (
-    <PaymentElement
+    <StripePaymentElement
       fallback={fallback}
       onReady={() => setIsPaymentElementReady(true)}
       options={{
@@ -277,7 +262,7 @@ const PaymentElementForm = ({ fallback }: { fallback?: ReactNode }) => {
 
 const usePaymentElement = () => {
   const { isPaymentElementReady, initializePaymentSource } = usePaymentElementContext();
-  const { stripe, elements } = useStipeUtilsContext();
+  const { stripe, elements } = useStripeUtilsContext();
   const { stripe: stripeFromContext, externalClientSecret } = usePaymentElementContext();
 
   const submit = useCallback(async () => {
@@ -292,12 +277,12 @@ const usePaymentElement = () => {
       },
       redirect: 'if_required',
     });
-    if (error || !setupIntent?.payment_method) {
-      return { data: undefined, error }; // just return, since stripe will handle the error
+    if (error) {
+      return { data: null, error } as const;
     }
     return {
       data: { gateway: 'stripe', paymentToken: setupIntent.payment_method as string },
-      error: undefined,
+      error: null,
     } as const;
   }, [stripe, elements]);
 
@@ -318,7 +303,7 @@ const usePaymentElement = () => {
 };
 
 export {
-  PaymentElementRoot as __experimental_PaymentElementRoot,
-  PaymentElementForm as __experimental_PaymentElementForm,
+  PaymentElementProvider as __experimental_PaymentElementProvider,
+  PaymentElement as __experimental_PaymentElement,
   usePaymentElement as __experimental_usePaymentElement,
 };

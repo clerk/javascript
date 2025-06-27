@@ -1125,7 +1125,6 @@ export class Clerk implements ClerkInterface {
    */
   public setActive = async ({ session, organization, beforeEmit, redirectUrl }: SetActiveParams): Promise<void> => {
     this.__internal_setActiveInProgress = true;
-    console.log('session provided', session, redirectUrl);
     try {
       if (!this.client) {
         throw new Error('setActive is being called before the client is loaded. Wait for init.');
@@ -1152,7 +1151,6 @@ export class Clerk implements ClerkInterface {
       }
 
       let newSession = session === undefined ? this.session : session;
-      console.log('newSession', newSession?.id);
 
       // At this point, the `session` variable should contain either an `SignedInSessionResource`
       // ,`null` or `undefined`.

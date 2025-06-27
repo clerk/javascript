@@ -348,7 +348,6 @@ const createElementComponent = (type: StripeElementType, isServer: boolean): Fun
   }) => {
     const ctx = useElementsOrCheckoutSdkContextWithUseCase(`mounts <${displayName}>`);
     const elements = 'elements' in ctx ? ctx.elements : null;
-    const checkoutSdk = 'checkoutSdk' in ctx ? ctx.checkoutSdk : null;
     const [element, setElement] = React.useState<StripeElement | null>(null);
     const elementRef = React.useRef<StripeElement | null>(null);
     const domNode = React.useRef<HTMLDivElement | null>(null);
@@ -372,25 +371,17 @@ const createElementComponent = (type: StripeElementType, isServer: boolean): Fun
 
     let readyCallback: UnknownCallback | undefined;
     if (onReady) {
-      if (type === 'expressCheckout') {
-        // Passes through the event, which includes visible PM types
-        readyCallback = () => {
-          setReady(true);
-          onReady();
-        };
-      } else {
-        // For other Elements, pass through the Element itself.
-        readyCallback = () => {
-          setReady(true);
-          onReady(element);
-        };
-      }
+      // For other Elements, pass through the Element itself.
+      readyCallback = () => {
+        setReady(true);
+        onReady(element);
+      };
     }
 
     useAttachEvent(element, 'ready', readyCallback);
 
     React.useLayoutEffect(() => {
-      if (elementRef.current === null && domNode.current !== null && (elements || checkoutSdk)) {
+      if (elementRef.current === null && domNode.current !== null && elements) {
         let newElement: StripeElement | null = null;
         if (elements) {
           newElement = elements.create(type as any, options);
@@ -405,7 +396,7 @@ const createElementComponent = (type: StripeElementType, isServer: boolean): Fun
           newElement.mount(domNode.current);
         }
       }
-    }, [elements, checkoutSdk, options]);
+    }, [elements, options]);
 
     const prevOptions = usePrevious(options);
     React.useEffect(() => {
