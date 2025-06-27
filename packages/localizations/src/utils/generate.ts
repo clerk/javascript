@@ -20,6 +20,7 @@ import { elGR } from '../el-GR';
 import { enGB } from '../en-GB';
 import { enUS } from '../en-US';
 import { esES } from '../es-ES';
+import { esCR } from '../es-CR';
 import { esMX } from '../es-MX';
 import { fiFI } from '../fi-FI';
 import { frFR } from '../fr-FR';
