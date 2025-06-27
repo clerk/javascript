@@ -32,6 +32,8 @@ function applyScalePrefix<Prefix extends string>(
   return result as Record<`${Prefix}${keyof ColorScale<string>}`, string>;
 }
 
+const HAS_MODERN_COLOR_SUPPORT = cssSupports.hasModernColorSupport();
+
 /**
  * Modern CSS alpha scale generation
  */
@@ -154,7 +156,7 @@ export function generateAlphaScale(
   const { baseColor, userScale } = processed;
 
   // Generate scale using modern or legacy implementation
-  const generated = cssSupports.hasModernColorSupport()
+  const generated = HAS_MODERN_COLOR_SUPPORT
     ? generateModernAlphaScale(baseColor)
     : generateLegacyAlphaScale(baseColor);
 
@@ -178,7 +180,7 @@ export function generateLightnessScale(
   const { baseColor, userScale } = processed;
 
   // Generate scale using modern or legacy implementation
-  const generated = cssSupports.hasModernColorSupport()
+  const generated = HAS_MODERN_COLOR_SUPPORT
     ? generateModernLightnessScale(baseColor)
     : generateLegacyLightnessScale(baseColor);
 
