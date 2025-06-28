@@ -6,7 +6,6 @@ import { LineItems } from '@/ui/elements/LineItems';
 
 import { useCheckoutContext } from '../../contexts';
 import { Box, descriptors, Flex, localizationKeys, useLocalizations } from '../../customizables';
-// TODO(@COMMERCE): Is this causing bundle size  issues ?
 import { EmailForm } from '../UserProfile/EmailForm';
 import { useCheckoutContextRoot } from './CheckoutPage';
 
@@ -101,7 +100,6 @@ export const AddEmailForm = () => {
           padding: t.space.$4,
         })}
       >
-        {/* TODO(@COMMERCE): How does ths operate for orgs ? */}
         <EmailForm
           title={localizationKeys('commerce.checkout.emailForm.title')}
           subtitle={localizationKeys('commerce.checkout.emailForm.subtitle')}
