@@ -9,22 +9,23 @@ Every time a PR is merged into `main`, an automated canary release will happen. 
 
 ## Stable releases
 
-A stable release will be triggered every time the "ci(repo): Version packages" PR is merged. Once versioning and publishing is done, the `clerk/javascript` repo will dispatch a workflow event, notifying other related Clerk repos of the new releases.
+A stable release will be triggered every time the "ci(repo): Version packages" PR is merged. Once the PR is merged, the following actions will take place:
 
-Actions that will be triggered:
+- All SDKs will be published to `npm`, except for those found in the excluded packages list in `.changeset/config.json`, or any packages with `private: true` set in their `package.json` file.
+- A workflow dispatch will be triggered to update the `clerkjs-proxy` worker in `clerk/sdk-infra-workers`.
+- A workflow dispatch will be triggered to update the `@clerk/nextjs` version in `clerk/dashboard`.
+- A workflow dispatch will be triggered to update the generated docs in `clerk/generated-typedoc`.
 
-- `clerk/cloudflare-workers`: The latest clerk-js versions in `clerkjs-proxy/wrangler.toml` will be updated a PR will open. Follow the instructions in the PR to manually release a new `clerkjs-proxy` worker.
+For details regarding the package versioning/publishing process, refer to the [Publishing docs](https://github.com/clerk/javascript/blob/main/docs/PUBLISH.md).
 
-For more details, refer to the [Publishing docs](https://github.com/clerk/javascript/blob/main/docs/PUBLISH.md).
+Refer to the docs in the (private) `clerk/sdk-infra-workers` repo for more details about the `clerkjs-proxy` worker release process.
 
 ## Automated canary releases
 
-A canary release will be triggered every time PR is merged into `main`. Once versioning and publishing is done, the `clerk/javascript` repo will dispatch a workflow event, notifying other related Clerk repos of the new releases.
+A canary release will be triggered every time PR is merged into `main`. Every commit merged into main will trigger the fol lowing actions:
 
-Actions that will be triggered:
-
-- `clerk/cloudflare-workers`: The latest clerk-js versions in `clerkjs-proxy/wrangler.toml` will be updated and directly committed to `main`. A second workflow will perform a canary release of the `clerkjs-proxy` worker.
-- `clerk/accounts`: A new Accounts deployment will take place, using the most recent canary `@clerk/nextjs` version. This change will not be committed to `main`.
+- A workflow dispatch will be triggered to update the `clerkjs-proxy` worker in `clerk/sdk-infra-workers`.
+- The canary Accounts project will be deployed using the most recent `@canary` version of `@clerk/nextjs`. This happens for testing purposes.
 
 For more details about canary releases, refer to the [Publishing docs](https://github.com/clerk/javascript/blob/main/docs/PUBLISH.md).
 
