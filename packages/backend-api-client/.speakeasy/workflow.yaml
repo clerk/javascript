@@ -1,0 +1,18 @@
+workflowVersion: 1.0.0
+speakeasyVersion: latest
+sources:
+    Clerk Backend API:
+        inputs:
+            - location: https://raw.githubusercontent.com/clerk/openapi-specs/refs/heads/main/bapi/2025-03-12.yml
+        registry:
+            location: registry.speakeasyapi.dev/clerk/clerk/clerk-backend-api
+targets:
+    clerk:
+        target: typescript
+        source: Clerk Backend API
+        codeSamples:
+            registry:
+                location: registry.speakeasyapi.dev/clerk/clerk/clerk-backend-api-typescript-code-samples
+            labelOverride:
+                fixedValue: Typescript (SDK)
+            blocking: false

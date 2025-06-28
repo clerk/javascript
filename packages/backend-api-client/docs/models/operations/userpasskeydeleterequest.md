@@ -1,0 +1,19 @@
+# UserPasskeyDeleteRequest
+
+## Example Usage
+
+```typescript
+import { UserPasskeyDeleteRequest } from "@clerk/backend-api-client/models/operations";
+
+let value: UserPasskeyDeleteRequest = {
+  userId: "<id>",
+  passkeyIdentificationId: "<id>",
+};
+```
+
+## Fields
+
+| Field                                             | Type                                              | Required                                          | Description                                       |
+| ------------------------------------------------- | ------------------------------------------------- | ------------------------------------------------- | ------------------------------------------------- |
+| `userId`                                          | *string*                                          | :heavy_check_mark:                                | The ID of the user that owns the passkey identity |
+| `passkeyIdentificationId`                         | *string*                                          | :heavy_check_mark:                                | The ID of the passkey identity to be deleted      |

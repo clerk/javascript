@@ -1,0 +1,24 @@
+# CreateJWTTemplateRequestBody
+
+## Example Usage
+
+```typescript
+import { CreateJWTTemplateRequestBody } from "@clerk/backend-api-client/models/operations";
+
+let value: CreateJWTTemplateRequestBody = {
+  name: "<value>",
+  claims: {},
+};
+```
+
+## Fields
+
+| Field                                                                                                | Type                                                                                                 | Required                                                                                             | Description                                                                                          |
+| ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `name`                                                                                               | *string*                                                                                             | :heavy_check_mark:                                                                                   | JWT template name                                                                                    |
+| `claims`                                                                                             | [operations.Claims](../../models/operations/claims.md)                                               | :heavy_check_mark:                                                                                   | JWT template claims in JSON format                                                                   |
+| `lifetime`                                                                                           | *number*                                                                                             | :heavy_minus_sign:                                                                                   | JWT token lifetime                                                                                   |
+| `allowedClockSkew`                                                                                   | *number*                                                                                             | :heavy_minus_sign:                                                                                   | JWT token allowed clock skew                                                                         |
+| `customSigningKey`                                                                                   | *boolean*                                                                                            | :heavy_minus_sign:                                                                                   | Whether a custom signing key/algorithm is also provided for this template                            |
+| `signingAlgorithm`                                                                                   | *string*                                                                                             | :heavy_minus_sign:                                                                                   | The custom signing algorithm to use when minting JWTs. Required if `custom_signing_key` is `true`.   |
+| `signingKey`                                                                                         | *string*                                                                                             | :heavy_minus_sign:                                                                                   | The custom signing private key to use when minting JWTs. Required if `custom_signing_key` is `true`. |
