@@ -46,7 +46,7 @@ export const getPaymentSources = async (params: GetPaymentSourcesParams) => {
     search: convertPageToOffsetSearchParams(rest),
   }).then(res => {
     const { data: paymentSources, total_count } =
-      res?.response as unknown as ClerkPaginatedResponse<CommercePaymentSourceJSON>;
+      res?.response as unknown as ClerkPaginatedResponse<CommercePaymentSourceJSON>; // oxlint-disable-line no-unsafe-optional-chaining
     return {
       total_count,
       data: paymentSources.map(paymentSource => new CommercePaymentSource(paymentSource)),

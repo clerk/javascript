@@ -48,10 +48,12 @@ class ClerkProtect extends BaseClerkControlElement {
       !state.userId || ((role || permission || feature || plan) && !has?.({ role, permission, feature, plan } as Parameters<CheckAuthorization>[0]));
 
     if (this.defaultSlot) {
+      // oxlint-disable-next-line no-unused-expressions
       isUnauthorized ? this.defaultSlot.setAttribute('hidden', '') : this.defaultSlot.removeAttribute('hidden');
     }
 
     if (this.fallbackSlot) {
+      // oxlint-disable-next-line no-unused-expressions
       isUnauthorized ? this.fallbackSlot.removeAttribute('hidden') : this.fallbackSlot.setAttribute('hidden', '');
     }
   }

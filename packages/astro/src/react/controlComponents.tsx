@@ -49,24 +49,24 @@ const useSafeIsLoaded = () => {
   return isLoaded;
 };
 
-export const ClerkLoaded = ({ children }: React.PropsWithChildren): JSX.Element | null => {
+export const ClerkLoaded = ({ children }: React.PropsWithChildren): React.ReactNode => {
   const isLoaded = useSafeIsLoaded();
 
   if (!isLoaded) {
     return null;
   }
 
-  return <>{children}</>;
+  return children;
 };
 
-export const ClerkLoading = ({ children }: React.PropsWithChildren): JSX.Element | null => {
+export const ClerkLoading = ({ children }: React.PropsWithChildren): React.ReactNode => {
   const isLoaded = useSafeIsLoaded();
 
   if (isLoaded) {
     return null;
   }
 
-  return <>{children}</>;
+  return children;
 };
 
 export type ProtectProps = React.PropsWithChildren<
@@ -85,7 +85,12 @@ export type ProtectProps = React.PropsWithChildren<
  * <Protect fallback={<p>Unauthorized</p>} />
  * ```
  */
-export const Protect = ({ children, fallback, treatPendingAsSignedOut, ...restAuthorizedParams }: ProtectProps) => {
+export const Protect = ({
+  children,
+  fallback,
+  treatPendingAsSignedOut,
+  ...restAuthorizedParams
+}: ProtectProps): React.ReactNode => {
   const { isLoaded, has, userId } = useAuth({ treatPendingAsSignedOut });
 
   /**
@@ -98,9 +103,9 @@ export const Protect = ({ children, fallback, treatPendingAsSignedOut, ...restAu
   /**
    * Fallback to UI provided by user or `null` if authorization checks failed
    */
-  const unauthorized = <>{fallback ?? null}</>;
+  const unauthorized = fallback ?? null;
 
-  const authorized = <>{children}</>;
+  const authorized = children;
 
   if (!userId) {
     return unauthorized;
@@ -142,7 +147,7 @@ export const AuthenticateWithRedirectCallback = withClerk(
   ({ clerk, ...handleRedirectCallbackParams }: WithClerkProp<HandleOAuthCallbackParams>) => {
     React.useEffect(() => {
       void clerk?.handleRedirectCallback(handleRedirectCallbackParams);
-    }, []);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     return null;
   },

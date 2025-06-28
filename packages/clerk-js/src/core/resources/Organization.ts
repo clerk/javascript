@@ -98,6 +98,7 @@ export class Organization extends BaseResource implements OrganizationResource {
         forceUpdateClient: true,
       },
     ).then(res => {
+      // oxlint-disable-next-line no-unsafe-optional-chaining
       const { data: roles, total_count } = res?.response as unknown as ClerkPaginatedResponse<RoleJSON>;
 
       return {
@@ -120,6 +121,7 @@ export class Organization extends BaseResource implements OrganizationResource {
         forceUpdateClient: true,
       },
     ).then(res => {
+      // oxlint-disable-next-line no-unsafe-optional-chaining
       const { data: invites, total_count } = res?.response as unknown as ClerkPaginatedResponse<OrganizationDomainJSON>;
 
       return {
@@ -148,7 +150,7 @@ export class Organization extends BaseResource implements OrganizationResource {
       search: convertPageToOffsetSearchParams(getRequestParam),
     }).then(res => {
       const { data: requests, total_count } =
-        res?.response as unknown as ClerkPaginatedResponse<OrganizationMembershipRequestJSON>;
+        res?.response as unknown as ClerkPaginatedResponse<OrganizationMembershipRequestJSON>; // oxlint-disable-line no-unsafe-optional-chaining
 
       return {
         total_count,
@@ -170,7 +172,7 @@ export class Organization extends BaseResource implements OrganizationResource {
       search: convertPageToOffsetSearchParams({ ...getMembershipsParams, paginated: true }),
     }).then(res => {
       const { data: suggestions, total_count } =
-        res?.response as unknown as ClerkPaginatedResponse<OrganizationMembershipJSON>;
+        res?.response as unknown as ClerkPaginatedResponse<OrganizationMembershipJSON>; // oxlint-disable-line no-unsafe-optional-chaining
 
       return {
         total_count,
@@ -193,7 +195,7 @@ export class Organization extends BaseResource implements OrganizationResource {
       },
     ).then(res => {
       const { data: requests, total_count } =
-        res?.response as unknown as ClerkPaginatedResponse<OrganizationInvitationJSON>;
+        res?.response as unknown as ClerkPaginatedResponse<OrganizationInvitationJSON>; // oxlint-disable-line no-unsafe-optional-chaining
 
       return {
         total_count,
@@ -242,7 +244,7 @@ export class Organization extends BaseResource implements OrganizationResource {
       search: convertPageToOffsetSearchParams(getSubscriptionsParams),
     }).then(res => {
       const { data: subscriptions, total_count } =
-        res?.response as unknown as ClerkPaginatedResponse<CommerceSubscriptionJSON>;
+        res?.response as unknown as ClerkPaginatedResponse<CommerceSubscriptionJSON>; // oxlint-disable-line no-unsafe-optional-chaining
 
       return {
         total_count,

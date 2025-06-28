@@ -20,6 +20,7 @@
     "clean": "rm -rf dist/*",
     "dev": "babel --keep-file-extension --out-dir=dist --watch src --copy-files",
     "lint": "eslint src/",
+    "lint:oxlint": "oxlint --quiet src",
     "lint:publint": "publint",
     "test": "vitest run",
     "test:watch": "vitest watch"

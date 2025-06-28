@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const path = require('path');
+const path = require('path'); // oxlint-disable-line @typescript-eslint/no-require-imports
 
 module.exports = {
   process(src, filePath) {

@@ -32,7 +32,7 @@ export class OrganizationSuggestion extends BaseResource implements Organization
       search: convertPageToOffsetSearchParams(params),
     }).then(res => {
       const { data: suggestions, total_count } =
-        res?.response as unknown as ClerkPaginatedResponse<OrganizationSuggestionJSON>;
+        res?.response as unknown as ClerkPaginatedResponse<OrganizationSuggestionJSON>; // oxlint-disable-line no-unsafe-optional-chaining
 
       return {
         total_count,
