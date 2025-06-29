@@ -1,0 +1,31 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Token Snapshots > should match snapshot for null jwt token 1`] = `
+{
+  "jwt": undefined,
+  "object": undefined,
+}
+`;
+
+exports[`Token Snapshots > should match snapshot for token structure 1`] = `
+{
+  "jwt": {
+    "claims": {
+      "__raw": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+      "iat": 1516239022,
+      "name": "John Doe",
+      "sub": "1234567890",
+    },
+    "encoded": {
+      "header": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",
+      "payload": "eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ",
+      "signature": "SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+    },
+    "header": {
+      "alg": "HS256",
+      "typ": "JWT",
+    },
+  },
+  "object": undefined,
+}
+`;

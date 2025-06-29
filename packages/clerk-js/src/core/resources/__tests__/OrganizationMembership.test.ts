@@ -72,3 +72,69 @@ describe('OrganizationMembership', () => {
     });
   });
 });
+
+describe('OrganizationMembership Snapshots', () => {
+  it('should match snapshot for organization membership structure', () => {
+    const organizationMembership = new OrganizationMembership({
+      object: 'organization_membership',
+      id: 'membership_123',
+      created_at: 1735689600000,
+      updated_at: 1735689650000,
+      role: 'admin',
+      permissions: ['org:sys_profile:manage', 'org:sys_memberships:manage'],
+      organization: {
+        id: 'org_123',
+        image_url: 'https://example.com/org-logo.png',
+        name: 'Acme Corp',
+        slug: 'acme-corp',
+        public_metadata: { industry: 'technology' },
+        object: 'organization',
+        created_at: 1735689500000,
+        updated_at: 1735689600000,
+        members_count: 25,
+        pending_invitations_count: 3,
+        admin_delete_enabled: true,
+        max_allowed_memberships: 100,
+        has_image: true,
+      },
+      public_metadata: {
+        department: 'engineering',
+        start_date: '2024-01-15',
+      },
+      public_user_data: {
+        object: 'public_user_data',
+        first_name: 'John',
+        last_name: 'Doe',
+        image_url: 'https://example.com/avatar.jpg',
+        identifier: 'john.doe@acme.com',
+        id: 'user_123',
+        has_image: true,
+      },
+    });
+
+    const snapshot = {
+      id: organizationMembership.id,
+      role: organizationMembership.role,
+      roleName: organizationMembership.roleName,
+      createdAt: organizationMembership.createdAt?.getTime(),
+      updatedAt: organizationMembership.updatedAt?.getTime(),
+      permissions: organizationMembership.permissions,
+      publicMetadata: organizationMembership.publicMetadata,
+      organization: {
+        id: organizationMembership.organization.id,
+        name: organizationMembership.organization.name,
+        slug: organizationMembership.organization.slug,
+        hasImage: organizationMembership.organization.hasImage,
+        membersCount: organizationMembership.organization.membersCount,
+      },
+      publicUserData: {
+        firstName: organizationMembership.publicUserData.firstName,
+        lastName: organizationMembership.publicUserData.lastName,
+        identifier: organizationMembership.publicUserData.identifier,
+        hasImage: organizationMembership.publicUserData.hasImage,
+      },
+    };
+
+    expect(snapshot).toMatchSnapshot();
+  });
+});

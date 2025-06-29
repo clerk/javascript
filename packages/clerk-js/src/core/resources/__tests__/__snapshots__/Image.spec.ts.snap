@@ -1,0 +1,17 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Image > Image Snapshots > should match snapshot for image instance structure 1`] = `
+{
+  "id": "img_123",
+  "name": "profile-photo.jpg",
+  "publicUrl": "https://img.clerk.com/profile-photo.jpg",
+}
+`;
+
+exports[`Image > Image Snapshots > should match snapshot for image with null values 1`] = `
+{
+  "id": "img_empty",
+  "name": null,
+  "publicUrl": null,
+}
+`;

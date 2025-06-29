@@ -1,0 +1,36 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Session Snapshots > should match snapshot for session instance structure 1`] = `
+{
+  "createdAt": 1735689600000,
+  "id": "session_123",
+  "lastActiveOrganizationId": "org_123",
+  "lastActiveToken": {
+    "jwt": null,
+    "object": undefined,
+  },
+  "status": "active",
+  "updatedAt": 1735689700000,
+  "user": {
+    "firstName": "John",
+    "id": "user_123",
+    "lastName": "Doe",
+  },
+}
+`;
+
+exports[`Session Snapshots > should match snapshot for session with no organization 1`] = `
+{
+  "createdAt": 1735689600000,
+  "id": "session_456",
+  "lastActiveOrganizationId": null,
+  "lastActiveToken": null,
+  "status": "active",
+  "updatedAt": 1735689600000,
+  "user": {
+    "firstName": "Jane",
+    "id": "user_456",
+    "lastName": "Smith",
+  },
+}
+`;

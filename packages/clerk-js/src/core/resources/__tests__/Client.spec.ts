@@ -85,11 +85,11 @@ describe('Client Singleton', () => {
     const clientObjectJSON: ClientJSON = {
       object: 'client',
       id: 'test_id',
-      status: 'active',
       last_active_session_id: 'test_session_id',
       sign_in: createSignIn({ id: 'test_sign_in_id' }, user),
       sign_up: createSignUp({ id: 'test_sign_up_id' }), //  This is only for testing purposes, this will never happen
       sessions: [session],
+      cookie_expires_at: null,
       created_at: Date.now() - 1000,
       updated_at: Date.now(),
     };
@@ -115,7 +115,7 @@ describe('Client Singleton', () => {
       updated_at: Date.now(),
     };
 
-    // @ts-expect-error This is a private method that we are mocking
+    // @ts-ignore This is a private method that we are mocking
     BaseResource._fetch = vi.fn().mockReturnValue(
       Promise.resolve({
         client: null,
@@ -140,7 +140,7 @@ describe('Client Singleton', () => {
     expect(client.signUp.id).toBeUndefined();
     expect(client.signIn.id).toBeUndefined();
 
-    // @ts-expect-error This is a private method that we are mocking
+    // @ts-ignore This is a private method that we are mocking
     expect(BaseResource._fetch).toHaveBeenCalledWith({
       method: 'DELETE',
       path: `/client`,
@@ -458,5 +458,218 @@ describe('Client Singleton', () => {
       created_at: expect.any(Number),
       updated_at: expect.any(Number),
     });
+  });
+});
+
+describe('Client Snapshots', () => {
+  it('should match snapshot for client instance structure', () => {
+    const user = createUser({ first_name: 'John', last_name: 'Doe', id: 'user_1' });
+    const session = createSession({ id: 'session_1' }, user);
+    const clientObjectJSON: ClientJSON = {
+      object: 'client',
+      id: 'test_id',
+      last_active_session_id: 'test_session_id',
+      sign_in: createSignIn({ id: 'test_sign_in_id' }, user),
+      sign_up: createSignUp({ id: 'test_sign_up_id' }),
+      sessions: [session],
+      created_at: 1735689600000, // Fixed timestamp
+      updated_at: 1735689600000,
+    } as any;
+
+    // @ts-expect-error We cannot mess with the singleton when tests are running in parallel
+    const client = new Client(clientObjectJSON);
+
+    // Create a serializable version for snapshot
+    const clientSnapshot = {
+      id: client.id,
+      lastActiveSessionId: client.lastActiveSessionId,
+      createdAt: client.createdAt?.getTime(),
+      updatedAt: client.updatedAt?.getTime(),
+      sessions: client.sessions.map((s: any) => ({
+        id: s.id,
+        status: s.status,
+        userId: s.user?.id,
+      })),
+      signIn: {
+        id: client.signIn?.id,
+        status: client.signIn?.status,
+      },
+      signUp: {
+        id: client.signUp?.id,
+        status: client.signUp?.status,
+      },
+    };
+
+    expect(clientSnapshot).toMatchSnapshot();
+  });
+
+  it('should match snapshot for __internal_toSnapshot method', () => {
+    const clientJSON = {
+      object: 'client',
+      status: null,
+      id: 'client_DUMMY_ID',
+      sessions: [],
+      sign_up: {
+        object: 'sign_up',
+        id: 'signup_123',
+        status: 'complete',
+        required_fields: ['email_address'],
+        optional_fields: [],
+        missing_fields: [],
+        unverified_fields: [],
+        verifications: {
+          email_address: {
+            object: 'verification',
+            id: 'verification_123',
+            status: 'verified',
+            strategy: 'email_code',
+            nonce: null,
+            message: null,
+            external_verification_redirect_url: null,
+            attempts: 1,
+            expire_at: 1735689600000,
+            error: { code: '', message: '', meta: {} },
+            verified_at_client: null,
+            next_action: '',
+            supported_strategies: ['email_code'],
+          },
+          phone_number: {
+            object: 'verification',
+            id: '',
+            status: null,
+            strategy: null,
+            nonce: null,
+            message: null,
+            external_verification_redirect_url: null,
+            attempts: null,
+            expire_at: 1735689600000,
+            error: { code: '', message: '', meta: {} },
+            verified_at_client: null,
+            next_action: '',
+            supported_strategies: [],
+          },
+          web3_wallet: {
+            object: 'verification',
+            id: '',
+            status: null,
+            strategy: null,
+            nonce: null,
+            message: null,
+            external_verification_redirect_url: null,
+            attempts: null,
+            expire_at: 1735689600000,
+            error: { code: '', message: '', meta: {} },
+            verified_at_client: null,
+            next_action: '',
+            supported_strategies: [],
+          },
+          external_account: {
+            object: 'verification',
+            id: '',
+            status: null,
+            strategy: null,
+            nonce: null,
+            message: null,
+            external_verification_redirect_url: null,
+            attempts: null,
+            expire_at: 1735689600000,
+            error: { code: '', message: '', meta: {} },
+            verified_at_client: null,
+          },
+        },
+        username: null,
+        first_name: 'John',
+        last_name: 'Doe',
+        email_address: 'john@example.com',
+        phone_number: null,
+        has_password: true,
+        unsafe_metadata: { custom: 'data' },
+        created_session_id: null,
+        created_user_id: null,
+        abandon_at: null,
+        web3_wallet: null,
+        legal_accepted_at: null,
+      },
+      sign_in: {
+        object: 'sign_in',
+        id: 'signin_123',
+        status: 'complete',
+        supported_identifiers: ['email_address'],
+        supported_first_factors: ['email_code'],
+        supported_second_factors: null,
+        first_factor_verification: {
+          object: 'verification',
+          id: 'verification_456',
+          status: 'verified',
+          strategy: 'email_code',
+          nonce: null,
+          message: null,
+          external_verification_redirect_url: null,
+          attempts: 1,
+          expire_at: 1735689600000,
+          error: { code: '', message: '', meta: {} },
+          verified_at_client: null,
+        },
+        second_factor_verification: {
+          object: 'verification',
+          id: '',
+          status: null,
+          strategy: null,
+          nonce: null,
+          message: null,
+          external_verification_redirect_url: null,
+          attempts: null,
+          expire_at: 1735689600000,
+          error: { code: '', message: '', meta: {} },
+          verified_at_client: null,
+        },
+        identifier: 'john@example.com',
+        created_session_id: 'session_123',
+        user_data: {
+          first_name: 'John',
+          last_name: 'Doe',
+        },
+      },
+      last_active_session_id: 'session_123',
+      cookie_expires_at: null,
+      created_at: 1735689600000,
+      updated_at: 1735689600000,
+    } as unknown as ClientJSONSnapshot;
+
+    // @ts-expect-error We cannot mess with the singleton when tests are running in parallel
+    const client = new Client(clientJSON);
+    const snapshot = client.__internal_toSnapshot();
+
+    expect(snapshot).toMatchSnapshot();
+  });
+
+  it('should match snapshot for empty client state', () => {
+    const emptyClientJSON = {
+      object: 'client',
+      status: null,
+      id: 'client_EMPTY',
+      sessions: [],
+      sign_up: null,
+      sign_in: null,
+      last_active_session_id: null,
+      cookie_expires_at: null,
+      created_at: 1735689600000,
+      updated_at: 1735689600000,
+    } as unknown as ClientJSONSnapshot;
+
+    // @ts-expect-error We cannot mess with the singleton when tests are running in parallel
+    const client = new Client(emptyClientJSON);
+
+    const clientSnapshot = {
+      id: client.id,
+      lastActiveSessionId: client.lastActiveSessionId,
+      createdAt: client.createdAt?.getTime(),
+      updatedAt: client.updatedAt?.getTime(),
+      sessions: client.sessions,
+      signIn: client.signIn,
+      signUp: client.signUp,
+    };
+
+    expect(clientSnapshot).toMatchSnapshot();
   });
 });

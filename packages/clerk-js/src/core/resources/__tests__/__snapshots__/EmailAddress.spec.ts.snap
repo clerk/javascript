@@ -1,0 +1,57 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`EmailAddress Snapshots > should match snapshot for __internal_toSnapshot method 1`] = `
+{
+  "email_address": "snapshot@test.com",
+  "id": "email_456",
+  "linked_to": [
+    {
+      "id": undefined,
+      "object": "identification_link",
+      "type": undefined,
+    },
+  ],
+  "matches_sso_connection": undefined,
+  "object": "email_address",
+  "verification": {
+    "attempts": 0,
+    "error": {
+      "code": "",
+      "long_message": undefined,
+      "message": "",
+      "meta": {
+        "email_addresses": undefined,
+        "identifiers": undefined,
+        "param_name": undefined,
+        "plan": undefined,
+        "session_id": undefined,
+        "zxcvbn": undefined,
+      },
+    },
+    "expire_at": 1735689800000,
+    "external_verification_redirect_url": null,
+    "id": "",
+    "message": null,
+    "nonce": null,
+    "object": "verification",
+    "status": "unverified",
+    "strategy": "email_link",
+    "verified_at_client": null,
+  },
+}
+`;
+
+exports[`EmailAddress Snapshots > should match snapshot for email address structure 1`] = `
+{
+  "createdAt": undefined,
+  "emailAddress": "user@example.com",
+  "id": "email_123",
+  "linkedTo": [],
+  "updatedAt": undefined,
+  "verification": {
+    "id": undefined,
+    "status": "verified",
+    "strategy": "email_code",
+  },
+}
+`;

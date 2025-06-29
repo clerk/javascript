@@ -1,0 +1,63 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`PhoneNumber Snapshots > should match snapshot for __internal_toSnapshot method 1`] = `
+{
+  "backup_codes": [
+    "backup_123",
+  ],
+  "default_second_factor": true,
+  "id": "phone_456",
+  "linked_to": [
+    {
+      "id": undefined,
+      "object": "identification_link",
+      "type": undefined,
+    },
+  ],
+  "object": "phone_number",
+  "phone_number": "+9876543210",
+  "reserved_for_second_factor": false,
+  "verification": {
+    "attempts": 0,
+    "error": {
+      "code": "",
+      "long_message": undefined,
+      "message": "",
+      "meta": {
+        "email_addresses": undefined,
+        "identifiers": undefined,
+        "param_name": undefined,
+        "plan": undefined,
+        "session_id": undefined,
+        "zxcvbn": undefined,
+      },
+    },
+    "expire_at": 1735689800000,
+    "external_verification_redirect_url": null,
+    "id": "",
+    "message": null,
+    "nonce": null,
+    "object": "verification",
+    "status": "unverified",
+    "strategy": "phone_code",
+    "verified_at_client": null,
+  },
+}
+`;
+
+exports[`PhoneNumber Snapshots > should match snapshot for phone number structure 1`] = `
+{
+  "backupCodes": [],
+  "defaultSecondFactor": false,
+  "id": "phone_123",
+  "linkedTo": [],
+  "phoneNumber": "+1234567890",
+  "reserved": undefined,
+  "reservedForSecondFactor": true,
+  "verification": {
+    "id": undefined,
+    "status": "verified",
+    "strategy": "phone_code",
+  },
+}
+`;

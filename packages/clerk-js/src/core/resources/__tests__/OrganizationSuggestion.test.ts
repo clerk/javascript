@@ -32,3 +32,68 @@ describe('OrganizationSuggestion', () => {
     });
   });
 });
+
+describe('OrganizationSuggestion Snapshots', () => {
+  it('should match snapshot for organization suggestion structure', () => {
+    const organizationSuggestion = new OrganizationSuggestion({
+      object: 'organization_suggestion',
+      id: 'suggestion_123',
+      public_organization_data: {
+        id: 'org_123',
+        name: 'Tech Innovators Inc',
+        slug: 'tech-innovators',
+        image_url: 'https://example.com/tech-logo.png',
+        has_image: true,
+      },
+      status: 'pending',
+      created_at: 1735689600000,
+      updated_at: 1735689650000,
+    });
+
+    const snapshot = {
+      id: organizationSuggestion.id,
+      status: organizationSuggestion.status,
+      createdAt: organizationSuggestion.createdAt?.getTime(),
+      updatedAt: organizationSuggestion.updatedAt?.getTime(),
+      publicOrganizationData: {
+        id: organizationSuggestion.publicOrganizationData.id,
+        name: organizationSuggestion.publicOrganizationData.name,
+        slug: organizationSuggestion.publicOrganizationData.slug,
+        imageUrl: organizationSuggestion.publicOrganizationData.imageUrl,
+        hasImage: organizationSuggestion.publicOrganizationData.hasImage,
+      },
+    };
+
+    expect(snapshot).toMatchSnapshot();
+  });
+
+  it('should match snapshot for organization suggestion with accepted status', () => {
+    const organizationSuggestion = new OrganizationSuggestion({
+      object: 'organization_suggestion',
+      id: 'suggestion_accepted',
+      public_organization_data: {
+        id: 'org_456',
+        name: 'Design Studio',
+        slug: 'design-studio',
+        image_url: null,
+        has_image: false,
+      },
+      status: 'accepted',
+      created_at: 1735689600000,
+      updated_at: 1735689700000,
+    });
+
+    const snapshot = {
+      id: organizationSuggestion.id,
+      status: organizationSuggestion.status,
+      publicOrganizationData: {
+        id: organizationSuggestion.publicOrganizationData.id,
+        name: organizationSuggestion.publicOrganizationData.name,
+        slug: organizationSuggestion.publicOrganizationData.slug,
+        hasImage: organizationSuggestion.publicOrganizationData.hasImage,
+      },
+    };
+
+    expect(snapshot).toMatchSnapshot();
+  });
+});

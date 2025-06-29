@@ -1,0 +1,41 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ExternalAccount Snapshots > should match snapshot for external account structure 1`] = `
+{
+  "approvedScopes": [
+    "email",
+    "profile",
+  ],
+  "createdAt": undefined,
+  "emailAddress": "user@gmail.com",
+  "firstName": "John",
+  "id": "external_123",
+  "imageUrl": "https://lh3.googleusercontent.com/avatar.jpg",
+  "label": null,
+  "lastName": "Doe",
+  "provider": "google",
+  "providerUserId": "google_user_123",
+  "updatedAt": undefined,
+  "username": null,
+  "verification": {
+    "status": "verified",
+    "strategy": "oauth_google",
+  },
+}
+`;
+
+exports[`ExternalAccount Snapshots > should match snapshot for minimal external account 1`] = `
+{
+  "approvedScopes": [],
+  "emailAddress": null,
+  "firstName": null,
+  "id": "external_minimal",
+  "imageUrl": null,
+  "label": null,
+  "lastName": null,
+  "provider": "github",
+  "providerUserId": "github_user_456",
+  "username": "githubuser",
+  "verification": null,
+}
+`;

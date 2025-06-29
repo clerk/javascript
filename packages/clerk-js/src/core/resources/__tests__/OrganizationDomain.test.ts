@@ -65,3 +65,79 @@ describe('OrganizationDomain', () => {
     });
   });
 });
+
+describe('OrganizationDomain Snapshots', () => {
+  it('should match snapshot for organization domain structure', () => {
+    const organizationDomain = new OrganizationDomain({
+      object: 'organization_domain',
+      id: 'domain_123',
+      name: 'acme.com',
+      organization_id: 'org_123',
+      enrollment_mode: 'automatic_invitation',
+      verification: {
+        attempts: 1,
+        expires_at: 1735689700000,
+        strategy: 'email_code',
+        status: 'verified',
+      },
+      affiliation_email_address: 'admin@acme.com',
+      created_at: 1735689600000,
+      updated_at: 1735689650000,
+      total_pending_invitations: 5,
+      total_pending_suggestions: 2,
+    });
+
+    const snapshot = {
+      id: organizationDomain.id,
+      name: organizationDomain.name,
+      organizationId: organizationDomain.organizationId,
+      enrollmentMode: organizationDomain.enrollmentMode,
+      affiliationEmailAddress: organizationDomain.affiliationEmailAddress,
+      totalPendingInvitations: organizationDomain.totalPendingInvitations,
+      totalPendingSuggestions: organizationDomain.totalPendingSuggestions,
+      verification: organizationDomain.verification
+        ? {
+            attempts: organizationDomain.verification.attempts,
+            status: organizationDomain.verification.status,
+            strategy: organizationDomain.verification.strategy,
+            expiresAt: organizationDomain.verification.expiresAt?.getTime(),
+          }
+        : null,
+      createdAt: organizationDomain.createdAt?.getTime(),
+      updatedAt: organizationDomain.updatedAt?.getTime(),
+    };
+
+    expect(snapshot).toMatchSnapshot();
+  });
+
+  it('should match snapshot for organization domain with null verification', () => {
+    const organizationDomain = new OrganizationDomain({
+      object: 'organization_domain',
+      id: 'domain_minimal',
+      name: 'example.org',
+      organization_id: 'org_456',
+      enrollment_mode: 'manual_invitation',
+      verification: null,
+      affiliation_email_address: null,
+      created_at: 1735689600000,
+      updated_at: 1735689600000,
+      total_pending_invitations: 0,
+      total_pending_suggestions: 0,
+    });
+
+    const snapshot = {
+      id: organizationDomain.id,
+      name: organizationDomain.name,
+      organizationId: organizationDomain.organizationId,
+      enrollmentMode: organizationDomain.enrollmentMode,
+      affiliationEmailAddress: organizationDomain.affiliationEmailAddress,
+      totalPendingInvitations: organizationDomain.totalPendingInvitations,
+      totalPendingSuggestions: organizationDomain.totalPendingSuggestions,
+      verification: organizationDomain.verification,
+      createdAt: organizationDomain.createdAt?.getTime(),
+      updatedAt: organizationDomain.updatedAt?.getTime(),
+    };
+
+    expect(snapshot).toMatchSnapshot();
+  });
+});

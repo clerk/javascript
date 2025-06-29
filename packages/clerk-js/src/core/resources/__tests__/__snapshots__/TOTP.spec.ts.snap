@@ -1,0 +1,28 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`TOTP Snapshots > should match snapshot for TOTP structure 1`] = `
+{
+  "backupCodes": [
+    "backup_abc123",
+    "backup_def456",
+  ],
+  "createdAt": 1735689500000,
+  "id": "totp_123",
+  "secret": "JBSWY3DPEHPK3PXP",
+  "updatedAt": 1735689650000,
+  "uri": "otpauth://totp/ClerkApp:user@example.com?secret=JBSWY3DPEHPK3PXP&issuer=ClerkApp",
+  "verified": true,
+}
+`;
+
+exports[`TOTP Snapshots > should match snapshot for unverified TOTP 1`] = `
+{
+  "backupCodes": [],
+  "createdAt": 1735689500000,
+  "id": "totp_456",
+  "secret": "MFRGG43FMZWXO33V",
+  "updatedAt": 1735689500000,
+  "uri": "otpauth://totp/ClerkApp:newuser@test.com?secret=MFRGG43FMZWXO33V&issuer=ClerkApp",
+  "verified": false,
+}
+`;

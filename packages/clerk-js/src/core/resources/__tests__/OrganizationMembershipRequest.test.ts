@@ -36,3 +36,41 @@ describe('OrganizationMembership', () => {
     });
   });
 });
+
+describe('OrganizationMembershipRequest Snapshots', () => {
+  it('should match snapshot for organization membership request structure', () => {
+    const organizationMembershipRequest = new OrganizationMembershipRequest({
+      object: 'organization_membership_request',
+      id: 'request_123',
+      organization_id: 'org_123',
+      status: 'pending',
+      created_at: 1735689600000,
+      updated_at: 1735689650000,
+      public_user_data: {
+        first_name: 'Jane',
+        last_name: 'Smith',
+        image_url: 'https://example.com/jane-avatar.jpg',
+        identifier: 'jane.smith@company.com',
+        id: 'user_456',
+        has_image: true,
+      },
+    });
+
+    const snapshot = {
+      id: organizationMembershipRequest.id,
+      organizationId: organizationMembershipRequest.organizationId,
+      status: organizationMembershipRequest.status,
+      createdAt: organizationMembershipRequest.createdAt?.getTime(),
+      updatedAt: organizationMembershipRequest.updatedAt?.getTime(),
+      publicUserData: {
+        firstName: organizationMembershipRequest.publicUserData.firstName,
+        lastName: organizationMembershipRequest.publicUserData.lastName,
+        identifier: organizationMembershipRequest.publicUserData.identifier,
+        hasImage: organizationMembershipRequest.publicUserData.hasImage,
+        imageUrl: organizationMembershipRequest.publicUserData.imageUrl,
+      },
+    };
+
+    expect(snapshot).toMatchSnapshot();
+  });
+});

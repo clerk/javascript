@@ -306,3 +306,167 @@ describe('User', () => {
     });
   });
 });
+
+describe('User Snapshots', () => {
+  it('should match snapshot for user instance structure', () => {
+    const userJSON: UserJSON = {
+      object: 'user',
+      id: 'user_123',
+      first_name: 'John',
+      last_name: 'Doe',
+      username: 'johndoe',
+      image_url: 'https://example.com/avatar.jpg',
+      has_image: true,
+      primary_email_address_id: 'email_123',
+      primary_phone_number_id: null,
+      primary_web3_wallet_id: null,
+      email_addresses: [
+        {
+          object: 'email_address',
+          id: 'email_123',
+          email_address: 'john@example.com',
+          verification: {
+            object: 'verification',
+            id: 'verification_123',
+            status: 'verified',
+            strategy: 'email_code',
+            attempts: 1,
+            expire_at: 1735689600000,
+            verified_at_client: null,
+            error: null,
+          },
+          linked_to: [],
+          created_at: 1735689500000,
+          updated_at: 1735689600000,
+        },
+      ],
+      phone_numbers: [],
+      web3_wallets: [],
+      external_accounts: [],
+      passkeys: [],
+      saml_accounts: [],
+      public_metadata: { role: 'user' },
+      unsafe_metadata: { preferences: { theme: 'dark' } },
+      created_at: 1735689500000,
+      updated_at: 1735689600000,
+      last_sign_in_at: 1735689550000,
+      password_enabled: true,
+      totp_enabled: false,
+      backup_code_enabled: false,
+      two_factor_enabled: false,
+      banned: false,
+      locked: false,
+      lockout_expires_in_seconds: null,
+      verification_attempts_remaining: 3,
+      delete_self_enabled: true,
+      create_organization_enabled: true,
+      last_active_at: 1735689600000,
+      profile_image_url: 'https://example.com/avatar.jpg',
+      organization_memberships: [],
+    };
+
+    const user = new User(userJSON);
+
+    const userSnapshot = {
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      fullName: user.fullName,
+      username: user.username,
+      imageUrl: user.imageUrl,
+      hasImage: user.hasImage,
+      primaryEmailAddressId: user.primaryEmailAddressId,
+      primaryPhoneNumberId: user.primaryPhoneNumberId,
+      primaryWeb3WalletId: user.primaryWeb3WalletId,
+      passwordEnabled: user.passwordEnabled,
+      totpEnabled: user.totpEnabled,
+      backupCodeEnabled: user.backupCodeEnabled,
+      twoFactorEnabled: user.twoFactorEnabled,
+      banned: user.banned,
+      locked: user.locked,
+      createdAt: user.createdAt?.getTime(),
+      updatedAt: user.updatedAt?.getTime(),
+      lastSignInAt: user.lastSignInAt?.getTime(),
+      lastActiveAt: user.lastActiveAt?.getTime(),
+      publicMetadata: user.publicMetadata,
+      unsafeMetadata: user.unsafeMetadata,
+      emailAddresses: user.emailAddresses.map(email => ({
+        id: email.id,
+        emailAddress: email.emailAddress,
+        verification: email.verification
+          ? {
+              status: email.verification.status,
+              strategy: email.verification.strategy,
+            }
+          : null,
+      })),
+    };
+
+    expect(userSnapshot).toMatchSnapshot();
+  });
+
+  it('should match snapshot for minimal user', () => {
+    const userJSON: UserJSON = {
+      object: 'user',
+      id: 'user_minimal',
+      first_name: null,
+      last_name: null,
+      username: null,
+      image_url: null,
+      has_image: false,
+      primary_email_address_id: null,
+      primary_phone_number_id: null,
+      primary_web3_wallet_id: null,
+      email_addresses: [],
+      phone_numbers: [],
+      web3_wallets: [],
+      external_accounts: [],
+      passkeys: [],
+      saml_accounts: [],
+      public_metadata: {},
+      unsafe_metadata: {},
+      created_at: 1735689600000,
+      updated_at: 1735689600000,
+      last_sign_in_at: null,
+      password_enabled: false,
+      totp_enabled: false,
+      backup_code_enabled: false,
+      two_factor_enabled: false,
+      banned: false,
+      locked: false,
+      lockout_expires_in_seconds: null,
+      verification_attempts_remaining: 3,
+      delete_self_enabled: true,
+      create_organization_enabled: false,
+      last_active_at: null,
+      profile_image_url: null,
+      organization_memberships: [],
+    };
+
+    const user = new User(userJSON);
+
+    const userSnapshot = {
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      fullName: user.fullName,
+      username: user.username,
+      imageUrl: user.imageUrl,
+      hasImage: user.hasImage,
+      passwordEnabled: user.passwordEnabled,
+      totpEnabled: user.totpEnabled,
+      backupCodeEnabled: user.backupCodeEnabled,
+      twoFactorEnabled: user.twoFactorEnabled,
+      banned: user.banned,
+      locked: user.locked,
+      createdAt: user.createdAt?.getTime(),
+      updatedAt: user.updatedAt?.getTime(),
+      lastSignInAt: user.lastSignInAt?.getTime(),
+      lastActiveAt: user.lastActiveAt?.getTime(),
+      publicMetadata: user.publicMetadata,
+      unsafeMetadata: user.unsafeMetadata,
+    };
+
+    expect(userSnapshot).toMatchSnapshot();
+  });
+});

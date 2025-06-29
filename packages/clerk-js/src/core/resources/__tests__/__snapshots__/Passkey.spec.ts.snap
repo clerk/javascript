@@ -1,0 +1,53 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Passkey Snapshots > should match snapshot for __internal_toSnapshot method 1`] = `
+{
+  "created_at": 1735689500000,
+  "id": "passkey_456",
+  "last_used_at": null,
+  "name": "iPhone Face ID",
+  "object": "passkey",
+  "updated_at": 1735689500000,
+  "verification": {
+    "attempts": 0,
+    "error": {
+      "code": "",
+      "long_message": undefined,
+      "message": "",
+      "meta": {
+        "email_addresses": undefined,
+        "identifiers": undefined,
+        "param_name": undefined,
+        "plan": undefined,
+        "session_id": undefined,
+        "zxcvbn": undefined,
+      },
+    },
+    "expire_at": 1735689800000,
+    "external_verification_redirect_url": null,
+    "id": "",
+    "message": null,
+    "nonce": null,
+    "object": "verification",
+    "status": "unverified",
+    "strategy": "passkey",
+    "verified_at_client": null,
+  },
+}
+`;
+
+exports[`Passkey Snapshots > should match snapshot for passkey structure 1`] = `
+{
+  "createdAt": 1735689500000,
+  "credentialId": undefined,
+  "id": "passkey_123",
+  "lastUsedAt": 1735689600000,
+  "name": "MacBook Pro Touch ID",
+  "updatedAt": 1735689650000,
+  "verification": {
+    "id": undefined,
+    "status": "verified",
+    "strategy": "passkey",
+  },
+}
+`;

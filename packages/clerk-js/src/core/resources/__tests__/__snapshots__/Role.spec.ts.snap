@@ -1,0 +1,34 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Role Snapshots > should match snapshot for role structure 1`] = `
+{
+  "createdAt": 1735689500000,
+  "description": "Full administrative access to organization",
+  "id": "role_123",
+  "key": "admin",
+  "name": "Administrator",
+  "permissions": [
+    Permission {
+      "createdAt": 2025-06-29T18:12:57.621Z,
+      "description": undefined,
+      "id": undefined,
+      "key": undefined,
+      "name": undefined,
+      "pathRoot": "",
+      "type": undefined,
+      "updatedAt": 2025-06-29T18:12:57.621Z,
+    },
+    Permission {
+      "createdAt": 2025-06-29T18:12:57.621Z,
+      "description": undefined,
+      "id": undefined,
+      "key": undefined,
+      "name": undefined,
+      "pathRoot": "",
+      "type": undefined,
+      "updatedAt": 2025-06-29T18:12:57.621Z,
+    },
+  ],
+  "updatedAt": 1735689650000,
+}
+`;

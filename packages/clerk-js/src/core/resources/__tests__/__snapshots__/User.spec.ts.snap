@@ -1,0 +1,68 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`User Snapshots > should match snapshot for minimal user 1`] = `
+{
+  "backupCodeEnabled": false,
+  "banned": undefined,
+  "createdAt": 1735689600000,
+  "firstName": null,
+  "fullName": null,
+  "hasImage": false,
+  "id": "user_minimal",
+  "imageUrl": "",
+  "lastActiveAt": undefined,
+  "lastName": null,
+  "lastSignInAt": undefined,
+  "locked": undefined,
+  "passwordEnabled": false,
+  "publicMetadata": {},
+  "totpEnabled": false,
+  "twoFactorEnabled": false,
+  "unsafeMetadata": {},
+  "updatedAt": 1735689600000,
+  "username": null,
+}
+`;
+
+exports[`User Snapshots > should match snapshot for user instance structure 1`] = `
+{
+  "backupCodeEnabled": false,
+  "banned": undefined,
+  "createdAt": 1735689500000,
+  "emailAddresses": [
+    {
+      "emailAddress": "john@example.com",
+      "id": "email_123",
+      "verification": {
+        "status": "verified",
+        "strategy": "email_code",
+      },
+    },
+  ],
+  "firstName": "John",
+  "fullName": "John Doe",
+  "hasImage": true,
+  "id": "user_123",
+  "imageUrl": "https://example.com/avatar.jpg",
+  "lastActiveAt": undefined,
+  "lastName": "Doe",
+  "lastSignInAt": 1735689550000,
+  "locked": undefined,
+  "passwordEnabled": true,
+  "primaryEmailAddressId": "email_123",
+  "primaryPhoneNumberId": null,
+  "primaryWeb3WalletId": null,
+  "publicMetadata": {
+    "role": "user",
+  },
+  "totpEnabled": false,
+  "twoFactorEnabled": false,
+  "unsafeMetadata": {
+    "preferences": {
+      "theme": "dark",
+    },
+  },
+  "updatedAt": 1735689600000,
+  "username": "johndoe",
+}
+`;

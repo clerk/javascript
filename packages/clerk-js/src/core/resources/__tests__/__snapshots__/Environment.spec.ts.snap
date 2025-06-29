@@ -1,0 +1,190 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Environment > Environment Snapshots > should match snapshot for __internal_toSnapshot method 1`] = `
+{
+  "api_keys_settings": {
+    "enabled": false,
+  },
+  "auth_config": {
+    "claimed_at": null,
+    "id": "",
+    "object": "auth_config",
+    "reverification": false,
+    "single_session_mode": true,
+  },
+  "commerce_settings": {
+    "billing": {
+      "enabled": false,
+      "has_paid_org_plans": false,
+      "has_paid_user_plans": false,
+      "stripe_publishable_key": "",
+    },
+  },
+  "display_config": {
+    "after_create_organization_url": "",
+    "after_join_waitlist_url": "",
+    "after_leave_organization_url": "",
+    "after_sign_in_url": "",
+    "after_sign_out_all_url": "",
+    "after_sign_out_one_url": "",
+    "after_sign_up_url": "",
+    "after_switch_session_url": "",
+    "application_name": "Snapshot Test App",
+    "branded": false,
+    "captcha_heartbeat": false,
+    "captcha_heartbeat_interval_ms": undefined,
+    "captcha_oauth_bypass": [],
+    "captcha_provider": "turnstile",
+    "captcha_public_key": null,
+    "captcha_public_key_invisible": null,
+    "captcha_widget_type": null,
+    "clerk_js_version": "5",
+    "create_organization_url": "",
+    "favicon_image_url": "",
+    "google_one_tap_client_id": undefined,
+    "home_url": "",
+    "id": "display_snapshot",
+    "instance_environment_type": "development",
+    "logo_image_url": "",
+    "object": "display_config",
+    "organization_profile_url": "",
+    "preferred_sign_in_strategy": "password",
+    "privacy_policy_url": "",
+    "show_devmode_warning": true,
+    "sign_in_url": "",
+    "sign_up_url": "",
+    "support_email": "",
+    "terms_url": "",
+    "theme": {
+      "accounts": {
+        "background_color": "#f5f5f5",
+      },
+      "buttons": {
+        "font_color": "#000000",
+        "font_family": "Arial",
+        "font_weight": "400",
+      },
+      "general": {
+        "background_color": "#f5f5f5",
+        "border_radius": "0.25em",
+        "box_shadow": "none",
+        "color": "#ff6c47",
+        "font_color": "#000000",
+        "font_family": "Arial",
+        "label_font_weight": "400",
+        "padding": "0.5em",
+      },
+    },
+    "user_profile_url": "",
+    "waitlist_url": "",
+  },
+  "id": "",
+  "maintenance_mode": false,
+  "object": "environment",
+  "organization_settings": {
+    "actions": {
+      "admin_delete": false,
+    },
+    "domains": {
+      "default_role": null,
+      "enabled": false,
+      "enrollment_modes": [],
+    },
+    "enabled": false,
+    "max_allowed_memberships": 1,
+  },
+  "user_settings": {
+    "actions": {
+      "create_organization": false,
+      "create_organizations_limit": null,
+      "delete_self": false,
+    },
+    "attributes": {
+      "email_address": {
+        "enabled": true,
+        "first_factors": [
+          "email_code",
+        ],
+        "name": "email_address",
+        "required": true,
+        "second_factors": [],
+        "used_for_first_factor": true,
+        "used_for_second_factor": false,
+        "verifications": [
+          "email_code",
+        ],
+        "verify_at_sign_up": true,
+      },
+    },
+    "passkey_settings": {
+      "allow_autofill": false,
+      "show_sign_in_button": false,
+    },
+    "password_settings": {
+      "allowed_special_characters": "!@#$%^&*",
+      "disable_hibp": true,
+      "enforce_hibp_on_sign_in": false,
+      "max_length": 50,
+      "min_length": 8,
+      "min_zxcvbn_strength": 3,
+      "require_lowercase": true,
+      "require_numbers": true,
+      "require_special_char": true,
+      "require_uppercase": true,
+      "show_zxcvbn": true,
+    },
+    "saml": {
+      "enabled": false,
+    },
+    "sign_in": {
+      "second_factor": {
+        "required": false,
+      },
+    },
+    "sign_up": {
+      "captcha_enabled": false,
+      "captcha_widget_type": "smart",
+      "custom_action_required": false,
+      "legal_consent_enabled": false,
+      "mode": "restricted",
+      "progressive": false,
+    },
+    "social": {},
+  },
+}
+`;
+
+exports[`Environment > Environment Snapshots > should match snapshot for environment structure 1`] = `
+{
+  "authConfig": {
+    "reverification": true,
+    "singleSessionMode": false,
+  },
+  "displayConfig": {
+    "applicationName": "Test App",
+    "branded": true,
+    "instanceEnvironmentType": "production",
+    "preferredSignInStrategy": "email_code",
+    "showDevModeWarning": false,
+  },
+  "maintenanceMode": false,
+  "organizationSettings": {
+    "enabled": true,
+    "maxAllowedMemberships": 10,
+  },
+  "userSettings": {
+    "actions": {
+      "create_organization": true,
+      "create_organizations_limit": null,
+      "delete_self": true,
+    },
+    "attributes": [
+      "email_address",
+      "password",
+    ],
+    "social": [
+      "oauth_google",
+    ],
+  },
+}
+`;

@@ -31,3 +31,62 @@ describe('OrganizationInvitation', () => {
     });
   });
 });
+
+describe('OrganizationInvitation Snapshots', () => {
+  it('should match snapshot for organization invitation structure', () => {
+    const organizationInvitation = new OrganizationInvitation({
+      object: 'organization_invitation',
+      email_address: 'newuser@example.com',
+      id: 'invitation_123',
+      organization_id: 'org_123',
+      public_metadata: {
+        department: 'engineering',
+        level: 'senior',
+      },
+      role: 'admin',
+      created_at: 1735689600000,
+      updated_at: 1735689650000,
+      status: 'pending',
+    });
+
+    const snapshot = {
+      id: organizationInvitation.id,
+      emailAddress: organizationInvitation.emailAddress,
+      organizationId: organizationInvitation.organizationId,
+      role: organizationInvitation.role,
+      roleName: organizationInvitation.roleName,
+      status: organizationInvitation.status,
+      createdAt: organizationInvitation.createdAt?.getTime(),
+      updatedAt: organizationInvitation.updatedAt?.getTime(),
+      publicMetadata: organizationInvitation.publicMetadata,
+    };
+
+    expect(snapshot).toMatchSnapshot();
+  });
+
+  it('should match snapshot for minimal organization invitation', () => {
+    const organizationInvitation = new OrganizationInvitation({
+      object: 'organization_invitation',
+      email_address: 'user@company.com',
+      id: 'invitation_minimal',
+      organization_id: 'org_456',
+      public_metadata: {},
+      role: 'basic_member',
+      created_at: 1735689600000,
+      updated_at: 1735689600000,
+      status: 'accepted',
+    });
+
+    const snapshot = {
+      id: organizationInvitation.id,
+      emailAddress: organizationInvitation.emailAddress,
+      organizationId: organizationInvitation.organizationId,
+      role: organizationInvitation.role,
+      roleName: organizationInvitation.roleName,
+      status: organizationInvitation.status,
+      publicMetadata: organizationInvitation.publicMetadata,
+    };
+
+    expect(snapshot).toMatchSnapshot();
+  });
+});

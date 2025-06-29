@@ -909,3 +909,78 @@ describe('Session', () => {
     });
   });
 });
+
+describe('Session Snapshots', () => {
+  it('should match snapshot for session instance structure', () => {
+    const user = createUser({ id: 'user_123', first_name: 'John', last_name: 'Doe' });
+    const sessionJSON: SessionJSON = {
+      object: 'session',
+      id: 'session_123',
+      status: 'active',
+      user: user,
+      last_active_organization_id: 'org_123',
+      last_active_token: { object: 'token', jwt: mockJwt },
+      actor: null,
+      created_at: 1735689600000,
+      updated_at: 1735689700000,
+      factor_verification_age: [0, 5],
+    };
+
+    const session = new Session(sessionJSON);
+
+    const sessionSnapshot = {
+      id: session.id,
+      status: session.status,
+      lastActiveOrganizationId: session.lastActiveOrganizationId,
+      createdAt: session.createdAt?.getTime(),
+      updatedAt: session.updatedAt?.getTime(),
+      user: {
+        id: session.user?.id,
+        firstName: session.user?.firstName,
+        lastName: session.user?.lastName,
+      },
+      lastActiveToken: session.lastActiveToken
+        ? {
+            object: session.lastActiveToken.object,
+            jwt: typeof session.lastActiveToken.jwt === 'string' ? 'jwt_token_present' : null,
+          }
+        : null,
+    };
+
+    expect(sessionSnapshot).toMatchSnapshot();
+  });
+
+  it('should match snapshot for session with no organization', () => {
+    const user = createUser({ id: 'user_456', first_name: 'Jane', last_name: 'Smith' });
+    const sessionJSON: SessionJSON = {
+      object: 'session',
+      id: 'session_456',
+      status: 'active',
+      user: user,
+      last_active_organization_id: null,
+      last_active_token: null,
+      actor: null,
+      created_at: 1735689600000,
+      updated_at: 1735689600000,
+      factor_verification_age: null,
+    };
+
+    const session = new Session(sessionJSON);
+
+    const sessionSnapshot = {
+      id: session.id,
+      status: session.status,
+      lastActiveOrganizationId: session.lastActiveOrganizationId,
+      createdAt: session.createdAt?.getTime(),
+      updatedAt: session.updatedAt?.getTime(),
+      user: {
+        id: session.user?.id,
+        firstName: session.user?.firstName,
+        lastName: session.user?.lastName,
+      },
+      lastActiveToken: session.lastActiveToken,
+    };
+
+    expect(sessionSnapshot).toMatchSnapshot();
+  });
+});

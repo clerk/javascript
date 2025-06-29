@@ -1,0 +1,25 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`UserData Snapshots > should match snapshot for complete user data 1`] = `
+{
+  "firstName": "Alice",
+  "hasImage": true,
+  "imageUrl": "https://example.com/alice-avatar.jpg",
+  "lastName": "Johnson",
+  "primaryEmailAddressId": undefined,
+  "primaryPhoneNumberId": undefined,
+  "primaryWeb3WalletId": undefined,
+}
+`;
+
+exports[`UserData Snapshots > should match snapshot for minimal user data 1`] = `
+{
+  "firstName": null,
+  "hasImage": false,
+  "imageUrl": undefined,
+  "lastName": null,
+  "primaryEmailAddressId": undefined,
+  "primaryPhoneNumberId": undefined,
+  "primaryWeb3WalletId": undefined,
+}
+`;

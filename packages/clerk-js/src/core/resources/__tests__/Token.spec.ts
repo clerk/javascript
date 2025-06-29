@@ -105,4 +105,45 @@ describe('Token', () => {
       });
     });
   });
+
+  it('has the same initial properties', () => {
+    const token = new Token({
+      object: 'token',
+      jwt: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
+    });
+
+    expect(token).toMatchObject({
+      jwt: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
+    });
+  });
+});
+
+describe('Token Snapshots', () => {
+  it('should match snapshot for token structure', () => {
+    const token = new Token({
+      object: 'token',
+      jwt: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
+    });
+
+    const snapshot = {
+      jwt: token.jwt,
+      object: token.object,
+    };
+
+    expect(snapshot).toMatchSnapshot();
+  });
+
+  it('should match snapshot for null jwt token', () => {
+    const token = new Token({
+      object: 'token',
+      jwt: null,
+    });
+
+    const snapshot = {
+      jwt: token.jwt,
+      object: token.object,
+    };
+
+    expect(snapshot).toMatchSnapshot();
+  });
 });
