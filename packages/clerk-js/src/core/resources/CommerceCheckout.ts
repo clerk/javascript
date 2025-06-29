@@ -9,7 +9,6 @@ import type {
 
 import { commerceTotalsFromJSON } from '../../utils';
 import { BaseResource, CommercePaymentSource, CommercePlan, isClerkAPIResponseError } from './internal';
-import { parseJSON } from './parser';
 
 export class CommerceCheckout extends BaseResource implements CommerceCheckoutResource {
   id!: string;
@@ -31,19 +30,21 @@ export class CommerceCheckout extends BaseResource implements CommerceCheckoutRe
   }
 
   protected fromJSON(data: CommerceCheckoutJSON | null): this {
-    Object.assign(
-      this,
-      parseJSON<CommerceCheckout>(data, {
-        customTransforms: {
-          paymentSource: value => (value ? new CommercePaymentSource(value) : undefined),
-          plan: value => new CommercePlan(value),
-          totals: value => commerceTotalsFromJSON(value),
-        },
-        defaultValues: {
-          planPeriodStart: undefined,
-        },
-      }),
-    );
+    if (!data) {
+      return this;
+    }
+
+    this.id = data.id;
+    this.externalClientSecret = data.external_client_secret;
+    this.externalGatewayId = data.external_gateway_id;
+    this.statement_id = data.statement_id;
+    this.paymentSource = data.payment_source ? new CommercePaymentSource(data.payment_source) : undefined;
+    this.plan = new CommercePlan(data.plan);
+    this.planPeriod = data.plan_period;
+    this.planPeriodStart = data.plan_period_start;
+    this.status = data.status;
+    this.totals = commerceTotalsFromJSON(data.totals);
+    this.isImmediatePlanChange = data.is_immediate_plan_change;
     return this;
   }
 

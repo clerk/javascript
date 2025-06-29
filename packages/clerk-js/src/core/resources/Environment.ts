@@ -13,7 +13,6 @@ import { eventBus, events } from '../../core/events';
 import { APIKeySettings } from './APIKeySettings';
 import { AuthConfig, BaseResource, CommerceSettings, DisplayConfig, UserSettings } from './internal';
 import { OrganizationSettings } from './OrganizationSettings';
-import { parseJSON } from './parser';
 
 export class Environment extends BaseResource implements EnvironmentResource {
   private static instance: Environment;
@@ -42,22 +41,18 @@ export class Environment extends BaseResource implements EnvironmentResource {
   }
 
   protected fromJSON(data: EnvironmentJSONSnapshot | EnvironmentJSON | null): this {
-    Object.assign(
-      this,
-      parseJSON<Environment>(data, {
-        nestedFields: {
-          authConfig: AuthConfig,
-          displayConfig: DisplayConfig,
-          organizationSettings: OrganizationSettings,
-          userSettings: UserSettings,
-          commerceSettings: CommerceSettings,
-          apiKeysSettings: APIKeySettings,
-        },
-        defaultValues: {
-          maintenanceMode: false,
-        },
-      }),
-    );
+    if (!data) {
+      return this;
+    }
+
+    this.authConfig = new AuthConfig(data.auth_config);
+    this.displayConfig = new DisplayConfig(data.display_config);
+    this.maintenanceMode = this.withDefault(data.maintenance_mode, this.maintenanceMode);
+    this.organizationSettings = new OrganizationSettings(data.organization_settings);
+    this.userSettings = new UserSettings(data.user_settings);
+    this.commerceSettings = new CommerceSettings(data.commerce_settings);
+    this.apiKeysSettings = new APIKeySettings(data.api_keys_settings);
+
     return this;
   }
 

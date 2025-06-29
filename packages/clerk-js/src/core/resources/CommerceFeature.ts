@@ -1,7 +1,6 @@
 import type { CommerceFeatureJSON, CommerceFeatureJSONSnapshot, CommerceFeatureResource } from '@clerk/types';
 
 import { BaseResource } from './internal';
-import { parseJSON } from './parser';
 
 export class CommerceFeature extends BaseResource implements CommerceFeatureResource {
   id!: string;
@@ -20,7 +19,12 @@ export class CommerceFeature extends BaseResource implements CommerceFeatureReso
       return this;
     }
 
-    Object.assign(this, parseJSON<CommerceFeatureResource>(data));
+    this.id = data.id;
+    this.name = data.name;
+    this.description = data.description;
+    this.slug = data.slug;
+    this.avatarUrl = data.avatar_url;
+
     return this;
   }
 

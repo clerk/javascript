@@ -25,6 +25,7 @@ import type {
   UserResource,
 } from '@clerk/types';
 
+import { unixEpochToDate } from '../../utils/date';
 import {
   convertJSONToPublicKeyRequestOptions,
   serializePublicKeyCredentialAssertion,
@@ -34,7 +35,6 @@ import { clerkInvalidStrategy, clerkMissingWebAuthnPublicKeyOptions } from '../e
 import { eventBus, events } from '../events';
 import { SessionTokenCache } from '../tokenCache';
 import { BaseResource, PublicUserData, Token, User } from './internal';
-import { parseJSON } from './parser';
 import { SessionVerification } from './SessionVerification';
 
 export class Session extends BaseResource implements SessionResource {
@@ -288,24 +288,29 @@ export class Session extends BaseResource implements SessionResource {
   };
 
   protected fromJSON(data: SessionJSON | SessionJSONSnapshot | null): this {
-    Object.assign(
-      this,
-      parseJSON<Session>(data, {
-        dateFields: ['lastActiveAt', 'expireAt', 'abandonAt', 'createdAt', 'updatedAt'],
-        nestedFields: {
-          user: User,
-          publicUserData: PublicUserData,
-          lastActiveToken: Token,
-        },
-        defaultValues: {
-          factorVerificationAge: null,
-          tasks: null,
-          actor: null,
-          lastActiveToken: null,
-          lastActiveOrganizationId: null,
-        },
-      }),
-    );
+    if (!data) {
+      return this;
+    }
+
+    this.id = data.id;
+    this.status = data.status;
+    this.expireAt = unixEpochToDate(data.expire_at);
+    this.abandonAt = unixEpochToDate(data.abandon_at);
+    this.factorVerificationAge = data.factor_verification_age;
+    this.lastActiveAt = unixEpochToDate(data.last_active_at || undefined);
+    this.lastActiveOrganizationId = data.last_active_organization_id;
+    this.actor = data.actor || null;
+    this.createdAt = unixEpochToDate(data.created_at);
+    this.updatedAt = unixEpochToDate(data.updated_at);
+    this.user = new User(data.user);
+    this.tasks = data.tasks || null;
+
+    if (data.public_user_data) {
+      this.publicUserData = new PublicUserData(data.public_user_data);
+    }
+
+    this.lastActiveToken = data.last_active_token ? new Token(data.last_active_token) : null;
+
     return this;
   }
 

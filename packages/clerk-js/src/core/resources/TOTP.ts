@@ -1,7 +1,7 @@
 import type { TOTPJSON, TOTPResource } from '@clerk/types';
 
+import { unixEpochToDate } from '../../utils/date';
 import { BaseResource } from './internal';
-import { parseJSON } from './parser';
 
 export class TOTP extends BaseResource implements TOTPResource {
   pathRoot = '/me';
@@ -24,12 +24,13 @@ export class TOTP extends BaseResource implements TOTPResource {
       return this;
     }
 
-    Object.assign(
-      this,
-      parseJSON<TOTPResource>(data, {
-        dateFields: ['updatedAt', 'createdAt'],
-      }),
-    );
+    this.id = data.id;
+    this.secret = data.secret;
+    this.uri = data.uri;
+    this.verified = data.verified;
+    this.backupCodes = data.backup_codes;
+    this.updatedAt = unixEpochToDate(data.updated_at);
+    this.createdAt = unixEpochToDate(data.created_at);
     return this;
   }
 }

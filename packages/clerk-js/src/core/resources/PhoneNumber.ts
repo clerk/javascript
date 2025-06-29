@@ -9,7 +9,6 @@ import type {
 } from '@clerk/types';
 
 import { BaseResource, IdentificationLink, Verification } from './internal';
-import { parseJSON } from './parser';
 
 export class PhoneNumber extends BaseResource implements PhoneNumberResource {
   id!: string;
@@ -73,23 +72,17 @@ export class PhoneNumber extends BaseResource implements PhoneNumberResource {
   };
 
   protected fromJSON(data: PhoneNumberJSON | PhoneNumberJSONSnapshot | null): this {
-    Object.assign(
-      this,
-      parseJSON<PhoneNumber>(data, {
-        nestedFields: {
-          verification: Verification,
-        },
-        arrayFields: {
-          linkedTo: IdentificationLink,
-        },
-        defaultValues: {
-          phoneNumber: '',
-          reservedForSecondFactor: false,
-          defaultSecondFactor: false,
-          linkedTo: [],
-        },
-      }),
-    );
+    if (!data) {
+      return this;
+    }
+
+    this.id = data.id;
+    this.phoneNumber = data.phone_number;
+    this.reservedForSecondFactor = data.reserved_for_second_factor;
+    this.defaultSecondFactor = data.default_second_factor;
+    this.verification = new Verification(data.verification);
+    this.linkedTo = (data.linked_to || []).map(link => new IdentificationLink(link));
+    this.backupCodes = data.backup_codes;
     return this;
   }
 

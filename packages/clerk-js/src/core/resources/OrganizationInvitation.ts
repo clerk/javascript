@@ -7,8 +7,8 @@ import type {
   OrganizationInvitationStatus,
 } from '@clerk/types';
 
+import { unixEpochToDate } from '../../utils/date';
 import { BaseResource } from './internal';
-import { parseJSON } from './parser';
 
 export class OrganizationInvitation extends BaseResource implements OrganizationInvitationResource {
   id!: string;
@@ -62,15 +62,17 @@ export class OrganizationInvitation extends BaseResource implements Organization
   };
 
   protected fromJSON(data: OrganizationInvitationJSON | null): this {
-    Object.assign(
-      this,
-      parseJSON<OrganizationInvitation>(data, {
-        dateFields: ['createdAt', 'updatedAt'],
-        defaultValues: {
-          publicMetadata: {},
-        },
-      }),
-    );
+    if (data) {
+      this.id = data.id;
+      this.emailAddress = data.email_address;
+      this.organizationId = data.organization_id;
+      this.publicMetadata = data.public_metadata;
+      this.role = data.role;
+      this.roleName = data.role_name;
+      this.status = data.status;
+      this.createdAt = unixEpochToDate(data.created_at);
+      this.updatedAt = unixEpochToDate(data.updated_at);
+    }
     return this;
   }
 }

@@ -1,7 +1,7 @@
 import type { PermissionJSON, PermissionResource } from '@clerk/types';
 
+import { unixEpochToDate } from '../../utils/date';
 import { BaseResource } from './internal';
-import { parseJSON } from './parser';
 
 export class Permission extends BaseResource implements PermissionResource {
   id!: string;
@@ -22,12 +22,13 @@ export class Permission extends BaseResource implements PermissionResource {
       return this;
     }
 
-    Object.assign(
-      this,
-      parseJSON<PermissionResource>(data, {
-        dateFields: ['createdAt', 'updatedAt'],
-      }),
-    );
+    this.id = data.id;
+    this.key = data.key;
+    this.name = data.name;
+    this.description = data.description;
+    this.type = data.type;
+    this.createdAt = unixEpochToDate(data.created_at);
+    this.updatedAt = unixEpochToDate(data.updated_at);
     return this;
   }
 }

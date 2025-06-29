@@ -10,7 +10,6 @@ import type {
 } from '@clerk/types';
 
 import { BaseResource, DeletedObject } from './internal';
-import { parseJSON } from './parser';
 
 export class CommercePaymentSource extends BaseResource implements CommercePaymentSourceResource {
   id!: string;
@@ -28,14 +27,19 @@ export class CommercePaymentSource extends BaseResource implements CommercePayme
   }
 
   protected fromJSON(data: CommercePaymentSourceJSON | null): this {
-    Object.assign(
-      this,
-      parseJSON<CommercePaymentSource>(data, {
-        defaultValues: {
-          walletType: undefined,
-        },
-      }),
-    );
+    if (!data) {
+      return this;
+    }
+
+    this.id = data.id;
+    this.last4 = data.last4;
+    this.paymentMethod = data.payment_method;
+    this.cardType = data.card_type;
+    this.isDefault = data.is_default;
+    this.isRemovable = data.is_removable;
+    this.status = data.status;
+    this.walletType = data.wallet_type ?? undefined;
+
     return this;
   }
 
@@ -78,14 +82,13 @@ export class CommerceInitializedPaymentSource extends BaseResource implements Co
   }
 
   protected fromJSON(data: CommerceInitializedPaymentSourceJSON | null): this {
-    Object.assign(
-      this,
-      parseJSON<CommerceInitializedPaymentSource>(data, {
-        defaultValues: {
-          paymentMethodOrder: ['card'],
-        },
-      }),
-    );
+    if (!data) {
+      return this;
+    }
+
+    this.externalClientSecret = data.external_client_secret;
+    this.externalGatewayId = data.external_gateway_id;
+    this.paymentMethodOrder = data.payment_method_order ?? ['card'];
     return this;
   }
 }

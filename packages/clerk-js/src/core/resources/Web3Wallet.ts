@@ -8,7 +8,6 @@ import type {
 } from '@clerk/types';
 
 import { BaseResource, Verification } from './internal';
-import { parseJSON } from './parser';
 
 export class Web3Wallet extends BaseResource implements Web3WalletResource {
   id!: string;
@@ -52,14 +51,13 @@ export class Web3Wallet extends BaseResource implements Web3WalletResource {
   }
 
   protected fromJSON(data: Web3WalletJSON | Web3WalletJSONSnapshot | null): this {
-    Object.assign(
-      this,
-      parseJSON<Web3Wallet>(data, {
-        customTransforms: {
-          verification: value => new Verification(value),
-        },
-      }),
-    );
+    if (!data) {
+      return this;
+    }
+
+    this.id = data.id;
+    this.web3Wallet = data.web3_wallet;
+    this.verification = new Verification(data.verification);
     return this;
   }
 

@@ -8,8 +8,8 @@ import type {
 } from '@clerk/types';
 
 import { convertPageToOffsetSearchParams } from '../../utils/convertPageToOffsetSearchParams';
+import { unixEpochToDate } from '../../utils/date';
 import { BaseResource } from './internal';
-import { parseJSON } from './parser';
 
 export class UserOrganizationInvitation extends BaseResource implements UserOrganizationInvitationResource {
   id!: string;
@@ -51,24 +51,22 @@ export class UserOrganizationInvitation extends BaseResource implements UserOrga
   };
 
   protected fromJSON(data: UserOrganizationInvitationJSON | null): this {
-    Object.assign(
-      this,
-      parseJSON<UserOrganizationInvitation>(data, {
-        dateFields: ['createdAt', 'updatedAt'],
-        customTransforms: {
-          publicOrganizationData: (value: any) => ({
-            hasImage: value.has_image,
-            imageUrl: value.image_url,
-            name: value.name,
-            id: value.id,
-            slug: value.slug,
-          }),
-        },
-        defaultValues: {
-          publicMetadata: {},
-        },
-      }),
-    );
+    if (data) {
+      this.id = data.id;
+      this.emailAddress = data.email_address;
+      this.publicOrganizationData = {
+        hasImage: data.public_organization_data.has_image,
+        imageUrl: data.public_organization_data.image_url,
+        name: data.public_organization_data.name,
+        id: data.public_organization_data.id,
+        slug: data.public_organization_data.slug,
+      };
+      this.publicMetadata = data.public_metadata;
+      this.role = data.role;
+      this.status = data.status;
+      this.createdAt = unixEpochToDate(data.created_at);
+      this.updatedAt = unixEpochToDate(data.updated_at);
+    }
     return this;
   }
 }

@@ -10,7 +10,6 @@ import type {
 
 import { commerceMoneyFromJSON } from '../../utils';
 import { BaseResource, CommercePlan, DeletedObject } from './internal';
-import { parseJSON } from './parser';
 
 export class CommerceSubscription extends BaseResource implements CommerceSubscriptionResource {
   id!: string;
@@ -25,7 +24,6 @@ export class CommerceSubscription extends BaseResource implements CommerceSubscr
   credit?: {
     amount: CommerceMoney;
   };
-
   constructor(data: CommerceSubscriptionJSON) {
     super();
     this.fromJSON(data);
@@ -36,18 +34,16 @@ export class CommerceSubscription extends BaseResource implements CommerceSubscr
       return this;
     }
 
-    Object.assign(
-      this,
-      parseJSON<CommerceSubscriptionResource>(data, {
-        nestedFields: {
-          plan: CommercePlan,
-        },
-        customTransforms: {
-          amount: value => (value ? commerceMoneyFromJSON(value) : undefined),
-          credit: value => (value && value.amount ? { amount: commerceMoneyFromJSON(value.amount) } : undefined),
-        },
-      }),
-    );
+    this.id = data.id;
+    this.paymentSourceId = data.payment_source_id;
+    this.plan = new CommercePlan(data.plan);
+    this.planPeriod = data.plan_period;
+    this.status = data.status;
+    this.periodStart = data.period_start;
+    this.periodEnd = data.period_end;
+    this.canceledAt = data.canceled_at;
+    this.amount = data.amount ? commerceMoneyFromJSON(data.amount) : undefined;
+    this.credit = data.credit && data.credit.amount ? { amount: commerceMoneyFromJSON(data.credit.amount) } : undefined;
     return this;
   }
 

@@ -10,10 +10,7 @@ import type {
   VerificationResource,
 } from '@clerk/types';
 
-import { BaseResource } from './internal';
-import { parseJSON } from './parser';
-import { Session } from './Session';
-import { Verification } from './Verification';
+import { BaseResource, Session, Verification } from './internal';
 
 export class SessionVerification extends BaseResource implements SessionVerificationResource {
   status!: SessionVerificationStatus;
@@ -30,24 +27,20 @@ export class SessionVerification extends BaseResource implements SessionVerifica
   }
 
   protected fromJSON(data: SessionVerificationJSON | null): this {
-    if (!data) {
-      return this;
+    if (data) {
+      this.id = data.id;
+      this.status = data.status;
+      this.session = new Session(data.session);
+      this.level = data.level;
+      this.supportedFirstFactors = deepSnakeToCamel(data.supported_first_factors) as
+        | SessionVerificationFirstFactor[]
+        | null;
+      this.supportedSecondFactors = deepSnakeToCamel(data.supported_second_factors) as
+        | SessionVerificationSecondFactor[]
+        | null;
+      this.firstFactorVerification = new Verification(data.first_factor_verification);
+      this.secondFactorVerification = new Verification(data.second_factor_verification);
     }
-
-    Object.assign(
-      this,
-      parseJSON<SessionVerificationResource>(data, {
-        nestedFields: {
-          session: Session,
-          firstFactorVerification: Verification,
-          secondFactorVerification: Verification,
-        },
-        customTransforms: {
-          supportedFirstFactors: value => deepSnakeToCamel(value) as SessionVerificationFirstFactor[] | null,
-          supportedSecondFactors: value => deepSnakeToCamel(value) as SessionVerificationSecondFactor[] | null,
-        },
-      }),
-    );
     return this;
   }
 }

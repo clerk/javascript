@@ -5,12 +5,11 @@ import type {
   EnterpriseAccountJSON,
   EnterpriseAccountJSONSnapshot,
   EnterpriseAccountResource,
-  EnterpriseProvider,
   VerificationResource,
 } from '@clerk/types';
 
+import { unixEpochToDate } from '../../utils/date';
 import { BaseResource } from './Base';
-import { parseJSON } from './parser';
 import { Verification } from './Verification';
 
 export class EnterpriseAccount extends BaseResource implements EnterpriseAccountResource {
@@ -38,22 +37,24 @@ export class EnterpriseAccount extends BaseResource implements EnterpriseAccount
       return this;
     }
 
-    Object.assign(
-      this,
-      parseJSON<EnterpriseAccountResource>(data, {
-        nestedFields: {
-          verification: Verification,
-          enterpriseConnection: EnterpriseAccountConnection,
-        },
-        defaultValues: {
-          emailAddress: '',
-          firstName: '',
-          lastName: '',
-          publicMetadata: {},
-          providerUserId: null,
-        },
-      }),
-    );
+    this.id = data.id;
+    this.provider = data.provider;
+    this.protocol = data.protocol;
+    this.providerUserId = data.provider_user_id;
+    this.active = data.active;
+    this.emailAddress = data.email_address;
+    this.firstName = data.first_name;
+    this.lastName = data.last_name;
+    this.publicMetadata = data.public_metadata;
+
+    if (data.verification) {
+      this.verification = new Verification(data.verification);
+    }
+
+    if (data.enterprise_connection) {
+      this.enterpriseConnection = new EnterpriseAccountConnection(data.enterprise_connection);
+    }
+
     return this;
   }
 
@@ -77,47 +78,40 @@ export class EnterpriseAccount extends BaseResource implements EnterpriseAccount
 
 export class EnterpriseAccountConnection extends BaseResource implements EnterpriseAccountConnectionResource {
   id!: string;
-  provider!: EnterpriseProvider;
-  name!: string;
-  domains!: string[];
-  sync!: boolean;
   active!: boolean;
-  setupStatus!: string;
-  publicMetadata = {};
-  protocol!: EnterpriseAccountResource['protocol'];
-  allowIdpInitiated = false;
-  allowSubdomains = false;
-  disableAdditionalIdentifications = false;
+  allowIdpInitiated!: boolean;
+  allowSubdomains!: boolean;
+  disableAdditionalIdentifications!: boolean;
   domain!: string;
   logoPublicUrl: string | null = '';
-  syncUserAttributes = false;
+  name!: string;
+  protocol!: EnterpriseAccountResource['protocol'];
+  provider!: EnterpriseAccountResource['provider'];
+  syncUserAttributes!: boolean;
   createdAt!: Date;
   updatedAt!: Date;
 
-  constructor(data: EnterpriseAccountConnectionJSON | EnterpriseAccountConnectionJSONSnapshot) {
+  constructor(data: EnterpriseAccountConnectionJSON | EnterpriseAccountConnectionJSONSnapshot | null) {
     super();
     this.fromJSON(data);
   }
 
   protected fromJSON(data: EnterpriseAccountConnectionJSON | EnterpriseAccountConnectionJSONSnapshot | null): this {
-    if (!data) {
-      return this;
+    if (data) {
+      this.id = data.id;
+      this.name = data.name;
+      this.domain = data.domain;
+      this.active = data.active;
+      this.provider = data.provider;
+      this.logoPublicUrl = data.logo_public_url;
+      this.syncUserAttributes = data.sync_user_attributes;
+      this.allowSubdomains = data.allow_subdomains;
+      this.allowIdpInitiated = data.allow_idp_initiated;
+      this.disableAdditionalIdentifications = data.disable_additional_identifications;
+      this.createdAt = unixEpochToDate(data.created_at);
+      this.updatedAt = unixEpochToDate(data.updated_at);
     }
 
-    Object.assign(
-      this,
-      parseJSON<EnterpriseAccountConnectionResource>(data, {
-        dateFields: ['createdAt', 'updatedAt'],
-        defaultValues: {
-          publicMetadata: {},
-          allowIdpInitiated: false,
-          allowSubdomains: false,
-          disableAdditionalIdentifications: false,
-          logoPublicUrl: '',
-          syncUserAttributes: false,
-        },
-      }),
-    );
     return this;
   }
 
@@ -130,13 +124,13 @@ export class EnterpriseAccountConnection extends BaseResource implements Enterpr
       active: this.active,
       protocol: this.protocol,
       provider: this.provider,
-      logo_public_url: this.logoPublicUrl || '',
+      logo_public_url: this.logoPublicUrl,
       sync_user_attributes: this.syncUserAttributes,
       allow_subdomains: this.allowSubdomains,
       allow_idp_initiated: this.allowIdpInitiated,
       disable_additional_identifications: this.disableAdditionalIdentifications,
-      created_at: this.createdAt?.getTime() || 0,
-      updated_at: this.updatedAt?.getTime() || 0,
-    } as unknown as EnterpriseAccountConnectionJSONSnapshot;
+      created_at: this.createdAt.getTime(),
+      updated_at: this.updatedAt.getTime(),
+    };
   }
 }

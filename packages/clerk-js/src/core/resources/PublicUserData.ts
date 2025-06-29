@@ -1,7 +1,5 @@
 import type { PublicUserData as IPublicUserData, PublicUserDataJSON, PublicUserDataJSONSnapshot } from '@clerk/types';
 
-import { parseJSON } from './parser';
-
 export class PublicUserData implements IPublicUserData {
   firstName!: string | null;
   lastName!: string | null;
@@ -15,22 +13,15 @@ export class PublicUserData implements IPublicUserData {
   }
 
   protected fromJSON(data: PublicUserDataJSON | PublicUserDataJSONSnapshot | null): this {
-    if (!data) {
-      return this;
+    if (data) {
+      this.firstName = data.first_name || null;
+      this.lastName = data.last_name || null;
+      this.imageUrl = data.image_url || '';
+      this.hasImage = data.has_image || false;
+      this.identifier = data.identifier || '';
+      this.userId = data.user_id;
     }
 
-    Object.assign(
-      this,
-      parseJSON<IPublicUserData>(data, {
-        defaultValues: {
-          firstName: null,
-          lastName: null,
-          imageUrl: '',
-          hasImage: false,
-          identifier: '',
-        },
-      }),
-    );
     return this;
   }
 

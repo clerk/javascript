@@ -8,8 +8,8 @@ import type {
 } from '@clerk/types';
 
 import { convertPageToOffsetSearchParams } from '../../utils/convertPageToOffsetSearchParams';
+import { unixEpochToDate } from '../../utils/date';
 import { BaseResource } from './Base';
-import { parseJSON } from './parser';
 
 export class OrganizationSuggestion extends BaseResource implements OrganizationSuggestionResource {
   id!: string;
@@ -48,21 +48,19 @@ export class OrganizationSuggestion extends BaseResource implements Organization
   };
 
   protected fromJSON(data: OrganizationSuggestionJSON | null): this {
-    Object.assign(
-      this,
-      parseJSON<OrganizationSuggestion>(data, {
-        dateFields: ['createdAt', 'updatedAt'],
-        customTransforms: {
-          publicOrganizationData: (value: any) => ({
-            hasImage: value.has_image,
-            imageUrl: value.image_url,
-            name: value.name,
-            id: value.id,
-            slug: value.slug,
-          }),
-        },
-      }),
-    );
+    if (data) {
+      this.id = data.id;
+      this.status = data.status;
+      this.publicOrganizationData = {
+        hasImage: data.public_organization_data.has_image,
+        imageUrl: data.public_organization_data.image_url,
+        name: data.public_organization_data.name,
+        id: data.public_organization_data.id,
+        slug: data.public_organization_data.slug,
+      };
+      this.createdAt = unixEpochToDate(data.created_at);
+      this.updatedAt = unixEpochToDate(data.updated_at);
+    }
     return this;
   }
 }

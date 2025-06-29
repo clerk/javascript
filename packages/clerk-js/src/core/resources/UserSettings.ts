@@ -17,7 +17,6 @@ import type {
 } from '@clerk/types';
 
 import { BaseResource } from './internal';
-import { parseJSON } from './parser';
 
 const defaultMaxPasswordLength = 72;
 const defaultMinPasswordLength = 8;
@@ -204,56 +203,50 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
   }
 
   protected fromJSON(data: UserSettingsJSON | UserSettingsJSONSnapshot | null): this {
-    Object.assign(
-      this,
-      parseJSON<UserSettings>(data, {
-        customTransforms: {
-          attributes: value =>
-            value
-              ? // @ts-expect-error
-                (Object.fromEntries(Object.entries(value).map(a => [a[0], { ...a[1], name: a[0] }])) as Attributes)
-              : this.attributes,
-          passwordSettings: value =>
-            value
-              ? {
-                  ...value,
-                  min_length: Math.max(value?.min_length ?? defaultMinPasswordLength, defaultMinPasswordLength),
-                  max_length:
-                    value?.max_length === 0
-                      ? defaultMaxPasswordLength
-                      : Math.min(value?.max_length ?? defaultMaxPasswordLength, defaultMaxPasswordLength),
-                }
-              : this.passwordSettings,
-          usernameSettings: value =>
-            value
-              ? {
-                  ...value,
-                  min_length: Math.max(value?.min_length ?? defaultMinUsernameLength, defaultMinUsernameLength),
-                  max_length: Math.min(value?.max_length ?? defaultMaxUsernameLength, defaultMaxUsernameLength),
-                }
-              : this.usernameSettings,
-        },
-        defaultValues: {
-          id: undefined,
-          actions: { create_organization: false, delete_self: false },
-          attributes: this.attributes,
-          enterpriseSSO: { enabled: false },
-          passkeySettings: { allow_autofill: false, show_sign_in_button: false },
-          passwordSettings: {} as PasswordSettingsData,
-          saml: { enabled: false },
-          signIn: { second_factor: { required: false, enabled: false } },
-          signUp: {
-            allowlist_only: false,
-            captcha_enabled: false,
-            legal_consent_enabled: false,
-            mode: 'public',
-            progressive: true,
-          },
-          social: {} as OAuthProviders,
-          usernameSettings: {} as UsernameSettingsData,
-        },
-      }),
+    if (!data) {
+      return this;
+    }
+
+    this.attributes = this.withDefault(
+      data.attributes
+        ? (Object.fromEntries(Object.entries(data.attributes).map(a => [a[0], { ...a[1], name: a[0] }])) as Attributes)
+        : null,
+      this.attributes,
     );
+    this.actions = this.withDefault(data.actions, this.actions);
+    this.enterpriseSSO = this.withDefault(data.enterprise_sso, this.enterpriseSSO);
+    this.passkeySettings = this.withDefault(data.passkey_settings, this.passkeySettings);
+    this.passwordSettings = data.password_settings
+      ? {
+          ...data.password_settings,
+          min_length: Math.max(
+            data.password_settings?.min_length ?? defaultMinPasswordLength,
+            defaultMinPasswordLength,
+          ),
+          max_length:
+            data.password_settings?.max_length === 0
+              ? defaultMaxPasswordLength
+              : Math.min(data.password_settings?.max_length ?? defaultMaxPasswordLength, defaultMaxPasswordLength),
+        }
+      : this.passwordSettings;
+    this.saml = this.withDefault(data.saml, this.saml);
+    this.signIn = this.withDefault(data.sign_in, this.signIn);
+    this.signUp = this.withDefault(data.sign_up, this.signUp);
+    this.social = this.withDefault(data.social, this.social);
+    this.usernameSettings = data.username_settings
+      ? {
+          ...data.username_settings,
+          min_length: Math.max(
+            data.username_settings?.min_length ?? defaultMinUsernameLength,
+            defaultMinUsernameLength,
+          ),
+          max_length: Math.min(
+            data.username_settings?.max_length ?? defaultMaxUsernameLength,
+            defaultMaxUsernameLength,
+          ),
+        }
+      : this.usernameSettings;
+
     return this;
   }
 
