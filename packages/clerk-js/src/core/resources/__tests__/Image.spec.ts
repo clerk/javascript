@@ -49,13 +49,7 @@ describe('Image', () => {
         public_url: 'https://img.clerk.com/profile-photo.jpg',
       });
 
-      const snapshot = {
-        id: image.id,
-        name: image.name,
-        publicUrl: image.publicUrl,
-      };
-
-      expect(snapshot).toMatchSnapshot();
+      expect(image).toMatchSnapshot();
     });
 
     it('should match snapshot for image with null values', () => {
@@ -66,13 +60,7 @@ describe('Image', () => {
         public_url: null,
       } as any);
 
-      const snapshot = {
-        id: image.id,
-        name: image.name,
-        publicUrl: image.publicUrl,
-      };
-
-      expect(snapshot).toMatchSnapshot();
+      expect(image).toMatchSnapshot();
     });
   });
 });

@@ -660,16 +660,6 @@ describe('Client Snapshots', () => {
     // @ts-expect-error We cannot mess with the singleton when tests are running in parallel
     const client = new Client(emptyClientJSON);
 
-    const clientSnapshot = {
-      id: client.id,
-      lastActiveSessionId: client.lastActiveSessionId,
-      createdAt: client.createdAt?.getTime(),
-      updatedAt: client.updatedAt?.getTime(),
-      sessions: client.sessions,
-      signIn: client.signIn,
-      signUp: client.signUp,
-    };
-
-    expect(clientSnapshot).toMatchSnapshot();
+    expect(client).toMatchSnapshot();
   });
 });

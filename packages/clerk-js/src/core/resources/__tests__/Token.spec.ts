@@ -7,6 +7,8 @@ import { mockFetch, mockNetworkFailedFetch } from '../../vitest/fixtures';
 import { BaseResource } from '../internal';
 import { Token } from '../Token';
 
+const FIXED_DATE = new Date('2025-01-01T00:00:00.000Z');
+
 const baseFapiClientOptions = {
   frontendApi: 'clerk.example.com',
   getSessionId() {
@@ -146,5 +148,20 @@ describe('Token Snapshots', () => {
     };
 
     expect(snapshot).toMatchSnapshot();
+  });
+
+  it('should match snapshot for __internal_toSnapshot method', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(FIXED_DATE);
+
+    const token = new Token({
+      object: 'token',
+      id: 'token_snapshot',
+      jwt: 'eyJhbGciOiJSUzI1NiIsImtpZCI6Imluc18yVDlwUkZST0NnYlJPRW1DbDNlX1ZYOEVfMVJSZWJUQ3JfQWZlWXciLCJ0eXAiOiJKV1QifQ.eyJhenAiOiJodHRwczovL2NsZXJrLmV4YW1wbGUuY29tIiwiZXhwIjoxNzM1Njg5NzAwLCJpYXQiOjE3MzU2ODk2MDAsImlzcyI6Imh0dHBzOi8vY2xlcmsuZXhhbXBsZS5jb20iLCJuYmYiOjE3MzU2ODk1OTAsInN1YiI6InVzZXJfMTIzIn0.signature',
+    });
+
+    expect(token.__internal_toSnapshot()).toMatchSnapshot();
+
+    vi.useRealTimers();
   });
 });

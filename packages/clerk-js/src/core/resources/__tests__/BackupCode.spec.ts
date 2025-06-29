@@ -31,14 +31,7 @@ describe('BackupCode Snapshots', () => {
       updated_at: 1735689650000,
     });
 
-    const snapshot = {
-      id: backupCode.id,
-      codes: backupCode.codes,
-      createdAt: backupCode.createdAt?.getTime(),
-      updatedAt: backupCode.updatedAt?.getTime(),
-    };
-
-    expect(snapshot).toMatchSnapshot();
+    expect(backupCode).toMatchSnapshot();
   });
 
   it('should match snapshot for empty backup codes', () => {
@@ -50,13 +43,6 @@ describe('BackupCode Snapshots', () => {
       updated_at: 1735689500000,
     });
 
-    const snapshot = {
-      id: backupCode.id,
-      codes: backupCode.codes,
-      createdAt: backupCode.createdAt?.getTime(),
-      updatedAt: backupCode.updatedAt?.getTime(),
-    };
-
-    expect(snapshot).toMatchSnapshot();
+    expect(backupCode).toMatchSnapshot();
   });
 });

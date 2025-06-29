@@ -1,0 +1,11 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`AuthConfig > should match snapshot 1`] = `
+{
+  "claimed_at": 1672531200000,
+  "id": "",
+  "object": "auth_config",
+  "reverification": true,
+  "single_session_mode": true,
+}
+`;

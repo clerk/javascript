@@ -50,21 +50,7 @@ describe('OrganizationSuggestion Snapshots', () => {
       updated_at: 1735689650000,
     });
 
-    const snapshot = {
-      id: organizationSuggestion.id,
-      status: organizationSuggestion.status,
-      createdAt: organizationSuggestion.createdAt?.getTime(),
-      updatedAt: organizationSuggestion.updatedAt?.getTime(),
-      publicOrganizationData: {
-        id: organizationSuggestion.publicOrganizationData.id,
-        name: organizationSuggestion.publicOrganizationData.name,
-        slug: organizationSuggestion.publicOrganizationData.slug,
-        imageUrl: organizationSuggestion.publicOrganizationData.imageUrl,
-        hasImage: organizationSuggestion.publicOrganizationData.hasImage,
-      },
-    };
-
-    expect(snapshot).toMatchSnapshot();
+    expect(organizationSuggestion).toMatchSnapshot();
   });
 
   it('should match snapshot for organization suggestion with accepted status', () => {
@@ -83,17 +69,6 @@ describe('OrganizationSuggestion Snapshots', () => {
       updated_at: 1735689700000,
     });
 
-    const snapshot = {
-      id: organizationSuggestion.id,
-      status: organizationSuggestion.status,
-      publicOrganizationData: {
-        id: organizationSuggestion.publicOrganizationData.id,
-        name: organizationSuggestion.publicOrganizationData.name,
-        slug: organizationSuggestion.publicOrganizationData.slug,
-        hasImage: organizationSuggestion.publicOrganizationData.hasImage,
-      },
-    };
-
-    expect(snapshot).toMatchSnapshot();
+    expect(organizationSuggestion).toMatchSnapshot();
   });
 });

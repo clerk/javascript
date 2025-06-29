@@ -29,14 +29,7 @@ describe('DeletedObject Snapshots', () => {
       deleted: true,
     });
 
-    const snapshot = {
-      object: deletedObject.object,
-      id: deletedObject.id,
-      slug: deletedObject.slug,
-      deleted: deletedObject.deleted,
-    };
-
-    expect(snapshot).toMatchSnapshot();
+    expect(deletedObject).toMatchSnapshot();
   });
 
   it('should match snapshot for deleted organization object', () => {
@@ -47,13 +40,6 @@ describe('DeletedObject Snapshots', () => {
       deleted: true,
     });
 
-    const snapshot = {
-      object: deletedObject.object,
-      id: deletedObject.id,
-      slug: deletedObject.slug,
-      deleted: deletedObject.deleted,
-    };
-
-    expect(snapshot).toMatchSnapshot();
+    expect(deletedObject).toMatchSnapshot();
   });
 });

@@ -1,25 +1,27 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`Permission Snapshots > should match snapshot for custom permission 1`] = `
-{
-  "createdAt": 1735689600000,
+Permission {
+  "createdAt": 2025-01-01T00:00:00.000Z,
   "description": "Read billing information",
   "id": "perm_custom_456",
   "key": "custom:billing:read",
   "name": "custom:billing:read",
+  "pathRoot": "",
   "type": "custom",
-  "updatedAt": 1735689600000,
+  "updatedAt": 2025-01-01T00:00:00.000Z,
 }
 `;
 
 exports[`Permission Snapshots > should match snapshot for permission structure 1`] = `
-{
-  "createdAt": 1735689600000,
+Permission {
+  "createdAt": 2025-01-01T00:00:00.000Z,
   "description": "Manage organization profile",
   "id": "perm_123",
   "key": "org:sys_profile:manage",
   "name": "org:sys_profile:manage",
+  "pathRoot": "",
   "type": "system",
-  "updatedAt": 1735689650000,
+  "updatedAt": 2025-01-01T00:00:50.000Z,
 }
 `;

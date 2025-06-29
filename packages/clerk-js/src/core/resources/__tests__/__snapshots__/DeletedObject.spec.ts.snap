@@ -1,7 +1,7 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`DeletedObject Snapshots > should match snapshot for deleted organization object 1`] = `
-{
+DeletedObject {
   "deleted": true,
   "id": "org_456",
   "object": "organization",
@@ -10,7 +10,7 @@ exports[`DeletedObject Snapshots > should match snapshot for deleted organizatio
 `;
 
 exports[`DeletedObject Snapshots > should match snapshot for deleted user object 1`] = `
-{
+DeletedObject {
   "deleted": true,
   "id": "user_123",
   "object": "user",

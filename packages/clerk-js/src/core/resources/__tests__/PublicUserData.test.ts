@@ -35,16 +35,7 @@ describe('PublicUserData Snapshots', () => {
       user_id: 'user_123',
     });
 
-    const snapshot = {
-      firstName: pud.firstName,
-      lastName: pud.lastName,
-      imageUrl: pud.imageUrl,
-      hasImage: pud.hasImage,
-      identifier: pud.identifier,
-      userId: pud.userId,
-    };
-
-    expect(snapshot).toMatchSnapshot();
+    expect(pud).toMatchSnapshot();
   });
 
   it('should match snapshot for minimal public user data', () => {
@@ -57,15 +48,6 @@ describe('PublicUserData Snapshots', () => {
       user_id: 'user_456',
     });
 
-    const snapshot = {
-      firstName: pud.firstName,
-      lastName: pud.lastName,
-      imageUrl: pud.imageUrl,
-      hasImage: pud.hasImage,
-      identifier: pud.identifier,
-      userId: pud.userId,
-    };
-
-    expect(snapshot).toMatchSnapshot();
+    expect(pud).toMatchSnapshot();
   });
 });

@@ -41,13 +41,21 @@ exports[`PhoneNumber Snapshots > should match snapshot for __internal_toSnapshot
 `;
 
 exports[`PhoneNumber Snapshots > should match snapshot for phone number structure 1`] = `
-{
+PhoneNumber {
+  "attemptVerification": [Function],
   "backupCodes": [],
+  "create": [Function],
   "defaultSecondFactor": false,
+  "destroy": [Function],
   "id": "phone_123",
   "linkedTo": [],
+  "makeDefaultSecondFactor": [Function],
+  "pathRoot": "/me/phone_numbers",
   "phoneNumber": "+1234567890",
+  "prepareVerification": [Function],
   "reservedForSecondFactor": false,
+  "setReservedForSecondFactor": [Function],
+  "toString": [Function],
   "verification": Verification {
     "attempts": 1,
     "channel": undefined,

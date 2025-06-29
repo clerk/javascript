@@ -2,6 +2,8 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { BaseResource, ExternalAccount } from '../internal';
 
+const FIXED_DATE = new Date('2025-01-01T00:00:00.000Z');
+
 describe('External account', () => {
   it('reauthorize', async () => {
     const targetId = 'test_id';
@@ -59,7 +61,7 @@ describe('ExternalAccount Snapshots', () => {
         id: 'external_123',
         provider: 'google',
         provider_user_id: 'google_user_123',
-        approved_scopes: ['email', 'profile'],
+        approved_scopes: 'email,profile',
         email_address: 'user@gmail.com',
         first_name: 'John',
         last_name: 'Doe',
@@ -71,36 +73,22 @@ describe('ExternalAccount Snapshots', () => {
         updated_at: 1735689600000,
         verification: {
           object: 'verification',
+          id: 'verification_123',
           status: 'verified',
           strategy: 'oauth_google',
           external_verification_redirect_url: 'https://accounts.google.com/oauth/authorize',
+          verified_at_client: null,
+          error: null,
+          attempts: 1,
+          expire_at: 1735689700000,
+          nonce: null,
+          message: null,
         },
-      },
+      } as any,
       '/me/external_accounts',
     );
 
-    const snapshot = {
-      id: externalAccount.id,
-      provider: externalAccount.provider,
-      providerUserId: externalAccount.providerUserId,
-      approvedScopes: externalAccount.approvedScopes,
-      emailAddress: externalAccount.emailAddress,
-      firstName: externalAccount.firstName,
-      lastName: externalAccount.lastName,
-      imageUrl: externalAccount.imageUrl,
-      username: externalAccount.username,
-      label: externalAccount.label,
-      createdAt: externalAccount.createdAt?.getTime(),
-      updatedAt: externalAccount.updatedAt?.getTime(),
-      verification: externalAccount.verification
-        ? {
-            status: externalAccount.verification.status,
-            strategy: externalAccount.verification.strategy,
-          }
-        : null,
-    };
-
-    expect(snapshot).toMatchSnapshot();
+    expect(externalAccount).toMatchSnapshot();
   });
 
   it('should match snapshot for minimal external account', () => {
@@ -110,7 +98,7 @@ describe('ExternalAccount Snapshots', () => {
         id: 'external_minimal',
         provider: 'github',
         provider_user_id: 'github_user_456',
-        approved_scopes: [],
+        approved_scopes: '',
         email_address: null,
         first_name: null,
         last_name: null,
@@ -121,24 +109,56 @@ describe('ExternalAccount Snapshots', () => {
         created_at: 1735689600000,
         updated_at: 1735689600000,
         verification: null,
-      },
+      } as any,
       '/me/external_accounts',
     );
 
-    const snapshot = {
-      id: externalAccount.id,
-      provider: externalAccount.provider,
-      providerUserId: externalAccount.providerUserId,
-      approvedScopes: externalAccount.approvedScopes,
-      emailAddress: externalAccount.emailAddress,
-      firstName: externalAccount.firstName,
-      lastName: externalAccount.lastName,
-      imageUrl: externalAccount.imageUrl,
-      username: externalAccount.username,
-      label: externalAccount.label,
-      verification: externalAccount.verification,
-    };
+    expect(externalAccount).toMatchSnapshot();
+  });
 
-    expect(snapshot).toMatchSnapshot();
+  it('should match snapshot for __internal_toSnapshot method', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(FIXED_DATE);
+
+    const externalAccount = new ExternalAccount(
+      {
+        object: 'external_account',
+        id: 'external_snapshot',
+        provider: 'google',
+        provider_user_id: 'google_user_789',
+        approved_scopes: 'email,profile,openid',
+        email_address: 'snapshot@example.com',
+        first_name: 'Jane',
+        last_name: 'Smith',
+        image_url: 'https://example.com/avatar.jpg',
+        username: 'janesmith',
+        public_metadata: {
+          source: 'oauth',
+          department: 'engineering',
+          verified: true,
+        },
+        label: 'Work Account',
+        created_at: 1735689500000,
+        updated_at: 1735689600000,
+        verification: {
+          object: 'verification',
+          id: 'verification_snapshot',
+          status: 'verified',
+          strategy: 'oauth_google',
+          external_verification_redirect_url: 'https://accounts.google.com/oauth/authorize',
+          attempts: 1,
+          expire_at: 1735689800000,
+          verified_at_client: null,
+          error: null,
+          nonce: null,
+          message: null,
+        },
+      } as any,
+      '/me/external_accounts',
+    );
+
+    expect(externalAccount.__internal_toSnapshot()).toMatchSnapshot();
+
+    vi.useRealTimers();
   });
 });

@@ -64,22 +64,7 @@ describe('Organization Snapshots', () => {
       has_image: true,
     });
 
-    const orgSnapshot = {
-      id: organization.id,
-      name: organization.name,
-      slug: organization.slug,
-      hasImage: organization.hasImage,
-      imageUrl: organization.imageUrl,
-      membersCount: organization.membersCount,
-      pendingInvitationsCount: organization.pendingInvitationsCount,
-      maxAllowedMemberships: organization.maxAllowedMemberships,
-      adminDeleteEnabled: organization.adminDeleteEnabled,
-      createdAt: organization.createdAt?.getTime(),
-      updatedAt: organization.updatedAt?.getTime(),
-      publicMetadata: organization.publicMetadata,
-    };
-
-    expect(orgSnapshot).toMatchSnapshot();
+    expect(organization).toMatchSnapshot();
   });
 
   it('should match snapshot for minimal organization', () => {
@@ -100,21 +85,6 @@ describe('Organization Snapshots', () => {
       has_image: false,
     });
 
-    const orgSnapshot = {
-      id: organization.id,
-      name: organization.name,
-      slug: organization.slug,
-      hasImage: organization.hasImage,
-      imageUrl: organization.imageUrl,
-      membersCount: organization.membersCount,
-      pendingInvitationsCount: organization.pendingInvitationsCount,
-      maxAllowedMemberships: organization.maxAllowedMemberships,
-      adminDeleteEnabled: organization.adminDeleteEnabled,
-      createdAt: organization.createdAt?.getTime(),
-      updatedAt: organization.updatedAt?.getTime(),
-      publicMetadata: organization.publicMetadata,
-    };
-
-    expect(orgSnapshot).toMatchSnapshot();
+    expect(organization).toMatchSnapshot();
   });
 });

@@ -48,4 +48,13 @@ describe('AuthConfig', () => {
       single_session_mode: true,
     });
   });
+
+  it('should match snapshot', () => {
+    const authConfig = new AuthConfig({
+      claimed_at: 1672531200000,
+      reverification: true,
+      single_session_mode: true,
+    });
+    expect(authConfig.__internal_toSnapshot()).toMatchSnapshot();
+  });
 });

@@ -40,17 +40,7 @@ describe('TOTP Snapshots', () => {
       updated_at: 1735689650000,
     });
 
-    const snapshot = {
-      id: totp.id,
-      secret: totp.secret,
-      uri: totp.uri,
-      verified: totp.verified,
-      backupCodes: totp.backupCodes,
-      createdAt: totp.createdAt?.getTime(),
-      updatedAt: totp.updatedAt?.getTime(),
-    };
-
-    expect(snapshot).toMatchSnapshot();
+    expect(totp).toMatchSnapshot();
   });
 
   it('should match snapshot for unverified TOTP', () => {
@@ -65,16 +55,6 @@ describe('TOTP Snapshots', () => {
       updated_at: 1735689500000,
     });
 
-    const snapshot = {
-      id: totp.id,
-      secret: totp.secret,
-      uri: totp.uri,
-      verified: totp.verified,
-      backupCodes: totp.backupCodes,
-      createdAt: totp.createdAt?.getTime(),
-      updatedAt: totp.updatedAt?.getTime(),
-    };
-
-    expect(snapshot).toMatchSnapshot();
+    expect(totp).toMatchSnapshot();
   });
 });

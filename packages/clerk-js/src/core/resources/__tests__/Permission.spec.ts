@@ -40,17 +40,7 @@ describe('Permission Snapshots', () => {
       updated_at: 1735689650000,
     });
 
-    const snapshot = {
-      id: permission.id,
-      name: permission.name,
-      key: permission.key,
-      description: permission.description,
-      type: permission.type,
-      createdAt: permission.createdAt?.getTime(),
-      updatedAt: permission.updatedAt?.getTime(),
-    };
-
-    expect(snapshot).toMatchSnapshot();
+    expect(permission).toMatchSnapshot();
   });
 
   it('should match snapshot for custom permission', () => {
@@ -65,16 +55,6 @@ describe('Permission Snapshots', () => {
       updated_at: 1735689600000,
     });
 
-    const snapshot = {
-      id: permission.id,
-      name: permission.name,
-      key: permission.key,
-      description: permission.description,
-      type: permission.type,
-      createdAt: permission.createdAt?.getTime(),
-      updatedAt: permission.updatedAt?.getTime(),
-    };
-
-    expect(snapshot).toMatchSnapshot();
+    expect(permission).toMatchSnapshot();
   });
 });

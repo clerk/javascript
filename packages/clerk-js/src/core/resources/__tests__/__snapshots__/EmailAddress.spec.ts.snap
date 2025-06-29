@@ -36,11 +36,18 @@ exports[`EmailAddress Snapshots > should match snapshot for __internal_toSnapsho
 `;
 
 exports[`EmailAddress Snapshots > should match snapshot for email address structure 1`] = `
-{
+EmailAddress {
+  "attemptVerification": [Function],
+  "createEmailLinkFlow": [Function],
+  "createEnterpriseSSOLinkFlow": [Function],
+  "destroy": [Function],
   "emailAddress": "test@example.com",
   "id": "email_123",
   "linkedTo": [],
   "matchesSsoConnection": undefined,
+  "pathRoot": "/me/email_addresses",
+  "prepareVerification": [Function],
+  "toString": [Function],
   "verification": Verification {
     "attempts": 1,
     "channel": undefined,

@@ -58,21 +58,11 @@ describe('EmailAddress Snapshots', () => {
           error: null as any,
         },
         linked_to: [],
-        created_at: 1735689600000,
-        updated_at: 1735689650000,
       },
       '/me/email_addresses',
     );
 
-    const snapshot = {
-      id: emailAddress.id,
-      emailAddress: emailAddress.emailAddress,
-      linkedTo: emailAddress.linkedTo,
-      verification: emailAddress.verification,
-      matchesSsoConnection: emailAddress.matchesSsoConnection,
-    };
-
-    expect(snapshot).toMatchSnapshot();
+    expect(emailAddress).toMatchSnapshot();
   });
 
   it('should match snapshot for __internal_toSnapshot method', () => {

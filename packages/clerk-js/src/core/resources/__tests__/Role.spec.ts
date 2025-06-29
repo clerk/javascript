@@ -82,17 +82,7 @@ describe('Role Snapshots', () => {
       updated_at: 1735689650000,
     });
 
-    const snapshot = {
-      id: role.id,
-      key: role.key,
-      name: role.name,
-      description: role.description,
-      permissions: role.permissions,
-      createdAt: role.createdAt.getTime(),
-      updatedAt: role.updatedAt.getTime(),
-    };
-
-    expect(snapshot).toMatchSnapshot();
+    expect(role).toMatchSnapshot();
     vi.useRealTimers();
   });
 
@@ -108,17 +98,6 @@ describe('Role Snapshots', () => {
       updated_at: 1735689500000,
     });
 
-    // Role doesn't have __internal_toSnapshot method, so we'll just test the structure
-    const snapshot = {
-      id: role.id,
-      key: role.key,
-      name: role.name,
-      description: role.description,
-      permissions: role.permissions,
-      createdAt: role.createdAt.getTime(),
-      updatedAt: role.updatedAt.getTime(),
-    };
-
-    expect(snapshot).toMatchSnapshot();
+    expect(role).toMatchSnapshot();
   });
 });

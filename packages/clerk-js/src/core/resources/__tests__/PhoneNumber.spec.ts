@@ -75,17 +75,7 @@ describe('PhoneNumber Snapshots', () => {
       '/me/phone_numbers',
     );
 
-    const snapshot = {
-      id: phoneNumber.id,
-      phoneNumber: phoneNumber.phoneNumber,
-      reservedForSecondFactor: phoneNumber.reservedForSecondFactor,
-      defaultSecondFactor: phoneNumber.defaultSecondFactor,
-      verification: phoneNumber.verification,
-      linkedTo: phoneNumber.linkedTo,
-      backupCodes: phoneNumber.backupCodes,
-    };
-
-    expect(snapshot).toMatchSnapshot();
+    expect(phoneNumber).toMatchSnapshot();
   });
 
   it('should match snapshot for __internal_toSnapshot method', () => {

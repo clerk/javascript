@@ -87,27 +87,7 @@ describe('OrganizationDomain Snapshots', () => {
       total_pending_suggestions: 2,
     });
 
-    const snapshot = {
-      id: organizationDomain.id,
-      name: organizationDomain.name,
-      organizationId: organizationDomain.organizationId,
-      enrollmentMode: organizationDomain.enrollmentMode,
-      affiliationEmailAddress: organizationDomain.affiliationEmailAddress,
-      totalPendingInvitations: organizationDomain.totalPendingInvitations,
-      totalPendingSuggestions: organizationDomain.totalPendingSuggestions,
-      verification: organizationDomain.verification
-        ? {
-            attempts: organizationDomain.verification.attempts,
-            status: organizationDomain.verification.status,
-            strategy: organizationDomain.verification.strategy,
-            expiresAt: organizationDomain.verification.expiresAt?.getTime(),
-          }
-        : null,
-      createdAt: organizationDomain.createdAt?.getTime(),
-      updatedAt: organizationDomain.updatedAt?.getTime(),
-    };
-
-    expect(snapshot).toMatchSnapshot();
+    expect(organizationDomain).toMatchSnapshot();
   });
 
   it('should match snapshot for organization domain with null verification', () => {
@@ -125,19 +105,6 @@ describe('OrganizationDomain Snapshots', () => {
       total_pending_suggestions: 0,
     });
 
-    const snapshot = {
-      id: organizationDomain.id,
-      name: organizationDomain.name,
-      organizationId: organizationDomain.organizationId,
-      enrollmentMode: organizationDomain.enrollmentMode,
-      affiliationEmailAddress: organizationDomain.affiliationEmailAddress,
-      totalPendingInvitations: organizationDomain.totalPendingInvitations,
-      totalPendingSuggestions: organizationDomain.totalPendingSuggestions,
-      verification: organizationDomain.verification,
-      createdAt: organizationDomain.createdAt?.getTime(),
-      updatedAt: organizationDomain.updatedAt?.getTime(),
-    };
-
-    expect(snapshot).toMatchSnapshot();
+    expect(organizationDomain).toMatchSnapshot();
   });
 });

@@ -1,24 +1,26 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`BackupCode Snapshots > should match snapshot for backup code structure 1`] = `
-{
+BackupCode {
   "codes": [
     "backup_abc123",
     "backup_def456",
     "backup_ghi789",
     "backup_jkl012",
   ],
-  "createdAt": 1735689500000,
+  "createdAt": 2024-12-31T23:58:20.000Z,
   "id": "backup_123",
-  "updatedAt": 1735689650000,
+  "pathRoot": "/me",
+  "updatedAt": 2025-01-01T00:00:50.000Z,
 }
 `;
 
 exports[`BackupCode Snapshots > should match snapshot for empty backup codes 1`] = `
-{
+BackupCode {
   "codes": [],
-  "createdAt": 1735689500000,
+  "createdAt": 2024-12-31T23:58:20.000Z,
   "id": "backup_empty",
-  "updatedAt": 1735689500000,
+  "pathRoot": "/me",
+  "updatedAt": 2024-12-31T23:58:20.000Z,
 }
 `;

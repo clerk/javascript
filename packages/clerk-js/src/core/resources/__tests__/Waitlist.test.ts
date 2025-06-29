@@ -28,13 +28,7 @@ describe('Waitlist Snapshots', () => {
       updated_at: 1735689650000,
     });
 
-    const snapshot = {
-      id: waitlist.id,
-      createdAt: waitlist.createdAt?.getTime(),
-      updatedAt: waitlist.updatedAt?.getTime(),
-    };
-
-    expect(snapshot).toMatchSnapshot();
+    expect(waitlist).toMatchSnapshot();
   });
 
   it('should match snapshot for minimal waitlist', () => {
@@ -45,12 +39,6 @@ describe('Waitlist Snapshots', () => {
       updated_at: 1735689600000,
     });
 
-    const snapshot = {
-      id: waitlist.id,
-      createdAt: waitlist.createdAt?.getTime(),
-      updatedAt: waitlist.updatedAt?.getTime(),
-    };
-
-    expect(snapshot).toMatchSnapshot();
+    expect(waitlist).toMatchSnapshot();
   });
 });

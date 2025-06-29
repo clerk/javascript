@@ -1,24 +1,26 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`Role Snapshots > should match snapshot for __internal_toSnapshot method 1`] = `
-{
-  "createdAt": 1735689400000,
+Role {
+  "createdAt": 2024-12-31T23:56:40.000Z,
   "description": "Basic user access",
   "id": "role_456",
   "key": "user",
   "name": "User",
+  "pathRoot": "",
   "permissions": [],
-  "updatedAt": 1735689500000,
+  "updatedAt": 2024-12-31T23:58:20.000Z,
 }
 `;
 
 exports[`Role Snapshots > should match snapshot for role structure 1`] = `
-{
-  "createdAt": 1735689500000,
+Role {
+  "createdAt": 2024-12-31T23:58:20.000Z,
   "description": "Full administrative access",
   "id": "role_123",
   "key": "admin",
   "name": "Administrator",
+  "pathRoot": "",
   "permissions": [
     Permission {
       "createdAt": 2024-12-31T23:58:20.000Z,
@@ -31,6 +33,6 @@ exports[`Role Snapshots > should match snapshot for role structure 1`] = `
       "updatedAt": 2025-01-01T00:00:50.000Z,
     },
   ],
-  "updatedAt": 1735689650000,
+  "updatedAt": 2025-01-01T00:00:50.000Z,
 }
 `;

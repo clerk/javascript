@@ -112,29 +112,6 @@ describe('OrganizationMembership Snapshots', () => {
       },
     });
 
-    const snapshot = {
-      id: organizationMembership.id,
-      role: organizationMembership.role,
-      roleName: organizationMembership.roleName,
-      createdAt: organizationMembership.createdAt?.getTime(),
-      updatedAt: organizationMembership.updatedAt?.getTime(),
-      permissions: organizationMembership.permissions,
-      publicMetadata: organizationMembership.publicMetadata,
-      organization: {
-        id: organizationMembership.organization.id,
-        name: organizationMembership.organization.name,
-        slug: organizationMembership.organization.slug,
-        hasImage: organizationMembership.organization.hasImage,
-        membersCount: organizationMembership.organization.membersCount,
-      },
-      publicUserData: {
-        firstName: organizationMembership.publicUserData.firstName,
-        lastName: organizationMembership.publicUserData.lastName,
-        identifier: organizationMembership.publicUserData.identifier,
-        hasImage: organizationMembership.publicUserData.hasImage,
-      },
-    };
-
-    expect(snapshot).toMatchSnapshot();
+    expect(organizationMembership).toMatchSnapshot();
   });
 });

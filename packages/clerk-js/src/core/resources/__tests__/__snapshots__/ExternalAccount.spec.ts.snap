@@ -1,40 +1,107 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`ExternalAccount Snapshots > should match snapshot for external account structure 1`] = `
+exports[`ExternalAccount Snapshots > should match snapshot for __internal_toSnapshot method 1`] = `
 {
-  "approvedScopes": [
-    "email",
-    "profile",
-  ],
-  "createdAt": undefined,
+  "approved_scopes": "email,profile,openid",
+  "email_address": "snapshot@example.com",
+  "first_name": "Jane",
+  "id": "external_snapshot",
+  "identification_id": undefined,
+  "image_url": "https://example.com/avatar.jpg",
+  "label": "Work Account",
+  "last_name": "Smith",
+  "object": "external_account",
+  "phone_number": undefined,
+  "provider": "google",
+  "provider_user_id": "google_user_789",
+  "public_metadata": {
+    "department": "engineering",
+    "source": "oauth",
+    "verified": true,
+  },
+  "username": "janesmith",
+  "verification": {
+    "attempts": 1,
+    "error": {
+      "code": "",
+      "long_message": undefined,
+      "message": "",
+      "meta": {
+        "email_addresses": undefined,
+        "identifiers": undefined,
+        "param_name": undefined,
+        "plan": undefined,
+        "session_id": undefined,
+        "zxcvbn": undefined,
+      },
+    },
+    "expire_at": 1735689800000,
+    "external_verification_redirect_url": "https://accounts.google.com/oauth/authorize",
+    "id": "",
+    "message": null,
+    "nonce": null,
+    "object": "verification",
+    "status": "verified",
+    "strategy": "oauth_google",
+    "verified_at_client": null,
+  },
+}
+`;
+
+exports[`ExternalAccount Snapshots > should match snapshot for external account structure 1`] = `
+ExternalAccount {
+  "approvedScopes": "email,profile",
+  "destroy": [Function],
   "emailAddress": "user@gmail.com",
   "firstName": "John",
   "id": "external_123",
+  "identificationId": undefined,
   "imageUrl": "https://lh3.googleusercontent.com/avatar.jpg",
   "label": null,
   "lastName": "Doe",
+  "pathRoot": "/me/external_accounts",
+  "phoneNumber": undefined,
   "provider": "google",
   "providerUserId": "google_user_123",
-  "updatedAt": undefined,
+  "publicMetadata": {
+    "source": "oauth",
+  },
+  "reauthorize": [Function],
   "username": null,
-  "verification": {
+  "verification": Verification {
+    "attempts": 1,
+    "channel": undefined,
+    "error": null,
+    "expireAt": 2025-01-01T00:01:40.000Z,
+    "externalVerificationRedirectURL": "https://accounts.google.com/oauth/authorize",
+    "message": null,
+    "nonce": null,
+    "pathRoot": "",
     "status": "verified",
     "strategy": "oauth_google",
+    "verifiedAtClient": null,
+    "verifiedFromTheSameClient": [Function],
   },
 }
 `;
 
 exports[`ExternalAccount Snapshots > should match snapshot for minimal external account 1`] = `
-{
-  "approvedScopes": [],
+ExternalAccount {
+  "approvedScopes": "",
+  "destroy": [Function],
   "emailAddress": null,
   "firstName": null,
   "id": "external_minimal",
+  "identificationId": undefined,
   "imageUrl": null,
   "label": null,
   "lastName": null,
+  "pathRoot": "/me/external_accounts",
+  "phoneNumber": undefined,
   "provider": "github",
   "providerUserId": "github_user_456",
+  "publicMetadata": {},
+  "reauthorize": [Function],
   "username": "githubuser",
   "verification": null,
 }

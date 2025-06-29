@@ -1,5 +1,13 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`Token Snapshots > should match snapshot for __internal_toSnapshot method 1`] = `
+{
+  "id": "",
+  "jwt": "eyJhbGciOiJSUzI1NiIsImtpZCI6Imluc18yVDlwUkZST0NnYlJPRW1DbDNlX1ZYOEVfMVJSZWJUQ3JfQWZlWXciLCJ0eXAiOiJKV1QifQ.eyJhenAiOiJodHRwczovL2NsZXJrLmV4YW1wbGUuY29tIiwiZXhwIjoxNzM1Njg5NzAwLCJpYXQiOjE3MzU2ODk2MDAsImlzcyI6Imh0dHBzOi8vY2xlcmsuZXhhbXBsZS5jb20iLCJuYmYiOjE3MzU2ODk1OTAsInN1YiI6InVzZXJfMTIzIn0.signature",
+  "object": "token",
+}
+`;
+
 exports[`Token Snapshots > should match snapshot for null jwt token 1`] = `
 {
   "jwt": undefined,

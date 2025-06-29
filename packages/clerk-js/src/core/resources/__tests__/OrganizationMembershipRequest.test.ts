@@ -56,21 +56,6 @@ describe('OrganizationMembershipRequest Snapshots', () => {
       },
     });
 
-    const snapshot = {
-      id: organizationMembershipRequest.id,
-      organizationId: organizationMembershipRequest.organizationId,
-      status: organizationMembershipRequest.status,
-      createdAt: organizationMembershipRequest.createdAt?.getTime(),
-      updatedAt: organizationMembershipRequest.updatedAt?.getTime(),
-      publicUserData: {
-        firstName: organizationMembershipRequest.publicUserData.firstName,
-        lastName: organizationMembershipRequest.publicUserData.lastName,
-        identifier: organizationMembershipRequest.publicUserData.identifier,
-        hasImage: organizationMembershipRequest.publicUserData.hasImage,
-        imageUrl: organizationMembershipRequest.publicUserData.imageUrl,
-      },
-    };
-
-    expect(snapshot).toMatchSnapshot();
+    expect(organizationMembershipRequest).toMatchSnapshot();
   });
 });

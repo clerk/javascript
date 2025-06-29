@@ -245,10 +245,13 @@ exports[`Client Snapshots > should match snapshot for client instance structure 
 `;
 
 exports[`Client Snapshots > should match snapshot for empty client state 1`] = `
-{
-  "createdAt": 1735689600000,
+Client {
+  "captchaBypass": false,
+  "cookieExpiresAt": null,
+  "createdAt": 2025-01-01T00:00:00.000Z,
   "id": "client_EMPTY",
   "lastActiveSessionId": null,
+  "pathRoot": "/client",
   "sessions": [],
   "signIn": SignIn {
     "attemptFirstFactor": [Function],
@@ -402,6 +405,6 @@ exports[`Client Snapshots > should match snapshot for empty client state 1`] = `
     },
     "web3wallet": null,
   },
-  "updatedAt": 1735689600000,
+  "updatedAt": 2025-01-01T00:00:00.000Z,
 }
 `;

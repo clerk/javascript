@@ -3,13 +3,13 @@
 exports[`Passkey Snapshots > should match snapshot for __internal_toSnapshot method 1`] = `
 {
   "created_at": 1735689500000,
-  "id": "passkey_456",
-  "last_used_at": null,
-  "name": "iPhone Face ID",
+  "id": "passkey_snapshot",
+  "last_used_at": 1735689600000,
+  "name": "Snapshot Device",
   "object": "passkey",
-  "updated_at": 1735689500000,
+  "updated_at": 1735689650000,
   "verification": {
-    "attempts": 0,
+    "attempts": 1,
     "error": {
       "code": "",
       "long_message": undefined,
@@ -29,7 +29,7 @@ exports[`Passkey Snapshots > should match snapshot for __internal_toSnapshot met
     "message": null,
     "nonce": null,
     "object": "verification",
-    "status": "unverified",
+    "status": "verified",
     "strategy": "passkey",
     "verified_at_client": null,
   },
@@ -38,11 +38,11 @@ exports[`Passkey Snapshots > should match snapshot for __internal_toSnapshot met
 
 exports[`Passkey Snapshots > should match snapshot for passkey structure 1`] = `
 {
-  "createdAt": 1735689500000,
+  "createdAt": 2024-12-31T23:58:20.000Z,
   "id": "passkey_123",
-  "lastUsedAt": 1735689600000,
-  "name": "MacBook Pro Touch ID",
-  "updatedAt": 1735689650000,
+  "lastUsedAt": 2025-01-01T00:00:00.000Z,
+  "name": "Test Device",
+  "updatedAt": 2025-01-01T00:00:50.000Z,
   "verification": PasskeyVerification {
     "attempts": 1,
     "channel": undefined,

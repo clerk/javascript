@@ -49,19 +49,7 @@ describe('OrganizationInvitation Snapshots', () => {
       status: 'pending',
     });
 
-    const snapshot = {
-      id: organizationInvitation.id,
-      emailAddress: organizationInvitation.emailAddress,
-      organizationId: organizationInvitation.organizationId,
-      role: organizationInvitation.role,
-      roleName: organizationInvitation.roleName,
-      status: organizationInvitation.status,
-      createdAt: organizationInvitation.createdAt?.getTime(),
-      updatedAt: organizationInvitation.updatedAt?.getTime(),
-      publicMetadata: organizationInvitation.publicMetadata,
-    };
-
-    expect(snapshot).toMatchSnapshot();
+    expect(organizationInvitation).toMatchSnapshot();
   });
 
   it('should match snapshot for minimal organization invitation', () => {
@@ -77,16 +65,6 @@ describe('OrganizationInvitation Snapshots', () => {
       status: 'accepted',
     });
 
-    const snapshot = {
-      id: organizationInvitation.id,
-      emailAddress: organizationInvitation.emailAddress,
-      organizationId: organizationInvitation.organizationId,
-      role: organizationInvitation.role,
-      roleName: organizationInvitation.roleName,
-      status: organizationInvitation.status,
-      publicMetadata: organizationInvitation.publicMetadata,
-    };
-
-    expect(snapshot).toMatchSnapshot();
+    expect(organizationInvitation).toMatchSnapshot();
   });
 });
