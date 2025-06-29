@@ -2,7 +2,7 @@ import type { CommercePlanJSON, CommercePlanJSONSnapshot, CommercePlanResource }
 
 import { CommerceFeature } from './CommerceFeature';
 import { BaseResource } from './internal';
-import { parseJSON, serializeToJSON } from './parser';
+import { parseJSON } from './parser';
 
 export class CommercePlan extends BaseResource implements CommercePlanResource {
   id!: string;
@@ -45,9 +45,25 @@ export class CommercePlan extends BaseResource implements CommercePlanResource {
   public __internal_toSnapshot(): CommercePlanJSONSnapshot {
     return {
       object: 'commerce_plan',
-      ...serializeToJSON(this, {
-        arrayFields: ['features'],
-      }),
-    } as CommercePlanJSONSnapshot;
+      id: this.id,
+      name: this.name,
+      amount: this.amount,
+      amount_formatted: this.amountFormatted,
+      annual_amount: this.annualAmount,
+      annual_amount_formatted: this.annualAmountFormatted,
+      annual_monthly_amount: this.annualMonthlyAmount,
+      annual_monthly_amount_formatted: this.annualMonthlyAmountFormatted,
+      currency: this.currency,
+      currency_symbol: this.currencySymbol,
+      description: this.description,
+      is_default: this.isDefault,
+      is_recurring: this.isRecurring,
+      has_base_fee: this.hasBaseFee,
+      payer_type: this.payerType,
+      publicly_visible: this.publiclyVisible,
+      slug: this.slug,
+      avatar_url: this.avatarUrl,
+      features: this.features.map(feature => feature.__internal_toSnapshot()),
+    };
   }
 }

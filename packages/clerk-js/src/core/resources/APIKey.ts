@@ -1,7 +1,7 @@
 import type { ApiKeyJSON, APIKeyResource } from '@clerk/types';
 
 import { BaseResource } from './internal';
-import { parseJSON, serializeToJSON } from './parser';
+import { parseJSON } from './parser';
 
 export class APIKey extends BaseResource implements APIKeyResource {
   pathRoot = '/api_keys';
@@ -40,7 +40,21 @@ export class APIKey extends BaseResource implements APIKeyResource {
   public __internal_toSnapshot(): ApiKeyJSON {
     return {
       object: 'api_key',
-      ...serializeToJSON(this),
-    } as ApiKeyJSON;
+      id: this.id,
+      type: this.type,
+      name: this.name,
+      subject: this.subject,
+      scopes: this.scopes,
+      claims: this.claims,
+      revoked: this.revoked,
+      revocation_reason: this.revocationReason,
+      expired: this.expired,
+      expiration: this.expiration ? this.expiration.getTime() : null,
+      created_by: this.createdBy,
+      description: this.description,
+      last_used_at: this.lastUsedAt ? this.lastUsedAt.getTime() : null,
+      created_at: this.createdAt.getTime(),
+      updated_at: this.updatedAt.getTime(),
+    };
   }
 }

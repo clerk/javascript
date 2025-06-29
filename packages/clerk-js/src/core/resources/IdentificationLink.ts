@@ -1,7 +1,7 @@
 import type { IdentificationLinkJSON, IdentificationLinkJSONSnapshot, IdentificationLinkResource } from '@clerk/types';
 
 import { BaseResource } from './Base';
-import { parseJSON, serializeToJSON } from './parser';
+import { parseJSON } from './parser';
 
 export class IdentificationLink extends BaseResource implements IdentificationLinkResource {
   id!: string;
@@ -20,7 +20,8 @@ export class IdentificationLink extends BaseResource implements IdentificationLi
   public __internal_toSnapshot(): IdentificationLinkJSONSnapshot {
     return {
       object: 'identification_link',
-      ...serializeToJSON(this),
-    } as IdentificationLinkJSONSnapshot;
+      id: this.id,
+      type: this.type,
+    };
   }
 }

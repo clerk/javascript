@@ -1,7 +1,7 @@
 import type { AuthConfigJSON, AuthConfigJSONSnapshot, AuthConfigResource, PhoneCodeChannel } from '@clerk/types';
 
 import { BaseResource } from './internal';
-import { parseJSON, serializeToJSON } from './parser';
+import { parseJSON } from './parser';
 
 export class AuthConfig extends BaseResource implements AuthConfigResource {
   claimedAt: Date | null = null;
@@ -26,8 +26,11 @@ export class AuthConfig extends BaseResource implements AuthConfigResource {
 
   public __internal_toSnapshot(): AuthConfigJSONSnapshot {
     return {
+      claimed_at: this.claimedAt ? this.claimedAt.getTime() : null,
+      id: this.id ?? '',
       object: 'auth_config',
-      ...serializeToJSON(this),
-    } as AuthConfigJSONSnapshot;
+      reverification: this.reverification,
+      single_session_mode: this.singleSessionMode,
+    };
   }
 }

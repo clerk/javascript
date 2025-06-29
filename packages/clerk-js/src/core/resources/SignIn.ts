@@ -67,7 +67,7 @@ import {
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from '../errors';
 import { BaseResource, UserData, Verification } from './internal';
-import { parseJSON, serializeToJSON } from './parser';
+import { parseJSON } from './parser';
 
 export class SignIn extends BaseResource implements SignInResource {
   pathRoot = '/client/sign_ins';
@@ -465,13 +465,16 @@ export class SignIn extends BaseResource implements SignInResource {
   public __internal_toSnapshot(): SignInJSONSnapshot {
     return {
       object: 'sign_in',
-      ...serializeToJSON(this, {
-        nestedFields: ['firstFactorVerification', 'secondFactorVerification', 'userData'],
-        customTransforms: {
-          supportedFirstFactors: value => deepCamelToSnake(value),
-          supportedSecondFactors: value => deepCamelToSnake(value),
-        },
-      }),
-    } as SignInJSONSnapshot;
+      id: this.id || '',
+      status: this.status || null,
+      supported_identifiers: this.supportedIdentifiers,
+      supported_first_factors: deepCamelToSnake(this.supportedFirstFactors),
+      supported_second_factors: deepCamelToSnake(this.supportedSecondFactors),
+      first_factor_verification: this.firstFactorVerification.__internal_toSnapshot(),
+      second_factor_verification: this.secondFactorVerification.__internal_toSnapshot(),
+      identifier: this.identifier,
+      created_session_id: this.createdSessionId,
+      user_data: this.userData.__internal_toSnapshot(),
+    };
   }
 }

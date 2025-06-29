@@ -10,7 +10,7 @@ import type {
 } from '@clerk/types';
 
 import { BaseResource } from './Base';
-import { parseJSON, serializeToJSON } from './parser';
+import { parseJSON } from './parser';
 import { Verification } from './Verification';
 
 export class EnterpriseAccount extends BaseResource implements EnterpriseAccountResource {
@@ -60,10 +60,18 @@ export class EnterpriseAccount extends BaseResource implements EnterpriseAccount
   public __internal_toSnapshot(): EnterpriseAccountJSONSnapshot {
     return {
       object: 'enterprise_account',
-      ...serializeToJSON(this, {
-        nestedFields: ['verification', 'enterpriseConnection'],
-      }),
-    } as EnterpriseAccountJSONSnapshot;
+      id: this.id,
+      provider: this.provider,
+      protocol: this.protocol,
+      provider_user_id: this.providerUserId,
+      active: this.active,
+      email_address: this.emailAddress,
+      first_name: this.firstName,
+      last_name: this.lastName,
+      public_metadata: this.publicMetadata,
+      verification: this.verification?.__internal_toSnapshot() || null,
+      enterprise_connection: this.enterpriseConnection?.__internal_toSnapshot() || null,
+    };
   }
 }
 
@@ -104,7 +112,19 @@ export class EnterpriseAccountConnection extends BaseResource implements Enterpr
   public __internal_toSnapshot(): EnterpriseAccountConnectionJSONSnapshot {
     return {
       object: 'enterprise_account_connection',
-      ...serializeToJSON(this),
-    } as EnterpriseAccountConnectionJSONSnapshot;
+      id: this.id,
+      name: this.name,
+      domain: this.domain,
+      active: this.active,
+      protocol: this.protocol,
+      provider: this.provider,
+      logo_public_url: this.logoPublicUrl || '',
+      sync_user_attributes: this.syncUserAttributes,
+      allow_subdomains: this.allowSubdomains,
+      allow_idp_initiated: this.allowIdpInitiated,
+      disable_additional_identifications: this.disableAdditionalIdentifications,
+      created_at: this.createdAt?.getTime() || 0,
+      updated_at: this.updatedAt?.getTime() || 0,
+    } as unknown as EnterpriseAccountConnectionJSONSnapshot;
   }
 }

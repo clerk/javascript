@@ -11,7 +11,7 @@ import type {
 
 import { SessionTokenCache } from '../tokenCache';
 import { BaseResource, Session, SignIn, SignUp } from './internal';
-import { parseJSON, serializeToJSON } from './parser';
+import { parseJSON } from './parser';
 
 export class Client extends BaseResource implements ClientResource {
   private static instance: Client | null | undefined;
@@ -140,11 +140,16 @@ export class Client extends BaseResource implements ClientResource {
   public __internal_toSnapshot(): ClientJSONSnapshot {
     return {
       object: 'client',
-      ...serializeToJSON(this, {
-        nestedFields: ['signUp', 'signIn'],
-        arrayFields: ['sessions'],
-      }),
-    } as ClientJSONSnapshot;
+      id: this.id || '',
+      sessions: this.sessions.map(s => s.__internal_toSnapshot()),
+      sign_up: this.signUp.__internal_toSnapshot(),
+      sign_in: this.signIn.__internal_toSnapshot(),
+      last_active_session_id: this.lastActiveSessionId,
+      captcha_bypass: this.captchaBypass,
+      cookie_expires_at: this.cookieExpiresAt ? this.cookieExpiresAt.getTime() : null,
+      created_at: this.createdAt?.getTime() ?? null,
+      updated_at: this.updatedAt?.getTime() ?? null,
+    };
   }
 
   protected path(): string {

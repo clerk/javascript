@@ -9,7 +9,7 @@ import type {
 } from '@clerk/types';
 
 import { BaseResource, IdentificationLink, Verification } from './internal';
-import { parseJSON, serializeToJSON } from './parser';
+import { parseJSON } from './parser';
 
 export class PhoneNumber extends BaseResource implements PhoneNumberResource {
   id!: string;
@@ -90,10 +90,13 @@ export class PhoneNumber extends BaseResource implements PhoneNumberResource {
   public __internal_toSnapshot(): PhoneNumberJSONSnapshot {
     return {
       object: 'phone_number',
-      ...serializeToJSON(this, {
-        nestedFields: ['verification'],
-        arrayFields: ['linkedTo'],
-      }),
-    } as PhoneNumberJSONSnapshot;
+      id: this.id || '',
+      phone_number: this.phoneNumber,
+      reserved_for_second_factor: this.reservedForSecondFactor,
+      default_second_factor: this.defaultSecondFactor,
+      verification: this.verification.__internal_toSnapshot(),
+      linked_to: this.linkedTo.map(link => link.__internal_toSnapshot()),
+      backup_codes: this.backupCodes,
+    };
   }
 }

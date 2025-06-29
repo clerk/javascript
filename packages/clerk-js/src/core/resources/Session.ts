@@ -34,7 +34,7 @@ import { clerkInvalidStrategy, clerkMissingWebAuthnPublicKeyOptions } from '../e
 import { eventBus, events } from '../events';
 import { SessionTokenCache } from '../tokenCache';
 import { BaseResource, PublicUserData, Token, User } from './internal';
-import { parseJSON, serializeToJSON } from './parser';
+import { parseJSON } from './parser';
 import { SessionVerification } from './SessionVerification';
 
 export class Session extends BaseResource implements SessionResource {
@@ -308,10 +308,21 @@ export class Session extends BaseResource implements SessionResource {
   public __internal_toSnapshot(): SessionJSONSnapshot {
     return {
       object: 'session',
-      ...serializeToJSON(this, {
-        nestedFields: ['user', 'publicUserData', 'lastActiveToken'],
-      }),
-    } as SessionJSONSnapshot;
+      id: this.id,
+      status: this.status,
+      expire_at: this.expireAt.getTime(),
+      abandon_at: this.abandonAt.getTime(),
+      factor_verification_age: this.factorVerificationAge,
+      last_active_at: this.lastActiveAt.getTime(),
+      last_active_organization_id: this.lastActiveOrganizationId,
+      actor: this.actor,
+      tasks: this.tasks,
+      user: this.user?.__internal_toSnapshot() || null,
+      public_user_data: this.publicUserData.__internal_toSnapshot(),
+      last_active_token: this.lastActiveToken?.__internal_toSnapshot() || null,
+      created_at: this.createdAt.getTime(),
+      updated_at: this.updatedAt.getTime(),
+    };
   }
 
   private async _getToken(options?: GetTokenOptions): Promise<string | null> {

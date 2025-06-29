@@ -2,7 +2,7 @@ import type { JWT, TokenJSON, TokenJSONSnapshot, TokenResource } from '@clerk/ty
 
 import { decode } from '../../utils';
 import { BaseResource } from './internal';
-import { parseJSON, serializeToJSON } from './parser';
+import { parseJSON } from './parser';
 
 export class Token extends BaseResource implements TokenResource {
   pathRoot = 'tokens';
@@ -48,11 +48,8 @@ export class Token extends BaseResource implements TokenResource {
   public __internal_toSnapshot(): TokenJSONSnapshot {
     return {
       object: 'token',
-      ...serializeToJSON(this, {
-        customTransforms: {
-          jwt: () => this.getRawString(),
-        },
-      }),
-    } as TokenJSONSnapshot;
+      id: this.id || '',
+      jwt: this.getRawString(),
+    };
   }
 }

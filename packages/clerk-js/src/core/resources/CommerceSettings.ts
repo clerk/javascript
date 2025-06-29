@@ -1,7 +1,7 @@
 import type { CommerceSettingsJSON, CommerceSettingsJSONSnapshot, CommerceSettingsResource } from '@clerk/types';
 
 import { BaseResource } from './internal';
-import { parseJSON, serializeToJSON } from './parser';
+import { parseJSON } from './parser';
 
 /**
  * @internal
@@ -38,7 +38,12 @@ export class CommerceSettings extends BaseResource implements CommerceSettingsRe
 
   public __internal_toSnapshot(): CommerceSettingsJSONSnapshot {
     return {
-      ...serializeToJSON(this),
+      billing: {
+        stripe_publishable_key: this.billing.stripePublishableKey,
+        enabled: this.billing.enabled,
+        has_paid_user_plans: this.billing.hasPaidUserPlans,
+        has_paid_org_plans: this.billing.hasPaidOrgPlans,
+      },
     } as unknown as CommerceSettingsJSONSnapshot;
   }
 }

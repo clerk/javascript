@@ -14,7 +14,7 @@ import type {
 } from '@clerk/types';
 
 import { BaseResource, IdentificationLink, Verification } from './internal';
-import { parseJSON, serializeToJSON } from './parser';
+import { parseJSON } from './parser';
 
 export class EmailAddress extends BaseResource implements EmailAddressResource {
   id!: string;
@@ -135,10 +135,11 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
   public __internal_toSnapshot(): EmailAddressJSONSnapshot {
     return {
       object: 'email_address',
-      ...serializeToJSON(this, {
-        nestedFields: ['verification'],
-        arrayFields: ['linkedTo'],
-      }),
-    } as EmailAddressJSONSnapshot;
+      id: this.id,
+      email_address: this.emailAddress,
+      verification: this.verification.__internal_toSnapshot(),
+      linked_to: this.linkedTo.map(link => link.__internal_toSnapshot()),
+      matches_sso_connection: this.matchesSsoConnection,
+    };
   }
 }
