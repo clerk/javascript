@@ -4,8 +4,8 @@ import type {
   OrganizationMembershipRequestResource,
 } from '@clerk/types';
 
-import { unixEpochToDate } from '../../utils/date';
 import { BaseResource, PublicUserData } from './internal';
+import { parseJSON } from './parser';
 
 export class OrganizationMembershipRequest extends BaseResource implements OrganizationMembershipRequestResource {
   id!: string;
@@ -33,16 +33,15 @@ export class OrganizationMembershipRequest extends BaseResource implements Organ
   };
 
   protected fromJSON(data: OrganizationMembershipRequestJSON | null): this {
-    if (data) {
-      this.id = data.id;
-      this.organizationId = data.organization_id;
-      this.status = data.status;
-      this.createdAt = unixEpochToDate(data.created_at);
-      this.updatedAt = unixEpochToDate(data.updated_at);
-      if (data.public_user_data) {
-        this.publicUserData = new PublicUserData(data.public_user_data);
-      }
-    }
+    Object.assign(
+      this,
+      parseJSON<OrganizationMembershipRequest>(data, {
+        dateFields: ['createdAt', 'updatedAt'],
+        nestedFields: {
+          publicUserData: PublicUserData,
+        },
+      }),
+    );
     return this;
   }
 }

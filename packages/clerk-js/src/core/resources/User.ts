@@ -32,7 +32,6 @@ import type {
   Web3WalletResource,
 } from '@clerk/types';
 
-import { unixEpochToDate } from '../../utils/date';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { getFullName } from '../../utils/user';
 import { eventBus, events } from '../events';
@@ -55,6 +54,7 @@ import {
   UserOrganizationInvitation,
   Web3Wallet,
 } from './internal';
+import { parseJSON, serializeToJSON } from './parser';
 
 export class User extends BaseResource implements UserResource {
   pathRoot = '/me';
@@ -328,108 +328,64 @@ export class User extends BaseResource implements UserResource {
       return this;
     }
 
-    this.id = data.id;
-    this.externalId = data.external_id || null;
-    this.firstName = data.first_name || null;
-    this.lastName = data.last_name || null;
+    const parsed = parseJSON<UserResource>(data, {
+      dateFields: ['lastSignInAt', 'legalAcceptedAt', 'updatedAt', 'createdAt'],
+      arrayFields: {
+        emailAddresses: EmailAddress,
+        phoneNumbers: PhoneNumber,
+        web3Wallets: Web3Wallet,
+        externalAccounts: ExternalAccount,
+        passkeys: Passkey,
+        organizationMemberships: OrganizationMembership,
+        samlAccounts: SamlAccount,
+        enterpriseAccounts: EnterpriseAccount,
+      },
+      defaultValues: {
+        publicMetadata: {},
+        unsafeMetadata: {},
+      },
+      customTransforms: {
+        emailAddresses: value => (value || []).map((ea: any) => new EmailAddress(ea, this.path() + '/email_addresses')),
+        phoneNumbers: value => (value || []).map((ph: any) => new PhoneNumber(ph, this.path() + '/phone_numbers')),
+        web3Wallets: value => (value || []).map((w: any) => new Web3Wallet(w, this.path() + '/web3_wallets')),
+        externalAccounts: value =>
+          (value || []).map((ea: any) => new ExternalAccount(ea, this.path() + '/external_accounts')),
+        samlAccounts: value => (value || []).map((sa: any) => new SamlAccount(sa, this.path() + '/saml_accounts')),
+        enterpriseAccounts: value =>
+          (value || []).map((ea: any) => new EnterpriseAccount(ea, this.path() + '/enterprise_accounts')),
+      },
+    });
+
+    Object.assign(this, parsed);
+
+    // Handle special cases that require additional logic
     if (this.firstName || this.lastName) {
       this.fullName = getFullName({ firstName: this.firstName, lastName: this.lastName });
     }
 
-    this.imageUrl = data.image_url || '';
-    this.hasImage = data.has_image || false;
-    this.username = data.username || null;
-    this.passwordEnabled = data.password_enabled || false;
-    this.emailAddresses = (data.email_addresses || []).map(
-      ea => new EmailAddress(ea, this.path() + '/email_addresses'),
-    );
-
-    this.primaryEmailAddressId = data.primary_email_address_id || null;
+    // Handle primary identifications
     this.primaryEmailAddress = this.emailAddresses.find(({ id }) => id === this.primaryEmailAddressId) || null;
-
-    this.phoneNumbers = (data.phone_numbers || []).map(ph => new PhoneNumber(ph, this.path() + '/phone_numbers'));
-
-    this.primaryPhoneNumberId = data.primary_phone_number_id || null;
     this.primaryPhoneNumber = this.phoneNumbers.find(({ id }) => id === this.primaryPhoneNumberId) || null;
-
-    this.web3Wallets = (data.web3_wallets || []).map(ph => new Web3Wallet(ph, this.path() + '/web3_wallets'));
-
-    this.primaryWeb3WalletId = data.primary_web3_wallet_id || null;
     this.primaryWeb3Wallet = this.web3Wallets.find(({ id }) => id === this.primaryWeb3WalletId) || null;
 
-    this.externalAccounts = (data.external_accounts || []).map(
-      ea => new ExternalAccount(ea, this.path() + '/external_accounts'),
-    );
-
-    this.passkeys = (data.passkeys || []).map(passkey => new Passkey(passkey));
-
-    this.organizationMemberships = (data.organization_memberships || []).map(om => new OrganizationMembership(om));
-
-    this.samlAccounts = (data.saml_accounts || []).map(sa => new SamlAccount(sa, this.path() + '/saml_accounts'));
-
-    this.enterpriseAccounts = (data.enterprise_accounts || []).map(
-      ea => new EnterpriseAccount(ea, this.path() + '/enterprise_accounts'),
-    );
-
-    this.publicMetadata = data.public_metadata || {};
-    this.unsafeMetadata = data.unsafe_metadata || {};
-
-    this.totpEnabled = data.totp_enabled || false;
-    this.backupCodeEnabled = data.backup_code_enabled || false;
-    this.twoFactorEnabled = data.two_factor_enabled || false;
-
-    this.createOrganizationEnabled = data.create_organization_enabled || false;
-    this.createOrganizationsLimit = data.create_organizations_limit || null;
-    this.deleteSelfEnabled = data.delete_self_enabled || false;
-
-    if (data.last_sign_in_at) {
-      this.lastSignInAt = unixEpochToDate(data.last_sign_in_at);
-    }
-
-    if (data.legal_accepted_at) {
-      this.legalAcceptedAt = unixEpochToDate(data.legal_accepted_at);
-    }
-
-    this.updatedAt = unixEpochToDate(data.updated_at || undefined);
-    this.createdAt = unixEpochToDate(data.created_at || undefined);
     return this;
   }
 
   public __internal_toSnapshot(): UserJSONSnapshot {
     return {
       object: 'user',
-      id: this.id,
-      external_id: this.externalId,
-      first_name: this.firstName,
-      last_name: this.lastName,
-      username: this.username,
-      public_metadata: this.publicMetadata,
-      unsafe_metadata: this.unsafeMetadata,
-      image_url: this.imageUrl,
-      has_image: this.hasImage,
-      email_addresses: this.emailAddresses.map(ea => ea.__internal_toSnapshot()),
-      phone_numbers: this.phoneNumbers.map(ph => ph.__internal_toSnapshot()),
-      web3_wallets: this.web3Wallets.map(ph => ph.__internal_toSnapshot()),
-      external_accounts: this.externalAccounts.map(ea => ea.__internal_toSnapshot()),
-      passkeys: this.passkeys.map(passkey => passkey.__internal_toSnapshot()),
-      organization_memberships: this.organizationMemberships.map(om => om.__internal_toSnapshot()),
-      saml_accounts: this.samlAccounts.map(sa => sa.__internal_toSnapshot()),
-      enterprise_accounts: this.enterpriseAccounts.map(ea => ea.__internal_toSnapshot()),
-      totp_enabled: this.totpEnabled,
-      backup_code_enabled: this.backupCodeEnabled,
-      two_factor_enabled: this.twoFactorEnabled,
-      create_organization_enabled: this.createOrganizationEnabled,
-      create_organizations_limit: this.createOrganizationsLimit,
-      delete_self_enabled: this.deleteSelfEnabled,
-      primary_email_address_id: this.primaryEmailAddressId,
-      primary_phone_number_id: this.primaryPhoneNumberId,
-      primary_web3_wallet_id: this.primaryWeb3WalletId,
-      password_enabled: this.passwordEnabled,
-      profile_image_id: this.imageUrl,
-      last_sign_in_at: this.lastSignInAt?.getTime() || null,
-      legal_accepted_at: this.legalAcceptedAt?.getTime() || null,
-      updated_at: this.updatedAt?.getTime() || null,
-      created_at: this.createdAt?.getTime() || null,
-    };
+      ...serializeToJSON(this, {
+        arrayFields: [
+          'emailAddresses',
+          'phoneNumbers',
+          'web3Wallets',
+          'externalAccounts',
+          'passkeys',
+          'organizationMemberships',
+          'samlAccounts',
+          'enterpriseAccounts',
+        ],
+      }),
+    } as UserJSONSnapshot;
   }
 }

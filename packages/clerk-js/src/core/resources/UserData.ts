@@ -1,5 +1,7 @@
 import type { UserData as IUserData, UserDataJSON, UserDataJSONSnapshot } from '@clerk/types';
 
+import { parseJSON, serializeToJSON } from './parser';
+
 export class UserData implements IUserData {
   firstName?: string;
   lastName?: string;
@@ -11,22 +13,11 @@ export class UserData implements IUserData {
   }
 
   protected fromJSON(data: UserDataJSON | UserDataJSONSnapshot | null): this {
-    if (data) {
-      this.firstName = data.first_name;
-      this.lastName = data.last_name;
-      this.imageUrl = data.image_url ?? undefined;
-      this.hasImage = data.has_image ?? undefined;
-    }
-
+    Object.assign(this, parseJSON<IUserData>(data));
     return this;
   }
 
   public __internal_toSnapshot(): UserDataJSONSnapshot {
-    return {
-      first_name: this.firstName,
-      last_name: this.lastName,
-      image_url: this.imageUrl || null,
-      has_image: this.hasImage || null,
-    };
+    return serializeToJSON(this) as UserDataJSONSnapshot;
   }
 }

@@ -9,6 +9,7 @@ import type {
 } from '@clerk/types';
 
 import { BaseResource, IdentificationLink, Verification } from './internal';
+import { parseJSON, serializeToJSON } from './parser';
 
 export class PhoneNumber extends BaseResource implements PhoneNumberResource {
   id!: string;
@@ -72,30 +73,27 @@ export class PhoneNumber extends BaseResource implements PhoneNumberResource {
   };
 
   protected fromJSON(data: PhoneNumberJSON | PhoneNumberJSONSnapshot | null): this {
-    if (!data) {
-      return this;
-    }
-
-    this.id = data.id;
-    this.phoneNumber = data.phone_number;
-    this.reservedForSecondFactor = data.reserved_for_second_factor;
-    this.defaultSecondFactor = data.default_second_factor;
-    this.verification = new Verification(data.verification);
-    this.linkedTo = (data.linked_to || []).map(link => new IdentificationLink(link));
-    this.backupCodes = data.backup_codes;
+    Object.assign(
+      this,
+      parseJSON<PhoneNumber>(data, {
+        nestedFields: {
+          verification: Verification,
+        },
+        arrayFields: {
+          linkedTo: IdentificationLink,
+        },
+      }),
+    );
     return this;
   }
 
   public __internal_toSnapshot(): PhoneNumberJSONSnapshot {
     return {
       object: 'phone_number',
-      id: this.id || '',
-      phone_number: this.phoneNumber,
-      reserved_for_second_factor: this.reservedForSecondFactor,
-      default_second_factor: this.defaultSecondFactor,
-      verification: this.verification.__internal_toSnapshot(),
-      linked_to: this.linkedTo.map(link => link.__internal_toSnapshot()),
-      backup_codes: this.backupCodes,
-    };
+      ...serializeToJSON(this, {
+        nestedFields: ['verification'],
+        arrayFields: ['linkedTo'],
+      }),
+    } as PhoneNumberJSONSnapshot;
   }
 }

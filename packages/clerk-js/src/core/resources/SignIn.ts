@@ -1,6 +1,6 @@
 import { ClerkWebAuthnError } from '@clerk/shared/error';
 import { Poller } from '@clerk/shared/poller';
-import { deepCamelToSnake, deepSnakeToCamel } from '@clerk/shared/underscore';
+import { deepCamelToSnake } from '@clerk/shared/underscore';
 import {
   isWebAuthnAutofillSupported as isWebAuthnAutofillSupportedOnWindow,
   isWebAuthnSupported as isWebAuthnSupportedOnWindow,
@@ -67,6 +67,7 @@ import {
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from '../errors';
 import { BaseResource, UserData, Verification } from './internal';
+import { parseJSON, serializeToJSON } from './parser';
 
 export class SignIn extends BaseResource implements SignInResource {
   pathRoot = '/client/sign_ins';
@@ -445,34 +446,32 @@ export class SignIn extends BaseResource implements SignInResource {
   };
 
   protected fromJSON(data: SignInJSON | SignInJSONSnapshot | null): this {
-    if (data) {
-      this.id = data.id;
-      this.status = data.status;
-      this.supportedIdentifiers = data.supported_identifiers;
-      this.identifier = data.identifier;
-      this.supportedFirstFactors = deepSnakeToCamel(data.supported_first_factors) as SignInFirstFactor[] | null;
-      this.supportedSecondFactors = deepSnakeToCamel(data.supported_second_factors) as SignInSecondFactor[] | null;
-      this.firstFactorVerification = new Verification(data.first_factor_verification);
-      this.secondFactorVerification = new Verification(data.second_factor_verification);
-      this.createdSessionId = data.created_session_id;
-      this.userData = new UserData(data.user_data);
-    }
+    Object.assign(
+      this,
+      parseJSON<SignIn>(data, {
+        nestedFields: {
+          firstFactorVerification: Verification,
+          secondFactorVerification: Verification,
+          userData: UserData,
+        },
+        defaultValues: {
+          createdSessionId: null,
+        },
+      }),
+    );
     return this;
   }
 
   public __internal_toSnapshot(): SignInJSONSnapshot {
     return {
       object: 'sign_in',
-      id: this.id || '',
-      status: this.status || null,
-      supported_identifiers: this.supportedIdentifiers,
-      supported_first_factors: deepCamelToSnake(this.supportedFirstFactors),
-      supported_second_factors: deepCamelToSnake(this.supportedSecondFactors),
-      first_factor_verification: this.firstFactorVerification.__internal_toSnapshot(),
-      second_factor_verification: this.secondFactorVerification.__internal_toSnapshot(),
-      identifier: this.identifier,
-      created_session_id: this.createdSessionId,
-      user_data: this.userData.__internal_toSnapshot(),
-    };
+      ...serializeToJSON(this, {
+        nestedFields: ['firstFactorVerification', 'secondFactorVerification', 'userData'],
+        customTransforms: {
+          supportedFirstFactors: value => deepCamelToSnake(value),
+          supportedSecondFactors: value => deepCamelToSnake(value),
+        },
+      }),
+    } as SignInJSONSnapshot;
   }
 }

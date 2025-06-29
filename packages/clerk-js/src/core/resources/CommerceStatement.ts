@@ -7,8 +7,8 @@ import type {
 } from '@clerk/types';
 
 import { commerceTotalsFromJSON } from '../../utils';
-import { unixEpochToDate } from '../../utils/date';
 import { BaseResource, CommercePayment } from './internal';
+import { parseJSON } from './parser';
 
 export class CommerceStatement extends BaseResource implements CommerceStatementResource {
   id!: string;
@@ -23,15 +23,17 @@ export class CommerceStatement extends BaseResource implements CommerceStatement
   }
 
   protected fromJSON(data: CommerceStatementJSON | null): this {
-    if (!data) {
-      return this;
-    }
-
-    this.id = data.id;
-    this.status = data.status;
-    this.timestamp = unixEpochToDate(data.timestamp);
-    this.totals = commerceTotalsFromJSON(data.totals);
-    this.groups = data.groups.map(group => new CommerceStatementGroup(group));
+    Object.assign(
+      this,
+      parseJSON<CommerceStatement>(data, {
+        dateFields: ['timestamp'],
+        customTransforms: {
+          totals: value => commerceTotalsFromJSON(value),
+          // @ts-expect-error
+          groups: value => value.map(group => new CommerceStatementGroup(group)),
+        },
+      }),
+    );
     return this;
   }
 }
@@ -46,13 +48,16 @@ export class CommerceStatementGroup {
   }
 
   protected fromJSON(data: CommerceStatementGroupJSON | null): this {
-    if (!data) {
-      return this;
-    }
-
-    this.id = data.id;
-    this.timestamp = unixEpochToDate(data.timestamp);
-    this.items = data.items.map(item => new CommercePayment(item));
+    Object.assign(
+      this,
+      parseJSON<CommerceStatementGroup>(data, {
+        dateFields: ['timestamp'],
+        customTransforms: {
+          // @ts-expect-error
+          items: value => value.map(item => new CommercePayment(item)),
+        },
+      }),
+    );
     return this;
   }
 }

@@ -9,8 +9,8 @@ import type {
   VerificationResource,
 } from '@clerk/types';
 
-import { unixEpochToDate } from '../../utils/date';
 import { BaseResource } from './Base';
+import { parseJSON, serializeToJSON } from './parser';
 import { Verification } from './Verification';
 
 export class SamlAccount extends BaseResource implements SamlAccountResource {
@@ -32,42 +32,35 @@ export class SamlAccount extends BaseResource implements SamlAccountResource {
   }
 
   protected fromJSON(data: SamlAccountJSON | SamlAccountJSONSnapshot | null): this {
-    if (!data) {
-      return this;
-    }
-
-    this.id = data.id;
-    this.provider = data.provider;
-    this.providerUserId = data.provider_user_id;
-    this.active = data.active;
-    this.emailAddress = data.email_address;
-    this.firstName = data.first_name;
-    this.lastName = data.last_name;
-
-    if (data.verification) {
-      this.verification = new Verification(data.verification);
-    }
-
-    if (data.saml_connection) {
-      this.samlConnection = new SamlAccountConnection(data.saml_connection);
-    }
-
+    Object.assign(
+      this,
+      parseJSON<SamlAccount>(data, {
+        nestedFields: {
+          verification: Verification,
+          samlConnection: SamlAccountConnection,
+        },
+        defaultValues: {
+          provider: 'saml_custom',
+          providerUserId: null,
+          active: false,
+          emailAddress: '',
+          firstName: '',
+          lastName: '',
+          verification: null,
+          samlConnection: null,
+        },
+      }),
+    );
     return this;
   }
 
   public __internal_toSnapshot(): SamlAccountJSONSnapshot {
     return {
       object: 'saml_account',
-      id: this.id,
-      provider: this.provider,
-      provider_user_id: this.providerUserId,
-      active: this.active,
-      email_address: this.emailAddress,
-      first_name: this.firstName,
-      last_name: this.lastName,
-      verification: this.verification?.__internal_toSnapshot() || null,
-      saml_connection: this.samlConnection?.__internal_toSnapshot(),
-    };
+      ...serializeToJSON(this, {
+        nestedFields: ['verification', 'samlConnection'],
+      }),
+    } as SamlAccountJSONSnapshot;
   }
 }
 
@@ -89,37 +82,19 @@ export class SamlAccountConnection extends BaseResource implements SamlAccountCo
     this.fromJSON(data);
   }
   protected fromJSON(data: SamlAccountConnectionJSON | SamlAccountConnectionJSONSnapshot | null): this {
-    if (data) {
-      this.id = data.id;
-      this.name = data.name;
-      this.domain = data.domain;
-      this.active = data.active;
-      this.provider = data.provider;
-      this.syncUserAttributes = data.sync_user_attributes;
-      this.allowSubdomains = data.allow_subdomains;
-      this.allowIdpInitiated = data.allow_idp_initiated;
-      this.disableAdditionalIdentifications = data.disable_additional_identifications;
-      this.createdAt = unixEpochToDate(data.created_at);
-      this.updatedAt = unixEpochToDate(data.updated_at);
-    }
-
+    Object.assign(
+      this,
+      parseJSON<SamlAccountConnection>(data, {
+        dateFields: ['createdAt', 'updatedAt'],
+      }),
+    );
     return this;
   }
 
   public __internal_toSnapshot(): SamlAccountConnectionJSONSnapshot {
     return {
       object: 'saml_account_connection',
-      id: this.id,
-      name: this.name,
-      domain: this.domain,
-      active: this.active,
-      provider: this.provider,
-      sync_user_attributes: this.syncUserAttributes,
-      allow_subdomains: this.allowSubdomains,
-      allow_idp_initiated: this.allowIdpInitiated,
-      disable_additional_identifications: this.disableAdditionalIdentifications,
-      created_at: this.createdAt.getTime(),
-      updated_at: this.updatedAt.getTime(),
-    };
+      ...serializeToJSON(this),
+    } as SamlAccountConnectionJSONSnapshot;
   }
 }

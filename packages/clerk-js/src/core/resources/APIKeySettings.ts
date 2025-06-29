@@ -1,6 +1,7 @@
 import type { APIKeysSettingsJSON, APIKeysSettingsJSONSnapshot, APIKeysSettingsResource } from '@clerk/types';
 
 import { BaseResource } from './internal';
+import { parseJSON } from './parser';
 
 /**
  * @internal
@@ -14,12 +15,7 @@ export class APIKeySettings extends BaseResource implements APIKeysSettingsResou
   }
 
   protected fromJSON(data: APIKeysSettingsJSON | APIKeysSettingsJSONSnapshot | null): this {
-    if (!data) {
-      return this;
-    }
-
-    this.enabled = this.withDefault(data.enabled, false);
-
+    Object.assign(this, parseJSON<APIKeysSettingsResource>(data));
     return this;
   }
 

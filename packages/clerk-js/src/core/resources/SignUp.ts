@@ -47,6 +47,7 @@ import {
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from '../errors';
 import { BaseResource, ClerkRuntimeError, SignUpVerifications } from './internal';
+import { parseJSON, serializeToJSON } from './parser';
 
 declare global {
   interface Window {
@@ -387,55 +388,25 @@ export class SignUp extends BaseResource implements SignUpResource {
   };
 
   protected fromJSON(data: SignUpJSON | SignUpJSONSnapshot | null): this {
-    if (data) {
-      this.id = data.id;
-      this.status = data.status;
-      this.requiredFields = data.required_fields;
-      this.optionalFields = data.optional_fields;
-      this.missingFields = data.missing_fields;
-      this.unverifiedFields = data.unverified_fields;
-      this.verifications = new SignUpVerifications(data.verifications);
-      this.username = data.username;
-      this.firstName = data.first_name;
-      this.lastName = data.last_name;
-      this.emailAddress = data.email_address;
-      this.phoneNumber = data.phone_number;
-      this.hasPassword = data.has_password;
-      this.unsafeMetadata = data.unsafe_metadata;
-      this.createdSessionId = data.created_session_id;
-      this.createdUserId = data.created_user_id;
-      this.abandonAt = data.abandon_at;
-      this.web3wallet = data.web3_wallet;
-      this.legalAcceptedAt = data.legal_accepted_at;
-    }
+    Object.assign(
+      this,
+      // TODO: Missing date fields probably
+      parseJSON<SignUp>(data, {
+        nestedFields: {
+          verifications: SignUpVerifications,
+        },
+      }),
+    );
     return this;
   }
 
   public __internal_toSnapshot(): SignUpJSONSnapshot {
     return {
       object: 'sign_up',
-      id: this.id || '',
-      status: this.status || null,
-      required_fields: this.requiredFields,
-      optional_fields: this.optionalFields,
-      missing_fields: this.missingFields,
-      unverified_fields: this.unverifiedFields,
-      verifications: this.verifications.__internal_toSnapshot(),
-      username: this.username,
-      first_name: this.firstName,
-      last_name: this.lastName,
-      email_address: this.emailAddress,
-      phone_number: this.phoneNumber,
-      has_password: this.hasPassword,
-      unsafe_metadata: this.unsafeMetadata,
-      created_session_id: this.createdSessionId,
-      created_user_id: this.createdUserId,
-      abandon_at: this.abandonAt,
-      web3_wallet: this.web3wallet,
-      legal_accepted_at: this.legalAcceptedAt,
-      external_account: this.externalAccount,
-      external_account_strategy: this.externalAccount?.strategy,
-    };
+      ...serializeToJSON(this, {
+        nestedFields: ['verifications'],
+      }),
+    } as SignUpJSONSnapshot;
   }
 
   private clientBypass() {

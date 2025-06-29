@@ -30,11 +30,11 @@ import type {
 } from '@clerk/types';
 
 import { convertPageToOffsetSearchParams } from '../../utils/convertPageToOffsetSearchParams';
-import { unixEpochToDate } from '../../utils/date';
 import { addPaymentSource, getPaymentSources, initializePaymentSource } from '../modules/commerce';
 import { BaseResource, CommerceSubscription, OrganizationInvitation, OrganizationMembership } from './internal';
 import { OrganizationDomain } from './OrganizationDomain';
 import { OrganizationMembershipRequest } from './OrganizationMembershipRequest';
+import { parseJSON, serializeToJSON } from './parser';
 import { Role } from './Role';
 
 export class Organization extends BaseResource implements OrganizationResource {
@@ -309,37 +309,23 @@ export class Organization extends BaseResource implements OrganizationResource {
       return this;
     }
 
-    this.id = data.id;
-    this.name = data.name;
-    this.slug = data.slug;
-    this.imageUrl = data.image_url || '';
-    this.hasImage = data.has_image || false;
-    this.publicMetadata = data.public_metadata || {};
-    this.membersCount = data.members_count || 0;
-    this.pendingInvitationsCount = data.pending_invitations_count || 0;
-    this.maxAllowedMemberships = data.max_allowed_memberships || 0;
-    this.adminDeleteEnabled = data.admin_delete_enabled || false;
-    this.createdAt = unixEpochToDate(data.created_at);
-    this.updatedAt = unixEpochToDate(data.updated_at);
+    Object.assign(
+      this,
+      parseJSON<OrganizationResource>(data, {
+        dateFields: ['createdAt', 'updatedAt'],
+        defaultValues: {
+          publicMetadata: {},
+        },
+      }),
+    );
     return this;
   }
 
   public __internal_toSnapshot(): OrganizationJSONSnapshot {
     return {
       object: 'organization',
-      id: this.id,
-      name: this.name,
-      slug: this.slug,
-      image_url: this.imageUrl,
-      has_image: this.hasImage,
-      public_metadata: this.publicMetadata,
-      members_count: this.membersCount,
-      pending_invitations_count: this.pendingInvitationsCount,
-      max_allowed_memberships: this.maxAllowedMemberships,
-      admin_delete_enabled: this.adminDeleteEnabled,
-      created_at: this.createdAt.getTime(),
-      updated_at: this.updatedAt.getTime(),
-    };
+      ...serializeToJSON(this),
+    } as OrganizationJSONSnapshot;
   }
 
   public async reload(params?: ClerkResourceReloadParams): Promise<this> {

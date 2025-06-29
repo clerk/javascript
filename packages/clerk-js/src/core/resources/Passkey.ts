@@ -14,13 +14,13 @@ import type {
   UpdatePasskeyParams,
 } from '@clerk/types';
 
-import { unixEpochToDate } from '../../utils/date';
 import {
   serializePublicKeyCredential,
   webAuthnCreateCredential as webAuthnCreateCredentialOnWindow,
 } from '../../utils/passkeys';
 import { clerkMissingWebAuthnPublicKeyOptions } from '../errors';
 import { BaseResource, DeletedObject, PasskeyVerification } from './internal';
+import { parseJSON, serializeToJSON } from './parser';
 
 export class Passkey extends BaseResource implements PasskeyResource {
   id!: string;
@@ -130,31 +130,24 @@ export class Passkey extends BaseResource implements PasskeyResource {
   };
 
   protected fromJSON(data: PasskeyJSON | PasskeyJSONSnapshot | null): this {
-    if (!data) {
-      return this;
-    }
-
-    this.id = data.id;
-    this.name = data.name;
-    this.lastUsedAt = data.last_used_at ? unixEpochToDate(data.last_used_at) : null;
-    this.createdAt = unixEpochToDate(data.created_at);
-    this.updatedAt = unixEpochToDate(data.updated_at);
-
-    if (data.verification) {
-      this.verification = new PasskeyVerification(data.verification);
-    }
+    Object.assign(
+      this,
+      parseJSON<Passkey>(data, {
+        dateFields: ['createdAt', 'updatedAt', 'lastUsedAt'],
+        nestedFields: {
+          verification: PasskeyVerification,
+        },
+      }),
+    );
     return this;
   }
 
   public __internal_toSnapshot(): PasskeyJSONSnapshot {
     return {
       object: 'passkey',
-      id: this.id,
-      name: this.name,
-      verification: this.verification?.__internal_toSnapshot() || null,
-      last_used_at: this.lastUsedAt?.getTime() || null,
-      created_at: this.createdAt.getTime(),
-      updated_at: this.updatedAt.getTime(),
-    };
+      ...serializeToJSON(this, {
+        nestedFields: ['verification'],
+      }),
+    } as PasskeyJSONSnapshot;
   }
 }

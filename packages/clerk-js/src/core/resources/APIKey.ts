@@ -1,7 +1,7 @@
 import type { ApiKeyJSON, APIKeyResource } from '@clerk/types';
 
-import { unixEpochToDate } from '../../utils/date';
 import { BaseResource } from './internal';
+import { parseJSON, serializeToJSON } from './parser';
 
 export class APIKey extends BaseResource implements APIKeyResource {
   pathRoot = '/api_keys';
@@ -28,46 +28,19 @@ export class APIKey extends BaseResource implements APIKeyResource {
   }
 
   protected fromJSON(data: ApiKeyJSON | null): this {
-    if (!data) {
-      return this;
-    }
-
-    this.id = data.id;
-    this.type = data.type;
-    this.name = data.name;
-    this.subject = data.subject;
-    this.scopes = data.scopes;
-    this.claims = data.claims;
-    this.revoked = data.revoked;
-    this.revocationReason = data.revocation_reason;
-    this.expired = data.expired;
-    this.expiration = data.expiration ? unixEpochToDate(data.expiration) : null;
-    this.createdBy = data.created_by;
-    this.description = data.description;
-    this.lastUsedAt = data.last_used_at ? unixEpochToDate(data.last_used_at) : null;
-    this.updatedAt = unixEpochToDate(data.updated_at);
-    this.createdAt = unixEpochToDate(data.created_at);
+    Object.assign(
+      this,
+      parseJSON<APIKey>(data, {
+        dateFields: ['expiration', 'lastUsedAt', 'createdAt', 'updatedAt'],
+      }),
+    );
     return this;
   }
 
   public __internal_toSnapshot(): ApiKeyJSON {
     return {
       object: 'api_key',
-      id: this.id,
-      type: this.type,
-      name: this.name,
-      subject: this.subject,
-      scopes: this.scopes,
-      claims: this.claims,
-      revoked: this.revoked,
-      revocation_reason: this.revocationReason,
-      expired: this.expired,
-      expiration: this.expiration ? this.expiration.getTime() : null,
-      created_by: this.createdBy,
-      description: this.description,
-      last_used_at: this.lastUsedAt ? this.lastUsedAt.getTime() : null,
-      created_at: this.createdAt.getTime(),
-      updated_at: this.updatedAt.getTime(),
-    };
+      ...serializeToJSON(this),
+    } as ApiKeyJSON;
   }
 }
