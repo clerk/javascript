@@ -39,15 +39,24 @@ exports[`Passkey Snapshots > should match snapshot for __internal_toSnapshot met
 exports[`Passkey Snapshots > should match snapshot for passkey structure 1`] = `
 {
   "createdAt": 1735689500000,
-  "credentialId": undefined,
   "id": "passkey_123",
   "lastUsedAt": 1735689600000,
   "name": "MacBook Pro Touch ID",
   "updatedAt": 1735689650000,
-  "verification": {
-    "id": undefined,
+  "verification": PasskeyVerification {
+    "attempts": 1,
+    "channel": undefined,
+    "error": null,
+    "expireAt": 2025-01-01T00:01:40.000Z,
+    "externalVerificationRedirectURL": null,
+    "message": null,
+    "nonce": null,
+    "pathRoot": "",
+    "publicKey": null,
     "status": "verified",
     "strategy": "passkey",
+    "verifiedAtClient": null,
+    "verifiedFromTheSameClient": [Function],
   },
 }
 `;

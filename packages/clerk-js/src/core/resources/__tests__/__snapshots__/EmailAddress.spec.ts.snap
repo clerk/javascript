@@ -2,22 +2,16 @@
 
 exports[`EmailAddress Snapshots > should match snapshot for __internal_toSnapshot method 1`] = `
 {
-  "email_address": "snapshot@test.com",
+  "email_address": "user@example.com",
   "id": "email_456",
-  "linked_to": [
-    {
-      "id": undefined,
-      "object": "identification_link",
-      "type": undefined,
-    },
-  ],
-  "matches_sso_connection": undefined,
+  "linked_to": [],
+  "matches_sso_connection": true,
   "object": "email_address",
   "verification": {
     "attempts": 0,
     "error": {
       "code": "",
-      "long_message": undefined,
+      "long_message": "",
       "message": "",
       "meta": {
         "email_addresses": undefined,
@@ -35,7 +29,7 @@ exports[`EmailAddress Snapshots > should match snapshot for __internal_toSnapsho
     "nonce": null,
     "object": "verification",
     "status": "unverified",
-    "strategy": "email_link",
+    "strategy": "email_code",
     "verified_at_client": null,
   },
 }
@@ -43,15 +37,23 @@ exports[`EmailAddress Snapshots > should match snapshot for __internal_toSnapsho
 
 exports[`EmailAddress Snapshots > should match snapshot for email address structure 1`] = `
 {
-  "createdAt": undefined,
-  "emailAddress": "user@example.com",
+  "emailAddress": "test@example.com",
   "id": "email_123",
   "linkedTo": [],
-  "updatedAt": undefined,
-  "verification": {
-    "id": undefined,
+  "matchesSsoConnection": undefined,
+  "verification": Verification {
+    "attempts": 1,
+    "channel": undefined,
+    "error": null,
+    "expireAt": 2025-01-01T00:01:40.000Z,
+    "externalVerificationRedirectURL": null,
+    "message": null,
+    "nonce": null,
+    "pathRoot": "",
     "status": "verified",
     "strategy": "email_code",
+    "verifiedAtClient": null,
+    "verifiedFromTheSameClient": [Function],
   },
 }
 `;

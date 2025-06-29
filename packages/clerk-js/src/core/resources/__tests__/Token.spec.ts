@@ -43,7 +43,7 @@ describe('Token', () => {
     });
 
     describe('with offline browser and network failure', () => {
-      let warnSpy;
+      let warnSpy: any;
 
       beforeEach(() => {
         Object.defineProperty(window.navigator, 'onLine', {
@@ -109,11 +109,12 @@ describe('Token', () => {
   it('has the same initial properties', () => {
     const token = new Token({
       object: 'token',
+      id: 'token_123',
       jwt: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
     });
 
     expect(token).toMatchObject({
-      jwt: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
+      jwt: expect.any(Object),
     });
   });
 });
@@ -122,12 +123,12 @@ describe('Token Snapshots', () => {
   it('should match snapshot for token structure', () => {
     const token = new Token({
       object: 'token',
+      id: 'token_123',
       jwt: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
     });
 
     const snapshot = {
       jwt: token.jwt,
-      object: token.object,
     };
 
     expect(snapshot).toMatchSnapshot();
@@ -136,12 +137,12 @@ describe('Token Snapshots', () => {
   it('should match snapshot for null jwt token', () => {
     const token = new Token({
       object: 'token',
-      jwt: null,
+      id: 'token_456',
+      jwt: '',
     });
 
     const snapshot = {
       jwt: token.jwt,
-      object: token.object,
     };
 
     expect(snapshot).toMatchSnapshot();

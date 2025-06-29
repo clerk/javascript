@@ -3,7 +3,6 @@
 exports[`Token Snapshots > should match snapshot for null jwt token 1`] = `
 {
   "jwt": undefined,
-  "object": undefined,
 }
 `;
 
@@ -26,6 +25,5 @@ exports[`Token Snapshots > should match snapshot for token structure 1`] = `
       "typ": "JWT",
     },
   },
-  "object": undefined,
 }
 `;

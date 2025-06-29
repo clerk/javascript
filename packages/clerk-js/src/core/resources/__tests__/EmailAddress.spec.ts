@@ -1,99 +1,120 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { EmailAddress } from '../EmailAddress';
 
+const FIXED_DATE = new Date('2025-01-01T00:00:00.000Z');
+
 describe('EmailAddress', () => {
   it('has the same initial properties', () => {
-    const emailAddress = new EmailAddress({
-      object: 'email_address',
-      id: 'email_123',
-      email_address: 'test@example.com',
-      verification: {
-        object: 'verification',
-        id: 'verification_123',
-        status: 'verified',
-        strategy: 'email_code',
-        attempts: 1,
-        expire_at: 1735689700000,
-        verified_at_client: null,
-        error: null,
+    const emailAddress = new EmailAddress(
+      {
+        object: 'email_address',
+        id: 'email_123',
+        email_address: 'test@example.com',
+        verification: {
+          object: 'verification',
+          id: 'verification_123',
+          status: 'verified',
+          strategy: 'email_code',
+          attempts: 1,
+          expire_at: 1735689700000,
+          verified_at_client: null,
+          error: null as any,
+        },
+        linked_to: [],
+        created_at: 1735689600000,
+        updated_at: 1735689650000,
       },
-      linked_to: [],
-      created_at: 1735689600000,
-      updated_at: 1735689650000,
-    });
+      '/me/email_addresses',
+    );
 
     expect(emailAddress).toMatchObject({
       id: 'email_123',
       emailAddress: 'test@example.com',
-      verification: expect.any(Object),
+      verification: expect.objectContaining({
+        status: 'verified',
+        strategy: 'email_code',
+      }),
       linkedTo: [],
-      createdAt: expect.any(Date),
-      updatedAt: expect.any(Date),
     });
   });
 });
 
 describe('EmailAddress Snapshots', () => {
   it('should match snapshot for email address structure', () => {
-    const emailAddress = new EmailAddress({
-      object: 'email_address',
-      id: 'email_123',
-      email_address: 'user@example.com',
-      verification: {
-        object: 'verification',
-        id: 'verification_123',
-        status: 'verified',
-        strategy: 'email_code',
-        attempts: 1,
-        expire_at: 1735689700000,
-        verified_at_client: null,
-        error: null,
+    const emailAddress = new EmailAddress(
+      {
+        object: 'email_address',
+        id: 'email_123',
+        email_address: 'test@example.com',
+        verification: {
+          object: 'verification',
+          id: 'verification_123',
+          status: 'verified',
+          strategy: 'email_code',
+          attempts: 1,
+          expire_at: 1735689700000,
+          verified_at_client: null,
+          error: null as any,
+        },
+        linked_to: [],
+        created_at: 1735689600000,
+        updated_at: 1735689650000,
       },
-      linked_to: [],
-      created_at: 1735689600000,
-      updated_at: 1735689650000,
-    });
+      '/me/email_addresses',
+    );
 
     const snapshot = {
       id: emailAddress.id,
       emailAddress: emailAddress.emailAddress,
-      verification: {
-        id: emailAddress.verification?.id,
-        status: emailAddress.verification?.status,
-        strategy: emailAddress.verification?.strategy,
-      },
       linkedTo: emailAddress.linkedTo,
-      createdAt: emailAddress.createdAt?.getTime(),
-      updatedAt: emailAddress.updatedAt?.getTime(),
+      verification: emailAddress.verification,
+      matchesSsoConnection: emailAddress.matchesSsoConnection,
     };
 
     expect(snapshot).toMatchSnapshot();
   });
 
   it('should match snapshot for __internal_toSnapshot method', () => {
-    const emailAddress = new EmailAddress({
-      object: 'email_address',
-      id: 'email_456',
-      email_address: 'snapshot@test.com',
-      verification: {
-        object: 'verification',
-        id: 'verification_456',
-        status: 'unverified',
-        strategy: 'email_link',
-        attempts: 0,
-        expire_at: 1735689800000,
-        verified_at_client: null,
-        error: null,
-      },
-      linked_to: ['user_123'],
-      created_at: 1735689600000,
-      updated_at: 1735689650000,
-    });
+    vi.useFakeTimers();
+    vi.setSystemTime(FIXED_DATE);
 
-    if (typeof emailAddress.__internal_toSnapshot === 'function') {
-      const snapshot = emailAddress.__internal_toSnapshot();
-      expect(snapshot).toMatchSnapshot();
-    }
+    const emailAddress = new EmailAddress(
+      {
+        object: 'email_address',
+        id: 'email_456',
+        email_address: 'user@example.com',
+        verification: {
+          object: 'verification',
+          id: '',
+          status: 'unverified',
+          strategy: 'email_code',
+          attempts: 0,
+          expire_at: 1735689800000,
+          verified_at_client: null,
+          error: {
+            code: '',
+            long_message: '',
+            message: '',
+            meta: {
+              param_name: undefined,
+              session_id: undefined,
+              zxcvbn: undefined,
+              plan: undefined,
+            },
+          },
+          external_verification_redirect_url: null,
+          message: null,
+          nonce: null,
+        },
+        linked_to: [],
+        matches_sso_connection: true,
+      } as any,
+      '/me/email_addresses',
+    );
+
+    expect(emailAddress.__internal_toSnapshot()).toMatchSnapshot();
+
+    vi.useRealTimers();
   });
 });

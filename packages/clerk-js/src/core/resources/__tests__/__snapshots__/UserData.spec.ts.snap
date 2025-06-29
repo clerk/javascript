@@ -2,24 +2,18 @@
 
 exports[`UserData Snapshots > should match snapshot for complete user data 1`] = `
 {
-  "firstName": "Alice",
+  "firstName": "John",
   "hasImage": true,
-  "imageUrl": "https://example.com/alice-avatar.jpg",
-  "lastName": "Johnson",
-  "primaryEmailAddressId": undefined,
-  "primaryPhoneNumberId": undefined,
-  "primaryWeb3WalletId": undefined,
+  "imageUrl": "https://example.com/avatar.jpg",
+  "lastName": "Doe",
 }
 `;
 
 exports[`UserData Snapshots > should match snapshot for minimal user data 1`] = `
 {
-  "firstName": null,
-  "hasImage": false,
-  "imageUrl": undefined,
-  "lastName": null,
-  "primaryEmailAddressId": undefined,
-  "primaryPhoneNumberId": undefined,
-  "primaryWeb3WalletId": undefined,
+  "first_name": "Jane",
+  "has_image": null,
+  "image_url": null,
+  "last_name": undefined,
 }
 `;

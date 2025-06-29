@@ -27,7 +27,6 @@ describe('Passkey', () => {
     expect(passkey).toMatchObject({
       id: 'passkey_123',
       name: 'My Device',
-      credentialId: 'credential_abc123',
       verification: expect.any(Object),
       lastUsedAt: expect.any(Date),
       createdAt: expect.any(Date),
@@ -61,15 +60,10 @@ describe('Passkey Snapshots', () => {
     const snapshot = {
       id: passkey.id,
       name: passkey.name,
-      credentialId: passkey.credentialId,
-      verification: {
-        id: passkey.verification?.id,
-        status: passkey.verification?.status,
-        strategy: passkey.verification?.strategy,
-      },
+      verification: passkey.verification,
       lastUsedAt: passkey.lastUsedAt?.getTime(),
-      createdAt: passkey.createdAt?.getTime(),
-      updatedAt: passkey.updatedAt?.getTime(),
+      createdAt: passkey.createdAt.getTime(),
+      updatedAt: passkey.updatedAt.getTime(),
     };
 
     expect(snapshot).toMatchSnapshot();

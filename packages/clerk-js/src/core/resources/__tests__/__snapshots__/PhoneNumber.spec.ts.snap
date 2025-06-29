@@ -3,25 +3,20 @@
 exports[`PhoneNumber Snapshots > should match snapshot for __internal_toSnapshot method 1`] = `
 {
   "backup_codes": [
-    "backup_123",
+    "backup1",
+    "backup2",
   ],
   "default_second_factor": true,
   "id": "phone_456",
-  "linked_to": [
-    {
-      "id": undefined,
-      "object": "identification_link",
-      "type": undefined,
-    },
-  ],
+  "linked_to": [],
   "object": "phone_number",
   "phone_number": "+9876543210",
-  "reserved_for_second_factor": false,
+  "reserved_for_second_factor": true,
   "verification": {
     "attempts": 0,
     "error": {
       "code": "",
-      "long_message": undefined,
+      "long_message": "",
       "message": "",
       "meta": {
         "email_addresses": undefined,
@@ -52,12 +47,20 @@ exports[`PhoneNumber Snapshots > should match snapshot for phone number structur
   "id": "phone_123",
   "linkedTo": [],
   "phoneNumber": "+1234567890",
-  "reserved": undefined,
-  "reservedForSecondFactor": true,
-  "verification": {
-    "id": undefined,
+  "reservedForSecondFactor": false,
+  "verification": Verification {
+    "attempts": 1,
+    "channel": undefined,
+    "error": null,
+    "expireAt": 2025-01-01T00:01:40.000Z,
+    "externalVerificationRedirectURL": null,
+    "message": null,
+    "nonce": null,
+    "pathRoot": "",
     "status": "verified",
     "strategy": "phone_code",
+    "verifiedAtClient": null,
+    "verifiedFromTheSameClient": [Function],
   },
 }
 `;
