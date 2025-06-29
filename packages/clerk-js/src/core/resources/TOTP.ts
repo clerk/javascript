@@ -20,6 +20,10 @@ export class TOTP extends BaseResource implements TOTPResource {
   }
 
   protected fromJSON(data: TOTPJSON | null): this {
+    if (!data) {
+      return this;
+    }
+
     Object.assign(
       this,
       parseJSON<TOTPResource>(data, {

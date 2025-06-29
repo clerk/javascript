@@ -32,6 +32,14 @@ export class APIKey extends BaseResource implements APIKeyResource {
       this,
       parseJSON<APIKey>(data, {
         dateFields: ['expiration', 'lastUsedAt', 'createdAt', 'updatedAt'],
+        defaultValues: {
+          claims: null,
+          revocationReason: null,
+          expiration: null,
+          createdBy: null,
+          description: null,
+          lastUsedAt: null,
+        },
       }),
     );
     return this;

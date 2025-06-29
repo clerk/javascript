@@ -15,10 +15,20 @@ export class AuthConfig extends BaseResource implements AuthConfigResource {
   }
 
   protected fromJSON(data: Partial<AuthConfigJSON> | null): this {
+    if (!data) {
+      return this;
+    }
+
     Object.assign(
       this,
       parseJSON<AuthConfigResource>(data, {
         dateFields: ['claimedAt'],
+        defaultValues: {
+          claimedAt: null,
+          reverification: false,
+          singleSessionMode: false,
+          preferredChannels: null,
+        },
       }),
     );
     return this;

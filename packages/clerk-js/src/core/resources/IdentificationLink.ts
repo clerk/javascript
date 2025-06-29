@@ -13,6 +13,10 @@ export class IdentificationLink extends BaseResource implements IdentificationLi
   }
 
   protected fromJSON(data: IdentificationLinkJSON | IdentificationLinkJSONSnapshot | null): this {
+    if (!data) {
+      return this;
+    }
+
     Object.assign(this, parseJSON<IdentificationLinkResource>(data));
     return this;
   }

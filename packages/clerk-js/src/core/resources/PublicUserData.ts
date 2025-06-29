@@ -19,7 +19,18 @@ export class PublicUserData implements IPublicUserData {
       return this;
     }
 
-    Object.assign(this, parseJSON<IPublicUserData>(data));
+    Object.assign(
+      this,
+      parseJSON<IPublicUserData>(data, {
+        defaultValues: {
+          firstName: null,
+          lastName: null,
+          imageUrl: '',
+          hasImage: false,
+          identifier: '',
+        },
+      }),
+    );
     return this;
   }
 

@@ -100,10 +100,22 @@ export class EnterpriseAccountConnection extends BaseResource implements Enterpr
   }
 
   protected fromJSON(data: EnterpriseAccountConnectionJSON | EnterpriseAccountConnectionJSONSnapshot | null): this {
+    if (!data) {
+      return this;
+    }
+
     Object.assign(
       this,
       parseJSON<EnterpriseAccountConnectionResource>(data, {
         dateFields: ['createdAt', 'updatedAt'],
+        defaultValues: {
+          publicMetadata: {},
+          allowIdpInitiated: false,
+          allowSubdomains: false,
+          disableAdditionalIdentifications: false,
+          logoPublicUrl: '',
+          syncUserAttributes: false,
+        },
       }),
     );
     return this;

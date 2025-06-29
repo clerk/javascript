@@ -52,6 +52,17 @@ export class Verification extends BaseResource implements VerificationResource {
           error: (value: any) => (value ? parseError(value) : null),
           externalVerificationRedirectURL: (value: string | null) => (value ? new URL(value) : null),
         },
+        defaultValues: {
+          status: null,
+          strategy: null,
+          nonce: null,
+          message: null,
+          externalVerificationRedirectURL: null,
+          attempts: null,
+          expireAt: null,
+          error: null,
+          verifiedAtClient: null,
+        },
       }),
     );
     return this;

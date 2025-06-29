@@ -35,6 +35,11 @@ export class OrganizationSettings extends BaseResource implements OrganizationSe
     Object.assign(
       this,
       parseJSON<OrganizationSettingsResource>(data, {
+        defaultValues: {
+          enabled: false,
+          maxAllowedMemberships: 1,
+          forceOrganizationSelection: false,
+        },
         customTransforms: {
           actions: value => ({
             adminDelete: value?.admin_delete || false,

@@ -13,6 +13,10 @@ export class UserData implements IUserData {
   }
 
   protected fromJSON(data: UserDataJSON | UserDataJSONSnapshot | null): this {
+    if (!data) {
+      return this;
+    }
+
     Object.assign(this, parseJSON<IUserData>(data));
     return this;
   }

@@ -20,6 +20,10 @@ export class CommerceSettings extends BaseResource implements CommerceSettingsRe
   }
 
   protected fromJSON(data: CommerceSettingsJSON | CommerceSettingsJSONSnapshot | null): this {
+    if (!data) {
+      return this;
+    }
+
     Object.assign(
       this,
       parseJSON<CommerceSettingsResource>(data, {

@@ -53,6 +53,9 @@ export class Environment extends BaseResource implements EnvironmentResource {
           commerceSettings: CommerceSettings,
           apiKeysSettings: APIKeySettings,
         },
+        defaultValues: {
+          maintenanceMode: false,
+        },
       }),
     );
     return this;

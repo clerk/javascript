@@ -132,6 +132,16 @@ export class Client extends BaseResource implements ClientResource {
           signUp: value => new SignUp(value),
           signIn: value => new SignIn(value),
         },
+        defaultValues: {
+          sessions: [],
+          signUp: new SignUp(),
+          signIn: new SignIn(),
+          lastActiveSessionId: null,
+          captchaBypass: false,
+          cookieExpiresAt: null,
+          createdAt: null,
+          updatedAt: null,
+        },
       }),
     );
     return this;
