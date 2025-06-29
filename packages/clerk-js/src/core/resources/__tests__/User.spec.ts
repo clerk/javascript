@@ -367,42 +367,7 @@ describe('User Snapshots', () => {
 
     const user = new User(userJSON);
 
-    const userSnapshot = {
-      id: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      fullName: user.fullName,
-      username: user.username,
-      imageUrl: user.imageUrl,
-      hasImage: user.hasImage,
-      primaryEmailAddressId: user.primaryEmailAddressId,
-      primaryPhoneNumberId: user.primaryPhoneNumberId,
-      primaryWeb3WalletId: user.primaryWeb3WalletId,
-      passwordEnabled: user.passwordEnabled,
-      totpEnabled: user.totpEnabled,
-      backupCodeEnabled: user.backupCodeEnabled,
-      twoFactorEnabled: user.twoFactorEnabled,
-      banned: user.banned,
-      locked: user.locked,
-      createdAt: user.createdAt?.getTime(),
-      updatedAt: user.updatedAt?.getTime(),
-      lastSignInAt: user.lastSignInAt?.getTime(),
-      lastActiveAt: user.lastActiveAt?.getTime(),
-      publicMetadata: user.publicMetadata,
-      unsafeMetadata: user.unsafeMetadata,
-      emailAddresses: user.emailAddresses.map(email => ({
-        id: email.id,
-        emailAddress: email.emailAddress,
-        verification: email.verification
-          ? {
-              status: email.verification.status,
-              strategy: email.verification.strategy,
-            }
-          : null,
-      })),
-    };
-
-    expect(userSnapshot).toMatchSnapshot();
+    expect(user).toMatchSnapshot();
   });
 
   it('should match snapshot for minimal user', () => {
@@ -412,7 +377,6 @@ describe('User Snapshots', () => {
       first_name: null,
       last_name: null,
       username: null,
-      image_url: null,
       has_image: false,
       primary_email_address_id: null,
       primary_phone_number_id: null,
@@ -432,41 +396,13 @@ describe('User Snapshots', () => {
       totp_enabled: false,
       backup_code_enabled: false,
       two_factor_enabled: false,
-      banned: false,
-      locked: false,
-      lockout_expires_in_seconds: null,
-      verification_attempts_remaining: 3,
       delete_self_enabled: true,
       create_organization_enabled: false,
-      last_active_at: null,
-      profile_image_url: null,
       organization_memberships: [],
     };
 
     const user = new User(userJSON);
 
-    const userSnapshot = {
-      id: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      fullName: user.fullName,
-      username: user.username,
-      imageUrl: user.imageUrl,
-      hasImage: user.hasImage,
-      passwordEnabled: user.passwordEnabled,
-      totpEnabled: user.totpEnabled,
-      backupCodeEnabled: user.backupCodeEnabled,
-      twoFactorEnabled: user.twoFactorEnabled,
-      banned: user.banned,
-      locked: user.locked,
-      createdAt: user.createdAt?.getTime(),
-      updatedAt: user.updatedAt?.getTime(),
-      lastSignInAt: user.lastSignInAt?.getTime(),
-      lastActiveAt: user.lastActiveAt?.getTime(),
-      publicMetadata: user.publicMetadata,
-      unsafeMetadata: user.unsafeMetadata,
-    };
-
-    expect(userSnapshot).toMatchSnapshot();
+    expect(user).toMatchSnapshot();
   });
 });
