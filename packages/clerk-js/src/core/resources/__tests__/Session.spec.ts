@@ -1009,7 +1009,7 @@ describe('Session Snapshots', () => {
       actor: null,
       created_at: 1735689500000,
       updated_at: 1735689600000,
-      abandoned_at: null,
+      abandon_at: null,
       expire_at: 1735776000000,
       last_active_token: {
         object: 'token',
@@ -1086,7 +1086,7 @@ describe('Session Snapshots', () => {
       actor: null,
       created_at: 1735689500000,
       updated_at: 1735689600000,
-      abandoned_at: null,
+      abandon_at: null,
       expire_at: 1735776000000,
       last_active_token: {
         object: 'token',
@@ -1127,11 +1127,6 @@ describe('Session Snapshots', () => {
         legal_accepted_at: 1735689400000,
         create_organization_enabled: true,
         delete_self_enabled: true,
-        last_active_at: 1735689600000,
-        banned: false,
-        locked: false,
-        lockout_expires_in_seconds: null,
-        verification_attempts_remaining: 3,
       },
       public_user_data: {
         first_name: 'Snapshot',
