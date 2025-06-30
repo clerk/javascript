@@ -250,7 +250,7 @@ const AddPaymentSourceForm = ({ children }: PropsWithChildren) => {
     const { setupIntent, error } = await stripe.confirmSetup({
       elements,
       confirmParams: {
-        return_url: '',
+        return_url: window.location.href,
       },
       redirect: 'if_required',
     });
