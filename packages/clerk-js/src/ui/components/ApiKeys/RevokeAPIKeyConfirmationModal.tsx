@@ -1,13 +1,14 @@
 import { useClerk } from '@clerk/shared/react';
 import { useSWRConfig } from 'swr';
 
+import { descriptors } from '@/ui/customizables';
 import { Card } from '@/ui/elements/Card';
 import { Form } from '@/ui/elements/Form';
 import { FormButtons } from '@/ui/elements/FormButtons';
 import { FormContainer } from '@/ui/elements/FormContainer';
 import { Modal } from '@/ui/elements/Modal';
-import { localizationKeys } from '@/ui/localization';
-import { useFormControl } from '@/ui/utils';
+import { localizationKeys, useLocalizations } from '@/ui/localization';
+import { useFormControl } from '@/ui/utils/useFormControl';
 
 type RevokeAPIKeyConfirmationModalProps = {
   subject: string;
@@ -30,16 +31,7 @@ export const RevokeAPIKeyConfirmationModal = ({
 }: RevokeAPIKeyConfirmationModalProps) => {
   const clerk = useClerk();
   const { mutate } = useSWRConfig();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!apiKeyId) return;
-
-    await clerk.apiKeys.revoke({ apiKeyID: apiKeyId });
-    const cacheKey = { key: 'api-keys', subject };
-    void mutate(cacheKey);
-    onClose();
-  };
+  const { t } = useLocalizations();
 
   const revokeField = useFormControl('apiKeyRevokeConfirmation', '', {
     type: 'text',
@@ -48,8 +40,18 @@ export const RevokeAPIKeyConfirmationModal = ({
     isRequired: true,
   });
 
-  // TODO: Make this locale-aware
-  const canSubmit = revokeField.value === 'Revoke';
+  const canSubmit = revokeField.value === t(localizationKeys('apiKeys.revokeConfirmation.confirmationText'));
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!apiKeyId || !canSubmit) return;
+
+    await clerk.apiKeys.revoke({ apiKeyID: apiKeyId });
+    const cacheKey = { key: 'api-keys', subject };
+
+    void mutate(cacheKey);
+    onClose();
+  };
 
   if (!isOpen) {
     return null;
@@ -75,11 +77,15 @@ export const RevokeAPIKeyConfirmationModal = ({
               minHeight: '100%',
               height: '100%',
               width: '100%',
+              borderRadius: t.radii.$lg,
             })
           : {},
       ]}
     >
-      <Card.Root role='alertdialog'>
+      <Card.Root
+        role='alertdialog'
+        elementDescriptor={descriptors.apiKeysRevokeModal}
+      >
         <Card.Content
           sx={t => ({
             textAlign: 'left',
@@ -91,7 +97,10 @@ export const RevokeAPIKeyConfirmationModal = ({
             headerSubtitle={localizationKeys('apiKeys.revokeConfirmation.formHint')}
           >
             <Form.Root onSubmit={handleSubmit}>
-              <Form.ControlRow elementId={revokeField.id}>
+              <Form.ControlRow
+                elementId={revokeField.id}
+                elementDescriptor={descriptors.apiKeysRevokeModalInput}
+              >
                 <Form.PlainInput {...revokeField.props} />
               </Form.ControlRow>
               <FormButtons
@@ -99,6 +108,7 @@ export const RevokeAPIKeyConfirmationModal = ({
                 colorScheme='danger'
                 isDisabled={!canSubmit}
                 onReset={onClose}
+                elementDescriptor={descriptors.apiKeysRevokeModalSubmitButton}
               />
             </Form.Root>
           </FormContainer>

@@ -28,11 +28,8 @@ export const createCheckoutPageObject = (testArgs: { page: EnhancedPage }) => {
       await frame.getByLabel('Country').selectOption(card.country);
       await frame.getByLabel('ZIP code').fill(card.zip);
     },
-    waitForStipeElements: async () => {
-      return page
-        .frameLocator('iframe[src*="elements-inner-payment"]')
-        .getByLabel('Card number')
-        .waitFor({ state: 'visible' });
+    waitForStripeElements: async ({ state = 'visible' }: { state?: 'visible' | 'hidden' } = {}) => {
+      return page.frameLocator('iframe[src*="elements-inner-payment"]').getByLabel('Card number').waitFor({ state });
     },
     clickPayOrSubscribe: async () => {
       await self.root.getByRole('button', { name: /subscribe|pay\s\$/i }).click();

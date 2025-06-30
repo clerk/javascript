@@ -1,5 +1,7 @@
 import type { Web3Provider } from '@clerk/types';
 
+import { clerkUnsupportedEnvironmentWarning } from '@/core/errors';
+
 import { toHex } from './hex';
 import { getInjectedWeb3Providers } from './injectedWeb3Providers';
 
@@ -75,6 +77,11 @@ export async function generateSignatureWithOKXWallet(params: GenerateSignaturePa
 
 async function getEthereumProvider(provider: Web3Provider) {
   if (provider === 'coinbase_wallet') {
+    if (__BUILD_DISABLE_RHC__) {
+      clerkUnsupportedEnvironmentWarning('Coinbase Wallet');
+      return null;
+    }
+
     const createCoinbaseWalletSDK = await import('@coinbase/wallet-sdk').then(mod => mod.createCoinbaseWalletSDK);
     const sdk = createCoinbaseWalletSDK({
       preference: {

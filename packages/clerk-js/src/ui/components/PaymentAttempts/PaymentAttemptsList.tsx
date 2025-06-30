@@ -1,25 +1,26 @@
 import type { CommercePaymentResource } from '@clerk/types';
 
 import { DataTable, DataTableRow } from '@/ui/elements/DataTable';
+import { formatDate } from '@/ui/utils/formatDate';
+import { truncateWithEndVisible } from '@/ui/utils/truncateTextWithEndVisible';
 
 import { usePaymentAttempts, useSubscriberTypeLocalizationRoot } from '../../contexts';
 import { Badge, localizationKeys, Td, Text } from '../../customizables';
 import { useRouter } from '../../router';
-import { formatDate, truncateWithEndVisible } from '../../utils';
 
 /* -------------------------------------------------------------------------------------------------
  * PaymentAttemptsList
  * -----------------------------------------------------------------------------------------------*/
 
 export const PaymentAttemptsList = () => {
-  const { data: paymentAttempts, isLoading } = usePaymentAttempts();
+  const { data: paymentAttempts, isLoading, count } = usePaymentAttempts();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
 
   return (
     <DataTable
       page={1}
       onPageChange={_ => {}}
-      itemCount={paymentAttempts?.total_count || 0}
+      itemCount={count}
       pageCount={1}
       itemsPerPage={10}
       isLoading={isLoading}
@@ -29,7 +30,7 @@ export const PaymentAttemptsList = () => {
         localizationKeys(`${localizationRoot}.billingPage.paymentHistorySection.tableHeader__amount`),
         localizationKeys(`${localizationRoot}.billingPage.paymentHistorySection.tableHeader__status`),
       ]}
-      rows={(paymentAttempts?.data || []).map(i => (
+      rows={paymentAttempts.map(i => (
         <PaymentAttemptsListRow
           key={i.id}
           paymentAttempt={i}

@@ -1319,7 +1319,16 @@ export class Clerk implements ClerkInterface {
   };
 
   public __experimental_navigateToTask = async ({ redirectUrlComplete }: NextTaskParams = {}): Promise<void> => {
-    const session = await this.session?.reload();
+    /**
+     * Invalidate previously cache pages with auth state before navigating
+     */
+    const onBeforeSetActive: SetActiveHook =
+      typeof window !== 'undefined' && typeof window.__unstable__onBeforeSetActive === 'function'
+        ? window.__unstable__onBeforeSetActive
+        : noop;
+    await onBeforeSetActive();
+
+    const session = this.session;
     if (!session || !this.environment) {
       return;
     }
@@ -1337,8 +1346,6 @@ export class Clerk implements ClerkInterface {
     const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
     const defaultRedirectUrlComplete = this.client?.signUp ? this.buildAfterSignUpUrl() : this.buildAfterSignInUrl();
 
-    this.#setTransitiveState();
-
     await tracker.track(async () => {
       await this.navigate(redirectUrlComplete ?? defaultRedirectUrlComplete);
     });
@@ -1349,6 +1356,17 @@ export class Clerk implements ClerkInterface {
 
     this.#setAccessors(session);
     this.#emit();
+
+    /**
+     * Invoke the Next.js middleware to synchronize server and client state after resolving a session task.
+     * This ensures that any server-side logic depending on the session status (like middleware-based
+     * redirects or protected routes) correctly reflects the updated client authentication state.
+     */
+    const onAfterSetActive: SetActiveHook =
+      typeof window !== 'undefined' && typeof window.__unstable__onAfterSetActive === 'function'
+        ? window.__unstable__onAfterSetActive
+        : noop;
+    await onAfterSetActive();
   };
 
   public addListener = (listener: ListenerCallback): UnsubscribeCallback => {
@@ -2004,11 +2022,6 @@ export class Clerk implements ClerkInterface {
   };
 
   public authenticateWithMetamask = async (props: AuthenticateWithMetamaskParams = {}): Promise<void> => {
-    if (__BUILD_DISABLE_RHC__) {
-      clerkUnsupportedEnvironmentWarning('Metamask');
-      return;
-    }
-
     await this.authenticateWithWeb3({
       ...props,
       strategy: 'web3_metamask_signature',
@@ -2016,11 +2029,6 @@ export class Clerk implements ClerkInterface {
   };
 
   public authenticateWithCoinbaseWallet = async (props: AuthenticateWithCoinbaseWalletParams = {}): Promise<void> => {
-    if (__BUILD_DISABLE_RHC__) {
-      clerkUnsupportedEnvironmentWarning('Coinbase Wallet');
-      return;
-    }
-
     await this.authenticateWithWeb3({
       ...props,
       strategy: 'web3_coinbase_wallet_signature',
@@ -2028,11 +2036,6 @@ export class Clerk implements ClerkInterface {
   };
 
   public authenticateWithOKXWallet = async (props: AuthenticateWithOKXWalletParams = {}): Promise<void> => {
-    if (__BUILD_DISABLE_RHC__) {
-      clerkUnsupportedEnvironmentWarning('OKX Wallet');
-      return;
-    }
-
     await this.authenticateWithWeb3({
       ...props,
       strategy: 'web3_okx_wallet_signature',
@@ -2048,11 +2051,6 @@ export class Clerk implements ClerkInterface {
     legalAccepted,
     secondFactorUrl,
   }: ClerkAuthenticateWithWeb3Params): Promise<void> => {
-    if (__BUILD_DISABLE_RHC__) {
-      clerkUnsupportedEnvironmentWarning('Web3');
-      return;
-    }
-
     if (!this.client || !this.environment) {
       return;
     }

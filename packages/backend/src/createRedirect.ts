@@ -17,12 +17,17 @@ const buildUrl = (
   const baseUrl = new URL(_baseUrl);
   const returnBackUrl = _returnBackUrl ? new URL(_returnBackUrl, baseUrl) : undefined;
   const res = new URL(_targetUrl, baseUrl);
+  const isCrossOriginRedirect = `${baseUrl.hostname}:${baseUrl.port}` !== `${res.hostname}:${res.port}`;
 
   if (returnBackUrl) {
+    if (isCrossOriginRedirect) {
+      returnBackUrl.searchParams.delete(constants.QueryParameters.ClerkSynced);
+    }
+
     res.searchParams.set('redirect_url', returnBackUrl.toString());
   }
   // For cross-origin redirects, we need to pass the dev browser token for URL session syncing
-  if (_devBrowserToken && baseUrl.hostname !== res.hostname) {
+  if (isCrossOriginRedirect && _devBrowserToken) {
     res.searchParams.set(constants.QueryParameters.DevBrowser, _devBrowserToken);
   }
   return res.toString();

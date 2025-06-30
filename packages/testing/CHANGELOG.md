@@ -1,5 +1,38 @@
 # @clerk/testing
 
+## 1.9.1
+
+### Patch Changes
+
+- Allow for `waitForStripeElements` helper to accept a `state` of `visible` or `hidden`. ([#6204](https://github.com/clerk/javascript/pull/6204)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`02a1f42`](https://github.com/clerk/javascript/commit/02a1f42dfdb28ea956d6cbd3fbabe10093d2fad8), [`edc0bfd`](https://github.com/clerk/javascript/commit/edc0bfdae929dad78a99dfd6275aad947d9ddd73)]:
+  - @clerk/shared@3.10.1
+  - @clerk/types@4.62.1
+  - @clerk/backend@2.3.1
+
+## 1.9.0
+
+### Minor Changes
+
+- Add API keys component testing helpers ([#6192](https://github.com/clerk/javascript/pull/6192)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Updated dependencies [[`f1be1fe`](https://github.com/clerk/javascript/commit/f1be1fe3d575c11acd04fc7aadcdec8f89829894), [`8bfdf94`](https://github.com/clerk/javascript/commit/8bfdf94646c54a5e13fcb81ebcb9df0209dbc6a1), [`bffb42a`](https://github.com/clerk/javascript/commit/bffb42aaf266a188b9ae7d16ace3024d468a3bd4), [`084e7cc`](https://github.com/clerk/javascript/commit/084e7cc5f6f6d101059bc8a6d60dc73f3262ef2f)]:
+  - @clerk/types@4.62.0
+  - @clerk/backend@2.3.0
+  - @clerk/shared@3.10.0
+
+## 1.8.2
+
+### Patch Changes
+
+- Updated dependencies [[`b495279`](https://github.com/clerk/javascript/commit/b4952796e3c7dee4ab4726de63a17b7f4265ce37), [`c3fa15d`](https://github.com/clerk/javascript/commit/c3fa15d60642b4fcbcf26e21caaca0fc60975795), [`628583a`](https://github.com/clerk/javascript/commit/628583a27ffd72521475e06f91e6f592ee87ba47), [`52d5e57`](https://github.com/clerk/javascript/commit/52d5e5768d54725b4d20d028135746493e05d44c), [`15a945c`](https://github.com/clerk/javascript/commit/15a945c02a9f6bc8d2f7d1e3534217100bf45936), [`10f3dda`](https://github.com/clerk/javascript/commit/10f3dda2beff0ce71a52c2f15c07094110078be2), [`72629b0`](https://github.com/clerk/javascript/commit/72629b06fb1fe720fa2a61462306a786a913e9a8), [`2692124`](https://github.com/clerk/javascript/commit/2692124a79369a9289ee18009667231d7e27b9ed)]:
+  - @clerk/types@4.61.0
+  - @clerk/backend@2.2.0
+  - @clerk/shared@3.9.8
+
 ## 1.8.1
 
 ### Patch Changes

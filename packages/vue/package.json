@@ -1,6 +1,6 @@
 {
   "name": "@clerk/vue",
-  "version": "1.8.8",
+  "version": "1.8.11",
   "description": "Clerk SDK for Vue",
   "keywords": [
     "clerk",
@@ -65,7 +65,7 @@
     "@vitejs/plugin-vue": "^5.2.4",
     "@vue.ts/tsx-auto-props": "^0.6.0",
     "unplugin-vue": "^6.2.0",
-    "vue": "3.5.16",
+    "vue": "3.5.17",
     "vue-tsc": "^2.2.10"
   },
   "peerDependencies": {

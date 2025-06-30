@@ -24,6 +24,7 @@ export const createLongRunningApps = () => {
     { id: 'react.vite.withEmailCodes_persist_client', config: react.vite, env: envs.withEmailCodes_destroy_client },
     { id: 'react.vite.withEmailLinks', config: react.vite, env: envs.withEmailLinks },
     { id: 'next.appRouter.withEmailCodes', config: next.appRouter, env: envs.withEmailCodes },
+    { id: 'next.appRouter.sessionsProd1', config: next.appRouter, env: envs.sessionsProd1 },
     {
       id: 'next.appRouter.withEmailCodes_persist_client',
       config: next.appRouter,
@@ -42,6 +43,7 @@ export const createLongRunningApps = () => {
       config: next.appRouter,
       env: envs.withSessionTasks,
     },
+    { id: 'next.appRouter.withAPIKeys', config: next.appRouter, env: envs.withAPIKeys },
     { id: 'withBillingStaging.next.appRouter', config: next.appRouter, env: envs.withBillingStaging },
     { id: 'withBilling.next.appRouter', config: next.appRouter, env: envs.withBilling },
     { id: 'withBillingStaging.vue.vite', config: vue.vite, env: envs.withBillingStaging },

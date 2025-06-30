@@ -1,12 +1,5 @@
 import { deprecated } from '@clerk/shared/deprecated';
-import type {
-  Autocomplete,
-  CheckAuthorizationWithCustomPermissions,
-  HandleOAuthCallbackParams,
-  OrganizationCustomPermissionKey,
-  OrganizationCustomRoleKey,
-  PendingSessionOptions,
-} from '@clerk/types';
+import type { HandleOAuthCallbackParams, PendingSessionOptions, ProtectProps as _ProtectProps } from '@clerk/types';
 import React from 'react';
 
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
@@ -77,50 +70,7 @@ export const ClerkDegraded = ({ children }: React.PropsWithChildren<unknown>) =>
 };
 
 export type ProtectProps = React.PropsWithChildren<
-  (
-    | {
-        condition?: never;
-        role: OrganizationCustomRoleKey;
-        permission?: never;
-        feature?: never;
-        plan?: never;
-      }
-    | {
-        condition?: never;
-        role?: never;
-        feature?: never;
-        plan?: never;
-        permission: OrganizationCustomPermissionKey;
-      }
-    | {
-        condition: (has: CheckAuthorizationWithCustomPermissions) => boolean;
-        role?: never;
-        permission?: never;
-        feature?: never;
-        plan?: never;
-      }
-    | {
-        condition?: never;
-        role?: never;
-        permission?: never;
-        feature: Autocomplete<`user:${string}` | `org:${string}`>;
-        plan?: never;
-      }
-    | {
-        condition?: never;
-        role?: never;
-        permission?: never;
-        feature?: never;
-        plan: Autocomplete<`user:${string}` | `org:${string}`>;
-      }
-    | {
-        condition?: never;
-        role?: never;
-        permission?: never;
-        feature?: never;
-        plan?: never;
-      }
-  ) & {
+  _ProtectProps & {
     fallback?: React.ReactNode;
   } & PendingSessionOptions
 >;

@@ -54,7 +54,7 @@ export class CommerceBilling implements CommerceBillingNamespace {
     const { orgId, ...rest } = params;
 
     return await BaseResource._fetch({
-      path: orgId ? `/organizations/${orgId}/commerce/subscription_items` : `/me/commerce/subscription_items`,
+      path: orgId ? `/organizations/${orgId}/commerce/subscriptions` : `/me/commerce/subscriptions`,
       method: 'GET',
       search: convertPageToOffsetSearchParams(rest),
     }).then(res => {

@@ -1,6 +1,6 @@
 import { useOrganization } from '@clerk/shared/react';
 
-import { ApiKeysContext } from '@/ui/contexts';
+import { ApiKeysContext, useOrganizationProfileContext } from '@/ui/contexts';
 import { Col, localizationKeys } from '@/ui/customizables';
 import { Header } from '@/ui/elements/Header';
 import { useUnsafeNavbarContext } from '@/ui/elements/Navbar';
@@ -10,6 +10,7 @@ import { APIKeysPage } from '../ApiKeys/ApiKeys';
 export const OrganizationAPIKeysPage = () => {
   const { organization } = useOrganization();
   const { contentRef } = useUnsafeNavbarContext();
+  const { apiKeysProps } = useOrganizationProfileContext();
 
   if (!organization) {
     // We should never reach this point, but we'll return null to make TS happy
@@ -24,7 +25,7 @@ export const OrganizationAPIKeysPage = () => {
           textVariant='h2'
         />
       </Header.Root>
-      <ApiKeysContext.Provider value={{ componentName: 'APIKeys' }}>
+      <ApiKeysContext.Provider value={{ ...apiKeysProps, componentName: 'APIKeys' }}>
         <APIKeysPage
           subject={organization.id}
           revokeModalRoot={contentRef}

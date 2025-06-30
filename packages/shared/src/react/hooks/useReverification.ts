@@ -1,5 +1,5 @@
 import type { Clerk, SessionVerificationLevel } from '@clerk/types';
-import { useMemo, useRef } from 'react';
+import { useCallback, useRef } from 'react';
 
 import { validateReverificationConfig } from '../../authorization';
 import { isReverificationHint, reverificationError } from '../../authorization-errors';
@@ -119,7 +119,6 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
             afterVerificationCancelled: cancel,
           });
         } else {
-          params.telemetry?.record(eventMethodCalled('UserVerificationCustomUI'));
           params.onNeedsReverification({
             cancel,
             complete,
@@ -199,14 +198,11 @@ export const useReverification: UseReverification = (fetcher, options) => {
   const fetcherRef = useRef(fetcher);
   const optionsRef = useRef(options);
 
-  const handleReverification = useMemo(() => {
-    const handler = createReverificationHandler({
-      openUIComponent: __internal_openReverification,
-      telemetry,
-      ...optionsRef.current,
-    })(fetcherRef.current);
-    return handler;
-  }, [__internal_openReverification, fetcherRef.current, optionsRef.current]);
+  telemetry?.record(
+    eventMethodCalled('useReverification', {
+      onNeedsReverification: Boolean(options?.onNeedsReverification),
+    }),
+  );
 
   // Keep fetcher and options ref in sync
   useSafeLayoutEffect(() => {
@@ -214,5 +210,15 @@ export const useReverification: UseReverification = (fetcher, options) => {
     optionsRef.current = options;
   });
 
-  return handleReverification;
+  return useCallback(
+    (...args) => {
+      const handler = createReverificationHandler({
+        openUIComponent: __internal_openReverification,
+        telemetry,
+        ...optionsRef.current,
+      })(fetcherRef.current);
+      return handler(...args);
+    },
+    [__internal_openReverification, telemetry],
+  );
 };

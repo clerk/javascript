@@ -10,7 +10,6 @@ import {
   invalidTokenAuthObject,
   isMachineTokenByPrefix,
   isTokenTypeAccepted,
-  type MachineTokenType,
   type SignedInAuthObject,
   type SignedOutAuthObject,
   signedOutAuthObject,
@@ -81,6 +80,40 @@ export const getAuthDataFromRequestSync = (
   return authObject;
 };
 
+const handleMachineToken = async (
+  bearerToken: string | undefined,
+  acceptsToken: NonNullable<AuthenticateRequestOptions['acceptsToken']>,
+  options: GetAuthDataFromRequestOptions,
+): Promise<AuthObject | null> => {
+  const hasMachineToken = bearerToken && isMachineTokenByPrefix(bearerToken);
+
+  const acceptsOnlySessionToken =
+    acceptsToken === TokenType.SessionToken ||
+    (Array.isArray(acceptsToken) && acceptsToken.length === 1 && acceptsToken[0] === TokenType.SessionToken);
+
+  if (hasMachineToken && !acceptsOnlySessionToken) {
+    const machineTokenType = getMachineTokenType(bearerToken);
+
+    // Early return if the token type is not accepted to save on the verify call
+    if (Array.isArray(acceptsToken) && !acceptsToken.includes(machineTokenType)) {
+      return invalidTokenAuthObject();
+    }
+    // Early return for scalar acceptsToken if it does not match the machine token type
+    if (!Array.isArray(acceptsToken) && acceptsToken !== 'any' && machineTokenType !== acceptsToken) {
+      const authObject = unauthenticatedMachineObject(acceptsToken, options);
+      return getAuthObjectForAcceptedToken({ authObject, acceptsToken });
+    }
+
+    const { data, errors } = await verifyMachineAuthToken(bearerToken, options);
+    const authObject = errors
+      ? unauthenticatedMachineObject(machineTokenType, options)
+      : authenticatedMachineObject(machineTokenType, bearerToken, data);
+    return getAuthObjectForAcceptedToken({ authObject, acceptsToken });
+  }
+
+  return null;
+};
+
 /**
  * Given a request object, builds an auth object from the request data. Used in server-side environments to get access
  * to auth data for a given request.
@@ -103,34 +136,19 @@ export const getAuthDataFromRequestAsync = async (
     authReason,
   };
 
-  const hasMachineToken = bearerToken && isMachineTokenByPrefix(bearerToken);
-  if (hasMachineToken) {
-    const machineTokenType = getMachineTokenType(bearerToken);
-
-    // Early return if the token type is not accepted to save on the verify call
-    if (Array.isArray(acceptsToken) && !acceptsToken.includes(machineTokenType)) {
-      return invalidTokenAuthObject();
-    }
-    // Early return for scalar acceptsToken if it does not match the machine token type
-    if (!Array.isArray(acceptsToken) && acceptsToken !== 'any' && machineTokenType !== acceptsToken) {
-      const authObject = unauthenticatedMachineObject(acceptsToken as MachineTokenType, options);
-      return getAuthObjectForAcceptedToken({ authObject, acceptsToken });
-    }
-
-    const { data, errors } = await verifyMachineAuthToken(bearerToken, options);
-    const authObject = errors
-      ? unauthenticatedMachineObject(machineTokenType, options)
-      : authenticatedMachineObject(machineTokenType, bearerToken, data);
-    return getAuthObjectForAcceptedToken({ authObject, acceptsToken });
+  // If the request has a machine token in header, handle it first.
+  const machineAuthObject = await handleMachineToken(bearerToken, acceptsToken, options);
+  if (machineAuthObject) {
+    return machineAuthObject;
   }
 
   // If a random token is present and acceptsToken is an array that does NOT include session_token,
-  // return invalidTokenAuthObject.
+  // return invalid token auth object.
   if (bearerToken && Array.isArray(acceptsToken) && !acceptsToken.includes(TokenType.SessionToken)) {
     return invalidTokenAuthObject();
   }
 
-  // Fallback to session logic (sync version) for all other cases
+  // Fallback to session logic for all other cases
   const authObject = getAuthDataFromRequestSync(req, opts);
   return getAuthObjectForAcceptedToken({ authObject, acceptsToken });
 };

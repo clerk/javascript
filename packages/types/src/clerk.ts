@@ -485,22 +485,21 @@ export interface Clerk {
   unmountPricingTable: (targetNode: HTMLDivElement) => void;
 
   /**
-   * @experimental
    * This API is in early access and may change in future releases.
    *
    * Mount a api keys component at the target element.
+   * @experimental
    * @param targetNode Target to mount the APIKeys component.
    * @param props Configuration parameters.
    */
   mountApiKeys: (targetNode: HTMLDivElement, props?: APIKeysProps) => void;
 
   /**
-   * @experimental
    * This API is in early access and may change in future releases.
    *
    * Unmount a api keys component from the target element.
    * If there is no component mounted at the target node, results in a noop.
-   *
+   * @experimental
    * @param targetNode Target node to unmount the ApiKeys component from.
    */
   unmountApiKeys: (targetNode: HTMLDivElement) => void;
@@ -1357,6 +1356,12 @@ export type UserProfileProps = RoutingOptions & {
    * @experimental
    **/
   __experimental_startPath?: string;
+  /**
+   * Specify options for the underlying <APIKeys /> component.
+   * e.g. <UserProfile apiKeysProps={{ showDescription: true }} />
+   * @experimental
+   **/
+  apiKeysProps?: APIKeysProps;
 };
 
 export type UserProfileModalProps = WithoutRouting<UserProfileProps>;
@@ -1382,6 +1387,12 @@ export type OrganizationProfileProps = RoutingOptions & {
    * @experimental
    **/
   __experimental_startPath?: string;
+  /**
+   * Specify options for the underlying <APIKeys /> component.
+   * e.g. <OrganizationProfile apiKeysProps={{ showDescription: true }} />
+   * @experimental
+   **/
+  apiKeysProps?: APIKeysProps;
 };
 
 export type OrganizationProfileModalProps = WithoutRouting<OrganizationProfileProps>;
@@ -1706,6 +1717,11 @@ export type APIKeysProps = {
    * prop of ClerkProvider (if one is provided)
    */
   appearance?: APIKeysTheme;
+  /**
+   * Whether to show the description field in the API key creation form.
+   * @default false
+   */
+  showDescription?: boolean;
 };
 
 export type GetAPIKeysParams = {
