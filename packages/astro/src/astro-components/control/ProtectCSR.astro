@@ -7,12 +7,14 @@ type Props = Omit<ProtectProps, 'condition'> & {
   fallbackSlotWrapperClass?: string;
 };
 
-const { role, permission, class: className, defaultSlotWrapperClass, fallbackSlotWrapperClass } = Astro.props;
+const { role, permission, feature, plan, class: className, defaultSlotWrapperClass, fallbackSlotWrapperClass } = Astro.props;
 ---
 
 <clerk-protect
   data-role={role}
   data-permission={permission}
+  data-feature={feature}
+  data-plan={plan}
   class={className}
 >
   <div class={defaultSlotWrapperClass} hidden data-clerk-control-slot-default>
@@ -40,8 +42,10 @@ class ClerkProtect extends BaseClerkControlElement {
 
     const role = this.dataset.role;
     const permission = this.dataset.permission;
+    const feature = this.dataset.feature;
+    const plan = this.dataset.plan;
     const isUnauthorized =
-      !state.userId || ((role || permission) && !has?.({ role, permission } as Parameters<CheckAuthorization>[0]));
+      !state.userId || ((role || permission || feature || plan) && !has?.({ role, permission, feature, plan } as Parameters<CheckAuthorization>[0]));
 
     if (this.defaultSlot) {
       isUnauthorized ? this.defaultSlot.setAttribute('hidden', '') : this.defaultSlot.removeAttribute('hidden');

@@ -9,12 +9,12 @@ import { FormButtonContainer } from '@/ui/elements/FormButtons';
 import type { FormProps } from '@/ui/elements/FormContainer';
 import { FormContainer } from '@/ui/elements/FormContainer';
 import { FullHeightLoader } from '@/ui/elements/FullHeightLoader';
+import { handleError } from '@/ui/utils/errorHandler';
 
 import { QRCode } from '../../common';
 import type { LocalizationKey } from '../../customizables';
 import { Button, Col, descriptors, Flex, localizationKeys, Text } from '../../customizables';
 import { useActionContext } from '../../elements/Action/ActionRoot';
-import { handleError } from '../../utils';
 
 type AddAuthenticatorAppProps = FormProps & {
   title: LocalizationKey;

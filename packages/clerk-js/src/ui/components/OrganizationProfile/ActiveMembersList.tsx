@@ -4,11 +4,11 @@ import type { OrganizationMembershipResource } from '@clerk/types';
 import { useCardState } from '@/ui/elements/contexts';
 import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
 import { UserPreview } from '@/ui/elements/UserPreview';
+import { handleError } from '@/ui/utils/errorHandler';
 
 import { Protect } from '../../common/Gate';
 import { Badge, Box, descriptors, localizationKeys, Td, Text } from '../../customizables';
 import { useFetchRoles, useLocalizeCustomRoles } from '../../hooks/useFetchRoles';
-import { handleError } from '../../utils';
 import { DataTable, RoleSelect, RowContainer } from './MemberListTable';
 
 type ActiveMembersListProps = {
