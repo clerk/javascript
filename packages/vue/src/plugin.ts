@@ -68,7 +68,7 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
         loaded.value = true;
 
         clerk.value.addListener(payload => {
-          if (isTransitiveStateChange(payload)) {
+          if (isTemporaryClearedState(payload)) {
             return;
           }
 
@@ -137,6 +137,6 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
  * @param resources - The Clerk resources object to check.
  * @returns True if the payload is a transitive state change, false otherwise.
  */
-function isTransitiveStateChange(resources: Resources): boolean {
+function isTemporaryClearedState(resources: Resources): boolean {
   return resources.user === undefined && resources.organization === undefined && resources.session === undefined;
 }
