@@ -248,10 +248,10 @@ export const ptBR: LocalizationResource = {
     billingPage: {
       paymentHistorySection: {
         empty: 'Nenhum histórico de pagamento',
-        tableHeader__date: 'Data',
-        tableHeader__amount: 'Valor',
-        tableHeader__status: 'Status',
         notFound: 'Pagamento não encontrado',
+        tableHeader__amount: 'Valor',
+        tableHeader__date: 'Data',
+        tableHeader__status: 'Status',
       },
       paymentSourcesSection: {
         actionLabel__default: 'Tornar padrão',
@@ -283,17 +283,17 @@ export const ptBR: LocalizationResource = {
         itemCaption__proratedCredit: 'Crédito proporcional para uso parcial do plano anterior',
         itemCaption__subscribedAndPaidForPlan: 'Assinado e pago para plano {{plan}} {{period}}',
         notFound: 'Extrato não encontrado',
-        tableHeader__date: 'Data',
         tableHeader__amount: 'Valor',
+        tableHeader__date: 'Data',
         title: 'Extratos',
         totalPaid: 'Total pago',
       },
       subscriptionsListSection: {
         actionLabel__newSubscription: 'Assinar um plano',
         actionLabel__switchPlan: 'Mudar de plano',
+        tableHeader__edit: 'Editar',
         tableHeader__plan: 'Plano',
         tableHeader__startDate: 'Data de início',
-        tableHeader__edit: 'Editar',
         title: 'Assinatura',
       },
       subscriptionsSection: {
@@ -906,10 +906,10 @@ export const ptBR: LocalizationResource = {
     billingPage: {
       paymentHistorySection: {
         empty: 'Nenhum histórico de pagamento',
-        tableHeader__date: 'Data',
-        tableHeader__amount: 'Valor',
-        tableHeader__status: 'Status',
         notFound: 'Pagamento não encontrado',
+        tableHeader__amount: 'Valor',
+        tableHeader__date: 'Data',
+        tableHeader__status: 'Status',
       },
       paymentSourcesSection: {
         actionLabel__default: 'Tornar padrão',
@@ -941,17 +941,17 @@ export const ptBR: LocalizationResource = {
         itemCaption__proratedCredit: 'Crédito proporcional para uso parcial do plano anterior',
         itemCaption__subscribedAndPaidForPlan: 'Assinado e pago para plano {{plan}} {{period}}',
         notFound: 'Extrato não encontrado',
-        tableHeader__date: 'Data',
         tableHeader__amount: 'Valor',
+        tableHeader__date: 'Data',
         title: 'Extratos',
         totalPaid: 'Total pago',
       },
       subscriptionsListSection: {
         actionLabel__newSubscription: 'Assinar um plano',
         actionLabel__switchPlan: 'Mudar de plano',
+        tableHeader__edit: 'Editar',
         tableHeader__plan: 'Plano',
         tableHeader__startDate: 'Data de início',
-        tableHeader__edit: 'Editar',
         title: 'Assinatura',
       },
       subscriptionsSection: {
