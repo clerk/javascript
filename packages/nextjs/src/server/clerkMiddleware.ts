@@ -202,8 +202,28 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       const authObject = requestState.toAuth();
       logger.debug('auth', () => ({ auth: authObject, debug: authObject.debug() }));
 
-      const redirectToSignIn = createMiddlewareRedirectToSignIn(clerkRequest);
-      const redirectToSignUp = createMiddlewareRedirectToSignUp(clerkRequest);
+      // Enhanced satellite domain handling: Check for unauthenticated requests on satellite domains
+      // and ensure they can properly redirect back after authentication
+      const isSatellite = requestState.isSatellite;
+      const isUnauthenticated = !authObject.userId;
+
+      // For satellite domains with unauthenticated users, we want to ensure proper redirect handling
+      // This fixes the issue where public routes on satellite domains don't redirect back after auth
+      if (isSatellite && isUnauthenticated) {
+        logger.debug('Satellite domain unauthenticated request detected');
+
+        // If this is a satellite domain and the user is not authenticated,
+        // we want to ensure any authentication attempts preserve the return URL
+        const currentUrl = clerkRequest.clerkUrl.toString();
+
+        // Only apply enhanced redirect logic if we're not already on an auth page
+        if (!currentUrl.includes('/sign-in') && !currentUrl.includes('/sign-up')) {
+          logger.debug('Enhancing redirect functions for satellite domain', { currentUrl });
+        }
+      }
+
+      const redirectToSignIn = createMiddlewareRedirectToSignIn(clerkRequest, requestState);
+      const redirectToSignUp = createMiddlewareRedirectToSignUp(clerkRequest, requestState);
       const protect = await createMiddlewareProtect(clerkRequest, authObject, redirectToSignIn);
 
       const authHandler = createMiddlewareAuthHandler(authObject, redirectToSignIn, redirectToSignUp);
@@ -363,19 +383,41 @@ export const createAuthenticateRequestOptions = (
 
 const createMiddlewareRedirectToSignIn = (
   clerkRequest: ClerkRequest,
+  requestState: RequestState,
 ): ClerkMiddlewareSessionAuthObject['redirectToSignIn'] => {
   return (opts = {}) => {
     const url = clerkRequest.clerkUrl.toString();
-    redirectToSignInError(url, opts.returnBackUrl);
+    const returnBackUrl = opts.returnBackUrl === null ? null : (opts.returnBackUrl || url).toString();
+
+    // For satellite domains, use the satellite domain sync flow instead of standard redirects
+    // This ensures proper cross-domain redirect handling similar to automatic satellite sync
+    if (requestState.isSatellite && requestState.signInUrl && returnBackUrl !== null) {
+      const redirectURL = new URL(requestState.signInUrl);
+      redirectURL.searchParams.set('redirect_url', returnBackUrl);
+      redirectToSignInError(redirectURL.toString(), returnBackUrl);
+    } else {
+      redirectToSignInError(url, returnBackUrl);
+    }
   };
 };
 
 const createMiddlewareRedirectToSignUp = (
   clerkRequest: ClerkRequest,
+  requestState: RequestState,
 ): ClerkMiddlewareSessionAuthObject['redirectToSignUp'] => {
   return (opts = {}) => {
     const url = clerkRequest.clerkUrl.toString();
-    redirectToSignUpError(url, opts.returnBackUrl);
+    const returnBackUrl = opts.returnBackUrl === null ? null : (opts.returnBackUrl || url).toString();
+
+    // For satellite domains, use the satellite domain sync flow instead of standard redirects
+    // This ensures proper cross-domain redirect handling similar to automatic satellite sync
+    if (requestState.isSatellite && requestState.signUpUrl && returnBackUrl !== null) {
+      const redirectURL = new URL(requestState.signUpUrl);
+      redirectURL.searchParams.set('redirect_url', returnBackUrl);
+      redirectToSignUpError(redirectURL.toString(), returnBackUrl);
+    } else {
+      redirectToSignUpError(url, returnBackUrl);
+    }
   };
 };
 
