@@ -16,11 +16,12 @@ export class CaptchaChallenge {
 
     if (canUseCaptcha && captchaSiteKey && captchaPublicKeyInvisible) {
       const captchaResult = await getCaptchaToken({
-        siteKey: captchaPublicKeyInvisible,
-        invisibleSiteKey: captchaPublicKeyInvisible,
-        widgetType: 'invisible',
-        captchaProvider: 'turnstile',
         action: opts?.action,
+        captchaProvider: 'turnstile',
+        invisibleSiteKey: captchaPublicKeyInvisible,
+        nonce: opts?.nonce,
+        siteKey: captchaPublicKeyInvisible,
+        widgetType: 'invisible',
       }).catch(e => {
         if (e.captchaError) {
           return { captchaError: e.captchaError };
@@ -47,10 +48,10 @@ export class CaptchaChallenge {
 
     if (canUseCaptcha && captchaSiteKey && captchaPublicKeyInvisible) {
       const captchaResult = await getCaptchaToken({
+        captchaProvider,
+        invisibleSiteKey: captchaPublicKeyInvisible,
         siteKey: captchaSiteKey,
         widgetType: captchaWidgetType,
-        invisibleSiteKey: captchaPublicKeyInvisible,
-        captchaProvider,
         ...opts,
       }).catch(e => {
         if (e.captchaError) {
