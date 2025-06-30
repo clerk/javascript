@@ -68,6 +68,10 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
         loaded.value = true;
 
         clerk.value.addListener(payload => {
+          if (isTransitiveStateChange(payload)) {
+            return;
+          }
+
           resources.value = payload;
         });
 
@@ -123,3 +127,16 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
     });
   },
 };
+
+/**
+ * Checks if the given Clerk resources payload represents a "transitive" state,
+ * where resources are cleared (set to undefined).
+ * This state is used to prevent UI flicker in React, but should be
+ * ignored in Vue to avoid unnecessary state updates and UI inconsistencies.
+ *
+ * @param resources - The Clerk resources object to check.
+ * @returns True if the payload is a transitive state change, false otherwise.
+ */
+function isTransitiveStateChange(resources: Resources): boolean {
+  return resources.user === undefined && resources.organization === undefined && resources.session === undefined;
+}
