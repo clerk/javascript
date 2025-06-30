@@ -83,7 +83,6 @@ export const ptBR: LocalizationResource = {
       description__subscriptionSuccessful: 'Sua nova assinatura está pronta.',
       downgradeNotice:
         'Você manterá sua assinatura atual e seus recursos até o final do ciclo de faturamento, após o qual você será transferido para este plano.',
-      pastDueNotice: 'Sua assinatura anterior estava atrasada, sem pagamento.',
       emailForm: {
         subtitle:
           'Antes de concluir sua compra, você deve adicionar um endereço de e-mail para o qual os recibos serão enviados.',
