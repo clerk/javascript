@@ -25,7 +25,7 @@ exports[`Passkey Snapshots > should match snapshot for __internal_toSnapshot met
     },
     "expire_at": 1735689800000,
     "external_verification_redirect_url": null,
-    "id": "",
+    "id": "verification_snapshot",
     "message": null,
     "nonce": null,
     "object": "verification",
@@ -37,18 +37,21 @@ exports[`Passkey Snapshots > should match snapshot for __internal_toSnapshot met
 `;
 
 exports[`Passkey Snapshots > should match snapshot for passkey structure 1`] = `
-{
+Passkey {
   "createdAt": 2024-12-31T23:58:20.000Z,
+  "delete": [Function],
   "id": "passkey_123",
   "lastUsedAt": 2025-01-01T00:00:00.000Z,
   "name": "Test Device",
+  "pathRoot": "/me/passkeys",
+  "update": [Function],
   "updatedAt": 2025-01-01T00:00:50.000Z,
   "verification": PasskeyVerification {
     "attempts": 1,
-    "channel": undefined,
     "error": null,
     "expireAt": 2025-01-01T00:01:40.000Z,
     "externalVerificationRedirectURL": null,
+    "id": "verification_123",
     "message": null,
     "nonce": null,
     "pathRoot": "",

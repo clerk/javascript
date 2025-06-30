@@ -405,6 +405,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       object: 'sign_up',
       ...serializeToJSON(this, {
         nestedFields: ['verifications'],
+        excludeFields: ['web3wallet'],
       }),
     } as SignUpJSONSnapshot;
   }

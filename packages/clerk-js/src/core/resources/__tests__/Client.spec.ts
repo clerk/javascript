@@ -506,7 +506,6 @@ describe('Client Snapshots', () => {
   it('should match snapshot for __internal_toSnapshot method', () => {
     const clientJSON = {
       object: 'client',
-      status: null,
       id: 'client_DUMMY_ID',
       sessions: [],
       sign_up: {
@@ -589,6 +588,8 @@ describe('Client Snapshots', () => {
         abandon_at: null,
         web3_wallet: null,
         legal_accepted_at: null,
+        external_account: undefined,
+        external_account_strategy: undefined,
       },
       sign_in: {
         object: 'sign_in',
@@ -628,6 +629,8 @@ describe('Client Snapshots', () => {
         user_data: {
           first_name: 'John',
           last_name: 'Doe',
+          has_image: null,
+          image_url: null,
         },
       },
       last_active_session_id: 'session_123',
@@ -646,7 +649,6 @@ describe('Client Snapshots', () => {
   it('should match snapshot for empty client state', () => {
     const emptyClientJSON = {
       object: 'client',
-      status: null,
       id: 'client_EMPTY',
       sessions: [],
       sign_up: null,

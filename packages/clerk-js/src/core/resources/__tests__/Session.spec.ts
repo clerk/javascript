@@ -918,6 +918,64 @@ describe('Session', () => {
 });
 
 describe('Session Snapshots', () => {
+  const __session = new Session({
+    object: 'session',
+    id: 'sess_snapshot',
+    status: 'active',
+    last_active_at: 1735689600000,
+    last_active_organization_id: 'org_snapshot',
+    actor: null,
+    created_at: 1735689500000,
+    updated_at: 1735689600000,
+    abandon_at: 1735689600000,
+    expire_at: 1735776000000,
+    last_active_token: {
+      id: '',
+      object: 'token',
+      jwt: 'eyJhbGciOiJSUzI1NiIsImtpZCI6Imluc18yVDlwUkZST0NnYlJPRW1DbDNlX1ZYOEVfMVJSZWJUQ3JfQWZlWXciLCJ0eXAiOiJKV1QifQ.eyJhenAiOiJodHRwczovL2NsZXJrLmV4YW1wbGUuY29tIiwiZXhwIjoxNzM1Njg5NzAwLCJpYXQiOjE3MzU2ODk2MDAsImlzcyI6Imh0dHBzOi8vY2xlcmsuZXhhbXBsZS5jb20iLCJuYmYiOjE3MzU2ODk1OTAsInN1YiI6InVzZXJfMTIzIn0.signature',
+    },
+    user: {
+      object: 'user',
+      id: 'user_snapshot',
+      username: 'snapshotuser',
+      first_name: 'Snapshot',
+      last_name: 'User',
+      email_addresses: [],
+      phone_numbers: [],
+      web3_wallets: [],
+      external_accounts: [],
+      passkeys: [],
+      organization_memberships: [],
+      saml_accounts: [],
+      enterprise_accounts: [],
+      public_metadata: { role: 'admin' },
+      unsafe_metadata: {},
+      created_at: 1735689400000,
+      updated_at: 1735689500000,
+      last_sign_in_at: 1735689600000,
+      image_url: 'https://example.com/snapshot-avatar.jpg',
+      has_image: true,
+      primary_email_address_id: 'email_snapshot',
+      primary_phone_number_id: null,
+      primary_web3_wallet_id: null,
+      password_enabled: true,
+      two_factor_enabled: true,
+      totp_enabled: true,
+      backup_code_enabled: true,
+      legal_accepted_at: 1735689400000,
+      create_organization_enabled: true,
+      delete_self_enabled: true,
+    },
+    public_user_data: {
+      first_name: 'Snapshot',
+      last_name: 'User',
+      image_url: 'https://example.com/snapshot-avatar.jpg',
+      has_image: true,
+      identifier: 'snapshotuser',
+      user_id: 'user_snapshot',
+    },
+  });
+
   it('should match snapshot for session instance structure', () => {
     const user = createUser({ id: 'user_123', first_name: 'John', last_name: 'Doe' });
     const sessionJSON: SessionJSON = {
@@ -961,6 +1019,8 @@ describe('Session Snapshots', () => {
   });
 
   it('should match snapshot for session with no organization', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(FIXED_DATE);
     const user = createUser({ id: 'user_456', first_name: 'Jane', last_name: 'Smith' });
     const sessionJSON: SessionJSON = {
       object: 'session',
@@ -977,96 +1037,15 @@ describe('Session Snapshots', () => {
 
     const session = new Session(sessionJSON);
 
-    const sessionSnapshot = {
-      id: session.id,
-      status: session.status,
-      lastActiveOrganizationId: session.lastActiveOrganizationId,
-      createdAt: session.createdAt?.getTime(),
-      updatedAt: session.updatedAt?.getTime(),
-      user: {
-        id: session.user?.id,
-        firstName: session.user?.firstName,
-        lastName: session.user?.lastName,
-      },
-      lastActiveToken: session.lastActiveToken,
-    };
-
-    expect(sessionSnapshot).toMatchSnapshot();
+    expect(session).toMatchSnapshot();
+    vi.useRealTimers();
   });
 
   it('should match snapshot for session structure', () => {
     vi.useFakeTimers();
     vi.setSystemTime(FIXED_DATE);
 
-    const session = new Session({
-      object: 'session',
-      id: 'sess_123',
-      client_id: 'client_123',
-      user_id: 'user_123',
-      status: 'active',
-      last_active_at: 1735689600000,
-      last_active_organization_id: 'org_123',
-      actor: null,
-      created_at: 1735689500000,
-      updated_at: 1735689600000,
-      abandon_at: null,
-      expire_at: 1735776000000,
-      last_active_token: {
-        object: 'token',
-        jwt: 'eyJhbGciOiJSUzI1NiIsImtpZCI6Imluc18yVDlwUkZST0NnYlJPRW1DbDNlX1ZYOEVfMVJSZWJUQ3JfQWZlWXciLCJ0eXAiOiJKV1QifQ.eyJhenAiOiJodHRwczovL2NsZXJrLmV4YW1wbGUuY29tIiwiZXhwIjoxNzM1Njg5NzAwLCJpYXQiOjE3MzU2ODk2MDAsImlzcyI6Imh0dHBzOi8vY2xlcmsuZXhhbXBsZS5jb20iLCJuYmYiOjE3MzU2ODk1OTAsInN1YiI6InVzZXJfMTIzIn0.signature',
-      },
-      user: {
-        object: 'user',
-        id: 'user_123',
-        username: 'testuser',
-        first_name: 'Test',
-        last_name: 'User',
-        email_addresses: [],
-        phone_numbers: [],
-        web3_wallets: [],
-        external_accounts: [],
-        passkeys: [],
-        organization_memberships: [],
-        saml_accounts: [],
-        enterprise_accounts: [],
-        public_metadata: {},
-        private_metadata: {},
-        unsafe_metadata: {},
-        created_at: 1735689400000,
-        updated_at: 1735689500000,
-        last_sign_in_at: 1735689600000,
-        profile_image_url: 'https://example.com/avatar.jpg',
-        image_url: 'https://example.com/avatar.jpg',
-        has_image: true,
-        primary_email_address_id: null,
-        primary_phone_number_id: null,
-        primary_web3_wallet_id: null,
-        password_enabled: true,
-        two_factor_enabled: false,
-        totp_enabled: false,
-        backup_code_enabled: false,
-        mfa_enabled_at: null,
-        mfa_disabled_at: null,
-        legal_accepted_at: null,
-        create_organization_enabled: true,
-        delete_self_enabled: true,
-        last_active_at: 1735689600000,
-        banned: false,
-        locked: false,
-        lockout_expires_in_seconds: null,
-        verification_attempts_remaining: 3,
-      },
-      public_user_data: {
-        first_name: 'Test',
-        last_name: 'User',
-        image_url: 'https://example.com/avatar.jpg',
-        has_image: true,
-        identifier: 'testuser',
-        user_id: 'user_123',
-      },
-    } as any);
-
-    expect(session).toMatchSnapshot();
+    expect(__session).toMatchSnapshot();
 
     vi.useRealTimers();
   });
@@ -1075,70 +1054,7 @@ describe('Session Snapshots', () => {
     vi.useFakeTimers();
     vi.setSystemTime(FIXED_DATE);
 
-    const session = new Session({
-      object: 'session',
-      id: 'sess_snapshot',
-      client_id: 'client_snapshot',
-      user_id: 'user_snapshot',
-      status: 'active',
-      last_active_at: 1735689600000,
-      last_active_organization_id: 'org_snapshot',
-      actor: null,
-      created_at: 1735689500000,
-      updated_at: 1735689600000,
-      abandon_at: null,
-      expire_at: 1735776000000,
-      last_active_token: {
-        object: 'token',
-        jwt: 'eyJhbGciOiJSUzI1NiIsImtpZCI6Imluc18yVDlwUkZST0NnYlJPRW1DbDNlX1ZYOEVfMVJSZWJUQ3JfQWZlWXciLCJ0eXAiOiJKV1QifQ.eyJhenAiOiJodHRwczovL2NsZXJrLmV4YW1wbGUuY29tIiwiZXhwIjoxNzM1Njg5NzAwLCJpYXQiOjE3MzU2ODk2MDAsImlzcyI6Imh0dHBzOi8vY2xlcmsuZXhhbXBsZS5jb20iLCJuYmYiOjE3MzU2ODk1OTAsInN1YiI6InVzZXJfMTIzIn0.signature',
-      },
-      user: {
-        object: 'user',
-        id: 'user_snapshot',
-        username: 'snapshotuser',
-        first_name: 'Snapshot',
-        last_name: 'User',
-        email_addresses: [],
-        phone_numbers: [],
-        web3_wallets: [],
-        external_accounts: [],
-        passkeys: [],
-        organization_memberships: [],
-        saml_accounts: [],
-        enterprise_accounts: [],
-        public_metadata: { role: 'admin' },
-        private_metadata: { internal_id: 12345 },
-        unsafe_metadata: {},
-        created_at: 1735689400000,
-        updated_at: 1735689500000,
-        last_sign_in_at: 1735689600000,
-        profile_image_url: 'https://example.com/snapshot-avatar.jpg',
-        image_url: 'https://example.com/snapshot-avatar.jpg',
-        has_image: true,
-        primary_email_address_id: 'email_snapshot',
-        primary_phone_number_id: null,
-        primary_web3_wallet_id: null,
-        password_enabled: true,
-        two_factor_enabled: true,
-        totp_enabled: true,
-        backup_code_enabled: true,
-        mfa_enabled_at: 1735689550000,
-        mfa_disabled_at: null,
-        legal_accepted_at: 1735689400000,
-        create_organization_enabled: true,
-        delete_self_enabled: true,
-      },
-      public_user_data: {
-        first_name: 'Snapshot',
-        last_name: 'User',
-        image_url: 'https://example.com/snapshot-avatar.jpg',
-        has_image: true,
-        identifier: 'snapshotuser',
-        user_id: 'user_snapshot',
-      },
-    } as any);
-
-    expect(session.__internal_toSnapshot()).toMatchSnapshot();
+    expect(__session.__internal_toSnapshot()).toMatchSnapshot();
 
     vi.useRealTimers();
   });

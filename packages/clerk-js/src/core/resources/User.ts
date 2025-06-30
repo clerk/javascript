@@ -385,6 +385,13 @@ export class User extends BaseResource implements UserResource {
           'samlAccounts',
           'enterpriseAccounts',
         ],
+        excludeFields: [
+          'fullName',
+          'primaryEmailAddress',
+          'primaryPhoneNumber',
+          'primaryWeb3Wallet',
+          'cachedSessionsWithActivities',
+        ],
       }),
     } as UserJSONSnapshot;
   }

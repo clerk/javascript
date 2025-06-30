@@ -10,7 +10,6 @@ describe('Passkey', () => {
       object: 'passkey',
       id: 'passkey_123',
       name: 'My Device',
-      credential_id: 'credential_abc123',
       verification: {
         object: 'verification',
         id: 'verification_123',
@@ -43,7 +42,6 @@ describe('Passkey Snapshots', () => {
       object: 'passkey',
       id: 'passkey_123',
       name: 'Test Device',
-      credential_id: 'cred_abc123def456',
       verification: {
         object: 'verification',
         id: 'verification_123',
@@ -59,16 +57,7 @@ describe('Passkey Snapshots', () => {
       updated_at: 1735689650000,
     } as any);
 
-    const snapshot = {
-      id: passkey.id,
-      name: passkey.name,
-      verification: passkey.verification,
-      lastUsedAt: passkey.lastUsedAt,
-      createdAt: passkey.createdAt,
-      updatedAt: passkey.updatedAt,
-    };
-
-    expect(snapshot).toMatchSnapshot();
+    expect(passkey).toMatchSnapshot();
   });
 
   it('should match snapshot for __internal_toSnapshot method', () => {
@@ -79,7 +68,6 @@ describe('Passkey Snapshots', () => {
       object: 'passkey',
       id: 'passkey_snapshot',
       name: 'Snapshot Device',
-      credential_id: 'credential_snapshot_123',
       verification: {
         object: 'verification',
         id: 'verification_snapshot',

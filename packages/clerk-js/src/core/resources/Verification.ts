@@ -3,6 +3,7 @@ import type {
   ClerkAPIError,
   PasskeyVerificationResource,
   PhoneCodeChannel,
+  PublicKeyCredentialCreationOptionsJSON,
   PublicKeyCredentialCreationOptionsWithoutExtensions,
   SignUpVerificationJSON,
   SignUpVerificationJSONSnapshot,
@@ -67,7 +68,7 @@ export class Verification extends BaseResource implements VerificationResource {
       message: this.message,
       external_verification_redirect_url: this.externalVerificationRedirectURL?.toString() || null,
       attempts: this.attempts,
-      expire_at: this.expireAt?.getTime() || null,
+      expire_at: this.expireAt?.getTime?.() || null,
       error: errorToJSON(this.error),
       verified_at_client: this.verifiedAtClient,
     };
@@ -87,18 +88,11 @@ export class PasskeyVerification extends Verification implements PasskeyVerifica
    */
   protected fromJSON(data: VerificationJSON | VerificationJSONSnapshot | null): this {
     super.fromJSON(data);
-    Object.assign(
-      this,
-      parseJSON<PasskeyVerification>(data, {
-        customTransforms: {
-          publicKey: (value: string | null) =>
-            value && data?.nonce ? convertJSONToPublicKeyCreateOptions(JSON.parse(data.nonce)) : null,
-        },
-        defaultValues: {
-          publicKey: null,
-        },
-      }),
-    );
+    if (data?.nonce) {
+      this.publicKey = convertJSONToPublicKeyCreateOptions(
+        JSON.parse(data.nonce) as PublicKeyCredentialCreationOptionsJSON,
+      );
+    }
     return this;
   }
 }
@@ -139,15 +133,13 @@ export class SignUpVerification extends Verification {
 
   constructor(data: SignUpVerificationJSON | SignUpVerificationJSONSnapshot | null) {
     super(data);
-    Object.assign(
-      this,
-      parseJSON<SignUpVerification>(data, {
-        defaultValues: {
-          nextAction: '',
-          supportedStrategies: [],
-        },
-      }),
-    );
+    if (data) {
+      this.nextAction = data.next_action;
+      this.supportedStrategies = data.supported_strategies;
+    } else {
+      this.nextAction = '';
+      this.supportedStrategies = [];
+    }
   }
 
   public __internal_toSnapshot(): SignUpVerificationJSONSnapshot {
