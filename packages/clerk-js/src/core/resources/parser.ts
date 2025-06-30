@@ -13,6 +13,7 @@ interface ParserConfig {
 }
 
 interface SerializerConfig {
+  excludeFields?: string[];
   nestedFields?: string[];
   arrayFields?: string[];
   customTransforms?: Record<string, TransformFn>;
@@ -74,7 +75,7 @@ export function parseJSON<T extends object>(data: Record<string, any> | null, co
     }
 
     // 3. Nested object fields
-    if (nestedFields[camelKey] && value) {
+    if (nestedFields[camelKey]) {
       const Constructor = nestedFields[camelKey];
       result[camelKey] = new Constructor(value);
       continue;
@@ -97,6 +98,8 @@ export function parseJSON<T extends object>(data: Record<string, any> | null, co
     result[camelKey] = value;
   }
 
+  console.log('--lala result', result);
+
   return result as Partial<T>;
 }
 
@@ -112,7 +115,7 @@ export function serializeToJSON<T extends object>(data: T | null, config: Serial
   }
 
   const result: Record<string, any> = {};
-  const { nestedFields = [], arrayFields = [], customTransforms = {} } = config;
+  const { nestedFields = [], arrayFields = [], customTransforms = {}, excludeFields = [] } = config;
 
   // Process each field in the data
   for (const [key, value] of Object.entries(data as Record<string, any>)) {
@@ -120,6 +123,10 @@ export function serializeToJSON<T extends object>(data: T | null, config: Serial
     // if (value === undefined) {
     //   continue;
     // }
+
+    if (typeof value === 'function') {
+      continue;
+    }
 
     // Convert camelCase to snake_case for all keys
     const outputKey = camelToSnake(key);
@@ -132,7 +139,15 @@ export function serializeToJSON<T extends object>(data: T | null, config: Serial
 
     // 2. Auto-convert Date fields to timestamp
     if (value instanceof Date) {
-      result[outputKey] = value.getTime();
+      result[outputKey] = value.getTime?.();
+      continue;
+    }
+
+    if (outputKey === 'path_root') {
+      continue;
+    }
+
+    if (excludeFields.includes(key)) {
       continue;
     }
 
