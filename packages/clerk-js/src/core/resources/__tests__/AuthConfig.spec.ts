@@ -43,9 +43,9 @@ describe('AuthConfig', () => {
     expect(snapshot).toEqual({
       object: 'auth_config',
       claimed_at: 1672531200000,
-      id: '',
       reverification: true,
       single_session_mode: true,
+      preferred_channels: null,
     });
   });
 

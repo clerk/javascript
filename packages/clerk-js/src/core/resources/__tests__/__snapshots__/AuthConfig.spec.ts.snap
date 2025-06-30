@@ -3,8 +3,8 @@
 exports[`AuthConfig > should match snapshot 1`] = `
 {
   "claimed_at": 1672531200000,
-  "id": "",
   "object": "auth_config",
+  "preferred_channels": null,
   "reverification": true,
   "single_session_mode": true,
 }
