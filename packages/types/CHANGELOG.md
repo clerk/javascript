@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.62.1
+
+### Patch Changes
+
+- Extract internal `ProtectProps` type to shared types to eliminate duplication across SDKs ([#6197](https://github.com/clerk/javascript/pull/6197)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 4.62.0
 
 ### Minor Changes
