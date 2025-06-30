@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { CaptchaOptions } from '../captcha/types';
 import { shouldRetryTurnstileErrorCode } from '../captcha/turnstile';
+import type { CaptchaOptions } from '../captcha/types';
 
 describe('shouldRetryTurnstileErrorCode', () => {
   it.each([
