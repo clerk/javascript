@@ -236,6 +236,7 @@ const AddPaymentSourceForm = ({ children }: PropsWithChildren) => {
   const elements = useElements();
   const { displayConfig } = useEnvironment();
   const { t } = useLocalizations();
+  const subscriberType = useSubscriberTypeContext();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -294,7 +295,8 @@ const AddPaymentSourceForm = ({ children }: PropsWithChildren) => {
               ? {
                   recurringPaymentRequest: {
                     paymentDescription: `${t(localizationKeys(checkout.planPeriod === 'month' ? 'commerce.paymentSource.applePayDescription.monthly' : 'commerce.paymentSource.applePayDescription.annual'))}`,
-                    managementURL: displayConfig.homeUrl,
+                    managementURL:
+                      subscriberType === 'org' ? displayConfig.organizationProfileUrl : displayConfig.userProfileUrl,
                     regularBilling: {
                       amount: checkout.totals.totalDueNow?.amount || checkout.totals.grandTotal.amount,
                       label: checkout.plan.name,
