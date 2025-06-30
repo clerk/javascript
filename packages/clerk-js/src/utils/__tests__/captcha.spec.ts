@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import type { CaptchaOptions } from '../captcha/types';
 import { shouldRetryTurnstileErrorCode } from '../captcha/turnstile';
 
 describe('shouldRetryTurnstileErrorCode', () => {
@@ -114,7 +115,7 @@ describe('Nonce support', () => {
   describe('CaptchaOptions type support', () => {
     it('should accept nonce in CaptchaOptions type definition', () => {
       // This test verifies that the CaptchaOptions type includes the nonce field
-      const validOptions: import('../captcha/types').CaptchaOptions = {
+      const validOptions: CaptchaOptions = {
         action: 'signup',
         captchaProvider: 'turnstile',
         closeModal: async () => {},
@@ -132,7 +133,7 @@ describe('Nonce support', () => {
     });
 
     it('should allow undefined nonce in CaptchaOptions', () => {
-      const validOptionsWithoutNonce: import('../captcha/types').CaptchaOptions = {
+      const validOptionsWithoutNonce: CaptchaOptions = {
         action: 'signup',
         captchaProvider: 'turnstile',
         invisibleSiteKey: 'test-invisible-key',
