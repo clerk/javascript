@@ -10,6 +10,8 @@
 
 import type { HslaColor, HslaColorString } from '@clerk/types';
 
+import { resolveCSSVariable } from './utils';
+
 const abbrRegex = /^#([a-f0-9]{3,4})$/i;
 const hexRegex = /^#([a-f0-9]{6})([a-f0-9]{2})?$/i;
 const rgbaRegex =
@@ -254,42 +256,9 @@ const hslaColorToHslaString = ({ h, s, l, a }: HslaColor): HslaColorString => {
   return `hsla(${h}, ${s}%, ${l}%, ${a ?? 1})` as HslaColorString;
 };
 
-const resolveCssVariable = (str: string): string | null => {
-  // Check if it's a CSS variable (starts with var()
-  const cssVarRegex = /^var\(\s*(--[^,\s)]+)\s*(?:,\s*([^)]+))?\s*\)$/;
-  const match = str.match(cssVarRegex);
-
-  if (!match) {
-    return null;
-  }
-
-  const [, variableName, fallbackValue] = match;
-
-  // Try to get the computed value from CSS custom property
-  if (typeof window !== 'undefined' && window.getComputedStyle) {
-    try {
-      const computedStyle = window.getComputedStyle(document.documentElement);
-      const resolvedValue = computedStyle.getPropertyValue(variableName).trim();
-
-      if (resolvedValue) {
-        return resolvedValue;
-      }
-    } catch {
-      // Silently fail and try fallback
-    }
-  }
-
-  // If we can't resolve the variable, try the fallback value
-  if (fallbackValue) {
-    return fallbackValue.trim();
-  }
-
-  return null;
-};
-
 const parse = (str: string): ParsedResult => {
   // First try to resolve CSS variables
-  const resolvedStr = resolveCssVariable(str);
+  const resolvedStr = resolveCSSVariable(str);
   const colorStr = resolvedStr || str;
 
   const prefix = colorStr.substr(0, 3).toLowerCase();

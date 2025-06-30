@@ -122,15 +122,20 @@ describe('Legacy Colors', () => {
 
     describe('CSS variable inputs', () => {
       // Mock DOM environment for testing CSS variables
+      const mockGetComputedStyle = vi.fn();
       const mockWindow = {
-        getComputedStyle: vi.fn(),
+        getComputedStyle: mockGetComputedStyle,
       };
 
       beforeEach(() => {
         // @ts-ignore
         global.window = mockWindow;
         // @ts-ignore
-        global.document = { documentElement: {} };
+        global.getComputedStyle = mockGetComputedStyle;
+        // @ts-ignore
+        global.document = {
+          documentElement: document?.createElement?.('div') || {},
+        };
       });
 
       afterEach(() => {
@@ -138,11 +143,13 @@ describe('Legacy Colors', () => {
         // @ts-ignore
         global.window = undefined;
         // @ts-ignore
+        global.getComputedStyle = undefined;
+        // @ts-ignore
         global.document = undefined;
       });
 
       it('should resolve CSS variables with hex values', () => {
-        mockWindow.getComputedStyle.mockReturnValue({
+        mockGetComputedStyle.mockReturnValue({
           getPropertyValue: vi.fn().mockReturnValue('#ff0000'),
         });
 
@@ -151,7 +158,7 @@ describe('Legacy Colors', () => {
       });
 
       it('should resolve CSS variables with rgb values', () => {
-        mockWindow.getComputedStyle.mockReturnValue({
+        mockGetComputedStyle.mockReturnValue({
           getPropertyValue: vi.fn().mockReturnValue('rgb(255, 0, 0)'),
         });
 
@@ -160,7 +167,7 @@ describe('Legacy Colors', () => {
       });
 
       it('should resolve CSS variables with hsl values', () => {
-        mockWindow.getComputedStyle.mockReturnValue({
+        mockGetComputedStyle.mockReturnValue({
           getPropertyValue: vi.fn().mockReturnValue('hsl(240, 100%, 50%)'),
         });
 
@@ -169,7 +176,7 @@ describe('Legacy Colors', () => {
       });
 
       it('should use fallback value when CSS variable is not defined', () => {
-        mockWindow.getComputedStyle.mockReturnValue({
+        mockGetComputedStyle.mockReturnValue({
           getPropertyValue: vi.fn().mockReturnValue(''),
         });
 
@@ -178,7 +185,7 @@ describe('Legacy Colors', () => {
       });
 
       it('should handle CSS variables with spaces', () => {
-        mockWindow.getComputedStyle.mockReturnValue({
+        mockGetComputedStyle.mockReturnValue({
           getPropertyValue: vi.fn().mockReturnValue('hsl(180, 50%, 50%)'),
         });
 
@@ -187,7 +194,7 @@ describe('Legacy Colors', () => {
       });
 
       it('should throw error when CSS variable cannot be resolved and no fallback', () => {
-        mockWindow.getComputedStyle.mockReturnValue({
+        mockGetComputedStyle.mockReturnValue({
           getPropertyValue: vi.fn().mockReturnValue(''),
         });
 
@@ -197,6 +204,8 @@ describe('Legacy Colors', () => {
       it('should work in server environment without window', () => {
         // @ts-ignore
         global.window = undefined;
+        // @ts-ignore
+        global.getComputedStyle = undefined;
 
         expect(() => colors.toHslaColor('var(--brand, red)')).not.toThrow();
         const result = colors.toHslaColor('var(--brand, red)');
