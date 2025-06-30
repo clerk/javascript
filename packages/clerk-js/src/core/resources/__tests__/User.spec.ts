@@ -336,8 +336,6 @@ describe('User Snapshots', () => {
             error: null,
           },
           linked_to: [],
-          created_at: 1735689500000,
-          updated_at: 1735689600000,
         },
       ],
       phone_numbers: [],
@@ -354,14 +352,8 @@ describe('User Snapshots', () => {
       totp_enabled: false,
       backup_code_enabled: false,
       two_factor_enabled: false,
-      banned: false,
-      locked: false,
-      lockout_expires_in_seconds: null,
-      verification_attempts_remaining: 3,
       delete_self_enabled: true,
       create_organization_enabled: true,
-      last_active_at: 1735689600000,
-      profile_image_url: 'https://example.com/avatar.jpg',
       organization_memberships: [],
     };
 
