@@ -15,20 +15,20 @@ import type { LocalizationResource } from '@clerk/types';
 export const ptBR: LocalizationResource = {
   locale: 'pt-BR',
   backButton: 'Voltar',
-  badge__activePlan: undefined,
-  badge__canceledEndsAt: undefined,
-  badge__currentPlan: undefined,
+  badge__activePlan: 'Ativo',
+  badge__canceledEndsAt: "Cancelado • Termina {{ date | shortDate('pt-BR') }}",
+  badge__currentPlan: 'Plano atual',
   badge__default: 'Padrão',
-  badge__endsAt: undefined,
-  badge__expired: undefined,
+  badge__endsAt: "Termina {{ date | shortDate('pt-BR') }}",
+  badge__expired: 'Expirado',
   badge__otherImpersonatorDevice: 'Personificar outro dispositivo',
   badge__primary: 'Principal',
-  badge__renewsAt: undefined,
+  badge__renewsAt: "Renova {{ date | shortDate('pt-BR') }}",
   badge__requiresAction: 'Requer ação',
-  badge__startsAt: undefined,
+  badge__startsAt: "Inicia {{ date | shortDate('pt-BR') }}",
   badge__thisDevice: 'Este dispositivo',
   badge__unverified: 'Não verificado',
-  badge__upcomingPlan: undefined,
+  badge__upcomingPlan: 'Próximo plano',
   badge__userDevice: 'Dispositivo do usuário',
   badge__you: 'Você',
   commerce: {
@@ -50,6 +50,7 @@ export const ptBR: LocalizationResource = {
       description__subscriptionSuccessful: 'Sua nova assinatura está pronta.',
       downgradeNotice:
         'Você manterá sua assinatura atual e seus recursos até o final do ciclo de faturamento, após o qual você será transferido para este plano.',
+      pastDueNotice: 'Sua assinatura anterior estava atrasada, sem pagamento.',
       emailForm: {
         subtitle:
           'Antes de concluir sua compra, você deve adicionar um endereço de e-mail para o qual os recibos serão enviados.',
@@ -66,6 +67,7 @@ export const ptBR: LocalizationResource = {
       title__paymentSuccessful: 'Pagamento realizado com sucesso!',
       title__subscriptionSuccessful: 'Sucesso!',
     },
+    credit: 'Crédito',
     creditRemainder: 'Crédito para o restante da sua assinatura atual.',
     defaultFreePlanActive: 'Você está atualmente no plano Gratuito',
     free: 'Gratuito',
@@ -104,6 +106,7 @@ export const ptBR: LocalizationResource = {
     switchPlan: 'Mudar de plano',
     switchToAnnual: 'Mudar para anual',
     switchToMonthly: 'Mudar para mensal',
+    totalDue: 'Total devido',
     totalDueToday: 'Total devido hoje',
     viewFeatures: 'Ver recursos',
     year: 'Ano',
@@ -201,6 +204,13 @@ export const ptBR: LocalizationResource = {
     badge__manualInvitation: 'Sem inscrição automática',
     badge__unverified: 'Não verificado',
     billingPage: {
+      paymentHistorySection: {
+        empty: 'Nenhum histórico de pagamento',
+        tableHeader__date: 'Data',
+        tableHeader__amount: 'Valor',
+        tableHeader__status: 'Status',
+        notFound: 'Pagamento não encontrado',
+      },
       paymentSourcesSection: {
         actionLabel__default: 'Tornar padrão',
         actionLabel__remove: 'Remover',
@@ -220,13 +230,28 @@ export const ptBR: LocalizationResource = {
         title: 'Métodos de pagamento',
       },
       start: {
+        headerTitle__payments: 'Pagamentos',
         headerTitle__plans: 'Planos',
         headerTitle__statements: 'Extratos',
         headerTitle__subscriptions: 'Assinaturas',
       },
+      statementsSection: {
+        empty: 'Nenhum extrato para exibir',
+        itemCaption__paidForPlan: 'Pago para plano {{plan}} {{period}}',
+        itemCaption__proratedCredit: 'Crédito proporcional para uso parcial do plano anterior',
+        itemCaption__subscribedAndPaidForPlan: 'Assinado e pago para plano {{plan}} {{period}}',
+        notFound: 'Extrato não encontrado',
+        tableHeader__date: 'Data',
+        tableHeader__amount: 'Valor',
+        title: 'Extratos',
+        totalPaid: 'Total pago',
+      },
       subscriptionsListSection: {
         actionLabel__newSubscription: 'Assinar um plano',
         actionLabel__switchPlan: 'Mudar de plano',
+        tableHeader__plan: 'Plano',
+        tableHeader__startDate: 'Data de início',
+        tableHeader__edit: 'Editar',
         title: 'Assinatura',
       },
       subscriptionsSection: {
@@ -833,6 +858,13 @@ export const ptBR: LocalizationResource = {
       title__codelist: 'Códigos de backup',
     },
     billingPage: {
+      paymentHistorySection: {
+        empty: 'Nenhum histórico de pagamento',
+        tableHeader__date: 'Data',
+        tableHeader__amount: 'Valor',
+        tableHeader__status: 'Status',
+        notFound: 'Pagamento não encontrado',
+      },
       paymentSourcesSection: {
         actionLabel__default: 'Tornar padrão',
         actionLabel__remove: 'Remover',
@@ -852,13 +884,28 @@ export const ptBR: LocalizationResource = {
         title: 'Métodos de pagamento',
       },
       start: {
+        headerTitle__payments: 'Pagamentos',
         headerTitle__plans: 'Planos',
         headerTitle__statements: 'Extratos',
         headerTitle__subscriptions: 'Assinaturas',
       },
+      statementsSection: {
+        empty: 'Nenhum extrato para exibir',
+        itemCaption__paidForPlan: 'Pago para plano {{plan}} {{period}}',
+        itemCaption__proratedCredit: 'Crédito proporcional para uso parcial do plano anterior',
+        itemCaption__subscribedAndPaidForPlan: 'Assinado e pago para plano {{plan}} {{period}}',
+        notFound: 'Extrato não encontrado',
+        tableHeader__date: 'Data',
+        tableHeader__amount: 'Valor',
+        title: 'Extratos',
+        totalPaid: 'Total pago',
+      },
       subscriptionsListSection: {
         actionLabel__newSubscription: 'Assinar um plano',
         actionLabel__switchPlan: 'Mudar de plano',
+        tableHeader__plan: 'Plano',
+        tableHeader__startDate: 'Data de início',
+        tableHeader__edit: 'Editar',
         title: 'Assinatura',
       },
       subscriptionsSection: {
