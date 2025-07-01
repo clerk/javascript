@@ -359,6 +359,7 @@ const redirectAdapter = (url: string | URL) => {
 
 const createMiddlewareRedirectToSignIn = (
   clerkRequest: ClerkRequest,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   requestState: RequestState,
 ): ClerkMiddlewareAuthObject['redirectToSignIn'] => {
   return (opts = {}) => {
