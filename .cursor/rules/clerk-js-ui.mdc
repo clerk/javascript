@@ -1,5 +1,5 @@
 ---
-description: 
+description: Coding rules for Clerk-JS UI and AIO Components
 globs: packages/clerk-js/src/ui/**/*.ts,packages/clerk-js/src/ui/**/*.tsx
 alwaysApply: false
 ---
