@@ -96,7 +96,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
 
     const authObject = requestState.toAuth();
 
-    const redirectToSignIn = createMiddlewareRedirectToSignIn(clerkRequest);
+    const redirectToSignIn = createMiddlewareRedirectToSignIn(clerkRequest, requestState);
     const authObjWithMethods: ClerkMiddlewareAuthObject = Object.assign(authObject, { redirectToSignIn });
 
     decorateAstroLocal(clerkRequest, context, requestState);
