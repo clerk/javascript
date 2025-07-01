@@ -74,6 +74,7 @@ const unboundCreateFixtures = (
       session: clerkMock.session,
       signIn: clerkMock.client.signIn,
       signUp: clerkMock.client.signUp,
+      billing: clerkMock.billing,
       environment: environmentMock,
       router: routerMock,
       options: optionsMock,

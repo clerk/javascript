@@ -158,5 +158,6 @@ export type AvailableComponentCtx =
   | PricingTableCtx
   | CheckoutCtx
   | APIKeysCtx
-  | OAuthConsentCtx;
+  | OAuthConsentCtx
+  | SubscriptionDetailsCtx;
 export type AvailableComponentName = AvailableComponentCtx['componentName'];

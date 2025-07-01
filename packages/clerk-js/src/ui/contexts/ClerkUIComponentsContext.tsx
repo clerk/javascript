@@ -1,4 +1,5 @@
 import type {
+  __experimental_SubscriptionDetailsProps,
   __internal_OAuthConsentProps,
   APIKeysProps,
   PricingTableProps,
@@ -25,6 +26,7 @@ import {
   UserVerificationContext,
   WaitlistContext,
 } from './components';
+import { SubscriptionDetailsContext } from './components/SubscriptionDetails';
 
 export function ComponentContextProvider({
   componentName,
@@ -107,6 +109,14 @@ export function ComponentContextProvider({
         <OAuthConsentContext.Provider value={{ componentName, ...(props as __internal_OAuthConsentProps) }}>
           {children}
         </OAuthConsentContext.Provider>
+      );
+    case 'SubscriptionDetails':
+      return (
+        <SubscriptionDetailsContext.Provider
+          value={{ componentName, ...(props as __experimental_SubscriptionDetailsProps) }}
+        >
+          {children}
+        </SubscriptionDetailsContext.Provider>
       );
 
     default:

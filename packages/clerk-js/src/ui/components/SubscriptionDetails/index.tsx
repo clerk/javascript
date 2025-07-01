@@ -2,6 +2,7 @@ import { useClerk, useOrganization } from '@clerk/shared/react';
 import type {
   __experimental_SubscriptionDetailsProps,
   __internal_CheckoutProps,
+  CommercePlanResource,
   CommerceSubscriptionResource,
 } from '@clerk/types';
 import * as React from 'react';
@@ -20,6 +21,8 @@ import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
 import { ThreeDots } from '@/ui/icons';
 import { handleError } from '@/ui/utils/errorHandler';
 import { formatDate } from '@/ui/utils/formatDate';
+
+const isFreePlan = (plan: CommercePlanResource) => !plan.hasBaseFee;
 
 import { usePlansContext, useSubscriberTypeContext, useSubscriptions } from '../../contexts';
 import {
@@ -187,7 +190,7 @@ const SubscriptionDetailsFooter = withCardStateProvider(() => {
   }, [subscription, setError, setLoading, subscriberType, organization?.id, onSubscriptionCancel, setIsOpen, setIdle]);
 
   // If either the active or upcoming subscription is the free plan, then a C1 cannot switch to a different period or cancel the plan
-  if (anySubscription.plan.isDefault) {
+  if (isFreePlan(anySubscription.plan)) {
     return null;
   }
 
@@ -340,9 +343,9 @@ const SubscriptionCardActions = ({ subscription }: { subscription: CommerceSubsc
   const isSwitchable =
     (subscription.planPeriod === 'month' && subscription.plan.annualMonthlyAmount > 0) ||
     subscription.planPeriod === 'annual';
-  const isFreePlan = subscription.plan.isDefault;
-  const isCancellable = subscription.canceledAt === null && !isFreePlan;
-  const isReSubscribable = subscription.canceledAt !== null && !isFreePlan;
+  const isFree = isFreePlan(subscription.plan);
+  const isCancellable = subscription.canceledAt === null && !isFree;
+  const isReSubscribable = subscription.canceledAt !== null && !isFree;
 
   const openCheckout = useCallback(
     (params?: __internal_CheckoutProps) => {
@@ -456,6 +459,7 @@ const SubscriptionCardActions = ({ subscription }: { subscription: CommerceSubsc
 // New component for individual subscription cards
 const SubscriptionCard = ({ subscription }: { subscription: CommerceSubscriptionResource }) => {
   const isActive = subscription.status === 'active';
+  const isFree = isFreePlan(subscription.plan);
   const { t } = useLocalizations();
 
   return (
@@ -539,10 +543,12 @@ const SubscriptionCard = ({ subscription }: { subscription: CommerceSubscription
             // TODO: Use localization for dates
             value={formatDate(subscription.createdAt)}
           />
-          <DetailRow
-            label={subscription.canceledAt ? 'Ends on' : 'Renews at'}
-            value={formatDate(subscription.periodEnd)}
-          />
+          {!isFree && (
+            <DetailRow
+              label={subscription.canceledAt ? 'Ends on' : 'Renews at'}
+              value={formatDate(subscription.periodEnd)}
+            />
+          )}
         </>
       ) : (
         <DetailRow
