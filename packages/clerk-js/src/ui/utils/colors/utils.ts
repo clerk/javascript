@@ -320,3 +320,57 @@ export function resolveCSSVariable(value: string, element?: Element): string | n
   // If variable couldn't be resolved, return the fallback value if provided
   return fallbackValue;
 }
+
+/**
+ * Resolves a CSS property to its computed value, in the context of a DOM element
+ * This is used to resolve CSS variables to their computed values, in the context of a DOM element.
+ *
+ * @param parentElement - The parent element to resolve the property in the context of
+ * @param propertyName - The CSS property name (e.g., 'color', 'font-weight', 'font-size')
+ * @param propertyValue - The property value to resolve (can be a CSS variable)
+ * @returns The resolved property value as a string
+ */
+export function resolveComputedCSSProperty(
+  parentElement: HTMLElement,
+  propertyName: string,
+  propertyValue: string,
+): string {
+  const element = document.createElement('div');
+  element.style.setProperty(propertyName, propertyValue);
+  parentElement.appendChild(element);
+  const computedStyle = window.getComputedStyle(element);
+  const computedValue = computedStyle.getPropertyValue(propertyName);
+  parentElement.removeChild(element);
+  return computedValue.trim();
+}
+
+/**
+ * Resolves a color to its computed value, in the context of a DOM element
+ * This is used to resolve CSS variables to their computed values, in the context of a DOM element to support passing
+ * CSS variables to Stripe Elements.
+ *
+ * @param parentElement - The parent element to resolve the color in the context of
+ * @param color - The color to resolve
+ * @param backgroundColor - The background color to use for the canvas, this is used to ensure colors that
+ * contain an alpha value mix together correctly. So the output matches the alpha usage in the CSS.
+ * @returns The resolved color as a hex string
+ */
+export function resolveComputedColor(parentElement: HTMLElement, color: string, backgroundColor: string) {
+  const computedColor = resolveComputedCSSProperty(parentElement, 'color', color);
+
+  const canvas = document.createElement('canvas');
+  canvas.width = 1;
+  canvas.height = 1;
+  const ctx = canvas.getContext('2d');
+
+  if (!ctx) {
+    return computedColor;
+  }
+
+  ctx.fillStyle = backgroundColor;
+  ctx.fillRect(0, 0, 1, 1);
+  ctx.fillStyle = computedColor;
+  ctx.fillRect(0, 0, 1, 1);
+  const { data } = ctx.getImageData(0, 0, 1, 1);
+  return `#${data[0].toString(16).padStart(2, '0')}${data[1].toString(16).padStart(2, '0')}${data[2].toString(16).padStart(2, '0')}`;
+}

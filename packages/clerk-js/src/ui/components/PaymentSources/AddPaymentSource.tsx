@@ -4,7 +4,7 @@ import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-
 import type { Appearance as StripeAppearance, SetupIntent } from '@stripe/stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import type { PropsWithChildren } from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
@@ -14,12 +14,12 @@ import { Form } from '@/ui/elements/Form';
 import { FormButtons } from '@/ui/elements/FormButtons';
 import { FormContainer } from '@/ui/elements/FormContainer';
 import { handleError } from '@/ui/utils/errorHandler';
-import { normalizeColorString } from '@/ui/utils/normalizeColorString';
 
 import { clerkUnsupportedEnvironmentWarning } from '../../../core/errors';
 import { useEnvironment, useSubscriberTypeContext, useSubscriberTypeLocalizationRoot } from '../../contexts';
 import { descriptors, Flex, localizationKeys, Spinner, useAppearance, useLocalizations } from '../../customizables';
 import type { LocalizationKey } from '../../localization';
+import { resolveComputedColor, resolveComputedCSSProperty } from '../../utils/colors/utils';
 
 type AddPaymentSourceProps = {
   onSuccess: (context: { stripeSetupIntent?: SetupIntent }) => Promise<void>;
@@ -84,30 +84,72 @@ const AddPaymentSourceRoot = ({ children, ...rest }: PropsWithChildren<AddPaymen
   const [headerSubtitle, setHeaderSubtitle] = useState<LocalizationKey | undefined>(undefined);
   const [submitLabel, setSubmitLabel] = useState<LocalizationKey | undefined>(undefined);
 
+  const { colors, fontWeights, fontSizes, radii, space } = useAppearance().parsedInternalTheme;
+  const [elementsAppearance, setElementsAppearance] = useState<StripeAppearance>({});
+
   useEffect(() => {
     void initializePaymentSource();
-  }, []);
+  }, [initializePaymentSource]);
+
+  const themeRefCallback = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (!node) {
+        return;
+      }
+
+      const appearance: StripeAppearance = {
+        variables: {
+          colorPrimary: resolveComputedColor(node, colors.$primary500, colors.$colorBackground),
+          colorBackground: resolveComputedColor(node, colors.$colorInputBackground, colors.$colorBackground),
+          colorText: resolveComputedColor(node, colors.$colorText, colors.$colorBackground),
+          colorTextSecondary: resolveComputedColor(node, colors.$colorTextSecondary, colors.$colorBackground),
+          colorSuccess: resolveComputedColor(node, colors.$success500, colors.$colorBackground),
+          colorDanger: resolveComputedColor(node, colors.$danger500, colors.$colorBackground),
+          colorWarning: resolveComputedColor(node, colors.$warning500, colors.$colorBackground),
+          fontWeightNormal: resolveComputedCSSProperty(node, 'font-weight', fontWeights.$normal.toString()),
+          fontWeightMedium: resolveComputedCSSProperty(node, 'font-weight', fontWeights.$medium.toString()),
+          fontWeightBold: resolveComputedCSSProperty(node, 'font-weight', fontWeights.$bold.toString()),
+          fontSizeXl: resolveComputedCSSProperty(node, 'font-size', fontSizes.$xl),
+          fontSizeLg: resolveComputedCSSProperty(node, 'font-size', fontSizes.$lg),
+          fontSizeSm: resolveComputedCSSProperty(node, 'font-size', fontSizes.$md),
+          fontSizeXs: resolveComputedCSSProperty(node, 'font-size', fontSizes.$sm),
+          borderRadius: resolveComputedCSSProperty(node, 'border-radius', radii.$lg),
+          spacingUnit: resolveComputedCSSProperty(node, 'padding', space.$1),
+        },
+      };
+
+      setElementsAppearance(appearance);
+    },
+    [colors, fontWeights, fontSizes, radii, space],
+  );
 
   return (
-    <AddPaymentSourceContext.Provider
-      value={{
-        value: {
-          headerTitle,
-          headerSubtitle,
-          submitLabel,
-          setHeaderTitle,
-          setHeaderSubtitle,
-          setSubmitLabel,
-          initializePaymentSource,
-          externalClientSecret,
-          stripe,
-          paymentMethodOrder,
-          ...rest,
-        },
-      }}
-    >
-      {children}
-    </AddPaymentSourceContext.Provider>
+    <>
+      <div
+        style={{ display: 'none' }}
+        ref={themeRefCallback}
+      />
+      <AddPaymentSourceContext.Provider
+        value={{
+          value: {
+            headerTitle,
+            headerSubtitle,
+            submitLabel,
+            setHeaderTitle,
+            setHeaderSubtitle,
+            setSubmitLabel,
+            initializePaymentSource,
+            externalClientSecret,
+            stripe,
+            paymentMethodOrder,
+            elementsAppearance,
+            ...rest,
+          },
+        }}
+      >
+        {children}
+      </AddPaymentSourceContext.Provider>
+    </>
   );
 };
 
@@ -122,29 +164,7 @@ const AddPaymentSourceLoading = (props: PropsWithChildren) => {
 };
 
 const AddPaymentSourceReady = (props: PropsWithChildren) => {
-  const { externalClientSecret, stripe } = useAddPaymentSourceContext();
-
-  const { colors, fontWeights, fontSizes, radii, space } = useAppearance().parsedInternalTheme;
-  const elementsAppearance: StripeAppearance = {
-    variables: {
-      colorPrimary: normalizeColorString(colors.$primary500),
-      colorBackground: normalizeColorString(colors.$colorInputBackground),
-      colorText: normalizeColorString(colors.$colorText),
-      colorTextSecondary: normalizeColorString(colors.$colorTextSecondary),
-      colorSuccess: normalizeColorString(colors.$success500),
-      colorDanger: normalizeColorString(colors.$danger500),
-      colorWarning: normalizeColorString(colors.$warning500),
-      fontWeightNormal: fontWeights.$normal.toString(),
-      fontWeightMedium: fontWeights.$medium.toString(),
-      fontWeightBold: fontWeights.$bold.toString(),
-      fontSizeXl: fontSizes.$xl,
-      fontSizeLg: fontSizes.$lg,
-      fontSizeSm: fontSizes.$md,
-      fontSizeXs: fontSizes.$sm,
-      borderRadius: radii.$md,
-      spacingUnit: space.$1,
-    },
-  };
+  const { externalClientSecret, stripe, elementsAppearance } = useAddPaymentSourceContext();
 
   if (!stripe || !externalClientSecret) {
     return null;
