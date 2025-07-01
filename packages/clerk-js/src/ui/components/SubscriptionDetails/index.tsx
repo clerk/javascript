@@ -475,10 +475,8 @@ const SubscriptionCard = ({ subscription }: { subscription: CommerceSubscription
   return (
     <Col
       sx={t => ({
-        borderWidth: t.borderWidths.$normal,
-        borderStyle: t.borderStyles.$solid,
-        borderColor: t.colors.$neutralAlpha100,
         borderRadius: t.radii.$md,
+        boxShadow: t.shadows.$tableBodyShadow,
       })}
     >
       <Col
