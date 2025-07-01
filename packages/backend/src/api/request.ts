@@ -108,7 +108,7 @@ export function buildRequest(options: BuildRequestOptions) {
       ...headerParams,
     };
 
-    if (secretKey) {
+    if (secretKey && !headers.Authorization) {
       headers.Authorization = `Bearer ${secretKey}`;
     }
 
