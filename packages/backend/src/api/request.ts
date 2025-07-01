@@ -57,6 +57,15 @@ type BuildRequestOptions = {
    * @default true
    */
   requireSecretKey?: boolean;
+  /**
+   * If true, omits the API version from the request URL path.
+   * This is required for bapi-proxy endpoints, which do not use versioning in the URL.
+   *
+   * Note: API versioning for these endpoints is instead handled via the `Clerk-API-Version` HTTP header.
+   *
+   * @default false
+   */
+  skipApiVersionInUrl?: boolean;
 };
 
 export function buildRequest(options: BuildRequestOptions) {
@@ -67,6 +76,7 @@ export function buildRequest(options: BuildRequestOptions) {
       apiUrl = API_URL,
       apiVersion = API_VERSION,
       userAgent = USER_AGENT,
+      skipApiVersionInUrl = false,
     } = options;
     const { path, method, queryParams, headerParams, bodyParams, formData } = requestOptions;
 
@@ -74,7 +84,7 @@ export function buildRequest(options: BuildRequestOptions) {
       assertValidSecretKey(secretKey);
     }
 
-    const url = joinPaths(apiUrl, apiVersion, path);
+    const url = skipApiVersionInUrl ? joinPaths(apiUrl, path) : joinPaths(apiUrl, apiVersion, path);
 
     // Build final URL with search parameters
     const finalUrl = new URL(url);

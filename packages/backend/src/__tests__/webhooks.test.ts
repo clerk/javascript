@@ -1,18 +1,6 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import { verifyWebhook } from '../webhooks';
-
-// Mock svix
-vi.mock('svix', () => {
-  return {
-    Webhook: vi.fn().mockImplementation(() => ({
-      verify: vi.fn().mockImplementation(payload => {
-        // Return the parsed payload for successful verification
-        return JSON.parse(payload);
-      }),
-    })),
-  };
-});
 
 describe('verifyWebhook', () => {
   const mockSecret = 'test_signing_secret';
