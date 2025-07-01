@@ -19,7 +19,7 @@ import { clerkUnsupportedEnvironmentWarning } from '../../../core/errors';
 import { useEnvironment, useSubscriberTypeContext, useSubscriberTypeLocalizationRoot } from '../../contexts';
 import { descriptors, Flex, localizationKeys, Spinner, useAppearance, useLocalizations } from '../../customizables';
 import type { LocalizationKey } from '../../localization';
-import { resolveComputedCSSColor, resolveComputedCSSProperty } from '../../utils/colors/utils';
+import { resolveComputedCSSColor, resolveComputedCSSProperty } from '../../utils/cssVariables';
 
 type AddPaymentSourceProps = {
   onSuccess: (context: { stripeSetupIntent?: SetupIntent }) => Promise<void>;

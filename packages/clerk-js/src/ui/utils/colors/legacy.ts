@@ -10,7 +10,7 @@
 
 import type { HslaColor, HslaColorString } from '@clerk/types';
 
-import { resolveCSSVariable } from './utils';
+import { resolveCSSVariable } from '../cssVariables';
 
 const abbrRegex = /^#([a-f0-9]{3,4})$/i;
 const hexRegex = /^#([a-f0-9]{6})([a-f0-9]{2})?$/i;
