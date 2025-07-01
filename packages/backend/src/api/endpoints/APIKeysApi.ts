@@ -5,7 +5,7 @@ import { AbstractAPI } from './AbstractApi';
 const basePath = '/api_keys';
 
 type CreateAPIKeyParams = {
-  type?: 'api_key';
+  type?: 'api_key' | 'machine_secret_key';
   /**
    * API key name
    */
