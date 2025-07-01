@@ -608,6 +608,18 @@ export type ElementsConfig = {
   apiKeysRevokeModal: WithOptions;
   apiKeysRevokeModalInput: WithOptions;
   apiKeysRevokeModalSubmitButton: WithOptions;
+
+  subscriptionDetailsCard: WithOptions;
+  subscriptionDetailsCardHeader: WithOptions;
+  subscriptionDetailsCardBadge: WithOptions;
+  subscriptionDetailsCardTitle: WithOptions;
+  subscriptionDetailsCardBody: WithOptions;
+  subscriptionDetailsCardFooter: WithOptions;
+  subscriptionDetailsCardActions: WithOptions;
+  subscriptionDetailsSummaryItems: WithOptions;
+  subscriptionDetailsSummaryItem: WithOptions;
+  subscriptionDetailsSummaryLabel: WithOptions;
+  subscriptionDetailsSummaryValue: WithOptions;
 };
 
 export type Elements = {

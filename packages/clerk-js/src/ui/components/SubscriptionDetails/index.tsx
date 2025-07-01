@@ -275,6 +275,7 @@ function SubscriptionDetailsSummary() {
 
   return (
     <Col
+      elementDescriptor={descriptors.subscriptionDetailsSummaryItems}
       gap={3}
       as='ul'
       sx={t => ({
@@ -307,7 +308,6 @@ function SubscriptionDetailsSummary() {
         </SummmaryItemLabel>
         <SummmaryItemValue>
           <Span
-            // elementDescriptor={descriptors.paymentAttemptFooterValueContainer}
             sx={t => ({
               display: 'flex',
               alignItems: 'center',
@@ -317,15 +317,11 @@ function SubscriptionDetailsSummary() {
             <Text
               variant='caption'
               colorScheme='secondary'
-              // elementDescriptor={descriptors.paymentAttemptFooterCurrency}
               sx={{ textTransform: 'uppercase' }}
             >
               {anySubscription.plan.currency}
             </Text>
-            <Text
-            // variant='h3'
-            // elementDescriptor={descriptors.paymentAttemptFooterValue}
-            >
+            <Text>
               {anySubscription.plan.currencySymbol}
               {anySubscription.planPeriod === 'month'
                 ? anySubscription.plan.amountFormatted
@@ -474,12 +470,14 @@ const SubscriptionCard = ({ subscription }: { subscription: CommerceSubscription
 
   return (
     <Col
+      elementDescriptor={descriptors.subscriptionDetailsCard}
       sx={t => ({
         borderRadius: t.radii.$md,
         boxShadow: t.shadows.$tableBodyShadow,
       })}
     >
       <Col
+        elementDescriptor={descriptors.subscriptionDetailsCardBody}
         gap={3}
         sx={t => ({
           padding: t.space.$3,
@@ -487,12 +485,12 @@ const SubscriptionCard = ({ subscription }: { subscription: CommerceSubscription
       >
         {/* Header with name and badge */}
         <Flex
+          elementDescriptor={descriptors.subscriptionDetailsCardHeader}
           align='center'
           gap={2}
         >
           {subscription.plan.avatarUrl ? (
             <Avatar
-              // TODO(@commerce): Add correct descriptor
               boxElementDescriptor={descriptors.planDetailAvatar}
               size={_ => 40}
               title={subscription.plan.name}
@@ -502,6 +500,7 @@ const SubscriptionCard = ({ subscription }: { subscription: CommerceSubscription
           ) : null}
 
           <Text
+            elementDescriptor={descriptors.subscriptionDetailsCardTitle}
             sx={{
               fontSize: '16px',
               fontWeight: '600',
@@ -512,6 +511,7 @@ const SubscriptionCard = ({ subscription }: { subscription: CommerceSubscription
             {subscription.plan.name}
           </Text>
           <Badge
+            elementDescriptor={descriptors.subscriptionDetailsCardBadge}
             colorScheme={isActive ? 'secondary' : 'primary'}
             localizationKey={isActive ? localizationKeys('badge__activePlan') : localizationKeys('badge__upcomingPlan')}
           />
@@ -519,7 +519,7 @@ const SubscriptionCard = ({ subscription }: { subscription: CommerceSubscription
 
         {/* Pricing details */}
         <Flex
-          elementDescriptor={descriptors.statementSectionContentDetailsList}
+          elementDescriptor={descriptors.subscriptionDetailsCardActions}
           justify='between'
           align='center'
         >
@@ -585,7 +585,7 @@ const DetailRow = ({ label, value }: { label: string; value: string }) => (
 function SummaryItem(props: React.PropsWithChildren) {
   return (
     <Box
-      elementDescriptor={descriptors.statementSectionContentDetailsListItem}
+      elementDescriptor={descriptors.subscriptionDetailsSummaryItem}
       as='li'
       sx={{
         display: 'flex',
@@ -601,7 +601,7 @@ function SummaryItem(props: React.PropsWithChildren) {
 function SummmaryItemLabel(props: React.PropsWithChildren) {
   return (
     <Span
-      elementDescriptor={descriptors.statementSectionContentDetailsListItemLabelContainer}
+      elementDescriptor={descriptors.subscriptionDetailsSummaryLabel}
       sx={t => ({
         display: 'flex',
         alignItems: 'center',
@@ -616,7 +616,7 @@ function SummmaryItemLabel(props: React.PropsWithChildren) {
 function SummmaryItemValue(props: React.PropsWithChildren) {
   return (
     <Span
-      elementDescriptor={descriptors.statementSectionContentDetailsListItemLabelContainer}
+      elementDescriptor={descriptors.subscriptionDetailsSummaryValue}
       sx={t => ({
         display: 'flex',
         alignItems: 'center',
