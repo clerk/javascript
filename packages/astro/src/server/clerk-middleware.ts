@@ -359,6 +359,7 @@ const redirectAdapter = (url: string | URL) => {
 
 const createMiddlewareRedirectToSignIn = (
   clerkRequest: ClerkRequest,
+  requestState: RequestState,
 ): ClerkMiddlewareAuthObject['redirectToSignIn'] => {
   return (opts = {}) => {
     const err = new Error(CONTROL_FLOW_ERROR.REDIRECT_TO_SIGN_IN) as any;
