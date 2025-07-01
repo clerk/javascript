@@ -104,12 +104,12 @@ export function buildRequest(options: BuildRequestOptions) {
     // Build headers
     const headers = new Headers({
       'Clerk-API-Version': SUPPORTED_BAPI_VERSION,
-      'User-Agent': userAgent,
+      [constants.Headers.UserAgent]: userAgent,
       ...headerParams,
     });
 
-    if (secretKey && !headers.has('Authorization')) {
-      headers.set('Authorization', `Bearer ${secretKey}`);
+    if (secretKey && !headers.has(constants.Headers.Authorization)) {
+      headers.set(constants.Headers.Authorization, `Bearer ${secretKey}`);
     }
 
     let res: Response | undefined;
