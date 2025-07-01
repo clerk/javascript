@@ -180,7 +180,7 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
         }));
       }
 
-      const requestState = await resolvedClerkClient.authenticateRequest(
+      let requestState = await resolvedClerkClient.authenticateRequest(
         clerkRequest,
         createAuthenticateRequestOptions(clerkRequest, options),
       );
@@ -199,7 +199,36 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
         throw new Error('Clerk: handshake status without redirect');
       }
 
+      // Check if we've just completed a satellite domain handshake and should re-authenticate
+      // This fixes the issue where auth state appears signed out after satellite handshake completion
+      const hasHandshakeCompletionIndicators =
+        requestState.isSatellite &&
+        (clerkRequest.clerkUrl.searchParams.has(constants.QueryParameters.ClerkSynced) ||
+          clerkRequest.clerkUrl.searchParams.has(constants.QueryParameters.DevBrowser) ||
+          (requestState.status === AuthStatus.SignedOut && clerkRequest.cookies.get(constants.Cookies.Session)));
+
+      if (hasHandshakeCompletionIndicators) {
+        logger.debug('Satellite handshake completion detected, re-authenticating for fresh auth state');
+        // Re-authenticate to get the updated auth state after handshake completion
+        requestState = await resolvedClerkClient.authenticateRequest(
+          clerkRequest,
+          createAuthenticateRequestOptions(clerkRequest, options),
+        );
+
+        logger.debug('Updated requestState after re-auth', () => ({
+          status: requestState.status,
+          // @ts-expect-error : FIXME
+          headers: JSON.stringify(Object.fromEntries(requestState.headers)),
+          reason: requestState.reason,
+        }));
+      }
+
       const authObject = requestState.toAuth();
+
+      if (!authObject) {
+        throw new Error('Clerk: Auth object is null after request state resolution');
+      }
+
       logger.debug('auth', () => ({ auth: authObject, debug: authObject.debug() }));
 
       // Enhanced satellite domain handling: Check for unauthenticated requests on satellite domains
