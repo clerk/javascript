@@ -355,7 +355,7 @@ export function resolveComputedCSSProperty(
  * contain an alpha value mix together correctly. So the output matches the alpha usage in the CSS.
  * @returns The resolved color as a hex string
  */
-export function resolveComputedColor(parentElement: HTMLElement, color: string, backgroundColor: string) {
+export function resolveComputedCSSColor(parentElement: HTMLElement, color: string, backgroundColor: string = 'white') {
   const computedColor = resolveComputedCSSProperty(parentElement, 'color', color);
 
   const canvas = document.createElement('canvas');

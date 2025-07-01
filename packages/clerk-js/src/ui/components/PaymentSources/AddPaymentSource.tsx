@@ -19,7 +19,7 @@ import { clerkUnsupportedEnvironmentWarning } from '../../../core/errors';
 import { useEnvironment, useSubscriberTypeContext, useSubscriberTypeLocalizationRoot } from '../../contexts';
 import { descriptors, Flex, localizationKeys, Spinner, useAppearance, useLocalizations } from '../../customizables';
 import type { LocalizationKey } from '../../localization';
-import { resolveComputedColor, resolveComputedCSSProperty } from '../../utils/colors/utils';
+import { resolveComputedCSSColor, resolveComputedCSSProperty } from '../../utils/colors/utils';
 
 type AddPaymentSourceProps = {
   onSuccess: (context: { stripeSetupIntent?: SetupIntent }) => Promise<void>;
@@ -99,13 +99,13 @@ const AddPaymentSourceRoot = ({ children, ...rest }: PropsWithChildren<AddPaymen
 
       const appearance: StripeAppearance = {
         variables: {
-          colorPrimary: resolveComputedColor(node, colors.$primary500, colors.$colorBackground),
-          colorBackground: resolveComputedColor(node, colors.$colorInputBackground, colors.$colorBackground),
-          colorText: resolveComputedColor(node, colors.$colorText, colors.$colorBackground),
-          colorTextSecondary: resolveComputedColor(node, colors.$colorTextSecondary, colors.$colorBackground),
-          colorSuccess: resolveComputedColor(node, colors.$success500, colors.$colorBackground),
-          colorDanger: resolveComputedColor(node, colors.$danger500, colors.$colorBackground),
-          colorWarning: resolveComputedColor(node, colors.$warning500, colors.$colorBackground),
+          colorPrimary: resolveComputedCSSColor(node, colors.$primary500, colors.$colorBackground),
+          colorBackground: resolveComputedCSSColor(node, colors.$colorInputBackground, colors.$colorBackground),
+          colorText: resolveComputedCSSColor(node, colors.$colorText, colors.$colorBackground),
+          colorTextSecondary: resolveComputedCSSColor(node, colors.$colorTextSecondary, colors.$colorBackground),
+          colorSuccess: resolveComputedCSSColor(node, colors.$success500, colors.$colorBackground),
+          colorDanger: resolveComputedCSSColor(node, colors.$danger500, colors.$colorBackground),
+          colorWarning: resolveComputedCSSColor(node, colors.$warning500, colors.$colorBackground),
           fontWeightNormal: resolveComputedCSSProperty(node, 'font-weight', fontWeights.$normal.toString()),
           fontWeightMedium: resolveComputedCSSProperty(node, 'font-weight', fontWeights.$medium.toString()),
           fontWeightBold: resolveComputedCSSProperty(node, 'font-weight', fontWeights.$bold.toString()),

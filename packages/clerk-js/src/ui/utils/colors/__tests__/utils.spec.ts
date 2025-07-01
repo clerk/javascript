@@ -14,7 +14,7 @@ import {
   generateRelativeColorSyntax,
   getSupportedColorVariant,
   isCSSVariable,
-  resolveComputedColor,
+  resolveComputedCSSColor,
   resolveComputedCSSProperty,
   resolveCSSVariable,
 } from '../utils';
@@ -473,7 +473,7 @@ describe('Color Utils', () => {
     });
   });
 
-  describe('resolveComputedColor', () => {
+  describe('resolveComputedCSSColor', () => {
     const mockElement = {
       appendChild: vi.fn(),
       removeChild: vi.fn(),
@@ -542,7 +542,7 @@ describe('Color Utils', () => {
     });
 
     it('should resolve a basic color to hex format', () => {
-      const result = resolveComputedColor(mockElement, 'red');
+      const result = resolveComputedCSSColor(mockElement, 'red');
 
       expect(mockCreateElement).toHaveBeenCalledWith('div');
       expect(mockCreatedElement.style.setProperty).toHaveBeenCalledWith('color', 'red');
@@ -560,21 +560,21 @@ describe('Color Utils', () => {
         data: [0, 128, 255, 255],
       });
 
-      const result = resolveComputedColor(mockElement, 'var(--primary-color)');
+      const result = resolveComputedCSSColor(mockElement, 'var(--primary-color)');
 
       expect(mockCreatedElement.style.setProperty).toHaveBeenCalledWith('color', 'var(--primary-color)');
       expect(result).toBe('#0080ff');
     });
 
     it('should use custom background color', () => {
-      const result = resolveComputedColor(mockElement, 'blue', 'black');
+      const result = resolveComputedCSSColor(mockElement, 'blue', 'black');
 
       expect(mockCanvasContext.fillRect).toHaveBeenCalledWith(0, 0, 1, 1);
       expect(result).toBe('#ff0000');
     });
 
     it('should default to white background when not specified', () => {
-      const result = resolveComputedColor(mockElement, 'green');
+      const result = resolveComputedCSSColor(mockElement, 'green');
 
       expect(mockCanvasContext.fillRect).toHaveBeenCalledWith(0, 0, 1, 1);
       expect(result).toBe('#ff0000');
@@ -597,7 +597,7 @@ describe('Color Utils', () => {
         getPropertyValue: vi.fn().mockReturnValue('rgb(255, 0, 0)'),
       });
 
-      const result = resolveComputedColor(mockElement, 'red');
+      const result = resolveComputedCSSColor(mockElement, 'red');
 
       expect(result).toBe('rgb(255, 0, 0)');
     });
@@ -607,7 +607,7 @@ describe('Color Utils', () => {
         data: [15, 5, 10, 255], // RGB values that would be single digit in hex
       });
 
-      const result = resolveComputedColor(mockElement, 'red');
+      const result = resolveComputedCSSColor(mockElement, 'red');
 
       // Should pad single digits with 0
       expect(result).toBe('#0f050a');
@@ -621,7 +621,7 @@ describe('Color Utils', () => {
         data: [255, 128, 64, 128], // With alpha
       });
 
-      const result = resolveComputedColor(mockElement, 'rgba(255, 128, 64, 0.5)');
+      const result = resolveComputedCSSColor(mockElement, 'rgba(255, 128, 64, 0.5)');
 
       expect(result).toBe('#ff8040');
     });
@@ -634,13 +634,13 @@ describe('Color Utils', () => {
         data: [120, 60, 180, 255],
       });
 
-      const result = resolveComputedColor(mockElement, 'hsl(270, 50%, 47%)');
+      const result = resolveComputedCSSColor(mockElement, 'hsl(270, 50%, 47%)');
 
       expect(result).toBe('#783cb4');
     });
 
     it('should create canvas with correct dimensions', () => {
-      resolveComputedColor(mockElement, 'red');
+      resolveComputedCSSColor(mockElement, 'red');
 
       const canvasCall = mockCreateElement.mock.calls.find(call => call[0] === 'canvas');
       expect(canvasCall).toBeDefined();
@@ -651,13 +651,13 @@ describe('Color Utils', () => {
     });
 
     it('should call getImageData with correct parameters', () => {
-      resolveComputedColor(mockElement, 'blue');
+      resolveComputedCSSColor(mockElement, 'blue');
 
       expect(mockCanvasContext.getImageData).toHaveBeenCalledWith(0, 0, 1, 1);
     });
 
     it('should properly clean up DOM element', () => {
-      resolveComputedColor(mockElement, 'purple');
+      resolveComputedCSSColor(mockElement, 'purple');
 
       expect(mockElement.appendChild).toHaveBeenCalledWith(mockCreatedElement);
       expect(mockElement.removeChild).toHaveBeenCalledWith(mockCreatedElement);
@@ -667,7 +667,7 @@ describe('Color Utils', () => {
     it('should set color style on temporary element', () => {
       const testColor = 'var(--test-color)';
 
-      resolveComputedColor(mockElement, testColor);
+      resolveComputedCSSColor(mockElement, testColor);
 
       expect(mockCreateElement).toHaveBeenCalledWith('div');
       expect(mockCreatedElement.style.setProperty).toHaveBeenCalledWith('color', testColor);
