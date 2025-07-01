@@ -29,18 +29,15 @@ type RevokeMachineTokenParams = WithMachineTokenSecret<{
 }>;
 
 export class MachineTokensApi extends AbstractAPI {
-  /**
-   * Attaches the machine token secret as an Authorization header if present.
-   */
-  #withMachineTokenSecretHeader<T extends WithMachineTokenSecret<unknown>>(
+  #withMachineTokenSecretHeader(
     options: ClerkBackendApiRequestOptions,
-    params: T,
+    machineTokenSecret?: string | null,
   ): ClerkBackendApiRequestOptions {
-    if (params.machineTokenSecret) {
+    if (machineTokenSecret) {
       return {
         ...options,
         headerParams: {
-          Authorization: `Bearer ${params.machineTokenSecret}`,
+          Authorization: `Bearer ${machineTokenSecret}`,
         },
       };
     }
@@ -48,20 +45,21 @@ export class MachineTokensApi extends AbstractAPI {
   }
 
   async create(params: CreateMachineTokenParams) {
+    const { machineTokenSecret, ...bodyParams } = params;
     return this.request<MachineToken>(
       this.#withMachineTokenSecretHeader(
         {
           method: 'POST',
           path: basePath,
-          bodyParams: params,
+          bodyParams,
         },
-        params,
+        machineTokenSecret,
       ),
     );
   }
 
   async update(params: UpdateMachineTokenParams) {
-    const { m2mTokenId, ...bodyParams } = params;
+    const { m2mTokenId, machineTokenSecret, ...bodyParams } = params;
     this.requireId(m2mTokenId);
     return this.request<MachineToken>(
       this.#withMachineTokenSecretHeader(
@@ -70,13 +68,13 @@ export class MachineTokensApi extends AbstractAPI {
           path: joinPaths(basePath, m2mTokenId),
           bodyParams,
         },
-        params,
+        machineTokenSecret,
       ),
     );
   }
 
   async revoke(params: RevokeMachineTokenParams) {
-    const { m2mTokenId, ...bodyParams } = params;
+    const { m2mTokenId, machineTokenSecret, ...bodyParams } = params;
     this.requireId(m2mTokenId);
     return this.request<MachineToken>(
       this.#withMachineTokenSecretHeader(
@@ -85,7 +83,7 @@ export class MachineTokensApi extends AbstractAPI {
           path: joinPaths(basePath, m2mTokenId, 'revoke'),
           bodyParams,
         },
-        params,
+        machineTokenSecret,
       ),
     );
   }
