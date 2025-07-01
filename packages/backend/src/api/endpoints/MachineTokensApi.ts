@@ -32,6 +32,8 @@ type VerifyMachineTokenParams = WithMachineSecret<{
   secret: string;
 }>;
 
+type MachineTokenWithoutSecret = Omit<MachineToken, 'secret'>;
+
 export class MachineTokensApi extends AbstractAPI {
   /**
    * Overrides the instance secret with the machine secret.
@@ -68,7 +70,7 @@ export class MachineTokensApi extends AbstractAPI {
   async update(params: UpdateMachineTokenParams) {
     const { m2mTokenId, machineSecret, ...bodyParams } = params;
     this.requireId(m2mTokenId);
-    return this.request<MachineToken>(
+    return this.request<MachineTokenWithoutSecret>(
       this.#withMachineSecretHeader(
         {
           method: 'PATCH',
@@ -83,7 +85,7 @@ export class MachineTokensApi extends AbstractAPI {
   async revoke(params: RevokeMachineTokenParams) {
     const { m2mTokenId, machineSecret, ...bodyParams } = params;
     this.requireId(m2mTokenId);
-    return this.request<MachineToken>(
+    return this.request<MachineTokenWithoutSecret>(
       this.#withMachineSecretHeader(
         {
           method: 'POST',
@@ -97,7 +99,7 @@ export class MachineTokensApi extends AbstractAPI {
 
   async verifySecret(params: VerifyMachineTokenParams) {
     const { secret, machineSecret } = params;
-    return this.request<MachineToken>(
+    return this.request<MachineTokenWithoutSecret>(
       this.#withMachineSecretHeader(
         {
           method: 'POST',

@@ -701,6 +701,7 @@ export interface SamlAccountConnectionJSON extends ClerkResourceJSON {
 export interface MachineTokenJSON extends ClerkResourceJSON {
   object: typeof ObjectType.MachineToken;
   name: string;
+  secret: string;
   subject: string;
   scopes: string[];
   claims: Record<string, any> | null;

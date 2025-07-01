@@ -4,6 +4,7 @@ export class MachineToken {
   constructor(
     readonly id: string,
     readonly name: string,
+    readonly secret: string,
     readonly subject: string,
     readonly scopes: string[],
     readonly claims: Record<string, any> | null,
@@ -17,10 +18,11 @@ export class MachineToken {
     readonly updatedAt: number,
   ) {}
 
-  static fromJSON(data: MachineTokenJSON) {
+  static fromJSON(data: MachineTokenJSON): MachineToken {
     return new MachineToken(
       data.id,
       data.name,
+      data.secret,
       data.subject,
       data.scopes,
       data.claims,
