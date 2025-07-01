@@ -412,6 +412,27 @@ ${tabs}
        * Hide "Extends" and "Extended by" sections
        */
       hierarchy: () => '',
+      /**
+       * @param {import('typedoc').DeclarationReflection} model
+       * @param {{ headingLevel: number }} options
+       */
+      accessor: (model, options) => {
+        // const defaultOutput = superPartials.accessor(model, options);
+
+        const name = model.name;
+
+        const type = model.getSignature?.type?.toString();
+
+        const comment = model.getSignature?.comment?.summary.reduce((acc, curr) => acc + curr.text, '');
+
+        console.log({
+          name,
+          type,
+          comment,
+        });
+
+        return '| ' + '`' + name + '`' + ' | <code>' + type + '</code> | ' + comment + ' |';
+      },
     };
   }
 }
