@@ -9,7 +9,7 @@ import { Menu } from '../icons';
 import { useRouter } from '../router';
 import type { PropsOfComponent } from '../styledSystem';
 import { animations, common, mqu } from '../styledSystem';
-import { colors } from '../utils';
+import { colors } from '../utils/colors';
 import { Card } from './Card';
 import { withFloatingTree } from './contexts';
 import { DevModeOverlay } from './DevModeNotice';

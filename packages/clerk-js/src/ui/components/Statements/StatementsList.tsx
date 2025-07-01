@@ -13,14 +13,14 @@ import { truncateWithEndVisible } from '../../utils/truncateTextWithEndVisible';
  * -----------------------------------------------------------------------------------------------*/
 
 export const StatementsList = () => {
-  const { data: statements, isLoading } = useStatements();
+  const { data: statements, isLoading, count } = useStatements();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
 
   return (
     <DataTable
       page={1}
       onPageChange={_ => {}}
-      itemCount={statements?.total_count || 0}
+      itemCount={count}
       pageCount={1}
       itemsPerPage={10}
       isLoading={isLoading}
@@ -29,7 +29,7 @@ export const StatementsList = () => {
         localizationKeys(`${localizationRoot}.billingPage.statementsSection.tableHeader__date`),
         localizationKeys(`${localizationRoot}.billingPage.statementsSection.tableHeader__amount`),
       ]}
-      rows={(statements?.data || []).map(i => (
+      rows={statements.map(i => (
         <StatementsListRow
           key={i.id}
           statement={i}

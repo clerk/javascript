@@ -1,5 +1,7 @@
 import { Header } from '@/ui/elements/Header';
 import { LineItems } from '@/ui/elements/LineItems';
+import { formatDate } from '@/ui/utils/formatDate';
+import { truncateWithEndVisible } from '@/ui/utils/truncateTextWithEndVisible';
 
 import { usePaymentAttemptsContext, useStatements } from '../../contexts';
 import { useSubscriberTypeLocalizationRoot } from '../../contexts/components';
@@ -18,7 +20,6 @@ import {
 import { useClipboard } from '../../hooks';
 import { Check, Copy } from '../../icons';
 import { useRouter } from '../../router';
-import { formatDate, truncateWithEndVisible } from '../../utils';
 
 export const PaymentAttemptPage = () => {
   const { params, navigate } = useRouter();

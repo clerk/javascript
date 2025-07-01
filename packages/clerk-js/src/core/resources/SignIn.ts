@@ -231,25 +231,27 @@ export class SignIn extends BaseResource implements SignInResource {
     params: AuthenticateWithRedirectParams,
     navigateCallback: (url: URL | string) => void,
   ): Promise<void> => {
-    const { strategy, redirectUrl, redirectUrlComplete, identifier, oidcPrompt } = params || {};
+    const { strategy, redirectUrl, redirectUrlComplete, identifier, oidcPrompt, continueSignIn } = params || {};
 
-    const { firstFactorVerification } =
-      (strategy === 'saml' || strategy === 'enterprise_sso') && this.id
-        ? await this.prepareFirstFactor({
-            strategy,
-            redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectUrl),
-            actionCompleteRedirectUrl: redirectUrlComplete,
-            oidcPrompt,
-          })
-        : await this.create({
-            strategy,
-            identifier,
-            redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectUrl),
-            actionCompleteRedirectUrl: redirectUrlComplete,
-            oidcPrompt,
-          });
+    if (!this.id || !continueSignIn) {
+      await this.create({
+        strategy,
+        identifier,
+        redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectUrl),
+        actionCompleteRedirectUrl: redirectUrlComplete,
+      });
+    }
 
-    const { status, externalVerificationRedirectURL } = firstFactorVerification;
+    if (strategy === 'saml' || strategy === 'enterprise_sso') {
+      await this.prepareFirstFactor({
+        strategy,
+        redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectUrl),
+        actionCompleteRedirectUrl: redirectUrlComplete,
+        oidcPrompt,
+      });
+    }
+
+    const { status, externalVerificationRedirectURL } = this.firstFactorVerification;
 
     if (status === 'unverified' && externalVerificationRedirectURL) {
       navigateCallback(externalVerificationRedirectURL);

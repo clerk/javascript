@@ -1,5 +1,25 @@
 # Change Log
 
+## 2.5.2
+
+### Patch Changes
+
+- Refactor re-exports from `@clerk/clerk-react`. ([#6205](https://github.com/clerk/javascript/pull/6205)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`02a1f42`](https://github.com/clerk/javascript/commit/02a1f42dfdb28ea956d6cbd3fbabe10093d2fad8), [`edc0bfd`](https://github.com/clerk/javascript/commit/edc0bfdae929dad78a99dfd6275aad947d9ddd73), [`1e737c7`](https://github.com/clerk/javascript/commit/1e737c7c0480eb48a1f515507ad4d6bc246817cc)]:
+  - @clerk/shared@3.10.1
+  - @clerk/clerk-react@5.32.3
+  - @clerk/clerk-js@5.69.3
+
+## 2.5.1
+
+### Patch Changes
+
+- Updated dependencies [[`f1be1fe`](https://github.com/clerk/javascript/commit/f1be1fe3d575c11acd04fc7aadcdec8f89829894), [`58e9a2f`](https://github.com/clerk/javascript/commit/58e9a2f2962330d52682edf096dcba77fc082b9e), [`bffb42a`](https://github.com/clerk/javascript/commit/bffb42aaf266a188b9ae7d16ace3024d468a3bd4), [`bffb42a`](https://github.com/clerk/javascript/commit/bffb42aaf266a188b9ae7d16ace3024d468a3bd4), [`036a853`](https://github.com/clerk/javascript/commit/036a8533d020b465b40e51e10ba24345edd36102)]:
+  - @clerk/clerk-js@5.69.2
+  - @clerk/shared@3.10.0
+  - @clerk/clerk-react@5.32.2
+
 ## 2.5.0
 
 ### Minor Changes

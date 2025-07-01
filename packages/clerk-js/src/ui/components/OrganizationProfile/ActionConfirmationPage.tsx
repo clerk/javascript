@@ -6,12 +6,13 @@ import { FormButtonContainer } from '@/ui/elements/FormButtons';
 import type { FormProps } from '@/ui/elements/FormContainer';
 import { FormContainer } from '@/ui/elements/FormContainer';
 import { SuccessPage } from '@/ui/elements/SuccessPage';
+import { handleError } from '@/ui/utils/errorHandler';
+import { useFormControl } from '@/ui/utils/useFormControl';
 
 import { useWizard, Wizard } from '../../common';
 import { useOrganizationProfileContext } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { Col, localizationKeys, Text } from '../../customizables';
-import { handleError, useFormControl } from '../../utils';
 import { organizationListParams } from '../OrganizationSwitcher/utils';
 
 type LeaveOrganizationFormProps = FormProps;

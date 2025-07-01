@@ -12,7 +12,7 @@ import type {
 } from '@clerk/types';
 
 import { useEnvironment } from '../contexts/EnvironmentContext';
-import { fromEntries } from '../utils';
+import { fromEntries } from '../utils/fromEntries';
 
 type ThirdPartyStrategyToDataMap = {
   [k in Web3Strategy | OAuthStrategy | PhoneCodeChannel]: {

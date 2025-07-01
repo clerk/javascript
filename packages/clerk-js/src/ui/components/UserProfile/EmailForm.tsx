@@ -7,12 +7,13 @@ import { Form } from '@/ui/elements/Form';
 import { FormButtons } from '@/ui/elements/FormButtons';
 import type { FormProps } from '@/ui/elements/FormContainer';
 import { FormContainer } from '@/ui/elements/FormContainer';
+import { handleError } from '@/ui/utils/errorHandler';
+import { useFormControl } from '@/ui/utils/useFormControl';
 
 import { useWizard, Wizard } from '../../common';
 import { useEnvironment } from '../../contexts';
 import type { LocalizationKey } from '../../localization';
 import { localizationKeys } from '../../localization';
-import { handleError, useFormControl } from '../../utils';
 import { VerifyWithCode } from './VerifyWithCode';
 import { VerifyWithEnterpriseConnection } from './VerifyWithEnterpriseConnection';
 import { VerifyWithLink } from './VerifyWithLink';

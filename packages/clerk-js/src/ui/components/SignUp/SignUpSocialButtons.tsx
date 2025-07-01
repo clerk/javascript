@@ -3,12 +3,14 @@ import type { OAuthStrategy, PhoneCodeChannel } from '@clerk/types';
 import React from 'react';
 
 import { useCardState } from '@/ui/elements/contexts';
+import { handleError } from '@/ui/utils/errorHandler';
+import { originPrefersPopup } from '@/ui/utils/originPrefersPopup';
+import { web3CallbackErrorHandler } from '@/ui/utils/web3CallbackErrorHandler';
 
 import { useCoreSignUp, useSignUpContext } from '../../contexts';
 import type { SocialButtonsProps } from '../../elements/SocialButtons';
 import { SocialButtons } from '../../elements/SocialButtons';
 import { useRouter } from '../../router';
-import { handleError, originPrefersPopup, web3CallbackErrorHandler } from '../../utils';
 
 export type SignUpSocialButtonsProps = SocialButtonsProps & {
   continueSignUp?: boolean;

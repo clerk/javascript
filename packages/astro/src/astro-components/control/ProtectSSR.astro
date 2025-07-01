@@ -6,10 +6,9 @@ type Props = ProtectProps;
 const { has, userId } = Astro.locals.auth();
 const isUnauthorized =
   !userId ||
-  (typeof Astro.props.condition === "function" &&
-    !Astro.props.condition(has)) ||
-  ((Astro.props.role || Astro.props.permission) && !has(Astro.props));
-  
+  (typeof Astro.props.condition === 'function' && !Astro.props.condition(has)) ||
+  ((Astro.props.role || Astro.props.permission || Astro.props.feature || Astro.props.plan) && !has(Astro.props));
+
 const hasProtectFallback = Astro.slots.has('protect-fallback');
 ---
 

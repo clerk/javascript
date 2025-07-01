@@ -1,36 +1,21 @@
 import { clerk } from '@clerk/testing/playwright';
-import type { Page } from '@playwright/test';
+import { type Page } from '@playwright/test';
 
-export async function disableColorMix(page: Page) {
-  await page.addInitScript(() => {
-    window.ClerkCSSSupport = {
-      ...window.ClerkCSSSupport,
-      colorMix: false,
-    };
-  });
-}
-
-export async function waitForClerkLoaded(page: Page, selector: string) {
+/**
+ * Signs in a user using email code strategy for integration tests.
+ * Navigates to sign-in page, waits for Clerk to load, then performs authentication.
+ * @param page - The Playwright page instance
+ * @example
+ * ```ts
+ * await signInWithEmailCode(page);
+ * await page.goto('/protected-page');
+ * ```
+ */
+export async function signInWithEmailCode(page: Page): Promise<void> {
+  await page.goto('/sign-in');
   await clerk.loaded({ page });
-  await page.waitForSelector(selector, { state: 'attached' });
-}
-
-type ColorMixRunnerOptions = {
-  path: string;
-  waitForClerkElement: string;
-  fn: (page: Page) => Promise<void>;
-};
-
-export function createColorMixRunner({ path, waitForClerkElement, fn }: ColorMixRunnerOptions) {
-  return async (page: Page) => {
-    await page.goto(path);
-    await waitForClerkLoaded(page, waitForClerkElement);
-    await fn(page);
-
-    await disableColorMix(page);
-
-    await page.reload();
-    await waitForClerkLoaded(page, waitForClerkElement);
-    await fn(page);
-  };
+  await clerk.signIn({
+    page,
+    signInParams: { strategy: 'email_code', identifier: 'sandbox+clerk_test@clerk.dev' },
+  });
 }

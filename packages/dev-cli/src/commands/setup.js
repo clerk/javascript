@@ -1,15 +1,16 @@
 import { spawn } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import path, { join } from 'node:path';
 
 import { parse } from 'dotenv';
 
 import { applyCodemod } from '../codemods/index.js';
-import { INVALID_INSTANCE_KEYS_ERROR } from '../utils/errors.js';
+import { INVALID_INSTANCE_KEYS_ERROR, NULL_ROOT_ERROR } from '../utils/errors.js';
 import { getClerkPackages } from '../utils/getClerkPackages.js';
 import { getConfiguration } from '../utils/getConfiguration.js';
-import { getDependencies } from '../utils/getDependencies.js';
+import { getMonorepoRoot } from '../utils/getMonorepoRoot.js';
+import { getPackageJSON } from '../utils/getPackageJSON.js';
 
 /**
  * Returns `true` if the cwd contains a file named `filename`, otherwise returns `false`.
@@ -35,11 +36,11 @@ function hasPackage(packages, dependency) {
 
 /**
  * Returns a string corresponding to the framework detected in the cwd.
- * @returns {Promise<string>}
+ * @param {{ dependencies?: Record<string, string>, devDependencies?: Record<string, string>}} pkgJSON
+ * @returns {string}
  */
-async function detectFramework() {
-  const { dependencies, devDependencies } = await getDependencies(join(process.cwd(), 'package.json'));
-
+function detectFramework(pkgJSON) {
+  const { dependencies, devDependencies } = pkgJSON;
   const IS_NEXT = hasPackage(dependencies, 'next');
   if (IS_NEXT) {
     return 'nextjs';
@@ -56,6 +57,36 @@ async function detectFramework() {
   }
 
   throw new Error('unable to determine framework');
+}
+
+/**
+ * Returns the output file tracing root for the current working directory.
+ * @returns {Promise<string | null>}
+ */
+async function getOutputFileTracingRoot() {
+  const monorepoRoot = await getMonorepoRoot();
+  if (!monorepoRoot) {
+    throw new Error(NULL_ROOT_ERROR);
+  }
+  const p1 = path.resolve(monorepoRoot);
+  const p2 = path.resolve(process.cwd());
+
+  const root1 = path.parse(p1).root;
+  const root2 = path.parse(p2).root;
+
+  if (root1 !== root2) return null;
+
+  const parts1 = p1.slice(root1.length).split(path.sep);
+  const parts2 = p2.slice(root2.length).split(path.sep);
+
+  const len = Math.min(parts1.length, parts2.length);
+  const common = [];
+  for (let i = 0; i < len; i++) {
+    if (parts1[i] === parts2[i]) common.push(parts1[i]);
+    else break;
+  }
+
+  return common.length ? path.join(root1, ...common) : root1;
 }
 
 /**
@@ -161,7 +192,7 @@ async function importPackageLock() {
  * @returns {Promise<void>}
  */
 async function linkDependencies() {
-  const { dependencies } = await getDependencies(join(process.cwd(), 'package.json'));
+  const { dependencies } = await getPackageJSON(join(process.cwd(), 'package.json'));
   if (!dependencies) {
     throw new Error('you have no dependencies');
   }
@@ -208,7 +239,9 @@ export async function setup({ js = true, skipInstall = false }) {
   const config = await getConfiguration();
   const instance = await getInstanceConfiguration(config);
 
-  const framework = await detectFramework();
+  const pkgJSON = await getPackageJSON(join(process.cwd(), 'package.json'));
+
+  const framework = detectFramework(pkgJSON);
   switch (framework) {
     case 'nextjs': {
       console.log('Next.js detected, writing environment variables to .env.local...');
@@ -217,6 +250,13 @@ export async function setup({ js = true, skipInstall = false }) {
         CLERK_SECRET_KEY: instance.secretKey,
         ...(js ? { NEXT_PUBLIC_CLERK_JS_URL: 'http://localhost:4000/npm/clerk.browser.js' } : {}),
       });
+
+      if (pkgJSON.scripts?.dev && pkgJSON.scripts.dev.includes('--turbo')) {
+        const outputFileTracingRoot = await getOutputFileTracingRoot();
+        console.warn(
+          `\n\x1b[43m\x1b[30m Heads up! \x1b[0m Your \`dev\` script is using Turbopack. You will need to set the \`outputFileTracingRoot\` in your \`next.config.mjs\` file to "${outputFileTracingRoot}".\n`,
+        );
+      }
       break;
     }
     case 'remix': {

@@ -19,7 +19,7 @@ export function validateHeaders<
         {
           error: 'Unauthorized',
           message: 'Missing Authorization header',
-        },
+        } as unknown as ResponseBodyType,
         { status: 401 },
       ) as ReturnType<HttpResponseResolver<Params, RequestBodyType, ResponseBodyType>>;
     }
@@ -28,7 +28,7 @@ export function validateHeaders<
         {
           error: 'Bad request',
           message: 'Missing Clerk-API-Version header',
-        },
+        } as unknown as ResponseBodyType,
         { status: 400 },
       ) as ReturnType<HttpResponseResolver<Params, RequestBodyType, ResponseBodyType>>;
     }
@@ -37,7 +37,7 @@ export function validateHeaders<
         {
           error: 'Bad request',
           message: 'Missing or invalid User-Agent header',
-        },
+        } as unknown as ResponseBodyType,
         { status: 400 },
       ) as ReturnType<HttpResponseResolver<Params, RequestBodyType, ResponseBodyType>>;
     }

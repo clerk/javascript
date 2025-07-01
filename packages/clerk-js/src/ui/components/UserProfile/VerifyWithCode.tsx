@@ -5,9 +5,9 @@ import { useFieldOTP } from '@/ui/elements/CodeControl';
 import { useCardState } from '@/ui/elements/contexts';
 import { Form } from '@/ui/elements/Form';
 import { FormButtonContainer } from '@/ui/elements/FormButtons';
+import { handleError } from '@/ui/utils/errorHandler';
 
 import { Button, descriptors, localizationKeys } from '../../customizables';
-import { handleError } from '../../utils';
 
 type VerifyWithCodeProps = {
   nextStep: () => void;
