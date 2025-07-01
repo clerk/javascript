@@ -11,12 +11,9 @@ import useSWR from 'swr';
 import { Avatar } from '@/ui/elements/Avatar';
 import { Drawer } from '@/ui/elements/Drawer';
 import { Switch } from '@/ui/elements/Switch';
-import { handleError } from '@/ui/utils/errorHandler';
 
-import { useProtect } from '../../common';
-import { SubscriberTypeContext, usePlansContext, useSubscriberTypeContext, useSubscriptions } from '../../contexts';
-import { Badge, Box, Button, Col, descriptors, Flex, Heading, localizationKeys, Span, Text } from '../../customizables';
-import { handleError } from '../../utils';
+import { SubscriberTypeContext } from '../../contexts';
+import { Box, Col, descriptors, Flex, Heading, localizationKeys, Span, Spinner, Text } from '../../customizables';
 
 export const PlanDetails = (props: __experimental_PlanDetailsProps) => {
   return (

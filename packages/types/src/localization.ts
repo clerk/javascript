@@ -175,6 +175,8 @@ export type __internal_LocalizationResource = {
     switchPlan: LocalizationValue;
     switchToMonthly: LocalizationValue;
     switchToAnnual: LocalizationValue;
+    switchToMonthlyWithPrice: LocalizationValue<'price' | 'currency'>;
+    switchToAnnualWithAnnualPrice: LocalizationValue<'price' | 'currency'>;
     billedAnnually: LocalizationValue;
     billedMonthlyOnly: LocalizationValue;
     alwaysFree: LocalizationValue;

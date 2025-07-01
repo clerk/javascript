@@ -1,4 +1,5 @@
 import type {
+  __experimental_SubscriptionDetailsProps,
   __internal_CheckoutProps,
   __internal_OAuthConsentProps,
   __internal_PlanDetailsProps,
@@ -136,6 +137,10 @@ export type SessionTasksCtx = {
 
 export type OAuthConsentCtx = __internal_OAuthConsentProps & {
   componentName: 'OAuthConsent';
+};
+
+export type SubscriptionDetailsCtx = __experimental_SubscriptionDetailsProps & {
+  componentName: 'SubscriptionDetails';
 };
 
 export type AvailableComponentCtx =
