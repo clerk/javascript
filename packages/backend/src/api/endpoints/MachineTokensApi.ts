@@ -5,9 +5,9 @@ import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/m2m_tokens';
 
-type WithMachineTokenSecret<T> = T & { machineTokenSecret?: string | null };
+type WithMachineSecret<T> = T & { machineSecret?: string | null };
 
-type CreateMachineTokenParams = WithMachineTokenSecret<{
+type CreateMachineTokenParams = WithMachineSecret<{
   name: string;
   subject: string;
   claims?: Record<string, any> | null;
@@ -16,28 +16,32 @@ type CreateMachineTokenParams = WithMachineTokenSecret<{
   secondsUntilExpiration?: number | null;
 }>;
 
-type UpdateMachineTokenParams = WithMachineTokenSecret<
+type UpdateMachineTokenParams = WithMachineSecret<
   {
     m2mTokenId: string;
     revoked?: boolean;
   } & Pick<CreateMachineTokenParams, 'secondsUntilExpiration' | 'claims' | 'scopes'>
 >;
 
-type RevokeMachineTokenParams = WithMachineTokenSecret<{
+type RevokeMachineTokenParams = WithMachineSecret<{
   m2mTokenId: string;
   revocationReason?: string | null;
+}>;
+
+type VerifyMachineTokenParams = WithMachineSecret<{
+  secret: string;
 }>;
 
 export class MachineTokensApi extends AbstractAPI {
   #withMachineTokenSecretHeader(
     options: ClerkBackendApiRequestOptions,
-    machineTokenSecret?: string | null,
+    machineSecret?: string | null,
   ): ClerkBackendApiRequestOptions {
-    if (machineTokenSecret) {
+    if (machineSecret) {
       return {
         ...options,
         headerParams: {
-          Authorization: `Bearer ${machineTokenSecret}`,
+          Authorization: `Bearer ${machineSecret}`,
         },
       };
     }
@@ -45,7 +49,7 @@ export class MachineTokensApi extends AbstractAPI {
   }
 
   async create(params: CreateMachineTokenParams) {
-    const { machineTokenSecret, ...bodyParams } = params;
+    const { machineSecret, ...bodyParams } = params;
     return this.request<MachineToken>(
       this.#withMachineTokenSecretHeader(
         {
@@ -53,13 +57,13 @@ export class MachineTokensApi extends AbstractAPI {
           path: basePath,
           bodyParams,
         },
-        machineTokenSecret,
+        machineSecret,
       ),
     );
   }
 
   async update(params: UpdateMachineTokenParams) {
-    const { m2mTokenId, machineTokenSecret, ...bodyParams } = params;
+    const { m2mTokenId, machineSecret, ...bodyParams } = params;
     this.requireId(m2mTokenId);
     return this.request<MachineToken>(
       this.#withMachineTokenSecretHeader(
@@ -68,13 +72,13 @@ export class MachineTokensApi extends AbstractAPI {
           path: joinPaths(basePath, m2mTokenId),
           bodyParams,
         },
-        machineTokenSecret,
+        machineSecret,
       ),
     );
   }
 
   async revoke(params: RevokeMachineTokenParams) {
-    const { m2mTokenId, machineTokenSecret, ...bodyParams } = params;
+    const { m2mTokenId, machineSecret, ...bodyParams } = params;
     this.requireId(m2mTokenId);
     return this.request<MachineToken>(
       this.#withMachineTokenSecretHeader(
@@ -83,16 +87,22 @@ export class MachineTokensApi extends AbstractAPI {
           path: joinPaths(basePath, m2mTokenId, 'revoke'),
           bodyParams,
         },
-        machineTokenSecret,
+        machineSecret,
       ),
     );
   }
 
-  async verifySecret(secret: string) {
-    return this.request<MachineToken>({
-      method: 'POST',
-      path: joinPaths(basePath, 'verify'),
-      bodyParams: { secret },
-    });
+  async verifySecret(params: VerifyMachineTokenParams) {
+    const { secret, machineSecret } = params;
+    return this.request<MachineToken>(
+      this.#withMachineTokenSecretHeader(
+        {
+          method: 'POST',
+          path: joinPaths(basePath, 'verify'),
+          bodyParams: { secret },
+        },
+        machineSecret,
+      ),
+    );
   }
 }
