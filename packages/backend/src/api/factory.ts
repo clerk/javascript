@@ -43,36 +43,34 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
     ),
     actorTokens: new ActorTokenAPI(request),
     allowlistIdentifiers: new AllowlistIdentifierAPI(request),
+    apiKeys: new APIKeysAPI(
+      buildRequest({
+        ...options,
+        skipApiVersionInUrl: true,
+      }),
+    ),
     betaFeatures: new BetaFeaturesAPI(request),
     blocklistIdentifiers: new BlocklistIdentifierAPI(request),
     clients: new ClientAPI(request),
     domains: new DomainAPI(request),
     emailAddresses: new EmailAddressAPI(request),
-    instance: new InstanceAPI(request),
-    invitations: new InvitationAPI(request),
-    // Using "/" instead of an actual version since they're bapi-proxy endpoints.
-    // bapi-proxy connects directly to C1 without URL versioning,
-    // while API versioning is handled through the Clerk-API-Version header.
-    machineTokens: new MachineTokensApi(
-      buildRequest({
-        ...options,
-        apiVersion: '/',
-      }),
-    ),
     idPOAuthAccessToken: new IdPOAuthAccessTokenApi(
       buildRequest({
         ...options,
-        apiVersion: '/',
+        skipApiVersionInUrl: true,
       }),
     ),
-    apiKeys: new APIKeysAPI(
-      buildRequest({
-        ...options,
-        apiVersion: '/',
-      }),
-    ),
+    instance: new InstanceAPI(request),
+    invitations: new InvitationAPI(request),
     jwks: new JwksAPI(request),
     jwtTemplates: new JwtTemplatesApi(request),
+    machineTokens: new MachineTokensApi(
+      buildRequest({
+        ...options,
+        skipApiVersionInUrl: true,
+        requireSecretKey: false,
+      }),
+    ),
     oauthApplications: new OAuthApplicationsApi(request),
     organizations: new OrganizationAPI(request),
     phoneNumbers: new PhoneNumberAPI(request),
