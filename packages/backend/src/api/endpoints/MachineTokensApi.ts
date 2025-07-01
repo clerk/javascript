@@ -33,7 +33,10 @@ type VerifyMachineTokenParams = WithMachineSecret<{
 }>;
 
 export class MachineTokensApi extends AbstractAPI {
-  #withMachineTokenSecretHeader(
+  /**
+   * Overrides the instance secret with the machine secret.
+   */
+  #withMachineSecretHeader(
     options: ClerkBackendApiRequestOptions,
     machineSecret?: string | null,
   ): ClerkBackendApiRequestOptions {
@@ -51,7 +54,7 @@ export class MachineTokensApi extends AbstractAPI {
   async create(params: CreateMachineTokenParams) {
     const { machineSecret, ...bodyParams } = params;
     return this.request<MachineToken>(
-      this.#withMachineTokenSecretHeader(
+      this.#withMachineSecretHeader(
         {
           method: 'POST',
           path: basePath,
@@ -66,7 +69,7 @@ export class MachineTokensApi extends AbstractAPI {
     const { m2mTokenId, machineSecret, ...bodyParams } = params;
     this.requireId(m2mTokenId);
     return this.request<MachineToken>(
-      this.#withMachineTokenSecretHeader(
+      this.#withMachineSecretHeader(
         {
           method: 'PATCH',
           path: joinPaths(basePath, m2mTokenId),
@@ -81,7 +84,7 @@ export class MachineTokensApi extends AbstractAPI {
     const { m2mTokenId, machineSecret, ...bodyParams } = params;
     this.requireId(m2mTokenId);
     return this.request<MachineToken>(
-      this.#withMachineTokenSecretHeader(
+      this.#withMachineSecretHeader(
         {
           method: 'POST',
           path: joinPaths(basePath, m2mTokenId, 'revoke'),
@@ -95,7 +98,7 @@ export class MachineTokensApi extends AbstractAPI {
   async verifySecret(params: VerifyMachineTokenParams) {
     const { secret, machineSecret } = params;
     return this.request<MachineToken>(
-      this.#withMachineTokenSecretHeader(
+      this.#withMachineSecretHeader(
         {
           method: 'POST',
           path: joinPaths(basePath, 'verify'),
