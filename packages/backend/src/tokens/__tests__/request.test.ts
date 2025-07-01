@@ -194,7 +194,7 @@ expect.extend({
     } else {
       return {
         message: () =>
-          `expected to be signed in, but got ${received.status} (${JSON.stringify(received)}, ${JSON.stringify(expected)})`,
+          `expected to be signed in, but got ${received.status}`,
         pass: false,
       };
     }
