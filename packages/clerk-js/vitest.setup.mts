@@ -84,6 +84,16 @@ if (typeof window !== 'undefined') {
   };
 }
 
+// Mock browser-tabs-lock to prevent window access errors in tests
+vi.mock('browser-tabs-lock', () => {
+  return {
+    default: vi.fn().mockImplementation(() => ({
+      acquireLock: vi.fn().mockResolvedValue(true),
+      releaseLock: vi.fn().mockResolvedValue(true),
+    })),
+  };
+});
+
 // Mock jest-chrome if its functionality is needed
 // Example: Mocking chrome.runtime.sendMessage
 // global.chrome = {
