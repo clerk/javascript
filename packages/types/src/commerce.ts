@@ -155,8 +155,21 @@ export interface CommerceSubscriptionResource extends ClerkResource {
   plan: CommercePlanResource;
   planPeriod: CommerceSubscriptionPlanPeriod;
   status: CommerceSubscriptionStatus;
+  createdAt: Date;
+  periodStartDate: Date;
+  periodEndDate: Date | null;
+  canceledAtDate: Date | null;
+  /**
+   * @deprecated Use `periodStartDate` instead
+   */
   periodStart: number;
+  /**
+   * @deprecated Use `periodEndDate` instead
+   */
   periodEnd: number;
+  /**
+   * @deprecated Use `canceledAtDate` instead
+   */
   canceledAt: number | null;
   amount?: CommerceMoney;
   credit?: {
