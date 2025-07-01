@@ -102,14 +102,14 @@ export function buildRequest(options: BuildRequestOptions) {
     }
 
     // Build headers
-    const headers: Record<string, any> = {
+    const headers = new Headers({
       'Clerk-API-Version': SUPPORTED_BAPI_VERSION,
       'User-Agent': userAgent,
       ...headerParams,
-    };
+    });
 
-    if (secretKey && !headers.Authorization) {
-      headers.Authorization = `Bearer ${secretKey}`;
+    if (secretKey && !headers.has('Authorization')) {
+      headers.set('Authorization', `Bearer ${secretKey}`);
     }
 
     let res: Response | undefined;
@@ -122,7 +122,7 @@ export function buildRequest(options: BuildRequestOptions) {
         });
       } else {
         // Enforce application/json for all non form-data requests
-        headers['Content-Type'] = 'application/json';
+        headers.set('Content-Type', 'application/json');
 
         const buildBody = () => {
           const hasBody = method !== 'GET' && bodyParams && Object.keys(bodyParams).length > 0;
