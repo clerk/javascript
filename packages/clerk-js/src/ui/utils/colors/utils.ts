@@ -356,7 +356,8 @@ export function resolveComputedCSSProperty(
  * @returns The resolved color as a hex string
  */
 export function resolveComputedCSSColor(parentElement: HTMLElement, color: string, backgroundColor: string = 'white') {
-  const computedColor = resolveComputedCSSProperty(parentElement, 'color', color);
+  const computedForegroundColor = resolveComputedCSSProperty(parentElement, 'color', color);
+  const computedBackgroundColor = resolveComputedCSSProperty(parentElement, 'color', backgroundColor);
 
   const canvas = document.createElement('canvas');
   canvas.width = 1;
@@ -364,12 +365,12 @@ export function resolveComputedCSSColor(parentElement: HTMLElement, color: strin
   const ctx = canvas.getContext('2d');
 
   if (!ctx) {
-    return computedColor;
+    return computedForegroundColor;
   }
 
-  ctx.fillStyle = backgroundColor;
+  ctx.fillStyle = computedBackgroundColor;
   ctx.fillRect(0, 0, 1, 1);
-  ctx.fillStyle = computedColor;
+  ctx.fillStyle = computedForegroundColor;
   ctx.fillRect(0, 0, 1, 1);
   const { data } = ctx.getImageData(0, 0, 1, 1);
   return `#${data[0].toString(16).padStart(2, '0')}${data[1].toString(16).padStart(2, '0')}${data[2].toString(16).padStart(2, '0')}`;
