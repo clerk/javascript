@@ -41,10 +41,15 @@ import {
   useLocalizations,
 } from '../../customizables';
 
+// We cannot derive the state of confrimation modal from the existance subscription, as it will make the animation laggy when the confimation closes.
 const SubscriptionForCancellationContext = React.createContext<{
   subscription: CommerceSubscriptionResource | null;
   setSubscription: (subscription: CommerceSubscriptionResource | null) => void;
+  confirmationOpen: boolean;
+  setConfirmationOpen: (confirmationOpen: boolean) => void;
 }>({
+  confirmationOpen: false,
+  setConfirmationOpen: () => {},
   subscription: null,
   setSubscription: () => {},
 });
@@ -97,6 +102,7 @@ const SubscriptionDetailsInternal = (props: __experimental_SubscriptionDetailsPr
   const [subscriptionForCancellation, setSubscriptionForCancellation] = useState<CommerceSubscriptionResource | null>(
     null,
   );
+  const [confirmationOpen, setConfirmationOpen] = useState(false);
 
   const {
     buttonPropsForPlan: _buttonPropsForPlan,
@@ -123,7 +129,12 @@ const SubscriptionDetailsInternal = (props: __experimental_SubscriptionDetailsPr
 
   return (
     <SubscriptionForCancellationContext.Provider
-      value={{ subscription: subscriptionForCancellation, setSubscription: setSubscriptionForCancellation }}
+      value={{
+        subscription: subscriptionForCancellation,
+        setSubscription: setSubscriptionForCancellation,
+        confirmationOpen,
+        setConfirmationOpen,
+      }}
     >
       <Drawer.Header title='Subscription' />
 
@@ -155,15 +166,12 @@ const SubscriptionDetailsFooter = withCardStateProvider(() => {
   const subscriberType = useSubscriberTypeContext();
   const { organization } = useOrganization();
   const { isLoading, error, setError, setLoading, setIdle } = useCardState();
-  const { subscription, setSubscription } = useContext(SubscriptionForCancellationContext);
+  const { subscription, confirmationOpen, setConfirmationOpen } = useContext(SubscriptionForCancellationContext);
   const { anySubscription } = useGuessableSubscription({ or: 'throw' });
   const { setIsOpen } = useDrawerContext();
   const { onSubscriptionCancel } = useSubscriptionDetailsContext();
 
-  const onOpenChange = useCallback(
-    (open: boolean) => setSubscription(open ? subscription : null),
-    [subscription, setSubscription],
-  );
+  const onOpenChange = useCallback((open: boolean) => setConfirmationOpen(open), [setConfirmationOpen]);
 
   const cancelSubscription = useCallback(async () => {
     if (!subscription) {
@@ -199,7 +207,7 @@ const SubscriptionDetailsFooter = withCardStateProvider(() => {
       <SubscriptionDetailsSummary />
 
       <Drawer.Confirmation
-        open={!!subscription}
+        open={confirmationOpen}
         onOpenChange={onOpenChange}
         actionsSlot={
           <>
@@ -336,7 +344,7 @@ const SubscriptionCardActions = ({ subscription }: { subscription: CommerceSubsc
   const subscriberType = useSubscriberTypeContext();
   const { setIsOpen } = useDrawerContext();
   const { revalidateAll } = usePlansContext();
-  const { setSubscription } = useContext(SubscriptionForCancellationContext);
+  const { setSubscription, setConfirmationOpen } = useContext(SubscriptionForCancellationContext);
   const canOrgManageBilling = useProtect(has => has({ permission: 'org:sys_billing:manage' }));
   const canManageBilling = subscriberType === 'user' || canOrgManageBilling;
 
@@ -397,6 +405,7 @@ const SubscriptionCardActions = ({ subscription }: { subscription: CommerceSubsc
             label: localizationKeys('commerce.cancelSubscription'),
             onClick: () => {
               setSubscription(subscription);
+              setConfirmationOpen(true);
             },
           }
         : null,
@@ -422,6 +431,7 @@ const SubscriptionCardActions = ({ subscription }: { subscription: CommerceSubsc
     setSubscription,
     canManageBilling,
     isReSubscribable,
+    setConfirmationOpen,
   ]);
 
   if (actions.length === 0) {
