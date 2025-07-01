@@ -167,6 +167,26 @@ class AuthenticateContext implements AuthenticateContext {
     return true;
   }
 
+  /**
+   * Determines if the request came from a different origin based on the referrer header.
+   * Used for cross-origin detection in multi-domain authentication flows.
+   *
+   * @returns {boolean} True if referrer exists and is from a different origin, false otherwise.
+   */
+  public isCrossOriginReferrer(): boolean {
+    if (!this.referrer || !this.origin) {
+      return false;
+    }
+
+    try {
+      const referrerOrigin = new URL(this.referrer).origin;
+      return referrerOrigin !== this.origin;
+    } catch {
+      // Invalid referrer URL format
+      return false;
+    }
+  }
+
   private initPublishableKeyValues(options: AuthenticateRequestOptions) {
     assertValidPublishableKey(options.publishableKey);
     this.publishableKey = options.publishableKey;
