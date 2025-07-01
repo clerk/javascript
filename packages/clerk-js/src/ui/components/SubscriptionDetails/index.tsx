@@ -490,20 +490,16 @@ const SubscriptionCard = ({ subscription }: { subscription: CommerceSubscription
           align='center'
           gap={2}
         >
-          <Avatar
-            boxElementDescriptor={descriptors.planDetailAvatar}
-            // TODO: Use size prop
-            size={_ => 40}
-            title={subscription.plan.name}
-            initials={subscription.plan.name[0]}
-            rounded={false}
-            // TODO: remove hardcoded image
-            imageUrl={subscription.plan.avatarUrl || 'https://i.ibb.co/s9GqfwtK/Frame-106.png'}
-            // TODO: remove hardcoded background
-            sx={{
-              background: 'unset',
-            }}
-          />
+          {subscription.plan.avatarUrl ? (
+            <Avatar
+              // TODO(@commerce): Add correct descriptor
+              boxElementDescriptor={descriptors.planDetailAvatar}
+              size={_ => 40}
+              title={subscription.plan.name}
+              rounded={false}
+              imageUrl={subscription.plan.avatarUrl}
+            />
+          ) : null}
 
           <Text
             sx={{
