@@ -168,6 +168,18 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       logger.debug('options', options);
       logger.debug('url', () => clerkRequest.toJSON());
 
+      // Initial request debugging
+      logger.debug('🚀 Initial middleware request', () => ({
+        url: clerkRequest.clerkUrl.toString(),
+        method: request.method,
+        isSatellite: options.isSatellite,
+        domain: options.domain,
+        signInUrl: options.signInUrl,
+        hasSessionCookie: !!clerkRequest.cookies.get(constants.Cookies.Session),
+        hasClientUatCookie: !!clerkRequest.cookies.get(constants.Cookies.ClientUat),
+        queryParams: Object.fromEntries(clerkRequest.clerkUrl.searchParams.entries()),
+      }));
+
       const authHeader = request.headers.get(constants.Headers.Authorization);
       if (authHeader && authHeader.startsWith('Basic ')) {
         logger.debug('Basic Auth detected');
@@ -201,25 +213,69 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
 
       // Check if we've just completed a satellite domain handshake and should re-authenticate
       // This fixes the issue where auth state appears signed out after satellite handshake completion
+      const debugInfo = {
+        isSatellite: requestState.isSatellite,
+        currentStatus: requestState.status,
+        url: clerkRequest.clerkUrl.toString(),
+        hasClerkSynced: clerkRequest.clerkUrl.searchParams.has(constants.QueryParameters.ClerkSynced),
+        hasDevBrowser: clerkRequest.clerkUrl.searchParams.has(constants.QueryParameters.DevBrowser),
+        hasSessionCookie: !!clerkRequest.cookies.get(constants.Cookies.Session),
+        hasClientUatCookie: !!clerkRequest.cookies.get(constants.Cookies.ClientUat),
+        sessionCookieValue: clerkRequest.cookies.get(constants.Cookies.Session) ? '[PRESENT]' : '[MISSING]',
+        allQueryParams: Object.fromEntries(clerkRequest.clerkUrl.searchParams.entries()),
+        allCookieNames: Array.from(clerkRequest.cookies.keys()),
+      };
+
+      logger.debug('🔍 Satellite handshake detection debug info', () => debugInfo);
+
+      const hasClerkSynced = clerkRequest.clerkUrl.searchParams.has(constants.QueryParameters.ClerkSynced);
+      const hasDevBrowser = clerkRequest.clerkUrl.searchParams.has(constants.QueryParameters.DevBrowser);
+      const hasSessionCookie = !!clerkRequest.cookies.get(constants.Cookies.Session);
+      const isSignedOutWithSession = requestState.status === AuthStatus.SignedOut && hasSessionCookie;
+
       const hasHandshakeCompletionIndicators =
-        requestState.isSatellite &&
-        (clerkRequest.clerkUrl.searchParams.has(constants.QueryParameters.ClerkSynced) ||
-          clerkRequest.clerkUrl.searchParams.has(constants.QueryParameters.DevBrowser) ||
-          (requestState.status === AuthStatus.SignedOut && clerkRequest.cookies.get(constants.Cookies.Session)));
+        requestState.isSatellite && (hasClerkSynced || hasDevBrowser || isSignedOutWithSession);
+
+      logger.debug('🔍 Handshake completion check', () => ({
+        isSatellite: requestState.isSatellite,
+        hasClerkSynced,
+        hasDevBrowser,
+        isSignedOutWithSession,
+        hasHandshakeCompletionIndicators,
+      }));
 
       if (hasHandshakeCompletionIndicators) {
-        logger.debug('Satellite handshake completion detected, re-authenticating for fresh auth state');
+        logger.debug('🔄 Satellite handshake completion detected, re-authenticating for fresh auth state');
+
+        const beforeReAuth = {
+          status: requestState.status,
+          reason: requestState.reason,
+          isSignedIn: requestState.isSignedIn,
+          token: requestState.token ? '[PRESENT]' : '[MISSING]',
+        };
+
+        logger.debug('📊 Auth state before re-authentication', () => beforeReAuth);
+
         // Re-authenticate to get the updated auth state after handshake completion
         requestState = await resolvedClerkClient.authenticateRequest(
           clerkRequest,
           createAuthenticateRequestOptions(clerkRequest, options),
         );
 
-        logger.debug('Updated requestState after re-auth', () => ({
+        const afterReAuth = {
           status: requestState.status,
-          // @ts-expect-error : FIXME
-          headers: JSON.stringify(Object.fromEntries(requestState.headers)),
           reason: requestState.reason,
+          isSignedIn: requestState.isSignedIn,
+          token: requestState.token ? '[PRESENT]' : '[MISSING]',
+        };
+
+        logger.debug('✅ Auth state after re-authentication', () => afterReAuth);
+        logger.debug('🔄 Re-auth comparison', () => ({
+          statusChanged: beforeReAuth.status !== afterReAuth.status,
+          signedInChanged: beforeReAuth.isSignedIn !== afterReAuth.isSignedIn,
+          tokenChanged: beforeReAuth.token !== afterReAuth.token,
+          from: `${beforeReAuth.status}/${beforeReAuth.isSignedIn}`,
+          to: `${afterReAuth.status}/${afterReAuth.isSignedIn}`,
         }));
       }
 
@@ -229,7 +285,16 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
         throw new Error('Clerk: Auth object is null after request state resolution');
       }
 
-      logger.debug('auth', () => ({ auth: authObject, debug: authObject.debug() }));
+      logger.debug('🔐 Final auth object details', () => ({
+        userId: authObject.userId || '[NONE]',
+        sessionId: authObject.sessionId || '[NONE]',
+        sessionStatus: authObject.sessionStatus || '[NONE]',
+        status: requestState.status,
+        isSignedIn: requestState.isSignedIn,
+        isSatellite: requestState.isSatellite,
+        hasToken: !!requestState.token,
+        debug: authObject.debug(),
+      }));
 
       // Enhanced satellite domain handling: Check for unauthenticated requests on satellite domains
       // and ensure they can properly redirect back after authentication
@@ -315,6 +380,16 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
           : {};
 
       decorateRequest(clerkRequest, handlerResult, requestState, resolvedParams, keylessKeysForRequestData);
+
+      // Final middleware summary
+      logger.debug('🏁 Middleware complete', () => ({
+        finalAuthStatus: requestState.status,
+        finalIsSignedIn: requestState.isSignedIn,
+        userId: authObject.userId || '[NONE]',
+        responseStatus: handlerResult.status,
+        wasReAuthTriggered: hasHandshakeCompletionIndicators,
+        isSatelliteRequest: requestState.isSatellite,
+      }));
 
       return handlerResult;
     });
