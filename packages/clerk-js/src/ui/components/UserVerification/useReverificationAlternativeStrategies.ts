@@ -2,7 +2,8 @@ import { isWebAuthnSupported } from '@clerk/shared/webauthn';
 import type { SignInFactor, SignInFirstFactor, SignInSecondFactor } from '@clerk/types';
 import { useMemo } from 'react';
 
-import { allStrategiesButtonsComparator } from '../../utils';
+import { allStrategiesButtonsComparator } from '@/ui/utils/factorSorting';
+
 import { factorHasLocalStrategy, isResetPasswordStrategy } from '../SignIn/utils';
 
 const firstFactorsAreEqual = (a: SignInFactor | null | undefined, b: SignInFactor | null | undefined) => {

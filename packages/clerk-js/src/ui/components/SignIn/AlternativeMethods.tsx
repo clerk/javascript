@@ -6,6 +6,7 @@ import { BackLink } from '@/ui/elements/BackLink';
 import { Card } from '@/ui/elements/Card';
 import { Divider } from '@/ui/elements/Divider';
 import { Header } from '@/ui/elements/Header';
+import { formatSafeIdentifier } from '@/ui/utils/formatSafeIdentifier';
 
 import { useCoreSignIn } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
@@ -13,7 +14,6 @@ import { Button, Col, descriptors, Flex, Flow, localizationKeys } from '../../cu
 import { useCardState } from '../../elements/contexts';
 import { useAlternativeStrategies } from '../../hooks/useAlternativeStrategies';
 import { ChatAltIcon, Email, Fingerprint, LinkIcon, LockClosedIcon, RequestAuthIcon } from '../../icons';
-import { formatSafeIdentifier } from '../../utils';
 import { SignInSocialButtons } from './SignInSocialButtons';
 import { useResetPasswordFactor } from './useResetPasswordFactor';
 import { withHavingTrouble } from './withHavingTrouble';

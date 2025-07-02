@@ -77,7 +77,7 @@ Pages Router Data Fetching
 - Use getServerSideProps for server-side rendering on each request
 - Use getStaticPaths with getStaticProps for dynamic static generation
 - Implement ISR (Incremental Static Regeneration) with revalidate option
-- Use SWR or React Query for client-side data fetching
+- Use SWR for client-side data fetching
 - Cache API responses appropriately based on data volatility
 
 Data Fetching Best Practices
@@ -138,7 +138,7 @@ API Route Structure
 - Organize API routes in app/api directory matching your URL structure
 - Use HTTP methods correctly (GET for reading, POST for creating, etc.)
 - Implement proper error handling with appropriate HTTP status codes
-- Validate request data using libraries like Zod or Joi
+- Validate request data using libraries like Zod
 - Use middleware for authentication and request validation
 - Document API endpoints with TypeScript interfaces
 

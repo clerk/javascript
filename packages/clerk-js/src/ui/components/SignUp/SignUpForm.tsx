@@ -2,11 +2,11 @@ import React from 'react';
 
 import { Form } from '@/ui/elements/Form';
 import { LegalCheckbox } from '@/ui/elements/LegalConsentCheckbox';
+import type { FormControlState } from '@/ui/utils/useFormControl';
 
 import { Col, localizationKeys, useAppearance } from '../../customizables';
 import { CaptchaElement } from '../../elements/CaptchaElement';
 import { mqu } from '../../styledSystem';
-import type { FormControlState } from '../../utils';
 import type { ActiveIdentifier, Fields } from './signUpFormHelpers';
 
 type SignUpFormProps = {

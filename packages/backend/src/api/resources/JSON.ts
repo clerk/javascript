@@ -1,4 +1,4 @@
-import type { SignUpStatus } from '@clerk/types';
+import type { SignUpStatus, VerificationStatus } from '@clerk/types';
 
 import type {
   ActorTokenStatus,
@@ -588,7 +588,7 @@ export interface UserJSON extends ClerkResourceJSON {
 }
 
 export interface VerificationJSON extends ClerkResourceJSON {
-  status: string;
+  status: VerificationStatus;
   strategy: string;
   attempts: number | null;
   expire_at: number | null;

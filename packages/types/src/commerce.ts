@@ -10,6 +10,7 @@ type WithOptionalOrgType<T> = T & {
 export interface CommerceBillingNamespace {
   getPaymentAttempts: (params: GetPaymentAttemptsParams) => Promise<ClerkPaginatedResponse<CommercePaymentResource>>;
   getPlans: (params?: GetPlansParams) => Promise<CommercePlanResource[]>;
+  getPlan: (params: { id: string }) => Promise<CommercePlanResource>;
   getSubscriptions: (params: GetSubscriptionsParams) => Promise<ClerkPaginatedResponse<CommerceSubscriptionResource>>;
   getStatements: (params: GetStatementsParams) => Promise<ClerkPaginatedResponse<CommerceStatementResource>>;
   startCheckout: (params: CreateCheckoutParams) => Promise<CommerceCheckoutResource>;
@@ -116,9 +117,9 @@ export type CommercePaymentStatus = 'pending' | 'paid' | 'failed';
 export interface CommercePaymentResource extends ClerkResource {
   id: string;
   amount: CommerceMoney;
-  paidAt?: number;
-  failedAt?: number;
-  updatedAt: number;
+  paidAt?: Date;
+  failedAt?: Date;
+  updatedAt: Date;
   paymentSource: CommercePaymentSourceResource;
   subscription: CommerceSubscriptionResource;
   subscriptionItem: CommerceSubscriptionResource;
@@ -136,12 +137,12 @@ export interface CommerceStatementResource extends ClerkResource {
   id: string;
   totals: CommerceStatementTotals;
   status: CommerceStatementStatus;
-  timestamp: number;
+  timestamp: Date;
   groups: CommerceStatementGroup[];
 }
 
 export interface CommerceStatementGroup {
-  timestamp: number;
+  timestamp: Date;
   items: CommercePaymentResource[];
 }
 
@@ -154,8 +155,21 @@ export interface CommerceSubscriptionResource extends ClerkResource {
   plan: CommercePlanResource;
   planPeriod: CommerceSubscriptionPlanPeriod;
   status: CommerceSubscriptionStatus;
+  createdAt: Date;
+  periodStartDate: Date;
+  periodEndDate: Date | null;
+  canceledAtDate: Date | null;
+  /**
+   * @deprecated Use `periodStartDate` instead
+   */
   periodStart: number;
+  /**
+   * @deprecated Use `periodEndDate` instead
+   */
   periodEnd: number;
+  /**
+   * @deprecated Use `canceledAtDate` instead
+   */
   canceledAt: number | null;
   amount?: CommerceMoney;
   credit?: {

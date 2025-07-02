@@ -6,7 +6,7 @@ import { usePrefersReducedMotion } from '../hooks';
 import { ChevronDown } from '../icons';
 import type { ThemableCssProp } from '../styledSystem';
 import { common } from '../styledSystem';
-import { colors } from '../utils';
+import { colors } from '../utils/colors';
 
 /* -------------------------------------------------------------------------------------------------
  * Disclosure Context

@@ -15,7 +15,7 @@ export const SignInFactorOneAlternativePhoneCodeCard = (props: SignInFactorOneAl
       <SignInFactorOneAlternativeChannelCodeForm
         {...props}
         cardTitle={localizationKeys('signIn.alternativePhoneCodeProvider.title', {
-          provider: getAlternativePhoneCodeProviderData(props.factor.channel)?.name,
+          provider: getAlternativePhoneCodeProviderData(props.factor.channel)?.name || '',
         })}
         cardSubtitle={localizationKeys('signIn.alternativePhoneCodeProvider.subtitle')}
         inputLabel={localizationKeys('signIn.alternativePhoneCodeProvider.formTitle')}

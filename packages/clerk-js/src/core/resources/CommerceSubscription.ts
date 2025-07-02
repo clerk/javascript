@@ -8,6 +8,8 @@ import type {
   DeletedObjectJSON,
 } from '@clerk/types';
 
+import { unixEpochToDate } from '@/utils/date';
+
 import { commerceMoneyFromJSON } from '../../utils';
 import { BaseResource, CommercePlan, DeletedObject } from './internal';
 
@@ -17,6 +19,10 @@ export class CommerceSubscription extends BaseResource implements CommerceSubscr
   plan!: CommercePlan;
   planPeriod!: CommerceSubscriptionPlanPeriod;
   status!: CommerceSubscriptionStatus;
+  createdAt!: Date;
+  periodStartDate!: Date;
+  periodEndDate!: Date | null;
+  canceledAtDate!: Date | null;
   periodStart!: number;
   periodEnd!: number;
   canceledAt!: number | null;
@@ -24,6 +30,7 @@ export class CommerceSubscription extends BaseResource implements CommerceSubscr
   credit?: {
     amount: CommerceMoney;
   };
+
   constructor(data: CommerceSubscriptionJSON) {
     super();
     this.fromJSON(data);
@@ -42,6 +49,12 @@ export class CommerceSubscription extends BaseResource implements CommerceSubscr
     this.periodStart = data.period_start;
     this.periodEnd = data.period_end;
     this.canceledAt = data.canceled_at;
+
+    this.createdAt = unixEpochToDate(data.created_at);
+    this.periodStartDate = unixEpochToDate(data.period_start);
+    this.periodEndDate = data.period_end ? unixEpochToDate(data.period_end) : null;
+    this.canceledAtDate = data.canceled_at ? unixEpochToDate(data.canceled_at) : null;
+
     this.amount = data.amount ? commerceMoneyFromJSON(data.amount) : undefined;
     this.credit = data.credit && data.credit.amount ? { amount: commerceMoneyFromJSON(data.credit.amount) } : undefined;
     return this;
@@ -52,8 +65,8 @@ export class CommerceSubscription extends BaseResource implements CommerceSubscr
     const json = (
       await BaseResource._fetch({
         path: orgId
-          ? `/organizations/${orgId}/commerce/subscription_items/${this.id}`
-          : `/me/commerce/subscription_items/${this.id}`,
+          ? `/organizations/${orgId}/commerce/subscriptions/${this.id}`
+          : `/me/commerce/subscriptions/${this.id}`,
         method: 'DELETE',
       })
     )?.response as unknown as DeletedObjectJSON;

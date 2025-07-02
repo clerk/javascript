@@ -5,6 +5,7 @@ import type { ApiClient, APIKey, IdPOAuthAccessToken, MachineToken } from '../ap
 import type {
   AuthenticatedMachineObject,
   AuthObject,
+  InvalidTokenAuthObject,
   SignedInAuthObject,
   SignedOutAuthObject,
   UnauthenticatedMachineObject,
@@ -200,7 +201,8 @@ export interface GetAuthFn<RequestType, ReturnsPromise extends boolean = false> 
     req: RequestType,
     options: AuthOptions & { acceptsToken: T },
   ): MaybePromise<
-    InferAuthObjectFromTokenArray<T, SessionAuthObject, MachineAuthObject<Exclude<T[number], SessionTokenType>>>,
+    | InferAuthObjectFromTokenArray<T, SessionAuthObject, MachineAuthObject<Exclude<T[number], SessionTokenType>>>
+    | InvalidTokenAuthObject,
     ReturnsPromise
   >;
 

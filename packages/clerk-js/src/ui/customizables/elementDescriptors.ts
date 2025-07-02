@@ -1,6 +1,7 @@
 import type { ElementObjectKey, ElementsConfig, IdSelectors, StateSelectors } from '@clerk/types';
 
-import { containsAllOfType, fromEntries } from '../utils';
+import { containsAllOfType } from '../utils/containsAllOf';
+import { fromEntries } from '../utils/fromEntries';
 
 export const CLASS_PREFIX = 'cl-';
 export const ID_CLASS_PREFIX = 'cl-id-';
@@ -333,6 +334,10 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'tabListContainer',
 
   'tableHead',
+  'tableBody',
+  'tableRow',
+  'tableHeaderCell',
+  'tableBodyCell',
 
   'paginationButton',
   'paginationButtonIcon',
@@ -458,6 +463,24 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'notificationBadge',
   'buttonArrowIcon',
   'spinner',
+
+  'apiKeys',
+  'apiKeysHeader',
+  'apiKeysSearchBox',
+  'apiKeysSearchInput',
+  'apiKeysAddButton',
+  'apiKeysTable',
+  'apiKeysCopyButton',
+  'apiKeysRevealButton',
+  'apiKeysCreateForm',
+  'apiKeysCreateFormNameInput',
+  'apiKeysCreateFormDescriptionInput',
+  'apiKeysCreateFormExpirationInput',
+  'apiKeysCreateFormSubmitButton',
+  'apiKeysCreateFormExpirationCaption',
+  'apiKeysRevokeModal',
+  'apiKeysRevokeModalInput',
+  'apiKeysRevokeModalSubmitButton',
 ] as const).map(camelize) as (keyof ElementsConfig)[];
 
 type TargettableClassname<K extends keyof ElementsConfig> = `${typeof CLASS_PREFIX}${K}`;

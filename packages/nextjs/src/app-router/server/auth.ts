@@ -1,4 +1,4 @@
-import type { AuthObject, MachineAuthObject, SessionAuthObject } from '@clerk/backend';
+import type { AuthObject, InvalidTokenAuthObject, MachineAuthObject, SessionAuthObject } from '@clerk/backend';
 import type {
   AuthenticateRequestOptions,
   InferAuthObjectFromToken,
@@ -56,11 +56,12 @@ export interface AuthFn<TRedirect = ReturnType<typeof redirect>> {
   <T extends TokenType[]>(
     options: AuthOptions & { acceptsToken: T },
   ): Promise<
-    InferAuthObjectFromTokenArray<
-      T,
-      SessionAuthWithRedirect<TRedirect>,
-      MachineAuthObject<Exclude<T[number], SessionTokenType>>
-    >
+    | InferAuthObjectFromTokenArray<
+        T,
+        SessionAuthWithRedirect<TRedirect>,
+        MachineAuthObject<Exclude<T[number], SessionTokenType>>
+      >
+    | InvalidTokenAuthObject
   >;
 
   /**
@@ -186,7 +187,8 @@ auth.protect = async (...args: any[]) => {
   require('server-only');
 
   const request = await buildRequestLike();
-  const authObject = await auth();
+  const requestedToken = args?.[0]?.token || args?.[1]?.token || TokenType.SessionToken;
+  const authObject = await auth({ acceptsToken: requestedToken });
 
   const protect = createProtect({
     request,

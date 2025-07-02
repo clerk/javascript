@@ -31,6 +31,7 @@ export {
   signedInAuthObject,
   authenticatedMachineObject,
   unauthenticatedMachineObject,
+  invalidTokenAuthObject,
   getAuthObjectFromJwt,
   getAuthObjectForAcceptedToken,
 } from './tokens/authObjects';
@@ -53,4 +54,4 @@ export { reverificationError, reverificationErrorResponse } from '@clerk/shared/
 
 export { verifyMachineAuthToken } from './tokens/verify';
 
-export { isMachineToken, getMachineTokenType, isTokenTypeAccepted } from './tokens/machine';
+export { isMachineTokenByPrefix, isMachineTokenType, getMachineTokenType, isTokenTypeAccepted } from './tokens/machine';

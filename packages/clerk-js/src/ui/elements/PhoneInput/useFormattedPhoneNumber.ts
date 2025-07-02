@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { extractDigits, formatPhoneNumber, parsePhoneString } from '../../utils';
+import { extractDigits, formatPhoneNumber, parsePhoneString } from '@/ui/utils/phoneUtils';
+
 import type { CountryIso } from './countryCodeData';
 import { IsoToCountryMap } from './countryCodeData';
 

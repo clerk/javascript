@@ -7,14 +7,15 @@ import type {
 } from '@clerk/types';
 
 import { commerceMoneyFromJSON } from '../../utils';
+import { unixEpochToDate } from '../../utils/date';
 import { BaseResource, CommercePaymentSource, CommerceSubscription } from './internal';
 
 export class CommercePayment extends BaseResource implements CommercePaymentResource {
   id!: string;
   amount!: CommerceMoney;
-  failedAt?: number;
-  paidAt?: number;
-  updatedAt!: number;
+  failedAt?: Date;
+  paidAt?: Date;
+  updatedAt!: Date;
   paymentSource!: CommercePaymentSource;
   subscription!: CommerceSubscription;
   subscriptionItem!: CommerceSubscription;
@@ -33,9 +34,9 @@ export class CommercePayment extends BaseResource implements CommercePaymentReso
 
     this.id = data.id;
     this.amount = commerceMoneyFromJSON(data.amount);
-    this.paidAt = data.paid_at;
-    this.failedAt = data.failed_at;
-    this.updatedAt = data.updated_at;
+    this.paidAt = data.paid_at ? unixEpochToDate(data.paid_at) : undefined;
+    this.failedAt = data.failed_at ? unixEpochToDate(data.failed_at) : undefined;
+    this.updatedAt = unixEpochToDate(data.updated_at);
     this.paymentSource = new CommercePaymentSource(data.payment_source);
     this.subscription = new CommerceSubscription(data.subscription);
     this.subscriptionItem = new CommerceSubscription(data.subscription_item);

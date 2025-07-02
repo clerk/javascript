@@ -14,6 +14,39 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const itIT: LocalizationResource = {
   locale: 'it-IT',
+  apiKeys: {
+    action__add: undefined,
+    action__search: undefined,
+    createdAndExpirationStatus__expiresOn: undefined,
+    createdAndExpirationStatus__never: undefined,
+    detailsTitle__emptyRow: undefined,
+    formButtonPrimary__add: undefined,
+    formFieldCaption__expiration__expiresOn: undefined,
+    formFieldCaption__expiration__never: undefined,
+    formFieldOption__expiration__180d: undefined,
+    formFieldOption__expiration__1d: undefined,
+    formFieldOption__expiration__1y: undefined,
+    formFieldOption__expiration__30d: undefined,
+    formFieldOption__expiration__60d: undefined,
+    formFieldOption__expiration__7d: undefined,
+    formFieldOption__expiration__90d: undefined,
+    formFieldOption__expiration__never: undefined,
+    formHint: undefined,
+    formTitle: undefined,
+    lastUsed__days: undefined,
+    lastUsed__hours: undefined,
+    lastUsed__minutes: undefined,
+    lastUsed__months: undefined,
+    lastUsed__seconds: undefined,
+    lastUsed__years: undefined,
+    menuAction__revoke: undefined,
+    revokeConfirmation: {
+      confirmationText: undefined,
+      formButtonPrimary__revoke: undefined,
+      formHint: undefined,
+      formTitle: undefined,
+    },
+  },
   backButton: 'Indietro',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
@@ -57,11 +90,13 @@ export const itIT: LocalizationResource = {
         title__subscriptionBegins: undefined,
         title__totalPaid: undefined,
       },
+      pastDueNotice: undefined,
       perMonth: undefined,
       title: undefined,
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
     },
+    credit: undefined,
     creditRemainder: undefined,
     defaultFreePlanActive: undefined,
     free: undefined,
@@ -100,6 +135,7 @@ export const itIT: LocalizationResource = {
     switchPlan: undefined,
     switchToAnnual: undefined,
     switchToMonthly: undefined,
+    totalDue: undefined,
     totalDueToday: undefined,
     viewFeatures: undefined,
     year: undefined,
@@ -134,6 +170,9 @@ export const itIT: LocalizationResource = {
   formFieldHintText__optional: 'Opzionale',
   formFieldHintText__slug:
     'Uno slug è un identificativo leggibile dall’uomo che deve essere univoco. Spesso viene usato negli URL.',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'Inserisci il codice di backup',
   formFieldInputPlaceholder__confirmDeletionUserAccount: undefined,
   formFieldInputPlaceholder__emailAddress: "Inserisci l'indirizzo email",
@@ -149,6 +188,9 @@ export const itIT: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Inserisci la tua password',
   formFieldInputPlaceholder__phoneNumber: 'Inserisci il numero di telefono',
   formFieldInputPlaceholder__username: 'Inserisci il nome utente',
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Abilita inviti automatici per questo dominio',
   formFieldLabel__backupCode: 'Codice di backup',
   formFieldLabel__confirmDeletion: 'Conferma',
@@ -193,11 +235,21 @@ export const itIT: LocalizationResource = {
     titleWithoutPersonal: 'Scegli un’organizzazione',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: 'Inviti automatici',
     badge__automaticSuggestion: 'Suggerimenti automatici',
     badge__manualInvitation: 'Nessuna iscrizione automatica',
     badge__unverified: 'Non verificato',
     billingPage: {
+      paymentHistorySection: {
+        empty: undefined,
+        notFound: undefined,
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        tableHeader__status: undefined,
+      },
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
@@ -216,13 +268,28 @@ export const itIT: LocalizationResource = {
         title: undefined,
       },
       start: {
+        headerTitle__payments: undefined,
         headerTitle__plans: undefined,
         headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
       },
+      statementsSection: {
+        empty: undefined,
+        itemCaption__paidForPlan: undefined,
+        itemCaption__proratedCredit: undefined,
+        itemCaption__subscribedAndPaidForPlan: undefined,
+        notFound: undefined,
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+        totalPaid: undefined,
+      },
       subscriptionsListSection: {
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
+        tableHeader__edit: undefined,
+        tableHeader__plan: undefined,
+        tableHeader__startDate: undefined,
         title: undefined,
       },
       subscriptionsSection: {
@@ -289,6 +356,7 @@ export const itIT: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: 'Gestisci la tua organizzazione.',
       general: 'Generale',
@@ -660,7 +728,8 @@ export const itIT: LocalizationResource = {
       checkbox: {
         label__onlyPrivacyPolicy: 'Accetto la Politica sulla Privacy',
         label__onlyTermsOfService: 'Accetto i Termini di Servizio',
-        label__termsOfServiceAndPrivacyPolicy: 'Accetto i Termini di Servizio e la Politica sulla Privacy',
+        label__termsOfServiceAndPrivacyPolicy:
+          'Accetto i {{ termsOfServiceLink || link("Termini di Servizio") }} e la {{ privacyPolicyLink || link("Politica sulla Privacy") }}',
       },
       continue: {
         subtitle: 'Per completare la registrazione, accetta i termini e la privacy policy.',
@@ -805,6 +874,9 @@ export const itIT: LocalizationResource = {
     action__signOutAll: 'Disconnetti da tutti gli accounts',
   },
   userProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Copiati!',
       actionLabel__copy: 'Copia tutti',
@@ -822,6 +894,13 @@ export const itIT: LocalizationResource = {
       title__codelist: 'Codici di backup',
     },
     billingPage: {
+      paymentHistorySection: {
+        empty: undefined,
+        notFound: undefined,
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        tableHeader__status: undefined,
+      },
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
@@ -840,13 +919,28 @@ export const itIT: LocalizationResource = {
         title: undefined,
       },
       start: {
+        headerTitle__payments: undefined,
         headerTitle__plans: undefined,
         headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
       },
+      statementsSection: {
+        empty: undefined,
+        itemCaption__paidForPlan: undefined,
+        itemCaption__proratedCredit: undefined,
+        itemCaption__subscribedAndPaidForPlan: undefined,
+        notFound: undefined,
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+        totalPaid: undefined,
+      },
       subscriptionsListSection: {
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
+        tableHeader__edit: undefined,
+        tableHeader__plan: undefined,
+        tableHeader__startDate: undefined,
         title: undefined,
       },
       subscriptionsSection: {
@@ -965,6 +1059,7 @@ export const itIT: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profilo',
+      apiKeys: undefined,
       billing: undefined,
       description: 'Gestisci il tuo account.',
       security: 'Sicurezza',

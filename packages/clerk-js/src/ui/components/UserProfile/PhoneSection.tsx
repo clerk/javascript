@@ -5,12 +5,13 @@ import { Fragment } from 'react';
 import { useCardState } from '@/ui/elements/contexts';
 import { ProfileSection } from '@/ui/elements/Section';
 import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
+import { handleError } from '@/ui/utils/errorHandler';
+import { stringToFormattedPhoneString } from '@/ui/utils/phoneUtils';
 
 import { Badge, Box, Flex, localizationKeys, Text } from '../../customizables';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import type { PropsOfComponent } from '../../styledSystem';
-import { handleError, stringToFormattedPhoneString } from '../../utils';
 import { PhoneForm } from './PhoneForm';
 import { RemovePhoneForm } from './RemoveResourceForm';
 import { sortIdentificationBasedOnVerification } from './utils';

@@ -35,6 +35,7 @@ export {
   GoogleOneTap,
   Waitlist,
   PricingTable,
+  APIKeys,
 } from './client-boundary/uiComponents';
 
 /**

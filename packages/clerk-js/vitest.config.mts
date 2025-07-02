@@ -46,11 +46,13 @@ export default defineConfig({
         'src/**/dist/**',
         'src/**/node_modules/**',
         'src/(ui|utils|core)/__tests__/**',
+        'src/sandbox/**',
       ],
     },
     environment: 'jsdom',
     globals: false,
     include: ['**/*.spec.?(c|m)[jt]s?(x)'],
+    exclude: ['sandbox/**/*.spec.?(c|m)[jt]s?(x)'],
     setupFiles: './vitest.setup.mts',
   },
   resolve: {

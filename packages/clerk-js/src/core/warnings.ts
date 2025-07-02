@@ -38,6 +38,8 @@ const warnings = {
     'The Checkout drawer cannot render unless a user is signed in. Since no user is signed in, this is no-op.',
   cannotOpenSignInOrSignUp:
     'The SignIn or SignUp modals do not render when a user is already signed in, unless the application allows multiple sessions. Since a user is signed in and this application only allows a single session, this is no-op.',
+  cannotRenderAPIKeysComponent:
+    'The <APIKeys/> component cannot be rendered when API keys is disabled. Since API keys is disabled, this is no-op.',
 };
 
 type SerializableWarnings = Serializable<typeof warnings>;

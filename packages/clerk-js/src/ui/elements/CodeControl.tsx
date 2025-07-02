@@ -8,8 +8,10 @@ import { useCardState } from '../elements/contexts';
 import { useLoadingStatus } from '../hooks';
 import type { PropsOfComponent } from '../styledSystem';
 import { common, mqu } from '../styledSystem';
-import type { FormControlState } from '../utils';
-import { handleError, sleep, useFormControl } from '../utils';
+import { handleError } from '../utils/errorHandler';
+import { sleep } from '../utils/sleep';
+import type { FormControlState } from '../utils/useFormControl';
+import { useFormControl } from '../utils/useFormControl';
 import { TimerButton } from './TimerButton';
 
 type UseCodeInputOptions = {

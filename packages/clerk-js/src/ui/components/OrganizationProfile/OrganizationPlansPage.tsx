@@ -22,7 +22,9 @@ const OrganizationPlansPageInternal = () => {
           paddingBlockEnd: t.space.$4,
         })}
       >
-        <Header.BackLink onClick={() => void navigate('../', { searchParams: new URLSearchParams('tab=plans') })}>
+        <Header.BackLink
+          onClick={() => void navigate('../', { searchParams: new URLSearchParams('tab=subscriptions') })}
+        >
           <Header.Title
             localizationKey={localizationKeys('organizationProfile.plansPage.title')}
             textVariant='h2'

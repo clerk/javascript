@@ -3,7 +3,12 @@ import type { CommerceSubscriptionResource } from '@clerk/types';
 import { ProfileSection } from '@/ui/elements/Section';
 
 import { useProtect } from '../../common';
-import { usePlansContext, useSubscriberTypeContext, useSubscriptions } from '../../contexts';
+import {
+  usePlansContext,
+  useSubscriberTypeContext,
+  useSubscriberTypeLocalizationRoot,
+  useSubscriptions,
+} from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import {
   Badge,
@@ -34,6 +39,7 @@ export function SubscriptionsList({
   arrowButtonEmptyText: LocalizationKey;
 }) {
   const { handleSelectPlan, captionForSubscription, canManageSubscription } = usePlansContext();
+  const localizationRoot = useSubscriberTypeLocalizationRoot();
   const subscriberType = useSubscriberTypeContext();
   const { data } = useSubscriptions();
   const { data: subscriptions = [] } = data || {};
@@ -80,9 +86,21 @@ export function SubscriptionsList({
         <Table tableHeadVisuallyHidden>
           <Thead>
             <Tr>
-              <Th>Plan</Th>
-              <Th>Start date</Th>
-              <Th>Edit</Th>
+              <Th
+                localizationKey={localizationKeys(
+                  `${localizationRoot}.billingPage.subscriptionsListSection.tableHeader__plan`,
+                )}
+              />
+              <Th
+                localizationKey={localizationKeys(
+                  `${localizationRoot}.billingPage.subscriptionsListSection.tableHeader__startDate`,
+                )}
+              />
+              <Th
+                localizationKey={localizationKeys(
+                  `${localizationRoot}.billingPage.subscriptionsListSection.tableHeader__edit`,
+                )}
+              />
             </Tr>
           </Thead>
           <Tbody>
@@ -108,7 +126,7 @@ export function SubscriptionsList({
                       >
                         {subscription.plan.name}
                       </Text>
-                      {sortedSubscriptions.length > 1 || !!subscription.canceledAt ? (
+                      {sortedSubscriptions.length > 1 || !!subscription.canceledAtDate ? (
                         <Badge
                           colorScheme={subscription.status === 'active' ? 'secondary' : 'primary'}
                           localizationKey={

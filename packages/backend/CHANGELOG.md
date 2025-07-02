@@ -1,5 +1,139 @@
 # Change Log
 
+## 2.3.1
+
+### Patch Changes
+
+- Updated dependencies [[`02a1f42`](https://github.com/clerk/javascript/commit/02a1f42dfdb28ea956d6cbd3fbabe10093d2fad8), [`edc0bfd`](https://github.com/clerk/javascript/commit/edc0bfdae929dad78a99dfd6275aad947d9ddd73)]:
+  - @clerk/shared@3.10.1
+  - @clerk/types@4.62.1
+
+## 2.3.0
+
+### Minor Changes
+
+- ## Optimize handshake payload delivery with nonce-based fetching ([#5905](https://github.com/clerk/javascript/pull/5905)) by [@jacekradko](https://github.com/jacekradko)
+
+  This change introduces a significant optimization to the handshake flow by replacing direct payload delivery with a nonce-based approach to overcome browser cookie size limitations.
+
+  ## Problem Solved
+
+  Previously, the handshake payload (an encoded JWT containing set-cookie headers) was sent directly in a cookie. Since browsers limit cookies to ~4KB, this severely restricted the practical size of session tokens, which are also JWTs stored in cookies but embedded within the handshake payload.
+
+  ## Solution
+
+  We now use a conditional approach based on payload size:
+
+  - **Small payloads (≤2KB)**: Continue using the direct approach for optimal performance
+  - **Large payloads (>2KB)**: Use nonce-based fetching to avoid cookie size limits
+
+  For large payloads, we:
+
+  1. Generate a short nonce (ID) for each handshake instance
+  2. Send only the nonce in the `__clerk_handshake_nonce` cookie
+  3. Use the nonce to fetch the actual handshake payload via a dedicated BAPI endpoint
+
+  ## New Handshake Flow (for payloads >2KB)
+
+  1. User visits `example.com`
+  2. Client app middleware triggers handshake → `307 FAPI/v1/client/handshake`
+  3. FAPI handshake resolves → `307 example.com` with `__clerk_handshake_nonce` cookie containing the nonce
+  4. Client app middleware makes `GET BAPI/v1/clients/handshake_payload?nonce=<nonce_value>` request (BAPI)
+  5. BAPI returns array of set-cookie header values
+  6. Client app middleware applies headers to the response
+
+  ## Traditional Flow (for payloads ≤2KB)
+
+  No changes. Continues to work as before with direct payload delivery in cookies for optimal performance.
+
+  ## Trade-offs
+
+  - **Added**: One additional BAPI call per handshake (only for payloads >2KB)
+  - **Removed**: Cookie size restrictions that previously limited session token size
+
+### Patch Changes
+
+- Ensure `__clerk_synced` is removed from cross-origin return-back urls ([#6196](https://github.com/clerk/javascript/pull/6196)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`f1be1fe`](https://github.com/clerk/javascript/commit/f1be1fe3d575c11acd04fc7aadcdec8f89829894), [`bffb42a`](https://github.com/clerk/javascript/commit/bffb42aaf266a188b9ae7d16ace3024d468a3bd4)]:
+  - @clerk/types@4.62.0
+  - @clerk/shared@3.10.0
+
+## 2.2.0
+
+### Minor Changes
+
+- Add support for `expiresInSeconds` parameter in session token generation. This allows setting custom expiration times for tokens both with and without templates via the backend API. ([#6150](https://github.com/clerk/javascript/pull/6150)) by [@jacekradko](https://github.com/jacekradko)
+
+- - Optimize `auth()` calls to avoid unnecessary verification calls when the provided token type is not in the `acceptsToken` array. ([#6123](https://github.com/clerk/javascript/pull/6123)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  - Add handling for invalid token types when `acceptsToken` is an array in `authenticateRequest()`: now returns a clear unauthenticated state (`tokenType: null`) if the token is not in the accepted list.
+
+- Introduce API keys Backend SDK methods ([#6169](https://github.com/clerk/javascript/pull/6169)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Add logic to ensure that we consider the proxy_url when creating the frontendApi url. ([#6120](https://github.com/clerk/javascript/pull/6120)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`b495279`](https://github.com/clerk/javascript/commit/b4952796e3c7dee4ab4726de63a17b7f4265ce37), [`c3fa15d`](https://github.com/clerk/javascript/commit/c3fa15d60642b4fcbcf26e21caaca0fc60975795), [`52d5e57`](https://github.com/clerk/javascript/commit/52d5e5768d54725b4d20d028135746493e05d44c), [`15a945c`](https://github.com/clerk/javascript/commit/15a945c02a9f6bc8d2f7d1e3534217100bf45936), [`72629b0`](https://github.com/clerk/javascript/commit/72629b06fb1fe720fa2a61462306a786a913e9a8)]:
+  - @clerk/types@4.61.0
+  - @clerk/shared@3.9.8
+
+## 2.1.0
+
+### Minor Changes
+
+- Improve `subject` property handling for machine auth objects. ([#6099](https://github.com/clerk/javascript/pull/6099)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Usage:
+
+  ```ts
+  import { createClerkClient } from '@clerk/backend';
+
+  const clerkClient = createClerkClient({
+    secretKey: process.env.CLERK_SECRET_KEY,
+    publishableKey: process.env.CLERK_PUBLISHABLE_KEY,
+  });
+
+  const requestState = await clerkClient.authenticateRequest(request, {
+    acceptsToken: 'any',
+  });
+
+  const authObject = requestState.toAuth();
+
+  switch (authObject.tokenType) {
+    case 'api_key':
+      // authObject.userId
+      // authObject.orgId
+      break;
+    case 'machine_token':
+      // authObject.machineId
+      break;
+    case 'oauth_token':
+      // authObject.userId
+      // authObject.clientId
+      break;
+  }
+  ```
+
+- Respect `acceptsToken` when returning unauthenticated session or machine object. ([#6112](https://github.com/clerk/javascript/pull/6112)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Re-organize internal types for the recently added "machine authentication" feature. ([#6067](https://github.com/clerk/javascript/pull/6067)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fix calculation of handshake URL when proxy URL is set on the ClerkProvider ([#6119](https://github.com/clerk/javascript/pull/6119)) by [@jacekradko](https://github.com/jacekradko)
+
+- Add JSdoc comments for user methods. ([#6091](https://github.com/clerk/javascript/pull/6091)) by [@NWylynko](https://github.com/NWylynko)
+
+- Updating type of Verification.status ([#6110](https://github.com/clerk/javascript/pull/6110)) by [@jacekradko](https://github.com/jacekradko)
+
+- Resolve machine token property mixing in discriminated unions ([#6079](https://github.com/clerk/javascript/pull/6079)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`19e9e11`](https://github.com/clerk/javascript/commit/19e9e11af04f13fd12975fbf7016fe0583202056), [`18bcb64`](https://github.com/clerk/javascript/commit/18bcb64a3e8b6d352d7933ed094d68214e6e80fb), [`138f733`](https://github.com/clerk/javascript/commit/138f733f13121487268a4f96e6eb2cffedc6e238), [`48be55b`](https://github.com/clerk/javascript/commit/48be55b61a86e014dd407414764d24bb43fd26f3), [`2c6f805`](https://github.com/clerk/javascript/commit/2c6f805a9e6e4685990f9a8abc740b2d0859a453), [`97749d5`](https://github.com/clerk/javascript/commit/97749d570bc687c7e05cd800a50e0ae4180a371d)]:
+  - @clerk/types@4.60.1
+  - @clerk/shared@3.9.7
+
 ## 2.0.0
 
 ### Major Changes

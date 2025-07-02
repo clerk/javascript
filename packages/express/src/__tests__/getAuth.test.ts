@@ -1,3 +1,5 @@
+import type { AuthenticatedMachineObject } from '@clerk/backend/internal';
+
 import { getAuth } from '../getAuth';
 import { mockRequest, mockRequestWithAuth } from './helpers';
 
@@ -33,14 +35,15 @@ describe('getAuth', () => {
     const req = mockRequestWithAuth({ tokenType: 'machine_token', id: 'm2m_1234' });
     const result = getAuth(req, { acceptsToken: ['machine_token', 'api_key'] });
     expect(result.tokenType).toBe('machine_token');
-    expect(result.id).toBe('m2m_1234');
-    expect(result.subject).toBeUndefined();
+
+    expect((result as AuthenticatedMachineObject<'machine_token'>).id).toBe('m2m_1234');
+    expect((result as AuthenticatedMachineObject<'machine_token'>).subject).toBeUndefined();
   });
 
   it('returns an unauthenticated auth object when the tokenType does not match acceptsToken', () => {
     const req = mockRequestWithAuth({ tokenType: 'session_token', userId: 'user_12345' });
     const result = getAuth(req, { acceptsToken: 'api_key' });
-    expect(result.tokenType).toBe('session_token'); // reflects the actual token found
+    expect(result.tokenType).toBe('api_key'); // reflects the actual token found
     // Properties specific to authenticated objects should be null or undefined
     expect(result.userId).toBeNull();
     expect(result.orgId).toBeNull();

@@ -1,11 +1,12 @@
 import React from 'react';
 
+import { colors } from '@/ui/utils/colors';
+
 import { useEnvironment } from '../../contexts';
 import { descriptors, Flex, Link, localizationKeys, useAppearance } from '../../customizables';
 import { useDevMode } from '../../hooks/useDevMode';
 import type { InternalTheme, PropsOfComponent } from '../../styledSystem';
 import { common, mqu } from '../../styledSystem';
-import { colors } from '../../utils';
 import { Card } from '.';
 
 type CardFooterProps = PropsOfComponent<typeof Flex> & {

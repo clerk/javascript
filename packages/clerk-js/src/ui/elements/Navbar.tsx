@@ -9,22 +9,30 @@ import { Menu } from '../icons';
 import { useRouter } from '../router';
 import type { PropsOfComponent } from '../styledSystem';
 import { animations, common, mqu } from '../styledSystem';
-import { colors } from '../utils';
+import { colors } from '../utils/colors';
 import { Card } from './Card';
 import { withFloatingTree } from './contexts';
 import { DevModeOverlay } from './DevModeNotice';
 import { Popover } from './Popover';
 
-type NavbarContextValue = { isOpen: boolean; open: () => void; close: () => void };
+type NavbarContextValue = {
+  isOpen: boolean;
+  open: () => void;
+  close: () => void;
+  contentRef?: React.RefObject<HTMLDivElement>;
+};
 export const [NavbarContext, useNavbarContext, useUnsafeNavbarContext] =
   createContextAndHook<NavbarContextValue>('NavbarContext');
 
-export const NavbarContextProvider = (props: React.PropsWithChildren<Record<never, never>>) => {
+export const NavbarContextProvider = ({
+  children,
+  contentRef,
+}: React.PropsWithChildren<{ contentRef?: React.RefObject<HTMLDivElement> }>) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const open = React.useCallback(() => setIsOpen(true), []);
   const close = React.useCallback(() => setIsOpen(false), []);
-  const value = React.useMemo(() => ({ value: { isOpen, open, close } }), [isOpen]);
-  return <NavbarContext.Provider value={value}>{props.children}</NavbarContext.Provider>;
+  const value = React.useMemo(() => ({ value: { isOpen, open, close, contentRef } }), [isOpen]);
+  return <NavbarContext.Provider value={value}>{children}</NavbarContext.Provider>;
 };
 
 export type NavbarRoute = {
