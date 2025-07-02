@@ -239,6 +239,13 @@ describe('Color Scales', () => {
       expect(result).toBeDefined();
       expect(Object.values(result).every(v => v === undefined)).toBe(true);
     });
+
+    it('should throw error when color scale object is missing 500 shade', () => {
+      const invalidScale = { '25': '#fef2f2', '100': '#fecaca', '600': '#dc2626' };
+
+      expect(() => generateAlphaScale(invalidScale as any)).toThrow('You need to provide at least the 500 shade');
+      expect(() => generateLightnessScale(invalidScale as any)).toThrow('You need to provide at least the 500 shade');
+    });
   });
 
   describe('applyScalePrefix', () => {
