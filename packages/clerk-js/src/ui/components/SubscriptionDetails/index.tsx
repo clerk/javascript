@@ -486,8 +486,6 @@ const SubscriptionCard = ({ subscription }: { subscription: CommerceSubscription
   const isActive = subscription.status === 'active';
   const { t } = useLocalizations();
 
-  console.log(subscription.periodEndDate, subscription.canceledAtDate, subscription);
-
   return (
     <Col
       elementDescriptor={descriptors.subscriptionDetailsCard}

@@ -90,7 +90,7 @@ const unboundCreateFixtures = (
     const MockClerkProvider = (props: any) => {
       const { children } = props;
 
-      const componentsWithoutContext = ['UsernameSection', 'UserProfileSection', 'SubscriptionDetails'];
+      const componentsWithoutContext = ['UsernameSection', 'UserProfileSection', 'SubscriptionDetails', 'PlanDetails'];
       const contextWrappedChildren = !componentsWithoutContext.includes(componentName) ? (
         <ComponentContextProvider
           componentName={componentName}

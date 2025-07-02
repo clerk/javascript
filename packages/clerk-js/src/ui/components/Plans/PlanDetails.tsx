@@ -33,7 +33,7 @@ const PlanDetailsInternal = ({
 
   const { data: plan, isLoading } = useSWR(
     planId || initialPlan ? { type: 'plan', id: planId || initialPlan?.id } : null,
-    // @ts-expect-error
+    // @ts-expect-error we are handling it above
     () => clerk.billing.getPlan({ id: planId || initialPlan?.id }),
     {
       fallbackData: initialPlan,
@@ -153,17 +153,6 @@ const PlanDetailsInternal = ({
           </Box>
         </Drawer.Body>
       ) : null}
-
-      {/* {!plan.isDefault && !isDefaultPlanImplicitlyActiveOrUpcoming ? (
-        <Drawer.Footer>
-          <Button
-            block
-            textVariant='buttonLarge'
-            {...buttonPropsForPlan({ plan })}
-            onClick={() => openCheckout()}
-          />
-        </Drawer.Footer>
-      ) : null} */}
     </SubscriberTypeContext.Provider>
   );
 };

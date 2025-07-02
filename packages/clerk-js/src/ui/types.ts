@@ -1,8 +1,8 @@
 import type {
+  __experimental_PlanDetailsProps,
   __experimental_SubscriptionDetailsProps,
   __internal_CheckoutProps,
   __internal_OAuthConsentProps,
-  __internal_PlanDetailsProps,
   __internal_UserVerificationProps,
   APIKeysProps,
   CreateOrganizationProps,
@@ -51,7 +51,8 @@ export type AvailableComponentProps =
   | PricingTableProps
   | __internal_CheckoutProps
   | __internal_UserVerificationProps
-  | __internal_PlanDetailsProps
+  | __experimental_SubscriptionDetailsProps
+  | __experimental_PlanDetailsProps
   | APIKeysProps;
 
 type ComponentMode = 'modal' | 'mounted';
@@ -141,6 +142,10 @@ export type OAuthConsentCtx = __internal_OAuthConsentProps & {
 
 export type SubscriptionDetailsCtx = __experimental_SubscriptionDetailsProps & {
   componentName: 'SubscriptionDetails';
+};
+
+export type PlanDetailsCtx = __experimental_PlanDetailsProps & {
+  componentName: 'PlanDetails';
 };
 
 export type AvailableComponentCtx =
