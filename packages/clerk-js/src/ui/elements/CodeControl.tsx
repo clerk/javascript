@@ -6,6 +6,7 @@ import type { LocalizationKey } from '../customizables';
 import { descriptors, Flex, Input } from '../customizables';
 import { useCardState } from '../elements/contexts';
 import { useLoadingStatus } from '../hooks';
+import { Box } from '../primitives';
 import type { PropsOfComponent } from '../styledSystem';
 import { common, mqu } from '../styledSystem';
 import { handleError } from '../utils/errorHandler';
@@ -130,6 +131,7 @@ export type OTPInputProps = {
   onResendCode?: React.MouseEventHandler<HTMLButtonElement>;
   otpControl: ReturnType<typeof useFieldOTP>['otpControl'];
   centerAlign?: boolean;
+  passwordManagerOffset?: number;
 };
 
 const [OTPInputContext, useOTPInputContext] = createContextAndHook<OTPInputProps>('OTPInputContext');
@@ -160,15 +162,21 @@ export const OTPResendButton = () => {
 export const OTPCodeControl = React.forwardRef<{ reset: any }>((_, ref) => {
   const [disabled, setDisabled] = React.useState(false);
   const refs = React.useRef<Array<HTMLInputElement | null>>([]);
+  const hiddenInputRef = React.useRef<HTMLInputElement>(null);
   const firstClickRef = React.useRef(false);
 
-  const { otpControl, isLoading, isDisabled, centerAlign = true } = useOTPInputContext();
+  const { otpControl, isLoading, isDisabled, centerAlign = true, passwordManagerOffset = 40 } = useOTPInputContext();
   const { feedback, values, setValues, feedbackType, length } = otpControl.otpInputProps;
 
   React.useImperativeHandle(ref, () => ({
     reset: () => {
       setValues(values.map(() => ''));
       setDisabled(false);
+
+      if (hiddenInputRef.current) {
+        hiddenInputRef.current.value = '';
+      }
+
       setTimeout(() => focusInputAt(0), 0);
     },
   }));
@@ -182,6 +190,13 @@ export const OTPCodeControl = React.forwardRef<{ reset: any }>((_, ref) => {
       setDisabled(true);
     }
   }, [feedback]);
+
+  // Update hidden input when values change
+  React.useEffect(() => {
+    if (hiddenInputRef.current) {
+      hiddenInputRef.current.value = values.join('');
+    }
+  }, [values]);
 
   const handleMultipleCharValue = ({ eventValue, inputPosition }: { eventValue: string; inputPosition: number }) => {
     const eventValues = (eventValue || '').split('');
@@ -274,40 +289,92 @@ export const OTPCodeControl = React.forwardRef<{ reset: any }>((_, ref) => {
     }
   };
 
+  // Handle hidden input changes (for password manager autofill)
+  const handleHiddenInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, '').slice(0, length);
+    const newValues = value.split('').concat(Array.from({ length: length - value.length }, () => ''));
+    setValues(newValues);
+
+    // Focus the appropriate visible input
+    if (value.length > 0) {
+      focusInputAt(Math.min(value.length - 1, length - 1));
+    }
+  };
+
   const centerSx = centerAlign ? { justifyContent: 'center', alignItems: 'center' } : {};
 
   return (
-    <Flex
-      isLoading={isLoading}
-      hasError={feedbackType === 'error'}
-      elementDescriptor={descriptors.otpCodeFieldInputs}
-      gap={2}
-      sx={t => ({ direction: 'ltr', padding: t.space.$1, marginLeft: `-${t.space.$1}`, ...centerSx })}
-    >
-      {values.map((value, index: number) => (
-        <SingleCharInput
-          elementDescriptor={descriptors.otpCodeFieldInput}
-          key={index}
-          value={value}
-          onClick={handleOnClick(index)}
-          onChange={handleOnChange(index)}
-          onKeyDown={handleOnKeyDown(index)}
-          onInput={handleOnInput(index)}
-          onPaste={handleOnPaste(index)}
-          id={`digit-${index}-field`}
-          ref={node => (refs.current[index] = node)}
-          autoFocus={index === 0 || undefined}
-          autoComplete='one-time-code'
-          aria-label={`${index === 0 ? 'Enter verification code. ' : ''}Digit ${index + 1}`}
-          isDisabled={isDisabled || isLoading || disabled || feedbackType === 'success'}
-          hasError={feedbackType === 'error'}
-          isSuccessfullyFilled={feedbackType === 'success'}
-          type='text'
-          inputMode='numeric'
-          name={`codeInput-${index}`}
-        />
-      ))}
-    </Flex>
+    <Box sx={{ position: 'relative' }}>
+      {/* Hidden input for password manager compatibility */}
+      <Input
+        ref={hiddenInputRef}
+        type='text'
+        autoComplete='one-time-code'
+        data-otp-hidden-input
+        inputMode='numeric'
+        pattern={`[0-9]{${length}}`}
+        minLength={length}
+        maxLength={length}
+        spellCheck={false}
+        aria-hidden='true'
+        tabIndex={-1}
+        onChange={handleHiddenInputChange}
+        onFocus={() => {
+          // When password manager focuses the hidden input, focus the first visible input
+          focusInputAt(0);
+        }}
+        sx={theme => ({
+          position: 'absolute',
+          left: '-9999px',
+          width: `calc(1px + ${passwordManagerOffset}px)`,
+          height: '1px',
+          opacity: theme.opacity.$hidden,
+          pointerEvents: 'none',
+          clipPath: `inset(0 ${passwordManagerOffset}px 0 0)`,
+        })}
+      />
+
+      <Flex
+        isLoading={isLoading}
+        hasError={feedbackType === 'error'}
+        elementDescriptor={descriptors.otpCodeFieldInputs}
+        gap={2}
+        sx={t => ({ direction: 'ltr', padding: t.space.$1, marginLeft: `-${t.space.$1}`, ...centerSx })}
+        role='group'
+        aria-label='Verification code input'
+      >
+        {values.map((value: string, index: number) => (
+          <SingleCharInput
+            elementDescriptor={descriptors.otpCodeFieldInput}
+            // eslint-disable-next-line react/no-array-index-key
+            key={index}
+            value={value}
+            onClick={handleOnClick(index)}
+            onChange={handleOnChange(index)}
+            onKeyDown={handleOnKeyDown(index)}
+            onInput={handleOnInput(index)}
+            onPaste={handleOnPaste(index)}
+            id={`digit-${index}-field`}
+            ref={node => (refs.current[index] = node)}
+            // eslint-disable-next-line jsx-a11y/no-autofocus
+            autoFocus={index === 0 || undefined}
+            autoComplete='off'
+            aria-label={`${index === 0 ? 'Enter verification code. ' : ''}Digit ${index + 1}`}
+            isDisabled={isDisabled || isLoading || disabled || feedbackType === 'success'}
+            hasError={feedbackType === 'error'}
+            isSuccessfullyFilled={feedbackType === 'success'}
+            type='text'
+            inputMode='numeric'
+            name={`codeInput-${index}`}
+            data-otp-segment
+            data-1p-ignore
+            data-lpignore='true'
+            maxLength={1}
+            pattern='[0-9]'
+          />
+        ))}
+      </Flex>
+    </Box>
   );
 });
 
