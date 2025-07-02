@@ -3,10 +3,9 @@ import type { PropsWithChildren } from 'react';
 import React, { useCallback } from 'react';
 
 import type { LocalizationKey } from '../customizables';
-import { descriptors, Flex, Input } from '../customizables';
+import { Box, descriptors, Flex, Input } from '../customizables';
 import { useCardState } from '../elements/contexts';
 import { useLoadingStatus } from '../hooks';
-import { Box } from '../primitives';
 import type { PropsOfComponent } from '../styledSystem';
 import { common, mqu } from '../styledSystem';
 import { handleError } from '../utils/errorHandler';
