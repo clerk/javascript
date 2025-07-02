@@ -1,6 +1,6 @@
 /**
  * The `TelemetryCollector` class handles collection of telemetry events from Clerk SDKs. Telemetry is opt-out and can be disabled by setting a CLERK_TELEMETRY_DISABLED environment variable.
- * The `ClerkProvider` also accepts a `telemetry` prop that will be passed to the collector during initialization:
+ * The `ClerkProvider` also accepts a `telemetry` prop that will be passed to the collector during initialization:.
  *
  * ```jsx
  * <ClerkProvider telemetry={false}>
@@ -8,7 +8,7 @@
  * </ClerkProvider>
  * ```
  *
- * For more information, please see the telemetry documentation page: https://clerk.com/docs/telemetry
+ * For more information, please see the telemetry documentation page: https://clerk.com/docs/telemetry.
  */
 import type {
   InstanceType,
@@ -17,6 +17,7 @@ import type {
   TelemetryEventRaw,
 } from '@clerk/types';
 
+import { getEnvVariable } from '../getEnvVariable';
 import { parsePublishableKey } from '../keys';
 import { isTruthy } from '../underscore';
 import { TelemetryEventThrottler } from './throttler';
@@ -98,7 +99,7 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
 
     // In browser or client environments, we most likely pass the disabled option to the collector, but in environments
     // where environment variables are available we also check for `CLERK_TELEMETRY_DISABLED`.
-    if (this.#config.disabled || (typeof process !== 'undefined' && isTruthy(process.env.CLERK_TELEMETRY_DISABLED))) {
+    if (this.#config.disabled || isTruthy(getEnvVariable('CLERK_TELEMETRY_DISABLED'))) {
       return false;
     }
 
@@ -113,7 +114,7 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
   }
 
   get isDebug(): boolean {
-    return this.#config.debug || (typeof process !== 'undefined' && isTruthy(process.env.CLERK_TELEMETRY_DEBUG));
+    return this.#config.debug || isTruthy(getEnvVariable('CLERK_TELEMETRY_DEBUG'));
   }
 
   record(event: TelemetryEventRaw): void {
