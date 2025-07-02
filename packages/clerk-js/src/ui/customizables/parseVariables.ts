@@ -4,11 +4,12 @@ import { spaceScaleKeys } from '../foundations/sizes';
 import type { fontSizes, fontWeights } from '../foundations/typography';
 import { colors } from '../utils/colors';
 import { colorOptionToThemedAlphaScale, colorOptionToThemedLightnessScale } from '../utils/colors/scales';
+import { cssSupports } from '../utils/cssSupports';
 import { fromEntries } from '../utils/fromEntries';
 import { removeUndefinedProps } from '../utils/removeUndefinedProps';
 
 export const createColorScales = (theme: Theme) => {
-  const variables = theme.variables || {};
+  const variables = removeInvalidValues(theme.variables || {});
 
   const dangerScale = colorOptionToThemedLightnessScale(variables.colorDanger, 'danger');
   const primaryScale = colorOptionToThemedLightnessScale(variables.colorPrimary, 'primary');
@@ -41,6 +42,49 @@ export const createColorScales = (theme: Theme) => {
     colorInputBackground: colors.toHslaString(variables.colorInputBackground),
     colorShimmer: colors.toHslaString(variables.colorShimmer),
   });
+};
+
+export const removeInvalidValues = (variables: NonNullable<Theme['variables']>): NonNullable<Theme['variables']> => {
+  // Check for modern color support. If present, we can simply return the variables as-is since we support everything
+  // CSS supports.
+  if (cssSupports.modernColor()) {
+    return variables;
+  }
+
+  // If not, we need to remove any values that are specified with CSS variables, as our color scale generation only
+  // supports CSS variables using modern CSS functionality.
+  const validVariables: Theme['variables'] = Object.fromEntries(
+    Object.entries(variables).filter(([key, value]) => {
+      if (typeof value === 'string') {
+        const isValid = !value.startsWith('var(');
+        if (!isValid) {
+          console.warn(
+            `Invalid color value: ${value} for key: ${key}, using default value instead. Using CSS variables is not supported in this browser.`,
+          );
+        }
+        return isValid;
+      }
+
+      if (typeof value === 'object') {
+        return Object.entries(value).every(([key, value]) => {
+          if (typeof value !== 'string') return true;
+
+          const isValid = !value.startsWith('var(');
+          if (!isValid) {
+            console.warn(
+              `Invalid color value: ${value} for key: ${key}, using default value instead. Using CSS variables is not supported in this browser.`,
+            );
+          }
+
+          return isValid;
+        });
+      }
+
+      return false;
+    }),
+  );
+
+  return validVariables;
 };
 
 export const createRadiiUnits = (theme: Theme) => {
