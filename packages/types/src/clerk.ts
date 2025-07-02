@@ -240,7 +240,7 @@ export interface Clerk {
   __internal_openSubscriptionDetails: (props?: __internal_SubscriptionDetailsProps) => void;
 
   /**
-   * Closes the Clerk PlanDetails drawer.
+   * Closes the Clerk SubscriptionDetails drawer.
    */
   __internal_closeSubscriptionDetails: () => void;
 
