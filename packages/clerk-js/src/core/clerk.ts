@@ -15,12 +15,11 @@ import {
 import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
 import { allSettled, handleValueOrFn, noop } from '@clerk/shared/utils';
 import type {
-  __experimental_PlanDetailsProps,
-  __experimental_SubscriptionDetailsProps,
   __internal_CheckoutProps,
   __internal_ComponentNavigationContext,
   __internal_OAuthConsentProps,
   __internal_PlanDetailsProps,
+  __internal_SubscriptionDetailsProps,
   __internal_UserVerificationModalProps,
   APIKeysNamespace,
   APIKeysProps,
@@ -591,27 +590,7 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls.ensureMounted().then(controls => controls.closeDrawer('checkout'));
   };
 
-  public __internal_openPlanDetails = (props?: __internal_PlanDetailsProps): void => {
-    this.assertComponentsReady(this.#componentControls);
-    if (disabledBillingFeature(this, this.environment)) {
-      if (this.#instanceType === 'development') {
-        throw new ClerkRuntimeError(warnings.cannotRenderAnyCommerceComponent('PlanDetails'), {
-          code: CANNOT_RENDER_BILLING_DISABLED_ERROR_CODE,
-        });
-      }
-      return;
-    }
-    void this.#componentControls
-      .ensureMounted({ preloadHint: 'PlanDetails' })
-      .then(controls => controls.openDrawer('planDetails', props || {}));
-  };
-
-  public __internal_closePlanDetails = (): void => {
-    this.assertComponentsReady(this.#componentControls);
-    void this.#componentControls.ensureMounted().then(controls => controls.closeDrawer('planDetails'));
-  };
-
-  public __experimental_openPlanDetails = (props?: __experimental_PlanDetailsProps): void => {
+  public __internal_openPlanDetails = (props: __internal_PlanDetailsProps): void => {
     this.assertComponentsReady(this.#componentControls);
     if (disabledBillingFeature(this, this.environment)) {
       if (this.#instanceType === 'development') {
@@ -628,19 +607,19 @@ export class Clerk implements ClerkInterface {
     this.telemetry?.record(eventPrebuiltComponentOpened(`PlanDetails`, props));
   };
 
-  public __experimental_closePlanDetails = (): void => {
+  public __internal_closePlanDetails = (): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls.ensureMounted().then(controls => controls.closeDrawer('planDetails'));
   };
 
-  public __experimental_openSubscriptionDetails = (props?: __experimental_SubscriptionDetailsProps): void => {
+  public __internal_openSubscriptionDetails = (props?: __internal_SubscriptionDetailsProps): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls
       .ensureMounted({ preloadHint: 'SubscriptionDetails' })
       .then(controls => controls.openDrawer('subscriptionDetails', props || {}));
   };
 
-  public __experimental_closeSubscriptionDetails = (): void => {
+  public __internal_closeSubscriptionDetails = (): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls.ensureMounted().then(controls => controls.closeDrawer('subscriptionDetails'));
   };

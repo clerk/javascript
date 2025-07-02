@@ -1,5 +1,5 @@
 import { useUser } from '@clerk/shared/react';
-import type { __experimental_SubscriptionDetailsProps, Appearance } from '@clerk/types';
+import type { __internal_SubscriptionDetailsProps, Appearance } from '@clerk/types';
 
 import { SubscriptionDetails } from '../components/SubscriptionDetails';
 import { LazyDrawerRenderer } from './providers';
@@ -13,7 +13,7 @@ export function MountedSubscriptionDetailDrawer({
   onOpenChange: (open: boolean) => void;
   subscriptionDetailsDrawer: {
     open: false;
-    props: null | __experimental_SubscriptionDetailsProps;
+    props: null | __internal_SubscriptionDetailsProps;
   };
 }) {
   const { user } = useUser();

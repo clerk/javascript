@@ -1,9 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
-import type {
-  __experimental_PlanDetailsProps,
-  CommercePlanResource,
-  CommerceSubscriptionPlanPeriod,
-} from '@clerk/types';
+import type { __internal_PlanDetailsProps, CommercePlanResource, CommerceSubscriptionPlanPeriod } from '@clerk/types';
 import * as React from 'react';
 import { useMemo, useState } from 'react';
 import useSWR from 'swr';
@@ -15,7 +11,7 @@ import { Switch } from '@/ui/elements/Switch';
 import { SubscriberTypeContext } from '../../contexts';
 import { Box, Col, descriptors, Flex, Heading, localizationKeys, Span, Spinner, Text } from '../../customizables';
 
-export const PlanDetails = (props: __experimental_PlanDetailsProps) => {
+export const PlanDetails = (props: __internal_PlanDetailsProps) => {
   return (
     <Drawer.Content>
       <PlanDetailsInternal {...props} />
@@ -27,7 +23,7 @@ const PlanDetailsInternal = ({
   planId,
   plan: initialPlan,
   initialPlanPeriod = 'month',
-}: __experimental_PlanDetailsProps) => {
+}: __internal_PlanDetailsProps) => {
   const clerk = useClerk();
   const [planPeriod, setPlanPeriod] = useState<CommerceSubscriptionPlanPeriod>(initialPlanPeriod);
 

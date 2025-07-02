@@ -3,11 +3,10 @@ import { clerkEvents, createClerkEventBus } from '@clerk/shared/clerkEventBus';
 import { loadClerkJsScript } from '@clerk/shared/loadClerkJsScript';
 import { handleValueOrFn } from '@clerk/shared/utils';
 import type {
-  __experimental_PlanDetailsProps,
-  __experimental_SubscriptionDetailsProps,
   __internal_CheckoutProps,
   __internal_OAuthConsentProps,
   __internal_PlanDetailsProps,
+  __internal_SubscriptionDetailsProps,
   __internal_UserVerificationModalProps,
   __internal_UserVerificationProps,
   APIKeysNamespace,
@@ -121,8 +120,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private preopenUserVerification?: null | __internal_UserVerificationProps = null;
   private preopenSignIn?: null | SignInProps = null;
   private preopenCheckout?: null | __internal_CheckoutProps = null;
-  private preopenPlanDetails?: null | __experimental_PlanDetailsProps = null;
-  private preopenSubscriptionDetails?: null | __experimental_SubscriptionDetailsProps = null;
+  private preopenPlanDetails: null | __internal_PlanDetailsProps = null;
+  private preopenSubscriptionDetails: null | __internal_SubscriptionDetailsProps = null;
   private preopenSignUp?: null | SignUpProps = null;
   private preopenUserProfile?: null | UserProfileProps = null;
   private preopenOrganizationProfile?: null | OrganizationProfileProps = null;
@@ -560,11 +559,11 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
 
     if (this.preopenPlanDetails !== null) {
-      clerkjs.__experimental_openPlanDetails(this.preopenPlanDetails);
+      clerkjs.__internal_openPlanDetails(this.preopenPlanDetails);
     }
 
     if (this.preopenSubscriptionDetails !== null) {
-      clerkjs.__experimental_openSubscriptionDetails(this.preopenSubscriptionDetails);
+      clerkjs.__internal_openSubscriptionDetails(this.preopenSubscriptionDetails);
     }
 
     if (this.preopenSignUp !== null) {
@@ -779,7 +778,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  __internal_openPlanDetails = (props?: __internal_PlanDetailsProps) => {
+  __internal_openPlanDetails = (props: __internal_PlanDetailsProps) => {
     if (this.clerkjs && this.loaded) {
       this.clerkjs.__internal_openPlanDetails(props);
     } else {
@@ -795,33 +794,17 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  __experimental_openPlanDetails = (props?: __experimental_PlanDetailsProps) => {
+  __internal_openSubscriptionDetails = (props?: __internal_SubscriptionDetailsProps) => {
     if (this.clerkjs && this.loaded) {
-      this.clerkjs.__experimental_openPlanDetails(props);
-    } else {
-      this.preopenPlanDetails = props;
-    }
-  };
-
-  __experimental_closePlanDetails = () => {
-    if (this.clerkjs && this.loaded) {
-      this.clerkjs.__experimental_closePlanDetails();
-    } else {
-      this.preopenPlanDetails = null;
-    }
-  };
-
-  __experimental_openSubscriptionDetails = (props?: __experimental_SubscriptionDetailsProps) => {
-    if (this.clerkjs && this.loaded) {
-      this.clerkjs.__experimental_openSubscriptionDetails(props);
+      this.clerkjs.__internal_openSubscriptionDetails(props);
     } else {
       this.preopenSubscriptionDetails = props;
     }
   };
 
-  __experimental_closeSubscriptionDetails = () => {
+  __internal_closeSubscriptionDetails = () => {
     if (this.clerkjs && this.loaded) {
-      this.clerkjs.__experimental_closeSubscriptionDetails();
+      this.clerkjs.__internal_closeSubscriptionDetails();
     } else {
       this.preopenSubscriptionDetails = null;
     }

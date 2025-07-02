@@ -224,9 +224,9 @@ export interface Clerk {
 
   /**
    * Opens the Clerk PlanDetails drawer component in a drawer.
-   * @param props Optional subscription details drawer configuration parameters.
+   * @param props `plan` or `planId` parameters are required.
    */
-  __internal_openPlanDetails: (props?: __internal_PlanDetailsProps) => void;
+  __internal_openPlanDetails: (props: __internal_PlanDetailsProps) => void;
 
   /**
    * Closes the Clerk PlanDetails drawer.
@@ -234,26 +234,15 @@ export interface Clerk {
   __internal_closePlanDetails: () => void;
 
   /**
-   * Opens the Clerk PlanDetails drawer component in a drawer.
-   * @param props Optional subscription details drawer configuration parameters.
+   * Opens the Clerk SubscriptionDetails drawer component in a drawer.
+   * @param props Optional configuration parameters.
    */
-  __experimental_openPlanDetails: (props?: __experimental_PlanDetailsProps) => void;
+  __internal_openSubscriptionDetails: (props?: __internal_SubscriptionDetailsProps) => void;
 
   /**
    * Closes the Clerk PlanDetails drawer.
    */
-  __experimental_closePlanDetails: () => void;
-
-  /**
-   * Opens the Clerk PlanDetails drawer component in a drawer.
-   * @param props Optional subscription details drawer configuration parameters.
-   */
-  __experimental_openSubscriptionDetails: (props?: __experimental_SubscriptionDetailsProps) => void;
-
-  /**
-   * Closes the Clerk PlanDetails drawer.
-   */
-  __experimental_closeSubscriptionDetails: () => void;
+  __internal_closeSubscriptionDetails: () => void;
 
   /**
   /** Opens the Clerk UserVerification component in a modal.
@@ -1761,23 +1750,18 @@ export type __internal_CheckoutProps = {
 export type __internal_PlanDetailsProps = {
   appearance?: PlanDetailTheme;
   plan?: CommercePlanResource;
-  subscriberType?: CommerceSubscriberType;
-  initialPlanPeriod?: CommerceSubscriptionPlanPeriod;
-  onSubscriptionCancel?: () => void;
-  portalId?: string;
-  portalRoot?: PortalRoot;
-};
-
-export type __experimental_PlanDetailsProps = {
-  appearance?: PlanDetailTheme;
-  plan?: CommercePlanResource;
   planId?: string;
   initialPlanPeriod?: CommerceSubscriptionPlanPeriod;
   portalId?: string;
   portalRoot?: PortalRoot;
 };
 
-export type __experimental_SubscriptionDetailsProps = {
+export type __internal_SubscriptionDetailsProps = {
+  /**
+   * The subscriber type to display the subscription details for.
+   * If `org` is provided, the subscription details will be displayed for the active organization.
+   * @default 'user'
+   */
   for?: CommerceSubscriberType;
   appearance?: SubscriptionDetailsTheme;
   onSubscriptionCancel?: () => void;

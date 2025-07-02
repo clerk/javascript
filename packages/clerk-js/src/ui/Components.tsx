@@ -1,8 +1,8 @@
 import { createDeferredPromise } from '@clerk/shared/utils';
 import type {
-  __experimental_PlanDetailsProps,
-  __experimental_SubscriptionDetailsProps,
   __internal_CheckoutProps,
+  __internal_PlanDetailsProps,
+  __internal_SubscriptionDetailsProps,
   __internal_UserVerificationProps,
   Appearance,
   Clerk,
@@ -112,9 +112,9 @@ export type ComponentControls = {
     props: T extends 'checkout'
       ? __internal_CheckoutProps
       : T extends 'planDetails'
-        ? __experimental_PlanDetailsProps
+        ? __internal_PlanDetailsProps
         : T extends 'subscriptionDetails'
-          ? __experimental_SubscriptionDetailsProps
+          ? __internal_SubscriptionDetailsProps
           : never,
   ) => void;
   closeDrawer: (
@@ -161,11 +161,11 @@ interface ComponentsState {
   };
   planDetailsDrawer: {
     open: false;
-    props: null | __experimental_PlanDetailsProps;
+    props: null | __internal_PlanDetailsProps;
   };
   subscriptionDetailsDrawer: {
     open: false;
-    props: null | __experimental_SubscriptionDetailsProps;
+    props: null | __internal_SubscriptionDetailsProps;
   };
   nodes: Map<HTMLDivElement, HtmlNodeOptions>;
   impersonationFab: boolean;

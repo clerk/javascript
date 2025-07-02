@@ -1,7 +1,7 @@
 import { useClerk, useOrganization } from '@clerk/shared/react';
 import type {
-  __experimental_SubscriptionDetailsProps,
   __internal_CheckoutProps,
+  __internal_SubscriptionDetailsProps,
   CommercePlanResource,
   CommerceSubscriptionResource,
 } from '@clerk/types';
@@ -55,7 +55,7 @@ const SubscriptionForCancellationContext = React.createContext<{
   setSubscription: () => {},
 });
 
-export const SubscriptionDetails = (props: __experimental_SubscriptionDetailsProps) => {
+export const SubscriptionDetails = (props: __internal_SubscriptionDetailsProps) => {
   return (
     <Drawer.Content>
       <SubscriptionDetailsContext.Provider value={{ componentName: 'SubscriptionDetails', ...props }}>
@@ -100,7 +100,7 @@ function useGuessableSubscription<Or extends 'throw' | undefined = undefined>(op
   };
 }
 
-const SubscriptionDetailsInternal = (props: __experimental_SubscriptionDetailsProps) => {
+const SubscriptionDetailsInternal = (props: __internal_SubscriptionDetailsProps) => {
   const { organization: _organization } = useOrganization();
   const [subscriptionForCancellation, setSubscriptionForCancellation] = useState<CommerceSubscriptionResource | null>(
     null,
