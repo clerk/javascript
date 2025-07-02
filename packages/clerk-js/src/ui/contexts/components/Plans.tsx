@@ -362,6 +362,7 @@ export const usePlansContext = () => {
 
       if (subscription && subscription.planPeriod === planPeriod && !subscription.canceledAtDate) {
         clerk.__experimental_openSubscriptionDetails({
+          for: subscriberType,
           onSubscriptionCancel: () => {
             revalidateAll();
             onSubscriptionChange?.();

@@ -27,7 +27,7 @@ export function MountedSubscriptionDetailDrawer({
       // Without this, the drawer would not be rendered after a session switch.
       key={user?.id}
       globalAppearance={appearance}
-      appearanceKey={'planDetails' as any}
+      appearanceKey={'subscriptionDetails' as any}
       componentAppearance={subscriptionDetailsDrawer.props.appearance || {}}
       flowName={'subscriptionDetails'}
       open={subscriptionDetailsDrawer.open}

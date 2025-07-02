@@ -3,7 +3,6 @@ import type {
   __experimental_PlanDetailsProps,
   __experimental_SubscriptionDetailsProps,
   __internal_CheckoutProps,
-  __internal_PlanDetailsProps,
   __internal_UserVerificationProps,
   Appearance,
   Clerk,
@@ -113,9 +112,9 @@ export type ComponentControls = {
     props: T extends 'checkout'
       ? __internal_CheckoutProps
       : T extends 'planDetails'
-        ? __internal_PlanDetailsProps
+        ? __experimental_PlanDetailsProps
         : T extends 'subscriptionDetails'
-          ? __internal_PlanDetailsProps
+          ? __experimental_SubscriptionDetailsProps
           : never,
   ) => void;
   closeDrawer: (

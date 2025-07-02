@@ -884,6 +884,7 @@ export type WaitlistTheme = Theme;
 export type PricingTableTheme = Theme;
 export type CheckoutTheme = Theme;
 export type PlanDetailTheme = Theme;
+export type SubscriptionDetailsTheme = Theme;
 export type APIKeysTheme = Theme;
 export type OAuthConsentTheme = Theme;
 

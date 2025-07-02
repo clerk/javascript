@@ -24,7 +24,7 @@ import { formatDate } from '@/ui/utils/formatDate';
 
 const isFreePlan = (plan: CommercePlanResource) => !plan.hasBaseFee;
 
-import { usePlansContext, useSubscriberTypeContext, useSubscriptions } from '../../contexts';
+import { SubscriberTypeContext, usePlansContext, useSubscriberTypeContext, useSubscriptions } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import {
   Badge,
@@ -59,7 +59,9 @@ export const SubscriptionDetails = (props: __experimental_SubscriptionDetailsPro
   return (
     <Drawer.Content>
       <SubscriptionDetailsContext.Provider value={{ componentName: 'SubscriptionDetails', ...props }}>
-        <SubscriptionDetailsInternal {...props} />
+        <SubscriberTypeContext.Provider value={props.for}>
+          <SubscriptionDetailsInternal {...props} />
+        </SubscriberTypeContext.Provider>
       </SubscriptionDetailsContext.Provider>
     </Drawer.Content>
   );

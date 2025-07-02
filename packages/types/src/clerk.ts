@@ -12,6 +12,7 @@ import type {
   PricingTableTheme,
   SignInTheme,
   SignUpTheme,
+  SubscriptionDetailsTheme,
   UserButtonTheme,
   UserProfileTheme,
   UserVerificationTheme,
@@ -1777,7 +1778,8 @@ export type __experimental_PlanDetailsProps = {
 };
 
 export type __experimental_SubscriptionDetailsProps = {
-  appearance?: PlanDetailTheme;
+  for?: CommerceSubscriberType;
+  appearance?: SubscriptionDetailsTheme;
   onSubscriptionCancel?: () => void;
   portalId?: string;
   portalRoot?: PortalRoot;
