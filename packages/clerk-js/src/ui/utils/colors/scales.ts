@@ -126,6 +126,11 @@ function processColorInput(
     };
   }
 
+  // If it's an object but missing the 500 shade, throw error
+  if (typeof color === 'object' && !color['500']) {
+    throw new Error('You need to provide at least the 500 shade');
+  }
+
   return null;
 }
 
