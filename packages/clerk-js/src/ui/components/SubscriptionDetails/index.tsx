@@ -297,8 +297,10 @@ function SubscriptionDetailsSummary() {
         <SummmaryItemValue>
           <Text colorScheme='secondary'>
             {upcomingSubscription
-              ? formatDate(upcomingSubscription.periodStart)
-              : formatDate(anySubscription.periodEnd)}
+              ? formatDate(upcomingSubscription.periodStartDate)
+              : anySubscription.periodEndDate
+                ? formatDate(anySubscription.periodEndDate)
+                : '-'}
           </Text>
         </SummmaryItemValue>
       </SummaryItem>
@@ -306,28 +308,26 @@ function SubscriptionDetailsSummary() {
         <SummmaryItemLabel>
           <Text>Next payment amount</Text>
         </SummmaryItemLabel>
-        <SummmaryItemValue>
-          <Span
-            sx={t => ({
-              display: 'flex',
-              alignItems: 'center',
-              gap: t.space.$1,
-            })}
+        <SummmaryItemValue
+          sx={t => ({
+            display: 'flex',
+            alignItems: 'center',
+            gap: t.space.$1,
+          })}
+        >
+          <Text
+            variant='caption'
+            colorScheme='secondary'
+            sx={{ textTransform: 'uppercase' }}
           >
-            <Text
-              variant='caption'
-              colorScheme='secondary'
-              sx={{ textTransform: 'uppercase' }}
-            >
-              {anySubscription.plan.currency}
-            </Text>
-            <Text>
-              {anySubscription.plan.currencySymbol}
-              {anySubscription.planPeriod === 'month'
-                ? anySubscription.plan.amountFormatted
-                : anySubscription.plan.annualAmountFormatted}
-            </Text>
-          </Span>
+            {anySubscription.plan.currency}
+          </Text>
+          <Text>
+            {anySubscription.plan.currencySymbol}
+            {anySubscription.planPeriod === 'month'
+              ? anySubscription.plan.amountFormatted
+              : anySubscription.plan.annualAmountFormatted}
+          </Text>
         </SummmaryItemValue>
       </SummaryItem>
     </Col>
@@ -465,7 +465,6 @@ const SubscriptionCardActions = ({ subscription }: { subscription: CommerceSubsc
 // New component for individual subscription cards
 const SubscriptionCard = ({ subscription }: { subscription: CommerceSubscriptionResource }) => {
   const isActive = subscription.status === 'active';
-  const isFree = isFreePlan(subscription.plan);
   const { t } = useLocalizations();
 
   return (
@@ -547,17 +546,18 @@ const SubscriptionCard = ({ subscription }: { subscription: CommerceSubscription
             // TODO: Use localization for dates
             value={formatDate(subscription.createdAt)}
           />
-          {!isFree && (
+          {/* The free plan does not have a period end date */}
+          {subscription.periodEndDate && (
             <DetailRow
-              label={subscription.canceledAt ? 'Ends on' : 'Renews at'}
-              value={formatDate(subscription.periodEnd)}
+              label={subscription.canceledAtDate ? 'Ends on' : 'Renews at'}
+              value={formatDate(subscription.periodEndDate)}
             />
           )}
         </>
       ) : (
         <DetailRow
           label='Begins on'
-          value={formatDate(subscription.periodStart)}
+          value={formatDate(subscription.periodStartDate)}
         />
       )}
     </Col>
@@ -567,6 +567,7 @@ const SubscriptionCard = ({ subscription }: { subscription: CommerceSubscription
 // Helper component for detail rows
 const DetailRow = ({ label, value }: { label: string; value: string }) => (
   <Flex
+    elementDescriptor={descriptors.subscriptionDetailsDetailRow}
     justify='between'
     align='center'
     sx={t => ({
@@ -577,8 +578,13 @@ const DetailRow = ({ label, value }: { label: string; value: string }) => (
       borderBlockStartColor: t.colors.$neutralAlpha100,
     })}
   >
-    <Text>{label}</Text>
-    <Text colorScheme='secondary'>{value}</Text>
+    <Text elementDescriptor={descriptors.subscriptionDetailsDetailRowLabel}>{label}</Text>
+    <Text
+      elementDescriptor={descriptors.subscriptionDetailsDetailRowValue}
+      colorScheme='secondary'
+    >
+      {value}
+    </Text>
   </Flex>
 );
 
@@ -613,15 +619,19 @@ function SummmaryItemLabel(props: React.PropsWithChildren) {
   );
 }
 
-function SummmaryItemValue(props: React.PropsWithChildren) {
+function SummmaryItemValue(props: Parameters<typeof Span>[0]) {
   return (
     <Span
       elementDescriptor={descriptors.subscriptionDetailsSummaryValue}
-      sx={t => ({
-        display: 'flex',
-        alignItems: 'center',
-        gap: t.space.$0x25,
-      })}
+      {...props}
+      sx={[
+        t => ({
+          display: 'flex',
+          alignItems: 'center',
+          gap: t.space.$0x25,
+        }),
+        props.sx,
+      ]}
     >
       {props.children}
     </Span>

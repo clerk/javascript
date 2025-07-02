@@ -620,6 +620,9 @@ export type ElementsConfig = {
   subscriptionDetailsSummaryItem: WithOptions;
   subscriptionDetailsSummaryLabel: WithOptions;
   subscriptionDetailsSummaryValue: WithOptions;
+  subscriptionDetailsDetailRow: WithOptions;
+  subscriptionDetailsDetailRowLabel: WithOptions;
+  subscriptionDetailsDetailRowValue: WithOptions;
 };
 
 export type Elements = {
