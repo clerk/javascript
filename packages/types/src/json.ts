@@ -702,6 +702,7 @@ export interface CommerceSubscriptionJSON extends ClerkResourceJSON {
   plan: CommercePlanJSON;
   plan_period: CommerceSubscriptionPlanPeriod;
   status: CommerceSubscriptionStatus;
+  created_at: number;
   period_start: number;
   period_end: number;
   canceled_at: number | null;

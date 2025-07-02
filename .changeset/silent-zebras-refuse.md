@@ -1,0 +1,3 @@
+---
+'@clerk/clerk-js': patch
+---

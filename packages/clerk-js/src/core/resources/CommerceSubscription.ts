@@ -8,8 +8,9 @@ import type {
   DeletedObjectJSON,
 } from '@clerk/types';
 
+import { unixEpochToDate } from '@/utils/date';
+
 import { commerceMoneyFromJSON } from '../../utils';
-import { unixEpochToDate } from '../../utils/date';
 import { BaseResource, CommercePlan, DeletedObject } from './internal';
 
 export class CommerceSubscription extends BaseResource implements CommerceSubscriptionResource {
@@ -19,13 +20,17 @@ export class CommerceSubscription extends BaseResource implements CommerceSubscr
   planPeriod!: CommerceSubscriptionPlanPeriod;
   status!: CommerceSubscriptionStatus;
   createdAt!: Date;
-  periodStart!: Date;
-  periodEnd!: Date;
-  canceledAt!: Date | null;
+  periodStartDate!: Date;
+  periodEndDate!: Date | null;
+  canceledAtDate!: Date | null;
+  periodStart!: number;
+  periodEnd!: number;
+  canceledAt!: number | null;
   amount?: CommerceMoney;
   credit?: {
     amount: CommerceMoney;
   };
+
   constructor(data: CommerceSubscriptionJSON) {
     super();
     this.fromJSON(data);
@@ -41,10 +46,15 @@ export class CommerceSubscription extends BaseResource implements CommerceSubscr
     this.plan = new CommercePlan(data.plan);
     this.planPeriod = data.plan_period;
     this.status = data.status;
+    this.periodStart = data.period_start;
+    this.periodEnd = data.period_end;
+    this.canceledAt = data.canceled_at;
+
     this.createdAt = unixEpochToDate(data.created_at);
-    this.periodStart = unixEpochToDate(data.period_start);
-    this.periodEnd = unixEpochToDate(data.period_end);
-    this.canceledAt = data.canceled_at ? unixEpochToDate(data.canceled_at) : null;
+    this.periodStartDate = unixEpochToDate(data.period_start);
+    this.periodEndDate = data.period_end ? unixEpochToDate(data.period_end) : null;
+    this.canceledAtDate = data.canceled_at ? unixEpochToDate(data.canceled_at) : null;
+
     this.amount = data.amount ? commerceMoneyFromJSON(data.amount) : undefined;
     this.credit = data.credit && data.credit.amount ? { amount: commerceMoneyFromJSON(data.credit.amount) } : undefined;
     return this;

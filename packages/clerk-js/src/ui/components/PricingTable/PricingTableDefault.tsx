@@ -144,7 +144,7 @@ function Card(props: CardProps) {
     shouldShowFooter = true;
     shouldShowFooterNotice = true;
   } else if (subscription.status === 'active') {
-    if (subscription.canceledAt) {
+    if (subscription.canceledAtDate) {
       shouldShowFooter = true;
       shouldShowFooterNotice = false;
     } else if (planPeriod !== subscription.planPeriod && plan.annualMonthlyAmount > 0) {
@@ -254,7 +254,7 @@ function Card(props: CardProps) {
                 elementDescriptor={descriptors.pricingTableCardFooterNotice}
                 variant={isCompact ? 'buttonSmall' : 'buttonLarge'}
                 localizationKey={localizationKeys('badge__startsAt', {
-                  date: subscription?.periodStart,
+                  date: subscription?.periodStartDate,
                 })}
                 colorScheme='secondary'
                 sx={t => ({

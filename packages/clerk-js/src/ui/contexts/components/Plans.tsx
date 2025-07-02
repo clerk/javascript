@@ -98,9 +98,9 @@ export const useSubscriptions = () => {
     if (
       isSignedIn &&
       defaultFreePlan &&
-      (_subscriptions.data.length === 0 || !_subscriptions.data.some(subscription => !subscription.canceledAt))
+      (_subscriptions.data.length === 0 || !_subscriptions.data.some(subscription => !subscription.canceledAtDate))
     ) {
-      const canceledSubscription = _subscriptions.data.find(subscription => subscription.canceledAt);
+      const canceledSubscription = _subscriptions.data.find(subscription => subscription.canceledAtDate);
       return [
         ..._subscriptions.data,
         new CommerceSubscription({
@@ -111,9 +111,9 @@ export const useSubscriptions = () => {
           plan_period: 'month',
           canceled_at: null,
           status: _subscriptions.data.length === 0 ? 'active' : 'upcoming',
-          period_start: canceledSubscription?.periodEnd?.getTime() || 0,
+          created_at: canceledSubscription?.periodEndDate?.getTime() || 0,
+          period_start: canceledSubscription?.periodEndDate?.getTime() || 0,
           period_end: 0,
-          created_at: canceledSubscription?.periodEnd?.getTime() || 0,
         }),
       ];
     }
@@ -191,7 +191,7 @@ export const usePlansContext = () => {
   // should the default plan be shown as active
   const isDefaultPlanImplicitlyActiveOrUpcoming = useMemo(() => {
     // are there no subscriptions or are all subscriptions canceled
-    return subscriptions.length === 0 || !subscriptions.some(subscription => !subscription.canceledAt);
+    return subscriptions.length === 0 || !subscriptions.some(subscription => !subscription.canceledAtDate);
   }, [subscriptions]);
 
   // return the active or upcoming subscription for a plan if it exists
@@ -240,7 +240,7 @@ export const usePlansContext = () => {
     ({ plan, subscription: sub }: { plan?: CommercePlanResource; subscription?: CommerceSubscriptionResource }) => {
       const subscription = sub ?? (plan ? activeOrUpcomingSubscription(plan) : undefined);
 
-      return !subscription || !subscription.canceledAt;
+      return !subscription || !subscription.canceledAtDate;
     },
     [activeOrUpcomingSubscription],
   );
@@ -283,7 +283,7 @@ export const usePlansContext = () => {
       const getLocalizationKey = () => {
         // Handle subscription cases
         if (subscription) {
-          if (_selectedPlanPeriod !== subscription.planPeriod && subscription.canceledAt) {
+          if (_selectedPlanPeriod !== subscription.planPeriod && subscription.canceledAtDate) {
             if (_selectedPlanPeriod === 'month') {
               return localizationKeys('commerce.switchToMonthly');
             }
@@ -293,7 +293,7 @@ export const usePlansContext = () => {
             }
           }
 
-          if (subscription.canceledAt) {
+          if (subscription.canceledAtDate) {
             return localizationKeys('commerce.reSubscribe');
           }
 
@@ -333,12 +333,16 @@ export const usePlansContext = () => {
 
   const captionForSubscription = useCallback((subscription: CommerceSubscriptionResource) => {
     if (subscription.status === 'upcoming') {
-      return localizationKeys('badge__startsAt', { date: subscription.periodStart });
-    } else if (subscription.canceledAt) {
-      return localizationKeys('badge__canceledEndsAt', { date: subscription.periodEnd });
-    } else {
-      return localizationKeys('badge__renewsAt', { date: subscription.periodEnd });
+      return localizationKeys('badge__startsAt', { date: subscription.periodStartDate });
     }
+    if (subscription.canceledAtDate) {
+      // @ts-expect-error `periodEndDate` is always defined when `canceledAtDate` exists
+      return localizationKeys('badge__canceledEndsAt', { date: subscription.periodEndDate });
+    }
+    if (subscription.periodEndDate) {
+      return localizationKeys('badge__renewsAt', { date: subscription.periodEndDate });
+    }
+    return;
   }, []);
 
   // handle the selection of a plan, either by opening the subscription details or checkout
@@ -356,7 +360,7 @@ export const usePlansContext = () => {
 
       const portalRoot = getClosestProfileScrollBox(mode, event);
 
-      if (subscription && subscription.planPeriod === planPeriod && !subscription.canceledAt) {
+      if (subscription && subscription.planPeriod === planPeriod && !subscription.canceledAtDate) {
         clerk.__experimental_openSubscriptionDetails({
           onSubscriptionCancel: () => {
             revalidateAll();

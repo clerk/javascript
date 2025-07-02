@@ -125,7 +125,7 @@ export function SubscriptionsList({
                       >
                         {subscription.plan.name}
                       </Text>
-                      {sortedSubscriptions.length > 1 || !!subscription.canceledAt ? (
+                      {sortedSubscriptions.length > 1 || !!subscription.canceledAtDate ? (
                         <Badge
                           colorScheme={subscription.status === 'active' ? 'secondary' : 'primary'}
                           localizationKey={
