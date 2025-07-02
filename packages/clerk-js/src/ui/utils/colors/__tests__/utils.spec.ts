@@ -6,15 +6,10 @@ import {
   createColorMixString,
   createEmptyColorScale,
   createRelativeColorString,
-  extractCSSVariableValue,
-  extractCSSVariableValueWithFallback,
-  extractMultipleCSSVariables,
   generateAlphaColorMix,
   generateColorMixSyntax,
   generateRelativeColorSyntax,
   getSupportedColorVariant,
-  isCSSVariable,
-  resolveCSSVariable,
 } from '../utils';
 
 // Mock cssSupports
@@ -188,156 +183,6 @@ describe('Color Utils', () => {
 
       const result = getSupportedColorVariant('red', 400);
       expect(result).toBe('red');
-    });
-  });
-
-  describe('CSS Variable Utilities', () => {
-    describe('isCSSVariable', () => {
-      it('should return true for valid CSS variables', () => {
-        expect(isCSSVariable('var(--color)')).toBe(true);
-        expect(isCSSVariable('var(--primary-color)')).toBe(true);
-        expect(isCSSVariable('var(--color, red)')).toBe(true);
-        expect(isCSSVariable('var(--color, rgba(255, 0, 0, 0.5))')).toBe(true);
-        expect(isCSSVariable('var( --color )')).toBe(true); // with spaces
-      });
-
-      it('should return false for invalid CSS variables', () => {
-        expect(isCSSVariable('--color')).toBe(false);
-        expect(isCSSVariable('color')).toBe(false);
-        expect(isCSSVariable('red')).toBe(false);
-        expect(isCSSVariable('#ff0000')).toBe(false);
-        expect(isCSSVariable('rgb(255, 0, 0)')).toBe(false);
-        expect(isCSSVariable('var(color)')).toBe(false); // missing --
-        expect(isCSSVariable('var(--)')).toBe(false); // empty variable name
-      });
-
-      it('should handle edge cases', () => {
-        expect(isCSSVariable('')).toBe(false);
-        expect(isCSSVariable(' ')).toBe(false);
-        // @ts-expect-error Testing runtime behavior
-        expect(isCSSVariable(null)).toBe(false);
-        // @ts-expect-error Testing runtime behavior
-        expect(isCSSVariable(undefined)).toBe(false);
-      });
-    });
-
-    describe('extractCSSVariableValue', () => {
-      it('should extract values from different variable name formats', () => {
-        mockGetPropertyValue.mockReturnValue('red');
-
-        expect(extractCSSVariableValue('var(--color)')).toBe('red');
-        expect(extractCSSVariableValue('--color')).toBe('red');
-        expect(extractCSSVariableValue('color')).toBe('red');
-
-        expect(mockGetPropertyValue).toHaveBeenCalledWith('--color');
-      });
-
-      it('should return null for non-existent variables', () => {
-        mockGetPropertyValue.mockReturnValue('');
-
-        expect(extractCSSVariableValue('--nonexistent')).toBe(null);
-      });
-
-      it('should trim whitespace from values', () => {
-        mockGetPropertyValue.mockReturnValue('  red  ');
-
-        expect(extractCSSVariableValue('--color')).toBe('red');
-      });
-
-      it('should use custom element when provided', () => {
-        const mockElement = document.createElement('div');
-        mockGetPropertyValue.mockReturnValue('blue');
-
-        extractCSSVariableValue('--color', mockElement);
-
-        expect(mockGetComputedStyle).toHaveBeenCalledWith(mockElement);
-      });
-
-      it('should use document.documentElement by default', () => {
-        mockGetPropertyValue.mockReturnValue('green');
-
-        extractCSSVariableValue('--color');
-
-        expect(mockGetComputedStyle).toHaveBeenCalledWith(document.documentElement);
-      });
-    });
-
-    describe('extractCSSVariableValueWithFallback', () => {
-      it('should return variable value when found', () => {
-        mockGetPropertyValue.mockReturnValue('red');
-
-        expect(extractCSSVariableValueWithFallback('--color', 'blue')).toBe('red');
-      });
-
-      it('should return fallback when variable not found', () => {
-        mockGetPropertyValue.mockReturnValue('');
-
-        expect(extractCSSVariableValueWithFallback('--color', 'blue')).toBe('blue');
-        expect(extractCSSVariableValueWithFallback('--color', 42)).toBe(42);
-        expect(extractCSSVariableValueWithFallback('--color', null)).toBe(null);
-      });
-    });
-
-    describe('extractMultipleCSSVariables', () => {
-      it('should extract multiple variables', () => {
-        mockGetPropertyValue.mockReturnValueOnce('red').mockReturnValueOnce('blue').mockReturnValueOnce('');
-
-        const result = extractMultipleCSSVariables(['--primary-color', '--secondary-color', '--nonexistent-color']);
-
-        expect(result).toEqual({
-          '--primary-color': 'red',
-          '--secondary-color': 'blue',
-          '--nonexistent-color': null,
-        });
-      });
-
-      it('should handle empty array', () => {
-        const result = extractMultipleCSSVariables([]);
-        expect(result).toEqual({});
-      });
-    });
-
-    describe('resolveCSSVariable', () => {
-      it('should resolve CSS variables with values', () => {
-        mockGetPropertyValue.mockReturnValue('red');
-
-        expect(resolveCSSVariable('var(--color)')).toBe('red');
-      });
-
-      it('should return fallback when variable not found', () => {
-        mockGetPropertyValue.mockReturnValue('');
-
-        expect(resolveCSSVariable('var(--color, blue)')).toBe('blue');
-        expect(resolveCSSVariable('var(--color, rgba(255, 0, 0, 0.5))')).toBe('rgba(255, 0, 0, 0.5)');
-      });
-
-      it('should return null when variable not found and no fallback', () => {
-        mockGetPropertyValue.mockReturnValue('');
-
-        expect(resolveCSSVariable('var(--color)')).toBe(null);
-      });
-
-      it('should return null for non-CSS variables', () => {
-        expect(resolveCSSVariable('red')).toBe(null);
-        expect(resolveCSSVariable('#ff0000')).toBe(null);
-        expect(resolveCSSVariable('--color')).toBe(null);
-      });
-
-      it('should handle whitespace in fallback values', () => {
-        mockGetPropertyValue.mockReturnValue('');
-
-        expect(resolveCSSVariable('var(--color,  blue  )')).toBe('blue');
-      });
-
-      it('should use custom element when provided', () => {
-        const mockElement = document.createElement('div');
-        mockGetPropertyValue.mockReturnValue('purple');
-
-        const result = resolveCSSVariable('var(--color)', mockElement);
-
-        expect(result).toBe('purple');
-        expect(mockGetComputedStyle).toHaveBeenCalledWith(mockElement);
-      });
     });
   });
 });
