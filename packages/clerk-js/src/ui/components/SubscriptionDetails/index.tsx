@@ -25,6 +25,7 @@ import { formatDate } from '@/ui/utils/formatDate';
 const isFreePlan = (plan: CommercePlanResource) => !plan.hasBaseFee;
 
 import { usePlansContext, useSubscriberTypeContext, useSubscriptions } from '../../contexts';
+import type { LocalizationKey } from '../../customizables';
 import {
   Badge,
   Box,
@@ -136,7 +137,7 @@ const SubscriptionDetailsInternal = (props: __experimental_SubscriptionDetailsPr
         setConfirmationOpen,
       }}
     >
-      <Drawer.Header title='Subscription' />
+      <Drawer.Header title={localizationKeys('commerce.subscriptionDetails.title')} />
 
       <Drawer.Body>
         <Col
@@ -254,7 +255,8 @@ const SubscriptionDetailsFooter = withCardStateProvider(() => {
                   ? localizationKeys('commerce.cancelSubscriptionNoCharge')
                   : localizationKeys('commerce.cancelSubscriptionAccessUntil', {
                       plan: subscription.plan.name,
-                      date: subscription.periodEnd,
+                      // @ts-expect-error this will always be defined in this state
+                      date: subscription.periodEndDate,
                     })
               }
             />
@@ -268,6 +270,7 @@ const SubscriptionDetailsFooter = withCardStateProvider(() => {
 
 function SubscriptionDetailsSummary() {
   const { anySubscription, activeSubscription, upcomingSubscription } = useGuessableSubscription({ or: 'throw' });
+  const { t } = useLocalizations();
 
   if (!activeSubscription) {
     return null;
@@ -284,15 +287,25 @@ function SubscriptionDetailsSummary() {
     >
       <SummaryItem>
         <SummmaryItemLabel>
-          <Text colorScheme='secondary'>Current billing cycle</Text>
+          <Text
+            colorScheme='secondary'
+            localizationKey={localizationKeys('commerce.subscriptionDetails.currentBillingCycle')}
+          />
         </SummmaryItemLabel>
         <SummmaryItemValue>
-          <Text colorScheme='secondary'>{activeSubscription.planPeriod === 'month' ? 'Monthly' : 'Annually'}</Text>
+          <Text
+            colorScheme='secondary'
+            localizationKey={
+              activeSubscription.planPeriod === 'month'
+                ? localizationKeys('commerce.monthly')
+                : localizationKeys('commerce.annually')
+            }
+          />
         </SummmaryItemValue>
       </SummaryItem>
       <SummaryItem>
         <SummmaryItemLabel>
-          <Text colorScheme='secondary'>Next payment on</Text>
+          <Text colorScheme='secondary'>{t(localizationKeys('commerce.subscriptionDetails.nextPaymentOn'))}</Text>
         </SummmaryItemLabel>
         <SummmaryItemValue>
           <Text colorScheme='secondary'>
@@ -306,7 +319,10 @@ function SubscriptionDetailsSummary() {
       </SummaryItem>
       <SummaryItem>
         <SummmaryItemLabel>
-          <Text>Next payment amount</Text>
+          <Text
+            colorScheme='secondary'
+            localizationKey={localizationKeys('commerce.subscriptionDetails.nextPaymentAmount')}
+          />
         </SummmaryItemLabel>
         <SummmaryItemValue
           sx={t => ({
@@ -337,6 +353,7 @@ function SubscriptionDetailsSummary() {
 const SubscriptionCardActions = ({ subscription }: { subscription: CommerceSubscriptionResource }) => {
   const { portalRoot } = useSubscriptionDetailsContext();
   const { __internal_openCheckout } = useClerk();
+  const { t } = useLocalizations();
   const subscriberType = useSubscriberTypeContext();
   const { setIsOpen } = useDrawerContext();
   const { revalidateAll } = usePlansContext();
@@ -348,8 +365,8 @@ const SubscriptionCardActions = ({ subscription }: { subscription: CommerceSubsc
     (subscription.planPeriod === 'month' && subscription.plan.annualMonthlyAmount > 0) ||
     subscription.planPeriod === 'annual';
   const isFree = isFreePlan(subscription.plan);
-  const isCancellable = subscription.canceledAt === null && !isFree;
-  const isReSubscribable = subscription.canceledAt !== null && !isFree;
+  const isCancellable = subscription.canceledAtDate === null && !isFree;
+  const isReSubscribable = subscription.canceledAtDate !== null && !isFree;
 
   const openCheckout = useCallback(
     (params?: __internal_CheckoutProps) => {
@@ -438,7 +455,7 @@ const SubscriptionCardActions = ({ subscription }: { subscription: CommerceSubsc
     <ThreeDotsMenu
       trigger={
         <Button
-          aria-label='Manage subscription'
+          aria-label={t(localizationKeys('commerce.manageSubscription'))}
           variant='bordered'
           colorScheme='secondary'
           sx={t => ({
@@ -466,6 +483,8 @@ const SubscriptionCardActions = ({ subscription }: { subscription: CommerceSubsc
 const SubscriptionCard = ({ subscription }: { subscription: CommerceSubscriptionResource }) => {
   const isActive = subscription.status === 'active';
   const { t } = useLocalizations();
+
+  console.log(subscription.periodEndDate, subscription.canceledAtDate, subscription);
 
   return (
     <Col
@@ -542,21 +561,24 @@ const SubscriptionCard = ({ subscription }: { subscription: CommerceSubscription
       {isActive ? (
         <>
           <DetailRow
-            label='Subscribed on'
-            // TODO: Use localization for dates
+            label={localizationKeys('commerce.subscriptionDetails.subscribedOn')}
             value={formatDate(subscription.createdAt)}
           />
           {/* The free plan does not have a period end date */}
           {subscription.periodEndDate && (
             <DetailRow
-              label={subscription.canceledAtDate ? 'Ends on' : 'Renews at'}
+              label={
+                subscription.canceledAtDate
+                  ? localizationKeys('commerce.subscriptionDetails.endsOn')
+                  : localizationKeys('commerce.subscriptionDetails.renewsAt')
+              }
               value={formatDate(subscription.periodEndDate)}
             />
           )}
         </>
       ) : (
         <DetailRow
-          label='Begins on'
+          label={localizationKeys('commerce.subscriptionDetails.beginsOn')}
           value={formatDate(subscription.periodStartDate)}
         />
       )}
@@ -565,7 +587,7 @@ const SubscriptionCard = ({ subscription }: { subscription: CommerceSubscription
 };
 
 // Helper component for detail rows
-const DetailRow = ({ label, value }: { label: string; value: string }) => (
+const DetailRow = ({ label, value }: { label: LocalizationKey; value: string }) => (
   <Flex
     elementDescriptor={descriptors.subscriptionDetailsDetailRow}
     justify='between'
@@ -578,7 +600,10 @@ const DetailRow = ({ label, value }: { label: string; value: string }) => (
       borderBlockStartColor: t.colors.$neutralAlpha100,
     })}
   >
-    <Text elementDescriptor={descriptors.subscriptionDetailsDetailRowLabel}>{label}</Text>
+    <Text
+      elementDescriptor={descriptors.subscriptionDetailsDetailRowLabel}
+      localizationKey={label}
+    />
     <Text
       elementDescriptor={descriptors.subscriptionDetailsDetailRowValue}
       colorScheme='secondary'

@@ -198,6 +198,16 @@ export type __internal_LocalizationResource = {
     cancelSubscriptionNoCharge: LocalizationValue;
     cancelSubscriptionAccessUntil: LocalizationValue<'plan' | 'date'>;
     popular: LocalizationValue;
+    subscriptionDetails: {
+      title: LocalizationValue;
+      currentBillingCycle: LocalizationValue;
+      nextPaymentOn: LocalizationValue;
+      nextPaymentAmount: LocalizationValue;
+      subscribedOn: LocalizationValue;
+      endsOn: LocalizationValue;
+      renewsAt: LocalizationValue;
+      beginsOn: LocalizationValue;
+    };
     monthly: LocalizationValue;
     annually: LocalizationValue;
     cannotSubscribeMonthly: LocalizationValue;
