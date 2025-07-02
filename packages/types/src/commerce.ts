@@ -10,6 +10,7 @@ type WithOptionalOrgType<T> = T & {
 export interface CommerceBillingNamespace {
   getPaymentAttempts: (params: GetPaymentAttemptsParams) => Promise<ClerkPaginatedResponse<CommercePaymentResource>>;
   getPlans: (params?: GetPlansParams) => Promise<CommercePlanResource[]>;
+  getPlan: (params: { id: string }) => Promise<CommercePlanResource>;
   getSubscriptions: (params: GetSubscriptionsParams) => Promise<ClerkPaginatedResponse<CommerceSubscriptionResource>>;
   getStatements: (params: GetStatementsParams) => Promise<ClerkPaginatedResponse<CommerceStatementResource>>;
   startCheckout: (params: CreateCheckoutParams) => Promise<CommerceCheckoutResource>;
@@ -154,8 +155,21 @@ export interface CommerceSubscriptionResource extends ClerkResource {
   plan: CommercePlanResource;
   planPeriod: CommerceSubscriptionPlanPeriod;
   status: CommerceSubscriptionStatus;
+  createdAt: Date;
+  periodStartDate: Date;
+  periodEndDate: Date | null;
+  canceledAtDate: Date | null;
+  /**
+   * @deprecated Use `periodStartDate` instead
+   */
   periodStart: number;
+  /**
+   * @deprecated Use `periodEndDate` instead
+   */
   periodEnd: number;
+  /**
+   * @deprecated Use `canceledAtDate` instead
+   */
   canceledAt: number | null;
   amount?: CommerceMoney;
   credit?: {

@@ -257,6 +257,7 @@ const AddPaymentSourceForm = ({ children }: PropsWithChildren) => {
   const elements = useElements();
   const { displayConfig } = useEnvironment();
   const { t } = useLocalizations();
+  const subscriberType = useSubscriberTypeContext();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -271,7 +272,7 @@ const AddPaymentSourceForm = ({ children }: PropsWithChildren) => {
     const { setupIntent, error } = await stripe.confirmSetup({
       elements,
       confirmParams: {
-        return_url: '', // TODO(@COMMERCE): need to figure this out
+        return_url: window.location.href,
       },
       redirect: 'if_required',
     });
@@ -315,7 +316,8 @@ const AddPaymentSourceForm = ({ children }: PropsWithChildren) => {
               ? {
                   recurringPaymentRequest: {
                     paymentDescription: `${t(localizationKeys(checkout.planPeriod === 'month' ? 'commerce.paymentSource.applePayDescription.monthly' : 'commerce.paymentSource.applePayDescription.annual'))}`,
-                    managementURL: displayConfig.homeUrl, // TODO(@COMMERCE): is this the right URL?
+                    managementURL:
+                      subscriberType === 'org' ? displayConfig.organizationProfileUrl : displayConfig.userProfileUrl,
                     regularBilling: {
                       amount: checkout.totals.totalDueNow?.amount || checkout.totals.grandTotal.amount,
                       label: checkout.plan.name,
