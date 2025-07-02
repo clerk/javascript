@@ -193,8 +193,7 @@ expect.extend({
       };
     } else {
       return {
-        message: () =>
-          `expected to be signed in, but got ${received.status}`,
+        message: () => `expected to be signed in, but got ${received.status}`,
         pass: false,
       };
     }
