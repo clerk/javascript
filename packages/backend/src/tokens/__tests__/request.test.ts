@@ -1435,6 +1435,36 @@ describe('tokens.authenticateRequest(options)', () => {
       });
     });
 
+    test('triggers handshake for cross-site document request on primary domain', async () => {
+      const request = mockRequestWithCookies(
+        {
+          referer: 'https://satellite.com/signin',
+          'sec-fetch-dest': 'document',
+          'sec-fetch-site': 'cross-site',
+          origin: 'https://primary.com',
+        },
+        {
+          __session: mockJwt,
+          __client_uat: '12345',
+        },
+        'https://primary.com/dashboard',
+      );
+
+      const requestState = await authenticateRequest(request, {
+        ...mockOptions(),
+        publishableKey: PK_LIVE,
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+
+      expect(requestState).toMatchHandshake({
+        reason: AuthErrorReason.PrimaryDomainCrossOriginSync,
+        domain: 'primary.com',
+        signInUrl: 'https://primary.com/sign-in',
+      });
+    });
+
     test('does not trigger handshake when referer is same origin', async () => {
       const request = mockRequestWithCookies(
         {

@@ -63,6 +63,7 @@ const Headers = {
   Origin: 'origin',
   Referrer: 'referer',
   SecFetchDest: 'sec-fetch-dest',
+  SecFetchSite: 'sec-fetch-site',
   UserAgent: 'user-agent',
   ReportingEndpoints: 'reporting-endpoints',
 } as const;
