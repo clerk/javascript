@@ -17,7 +17,6 @@ import type {
   TelemetryEventRaw,
 } from '@clerk/types';
 
-import { getEnvVariable } from '../getEnvVariable';
 import { parsePublishableKey } from '../keys';
 import { isTruthy } from '../underscore';
 import { TelemetryEventThrottler } from './throttler';
@@ -99,7 +98,10 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
 
     // In browser or client environments, we most likely pass the disabled option to the collector, but in environments
     // where environment variables are available we also check for `CLERK_TELEMETRY_DISABLED`.
-    if (this.#config.disabled || isTruthy(getEnvVariable('CLERK_TELEMETRY_DISABLED'))) {
+    if (
+      this.#config.disabled ||
+      (typeof process !== 'undefined' && process.env && isTruthy(process.env.CLERK_TELEMETRY_DISABLED))
+    ) {
       return false;
     }
 
@@ -114,7 +116,10 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
   }
 
   get isDebug(): boolean {
-    return this.#config.debug || isTruthy(getEnvVariable('CLERK_TELEMETRY_DEBUG'));
+    return (
+      this.#config.debug ||
+      (typeof process !== 'undefined' && process.env && isTruthy(process.env.CLERK_TELEMETRY_DEBUG))
+    );
   }
 
   record(event: TelemetryEventRaw): void {
