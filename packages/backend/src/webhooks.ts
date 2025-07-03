@@ -24,8 +24,6 @@ const SVIX_ID_HEADER = 'svix-id';
 const SVIX_TIMESTAMP_HEADER = 'svix-timestamp';
 const SVIX_SIGNATURE_HEADER = 'svix-signature';
 
-const REQUIRED_WEBHOOK_HEADERS = [SVIX_ID_HEADER, SVIX_TIMESTAMP_HEADER, SVIX_SIGNATURE_HEADER] as const;
-
 export * from './api/resources/Webhooks';
 
 /**
