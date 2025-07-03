@@ -1,11 +1,12 @@
-/** The following files are not exported on purpose:
+/**
+ * The following files are not exported on purpose:
  * - cookie.ts
- * - globs.ts
+ * - globs.ts.
  *
  * The following folders are also not exported on purpose:
- * - react
+ * - react.
  *
- * People should always use @clerk/shared/<name> instead
+ * People should always use @clerk/shared/<name> instead.
  */
 
 export * from './utils';

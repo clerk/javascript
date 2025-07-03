@@ -1,3 +1,4 @@
+import { __experimental_useCheckout as useCheckout } from '@clerk/shared/react';
 import { useEffect, useId, useRef, useState } from 'react';
 
 import { Drawer, useDrawerContext } from '@/ui/elements/Drawer';
@@ -9,7 +10,6 @@ import { Box, Button, descriptors, Heading, localizationKeys, Span, Text, useApp
 import { transitionDurationValues, transitionTiming } from '../../foundations/transitions';
 import { usePrefersReducedMotion } from '../../hooks';
 import { useRouter } from '../../router';
-import { useCheckoutContextRoot } from './CheckoutPage';
 
 const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
 const lerp = (start: number, end: number, amt: number) => start + (end - start) * amt;
@@ -18,7 +18,7 @@ export const CheckoutComplete = () => {
   const router = useRouter();
   const { setIsOpen } = useDrawerContext();
   const { newSubscriptionRedirectUrl } = useCheckoutContext();
-  const { checkout } = useCheckoutContextRoot();
+  const checkout = useCheckout();
   const [mousePosition, setMousePosition] = useState({ x: 256, y: 256 });
   const [currentPosition, setCurrentPosition] = useState({ x: 256, y: 256 });
 

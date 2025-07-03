@@ -54,6 +54,8 @@ export {
   useSignUp,
   useUser,
   useReverification,
+  __experimental_useCheckout,
+  __experimental_CheckoutProvider,
 } from './client-boundary/hooks';
 
 /**
