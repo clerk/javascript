@@ -210,7 +210,7 @@ const PlanDetailsInternal = ({
       {(!plan.isDefault && !isDefaultPlanImplicitlyActiveOrUpcoming) || !subscription ? (
         <Drawer.Footer>
           {subscription ? (
-            subscription.canceledAt ? (
+            subscription.canceledAtDate ? (
               <Button
                 block
                 textVariant='buttonLarge'
@@ -318,7 +318,8 @@ const PlanDetailsInternal = ({
                 ? localizationKeys('commerce.cancelSubscriptionNoCharge')
                 : localizationKeys('commerce.cancelSubscriptionAccessUntil', {
                     plan: subscription.plan.name,
-                    date: subscription.periodEnd,
+                    // @ts-expect-error this will always be defined in this case.
+                    date: subscription.periodEndDate,
                   })
             }
           />
