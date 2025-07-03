@@ -41,8 +41,7 @@ export function SubscriptionsList({
   const { handleSelectPlan, captionForSubscription, canManageSubscription } = usePlansContext();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
   const subscriberType = useSubscriberTypeContext();
-  const { data } = useSubscriptions();
-  const { data: subscriptions = [] } = data || {};
+  const { data: subscriptions } = useSubscriptions();
   const canManageBilling = useProtect(
     has => has({ permission: 'org:sys_billing:manage' }) || subscriberType === 'user',
   );

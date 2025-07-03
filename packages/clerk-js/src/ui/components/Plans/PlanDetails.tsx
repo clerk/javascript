@@ -348,8 +348,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
   const { plan, subscription, closeSlot, planPeriod, setPlanPeriod } = props;
 
   const { captionForSubscription, isDefaultPlanImplicitlyActiveOrUpcoming } = usePlansContext();
-  const { data } = useSubscriptions();
-  const { data: subscriptions = [] } = data || {};
+  const { data: subscriptions } = useSubscriptions();
 
   const isImplicitlyActiveOrUpcoming = isDefaultPlanImplicitlyActiveOrUpcoming && plan.isDefault;
 

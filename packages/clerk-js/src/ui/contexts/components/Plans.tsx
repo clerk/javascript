@@ -2,6 +2,7 @@ import {
   __experimental_usePaymentAttempts,
   __experimental_usePaymentMethods,
   __experimental_useStatements,
+  __experimental_useSubscriptionItems,
   useClerk,
   useOrganization,
   useSession,
@@ -71,20 +72,14 @@ export const useStatements = (params?: { mode: 'cache' }) => {
 };
 
 export const useSubscriptions = () => {
-  const { billing } = useClerk();
-  const { organization } = useOrganization();
-  const { user } = useUser();
   const subscriberType = useSubscriberTypeContext();
 
-  return useSWR(
-    {
-      key: `commerce-subscriptions`,
-      userId: user?.id,
-      args: { orgId: subscriberType === 'org' ? organization?.id : undefined },
-    },
-    ({ args, userId }) => (userId ? billing.getSubscriptions(args) : undefined),
-    dedupeOptions,
-  );
+  return __experimental_useSubscriptionItems({
+    for: subscriberType === 'org' ? 'organization' : 'user',
+    initialPage: 1,
+    pageSize: 10,
+    keepPreviousData: true,
+  });
 };
 
 export const usePlans = () => {
@@ -128,8 +123,7 @@ export const usePlansContext = () => {
     return false;
   }, [clerk, subscriberType]);
 
-  const { data, mutate: mutateSubscriptions } = useSubscriptions();
-  const { data: subscriptions = [] } = data || {};
+  const { data: subscriptions, revalidate: revalidateSubscriptions } = useSubscriptions();
 
   // Invalidates cache but does not fetch immediately
   const { data: plans, mutate: mutatePlans } = useSWR<Awaited<ReturnType<typeof clerk.billing.getPlans>>>({
@@ -144,11 +138,11 @@ export const usePlansContext = () => {
 
   const revalidateAll = useCallback(() => {
     // Revalidate the plans and subscriptions
-    void mutateSubscriptions();
+    void revalidateSubscriptions();
     void mutatePlans();
     void revalidateStatements();
     void revalidatePaymentSources();
-  }, [mutateSubscriptions, mutatePlans, revalidateStatements, revalidatePaymentSources]);
+  }, [revalidateSubscriptions, mutatePlans, revalidateStatements, revalidatePaymentSources]);
 
   // should the default plan be shown as active
   const isDefaultPlanImplicitlyActiveOrUpcoming = useMemo(() => {
