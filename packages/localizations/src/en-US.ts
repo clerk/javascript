@@ -67,6 +67,7 @@ export const enUS: LocalizationResource = {
     cancelSubscriptionTitle: 'Cancel {{plan}} Subscription?',
     cannotSubscribeMonthly:
       'You cannot subscribe to this plan by paying monthly. To subscribe to this plan, you need to choose to pay annually.',
+    cannotSubscribeMonthlyNoAnnual: 'You cannot subscribe to this plan with an existing annual subscription.',
     checkout: {
       description__paymentSuccessful: 'Your payment was successful.',
       description__subscriptionSuccessful: 'Your new subscription is all set.',

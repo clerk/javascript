@@ -82,7 +82,11 @@ export const InvalidPlanScreen = () => {
           <Alert
             variant='info'
             colorScheme='info'
-            title={localizationKeys('commerce.cannotSubscribeMonthly')}
+            title={
+              planFromError.annual_monthly_amount_formatted !== '0'
+                ? localizationKeys('commerce.cannotSubscribeMonthly')
+                : localizationKeys('commerce.cannotSubscribeMonthlyNoAnnual')
+            }
           />
         </Box>
       </Flex>
