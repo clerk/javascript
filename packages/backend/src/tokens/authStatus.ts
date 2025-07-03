@@ -107,6 +107,7 @@ export const AuthErrorReason = {
   DevBrowserMissing: 'dev-browser-missing',
   DevBrowserSync: 'dev-browser-sync',
   PrimaryRespondsToSyncing: 'primary-responds-to-syncing',
+  PrimaryDomainCrossOriginSync: 'primary-domain-cross-origin-sync',
   SatelliteCookieNeedsSyncing: 'satellite-needs-syncing',
   SessionTokenAndUATMissing: 'session-token-and-uat-missing',
   SessionTokenMissing: 'session-token-missing',
