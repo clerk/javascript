@@ -7,7 +7,15 @@ import type {
 } from '@clerk/types';
 
 import type { Clerk } from '../../clerk';
-import { createCheckoutManager } from './manager';
+import { type CheckoutKey, createCheckoutManager } from './manager';
+
+/**
+ * Generate cache key for checkout instance
+ */
+function cacheKey(options: { userId: string; orgId?: string; planId: string; planPeriod: string }): CheckoutKey {
+  const { userId, orgId, planId, planPeriod } = options;
+  return `${userId}-${orgId || 'user'}-${planId}-${planPeriod}` as CheckoutKey;
+}
 
 /**
  * Create a checkout instance with the given options
@@ -26,11 +34,14 @@ function createCheckoutInstance(
     throw new Error('Clerk: Use `setActive` to set the organization');
   }
 
-  const manager = createCheckoutManager({
+  const checkoutKey = cacheKey({
+    userId: clerk.user.id,
+    orgId: forOrganization === 'organization' ? clerk.organization?.id : undefined,
     planId,
     planPeriod,
-    for: forOrganization,
   });
+
+  const manager = createCheckoutManager(checkoutKey);
 
   const start = async (): Promise<CommerceCheckoutResource> => {
     return manager.executeOperation('start', async () => {
@@ -69,7 +80,7 @@ function createCheckoutInstance(
     finalize,
     clear,
     subscribe,
-    getState: () => manager.getCacheState(),
+    getState: manager.getCacheState,
   };
 }
 

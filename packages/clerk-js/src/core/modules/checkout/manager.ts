@@ -1,25 +1,51 @@
 import type { __experimental_CheckoutCacheState, ClerkAPIResponseError, CommerceCheckoutResource } from '@clerk/types';
 
-import { createStore, createStoreKey, type StoreKey } from '../../store';
+type CheckoutKey = string & { readonly __tag: 'CheckoutKey' };
 
-type CheckoutKey = StoreKey;
+const createManagerCache = <CacheKey, CacheState>() => {
+  const cache = new Map<CacheKey, CacheState>();
+  const listeners = new Map<CacheKey, Set<(newState: CacheState) => void>>();
+  const pendingOperations = new Map<CacheKey, Map<string, Promise<CommerceCheckoutResource>>>();
+
+  return {
+    cache,
+    listeners,
+    pendingOperations,
+    safeGet<K extends CacheKey, V extends Set<any>>(key: K, map: Map<K, V>): NonNullable<V> {
+      if (!map.has(key)) {
+        map.set(key, new Set() as V);
+      }
+      return map.get(key) as NonNullable<V>;
+    },
+    safeGetOperations<K extends CacheKey>(key: K): Map<string, Promise<CommerceCheckoutResource>> {
+      if (!this.pendingOperations.has(key)) {
+        this.pendingOperations.set(key, new Map<string, Promise<CommerceCheckoutResource>>());
+      }
+      return this.pendingOperations.get(key) as Map<string, Promise<CommerceCheckoutResource>>;
+    },
+  };
+};
+
+const managerCache = createManagerCache<CheckoutKey, __experimental_CheckoutCacheState>();
 
 const CHECKOUT_STATUS = {
-  AWAITING_INITIALIZATION: 'awaiting_initialization' as const,
-  AWAITING_CONFIRMATION: 'awaiting_confirmation' as const,
-  COMPLETED: 'completed' as const,
-};
+  AWAITING_INITIALIZATION: 'awaiting_initialization',
+  AWAITING_CONFIRMATION: 'awaiting_confirmation',
+  COMPLETED: 'completed',
+} as const;
 
-const FETCH_STATUS = {
-  IDLE: 'idle' as const,
-  FETCHING: 'fetching' as const,
-  ERROR: 'error' as const,
-};
+export const FETCH_STATUS = {
+  IDLE: 'idle',
+  FETCHING: 'fetching',
+  ERROR: 'error',
+} as const;
 
 /**
  * Derives the checkout state from the base state.
  */
-function deriveCheckoutState(baseState: Partial<__experimental_CheckoutCacheState>): __experimental_CheckoutCacheState {
+function deriveCheckoutState(
+  baseState: Omit<__experimental_CheckoutCacheState, 'fetchStatus' | 'status'>,
+): __experimental_CheckoutCacheState {
   const fetchStatus = (() => {
     if (baseState.isStarting || baseState.isConfirming) return FETCH_STATUS.FETCHING;
     if (baseState.error) return FETCH_STATUS.ERROR;
@@ -27,20 +53,16 @@ function deriveCheckoutState(baseState: Partial<__experimental_CheckoutCacheStat
   })();
 
   const status = (() => {
-    if (baseState.checkout?.status === 'complete') return CHECKOUT_STATUS.COMPLETED;
-    if (baseState.isConfirming) return CHECKOUT_STATUS.AWAITING_CONFIRMATION;
+    if (baseState.checkout?.status === CHECKOUT_STATUS.COMPLETED) return CHECKOUT_STATUS.COMPLETED;
+    if (baseState.checkout) return CHECKOUT_STATUS.AWAITING_CONFIRMATION;
     return CHECKOUT_STATUS.AWAITING_INITIALIZATION;
   })();
 
   return {
-    isStarting: false,
-    isConfirming: false,
-    error: null,
-    checkout: null,
     ...baseState,
     fetchStatus,
     status,
-  } as __experimental_CheckoutCacheState;
+  };
 }
 
 const defaultCacheState: __experimental_CheckoutCacheState = Object.freeze(
@@ -52,75 +74,103 @@ const defaultCacheState: __experimental_CheckoutCacheState = Object.freeze(
   }),
 );
 
-// Create a global store instance for checkout management using the factory
-const checkoutStore = createStore<CheckoutKey, __experimental_CheckoutCacheState>({
-  deriveState: deriveCheckoutState,
-  defaultState: defaultCacheState,
-});
-
-export interface CheckoutManager {
-  getCacheState(): __experimental_CheckoutCacheState;
-  subscribe(listener: (newState: __experimental_CheckoutCacheState) => void): () => void;
-  executeOperation(
-    operation: 'start' | 'confirm',
-    handler: () => Promise<CommerceCheckoutResource>,
-  ): Promise<CommerceCheckoutResource>;
-  clearCheckout(): void;
-}
-
 /**
- * Creates a checkout manager for a specific checkout configuration.
+ * Creates a checkout manager for handling checkout operations and state management.
+ *
+ * @param cacheKey - Unique identifier for the checkout instance
+ * @returns Manager with methods for checkout operations and state subscription
+ *
+ * @example
+ * ```typescript
+ * const manager = createCheckoutManager('user-123-plan-456-monthly');
+ * const unsubscribe = manager.subscribe(state => console.log(state));
+ * ```
  */
-function createCheckoutManager(options: { planId: string; planPeriod: string; for?: 'organization' }): CheckoutManager {
-  const cacheKey = createStoreKey(`${options.for || 'user'}:${options.planId}:${options.planPeriod}`);
+function createCheckoutManager(cacheKey: CheckoutKey) {
+  const listeners = managerCache.safeGet(cacheKey, managerCache.listeners);
+  const pendingOperations = managerCache.safeGetOperations(cacheKey);
+
+  const notifyListeners = () => {
+    listeners.forEach(listener => listener(getCacheState()));
+  };
 
   const getCacheState = (): __experimental_CheckoutCacheState => {
-    return checkoutStore.getState(cacheKey);
+    return managerCache.cache.get(cacheKey) || defaultCacheState;
   };
 
   const updateCacheState = (
     updates: Partial<Omit<__experimental_CheckoutCacheState, 'fetchStatus' | 'status'>>,
   ): void => {
-    checkoutStore.setState(cacheKey, updates);
-  };
-
-  const executeOperation = async (
-    operation: 'start' | 'confirm',
-    handler: () => Promise<CommerceCheckoutResource>,
-  ): Promise<CommerceCheckoutResource> => {
-    const operationId = `${operation}-${Date.now()}`;
-
-    checkoutStore.addPendingOperation(cacheKey, operationId);
-
-    const loadingStateKey = operation === 'start' ? 'isStarting' : 'isConfirming';
-    updateCacheState({ [loadingStateKey]: true, error: null });
-
-    try {
-      const checkout = await handler();
-      updateCacheState({ [loadingStateKey]: false, checkout, error: null });
-      return checkout;
-    } catch (error) {
-      const clerkError = error as ClerkAPIResponseError;
-      updateCacheState({ [loadingStateKey]: false, error: clerkError });
-      throw error;
-    } finally {
-      checkoutStore.removePendingOperation(cacheKey, operationId);
-    }
-  };
-
-  const clearCheckout = (): void => {
-    if (!checkoutStore.hasPendingOperations(cacheKey)) {
-      checkoutStore.clearState(cacheKey);
-    }
+    const currentState = getCacheState();
+    const baseState = { ...currentState, ...updates };
+    const newState = deriveCheckoutState(baseState);
+    managerCache.cache.set(cacheKey, Object.freeze(newState));
+    notifyListeners();
   };
 
   return {
-    getCacheState,
     subscribe(listener: (newState: __experimental_CheckoutCacheState) => void): () => void {
-      return checkoutStore.subscribe(cacheKey, listener);
+      listeners.add(listener);
+      return () => {
+        listeners.delete(listener);
+      };
     },
-    executeOperation,
-    clearCheckout,
+
+    getCacheState,
+
+    // Shared operation handler to eliminate duplication
+    async executeOperation(
+      operationType: 'start' | 'confirm',
+      operationFn: () => Promise<CommerceCheckoutResource>,
+    ): Promise<CommerceCheckoutResource> {
+      const operationId = `${cacheKey}-${operationType}`;
+      const isRunningField = operationType === 'start' ? 'isStarting' : 'isConfirming';
+
+      // Check if there's already a pending operation
+      const existingOperation = pendingOperations.get(operationId);
+      if (existingOperation) {
+        // Wait for the existing operation to complete and return its result
+        // If it fails, all callers should receive the same error
+        return await existingOperation;
+      }
+
+      // Create and store the operation promise
+      const operationPromise = (async () => {
+        try {
+          // Mark operation as in progress and clear any previous errors
+          updateCacheState({
+            [isRunningField]: true,
+            error: null,
+            ...(operationType === 'start' ? { checkout: null } : {}),
+          });
+
+          // Execute the checkout operation
+          const result = await operationFn();
+
+          // Update state with successful result
+          updateCacheState({ [isRunningField]: false, error: null, checkout: result });
+          return result;
+        } catch (error) {
+          // Cast error to expected type and update state
+          const clerkError = error as ClerkAPIResponseError;
+          updateCacheState({ [isRunningField]: false, error: clerkError });
+          throw error;
+        } finally {
+          // Always clean up pending operation tracker
+          pendingOperations.delete(operationId);
+        }
+      })();
+
+      pendingOperations.set(operationId, operationPromise);
+      return operationPromise;
+    },
+
+    clearCheckout(): void {
+      // Only reset the state if there are no pending operations
+      if (pendingOperations.size === 0) {
+        updateCacheState(defaultCacheState);
+      }
+    },
   };
 }
 
