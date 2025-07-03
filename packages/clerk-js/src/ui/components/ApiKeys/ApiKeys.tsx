@@ -1,7 +1,7 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
-import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
+import { useClerk, useOrganization, useSession, useUser } from '@clerk/shared/react';
 import type { CreateAPIKeyParams } from '@clerk/types';
-import { lazy, useState } from 'react';
+import { lazy, useMemo, useState } from 'react';
 import useSWRMutation from 'swr/mutation';
 
 import { useApiKeysContext, withCoreUserGuard } from '@/ui/contexts';
@@ -32,6 +32,7 @@ type APIKeysPageProps = {
   subject: string;
   perPage?: number;
   revokeModalRoot?: React.MutableRefObject<HTMLElement | null>;
+  canManageAPIKeys?: boolean;
 };
 
 const RevokeAPIKeyConfirmationModal = lazy(() =>
@@ -40,7 +41,7 @@ const RevokeAPIKeyConfirmationModal = lazy(() =>
   })),
 );
 
-export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPageProps) => {
+export const APIKeysPage = ({ subject, perPage, revokeModalRoot, canManageAPIKeys = true }: APIKeysPageProps) => {
   const {
     apiKeys,
     isLoading,
@@ -118,16 +119,18 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
               elementDescriptor={descriptors.apiKeysSearchInput}
             />
           </Box>
-          <Action.Trigger
-            value='add-api-key'
-            hideOnActive={false}
-          >
-            <Button
-              variant='solid'
-              localizationKey={localizationKeys('apiKeys.action__add')}
-              elementDescriptor={descriptors.apiKeysAddButton}
-            />
-          </Action.Trigger>
+          {canManageAPIKeys && (
+            <Action.Trigger
+              value='add-api-key'
+              hideOnActive={false}
+            >
+              <Button
+                variant='solid'
+                localizationKey={localizationKeys('apiKeys.action__add')}
+                elementDescriptor={descriptors.apiKeysAddButton}
+              />
+            </Action.Trigger>
+          )}
         </Flex>
         <Action.Open value='add-api-key'>
           <Flex sx={t => ({ paddingTop: t.space.$6, paddingBottom: t.space.$6 })}>
@@ -145,6 +148,7 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
         isLoading={isLoading}
         onRevoke={handleRevoke}
         elementDescriptor={descriptors.apiKeysTable}
+        canManageAPIKeys={canManageAPIKeys}
       />
       {itemCount > (perPage ?? 5) && (
         <Pagination
@@ -176,8 +180,21 @@ const _APIKeys = () => {
   const ctx = useApiKeysContext();
   const { user } = useUser();
   const { organization } = useOrganization();
+  const { session } = useSession();
 
   const subject = organization?.id ?? user?.id ?? '';
+
+  const canManageAPIKeys = useMemo(() => {
+    if (organization) {
+      if (session?.checkAuthorization({ permission: 'org:sys_api_keys:manage' })) {
+        return true;
+      }
+
+      return false;
+    }
+
+    return true;
+  }, [session, organization]);
 
   return (
     <Flow.Root
@@ -189,6 +206,7 @@ const _APIKeys = () => {
       <APIKeysPage
         subject={subject}
         perPage={ctx.perPage}
+        canManageAPIKeys={canManageAPIKeys}
       />
     </Flow.Root>
   );

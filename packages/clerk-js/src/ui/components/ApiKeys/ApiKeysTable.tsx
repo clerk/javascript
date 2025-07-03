@@ -111,11 +111,13 @@ export const ApiKeysTable = ({
   isLoading,
   onRevoke,
   elementDescriptor,
+  canManageAPIKeys,
 }: {
   rows: APIKeyResource[];
   isLoading: boolean;
   onRevoke: (id: string, name: string) => void;
   elementDescriptor?: ElementDescriptor;
+  canManageAPIKeys: boolean;
 }) => {
   return (
     <Flex sx={t => ({ width: '100%', [mqu.sm]: { overflowX: 'auto', padding: t.space.$0x25 } })}>
@@ -204,6 +206,7 @@ export const ApiKeysTable = ({
                         label: localizationKeys('apiKeys.menuAction__revoke'),
                         isDestructive: true,
                         onClick: () => onRevoke(apiKey.id, apiKey.name),
+                        isDisabled: !canManageAPIKeys,
                       },
                     ]}
                   />
