@@ -68,6 +68,7 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
       buildRequest({
         ...options,
         skipApiVersionInUrl: true,
+        requireSecretKey: false,
       }),
     ),
     oauthApplications: new OAuthApplicationsApi(request),
