@@ -35,9 +35,9 @@ function createStandardWebhookHeaders(request: Request): Record<string, string> 
   const headers: Record<string, string> = {};
 
   // Map Svix headers to Standard Webhooks headers
-  const svixId = request.headers.get(SVIX_ID_HEADER);
-  const svixTimestamp = request.headers.get(SVIX_TIMESTAMP_HEADER);
-  const svixSignature = request.headers.get(SVIX_SIGNATURE_HEADER);
+  const svixId = request.headers.get(SVIX_ID_HEADER)?.trim();
+  const svixTimestamp = request.headers.get(SVIX_TIMESTAMP_HEADER)?.trim();
+  const svixSignature = request.headers.get(SVIX_SIGNATURE_HEADER)?.trim();
 
   if (svixId) {
     headers[STANDARD_WEBHOOK_ID_HEADER] = svixId;
@@ -94,12 +94,23 @@ export async function verifyWebhook(request: Request, options: VerifyWebhookOpti
   }
 
   // Check for required Svix headers
-  const webhookId = request.headers.get(SVIX_ID_HEADER);
-  const webhookTimestamp = request.headers.get(SVIX_TIMESTAMP_HEADER);
-  const webhookSignature = request.headers.get(SVIX_SIGNATURE_HEADER);
+  const webhookId = request.headers.get(SVIX_ID_HEADER)?.trim();
+  const webhookTimestamp = request.headers.get(SVIX_TIMESTAMP_HEADER)?.trim();
+  const webhookSignature = request.headers.get(SVIX_SIGNATURE_HEADER)?.trim();
 
   if (!webhookId || !webhookTimestamp || !webhookSignature) {
-    const missingHeaders = REQUIRED_WEBHOOK_HEADERS.filter(header => !request.headers.has(header));
+    const missingHeaders = [];
+
+    if (!webhookId) {
+      missingHeaders.push(SVIX_ID_HEADER);
+    }
+    if (!webhookTimestamp) {
+      missingHeaders.push(SVIX_TIMESTAMP_HEADER);
+    }
+    if (!webhookSignature) {
+      missingHeaders.push(SVIX_SIGNATURE_HEADER);
+    }
+
     return errorThrower.throw(`Missing required webhook headers: ${missingHeaders.join(', ')}`);
   }
 

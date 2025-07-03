@@ -187,4 +187,34 @@ describe('verifyWebhook', () => {
     expect(result).toHaveProperty('type', 'user.created');
     expect(result).toHaveProperty('data.id', 'user_123');
   });
+
+  it('should handle whitespace-only header values correctly', async () => {
+    const mockRequest = new Request('https://clerk.com/webhooks', {
+      method: 'POST',
+      body: mockBody,
+      headers: new Headers({
+        'svix-id': '', // Empty - should be caught
+        'svix-timestamp': '   ', // Whitespace - should be caught
+        'svix-signature': 'v1,signature',
+      }),
+    });
+
+    // This should fail because whitespace-only headers should be treated as missing
+    await expect(verifyWebhook(mockRequest)).rejects.toThrow('Missing required webhook headers');
+  });
+
+  it('should handle mixed empty and whitespace headers correctly', async () => {
+    const mockRequest = new Request('https://clerk.com/webhooks', {
+      method: 'POST',
+      body: mockBody,
+      headers: new Headers({
+        'svix-id': '  \t  ', // Mixed whitespace and tabs
+        'svix-timestamp': '\n', // Newline character
+        'svix-signature': '', // Empty string
+      }),
+    });
+
+    // All should be treated as missing
+    await expect(verifyWebhook(mockRequest)).rejects.toThrow('svix-id, svix-timestamp, svix-signature');
+  });
 });
