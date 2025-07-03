@@ -206,7 +206,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withAPIKeys] })('api keys @ge
     await fakeMember.deleteIfExists();
   });
 
-  test('can only read API keys', async ({ page, context }) => {
+  test('user with read permission can read API keys but not manage them', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
 
     const fakeViewer = u.services.users.createFakeUser();
