@@ -1,5 +1,33 @@
 # Change Log
 
+## 5.70.0
+
+### Minor Changes
+
+- Convert date properties from number to Date in CommerceSubscriptionResource ([#6233](https://github.com/clerk/javascript/pull/6233)) by [@panteliselef](https://github.com/panteliselef)
+
+  Deprecates fields of type `number`
+
+  - subscription.periodStart
+  - subscription.periodEnd
+  - subscription.canceledAt
+    Introduces fields of type `Date`
+  - subscription.periodStartDate
+  - subscription.periodEndDate
+  - subscription.canceledAtDate
+  - subscription.createdAt
+
+- Add `getPlan` by id to the billing namespace. ([#6230](https://github.com/clerk/javascript/pull/6230)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- ([#6183](https://github.com/clerk/javascript/pull/6183)) by [@aeliox](https://github.com/aeliox)
+
+- Updated dependencies [[`baac817`](https://github.com/clerk/javascript/commit/baac81749c4c1bc1c3efaff267200cecc50047f4), [`abd8446`](https://github.com/clerk/javascript/commit/abd844609dad263d974da7fbf5e3575afce73abe), [`8387a39`](https://github.com/clerk/javascript/commit/8387a392a04906f0f10d84c61cfee36f23942f85), [`f2a6641`](https://github.com/clerk/javascript/commit/f2a66419b1813abc86ea98fde7475861995a1486), [`01a0f29`](https://github.com/clerk/javascript/commit/01a0f2934941d4ed74323ef17d4daa2b8e37ce75)]:
+  - @clerk/localizations@3.17.3
+  - @clerk/shared@3.10.2
+  - @clerk/types@4.63.0
+
 ## 5.69.3
 
 ### Patch Changes
