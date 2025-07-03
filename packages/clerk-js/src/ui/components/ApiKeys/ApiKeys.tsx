@@ -186,11 +186,7 @@ const _APIKeys = () => {
 
   const canManageAPIKeys = useMemo(() => {
     if (organization) {
-      if (session?.checkAuthorization({ permission: 'org:sys_api_keys:manage' })) {
-        return true;
-      }
-
-      return false;
+      return session?.checkAuthorization({ permission: 'org:sys_api_keys:manage' }) ?? false;
     }
 
     return true;

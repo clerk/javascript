@@ -1,5 +1,10 @@
-import { APIKeys } from '@clerk/nextjs';
+import { APIKeys, OrganizationSwitcher } from '@clerk/nextjs';
 
 export default function Page() {
-  return <APIKeys />;
+  return (
+    <>
+      <OrganizationSwitcher />
+      <APIKeys />
+    </>
+  );
 }

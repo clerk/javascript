@@ -1,14 +1,33 @@
-import { useClerk } from '@clerk/shared/react';
-import { useState } from 'react';
+import { useClerk, useOrganization, useSession } from '@clerk/shared/react';
+import { useMemo, useState } from 'react';
 import useSWR from 'swr';
 
 export const useApiKeys = ({ subject, perPage = 5 }: { subject: string; perPage?: number }) => {
   const clerk = useClerk();
+  const { session } = useSession();
+  const { organization } = useOrganization();
+
+  const canReadAPIKeys = useMemo(() => {
+    if (!session) {
+      return false;
+    }
+
+    if (organization) {
+      return session.checkAuthorization({ permission: 'org:sys_api_keys:read' });
+    }
+
+    return true;
+  }, [session, organization]);
+
   const cacheKey = {
     key: 'api-keys',
     subject,
   };
-  const { data: apiKeys, isLoading, mutate } = useSWR(cacheKey, () => clerk.apiKeys.getAll({ subject }));
+  const {
+    data: apiKeys,
+    isLoading,
+    mutate,
+  } = useSWR(canReadAPIKeys ? cacheKey : null, () => clerk.apiKeys.getAll({ subject }));
   const [search, setSearch] = useState('');
   const filteredApiKeys = (apiKeys ?? []).filter(key => key.name.toLowerCase().includes(search.toLowerCase()));
 
