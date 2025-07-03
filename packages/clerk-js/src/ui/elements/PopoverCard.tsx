@@ -85,7 +85,7 @@ const PopoverCardFooter = (props: PropsOfComponent<typeof Flex>) => {
             colors.setAlpha(t.colors.$colorBackground, 1),
             t.colors.$neutralAlpha50,
           ),
-          marginTop: `-${t.space.$2}`,
+          marginTop: `calc(${t.space.$2} * -1)`,
           paddingTop: t.space.$2,
           '&:empty': {
             padding: 0,
