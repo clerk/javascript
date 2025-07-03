@@ -130,7 +130,6 @@ export type OTPInputProps = {
   onResendCode?: React.MouseEventHandler<HTMLButtonElement>;
   otpControl: ReturnType<typeof useFieldOTP>['otpControl'];
   centerAlign?: boolean;
-  passwordManagerOffset?: number;
 };
 
 const [OTPInputContext, useOTPInputContext] = createContextAndHook<OTPInputProps>('OTPInputContext');
@@ -164,7 +163,7 @@ export const OTPCodeControl = React.forwardRef<{ reset: any }>((_, ref) => {
   const hiddenInputRef = React.useRef<HTMLInputElement>(null);
   const firstClickRef = React.useRef(false);
 
-  const { otpControl, isLoading, isDisabled, centerAlign = true, passwordManagerOffset = 40 } = useOTPInputContext();
+  const { otpControl, isLoading, isDisabled, centerAlign = true } = useOTPInputContext();
   const { feedback, values, setValues, feedbackType, length } = otpControl.otpInputProps;
 
   React.useImperativeHandle(ref, () => ({
