@@ -1,5 +1,13 @@
 # @clerk/vue
 
+## 1.8.12
+
+### Patch Changes
+
+- Updated dependencies [[`abd8446`](https://github.com/clerk/javascript/commit/abd844609dad263d974da7fbf5e3575afce73abe), [`8387a39`](https://github.com/clerk/javascript/commit/8387a392a04906f0f10d84c61cfee36f23942f85), [`f2a6641`](https://github.com/clerk/javascript/commit/f2a66419b1813abc86ea98fde7475861995a1486)]:
+  - @clerk/shared@3.10.2
+  - @clerk/types@4.63.0
+
 ## 1.8.11
 
 ### Patch Changes

@@ -1,5 +1,14 @@
 # Change Log
 
+## 3.10.2
+
+### Patch Changes
+
+- Fixes an issue accessing the `CLERK_TELEMETRY_DEBUG` environment variable during telemetry collection ([#6245](https://github.com/clerk/javascript/pull/6245)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`8387a39`](https://github.com/clerk/javascript/commit/8387a392a04906f0f10d84c61cfee36f23942f85), [`f2a6641`](https://github.com/clerk/javascript/commit/f2a66419b1813abc86ea98fde7475861995a1486)]:
+  - @clerk/types@4.63.0
+
 ## 3.10.1
 
 ### Patch Changes
