@@ -303,7 +303,10 @@ export const OTPCodeControl = React.forwardRef<{ reset: any }>((_, ref) => {
   const centerSx = centerAlign ? { justifyContent: 'center', alignItems: 'center' } : {};
 
   return (
-    <Box sx={{ position: 'relative' }}>
+    <Box
+      elementDescriptor={descriptors.otpCodeFieldInputContainer}
+      sx={{ position: 'relative' }}
+    >
       {/* Hidden input for password manager compatibility */}
       <Input
         ref={hiddenInputRef}
@@ -322,14 +325,10 @@ export const OTPCodeControl = React.forwardRef<{ reset: any }>((_, ref) => {
           // When password manager focuses the hidden input, focus the first visible input
           focusInputAt(0);
         }}
-        sx={theme => ({
-          position: 'absolute',
+        sx={() => ({
+          ...common.visuallyHidden(),
           left: '-9999px',
-          width: `calc(1px + ${passwordManagerOffset}px)`,
-          height: '1px',
-          opacity: theme.opacity.$hidden,
           pointerEvents: 'none',
-          clipPath: `inset(0 ${passwordManagerOffset}px 0 0)`,
         })}
       />
 

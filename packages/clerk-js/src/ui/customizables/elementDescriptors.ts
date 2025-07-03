@@ -98,6 +98,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'otpCodeField',
   'otpCodeFieldInputs',
   'otpCodeFieldInput',
+  'otpCodeFieldInputContainer',
   'otpCodeFieldErrorText',
   'formResendCodeLink',
 
