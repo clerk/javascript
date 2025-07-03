@@ -481,6 +481,21 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'apiKeysRevokeModal',
   'apiKeysRevokeModalInput',
   'apiKeysRevokeModalSubmitButton',
+
+  'subscriptionDetailsCard',
+  'subscriptionDetailsCardHeader',
+  'subscriptionDetailsCardBadge',
+  'subscriptionDetailsCardTitle',
+  'subscriptionDetailsCardBody',
+  'subscriptionDetailsCardFooter',
+  'subscriptionDetailsCardActions',
+  'subscriptionDetailsSummaryItems',
+  'subscriptionDetailsSummaryItem',
+  'subscriptionDetailsSummaryLabel',
+  'subscriptionDetailsSummaryValue',
+  'subscriptionDetailsDetailRow',
+  'subscriptionDetailsDetailRowLabel',
+  'subscriptionDetailsDetailRowValue',
 ] as const).map(camelize) as (keyof ElementsConfig)[];
 
 type TargettableClassname<K extends keyof ElementsConfig> = `${typeof CLASS_PREFIX}${K}`;

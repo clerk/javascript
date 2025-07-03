@@ -175,6 +175,8 @@ export type __internal_LocalizationResource = {
     switchPlan: LocalizationValue;
     switchToMonthly: LocalizationValue;
     switchToAnnual: LocalizationValue;
+    switchToMonthlyWithPrice: LocalizationValue<'price' | 'currency'>;
+    switchToAnnualWithAnnualPrice: LocalizationValue<'price' | 'currency'>;
     billedAnnually: LocalizationValue;
     billedMonthlyOnly: LocalizationValue;
     alwaysFree: LocalizationValue;
@@ -196,6 +198,16 @@ export type __internal_LocalizationResource = {
     cancelSubscriptionNoCharge: LocalizationValue;
     cancelSubscriptionAccessUntil: LocalizationValue<'plan' | 'date'>;
     popular: LocalizationValue;
+    subscriptionDetails: {
+      title: LocalizationValue;
+      currentBillingCycle: LocalizationValue;
+      nextPaymentOn: LocalizationValue;
+      nextPaymentAmount: LocalizationValue;
+      subscribedOn: LocalizationValue;
+      endsOn: LocalizationValue;
+      renewsAt: LocalizationValue;
+      beginsOn: LocalizationValue;
+    };
     monthly: LocalizationValue;
     annually: LocalizationValue;
     cannotSubscribeMonthly: LocalizationValue;

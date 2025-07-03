@@ -6,3 +6,9 @@ export const MountedCheckoutDrawer = lazy(() =>
 export const MountedPlanDetailDrawer = lazy(() =>
   import('./MountedPlanDetailDrawer').then(module => ({ default: module.MountedPlanDetailDrawer })),
 );
+
+export const MountedSubscriptionDetailDrawer = lazy(() =>
+  import('./MountedSubscriptionDetailDrawer').then(module => ({
+    default: module.MountedSubscriptionDetailDrawer,
+  })),
+);
