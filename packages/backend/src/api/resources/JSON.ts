@@ -719,6 +719,7 @@ export interface APIKeyJSON extends ClerkResourceJSON {
   object: typeof ObjectType.ApiKey;
   type: string;
   name: string;
+  secret?: string;
   subject: string;
   scopes: string[];
   claims: Record<string, any> | null;

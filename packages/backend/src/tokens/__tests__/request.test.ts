@@ -1396,4 +1396,188 @@ describe('tokens.authenticateRequest(options)', () => {
       });
     });
   });
+
+  describe('Cross-origin sync', () => {
+    beforeEach(() => {
+      server.use(
+        http.get('https://api.clerk.test/v1/jwks', () => {
+          return HttpResponse.json(mockJwks);
+        }),
+      );
+    });
+
+    test('triggers handshake for cross-origin document request on primary domain', async () => {
+      const request = mockRequestWithCookies(
+        {
+          referer: 'https://satellite.com/signin',
+          'sec-fetch-dest': 'document',
+          origin: 'https://primary.com',
+        },
+        {
+          __session: mockJwt,
+          __client_uat: '12345',
+        },
+        'https://primary.com/dashboard',
+      );
+
+      const requestState = await authenticateRequest(request, {
+        ...mockOptions(),
+        publishableKey: PK_LIVE,
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+
+      expect(requestState).toMatchHandshake({
+        reason: AuthErrorReason.PrimaryDomainCrossOriginSync,
+        domain: 'primary.com',
+        signInUrl: 'https://primary.com/sign-in',
+      });
+    });
+
+    test('triggers handshake for cross-site document request on primary domain', async () => {
+      const request = mockRequestWithCookies(
+        {
+          referer: 'https://satellite.com/signin',
+          'sec-fetch-dest': 'document',
+          'sec-fetch-site': 'cross-site',
+          origin: 'https://primary.com',
+        },
+        {
+          __session: mockJwt,
+          __client_uat: '12345',
+        },
+        'https://primary.com/dashboard',
+      );
+
+      const requestState = await authenticateRequest(request, {
+        ...mockOptions(),
+        publishableKey: PK_LIVE,
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+
+      expect(requestState).toMatchHandshake({
+        reason: AuthErrorReason.PrimaryDomainCrossOriginSync,
+        domain: 'primary.com',
+        signInUrl: 'https://primary.com/sign-in',
+      });
+    });
+
+    test('does not trigger handshake when referer is same origin', async () => {
+      const request = mockRequestWithCookies(
+        {
+          referer: 'https://primary.com/signin',
+          'sec-fetch-dest': 'document',
+          origin: 'https://primary.com',
+        },
+        {
+          __session: mockJwt,
+          __client_uat: '12345',
+        },
+        'https://primary.com/dashboard',
+      );
+
+      const requestState = await authenticateRequest(request, {
+        ...mockOptions(),
+        publishableKey: PK_LIVE,
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+
+      expect(requestState).toBeSignedIn({
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+    });
+
+    test('does not trigger handshake when no referer header', async () => {
+      const request = mockRequestWithCookies(
+        {
+          'sec-fetch-dest': 'document',
+          origin: 'https://primary.com',
+        },
+        {
+          __session: mockJwt,
+          __client_uat: '12345',
+        },
+        'https://primary.com/dashboard',
+      );
+
+      const requestState = await authenticateRequest(request, {
+        ...mockOptions(),
+        publishableKey: PK_LIVE,
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+
+      expect(requestState).toBeSignedIn({
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+    });
+
+    test('does not trigger handshake for non-document requests', async () => {
+      const request = mockRequestWithCookies(
+        {
+          referer: 'https://satellite.com/signin',
+          'sec-fetch-dest': 'empty',
+          origin: 'https://primary.com',
+        },
+        {
+          __session: mockJwt,
+          __client_uat: '12345',
+        },
+        'https://primary.com/api/data',
+      );
+
+      const requestState = await authenticateRequest(request, {
+        ...mockOptions(),
+        publishableKey: PK_LIVE,
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+
+      expect(requestState).toBeSignedIn({
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+    });
+
+    test('does not trigger handshake when referer header contains invalid URL format', async () => {
+      const request = mockRequestWithCookies(
+        {
+          referer: 'invalid-url-format',
+          'sec-fetch-dest': 'document',
+          origin: 'https://primary.com',
+        },
+        {
+          __session: mockJwt,
+          __client_uat: '12345',
+        },
+        'https://primary.com/dashboard',
+      );
+
+      const requestState = await authenticateRequest(request, {
+        ...mockOptions(),
+        publishableKey: PK_LIVE,
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+
+      expect(requestState).toBeSignedIn({
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+    });
+  });
 });
