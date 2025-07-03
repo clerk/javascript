@@ -4,7 +4,7 @@ import { appConfigs } from '../../presets';
 import type { FakeOrganization, FakeUser } from '../../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../../testUtils';
 
-testAgainstRunningApps({ withEnv: [appConfigs.envs.withAPIKeys] })('api keys @xgeneric', ({ app }) => {
+testAgainstRunningApps({ withEnv: [appConfigs.envs.withAPIKeys] })('api keys @generic', ({ app }) => {
   test.describe.configure({ mode: 'serial' });
 
   let fakeAdmin: FakeUser;
