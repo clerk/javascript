@@ -178,6 +178,10 @@ function getEmailAddressField({
   isProgressiveSignUp,
 }: FieldDeterminationProps): Field | undefined {
   if (isProgressiveSignUp) {
+    const isPasswordVisible = Boolean(attributes.password?.enabled && attributes.password.required);
+    const isPhoneRequired = Boolean(attributes.phone_number?.enabled && attributes.phone_number?.required);
+    const isEmailActive = activeCommIdentifierType === 'emailAddress';
+
     // If there is no ticket, or there is a ticket along with an email, and email address is enabled,
     // we have to show it in the SignUp form
     const show = (!hasTicket || (hasTicket && hasEmail)) && attributes.email_address?.enabled;
@@ -192,8 +196,11 @@ function getEmailAddressField({
       return;
     }
 
+    const shouldBeRequired =
+      Boolean(attributes.email_address?.required) || (isPasswordVisible && isEmailActive && !isPhoneRequired);
+
     return {
-      required: Boolean(attributes.email_address?.required),
+      required: shouldBeRequired,
       disabled: !!hasTicket && !!hasEmail,
     };
   }
@@ -221,6 +228,10 @@ function getPhoneNumberField({
   isProgressiveSignUp,
 }: FieldDeterminationProps): Field | undefined {
   if (isProgressiveSignUp) {
+    const isPasswordVisible = Boolean(attributes.password?.enabled && attributes.password.required);
+    const isEmailRequired = Boolean(attributes.email_address?.enabled && attributes.email_address?.required);
+    const isPhoneActive = activeCommIdentifierType === 'phoneNumber';
+
     // If there is no ticket and phone number is enabled, we have to show it in the SignUp form
     const show = attributes.phone_number?.enabled;
 
@@ -234,8 +245,11 @@ function getPhoneNumberField({
       return;
     }
 
+    const shouldBeRequired =
+      Boolean(attributes.phone_number?.required) || (isPasswordVisible && isPhoneActive && !isEmailRequired);
+
     return {
-      required: Boolean(attributes.phone_number?.required),
+      required: shouldBeRequired,
     };
   }
 
