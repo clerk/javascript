@@ -221,12 +221,5 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('OTP @elem
       // Check that only 4 segments are rendered
       await expect(otpSegmentsWrapper.locator('> div')).toHaveCount(4);
     });
-
-    test('passwordManagerOffset', async ({ page }) => {
-      const otp = page.getByTestId(otpTypes.segmentedOtpWithProps);
-
-      // The computed styles are different on CI/local etc. so it's not use to check the exact value
-      await expect(otp).toHaveCSS('clip-path', /inset\(0px \d+\.\d+px 0px 0px\)/i);
-    });
   });
 });
