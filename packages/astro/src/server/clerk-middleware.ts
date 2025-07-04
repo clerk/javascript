@@ -96,7 +96,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
 
     const authObject = requestState.toAuth();
 
-    const redirectToSignIn = createMiddlewareRedirectToSignIn(clerkRequest);
+    const redirectToSignIn = createMiddlewareRedirectToSignIn(clerkRequest, requestState);
     const authObjWithMethods: ClerkMiddlewareAuthObject = Object.assign(authObject, { redirectToSignIn });
 
     decorateAstroLocal(clerkRequest, context, requestState);
@@ -359,6 +359,8 @@ const redirectAdapter = (url: string | URL) => {
 
 const createMiddlewareRedirectToSignIn = (
   clerkRequest: ClerkRequest,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  requestState: RequestState,
 ): ClerkMiddlewareAuthObject['redirectToSignIn'] => {
   return (opts = {}) => {
     const err = new Error(CONTROL_FLOW_ERROR.REDIRECT_TO_SIGN_IN) as any;
