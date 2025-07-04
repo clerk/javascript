@@ -57,6 +57,22 @@ export interface CommercePlanResource extends ClerkResource {
   isDefault: boolean;
   isRecurring: boolean;
   hasBaseFee: boolean;
+  /**
+   * Specifies the subscriber type this plan is designed for.
+   *
+   * Each plan is exclusively created for either individual users or organizations,
+   * and cannot be used interchangeably.
+   *
+   * @type {['user'] | ['org']}
+   * @example
+   * ```ts
+   * // For a user plan
+   * payerType: ['user']
+   *
+   * // For an organization plan
+   * payerType: ['org']
+   * ```
+   */
   payerType: string[];
   publiclyVisible: boolean;
   slug: string;
