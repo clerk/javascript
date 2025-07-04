@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.64.0
+
+### Minor Changes
+
+- Add `__internal_loadStripeJs` in Clerk interface. ([#6180](https://github.com/clerk/javascript/pull/6180)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 4.63.0
 
 ### Minor Changes
