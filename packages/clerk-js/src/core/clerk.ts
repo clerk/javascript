@@ -86,7 +86,7 @@ import type { MountComponentRenderer } from '../ui/Components';
 import {
   ALLOWED_PROTOCOLS,
   buildURL,
-  canViewOrgManageAPIKeys,
+  canViewOrManageAPIKeys,
   completeSignUpFlow,
   createAllowedRedirectOrigins,
   createBeforeUnloadTracker,
@@ -1092,7 +1092,7 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
-    if (this.organization && !canViewOrgManageAPIKeys(this)) {
+    if (this.organization && !canViewOrManageAPIKeys(this)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderAPIKeysComponentForOrgWhenUnauthorized, {
           code: CANNOT_RENDER_API_KEYS_ORG_UNAUTHORIZED_ERROR_CODE,

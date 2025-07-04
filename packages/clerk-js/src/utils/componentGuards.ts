@@ -38,7 +38,7 @@ export const disabledAPIKeysFeature: ComponentGuard = (_, environment) => {
   return !environment?.apiKeysSettings?.enabled;
 };
 
-export const canViewOrgManageAPIKeys: ComponentGuard = clerk => {
+export const canViewOrManageAPIKeys: ComponentGuard = clerk => {
   if (!clerk.session) {
     return false;
   }
