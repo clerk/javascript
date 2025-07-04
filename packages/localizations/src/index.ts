@@ -8,6 +8,7 @@ export { deDE } from './de-DE';
 export { elGR } from './el-GR';
 export { enUS } from './en-US';
 export { enGB } from './en-GB';
+export { esCR } from './es-CR';
 export { esES } from './es-ES';
 export { esMX } from './es-MX';
 export { esUY } from './es-UY';

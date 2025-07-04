@@ -1,5 +1,25 @@
 # @clerk/tanstack-react-start
 
+## 0.18.3
+
+### Patch Changes
+
+- Updated dependencies [[`c2f24da`](https://github.com/clerk/javascript/commit/c2f24dab96c052b2748a210eef45540f788654aa), [`abd8446`](https://github.com/clerk/javascript/commit/abd844609dad263d974da7fbf5e3575afce73abe), [`8387a39`](https://github.com/clerk/javascript/commit/8387a392a04906f0f10d84c61cfee36f23942f85), [`feba23c`](https://github.com/clerk/javascript/commit/feba23c85d1ff94930de61f3b6961e2ebb2f65ce), [`f2a6641`](https://github.com/clerk/javascript/commit/f2a66419b1813abc86ea98fde7475861995a1486), [`de9c01a`](https://github.com/clerk/javascript/commit/de9c01ac683f52c1919e1584faba087f92a0ca22), [`a8638b0`](https://github.com/clerk/javascript/commit/a8638b02f0daff780f3aef038983714db21db558), [`3b4b3cb`](https://github.com/clerk/javascript/commit/3b4b3cb941a1a503ce51e086e7bdd663c2a1ddc2)]:
+  - @clerk/backend@2.4.0
+  - @clerk/shared@3.10.2
+  - @clerk/types@4.63.0
+  - @clerk/clerk-react@5.32.4
+
+## 0.18.2
+
+### Patch Changes
+
+- Updated dependencies [[`02a1f42`](https://github.com/clerk/javascript/commit/02a1f42dfdb28ea956d6cbd3fbabe10093d2fad8), [`edc0bfd`](https://github.com/clerk/javascript/commit/edc0bfdae929dad78a99dfd6275aad947d9ddd73)]:
+  - @clerk/shared@3.10.1
+  - @clerk/clerk-react@5.32.3
+  - @clerk/types@4.62.1
+  - @clerk/backend@2.3.1
+
 ## 0.18.1
 
 ### Patch Changes
