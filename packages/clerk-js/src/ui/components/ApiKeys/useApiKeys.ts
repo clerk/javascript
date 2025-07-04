@@ -2,13 +2,26 @@ import { useClerk } from '@clerk/shared/react';
 import { useState } from 'react';
 import useSWR from 'swr';
 
-export const useApiKeys = ({ subject, perPage = 5 }: { subject: string; perPage?: number }) => {
+export const useApiKeys = ({
+  subject,
+  perPage = 5,
+  enabled,
+}: {
+  subject: string;
+  perPage?: number;
+  enabled: boolean;
+}) => {
   const clerk = useClerk();
+
   const cacheKey = {
     key: 'api-keys',
     subject,
   };
-  const { data: apiKeys, isLoading, mutate } = useSWR(cacheKey, () => clerk.apiKeys.getAll({ subject }));
+  const {
+    data: apiKeys,
+    isLoading,
+    mutate,
+  } = useSWR(enabled ? cacheKey : null, () => clerk.apiKeys.getAll({ subject }));
   const [search, setSearch] = useState('');
   const filteredApiKeys = (apiKeys ?? []).filter(key => key.name.toLowerCase().includes(search.toLowerCase()));
 
