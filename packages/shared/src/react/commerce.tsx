@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/consistent-type-imports */
 import type { CommerceCheckoutResource, EnvironmentResource } from '@clerk/types';
 import type { Stripe, StripeElements } from '@stripe/stripe-js';
-import { type PropsWithChildren, ReactNode, useCallback, useEffect, useState } from 'react';
+import { type PropsWithChildren, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import React from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
@@ -122,13 +122,20 @@ type internalStripeAppearance = {
   spacingUnit: string;
 };
 
+type PaymentElementProviderProps = {
+  checkout?: CommerceCheckoutResource;
+  stripeAppearance?: internalStripeAppearance;
+  // TODO(@COMMERCE): What can we do to remove this ?
+  for: 'org' | 'user';
+  paymentDescription?: string;
+};
+
 const [PaymentElementContext, usePaymentElementContext] = createContextAndHook<
-  ReturnType<typeof usePaymentSourceUtils> & {
-    setIsPaymentElementReady: (isPaymentElementReady: boolean) => void;
-    isPaymentElementReady: boolean;
-    checkout?: CommerceCheckoutResource;
-    paymentDescription?: string;
-  }
+  ReturnType<typeof usePaymentSourceUtils> &
+    PaymentElementProviderProps & {
+      setIsPaymentElementReady: (isPaymentElementReady: boolean) => void;
+      isPaymentElementReady: boolean;
+    }
 >('PaymentElementContext');
 
 const [StripeUtilsContext, useStripeUtilsContext] = createContextAndHook<{
@@ -147,57 +154,9 @@ const DummyStripeUtils = ({ children }: PropsWithChildren) => {
   return <StripeUtilsContext.Provider value={{ value: {} as any }}>{children}</StripeUtilsContext.Provider>;
 };
 
-type PaymentElementConfig = {
-  checkout?: CommerceCheckoutResource;
-  stripeAppearance?: internalStripeAppearance;
-  // TODO(@COMMERCE): What can we do to remove this ?
-  for: 'org' | 'user';
-  paymentDescription?: string;
-};
-
-const PaymentElementProvider = (props: PropsWithChildren<PaymentElementConfig>) => {
-  return (
-    <StripeLibsProvider>
-      <PaymentElementInternalRoot {...props} />
-    </StripeLibsProvider>
-  );
-};
-
-const PaymentElementInternalRoot = (props: PropsWithChildren<PaymentElementConfig>) => {
+const PropsProvider = ({ children, ...props }: PropsWithChildren<PaymentElementProviderProps>) => {
   const utils = usePaymentSourceUtils(props.for);
-  const { stripe, externalClientSecret } = utils;
   const [isPaymentElementReady, setIsPaymentElementReady] = useState(false);
-
-  if (stripe && externalClientSecret) {
-    return (
-      <PaymentElementContext.Provider
-        value={{
-          value: {
-            ...utils,
-            setIsPaymentElementReady,
-            isPaymentElementReady,
-            checkout: props.checkout,
-            paymentDescription: props.paymentDescription,
-          },
-        }}
-      >
-        <Elements
-          // This key is used to reset the payment intent, since Stripe doesn't provide a way to reset the payment intent.
-          key={externalClientSecret}
-          stripe={stripe}
-          options={{
-            clientSecret: externalClientSecret,
-            appearance: {
-              variables: { ...props.stripeAppearance },
-            },
-          }}
-        >
-          <ValidateStripeUtils>{props.children}</ValidateStripeUtils>
-        </Elements>
-      </PaymentElementContext.Provider>
-    );
-  }
-
   return (
     <PaymentElementContext.Provider
       value={{
@@ -207,18 +166,96 @@ const PaymentElementInternalRoot = (props: PropsWithChildren<PaymentElementConfi
           isPaymentElementReady,
           checkout: props.checkout,
           paymentDescription: props.paymentDescription,
+          for: props.for,
         },
       }}
     >
-      <DummyStripeUtils>{props.children}</DummyStripeUtils>
+      {children}
     </PaymentElementContext.Provider>
   );
 };
 
+const PaymentElementProvider = (props: PropsWithChildren<PaymentElementProviderProps>) => {
+  return (
+    <StripeLibsProvider>
+      <PropsProvider {...props}>
+        <PaymentElementInternalRoot />
+      </PropsProvider>
+    </StripeLibsProvider>
+  );
+};
+
+const PaymentElementInternalRoot = (props: PropsWithChildren) => {
+  const { stripe, externalClientSecret, stripeAppearance } = usePaymentElementContext();
+
+  if (stripe && externalClientSecret) {
+    return (
+      <Elements
+        // This key is used to reset the payment intent, since Stripe doesn't provide a way to reset the payment intent.
+        key={externalClientSecret}
+        stripe={stripe}
+        options={{
+          clientSecret: externalClientSecret,
+          appearance: {
+            variables: stripeAppearance,
+          },
+        }}
+      >
+        <ValidateStripeUtils>{props.children}</ValidateStripeUtils>
+      </Elements>
+    );
+  }
+
+  return <DummyStripeUtils>{props.children}</DummyStripeUtils>;
+};
+
 const PaymentElement = ({ fallback }: { fallback?: ReactNode }) => {
-  const { setIsPaymentElementReady, paymentMethodOrder, checkout, stripe, externalClientSecret, paymentDescription } =
-    usePaymentElementContext();
+  const {
+    setIsPaymentElementReady,
+    paymentMethodOrder,
+    checkout,
+    stripe,
+    externalClientSecret,
+    paymentDescription,
+    for: subscriberType,
+  } = usePaymentElementContext();
   const environment = useInternalEnvironment();
+
+  const applePay = useMemo(() => {
+    if (!checkout) {
+      return undefined;
+    }
+
+    return {
+      recurringPaymentRequest: {
+        paymentDescription: paymentDescription || '',
+        managementURL:
+          subscriberType === 'org'
+            ? environment?.displayConfig.organizationProfileUrl || ''
+            : environment?.displayConfig.userProfileUrl || '',
+        regularBilling: {
+          amount: checkout.totals.totalDueNow?.amount || checkout.totals.grandTotal.amount,
+          label: checkout.plan.name,
+          recurringPaymentIntervalUnit: checkout.planPeriod === 'annual' ? 'year' : 'month',
+        },
+      },
+    } as const;
+  }, [checkout, paymentDescription, subscriberType, environment]);
+
+  const options = useMemo(() => {
+    return {
+      layout: {
+        type: 'tabs',
+        defaultCollapsed: false,
+      },
+      paymentMethodOrder,
+      applePay,
+    } as const;
+  }, [applePay, paymentMethodOrder]);
+
+  const onReady = useCallback(() => {
+    setIsPaymentElementReady(true);
+  }, [setIsPaymentElementReady]);
 
   if (!stripe || !externalClientSecret) {
     return <>{fallback}</>;
@@ -227,27 +264,8 @@ const PaymentElement = ({ fallback }: { fallback?: ReactNode }) => {
   return (
     <StripePaymentElement
       fallback={fallback}
-      onReady={() => setIsPaymentElementReady(true)}
-      options={{
-        layout: {
-          type: 'tabs',
-          defaultCollapsed: false,
-        },
-        paymentMethodOrder,
-        applePay: checkout
-          ? {
-              recurringPaymentRequest: {
-                paymentDescription: paymentDescription || '',
-                managementURL: environment?.displayConfig.homeUrl || '', // TODO(@COMMERCE): is this the right URL?
-                regularBilling: {
-                  amount: checkout.totals.totalDueNow?.amount || checkout.totals.grandTotal.amount,
-                  label: checkout.plan.name,
-                  recurringPaymentIntervalUnit: checkout.planPeriod === 'annual' ? 'year' : 'month',
-                },
-              },
-            }
-          : undefined,
-      }}
+      onReady={onReady}
+      options={options}
     />
   );
 };
@@ -259,13 +277,15 @@ const usePaymentElement = () => {
 
   const submit = useCallback(async () => {
     if (!stripe || !elements) {
-      throw new Error('Stripe and Elements are not yet ready');
+      throw new Error(
+        'Clerk: Unable to submit, Stripe libraries are not yet loaded. Be sure to check `isFormReady` before calling `submit`.',
+      );
     }
 
     const { setupIntent, error } = await stripe.confirmSetup({
       elements,
       confirmParams: {
-        return_url: '', // TODO(@COMMERCE): need to figure this out
+        return_url: window.location.href,
       },
       redirect: 'if_required',
     });

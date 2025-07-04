@@ -20,7 +20,7 @@ import type {
 import type { FunctionComponent, PropsWithChildren, ReactNode } from 'react';
 import React, { useState } from 'react';
 
-import { useAttachEvent, usePrevious } from './use-previous';
+import { useAttachEvent, usePrevious } from './utils';
 
 interface ElementsContextValue {
   elements: StripeElements | null;
