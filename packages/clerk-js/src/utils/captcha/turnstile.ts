@@ -26,9 +26,9 @@ export const shouldRetryTurnstileErrorCode = (errorCode: string) => {
   return !!codesWithRetries.find(w => errorCode.startsWith(w));
 };
 
-async function loadCaptcha() {
+async function loadCaptcha(nonce?: string) {
   if (!window.turnstile) {
-    await loadCaptchaFromCloudflareURL().catch(() => {
+    await loadCaptchaFromCloudflareURL(nonce).catch(() => {
       // eslint-disable-next-line @typescript-eslint/only-throw-error
       throw { captchaError: 'captcha_script_failed_to_load' };
     });
@@ -36,13 +36,13 @@ async function loadCaptcha() {
   return window.turnstile;
 }
 
-async function loadCaptchaFromCloudflareURL() {
+async function loadCaptchaFromCloudflareURL(nonce?: string) {
   try {
     if (__BUILD_DISABLE_RHC__) {
       return Promise.reject(new Error('Captcha not supported in this environment'));
     }
 
-    return await loadScript(CLOUDFLARE_TURNSTILE_ORIGINAL_URL, { defer: true });
+    return await loadScript(CLOUDFLARE_TURNSTILE_ORIGINAL_URL, { defer: true, nonce });
   } catch (err) {
     console.warn(
       'Clerk: Failed to load the CAPTCHA script from Cloudflare. If you see a CSP error in your browser, please add the necessary CSP rules to your app. Visit https://clerk.com/docs/security/clerk-csp for more information.',
@@ -71,9 +71,9 @@ function getCaptchaAttibutesFromElemenet(element: HTMLElement): CaptchaAttribute
  *  not exist, the invisibleSiteKey is used as a fallback and the widget is rendered in a hidden div at the bottom of the body.
  */
 export const getTurnstileToken = async (opts: CaptchaOptions) => {
-  const { siteKey, widgetType, invisibleSiteKey } = opts;
+  const { siteKey, widgetType, invisibleSiteKey, nonce } = opts;
   const { modalContainerQuerySelector, modalWrapperQuerySelector, closeModal, openModal } = opts;
-  const captcha: Turnstile.Turnstile = await loadCaptcha();
+  const captcha: Turnstile.Turnstile = await loadCaptcha(nonce);
   const errorCodes: (string | number)[] = [];
 
   let captchaToken = '';
