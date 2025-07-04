@@ -187,11 +187,11 @@ const PropsProvider = ({ children, ...props }: PropsWithChildren<PaymentElementP
   );
 };
 
-const PaymentElementProvider = (props: PropsWithChildren<PaymentElementProviderProps>) => {
+const PaymentElementProvider = ({ children, ...props }: PropsWithChildren<PaymentElementProviderProps>) => {
   return (
     <StripeLibsProvider>
       <PropsProvider {...props}>
-        <PaymentElementInternalRoot />
+        <PaymentElementInternalRoot>{children}</PaymentElementInternalRoot>
       </PropsProvider>
     </StripeLibsProvider>
   );
