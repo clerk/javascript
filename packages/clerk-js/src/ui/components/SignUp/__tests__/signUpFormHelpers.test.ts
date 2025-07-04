@@ -536,6 +536,118 @@ describe('determineActiveFields()', () => {
 
       expect(res).toEqual(result);
     });
+
+    describe('email or phone requirements with password', () => {
+      type Scenario = [string, any, any];
+      const scenaria: Scenario[] = [
+        [
+          'email optional, phone primary required with password',
+          {
+            ...mockDefaultAttributesProgressive,
+            email_address: {
+              enabled: true,
+              required: false,
+              used_for_first_factor: true,
+            },
+            phone_number: {
+              enabled: true,
+              required: true,
+              used_for_first_factor: true,
+            },
+            password: {
+              enabled: true,
+              required: true,
+            },
+          },
+          {
+            emailAddress: {
+              required: false,
+              disabled: false,
+            },
+            phoneNumber: {
+              required: true,
+            },
+            password: {
+              required: true,
+            },
+          },
+        ],
+        [
+          'phone optional, email required with password',
+          {
+            ...mockDefaultAttributesProgressive,
+            email_address: {
+              enabled: true,
+              required: true,
+              used_for_first_factor: true,
+            },
+            phone_number: {
+              enabled: true,
+              required: false,
+              used_for_first_factor: true,
+            },
+            password: {
+              enabled: true,
+              required: true,
+            },
+          },
+          {
+            emailAddress: {
+              required: true,
+              disabled: false,
+            },
+            phoneNumber: {
+              required: false,
+            },
+            password: {
+              required: true,
+            },
+          },
+        ],
+        [
+          'email and phone required with password',
+          {
+            ...mockDefaultAttributesProgressive,
+            email_address: {
+              enabled: true,
+              required: true,
+              used_for_first_factor: true,
+            },
+            phone_number: {
+              enabled: true,
+              required: true,
+              used_for_first_factor: true,
+            },
+            password: {
+              enabled: true,
+              required: true,
+            },
+          },
+          {
+            emailAddress: {
+              required: true,
+              disabled: false,
+            },
+            phoneNumber: {
+              required: true,
+            },
+            password: {
+              required: true,
+            },
+          },
+        ],
+      ];
+
+      it.each(scenaria)('%s', (___, attributes, result) => {
+        const actualResult = determineActiveFields({
+          attributes: attributes,
+          activeCommIdentifierType: getInitialActiveIdentifier(attributes, isProgressiveSignUp),
+          isProgressiveSignUp,
+        });
+
+        expect(actualResult).toEqual(result);
+      });
+    });
   });
 });
 

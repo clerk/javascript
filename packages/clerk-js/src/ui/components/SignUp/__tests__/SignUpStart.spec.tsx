@@ -88,14 +88,20 @@ describe('SignUpStart', () => {
       screen.getByText('Password');
     });
 
-    it('enables optional email', async () => {
+    it('should keep email optional when phone is primary with password', async () => {
       const { wrapper } = await createFixtures(f => {
         f.withEmailAddress({ required: false });
         f.withPhoneNumber({ required: true });
         f.withPassword({ required: true });
       });
       render(<SignUpStart />, { wrapper });
-      expect(screen.getByText('Email address').nextElementSibling?.textContent).toBe('Optional');
+
+      const emailAddress = screen.getByLabelText('Email address', { selector: 'input' });
+      expect(emailAddress.ariaRequired).toBe('false');
+      expect(screen.getByText('Optional')).toBeInTheDocument();
+
+      const phoneInput = screen.getByLabelText('Phone number', { selector: 'input' });
+      expect(phoneInput.ariaRequired).toBe('true');
     });
 
     it('enables optional phone number', async () => {
