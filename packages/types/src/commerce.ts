@@ -63,14 +63,14 @@ export interface CommercePlanResource extends ClerkResource {
    * Each plan is exclusively created for either individual users or organizations,
    * and cannot be used interchangeably.
    *
-   * @type {['user'] | ['organization']}
+   * @type {['user'] | ['org']}
    * @example
    * ```ts
    * // For a user plan
    * payerType: ['user']
    *
    * // For an organization plan
-   * payerType: ['organization']
+   * payerType: ['org']
    * ```
    */
   payerType: string[];
