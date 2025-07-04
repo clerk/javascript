@@ -18,14 +18,22 @@ export const ForceOrganizationSelectionTask = withCardStateProvider(() => {
   const { userMemberships, userInvitations, userSuggestions } = useOrganizationList(organizationListParams);
   const currentFlow = useRef<'create-organization' | 'organization-selection'>();
   const contentRef = useRef<HTMLDivElement | null>(null);
+  const preservedHeightRef = useRef<number | null>(null);
 
   const isLoading = userMemberships?.isLoading || userInvitations?.isLoading || userSuggestions?.isLoading;
   const hasData = !!(userMemberships?.count || userInvitations?.count || userSuggestions?.count);
 
+  // Capture height before switching to loading state
+  useEffect(() => {
+    if (!isLoading && contentRef.current) {
+      preservedHeightRef.current = contentRef.current.offsetHeight;
+    }
+  }, [isLoading]);
+
   if (isLoading) {
     return (
-      <FlowCard ref={contentRef}>
-        <FlowLoadingState contentRef={contentRef} />
+      <FlowCard>
+        <FlowLoadingState preservedHeight={preservedHeightRef.current} />
       </FlowCard>
     );
   }
@@ -123,23 +131,19 @@ const FlowCard = forwardRef<HTMLDivElement, PropsWithChildren>(({ children }, re
   );
 });
 
-const FlowLoadingState = ({ contentRef }: { contentRef: React.RefObject<HTMLDivElement | null> }) => {
-  const preservedHeight = contentRef.current?.offsetHeight ?? null;
-
-  return (
-    <Flex
-      direction='row'
-      center
-      sx={t => ({
-        height: preservedHeight ? `${preservedHeight}px` : '100%',
-        minHeight: preservedHeight ? `${preservedHeight}px` : t.sizes.$60,
-      })}
-    >
-      <Spinner
-        size='xl'
-        colorScheme='primary'
-        elementDescriptor={descriptors.spinner}
-      />
-    </Flex>
-  );
-};
+const FlowLoadingState = ({ preservedHeight }: { preservedHeight: number | null }) => (
+  <Flex
+    direction='row'
+    center
+    sx={t => ({
+      height: preservedHeight ? `${preservedHeight}px` : '100%',
+      minHeight: preservedHeight ? `${preservedHeight}px` : t.sizes.$60,
+    })}
+  >
+    <Spinner
+      size='xl'
+      colorScheme='primary'
+      elementDescriptor={descriptors.spinner}
+    />
+  </Flex>
+);
