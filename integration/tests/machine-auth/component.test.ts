@@ -173,7 +173,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withAPIKeys] })('api keys @ge
     await expect(row.locator('input')).toHaveAttribute('type', 'password');
   });
 
-  test('members cannot read and manage API keys by default', async ({ page, context }) => {
+  test('component does not render for orgs when user does not have permissions', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
 
     const fakeMember = u.services.users.createFakeUser();
@@ -197,16 +197,20 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withAPIKeys] })('api keys @ge
       }
     });
 
+    // Check that standalone component is not rendered
     await u.po.page.goToRelative('/api-keys');
-    await u.po.apiKeys.waitForMounted();
-    await expect(u.page.getByRole('button', { name: /Add new key/i })).toBeHidden();
+    await expect(u.page.locator('.cl-apiKeys-root')).toBeHidden({ timeout: 1000 });
+
+    // Check that page is not rendered in OrganizationProfile
+    await u.po.page.goToRelative('/organization-profile#/organization-api-keys');
+    await expect(u.page.locator('.cl-apiKeys-root')).toBeHidden({ timeout: 1000 });
 
     expect(apiKeysRequestWasMade).toBe(false);
 
     await fakeMember.deleteIfExists();
   });
 
-  test('user with read permission can read API keys but not manage them', async ({ page, context }) => {
+  test('user with read permission can view API keys but not manage them', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
 
     const fakeViewer = u.services.users.createFakeUser();
@@ -230,9 +234,17 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withAPIKeys] })('api keys @ge
       }
     });
 
+    // Check that standalone component is rendered and user can read API keys
     await u.po.page.goToRelative('/api-keys');
     await u.po.apiKeys.waitForMounted();
     await expect(u.page.getByRole('button', { name: /Add new key/i })).toBeHidden();
+    await expect(u.page.getByRole('columnheader', { name: /Actions/i })).toBeHidden();
+
+    // Check that page is rendered in OrganizationProfile and user can read API keys
+    await u.po.page.goToRelative('/organization-profile#/organization-api-keys');
+    await expect(u.page.locator('.cl-apiKeys')).toBeVisible();
+    await expect(u.page.getByRole('button', { name: /Add new key/i })).toBeHidden();
+    await expect(u.page.getByRole('columnheader', { name: /Actions/i })).toBeHidden();
 
     expect(apiKeysRequestWasMade).toBe(true);
 
