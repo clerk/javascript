@@ -130,7 +130,7 @@ export const ApiKeysTable = ({
             <Th>Name</Th>
             <Th>Last used</Th>
             <Th>Key</Th>
-            <Th>Actions</Th>
+            {canManageAPIKeys && <Th>Actions</Th>}
           </Tr>
         </Thead>
         <Tbody>
@@ -199,18 +199,19 @@ export const ApiKeysTable = ({
                     <CopySecretButton apiKeyID={apiKey.id} />
                   </Flex>
                 </Td>
-                <Td>
-                  <ThreeDotsMenu
-                    actions={[
-                      {
-                        label: localizationKeys('apiKeys.menuAction__revoke'),
-                        isDestructive: true,
-                        onClick: () => onRevoke(apiKey.id, apiKey.name),
-                        isDisabled: !canManageAPIKeys,
-                      },
-                    ]}
-                  />
-                </Td>
+                {canManageAPIKeys && (
+                  <Td>
+                    <ThreeDotsMenu
+                      actions={[
+                        {
+                          label: localizationKeys('apiKeys.menuAction__revoke'),
+                          isDestructive: true,
+                          onClick: () => onRevoke(apiKey.id, apiKey.name),
+                        },
+                      ]}
+                    />
+                  </Td>
+                )}
               </Tr>
             ))
           )}

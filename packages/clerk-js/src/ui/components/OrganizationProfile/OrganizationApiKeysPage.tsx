@@ -1,6 +1,5 @@
 import { useOrganization } from '@clerk/shared/react';
 
-import { useProtect } from '@/ui/common';
 import { ApiKeysContext, useOrganizationProfileContext } from '@/ui/contexts';
 import { Col, localizationKeys } from '@/ui/customizables';
 import { Header } from '@/ui/elements/Header';
@@ -12,7 +11,6 @@ export const OrganizationAPIKeysPage = () => {
   const { organization } = useOrganization();
   const { contentRef } = useUnsafeNavbarContext();
   const { apiKeysProps } = useOrganizationProfileContext();
-  const canManageAPIKeys = useProtect(has => has({ permission: 'org:sys_api_keys:manage' }));
 
   if (!organization) {
     // We should never reach this point, but we'll return null to make TS happy
@@ -31,7 +29,6 @@ export const OrganizationAPIKeysPage = () => {
         <APIKeysPage
           subject={organization.id}
           revokeModalRoot={contentRef}
-          canManageAPIKeys={canManageAPIKeys}
         />
       </ApiKeysContext.Provider>
     </Col>

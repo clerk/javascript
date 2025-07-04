@@ -44,7 +44,7 @@ export const canViewOrgManageAPIKeys: ComponentGuard = clerk => {
   }
 
   return (
-    clerk.session?.checkAuthorization?.({ permission: 'org:sys_api_keys:read' }) ||
-    clerk.session?.checkAuthorization?.({ permission: 'org:sys_api_keys:manage' })
+    clerk.session.checkAuthorization({ permission: 'org:sys_api_keys:read' }) ||
+    clerk.session.checkAuthorization({ permission: 'org:sys_api_keys:manage' })
   );
 };

@@ -1,9 +1,10 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
-import { useClerk, useOrganization, useSession, useUser } from '@clerk/shared/react';
+import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
 import type { CreateAPIKeyParams } from '@clerk/types';
-import { lazy, useMemo, useState } from 'react';
+import { lazy, useState } from 'react';
 import useSWRMutation from 'swr/mutation';
 
+import { useProtect } from '@/ui/common';
 import { useApiKeysContext, withCoreUserGuard } from '@/ui/contexts';
 import {
   Box,
@@ -22,6 +23,7 @@ import { InputWithIcon } from '@/ui/elements/InputWithIcon';
 import { Pagination } from '@/ui/elements/Pagination';
 import { MagnifyingGlass } from '@/ui/icons';
 import { mqu } from '@/ui/styledSystem';
+import { isOrganizationId } from '@/utils';
 
 import { ApiKeysTable } from './ApiKeysTable';
 import type { OnCreateParams } from './CreateApiKeyForm';
@@ -32,7 +34,6 @@ type APIKeysPageProps = {
   subject: string;
   perPage?: number;
   revokeModalRoot?: React.MutableRefObject<HTMLElement | null>;
-  canManageAPIKeys?: boolean;
 };
 
 const RevokeAPIKeyConfirmationModal = lazy(() =>
@@ -41,7 +42,11 @@ const RevokeAPIKeyConfirmationModal = lazy(() =>
   })),
 );
 
-export const APIKeysPage = ({ subject, perPage, revokeModalRoot, canManageAPIKeys = true }: APIKeysPageProps) => {
+export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPageProps) => {
+  const isOrg = isOrganizationId(subject);
+  const canReadAPIKeys = useProtect({ permission: 'org:sys_api_keys:read' });
+  const canManageAPIKeys = useProtect({ permission: 'org:sys_api_keys:manage' });
+
   const {
     apiKeys,
     isLoading,
@@ -54,7 +59,7 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot, canManageAPIKey
     startingRow,
     endingRow,
     cacheKey,
-  } = useApiKeys({ subject, perPage });
+  } = useApiKeys({ subject, perPage, enabled: isOrg ? canReadAPIKeys : true });
   const card = useCardState();
   const { trigger: createApiKey, isMutating } = useSWRMutation(cacheKey, (_, { arg }: { arg: CreateAPIKeyParams }) =>
     clerk.apiKeys.create(arg),
@@ -119,7 +124,7 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot, canManageAPIKey
               elementDescriptor={descriptors.apiKeysSearchInput}
             />
           </Box>
-          {canManageAPIKeys && (
+          {((isOrg && canManageAPIKeys) || !isOrg) && (
             <Action.Trigger
               value='add-api-key'
               hideOnActive={false}
@@ -148,7 +153,7 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot, canManageAPIKey
         isLoading={isLoading}
         onRevoke={handleRevoke}
         elementDescriptor={descriptors.apiKeysTable}
-        canManageAPIKeys={canManageAPIKeys}
+        canManageAPIKeys={(isOrg && canManageAPIKeys) || !isOrg}
       />
       {itemCount > (perPage ?? 5) && (
         <Pagination
@@ -180,17 +185,8 @@ const _APIKeys = () => {
   const ctx = useApiKeysContext();
   const { user } = useUser();
   const { organization } = useOrganization();
-  const { session } = useSession();
 
   const subject = organization?.id ?? user?.id ?? '';
-
-  const canManageAPIKeys = useMemo(() => {
-    if (organization) {
-      return session?.checkAuthorization({ permission: 'org:sys_api_keys:manage' }) ?? false;
-    }
-
-    return true;
-  }, [session, organization]);
 
   return (
     <Flow.Root
@@ -202,7 +198,6 @@ const _APIKeys = () => {
       <APIKeysPage
         subject={subject}
         perPage={ctx.perPage}
-        canManageAPIKeys={canManageAPIKeys}
       />
     </Flow.Root>
   );
