@@ -626,6 +626,22 @@ export interface CommercePlanJSON extends ClerkResourceJSON {
   is_default: boolean;
   is_recurring: boolean;
   has_base_fee: boolean;
+  /**
+   * Specifies the subscriber type this plan is designed for.
+   *
+   * Each plan is exclusively created for either individual users or organizations,
+   * and cannot be used interchangeably.
+   *
+   * @type {['user'] | ['organization']}
+   * @example
+   * ```ts
+   * // For a user plan
+   * payer_type: ['user']
+   *
+   * // For an organization plan
+   * payer_type: ['organization']
+   * ```
+   */
   payer_type: string[];
   publicly_visible: boolean;
   slug: string;
