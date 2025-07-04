@@ -1,5 +1,20 @@
 # Change Log
 
+## 3.11.0
+
+### Minor Changes
+
+- Export experimental hooks and components for PaymentElement ([#6180](https://github.com/clerk/javascript/pull/6180)) by [@panteliselef](https://github.com/panteliselef)
+
+  - `__experimental_usePaymentElement`
+  - `__experimental_PaymentElementProvider`
+  - `__experimental_PaymentElement`
+
+### Patch Changes
+
+- Updated dependencies [[`ec207dc`](https://github.com/clerk/javascript/commit/ec207dcd2a13340cfa4e3b80d3d52d1b4e7d5f23)]:
+  - @clerk/types@4.64.0
+
 ## 3.10.2
 
 ### Patch Changes

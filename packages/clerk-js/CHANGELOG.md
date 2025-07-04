@@ -1,5 +1,18 @@
 # Change Log
 
+## 5.71.0
+
+### Minor Changes
+
+- Remove `@stripe/react-stripe-js` dependency and only allow loading of stripe-js via `Clerk.__internal_loadStripeJs()`. ([#6180](https://github.com/clerk/javascript/pull/6180)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Updated dependencies [[`ec207dc`](https://github.com/clerk/javascript/commit/ec207dcd2a13340cfa4e3b80d3d52d1b4e7d5f23), [`ec207dc`](https://github.com/clerk/javascript/commit/ec207dcd2a13340cfa4e3b80d3d52d1b4e7d5f23)]:
+  - @clerk/shared@3.11.0
+  - @clerk/types@4.64.0
+  - @clerk/localizations@3.17.4
+
 ## 5.70.0
 
 ### Minor Changes
