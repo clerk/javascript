@@ -14,6 +14,18 @@ import { Elements, PaymentElement as StripePaymentElement, useElements, useStrip
 
 type LoadStripeFn = typeof import('@stripe/stripe-js').loadStripe;
 
+type PaymentElementError = {
+  gateway: 'stripe';
+  error: {
+    /**
+     * For some errors that could be handled programmatically, a short string indicating the [error code](https://stripe.com/docs/error-codes) reported.
+     */
+    code?: string;
+    message?: string;
+    type: string;
+  };
+};
+
 const [StripeLibsContext, useStripeLibsContext] = createContextAndHook<{
   loadStripe: LoadStripeFn;
 } | null>('StripeLibsContext');
@@ -270,16 +282,46 @@ const PaymentElement = ({ fallback }: { fallback?: ReactNode }) => {
   );
 };
 
-const usePaymentElement = () => {
+const throwLibsMissingError = () => {
+  throw new Error(
+    'Clerk: Unable to submit, Stripe libraries are not yet loaded. Be sure to check `isFormReady` before calling `submit`.',
+  );
+};
+
+type UsePaymentElementReturn = {
+  submit: () => Promise<
+    | {
+        data: { gateway: 'stripe'; paymentToken: string };
+        error: null;
+      }
+    | {
+        data: null;
+        error: PaymentElementError;
+      }
+  >;
+  reset: () => Promise<void>;
+  isFormReady: boolean;
+} & (
+  | {
+      provider: {
+        name: 'stripe';
+      };
+      isProviderReady: true;
+    }
+  | {
+      provider: undefined;
+      isProviderReady: false;
+    }
+);
+
+const usePaymentElement = (): UsePaymentElementReturn => {
   const { isPaymentElementReady, initializePaymentSource } = usePaymentElementContext();
   const { stripe, elements } = useStripeUtilsContext();
-  const { stripe: stripeFromContext, externalClientSecret } = usePaymentElementContext();
+  const { externalClientSecret } = usePaymentElementContext();
 
   const submit = useCallback(async () => {
     if (!stripe || !elements) {
-      throw new Error(
-        'Clerk: Unable to submit, Stripe libraries are not yet loaded. Be sure to check `isFormReady` before calling `submit`.',
-      );
+      return throwLibsMissingError();
     }
 
     const { setupIntent, error } = await stripe.confirmSetup({
@@ -290,7 +332,17 @@ const usePaymentElement = () => {
       redirect: 'if_required',
     });
     if (error) {
-      return { data: null, error } as const;
+      return {
+        data: null,
+        error: {
+          gateway: 'stripe',
+          error: {
+            code: error.code,
+            message: error.message,
+            type: error.type,
+          },
+        },
+      } as const;
     }
     return {
       data: { gateway: 'stripe', paymentToken: setupIntent.payment_method as string },
@@ -298,18 +350,32 @@ const usePaymentElement = () => {
     } as const;
   }, [stripe, elements]);
 
-  const isProviderReady = stripe && externalClientSecret;
+  const reset = useCallback(async () => {
+    if (!stripe || !elements) {
+      return throwLibsMissingError();
+    }
 
+    await initializePaymentSource();
+  }, [stripe, elements, initializePaymentSource]);
+
+  const isProviderReady = Boolean(stripe && externalClientSecret);
+
+  if (!isProviderReady) {
+    return {
+      submit: throwLibsMissingError,
+      reset: throwLibsMissingError,
+      isFormReady: false,
+      provider: undefined,
+      isProviderReady: false,
+    };
+  }
   return {
     submit,
-    reset: initializePaymentSource,
+    reset,
     isFormReady: isPaymentElementReady,
-    provider: isProviderReady
-      ? {
-          name: 'stripe',
-          instance: stripeFromContext,
-        }
-      : undefined,
+    provider: {
+      name: 'stripe',
+    },
     isProviderReady: isProviderReady,
   };
 };
