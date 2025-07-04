@@ -1,5 +1,23 @@
 # Change Log
 
+## 3.17.3
+
+### Patch Changes
+
+- Generate placeholder API keys locales ([#6223](https://github.com/clerk/javascript/pull/6223)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Include `esCR` in the package's exports ([#6207](https://github.com/clerk/javascript/pull/6207)) by [@beerose](https://github.com/beerose)
+
+- Updated dependencies [[`8387a39`](https://github.com/clerk/javascript/commit/8387a392a04906f0f10d84c61cfee36f23942f85), [`f2a6641`](https://github.com/clerk/javascript/commit/f2a66419b1813abc86ea98fde7475861995a1486)]:
+  - @clerk/types@4.63.0
+
+## 3.17.2
+
+### Patch Changes
+
+- Updated dependencies [[`edc0bfd`](https://github.com/clerk/javascript/commit/edc0bfdae929dad78a99dfd6275aad947d9ddd73)]:
+  - @clerk/types@4.62.1
+
 ## 3.17.1
 
 ### Patch Changes

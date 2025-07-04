@@ -5,7 +5,6 @@ import type {
   CommercePaymentSourceResource,
   ConfirmCheckoutParams,
 } from '@clerk/types';
-import type { SetupIntent } from '@stripe/stripe-js';
 import { useMemo, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';
@@ -144,7 +143,7 @@ const useCheckoutMutations = () => {
     }
   };
 
-  const payWithExistingPaymentSource = async (e: React.FormEvent<HTMLFormElement>) => {
+  const payWithExistingPaymentSource = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const data = new FormData(e.currentTarget);
@@ -152,17 +151,10 @@ const useCheckoutMutations = () => {
 
     return confirmCheckout({
       paymentSourceId,
-      ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
     });
   };
 
-  const addPaymentSourceAndPay = async (ctx: { stripeSetupIntent?: SetupIntent }) => {
-    return confirmCheckout({
-      gateway: 'stripe',
-      paymentToken: ctx.stripeSetupIntent?.payment_method as string,
-      ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
-    });
-  };
+  const addPaymentSourceAndPay = (ctx: { gateway: 'stripe'; paymentToken: string }) => confirmCheckout(ctx);
 
   const payWithTestCard = () =>
     confirmCheckout({
