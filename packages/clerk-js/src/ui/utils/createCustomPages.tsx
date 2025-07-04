@@ -1,6 +1,7 @@
 import type { CustomPage, EnvironmentResource, LoadedClerk } from '@clerk/types';
 
 import {
+  canViewOrgManageAPIKeys,
   disabledAPIKeysFeature,
   disabledBillingFeature,
   hasPaidOrgPlans,
@@ -99,7 +100,7 @@ const createCustomPages = (
     commerce:
       !disabledBillingFeature(clerk, environment) &&
       (organization ? hasPaidOrgPlans(clerk, environment) : hasPaidUserPlans(clerk, environment)),
-    apiKeys: !disabledAPIKeysFeature(clerk, environment),
+    apiKeys: !disabledAPIKeysFeature(clerk, environment) && (organization ? canViewOrgManageAPIKeys(clerk) : true),
   });
 
   if (isDevelopmentSDK(clerk)) {

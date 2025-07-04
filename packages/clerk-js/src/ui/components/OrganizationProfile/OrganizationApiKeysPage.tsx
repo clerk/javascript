@@ -1,6 +1,6 @@
-import { useOrganization, useSession } from '@clerk/shared/react';
-import { useMemo } from 'react';
+import { useOrganization } from '@clerk/shared/react';
 
+import { useProtect } from '@/ui/common';
 import { ApiKeysContext, useOrganizationProfileContext } from '@/ui/contexts';
 import { Col, localizationKeys } from '@/ui/customizables';
 import { Header } from '@/ui/elements/Header';
@@ -12,15 +12,7 @@ export const OrganizationAPIKeysPage = () => {
   const { organization } = useOrganization();
   const { contentRef } = useUnsafeNavbarContext();
   const { apiKeysProps } = useOrganizationProfileContext();
-  const { session } = useSession();
-
-  const canManageAPIKeys = useMemo(() => {
-    if (session?.checkAuthorization({ permission: 'org:sys_api_keys:manage' })) {
-      return true;
-    }
-
-    return false;
-  }, [session]);
+  const canManageAPIKeys = useProtect(has => has({ permission: 'org:sys_api_keys:manage' }));
 
   if (!organization) {
     // We should never reach this point, but we'll return null to make TS happy

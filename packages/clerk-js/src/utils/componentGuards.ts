@@ -37,3 +37,14 @@ export const hasPaidUserPlans: ComponentGuard = (_, environment) => {
 export const disabledAPIKeysFeature: ComponentGuard = (_, environment) => {
   return !environment?.apiKeysSettings?.enabled;
 };
+
+export const canViewOrgManageAPIKeys: ComponentGuard = clerk => {
+  if (!clerk.session) {
+    return false;
+  }
+
+  return (
+    clerk.session?.checkAuthorization?.({ permission: 'org:sys_api_keys:read' }) ||
+    clerk.session?.checkAuthorization?.({ permission: 'org:sys_api_keys:manage' })
+  );
+};
