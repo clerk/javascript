@@ -56,15 +56,14 @@ export class CaptchaChallenge {
         if (e.captchaError) {
           return { captchaError: e.captchaError };
         }
-        // if captcha action is signup, we return undefined, because we don't want to make the call to FAPI
-        return opts?.action === 'verify' ? { captchaError: e?.message || e || 'unexpected_captcha_error' } : undefined;
+        return { captchaError: e?.message || e || 'unexpected_captcha_error' };
       });
-      return opts?.action === 'verify' ? { ...captchaResult, captchaAction: 'verify' } : captchaResult;
+      return { ...captchaResult, captchaAction: opts?.action };
     }
 
-    // if captcha action is signup, we return an empty object, because it means that the bot protection is disabled
+    // if captcha action is signup, we return undefined, because it means that the bot protection is disabled
     // and the user should be able to sign up without solving a captcha
-    return opts?.action === 'verify' ? { captchaError: 'captcha_unavailable', captchaAction: opts?.action } : {};
+    return opts?.action === 'verify' ? { captchaError: 'captcha_unavailable', captchaAction: opts?.action } : undefined;
   }
 
   /**
