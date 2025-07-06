@@ -33,7 +33,7 @@ export function handleNetlifyCacheInDevInstance({
   publishableKey: string;
 }) {
   const isOnNetlify =
-    process.env.NETLIFY || process.env.URL?.endsWith('netlify.app') || Boolean(process.env.NETLIFY_FUNCTIONS_TOKEN);
+    globalThis.process.env.NETLIFY || globalThis.process.env.URL?.endsWith('netlify.app') || Boolean(globalThis.process.env.NETLIFY_FUNCTIONS_TOKEN);
   const isDevelopmentInstance = isDevelopmentFromPublishableKey(publishableKey);
   if (isOnNetlify && isDevelopmentInstance) {
     const hasHandshakeQueryParam = locationHeader.includes('__clerk_handshake');
