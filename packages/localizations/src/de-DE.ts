@@ -17,6 +17,10 @@ export const deDE: LocalizationResource = {
   apiKeys: {
     action__add: 'Neuen API-Key hinzufügen',
     action__search: 'Suche',
+    alerts: {
+      nameAlreadyExists: undefined,
+      noPermissionsToManageAPIKeys: undefined,
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: 'Keine API-Keys gefunden',

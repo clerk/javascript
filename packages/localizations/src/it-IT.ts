@@ -17,6 +17,10 @@ export const itIT: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    alerts: {
+      nameAlreadyExists: undefined,
+      noPermissionsToManageAPIKeys: undefined,
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,

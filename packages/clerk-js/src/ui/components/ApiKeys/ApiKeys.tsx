@@ -75,7 +75,9 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
     } catch (err: any) {
       if (isClerkAPIResponseError(err)) {
         if (err.status === 409) {
-          card.setError('API Key name already exists');
+          card.setError(t(localizationKeys('apiKeys.alerts.nameAlreadyExists')));
+        } else if (err.status === 403) {
+          card.setError(t(localizationKeys('apiKeys.alerts.noPermissionsToManageAPIKeys')));
         }
       }
     }

@@ -1184,6 +1184,10 @@ export type __internal_LocalizationResource = {
     createdAndExpirationStatus__expiresOn: LocalizationValue<'createdDate' | 'expiresDate'>;
     formFieldCaption__expiration__never: LocalizationValue;
     formFieldCaption__expiration__expiresOn: LocalizationValue<'date'>;
+    alerts: {
+      nameAlreadyExists: LocalizationValue;
+      noPermissionsToManageAPIKeys: LocalizationValue;
+    };
   };
 };
 

@@ -5,6 +5,10 @@ export const enUS: LocalizationResource = {
   apiKeys: {
     action__add: 'Add new key',
     action__search: 'Search keys',
+    alerts: {
+      nameAlreadyExists: 'API key name already exists.',
+      noPermissionsToManageAPIKeys: 'You do not have permissions to manage API keys for this organization.',
+    },
     createdAndExpirationStatus__expiresOn:
       "Created {{ createdDate | shortDate('en-US') }} • Expires {{ expiresDate | longDate('en-US') }}",
     createdAndExpirationStatus__never: "Created {{ createdDate | shortDate('en-US') }} • Never expires",
