@@ -27,9 +27,10 @@ type ForceNull<T> = {
 };
 
 type CheckoutProperties = Omit<RemoveFunctions<CommerceCheckoutResource>, 'pathRoot' | 'status'>;
-type NullableCheckoutProperties = ForceNull<CheckoutProperties>;
 
-type __experimental_UseCheckoutReturn = (CheckoutProperties | NullableCheckoutProperties) & {
+type NullableCheckoutProperties = CheckoutProperties | ForceNull<CheckoutProperties>;
+
+type __experimental_UseCheckoutReturn = NullableCheckoutProperties & {
   confirm: (params: ConfirmCheckoutParams) => Promise<CommerceCheckoutResource>;
   start: () => Promise<CommerceCheckoutResource>;
   isStarting: boolean;
@@ -75,7 +76,7 @@ export const useCheckout = (options?: UseCheckoutOptions): __experimental_UseChe
     () => manager.getState(),
   );
 
-  const properties = useMemo(() => {
+  const properties = useMemo<NullableCheckoutProperties>(() => {
     if (!managerProperties.checkout) {
       return {
         id: null,
