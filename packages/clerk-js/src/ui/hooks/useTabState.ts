@@ -1,4 +1,4 @@
-import React from 'react';
+import { useEffect, useState } from 'react';
 
 import { useRouter } from '../router';
 
@@ -15,7 +15,15 @@ export const useTabState = (tabMap: TabMap, defaultTab = 0) => {
     return tabIndex ? parseInt(tabIndex, 10) : defaultTab;
   };
 
-  const [selectedTab, setSelectedTab] = React.useState(getInitialTab());
+  const [selectedTab, setSelectedTab] = useState(getInitialTab());
+
+  // Listen for URL changes (browser back/forward)
+  useEffect(() => {
+    const currentTab = getInitialTab();
+    if (currentTab !== selectedTab) {
+      setSelectedTab(currentTab);
+    }
+  }, [router.queryParams.tab]);
 
   const handleTabChange = (index: number) => {
     setSelectedTab(index);
