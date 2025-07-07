@@ -110,7 +110,7 @@
     "@clerk/shared": "workspace:^",
     "@clerk/types": "workspace:^",
     "cookie": "1.0.2",
-    "snakecase-keys": "9.0.0",
+    "snakecase-keys": "9.0.1",
     "standardwebhooks": "^1.0.0",
     "tslib": "catalog:repo"
   },
