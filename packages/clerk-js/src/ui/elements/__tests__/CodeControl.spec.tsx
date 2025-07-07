@@ -1,3 +1,4 @@
+import { ClerkRuntimeError } from '@clerk/shared/error';
 import { fireEvent, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -567,7 +568,7 @@ describe('CodeControl', () => {
 
       const onCodeEntryFinished = vi.fn((_, __, reject) => {
         // Simulate synchronous error handling - just call reject
-        const error = new Error('Invalid code');
+        const error = new ClerkRuntimeError('Invalid code', { code: 'invalid_code' });
         reject(error);
       });
 
