@@ -23,7 +23,7 @@ type PaymentMethodSource = 'existing' | 'new';
 const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
 
 export const CheckoutForm = withCardStateProvider(() => {
-  const checkout = useCheckout();
+  const { checkout } = useCheckout();
 
   const { id, plan, totals, isImmediatePlanChange, planPeriod } = checkout;
 
@@ -116,7 +116,8 @@ export const CheckoutForm = withCardStateProvider(() => {
 const useCheckoutMutations = () => {
   const { organization } = useOrganization();
   const { subscriberType, onSubscriptionComplete } = useCheckoutContext();
-  const { id, confirm } = useCheckout();
+  const { checkout } = useCheckout();
+  const { id, confirm } = checkout;
   const card = useCardState();
 
   if (!id) {
@@ -166,7 +167,8 @@ const useCheckoutMutations = () => {
 };
 
 const CheckoutFormElements = () => {
-  const { id, totals } = useCheckout();
+  const { checkout } = useCheckout();
+  const { id, totals } = checkout;
   const { data: paymentSources } = usePaymentMethods();
 
   const [paymentMethodSource, setPaymentMethodSource] = useState<PaymentMethodSource>(() =>
@@ -274,7 +276,7 @@ export const PayWithTestPaymentSource = () => {
 
 const AddPaymentSourceForCheckout = withCardStateProvider(() => {
   const { addPaymentSourceAndPay } = useCheckoutMutations();
-  const checkout = useCheckout();
+  const { checkout } = useCheckout();
   const { id, totals } = checkout;
 
   if (!id) {
@@ -311,7 +313,8 @@ const ExistingPaymentSourceForm = withCardStateProvider(
     totalDueNow: CommerceMoney;
     paymentSources: CommercePaymentSourceResource[];
   }) => {
-    const { paymentSource } = useCheckout();
+    const { checkout } = useCheckout();
+    const { paymentSource } = checkout;
 
     const { payWithExistingPaymentSource } = useCheckoutMutations();
     const card = useCardState();

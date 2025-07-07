@@ -30,17 +30,19 @@ type CheckoutProperties = Omit<RemoveFunctions<CommerceCheckoutResource>, 'pathR
 
 type NullableCheckoutProperties = CheckoutProperties | ForceNull<CheckoutProperties>;
 
-type __experimental_UseCheckoutReturn = NullableCheckoutProperties & {
-  confirm: (params: ConfirmCheckoutParams) => Promise<CommerceCheckoutResource>;
-  start: () => Promise<CommerceCheckoutResource>;
-  isStarting: boolean;
-  isConfirming: boolean;
-  error: ClerkAPIResponseError | null;
-  status: __experimental_CheckoutCacheState['status'];
-  clear: () => void;
-  finalize: (params: { redirectUrl?: string }) => void;
-  fetchStatus: 'idle' | 'fetching' | 'error';
-  getState: () => __experimental_CheckoutCacheState;
+type __experimental_UseCheckoutReturn = {
+  checkout: NullableCheckoutProperties & {
+    confirm: (params: ConfirmCheckoutParams) => Promise<CommerceCheckoutResource>;
+    start: () => Promise<CommerceCheckoutResource>;
+    isStarting: boolean;
+    isConfirming: boolean;
+    error: ClerkAPIResponseError | null;
+    status: __experimental_CheckoutCacheState['status'];
+    clear: () => void;
+    finalize: (params: { redirectUrl?: string }) => void;
+    fetchStatus: 'idle' | 'fetching' | 'error';
+    getState: () => __experimental_CheckoutCacheState;
+  };
 };
 
 type UseCheckoutOptions = {
@@ -101,7 +103,7 @@ export const useCheckout = (options?: UseCheckoutOptions): __experimental_UseChe
     return rest;
   }, [managerProperties.checkout]);
 
-  return {
+  const checkout = {
     ...properties,
     getState: manager.getState,
     // @ts-ignore
@@ -115,5 +117,9 @@ export const useCheckout = (options?: UseCheckoutOptions): __experimental_UseChe
     error: managerProperties.error,
     status: managerProperties.status,
     fetchStatus: managerProperties.fetchStatus,
+  };
+
+  return {
+    checkout,
   };
 };

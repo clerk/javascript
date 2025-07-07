@@ -136,7 +136,7 @@ type internalStripeAppearance = {
 };
 
 type PaymentElementProviderProps = {
-  checkout?: CommerceCheckoutResource | ReturnType<typeof useCheckout>;
+  checkout?: CommerceCheckoutResource | ReturnType<typeof useCheckout>['checkout'];
   stripeAppearance?: internalStripeAppearance;
   // TODO(@COMMERCE): What can we do to remove this ?
   for: 'org' | 'user';

@@ -48,7 +48,7 @@ const useStripeAppearance = () => {
 
 type AddPaymentSourceProps = {
   onSuccess: (context: { gateway: 'stripe'; paymentToken: string }) => Promise<void>;
-  checkout?: ReturnType<typeof useCheckout>;
+  checkout?: ReturnType<typeof useCheckout>['checkout'];
   cancelAction?: () => void;
 };
 

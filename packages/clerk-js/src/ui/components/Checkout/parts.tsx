@@ -10,7 +10,7 @@ import { Box, descriptors, Flex, localizationKeys, useLocalizations } from '../.
 import { EmailForm } from '../UserProfile/EmailForm';
 
 export const GenericError = () => {
-  const { error } = useCheckout();
+  const { checkout } = useCheckout();
 
   const { translateError } = useLocalizations();
   const { t } = useLocalizations();
@@ -29,7 +29,9 @@ export const GenericError = () => {
           variant='danger'
           colorScheme='danger'
         >
-          {error ? translateError(error.errors[0]) : t(localizationKeys('unstable__errors.form_param_value_invalid'))}
+          {checkout.error
+            ? translateError(checkout.error.errors[0])
+            : t(localizationKeys('unstable__errors.form_param_value_invalid'))}
         </Alert>
       </Flex>
     </Drawer.Body>
@@ -38,7 +40,8 @@ export const GenericError = () => {
 
 export const InvalidPlanScreen = () => {
   const { planPeriod } = useCheckoutContext();
-  const { error } = useCheckout();
+  const { checkout } = useCheckout();
+  const error = checkout.error;
 
   const planFromError = useMemo(() => {
     const _error = error?.errors.find(e => e.code === 'invalid_plan_change');
@@ -91,7 +94,7 @@ export const InvalidPlanScreen = () => {
 };
 
 export const AddEmailForm = () => {
-  const { start } = useCheckout();
+  const { checkout } = useCheckout();
   const { setIsOpen } = useDrawerContext();
   return (
     <Drawer.Body>
@@ -103,7 +106,7 @@ export const AddEmailForm = () => {
         <EmailForm
           title={localizationKeys('commerce.checkout.emailForm.title')}
           subtitle={localizationKeys('commerce.checkout.emailForm.subtitle')}
-          onSuccess={() => start().catch(() => null)}
+          onSuccess={() => checkout.start().catch(() => null)}
           onReset={() => setIsOpen(false)}
           disableAutoFocus
         />

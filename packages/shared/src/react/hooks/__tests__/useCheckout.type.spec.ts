@@ -56,15 +56,17 @@ describe('useCheckout type tests', () => {
   });
 
   describe('return value', () => {
+    type CheckoutObject = UseCheckoutReturn['checkout'];
     describe('methods', () => {
       it('has required methods', () => {
-        type Methods = Pick<UseCheckoutReturn, 'confirm' | 'start' | 'clear' | 'finalize' | 'getState'>;
+        type Methods = Pick<CheckoutObject, 'confirm' | 'start' | 'clear' | 'finalize' | 'getState'>;
+
         type MethodNames = keyof Methods;
         expectTypeOf<MethodNames>().toEqualTypeOf<'confirm' | 'start' | 'clear' | 'finalize' | 'getState'>();
       });
 
       it('has correct method signatures', () => {
-        type Methods = Pick<UseCheckoutReturn, 'confirm' | 'start' | 'clear' | 'finalize' | 'getState'>;
+        type Methods = Pick<CheckoutObject, 'confirm' | 'start' | 'clear' | 'finalize' | 'getState'>;
         type ConfirmMethod = Methods['confirm'];
         type StartMethod = Methods['start'];
         type ClearMethod = Methods['clear'];
@@ -82,7 +84,7 @@ describe('useCheckout type tests', () => {
 
     describe('properties', () => {
       it('has required status properties with correct types', () => {
-        type StatusProps = Pick<UseCheckoutReturn, 'isStarting' | 'isConfirming' | 'error' | 'status' | 'fetchStatus'>;
+        type StatusProps = Pick<CheckoutObject, 'isStarting' | 'isConfirming' | 'error' | 'status' | 'fetchStatus'>;
         type PropNames = keyof StatusProps;
         expectTypeOf<PropNames>().toEqualTypeOf<'isStarting' | 'isConfirming' | 'error' | 'status' | 'fetchStatus'>();
 
@@ -97,7 +99,7 @@ describe('useCheckout type tests', () => {
 
       it('has nullable checkout properties', () => {
         type CheckoutProps = Pick<
-          UseCheckoutReturn,
+          CheckoutObject,
           | 'id'
           | 'externalClientSecret'
           | 'externalGatewayId'
