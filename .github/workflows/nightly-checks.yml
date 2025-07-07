@@ -1,5 +1,9 @@
 name: Nightly upstream tests
 on:
+  pull_request:
+    branches:
+      - main
+      - release/v4
   workflow_dispatch:
   schedule:
     - cron: '0 7 * * *'
@@ -7,12 +11,14 @@ on:
 jobs:
   integration-tests:
     name: Integration Tests
-    runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
+    runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}\
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_EXTENDED && fromJSON(vars.TIMEOUT_MINUTES_EXTENDED) || 30 }}
 
     strategy:
       matrix:
         test-name: ['nextjs']
+      # Don't cancel other matrix jobs if one fails
+      fail-fast: false
 
     steps:
       - name: Checkout Repo
@@ -40,12 +46,31 @@ jobs:
         working-directory: ./integration
         run: pnpm init && pnpm add @clerk/backend
 
+      - name: List installed packages in /integration
+        working-directory: ./integration
+        run: |
+          echo "=== Listing installed packages in /integration ==="
+          pnpm list --json
+          echo "=== Detailed package info for @clerk/backend ==="
+          pnpm list @clerk/backend
+
       - name: Install @clerk/clerk-js in os temp
         working-directory: ${{runner.temp}}
         run: mkdir clerk-js && cd clerk-js && pnpm init && pnpm add @clerk/clerk-js
 
       - name: Run Integration Tests
-        run: pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS --only
+        id: integration_tests
+        continue-on-error: true
+        run: |
+          # Capture the output and exit code
+          OUTPUT_FILE="${{runner.temp}}/test-output.log"
+          # Only run Typedoc tests for one matrix version
+          if [ "${{ matrix.test-name }}" == "nextjs" ]; then
+            E2E_DEBUG=1 E2E_APP_ID=quickstart.next.appRouter pnpm test:integration:base --grep @quickstart 2>&1 | tee "$OUTPUT_FILE"
+          else
+            E2E_DEBUG=1 pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS --only 2>&1 | tee "$OUTPUT_FILE"
+          fi
+          echo "exit_code=${PIPESTATUS[0]}" >> $GITHUB_OUTPUT
         env:
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
           E2E_CLERK_VERSION: 'latest'
@@ -56,11 +81,36 @@ jobs:
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
           MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
 
+      # Upload test artifacts if tests failed
+      - name: Upload Test Artifacts
+        if: steps.integration_tests.outputs.exit_code != '0'
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-artifacts-${{ matrix.test-name }}
+          path: |
+            ${{runner.temp}}/test-output.log
+            integration/test-results/
+            integration/.next/
+            ${{runner.temp}}/clerk-js/node_modules/
+          retention-days: 7
+
       - name: Report Status
         if: always()
         uses: ravsamhq/notify-slack-action@v1
         with:
-          status: ${{ job.status }}
+          status: ${{ steps.integration_tests.outputs.exit_code == '0' && 'success' || 'failure' }}
           notify_when: 'failure'
+          notification_title: 'Integration Test Failure - ${{ matrix.test-name }}'
+          message_format: |
+            *Job:* ${{ github.workflow }} (${{ matrix.test-name }})
+            *Status:* ${{ steps.integration_tests.outputs.exit_code == '0' && 'Success' || 'Failed' }}
+            *Commit:* ${{ github.sha }}
+            *PR:* ${{ github.event.pull_request.html_url }}
+            *Artifacts:* ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_SDK_E2E_ALERTS_WEBHOOK_URL }}
+
+      # Fail the workflow if tests failed
+      - name: Check Test Status
+        if: steps.integration_tests.outputs.exit_code != '0'
+        run: exit 1

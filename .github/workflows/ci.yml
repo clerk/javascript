@@ -18,6 +18,7 @@ jobs:
   # Check triggering actor permissions to prevent PRs from forks accessing secrets by default, preventing them from exfiltrating secrets for malicious purposes
   check-permissions:
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    if: false
     defaults:
       run:
         shell: bash

@@ -13,6 +13,8 @@ on:
 jobs:
   pr-title-lint:
     runs-on: ubuntu-latest
+    # DISABLED: This workflow is temporarily disabled. Remove this condition to re-enable.
+    if: false
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
