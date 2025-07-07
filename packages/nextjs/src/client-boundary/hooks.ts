@@ -11,6 +11,9 @@ export {
   useSignUp,
   useUser,
   useReverification,
+  __experimental_usePaymentElement,
+  __experimental_PaymentElementProvider,
+  __experimental_PaymentElement,
 } from '@clerk/clerk-react';
 
 export {
