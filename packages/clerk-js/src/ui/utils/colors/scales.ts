@@ -1,7 +1,7 @@
 import type { ColorScale, CssColorOrAlphaScale, CssColorOrScale, HslaColorString } from '@clerk/types';
 
 import { cssSupports } from '../cssSupports';
-import { ALPHA_VALUES, COLOR_SCALE, DARK_SHADES, LIGHT_SHADES, LIGHTNESS_CONFIG } from './constants';
+import { ALL_SHADES, ALPHA_VALUES, COLOR_SCALE, DARK_SHADES, LIGHT_SHADES, LIGHTNESS_CONFIG } from './constants';
 import { colors as legacyColors } from './legacy';
 import { createEmptyColorScale, generateAlphaColorMix, getSupportedColorVariant } from './utils';
 
@@ -126,9 +126,19 @@ function processColorInput(
     };
   }
 
-  // If it's an object but missing the 500 shade, throw error
-  if (typeof color === 'object' && !color['500']) {
-    throw new Error('You need to provide at least the 500 shade');
+  // If it's an object, check if it has any valid shade keys
+  if (typeof color === 'object') {
+    const hasValidShadeKeys = ALL_SHADES.some((shade: keyof ColorScale<string>) => color[shade]);
+
+    if (hasValidShadeKeys && !color['500']) {
+      // Has valid shade keys but missing 500 - this is an error
+      throw new Error('You need to provide at least the 500 shade');
+    }
+
+    // No valid shade keys - treat as invalid input
+    if (!hasValidShadeKeys) {
+      return null;
+    }
   }
 
   return null;
