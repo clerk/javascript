@@ -59,25 +59,25 @@ describe('useCheckout type tests', () => {
     type CheckoutObject = UseCheckoutReturn['checkout'];
     describe('methods', () => {
       it('has required methods', () => {
-        type Methods = Pick<CheckoutObject, 'confirm' | 'start' | 'clear' | 'finalize' | 'getState'>;
+        type Methods = Pick<CheckoutObject, 'confirm' | 'start' | 'clear' | 'complete' | 'getState'>;
 
         type MethodNames = keyof Methods;
-        expectTypeOf<MethodNames>().toEqualTypeOf<'confirm' | 'start' | 'clear' | 'finalize' | 'getState'>();
+        expectTypeOf<MethodNames>().toEqualTypeOf<'confirm' | 'start' | 'clear' | 'complete' | 'getState'>();
       });
 
       it('has correct method signatures', () => {
-        type Methods = Pick<CheckoutObject, 'confirm' | 'start' | 'clear' | 'finalize' | 'getState'>;
+        type Methods = Pick<CheckoutObject, 'confirm' | 'start' | 'clear' | 'complete' | 'getState'>;
         type ConfirmMethod = Methods['confirm'];
         type StartMethod = Methods['start'];
         type ClearMethod = Methods['clear'];
-        type FinalizeMethod = Methods['finalize'];
+        type CompleteMethod = Methods['complete'];
         type GetStateMethod = Methods['getState'];
 
         expectTypeOf<ConfirmMethod>().parameter(0).toEqualTypeOf<ConfirmCheckoutParams>();
         expectTypeOf<ConfirmMethod>().returns.toEqualTypeOf<Promise<CommerceCheckoutResource>>();
         expectTypeOf<StartMethod>().returns.toEqualTypeOf<Promise<CommerceCheckoutResource>>();
         expectTypeOf<ClearMethod>().returns.toBeVoid();
-        expectTypeOf<FinalizeMethod>().parameter(0).toEqualTypeOf<{ redirectUrl?: string }>();
+        expectTypeOf<CompleteMethod>().parameter(0).toEqualTypeOf<{ redirectUrl: string } | undefined>();
         expectTypeOf<GetStateMethod>().returns.toEqualTypeOf<__experimental_CheckoutCacheState>();
       });
     });

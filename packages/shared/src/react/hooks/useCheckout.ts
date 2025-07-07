@@ -39,7 +39,7 @@ type __experimental_UseCheckoutReturn = {
     error: ClerkAPIResponseError | null;
     status: __experimental_CheckoutCacheState['status'];
     clear: () => void;
-    finalize: (params: { redirectUrl?: string }) => void;
+    complete: (params?: { redirectUrl: string }) => void;
     fetchStatus: 'idle' | 'fetching' | 'error';
     getState: () => __experimental_CheckoutCacheState;
   };
@@ -111,7 +111,7 @@ export const useCheckout = (options?: UseCheckoutOptions): __experimental_UseChe
     start: manager.start,
     confirm: manager.confirm,
     clear: manager.clear,
-    finalize: manager.finalize,
+    complete: manager.complete,
     isStarting: managerProperties.isStarting,
     isConfirming: managerProperties.isConfirming,
     error: managerProperties.error,
