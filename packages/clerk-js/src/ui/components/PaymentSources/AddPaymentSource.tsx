@@ -1,10 +1,10 @@
+import type { __experimental_useCheckout as useCheckout } from '@clerk/shared/react';
 import {
   __experimental_PaymentElement as PaymentElement,
   __experimental_PaymentElementProvider as PaymentElementProvider,
   __experimental_usePaymentElement as usePaymentElement,
   createContextAndHook,
 } from '@clerk/shared/react';
-import type { CommerceCheckoutResource } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
@@ -48,7 +48,7 @@ const useStripeAppearance = () => {
 
 type AddPaymentSourceProps = {
   onSuccess: (context: { gateway: 'stripe'; paymentToken: string }) => Promise<void>;
-  checkout?: CommerceCheckoutResource;
+  checkout?: ReturnType<typeof useCheckout>;
   cancelAction?: () => void;
 };
 

@@ -7,6 +7,7 @@ import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
 import { createContextAndHook } from './hooks/createContextAndHook';
+import type { useCheckout } from './hooks/useCheckout';
 import { useClerk } from './hooks/useClerk';
 import { useOrganization } from './hooks/useOrganization';
 import { useUser } from './hooks/useUser';
@@ -135,7 +136,7 @@ type internalStripeAppearance = {
 };
 
 type PaymentElementProviderProps = {
-  checkout?: CommerceCheckoutResource;
+  checkout?: CommerceCheckoutResource | ReturnType<typeof useCheckout>;
   stripeAppearance?: internalStripeAppearance;
   // TODO(@COMMERCE): What can we do to remove this ?
   for: 'org' | 'user';
@@ -234,7 +235,7 @@ const PaymentElement = ({ fallback }: { fallback?: ReactNode }) => {
   const environment = useInternalEnvironment();
 
   const applePay = useMemo(() => {
-    if (!checkout) {
+    if (!checkout || !checkout.totals || !checkout.plan) {
       return undefined;
     }
 
