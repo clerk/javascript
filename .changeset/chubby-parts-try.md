@@ -2,8 +2,6 @@
 '@clerk/clerk-js': minor
 ---
 
-Add modern CSS color manipulation utilities with progressive enhancement support. This update introduces:
+Add CSS variable support to the `appearance.variables` object, enabling use of CSS custom properties. For example, you can now use `colorPrimary: 'var(--brand-color)'` to reference CSS variables defined in your stylesheets.
 
-- CSS variable support in `appearance.variables` object (e.g., `colorPrimary: 'var(--brand-color)'`)
-- Modern CSS features like `color-mix()` and relative color syntax when supported by browser
-- Automatic fallback to legacy HSLA-based color manipulation for older browsers
+This feature includes automatic fallback support for browsers that don't support modern CSS color manipulation features.
