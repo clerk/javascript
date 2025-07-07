@@ -35,12 +35,6 @@ const PUBLISHABLE_FRONTEND_API_DEV_REGEX = /^(([a-z]+)-){2}([0-9]{1,2})\.clerk\.
  *
  * @param frontendApi - The frontend API URL (e.g., 'clerk.example.com').
  * @returns A base64-encoded publishable key with appropriate prefix (pk_live_ or pk_test_).
- *
- * @example
- * ```typescript
- * const key = buildPublishableKey('clerk.example.com');
- * // Returns: 'pk_live_Y2xlcmsuZXhhbXBsZS5jb20k'
- * ```
  */
 export function buildPublishableKey(frontendApi: string): string {
   const isDevKey =
@@ -56,13 +50,6 @@ export function buildPublishableKey(frontendApi: string): string {
  *
  * @param decoded - The decoded publishable key string to validate.
  * @returns `true` if the decoded key has valid format, `false` otherwise.
- *
- * @example
- * ```typescript
- * isValidDecodedPublishableKey('clerk.example.com$'); // true
- * isValidDecodedPublishableKey('clerk.example.com'); // false
- * isValidDecodedPublishableKey('clerk.example.com$$'); // false
- * ```
  */
 function isValidDecodedPublishableKey(decoded: string): boolean {
   if (!decoded.endsWith('$')) {
@@ -97,15 +84,6 @@ export function parsePublishableKey(
  * @returns Parsed publishable key object with instanceType and frontendApi, or null if invalid.
  *
  * @throws {Error} When options.fatal is true and key is missing or invalid.
- *
- * @example
- * ```typescript
- * const result = parsePublishableKey('pk_test_Y2xlcmsuZXhhbXBsZS5jb20k');
- * // Returns: { instanceType: 'development', frontendApi: 'clerk.example.com' }
- *
- * const result = parsePublishableKey('invalid-key', { fatal: true });
- * // Throws: Error('Publishable key not valid.')
- * ```
  */
 export function parsePublishableKey(
   key: string | undefined,
@@ -163,14 +141,6 @@ export function parsePublishableKey(
  *
  * @param key - The key to be checked. Defaults to an empty string if not provided.
  * @returns `true` if 'key' is a valid publishable key, `false` otherwise.
- *
- * @example
- * ```typescript
- * isPublishableKey('pk_test_Y2xlcmsuZXhhbXBsZS5jb20k'); // true
- * isPublishableKey('pk_live_Y2xlcmsuZXhhbXBsZS5jb20k'); // true
- * isPublishableKey('invalid-key'); // false
- * isPublishableKey(); // false
- * ```
  */
 export function isPublishableKey(key: string = '') {
   try {
@@ -202,14 +172,6 @@ export function isPublishableKey(key: string = '') {
  * Uses a Map to cache results for better performance on repeated checks.
  *
  * @returns An object with an isDevOrStagingUrl method that checks if a URL is dev/staging.
- *
- * @example
- * ```typescript
- * const cache = createDevOrStagingUrlCache();
- * cache.isDevOrStagingUrl('example.clerk.dev'); // true
- * cache.isDevOrStagingUrl('example.clerk.com'); // false
- * cache.isDevOrStagingUrl(new URL('https://example.clerk.dev')); // true
- * ```
  */
 export function createDevOrStagingUrlCache() {
   const devOrStagingUrlCache = new Map<string, boolean>();
@@ -243,13 +205,6 @@ export function createDevOrStagingUrlCache() {
  *
  * @param apiKey - The API key to check.
  * @returns `true` if the key is for development, `false` otherwise.
- *
- * @example
- * ```typescript
- * isDevelopmentFromPublishableKey('pk_test_abc123'); // true
- * isDevelopmentFromPublishableKey('test_abc123'); // true
- * isDevelopmentFromPublishableKey('pk_live_abc123'); // false
- * ```
  */
 export function isDevelopmentFromPublishableKey(apiKey: string): boolean {
   return apiKey.startsWith('test_') || apiKey.startsWith('pk_test_');
@@ -261,13 +216,6 @@ export function isDevelopmentFromPublishableKey(apiKey: string): boolean {
  *
  * @param apiKey - The API key to check.
  * @returns `true` if the key is for production, `false` otherwise.
- *
- * @example
- * ```typescript
- * isProductionFromPublishableKey('pk_live_abc123'); // true
- * isProductionFromPublishableKey('live_abc123'); // true
- * isProductionFromPublishableKey('pk_test_abc123'); // false
- * ```
  */
 export function isProductionFromPublishableKey(apiKey: string): boolean {
   return apiKey.startsWith('live_') || apiKey.startsWith('pk_live_');
@@ -279,13 +227,6 @@ export function isProductionFromPublishableKey(apiKey: string): boolean {
  *
  * @param apiKey - The secret key to check.
  * @returns `true` if the key is for development, `false` otherwise.
- *
- * @example
- * ```typescript
- * isDevelopmentFromSecretKey('sk_test_abc123'); // true
- * isDevelopmentFromSecretKey('test_abc123'); // true
- * isDevelopmentFromSecretKey('sk_live_abc123'); // false
- * ```
  */
 export function isDevelopmentFromSecretKey(apiKey: string): boolean {
   return apiKey.startsWith('test_') || apiKey.startsWith('sk_test_');
@@ -297,13 +238,6 @@ export function isDevelopmentFromSecretKey(apiKey: string): boolean {
  *
  * @param apiKey - The secret key to check.
  * @returns `true` if the key is for production, `false` otherwise.
- *
- * @example
- * ```typescript
- * isProductionFromSecretKey('sk_live_abc123'); // true
- * isProductionFromSecretKey('live_abc123'); // true
- * isProductionFromSecretKey('sk_test_abc123'); // false
- * ```
  */
 export function isProductionFromSecretKey(apiKey: string): boolean {
   return apiKey.startsWith('live_') || apiKey.startsWith('sk_live_');
@@ -316,12 +250,6 @@ export function isProductionFromSecretKey(apiKey: string): boolean {
  * @param publishableKey - The publishable key to generate suffix from.
  * @param subtle - The SubtleCrypto interface to use for hashing (defaults to globalThis.crypto.subtle).
  * @returns A promise that resolves to an 8-character URL-safe base64 string.
- *
- * @example
- * ```typescript
- * const suffix = await getCookieSuffix('pk_test_abc123');
- * // Returns: 'xY9kL2mP' (8 characters, URL-safe)
- * ```
  */
 export async function getCookieSuffix(
   publishableKey: string,
@@ -341,12 +269,6 @@ export async function getCookieSuffix(
  * @param cookieName - The base cookie name.
  * @param cookieSuffix - The suffix to append (typically generated by getCookieSuffix).
  * @returns The suffixed cookie name in format: `${cookieName}_${cookieSuffix}`.
- *
- * @example
- * ```typescript
- * const suffixedName = getSuffixedCookieName('__session', 'xY9kL2mP');
- * // Returns: '__session_xY9kL2mP'
- * ```
  */
 export const getSuffixedCookieName = (cookieName: string, cookieSuffix: string): string => {
   return `${cookieName}_${cookieSuffix}`;

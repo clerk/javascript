@@ -51,7 +51,6 @@ describe('parsePublishableKey(key)', () => {
   });
 
   it('returns null for keys with extra characters after $', () => {
-    // The problematic key from the issue - fake-clerk-malformed.clerk.accounts.dev$extra
     expect(parsePublishableKey('pk_live_ZmFrZS1jbGVyay1tYWxmb3JtZWQuY2xlcmsuYWNjb3VudHMuZGV2JGV4dHJh')).toBeNull();
   });
 
@@ -62,12 +61,10 @@ describe('parsePublishableKey(key)', () => {
   });
 
   it('returns null for keys with multiple $ characters', () => {
-    // fake-clerk-multiple.clerk.accounts.dev$$
     expect(parsePublishableKey('pk_live_ZmFrZS1jbGVyay1tdWx0aXBsZS5jbGVyay5hY2NvdW50cy5kZXYkJA==')).toBeNull();
   });
 
   it('returns null for keys without proper domain format', () => {
-    // invalidkey$
     expect(parsePublishableKey('pk_live_aW52YWxpZGtleSQ=')).toBeNull();
   });
 
@@ -88,7 +85,6 @@ describe('parsePublishableKey(key)', () => {
   });
 
   it('applies the proxyUrl if provided', () => {
-    // fake-clerk-test.clerk.accounts.dev$
     expect(
       parsePublishableKey('pk_live_ZmFrZS1jbGVyay10ZXN0LmNsZXJrLmFjY291bnRzLmRldiQ=', {
         proxyUrl: 'example.com/__clerk',
@@ -100,7 +96,6 @@ describe('parsePublishableKey(key)', () => {
   });
 
   it('applies the domain if provided for production keys and isSatellite is true', () => {
-    // fake-clerk-test.clerk.accounts.dev$
     expect(
       parsePublishableKey('pk_live_ZmFrZS1jbGVyay10ZXN0LmNsZXJrLmFjY291bnRzLmRldiQ=', {
         domain: 'example.com',
@@ -113,7 +108,6 @@ describe('parsePublishableKey(key)', () => {
   });
 
   it('ignores domain for production keys when isSatellite is false', () => {
-    // fake-clerk-test.clerk.accounts.dev$
     expect(
       parsePublishableKey('pk_live_ZmFrZS1jbGVyay10ZXN0LmNsZXJrLmFjY291bnRzLmRldiQ=', {
         domain: 'example.com',
@@ -137,7 +131,6 @@ describe('parsePublishableKey(key)', () => {
 
 describe('isPublishableKey(key)', () => {
   it('returns true if the key is a valid publishable key', () => {
-    // fake-clerk-test.clerk.accounts.dev$
     expect(isPublishableKey('pk_live_ZmFrZS1jbGVyay10ZXN0LmNsZXJrLmFjY291bnRzLmRldiQ=')).toBe(true);
     expect(isPublishableKey('pk_test_Y2xlcmsuY2xlcmsuZGV2JA==')).toBe(true);
   });
@@ -153,21 +146,16 @@ describe('isPublishableKey(key)', () => {
   });
 
   it('returns false if the decoded key has extra characters after $', () => {
-    // This is the problematic key from the issue - fake-clerk-malformed.clerk.accounts.dev$extra
     expect(isPublishableKey('pk_live_ZmFrZS1jbGVyay1tYWxmb3JtZWQuY2xlcmsuYWNjb3VudHMuZGV2JGV4dHJh')).toBe(false);
-    // Other variations with extra content after $
     expect(isPublishableKey('pk_test_Y2xlcmsuY2xlcmsuZGV2JGV4dHJh')).toBe(false);
   });
 
   it('returns false if the decoded key has multiple $ characters', () => {
-    // fake-clerk-multiple.clerk.accounts.dev$$
     expect(isPublishableKey('pk_live_ZmFrZS1jbGVyay1tdWx0aXBsZS5jbGVyay5hY2NvdW50cy5kZXYkJA==')).toBe(false);
-    // $fake-clerk-prefix.clerk.accounts.dev$
     expect(isPublishableKey('pk_live_JGZha2UtY2xlcmstcHJlZml4LmNsZXJrLmFjY291bnRzLmRldiQ=')).toBe(false);
   });
 
   it('returns false if the decoded key does not look like a domain', () => {
-    // invalidkey$
     expect(isPublishableKey('pk_live_aW52YWxpZGtleSQ=')).toBe(false);
   });
 });
@@ -257,7 +245,7 @@ describe('isProductionFromSecretKey(key)', () => {
 
 describe('getCookieSuffix(publishableKey, subtle?)', () => {
   const cases: Array<[string, string]> = [
-    ['pk_live_ZmFrZS1jbGVyay10ZXN0LmNsZXJrLmFjY291bnRzLmRldiQ=', 'qReyu04C'], // fake-clerk-test.clerk.accounts.dev$
+    ['pk_live_ZmFrZS1jbGVyay10ZXN0LmNsZXJrLmFjY291bnRzLmRldiQ=', 'qReyu04C'],
     ['pk_test_Y2xlcmsuY2xlcmsuZGV2JA', 'QvfNY2dr'],
   ];
 
