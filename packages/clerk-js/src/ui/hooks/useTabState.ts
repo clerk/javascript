@@ -23,7 +23,7 @@ export const useTabState = (tabMap: TabMap, defaultTab = 0) => {
     if (currentTab !== selectedTab) {
       setSelectedTab(currentTab);
     }
-  }, [router.queryParams.tab, selectedTab]);
+  }, [router.queryParams.tab]);
 
   const handleTabChange = (index: number) => {
     setSelectedTab(index);
