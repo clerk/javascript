@@ -2,4 +2,4 @@
 "@clerk/shared": patch
 ---
 
-Use shared safe environment variable access in Netlify cache handler
+Make sure `process` is defined in environment when checking if application is running on Netlify.
