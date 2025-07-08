@@ -14,10 +14,6 @@ type UpdateMachineParams = {
   name: string;
 };
 
-type DeleteMachineParams = {
-  machineId: string;
-};
-
 type GetMachineListParams = {
   limit?: number;
   offset?: number;
@@ -51,8 +47,7 @@ export class MachineApi extends AbstractAPI {
     });
   }
 
-  async delete(params: DeleteMachineParams) {
-    const { machineId } = params;
+  async delete(machineId: string) {
     this.requireId(machineId);
     return this.request<Machine>({
       method: 'DELETE',
