@@ -34,7 +34,11 @@ export function handleNetlifyCacheInDevInstance({
   requestStateHeaders: Headers;
   publishableKey: string;
 }) {
-  const isOnNetlify = getEnvVariable('NETLIFY') || getEnvVariable('URL')?.endsWith('netlify.app') || Boolean(getEnvVariable('NETLIFY_FUNCTIONS_TOKEN'));
+  const isOnNetlify =
+  getEnvVariable('NETLIFY') ||
+  (typeof getEnvVariable('URL') === 'string' && getEnvVariable('URL').endsWith('netlify.app')) ||
+  Boolean(getEnvVariable('NETLIFY_FUNCTIONS_TOKEN'));
+
   const isDevelopmentInstance = isDevelopmentFromPublishableKey(publishableKey);
   if (isOnNetlify && isDevelopmentInstance) {
     const hasHandshakeQueryParam = locationHeader.includes('__clerk_handshake');
