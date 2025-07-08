@@ -87,7 +87,6 @@ export default function OTP() {
               className='segmented-otp-with-props-wrapper flex justify-center has-[:disabled]:opacity-50'
               type='otp'
               data-testid='segmented-otp-with-props'
-              passwordManagerOffset={4}
               length={4}
               render={({ value, status }) => {
                 return (
