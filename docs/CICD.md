@@ -22,7 +22,7 @@ Refer to the docs in the (private) `clerk/sdk-infra-workers` repo for more detai
 
 ## Automated canary releases
 
-A canary release will be triggered every time PR is merged into `main`. Every commit merged into main will trigger the fol lowing actions:
+A canary release will be triggered every time PR is merged into `main`. Every commit merged into main will trigger the following actions:
 
 - A workflow dispatch will be triggered to update the `clerkjs-proxy` worker in `clerk/sdk-infra-workers`.
 - The canary Accounts project will be deployed using the most recent `@canary` version of `@clerk/nextjs`. This happens for testing purposes.
