@@ -132,6 +132,7 @@ export type CheckoutCtx = __internal_CheckoutProps & {
 export type SessionTasksCtx = {
   nextTask: () => Promise<void>;
   redirectUrlComplete?: string;
+  currentTaskContainer: React.RefObject<HTMLDivElement> | null;
 };
 
 export type OAuthConsentCtx = __internal_OAuthConsentProps & {
