@@ -83,9 +83,9 @@ export const InvalidPlanScreen = () => {
             variant='info'
             colorScheme='info'
             title={
-              planFromError.annual_monthly_amount_formatted !== '0'
+              planFromError.is_recoverable
                 ? localizationKeys('commerce.cannotSubscribeMonthly')
-                : localizationKeys('commerce.cannotSubscribeMonthlyNoAnnual')
+                : localizationKeys('commerce.cannotSubscribeUnrecoverable')
             }
           />
         </Box>
