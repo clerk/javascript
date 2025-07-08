@@ -34,7 +34,7 @@ type VerifyMachineTokenParams = WithMachineSecret<{
 
 export class MachineTokensApi extends AbstractAPI {
   /**
-   * Overrides the instance secret with the machine secret.
+   * Overrides the instance secret with a machine secret.
    */
   #withMachineSecretHeader(
     options: ClerkBackendApiRequestOptions,
