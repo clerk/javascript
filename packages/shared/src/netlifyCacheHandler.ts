@@ -1,4 +1,4 @@
-/* eslint-disable turbo/no-undeclared-env-vars */
+import { getEnvVariable } from './getEnvVariable';
 import { isDevelopmentFromPublishableKey } from './keys';
 
 /**
@@ -19,7 +19,7 @@ export const CLERK_NETLIFY_CACHE_BUST_PARAM = '__clerk_netlify_cache_bust';
  * The issue happens only on Clerk development instances running on Netlify. This is
  * a workaround until we find a better solution.
  *
- * See https://answers.netlify.com/t/cache-handling-recommendation-for-authentication-handshake-redirects/143969/1
+ * See https://answers.netlify.com/t/cache-handling-recommendation-for-authentication-handshake-redirects/143969/1.
  *
  * @internal
  */
@@ -33,7 +33,10 @@ export function handleNetlifyCacheInDevInstance({
   publishableKey: string;
 }) {
   const isOnNetlify =
-    process.env.NETLIFY || process.env.URL?.endsWith('netlify.app') || Boolean(process.env.NETLIFY_FUNCTIONS_TOKEN);
+    getEnvVariable('NETLIFY') ||
+    (typeof getEnvVariable('URL') === 'string' && getEnvVariable('URL').endsWith('netlify.app')) ||
+    Boolean(getEnvVariable('NETLIFY_FUNCTIONS_TOKEN'));
+
   const isDevelopmentInstance = isDevelopmentFromPublishableKey(publishableKey);
   if (isOnNetlify && isDevelopmentInstance) {
     const hasHandshakeQueryParam = locationHeader.includes('__clerk_handshake');
