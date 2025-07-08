@@ -336,7 +336,7 @@ export const OTPCodeControl = React.forwardRef<{ reset: any }>((_, ref) => {
         hasError={feedbackType === 'error'}
         elementDescriptor={descriptors.otpCodeFieldInputs}
         gap={2}
-        sx={t => ({ direction: 'ltr', padding: t.space.$1, marginLeft: `-${t.space.$1}`, ...centerSx })}
+        sx={t => ({ direction: 'ltr', padding: t.space.$1, marginLeft: `calc(${t.space.$1} * -1)`, ...centerSx })}
         role='group'
         aria-label='Verification code input'
       >
