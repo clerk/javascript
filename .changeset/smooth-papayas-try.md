@@ -2,4 +2,4 @@
 '@clerk/shared': patch
 ---
 
-Enahncing publishable key parsing and validation logic to validate expected format
+Enhancing publishable key parsing and validation logic to validate expected format
