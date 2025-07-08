@@ -1,5 +1,62 @@
 # Change Log
 
+## 5.71.0
+
+### Minor Changes
+
+- Add CSS variable support to the `appearance.variables` object, enabling use of CSS custom properties. For example, you can now use `colorPrimary: 'var(--brand-color)'` to reference CSS variables defined in your stylesheets. ([#6187](https://github.com/clerk/javascript/pull/6187)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  This feature includes automatic fallback support for browsers that don't support modern CSS color manipulation features.
+
+- Added granular permission checks to `<APIKeys />` component to support read-only and manage roles ([#6253](https://github.com/clerk/javascript/pull/6253)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Remove `@stripe/react-stripe-js` dependency and only allow loading of stripe-js via `Clerk.__internal_loadStripeJs()`. ([#6180](https://github.com/clerk/javascript/pull/6180)) by [@panteliselef](https://github.com/panteliselef)
+
+- Password managers will now autofill OTP code verifications. ([#6247](https://github.com/clerk/javascript/pull/6247)) by [@tmilewski](https://github.com/tmilewski)
+
+- Adds Content Security Policy (CSP) nonce support to the Cloudflare Turnstile ([#6226](https://github.com/clerk/javascript/pull/6226)) by [@jacekradko](https://github.com/jacekradko)
+
+### Patch Changes
+
+- Fix browser back / forward navigation for tabs ([#6264](https://github.com/clerk/javascript/pull/6264)) by [@aeliox](https://github.com/aeliox)
+
+- ([#6109](https://github.com/clerk/javascript/pull/6109)) by [@aeliox](https://github.com/aeliox)
+
+- Fix layout shift when navigating after task resolution ([#6265](https://github.com/clerk/javascript/pull/6265)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`f42c4fe`](https://github.com/clerk/javascript/commit/f42c4fedfdab873129b876eba38b3677f190b460), [`ec207dc`](https://github.com/clerk/javascript/commit/ec207dcd2a13340cfa4e3b80d3d52d1b4e7d5f23), [`d00ef33`](https://github.com/clerk/javascript/commit/d00ef33dca4290a5aff52169a9076a6b4cabeee2), [`ec207dc`](https://github.com/clerk/javascript/commit/ec207dcd2a13340cfa4e3b80d3d52d1b4e7d5f23), [`0e0cc1f`](https://github.com/clerk/javascript/commit/0e0cc1fa85347d727a4fd3718fe45b0f0244ddd9)]:
+  - @clerk/types@4.64.0
+  - @clerk/shared@3.11.0
+  - @clerk/localizations@3.18.0
+
+## 5.70.0
+
+### Minor Changes
+
+- Convert date properties from number to Date in CommerceSubscriptionResource ([#6233](https://github.com/clerk/javascript/pull/6233)) by [@panteliselef](https://github.com/panteliselef)
+
+  Deprecates fields of type `number`
+
+  - subscription.periodStart
+  - subscription.periodEnd
+  - subscription.canceledAt
+    Introduces fields of type `Date`
+  - subscription.periodStartDate
+  - subscription.periodEndDate
+  - subscription.canceledAtDate
+  - subscription.createdAt
+
+- Add `getPlan` by id to the billing namespace. ([#6230](https://github.com/clerk/javascript/pull/6230)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- ([#6183](https://github.com/clerk/javascript/pull/6183)) by [@aeliox](https://github.com/aeliox)
+
+- Updated dependencies [[`baac817`](https://github.com/clerk/javascript/commit/baac81749c4c1bc1c3efaff267200cecc50047f4), [`abd8446`](https://github.com/clerk/javascript/commit/abd844609dad263d974da7fbf5e3575afce73abe), [`8387a39`](https://github.com/clerk/javascript/commit/8387a392a04906f0f10d84c61cfee36f23942f85), [`f2a6641`](https://github.com/clerk/javascript/commit/f2a66419b1813abc86ea98fde7475861995a1486), [`01a0f29`](https://github.com/clerk/javascript/commit/01a0f2934941d4ed74323ef17d4daa2b8e37ce75)]:
+  - @clerk/localizations@3.17.3
+  - @clerk/shared@3.10.2
+  - @clerk/types@4.63.0
+
 ## 5.69.3
 
 ### Patch Changes

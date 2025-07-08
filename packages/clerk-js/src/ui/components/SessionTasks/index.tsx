@@ -1,6 +1,6 @@
 import { useClerk } from '@clerk/shared/react';
 import { eventComponentMounted } from '@clerk/shared/telemetry';
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';
 import { withCardStateProvider } from '@/ui/elements/contexts';
@@ -57,6 +57,7 @@ export const SessionTask = withCardStateProvider(() => {
   const signInContext = useContext(SignInContext);
   const signUpContext = useContext(SignUpContext);
   const [isNavigatingToTask, setIsNavigatingToTask] = useState(false);
+  const currentTaskContainer = useRef<HTMLDivElement>(null);
 
   const redirectUrlComplete =
     signInContext?.afterSignInUrl ?? signUpContext?.afterSignUpUrl ?? clerk?.buildAfterSignInUrl();
@@ -88,8 +89,12 @@ export const SessionTask = withCardStateProvider(() => {
 
   if (!clerk.session?.currentTask) {
     return (
-      <Card.Root>
-        <Card.Content>
+      <Card.Root
+        sx={() => ({
+          minHeight: currentTaskContainer ? currentTaskContainer.current?.offsetHeight : undefined,
+        })}
+      >
+        <Card.Content sx={() => ({ flex: 1 })}>
           <LoadingCardContainer />
         </Card.Content>
         <Card.Footer />
@@ -98,7 +103,7 @@ export const SessionTask = withCardStateProvider(() => {
   }
 
   return (
-    <SessionTasksContext.Provider value={{ nextTask, redirectUrlComplete }}>
+    <SessionTasksContext.Provider value={{ nextTask, redirectUrlComplete, currentTaskContainer }}>
       <SessionTaskRoutes />
     </SessionTasksContext.Provider>
   );

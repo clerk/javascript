@@ -49,7 +49,7 @@ export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>((pro
       elementDescriptor={descriptors.footer}
       sx={[
         t => ({
-          marginTop: `-${t.space.$2}`,
+          marginTop: `calc(${t.space.$2} * -1)`,
           paddingTop: t.space.$2,
           background: common.mergedColorsBackground(
             colors.setAlpha(t.colors.$colorBackground, 1),

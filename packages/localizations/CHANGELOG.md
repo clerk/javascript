@@ -1,5 +1,27 @@
 # Change Log
 
+## 3.18.0
+
+### Minor Changes
+
+- Add missing Portuguese pt-BR locales for the statements elements ([#6222](https://github.com/clerk/javascript/pull/6222)) by [@lightapps-smart-blocks](https://github.com/lightapps-smart-blocks)
+
+### Patch Changes
+
+- Updated dependencies [[`f42c4fe`](https://github.com/clerk/javascript/commit/f42c4fedfdab873129b876eba38b3677f190b460), [`ec207dc`](https://github.com/clerk/javascript/commit/ec207dcd2a13340cfa4e3b80d3d52d1b4e7d5f23)]:
+  - @clerk/types@4.64.0
+
+## 3.17.3
+
+### Patch Changes
+
+- Generate placeholder API keys locales ([#6223](https://github.com/clerk/javascript/pull/6223)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Include `esCR` in the package's exports ([#6207](https://github.com/clerk/javascript/pull/6207)) by [@beerose](https://github.com/beerose)
+
+- Updated dependencies [[`8387a39`](https://github.com/clerk/javascript/commit/8387a392a04906f0f10d84c61cfee36f23942f85), [`f2a6641`](https://github.com/clerk/javascript/commit/f2a66419b1813abc86ea98fde7475861995a1486)]:
+  - @clerk/types@4.63.0
+
 ## 3.17.2
 
 ### Patch Changes

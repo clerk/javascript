@@ -1,15 +1,16 @@
 import type { CaptchaProvider, CaptchaWidgetType } from '@clerk/types';
 
 export type CaptchaOptions = {
-  siteKey: string;
-  widgetType: CaptchaWidgetType;
-  invisibleSiteKey: string;
+  action?: 'verify' | 'signup' | 'heartbeat';
   captchaProvider: CaptchaProvider;
+  closeModal?: () => Promise<unknown>;
+  invisibleSiteKey: string;
   modalContainerQuerySelector?: string;
   modalWrapperQuerySelector?: string;
+  nonce?: string;
   openModal?: () => Promise<unknown>;
-  closeModal?: () => Promise<unknown>;
-  action?: 'verify' | 'signup' | 'heartbeat';
+  siteKey: string;
+  widgetType: CaptchaWidgetType;
 };
 
 export type GetCaptchaTokenReturn = {
