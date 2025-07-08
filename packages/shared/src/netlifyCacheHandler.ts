@@ -1,6 +1,8 @@
 /* eslint-disable turbo/no-undeclared-env-vars */
 import { isDevelopmentFromPublishableKey } from './keys';
 
+import { getEnvVariable } from './getEnvVariable'
+
 /**
  * Cache busting parameter for Netlify to prevent cached responses
  * during handshake flows with Clerk development instances.
@@ -32,8 +34,7 @@ export function handleNetlifyCacheInDevInstance({
   requestStateHeaders: Headers;
   publishableKey: string;
 }) {
-  const isOnNetlify =
-    globalThis.process?.env?.NETLIFY || globalThis.process?.env?.URL?.endsWith('netlify.app') || Boolean(globalThis.process?.env?.NETLIFY_FUNCTIONS_TOKEN);
+  const isOnNetlify = getEnvVariable('NETLIFY') || getEnvVariable('URL')?.endsWith('netlify.app') || Boolean(getEnvVariable('NETLIFY_FUNCTIONS_TOKEN'));
   const isDevelopmentInstance = isDevelopmentFromPublishableKey(publishableKey);
   if (isOnNetlify && isDevelopmentInstance) {
     const hasHandshakeQueryParam = locationHeader.includes('__clerk_handshake');
