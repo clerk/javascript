@@ -1,4 +1,4 @@
-import { getEnvVariable } from './getEnvVariable';
+/* eslint-disable turbo/no-undeclared-env-vars */
 import { isDevelopmentFromPublishableKey } from './keys';
 
 /**
@@ -10,6 +10,23 @@ import { isDevelopmentFromPublishableKey } from './keys';
  * @internal
  */
 export const CLERK_NETLIFY_CACHE_BUST_PARAM = '__clerk_netlify_cache_bust';
+
+/**
+ * Returns true if running in a Netlify environment.
+ * Checks for Netlify-specific environment variables in process.env.
+ * Safe for browser and non-Node environments.
+ */
+function isNetlifyRuntime(): boolean {
+  if (typeof process === 'undefined' || !process.env) {
+    return false;
+  }
+
+  return (
+    Boolean(process.env.NETLIFY) ||
+    Boolean(process.env.NETLIFY_FUNCTIONS_TOKEN) ||
+    (typeof process.env.URL === 'string' && process.env.URL.endsWith('netlify.app'))
+  );
+}
 
 /**
  * Prevents infinite redirects in Netlify's functions by adding a cache bust parameter
@@ -32,12 +49,9 @@ export function handleNetlifyCacheInDevInstance({
   requestStateHeaders: Headers;
   publishableKey: string;
 }) {
-  const isOnNetlify =
-    getEnvVariable('NETLIFY') ||
-    (typeof getEnvVariable('URL') === 'string' && getEnvVariable('URL').endsWith('netlify.app')) ||
-    Boolean(getEnvVariable('NETLIFY_FUNCTIONS_TOKEN'));
-
+  const isOnNetlify = isNetlifyRuntime();
   const isDevelopmentInstance = isDevelopmentFromPublishableKey(publishableKey);
+
   if (isOnNetlify && isDevelopmentInstance) {
     const hasHandshakeQueryParam = locationHeader.includes('__clerk_handshake');
     // If location header is the original URL before the handshake flow, add cache bust param
