@@ -1285,6 +1285,15 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
+    /**
+     * Invalidate previously cache pages with auth state before navigating
+     */
+    const onBeforeSetActive: SetActiveHook =
+      typeof window !== 'undefined' && typeof window.__unstable__onBeforeSetActive === 'function'
+        ? window.__unstable__onBeforeSetActive
+        : noop;
+    await onBeforeSetActive();
+
     let newSession: SignedInSessionResource | null = session;
 
     // Handles multi-session scenario when switching between `pending` sessions
@@ -1300,15 +1309,6 @@ export class Clerk implements ClerkInterface {
     if (!token) {
       eventBus.emit(events.TokenUpdate, { token: null });
     }
-
-    /**
-     * Invalidate previously cache pages with auth state before navigating
-     */
-    const onBeforeSetActive: SetActiveHook =
-      typeof window !== 'undefined' && typeof window.__unstable__onBeforeSetActive === 'function'
-        ? window.__unstable__onBeforeSetActive
-        : noop;
-    await onBeforeSetActive();
 
     // Only triggers navigation for internal AIO components routing or multi-session switch
     const isSwitchingSessions = this.session?.id != session.id;
