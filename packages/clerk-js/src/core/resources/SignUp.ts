@@ -288,11 +288,21 @@ export class SignUp extends BaseResource implements SignUpResource {
       oidcPrompt,
     } = params;
 
+    const redirectUrlWithAuthToken = SignUp.clerk.buildUrlWithAuth(redirectUrl);
+
+    // When force organization selection is enabled, redirect to SSO callback route.
+    // This ensures organization selection tasks are displayed after sign-up,
+    // rather than redirecting to potentially unprotected pages while the session is pending.
+    const actionCompleteRedirectUrl = SignUp.clerk.__unstable__environment?.organizationSettings
+      .forceOrganizationSelection
+      ? redirectUrlWithAuthToken
+      : redirectUrlComplete;
+
     const authenticateFn = () => {
       const authParams = {
         strategy,
-        redirectUrl: SignUp.clerk.buildUrlWithAuth(redirectUrl),
-        actionCompleteRedirectUrl: redirectUrlComplete,
+        redirectUrl: redirectUrlWithAuthToken,
+        actionCompleteRedirectUrl,
         unsafeMetadata,
         emailAddress,
         legalAccepted,
