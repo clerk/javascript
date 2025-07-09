@@ -59,9 +59,6 @@ export {
   __experimental_PaymentElement,
   __experimental_useCheckout,
   __experimental_CheckoutProvider,
-  __experimental_usePaymentElement,
-  __experimental_PaymentElementProvider,
-  __experimental_PaymentElement,
 } from './client-boundary/hooks';
 
 /**
