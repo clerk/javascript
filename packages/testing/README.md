@@ -37,7 +37,7 @@ It currently supports the following testing frameworks:
 ### Prerequisites
 
 - Node.js `>=18.17.0` or later
-- Playwright v1+ or Cypress v13+
+- Playwright v1+ or Cypress v13 or v14
 
 ### Installation
 
