@@ -46,6 +46,5 @@ export const getEnvVariable = (name: string, context?: Record<string, any>): str
   } catch {
     // This will raise an error in Cloudflare Pages
   }
-
   return '';
 };
