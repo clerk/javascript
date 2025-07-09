@@ -31,6 +31,12 @@ const primaryAlphaScale = colorOptionToThemedAlphaScale(clerkCssVar('color-prima
 const successAlphaScale = colorOptionToThemedAlphaScale(clerkCssVar('color-success', '#22C543'), 'successAlpha');
 const warningAlphaScale = colorOptionToThemedAlphaScale(clerkCssVar('color-warning', '#F36B16'), 'warningAlpha');
 
+const colorText = clerkCssVar('color-text', '#212126');
+const colorTextSecondary = clerkCssVar(
+  'color-text-secondary',
+  colorUtils.makeTransparent(colorText, 0.35) || '#747686',
+);
+
 export const colors = Object.freeze({
   avatarBorder: neutralAlphaScale?.neutralAlpha200,
   avatarBackground: neutralAlphaScale?.neutralAlpha400,
@@ -39,8 +45,8 @@ export const colors = Object.freeze({
   ...whiteAlpha,
   colorBackground: clerkCssVar('color-background', 'white'),
   colorInputBackground: clerkCssVar('color-input-background', 'white'),
-  colorText: clerkCssVar('color-text', '#212126'),
-  colorTextSecondary: clerkCssVar('color-text-secondary', '#747686'),
+  colorText,
+  colorTextSecondary,
   colorInputText: clerkCssVar('color-input-text', '#131316'),
   colorTextOnPrimaryBackground: clerkCssVar('color-text-on-primary-background', 'white'),
   colorShimmer: clerkCssVar('color-shimmer', 'rgba(255, 255, 255, 0.36)'),
