@@ -152,6 +152,9 @@
     "pnpm": ">=10.12.4"
   },
   "pnpm": {
+    "onlyBuiltDependencies": [
+      "cypress"
+    ],
     "overrides": {
       "jest": "29.7.0",
       "jest-snapshot-prettier": "npm:prettier@^3.5.3"
