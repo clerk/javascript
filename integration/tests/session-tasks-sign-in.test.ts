@@ -13,13 +13,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
     test.describe.configure({ mode: 'serial' });
 
     let fakeUser: FakeUser;
-
-    test.beforeAll(async () => {
-      const u = createTestUtils({ app });
-      fakeUser = u.services.users.createFakeUser();
-      await u.services.users.createBapiUser(fakeUser);
-    });
-
     test.afterAll(async () => {
       const u = createTestUtils({ app });
       await fakeUser.deleteIfExists();
@@ -29,6 +22,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
 
     test.skip('with email and password, navigate to task on after sign-in', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
+      fakeUser = u.services.users.createFakeUser();
+      await u.services.users.createBapiUser(fakeUser);
 
       // Performs sign-in
       await u.po.signIn.goTo();
@@ -86,6 +81,35 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
       await fakeUser.deleteIfExists();
       // Delete the user on the app instance.
       await u.services.users.deleteIfExists({ email: fakeUser.email });
+    });
+
+    test('when switching sessions, navigate to task', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+      fakeUser = u.services.users.createFakeUser();
+      await u.services.users.createBapiUser(fakeUser);
+
+      // Create user for second session
+      const fakeUser2 = u.services.users.createFakeUser();
+      await u.services.users.createBapiUser(fakeUser2);
+
+      // Performs sign-in
+      await u.po.signIn.goTo();
+      await u.po.signIn.setIdentifier(fakeUser.email);
+      await u.po.signIn.continue();
+      await u.po.signIn.setPassword(fakeUser.password);
+      await u.po.signIn.continue();
+      await u.po.expect.toBeSignedIn();
+
+      // Resolves task
+      const fakeOrganization = u.services.organizations.createFakeOrganization();
+      await u.po.sessionTask.resolveForceOrganizationSelectionTask(fakeOrganization);
+      await u.po.expect.toHaveResolvedTask();
+
+      // Navigates to after sign-in
+      await u.page.waitForAppUrl('/');
+
+      await u.po.userButton.toggleTrigger();
+      await u.po.userButton.waitForPopover();
     });
   },
 );
