@@ -83,7 +83,7 @@
   },
   "peerDependencies": {
     "@playwright/test": "^1",
-    "cypress": "^13"
+    "cypress": "^13 || ^14"
   },
   "peerDependenciesMeta": {
     "@playwright/test": {
