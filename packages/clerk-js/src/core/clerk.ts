@@ -1285,15 +1285,6 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
-    /**
-     * Invalidate previously cache pages with auth state before navigating
-     */
-    const onBeforeSetActive: SetActiveHook =
-      typeof window !== 'undefined' && typeof window.__unstable__onBeforeSetActive === 'function'
-        ? window.__unstable__onBeforeSetActive
-        : noop;
-    await onBeforeSetActive();
-
     let newSession: SignedInSessionResource | null = session;
 
     // Handles multi-session scenario when switching between `pending` sessions
@@ -1324,22 +1315,11 @@ export class Clerk implements ClerkInterface {
 
     this.#setAccessors(session);
     this.#emit();
-
-    /**
-     * Invoke the Next.js middleware to synchronize server and client state after resolving a session task.
-     * This ensures that any server-side logic depending on the session status (like middleware-based
-     * redirects or protected routes) correctly reflects the updated client authentication state.
-     */
-    const onAfterSetActive: SetActiveHook =
-      typeof window !== 'undefined' && typeof window.__unstable__onAfterSetActive === 'function'
-        ? window.__unstable__onAfterSetActive
-        : noop;
-    await onAfterSetActive();
   };
 
   public __experimental_navigateToTask = async ({ redirectUrlComplete }: NextTaskParams = {}): Promise<void> => {
     /**
-     * Invalidate previously cache pages with auth state before navigating
+     * Invalidate previously cached pages with auth state before navigating
      */
     const onBeforeSetActive: SetActiveHook =
       typeof window !== 'undefined' && typeof window.__unstable__onBeforeSetActive === 'function'

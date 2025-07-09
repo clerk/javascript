@@ -32,6 +32,12 @@ export const createUserButtonPageObject = (testArgs: { page: EnhancedPage }) => 
     triggerManageAccount: () => {
       return page.getByRole('menuitem', { name: /Manage account/i }).click();
     },
+    switchAccount: (username: string) => {
+      return page
+        .getByRole('menuitem')
+        .filter({ has: page.locator('span', { hasText: username }) })
+        .click();
+    },
   };
 
   return self;

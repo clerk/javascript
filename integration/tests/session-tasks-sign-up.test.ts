@@ -30,7 +30,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
     test('navigate to task on after sign-up', async ({ page, context }) => {
       // Performs sign-up
       const u = createTestUtils({ app, page, context });
-
       await u.po.signUp.goTo();
       await u.po.signUp.signUpWithEmailAndPassword({
         email: fakeUser.email,
@@ -40,7 +39,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
 
       // Redirects back to tasks when accessing protected route by `auth.protect`
       await u.page.goToRelative('/page-protected');
-      expect(page.url()).toContain('tasks');
+      expect(u.page.url()).toContain('tasks');
 
       // Resolves task
       const fakeOrganization = u.services.organizations.createFakeOrganization();
