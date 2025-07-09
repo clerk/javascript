@@ -1,3 +1,6 @@
+import { colors } from '../utils/colors';
+import { cssSupports } from '../utils/cssSupports';
+import { clerkCssVar } from '../utils/cssVariables';
 import type { InternalTheme } from './types';
 
 const textVariants = (t: InternalTheme) => {
@@ -190,6 +193,15 @@ const mergedColorsBackground = (colorBack: string, colorFront: string) => {
   return `linear-gradient(${colorFront},${colorFront}), linear-gradient(${colorBack}, ${colorBack})`;
 };
 
+const secondaryBackground = (t: InternalTheme) => {
+  return cssSupports.colorMix()
+    ? clerkCssVar(
+        'color-background-secondary',
+        `color-mix(in srgb, ${t.colors.$colorBackground}, ${t.colors.$neutralAlpha50})`,
+      )
+    : mergedColorsBackground(colors.setAlpha(t.colors.$colorBackground, 1), t.colors.$neutralAlpha50);
+};
+
 const visuallyHidden = () =>
   ({
     clip: 'rect(0 0 0 0)',
@@ -212,5 +224,6 @@ export const common = {
   maxHeightScroller,
   unstyledScrollbar,
   mergedColorsBackground,
+  secondaryBackground,
   visuallyHidden,
 };
