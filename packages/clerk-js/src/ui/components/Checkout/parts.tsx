@@ -43,6 +43,11 @@ export const InvalidPlanScreen = () => {
     return error?.meta?.plan;
   }, [errors]);
 
+  const isPlanUpgradePossible = useMemo(() => {
+    const error = errors?.find(e => e.code === 'invalid_plan_change');
+    return error?.meta?.isPlanUpgradePossible || false;
+  }, [errors]);
+
   const { planPeriod } = useCheckoutContext();
 
   if (!planFromError) {
@@ -83,7 +88,7 @@ export const InvalidPlanScreen = () => {
             variant='info'
             colorScheme='info'
             title={
-              planFromError.is_recoverable
+              isPlanUpgradePossible
                 ? localizationKeys('commerce.cannotSubscribeMonthly')
                 : localizationKeys('commerce.cannotSubscribeUnrecoverable')
             }

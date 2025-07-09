@@ -35,8 +35,8 @@ export interface ClerkAPIError {
       currency_symbol: string;
       id: string;
       name: string;
-      is_recoverable: boolean;
     };
+    isPlanUpgradePossible?: boolean;
   };
 }
 

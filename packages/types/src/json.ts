@@ -357,8 +357,8 @@ export interface ClerkAPIErrorJSON {
       currency_symbol: string;
       id: string;
       name: string;
-      is_recoverable: boolean;
     };
+    is_plan_upgrade_possible?: boolean;
   };
 }
 
