@@ -20,16 +20,56 @@ export const whiteAlpha = Object.freeze({
   whiteAlpha950: 'hsla(0, 0%, 100%, 0.92)',
 } as const);
 
-const dangerScale = colorOptionToThemedLightnessScale(clerkCssVar('color-danger', '#EF4444'), 'danger');
-const primaryScale = colorOptionToThemedLightnessScale(clerkCssVar('color-primary', '#2F3037'), 'primary');
-const successScale = colorOptionToThemedLightnessScale(clerkCssVar('color-success', '#22C543'), 'success');
-const warningScale = colorOptionToThemedLightnessScale(clerkCssVar('color-warning', '#F36B16'), 'warning');
+type LightnessScale<T extends string> = NonNullable<ReturnType<typeof colorOptionToThemedLightnessScale<T>>>;
+type AlphaScale<T extends string> = NonNullable<ReturnType<typeof colorOptionToThemedAlphaScale<T>>>;
 
-const dangerAlphaScale = colorOptionToThemedAlphaScale(clerkCssVar('color-danger', '#EF4444'), 'dangerAlpha');
-const neutralAlphaScale = colorOptionToThemedAlphaScale(clerkCssVar('color-neutral', '#000000'), 'neutralAlpha');
-const primaryAlphaScale = colorOptionToThemedAlphaScale(clerkCssVar('color-primary', '#2F3037'), 'primaryAlpha');
-const successAlphaScale = colorOptionToThemedAlphaScale(clerkCssVar('color-success', '#22C543'), 'successAlpha');
-const warningAlphaScale = colorOptionToThemedAlphaScale(clerkCssVar('color-warning', '#F36B16'), 'warningAlpha');
+/**
+ * Color scale generation with clerkCssVar
+ *
+ * These functions will never return undefined because:
+ * 1. clerkCssVar always provides a fallback value (e.g., 'var(--clerk-color-danger, #EF4444)')
+ * 2. The fallback ensures a valid color string is always passed to the scale generation functions
+ * 3. Valid color strings always produce complete color scales
+ *
+ * Therefore, it's safe to assert these as NonNullable.
+ */
+const dangerScale = colorOptionToThemedLightnessScale(
+  clerkCssVar('color-danger', '#EF4444'),
+  'danger',
+) as LightnessScale<'danger'>;
+const primaryScale = colorOptionToThemedLightnessScale(
+  clerkCssVar('color-primary', '#2F3037'),
+  'primary',
+) as LightnessScale<'primary'>;
+const successScale = colorOptionToThemedLightnessScale(
+  clerkCssVar('color-success', '#22C543'),
+  'success',
+) as LightnessScale<'success'>;
+const warningScale = colorOptionToThemedLightnessScale(
+  clerkCssVar('color-warning', '#F36B16'),
+  'warning',
+) as LightnessScale<'warning'>;
+
+const dangerAlphaScale = colorOptionToThemedAlphaScale(
+  clerkCssVar('color-danger', '#EF4444'),
+  'dangerAlpha',
+) as AlphaScale<'dangerAlpha'>;
+const neutralAlphaScale = colorOptionToThemedAlphaScale(
+  clerkCssVar('color-neutral', '#000000'),
+  'neutralAlpha',
+) as AlphaScale<'neutralAlpha'>;
+const primaryAlphaScale = colorOptionToThemedAlphaScale(
+  clerkCssVar('color-primary', '#2F3037'),
+  'primaryAlpha',
+) as AlphaScale<'primaryAlpha'>;
+const successAlphaScale = colorOptionToThemedAlphaScale(
+  clerkCssVar('color-success', '#22C543'),
+  'successAlpha',
+) as AlphaScale<'successAlpha'>;
+const warningAlphaScale = colorOptionToThemedAlphaScale(
+  clerkCssVar('color-warning', '#F36B16'),
+  'warningAlpha',
+) as AlphaScale<'warningAlpha'>;
 
 const colorText = clerkCssVar('color-text', '#212126');
 const colorTextSecondary = clerkCssVar(
@@ -38,11 +78,9 @@ const colorTextSecondary = clerkCssVar(
 );
 
 export const colors = Object.freeze({
-  avatarBorder: neutralAlphaScale?.neutralAlpha200,
-  avatarBackground: neutralAlphaScale?.neutralAlpha400,
-  modalBackdrop: neutralAlphaScale?.neutralAlpha700,
-  ...neutralAlphaScale,
-  ...whiteAlpha,
+  avatarBorder: neutralAlphaScale.neutralAlpha200,
+  avatarBackground: neutralAlphaScale.neutralAlpha400,
+  modalBackdrop: neutralAlphaScale.neutralAlpha700,
   colorBackground: clerkCssVar('color-background', 'white'),
   colorInputBackground: clerkCssVar('color-input-background', 'white'),
   colorText,
@@ -53,8 +91,10 @@ export const colors = Object.freeze({
   transparent: 'transparent',
   white: 'white',
   black: 'black',
+  ...neutralAlphaScale,
+  ...whiteAlpha,
   ...primaryScale,
-  primaryHover: colorUtils.adjustForLightness(primaryScale?.primary500),
+  primaryHover: colorUtils.adjustForLightness(primaryScale.primary500),
   ...primaryAlphaScale,
   ...dangerScale,
   ...dangerAlphaScale,
