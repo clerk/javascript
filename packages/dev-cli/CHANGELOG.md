@@ -1,5 +1,11 @@
 # @clerk/dev-cli
 
+## 0.0.12
+
+### Patch Changes
+
+- Add warning regarding Turbopack usage. ([#6189](https://github.com/clerk/javascript/pull/6189)) by [@dstaley](https://github.com/dstaley)
+
 ## 0.0.11
 
 ### Patch Changes

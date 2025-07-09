@@ -1,5 +1,57 @@
 # Change Log
 
+## 4.64.0
+
+### Minor Changes
+
+- Add `__internal_loadStripeJs` in Clerk interface. ([#6180](https://github.com/clerk/javascript/pull/6180)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Add jsdoc comments for `payerType` in `CommercePlanResource`. ([#6257](https://github.com/clerk/javascript/pull/6257)) by [@panteliselef](https://github.com/panteliselef)
+
+## 4.63.0
+
+### Minor Changes
+
+- Convert date properties from number to Date in CommerceSubscriptionResource ([#6233](https://github.com/clerk/javascript/pull/6233)) by [@panteliselef](https://github.com/panteliselef)
+
+  Deprecates fields of type `number`
+
+  - subscription.periodStart
+  - subscription.periodEnd
+  - subscription.canceledAt
+    Introduces fields of type `Date`
+  - subscription.periodStartDate
+  - subscription.periodEndDate
+  - subscription.canceledAtDate
+  - subscription.createdAt
+
+- Add `getPlan` by id to the billing namespace. ([#6230](https://github.com/clerk/javascript/pull/6230)) by [@panteliselef](https://github.com/panteliselef)
+
+## 4.62.1
+
+### Patch Changes
+
+- Extract internal `ProtectProps` type to shared types to eliminate duplication across SDKs ([#6197](https://github.com/clerk/javascript/pull/6197)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 4.62.0
+
+### Minor Changes
+
+- Introduce experimental paginated hooks for commerce data. ([#6159](https://github.com/clerk/javascript/pull/6159)) by [@panteliselef](https://github.com/panteliselef)
+
+  - `useStatements`
+  - `usePaymentAttempts`
+  - `usePaymentMethods`
+    Prefixed with `__experimental_`
+
+### Patch Changes
+
+- Fixes stale `SignIn` object on `authenticateWithRedirect` for `saml` and `enterprise_sso` custom flows ([#6160](https://github.com/clerk/javascript/pull/6160)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  Previously, the same connection identifier would be used on every `authenticateWithRedirect` call leading to redirecting to the wrong identity provider
+
 ## 4.61.0
 
 ### Minor Changes

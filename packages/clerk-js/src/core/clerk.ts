@@ -86,6 +86,7 @@ import type { MountComponentRenderer } from '../ui/Components';
 import {
   ALLOWED_PROTOCOLS,
   buildURL,
+  canViewOrManageAPIKeys,
   completeSignUpFlow,
   createAllowedRedirectOrigins,
   createBeforeUnloadTracker,
@@ -168,6 +169,7 @@ const CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE = 'cannot_render_organizat
 const CANNOT_RENDER_ORGANIZATION_MISSING_ERROR_CODE = 'cannot_render_organization_missing';
 const CANNOT_RENDER_SINGLE_SESSION_ENABLED_ERROR_CODE = 'cannot_render_single_session_enabled';
 const CANNOT_RENDER_API_KEYS_DISABLED_ERROR_CODE = 'cannot_render_api_keys_disabled';
+const CANNOT_RENDER_API_KEYS_ORG_UNAUTHORIZED_ERROR_CODE = 'cannot_render_api_keys_org_unauthorized';
 const defaultOptions: ClerkOptions = {
   polling: true,
   standardBrowser: true,
@@ -645,6 +647,16 @@ export class Clerk implements ClerkInterface {
       .then(controls => controls.closeModal('blankCaptcha'));
   };
 
+  public __internal_loadStripeJs = async () => {
+    if (__BUILD_DISABLE_RHC__) {
+      clerkUnsupportedEnvironmentWarning('Stripe');
+      return { loadStripe: () => Promise.resolve(null) };
+    }
+
+    const { loadStripe } = await import('@stripe/stripe-js');
+    return loadStripe;
+  };
+
   public openSignUp = (props?: SignUpProps): void => {
     this.assertComponentsReady(this.#componentControls);
     if (sessionExistsAndSingleSessionModeEnabled(this, this.environment)) {
@@ -1089,6 +1101,16 @@ export class Clerk implements ClerkInterface {
       }
       return;
     }
+
+    if (this.organization && !canViewOrManageAPIKeys(this)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderAPIKeysComponentForOrgWhenUnauthorized, {
+          code: CANNOT_RENDER_API_KEYS_ORG_UNAUTHORIZED_ERROR_CODE,
+        });
+      }
+      return;
+    }
+
     void this.#componentControls.ensureMounted({ preloadHint: 'APIKeys' }).then(controls =>
       controls.mountComponent({
         name: 'APIKeys',

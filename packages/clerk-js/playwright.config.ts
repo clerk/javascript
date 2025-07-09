@@ -16,6 +16,8 @@ const baseURL = `http://localhost:${PORT}`;
  */
 export default defineConfig({
   testDir: './sandbox/integration',
+  /* Global setup for Clerk testing */
+  globalSetup: './sandbox/integration/global.setup.ts',
   /* Run tests in files in parallel */
   fullyParallel: false,
   /* Fail the build on CI if you accidentally left test.only in the source code. */

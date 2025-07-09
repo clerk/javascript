@@ -10,6 +10,7 @@ type WithOptionalOrgType<T> = T & {
 export interface CommerceBillingNamespace {
   getPaymentAttempts: (params: GetPaymentAttemptsParams) => Promise<ClerkPaginatedResponse<CommercePaymentResource>>;
   getPlans: (params?: GetPlansParams) => Promise<CommercePlanResource[]>;
+  getPlan: (params: { id: string }) => Promise<CommercePlanResource>;
   getSubscriptions: (params: GetSubscriptionsParams) => Promise<ClerkPaginatedResponse<CommerceSubscriptionResource>>;
   getStatements: (params: GetStatementsParams) => Promise<ClerkPaginatedResponse<CommerceStatementResource>>;
   startCheckout: (params: CreateCheckoutParams) => Promise<CommerceCheckoutResource>;
@@ -56,6 +57,22 @@ export interface CommercePlanResource extends ClerkResource {
   isDefault: boolean;
   isRecurring: boolean;
   hasBaseFee: boolean;
+  /**
+   * Specifies the subscriber type this plan is designed for.
+   *
+   * Each plan is exclusively created for either individual users or organizations,
+   * and cannot be used interchangeably.
+   *
+   * @type {['user'] | ['org']}
+   * @example
+   * ```ts
+   * // For a user plan
+   * payerType: ['user']
+   *
+   * // For an organization plan
+   * payerType: ['org']
+   * ```
+   */
   payerType: string[];
   publiclyVisible: boolean;
   slug: string;
@@ -154,8 +171,21 @@ export interface CommerceSubscriptionResource extends ClerkResource {
   plan: CommercePlanResource;
   planPeriod: CommerceSubscriptionPlanPeriod;
   status: CommerceSubscriptionStatus;
+  createdAt: Date;
+  periodStartDate: Date;
+  periodEndDate: Date | null;
+  canceledAtDate: Date | null;
+  /**
+   * @deprecated Use `periodStartDate` instead
+   */
   periodStart: number;
+  /**
+   * @deprecated Use `periodEndDate` instead
+   */
   periodEnd: number;
+  /**
+   * @deprecated Use `canceledAtDate` instead
+   */
   canceledAt: number | null;
   amount?: CommerceMoney;
   credit?: {
