@@ -172,7 +172,7 @@ function SignUpContinueInternal() {
     card.setError(undefined);
 
     return signUp
-      .update(buildRequest(fieldsToSubmit))
+      .update(buildRequest(fieldsToSubmit), { triggerCaptchaChallenge: true })
       .then(res =>
         completeSignUpFlow({
           signUp: res,
