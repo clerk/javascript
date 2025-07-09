@@ -183,9 +183,6 @@ describe('HandshakeService', () => {
       const headers = handshakeService.buildRedirectToHandshake('test-reason', { iat_uat_delta: '100' });
       const location = headers.get(constants.Headers.Location);
       expect(location).toBeDefined();
-      if (!location) {
-        throw new Error('Location header is missing');
-      }
       const url = new URL(location);
 
       expect(url.searchParams.get('iat_uat_delta')).toBe('100');
