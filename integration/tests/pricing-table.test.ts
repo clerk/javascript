@@ -344,9 +344,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await expect(
         page
           .locator('.cl-checkout-root')
-          .getByText(
-            'You cannot subscribe to this plan by paying monthly. To subscribe to this plan, you need to choose to pay annually',
-          ),
+          .getByText('You cannot subscribe to this plan. Your existing subscription is more expensive than this plan.'),
       ).toBeVisible();
 
       await fakeUser.deleteIfExists();
