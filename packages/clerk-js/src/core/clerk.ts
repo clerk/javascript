@@ -28,9 +28,9 @@ import type {
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
+  Clerk as ClerkInterface,
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
-  Clerk as ClerkInterface,
   ClerkOptions,
   ClientJSONSnapshot,
   ClientResource,
@@ -1301,7 +1301,16 @@ export class Clerk implements ClerkInterface {
       eventBus.emit(events.TokenUpdate, { token: null });
     }
 
-    // Only triggers navigation for internal AIO components routing or multi-session switch, in order to not affect custom flows
+    /**
+     * Invalidate previously cache pages with auth state before navigating
+     */
+    const onBeforeSetActive: SetActiveHook =
+      typeof window !== 'undefined' && typeof window.__unstable__onBeforeSetActive === 'function'
+        ? window.__unstable__onBeforeSetActive
+        : noop;
+    await onBeforeSetActive();
+
+    // Only triggers navigation for internal AIO components routing or multi-session switch
     const isSwitchingSessions = this.session?.id != session.id;
     const shouldNavigateOnSetActive = this.#componentNavigationContext || isSwitchingSessions;
     if (newSession?.currentTask && shouldNavigateOnSetActive) {
@@ -1315,6 +1324,17 @@ export class Clerk implements ClerkInterface {
 
     this.#setAccessors(session);
     this.#emit();
+
+    /**
+     * Invoke the Next.js middleware to synchronize server and client state after resolving a session task.
+     * This ensures that any server-side logic depending on the session status (like middleware-based
+     * redirects or protected routes) correctly reflects the updated client authentication state.
+     */
+    const onAfterSetActive: SetActiveHook =
+      typeof window !== 'undefined' && typeof window.__unstable__onAfterSetActive === 'function'
+        ? window.__unstable__onAfterSetActive
+        : noop;
+    await onAfterSetActive();
   };
 
   public __experimental_navigateToTask = async ({ redirectUrlComplete }: NextTaskParams = {}): Promise<void> => {
