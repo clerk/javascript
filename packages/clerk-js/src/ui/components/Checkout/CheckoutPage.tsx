@@ -7,7 +7,7 @@ import { useEffect, useMemo } from 'react';
 import { useCheckoutContext } from '@/ui/contexts/components';
 
 const Initiator = () => {
-  const checkout = useCheckout();
+  const { checkout } = useCheckout();
 
   useEffect(() => {
     checkout.start().catch(() => null);
@@ -31,9 +31,15 @@ const Root = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-const Stage = ({ children, name }: { children: React.ReactNode; name: ReturnType<typeof useCheckout>['status'] }) => {
-  const { status } = useCheckout();
-  if (status !== name) {
+const Stage = ({
+  children,
+  name,
+}: {
+  children: React.ReactNode;
+  name: ReturnType<typeof useCheckout>['checkout']['status'];
+}) => {
+  const { checkout } = useCheckout();
+  if (checkout.status !== name) {
     return null;
   }
   return children;
@@ -46,7 +52,8 @@ const FetchStatus = ({
   children: React.ReactNode;
   status: 'idle' | 'fetching' | 'error' | 'invalid_plan_change' | 'missing_payer_email';
 }) => {
-  const { fetchStatus, error } = useCheckout();
+  const { checkout } = useCheckout();
+  const { fetchStatus, error } = checkout;
 
   const internalFetchStatus = useMemo(() => {
     if (fetchStatus === 'error' && error?.errors) {

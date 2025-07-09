@@ -17,6 +17,7 @@ export class APIKey {
     readonly lastUsedAt: number | null,
     readonly createdAt: number,
     readonly updatedAt: number,
+    readonly secret?: string,
   ) {}
 
   static fromJSON(data: APIKeyJSON) {
@@ -36,6 +37,7 @@ export class APIKey {
       data.last_used_at,
       data.created_at,
       data.updated_at,
+      data.secret,
     );
   }
 }

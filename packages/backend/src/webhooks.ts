@@ -1,6 +1,6 @@
 import { getEnvVariable } from '@clerk/shared/getEnvVariable';
-import crypto from 'crypto';
 import { errorThrower } from 'src/util/shared';
+import { Webhook } from 'standardwebhooks';
 
 import type { WebhookEvent } from './api/resources/Webhooks';
 
@@ -14,16 +14,44 @@ export type VerifyWebhookOptions = {
   signingSecret?: string;
 };
 
+// Standard Webhooks header names
+const STANDARD_WEBHOOK_ID_HEADER = 'webhook-id';
+const STANDARD_WEBHOOK_TIMESTAMP_HEADER = 'webhook-timestamp';
+const STANDARD_WEBHOOK_SIGNATURE_HEADER = 'webhook-signature';
+
+// Svix header names (for mapping)
 const SVIX_ID_HEADER = 'svix-id';
 const SVIX_TIMESTAMP_HEADER = 'svix-timestamp';
 const SVIX_SIGNATURE_HEADER = 'svix-signature';
 
-const REQUIRED_SVIX_HEADERS = [SVIX_ID_HEADER, SVIX_TIMESTAMP_HEADER, SVIX_SIGNATURE_HEADER] as const;
-
 export * from './api/resources/Webhooks';
 
 /**
- * Verifies the authenticity of a webhook request using Svix. Returns a promise that resolves to the verified webhook event data.
+ * Maps Svix headers to Standard Webhooks headers for compatibility
+ */
+function createStandardWebhookHeaders(request: Request): Record<string, string> {
+  const headers: Record<string, string> = {};
+
+  // Map Svix headers to Standard Webhooks headers
+  const svixId = request.headers.get(SVIX_ID_HEADER)?.trim();
+  const svixTimestamp = request.headers.get(SVIX_TIMESTAMP_HEADER)?.trim();
+  const svixSignature = request.headers.get(SVIX_SIGNATURE_HEADER)?.trim();
+
+  if (svixId) {
+    headers[STANDARD_WEBHOOK_ID_HEADER] = svixId;
+  }
+  if (svixTimestamp) {
+    headers[STANDARD_WEBHOOK_TIMESTAMP_HEADER] = svixTimestamp;
+  }
+  if (svixSignature) {
+    headers[STANDARD_WEBHOOK_SIGNATURE_HEADER] = svixSignature;
+  }
+
+  return headers;
+}
+
+/**
+ * Verifies the authenticity of a webhook request using Standard Webhooks. Returns a promise that resolves to the verified webhook event data.
  *
  * @param request - The request object.
  * @param options - Optional configuration object.
@@ -56,9 +84,6 @@ export * from './api/resources/Webhooks';
  */
 export async function verifyWebhook(request: Request, options: VerifyWebhookOptions = {}): Promise<WebhookEvent> {
   const secret = options.signingSecret ?? getEnvVariable('CLERK_WEBHOOK_SIGNING_SECRET');
-  const svixId = request.headers.get(SVIX_ID_HEADER);
-  const svixTimestamp = request.headers.get(SVIX_TIMESTAMP_HEADER);
-  const svixSignature = request.headers.get(SVIX_SIGNATURE_HEADER);
 
   if (!secret) {
     return errorThrower.throw(
@@ -66,29 +91,46 @@ export async function verifyWebhook(request: Request, options: VerifyWebhookOpti
     );
   }
 
-  if (!svixId || !svixTimestamp || !svixSignature) {
-    const missingHeaders = REQUIRED_SVIX_HEADERS.filter(header => !request.headers.has(header));
-    return errorThrower.throw(`Missing required Svix headers: ${missingHeaders.join(', ')}`);
+  // Check for required Svix headers
+  const webhookId = request.headers.get(SVIX_ID_HEADER)?.trim();
+  const webhookTimestamp = request.headers.get(SVIX_TIMESTAMP_HEADER)?.trim();
+  const webhookSignature = request.headers.get(SVIX_SIGNATURE_HEADER)?.trim();
+
+  if (!webhookId || !webhookTimestamp || !webhookSignature) {
+    const missingHeaders = [];
+
+    if (!webhookId) {
+      missingHeaders.push(SVIX_ID_HEADER);
+    }
+    if (!webhookTimestamp) {
+      missingHeaders.push(SVIX_TIMESTAMP_HEADER);
+    }
+    if (!webhookSignature) {
+      missingHeaders.push(SVIX_SIGNATURE_HEADER);
+    }
+
+    return errorThrower.throw(`Missing required webhook headers: ${missingHeaders.join(', ')}`);
   }
 
   const body = await request.text();
 
-  const signedContent = `${svixId}.${svixTimestamp}.${body}`;
+  // Create Standard Webhooks compatible headers mapping
+  const standardHeaders = createStandardWebhookHeaders(request);
 
-  const secretBytes = Buffer.from(secret.split('_')[1], 'base64');
+  // Initialize Standard Webhooks verifier
+  const webhook = new Webhook(secret);
 
-  const constructedSignature = crypto.createHmac('sha256', secretBytes).update(signedContent).digest('base64');
+  try {
+    // Verify using Standard Webhooks - this provides constant-time comparison
+    // and proper signature format handling
+    const payload = webhook.verify(body, standardHeaders) as Record<string, unknown>;
 
-  // svixSignature can be a string with one or more space separated signatures
-  if (svixSignature.split(' ').includes(constructedSignature)) {
-    return errorThrower.throw('Incoming webhook does not have a valid signature');
+    return {
+      type: payload.type,
+      object: 'event',
+      data: payload.data,
+    } as WebhookEvent;
+  } catch (e) {
+    return errorThrower.throw(`Unable to verify incoming webhook: ${e instanceof Error ? e.message : 'Unknown error'}`);
   }
-
-  const payload = JSON.parse(body);
-
-  return {
-    type: payload.type,
-    object: 'event',
-    data: payload.data,
-  } as WebhookEvent;
 }

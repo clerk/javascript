@@ -1,10 +1,5 @@
 import { __experimental_useCheckout as useCheckout, useOrganization } from '@clerk/shared/react';
-import type {
-  CommerceCheckoutResource,
-  CommerceMoney,
-  CommercePaymentSourceResource,
-  ConfirmCheckoutParams,
-} from '@clerk/types';
+import type { CommerceMoney, CommercePaymentSourceResource, ConfirmCheckoutParams } from '@clerk/types';
 import { useMemo, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';
@@ -28,8 +23,9 @@ type PaymentMethodSource = 'existing' | 'new';
 const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
 
 export const CheckoutForm = withCardStateProvider(() => {
-  const checkout = useCheckout();
-  const { id, plan, totals, isImmediatePlanChange, __internal_checkout, planPeriod } = checkout;
+  const { checkout } = useCheckout();
+
+  const { id, plan, totals, isImmediatePlanChange, planPeriod } = checkout;
 
   if (!id) {
     return null;
@@ -112,7 +108,7 @@ export const CheckoutForm = withCardStateProvider(() => {
         </Box>
       )}
 
-      <CheckoutFormElements checkout={__internal_checkout} />
+      <CheckoutFormElements />
     </Drawer.Body>
   );
 });
@@ -120,7 +116,8 @@ export const CheckoutForm = withCardStateProvider(() => {
 const useCheckoutMutations = () => {
   const { organization } = useOrganization();
   const { subscriberType, onSubscriptionComplete } = useCheckoutContext();
-  const { id, confirm } = useCheckout();
+  const { checkout } = useCheckout();
+  const { id, confirm } = checkout;
   const card = useCardState();
 
   if (!id) {
@@ -169,12 +166,18 @@ const useCheckoutMutations = () => {
   };
 };
 
-const CheckoutFormElements = ({ checkout }: { checkout: CommerceCheckoutResource }) => {
+const CheckoutFormElements = () => {
+  const { checkout } = useCheckout();
+  const { id, totals } = checkout;
   const { data: paymentSources } = usePaymentMethods();
 
   const [paymentMethodSource, setPaymentMethodSource] = useState<PaymentMethodSource>(() =>
     paymentSources.length > 0 ? 'existing' : 'new',
   );
+
+  if (!id) {
+    return null;
+  }
 
   return (
     <Col
@@ -183,7 +186,7 @@ const CheckoutFormElements = ({ checkout }: { checkout: CommerceCheckoutResource
       sx={t => ({ padding: t.space.$4 })}
     >
       {/* only show if there are payment sources and there is a total due now */}
-      {paymentSources.length > 0 && checkout.totals.totalDueNow.amount > 0 && (
+      {paymentSources.length > 0 && totals.totalDueNow.amount > 0 && (
         <SegmentedControl.Root
           aria-label='Payment method source'
           value={paymentMethodSource}
@@ -204,9 +207,8 @@ const CheckoutFormElements = ({ checkout }: { checkout: CommerceCheckoutResource
 
       {paymentMethodSource === 'existing' && (
         <ExistingPaymentSourceForm
-          checkout={checkout}
           paymentSources={paymentSources}
-          totalDueNow={checkout.totals.totalDueNow}
+          totalDueNow={totals.totalDueNow}
         />
       )}
 
@@ -274,7 +276,8 @@ export const PayWithTestPaymentSource = () => {
 
 const AddPaymentSourceForCheckout = withCardStateProvider(() => {
   const { addPaymentSourceAndPay } = useCheckoutMutations();
-  const { id, __internal_checkout, totals } = useCheckout();
+  const { checkout } = useCheckout();
+  const { id, totals } = checkout;
 
   if (!id) {
     return null;
@@ -283,7 +286,7 @@ const AddPaymentSourceForCheckout = withCardStateProvider(() => {
   return (
     <AddPaymentSource.Root
       onSuccess={addPaymentSourceAndPay}
-      checkout={__internal_checkout}
+      checkout={checkout}
     >
       <DevOnly>
         <PayWithTestPaymentSource />
@@ -304,18 +307,19 @@ const AddPaymentSourceForCheckout = withCardStateProvider(() => {
 
 const ExistingPaymentSourceForm = withCardStateProvider(
   ({
-    checkout,
     totalDueNow,
     paymentSources,
   }: {
-    checkout: CommerceCheckoutResource;
     totalDueNow: CommerceMoney;
     paymentSources: CommercePaymentSourceResource[];
   }) => {
+    const { checkout } = useCheckout();
+    const { paymentSource } = checkout;
+
     const { payWithExistingPaymentSource } = useCheckoutMutations();
     const card = useCardState();
     const [selectedPaymentSource, setSelectedPaymentSource] = useState<CommercePaymentSourceResource | undefined>(
-      checkout.paymentSource || paymentSources.find(p => p.isDefault),
+      paymentSource || paymentSources.find(p => p.isDefault),
     );
 
     const options = useMemo(() => {
@@ -341,7 +345,7 @@ const ExistingPaymentSourceForm = withCardStateProvider(
           rowGap: t.space.$4,
         })}
       >
-        {checkout.totals.totalDueNow.amount > 0 ? (
+        {totalDueNow.amount > 0 ? (
           <Select
             elementId='paymentSource'
             options={options}

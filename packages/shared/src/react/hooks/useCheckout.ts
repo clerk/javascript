@@ -20,39 +20,29 @@ type RemoveFunctions<T> = {
 };
 
 /**
- * Utility type that makes all properties nullable.
+ * Utility type that makes all properties `null`.
  */
-type Nullable<T> = {
+type ForceNull<T> = {
   [K in keyof T]: null;
 };
 
-type CheckoutProperties = Omit<
-  RemoveFunctions<CommerceCheckoutResource>,
-  'paymentSource' | 'plan' | 'pathRoot' | 'reload' | 'confirm'
-> & {
-  plan: RemoveFunctions<CommerceCheckoutResource['plan']>;
-  paymentSource: RemoveFunctions<CommerceCheckoutResource['paymentSource']>;
-  __internal_checkout: CommerceCheckoutResource;
-};
-type NullableCheckoutProperties = Nullable<
-  Omit<RemoveFunctions<CommerceCheckoutResource>, 'paymentSource' | 'plan' | 'pathRoot' | 'reload' | 'confirm'>
-> & {
-  plan: null;
-  paymentSource: null;
-  __internal_checkout: null;
-};
+type CheckoutProperties = Omit<RemoveFunctions<CommerceCheckoutResource>, 'pathRoot' | 'status'>;
 
-type UseCheckoutReturn = (CheckoutProperties | NullableCheckoutProperties) & {
-  confirm: (params: ConfirmCheckoutParams) => Promise<CommerceCheckoutResource>;
-  start: () => Promise<CommerceCheckoutResource>;
-  isStarting: boolean;
-  isConfirming: boolean;
-  error: ClerkAPIResponseError | null;
-  status: __experimental_CheckoutCacheState['status'];
-  clear: () => void;
-  finalize: (params: { redirectUrl?: string }) => void;
-  fetchStatus: 'idle' | 'fetching' | 'error';
-  getState: () => __experimental_CheckoutCacheState;
+type NullableCheckoutProperties = CheckoutProperties | ForceNull<CheckoutProperties>;
+
+type __experimental_UseCheckoutReturn = {
+  checkout: NullableCheckoutProperties & {
+    confirm: (params: ConfirmCheckoutParams) => Promise<CommerceCheckoutResource>;
+    start: () => Promise<CommerceCheckoutResource>;
+    isStarting: boolean;
+    isConfirming: boolean;
+    error: ClerkAPIResponseError | null;
+    status: __experimental_CheckoutCacheState['status'];
+    clear: () => void;
+    complete: (params?: { redirectUrl: string }) => void;
+    fetchStatus: 'idle' | 'fetching' | 'error';
+    getState: () => __experimental_CheckoutCacheState;
+  };
 };
 
 type UseCheckoutOptions = {
@@ -61,7 +51,7 @@ type UseCheckoutOptions = {
   planId: string;
 };
 
-export const useCheckout = (options?: UseCheckoutOptions): UseCheckoutReturn => {
+export const useCheckout = (options?: UseCheckoutOptions): __experimental_UseCheckoutReturn => {
   const contextOptions = useCheckoutContext();
   const { for: forOrganization, planId, planPeriod } = options || contextOptions;
 
@@ -88,7 +78,7 @@ export const useCheckout = (options?: UseCheckoutOptions): UseCheckoutReturn => 
     () => manager.getState(),
   );
 
-  const properties = useMemo(() => {
+  const properties = useMemo<NullableCheckoutProperties>(() => {
     if (!managerProperties.checkout) {
       return {
         id: null,
@@ -113,21 +103,23 @@ export const useCheckout = (options?: UseCheckoutOptions): UseCheckoutReturn => 
     return rest;
   }, [managerProperties.checkout]);
 
-  return {
+  const checkout = {
     ...properties,
     getState: manager.getState,
-    // @ts-expect-error - this is a temporary fix to allow the checkout to be null
+    // @ts-ignore
     checkout: null,
-    // @ts-expect-error - this is a temporary fix to allow the checkout to be null
-    __internal_checkout: managerProperties.checkout,
     start: manager.start,
     confirm: manager.confirm,
     clear: manager.clear,
-    finalize: manager.finalize,
+    complete: manager.complete,
     isStarting: managerProperties.isStarting,
     isConfirming: managerProperties.isConfirming,
     error: managerProperties.error,
     status: managerProperties.status,
     fetchStatus: managerProperties.fetchStatus,
+  };
+
+  return {
+    checkout,
   };
 };
