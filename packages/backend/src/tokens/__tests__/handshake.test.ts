@@ -181,8 +181,7 @@ describe('HandshakeService', () => {
 
     it('should include additional search params when provided', () => {
       const headers = handshakeService.buildRedirectToHandshake('test-reason', { iat_uat_delta: '100' });
-      const location = headers.get(constants.Headers.Location);
-      expect(location).toBeDefined();
+      const location = headers.get(constants.Headers.Location) ?? '';
       const url = new URL(location);
 
       expect(url.searchParams.get('iat_uat_delta')).toBe('100');
