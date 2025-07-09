@@ -13,13 +13,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
     test.describe.configure({ mode: 'serial' });
 
     let fakeUser: FakeUser;
-
-    test.beforeAll(async () => {
-      const u = createTestUtils({ app });
-      fakeUser = u.services.users.createFakeUser();
-      await u.services.users.createBapiUser(fakeUser);
-    });
-
     test.afterAll(async () => {
       const u = createTestUtils({ app });
       await fakeUser.deleteIfExists();
@@ -29,6 +22,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
 
     test('with email and password, navigate to task on after sign-in', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
+      fakeUser = u.services.users.createFakeUser();
 
       // Performs sign-in
       await u.po.signIn.goTo();
@@ -53,6 +47,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
 
     test('with sso, navigate to task on after sign-in', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
+      fakeUser = u.services.users.createFakeUser();
 
       // Create a clerkClient for the OAuth provider instance
       const client = createClerkClient({
