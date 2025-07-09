@@ -2,7 +2,7 @@ import { colors as colorUtils } from '../utils/colors';
 import { colorOptionToThemedAlphaScale, colorOptionToThemedLightnessScale } from '../utils/colors/scales';
 import { clerkCssVar } from '../utils/cssVariables';
 
-export const whiteAlpha = Object.freeze({
+const whiteAlpha = Object.freeze({
   whiteAlpha25: 'hsla(0, 0%, 100%, 0.02)',
   whiteAlpha50: 'hsla(0, 0%, 100%, 0.03)',
   whiteAlpha100: 'hsla(0, 0%, 100%, 0.07)',
@@ -77,7 +77,7 @@ const colorTextSecondary = clerkCssVar(
   colorUtils.makeTransparent(colorText, 0.35) || '#747686',
 );
 
-export const colors = Object.freeze({
+const colors = Object.freeze({
   avatarBorder: neutralAlphaScale.neutralAlpha200,
   avatarBackground: neutralAlphaScale.neutralAlpha400,
   modalBackdrop: neutralAlphaScale.neutralAlpha700,
@@ -103,3 +103,5 @@ export const colors = Object.freeze({
   ...successScale,
   ...successAlphaScale,
 } as const);
+
+export { colors, neutralAlphaScale as neutralAlpha, whiteAlpha };
