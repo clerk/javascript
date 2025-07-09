@@ -14,9 +14,13 @@ export class SamlConnection {
      */
     readonly name: string,
     /**
-     * The domain of your organization. Sign in flows using an email with this domain will use the connection.
+     * @deprecated The domain of your organization. Sign in flows using an email with this domain will use the connection.
      */
     readonly domain: string,
+    /**
+     * The domains of your organization. Sign in flows using an email with one of these domains will use the connection.
+     */
+    readonly domains: string[],
     /**
      * The organization ID of the organization.
      */
@@ -95,6 +99,7 @@ export class SamlConnection {
       data.id,
       data.name,
       data.domain,
+      data.domains,
       data.organization_id,
       data.idp_entity_id,
       data.idp_sso_url,
@@ -121,7 +126,11 @@ export class SamlAccountConnection {
   constructor(
     readonly id: string,
     readonly name: string,
+    /**
+     * @deprecated Use `domains` array instead. This field will be removed in a future version.
+     */
     readonly domain: string,
+    readonly domains: string[],
     readonly active: boolean,
     readonly provider: string,
     readonly syncUserAttributes: boolean,
@@ -135,6 +144,7 @@ export class SamlAccountConnection {
       data.id,
       data.name,
       data.domain,
+      data.domains,
       data.active,
       data.provider,
       data.sync_user_attributes,
