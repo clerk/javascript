@@ -16,6 +16,7 @@ import { createSessionCookie } from './cookies/session';
 import { getCookieSuffix } from './cookieSuffix';
 import type { DevBrowser } from './devBrowser';
 import { createDevBrowser } from './devBrowser';
+
 import { SessionCookiePoller } from './SessionCookiePoller';
 
 // TODO(@dimkl): make AuthCookieService singleton since it handles updating cookies using a poller
