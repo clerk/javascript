@@ -79,7 +79,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.44.0",
-    "cypress": "^13.9.0"
+    "cypress": "^14.5.1"
   },
   "peerDependencies": {
     "@playwright/test": "^1",
