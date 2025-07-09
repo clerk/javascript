@@ -294,6 +294,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
     reason: string,
     message: string,
     headers?: Headers,
+    handshakeSearchParams?: Record<string, string | undefined>,
   ): SignedInState | SignedOutState | HandshakeState {
     if (!handshakeService.isRequestEligibleForHandshake()) {
       return signedOut({
@@ -306,7 +307,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
 
     // Right now the only usage of passing in different headers is for multi-domain sync, which redirects somewhere else.
     // In the future if we want to decorate the handshake redirect with additional headers per call we need to tweak this logic.
-    const handshakeHeaders = headers ?? handshakeService.buildRedirectToHandshake(reason);
+    const handshakeHeaders = headers ?? handshakeService.buildRedirectToHandshake(reason, handshakeSearchParams);
 
     // Chrome aggressively caches inactive tabs. If we don't set the header here,
     // all 307 redirects will be cached and the handshake will end up in an infinite loop.
@@ -534,7 +535,15 @@ export const authenticateRequest: AuthenticateRequest = (async (
     }
 
     if (decodeResult.payload.iat < authenticateContext.clientUat) {
-      return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.SessionTokenIATBeforeClientUAT, '');
+      // Track delta for observability
+      const delta = authenticateContext.clientUat - decodeResult.payload.iat;
+      return handleMaybeHandshakeStatus(
+        authenticateContext,
+        AuthErrorReason.SessionTokenIATBeforeClientUAT,
+        '',
+        undefined,
+        { iat_uat_delta: delta.toString() },
+      );
     }
 
     try {
