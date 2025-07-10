@@ -24,8 +24,9 @@ export async function verifyWebhook(req: ExpressRequest, options?: VerifyWebhook
   const webRequest = incomingMessageToRequest(req);
   // Cloning instead of implementing the body inside incomingMessageToRequest
   // to make it more predictable
+  // we must pass in body as json string
   const clonedRequest = new Request(webRequest, {
-    body: req.body,
+    body: JSON.stringify(req.body),
   });
   return verifyWebhookBase(clonedRequest, options);
 }
