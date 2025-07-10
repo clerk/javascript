@@ -18,7 +18,7 @@ export type ClerkProviderProps = Without<React.ComponentProps<typeof ClerkReactP
   publishableKey?: string;
   /**
    * The token cache is used to persist the active user's session token. Clerk stores this token in memory by default, however it is recommended to use a token cache for production applications.
-   * @see https://clerk.com/docs/quickstarts/expo#configure-the-token-cache-with-expo
+   * @see https://clerk.com/docs/quickstarts/expo#configure-the-token-cache
    */
   tokenCache?: TokenCache;
   /**
