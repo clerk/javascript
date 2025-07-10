@@ -8,11 +8,12 @@ type LoadScriptOptions = {
   defer?: boolean;
   crossOrigin?: 'anonymous' | 'use-credentials';
   nonce?: string;
+  integrity?: string;
   beforeLoad?: (script: HTMLScriptElement) => void;
 };
 
 export async function loadScript(src = '', opts: LoadScriptOptions): Promise<HTMLScriptElement> {
-  const { async, defer, beforeLoad, crossOrigin, nonce } = opts || {};
+  const { async, defer, beforeLoad, crossOrigin, nonce, integrity } = opts || {};
 
   const load = () => {
     return new Promise<HTMLScriptElement>((resolve, reject) => {
@@ -26,7 +27,11 @@ export async function loadScript(src = '', opts: LoadScriptOptions): Promise<HTM
 
       const script = document.createElement('script');
 
+
+      
       if (crossOrigin) script.setAttribute('crossorigin', crossOrigin);
+      if (integrity) script.setAttribute('integrity', integrity);
+      
       script.async = async || false;
       script.defer = defer || false;
 
