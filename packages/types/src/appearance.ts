@@ -624,9 +624,16 @@ export type Variables = {
   /**
    * The color of text appearing on top of an element that with a background color of {@link Variables.colorPrimary},
    * eg: solid primary buttons.
+   * @deprecated Use {@link Variables.colorPrimaryForeground} instead.
    * @default 'white'
    */
   colorTextOnPrimaryBackground?: CssColor;
+  /**
+   * The color of text appearing on top of an element that with a background color of {@link Variables.colorPrimary},
+   * eg: solid primary buttons.
+   * @default 'white'
+   */
+  colorPrimaryForeground?: CssColor;
   /**
    * The color used to indicate errors or destructive actions. Set this to your brand's danger color.
    * @default '#EF4444'

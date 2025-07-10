@@ -5,7 +5,7 @@ export const dark = experimental_createTheme({
     colorBackground: '#212126',
     colorNeutral: 'white',
     colorPrimary: '#ffffff',
-    colorTextOnPrimaryBackground: 'black',
+    colorPrimaryForeground: 'black',
     colorText: 'white',
     colorInputText: 'white',
     colorInputBackground: '#26262B',

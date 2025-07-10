@@ -16,7 +16,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
       variant: common.textVariants(theme),
       colorScheme: {
         body: { color: theme.colors.$colorText },
-        onPrimaryBg: { color: theme.colors.$colorTextOnPrimaryBackground },
+        onPrimaryBg: { color: theme.colors.$colorPrimaryForeground },
         danger: { color: theme.colors.$danger500 },
         success: { color: theme.colors.$success500 },
         warning: { color: theme.colors.$warning500 },

@@ -33,7 +33,11 @@ export const createColorScales = (theme: Theme) => {
     ...successAlphaScale,
     ...warningAlphaScale,
     primaryHover: colors.adjustForLightness(primaryScale?.primary500),
-    colorTextOnPrimaryBackground: colors.toHslaString(variables.colorTextOnPrimaryBackground),
+    colorPrimaryForeground: variables.colorPrimaryForeground
+      ? colors.toHslaString(variables.colorPrimaryForeground)
+      : variables.colorTextOnPrimaryBackground
+        ? colors.toHslaString(variables.colorTextOnPrimaryBackground)
+        : undefined,
     colorText: colors.toHslaString(variables.colorText),
     colorTextSecondary:
       colors.toHslaString(variables.colorTextSecondary) || colors.makeTransparent(variables.colorText, 0.35),

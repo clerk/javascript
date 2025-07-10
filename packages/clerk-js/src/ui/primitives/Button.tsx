@@ -51,7 +51,7 @@ const { applyVariants, filterProps } = createVariants(
             [vars.accent]: theme.colors.$primary500,
             [vars.accentHover]: theme.colors.$primaryHover,
             [vars.border]: theme.colors.$primary500,
-            [vars.accentContrast]: theme.colors.$colorTextOnPrimaryBackground,
+            [vars.accentContrast]: theme.colors.$colorPrimaryForeground,
             [vars.alpha]: theme.colors.$neutralAlpha50,
           },
           secondary: {
