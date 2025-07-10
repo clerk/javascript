@@ -125,10 +125,11 @@ export class HandshakeService {
   /**
    * Builds the redirect headers for a handshake request
    * @param reason - The reason for the handshake (e.g. 'session-token-expired')
+   * @param additionalSearchParams - Additional search params to append to the handshake URL (e.g. to help with observability)
    * @returns Headers object containing the Location header for redirect
    * @throws Error if clerkUrl is missing in authenticateContext
    */
-  buildRedirectToHandshake(reason: string): Headers {
+  buildRedirectToHandshake(reason: string, additionalSearchParams?: Record<string, string | undefined>): Headers {
     if (!this.authenticateContext?.clerkUrl) {
       throw new Error('Missing clerkUrl in authenticateContext');
     }
@@ -160,6 +161,14 @@ export class HandshakeService {
       const params = this.getOrganizationSyncQueryParams(toActivate);
       params.forEach((value, key) => {
         url.searchParams.append(key, value);
+      });
+    }
+
+    if (additionalSearchParams) {
+      Object.entries(additionalSearchParams).forEach(([key, value]) => {
+        if (typeof value !== 'undefined') {
+          url.searchParams.append(key, value);
+        }
       });
     }
 
