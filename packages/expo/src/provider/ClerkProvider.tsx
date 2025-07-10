@@ -5,7 +5,6 @@ import type { Without } from '@clerk/types';
 import * as WebBrowser from 'expo-web-browser';
 
 import type { TokenCache } from '../cache/types';
-import { tokenCache as defaultTokenCache } from '../token-cache';
 import { isNative, isWeb } from '../utils/runtime';
 import { getClerkInstance } from './singleton';
 import type { BuildClerkOptions } from './singleton/types';
@@ -44,7 +43,7 @@ const SDK_METADATA = {
 export function ClerkProvider(props: ClerkProviderProps): JSX.Element {
   const {
     children,
-    tokenCache = defaultTokenCache,
+    tokenCache,
     publishableKey,
     __experimental_passkeys,
     experimental,
