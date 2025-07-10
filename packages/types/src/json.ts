@@ -705,6 +705,7 @@ export interface CommerceSubscriptionJSON extends ClerkResourceJSON {
   period_start: number;
   period_end: number;
   canceled_at: number | null;
+  past_due_at: number | null;
 }
 
 export interface CommerceMoneyJSON {

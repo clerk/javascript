@@ -114,6 +114,7 @@ export const useSubscriptions = () => {
           created_at: canceledSubscription?.periodEndDate?.getTime() || 0,
           period_start: canceledSubscription?.periodEndDate?.getTime() || 0,
           period_end: 0,
+          past_due_at: null,
         }),
       ];
     }
