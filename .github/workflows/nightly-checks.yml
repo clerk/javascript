@@ -11,14 +11,12 @@ on:
 jobs:
   integration-tests:
     name: Integration Tests
-    runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}\
+    runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_EXTENDED && fromJSON(vars.TIMEOUT_MINUTES_EXTENDED) || 30 }}
 
     strategy:
       matrix:
         test-name: ['nextjs']
-      # Don't cancel other matrix jobs if one fails
-      fail-fast: false
 
     steps:
       - name: Checkout Repo
@@ -45,14 +43,6 @@ jobs:
       - name: Install @clerk/backend in /integration
         working-directory: ./integration
         run: pnpm init && pnpm add @clerk/backend
-
-      - name: List installed packages in /integration
-        working-directory: ./integration
-        run: |
-          echo "=== Listing installed packages in /integration ==="
-          pnpm list --json
-          echo "=== Detailed package info for @clerk/backend ==="
-          pnpm list @clerk/backend
 
       - name: Install @clerk/clerk-js in os temp
         working-directory: ${{runner.temp}}
