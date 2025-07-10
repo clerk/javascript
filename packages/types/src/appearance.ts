@@ -724,9 +724,15 @@ export type Variables = {
   borderRadius?: CssLengthUnit;
   /**
    * The base spacing unit that all margins, paddings and gaps between the elements are derived from.
+   * @deprecated Use {@link Variables.spacing} instead.
    * @default '1rem'
    */
   spacingUnit?: CssLengthUnit;
+  /**
+   * The base spacing that all margins, paddings and gaps between the elements are derived from.
+   * @default '1rem'
+   */
+  spacing?: CssLengthUnit;
 };
 
 export type BaseThemeTaggedType = { __type: 'prebuilt_appearance' };

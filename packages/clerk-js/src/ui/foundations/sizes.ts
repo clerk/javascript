@@ -6,7 +6,7 @@ const baseSpaceUnits = Object.freeze({
   px: '1px',
 } as const);
 
-const dynamicSpaceUnitsDefaultVar = clerkCssVar('spacing-unit', '1rem');
+const dynamicSpaceUnitsDefaultVar = clerkCssVar('spacing', '1rem');
 const calcDynamicSpaceUnits = (num: number) => `calc(${dynamicSpaceUnitsDefaultVar} * ((${num} / 0.5) * 0.125))`;
 
 const dynamicSpaceUnits = Object.freeze({

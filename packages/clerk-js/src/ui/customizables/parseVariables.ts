@@ -107,15 +107,16 @@ export const createRadiiUnits = (theme: Theme) => {
 };
 
 export const createSpaceScale = (theme: Theme) => {
-  const { spacingUnit } = theme.variables || {};
-  if (spacingUnit === undefined) {
+  const { spacing, spacingUnit } = theme.variables || {};
+  const spacingValue = spacing ?? spacingUnit;
+  if (spacingValue === undefined) {
     return;
   }
   return fromEntries(
     spaceScaleKeys.map(k => {
       const num = Number.parseFloat(k.replace('x', '.'));
       const percentage = (num / 0.5) * 0.125;
-      return [k, `calc(${spacingUnit} * ${percentage})`];
+      return [k, `calc(${spacingValue} * ${percentage})`];
     }),
   );
 };
