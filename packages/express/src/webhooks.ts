@@ -24,9 +24,23 @@ export async function verifyWebhook(req: ExpressRequest, options?: VerifyWebhook
   const webRequest = incomingMessageToRequest(req);
   // Cloning instead of implementing the body inside incomingMessageToRequest
   // to make it more predictable
-  // we must pass in body as json string
+  // we must pass in body as string not as an Object or Buffer
+  let serializedBody: string;
+  if (typeof req.body === 'string') {
+    serializedBody = req.body;
+  } else if (Buffer.isBuffer(req.body)) {
+    serializedBody = req.body.toString('utf8');
+  } else if (req.body === undefined || req.body === null) {
+    serializedBody = '';
+  } else {
+    try {
+      serializedBody = JSON.stringify(req.body);
+    } catch (error) {
+      throw new Error(`Failed to serialize request body: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
   const clonedRequest = new Request(webRequest, {
-    body: JSON.stringify(req.body),
+    body: serializedBody,
   });
   return verifyWebhookBase(clonedRequest, options);
 }
