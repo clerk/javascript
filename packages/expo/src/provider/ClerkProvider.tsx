@@ -5,6 +5,7 @@ import type { Without } from '@clerk/types';
 import * as WebBrowser from 'expo-web-browser';
 
 import type { TokenCache } from '../cache/types';
+import { tokenCache as secureStoreTokenCache } from '../token-cache';
 import { isNative, isWeb } from '../utils/runtime';
 import { getClerkInstance } from './singleton';
 import type { BuildClerkOptions } from './singleton/types';
@@ -17,7 +18,7 @@ export type ClerkProviderProps = Without<React.ComponentProps<typeof ClerkReactP
   publishableKey?: string;
   /**
    * The token cache is used to persist the active user's session token. Clerk stores this token in memory by default, however it is recommended to use a token cache for production applications.
-   * @see https://clerk.com/docs/quickstarts/expo#configure-the-token-cache-with-expo
+   * @see https://clerk.com/docs/quickstarts/expo#configure-the-token-cache
    */
   tokenCache?: TokenCache;
   /**
@@ -69,7 +70,7 @@ export function ClerkProvider(props: ClerkProviderProps): JSX.Element {
         isNative()
           ? getClerkInstance({
               publishableKey: pk,
-              tokenCache,
+              tokenCache: tokenCache || secureStoreTokenCache,
               __experimental_passkeys,
               __experimental_resourceCache,
             })
