@@ -143,7 +143,6 @@ export const usePlans = () => {
 type HandleSelectPlanProps = {
   plan: CommercePlanResource;
   planPeriod: CommerceSubscriptionPlanPeriod;
-  onSubscriptionChange?: () => void;
   mode?: 'modal' | 'mounted';
   event?: React.MouseEvent<HTMLElement>;
   appearance?: Appearance;
@@ -345,53 +344,44 @@ export const usePlansContext = () => {
     return;
   }, []);
 
+  const openSubscriptionDetails = useCallback(
+    (event?: React.MouseEvent<HTMLElement>) => {
+      const portalRoot = getClosestProfileScrollBox('modal', event);
+      clerk.__internal_openSubscriptionDetails({
+        for: subscriberType,
+        onSubscriptionCancel: () => {
+          revalidateAll();
+        },
+        portalRoot,
+      });
+    },
+    [clerk, subscriberType, revalidateAll],
+  );
+
   // handle the selection of a plan, either by opening the subscription details or checkout
   const handleSelectPlan = useCallback(
-    ({
-      plan,
-      planPeriod,
-      onSubscriptionChange,
-      mode = 'mounted',
-      event,
-      appearance,
-      newSubscriptionRedirectUrl,
-    }: HandleSelectPlanProps) => {
-      const subscription = activeOrUpcomingSubscriptionWithPlanPeriod(plan, planPeriod);
-
+    ({ plan, planPeriod, mode = 'mounted', event, appearance, newSubscriptionRedirectUrl }: HandleSelectPlanProps) => {
       const portalRoot = getClosestProfileScrollBox(mode, event);
 
-      if (subscription && subscription.planPeriod === planPeriod && !subscription.canceledAtDate) {
-        clerk.__internal_openSubscriptionDetails({
-          for: subscriberType,
-          onSubscriptionCancel: () => {
-            revalidateAll();
-            onSubscriptionChange?.();
-          },
-          appearance,
-          portalRoot,
-        });
-      } else {
-        clerk.__internal_openCheckout({
-          planId: plan.id,
-          // if the plan doesn't support annual, use monthly
-          planPeriod: planPeriod === 'annual' && plan.annualMonthlyAmount === 0 ? 'month' : planPeriod,
-          subscriberType,
-          onSubscriptionComplete: () => {
-            revalidateAll();
-            onSubscriptionChange?.();
-          },
-          onClose: () => {
-            if (session?.id) {
-              void clerk.setActive({ session: session.id });
-            }
-          },
-          appearance,
-          portalRoot,
-          newSubscriptionRedirectUrl,
-        });
-      }
+      clerk.__internal_openCheckout({
+        planId: plan.id,
+        // if the plan doesn't support annual, use monthly
+        planPeriod: planPeriod === 'annual' && plan.annualMonthlyAmount === 0 ? 'month' : planPeriod,
+        subscriberType,
+        onSubscriptionComplete: () => {
+          revalidateAll();
+        },
+        onClose: () => {
+          if (session?.id) {
+            void clerk.setActive({ session: session.id });
+          }
+        },
+        appearance,
+        portalRoot,
+        newSubscriptionRedirectUrl,
+      });
     },
-    [clerk, revalidateAll, activeOrUpcomingSubscription, subscriberType, session?.id],
+    [clerk, revalidateAll, subscriberType, session?.id],
   );
 
   const defaultFreePlan = useMemo(() => {
@@ -404,6 +394,7 @@ export const usePlansContext = () => {
     activeOrUpcomingSubscriptionBasedOnPlanPeriod: activeOrUpcomingSubscriptionWithPlanPeriod,
     isDefaultPlanImplicitlyActiveOrUpcoming,
     handleSelectPlan,
+    openSubscriptionDetails,
     buttonPropsForPlan,
     canManageSubscription,
     captionForSubscription,
