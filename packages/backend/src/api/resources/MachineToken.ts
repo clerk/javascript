@@ -15,9 +15,10 @@ export class MachineToken {
     readonly creationReason: string | null,
     readonly createdAt: number,
     readonly updatedAt: number,
+    readonly secret?: string,
   ) {}
 
-  static fromJSON(data: MachineTokenJSON) {
+  static fromJSON(data: MachineTokenJSON): MachineToken {
     return new MachineToken(
       data.id,
       data.name,
@@ -32,6 +33,7 @@ export class MachineToken {
       data.creation_reason,
       data.created_at,
       data.updated_at,
+      data.secret,
     );
   }
 }
