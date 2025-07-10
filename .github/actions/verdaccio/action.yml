@@ -22,7 +22,7 @@ inputs:
     default: 'http://localhost:4873'
 
 runs:
-  using: "composite"
+  using: 'composite'
   steps:
     - name: Update NPM Registry to Verdaccio
       shell: bash
