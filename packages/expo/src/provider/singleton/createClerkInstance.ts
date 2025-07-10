@@ -10,7 +10,6 @@ import type {
 } from '@clerk/types';
 import { Platform } from 'react-native';
 
-import type { TokenCache } from '../../cache';
 import {
   ClientResourceCache,
   DUMMY_CLERK_CLIENT_RESOURCE,
@@ -18,8 +17,8 @@ import {
   EnvironmentResourceCache,
   SessionJWTCache,
 } from '../../cache';
+import { MemoryTokenCache } from '../../cache/MemoryTokenCache';
 import { errorThrower } from '../../errorThrower';
-import { tokenCache as secureStoreTokenCache } from '../../token-cache';
 import { isNative } from '../../utils';
 import type { BuildClerkOptions } from './types';
 
@@ -35,7 +34,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
   return (options?: BuildClerkOptions): HeadlessBrowserClerk | BrowserClerk => {
     const {
       publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY || process.env.CLERK_PUBLISHABLE_KEY || '',
-      tokenCache = secureStoreTokenCache as TokenCache,
+      tokenCache = MemoryTokenCache,
       __experimental_resourceCache: createResourceCache,
     } = options || {};
 

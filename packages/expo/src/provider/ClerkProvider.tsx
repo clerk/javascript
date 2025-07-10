@@ -5,6 +5,7 @@ import type { Without } from '@clerk/types';
 import * as WebBrowser from 'expo-web-browser';
 
 import type { TokenCache } from '../cache/types';
+import { tokenCache as secureStoreTokenCache } from '../token-cache';
 import { isNative, isWeb } from '../utils/runtime';
 import { getClerkInstance } from './singleton';
 import type { BuildClerkOptions } from './singleton/types';
@@ -69,7 +70,7 @@ export function ClerkProvider(props: ClerkProviderProps): JSX.Element {
         isNative()
           ? getClerkInstance({
               publishableKey: pk,
-              tokenCache,
+              tokenCache: tokenCache || secureStoreTokenCache,
               __experimental_passkeys,
               __experimental_resourceCache,
             })

@@ -16,11 +16,4 @@ const createMemoryTokenCache = (): TokenCache => {
   };
 };
 
-/**
- * @deprecated
- * MemoryTokenCache is not secure and should only be used for testing or non-production environments.
- * For production, use the default tokenCache implementation, which uses expo-secure-store for secure storage.
- *
- * @see https://docs.expo.dev/versions/latest/sdk/securestore/
- */
 export const MemoryTokenCache = createMemoryTokenCache();
