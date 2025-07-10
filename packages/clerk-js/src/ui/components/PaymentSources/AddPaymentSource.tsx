@@ -13,37 +13,40 @@ import { useCardState } from '@/ui/elements/contexts';
 import { Form } from '@/ui/elements/Form';
 import { FormButtons } from '@/ui/elements/FormButtons';
 import { FormContainer } from '@/ui/elements/FormContainer';
+import { resolveComputedCSSColor, resolveComputedCSSProperty } from '@/ui/utils/cssVariables';
 import { handleError } from '@/ui/utils/errorHandler';
-import { normalizeColorString } from '@/ui/utils/normalizeColorString';
 
 import { useSubscriberTypeContext, useSubscriberTypeLocalizationRoot } from '../../contexts';
 import { descriptors, Flex, localizationKeys, Spinner, useAppearance, useLocalizations } from '../../customizables';
 import type { LocalizationKey } from '../../localization';
 
-const useStripeAppearance = () => {
+const useStripeAppearance = (node: HTMLElement | null) => {
   const theme = useAppearance().parsedInternalTheme;
 
   return useMemo(() => {
+    if (!node) {
+      return undefined;
+    }
     const { colors, fontWeights, fontSizes, radii, space } = theme;
     return {
-      colorPrimary: normalizeColorString(colors.$primary500),
-      colorBackground: normalizeColorString(colors.$colorInputBackground),
-      colorText: normalizeColorString(colors.$colorText),
-      colorTextSecondary: normalizeColorString(colors.$colorTextSecondary),
-      colorSuccess: normalizeColorString(colors.$success500),
-      colorDanger: normalizeColorString(colors.$danger500),
-      colorWarning: normalizeColorString(colors.$warning500),
-      fontWeightNormal: fontWeights.$normal.toString(),
-      fontWeightMedium: fontWeights.$medium.toString(),
-      fontWeightBold: fontWeights.$bold.toString(),
-      fontSizeXl: fontSizes.$xl,
-      fontSizeLg: fontSizes.$lg,
-      fontSizeSm: fontSizes.$md,
-      fontSizeXs: fontSizes.$sm,
-      borderRadius: radii.$md,
-      spacingUnit: space.$1,
+      colorPrimary: resolveComputedCSSColor(node, colors.$primary500, colors.$colorBackground),
+      colorBackground: resolveComputedCSSColor(node, colors.$colorInputBackground, colors.$colorBackground),
+      colorText: resolveComputedCSSColor(node, colors.$colorText, colors.$colorBackground),
+      colorTextSecondary: resolveComputedCSSColor(node, colors.$colorTextSecondary, colors.$colorBackground),
+      colorSuccess: resolveComputedCSSColor(node, colors.$success500, colors.$colorBackground),
+      colorDanger: resolveComputedCSSColor(node, colors.$danger500, colors.$colorBackground),
+      colorWarning: resolveComputedCSSColor(node, colors.$warning500, colors.$colorBackground),
+      fontWeightNormal: resolveComputedCSSProperty(node, 'font-weight', fontWeights.$normal.toString()),
+      fontWeightMedium: resolveComputedCSSProperty(node, 'font-weight', fontWeights.$medium.toString()),
+      fontWeightBold: resolveComputedCSSProperty(node, 'font-weight', fontWeights.$bold.toString()),
+      fontSizeXl: resolveComputedCSSProperty(node, 'font-size', fontSizes.$xl),
+      fontSizeLg: resolveComputedCSSProperty(node, 'font-size', fontSizes.$lg),
+      fontSizeSm: resolveComputedCSSProperty(node, 'font-size', fontSizes.$md),
+      fontSizeXs: resolveComputedCSSProperty(node, 'font-size', fontSizes.$sm),
+      borderRadius: resolveComputedCSSProperty(node, 'border-radius', radii.$lg),
+      spacingUnit: resolveComputedCSSProperty(node, 'padding', space.$1),
     };
-  }, [theme]);
+  }, [theme, node]);
 };
 
 type AddPaymentSourceProps = {
@@ -66,11 +69,12 @@ const [AddPaymentSourceContext, useAddPaymentSourceContext] = createContextAndHo
 
 const AddPaymentSourceRoot = ({ children, checkout, ...rest }: PropsWithChildren<AddPaymentSourceProps>) => {
   const subscriberType = useSubscriberTypeContext();
+  const stripeAppearanceNode = useRef<HTMLDivElement | null>(null);
   const { t } = useLocalizations();
   const [headerTitle, setHeaderTitle] = useState<LocalizationKey | undefined>(undefined);
   const [headerSubtitle, setHeaderSubtitle] = useState<LocalizationKey | undefined>(undefined);
   const [submitLabel, setSubmitLabel] = useState<LocalizationKey | undefined>(undefined);
-  const stripeAppearance = useStripeAppearance();
+  const stripeAppearance = useStripeAppearance(stripeAppearanceNode.current);
 
   return (
     <AddPaymentSourceContext.Provider
@@ -87,6 +91,10 @@ const AddPaymentSourceRoot = ({ children, checkout, ...rest }: PropsWithChildren
         },
       }}
     >
+      <div
+        ref={stripeAppearanceNode}
+        style={{ display: 'none' }}
+      />
       <PaymentElementProvider
         checkout={checkout}
         for={subscriberType}

@@ -174,12 +174,10 @@ const PropsProvider = ({ children, ...props }: PropsWithChildren<PaymentElementP
     <PaymentElementContext.Provider
       value={{
         value: {
+          ...props,
           ...utils,
           setIsPaymentElementReady,
           isPaymentElementReady,
-          checkout: props.checkout,
-          paymentDescription: props.paymentDescription,
-          for: props.for,
         },
       }}
     >
