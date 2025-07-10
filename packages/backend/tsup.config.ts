@@ -21,6 +21,7 @@ export default defineConfig(overrideOptions => {
     bundle: true,
     clean: true,
     minify: false,
+    noExternal: ['snakecase-keys'],
   };
 
   const esm: Options = {
