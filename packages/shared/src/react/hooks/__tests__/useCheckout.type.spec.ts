@@ -59,26 +59,40 @@ describe('useCheckout type tests', () => {
     type CheckoutObject = UseCheckoutReturn['checkout'];
     describe('methods', () => {
       it('has required methods', () => {
-        type Methods = Pick<CheckoutObject, 'confirm' | 'start' | 'clear' | 'complete' | 'getState'>;
+        type Methods = Pick<CheckoutObject, 'confirm' | 'start' | 'clear' | 'finalize' | 'getState'>;
 
         type MethodNames = keyof Methods;
-        expectTypeOf<MethodNames>().toEqualTypeOf<'confirm' | 'start' | 'clear' | 'complete' | 'getState'>();
+        expectTypeOf<MethodNames>().toEqualTypeOf<'confirm' | 'start' | 'clear' | 'finalize' | 'getState'>();
       });
 
       it('has correct method signatures', () => {
-        type Methods = Pick<CheckoutObject, 'confirm' | 'start' | 'clear' | 'complete' | 'getState'>;
+        type Methods = Pick<CheckoutObject, 'confirm' | 'start' | 'clear' | 'finalize' | 'getState'>;
         type ConfirmMethod = Methods['confirm'];
         type StartMethod = Methods['start'];
         type ClearMethod = Methods['clear'];
-        type CompleteMethod = Methods['complete'];
+        type FinalizeMethod = Methods['finalize'];
         type GetStateMethod = Methods['getState'];
 
         expectTypeOf<ConfirmMethod>().parameter(0).toEqualTypeOf<ConfirmCheckoutParams>();
         expectTypeOf<ConfirmMethod>().returns.toEqualTypeOf<Promise<CommerceCheckoutResource>>();
         expectTypeOf<StartMethod>().returns.toEqualTypeOf<Promise<CommerceCheckoutResource>>();
         expectTypeOf<ClearMethod>().returns.toBeVoid();
-        expectTypeOf<CompleteMethod>().parameter(0).toEqualTypeOf<{ redirectUrl: string } | undefined>();
+        expectTypeOf<FinalizeMethod>().parameter(0).toEqualTypeOf<{ redirectUrl: string } | undefined>();
         expectTypeOf<GetStateMethod>().returns.toEqualTypeOf<__experimental_CheckoutCacheState>();
+      });
+
+      it('has correct return types for start and confirm', () => {
+        type Methods = Pick<CheckoutObject, 'confirm' | 'start'>;
+        type ConfirmMethod = Methods['confirm'];
+        type StartMethod = Methods['start'];
+
+        // Test that start returns a Promise
+        expectTypeOf<StartMethod>().parameters.toEqualTypeOf<[]>();
+        expectTypeOf<StartMethod>().returns.toEqualTypeOf<Promise<CommerceCheckoutResource>>();
+
+        // Test that confirm returns a Promise and accepts correct parameters
+        expectTypeOf<ConfirmMethod>().parameters.toEqualTypeOf<[ConfirmCheckoutParams]>();
+        expectTypeOf<ConfirmMethod>().returns.toEqualTypeOf<Promise<CommerceCheckoutResource>>();
       });
     });
 

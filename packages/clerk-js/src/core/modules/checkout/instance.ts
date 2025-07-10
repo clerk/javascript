@@ -64,7 +64,7 @@ function createCheckoutInstance(
     });
   };
 
-  const complete = (params?: { redirectUrl: string }) => {
+  const finalize = (params?: { redirectUrl: string }) => {
     const { redirectUrl } = params || {};
     void clerk.setActive({ session: clerk.session?.id, redirectUrl });
   };
@@ -78,7 +78,7 @@ function createCheckoutInstance(
   return {
     start,
     confirm,
-    complete,
+    finalize,
     clear,
     subscribe,
     getState: manager.getCacheState,
