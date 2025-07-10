@@ -1,11 +1,18 @@
-import type { __experimental_CheckoutCacheState, ClerkAPIResponseError, CommerceCheckoutResource } from '@clerk/types';
+import type {
+  __experimental_CheckoutCacheState,
+  __experimental_CheckoutInstance,
+  ClerkAPIResponseError,
+  CommerceCheckoutResource,
+} from '@clerk/types';
 
 type CheckoutKey = string & { readonly __tag: 'CheckoutKey' };
+
+type CheckoutResult = Awaited<ReturnType<__experimental_CheckoutInstance['start']>>;
 
 const createManagerCache = <CacheKey, CacheState>() => {
   const cache = new Map<CacheKey, CacheState>();
   const listeners = new Map<CacheKey, Set<(newState: CacheState) => void>>();
-  const pendingOperations = new Map<CacheKey, Map<string, Promise<CommerceCheckoutResource>>>();
+  const pendingOperations = new Map<CacheKey, Map<string, Promise<CheckoutResult>>>();
 
   return {
     cache,
@@ -17,11 +24,11 @@ const createManagerCache = <CacheKey, CacheState>() => {
       }
       return map.get(key) as NonNullable<V>;
     },
-    safeGetOperations<K extends CacheKey>(key: K): Map<string, Promise<CommerceCheckoutResource>> {
+    safeGetOperations<K extends CacheKey>(key: K): Map<string, Promise<CheckoutResult>> {
       if (!this.pendingOperations.has(key)) {
-        this.pendingOperations.set(key, new Map<string, Promise<CommerceCheckoutResource>>());
+        this.pendingOperations.set(key, new Map<string, Promise<CheckoutResult>>());
       }
-      return this.pendingOperations.get(key) as Map<string, Promise<CommerceCheckoutResource>>;
+      return this.pendingOperations.get(key) as Map<string, Promise<CheckoutResult>>;
     },
   };
 };
@@ -122,7 +129,7 @@ function createCheckoutManager(cacheKey: CheckoutKey) {
     async executeOperation(
       operationType: 'start' | 'confirm',
       operationFn: () => Promise<CommerceCheckoutResource>,
-    ): Promise<CommerceCheckoutResource> {
+    ): Promise<CheckoutResult> {
       const operationId = `${cacheKey}-${operationType}`;
       const isRunningField = operationType === 'start' ? 'isStarting' : 'isConfirming';
 
@@ -136,6 +143,8 @@ function createCheckoutManager(cacheKey: CheckoutKey) {
 
       // Create and store the operation promise
       const operationPromise = (async () => {
+        let data: CommerceCheckoutResource | null = null;
+        let error: ClerkAPIResponseError | null = null;
         try {
           // Mark operation as in progress and clear any previous errors
           updateCacheState({
@@ -149,16 +158,17 @@ function createCheckoutManager(cacheKey: CheckoutKey) {
 
           // Update state with successful result
           updateCacheState({ [isRunningField]: false, error: null, checkout: result });
-          return result;
-        } catch (error) {
+          data = result;
+        } catch (e) {
           // Cast error to expected type and update state
-          const clerkError = error as ClerkAPIResponseError;
+          const clerkError = e as ClerkAPIResponseError;
+          error = clerkError;
           updateCacheState({ [isRunningField]: false, error: clerkError });
-          throw error;
         } finally {
           // Always clean up pending operation tracker
           pendingOperations.delete(operationId);
         }
+        return { data, error } as CheckoutResult;
       })();
 
       pendingOperations.set(operationId, operationPromise);

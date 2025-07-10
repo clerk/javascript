@@ -106,7 +106,7 @@ export const AddEmailForm = () => {
         <EmailForm
           title={localizationKeys('commerce.checkout.emailForm.title')}
           subtitle={localizationKeys('commerce.checkout.emailForm.subtitle')}
-          onSuccess={() => checkout.start().catch(() => null)}
+          onSuccess={() => void checkout.start()}
           onReset={() => setIsOpen(false)}
           disableAutoFocus
         />

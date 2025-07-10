@@ -2,8 +2,6 @@ import type {
   __experimental_CheckoutCacheState,
   __experimental_CheckoutInstance,
   __experimental_CheckoutOptions,
-  CommerceCheckoutResource,
-  ConfirmCheckoutParams,
 } from '@clerk/types';
 
 import type { Clerk } from '../../clerk';
@@ -43,7 +41,7 @@ function createCheckoutInstance(
 
   const manager = createCheckoutManager(checkoutKey);
 
-  const start = async (): Promise<CommerceCheckoutResource> => {
+  const start: __experimental_CheckoutInstance['start'] = async () => {
     return manager.executeOperation('start', async () => {
       const result = await clerk.billing?.startCheckout({
         ...(forOrganization === 'organization' ? { orgId: clerk.organization?.id } : {}),
@@ -54,7 +52,7 @@ function createCheckoutInstance(
     });
   };
 
-  const confirm = async (params: ConfirmCheckoutParams): Promise<CommerceCheckoutResource> => {
+  const confirm: __experimental_CheckoutInstance['confirm'] = async params => {
     return manager.executeOperation('confirm', async () => {
       const checkout = manager.getCacheState().checkout;
       if (!checkout) {

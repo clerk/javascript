@@ -1,5 +1,6 @@
 import type {
   __experimental_CheckoutCacheState,
+  ClerkAPIResponseError,
   CommerceCheckoutResource,
   CommerceSubscriptionPlanPeriod,
   ConfirmCheckoutParams,
@@ -73,9 +74,19 @@ describe('useCheckout type tests', () => {
         type FinalizeMethod = Methods['finalize'];
         type GetStateMethod = Methods['getState'];
 
+        type CheckoutResult =
+          | {
+              data: CommerceCheckoutResource;
+              error: null;
+            }
+          | {
+              data: null;
+              error: ClerkAPIResponseError;
+            };
+
         expectTypeOf<ConfirmMethod>().parameter(0).toEqualTypeOf<ConfirmCheckoutParams>();
-        expectTypeOf<ConfirmMethod>().returns.toEqualTypeOf<Promise<CommerceCheckoutResource>>();
-        expectTypeOf<StartMethod>().returns.toEqualTypeOf<Promise<CommerceCheckoutResource>>();
+        expectTypeOf<ConfirmMethod>().returns.resolves.toEqualTypeOf<CheckoutResult>();
+        expectTypeOf<StartMethod>().returns.resolves.toEqualTypeOf<CheckoutResult>();
         expectTypeOf<ClearMethod>().returns.toBeVoid();
         expectTypeOf<FinalizeMethod>().parameter(0).toEqualTypeOf<{ redirectUrl: string } | undefined>();
         expectTypeOf<GetStateMethod>().returns.toEqualTypeOf<__experimental_CheckoutCacheState>();
@@ -86,13 +97,23 @@ describe('useCheckout type tests', () => {
         type ConfirmMethod = Methods['confirm'];
         type StartMethod = Methods['start'];
 
-        // Test that start returns a Promise
-        expectTypeOf<StartMethod>().parameters.toEqualTypeOf<[]>();
-        expectTypeOf<StartMethod>().returns.toEqualTypeOf<Promise<CommerceCheckoutResource>>();
+        type CheckoutResult =
+          | {
+              data: CommerceCheckoutResource;
+              error: null;
+            }
+          | {
+              data: null;
+              error: ClerkAPIResponseError;
+            };
 
-        // Test that confirm returns a Promise and accepts correct parameters
+        // Test that start returns a Promise of CheckoutResult
+        expectTypeOf<StartMethod>().parameters.toEqualTypeOf<[]>();
+        expectTypeOf<StartMethod>().returns.resolves.toEqualTypeOf<CheckoutResult>();
+
+        // Test that confirm returns a Promise of CheckoutResult and accepts correct parameters
         expectTypeOf<ConfirmMethod>().parameters.toEqualTypeOf<[ConfirmCheckoutParams]>();
-        expectTypeOf<ConfirmMethod>().returns.toEqualTypeOf<Promise<CommerceCheckoutResource>>();
+        expectTypeOf<ConfirmMethod>().returns.resolves.toEqualTypeOf<CheckoutResult>();
       });
     });
 

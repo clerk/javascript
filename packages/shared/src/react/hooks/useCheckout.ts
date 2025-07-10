@@ -1,8 +1,8 @@
 import type {
   __experimental_CheckoutCacheState,
+  __experimental_CheckoutInstance,
   CommerceCheckoutResource,
   CommerceSubscriptionPlanPeriod,
-  ConfirmCheckoutParams,
 } from '@clerk/types';
 import { useMemo, useSyncExternalStore } from 'react';
 
@@ -32,8 +32,8 @@ type NullableCheckoutProperties = CheckoutProperties | ForceNull<CheckoutPropert
 
 type __experimental_UseCheckoutReturn = {
   checkout: NullableCheckoutProperties & {
-    confirm: (params: ConfirmCheckoutParams) => Promise<CommerceCheckoutResource>;
-    start: () => Promise<CommerceCheckoutResource>;
+    confirm: __experimental_CheckoutInstance['confirm'];
+    start: __experimental_CheckoutInstance['start'];
     isStarting: boolean;
     isConfirming: boolean;
     error: ClerkAPIResponseError | null;
@@ -106,8 +106,6 @@ export const useCheckout = (options?: UseCheckoutOptions): __experimental_UseChe
   const checkout = {
     ...properties,
     getState: manager.getState,
-    // @ts-ignore
-    checkout: null,
     start: manager.start,
     confirm: manager.confirm,
     clear: manager.clear,

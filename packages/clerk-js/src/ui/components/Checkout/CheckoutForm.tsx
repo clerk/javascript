@@ -127,17 +127,18 @@ const useCheckoutMutations = () => {
   const confirmCheckout = async (params: ConfirmCheckoutParams) => {
     card.setLoading();
     card.setError(undefined);
-    try {
-      await confirm({
-        ...params,
-        ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
-      });
-      onSubscriptionComplete?.();
-    } catch (error) {
+
+    const { data, error } = await confirm({
+      ...params,
+      ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
+    });
+
+    if (error) {
       handleError(error, [], card.setError);
-    } finally {
-      card.setIdle();
+    } else if (data) {
+      onSubscriptionComplete?.();
     }
+    card.setIdle();
   };
 
   const payWithExistingPaymentSource = (e: React.FormEvent<HTMLFormElement>) => {

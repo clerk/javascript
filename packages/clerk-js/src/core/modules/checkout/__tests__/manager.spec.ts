@@ -174,7 +174,10 @@ describe('createCheckoutManager', () => {
       const result = await manager.executeOperation('start', mockOperation);
 
       expect(mockOperation).toHaveBeenCalledOnce();
-      expect(result).toBe(mockCheckout);
+      expect(result).toEqual({
+        data: mockCheckout,
+        error: null,
+      });
 
       const finalState = manager.getCacheState();
       expect(finalState).toEqual(
@@ -214,7 +217,12 @@ describe('createCheckoutManager', () => {
         .fn()
         .mockRejectedValue(mockError);
 
-      await expect(manager.executeOperation('start', mockOperation)).rejects.toThrow('Operation failed');
+      const result = await manager.executeOperation('start', mockOperation);
+
+      expect(result).toEqual({
+        data: null,
+        error: mockError,
+      });
 
       const finalState = manager.getCacheState();
       expect(finalState).toEqual(
@@ -234,7 +242,11 @@ describe('createCheckoutManager', () => {
         .fn()
         .mockRejectedValue(mockError);
 
-      await expect(manager.executeOperation('start', failingOperation)).rejects.toThrow();
+      const result = await manager.executeOperation('start', failingOperation);
+      expect(result).toEqual({
+        data: null,
+        error: mockError,
+      });
 
       const errorState = manager.getCacheState();
       expect(errorState.error).toBe(mockError);
@@ -245,7 +257,11 @@ describe('createCheckoutManager', () => {
         .fn()
         .mockResolvedValue(mockCheckout);
 
-      await manager.executeOperation('start', successfulOperation);
+      const successResult = await manager.executeOperation('start', successfulOperation);
+      expect(successResult).toEqual({
+        data: mockCheckout,
+        error: null,
+      });
 
       const finalState = manager.getCacheState();
       expect(finalState.error).toBeNull();
@@ -262,7 +278,10 @@ describe('createCheckoutManager', () => {
 
       const result = await manager.executeOperation('confirm', mockOperation);
 
-      expect(result).toBe(mockCheckout);
+      expect(result).toEqual({
+        data: mockCheckout,
+        error: null,
+      });
 
       const finalState = manager.getCacheState();
       expect(finalState).toEqual(
@@ -301,7 +320,11 @@ describe('createCheckoutManager', () => {
         .fn()
         .mockRejectedValue(mockError);
 
-      await expect(manager.executeOperation('confirm', mockOperation)).rejects.toThrow('Confirm failed');
+      const result = await manager.executeOperation('confirm', mockOperation);
+      expect(result).toEqual({
+        data: null,
+        error: mockError,
+      });
 
       const finalState = manager.getCacheState();
       expect(finalState).toEqual(
@@ -332,9 +355,18 @@ describe('createCheckoutManager', () => {
       expect(mockOperation).toHaveBeenCalledOnce();
 
       // All results should be the same
-      expect(result1).toBe(mockCheckout);
-      expect(result2).toBe(mockCheckout);
-      expect(result3).toBe(mockCheckout);
+      expect(result1).toEqual({
+        data: mockCheckout,
+        error: null,
+      });
+      expect(result2).toEqual({
+        data: mockCheckout,
+        error: null,
+      });
+      expect(result3).toEqual({
+        data: mockCheckout,
+        error: null,
+      });
     });
 
     it('should deduplicate concurrent confirm operations', async () => {
@@ -370,8 +402,14 @@ describe('createCheckoutManager', () => {
 
       expect(startOperation).toHaveBeenCalledOnce();
       expect(confirmOperation).toHaveBeenCalledOnce();
-      expect(startResult).toBe(startCheckout);
-      expect(confirmResult).toBe(confirmCheckout);
+      expect(startResult).toEqual({
+        data: startCheckout,
+        error: null,
+      });
+      expect(confirmResult).toEqual({
+        data: confirmCheckout,
+        error: null,
+      });
     });
 
     it('should propagate errors to all concurrent callers', async () => {
@@ -386,8 +424,15 @@ describe('createCheckoutManager', () => {
         manager.executeOperation('start', mockOperation),
       ];
 
-      // All promises should reject with the same error
-      await expect(Promise.all(promises)).rejects.toThrow('Concurrent operation failed');
+      const results = await Promise.all(promises);
+
+      // All promises should resolve with the same error
+      results.forEach(result => {
+        expect(result).toEqual({
+          data: null,
+          error: mockError,
+        });
+      });
       expect(mockOperation).toHaveBeenCalledOnce();
     });
 
@@ -403,8 +448,14 @@ describe('createCheckoutManager', () => {
 
       expect(operation1).toHaveBeenCalledOnce();
       expect(operation2).toHaveBeenCalledOnce();
-      expect(result1).toBe(checkout1);
-      expect(result2).toBe(checkout2);
+      expect(result1).toEqual({
+        data: checkout1,
+        error: null,
+      });
+      expect(result2).toEqual({
+        data: checkout2,
+        error: null,
+      });
     });
   });
 
@@ -494,7 +545,11 @@ describe('createCheckoutManager', () => {
         .fn()
         .mockRejectedValue(mockError);
 
-      await expect(manager.executeOperation('start', failingOperation)).rejects.toThrow();
+      const result = await manager.executeOperation('start', failingOperation);
+      expect(result).toEqual({
+        data: null,
+        error: mockError,
+      });
       expect(manager.getCacheState().fetchStatus).toBe(FETCH_STATUS.ERROR);
     });
 
@@ -627,8 +682,14 @@ describe('createCheckoutManager', () => {
       // Both operations should execute (not deduplicated across managers)
       expect(operation1).toHaveBeenCalledOnce();
       expect(operation2).toHaveBeenCalledOnce();
-      expect(result1).toBe(checkout1);
-      expect(result2).toBe(checkout2);
+      expect(result1).toEqual({
+        data: checkout1,
+        error: null,
+      });
+      expect(result2).toEqual({
+        data: checkout2,
+        error: null,
+      });
     });
   });
 });
