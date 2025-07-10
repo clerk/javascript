@@ -1,9 +1,5 @@
 name: Nightly upstream tests
 on:
-  pull_request:
-    branches:
-      - main
-      - release/v4
   workflow_dispatch:
   schedule:
     - cron: '0 7 * * *'
