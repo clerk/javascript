@@ -1,10 +1,6 @@
 import type { Attribute } from '@clerk/types';
 
-import {
-  determineActiveFields,
-  determineRequiredCommunicationMethod,
-  getInitialActiveIdentifier,
-} from '../signUpFormHelpers';
+import { determineActiveFields, determineRequiredIdentifier, getInitialActiveIdentifier } from '../signUpFormHelpers';
 
 const createAttributeData = (name: Attribute, enabled: boolean, required: boolean, usedForFirstFactor: boolean) => ({
   name,
@@ -816,7 +812,7 @@ describe('determineActiveFields()', () => {
   });
 });
 
-describe('determineRequiredCommunicationMethod', () => {
+describe('determineRequiredIdentifier', () => {
   const createMinimalAttributes = (overrides: any = {}) => ({
     email_address: createAttributeData('email_address', false, false, false),
     phone_number: createAttributeData('phone_number', false, false, false),
@@ -833,7 +829,7 @@ describe('determineRequiredCommunicationMethod', () => {
         phone_number: createAttributeData('phone_number', true, false, false),
         username: createAttributeData('username', true, true, false),
       });
-      const result = determineRequiredCommunicationMethod(attributes);
+      const result = determineRequiredIdentifier(attributes);
       expect(result).toEqual({
         emailShouldBeRequired: true,
         phoneShouldBeRequired: false,
@@ -850,7 +846,7 @@ describe('determineRequiredCommunicationMethod', () => {
         ...requiredPassword,
         email_address: createAttributeData('email_address', true, true, true),
       });
-      const result = determineRequiredCommunicationMethod(attributes);
+      const result = determineRequiredIdentifier(attributes);
       expect(result).toEqual({
         emailShouldBeRequired: true,
         phoneShouldBeRequired: false,
@@ -860,7 +856,7 @@ describe('determineRequiredCommunicationMethod', () => {
 
     it('requires nothing if no communication methods are enabled', () => {
       const attributes = createMinimalAttributes({ ...requiredPassword });
-      const result = determineRequiredCommunicationMethod(attributes);
+      const result = determineRequiredIdentifier(attributes);
       expect(result).toEqual({
         emailShouldBeRequired: false,
         phoneShouldBeRequired: false,
@@ -873,7 +869,7 @@ describe('determineRequiredCommunicationMethod', () => {
         ...requiredPassword,
         email_address: createAttributeData('email_address', true, false, false),
       });
-      const result = determineRequiredCommunicationMethod(attributes);
+      const result = determineRequiredIdentifier(attributes);
       expect(result).toEqual({
         emailShouldBeRequired: true,
         phoneShouldBeRequired: false,
@@ -886,7 +882,7 @@ describe('determineRequiredCommunicationMethod', () => {
         ...requiredPassword,
         phone_number: createAttributeData('phone_number', true, false, false),
       });
-      const result = determineRequiredCommunicationMethod(attributes);
+      const result = determineRequiredIdentifier(attributes);
       expect(result).toEqual({
         emailShouldBeRequired: false,
         phoneShouldBeRequired: true,
@@ -899,7 +895,7 @@ describe('determineRequiredCommunicationMethod', () => {
         ...requiredPassword,
         username: createAttributeData('username', true, false, true),
       });
-      const result = determineRequiredCommunicationMethod(attributes);
+      const result = determineRequiredIdentifier(attributes);
       expect(result).toEqual({
         emailShouldBeRequired: false,
         phoneShouldBeRequired: false,
@@ -913,7 +909,7 @@ describe('determineRequiredCommunicationMethod', () => {
         email_address: createAttributeData('email_address', true, false, false),
         phone_number: createAttributeData('phone_number', true, false, false),
       });
-      const result = determineRequiredCommunicationMethod(attributes);
+      const result = determineRequiredIdentifier(attributes);
       expect(result).toEqual({
         emailShouldBeRequired: true,
         phoneShouldBeRequired: true,
@@ -926,7 +922,7 @@ describe('determineRequiredCommunicationMethod', () => {
         ...requiredPassword,
         username: createAttributeData('username', true, false, false),
       });
-      const result = determineRequiredCommunicationMethod(attributes);
+      const result = determineRequiredIdentifier(attributes);
       expect(result).toEqual({
         emailShouldBeRequired: true,
         phoneShouldBeRequired: false,
@@ -940,7 +936,7 @@ describe('determineRequiredCommunicationMethod', () => {
         email_address: createAttributeData('email_address', true, false, false),
         username: createAttributeData('username', true, false, true),
       });
-      const result = determineRequiredCommunicationMethod(attributes);
+      const result = determineRequiredIdentifier(attributes);
       expect(result).toEqual({
         emailShouldBeRequired: true,
         phoneShouldBeRequired: false,
@@ -954,7 +950,7 @@ describe('determineRequiredCommunicationMethod', () => {
         phone_number: createAttributeData('phone_number', true, false, false),
         username: createAttributeData('username', true, false, true),
       });
-      const result = determineRequiredCommunicationMethod(attributes);
+      const result = determineRequiredIdentifier(attributes);
       expect(result).toEqual({
         emailShouldBeRequired: false,
         phoneShouldBeRequired: true,

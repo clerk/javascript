@@ -192,7 +192,7 @@ function getEmailAddressField({
       return;
     }
 
-    const { emailShouldBeRequired } = determineRequiredCommunicationMethod(attributes);
+    const { emailShouldBeRequired } = determineRequiredIdentifier(attributes);
 
     return {
       required: emailShouldBeRequired,
@@ -236,7 +236,7 @@ function getPhoneNumberField({
       return;
     }
 
-    const { phoneShouldBeRequired } = determineRequiredCommunicationMethod(attributes);
+    const { phoneShouldBeRequired } = determineRequiredIdentifier(attributes);
 
     return {
       required: phoneShouldBeRequired,
@@ -324,15 +324,15 @@ const outcomePredicates: Record<Outcome, ((ctx: Context) => boolean)[]> = {
   mirrorServer: [
     // If password is not required, then field requirements are determined by the server.
     ctx => !ctx.passwordRequired,
-    // If any of the communication methods are already required by the server, then we don't need to do anything.
+    // If any of the identifiers are already required by the server, then we don't need to do anything.
     ctx => ctx.email.required || ctx.phone.required || (ctx.username.required && ctx.username.firstFactor),
   ],
   none: [
-    // If none of the communication methods are enabled, then none can be required.
+    // If none of the identifiers are enabled, then none can be required.
     ctx => !ctx.email.enabled && !ctx.phone.enabled && !ctx.username.enabled,
   ],
   email: [
-    // If email is the only enabled communication method, it should be required.
+    // If email is the only enabled identifier, it should be required.
     ctx => ctx.email.enabled && !ctx.phone.enabled && !ctx.username.enabled,
     // If email is enabled but not required, and phone is enabled and not required, then email should be required.
     ctx => ctx.email.enabled && !ctx.email.required && ctx.phone.enabled && !ctx.phone.required,
@@ -364,7 +364,7 @@ const outcomePredicates: Record<Outcome, ((ctx: Context) => boolean)[]> = {
  * When password is required, we need to ensure at least one identifier
  * (email, phone, or username) is also required
  */
-export function determineRequiredCommunicationMethod(attributes: Partial<Attributes>): {
+export function determineRequiredIdentifier(attributes: Partial<Attributes>): {
   emailShouldBeRequired: boolean;
   phoneShouldBeRequired: boolean;
   usernameShouldBeRequired: boolean;
@@ -410,7 +410,7 @@ export function determineRequiredCommunicationMethod(attributes: Partial<Attribu
   const phoneShouldBeRequired = outcomeMet('phone');
   const usernameShouldBeRequired = outcomeMet('username');
 
-  // If password is required and no communication method is enabled, then email is the default.
+  // If password is required and no identifier is enabled, then email is the default.
   if (ctx.passwordRequired && !emailShouldBeRequired && !phoneShouldBeRequired && !usernameShouldBeRequired) {
     return {
       emailShouldBeRequired: true,
