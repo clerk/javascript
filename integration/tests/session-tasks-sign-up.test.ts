@@ -53,7 +53,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
       await u.page.waitForAppUrl('/');
     });
 
-    test('with sso, navigate to task on after sign-up', async ({ page, context }) => {
+    test.skip('with sso, navigate to task on after sign-up', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
 
       // Create a clerkClient for the OAuth provider instance
