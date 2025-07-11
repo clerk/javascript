@@ -155,7 +155,10 @@ export const authenticateRequest: AuthenticateRequest = (async (
   const organizationMatcher = new OrganizationMatcher(options.organizationSyncOptions);
   const handshakeService = new HandshakeService(
     authenticateContext,
-    { organizationSyncOptions: options.organizationSyncOptions },
+    { 
+      organizationSyncOptions: options.organizationSyncOptions,
+      outageResilienceConfig: options.outageResilienceConfig,
+    },
     organizationMatcher,
   );
 

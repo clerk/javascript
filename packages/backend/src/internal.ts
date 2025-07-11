@@ -14,6 +14,11 @@ export type {
   InferAuthObjectFromTokenArray,
   GetAuthFn,
 } from './tokens/types';
+export type {
+  OutageResilienceConfig,
+  SdkCapabilityResult,
+  SdkCapabilityIndicators,
+} from './tokens/outageResilience';
 
 export { TokenType } from './tokens/tokenTypes';
 export type { SessionTokenType, MachineTokenType } from './tokens/tokenTypes';

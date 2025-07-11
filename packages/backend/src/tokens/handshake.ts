@@ -9,6 +9,8 @@ import { AuthErrorReason, signedIn, signedOut } from './authStatus';
 import { getCookieName, getCookieValue } from './cookie';
 import { loadClerkJWKFromLocal, loadClerkJWKFromRemote } from './keys';
 import type { OrganizationMatcher } from './organizationMatcher';
+import type { OutageResilienceConfig, SdkCapabilityResult } from './outageResilience';
+import { OutageResilienceService } from './outageResilience';
 import { TokenType } from './tokenTypes';
 import type { OrganizationSyncOptions, OrganizationSyncTarget } from './types';
 import type { VerifyTokenOptions } from './verify';
@@ -87,15 +89,17 @@ export class HandshakeService {
   private readonly authenticateContext: AuthenticateContext;
   private readonly organizationMatcher: OrganizationMatcher;
   private readonly options: { organizationSyncOptions?: OrganizationSyncOptions };
+  private readonly outageResilienceService: OutageResilienceService;
 
   constructor(
     authenticateContext: AuthenticateContext,
-    options: { organizationSyncOptions?: OrganizationSyncOptions },
+    options: { organizationSyncOptions?: OrganizationSyncOptions; outageResilienceConfig?: Partial<OutageResilienceConfig> },
     organizationMatcher: OrganizationMatcher,
   ) {
     this.authenticateContext = authenticateContext;
     this.options = options;
     this.organizationMatcher = organizationMatcher;
+    this.outageResilienceService = new OutageResilienceService(options.outageResilienceConfig);
   }
 
   /**
@@ -120,6 +124,20 @@ export class HandshakeService {
     }
 
     return false;
+  }
+
+  /**
+   * Determines if the current request has built-in outage resilience support
+   */
+  hasBuiltInOutageResiliency(): SdkCapabilityResult {
+    return this.outageResilienceService.hasBuiltInOutageResiliency(this.authenticateContext);
+  }
+
+  /**
+   * Determines if we should serve an error page or redirect directly for outages
+   */
+  shouldServeErrorPage(endpoint: string): { shouldServeErrorPage: boolean; reason: string } {
+    return this.outageResilienceService.shouldServeErrorPage(this.authenticateContext, endpoint);
   }
 
   /**
@@ -163,7 +181,19 @@ export class HandshakeService {
       });
     }
 
-    return new Headers({ [constants.Headers.Location]: url.href });
+    // Create base headers with Location
+    const headers = new Headers({ [constants.Headers.Location]: url.href });
+
+    // Add outage resilience headers if applicable
+    const capability = this.hasBuiltInOutageResiliency();
+    const resilienceHeaders = this.outageResilienceService.createResilienceHeaders(capability);
+    
+    // Merge resilience headers into the response headers
+    resilienceHeaders.forEach((value, key) => {
+      headers.set(key, value);
+    });
+
+    return headers;
   }
 
   /**

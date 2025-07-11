@@ -10,6 +10,7 @@ import type {
   SignedOutAuthObject,
   UnauthenticatedMachineObject,
 } from './authObjects';
+import type { OutageResilienceConfig } from './outageResilience';
 import type { SessionTokenType, TokenType } from './tokenTypes';
 import type { VerifyTokenOptions } from './verify';
 
@@ -58,6 +59,10 @@ export type AuthenticateRequestOptions = {
    * If the activation can't be performed, either because an organization doesn't exist or the user lacks access, the active organization in the session won't be changed. Ultimately, it's the responsibility of the page to verify that the resources are appropriate to render given the URL and handle mismatches appropriately (e.g., by returning a 404).
    */
   organizationSyncOptions?: OrganizationSyncOptions;
+  /**
+   * Configuration for outage resilience behavior
+   */
+  outageResilienceConfig?: Partial<OutageResilienceConfig>;
   /**
    * @internal
    */
