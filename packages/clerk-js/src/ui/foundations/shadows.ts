@@ -1,8 +1,11 @@
 import { createAlphaColorMixString } from '../utils/colors/utils';
 import { clerkCssVar } from '../utils/cssVariables';
+import { cssSupports } from '../utils/cssSupports';
 
 const shadow = (color: string, alpha: number) =>
-  clerkCssVar('color-shadow', createAlphaColorMixString(color, alpha * 100));
+  cssSupports.modernColor()
+    ? clerkCssVar('color-shadow', createAlphaColorMixString(color, alpha * 100))
+    : `rgba(0, 0, 0, ${alpha})`;
 
 /**
  * Creates a complete set of shadows using the provided shadow color
