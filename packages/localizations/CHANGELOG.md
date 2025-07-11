@@ -1,5 +1,16 @@
 # Change Log
 
+## 3.18.0
+
+### Minor Changes
+
+- Add missing Portuguese pt-BR locales for the statements elements ([#6222](https://github.com/clerk/javascript/pull/6222)) by [@lightapps-smart-blocks](https://github.com/lightapps-smart-blocks)
+
+### Patch Changes
+
+- Updated dependencies [[`f42c4fe`](https://github.com/clerk/javascript/commit/f42c4fedfdab873129b876eba38b3677f190b460), [`ec207dc`](https://github.com/clerk/javascript/commit/ec207dcd2a13340cfa4e3b80d3d52d1b4e7d5f23)]:
+  - @clerk/types@4.64.0
+
 ## 3.17.3
 
 ### Patch Changes
