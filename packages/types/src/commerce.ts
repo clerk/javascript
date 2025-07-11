@@ -137,8 +137,8 @@ export interface CommercePaymentResource extends ClerkResource {
   failedAt?: Date;
   updatedAt: Date;
   paymentSource: CommercePaymentSourceResource;
-  subscription: CommerceSubscriptionResource;
   subscriptionItem: CommerceSubscriptionResource;
+  subscription: CommerceSubscriptionResource;
   chargeType: CommercePaymentChargeType;
   status: CommercePaymentStatus;
 }
