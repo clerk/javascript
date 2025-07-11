@@ -47,7 +47,7 @@ const themeB = {
     fontFamilyButtons: 'Arial',
     fontSize: '2rem',
     fontWeight: { normal: 700 },
-    spacing: '1px',
+    spacing: '2px',
   },
 } as const;
 
