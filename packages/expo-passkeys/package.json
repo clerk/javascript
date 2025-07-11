@@ -25,6 +25,8 @@
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "dev:publish": "pnpm dev -- --env.publish",
+    "format": "prettier --write .",
+    "format:check": "prettier --cache --check .",
     "lint": "eslint src",
     "open:android": "open -a \"Android Studio\" example/android",
     "open:ios": "xed example/ios",
