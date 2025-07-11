@@ -4,10 +4,11 @@ import { spaceScaleKeys } from '../foundations/sizes';
 import type { fontWeights } from '../foundations/typography';
 import { colors } from '../utils/colors';
 import { colorOptionToThemedAlphaScale, colorOptionToThemedLightnessScale } from '../utils/colors/scales';
+import { createAlphaColorMixString } from '../utils/colors/utils';
 import { cssSupports } from '../utils/cssSupports';
 import { fromEntries } from '../utils/fromEntries';
 import { removeUndefinedProps } from '../utils/removeUndefinedProps';
-import { createShadowSet } from '../foundations/shadows';
+import { createShadowSet, generateShadow } from '../foundations/shadows';
 
 export const createColorScales = (theme: Theme) => {
   const variables = removeInvalidValues(theme.variables || {});
@@ -194,6 +195,8 @@ export const createShadowsUnits = (theme: Theme) => {
     return;
   }
 
-  // Use the shared shadow creation function with the custom shadow color
-  return createShadowSet(shadowColor);
+  return createShadowSet(
+    shadowColor,
+    generateShadow((color, alpha) => createAlphaColorMixString(color, alpha * 100)),
+  );
 };
