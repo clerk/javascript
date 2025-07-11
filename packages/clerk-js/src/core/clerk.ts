@@ -1209,15 +1209,16 @@ export class Clerk implements ClerkInterface {
         }
       }
 
-      if (newSession?.status === 'pending') {
-        await this.#handlePendingSession(newSession);
-        return;
-      }
-
       /**
        * Hint to each framework, that the user will be signed out when `{session: null}` is provided.
        */
       await onBeforeSetActive(newSession === null ? 'sign-out' : undefined);
+
+      if (newSession?.status === 'pending') {
+        await this.#handlePendingSession(newSession);
+        await onAfterSetActive();
+        return;
+      }
 
       //1. setLastActiveSession to passed user session (add a param).
       //   Note that this will also update the session's active organization
@@ -1301,8 +1302,10 @@ export class Clerk implements ClerkInterface {
       eventBus.emit(events.TokenUpdate, { token: null });
     }
 
-    // Only triggers navigation for internal routing, in order to not affect custom flows
-    if (newSession?.currentTask && this.#componentNavigationContext) {
+    // Only triggers navigation for internal AIO components routing or multi-session switch
+    const isSwitchingSessions = this.session?.id != session.id;
+    const shouldNavigateOnSetActive = this.#componentNavigationContext || isSwitchingSessions;
+    if (newSession?.currentTask && shouldNavigateOnSetActive) {
       await navigateToTask(session.currentTask.key, {
         options: this.#options,
         environment: this.environment,
@@ -1317,7 +1320,7 @@ export class Clerk implements ClerkInterface {
 
   public __experimental_navigateToTask = async ({ redirectUrlComplete }: NextTaskParams = {}): Promise<void> => {
     /**
-     * Invalidate previously cache pages with auth state before navigating
+     * Invalidate previously cached pages with auth state before navigating
      */
     const onBeforeSetActive: SetActiveHook =
       typeof window !== 'undefined' && typeof window.__unstable__onBeforeSetActive === 'function'
