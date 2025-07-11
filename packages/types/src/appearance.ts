@@ -54,6 +54,14 @@ export type CssColorOrAlphaScale = string | AlphaColorScale;
 type CssColor = string | TransparentColor | BuiltInColors;
 type CssLengthUnit = string;
 
+type FontSizeScale = {
+  xs?: string;
+  sm?: string;
+  md?: string;
+  lg?: string;
+  xl?: string;
+};
+
 type FontWeightNamedValue = CSS.Properties['fontWeight'];
 type FontWeightNumericValue = 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900;
 
@@ -723,6 +731,11 @@ export type Variables = {
    */
   colorRing?: CssColor;
   /**
+   * The color of the shadow used in card components.
+   * @default 'rgba(25, 28, 33, 0.20)'
+   */
+  colorShadow?: CssColor;
+  /**
    * The default font that will be used in all components.
    * This can be the name of a custom font loaded by your code or the name of a web-safe font ((@link WebSafeFont})
    * If a specific fontFamily is not provided, the components will inherit the font of the parent element.
@@ -742,7 +755,7 @@ export type Variables = {
    * By default, this value is relative to the root fontSize of the html element.
    * @default '0.8125rem'
    */
-  fontSize?: CssLengthUnit;
+  fontSize?: CssLengthUnit | FontSizeScale;
   /**
    * The font weight the components will use. By default, the components will use the 400, 500, 600 and 700 weights
    * for normal, medium, semibold and bold text respectively.
