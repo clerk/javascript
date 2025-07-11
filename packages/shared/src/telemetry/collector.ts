@@ -236,10 +236,8 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
       version: this.#metadata.sdkVersion,
     };
 
-    // @ts-expect-error -- The global window.Clerk type is declared in clerk-js, but we can't rely on that here
-    if (typeof window !== 'undefined' && window.Clerk) {
-      // @ts-expect-error -- The global window.Clerk type is declared in clerk-js, but we can't rely on that here
-      sdkMetadata = { ...sdkMetadata, ...window.Clerk.constructor.sdkMetadata };
+    if (typeof window !== 'undefined' && (window as any).Clerk) {
+      sdkMetadata = { ...sdkMetadata, ...(window as any).Clerk.constructor.sdkMetadata };
     }
 
     return sdkMetadata;
