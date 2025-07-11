@@ -358,6 +358,7 @@ export interface ClerkAPIErrorJSON {
       id: string;
       name: string;
     };
+    is_plan_upgrade_possible?: boolean;
   };
 }
 
