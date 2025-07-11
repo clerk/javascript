@@ -68,7 +68,7 @@ const inputStyles = (theme: InternalTheme) => ({
     idle2: theme.colors.$neutralAlpha100,
     hover1: theme.colors.$neutralAlpha300,
     hover2: theme.colors.$neutralAlpha150,
-    focus: theme.colors.$neutralAlpha150,
+    focus: theme.colors.$colorRing,
   }),
   '&[data-feedback="error"]': inputShadowStyles(theme, {
     idle1: theme.colors.$dangerAlpha400,
@@ -121,7 +121,7 @@ export const polishedAppearance: Appearance = {
             '&:focus': {
               boxShadow: [
                 BUTTON_SOLID_SHADOW(theme.colors.$primary500),
-                theme.shadows.$focusRing.replace('{{color}}', theme.colors.$neutralAlpha200),
+                theme.shadows.$focusRing.replace('{{color}}', theme.colors.$colorRing),
               ].toString(),
             },
           },
@@ -141,7 +141,7 @@ export const polishedAppearance: Appearance = {
           '&:focus': {
             boxShadow: [
               BUTTON_OUTLINE_SHADOW(theme.colors.$neutralAlpha100),
-              theme.shadows.$focusRing.replace('{{color}}', theme.colors.$neutralAlpha200),
+              theme.shadows.$focusRing.replace('{{color}}', theme.colors.$colorRing),
             ].toString(),
           },
         },
@@ -151,7 +151,7 @@ export const polishedAppearance: Appearance = {
           '&:focus': {
             boxShadow: [
               BUTTON_OUTLINE_SHADOW(theme.colors.$neutralAlpha100),
-              theme.shadows.$focusRing.replace('{{color}}', theme.colors.$neutralAlpha200),
+              theme.shadows.$focusRing.replace('{{color}}', theme.colors.$colorRing),
             ].toString(),
           },
         },

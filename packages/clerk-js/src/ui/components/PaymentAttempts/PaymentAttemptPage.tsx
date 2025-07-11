@@ -228,7 +228,7 @@ function CopyButton({ text, copyLabel = 'Copy' }: { text: string; copyLabel?: st
         borderRadius: t.radii.$sm,
         '&:focus-visible': {
           outline: '2px solid',
-          outlineColor: t.colors.$neutralAlpha200,
+          outlineColor: t.colors.$colorRing,
         },
       })}
       focusRing={false}

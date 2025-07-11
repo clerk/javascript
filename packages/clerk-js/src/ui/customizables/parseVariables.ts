@@ -55,6 +55,7 @@ export const createColorScales = (theme: Theme) => {
       : colors.toHslaString(variables.colorInputBackground),
     colorShimmer: colors.toHslaString(variables.colorShimmer),
     colorMuted: variables.colorMuted ? colors.toHslaString(variables.colorMuted) : undefined,
+    colorRing: variables.colorRing ? colors.toHslaString(variables.colorRing) : undefined,
   });
 };
 

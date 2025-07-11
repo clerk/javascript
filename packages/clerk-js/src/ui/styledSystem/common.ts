@@ -137,7 +137,7 @@ const focusRingStyles = (t: InternalTheme) => {
   return {
     '&::-moz-focus-inner': { border: '0' },
     WebkitTapHighlightColor: 'transparent',
-    boxShadow: t.shadows.$focusRing.replace('{{color}}', t.colors.$neutralAlpha200),
+    boxShadow: t.shadows.$focusRing.replace('{{color}}', t.colors.$colorRing),
     transitionProperty: t.transitionProperty.$common,
     transitionTimingFunction: t.transitionTiming.$common,
     transitionDuration: t.transitionDuration.$focusRing,
