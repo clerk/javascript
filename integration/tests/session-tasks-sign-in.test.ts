@@ -48,7 +48,9 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
       await u.page.goToRelative('/page-protected');
 
       // Resolves task
-      const fakeOrganization = u.services.organizations.createFakeOrganization();
+      const fakeOrganization = Object.assign(u.services.organizations.createFakeOrganization(), {
+        slug: u.services.organizations.createFakeOrganization().slug + '-with-sign-in-password',
+      });
       await u.po.signIn.waitForMounted();
       await u.po.sessionTask.resolveForceOrganizationSelectionTask(fakeOrganization);
       await u.po.expect.toHaveResolvedTask();
@@ -82,7 +84,9 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
 
       // Resolves task
       await u.po.signIn.waitForMounted();
-      const fakeOrganization = u.services.organizations.createFakeOrganization();
+      const fakeOrganization = Object.assign(u.services.organizations.createFakeOrganization(), {
+        slug: u.services.organizations.createFakeOrganization().slug + '-with-sign-in-sso',
+      });
       await u.po.sessionTask.resolveForceOrganizationSelectionTask(fakeOrganization);
       await u.po.expect.toHaveResolvedTask();
 
