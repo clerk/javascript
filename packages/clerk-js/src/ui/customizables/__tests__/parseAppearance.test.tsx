@@ -89,7 +89,7 @@ describe('AppearanceProvider internalTheme flows', () => {
     expect(result.current.parsedInternalTheme.fonts.$buttons).toBe(themeA.variables.fontFamily);
     expect(result.current.parsedInternalTheme.fontSizes.$md).toBe('1rem');
     expect(result.current.parsedInternalTheme.fontWeights.$normal).toBe(themeA.variables.fontWeight.normal);
-    expect(result.current.parsedInternalTheme.space.$1).toContain(themeA.variables.spacingUnit);
+    expect(result.current.parsedInternalTheme.space.$1).toContain(themeA.variables.spacing);
   });
 
   it('sets the theme correctly from the appearance prop', () => {
@@ -119,7 +119,7 @@ describe('AppearanceProvider internalTheme flows', () => {
     expect(result.current.parsedInternalTheme.fonts.$buttons).toBe(themeB.variables.fontFamily);
     expect(result.current.parsedInternalTheme.fontSizes.$md).toBe('2rem');
     expect(result.current.parsedInternalTheme.fontWeights.$normal).toBe(themeB.variables.fontWeight.normal);
-    expect(result.current.parsedInternalTheme.space.$1).toContain(themeB.variables.spacingUnit);
+    expect(result.current.parsedInternalTheme.space.$1).toContain(themeB.variables.spacing);
   });
 
   it('merges the globalAppearance with the appearance in the theme', () => {
@@ -150,7 +150,7 @@ describe('AppearanceProvider internalTheme flows', () => {
     expect(result.current.parsedInternalTheme.fonts.$buttons).toBe(themeB.variables.fontFamily);
     expect(result.current.parsedInternalTheme.fontSizes.$md).toBe('2rem');
     expect(result.current.parsedInternalTheme.fontWeights.$normal).toBe(themeB.variables.fontWeight.normal);
-    expect(result.current.parsedInternalTheme.space.$1).toContain(themeB.variables.spacingUnit);
+    expect(result.current.parsedInternalTheme.space.$1).toContain(themeB.variables.spacing);
   });
 });
 
