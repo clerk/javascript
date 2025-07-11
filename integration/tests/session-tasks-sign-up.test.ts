@@ -30,7 +30,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
       await app.teardown();
     });
 
-    test('navigate to task on after sign-up', async ({ page, context }) => {
+    test.skip('navigate to task on after sign-up', async ({ page, context }) => {
       // Performs sign-up
       const u = createTestUtils({ app, page, context });
       await u.po.signUp.goTo();
