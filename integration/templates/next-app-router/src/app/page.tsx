@@ -11,7 +11,7 @@ export default function Home() {
       <SignedOut>SignedOut</SignedOut>
       <Protect fallback={'SignedOut from protect'}>SignedIn from protect</Protect>
       <SignIn
-        path={'/'}
+        routing='hash'
         signUpUrl={'/sign-up'}
       />
       <ul>
