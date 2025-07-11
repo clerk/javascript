@@ -1,4 +1,8 @@
-import type { ClerkAPIError, ClerkAPIErrorJSON } from '@clerk/types';
+import type {
+  ClerkAPIError,
+  ClerkAPIErrorJSON,
+  ClerkAPIResponseError as ClerkAPIResponseErrorInterface,
+} from '@clerk/types';
 
 export function isUnauthorizedError(e: any): boolean {
   const status = e?.status;
@@ -116,7 +120,7 @@ export function errorToJSON(error: ClerkAPIError | null): ClerkAPIErrorJSON {
   };
 }
 
-export class ClerkAPIResponseError extends Error {
+export class ClerkAPIResponseError extends Error implements ClerkAPIResponseErrorInterface {
   clerkError: true;
 
   status: number;
