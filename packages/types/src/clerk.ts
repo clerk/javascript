@@ -225,7 +225,16 @@ export interface Clerk {
   /** Current User. */
   user: UserResource | null | undefined;
 
-  /** Billing Object */
+  /**
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+   * @see https://clerk.com/docs/billing/overview
+   *
+   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+   * @example
+   * ```tsx
+   * <ClerkProvider clerkJsVersion="x.x.x" />
+   * ```
+   */
   billing: CommerceBillingNamespace;
 
   telemetry: TelemetryCollector | undefined;
@@ -1772,6 +1781,16 @@ export type RevokeAPIKeyParams = {
   revocationReason?: string;
 };
 
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+ * @see https://clerk.com/docs/billing/overview
+ *
+ * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+ * @example
+ * ```tsx
+ * <ClerkProvider clerkJsVersion="x.x.x" />
+ * ```
+ */
 export type __internal_CheckoutProps = {
   appearance?: CheckoutTheme;
   planId?: string;
@@ -1788,6 +1807,16 @@ export type __internal_CheckoutProps = {
   onClose?: () => void;
 };
 
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+ * @see https://clerk.com/docs/billing/overview
+ *
+ * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+ * @example
+ * ```tsx
+ * <ClerkProvider clerkJsVersion="x.x.x" />
+ * ```
+ */
 export type __internal_PlanDetailsProps = {
   appearance?: PlanDetailTheme;
   plan?: CommercePlanResource;
