@@ -11,6 +11,8 @@ export {
   useSignUp,
   useUser,
   useReverification,
+  __experimental_useCheckout,
+  __experimental_CheckoutProvider,
   __experimental_usePaymentElement,
   __experimental_PaymentElementProvider,
   __experimental_PaymentElement,
