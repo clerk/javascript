@@ -5,7 +5,7 @@ import type { InternalUIComponentId } from '../../types';
 interface Props {
   [key: string]: unknown;
   id?: string;
-  component: InternalUIComponentId
+  component: InternalUIComponentId;
 }
 
 const { component, id, ...props } = Astro.props;
