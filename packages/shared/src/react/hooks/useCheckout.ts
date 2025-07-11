@@ -94,6 +94,7 @@ export const useCheckout = (options?: UseCheckoutOptions): __experimental_UseChe
       };
     }
     const {
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       reload,
       confirm,
       pathRoot,
