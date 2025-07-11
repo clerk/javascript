@@ -98,8 +98,8 @@ jobs:
 
               github.rest.actions.createWorkflowDispatch({
                 owner: 'clerk',
-                repo: 'generated-typedoc',
-                workflow_id: 'update-docs.yml',
+                repo: 'clerk-docs',
+                workflow_id: 'typedoc.yml',
                 ref: 'main',
               })
             } else{
