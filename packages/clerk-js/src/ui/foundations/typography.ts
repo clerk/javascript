@@ -26,7 +26,7 @@ const fontSizesDefaultVar = clerkCssVar('font-size', '0.8125rem');
 const fontSizes = Object.freeze({
   xs: clerkCssVar('font-size-xs', `calc(${fontSizesDefaultVar} * 0.8)`), // 0.6875rem
   sm: clerkCssVar('font-size-sm', `calc(${fontSizesDefaultVar} * 0.9)`), // 0.75rem
-  md: clerkCssVar('font-size-md', fontSizesDefaultVar),
+  md: fontSizesDefaultVar,
   lg: clerkCssVar('font-size-lg', `calc(${fontSizesDefaultVar} * 1.3)`), // 1.0625rem
   xl: clerkCssVar('font-size-xl', `calc(${fontSizesDefaultVar} * 1.85)`), // 1.5rem
 } as const);
