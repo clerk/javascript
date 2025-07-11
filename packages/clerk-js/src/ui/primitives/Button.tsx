@@ -58,7 +58,7 @@ const { applyVariants, filterProps } = createVariants(
             [vars.accent]: theme.colors.$colorBackground,
             [vars.accentHover]: `color-mix(in srgb, ${vars.accent}, ${theme.colors.$neutralAlpha50})`,
             [vars.border]: theme.colors.$primary500,
-            [vars.accentContrast]: theme.colors.$colorText,
+            [vars.accentContrast]: theme.colors.$colorForeground,
             [vars.alpha]: theme.colors.$neutralAlpha50,
           },
           neutral: {

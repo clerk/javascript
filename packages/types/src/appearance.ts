@@ -658,9 +658,15 @@ export type Variables = {
   colorNeutral?: CssColorOrAlphaScale;
   /**
    * The default text color.
+   * @deprecated Use {@link Variables.colorForeground} instead.
    * @default '#212126'
    */
   colorText?: CssColor;
+  /**
+   * The default text color.
+   * @default 'inherit'
+   */
+  colorForeground?: CssColor;
   /**
    * The text color for elements of lower importance, eg: a subtitle text.
    * This color is a lighter shade of {@link Variables.colorText}.

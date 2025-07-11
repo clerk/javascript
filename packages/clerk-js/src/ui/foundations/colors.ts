@@ -71,10 +71,10 @@ const warningAlphaScale = colorOptionToThemedAlphaScale(
   'warningAlpha',
 ) as AlphaScale<'warningAlpha'>;
 
-const colorText = clerkCssVar('color-text', '#212126');
+const colorForeground = clerkCssVar('color-foreground', '#212126');
 const colorMutedForeground = clerkCssVar(
   'color-muted-foreground',
-  colorUtils.makeTransparent(colorText, 0.35) || '#747686',
+  colorUtils.makeTransparent(colorForeground, 0.35) || '#747686',
 );
 
 const colors = Object.freeze({
@@ -83,7 +83,7 @@ const colors = Object.freeze({
   modalBackdrop: neutralAlphaScale.neutralAlpha700,
   colorBackground: clerkCssVar('color-background', 'white'),
   colorInputBackground: clerkCssVar('color-input-background', 'white'),
-  colorText,
+  colorForeground,
   colorMutedForeground,
   colorInputText: clerkCssVar('color-input-text', '#131316'),
   colorPrimaryForeground: clerkCssVar('color-primary-foreground', 'white'),

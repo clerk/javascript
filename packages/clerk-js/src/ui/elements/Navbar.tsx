@@ -160,7 +160,7 @@ const NavbarContainer = (
         ),
         padding: `${t.space.$6} ${t.space.$5} ${t.space.$4} ${t.space.$3}`,
         marginRight: `calc(${t.space.$2} * -1)`,
-        color: t.colors.$colorText,
+        color: t.colors.$colorForeground,
         justifyContent: 'space-between',
       })}
     >
@@ -228,7 +228,7 @@ const MobileNavbarContainer = withFloatingTree((props: React.PropsWithChildren<R
           width: '100%',
           zIndex: t.zIndices.$navbar,
           overflow: 'hidden',
-          color: t.colors.$colorText,
+          color: t.colors.$colorForeground,
         })}
       >
         <Col
@@ -346,7 +346,7 @@ export const NavbarMenuButtonRow = ({ navbarTitleLocalizationKey, ...props }: Na
         textVariant='h2'
         variant='ghost'
         sx={t => ({
-          color: t.colors.$colorText,
+          color: t.colors.$colorForeground,
           gap: t.space.$2x5,
           width: 'fit-content',
           alignItems: 'center',

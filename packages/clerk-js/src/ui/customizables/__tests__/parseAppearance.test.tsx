@@ -81,7 +81,7 @@ describe('AppearanceProvider internalTheme flows', () => {
     expect(result.current.parsedInternalTheme.colors.$colorBackground).toBe(knownColors[themeAColor]);
     expect(result.current.parsedInternalTheme.colors.$colorInputBackground).toBe(knownColors[themeAColor]);
     expect(result.current.parsedInternalTheme.colors.$colorInputText).toBe(knownColors[themeAColor]);
-    expect(result.current.parsedInternalTheme.colors.$colorText).toBe(knownColors[themeAColor]);
+    expect(result.current.parsedInternalTheme.colors.$colorForeground).toBe(knownColors[themeAColor]);
     expect(result.current.parsedInternalTheme.colors.$colorPrimaryForeground).toBe(knownColors[themeAColor]);
     expect(result.current.parsedInternalTheme.colors.$colorMutedForeground).toBe(knownColors[themeAColor]);
     expect(result.current.parsedInternalTheme.radii.$md).toBe(themeA.variables.borderRadius);
@@ -111,7 +111,7 @@ describe('AppearanceProvider internalTheme flows', () => {
     expect(result.current.parsedInternalTheme.colors.$colorBackground).toBe(knownColors[themeBColor]);
     expect(result.current.parsedInternalTheme.colors.$colorInputBackground).toBe(knownColors[themeBColor]);
     expect(result.current.parsedInternalTheme.colors.$colorInputText).toBe(knownColors[themeBColor]);
-    expect(result.current.parsedInternalTheme.colors.$colorText).toBe(knownColors[themeBColor]);
+    expect(result.current.parsedInternalTheme.colors.$colorForeground).toBe(knownColors[themeBColor]);
     expect(result.current.parsedInternalTheme.colors.$colorPrimaryForeground).toBe(knownColors[themeBColor]);
     expect(result.current.parsedInternalTheme.colors.$colorMutedForeground).toBe(knownColors[themeBColor]);
     expect(result.current.parsedInternalTheme.radii.$md).toBe(themeB.variables.borderRadius);
@@ -142,7 +142,7 @@ describe('AppearanceProvider internalTheme flows', () => {
     expect(result.current.parsedInternalTheme.colors.$colorBackground).toBe(knownColors[themeBColor]);
     expect(result.current.parsedInternalTheme.colors.$colorInputBackground).toBe(knownColors[themeBColor]);
     expect(result.current.parsedInternalTheme.colors.$colorInputText).toBe(knownColors[themeBColor]);
-    expect(result.current.parsedInternalTheme.colors.$colorText).toBe(knownColors[themeBColor]);
+    expect(result.current.parsedInternalTheme.colors.$colorForeground).toBe(knownColors[themeBColor]);
     expect(result.current.parsedInternalTheme.colors.$colorPrimaryForeground).toBe(knownColors[themeBColor]);
     expect(result.current.parsedInternalTheme.colors.$colorMutedForeground).toBe(knownColors[themeBColor]);
     expect(result.current.parsedInternalTheme.radii.$md).toBe(themeB.variables.borderRadius);

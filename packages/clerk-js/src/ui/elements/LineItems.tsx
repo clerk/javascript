@@ -100,7 +100,7 @@ const Title = React.forwardRef<HTMLTableCellElement, TitleProps>(({ title, descr
       elementId={descriptors.lineItemsTitle.setId(variant)}
       sx={t => ({
         display: 'grid',
-        color: variant === 'primary' ? t.colors.$colorText : t.colors.$colorMutedForeground,
+        color: variant === 'primary' ? t.colors.$colorForeground : t.colors.$colorMutedForeground,
         ...common.textVariants(t)[textVariant],
       })}
     >
@@ -172,7 +172,7 @@ function Description({ text, prefix, suffix, truncateText = false, copyText = fa
       sx={t => ({
         display: 'grid',
         justifyContent: 'end',
-        color: variant === 'tertiary' ? t.colors.$colorMutedForeground : t.colors.$colorText,
+        color: variant === 'tertiary' ? t.colors.$colorMutedForeground : t.colors.$colorForeground,
       })}
     >
       <Span

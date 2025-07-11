@@ -17,7 +17,7 @@ export const PaymentSourceRow = ({ paymentSource }: { paymentSource: CommercePay
         elementDescriptor={descriptors.paymentSourceRowIcon}
       />
       <Text
-        sx={t => ({ color: t.colors.$colorText, textTransform: 'capitalize' })}
+        sx={t => ({ color: t.colors.$colorForeground, textTransform: 'capitalize' })}
         truncate
         elementDescriptor={descriptors.paymentSourceRowType}
       >

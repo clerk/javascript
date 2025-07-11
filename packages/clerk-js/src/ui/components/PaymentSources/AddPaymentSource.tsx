@@ -31,7 +31,7 @@ const useStripeAppearance = (node: HTMLElement | null) => {
     return {
       colorPrimary: resolveComputedCSSColor(node, colors.$primary500, colors.$colorBackground),
       colorBackground: resolveComputedCSSColor(node, colors.$colorInputBackground, colors.$colorBackground),
-      colorText: resolveComputedCSSColor(node, colors.$colorText, colors.$colorBackground),
+      colorText: resolveComputedCSSColor(node, colors.$colorForeground, colors.$colorBackground),
       colorTextSecondary: resolveComputedCSSColor(node, colors.$colorMutedForeground, colors.$colorBackground),
       colorSuccess: resolveComputedCSSColor(node, colors.$success500, colors.$colorBackground),
       colorDanger: resolveComputedCSSColor(node, colors.$danger500, colors.$colorBackground),
