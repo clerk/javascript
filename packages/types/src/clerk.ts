@@ -1,3 +1,4 @@
+import type { ClerkAPIResponseError } from './api';
 import type { APIKeysNamespace } from './apiKeys';
 import type {
   APIKeysTheme,
@@ -20,9 +21,11 @@ import type {
 import type { ClientResource } from './client';
 import type {
   CommerceBillingNamespace,
+  CommerceCheckoutResource,
   CommercePlanResource,
   CommerceSubscriberType,
   CommerceSubscriptionPlanPeriod,
+  ConfirmCheckoutParams,
 } from './commerce';
 import type { CustomMenuItem } from './customMenuItems';
 import type { CustomPage } from './customPages';
@@ -54,6 +57,44 @@ import type { TelemetryCollector } from './telemetry';
 import type { UserResource } from './user';
 import type { Autocomplete, DeepPartial, DeepSnakeToCamel } from './utils';
 import type { WaitlistResource } from './waitlist';
+
+type __experimental_CheckoutStatus = 'awaiting_initialization' | 'awaiting_confirmation' | 'completed';
+
+export type __experimental_CheckoutCacheState = Readonly<{
+  isStarting: boolean;
+  isConfirming: boolean;
+  error: ClerkAPIResponseError | null;
+  checkout: CommerceCheckoutResource | null;
+  fetchStatus: 'idle' | 'fetching' | 'error';
+  status: __experimental_CheckoutStatus;
+}>;
+
+export type __experimental_CheckoutOptions = {
+  for?: 'organization';
+  planPeriod: CommerceSubscriptionPlanPeriod;
+  planId: string;
+};
+
+type CheckoutResult =
+  | {
+      data: CommerceCheckoutResource;
+      error: null;
+    }
+  | {
+      data: null;
+      error: ClerkAPIResponseError;
+    };
+
+export type __experimental_CheckoutInstance = {
+  confirm: (params: ConfirmCheckoutParams) => Promise<CheckoutResult>;
+  start: () => Promise<CheckoutResult>;
+  clear: () => void;
+  finalize: (params?: { redirectUrl: string }) => void;
+  subscribe: (listener: (state: __experimental_CheckoutCacheState) => void) => () => void;
+  getState: () => __experimental_CheckoutCacheState;
+};
+
+type __experimental_CheckoutFunction = (options: __experimental_CheckoutOptions) => __experimental_CheckoutInstance;
 
 /**
  * @inline
@@ -795,6 +836,13 @@ export interface Clerk {
    * This API is in early access and may change in future releases.
    */
   apiKeys: APIKeysNamespace;
+
+  /**
+   * Checkout API
+   * @experimental
+   * This API is in early access and may change in future releases.
+   */
+  __experimental_checkout: __experimental_CheckoutFunction;
 }
 
 export type HandleOAuthCallbackParams = TransferableOption &
