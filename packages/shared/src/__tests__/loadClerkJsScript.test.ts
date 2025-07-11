@@ -12,6 +12,12 @@ jest.mock('../loadScript');
 setClerkJsLoadingErrorPackageName('@clerk/clerk-react');
 const jsPackageMajorVersion = getMajorVersion(JS_PACKAGE_VERSION);
 
+const mockClerk = {
+  status: 'ready',
+  loaded: true,
+  load: jest.fn(),
+};
+
 describe('loadClerkJsScript(options)', () => {
   const mockPublishableKey = 'pk_test_Zm9vLWJhci0xMy5jbGVyay5hY2NvdW50cy5kZXYk';
 
@@ -19,17 +25,43 @@ describe('loadClerkJsScript(options)', () => {
     jest.clearAllMocks();
     (loadScript as jest.Mock).mockResolvedValue(undefined);
     document.querySelector = jest.fn().mockReturnValue(null);
+
+    (window as any).Clerk = undefined;
+
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
   });
 
   test('throws error when publishableKey is missing', async () => {
-    await expect(() => loadClerkJsScript({} as any)).rejects.toThrow(
+    await expect(loadClerkJsScript({} as any)).rejects.toThrow(
       '@clerk/clerk-react: Missing publishableKey. You can get your key at https://dashboard.clerk.com/last-active?path=api-keys.',
     );
   });
 
-  test('loads script when no existing script is found', async () => {
-    await loadClerkJsScript({ publishableKey: mockPublishableKey });
+  test('returns null immediately when Clerk is already loaded', async () => {
+    (window as any).Clerk = mockClerk;
 
+    const result = await loadClerkJsScript({ publishableKey: mockPublishableKey });
+    expect(result).toBeNull();
+    expect(loadScript).not.toHaveBeenCalled();
+  });
+
+  test('loads script and waits for Clerk to be available', async () => {
+    const loadPromise = loadClerkJsScript({ publishableKey: mockPublishableKey });
+
+    // Simulate Clerk becoming available after 250ms
+    setTimeout(() => {
+      (window as any).Clerk = mockClerk;
+    }, 250);
+
+    // Advance timers to allow polling to detect Clerk
+    jest.advanceTimersByTime(300);
+
+    const result = await loadPromise;
+    expect(result).toBeNull();
     expect(loadScript).toHaveBeenCalledWith(
       expect.stringContaining(
         `https://foo-bar-13.clerk.accounts.dev/npm/@clerk/clerk-js@${jsPackageMajorVersion}/dist/clerk.browser.js`,
@@ -42,34 +74,74 @@ describe('loadClerkJsScript(options)', () => {
     );
   });
 
-  test('uses existing script when found', async () => {
+  test('times out and rejects when Clerk does not load', async () => {
+    let rejectedWith: any;
+
+    const loadPromise = loadClerkJsScript({ publishableKey: mockPublishableKey, scriptLoadTimeout: 1000 });
+
+    try {
+      jest.advanceTimersByTime(1000);
+      await loadPromise;
+    } catch (error) {
+      rejectedWith = error;
+    }
+
+    expect(rejectedWith).toBeInstanceOf(Error);
+    expect(rejectedWith.message).toBe('Clerk: Failed to load Clerk');
+    expect((window as any).Clerk).toBeUndefined();
+  });
+
+  test('waits for existing script with timeout', async () => {
     const mockExistingScript = document.createElement('script');
     document.querySelector = jest.fn().mockReturnValue(mockExistingScript);
 
     const loadPromise = loadClerkJsScript({ publishableKey: mockPublishableKey });
-    mockExistingScript.dispatchEvent(new Event('load'));
 
-    await expect(loadPromise).resolves.toBe(mockExistingScript);
+    // Simulate Clerk becoming available after 250ms
+    setTimeout(() => {
+      (window as any).Clerk = mockClerk;
+    }, 250);
+
+    // Advance timers to allow polling to detect Clerk
+    jest.advanceTimersByTime(300);
+
+    const result = await loadPromise;
+    expect(result).toBeNull();
     expect(loadScript).not.toHaveBeenCalled();
   });
 
-  test('rejects when existing script fails to load', async () => {
-    const mockExistingScript = document.createElement('script');
-    document.querySelector = jest.fn().mockReturnValue(mockExistingScript);
+  test('handles race condition when Clerk loads just as timeout fires', async () => {
+    const loadPromise = loadClerkJsScript({ publishableKey: mockPublishableKey, scriptLoadTimeout: 1000 });
 
+    setTimeout(() => {
+      (window as any).Clerk = mockClerk;
+    }, 999);
+
+    jest.advanceTimersByTime(1000);
+
+    const result = await loadPromise;
+    expect(result).toBeNull();
+    expect((window as any).Clerk).toBe(mockClerk);
+  });
+
+  test('validates Clerk is properly loaded with required methods', async () => {
     const loadPromise = loadClerkJsScript({ publishableKey: mockPublishableKey });
-    mockExistingScript.dispatchEvent(new Event('error'));
 
-    await expect(loadPromise).rejects.toBe('Clerk: Failed to load Clerk');
-    expect(loadScript).not.toHaveBeenCalled();
-  });
+    setTimeout(() => {
+      (window as any).Clerk = { status: 'ready' };
+    }, 100);
 
-  test('throws error when loadScript fails', async () => {
-    (loadScript as jest.Mock).mockRejectedValue(new Error('Script load failed'));
+    jest.advanceTimersByTime(15000);
 
-    await expect(loadClerkJsScript({ publishableKey: mockPublishableKey })).rejects.toThrow(
-      'Clerk: Failed to load Clerk',
-    );
+    try {
+      await loadPromise;
+      fail('Should have thrown error');
+    } catch (error) {
+      expect(error).toBeInstanceOf(Error);
+      expect((error as Error).message).toBe('Clerk: Failed to load Clerk');
+      // The malformed Clerk object should still be there since it was set
+      expect((window as any).Clerk).toEqual({ status: 'ready' });
+    }
   });
 });
 
