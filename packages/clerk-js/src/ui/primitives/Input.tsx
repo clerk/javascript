@@ -32,7 +32,7 @@ const { applyVariants, filterProps } = createVariants((theme, props) => ({
       animationName: 'onAutoFillStart',
     },
     '::placeholder': {
-      color: theme.colors.$colorTextSecondary,
+      color: theme.colors.$colorMutedForeground,
     },
   },
   variants: {

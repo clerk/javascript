@@ -24,7 +24,7 @@ export const PaymentSourceRow = ({ paymentSource }: { paymentSource: CommercePay
         {paymentSource.paymentMethod === 'card' ? paymentSource.cardType : paymentSource.paymentMethod}
       </Text>
       <Text
-        sx={t => ({ color: t.colors.$colorTextSecondary })}
+        sx={t => ({ color: t.colors.$colorMutedForeground })}
         variant='caption'
         truncate
         elementDescriptor={descriptors.paymentSourceRowValue}

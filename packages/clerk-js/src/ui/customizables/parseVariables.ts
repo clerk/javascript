@@ -39,8 +39,11 @@ export const createColorScales = (theme: Theme) => {
         ? colors.toHslaString(variables.colorTextOnPrimaryBackground)
         : undefined,
     colorText: colors.toHslaString(variables.colorText),
-    colorTextSecondary:
-      colors.toHslaString(variables.colorTextSecondary) || colors.makeTransparent(variables.colorText, 0.35),
+    colorMutedForeground: variables.colorMutedForeground
+      ? colors.toHslaString(variables.colorMutedForeground)
+      : variables.colorTextSecondary
+        ? colors.toHslaString(variables.colorTextSecondary)
+        : colors.makeTransparent(variables.colorText, 0.35),
     colorInputText: colors.toHslaString(variables.colorInputText),
     colorBackground: colors.toHslaString(variables.colorBackground),
     colorInputBackground: colors.toHslaString(variables.colorInputBackground),

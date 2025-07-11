@@ -136,7 +136,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ text, value }
               position: 'relative',
               width: fullWidth ? '100%' : 'auto',
               backgroundColor: isSelected ? t.colors.$colorBackground : 'transparent',
-              color: isSelected ? t.colors.$colorText : t.colors.$colorTextSecondary,
+              color: isSelected ? t.colors.$colorText : t.colors.$colorMutedForeground,
               fontSize: size === 'lg' ? t.fontSizes.$md : t.fontSizes.$xs,
               minHeight: t.sizes.$6,
               boxShadow: isSelected ? t.shadows.$segmentedControl : 'none',

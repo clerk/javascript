@@ -102,7 +102,7 @@ export const PaymentAttemptPage = () => {
                   display: 'flex',
                   alignItems: 'center',
                   gap: t.space.$0x25,
-                  color: t.colors.$colorTextSecondary,
+                  color: t.colors.$colorMutedForeground,
                 })}
               >
                 <CopyButton

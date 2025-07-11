@@ -20,7 +20,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
         danger: { color: theme.colors.$danger500 },
         success: { color: theme.colors.$success500 },
         warning: { color: theme.colors.$warning500 },
-        secondary: { color: theme.colors.$colorTextSecondary },
+        secondary: { color: theme.colors.$colorMutedForeground },
         inherit: { color: 'inherit' },
       },
       truncate: {

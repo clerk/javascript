@@ -165,7 +165,7 @@ export const TagInput = (props: TagInputProps) => {
           lineHeight: t.space.$5,
           paddingLeft: t.space.$1,
           '::placeholder': {
-            color: t.colors.$colorTextSecondary,
+            color: t.colors.$colorMutedForeground,
           },
           boxShadow: 'none',
           ':hover': {
@@ -219,7 +219,7 @@ const TagPill = (props: TagPillProps) => {
         elementDescriptor={descriptors.tagPillIcon}
         size='md'
         icon={Plus}
-        sx={t => ({ color: t.colors.$colorTextSecondary, transform: 'translateY(0px) rotate(45deg)' })}
+        sx={t => ({ color: t.colors.$colorMutedForeground, transform: 'translateY(0px) rotate(45deg)' })}
       />
     </Flex>
   );

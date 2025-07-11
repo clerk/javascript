@@ -664,9 +664,16 @@ export type Variables = {
   /**
    * The text color for elements of lower importance, eg: a subtitle text.
    * This color is a lighter shade of {@link Variables.colorText}.
+   * @deprecated Use {@link Variables.colorMutedForeground} instead.
    * @default '#747686'
    */
   colorTextSecondary?: CssColor;
+  /**
+   * The text color for elements of lower importance, eg: a subtitle text.
+   * This color is a lighter shade of {@link Variables.colorText}.
+   * @default '#747686'
+   */
+  colorMutedForeground?: CssColor;
   /**
    * The background color for the card container.
    * @default 'white'
