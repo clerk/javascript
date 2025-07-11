@@ -22,6 +22,40 @@ import { isTruthy } from '../underscore';
 import { TelemetryEventThrottler } from './throttler';
 import type { TelemetryCollectorOptions } from './types';
 
+/**
+ * Interface describing the expected structure of window.Clerk
+ */
+interface WindowClerk {
+  constructor: {
+    sdkMetadata?: {
+      name?: string;
+      version?: string;
+    };
+  };
+}
+
+/**
+ * Extend the Window interface to include the Clerk property
+ */
+declare global {
+  interface Window {
+    Clerk?: WindowClerk;
+  }
+}
+
+/**
+ * Type guard to check if window.Clerk exists and has the expected structure
+ */
+function isWindowClerkWithMetadata(clerk: unknown): clerk is WindowClerk {
+  return (
+    typeof clerk === 'object' &&
+    clerk !== null &&
+    'constructor' in clerk &&
+    typeof clerk.constructor === 'object' &&
+    clerk.constructor !== null
+  );
+}
+
 type TelemetryCollectorConfig = Pick<
   TelemetryCollectorOptions,
   'samplingRate' | 'disabled' | 'debug' | 'maxBufferSize'
@@ -231,13 +265,25 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
    * This is necessary because the sdkMetadata can be set by the host SDK after the TelemetryCollector is instantiated.
    */
   #getSDKMetadata() {
-    let sdkMetadata = {
+    const sdkMetadata = {
       name: this.#metadata.sdk,
       version: this.#metadata.sdkVersion,
     };
 
-    if (typeof window !== 'undefined' && (window as any).Clerk) {
-      sdkMetadata = { ...sdkMetadata, ...(window as any).Clerk.constructor.sdkMetadata };
+    if (typeof window !== 'undefined' && window.Clerk) {
+      const windowClerk = window.Clerk;
+      
+      if (isWindowClerkWithMetadata(windowClerk) && windowClerk.constructor.sdkMetadata) {
+        const { name, version } = windowClerk.constructor.sdkMetadata;
+        
+        // Only update properties if they exist to avoid overwriting with undefined
+        if (name !== undefined) {
+          sdkMetadata.name = name;
+        }
+        if (version !== undefined) {
+          sdkMetadata.version = version;
+        }
+      }
     }
 
     return sdkMetadata;
