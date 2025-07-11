@@ -197,7 +197,8 @@ const mutedBackground = (t: InternalTheme) => {
   return cssSupports.colorMix()
     ? clerkCssVar(
         'color-muted',
-        t.colors.$colorMuted || `color-mix(in srgb, ${t.colors.$colorBackground}, ${t.colors.$neutralAlpha50})`,
+        t.colors.$colorMuted ||
+          mergedColorsBackground(colors.setAlpha(t.colors.$colorBackground, 1), t.colors.$neutralAlpha50),
       )
     : mergedColorsBackground(colors.setAlpha(t.colors.$colorBackground, 1), t.colors.$neutralAlpha50);
 };
