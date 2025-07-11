@@ -6,7 +6,7 @@ import type { FakeOrganization, FakeUser } from '../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../testUtils';
 
 testAgainstRunningApps({
-  withEnv: [appConfigs.envs.withCustomRoles, appConfigs.envs.withBillingStaging],
+  withEnv: [appConfigs.envs.withCustomRoles, appConfigs.envs.withBillingJwtV2],
 })('authorization @nextjs', ({ app }) => {
   test.describe.configure({ mode: 'serial' });
 
