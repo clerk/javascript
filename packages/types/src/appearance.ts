@@ -609,6 +609,21 @@ export type ElementsConfig = {
   apiKeysRevokeModal: WithOptions;
   apiKeysRevokeModalInput: WithOptions;
   apiKeysRevokeModalSubmitButton: WithOptions;
+
+  subscriptionDetailsCard: WithOptions;
+  subscriptionDetailsCardHeader: WithOptions;
+  subscriptionDetailsCardBadge: WithOptions;
+  subscriptionDetailsCardTitle: WithOptions;
+  subscriptionDetailsCardBody: WithOptions;
+  subscriptionDetailsCardFooter: WithOptions;
+  subscriptionDetailsCardActions: WithOptions;
+  subscriptionDetailsSummaryItems: WithOptions;
+  subscriptionDetailsSummaryItem: WithOptions;
+  subscriptionDetailsSummaryLabel: WithOptions;
+  subscriptionDetailsSummaryValue: WithOptions;
+  subscriptionDetailsDetailRow: WithOptions;
+  subscriptionDetailsDetailRowLabel: WithOptions;
+  subscriptionDetailsDetailRowValue: WithOptions;
 };
 
 export type Elements = {
@@ -870,6 +885,7 @@ export type WaitlistTheme = Theme;
 export type PricingTableTheme = Theme;
 export type CheckoutTheme = Theme;
 export type PlanDetailTheme = Theme;
+export type SubscriptionDetailsTheme = Theme;
 export type APIKeysTheme = Theme;
 export type OAuthConsentTheme = Theme;
 
