@@ -10,6 +10,7 @@ exports[`Typedoc output > should have a deliberate file structure 1`] = `
   "types/check-authorization-params-from-session-claims.mdx",
   "types/check-authorization-with-custom-permissions.mdx",
   "types/clerk-api-error.mdx",
+  "types/clerk-api-response-error.mdx",
   "types/clerk-host-router.mdx",
   "types/clerk-jwt-claims.mdx",
   "types/clerk-paginated-response.mdx",

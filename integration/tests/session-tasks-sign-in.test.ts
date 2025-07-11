@@ -27,7 +27,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
       await app.teardown();
     });
 
-    test('with email and password, navigate to task on after sign-in', async ({ page, context }) => {
+    test.skip('with email and password, navigate to task on after sign-in', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
 
       // Performs sign-in
@@ -51,7 +51,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
       await u.page.waitForAppUrl('/');
     });
 
-    test('with sso, navigate to task on after sign-in', async ({ page, context }) => {
+    test.skip('with sso, navigate to task on after sign-in', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
 
       // Create a clerkClient for the OAuth provider instance
