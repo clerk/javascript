@@ -7,6 +7,7 @@ import { colorOptionToThemedAlphaScale, colorOptionToThemedLightnessScale } from
 import { cssSupports } from '../utils/cssSupports';
 import { fromEntries } from '../utils/fromEntries';
 import { removeUndefinedProps } from '../utils/removeUndefinedProps';
+import { createShadowSet } from '../foundations/shadows';
 
 export const createColorScales = (theme: Theme) => {
   const variables = removeInvalidValues(theme.variables || {});
@@ -180,4 +181,19 @@ export const createFontWeightScale = (theme: Theme): Partial<Record<keyof typeof
 export const createFonts = (theme: Theme) => {
   const { fontFamily, fontFamilyButtons } = theme.variables || {};
   return removeUndefinedProps({ main: fontFamily, buttons: fontFamilyButtons });
+};
+
+export const createShadowsUnits = (theme: Theme) => {
+  const { colorShadow } = theme.variables || {};
+  if (!colorShadow) {
+    return;
+  }
+
+  const shadowColor = colors.toHslaString(colorShadow);
+  if (!shadowColor) {
+    return;
+  }
+
+  // Use the shared shadow creation function with the custom shadow color
+  return createShadowSet(shadowColor);
 };
