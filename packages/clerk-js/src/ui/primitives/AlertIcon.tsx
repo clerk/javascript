@@ -14,7 +14,7 @@ const { applyVariants, filterProps } = createVariants(theme => ({
       warning: { color: theme.colors.$warning500 },
       success: { color: theme.colors.$success500 },
       primary: { color: theme.colors.$primary500 },
-      info: { color: theme.colors.$colorTextSecondary },
+      info: { color: theme.colors.$colorMutedForeground },
     },
   },
 }));

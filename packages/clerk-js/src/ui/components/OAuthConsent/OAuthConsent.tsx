@@ -152,7 +152,7 @@ export function OAuthConsentInternal() {
                       display: 'inline-block',
                       width: t.space.$1,
                       height: t.space.$1,
-                      background: t.colors.$colorTextSecondary,
+                      background: t.colors.$colorMutedForeground,
                       borderRadius: t.radii.$circle,
                       transform: 'translateY(-0.1875rem)',
                       marginRight: t.space.$2,
@@ -369,7 +369,7 @@ function ConnectionSeparator() {
       height={2}
       aria-hidden
       sx={t => ({
-        color: t.colors.$colorTextSecondary,
+        color: t.colors.$colorMutedForeground,
       })}
     >
       <path

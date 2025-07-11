@@ -33,9 +33,9 @@ const sharedStyles: ThemableCssProp = t => ({
 });
 
 export const sharedMainIdentifierSx: ThemableCssProp = t => ({
-  color: t.colors.$colorText,
+  color: t.colors.$colorForeground,
   ':hover': {
-    color: t.colors.$colorText,
+    color: t.colors.$colorForeground,
   },
 });
 

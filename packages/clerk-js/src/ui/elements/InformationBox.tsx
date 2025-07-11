@@ -22,7 +22,7 @@ export function InformationBox(props: InformationBoxProps) {
       />
       <Text
         localizationKey={props.message}
-        sx={t => ({ color: t.colors.$colorTextSecondary })}
+        sx={t => ({ color: t.colors.$colorMutedForeground })}
       />
     </Flex>
   );

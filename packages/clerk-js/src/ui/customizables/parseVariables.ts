@@ -1,7 +1,7 @@
 import type { Theme } from '@clerk/types';
 
 import { spaceScaleKeys } from '../foundations/sizes';
-import type { fontSizes, fontWeights } from '../foundations/typography';
+import type { fontWeights } from '../foundations/typography';
 import { colors } from '../utils/colors';
 import { colorOptionToThemedAlphaScale, colorOptionToThemedLightnessScale } from '../utils/colors/scales';
 import { cssSupports } from '../utils/cssSupports';
@@ -33,14 +33,30 @@ export const createColorScales = (theme: Theme) => {
     ...successAlphaScale,
     ...warningAlphaScale,
     primaryHover: colors.adjustForLightness(primaryScale?.primary500),
-    colorTextOnPrimaryBackground: colors.toHslaString(variables.colorTextOnPrimaryBackground),
-    colorText: colors.toHslaString(variables.colorText),
-    colorTextSecondary:
-      colors.toHslaString(variables.colorTextSecondary) || colors.makeTransparent(variables.colorText, 0.35),
-    colorInputText: colors.toHslaString(variables.colorInputText),
+    colorPrimaryForeground: variables.colorPrimaryForeground
+      ? colors.toHslaString(variables.colorPrimaryForeground)
+      : variables.colorTextOnPrimaryBackground
+        ? colors.toHslaString(variables.colorTextOnPrimaryBackground)
+        : undefined,
+    colorForeground: variables.colorForeground
+      ? colors.toHslaString(variables.colorForeground)
+      : colors.toHslaString(variables.colorText),
+    colorMutedForeground: variables.colorMutedForeground
+      ? colors.toHslaString(variables.colorMutedForeground)
+      : variables.colorTextSecondary
+        ? colors.toHslaString(variables.colorTextSecondary)
+        : colors.makeTransparent(variables.colorText, 0.35),
+    colorInputForeground: variables.colorInputForeground
+      ? colors.toHslaString(variables.colorInputForeground)
+      : colors.toHslaString(variables.colorInputText),
     colorBackground: colors.toHslaString(variables.colorBackground),
-    colorInputBackground: colors.toHslaString(variables.colorInputBackground),
+    colorInput: variables.colorInput
+      ? colors.toHslaString(variables.colorInput)
+      : colors.toHslaString(variables.colorInputBackground),
     colorShimmer: colors.toHslaString(variables.colorShimmer),
+    colorMuted: variables.colorMuted ? colors.toHslaString(variables.colorMuted) : undefined,
+    colorRing: variables.colorRing ? colors.toHslaString(variables.colorRing) : undefined,
+    colorShadow: variables.colorShadow ? colors.toHslaString(variables.colorShadow) : undefined,
   });
 };
 
@@ -103,37 +119,60 @@ export const createRadiiUnits = (theme: Theme) => {
 };
 
 export const createSpaceScale = (theme: Theme) => {
-  const { spacingUnit } = theme.variables || {};
-  if (spacingUnit === undefined) {
+  const { spacing, spacingUnit } = theme.variables || {};
+  const spacingValue = spacing ?? spacingUnit;
+  if (spacingValue === undefined) {
     return;
   }
   return fromEntries(
     spaceScaleKeys.map(k => {
       const num = Number.parseFloat(k.replace('x', '.'));
       const percentage = (num / 0.5) * 0.125;
-      return [k, `calc(${spacingUnit} * ${percentage})`];
+      return [k, `calc(${spacingValue} * ${percentage})`];
     }),
   );
 };
 
+// Font size scale constants that match the default theme foundations
+// These ratios are used consistently across the design system
+const FONT_SIZE_SCALE_RATIOS = {
+  xs: 0.8,
+  sm: 0.9,
+  md: 1,
+  lg: 1.3,
+  xl: 1.85,
+} as const;
+
+type FontSizeKey = keyof typeof FONT_SIZE_SCALE_RATIOS;
+
 // We want to keep the same ratio between the font sizes we have for the default theme
 // This is directly related to the fontSizes object in the theme default foundations
 // ref: src/ui/foundations/typography.ts
-export const createFontSizeScale = (theme: Theme): Record<keyof typeof fontSizes, string> | undefined => {
+export const createFontSizeScale = (theme: Theme): Partial<Record<FontSizeKey, string>> | undefined => {
   const { fontSize } = theme.variables || {};
   if (fontSize === undefined) {
     return;
   }
-  return {
-    xs: `calc(${fontSize} * 0.8)`,
-    sm: `calc(${fontSize} * 0.9)`,
-    md: fontSize,
-    lg: `calc(${fontSize} * 1.3)`,
-    xl: `calc(${fontSize} * 1.85)`,
-  };
+
+  if (typeof fontSize === 'object') {
+    // When fontSize is an object, filter out undefined values and return only defined properties
+    return removeUndefinedProps(
+      Object.fromEntries(
+        Object.entries(FONT_SIZE_SCALE_RATIOS).map(([key, _ratio]) => [key, fontSize[key as FontSizeKey] ?? undefined]),
+      ) as Record<FontSizeKey, string | undefined>,
+    );
+  }
+
+  // When fontSize is a string, calculate all sizes based on the base value and ratios
+  return Object.fromEntries(
+    Object.entries(FONT_SIZE_SCALE_RATIOS).map(([key, ratio]) => [
+      key,
+      ratio === 1 ? fontSize : `calc(${fontSize} * ${ratio})`,
+    ]),
+  ) as Record<FontSizeKey, string>;
 };
 
-export const createFontWeightScale = (theme: Theme): Record<keyof typeof fontWeights, any> => {
+export const createFontWeightScale = (theme: Theme): Partial<Record<keyof typeof fontWeights, string | number>> => {
   const { fontWeight } = theme.variables || {};
   return removeUndefinedProps({ ...fontWeight });
 };

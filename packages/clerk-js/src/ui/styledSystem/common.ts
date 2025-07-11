@@ -1,3 +1,5 @@
+import { colors } from '../utils/colors';
+import { clerkCssVar } from '../utils/cssVariables';
 import type { InternalTheme } from './types';
 
 const textVariants = (t: InternalTheme) => {
@@ -134,7 +136,7 @@ const focusRingStyles = (t: InternalTheme) => {
   return {
     '&::-moz-focus-inner': { border: '0' },
     WebkitTapHighlightColor: 'transparent',
-    boxShadow: t.shadows.$focusRing.replace('{{color}}', t.colors.$neutralAlpha200),
+    boxShadow: t.shadows.$focusRing.replace('{{color}}', t.colors.$colorRing),
     transitionProperty: t.transitionProperty.$common,
     transitionTimingFunction: t.transitionTiming.$common,
     transitionDuration: t.transitionDuration.$focusRing,
@@ -190,6 +192,13 @@ const mergedColorsBackground = (colorBack: string, colorFront: string) => {
   return `linear-gradient(${colorFront},${colorFront}), linear-gradient(${colorBack}, ${colorBack})`;
 };
 
+const mutedBackground = (t: InternalTheme) => {
+  const defaultColor =
+    t.colors.$colorMuted ||
+    mergedColorsBackground(colors.setAlpha(t.colors.$colorBackground, 1), t.colors.$neutralAlpha50);
+  return clerkCssVar('color-muted', defaultColor);
+};
+
 const visuallyHidden = () =>
   ({
     clip: 'rect(0 0 0 0)',
@@ -210,6 +219,7 @@ export const common = {
   borderColor,
   centeredFlex,
   maxHeightScroller,
+  mutedBackground,
   unstyledScrollbar,
   mergedColorsBackground,
   visuallyHidden,

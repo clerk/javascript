@@ -5,23 +5,20 @@ import { descriptors, Flex, Image, useAppearance } from '../customizables';
 import type { PropsOfComponent } from '../styledSystem';
 import { RouterLink } from './RouterLink';
 
-type WidthInRem = `${string}rem`;
-const getContainerHeightForImageRatio = (imageRef: React.RefObject<HTMLImageElement>, remWidth: WidthInRem) => {
-  const baseFontSize = 16;
-  const base = Number.parseFloat(remWidth.replace('rem', '')) * baseFontSize;
+const getContainerHeightForImageRatio = (imageRef: React.RefObject<HTMLImageElement>, width: string) => {
   if (!imageRef.current) {
-    return base;
+    return `calc(${width} * 2)`;
   }
   const ratio = imageRef.current.naturalWidth / imageRef.current.naturalHeight;
-  let newHeight = `${base}px`;
+
   if (ratio <= 1) {
     // logo is taller than it is wide
-    newHeight = `${2 * base}px`;
+    return `calc(${width} * 2)`;
   } else if (ratio > 1 && ratio <= 2) {
     // logo is up to 2x wider than it is tall
-    newHeight = `${(2 * base) / ratio}px`;
+    return `calc((${width} * 2) / ${ratio})`;
   }
-  return newHeight;
+  return width;
 };
 
 type ApplicationLogoProps = PropsOfComponent<typeof Flex>;

@@ -15,17 +15,17 @@ const themeA = {
     colorSuccess: themeAColor,
     colorWarning: themeAColor,
     colorBackground: themeAColor,
-    colorInputBackground: themeAColor,
-    colorInputText: themeAColor,
+    colorInput: themeAColor,
+    colorInputForeground: themeAColor,
     colorText: themeAColor,
-    colorTextOnPrimaryBackground: themeAColor,
+    colorPrimaryForeground: themeAColor,
     colorTextSecondary: themeAColor,
     borderRadius: '1rem',
     fontFamily: 'Comic Sans',
     fontFamilyButtons: 'Comic Sans',
     fontSize: '1rem',
     fontWeight: { normal: 600 },
-    spacingUnit: 'px',
+    spacing: '1px',
   },
 } as const;
 
@@ -37,17 +37,17 @@ const themeB = {
     colorSuccess: themeBColor,
     colorWarning: themeBColor,
     colorBackground: themeBColor,
-    colorInputBackground: themeBColor,
-    colorInputText: themeBColor,
+    colorInput: themeBColor,
+    colorInputForeground: themeBColor,
     colorText: themeBColor,
-    colorTextOnPrimaryBackground: themeBColor,
+    colorPrimaryForeground: themeBColor,
     colorTextSecondary: themeBColor,
     borderRadius: '2rem',
     fontFamily: 'Arial',
     fontFamilyButtons: 'Arial',
     fontSize: '2rem',
     fontWeight: { normal: 700 },
-    spacingUnit: 'px',
+    spacing: '2px',
   },
 } as const;
 
@@ -79,17 +79,17 @@ describe('AppearanceProvider internalTheme flows', () => {
     expect(result.current.parsedInternalTheme.colors.$success500).toBe(knownColors[themeAColor]);
     expect(result.current.parsedInternalTheme.colors.$warning500).toBe(knownColors[themeAColor]);
     expect(result.current.parsedInternalTheme.colors.$colorBackground).toBe(knownColors[themeAColor]);
-    expect(result.current.parsedInternalTheme.colors.$colorInputBackground).toBe(knownColors[themeAColor]);
-    expect(result.current.parsedInternalTheme.colors.$colorInputText).toBe(knownColors[themeAColor]);
-    expect(result.current.parsedInternalTheme.colors.$colorText).toBe(knownColors[themeAColor]);
-    expect(result.current.parsedInternalTheme.colors.$colorTextOnPrimaryBackground).toBe(knownColors[themeAColor]);
-    expect(result.current.parsedInternalTheme.colors.$colorTextSecondary).toBe(knownColors[themeAColor]);
+    expect(result.current.parsedInternalTheme.colors.$colorInput).toBe(knownColors[themeAColor]);
+    expect(result.current.parsedInternalTheme.colors.$colorInputForeground).toBe(knownColors[themeAColor]);
+    expect(result.current.parsedInternalTheme.colors.$colorForeground).toBe(knownColors[themeAColor]);
+    expect(result.current.parsedInternalTheme.colors.$colorPrimaryForeground).toBe(knownColors[themeAColor]);
+    expect(result.current.parsedInternalTheme.colors.$colorMutedForeground).toBe(knownColors[themeAColor]);
     expect(result.current.parsedInternalTheme.radii.$md).toBe(themeA.variables.borderRadius);
     expect(result.current.parsedInternalTheme.fonts.$main).toBe(themeA.variables.fontFamily);
     expect(result.current.parsedInternalTheme.fonts.$buttons).toBe(themeA.variables.fontFamily);
     expect(result.current.parsedInternalTheme.fontSizes.$md).toBe('1rem');
     expect(result.current.parsedInternalTheme.fontWeights.$normal).toBe(themeA.variables.fontWeight.normal);
-    expect(result.current.parsedInternalTheme.space.$1).toContain(themeA.variables.spacingUnit);
+    expect(result.current.parsedInternalTheme.space.$1).toContain(themeA.variables.spacing);
   });
 
   it('sets the theme correctly from the appearance prop', () => {
@@ -109,17 +109,17 @@ describe('AppearanceProvider internalTheme flows', () => {
     expect(result.current.parsedInternalTheme.colors.$success500).toBe(knownColors[themeBColor]);
     expect(result.current.parsedInternalTheme.colors.$warning500).toBe(knownColors[themeBColor]);
     expect(result.current.parsedInternalTheme.colors.$colorBackground).toBe(knownColors[themeBColor]);
-    expect(result.current.parsedInternalTheme.colors.$colorInputBackground).toBe(knownColors[themeBColor]);
-    expect(result.current.parsedInternalTheme.colors.$colorInputText).toBe(knownColors[themeBColor]);
-    expect(result.current.parsedInternalTheme.colors.$colorText).toBe(knownColors[themeBColor]);
-    expect(result.current.parsedInternalTheme.colors.$colorTextOnPrimaryBackground).toBe(knownColors[themeBColor]);
-    expect(result.current.parsedInternalTheme.colors.$colorTextSecondary).toBe(knownColors[themeBColor]);
+    expect(result.current.parsedInternalTheme.colors.$colorInput).toBe(knownColors[themeBColor]);
+    expect(result.current.parsedInternalTheme.colors.$colorInputForeground).toBe(knownColors[themeBColor]);
+    expect(result.current.parsedInternalTheme.colors.$colorForeground).toBe(knownColors[themeBColor]);
+    expect(result.current.parsedInternalTheme.colors.$colorPrimaryForeground).toBe(knownColors[themeBColor]);
+    expect(result.current.parsedInternalTheme.colors.$colorMutedForeground).toBe(knownColors[themeBColor]);
     expect(result.current.parsedInternalTheme.radii.$md).toBe(themeB.variables.borderRadius);
     expect(result.current.parsedInternalTheme.fonts.$main).toBe(themeB.variables.fontFamily);
     expect(result.current.parsedInternalTheme.fonts.$buttons).toBe(themeB.variables.fontFamily);
     expect(result.current.parsedInternalTheme.fontSizes.$md).toBe('2rem');
     expect(result.current.parsedInternalTheme.fontWeights.$normal).toBe(themeB.variables.fontWeight.normal);
-    expect(result.current.parsedInternalTheme.space.$1).toContain(themeB.variables.spacingUnit);
+    expect(result.current.parsedInternalTheme.space.$1).toContain(themeB.variables.spacing);
   });
 
   it('merges the globalAppearance with the appearance in the theme', () => {
@@ -140,17 +140,17 @@ describe('AppearanceProvider internalTheme flows', () => {
     expect(result.current.parsedInternalTheme.colors.$success500).toBe(knownColors[themeBColor]);
     expect(result.current.parsedInternalTheme.colors.$warning500).toBe(knownColors[themeBColor]);
     expect(result.current.parsedInternalTheme.colors.$colorBackground).toBe(knownColors[themeBColor]);
-    expect(result.current.parsedInternalTheme.colors.$colorInputBackground).toBe(knownColors[themeBColor]);
-    expect(result.current.parsedInternalTheme.colors.$colorInputText).toBe(knownColors[themeBColor]);
-    expect(result.current.parsedInternalTheme.colors.$colorText).toBe(knownColors[themeBColor]);
-    expect(result.current.parsedInternalTheme.colors.$colorTextOnPrimaryBackground).toBe(knownColors[themeBColor]);
-    expect(result.current.parsedInternalTheme.colors.$colorTextSecondary).toBe(knownColors[themeBColor]);
+    expect(result.current.parsedInternalTheme.colors.$colorInput).toBe(knownColors[themeBColor]);
+    expect(result.current.parsedInternalTheme.colors.$colorInputForeground).toBe(knownColors[themeBColor]);
+    expect(result.current.parsedInternalTheme.colors.$colorForeground).toBe(knownColors[themeBColor]);
+    expect(result.current.parsedInternalTheme.colors.$colorPrimaryForeground).toBe(knownColors[themeBColor]);
+    expect(result.current.parsedInternalTheme.colors.$colorMutedForeground).toBe(knownColors[themeBColor]);
     expect(result.current.parsedInternalTheme.radii.$md).toBe(themeB.variables.borderRadius);
     expect(result.current.parsedInternalTheme.fonts.$main).toBe(themeB.variables.fontFamily);
     expect(result.current.parsedInternalTheme.fonts.$buttons).toBe(themeB.variables.fontFamily);
     expect(result.current.parsedInternalTheme.fontSizes.$md).toBe('2rem');
     expect(result.current.parsedInternalTheme.fontWeights.$normal).toBe(themeB.variables.fontWeight.normal);
-    expect(result.current.parsedInternalTheme.space.$1).toContain(themeB.variables.spacingUnit);
+    expect(result.current.parsedInternalTheme.space.$1).toContain(themeB.variables.spacing);
   });
 });
 

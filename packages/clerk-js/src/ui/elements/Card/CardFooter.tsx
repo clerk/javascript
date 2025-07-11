@@ -1,7 +1,5 @@
 import React from 'react';
 
-import { colors } from '@/ui/utils/colors';
-
 import { useEnvironment } from '../../contexts';
 import { descriptors, Flex, Link, localizationKeys, useAppearance } from '../../customizables';
 import { useDevMode } from '../../hooks/useDevMode';
@@ -51,10 +49,7 @@ export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>((pro
         t => ({
           marginTop: `calc(${t.space.$2} * -1)`,
           paddingTop: t.space.$2,
-          background: common.mergedColorsBackground(
-            colors.setAlpha(t.colors.$colorBackground, 1),
-            t.colors.$neutralAlpha50,
-          ),
+          background: common.mutedBackground(t),
           '&:empty': {
             padding: 0,
             marginTop: 0,

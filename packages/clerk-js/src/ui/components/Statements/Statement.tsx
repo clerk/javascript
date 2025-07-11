@@ -54,7 +54,7 @@ function Header({ title, id, status }: { title: string | LocalizationKey; id: st
             display: 'flex',
             alignItems: 'center',
             gap: t.space.$0x25,
-            color: t.colors.$colorTextSecondary,
+            color: t.colors.$colorMutedForeground,
           })}
         >
           <CopyButton
@@ -329,7 +329,7 @@ function SectionContentDetailsListItem({
           display: 'flex',
           alignItems: 'center',
           gap: t.space.$0x25,
-          color: t.colors.$colorTextSecondary,
+          color: t.colors.$colorMutedForeground,
         })}
       >
         {typeof value === 'string' ? (
@@ -428,7 +428,7 @@ function CopyButton({ text, copyLabel = 'Copy' }: { text: string; copyLabel?: st
         borderRadius: t.radii.$sm,
         '&:focus-visible': {
           outline: '2px solid',
-          outlineColor: t.colors.$neutralAlpha200,
+          outlineColor: t.colors.$colorRing,
         },
       })}
       focusRing={false}

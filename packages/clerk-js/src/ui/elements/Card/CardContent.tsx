@@ -66,7 +66,7 @@ export const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>((p
             />
           }
           sx={t => ({
-            color: t.colors.$colorTextSecondary,
+            color: t.colors.$colorMutedForeground,
             zIndex: t.zIndices.$modal,
             position: 'absolute',
             top: t.space.$2,

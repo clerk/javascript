@@ -22,7 +22,7 @@ export const ProviderInitialIcon = (props: ProviderInitialIconProps) => {
         width: t.space.$4,
         height: t.space.$4,
         borderRadius: t.radii.$sm,
-        color: t.colors.$colorTextOnPrimaryBackground,
+        color: t.colors.$colorPrimaryForeground,
         backgroundColor: t.colors.$primary500,
       })}
       {...rest}

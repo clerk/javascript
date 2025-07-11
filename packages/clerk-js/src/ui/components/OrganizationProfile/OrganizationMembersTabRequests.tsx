@@ -72,7 +72,7 @@ export const OrganizationMembersTabRequests = () => {
                       )}
                       sx={t => ({
                         paddingLeft: t.space.$10,
-                        color: t.colors.$colorTextSecondary,
+                        color: t.colors.$colorMutedForeground,
                         [mqu.md]: {
                           paddingLeft: 0,
                         },

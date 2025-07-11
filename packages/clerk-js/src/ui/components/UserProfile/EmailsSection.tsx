@@ -57,7 +57,7 @@ export const EmailsSection = ({ shouldAllowCreation = true }) => {
                 <ProfileSection.Item id='emailAddresses'>
                   <Flex sx={t => ({ overflow: 'hidden', gap: t.space.$1 })}>
                     <Text
-                      sx={t => ({ color: t.colors.$colorText })}
+                      sx={t => ({ color: t.colors.$colorForeground })}
                       truncate
                     >
                       {email.emailAddress}
