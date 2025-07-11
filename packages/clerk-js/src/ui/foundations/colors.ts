@@ -85,6 +85,7 @@ const colors = Object.freeze({
   colorInput: clerkCssVar('color-input', 'white'),
   colorForeground,
   colorMutedForeground,
+  colorMuted: undefined,
   colorInputForeground: clerkCssVar('color-input-foreground', '#131316'),
   colorPrimaryForeground: clerkCssVar('color-primary-foreground', 'white'),
   colorShimmer: clerkCssVar('color-shimmer', 'rgba(255, 255, 255, 0.36)'),

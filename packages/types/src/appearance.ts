@@ -668,6 +668,11 @@ export type Variables = {
    */
   colorForeground?: CssColor;
   /**
+   * The background color for elements of lower importance, eg: a muted background.
+   * his color is a lighter shade of {@link Variables.background} and {@link Variables.colorNeutral}.
+   */
+  colorMuted?: CssColor;
+  /**
    * The text color for elements of lower importance, eg: a subtitle text.
    * This color is a lighter shade of {@link Variables.colorText}.
    * @deprecated Use {@link Variables.colorMutedForeground} instead.
