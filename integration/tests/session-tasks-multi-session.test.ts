@@ -80,10 +80,11 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
       await u.po.userButton.waitForMounted();
       await u.po.userButton.toggleTrigger();
       await u.po.userButton.waitForPopover();
-      await u.po.userButton.switchAccount(user2.firstName);
+      await u.po.userButton.toHaveVisibleMenuItems([/Manage account/i, /Sign out$/i]);
+      await u.po.userButton.switchAccount(user2.email);
 
       // Resolve task
-      await u.page.waitForAppUrl('/sign-in/tasks/add-organization');
+      await u.po.signIn.waitForMounted();
       const fakeOrganization2 = u.services.organizations.createFakeOrganization();
       await u.po.sessionTask.resolveForceOrganizationSelectionTask(fakeOrganization2);
       await u.po.expect.toHaveResolvedTask();
