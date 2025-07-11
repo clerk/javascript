@@ -4,33 +4,21 @@ import type {
   ClerkAPIResponseError as ClerkAPIResponseErrorInterface,
 } from '@clerk/types';
 
-/**
- *
- */
 export function isUnauthorizedError(e: any): boolean {
   const status = e?.status;
   const code = e?.errors?.[0]?.code;
   return code === 'authentication_invalid' && status === 401;
 }
 
-/**
- *
- */
 export function isCaptchaError(e: ClerkAPIResponseError): boolean {
   return ['captcha_invalid', 'captcha_not_enabled', 'captcha_missing_token'].includes(e.errors[0].code);
 }
 
-/**
- *
- */
 export function is4xxError(e: any): boolean {
   const status = e?.status;
   return !!status && status >= 400 && status < 500;
 }
 
-/**
- *
- */
 export function isNetworkError(e: any): boolean {
   // TODO: revise during error handling epic
   const message = (`${e.message}${e.name}` || '').toLowerCase().replace(/\s+/g, '');
@@ -52,16 +40,10 @@ export interface MetamaskError extends Error {
   data?: unknown;
 }
 
-/**
- *
- */
 export function isKnownError(error: any): error is ClerkAPIResponseError | ClerkRuntimeError | MetamaskError {
   return isClerkAPIResponseError(error) || isMetamaskError(error) || isClerkRuntimeError(error);
 }
 
-/**
- *
- */
 export function isClerkAPIResponseError(err: any): err is ClerkAPIResponseError {
   return 'clerkError' in err;
 }
@@ -86,44 +68,26 @@ export function isClerkRuntimeError(err: any): err is ClerkRuntimeError {
   return 'clerkRuntimeError' in err;
 }
 
-/**
- *
- */
 export function isReverificationCancelledError(err: any) {
   return isClerkRuntimeError(err) && err.code === 'reverification_cancelled';
 }
 
-/**
- *
- */
 export function isMetamaskError(err: any): err is MetamaskError {
   return 'code' in err && [4001, 32602, 32603].includes(err.code) && 'message' in err;
 }
 
-/**
- *
- */
 export function isUserLockedError(err: any) {
   return isClerkAPIResponseError(err) && err.errors?.[0]?.code === 'user_locked';
 }
 
-/**
- *
- */
 export function isPasswordPwnedError(err: any) {
   return isClerkAPIResponseError(err) && err.errors?.[0]?.code === 'form_password_pwned';
 }
 
-/**
- *
- */
 export function parseErrors(data: ClerkAPIErrorJSON[] = []): ClerkAPIError[] {
   return data.length > 0 ? data.map(parseError) : [];
 }
 
-/**
- *
- */
 export function parseError(error: ClerkAPIErrorJSON): ClerkAPIError {
   return {
     code: error.code,
@@ -140,9 +104,6 @@ export function parseError(error: ClerkAPIErrorJSON): ClerkAPIError {
   };
 }
 
-/**
- *
- */
 export function errorToJSON(error: ClerkAPIError | null): ClerkAPIErrorJSON {
   return {
     code: error?.code || '',
@@ -256,9 +217,6 @@ export class EmailLinkError extends Error {
   }
 }
 
-/**
- *
- */
 export function isEmailLinkError(err: Error): err is EmailLinkError {
   return err.name === 'EmailLinkError';
 }
@@ -317,20 +275,9 @@ export interface ErrorThrower {
   throw(message: string): never;
 }
 
-/**
- *
- */
 export function buildErrorThrower({ packageName, customMessages }: ErrorThrowerOptions): ErrorThrower {
   let pkg = packageName;
 
-  const messages = {
-    ...DefaultMessages,
-    ...customMessages,
-  };
-
-  /**
-   *
-   */
   function buildMessage(rawMessage: string, replacements?: Record<string, string | number>) {
     if (!replacements) {
       return `${pkg}: ${rawMessage}`;
@@ -346,6 +293,11 @@ export function buildErrorThrower({ packageName, customMessages }: ErrorThrowerO
 
     return `${pkg}: ${msg}`;
   }
+
+  const messages = {
+    ...DefaultMessages,
+    ...customMessages,
+  };
 
   return {
     setPackageName({ packageName }: ErrorThrowerOptions): ErrorThrower {
