@@ -731,8 +731,8 @@ export type Variables = {
    */
   colorRing?: CssColor;
   /**
-   * The color of the shadow used in card components.
-   * @default 'rgba(25, 28, 33, 0.20)'
+   * The color used as the base for all shadows.
+   * @default '#000000'
    */
   colorShadow?: CssColor;
   /**
