@@ -1209,15 +1209,16 @@ export class Clerk implements ClerkInterface {
         }
       }
 
-      if (newSession?.status === 'pending') {
-        await this.#handlePendingSession(newSession);
-        return;
-      }
-
       /**
        * Hint to each framework, that the user will be signed out when `{session: null}` is provided.
        */
       await onBeforeSetActive(newSession === null ? 'sign-out' : undefined);
+
+      if (newSession?.status === 'pending') {
+        await this.#handlePendingSession(newSession);
+        await onAfterSetActive();
+        return;
+      }
 
       //1. setLastActiveSession to passed user session (add a param).
       //   Note that this will also update the session's active organization
