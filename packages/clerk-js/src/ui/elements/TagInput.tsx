@@ -122,7 +122,7 @@ export const TagInput = (props: TagInputProps) => {
           maxWidth: '100%',
           padding: `${t.space.$1x5} ${t.space.$2}`,
           backgroundColor: t.colors.$colorInputBackground,
-          color: t.colors.$colorInputText,
+          color: t.colors.$colorInputForeground,
           minHeight: t.sizes.$20,
           maxHeight: t.sizes.$60,
           overflowY: 'auto',

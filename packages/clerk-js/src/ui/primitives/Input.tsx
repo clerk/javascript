@@ -11,7 +11,7 @@ const { applyVariants, filterProps } = createVariants((theme, props) => ({
     margin: 0,
     padding: `${theme.space.$1x5} ${theme.space.$3}`,
     backgroundColor: theme.colors.$colorInputBackground,
-    color: theme.colors.$colorInputText,
+    color: theme.colors.$colorInputForeground,
     // outline support for Windows contrast themes
     outline: 'transparent solid 2px',
     outlineOffset: '2px',

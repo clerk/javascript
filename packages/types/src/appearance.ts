@@ -687,9 +687,15 @@ export type Variables = {
   colorBackground?: CssColor;
   /**
    * The default text color inside input elements. To customise the input background color instead, use {@link Variables.colorInputBackground}.
+   * @deprecated Use {@link Variables.colorInputForeground} instead.
    * @default 'black'
    */
   colorInputText?: CssColor;
+  /**
+   * The default text color inside input elements. To customise the input background color instead, use {@link Variables.colorInputBackground}.
+   * @default 'black'
+   */
+  colorInputForeground?: CssColor;
   /**
    * The background color for all input elements.
    * @default 'white'
