@@ -8,7 +8,7 @@ export const dark = experimental_createTheme({
     colorPrimaryForeground: 'black',
     colorForeground: 'white',
     colorInputForeground: 'white',
-    colorInputBackground: '#26262B',
+    colorInput: '#26262B',
   },
   elements: {
     providerIcon__apple: { filter: 'invert(1)' },

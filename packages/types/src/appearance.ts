@@ -698,9 +698,15 @@ export type Variables = {
   colorInputForeground?: CssColor;
   /**
    * The background color for all input elements.
+   * @deprecated Use {@link Variables.colorInput} instead.
    * @default 'white'
    */
   colorInputBackground?: CssColor;
+  /**
+   * The background color for all input elements.
+   * @default 'white'
+   */
+  colorInput?: CssColor;
   /**
    * The color of the avatar shimmer
    * @default 'rgba(255, 255, 255, 0.36)'

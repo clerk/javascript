@@ -82,7 +82,7 @@ const colors = Object.freeze({
   avatarBackground: neutralAlphaScale.neutralAlpha400,
   modalBackdrop: neutralAlphaScale.neutralAlpha700,
   colorBackground: clerkCssVar('color-background', 'white'),
-  colorInputBackground: clerkCssVar('color-input-background', 'white'),
+  colorInput: clerkCssVar('color-input', 'white'),
   colorForeground,
   colorMutedForeground,
   colorInputForeground: clerkCssVar('color-input-foreground', '#131316'),

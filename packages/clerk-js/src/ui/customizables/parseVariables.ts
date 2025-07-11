@@ -50,7 +50,9 @@ export const createColorScales = (theme: Theme) => {
       ? colors.toHslaString(variables.colorInputForeground)
       : colors.toHslaString(variables.colorInputText),
     colorBackground: colors.toHslaString(variables.colorBackground),
-    colorInputBackground: colors.toHslaString(variables.colorInputBackground),
+    colorInput: variables.colorInput
+      ? colors.toHslaString(variables.colorInput)
+      : colors.toHslaString(variables.colorInputBackground),
     colorShimmer: colors.toHslaString(variables.colorShimmer),
   });
 };

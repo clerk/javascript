@@ -15,7 +15,7 @@ const themeA = {
     colorSuccess: themeAColor,
     colorWarning: themeAColor,
     colorBackground: themeAColor,
-    colorInputBackground: themeAColor,
+    colorInput: themeAColor,
     colorInputForeground: themeAColor,
     colorText: themeAColor,
     colorPrimaryForeground: themeAColor,
@@ -37,7 +37,7 @@ const themeB = {
     colorSuccess: themeBColor,
     colorWarning: themeBColor,
     colorBackground: themeBColor,
-    colorInputBackground: themeBColor,
+    colorInput: themeBColor,
     colorInputForeground: themeBColor,
     colorText: themeBColor,
     colorPrimaryForeground: themeBColor,
@@ -79,7 +79,7 @@ describe('AppearanceProvider internalTheme flows', () => {
     expect(result.current.parsedInternalTheme.colors.$success500).toBe(knownColors[themeAColor]);
     expect(result.current.parsedInternalTheme.colors.$warning500).toBe(knownColors[themeAColor]);
     expect(result.current.parsedInternalTheme.colors.$colorBackground).toBe(knownColors[themeAColor]);
-    expect(result.current.parsedInternalTheme.colors.$colorInputBackground).toBe(knownColors[themeAColor]);
+    expect(result.current.parsedInternalTheme.colors.$colorInput).toBe(knownColors[themeAColor]);
     expect(result.current.parsedInternalTheme.colors.$colorInputForeground).toBe(knownColors[themeAColor]);
     expect(result.current.parsedInternalTheme.colors.$colorForeground).toBe(knownColors[themeAColor]);
     expect(result.current.parsedInternalTheme.colors.$colorPrimaryForeground).toBe(knownColors[themeAColor]);
@@ -109,7 +109,7 @@ describe('AppearanceProvider internalTheme flows', () => {
     expect(result.current.parsedInternalTheme.colors.$success500).toBe(knownColors[themeBColor]);
     expect(result.current.parsedInternalTheme.colors.$warning500).toBe(knownColors[themeBColor]);
     expect(result.current.parsedInternalTheme.colors.$colorBackground).toBe(knownColors[themeBColor]);
-    expect(result.current.parsedInternalTheme.colors.$colorInputBackground).toBe(knownColors[themeBColor]);
+    expect(result.current.parsedInternalTheme.colors.$colorInput).toBe(knownColors[themeBColor]);
     expect(result.current.parsedInternalTheme.colors.$colorInputForeground).toBe(knownColors[themeBColor]);
     expect(result.current.parsedInternalTheme.colors.$colorForeground).toBe(knownColors[themeBColor]);
     expect(result.current.parsedInternalTheme.colors.$colorPrimaryForeground).toBe(knownColors[themeBColor]);
@@ -140,7 +140,7 @@ describe('AppearanceProvider internalTheme flows', () => {
     expect(result.current.parsedInternalTheme.colors.$success500).toBe(knownColors[themeBColor]);
     expect(result.current.parsedInternalTheme.colors.$warning500).toBe(knownColors[themeBColor]);
     expect(result.current.parsedInternalTheme.colors.$colorBackground).toBe(knownColors[themeBColor]);
-    expect(result.current.parsedInternalTheme.colors.$colorInputBackground).toBe(knownColors[themeBColor]);
+    expect(result.current.parsedInternalTheme.colors.$colorInput).toBe(knownColors[themeBColor]);
     expect(result.current.parsedInternalTheme.colors.$colorInputForeground).toBe(knownColors[themeBColor]);
     expect(result.current.parsedInternalTheme.colors.$colorForeground).toBe(knownColors[themeBColor]);
     expect(result.current.parsedInternalTheme.colors.$colorPrimaryForeground).toBe(knownColors[themeBColor]);
