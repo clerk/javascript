@@ -15,7 +15,7 @@ export type ClerkOptions = CreateBackendApiOptions &
   Partial<
     Pick<
       CreateAuthenticateRequestOptions['options'],
-      'audience' | 'jwtKey' | 'proxyUrl' | 'secretKey' | 'publishableKey' | 'domain' | 'isSatellite'
+      'audience' | 'jwtKey' | 'proxyUrl' | 'secretKey' | 'publishableKey' | 'domain' | 'isSatellite' | 'outageResilienceConfig'
     >
   > & { sdkMetadata?: SDKMetadata; telemetry?: Pick<TelemetryCollectorOptions, 'disabled' | 'debug'> };
 
@@ -164,3 +164,12 @@ export type {
  */
 export type { AuthObject, InvalidTokenAuthObject } from './tokens/authObjects';
 export type { SessionAuthObject, MachineAuthObject } from './tokens/types';
+
+/**
+ * Outage resilience
+ */
+export type { 
+  OutageResilienceConfig, 
+  SdkCapabilityResult, 
+  SdkCapabilityIndicators 
+} from './tokens/outageResilience';
