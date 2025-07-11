@@ -48,7 +48,10 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
       await u.po.expect.toBeSignedIn();
 
       // Resolves task
-      const fakeOrganization = u.services.organizations.createFakeOrganization();
+      const fakeOrganization = Object.assign(u.services.organizations.createFakeOrganization(), {
+        slug: u.services.organizations.createFakeOrganization().slug + '-with-session-tasks',
+      });
+
       await u.po.sessionTask.resolveForceOrganizationSelectionTask(fakeOrganization);
       await u.po.expect.toHaveResolvedTask();
 

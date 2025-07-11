@@ -1,10 +1,10 @@
+import { createClerkClient } from '@clerk/backend';
 import { test } from '@playwright/test';
 
 import { appConfigs } from '../presets';
+import { instanceKeys } from '../presets/envs';
 import type { FakeUser } from '../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../testUtils';
-import { createClerkClient } from '@clerk/backend';
-import { instanceKeys } from '../presets/envs';
 import { createUserService } from '../testUtils/usersService';
 
 testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
@@ -49,6 +49,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
 
       // Resolves task
       const fakeOrganization = u.services.organizations.createFakeOrganization();
+      await u.po.signIn.waitForMounted();
       await u.po.sessionTask.resolveForceOrganizationSelectionTask(fakeOrganization);
       await u.po.expect.toHaveResolvedTask();
 
@@ -56,7 +57,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
       await u.page.waitForAppUrl('/');
     });
 
-    test.skip('with sso, navigate to task on after sign-in', async ({ page, context }) => {
+    test('with sso, navigate to task on after sign-in', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
 
       // Create a clerkClient for the OAuth provider instance
@@ -80,7 +81,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
       await u.po.signIn.enterTestOtpCode();
 
       // Resolves task
-      await u.page.waitForAppUrl('/sign-in/tasks/add-organization');
+      await u.po.signIn.waitForMounted();
       const fakeOrganization = u.services.organizations.createFakeOrganization();
       await u.po.sessionTask.resolveForceOrganizationSelectionTask(fakeOrganization);
       await u.po.expect.toHaveResolvedTask();
