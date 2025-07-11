@@ -245,7 +245,7 @@ export const CheckoutComplete = () => {
               borderRadius: t.radii.$circle,
               backgroundImage: `linear-gradient(180deg, rgba(255, 255, 255, 0.30) 0%, rgba(0, 0, 0, 0.12) 50%, rgba(0, 0, 0, 0.30) 95.31%)`,
               boxShadow: '0px 4px 12px 0px rgba(0, 0, 0, 0.35), 0px 1px 0px 0px rgba(255, 255, 255, 0.05) inset',
-              color: canHover ? t.colors.$success500 : t.colors.$colorText,
+              color: canHover ? t.colors.$success500 : t.colors.$colorForeground,
               ':before': {
                 content: '""',
                 position: 'absolute',
@@ -319,7 +319,7 @@ export const CheckoutComplete = () => {
                 animationDuration: `${transitionDurationValues.slowest}ms`,
                 animationTimingFunction: transitionTiming.bezier,
                 animationFillMode: 'forwards',
-                color: t.colors.$colorText,
+                color: t.colors.$colorForeground,
                 '@keyframes slideUp': {
                   '0%': {
                     transform: 'translateY(30px)',

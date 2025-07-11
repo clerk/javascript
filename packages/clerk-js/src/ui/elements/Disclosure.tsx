@@ -95,7 +95,7 @@ const Trigger = React.forwardRef<HTMLButtonElement, TriggerProps>(({ text }, ref
         fontSize: t.fontSizes.$md,
         justifyContent: 'space-between',
         padding: t.sizes.$3,
-        color: t.colors.$colorText,
+        color: t.colors.$colorForeground,
         borderRadius: t.radii.$lg,
         zIndex: 2,
       })}

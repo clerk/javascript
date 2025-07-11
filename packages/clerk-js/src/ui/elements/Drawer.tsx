@@ -419,7 +419,7 @@ const Close = React.forwardRef<HTMLButtonElement>((_, ref) => {
         />
       }
       sx={t => ({
-        color: t.colors.$colorTextSecondary,
+        color: t.colors.$colorMutedForeground,
         padding: t.space.$3,
         marginInlineStart: 'auto',
       })}

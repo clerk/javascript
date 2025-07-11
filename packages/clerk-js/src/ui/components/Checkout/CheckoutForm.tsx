@@ -383,7 +383,7 @@ const ExistingPaymentSourceForm = withCardStateProvider(
             <SelectOptionList
               sx={t => ({
                 paddingBlock: t.space.$1,
-                color: t.colors.$colorText,
+                color: t.colors.$colorForeground,
               })}
             />
           </Select>

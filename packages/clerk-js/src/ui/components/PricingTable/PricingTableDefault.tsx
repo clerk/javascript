@@ -4,7 +4,6 @@ import * as React from 'react';
 
 import { Switch } from '@/ui/elements/Switch';
 import { Tooltip } from '@/ui/elements/Tooltip';
-import { colors } from '@/ui/utils/colors';
 import { getClosestProfileScrollBox } from '@/ui/utils/getClosestProfileScrollBox';
 
 import { useProtect } from '../../common';
@@ -168,10 +167,7 @@ function Card(props: CardProps) {
         gap: 0,
         gridTemplateRows: 'subgrid',
         gridRow: 'span 5',
-        background: common.mergedColorsBackground(
-          colors.setAlpha(t.colors.$colorBackground, 1),
-          t.colors.$neutralAlpha50,
-        ),
+        background: common.mutedBackground(t),
         borderWidth: t.borderWidths.$normal,
         borderStyle: t.borderStyles.$solid,
         borderColor: t.colors.$neutralAlpha100,

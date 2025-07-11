@@ -179,7 +179,7 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
               gap={1}
               center
             >
-              <Text sx={t => ({ color: t.colors.$colorText })}>{`${
+              <Text sx={t => ({ color: t.colors.$colorForeground })}>{`${
                 providerToDisplayData[account.provider].name
               }`}</Text>
               <Text

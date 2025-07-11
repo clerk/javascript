@@ -33,14 +33,28 @@ export const createColorScales = (theme: Theme) => {
     ...successAlphaScale,
     ...warningAlphaScale,
     primaryHover: colors.adjustForLightness(primaryScale?.primary500),
-    colorTextOnPrimaryBackground: colors.toHslaString(variables.colorTextOnPrimaryBackground),
-    colorText: colors.toHslaString(variables.colorText),
-    colorTextSecondary:
-      colors.toHslaString(variables.colorTextSecondary) || colors.makeTransparent(variables.colorText, 0.35),
-    colorInputText: colors.toHslaString(variables.colorInputText),
+    colorPrimaryForeground: variables.colorPrimaryForeground
+      ? colors.toHslaString(variables.colorPrimaryForeground)
+      : variables.colorTextOnPrimaryBackground
+        ? colors.toHslaString(variables.colorTextOnPrimaryBackground)
+        : undefined,
+    colorForeground: variables.colorForeground
+      ? colors.toHslaString(variables.colorForeground)
+      : colors.toHslaString(variables.colorText),
+    colorMutedForeground: variables.colorMutedForeground
+      ? colors.toHslaString(variables.colorMutedForeground)
+      : variables.colorTextSecondary
+        ? colors.toHslaString(variables.colorTextSecondary)
+        : colors.makeTransparent(variables.colorText, 0.35),
+    colorInputForeground: variables.colorInputForeground
+      ? colors.toHslaString(variables.colorInputForeground)
+      : colors.toHslaString(variables.colorInputText),
     colorBackground: colors.toHslaString(variables.colorBackground),
-    colorInputBackground: colors.toHslaString(variables.colorInputBackground),
+    colorInput: variables.colorInput
+      ? colors.toHslaString(variables.colorInput)
+      : colors.toHslaString(variables.colorInputBackground),
     colorShimmer: colors.toHslaString(variables.colorShimmer),
+    colorMuted: variables.colorMuted ? colors.toHslaString(variables.colorMuted) : undefined,
   });
 };
 
@@ -103,15 +117,16 @@ export const createRadiiUnits = (theme: Theme) => {
 };
 
 export const createSpaceScale = (theme: Theme) => {
-  const { spacingUnit } = theme.variables || {};
-  if (spacingUnit === undefined) {
+  const { spacing, spacingUnit } = theme.variables || {};
+  const spacingValue = spacing ?? spacingUnit;
+  if (spacingValue === undefined) {
     return;
   }
   return fromEntries(
     spaceScaleKeys.map(k => {
       const num = Number.parseFloat(k.replace('x', '.'));
       const percentage = (num / 0.5) * 0.125;
-      return [k, `calc(${spacingUnit} * ${percentage})`];
+      return [k, `calc(${spacingValue} * ${percentage})`];
     }),
   );
 };

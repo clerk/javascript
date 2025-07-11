@@ -99,7 +99,7 @@ const SecretInputWithToggle = ({ apiKeyID }: { apiKeyID: string }) => {
       >
         <Icon
           icon={revealed ? EyeSlash : Eye}
-          sx={t => ({ color: t.colors.$colorTextSecondary })}
+          sx={t => ({ color: t.colors.$colorMutedForeground })}
         />
       </Button>
     </Flex>

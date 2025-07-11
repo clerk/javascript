@@ -71,10 +71,10 @@ const warningAlphaScale = colorOptionToThemedAlphaScale(
   'warningAlpha',
 ) as AlphaScale<'warningAlpha'>;
 
-const colorText = clerkCssVar('color-text', '#212126');
-const colorTextSecondary = clerkCssVar(
-  'color-text-secondary',
-  colorUtils.makeTransparent(colorText, 0.35) || '#747686',
+const colorForeground = clerkCssVar('color-foreground', '#212126');
+const colorMutedForeground = clerkCssVar(
+  'color-muted-foreground',
+  colorUtils.makeTransparent(colorForeground, 0.35) || '#747686',
 );
 
 const colors = Object.freeze({
@@ -82,11 +82,12 @@ const colors = Object.freeze({
   avatarBackground: neutralAlphaScale.neutralAlpha400,
   modalBackdrop: neutralAlphaScale.neutralAlpha700,
   colorBackground: clerkCssVar('color-background', 'white'),
-  colorInputBackground: clerkCssVar('color-input-background', 'white'),
-  colorText,
-  colorTextSecondary,
-  colorInputText: clerkCssVar('color-input-text', '#131316'),
-  colorTextOnPrimaryBackground: clerkCssVar('color-text-on-primary-background', 'white'),
+  colorInput: clerkCssVar('color-input', 'white'),
+  colorForeground,
+  colorMutedForeground,
+  colorMuted: undefined,
+  colorInputForeground: clerkCssVar('color-input-foreground', '#131316'),
+  colorPrimaryForeground: clerkCssVar('color-primary-foreground', 'white'),
   colorShimmer: clerkCssVar('color-shimmer', 'rgba(255, 255, 255, 0.36)'),
   transparent: 'transparent',
   white: 'white',

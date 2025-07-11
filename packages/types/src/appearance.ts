@@ -624,9 +624,16 @@ export type Variables = {
   /**
    * The color of text appearing on top of an element that with a background color of {@link Variables.colorPrimary},
    * eg: solid primary buttons.
+   * @deprecated Use {@link Variables.colorPrimaryForeground} instead.
    * @default 'white'
    */
   colorTextOnPrimaryBackground?: CssColor;
+  /**
+   * The color of text appearing on top of an element that with a background color of {@link Variables.colorPrimary},
+   * eg: solid primary buttons.
+   * @default 'white'
+   */
+  colorPrimaryForeground?: CssColor;
   /**
    * The color used to indicate errors or destructive actions. Set this to your brand's danger color.
    * @default '#EF4444'
@@ -651,15 +658,33 @@ export type Variables = {
   colorNeutral?: CssColorOrAlphaScale;
   /**
    * The default text color.
+   * @deprecated Use {@link Variables.colorForeground} instead.
    * @default '#212126'
    */
   colorText?: CssColor;
+  /**
+   * The default text color.
+   * @default 'inherit'
+   */
+  colorForeground?: CssColor;
+  /**
+   * The background color for elements of lower importance, eg: a muted background.
+   * his color is a lighter shade of {@link Variables.background} and {@link Variables.colorNeutral}.
+   */
+  colorMuted?: CssColor;
+  /**
+   * The text color for elements of lower importance, eg: a subtitle text.
+   * This color is a lighter shade of {@link Variables.colorText}.
+   * @deprecated Use {@link Variables.colorMutedForeground} instead.
+   * @default '#747686'
+   */
+  colorTextSecondary?: CssColor;
   /**
    * The text color for elements of lower importance, eg: a subtitle text.
    * This color is a lighter shade of {@link Variables.colorText}.
    * @default '#747686'
    */
-  colorTextSecondary?: CssColor;
+  colorMutedForeground?: CssColor;
   /**
    * The background color for the card container.
    * @default 'white'
@@ -667,14 +692,26 @@ export type Variables = {
   colorBackground?: CssColor;
   /**
    * The default text color inside input elements. To customise the input background color instead, use {@link Variables.colorInputBackground}.
+   * @deprecated Use {@link Variables.colorInputForeground} instead.
    * @default 'black'
    */
   colorInputText?: CssColor;
   /**
+   * The default text color inside input elements. To customise the input background color instead, use {@link Variables.colorInputBackground}.
+   * @default 'black'
+   */
+  colorInputForeground?: CssColor;
+  /**
    * The background color for all input elements.
+   * @deprecated Use {@link Variables.colorInput} instead.
    * @default 'white'
    */
   colorInputBackground?: CssColor;
+  /**
+   * The background color for all input elements.
+   * @default 'white'
+   */
+  colorInput?: CssColor;
   /**
    * The color of the avatar shimmer
    * @default 'rgba(255, 255, 255, 0.36)'
@@ -717,9 +754,15 @@ export type Variables = {
   borderRadius?: CssLengthUnit;
   /**
    * The base spacing unit that all margins, paddings and gaps between the elements are derived from.
+   * @deprecated Use {@link Variables.spacing} instead.
    * @default '1rem'
    */
   spacingUnit?: CssLengthUnit;
+  /**
+   * The base spacing that all margins, paddings and gaps between the elements are derived from.
+   * @default '1rem'
+   */
+  spacing?: CssLengthUnit;
 };
 
 export type BaseThemeTaggedType = { __type: 'prebuilt_appearance' };
