@@ -272,10 +272,10 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
 
     if (typeof window !== 'undefined' && window.Clerk) {
       const windowClerk = window.Clerk;
-      
+
       if (isWindowClerkWithMetadata(windowClerk) && windowClerk.constructor.sdkMetadata) {
         const { name, version } = windowClerk.constructor.sdkMetadata;
-        
+
         // Only update properties if they exist to avoid overwriting with undefined
         if (name !== undefined) {
           sdkMetadata.name = name;
