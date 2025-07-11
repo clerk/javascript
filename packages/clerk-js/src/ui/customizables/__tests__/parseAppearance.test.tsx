@@ -25,7 +25,7 @@ const themeA = {
     fontFamilyButtons: 'Comic Sans',
     fontSize: '1rem',
     fontWeight: { normal: 600 },
-    spacing: 'px',
+    spacing: '1px',
   },
 } as const;
 
@@ -47,7 +47,7 @@ const themeB = {
     fontFamilyButtons: 'Arial',
     fontSize: '2rem',
     fontWeight: { normal: 700 },
-    spacing: 'px',
+    spacing: '1px',
   },
 } as const;
 
