@@ -508,7 +508,7 @@ describe('createCheckoutManager', () => {
       expect(state.fetchStatus).toBe('fetching');
 
       // Resolve the operation
-      resolveOperation!(mockCheckout);
+      resolveOperation?.(mockCheckout);
       await operationPromise;
 
       // Now clearing should work

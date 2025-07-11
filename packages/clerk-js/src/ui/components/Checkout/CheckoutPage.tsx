@@ -22,8 +22,14 @@ const Root = ({ children }: { children: React.ReactNode }) => {
   return (
     <CheckoutProvider
       for={subscriberType === 'org' ? 'organization' : undefined}
-      planId={planId!}
-      planPeriod={planPeriod!}
+      planId={
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        planId!
+      }
+      planPeriod={
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        planPeriod!
+      }
     >
       <Initiator />
       {children}
