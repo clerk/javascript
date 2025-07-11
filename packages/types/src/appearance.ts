@@ -718,8 +718,8 @@ export type Variables = {
    */
   colorShimmer?: CssColor;
   /**
-   * The color of the ring when and interactive element is focused.
-   * @default 'rgba(255, 255, 255, 0.36)'
+   * The color of the ring when an interactive element is focused.
+   * @default {@link Variables.colorNeutral} at 15% opacity
    */
   colorRing?: CssColor;
   /**
