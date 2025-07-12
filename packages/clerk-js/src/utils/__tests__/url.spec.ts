@@ -422,6 +422,7 @@ describe('isRedirectForFAPIInitiatedFlow(frontendAp: string, redirectUrl: string
     ['clerk.foo.bar-53.lcl.dev', 'https://clerk.foo.bar-53.lcl.dev/oauth/authorize', true],
     ['clerk.foo.bar-53.lcl.dev', 'https://clerk.foo.bar-53.lcl.dev/v1/verify', true],
     ['clerk.foo.bar-53.lcl.dev', 'https://clerk.foo.bar-53.lcl.dev/v1/tickets/accept', true],
+    ['clerk.foo.bar-53.lcl.dev', 'https://clerk.foo.bar-53.lcl.dev/oauth/authorize-with-immediate-redirect', true],
     ['clerk.foo.bar-53.lcl.dev', 'https://google.com', false],
     ['clerk.foo.bar-53.lcl.dev', 'https://google.com/v1/verify', false],
   ];
@@ -441,6 +442,7 @@ describe('requiresUserInput(redirectUrl: string)', () => {
     ['https://clerk.foo.bar-53.lcl.dev/oauth/authorize', true],
     ['https://clerk.foo.bar-53.lcl.dev/v1/verify', false],
     ['https://clerk.foo.bar-53.lcl.dev/v1/tickets/accept', false],
+    ['https://clerk.foo.bar-53.lcl.dev/oauth/authorize-with-immediate-redirect', false],
     ['https://google.com', false],
     ['https://google.com/v1/verify', false],
   ];

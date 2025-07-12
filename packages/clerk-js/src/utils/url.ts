@@ -337,6 +337,7 @@ const frontendApiRedirectPathsWithUserInput: string[] = [
 const frontendApiRedirectPathsNoUserInput: string[] = [
   '/v1/verify', // magic links
   '/v1/tickets/accept', // ticket flow
+  '/oauth/authorize-with-immediate-redirect', // Similiar to OAuth Authorize, but even if a user is signed out - we immediately redirect
 ];
 
 export function isRedirectForFAPIInitiatedFlow(frontendApi: string, redirectUrl: string): boolean {
