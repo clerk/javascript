@@ -143,7 +143,51 @@
       ],
       "outputs": []
     },
+    "format": {
+      "inputs": [
+        "**/*.js",
+        "**/*.jsx",
+        "**/*.ts",
+        "**/*.tsx",
+        "**/*.json",
+        "**/*.md",
+        "**/*.mdx",
+        "**/*.vue",
+        "**/*.astro",
+        "**/*.css",
+        "**/*.scss",
+        "**/*.html",
+        "!**/__snapshots__/**",
+        "!CHANGELOG.md",
+        "!coverage/**",
+        "!dist/**",
+        "!examples/**",
+        "!node_modules/**"
+      ],
+      "outputs": [],
+      "cache": false
+    },
     "format:check": {
+      "inputs": [
+        "**/*.js",
+        "**/*.jsx",
+        "**/*.ts",
+        "**/*.tsx",
+        "**/*.json",
+        "**/*.md",
+        "**/*.mdx",
+        "**/*.vue",
+        "**/*.astro",
+        "**/*.css",
+        "**/*.scss",
+        "**/*.html",
+        "!**/__snapshots__/**",
+        "!CHANGELOG.md",
+        "!coverage/**",
+        "!dist/**",
+        "!examples/**",
+        "!node_modules/**"
+      ],
       "outputs": []
     },
     "//#test:integration:ap-flows": {
