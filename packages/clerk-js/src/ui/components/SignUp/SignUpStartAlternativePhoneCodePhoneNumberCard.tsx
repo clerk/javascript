@@ -5,11 +5,11 @@ import { useCardState } from '@/ui/elements/contexts';
 import { Form } from '@/ui/elements/Form';
 import { Header } from '@/ui/elements/Header';
 import { LegalCheckbox } from '@/ui/elements/LegalConsentCheckbox';
+import type { FormControlState } from '@/ui/utils/useFormControl';
 
 import { Button, Col, descriptors, Flex, Image, localizationKeys } from '../../customizables';
 import { CaptchaElement } from '../../elements/CaptchaElement';
 import { useEnabledThirdPartyProviders } from '../../hooks';
-import type { FormControlState } from '../../utils';
 import type { Fields } from './signUpFormHelpers';
 
 type SignUpFormProps = {
@@ -75,7 +75,9 @@ export const SignUpStartAlternativePhoneCodePhoneNumberCard = (props: SignUpForm
               <Form.ControlRow elementId='phoneNumber'>
                 <Form.PhoneInput
                   {...formState.phoneNumber.props}
-                  label={localizationKeys('signUp.start.alternativePhoneCodeProvider.label', { provider })}
+                  label={localizationKeys('signUp.start.alternativePhoneCodeProvider.label', {
+                    provider: provider || '',
+                  })}
                   isRequired
                   isOptional={false}
                   actionLabel={undefined}

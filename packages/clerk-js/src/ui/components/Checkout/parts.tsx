@@ -1,15 +1,17 @@
+import { __experimental_useCheckout as useCheckout } from '@clerk/shared/react';
+import { useMemo } from 'react';
+
 import { Alert } from '@/ui/elements/Alert';
 import { Drawer, useDrawerContext } from '@/ui/elements/Drawer';
 import { LineItems } from '@/ui/elements/LineItems';
 
 import { useCheckoutContext } from '../../contexts';
 import { Box, descriptors, Flex, localizationKeys, useLocalizations } from '../../customizables';
-// TODO(@COMMERCE): Is this causing bundle size  issues ?
 import { EmailForm } from '../UserProfile/EmailForm';
-import { useCheckoutContextRoot } from './CheckoutPage';
 
 export const GenericError = () => {
-  const { errors } = useCheckoutContextRoot();
+  const { checkout } = useCheckout();
+
   const { translateError } = useLocalizations();
   const { t } = useLocalizations();
   return (
@@ -27,18 +29,26 @@ export const GenericError = () => {
           variant='danger'
           colorScheme='danger'
         >
-          {errors ? translateError(errors[0]) : t(localizationKeys('unstable__errors.form_param_value_invalid'))}
+          {checkout.error
+            ? translateError(checkout.error.errors[0])
+            : t(localizationKeys('unstable__errors.form_param_value_invalid'))}
         </Alert>
       </Flex>
     </Drawer.Body>
   );
 };
 
-export const InvalidPlanError = () => {
-  const { plan } = useCheckoutContextRoot();
+export const InvalidPlanScreen = () => {
   const { planPeriod } = useCheckoutContext();
+  const { checkout } = useCheckout();
+  const error = checkout.error;
 
-  if (!plan) {
+  const planFromError = useMemo(() => {
+    const _error = error?.errors.find(e => e.code === 'invalid_plan_change');
+    return _error?.meta?.plan;
+  }, [error]);
+
+  if (!planFromError) {
     return null;
   }
 
@@ -60,12 +70,12 @@ export const InvalidPlanError = () => {
           <LineItems.Root>
             <LineItems.Group>
               <LineItems.Title
-                title={plan.name}
+                title={planFromError.name}
                 description={planPeriod === 'annual' ? localizationKeys('commerce.billedAnnually') : undefined}
               />
               <LineItems.Description
                 prefix={planPeriod === 'annual' ? 'x12' : undefined}
-                text={`${plan.currencySymbol}${planPeriod === 'month' ? plan.amountFormatted : plan.annualMonthlyAmountFormatted}`}
+                text={`${planFromError.currency_symbol}${planPeriod === 'month' ? planFromError.amount_formatted : planFromError.annual_monthly_amount_formatted}`}
                 suffix={localizationKeys('commerce.checkout.perMonth')}
               />
             </LineItems.Group>
@@ -84,7 +94,7 @@ export const InvalidPlanError = () => {
 };
 
 export const AddEmailForm = () => {
-  const { startCheckout } = useCheckoutContextRoot();
+  const { checkout } = useCheckout();
   const { setIsOpen } = useDrawerContext();
   return (
     <Drawer.Body>
@@ -93,11 +103,10 @@ export const AddEmailForm = () => {
           padding: t.space.$4,
         })}
       >
-        {/* TODO(@COMMERCE): How does ths operate for orgs ? */}
         <EmailForm
           title={localizationKeys('commerce.checkout.emailForm.title')}
           subtitle={localizationKeys('commerce.checkout.emailForm.subtitle')}
-          onSuccess={startCheckout}
+          onSuccess={() => void checkout.start()}
           onReset={() => setIsOpen(false)}
           disableAutoFocus
         />

@@ -1,11 +1,12 @@
 import React from 'react';
 
+import { colors } from '@/ui/utils/colors';
+
 import { useEnvironment } from '../../contexts';
 import { descriptors, Flex, Link, localizationKeys, useAppearance } from '../../customizables';
 import { useDevMode } from '../../hooks/useDevMode';
 import type { InternalTheme, PropsOfComponent } from '../../styledSystem';
 import { common, mqu } from '../../styledSystem';
-import { colors } from '../../utils';
 import { Card } from '.';
 
 type CardFooterProps = PropsOfComponent<typeof Flex> & {
@@ -48,7 +49,7 @@ export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>((pro
       elementDescriptor={descriptors.footer}
       sx={[
         t => ({
-          marginTop: `-${t.space.$2}`,
+          marginTop: `calc(${t.space.$2} * -1)`,
           paddingTop: t.space.$2,
           background: common.mergedColorsBackground(
             colors.setAlpha(t.colors.$colorBackground, 1),

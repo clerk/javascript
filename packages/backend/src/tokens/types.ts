@@ -1,7 +1,16 @@
 import type { MatchFunction } from '@clerk/shared/pathToRegexp';
+import type { PendingSessionOptions } from '@clerk/types';
 
 import type { ApiClient, APIKey, IdPOAuthAccessToken, MachineToken } from '../api';
-import type { TokenType } from './tokenTypes';
+import type {
+  AuthenticatedMachineObject,
+  AuthObject,
+  InvalidTokenAuthObject,
+  SignedInAuthObject,
+  SignedOutAuthObject,
+  UnauthenticatedMachineObject,
+} from './authObjects';
+import type { SessionTokenType, TokenType } from './tokenTypes';
 import type { VerifyTokenOptions } from './verify';
 
 /**
@@ -60,6 +69,9 @@ export type AuthenticateRequestOptions = {
   acceptsToken?: TokenType | TokenType[] | 'any';
 } & VerifyTokenOptions;
 
+/**
+ * @inline
+ */
 export type OrganizationSyncOptions = {
   /**
    * Specifies URL patterns that are organization-specific, containing an organization ID or slug as a path parameter. If a request matches this path, the organization identifier will be used to set that org as active.
@@ -68,8 +80,7 @@ export type OrganizationSyncOptions = {
    *
    * Patterns must have a path parameter named either `:id` (to match a Clerk organization ID) or `:slug` (to match a Clerk organization slug).
    *
-   * > [!WARNING]
-   * > If the organization can't be activated—either because it doesn't exist or the user lacks access—the previously active organization will remain unchanged. Components must detect this case and provide an appropriate error and/or resolution pathway, such as calling `notFound()` or displaying an [`<OrganizationSwitcher />`](https://clerk.com/docs/components/organization/organization-switcher).
+   * If the organization can't be activated—either because it doesn't exist or the user lacks access—the previously active organization will remain unchanged. Components must detect this case and provide an appropriate error and/or resolution pathway, such as calling `notFound()` or displaying an [`<OrganizationSwitcher />`](https://clerk.com/docs/components/organization/organization-switcher).
    *
    * @example
    * ["/orgs/:slug", "/orgs/:slug/(.*)"]
@@ -81,7 +92,7 @@ export type OrganizationSyncOptions = {
   organizationPatterns?: Pattern[];
 
   /**
-   * URL patterns for resources that exist within the context of a [Clerk Personal Account](https://clerk.com/docs/organizations/organization-workspaces#organization-workspaces-in-the-clerk-dashboard:~:text=Personal%20account) (user-specific, outside any organization).
+   * URL patterns for resources that exist within the context of a [Clerk Personal Account](https://clerk.com/docs/organizations/organization-workspaces) (user-specific, outside any organization).
    *
    * If the route also matches the `organizationPattern` prop, the `organizationPattern` prop takes precedence.
    *
@@ -139,3 +150,83 @@ export type OrganizationSyncTargetMatchers = {
 export type OrganizationSyncTarget =
   | { type: 'personalAccount' }
   | { type: 'organization'; organizationId?: string; organizationSlug?: string };
+
+/**
+ * Infers auth object type from an array of token types.
+ * - Session token only -> SessionType
+ * - Mixed tokens -> SessionType | MachineType
+ * - Machine tokens only -> MachineType
+ */
+export type InferAuthObjectFromTokenArray<
+  T extends readonly TokenType[],
+  SessionType extends AuthObject,
+  MachineType extends AuthObject,
+> = SessionTokenType extends T[number]
+  ? T[number] extends SessionTokenType
+    ? SessionType
+    : SessionType | (MachineType & { tokenType: Exclude<T[number], SessionTokenType> })
+  : MachineType & { tokenType: Exclude<T[number], SessionTokenType> };
+
+/**
+ * Infers auth object type from a single token type.
+ * Returns SessionType for session tokens, or MachineType for machine tokens.
+ */
+export type InferAuthObjectFromToken<
+  T extends TokenType,
+  SessionType extends AuthObject,
+  MachineType extends AuthObject,
+> = T extends SessionTokenType ? SessionType : MachineType & { tokenType: Exclude<T, SessionTokenType> };
+
+export type SessionAuthObject = SignedInAuthObject | SignedOutAuthObject;
+export type MachineAuthObject<T extends Exclude<TokenType, SessionTokenType>> = T extends any
+  ? AuthenticatedMachineObject<T> | UnauthenticatedMachineObject<T>
+  : never;
+
+type AuthOptions = PendingSessionOptions & { acceptsToken?: AuthenticateRequestOptions['acceptsToken'] };
+
+type MaybePromise<T, IsPromise extends boolean> = IsPromise extends true ? Promise<T> : T;
+
+/**
+ * Shared generic overload type for getAuth() helpers across SDKs.
+ *
+ * - Parameterized by the request type (RequestType).
+ * - Handles different accepted token types and their corresponding return types.
+ */
+export interface GetAuthFn<RequestType, ReturnsPromise extends boolean = false> {
+  /**
+   * @example
+   * const auth = await getAuth(req, { acceptsToken: ['session_token', 'api_key'] })
+   */
+  <T extends TokenType[]>(
+    req: RequestType,
+    options: AuthOptions & { acceptsToken: T },
+  ): MaybePromise<
+    | InferAuthObjectFromTokenArray<T, SessionAuthObject, MachineAuthObject<Exclude<T[number], SessionTokenType>>>
+    | InvalidTokenAuthObject,
+    ReturnsPromise
+  >;
+
+  /**
+   * @example
+   * const auth = await getAuth(req, { acceptsToken: 'session_token' })
+   */
+  <T extends TokenType>(
+    req: RequestType,
+    options: AuthOptions & { acceptsToken: T },
+  ): MaybePromise<
+    InferAuthObjectFromToken<T, SessionAuthObject, MachineAuthObject<Exclude<T, SessionTokenType>>>,
+    ReturnsPromise
+  >;
+
+  /**
+   * @example
+   * const auth = await getAuth(req, { acceptsToken: 'any' })
+   */
+  (req: RequestType, options: AuthOptions & { acceptsToken: 'any' }): MaybePromise<AuthObject, ReturnsPromise>;
+
+  /**
+   * @example
+   * const auth = await getAuth(req)
+   */
+  (req: RequestType, options?: PendingSessionOptions): MaybePromise<SessionAuthObject, ReturnsPromise>;
+}

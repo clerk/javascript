@@ -1,4 +1,7 @@
+import type { ClerkAPIResponseError } from './api';
+import type { APIKeysNamespace } from './apiKeys';
 import type {
+  APIKeysTheme,
   Appearance,
   CheckoutTheme,
   CreateOrganizationTheme,
@@ -18,9 +21,11 @@ import type {
 import type { ClientResource } from './client';
 import type {
   CommerceBillingNamespace,
+  CommerceCheckoutResource,
   CommercePlanResource,
   CommerceSubscriberType,
   CommerceSubscriptionPlanPeriod,
+  ConfirmCheckoutParams,
 } from './commerce';
 import type { CustomMenuItem } from './customMenuItems';
 import type { CustomPage } from './customPages';
@@ -52,6 +57,44 @@ import type { TelemetryCollector } from './telemetry';
 import type { UserResource } from './user';
 import type { Autocomplete, DeepPartial, DeepSnakeToCamel } from './utils';
 import type { WaitlistResource } from './waitlist';
+
+type __experimental_CheckoutStatus = 'awaiting_initialization' | 'awaiting_confirmation' | 'completed';
+
+export type __experimental_CheckoutCacheState = Readonly<{
+  isStarting: boolean;
+  isConfirming: boolean;
+  error: ClerkAPIResponseError | null;
+  checkout: CommerceCheckoutResource | null;
+  fetchStatus: 'idle' | 'fetching' | 'error';
+  status: __experimental_CheckoutStatus;
+}>;
+
+export type __experimental_CheckoutOptions = {
+  for?: 'organization';
+  planPeriod: CommerceSubscriptionPlanPeriod;
+  planId: string;
+};
+
+type CheckoutResult =
+  | {
+      data: CommerceCheckoutResource;
+      error: null;
+    }
+  | {
+      data: null;
+      error: ClerkAPIResponseError;
+    };
+
+export type __experimental_CheckoutInstance = {
+  confirm: (params: ConfirmCheckoutParams) => Promise<CheckoutResult>;
+  start: () => Promise<CheckoutResult>;
+  clear: () => void;
+  finalize: (params?: { redirectUrl: string }) => void;
+  subscribe: (listener: (state: __experimental_CheckoutCacheState) => void) => () => void;
+  getState: () => __experimental_CheckoutCacheState;
+};
+
+type __experimental_CheckoutFunction = (options: __experimental_CheckoutOptions) => __experimental_CheckoutInstance;
 
 /**
  * @inline
@@ -182,7 +225,16 @@ export interface Clerk {
   /** Current User. */
   user: UserResource | null | undefined;
 
-  /** Billing Object */
+  /**
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+   * @see https://clerk.com/docs/billing/overview
+   *
+   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+   * @example
+   * ```tsx
+   * <ClerkProvider clerkJsVersion="x.x.x" />
+   * ```
+   */
   billing: CommerceBillingNamespace;
 
   telemetry: TelemetryCollector | undefined;
@@ -460,6 +512,26 @@ export interface Clerk {
   unmountPricingTable: (targetNode: HTMLDivElement) => void;
 
   /**
+   * This API is in early access and may change in future releases.
+   *
+   * Mount a api keys component at the target element.
+   * @experimental
+   * @param targetNode Target to mount the APIKeys component.
+   * @param props Configuration parameters.
+   */
+  mountApiKeys: (targetNode: HTMLDivElement, props?: APIKeysProps) => void;
+
+  /**
+   * This API is in early access and may change in future releases.
+   *
+   * Unmount a api keys component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   * @experimental
+   * @param targetNode Target node to unmount the ApiKeys component from.
+   */
+  unmountApiKeys: (targetNode: HTMLDivElement) => void;
+
+  /**
    * Mounts a OAuth consent component at the target element.
    * @param targetNode Target node to mount the OAuth consent component.
    * @param oauthConsentProps OAuth consent configuration parameters.
@@ -471,6 +543,12 @@ export interface Clerk {
    * @param targetNode Target node to unmount the OAuth consent component from.
    */
   __internal_unmountOAuthConsent: (targetNode: HTMLDivElement) => void;
+
+  /**
+   * @internal
+   * Loads Stripe libraries for commerce functionality
+   */
+  __internal_loadStripeJs: () => Promise<any>;
 
   /**
    * Register a listener that triggers a callback each time important Clerk resources are changed.
@@ -751,6 +829,20 @@ export interface Clerk {
    * initiated outside of the Clerk class.
    */
   __internal_setActiveInProgress: boolean;
+
+  /**
+   * API Keys Object
+   * @experimental
+   * This API is in early access and may change in future releases.
+   */
+  apiKeys: APIKeysNamespace;
+
+  /**
+   * Checkout API
+   * @experimental
+   * This API is in early access and may change in future releases.
+   */
+  __experimental_checkout: __experimental_CheckoutFunction;
 }
 
 export type HandleOAuthCallbackParams = TransferableOption &
@@ -1304,6 +1396,12 @@ export type UserProfileProps = RoutingOptions & {
    * @experimental
    **/
   __experimental_startPath?: string;
+  /**
+   * Specify options for the underlying <APIKeys /> component.
+   * e.g. <UserProfile apiKeysProps={{ showDescription: true }} />
+   * @experimental
+   **/
+  apiKeysProps?: APIKeysProps;
 };
 
 export type UserProfileModalProps = WithoutRouting<UserProfileProps>;
@@ -1329,6 +1427,12 @@ export type OrganizationProfileProps = RoutingOptions & {
    * @experimental
    **/
   __experimental_startPath?: string;
+  /**
+   * Specify options for the underlying <APIKeys /> component.
+   * e.g. <OrganizationProfile apiKeysProps={{ showDescription: true }} />
+   * @experimental
+   **/
+  apiKeysProps?: APIKeysProps;
 };
 
 export type OrganizationProfileModalProps = WithoutRouting<OrganizationProfileProps>;
@@ -1635,6 +1739,58 @@ type PortalRoot = HTMLElement | null | undefined;
 
 export type PricingTableProps = PricingTableBaseProps & PricingTableDefaultProps;
 
+export type APIKeysProps = {
+  /**
+   * The type of API key to filter by.
+   * Currently, only 'api_key' is supported.
+   * @default 'api_key'
+   */
+  type?: 'api_key';
+  /**
+   * The number of API keys to show per page.
+   * @default 5
+   */
+  perPage?: number;
+  /**
+   * Customisation options to fully match the Clerk components to your own brand.
+   * These options serve as overrides and will be merged with the global `appearance`
+   * prop of ClerkProvider (if one is provided)
+   */
+  appearance?: APIKeysTheme;
+  /**
+   * Whether to show the description field in the API key creation form.
+   * @default false
+   */
+  showDescription?: boolean;
+};
+
+export type GetAPIKeysParams = {
+  subject?: string;
+};
+
+export type CreateAPIKeyParams = {
+  type?: 'api_key';
+  name: string;
+  subject?: string;
+  secondsUntilExpiration?: number;
+  description?: string;
+};
+
+export type RevokeAPIKeyParams = {
+  apiKeyID: string;
+  revocationReason?: string;
+};
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+ * @see https://clerk.com/docs/billing/overview
+ *
+ * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+ * @example
+ * ```tsx
+ * <ClerkProvider clerkJsVersion="x.x.x" />
+ * ```
+ */
 export type __internal_CheckoutProps = {
   appearance?: CheckoutTheme;
   planId?: string;
@@ -1651,6 +1807,16 @@ export type __internal_CheckoutProps = {
   onClose?: () => void;
 };
 
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+ * @see https://clerk.com/docs/billing/overview
+ *
+ * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+ * @example
+ * ```tsx
+ * <ClerkProvider clerkJsVersion="x.x.x" />
+ * ```
+ */
 export type __internal_PlanDetailsProps = {
   appearance?: PlanDetailTheme;
   plan?: CommercePlanResource;

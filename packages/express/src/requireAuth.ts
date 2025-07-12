@@ -33,7 +33,10 @@ import type { ClerkMiddlewareOptions, ExpressRequestWithAuth } from './types';
  * router.get('/path', requireAuth(), hasPermission, getHandler)
  */
 export const requireAuth = (options: ClerkMiddlewareOptions = {}): RequestHandler => {
-  const authMiddleware = authenticateAndDecorateRequest(options);
+  const authMiddleware = authenticateAndDecorateRequest({
+    ...options,
+    acceptsToken: 'any',
+  });
 
   return (request, response, next) => {
     authMiddleware(request, response, err => {

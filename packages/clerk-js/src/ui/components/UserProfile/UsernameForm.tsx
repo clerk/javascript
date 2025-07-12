@@ -5,10 +5,12 @@ import { Form } from '@/ui/elements/Form';
 import { FormButtons } from '@/ui/elements/FormButtons';
 import type { FormProps } from '@/ui/elements/FormContainer';
 import { FormContainer } from '@/ui/elements/FormContainer';
+import { handleError } from '@/ui/utils/errorHandler';
+import { useFormControl } from '@/ui/utils/useFormControl';
+import { createUsernameError } from '@/ui/utils/usernameUtils';
 
 import { useEnvironment } from '../../contexts';
 import { localizationKeys, useLocalizations } from '../../customizables';
-import { createUsernameError, handleError, useFormControl } from '../../utils';
 
 type UsernameFormProps = FormProps;
 

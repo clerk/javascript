@@ -13,7 +13,7 @@ import { incomingMessageToRequest, loadApiEnv, loadClientEnv } from './utils';
 
 export const authenticateRequest = (opts: AuthenticateRequestParams) => {
   const { clerkClient, request, options } = opts;
-  const { jwtKey, authorizedParties, audience } = options || {};
+  const { jwtKey, authorizedParties, audience, acceptsToken } = options || {};
 
   const clerkRequest = createClerkRequest(incomingMessageToRequest(request));
   const env = { ...loadApiEnv(), ...loadClientEnv() };
@@ -47,6 +47,7 @@ export const authenticateRequest = (opts: AuthenticateRequestParams) => {
     isSatellite,
     domain,
     signInUrl,
+    acceptsToken,
   });
 };
 
@@ -116,11 +117,13 @@ export const authenticateAndDecorateRequest = (options: ClerkMiddlewareOptions =
       const authHandler = (opts: Parameters<typeof requestState.toAuth>[0]) => requestState.toAuth(opts);
       const authObject = requestState.toAuth();
 
-      const auth = new Proxy(Object.assign(authHandler, authObject), {
-        get(target, prop: string, receiver) {
+      const auth = new Proxy(authHandler, {
+        get(target, prop, receiver) {
           deprecated('req.auth', 'Use `req.auth()` as a function instead.');
-
-          return Reflect.get(target, prop, receiver);
+          // If the property exists on the function, return it
+          if (prop in target) return Reflect.get(target, prop, receiver);
+          // Otherwise, get it from the authObject
+          return authObject?.[prop as keyof typeof authObject];
         },
       });
 

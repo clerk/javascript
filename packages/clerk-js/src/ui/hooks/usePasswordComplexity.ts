@@ -4,7 +4,7 @@ import type { ComplexityErrors, UsePasswordComplexityConfig } from '../../utils/
 import { validate } from '../../utils/passwords/complexity';
 import type { LocalizationKey } from '../localization';
 import { localizationKeys, useLocalizations } from '../localization';
-import { addFullStop, createListFormat } from '../utils';
+import { addFullStop, createListFormat } from '../utils/passwordUtils';
 
 const errorMessages: Record<keyof Omit<ComplexityErrors, 'allowed_special_characters'>, [string, string] | string> = {
   max_length: ['unstable__errors.passwordComplexity.maximumLength', 'length'],

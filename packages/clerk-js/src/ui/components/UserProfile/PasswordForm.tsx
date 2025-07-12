@@ -9,11 +9,13 @@ import type { FormProps } from '@/ui/elements/FormContainer';
 import { FormContainer } from '@/ui/elements/FormContainer';
 import { InformationBox } from '@/ui/elements/InformationBox';
 import type { SuccessPage } from '@/ui/elements/SuccessPage';
+import { handleError } from '@/ui/utils/errorHandler';
+import { createPasswordError } from '@/ui/utils/passwordUtils';
+import { useFormControl } from '@/ui/utils/useFormControl';
 
 import { useEnvironment } from '../../contexts';
 import { localizationKeys, useLocalizations } from '../../customizables';
 import { useConfirmPassword } from '../../hooks';
-import { createPasswordError, handleError, useFormControl } from '../../utils';
 
 const generateSuccessPageText = (userHasPassword: boolean, sessionSignOut: boolean) => {
   const localizedTexts = [];

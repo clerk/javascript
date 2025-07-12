@@ -309,10 +309,45 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       });
       await u.po.checkout.clickPayOrSubscribe();
       await expect(u.po.page.locator('.cl-checkout-root').getByText('The card was declined.').first()).toBeVisible();
-      await u.po.checkout.waitForStipeElements();
+      // It should unmount and remount the payment element
+      await u.po.checkout.waitForStripeElements({ state: 'hidden' });
+      await u.po.checkout.waitForStripeElements({ state: 'visible' });
       await u.po.checkout.fillTestCard();
       await u.po.checkout.clickPayOrSubscribe();
       await expect(u.po.page.locator('.cl-checkout-root').getByText('Payment was successful!')).toBeVisible();
+
+      await fakeUser.deleteIfExists();
+    });
+
+    test('displays notice then plan cannot change', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+
+      const fakeUser = u.services.users.createFakeUser();
+      await u.services.users.createBapiUser(fakeUser);
+
+      await u.po.signIn.goTo();
+      await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+      await u.po.page.goToRelative('/user');
+
+      await u.po.userProfile.waitForMounted();
+      await u.po.userProfile.switchToBillingTab();
+      await u.po.page.getByRole('button', { name: 'Switch plans' }).click();
+      await u.po.pricingTable.startCheckout({ planSlug: 'plus', period: 'annually' });
+      await u.po.checkout.waitForMounted();
+      await u.po.checkout.fillTestCard();
+      await u.po.checkout.clickPayOrSubscribe();
+      await expect(u.po.page.getByText('Payment was successful!')).toBeVisible();
+
+      await u.po.checkout.confirmAndContinue();
+      await u.po.pricingTable.startCheckout({ planSlug: 'pro', shouldSwitch: true, period: 'monthly' });
+      await u.po.checkout.waitForMounted();
+      await expect(
+        page
+          .locator('.cl-checkout-root')
+          .getByText(
+            'You cannot subscribe to this plan by paying monthly. To subscribe to this plan, you need to choose to pay annually',
+          ),
+      ).toBeVisible();
 
       await fakeUser.deleteIfExists();
     });

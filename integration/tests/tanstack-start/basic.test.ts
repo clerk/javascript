@@ -71,5 +71,15 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
 
       expect(clerkInitialState !== undefined).toBeTruthy();
     });
+
+    test('clerk handler sets headers', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+      const r = await u.po.signIn.goTo();
+
+      expect(r.headers()).toMatchObject({
+        'x-clerk-auth-reason': 'session-token-and-uat-missing',
+        'x-clerk-auth-status': 'signed-out',
+      });
+    });
   },
 );

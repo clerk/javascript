@@ -1,5 +1,174 @@
 # Change Log
 
+## 5.71.0
+
+### Minor Changes
+
+- Add CSS variable support to the `appearance.variables` object, enabling use of CSS custom properties. For example, you can now use `colorPrimary: 'var(--brand-color)'` to reference CSS variables defined in your stylesheets. ([#6187](https://github.com/clerk/javascript/pull/6187)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  This feature includes automatic fallback support for browsers that don't support modern CSS color manipulation features.
+
+- Added granular permission checks to `<APIKeys />` component to support read-only and manage roles ([#6253](https://github.com/clerk/javascript/pull/6253)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Remove `@stripe/react-stripe-js` dependency and only allow loading of stripe-js via `Clerk.__internal_loadStripeJs()`. ([#6180](https://github.com/clerk/javascript/pull/6180)) by [@panteliselef](https://github.com/panteliselef)
+
+- Password managers will now autofill OTP code verifications. ([#6247](https://github.com/clerk/javascript/pull/6247)) by [@tmilewski](https://github.com/tmilewski)
+
+- Adds Content Security Policy (CSP) nonce support to the Cloudflare Turnstile ([#6226](https://github.com/clerk/javascript/pull/6226)) by [@jacekradko](https://github.com/jacekradko)
+
+### Patch Changes
+
+- Fix browser back / forward navigation for tabs ([#6264](https://github.com/clerk/javascript/pull/6264)) by [@aeliox](https://github.com/aeliox)
+
+- ([#6109](https://github.com/clerk/javascript/pull/6109)) by [@aeliox](https://github.com/aeliox)
+
+- Fix layout shift when navigating after task resolution ([#6265](https://github.com/clerk/javascript/pull/6265)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`f42c4fe`](https://github.com/clerk/javascript/commit/f42c4fedfdab873129b876eba38b3677f190b460), [`ec207dc`](https://github.com/clerk/javascript/commit/ec207dcd2a13340cfa4e3b80d3d52d1b4e7d5f23), [`d00ef33`](https://github.com/clerk/javascript/commit/d00ef33dca4290a5aff52169a9076a6b4cabeee2), [`ec207dc`](https://github.com/clerk/javascript/commit/ec207dcd2a13340cfa4e3b80d3d52d1b4e7d5f23), [`0e0cc1f`](https://github.com/clerk/javascript/commit/0e0cc1fa85347d727a4fd3718fe45b0f0244ddd9)]:
+  - @clerk/types@4.64.0
+  - @clerk/shared@3.11.0
+  - @clerk/localizations@3.18.0
+
+## 5.70.0
+
+### Minor Changes
+
+- Convert date properties from number to Date in CommerceSubscriptionResource ([#6233](https://github.com/clerk/javascript/pull/6233)) by [@panteliselef](https://github.com/panteliselef)
+
+  Deprecates fields of type `number`
+
+  - subscription.periodStart
+  - subscription.periodEnd
+  - subscription.canceledAt
+    Introduces fields of type `Date`
+  - subscription.periodStartDate
+  - subscription.periodEndDate
+  - subscription.canceledAtDate
+  - subscription.createdAt
+
+- Add `getPlan` by id to the billing namespace. ([#6230](https://github.com/clerk/javascript/pull/6230)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- ([#6183](https://github.com/clerk/javascript/pull/6183)) by [@aeliox](https://github.com/aeliox)
+
+- Updated dependencies [[`baac817`](https://github.com/clerk/javascript/commit/baac81749c4c1bc1c3efaff267200cecc50047f4), [`abd8446`](https://github.com/clerk/javascript/commit/abd844609dad263d974da7fbf5e3575afce73abe), [`8387a39`](https://github.com/clerk/javascript/commit/8387a392a04906f0f10d84c61cfee36f23942f85), [`f2a6641`](https://github.com/clerk/javascript/commit/f2a66419b1813abc86ea98fde7475861995a1486), [`01a0f29`](https://github.com/clerk/javascript/commit/01a0f2934941d4ed74323ef17d4daa2b8e37ce75)]:
+  - @clerk/localizations@3.17.3
+  - @clerk/shared@3.10.2
+  - @clerk/types@4.63.0
+
+## 5.69.3
+
+### Patch Changes
+
+- Hide invitation in `OrganizationSwitcher` when user is already an active member of the organization ([#6208](https://github.com/clerk/javascript/pull/6208)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`02a1f42`](https://github.com/clerk/javascript/commit/02a1f42dfdb28ea956d6cbd3fbabe10093d2fad8), [`edc0bfd`](https://github.com/clerk/javascript/commit/edc0bfdae929dad78a99dfd6275aad947d9ddd73)]:
+  - @clerk/shared@3.10.1
+  - @clerk/types@4.62.1
+  - @clerk/localizations@3.17.2
+
+## 5.69.2
+
+### Patch Changes
+
+- Fixes stale `SignIn` object on `authenticateWithRedirect` for `saml` and `enterprise_sso` custom flows ([#6160](https://github.com/clerk/javascript/pull/6160)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  Previously, the same connection identifier would be used on every `authenticateWithRedirect` call leading to redirecting to the wrong identity provider
+
+- Fix SVG masking cross-browser compatibility in checkout complete component ([#6190](https://github.com/clerk/javascript/pull/6190)) by [@panteliselef](https://github.com/panteliselef)
+
+- Use hooks exported from `@clerk/shared` to query commerce data. ([#6159](https://github.com/clerk/javascript/pull/6159)) by [@panteliselef](https://github.com/panteliselef)
+
+- Do not display create organization form after accepting organization invitation on after-auth flow ([#6191](https://github.com/clerk/javascript/pull/6191)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`65ca8f5`](https://github.com/clerk/javascript/commit/65ca8f5f6665597fc03f9f5e0bdb99fcab3d056c), [`f1be1fe`](https://github.com/clerk/javascript/commit/f1be1fe3d575c11acd04fc7aadcdec8f89829894), [`bffb42a`](https://github.com/clerk/javascript/commit/bffb42aaf266a188b9ae7d16ace3024d468a3bd4)]:
+  - @clerk/localizations@3.17.1
+  - @clerk/types@4.62.0
+  - @clerk/shared@3.10.0
+
+## 5.69.1
+
+### Patch Changes
+
+- Add element descriptors to `<APIKeys />` component ([#6095](https://github.com/clerk/javascript/pull/6095)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fixed issues causing incorrect form fields or restricted access for users with existing sign-up tickets ([#6143](https://github.com/clerk/javascript/pull/6143)) by [@jacekradko](https://github.com/jacekradko)
+
+- Prevent organization list from displaying after creating an organization through the force organization selection flow ([#6117](https://github.com/clerk/javascript/pull/6117)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Replace expiration segmented list with dropdown and hide description field in `<APIKeys />` component ([#6153](https://github.com/clerk/javascript/pull/6153)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Add `signInMode` prop to `PricingTable` for configuring sign in behavior ([#6154](https://github.com/clerk/javascript/pull/6154)) by [@aeliox](https://github.com/aeliox)
+
+- Reworked the cache key creation logic in SignInFactorOneCodeForm.tsx not to rely on sign_in.id, which can change after host app re-renders ([#6134](https://github.com/clerk/javascript/pull/6134)) by [@jacekradko](https://github.com/jacekradko)
+
+- Bug fix: Drawers would always act as prefered-reduced-motion was turned on on the first render. ([#6149](https://github.com/clerk/javascript/pull/6149)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fixes a scenario where the session token would not immediately update after a call to `Clerk.session.touch()`. ([#6144](https://github.com/clerk/javascript/pull/6144)) by [@brkalow](https://github.com/brkalow)
+
+- Updated dependencies [[`86f32ab`](https://github.com/clerk/javascript/commit/86f32ab3e32a929504b6d6ccb005d097f005b28a), [`b495279`](https://github.com/clerk/javascript/commit/b4952796e3c7dee4ab4726de63a17b7f4265ce37), [`c3fa15d`](https://github.com/clerk/javascript/commit/c3fa15d60642b4fcbcf26e21caaca0fc60975795), [`52d5e57`](https://github.com/clerk/javascript/commit/52d5e5768d54725b4d20d028135746493e05d44c), [`15a945c`](https://github.com/clerk/javascript/commit/15a945c02a9f6bc8d2f7d1e3534217100bf45936), [`9487346`](https://github.com/clerk/javascript/commit/94873467057fd3948e4182406a928030dc073bf8), [`656851d`](https://github.com/clerk/javascript/commit/656851da4a2cd3ec987c1f815f1bc621fbf00b90), [`72629b0`](https://github.com/clerk/javascript/commit/72629b06fb1fe720fa2a61462306a786a913e9a8), [`0271fd3`](https://github.com/clerk/javascript/commit/0271fd30e1fb8fa838cf4ca56094c74404982eff)]:
+  - @clerk/localizations@3.17.0
+  - @clerk/types@4.61.0
+  - @clerk/shared@3.9.8
+
+## 5.69.0
+
+### Minor Changes
+
+- Add `<APIKeys />` component. This component will initially be in early access and not recommended for production usage just yet. ([#5858](https://github.com/clerk/javascript/pull/5858)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Add payment history tab to UserProfile and OrgProfile ([#6075](https://github.com/clerk/javascript/pull/6075)) by [@aeliox](https://github.com/aeliox)
+
+- Maintain current active organization when `setActive({ organization: null })` is called with force organization selection enabled ([#6103](https://github.com/clerk/javascript/pull/6103)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Add `.v0.dev` as prefered origin for oauth flows with popup. ([#6118](https://github.com/clerk/javascript/pull/6118)) by [@mwickett](https://github.com/mwickett)
+
+- Do not allow `setActive({ organization: null })` when organization selection is forced ([#6073](https://github.com/clerk/javascript/pull/6073)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Fix Stripe Elements error handling ([#6074](https://github.com/clerk/javascript/pull/6074)) by [@aeliox](https://github.com/aeliox)
+
+- Use error metadata for invalid change plan screen on `Checkout` component. ([#6102](https://github.com/clerk/javascript/pull/6102)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add localizations for some commerce strings, general cleanups ([#6101](https://github.com/clerk/javascript/pull/6101)) by [@aeliox](https://github.com/aeliox)
+
+- Display info tooltip for past due amounts at checkout. ([#6097](https://github.com/clerk/javascript/pull/6097)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`19e9e11`](https://github.com/clerk/javascript/commit/19e9e11af04f13fd12975fbf7016fe0583202056), [`18bcb64`](https://github.com/clerk/javascript/commit/18bcb64a3e8b6d352d7933ed094d68214e6e80fb), [`138f733`](https://github.com/clerk/javascript/commit/138f733f13121487268a4f96e6eb2cffedc6e238), [`48be55b`](https://github.com/clerk/javascript/commit/48be55b61a86e014dd407414764d24bb43fd26f3), [`2c6f805`](https://github.com/clerk/javascript/commit/2c6f805a9e6e4685990f9a8abc740b2d0859a453), [`97749d5`](https://github.com/clerk/javascript/commit/97749d570bc687c7e05cd800a50e0ae4180a371d)]:
+  - @clerk/localizations@3.16.5
+  - @clerk/types@4.60.1
+  - @clerk/shared@3.9.7
+
+## 5.68.0
+
+### Minor Changes
+
+- Introduce `cssLayerName` option to allow users to opt Clerk styles into a native CSS layer. ([#5552](https://github.com/clerk/javascript/pull/5552)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Get `payment_method_order` for Stripe payment elements from backend ([#6034](https://github.com/clerk/javascript/pull/6034)) by [@aeliox](https://github.com/aeliox)
+
+- Use the `is_removable` flag on a payment source to determine if it can be removed. ([#6033](https://github.com/clerk/javascript/pull/6033)) by [@aeliox](https://github.com/aeliox)
+
+- Clean up layout and logic of the `PlanDetails` drawer ([#5928](https://github.com/clerk/javascript/pull/5928)) by [@aeliox](https://github.com/aeliox)
+
+- Initiate enterprise SSO from ticket flows, such as organization invitations. ([#6009](https://github.com/clerk/javascript/pull/6009)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Introduce internal `<OAuthConsent />` component to be used internally in the machine auth OAuth flow in account portal. ([#6021](https://github.com/clerk/javascript/pull/6021)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- feat(types,clerk-js): Update types; RoleSelect allows fallbackLabel ([#6037](https://github.com/clerk/javascript/pull/6037)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
+  - this updates OrganizationInvitation and OrganizationMembership resource+types to include `roleName` which is already present on frontend-api responses, as `role_name`.
+  - this updates RoleSelect to allow rendering a `fallbackLabel` in the event that `value` does not map to any of the supplied roles
+
+- Updated dependencies [[`d8fa5d9`](https://github.com/clerk/javascript/commit/d8fa5d9d3d8dc575260d8d2b7c7eeeb0052d0b0d), [`be2e89c`](https://github.com/clerk/javascript/commit/be2e89ca11aa43d48f74c57a5a34e20d85b4003c), [`85f3db4`](https://github.com/clerk/javascript/commit/85f3db4305b78a71271526b5ef900a5d1b941805), [`5644d94`](https://github.com/clerk/javascript/commit/5644d94f711a0733e4970c3f15c24d56cafc8743), [`b578225`](https://github.com/clerk/javascript/commit/b5782258242474c9b0987a3f8349836cd763f24b), [`8838120`](https://github.com/clerk/javascript/commit/8838120596830b88fec1c6c853371dabfec74a0d)]:
+  - @clerk/types@4.60.0
+  - @clerk/localizations@3.16.4
+  - @clerk/shared@3.9.6
+
 ## 5.67.5
 
 ### Patch Changes

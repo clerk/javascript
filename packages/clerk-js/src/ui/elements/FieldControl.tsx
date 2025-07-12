@@ -18,7 +18,7 @@ import {
 import type { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
 import { FormFieldContextProvider, sanitizeInputProps, useFormField } from '../primitives/hooks/useFormField';
 import type { PropsOfComponent } from '../styledSystem';
-import type { useFormControl as useFormControlUtil } from '../utils';
+import type { useFormControl as useFormControlUtil } from '../utils/useFormControl';
 import { OTPCodeControl, OTPResendButton, OTPRoot } from './CodeControl';
 import { useCardState } from './contexts';
 import type { FormFeedbackProps } from './FormControl';

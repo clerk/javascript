@@ -1,4 +1,8 @@
-import type { ClerkAPIError, ClerkAPIErrorJSON } from '@clerk/types';
+import type {
+  ClerkAPIError,
+  ClerkAPIErrorJSON,
+  ClerkAPIResponseError as ClerkAPIResponseErrorInterface,
+} from '@clerk/types';
 
 export function isUnauthorizedError(e: any): boolean {
   const status = e?.status;
@@ -47,8 +51,8 @@ export function isClerkAPIResponseError(err: any): err is ClerkAPIResponseError 
 /**
  * Checks if the provided error object is an instance of ClerkRuntimeError.
  *
- * @param {any} err - The error object to check.
- * @returns {boolean} True if the error is a ClerkRuntimeError, false otherwise.
+ * @param err - The error object to check.
+ * @returns True if the error is a ClerkRuntimeError, false otherwise.
  *
  * @example
  * const error = new ClerkRuntimeError('An error occurred');
@@ -95,6 +99,7 @@ export function parseError(error: ClerkAPIErrorJSON): ClerkAPIError {
       emailAddresses: error?.meta?.email_addresses,
       identifiers: error?.meta?.identifiers,
       zxcvbn: error?.meta?.zxcvbn,
+      plan: error?.meta?.plan,
     },
   };
 }
@@ -110,11 +115,12 @@ export function errorToJSON(error: ClerkAPIError | null): ClerkAPIErrorJSON {
       email_addresses: error?.meta?.emailAddresses,
       identifiers: error?.meta?.identifiers,
       zxcvbn: error?.meta?.zxcvbn,
+      plan: error?.meta?.plan,
     },
   };
 }
 
-export class ClerkAPIResponseError extends Error {
+export class ClerkAPIResponseError extends Error implements ClerkAPIResponseErrorInterface {
   clerkError: true;
 
   status: number;
@@ -154,6 +160,7 @@ export class ClerkAPIResponseError extends Error {
  * Custom error class for representing Clerk runtime errors.
  *
  * @class ClerkRuntimeError
+ *
  * @example
  *   throw new ClerkRuntimeError('An error occurred', { code: 'password_invalid' });
  */
@@ -192,7 +199,7 @@ export class ClerkRuntimeError extends Error {
   /**
    * Returns a string representation of the error.
    *
-   * @returns {string} A formatted string with the error name and message.
+   * @returns A formatted string with the error name and message.
    */
   public toString = () => {
     return `[${this.name}]\nMessage:${this.message}`;
@@ -271,11 +278,6 @@ export interface ErrorThrower {
 export function buildErrorThrower({ packageName, customMessages }: ErrorThrowerOptions): ErrorThrower {
   let pkg = packageName;
 
-  const messages = {
-    ...DefaultMessages,
-    ...customMessages,
-  };
-
   function buildMessage(rawMessage: string, replacements?: Record<string, string | number>) {
     if (!replacements) {
       return `${pkg}: ${rawMessage}`;
@@ -291,6 +293,11 @@ export function buildErrorThrower({ packageName, customMessages }: ErrorThrowerO
 
     return `${pkg}: ${msg}`;
   }
+
+  const messages = {
+    ...DefaultMessages,
+    ...customMessages,
+  };
 
   return {
     setPackageName({ packageName }: ErrorThrowerOptions): ErrorThrower {

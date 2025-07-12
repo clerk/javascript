@@ -4,6 +4,8 @@ import * as React from 'react';
 
 import { Switch } from '@/ui/elements/Switch';
 import { Tooltip } from '@/ui/elements/Tooltip';
+import { colors } from '@/ui/utils/colors';
+import { getClosestProfileScrollBox } from '@/ui/utils/getClosestProfileScrollBox';
 
 import { useProtect } from '../../common';
 import { usePlansContext, usePricingTableContext, useSubscriberTypeContext } from '../../contexts';
@@ -23,7 +25,6 @@ import {
 } from '../../customizables';
 import { Check, Plus } from '../../icons';
 import { common, InternalThemeProvider } from '../../styledSystem';
-import { colors, getClosestProfileScrollBox } from '../../utils';
 
 interface PricingTableDefaultProps {
   plans?: CommercePlanResource[] | null;
@@ -142,7 +143,7 @@ function Card(props: CardProps) {
     shouldShowFooter = true;
     shouldShowFooterNotice = true;
   } else if (subscription.status === 'active') {
-    if (subscription.canceledAt) {
+    if (subscription.canceledAtDate) {
       shouldShowFooter = true;
       shouldShowFooterNotice = false;
     } else if (planPeriod !== subscription.planPeriod && plan.annualMonthlyAmount > 0) {
@@ -247,11 +248,13 @@ function Card(props: CardProps) {
               order: ctaPosition === 'top' ? -1 : undefined,
             })}
           >
-            {shouldShowFooterNotice ? (
+            {shouldShowFooterNotice && subscription ? (
               <Text
                 elementDescriptor={descriptors.pricingTableCardFooterNotice}
                 variant={isCompact ? 'buttonSmall' : 'buttonLarge'}
-                localizationKey={localizationKeys('badge__startsAt', { date: subscription?.periodStart })}
+                localizationKey={localizationKeys('badge__startsAt', {
+                  date: subscription?.periodStartDate,
+                })}
                 colorScheme='secondary'
                 sx={t => ({
                   paddingBlock: t.space.$1x5,

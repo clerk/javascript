@@ -5,7 +5,7 @@ import { Col, descriptors, Flex, Flow, useAppearance } from '../customizables';
 import type { ElementDescriptor } from '../customizables/elementDescriptors';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { animations, common } from '../styledSystem';
-import { colors } from '../utils';
+import { colors } from '../utils/colors';
 import { Card } from './Card';
 
 const PopoverCardRoot = React.forwardRef<
@@ -85,7 +85,7 @@ const PopoverCardFooter = (props: PropsOfComponent<typeof Flex>) => {
             colors.setAlpha(t.colors.$colorBackground, 1),
             t.colors.$neutralAlpha50,
           ),
-          marginTop: `-${t.space.$2}`,
+          marginTop: `calc(${t.space.$2} * -1)`,
           paddingTop: t.space.$2,
           '&:empty': {
             padding: 0,

@@ -14,11 +14,11 @@ import { Alert } from '@/ui/elements/Alert';
 import { Avatar } from '@/ui/elements/Avatar';
 import { Drawer, useDrawerContext } from '@/ui/elements/Drawer';
 import { Switch } from '@/ui/elements/Switch';
+import { handleError } from '@/ui/utils/errorHandler';
 
 import { useProtect } from '../../common';
 import { SubscriberTypeContext, usePlansContext, useSubscriberTypeContext, useSubscriptions } from '../../contexts';
 import { Badge, Box, Button, Col, descriptors, Flex, Heading, localizationKeys, Span, Text } from '../../customizables';
-import { handleError } from '../../utils';
 
 export const PlanDetails = (props: __internal_PlanDetailsProps) => {
   return (
@@ -210,7 +210,7 @@ const PlanDetailsInternal = ({
       {(!plan.isDefault && !isDefaultPlanImplicitlyActiveOrUpcoming) || !subscription ? (
         <Drawer.Footer>
           {subscription ? (
-            subscription.canceledAt ? (
+            subscription.canceledAtDate ? (
               <Button
                 block
                 textVariant='buttonLarge'
@@ -318,7 +318,8 @@ const PlanDetailsInternal = ({
                 ? localizationKeys('commerce.cancelSubscriptionNoCharge')
                 : localizationKeys('commerce.cancelSubscriptionAccessUntil', {
                     plan: subscription.plan.name,
-                    date: subscription.periodEnd,
+                    // @ts-expect-error this will always be defined in this case.
+                    date: subscription.periodEndDate,
                   })
             }
           />

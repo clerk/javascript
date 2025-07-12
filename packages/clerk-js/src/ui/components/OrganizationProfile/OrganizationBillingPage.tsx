@@ -7,14 +7,15 @@ import { Protect } from '../../common';
 import { SubscriberTypeContext } from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
 import { useTabState } from '../../hooks/useTabState';
+import { PaymentAttemptsList } from '../PaymentAttempts';
 import { PaymentSources } from '../PaymentSources';
 import { StatementsList } from '../Statements';
 import { SubscriptionsList } from '../Subscriptions';
 
 const orgTabMap = {
-  0: 'plans',
+  0: 'subscriptions',
   1: 'statements',
-  2: 'payment-methods',
+  2: 'payments',
 } as const;
 
 const OrganizationBillingPageInternal = withCardStateProvider(() => {
@@ -50,6 +51,7 @@ const OrganizationBillingPageInternal = withCardStateProvider(() => {
               localizationKey={localizationKeys('organizationProfile.billingPage.start.headerTitle__subscriptions')}
             />
             <Tab localizationKey={localizationKeys('organizationProfile.billingPage.start.headerTitle__statements')} />
+            <Tab localizationKey={localizationKeys('organizationProfile.billingPage.start.headerTitle__payments')} />
           </TabsList>
           <TabPanels>
             <TabPanel sx={{ width: '100%', flexDirection: 'column' }}>
@@ -68,6 +70,9 @@ const OrganizationBillingPageInternal = withCardStateProvider(() => {
             </TabPanel>
             <TabPanel sx={{ width: '100%' }}>
               <StatementsList />
+            </TabPanel>
+            <TabPanel sx={{ width: '100%' }}>
+              <PaymentAttemptsList />
             </TabPanel>
           </TabPanels>
         </Tabs>

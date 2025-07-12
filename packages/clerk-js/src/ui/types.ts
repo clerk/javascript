@@ -3,6 +3,7 @@ import type {
   __internal_OAuthConsentProps,
   __internal_PlanDetailsProps,
   __internal_UserVerificationProps,
+  APIKeysProps,
   CreateOrganizationProps,
   GoogleOneTapProps,
   NewSubscriptionRedirectUrl,
@@ -49,9 +50,11 @@ export type AvailableComponentProps =
   | PricingTableProps
   | __internal_CheckoutProps
   | __internal_UserVerificationProps
-  | __internal_PlanDetailsProps;
+  | __internal_PlanDetailsProps
+  | APIKeysProps;
 
 type ComponentMode = 'modal' | 'mounted';
+type SignInMode = 'modal' | 'redirect';
 
 export type SignInCtx = SignInProps & {
   componentName: 'SignIn';
@@ -114,6 +117,12 @@ export type WaitlistCtx = WaitlistProps & {
 export type PricingTableCtx = PricingTableProps & {
   componentName: 'PricingTable';
   mode?: ComponentMode;
+  signInMode?: SignInMode;
+};
+
+export type APIKeysCtx = APIKeysProps & {
+  componentName: 'APIKeys';
+  mode?: ComponentMode;
 };
 
 export type CheckoutCtx = __internal_CheckoutProps & {
@@ -123,6 +132,7 @@ export type CheckoutCtx = __internal_CheckoutProps & {
 export type SessionTasksCtx = {
   nextTask: () => Promise<void>;
   redirectUrlComplete?: string;
+  currentTaskContainer: React.RefObject<HTMLDivElement> | null;
 };
 
 export type OAuthConsentCtx = __internal_OAuthConsentProps & {
@@ -143,5 +153,6 @@ export type AvailableComponentCtx =
   | WaitlistCtx
   | PricingTableCtx
   | CheckoutCtx
+  | APIKeysCtx
   | OAuthConsentCtx;
 export type AvailableComponentName = AvailableComponentCtx['componentName'];

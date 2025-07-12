@@ -19,11 +19,11 @@ import { ClerkProvider } from '@clerk/nextjs'
 
 export default function RootLayout({ children }) {
   return (
-    (<ClerkProvider dynamic>
+    <ClerkProvider dynamic>
       <html>
         <body>{children}</body>
       </html>
-    </ClerkProvider>)
+    </ClerkProvider>
   );
 }
       `,

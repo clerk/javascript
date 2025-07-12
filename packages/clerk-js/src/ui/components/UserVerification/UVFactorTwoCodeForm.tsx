@@ -5,9 +5,9 @@ import React from 'react';
 import { useCardState } from '@/ui/elements/contexts';
 import type { VerificationCodeCardProps } from '@/ui/elements/VerificationCodeCard';
 import { VerificationCodeCard } from '@/ui/elements/VerificationCodeCard';
+import { handleError } from '@/ui/utils/errorHandler';
 
 import type { LocalizationKey } from '../../localization';
-import { handleError } from '../../utils';
 import { useAfterVerification } from './use-after-verification';
 
 export type UVFactorTwoCodeCard = Pick<VerificationCodeCardProps, 'onShowAlternativeMethodsClicked'> & {

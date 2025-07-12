@@ -1,4 +1,13 @@
-import { useClerk, useOrganization, useSession, useUser } from '@clerk/shared/react';
+import {
+  __experimental_usePaymentAttempts,
+  __experimental_usePaymentMethods,
+  __experimental_useStatements,
+  __experimental_useSubscriptionItems,
+  useClerk,
+  useOrganization,
+  useSession,
+  useUser,
+} from '@clerk/shared/react';
 import type {
   Appearance,
   CommercePlanResource,
@@ -8,10 +17,10 @@ import type {
 import { useCallback, useMemo } from 'react';
 import useSWR from 'swr';
 
-import { CommerceSubscription } from '../../../core/resources/internal';
+import { getClosestProfileScrollBox } from '@/ui/utils/getClosestProfileScrollBox';
+
 import type { LocalizationKey } from '../../localization';
 import { localizationKeys } from '../../localization';
-import { getClosestProfileScrollBox } from '../../utils';
 import { useSubscriberTypeContext } from './SubscriberType';
 
 const dedupeOptions = {
@@ -30,86 +39,47 @@ export const usePaymentSourcesCacheKey = () => {
   };
 };
 
-export const usePaymentSources = () => {
-  const { organization } = useOrganization();
-  const { user } = useUser();
+// TODO(@COMMERCE): Rename payment sources to payment methods at the API level
+export const usePaymentMethods = () => {
   const subscriberType = useSubscriberTypeContext();
-  const cacheKey = usePaymentSourcesCacheKey();
-
-  return useSWR(cacheKey, () => (subscriberType === 'org' ? organization : user)?.getPaymentSources({}), dedupeOptions);
+  return __experimental_usePaymentMethods({
+    for: subscriberType === 'org' ? 'organization' : 'user',
+    initialPage: 1,
+    pageSize: 10,
+    keepPreviousData: true,
+  });
 };
 
-export const useStatementsCacheKey = () => {
-  const { organization } = useOrganization();
-  const { user } = useUser();
+export const usePaymentAttempts = () => {
   const subscriberType = useSubscriberTypeContext();
-
-  return {
-    key: `commerce-statements`,
-    userId: user?.id,
-    args: { orgId: subscriberType === 'org' ? organization?.id : undefined },
-  };
+  return __experimental_usePaymentAttempts({
+    for: subscriberType === 'org' ? 'organization' : 'user',
+    initialPage: 1,
+    pageSize: 10,
+    keepPreviousData: true,
+  });
 };
 
-export const useStatements = () => {
-  const { billing } = useClerk();
-  const cacheKey = useStatementsCacheKey();
-
-  return useSWR(cacheKey, ({ args, userId }) => (userId ? billing.getStatements(args) : undefined), dedupeOptions);
+export const useStatements = (params?: { mode: 'cache' }) => {
+  const subscriberType = useSubscriberTypeContext();
+  return __experimental_useStatements({
+    for: subscriberType === 'org' ? 'organization' : 'user',
+    initialPage: 1,
+    pageSize: 10,
+    keepPreviousData: true,
+    __experimental_mode: params?.mode,
+  });
 };
 
 export const useSubscriptions = () => {
-  const { billing } = useClerk();
-  const { organization } = useOrganization();
-  const { user, isSignedIn } = useUser();
   const subscriberType = useSubscriberTypeContext();
-  const { data: plans } = usePlans();
 
-  const { data: _subscriptions, ...rest } = useSWR(
-    {
-      key: `commerce-subscriptions`,
-      userId: user?.id,
-      args: { orgId: subscriberType === 'org' ? organization?.id : undefined },
-    },
-    ({ args, userId }) => (userId ? billing.getSubscriptions(args) : undefined),
-    dedupeOptions,
-  );
-
-  const subscriptions = useMemo(() => {
-    if (!_subscriptions) {
-      return [];
-    }
-    const defaultFreePlan = plans?.find(plan => plan.hasBaseFee === false && plan.amount === 0);
-
-    // are we signed in, is there a default free plan, and should it be shown as active or upcoming? then add an implicit subscription
-    if (
-      isSignedIn &&
-      defaultFreePlan &&
-      (_subscriptions.data.length === 0 || !_subscriptions.data.some(subscription => !subscription.canceledAt))
-    ) {
-      const canceledSubscription = _subscriptions.data.find(subscription => subscription.canceledAt);
-      return [
-        ..._subscriptions.data,
-        new CommerceSubscription({
-          object: 'commerce_subscription',
-          id: '__implicit_default_plan_subscription__',
-          payment_source_id: '',
-          plan: defaultFreePlan.__internal_toSnapshot(),
-          plan_period: 'month',
-          canceled_at: null,
-          status: _subscriptions.data.length === 0 ? 'active' : 'upcoming',
-          period_start: canceledSubscription?.periodEnd || 0,
-          period_end: 0,
-        }),
-      ];
-    }
-    return _subscriptions.data;
-  }, [_subscriptions, plans, isSignedIn]);
-
-  return {
-    data: subscriptions,
-    ...rest,
-  };
+  return __experimental_useSubscriptionItems({
+    for: subscriberType === 'org' ? 'organization' : 'user',
+    initialPage: 1,
+    pageSize: 10,
+    keepPreviousData: true,
+  });
 };
 
 export const usePlans = () => {
@@ -153,7 +123,7 @@ export const usePlansContext = () => {
     return false;
   }, [clerk, subscriberType]);
 
-  const { data: subscriptions, mutate: mutateSubscriptions } = useSubscriptions();
+  const { data: subscriptions, revalidate: revalidateSubscriptions } = useSubscriptions();
 
   // Invalidates cache but does not fetch immediately
   const { data: plans, mutate: mutatePlans } = useSWR<Awaited<ReturnType<typeof clerk.billing.getPlans>>>({
@@ -162,23 +132,22 @@ export const usePlansContext = () => {
   });
 
   // Invalidates cache but does not fetch immediately
-  const { mutate: mutateStatements } =
-    useSWR<Awaited<ReturnType<typeof clerk.billing.getStatements>>>(useStatementsCacheKey());
+  const { revalidate: revalidateStatements } = useStatements({ mode: 'cache' });
 
-  const { mutate: mutatePaymentSources } = usePaymentSources();
+  const { revalidate: revalidatePaymentSources } = usePaymentMethods();
 
   const revalidateAll = useCallback(() => {
     // Revalidate the plans and subscriptions
-    void mutateSubscriptions();
+    void revalidateSubscriptions();
     void mutatePlans();
-    void mutateStatements();
-    void mutatePaymentSources();
-  }, [mutateSubscriptions, mutatePlans, mutateStatements, mutatePaymentSources]);
+    void revalidateStatements();
+    void revalidatePaymentSources();
+  }, [revalidateSubscriptions, mutatePlans, revalidateStatements, revalidatePaymentSources]);
 
   // should the default plan be shown as active
   const isDefaultPlanImplicitlyActiveOrUpcoming = useMemo(() => {
     // are there no subscriptions or are all subscriptions canceled
-    return subscriptions.length === 0 || !subscriptions.some(subscription => !subscription.canceledAt);
+    return subscriptions.length === 0 || !subscriptions.some(subscription => !subscription.canceledAtDate);
   }, [subscriptions]);
 
   // return the active or upcoming subscription for a plan if it exists
@@ -227,17 +196,10 @@ export const usePlansContext = () => {
     ({ plan, subscription: sub }: { plan?: CommercePlanResource; subscription?: CommerceSubscriptionResource }) => {
       const subscription = sub ?? (plan ? activeOrUpcomingSubscription(plan) : undefined);
 
-      return !subscription || !subscription.canceledAt;
+      return !subscription || !subscription.canceledAtDate;
     },
     [activeOrUpcomingSubscription],
   );
-
-  // should the default plan be shown as active
-  const upcomingSubscriptionsExist = useMemo(() => {
-    return (
-      subscriptions.some(subscription => subscription.status === 'upcoming') || isDefaultPlanImplicitlyActiveOrUpcoming
-    );
-  }, [subscriptions, isDefaultPlanImplicitlyActiveOrUpcoming]);
 
   // return the CTA button props for a plan
   const buttonPropsForPlan = useCallback(
@@ -270,7 +232,7 @@ export const usePlansContext = () => {
       const getLocalizationKey = () => {
         // Handle subscription cases
         if (subscription) {
-          if (_selectedPlanPeriod !== subscription.planPeriod && subscription.canceledAt) {
+          if (_selectedPlanPeriod !== subscription.planPeriod && subscription.canceledAtDate) {
             if (_selectedPlanPeriod === 'month') {
               return localizationKeys('commerce.switchToMonthly');
             }
@@ -280,7 +242,7 @@ export const usePlansContext = () => {
             }
           }
 
-          if (subscription.canceledAt) {
+          if (subscription.canceledAtDate) {
             return localizationKeys('commerce.reSubscribe');
           }
 
@@ -320,12 +282,16 @@ export const usePlansContext = () => {
 
   const captionForSubscription = useCallback((subscription: CommerceSubscriptionResource) => {
     if (subscription.status === 'upcoming') {
-      return localizationKeys('badge__startsAt', { date: subscription.periodStart });
-    } else if (subscription.canceledAt) {
-      return localizationKeys('badge__canceledEndsAt', { date: subscription.periodEnd });
-    } else {
-      return localizationKeys('badge__renewsAt', { date: subscription.periodEnd });
+      return localizationKeys('badge__startsAt', { date: subscription.periodStartDate });
     }
+    if (subscription.canceledAtDate) {
+      // @ts-expect-error `periodEndDate` is always defined when `canceledAtDate` exists
+      return localizationKeys('badge__canceledEndsAt', { date: subscription.periodEndDate });
+    }
+    if (subscription.periodEndDate) {
+      return localizationKeys('badge__renewsAt', { date: subscription.periodEndDate });
+    }
+    return;
   }, []);
 
   // handle the selection of a plan, either by opening the subscription details or checkout
@@ -343,7 +309,7 @@ export const usePlansContext = () => {
 
       const portalRoot = getClosestProfileScrollBox(mode, event);
 
-      if (subscription && subscription.planPeriod === planPeriod && !subscription.canceledAt) {
+      if (subscription && subscription.planPeriod === planPeriod && !subscription.canceledAtDate) {
         clerk.__internal_openPlanDetails({
           plan,
           initialPlanPeriod: planPeriod,
@@ -392,7 +358,6 @@ export const usePlansContext = () => {
     buttonPropsForPlan,
     canManageSubscription,
     captionForSubscription,
-    upcomingSubscriptionsExist,
     defaultFreePlan,
     revalidateAll,
   };

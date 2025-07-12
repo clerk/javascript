@@ -16,6 +16,10 @@ import { Form } from '@/ui/elements/Form';
 import { Header } from '@/ui/elements/Header';
 import { LoadingCard } from '@/ui/elements/LoadingCard';
 import { SocialButtonsReversibleContainerWithDivider } from '@/ui/elements/ReversibleContainer';
+import { handleError } from '@/ui/utils/errorHandler';
+import { isMobileDevice } from '@/ui/utils/isMobileDevice';
+import type { FormControlState } from '@/ui/utils/useFormControl';
+import { buildRequest, useFormControl } from '@/ui/utils/useFormControl';
 
 import { ERROR_CODES, SIGN_UP_MODES } from '../../../core/constants';
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
@@ -33,8 +37,6 @@ import { CaptchaElement } from '../../elements/CaptchaElement';
 import { useLoadingStatus } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router';
-import type { FormControlState } from '../../utils';
-import { buildRequest, handleError, isMobileDevice, useFormControl } from '../../utils';
 import { handleCombinedFlowTransfer } from './handleCombinedFlowTransfer';
 import { useHandleAuthenticateWithPasskey } from './shared';
 import { SignInAlternativePhoneCodePhoneNumberCard } from './SignInAlternativePhoneCodePhoneNumberCard';
@@ -222,6 +224,10 @@ function SignInStartInternal(): JSX.Element {
       .then(res => {
         switch (res.status) {
           case 'needs_first_factor':
+            if (hasOnlyEnterpriseSSOFirstFactors(res)) {
+              return authenticateWithEnterpriseSSO();
+            }
+
             return navigate('factor-one');
           case 'needs_second_factor':
             return navigate('factor-two');
@@ -241,6 +247,12 @@ function SignInStartInternal(): JSX.Element {
         return attemptToRecoverFromSignInError(err);
       })
       .finally(() => {
+        // Keep the card in loading state during SSO redirect to prevent UI flicker
+        // This is necessary because there's a brief delay between initiating the SSO flow
+        // and the actual redirect to the external Identity Provider
+        const isRedirectingToSSOProvider = hasOnlyEnterpriseSSOFirstFactors(signIn);
+        if (isRedirectingToSSOProvider) return;
+
         status.setIdle();
         card.setIdle();
       });
@@ -364,7 +376,7 @@ function SignInStartInternal(): JSX.Element {
           }
           break;
         case 'needs_first_factor':
-          if (res.supportedFirstFactors?.every(ff => ff.strategy === 'enterprise_sso')) {
+          if (hasOnlyEnterpriseSSOFirstFactors(res)) {
             await authenticateWithEnterpriseSSO();
             break;
           }
@@ -395,6 +407,7 @@ function SignInStartInternal(): JSX.Element {
       redirectUrl,
       redirectUrlComplete,
       oidcPrompt: ctx.oidcPrompt,
+      continueSignIn: true,
     });
   };
 
@@ -603,6 +616,14 @@ function SignInStartInternal(): JSX.Element {
     </Flow.Part>
   );
 }
+
+const hasOnlyEnterpriseSSOFirstFactors = (signIn: SignInResource): boolean => {
+  if (!signIn.supportedFirstFactors?.length) {
+    return false;
+  }
+
+  return signIn.supportedFirstFactors.every(ff => ff.strategy === 'enterprise_sso');
+};
 
 const InstantPasswordRow = ({ field }: { field?: FormControlState<'password'> }) => {
   const [autofilled, setAutofilled] = useState(false);

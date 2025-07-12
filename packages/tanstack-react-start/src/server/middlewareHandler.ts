@@ -1,34 +1,34 @@
 import type { AnyRouter } from '@tanstack/react-router';
-import type { EventHandler } from '@tanstack/react-start/server';
+import type { CustomizeStartHandler, HandlerCallback, RequestHandler } from '@tanstack/react-start/server';
 
 import { authenticateRequest } from './authenticateRequest';
 import { loadOptions } from './loadOptions';
 import type { LoaderOptions } from './types';
 import { getResponseClerkState } from './utils';
 
-export type HandlerCallback<TRouter extends AnyRouter> = (ctx: {
-  request: Request;
-  router: TRouter;
-  responseHeaders: Headers;
-}) => Response | Promise<Response>;
-export type CustomizeStartHandler<TRouter extends AnyRouter> = (cb: HandlerCallback<TRouter>) => EventHandler;
-
 export function createClerkHandler<TRouter extends AnyRouter>(
   eventHandler: CustomizeStartHandler<TRouter>,
   clerkOptions: LoaderOptions = {},
 ) {
-  return (cb: HandlerCallback<TRouter>): EventHandler => {
+  return (cb: HandlerCallback<TRouter>): RequestHandler => {
     return eventHandler(async ({ request, router, responseHeaders }) => {
       try {
         const loadedOptions = loadOptions(request, clerkOptions);
 
-        const requestState = await authenticateRequest(request, loadedOptions);
+        const requestState = await authenticateRequest(request, {
+          ...loadedOptions,
+          acceptsToken: 'any',
+        });
 
-        const clerkInitialState = getResponseClerkState(requestState, loadedOptions);
+        const { clerkInitialState, headers } = getResponseClerkState(requestState, loadedOptions);
 
         // Merging the TanStack router context with the Clerk context and loading the router
         router.update({
-          context: { ...router.options.context, ...clerkInitialState },
+          context: { ...router.options.context, clerkInitialState },
+        });
+
+        headers.forEach((value, key) => {
+          responseHeaders.set(key, value);
         });
 
         await router.load();

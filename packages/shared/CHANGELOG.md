@@ -1,5 +1,86 @@
 # Change Log
 
+## 3.11.0
+
+### Minor Changes
+
+- Export experimental hooks and components for PaymentElement ([#6180](https://github.com/clerk/javascript/pull/6180)) by [@panteliselef](https://github.com/panteliselef)
+
+  - `__experimental_usePaymentElement`
+  - `__experimental_PaymentElementProvider`
+  - `__experimental_PaymentElement`
+
+### Patch Changes
+
+- Enhancing publishable key parsing and validation logic to validate expected format ([#6266](https://github.com/clerk/javascript/pull/6266)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`f42c4fe`](https://github.com/clerk/javascript/commit/f42c4fedfdab873129b876eba38b3677f190b460), [`ec207dc`](https://github.com/clerk/javascript/commit/ec207dcd2a13340cfa4e3b80d3d52d1b4e7d5f23)]:
+  - @clerk/types@4.64.0
+
+## 3.10.2
+
+### Patch Changes
+
+- Fixes an issue accessing the `CLERK_TELEMETRY_DEBUG` environment variable during telemetry collection ([#6245](https://github.com/clerk/javascript/pull/6245)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`8387a39`](https://github.com/clerk/javascript/commit/8387a392a04906f0f10d84c61cfee36f23942f85), [`f2a6641`](https://github.com/clerk/javascript/commit/f2a66419b1813abc86ea98fde7475861995a1486)]:
+  - @clerk/types@4.63.0
+
+## 3.10.1
+
+### Patch Changes
+
+- Bugfix: prevent stale closures in useReverification hook ([#6201](https://github.com/clerk/javascript/pull/6201)) by [@bratsos](https://github.com/bratsos)
+
+- Updated dependencies [[`edc0bfd`](https://github.com/clerk/javascript/commit/edc0bfdae929dad78a99dfd6275aad947d9ddd73)]:
+  - @clerk/types@4.62.1
+
+## 3.10.0
+
+### Minor Changes
+
+- Introduce experimental paginated hooks for commerce data. ([#6159](https://github.com/clerk/javascript/pull/6159)) by [@panteliselef](https://github.com/panteliselef)
+
+  - `useStatements`
+  - `usePaymentAttempts`
+  - `usePaymentMethods`
+    Prefixed with `__experimental_`
+
+### Patch Changes
+
+- Updated dependencies [[`f1be1fe`](https://github.com/clerk/javascript/commit/f1be1fe3d575c11acd04fc7aadcdec8f89829894), [`bffb42a`](https://github.com/clerk/javascript/commit/bffb42aaf266a188b9ae7d16ace3024d468a3bd4)]:
+  - @clerk/types@4.62.0
+
+## 3.9.8
+
+### Patch Changes
+
+- Track usage of react hooks on development instances. ([#6158](https://github.com/clerk/javascript/pull/6158)) by [@panteliselef](https://github.com/panteliselef)
+
+  - `useReverification`
+  - `useSession`
+  - `useSessionList`
+  - `useUser`
+
+- Updated dependencies [[`b495279`](https://github.com/clerk/javascript/commit/b4952796e3c7dee4ab4726de63a17b7f4265ce37), [`c3fa15d`](https://github.com/clerk/javascript/commit/c3fa15d60642b4fcbcf26e21caaca0fc60975795), [`52d5e57`](https://github.com/clerk/javascript/commit/52d5e5768d54725b4d20d028135746493e05d44c), [`15a945c`](https://github.com/clerk/javascript/commit/15a945c02a9f6bc8d2f7d1e3534217100bf45936)]:
+  - @clerk/types@4.61.0
+
+## 3.9.7
+
+### Patch Changes
+
+- Parse partial `plan` in `ClerkAPIError.meta` ([#6102](https://github.com/clerk/javascript/pull/6102)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`19e9e11`](https://github.com/clerk/javascript/commit/19e9e11af04f13fd12975fbf7016fe0583202056), [`18bcb64`](https://github.com/clerk/javascript/commit/18bcb64a3e8b6d352d7933ed094d68214e6e80fb), [`138f733`](https://github.com/clerk/javascript/commit/138f733f13121487268a4f96e6eb2cffedc6e238), [`48be55b`](https://github.com/clerk/javascript/commit/48be55b61a86e014dd407414764d24bb43fd26f3), [`2c6f805`](https://github.com/clerk/javascript/commit/2c6f805a9e6e4685990f9a8abc740b2d0859a453), [`97749d5`](https://github.com/clerk/javascript/commit/97749d570bc687c7e05cd800a50e0ae4180a371d)]:
+  - @clerk/types@4.60.1
+
+## 3.9.6
+
+### Patch Changes
+
+- Updated dependencies [[`d8fa5d9`](https://github.com/clerk/javascript/commit/d8fa5d9d3d8dc575260d8d2b7c7eeeb0052d0b0d), [`be2e89c`](https://github.com/clerk/javascript/commit/be2e89ca11aa43d48f74c57a5a34e20d85b4003c), [`5644d94`](https://github.com/clerk/javascript/commit/5644d94f711a0733e4970c3f15c24d56cafc8743), [`b578225`](https://github.com/clerk/javascript/commit/b5782258242474c9b0987a3f8349836cd763f24b), [`8838120`](https://github.com/clerk/javascript/commit/8838120596830b88fec1c6c853371dabfec74a0d)]:
+  - @clerk/types@4.60.0
+
 ## 3.9.5
 
 ### Patch Changes

@@ -2,49 +2,89 @@ import type { Theme } from '@clerk/types';
 
 import { spaceScaleKeys } from '../foundations/sizes';
 import type { fontSizes, fontWeights } from '../foundations/typography';
-import {
-  colorOptionToHslaAlphaScale,
-  colorOptionToHslaLightnessScale,
-  colors,
-  fromEntries,
-  removeUndefinedProps,
-} from '../utils';
+import { colors } from '../utils/colors';
+import { colorOptionToThemedAlphaScale, colorOptionToThemedLightnessScale } from '../utils/colors/scales';
+import { cssSupports } from '../utils/cssSupports';
+import { fromEntries } from '../utils/fromEntries';
+import { removeUndefinedProps } from '../utils/removeUndefinedProps';
 
 export const createColorScales = (theme: Theme) => {
-  const variables = theme.variables || {};
+  const variables = removeInvalidValues(theme.variables || {});
 
-  const primaryScale = colorOptionToHslaLightnessScale(variables.colorPrimary, 'primary');
-  const primaryAlphaScale = colorOptionToHslaAlphaScale(primaryScale?.primary500, 'primaryAlpha');
-  const dangerScale = colorOptionToHslaLightnessScale(variables.colorDanger, 'danger');
-  const dangerAlphaScale = colorOptionToHslaAlphaScale(dangerScale?.danger500, 'dangerAlpha');
-  const successScale = colorOptionToHslaLightnessScale(variables.colorSuccess, 'success');
-  const successAlphaScale = colorOptionToHslaAlphaScale(successScale?.success500, 'successAlpha');
-  const warningScale = colorOptionToHslaLightnessScale(variables.colorWarning, 'warning');
-  const warningAlphaScale = colorOptionToHslaAlphaScale(warningScale?.warning500, 'warningAlpha');
+  const dangerScale = colorOptionToThemedLightnessScale(variables.colorDanger, 'danger');
+  const primaryScale = colorOptionToThemedLightnessScale(variables.colorPrimary, 'primary');
+  const successScale = colorOptionToThemedLightnessScale(variables.colorSuccess, 'success');
+  const warningScale = colorOptionToThemedLightnessScale(variables.colorWarning, 'warning');
+
+  const dangerAlphaScale = colorOptionToThemedAlphaScale(dangerScale?.danger500, 'dangerAlpha');
+  const neutralAlphaScale = colorOptionToThemedAlphaScale(variables.colorNeutral, 'neutralAlpha');
+  const primaryAlphaScale = colorOptionToThemedAlphaScale(primaryScale?.primary500, 'primaryAlpha');
+  const successAlphaScale = colorOptionToThemedAlphaScale(successScale?.success500, 'successAlpha');
+  const warningAlphaScale = colorOptionToThemedAlphaScale(warningScale?.warning500, 'warningAlpha');
 
   return removeUndefinedProps({
-    ...primaryScale,
-    ...primaryAlphaScale,
     ...dangerScale,
-    ...dangerAlphaScale,
+    ...primaryScale,
     ...successScale,
-    ...successAlphaScale,
     ...warningScale,
+    ...dangerAlphaScale,
+    ...neutralAlphaScale,
+    ...primaryAlphaScale,
+    ...successAlphaScale,
     ...warningAlphaScale,
-    ...colorOptionToHslaAlphaScale(variables.colorNeutral, 'neutralAlpha'),
     primaryHover: colors.adjustForLightness(primaryScale?.primary500),
-    colorTextOnPrimaryBackground: toHSLA(variables.colorTextOnPrimaryBackground),
-    colorText: toHSLA(variables.colorText),
-    colorTextSecondary: toHSLA(variables.colorTextSecondary) || colors.makeTransparent(variables.colorText, 0.35),
-    colorInputText: toHSLA(variables.colorInputText),
-    colorBackground: toHSLA(variables.colorBackground),
-    colorInputBackground: toHSLA(variables.colorInputBackground),
-    colorShimmer: toHSLA(variables.colorShimmer),
+    colorTextOnPrimaryBackground: colors.toHslaString(variables.colorTextOnPrimaryBackground),
+    colorText: colors.toHslaString(variables.colorText),
+    colorTextSecondary:
+      colors.toHslaString(variables.colorTextSecondary) || colors.makeTransparent(variables.colorText, 0.35),
+    colorInputText: colors.toHslaString(variables.colorInputText),
+    colorBackground: colors.toHslaString(variables.colorBackground),
+    colorInputBackground: colors.toHslaString(variables.colorInputBackground),
+    colorShimmer: colors.toHslaString(variables.colorShimmer),
   });
 };
 
-export const toHSLA = (str: string | undefined) => {
-  return str ? colors.toHslaString(str) : undefined;
+export const removeInvalidValues = (variables: NonNullable<Theme['variables']>): NonNullable<Theme['variables']> => {
+  // Check for modern color support. If present, we can simply return the variables as-is since we support everything
+  // CSS supports.
+  if (cssSupports.modernColor()) {
+    return variables;
+  }
+
+  // If not, we need to remove any values that are specified with CSS variables, as our color scale generation only
+  // supports CSS variables using modern CSS functionality.
+  const validVariables: Theme['variables'] = Object.fromEntries(
+    Object.entries(variables).filter(([key, value]) => {
+      if (typeof value === 'string') {
+        const isValid = !value.startsWith('var(');
+        if (!isValid) {
+          console.warn(
+            `Invalid color value: ${value} for key: ${key}, using default value instead. Using CSS variables is not supported in this browser.`,
+          );
+        }
+        return isValid;
+      }
+
+      if (typeof value === 'object') {
+        return Object.entries(value).every(([key, value]) => {
+          if (typeof value !== 'string') return true;
+
+          const isValid = !value.startsWith('var(');
+          if (!isValid) {
+            console.warn(
+              `Invalid color value: ${value} for key: ${key}, using default value instead. Using CSS variables is not supported in this browser.`,
+            );
+          }
+
+          return isValid;
+        });
+      }
+
+      return false;
+    }),
+  );
+
+  return validVariables;
 };
 
 export const createRadiiUnits = (theme: Theme) => {
@@ -54,12 +94,11 @@ export const createRadiiUnits = (theme: Theme) => {
   }
 
   const md = borderRadius === 'none' ? '0' : borderRadius;
-  const { numericValue, unit = 'rem' } = splitCssUnit(md);
   return {
-    sm: (numericValue * 0.66).toString() + unit,
+    sm: `calc(${md} * 0.66)`,
     md,
-    lg: (numericValue * 1.33).toString() + unit,
-    xl: (numericValue * 2).toString() + unit,
+    lg: `calc(${md} * 1.33)`,
+    xl: `calc(${md} * 2)`,
   };
 };
 
@@ -68,12 +107,11 @@ export const createSpaceScale = (theme: Theme) => {
   if (spacingUnit === undefined) {
     return;
   }
-  const { numericValue, unit } = splitCssUnit(spacingUnit);
   return fromEntries(
     spaceScaleKeys.map(k => {
       const num = Number.parseFloat(k.replace('x', '.'));
       const percentage = (num / 0.5) * 0.125;
-      return [k, `${numericValue * percentage}${unit}`];
+      return [k, `calc(${spacingUnit} * ${percentage})`];
     }),
   );
 };
@@ -86,13 +124,12 @@ export const createFontSizeScale = (theme: Theme): Record<keyof typeof fontSizes
   if (fontSize === undefined) {
     return;
   }
-  const { numericValue, unit = 'rem' } = splitCssUnit(fontSize);
   return {
-    xs: (numericValue * 0.8).toString() + unit,
-    sm: (numericValue * 0.9).toString() + unit,
+    xs: `calc(${fontSize} * 0.8)`,
+    sm: `calc(${fontSize} * 0.9)`,
     md: fontSize,
-    lg: (numericValue * 1.3).toString() + unit,
-    xl: (numericValue * 1.85).toString() + unit,
+    lg: `calc(${fontSize} * 1.3)`,
+    xl: `calc(${fontSize} * 1.85)`,
   };
 };
 
@@ -104,10 +141,4 @@ export const createFontWeightScale = (theme: Theme): Record<keyof typeof fontWei
 export const createFonts = (theme: Theme) => {
   const { fontFamily, fontFamilyButtons } = theme.variables || {};
   return removeUndefinedProps({ main: fontFamily, buttons: fontFamilyButtons });
-};
-
-const splitCssUnit = (str: string) => {
-  const numericValue = Number.parseFloat(str);
-  const unit = str.replace(numericValue.toString(), '') || undefined;
-  return { numericValue, unit };
 };

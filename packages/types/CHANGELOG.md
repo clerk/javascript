@@ -1,5 +1,106 @@
 # Change Log
 
+## 4.64.0
+
+### Minor Changes
+
+- Add `__internal_loadStripeJs` in Clerk interface. ([#6180](https://github.com/clerk/javascript/pull/6180)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Add jsdoc comments for `payerType` in `CommercePlanResource`. ([#6257](https://github.com/clerk/javascript/pull/6257)) by [@panteliselef](https://github.com/panteliselef)
+
+## 4.63.0
+
+### Minor Changes
+
+- Convert date properties from number to Date in CommerceSubscriptionResource ([#6233](https://github.com/clerk/javascript/pull/6233)) by [@panteliselef](https://github.com/panteliselef)
+
+  Deprecates fields of type `number`
+
+  - subscription.periodStart
+  - subscription.periodEnd
+  - subscription.canceledAt
+    Introduces fields of type `Date`
+  - subscription.periodStartDate
+  - subscription.periodEndDate
+  - subscription.canceledAtDate
+  - subscription.createdAt
+
+- Add `getPlan` by id to the billing namespace. ([#6230](https://github.com/clerk/javascript/pull/6230)) by [@panteliselef](https://github.com/panteliselef)
+
+## 4.62.1
+
+### Patch Changes
+
+- Extract internal `ProtectProps` type to shared types to eliminate duplication across SDKs ([#6197](https://github.com/clerk/javascript/pull/6197)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 4.62.0
+
+### Minor Changes
+
+- Introduce experimental paginated hooks for commerce data. ([#6159](https://github.com/clerk/javascript/pull/6159)) by [@panteliselef](https://github.com/panteliselef)
+
+  - `useStatements`
+  - `usePaymentAttempts`
+  - `usePaymentMethods`
+    Prefixed with `__experimental_`
+
+### Patch Changes
+
+- Fixes stale `SignIn` object on `authenticateWithRedirect` for `saml` and `enterprise_sso` custom flows ([#6160](https://github.com/clerk/javascript/pull/6160)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  Previously, the same connection identifier would be used on every `authenticateWithRedirect` call leading to redirecting to the wrong identity provider
+
+## 4.61.0
+
+### Minor Changes
+
+- Expose `__internal_LocalizationResource` which now includes metadata for which keys require interpolation. ([#6108](https://github.com/clerk/javascript/pull/6108)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add support for `expiresInSeconds` parameter in session token generation. This allows setting custom expiration times for tokens both with and without templates via the backend API. ([#6150](https://github.com/clerk/javascript/pull/6150)) by [@jacekradko](https://github.com/jacekradko)
+
+### Patch Changes
+
+- Add element descriptors to `<APIKeys />` component ([#6095](https://github.com/clerk/javascript/pull/6095)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Replace expiration segmented list with dropdown and hide description field in `<APIKeys />` component ([#6153](https://github.com/clerk/javascript/pull/6153)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 4.60.1
+
+### Patch Changes
+
+- Add payment history tab to UserProfile and OrgProfile ([#6075](https://github.com/clerk/javascript/pull/6075)) by [@aeliox](https://github.com/aeliox)
+
+- Add TypeScript types and en-US localization for upcoming `<APIKeys />` component. This component will initially be in early access. ([#5858](https://github.com/clerk/javascript/pull/5858)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Add missing semibold FontWeightScale type ([#6114](https://github.com/clerk/javascript/pull/6114)) by [@jacekradko](https://github.com/jacekradko)
+
+- Parse partial `plan` in `ClerkAPIError.meta` ([#6102](https://github.com/clerk/javascript/pull/6102)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add localizations for some commerce strings, general cleanups ([#6101](https://github.com/clerk/javascript/pull/6101)) by [@aeliox](https://github.com/aeliox)
+
+- Introduce `commerce.checkout.pastDueNotice` localization key. ([#6097](https://github.com/clerk/javascript/pull/6097)) by [@panteliselef](https://github.com/panteliselef)
+
+## 4.60.0
+
+### Minor Changes
+
+- Introduce `cssLayerName` option to allow users to opt Clerk styles into a native CSS layer. ([#5552](https://github.com/clerk/javascript/pull/5552)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Get `payment_method_order` for Stripe payment elements from backend ([#6034](https://github.com/clerk/javascript/pull/6034)) by [@aeliox](https://github.com/aeliox)
+
+- Use the `is_removable` flag on a payment source to determine if it can be removed. ([#6033](https://github.com/clerk/javascript/pull/6033)) by [@aeliox](https://github.com/aeliox)
+
+- Introduce internal `<OAuthConsent />` component to be used internally in the machine auth OAuth flow in account portal. ([#6021](https://github.com/clerk/javascript/pull/6021)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- feat(types,clerk-js): Update types; RoleSelect allows fallbackLabel ([#6037](https://github.com/clerk/javascript/pull/6037)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
+  - this updates OrganizationInvitation and OrganizationMembership resource+types to include `roleName` which is already present on frontend-api responses, as `role_name`.
+  - this updates RoleSelect to allow rendering a `fallbackLabel` in the event that `value` does not map to any of the supplied roles
+
 ## 4.59.3
 
 ### Patch Changes

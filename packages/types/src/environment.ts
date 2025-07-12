@@ -1,3 +1,4 @@
+import type { APIKeysSettingsResource } from './apiKeysSettings';
 import type { AuthConfigResource } from './authConfig';
 import type { CommerceSettingsResource } from './commerceSettings';
 import type { DisplayConfigResource } from './displayConfig';
@@ -12,6 +13,7 @@ export interface EnvironmentResource extends ClerkResource {
   authConfig: AuthConfigResource;
   displayConfig: DisplayConfigResource;
   commerceSettings: CommerceSettingsResource;
+  apiKeysSettings: APIKeysSettingsResource;
   isSingleSession: () => boolean;
   isProduction: () => boolean;
   isDevelopmentOrStaging: () => boolean;

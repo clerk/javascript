@@ -1,6 +1,6 @@
 ## Description
 
-<!-- 
+<!--
   Thanks for contributing to Clerk. Make sure to read the contributing guide at https://github.com/clerk/javascript/blob/main/docs/CONTRIBUTING.md before opening a PR!
 
   **Please create a feature request before starting work on any significant change.**

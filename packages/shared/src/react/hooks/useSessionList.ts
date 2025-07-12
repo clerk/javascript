@@ -1,7 +1,9 @@
 import type { UseSessionListReturn } from '@clerk/types';
 
+import { eventMethodCalled } from '../../telemetry/events/method-called';
 import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useClientContext } from '../contexts';
 
+const hookName = 'useSessionList';
 /**
  * The `useSessionList()` hook returns an array of [`Session`](https://clerk.com/docs/references/javascript/session) objects that have been registered on the client device.
  *
@@ -46,10 +48,13 @@ import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useClientCont
  * </Tabs>
  */
 export const useSessionList = (): UseSessionListReturn => {
-  useAssertWrappedByClerkProvider('useSessionList');
+  useAssertWrappedByClerkProvider(hookName);
 
   const isomorphicClerk = useClerkInstanceContext();
   const client = useClientContext();
+  const clerk = useClerkInstanceContext();
+
+  clerk.telemetry?.record(eventMethodCalled(hookName));
 
   if (!client) {
     return { isLoaded: false, sessions: undefined, setActive: undefined };
