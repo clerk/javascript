@@ -17,7 +17,7 @@ export interface CommerceBillingNamespace {
 }
 
 export type CommerceSubscriberType = 'org' | 'user';
-export type CommerceSubscriptionStatus = 'active' | 'ended' | 'upcoming' | 'past_due';
+export type CommerceSubscriptionStatus = 'active' | 'ended' | 'upcoming';
 export type CommerceSubscriptionPlanPeriod = 'month' | 'annual';
 
 export interface CommercePaymentSourceMethods {
@@ -156,7 +156,6 @@ export interface CommerceSubscriptionResource extends ClerkResource {
   planPeriod: CommerceSubscriptionPlanPeriod;
   status: CommerceSubscriptionStatus;
   createdAt: Date;
-  pastDueAt: Date | null;
   periodStartDate: Date;
   periodEndDate: Date | null;
   canceledAtDate: Date | null;

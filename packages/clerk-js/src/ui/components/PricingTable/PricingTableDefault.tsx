@@ -191,7 +191,6 @@ function Card(props: CardProps) {
             isPlanActive ? (
               <Badge
                 colorScheme='secondary'
-                // here
                 localizationKey={localizationKeys('badge__activePlan')}
               />
             ) : (

@@ -531,7 +531,6 @@ const SubscriptionCard = ({ subscription }: { subscription: CommerceSubscription
           <Badge
             elementDescriptor={descriptors.subscriptionDetailsCardBadge}
             colorScheme={isActive ? 'secondary' : 'primary'}
-            // here
             localizationKey={isActive ? localizationKeys('badge__activePlan') : localizationKeys('badge__upcomingPlan')}
           />
         </Flex>

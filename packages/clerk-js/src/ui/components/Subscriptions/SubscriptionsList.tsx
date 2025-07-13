@@ -113,7 +113,6 @@ export function SubscriptionsList({
                         {subscription.plan.name}
                       </Text>
                       {sortedSubscriptions.length > 1 || !!subscription.canceledAtDate ? (
-                        // here
                         <Badge
                           colorScheme={subscription.status === 'active' ? 'secondary' : 'primary'}
                           localizationKey={
@@ -124,9 +123,7 @@ export function SubscriptionsList({
                         />
                       ) : null}
                     </Flex>
-
                     {(!subscription.plan.isDefault || subscription.status === 'upcoming') && (
-                      // here
                       <Text
                         variant='caption'
                         colorScheme='secondary'
