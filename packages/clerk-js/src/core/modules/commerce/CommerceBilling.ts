@@ -48,6 +48,15 @@ export class CommerceBilling implements CommerceBillingNamespace {
     return new CommercePlan(plan);
   };
 
+  getSubscription = async (params: GetSubscriptionsParams): Promise<any> => {
+    return await BaseResource._fetch({
+      path: params.orgId ? `/organizations/${params.orgId}/commerce/subscription` : `/me/commerce/subscription`,
+      method: 'GET',
+    }).then(res => {
+      return res;
+    });
+  };
+
   getSubscriptions = async (
     params: GetSubscriptionsParams,
   ): Promise<ClerkPaginatedResponse<CommerceSubscriptionResource>> => {

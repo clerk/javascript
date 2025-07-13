@@ -11,6 +11,10 @@ export interface CommerceBillingNamespace {
   getPaymentAttempts: (params: GetPaymentAttemptsParams) => Promise<ClerkPaginatedResponse<CommercePaymentResource>>;
   getPlans: (params?: GetPlansParams) => Promise<CommercePlanResource[]>;
   getPlan: (params: { id: string }) => Promise<CommercePlanResource>;
+  getSubscription: (params: GetSubscriptionsParams) => Promise<any>;
+  /**
+   * @deprecated Use `getSubscription`
+   */
   getSubscriptions: (params: GetSubscriptionsParams) => Promise<ClerkPaginatedResponse<CommerceSubscriptionResource>>;
   getStatements: (params: GetStatementsParams) => Promise<ClerkPaginatedResponse<CommerceStatementResource>>;
   startCheckout: (params: CreateCheckoutParams) => Promise<CommerceCheckoutResource>;

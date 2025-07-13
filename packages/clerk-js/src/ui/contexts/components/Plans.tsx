@@ -5,6 +5,7 @@ import {
   useClerk,
   useOrganization,
   useSession,
+  useSubscription,
   useUser,
 } from '@clerk/shared/react';
 import type {
@@ -72,6 +73,7 @@ export const useStatements = (params?: { mode: 'cache' }) => {
 };
 
 export const useSubscriptions = () => {
+  useSubscription();
   const { billing } = useClerk();
   const { organization } = useOrganization();
   const { user, isSignedIn } = useUser();
