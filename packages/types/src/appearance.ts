@@ -512,6 +512,7 @@ export type ElementsConfig = {
   statementCopyButton: WithOptions;
   menuButton: WithOptions<MenuId>;
   menuButtonEllipsis: WithOptions;
+  menuButtonEllipsisBordered: WithOptions;
   menuList: WithOptions<MenuId>;
   menuItem: WithOptions<MenuId>;
 

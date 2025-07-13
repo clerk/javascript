@@ -387,6 +387,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'statementCopyButton',
   'menuButton',
   'menuButtonEllipsis',
+  'menuButtonEllipsisBordered',
   'menuList',
   'menuItem',
 

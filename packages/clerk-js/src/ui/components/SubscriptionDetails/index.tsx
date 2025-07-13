@@ -18,7 +18,6 @@ import { CardAlert } from '@/ui/elements/Card/CardAlert';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Drawer, useDrawerContext } from '@/ui/elements/Drawer';
 import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
-import { ThreeDots } from '@/ui/icons';
 import { handleError } from '@/ui/utils/errorHandler';
 import { formatDate } from '@/ui/utils/formatDate';
 
@@ -34,7 +33,6 @@ import {
   descriptors,
   Flex,
   Heading,
-  Icon,
   localizationKeys,
   Span,
   Spinner,
@@ -141,23 +139,24 @@ const SubscriptionDetailsInternal = (props: __internal_SubscriptionDetailsProps)
     >
       <Drawer.Header title={localizationKeys('commerce.subscriptionDetails.title')} />
 
-      <Drawer.Body>
-        <Col
-          gap={4}
-          sx={t => ({
-            padding: t.space.$4,
-            overflowY: 'auto',
-          })}
-        >
-          {/* Subscription Cards */}
-          {subscriptions?.map(subscriptionItem => (
-            <SubscriptionCard
-              key={subscriptionItem.id}
-              subscription={subscriptionItem}
-              {...props}
-            />
-          ))}
-        </Col>
+      <Drawer.Body
+        sx={t => ({
+          display: 'flex',
+          flexDirection: 'column',
+          flex: 1,
+          overflowY: 'auto',
+          padding: t.space.$4,
+          gap: t.space.$4,
+        })}
+      >
+        {/* Subscription Cards */}
+        {subscriptions?.map(subscriptionItem => (
+          <SubscriptionCard
+            key={subscriptionItem.id}
+            subscription={subscriptionItem}
+            {...props}
+          />
+        ))}
       </Drawer.Body>
 
       <SubscriptionDetailsFooter />
@@ -355,7 +354,6 @@ function SubscriptionDetailsSummary() {
 const SubscriptionCardActions = ({ subscription }: { subscription: CommerceSubscriptionResource }) => {
   const { portalRoot } = useSubscriptionDetailsContext();
   const { __internal_openCheckout } = useClerk();
-  const { t } = useLocalizations();
   const subscriberType = useSubscriberTypeContext();
   const { setIsOpen } = useDrawerContext();
   const { revalidateAll } = usePlansContext();
@@ -455,27 +453,7 @@ const SubscriptionCardActions = ({ subscription }: { subscription: CommerceSubsc
 
   return (
     <ThreeDotsMenu
-      trigger={
-        <Button
-          aria-label={t(localizationKeys('commerce.manageSubscription'))}
-          variant='bordered'
-          colorScheme='secondary'
-          sx={t => ({
-            width: t.sizes.$6,
-            height: t.sizes.$6,
-          })}
-          elementDescriptor={[descriptors.menuButton, descriptors.menuButtonEllipsis]}
-        >
-          <Icon
-            icon={ThreeDots}
-            sx={t => ({
-              width: t.sizes.$4,
-              height: t.sizes.$4,
-              opacity: t.opacity.$inactive,
-            })}
-          />
-        </Button>
-      }
+      variant='bordered'
       actions={actions}
     />
   );
@@ -519,12 +497,13 @@ const SubscriptionCard = ({ subscription }: { subscription: CommerceSubscription
 
           <Text
             elementDescriptor={descriptors.subscriptionDetailsCardTitle}
-            sx={{
-              fontSize: '16px',
-              fontWeight: '600',
-              color: '#333',
+            variant='h2'
+            sx={t => ({
+              fontSize: t.fontSizes.$lg,
+              fontWeight: t.fontWeights.$semibold,
+              color: t.colors.$colorText,
               marginInlineEnd: 'auto',
-            }}
+            })}
           >
             {subscription.plan.name}
           </Text>
