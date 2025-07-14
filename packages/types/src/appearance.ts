@@ -731,7 +731,7 @@ export type Variables = {
    */
   colorRing?: CssColor;
   /**
-   * The color used as the base for all shadows.
+   * The color used as the base for shadows.
    * @default '#000000'
    */
   colorShadow?: CssColor;
