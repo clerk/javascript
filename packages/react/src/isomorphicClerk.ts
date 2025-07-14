@@ -802,7 +802,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     if (this.clerkjs && this.loaded) {
       this.clerkjs.__internal_openSubscriptionDetails(props);
     } else {
-      this.preopenSubscriptionDetails = props;
+      this.preopenSubscriptionDetails = props ?? null;
     }
   };
 
