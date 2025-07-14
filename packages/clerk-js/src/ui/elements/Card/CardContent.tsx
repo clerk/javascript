@@ -39,7 +39,7 @@ export const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>((p
           zIndex: t.zIndices.$card,
           borderWidth: t.borderWidths.$normal,
           borderStyle: t.borderStyles.$solid,
-          borderColor: t.colors.$neutralAlpha50,
+          borderColor: t.colors.$borderAlpha50,
           boxShadow: t.shadows.$cardContentShadow,
           borderRadius: t.radii.$lg,
           position: 'relative',

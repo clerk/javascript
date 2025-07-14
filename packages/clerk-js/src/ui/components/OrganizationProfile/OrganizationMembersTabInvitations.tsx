@@ -38,7 +38,7 @@ export const OrganizationMembersTabInvitations = withCardStateProvider(() => {
               paddingRight: t.space.$1,
               borderBottomWidth: t.borderWidths.$normal,
               borderBottomStyle: t.borderStyles.$solid,
-              borderBottomColor: t.colors.$neutralAlpha100,
+              borderBottomColor: t.colors.$borderAlpha100,
               [mqu.md]: {
                 flexDirection: 'column',
                 gap: t.space.$2,

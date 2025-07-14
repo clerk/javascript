@@ -736,6 +736,11 @@ export type Variables = {
    */
   colorShadow?: CssColor;
   /**
+   * The color of the border.
+   * @default '#000000'
+   */
+  colorBorder?: CssColor;
+  /**
    * The default font that will be used in all components.
    * This can be the name of a custom font loaded by your code or the name of a web-safe font ((@link WebSafeFont})
    * If a specific fontFamily is not provided, the components will inherit the font of the parent element.

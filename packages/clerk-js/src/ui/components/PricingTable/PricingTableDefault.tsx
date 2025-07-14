@@ -170,7 +170,7 @@ function Card(props: CardProps) {
         background: common.mutedBackground(t),
         borderWidth: t.borderWidths.$normal,
         borderStyle: t.borderStyles.$solid,
-        borderColor: t.colors.$neutralAlpha100,
+        borderColor: t.colors.$borderAlpha100,
         boxShadow: !isCompact ? t.shadows.$cardBoxShadow : t.shadows.$tableBodyShadow,
         borderRadius: t.radii.$xl,
         overflow: 'hidden',
@@ -220,7 +220,7 @@ function Card(props: CardProps) {
               backgroundColor: hasFeatures ? t.colors.$colorBackground : 'transparent',
               borderTopWidth: hasFeatures ? t.borderWidths.$normal : 0,
               borderTopStyle: t.borderStyles.$solid,
-              borderTopColor: t.colors.$neutralAlpha100,
+              borderTopColor: t.colors.$borderAlpha100,
             })}
             data-variant={isCompact ? 'compact' : 'default'}
           >
@@ -240,7 +240,7 @@ function Card(props: CardProps) {
               padding: isCompact ? t.space.$3 : t.space.$4,
               borderTopWidth: t.borderWidths.$normal,
               borderTopStyle: t.borderStyles.$solid,
-              borderTopColor: t.colors.$neutralAlpha100,
+              borderTopColor: t.colors.$borderAlpha100,
               order: ctaPosition === 'top' ? -1 : undefined,
             })}
           >

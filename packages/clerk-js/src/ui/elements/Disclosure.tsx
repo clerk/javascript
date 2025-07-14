@@ -167,7 +167,7 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
             borderRadius: t.radii.$lg,
             borderWidth: t.borderWidths.$normal,
             borderStyle: t.borderStyles.$solid,
-            borderColor: t.colors.$neutralAlpha100,
+            borderColor: t.colors.$borderAlpha100,
             background: common.mergedColorsBackground(
               colors.setAlpha(t.colors.$colorBackground, 1),
               t.colors.$neutralAlpha50,

@@ -64,7 +64,7 @@ function Group({ children, borderTop = false, variant = 'primary' }: GroupProps)
             ? {
                 borderTopWidth: t.borderWidths.$normal,
                 borderTopStyle: t.borderStyles.$solid,
-                borderTopColor: t.colors.$neutralAlpha100,
+                borderTopColor: t.colors.$borderAlpha100,
                 paddingTop: t.space.$2,
               }
             : {}),
