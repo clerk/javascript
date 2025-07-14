@@ -36,12 +36,7 @@ export function MountedPlanDetailDrawer({
       portalId={planDetailsDrawer.props.portalId}
       portalRoot={planDetailsDrawer.props.portalRoot as HTMLElement | null | undefined}
     >
-      <PlanDetails
-        {...planDetailsDrawer.props}
-        subscriberType={planDetailsDrawer.props.subscriberType || 'user'}
-        onSubscriptionCancel={planDetailsDrawer.props.onSubscriptionCancel || (() => {})}
-        appearance={planDetailsDrawer.props.appearance}
-      />
+      <PlanDetails {...planDetailsDrawer.props} />
     </LazyDrawerRenderer>
   );
 }

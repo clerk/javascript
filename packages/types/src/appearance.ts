@@ -513,6 +513,7 @@ export type ElementsConfig = {
   statementCopyButton: WithOptions;
   menuButton: WithOptions<MenuId>;
   menuButtonEllipsis: WithOptions;
+  menuButtonEllipsisBordered: WithOptions;
   menuList: WithOptions<MenuId>;
   menuItem: WithOptions<MenuId>;
 
@@ -609,6 +610,17 @@ export type ElementsConfig = {
   apiKeysRevokeModal: WithOptions;
   apiKeysRevokeModalInput: WithOptions;
   apiKeysRevokeModalSubmitButton: WithOptions;
+
+  subscriptionDetailsCard: WithOptions;
+  subscriptionDetailsCardHeader: WithOptions;
+  subscriptionDetailsCardBadge: WithOptions;
+  subscriptionDetailsCardTitle: WithOptions;
+  subscriptionDetailsCardBody: WithOptions;
+  subscriptionDetailsCardFooter: WithOptions;
+  subscriptionDetailsCardActions: WithOptions;
+  subscriptionDetailsDetailRow: WithOptions;
+  subscriptionDetailsDetailRowLabel: WithOptions;
+  subscriptionDetailsDetailRowValue: WithOptions;
 };
 
 export type Elements = {
@@ -870,6 +882,7 @@ export type WaitlistTheme = Theme;
 export type PricingTableTheme = Theme;
 export type CheckoutTheme = Theme;
 export type PlanDetailTheme = Theme;
+export type SubscriptionDetailsTheme = Theme;
 export type APIKeysTheme = Theme;
 export type OAuthConsentTheme = Theme;
 

@@ -13,6 +13,7 @@ import type {
   PricingTableTheme,
   SignInTheme,
   SignUpTheme,
+  SubscriptionDetailsTheme,
   UserButtonTheme,
   UserProfileTheme,
   UserVerificationTheme,
@@ -273,15 +274,27 @@ export interface Clerk {
 
   /**
    * Opens the Clerk PlanDetails drawer component in a drawer.
-   * @param props Optional subscription details drawer configuration parameters.
+   * @param props `plan` or `planId` parameters are required.
    */
-  __internal_openPlanDetails: (props?: __internal_PlanDetailsProps) => void;
+  __internal_openPlanDetails: (props: __internal_PlanDetailsProps) => void;
 
   /**
    * Closes the Clerk PlanDetails drawer.
    */
   __internal_closePlanDetails: () => void;
 
+  /**
+   * Opens the Clerk SubscriptionDetails drawer component in a drawer.
+   * @param props Optional configuration parameters.
+   */
+  __internal_openSubscriptionDetails: (props?: __internal_SubscriptionDetailsProps) => void;
+
+  /**
+   * Closes the Clerk SubscriptionDetails drawer.
+   */
+  __internal_closeSubscriptionDetails: () => void;
+
+  /**
   /** Opens the Clerk UserVerification component in a modal.
    * @param props Optional user verification configuration parameters.
    */
@@ -1820,8 +1833,20 @@ export type __internal_CheckoutProps = {
 export type __internal_PlanDetailsProps = {
   appearance?: PlanDetailTheme;
   plan?: CommercePlanResource;
-  subscriberType?: CommerceSubscriberType;
+  planId?: string;
   initialPlanPeriod?: CommerceSubscriptionPlanPeriod;
+  portalId?: string;
+  portalRoot?: PortalRoot;
+};
+
+export type __internal_SubscriptionDetailsProps = {
+  /**
+   * The subscriber type to display the subscription details for.
+   * If `org` is provided, the subscription details will be displayed for the active organization.
+   * @default 'user'
+   */
+  for?: CommerceSubscriberType;
+  appearance?: SubscriptionDetailsTheme;
   onSubscriptionCancel?: () => void;
   portalId?: string;
   portalRoot?: PortalRoot;
