@@ -731,9 +731,9 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  __experimental_navigateToTask = async (params?: NextTaskParams): Promise<void> => {
+  navigateToTask = async (params?: NextTaskParams): Promise<void> => {
     if (this.clerkjs) {
-      return this.clerkjs.__experimental_navigateToTask(params);
+      return this.clerkjs.navigateToTask(params);
     } else {
       return Promise.reject();
     }

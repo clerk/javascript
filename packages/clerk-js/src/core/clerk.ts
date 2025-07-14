@@ -29,9 +29,9 @@ import type {
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
-  Clerk as ClerkInterface,
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
+  Clerk as ClerkInterface,
   ClerkOptions,
   ClientJSONSnapshot,
   ClientResource,
@@ -1333,7 +1333,7 @@ export class Clerk implements ClerkInterface {
     this.#emit();
   };
 
-  public __experimental_navigateToTask = async ({ redirectUrlComplete }: NextTaskParams = {}): Promise<void> => {
+  public navigateToTask = async ({ redirectUrlComplete }: NextTaskParams = {}): Promise<void> => {
     /**
      * Invalidate previously cached pages with auth state before navigating
      */
