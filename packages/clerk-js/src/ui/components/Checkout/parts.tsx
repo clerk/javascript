@@ -44,14 +44,14 @@ export const InvalidPlanScreen = () => {
   const error = checkout.error;
 
   const planFromError = useMemo(() => {
-    const error = errors?.find(e => e.code === 'invalid_plan_change');
-    return error?.meta?.plan;
-  }, [errors]);
+    const _error = error?.errors.find(e => e.code === 'invalid_plan_change');
+    return _error?.meta?.plan;
+  }, [error]);
 
   const isPlanUpgradePossible = useMemo(() => {
-    const error = errors?.find(e => e.code === 'invalid_plan_change');
-    return error?.meta?.isPlanUpgradePossible || false;
-  }, [errors]);
+    const _error = error?.errors.find(e => e.code === 'invalid_plan_change');
+    return _error?.meta?.isPlanUpgradePossible || false;
+  }, [error]);
 
   if (!planFromError) {
     return null;
