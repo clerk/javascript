@@ -57,7 +57,7 @@ jobs:
 
                 // Only check for "major" in the YAML frontmatter section (between --- markers)
                 // This avoids false positives from descriptive text mentioning "major"
-                const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
+                const frontmatterMatch = content.match(/^---\r?\n([\s\S]*?)\r?\n---\s*$/m);
                 if (frontmatterMatch) {
                   const frontmatter = frontmatterMatch[1];
                   if (/:\s*["']?major["']?/.test(frontmatter)) {
