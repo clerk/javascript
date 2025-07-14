@@ -19,16 +19,23 @@ const letterSpacings = Object.freeze({
   normal: 'normal',
 } as const);
 
-// We want to achieve the md size to be 13px for root font size of 16px
-// This is directly related to the createFontSizeScale function in the theme
-// ref: src/ui/customizables/parseVariables.ts
+export const FONT_SIZE_SCALE_RATIOS = Object.freeze({
+  xs: '11 / 13', // 0.846154
+  sm: '12 / 13', // 0.923077
+  md: '1', // 1.0
+  lg: '17 / 13', // 1.307692
+  xl: '24 / 13', // 1.846154
+} as const);
+
+export type FontSizeKey = keyof typeof FONT_SIZE_SCALE_RATIOS;
+
 const fontSizesDefaultVar = clerkCssVar('font-size', '0.8125rem');
 const fontSizes = Object.freeze({
-  xs: clerkCssVar('font-size-xs', `calc(${fontSizesDefaultVar} * 0.8)`), // 0.6875rem
-  sm: clerkCssVar('font-size-sm', `calc(${fontSizesDefaultVar} * 0.9)`), // 0.75rem
-  md: clerkCssVar('font-size-md', fontSizesDefaultVar), // 1rem
-  lg: clerkCssVar('font-size-lg', `calc(${fontSizesDefaultVar} * 1.3)`), // 1.0625rem
-  xl: clerkCssVar('font-size-xl', `calc(${fontSizesDefaultVar} * 1.85)`), // 1.5rem
+  xs: clerkCssVar('font-size-xs', `calc(${fontSizesDefaultVar} * ${FONT_SIZE_SCALE_RATIOS.xs})`), // 0.6875rem
+  sm: clerkCssVar('font-size-sm', `calc(${fontSizesDefaultVar} * ${FONT_SIZE_SCALE_RATIOS.sm})`), // 0.75rem
+  md: clerkCssVar('font-size-md', fontSizesDefaultVar), // 0.8125rem
+  lg: clerkCssVar('font-size-lg', `calc(${fontSizesDefaultVar} * ${FONT_SIZE_SCALE_RATIOS.lg})`), // 1.0625rem
+  xl: clerkCssVar('font-size-xl', `calc(${fontSizesDefaultVar} * ${FONT_SIZE_SCALE_RATIOS.xl})`), // 1.5rem
 } as const);
 
 const fontStyles = Object.freeze({

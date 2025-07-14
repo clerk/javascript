@@ -1,8 +1,8 @@
 import type { Theme } from '@clerk/types';
 
 import { createShadowSet, generateShadow } from '../foundations/shadows';
-import { spaceScaleKeys } from '../foundations/sizes';
-import type { fontWeights } from '../foundations/typography';
+import { BORDER_RADIUS_SCALE_RATIOS, spaceScaleKeys } from '../foundations/sizes';
+import { FONT_SIZE_SCALE_RATIOS, type FontSizeKey, type fontWeights } from '../foundations/typography';
 import { colors } from '../utils/colors';
 import { colorOptionToThemedAlphaScale, colorOptionToThemedLightnessScale } from '../utils/colors/scales';
 import { createAlphaColorMixString } from '../utils/colors/utils';
@@ -119,10 +119,10 @@ export const createRadiiUnits = (theme: Theme) => {
 
   const md = borderRadius === 'none' ? '0' : borderRadius;
   return {
-    sm: `calc(${md} * 0.66)`,
+    sm: `calc(${md} * ${BORDER_RADIUS_SCALE_RATIOS.sm})`,
     md,
-    lg: `calc(${md} * 1.33)`,
-    xl: `calc(${md} * 2)`,
+    lg: `calc(${md} * ${BORDER_RADIUS_SCALE_RATIOS.lg})`,
+    xl: `calc(${md} * ${BORDER_RADIUS_SCALE_RATIOS.xl})`,
   };
 };
 
@@ -140,18 +140,6 @@ export const createSpaceScale = (theme: Theme) => {
     }),
   );
 };
-
-// Font size scale constants that match the default theme foundations
-// These ratios are used consistently across the design system
-const FONT_SIZE_SCALE_RATIOS = {
-  xs: 0.8,
-  sm: 0.9,
-  md: 1,
-  lg: 1.3,
-  xl: 1.85,
-} as const;
-
-type FontSizeKey = keyof typeof FONT_SIZE_SCALE_RATIOS;
 
 // We want to keep the same ratio between the font sizes we have for the default theme
 // This is directly related to the fontSizes object in the theme default foundations
@@ -171,11 +159,12 @@ export const createFontSizeScale = (theme: Theme): Partial<Record<FontSizeKey, s
     );
   }
 
-  // When fontSize is a string, calculate all sizes based on the base value and ratios
+  // When fontSize is a string, calculate all sizes based on the base value and fractions for precision
+  // Using fractions instead of decimal ratios to avoid floating-point precision issues
   return Object.fromEntries(
-    Object.entries(FONT_SIZE_SCALE_RATIOS).map(([key, ratio]) => [
+    Object.entries(FONT_SIZE_SCALE_RATIOS).map(([key, fraction]) => [
       key,
-      ratio === 1 ? fontSize : `calc(${fontSize} * ${ratio})`,
+      fraction === '1' ? fontSize : `calc(${fontSize} * ${fraction})`,
     ]),
   ) as Record<FontSizeKey, string>;
 };
