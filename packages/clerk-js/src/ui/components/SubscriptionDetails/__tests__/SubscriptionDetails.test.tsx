@@ -729,4 +729,74 @@ describe('SubscriptionDetails', () => {
       );
     });
   });
+
+  it('past due subscription shows correct status and disables actions', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['test@clerk.com'] });
+    });
+
+    const plan = {
+      id: 'plan_monthly',
+      name: 'Monthly Plan',
+      amount: 1000,
+      amountFormatted: '10.00',
+      annualAmount: 9000,
+      annualAmountFormatted: '90.00',
+      annualMonthlyAmount: 750,
+      annualMonthlyAmountFormatted: '7.50',
+      currencySymbol: '$',
+      description: 'Monthly Plan',
+      hasBaseFee: true,
+      isRecurring: true,
+      currency: 'USD',
+      isDefault: false,
+      payerType: ['user'],
+      publiclyVisible: true,
+      slug: 'monthly-plan',
+      avatarUrl: '',
+      features: [],
+    };
+
+    fixtures.clerk.billing.getSubscriptions.mockResolvedValue({
+      data: [
+        {
+          id: 'sub_past_due',
+          plan,
+          createdAt: new Date('2021-01-01'),
+          periodStartDate: new Date('2021-01-01'),
+          periodEndDate: new Date('2021-02-01'),
+          canceledAtDate: null,
+          paymentSourceId: 'src_123',
+          planPeriod: 'month' as const,
+          status: 'past_due' as const,
+          pastDueAt: new Date('2021-01-15'),
+        },
+      ],
+      total_count: 1,
+    });
+
+    const { getByRole, getByText, queryByText, queryByRole } = render(
+      <Drawer.Root
+        open
+        onOpenChange={() => {}}
+      >
+        <SubscriptionDetails />
+      </Drawer.Root>,
+      { wrapper },
+    );
+
+    await waitFor(() => {
+      expect(getByRole('heading', { name: /Subscription/i })).toBeVisible();
+      expect(getByText('Monthly Plan')).toBeVisible();
+      expect(getByText('Past due')).toBeVisible();
+      expect(getByText('$10.00 / Month')).toBeVisible();
+
+      expect(queryByText('Subscribed on')).toBeNull();
+      expect(getByText('Past due on')).toBeVisible();
+      expect(getByText('January 15, 2021')).toBeVisible();
+
+      // Menu button should be present but disabled
+      expect(queryByRole('button', { name: /Open menu/i })).toBeNull();
+    });
+  });
 });

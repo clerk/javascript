@@ -280,6 +280,10 @@ export const usePlansContext = () => {
   );
 
   const captionForSubscription = useCallback((subscription: CommerceSubscriptionResource) => {
+    if (subscription.pastDueAt) {
+      return localizationKeys('badge__pastDueAt', { date: subscription.pastDueAt });
+    }
+
     if (subscription.status === 'upcoming') {
       return localizationKeys('badge__startsAt', { date: subscription.periodStartDate });
     }
