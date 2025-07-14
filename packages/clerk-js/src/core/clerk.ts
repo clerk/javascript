@@ -21,6 +21,7 @@ import type {
   __internal_ComponentNavigationContext,
   __internal_OAuthConsentProps,
   __internal_PlanDetailsProps,
+  __internal_SubscriptionDetailsProps,
   __internal_UserVerificationModalProps,
   APIKeysNamespace,
   APIKeysProps,
@@ -602,7 +603,7 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls.ensureMounted().then(controls => controls.closeDrawer('checkout'));
   };
 
-  public __internal_openPlanDetails = (props?: __internal_PlanDetailsProps): void => {
+  public __internal_openPlanDetails = (props: __internal_PlanDetailsProps): void => {
     this.assertComponentsReady(this.#componentControls);
     if (disabledBillingFeature(this, this.environment)) {
       if (this.#instanceType === 'development') {
@@ -615,11 +616,25 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls
       .ensureMounted({ preloadHint: 'PlanDetails' })
       .then(controls => controls.openDrawer('planDetails', props || {}));
+
+    this.telemetry?.record(eventPrebuiltComponentOpened(`PlanDetails`, props));
   };
 
   public __internal_closePlanDetails = (): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls.ensureMounted().then(controls => controls.closeDrawer('planDetails'));
+  };
+
+  public __internal_openSubscriptionDetails = (props?: __internal_SubscriptionDetailsProps): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls
+      .ensureMounted({ preloadHint: 'SubscriptionDetails' })
+      .then(controls => controls.openDrawer('subscriptionDetails', props || {}));
+  };
+
+  public __internal_closeSubscriptionDetails = (): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted().then(controls => controls.closeDrawer('subscriptionDetails'));
   };
 
   public __internal_openReverification = (props?: __internal_UserVerificationModalProps): void => {
