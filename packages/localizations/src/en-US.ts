@@ -131,7 +131,7 @@ export const enUS: LocalizationResource = {
       endsOn: 'Ends on',
       renewsAt: 'Renews at',
       beginsOn: 'Begins on',
-      pastDueAt: 'Past due at',
+      pastDueAt: 'Past due on',
     },
     reSubscribe: 'Resubscribe',
     seeAllFeatures: 'See all features',
