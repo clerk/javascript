@@ -1,5 +1,6 @@
 import type { Theme } from '@clerk/types';
 
+import { createShadowSet, generateShadow } from '../foundations/shadows';
 import { spaceScaleKeys } from '../foundations/sizes';
 import type { fontWeights } from '../foundations/typography';
 import { colors } from '../utils/colors';
@@ -8,7 +9,6 @@ import { createAlphaColorMixString } from '../utils/colors/utils';
 import { cssSupports } from '../utils/cssSupports';
 import { fromEntries } from '../utils/fromEntries';
 import { removeUndefinedProps } from '../utils/removeUndefinedProps';
-import { createShadowSet, generateShadow } from '../foundations/shadows';
 
 export const createColorScales = (theme: Theme) => {
   const variables = removeInvalidValues(theme.variables || {});
