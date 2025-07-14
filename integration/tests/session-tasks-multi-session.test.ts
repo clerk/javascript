@@ -36,7 +36,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
       await u.page.context().clearCookies();
     });
 
-    test.skip('when switching sessions, navigate to task', async ({ page, context }) => {
+    test('when switching sessions, navigate to task', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
 
       // Performs sign-in
@@ -82,9 +82,13 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
       await u.po.userButton.waitForPopover();
       await u.po.userButton.toHaveVisibleMenuItems([/Manage account/i, /Sign out$/i]);
       await u.po.userButton.switchAccount(user2.email);
+      await u.po.userButton.waitForPopoverClosed();
+
+      // Wait for sign-in component to be mounted after switching accounts
+      await u.po.signIn.waitForMounted();
+      await page.waitForURL(/tasks/);
 
       // Resolve task
-      await u.po.signIn.waitForMounted();
       const fakeOrganization2 = u.services.organizations.createFakeOrganization();
       await u.po.sessionTask.resolveForceOrganizationSelectionTask(fakeOrganization2);
       await u.po.expect.toHaveResolvedTask();
