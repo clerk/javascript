@@ -61,7 +61,7 @@ export const InvalidPlanScreen = () => {
             padding: t.space.$4,
             borderBottomWidth: t.borderWidths.$normal,
             borderBottomStyle: t.borderStyles.$solid,
-            borderBottomColor: t.colors.$neutralAlpha100,
+            borderBottomColor: t.colors.$borderAlpha100,
           })}
         >
           <LineItems.Root>

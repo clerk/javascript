@@ -88,7 +88,7 @@ const Root = React.forwardRef<HTMLDivElement, RootProps>(
                   borderRadius: t.radii.$md,
                   borderWidth: t.borderWidths.$normal,
                   borderStyle: t.borderStyles.$solid,
-                  borderColor: t.colors.$neutralAlpha100,
+                  borderColor: t.colors.$borderAlpha100,
                   isolation: 'isolate',
                 }),
                 sx,

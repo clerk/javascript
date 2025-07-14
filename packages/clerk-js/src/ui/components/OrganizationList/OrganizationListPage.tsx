@@ -64,7 +64,7 @@ const CreateOrganizationButton = ({
       sx={t => ({
         borderTopWidth: t.borderWidths.$normal,
         borderTopStyle: t.borderStyles.$solid,
-        borderTopColor: t.colors.$neutralAlpha100,
+        borderTopColor: t.colors.$borderAlpha100,
         padding: `${t.space.$5} ${t.space.$5}`,
       })}
       iconSx={t => ({

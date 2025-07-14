@@ -264,7 +264,7 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
             borderStartEndRadius: strategy === 'fixed' ? t.radii.$lg : 0,
             borderWidth: t.borderWidths.$normal,
             borderStyle: t.borderStyles.$solid,
-            borderColor: t.colors.$neutralAlpha100,
+            borderColor: t.colors.$borderAlpha100,
             boxShadow: t.shadows.$cardBoxShadow,
             overflow: 'hidden',
             pointerEvents: 'auto',

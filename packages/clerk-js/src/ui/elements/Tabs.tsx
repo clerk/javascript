@@ -105,7 +105,7 @@ export const TabsList = (props: TabsListProps) => {
         t => ({
           borderBottomStyle: t.borderStyles.$solid,
           borderBottomWidth: t.borderWidths.$normal,
-          borderColor: t.colors.$neutralAlpha100,
+          borderColor: t.colors.$borderAlpha100,
         }),
         sx,
       ]}
