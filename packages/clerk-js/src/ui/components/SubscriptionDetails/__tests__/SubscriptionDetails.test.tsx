@@ -792,7 +792,7 @@ describe('SubscriptionDetails', () => {
       expect(getByText('$10.00 / Month')).toBeVisible();
 
       expect(queryByText('Subscribed on')).toBeNull();
-      expect(getByText('Past due at')).toBeVisible();
+      expect(getByText('Past due on')).toBeVisible();
       expect(getByText('January 15, 2021')).toBeVisible();
 
       // Menu button should be present but disabled
