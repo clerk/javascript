@@ -146,7 +146,9 @@ export type __internal_LocalizationResource = {
   badge__currentPlan: LocalizationValue;
   badge__upcomingPlan: LocalizationValue;
   badge__activePlan: LocalizationValue;
+  badge__pastDuePlan: LocalizationValue;
   badge__startsAt: LocalizationValue<'date'>;
+  badge__pastDueAt: LocalizationValue<'date'>;
   badge__endsAt: LocalizationValue;
   badge__expired: LocalizationValue;
   badge__canceledEndsAt: LocalizationValue<'date'>;
@@ -207,6 +209,7 @@ export type __internal_LocalizationResource = {
       endsOn: LocalizationValue;
       renewsAt: LocalizationValue;
       beginsOn: LocalizationValue;
+      pastDueAt: LocalizationValue;
     };
     monthly: LocalizationValue;
     annually: LocalizationValue;

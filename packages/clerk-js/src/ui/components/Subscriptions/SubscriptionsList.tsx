@@ -9,7 +9,6 @@ import {
 } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import {
-  Badge,
   Button,
   Col,
   Flex,
@@ -26,6 +25,7 @@ import {
 } from '../../customizables';
 import { ArrowsUpDown, CogFilled, Plans, Plus } from '../../icons';
 import { useRouter } from '../../router';
+import { SubscriptionBadge } from './badge';
 
 export function SubscriptionsList({
   title,
@@ -113,15 +113,7 @@ export function SubscriptionsList({
                         {subscription.plan.name}
                       </Text>
                       {sortedSubscriptions.length > 1 || !!subscription.canceledAtDate ? (
-                        // here
-                        <Badge
-                          colorScheme={subscription.status === 'active' ? 'secondary' : 'primary'}
-                          localizationKey={
-                            subscription.status === 'active'
-                              ? localizationKeys('badge__activePlan')
-                              : localizationKeys('badge__upcomingPlan')
-                          }
-                        />
+                        <SubscriptionBadge subscription={subscription} />
                       ) : null}
                     </Flex>
 

@@ -10,7 +10,6 @@ import { getClosestProfileScrollBox } from '@/ui/utils/getClosestProfileScrollBo
 import { useProtect } from '../../common';
 import { usePlansContext, usePricingTableContext, useSubscriberTypeContext } from '../../contexts';
 import {
-  Badge,
   Box,
   Button,
   Col,
@@ -25,6 +24,7 @@ import {
 } from '../../customizables';
 import { Check, Plus } from '../../icons';
 import { common, InternalThemeProvider } from '../../styledSystem';
+import { SubscriptionBadge } from '../Subscriptions/badge';
 
 interface PricingTableDefaultProps {
   plans?: CommercePlanResource[] | null;
@@ -186,22 +186,7 @@ function Card(props: CardProps) {
         isCompact={isCompact}
         planPeriod={planPeriod}
         setPlanPeriod={setPlanPeriod}
-        badge={
-          showStatusRow ? (
-            isPlanActive ? (
-              <Badge
-                colorScheme='secondary'
-                // here
-                localizationKey={localizationKeys('badge__activePlan')}
-              />
-            ) : (
-              <Badge
-                colorScheme='primary'
-                localizationKey={localizationKeys('badge__upcomingPlan')}
-              />
-            )
-          ) : undefined
-        }
+        badge={showStatusRow ? <SubscriptionBadge subscription={subscription} /> : undefined}
       />
       <Box
         elementDescriptor={descriptors.pricingTableCardBody}
