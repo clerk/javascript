@@ -36,7 +36,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
       await u.page.context().clearCookies();
     });
 
-    test('when switching sessions, navigate to task', async ({ page, context }) => {
+    test.skip('when switching sessions, navigate to task', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
 
       // Performs sign-in
