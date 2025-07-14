@@ -103,7 +103,7 @@ describe('SubscriptionDetails', () => {
     await userEvent.click(menuButton);
 
     await waitFor(() => {
-      expect(getByText('Switch to annual $100.00 per year')).toBeVisible();
+      expect(getByText('Switch to annual $100.00 / year')).toBeVisible();
       expect(getByText('Cancel subscription')).toBeVisible();
     });
   });
@@ -183,7 +183,7 @@ describe('SubscriptionDetails', () => {
     await userEvent.click(menuButton);
 
     await waitFor(() => {
-      expect(getByText('Switch to monthly $10.00 per month')).toBeVisible();
+      expect(getByText('Switch to monthly $10.00 / month')).toBeVisible();
       expect(getByText('Cancel subscription')).toBeVisible();
     });
   });
@@ -245,7 +245,7 @@ describe('SubscriptionDetails', () => {
       expect(getByText('Subscribed on')).toBeVisible();
       expect(getByText('January 1, 2021')).toBeVisible();
 
-      expect(queryByText('Renews at')).toBeNull();
+      expect(getByText('Renews at')).toBeVisible();
       expect(queryByText('Ends on')).toBeNull();
       expect(queryByText('Current billing cycle')).toBeNull();
       expect(queryByText('Monthly')).toBeNull();
@@ -368,7 +368,7 @@ describe('SubscriptionDetails', () => {
     await userEvent.click(menuButton);
 
     await waitFor(() => {
-      expect(getByText('Switch to monthly $13.00 per month')).toBeVisible();
+      expect(getByText('Switch to monthly $13.00 / month')).toBeVisible();
       expect(getByText('Resubscribe')).toBeVisible();
       expect(queryByText('Cancel subscription')).toBeNull();
     });
@@ -376,7 +376,7 @@ describe('SubscriptionDetails', () => {
     await userEvent.click(upcomingMenuButton);
 
     await waitFor(() => {
-      expect(getByText('Switch to annual $90.00 per year')).toBeVisible();
+      expect(getByText('Switch to annual $90.00 / year')).toBeVisible();
       expect(getByText('Cancel subscription')).toBeVisible();
     });
   });
@@ -491,7 +491,7 @@ describe('SubscriptionDetails', () => {
     });
   });
 
-  it.only('allows cancelling a subscription of a monthly plan', async () => {
+  it('allows cancelling a subscription of a monthly plan', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
     });
