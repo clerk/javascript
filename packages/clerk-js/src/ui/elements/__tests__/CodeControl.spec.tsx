@@ -328,17 +328,76 @@ describe('CodeControl', () => {
 
       // Simulate autofill with mixed characters
       if (hiddenInput) {
-        fireEvent.change(hiddenInput, { target: { value: '1a2b3c4d5e6f' } });
+        fireEvent.change(hiddenInput, { target: { value: '1a2b3c' } });
       }
 
       await waitFor(() => {
         expect(visibleInputs[0]).toHaveValue('1');
         expect(visibleInputs[1]).toHaveValue('2');
         expect(visibleInputs[2]).toHaveValue('3');
-        expect(visibleInputs[3]).toHaveValue('4');
-        expect(visibleInputs[4]).toHaveValue('5');
-        expect(visibleInputs[5]).toHaveValue('6');
+        expect(visibleInputs[3]).toHaveValue('');
+        expect(visibleInputs[4]).toHaveValue('');
+        expect(visibleInputs[5]).toHaveValue('');
       });
+    });
+
+    it('has proper password manager attributes for detection', async () => {
+      const { wrapper } = await createFixtures();
+      const onCodeEntryFinished = vi.fn();
+      const Component = createOTPComponent(onCodeEntryFinished);
+
+      const { container } = render(<Component />, { wrapper });
+
+      const hiddenInput = container.querySelector('[data-otp-hidden-input]');
+
+      // Verify critical attributes for detection
+      expect(hiddenInput).toHaveAttribute('autocomplete', 'one-time-code');
+      expect(hiddenInput).toHaveAttribute('inputmode', 'numeric');
+      expect(hiddenInput).toHaveAttribute('pattern', '[0-9]{6}');
+      expect(hiddenInput).toHaveAttribute('minlength', '6');
+      expect(hiddenInput).toHaveAttribute('maxlength', '6');
+      expect(hiddenInput).toHaveAttribute('name', 'otp');
+      expect(hiddenInput).toHaveAttribute('id', 'otp-input');
+      expect(hiddenInput).toHaveAttribute('data-otp-input', 'true');
+      expect(hiddenInput).toHaveAttribute('role', 'textbox');
+      expect(hiddenInput).toHaveAttribute('aria-label', 'Enter verification code');
+      expect(hiddenInput).toHaveAttribute('data-testid', 'otp-input');
+    });
+
+    it('handles focus redirection from hidden input to visible inputs', async () => {
+      const { wrapper } = await createFixtures();
+      const onCodeEntryFinished = vi.fn();
+      const Component = createOTPComponent(onCodeEntryFinished);
+
+      const { container } = render(<Component />, { wrapper });
+
+      const hiddenInput = container.querySelector('[data-otp-hidden-input]') as HTMLInputElement;
+      const visibleInputs = container.querySelectorAll('[data-otp-segment]');
+
+      // Focus the hidden input (simulating password manager behavior)
+      hiddenInput.focus();
+
+      await waitFor(() => {
+        // Should redirect focus to first visible input
+        expect(visibleInputs[0]).toHaveFocus();
+      });
+    });
+
+    it('maintains accessibility with proper ARIA attributes', async () => {
+      const { wrapper } = await createFixtures();
+      const onCodeEntryFinished = vi.fn();
+      const Component = createOTPComponent(onCodeEntryFinished);
+
+      const { container } = render(<Component />, { wrapper });
+
+      const hiddenInput = container.querySelector('[data-otp-hidden-input]');
+      const inputContainer = container.querySelector('[role="group"]');
+      const instructions = container.querySelector('#otp-instructions');
+
+      // Verify ARIA setup
+      expect(hiddenInput).toHaveAttribute('aria-describedby', 'otp-instructions');
+      expect(inputContainer).toHaveAttribute('aria-describedby', 'otp-instructions');
+      expect(instructions).toHaveTextContent('Enter the 6-digit verification code');
     });
 
     it('focuses first visible input when hidden input is focused', async () => {

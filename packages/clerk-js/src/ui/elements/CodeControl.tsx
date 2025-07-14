@@ -196,6 +196,19 @@ export const OTPCodeControl = React.forwardRef<{ reset: any }>((_, ref) => {
     }
   }, [values]);
 
+  // Focus management for password managers
+  React.useEffect(() => {
+    const handleFocus = () => {
+      // If focus is on the hidden input, redirect to first visible input
+      if (document.activeElement === hiddenInputRef.current) {
+        setTimeout(() => focusInputAt(0), 0);
+      }
+    };
+
+    document.addEventListener('focusin', handleFocus);
+    return () => document.removeEventListener('focusin', handleFocus);
+  }, []);
+
   const handleMultipleCharValue = ({ eventValue, inputPosition }: { eventValue: string; inputPosition: number }) => {
     const eventValues = (eventValue || '').split('');
 
@@ -311,13 +324,19 @@ export const OTPCodeControl = React.forwardRef<{ reset: any }>((_, ref) => {
         ref={hiddenInputRef}
         type='text'
         autoComplete='one-time-code'
-        data-otp-hidden-input
         inputMode='numeric'
         pattern={`[0-9]{${length}}`}
         minLength={length}
         maxLength={length}
         spellCheck={false}
-        aria-hidden='true'
+        name='otp'
+        id='otp-input'
+        data-otp-input
+        data-otp-hidden-input
+        data-testid='otp-input'
+        role='textbox'
+        aria-label='Enter verification code'
+        aria-describedby='otp-instructions'
         tabIndex={-1}
         onChange={handleHiddenInputChange}
         onFocus={() => {
@@ -325,11 +344,40 @@ export const OTPCodeControl = React.forwardRef<{ reset: any }>((_, ref) => {
           focusInputAt(0);
         }}
         sx={() => ({
-          ...common.visuallyHidden(),
-          left: '-9999px',
+          // NOTE: Do not use the visuallyHidden() utility here, as it will break password manager autofill
+          position: 'absolute',
+          opacity: 0,
+          width: '1px',
+          height: '1px',
+          overflow: 'hidden',
+          clip: 'rect(0, 0, 0, 0)',
+          clipPath: 'inset(50%)',
+          whiteSpace: 'nowrap',
+          // Ensure the input is still accessible to password managers
+          // by not using display: none or visibility: hidden
           pointerEvents: 'none',
+          // Position slightly within the container for better detection
+          top: 0,
+          left: 0,
         })}
       />
+
+      {/* Hidden instructions for screen readers and password managers */}
+      <span
+        id='otp-instructions'
+        style={{
+          position: 'absolute',
+          width: '1px',
+          height: '1px',
+          padding: 0,
+          margin: '-1px',
+          overflow: 'hidden',
+          clip: 'rect(0, 0, 0, 0)',
+          border: 0,
+        }}
+      >
+        Enter the {length}-digit verification code
+      </span>
 
       <Flex
         isLoading={isLoading}
@@ -339,6 +387,7 @@ export const OTPCodeControl = React.forwardRef<{ reset: any }>((_, ref) => {
         sx={t => ({ direction: 'ltr', padding: t.space.$1, marginLeft: `calc(${t.space.$1} * -1)`, ...centerSx })}
         role='group'
         aria-label='Verification code input'
+        aria-describedby='otp-instructions'
       >
         {values.map((value: string, index: number) => (
           <SingleCharInput
@@ -363,8 +412,8 @@ export const OTPCodeControl = React.forwardRef<{ reset: any }>((_, ref) => {
             type='text'
             inputMode='numeric'
             name={`codeInput-${index}`}
-            data-otp-segment
-            data-1p-ignore
+            data-otp-segment='true'
+            data-1p-ignore='true'
             data-lpignore='true'
             maxLength={1}
             pattern='[0-9]'
