@@ -1,5 +1,3 @@
-import type { CommerceSubscriptionResource } from '@clerk/types';
-
 import { ProfileSection } from '@/ui/elements/Section';
 
 import { useProtect } from '../../common';
@@ -38,7 +36,7 @@ export function SubscriptionsList({
   arrowButtonText: LocalizationKey;
   arrowButtonEmptyText: LocalizationKey;
 }) {
-  const { handleSelectPlan, captionForSubscription, canManageSubscription } = usePlansContext();
+  const { captionForSubscription, openSubscriptionDetails } = usePlansContext();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
   const subscriberType = useSubscriberTypeContext();
   const { data: subscriptions } = useSubscriptions();
@@ -46,17 +44,6 @@ export function SubscriptionsList({
     has => has({ permission: 'org:sys_billing:manage' }) || subscriberType === 'user',
   );
   const { navigate } = useRouter();
-  const handleSelectSubscription = (
-    subscription: CommerceSubscriptionResource,
-    event?: React.MouseEvent<HTMLElement>,
-  ) => {
-    handleSelectPlan({
-      mode: 'modal', // always modal for now
-      plan: subscription.plan,
-      planPeriod: subscription.planPeriod,
-      event,
-    });
-  };
 
   const sortedSubscriptions = subscriptions.sort((a, b) => {
     // alway put active subscriptions first
@@ -179,28 +166,26 @@ export function SubscriptionsList({
                     textAlign: 'right',
                   })}
                 >
-                  {canManageSubscription({ subscription }) && subscription.id && !subscription.plan.isDefault && (
-                    <Button
-                      aria-label='Manage subscription'
-                      onClick={event => handleSelectSubscription(subscription, event)}
-                      variant='bordered'
-                      colorScheme='secondary'
-                      isDisabled={!canManageBilling}
+                  <Button
+                    aria-label='Manage subscription'
+                    onClick={event => openSubscriptionDetails(event)}
+                    variant='bordered'
+                    colorScheme='secondary'
+                    isDisabled={!canManageBilling}
+                    sx={t => ({
+                      width: t.sizes.$6,
+                      height: t.sizes.$6,
+                    })}
+                  >
+                    <Icon
+                      icon={CogFilled}
                       sx={t => ({
-                        width: t.sizes.$6,
-                        height: t.sizes.$6,
+                        width: t.sizes.$4,
+                        height: t.sizes.$4,
+                        opacity: t.opacity.$inactive,
                       })}
-                    >
-                      <Icon
-                        icon={CogFilled}
-                        sx={t => ({
-                          width: t.sizes.$4,
-                          height: t.sizes.$4,
-                          opacity: t.opacity.$inactive,
-                        })}
-                      />
-                    </Button>
-                  )}
+                    />
+                  </Button>
                 </Td>
               </Tr>
             ))}

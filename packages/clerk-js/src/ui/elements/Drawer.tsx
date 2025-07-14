@@ -339,6 +339,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>(({ title, children,
 
 interface BodyProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
+  sx?: ThemableCssProp;
 }
 
 const Body = React.forwardRef<HTMLDivElement, BodyProps>(({ children, ...props }, ref) => {
@@ -346,13 +347,16 @@ const Body = React.forwardRef<HTMLDivElement, BodyProps>(({ children, ...props }
     <Box
       ref={ref}
       elementDescriptor={descriptors.drawerBody}
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        flex: 1,
-        overflowY: 'auto',
-        overflowX: 'hidden',
-      }}
+      sx={[
+        () => ({
+          display: 'flex',
+          flexDirection: 'column',
+          flex: 1,
+          overflowY: 'auto',
+          overflowX: 'hidden',
+        }),
+        props.sx,
+      ]}
       {...props}
     >
       {children}

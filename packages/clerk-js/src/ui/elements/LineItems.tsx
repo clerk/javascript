@@ -81,7 +81,7 @@ function Group({ children, borderTop = false, variant = 'primary' }: GroupProps)
  * -----------------------------------------------------------------------------------------------*/
 
 interface TitleProps {
-  title: string | LocalizationKey;
+  title?: string | LocalizationKey;
   description?: string | LocalizationKey;
   icon?: React.ComponentType;
 }
@@ -104,22 +104,24 @@ const Title = React.forwardRef<HTMLTableCellElement, TitleProps>(({ title, descr
         ...common.textVariants(t)[textVariant],
       })}
     >
-      <Span
-        sx={t => ({
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: t.space.$1,
-        })}
-      >
-        {icon ? (
-          <Icon
-            size='md'
-            icon={icon}
-            aria-hidden
-          />
-        ) : null}
-        <Span localizationKey={title} />
-      </Span>
+      {title ? (
+        <Span
+          sx={t => ({
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: t.space.$1,
+          })}
+        >
+          {icon ? (
+            <Icon
+              size='md'
+              icon={icon}
+              aria-hidden
+            />
+          ) : null}
+          <Span localizationKey={title} />
+        </Span>
+      ) : null}
       {description ? (
         <Span
           localizationKey={description}
