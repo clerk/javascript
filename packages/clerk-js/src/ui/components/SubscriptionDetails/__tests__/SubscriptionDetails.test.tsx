@@ -655,7 +655,6 @@ describe('SubscriptionDetails', () => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
     });
 
-    const switchToMonthlyMock = jest.fn().mockResolvedValue({});
     const plan = {
       id: 'plan_annual',
       name: 'Annual Plan',
