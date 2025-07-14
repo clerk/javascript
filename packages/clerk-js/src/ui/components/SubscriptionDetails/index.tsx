@@ -465,7 +465,7 @@ const SubscriptionCard = ({ subscription }: { subscription: CommerceSubscription
             sx={t => ({
               fontSize: t.fontSizes.$lg,
               fontWeight: t.fontWeights.$semibold,
-              color: t.colors.$colorText,
+              color: t.colors.$colorForeground,
               marginInlineEnd: 'auto',
             })}
           >

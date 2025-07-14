@@ -28,7 +28,7 @@ const { applyVariants, filterProps } = createVariants(theme => ({
       outline: {
         [vars.accent]: theme.colors.$neutralAlpha600,
         [vars.bg]: 'transparent',
-        [vars.borderColor]: theme.colors.$neutralAlpha150,
+        [vars.borderColor]: theme.colors.$borderAlpha150,
       },
     },
   },

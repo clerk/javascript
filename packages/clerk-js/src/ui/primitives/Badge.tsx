@@ -22,9 +22,9 @@ const { applyVariants, filterProps } = createVariants(theme => ({
     textVariant: { ...common.textVariants(theme) },
     colorScheme: {
       primary: {
-        [vars.accent]: theme.colors.$neutralAlpha600,
-        [vars.bg]: theme.colors.$neutralAlpha50,
-        [vars.borderColor]: theme.colors.$neutralAlpha150,
+        [vars.accent]: theme.colors.$borderAlpha600,
+        [vars.bg]: theme.colors.$borderAlpha50,
+        [vars.borderColor]: theme.colors.$borderAlpha150,
       },
       secondary: {
         [vars.accent]: theme.colors.$colorPrimaryForeground,
