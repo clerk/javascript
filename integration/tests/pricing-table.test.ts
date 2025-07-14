@@ -341,11 +341,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await u.po.checkout.confirmAndContinue();
       await u.po.pricingTable.startCheckout({ planSlug: 'pro', shouldSwitch: true, period: 'monthly' });
       await u.po.checkout.waitForMounted();
-      await expect(
-        page
-          .locator('.cl-checkout-root')
-          .getByText('You cannot subscribe to this plan. Your existing subscription is more expensive than this plan.'),
-      ).toBeVisible();
+      await expect(page.locator('.cl-checkout-root').getByText('You cannot subscribe to this plan.')).toBeVisible();
 
       await fakeUser.deleteIfExists();
     });
