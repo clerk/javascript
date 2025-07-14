@@ -116,7 +116,7 @@ function SectionHeader({ text }: { text: string | LocalizationKey }) {
         background: t.colors.$neutralAlpha50,
         borderBlockWidth: t.borderWidths.$normal,
         borderBlockStyle: t.borderStyles.$solid,
-        borderBlockColor: t.colors.$neutralAlpha100,
+        borderBlockColor: t.colors.$borderAlpha100,
       })}
     >
       <Heading
@@ -154,7 +154,7 @@ function SectionContentItem({ children }: { children: React.ReactNode }) {
         '&:not(:first-child)': {
           borderBlockStartWidth: t.borderWidths.$normal,
           borderBlockStartStyle: t.borderStyles.$solid,
-          borderBlockStartColor: t.colors.$neutralAlpha100,
+          borderBlockStartColor: t.colors.$borderAlpha100,
         },
       })}
     >
@@ -299,7 +299,7 @@ function SectionContentDetailsListItem({
         '&:not(:first-child)': {
           borderBlockStartWidth: t.borderWidths.$normal,
           borderBlockStartStyle: t.borderStyles.$solid,
-          borderBlockStartColor: t.colors.$neutralAlpha100,
+          borderBlockStartColor: t.colors.$borderAlpha100,
         },
       })}
     >
@@ -376,7 +376,7 @@ function Footer({ label, value }: { label: string | LocalizationKey; value: stri
         background: t.colors.$neutralAlpha25,
         borderBlockStartWidth: t.borderWidths.$normal,
         borderBlockStartStyle: t.borderStyles.$solid,
-        borderBlockStartColor: t.colors.$neutralAlpha100,
+        borderBlockStartColor: t.colors.$borderAlpha100,
         display: 'flex',
         justifyContent: 'space-between',
       })}

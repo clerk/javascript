@@ -54,7 +54,7 @@ const Root = React.forwardRef<HTMLDivElement, RootProps>(
           sx={t => ({
             width: '100%',
             borderRadius: t.radii.$lg,
-            boxShadow: `inset 0 0 0 1px ${t.colors.$neutralAlpha100}`,
+            boxShadow: `inset 0 0 0 1px ${t.colors.$borderAlpha100}`,
             backgroundColor: t.colors.$colorBackground,
             isolation: 'isolate',
           })}

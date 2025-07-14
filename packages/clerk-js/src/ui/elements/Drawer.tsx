@@ -304,7 +304,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>(({ title, children,
           ),
           borderBlockEndWidth: t.borderWidths.$normal,
           borderBlockEndStyle: t.borderStyles.$solid,
-          borderBlockEndColor: t.colors.$neutralAlpha100,
+          borderBlockEndColor: t.colors.$borderAlpha100,
           borderStartStartRadius: t.radii.$lg,
           borderStartEndRadius: t.radii.$lg,
           paddingBlock: title ? t.space.$3 : undefined,
@@ -388,7 +388,7 @@ const Footer = React.forwardRef<HTMLDivElement, FooterProps>(({ children, sx, ..
           ),
           borderBlockStartWidth: t.borderWidths.$normal,
           borderBlockStartStyle: t.borderStyles.$solid,
-          borderBlockStartColor: t.colors.$neutralAlpha100,
+          borderBlockStartColor: t.colors.$borderAlpha100,
           borderEndStartRadius: t.radii.$xl,
           borderEndEndRadius: t.radii.$xl,
           paddingBlock: t.space.$3,
@@ -532,7 +532,7 @@ const Confirmation = React.forwardRef<HTMLDivElement, ConfirmationProps>(
               padding: t.space.$4,
               borderStartStartRadius: t.radii.$md,
               borderStartEndRadius: t.radii.$md,
-              boxShadow: `0 0 0 1px ${t.colors.$neutralAlpha100}`,
+              boxShadow: `0 0 0 1px ${t.colors.$borderAlpha100}`,
             })}
           >
             {children}

@@ -48,7 +48,7 @@ export const PaymentAttemptPage = () => {
         sx={t => ({
           borderBlockEndWidth: t.borderWidths.$normal,
           borderBlockEndStyle: t.borderStyles.$solid,
-          borderBlockEndColor: t.colors.$neutralAlpha100,
+          borderBlockEndColor: t.colors.$borderAlpha100,
           marginBlockEnd: t.space.$4,
           paddingBlockEnd: t.space.$4,
         })}
@@ -171,7 +171,7 @@ export const PaymentAttemptPage = () => {
               background: t.colors.$neutralAlpha25,
               borderBlockStartWidth: t.borderWidths.$normal,
               borderBlockStartStyle: t.borderStyles.$solid,
-              borderBlockStartColor: t.colors.$neutralAlpha100,
+              borderBlockStartColor: t.colors.$borderAlpha100,
               display: 'flex',
               justifyContent: 'space-between',
             })}
