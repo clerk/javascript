@@ -2,11 +2,11 @@
 import ProtectCSR from './ProtectCSR.astro';
 import ProtectSSR from './ProtectSSR.astro';
 
-import { isStaticOutput } from "virtual:@clerk/astro/config";
+import { isStaticOutput } from 'virtual:@clerk/astro/config';
 import type { ProtectProps } from '../../types';
 
 type Props = ProtectProps & {
-  isStatic?: boolean
+  isStatic?: boolean;
   /**
    * The class name to apply to the outermost element of the component.
    * This class is only applied to static components.
@@ -22,7 +22,7 @@ type Props = ProtectProps & {
    * This class is only applied to static components.
    */
   fallbackSlotWrapperClass?: string;
-}
+};
 
 const { isStatic, ...props } = Astro.props;
 
@@ -36,9 +36,17 @@ const hasProtectFallback = Astro.slots.has('protect-fallback');
 
 <ProtectComponent {...props}>
   <slot />
-  {hasProtectFallback ? (
-    <slot name="protect-fallback" slot="protect-fallback" />
-  ) : (
-    <slot name="fallback" slot="fallback" />
-  )}
+  {
+    hasProtectFallback ? (
+      <slot
+        name='protect-fallback'
+        slot='protect-fallback'
+      />
+    ) : (
+      <slot
+        name='fallback'
+        slot='fallback'
+      />
+    )
+  }
 </ProtectComponent>

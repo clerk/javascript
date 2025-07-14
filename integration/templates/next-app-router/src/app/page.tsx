@@ -1,4 +1,4 @@
-import { SignedIn, SignedOut, SignIn, UserButton, Protect } from '@clerk/nextjs';
+import { Protect, SignedIn, SignedOut, SignIn, UserButton } from '@clerk/nextjs';
 import Link from 'next/link';
 import { ClientId } from './client-id';
 
@@ -11,7 +11,7 @@ export default function Home() {
       <SignedOut>SignedOut</SignedOut>
       <Protect fallback={'SignedOut from protect'}>SignedIn from protect</Protect>
       <SignIn
-        path={'/'}
+        routing='hash'
         signUpUrl={'/sign-up'}
       />
       <ul>

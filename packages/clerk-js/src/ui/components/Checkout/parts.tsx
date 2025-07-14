@@ -1,3 +1,4 @@
+import { __experimental_useCheckout as useCheckout } from '@clerk/shared/react';
 import { useMemo } from 'react';
 
 import { Alert } from '@/ui/elements/Alert';
@@ -7,10 +8,10 @@ import { LineItems } from '@/ui/elements/LineItems';
 import { useCheckoutContext } from '../../contexts';
 import { Box, descriptors, Flex, localizationKeys, useLocalizations } from '../../customizables';
 import { EmailForm } from '../UserProfile/EmailForm';
-import { useCheckoutContextRoot } from './CheckoutPage';
 
 export const GenericError = () => {
-  const { errors } = useCheckoutContextRoot();
+  const { checkout } = useCheckout();
+
   const { translateError } = useLocalizations();
   const { t } = useLocalizations();
   return (
@@ -28,7 +29,9 @@ export const GenericError = () => {
           variant='danger'
           colorScheme='danger'
         >
-          {errors ? translateError(errors[0]) : t(localizationKeys('unstable__errors.form_param_value_invalid'))}
+          {checkout.error
+            ? translateError(checkout.error.errors[0])
+            : t(localizationKeys('unstable__errors.form_param_value_invalid'))}
         </Alert>
       </Flex>
     </Drawer.Body>
@@ -36,7 +39,9 @@ export const GenericError = () => {
 };
 
 export const InvalidPlanScreen = () => {
-  const { errors } = useCheckoutContextRoot();
+  const { planPeriod } = useCheckoutContext();
+  const { checkout } = useCheckout();
+  const error = checkout.error;
 
   const planFromError = useMemo(() => {
     const error = errors?.find(e => e.code === 'invalid_plan_change');
@@ -47,8 +52,6 @@ export const InvalidPlanScreen = () => {
     const error = errors?.find(e => e.code === 'invalid_plan_change');
     return error?.meta?.isPlanUpgradePossible || false;
   }, [errors]);
-
-  const { planPeriod } = useCheckoutContext();
 
   if (!planFromError) {
     return null;
@@ -100,7 +103,7 @@ export const InvalidPlanScreen = () => {
 };
 
 export const AddEmailForm = () => {
-  const { startCheckout } = useCheckoutContextRoot();
+  const { checkout } = useCheckout();
   const { setIsOpen } = useDrawerContext();
   return (
     <Drawer.Body>
@@ -112,7 +115,7 @@ export const AddEmailForm = () => {
         <EmailForm
           title={localizationKeys('commerce.checkout.emailForm.title')}
           subtitle={localizationKeys('commerce.checkout.emailForm.subtitle')}
-          onSuccess={startCheckout}
+          onSuccess={() => void checkout.start()}
           onReset={() => setIsOpen(false)}
           disableAutoFocus
         />

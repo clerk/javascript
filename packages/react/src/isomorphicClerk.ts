@@ -705,6 +705,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     return this.clerkjs?.apiKeys;
   }
 
+  __experimental_checkout = (...args: Parameters<Clerk['__experimental_checkout']>) => {
+    return this.clerkjs?.__experimental_checkout(...args);
+  };
+
   __unstable__setEnvironment(...args: any): void {
     if (this.clerkjs && '__unstable__setEnvironment' in this.clerkjs) {
       (this.clerkjs as any).__unstable__setEnvironment(args);

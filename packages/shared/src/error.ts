@@ -1,4 +1,8 @@
-import type { ClerkAPIError, ClerkAPIErrorJSON } from '@clerk/types';
+import type {
+  ClerkAPIError,
+  ClerkAPIErrorJSON,
+  ClerkAPIResponseError as ClerkAPIResponseErrorInterface,
+} from '@clerk/types';
 
 /**
  *
@@ -157,7 +161,7 @@ export function errorToJSON(error: ClerkAPIError | null): ClerkAPIErrorJSON {
   };
 }
 
-export class ClerkAPIResponseError extends Error {
+export class ClerkAPIResponseError extends Error implements ClerkAPIResponseErrorInterface {
   clerkError: true;
 
   status: number;
@@ -321,14 +325,6 @@ export interface ErrorThrower {
 export function buildErrorThrower({ packageName, customMessages }: ErrorThrowerOptions): ErrorThrower {
   let pkg = packageName;
 
-  const messages = {
-    ...DefaultMessages,
-    ...customMessages,
-  };
-
-  /**
-   *
-   */
   function buildMessage(rawMessage: string, replacements?: Record<string, string | number>) {
     if (!replacements) {
       return `${pkg}: ${rawMessage}`;
@@ -344,6 +340,11 @@ export function buildErrorThrower({ packageName, customMessages }: ErrorThrowerO
 
     return `${pkg}: ${msg}`;
   }
+
+  const messages = {
+    ...DefaultMessages,
+    ...customMessages,
+  };
 
   return {
     setPackageName({ packageName }: ErrorThrowerOptions): ErrorThrower {

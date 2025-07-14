@@ -3,13 +3,18 @@ import type { SamlIdpSlug } from '@clerk/types';
 import { joinPaths } from '../../util/path';
 import type { SamlConnection } from '../resources';
 import { AbstractAPI } from './AbstractApi';
+import type { WithSign } from './util-types';
 
 const basePath = '/saml_connections';
 
 type SamlConnectionListParams = {
   limit?: number;
   offset?: number;
+  query?: string;
+  orderBy?: WithSign<'phone_number' | 'email_address' | 'created_at' | 'first_name' | 'last_name' | 'username'>;
+  organizationId?: WithSign<string>[];
 };
+
 type CreateSamlConnectionParams = {
   name: string;
   provider: SamlIdpSlug;
