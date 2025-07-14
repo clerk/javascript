@@ -128,7 +128,7 @@ function Card(props: CardProps) {
     () => activeOrUpcomingSubscriptionBasedOnPlanPeriod(plan, planPeriod),
     [plan, planPeriod, activeOrUpcomingSubscriptionBasedOnPlanPeriod],
   );
-  const isPlanActive = subscription?.status === 'active';
+
   const hasFeatures = plan.features.length > 0;
   const showStatusRow = !!subscription;
 

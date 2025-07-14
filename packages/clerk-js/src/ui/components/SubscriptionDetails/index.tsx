@@ -28,14 +28,12 @@ import { LineItems } from '@/ui/elements/LineItems';
 import { SubscriberTypeContext, usePlansContext, useSubscriberTypeContext, useSubscriptions } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import {
-  Badge,
   Button,
   Col,
   descriptors,
   Flex,
   Heading,
   localizationKeys,
-  Span,
   Spinner,
   Text,
   useLocalizations,
@@ -279,7 +277,6 @@ function SubscriptionDetailsSummary() {
   const { anySubscription, activeSubscription, upcomingSubscription } = useGuessableSubscription({
     or: 'throw',
   });
-  const { t } = useLocalizations();
 
   if (!activeSubscription) {
     return null;
