@@ -1,5 +1,24 @@
 # Change Log
 
+## 5.72.0
+
+### Minor Changes
+
+- [Billing Beta]: Introduce experimental `Clerk.__experimental_checkout()` for managing the state of a checkout session. ([#6195](https://github.com/clerk/javascript/pull/6195)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Bugfix: Fixed incorrect field validation when using password authentication with email or phone number during sign-up. Optional email and phone fields now correctly display their requirement status. ([#6259](https://github.com/clerk/javascript/pull/6259)) by [@bratsos](https://github.com/bratsos)
+
+- Force redirect to SSO callback route when force-an-org is enabled, ensuring task display and organization selection ([#6271](https://github.com/clerk/javascript/pull/6271)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Navigate to tasks when switching sessions ([#6273](https://github.com/clerk/javascript/pull/6273)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`2be6a53`](https://github.com/clerk/javascript/commit/2be6a53959cb8a3127c2eb5d1aeb4248872d2c24), [`f6a1c35`](https://github.com/clerk/javascript/commit/f6a1c35bd5fb4bd2a3cd45bdaf9defe6be59d4a9), [`6826d0b`](https://github.com/clerk/javascript/commit/6826d0bbd03e844d49224565878a4326684f06b4), [`f6a1c35`](https://github.com/clerk/javascript/commit/f6a1c35bd5fb4bd2a3cd45bdaf9defe6be59d4a9), [`97a07f7`](https://github.com/clerk/javascript/commit/97a07f78b4b0c3dc701a2610097ec7d6232f79e7)]:
+  - @clerk/types@4.65.0
+  - @clerk/shared@3.12.0
+  - @clerk/localizations@3.18.1
+
 ## 5.71.0
 
 ### Minor Changes

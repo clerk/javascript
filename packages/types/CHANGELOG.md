@@ -1,5 +1,17 @@
 # Change Log
 
+## 4.65.0
+
+### Minor Changes
+
+- [Billing Beta]: Introduce experimental `Clerk.__experimental_checkout()` for managing the state of a checkout session. ([#6195](https://github.com/clerk/javascript/pull/6195)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Add notice for upcoming/possible breaking changes in commerce related APIs. ([#6285](https://github.com/clerk/javascript/pull/6285)) by [@panteliselef](https://github.com/panteliselef)
+
+- Export `ClerkAPIResponseError` interface from types package. ([#6286](https://github.com/clerk/javascript/pull/6286)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 4.64.0
 
 ### Minor Changes
