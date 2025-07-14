@@ -731,10 +731,15 @@ export type Variables = {
    */
   colorRing?: CssColor;
   /**
-   * The color of the shadow used in card components.
+   * The base shadow color used in the components.
    * @default 'rgba(25, 28, 33, 0.20)'
    */
   colorShadow?: CssColor;
+  /**
+   * The base border color used in the components.
+   * @default {@link Variables.colorNeutral}
+   */
+  colorBorder?: CssColor;
   /**
    * The default font that will be used in all components.
    * This can be the name of a custom font loaded by your code or the name of a web-safe font ((@link WebSafeFont})
