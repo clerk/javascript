@@ -64,6 +64,7 @@ export const createColorScales = (theme: Theme) => {
     colorMuted: variables.colorMuted ? colors.toHslaString(variables.colorMuted) : undefined,
     colorRing: variables.colorRing ? colors.toHslaString(variables.colorRing) : undefined,
     colorShadow: variables.colorShadow ? colors.toHslaString(variables.colorShadow) : undefined,
+    colorModalBackdrop: variables.colorModalBackdrop ? colors.toHslaString(variables.colorModalBackdrop) : undefined,
   });
 };
 
