@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
+  clerkCssVar,
   extractCSSVariableValue,
   extractCSSVariableValueWithFallback,
   extractMultipleCSSVariables,
@@ -517,6 +518,12 @@ describe('CSS Variable Utilities', () => {
       expect(mockCreatedElement.style.setProperty).toHaveBeenCalledWith('color', testColor);
       expect(mockElement.appendChild).toHaveBeenCalledWith(mockCreatedElement);
       expect(mockGetComputedStyle).toHaveBeenCalledWith(mockCreatedElement);
+    });
+  });
+
+  describe('clerkCssVar', () => {
+    it('should return a CSS variable string', () => {
+      expect(clerkCssVar('color', 'red')).toBe('var(--clerk-color, red)');
     });
   });
 });
