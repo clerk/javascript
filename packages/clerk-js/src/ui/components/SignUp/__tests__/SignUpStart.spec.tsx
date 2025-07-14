@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { CardStateProvider } from '@/ui/elements/contexts';
 
-import { render, screen, waitFor } from '../../../../vitestUtils';
+import { fireEvent, render, screen, waitFor } from '../../../../vitestUtils';
 import { OptionsProvider } from '../../../contexts';
 import { AppearanceProvider } from '../../../customizables';
 import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
@@ -88,14 +88,83 @@ describe('SignUpStart', () => {
       screen.getByText('Password');
     });
 
-    it('enables optional email', async () => {
+    it('should keep email optional when phone is primary with password', async () => {
       const { wrapper } = await createFixtures(f => {
         f.withEmailAddress({ required: false });
         f.withPhoneNumber({ required: true });
         f.withPassword({ required: true });
       });
       render(<SignUpStart />, { wrapper });
-      expect(screen.getByText('Email address').nextElementSibling?.textContent).toBe('Optional');
+
+      const emailAddress = screen.getByLabelText('Email address', { selector: 'input' });
+      expect(emailAddress.ariaRequired).toBe('false');
+      expect(screen.getByText('Optional')).toBeInTheDocument();
+
+      const phoneInput = screen.getByLabelText('Phone number', { selector: 'input' });
+      expect(phoneInput.ariaRequired).toBe('true');
+    });
+
+    it('should require phone when password is required and phone is primary communication method', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withPhoneNumber({ required: false, used_for_first_factor: true });
+        f.withPassword({ required: true });
+      });
+      render(<SignUpStart />, { wrapper });
+
+      const phoneInput = screen.getByLabelText('Phone number', { selector: 'input' });
+      expect(phoneInput.ariaRequired).toBe('true');
+
+      expect(screen.queryByLabelText('Email address', { selector: 'input' })).not.toBeInTheDocument();
+    });
+
+    it('should require email when only email is enabled with password', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withEmailAddress({ required: true, used_for_first_factor: true });
+        f.withPassword({ required: true });
+      });
+
+      render(<SignUpStart />, { wrapper });
+
+      const emailAddress = screen.getByLabelText('Email address', { selector: 'input' });
+      expect(emailAddress.ariaRequired).toBe('true');
+      expect(screen.queryByText('Optional')).not.toBeInTheDocument();
+      expect(screen.queryByLabelText('Phone number', { selector: 'input' })).not.toBeInTheDocument();
+    });
+
+    it('should require email when password is required and email is primary communication method', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withEmailAddress({ required: false, used_for_first_factor: true });
+        f.withPhoneNumber({ required: false, used_for_first_factor: false });
+        f.withPassword({ required: true });
+      });
+      render(<SignUpStart />, { wrapper });
+
+      const emailAddress = screen.getByLabelText('Email address', { selector: 'input' });
+      expect(emailAddress.ariaRequired).toBe('true');
+      expect(screen.queryByText('Optional')).not.toBeInTheDocument();
+
+      expect(screen.queryByLabelText('Phone number', { selector: 'input' })).not.toBeInTheDocument();
+    });
+
+    it('should require active field when toggling between email and phone with password', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withEmailAddress({ required: false, used_for_first_factor: true });
+        f.withPhoneNumber({ required: false, used_for_first_factor: true });
+        f.withPassword({ required: true });
+      });
+      render(<SignUpStart />, { wrapper });
+
+      const emailInput = screen.getByLabelText('Email address', { selector: 'input' });
+      expect(emailInput.ariaRequired).toBe('true');
+      expect(screen.queryByText('Optional')).not.toBeInTheDocument();
+
+      const usePhoneButton = screen.getByText(/use phone/i);
+      fireEvent.click(usePhoneButton);
+
+      const phoneInput = screen.getByLabelText('Phone number', { selector: 'input' });
+      expect(phoneInput.ariaRequired).toBe('true');
+
+      expect(screen.queryByLabelText('Email address', { selector: 'input' })).not.toBeInTheDocument();
     });
 
     it('enables optional phone number', async () => {

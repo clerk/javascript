@@ -1,11 +1,11 @@
 {
   "files": [
-    { "path": "./dist/clerk.js", "maxSize": "612kB" },
+    { "path": "./dist/clerk.js", "maxSize": "614kB" },
     { "path": "./dist/clerk.browser.js", "maxSize": "72.2KB" },
     { "path": "./dist/clerk.legacy.browser.js", "maxSize": "115KB" },
     { "path": "./dist/clerk.headless*.js", "maxSize": "55KB" },
-    { "path": "./dist/ui-common*.js", "maxSize": "111.9KB" },
-    { "path": "./dist/ui-common*.legacy.*.js", "maxSize": "113.67KB" },
+    { "path": "./dist/ui-common*.js", "maxSize": "110KB" },
+    { "path": "./dist/ui-common*.legacy.*.js", "maxSize": "113.72KB" },
     { "path": "./dist/vendors*.js", "maxSize": "40.2KB" },
     { "path": "./dist/coinbase*.js", "maxSize": "38KB" },
     { "path": "./dist/stripe-vendors*.js", "maxSize": "1KB" },
@@ -15,7 +15,7 @@
     { "path": "./dist/organizationswitcher*.js", "maxSize": "5KB" },
     { "path": "./dist/organizationlist*.js", "maxSize": "5.5KB" },
     { "path": "./dist/signin*.js", "maxSize": "14KB" },
-    { "path": "./dist/signup*.js", "maxSize": "8.5KB" },
+    { "path": "./dist/signup*.js", "maxSize": "8.86KB" },
     { "path": "./dist/userbutton*.js", "maxSize": "5KB" },
     { "path": "./dist/userprofile*.js", "maxSize": "16KB" },
     { "path": "./dist/userverification*.js", "maxSize": "5KB" },
