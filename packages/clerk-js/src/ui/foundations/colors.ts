@@ -33,6 +33,9 @@ type AlphaScale<T extends string> = NonNullable<ReturnType<typeof colorOptionToT
  *
  * Therefore, it's safe to assert these as NonNullable.
  */
+
+const defaultColorNeutral = clerkCssVar('color-neutral', '#000000');
+
 const dangerScale = colorOptionToThemedLightnessScale(
   clerkCssVar('color-danger', '#EF4444'),
   'danger',
@@ -55,7 +58,7 @@ const dangerAlphaScale = colorOptionToThemedAlphaScale(
   'dangerAlpha',
 ) as AlphaScale<'dangerAlpha'>;
 const neutralAlphaScale = colorOptionToThemedAlphaScale(
-  clerkCssVar('color-neutral', '#000000'),
+  defaultColorNeutral,
   'neutralAlpha',
 ) as AlphaScale<'neutralAlpha'>;
 const primaryAlphaScale = colorOptionToThemedAlphaScale(
@@ -72,7 +75,7 @@ const warningAlphaScale = colorOptionToThemedAlphaScale(
 ) as AlphaScale<'warningAlpha'>;
 
 const borderAlphaScale = colorOptionToThemedAlphaScale(
-  clerkCssVar('color-border', '#000000'),
+  clerkCssVar('color-border', defaultColorNeutral),
   'borderAlpha',
 ) as AlphaScale<'borderAlpha'>;
 
