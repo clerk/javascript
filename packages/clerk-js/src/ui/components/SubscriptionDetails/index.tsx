@@ -23,18 +23,18 @@ import { formatDate } from '@/ui/utils/formatDate';
 
 const isFreePlan = (plan: CommercePlanResource) => !plan.hasBaseFee;
 
+import { LineItems } from '@/ui/elements/LineItems';
+
 import { SubscriberTypeContext, usePlansContext, useSubscriberTypeContext, useSubscriptions } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import {
   Badge,
-  Box,
   Button,
   Col,
   descriptors,
   Flex,
   Heading,
   localizationKeys,
-  Span,
   Spinner,
   Text,
   useLocalizations,
@@ -271,83 +271,47 @@ const SubscriptionDetailsFooter = withCardStateProvider(() => {
 
 function SubscriptionDetailsSummary() {
   const { anySubscription, activeSubscription, upcomingSubscription } = useGuessableSubscription({ or: 'throw' });
-  const { t } = useLocalizations();
 
   if (!activeSubscription) {
     return null;
   }
 
   return (
-    <Col
-      elementDescriptor={descriptors.subscriptionDetailsSummaryItems}
-      gap={3}
-      as='ul'
-      sx={t => ({
-        paddingBlock: t.space.$1,
-      })}
-    >
-      <SummaryItem>
-        <SummmaryItemLabel>
-          <Text
-            colorScheme='secondary'
-            localizationKey={localizationKeys('commerce.subscriptionDetails.currentBillingCycle')}
-          />
-        </SummmaryItemLabel>
-        <SummmaryItemValue>
-          <Text
-            colorScheme='secondary'
-            localizationKey={
-              activeSubscription.planPeriod === 'month'
-                ? localizationKeys('commerce.monthly')
-                : localizationKeys('commerce.annually')
-            }
-          />
-        </SummmaryItemValue>
-      </SummaryItem>
-      <SummaryItem>
-        <SummmaryItemLabel>
-          <Text colorScheme='secondary'>{t(localizationKeys('commerce.subscriptionDetails.nextPaymentOn'))}</Text>
-        </SummmaryItemLabel>
-        <SummmaryItemValue>
-          <Text colorScheme='secondary'>
-            {upcomingSubscription
+    <LineItems.Root>
+      <LineItems.Group>
+        <LineItems.Title description={localizationKeys('commerce.subscriptionDetails.currentBillingCycle')} />
+        <LineItems.Description
+          text={
+            activeSubscription.planPeriod === 'month'
+              ? localizationKeys('commerce.monthly')
+              : localizationKeys('commerce.annually')
+          }
+        />
+      </LineItems.Group>
+      <LineItems.Group>
+        <LineItems.Title description={localizationKeys('commerce.subscriptionDetails.nextPaymentOn')} />
+        <LineItems.Description
+          text={
+            upcomingSubscription
               ? formatDate(upcomingSubscription.periodStartDate)
               : anySubscription.periodEndDate
                 ? formatDate(anySubscription.periodEndDate)
-                : '-'}
-          </Text>
-        </SummmaryItemValue>
-      </SummaryItem>
-      <SummaryItem>
-        <SummmaryItemLabel>
-          <Text
-            colorScheme='secondary'
-            localizationKey={localizationKeys('commerce.subscriptionDetails.nextPaymentAmount')}
-          />
-        </SummmaryItemLabel>
-        <SummmaryItemValue
-          sx={t => ({
-            display: 'flex',
-            alignItems: 'center',
-            gap: t.space.$1,
-          })}
-        >
-          <Text
-            variant='caption'
-            colorScheme='secondary'
-            sx={{ textTransform: 'uppercase' }}
-          >
-            {anySubscription.plan.currency}
-          </Text>
-          <Text>
-            {anySubscription.plan.currencySymbol}
-            {anySubscription.planPeriod === 'month'
+                : '-'
+          }
+        />
+      </LineItems.Group>
+      <LineItems.Group>
+        <LineItems.Title description={localizationKeys('commerce.subscriptionDetails.nextPaymentAmount')} />
+        <LineItems.Description
+          prefix={anySubscription.plan.currency}
+          text={`${anySubscription.plan.currencySymbol}${
+            anySubscription.planPeriod === 'month'
               ? anySubscription.plan.amountFormatted
-              : anySubscription.plan.annualAmountFormatted}
-          </Text>
-        </SummmaryItemValue>
-      </SummaryItem>
-    </Col>
+              : anySubscription.plan.annualAmountFormatted
+          }`}
+        />
+      </LineItems.Group>
+    </LineItems.Root>
   );
 }
 
@@ -591,53 +555,3 @@ const DetailRow = ({ label, value }: { label: LocalizationKey; value: string }) 
     </Text>
   </Flex>
 );
-
-function SummaryItem(props: React.PropsWithChildren) {
-  return (
-    <Box
-      elementDescriptor={descriptors.subscriptionDetailsSummaryItem}
-      as='li'
-      sx={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        flexWrap: 'wrap',
-      }}
-    >
-      {props.children}
-    </Box>
-  );
-}
-
-function SummmaryItemLabel(props: React.PropsWithChildren) {
-  return (
-    <Span
-      elementDescriptor={descriptors.subscriptionDetailsSummaryLabel}
-      sx={t => ({
-        display: 'flex',
-        alignItems: 'center',
-        gap: t.space.$1x5,
-      })}
-    >
-      {props.children}
-    </Span>
-  );
-}
-
-function SummmaryItemValue(props: Parameters<typeof Span>[0]) {
-  return (
-    <Span
-      elementDescriptor={descriptors.subscriptionDetailsSummaryValue}
-      {...props}
-      sx={[
-        t => ({
-          display: 'flex',
-          alignItems: 'center',
-          gap: t.space.$0x25,
-        }),
-        props.sx,
-      ]}
-    >
-      {props.children}
-    </Span>
-  );
-}

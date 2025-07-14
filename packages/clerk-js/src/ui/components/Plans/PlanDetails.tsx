@@ -59,7 +59,6 @@ const PlanDetailsInternal = ({
 
   return (
     <SubscriberTypeContext.Provider value={plan.payerType[0] as 'user' | 'org'}>
-      {/* TODO: type assertion is a hack, make FAPI stricter */}
       <Drawer.Header
         sx={t =>
           !hasFeatures

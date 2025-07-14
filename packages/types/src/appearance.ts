@@ -618,10 +618,6 @@ export type ElementsConfig = {
   subscriptionDetailsCardBody: WithOptions;
   subscriptionDetailsCardFooter: WithOptions;
   subscriptionDetailsCardActions: WithOptions;
-  subscriptionDetailsSummaryItems: WithOptions;
-  subscriptionDetailsSummaryItem: WithOptions;
-  subscriptionDetailsSummaryLabel: WithOptions;
-  subscriptionDetailsSummaryValue: WithOptions;
   subscriptionDetailsDetailRow: WithOptions;
   subscriptionDetailsDetailRowLabel: WithOptions;
   subscriptionDetailsDetailRowValue: WithOptions;
