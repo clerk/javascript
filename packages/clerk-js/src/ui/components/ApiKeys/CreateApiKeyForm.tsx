@@ -236,7 +236,7 @@ export const CreateApiKeyForm: React.FC<CreateApiKeyFormProps> = ({ onCreate, is
             sx={t => ({
               borderTopWidth: t.borderWidths.$normal,
               borderTopStyle: t.borderStyles.$solid,
-              borderTopColor: t.colors.$neutralAlpha100,
+              borderTopColor: t.colors.$borderAlpha100,
               paddingTop: t.space.$4,
               paddingBottom: t.space.$4,
             })}

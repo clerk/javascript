@@ -16,7 +16,7 @@ function Root({ children }: { children: React.ReactNode }) {
       sx={t => ({
         borderWidth: t.borderWidths.$normal,
         borderStyle: t.borderStyles.$solid,
-        borderColor: t.colors.$neutralAlpha100,
+        borderColor: t.colors.$borderAlpha100,
         borderRadius: t.radii.$lg,
         overflow: 'clip',
       })}
@@ -255,7 +255,7 @@ function SectionContentDetailsList({ children }: { children: React.ReactNode }) 
         padding: 0,
         borderWidth: t.borderWidths.$normal,
         borderStyle: t.borderStyles.$solid,
-        borderColor: t.colors.$neutralAlpha100,
+        borderColor: t.colors.$borderAlpha100,
         borderRadius: t.radii.$md,
         overflow: 'hidden',
       })}

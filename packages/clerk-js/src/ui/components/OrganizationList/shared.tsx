@@ -19,7 +19,7 @@ export const PreviewListItems = (props: PropsWithChildren) => {
         overflowY: 'auto',
         borderTopWidth: t.borderWidths.$normal,
         borderTopStyle: t.borderStyles.$solid,
-        borderTopColor: t.colors.$neutralAlpha100,
+        borderTopColor: t.colors.$borderAlpha100,
         ...common.unstyledScrollbar(t),
       })}
     >
@@ -54,7 +54,7 @@ export const PreviewListItem = (
           justifyContent: 'space-between',
           borderTopWidth: t.borderWidths.$normal,
           borderTopStyle: t.borderStyles.$solid,
-          borderTopColor: t.colors.$neutralAlpha100,
+          borderTopColor: t.colors.$borderAlpha100,
         }),
         sharedStyles,
       ]}
