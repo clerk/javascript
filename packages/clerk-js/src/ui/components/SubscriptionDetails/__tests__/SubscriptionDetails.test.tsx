@@ -103,7 +103,7 @@ describe('SubscriptionDetails', () => {
     await userEvent.click(menuButton);
 
     await waitFor(() => {
-      expect(getByText('Switch to annual $100.00 per year')).toBeVisible();
+      expect(getByText('Switch to annual $100.00 / year')).toBeVisible();
       expect(getByText('Cancel subscription')).toBeVisible();
     });
   });
@@ -183,7 +183,7 @@ describe('SubscriptionDetails', () => {
     await userEvent.click(menuButton);
 
     await waitFor(() => {
-      expect(getByText('Switch to monthly $10.00 per month')).toBeVisible();
+      expect(getByText('Switch to monthly $10.00 / month')).toBeVisible();
       expect(getByText('Cancel subscription')).toBeVisible();
     });
   });
@@ -245,7 +245,7 @@ describe('SubscriptionDetails', () => {
       expect(getByText('Subscribed on')).toBeVisible();
       expect(getByText('January 1, 2021')).toBeVisible();
 
-      expect(queryByText('Renews at')).toBeNull();
+      expect(getByText('Renews at')).toBeVisible();
       expect(queryByText('Ends on')).toBeNull();
       expect(queryByText('Current billing cycle')).toBeNull();
       expect(queryByText('Monthly')).toBeNull();
@@ -368,7 +368,7 @@ describe('SubscriptionDetails', () => {
     await userEvent.click(menuButton);
 
     await waitFor(() => {
-      expect(getByText('Switch to monthly $13.00 per month')).toBeVisible();
+      expect(getByText('Switch to monthly $13.00 / month')).toBeVisible();
       expect(getByText('Resubscribe')).toBeVisible();
       expect(queryByText('Cancel subscription')).toBeNull();
     });
@@ -376,7 +376,7 @@ describe('SubscriptionDetails', () => {
     await userEvent.click(upcomingMenuButton);
 
     await waitFor(() => {
-      expect(getByText('Switch to annual $90.00 per year')).toBeVisible();
+      expect(getByText('Switch to annual $90.00 / year')).toBeVisible();
       expect(getByText('Cancel subscription')).toBeVisible();
     });
   });
@@ -491,7 +491,7 @@ describe('SubscriptionDetails', () => {
     });
   });
 
-  it.only('allows cancelling a subscription of a monthly plan', async () => {
+  it('allows cancelling a subscription of a monthly plan', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
     });
@@ -727,6 +727,76 @@ describe('SubscriptionDetails', () => {
           planPeriod: 'month' as const,
         }),
       );
+    });
+  });
+
+  it('past due subscription shows correct status and disables actions', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['test@clerk.com'] });
+    });
+
+    const plan = {
+      id: 'plan_monthly',
+      name: 'Monthly Plan',
+      amount: 1000,
+      amountFormatted: '10.00',
+      annualAmount: 9000,
+      annualAmountFormatted: '90.00',
+      annualMonthlyAmount: 750,
+      annualMonthlyAmountFormatted: '7.50',
+      currencySymbol: '$',
+      description: 'Monthly Plan',
+      hasBaseFee: true,
+      isRecurring: true,
+      currency: 'USD',
+      isDefault: false,
+      payerType: ['user'],
+      publiclyVisible: true,
+      slug: 'monthly-plan',
+      avatarUrl: '',
+      features: [],
+    };
+
+    fixtures.clerk.billing.getSubscriptions.mockResolvedValue({
+      data: [
+        {
+          id: 'sub_past_due',
+          plan,
+          createdAt: new Date('2021-01-01'),
+          periodStartDate: new Date('2021-01-01'),
+          periodEndDate: new Date('2021-02-01'),
+          canceledAtDate: null,
+          paymentSourceId: 'src_123',
+          planPeriod: 'month' as const,
+          status: 'past_due' as const,
+          pastDueAt: new Date('2021-01-15'),
+        },
+      ],
+      total_count: 1,
+    });
+
+    const { getByRole, getByText, queryByText, queryByRole } = render(
+      <Drawer.Root
+        open
+        onOpenChange={() => {}}
+      >
+        <SubscriptionDetails />
+      </Drawer.Root>,
+      { wrapper },
+    );
+
+    await waitFor(() => {
+      expect(getByRole('heading', { name: /Subscription/i })).toBeVisible();
+      expect(getByText('Monthly Plan')).toBeVisible();
+      expect(getByText('Past due')).toBeVisible();
+      expect(getByText('$10.00 / Month')).toBeVisible();
+
+      expect(queryByText('Subscribed on')).toBeNull();
+      expect(getByText('Past due at')).toBeVisible();
+      expect(getByText('January 15, 2021')).toBeVisible();
+
+      // Menu button should be present but disabled
+      expect(queryByRole('button', { name: /Open menu/i })).toBeNull();
     });
   });
 });
