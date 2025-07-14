@@ -130,7 +130,7 @@ export const MenuList = (props: MenuListProps) => {
             backgroundColor: colors.makeSolid(t.colors.$colorBackground),
             borderWidth: t.borderWidths.$normal,
             borderStyle: t.borderStyles.$solid,
-            borderColor: t.colors.$neutralAlpha50,
+            borderColor: t.colors.$borderAlpha50,
             outline: 'none',
             borderRadius: t.radii.$md,
             padding: t.space.$0x5,

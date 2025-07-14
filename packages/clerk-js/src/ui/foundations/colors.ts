@@ -71,6 +71,11 @@ const warningAlphaScale = colorOptionToThemedAlphaScale(
   'warningAlpha',
 ) as AlphaScale<'warningAlpha'>;
 
+const borderAlphaScale = colorOptionToThemedAlphaScale(
+  clerkCssVar('color-border', '#000000'),
+  'borderAlpha',
+) as AlphaScale<'borderAlpha'>;
+
 const colorForeground = clerkCssVar('color-foreground', '#212126');
 const colorMutedForeground = clerkCssVar(
   'color-muted-foreground',
@@ -104,6 +109,7 @@ const colors = Object.freeze({
   ...warningAlphaScale,
   ...successScale,
   ...successAlphaScale,
+  ...borderAlphaScale,
 } as const);
 
 export { colors, neutralAlphaScale as neutralAlpha, whiteAlpha };

@@ -196,7 +196,7 @@ const TagPill = (props: TagPillProps) => {
         boxShadow: t.shadows.$badge,
         borderWidth: t.borderWidths.$normal,
         borderStyle: t.borderStyles.$solid,
-        borderColor: t.colors.$neutralAlpha100,
+        borderColor: t.colors.$borderAlpha100,
         display: 'inline-flex',
         marginRight: '1px',
         cursor: 'pointer',

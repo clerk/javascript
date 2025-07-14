@@ -23,6 +23,10 @@ export const createColorScales = (theme: Theme) => {
   const primaryAlphaScale = colorOptionToThemedAlphaScale(primaryScale?.primary500, 'primaryAlpha');
   const successAlphaScale = colorOptionToThemedAlphaScale(successScale?.success500, 'successAlpha');
   const warningAlphaScale = colorOptionToThemedAlphaScale(warningScale?.warning500, 'warningAlpha');
+  const borderAlphaScale = colorOptionToThemedAlphaScale(
+    variables.colorBorder || variables.colorNeutral,
+    'borderAlpha',
+  );
 
   return removeUndefinedProps({
     ...dangerScale,
@@ -34,6 +38,7 @@ export const createColorScales = (theme: Theme) => {
     ...primaryAlphaScale,
     ...successAlphaScale,
     ...warningAlphaScale,
+    ...borderAlphaScale,
     primaryHover: colors.adjustForLightness(primaryScale?.primary500),
     colorPrimaryForeground: variables.colorPrimaryForeground
       ? colors.toHslaString(variables.colorPrimaryForeground)
