@@ -335,8 +335,9 @@ export const OTPCodeControl = React.forwardRef<{ reset: any }>((_, ref) => {
         data-otp-hidden-input
         data-testid='otp-input'
         role='textbox'
-        aria-label='Enter verification code'
+        aria-label='One-time password input for password managers'
         aria-describedby='otp-instructions'
+        aria-hidden
         tabIndex={-1}
         onChange={handleHiddenInputChange}
         onFocus={() => {
