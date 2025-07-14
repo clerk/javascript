@@ -3,7 +3,6 @@ import { expect, test } from '@playwright/test';
 import { appConfigs } from '../presets';
 import type { FakeUser } from '../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../testUtils';
-import type { FakeOrganization } from '../testUtils/organizationsService';
 
 testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
   'session tasks after sign-up flow @nextjs',
@@ -11,7 +10,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
     test.describe.configure({ mode: 'serial' });
 
     let fakeUser: FakeUser;
-    let fakeOrganization: FakeOrganization;
 
     test.beforeAll(() => {
       const u = createTestUtils({ app });
@@ -20,7 +18,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
         withPhoneNumber: true,
         withUsername: true,
       });
-      fakeOrganization = u.services.organizations.createFakeOrganization();
     });
 
     test.afterAll(async () => {
@@ -42,9 +39,12 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
 
       // Redirects back to tasks when accessing protected route by `auth.protect`
       await u.page.goToRelative('/page-protected');
-      expect(page.url()).toContain('tasks');
+      expect(u.page.url()).toContain('tasks');
 
       // Resolves task
+      const fakeOrganization = Object.assign(u.services.organizations.createFakeOrganization(), {
+        slug: u.services.organizations.createFakeOrganization().slug + '-with-sign-up',
+      });
       await u.po.sessionTask.resolveForceOrganizationSelectionTask(fakeOrganization);
       await u.po.expect.toHaveResolvedTask();
 

@@ -15,6 +15,8 @@ import {
 import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
 import { allSettled, handleValueOrFn, noop } from '@clerk/shared/utils';
 import type {
+  __experimental_CheckoutInstance,
+  __experimental_CheckoutOptions,
   __internal_CheckoutProps,
   __internal_ComponentNavigationContext,
   __internal_OAuthConsentProps,
@@ -87,6 +89,7 @@ import type { MountComponentRenderer } from '../ui/Components';
 import {
   ALLOWED_PROTOCOLS,
   buildURL,
+  canViewOrManageAPIKeys,
   completeSignUpFlow,
   createAllowedRedirectOrigins,
   createBeforeUnloadTracker,
@@ -137,6 +140,7 @@ import type { FapiClient, FapiRequestCallback } from './fapiClient';
 import { createFapiClient } from './fapiClient';
 import { createClientFromJwt } from './jwt-client';
 import { APIKeys } from './modules/apiKeys';
+import { createCheckoutInstance } from './modules/checkout/instance';
 import { CommerceBilling } from './modules/commerce';
 import {
   BaseResource,
@@ -169,6 +173,7 @@ const CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE = 'cannot_render_organizat
 const CANNOT_RENDER_ORGANIZATION_MISSING_ERROR_CODE = 'cannot_render_organization_missing';
 const CANNOT_RENDER_SINGLE_SESSION_ENABLED_ERROR_CODE = 'cannot_render_single_session_enabled';
 const CANNOT_RENDER_API_KEYS_DISABLED_ERROR_CODE = 'cannot_render_api_keys_disabled';
+const CANNOT_RENDER_API_KEYS_ORG_UNAUTHORIZED_ERROR_CODE = 'cannot_render_api_keys_org_unauthorized';
 const defaultOptions: ClerkOptions = {
   polling: true,
   standardBrowser: true,
@@ -196,6 +201,7 @@ export class Clerk implements ClerkInterface {
   };
   private static _billing: CommerceBillingNamespace;
   private static _apiKeys: APIKeysNamespace;
+  private _checkout: ClerkInterface['__experimental_checkout'] | undefined;
 
   public client: ClientResource | undefined;
   public session: SignedInSessionResource | null | undefined;
@@ -336,6 +342,13 @@ export class Clerk implements ClerkInterface {
       Clerk._apiKeys = new APIKeys();
     }
     return Clerk._apiKeys;
+  }
+
+  __experimental_checkout(options: __experimental_CheckoutOptions): __experimental_CheckoutInstance {
+    if (!this._checkout) {
+      this._checkout = params => createCheckoutInstance(this, params);
+    }
+    return this._checkout(options);
   }
 
   public __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K] {
@@ -658,6 +671,16 @@ export class Clerk implements ClerkInterface {
     return this.#componentControls
       .ensureMounted({ preloadHint: 'BlankCaptchaModal' })
       .then(controls => controls.closeModal('blankCaptcha'));
+  };
+
+  public __internal_loadStripeJs = async () => {
+    if (__BUILD_DISABLE_RHC__) {
+      clerkUnsupportedEnvironmentWarning('Stripe');
+      return { loadStripe: () => Promise.resolve(null) };
+    }
+
+    const { loadStripe } = await import('@stripe/stripe-js');
+    return loadStripe;
   };
 
   public openSignUp = (props?: SignUpProps): void => {
@@ -1104,6 +1127,16 @@ export class Clerk implements ClerkInterface {
       }
       return;
     }
+
+    if (this.organization && !canViewOrManageAPIKeys(this)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderAPIKeysComponentForOrgWhenUnauthorized, {
+          code: CANNOT_RENDER_API_KEYS_ORG_UNAUTHORIZED_ERROR_CODE,
+        });
+      }
+      return;
+    }
+
     void this.#componentControls.ensureMounted({ preloadHint: 'APIKeys' }).then(controls =>
       controls.mountComponent({
         name: 'APIKeys',
@@ -1191,15 +1224,16 @@ export class Clerk implements ClerkInterface {
         }
       }
 
-      if (newSession?.status === 'pending') {
-        await this.#handlePendingSession(newSession);
-        return;
-      }
-
       /**
        * Hint to each framework, that the user will be signed out when `{session: null}` is provided.
        */
       await onBeforeSetActive(newSession === null ? 'sign-out' : undefined);
+
+      if (newSession?.status === 'pending') {
+        await this.#handlePendingSession(newSession);
+        await onAfterSetActive();
+        return;
+      }
 
       //1. setLastActiveSession to passed user session (add a param).
       //   Note that this will also update the session's active organization
@@ -1283,8 +1317,10 @@ export class Clerk implements ClerkInterface {
       eventBus.emit(events.TokenUpdate, { token: null });
     }
 
-    // Only triggers navigation for internal routing, in order to not affect custom flows
-    if (newSession?.currentTask && this.#componentNavigationContext) {
+    // Only triggers navigation for internal AIO components routing or multi-session switch
+    const isSwitchingSessions = this.session?.id != session.id;
+    const shouldNavigateOnSetActive = this.#componentNavigationContext || isSwitchingSessions;
+    if (newSession?.currentTask && shouldNavigateOnSetActive) {
       await navigateToTask(session.currentTask.key, {
         options: this.#options,
         environment: this.environment,
@@ -1299,7 +1335,7 @@ export class Clerk implements ClerkInterface {
 
   public __experimental_navigateToTask = async ({ redirectUrlComplete }: NextTaskParams = {}): Promise<void> => {
     /**
-     * Invalidate previously cache pages with auth state before navigating
+     * Invalidate previously cached pages with auth state before navigating
      */
     const onBeforeSetActive: SetActiveHook =
       typeof window !== 'undefined' && typeof window.__unstable__onBeforeSetActive === 'function'

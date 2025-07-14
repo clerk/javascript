@@ -1,3 +1,4 @@
+import { __experimental_useCheckout as useCheckout } from '@clerk/shared/react';
 import { useEffect, useId, useRef, useState } from 'react';
 
 import { Drawer, useDrawerContext } from '@/ui/elements/Drawer';
@@ -9,7 +10,6 @@ import { Box, Button, descriptors, Heading, localizationKeys, Span, Text, useApp
 import { transitionDurationValues, transitionTiming } from '../../foundations/transitions';
 import { usePrefersReducedMotion } from '../../hooks';
 import { useRouter } from '../../router';
-import { useCheckoutContextRoot } from './CheckoutPage';
 
 const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
 const lerp = (start: number, end: number, amt: number) => start + (end - start) * amt;
@@ -18,7 +18,8 @@ export const CheckoutComplete = () => {
   const router = useRouter();
   const { setIsOpen } = useDrawerContext();
   const { newSubscriptionRedirectUrl } = useCheckoutContext();
-  const { checkout } = useCheckoutContextRoot();
+  const { checkout } = useCheckout();
+  const { totals, paymentSource, planPeriodStart } = checkout;
   const [mousePosition, setMousePosition] = useState({ x: 256, y: 256 });
   const [currentPosition, setCurrentPosition] = useState({ x: 256, y: 256 });
 
@@ -82,7 +83,7 @@ export const CheckoutComplete = () => {
     }
   };
 
-  if (!checkout) {
+  if (!totals) {
     return null;
   }
 
@@ -309,7 +310,7 @@ export const CheckoutComplete = () => {
               as='h2'
               textVariant='h2'
               localizationKey={
-                checkout.totals.totalDueNow.amount > 0
+                totals.totalDueNow.amount > 0
                   ? localizationKeys('commerce.checkout.title__paymentSuccessful')
                   : localizationKeys('commerce.checkout.title__subscriptionSuccessful')
               }
@@ -364,7 +365,7 @@ export const CheckoutComplete = () => {
                 }),
               })}
               localizationKey={
-                checkout.totals.totalDueNow.amount > 0
+                totals.totalDueNow.amount > 0
                   ? localizationKeys('commerce.checkout.description__paymentSuccessful')
                   : localizationKeys('commerce.checkout.description__subscriptionSuccessful')
               }
@@ -396,28 +397,26 @@ export const CheckoutComplete = () => {
         <LineItems.Root>
           <LineItems.Group variant='secondary'>
             <LineItems.Title title={localizationKeys('commerce.checkout.lineItems.title__totalPaid')} />
-            <LineItems.Description
-              text={`${checkout.totals.totalDueNow.currencySymbol}${checkout.totals.totalDueNow.amountFormatted}`}
-            />
+            <LineItems.Description text={`${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`} />
           </LineItems.Group>
           <LineItems.Group variant='secondary'>
             <LineItems.Title
               title={
-                checkout.totals.totalDueNow.amount > 0
+                totals.totalDueNow.amount > 0
                   ? localizationKeys('commerce.checkout.lineItems.title__paymentMethod')
                   : localizationKeys('commerce.checkout.lineItems.title__subscriptionBegins')
               }
             />
             <LineItems.Description
               text={
-                checkout.totals.totalDueNow.amount > 0
-                  ? checkout.paymentSource
-                    ? checkout.paymentSource.paymentMethod !== 'card'
-                      ? `${capitalize(checkout.paymentSource.paymentMethod)}`
-                      : `${capitalize(checkout.paymentSource.cardType)} ⋯ ${checkout.paymentSource.last4}`
+                totals.totalDueNow.amount > 0
+                  ? paymentSource
+                    ? paymentSource.paymentMethod !== 'card'
+                      ? `${capitalize(paymentSource.paymentMethod)}`
+                      : `${capitalize(paymentSource.cardType)} ⋯ ${paymentSource.last4}`
                     : '–'
-                  : checkout.planPeriodStart
-                    ? formatDate(new Date(checkout.planPeriodStart))
+                  : planPeriodStart
+                    ? formatDate(new Date(planPeriodStart))
                     : '–'
               }
             />

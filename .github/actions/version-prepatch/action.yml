@@ -9,7 +9,7 @@ inputs:
     required: true
 
 runs:
-  using: "composite"
+  using: 'composite'
   steps:
     - name: Bump prepatch version
       id: bump-prepatch-version

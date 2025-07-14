@@ -10,6 +10,8 @@
 
 import type { HslaColor, HslaColorString } from '@clerk/types';
 
+import { resolveCSSVariable } from '../cssVariables';
+
 const abbrRegex = /^#([a-f0-9]{3,4})$/i;
 const hexRegex = /^#([a-f0-9]{6})([a-f0-9]{2})?$/i;
 const rgbaRegex =
@@ -255,17 +257,21 @@ const hslaColorToHslaString = ({ h, s, l, a }: HslaColor): HslaColorString => {
 };
 
 const parse = (str: string): ParsedResult => {
-  const prefix = str.substr(0, 3).toLowerCase();
+  // First try to resolve CSS variables
+  const resolvedStr = resolveCSSVariable(str);
+  const colorStr = resolvedStr || str;
+
+  const prefix = colorStr.substr(0, 3).toLowerCase();
   let res;
   if (prefix === 'hsl') {
-    res = { model: 'hsl', value: parseHsl(str) };
+    res = { model: 'hsl', value: parseHsl(colorStr) };
   } else if (prefix === 'hwb') {
-    res = { model: 'hwb', value: parseHwb(str) };
+    res = { model: 'hwb', value: parseHwb(colorStr) };
   } else {
-    res = { model: 'rgb', value: parseRgb(str) };
+    res = { model: 'rgb', value: parseRgb(colorStr) };
   }
   if (!res || !res.value) {
-    throw new Error(`Clerk: "${str}" cannot be used as a color within 'variables'. You can pass one of:
+    throw new Error(`Clerk: "${colorStr}" cannot be used as a color within 'variables'. You can pass one of:
 - any valid hsl or hsla color
 - any valid rgb or rgba color
 - any valid hex color

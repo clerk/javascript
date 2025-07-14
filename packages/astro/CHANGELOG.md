@@ -1,5 +1,23 @@
 # @clerk/astro
 
+## 2.10.3
+
+### Patch Changes
+
+- Updated dependencies [[`f42c4fe`](https://github.com/clerk/javascript/commit/f42c4fedfdab873129b876eba38b3677f190b460), [`ec207dc`](https://github.com/clerk/javascript/commit/ec207dcd2a13340cfa4e3b80d3d52d1b4e7d5f23), [`ec207dc`](https://github.com/clerk/javascript/commit/ec207dcd2a13340cfa4e3b80d3d52d1b4e7d5f23), [`0e0cc1f`](https://github.com/clerk/javascript/commit/0e0cc1fa85347d727a4fd3718fe45b0f0244ddd9)]:
+  - @clerk/types@4.64.0
+  - @clerk/shared@3.11.0
+  - @clerk/backend@2.4.1
+
+## 2.10.2
+
+### Patch Changes
+
+- Updated dependencies [[`c2f24da`](https://github.com/clerk/javascript/commit/c2f24dab96c052b2748a210eef45540f788654aa), [`abd8446`](https://github.com/clerk/javascript/commit/abd844609dad263d974da7fbf5e3575afce73abe), [`8387a39`](https://github.com/clerk/javascript/commit/8387a392a04906f0f10d84c61cfee36f23942f85), [`feba23c`](https://github.com/clerk/javascript/commit/feba23c85d1ff94930de61f3b6961e2ebb2f65ce), [`f2a6641`](https://github.com/clerk/javascript/commit/f2a66419b1813abc86ea98fde7475861995a1486), [`de9c01a`](https://github.com/clerk/javascript/commit/de9c01ac683f52c1919e1584faba087f92a0ca22), [`a8638b0`](https://github.com/clerk/javascript/commit/a8638b02f0daff780f3aef038983714db21db558), [`3b4b3cb`](https://github.com/clerk/javascript/commit/3b4b3cb941a1a503ce51e086e7bdd663c2a1ddc2)]:
+  - @clerk/backend@2.4.0
+  - @clerk/shared@3.10.2
+  - @clerk/types@4.63.0
+
 ## 2.10.1
 
 ### Patch Changes

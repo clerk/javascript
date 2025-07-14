@@ -553,6 +553,20 @@ export const authenticateRequest: AuthenticateRequest = (async (
         token: authenticateContext.sessionTokenInCookie!,
       });
 
+      // Check for cross-origin requests from satellite domains to primary domain
+      const shouldForceHandshakeForCrossDomain =
+        !authenticateContext.isSatellite && // We're on primary
+        authenticateContext.secFetchDest === 'document' && // Document navigation
+        authenticateContext.isCrossOriginReferrer(); // Came from different domain
+
+      if (shouldForceHandshakeForCrossDomain) {
+        return handleMaybeHandshakeStatus(
+          authenticateContext,
+          AuthErrorReason.PrimaryDomainCrossOriginSync,
+          'Cross-origin request from satellite domain requires handshake',
+        );
+      }
+
       const authObject = signedInRequestState.toAuth();
       // Org sync if necessary
       if (authObject.userId) {

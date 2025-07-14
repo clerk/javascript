@@ -1,5 +1,33 @@
 # Change Log
 
+## 2.4.1
+
+### Patch Changes
+
+- Updated dependencies [[`f42c4fe`](https://github.com/clerk/javascript/commit/f42c4fedfdab873129b876eba38b3677f190b460), [`ec207dc`](https://github.com/clerk/javascript/commit/ec207dcd2a13340cfa4e3b80d3d52d1b4e7d5f23), [`ec207dc`](https://github.com/clerk/javascript/commit/ec207dcd2a13340cfa4e3b80d3d52d1b4e7d5f23), [`0e0cc1f`](https://github.com/clerk/javascript/commit/0e0cc1fa85347d727a4fd3718fe45b0f0244ddd9)]:
+  - @clerk/types@4.64.0
+  - @clerk/shared@3.11.0
+
+## 2.4.0
+
+### Minor Changes
+
+- Trigger a handshake on a signed in, cross origin request to sync session state from a satellite domain. ([#6238](https://github.com/clerk/javascript/pull/6238)) by [@brkalow](https://github.com/brkalow)
+
+### Patch Changes
+
+- Refactor webhook verification to use verification from the `standardwebhooks` package, which is what our underlying provider relies on. ([#6252](https://github.com/clerk/javascript/pull/6252)) by [@brkalow](https://github.com/brkalow)
+
+- Add optional `secret` property in API key response ([#6246](https://github.com/clerk/javascript/pull/6246)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Use Headers constructor when building BAPI client headers ([#6235](https://github.com/clerk/javascript/pull/6235)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Use explicit config for api version handling in backend client request builder ([#6232](https://github.com/clerk/javascript/pull/6232)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`abd8446`](https://github.com/clerk/javascript/commit/abd844609dad263d974da7fbf5e3575afce73abe), [`8387a39`](https://github.com/clerk/javascript/commit/8387a392a04906f0f10d84c61cfee36f23942f85), [`f2a6641`](https://github.com/clerk/javascript/commit/f2a66419b1813abc86ea98fde7475861995a1486)]:
+  - @clerk/shared@3.10.2
+  - @clerk/types@4.63.0
+
 ## 2.3.1
 
 ### Patch Changes

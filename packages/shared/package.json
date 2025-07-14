@@ -1,6 +1,6 @@
 {
   "name": "@clerk/shared",
-  "version": "3.10.1",
+  "version": "3.11.0",
   "description": "Internal package utils used by the Clerk SDKs",
   "repository": {
     "type": "git",
@@ -136,7 +136,7 @@
     "lint:attw": "attw --pack . --profile node16",
     "lint:publint": "publint",
     "publish:local": "pnpm yalc push --replace  --sig",
-    "test": "jest",
+    "test": "jest && vitest",
     "test:cache:clear": "jest --clearCache --useStderr",
     "test:ci": "jest --maxWorkers=70%",
     "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html"
@@ -150,6 +150,8 @@
     "swr": "^2.3.3"
   },
   "devDependencies": {
+    "@stripe/react-stripe-js": "3.1.1",
+    "@stripe/stripe-js": "5.6.0",
     "@types/glob-to-regexp": "0.4.4",
     "@types/js-cookie": "3.0.6",
     "cross-fetch": "^4.0.0",
