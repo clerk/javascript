@@ -732,7 +732,7 @@ export type Variables = {
   colorRing?: CssColor;
   /**
    * The base shadow color used in the components.
-   * @default 'rgba(25, 28, 33, 0.20)'
+   * @default '#000000'
    */
   colorShadow?: CssColor;
   /**

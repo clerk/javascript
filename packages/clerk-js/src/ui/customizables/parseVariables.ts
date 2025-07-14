@@ -4,9 +4,11 @@ import { spaceScaleKeys } from '../foundations/sizes';
 import type { fontWeights } from '../foundations/typography';
 import { colors } from '../utils/colors';
 import { colorOptionToThemedAlphaScale, colorOptionToThemedLightnessScale } from '../utils/colors/scales';
+import { createAlphaColorMixString } from '../utils/colors/utils';
 import { cssSupports } from '../utils/cssSupports';
 import { fromEntries } from '../utils/fromEntries';
 import { removeUndefinedProps } from '../utils/removeUndefinedProps';
+import { createShadowSet, generateShadow } from '../foundations/shadows';
 
 export const createColorScales = (theme: Theme) => {
   const variables = removeInvalidValues(theme.variables || {});
@@ -185,4 +187,21 @@ export const createFontWeightScale = (theme: Theme): Partial<Record<keyof typeof
 export const createFonts = (theme: Theme) => {
   const { fontFamily, fontFamilyButtons } = theme.variables || {};
   return removeUndefinedProps({ main: fontFamily, buttons: fontFamilyButtons });
+};
+
+export const createShadowsUnits = (theme: Theme) => {
+  const { colorShadow } = theme.variables || {};
+  if (!colorShadow) {
+    return;
+  }
+
+  const shadowColor = colors.toHslaString(colorShadow);
+  if (!shadowColor) {
+    return;
+  }
+
+  return createShadowSet(
+    shadowColor,
+    generateShadow((color, alpha) => createAlphaColorMixString(color, alpha * 100)),
+  );
 };
