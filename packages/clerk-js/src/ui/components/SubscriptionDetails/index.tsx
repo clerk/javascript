@@ -28,7 +28,6 @@ import { LineItems } from '@/ui/elements/LineItems';
 import { SubscriberTypeContext, usePlansContext, useSubscriberTypeContext, useSubscriptions } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import {
-  Badge,
   Button,
   Col,
   descriptors,
@@ -39,6 +38,7 @@ import {
   Text,
   useLocalizations,
 } from '../../customizables';
+import { SubscriptionBadge } from '../Subscriptions/badge';
 
 // We cannot derive the state of confrimation modal from the existance subscription, as it will make the animation laggy when the confimation closes.
 const SubscriptionForCancellationContext = React.createContext<{
@@ -68,12 +68,14 @@ export const SubscriptionDetails = (props: __internal_SubscriptionDetailsProps) 
 type UseGuessableSubscriptionResult<Or extends 'throw' | undefined = undefined> = Or extends 'throw'
   ? {
       upcomingSubscription?: CommerceSubscriptionResource;
-      activeSubscription: CommerceSubscriptionResource;
+      pastDueSubscription?: CommerceSubscriptionResource;
+      activeSubscription?: CommerceSubscriptionResource;
       anySubscription: CommerceSubscriptionResource;
       isLoading: boolean;
     }
   : {
       upcomingSubscription?: CommerceSubscriptionResource;
+      pastDueSubscription?: CommerceSubscriptionResource;
       activeSubscription?: CommerceSubscriptionResource;
       anySubscription?: CommerceSubscriptionResource;
       isLoading: boolean;
@@ -85,15 +87,17 @@ function useGuessableSubscription<Or extends 'throw' | undefined = undefined>(op
   const { data: subscriptions, isLoading } = useSubscriptions();
   const activeSubscription = subscriptions?.find(sub => sub.status === 'active');
   const upcomingSubscription = subscriptions?.find(sub => sub.status === 'upcoming');
+  const pastDueSubscription = subscriptions?.find(sub => sub.status === 'past_due');
 
-  if (options?.or === 'throw' && !activeSubscription) {
-    throw new Error('No active subscription found');
+  if (options?.or === 'throw' && !activeSubscription && !pastDueSubscription) {
+    throw new Error('No active or past due subscription found');
   }
 
   return {
     upcomingSubscription,
+    pastDueSubscription,
     activeSubscription: activeSubscription as any, // Type is correct due to the throw above
-    anySubscription: (upcomingSubscription || activeSubscription) as any,
+    anySubscription: (upcomingSubscription || activeSubscription || pastDueSubscription) as any,
     isLoading,
   };
 }
@@ -111,7 +115,7 @@ const SubscriptionDetailsInternal = (props: __internal_SubscriptionDetailsProps)
   } = usePlansContext();
 
   const { data: subscriptions, isLoading } = useSubscriptions();
-  const { activeSubscription } = useGuessableSubscription();
+  const { activeSubscription, pastDueSubscription } = useGuessableSubscription();
 
   if (isLoading) {
     return (
@@ -123,7 +127,7 @@ const SubscriptionDetailsInternal = (props: __internal_SubscriptionDetailsProps)
     );
   }
 
-  if (!activeSubscription) {
+  if (!activeSubscription && !pastDueSubscription) {
     // Should never happen, since Free will always be active
     return null;
   }
@@ -200,7 +204,7 @@ const SubscriptionDetailsFooter = withCardStateProvider(() => {
   }, [subscription, setError, setLoading, subscriberType, organization?.id, onSubscriptionCancel, setIsOpen, setIdle]);
 
   // If either the active or upcoming subscription is the free plan, then a C1 cannot switch to a different period or cancel the plan
-  if (isFreePlan(anySubscription.plan)) {
+  if (isFreePlan(anySubscription.plan) || anySubscription.status === 'past_due') {
     return null;
   }
 
@@ -270,7 +274,9 @@ const SubscriptionDetailsFooter = withCardStateProvider(() => {
 });
 
 function SubscriptionDetailsSummary() {
-  const { anySubscription, activeSubscription, upcomingSubscription } = useGuessableSubscription({ or: 'throw' });
+  const { anySubscription, activeSubscription, upcomingSubscription } = useGuessableSubscription({
+    or: 'throw',
+  });
 
   if (!activeSubscription) {
     return null;
@@ -326,10 +332,11 @@ const SubscriptionCardActions = ({ subscription }: { subscription: CommerceSubsc
   const canManageBilling = subscriberType === 'user' || canOrgManageBilling;
 
   const isSwitchable =
-    (subscription.planPeriod === 'month' && subscription.plan.annualMonthlyAmount > 0) ||
-    subscription.planPeriod === 'annual';
+    ((subscription.planPeriod === 'month' && subscription.plan.annualMonthlyAmount > 0) ||
+      subscription.planPeriod === 'annual') &&
+    subscription.status !== 'past_due';
   const isFree = isFreePlan(subscription.plan);
-  const isCancellable = subscription.canceledAtDate === null && !isFree;
+  const isCancellable = subscription.canceledAtDate === null && !isFree && subscription.status !== 'past_due';
   const isReSubscribable = subscription.canceledAtDate !== null && !isFree;
 
   const openCheckout = useCallback(
@@ -425,7 +432,6 @@ const SubscriptionCardActions = ({ subscription }: { subscription: CommerceSubsc
 
 // New component for individual subscription cards
 const SubscriptionCard = ({ subscription }: { subscription: CommerceSubscriptionResource }) => {
-  const isActive = subscription.status === 'active';
   const { t } = useLocalizations();
 
   return (
@@ -471,10 +477,9 @@ const SubscriptionCard = ({ subscription }: { subscription: CommerceSubscription
           >
             {subscription.plan.name}
           </Text>
-          <Badge
+          <SubscriptionBadge
+            subscription={subscription}
             elementDescriptor={descriptors.subscriptionDetailsCardBadge}
-            colorScheme={isActive ? 'secondary' : 'primary'}
-            localizationKey={isActive ? localizationKeys('badge__activePlan') : localizationKeys('badge__upcomingPlan')}
           />
         </Flex>
 
@@ -501,7 +506,14 @@ const SubscriptionCard = ({ subscription }: { subscription: CommerceSubscription
         </Flex>
       </Col>
 
-      {isActive ? (
+      {subscription.pastDueAt ? (
+        <DetailRow
+          label={localizationKeys('commerce.subscriptionDetails.pastDueAt')}
+          value={formatDate(subscription.pastDueAt)}
+        />
+      ) : null}
+
+      {subscription.status === 'active' ? (
         <>
           <DetailRow
             label={localizationKeys('commerce.subscriptionDetails.subscribedOn')}
@@ -519,12 +531,14 @@ const SubscriptionCard = ({ subscription }: { subscription: CommerceSubscription
             />
           )}
         </>
-      ) : (
+      ) : null}
+
+      {subscription.status === 'upcoming' ? (
         <DetailRow
           label={localizationKeys('commerce.subscriptionDetails.beginsOn')}
           value={formatDate(subscription.periodStartDate)}
         />
-      )}
+      ) : null}
     </Col>
   );
 };
