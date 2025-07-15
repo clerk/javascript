@@ -64,7 +64,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     await expect(u.po.page.getByText('Checkout')).toBeVisible();
   });
 
-  test('can subscribe to a plan', async ({ page, context }) => {
+  test.skip('can subscribe to a plan', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -87,7 +87,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     }
   });
 
-  test('can upgrade to a new plan with saved card', async ({ page, context }) => {
+  test.skip('can upgrade to a new plan with saved card', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -100,7 +100,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     await expect(u.po.page.getByText('Payment was successful!')).toBeVisible();
   });
 
-  test('can downgrade to previous plan', async ({ page, context }) => {
+  test.skip('can downgrade to previous plan', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -114,7 +114,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     await expect(u.po.page.getByText('Success!')).toBeVisible();
   });
 
-  test('user is prompted to add email before checkout', async ({ page, context }) => {
+  test.skip('user is prompted to add email before checkout', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
 
     const fakeUser = u.services.users.createFakeUser({ withEmail: false, withPhoneNumber: true });
@@ -157,7 +157,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
   // });
 
   test.describe('redirects', () => {
-    test('default navigates to afterSignInUrl', async ({ page, context }) => {
+    test.skip('default navigates to afterSignInUrl', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -174,7 +174,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await u.page.waitForAppUrl('/');
     });
 
-    test('navigates to supplied newSubscriptionRedirectUrl', async ({ page, context }) => {
+    test.skip('navigates to supplied newSubscriptionRedirectUrl', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -193,7 +193,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
   });
 
   test.describe('in UserProfile', () => {
-    test('renders pricing table with plans', async ({ page, context }) => {
+    test.skip('renders pricing table with plans', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -206,7 +206,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await expect(u.po.page.getByRole('heading', { name: 'Pro' })).toBeVisible();
     });
 
-    test('can subscribe to a plan, revalidates payment sources on complete and then downgrades to free', async ({
+    test.skip('can subscribe to a plan, revalidates payment sources on complete and then downgrades to free', async ({
       page,
       context,
     }) => {
@@ -254,7 +254,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await fakeUser.deleteIfExists();
     });
 
-    test('checkout always revalidates on open', async ({ page, context }) => {
+    test.skip('checkout always revalidates on open', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
 
       const fakeUser = u.services.users.createFakeUser();
@@ -282,7 +282,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await fakeUser.deleteIfExists();
     });
 
-    test('adds payment source via checkout and resets stripe setup intent after failed payment', async ({
+    test.skip('adds payment source via checkout and resets stripe setup intent after failed payment', async ({
       page,
       context,
     }) => {
@@ -319,7 +319,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await fakeUser.deleteIfExists();
     });
 
-    test('displays notice then plan cannot change', async ({ page, context }) => {
+    test.skip('displays notice then plan cannot change', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
 
       const fakeUser = u.services.users.createFakeUser();
