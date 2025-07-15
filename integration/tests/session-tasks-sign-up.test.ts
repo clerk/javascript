@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { test } from '@playwright/test';
 
 import { appConfigs } from '../presets';
 import type { FakeUser } from '../testUtils';
@@ -44,6 +44,32 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
       // Resolves task
       const fakeOrganization = Object.assign(u.services.organizations.createFakeOrganization(), {
         slug: u.services.organizations.createFakeOrganization().slug + '-with-sign-up',
+      });
+      await u.po.sessionTask.resolveForceOrganizationSelectionTask(fakeOrganization);
+      await u.po.expect.toHaveResolvedTask();
+
+      // Navigates to after sign-up
+      await u.page.waitForAppUrl('/');
+    });
+
+    test('with sso, navigate to task on after sign-up', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+
+      await u.po.signUp.goTo();
+      await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
+
+      await u.po.signIn.waitForMounted();
+      await u.po.signIn.getGoToSignUp().click();
+
+      await u.po.signUp.waitForMounted();
+      await u.po.signUp.setEmailAddress(fakeUser.email);
+      await u.po.signUp.continue();
+      await u.po.signUp.enterTestOtpCode();
+
+      // Resolves task
+      await u.po.signIn.waitForMounted();
+      const fakeOrganization = Object.assign(u.services.organizations.createFakeOrganization(), {
+        slug: u.services.organizations.createFakeOrganization().slug + '-with-sign-in-sso',
       });
       await u.po.sessionTask.resolveForceOrganizationSelectionTask(fakeOrganization);
       await u.po.expect.toHaveResolvedTask();
