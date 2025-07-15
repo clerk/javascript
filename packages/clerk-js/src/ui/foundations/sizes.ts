@@ -2,7 +2,6 @@ import { clerkCssVar } from '../utils/cssVariables';
 
 const SPACING_BASE_UNIT = '1rem';
 const SPACING_MULTIPLIER = 0.25; // ((num / 0.5) * 0.125)
-const BORDER_RADIUS_DEFAULT = '0.375rem';
 
 const baseSpaceUnits = Object.freeze({
   none: '0',
@@ -167,19 +166,26 @@ const sizes = Object.freeze({
   ...spaceUnits,
 } as const);
 
-const radiiDefaultVar = clerkCssVar('border-radius', BORDER_RADIUS_DEFAULT);
-
 /**
  * Border radius scale with CSS variables for theming
  */
+export const BORDER_RADIUS_SCALE_RATIOS = Object.freeze({
+  sm: '2 / 3', // 0.66
+  md: '1', // 1.0
+  lg: '4 / 3', // 1.33
+  xl: '2', // 2.0
+} as const);
+
+const radiiDefaultVar = clerkCssVar('border-radius', '0.375rem');
+
 const radii = Object.freeze({
   none: '0px',
   circle: '50%',
   avatar: clerkCssVar('border-radius-avatar', radiiDefaultVar),
-  sm: clerkCssVar('border-radius-sm', `calc(${radiiDefaultVar} * 0.666)`),
+  sm: clerkCssVar('border-radius-sm', `calc(${radiiDefaultVar} * ${BORDER_RADIUS_SCALE_RATIOS.sm})`), // Use fraction for precision
   md: clerkCssVar('border-radius-md', radiiDefaultVar),
-  lg: clerkCssVar('border-radius-lg', `calc(${radiiDefaultVar} * 1.333)`),
-  xl: clerkCssVar('border-radius-xl', `calc(${radiiDefaultVar} * 2)`),
+  lg: clerkCssVar('border-radius-lg', `calc(${radiiDefaultVar} * ${BORDER_RADIUS_SCALE_RATIOS.lg})`), // Use fraction for precision
+  xl: clerkCssVar('border-radius-xl', `calc(${radiiDefaultVar} * ${BORDER_RADIUS_SCALE_RATIOS.xl})`),
   halfHeight: '99999px',
 } as const);
 
