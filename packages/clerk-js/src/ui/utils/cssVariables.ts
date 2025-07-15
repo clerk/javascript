@@ -175,8 +175,17 @@ export function resolveCSSVariable(value: string, element?: Element): string | n
     return resolvedValue;
   }
 
-  // If variable couldn't be resolved, return the fallback value if provided
-  return fallbackValue;
+  // If variable couldn't be resolved, check if fallback is also a CSS variable
+  if (fallbackValue) {
+    if (isCSSVariable(fallbackValue)) {
+      // Recursively resolve nested CSS variables
+      const recursiveResult = resolveCSSVariable(fallbackValue, element);
+      return recursiveResult;
+    }
+    return fallbackValue;
+  }
+
+  return null;
 }
 
 /**
