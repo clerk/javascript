@@ -83,6 +83,7 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
       })
       .catch(err => {
         if (isUserLockedError(err)) {
+          card.setError(err.errors[0]);
           // @ts-expect-error -- private method for the time being
           return clerk.__internal_navigateWithError('..', err.errors[0]);
         }
