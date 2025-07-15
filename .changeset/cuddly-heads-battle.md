@@ -34,3 +34,4 @@ Deprecated variables will continue to work but will be removed in the next major
 - `colorMuted` - The background color for elements of lower importance, eg: a muted background.
 - `colorShadow` - The base shadow color used in the components.
 - `colorBorder` - The base border color used in the components.
+- `colorModalBackdrop` - The background color of the modal backdrop.
