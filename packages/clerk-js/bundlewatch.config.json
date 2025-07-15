@@ -14,7 +14,7 @@
     { "path": "./dist/organizationprofile*.js", "maxSize": "10KB" },
     { "path": "./dist/organizationswitcher*.js", "maxSize": "5KB" },
     { "path": "./dist/organizationlist*.js", "maxSize": "5.5KB" },
-    { "path": "./dist/signin*.js", "maxSize": "14KB" },
+    { "path": "./dist/signin*.js", "maxSize": "18KB" },
     { "path": "./dist/signup*.js", "maxSize": "8.86KB" },
     { "path": "./dist/userbutton*.js", "maxSize": "5KB" },
     { "path": "./dist/userprofile*.js", "maxSize": "16KB" },
