@@ -6,7 +6,6 @@ import type {
   CommercePaymentResource,
   CommercePlanJSON,
   CommercePlanResource,
-  CommerceProductJSON,
   CommerceStatementJSON,
   CommerceStatementResource,
   CommerceSubscriptionJSON,
@@ -29,15 +28,22 @@ import {
 } from '../../resources/internal';
 
 export class CommerceBilling implements CommerceBillingNamespace {
-  getPlans = async (params?: GetPlansParams): Promise<CommercePlanResource[]> => {
-    const { data: products } = (await BaseResource._fetch({
-      path: `/commerce/products`,
+  getPlans = async (params?: GetPlansParams): Promise<ClerkPaginatedResponse<CommercePlanResource>> => {
+    const safeParams = Object.assign({}, params);
+    (safeParams as any).payer_type = safeParams.for || 'user';
+    delete safeParams.for;
+    return await BaseResource._fetch({
+      path: `/commerce/plans`,
       method: 'GET',
-      search: { payerType: params?.subscriberType || '' },
-    })) as unknown as ClerkPaginatedResponse<CommerceProductJSON>;
+      search: convertPageToOffsetSearchParams(safeParams),
+    }).then(res => {
+      const { data: plans, total_count } = res as unknown as ClerkPaginatedResponse<CommercePlanJSON>;
 
-    const defaultProduct = products.find(product => product.is_default);
-    return defaultProduct?.plans.map(plan => new CommercePlan(plan)) || [];
+      return {
+        total_count,
+        data: plans.map(plan => new CommercePlan(plan)),
+      };
+    });
   };
 
   getPlan = async (params: { id: string }): Promise<CommercePlanResource> => {

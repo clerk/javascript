@@ -12,7 +12,8 @@ const PricingTableRoot = (props: PricingTableProps) => {
   const { mode = 'mounted', signInMode = 'redirect' } = usePricingTableContext();
   const isCompact = mode === 'modal';
   const { data: subscriptions } = useSubscriptions();
-  const { data: plans } = usePlans();
+  const { data: plans, error } = usePlans();
+  console.log('plansss', plans, error);
   const { handleSelectPlan } = usePlansContext();
 
   const defaultPlanPeriod = useMemo(() => {
