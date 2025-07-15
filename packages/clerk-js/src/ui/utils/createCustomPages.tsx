@@ -3,9 +3,8 @@ import type { CustomPage, EnvironmentResource, LoadedClerk } from '@clerk/types'
 import {
   canViewOrManageAPIKeys,
   disabledAPIKeysFeature,
-  disabledBillingFeature,
-  hasPaidOrgPlans,
-  hasPaidUserPlans,
+  disabledOrganizationBillingFeature,
+  disabledUserBillingFeature,
   isValidUrl,
 } from '../../utils';
 import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID, USER_PROFILE_NAVBAR_ROUTE_ID } from '../constants';
@@ -97,9 +96,9 @@ const createCustomPages = (
   organization?: boolean,
 ) => {
   const { INITIAL_ROUTES, pageToRootNavbarRouteMap, validReorderItemLabels } = getDefaultRoutes({
-    commerce:
-      !disabledBillingFeature(clerk, environment) &&
-      (organization ? hasPaidOrgPlans(clerk, environment) : hasPaidUserPlans(clerk, environment)),
+    commerce: organization
+      ? !disabledOrganizationBillingFeature(clerk, environment)
+      : !disabledUserBillingFeature(clerk, environment),
     apiKeys: !disabledAPIKeysFeature(clerk, environment) && (organization ? canViewOrManageAPIKeys(clerk) : true),
   });
 

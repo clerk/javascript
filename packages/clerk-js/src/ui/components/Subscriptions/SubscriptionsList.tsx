@@ -2,6 +2,7 @@ import { ProfileSection } from '@/ui/elements/Section';
 
 import { useProtect } from '../../common';
 import {
+  useEnvironment,
   usePlansContext,
   useSubscriberTypeContext,
   useSubscriberTypeLocalizationRoot,
@@ -44,6 +45,7 @@ export function SubscriptionsList({
     has => has({ permission: 'org:sys_billing:manage' }) || subscriberType === 'user',
   );
   const { navigate } = useRouter();
+  const { commerceSettings } = useEnvironment();
 
   const sortedSubscriptions = subscriptions.sort((a, b) => {
     // alway put active subscriptions first
@@ -188,22 +190,25 @@ export function SubscriptionsList({
         </Table>
       )}
 
-      <ProfileSection.ArrowButton
-        id='subscriptionsList'
-        textLocalizationKey={subscriptions.length > 0 ? arrowButtonText : arrowButtonEmptyText}
-        sx={[
-          t => ({
-            justifyContent: 'start',
-            height: t.sizes.$8,
-          }),
-        ]}
-        leftIcon={subscriptions.length > 0 ? ArrowsUpDown : Plus}
-        leftIconSx={t => ({
-          width: t.sizes.$4,
-          height: t.sizes.$4,
-        })}
-        onClick={() => void navigate('plans')}
-      />
+      {(commerceSettings.billing.user.hasPaidPlans && subscriberType === 'user') ||
+      (commerceSettings.billing.organization.hasPaidPlans && subscriberType === 'org') ? (
+        <ProfileSection.ArrowButton
+          id='subscriptionsList'
+          textLocalizationKey={subscriptions.length > 0 ? arrowButtonText : arrowButtonEmptyText}
+          sx={[
+            t => ({
+              justifyContent: 'start',
+              height: t.sizes.$8,
+            }),
+          ]}
+          leftIcon={subscriptions.length > 0 ? ArrowsUpDown : Plus}
+          leftIconSx={t => ({
+            width: t.sizes.$4,
+            height: t.sizes.$4,
+          })}
+          onClick={() => void navigate('plans')}
+        />
+      ) : null}
     </ProfileSection.Root>
   );
 }
