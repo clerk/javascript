@@ -113,7 +113,7 @@ export function OAuthConsentInternal() {
               textAlign: 'left',
               borderWidth: t.borderWidths.$normal,
               borderStyle: t.borderStyles.$solid,
-              borderColor: t.colors.$neutralAlpha100,
+              borderColor: t.colors.$borderAlpha100,
               borderRadius: t.radii.$lg,
               overflow: 'hidden',
             })}
@@ -146,13 +146,13 @@ export function OAuthConsentInternal() {
                     paddingBlock: t.space.$2,
                     borderTopWidth: t.borderWidths.$normal,
                     borderTopStyle: t.borderStyles.$solid,
-                    borderTopColor: t.colors.$neutralAlpha100,
+                    borderTopColor: t.colors.$borderAlpha100,
                     '&::before': {
                       content: '""',
                       display: 'inline-block',
                       width: t.space.$1,
                       height: t.space.$1,
-                      background: t.colors.$colorTextSecondary,
+                      background: t.colors.$colorMutedForeground,
                       borderRadius: t.radii.$circle,
                       transform: 'translateY(-0.1875rem)',
                       marginRight: t.space.$2,
@@ -340,7 +340,7 @@ function ConnectionIcon({ size = 'md', sx }: { size?: 'sm' | 'md'; sx?: Themable
           borderRadius: t.radii.$circle,
           borderWidth: t.borderWidths.$normal,
           borderStyle: t.borderStyles.$solid,
-          borderColor: t.colors.$neutralAlpha100,
+          borderColor: t.colors.$borderAlpha100,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -369,7 +369,7 @@ function ConnectionSeparator() {
       height={2}
       aria-hidden
       sx={t => ({
-        color: t.colors.$colorTextSecondary,
+        color: t.colors.$colorMutedForeground,
       })}
     >
       <path

@@ -43,7 +43,7 @@ export const CheckoutForm = withCardStateProvider(() => {
           padding: t.space.$4,
           borderBottomWidth: t.borderWidths.$normal,
           borderBottomStyle: t.borderStyles.$solid,
-          borderBottomColor: t.colors.$neutralAlpha100,
+          borderBottomColor: t.colors.$borderAlpha100,
         })}
       >
         <LineItems.Root>
@@ -230,7 +230,7 @@ export const PayWithTestPaymentSource = () => {
         borderRadius: t.radii.$md,
         borderWidth: t.borderWidths.$normal,
         borderStyle: t.borderStyles.$solid,
-        borderColor: t.colors.$neutralAlpha100,
+        borderColor: t.colors.$borderAlpha100,
         display: 'flex',
         flexDirection: 'column',
         rowGap: t.space.$2,
@@ -375,7 +375,7 @@ const ExistingPaymentSourceForm = withCardStateProvider(
             <SelectOptionList
               sx={t => ({
                 paddingBlock: t.space.$1,
-                color: t.colors.$colorText,
+                color: t.colors.$colorForeground,
               })}
             />
           </Select>
