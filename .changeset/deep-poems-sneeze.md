@@ -2,4 +2,4 @@
 '@clerk/clerk-js': patch
 ---
 
-Do not trigger after-auth navigation outside of AIOs
+Do not trigger after-auth navigation from `useMultisessionActions`
