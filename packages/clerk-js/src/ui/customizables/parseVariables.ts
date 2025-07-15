@@ -10,6 +10,22 @@ import { cssSupports } from '../utils/cssSupports';
 import { fromEntries } from '../utils/fromEntries';
 import { removeUndefinedProps } from '../utils/removeUndefinedProps';
 
+const createMutedForegroundColor = (variables: NonNullable<Theme['variables']>) => {
+  if (variables.colorMutedForeground) {
+    return colors.toHslaString(variables.colorMutedForeground);
+  }
+
+  if (variables.colorTextSecondary) {
+    return colors.toHslaString(variables.colorTextSecondary);
+  }
+
+  if (variables.colorForeground) {
+    return colors.makeTransparent(variables.colorForeground, 0.35);
+  }
+
+  return colors.makeTransparent(variables.colorText, 0.35);
+};
+
 export const createColorScales = (theme: Theme) => {
   const variables = removeInvalidValues(theme.variables || {});
 
@@ -48,11 +64,7 @@ export const createColorScales = (theme: Theme) => {
     colorForeground: variables.colorForeground
       ? colors.toHslaString(variables.colorForeground)
       : colors.toHslaString(variables.colorText),
-    colorMutedForeground: variables.colorMutedForeground
-      ? colors.toHslaString(variables.colorMutedForeground)
-      : variables.colorTextSecondary
-        ? colors.toHslaString(variables.colorTextSecondary)
-        : colors.makeTransparent(variables.colorText, 0.35),
+    colorMutedForeground: createMutedForegroundColor(variables),
     colorInputForeground: variables.colorInputForeground
       ? colors.toHslaString(variables.colorInputForeground)
       : colors.toHslaString(variables.colorInputText),
