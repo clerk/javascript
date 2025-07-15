@@ -29,9 +29,9 @@ import type {
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
+  Clerk as ClerkInterface,
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
-  Clerk as ClerkInterface,
   ClerkOptions,
   ClientJSONSnapshot,
   ClientResource,
@@ -1318,7 +1318,7 @@ export class Clerk implements ClerkInterface {
     }
 
     // Only triggers navigation for internal AIO components routing or multi-session switch
-    const isSwitchingSessions = this.session?.id != session.id;
+    const isSwitchingSessions = this.session?.id && this.session?.id != session.id;
     const shouldNavigateOnSetActive = this.#componentNavigationContext || isSwitchingSessions;
     if (newSession?.currentTask && shouldNavigateOnSetActive) {
       await navigateToTask(session.currentTask.key, {
