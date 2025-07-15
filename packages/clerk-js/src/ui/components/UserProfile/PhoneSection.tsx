@@ -66,7 +66,7 @@ export const PhoneSection = ({ shouldAllowCreation = true }: { shouldAllowCreati
                       gap={2}
                       center
                     >
-                      <Text sx={t => ({ color: t.colors.$colorText })}>
+                      <Text sx={t => ({ color: t.colors.$colorForeground })}>
                         {stringToFormattedPhoneString(phone.phoneNumber)}
                       </Text>
                       {user?.primaryPhoneNumberId === phoneId && (
