@@ -11,19 +11,22 @@ const PricingTableRoot = (props: PricingTableProps) => {
   const clerk = useClerk();
   const { mode = 'mounted', signInMode = 'redirect' } = usePricingTableContext();
   const isCompact = mode === 'modal';
-  const { data: subscriptions } = useSubscriptions();
+  const { data: subscription } = useSubscriptions();
+  const subscriptionItems = useMemo(() => {
+    return subscription?.subscriptionItems || [];
+  }, [subscription]);
   const { data: plans } = usePlans();
   const { handleSelectPlan } = usePlansContext();
 
   const defaultPlanPeriod = useMemo(() => {
     if (isCompact) {
-      const upcomingSubscription = subscriptions?.find(sub => sub.status === 'upcoming');
+      const upcomingSubscription = subscriptionItems?.find(sub => sub.status === 'upcoming');
       if (upcomingSubscription) {
         return upcomingSubscription.planPeriod;
       }
 
       // don't pay attention to the default plan
-      const activeSubscription = subscriptions?.find(
+      const activeSubscription = subscriptionItems?.find(
         sub => !sub.canceledAtDate && sub.status === 'active' && !sub.plan.isDefault,
       );
       if (activeSubscription) {
@@ -32,7 +35,7 @@ const PricingTableRoot = (props: PricingTableProps) => {
     }
 
     return 'annual';
-  }, [isCompact, subscriptions]);
+  }, [isCompact, subscriptionItems]);
 
   const [planPeriod, setPlanPeriod] = useState<CommerceSubscriptionPlanPeriod>(defaultPlanPeriod);
 

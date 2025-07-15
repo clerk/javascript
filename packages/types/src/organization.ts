@@ -1,4 +1,4 @@
-import type { CommercePaymentSourceMethods, CommerceSubscriptionResource, GetSubscriptionsParams } from './commerce';
+import type { CommercePaymentSourceMethods } from './commerce';
 import type { OrganizationDomainResource, OrganizationEnrollmentMode } from './organizationDomain';
 import type { OrganizationInvitationResource, OrganizationInvitationStatus } from './organizationInvitation';
 import type { OrganizationCustomRoleKey, OrganizationMembershipResource } from './organizationMembership';
@@ -56,7 +56,6 @@ export interface OrganizationResource extends ClerkResource, CommercePaymentSour
   getMembershipRequests: (
     params?: GetMembershipRequestParams,
   ) => Promise<ClerkPaginatedResponse<OrganizationMembershipRequestResource>>;
-  getSubscriptions: (params?: GetSubscriptionsParams) => Promise<ClerkPaginatedResponse<CommerceSubscriptionResource>>;
   addMember: (params: AddMemberParams) => Promise<OrganizationMembershipResource>;
   inviteMember: (params: InviteMemberParams) => Promise<OrganizationInvitationResource>;
   inviteMembers: (params: InviteMembersParams) => Promise<OrganizationInvitationResource[]>;

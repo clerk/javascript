@@ -3,10 +3,10 @@ import type {
   __internal_CheckoutProps,
   __internal_SubscriptionDetailsProps,
   CommercePlanResource,
-  CommerceSubscriptionResource,
+  CommerceSubscriptionItemResource,
 } from '@clerk/types';
 import * as React from 'react';
-import { useCallback, useContext, useState } from 'react';
+import { useCallback, useContext, useMemo, useState } from 'react';
 
 import { useProtect } from '@/ui/common/Gate';
 import {
@@ -17,13 +17,10 @@ import { Avatar } from '@/ui/elements/Avatar';
 import { CardAlert } from '@/ui/elements/Card/CardAlert';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Drawer, useDrawerContext } from '@/ui/elements/Drawer';
+import { LineItems } from '@/ui/elements/LineItems';
 import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
 import { handleError } from '@/ui/utils/errorHandler';
 import { formatDate } from '@/ui/utils/formatDate';
-
-const isFreePlan = (plan: CommercePlanResource) => !plan.hasBaseFee;
-
-import { LineItems } from '@/ui/elements/LineItems';
 
 import { SubscriberTypeContext, usePlansContext, useSubscriberTypeContext, useSubscriptions } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
@@ -40,10 +37,12 @@ import {
 } from '../../customizables';
 import { SubscriptionBadge } from '../Subscriptions/badge';
 
+const isFreePlan = (plan: CommercePlanResource) => !plan.hasBaseFee;
+
 // We cannot derive the state of confrimation modal from the existance subscription, as it will make the animation laggy when the confimation closes.
 const SubscriptionForCancellationContext = React.createContext<{
-  subscription: CommerceSubscriptionResource | null;
-  setSubscription: (subscription: CommerceSubscriptionResource | null) => void;
+  subscription: CommerceSubscriptionItemResource | null;
+  setSubscription: (subscription: CommerceSubscriptionItemResource | null) => void;
   confirmationOpen: boolean;
   setConfirmationOpen: (confirmationOpen: boolean) => void;
 }>({
@@ -67,27 +66,30 @@ export const SubscriptionDetails = (props: __internal_SubscriptionDetailsProps) 
 
 type UseGuessableSubscriptionResult<Or extends 'throw' | undefined = undefined> = Or extends 'throw'
   ? {
-      upcomingSubscription?: CommerceSubscriptionResource;
-      pastDueSubscription?: CommerceSubscriptionResource;
-      activeSubscription?: CommerceSubscriptionResource;
-      anySubscription: CommerceSubscriptionResource;
+      upcomingSubscription?: CommerceSubscriptionItemResource;
+      pastDueSubscription?: CommerceSubscriptionItemResource;
+      activeSubscription?: CommerceSubscriptionItemResource;
+      anySubscription: CommerceSubscriptionItemResource;
       isLoading: boolean;
     }
   : {
-      upcomingSubscription?: CommerceSubscriptionResource;
-      pastDueSubscription?: CommerceSubscriptionResource;
-      activeSubscription?: CommerceSubscriptionResource;
-      anySubscription?: CommerceSubscriptionResource;
+      upcomingSubscription?: CommerceSubscriptionItemResource;
+      pastDueSubscription?: CommerceSubscriptionItemResource;
+      activeSubscription?: CommerceSubscriptionItemResource;
+      anySubscription?: CommerceSubscriptionItemResource;
       isLoading: boolean;
     };
 
 function useGuessableSubscription<Or extends 'throw' | undefined = undefined>(options?: {
   or?: Or;
 }): UseGuessableSubscriptionResult<Or> {
-  const { data: subscriptions, isLoading } = useSubscriptions();
-  const activeSubscription = subscriptions?.find(sub => sub.status === 'active');
-  const upcomingSubscription = subscriptions?.find(sub => sub.status === 'upcoming');
-  const pastDueSubscription = subscriptions?.find(sub => sub.status === 'past_due');
+  const { data: subscription, isLoading } = useSubscriptions();
+  const subscriptionItems = useMemo(() => {
+    return subscription?.subscriptionItems || [];
+  }, [subscription]);
+  const activeSubscription = subscriptionItems?.find(sub => sub.status === 'active');
+  const upcomingSubscription = subscriptionItems?.find(sub => sub.status === 'upcoming');
+  const pastDueSubscription = subscriptionItems?.find(sub => sub.status === 'past_due');
 
   if (options?.or === 'throw' && !activeSubscription && !pastDueSubscription) {
     throw new Error('No active or past due subscription found');
@@ -103,18 +105,14 @@ function useGuessableSubscription<Or extends 'throw' | undefined = undefined>(op
 }
 
 const SubscriptionDetailsInternal = (props: __internal_SubscriptionDetailsProps) => {
-  const { organization: _organization } = useOrganization();
-  const [subscriptionForCancellation, setSubscriptionForCancellation] = useState<CommerceSubscriptionResource | null>(
-    null,
-  );
+  const [subscriptionForCancellation, setSubscriptionForCancellation] =
+    useState<CommerceSubscriptionItemResource | null>(null);
   const [confirmationOpen, setConfirmationOpen] = useState(false);
 
-  const {
-    buttonPropsForPlan: _buttonPropsForPlan,
-    isDefaultPlanImplicitlyActiveOrUpcoming: _isDefaultPlanImplicitlyActiveOrUpcoming,
-  } = usePlansContext();
-
-  const { data: subscriptions, isLoading } = useSubscriptions();
+  const { data: subscription, isLoading } = useSubscriptions();
+  const subscriptionItems = useMemo(() => {
+    return subscription?.subscriptionItems || [];
+  }, [subscription]);
   const { activeSubscription, pastDueSubscription } = useGuessableSubscription();
 
   if (isLoading) {
@@ -154,7 +152,7 @@ const SubscriptionDetailsInternal = (props: __internal_SubscriptionDetailsProps)
         })}
       >
         {/* Subscription Cards */}
-        {subscriptions?.map(subscriptionItem => (
+        {subscriptionItems?.map(subscriptionItem => (
           <SubscriptionCard
             key={subscriptionItem.id}
             subscription={subscriptionItem}
@@ -321,7 +319,7 @@ function SubscriptionDetailsSummary() {
   );
 }
 
-const SubscriptionCardActions = ({ subscription }: { subscription: CommerceSubscriptionResource }) => {
+const SubscriptionCardActions = ({ subscription }: { subscription: CommerceSubscriptionItemResource }) => {
   const { portalRoot } = useSubscriptionDetailsContext();
   const { __internal_openCheckout } = useClerk();
   const subscriberType = useSubscriberTypeContext();
@@ -431,7 +429,7 @@ const SubscriptionCardActions = ({ subscription }: { subscription: CommerceSubsc
 };
 
 // New component for individual subscription cards
-const SubscriptionCard = ({ subscription }: { subscription: CommerceSubscriptionResource }) => {
+const SubscriptionCard = ({ subscription }: { subscription: CommerceSubscriptionItemResource }) => {
   const { t } = useLocalizations();
 
   return (

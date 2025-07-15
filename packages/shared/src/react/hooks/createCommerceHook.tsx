@@ -35,7 +35,7 @@ type CommerceHookConfig<TResource extends ClerkResource, TParams extends PagesOr
  *
  * @internal
  */
-export function createCommerceHook<TResource extends ClerkResource, TParams extends PagesOrInfiniteOptions>({
+export function createCommercePaginatedHook<TResource extends ClerkResource, TParams extends PagesOrInfiniteOptions>({
   hookName,
   resourceType,
   useFetcher,

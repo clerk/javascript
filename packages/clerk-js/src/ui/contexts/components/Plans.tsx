@@ -2,17 +2,15 @@ import {
   __experimental_usePaymentAttempts,
   __experimental_usePaymentMethods,
   __experimental_useStatements,
-  __experimental_useSubscriptionItems,
+  __experimental_useSubscription,
   useClerk,
-  useOrganization,
   useSession,
-  useUser,
 } from '@clerk/shared/react';
 import type {
   Appearance,
   CommercePlanResource,
+  CommerceSubscriptionItemResource,
   CommerceSubscriptionPlanPeriod,
-  CommerceSubscriptionResource,
 } from '@clerk/types';
 import { useCallback, useMemo } from 'react';
 import useSWR from 'swr';
@@ -26,17 +24,6 @@ import { useSubscriberTypeContext } from './SubscriberType';
 const dedupeOptions = {
   dedupingInterval: 1_000 * 60, // 1 minute,
   keepPreviousData: true,
-};
-
-export const usePaymentSourcesCacheKey = () => {
-  const { organization } = useOrganization();
-  const { user } = useUser();
-  const subscriberType = useSubscriberTypeContext();
-
-  return {
-    key: `commerce-payment-sources`,
-    resourceId: subscriberType === 'org' ? organization?.id : user?.id,
-  };
 };
 
 // TODO(@COMMERCE): Rename payment sources to payment methods at the API level
@@ -73,11 +60,8 @@ export const useStatements = (params?: { mode: 'cache' }) => {
 
 export const useSubscriptions = () => {
   const subscriberType = useSubscriberTypeContext();
-
-  return __experimental_useSubscriptionItems({
+  return __experimental_useSubscription({
     for: subscriberType === 'org' ? 'organization' : 'user',
-    initialPage: 1,
-    pageSize: 10,
     keepPreviousData: true,
   });
 };
@@ -122,7 +106,8 @@ export const usePlansContext = () => {
     return false;
   }, [clerk, subscriberType]);
 
-  const { data: subscriptions, revalidate: revalidateSubscriptions } = useSubscriptions();
+  const { data: subscription, mutate: revalidateSubscriptions } = useSubscriptions();
+  const subscriptionItems = useMemo(() => subscription?.subscriptionItems || [], [subscription]);
 
   // Invalidates cache but does not fetch immediately
   const { data: plans, mutate: mutatePlans } = useSWR<Awaited<ReturnType<typeof clerk.billing.getPlans>>>({
@@ -146,23 +131,23 @@ export const usePlansContext = () => {
   // should the default plan be shown as active
   const isDefaultPlanImplicitlyActiveOrUpcoming = useMemo(() => {
     // are there no subscriptions or are all subscriptions canceled
-    return subscriptions.length === 0 || !subscriptions.some(subscription => !subscription.canceledAtDate);
-  }, [subscriptions]);
+    return subscriptionItems.length === 0 || !subscriptionItems.some(subscription => !subscription.canceledAtDate);
+  }, [subscriptionItems]);
 
   // return the active or upcoming subscription for a plan if it exists
   const activeOrUpcomingSubscription = useCallback(
     (plan: CommercePlanResource) => {
-      return subscriptions.find(subscription => subscription.plan.id === plan.id);
+      return subscriptionItems.find(subscription => subscription.plan.id === plan.id);
     },
-    [subscriptions],
+    [subscriptionItems],
   );
 
   // returns all subscriptions for a plan that are active or upcoming
   const activeAndUpcomingSubscriptions = useCallback(
     (plan: CommercePlanResource) => {
-      return subscriptions.filter(subscription => subscription.plan.id === plan.id);
+      return subscriptionItems.filter(subscription => subscription.plan.id === plan.id);
     },
-    [subscriptions],
+    [subscriptionItems],
   );
 
   // return the active or upcoming subscription for a plan based on the plan period, if there is no subscription for the plan period, return the first subscription
@@ -192,7 +177,7 @@ export const usePlansContext = () => {
   );
 
   const canManageSubscription = useCallback(
-    ({ plan, subscription: sub }: { plan?: CommercePlanResource; subscription?: CommerceSubscriptionResource }) => {
+    ({ plan, subscription: sub }: { plan?: CommercePlanResource; subscription?: CommerceSubscriptionItemResource }) => {
       const subscription = sub ?? (plan ? activeOrUpcomingSubscription(plan) : undefined);
 
       return !subscription || !subscription.canceledAtDate;
@@ -209,7 +194,7 @@ export const usePlansContext = () => {
       selectedPlanPeriod = 'annual',
     }: {
       plan?: CommercePlanResource;
-      subscription?: CommerceSubscriptionResource;
+      subscription?: CommerceSubscriptionItemResource;
       isCompact?: boolean;
       selectedPlanPeriod?: CommerceSubscriptionPlanPeriod;
     }): {
@@ -262,7 +247,7 @@ export const usePlansContext = () => {
 
         // Handle non-subscription cases
         const hasNonDefaultSubscriptions =
-          subscriptions.filter(subscription => !subscription.plan.isDefault).length > 0;
+          subscriptionItems.filter(subscription => !subscription.plan.isDefault).length > 0;
         return hasNonDefaultSubscriptions
           ? localizationKeys('commerce.switchPlan')
           : localizationKeys('commerce.subscribe');
@@ -276,10 +261,10 @@ export const usePlansContext = () => {
         disabled: !canManageBilling,
       };
     },
-    [activeOrUpcomingSubscriptionWithPlanPeriod, canManageBilling, subscriptions],
+    [activeOrUpcomingSubscriptionWithPlanPeriod, canManageBilling, subscriptionItems],
   );
 
-  const captionForSubscription = useCallback((subscription: CommerceSubscriptionResource) => {
+  const captionForSubscription = useCallback((subscription: CommerceSubscriptionItemResource) => {
     if (subscription.pastDueAt) {
       return localizationKeys('badge__pastDueAt', { date: subscription.pastDueAt });
     }
