@@ -1,6 +1,6 @@
 import { createAlphaColorMixString } from '../utils/colors/utils';
-import { clerkCssVar } from '../utils/cssVariables';
 import { cssSupports } from '../utils/cssSupports';
+import { clerkCssVar } from '../utils/cssVariables';
 
 type ShadowGenerator = (color: string, alpha: number) => string;
 
