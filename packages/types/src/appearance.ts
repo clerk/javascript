@@ -753,8 +753,8 @@ export type Variables = {
    */
   colorBorder?: CssColor;
   /**
-   * The background color of the modal backdrop rendered at 50% opacity.
-   * @default {@link Variables.colorNeutral} at 50% opacity
+   * The background color of the modal backdrop rendered at 73% opacity.
+   * @default {@link Variables.colorNeutral} at 73% opacity
    */
   colorModalBackdrop?: CssColor;
   /**
