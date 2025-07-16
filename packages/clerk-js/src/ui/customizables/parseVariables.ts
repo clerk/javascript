@@ -1,47 +1,126 @@
 import type { Theme } from '@clerk/types';
 
-import { spaceScaleKeys } from '../foundations/sizes';
-import type { fontSizes, fontWeights } from '../foundations/typography';
-import { colorOptionToHslaAlphaScale, colorOptionToHslaLightnessScale } from '../utils/colorOptionToHslaScale';
+import { createShadowSet, generateShadow } from '../foundations/shadows';
+import { BORDER_RADIUS_SCALE_RATIOS, spaceScaleKeys } from '../foundations/sizes';
+import { FONT_SIZE_SCALE_RATIOS, type FontSizeKey, type fontWeights } from '../foundations/typography';
 import { colors } from '../utils/colors';
+import { colorOptionToThemedAlphaScale, colorOptionToThemedLightnessScale } from '../utils/colors/scales';
+import { createAlphaColorMixString } from '../utils/colors/utils';
+import { cssSupports } from '../utils/cssSupports';
 import { fromEntries } from '../utils/fromEntries';
 import { removeUndefinedProps } from '../utils/removeUndefinedProps';
 
-export const createColorScales = (theme: Theme) => {
-  const variables = theme.variables || {};
+const createMutedForegroundColor = (variables: NonNullable<Theme['variables']>) => {
+  if (variables.colorMutedForeground) {
+    return colors.toHslaString(variables.colorMutedForeground);
+  }
 
-  const primaryScale = colorOptionToHslaLightnessScale(variables.colorPrimary, 'primary');
-  const primaryAlphaScale = colorOptionToHslaAlphaScale(primaryScale?.primary500, 'primaryAlpha');
-  const dangerScale = colorOptionToHslaLightnessScale(variables.colorDanger, 'danger');
-  const dangerAlphaScale = colorOptionToHslaAlphaScale(dangerScale?.danger500, 'dangerAlpha');
-  const successScale = colorOptionToHslaLightnessScale(variables.colorSuccess, 'success');
-  const successAlphaScale = colorOptionToHslaAlphaScale(successScale?.success500, 'successAlpha');
-  const warningScale = colorOptionToHslaLightnessScale(variables.colorWarning, 'warning');
-  const warningAlphaScale = colorOptionToHslaAlphaScale(warningScale?.warning500, 'warningAlpha');
+  if (variables.colorTextSecondary) {
+    return colors.toHslaString(variables.colorTextSecondary);
+  }
+
+  if (variables.colorForeground) {
+    return colors.makeTransparent(variables.colorForeground, 0.35);
+  }
+
+  return colors.makeTransparent(variables.colorText, 0.35);
+};
+
+export const createColorScales = (theme: Theme) => {
+  const variables = removeInvalidValues(theme.variables || {});
+
+  const dangerScale = colorOptionToThemedLightnessScale(variables.colorDanger, 'danger');
+  const primaryScale = colorOptionToThemedLightnessScale(variables.colorPrimary, 'primary');
+  const successScale = colorOptionToThemedLightnessScale(variables.colorSuccess, 'success');
+  const warningScale = colorOptionToThemedLightnessScale(variables.colorWarning, 'warning');
+
+  const dangerAlphaScale = colorOptionToThemedAlphaScale(dangerScale?.danger500, 'dangerAlpha');
+  const neutralAlphaScale = colorOptionToThemedAlphaScale(variables.colorNeutral, 'neutralAlpha');
+  const primaryAlphaScale = colorOptionToThemedAlphaScale(primaryScale?.primary500, 'primaryAlpha');
+  const successAlphaScale = colorOptionToThemedAlphaScale(successScale?.success500, 'successAlpha');
+  const warningAlphaScale = colorOptionToThemedAlphaScale(warningScale?.warning500, 'warningAlpha');
+  const borderAlphaScale = colorOptionToThemedAlphaScale(
+    variables.colorBorder || variables.colorNeutral,
+    'borderAlpha',
+  );
 
   return removeUndefinedProps({
-    ...primaryScale,
-    ...primaryAlphaScale,
     ...dangerScale,
-    ...dangerAlphaScale,
+    ...primaryScale,
     ...successScale,
-    ...successAlphaScale,
     ...warningScale,
+    ...dangerAlphaScale,
+    ...neutralAlphaScale,
+    ...primaryAlphaScale,
+    ...successAlphaScale,
     ...warningAlphaScale,
-    ...colorOptionToHslaAlphaScale(variables.colorNeutral, 'neutralAlpha'),
+    ...borderAlphaScale,
     primaryHover: colors.adjustForLightness(primaryScale?.primary500),
-    colorTextOnPrimaryBackground: toHSLA(variables.colorTextOnPrimaryBackground),
-    colorText: toHSLA(variables.colorText),
-    colorTextSecondary: toHSLA(variables.colorTextSecondary) || colors.makeTransparent(variables.colorText, 0.35),
-    colorInputText: toHSLA(variables.colorInputText),
-    colorBackground: toHSLA(variables.colorBackground),
-    colorInputBackground: toHSLA(variables.colorInputBackground),
-    colorShimmer: toHSLA(variables.colorShimmer),
+    colorPrimaryForeground: variables.colorPrimaryForeground
+      ? colors.toHslaString(variables.colorPrimaryForeground)
+      : variables.colorTextOnPrimaryBackground
+        ? colors.toHslaString(variables.colorTextOnPrimaryBackground)
+        : undefined,
+    colorForeground: variables.colorForeground
+      ? colors.toHslaString(variables.colorForeground)
+      : colors.toHslaString(variables.colorText),
+    colorMutedForeground: createMutedForegroundColor(variables),
+    colorInputForeground: variables.colorInputForeground
+      ? colors.toHslaString(variables.colorInputForeground)
+      : colors.toHslaString(variables.colorInputText),
+    colorBackground: colors.toHslaString(variables.colorBackground),
+    colorInput: variables.colorInput
+      ? colors.toHslaString(variables.colorInput)
+      : colors.toHslaString(variables.colorInputBackground),
+    colorShimmer: colors.toHslaString(variables.colorShimmer),
+    colorMuted: variables.colorMuted ? colors.toHslaString(variables.colorMuted) : undefined,
+    colorRing: variables.colorRing ? colors.toHslaString(variables.colorRing) : undefined,
+    colorShadow: variables.colorShadow ? colors.toHslaString(variables.colorShadow) : undefined,
+    colorModalBackdrop: variables.colorModalBackdrop ? colors.toHslaString(variables.colorModalBackdrop) : undefined,
   });
 };
 
-export const toHSLA = (str: string | undefined) => {
-  return str ? colors.toHslaString(str) : undefined;
+export const removeInvalidValues = (variables: NonNullable<Theme['variables']>): NonNullable<Theme['variables']> => {
+  // Check for modern color support. If present, we can simply return the variables as-is since we support everything
+  // CSS supports.
+  if (cssSupports.modernColor()) {
+    return variables;
+  }
+
+  // If not, we need to remove any values that are specified with CSS variables, as our color scale generation only
+  // supports CSS variables using modern CSS functionality.
+  const validVariables: Theme['variables'] = Object.fromEntries(
+    Object.entries(variables).filter(([key, value]) => {
+      if (typeof value === 'string') {
+        const isValid = !value.startsWith('var(');
+        if (!isValid) {
+          console.warn(
+            `Invalid color value: ${value} for key: ${key}, using default value instead. Using CSS variables is not supported in this browser.`,
+          );
+        }
+        return isValid;
+      }
+
+      if (typeof value === 'object') {
+        return Object.entries(value).every(([key, value]) => {
+          if (typeof value !== 'string') return true;
+
+          const isValid = !value.startsWith('var(');
+          if (!isValid) {
+            console.warn(
+              `Invalid color value: ${value} for key: ${key}, using default value instead. Using CSS variables is not supported in this browser.`,
+            );
+          }
+
+          return isValid;
+        });
+      }
+
+      return false;
+    }),
+  );
+
+  return validVariables;
 };
 
 export const createRadiiUnits = (theme: Theme) => {
@@ -51,26 +130,25 @@ export const createRadiiUnits = (theme: Theme) => {
   }
 
   const md = borderRadius === 'none' ? '0' : borderRadius;
-  const { numericValue, unit = 'rem' } = splitCssUnit(md);
   return {
-    sm: (numericValue * 0.66).toString() + unit,
+    sm: `calc(${md} * ${BORDER_RADIUS_SCALE_RATIOS.sm})`,
     md,
-    lg: (numericValue * 1.33).toString() + unit,
-    xl: (numericValue * 2).toString() + unit,
+    lg: `calc(${md} * ${BORDER_RADIUS_SCALE_RATIOS.lg})`,
+    xl: `calc(${md} * ${BORDER_RADIUS_SCALE_RATIOS.xl})`,
   };
 };
 
 export const createSpaceScale = (theme: Theme) => {
-  const { spacingUnit } = theme.variables || {};
-  if (spacingUnit === undefined) {
+  const { spacing, spacingUnit } = theme.variables || {};
+  const spacingValue = spacing ?? spacingUnit;
+  if (spacingValue === undefined) {
     return;
   }
-  const { numericValue, unit } = splitCssUnit(spacingUnit);
   return fromEntries(
     spaceScaleKeys.map(k => {
       const num = Number.parseFloat(k.replace('x', '.'));
       const percentage = (num / 0.5) * 0.125;
-      return [k, `${numericValue * percentage}${unit}`];
+      return [k, `calc(${spacingValue} * ${percentage})`];
     }),
   );
 };
@@ -78,22 +156,32 @@ export const createSpaceScale = (theme: Theme) => {
 // We want to keep the same ratio between the font sizes we have for the default theme
 // This is directly related to the fontSizes object in the theme default foundations
 // ref: src/ui/foundations/typography.ts
-export const createFontSizeScale = (theme: Theme): Record<keyof typeof fontSizes, string> | undefined => {
+export const createFontSizeScale = (theme: Theme): Partial<Record<FontSizeKey, string>> | undefined => {
   const { fontSize } = theme.variables || {};
   if (fontSize === undefined) {
     return;
   }
-  const { numericValue, unit = 'rem' } = splitCssUnit(fontSize);
-  return {
-    xs: (numericValue * 0.8).toString() + unit,
-    sm: (numericValue * 0.9).toString() + unit,
-    md: fontSize,
-    lg: (numericValue * 1.3).toString() + unit,
-    xl: (numericValue * 1.85).toString() + unit,
-  };
+
+  if (typeof fontSize === 'object') {
+    // When fontSize is an object, filter out undefined values and return only defined properties
+    return removeUndefinedProps(
+      Object.fromEntries(
+        Object.entries(FONT_SIZE_SCALE_RATIOS).map(([key, _ratio]) => [key, fontSize[key as FontSizeKey] ?? undefined]),
+      ) as Record<FontSizeKey, string | undefined>,
+    );
+  }
+
+  // When fontSize is a string, calculate all sizes based on the base value and fractions for precision
+  // Using fractions instead of decimal ratios to avoid floating-point precision issues
+  return Object.fromEntries(
+    Object.entries(FONT_SIZE_SCALE_RATIOS).map(([key, fraction]) => [
+      key,
+      fraction === '1' ? fontSize : `calc(${fontSize} * ${fraction})`,
+    ]),
+  ) as Record<FontSizeKey, string>;
 };
 
-export const createFontWeightScale = (theme: Theme): Record<keyof typeof fontWeights, any> => {
+export const createFontWeightScale = (theme: Theme): Partial<Record<keyof typeof fontWeights, string | number>> => {
   const { fontWeight } = theme.variables || {};
   return removeUndefinedProps({ ...fontWeight });
 };
@@ -103,8 +191,19 @@ export const createFonts = (theme: Theme) => {
   return removeUndefinedProps({ main: fontFamily, buttons: fontFamilyButtons });
 };
 
-const splitCssUnit = (str: string) => {
-  const numericValue = Number.parseFloat(str);
-  const unit = str.replace(numericValue.toString(), '') || undefined;
-  return { numericValue, unit };
+export const createShadowsUnits = (theme: Theme) => {
+  const { colorShadow } = theme.variables || {};
+  if (!colorShadow) {
+    return;
+  }
+
+  const shadowColor = colors.toHslaString(colorShadow);
+  if (!shadowColor) {
+    return;
+  }
+
+  return createShadowSet(
+    shadowColor,
+    generateShadow((color, alpha) => createAlphaColorMixString(color, alpha * 100)),
+  );
 };

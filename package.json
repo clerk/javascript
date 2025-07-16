@@ -123,6 +123,7 @@
     "jsonwebtoken": "9.0.2",
     "lint-staged": "^14.0.1",
     "prettier": "^3.5.3",
+    "prettier-plugin-astro": "^0.14.1",
     "prettier-plugin-packagejson": "^2.5.15",
     "prettier-plugin-tailwindcss": "^0.6.12",
     "publint": "^0.3.12",
@@ -146,12 +147,15 @@
     "yalc": "1.0.0-pre.53",
     "zx": "catalog:repo"
   },
-  "packageManager": "pnpm@9.15.9+sha512.68046141893c66fad01c079231128e9afb89ef87e2691d69e4d40eee228988295fd4682181bae55b58418c3a253bde65a505ec7c5f9403ece5cc3cd37dcf2531",
+  "packageManager": "pnpm@10.12.4+sha512.5ea8b0deed94ed68691c9bad4c955492705c5eeb8a87ef86bc62c74a26b037b08ff9570f108b2e4dbd1dd1a9186fea925e527f141c648e85af45631074680184",
   "engines": {
     "node": ">=18.17.0",
-    "pnpm": ">=9.15.9"
+    "pnpm": ">=10.12.4"
   },
   "pnpm": {
+    "onlyBuiltDependencies": [
+      "cypress"
+    ],
     "overrides": {
       "jest": "29.7.0",
       "jest-snapshot-prettier": "npm:prettier@^3.5.3"

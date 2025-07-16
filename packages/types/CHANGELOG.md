@@ -1,5 +1,77 @@
 # Change Log
 
+## 4.67.0
+
+### Minor Changes
+
+- Do not trigger after-auth navigation from `useMultisessionActions` ([#6323](https://github.com/clerk/javascript/pull/6323)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+## 4.66.1
+
+### Patch Changes
+
+- [Billing Beta] Add experimental JSDoc for `org.getSubscriptions`. ([#6318](https://github.com/clerk/javascript/pull/6318)) by [@panteliselef](https://github.com/panteliselef)
+
+## 4.66.0
+
+### Minor Changes
+
+- Expose Clerk CSS variables as an option for theming Clerk's components. This change introduces CSS custom properties that allow developers to customize Clerk's appearance using standard CSS variables, providing a more flexible theming approach. ([#6275](https://github.com/clerk/javascript/pull/6275)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  ```css
+  :root {
+    --clerk-color-primary: #6d47ff;
+    --clerk-color-primary-foreground: #ffffff;
+  }
+  ```
+
+  ## Deprecated variables
+
+  | Deprecated                     | New                      |
+  | ------------------------------ | ------------------------ |
+  | `colorText`                    | `colorForeground`        |
+  | `colorTextOnPrimaryBackground` | `colorPrimaryForeground` |
+  | `colorTextSecondary`           | `colorMutedForeground`   |
+  | `spacingUnit`                  | `spacing`                |
+  | `colorInputText`               | `colorInputForeground`   |
+  | `colorInputBackground`         | `colorInput`             |
+
+  Deprecated variables will continue to work but will be removed in the next major version.
+
+  ## New variables
+
+  - `colorRing` - The color of the ring when an interactive element is focused.
+  - `colorMuted` - The background color for elements of lower importance, eg: a muted background.
+  - `colorShadow` - The base shadow color used in the components.
+  - `colorBorder` - The base border color used in the components.
+  - `colorModalBackdrop` - The background color of the modal backdrop.
+
+- Display past due subscriptions properly. ([#6309](https://github.com/clerk/javascript/pull/6309)) by [@panteliselef](https://github.com/panteliselef)
+
+- Extract `SubscriptionDetails`, into its own internal component, out of existing (also internal) `PlanDetails` component. ([#6148](https://github.com/clerk/javascript/pull/6148)) by [@panteliselef](https://github.com/panteliselef)
+
+## 4.65.0
+
+### Minor Changes
+
+- [Billing Beta]: Introduce experimental `Clerk.__experimental_checkout()` for managing the state of a checkout session. ([#6195](https://github.com/clerk/javascript/pull/6195)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Add notice for upcoming/possible breaking changes in commerce related APIs. ([#6285](https://github.com/clerk/javascript/pull/6285)) by [@panteliselef](https://github.com/panteliselef)
+
+- Export `ClerkAPIResponseError` interface from types package. ([#6286](https://github.com/clerk/javascript/pull/6286)) by [@panteliselef](https://github.com/panteliselef)
+
+## 4.64.0
+
+### Minor Changes
+
+- Add `__internal_loadStripeJs` in Clerk interface. ([#6180](https://github.com/clerk/javascript/pull/6180)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Add jsdoc comments for `payerType` in `CommercePlanResource`. ([#6257](https://github.com/clerk/javascript/pull/6257)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 4.63.0
 
 ### Minor Changes

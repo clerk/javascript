@@ -4,8 +4,10 @@ import { loadClerkJsScript } from '@clerk/shared/loadClerkJsScript';
 import { handleValueOrFn } from '@clerk/shared/utils';
 import type {
   __internal_CheckoutProps,
+  __internal_NavigateToTaskIfAvailableParams,
   __internal_OAuthConsentProps,
   __internal_PlanDetailsProps,
+  __internal_SubscriptionDetailsProps,
   __internal_UserVerificationModalProps,
   __internal_UserVerificationProps,
   APIKeysNamespace,
@@ -29,7 +31,6 @@ import type {
   JoinWaitlistParams,
   ListenerCallback,
   LoadedClerk,
-  NextTaskParams,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationResource,
@@ -119,7 +120,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private preopenUserVerification?: null | __internal_UserVerificationProps = null;
   private preopenSignIn?: null | SignInProps = null;
   private preopenCheckout?: null | __internal_CheckoutProps = null;
-  private preopenPlanDetails?: null | __internal_PlanDetailsProps = null;
+  private preopenPlanDetails: null | __internal_PlanDetailsProps = null;
+  private preopenSubscriptionDetails: null | __internal_SubscriptionDetailsProps = null;
   private preopenSignUp?: null | SignUpProps = null;
   private preopenUserProfile?: null | UserProfileProps = null;
   private preopenOrganizationProfile?: null | OrganizationProfileProps = null;
@@ -560,6 +562,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.__internal_openPlanDetails(this.preopenPlanDetails);
     }
 
+    if (this.preopenSubscriptionDetails !== null) {
+      clerkjs.__internal_openSubscriptionDetails(this.preopenSubscriptionDetails);
+    }
+
     if (this.preopenSignUp !== null) {
       clerkjs.openSignUp(this.preopenSignUp);
     }
@@ -705,6 +711,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     return this.clerkjs?.apiKeys;
   }
 
+  __experimental_checkout = (...args: Parameters<Clerk['__experimental_checkout']>) => {
+    return this.clerkjs?.__experimental_checkout(...args);
+  };
+
   __unstable__setEnvironment(...args: any): void {
     if (this.clerkjs && '__unstable__setEnvironment' in this.clerkjs) {
       (this.clerkjs as any).__unstable__setEnvironment(args);
@@ -721,9 +731,9 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  __experimental_navigateToTask = async (params?: NextTaskParams): Promise<void> => {
+  __internal_navigateToTaskIfAvailable = async (params?: __internal_NavigateToTaskIfAvailableParams): Promise<void> => {
     if (this.clerkjs) {
-      return this.clerkjs.__experimental_navigateToTask(params);
+      return this.clerkjs.__internal_navigateToTaskIfAvailable(params);
     } else {
       return Promise.reject();
     }
@@ -772,7 +782,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  __internal_openPlanDetails = (props?: __internal_PlanDetailsProps) => {
+  __internal_openPlanDetails = (props: __internal_PlanDetailsProps) => {
     if (this.clerkjs && this.loaded) {
       this.clerkjs.__internal_openPlanDetails(props);
     } else {
@@ -785,6 +795,22 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.clerkjs.__internal_closePlanDetails();
     } else {
       this.preopenPlanDetails = null;
+    }
+  };
+
+  __internal_openSubscriptionDetails = (props?: __internal_SubscriptionDetailsProps) => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.__internal_openSubscriptionDetails(props);
+    } else {
+      this.preopenSubscriptionDetails = props ?? null;
+    }
+  };
+
+  __internal_closeSubscriptionDetails = () => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.__internal_closeSubscriptionDetails();
+    } else {
+      this.preopenSubscriptionDetails = null;
     }
   };
 

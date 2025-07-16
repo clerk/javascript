@@ -1,5 +1,122 @@
 # Change Log
 
+## 5.73.2
+
+### Patch Changes
+
+- Do not trigger after-auth navigation from `useMultisessionActions` ([#6323](https://github.com/clerk/javascript/pull/6323)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`2a90b68`](https://github.com/clerk/javascript/commit/2a90b689550ae960496c9292ca23e0225e3425cd), [`af50905`](https://github.com/clerk/javascript/commit/af50905ea497ed3286c8c4c374498e06ca6ee82b)]:
+  - @clerk/types@4.67.0
+  - @clerk/shared@3.12.3
+  - @clerk/localizations@3.19.2
+
+## 5.73.1
+
+### Patch Changes
+
+- Refactor after-auth flows to keep navigation internally ([#6319](https://github.com/clerk/javascript/pull/6319)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`8ee859c`](https://github.com/clerk/javascript/commit/8ee859ce00d1d5747c14a80fe7166303e64a4f1f)]:
+  - @clerk/shared@3.12.2
+  - @clerk/types@4.66.1
+  - @clerk/localizations@3.19.1
+
+## 5.73.0
+
+### Minor Changes
+
+- Expose Clerk CSS variables as an option for theming Clerk's components. This change introduces CSS custom properties that allow developers to customize Clerk's appearance using standard CSS variables, providing a more flexible theming approach. ([#6275](https://github.com/clerk/javascript/pull/6275)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  ```css
+  :root {
+    --clerk-color-primary: #6d47ff;
+    --clerk-color-primary-foreground: #ffffff;
+  }
+  ```
+
+  ## Deprecated variables
+
+  | Deprecated                     | New                      |
+  | ------------------------------ | ------------------------ |
+  | `colorText`                    | `colorForeground`        |
+  | `colorTextOnPrimaryBackground` | `colorPrimaryForeground` |
+  | `colorTextSecondary`           | `colorMutedForeground`   |
+  | `spacingUnit`                  | `spacing`                |
+  | `colorInputText`               | `colorInputForeground`   |
+  | `colorInputBackground`         | `colorInput`             |
+
+  Deprecated variables will continue to work but will be removed in the next major version.
+
+  ## New variables
+
+  - `colorRing` - The color of the ring when an interactive element is focused.
+  - `colorMuted` - The background color for elements of lower importance, eg: a muted background.
+  - `colorShadow` - The base shadow color used in the components.
+  - `colorBorder` - The base border color used in the components.
+  - `colorModalBackdrop` - The background color of the modal backdrop.
+
+- Display past due subscriptions properly. ([#6309](https://github.com/clerk/javascript/pull/6309)) by [@panteliselef](https://github.com/panteliselef)
+
+- Extract `SubscriptionDetails`, into its own internal component, out of existing (also internal) `PlanDetails` component. ([#6148](https://github.com/clerk/javascript/pull/6148)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Enhanced detection of password manangers ([#6311](https://github.com/clerk/javascript/pull/6311)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`025e304`](https://github.com/clerk/javascript/commit/025e304c4d6402dfd750ee51ac9c8fc2dea1f353), [`dedf487`](https://github.com/clerk/javascript/commit/dedf48703986d547d5b28155b0182a51030cffeb), [`b96114e`](https://github.com/clerk/javascript/commit/b96114e438638896ba536bb7a17b09cdadcd9407)]:
+  - @clerk/types@4.66.0
+  - @clerk/localizations@3.19.0
+  - @clerk/shared@3.12.1
+
+## 5.72.0
+
+### Minor Changes
+
+- [Billing Beta]: Introduce experimental `Clerk.__experimental_checkout()` for managing the state of a checkout session. ([#6195](https://github.com/clerk/javascript/pull/6195)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Bugfix: Fixed incorrect field validation when using password authentication with email or phone number during sign-up. Optional email and phone fields now correctly display their requirement status. ([#6259](https://github.com/clerk/javascript/pull/6259)) by [@bratsos](https://github.com/bratsos)
+
+- Force redirect to SSO callback route when force-an-org is enabled, ensuring task display and organization selection ([#6271](https://github.com/clerk/javascript/pull/6271)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Navigate to tasks when switching sessions ([#6273](https://github.com/clerk/javascript/pull/6273)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`2be6a53`](https://github.com/clerk/javascript/commit/2be6a53959cb8a3127c2eb5d1aeb4248872d2c24), [`f6a1c35`](https://github.com/clerk/javascript/commit/f6a1c35bd5fb4bd2a3cd45bdaf9defe6be59d4a9), [`6826d0b`](https://github.com/clerk/javascript/commit/6826d0bbd03e844d49224565878a4326684f06b4), [`f6a1c35`](https://github.com/clerk/javascript/commit/f6a1c35bd5fb4bd2a3cd45bdaf9defe6be59d4a9), [`97a07f7`](https://github.com/clerk/javascript/commit/97a07f78b4b0c3dc701a2610097ec7d6232f79e7)]:
+  - @clerk/types@4.65.0
+  - @clerk/shared@3.12.0
+  - @clerk/localizations@3.18.1
+
+## 5.71.0
+
+### Minor Changes
+
+- Add CSS variable support to the `appearance.variables` object, enabling use of CSS custom properties. For example, you can now use `colorPrimary: 'var(--brand-color)'` to reference CSS variables defined in your stylesheets. ([#6187](https://github.com/clerk/javascript/pull/6187)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  This feature includes automatic fallback support for browsers that don't support modern CSS color manipulation features.
+
+- Added granular permission checks to `<APIKeys />` component to support read-only and manage roles ([#6253](https://github.com/clerk/javascript/pull/6253)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Remove `@stripe/react-stripe-js` dependency and only allow loading of stripe-js via `Clerk.__internal_loadStripeJs()`. ([#6180](https://github.com/clerk/javascript/pull/6180)) by [@panteliselef](https://github.com/panteliselef)
+
+- Password managers will now autofill OTP code verifications. ([#6247](https://github.com/clerk/javascript/pull/6247)) by [@tmilewski](https://github.com/tmilewski)
+
+- Adds Content Security Policy (CSP) nonce support to the Cloudflare Turnstile ([#6226](https://github.com/clerk/javascript/pull/6226)) by [@jacekradko](https://github.com/jacekradko)
+
+### Patch Changes
+
+- Fix browser back / forward navigation for tabs ([#6264](https://github.com/clerk/javascript/pull/6264)) by [@aeliox](https://github.com/aeliox)
+
+- ([#6109](https://github.com/clerk/javascript/pull/6109)) by [@aeliox](https://github.com/aeliox)
+
+- Fix layout shift when navigating after task resolution ([#6265](https://github.com/clerk/javascript/pull/6265)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`f42c4fe`](https://github.com/clerk/javascript/commit/f42c4fedfdab873129b876eba38b3677f190b460), [`ec207dc`](https://github.com/clerk/javascript/commit/ec207dcd2a13340cfa4e3b80d3d52d1b4e7d5f23), [`d00ef33`](https://github.com/clerk/javascript/commit/d00ef33dca4290a5aff52169a9076a6b4cabeee2), [`ec207dc`](https://github.com/clerk/javascript/commit/ec207dcd2a13340cfa4e3b80d3d52d1b4e7d5f23), [`0e0cc1f`](https://github.com/clerk/javascript/commit/0e0cc1fa85347d727a4fd3718fe45b0f0244ddd9)]:
+  - @clerk/types@4.64.0
+  - @clerk/shared@3.11.0
+  - @clerk/localizations@3.18.0
+
 ## 5.70.0
 
 ### Minor Changes

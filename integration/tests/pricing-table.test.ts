@@ -68,8 +68,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     const u = createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
-    await u.po.page.goToRelative('/pricing-table');
-
+    await u.po.page.goToRelative('/pricing-table?newSubscriptionRedirectUrl=/pricing-table');
     await u.po.pricingTable.waitForMounted();
     await u.po.pricingTable.startCheckout({ planSlug: 'plus' });
     await u.po.checkout.waitForMounted();
@@ -172,6 +171,13 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
         .getByRole('button', { name: /^continue$/i })
         .click();
       await u.page.waitForAppUrl('/');
+      // eslint-disable-next-line playwright/no-conditional-in-test
+      if (app.name.includes('next')) {
+        // Correctly updates RSCs with the new `pla` claim.
+        await expect(u.po.page.getByText('user in pro')).toBeVisible({
+          timeout: 5_000,
+        });
+      }
     });
 
     test('navigates to supplied newSubscriptionRedirectUrl', async ({ page, context }) => {

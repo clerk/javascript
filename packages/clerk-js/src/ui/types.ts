@@ -2,6 +2,7 @@ import type {
   __internal_CheckoutProps,
   __internal_OAuthConsentProps,
   __internal_PlanDetailsProps,
+  __internal_SubscriptionDetailsProps,
   __internal_UserVerificationProps,
   APIKeysProps,
   CreateOrganizationProps,
@@ -50,6 +51,7 @@ export type AvailableComponentProps =
   | PricingTableProps
   | __internal_CheckoutProps
   | __internal_UserVerificationProps
+  | __internal_SubscriptionDetailsProps
   | __internal_PlanDetailsProps
   | APIKeysProps;
 
@@ -132,10 +134,19 @@ export type CheckoutCtx = __internal_CheckoutProps & {
 export type SessionTasksCtx = {
   nextTask: () => Promise<void>;
   redirectUrlComplete?: string;
+  currentTaskContainer: React.RefObject<HTMLDivElement> | null;
 };
 
 export type OAuthConsentCtx = __internal_OAuthConsentProps & {
   componentName: 'OAuthConsent';
+};
+
+export type SubscriptionDetailsCtx = __internal_SubscriptionDetailsProps & {
+  componentName: 'SubscriptionDetails';
+};
+
+export type PlanDetailsCtx = __internal_PlanDetailsProps & {
+  componentName: 'PlanDetails';
 };
 
 export type AvailableComponentCtx =
@@ -153,5 +164,7 @@ export type AvailableComponentCtx =
   | PricingTableCtx
   | CheckoutCtx
   | APIKeysCtx
-  | OAuthConsentCtx;
+  | OAuthConsentCtx
+  | SubscriptionDetailsCtx
+  | PlanDetailsCtx;
 export type AvailableComponentName = AvailableComponentCtx['componentName'];
