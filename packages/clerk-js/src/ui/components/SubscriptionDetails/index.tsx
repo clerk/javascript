@@ -266,11 +266,16 @@ const SubscriptionDetailsFooter = withCardStateProvider(() => {
 });
 
 function SubscriptionDetailsSummary() {
-  const { anySubscription, activeSubscription, upcomingSubscription } = useGuessableSubscription({
+  const { activeSubscription } = useGuessableSubscription({
     or: 'throw',
   });
+  const { data: subscription } = useSubscription();
 
-  if (!activeSubscription) {
+  if (!subscription || !activeSubscription) {
+    return null;
+  }
+
+  if (subscription.status !== 'active') {
     return null;
   }
 
@@ -288,25 +293,13 @@ function SubscriptionDetailsSummary() {
       </LineItems.Group>
       <LineItems.Group>
         <LineItems.Title description={localizationKeys('commerce.subscriptionDetails.nextPaymentOn')} />
-        <LineItems.Description
-          text={
-            upcomingSubscription
-              ? formatDate(upcomingSubscription.periodStartDate)
-              : anySubscription.periodEndDate
-                ? formatDate(anySubscription.periodEndDate)
-                : '-'
-          }
-        />
+        <LineItems.Description text={formatDate(subscription.nextPayment.time)} />
       </LineItems.Group>
       <LineItems.Group>
         <LineItems.Title description={localizationKeys('commerce.subscriptionDetails.nextPaymentAmount')} />
         <LineItems.Description
-          prefix={anySubscription.plan.currency}
-          text={`${anySubscription.plan.currencySymbol}${
-            anySubscription.planPeriod === 'month'
-              ? anySubscription.plan.amountFormatted
-              : anySubscription.plan.annualAmountFormatted
-          }`}
+          prefix={subscription.nextPayment.amount.currency}
+          text={`${subscription.nextPayment.amount.currencySymbol}${subscription.nextPayment.amount.amountFormatted}`}
         />
       </LineItems.Group>
     </LineItems.Root>
