@@ -1,4 +1,4 @@
-import { test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 import { appConfigs } from '../presets';
 import type { FakeUser } from '../testUtils';
@@ -11,7 +11,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
 
     let fakeUser: FakeUser;
 
-    test.beforeAll(() => {
+    test.beforeEach(() => {
       const u = createTestUtils({ app });
       fakeUser = u.services.users.createFakeUser({
         fictionalEmail: true,
@@ -25,6 +25,12 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
       await u.services.organizations.deleteAll();
       await fakeUser.deleteIfExists();
       await app.teardown();
+    });
+
+    test.afterEach(async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+      await u.page.signOut();
+      await u.page.context().clearCookies();
     });
 
     test('navigate to task on after sign-up', async ({ page, context }) => {
