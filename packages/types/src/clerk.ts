@@ -2003,6 +2003,17 @@ export interface AuthenticateWithGoogleOneTapParams {
   legalAccepted?: boolean;
 }
 
+/**
+ * @deprecated Use `__internal_NavigateToTaskIfAvailableParams` instead
+ */
+export interface NextTaskParams {
+  /**
+   * Full URL or path to navigate to after successfully resolving all tasks
+   * @default undefined
+   */
+  redirectUrlComplete?: string;
+}
+
 export interface __internal_NavigateToTaskIfAvailableParams {
   /**
    * Full URL or path to navigate to after successfully resolving all tasks
