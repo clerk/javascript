@@ -64,7 +64,7 @@ function Group({ children, borderTop = false, variant = 'primary' }: GroupProps)
             ? {
                 borderTopWidth: t.borderWidths.$normal,
                 borderTopStyle: t.borderStyles.$solid,
-                borderTopColor: t.colors.$neutralAlpha100,
+                borderTopColor: t.colors.$borderAlpha100,
                 paddingTop: t.space.$2,
               }
             : {}),
@@ -100,7 +100,7 @@ const Title = React.forwardRef<HTMLTableCellElement, TitleProps>(({ title, descr
       elementId={descriptors.lineItemsTitle.setId(variant)}
       sx={t => ({
         display: 'grid',
-        color: variant === 'primary' ? t.colors.$colorText : t.colors.$colorTextSecondary,
+        color: variant === 'primary' ? t.colors.$colorForeground : t.colors.$colorMutedForeground,
         ...common.textVariants(t)[textVariant],
       })}
     >
@@ -128,7 +128,7 @@ const Title = React.forwardRef<HTMLTableCellElement, TitleProps>(({ title, descr
           elementDescriptor={descriptors.lineItemsTitleDescription}
           sx={t => ({
             fontSize: t.fontSizes.$sm,
-            color: t.colors.$colorTextSecondary,
+            color: t.colors.$colorMutedForeground,
           })}
         />
       ) : null}
@@ -174,7 +174,7 @@ function Description({ text, prefix, suffix, truncateText = false, copyText = fa
       sx={t => ({
         display: 'grid',
         justifyContent: 'end',
-        color: variant === 'tertiary' ? t.colors.$colorTextSecondary : t.colors.$colorText,
+        color: variant === 'tertiary' ? t.colors.$colorMutedForeground : t.colors.$colorForeground,
       })}
     >
       <Span
@@ -192,7 +192,7 @@ function Description({ text, prefix, suffix, truncateText = false, copyText = fa
             localizationKey={prefix}
             elementDescriptor={descriptors.lineItemsDescriptionPrefix}
             sx={t => ({
-              color: t.colors.$colorTextSecondary,
+              color: t.colors.$colorMutedForeground,
               ...common.textVariants(t).caption,
             })}
           />
@@ -224,7 +224,7 @@ function Description({ text, prefix, suffix, truncateText = false, copyText = fa
           localizationKey={suffix}
           elementDescriptor={descriptors.lineItemsDescriptionSuffix}
           sx={t => ({
-            color: t.colors.$colorTextSecondary,
+            color: t.colors.$colorMutedForeground,
             ...common.textVariants(t).caption,
             justifySelf: 'flex-end',
           })}
@@ -269,7 +269,7 @@ function CopyButton({ text, copyLabel = 'Copy' }: { text: string; copyLabel?: st
         borderRadius: t.radii.$sm,
         '&:focus-visible': {
           outline: '2px solid',
-          outlineColor: t.colors.$neutralAlpha200,
+          outlineColor: t.colors.$colorRing,
         },
       })}
       focusRing={false}

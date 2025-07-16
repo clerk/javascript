@@ -102,7 +102,7 @@ export function PricingTableMatrix({
               backgroundColor: t.colors.$colorBackground,
               borderBottomWidth: t.borderWidths.$normal,
               borderBottomStyle: t.borderStyles.$solid,
-              borderBottomColor: t.colors.$neutralAlpha100,
+              borderBottomColor: t.colors.$borderAlpha100,
               zIndex: 1,
             })}
           >
@@ -351,7 +351,7 @@ export function PricingTableMatrix({
                     gridTemplateColumns,
                     borderBottomWidth: t.borderWidths.$normal,
                     borderBottomStyle: t.borderStyles.$solid,
-                    borderBottomColor: t.colors.$neutralAlpha100,
+                    borderBottomColor: t.colors.$borderAlpha100,
                     ':after': {
                       content: '""',
                       position: 'absolute',
