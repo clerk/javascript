@@ -9,7 +9,7 @@ import { errorThrower } from '../utils/errors';
 export type StartSSOFlowParams = {
   redirectUrl?: string;
   unsafeMetadata?: SignUpUnsafeMetadata;
-  options: AuthSessionOpenOptions;
+  options?: AuthSessionOpenOptions;
 } & (
     | {
       strategy: OAuthStrategy;
@@ -71,7 +71,7 @@ export function useSSO() {
     const authSessionResult = await WebBrowser.openAuthSessionAsync(
       externalVerificationRedirectURL.toString(),
       redirectUrl,
-      options,
+      options || {},
     );
     if (authSessionResult.type !== 'success' || !authSessionResult.url) {
       return {
