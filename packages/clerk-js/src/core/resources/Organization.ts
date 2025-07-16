@@ -2,8 +2,8 @@ import type {
   AddMemberParams,
   ClerkPaginatedResponse,
   ClerkResourceReloadParams,
-  CommerceSubscriptionJSON,
-  CommerceSubscriptionResource,
+  CommerceSubscriptionItemJSON,
+  CommerceSubscriptionItemResource,
   CreateOrganizationParams,
   GetDomainsParams,
   GetInvitationsParams,
@@ -32,7 +32,7 @@ import type {
 import { convertPageToOffsetSearchParams } from '../../utils/convertPageToOffsetSearchParams';
 import { unixEpochToDate } from '../../utils/date';
 import { addPaymentSource, getPaymentSources, initializePaymentSource } from '../modules/commerce';
-import { BaseResource, CommerceSubscription, OrganizationInvitation, OrganizationMembership } from './internal';
+import { BaseResource, CommerceSubscriptionItem, OrganizationInvitation, OrganizationMembership } from './internal';
 import { OrganizationDomain } from './OrganizationDomain';
 import { OrganizationMembershipRequest } from './OrganizationMembershipRequest';
 import { Role } from './Role';
@@ -235,18 +235,18 @@ export class Organization extends BaseResource implements OrganizationResource {
 
   getSubscriptions = async (
     getSubscriptionsParams?: GetSubscriptionsParams,
-  ): Promise<ClerkPaginatedResponse<CommerceSubscriptionResource>> => {
+  ): Promise<ClerkPaginatedResponse<CommerceSubscriptionItemResource>> => {
     return await BaseResource._fetch({
       path: `/organizations/${this.id}/commerce/subscriptions`,
       method: 'GET',
       search: convertPageToOffsetSearchParams(getSubscriptionsParams),
     }).then(res => {
       const { data: subscriptions, total_count } =
-        res?.response as unknown as ClerkPaginatedResponse<CommerceSubscriptionJSON>;
+        res?.response as unknown as ClerkPaginatedResponse<CommerceSubscriptionItemJSON>;
 
       return {
         total_count,
-        data: subscriptions.map(subscription => new CommerceSubscription(subscription)),
+        data: subscriptions.map(subscription => new CommerceSubscriptionItem(subscription)),
       };
     });
   };

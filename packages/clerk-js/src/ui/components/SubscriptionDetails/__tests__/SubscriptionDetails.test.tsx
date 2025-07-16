@@ -33,8 +33,22 @@ describe('SubscriptionDetails', () => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
     });
 
-    fixtures.clerk.billing.getSubscriptions.mockResolvedValue({
-      data: [
+    fixtures.clerk.billing.getSubscription.mockResolvedValue({
+      activeAt: new Date('2021-01-01'),
+      createdAt: new Date('2021-01-01'),
+      pastDueAt: null,
+      id: 'sub_123',
+      nextPayment: {
+        amount: {
+          amount: 1000,
+          amountFormatted: '10.00',
+          currency: 'USD',
+          currencySymbol: '$',
+        },
+        time: new Date('2021-02-01'),
+      },
+      status: 'active',
+      subscriptionItems: [
         {
           id: 'sub_123',
           plan: {
@@ -62,7 +76,6 @@ describe('SubscriptionDetails', () => {
           status: 'active',
         },
       ],
-      total_count: 1,
     });
 
     const { getByRole, getByText, queryByText, getAllByText, userEvent } = render(
@@ -113,8 +126,22 @@ describe('SubscriptionDetails', () => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
     });
 
-    fixtures.clerk.billing.getSubscriptions.mockResolvedValue({
-      data: [
+    fixtures.clerk.billing.getSubscription.mockResolvedValue({
+      activeAt: new Date('2021-01-01'),
+      createdAt: new Date('2021-01-01'),
+      pastDueAt: null,
+      id: 'sub_123',
+      nextPayment: {
+        amount: {
+          amount: 10000,
+          amountFormatted: '100.00',
+          currency: 'USD',
+          currencySymbol: '$',
+        },
+        time: new Date('2022-01-01'),
+      },
+      status: 'active',
+      subscriptionItems: [
         {
           id: 'sub_123',
           plan: {
@@ -142,7 +169,6 @@ describe('SubscriptionDetails', () => {
           status: 'active' as const,
         },
       ],
-      total_count: 1,
     });
 
     const { getByRole, getByText, queryByText, getAllByText, userEvent } = render(
@@ -193,8 +219,22 @@ describe('SubscriptionDetails', () => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
     });
 
-    fixtures.clerk.billing.getSubscriptions.mockResolvedValue({
-      data: [
+    fixtures.clerk.billing.getSubscription.mockResolvedValue({
+      activeAt: new Date('2021-01-01'),
+      createdAt: new Date('2021-01-01'),
+      pastDueAt: null,
+      id: 'sub_123',
+      status: 'active',
+      nextPayment: {
+        amount: {
+          amount: 1000,
+          amountFormatted: '10.00',
+          currency: 'USD',
+          currencySymbol: '$',
+        },
+        time: new Date('2021-01-01'),
+      },
+      subscriptionItems: [
         {
           id: 'sub_123',
           plan: {
@@ -222,7 +262,6 @@ describe('SubscriptionDetails', () => {
           status: 'active' as const,
         },
       ],
-      total_count: 1,
     });
 
     const { getByRole, getByText, queryByText, queryByRole } = render(
@@ -303,8 +342,22 @@ describe('SubscriptionDetails', () => {
       features: [],
     };
 
-    fixtures.clerk.billing.getSubscriptions.mockResolvedValue({
-      data: [
+    fixtures.clerk.billing.getSubscription.mockResolvedValue({
+      activeAt: new Date('2021-01-01'),
+      createdAt: new Date('2021-01-01'),
+      pastDueAt: null,
+      id: 'sub_123',
+      status: 'active',
+      nextPayment: {
+        amount: {
+          amount: 1000,
+          amountFormatted: '10.00',
+          currency: 'USD',
+          currencySymbol: '$',
+        },
+        time: new Date('2021-02-01'),
+      },
+      subscriptionItems: [
         {
           id: 'sub_annual',
           plan: planAnnual,
@@ -328,7 +381,6 @@ describe('SubscriptionDetails', () => {
           status: 'upcoming' as const,
         },
       ],
-      total_count: 2,
     });
 
     const { getByRole, getByText, getAllByText, queryByText, getAllByRole, userEvent } = render(
@@ -430,8 +482,22 @@ describe('SubscriptionDetails', () => {
       features: [],
     };
 
-    fixtures.clerk.billing.getSubscriptions.mockResolvedValue({
-      data: [
+    fixtures.clerk.billing.getSubscription.mockResolvedValue({
+      activeAt: new Date('2021-01-01'),
+      createdAt: new Date('2021-01-01'),
+      pastDueAt: null,
+      id: 'sub_123',
+      status: 'active',
+      nextPayment: {
+        amount: {
+          amount: 1000,
+          amountFormatted: '10.00',
+          currency: 'USD',
+          currencySymbol: '$',
+        },
+        time: new Date('2021-01-01'),
+      },
+      subscriptionItems: [
         {
           id: 'test_active',
           plan: planMonthly,
@@ -454,7 +520,6 @@ describe('SubscriptionDetails', () => {
           status: 'upcoming' as const,
         },
       ],
-      total_count: 2,
     });
 
     const { getByRole, getByText, queryByText, getAllByText } = render(
@@ -498,8 +563,22 @@ describe('SubscriptionDetails', () => {
 
     const cancelSubscriptionMock = jest.fn().mockResolvedValue({});
 
-    fixtures.clerk.billing.getSubscriptions.mockResolvedValue({
-      data: [
+    fixtures.clerk.billing.getSubscription.mockResolvedValue({
+      activeAt: new Date('2021-01-01'),
+      createdAt: new Date('2021-01-01'),
+      pastDueAt: null,
+      id: 'sub_123',
+      nextPayment: {
+        amount: {
+          amount: 1000,
+          amountFormatted: '10.00',
+          currency: 'USD',
+          currencySymbol: '$',
+        },
+        time: new Date('2021-01-01'),
+      },
+      status: 'active',
+      subscriptionItems: [
         {
           id: 'sub_123',
           plan: {
@@ -528,7 +607,6 @@ describe('SubscriptionDetails', () => {
           cancel: cancelSubscriptionMock,
         },
       ],
-      total_count: 1,
     });
 
     const { getByRole, getByText, userEvent } = render(
@@ -618,9 +696,21 @@ describe('SubscriptionDetails', () => {
     };
 
     // Mock getSubscriptions to return the canceled subscription
-    fixtures.clerk.billing.getSubscriptions.mockResolvedValue({
-      data: [subscription],
-      total_count: 1,
+    fixtures.clerk.billing.getSubscription.mockResolvedValue({
+      activeAt: new Date('2021-01-01'),
+      createdAt: new Date('2021-01-01'),
+      pastDueAt: null,
+      id: 'sub_123',
+      nextPayment: {
+        amount: {
+          amount: 1000,
+          amountFormatted: '10.00',
+          currency: 'USD',
+          currencySymbol: '$',
+        },
+        time: new Date('2021-01-01'),
+      },
+      subscriptionItems: [subscription],
     });
 
     const { getByRole, getByText, userEvent } = render(
@@ -693,9 +783,21 @@ describe('SubscriptionDetails', () => {
     };
 
     // Mock getSubscriptions to return the annual subscription
-    fixtures.clerk.billing.getSubscriptions.mockResolvedValue({
-      data: [subscription],
-      total_count: 1,
+    fixtures.clerk.billing.getSubscription.mockResolvedValue({
+      activeAt: new Date('2021-01-01'),
+      createdAt: new Date('2021-01-01'),
+      pastDueAt: null,
+      id: 'sub_123',
+      nextPayment: {
+        amount: {
+          amount: 1000,
+          amountFormatted: '10.00',
+          currency: 'USD',
+          currencySymbol: '$',
+        },
+        time: new Date('2021-01-01'),
+      },
+      subscriptionItems: [subscription],
     });
 
     const { getByRole, getByText, userEvent } = render(
@@ -757,8 +859,21 @@ describe('SubscriptionDetails', () => {
       features: [],
     };
 
-    fixtures.clerk.billing.getSubscriptions.mockResolvedValue({
-      data: [
+    fixtures.clerk.billing.getSubscription.mockResolvedValue({
+      activeAt: new Date('2021-01-01'),
+      createdAt: new Date('2021-01-01'),
+      pastDueAt: null,
+      id: 'sub_123',
+      nextPayment: {
+        amount: {
+          amount: 1000,
+          amountFormatted: '10.00',
+          currency: 'USD',
+          currencySymbol: '$',
+        },
+        time: new Date('2021-01-01'),
+      },
+      subscriptionItems: [
         {
           id: 'sub_past_due',
           plan,
@@ -772,7 +887,6 @@ describe('SubscriptionDetails', () => {
           pastDueAt: new Date('2021-01-15'),
         },
       ],
-      total_count: 1,
     });
 
     const { getByRole, getByText, queryByText, queryByRole } = render(

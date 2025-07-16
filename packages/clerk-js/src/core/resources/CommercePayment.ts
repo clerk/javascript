@@ -3,12 +3,14 @@ import type {
   CommercePaymentChargeType,
   CommercePaymentJSON,
   CommercePaymentResource,
+  CommercePaymentSourceResource,
   CommercePaymentStatus,
+  CommerceSubscriptionItemResource,
 } from '@clerk/types';
 
 import { commerceMoneyFromJSON } from '../../utils';
 import { unixEpochToDate } from '../../utils/date';
-import { BaseResource, CommercePaymentSource, CommerceSubscription } from './internal';
+import { BaseResource, CommercePaymentSource, CommerceSubscriptionItem } from './internal';
 
 export class CommercePayment extends BaseResource implements CommercePaymentResource {
   id!: string;
@@ -16,9 +18,12 @@ export class CommercePayment extends BaseResource implements CommercePaymentReso
   failedAt?: Date;
   paidAt?: Date;
   updatedAt!: Date;
-  paymentSource!: CommercePaymentSource;
-  subscription!: CommerceSubscription;
-  subscriptionItem!: CommerceSubscription;
+  paymentSource!: CommercePaymentSourceResource;
+  /**
+   * @deprecated
+   */
+  subscription!: CommerceSubscriptionItemResource;
+  subscriptionItem!: CommerceSubscriptionItemResource;
   chargeType!: CommercePaymentChargeType;
   status!: CommercePaymentStatus;
 
@@ -38,8 +43,8 @@ export class CommercePayment extends BaseResource implements CommercePaymentReso
     this.failedAt = data.failed_at ? unixEpochToDate(data.failed_at) : undefined;
     this.updatedAt = unixEpochToDate(data.updated_at);
     this.paymentSource = new CommercePaymentSource(data.payment_source);
-    this.subscription = new CommerceSubscription(data.subscription);
-    this.subscriptionItem = new CommerceSubscription(data.subscription_item);
+    this.subscription = new CommerceSubscriptionItem(data.subscription);
+    this.subscriptionItem = new CommerceSubscriptionItem(data.subscription_item);
     this.chargeType = data.charge_type;
     this.status = data.status;
     return this;

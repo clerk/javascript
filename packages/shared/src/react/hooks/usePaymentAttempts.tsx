@@ -1,12 +1,12 @@
 import type { CommercePaymentResource, GetPaymentAttemptsParams } from '@clerk/types';
 
 import { useClerkInstanceContext } from '../contexts';
-import { createCommerceHook } from './createCommerceHook';
+import { createCommercePaginatedHook } from './createCommerceHook';
 
 /**
  * @internal
  */
-export const usePaymentAttempts = createCommerceHook<CommercePaymentResource, GetPaymentAttemptsParams>({
+export const usePaymentAttempts = createCommercePaginatedHook<CommercePaymentResource, GetPaymentAttemptsParams>({
   hookName: 'usePaymentAttempts',
   resourceType: 'commerce-payment-attempts',
   useFetcher: () => {
