@@ -260,6 +260,51 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await fakeUser.deleteIfExists();
     });
 
+    test('can unsubscribe from a plan', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+
+      const fakeUser = u.services.users.createFakeUser();
+      await u.services.users.createBapiUser(fakeUser);
+
+      await u.po.signIn.goTo();
+      await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+      await u.po.page.goToRelative('/user');
+
+      await u.po.userProfile.waitForMounted();
+      await u.po.userProfile.switchToBillingTab();
+      await expect(u.po.page.getByText(/Free/i)).toBeVisible();
+      await u.po.page.getByRole('button', { name: 'Switch plans' }).click();
+      await u.po.pricingTable.startCheckout({ planSlug: 'plus' });
+      await u.po.checkout.waitForMounted();
+      await u.po.checkout.fillTestCard();
+      await u.po.checkout.clickPayOrSubscribe();
+      await expect(u.po.page.getByText('Payment was successful!')).toBeVisible();
+
+      await u.po.checkout.confirmAndContinue();
+      await u.po.page.locator('.cl-headerBackLink').getByText('Plans').click();
+
+      await u.page.waitForTimeout(1000);
+      await expect(u.po.page.locator('.cl-profileSectionContent__subscriptionsList').getByText('Plus')).toBeVisible();
+      await u.po.page.getByRole('button', { name: 'Manage subscription' }).first().click();
+      await u.po.subscriptionDetails.waitForMounted();
+      await u.po.subscriptionDetails.root.locator('.cl-menuButtonEllipsisBordered').click();
+      await u.po.subscriptionDetails.root.getByText('Cancel subscription').click();
+      await u.po.subscriptionDetails.root.locator('.cl-drawerConfirmationRoot').waitFor({ state: 'visible' });
+      await u.po.subscriptionDetails.root.getByText('Cancel subscription').click();
+      await u.po.subscriptionDetails.waitForUnmounted();
+
+      // Verify the Free plan with Upcoming status exists
+      await expect(
+        u.po.page
+          .locator('.cl-profileSectionContent__subscriptionsList')
+          .getByText('Free')
+          .locator('xpath=..')
+          .getByText('Upcoming'),
+      ).toBeVisible();
+
+      await fakeUser.deleteIfExists();
+    });
+
     test('checkout always revalidates on open', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
 
