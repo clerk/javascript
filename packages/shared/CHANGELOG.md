@@ -1,5 +1,14 @@
 # Change Log
 
+## 3.12.3
+
+### Patch Changes
+
+- Mark error utilities as internal. ([#6328](https://github.com/clerk/javascript/pull/6328)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`2a90b68`](https://github.com/clerk/javascript/commit/2a90b689550ae960496c9292ca23e0225e3425cd)]:
+  - @clerk/types@4.67.0
+
 ## 3.12.2
 
 ### Patch Changes
