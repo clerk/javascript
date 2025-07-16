@@ -6,7 +6,7 @@ import type {
   CommerceSubscriptionItemResource,
 } from '@clerk/types';
 import * as React from 'react';
-import { useCallback, useContext, useMemo, useState } from 'react';
+import { useCallback, useContext, useState } from 'react';
 
 import { useProtect } from '@/ui/common/Gate';
 import {
@@ -22,7 +22,7 @@ import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
 import { handleError } from '@/ui/utils/errorHandler';
 import { formatDate } from '@/ui/utils/formatDate';
 
-import { SubscriberTypeContext, usePlansContext, useSubscriberTypeContext, useSubscriptions } from '../../contexts';
+import { SubscriberTypeContext, usePlansContext, useSubscriberTypeContext, useSubscription } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import {
   Button,
@@ -83,10 +83,7 @@ type UseGuessableSubscriptionResult<Or extends 'throw' | undefined = undefined> 
 function useGuessableSubscription<Or extends 'throw' | undefined = undefined>(options?: {
   or?: Or;
 }): UseGuessableSubscriptionResult<Or> {
-  const { data: subscription, isLoading } = useSubscriptions();
-  const subscriptionItems = useMemo(() => {
-    return subscription?.subscriptionItems || [];
-  }, [subscription]);
+  const { subscriptionItems, isLoading } = useSubscription();
   const activeSubscription = subscriptionItems?.find(sub => sub.status === 'active');
   const upcomingSubscription = subscriptionItems?.find(sub => sub.status === 'upcoming');
   const pastDueSubscription = subscriptionItems?.find(sub => sub.status === 'past_due');
@@ -109,10 +106,7 @@ const SubscriptionDetailsInternal = (props: __internal_SubscriptionDetailsProps)
     useState<CommerceSubscriptionItemResource | null>(null);
   const [confirmationOpen, setConfirmationOpen] = useState(false);
 
-  const { data: subscription, isLoading } = useSubscriptions();
-  const subscriptionItems = useMemo(() => {
-    return subscription?.subscriptionItems || [];
-  }, [subscription]);
+  const { subscriptionItems, isLoading } = useSubscription();
   const { activeSubscription, pastDueSubscription } = useGuessableSubscription();
 
   if (isLoading) {

@@ -58,12 +58,18 @@ export const useStatements = (params?: { mode: 'cache' }) => {
   });
 };
 
-export const useSubscriptions = () => {
+export const useSubscription = () => {
   const subscriberType = useSubscriberTypeContext();
-  return __experimental_useSubscription({
+  const subscription = __experimental_useSubscription({
     for: subscriberType === 'org' ? 'organization' : 'user',
     keepPreviousData: true,
   });
+  const subscriptionItems = useMemo(() => subscription.data?.subscriptionItems || [], [subscription.data]);
+
+  return {
+    ...subscription,
+    subscriptionItems,
+  };
 };
 
 export const usePlans = () => {
@@ -106,8 +112,7 @@ export const usePlansContext = () => {
     return false;
   }, [clerk, subscriberType]);
 
-  const { data: subscription, mutate: revalidateSubscriptions } = useSubscriptions();
-  const subscriptionItems = useMemo(() => subscription?.subscriptionItems || [], [subscription]);
+  const { subscriptionItems, revalidate: revalidateSubscriptions } = useSubscription();
 
   // Invalidates cache but does not fetch immediately
   const { data: plans, mutate: mutatePlans } = useSWR<Awaited<ReturnType<typeof clerk.billing.getPlans>>>({

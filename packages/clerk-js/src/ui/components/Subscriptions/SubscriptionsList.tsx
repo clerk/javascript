@@ -7,7 +7,7 @@ import {
   usePlansContext,
   useSubscriberTypeContext,
   useSubscriberTypeLocalizationRoot,
-  useSubscriptions,
+  useSubscription,
 } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import {
@@ -41,10 +41,7 @@ export function SubscriptionsList({
   const { captionForSubscription, openSubscriptionDetails } = usePlansContext();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
   const subscriberType = useSubscriberTypeContext();
-  const { data: subscription } = useSubscriptions();
-  const subscriptionItems = useMemo(() => {
-    return subscription?.subscriptionItems || [];
-  }, [subscription]);
+  const { subscriptionItems } = useSubscription();
   const canManageBilling = useProtect(
     has => has({ permission: 'org:sys_billing:manage' }) || subscriberType === 'user',
   );

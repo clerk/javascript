@@ -1,3 +1,5 @@
+import { useCallback } from 'react';
+
 import { eventMethodCalled } from '../../telemetry/events';
 import { useSWR } from '../clerk-swr';
 import { useClerkInstanceContext, useOrganizationContext, useUserContext } from '../contexts';
@@ -21,7 +23,7 @@ export const useSubscription = (params?: UseSubscriptionParams) => {
   const { organization } = useOrganizationContext();
   clerk.telemetry?.record(eventMethodCalled('useSubscription'));
 
-  return useSWR(
+  const swr = useSWR(
     user?.id
       ? {
           type: 'commerce-subscription',
@@ -31,8 +33,18 @@ export const useSubscription = (params?: UseSubscriptionParams) => {
       : null,
     ({ args }) => clerk.billing.getSubscription(args),
     {
-      dedupingInterval: 1_000 * 60 * 2, // 2 minutes,
-      keepPreviousData: params?.keepPreviousData ?? true,
+      dedupingInterval: 1_000 * 60,
+      keepPreviousData: params?.keepPreviousData,
     },
   );
+
+  const revalidate = useCallback(() => swr.mutate(), [swr.mutate]);
+
+  return {
+    data: swr.data,
+    error: swr.error,
+    isLoading: swr.isLoading,
+    isFetching: swr.isValidating,
+    revalidate,
+  };
 };

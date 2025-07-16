@@ -2,8 +2,9 @@ import { useClerk } from '@clerk/shared/react';
 import type { CommercePlanResource, CommerceSubscriptionPlanPeriod, PricingTableProps } from '@clerk/types';
 import { useEffect, useMemo, useState } from 'react';
 
-import { usePaymentMethods, usePlans, usePlansContext, usePricingTableContext, useSubscriptions } from '../../contexts';
-import { Flow } from '../../customizables';
+import { Flow } from '@/ui/customizables/Flow';
+
+import { usePaymentMethods, usePlans, usePlansContext, usePricingTableContext, useSubscription } from '../../contexts';
 import { PricingTableDefault } from './PricingTableDefault';
 import { PricingTableMatrix } from './PricingTableMatrix';
 
@@ -11,10 +12,7 @@ const PricingTableRoot = (props: PricingTableProps) => {
   const clerk = useClerk();
   const { mode = 'mounted', signInMode = 'redirect' } = usePricingTableContext();
   const isCompact = mode === 'modal';
-  const { data: subscription } = useSubscriptions();
-  const subscriptionItems = useMemo(() => {
-    return subscription?.subscriptionItems || [];
-  }, [subscription]);
+  const { subscriptionItems } = useSubscription();
   const { data: plans } = usePlans();
   const { handleSelectPlan } = usePlansContext();
 
