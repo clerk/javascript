@@ -1903,6 +1903,7 @@ export interface HandleEmailLinkVerificationParams {
 type ButtonPropsModal<T extends SignInProps | SignUpProps> = {
   mode: 'modal';
   appearance?: T['appearance'];
+  unsafeMetadata?: T extends SignUpProps ? SignUpUnsafeMetadata : never;
 };
 
 type ButtonPropsRedirect = {
@@ -1923,9 +1924,7 @@ export type SignInButtonProps = ButtonProps<SignInProps> &
     | 'oauthFlow'
   >;
 
-export type SignUpButtonProps = {
-  unsafeMetadata?: SignUpUnsafeMetadata;
-} & ButtonProps<SignUpProps> &
+export type SignUpButtonProps = ButtonProps<SignUpProps> &
   Pick<
     SignUpProps,
     | 'fallbackRedirectUrl'
