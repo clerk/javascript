@@ -32,7 +32,6 @@ export const cssSupports = {
    * Returns true if either relativeColorSyntax or colorMix is supported
    */
   modernColor() {
-    return false;
     if (SUPPORTS_MODERN_COLOR !== undefined) return SUPPORTS_MODERN_COLOR;
     try {
       SUPPORTS_MODERN_COLOR = this.relativeColorSyntax() || this.colorMix();
