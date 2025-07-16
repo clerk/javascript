@@ -164,22 +164,26 @@ const SubscriptionDetailsFooter = withCardStateProvider(() => {
   const subscriberType = useSubscriberTypeContext();
   const { organization } = useOrganization();
   const { isLoading, error, setError, setLoading, setIdle } = useCardState();
-  const { subscription, confirmationOpen, setConfirmationOpen } = useContext(SubscriptionForCancellationContext);
-  const { anySubscription } = useGuessableSubscription({ or: 'throw' });
+  const {
+    subscription: selectedSubscription,
+    confirmationOpen,
+    setConfirmationOpen,
+  } = useContext(SubscriptionForCancellationContext);
+  const { data: subscription } = useSubscription();
   const { setIsOpen } = useDrawerContext();
   const { onSubscriptionCancel } = useSubscriptionDetailsContext();
 
   const onOpenChange = useCallback((open: boolean) => setConfirmationOpen(open), [setConfirmationOpen]);
 
   const cancelSubscription = useCallback(async () => {
-    if (!subscription) {
+    if (!selectedSubscription) {
       return;
     }
 
     setError(undefined);
     setLoading();
 
-    await subscription
+    await selectedSubscription
       .cancel({ orgId: subscriberType === 'org' ? organization?.id : undefined })
       .then(() => {
         onSubscriptionCancel?.();
@@ -193,10 +197,19 @@ const SubscriptionDetailsFooter = withCardStateProvider(() => {
       .finally(() => {
         setIdle();
       });
-  }, [subscription, setError, setLoading, subscriberType, organization?.id, onSubscriptionCancel, setIsOpen, setIdle]);
+  }, [
+    selectedSubscription,
+    setError,
+    setLoading,
+    subscriberType,
+    organization?.id,
+    onSubscriptionCancel,
+    setIsOpen,
+    setIdle,
+  ]);
 
-  // If either the active or upcoming subscription is the free plan, then a C1 cannot switch to a different period or cancel the plan
-  if (isFreePlan(anySubscription.plan) || anySubscription.status === 'past_due') {
+  // Missing nextPayment means that an upcoming subscription is for the free plan
+  if (!subscription?.nextPayment) {
     return null;
   }
 
@@ -234,24 +247,24 @@ const SubscriptionDetailsFooter = withCardStateProvider(() => {
           </>
         }
       >
-        {subscription ? (
+        {selectedSubscription ? (
           <>
             <Heading
               elementDescriptor={descriptors.drawerConfirmationTitle}
               as='h2'
               textVariant='h3'
               localizationKey={localizationKeys('commerce.cancelSubscriptionTitle', {
-                plan: `${subscription.status === 'upcoming' ? 'upcoming ' : ''}${subscription.plan.name}`,
+                plan: `${selectedSubscription.status === 'upcoming' ? 'upcoming ' : ''}${selectedSubscription.plan.name}`,
               })}
             />
             <Text
               elementDescriptor={descriptors.drawerConfirmationDescription}
               colorScheme='secondary'
               localizationKey={
-                subscription.status === 'upcoming'
+                selectedSubscription.status === 'upcoming'
                   ? localizationKeys('commerce.cancelSubscriptionNoCharge')
                   : localizationKeys('commerce.cancelSubscriptionAccessUntil', {
-                      plan: subscription.plan.name,
+                      plan: selectedSubscription.plan.name,
                       // @ts-expect-error this will always be defined in this state
                       date: subscription.periodEndDate,
                     })
@@ -271,11 +284,11 @@ function SubscriptionDetailsSummary() {
   });
   const { data: subscription } = useSubscription();
 
-  if (!subscription || !activeSubscription) {
-    return null;
-  }
-
-  if (subscription.status !== 'active') {
+  if (
+    // Missing nextPayment means that an upcoming subscription is for the free plan
+    !subscription?.nextPayment ||
+    !activeSubscription
+  ) {
     return null;
   }
 

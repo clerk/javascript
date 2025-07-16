@@ -23,13 +23,13 @@ export class CommerceSubscription extends BaseResource implements CommerceSubscr
   pastDueAt!: Date | null;
   updatedAt!: Date | null;
   //TODO(@COMMERCE): Why can this be undefined ?
-  nextPayment!: {
+  nextPayment: {
     //TODO(@COMMERCE): Why can this be undefined ?
     amount: CommerceMoney;
     //TODO(@COMMERCE): This need to change to `date` probably
     //TODO(@COMMERCE): Why can this be undefined ?
     time: Date;
-  };
+  } | null = null;
   subscriptionItems!: CommerceSubscriptionItemResource[];
 
   constructor(data: CommerceSubscriptionJSON) {
@@ -48,10 +48,12 @@ export class CommerceSubscription extends BaseResource implements CommerceSubscr
     this.updatedAt = data.update_at ? unixEpochToDate(data.update_at) : null;
     this.activeAt = unixEpochToDate(data.active_at);
     this.pastDueAt = data.past_due_at ? unixEpochToDate(data.past_due_at) : null;
-    this.nextPayment = {
-      amount: commerceMoneyFromJSON(data.next_payment.amount),
-      time: unixEpochToDate(data.next_payment.time),
-    };
+    this.nextPayment = data.next_payment
+      ? {
+          amount: commerceMoneyFromJSON(data.next_payment.amount),
+          time: unixEpochToDate(data.next_payment.time),
+        }
+      : null;
     this.subscriptionItems = data.subscription_items.map(item => new CommerceSubscriptionItem(item));
     return this;
   }

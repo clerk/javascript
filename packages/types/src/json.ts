@@ -807,7 +807,7 @@ export interface CommerceSubscriptionItemJSON extends ClerkResourceJSON {
 export interface CommerceSubscriptionJSON extends ClerkResourceJSON {
   object: 'commerce_subscription';
   id: string;
-  next_payment: {
+  next_payment?: {
     amount: CommerceMoneyJSON;
     // This need to change to `date` probably
     time: number;
