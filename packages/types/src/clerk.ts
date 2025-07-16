@@ -815,12 +815,10 @@ export interface Clerk {
   joinWaitlist: (params: JoinWaitlistParams) => Promise<WaitlistResource>;
 
   /**
-   * Navigates to the next task or redirects to completion URL.
-   * If the current session has pending tasks, it navigates to the next task.
-   * If all tasks are complete, it navigates to the provided completion URL or defaults to the origin redirect URL (either from sign-in or sign-up).
+   * Navigates to the current task or redirects to `redirectUrlComplete` once the session is `active`.
    * @internal
    */
-  __internal_navigateToTaskIfAvailable: (params?: NextTaskParams) => Promise<void>;
+  __internal_navigateToTaskIfAvailable: (params?: __internal_NavigateToTaskIfAvailableParams) => Promise<void>;
 
   /**
    * This is an optional function.
@@ -2005,7 +2003,7 @@ export interface AuthenticateWithGoogleOneTapParams {
   legalAccepted?: boolean;
 }
 
-export interface NextTaskParams {
+export interface __internal_NavigateToTaskIfAvailableParams {
   /**
    * Full URL or path to navigate to after successfully resolving all tasks
    * @default undefined

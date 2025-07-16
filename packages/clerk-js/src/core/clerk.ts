@@ -19,6 +19,7 @@ import type {
   __experimental_CheckoutOptions,
   __internal_CheckoutProps,
   __internal_ComponentNavigationContext,
+  __internal_NavigateToTaskIfAvailableParams,
   __internal_OAuthConsentProps,
   __internal_PlanDetailsProps,
   __internal_SubscriptionDetailsProps,
@@ -50,7 +51,6 @@ import type {
   JoinWaitlistParams,
   ListenerCallback,
   NavigateOptions,
-  NextTaskParams,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationResource,
@@ -1332,7 +1332,9 @@ export class Clerk implements ClerkInterface {
     this.#emit();
   };
 
-  public __internal_navigateToTaskIfAvailable = async ({ redirectUrlComplete }: NextTaskParams = {}): Promise<void> => {
+  public __internal_navigateToTaskIfAvailable = async ({
+    redirectUrlComplete,
+  }: __internal_NavigateToTaskIfAvailableParams = {}): Promise<void> => {
     const session = this.session;
     if (!session || !this.environment) {
       return;
@@ -1348,15 +1350,16 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
-    const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
-    const defaultRedirectUrlComplete = this.client?.signUp ? this.buildAfterSignUpUrl() : this.buildAfterSignInUrl();
+    if (redirectUrlComplete) {
+      const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
 
-    await tracker.track(async () => {
-      await this.navigate(redirectUrlComplete ?? defaultRedirectUrlComplete);
-    });
+      await tracker.track(async () => {
+        await this.navigate(redirectUrlComplete);
+      });
 
-    if (tracker.isUnloading()) {
-      return;
+      if (tracker.isUnloading()) {
+        return;
+      }
     }
   };
 
