@@ -349,15 +349,9 @@ void (async () => {
       ...(componentControls.clerk.getProps() ?? {}),
       signInUrl: '/sign-in',
       signUpUrl: '/sign-up',
-      appearance: {
-        variables: {
-          colorModalBackdrop: 'red',
-          colorRing: 'red',
-        },
-      },
     });
     renderCurrentRoute();
-    // updateVariables();
+    updateVariables();
     updateOtherOptions();
   } else {
     console.error(`Unknown route: "${route}".`);
