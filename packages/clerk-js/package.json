@@ -62,6 +62,7 @@
   "dependencies": {
     "@clerk/localizations": "workspace:^",
     "@clerk/shared": "workspace:^",
+    "@clerk/themes": "workspace:^",
     "@clerk/types": "workspace:^",
     "@coinbase/wallet-sdk": "4.3.0",
     "@emotion/cache": "11.11.0",

@@ -86,6 +86,7 @@ import type {
 } from '@clerk/types';
 
 import type { MountComponentRenderer } from '../ui/Components';
+import { detectShadcnUsage } from '../utils/shadcnDetection';
 import {
   ALLOWED_PROTOCOLS,
   buildURL,
@@ -153,6 +154,8 @@ import {
 } from './resources/internal';
 import { navigateToTask } from './sessionTasks';
 import { warnings } from './warnings';
+
+const shadcnTheme = require('@clerk/themes').shadcn;
 
 type SetActiveHook = (intent?: 'sign-out') => void | Promise<void>;
 
@@ -2727,7 +2730,7 @@ export class Clerk implements ClerkInterface {
   };
 
   #initOptions = (options?: ClerkOptions): ClerkOptions => {
-    return {
+    const processedOptions = {
       ...defaultOptions,
       ...options,
       allowedRedirectOrigins: createAllowedRedirectOrigins(
@@ -2736,6 +2739,19 @@ export class Clerk implements ClerkInterface {
         this.instanceType,
       ),
     };
+
+    // Auto-inject shadcn theme if detected and not already set
+    if (shadcnTheme && !processedOptions.appearance?.baseTheme) {
+      const isShadcnDetected = detectShadcnUsage();
+      if (isShadcnDetected) {
+        processedOptions.appearance = {
+          baseTheme: shadcnTheme,
+          ...processedOptions.appearance,
+        };
+      }
+    }
+
+    return processedOptions;
   };
 
   /**
