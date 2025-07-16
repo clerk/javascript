@@ -67,7 +67,7 @@ export const UserMembershipList = (props: UserMembershipListProps) => {
         // 4 items + 4px border (four 1px borders)
         maxHeight: `calc((4 * ${t.sizes.$17}) + 4px)`,
         overflowY: 'auto',
-        '> button,div': { border: `0 solid ${t.colors.$neutralAlpha100}` },
+        '> button,div': { border: `0 solid ${t.colors.$borderAlpha100}` },
         '>:not([hidden])~:not([hidden])': {
           borderTopWidth: '1px',
           borderBottomWidth: '0',
@@ -101,7 +101,7 @@ export const UserMembershipList = (props: UserMembershipListProps) => {
           onClick={() => onOrganizationClick(organization)}
           role='menuitem'
           sx={t => ({
-            border: `0 solid ${t.colors.$neutralAlpha100}`,
+            border: `0 solid ${t.colors.$borderAlpha100}`,
           })}
         >
           <OrganizationPreview

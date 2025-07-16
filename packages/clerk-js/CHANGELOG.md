@@ -1,5 +1,74 @@
 # Change Log
 
+## 5.73.2
+
+### Patch Changes
+
+- Do not trigger after-auth navigation from `useMultisessionActions` ([#6323](https://github.com/clerk/javascript/pull/6323)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`2a90b68`](https://github.com/clerk/javascript/commit/2a90b689550ae960496c9292ca23e0225e3425cd), [`af50905`](https://github.com/clerk/javascript/commit/af50905ea497ed3286c8c4c374498e06ca6ee82b)]:
+  - @clerk/types@4.67.0
+  - @clerk/shared@3.12.3
+  - @clerk/localizations@3.19.2
+
+## 5.73.1
+
+### Patch Changes
+
+- Refactor after-auth flows to keep navigation internally ([#6319](https://github.com/clerk/javascript/pull/6319)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`8ee859c`](https://github.com/clerk/javascript/commit/8ee859ce00d1d5747c14a80fe7166303e64a4f1f)]:
+  - @clerk/shared@3.12.2
+  - @clerk/types@4.66.1
+  - @clerk/localizations@3.19.1
+
+## 5.73.0
+
+### Minor Changes
+
+- Expose Clerk CSS variables as an option for theming Clerk's components. This change introduces CSS custom properties that allow developers to customize Clerk's appearance using standard CSS variables, providing a more flexible theming approach. ([#6275](https://github.com/clerk/javascript/pull/6275)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  ```css
+  :root {
+    --clerk-color-primary: #6d47ff;
+    --clerk-color-primary-foreground: #ffffff;
+  }
+  ```
+
+  ## Deprecated variables
+
+  | Deprecated                     | New                      |
+  | ------------------------------ | ------------------------ |
+  | `colorText`                    | `colorForeground`        |
+  | `colorTextOnPrimaryBackground` | `colorPrimaryForeground` |
+  | `colorTextSecondary`           | `colorMutedForeground`   |
+  | `spacingUnit`                  | `spacing`                |
+  | `colorInputText`               | `colorInputForeground`   |
+  | `colorInputBackground`         | `colorInput`             |
+
+  Deprecated variables will continue to work but will be removed in the next major version.
+
+  ## New variables
+
+  - `colorRing` - The color of the ring when an interactive element is focused.
+  - `colorMuted` - The background color for elements of lower importance, eg: a muted background.
+  - `colorShadow` - The base shadow color used in the components.
+  - `colorBorder` - The base border color used in the components.
+  - `colorModalBackdrop` - The background color of the modal backdrop.
+
+- Display past due subscriptions properly. ([#6309](https://github.com/clerk/javascript/pull/6309)) by [@panteliselef](https://github.com/panteliselef)
+
+- Extract `SubscriptionDetails`, into its own internal component, out of existing (also internal) `PlanDetails` component. ([#6148](https://github.com/clerk/javascript/pull/6148)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Enhanced detection of password manangers ([#6311](https://github.com/clerk/javascript/pull/6311)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`025e304`](https://github.com/clerk/javascript/commit/025e304c4d6402dfd750ee51ac9c8fc2dea1f353), [`dedf487`](https://github.com/clerk/javascript/commit/dedf48703986d547d5b28155b0182a51030cffeb), [`b96114e`](https://github.com/clerk/javascript/commit/b96114e438638896ba536bb7a17b09cdadcd9407)]:
+  - @clerk/types@4.66.0
+  - @clerk/localizations@3.19.0
+  - @clerk/shared@3.12.1
+
 ## 5.72.0
 
 ### Minor Changes

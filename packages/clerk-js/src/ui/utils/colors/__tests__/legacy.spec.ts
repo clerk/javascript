@@ -211,6 +211,160 @@ describe('Legacy Colors', () => {
         const result = colors.toHslaColor('var(--brand, red)');
         expect(result).toEqual({ h: 0, s: 100, l: 50, a: 1 });
       });
+
+      describe('nested CSS variables', () => {
+        it('should resolve nested CSS variables in fallback', () => {
+          // Mock first variable not found, second variable found
+          mockGetComputedStyle.mockReturnValue({
+            getPropertyValue: vi
+              .fn()
+              .mockReturnValueOnce('') // --primary-color not found
+              .mockReturnValueOnce('#0000ff'), // --fallback-color found
+          });
+
+          const result = colors.toHslaColor('var(--primary-color, var(--fallback-color))');
+          expect(result).toEqual({ h: 240, s: 100, l: 50, a: 1 });
+        });
+
+        it('should resolve multiple levels of nested CSS variables', () => {
+          mockGetComputedStyle.mockReturnValue({
+            getPropertyValue: vi
+              .fn()
+              .mockReturnValueOnce('') // --level1 not found
+              .mockReturnValueOnce('') // --level2 not found
+              .mockReturnValueOnce('#00ff00'), // --level3 found
+          });
+
+          const result = colors.toHslaColor('var(--level1, var(--level2, var(--level3)))');
+          expect(result).toEqual({ h: 120, s: 100, l: 50, a: 1 });
+        });
+
+        it('should fall back to final static value when all variables are not found', () => {
+          mockGetComputedStyle.mockReturnValue({
+            getPropertyValue: vi
+              .fn()
+              .mockReturnValueOnce('') // --primary-color not found
+              .mockReturnValueOnce('') // --secondary-color not found
+              .mockReturnValueOnce(''), // --tertiary-color not found
+          });
+
+          const result = colors.toHslaColor(
+            'var(--primary-color, var(--secondary-color, var(--tertiary-color, #ff0000)))',
+          );
+          expect(result).toEqual({ h: 0, s: 100, l: 50, a: 1 });
+        });
+
+        it('should handle the specific Clerk CSS variable pattern', () => {
+          mockGetComputedStyle.mockReturnValue({
+            getPropertyValue: vi
+              .fn()
+              .mockReturnValueOnce('') // --clerk-color-border not found
+              .mockReturnValueOnce(''), // --clerk-color-neutral not found
+          });
+
+          const result = colors.toHslaColor('var(--clerk-color-border, var(--clerk-color-neutral, #000000))');
+          expect(result).toEqual({ h: 0, s: 0, l: 0, a: 1 });
+        });
+
+        it('should resolve nested variables with complex static fallbacks', () => {
+          mockGetComputedStyle.mockReturnValue({
+            getPropertyValue: vi
+              .fn()
+              .mockReturnValueOnce('') // --border-color not found
+              .mockReturnValueOnce(''), // --neutral-color not found
+          });
+
+          const result = colors.toHslaColor('var(--border-color, var(--neutral-color, rgba(255, 0, 0, 0.5)))');
+          expect(result).toEqual({ h: 0, s: 100, l: 50, a: 0.5 });
+        });
+
+        it('should handle nested variables with whitespace', () => {
+          mockGetComputedStyle.mockReturnValue({
+            getPropertyValue: vi
+              .fn()
+              .mockReturnValueOnce('') // --primary-color not found
+              .mockReturnValueOnce('hsl(60, 100%, 50%)'), // --fallback-color found
+          });
+
+          const result = colors.toHslaColor('var( --primary-color , var( --fallback-color , red ) )');
+          expect(result).toEqual({ h: 60, s: 100, l: 50, a: 1 });
+        });
+
+        it('should return the first resolved variable in the chain', () => {
+          mockGetComputedStyle.mockReturnValue({
+            getPropertyValue: vi.fn().mockReturnValueOnce('#800080'), // --primary-color found
+          });
+
+          const result = colors.toHslaColor('var(--primary-color, var(--fallback-color, red))');
+          expect(result).toEqual({ h: 300, s: 100, l: 25, a: 1 });
+        });
+
+        it('should handle nested variables where intermediate variable is found', () => {
+          mockGetComputedStyle.mockReturnValue({
+            getPropertyValue: vi
+              .fn()
+              .mockReturnValueOnce('') // --primary-color not found
+              .mockReturnValueOnce('rgb(255, 165, 0)'), // --secondary-color found
+          });
+
+          const result = colors.toHslaColor('var(--primary-color, var(--secondary-color, var(--tertiary-color, red)))');
+          expect(result).toEqual({ h: 38, s: 100, l: 50, a: 1 });
+        });
+
+        it('should handle deeply nested variables (4+ levels)', () => {
+          mockGetComputedStyle.mockReturnValue({
+            getPropertyValue: vi
+              .fn()
+              .mockReturnValueOnce('') // --level1 not found
+              .mockReturnValueOnce('') // --level2 not found
+              .mockReturnValueOnce('') // --level3 not found
+              .mockReturnValueOnce('#ff00ff'), // --level4 found
+          });
+
+          const result = colors.toHslaColor('var(--level1, var(--level2, var(--level3, var(--level4))))');
+          expect(result).toEqual({ h: 300, s: 100, l: 50, a: 1 });
+        });
+
+        it('should throw error when nested variables cannot be resolved and no static fallback', () => {
+          mockGetComputedStyle.mockReturnValue({
+            getPropertyValue: vi
+              .fn()
+              .mockReturnValueOnce('') // --primary-color not found
+              .mockReturnValueOnce(''), // --fallback-color not found
+          });
+
+          expect(() => colors.toHslaColor('var(--primary-color, var(--fallback-color))')).toThrow();
+        });
+
+        it('should handle real-world Clerk color variable patterns', () => {
+          const testCases = [
+            {
+              input: 'var(--clerk-color-danger, #ef4444)',
+              mockValue: '#ef4444',
+              expected: { h: 0, s: 84, l: 60, a: 1 },
+            },
+            {
+              input: 'var(--clerk-color-success, #22c543)',
+              mockValue: '#22c543',
+              expected: { h: 132, s: 70, l: 45, a: 1 },
+            },
+            {
+              input: 'var(--clerk-color-warning, #f36b16)',
+              mockValue: '#f36b16',
+              expected: { h: 23, s: 90, l: 51, a: 1 },
+            },
+          ];
+
+          testCases.forEach(({ input, mockValue, expected }) => {
+            mockGetComputedStyle.mockReturnValue({
+              getPropertyValue: vi.fn().mockReturnValue(mockValue),
+            });
+
+            const result = colors.toHslaColor(input);
+            expect(result).toEqual(expected);
+          });
+        });
+      });
     });
 
     describe('error cases', () => {

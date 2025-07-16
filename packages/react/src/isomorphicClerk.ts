@@ -4,6 +4,7 @@ import { loadClerkJsScript } from '@clerk/shared/loadClerkJsScript';
 import { handleValueOrFn } from '@clerk/shared/utils';
 import type {
   __internal_CheckoutProps,
+  __internal_NavigateToTaskIfAvailableParams,
   __internal_OAuthConsentProps,
   __internal_PlanDetailsProps,
   __internal_SubscriptionDetailsProps,
@@ -30,7 +31,6 @@ import type {
   JoinWaitlistParams,
   ListenerCallback,
   LoadedClerk,
-  NextTaskParams,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationResource,
@@ -731,9 +731,9 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  __experimental_navigateToTask = async (params?: NextTaskParams): Promise<void> => {
+  __internal_navigateToTaskIfAvailable = async (params?: __internal_NavigateToTaskIfAvailableParams): Promise<void> => {
     if (this.clerkjs) {
-      return this.clerkjs.__experimental_navigateToTask(params);
+      return this.clerkjs.__internal_navigateToTaskIfAvailable(params);
     } else {
       return Promise.reject();
     }

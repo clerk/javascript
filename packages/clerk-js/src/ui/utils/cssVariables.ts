@@ -175,8 +175,17 @@ export function resolveCSSVariable(value: string, element?: Element): string | n
     return resolvedValue;
   }
 
-  // If variable couldn't be resolved, return the fallback value if provided
-  return fallbackValue;
+  // If variable couldn't be resolved, check if fallback is also a CSS variable
+  if (fallbackValue) {
+    if (isCSSVariable(fallbackValue)) {
+      // Recursively resolve nested CSS variables
+      const recursiveResult = resolveCSSVariable(fallbackValue, element);
+      return recursiveResult;
+    }
+    return fallbackValue;
+  }
+
+  return null;
 }
 
 /**
@@ -233,3 +242,11 @@ export function resolveComputedCSSColor(parentElement: HTMLElement, color: strin
   const { data } = ctx.getImageData(0, 0, 1, 1);
   return `#${data[0].toString(16).padStart(2, '0')}${data[1].toString(16).padStart(2, '0')}${data[2].toString(16).padStart(2, '0')}`;
 }
+
+/**
+ * Creates a CSS variable prefixed with `clerk-` with a default value
+ * @param name - The name of the CSS variable
+ * @param defaultValue - The default value
+ * @returns The CSS variable string
+ */
+export const clerkCssVar = (name: string, defaultValue: string) => `var(--clerk-${name}, ${defaultValue})`;
