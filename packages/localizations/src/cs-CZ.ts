@@ -187,7 +187,8 @@ export const csCZ: LocalizationResource = {
   formFieldError__notMatchingPasswords: 'Hesla se neshodují.',
   formFieldError__verificationLinkExpired: 'Ověřovací odkaz vypršel. Prosím, požádejte o nový odkaz.',
   formFieldHintText__optional: 'Volitelné',
-  formFieldHintText__slug: 'Slug je člověkem čitelný identifikátor, který musí být unikátní. Často se používá v URL adresách.',
+  formFieldHintText__slug:
+    'Slug je člověkem čitelný identifikátor, který musí být unikátní. Často se používá v URL adresách.',
   formFieldInputPlaceholder__apiKeyDescription: 'Vysvětlete, proč generujete tento klíč',
   formFieldInputPlaceholder__apiKeyExpirationDate: 'Vyberte datum',
   formFieldInputPlaceholder__apiKeyName: 'Zadejte název tajného klíče',
@@ -236,8 +237,7 @@ export const csCZ: LocalizationResource = {
     action__signOut: 'Odhlásit se',
     title: 'Přihlášen jako {{identifier}}',
   },
-  maintenanceMode:
-    'Momentálně provádíme údržbu, ale nebojte se, nemělo by to trvat déle než pár minut.',
+  maintenanceMode: 'Momentálně provádíme údržbu, ale nebojte se, nemělo by to trvat déle než pár minut.',
   membershipRole__admin: 'Správce',
   membershipRole__basicMember: 'Člen',
   membershipRole__guestMember: 'Host',
@@ -592,7 +592,8 @@ export const csCZ: LocalizationResource = {
     },
     emailLink: {
       clientMismatch: {
-        subtitle: 'Pro pokračování otevřete ověřovací odkaz na zařízení a prohlížeči, ze kterého jste zahájili přihlášení',
+        subtitle:
+          'Pro pokračování otevřete ověřovací odkaz na zařízení a prohlížeči, ze kterého jste zahájili přihlášení',
         title: 'Ověřovací odkaz je pro toto zařízení neplatný',
       },
       expired: {
@@ -644,7 +645,8 @@ export const csCZ: LocalizationResource = {
       title: 'Nelze se přihlásit',
     },
     passkey: {
-      subtitle: 'Použití vašeho přístupového klíče potvrzuje, že jste to vy. Vaše zařízení může požádat o otisk prstu, obličej nebo zámek obrazovky.',
+      subtitle:
+        'Použití vašeho přístupového klíče potvrzuje, že jste to vy. Vaše zařízení může požádat o otisk prstu, obličej nebo zámek obrazovky.',
       title: 'Použít váš přístupový klíč',
     },
     password: {
@@ -725,7 +727,8 @@ export const csCZ: LocalizationResource = {
     },
     emailLink: {
       clientMismatch: {
-        subtitle: 'Pro pokračování otevřete ověřovací odkaz na zařízení a prohlížeči, ze kterého jste zahájili registraci',
+        subtitle:
+          'Pro pokračování otevřete ověřovací odkaz na zařízení a prohlížeči, ze kterého jste zahájili registraci',
         title: 'Ověřovací odkaz je pro toto zařízení neplatný',
       },
       formSubtitle: 'Použijte ověřovací odkaz odeslaný na vaši e-mailovou adresu',
@@ -769,8 +772,10 @@ export const csCZ: LocalizationResource = {
       actionText: 'Už máte účet?',
       blockButton__emailSupport: 'Podpora přes e-mail',
       blockButton__joinWaitlist: 'Připojit se k čekací listině',
-      subtitle: 'Registrace jsou momentálně zakázány. Pokud se domníváte, že byste měli mít přístup, kontaktujte prosím podporu.',
-      subtitleWaitlist: 'Registrace jsou momentálně zakázány. Chcete-li být první, kdo se dozví, kdy spustíme, připojte se k čekací listině.',
+      subtitle:
+        'Registrace jsou momentálně zakázány. Pokud se domníváte, že byste měli mít přístup, kontaktujte prosím podporu.',
+      subtitleWaitlist:
+        'Registrace jsou momentálně zakázány. Chcete-li být první, kdo se dozví, kdy spustíme, připojte se k čekací listině.',
       title: 'Omezený přístup',
     },
     start: {
@@ -813,8 +818,7 @@ export const csCZ: LocalizationResource = {
     form_password_incorrect: undefined,
     form_password_length_too_short: 'Vaše heslo je příliš krátké. Musí mít alespoň 8 znaků.',
     form_password_not_strong_enough: 'Vaše heslo není dostatečně silné.',
-    form_password_pwned:
-      'Toto heslo bylo nalezeno jako součást prolomení a nelze ho použít, zkuste prosím jiné heslo.',
+    form_password_pwned: 'Toto heslo bylo nalezeno jako součást prolomení a nelze ho použít, zkuste prosím jiné heslo.',
     form_password_pwned__sign_in:
       'Toto heslo bylo nalezeno jako součást prolomení a nelze ho použít, prosím resetujte si heslo.',
     form_password_size_in_bytes_exceeded: undefined,
@@ -1055,7 +1059,8 @@ export const csCZ: LocalizationResource = {
         buttonUnableToScan__nonPrimary: 'Nemůžete naskenovat QR kód?',
         infoText__ableToScan:
           'Nastavte novou metodu přihlášení ve vaší aplikaci pro ověřování a naskenujte následující QR kód, abyste ji propojili se svým účtem.',
-        infoText__unableToScan: 'Nastavte novou metodu přihlášení ve své aplikaci pro ověřování a zadejte níže uvedený klíč.',
+        infoText__unableToScan:
+          'Nastavte novou metodu přihlášení ve své aplikaci pro ověřování a zadejte níže uvedený klíč.',
         inputLabel__unableToScan1:
           'Ujistěte se, že je povoleno časové nebo jednorázové heslo, a dokončete propojení svého účtu.',
         inputLabel__unableToScan2:
@@ -1093,7 +1098,8 @@ export const csCZ: LocalizationResource = {
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'Doporučuje se odhlásit se ze všech ostatních zařízení, která mohla použít vaše staré heslo.',
-      readonly: 'Vaše heslo nelze aktuálně upravit, protože se můžete přihlásit pouze prostřednictvím podnikového připojení.',
+      readonly:
+        'Vaše heslo nelze aktuálně upravit, protože se můžete přihlásit pouze prostřednictvím podnikového připojení.',
       successMessage__set: 'Vaše heslo bylo nastaveno.',
       successMessage__signOutOfOtherSessions: 'Všechna ostatní zařízení byla odhlášena.',
       successMessage__update: 'Vaše heslo bylo aktualizováno.',
