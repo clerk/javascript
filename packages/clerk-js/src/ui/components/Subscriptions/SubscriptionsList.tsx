@@ -140,7 +140,7 @@ export function SubscriptionsList({
                     {(subscription.plan.amount > 0 || subscription.plan.annualAmount > 0) && (
                       <Span
                         sx={t => ({
-                          color: t.colors.$colorTextSecondary,
+                          color: t.colors.$colorMutedForeground,
                           textTransform: 'lowercase',
                           ':before': {
                             content: '"/"',

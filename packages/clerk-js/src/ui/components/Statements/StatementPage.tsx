@@ -33,7 +33,7 @@ export const StatementPage = () => {
         sx={t => ({
           borderBlockEndWidth: t.borderWidths.$normal,
           borderBlockEndStyle: t.borderStyles.$solid,
-          borderBlockEndColor: t.colors.$neutralAlpha100,
+          borderBlockEndColor: t.colors.$borderAlpha100,
           marginBlockEnd: t.space.$4,
           paddingBlockEnd: t.space.$4,
         })}

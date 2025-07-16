@@ -64,12 +64,11 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     await expect(u.po.page.getByText('Checkout')).toBeVisible();
   });
 
-  test.skip('can subscribe to a plan', async ({ page, context }) => {
+  test('can subscribe to a plan', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
-    await u.po.page.goToRelative('/pricing-table');
-
+    await u.po.page.goToRelative('/pricing-table?newSubscriptionRedirectUrl=/pricing-table');
     await u.po.pricingTable.waitForMounted();
     await u.po.pricingTable.startCheckout({ planSlug: 'plus' });
     await u.po.checkout.waitForMounted();
@@ -87,7 +86,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     }
   });
 
-  test.skip('can upgrade to a new plan with saved card', async ({ page, context }) => {
+  test('can upgrade to a new plan with saved card', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -100,7 +99,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     await expect(u.po.page.getByText('Payment was successful!')).toBeVisible();
   });
 
-  test.skip('can downgrade to previous plan', async ({ page, context }) => {
+  test('can downgrade to previous plan', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -114,7 +113,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     await expect(u.po.page.getByText('Success!')).toBeVisible();
   });
 
-  test.skip('user is prompted to add email before checkout', async ({ page, context }) => {
+  test('user is prompted to add email before checkout', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
 
     const fakeUser = u.services.users.createFakeUser({ withEmail: false, withPhoneNumber: true });
@@ -157,7 +156,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
   // });
 
   test.describe('redirects', () => {
-    test.skip('default navigates to afterSignInUrl', async ({ page, context }) => {
+    test('default navigates to afterSignInUrl', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -172,9 +171,16 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
         .getByRole('button', { name: /^continue$/i })
         .click();
       await u.page.waitForAppUrl('/');
+      // eslint-disable-next-line playwright/no-conditional-in-test
+      if (app.name.includes('next')) {
+        // Correctly updates RSCs with the new `pla` claim.
+        await expect(u.po.page.getByText('user in pro')).toBeVisible({
+          timeout: 5_000,
+        });
+      }
     });
 
-    test.skip('navigates to supplied newSubscriptionRedirectUrl', async ({ page, context }) => {
+    test('navigates to supplied newSubscriptionRedirectUrl', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -193,7 +199,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
   });
 
   test.describe('in UserProfile', () => {
-    test.skip('renders pricing table with plans', async ({ page, context }) => {
+    test('renders pricing table with plans', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -206,7 +212,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await expect(u.po.page.getByRole('heading', { name: 'Pro' })).toBeVisible();
     });
 
-    test.skip('can subscribe to a plan, revalidates payment sources on complete and then downgrades to free', async ({
+    test('can subscribe to a plan, revalidates payment sources on complete and then downgrades to free', async ({
       page,
       context,
     }) => {
@@ -254,7 +260,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await fakeUser.deleteIfExists();
     });
 
-    test.skip('checkout always revalidates on open', async ({ page, context }) => {
+    test('checkout always revalidates on open', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
 
       const fakeUser = u.services.users.createFakeUser();
@@ -282,7 +288,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await fakeUser.deleteIfExists();
     });
 
-    test.skip('adds payment source via checkout and resets stripe setup intent after failed payment', async ({
+    test('adds payment source via checkout and resets stripe setup intent after failed payment', async ({
       page,
       context,
     }) => {
@@ -319,7 +325,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await fakeUser.deleteIfExists();
     });
 
-    test.skip('displays notice then plan cannot change', async ({ page, context }) => {
+    test('displays notice then plan cannot change', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
 
       const fakeUser = u.services.users.createFakeUser();
