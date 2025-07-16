@@ -351,7 +351,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
         page
           .locator('.cl-checkout-root')
           .getByText(
-            'You cannot subscribe to this plan by paying monthly. To subscribe to this plan, you need to choose to pay annually',
+            'You cannot subscribe to this plan by paying monthly. To subscribe to this plan, you need to choose to pay annually.',
           ),
       ).toBeVisible();
 

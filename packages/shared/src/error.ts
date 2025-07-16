@@ -167,6 +167,7 @@ export function parseError(error: ClerkAPIErrorJSON): ClerkAPIError {
       identifiers: error?.meta?.identifiers,
       zxcvbn: error?.meta?.zxcvbn,
       plan: error?.meta?.plan,
+      isPlanUpgradePossible: error?.meta?.is_plan_upgrade_possible,
     },
   };
 }
@@ -188,6 +189,7 @@ export function errorToJSON(error: ClerkAPIError | null): ClerkAPIErrorJSON {
       identifiers: error?.meta?.identifiers,
       zxcvbn: error?.meta?.zxcvbn,
       plan: error?.meta?.plan,
+      is_plan_upgrade_possible: error?.meta?.isPlanUpgradePossible,
     },
   };
 }
