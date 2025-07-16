@@ -34,6 +34,7 @@ export const ObjectType = {
   InstanceRestrictions: 'instance_restrictions',
   InstanceSettings: 'instance_settings',
   Invitation: 'invitation',
+  Machine: 'machine',
   MachineToken: 'machine_to_machine_token',
   JwtTemplate: 'jwt_template',
   OauthAccessToken: 'oauth_access_token',
@@ -694,6 +695,15 @@ export interface SamlAccountConnectionJSON extends ClerkResourceJSON {
   allow_subdomains: boolean;
   allow_idp_initiated: boolean;
   disable_additional_identifications: boolean;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface MachineJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.Machine;
+  id: string;
+  name: string;
+  instance_id: string;
   created_at: number;
   updated_at: number;
 }

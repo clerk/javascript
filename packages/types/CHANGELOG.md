@@ -1,5 +1,17 @@
 # Change Log
 
+## 4.67.0
+
+### Minor Changes
+
+- Do not trigger after-auth navigation from `useMultisessionActions` ([#6323](https://github.com/clerk/javascript/pull/6323)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+## 4.66.1
+
+### Patch Changes
+
+- [Billing Beta] Add experimental JSDoc for `org.getSubscriptions`. ([#6318](https://github.com/clerk/javascript/pull/6318)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 4.66.0
 
 ### Minor Changes
