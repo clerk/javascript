@@ -13,4 +13,7 @@ export const usePlans = createCommerceHook<CommercePlanResource, GetPlansParams>
     const clerk = useClerkInstanceContext();
     return params => clerk.billing.getPlans({ ...params, for: _for === 'organization' ? 'org' : 'user' });
   },
+  options: {
+    unauthenticated: true,
+  },
 });
