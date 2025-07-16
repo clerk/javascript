@@ -2,7 +2,6 @@ import { experimental_createTheme } from '../createTheme';
 
 export const shadcn = experimental_createTheme({
   variables: {
-    borderRadius: 'calc(var(--radius) - 2px)',
     colorBackground: 'var(--card)',
     colorForeground: 'var(--card-foreground)',
     colorPrimary: 'var(--primary)',
