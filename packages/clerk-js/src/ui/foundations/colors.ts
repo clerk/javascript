@@ -88,7 +88,7 @@ const colorMutedForeground = clerkCssVar(
 const colors = Object.freeze({
   avatarBorder: neutralAlphaScale.neutralAlpha200,
   avatarBackground: neutralAlphaScale.neutralAlpha400,
-  colorModalBackdrop: colorUtils.makeTransparent(clerkCssVar('color-modal-backdrop', defaultColorNeutral), 0.5),
+  colorModalBackdrop: colorUtils.makeTransparent(clerkCssVar('color-modal-backdrop', defaultColorNeutral), 0.27),
   colorBackground: clerkCssVar('color-background', 'white'),
   colorInput: clerkCssVar('color-input', 'white'),
   colorForeground,
