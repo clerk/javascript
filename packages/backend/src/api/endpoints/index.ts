@@ -11,6 +11,7 @@ export * from './EmailAddressApi';
 export * from './IdPOAuthAccessTokenApi';
 export * from './InstanceApi';
 export * from './InvitationApi';
+export * from './MachineApi';
 export * from './MachineTokensApi';
 export * from './JwksApi';
 export * from './JwtTemplatesApi';

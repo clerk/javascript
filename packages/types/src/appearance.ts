@@ -738,7 +738,7 @@ export type Variables = {
    */
   colorShimmer?: CssColor;
   /**
-   * The color of the ring when an interactive element is focused.
+   * The color of the ring when an interactive element is focused rendered at 15% opacity.
    * @default {@link Variables.colorNeutral} at 15% opacity
    */
   colorRing?: CssColor;
@@ -753,8 +753,8 @@ export type Variables = {
    */
   colorBorder?: CssColor;
   /**
-   * The background color of the modal backdrop.
-   * @default {@link Variables.colorNeutral} at 70% opacity
+   * The background color of the modal backdrop rendered at 73% opacity.
+   * @default {@link Variables.colorNeutral} at 73% opacity
    */
   colorModalBackdrop?: CssColor;
   /**
