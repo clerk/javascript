@@ -1,5 +1,16 @@
 # Change Log
 
+## 5.73.1
+
+### Patch Changes
+
+- Refactor after-auth flows to keep navigation internally ([#6319](https://github.com/clerk/javascript/pull/6319)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`8ee859c`](https://github.com/clerk/javascript/commit/8ee859ce00d1d5747c14a80fe7166303e64a4f1f)]:
+  - @clerk/shared@3.12.2
+  - @clerk/types@4.66.1
+  - @clerk/localizations@3.19.1
+
 ## 5.73.0
 
 ### Minor Changes
