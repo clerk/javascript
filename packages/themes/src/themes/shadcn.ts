@@ -30,5 +30,10 @@ export const shadcn = experimental_createTheme({
   elements: {
     input: 'bg-transparent dark:bg-input/30',
     cardBox: 'shadow-sm border',
+    button: {
+      '&::after': {
+        display: 'none',
+      },
+    },
   },
 });
