@@ -146,7 +146,9 @@ export type __internal_LocalizationResource = {
   badge__currentPlan: LocalizationValue;
   badge__upcomingPlan: LocalizationValue;
   badge__activePlan: LocalizationValue;
+  badge__pastDuePlan: LocalizationValue;
   badge__startsAt: LocalizationValue<'date'>;
+  badge__pastDueAt: LocalizationValue<'date'>;
   badge__endsAt: LocalizationValue;
   badge__expired: LocalizationValue;
   badge__canceledEndsAt: LocalizationValue<'date'>;
@@ -175,6 +177,8 @@ export type __internal_LocalizationResource = {
     switchPlan: LocalizationValue;
     switchToMonthly: LocalizationValue;
     switchToAnnual: LocalizationValue;
+    switchToMonthlyWithPrice: LocalizationValue<'price' | 'currency'>;
+    switchToAnnualWithAnnualPrice: LocalizationValue<'price' | 'currency'>;
     billedAnnually: LocalizationValue;
     billedMonthlyOnly: LocalizationValue;
     alwaysFree: LocalizationValue;
@@ -196,6 +200,17 @@ export type __internal_LocalizationResource = {
     cancelSubscriptionNoCharge: LocalizationValue;
     cancelSubscriptionAccessUntil: LocalizationValue<'plan' | 'date'>;
     popular: LocalizationValue;
+    subscriptionDetails: {
+      title: LocalizationValue;
+      currentBillingCycle: LocalizationValue;
+      nextPaymentOn: LocalizationValue;
+      nextPaymentAmount: LocalizationValue;
+      subscribedOn: LocalizationValue;
+      endsOn: LocalizationValue;
+      renewsAt: LocalizationValue;
+      beginsOn: LocalizationValue;
+      pastDueAt: LocalizationValue;
+    };
     monthly: LocalizationValue;
     annually: LocalizationValue;
     cannotSubscribeMonthly: LocalizationValue;

@@ -21,14 +21,14 @@ const { applyVariants, filterProps } = createVariants(theme => ({
     textVariant: { ...common.textVariants(theme) },
     colorScheme: {
       primary: {
-        [vars.accent]: theme.colors.$colorTextOnPrimaryBackground,
+        [vars.accent]: theme.colors.$colorPrimaryForeground,
         [vars.bg]: `linear-gradient(180deg, ${theme.colors.$whiteAlpha300} 0%, ${theme.colors.$transparent} 100%), ${theme.colors.$primary500}`,
         borderWidth: 0,
       },
       outline: {
         [vars.accent]: theme.colors.$neutralAlpha600,
         [vars.bg]: 'transparent',
-        [vars.borderColor]: theme.colors.$neutralAlpha150,
+        [vars.borderColor]: theme.colors.$borderAlpha150,
       },
     },
   },

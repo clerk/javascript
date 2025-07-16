@@ -1,5 +1,23 @@
 # @clerk/astro
 
+## 2.10.5
+
+### Patch Changes
+
+- Updated dependencies [[`025e304`](https://github.com/clerk/javascript/commit/025e304c4d6402dfd750ee51ac9c8fc2dea1f353), [`dedf487`](https://github.com/clerk/javascript/commit/dedf48703986d547d5b28155b0182a51030cffeb), [`b96114e`](https://github.com/clerk/javascript/commit/b96114e438638896ba536bb7a17b09cdadcd9407)]:
+  - @clerk/types@4.66.0
+  - @clerk/backend@2.4.3
+  - @clerk/shared@3.12.1
+
+## 2.10.4
+
+### Patch Changes
+
+- Updated dependencies [[`2be6a53`](https://github.com/clerk/javascript/commit/2be6a53959cb8a3127c2eb5d1aeb4248872d2c24), [`f6a1c35`](https://github.com/clerk/javascript/commit/f6a1c35bd5fb4bd2a3cd45bdaf9defe6be59d4a9), [`6826d0b`](https://github.com/clerk/javascript/commit/6826d0bbd03e844d49224565878a4326684f06b4), [`f6a1c35`](https://github.com/clerk/javascript/commit/f6a1c35bd5fb4bd2a3cd45bdaf9defe6be59d4a9), [`8fdb209`](https://github.com/clerk/javascript/commit/8fdb20913b0b0f88244099f6c6a7b979e0f79327), [`97a07f7`](https://github.com/clerk/javascript/commit/97a07f78b4b0c3dc701a2610097ec7d6232f79e7), [`e3da9f4`](https://github.com/clerk/javascript/commit/e3da9f4a17a2a5f71d7e02a81b86d6002c93cc59)]:
+  - @clerk/types@4.65.0
+  - @clerk/shared@3.12.0
+  - @clerk/backend@2.4.2
+
 ## 2.10.3
 
 ### Patch Changes
@@ -241,7 +259,7 @@
 
   ```astro
   ---
-  import { CreateOrganization } from '@clerk/astro/components'
+  import { CreateOrganization } from '@clerk/astro/components';
   ---
 
   <CreateOrganization />
@@ -585,8 +603,8 @@
   Regular usage without server islands:
 
   ```astro
-  <Protect role="admin">
-    <p slot="fallback">Not an admin</p>
+  <Protect role='admin'>
+    <p slot='fallback'>Not an admin</p>
     <p>You're an admin</p>
   </Protect>
   ```
@@ -594,9 +612,12 @@
   Example with server islands:
 
   ```astro
-  <Protect server:defer role="admin">
-    <p slot="fallback">Loading...</p>
-    <p slot="protect-fallback">Not an admin</p>
+  <Protect
+    server:defer
+    role='admin'
+  >
+    <p slot='fallback'>Loading...</p>
+    <p slot='protect-fallback'>Not an admin</p>
     <p>You're an admin</p>
   </Protect>
   ```
@@ -1231,7 +1252,7 @@
 
   ```astro
   ---
-  import { SignInButton } from '@clerk/components/astro'
+  import { SignInButton } from '@clerk/components/astro';
   ---
 
   <SignInButton asChild>

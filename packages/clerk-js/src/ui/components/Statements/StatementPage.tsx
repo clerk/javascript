@@ -33,7 +33,7 @@ export const StatementPage = () => {
         sx={t => ({
           borderBlockEndWidth: t.borderWidths.$normal,
           borderBlockEndStyle: t.borderStyles.$solid,
-          borderBlockEndColor: t.colors.$neutralAlpha100,
+          borderBlockEndColor: t.colors.$borderAlpha100,
           marginBlockEnd: t.space.$4,
           paddingBlockEnd: t.space.$4,
         })}
@@ -67,8 +67,8 @@ export const StatementPage = () => {
                   {group.items.map(item => (
                     <Statement.SectionContentItem key={item.id}>
                       <Statement.SectionContentDetailsHeader
-                        title={item.subscription.plan.name}
-                        description={`${item.subscription.amount?.currencySymbol}${item.subscription.amount?.amountFormatted} / ${item.subscription.planPeriod === 'month' ? t(localizationKeys('commerce.month')) : t(localizationKeys('commerce.year'))}`}
+                        title={item.subscriptionItem.plan.name}
+                        description={`${item.subscriptionItem.amount?.currencySymbol}${item.subscriptionItem.amount?.amountFormatted} / ${item.subscriptionItem.planPeriod === 'month' ? t(localizationKeys('commerce.month')) : t(localizationKeys('commerce.year'))}`}
                         secondaryTitle={`${item.amount.currencySymbol}${item.amount.amountFormatted}`}
                       />
                       <Statement.SectionContentDetailsList>
@@ -78,15 +78,15 @@ export const StatementPage = () => {
                               ? localizationKeys(
                                   `${localizationRoot}.billingPage.statementsSection.itemCaption__paidForPlan`,
                                   {
-                                    plan: item.subscription.plan.name,
-                                    period: item.subscription.planPeriod,
+                                    plan: item.subscriptionItem.plan.name,
+                                    period: item.subscriptionItem.planPeriod,
                                   },
                                 )
                               : localizationKeys(
                                   `${localizationRoot}.billingPage.statementsSection.itemCaption__subscribedAndPaidForPlan`,
                                   {
-                                    plan: item.subscription.plan.name,
-                                    period: item.subscription.planPeriod,
+                                    plan: item.subscriptionItem.plan.name,
+                                    period: item.subscriptionItem.planPeriod,
                                   },
                                 )
                           }
@@ -95,12 +95,12 @@ export const StatementPage = () => {
                           valueTruncated
                           valueCopyable
                         />
-                        {item.subscription.credit && item.subscription.credit.amount.amount > 0 ? (
+                        {item.subscriptionItem.credit && item.subscriptionItem.credit.amount.amount > 0 ? (
                           <Statement.SectionContentDetailsListItem
                             label={localizationKeys(
                               `${localizationRoot}.billingPage.statementsSection.itemCaption__proratedCredit`,
                             )}
-                            value={`(${item.subscription.credit.amount.currencySymbol}${item.subscription.credit.amount.amountFormatted})`}
+                            value={`(${item.subscriptionItem.credit.amount.currencySymbol}${item.subscriptionItem.credit.amount.amountFormatted})`}
                           />
                         ) : null}
                       </Statement.SectionContentDetailsList>
