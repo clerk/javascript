@@ -193,7 +193,7 @@ export const RoleSelect = (props: {
         sx={
           triggerSx ||
           (t => ({
-            color: t.colors.$colorText,
+            color: t.colors.$colorForeground,
             backgroundColor: 'transparent',
             textWrap: 'nowrap',
           }))

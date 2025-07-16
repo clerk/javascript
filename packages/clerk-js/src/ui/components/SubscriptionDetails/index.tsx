@@ -469,7 +469,7 @@ const SubscriptionCard = ({ subscription }: { subscription: CommerceSubscription
             sx={t => ({
               fontSize: t.fontSizes.$lg,
               fontWeight: t.fontWeights.$semibold,
-              color: t.colors.$colorText,
+              color: t.colors.$colorForeground,
               marginInlineEnd: 'auto',
             })}
           >
@@ -552,7 +552,7 @@ const DetailRow = ({ label, value }: { label: LocalizationKey; value: string }) 
       paddingBlock: t.space.$3,
       borderBlockStartWidth: t.borderWidths.$normal,
       borderBlockStartStyle: t.borderStyles.$solid,
-      borderBlockStartColor: t.colors.$neutralAlpha100,
+      borderBlockStartColor: t.colors.$borderAlpha100,
     })}
   >
     <Text

@@ -4,7 +4,7 @@ import { common, createVariants } from '../styledSystem';
 const { applyVariants, filterProps } = createVariants(theme => ({
   base: {
     boxSizing: 'border-box',
-    color: `${theme.colors.$colorText}`,
+    color: `${theme.colors.$colorForeground}`,
     margin: 0,
   },
   variants: {
