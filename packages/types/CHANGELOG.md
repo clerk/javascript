@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.66.1
+
+### Patch Changes
+
+- [Billing Beta] Add experimental JSDoc for `org.getSubscriptions`. ([#6318](https://github.com/clerk/javascript/pull/6318)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 4.66.0
 
 ### Minor Changes
