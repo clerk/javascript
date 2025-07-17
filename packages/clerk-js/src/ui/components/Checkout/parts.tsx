@@ -48,6 +48,11 @@ export const InvalidPlanScreen = () => {
     return _error?.meta?.plan;
   }, [error]);
 
+  const isPlanUpgradePossible = useMemo(() => {
+    const _error = error?.errors.find(e => e.code === 'invalid_plan_change');
+    return _error?.meta?.isPlanUpgradePossible || false;
+  }, [error]);
+
   if (!planFromError) {
     return null;
   }
@@ -85,7 +90,11 @@ export const InvalidPlanScreen = () => {
           <Alert
             variant='info'
             colorScheme='info'
-            title={localizationKeys('commerce.cannotSubscribeMonthly')}
+            title={
+              isPlanUpgradePossible
+                ? localizationKeys('commerce.cannotSubscribeMonthly')
+                : localizationKeys('commerce.cannotSubscribeUnrecoverable')
+            }
           />
         </Box>
       </Flex>
