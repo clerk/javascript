@@ -29,13 +29,12 @@ import {
 
 export class CommerceBilling implements CommerceBillingNamespace {
   getPlans = async (params?: GetPlansParams): Promise<ClerkPaginatedResponse<CommercePlanResource>> => {
-    const safeParams = Object.assign({}, params);
-    (safeParams as any).payer_type = safeParams.for || 'user';
-    delete safeParams.for;
+    const { for: forParam, ...safeParams } = params || {};
+    const searchParams = { ...safeParams, payer_type: forParam || 'user' };
     return await BaseResource._fetch({
       path: `/commerce/plans`,
       method: 'GET',
-      search: convertPageToOffsetSearchParams(safeParams),
+      search: convertPageToOffsetSearchParams(searchParams),
     }).then(res => {
       const { data: plans, total_count } = res as unknown as ClerkPaginatedResponse<CommercePlanJSON>;
 
