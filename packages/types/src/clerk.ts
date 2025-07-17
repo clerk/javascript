@@ -23,8 +23,8 @@ import type { ClientResource } from './client';
 import type {
   CommerceBillingNamespace,
   CommerceCheckoutResource,
+  CommercePayerType,
   CommercePlanResource,
-  CommerceSubscriberType,
   CommerceSubscriptionPlanPeriod,
   ConfirmCheckoutParams,
 } from './commerce';
@@ -1806,7 +1806,7 @@ export type __internal_CheckoutProps = {
   appearance?: CheckoutTheme;
   planId?: string;
   planPeriod?: CommerceSubscriptionPlanPeriod;
-  subscriberType?: CommerceSubscriberType;
+  subscriberType?: CommercePayerType;
   onSubscriptionComplete?: () => void;
   portalId?: string;
   portalRoot?: PortalRoot;
@@ -1843,7 +1843,7 @@ export type __internal_SubscriptionDetailsProps = {
    * If `org` is provided, the subscription details will be displayed for the active organization.
    * @default 'user'
    */
-  for?: CommerceSubscriberType;
+  for?: CommercePayerType;
   appearance?: SubscriptionDetailsTheme;
   onSubscriptionCancel?: () => void;
   portalId?: string;

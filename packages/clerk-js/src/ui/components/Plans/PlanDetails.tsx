@@ -58,7 +58,7 @@ const PlanDetailsInternal = ({
   const hasFeatures = features.length > 0;
 
   return (
-    <SubscriberTypeContext.Provider value={plan.payerType[0] as 'user' | 'org'}>
+    <SubscriberTypeContext.Provider value={plan.forPayerType}>
       <Drawer.Header
         sx={t =>
           !hasFeatures

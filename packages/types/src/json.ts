@@ -10,6 +10,7 @@ import type {
   CommerceStatementStatus,
   CommerceSubscriptionPlanPeriod,
   CommerceSubscriptionStatus,
+  CommercePayerType,
 } from './commerce';
 import type { CommerceSettingsJSON } from './commerceSettings';
 import type { DisplayConfigJSON } from './displayConfig';
@@ -643,23 +644,7 @@ export interface CommercePlanJSON extends ClerkResourceJSON {
   is_default: boolean;
   is_recurring: boolean;
   has_base_fee: boolean;
-  /**
-   * Specifies the subscriber type this plan is designed for.
-   *
-   * Each plan is exclusively created for either individual users or organizations,
-   * and cannot be used interchangeably.
-   *
-   * @type {['user'] | ['org']}
-   * @example
-   * ```ts
-   * // For a user plan
-   * payer_type: ['user']
-   *
-   * // For an organization plan
-   * payer_type: ['org']
-   * ```
-   */
-  payer_type: string[];
+  for_payer_type: CommercePayerType;
   publicly_visible: boolean;
   slug: string;
   avatar_url: string;
