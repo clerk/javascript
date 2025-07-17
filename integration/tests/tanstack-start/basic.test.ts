@@ -74,7 +74,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
       expect(clerkInitialState !== undefined).toBeTruthy();
     });
 
-    test('getAuth() works inside server functions', async ({ page, context }) => {
+    test('retrieve auth state in server functions', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
 
       await u.page.goToRelative('/user');
