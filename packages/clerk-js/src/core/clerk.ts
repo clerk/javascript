@@ -2727,16 +2727,21 @@ export class Clerk implements ClerkInterface {
   };
 
   #initOptions = (options?: ClerkOptions): ClerkOptions => {
-    // Extract baseTheme from appearance if it exists
     let processedOptions = options ? { ...options } : {};
     if (
       processedOptions.appearance &&
       typeof processedOptions.appearance === 'object' &&
       'baseTheme' in processedOptions.appearance
     ) {
+      const { cssLayerName, ...baseTheme } = (processedOptions.appearance as any).baseTheme;
+      const processedCssLayerName = (processedOptions.appearance as any).cssLayerName || cssLayerName;
+
       processedOptions = {
         ...processedOptions,
-        appearance: (processedOptions.appearance as any).baseTheme,
+        appearance: {
+          baseTheme,
+          ...(processedCssLayerName && { cssLayerName: processedCssLayerName }),
+        },
       };
     }
 
