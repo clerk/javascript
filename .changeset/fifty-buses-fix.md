@@ -1,5 +1,6 @@
 ---
-'@clerk/tanstack-react-start': patch
+'@clerk/tanstack-react-start': minor
 ---
 
-Fix serialization errors during handshake
+- Fixes serialization errors during handshake
+- Bump `@tanstack/react-start` and `@tanstack/react-router` peer dependency to 1.127.0
