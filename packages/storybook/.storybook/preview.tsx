@@ -1,10 +1,9 @@
-// @ts-ignore - workspace package import
 import './main.css';
 
 import { ClerkProvider } from '@clerk/clerk-react';
 import { enUS, esES, frFR, koKR, zhCN } from '@clerk/localizations';
 import type { Appearance } from '@clerk/types';
-import type { Preview } from '@storybook/react';
+import { withThemeByClassName } from '@storybook/addon-themes';
 import React from 'react';
 
 // Map locale selector values to localization resources
@@ -16,7 +15,13 @@ const localeMap = {
   kr: koKR,
 } as const;
 
-const preview: Preview = {
+// Mock router functions for Storybook
+const mockRouter = {
+  push: () => {},
+  replace: () => {},
+};
+
+const preview: any = {
   parameters: {
     controls: {
       matchers: {
@@ -25,11 +30,6 @@ const preview: Preview = {
       },
     },
     layout: 'centered',
-    darkMode: {
-      stylePreview: true,
-      darkClass: 'dark',
-      lightClass: 'light',
-    },
   },
   globalTypes: {
     locale: {
@@ -169,7 +169,14 @@ const preview: Preview = {
     spacing: '1rem',
   },
   decorators: [
-    (Story, context) => {
+    withThemeByClassName({
+      themes: {
+        light: 'light',
+        dark: 'dark',
+      },
+      defaultTheme: 'light',
+    }),
+    (Story: any, context: any) => {
       const {
         colorPrimary,
         colorPrimaryForeground,
@@ -225,8 +232,10 @@ const preview: Preview = {
         ClerkProvider,
         {
           publishableKey: 'pk_test_dG91Y2hlZC1sYWR5YmlyZC0yMy5jbGVyay5hY2NvdW50cy5kZXYk',
-          appearance: appearance,
-          localization: localization,
+          appearance,
+          localization,
+          routerPush: mockRouter.push,
+          routerReplace: mockRouter.replace,
         } as any,
         React.createElement(Story),
       );

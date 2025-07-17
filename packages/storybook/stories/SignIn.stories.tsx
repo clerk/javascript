@@ -1,6 +1,5 @@
-import React from 'react';
-import type { Meta, StoryObj } from '@storybook/react';
 import { SignIn } from '@clerk/clerk-react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 
 // Define the story metadata
 const meta: Meta<typeof SignIn> = {
