@@ -15,21 +15,14 @@ export const shadcn = experimental_createTheme({
     colorPrimary: 'var(--primary)',
     colorPrimaryForeground: 'var(--primary-foreground)',
     colorRing: 'var(--ring)',
-    fontSize: {
-      sm: 'var(--text-sm)',
-      md: 'var(--text-sm)',
-      lg: 'var(--text-base)',
-      xl: 'var(--text-base)',
-    },
     fontWeight: {
-      medium: 'var(--font-weight-medium)',
-      semibold: 'var(--font-weight-semibold)',
       bold: 'var(--font-weight-semibold)',
     },
   },
   elements: {
     input: 'bg-transparent dark:bg-input/30',
     cardBox: 'shadow-sm border',
+    popoverBox: 'shadow-sm border',
     button: {
       '&::after': {
         display: 'none',
