@@ -4,7 +4,6 @@ import { FloatingTree, useFloatingParentNodeId } from '@floating-ui/react';
 import React from 'react';
 
 import { useLocalizations } from '../../customizables';
-import { useSafeState } from '../../hooks';
 
 type Status = 'idle' | 'loading' | 'error';
 type Metadata = string | undefined;
@@ -19,11 +18,17 @@ const [CardStateCtx, _useCardState] = createContextAndHook<CardStateCtxValue>('C
 export const CardStateProvider = (props: React.PropsWithChildren<any>) => {
   const { translateError } = useLocalizations();
 
-  const [state, setState] = useSafeState<State>({
+  const [state, setState] = React.useState<State>(() => ({
     status: 'idle',
     metadata: undefined,
     error: translateError(window?.Clerk?.__internal_last_error || undefined),
-  });
+  }));
+
+  const lastError = window?.Clerk?.__internal_last_error;
+  if (lastError) {
+    console.log('CardStateProvider: setting error', lastError);
+    setState(s => ({ ...s, error: translateError(lastError) }));
+  }
 
   const value = React.useMemo(() => ({ value: { state, setState } }), [state, setState]);
   return <CardStateCtx.Provider value={value}>{props.children}</CardStateCtx.Provider>;
