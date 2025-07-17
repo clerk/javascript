@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types'
+import type { LocalizationResource } from '@clerk/types';
 
 export const viVN: LocalizationResource = {
   locale: 'vi-VN',
@@ -22,7 +22,7 @@ export const viVN: LocalizationResource = {
     createdAndExpirationStatus__never: "Tạo {{ createdDate | shortDate('vi-VN') }} • Không hết hạn",
     detailsTitle__emptyRow: 'Không tìm thấy khoá API',
     formButtonPrimary__add: 'Tạo khoá',
-    formFieldCaption__expiration__expiresOn: 'Hết hạn {{ date }}'
+    formFieldCaption__expiration__expiresOn: 'Hết hạn {{ date }}',
     formFieldCaption__expiration__never: 'Khoá này sẽ không hết hạn',
     formFieldOption__expiration__180d: '180 Ngày',
     formFieldOption__expiration__1d: '1 Ngày',
@@ -34,7 +34,7 @@ export const viVN: LocalizationResource = {
     formFieldOption__expiration__never: 'Không hết hạn',
     formHint: 'Nhập tên để tạo khoá mới. Bạn sẽ có thể hủy bỏ bất kỳ lúc nào.',
     formTitle: 'Thêm khoá API mới',
-    
+
     lastUsed__days: '{{days}} ngày trước',
     lastUsed__hours: '{{hours}} giờ trước',
     lastUsed__minutes: '{{minutes}} phút trước',
@@ -43,7 +43,7 @@ export const viVN: LocalizationResource = {
     lastUsed__years: '{{years}} năm trước',
     menuAction__revoke: 'Hủy khoá',
     revokeConfirmation: {
-      confirmationText: 'Hủy'
+      confirmationText: 'Hủy',
       formButtonPrimary__revoke: 'Hủy khoá',
       formHint: 'Bạn có chắc chắn muốn xóa khoá này không?',
       formTitle: 'Hủy khoá "{{apiKeyName}}" không?',
@@ -85,23 +85,21 @@ export const viVN: LocalizationResource = {
       description__subscriptionSuccessful: 'Đăng ký mới của bạn đã được thiết lập.',
       downgradeNotice:
         'Bạn sẽ giữ đăng ký hiện tại và các tính năng của nó cho đến cuối chu kỳ thanh toán, sau đó bạn sẽ được chuyển sang đăng ký này.',
-      pastDueNotice: 'Đăng ký trước của bạn đã quá hạn và chưa thanh toán.',
       emailForm: {
-        subtitle:
-          'Trước khi bạn có thể hoàn thành việc mua hàng, bạn phải thêm địa chỉ email nơi gửi hóa đơn.',
-        title: 'Thêm địa chỉ email'
+        subtitle: 'Trước khi bạn có thể hoàn thành việc mua hàng, bạn phải thêm địa chỉ email nơi gửi hóa đơn.',
+        title: 'Thêm địa chỉ email',
       },
       lineItems: {
         title__paymentMethod: 'Phương thức thanh toán',
         title__statementId: 'ID hóa đơn',
         title__subscriptionBegins: 'Đăng ký bắt đầu',
-        title__totalPaid: 'Tổng thanh toán'
+        title__totalPaid: 'Tổng thanh toán',
       },
-      pastDueNotice: undefined,
+      pastDueNotice: 'Đăng ký trước của bạn đã quá hạn và chưa thanh toán.',
       perMonth: 'hàng tháng',
       title: 'Thanh toán',
       title__paymentSuccessful: 'Thanh toán thành công!',
-      title__subscriptionSuccessful: 'Thành công!'
+      title__subscriptionSuccessful: 'Thành công!',
     },
     credit: 'Tín dụng',
     creditRemainder: 'Tín dụng cho phần còn lại của đăng ký hiện tại.',
@@ -119,7 +117,7 @@ export const viVN: LocalizationResource = {
     paymentSource: {
       applePayDescription: {
         annual: 'Thanh toán hàng năm',
-        monthly: 'Thanh toán hàng tháng'
+        monthly: 'Thanh toán hàng tháng',
       },
       dev: {
         anyNumbers: 'Bất kỳ số nào',
@@ -127,13 +125,13 @@ export const viVN: LocalizationResource = {
         cvcZip: 'CVC, ZIP',
         developmentMode: 'Chế độ phát triển',
         expirationDate: 'Ngày hết hạn',
-        testCardInfo: 'Thông tin thử nghiệm'
-      }
+        testCardInfo: 'Thông tin thử nghiệm',
+      },
     },
     popular: 'Phổ biến',
     pricingTable: {
       billingCycle: 'Chu kỳ thanh toán',
-      included: 'Bao gồm'
+      included: 'Bao gồm',
     },
     reSubscribe: 'Đăng ký lại',
     seeAllFeatures: 'Xem tất cả tính năng',
@@ -145,14 +143,14 @@ export const viVN: LocalizationResource = {
     totalDue: 'Tổng cần thanh toán',
     totalDueToday: 'Tổng cần thanh toán hôm nay',
     viewFeatures: 'Xem tính năng',
-    year: 'Năm'
+    year: 'Năm',
   },
   createOrganization: {
     formButtonSubmit: 'Tạo tổ chức',
     invitePage: {
-      formButtonReset: 'Bỏ qua'
+      formButtonReset: 'Bỏ qua',
     },
-    title: 'Tạo tổ chức'
+    title: 'Tạo tổ chức',
   },
   dates: {
     lastDay: "Hôm qua lúc {{ date | timeString('vi-VN') }}",
@@ -160,7 +158,7 @@ export const viVN: LocalizationResource = {
     nextDay: "Ngày mai lúc {{ date | timeString('vi-VN') }}",
     numeric: "{{ date | numeric('vi-VN') }}",
     previous6Days: "{{ date | weekday('vi-VN','long') }} lúc {{ date | timeString('vi-VN') }}",
-    sameDay: "Hôm nay lúc {{ date | timeString('vi-VN') }}"
+    sameDay: "Hôm nay lúc {{ date | timeString('vi-VN') }}",
   },
   dividerText: 'hoặc',
   footerActionLink__alternativePhoneCodeProvider: 'Gửi mã qua SMS thay vì email',
@@ -173,8 +171,7 @@ export const viVN: LocalizationResource = {
   formFieldAction__forgotPassword: 'Quên mật khẩu?',
   formFieldError__matchingPasswords: 'Mật khẩu trùng khớp.',
   formFieldError__notMatchingPasswords: 'Mật khẩu không trùng khớp.',
-  formFieldError__verificationLinkExpired:
-    'Liên kết xác minh đã hết hạn. Vui lòng yêu cầu liên kết mới.',
+  formFieldError__verificationLinkExpired: 'Liên kết xác minh đã hết hạn. Vui lòng yêu cầu liên kết mới.',
   formFieldHintText__optional: 'Tùy chọn',
   formFieldHintText__slug:
     'Một slug là một ID dễ đọc bởi con người mà phải độc nhất. Nó thường được sử dụng trong URL.',
@@ -224,10 +221,9 @@ export const viVN: LocalizationResource = {
   formFieldLabel__username: 'Tên người dùng',
   impersonationFab: {
     action__signOut: 'Đăng xuất',
-    title: 'Đăng nhập với {{identifier}}'
+    title: 'Đăng nhập với {{identifier}}',
   },
-  maintenanceMode:
-    'Chúng tôi đang trong quá trình bảo trì, nhưng đừng lo lắng, nó không nên mất quá nhiều thời gian.',
+  maintenanceMode: 'Chúng tôi đang trong quá trình bảo trì, nhưng đừng lo lắng, nó không nên mất quá nhiều thời gian.',
   membershipRole__admin: 'Quản trị viên',
   membershipRole__basicMember: 'Thành viên',
   membershipRole__guestMember: 'Khách',
@@ -240,11 +236,11 @@ export const viVN: LocalizationResource = {
     subtitle: 'để tiếp tục đến {{applicationName}}',
     suggestionsAcceptedLabel: 'Đang chờ phê duyệt',
     title: 'Chọn tài khoản',
-    titleWithoutPersonal: 'Chọn tổ chức'
+    titleWithoutPersonal: 'Chọn tổ chức',
   },
   organizationProfile: {
     apiKeysPage: {
-      title: 'Khoá API'
+      title: 'Khoá API',
     },
     badge__automaticInvitation: 'Tự động mời',
     badge__automaticSuggestion: 'Tự động gợi ý',
@@ -253,7 +249,7 @@ export const viVN: LocalizationResource = {
     billingPage: {
       paymentHistorySection: {
         empty: 'Không có lịch sử thanh toán',
-        notFound: 'Không tìm thấy lịch sử thanh toán'
+        notFound: 'Không tìm thấy lịch sử thanh toán',
         tableHeader__amount: 'Số tiền',
         tableHeader__date: 'Ngày',
         tableHeader__status: 'Trạng thái',
@@ -272,15 +268,15 @@ export const viVN: LocalizationResource = {
           messageLine2:
             'Bạn sẽ không còn thể sử dụng nguồn thanh toán này và bất kỳ đăng ký lặp lại nào phụ thuộc vào nó sẽ không còn hoạt động.',
           successMessage: '{{paymentSource}} đã bị xóa khỏi tài khoản của bạn.',
-          title: 'Xóa phương thức thanh toán'
+          title: 'Xóa phương thức thanh toán',
         },
-        title: 'Phương thức thanh toán'
+        title: 'Phương thức thanh toán',
       },
       start: {
         headerTitle__payments: 'Thanh toán',
         headerTitle__plans: 'Gói',
         headerTitle__statements: 'Hóa đơn',
-        headerTitle__subscriptions: 'Đăng ký'
+        headerTitle__subscriptions: 'Đăng ký',
       },
       statementsSection: {
         empty: 'Không có hóa đơn để hiển thị',
@@ -291,18 +287,7 @@ export const viVN: LocalizationResource = {
         tableHeader__amount: 'Số tiền',
         tableHeader__date: 'Ngày',
         title: 'Hóa đơn',
-        totalPaid: 'Tổng thanh toán'
-      },
-      statementsSection: {
-        empty: undefined,
-        itemCaption__paidForPlan: undefined,
-        itemCaption__proratedCredit: undefined,
-        itemCaption__subscribedAndPaidForPlan: undefined,
-        notFound: undefined,
-        tableHeader__amount: undefined,
-        tableHeader__date: undefined,
-        title: undefined,
-        totalPaid: undefined,
+        totalPaid: 'Tổng thanh toán',
       },
       subscriptionsListSection: {
         actionLabel__newSubscription: 'Đăng ký gói',
@@ -310,30 +295,29 @@ export const viVN: LocalizationResource = {
         tableHeader__edit: 'Sửa',
         tableHeader__plan: 'Gói',
         tableHeader__startDate: 'Ngày bắt đầu',
-        title: 'Đăng ký'
+        title: 'Đăng ký',
       },
       subscriptionsSection: {
-        actionLabel__default: 'Quản lý'
+        actionLabel__default: 'Quản lý',
       },
       switchPlansSection: {
-        title: 'Chuyển gói'
+        title: 'Chuyển gói',
       },
-      title: 'Thanh toán'
+      title: 'Thanh toán',
     },
     createDomainPage: {
       subtitle:
         'Thêm tên miền để xác minh. Người dùng với địa chỉ email ở tên miền này có thể tham gia tổ chức tự động hoặc yêu cầu tham gia.',
-      title: 'Thêm tên miền'
+      title: 'Thêm tên miền',
     },
     invitePage: {
       detailsTitle__inviteFailed:
         'Mời không thể được gửi. Đã có mời đang chờ cho các địa chỉ email sau: {{email_addresses}}.',
       formButtonPrimary__continue: 'Gửi mời',
       selectDropdown__role: 'Chọn vai trò',
-      subtitle:
-        'Nhập hoặc dán một hoặc nhiều địa chỉ email, cách nhau bằng dấu cách hoặc dấu phẩy.',
+      subtitle: 'Nhập hoặc dán một hoặc nhiều địa chỉ email, cách nhau bằng dấu cách hoặc dấu phẩy.',
       successMessage: 'Mời đã được gửi thành công',
-      title: 'Mời thành viên mới'
+      title: 'Mời thành viên mới',
     },
     membersPage: {
       action__invite: 'Mời',
@@ -343,7 +327,7 @@ export const viVN: LocalizationResource = {
         tableHeader__actions: 'Hành động',
         tableHeader__joined: 'Tham gia',
         tableHeader__role: 'Vai trò',
-        tableHeader__user: 'Người dùng'
+        tableHeader__user: 'Người dùng',
       },
       detailsTitle__emptyRow: 'Không có thành viên để hiển thị',
       invitationsTab: {
@@ -351,31 +335,31 @@ export const viVN: LocalizationResource = {
           headerSubtitle:
             'Mời người dùng bằng cách kết nối tên miền email với tổ chức của bạn. Bất kỳ ai đăng ký với tên miền email khớp sẽ có thể tham gia tổ chức bất cứ lúc nào.',
           headerTitle: 'Tự động mời',
-          primaryButton: 'Quản lý tên miền đã xác minh'
+          primaryButton: 'Quản lý tên miền đã xác minh',
         },
-        table__emptyRow: 'Không có mời để hiển thị'
+        table__emptyRow: 'Không có mời để hiển thị',
       },
       invitedMembersTab: {
         menuAction__revoke: 'Hủy mời',
-        tableHeader__invited: 'Đã mời'
+        tableHeader__invited: 'Đã mời',
       },
       requestsTab: {
         autoSuggestions: {
           headerSubtitle:
             'Người dùng đăng ký với tên miền email khớp sẽ có thể thấy gợi ý để yêu cầu tham gia tổ chức của bạn.',
           headerTitle: 'Tự động gợi ý',
-          primaryButton: 'Quản lý tên miền đã xác minh'
+          primaryButton: 'Quản lý tên miền đã xác minh',
         },
         menuAction__approve: 'Phê duyệt',
         menuAction__reject: 'Từ chối',
         tableHeader__requested: 'Yêu cầu truy cập',
-        table__emptyRow: 'Không có yêu cầu để hiển thị'
+        table__emptyRow: 'Không có yêu cầu để hiển thị',
       },
       start: {
         headerTitle__invitations: 'Mời',
         headerTitle__members: 'Thành viên',
-        headerTitle__requests: 'Yêu cầu'
-      }
+        headerTitle__requests: 'Yêu cầu',
+      },
     },
     navbar: {
       apiKeys: 'Khoá API',
@@ -383,13 +367,13 @@ export const viVN: LocalizationResource = {
       description: 'Quản lý tổ chức của bạn.',
       general: 'Tổng quan',
       members: 'Thành viên',
-      title: 'Tổ chức'
+      title: 'Tổ chức',
     },
     plansPage: {
       alerts: {
-        noPermissionsToManageBilling: 'Bạn không có quyền quản lý thanh toán cho tổ chức này.'
+        noPermissionsToManageBilling: 'Bạn không có quyền quản lý thanh toán cho tổ chức này.',
       },
-      title: 'Gói'
+      title: 'Gói',
     },
     profilePage: {
       dangerSection: {
@@ -398,7 +382,7 @@ export const viVN: LocalizationResource = {
           messageLine1: 'Bạn có chắc chắn muốn xóa tổ chức này?',
           messageLine2: 'Hành động này là vĩnh viễn và không thể hoàn tác.',
           successMessage: 'Bạn đã xóa tổ chức.',
-          title: 'Xóa tổ chức'
+          title: 'Xóa tổ chức',
         },
         leaveOrganization: {
           actionDescription: 'Nhập "{{organizationName}}" dưới để tiếp tục.',
@@ -406,9 +390,9 @@ export const viVN: LocalizationResource = {
             'Bạn có chắc chắn muốn rời khỏi tổ chức này? Bạn sẽ mất quyền truy cập vào tổ chức này và ứng dụng của nó.',
           messageLine2: 'Hành động này là vĩnh viễn và không thể hoàn tác.',
           successMessage: 'Bạn đã rời khỏi tổ chức.',
-          title: 'Rời khỏi tổ chức'
+          title: 'Rời khỏi tổ chức',
         },
-        title: 'Nguy hiểm'
+        title: 'Nguy hiểm',
       },
       domainSection: {
         menuAction__manage: 'Quản lý',
@@ -417,16 +401,16 @@ export const viVN: LocalizationResource = {
         primaryButton: 'Thêm tên miền',
         subtitle:
           'Cho phép người dùng tham gia tổ chức tự động hoặc yêu cầu tham gia dựa trên tên miền email đã xác minh.',
-        title: 'Tên miền đã xác minh'
+        title: 'Tên miền đã xác minh',
       },
       successMessage: 'Tổ chức đã được cập nhật.',
-      title: 'Cập nhật hồ sơ'
+      title: 'Cập nhật hồ sơ',
     },
     removeDomainPage: {
       messageLine1: 'Tên miền email {{domain}} sẽ bị xóa.',
       messageLine2: 'Người dùng sẽ không thể tham gia tổ chức tự động sau đây.',
       successMessage: '{{domain}} đã bị xóa.',
-      title: 'Xóa tên miền'
+      title: 'Xóa tên miền',
     },
     start: {
       headerTitle__general: 'Tổng quan',
@@ -434,15 +418,15 @@ export const viVN: LocalizationResource = {
       profileSection: {
         primaryButton: 'Cập nhật hồ sơ',
         title: 'Hồ sơ tổ chức',
-        uploadAction__title: 'Logo'
-      }
+        uploadAction__title: 'Logo',
+      },
     },
     verifiedDomainPage: {
       dangerTab: {
         calloutInfoLabel: 'Xóa tên miền này sẽ ảnh hưởng đến người dùng đã mời.',
         removeDomainActionLabel__remove: 'Xóa tên miền',
         removeDomainSubtitle: 'Xóa tên miền này khỏi tên miền đã xác minh',
-        removeDomainTitle: 'Xóa tên miền'
+        removeDomainTitle: 'Xóa tên miền',
       },
       enrollmentTab: {
         automaticInvitationOption__description:
@@ -456,24 +440,23 @@ export const viVN: LocalizationResource = {
         calloutSuggestionCountLabel: 'Gợi ý đang chờ gửi đến người dùng: {{count}}',
         manualInvitationOption__description: 'Người dùng chỉ có thể được mời thủ công đến tổ chức.',
         manualInvitationOption__label: 'Không tự động đăng ký',
-        subtitle: 'Chọn cách người dùng từ tên miền này có thể tham gia tổ chức.'
+        subtitle: 'Chọn cách người dùng từ tên miền này có thể tham gia tổ chức.',
       },
       start: {
         headerTitle__danger: 'Nguy hiểm',
-        headerTitle__enrollment: 'Chế độ đăng ký'
+        headerTitle__enrollment: 'Chế độ đăng ký',
       },
       subtitle: 'Tên miền {{domain}} đã được xác minh. Tiếp tục bằng cách chọn chế độ đăng ký.',
-      title: 'Cập nhật {{domain}}'
+      title: 'Cập nhật {{domain}}',
     },
     verifyDomainPage: {
       formSubtitle: 'Nhập mã xác minh đã gửi đến địa chỉ email của bạn',
       formTitle: 'Mã xác minh',
       resendButton: 'Không nhận được mã? Gửi lại',
       subtitle: 'Tên miền {{domainName}} cần được xác minh qua email.',
-      subtitleVerificationCodeScreen:
-        'Một mã xác minh đã được gửi đến {{emailAddress}}. Nhập mã để tiếp tục.',
-      title: 'Xác minh tên miền'
-    }
+      subtitleVerificationCodeScreen: 'Một mã xác minh đã được gửi đến {{emailAddress}}. Nhập mã để tiếp tục.',
+      title: 'Xác minh tên miền',
+    },
   },
   organizationSwitcher: {
     action__createOrganization: 'Tạo tổ chức',
@@ -482,7 +465,7 @@ export const viVN: LocalizationResource = {
     action__suggestionsAccept: 'Yêu cầu tham gia',
     notSelected: 'Không có tổ chức được chọn',
     personalWorkspace: 'Tài khoản cá nhân',
-    suggestionsAcceptedLabel: 'Đang chờ phê duyệt'
+    suggestionsAcceptedLabel: 'Đang chờ phê duyệt',
   },
   paginationButton__next: 'Tiếp',
   paginationButton__previous: 'Trước',
@@ -502,61 +485,61 @@ export const viVN: LocalizationResource = {
         blockButton__emailSupport: 'Email hỗ trợ',
         content:
           'Nếu bạn gặp vấn đề khi xác minh tài khoản của mình, email chúng tôi và chúng tôi sẽ hỗ trợ bạn khôi phục quyền truy cập sớm nhất có thể.',
-        title: 'Liên hệ hỗ trợ'
+        title: 'Liên hệ hỗ trợ',
       },
       subtitle: 'Gặp vấn đề? Bạn có thể sử dụng bất kỳ phương thức nào để xác minh.',
-      title: 'Sử dụng phương thức khác'
+      title: 'Sử dụng phương thức khác',
     },
     backupCodeMfa: {
       subtitle: 'Nhập mã dự phòng bạn nhận được khi thiết lập xác thực hai bước',
-      title: 'Nhập mã dự phòng'
+      title: 'Nhập mã dự phòng',
     },
     emailCode: {
       formTitle: 'Mã xác minh',
       resendButton: 'Không nhận được mã? Gửi lại',
       subtitle: 'Nhập mã đã gửi đến email của bạn để tiếp tục',
-      title: 'Xác minh yêu cầu'
+      title: 'Xác minh yêu cầu',
     },
     noAvailableMethods: {
       message: 'Không thể tiếp tục với xác minh. Không có yếu tố xác thực phù hợp được cấu hình',
       subtitle: 'Đã xảy ra lỗi',
-      title: 'Không thể xác minh tài khoản của bạn'
+      title: 'Không thể xác minh tài khoản của bạn',
     },
     passkey: {
       blockButton__passkey: 'Sử dụng mã passkey',
       subtitle:
         'Sử dụng mã passkey xác minh danh tính của bạn. Thiết bị của bạn có thể yêu cầu vân tay, khuôn mặt hoặc khóa màn hình.',
-      title: 'Sử dụng mã passkey'
+      title: 'Sử dụng mã passkey',
     },
     password: {
       actionLink: 'Sử dụng phương thức khác',
       subtitle: 'Nhập mật khẩu hiện tại để tiếp tục',
-      title: 'Xác minh yêu cầu'
+      title: 'Xác minh yêu cầu',
     },
     phoneCode: {
       formTitle: 'Mã xác minh',
       resendButton: 'Không nhận được mã? Gửi lại',
       subtitle: 'Nhập mã đã gửi đến điện thoại của bạn để tiếp tục',
-      title: 'Xác minh yêu cầu'
+      title: 'Xác minh yêu cầu',
     },
     phoneCodeMfa: {
       formTitle: 'Mã xác minh',
       resendButton: 'Không nhận được mã? Gửi lại',
       subtitle: 'Nhập mã đã gửi đến điện thoại của bạn để tiếp tục',
-      title: 'Xác minh yêu cầu'
+      title: 'Xác minh yêu cầu',
     },
     totpMfa: {
       formTitle: 'Mã xác minh',
       subtitle: 'Nhập mã đã được tạo bởi ứng dụng xác thực của bạn để tiếp tục',
-      title: 'Xác minh yêu cầu'
-    }
+      title: 'Xác minh yêu cầu',
+    },
   },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Thêm tài khoản',
       action__signOutAll: 'Đăng xuất khỏi tất cả tài khoản',
       subtitle: 'Chọn tài khoản với đó bạn muốn tiếp tục.',
-      title: 'Chọn tài khoản'
+      title: 'Chọn tài khoản',
     },
     alternativeMethods: {
       actionLink: 'Liên hệ hỗ trợ',
@@ -572,62 +555,61 @@ export const viVN: LocalizationResource = {
         blockButton__emailSupport: 'Email hỗ trợ',
         content:
           'Nếu bạn gặp vấn đề khi đăng nhập vào tài khoản của mình, email chúng tôi và chúng tôi sẽ hỗ trợ bạn khôi phục quyền truy cập sớm nhất có thể.',
-        title: 'Liên hệ hỗ trợ'
+        title: 'Liên hệ hỗ trợ',
       },
       subtitle: 'Gặp vấn đề? Bạn có thể sử dụng bất kỳ phương thức nào để đăng nhập.',
-      title: 'Sử dụng phương thức khác'
+      title: 'Sử dụng phương thức khác',
     },
     alternativePhoneCodeProvider: {
       formTitle: 'Mã xác minh',
       resendButton: 'Không nhận được mã? Gửi lại',
       subtitle: 'để tiếp tục đến {{applicationName}}',
-      title: 'Kiểm tra {{provider}}'
+      title: 'Kiểm tra {{provider}}',
     },
     backupCodeMfa: {
       subtitle: 'Mã dự phòng của bạn là mã bạn nhận được khi thiết lập xác thực hai bước.',
-      title: 'Nhập mã dự phòng'
+      title: 'Nhập mã dự phòng',
     },
     emailCode: {
       formTitle: 'Mã xác minh',
       resendButton: 'Không nhận được mã? Gửi lại',
       subtitle: 'để tiếp tục đến {{applicationName}}',
-      title: 'Kiểm tra email'
+      title: 'Kiểm tra email',
     },
     emailLink: {
       clientMismatch: {
-        subtitle:
-          'Để tiếp tục, mở liên kết xác minh trên thiết bị và trình duyệt từ đó bạn đã khởi động đăng nhập',
-        title: 'Liên kết xác minh không hợp lệ cho thiết bị này'
+        subtitle: 'Để tiếp tục, mở liên kết xác minh trên thiết bị và trình duyệt từ đó bạn đã khởi động đăng nhập',
+        title: 'Liên kết xác minh không hợp lệ cho thiết bị này',
       },
       expired: {
         subtitle: 'Quay lại tab gốc để tiếp tục.',
-        title: 'Liên kết xác minh đã hết hạn'
+        title: 'Liên kết xác minh đã hết hạn',
       },
       failed: {
         subtitle: 'Quay lại tab gốc để tiếp tục.',
-        title: 'Liên kết xác minh không hợp lệ'
+        title: 'Liên kết xác minh không hợp lệ',
       },
       formSubtitle: 'Sử dụng liên kết xác minh đã gửi đến email của bạn',
       formTitle: 'Liên kết xác minh',
       loading: {
         subtitle: 'Bạn sẽ được chuyển hướng sớm',
-        title: 'Đang đăng nhập...'
+        title: 'Đang đăng nhập...',
       },
       resendButton: 'Không nhận được liên kết? Gửi lại',
       subtitle: 'để tiếp tục đến {{applicationName}}',
       title: 'Kiểm tra email',
       unusedTab: {
-        title: 'Bạn có thể đóng tab này'
+        title: 'Bạn có thể đóng tab này',
       },
       verified: {
         subtitle: 'Bạn sẽ được chuyển hướng sớm',
-        title: 'Đăng nhập thành công'
+        title: 'Đăng nhập thành công',
       },
       verifiedSwitchTab: {
         subtitle: 'Quay lại tab gốc để tiếp tục',
         subtitleNewTab: 'Quay lại tab mới được mở để tiếp tục',
-        titleNewTab: 'Đăng nhập trên tab khác'
-      }
+        titleNewTab: 'Đăng nhập trên tab khác',
+      },
     },
     forgotPassword: {
       formTitle: 'Mã xác minh mật khẩu',
@@ -635,52 +617,51 @@ export const viVN: LocalizationResource = {
       subtitle: 'để đặt lại mật khẩu của bạn',
       subtitle_email: 'Đầu tiên, nhập mã đã gửi đến email của bạn',
       subtitle_phone: 'Đầu tiên, nhập mã đã gửi đến điện thoại của bạn',
-      title: 'Đặt lại mật khẩu'
+      title: 'Đặt lại mật khẩu',
     },
     forgotPasswordAlternativeMethods: {
       blockButton__resetPassword: 'Đặt lại mật khẩu',
       label__alternativeMethods: 'Hoặc, đăng nhập với phương thức khác',
-      title: 'Quên mật khẩu?'
+      title: 'Quên mật khẩu?',
     },
     noAvailableMethods: {
       message: 'Không thể tiếp tục đăng nhập. Không có yếu tố xác thực phù hợp được cấu hình',
       subtitle: 'Đã xảy ra lỗi',
-      title: 'Không thể đăng nhập'
+      title: 'Không thể đăng nhập',
     },
     passkey: {
       subtitle:
         'Sử dụng mã passkey xác minh danh tính của bạn. Thiết bị của bạn có thể yêu cầu vân tay, khuôn mặt hoặc khóa màn hình.',
-      title: 'Sử dụng mã passkey'
+      title: 'Sử dụng mã passkey',
     },
     password: {
       actionLink: 'Sử dụng phương thức khác',
       subtitle: 'Nhập mật khẩu được liên kết với tài khoản của bạn',
-      title: 'Nhập mật khẩu'
+      title: 'Nhập mật khẩu',
     },
     passwordPwned: {
-      title: 'Mật khẩu bị rò rỉ'
+      title: 'Mật khẩu bị rò rỉ',
     },
     phoneCode: {
       formTitle: 'Mã xác minh',
       resendButton: 'Không nhận được mã? Gửi lại',
       subtitle: 'để tiếp tục đến {{applicationName}}',
-      title: 'Kiểm tra điện thoại'
+      title: 'Kiểm tra điện thoại',
     },
     phoneCodeMfa: {
       formTitle: 'Mã xác minh',
       resendButton: 'Không nhận được mã? Gửi lại',
       subtitle: 'để tiếp tục đến {{applicationName}}',
-      title: 'Kiểm tra điện thoại'
+      title: 'Kiểm tra điện thoại',
     },
     resetPassword: {
       formButtonPrimary: 'Đặt lại mật khẩu',
       requiredMessage: 'Vì lý do bảo mật, việc đặt lại mật khẩu là bắt buộc.',
-      successMessage:
-        'Mật khẩu của bạn đã được thay đổi thành công. Đang đăng nhập, vui lòng chờ một lát.',
-      title: 'Đặt mật khẩu mới'
+      successMessage: 'Mật khẩu của bạn đã được thay đổi thành công. Đang đăng nhập, vui lòng chờ một lát.',
+      title: 'Đặt mật khẩu mới',
     },
     resetPasswordMfa: {
-      detailsLabel: 'Chúng tôi cần xác minh danh tính của bạn trước khi đặt lại mật khẩu.'
+      detailsLabel: 'Chúng tôi cần xác minh danh tính của bạn trước khi đặt lại mật khẩu.',
     },
     start: {
       actionLink: 'Đăng ký',
@@ -696,93 +677,89 @@ export const viVN: LocalizationResource = {
         actionLink: 'Sử dụng phương thức khác',
         label: '{{provider}} số điện thoại',
         subtitle: 'Nhập số điện thoại của bạn để nhận mã xác minh trên {{provider}}.',
-        title: 'Đăng nhập vào {{applicationName}} với {{provider}}'
+        title: 'Đăng nhập vào {{applicationName}} với {{provider}}',
       },
       subtitle: 'Chào mừng trở lại! Vui lòng đăng nhập để tiếp tục',
       subtitleCombined: undefined,
       title: 'Đăng nhập vào {{applicationName}}',
-      titleCombined: 'Tiếp tục đến {{applicationName}}'
+      titleCombined: 'Tiếp tục đến {{applicationName}}',
     },
     totpMfa: {
       formTitle: 'Mã xác minh',
       subtitle: 'Để tiếp tục, vui lòng nhập mã xác minh được tạo bởi ứng dụng xác thực của bạn',
-      title: 'Xác thực hai bước'
-    }
+      title: 'Xác thực hai bước',
+    },
   },
   signInEnterPasswordTitle: 'Nhập mật khẩu',
   signUp: {
     alternativePhoneCodeProvider: {
       resendButton: 'Không nhận được mã? Gửi lại',
       subtitle: 'Nhập mã xác minh đã gửi đến {{provider}}',
-      title: 'Xác minh {{provider}}'
+      title: 'Xác minh {{provider}}',
     },
     continue: {
       actionLink: 'Đăng nhập',
       actionText: 'Đã có tài khoản?',
       subtitle: 'Vui lòng điền các chi tiết còn lại để tiếp tục.',
-      title: 'Điền các trường còn thiếu'
+      title: 'Điền các trường còn thiếu',
     },
     emailCode: {
       formSubtitle: 'Nhập mã xác minh đã gửi đến email của bạn',
       formTitle: 'Mã xác minh',
       resendButton: 'Không nhận được mã? Gửi lại',
       subtitle: 'Nhập mã xác minh đã gửi đến email của bạn',
-      title: 'Xác minh email'
+      title: 'Xác minh email',
     },
     emailLink: {
       clientMismatch: {
-        subtitle:
-          'Để tiếp tục, mở liên kết xác minh trên thiết bị và trình duyệt từ đó bạn đã khởi động đăng ký',
-        title: 'Liên kết xác minh không hợp lệ cho thiết bị này'
+        subtitle: 'Để tiếp tục, mở liên kết xác minh trên thiết bị và trình duyệt từ đó bạn đã khởi động đăng ký',
+        title: 'Liên kết xác minh không hợp lệ cho thiết bị này',
       },
       formSubtitle: 'Sử dụng liên kết xác minh đã gửi đến email của bạn',
       formTitle: 'Liên kết xác minh',
       loading: {
-        title: 'Đang đăng ký...'
+        title: 'Đang đăng ký...',
       },
       resendButton: 'Không nhận được liên kết? Gửi lại',
       subtitle: 'để tiếp tục đến {{applicationName}}',
       title: 'Xác minh email',
       verified: {
-        title: 'Đăng ký thành công'
+        title: 'Đăng ký thành công',
       },
       verifiedSwitchTab: {
         subtitle: 'Quay lại tab mới được mở để tiếp tục',
         subtitleNewTab: 'Quay lại tab trước để tiếp tục',
-        title: 'Xác minh email thành công'
-      }
+        title: 'Xác minh email thành công',
+      },
     },
     legalConsent: {
       checkbox: {
-        label__onlyPrivacyPolicy:
-          'Tôi đồng ý với {{ privacyPolicyLink || link("Chính sách bảo mật") }}',
-        label__onlyTermsOfService:
-          'Tôi đồng ý với {{ termsOfServiceLink || link("Điều khoản dịch vụ") }}',
+        label__onlyPrivacyPolicy: 'Tôi đồng ý với {{ privacyPolicyLink || link("Chính sách bảo mật") }}',
+        label__onlyTermsOfService: 'Tôi đồng ý với {{ termsOfServiceLink || link("Điều khoản dịch vụ") }}',
         label__termsOfServiceAndPrivacyPolicy:
-          'Tôi đồng ý với {{ termsOfServiceLink || link("Điều khoản dịch vụ") }} và {{ privacyPolicyLink || link("Chính sách bảo mật") }}'
+          'Tôi đồng ý với {{ termsOfServiceLink || link("Điều khoản dịch vụ") }} và {{ privacyPolicyLink || link("Chính sách bảo mật") }}',
       },
       continue: {
         subtitle: 'Vui lòng đọc và đồng ý với các điều khoản để tiếp tục',
-        title: 'Đồng ý với điều khoản'
-      }
+        title: 'Đồng ý với điều khoản',
+      },
     },
     phoneCode: {
       formSubtitle: 'Nhập mã xác minh đã gửi đến số điện thoại của bạn',
       formTitle: 'Mã xác minh',
       resendButton: 'Không nhận được mã? Gửi lại',
       subtitle: 'Nhập mã xác minh đã gửi đến số điện thoại của bạn',
-      title: 'Xác minh điện thoại'
+      title: 'Xác minh điện thoại',
     },
     restrictedAccess: {
       actionLink: 'Đăng nhập',
       actionText: 'Đã có tài khoản?',
       blockButton__emailSupport: 'Email hỗ trợ',
       blockButton__joinWaitlist: 'Tham gia danh sách chờ',
-      subtitle:
-        'Đăng ký hiện không khả dụng. Nếu bạn tin rằng bạn có quyền truy cập, vui lòng liên hệ hỗ trợ.',
+      subtitle: 'Đăng ký hiện không khả dụng. Nếu bạn tin rằng bạn có quyền truy cập, vui lòng liên hệ hỗ trợ.',
       subtitleWaitlist:
         'Đăng ký hiện không khả dụng. Để biết thông tin sớm nhất khi chúng tôi khởi chạy, hãy tham gia danh sách chờ.',
-      title: 'Quyền truy cập bị giới hạn'
+      title: 'Quyền truy cập bị giới hạn',
     },
     start: {
       actionLink: 'Đăng nhập',
@@ -793,13 +770,13 @@ export const viVN: LocalizationResource = {
         actionLink: 'Sử dụng phương thức khác',
         label: '{{provider}} số điện thoại',
         subtitle: 'Nhập số điện thoại của bạn để nhận mã xác minh trên {{provider}}.',
-        title: 'Đăng ký vào {{applicationName}} với {{provider}}'
+        title: 'Đăng ký vào {{applicationName}} với {{provider}}',
       },
       subtitle: 'Chào mừng! Vui lòng điền các chi tiết để bắt đầu.',
       subtitleCombined: 'Chào mừng! Vui lòng điền các chi tiết để bắt đầu.',
       title: 'Tạo tài khoản của bạn',
-      titleCombined: 'Tạo tài khoản của bạn'
-    }
+      titleCombined: 'Tạo tài khoản của bạn',
+    },
   },
   socialButtonsBlockButton: 'Tiếp tục với {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
@@ -831,8 +808,7 @@ export const viVN: LocalizationResource = {
     form_password_size_in_bytes_exceeded: undefined,
     form_password_validation_failed: undefined,
     form_username_invalid_character: undefined,
-    form_username_invalid_length:
-      'Tên người dùng của bạn phải có giữa {{min_length}} và {{max_length}} ký tự.',
+    form_username_invalid_length: 'Tên người dùng của bạn phải có giữa {{min_length}} và {{max_length}} ký tự.',
     identification_deletion_failed: undefined,
     not_allowed_access: undefined,
     organization_domain_blocked: undefined,
@@ -842,8 +818,7 @@ export const viVN: LocalizationResource = {
     organization_minimum_permissions_needed: undefined,
     passkey_already_exists: 'Mã passkey đã được đăng ký với thiết bị này.',
     passkey_not_supported: 'Mã passkey không được hỗ trợ trên thiết bị này.',
-    passkey_pa_not_supported:
-      'Đăng ký yêu cầu một bộ xác thực nền tảng nhưng thiết bị không hỗ trợ nó.',
+    passkey_pa_not_supported: 'Đăng ký yêu cầu một bộ xác thực nền tảng nhưng thiết bị không hỗ trợ nó.',
     passkey_registration_cancelled: 'Đăng ký mã passkey đã bị hủy hoặc hết hạn.',
     passkey_retrieval_cancelled: 'Xác minh mã passkey đã bị hủy hoặc hết hạn.',
     passwordComplexity: {
@@ -853,15 +828,13 @@ export const viVN: LocalizationResource = {
       requireNumbers: 'một số',
       requireSpecialCharacter: 'một ký tự đặc biệt',
       requireUppercase: 'một chữ cái viết hoa',
-      sentencePrefix: 'Mật khẩu của bạn phải chứa'
+      sentencePrefix: 'Mật khẩu của bạn phải chứa',
     },
     phone_number_exists: undefined,
     session_exists: undefined,
-    web3_missing_identifier:
-      'Không tìm thấy phần mở rộng Web3 Wallet. Vui lòng cài đặt một phần mở rộng để tiếp tục.',
+    web3_missing_identifier: 'Không tìm thấy phần mở rộng Web3 Wallet. Vui lòng cài đặt một phần mở rộng để tiếp tục.',
     zxcvbn: {
-      couldBeStronger:
-        'Mật khẩu của bạn hoạt động, nhưng có thể mạnh hơn. Hãy thử thêm nhiều ký tự.',
+      couldBeStronger: 'Mật khẩu của bạn hoạt động, nhưng có thể mạnh hơn. Hãy thử thêm nhiều ký tự.',
       goodPassword: 'Mật khẩu của bạn đáp ứng tất cả các yêu cầu cần thiết.',
       notEnough: 'Mật khẩu của bạn không đủ mạnh.',
       suggestions: {
@@ -871,16 +844,14 @@ export const viVN: LocalizationResource = {
         capitalization: 'Viết hoa nhiều hơn chữ cái đầu tiên.',
         dates: 'Tránh ngày và năm mà bạn liên quan đến.',
         l33t: "Tránh các thay thế chữ cái dễ dự đoán như '@' thay vì 'a'.",
-        longerKeyboardPattern:
-          'Sử dụng các khuôn mẫu bàn phím dài hơn và thay đổi hướng gõ nhiều lần.',
-        noNeed:
-          'Bạn có thể tạo mật khẩu mạnh mà không sử dụng các ký tự đặc biệt, số hoặc chữ cái viết hoa.',
+        longerKeyboardPattern: 'Sử dụng các khuôn mẫu bàn phím dài hơn và thay đổi hướng gõ nhiều lần.',
+        noNeed: 'Bạn có thể tạo mật khẩu mạnh mà không sử dụng các ký tự đặc biệt, số hoặc chữ cái viết hoa.',
         pwned: 'Nếu bạn sử dụng mật khẩu này ở nơi khác, bạn nên thay đổi nó.',
         recentYears: 'Tránh năm gần đây.',
         repeated: 'Tránh các từ và ký tự lặp lại.',
         reverseWords: 'Tránh các từ viết ngược của các từ thông dụng.',
         sequences: 'Tránh các chuỗi ký tự thông dụng.',
-        useWords: 'Sử dụng nhiều từ, nhưng tránh các cụm từ thông dụng.'
+        useWords: 'Sử dụng nhiều từ, nhưng tránh các cụm từ thông dụng.',
       },
       warnings: {
         common: 'Đây là một mật khẩu thường được sử dụng.',
@@ -898,19 +869,19 @@ export const viVN: LocalizationResource = {
         topHundred: 'Đây là một mật khẩu thường được sử dụng.',
         topTen: 'Đây là một mật khẩu thường được sử dụng.',
         userInputs: 'Không nên có bất kỳ dữ liệu cá nhân hoặc liên quan đến trang nào.',
-        wordByItself: 'Các từ đơn dễ dự đoán.'
-      }
-    }
+        wordByItself: 'Các từ đơn dễ dự đoán.',
+      },
+    },
   },
   userButton: {
     action__addAccount: 'Thêm tài khoản',
     action__manageAccount: 'Quản lý tài khoản',
     action__signOut: 'Đăng xuất',
-    action__signOutAll: 'Đăng xuất tất cả tài khoản'
+    action__signOutAll: 'Đăng xuất tất cả tài khoản',
   },
   userProfile: {
     apiKeysPage: {
-      title: 'Khoá API'
+      title: 'Khoá API',
     },
     backupCodePage: {
       actionLabel__copied: 'Đã sao chép!',
@@ -926,12 +897,12 @@ export const viVN: LocalizationResource = {
       successSubtitle:
         'Bạn có thể sử dụng một trong số chúng để đăng nhập vào tài khoản của bạn, nếu bạn mất quyền truy cập vào thiết bị xác thực của bạn.',
       title: 'Thêm xác minh mã sao lưu',
-      title__codelist: 'Mã sao lưu'
+      title__codelist: 'Mã sao lưu',
     },
     billingPage: {
       paymentHistorySection: {
         empty: 'Không có lịch sử thanh toán',
-        notFound: 'Không tìm thấy lịch sử thanh toán'
+        notFound: 'Không tìm thấy lịch sử thanh toán',
         tableHeader__amount: 'Số tiền',
         tableHeader__date: 'Ngày',
         tableHeader__status: 'Trạng thái',
@@ -950,15 +921,15 @@ export const viVN: LocalizationResource = {
           messageLine2:
             'Bạn sẽ không còn thể sử dụng nguồn thanh toán này và bất kỳ đăng ký lặp lại nào phụ thuộc vào nó sẽ không còn hoạt động.',
           successMessage: '{{paymentSource}} đã bị xóa khỏi tài khoản của bạn.',
-          title: 'Xóa phương thức thanh toán'
+          title: 'Xóa phương thức thanh toán',
         },
-        title: 'Phương thức thanh toán'
+        title: 'Phương thức thanh toán',
       },
       start: {
         headerTitle__payments: 'Thanh toán',
         headerTitle__plans: 'Gói',
         headerTitle__statements: 'Báo cáo',
-        headerTitle__subscriptions: 'Đăng ký'
+        headerTitle__subscriptions: 'Đăng ký',
       },
       statementsSection: {
         empty: 'Không có báo cáo để hiển thị',
@@ -969,7 +940,7 @@ export const viVN: LocalizationResource = {
         tableHeader__amount: 'Số tiền',
         tableHeader__date: 'Ngày',
         title: 'Báo cáo',
-        totalPaid: 'Tổng thanh toán'
+        totalPaid: 'Tổng thanh toán',
       },
       subscriptionsListSection: {
         actionLabel__newSubscription: 'Đăng ký gói',
@@ -977,15 +948,15 @@ export const viVN: LocalizationResource = {
         tableHeader__edit: 'Sửa',
         tableHeader__plan: 'Gói',
         tableHeader__startDate: 'Ngày bắt đầu',
-        title: 'Đăng ký'
+        title: 'Đăng ký',
       },
       subscriptionsSection: {
-        actionLabel__default: 'Quản lý'
+        actionLabel__default: 'Quản lý',
       },
       switchPlansSection: {
-        title: 'Chuyển gói'
+        title: 'Chuyển gói',
       },
-      title: 'Thanh toán'
+      title: 'Thanh toán',
     },
     connectedAccountPage: {
       formHint: 'Chọn nhà cung cấp để kết nối tài khoản của bạn.',
@@ -995,18 +966,18 @@ export const viVN: LocalizationResource = {
         messageLine2:
           'Bạn sẽ không còn thể sử dụng tài khoản kết nối này và bất kỳ tính năng phụ thuộc nào sẽ không còn hoạt động.',
         successMessage: '{{connectedAccount}} đã bị xóa khỏi tài khoản của bạn.',
-        title: 'Xóa tài khoản kết nối'
+        title: 'Xóa tài khoản kết nối',
       },
       socialButtonsBlockButton: '{{provider|titleize}}',
       successMessage: 'Nhà cung cấp đã được thêm vào tài khoản của bạn',
-      title: 'Thêm tài khoản kết nối'
+      title: 'Thêm tài khoản kết nối',
     },
     deletePage: {
       actionDescription: 'Nhập "Xóa tài khoản" dưới đây để tiếp tục.',
       confirm: 'Xóa tài khoản',
       messageLine1: 'Bạn có chắc chắn muốn xóa tài khoản của bạn?',
       messageLine2: 'Hành động này là vĩnh viễn và không thể hoàn tác.',
-      title: 'Xóa tài khoản'
+      title: 'Xóa tài khoản',
     },
     emailAddressPage: {
       emailCode: {
@@ -1014,29 +985,28 @@ export const viVN: LocalizationResource = {
         formSubtitle: 'Nhập mã xác thực được gửi đến {{identifier}}',
         formTitle: 'Mã xác thực',
         resendButton: 'Không nhận được mã? Gửi lại',
-        successMessage: 'Email {{identifier}} đã được thêm vào tài khoản của bạn.'
+        successMessage: 'Email {{identifier}} đã được thêm vào tài khoản của bạn.',
       },
       emailLink: {
         formHint: 'Một email chứa liên kết xác thực sẽ được gửi đến địa chỉ email này.',
         formSubtitle: 'Nhấp vào liên kết xác thực trong email được gửi đến {{identifier}}',
         formTitle: 'Liên kết xác thực',
         resendButton: 'Không nhận được liên kết? Gửi lại',
-        successMessage: 'Email {{identifier}} đã được thêm vào tài khoản của bạn.'
+        successMessage: 'Email {{identifier}} đã được thêm vào tài khoản của bạn.',
       },
       enterpriseSSOLink: {
         formButton: 'Nhấp để đăng nhập',
-        formSubtitle: 'Hoàn thành đăng nhập với {{identifier}}'
+        formSubtitle: 'Hoàn thành đăng nhập với {{identifier}}',
       },
-      formHint:
-        'Bạn cần xác thực địa chỉ email này trước khi nó có thể được thêm vào tài khoản của bạn.',
+      formHint: 'Bạn cần xác thực địa chỉ email này trước khi nó có thể được thêm vào tài khoản của bạn.',
       removeResource: {
         messageLine1: '{{identifier}} sẽ bị xóa khỏi tài khoản này.',
         messageLine2: 'Bạn sẽ không còn thể đăng nhập bằng địa chỉ email này.',
         successMessage: '{{emailAddress}} đã bị xóa khỏi tài khoản của bạn.',
-        title: 'Xóa địa chỉ email'
+        title: 'Xóa địa chỉ email',
       },
       title: 'Thêm địa chỉ email',
-      verifyTitle: 'Xác thực địa chỉ email'
+      verifyTitle: 'Xác thực địa chỉ email',
     },
     formButtonPrimary__add: 'Thêm',
     formButtonPrimary__continue: 'Tiếp tục',
@@ -1046,7 +1016,7 @@ export const viVN: LocalizationResource = {
     formButtonReset: 'Hủy',
     mfaPage: {
       formHint: 'Chọn phương thức để thêm.',
-      title: 'Thêm xác thực hai bước'
+      title: 'Thêm xác thực hai bước',
     },
     mfaPhoneCodePage: {
       backButton: 'Sử dụng số điện thoại hiện có',
@@ -1055,18 +1025,17 @@ export const viVN: LocalizationResource = {
         messageLine1: '{{identifier}} sẽ không còn nhận được mã xác thực khi đăng nhập.',
         messageLine2: 'Tài khoản của bạn có thể không an toàn hơn. Bạn có chắc chắn muốn tiếp tục?',
         successMessage: 'Xác thực mã SMS hai bước đã bị xóa cho {{mfaPhoneCode}}',
-        title: 'Xóa xác thực hai bước'
+        title: 'Xóa xác thực hai bước',
       },
       subtitle__availablePhoneNumbers:
         'Chọn số điện thoại hiện có để đăng ký xác thực mã SMS hai bước hoặc thêm số điện thoại mới.',
       subtitle__unavailablePhoneNumbers:
         'Không có số điện thoại nào để đăng ký xác thực mã SMS hai bước, vui lòng thêm số điện thoại mới.',
-      successMessage1:
-        'Khi đăng nhập, bạn sẽ cần nhập mã xác thực được gửi đến số điện thoại này làm bước thêm.',
+      successMessage1: 'Khi đăng nhập, bạn sẽ cần nhập mã xác thực được gửi đến số điện thoại này làm bước thêm.',
       successMessage2:
         'Lưu các mã sao lưu này và lưu trữ chúng ở một nơi an toàn. Nếu bạn mất quyền truy cập vào thiết bị xác thực của bạn, bạn có thể sử dụng mã sao lưu để đăng nhập.',
       successTitle: 'Xác thực mã SMS đã được bật',
-      title: 'Thêm xác thực mã SMS'
+      title: 'Thêm xác thực mã SMS',
     },
     mfaTOTPPage: {
       authenticatorApp: {
@@ -1079,20 +1048,19 @@ export const viVN: LocalizationResource = {
         inputLabel__unableToScan1:
           'Đảm bảo mã thời gian hoặc mã một lần đã được bật, sau đó hoàn thành việc kết nối tài khoản của bạn.',
         inputLabel__unableToScan2:
-          'Ngoài ra, nếu ứng dụng xác thực của bạn hỗ trợ TOTP URIs, bạn cũng có thể sao chép URI đầy đủ.'
+          'Ngoài ra, nếu ứng dụng xác thực của bạn hỗ trợ TOTP URIs, bạn cũng có thể sao chép URI đầy đủ.',
       },
       removeResource: {
-        messageLine1:
-          'Mã xác thực từ ứng dụng xác thực này sẽ không còn được yêu cầu khi đăng nhập.',
+        messageLine1: 'Mã xác thực từ ứng dụng xác thực này sẽ không còn được yêu cầu khi đăng nhập.',
         messageLine2: 'Tài khoản của bạn có thể không an toàn hơn. Bạn có chắc chắn muốn tiếp tục?',
         successMessage: 'Xác thực hai bước qua ứng dụng xác thực đã bị xóa.',
-        title: 'Xóa xác thực hai bước'
+        title: 'Xóa xác thực hai bước',
       },
       successMessage:
         'Xác thực hai bước đã được bật. Khi đăng nhập, bạn sẽ cần nhập mã xác thực từ ứng dụng xác thực này làm bước thêm.',
       title: 'Thêm ứng dụng xác thực',
       verifySubtitle: 'Nhập mã xác thực được tạo bởi ứng dụng xác thực của bạn',
-      verifyTitle: 'Mã xác thực'
+      verifyTitle: 'Mã xác thực',
     },
     mobileButton__menu: 'Menu',
     navbar: {
@@ -1101,15 +1069,15 @@ export const viVN: LocalizationResource = {
       billing: 'Thanh toán',
       description: 'Quản lý thông tin tài khoản của bạn.',
       security: 'Bảo mật',
-      title: 'Tài khoản'
+      title: 'Tài khoản',
     },
     passkeyScreen: {
       removeResource: {
         messageLine1: '{{name}} sẽ bị xóa khỏi tài khoản này.',
-        title: 'Xóa passkey'
+        title: 'Xóa passkey',
       },
       subtitle__rename: 'Bạn có thể thay đổi tên passkey để dễ dàng tìm kiếm.',
-      title__rename: 'Đổi tên Passkey'
+      title__rename: 'Đổi tên Passkey',
     },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
@@ -1120,7 +1088,7 @@ export const viVN: LocalizationResource = {
       successMessage__signOutOfOtherSessions: 'Tất cả các thiết bị khác đã được đăng xuất.',
       successMessage__update: 'Mật khẩu của bạn đã được cập nhật.',
       title__set: 'Thiết lập mật khẩu',
-      title__update: 'Cập nhật mật khẩu'
+      title__update: 'Cập nhật mật khẩu',
     },
     phoneNumberPage: {
       infoText:
@@ -1129,30 +1097,29 @@ export const viVN: LocalizationResource = {
         messageLine1: '{{identifier}} sẽ bị xóa khỏi tài khoản này.',
         messageLine2: 'Bạn sẽ không còn thể đăng nhập bằng số điện thoại này.',
         successMessage: '{{phoneNumber}} đã bị xóa khỏi tài khoản của bạn.',
-        title: 'Xóa số điện thoại'
+        title: 'Xóa số điện thoại',
       },
       successMessage: '{{identifier}} đã được thêm vào tài khoản của bạn.',
       title: 'Thêm số điện thoại',
       verifySubtitle: 'Nhập mã xác thực được gửi đến {{identifier}}',
-      verifyTitle: 'Xác thực số điện thoại'
+      verifyTitle: 'Xác thực số điện thoại',
     },
     plansPage: {
-      title: 'Gói'
+      title: 'Gói',
     },
     profilePage: {
       fileDropAreaHint: 'Kích thước khuyến nghị 1:1, tối đa 10MB.',
       imageFormDestructiveActionSubtitle: 'Xóa',
       imageFormSubtitle: 'Tải lên',
       imageFormTitle: 'Ảnh hồ sơ',
-      readonly:
-        'Thông tin hồ sơ của bạn đã được cung cấp thông qua kết nối doanh nghiệp và không thể được chỉnh sửa.',
+      readonly: 'Thông tin hồ sơ của bạn đã được cung cấp thông qua kết nối doanh nghiệp và không thể được chỉnh sửa.',
       successMessage: 'Hồ sơ của bạn đã được cập nhật.',
-      title: 'Cập nhật hồ sơ'
+      title: 'Cập nhật hồ sơ',
     },
     start: {
       activeDevicesSection: {
         destructiveAction: 'Đăng xuất khỏi thiết bị',
-        title: 'Thiết bị hoạt động'
+        title: 'Thiết bị hoạt động',
       },
       connectedAccountsSection: {
         actionLabel__connectionFailed: 'Kết nối lại',
@@ -1162,11 +1129,11 @@ export const viVN: LocalizationResource = {
         subtitle__disconnected: 'Tài khoản này đã bị ngắt kết nối.',
         subtitle__reauthorize:
           'Các phạm vi được yêu cầu đã được cập nhật, và bạn có thể đang gặp phải chức năng giới hạn. Vui lòng xác thực lại ứng dụng này để tránh bất kỳ vấn đề nào',
-        title: 'Tài khoản kết nối'
+        title: 'Tài khoản kết nối',
       },
       dangerSection: {
         deleteAccountButton: 'Xóa tài khoản',
-        title: 'Xóa tài khoản'
+        title: 'Xóa tài khoản',
       },
       emailAddressesSection: {
         destructiveAction: 'Xóa email',
@@ -1174,10 +1141,10 @@ export const viVN: LocalizationResource = {
         detailsAction__primary: 'Hoàn thành xác thực',
         detailsAction__unverified: 'Xác thực',
         primaryButton: 'Thêm địa chỉ email',
-        title: 'Địa chỉ email'
+        title: 'Địa chỉ email',
       },
       enterpriseAccountsSection: {
-        title: 'Tài khoản doanh nghiệp'
+        title: 'Tài khoản doanh nghiệp',
       },
       headerTitle__account: 'Chi tiết hồ sơ',
       headerTitle__security: 'Bảo mật',
@@ -1187,29 +1154,29 @@ export const viVN: LocalizationResource = {
           headerTitle: 'Mã sao lưu',
           subtitle__regenerate:
             'Lấy một bộ mã sao lưu mới và an toàn. Các mã sao lưu trước đó sẽ bị xóa và không thể được sử dụng.',
-          title__regenerate: 'Tạo lại mã sao lưu'
+          title__regenerate: 'Tạo lại mã sao lưu',
         },
         phoneCode: {
           actionLabel__setDefault: 'Đặt làm chính',
-          destructiveActionLabel: 'Xóa'
+          destructiveActionLabel: 'Xóa',
         },
         primaryButton: 'Thêm xác thực hai bước',
         title: 'Xác thực hai bước',
         totp: {
           destructiveActionTitle: 'Xóa',
-          headerTitle: 'Ứng dụng xác thực'
-        }
+          headerTitle: 'Ứng dụng xác thực',
+        },
       },
       passkeysSection: {
         menuAction__destructive: 'Xóa',
         menuAction__rename: 'Đổi tên',
         primaryButton: 'Thêm passkey',
-        title: 'Passkeys'
+        title: 'Passkeys',
       },
       passwordSection: {
         primaryButton__setPassword: 'Thiết lập mật khẩu',
         primaryButton__updatePassword: 'Cập nhật mật khẩu',
-        title: 'Mật khẩu'
+        title: 'Mật khẩu',
       },
       phoneNumbersSection: {
         destructiveAction: 'Xóa số điện thoại',
@@ -1217,56 +1184,55 @@ export const viVN: LocalizationResource = {
         detailsAction__primary: 'Hoàn thành xác thực',
         detailsAction__unverified: 'Xác thực số điện thoại',
         primaryButton: 'Thêm số điện thoại',
-        title: 'Số điện thoại'
+        title: 'Số điện thoại',
       },
       profileSection: {
         primaryButton: 'Cập nhật hồ sơ',
-        title: 'Hồ sơ'
+        title: 'Hồ sơ',
       },
       usernameSection: {
         primaryButton__setUsername: 'Thiết lập tên người dùng',
         primaryButton__updateUsername: 'Cập nhật tên người dùng',
-        title: 'Tên người dùng'
+        title: 'Tên người dùng',
       },
       web3WalletsSection: {
         destructiveAction: 'Xóa ví',
         detailsAction__nonPrimary: 'Đặt làm chính',
         primaryButton: 'Kết nối ví',
-        title: 'Ví Web3'
-      }
+        title: 'Ví Web3',
+      },
     },
     usernamePage: {
       successMessage: 'Tên người dùng của bạn đã được cập nhật.',
       title__set: 'Thiết lập tên người dùng',
-      title__update: 'Cập nhật tên người dùng'
+      title__update: 'Cập nhật tên người dùng',
     },
     web3WalletPage: {
       removeResource: {
         messageLine1: '{{identifier}} sẽ bị xóa khỏi tài khoản này.',
         messageLine2: 'Bạn sẽ không còn thể đăng nhập bằng ví web3 này.',
         successMessage: '{{web3Wallet}} đã bị xóa khỏi tài khoản của bạn.',
-        title: 'Xóa ví web3'
+        title: 'Xóa ví web3',
       },
       subtitle__availableWallets: 'Chọn một ví web3 để kết nối với tài khoản của bạn.',
       subtitle__unavailableWallets: 'Không có ví web3 nào có sẵn.',
       successMessage: 'Ví đã được thêm vào tài khoản của bạn.',
       title: 'Thêm ví web3',
-      web3WalletButtonsBlockButton: '{{provider|titleize}}'
-    }
+      web3WalletButtonsBlockButton: '{{provider|titleize}}',
+    },
   },
   waitlist: {
     start: {
       actionLink: 'Đăng nhập',
       actionText: 'Đã có quyền truy cập?',
       formButton: 'Tham gia danh sách chờ',
-      subtitle:
-        'Nhập địa chỉ email của bạn và chúng tôi sẽ thông báo khi vị trí của bạn đã sẵn sàng',
-      title: 'Tham gia danh sách chờ'
+      subtitle: 'Nhập địa chỉ email của bạn và chúng tôi sẽ thông báo khi vị trí của bạn đã sẵn sàng',
+      title: 'Tham gia danh sách chờ',
     },
     success: {
       message: 'Bạn sẽ được chuyển hướng sớm...',
       subtitle: 'Chúng tôi sẽ liên hệ khi vị trí của bạn đã sẵn sàng',
-      title: 'Cảm ơn bạn đã tham gia danh sách chờ!'
-    }
-  }
-} as const
+      title: 'Cảm ơn bạn đã tham gia danh sách chờ!',
+    },
+  },
+} as const;
