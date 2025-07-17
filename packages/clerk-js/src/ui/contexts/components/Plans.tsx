@@ -1,12 +1,11 @@
 import {
   __experimental_usePaymentAttempts,
   __experimental_usePaymentMethods,
+  __experimental_usePlans,
   __experimental_useStatements,
   __experimental_useSubscriptionItems,
   useClerk,
-  useOrganization,
   useSession,
-  useUser,
 } from '@clerk/shared/react';
 import type {
   Appearance,
@@ -15,29 +14,12 @@ import type {
   CommerceSubscriptionResource,
 } from '@clerk/types';
 import { useCallback, useMemo } from 'react';
-import useSWR from 'swr';
 
 import { getClosestProfileScrollBox } from '@/ui/utils/getClosestProfileScrollBox';
 
 import type { LocalizationKey } from '../../localization';
 import { localizationKeys } from '../../localization';
 import { useSubscriberTypeContext } from './SubscriberType';
-
-const dedupeOptions = {
-  dedupingInterval: 1_000 * 60, // 1 minute,
-  keepPreviousData: true,
-};
-
-export const usePaymentSourcesCacheKey = () => {
-  const { organization } = useOrganization();
-  const { user } = useUser();
-  const subscriberType = useSubscriberTypeContext();
-
-  return {
-    key: `commerce-payment-sources`,
-    resourceId: subscriberType === 'org' ? organization?.id : user?.id,
-  };
-};
 
 // TODO(@COMMERCE): Rename payment sources to payment methods at the API level
 export const usePaymentMethods = () => {
@@ -82,18 +64,16 @@ export const useSubscriptions = () => {
   });
 };
 
-export const usePlans = () => {
-  const { billing } = useClerk();
+export const usePlans = (params?: { mode: 'cache' }) => {
   const subscriberType = useSubscriberTypeContext();
 
-  return useSWR(
-    {
-      key: `commerce-plans`,
-      args: { subscriberType },
-    },
-    ({ args }) => billing.getPlans(args),
-    dedupeOptions,
-  );
+  return __experimental_usePlans({
+    for: subscriberType === 'org' ? 'organization' : 'user',
+    initialPage: 1,
+    pageSize: 50,
+    keepPreviousData: true,
+    __experimental_mode: params?.mode,
+  });
 };
 
 type HandleSelectPlanProps = {
@@ -125,10 +105,7 @@ export const usePlansContext = () => {
   const { data: subscriptions, revalidate: revalidateSubscriptions } = useSubscriptions();
 
   // Invalidates cache but does not fetch immediately
-  const { data: plans, mutate: mutatePlans } = useSWR<Awaited<ReturnType<typeof clerk.billing.getPlans>>>({
-    key: `commerce-plans`,
-    args: { subscriberType },
-  });
+  const { data: plans, revalidate: revalidatePlans } = usePlans({ mode: 'cache' });
 
   // Invalidates cache but does not fetch immediately
   const { revalidate: revalidateStatements } = useStatements({ mode: 'cache' });
@@ -138,10 +115,10 @@ export const usePlansContext = () => {
   const revalidateAll = useCallback(() => {
     // Revalidate the plans and subscriptions
     void revalidateSubscriptions();
-    void mutatePlans();
+    void revalidatePlans();
     void revalidateStatements();
     void revalidatePaymentSources();
-  }, [revalidateSubscriptions, mutatePlans, revalidateStatements, revalidatePaymentSources]);
+  }, [revalidateSubscriptions, revalidatePlans, revalidateStatements, revalidatePaymentSources]);
 
   // should the default plan be shown as active
   const isDefaultPlanImplicitlyActiveOrUpcoming = useMemo(() => {
