@@ -1,5 +1,15 @@
 # Change Log
 
+## 5.35.3
+
+### Patch Changes
+
+- Ensure proper typing for `SignUpButton` and only allow `unsafeMetadata={...}` when `mode="modal"` ([#6340](https://github.com/clerk/javascript/pull/6340)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`d2f6f9e`](https://github.com/clerk/javascript/commit/d2f6f9e02036a4288916fcce14f24be5d56561c4), [`a329836`](https://github.com/clerk/javascript/commit/a329836a6c64f0a551a277ccae07043456a70523), [`6041c39`](https://github.com/clerk/javascript/commit/6041c39a31e787a6065dbc3f21e1c569982a06de), [`3f1270d`](https://github.com/clerk/javascript/commit/3f1270db86a21ead0ed6f0bd4f9986485203e973)]:
+  - @clerk/types@4.68.0
+  - @clerk/shared@3.13.0
+
 ## 5.35.2
 
 ### Patch Changes

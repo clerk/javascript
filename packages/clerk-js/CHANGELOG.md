@@ -1,5 +1,29 @@
 # Change Log
 
+## 5.74.0
+
+### Minor Changes
+
+- [Billing Beta] Update `clerk.billing.getPlans()` to return paginated data and introduce the `usePlans()` hook. ([#6327](https://github.com/clerk/javascript/pull/6327)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Marking root of subscription modal with `cl-subscriptionDetails-root`. ([#6333](https://github.com/clerk/javascript/pull/6333)) by [@panteliselef](https://github.com/panteliselef)
+
+- - Render parsed `colorRing` at 15% vs 100% ([#6334](https://github.com/clerk/javascript/pull/6334)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  - Render parsed `colorModalBackdrop` at 73% vs 100%
+  - Ensure `avatarBackground` and `avatarBorder` render with parsed neutral colors when `colorNeutral` is passed in via variables prop
+
+- Improve invalid plan change callout for monthly-only plans ([#6248](https://github.com/clerk/javascript/pull/6248)) by [@aeliox](https://github.com/aeliox)
+
+- Navigate to tasks on `sso-callback` route ([#6324](https://github.com/clerk/javascript/pull/6324)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`d2f6f9e`](https://github.com/clerk/javascript/commit/d2f6f9e02036a4288916fcce14f24be5d56561c4), [`a329836`](https://github.com/clerk/javascript/commit/a329836a6c64f0a551a277ccae07043456a70523), [`6041c39`](https://github.com/clerk/javascript/commit/6041c39a31e787a6065dbc3f21e1c569982a06de), [`3f1270d`](https://github.com/clerk/javascript/commit/3f1270db86a21ead0ed6f0bd4f9986485203e973)]:
+  - @clerk/types@4.68.0
+  - @clerk/shared@3.13.0
+  - @clerk/localizations@3.20.0
+
 ## 5.73.2
 
 ### Patch Changes
