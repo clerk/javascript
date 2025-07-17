@@ -1900,19 +1900,22 @@ export interface HandleEmailLinkVerificationParams {
   onVerifiedOnOtherDevice?: () => void;
 }
 
-type ButtonPropsModal<T extends SignInProps | SignUpProps> = {
+type SignInButtonPropsModal = {
   mode: 'modal';
-  appearance?: T['appearance'];
-  unsafeMetadata?: T extends SignUpProps ? SignUpUnsafeMetadata : never;
+  appearance?: SignInProps['appearance'];
+};
+
+type SignUpButtonPropsModal = {
+  mode: 'modal';
+  appearance?: SignUpProps['appearance'];
+  unsafeMetadata?: SignUpUnsafeMetadata;
 };
 
 type ButtonPropsRedirect = {
   mode?: 'redirect';
 };
 
-type ButtonProps<T extends SignInProps | SignUpProps> = ButtonPropsModal<T> | ButtonPropsRedirect;
-
-export type SignInButtonProps = ButtonProps<SignInProps> &
+export type SignInButtonProps = (SignInButtonPropsModal | ButtonPropsRedirect) &
   Pick<
     SignInProps,
     | 'fallbackRedirectUrl'
@@ -1924,7 +1927,7 @@ export type SignInButtonProps = ButtonProps<SignInProps> &
     | 'oauthFlow'
   >;
 
-export type SignUpButtonProps = ButtonProps<SignUpProps> &
+export type SignUpButtonProps = (SignUpButtonPropsModal | ButtonPropsRedirect) &
   Pick<
     SignUpProps,
     | 'fallbackRedirectUrl'
