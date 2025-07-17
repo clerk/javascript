@@ -419,8 +419,8 @@ importers:
         specifier: catalog:peer-react
         version: 18.3.1(react@18.3.1)
       webextension-polyfill:
-        specifier: ^0.10.0
-        version: 0.10.0
+        specifier: ~0.12.0
+        version: 0.12.0
     devDependencies:
       '@types/chrome':
         specifier: '*'
@@ -14485,8 +14485,8 @@ packages:
     resolution: {integrity: sha512-d2JWLCivmZYTSIoge9MsgFCZrt571BikcWGYkjC1khllbTeDlGqZ2D8vD8E/lJa8WGWbb7Plm8/XJYV7IJHZZw==}
     engines: {node: '>= 8'}
 
-  webextension-polyfill@0.10.0:
-    resolution: {integrity: sha512-c5s35LgVa5tFaHhrZDnr3FpQpjj1BB+RXhLTYUxGqBVN460HkbM8TBtEqdXWbpTKfzwCcjAZVF7zXCYSKtcp9g==}
+  webextension-polyfill@0.12.0:
+    resolution: {integrity: sha512-97TBmpoWJEE+3nFBQ4VocyCdLKfw54rFaJ6EVQYLBCXqCIpLSZkwGgASpv4oPt9gdKCJ80RJlcmNzNn008Ag6Q==}
 
   webidl-conversions@3.0.1:
     resolution: {integrity: sha512-2JAn3z8AR6rjK8Sm8orRC0h/bcl/DqL7tRPdGZ4I1CjdF+EaMLmYxBHyXuKL849eucPFhvBoxMsflfOb8kxaeQ==}
@@ -31707,7 +31707,7 @@ snapshots:
 
   web-streams-polyfill@3.3.3: {}
 
-  webextension-polyfill@0.10.0: {}
+  webextension-polyfill@0.12.0: {}
 
   webidl-conversions@3.0.1: {}
 
