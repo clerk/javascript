@@ -1,5 +1,16 @@
 # Change Log
 
+## 3.13.0
+
+### Minor Changes
+
+- [Billing Beta] Update `clerk.billing.getPlans()` to return paginated data and introduce the `usePlans()` hook. ([#6327](https://github.com/clerk/javascript/pull/6327)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Updated dependencies [[`d2f6f9e`](https://github.com/clerk/javascript/commit/d2f6f9e02036a4288916fcce14f24be5d56561c4), [`a329836`](https://github.com/clerk/javascript/commit/a329836a6c64f0a551a277ccae07043456a70523), [`6041c39`](https://github.com/clerk/javascript/commit/6041c39a31e787a6065dbc3f21e1c569982a06de), [`3f1270d`](https://github.com/clerk/javascript/commit/3f1270db86a21ead0ed6f0bd4f9986485203e973)]:
+  - @clerk/types@4.68.0
+
 ## 3.12.3
 
 ### Patch Changes

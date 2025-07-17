@@ -214,6 +214,7 @@ export type __internal_LocalizationResource = {
     monthly: LocalizationValue;
     annually: LocalizationValue;
     cannotSubscribeMonthly: LocalizationValue;
+    cannotSubscribeUnrecoverable: LocalizationValue;
     pricingTable: {
       billingCycle: LocalizationValue;
       included: LocalizationValue;

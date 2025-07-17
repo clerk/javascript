@@ -10,7 +10,7 @@ const BUTTON_OUTLINE_SHADOW = (color: string) =>
 
 const cardContentStyles = (theme: InternalTheme) => ({
   borderWidth: 0,
-  boxShadow: `${theme.shadows.$cardContentShadow}, ${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha50}`,
+  boxShadow: `${theme.shadows.$cardContentShadow}, ${BORDER_SHADOW_LENGTH} ${theme.colors.$borderAlpha50}`,
 });
 
 const inputShadowStyles = (
