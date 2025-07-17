@@ -1,8 +1,20 @@
 // @ts-ignore - workspace package import
+import './main.css';
+
 import { ClerkProvider } from '@clerk/clerk-react';
+import { enUS, esES, frFR, koKR, zhCN } from '@clerk/localizations';
 import type { Appearance } from '@clerk/types';
 import type { Preview } from '@storybook/react';
 import React from 'react';
+
+// Map locale selector values to localization resources
+const localeMap = {
+  en: enUS,
+  fr: frFR,
+  es: esES,
+  zh: zhCN,
+  kr: koKR,
+} as const;
 
 const preview: Preview = {
   parameters: {
@@ -13,6 +25,29 @@ const preview: Preview = {
       },
     },
     layout: 'centered',
+    darkMode: {
+      stylePreview: true,
+      darkClass: 'dark',
+      lightClass: 'light',
+    },
+  },
+  globalTypes: {
+    locale: {
+      description: 'Locale',
+      toolbar: {
+        icon: 'globe',
+        items: [
+          { value: 'en', right: '🇺🇸', title: 'English' },
+          { value: 'fr', right: '🇫🇷', title: 'Français' },
+          { value: 'es', right: '🇪🇸', title: 'Español' },
+          { value: 'zh', right: '🇨🇳', title: '中文' },
+          { value: 'kr', right: '🇰🇷', title: '한국어' },
+        ],
+      },
+    },
+  },
+  initialGlobals: {
+    locale: 'en',
   },
   argTypes: {
     // Color Variables
@@ -157,6 +192,10 @@ const preview: Preview = {
         spacing,
       } = context.args;
 
+      // Get the selected locale with proper type safety
+      const selectedLocale = context.globals.locale as keyof typeof localeMap;
+      const localization = localeMap[selectedLocale] || localeMap.en;
+
       // Build appearance object with individual variables
       const appearance: Appearance = {
         variables: {
@@ -187,14 +226,9 @@ const preview: Preview = {
         {
           publishableKey: 'pk_test_dG91Y2hlZC1sYWR5YmlyZC0yMy5jbGVyay5hY2NvdW50cy5kZXYk',
           appearance: appearance,
+          localization: localization,
         } as any,
-        React.createElement(
-          'div',
-          {
-            style: { fontFamily: 'sans-serif' },
-          },
-          React.createElement(Story),
-        ),
+        React.createElement(Story),
       );
     },
   ],

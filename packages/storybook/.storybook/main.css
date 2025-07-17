@@ -1,0 +1,12 @@
+:root {
+  --background: #f5f5f5;
+}
+
+.dark {
+  --background: #0a0a0a;
+}
+
+body {
+  font-family: 'ui-sans-serif', sans-serif;
+  background-color: var(--background);
+}
