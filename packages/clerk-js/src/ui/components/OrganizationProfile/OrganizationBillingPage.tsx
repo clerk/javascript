@@ -26,7 +26,7 @@ const OrganizationBillingPageInternal = withCardStateProvider(() => {
   return (
     <Col
       elementDescriptor={descriptors.page}
-      sx={t => ({ gap: t.space.$8, color: t.colors.$colorText })}
+      sx={t => ({ gap: t.space.$8, color: t.colors.$colorForeground })}
     >
       <Col
         elementDescriptor={descriptors.profilePage}

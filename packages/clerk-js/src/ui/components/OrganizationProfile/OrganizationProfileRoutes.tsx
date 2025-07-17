@@ -116,15 +116,21 @@ export const OrganizationProfileRoutes = () => {
           </Protect>
         )}
         {apiKeysSettings.enabled && (
-          <Route path={isApiKeysPageRoot ? undefined : 'organization-api-keys'}>
-            <Switch>
-              <Route index>
-                <Suspense fallback={''}>
-                  <OrganizationAPIKeysPage />
-                </Suspense>
-              </Route>
-            </Switch>
-          </Route>
+          <Protect
+            condition={has =>
+              has({ permission: 'org:sys_api_keys:read' }) || has({ permission: 'org:sys_api_keys:manage' })
+            }
+          >
+            <Route path={isApiKeysPageRoot ? undefined : 'organization-api-keys'}>
+              <Switch>
+                <Route index>
+                  <Suspense fallback={''}>
+                    <OrganizationAPIKeysPage />
+                  </Suspense>
+                </Route>
+              </Switch>
+            </Route>
+          </Protect>
         )}
       </Route>
     </Switch>

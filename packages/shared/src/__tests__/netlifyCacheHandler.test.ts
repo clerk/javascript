@@ -60,4 +60,24 @@ describe('handleNetlifyCacheInDevInstance', () => {
 
     expect(requestStateHeaders.get('Location')).toBe('https://example.netlify.app');
   });
+
+  it('should ignore the URL environment variable if it is not a string', () => {
+    // @ts-expect-error - Random object
+    process.env.URL = {};
+    process.env.NETLIFY = 'true';
+
+    const requestStateHeaders = new Headers({
+      Location: 'https://example.netlify.app',
+    });
+    const locationHeader = requestStateHeaders.get('Location') || '';
+
+    handleNetlifyCacheInDevInstance({
+      locationHeader,
+      requestStateHeaders,
+      publishableKey: mockPublishableKey,
+    });
+
+    const locationUrl = new URL(requestStateHeaders.get('Location') || '');
+    expect(locationUrl.searchParams.has(CLERK_NETLIFY_CACHE_BUST_PARAM)).toBe(true);
+  });
 });

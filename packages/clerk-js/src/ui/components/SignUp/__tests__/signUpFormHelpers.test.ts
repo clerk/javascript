@@ -1,6 +1,6 @@
 import type { Attribute } from '@clerk/types';
 
-import { determineActiveFields, getInitialActiveIdentifier } from '../signUpFormHelpers';
+import { determineActiveFields, determineRequiredIdentifier, getInitialActiveIdentifier } from '../signUpFormHelpers';
 
 const createAttributeData = (name: Attribute, enabled: boolean, required: boolean, usedForFirstFactor: boolean) => ({
   name,
@@ -535,6 +535,427 @@ describe('determineActiveFields()', () => {
       });
 
       expect(res).toEqual(result);
+    });
+
+    describe('email or phone requirements with password', () => {
+      type Scenario = [string, any, any];
+      const scenaria: Scenario[] = [
+        [
+          'email optional, phone primary required with password',
+          {
+            ...mockDefaultAttributesProgressive,
+            email_address: {
+              enabled: true,
+              required: false,
+              used_for_first_factor: true,
+            },
+            phone_number: {
+              enabled: true,
+              required: true,
+              used_for_first_factor: true,
+            },
+            password: {
+              enabled: true,
+              required: true,
+            },
+          },
+          {
+            emailAddress: {
+              required: false,
+              disabled: false,
+            },
+            phoneNumber: {
+              required: true,
+            },
+            password: {
+              required: true,
+            },
+          },
+        ],
+        [
+          'phone optional, email required with password',
+          {
+            ...mockDefaultAttributesProgressive,
+            email_address: {
+              enabled: true,
+              required: true,
+              used_for_first_factor: true,
+            },
+            phone_number: {
+              enabled: true,
+              required: false,
+              used_for_first_factor: true,
+            },
+            password: {
+              enabled: true,
+              required: true,
+            },
+          },
+          {
+            emailAddress: {
+              required: true,
+              disabled: false,
+            },
+            phoneNumber: {
+              required: false,
+            },
+            password: {
+              required: true,
+            },
+          },
+        ],
+        [
+          'email and phone required with password',
+          {
+            ...mockDefaultAttributesProgressive,
+            email_address: {
+              enabled: true,
+              required: true,
+              used_for_first_factor: true,
+            },
+            phone_number: {
+              enabled: true,
+              required: true,
+              used_for_first_factor: true,
+            },
+            password: {
+              enabled: true,
+              required: true,
+            },
+          },
+          {
+            emailAddress: {
+              required: true,
+              disabled: false,
+            },
+            phoneNumber: {
+              required: true,
+            },
+            password: {
+              required: true,
+            },
+          },
+        ],
+      ];
+
+      it.each(scenaria)('%s', (___, attributes, result) => {
+        const actualResult = determineActiveFields({
+          attributes: attributes,
+          activeCommIdentifierType: getInitialActiveIdentifier(attributes, isProgressiveSignUp),
+          isProgressiveSignUp,
+        });
+
+        expect(actualResult).toEqual(result);
+      });
+    });
+
+    describe('password security: requires communication method', () => {
+      // When password is required but no communication method is explicitly required,
+      // we should automatically require one for password recovery
+      type Scenario = [string, any, any];
+      const scenaria: Scenario[] = [
+        [
+          'password required, both email and phone optional and neither primary - email takes precedence',
+          {
+            ...mockDefaultAttributesProgressive,
+            email_address: {
+              enabled: true,
+              required: false,
+              used_for_first_factor: false,
+            },
+            phone_number: {
+              enabled: true,
+              required: false,
+              used_for_first_factor: false,
+            },
+            password: {
+              enabled: true,
+              required: true,
+            },
+          },
+          {
+            emailAddress: {
+              required: true,
+              disabled: false,
+            },
+            password: {
+              required: true,
+            },
+          },
+        ],
+        [
+          'password required, only email available - email becomes required',
+          {
+            ...mockDefaultAttributesProgressive,
+            email_address: {
+              enabled: true,
+              required: false,
+              used_for_first_factor: false,
+            },
+            phone_number: {
+              enabled: false,
+              required: false,
+              used_for_first_factor: false,
+            },
+            password: {
+              enabled: true,
+              required: true,
+            },
+          },
+          {
+            emailAddress: {
+              required: true,
+              disabled: false,
+            },
+            password: {
+              required: true,
+            },
+          },
+        ],
+        [
+          'password required, only phone available - phone becomes required',
+          {
+            ...mockDefaultAttributesProgressive,
+            email_address: {
+              enabled: false,
+              required: false,
+              used_for_first_factor: false,
+            },
+            phone_number: {
+              enabled: true,
+              required: false,
+              used_for_first_factor: false,
+            },
+            password: {
+              enabled: true,
+              required: true,
+            },
+          },
+          {
+            phoneNumber: {
+              required: true,
+            },
+            password: {
+              required: true,
+            },
+          },
+        ],
+      ];
+
+      it.each(scenaria)('%s', (___, attributes, result) => {
+        const actualResult = determineActiveFields({
+          attributes: attributes,
+          activeCommIdentifierType: getInitialActiveIdentifier(attributes, isProgressiveSignUp),
+          isProgressiveSignUp,
+        });
+
+        expect(actualResult).toEqual(result);
+      });
+    });
+
+    describe('password security: requirement follows active field in email OR phone scenarios', () => {
+      // When both email and phone are optional but password is required,
+      // the currently active field should become required
+      it('email required when active in email OR phone scenario with password', () => {
+        const attributes = {
+          email_address: createAttributeData('email_address', true, false, true),
+          phone_number: createAttributeData('phone_number', true, false, true),
+          password: createAttributeData('password', true, true, false),
+          first_name: createAttributeData('first_name', false, false, false),
+          last_name: createAttributeData('last_name', false, false, false),
+          username: createAttributeData('username', false, false, false),
+        };
+
+        const result = determineActiveFields({
+          attributes: attributes,
+          activeCommIdentifierType: 'emailAddress', // Email is currently active
+          isProgressiveSignUp,
+        });
+
+        expect(result).toEqual({
+          emailAddress: {
+            required: true,
+            disabled: false,
+          },
+          password: {
+            required: true,
+          },
+        });
+      });
+
+      it('phone required when active in email OR phone scenario with password', () => {
+        const attributes = {
+          email_address: createAttributeData('email_address', true, false, true),
+          phone_number: createAttributeData('phone_number', true, false, true),
+          password: createAttributeData('password', true, true, false),
+          first_name: createAttributeData('first_name', false, false, false),
+          last_name: createAttributeData('last_name', false, false, false),
+          username: createAttributeData('username', false, false, false),
+        };
+
+        const result = determineActiveFields({
+          attributes: attributes,
+          activeCommIdentifierType: 'phoneNumber', // Phone is currently active
+          isProgressiveSignUp,
+        });
+
+        expect(result).toEqual({
+          phoneNumber: {
+            required: true,
+          },
+          password: {
+            required: true,
+          },
+        });
+      });
+    });
+  });
+});
+
+describe('determineRequiredIdentifier', () => {
+  const createMinimalAttributes = (overrides: any = {}) => ({
+    email_address: createAttributeData('email_address', false, false, false),
+    phone_number: createAttributeData('phone_number', false, false, false),
+    username: createAttributeData('username', false, false, false),
+    password: createAttributeData('password', false, false, false),
+    ...overrides,
+  });
+
+  describe('when password is NOT required', () => {
+    it('mirrors server settings for all fields', () => {
+      const attributes = createMinimalAttributes({
+        password: createAttributeData('password', true, false, false), // password not required
+        email_address: createAttributeData('email_address', true, true, true),
+        phone_number: createAttributeData('phone_number', true, false, false),
+        username: createAttributeData('username', true, true, false),
+      });
+      const result = determineRequiredIdentifier(attributes);
+      expect(result).toEqual({
+        emailShouldBeRequired: true,
+        phoneShouldBeRequired: false,
+        usernameShouldBeRequired: true,
+      });
+    });
+  });
+
+  describe('when password IS required', () => {
+    const requiredPassword = { password: createAttributeData('password', true, true, false) };
+
+    it('mirrors server settings if a communication method is already required', () => {
+      const attributes = createMinimalAttributes({
+        ...requiredPassword,
+        email_address: createAttributeData('email_address', true, true, true),
+      });
+      const result = determineRequiredIdentifier(attributes);
+      expect(result).toEqual({
+        emailShouldBeRequired: true,
+        phoneShouldBeRequired: false,
+        usernameShouldBeRequired: false,
+      });
+    });
+
+    it('requires nothing if no communication methods are enabled', () => {
+      const attributes = createMinimalAttributes({ ...requiredPassword });
+      const result = determineRequiredIdentifier(attributes);
+      expect(result).toEqual({
+        emailShouldBeRequired: false,
+        phoneShouldBeRequired: false,
+        usernameShouldBeRequired: false,
+      });
+    });
+
+    it('requires email if it is the only enabled communication method', () => {
+      const attributes = createMinimalAttributes({
+        ...requiredPassword,
+        email_address: createAttributeData('email_address', true, false, false),
+      });
+      const result = determineRequiredIdentifier(attributes);
+      expect(result).toEqual({
+        emailShouldBeRequired: true,
+        phoneShouldBeRequired: false,
+        usernameShouldBeRequired: false,
+      });
+    });
+
+    it('requires phone if it is the only enabled communication method', () => {
+      const attributes = createMinimalAttributes({
+        ...requiredPassword,
+        phone_number: createAttributeData('phone_number', true, false, false),
+      });
+      const result = determineRequiredIdentifier(attributes);
+      expect(result).toEqual({
+        emailShouldBeRequired: false,
+        phoneShouldBeRequired: true,
+        usernameShouldBeRequired: false,
+      });
+    });
+
+    it('requires username if it is the only enabled communication method and a first factor', () => {
+      const attributes = createMinimalAttributes({
+        ...requiredPassword,
+        username: createAttributeData('username', true, false, true),
+      });
+      const result = determineRequiredIdentifier(attributes);
+      expect(result).toEqual({
+        emailShouldBeRequired: false,
+        phoneShouldBeRequired: false,
+        usernameShouldBeRequired: true,
+      });
+    });
+
+    it('defaults to requiring both email and phone if both email and phone are enabled but not required', () => {
+      const attributes = createMinimalAttributes({
+        ...requiredPassword,
+        email_address: createAttributeData('email_address', true, false, false),
+        phone_number: createAttributeData('phone_number', true, false, false),
+      });
+      const result = determineRequiredIdentifier(attributes);
+      expect(result).toEqual({
+        emailShouldBeRequired: true,
+        phoneShouldBeRequired: true,
+        usernameShouldBeRequired: false,
+      });
+    });
+
+    it('requires email by default if no other communication methods are required by instance settings', () => {
+      const attributes = createMinimalAttributes({
+        ...requiredPassword,
+        username: createAttributeData('username', true, false, false),
+      });
+      const result = determineRequiredIdentifier(attributes);
+      expect(result).toEqual({
+        emailShouldBeRequired: true,
+        phoneShouldBeRequired: false,
+        usernameShouldBeRequired: false,
+      });
+    });
+
+    it('requires email when username is a non-required first factor', () => {
+      const attributes = createMinimalAttributes({
+        ...requiredPassword,
+        email_address: createAttributeData('email_address', true, false, false),
+        username: createAttributeData('username', true, false, true),
+      });
+      const result = determineRequiredIdentifier(attributes);
+      expect(result).toEqual({
+        emailShouldBeRequired: true,
+        phoneShouldBeRequired: false,
+        usernameShouldBeRequired: false,
+      });
+    });
+
+    it('requires phone when username is a non-required first factor and email is disabled', () => {
+      const attributes = createMinimalAttributes({
+        ...requiredPassword,
+        phone_number: createAttributeData('phone_number', true, false, false),
+        username: createAttributeData('username', true, false, true),
+      });
+      const result = determineRequiredIdentifier(attributes);
+      expect(result).toEqual({
+        emailShouldBeRequired: false,
+        phoneShouldBeRequired: true,
+        usernameShouldBeRequired: false,
+      });
     });
   });
 });

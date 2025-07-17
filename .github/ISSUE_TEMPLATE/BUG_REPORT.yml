@@ -1,7 +1,7 @@
-name: "🐛 Bug Report"
+name: '🐛 Bug Report'
 description: Report a bug in Clerk's JavaScript packages.
 labels:
-  - "needs-triage"
+  - 'needs-triage'
 body:
   - type: markdown
     attributes:
@@ -30,7 +30,7 @@ body:
     id: reproduction-link
     attributes:
       label: Reproduction
-      placeholder: "https://github.com/username/repository-name/"
+      placeholder: 'https://github.com/username/repository-name/'
       description: |
         Link to a minimal reproduction (GitHub repository, CodeSandbox, StackBlitz, etc.).
 
@@ -44,7 +44,7 @@ body:
     id: publishable-key
     attributes:
       label: Publishable key
-      placeholder: "pk_test_123456789"
+      placeholder: 'pk_test_123456789'
       description: |
         Go to your Clerk dashboard and to the **API Keys** section. Copy the **Publishable key** and paste it here.
 
