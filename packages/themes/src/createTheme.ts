@@ -9,9 +9,17 @@ interface CreateClerkThemeParams extends DeepPartial<Theme> {
    * {@link Theme.elements}
    */
   elements?: Elements | ((params: { theme: InternalTheme }) => Elements);
+  /**
+   * Optional CSS layer name for the theme
+   */
+  cssLayerName?: string;
 }
 
 export const experimental_createTheme = (appearance: Appearance<CreateClerkThemeParams>): BaseTheme => {
   // Placeholder method that might hande more transformations in the future
-  return { ...appearance, __type: 'prebuilt_appearance' };
+  return {
+    ...(appearance.cssLayerName && { cssLayerName: appearance.cssLayerName }),
+    ...appearance,
+    __type: 'prebuilt_appearance',
+  };
 };

@@ -2727,9 +2727,22 @@ export class Clerk implements ClerkInterface {
   };
 
   #initOptions = (options?: ClerkOptions): ClerkOptions => {
+    // Extract baseTheme from appearance if it exists
+    let processedOptions = options ? { ...options } : {};
+    if (
+      processedOptions.appearance &&
+      typeof processedOptions.appearance === 'object' &&
+      'baseTheme' in processedOptions.appearance
+    ) {
+      processedOptions = {
+        ...processedOptions,
+        appearance: (processedOptions.appearance as any).baseTheme,
+      };
+    }
+
     return {
       ...defaultOptions,
-      ...options,
+      ...processedOptions,
       allowedRedirectOrigins: createAllowedRedirectOrigins(
         options?.allowedRedirectOrigins,
         this.frontendApi,
