@@ -30,6 +30,7 @@ const preview: any = {
       },
     },
     layout: 'centered',
+    backgrounds: { disable: true },
   },
   globalTypes: {
     locale: {
