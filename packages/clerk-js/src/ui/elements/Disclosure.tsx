@@ -54,7 +54,7 @@ const Root = React.forwardRef<HTMLDivElement, RootProps>(
           sx={t => ({
             width: '100%',
             borderRadius: t.radii.$lg,
-            boxShadow: `inset 0 0 0 1px ${t.colors.$neutralAlpha100}`,
+            boxShadow: `inset 0 0 0 1px ${t.colors.$borderAlpha100}`,
             backgroundColor: t.colors.$colorBackground,
             isolation: 'isolate',
           })}
@@ -95,7 +95,7 @@ const Trigger = React.forwardRef<HTMLButtonElement, TriggerProps>(({ text }, ref
         fontSize: t.fontSizes.$md,
         justifyContent: 'space-between',
         padding: t.sizes.$3,
-        color: t.colors.$colorText,
+        color: t.colors.$colorForeground,
         borderRadius: t.radii.$lg,
         zIndex: 2,
       })}
@@ -167,7 +167,7 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
             borderRadius: t.radii.$lg,
             borderWidth: t.borderWidths.$normal,
             borderStyle: t.borderStyles.$solid,
-            borderColor: t.colors.$neutralAlpha100,
+            borderColor: t.colors.$borderAlpha100,
             background: common.mergedColorsBackground(
               colors.setAlpha(t.colors.$colorBackground, 1),
               t.colors.$neutralAlpha50,

@@ -18,6 +18,22 @@ export * from '@clerk/backend/webhooks';
  * @throws Will throw an error if the webhook signature verification fails
  * @returns A promise that resolves to the verified webhook event data
  *
+ * @example
+ * ```typescript
+ * import { verifyWebhook } from '@clerk/express/webhooks';
+ * import express from 'express';
+ *
+ * app.post('/api/webhooks', express.raw({ type: 'application/json' }), async (req, res) => {
+ *   try {
+ *     const evt = await verifyWebhook(req);
+ *     // handle event
+ *     res.send('Webhook received');
+ *   } catch (err) {
+ *     res.status(400).send('Webhook verification failed');
+ *   }
+ * });
+ * ```
+ *
  * @see {@link https://clerk.com/docs/webhooks/sync-data} to learn more about syncing Clerk data to your application using webhooks
  */
 export async function verifyWebhook(req: ExpressRequest, options?: VerifyWebhookOptions) {

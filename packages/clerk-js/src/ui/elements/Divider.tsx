@@ -58,7 +58,7 @@ const DividerLine = (props?: DividerLineProps) => {
       elementDescriptor={descriptors.dividerLine}
       sx={t => ({
         flex: '1',
-        backgroundColor: t.colors.$neutralAlpha100,
+        backgroundColor: t.colors.$borderAlpha100,
         ...styles,
       })}
     />

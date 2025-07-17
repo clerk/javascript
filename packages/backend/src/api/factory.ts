@@ -13,6 +13,7 @@ import {
   InvitationAPI,
   JwksAPI,
   JwtTemplatesApi,
+  MachineApi,
   MachineTokensApi,
   OAuthApplicationsApi,
   OrganizationAPI,
@@ -64,6 +65,7 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
     invitations: new InvitationAPI(request),
     jwks: new JwksAPI(request),
     jwtTemplates: new JwtTemplatesApi(request),
+    machines: new MachineApi(request),
     machineTokens: new MachineTokensApi(
       buildRequest({
         ...options,

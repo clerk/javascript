@@ -14,7 +14,7 @@ const PlansPageInternal = () => {
         sx={t => ({
           borderBottomWidth: t.borderWidths.$normal,
           borderBottomStyle: t.borderStyles.$solid,
-          borderBottomColor: t.colors.$neutralAlpha100,
+          borderBottomColor: t.colors.$borderAlpha100,
           marginBlockEnd: t.space.$4,
           paddingBlockEnd: t.space.$4,
         })}

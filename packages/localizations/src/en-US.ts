@@ -48,9 +48,11 @@ export const enUS: LocalizationResource = {
   badge__renewsAt: "Renews {{ date | shortDate('en-US') }}",
   badge__requiresAction: 'Requires action',
   badge__startsAt: "Starts {{ date | shortDate('en-US') }}",
+  badge__pastDueAt: "Past due {{ date | shortDate('en-US') }}",
   badge__thisDevice: 'This device',
   badge__unverified: 'Unverified',
   badge__upcomingPlan: 'Upcoming',
+  badge__pastDuePlan: 'Past due',
   badge__userDevice: 'User device',
   badge__you: 'You',
   commerce: {
@@ -67,6 +69,8 @@ export const enUS: LocalizationResource = {
     cancelSubscriptionTitle: 'Cancel {{plan}} Subscription?',
     cannotSubscribeMonthly:
       'You cannot subscribe to this plan by paying monthly. To subscribe to this plan, you need to choose to pay annually.',
+    cannotSubscribeUnrecoverable:
+      'You cannot subscribe to this plan. Your existing subscription is more expensive than this plan.',
     checkout: {
       description__paymentSuccessful: 'Your payment was successful.',
       description__subscriptionSuccessful: 'Your new subscription is all set.',
@@ -120,6 +124,17 @@ export const enUS: LocalizationResource = {
       billingCycle: 'Billing cycle',
       included: 'Included',
     },
+    subscriptionDetails: {
+      title: 'Subscription',
+      currentBillingCycle: 'Current billing cycle',
+      nextPaymentOn: 'Next payment on',
+      nextPaymentAmount: 'Next payment amount',
+      subscribedOn: 'Subscribed on',
+      endsOn: 'Ends on',
+      renewsAt: 'Renews at',
+      beginsOn: 'Begins on',
+      pastDueAt: 'Past due on',
+    },
     reSubscribe: 'Resubscribe',
     seeAllFeatures: 'See all features',
     subscribe: 'Subscribe',
@@ -127,6 +142,8 @@ export const enUS: LocalizationResource = {
     switchPlan: 'Switch to this plan',
     switchToAnnual: 'Switch to annual',
     switchToMonthly: 'Switch to monthly',
+    switchToMonthlyWithPrice: 'Switch to monthly {{currency}}{{price}} / month',
+    switchToAnnualWithAnnualPrice: 'Switch to annual {{currency}}{{price}} / year',
     totalDue: 'Total due',
     totalDueToday: 'Total Due Today',
     viewFeatures: 'View features',

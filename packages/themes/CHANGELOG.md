@@ -1,5 +1,72 @@
 # Change Log
 
+## 2.3.3
+
+### Patch Changes
+
+- Updated dependencies [[`d2f6f9e`](https://github.com/clerk/javascript/commit/d2f6f9e02036a4288916fcce14f24be5d56561c4), [`a329836`](https://github.com/clerk/javascript/commit/a329836a6c64f0a551a277ccae07043456a70523), [`6041c39`](https://github.com/clerk/javascript/commit/6041c39a31e787a6065dbc3f21e1c569982a06de), [`3f1270d`](https://github.com/clerk/javascript/commit/3f1270db86a21ead0ed6f0bd4f9986485203e973)]:
+  - @clerk/types@4.68.0
+
+## 2.3.2
+
+### Patch Changes
+
+- Updated dependencies [[`2a90b68`](https://github.com/clerk/javascript/commit/2a90b689550ae960496c9292ca23e0225e3425cd)]:
+  - @clerk/types@4.67.0
+
+## 2.3.1
+
+### Patch Changes
+
+- Updated dependencies [[`8ee859c`](https://github.com/clerk/javascript/commit/8ee859ce00d1d5747c14a80fe7166303e64a4f1f)]:
+  - @clerk/types@4.66.1
+
+## 2.3.0
+
+### Minor Changes
+
+- Expose Clerk CSS variables as an option for theming Clerk's components. This change introduces CSS custom properties that allow developers to customize Clerk's appearance using standard CSS variables, providing a more flexible theming approach. ([#6275](https://github.com/clerk/javascript/pull/6275)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  ```css
+  :root {
+    --clerk-color-primary: #6d47ff;
+    --clerk-color-primary-foreground: #ffffff;
+  }
+  ```
+
+  ## Deprecated variables
+
+  | Deprecated                     | New                      |
+  | ------------------------------ | ------------------------ |
+  | `colorText`                    | `colorForeground`        |
+  | `colorTextOnPrimaryBackground` | `colorPrimaryForeground` |
+  | `colorTextSecondary`           | `colorMutedForeground`   |
+  | `spacingUnit`                  | `spacing`                |
+  | `colorInputText`               | `colorInputForeground`   |
+  | `colorInputBackground`         | `colorInput`             |
+
+  Deprecated variables will continue to work but will be removed in the next major version.
+
+  ## New variables
+
+  - `colorRing` - The color of the ring when an interactive element is focused.
+  - `colorMuted` - The background color for elements of lower importance, eg: a muted background.
+  - `colorShadow` - The base shadow color used in the components.
+  - `colorBorder` - The base border color used in the components.
+  - `colorModalBackdrop` - The background color of the modal backdrop.
+
+### Patch Changes
+
+- Updated dependencies [[`025e304`](https://github.com/clerk/javascript/commit/025e304c4d6402dfd750ee51ac9c8fc2dea1f353), [`dedf487`](https://github.com/clerk/javascript/commit/dedf48703986d547d5b28155b0182a51030cffeb), [`b96114e`](https://github.com/clerk/javascript/commit/b96114e438638896ba536bb7a17b09cdadcd9407)]:
+  - @clerk/types@4.66.0
+
+## 2.2.56
+
+### Patch Changes
+
+- Updated dependencies [[`2be6a53`](https://github.com/clerk/javascript/commit/2be6a53959cb8a3127c2eb5d1aeb4248872d2c24), [`6826d0b`](https://github.com/clerk/javascript/commit/6826d0bbd03e844d49224565878a4326684f06b4), [`f6a1c35`](https://github.com/clerk/javascript/commit/f6a1c35bd5fb4bd2a3cd45bdaf9defe6be59d4a9)]:
+  - @clerk/types@4.65.0
+
 ## 2.2.55
 
 ### Patch Changes

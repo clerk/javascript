@@ -55,9 +55,15 @@ jobs:
 
                 const content = Buffer.from(changesetContent.content, changesetContent.encoding).toString();
 
-                if (/major/.test(content)) {
-                  hasMajorChangeset = true;
-                  break;
+                // Only check for "major" in the YAML frontmatter section (between --- markers)
+                // This avoids false positives from descriptive text mentioning "major"
+                const frontmatterMatch = content.match(/^---\r?\n([\s\S]*?)\r?\n---\s*$/m);
+                if (frontmatterMatch) {
+                  const frontmatter = frontmatterMatch[1];
+                  if (/:\s*["']?major["']?/.test(frontmatter)) {
+                    hasMajorChangeset = true;
+                    break;
+                  }
                 }
               }
             }

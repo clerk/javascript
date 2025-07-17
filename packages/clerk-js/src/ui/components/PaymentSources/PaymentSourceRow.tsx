@@ -17,14 +17,14 @@ export const PaymentSourceRow = ({ paymentSource }: { paymentSource: CommercePay
         elementDescriptor={descriptors.paymentSourceRowIcon}
       />
       <Text
-        sx={t => ({ color: t.colors.$colorText, textTransform: 'capitalize' })}
+        sx={t => ({ color: t.colors.$colorForeground, textTransform: 'capitalize' })}
         truncate
         elementDescriptor={descriptors.paymentSourceRowType}
       >
         {paymentSource.paymentMethod === 'card' ? paymentSource.cardType : paymentSource.paymentMethod}
       </Text>
       <Text
-        sx={t => ({ color: t.colors.$colorTextSecondary })}
+        sx={t => ({ color: t.colors.$colorMutedForeground })}
         variant='caption'
         truncate
         elementDescriptor={descriptors.paymentSourceRowValue}

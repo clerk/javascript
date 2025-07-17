@@ -35,7 +35,7 @@ const PageButton = (props: PageButtonProps) => {
       variant='outline'
       sx={t => [
         {
-          color: t.colors.$colorText,
+          color: t.colors.$colorForeground,
           opacity: isActive ? 1 : t.opacity.$inactive,
           padding: `${t.space.$0x5} ${t.space.$0x5}`,
         },

@@ -131,6 +131,7 @@ export type {
   OrganizationMembershipPublicUserData,
   OrganizationSettings,
   PhoneNumber,
+  SamlConnection,
   Session,
   SignInToken,
   SignUpAttempt,

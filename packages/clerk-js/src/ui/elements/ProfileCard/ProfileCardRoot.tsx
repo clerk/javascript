@@ -59,7 +59,7 @@ export const ProfileCardRoot = React.forwardRef<HTMLDivElement, PropsOfComponent
               />
             }
             sx={t => ({
-              color: t.colors.$colorTextSecondary,
+              color: t.colors.$colorMutedForeground,
               padding: t.space.$3,
             })}
           />

@@ -59,7 +59,7 @@ export const MfaBackupCodeList = (props: MfaBackupCodeListProps) => {
         sx={t => ({
           borderWidth: t.borderWidths.$normal,
           borderStyle: t.borderStyles.$solid,
-          borderColor: t.colors.$neutralAlpha100,
+          borderColor: t.colors.$borderAlpha100,
           borderRadius: t.radii.$lg,
         })}
       >
@@ -82,13 +82,13 @@ export const MfaBackupCodeList = (props: MfaBackupCodeListProps) => {
           sx={t => ({
             borderTopWidth: t.borderWidths.$normal,
             borderTopStyle: t.borderStyles.$solid,
-            borderTopColor: t.colors.$neutralAlpha100,
+            borderTopColor: t.colors.$borderAlpha100,
             gridTemplateColumns: `repeat(3, minmax(0, 1fr))`,
             '>:not([hidden])~:not([hidden])': {
               borderRightWidth: '0px',
               borderLeftWidth: '1px',
               borderStyle: 'solid',
-              borderColor: t.colors.$neutralAlpha100,
+              borderColor: t.colors.$borderAlpha100,
             },
             '>:first-child': {
               borderBottomLeftRadius: t.radii.$lg,

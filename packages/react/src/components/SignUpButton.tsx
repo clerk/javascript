@@ -13,7 +13,6 @@ export const SignUpButton = withClerk(
       signInFallbackRedirectUrl,
       signInForceRedirectUrl,
       mode,
-      unsafeMetadata,
       initialValues,
       oauthFlow,
       ...rest
@@ -28,13 +27,16 @@ export const SignUpButton = withClerk(
         forceRedirectUrl,
         signInFallbackRedirectUrl,
         signInForceRedirectUrl,
-        unsafeMetadata,
         initialValues,
         oauthFlow,
       };
 
       if (mode === 'modal') {
-        return clerk.openSignUp({ ...opts, appearance: props.appearance });
+        return clerk.openSignUp({
+          ...opts,
+          appearance: props.appearance,
+          unsafeMetadata: props.unsafeMetadata,
+        });
       }
 
       return clerk.redirectToSignUp({

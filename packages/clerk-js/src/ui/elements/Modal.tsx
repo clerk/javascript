@@ -68,7 +68,7 @@ export const Modal = withFloatingTree((props: ModalProps) => {
             t => ({
               animation: `${animations.fadeIn} 150ms ${t.transitionTiming.$common}`,
               zIndex: t.zIndices.$modal,
-              backgroundColor: t.colors.$modalBackdrop,
+              backgroundColor: t.colors.$colorModalBackdrop,
               alignItems: 'flex-start',
               justifyContent: 'center',
               overflow: 'auto',

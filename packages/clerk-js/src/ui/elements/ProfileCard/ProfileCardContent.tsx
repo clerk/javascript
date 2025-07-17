@@ -42,7 +42,7 @@ export const ProfileCardContent = (props: ProfileCardContentProps) => {
         overflow: 'hidden',
         borderWidth: t.borderWidths.$normal,
         borderStyle: t.borderStyles.$solid,
-        borderColor: t.colors.$neutralAlpha50,
+        borderColor: t.colors.$borderAlpha50,
         boxShadow: t.shadows.$cardContentShadow,
       })}
       data-clerk-profile-scroll-box-root={scrollBoxId}

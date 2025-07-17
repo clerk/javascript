@@ -130,7 +130,7 @@ export const PaymentSources = withCardStateProvider(() => {
         flex: 1,
         borderTopWidth: t.borderWidths.$normal,
         borderTopStyle: t.borderStyles.$solid,
-        borderTopColor: t.colors.$neutralAlpha100,
+        borderTopColor: t.colors.$borderAlpha100,
       })}
     >
       <Action.Root>

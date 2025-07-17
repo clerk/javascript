@@ -183,6 +183,13 @@ export function useInput({
       pattern: `[0-9]{${length}}`,
       minLength: length,
       maxLength: length,
+      // Enhanced naming for better password manager detection
+      name: 'otp',
+      id: 'otp-input',
+      // Additional attributes for password manager compatibility
+      'data-testid': 'otp-input',
+      role: 'textbox',
+      'aria-label': 'Enter verification code',
       onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
         // Only accept numbers
         event.currentTarget.value = event.currentTarget.value.replace(/\D+/g, '');

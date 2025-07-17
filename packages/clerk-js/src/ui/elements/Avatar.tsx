@@ -107,7 +107,7 @@ const InitialsAvatarFallback = (props: { initials: string }) => {
   return (
     <Text
       as='span'
-      sx={t => ({ ...common.centeredFlex('inline-flex'), width: '100%', color: t.colors.$colorText })}
+      sx={t => ({ ...common.centeredFlex('inline-flex'), width: '100%', color: t.colors.$colorForeground })}
     >
       {initials}
     </Text>

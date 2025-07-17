@@ -30,7 +30,7 @@ export const ActionCard = (props: ActionCardProps) => {
           padding: `${t.space.$4} ${t.space.$5}`,
           borderWidth: t.borderWidths.$normal,
           borderStyle: t.borderStyles.$solid,
-          borderColor: t.colors.$neutralAlpha100,
+          borderColor: t.colors.$borderAlpha100,
           ...styles(t)[variant],
         }),
         sx,

@@ -20,6 +20,7 @@ export class CommerceSubscription extends BaseResource implements CommerceSubscr
   planPeriod!: CommerceSubscriptionPlanPeriod;
   status!: CommerceSubscriptionStatus;
   createdAt!: Date;
+  pastDueAt!: Date | null;
   periodStartDate!: Date;
   periodEndDate!: Date | null;
   canceledAtDate!: Date | null;
@@ -51,6 +52,8 @@ export class CommerceSubscription extends BaseResource implements CommerceSubscr
     this.canceledAt = data.canceled_at;
 
     this.createdAt = unixEpochToDate(data.created_at);
+    this.pastDueAt = data.past_due_at ? unixEpochToDate(data.past_due_at) : null;
+
     this.periodStartDate = unixEpochToDate(data.period_start);
     this.periodEndDate = data.period_end ? unixEpochToDate(data.period_end) : null;
     this.canceledAtDate = data.canceled_at ? unixEpochToDate(data.canceled_at) : null;
@@ -65,8 +68,8 @@ export class CommerceSubscription extends BaseResource implements CommerceSubscr
     const json = (
       await BaseResource._fetch({
         path: orgId
-          ? `/organizations/${orgId}/commerce/subscriptions/${this.id}`
-          : `/me/commerce/subscriptions/${this.id}`,
+          ? `/organizations/${orgId}/commerce/subscription_items/${this.id}`
+          : `/me/commerce/subscription_items/${this.id}`,
         method: 'DELETE',
       })
     )?.response as unknown as DeletedObjectJSON;

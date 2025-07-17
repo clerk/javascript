@@ -1,3 +1,5 @@
+import { colors } from '../utils/colors';
+import { clerkCssVar } from '../utils/cssVariables';
 import type { InternalTheme } from './types';
 
 const textVariants = (t: InternalTheme) => {
@@ -77,10 +79,10 @@ const textVariants = (t: InternalTheme) => {
 };
 
 const borderVariants = (t: InternalTheme, props?: any) => {
-  const hoverBorderColor = !props?.hasError ? t.colors.$neutralAlpha300 : t.colors.$dangerAlpha500;
+  const hoverBorderColor = !props?.hasError ? t.colors.$borderAlpha300 : t.colors.$dangerAlpha500;
   const hoverBoxShadow = t.shadows.$input.replace(
     '{{color}}',
-    !props?.hasError ? t.colors.$neutralAlpha150 : t.colors.$dangerAlpha200,
+    !props?.hasError ? t.colors.$borderAlpha150 : t.colors.$dangerAlpha200,
   );
   const hoverStyles = {
     '&:hover': {
@@ -100,7 +102,7 @@ const borderVariants = (t: InternalTheme, props?: any) => {
               hoverBoxShadow,
               t.shadows.$focusRing.replace(
                 '{{color}}',
-                !props?.hasError ? t.colors.$neutralAlpha150 : (t.colors.$dangerAlpha200 as string),
+                !props?.hasError ? t.colors.$borderAlpha150 : (t.colors.$dangerAlpha200 as string),
               ),
             ].toString(),
           },
@@ -110,10 +112,10 @@ const borderVariants = (t: InternalTheme, props?: any) => {
       borderRadius: t.radii.$md,
       borderWidth: t.borderWidths.$normal,
       borderStyle: t.borderStyles.$solid,
-      borderColor: !props?.hasError ? t.colors.$neutralAlpha150 : t.colors.$dangerAlpha500,
+      borderColor: !props?.hasError ? t.colors.$borderAlpha150 : t.colors.$dangerAlpha500,
       boxShadow: t.shadows.$input.replace(
         '{{color}}',
-        !props?.hasError ? t.colors.$neutralAlpha100 : t.colors.$neutralAlpha150,
+        !props?.hasError ? t.colors.$borderAlpha100 : t.colors.$borderAlpha150,
       ),
       transitionProperty: t.transitionProperty.$common,
       transitionTimingFunction: t.transitionTiming.$common,
@@ -126,7 +128,7 @@ const borderVariants = (t: InternalTheme, props?: any) => {
 
 const borderColor = (t: InternalTheme, props?: any) => {
   return {
-    borderColor: props?.hasError ? t.colors.$dangerAlpha500 : t.colors.$neutralAlpha150,
+    borderColor: props?.hasError ? t.colors.$dangerAlpha500 : t.colors.$borderAlpha150,
   } as const;
 };
 
@@ -134,7 +136,7 @@ const focusRingStyles = (t: InternalTheme) => {
   return {
     '&::-moz-focus-inner': { border: '0' },
     WebkitTapHighlightColor: 'transparent',
-    boxShadow: t.shadows.$focusRing.replace('{{color}}', t.colors.$neutralAlpha200),
+    boxShadow: t.shadows.$focusRing.replace('{{color}}', t.colors.$colorRing),
     transitionProperty: t.transitionProperty.$common,
     transitionTimingFunction: t.transitionTiming.$common,
     transitionDuration: t.transitionDuration.$focusRing,
@@ -190,6 +192,13 @@ const mergedColorsBackground = (colorBack: string, colorFront: string) => {
   return `linear-gradient(${colorFront},${colorFront}), linear-gradient(${colorBack}, ${colorBack})`;
 };
 
+const mutedBackground = (t: InternalTheme) => {
+  const defaultColor =
+    t.colors.$colorMuted ||
+    mergedColorsBackground(colors.setAlpha(t.colors.$colorBackground, 1), t.colors.$neutralAlpha50);
+  return clerkCssVar('color-muted', defaultColor);
+};
+
 const visuallyHidden = () =>
   ({
     clip: 'rect(0 0 0 0)',
@@ -210,6 +219,7 @@ export const common = {
   borderColor,
   centeredFlex,
   maxHeightScroller,
+  mutedBackground,
   unstyledScrollbar,
   mergedColorsBackground,
   visuallyHidden,
