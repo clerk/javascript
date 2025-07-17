@@ -1,20 +1,19 @@
 import { useClerk, useOrganization } from '@clerk/shared/react';
 import type { CommercePaymentSourceResource } from '@clerk/types';
-import type { SetupIntent } from '@stripe/stripe-js';
-import { Fragment, useCallback, useMemo, useRef } from 'react';
+import { Fragment, useMemo, useRef } from 'react';
 
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { FullHeightLoader } from '@/ui/elements/FullHeightLoader';
 import { ProfileSection } from '@/ui/elements/Section';
 import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
+import { handleError } from '@/ui/utils/errorHandler';
 
 import { RemoveResourceForm } from '../../common';
 import { DevOnly } from '../../common/DevOnly';
-import { usePaymentSources, useSubscriberTypeContext, useSubscriberTypeLocalizationRoot } from '../../contexts';
+import { usePaymentMethods, useSubscriberTypeContext, useSubscriberTypeLocalizationRoot } from '../../contexts';
 import { localizationKeys } from '../../customizables';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
-import { handleError } from '../../utils';
 import * as AddPaymentSource from './AddPaymentSource';
 import { PaymentSourceRow } from './PaymentSourceRow';
 import { TestPaymentSource } from './TestPaymentSource';
@@ -25,12 +24,9 @@ const AddScreen = withCardStateProvider(({ onSuccess }: { onSuccess: () => void 
   const subscriberType = useSubscriberTypeContext();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
 
-  const onAddPaymentSourceSuccess = async (context: { stripeSetupIntent?: SetupIntent }) => {
+  const onAddPaymentSourceSuccess = async (context: { gateway: 'stripe'; paymentToken: string }) => {
     const resource = subscriberType === 'org' ? clerk?.organization : clerk.user;
-    await resource?.addPaymentSource({
-      gateway: 'stripe',
-      paymentToken: context.stripeSetupIntent?.payment_method as string,
-    });
+    await resource?.addPaymentSource(context);
     onSuccess();
     close();
     return Promise.resolve();
@@ -114,16 +110,12 @@ export const PaymentSources = withCardStateProvider(() => {
   const localizationRoot = useSubscriberTypeLocalizationRoot();
   const resource = subscriberType === 'org' ? clerk?.organization : clerk.user;
 
-  const { data, isLoading, mutate: mutatePaymentSources } = usePaymentSources();
-
-  const { data: paymentSources = [] } = data || {};
+  const { data: paymentMethods, isLoading, revalidate: revalidatePaymentMethods } = usePaymentMethods();
 
   const sortedPaymentSources = useMemo(
-    () => paymentSources.sort((a, b) => (a.isDefault && !b.isDefault ? -1 : 1)),
-    [paymentSources],
+    () => paymentMethods.sort((a, b) => (a.isDefault && !b.isDefault ? -1 : 1)),
+    [paymentMethods],
   );
-
-  const revalidatePaymentSources = useCallback(() => void mutatePaymentSources(), [mutatePaymentSources]);
 
   if (!resource) {
     return null;
@@ -138,7 +130,7 @@ export const PaymentSources = withCardStateProvider(() => {
         flex: 1,
         borderTopWidth: t.borderWidths.$normal,
         borderTopStyle: t.borderStyles.$solid,
-        borderTopColor: t.colors.$neutralAlpha100,
+        borderTopColor: t.colors.$borderAlpha100,
       })}
     >
       <Action.Root>
@@ -156,7 +148,7 @@ export const PaymentSources = withCardStateProvider(() => {
                     <PaymentSourceRow paymentSource={paymentSource} />
                     <PaymentSourceMenu
                       paymentSource={paymentSource}
-                      revalidate={revalidatePaymentSources}
+                      revalidate={revalidatePaymentMethods}
                     />
                   </ProfileSection.Item>
 
@@ -164,7 +156,7 @@ export const PaymentSources = withCardStateProvider(() => {
                     <Action.Card variant='destructive'>
                       <RemoveScreen
                         paymentSource={paymentSource}
-                        revalidate={revalidatePaymentSources}
+                        revalidate={revalidatePaymentMethods}
                       />
                     </Action.Card>
                   </Action.Open>
@@ -178,7 +170,7 @@ export const PaymentSources = withCardStateProvider(() => {
               </Action.Trigger>
               <Action.Open value='add'>
                 <Action.Card>
-                  <AddScreen onSuccess={revalidatePaymentSources} />
+                  <AddScreen onSuccess={revalidatePaymentMethods} />
                 </Action.Card>
               </Action.Open>
             </>

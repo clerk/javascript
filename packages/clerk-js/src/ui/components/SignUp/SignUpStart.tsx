@@ -8,6 +8,11 @@ import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
 import { LoadingCard } from '@/ui/elements/LoadingCard';
 import { SocialButtonsReversibleContainerWithDivider } from '@/ui/elements/ReversibleContainer';
+import { handleError } from '@/ui/utils/errorHandler';
+import { createPasswordError } from '@/ui/utils/passwordUtils';
+import type { FormControlState } from '@/ui/utils/useFormControl';
+import { buildRequest, useFormControl } from '@/ui/utils/useFormControl';
+import { createUsernameError } from '@/ui/utils/usernameUtils';
 
 import { ERROR_CODES, SIGN_UP_MODES } from '../../../core/constants';
 import { getClerkQueryParam, removeClerkQueryParam } from '../../../utils/getClerkQueryParam';
@@ -17,8 +22,6 @@ import { descriptors, Flex, Flow, localizationKeys, useAppearance, useLocalizati
 import { CaptchaElement } from '../../elements/CaptchaElement';
 import { useLoadingStatus } from '../../hooks';
 import { useRouter } from '../../router';
-import type { FormControlState } from '../../utils';
-import { buildRequest, createPasswordError, createUsernameError, handleError, useFormControl } from '../../utils';
 import { getPreferredAlternativePhoneChannel } from '../SignIn/utils';
 import { SignUpForm } from './SignUpForm';
 import type { ActiveIdentifier } from './signUpFormHelpers';

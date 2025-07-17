@@ -2,7 +2,7 @@ import { useClerk } from '@clerk/shared/react';
 import type { CommercePlanResource, CommerceSubscriptionPlanPeriod, PricingTableProps } from '@clerk/types';
 import { useEffect, useMemo, useState } from 'react';
 
-import { usePaymentSources, usePlans, usePlansContext, usePricingTableContext, useSubscriptions } from '../../contexts';
+import { usePaymentMethods, usePlans, usePlansContext, usePricingTableContext, useSubscriptions } from '../../contexts';
 import { Flow } from '../../customizables';
 import { PricingTableDefault } from './PricingTableDefault';
 import { PricingTableMatrix } from './PricingTableMatrix';
@@ -24,7 +24,7 @@ const PricingTableRoot = (props: PricingTableProps) => {
 
       // don't pay attention to the default plan
       const activeSubscription = subscriptions?.find(
-        sub => !sub.canceledAt && sub.status === 'active' && !sub.plan.isDefault,
+        sub => !sub.canceledAtDate && sub.status === 'active' && !sub.plan.isDefault,
       );
       if (activeSubscription) {
         return activeSubscription.planPeriod;
@@ -60,7 +60,7 @@ const PricingTableRoot = (props: PricingTableProps) => {
   };
 
   // Pre-fetch payment sources
-  usePaymentSources();
+  usePaymentMethods();
 
   return (
     <Flow.Root

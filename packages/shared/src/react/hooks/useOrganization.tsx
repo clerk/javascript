@@ -67,6 +67,7 @@ export type UseOrganizationParams = {
    */
   invitations?: true | PaginatedHookConfig<GetInvitationsParams>;
   /**
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
    * If set to `true`, all default properties will be used.<br />
    * Otherwise, accepts an object with the following optional properties:
    * <ul>
@@ -111,6 +112,7 @@ export type UseOrganizationReturn<T extends UseOrganizationParams> =
        */
       invitations: PaginatedResourcesWithDefault<OrganizationInvitationResource>;
       /**
+       * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
        * Includes a paginated list of the organization's subscriptions.
        */
       subscriptions: PaginatedResourcesWithDefault<CommerceSubscriptionResource>;

@@ -1,5 +1,7 @@
 import { Header } from '@/ui/elements/Header';
 import { LineItems } from '@/ui/elements/LineItems';
+import { formatDate } from '@/ui/utils/formatDate';
+import { truncateWithEndVisible } from '@/ui/utils/truncateTextWithEndVisible';
 
 import { usePaymentAttemptsContext, useStatements } from '../../contexts';
 import { useSubscriberTypeLocalizationRoot } from '../../contexts/components';
@@ -18,7 +20,6 @@ import {
 import { useClipboard } from '../../hooks';
 import { Check, Copy } from '../../icons';
 import { useRouter } from '../../router';
-import { formatDate, truncateWithEndVisible } from '../../utils';
 
 export const PaymentAttemptPage = () => {
   const { params, navigate } = useRouter();
@@ -47,7 +48,7 @@ export const PaymentAttemptPage = () => {
         sx={t => ({
           borderBlockEndWidth: t.borderWidths.$normal,
           borderBlockEndStyle: t.borderStyles.$solid,
-          borderBlockEndColor: t.colors.$neutralAlpha100,
+          borderBlockEndColor: t.colors.$borderAlpha100,
           marginBlockEnd: t.space.$4,
           paddingBlockEnd: t.space.$4,
         })}
@@ -71,7 +72,7 @@ export const PaymentAttemptPage = () => {
           sx={t => ({
             borderWidth: t.borderWidths.$normal,
             borderStyle: t.borderStyles.$solid,
-            borderColor: t.colors.$neutralAlpha100,
+            borderColor: t.colors.$borderAlpha100,
             borderRadius: t.radii.$lg,
             overflow: 'clip',
           })}
@@ -101,7 +102,7 @@ export const PaymentAttemptPage = () => {
                   display: 'flex',
                   alignItems: 'center',
                   gap: t.space.$0x25,
-                  color: t.colors.$colorTextSecondary,
+                  color: t.colors.$colorMutedForeground,
                 })}
               >
                 <CopyButton
@@ -170,7 +171,7 @@ export const PaymentAttemptPage = () => {
               background: t.colors.$neutralAlpha25,
               borderBlockStartWidth: t.borderWidths.$normal,
               borderBlockStartStyle: t.borderStyles.$solid,
-              borderBlockStartColor: t.colors.$neutralAlpha100,
+              borderBlockStartColor: t.colors.$borderAlpha100,
               display: 'flex',
               justifyContent: 'space-between',
             })}
@@ -227,7 +228,7 @@ function CopyButton({ text, copyLabel = 'Copy' }: { text: string; copyLabel?: st
         borderRadius: t.radii.$sm,
         '&:focus-visible': {
           outline: '2px solid',
-          outlineColor: t.colors.$neutralAlpha200,
+          outlineColor: t.colors.$colorRing,
         },
       })}
       focusRing={false}

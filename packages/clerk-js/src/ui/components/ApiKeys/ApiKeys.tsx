@@ -4,6 +4,7 @@ import type { CreateAPIKeyParams } from '@clerk/types';
 import { lazy, useState } from 'react';
 import useSWRMutation from 'swr/mutation';
 
+import { useProtect } from '@/ui/common';
 import { useApiKeysContext, withCoreUserGuard } from '@/ui/contexts';
 import {
   Box,
@@ -22,6 +23,7 @@ import { InputWithIcon } from '@/ui/elements/InputWithIcon';
 import { Pagination } from '@/ui/elements/Pagination';
 import { MagnifyingGlass } from '@/ui/icons';
 import { mqu } from '@/ui/styledSystem';
+import { isOrganizationId } from '@/utils';
 
 import { ApiKeysTable } from './ApiKeysTable';
 import type { OnCreateParams } from './CreateApiKeyForm';
@@ -41,6 +43,10 @@ const RevokeAPIKeyConfirmationModal = lazy(() =>
 );
 
 export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPageProps) => {
+  const isOrg = isOrganizationId(subject);
+  const canReadAPIKeys = useProtect({ permission: 'org:sys_api_keys:read' });
+  const canManageAPIKeys = useProtect({ permission: 'org:sys_api_keys:manage' });
+
   const {
     apiKeys,
     isLoading,
@@ -53,7 +59,7 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
     startingRow,
     endingRow,
     cacheKey,
-  } = useApiKeys({ subject, perPage });
+  } = useApiKeys({ subject, perPage, enabled: isOrg ? canReadAPIKeys : true });
   const card = useCardState();
   const { trigger: createApiKey, isMutating } = useSWRMutation(cacheKey, (_, { arg }: { arg: CreateAPIKeyParams }) =>
     clerk.apiKeys.create(arg),
@@ -118,16 +124,18 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
               elementDescriptor={descriptors.apiKeysSearchInput}
             />
           </Box>
-          <Action.Trigger
-            value='add-api-key'
-            hideOnActive={false}
-          >
-            <Button
-              variant='solid'
-              localizationKey={localizationKeys('apiKeys.action__add')}
-              elementDescriptor={descriptors.apiKeysAddButton}
-            />
-          </Action.Trigger>
+          {((isOrg && canManageAPIKeys) || !isOrg) && (
+            <Action.Trigger
+              value='add-api-key'
+              hideOnActive={false}
+            >
+              <Button
+                variant='solid'
+                localizationKey={localizationKeys('apiKeys.action__add')}
+                elementDescriptor={descriptors.apiKeysAddButton}
+              />
+            </Action.Trigger>
+          )}
         </Flex>
         <Action.Open value='add-api-key'>
           <Flex sx={t => ({ paddingTop: t.space.$6, paddingBottom: t.space.$6 })}>
@@ -145,6 +153,7 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
         isLoading={isLoading}
         onRevoke={handleRevoke}
         elementDescriptor={descriptors.apiKeysTable}
+        canManageAPIKeys={(isOrg && canManageAPIKeys) || !isOrg}
       />
       {itemCount > (perPage ?? 5) && (
         <Pagination

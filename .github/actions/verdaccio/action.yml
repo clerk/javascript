@@ -22,7 +22,7 @@ inputs:
     default: 'http://localhost:4873'
 
 runs:
-  using: "composite"
+  using: 'composite'
   steps:
     - name: Update NPM Registry to Verdaccio
       shell: bash
@@ -32,7 +32,15 @@ runs:
       shell: bash
       run: |
         nohup ./node_modules/.bin/verdaccio --config ./verdaccio.publish.yaml & echo "VERDACCIO_PID=$!" >> $GITHUB_ENV
-        sleep 5
+        # Wait for Verdaccio to start and verify it's responding
+        for i in {1..10}; do
+          if curl -f ${{ inputs.registry }}/ > /dev/null 2>&1; then
+            echo "Verdaccio is up and running"
+            break
+          fi
+          echo "Waiting for Verdaccio to start (attempt $i)..."
+          sleep 2
+        done
         pnpm config set $(echo ${{ inputs.registry }} | sed -E 's/https?://')/:_authToken secretToken
 
     - name: Publish to Verdaccio
@@ -41,10 +49,25 @@ runs:
 
     - name: Stop Verdaccio
       shell: bash
-      run: kill -9 $VERDACCIO_PID
+      run: |
+        if [ -n "$VERDACCIO_PID" ]; then
+          kill -9 $VERDACCIO_PID || true
+          sleep 2
+        fi
 
     - name: Run Verdaccio (using install config)
       shell: bash
       run: |
-        nohup ./node_modules/.bin/verdaccio --config ./verdaccio.install.yaml & sleep 5
+        nohup ./node_modules/.bin/verdaccio --config ./verdaccio.install.yaml & echo "VERDACCIO_PID=$!" >> $GITHUB_ENV
+        # Wait for Verdaccio to start and verify it's responding
+        for i in {1..10}; do
+          if curl -f ${{ inputs.registry }}/ > /dev/null 2>&1; then
+            echo "Verdaccio is up and running"
+            break
+          fi
+          echo "Waiting for Verdaccio to start (attempt $i)..."
+          sleep 2
+        done
         pnpm config set $(echo ${{ inputs.registry }} | sed -E 's/https?://')/:_authToken secretToken
+        # Verify proxy is working by trying to fetch a known package
+        pnpm view semver > /dev/null 2>&1 || echo "Warning: Could not fetch semver package, proxy might not be working"

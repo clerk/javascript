@@ -7,7 +7,7 @@ import { FormButtons } from '../elements/FormButtons';
 import type { FormProps } from '../elements/FormContainer';
 import { FormContainer } from '../elements/FormContainer';
 import type { LocalizationKey } from '../localization';
-import { handleError } from '../utils';
+import { handleError } from '../utils/errorHandler';
 
 type RemoveFormProps = FormProps & {
   title: LocalizationKey;

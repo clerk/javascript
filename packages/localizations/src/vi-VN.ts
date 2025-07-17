@@ -17,36 +17,37 @@ export const viVN: LocalizationResource = {
   apiKeys: {
     action__add: 'Thêm khoá mới',
     action__search: 'Tìm kiếm khoá',
-    formFieldOption__expiration__1d: '1 Ngày',
-    formFieldOption__expiration__7d: '7 Ngày',
-    formFieldOption__expiration__30d: '30 Ngày',
-    formFieldOption__expiration__60d: '60 Ngày',
-    formFieldOption__expiration__90d: '90 Ngày',
-    formFieldOption__expiration__180d: '180 Ngày',
-    formFieldOption__expiration__1y: '1 Năm',
-    formFieldOption__expiration__never: 'Không hết hạn',
-    lastUsed__seconds: '{{seconds}} giây trước',
-    lastUsed__minutes: '{{minutes}} phút trước',
-    lastUsed__hours: '{{hours}} giờ trước',
-    lastUsed__days: '{{days}} ngày trước',
-    lastUsed__months: '{{months}} tháng trước',
-    lastUsed__years: '{{years}} năm trước',
+    createdAndExpirationStatus__expiresOn:
+      "Tạo {{ createdDate | shortDate('vi-VN') }} • Hết hạn {{ expiresDate | longDate('vi-VN') }}",
+    createdAndExpirationStatus__never: "Tạo {{ createdDate | shortDate('vi-VN') }} • Không hết hạn",
     detailsTitle__emptyRow: 'Không tìm thấy khoá API',
     formButtonPrimary__add: 'Tạo khoá',
+    formFieldCaption__expiration__expiresOn: 'Hết hạn {{ date }}'
+    formFieldCaption__expiration__never: 'Khoá này sẽ không hết hạn',
+    formFieldOption__expiration__180d: '180 Ngày',
+    formFieldOption__expiration__1d: '1 Ngày',
+    formFieldOption__expiration__1y: '1 Năm',
+    formFieldOption__expiration__30d: '30 Ngày',
+    formFieldOption__expiration__60d: '60 Ngày',
+    formFieldOption__expiration__7d: '7 Ngày',
+    formFieldOption__expiration__90d: '90 Ngày',
+    formFieldOption__expiration__never: 'Không hết hạn',
     formHint: 'Nhập tên để tạo khoá mới. Bạn sẽ có thể hủy bỏ bất kỳ lúc nào.',
     formTitle: 'Thêm khoá API mới',
+    
+    lastUsed__days: '{{days}} ngày trước',
+    lastUsed__hours: '{{hours}} giờ trước',
+    lastUsed__minutes: '{{minutes}} phút trước',
+    lastUsed__months: '{{months}} tháng trước',
+    lastUsed__seconds: '{{seconds}} giây trước',
+    lastUsed__years: '{{years}} năm trước',
     menuAction__revoke: 'Hủy khoá',
     revokeConfirmation: {
+      confirmationText: 'Hủy'
       formButtonPrimary__revoke: 'Hủy khoá',
       formHint: 'Bạn có chắc chắn muốn xóa khoá này không?',
       formTitle: 'Hủy khoá "{{apiKeyName}}" không?',
-      confirmationText: 'Hủy'
     },
-    createdAndExpirationStatus__never: "Tạo {{ createdDate | shortDate('vi-VN') }} • Không hết hạn",
-    createdAndExpirationStatus__expiresOn:
-      "Tạo {{ createdDate | shortDate('vi-VN') }} • Hết hạn {{ expiresDate | longDate('vi-VN') }}",
-    formFieldCaption__expiration__never: 'Khoá này sẽ không hết hạn',
-    formFieldCaption__expiration__expiresOn: 'Hết hạn {{ date }}'
   },
   backButton: 'Quay lại',
   badge__activePlan: 'Đang hoạt động',
@@ -96,6 +97,7 @@ export const viVN: LocalizationResource = {
         title__subscriptionBegins: 'Đăng ký bắt đầu',
         title__totalPaid: 'Tổng thanh toán'
       },
+      pastDueNotice: undefined,
       perMonth: 'hàng tháng',
       title: 'Thanh toán',
       title__paymentSuccessful: 'Thanh toán thành công!',
@@ -176,9 +178,9 @@ export const viVN: LocalizationResource = {
   formFieldHintText__optional: 'Tùy chọn',
   formFieldHintText__slug:
     'Một slug là một ID dễ đọc bởi con người mà phải độc nhất. Nó thường được sử dụng trong URL.',
-  formFieldInputPlaceholder__apiKeyName: 'Nhập tên khoá bí mật',
-  formFieldInputPlaceholder__apiKeyExpirationDate: 'Chọn ngày',
   formFieldInputPlaceholder__apiKeyDescription: 'Giải thích tại sao bạn đang tạo khoá này',
+  formFieldInputPlaceholder__apiKeyExpirationDate: 'Chọn ngày',
+  formFieldInputPlaceholder__apiKeyName: 'Nhập tên khoá bí mật',
   formFieldInputPlaceholder__backupCode: 'Nhập mã dự phòng',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Xóa tài khoản',
   formFieldInputPlaceholder__emailAddress: 'Nhập địa chỉ email của bạn',
@@ -251,10 +253,10 @@ export const viVN: LocalizationResource = {
     billingPage: {
       paymentHistorySection: {
         empty: 'Không có lịch sử thanh toán',
-        tableHeader__date: 'Ngày',
-        tableHeader__amount: 'Số tiền',
-        tableHeader__status: 'Trạng thái',
         notFound: 'Không tìm thấy lịch sử thanh toán'
+        tableHeader__amount: 'Số tiền',
+        tableHeader__date: 'Ngày',
+        tableHeader__status: 'Trạng thái',
       },
       paymentSourcesSection: {
         actionLabel__default: 'Làm mặc định',
@@ -286,17 +288,28 @@ export const viVN: LocalizationResource = {
         itemCaption__proratedCredit: 'Tín dụng phân chia cho sử dụng một phần của đăng ký trước',
         itemCaption__subscribedAndPaidForPlan: 'Đăng ký và thanh toán cho gói {{plan}} {{period}}',
         notFound: 'Không tìm thấy hóa đơn',
-        tableHeader__date: 'Ngày',
         tableHeader__amount: 'Số tiền',
+        tableHeader__date: 'Ngày',
         title: 'Hóa đơn',
         totalPaid: 'Tổng thanh toán'
+      },
+      statementsSection: {
+        empty: undefined,
+        itemCaption__paidForPlan: undefined,
+        itemCaption__proratedCredit: undefined,
+        itemCaption__subscribedAndPaidForPlan: undefined,
+        notFound: undefined,
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+        totalPaid: undefined,
       },
       subscriptionsListSection: {
         actionLabel__newSubscription: 'Đăng ký gói',
         actionLabel__switchPlan: 'Chuyển gói',
+        tableHeader__edit: 'Sửa',
         tableHeader__plan: 'Gói',
         tableHeader__startDate: 'Ngày bắt đầu',
-        tableHeader__edit: 'Sửa',
         title: 'Đăng ký'
       },
       subscriptionsSection: {
@@ -918,10 +931,10 @@ export const viVN: LocalizationResource = {
     billingPage: {
       paymentHistorySection: {
         empty: 'Không có lịch sử thanh toán',
-        tableHeader__date: 'Ngày',
-        tableHeader__amount: 'Số tiền',
-        tableHeader__status: 'Trạng thái',
         notFound: 'Không tìm thấy lịch sử thanh toán'
+        tableHeader__amount: 'Số tiền',
+        tableHeader__date: 'Ngày',
+        tableHeader__status: 'Trạng thái',
       },
       paymentSourcesSection: {
         actionLabel__default: 'Làm mặc định',
@@ -953,17 +966,17 @@ export const viVN: LocalizationResource = {
         itemCaption__proratedCredit: 'Tín dụng phân chia cho sử dụng một phần của đăng ký trước',
         itemCaption__subscribedAndPaidForPlan: 'Đăng ký và thanh toán cho {{plan}} {{period}} gói',
         notFound: 'Không tìm thấy báo cáo',
-        tableHeader__date: 'Ngày',
         tableHeader__amount: 'Số tiền',
+        tableHeader__date: 'Ngày',
         title: 'Báo cáo',
         totalPaid: 'Tổng thanh toán'
       },
       subscriptionsListSection: {
         actionLabel__newSubscription: 'Đăng ký gói',
         actionLabel__switchPlan: 'Chuyển gói',
+        tableHeader__edit: 'Sửa',
         tableHeader__plan: 'Gói',
         tableHeader__startDate: 'Ngày bắt đầu',
-        tableHeader__edit: 'Sửa',
         title: 'Đăng ký'
       },
       subscriptionsSection: {

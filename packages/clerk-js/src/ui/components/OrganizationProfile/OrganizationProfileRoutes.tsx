@@ -6,9 +6,6 @@ import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
 import { Route, Switch } from '../../router';
 import { OrganizationGeneralPage } from './OrganizationGeneralPage';
 import { OrganizationMembers } from './OrganizationMembers';
-import { OrganizationPaymentAttemptPage } from './OrganizationPaymentAttemptPage';
-import { OrganizationPlansPage } from './OrganizationPlansPage';
-import { OrganizationStatementPage } from './OrganizationStatementPage';
 
 const OrganizationBillingPage = lazy(() =>
   import(/* webpackChunkName: "op-billing-page"*/ './OrganizationBillingPage').then(module => ({
@@ -19,6 +16,24 @@ const OrganizationBillingPage = lazy(() =>
 const OrganizationAPIKeysPage = lazy(() =>
   import(/* webpackChunkName: "op-api-keys-page"*/ './OrganizationApiKeysPage').then(module => ({
     default: module.OrganizationAPIKeysPage,
+  })),
+);
+
+const OrganizationPlansPage = lazy(() =>
+  import(/* webpackChunkName: "op-plans-page"*/ './OrganizationPlansPage').then(module => ({
+    default: module.OrganizationPlansPage,
+  })),
+);
+
+const OrganizationStatementPage = lazy(() =>
+  import(/* webpackChunkName: "statement-page"*/ './OrganizationStatementPage').then(module => ({
+    default: module.OrganizationStatementPage,
+  })),
+);
+
+const OrganizationPaymentAttemptPage = lazy(() =>
+  import(/* webpackChunkName: "payment-attempt-page"*/ './OrganizationPaymentAttemptPage').then(module => ({
+    default: module.OrganizationPaymentAttemptPage,
   })),
 );
 
@@ -82,19 +97,16 @@ export const OrganizationProfileRoutes = () => {
                   </Suspense>
                 </Route>
                 <Route path='plans'>
-                  {/* TODO(@commerce): Should this be lazy loaded ? */}
                   <Suspense fallback={''}>
                     <OrganizationPlansPage />
                   </Suspense>
                 </Route>
                 <Route path='statement/:statementId'>
-                  {/* TODO(@commerce): Should this be lazy loaded ? */}
                   <Suspense fallback={''}>
                     <OrganizationStatementPage />
                   </Suspense>
                 </Route>
                 <Route path='payment-attempt/:paymentAttemptId'>
-                  {/* TODO(@commerce): Should this be lazy loaded ? */}
                   <Suspense fallback={''}>
                     <OrganizationPaymentAttemptPage />
                   </Suspense>
@@ -104,15 +116,21 @@ export const OrganizationProfileRoutes = () => {
           </Protect>
         )}
         {apiKeysSettings.enabled && (
-          <Route path={isApiKeysPageRoot ? undefined : 'organization-api-keys'}>
-            <Switch>
-              <Route index>
-                <Suspense fallback={''}>
-                  <OrganizationAPIKeysPage />
-                </Suspense>
-              </Route>
-            </Switch>
-          </Route>
+          <Protect
+            condition={has =>
+              has({ permission: 'org:sys_api_keys:read' }) || has({ permission: 'org:sys_api_keys:manage' })
+            }
+          >
+            <Route path={isApiKeysPageRoot ? undefined : 'organization-api-keys'}>
+              <Switch>
+                <Route index>
+                  <Suspense fallback={''}>
+                    <OrganizationAPIKeysPage />
+                  </Suspense>
+                </Route>
+              </Switch>
+            </Route>
+          </Protect>
         )}
       </Route>
     </Switch>

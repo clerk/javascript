@@ -10,13 +10,15 @@ import { FormContainer } from '@/ui/elements/FormContainer';
 import { Header } from '@/ui/elements/Header';
 import { IconButton } from '@/ui/elements/IconButton';
 import { SuccessPage } from '@/ui/elements/SuccessPage';
+import { createSlug } from '@/ui/utils/createSlug';
+import { handleError } from '@/ui/utils/errorHandler';
+import { useFormControl } from '@/ui/utils/useFormControl';
 
 import { useWizard, Wizard } from '../../common';
 import { Col, Icon } from '../../customizables';
 import { Upload } from '../../icons';
 import type { LocalizationKey } from '../../localization';
 import { localizationKeys } from '../../localization';
-import { createSlug, handleError, useFormControl } from '../../utils';
 import { InviteMembersForm } from '../OrganizationProfile/InviteMembersForm';
 import { InvitationsSentMessage } from '../OrganizationProfile/InviteMembersScreen';
 import { OrganizationProfileAvatarUploader } from '../OrganizationProfile/OrganizationProfileAvatarUploader';
@@ -160,7 +162,7 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
                       size='md'
                       icon={Upload}
                       sx={t => ({
-                        color: t.colors.$colorTextSecondary,
+                        color: t.colors.$colorMutedForeground,
                         transitionDuration: t.transitionDuration.$controls,
                       })}
                     />
@@ -171,7 +173,7 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
                     borderRadius: t.radii.$md,
                     borderWidth: t.borderWidths.$normal,
                     borderStyle: t.borderStyles.$dashed,
-                    borderColor: t.colors.$neutralAlpha200,
+                    borderColor: t.colors.$borderAlpha200,
                     backgroundColor: t.colors.$neutralAlpha50,
                     ':hover': {
                       backgroundColor: t.colors.$neutralAlpha50,

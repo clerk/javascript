@@ -2,13 +2,13 @@ import { useClerk } from '@clerk/shared/react';
 import { createContext, useContext, useMemo } from 'react';
 
 import type { NavbarRoute } from '@/ui/elements/Navbar';
+import type { CustomPageContent } from '@/ui/utils/createCustomPages';
+import { createOrganizationProfileCustomPages } from '@/ui/utils/createCustomPages';
 
 import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID } from '../../constants';
 import { useEnvironment } from '../../contexts';
 import { useRouter } from '../../router';
 import type { OrganizationProfileCtx } from '../../types';
-import type { CustomPageContent } from '../../utils';
-import { createOrganizationProfileCustomPages } from '../../utils';
 
 type PagesType = {
   routes: NavbarRoute[];

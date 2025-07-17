@@ -1,8 +1,9 @@
 import { useOrganizationList } from '@clerk/shared/react/index';
 import type { PropsWithChildren } from 'react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { OrganizationListContext } from '@/ui/contexts';
+import { useSessionTasksContext } from '@/ui/contexts/components/SessionTasks';
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 
@@ -16,6 +17,8 @@ import { organizationListParams } from '../../OrganizationSwitcher/utils';
  */
 export const ForceOrganizationSelectionTask = withCardStateProvider(() => {
   const { userMemberships, userInvitations, userSuggestions } = useOrganizationList(organizationListParams);
+  const currentFlow = useRef<'create-organization' | 'organization-selection'>();
+
   const isLoading = userMemberships?.isLoading || userInvitations?.isLoading || userSuggestions?.isLoading;
   const hasData = !!(userMemberships?.count || userInvitations?.count || userSuggestions?.count);
 
@@ -27,15 +30,26 @@ export const ForceOrganizationSelectionTask = withCardStateProvider(() => {
     );
   }
 
-  if (hasData) {
-    return <OrganizationSelectionPage />;
+  // Only show the organization selection page if organizations exist when the component first mounts.
+  // This prevents unwanted screen transitions that could occur from data revalidation,
+  // such as when a user accepts an organization invitation and the membership list updates.
+  if (hasData || currentFlow.current === 'organization-selection') {
+    return <OrganizationSelectionPage currentFlow={currentFlow} />;
   }
 
-  return <CreateOrganizationPage />;
+  return <CreateOrganizationPage currentFlow={currentFlow} />;
 });
 
-const OrganizationSelectionPage = () => {
+type CommonPageProps = {
+  currentFlow: React.MutableRefObject<'create-organization' | 'organization-selection' | undefined>;
+};
+
+const OrganizationSelectionPage = ({ currentFlow }: CommonPageProps) => {
   const [showCreateOrganizationForm, setShowCreateOrganizationForm] = useState(false);
+
+  useEffect(() => {
+    currentFlow.current = 'organization-selection';
+  }, [currentFlow]);
 
   return (
     <OrganizationListContext.Provider
@@ -66,7 +80,11 @@ const OrganizationSelectionPage = () => {
   );
 };
 
-const CreateOrganizationPage = () => {
+const CreateOrganizationPage = ({ currentFlow }: CommonPageProps) => {
+  useEffect(() => {
+    currentFlow.current = 'create-organization';
+  }, [currentFlow]);
+
   return (
     <FlowCard>
       <Box
@@ -86,9 +104,10 @@ const CreateOrganizationPage = () => {
 
 const FlowCard = ({ children }: PropsWithChildren) => {
   const card = useCardState();
+  const { currentTaskContainer } = useSessionTasksContext();
 
   return (
-    <Card.Root>
+    <Card.Root ref={currentTaskContainer}>
       <Card.Content sx={t => ({ padding: `${t.space.$8} ${t.space.$none} ${t.space.$none}` })}>
         <Card.Alert sx={t => ({ margin: `${t.space.$none} ${t.space.$5}` })}>{card.error}</Card.Alert>
         {children}

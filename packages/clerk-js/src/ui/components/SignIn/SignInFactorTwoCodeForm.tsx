@@ -6,6 +6,7 @@ import React from 'react';
 import { useCardState } from '@/ui/elements/contexts';
 import type { VerificationCodeCardProps } from '@/ui/elements/VerificationCodeCard';
 import { VerificationCodeCard } from '@/ui/elements/VerificationCodeCard';
+import { handleError } from '@/ui/utils/errorHandler';
 
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { useCoreSignIn, useSignInContext } from '../../contexts';
@@ -13,7 +14,6 @@ import { localizationKeys, Text } from '../../customizables';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import type { LocalizationKey } from '../../localization';
 import { useRouter } from '../../router';
-import { handleError } from '../../utils';
 import { isResetPasswordStrategy } from './utils';
 
 export type SignInFactorTwoCodeCard = Pick<VerificationCodeCardProps, 'onShowAlternativeMethodsClicked'> & {

@@ -37,6 +37,7 @@ export * from './organizationSuggestion';
 export * from './passwords';
 export * from './permission';
 export * from './phoneNumber';
+export * from './protect';
 export * from './redirects';
 export * from './resource';
 export * from './role';

@@ -1,4 +1,4 @@
-export * from '@clerk/clerk-react';
+export * from './react/re-exports';
 
 export type { StorageCache } from './internal/utils/storage';
 

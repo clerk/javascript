@@ -149,6 +149,7 @@ export class HandshakeService {
       this.authenticateContext.usesSuffixedCookies().toString(),
     );
     url.searchParams.append(constants.QueryParameters.HandshakeReason, reason);
+    url.searchParams.append(constants.QueryParameters.HandshakeFormat, 'nonce');
 
     if (this.authenticateContext.instanceType === 'development' && this.authenticateContext.devBrowserToken) {
       url.searchParams.append(constants.QueryParameters.DevBrowser, this.authenticateContext.devBrowserToken);

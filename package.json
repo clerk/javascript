@@ -40,6 +40,7 @@
     "test:integration:expo-web": "E2E_APP_ID=expo.expo-web pnpm test:integration:base --grep @expo-web",
     "test:integration:express": "E2E_APP_ID=express.* pnpm test:integration:base --grep @express",
     "test:integration:generic": "E2E_APP_ID=react.vite.*,next.appRouter.withEmailCodes* pnpm test:integration:base --grep @generic",
+    "test:integration:handshake": "DISABLE_WEB_SECURITY=true E2E_APP_ID=next.appRouter.sessionsProd1 pnpm test:integration:base --grep @handshake",
     "test:integration:localhost": "pnpm test:integration:base --grep @localhost",
     "test:integration:nextjs": "E2E_APP_ID=next.appRouter.* pnpm test:integration:base --grep @nextjs",
     "test:integration:nuxt": "E2E_APP_ID=nuxt.node npm run test:integration:base -- --grep @nuxt",
@@ -51,7 +52,7 @@
     "test:integration:vue": "E2E_APP_ID=vue.vite pnpm test:integration:base --grep @vue",
     "test:typedoc": "pnpm typedoc:generate && cd ./.typedoc && vitest run",
     "turbo:clean": "turbo daemon clean",
-    "typedoc:generate": "pnpm build:declarations && typedoc --tsconfig tsconfig.typedoc.json",
+    "typedoc:generate": "pnpm build:declarations && typedoc --tsconfig tsconfig.typedoc.json && rm -rf .typedoc/docs && mv .typedoc/temp-docs .typedoc/docs",
     "version-packages": "changeset version && pnpm install --lockfile-only --engine-strict=false",
     "version-packages:canary": "./scripts/canary.mjs",
     "version-packages:snapshot": "./scripts/snapshot.mjs",
@@ -80,7 +81,7 @@
     "@testing-library/user-event": "^14.5.2",
     "@types/cross-spawn": "^6.0.6",
     "@types/jest": "^29.3.1",
-    "@types/node": "^22.15.32",
+    "@types/node": "^22.15.33",
     "@types/react": "catalog:react",
     "@types/react-dom": "catalog:react",
     "@vitejs/plugin-react": "^4.5.2",
@@ -122,6 +123,7 @@
     "jsonwebtoken": "9.0.2",
     "lint-staged": "^14.0.1",
     "prettier": "^3.5.3",
+    "prettier-plugin-astro": "^0.14.1",
     "prettier-plugin-packagejson": "^2.5.15",
     "prettier-plugin-tailwindcss": "^0.6.12",
     "publint": "^0.3.12",
@@ -145,12 +147,15 @@
     "yalc": "1.0.0-pre.53",
     "zx": "catalog:repo"
   },
-  "packageManager": "pnpm@9.15.9+sha512.68046141893c66fad01c079231128e9afb89ef87e2691d69e4d40eee228988295fd4682181bae55b58418c3a253bde65a505ec7c5f9403ece5cc3cd37dcf2531",
+  "packageManager": "pnpm@10.12.4+sha512.5ea8b0deed94ed68691c9bad4c955492705c5eeb8a87ef86bc62c74a26b037b08ff9570f108b2e4dbd1dd1a9186fea925e527f141c648e85af45631074680184",
   "engines": {
     "node": ">=18.17.0",
-    "pnpm": ">=9.15.9"
+    "pnpm": ">=10.12.4"
   },
   "pnpm": {
+    "onlyBuiltDependencies": [
+      "cypress"
+    ],
     "overrides": {
       "jest": "29.7.0",
       "jest-snapshot-prettier": "npm:prettier@^3.5.3"

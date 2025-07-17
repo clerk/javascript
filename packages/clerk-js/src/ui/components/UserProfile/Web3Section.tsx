@@ -5,13 +5,13 @@ import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { ProfileSection } from '@/ui/elements/Section';
 import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
+import { handleError } from '@/ui/utils/errorHandler';
 
 import { Badge, Box, Flex, Image, localizationKeys, Text } from '../../customizables';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { useEnabledThirdPartyProviders } from '../../hooks';
 import type { PropsOfComponent } from '../../styledSystem';
-import { handleError } from '../../utils';
 import { RemoveWeb3WalletForm } from './RemoveResourceForm';
 import { sortIdentificationBasedOnVerification } from './utils';
 import { AddWeb3WalletActionMenu } from './Web3Form';
