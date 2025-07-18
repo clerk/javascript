@@ -126,7 +126,7 @@ runs:
       run: |
         VERSION=$(node -p "require('@playwright/test/package.json').version")
         echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
-        
+
     - name: Cache Playwright Binaries
       if: inputs.playwright-enabled == 'true'
       uses: useblacksmith/cache@v5

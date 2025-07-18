@@ -12,6 +12,7 @@ import { createPricingTablePageObject } from './pricingTable';
 import { createSessionTaskComponentPageObject } from './sessionTask';
 import { createSignInComponentPageObject } from './signIn';
 import { createSignUpComponentPageObject } from './signUp';
+import { createSubscriptionDetailsPageObject } from './subscriptionDetails';
 import { createTestingTokenPageObject } from './testingToken';
 import { createUserButtonPageObject } from './userButton';
 import { createUserProfileComponentPageObject } from './userProfile';
@@ -48,5 +49,6 @@ export const createPageObjects = ({
     userVerification: createUserVerificationComponentPageObject(testArgs),
     waitlist: createWaitlistComponentPageObject(testArgs),
     apiKeys: createAPIKeysComponentPageObject(testArgs),
+    subscriptionDetails: createSubscriptionDetailsPageObject(testArgs),
   };
 };
