@@ -886,8 +886,8 @@ importers:
         specifier: workspace:^
         version: link:../types
       cookie:
-        specifier: 0.7.2
-        version: 0.7.2
+        specifier: 1.0.2
+        version: 1.0.2
       react:
         specifier: catalog:peer-react
         version: 18.3.1
@@ -907,9 +907,6 @@ importers:
       '@remix-run/server-runtime':
         specifier: ^2.16.8
         version: 2.16.8(typescript@5.8.3)
-      '@types/cookie':
-        specifier: ^0.6.0
-        version: 0.6.0
 
   packages/shared:
     dependencies:
