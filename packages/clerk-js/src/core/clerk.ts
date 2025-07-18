@@ -2735,8 +2735,6 @@ export class Clerk implements ClerkInterface {
       processedOptions.appearance = processCssLayerNameExtraction(processedOptions.appearance);
     }
 
-    console.log('processedOptions', processedOptions);
-
     return {
       ...defaultOptions,
       ...processedOptions,
