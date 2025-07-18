@@ -21,9 +21,8 @@ export * from '@clerk/backend/webhooks';
  * @example
  * ```typescript
  * import { verifyWebhook } from '@clerk/express/webhooks';
- * import express from 'express';
  *
- * app.post('/api/webhooks', express.raw({ type: 'application/json' }), async (req, res) => {
+ * app.post('/api/webhooks', async (req, res) => {
  *   try {
  *     const evt = await verifyWebhook(req);
  *     // handle event
