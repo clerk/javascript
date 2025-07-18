@@ -13,5 +13,8 @@ interface CreateClerkThemeParams extends DeepPartial<Theme> {
 
 export const experimental_createTheme = (appearance: Appearance<CreateClerkThemeParams>): BaseTheme => {
   // Placeholder method that might hande more transformations in the future
-  return { ...appearance, __type: 'prebuilt_appearance' };
+  return {
+    ...appearance,
+    __type: 'prebuilt_appearance',
+  };
 };

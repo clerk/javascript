@@ -806,7 +806,7 @@ export type Variables = {
 };
 
 export type BaseThemeTaggedType = { __type: 'prebuilt_appearance' };
-export type BaseTheme = BaseThemeTaggedType;
+export type BaseTheme = BaseThemeTaggedType & { cssLayerName?: string };
 
 export type Theme = {
   /**
