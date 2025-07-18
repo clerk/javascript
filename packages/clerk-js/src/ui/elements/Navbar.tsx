@@ -279,13 +279,14 @@ const NavButton = (props: NavButtonProps) => {
           gap: t.space.$3,
           justifyContent: 'flex-start',
           backgroundColor: isActive ? t.colors.$neutralAlpha100 : undefined,
-          color: isActive ? t.colors.$primary500 : t.colors.$colorMutedForeground,
+          color: isActive ? t.colors.$primary500 : t.colors.$neutralAlpha600,
           '&:hover': {
             backgroundColor: isActive ? undefined : t.colors.$neutralAlpha25,
           },
           '&:focus': {
             backgroundColor: isActive ? undefined : t.colors.$neutralAlpha50,
           },
+          opacity: isActive ? 1 : 0.6,
         }),
         sx,
       ]}
