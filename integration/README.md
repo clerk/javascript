@@ -24,16 +24,9 @@ Before you begin writing tests, you should already have:
 
 You'll only need to follow these instructions once when you setup the integration test suite.
 
-1. Navigate to the `integration` folder:
-   ```shell
-   cd integration
-   ```
-1. Make local duplicates of the sample files. They'll be automatically ignored by git:
-   ```shell
-   cp .env.local.sample .env.local
-   cp .keys.json.sample .keys.json
-   ```
-1. Open Clerk's 1Password and search for **JS SDKs integration tests**. Inside the secure note you'll find the secret keys that should go into `.env.local` and `.keys.json`. Copy them over.
+1. Make sure you have the [1Password CLI installed](https://developer.1password.com/docs/cli/get-started/) and have access to Clerk's "Shared" vault. You will also need to [enable the 1Password desktop app integration](https://developer.1password.com/docs/cli/get-started/#step-2-turn-on-the-1password-desktop-app-integration).
+
+1. Run `pnpm integration:secrets`.
 
 1. Generate the required session keys by running the following command in the `./certs` directory: `mkcert -cert-file sessions.pem -key-file sessions-key.pem "example.com" "*.example.com"`.
 
@@ -590,3 +583,17 @@ Before writing tests, it's important to understand how Playwright handles test i
 > - `VERCEL_PROJECT_ID`: Only required if you plan on running deployment tests locally. This is the Vercel project ID, and it points to an application created via the Vercel dashboard. The easiest way to get access to it is by linking a local app to the Vercel project using the Vercel CLI, and then copying the values from the `.vercel` directory.
 > - `VERCEL_ORG_ID`: The organization that owns the Vercel project. See above for more details.
 > - `VERCEL_TOKEN`: A personal access token. This corresponds to a real user running the deployment command. Attention: Be extra careful with this token as it can't be scoped to a single Vercel project, meaning that the token has access to every project in the account it belongs to.
+
+## Appendix
+
+### Production Hosts
+
+Production instances necessitate the use of DNS hostnames.
+For example, `multiple-apps-e2e.clerk.app` facilitates subdomain testing.
+During a test, a local proxy is established to direct requests from the DNS host to a local server.
+
+To incorporate a new hostname:
+
+- Provision a new `.clerk.app` host domain.
+- Establish and configure a new Clerk production application.
+- Update the local test certificates to encompass the new domain alongside existing ones.

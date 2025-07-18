@@ -8,6 +8,12 @@ import {
 } from './constants';
 import { parsePublishableKey } from './keys';
 
+/**
+ * Get the correct API url based on the publishable key.
+ *
+ * @param publishableKey - The publishable key to parse.
+ * @returns One of Clerk's API URLs.
+ */
 export const apiUrlFromPublishableKey = (publishableKey: string) => {
   const frontendApi = parsePublishableKey(publishableKey)?.frontendApi;
 

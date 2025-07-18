@@ -232,7 +232,7 @@ const RadioGroup = (
             sx={t => ({
               borderWidth: t.borderWidths.$normal,
               borderStyle: t.borderStyles.$solid,
-              borderColor: t.colors.$neutralAlpha100,
+              borderColor: t.colors.$borderAlpha100,
               borderRadius: t.radii.$md,
               padding: t.space.$2,
             })}

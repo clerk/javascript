@@ -1,4 +1,4 @@
-import type { AuthObject } from '@clerk/backend';
+import type { SignedInAuthObject, SignedOutAuthObject } from '@clerk/backend/internal';
 import { makeAuthObjectSerializable, stripPrivateDataFromObject } from '@clerk/backend/internal';
 import type { InitialState } from '@clerk/types';
 import type { H3Event } from 'h3';
@@ -17,7 +17,7 @@ export function toWebRequest(event: H3Event) {
   });
 }
 
-export function createInitialState(auth: AuthObject) {
+export function createInitialState(auth: SignedInAuthObject | SignedOutAuthObject) {
   const initialState = makeAuthObjectSerializable(stripPrivateDataFromObject(auth));
   return initialState as unknown as InitialState;
 }

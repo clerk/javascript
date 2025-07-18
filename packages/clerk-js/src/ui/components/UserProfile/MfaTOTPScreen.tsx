@@ -1,10 +1,12 @@
 import type { TOTPResource } from '@clerk/types';
 import React from 'react';
 
+import { withCardStateProvider } from '@/ui/elements/contexts';
+import type { FormProps } from '@/ui/elements/FormContainer';
+import { SuccessPage } from '@/ui/elements/SuccessPage';
+
 import { useWizard, Wizard } from '../../common';
 import { localizationKeys } from '../../customizables';
-import type { FormProps } from '../../elements';
-import { SuccessPage, withCardStateProvider } from '../../elements';
 import { AddAuthenticatorApp } from './AddAuthenticatorApp';
 import { MfaBackupCodeList } from './MfaBackupCodeList';
 import { VerifyTOTP } from './VerifyTOTP';

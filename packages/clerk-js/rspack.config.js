@@ -16,6 +16,7 @@ const variants = {
   clerkHeadless: 'clerk.headless',
   clerkHeadlessBrowser: 'clerk.headless.browser',
   clerkLegacyBrowser: 'clerk.legacy.browser',
+  clerkCHIPS: 'clerk.chips.browser',
 };
 
 const variantToSourceFile = {
@@ -25,6 +26,7 @@ const variantToSourceFile = {
   [variants.clerkHeadless]: './src/index.headless.ts',
   [variants.clerkHeadlessBrowser]: './src/index.headless.browser.ts',
   [variants.clerkLegacyBrowser]: './src/index.legacy.browser.ts',
+  [variants.clerkCHIPS]: './src/index.chips.browser.ts',
 };
 
 /**
@@ -39,6 +41,9 @@ const common = ({ mode, variant, disableRHC = false }) => {
   return {
     mode,
     resolve: {
+      alias: {
+        '@': path.resolve(__dirname, './src'),
+      },
       // Attempt to resolve these extensions in order
       // @see https://webpack.js.org/configuration/resolve/#resolveextensions
       extensions: ['.ts', '.tsx', '.mjs', '.js', '.jsx'],
@@ -53,6 +58,7 @@ const common = ({ mode, variant, disableRHC = false }) => {
          */
         __BUILD_FLAG_KEYLESS_UI__: isDevelopment(mode),
         __BUILD_DISABLE_RHC__: JSON.stringify(disableRHC),
+        __BUILD_VARIANT_CHIPS__: variant === variants.clerkCHIPS,
       }),
       new rspack.EnvironmentPlugin({
         CLERK_ENV: mode,
@@ -75,6 +81,7 @@ const common = ({ mode, variant, disableRHC = false }) => {
      * Necessary to prevent the Stripe dependencies from being bundled into
      * SDKs such as Browser Extensions.
      */
+    // TODO: @COMMERCE:  Do we still need this?
     externals: disableRHC ? ['@stripe/stripe-js', '@stripe/react-stripe-js'] : undefined,
     optimization: {
       splitChunks: {
@@ -94,28 +101,25 @@ const common = ({ mode, variant, disableRHC = false }) => {
             name: 'coinbase-wallet-sdk',
             chunks: 'all',
           },
+          stripeVendor: {
+            test: /[\\/]node_modules[\\/](@stripe\/stripe-js)[\\/]/,
+            name: 'stripe-vendors',
+            chunks: 'all',
+            enforce: true,
+          },
           /**
            * Sign up is shared between the SignUp component and the SignIn component.
            */
           signUp: {
             minChunks: 1,
             name: 'signup',
-            test: module => module.resource && module.resource.includes('/ui/components/SignUp'),
-          },
-          paymentSources: {
-            minChunks: 1,
-            name: 'paymentSources',
-            test: module =>
-              module.resource &&
-              (module.resource.includes('/ui/components/PaymentSources') ||
-                // Include `@stripe/react-stripe-js` and `@stripe/stripe-js` in the checkout chunk
-                module.resource.includes('/node_modules/@stripe')),
+            test: module => !!(module.resource && module.resource.includes('/ui/components/SignUp')),
           },
           common: {
             minChunks: 1,
             name: 'ui-common',
             priority: -20,
-            test: module => module.resource && !module.resource.includes('/ui/components'),
+            test: module => !!(module.resource && !module.resource.includes('/ui/components')),
           },
           defaultVendors: {
             minChunks: 1,
@@ -406,6 +410,13 @@ const prodConfig = ({ mode, env, analysis }) => {
     // externalsForHeadless(),
   );
 
+  const clerkCHIPS = merge(
+    entryForVariant(variants.clerkCHIPS),
+    common({ mode, variant: variants.clerkCHIPS }),
+    commonForProd(),
+    commonForProdChunked(),
+  );
+
   const clerkEsm = merge(
     entryForVariant(variants.clerk),
     common({ mode, variant: variants.clerk }),
@@ -513,6 +524,7 @@ const prodConfig = ({ mode, env, analysis }) => {
     clerkLegacyBrowser,
     clerkHeadless,
     clerkHeadlessBrowser,
+    clerkCHIPS,
     clerkEsm,
     clerkEsmNoRHC,
     clerkCjs,
@@ -533,6 +545,7 @@ const devConfig = ({ mode, env }) => {
   // By default we use https://js.lclclerk.com which is what our local dev proxy looks for.
   const devUrl = new URL(env.devOrigin || 'https://js.lclclerk.com');
   const isSandbox = !!env.sandbox;
+  const port = Number(new URL(env.devOrigin ?? 'http://localhost:4000').port || 4000);
 
   /** @type {() => import('@rspack/core').Configuration} */
   const commonForDev = () => {
@@ -563,7 +576,7 @@ const devConfig = ({ mode, env }) => {
         allowedHosts: ['all'],
         headers: { 'Access-Control-Allow-Origin': '*' },
         host: '0.0.0.0',
-        port: 4000,
+        port,
         hot: true,
         liveReload: false,
         client: { webSocketURL: `auto://${devUrl.host}/ws` },
@@ -613,6 +626,11 @@ const devConfig = ({ mode, env }) => {
       common({ mode, variant: variants.clerkHeadlessBrowser }),
       commonForDev(),
       // externalsForHeadless(),
+    ),
+    [variants.clerkCHIPS]: merge(
+      entryForVariant(variants.clerkCHIPS),
+      common({ mode, variant: variants.clerkCHIPS }),
+      commonForDev(),
     ),
   };
 

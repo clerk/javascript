@@ -28,6 +28,7 @@ export interface VueClerkInjectionKeyType {
     orgRole: OrganizationCustomRoleKey | null | undefined;
     orgSlug: string | null | undefined;
     orgPermissions: OrganizationCustomPermissionKey[] | null | undefined;
+    factorVerificationAge: [number, number] | null;
   }>;
   clientCtx: ComputedRef<ClientResource | null | undefined>;
   sessionCtx: ComputedRef<SignedInSessionResource | null | undefined>;

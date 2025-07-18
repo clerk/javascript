@@ -6,7 +6,7 @@ import type { FakeOrganization, FakeUser } from '../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../testUtils';
 
 testAgainstRunningApps({
-  withEnv: [appConfigs.envs.withBillingStaging],
+  withEnv: [appConfigs.envs.withBillingJwtV2],
 })('has() for JWT v2 @nextjs', ({ app }) => {
   test.describe.configure({ mode: 'serial' });
 
@@ -74,6 +74,7 @@ testAgainstRunningApps({
     async function assertPermsRolesFeatures() {
       await expect(u.page.getByText(`has({ permission: "org:impersonation:read" }) -> true`)).toBeVisible();
       await expect(u.page.getByText(`has({ permission: "org:magic_links:create" }) -> true`)).toBeVisible();
+      await expect(u.page.getByText(`has({ permission: "magic_links:create" }) -> true`)).toBeVisible();
       await expect(u.page.getByText(`has({ permission: "org:magic_links:read" }) -> true`)).toBeVisible();
       await expect(u.page.getByText(`has({ permission: "org:impersonation:manage" }) -> true`)).toBeVisible();
       await expect(u.page.getByText(`has({ role: "org:admin" }) -> true`)).toBeVisible();
@@ -171,6 +172,7 @@ testAgainstRunningApps({
       await expect(u.page.getByText(`has({ role: "org:admin" }) -> false`)).toBeVisible();
       await expect(u.page.getByText(`has({ role: "org:manager" }) -> false`)).toBeVisible();
       await expect(u.page.getByText(`has({ role: "org:impersonation_reader" }) -> true`)).toBeVisible();
+      await expect(u.page.getByText(`has({ role: "impersonation_reader" }) -> true`)).toBeVisible();
       await expect(u.page.getByText(`role -> org:impersonation_reader`)).toBeVisible();
       await expect(u.page.getByText(`has({ feature: "org:impersonation" }) -> true`)).toBeVisible();
       await expect(u.page.getByText(`has({ feature: "org:magic_links" }) -> true`)).toBeVisible();

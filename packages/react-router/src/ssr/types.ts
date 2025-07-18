@@ -1,5 +1,5 @@
-import type { AuthObject, Organization, Session, User, VerifyTokenOptions } from '@clerk/backend';
-import type { RequestState } from '@clerk/backend/internal';
+import type { Organization, Session, User, VerifyTokenOptions } from '@clerk/backend';
+import type { RequestState, SignedInAuthObject, SignedOutAuthObject } from '@clerk/backend/internal';
 import type {
   LegacyRedirectProps,
   MultiDomainAndOrProxy,
@@ -8,37 +8,9 @@ import type {
   SignUpFallbackRedirectUrl,
   SignUpForceRedirectUrl,
 } from '@clerk/types';
-import type { LoaderFunction, UNSAFE_DataWithResponseInit } from 'react-router';
-import type { CreateServerLoaderArgs } from 'react-router/route-module';
+import type { LoaderFunction, LoaderFunctionArgs, UNSAFE_DataWithResponseInit } from 'react-router';
 
-type Func = (...args: any[]) => unknown;
-
-type RouteModule = {
-  meta?: Func;
-  links?: Func;
-  headers?: Func;
-  loader?: Func;
-  clientLoader?: Func;
-  action?: Func;
-  clientAction?: Func;
-  HydrateFallback?: unknown;
-  default?: unknown;
-  ErrorBoundary?: unknown;
-  [key: string]: unknown;
-};
-
-export type RouteInfo = {
-  parents: RouteInfo[];
-  module: RouteModule;
-  id: unknown;
-  file: string;
-  path: string;
-  params: unknown;
-  loaderData: unknown;
-  actionData: unknown;
-};
-
-export type GetAuthReturn = Promise<AuthObject>;
+export type GetAuthReturn = Promise<SignedInAuthObject | SignedOutAuthObject>;
 
 export type RootAuthLoaderOptions = {
   /**
@@ -101,8 +73,6 @@ type RootAuthLoaderCallbackReturn =
   | UNSAFE_DataWithResponseInit<unknown>
   | Promise<UNSAFE_DataWithResponseInit<unknown>>;
 
-// TODO: Figure out how to use the Route.LoaderArgs from userland code
-export type LoaderFunctionArgs = CreateServerLoaderArgs<RouteInfo>;
 export type LoaderFunctionReturn = ReturnType<LoaderFunction>;
 
 export type LoaderFunctionArgsWithAuth<Options extends RootAuthLoaderOptions = any> = LoaderFunctionArgs & {
@@ -110,7 +80,7 @@ export type LoaderFunctionArgsWithAuth<Options extends RootAuthLoaderOptions = a
 };
 
 export type RequestWithAuth<Options extends RootAuthLoaderOptions = any> = LoaderFunctionArgs['request'] & {
-  auth: Omit<AuthObject, 'session' | 'user' | 'organization'>;
+  auth: Omit<SignedInAuthObject | SignedOutAuthObject, 'session' | 'user' | 'organization'>;
 } & (Options extends { loadSession: true } ? { session: Session | null } : object) &
   (Options extends { loadUser: true } ? { user: User | null } : object) &
   (Options extends { loadOrganization: true } ? { organization: Organization | null } : object);

@@ -1,5 +1,8 @@
+import { Card } from '@/ui/elements/Card';
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { Header } from '@/ui/elements/Header';
+
 import { Col, descriptors, localizationKeys, Spinner, Text } from '../../customizables';
-import { Card, Header, useCardState, withCardStateProvider } from '../../elements';
 import { useSetSessionWithTimeout } from '../../hooks/useSetSessionWithTimeout';
 import { Flex } from '../../primitives';
 

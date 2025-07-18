@@ -6,7 +6,7 @@ type StorageCacheOptions = {
 
 export type StorageCache = {
   createKey: (...keys: string[]) => string;
-  get: <T = any>(key: string) => Promise<T>;
+  get: <T = any>(key: string) => Promise<T | undefined>;
   remove: (key: string) => Promise<void>;
   set: (key: string, value: string) => Promise<void>;
 };
@@ -20,7 +20,7 @@ const createBrowserStorageCache = (opts: StorageCacheOptions = {}): StorageCache
 
   return {
     createKey,
-    get: (key: string) => browser.storage[__storageArea].get(key).then(result => result[key] || undefined),
+    get: <T>(key: string) => browser.storage[__storageArea].get(key).then(result => (result[key] as T) || undefined),
     remove: (key: string) => browser.storage[__storageArea].remove(key),
     set: (key: string, value: string) => browser.storage[__storageArea].set({ [key]: value }),
   };

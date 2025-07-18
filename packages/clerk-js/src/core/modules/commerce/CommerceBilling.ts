@@ -1,90 +1,125 @@
 import type {
-  __experimental_CommerceBillingNamespace,
-  __experimental_CommerceCheckoutJSON,
-  __experimental_CommerceInvoiceJSON,
-  __experimental_CommerceInvoiceResource,
-  __experimental_CommercePlanResource,
-  __experimental_CommerceProductJSON,
-  __experimental_CommerceSubscriptionJSON,
-  __experimental_CommerceSubscriptionResource,
-  __experimental_CreateCheckoutParams,
-  __experimental_GetInvoicesParams,
-  __experimental_GetPlansParams,
-  __experimental_GetSubscriptionsParams,
   ClerkPaginatedResponse,
+  CommerceBillingNamespace,
+  CommerceCheckoutJSON,
+  CommercePaymentJSON,
+  CommercePaymentResource,
+  CommercePlanJSON,
+  CommercePlanResource,
+  CommerceStatementJSON,
+  CommerceStatementResource,
+  CommerceSubscriptionJSON,
+  CommerceSubscriptionResource,
+  CreateCheckoutParams,
+  GetPaymentAttemptsParams,
+  GetPlansParams,
+  GetStatementsParams,
+  GetSubscriptionsParams,
 } from '@clerk/types';
 
 import { convertPageToOffsetSearchParams } from '../../../utils/convertPageToOffsetSearchParams';
 import {
-  __experimental_CommerceCheckout,
-  __experimental_CommerceInvoice,
-  __experimental_CommercePlan,
-  __experimental_CommerceSubscription,
   BaseResource,
+  CommerceCheckout,
+  CommercePayment,
+  CommercePlan,
+  CommerceStatement,
+  CommerceSubscription,
 } from '../../resources/internal';
 
-export class __experimental_CommerceBilling implements __experimental_CommerceBillingNamespace {
-  getPlans = async (params?: __experimental_GetPlansParams): Promise<__experimental_CommercePlanResource[]> => {
-    const { data: products } = (await BaseResource._fetch({
-      path: `/commerce/products`,
+export class CommerceBilling implements CommerceBillingNamespace {
+  getPlans = async (params?: GetPlansParams): Promise<ClerkPaginatedResponse<CommercePlanResource>> => {
+    const { for: forParam, ...safeParams } = params || {};
+    const searchParams = { ...safeParams, payer_type: forParam || 'user' };
+    return await BaseResource._fetch({
+      path: `/commerce/plans`,
       method: 'GET',
-      search: { payerType: params?.subscriberType || '' },
-    })) as unknown as ClerkPaginatedResponse<__experimental_CommerceProductJSON>;
+      search: convertPageToOffsetSearchParams(searchParams),
+    }).then(res => {
+      const { data: plans, total_count } = res as unknown as ClerkPaginatedResponse<CommercePlanJSON>;
 
-    const defaultProduct = products.find(product => product.is_default);
-    return defaultProduct?.plans.map(plan => new __experimental_CommercePlan(plan)) || [];
+      return {
+        total_count,
+        data: plans.map(plan => new CommercePlan(plan)),
+      };
+    });
+  };
+
+  getPlan = async (params: { id: string }): Promise<CommercePlanResource> => {
+    const plan = (await BaseResource._fetch({
+      path: `/commerce/plans/${params.id}`,
+      method: 'GET',
+    })) as unknown as CommercePlanJSON;
+    return new CommercePlan(plan);
   };
 
   getSubscriptions = async (
-    params: __experimental_GetSubscriptionsParams,
-  ): Promise<ClerkPaginatedResponse<__experimental_CommerceSubscriptionResource>> => {
+    params: GetSubscriptionsParams,
+  ): Promise<ClerkPaginatedResponse<CommerceSubscriptionResource>> => {
     const { orgId, ...rest } = params;
 
     return await BaseResource._fetch({
-      path: orgId ? `/organizations/${orgId}/subscriptions` : `/me/commerce/subscriptions`,
+      path: orgId ? `/organizations/${orgId}/commerce/subscriptions` : `/me/commerce/subscriptions`,
       method: 'GET',
       search: convertPageToOffsetSearchParams(rest),
     }).then(res => {
       const { data: subscriptions, total_count } =
-        res?.response as unknown as ClerkPaginatedResponse<__experimental_CommerceSubscriptionJSON>;
+        res?.response as unknown as ClerkPaginatedResponse<CommerceSubscriptionJSON>;
 
       return {
         total_count,
-        data: subscriptions.map(subscription => new __experimental_CommerceSubscription(subscription)),
+        data: subscriptions.map(subscription => new CommerceSubscription(subscription)),
       };
     });
   };
 
-  getInvoices = async (
-    params: __experimental_GetInvoicesParams,
-  ): Promise<ClerkPaginatedResponse<__experimental_CommerceInvoiceResource>> => {
+  getStatements = async (params: GetStatementsParams): Promise<ClerkPaginatedResponse<CommerceStatementResource>> => {
     const { orgId, ...rest } = params;
 
     return await BaseResource._fetch({
-      path: orgId ? `/organizations/${orgId}/invoices` : `/me/commerce/invoices`,
+      path: orgId ? `/organizations/${orgId}/commerce/statements` : `/me/commerce/statements`,
       method: 'GET',
       search: convertPageToOffsetSearchParams(rest),
     }).then(res => {
-      const { data: invoices, total_count } =
-        res?.response as unknown as ClerkPaginatedResponse<__experimental_CommerceInvoiceJSON>;
+      const { data: statements, total_count } =
+        res?.response as unknown as ClerkPaginatedResponse<CommerceStatementJSON>;
 
       return {
         total_count,
-        data: invoices.map(invoice => new __experimental_CommerceInvoice(invoice)),
+        data: statements.map(statement => new CommerceStatement(statement)),
       };
     });
   };
 
-  startCheckout = async (params: __experimental_CreateCheckoutParams) => {
+  getPaymentAttempts = async (
+    params: GetPaymentAttemptsParams,
+  ): Promise<ClerkPaginatedResponse<CommercePaymentResource>> => {
+    const { orgId, ...rest } = params;
+
+    return await BaseResource._fetch({
+      path: orgId ? `/organizations/${orgId}/commerce/payment_attempts` : `/me/commerce/payment_attempts`,
+      method: 'GET',
+      search: convertPageToOffsetSearchParams(rest),
+    }).then(res => {
+      const { data: payments, total_count } = res as unknown as ClerkPaginatedResponse<CommercePaymentJSON>;
+
+      return {
+        total_count,
+        data: payments.map(payment => new CommercePayment(payment)),
+      };
+    });
+  };
+
+  startCheckout = async (params: CreateCheckoutParams) => {
     const { orgId, ...rest } = params;
     const json = (
-      await BaseResource._fetch<__experimental_CommerceCheckoutJSON>({
+      await BaseResource._fetch<CommerceCheckoutJSON>({
         path: orgId ? `/organizations/${orgId}/commerce/checkouts` : `/me/commerce/checkouts`,
         method: 'POST',
         body: rest as any,
       })
-    )?.response as unknown as __experimental_CommerceCheckoutJSON;
+    )?.response as unknown as CommerceCheckoutJSON;
 
-    return new __experimental_CommerceCheckout(json, orgId);
+    return new CommerceCheckout(json, orgId);
   };
 }

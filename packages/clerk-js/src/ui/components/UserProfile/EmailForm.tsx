@@ -2,21 +2,30 @@ import { useReverification, useUser } from '@clerk/shared/react';
 import type { EmailAddressResource, EnvironmentResource, PrepareEmailAddressVerificationParams } from '@clerk/types';
 import React from 'react';
 
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { Form } from '@/ui/elements/Form';
+import { FormButtons } from '@/ui/elements/FormButtons';
+import type { FormProps } from '@/ui/elements/FormContainer';
+import { FormContainer } from '@/ui/elements/FormContainer';
+import { handleError } from '@/ui/utils/errorHandler';
+import { useFormControl } from '@/ui/utils/useFormControl';
+
 import { useWizard, Wizard } from '../../common';
 import { useEnvironment } from '../../contexts';
-import { localizationKeys } from '../../customizables';
-import type { FormProps } from '../../elements';
-import { Form, FormButtons, FormContainer, useCardState, withCardStateProvider } from '../../elements';
-import { handleError, useFormControl } from '../../utils';
+import type { LocalizationKey } from '../../localization';
+import { localizationKeys } from '../../localization';
 import { VerifyWithCode } from './VerifyWithCode';
 import { VerifyWithEnterpriseConnection } from './VerifyWithEnterpriseConnection';
 import { VerifyWithLink } from './VerifyWithLink';
 
 type EmailFormProps = FormProps & {
   emailId?: string;
+  title?: LocalizationKey;
+  subtitle?: LocalizationKey;
+  disableAutoFocus?: boolean;
 };
 export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
-  const { emailId: id, onSuccess, onReset } = props;
+  const { emailId: id, onSuccess, onReset, disableAutoFocus = false } = props;
   const card = useCardState();
   const { user } = useUser();
   const environment = useEnvironment();
@@ -57,14 +66,14 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
   return (
     <Wizard {...wizard.props}>
       <FormContainer
-        headerTitle={localizationKeys('userProfile.emailAddressPage.title')}
-        headerSubtitle={localizationKeys('userProfile.emailAddressPage.formHint')}
+        headerTitle={props.title || localizationKeys('userProfile.emailAddressPage.title')}
+        headerSubtitle={props.subtitle || localizationKeys('userProfile.emailAddressPage.formHint')}
       >
         <Form.Root onSubmit={addEmail}>
           <Form.ControlRow elementId={emailField.id}>
             <Form.PlainInput
               {...emailField.props}
-              autoFocus
+              autoFocus={!disableAutoFocus}
             />
           </Form.ControlRow>
           <FormButtons
@@ -78,7 +87,7 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
       <FormContainer
         headerTitle={localizationKeys('userProfile.emailAddressPage.verifyTitle')}
         headerSubtitle={localizationKeys(`${translationKey}.formSubtitle`, {
-          identifier: emailAddressRef.current?.emailAddress,
+          identifier: emailAddressRef.current?.emailAddress || '',
         })}
       >
         {strategy === 'email_link' && (

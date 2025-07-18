@@ -1,8 +1,11 @@
 ---
-import type { GoogleOneTapProps } from "@clerk/types";
-type Props = GoogleOneTapProps
+import type { GoogleOneTapProps } from '@clerk/types';
+type Props = GoogleOneTapProps;
 
-import InternalUIComponentRenderer from './InternalUIComponentRenderer.astro'
+import InternalUIComponentRenderer from './InternalUIComponentRenderer.astro';
 ---
 
-<InternalUIComponentRenderer {...Astro.props} component="google-one-tap" />
+<InternalUIComponentRenderer
+  {...Astro.props}
+  component='google-one-tap'
+/>

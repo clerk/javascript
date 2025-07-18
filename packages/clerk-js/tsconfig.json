@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "allowJs": false,
-    "baseUrl": "src",
     "declaration": false,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
@@ -20,7 +19,10 @@
     "sourceMap": false,
     "strict": true,
     "target": "ES2019",
-    "useUnknownInCatchVariables": false
+    "useUnknownInCatchVariables": false,
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
   "include": ["src", "jest.setup.ts", "jest.setup-after-env.ts", "jest.jsdom-with-timezone.ts"]
 }

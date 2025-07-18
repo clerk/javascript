@@ -1,8 +1,9 @@
 import { describe, it } from '@jest/globals';
 import { act, waitFor } from '@testing-library/react';
 
+import { CardStateProvider } from '@/ui/elements/contexts';
+
 import { render, screen } from '../../../../testUtils';
-import { CardStateProvider } from '../../../elements';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { PhoneSection } from '../PhoneSection';
 

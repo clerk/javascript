@@ -17,6 +17,18 @@ describe('OrganizationSuggestion', () => {
       updated_at: 5678,
     });
 
-    expect(organizationSuggestion).toMatchSnapshot();
+    expect(organizationSuggestion).toMatchObject({
+      id: 'test_id',
+      status: 'pending',
+      createdAt: expect.any(Date),
+      updatedAt: expect.any(Date),
+      publicOrganizationData: {
+        hasImage: true,
+        id: 'test_org_id',
+        imageUrl: 'test_image_url',
+        name: 'Test org',
+        slug: 'test-org',
+      },
+    });
   });
 });
