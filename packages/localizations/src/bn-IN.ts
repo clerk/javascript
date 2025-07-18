@@ -45,7 +45,7 @@ export const bnIN: LocalizationResource = {
   formButtonPrimary__verify: 'যাচাই করুন',
   formFieldAction__forgotPassword: 'পাসওয়ার্ড ভুলে গেছেন?',
   formFieldError__matchingPasswords: 'পাসওয়ার্ড মিলেছে।',
-  formFieldError__notMatchingPasswords: "পাসওয়ার্ড মিলে না।",
+  formFieldError__notMatchingPasswords: 'পাসওয়ার্ড মিলে না।',
   formFieldError__verificationLinkExpired: 'যাচাইকরণ লিংকের মেয়াদ শেষ হয়েছে। দয়া করে একটি নতুন লিংক অনুরোধ করুন।',
   formFieldHintText__optional: 'ঐচ্ছিক',
   formFieldHintText__slug: 'স্লাগ একটি মানব-পাঠযোগ্য আইডি যা অবশ্যই অনন্য হতে হবে। এটি প্রায়শই URL-এ ব্যবহৃত হয়।',
@@ -92,7 +92,7 @@ export const bnIN: LocalizationResource = {
     title: '{{identifier}} হিসাবে সাইন ইন করা হয়েছে',
   },
   maintenanceMode:
-    "আমরা বর্তমানে রক্ষণাবেক্ষণের কাজ করছি, কিন্তু চিন্তা করবেন না, এটি কয়েক মিনিটের বেশি সময় নেবে না।",
+    'আমরা বর্তমানে রক্ষণাবেক্ষণের কাজ করছি, কিন্তু চিন্তা করবেন না, এটি কয়েক মিনিটের বেশি সময় নেবে না।',
   membershipRole__admin: 'অ্যাডমিন',
   membershipRole__basicMember: 'সদস্য',
   membershipRole__guestMember: 'অতিথি',
@@ -252,7 +252,7 @@ export const bnIN: LocalizationResource = {
     verifyDomainPage: {
       formSubtitle: 'আপনার ইমেইল ঠিকানায় পাঠানো যাচাইকরণ কোড লিখুন',
       formTitle: 'যাচাইকরণ কোড',
-      resendButton: "কোনো কোড পাননি? পুনরায় পাঠান",
+      resendButton: 'কোনো কোড পাননি? পুনরায় পাঠান',
       subtitle: 'ডোমেন {{domainName}} ইমেইলের মাধ্যমে যাচাই করা প্রয়োজন।',
       subtitleVerificationCodeScreen: '{{emailAddress}}-এ একটি যাচাইকরণ কোড পাঠানো হয়েছে। চালিয়ে যেতে কোডটি লিখুন।',
       title: 'ডোমেন যাচাই করুন',
@@ -296,7 +296,7 @@ export const bnIN: LocalizationResource = {
     },
     emailCode: {
       formTitle: 'যাচাইকরণ কোড',
-      resendButton: "কোনো কোড পাননি? পুনরায় পাঠান",
+      resendButton: 'কোনো কোড পাননি? পুনরায় পাঠান',
       subtitle: 'চালিয়ে যেতে আপনার ইমেইলে পাঠানো কোড লিখুন',
       title: 'যাচাইকরণ প্রয়োজন',
     },
@@ -318,13 +318,13 @@ export const bnIN: LocalizationResource = {
     },
     phoneCode: {
       formTitle: 'যাচাইকরণ কোড',
-      resendButton: "কোনো কোড পাননি? পুনরায় পাঠান",
+      resendButton: 'কোনো কোড পাননি? পুনরায় পাঠান',
       subtitle: 'চালিয়ে যেতে আপনার ফোনে পাঠানো কোড লিখুন',
       title: 'যাচাইকরণ প্রয়োজন',
     },
     phoneCodeMfa: {
       formTitle: 'যাচাইকরণ কোড',
-      resendButton: "কোনো কোড পাননি? পুনরায় পাঠান",
+      resendButton: 'কোনো কোড পাননি? পুনরায় পাঠান',
       subtitle: 'চালিয়ে যেতে আপনার ফোনে পাঠানো কোড লিখুন',
       title: 'যাচাইকরণ প্রয়োজন',
     },
@@ -366,14 +366,13 @@ export const bnIN: LocalizationResource = {
     },
     emailCode: {
       formTitle: 'যাচাইকরণ কোড',
-      resendButton: "কোনো কোড পাননি? পুনরায় পাঠান",
+      resendButton: 'কোনো কোড পাননি? পুনরায় পাঠান',
       subtitle: '{{applicationName}}-এ চালিয়ে যাওয়ার জন্য',
       title: 'আপনার ইমেইল চেক করুন',
     },
     emailLink: {
       clientMismatch: {
-        subtitle:
-          'চালিয়ে যেতে, যে ডিভাইস এবং ব্রাউজার থেকে আপনি সাইন-ইন শুরু করেছেন সেখানে যাচাইকরণ লিংক খুলুন',
+        subtitle: 'চালিয়ে যেতে, যে ডিভাইস এবং ব্রাউজার থেকে আপনি সাইন-ইন শুরু করেছেন সেখানে যাচাইকরণ লিংক খুলুন',
         title: 'এই ডিভাইসের জন্য যাচাইকরণ লিংক অবৈধ',
       },
       expired: {
@@ -390,7 +389,7 @@ export const bnIN: LocalizationResource = {
         subtitle: 'আপনি শীঘ্রই রিডাইরেক্ট হবেন',
         title: 'সাইন ইন করা হচ্ছে...',
       },
-      resendButton: "কোনো লিংক পাননি? পুনরায় পাঠান",
+      resendButton: 'কোনো লিংক পাননি? পুনরায় পাঠান',
       subtitle: '{{applicationName}}-এ চালিয়ে যাওয়ার জন্য',
       title: 'আপনার ইমেইল চেক করুন',
       unusedTab: {
@@ -408,7 +407,7 @@ export const bnIN: LocalizationResource = {
     },
     forgotPassword: {
       formTitle: 'পাসওয়ার্ড রিসেট কোড',
-      resendButton: "কোনো কোড পাননি? পুনরায় পাঠান",
+      resendButton: 'কোনো কোড পাননি? পুনরায় পাঠান',
       subtitle: 'আপনার পাসওয়ার্ড রিসেট করতে',
       subtitle_email: 'প্রথমে, আপনার ইমেইল ঠিকানায় পাঠানো কোড লিখুন',
       subtitle_phone: 'প্রথমে, আপনার ফোনে পাঠানো কোড লিখুন',
@@ -420,12 +419,13 @@ export const bnIN: LocalizationResource = {
       title: 'পাসওয়ার্ড ভুলে গেছেন?',
     },
     noAvailableMethods: {
-      message: "সাইন ইন চালিয়ে যাওয়া যাচ্ছে না। কোনো উপলব্ধ অথেনটিকেশন ফ্যাক্টর নেই।",
+      message: 'সাইন ইন চালিয়ে যাওয়া যাচ্ছে না। কোনো উপলব্ধ অথেনটিকেশন ফ্যাক্টর নেই।',
       subtitle: 'একটি ত্রুটি ঘটেছে',
       title: 'সাইন ইন করা যাচ্ছে না',
     },
     passkey: {
-      subtitle: "আপনার পাসকি ব্যবহার করলে নিশ্চিত হয় যে এটি আপনি। আপনার ডিভাইস আপনার আঙ্গুলের ছাপ, মুখ বা স্ক্রিন লক চাইতে পারে।",
+      subtitle:
+        'আপনার পাসকি ব্যবহার করলে নিশ্চিত হয় যে এটি আপনি। আপনার ডিভাইস আপনার আঙ্গুলের ছাপ, মুখ বা স্ক্রিন লক চাইতে পারে।',
       title: 'আপনার পাসকি ব্যবহার করুন',
     },
     password: {
@@ -438,20 +438,21 @@ export const bnIN: LocalizationResource = {
     },
     phoneCode: {
       formTitle: 'যাচাইকরণ কোড',
-      resendButton: "কোনো কোড পাননি? পুনরায় পাঠান",
+      resendButton: 'কোনো কোড পাননি? পুনরায় পাঠান',
       subtitle: '{{applicationName}}-এ চালিয়ে যাওয়ার জন্য',
       title: 'আপনার ফোন চেক করুন',
     },
     phoneCodeMfa: {
       formTitle: 'যাচাইকরণ কোড',
-      resendButton: "কোনো কোড পাননি? পুনরায় পাঠান",
+      resendButton: 'কোনো কোড পাননি? পুনরায় পাঠান',
       subtitle: 'চালিয়ে যেতে, আপনার ফোনে পাঠানো যাচাইকরণ কোড লিখুন',
       title: 'আপনার ফোন চেক করুন',
     },
     resetPassword: {
       formButtonPrimary: 'পাসওয়ার্ড রিসেট করুন',
       requiredMessage: 'নিরাপত্তা কারণে, আপনার পাসওয়ার্ড রিসেট করা প্রয়োজন।',
-      successMessage: 'আপনার পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে। আপনাকে সাইন ইন করা হচ্ছে, দয়া করে একটু অপেক্ষা করুন।',
+      successMessage:
+        'আপনার পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে। আপনাকে সাইন ইন করা হচ্ছে, দয়া করে একটু অপেক্ষা করুন।',
       title: 'নতুন পাসওয়ার্ড সেট করুন',
     },
     resetPasswordMfa: {
@@ -489,14 +490,13 @@ export const bnIN: LocalizationResource = {
     emailCode: {
       formSubtitle: 'আপনার ইমেইল ঠিকানায় পাঠানো যাচাইকরণ কোড লিখুন',
       formTitle: 'যাচাইকরণ কোড',
-      resendButton: "কোনো কোড পাননি? পুনরায় পাঠান",
+      resendButton: 'কোনো কোড পাননি? পুনরায় পাঠান',
       subtitle: 'আপনার ইমেইলে পাঠানো যাচাইকরণ কোড লিখুন',
       title: 'আপনার ইমেইল যাচাই করুন',
     },
     emailLink: {
       clientMismatch: {
-        subtitle:
-          'চালিয়ে যেতে, যে ডিভাইস এবং ব্রাউজার থেকে আপনি সাইন-আপ শুরু করেছেন সেখানে যাচাইকরণ লিংক খুলুন',
+        subtitle: 'চালিয়ে যেতে, যে ডিভাইস এবং ব্রাউজার থেকে আপনি সাইন-আপ শুরু করেছেন সেখানে যাচাইকরণ লিংক খুলুন',
         title: 'এই ডিভাইসের জন্য যাচাইকরণ লিংক অবৈধ',
       },
       formSubtitle: 'আপনার ইমেইল ঠিকানায় পাঠানো যাচাইকরণ লিংক ব্যবহার করুন',
@@ -504,7 +504,7 @@ export const bnIN: LocalizationResource = {
       loading: {
         title: 'সাইন আপ করা হচ্ছে...',
       },
-      resendButton: "কোনো লিংক পাননি? পুনরায় পাঠান",
+      resendButton: 'কোনো লিংক পাননি? পুনরায় পাঠান',
       subtitle: '{{applicationName}}-এ চালিয়ে যাওয়ার জন্য',
       title: 'আপনার ইমেইল যাচাই করুন',
       verified: {
@@ -531,7 +531,7 @@ export const bnIN: LocalizationResource = {
     phoneCode: {
       formSubtitle: 'আপনার ফোন নম্বরে পাঠানো যাচাইকরণ কোড লিখুন',
       formTitle: 'যাচাইকরণ কোড',
-      resendButton: "কোনো কোড পাননি? পুনরায় পাঠান",
+      resendButton: 'কোনো কোড পাননি? পুনরায় পাঠান',
       subtitle: 'আপনার ফোনে পাঠানো যাচাইকরণ কোড লিখুন',
       title: 'আপনার ফোন যাচাই করুন',
     },
@@ -540,7 +540,8 @@ export const bnIN: LocalizationResource = {
       actionText: 'ইতিমধ্যে একটি অ্যাকাউন্ট আছে?',
       blockButton__emailSupport: 'ইমেইল সাপোর্ট',
       blockButton__joinWaitlist: 'ওয়েটলিস্টে যোগ দিন',
-      subtitle: 'সাইন আপ বর্তমানে অক্ষম। আপনি যদি মনে করেন আপনার অ্যাক্সেস থাকা উচিত, দয়া করে সাপোর্টের সাথে যোগাযোগ করুন।',
+      subtitle:
+        'সাইন আপ বর্তমানে অক্ষম। আপনি যদি মনে করেন আপনার অ্যাক্সেস থাকা উচিত, দয়া করে সাপোর্টের সাথে যোগাযোগ করুন।',
       subtitleWaitlist: 'সাইন আপ বর্তমানে অক্ষম। আমরা যখন লঞ্চ করব তখন প্রথম জানতে, ওয়েটলিস্টে যোগ দিন।',
       title: 'অ্যাক্সেস সীমিত',
     },
@@ -567,7 +568,8 @@ export const bnIN: LocalizationResource = {
     form_identifier_exists__email_address: 'এই ইমেইল ঠিকানা ব্যবহৃত হয়েছে। দয়া করে অন্য একটি ব্যবহার করুন।',
     form_identifier_exists__phone_number: 'এই ফোন নম্বর ব্যবহৃত হয়েছে। দয়া করে অন্য একটি ব্যবহার করুন।',
     form_identifier_exists__username: 'এই ব্যবহারকারীর নাম ব্যবহৃত হয়েছে। দয়া করে অন্য একটি ব্যবহার করুন।',
-    form_identifier_not_found: 'এই শনাক্তকারী দিয়ে কোনো অ্যাকাউন্ট পাওয়া যায়নি। দয়া করে চেক করুন এবং আবার চেষ্টা করুন।',
+    form_identifier_not_found:
+      'এই শনাক্তকারী দিয়ে কোনো অ্যাকাউন্ট পাওয়া যায়নি। দয়া করে চেক করুন এবং আবার চেষ্টা করুন।',
     form_param_format_invalid: 'লেখা মানটি একটি অবৈধ ফরম্যাটে আছে। দয়া করে চেক করুন এবং সংশোধন করুন।',
     form_param_format_invalid__email_address: 'ইমেইল ঠিকানা একটি বৈধ ইমেইল ঠিকানা হতে হবে।',
     form_param_format_invalid__phone_number: 'ফোন নম্বর একটি বৈধ আন্তর্জাতিক ফরম্যাটে হতে হবে।',
@@ -595,13 +597,12 @@ export const bnIN: LocalizationResource = {
     organization_domain_blocked: 'এটি একটি ব্লক করা ইমেইল প্রদানকারী ডোমেন। দয়া করে একটি ভিন্ন ব্যবহার করুন।',
     organization_domain_common: 'এটি একটি সাধারণ ইমেইল প্রদানকারী ডোমেন। দয়া করে একটি ভিন্ন ব্যবহার করুন।',
     organization_domain_exists_for_enterprise_connection: 'এই ডোমেন ইতিমধ্যে আপনার সংগঠনের SSO-এর জন্য ব্যবহৃত হচ্ছে',
-    organization_membership_quota_exceeded:
-      'আপনি অপেক্ষিত আমন্ত্রণ সহ সংগঠনের সদস্যতার সীমায় পৌঁছে গেছেন।',
-    organization_minimum_permissions_needed:
-      'অন্তত একজন সংগঠনের সদস্যের ন্যূনতম প্রয়োজনীয় অনুমতি থাকতে হবে।',
+    organization_membership_quota_exceeded: 'আপনি অপেক্ষিত আমন্ত্রণ সহ সংগঠনের সদস্যতার সীমায় পৌঁছে গেছেন।',
+    organization_minimum_permissions_needed: 'অন্তত একজন সংগঠনের সদস্যের ন্যূনতম প্রয়োজনীয় অনুমতি থাকতে হবে।',
     passkey_already_exists: 'এই ডিভাইসে ইতিমধ্যে একটি পাসকি নিবন্ধিত আছে।',
     passkey_not_supported: 'এই ডিভাইসে পাসকি সমর্থিত নয়।',
-    passkey_pa_not_supported: 'রেজিস্ট্রেশনের জন্য একটি প্ল্যাটফর্ম অথেনটিকেটর প্রয়োজন কিন্তু ডিভাইসটি এটি সমর্থন করে না।',
+    passkey_pa_not_supported:
+      'রেজিস্ট্রেশনের জন্য একটি প্ল্যাটফর্ম অথেনটিকেটর প্রয়োজন কিন্তু ডিভাইসটি এটি সমর্থন করে না।',
     passkey_registration_cancelled: 'পাসকি রেজিস্ট্রেশন বাতিল করা হয়েছে বা সময় শেষ হয়ে গেছে।',
     passkey_retrieval_cancelled: 'পাসকি যাচাইকরণ বাতিল করা হয়েছে বা সময় শেষ হয়ে গেছে।',
     passwordComplexity: {
@@ -729,21 +730,21 @@ export const bnIN: LocalizationResource = {
         formHint: 'এই ইমেইল ঠিকানায় একটি যাচাইকরণ কোড সহ একটি ইমেইল পাঠানো হবে।',
         formSubtitle: '{{identifier}}-এ পাঠানো যাচাইকরণ কোড লিখুন',
         formTitle: 'যাচাইকরণ কোড',
-        resendButton: "কোনো কোড পাননি? পুনরায় পাঠান",
+        resendButton: 'কোনো কোড পাননি? পুনরায় পাঠান',
         successMessage: 'ইমেইল {{identifier}} আপনার অ্যাকাউন্টে যোগ করা হয়েছে।',
       },
       emailLink: {
         formHint: 'এই ইমেইল ঠিকানায় একটি যাচাইকরণ লিংক সহ একটি ইমেইল পাঠানো হবে।',
         formSubtitle: '{{identifier}}-এ পাঠানো ইমেইলের যাচাইকরণ লিংকে ক্লিক করুন',
         formTitle: 'যাচাইকরণ লিংক',
-        resendButton: "কোনো লিংক পাননি? পুনরায় পাঠান",
+        resendButton: 'কোনো লিংক পাননি? পুনরায় পাঠান',
         successMessage: 'ইমেইল {{identifier}} আপনার অ্যাকাউন্টে যোগ করা হয়েছে।',
       },
       enterpriseSSOLink: {
         formButton: 'সাইন-ইন করতে ক্লিক করুন',
         formSubtitle: '{{identifier}} দিয়ে সাইন-ইন সম্পূর্ণ করুন',
       },
-      formHint: "আপনার অ্যাকাউন্টে যোগ করার আগে এই ইমেইল ঠিকানা যাচাই করতে হবে।",
+      formHint: 'আপনার অ্যাকাউন্টে যোগ করার আগে এই ইমেইল ঠিকানা যাচাই করতে হবে।',
       removeResource: {
         messageLine1: '{{identifier}} এই অ্যাকাউন্ট থেকে সরানো হবে।',
         messageLine2: 'আপনি আর এই ইমেইল ঠিকানা ব্যবহার করে সাইন ইন করতে পারবেন না।',
@@ -826,7 +827,8 @@ export const bnIN: LocalizationResource = {
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'এটি সুপারিশ করা হয় যে আপনি অন্য সব ডিভাইস থেকে সাইন আউট করুন যেগুলিতে আপনার পুরানো পাসওয়ার্ড ব্যবহার করা হয়েছে।',
-      readonly: 'আপনার পাসওয়ার্ড বর্তমানে সম্পাদনা করা যাবে না কারণ আপনি শুধুমাত্র এন্টারপ্রাইজ সংযোগের মাধ্যমে সাইন ইন করতে পারেন।',
+      readonly:
+        'আপনার পাসওয়ার্ড বর্তমানে সম্পাদনা করা যাবে না কারণ আপনি শুধুমাত্র এন্টারপ্রাইজ সংযোগের মাধ্যমে সাইন ইন করতে পারেন।',
       successMessage__set: 'আপনার পাসওয়ার্ড সেট করা হয়েছে।',
       successMessage__signOutOfOtherSessions: 'অন্য সব ডিভাইস থেকে সাইন আউট করা হয়েছে।',
       successMessage__update: 'আপনার পাসওয়ার্ড আপডেট করা হয়েছে।',

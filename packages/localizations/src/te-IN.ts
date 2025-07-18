@@ -45,7 +45,7 @@ export const teIN: LocalizationResource = {
   formButtonPrimary__verify: 'ధృవీకరించండి',
   formFieldAction__forgotPassword: 'పాస్‌వర్డ్ మర్చిపోయారా?',
   formFieldError__matchingPasswords: 'పాస్‌వర్డ్‌లు సరిపోలాయి.',
-  formFieldError__notMatchingPasswords: "పాస్‌వర్డ్‌లు సరిపోలడం లేదు.",
+  formFieldError__notMatchingPasswords: 'పాస్‌వర్డ్‌లు సరిపోలడం లేదు.',
   formFieldError__verificationLinkExpired: 'ధృవీకరణ లింక్ గడువు ముగిసింది. దయచేసి కొత్త లింక్‌ను అభ్యర్థించండి.',
   formFieldHintText__optional: 'ఐచ్ఛికం',
   formFieldHintText__slug: 'స్లగ్ అనేది మానవ-చదవగలిగే ID, అది ప్రత్యేకంగా ఉండాలి. ఇది తరచుగా URL లలో ఉపయోగించబడుతుంది.',
@@ -91,8 +91,7 @@ export const teIN: LocalizationResource = {
     action__signOut: 'సైన్ అవుట్',
     title: '{{identifier}} గా సైన్ ఇన్ చేసారు',
   },
-  maintenanceMode:
-    "మేము ప్రస్తుతం నిర్వహణలో ఉన్నాము, కానీ చింతించకండి, ఇది కొన్ని నిమిషాల కంటే ఎక్కువ సమయం తీసుకోదు.",
+  maintenanceMode: 'మేము ప్రస్తుతం నిర్వహణలో ఉన్నాము, కానీ చింతించకండి, ఇది కొన్ని నిమిషాల కంటే ఎక్కువ సమయం తీసుకోదు.',
   membershipRole__admin: 'నిర్వాహకుడు',
   membershipRole__basicMember: 'సభ్యుడు',
   membershipRole__guestMember: 'అతిథి',
@@ -122,7 +121,8 @@ export const teIN: LocalizationResource = {
         'ఆహ్వానాలు పంపడం సాధ్యం కాలేదు. కింది ఇమెయిల్ చిరునామాల కోసం ఇప్పటికే పెండింగ్‌లో ఉన్న ఆహ్వానాలు ఉన్నాయి: {{email_addresses}}.',
       formButtonPrimary__continue: 'ఆహ్వానాలను పంపండి',
       selectDropdown__role: 'పాత్రను ఎంచుకోండి',
-      subtitle: 'ఒకటి లేదా అంతకంటే ఎక్కువ ఇమెయిల్ చిరునామాలను నమోదు చేయండి లేదా అతికించండి, స్థలాలు లేదా కామాలతో విడదీయబడింది.',
+      subtitle:
+        'ఒకటి లేదా అంతకంటే ఎక్కువ ఇమెయిల్ చిరునామాలను నమోదు చేయండి లేదా అతికించండి, స్థలాలు లేదా కామాలతో విడదీయబడింది.',
       successMessage: 'ఆహ్వానాలు విజయవంతంగా పంపబడ్డాయి',
       title: 'కొత్త సభ్యులను ఆహ్వానించండి',
     },
@@ -252,9 +252,10 @@ export const teIN: LocalizationResource = {
     verifyDomainPage: {
       formSubtitle: 'మీ ఇమెయిల్ చిరునామాకు పంపిన ధృవీకరణ కోడ్‌ను నమోదు చేయండి',
       formTitle: 'ధృవీకరణ కోడ్',
-      resendButton: "కోడ్ అందలేదా? మళ్ళీ పంపండి",
+      resendButton: 'కోడ్ అందలేదా? మళ్ళీ పంపండి',
       subtitle: 'డొమైన్ {{domainName}} ఇమెయిల్ ద్వారా ధృవీకరించబడాలి.',
-      subtitleVerificationCodeScreen: 'ధృవీకరణ కోడ్ {{emailAddress}}కి పంపబడింది. కొనసాగించడానికి కోడ్‌ను నమోదు చేయండి.',
+      subtitleVerificationCodeScreen:
+        'ధృవీకరణ కోడ్ {{emailAddress}}కి పంపబడింది. కొనసాగించడానికి కోడ్‌ను నమోదు చేయండి.',
       title: 'డొమైన్‌ను ధృవీకరించండి',
     },
   },
@@ -296,7 +297,7 @@ export const teIN: LocalizationResource = {
     },
     emailCode: {
       formTitle: 'ధృవీకరణ కోడ్',
-      resendButton: "కోడ్ అందలేదా? మళ్ళీ పంపండి",
+      resendButton: 'కోడ్ అందలేదా? మళ్ళీ పంపండి',
       subtitle: 'కొనసాగించడానికి మీ ఇమెయిల్‌కి పంపిన కోడ్‌ను నమోదు చేయండి',
       title: 'ధృవీకరణ అవసరం',
     },
@@ -318,13 +319,13 @@ export const teIN: LocalizationResource = {
     },
     phoneCode: {
       formTitle: 'ధృవీకరణ కోడ్',
-      resendButton: "కోడ్ అందలేదా? మళ్ళీ పంపండి",
+      resendButton: 'కోడ్ అందలేదా? మళ్ళీ పంపండి',
       subtitle: 'కొనసాగించడానికి మీ ఫోన్‌కి పంపిన కోడ్‌ను నమోదు చేయండి',
       title: 'ధృవీకరణ అవసరం',
     },
     phoneCodeMfa: {
       formTitle: 'ధృవీకరణ కోడ్',
-      resendButton: "కోడ్ అందలేదా? మళ్ళీ పంపండి",
+      resendButton: 'కోడ్ అందలేదా? మళ్ళీ పంపండి',
       subtitle: 'కొనసాగించడానికి మీ ఫోన్‌కి పంపిన కోడ్‌ను నమోదు చేయండి',
       title: 'ధృవీకరణ అవసరం',
     },
@@ -366,14 +367,13 @@ export const teIN: LocalizationResource = {
     },
     emailCode: {
       formTitle: 'ధృవీకరణ కోడ్',
-      resendButton: "కోడ్ అందలేదా? మళ్ళీ పంపండి",
+      resendButton: 'కోడ్ అందలేదా? మళ్ళీ పంపండి',
       subtitle: '{{applicationName}}కి కొనసాగించడానికి',
       title: 'మీ ఇమెయిల్‌ను తనిఖీ చేయండి',
     },
     emailLink: {
       clientMismatch: {
-        subtitle:
-          'కొనసాగించడానికి, మీరు సైన్-ఇన్ ప్రారంభించిన పరికరం మరియు బ్రౌజర్‌లో ధృవీకరణ లింక్‌ను తెరవండి',
+        subtitle: 'కొనసాగించడానికి, మీరు సైన్-ఇన్ ప్రారంభించిన పరికరం మరియు బ్రౌజర్‌లో ధృవీకరణ లింక్‌ను తెరవండి',
         title: 'ఈ పరికరానికి ధృవీకరణ లింక్ చెల్లదు',
       },
       expired: {
@@ -390,7 +390,7 @@ export const teIN: LocalizationResource = {
         subtitle: 'మీరు త్వరలో పునఃనిర్దేశించబడతారు',
         title: 'సైన్ ఇన్ చేస్తోంది...',
       },
-      resendButton: "లింక్ అందలేదా? మళ్ళీ పంపండి",
+      resendButton: 'లింక్ అందలేదా? మళ్ళీ పంపండి',
       subtitle: '{{applicationName}}కి కొనసాగించడానికి',
       title: 'మీ ఇమెయిల్‌ను తనిఖీ చేయండి',
       unusedTab: {
@@ -408,7 +408,7 @@ export const teIN: LocalizationResource = {
     },
     forgotPassword: {
       formTitle: 'పాస్‌వర్డ్ రీసెట్ కోడ్',
-      resendButton: "కోడ్ అందలేదా? మళ్ళీ పంపండి",
+      resendButton: 'కోడ్ అందలేదా? మళ్ళీ పంపండి',
       subtitle: 'మీ పాస్‌వర్డ్‌ను రీసెట్ చేయడానికి',
       subtitle_email: 'మొదట, మీ ఇమెయిల్ చిరునామాకు పంపిన కోడ్‌ను నమోదు చేయండి',
       subtitle_phone: 'మొదట, మీ ఫోన్‌కి పంపిన కోడ్‌ను నమోదు చేయండి',
@@ -420,12 +420,13 @@ export const teIN: LocalizationResource = {
       title: 'పాస్‌వర్డ్ మర్చిపోయారా?',
     },
     noAvailableMethods: {
-      message: "సైన్ ఇన్‌తో కొనసాగలేము. అందుబాటులో ఉన్న ప్రమాణీకరణ కారకం లేదు.",
+      message: 'సైన్ ఇన్‌తో కొనసాగలేము. అందుబాటులో ఉన్న ప్రమాణీకరణ కారకం లేదు.',
       subtitle: 'లోపం సంభవించింది',
       title: 'సైన్ ఇన్ చేయలేము',
     },
     passkey: {
-      subtitle: "మీ పాస్‌కీని ఉపయోగించడం అది మీరని నిర్ధారిస్తుంది. మీ పరికరం మీ వేలిముద్ర, ముఖం లేదా స్క్రీన్ లాక్ కోసం అడగవచ్చు.",
+      subtitle:
+        'మీ పాస్‌కీని ఉపయోగించడం అది మీరని నిర్ధారిస్తుంది. మీ పరికరం మీ వేలిముద్ర, ముఖం లేదా స్క్రీన్ లాక్ కోసం అడగవచ్చు.',
       title: 'మీ పాస్‌కీని ఉపయోగించండి',
     },
     password: {
@@ -438,20 +439,21 @@ export const teIN: LocalizationResource = {
     },
     phoneCode: {
       formTitle: 'ధృవీకరణ కోడ్',
-      resendButton: "కోడ్ అందలేదా? మళ్ళీ పంపండి",
+      resendButton: 'కోడ్ అందలేదా? మళ్ళీ పంపండి',
       subtitle: '{{applicationName}}కి కొనసాగించడానికి',
       title: 'మీ ఫోన్‌ను తనిఖీ చేయండి',
     },
     phoneCodeMfa: {
       formTitle: 'ధృవీకరణ కోడ్',
-      resendButton: "కోడ్ అందలేదా? మళ్ళీ పంపండి",
+      resendButton: 'కోడ్ అందలేదా? మళ్ళీ పంపండి',
       subtitle: 'కొనసాగించడానికి, దయచేసి మీ ఫోన్‌కి పంపిన ధృవీకరణ కోడ్‌ను నమోదు చేయండి',
       title: 'మీ ఫోన్‌ను తనిఖీ చేయండి',
     },
     resetPassword: {
       formButtonPrimary: 'పాస్‌వర్డ్ రీసెట్ చేయండి',
       requiredMessage: 'భద్రతా కారణాల వల్ల, మీ పాస్‌వర్డ్‌ను రీసెట్ చేయడం అవసరం.',
-      successMessage: 'మీ పాస్‌వర్డ్ విజయవంతంగా మార్చబడింది. మిమ్మల్ని సైన్ ఇన్ చేస్తోంది, దయచేసి ఒక క్షణం వేచి ఉండండి.',
+      successMessage:
+        'మీ పాస్‌వర్డ్ విజయవంతంగా మార్చబడింది. మిమ్మల్ని సైన్ ఇన్ చేస్తోంది, దయచేసి ఒక క్షణం వేచి ఉండండి.',
       title: 'కొత్త పాస్‌వర్డ్‌ను సెట్ చేయండి',
     },
     resetPasswordMfa: {
@@ -489,14 +491,13 @@ export const teIN: LocalizationResource = {
     emailCode: {
       formSubtitle: 'మీ ఇమెయిల్ చిరునామాకు పంపిన ధృవీకరణ కోడ్‌ను నమోదు చేయండి',
       formTitle: 'ధృవీకరణ కోడ్',
-      resendButton: "కోడ్ అందలేదా? మళ్ళీ పంపండి",
+      resendButton: 'కోడ్ అందలేదా? మళ్ళీ పంపండి',
       subtitle: 'మీ ఇమెయిల్‌కి పంపిన ధృవీకరణ కోడ్‌ను నమోదు చేయండి',
       title: 'మీ ఇమెయిల్‌ను ధృవీకరించండి',
     },
     emailLink: {
       clientMismatch: {
-        subtitle:
-          'కొనసాగించడానికి, మీరు సైన్-అప్ ప్రారంభించిన పరికరం మరియు బ్రౌజర్‌లో ధృవీకరణ లింక్‌ను తెరవండి',
+        subtitle: 'కొనసాగించడానికి, మీరు సైన్-అప్ ప్రారంభించిన పరికరం మరియు బ్రౌజర్‌లో ధృవీకరణ లింక్‌ను తెరవండి',
         title: 'ఈ పరికరానికి ధృవీకరణ లింక్ చెల్లదు',
       },
       formSubtitle: 'మీ ఇమెయిల్ చిరునామాకు పంపిన ధృవీకరణ లింక్‌ను ఉపయోగించండి',
@@ -504,7 +505,7 @@ export const teIN: LocalizationResource = {
       loading: {
         title: 'సైన్ అప్ చేస్తోంది...',
       },
-      resendButton: "లింక్ అందలేదా? మళ్ళీ పంపండి",
+      resendButton: 'లింక్ అందలేదా? మళ్ళీ పంపండి',
       subtitle: '{{applicationName}}కి కొనసాగించడానికి',
       title: 'మీ ఇమెయిల్‌ను ధృవీకరించండి',
       verified: {
@@ -531,7 +532,7 @@ export const teIN: LocalizationResource = {
     phoneCode: {
       formSubtitle: 'మీ ఫోన్ నంబర్‌కి పంపిన ధృవీకరణ కోడ్‌ను నమోదు చేయండి',
       formTitle: 'ధృవీకరణ కోడ్',
-      resendButton: "కోడ్ అందలేదా? మళ్ళీ పంపండి",
+      resendButton: 'కోడ్ అందలేదా? మళ్ళీ పంపండి',
       subtitle: 'మీ ఫోన్‌కి పంపిన ధృవీకరణ కోడ్‌ను నమోదు చేయండి',
       title: 'మీ ఫోన్‌ను ధృవీకరించండి',
     },
@@ -540,8 +541,10 @@ export const teIN: LocalizationResource = {
       actionText: 'ఇప్పటికే ఖాతా ఉందా?',
       blockButton__emailSupport: 'ఇమెయిల్ మద్దతు',
       blockButton__joinWaitlist: 'వెయిట్‌లిస్ట్‌లో చేరండి',
-      subtitle: 'ప్రస్తుతం సైన్ అప్‌లు నిలిపివేయబడ్డాయి. మీకు ప్రాప్యత ఉండాలని మీరు నమ్మితే, దయచేసి మద్దతును సంప్రదించండి.',
-      subtitleWaitlist: 'ప్రస్తుతం సైన్ అప్‌లు నిలిపివేయబడ్డాయి. మేము ప్రారంభించినప్పుడు తెలుసుకోడానికి వెయిట్‌లిస్ట్‌లో చేరండి.',
+      subtitle:
+        'ప్రస్తుతం సైన్ అప్‌లు నిలిపివేయబడ్డాయి. మీకు ప్రాప్యత ఉండాలని మీరు నమ్మితే, దయచేసి మద్దతును సంప్రదించండి.',
+      subtitleWaitlist:
+        'ప్రస్తుతం సైన్ అప్‌లు నిలిపివేయబడ్డాయి. మేము ప్రారంభించినప్పుడు తెలుసుకోడానికి వెయిట్‌లిస్ట్‌లో చేరండి.',
       title: 'ప్రాప్యత పరిమితం చేయబడింది',
     },
     start: {
@@ -579,7 +582,7 @@ export const teIN: LocalizationResource = {
     form_password_incorrect: 'మీరు నమోదు చేసిన పాస్‌వర్డ్ తప్పు. దయచేసి మళ్ళీ ప్రయత్నించండి.',
     form_password_length_too_short: 'మీ పాస్‌వర్డ్ చాలా చిన్నది. ఇది కనీసం 8 అక్షరాల పొడవు ఉండాలి.',
     form_password_not_strong_enough: 'మీ పాస్‌వర్డ్ సరిపడా బలంగా లేదు.',
-          form_password_pwned:
+    form_password_pwned:
       'ఈ పాస్‌వర్డ్ డేటా ఉల్లంఘన భాగంగా కనుగొనబడింది మరియు ఉపయోగించడానికి వీలుపడదు, దయచేసి మరొక పాస్‌వర్డ్‌ను ప్రయత్నించండి.',
     form_password_pwned__sign_in:
       'ఈ పాస్‌వర్డ్ డేటా ఉల్లంఘన భాగంగా కనుగొనబడింది మరియు ఉపయోగించడానికి వీలుపడదు, దయచేసి మీ పాస్‌వర్డ్‌ను రీసెట్ చేయండి.',
@@ -597,8 +600,7 @@ export const teIN: LocalizationResource = {
     organization_domain_exists_for_enterprise_connection: 'ఈ డొమైన్ ఇప్పటికే మీ సంస్థ SSOకి ఉపయోగించబడుతోంది',
     organization_membership_quota_exceeded:
       'మీరు మీ సంస్థ సభ్యత్వాలను, పెండింగ్ ఆహ్వానాలతో సహా పరిమితిని చేరుకున్నారు.',
-    organization_minimum_permissions_needed:
-      'కనీస అవసరమైన అనుమతులు కలిగిన కనీసం ఒక సంస్థ సభ్యుడు ఉండాలి.',
+    organization_minimum_permissions_needed: 'కనీస అవసరమైన అనుమతులు కలిగిన కనీసం ఒక సంస్థ సభ్యుడు ఉండాలి.',
     passkey_already_exists: 'ఈ పరికరంతో పాస్‌కీ ఇప్పటికే నమోదు చేయబడింది.',
     passkey_not_supported: 'పాస్‌కీలు ఈ పరికరంలో మద్దతు లేవు.',
     passkey_pa_not_supported: 'నమోదు కోసం ప్లాట్‌ఫామ్ ప్రమాణీకరణకర్త అవసరం కానీ పరికరం దానికి మద్దతు ఇవ్వదు.',
@@ -616,7 +618,8 @@ export const teIN: LocalizationResource = {
     phone_number_exists: 'ఈ ఫోన్ నంబర్ తీసుకోబడింది. దయచేసి మరొకదాన్ని ప్రయత్నించండి.',
     web3_missing_identifier: 'Web3 వాలెట్ పొడిగింపు కనుగొనబడలేదు. కొనసాగించడానికి దయచేసి ఒకదాన్ని ఇన్‌స్టాల్ చేయండి.',
     zxcvbn: {
-      couldBeStronger: 'మీ పాస్‌వర్డ్ పనిచేస్తుంది, కానీ మరింత బలంగా ఉండవచ్చు. మరిన్ని అక్షరాలను జోడించడానికి ప్రయత్నించండి.',
+      couldBeStronger:
+        'మీ పాస్‌వర్డ్ పనిచేస్తుంది, కానీ మరింత బలంగా ఉండవచ్చు. మరిన్ని అక్షరాలను జోడించడానికి ప్రయత్నించండి.',
       goodPassword: 'మీ పాస్‌వర్డ్ అన్ని అవసరమైన అవసరాలను తీరుస్తుంది.',
       notEnough: 'మీ పాస్‌వర్డ్ సరిపడా బలంగా లేదు.',
       suggestions: {
@@ -708,8 +711,7 @@ export const teIN: LocalizationResource = {
       formHint__noAccounts: 'అందుబాటులో ఉన్న బాహ్య ఖాతా ప్రొవైడర్‌లు లేవు.',
       removeResource: {
         messageLine1: '{{identifier}} ఈ ఖాతా నుండి తొలగించబడుతుంది.',
-        messageLine2:
-          'మీరు ఇకపై ఈ కనెక్టెడ్ ఖాతాను ఉపయోగించలేరు మరియు దాని ఆధారిత ఫీచర్‌లు ఇకపై పనిచేయవు.',
+        messageLine2: 'మీరు ఇకపై ఈ కనెక్టెడ్ ఖాతాను ఉపయోగించలేరు మరియు దాని ఆధారిత ఫీచర్‌లు ఇకపై పనిచేయవు.',
         successMessage: '{{connectedAccount}} మీ ఖాతా నుండి తొలగించబడింది.',
         title: 'కనెక్టెడ్ ఖాతాను తొలగించండి',
       },
@@ -729,21 +731,21 @@ export const teIN: LocalizationResource = {
         formHint: 'ధృవీకరణ కోడ్‌తో ఈమెయిల్ ఈ ఇమెయిల్ చిరునామాకు పంపబడుతుంది.',
         formSubtitle: '{{identifier}}కి పంపిన ధృవీకరణ కోడ్‌ను నమోదు చేయండి',
         formTitle: 'ధృవీకరణ కోడ్',
-        resendButton: "కోడ్ అందలేదా? మళ్ళీ పంపండి",
+        resendButton: 'కోడ్ అందలేదా? మళ్ళీ పంపండి',
         successMessage: 'ఇమెయిల్ {{identifier}} మీ ఖాతాకు జోడించబడింది.',
       },
       emailLink: {
         formHint: 'ధృవీకరణ లింక్‌తో ఈమెయిల్ ఈ ఇమెయిల్ చిరునామాకు పంపబడుతుంది.',
         formSubtitle: '{{identifier}}కి పంపిన ఇమెయిల్‌లోని ధృవీకరణ లింక్‌పై క్లిక్ చేయండి',
         formTitle: 'ధృవీకరణ లింక్',
-        resendButton: "లింక్ అందలేదా? మళ్ళీ పంపండి",
+        resendButton: 'లింక్ అందలేదా? మళ్ళీ పంపండి',
         successMessage: 'ఇమెయిల్ {{identifier}} మీ ఖాతాకు జోడించబడింది.',
       },
       enterpriseSSOLink: {
         formButton: 'సైన్-ఇన్ చేయడానికి క్లిక్ చేయండి',
         formSubtitle: '{{identifier}}తో సైన్-ఇన్‌ను పూర్తి చేయండి',
       },
-      formHint: "ఇది మీ ఖాతాకు జోడించబడటానికి ముందు ఈ ఇమెయిల్ చిరునామాను ధృవీకరించాల్సి ఉంటుంది.",
+      formHint: 'ఇది మీ ఖాతాకు జోడించబడటానికి ముందు ఈ ఇమెయిల్ చిరునామాను ధృవీకరించాల్సి ఉంటుంది.',
       removeResource: {
         messageLine1: '{{identifier}} ఈ ఖాతా నుండి తొలగించబడుతుంది.',
         messageLine2: 'మీరు ఇకపై ఈ ఇమెయిల్ చిరునామాను ఉపయోగించి సైన్ ఇన్ చేయలేరు.',
@@ -776,8 +778,7 @@ export const teIN: LocalizationResource = {
         'SMS కోడ్ రెండు-దశల ధృవీకరణకు నమోదు చేయడానికి ఉన్న ఫోన్ నంబర్‌ను ఎంచుకోండి లేదా కొత్తదాన్ని జోడించండి.',
       subtitle__unavailablePhoneNumbers:
         'SMS కోడ్ రెండు-దశల ధృవీకరణకు నమోదు చేయడానికి అందుబాటులో ఉన్న ఫోన్ నంబర్‌లు లేవు, దయచేసి కొత్తదాన్ని జోడించండి.',
-      successMessage1:
-        'సైన్ ఇన్ చేసేటప్పుడు, అదనపు దశగా ఈ ఫోన్ నంబర్‌కి పంపిన ధృవీకరణ కోడ్‌ను మీరు నమోదు చేయాలి.',
+      successMessage1: 'సైన్ ఇన్ చేసేటప్పుడు, అదనపు దశగా ఈ ఫోన్ నంబర్‌కి పంపిన ధృవీకరణ కోడ్‌ను మీరు నమోదు చేయాలి.',
       successMessage2:
         'ఈ బ్యాకప్ కోడ్‌లను సేవ్ చేసి వాటిని సురక్షితంగా నిల్వ చేయండి. మీరు మీ ప్రమాణీకరణ పరికరంపై యాక్సెస్‌ను కోల్పోతే, సైన్ ఇన్ చేయడానికి మీరు బ్యాకప్ కోడ్‌లను ఉపయోగించవచ్చు.',
       successTitle: 'SMS కోడ్ ధృవీకరణ ప్రారంభించబడింది',
@@ -789,7 +790,8 @@ export const teIN: LocalizationResource = {
         buttonUnableToScan__nonPrimary: 'QR కోడ్‌ను స్కాన్ చేయలేరా?',
         infoText__ableToScan:
           'మీ ప్రమాణీకరణ యాప్‌లో కొత్త సైన్-ఇన్ పద్ధతిని సెటప్ చేసి, దానిని మీ ఖాతాకు లింక్ చేయడానికి క్రింది QR కోడ్‌ను స్కాన్ చేయండి.',
-        infoText__unableToScan: 'మీ ప్రమాణీకరణలో కొత్త సైన్-ఇన్ పద్ధతిని సెటప్ చేసి, క్రింద అందించిన కీని నమోదు చేయండి.',
+        infoText__unableToScan:
+          'మీ ప్రమాణీకరణలో కొత్త సైన్-ఇన్ పద్ధతిని సెటప్ చేసి, క్రింద అందించిన కీని నమోదు చేయండి.',
         inputLabel__unableToScan1:
           'టైమ్-బేస్డ్ లేదా వన్-టైమ్ పాస్‌వర్డ్‌లు ప్రారంభించబడ్డాయని నిర్ధారించుకోండి, ఆపై మీ ఖాతాను లింక్ చేయడం పూర్తి చేయండి.',
         inputLabel__unableToScan2:
@@ -826,7 +828,8 @@ export const teIN: LocalizationResource = {
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'మీ పాత పాస్‌వర్డ్‌ను ఉపయోగించి ఉండవచ్చు ఇతర అన్ని పరికరాల నుండి సైన్ అవుట్ అవ్వడం సిఫార్సు చేయబడింది.',
-      readonly: 'మీరు ఎంటర్‌ప్రైజ్ కనెక్షన్ ద్వారా మాత్రమే సైన్ ఇన్ చేయగలిగినందున మీ పాస్‌వర్డ్‌ను ప్రస్తుతం సవరించలేరు.',
+      readonly:
+        'మీరు ఎంటర్‌ప్రైజ్ కనెక్షన్ ద్వారా మాత్రమే సైన్ ఇన్ చేయగలిగినందున మీ పాస్‌వర్డ్‌ను ప్రస్తుతం సవరించలేరు.',
       successMessage__set: 'మీ పాస్‌వర్డ్ సెట్ చేయబడింది.',
       successMessage__signOutOfOtherSessions: 'అన్ని ఇతర పరికరాలు సైన్ అవుట్ చేయబడ్డాయి.',
       successMessage__update: 'మీ పాస్‌వర్డ్ నవీకరించబడింది.',

@@ -45,7 +45,7 @@ export const msMY: LocalizationResource = {
   formButtonPrimary__verify: 'Sahkan',
   formFieldAction__forgotPassword: 'Lupa kata laluan?',
   formFieldError__matchingPasswords: 'Kata laluan sepadan.',
-  formFieldError__notMatchingPasswords: "Kata laluan tidak sepadan.",
+  formFieldError__notMatchingPasswords: 'Kata laluan tidak sepadan.',
   formFieldError__verificationLinkExpired: 'Pautan pengesahan telah tamat tempoh. Sila minta pautan baharu.',
   formFieldHintText__optional: 'Pilihan',
   formFieldHintText__slug: 'Slug adalah ID mesra manusia yang mestilah unik. Ia sering digunakan dalam URL.',
@@ -92,7 +92,7 @@ export const msMY: LocalizationResource = {
     title: 'Didaftarkan sebagai {{identifier}}',
   },
   maintenanceMode:
-    "Kami sedang menjalani penyelenggaraan, tetapi jangan risau, ini tidak sepatutnya mengambil masa lebih daripada beberapa minit.",
+    'Kami sedang menjalani penyelenggaraan, tetapi jangan risau, ini tidak sepatutnya mengambil masa lebih daripada beberapa minit.',
   membershipRole__admin: 'Pentadbir',
   membershipRole__basicMember: 'Ahli',
   membershipRole__guestMember: 'Tetamu',
@@ -252,9 +252,10 @@ export const msMY: LocalizationResource = {
     verifyDomainPage: {
       formSubtitle: 'Masukkan kod pengesahan yang dihantar ke alamat e-mel anda',
       formTitle: 'Kod pengesahan',
-      resendButton: "Tidak menerima kod? Hantar semula",
+      resendButton: 'Tidak menerima kod? Hantar semula',
       subtitle: 'Domain {{domainName}} perlu disahkan melalui e-mel.',
-      subtitleVerificationCodeScreen: 'Kod pengesahan telah dihantar ke {{emailAddress}}. Masukkan kod untuk meneruskan.',
+      subtitleVerificationCodeScreen:
+        'Kod pengesahan telah dihantar ke {{emailAddress}}. Masukkan kod untuk meneruskan.',
       title: 'Sahkan domain',
     },
   },
@@ -296,7 +297,7 @@ export const msMY: LocalizationResource = {
     },
     emailCode: {
       formTitle: 'Kod pengesahan',
-      resendButton: "Tidak menerima kod? Hantar semula",
+      resendButton: 'Tidak menerima kod? Hantar semula',
       subtitle: 'Masukkan kod yang dihantar ke e-mel anda untuk meneruskan',
       title: 'Pengesahan diperlukan',
     },
@@ -318,13 +319,13 @@ export const msMY: LocalizationResource = {
     },
     phoneCode: {
       formTitle: 'Kod pengesahan',
-      resendButton: "Tidak menerima kod? Hantar semula",
+      resendButton: 'Tidak menerima kod? Hantar semula',
       subtitle: 'Masukkan kod yang dihantar ke telefon anda untuk meneruskan',
       title: 'Pengesahan diperlukan',
     },
     phoneCodeMfa: {
       formTitle: 'Kod pengesahan',
-      resendButton: "Tidak menerima kod? Hantar semula",
+      resendButton: 'Tidak menerima kod? Hantar semula',
       subtitle: 'Masukkan kod yang dihantar ke telefon anda untuk meneruskan',
       title: 'Pengesahan diperlukan',
     },
@@ -366,7 +367,7 @@ export const msMY: LocalizationResource = {
     },
     emailCode: {
       formTitle: 'Kod pengesahan',
-      resendButton: "Tidak menerima kod? Hantar semula",
+      resendButton: 'Tidak menerima kod? Hantar semula',
       subtitle: 'untuk meneruskan ke {{applicationName}}',
       title: 'Periksa e-mel anda',
     },
@@ -390,7 +391,7 @@ export const msMY: LocalizationResource = {
         subtitle: 'Anda akan dialihkan tidak lama lagi',
         title: 'Mendaftar masuk...',
       },
-      resendButton: "Tidak menerima pautan? Hantar semula",
+      resendButton: 'Tidak menerima pautan? Hantar semula',
       subtitle: 'untuk meneruskan ke {{applicationName}}',
       title: 'Periksa e-mel anda',
       unusedTab: {
@@ -408,7 +409,7 @@ export const msMY: LocalizationResource = {
     },
     forgotPassword: {
       formTitle: 'Kod tetapan semula kata laluan',
-      resendButton: "Tidak menerima kod? Hantar semula",
+      resendButton: 'Tidak menerima kod? Hantar semula',
       subtitle: 'untuk menetapkan semula kata laluan anda',
       subtitle_email: 'Pertama, masukkan kod yang dihantar ke alamat e-mel anda',
       subtitle_phone: 'Pertama, masukkan kod yang dihantar ke telefon anda',
@@ -420,12 +421,13 @@ export const msMY: LocalizationResource = {
       title: 'Lupa Kata Laluan?',
     },
     noAvailableMethods: {
-      message: "Tidak dapat meneruskan pendaftaran masuk. Tiada faktor pengesahan yang tersedia.",
+      message: 'Tidak dapat meneruskan pendaftaran masuk. Tiada faktor pengesahan yang tersedia.',
       subtitle: 'Ralat berlaku',
       title: 'Tidak dapat mendaftar masuk',
     },
     passkey: {
-      subtitle: "Menggunakan kunci pas anda mengesahkan bahawa itu adalah anda. Peranti anda mungkin meminta cap jari, wajah atau kunci skrin anda.",
+      subtitle:
+        'Menggunakan kunci pas anda mengesahkan bahawa itu adalah anda. Peranti anda mungkin meminta cap jari, wajah atau kunci skrin anda.',
       title: 'Gunakan kunci pas anda',
     },
     password: {
@@ -438,13 +440,13 @@ export const msMY: LocalizationResource = {
     },
     phoneCode: {
       formTitle: 'Kod pengesahan',
-      resendButton: "Tidak menerima kod? Hantar semula",
+      resendButton: 'Tidak menerima kod? Hantar semula',
       subtitle: 'untuk meneruskan ke {{applicationName}}',
       title: 'Periksa telefon anda',
     },
     phoneCodeMfa: {
       formTitle: 'Kod pengesahan',
-      resendButton: "Tidak menerima kod? Hantar semula",
+      resendButton: 'Tidak menerima kod? Hantar semula',
       subtitle: 'Untuk meneruskan, sila masukkan kod pengesahan yang dihantar ke telefon anda',
       title: 'Periksa telefon anda',
     },
@@ -489,7 +491,7 @@ export const msMY: LocalizationResource = {
     emailCode: {
       formSubtitle: 'Masukkan kod pengesahan yang dihantar ke alamat e-mel anda',
       formTitle: 'Kod pengesahan',
-      resendButton: "Tidak menerima kod? Hantar semula",
+      resendButton: 'Tidak menerima kod? Hantar semula',
       subtitle: 'Masukkan kod pengesahan yang dihantar ke e-mel anda',
       title: 'Sahkan e-mel anda',
     },
@@ -504,7 +506,7 @@ export const msMY: LocalizationResource = {
       loading: {
         title: 'Mendaftar...',
       },
-      resendButton: "Tidak menerima pautan? Hantar semula",
+      resendButton: 'Tidak menerima pautan? Hantar semula',
       subtitle: 'untuk meneruskan ke {{applicationName}}',
       title: 'Sahkan e-mel anda',
       verified: {
@@ -531,7 +533,7 @@ export const msMY: LocalizationResource = {
     phoneCode: {
       formSubtitle: 'Masukkan kod pengesahan yang dihantar ke nombor telefon anda',
       formTitle: 'Kod pengesahan',
-      resendButton: "Tidak menerima kod? Hantar semula",
+      resendButton: 'Tidak menerima kod? Hantar semula',
       subtitle: 'Masukkan kod pengesahan yang dihantar ke telefon anda',
       title: 'Sahkan telefon anda',
     },
@@ -540,8 +542,10 @@ export const msMY: LocalizationResource = {
       actionText: 'Sudah mempunyai akaun?',
       blockButton__emailSupport: 'E-mel sokongan',
       blockButton__joinWaitlist: 'Sertai senarai menunggu',
-      subtitle: 'Pendaftaran kini dilumpuhkan. Jika anda percaya anda sepatutnya mempunyai akses, sila hubungi sokongan.',
-      subtitleWaitlist: 'Pendaftaran kini dilumpuhkan. Untuk menjadi yang pertama tahu bila kami melancarkan, sertai senarai menunggu.',
+      subtitle:
+        'Pendaftaran kini dilumpuhkan. Jika anda percaya anda sepatutnya mempunyai akses, sila hubungi sokongan.',
+      subtitleWaitlist:
+        'Pendaftaran kini dilumpuhkan. Untuk menjadi yang pertama tahu bila kami melancarkan, sertai senarai menunggu.',
       title: 'Akses terhad',
     },
     start: {
@@ -568,7 +572,8 @@ export const msMY: LocalizationResource = {
     form_identifier_exists__phone_number: 'Nombor telefon ini telah diambil. Sila cuba yang lain.',
     form_identifier_exists__username: 'Nama pengguna ini telah diambil. Sila cuba yang lain.',
     form_identifier_not_found: 'Tiada akaun dijumpai dengan pengenal ini. Sila periksa dan cuba lagi.',
-    form_param_format_invalid: 'Nilai yang dimasukkan adalah dalam format yang tidak sah. Sila periksa dan betulkannya.',
+    form_param_format_invalid:
+      'Nilai yang dimasukkan adalah dalam format yang tidak sah. Sila periksa dan betulkannya.',
     form_param_format_invalid__email_address: 'Alamat e-mel mestilah alamat e-mel yang sah.',
     form_param_format_invalid__phone_number: 'Nombor telefon mestilah dalam format antarabangsa yang sah.',
     form_param_max_length_exceeded__first_name: 'Nama pertama tidak boleh melebihi 256 aksara.',
@@ -588,7 +593,8 @@ export const msMY: LocalizationResource = {
     form_password_validation_failed: 'Kata Laluan Tidak Betul',
     form_username_invalid_character:
       'Nama pengguna anda mengandungi aksara yang tidak sah. Sila gunakan hanya huruf, nombor, dan garis bawah.',
-    form_username_invalid_length: 'Nama pengguna anda mestilah antara {{min_length}} dan {{max_length}} aksara panjang.',
+    form_username_invalid_length:
+      'Nama pengguna anda mestilah antara {{min_length}} dan {{max_length}} aksara panjang.',
     identification_deletion_failed: 'Anda tidak boleh memadamkan pengenalan terakhir anda.',
     not_allowed_access:
       'Anda tidak mempunyai kebenaran untuk mengakses halaman ini. Sila hubungi sokongan jika anda percaya ini adalah kesilapan.',
@@ -729,21 +735,21 @@ export const msMY: LocalizationResource = {
         formHint: 'E-mel yang mengandungi kod pengesahan akan dihantar ke alamat e-mel ini.',
         formSubtitle: 'Masukkan kod pengesahan yang dihantar ke {{identifier}}',
         formTitle: 'Kod pengesahan',
-        resendButton: "Tidak menerima kod? Hantar semula",
+        resendButton: 'Tidak menerima kod? Hantar semula',
         successMessage: 'E-mel {{identifier}} telah ditambah ke akaun anda.',
       },
       emailLink: {
         formHint: 'E-mel yang mengandungi pautan pengesahan akan dihantar ke alamat e-mel ini.',
         formSubtitle: 'Klik pada pautan pengesahan dalam e-mel yang dihantar ke {{identifier}}',
         formTitle: 'Pautan pengesahan',
-        resendButton: "Tidak menerima pautan? Hantar semula",
+        resendButton: 'Tidak menerima pautan? Hantar semula',
         successMessage: 'E-mel {{identifier}} telah ditambah ke akaun anda.',
       },
       enterpriseSSOLink: {
         formButton: 'Klik untuk mendaftar masuk',
         formSubtitle: 'Selesaikan pendaftaran masuk dengan {{identifier}}',
       },
-      formHint: "Anda perlu mengesahkan alamat e-mel ini sebelum ia boleh ditambah ke akaun anda.",
+      formHint: 'Anda perlu mengesahkan alamat e-mel ini sebelum ia boleh ditambah ke akaun anda.',
       removeResource: {
         messageLine1: '{{identifier}} akan dikeluarkan dari akaun ini.',
         messageLine2: 'Anda tidak akan dapat mendaftar masuk menggunakan alamat e-mel ini lagi.',
@@ -789,7 +795,8 @@ export const msMY: LocalizationResource = {
         buttonUnableToScan__nonPrimary: 'Tidak dapat mengimbas kod QR?',
         infoText__ableToScan:
           'Sediakan kaedah pendaftaran masuk baharu dalam aplikasi pengesah anda dan imbas kod QR berikut untuk menghubungkannya ke akaun anda.',
-        infoText__unableToScan: 'Sediakan kaedah pendaftaran masuk baharu dalam pengesah anda dan masukkan Kunci yang diberikan di bawah.',
+        infoText__unableToScan:
+          'Sediakan kaedah pendaftaran masuk baharu dalam pengesah anda dan masukkan Kunci yang diberikan di bawah.',
         inputLabel__unableToScan1:
           'Pastikan Kata laluan Berasaskan Masa atau Sekali diaktifkan, kemudian selesaikan menghubungkan akaun anda.',
         inputLabel__unableToScan2:
@@ -826,7 +833,8 @@ export const msMY: LocalizationResource = {
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'Adalah disyorkan untuk mendaftar keluar dari semua peranti lain yang mungkin telah menggunakan kata laluan lama anda.',
-      readonly: 'Kata laluan anda pada masa ini tidak boleh disunting kerana anda hanya boleh mendaftar masuk melalui sambungan perusahaan.',
+      readonly:
+        'Kata laluan anda pada masa ini tidak boleh disunting kerana anda hanya boleh mendaftar masuk melalui sambungan perusahaan.',
       successMessage__set: 'Kata laluan anda telah ditetapkan.',
       successMessage__signOutOfOtherSessions: 'Semua peranti lain telah didaftarkan keluar.',
       successMessage__update: 'Kata laluan anda telah dikemas kini.',
