@@ -1,26 +1,161 @@
+/*
+ * =====================================================================================
+ * DISCLAIMER:
+ * =====================================================================================
+ * This localization file is a community contribution and is not officially maintained
+ * by Clerk. It has been provided by the community and may not be fully aligned
+ * with the current or future states of the main application. Clerk does not guarantee
+ * the accuracy, completeness, or timeliness of the translations in this file.
+ * Use of this file is at your own risk and discretion.
+ * =====================================================================================
+ */
+
 import type { LocalizationResource } from '@clerk/types';
 
 export const teIN: LocalizationResource = {
   locale: 'te-IN',
-  __experimental_commerce: {
-    billedAnnually: 'వార్షిక బిల్లింగ్',
-    free: 'ఉచితం',
-    getStarted: 'ప్రారంభించండి',
-    manageMembership: 'సభ్యత్వాన్ని నిర్వహించండి',
-    month: 'నెల',
-    switchPlan: 'ఈ ప్లాన్‌కు మారండి',
+  apiKeys: {
+    action__add: undefined,
+    action__search: undefined,
+    createdAndExpirationStatus__expiresOn: undefined,
+    createdAndExpirationStatus__never: undefined,
+    detailsTitle__emptyRow: undefined,
+    formButtonPrimary__add: undefined,
+    formFieldCaption__expiration__expiresOn: undefined,
+    formFieldCaption__expiration__never: undefined,
+    formFieldOption__expiration__180d: undefined,
+    formFieldOption__expiration__1d: undefined,
+    formFieldOption__expiration__1y: undefined,
+    formFieldOption__expiration__30d: undefined,
+    formFieldOption__expiration__60d: undefined,
+    formFieldOption__expiration__7d: undefined,
+    formFieldOption__expiration__90d: undefined,
+    formFieldOption__expiration__never: undefined,
+    formHint: undefined,
+    formTitle: undefined,
+    lastUsed__days: undefined,
+    lastUsed__hours: undefined,
+    lastUsed__minutes: undefined,
+    lastUsed__months: undefined,
+    lastUsed__seconds: undefined,
+    lastUsed__years: undefined,
+    menuAction__revoke: undefined,
+    revokeConfirmation: {
+      confirmationText: undefined,
+      formButtonPrimary__revoke: undefined,
+      formHint: undefined,
+      formTitle: undefined,
+    },
   },
   backButton: 'వెనుకకు',
+  badge__activePlan: undefined,
+  badge__canceledEndsAt: undefined,
   badge__currentPlan: 'ప్రస్తుత ప్లాన్',
   badge__default: 'డిఫాల్ట్',
+  badge__endsAt: undefined,
   badge__expired: 'గడువు ముగిసింది',
   badge__otherImpersonatorDevice: 'ఇతర నకిలీ పరికరం',
+  badge__pastDueAt: undefined,
+  badge__pastDuePlan: undefined,
   badge__primary: 'ప్రాథమిక',
+  badge__renewsAt: undefined,
   badge__requiresAction: 'చర్య అవసరం',
+  badge__startsAt: undefined,
   badge__thisDevice: 'ఈ పరికరం',
   badge__unverified: 'ధృవీకరించబడలేదు',
+  badge__upcomingPlan: undefined,
   badge__userDevice: 'వినియోగదారు పరికరం',
   badge__you: 'మీరు',
+  commerce: {
+    addPaymentMethod: undefined,
+    alwaysFree: undefined,
+    annually: undefined,
+    availableFeatures: undefined,
+    billedAnnually: 'వార్షిక బిల్లింగ్',
+    billedMonthlyOnly: undefined,
+    cancelSubscription: undefined,
+    cancelSubscriptionAccessUntil: undefined,
+    cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionTitle: undefined,
+    cannotSubscribeMonthly: undefined,
+    cannotSubscribeUnrecoverable: undefined,
+    checkout: {
+      description__paymentSuccessful: undefined,
+      description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      lineItems: {
+        title__paymentMethod: undefined,
+        title__statementId: undefined,
+        title__subscriptionBegins: undefined,
+        title__totalPaid: undefined,
+      },
+      pastDueNotice: undefined,
+      perMonth: undefined,
+      title: undefined,
+      title__paymentSuccessful: undefined,
+      title__subscriptionSuccessful: undefined,
+    },
+    credit: undefined,
+    creditRemainder: undefined,
+    defaultFreePlanActive: undefined,
+    free: 'ఉచితం',
+    getStarted: 'ప్రారంభించండి',
+    keepSubscription: undefined,
+    manage: undefined,
+    manageSubscription: 'సభ్యత్వాన్ని నిర్వహించండి',
+    month: 'నెల',
+    monthly: undefined,
+    pastDue: undefined,
+    pay: undefined,
+    paymentMethods: undefined,
+    paymentSource: {
+      applePayDescription: {
+        annual: undefined,
+        monthly: undefined,
+      },
+      dev: {
+        anyNumbers: undefined,
+        cardNumber: undefined,
+        cvcZip: undefined,
+        developmentMode: undefined,
+        expirationDate: undefined,
+        testCardInfo: undefined,
+      },
+    },
+    popular: undefined,
+    pricingTable: {
+      billingCycle: undefined,
+      included: undefined,
+    },
+    reSubscribe: undefined,
+    seeAllFeatures: undefined,
+    subscribe: undefined,
+    subscriptionDetails: {
+      beginsOn: undefined,
+      currentBillingCycle: undefined,
+      endsOn: undefined,
+      nextPaymentAmount: undefined,
+      nextPaymentOn: undefined,
+      pastDueAt: undefined,
+      renewsAt: undefined,
+      subscribedOn: undefined,
+      title: undefined,
+    },
+    subtotal: undefined,
+    switchPlan: 'ఈ ప్లాన్‌కు మారండి',
+    switchToAnnual: undefined,
+    switchToAnnualWithAnnualPrice: undefined,
+    switchToMonthly: undefined,
+    switchToMonthlyWithPrice: undefined,
+    totalDue: undefined,
+    totalDueToday: undefined,
+    viewFeatures: undefined,
+    year: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'సంస్థను సృష్టించండి',
     invitePage: {
@@ -37,6 +172,7 @@ export const teIN: LocalizationResource = {
     sameDay: "ఈరోజు {{ date | timeString('te-IN') }}",
   },
   dividerText: 'లేదా',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'మరొక పద్ధతిని ఉపయోగించండి',
   footerPageLink__help: 'సహాయం',
   footerPageLink__privacy: 'గోప్యత',
@@ -49,6 +185,9 @@ export const teIN: LocalizationResource = {
   formFieldError__verificationLinkExpired: 'ధృవీకరణ లింక్ గడువు ముగిసింది. దయచేసి కొత్త లింక్‌ను అభ్యర్థించండి.',
   formFieldHintText__optional: 'ఐచ్ఛికం',
   formFieldHintText__slug: 'స్లగ్ అనేది మానవ-చదవగలిగే ID, అది ప్రత్యేకంగా ఉండాలి. ఇది తరచుగా URL లలో ఉపయోగించబడుతుంది.',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'బ్యాకప్ కోడ్‌ని నమోదు చేయండి',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'ఖాతాను తొలగించండి',
   formFieldInputPlaceholder__emailAddress: 'మీ ఇమెయిల్ చిరునామాను నమోదు చేయండి',
@@ -63,6 +202,9 @@ export const teIN: LocalizationResource = {
   formFieldInputPlaceholder__password: 'మీ పాస్‌వర్డ్‌ను నమోదు చేయండి',
   formFieldInputPlaceholder__phoneNumber: 'మీ ఫోన్ నంబర్‌ను నమోదు చేయండి',
   formFieldInputPlaceholder__username: undefined,
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'ఈ డొమైన్ కోసం స్వయంచాలక ఆహ్వానాలను ప్రారంభించండి',
   formFieldLabel__backupCode: 'బ్యాకప్ కోడ్',
   formFieldLabel__confirmDeletion: 'నిర్ధారణ',
@@ -107,10 +249,72 @@ export const teIN: LocalizationResource = {
     titleWithoutPersonal: 'సంస్థను ఎంచుకోండి',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: 'స్వయంచాలక ఆహ్వానాలు',
     badge__automaticSuggestion: 'స్వయంచాలక సూచనలు',
     badge__manualInvitation: 'స్వయంచాలక నమోదు లేదు',
     badge__unverified: 'ధృవీకరించబడలేదు',
+    billingPage: {
+      paymentHistorySection: {
+        empty: undefined,
+        notFound: undefined,
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        tableHeader__status: undefined,
+      },
+      paymentSourcesSection: {
+        actionLabel__default: 'డిఫాల్ట్‌గా చేయండి',
+        actionLabel__remove: 'తొలగించండి',
+        add: 'కొత్త చెల్లింపు మూలాన్ని జోడించండి',
+        addSubtitle: 'మీ ఖాతాకు కొత్త చెల్లింపు మూలాన్ని జోడించండి.',
+        cancelButton: 'రద్దు చేయండి',
+        formButtonPrimary__add: 'చెల్లింపు పద్ధతిని జోడించండి',
+        formButtonPrimary__pay: '{{amount}} చెల్లించండి',
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: '{{identifier}} ఈ ఖాతా నుండి తొలగించబడుతుంది.',
+          messageLine2:
+            'మీరు ఇకపై ఈ చెల్లింపు మూలాన్ని ఉపయోగించలేరు మరియు దానిపై ఆధారపడిన పునరావృత సబ్‌స్క్రిప్షన్‌లు ఇకపై పనిచేయవు.',
+          successMessage: '{{paymentSource}} మీ ఖాతా నుండి తొలగించబడింది.',
+          title: 'చెల్లింపు మూలాన్ని తొలగించండి',
+        },
+        title: 'అందుబాటులో ఉన్న ఎంపికలు',
+      },
+      start: {
+        headerTitle__payments: undefined,
+        headerTitle__plans: 'ప్లాన్‌లు',
+        headerTitle__statements: 'ఇన్‌వాయిస్‌లు',
+        headerTitle__subscriptions: undefined,
+      },
+      statementsSection: {
+        empty: undefined,
+        itemCaption__paidForPlan: undefined,
+        itemCaption__proratedCredit: undefined,
+        itemCaption__subscribedAndPaidForPlan: undefined,
+        notFound: undefined,
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+        totalPaid: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        tableHeader__edit: undefined,
+        tableHeader__plan: undefined,
+        tableHeader__startDate: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: 'బిల్లింగ్ & చెల్లింపులు',
+    },
     createDomainPage: {
       subtitle:
         'ధృవీకరించడానికి డొమైన్‌ను జోడించండి. ఈ డొమైన్‌లో ఇమెయిల్ చిరునామాలు ఉన్న వినియోగదారులు స్వయంచాలకంగా సంస్థలో చేరవచ్చు లేదా చేరడానికి అభ్యర్థించవచ్చు.',
@@ -169,11 +373,18 @@ export const teIN: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
+      billing: 'బిల్లింగ్',
       description: 'మీ సంస్థను నిర్వహించండి.',
       general: 'సాధారణ',
       members: 'సభ్యులు',
       title: 'సంస్థ',
-      billing: 'బిల్లింగ్',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -361,6 +572,12 @@ export const teIN: LocalizationResource = {
       subtitle: 'సమస్యలు ఎదుర్కొంటున్నారా? సైన్ ఇన్ చేయడానికి మీరు ఈ పద్ధతులలో దేనినైనా ఉపయోగించవచ్చు.',
       title: 'మరొక పద్ధతిని ఉపయోగించండి',
     },
+    alternativePhoneCodeProvider: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     backupCodeMfa: {
       subtitle: 'మీ బ్యాకప్ కోడ్ రెండు-దశల ప్రమాణీకరణను సెటప్ చేసేటప్పుడు మీరు పొందిన కోడ్.',
       title: 'బ్యాకప్ కోడ్‌ను నమోదు చేయండి',
@@ -469,6 +686,12 @@ export const teIN: LocalizationResource = {
       actionLink__use_username: 'వినియోగదారు పేరును ఉపయోగించండి',
       actionText: 'ఖాతా లేదా?',
       actionText__join_waitlist: 'త్వరగా ప్రాప్యత కావాలా?',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'మళ్ళీ స్వాగతం! కొనసాగించడానికి దయచేసి సైన్ ఇన్ చేయండి',
       subtitleCombined: undefined,
       title: '{{applicationName}}కి సైన్ ఇన్ చేయండి',
@@ -482,6 +705,11 @@ export const teIN: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'మీ పాస్‌వర్డ్‌ను నమోదు చేయండి',
   signUp: {
+    alternativePhoneCodeProvider: {
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     continue: {
       actionLink: 'సైన్ ఇన్ చేయండి',
       actionText: 'ఇప్పటికే ఖాతా ఉందా?',
@@ -552,6 +780,12 @@ export const teIN: LocalizationResource = {
       actionLink__use_email: 'బదులుగా ఇమెయిల్‌ను ఉపయోగించండి',
       actionLink__use_phone: 'బదులుగా ఫోన్‌ను ఉపయోగించండి',
       actionText: 'ఇప్పటికే ఖాతా ఉందా?',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'స్వాగతం! ప్రారంభించడానికి దయచేసి వివరాలను పూరించండి.',
       subtitleCombined: 'స్వాగతం! ప్రారంభించడానికి దయచేసి వివరాలను పూరించండి.',
       title: 'మీ ఖాతాను సృష్టించండి',
@@ -616,6 +850,7 @@ export const teIN: LocalizationResource = {
       sentencePrefix: 'మీ పాస్‌వర్డ్‌లో ఉండాలి',
     },
     phone_number_exists: 'ఈ ఫోన్ నంబర్ తీసుకోబడింది. దయచేసి మరొకదాన్ని ప్రయత్నించండి.',
+    session_exists: undefined,
     web3_missing_identifier: 'Web3 వాలెట్ పొడిగింపు కనుగొనబడలేదు. కొనసాగించడానికి దయచేసి ఒకదాన్ని ఇన్‌స్టాల్ చేయండి.',
     zxcvbn: {
       couldBeStronger:
@@ -665,30 +900,8 @@ export const teIN: LocalizationResource = {
     action__signOutAll: 'అన్ని ఖాతాల నుండి సైన్ అవుట్ అవ్వండి',
   },
   userProfile: {
-    __experimental_billingPage: {
-      start: {
-        headerTitle__invoices: 'ఇన్‌వాయిస్‌లు',
-        headerTitle__paymentSources: 'చెల్లింపు మూలాలు',
-        headerTitle__plans: 'ప్లాన్‌లు',
-      },
-      title: 'బిల్లింగ్ & చెల్లింపులు',
-      paymentSourcesSection: {
-        title: 'అందుబాటులో ఉన్న ఎంపికలు',
-        add: 'కొత్త చెల్లింపు మూలాన్ని జోడించండి',
-        addSubtitle: 'మీ ఖాతాకు కొత్త చెల్లింపు మూలాన్ని జోడించండి.',
-        cancelButton: 'రద్దు చేయండి',
-        actionLabel__default: 'డిఫాల్ట్‌గా చేయండి',
-        actionLabel__remove: 'తొలగించండి',
-        formButtonPrimary__add: 'చెల్లింపు పద్ధతిని జోడించండి',
-        formButtonPrimary__pay: '{{amount}} చెల్లించండి',
-        removeResource: {
-          title: 'చెల్లింపు మూలాన్ని తొలగించండి',
-          messageLine1: '{{identifier}} ఈ ఖాతా నుండి తొలగించబడుతుంది.',
-          messageLine2:
-            'మీరు ఇకపై ఈ చెల్లింపు మూలాన్ని ఉపయోగించలేరు మరియు దానిపై ఆధారపడిన పునరావృత సబ్‌స్క్రిప్షన్‌లు ఇకపై పనిచేయవు.',
-          successMessage: '{{paymentSource}} మీ ఖాతా నుండి తొలగించబడింది.',
-        },
-      },
+    apiKeysPage: {
+      title: undefined,
     },
     backupCodePage: {
       actionLabel__copied: 'కాపీ చేయబడింది!',
@@ -705,6 +918,65 @@ export const teIN: LocalizationResource = {
         'మీ ప్రమాణీకరణ పరికరంపై యాక్సెస్‌ను కోల్పోతే, మీ ఖాతాలోకి సైన్ ఇన్ చేయడానికి మీరు వీటిలో ఒకదాన్ని ఉపయోగించవచ్చు.',
       title: 'బ్యాకప్ కోడ్ ధృవీకరణను జోడించండి',
       title__codelist: 'బ్యాకప్ కోడ్‌లు',
+    },
+    billingPage: {
+      paymentHistorySection: {
+        empty: undefined,
+        notFound: undefined,
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        tableHeader__status: undefined,
+      },
+      paymentSourcesSection: {
+        actionLabel__default: 'డిఫాల్ట్‌గా చేయండి',
+        actionLabel__remove: 'తొలగించండి',
+        add: 'కొత్త చెల్లింపు మూలాన్ని జోడించండి',
+        addSubtitle: 'మీ ఖాతాకు కొత్త చెల్లింపు మూలాన్ని జోడించండి.',
+        cancelButton: 'రద్దు చేయండి',
+        formButtonPrimary__add: 'చెల్లింపు పద్ధతిని జోడించండి',
+        formButtonPrimary__pay: '{{amount}} చెల్లించండి',
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: '{{identifier}} ఈ ఖాతా నుండి తొలగించబడుతుంది.',
+          messageLine2:
+            'మీరు ఇకపై ఈ చెల్లింపు మూలాన్ని ఉపయోగించలేరు మరియు దానిపై ఆధారపడిన పునరావృత సబ్‌స్క్రిప్షన్‌లు ఇకపై పనిచేయవు.',
+          successMessage: '{{paymentSource}} మీ ఖాతా నుండి తొలగించబడింది.',
+          title: 'చెల్లింపు మూలాన్ని తొలగించండి',
+        },
+        title: 'అందుబాటులో ఉన్న ఎంపికలు',
+      },
+      start: {
+        headerTitle__payments: undefined,
+        headerTitle__plans: 'ప్లాన్‌లు',
+        headerTitle__statements: 'ఇన్‌వాయిస్‌లు',
+        headerTitle__subscriptions: undefined,
+      },
+      statementsSection: {
+        empty: undefined,
+        itemCaption__paidForPlan: undefined,
+        itemCaption__proratedCredit: undefined,
+        itemCaption__subscribedAndPaidForPlan: undefined,
+        notFound: undefined,
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+        totalPaid: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        tableHeader__edit: undefined,
+        tableHeader__plan: undefined,
+        tableHeader__startDate: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: 'బిల్లింగ్ & చెల్లింపులు',
     },
     connectedAccountPage: {
       formHint: 'మీ ఖాతాను కనెక్ట్ చేయడానికి ప్రొవైడర్‌ను ఎంచుకోండి.',
@@ -812,6 +1084,7 @@ export const teIN: LocalizationResource = {
     mobileButton__menu: 'మెనూ',
     navbar: {
       account: 'ప్రొఫైల్',
+      apiKeys: undefined,
       billing: 'బిల్లింగ్',
       description: 'మీ ఖాతా సమాచారాన్ని నిర్వహించండి.',
       security: 'భద్రత',
@@ -849,6 +1122,9 @@ export const teIN: LocalizationResource = {
       title: 'ఫోన్ నంబర్‌ను జోడించండి',
       verifySubtitle: '{{identifier}}కి పంపిన ధృవీకరణ కోడ్‌ను నమోదు చేయండి',
       verifyTitle: 'ఫోన్ నంబర్‌ను ధృవీకరించండి',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: 'సిఫార్సు చేయబడిన పరిమాణం 1:1, 10MB వరకు.',
