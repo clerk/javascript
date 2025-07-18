@@ -1,10 +1,8 @@
 import { deprecated } from '@clerk/shared/deprecated';
 import type {
-  CheckAuthorizationWithCustomPermissions,
   HandleOAuthCallbackParams,
-  OrganizationCustomPermissionKey,
-  OrganizationCustomRoleKey,
   PendingSessionOptions,
+  ProtectProps as _ProtectProps,
   RedirectOptions,
 } from '@clerk/types';
 import { defineComponent } from 'vue';
@@ -106,29 +104,7 @@ export const AuthenticateWithRedirectCallback = defineComponent((props: HandleOA
   return () => null;
 });
 
-export type ProtectProps = (
-  | {
-      condition?: never;
-      role: OrganizationCustomRoleKey;
-      permission?: never;
-    }
-  | {
-      condition?: never;
-      role?: never;
-      permission: OrganizationCustomPermissionKey;
-    }
-  | {
-      condition: (has: CheckAuthorizationWithCustomPermissions) => boolean;
-      role?: never;
-      permission?: never;
-    }
-  | {
-      condition?: never;
-      role?: never;
-      permission?: never;
-    }
-) &
-  PendingSessionOptions;
+export type ProtectProps = _ProtectProps & PendingSessionOptions;
 
 export const Protect = defineComponent((props: ProtectProps, { slots }) => {
   const { isLoaded, has, userId } = useAuth({ treatPendingAsSignedOut: props.treatPendingAsSignedOut });
@@ -160,7 +136,7 @@ export const Protect = defineComponent((props: ProtectProps, { slots }) => {
       return slots.fallback?.();
     }
 
-    if (props.role || props.permission) {
+    if (props.role || props.permission || props.feature || props.plan) {
       if (has.value?.(props)) {
         return slots.default?.();
       }

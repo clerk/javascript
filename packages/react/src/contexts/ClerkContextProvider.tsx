@@ -1,5 +1,11 @@
 import { deriveState } from '@clerk/shared/deriveState';
-import { ClientContext, OrganizationProvider, SessionContext, UserContext } from '@clerk/shared/react';
+import {
+  __experimental_CheckoutProvider as CheckoutProvider,
+  ClientContext,
+  OrganizationProvider,
+  SessionContext,
+  UserContext,
+} from '@clerk/shared/react';
 import type { ClientResource, InitialState, Resources } from '@clerk/types';
 import React from 'react';
 
@@ -89,7 +95,14 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
         <SessionContext.Provider value={sessionCtx}>
           <OrganizationProvider {...organizationCtx.value}>
             <AuthContext.Provider value={authCtx}>
-              <UserContext.Provider value={userCtx}>{children}</UserContext.Provider>
+              <UserContext.Provider value={userCtx}>
+                <CheckoutProvider
+                  // @ts-expect-error - value is not used
+                  value={undefined}
+                >
+                  {children}
+                </CheckoutProvider>
+              </UserContext.Provider>
             </AuthContext.Provider>
           </OrganizationProvider>
         </SessionContext.Provider>
@@ -99,27 +112,26 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
 }
 
 const useLoadedIsomorphicClerk = (options: IsomorphicClerkOptions) => {
-  const isomorphicClerk = React.useMemo(() => IsomorphicClerk.getOrCreateInstance(options), []);
-  const [clerkStatus, setStatus] = React.useState(isomorphicClerk.status);
+  const isomorphicClerkRef = React.useRef(IsomorphicClerk.getOrCreateInstance(options));
+  const [clerkStatus, setClerkStatus] = React.useState(isomorphicClerkRef.current.status);
 
   React.useEffect(() => {
-    void isomorphicClerk.__unstable__updateProps({ appearance: options.appearance });
+    void isomorphicClerkRef.current.__unstable__updateProps({ appearance: options.appearance });
   }, [options.appearance]);
 
   React.useEffect(() => {
-    void isomorphicClerk.__unstable__updateProps({ options });
+    void isomorphicClerkRef.current.__unstable__updateProps({ options });
   }, [options.localization]);
 
   React.useEffect(() => {
-    isomorphicClerk.on('status', setStatus);
-    return () => isomorphicClerk.off('status', setStatus);
-  }, [isomorphicClerk]);
-
-  React.useEffect(() => {
+    isomorphicClerkRef.current.on('status', setClerkStatus);
     return () => {
+      if (isomorphicClerkRef.current) {
+        isomorphicClerkRef.current.off('status', setClerkStatus);
+      }
       IsomorphicClerk.clearInstance();
     };
   }, []);
 
-  return { isomorphicClerk, clerkStatus };
+  return { isomorphicClerk: isomorphicClerkRef.current, clerkStatus };
 };

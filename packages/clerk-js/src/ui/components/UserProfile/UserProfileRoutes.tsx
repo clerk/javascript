@@ -2,9 +2,8 @@ import { lazy, Suspense } from 'react';
 
 import { CustomPageContentContainer } from '../../common/CustomPageContentContainer';
 import { USER_PROFILE_NAVBAR_ROUTE_ID } from '../../constants';
-import { InvoicesContextProvider, useEnvironment, useUserProfileContext } from '../../contexts';
+import { useEnvironment, useUserProfileContext } from '../../contexts';
 import { Route, Switch } from '../../router';
-import { InvoicePage } from '../Invoices/InvoicePage';
 import { AccountPage } from './AccountPage';
 import { SecurityPage } from './SecurityPage';
 
@@ -14,13 +13,38 @@ const BillingPage = lazy(() =>
   })),
 );
 
+const APIKeysPage = lazy(() =>
+  import(/* webpackChunkName: "up-api-keys-page"*/ './ApiKeysPage').then(module => ({
+    default: module.APIKeysPage,
+  })),
+);
+
+const PlansPage = lazy(() =>
+  import(/* webpackChunkName: "up-plans-page"*/ './PlansPage').then(module => ({
+    default: module.PlansPage,
+  })),
+);
+
+const StatementPage = lazy(() =>
+  import(/* webpackChunkName: "statement-page"*/ '../Statements').then(module => ({
+    default: module.StatementPage,
+  })),
+);
+
+const PaymentAttemptPage = lazy(() =>
+  import(/* webpackChunkName: "payment-attempt-page"*/ '../PaymentAttempts').then(module => ({
+    default: module.PaymentAttemptPage,
+  })),
+);
+
 export const UserProfileRoutes = () => {
   const { pages } = useUserProfileContext();
-  const { __experimental_commerceSettings } = useEnvironment();
+  const { apiKeysSettings, commerceSettings } = useEnvironment();
 
   const isAccountPageRoot = pages.routes[0].id === USER_PROFILE_NAVBAR_ROUTE_ID.ACCOUNT;
   const isSecurityPageRoot = pages.routes[0].id === USER_PROFILE_NAVBAR_ROUTE_ID.SECURITY;
   const isBillingPageRoot = pages.routes[0].id === USER_PROFILE_NAVBAR_ROUTE_ID.BILLING;
+  const isAPIKeysPageRoot = pages.routes[0].id === USER_PROFILE_NAVBAR_ROUTE_ID.API_KEYS;
 
   const customPageRoutesWithContents = pages.contents?.map((customPage, index) => {
     const shouldFirstCustomItemBeOnRoot = !isAccountPageRoot && !isSecurityPageRoot && index === 0;
@@ -56,25 +80,43 @@ export const UserProfileRoutes = () => {
             </Route>
           </Switch>
         </Route>
-        {__experimental_commerceSettings.billing.enabled &&
-          __experimental_commerceSettings.billing.hasPaidUserPlans && (
-            <Route path={isBillingPageRoot ? undefined : 'billing'}>
-              <Switch>
-                <Route index>
-                  <Suspense fallback={''}>
-                    <BillingPage />
-                  </Suspense>
-                </Route>
-                <Route path='invoice/:invoiceId'>
-                  <Suspense fallback={''}>
-                    <InvoicesContextProvider>
-                      <InvoicePage />
-                    </InvoicesContextProvider>
-                  </Suspense>
-                </Route>
-              </Switch>
-            </Route>
-          )}
+        {commerceSettings.billing.enabled && commerceSettings.billing.hasPaidUserPlans && (
+          <Route path={isBillingPageRoot ? undefined : 'billing'}>
+            <Switch>
+              <Route index>
+                <Suspense fallback={''}>
+                  <BillingPage />
+                </Suspense>
+              </Route>
+              <Route path='plans'>
+                <Suspense fallback={''}>
+                  <PlansPage />
+                </Suspense>
+              </Route>
+              <Route path='statement/:statementId'>
+                <Suspense fallback={''}>
+                  <StatementPage />
+                </Suspense>
+              </Route>
+              <Route path='payment-attempt/:paymentAttemptId'>
+                <Suspense fallback={''}>
+                  <PaymentAttemptPage />
+                </Suspense>
+              </Route>
+            </Switch>
+          </Route>
+        )}
+        {apiKeysSettings.enabled && (
+          <Route path={isAPIKeysPageRoot ? undefined : 'api-keys'}>
+            <Switch>
+              <Route index>
+                <Suspense fallback={''}>
+                  <APIKeysPage />
+                </Suspense>
+              </Route>
+            </Switch>
+          </Route>
+        )}
       </Route>
     </Switch>
   );

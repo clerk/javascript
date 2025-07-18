@@ -1,11 +1,12 @@
+/* eslint-disable jsdoc/require-description-complete-sentence */
 import type {
-  __experimental_CommerceSubscriptionResource,
-  __experimental_GetSubscriptionsParams,
   ClerkPaginatedResponse,
+  CommerceSubscriptionResource,
   GetDomainsParams,
   GetInvitationsParams,
   GetMembershipRequestParams,
   GetMembersParams,
+  GetSubscriptionsParams,
   OrganizationDomainResource,
   OrganizationInvitationResource,
   OrganizationMembershipRequestResource,
@@ -66,6 +67,7 @@ export type UseOrganizationParams = {
    */
   invitations?: true | PaginatedHookConfig<GetInvitationsParams>;
   /**
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
    * If set to `true`, all default properties will be used.<br />
    * Otherwise, accepts an object with the following optional properties:
    * <ul>
@@ -73,7 +75,7 @@ export type UseOrganizationParams = {
    *  <li>Any of the properties described in [Shared properties](#shared-properties).</li>
    * </ul>
    */
-  subscriptions?: true | PaginatedHookConfig<__experimental_GetSubscriptionsParams>;
+  subscriptions?: true | PaginatedHookConfig<GetSubscriptionsParams>;
 };
 
 /**
@@ -110,9 +112,10 @@ export type UseOrganizationReturn<T extends UseOrganizationParams> =
        */
       invitations: PaginatedResourcesWithDefault<OrganizationInvitationResource>;
       /**
+       * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
        * Includes a paginated list of the organization's subscriptions.
        */
-      subscriptions: PaginatedResourcesWithDefault<__experimental_CommerceSubscriptionResource>;
+      subscriptions: PaginatedResourcesWithDefault<CommerceSubscriptionResource>;
     }
   | {
       isLoaded: true;
@@ -122,7 +125,7 @@ export type UseOrganizationReturn<T extends UseOrganizationParams> =
       membershipRequests: PaginatedResourcesWithDefault<OrganizationMembershipRequestResource>;
       memberships: PaginatedResourcesWithDefault<OrganizationMembershipResource>;
       invitations: PaginatedResourcesWithDefault<OrganizationInvitationResource>;
-      subscriptions: PaginatedResourcesWithDefault<__experimental_CommerceSubscriptionResource>;
+      subscriptions: PaginatedResourcesWithDefault<CommerceSubscriptionResource>;
     }
   | {
       isLoaded: boolean;
@@ -145,7 +148,7 @@ export type UseOrganizationReturn<T extends UseOrganizationParams> =
         T['invitations'] extends { infinite: true } ? true : false
       > | null;
       subscriptions: PaginatedResources<
-        __experimental_CommerceSubscriptionResource,
+        CommerceSubscriptionResource,
         T['subscriptions'] extends { infinite: true } ? true : false
       > | null;
     };
@@ -461,13 +464,13 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
   );
 
   const subscriptions = usePagesOrInfinite<
-    __experimental_GetSubscriptionsParams,
-    ClerkPaginatedResponse<__experimental_CommerceSubscriptionResource>
+    GetSubscriptionsParams,
+    ClerkPaginatedResponse<CommerceSubscriptionResource>
   >(
     {
       ...subscriptionsParams,
     },
-    organization?.__experimental_getSubscriptions,
+    organization?.getSubscriptions,
     {
       keepPreviousData: subscriptionsSafeValues.keepPreviousData,
       infinite: subscriptionsSafeValues.infinite,

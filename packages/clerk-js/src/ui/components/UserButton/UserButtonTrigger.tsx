@@ -1,9 +1,11 @@
 import { useUser } from '@clerk/shared/react';
 import { forwardRef } from 'react';
 
+import { UserAvatar } from '@/ui/elements/UserAvatar';
+import { withAvatarShimmer } from '@/ui/elements/withAvatarShimmer';
+
 import { useUserButtonContext } from '../../contexts';
 import { Button, descriptors, Flex } from '../../customizables';
-import { UserAvatar, withAvatarShimmer } from '../../elements';
 import type { PropsOfComponent } from '../../styledSystem';
 import { UserButtonTopLevelIdentifier } from './UserButtonTopLevelIdentifier';
 
@@ -21,7 +23,7 @@ export const UserButtonTrigger = withAvatarShimmer(
       <Button
         elementDescriptor={descriptors.userButtonTrigger}
         variant='roundWrapper'
-        sx={[t => ({ borderRadius: showName ? t.radii.$md : t.radii.$circle, color: t.colors.$colorText }), sx]}
+        sx={[t => ({ borderRadius: showName ? t.radii.$md : t.radii.$circle, color: t.colors.$colorForeground }), sx]}
         ref={ref}
         aria-label={`${props.isOpen ? 'Close' : 'Open'} user button`}
         aria-expanded={props.isOpen}

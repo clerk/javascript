@@ -1,6 +1,6 @@
 {
   "name": "@clerk/dev-cli",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "CLI tool designed to simplify the process of iterating on packages within the clerk/javascript repository",
   "homepage": "https://clerk.com/",
   "bugs": {
@@ -22,11 +22,11 @@
     "lint": "eslint src"
   },
   "dependencies": {
-    "commander": "^12.1.0",
-    "concurrently": "^9.0.1",
-    "dotenv": "^16.4.5",
+    "commander": "^14.0.0",
+    "concurrently": "^9.2.0",
+    "dotenv": "^17.2.0",
     "globby": "^14.0.2",
-    "jscodeshift": "^0.16.1"
+    "jscodeshift": "^17.3.0"
   },
   "devDependencies": {},
   "engines": {

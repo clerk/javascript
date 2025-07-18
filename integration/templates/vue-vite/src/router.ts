@@ -36,6 +36,17 @@ const routes = [
     path: '/custom-pages/organization-profile',
     component: () => import('./views/custom-pages/OrganizationProfile.vue'),
   },
+  {
+    name: 'PricingTable',
+    path: '/pricing-table',
+    component: () => import('./views/PricingTable.vue'),
+  },
+  // This was added for billing tests
+  {
+    name: 'User',
+    path: '/user',
+    component: () => import('./views/Profile.vue'),
+  },
 ];
 
 const router = createRouter({

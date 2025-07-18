@@ -26,7 +26,7 @@ export const authAuthHeaderMissing = (helperName = 'auth', prefixSteps?: string[
 - Your Middleware matcher is configured to match this route or page.
 - If you are using the src directory, make sure the Middleware file is inside of it.
 
-For more details, see https://clerk.com/docs/quickstarts/nextjs
+For more details, see https://clerk.com/err/auth-middleware
 `;
 
 export const authSignatureInvalid = `Clerk: Unable to verify request, this usually means the Clerk middleware did not run. Ensure Clerk's middleware is properly integrated and matches the current route. For more information, see: https://clerk.com/docs/references/nextjs/clerk-middleware. (code=auth_signature_invalid)`;

@@ -2,17 +2,21 @@ import { useReverification, useUser } from '@clerk/shared/react';
 import type { ExternalAccountResource, OAuthProvider, OAuthScope, OAuthStrategy } from '@clerk/types';
 import { Fragment, useState } from 'react';
 
+import { Card } from '@/ui/elements/Card';
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { ProfileSection } from '@/ui/elements/Section';
+import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
+import { handleError } from '@/ui/utils/errorHandler';
+
 import { appendModalState } from '../../../utils';
 import { ProviderInitialIcon } from '../../common';
 import { useUserProfileContext } from '../../contexts';
 import { Box, Button, descriptors, Flex, Image, localizationKeys, Text } from '../../customizables';
-import { Card, ProfileSection, ThreeDotsMenu, useCardState, withCardStateProvider } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { useEnabledThirdPartyProviders } from '../../hooks';
 import { useRouter } from '../../router';
 import type { PropsOfComponent } from '../../styledSystem';
-import { handleError } from '../../utils';
 import { AddConnectedAccount } from './ConnectedAccountsMenu';
 import { RemoveConnectedAccountForm } from './RemoveResourceForm';
 
@@ -175,7 +179,7 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
               gap={1}
               center
             >
-              <Text sx={t => ({ color: t.colors.$colorText })}>{`${
+              <Text sx={t => ({ color: t.colors.$colorForeground })}>{`${
                 providerToDisplayData[account.provider].name
               }`}</Text>
               <Text

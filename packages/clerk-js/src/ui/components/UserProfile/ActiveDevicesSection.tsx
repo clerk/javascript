@@ -1,12 +1,16 @@
 import { useReverification, useSession, useUser } from '@clerk/shared/react';
 import type { SessionWithActivitiesResource, SignedInSessionResource } from '@clerk/types';
 
+import { FullHeightLoader } from '@/ui/elements/FullHeightLoader';
+import { ProfileSection } from '@/ui/elements/Section';
+import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
+import { handleError } from '@/ui/utils/errorHandler';
+import { getRelativeToNowDateKey } from '@/ui/utils/getRelativeToNowDateKey';
+
 import { Badge, Col, descriptors, Flex, Icon, localizationKeys, Text, useLocalizations } from '../../customizables';
-import { FullHeightLoader, ProfileSection, ThreeDotsMenu } from '../../elements';
 import { useFetch, useLoadingStatus } from '../../hooks';
 import { DeviceLaptop, DeviceMobile } from '../../icons';
 import { mqu, type PropsOfComponent } from '../../styledSystem';
-import { getRelativeToNowDateKey, handleError } from '../../utils';
 import { currentSessionFirst } from './utils';
 
 export const ActiveDevicesSection = () => {

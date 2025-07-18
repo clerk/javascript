@@ -10,6 +10,7 @@ import {
   createFontSizeScale,
   createFontWeightScale,
   createRadiiUnits,
+  createShadowsUnits,
   createSpaceScale,
 } from './parseVariables';
 
@@ -20,7 +21,7 @@ export type ParsedCaptcha = Required<CaptchaAppearanceOptions>;
 
 type PublicAppearanceTopLevelKey = keyof Omit<
   Appearance,
-  'baseTheme' | 'elements' | 'layout' | 'variables' | 'captcha'
+  'baseTheme' | 'elements' | 'layout' | 'variables' | 'captcha' | 'cssLayerName'
 >;
 
 export type AppearanceCascade = {
@@ -144,5 +145,6 @@ const createInternalThemeFromVariables = (theme: Theme | undefined): DeepPartial
   const fontSizes = { ...createFontSizeScale(theme) };
   const fontWeights = { ...createFontWeightScale(theme) };
   const fonts = { ...createFonts(theme) };
-  return createInternalTheme({ colors, radii, space, fontSizes, fontWeights, fonts } as any);
+  const shadows = { ...createShadowsUnits(theme) };
+  return createInternalTheme({ colors, radii, space, fontSizes, fontWeights, fonts, shadows } as any);
 };

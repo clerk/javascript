@@ -1,11 +1,9 @@
 import type {
-  CheckAuthorizationWithCustomPermissions,
   Clerk,
   ClerkOptions,
   ClientResource,
   MultiDomainAndOrProxyPrimitives,
-  OrganizationCustomPermissionKey,
-  OrganizationCustomRoleKey,
+  ProtectProps,
   Without,
 } from '@clerk/types';
 
@@ -47,28 +45,6 @@ declare global {
   }
 }
 
-type ProtectProps =
-  | {
-      condition?: never;
-      role: OrganizationCustomRoleKey;
-      permission?: never;
-    }
-  | {
-      condition?: never;
-      role?: never;
-      permission: OrganizationCustomPermissionKey;
-    }
-  | {
-      condition: (has: CheckAuthorizationWithCustomPermissions) => boolean;
-      role?: never;
-      permission?: never;
-    }
-  | {
-      condition?: never;
-      role?: never;
-      permission?: never;
-    };
-
 export type { AstroClerkUpdateOptions, AstroClerkIntegrationParams, AstroClerkCreateInstanceParams, ProtectProps };
 
 export type ButtonProps<Tag> = {
@@ -83,3 +59,16 @@ export type ButtonProps<Tag> = {
   as: Tag;
   asChild?: boolean;
 };
+
+export type InternalUIComponentId =
+  | 'sign-in'
+  | 'sign-up'
+  | 'create-organization'
+  | 'organization-list'
+  | 'organization-profile'
+  | 'organization-switcher'
+  | 'user-button'
+  | 'user-profile'
+  | 'google-one-tap'
+  | 'waitlist'
+  | 'pricing-table';

@@ -156,7 +156,6 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
           position: 'fixed',
           bottom: '1.25rem',
           right: '1.25rem',
-          zIndex: t.zIndices.$fab,
           height: `${t.sizes.$10}`,
           minWidth: '13.4rem',
           paddingLeft: `${t.space.$3}`,

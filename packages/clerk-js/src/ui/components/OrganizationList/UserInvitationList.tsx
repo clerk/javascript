@@ -2,9 +2,10 @@ import { useClerk, useOrganizationList } from '@clerk/shared/react';
 import type { OrganizationResource, UserOrganizationInvitationResource } from '@clerk/types';
 import { useState } from 'react';
 
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { handleError } from '@/ui/utils/errorHandler';
+
 import { localizationKeys } from '../../customizables';
-import { useCardState, withCardStateProvider } from '../../elements';
-import { handleError } from '../../utils';
 import { populateCacheUpdateItem } from '../OrganizationSwitcher/utils';
 import { PreviewListItem, PreviewListItemButton } from './shared';
 import { MembershipPreview } from './UserMembershipList';

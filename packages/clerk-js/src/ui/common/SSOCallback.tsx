@@ -3,10 +3,12 @@ import type { HandleOAuthCallbackParams, HandleSamlCallbackParams } from '@clerk
 import React from 'react';
 
 import { Flow } from '../customizables';
-import { Card, LoadingCardContainer, useCardState, withCardStateProvider } from '../elements';
 import { CaptchaElement } from '../elements/CaptchaElement';
+import { Card } from '../elements/Card';
+import { useCardState, withCardStateProvider } from '../elements/contexts';
+import { LoadingCardContainer } from '../elements/LoadingCard';
 import { useRouter } from '../router';
-import { handleError } from '../utils';
+import { handleError } from '../utils/errorHandler';
 
 export const SSOCallback = withCardStateProvider<HandleOAuthCallbackParams | HandleSamlCallbackParams>(props => {
   return (
@@ -17,13 +19,19 @@ export const SSOCallback = withCardStateProvider<HandleOAuthCallbackParams | Han
 });
 
 export const SSOCallbackCard = (props: HandleOAuthCallbackParams | HandleSamlCallbackParams) => {
-  const { handleRedirectCallback, __internal_setActiveInProgress } = useClerk();
+  const { handleRedirectCallback, __internal_setActiveInProgress, __internal_navigateToTaskIfAvailable, session } =
+    useClerk();
   const { navigate } = useRouter();
   const card = useCardState();
 
   React.useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout>;
     if (__internal_setActiveInProgress !== true) {
+      if (session?.currentTask) {
+        void __internal_navigateToTaskIfAvailable();
+        return;
+      }
+
       const intent = new URLSearchParams(window.location.search).get('intent');
       const reloadResource = intent === 'signIn' || intent === 'signUp' ? intent : undefined;
       handleRedirectCallback({ ...props, reloadResource }, navigate).catch(e => {

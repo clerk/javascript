@@ -2,12 +2,16 @@ import { useReverification, useUser } from '@clerk/shared/react';
 import type { PhoneNumberResource, UserResource } from '@clerk/types';
 import { Fragment } from 'react';
 
+import { useCardState } from '@/ui/elements/contexts';
+import { ProfileSection } from '@/ui/elements/Section';
+import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
+import { handleError } from '@/ui/utils/errorHandler';
+import { stringToFormattedPhoneString } from '@/ui/utils/phoneUtils';
+
 import { Badge, Box, Flex, localizationKeys, Text } from '../../customizables';
-import { ProfileSection, ThreeDotsMenu, useCardState } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import type { PropsOfComponent } from '../../styledSystem';
-import { handleError, stringToFormattedPhoneString } from '../../utils';
 import { PhoneForm } from './PhoneForm';
 import { RemovePhoneForm } from './RemoveResourceForm';
 import { sortIdentificationBasedOnVerification } from './utils';
@@ -62,7 +66,7 @@ export const PhoneSection = ({ shouldAllowCreation = true }: { shouldAllowCreati
                       gap={2}
                       center
                     >
-                      <Text sx={t => ({ color: t.colors.$colorText })}>
+                      <Text sx={t => ({ color: t.colors.$colorForeground })}>
                         {stringToFormattedPhoneString(phone.phoneNumber)}
                       </Text>
                       {user?.primaryPhoneNumberId === phoneId && (

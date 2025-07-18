@@ -1,9 +1,10 @@
 import { useUser } from '@clerk/shared/react';
 import type { EnterpriseAccountResource, OAuthProvider } from '@clerk/types';
 
+import { ProfileSection } from '@/ui/elements/Section';
+
 import { ProviderInitialIcon } from '../../common';
 import { Badge, Box, descriptors, Flex, Image, localizationKeys, Text } from '../../customizables';
-import { ProfileSection } from '../../elements';
 
 export const EnterpriseAccountsSection = () => {
   const { user } = useUser();

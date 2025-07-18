@@ -17,7 +17,7 @@ import {
 import { importKey } from './cryptoKeys';
 import type { JwtReturnType } from './types';
 
-const DEFAULT_CLOCK_SKEW_IN_SECONDS = 5 * 1000;
+const DEFAULT_CLOCK_SKEW_IN_MS = 5 * 1000;
 
 export async function hasValidSignature(jwt: Jwt, key: JsonWebKey | string): Promise<JwtReturnType<boolean, Error>> {
   const { header, signature, raw } = jwt;
@@ -94,6 +94,9 @@ export function decodeJwt(token: string): JwtReturnType<Jwt, TokenVerificationEr
   return { data };
 }
 
+/**
+ * @inline
+ */
 export type VerifyJwtOptions = {
   /**
    * A string or list of [audiences](https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.3). If passed, it is checked against the `aud` claim in the token.
@@ -103,7 +106,7 @@ export type VerifyJwtOptions = {
    * An allowlist of origins to verify against, to protect your application from the subdomain cookie leaking attack.
    * @example
    * ```ts
-   * authorizedParties: ['http://localhost:3000', 'https://example.com']
+   * ['http://localhost:3000', 'https://example.com']
    * ```
    */
   authorizedParties?: string[];
@@ -123,7 +126,7 @@ export async function verifyJwt(
   options: VerifyJwtOptions,
 ): Promise<JwtReturnType<JwtPayload, TokenVerificationError>> {
   const { audience, authorizedParties, clockSkewInMs, key } = options;
-  const clockSkew = clockSkewInMs || DEFAULT_CLOCK_SKEW_IN_SECONDS;
+  const clockSkew = clockSkewInMs || DEFAULT_CLOCK_SKEW_IN_MS;
 
   const { data: decoded, errors } = decodeJwt(token);
   if (errors) {

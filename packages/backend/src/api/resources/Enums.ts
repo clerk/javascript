@@ -21,6 +21,9 @@ export type OAuthProvider =
 
 export type OAuthStrategy = `oauth_${OAuthProvider}`;
 
+/**
+ * @inline
+ */
 export type OrganizationInvitationStatus = 'pending' | 'accepted' | 'revoked' | 'expired';
 
 export type OrganizationDomainVerificationStatus = 'unverified' | 'verified';
@@ -35,6 +38,9 @@ export type SignInStatus = 'needs_identifier' | 'needs_factor_one' | 'needs_fact
 
 export type SignUpVerificationNextAction = 'needs_prepare' | 'needs_attempt' | '';
 
+/**
+ * @inline
+ */
 export type InvitationStatus = 'pending' | 'accepted' | 'revoked' | 'expired';
 
 export const DomainsEnrollmentModes = {
@@ -51,8 +57,17 @@ export const ActorTokenStatus = {
 } as const;
 export type ActorTokenStatus = (typeof ActorTokenStatus)[keyof typeof ActorTokenStatus];
 
+/**
+ * @inline
+ */
 export type AllowlistIdentifierType = 'email_address' | 'phone_number' | 'web3_wallet';
 
+/**
+ * @inline
+ */
 export type BlocklistIdentifierType = AllowlistIdentifierType;
 
+/**
+ * @inline
+ */
 export type WaitlistEntryStatus = 'pending' | 'invited' | 'completed' | 'rejected';

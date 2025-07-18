@@ -1,7 +1,10 @@
+import { withCardStateProvider } from '@/ui/elements/contexts';
+import { Header } from '@/ui/elements/Header';
+import { ProfileSection } from '@/ui/elements/Section';
+
 import { Protect } from '../../common';
 import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
 import { Col, Flex, localizationKeys, Text } from '../../customizables';
-import { Header, ProfileSection, withCardStateProvider } from '../../elements';
 import { mqu } from '../../styledSystem';
 import { DomainList } from './DomainList';
 import { InvitedMembersList } from './InvitedMembersList';
@@ -35,7 +38,7 @@ export const OrganizationMembersTabInvitations = withCardStateProvider(() => {
               paddingRight: t.space.$1,
               borderBottomWidth: t.borderWidths.$normal,
               borderBottomStyle: t.borderStyles.$solid,
-              borderBottomColor: t.colors.$neutralAlpha100,
+              borderBottomColor: t.colors.$borderAlpha100,
               [mqu.md]: {
                 flexDirection: 'column',
                 gap: t.space.$2,
@@ -70,7 +73,7 @@ export const OrganizationMembersTabInvitations = withCardStateProvider(() => {
                       )}
                       sx={t => ({
                         paddingLeft: t.space.$10,
-                        color: t.colors.$colorTextSecondary,
+                        color: t.colors.$colorMutedForeground,
                         [mqu.md]: {
                           paddingLeft: 0,
                         },

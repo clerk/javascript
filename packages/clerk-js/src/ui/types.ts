@@ -1,16 +1,17 @@
 import type {
-  __experimental_CheckoutProps,
-  __experimental_CommerceInvoiceResource,
-  __experimental_CommercePlanResource,
-  __experimental_CommerceSubscriberType,
-  __experimental_CommerceSubscriptionResource,
-  __experimental_PricingTableProps,
+  __internal_CheckoutProps,
+  __internal_OAuthConsentProps,
+  __internal_PlanDetailsProps,
+  __internal_SubscriptionDetailsProps,
   __internal_UserVerificationProps,
+  APIKeysProps,
   CreateOrganizationProps,
   GoogleOneTapProps,
+  NewSubscriptionRedirectUrl,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationSwitcherProps,
+  PricingTableProps,
   SignInFallbackRedirectUrl,
   SignInForceRedirectUrl,
   SignInProps,
@@ -34,6 +35,7 @@ export type {
   OrganizationListProps,
   WaitlistProps,
   __internal_UserVerificationProps,
+  __internal_OAuthConsentProps,
 };
 
 export type AvailableComponentProps =
@@ -46,11 +48,15 @@ export type AvailableComponentProps =
   | CreateOrganizationProps
   | OrganizationListProps
   | WaitlistProps
-  | __experimental_PricingTableProps
-  | __experimental_CheckoutProps
-  | __internal_UserVerificationProps;
+  | PricingTableProps
+  | __internal_CheckoutProps
+  | __internal_UserVerificationProps
+  | __internal_SubscriptionDetailsProps
+  | __internal_PlanDetailsProps
+  | APIKeysProps;
 
 type ComponentMode = 'modal' | 'mounted';
+type SignInMode = 'modal' | 'redirect';
 
 export type SignInCtx = SignInProps & {
   componentName: 'SignIn';
@@ -110,47 +116,37 @@ export type WaitlistCtx = WaitlistProps & {
   mode?: ComponentMode;
 };
 
-export type __experimental_PricingTableCtx = __experimental_PricingTableProps & {
+export type PricingTableCtx = PricingTableProps & {
   componentName: 'PricingTable';
   mode?: ComponentMode;
-  subscriberType?: __experimental_CommerceSubscriberType;
+  signInMode?: SignInMode;
 };
 
-export type __experimental_CheckoutCtx = __experimental_CheckoutProps & {
+export type APIKeysCtx = APIKeysProps & {
+  componentName: 'APIKeys';
+  mode?: ComponentMode;
+};
+
+export type CheckoutCtx = __internal_CheckoutProps & {
   componentName: 'Checkout';
-};
-
-export type __experimental_PaymentSourcesCtx = {
-  componentName: 'PaymentSources';
-  subscriberType?: __experimental_CommerceSubscriberType;
-};
-
-export type __experimental_InvoicesCtx = {
-  componentName: 'Invoices';
-  subscriberType: __experimental_CommerceSubscriberType;
-  invoices: __experimental_CommerceInvoiceResource[];
-  totalCount: number;
-  isLoading: boolean;
-  revalidate: () => void;
-  getInvoiceById: (invoiceId: string) => __experimental_CommerceInvoiceResource | undefined;
-};
-
-export type __experimental_PlansCtx = {
-  componentName: 'Plans';
-  subscriberType: __experimental_CommerceSubscriberType;
-  plans: __experimental_CommercePlanResource[];
-  subscriptions: __experimental_CommerceSubscriptionResource[];
-  isLoading: boolean;
-  revalidate: () => void;
-  activeOrUpcomingSubscription: (
-    plan: __experimental_CommercePlanResource,
-  ) => __experimental_CommerceSubscriptionResource | undefined;
-  isDefaultPlanImplicitlyActive: boolean;
-};
+} & NewSubscriptionRedirectUrl;
 
 export type SessionTasksCtx = {
   nextTask: () => Promise<void>;
   redirectUrlComplete?: string;
+  currentTaskContainer: React.RefObject<HTMLDivElement> | null;
+};
+
+export type OAuthConsentCtx = __internal_OAuthConsentProps & {
+  componentName: 'OAuthConsent';
+};
+
+export type SubscriptionDetailsCtx = __internal_SubscriptionDetailsProps & {
+  componentName: 'SubscriptionDetails';
+};
+
+export type PlanDetailsCtx = __internal_PlanDetailsProps & {
+  componentName: 'PlanDetails';
 };
 
 export type AvailableComponentCtx =
@@ -165,6 +161,10 @@ export type AvailableComponentCtx =
   | OrganizationListCtx
   | GoogleOneTapCtx
   | WaitlistCtx
-  | __experimental_PricingTableCtx
-  | __experimental_CheckoutCtx;
+  | PricingTableCtx
+  | CheckoutCtx
+  | APIKeysCtx
+  | OAuthConsentCtx
+  | SubscriptionDetailsCtx
+  | PlanDetailsCtx;
 export type AvailableComponentName = AvailableComponentCtx['componentName'];

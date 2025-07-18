@@ -3,11 +3,15 @@ import { clerkEvents, createClerkEventBus } from '@clerk/shared/clerkEventBus';
 import { loadClerkJsScript } from '@clerk/shared/loadClerkJsScript';
 import { handleValueOrFn } from '@clerk/shared/utils';
 import type {
-  __experimental_CheckoutProps,
-  __experimental_CommerceNamespace,
-  __experimental_PricingTableProps,
+  __internal_CheckoutProps,
+  __internal_NavigateToTaskIfAvailableParams,
+  __internal_OAuthConsentProps,
+  __internal_PlanDetailsProps,
+  __internal_SubscriptionDetailsProps,
   __internal_UserVerificationModalProps,
   __internal_UserVerificationProps,
+  APIKeysNamespace,
+  APIKeysProps,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
@@ -17,6 +21,7 @@ import type {
   ClerkOptions,
   ClerkStatus,
   ClientResource,
+  CommerceBillingNamespace,
   CreateOrganizationParams,
   CreateOrganizationProps,
   DomainOrProxyUrl,
@@ -26,11 +31,11 @@ import type {
   JoinWaitlistParams,
   ListenerCallback,
   LoadedClerk,
-  NextTaskParams,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationResource,
   OrganizationSwitcherProps,
+  PricingTableProps,
   RedirectOptions,
   SetActiveParams,
   SignInProps,
@@ -96,12 +101,14 @@ type IsomorphicLoadedClerk = Without<
   | '__internal_addNavigationListener'
   | '__internal_getCachedResources'
   | '__internal_reloadInitialResources'
-  | '__experimental_commerce'
+  | 'billing'
+  | 'apiKeys'
   | '__internal_setComponentNavigationContext'
   | '__internal_setActiveInProgress'
 > & {
   client: ClientResource | undefined;
-  __experimental_commerce: __experimental_CommerceNamespace | undefined;
+  billing: CommerceBillingNamespace | undefined;
+  apiKeys: APIKeysNamespace | undefined;
 };
 
 export class IsomorphicClerk implements IsomorphicLoadedClerk {
@@ -112,7 +119,9 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private preopenOneTap?: null | GoogleOneTapProps = null;
   private preopenUserVerification?: null | __internal_UserVerificationProps = null;
   private preopenSignIn?: null | SignInProps = null;
-  private preopenCheckout?: null | __experimental_CheckoutProps = null;
+  private preopenCheckout?: null | __internal_CheckoutProps = null;
+  private preopenPlanDetails: null | __internal_PlanDetailsProps = null;
+  private preopenSubscriptionDetails: null | __internal_SubscriptionDetailsProps = null;
   private preopenSignUp?: null | SignUpProps = null;
   private preopenUserProfile?: null | UserProfileProps = null;
   private preopenOrganizationProfile?: null | OrganizationProfileProps = null;
@@ -128,7 +137,9 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountOrganizationListNodes = new Map<HTMLDivElement, OrganizationListProps | undefined>();
   private premountMethodCalls = new Map<MethodName<BrowserClerk>, MethodCallback>();
   private premountWaitlistNodes = new Map<HTMLDivElement, WaitlistProps | undefined>();
-  private premountPricingTableNodes = new Map<HTMLDivElement, __experimental_PricingTableProps | undefined>();
+  private premountPricingTableNodes = new Map<HTMLDivElement, PricingTableProps | undefined>();
+  private premountApiKeysNodes = new Map<HTMLDivElement, APIKeysProps | undefined>();
+  private premountOAuthConsentNodes = new Map<HTMLDivElement, __internal_OAuthConsentProps | undefined>();
   // A separate Map of `addListener` method calls to handle multiple listeners.
   private premountAddListenerCalls = new Map<
     ListenerCallback,
@@ -241,7 +252,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.options.sdkMetadata = SDK_METADATA;
     }
     this.#eventBus.emit(clerkEvents.Status, 'loading');
-    this.#eventBus.prioritizedOn(clerkEvents.Status, status => (this.#status = status as ClerkStatus));
+    this.#eventBus.prioritizedOn(clerkEvents.Status, status => (this.#status = status));
 
     if (this.#publishableKey) {
       void this.loadClerkJS();
@@ -318,6 +329,15 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return callback();
     } else {
       this.premountMethodCalls.set('buildAfterSignOutUrl', callback);
+    }
+  };
+
+  buildNewSubscriptionRedirectUrl = (): string | void => {
+    const callback = () => this.clerkjs?.buildNewSubscriptionRedirectUrl() || '';
+    if (this.clerkjs && this.loaded) {
+      return callback();
+    } else {
+      this.premountMethodCalls.set('buildNewSubscriptionRedirectUrl', callback);
     }
   };
 
@@ -538,6 +558,14 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.__internal_openCheckout(this.preopenCheckout);
     }
 
+    if (this.preopenPlanDetails !== null) {
+      clerkjs.__internal_openPlanDetails(this.preopenPlanDetails);
+    }
+
+    if (this.preopenSubscriptionDetails !== null) {
+      clerkjs.__internal_openSubscriptionDetails(this.preopenSubscriptionDetails);
+    }
+
     if (this.preopenSignUp !== null) {
       clerkjs.openSignUp(this.preopenSignUp);
     }
@@ -591,7 +619,15 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     });
 
     this.premountPricingTableNodes.forEach((props, node) => {
-      clerkjs.__experimental_mountPricingTable(node, props);
+      clerkjs.mountPricingTable(node, props);
+    });
+
+    this.premountApiKeysNodes.forEach((props, node) => {
+      clerkjs.mountApiKeys(node, props);
+    });
+
+    this.premountOAuthConsentNodes.forEach((props, node) => {
+      clerkjs.__internal_mountOAuthConsent(node, props);
     });
 
     /**
@@ -667,9 +703,17 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   }
 
-  get __experimental_commerce(): __experimental_CommerceNamespace | undefined {
-    return this.clerkjs?.__experimental_commerce;
+  get billing(): CommerceBillingNamespace | undefined {
+    return this.clerkjs?.billing;
   }
+
+  get apiKeys(): APIKeysNamespace | undefined {
+    return this.clerkjs?.apiKeys;
+  }
+
+  __experimental_checkout = (...args: Parameters<Clerk['__experimental_checkout']>) => {
+    return this.clerkjs?.__experimental_checkout(...args);
+  };
 
   __unstable__setEnvironment(...args: any): void {
     if (this.clerkjs && '__unstable__setEnvironment' in this.clerkjs) {
@@ -687,9 +731,9 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  __experimental_nextTask = async (params?: NextTaskParams): Promise<void> => {
+  __internal_navigateToTaskIfAvailable = async (params?: __internal_NavigateToTaskIfAvailableParams): Promise<void> => {
     if (this.clerkjs) {
-      return this.clerkjs.__experimental_nextTask(params);
+      return this.clerkjs.__internal_navigateToTaskIfAvailable(params);
     } else {
       return Promise.reject();
     }
@@ -722,7 +766,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  __internal_openCheckout = (props?: __experimental_CheckoutProps) => {
+  __internal_openCheckout = (props?: __internal_CheckoutProps) => {
     if (this.clerkjs && this.loaded) {
       this.clerkjs.__internal_openCheckout(props);
     } else {
@@ -735,6 +779,38 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.clerkjs.__internal_closeCheckout();
     } else {
       this.preopenCheckout = null;
+    }
+  };
+
+  __internal_openPlanDetails = (props: __internal_PlanDetailsProps) => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.__internal_openPlanDetails(props);
+    } else {
+      this.preopenPlanDetails = props;
+    }
+  };
+
+  __internal_closePlanDetails = () => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.__internal_closePlanDetails();
+    } else {
+      this.preopenPlanDetails = null;
+    }
+  };
+
+  __internal_openSubscriptionDetails = (props?: __internal_SubscriptionDetailsProps) => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.__internal_openSubscriptionDetails(props);
+    } else {
+      this.preopenSubscriptionDetails = props ?? null;
+    }
+  };
+
+  __internal_closeSubscriptionDetails = () => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.__internal_closeSubscriptionDetails();
+    } else {
+      this.preopenSubscriptionDetails = null;
     }
   };
 
@@ -1003,19 +1079,51 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  __experimental_mountPricingTable = (node: HTMLDivElement, props?: __experimental_PricingTableProps) => {
+  mountPricingTable = (node: HTMLDivElement, props?: PricingTableProps) => {
     if (this.clerkjs && this.loaded) {
-      this.clerkjs.__experimental_mountPricingTable(node, props);
+      this.clerkjs.mountPricingTable(node, props);
     } else {
       this.premountPricingTableNodes.set(node, props);
     }
   };
 
-  __experimental_unmountPricingTable = (node: HTMLDivElement) => {
+  unmountPricingTable = (node: HTMLDivElement) => {
     if (this.clerkjs && this.loaded) {
-      this.clerkjs.__experimental_unmountPricingTable(node);
+      this.clerkjs.unmountPricingTable(node);
     } else {
       this.premountPricingTableNodes.delete(node);
+    }
+  };
+
+  mountApiKeys = (node: HTMLDivElement, props?: APIKeysProps): void => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.mountApiKeys(node, props);
+    } else {
+      this.premountApiKeysNodes.set(node, props);
+    }
+  };
+
+  unmountApiKeys = (node: HTMLDivElement): void => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.unmountApiKeys(node);
+    } else {
+      this.premountApiKeysNodes.delete(node);
+    }
+  };
+
+  __internal_mountOAuthConsent = (node: HTMLDivElement, props?: __internal_OAuthConsentProps) => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.__internal_mountOAuthConsent(node, props);
+    } else {
+      this.premountOAuthConsentNodes.set(node, props);
+    }
+  };
+
+  __internal_unmountOAuthConsent = (node: HTMLDivElement) => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.__internal_unmountOAuthConsent(node);
+    } else {
+      this.premountOAuthConsentNodes.delete(node);
     }
   };
 
@@ -1226,6 +1334,11 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   authenticateWithGoogleOneTap = async (params: AuthenticateWithGoogleOneTapParams) => {
     const clerkjs = await this.#waitForClerkJS();
     return clerkjs.authenticateWithGoogleOneTap(params);
+  };
+
+  __internal_loadStripeJs = async () => {
+    const clerkjs = await this.#waitForClerkJS();
+    return clerkjs.__internal_loadStripeJs();
   };
 
   createOrganization = async (params: CreateOrganizationParams): Promise<OrganizationResource | void> => {

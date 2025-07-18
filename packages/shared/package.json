@@ -1,6 +1,6 @@
 {
   "name": "@clerk/shared",
-  "version": "3.7.2",
+  "version": "3.13.0",
   "description": "Internal package utils used by the Clerk SDKs",
   "repository": {
     "type": "git",
@@ -120,7 +120,9 @@
     "organization",
     "jwtPayloadParser",
     "eventBus",
-    "clerkEventBus"
+    "netlifyCacheHandler",
+    "clerkEventBus",
+    "phoneCodeChannel"
   ],
   "scripts": {
     "build": "tsup",
@@ -134,7 +136,7 @@
     "lint:attw": "attw --pack . --profile node16",
     "lint:publint": "publint",
     "publish:local": "pnpm yalc push --replace  --sig",
-    "test": "jest",
+    "test": "jest && vitest",
     "test:cache:clear": "jest --clearCache --useStderr",
     "test:ci": "jest --maxWorkers=70%",
     "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html"
@@ -144,13 +146,15 @@
     "dequal": "2.0.3",
     "glob-to-regexp": "0.4.1",
     "js-cookie": "3.0.5",
-    "std-env": "^3.8.1",
-    "swr": "^2.3.3"
+    "std-env": "^3.9.0",
+    "swr": "2.3.4"
   },
   "devDependencies": {
+    "@stripe/react-stripe-js": "3.1.1",
+    "@stripe/stripe-js": "5.6.0",
     "@types/glob-to-regexp": "0.4.4",
     "@types/js-cookie": "3.0.6",
-    "cross-fetch": "^4.0.0",
+    "cross-fetch": "^4.1.0",
     "esbuild": "0.25.0"
   },
   "peerDependencies": {

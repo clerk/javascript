@@ -84,6 +84,9 @@ export function loadClerkJWKFromLocal(localKey?: string): JsonWebKey {
   return getFromCache(LocalJwkKid);
 }
 
+/**
+ * @internal
+ */
 export type LoadClerkJWKFromRemoteOptions = {
   /**
    * @internal
@@ -94,7 +97,7 @@ export type LoadClerkJWKFromRemoteOptions = {
    */
   jwksCacheTtlInMs?: number;
   /**
-   * A flag to skip ignore cache and always fetch JWKS before each jwt verification.
+   * A flag to ignore the JWKS cache and always fetch JWKS before each JWT verification.
    */
   skipJwksCache?: boolean;
   /**
@@ -102,7 +105,7 @@ export type LoadClerkJWKFromRemoteOptions = {
    */
   secretKey?: string;
   /**
-   * The [Clerk Backend API](https://clerk.com/docs/reference/backend-api) endpoint.
+   * The [Clerk Backend API](https://clerk.com/docs/reference/backend-api){{ target: '_blank' }} endpoint.
    * @default 'https://api.clerk.com'
    */
   apiUrl?: string;

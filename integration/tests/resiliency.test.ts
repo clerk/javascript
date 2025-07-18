@@ -197,8 +197,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
       await expect(page.getByText('Clerk is loading', { exact: true })).toBeHidden();
     });
 
-    // TODO: Fix detection of hotloaded clerk-js failing
-    test.skip('clerk-js client fails and status degraded', async ({ page, context }) => {
+    test('clerk-js client fails and status degraded', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
 
       await page.route('**/v1/client?**', route => route.fulfill(make500ClerkResponse()));
@@ -227,8 +226,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
       await expect(page.getByText('Clerk is loading', { exact: true })).toBeHidden();
     });
 
-    // TODO: Fix flakiness when intercepting environment requests
-    test.skip('clerk-js environment fails and status degraded', async ({ page, context }) => {
+    test('clerk-js environment fails and status degraded', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
 
       await page.route('**/v1/environment?**', route => route.fulfill(make500ClerkResponse()));

@@ -7,7 +7,7 @@ import {
   createFakeUserOrganizationInvitation,
   createFakeUserOrganizationMembership,
 } from '../../OrganizationSwitcher/__tests__/utlis';
-import { OrganizationList } from '../OrganizationList';
+import { OrganizationList } from '../';
 
 const { createFixtures } = bindCreateFixtures('OrganizationList');
 

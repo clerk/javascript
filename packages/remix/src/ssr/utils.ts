@@ -2,7 +2,7 @@ import { constants, debugRequestState } from '@clerk/backend/internal';
 import { isTruthy } from '@clerk/shared/underscore';
 import type { AppLoadContext, defer } from '@remix-run/server-runtime';
 import { json } from '@remix-run/server-runtime';
-import cookie from 'cookie';
+import { parse as parseCookie } from 'cookie';
 
 import { getEnvVariable } from '../utils/utils';
 import type { RequestStateWithRedirectUrls } from './types';
@@ -22,7 +22,7 @@ export function isRedirect(res: Response): boolean {
 }
 
 export const parseCookies = (req: Request) => {
-  return cookie.parse(req.headers.get('cookie') || '');
+  return parseCookie(req.headers.get('cookie') || '');
 };
 
 export function assertValidHandlerResult(val: any, error?: string): asserts val is Record<string, unknown> | null {
@@ -94,6 +94,7 @@ export function getResponseClerkState(requestState: RequestStateWithRedirectUrls
     __signUpForceRedirectUrl: requestState.signUpForceRedirectUrl,
     __signInFallbackRedirectUrl: requestState.signInFallbackRedirectUrl,
     __signUpFallbackRedirectUrl: requestState.signUpFallbackRedirectUrl,
+    newSubscriptionRedirectUrl: requestState.newSubscriptionRedirectUrl,
     __clerk_debug: debugRequestState(requestState),
     __clerkJSUrl: getEnvVariable('CLERK_JS', context),
     __clerkJSVersion: getEnvVariable('CLERK_JS_VERSION', context),

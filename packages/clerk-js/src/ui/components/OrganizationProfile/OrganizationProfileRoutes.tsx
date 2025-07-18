@@ -2,9 +2,8 @@ import { lazy, Suspense } from 'react';
 
 import { Protect } from '../../common';
 import { CustomPageContentContainer } from '../../common/CustomPageContentContainer';
-import { InvoicesContextProvider, useEnvironment, useOrganizationProfileContext } from '../../contexts';
+import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
 import { Route, Switch } from '../../router';
-import { InvoicePage } from '../Invoices/InvoicePage';
 import { OrganizationGeneralPage } from './OrganizationGeneralPage';
 import { OrganizationMembers } from './OrganizationMembers';
 
@@ -14,9 +13,34 @@ const OrganizationBillingPage = lazy(() =>
   })),
 );
 
+const OrganizationAPIKeysPage = lazy(() =>
+  import(/* webpackChunkName: "op-api-keys-page"*/ './OrganizationApiKeysPage').then(module => ({
+    default: module.OrganizationAPIKeysPage,
+  })),
+);
+
+const OrganizationPlansPage = lazy(() =>
+  import(/* webpackChunkName: "op-plans-page"*/ './OrganizationPlansPage').then(module => ({
+    default: module.OrganizationPlansPage,
+  })),
+);
+
+const OrganizationStatementPage = lazy(() =>
+  import(/* webpackChunkName: "statement-page"*/ './OrganizationStatementPage').then(module => ({
+    default: module.OrganizationStatementPage,
+  })),
+);
+
+const OrganizationPaymentAttemptPage = lazy(() =>
+  import(/* webpackChunkName: "payment-attempt-page"*/ './OrganizationPaymentAttemptPage').then(module => ({
+    default: module.OrganizationPaymentAttemptPage,
+  })),
+);
+
 export const OrganizationProfileRoutes = () => {
-  const { pages, isMembersPageRoot, isGeneralPageRoot, isBillingPageRoot } = useOrganizationProfileContext();
-  const { __experimental_commerceSettings } = useEnvironment();
+  const { pages, isMembersPageRoot, isGeneralPageRoot, isBillingPageRoot, isApiKeysPageRoot } =
+    useOrganizationProfileContext();
+  const { apiKeysSettings, commerceSettings } = useEnvironment();
 
   const customPageRoutesWithContents = pages.contents?.map((customPage, index) => {
     const shouldFirstCustomItemBeOnRoot = !isGeneralPageRoot && !isMembersPageRoot && index === 0;
@@ -59,23 +83,54 @@ export const OrganizationProfileRoutes = () => {
             </Route>
           </Switch>
         </Route>
-        {__experimental_commerceSettings.billing.enabled && __experimental_commerceSettings.billing.hasPaidOrgPlans && (
-          <Route path={isBillingPageRoot ? undefined : 'organization-billing'}>
-            <Switch>
-              <Route index>
-                <Suspense fallback={''}>
-                  <OrganizationBillingPage providerProps={{ subscriberType: 'org' }} />
-                </Suspense>
-              </Route>
-              <Route path='invoice/:invoiceId'>
-                <Suspense fallback={''}>
-                  <InvoicesContextProvider subscriberType='org'>
-                    <InvoicePage />
-                  </InvoicesContextProvider>
-                </Suspense>
-              </Route>
-            </Switch>
-          </Route>
+        {commerceSettings.billing.enabled && commerceSettings.billing.hasPaidOrgPlans && (
+          <Protect
+            condition={has =>
+              has({ permission: 'org:sys_billing:read' }) || has({ permission: 'org:sys_billing:manage' })
+            }
+          >
+            <Route path={isBillingPageRoot ? undefined : 'organization-billing'}>
+              <Switch>
+                <Route index>
+                  <Suspense fallback={''}>
+                    <OrganizationBillingPage />
+                  </Suspense>
+                </Route>
+                <Route path='plans'>
+                  <Suspense fallback={''}>
+                    <OrganizationPlansPage />
+                  </Suspense>
+                </Route>
+                <Route path='statement/:statementId'>
+                  <Suspense fallback={''}>
+                    <OrganizationStatementPage />
+                  </Suspense>
+                </Route>
+                <Route path='payment-attempt/:paymentAttemptId'>
+                  <Suspense fallback={''}>
+                    <OrganizationPaymentAttemptPage />
+                  </Suspense>
+                </Route>
+              </Switch>
+            </Route>
+          </Protect>
+        )}
+        {apiKeysSettings.enabled && (
+          <Protect
+            condition={has =>
+              has({ permission: 'org:sys_api_keys:read' }) || has({ permission: 'org:sys_api_keys:manage' })
+            }
+          >
+            <Route path={isApiKeysPageRoot ? undefined : 'organization-api-keys'}>
+              <Switch>
+                <Route index>
+                  <Suspense fallback={''}>
+                    <OrganizationAPIKeysPage />
+                  </Suspense>
+                </Route>
+              </Switch>
+            </Route>
+          </Protect>
         )}
       </Route>
     </Switch>

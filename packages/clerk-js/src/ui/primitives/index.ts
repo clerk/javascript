@@ -29,3 +29,4 @@ export * from './Text';
 export * from './Th';
 export * from './Thead';
 export * from './Tr';
+export * from './Hr';
