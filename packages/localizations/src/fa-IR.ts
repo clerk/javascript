@@ -1,7 +1,52 @@
+/*
+ * =====================================================================================
+ * DISCLAIMER:
+ * =====================================================================================
+ * This localization file is a community contribution and is not officially maintained
+ * by Clerk. It has been provided by the community and may not be fully aligned
+ * with the current or future states of the main application. Clerk does not guarantee
+ * the accuracy, completeness, or timeliness of the translations in this file.
+ * Use of this file is at your own risk and discretion.
+ * =====================================================================================
+ */
+
 import type { LocalizationResource } from '@clerk/types';
 
 export const faIR: LocalizationResource = {
   locale: 'fa-IR',
+  apiKeys: {
+    action__add: undefined,
+    action__search: undefined,
+    createdAndExpirationStatus__expiresOn: undefined,
+    createdAndExpirationStatus__never: undefined,
+    detailsTitle__emptyRow: undefined,
+    formButtonPrimary__add: undefined,
+    formFieldCaption__expiration__expiresOn: undefined,
+    formFieldCaption__expiration__never: undefined,
+    formFieldOption__expiration__180d: undefined,
+    formFieldOption__expiration__1d: undefined,
+    formFieldOption__expiration__1y: undefined,
+    formFieldOption__expiration__30d: undefined,
+    formFieldOption__expiration__60d: undefined,
+    formFieldOption__expiration__7d: undefined,
+    formFieldOption__expiration__90d: undefined,
+    formFieldOption__expiration__never: undefined,
+    formHint: undefined,
+    formTitle: undefined,
+    lastUsed__days: undefined,
+    lastUsed__hours: undefined,
+    lastUsed__minutes: undefined,
+    lastUsed__months: undefined,
+    lastUsed__seconds: undefined,
+    lastUsed__years: undefined,
+    menuAction__revoke: undefined,
+    revokeConfirmation: {
+      confirmationText: undefined,
+      formButtonPrimary__revoke: undefined,
+      formHint: undefined,
+      formTitle: undefined,
+    },
+  },
   backButton: 'بازگشت',
   badge__activePlan: 'فعال',
   badge__canceledEndsAt: "لغو شد • پایان می‌یابد {{ date | shortDate('en-US') }}",
@@ -10,6 +55,8 @@ export const faIR: LocalizationResource = {
   badge__endsAt: "به پایان می رسد {{ date | shortDate('en-US') }}",
   badge__expired: 'مننقضی شده',
   badge__otherImpersonatorDevice: 'دستگاه جعل هویت دیگر',
+  badge__pastDueAt: undefined,
+  badge__pastDuePlan: undefined,
   badge__primary: 'اولیه',
   badge__renewsAt: "{{ date | shortDate('en-US') }} را تمدید می‌کند",
   badge__requiresAction: 'نیاز به اقدام دارد',
@@ -33,13 +80,15 @@ export const faIR: LocalizationResource = {
     cancelSubscriptionTitle: 'اشتراک {{plan}} لغو شود؟',
     cannotSubscribeMonthly:
       'شما نمی‌توانید با پرداخت ماهانه در این طرح مشترک شوید. برای عضویت در این طرح، باید پرداخت سالانه را انتخاب کنید.',
+    cannotSubscribeUnrecoverable: undefined,
     checkout: {
       description__paymentSuccessful: 'پرداخت شما با موفقیت انجام شد.',
       description__subscriptionSuccessful: 'اشتراک شما با موفقیت ایجاد شد.',
       downgradeNotice:
         'شما اشتراک فعلی و ویژگی‌های آن را تا پایان دوره صورتحساب حفظ خواهید کرد، سپس به این اشتراک منتقل خواهید شد.',
       emailForm: {
-        subtitle: 'قبل از اینکه بتوانید خرید خود را تکمیل کنید، باید یک آدرس ایمیل اضافه کنید که رسیدها به آن ارسال شوند.',
+        subtitle:
+          'قبل از اینکه بتوانید خرید خود را تکمیل کنید، باید یک آدرس ایمیل اضافه کنید که رسیدها به آن ارسال شوند.',
         title: 'یک آدرس ایمیل اضافه کنید',
       },
       lineItems: {
@@ -48,13 +97,15 @@ export const faIR: LocalizationResource = {
         title__subscriptionBegins: 'شروع اشتراک',
         title__totalPaid: 'کل پرداختی',
       },
+      pastDueNotice: undefined,
       perMonth: 'ماهانه',
       title: 'تسویه حساب',
       title__paymentSuccessful: 'پرداخت موفقیت آمیز بود!',
       title__subscriptionSuccessful: 'موفقیت آمیز!',
     },
+    credit: undefined,
     creditRemainder: 'اعتبار برای باقیمانده اشتراک فعلی شما.',
-    defaultFreePlanActive: "شما در حال حاضر در طرح رایگان هستید",
+    defaultFreePlanActive: 'شما در حال حاضر در طرح رایگان هستید',
     free: 'رایگان',
     getStarted: 'شروع کنید',
     keepSubscription: 'حفظ اشتراک',
@@ -87,10 +138,24 @@ export const faIR: LocalizationResource = {
     reSubscribe: 'اشتراک مجدد',
     seeAllFeatures: 'مشاهده همه ویژگی‌ها',
     subscribe: 'مشترک شوید',
+    subscriptionDetails: {
+      beginsOn: undefined,
+      currentBillingCycle: undefined,
+      endsOn: undefined,
+      nextPaymentAmount: undefined,
+      nextPaymentOn: undefined,
+      pastDueAt: undefined,
+      renewsAt: undefined,
+      subscribedOn: undefined,
+      title: undefined,
+    },
     subtotal: 'جمع فرعی',
     switchPlan: 'به این طرح تغییر دهید',
     switchToAnnual: 'به سالانه تغییر دهید',
+    switchToAnnualWithAnnualPrice: undefined,
     switchToMonthly: 'به ماهانه تغییر دهید',
+    switchToMonthlyWithPrice: undefined,
+    totalDue: undefined,
     totalDueToday: 'سررسید کل امروز',
     viewFeatures: 'مشاهده ویژگی ها',
     year: 'سال',
@@ -120,10 +185,14 @@ export const faIR: LocalizationResource = {
   formButtonPrimary__verify: 'تأیید',
   formFieldAction__forgotPassword: 'رمز عبور را فراموش کرده‌اید؟',
   formFieldError__matchingPasswords: 'رمزهای عبور مطابقت دارند.',
-  formFieldError__notMatchingPasswords: "رمزهای عبور مطابقت ندارند.",
+  formFieldError__notMatchingPasswords: 'رمزهای عبور مطابقت ندارند.',
   formFieldError__verificationLinkExpired: 'لینک تأیید منقضی شده است. لطفاً درخواست لینک جدید بدهید.',
   formFieldHintText__optional: 'اختیاری',
-  formFieldHintText__slug: 'اسلاگ یک شناسه قابل خواندن توسط انسان است که باید منحصر به فرد باشد. اغلب در URL ها استفاده می شود.',
+  formFieldHintText__slug:
+    'اسلاگ یک شناسه قابل خواندن توسط انسان است که باید منحصر به فرد باشد. اغلب در URL ها استفاده می شود.',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'کد پشتیبان را وارد کنید',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'حذف حساب',
   formFieldInputPlaceholder__emailAddress: 'آدرس ایمیل خود را وارد کنید',
@@ -138,6 +207,9 @@ export const faIR: LocalizationResource = {
   formFieldInputPlaceholder__password: 'رمز عبور خود را وارد کنید',
   formFieldInputPlaceholder__phoneNumber: 'شماره تلفن خود را وارد کنید',
   formFieldInputPlaceholder__username: undefined,
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'دعوت‌های خودکار را برای این دامنه فعال کنید',
   formFieldLabel__backupCode: 'کد  پشتیبان',
   formFieldLabel__confirmDeletion: 'تایید',
@@ -166,8 +238,7 @@ export const faIR: LocalizationResource = {
     action__signOut: 'خروج',
     title: 'با نام کاربری {{identifier}} وارد سیستم شدم',
   },
-  maintenanceMode:
-    "در حال حاضر در حال تعمیر و نگهداری هستیم، اما نگران نباشید، نباید بیشتر از چند دقیقه طول بکشد.",
+  maintenanceMode: 'در حال حاضر در حال تعمیر و نگهداری هستیم، اما نگران نباشید، نباید بیشتر از چند دقیقه طول بکشد.',
   membershipRole__admin: 'مدیر',
   membershipRole__basicMember: 'عضو',
   membershipRole__guestMember: 'مهمان',
@@ -183,11 +254,21 @@ export const faIR: LocalizationResource = {
     titleWithoutPersonal: 'یک سازمان را انتخاب کنید',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: 'دعوت نامه های خودکار',
     badge__automaticSuggestion: 'پیشنهادات خودکار',
     badge__manualInvitation: 'بدون ثبت نام خودکار',
     badge__unverified: 'تایید نشده',
     billingPage: {
+      paymentHistorySection: {
+        empty: undefined,
+        notFound: undefined,
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        tableHeader__status: undefined,
+      },
       paymentSourcesSection: {
         actionLabel__default: 'پیش فرض کنید',
         actionLabel__remove: 'حذف',
@@ -207,13 +288,28 @@ export const faIR: LocalizationResource = {
         title: 'روش های پرداخت',
       },
       start: {
+        headerTitle__payments: undefined,
         headerTitle__plans: 'طرح ها',
         headerTitle__statements: 'بیانیه‌ها',
         headerTitle__subscriptions: 'اشتراک ها',
       },
+      statementsSection: {
+        empty: undefined,
+        itemCaption__paidForPlan: undefined,
+        itemCaption__proratedCredit: undefined,
+        itemCaption__subscribedAndPaidForPlan: undefined,
+        notFound: undefined,
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+        totalPaid: undefined,
+      },
       subscriptionsListSection: {
         actionLabel__newSubscription: 'در یک طرح مشترک شوید',
         actionLabel__switchPlan: 'تغییر طرح',
+        tableHeader__edit: undefined,
+        tableHeader__plan: undefined,
+        tableHeader__startDate: undefined,
         title: 'اشتراک',
       },
       subscriptionsSection: {
@@ -281,6 +377,7 @@ export const faIR: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: 'صورتحساب',
       description: 'سازمان خود را مدیریت کنید',
       general: 'عمومی',
@@ -370,7 +467,7 @@ export const faIR: LocalizationResource = {
     verifyDomainPage: {
       formSubtitle: 'کد تایید ارسال شده به آدرس ایمیل خود را وارد کنید',
       formTitle: 'کد تأیید',
-      resendButton: "کدی دریافت نکردید؟ ارسال دوباره",
+      resendButton: 'کدی دریافت نکردید؟ ارسال دوباره',
       subtitle: 'دامنه {{domainName}} باید از طریق ایمیل تأیید شود.',
       subtitleVerificationCodeScreen: 'کد تایید به {{emailAddress}} ارسال شد. برای ادامه، کد را وارد کنید.',
       title: 'تأیید دامنه',
@@ -414,7 +511,7 @@ export const faIR: LocalizationResource = {
     },
     emailCode: {
       formTitle: 'کد تأیید',
-      resendButton: "کدی دریافت نکردید؟ ارسال دوباره",
+      resendButton: 'کدی دریافت نکردید؟ ارسال دوباره',
       subtitle: 'برای ادامه، کد ارسال شده به ایمیل خود را وارد کنید',
       title: 'تایید هویت الزامی است',
     },
@@ -436,13 +533,13 @@ export const faIR: LocalizationResource = {
     },
     phoneCode: {
       formTitle: 'کد تأیید',
-      resendButton: "کدی دریافت نکردید؟ ارسال دوباره",
+      resendButton: 'کدی دریافت نکردید؟ ارسال دوباره',
       subtitle: 'برای ادامه، کد ارسال شده به تلفن خود را وارد کنید',
       title: 'تایید هویت الزامی است',
     },
     phoneCodeMfa: {
       formTitle: 'کد تأیید',
-      resendButton: "کدی دریافت نکردید؟ ارسال دوباره",
+      resendButton: 'کدی دریافت نکردید؟ ارسال دوباره',
       subtitle: 'برای ادامه، کد ارسال شده به تلفن خود را وارد کنید',
       title: 'تایید هویت الزامی است',
     },
@@ -480,7 +577,7 @@ export const faIR: LocalizationResource = {
     },
     alternativePhoneCodeProvider: {
       formTitle: 'کد تأیید',
-      resendButton: "کدی دریافت نکردید؟ ارسال دوباره",
+      resendButton: 'کدی دریافت نکردید؟ ارسال دوباره',
       subtitle: 'برای ادامه به {{applicationName}}',
       title: '{{provider}} خود را بررسی کنید',
     },
@@ -490,7 +587,7 @@ export const faIR: LocalizationResource = {
     },
     emailCode: {
       formTitle: 'کد تأیید',
-      resendButton: "کدی دریافت نکردید؟ ارسال دوباره",
+      resendButton: 'کدی دریافت نکردید؟ ارسال دوباره',
       subtitle: 'برای ادامه به {{applicationName}}',
       title: 'ایمیل خود را بررسی کنید',
     },
@@ -514,7 +611,7 @@ export const faIR: LocalizationResource = {
         subtitle: 'به زودی منتقل خواهید شد',
         title: 'در حال ورود...',
       },
-      resendButton: "لینکی دریافت نکردید؟ دوباره ارسال کنید",
+      resendButton: 'لینکی دریافت نکردید؟ دوباره ارسال کنید',
       subtitle: 'برای ادامه به {{applicationName}}',
       title: 'ایمیل خود را بررسی کنید',
       unusedTab: {
@@ -532,7 +629,7 @@ export const faIR: LocalizationResource = {
     },
     forgotPassword: {
       formTitle: 'کد رمز عبور را بازنشانی کنید',
-      resendButton: "کدی دریافت نکردید؟ ارسال دوباره",
+      resendButton: 'کدی دریافت نکردید؟ ارسال دوباره',
       subtitle: 'برای بازنشانی رمز عبور خود',
       subtitle_email: 'ابتدا کد ارسال شده به ایمیل خود را وارد کنید',
       subtitle_phone: 'ابتدا کد ارسال شده به تلفن همراه خود را وارد کنید',
@@ -544,12 +641,13 @@ export const faIR: LocalizationResource = {
       title: 'رمز عبور را فراموش کرده‌اید؟',
     },
     noAvailableMethods: {
-      message: "نمی‌توان وارد سیستم شد. هیچ عامل احراز هویتی در دسترس نیست.",
+      message: 'نمی‌توان وارد سیستم شد. هیچ عامل احراز هویتی در دسترس نیست.',
       subtitle: 'خطایی رخ داد',
       title: 'نمی توان وارد سیستم شد',
     },
     passkey: {
-      subtitle: "ستفاده از کلید عبور، هویت شما را تأیید می‌کند. ممکن است دستگاه از شما اثر انگشت، چهره یا قفل صفحه را درخواست کند.",
+      subtitle:
+        'ستفاده از کلید عبور، هویت شما را تأیید می‌کند. ممکن است دستگاه از شما اثر انگشت، چهره یا قفل صفحه را درخواست کند.',
       title: 'از کلید عبور خود استفاده کنید',
     },
     password: {
@@ -562,13 +660,13 @@ export const faIR: LocalizationResource = {
     },
     phoneCode: {
       formTitle: 'کد تأیید',
-      resendButton: "کدی دریافت نکردید؟ ارسال دوباره",
+      resendButton: 'کدی دریافت نکردید؟ ارسال دوباره',
       subtitle: 'برای ادامه به {{applicationName}}',
       title: 'تلفن همراه خود را چک کنید',
     },
     phoneCodeMfa: {
       formTitle: 'کد تأیید',
-      resendButton: "کدی دریافت نکردید؟ ارسال دوباره",
+      resendButton: 'کدی دریافت نکردید؟ ارسال دوباره',
       subtitle: 'برای ادامه، لطفاً کد تأیید ارسال شده به تلفن خود را وارد کنید',
       title: 'تلفن همراه خود را چک کنید',
     },
@@ -611,7 +709,7 @@ export const faIR: LocalizationResource = {
   signInEnterPasswordTitle: 'رمز عبور خود را وارد کنید',
   signUp: {
     alternativePhoneCodeProvider: {
-      resendButton: "کدی دریافت نکردید؟ ارسال دوباره",
+      resendButton: 'کدی دریافت نکردید؟ ارسال دوباره',
       subtitle: 'کد تأیید ارسال شده به {{provider}} خود را وارد کنید',
       title: '{{provider}} خود را تأیید کنید',
     },
@@ -624,14 +722,13 @@ export const faIR: LocalizationResource = {
     emailCode: {
       formSubtitle: 'کد تایید ارسال شده به آدرس ایمیل خود را وارد کنید',
       formTitle: 'کد تأیید',
-      resendButton: "کدی دریافت نکردید؟ ارسال دوباره",
+      resendButton: 'کدی دریافت نکردید؟ ارسال دوباره',
       subtitle: 'کد تایید ارسال شده به ایمیلتان را وارد کنید',
       title: 'ایمیل خود را تأیید کنید',
     },
     emailLink: {
       clientMismatch: {
-        subtitle:
-          'برای ادامه، لینک تأیید را در دستگاه و مرورگری که ثبت نام را از طریق آن آغاز کرده‌اید، باز کنید.',
+        subtitle: 'برای ادامه، لینک تأیید را در دستگاه و مرورگری که ثبت نام را از طریق آن آغاز کرده‌اید، باز کنید.',
         title: 'لینک تأیید برای این دستگاه نامعتبر است',
       },
       formSubtitle: 'از لینک تایید ارسال شده به ایمیلتان استفاده کنید',
@@ -639,7 +736,7 @@ export const faIR: LocalizationResource = {
       loading: {
         title: 'در حال ثبت نام...',
       },
-      resendButton: "لینکی دریافت نکردید؟ دوباره ارسال کنید",
+      resendButton: 'لینکی دریافت نکردید؟ دوباره ارسال کنید',
       subtitle: 'برای ادامه به {{applicationName}}',
       title: 'ایمیل خود را تأیید کنید',
       verified: {
@@ -666,7 +763,7 @@ export const faIR: LocalizationResource = {
     phoneCode: {
       formSubtitle: 'کد تایید ارسال شده به شماره تلفن خود را وارد کنید',
       formTitle: 'کد تأیید',
-      resendButton: "کدی دریافت نکردید؟ ارسال دوباره",
+      resendButton: 'کدی دریافت نکردید؟ ارسال دوباره',
       subtitle: 'کد تایید ارسال شده به تلفن خود را وارد کنید',
       title: 'تلفن همراه خود را تایید کنید',
     },
@@ -675,8 +772,10 @@ export const faIR: LocalizationResource = {
       actionText: 'حساب کاربری دارید؟',
       blockButton__emailSupport: 'پشتیبانی ایمیل',
       blockButton__joinWaitlist: 'به لیست انتظار بپیوندید',
-      subtitle: 'ثبت نام در حال حاضر غیرفعال است. اگر فکر می‌کنید باید دسترسی داشته باشید، لطفاً با پشتیبانی تماس بگیرید.',
-      subtitleWaitlist: 'ثبت نام در حال حاضر غیرفعال است. برای اینکه اولین نفری باشید که از زمان شروع به کار ما مطلع می‌شود، به لیست انتظار بپیوندید.',
+      subtitle:
+        'ثبت نام در حال حاضر غیرفعال است. اگر فکر می‌کنید باید دسترسی داشته باشید، لطفاً با پشتیبانی تماس بگیرید.',
+      subtitleWaitlist:
+        'ثبت نام در حال حاضر غیرفعال است. برای اینکه اولین نفری باشید که از زمان شروع به کار ما مطلع می‌شود، به لیست انتظار بپیوندید.',
       title: 'دسترسی محدود شده است',
     },
     start: {
@@ -798,6 +897,9 @@ export const faIR: LocalizationResource = {
     action__signOutAll: 'خروج از همه حساب‌ها',
   },
   userProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'کپی شده!',
       actionLabel__copy: 'کپی همه',
@@ -815,6 +917,13 @@ export const faIR: LocalizationResource = {
       title__codelist: 'کدهای پشتیبان',
     },
     billingPage: {
+      paymentHistorySection: {
+        empty: undefined,
+        notFound: undefined,
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        tableHeader__status: undefined,
+      },
       paymentSourcesSection: {
         actionLabel__default: 'پیش فرض کنید',
         actionLabel__remove: 'حذف',
@@ -834,13 +943,28 @@ export const faIR: LocalizationResource = {
         title: 'روش های پرداخت',
       },
       start: {
+        headerTitle__payments: undefined,
         headerTitle__plans: 'طرح ها',
         headerTitle__statements: 'بیانیه‌ها',
         headerTitle__subscriptions: 'اشتراک',
       },
+      statementsSection: {
+        empty: undefined,
+        itemCaption__paidForPlan: undefined,
+        itemCaption__proratedCredit: undefined,
+        itemCaption__subscribedAndPaidForPlan: undefined,
+        notFound: undefined,
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+        totalPaid: undefined,
+      },
       subscriptionsListSection: {
         actionLabel__newSubscription: 'در یک طرح مشترک شوید',
         actionLabel__switchPlan: 'تغییر طرح',
+        tableHeader__edit: undefined,
+        tableHeader__plan: undefined,
+        tableHeader__startDate: undefined,
         title: 'اشتراک',
       },
       subscriptionsSection: {
@@ -877,21 +1001,21 @@ export const faIR: LocalizationResource = {
         formHint: 'ایمیلی حاوی کد تایید به این آدرس ایمیل ارسال خواهد شد.',
         formSubtitle: 'کد تایید ارسال شده به {{identifier}} را وارد کنید',
         formTitle: 'کد تأیید',
-        resendButton: "کدی دریافت نکردید؟ ارسال دوباره",
+        resendButton: 'کدی دریافت نکردید؟ ارسال دوباره',
         successMessage: 'ایمیل {{identifier}} به حساب شما اضافه شد.',
       },
       emailLink: {
         formHint: 'ایمیلی حاوی لینک تأیید به این آدرس ایمیل ارسال خواهد شد.',
         formSubtitle: 'روی لینک تأیید در ایمیل ارسال شده به {{identifier}} کلیک کنید',
         formTitle: 'لینک تأیید',
-        resendButton: "لینکی دریافت نکردید؟ دوباره ارسال کنید",
+        resendButton: 'لینکی دریافت نکردید؟ دوباره ارسال کنید',
         successMessage: 'ایمیل {{identifier}} به حساب شما اضافه شد.',
       },
       enterpriseSSOLink: {
         formButton: 'برای ورود کلیک کنید',
         formSubtitle: 'ورود به سیستم را با {{identifier}} تکمیل کنید',
       },
-      formHint: "قبل از اینکه بتوانید این آدرس ایمیل را به حساب خود اضافه کنید، باید آن را تأیید کنید.",
+      formHint: 'قبل از اینکه بتوانید این آدرس ایمیل را به حساب خود اضافه کنید، باید آن را تأیید کنید.',
       removeResource: {
         messageLine1: '{{identifier}} از این حساب حذف خواهد شد.',
         messageLine2: 'دیگر نمی‌توانید با استفاده از این آدرس ایمیل وارد سیستم شوید.',
@@ -958,6 +1082,7 @@ export const faIR: LocalizationResource = {
     mobileButton__menu: 'منو',
     navbar: {
       account: 'نمایه',
+      apiKeys: undefined,
       billing: 'صورتحساب',
       description: 'اطلاعات حساب خود را مدیریت کنید.',
       security: 'امنیت',
@@ -982,8 +1107,7 @@ export const faIR: LocalizationResource = {
       title__update: 'ه‌روزرسانی رمز عبور',
     },
     phoneNumberPage: {
-      infoText:
-        'یک پیامک حاوی کد تأیید به این شماره تلفن ارسال خواهد شد. ممکن است هزینه پیامک و داده اعمال شود.',
+      infoText: 'یک پیامک حاوی کد تأیید به این شماره تلفن ارسال خواهد شد. ممکن است هزینه پیامک و داده اعمال شود.',
       removeResource: {
         messageLine1: '{{identifier}} از این حساب حذف خواهد شد.',
         messageLine2: 'دیگر نمی‌توانید با استفاده از این شماره تلفن وارد سیستم شوید.',
