@@ -112,6 +112,7 @@ import {
   isRedirectForFAPIInitiatedFlow,
   noOrganizationExists,
   noUserExists,
+  processCssLayerNameExtraction,
   removeClerkQueryParam,
   requiresUserInput,
   sessionExistsAndSingleSessionModeEnabled,
@@ -2727,9 +2728,18 @@ export class Clerk implements ClerkInterface {
   };
 
   #initOptions = (options?: ClerkOptions): ClerkOptions => {
+    const processedOptions = options ? { ...options } : {};
+
+    // Extract cssLayerName from baseTheme if present and move it to appearance level
+    if (processedOptions.appearance) {
+      processedOptions.appearance = processCssLayerNameExtraction(processedOptions.appearance);
+    }
+
+    console.log('processedOptions', processedOptions);
+
     return {
       ...defaultOptions,
-      ...options,
+      ...processedOptions,
       allowedRedirectOrigins: createAllowedRedirectOrigins(
         options?.allowedRedirectOrigins,
         this.frontendApi,
