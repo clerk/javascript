@@ -86,7 +86,7 @@ export const UserPreview = (props: UserPreviewProps) => {
       elementId={descriptors.userPreview.setId(elementId)}
       align='center'
       as='span'
-      sx={[t => ({ minWidth: '0px', width: 'fit-content', gap: t.space.$4 }), sx]}
+      sx={[t => ({ minWidth: '0px', width: 'fit-content', gap: t.space.$3 }), sx]}
       {...rest}
     >
       {/*Do not attempt to render or reserve space based on height if image url is not defined*/}
