@@ -1,6 +1,5 @@
 import { useClerk, useOrganization } from '@clerk/shared/react';
 import type { CommercePaymentSourceResource } from '@clerk/types';
-import type { SetupIntent } from '@stripe/stripe-js';
 import { Fragment, useMemo, useRef } from 'react';
 
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
@@ -25,12 +24,9 @@ const AddScreen = withCardStateProvider(({ onSuccess }: { onSuccess: () => void 
   const subscriberType = useSubscriberTypeContext();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
 
-  const onAddPaymentSourceSuccess = async (context: { stripeSetupIntent?: SetupIntent }) => {
+  const onAddPaymentSourceSuccess = async (context: { gateway: 'stripe'; paymentToken: string }) => {
     const resource = subscriberType === 'org' ? clerk?.organization : clerk.user;
-    await resource?.addPaymentSource({
-      gateway: 'stripe',
-      paymentToken: context.stripeSetupIntent?.payment_method as string,
-    });
+    await resource?.addPaymentSource(context);
     onSuccess();
     close();
     return Promise.resolve();
@@ -134,7 +130,7 @@ export const PaymentSources = withCardStateProvider(() => {
         flex: 1,
         borderTopWidth: t.borderWidths.$normal,
         borderTopStyle: t.borderStyles.$solid,
-        borderTopColor: t.colors.$neutralAlpha100,
+        borderTopColor: t.colors.$borderAlpha100,
       })}
     >
       <Action.Root>

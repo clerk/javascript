@@ -1,3 +1,4 @@
+import { __experimental_useCheckout as useCheckout } from '@clerk/shared/react';
 import { useMemo } from 'react';
 
 import { Alert } from '@/ui/elements/Alert';
@@ -6,12 +7,11 @@ import { LineItems } from '@/ui/elements/LineItems';
 
 import { useCheckoutContext } from '../../contexts';
 import { Box, descriptors, Flex, localizationKeys, useLocalizations } from '../../customizables';
-// TODO(@COMMERCE): Is this causing bundle size  issues ?
 import { EmailForm } from '../UserProfile/EmailForm';
-import { useCheckoutContextRoot } from './CheckoutPage';
 
 export const GenericError = () => {
-  const { errors } = useCheckoutContextRoot();
+  const { checkout } = useCheckout();
+
   const { translateError } = useLocalizations();
   const { t } = useLocalizations();
   return (
@@ -29,7 +29,9 @@ export const GenericError = () => {
           variant='danger'
           colorScheme='danger'
         >
-          {errors ? translateError(errors[0]) : t(localizationKeys('unstable__errors.form_param_value_invalid'))}
+          {checkout.error
+            ? translateError(checkout.error.errors[0])
+            : t(localizationKeys('unstable__errors.form_param_value_invalid'))}
         </Alert>
       </Flex>
     </Drawer.Body>
@@ -37,14 +39,19 @@ export const GenericError = () => {
 };
 
 export const InvalidPlanScreen = () => {
-  const { errors } = useCheckoutContextRoot();
+  const { planPeriod } = useCheckoutContext();
+  const { checkout } = useCheckout();
+  const error = checkout.error;
 
   const planFromError = useMemo(() => {
-    const error = errors?.find(e => e.code === 'invalid_plan_change');
-    return error?.meta?.plan;
-  }, [errors]);
+    const _error = error?.errors.find(e => e.code === 'invalid_plan_change');
+    return _error?.meta?.plan;
+  }, [error]);
 
-  const { planPeriod } = useCheckoutContext();
+  const isPlanUpgradePossible = useMemo(() => {
+    const _error = error?.errors.find(e => e.code === 'invalid_plan_change');
+    return _error?.meta?.isPlanUpgradePossible || false;
+  }, [error]);
 
   if (!planFromError) {
     return null;
@@ -62,7 +69,7 @@ export const InvalidPlanScreen = () => {
             padding: t.space.$4,
             borderBottomWidth: t.borderWidths.$normal,
             borderBottomStyle: t.borderStyles.$solid,
-            borderBottomColor: t.colors.$neutralAlpha100,
+            borderBottomColor: t.colors.$borderAlpha100,
           })}
         >
           <LineItems.Root>
@@ -83,7 +90,11 @@ export const InvalidPlanScreen = () => {
           <Alert
             variant='info'
             colorScheme='info'
-            title={localizationKeys('commerce.cannotSubscribeMonthly')}
+            title={
+              isPlanUpgradePossible
+                ? localizationKeys('commerce.cannotSubscribeMonthly')
+                : localizationKeys('commerce.cannotSubscribeUnrecoverable')
+            }
           />
         </Box>
       </Flex>
@@ -92,7 +103,7 @@ export const InvalidPlanScreen = () => {
 };
 
 export const AddEmailForm = () => {
-  const { startCheckout } = useCheckoutContextRoot();
+  const { checkout } = useCheckout();
   const { setIsOpen } = useDrawerContext();
   return (
     <Drawer.Body>
@@ -101,11 +112,10 @@ export const AddEmailForm = () => {
           padding: t.space.$4,
         })}
       >
-        {/* TODO(@COMMERCE): How does ths operate for orgs ? */}
         <EmailForm
           title={localizationKeys('commerce.checkout.emailForm.title')}
           subtitle={localizationKeys('commerce.checkout.emailForm.subtitle')}
-          onSuccess={startCheckout}
+          onSuccess={() => void checkout.start()}
           onReset={() => setIsOpen(false)}
           disableAutoFocus
         />

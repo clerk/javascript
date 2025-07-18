@@ -1,5 +1,93 @@
 # Change Log
 
+## 2.5.0
+
+### Minor Changes
+
+- Add machines Backend API resource and methods ([#6335](https://github.com/clerk/javascript/pull/6335)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Bump `snakecase-keys` to v9 which is the first ESM-only versions. This change should resolve any `TypeError: Cannot destructure property 'snakeCase' of 'require(...)' as it is undefined.` errors using Vitest. ([#6255](https://github.com/clerk/javascript/pull/6255)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Update `clerk.samlConnections.getSamlConnectionList()` to return paginated data and export the `SamlConnection` type. ([#6332](https://github.com/clerk/javascript/pull/6332)) by [@jaredpiedt](https://github.com/jaredpiedt)
+
+- Updated dependencies [[`d2f6f9e`](https://github.com/clerk/javascript/commit/d2f6f9e02036a4288916fcce14f24be5d56561c4), [`a329836`](https://github.com/clerk/javascript/commit/a329836a6c64f0a551a277ccae07043456a70523), [`6041c39`](https://github.com/clerk/javascript/commit/6041c39a31e787a6065dbc3f21e1c569982a06de), [`3f1270d`](https://github.com/clerk/javascript/commit/3f1270db86a21ead0ed6f0bd4f9986485203e973)]:
+  - @clerk/types@4.68.0
+  - @clerk/shared@3.13.0
+
+## 2.4.5
+
+### Patch Changes
+
+- Updated dependencies [[`2a90b68`](https://github.com/clerk/javascript/commit/2a90b689550ae960496c9292ca23e0225e3425cd), [`af50905`](https://github.com/clerk/javascript/commit/af50905ea497ed3286c8c4c374498e06ca6ee82b)]:
+  - @clerk/types@4.67.0
+  - @clerk/shared@3.12.3
+
+## 2.4.4
+
+### Patch Changes
+
+- Updated dependencies [[`8ee859c`](https://github.com/clerk/javascript/commit/8ee859ce00d1d5747c14a80fe7166303e64a4f1f)]:
+  - @clerk/shared@3.12.2
+  - @clerk/types@4.66.1
+
+## 2.4.3
+
+### Patch Changes
+
+- Updated dependencies [[`025e304`](https://github.com/clerk/javascript/commit/025e304c4d6402dfd750ee51ac9c8fc2dea1f353), [`dedf487`](https://github.com/clerk/javascript/commit/dedf48703986d547d5b28155b0182a51030cffeb), [`b96114e`](https://github.com/clerk/javascript/commit/b96114e438638896ba536bb7a17b09cdadcd9407)]:
+  - @clerk/types@4.66.0
+  - @clerk/shared@3.12.1
+
+## 2.4.2
+
+### Patch Changes
+
+- Add `query`, `orderBy`, and `organizationId` to the `SamlConnectionListParams` type. ([#6279](https://github.com/clerk/javascript/pull/6279)) by [@jaredpiedt](https://github.com/jaredpiedt)
+
+- Add `event_attributes` to the `Webhook` type. ([#6162](https://github.com/clerk/javascript/pull/6162)) by [@jaredpiedt](https://github.com/jaredpiedt)
+
+- Updated dependencies [[`2be6a53`](https://github.com/clerk/javascript/commit/2be6a53959cb8a3127c2eb5d1aeb4248872d2c24), [`f6a1c35`](https://github.com/clerk/javascript/commit/f6a1c35bd5fb4bd2a3cd45bdaf9defe6be59d4a9), [`6826d0b`](https://github.com/clerk/javascript/commit/6826d0bbd03e844d49224565878a4326684f06b4), [`f6a1c35`](https://github.com/clerk/javascript/commit/f6a1c35bd5fb4bd2a3cd45bdaf9defe6be59d4a9), [`97a07f7`](https://github.com/clerk/javascript/commit/97a07f78b4b0c3dc701a2610097ec7d6232f79e7)]:
+  - @clerk/types@4.65.0
+  - @clerk/shared@3.12.0
+
+## 2.4.1
+
+### Patch Changes
+
+- Updated dependencies [[`f42c4fe`](https://github.com/clerk/javascript/commit/f42c4fedfdab873129b876eba38b3677f190b460), [`ec207dc`](https://github.com/clerk/javascript/commit/ec207dcd2a13340cfa4e3b80d3d52d1b4e7d5f23), [`ec207dc`](https://github.com/clerk/javascript/commit/ec207dcd2a13340cfa4e3b80d3d52d1b4e7d5f23), [`0e0cc1f`](https://github.com/clerk/javascript/commit/0e0cc1fa85347d727a4fd3718fe45b0f0244ddd9)]:
+  - @clerk/types@4.64.0
+  - @clerk/shared@3.11.0
+
+## 2.4.0
+
+### Minor Changes
+
+- Trigger a handshake on a signed in, cross origin request to sync session state from a satellite domain. ([#6238](https://github.com/clerk/javascript/pull/6238)) by [@brkalow](https://github.com/brkalow)
+
+### Patch Changes
+
+- Refactor webhook verification to use verification from the `standardwebhooks` package, which is what our underlying provider relies on. ([#6252](https://github.com/clerk/javascript/pull/6252)) by [@brkalow](https://github.com/brkalow)
+
+- Add optional `secret` property in API key response ([#6246](https://github.com/clerk/javascript/pull/6246)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Use Headers constructor when building BAPI client headers ([#6235](https://github.com/clerk/javascript/pull/6235)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Use explicit config for api version handling in backend client request builder ([#6232](https://github.com/clerk/javascript/pull/6232)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`abd8446`](https://github.com/clerk/javascript/commit/abd844609dad263d974da7fbf5e3575afce73abe), [`8387a39`](https://github.com/clerk/javascript/commit/8387a392a04906f0f10d84c61cfee36f23942f85), [`f2a6641`](https://github.com/clerk/javascript/commit/f2a66419b1813abc86ea98fde7475861995a1486)]:
+  - @clerk/shared@3.10.2
+  - @clerk/types@4.63.0
+
+## 2.3.1
+
+### Patch Changes
+
+- Updated dependencies [[`02a1f42`](https://github.com/clerk/javascript/commit/02a1f42dfdb28ea956d6cbd3fbabe10093d2fad8), [`edc0bfd`](https://github.com/clerk/javascript/commit/edc0bfdae929dad78a99dfd6275aad947d9ddd73)]:
+  - @clerk/shared@3.10.1
+  - @clerk/types@4.62.1
+
 ## 2.3.0
 
 ### Minor Changes

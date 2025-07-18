@@ -99,7 +99,7 @@ const SecretInputWithToggle = ({ apiKeyID }: { apiKeyID: string }) => {
       >
         <Icon
           icon={revealed ? EyeSlash : Eye}
-          sx={t => ({ color: t.colors.$colorTextSecondary })}
+          sx={t => ({ color: t.colors.$colorMutedForeground })}
         />
       </Button>
     </Flex>
@@ -111,11 +111,13 @@ export const ApiKeysTable = ({
   isLoading,
   onRevoke,
   elementDescriptor,
+  canManageAPIKeys,
 }: {
   rows: APIKeyResource[];
   isLoading: boolean;
   onRevoke: (id: string, name: string) => void;
   elementDescriptor?: ElementDescriptor;
+  canManageAPIKeys: boolean;
 }) => {
   return (
     <Flex sx={t => ({ width: '100%', [mqu.sm]: { overflowX: 'auto', padding: t.space.$0x25 } })}>
@@ -128,7 +130,7 @@ export const ApiKeysTable = ({
             <Th>Name</Th>
             <Th>Last used</Th>
             <Th>Key</Th>
-            <Th>Actions</Th>
+            {canManageAPIKeys && <Th>Actions</Th>}
           </Tr>
         </Thead>
         <Tbody>
@@ -197,17 +199,19 @@ export const ApiKeysTable = ({
                     <CopySecretButton apiKeyID={apiKey.id} />
                   </Flex>
                 </Td>
-                <Td>
-                  <ThreeDotsMenu
-                    actions={[
-                      {
-                        label: localizationKeys('apiKeys.menuAction__revoke'),
-                        isDestructive: true,
-                        onClick: () => onRevoke(apiKey.id, apiKey.name),
-                      },
-                    ]}
-                  />
-                </Td>
+                {canManageAPIKeys && (
+                  <Td>
+                    <ThreeDotsMenu
+                      actions={[
+                        {
+                          label: localizationKeys('apiKeys.menuAction__revoke'),
+                          isDestructive: true,
+                          onClick: () => onRevoke(apiKey.id, apiKey.name),
+                        },
+                      ]}
+                    />
+                  </Td>
+                )}
               </Tr>
             ))
           )}

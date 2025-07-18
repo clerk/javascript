@@ -6,7 +6,7 @@ import type { FakeOrganization, FakeUser } from '../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../testUtils';
 
 testAgainstRunningApps({
-  withEnv: [appConfigs.envs.withBillingStaging],
+  withEnv: [appConfigs.envs.withBillingJwtV2],
 })('has() for JWT v2 @nextjs', ({ app }) => {
   test.describe.configure({ mode: 'serial' });
 

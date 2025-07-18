@@ -10,8 +10,8 @@ const { applyVariants, filterProps } = createVariants((theme, props) => ({
     boxSizing: 'border-box',
     margin: 0,
     padding: `${theme.space.$1x5} ${theme.space.$3}`,
-    backgroundColor: theme.colors.$colorInputBackground,
-    color: theme.colors.$colorInputText,
+    backgroundColor: theme.colors.$colorInput,
+    color: theme.colors.$colorInputForeground,
     // outline support for Windows contrast themes
     outline: 'transparent solid 2px',
     outlineOffset: '2px',
@@ -32,7 +32,7 @@ const { applyVariants, filterProps } = createVariants((theme, props) => ({
       animationName: 'onAutoFillStart',
     },
     '::placeholder': {
-      color: theme.colors.$colorTextSecondary,
+      color: theme.colors.$colorMutedForeground,
     },
   },
   variants: {

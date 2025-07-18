@@ -10,7 +10,7 @@ const BUTTON_OUTLINE_SHADOW = (color: string) =>
 
 const cardContentStyles = (theme: InternalTheme) => ({
   borderWidth: 0,
-  boxShadow: `${theme.shadows.$cardContentShadow}, ${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha50}`,
+  boxShadow: `${theme.shadows.$cardContentShadow}, ${BORDER_SHADOW_LENGTH} ${theme.colors.$borderAlpha50}`,
 });
 
 const inputShadowStyles = (
@@ -64,11 +64,11 @@ const checkboxShadowStyles = (
 const inputStyles = (theme: InternalTheme) => ({
   borderWidth: 0,
   ...inputShadowStyles(theme, {
-    idle1: theme.colors.$neutralAlpha150,
-    idle2: theme.colors.$neutralAlpha100,
-    hover1: theme.colors.$neutralAlpha300,
-    hover2: theme.colors.$neutralAlpha150,
-    focus: theme.colors.$neutralAlpha150,
+    idle1: theme.colors.$borderAlpha150,
+    idle2: theme.colors.$borderAlpha100,
+    hover1: theme.colors.$borderAlpha300,
+    hover2: theme.colors.$borderAlpha150,
+    focus: theme.colors.$colorRing,
   }),
   '&[data-feedback="error"]': inputShadowStyles(theme, {
     idle1: theme.colors.$dangerAlpha400,
@@ -121,7 +121,7 @@ export const polishedAppearance: Appearance = {
             '&:focus': {
               boxShadow: [
                 BUTTON_SOLID_SHADOW(theme.colors.$primary500),
-                theme.shadows.$focusRing.replace('{{color}}', theme.colors.$neutralAlpha200),
+                theme.shadows.$focusRing.replace('{{color}}', theme.colors.$colorRing),
               ].toString(),
             },
           },
@@ -137,21 +137,21 @@ export const polishedAppearance: Appearance = {
         },
         '&[data-variant="outline"]': {
           borderWidth: 0,
-          boxShadow: BUTTON_OUTLINE_SHADOW(theme.colors.$neutralAlpha100),
+          boxShadow: BUTTON_OUTLINE_SHADOW(theme.colors.$borderAlpha100),
           '&:focus': {
             boxShadow: [
-              BUTTON_OUTLINE_SHADOW(theme.colors.$neutralAlpha100),
-              theme.shadows.$focusRing.replace('{{color}}', theme.colors.$neutralAlpha200),
+              BUTTON_OUTLINE_SHADOW(theme.colors.$borderAlpha100),
+              theme.shadows.$focusRing.replace('{{color}}', theme.colors.$colorRing),
             ].toString(),
           },
         },
         '&[data-variant="bordered"]': {
           borderWidth: 0,
-          boxShadow: BUTTON_OUTLINE_SHADOW(theme.colors.$neutralAlpha100),
+          boxShadow: BUTTON_OUTLINE_SHADOW(theme.colors.$borderAlpha100),
           '&:focus': {
             boxShadow: [
-              BUTTON_OUTLINE_SHADOW(theme.colors.$neutralAlpha100),
-              theme.shadows.$focusRing.replace('{{color}}', theme.colors.$neutralAlpha200),
+              BUTTON_OUTLINE_SHADOW(theme.colors.$borderAlpha100),
+              theme.shadows.$focusRing.replace('{{color}}', theme.colors.$colorRing),
             ].toString(),
           },
         },
@@ -160,7 +160,7 @@ export const polishedAppearance: Appearance = {
         borderWidth: 0,
         margin: '1px',
         '&[data-color="primary"]': {
-          boxShadow: `${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha150}, ${theme.shadows.$badge}`,
+          boxShadow: `${BORDER_SHADOW_LENGTH} ${theme.colors.$borderAlpha100}, ${theme.shadows.$badge}`,
         },
         '&[data-color="danger"]': {
           boxShadow: `${BORDER_SHADOW_LENGTH} ${theme.colors.$dangerAlpha300}, ${theme.shadows.$badge}`,
@@ -205,7 +205,7 @@ export const polishedAppearance: Appearance = {
       },
       tagPillContainer: {
         borderWidth: 0,
-        boxShadow: `${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha150}, ${theme.shadows.$badge}`,
+        boxShadow: `${BORDER_SHADOW_LENGTH} ${theme.colors.$borderAlpha100}, ${theme.shadows.$badge}`,
       },
       phoneInputBox: {
         ...inputStyles(theme),
@@ -219,15 +219,15 @@ export const polishedAppearance: Appearance = {
       },
       cardBox: {
         borderWidth: 0,
-        boxShadow: `${theme.shadows.$cardBoxShadow}, ${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha100}`,
+        boxShadow: `${theme.shadows.$cardBoxShadow}, ${BORDER_SHADOW_LENGTH} ${theme.colors.$borderAlpha100}`,
       },
       drawerContent: {
         borderWidth: 0,
-        boxShadow: `${theme.shadows.$cardBoxShadow}, ${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha100}`,
+        boxShadow: `${theme.shadows.$cardBoxShadow}, ${BORDER_SHADOW_LENGTH} ${theme.colors.$borderAlpha100}`,
       },
       popoverBox: {
         borderWidth: 0,
-        boxShadow: `${theme.shadows.$cardBoxShadow}, ${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha100}`,
+        boxShadow: `${theme.shadows.$cardBoxShadow}, ${BORDER_SHADOW_LENGTH} ${theme.colors.$borderAlpha100}`,
       },
       card: {
         ...cardContentStyles(theme),
@@ -235,11 +235,11 @@ export const polishedAppearance: Appearance = {
       pricingTableCard: {
         '&[data-variant="default"]': {
           borderWidth: 0,
-          boxShadow: `${theme.shadows.$cardBoxShadow}, ${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha100}`,
+          boxShadow: `${theme.shadows.$cardBoxShadow}, ${BORDER_SHADOW_LENGTH} ${theme.colors.$borderAlpha100}`,
         },
         '&[data-variant="compact"]': {
           borderWidth: 0,
-          boxShadow: `0px 0px 2px 0px rgba(0, 0, 0, 0.08), 0px 1px 2px 0px rgba(25, 28, 33, 0.12), 0px 0px 0px 1px ${theme.colors.$neutralAlpha100}`,
+          boxShadow: `0px 0px 2px 0px rgba(0, 0, 0, 0.08), 0px 1px 2px 0px rgba(25, 28, 33, 0.12), 0px 0px 0px 1px ${theme.colors.$borderAlpha100}`,
         },
       },
       scrollBox: {
@@ -253,15 +253,15 @@ export const polishedAppearance: Appearance = {
       },
       menuList: {
         borderWidth: 0,
-        boxShadow: `${theme.shadows.$menuShadow}, ${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha100}`,
+        boxShadow: `${theme.shadows.$menuShadow}, ${BORDER_SHADOW_LENGTH} ${theme.colors.$borderAlpha100}`,
       },
       actionCard: {
         borderWidth: 0,
-        boxShadow: `${theme.shadows.$actionCardShadow}, ${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha100}`,
+        boxShadow: `${theme.shadows.$actionCardShadow}, ${BORDER_SHADOW_LENGTH} ${theme.colors.$borderAlpha100}`,
       },
       table: {
         borderWidth: 0,
-        boxShadow: `0px 0px 2px 0px rgba(0, 0, 0, 0.08), 0px 1px 2px 0px rgba(25, 28, 33, 0.12), 0px 0px 0px 1px ${theme.colors.$neutralAlpha100}`,
+        boxShadow: `0px 0px 2px 0px rgba(0, 0, 0, 0.08), 0px 1px 2px 0px rgba(25, 28, 33, 0.12), 0px 0px 0px 1px ${theme.colors.$borderAlpha100}`,
       },
     };
   },
