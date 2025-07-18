@@ -4,13 +4,13 @@
 
 import type { APIKeysSettingsJSON } from './apiKeysSettings';
 import type {
+  CommercePayerType,
   CommercePaymentChargeType,
   CommercePaymentSourceStatus,
   CommercePaymentStatus,
   CommerceStatementStatus,
   CommerceSubscriptionPlanPeriod,
   CommerceSubscriptionStatus,
-  CommercePayerType,
 } from './commerce';
 import type { CommerceSettingsJSON } from './commerceSettings';
 import type { DisplayConfigJSON } from './displayConfig';
