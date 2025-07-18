@@ -2789,8 +2789,6 @@ export class Clerk implements ClerkInterface {
       }
     }
 
-    console.table({ options, processedOptions });
-
     return {
       ...defaultOptions,
       ...processedOptions,
