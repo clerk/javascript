@@ -3,8 +3,10 @@ import type { ClerkAPIError, ClerkRuntimeError } from '@clerk/types';
 import { FloatingTree, useFloatingParentNodeId } from '@floating-ui/react';
 import React from 'react';
 
+import { useSafeState } from '@/ui/hooks';
+
+import { eventBus, events } from '../../../core/events';
 import { useLocalizations } from '../../customizables';
-import { useSafeState } from '../../hooks';
 
 type Status = 'idle' | 'loading' | 'error';
 type Metadata = string | undefined;
@@ -22,8 +24,26 @@ export const CardStateProvider = (props: React.PropsWithChildren<any>) => {
   const [state, setState] = useSafeState<State>({
     status: 'idle',
     metadata: undefined,
-    error: translateError(window?.Clerk?.__internal_last_error || undefined),
+    error: undefined,
   });
+
+  React.useEffect(() => {
+    const initialError = window?.Clerk?.__internal_last_error;
+    if (initialError) {
+      setState(s => ({ ...s, error: translateError(initialError) }));
+    }
+
+    const handler = () => {
+      const error = window?.Clerk?.__internal_last_error;
+      if (error) {
+        setState(s => ({ ...s, error: translateError(error) }));
+      }
+    };
+
+    eventBus.on(events.ErrorUserLocked, handler);
+
+    return () => eventBus.off(events.ErrorUserLocked, handler);
+  }, [translateError, setState]);
 
   const value = React.useMemo(() => ({ value: { state, setState } }), [state, setState]);
   return <CardStateCtx.Provider value={value}>{props.children}</CardStateCtx.Provider>;
