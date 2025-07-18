@@ -54,7 +54,7 @@
     "webextension-polyfill": "~0.12.0"
   },
   "devDependencies": {
-    "@types/chrome": "*",
+    "@types/chrome": "^0.1.1",
     "@types/webextension-polyfill": "^0.12.3",
     "type-fest": "^4.41.0"
   },
