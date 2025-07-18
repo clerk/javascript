@@ -22,15 +22,30 @@ export interface SessionVerificationResource extends ClerkResource {
 
 export type SessionVerificationStatus = 'needs_first_factor' | 'needs_second_factor' | 'complete';
 
+/**
+ * @inline
+ */
 export type SessionVerificationTypes = 'strict_mfa' | 'strict' | 'moderate' | 'lax';
 
+/**
+ * The `ReverificationConfig` type has the following properties:
+ */
 export type ReverificationConfig =
   | SessionVerificationTypes
   | {
+      /**
+       * The reverification level of credentials to check for.
+       */
       level: SessionVerificationLevel;
+      /**
+       * The age of the factor level to check for. Value should be greater than or equal to 1 and less than 99,999.
+       */
       afterMinutes: SessionVerificationAfterMinutes;
     };
 
+/**
+ * @inline
+ */
 export type SessionVerificationLevel = 'first_factor' | 'second_factor' | 'multi_factor';
 export type SessionVerificationAfterMinutes = number;
 

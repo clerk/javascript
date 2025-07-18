@@ -1,32 +1,26 @@
 ---
-import type { HTMLTag, Polymorphic } from 'astro/types'
-import type { SignOutOptions, Without } from '@clerk/types'
+import type { HTMLTag, Polymorphic } from 'astro/types';
+import type { SignOutOptions, Without } from '@clerk/types';
 import type { ButtonProps } from '../../types';
-import { addUnstyledAttributeToFirstTag, logAsPropUsageDeprecation } from './utils'
+import { addUnstyledAttributeToFirstTag, logAsPropUsageDeprecation } from './utils';
 
-type Props<Tag extends HTMLTag = 'button'> = Polymorphic<SignOutOptions & ButtonProps<Tag>>
+type Props<Tag extends HTMLTag = 'button'> = Polymorphic<SignOutOptions & ButtonProps<Tag>>;
 
-import { generateSafeId } from '@clerk/astro/internal'
+import { generateSafeId } from '@clerk/astro/internal';
 
 const safeId = generateSafeId();
 
 if ('as' in Astro.props) {
-  logAsPropUsageDeprecation()
+  logAsPropUsageDeprecation();
 }
 
-const {
-  as: Tag = 'button',
-  asChild,
-  redirectUrl = '/',
-  sessionId,
-  ...elementProps
-} = Astro.props
+const { as: Tag = 'button', asChild, redirectUrl = '/', sessionId, ...elementProps } = Astro.props;
 
-let htmlElement = ''
+let htmlElement = '';
 
 if (asChild) {
-  htmlElement = await Astro.slots.render('default')
-  htmlElement = addUnstyledAttributeToFirstTag(htmlElement, safeId)
+  htmlElement = await Astro.slots.render('default');
+  htmlElement = addUnstyledAttributeToFirstTag(htmlElement, safeId);
 }
 ---
 
@@ -34,16 +28,19 @@ if (asChild) {
   asChild ? (
     <Fragment set:html={htmlElement} />
   ) : (
-    <Tag {...elementProps} data-clerk-unstyled-id={safeId}>
+    <Tag
+      {...elementProps}
+      data-clerk-unstyled-id={safeId}
+    >
       <slot>Sign out</slot>
-    </Tag >
+    </Tag>
   )
 }
 
 <script is:inline define:vars={{ redirectUrl, sessionId, safeId }}>
   const btn = document.querySelector(`[data-clerk-unstyled-id="${safeId}"]`);
 
-  btn.addEventListener("click", () => {
-    window.Clerk.signOut({ redirectUrl, sessionId })
+  btn.addEventListener('click', () => {
+    window.Clerk.signOut({ redirectUrl, sessionId });
   });
 </script>

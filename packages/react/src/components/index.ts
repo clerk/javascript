@@ -9,7 +9,8 @@ export {
   OrganizationList,
   GoogleOneTap,
   Waitlist,
-  __experimental_PricingTable,
+  PricingTable,
+  APIKeys,
 } from './uiComponents';
 
 export {

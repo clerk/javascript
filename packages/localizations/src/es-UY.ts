@@ -554,8 +554,7 @@ export const esUY: LocalizationResource = {
     form_identifier_exists__email_address: 'Este correo electrónico ya está en uso. Por favor, probá con otro.',
     form_identifier_exists__phone_number: 'Este número de teléfono ya está en uso. Por favor, probá con otro.',
     form_identifier_exists__username: 'Este nombre de usuario ya está en uso. Por favor, probá con otro.',
-    form_identifier_not_found:
-      'No se encontró una cuenta con este identificador. Por favor, verificá e intentá de nuevo.',
+    form_identifier_not_found: 'No se encontró una cuenta con esos detalles.',
     form_param_format_invalid: 'El valor ingresado tiene un formato inválido. Por favor, verificá y corregí.',
     form_param_format_invalid__email_address: 'El correo electrónico debe ser válido.',
     form_param_format_invalid__phone_number: 'El número de teléfono debe estar en un formato internacional válido.',
@@ -579,7 +578,7 @@ export const esUY: LocalizationResource = {
     form_username_invalid_length: 'Tu nombre de usuario debe tener entre {{min_length}} y {{max_length}} caracteres.',
     identification_deletion_failed: 'No podés eliminar tu última identificación.',
     not_allowed_access:
-      'No tenés permiso para acceder a esta página. Por favor, contactá al soporte si creés que esto es un error.',
+      "La dirección de correo electrónico o el número de teléfono no está permitido para registrarse. Esto puede deberse al uso de '+', '=', '#' o '.' en tu dirección de correo electrónico, el uso de un dominio conectado a un servicio de correo electrónico temporal o la exclusión explícita. Si cree que se trata de un error, póngase en contacto con el soporte.",
     organization_domain_blocked: 'Este es un dominio de proveedor de correo bloqueado. Por favor, usá otro.',
     organization_domain_common: 'Este es un dominio de proveedor de correo común. Por favor, usá otro.',
     organization_domain_exists_for_enterprise_connection: 'Este dominio ya se utiliza para el SSO de tu organización.',
@@ -602,6 +601,7 @@ export const esUY: LocalizationResource = {
       sentencePrefix: 'Tu contraseña debe contener',
     },
     phone_number_exists: 'Este número de teléfono ya está en uso. Por favor, probá con otro.',
+    session_exists: 'Ya has iniciado sesión',
     web3_missing_identifier: 'No se encontró una extensión de cartera Web3. Por favor, instalá una para continuar.',
     zxcvbn: {
       couldBeStronger: 'Tu contraseña funciona, pero podría ser más fuerte. Intentá agregar más caracteres.',

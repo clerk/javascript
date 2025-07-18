@@ -29,6 +29,7 @@ vi.mock('expo-secure-store', () => {
     setItemAsync: mocks.setItemAsync,
     getItemAsync: mocks.getItemAsync,
     deleteItemAsync: mocks.deleteItemAsync,
+    AFTER_FIRST_UNLOCK: 0,
   };
 });
 

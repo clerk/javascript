@@ -2,8 +2,9 @@ import { useSession } from '@clerk/shared/react';
 import type { SessionVerificationLevel } from '@clerk/types';
 import { useMemo } from 'react';
 
+import { LoadingCard } from '@/ui/elements/LoadingCard';
+
 import { useUserVerification } from '../../contexts';
-import { LoadingCard } from '../../elements';
 import { useFetch } from '../../hooks';
 
 const useUserVerificationSessionKey = () => {

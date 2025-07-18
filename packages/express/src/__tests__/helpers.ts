@@ -28,20 +28,13 @@ export function mockRequest(): ExpressRequest {
 
 export function mockRequestWithAuth(auth: Partial<AuthObject> = {}): ExpressRequestWithAuth {
   return {
-    auth: {
-      sessionClaims: null,
-      sessionId: null,
-      actor: null,
-      userId: null,
-      orgId: null,
-      orgRole: null,
-      orgSlug: null,
-      orgPermissions: null,
-      getToken: async () => '',
+    auth: () => ({
+      getToken: () => Promise.resolve(''),
       has: () => false,
       debug: () => ({}),
+      tokenType: 'session_token',
       ...auth,
-    },
+    }),
   } as unknown as ExpressRequestWithAuth;
 }
 

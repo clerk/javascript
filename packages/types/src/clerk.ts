@@ -1,14 +1,19 @@
+import type { ClerkAPIResponseError } from './api';
+import type { APIKeysNamespace } from './apiKeys';
 import type {
+  APIKeysTheme,
   Appearance,
   CheckoutTheme,
   CreateOrganizationTheme,
+  OAuthConsentTheme,
   OrganizationListTheme,
   OrganizationProfileTheme,
   OrganizationSwitcherTheme,
+  PlanDetailTheme,
   PricingTableTheme,
   SignInTheme,
   SignUpTheme,
-  SubscriptionDetailTheme,
+  SubscriptionDetailsTheme,
   UserButtonTheme,
   UserProfileTheme,
   UserVerificationTheme,
@@ -16,10 +21,12 @@ import type {
 } from './appearance';
 import type { ClientResource } from './client';
 import type {
-  __experimental_CommerceNamespace,
-  __experimental_CommerceSubscriberType,
-  __experimental_CommerceSubscriptionPlanPeriod,
-  __experimental_CommerceSubscriptionResource,
+  CommerceBillingNamespace,
+  CommerceCheckoutResource,
+  CommercePayerType,
+  CommercePlanResource,
+  CommerceSubscriptionPlanPeriod,
+  ConfirmCheckoutParams,
 } from './commerce';
 import type { CustomMenuItem } from './customMenuItems';
 import type { CustomPage } from './customPages';
@@ -33,6 +40,7 @@ import type {
   AfterMultiSessionSingleSignOutUrl,
   AfterSignOutUrl,
   LegacyRedirectProps,
+  NewSubscriptionRedirectUrl,
   RedirectOptions,
   RedirectUrlProp,
   SignInFallbackRedirectUrl,
@@ -50,6 +58,44 @@ import type { TelemetryCollector } from './telemetry';
 import type { UserResource } from './user';
 import type { Autocomplete, DeepPartial, DeepSnakeToCamel } from './utils';
 import type { WaitlistResource } from './waitlist';
+
+type __experimental_CheckoutStatus = 'awaiting_initialization' | 'awaiting_confirmation' | 'completed';
+
+export type __experimental_CheckoutCacheState = Readonly<{
+  isStarting: boolean;
+  isConfirming: boolean;
+  error: ClerkAPIResponseError | null;
+  checkout: CommerceCheckoutResource | null;
+  fetchStatus: 'idle' | 'fetching' | 'error';
+  status: __experimental_CheckoutStatus;
+}>;
+
+export type __experimental_CheckoutOptions = {
+  for?: 'organization';
+  planPeriod: CommerceSubscriptionPlanPeriod;
+  planId: string;
+};
+
+type CheckoutResult =
+  | {
+      data: CommerceCheckoutResource;
+      error: null;
+    }
+  | {
+      data: null;
+      error: ClerkAPIResponseError;
+    };
+
+export type __experimental_CheckoutInstance = {
+  confirm: (params: ConfirmCheckoutParams) => Promise<CheckoutResult>;
+  start: () => Promise<CheckoutResult>;
+  clear: () => void;
+  finalize: (params?: { redirectUrl: string }) => void;
+  subscribe: (listener: (state: __experimental_CheckoutCacheState) => void) => () => void;
+  getState: () => __experimental_CheckoutCacheState;
+};
+
+type __experimental_CheckoutFunction = (options: __experimental_CheckoutOptions) => __experimental_CheckoutInstance;
 
 /**
  * @inline
@@ -180,8 +226,17 @@ export interface Clerk {
   /** Current User. */
   user: UserResource | null | undefined;
 
-  /** Commerce Object */
-  __experimental_commerce: __experimental_CommerceNamespace;
+  /**
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+   * @see https://clerk.com/docs/billing/overview
+   *
+   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+   * @example
+   * ```tsx
+   * <ClerkProvider clerkJsVersion="x.x.x" />
+   * ```
+   */
+  billing: CommerceBillingNamespace;
 
   telemetry: TelemetryCollector | undefined;
 
@@ -210,7 +265,7 @@ export interface Clerk {
    * Opens the Clerk Checkout component in a drawer.
    * @param props Optional checkout configuration parameters.
    */
-  __internal_openCheckout: (props?: __experimental_CheckoutProps) => void;
+  __internal_openCheckout: (props?: __internal_CheckoutProps) => void;
 
   /**
    * Closes the Clerk Checkout drawer.
@@ -218,16 +273,28 @@ export interface Clerk {
   __internal_closeCheckout: () => void;
 
   /**
-   * Opens the Clerk SubscriptionDetails drawer component in a drawer.
-   * @param props Optional subscription details drawer configuration parameters.
+   * Opens the Clerk PlanDetails drawer component in a drawer.
+   * @param props `plan` or `planId` parameters are required.
    */
-  __internal_openSubscriptionDetails: (props?: __experimental_SubscriptionDetailsProps) => void;
+  __internal_openPlanDetails: (props: __internal_PlanDetailsProps) => void;
+
+  /**
+   * Closes the Clerk PlanDetails drawer.
+   */
+  __internal_closePlanDetails: () => void;
+
+  /**
+   * Opens the Clerk SubscriptionDetails drawer component in a drawer.
+   * @param props Optional configuration parameters.
+   */
+  __internal_openSubscriptionDetails: (props?: __internal_SubscriptionDetailsProps) => void;
 
   /**
    * Closes the Clerk SubscriptionDetails drawer.
    */
   __internal_closeSubscriptionDetails: () => void;
 
+  /**
   /** Opens the Clerk UserVerification component in a modal.
    * @param props Optional user verification configuration parameters.
    */
@@ -447,7 +514,7 @@ export interface Clerk {
    * @param targetNode Target node to mount the PricingTable component.
    * @param props configuration parameters.
    */
-  __experimental_mountPricingTable: (targetNode: HTMLDivElement, props?: __experimental_PricingTableProps) => void;
+  mountPricingTable: (targetNode: HTMLDivElement, props?: PricingTableProps) => void;
 
   /**
    * Unmount a pricing table component from the target element.
@@ -455,7 +522,46 @@ export interface Clerk {
    *
    * @param targetNode Target node to unmount the PricingTable component from.
    */
-  __experimental_unmountPricingTable: (targetNode: HTMLDivElement) => void;
+  unmountPricingTable: (targetNode: HTMLDivElement) => void;
+
+  /**
+   * This API is in early access and may change in future releases.
+   *
+   * Mount a api keys component at the target element.
+   * @experimental
+   * @param targetNode Target to mount the APIKeys component.
+   * @param props Configuration parameters.
+   */
+  mountApiKeys: (targetNode: HTMLDivElement, props?: APIKeysProps) => void;
+
+  /**
+   * This API is in early access and may change in future releases.
+   *
+   * Unmount a api keys component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   * @experimental
+   * @param targetNode Target node to unmount the ApiKeys component from.
+   */
+  unmountApiKeys: (targetNode: HTMLDivElement) => void;
+
+  /**
+   * Mounts a OAuth consent component at the target element.
+   * @param targetNode Target node to mount the OAuth consent component.
+   * @param oauthConsentProps OAuth consent configuration parameters.
+   */
+  __internal_mountOAuthConsent: (targetNode: HTMLDivElement, oauthConsentProps?: __internal_OAuthConsentProps) => void;
+
+  /**
+   * Unmounts a OAuth consent component from the target element.
+   * @param targetNode Target node to unmount the OAuth consent component from.
+   */
+  __internal_unmountOAuthConsent: (targetNode: HTMLDivElement) => void;
+
+  /**
+   * @internal
+   * Loads Stripe libraries for commerce functionality
+   */
+  __internal_loadStripeJs: () => Promise<any>;
 
   /**
    * Register a listener that triggers a callback each time important Clerk resources are changed.
@@ -564,6 +670,11 @@ export interface Clerk {
    * Returns the configured afterSignOutUrl of the instance.
    */
   buildAfterSignOutUrl(): string;
+
+  /**
+   * Returns the configured newSubscriptionRedirectUrl of the instance.
+   */
+  buildNewSubscriptionRedirectUrl(): string;
 
   /**
    * Returns the configured afterMultiSessionSingleSignOutUrl of the instance.
@@ -704,12 +815,10 @@ export interface Clerk {
   joinWaitlist: (params: JoinWaitlistParams) => Promise<WaitlistResource>;
 
   /**
-   * Navigates to the next task or redirects to completion URL.
-   * If the current session has pending tasks, it navigates to the next task.
-   * If all tasks are complete, it navigates to the provided completion URL.
-   * @experimental
+   * Navigates to the current task or redirects to `redirectUrlComplete` once the session is `active`.
+   * @internal
    */
-  __experimental_nextTask: (params?: NextTaskParams) => Promise<void>;
+  __internal_navigateToTaskIfAvailable: (params?: __internal_NavigateToTaskIfAvailableParams) => Promise<void>;
 
   /**
    * This is an optional function.
@@ -731,6 +840,20 @@ export interface Clerk {
    * initiated outside of the Clerk class.
    */
   __internal_setActiveInProgress: boolean;
+
+  /**
+   * API Keys Object
+   * @experimental
+   * This API is in early access and may change in future releases.
+   */
+  apiKeys: APIKeysNamespace;
+
+  /**
+   * Checkout API
+   * @experimental
+   * This API is in early access and may change in future releases.
+   */
+  __experimental_checkout: __experimental_CheckoutFunction;
 }
 
 export type HandleOAuthCallbackParams = TransferableOption &
@@ -814,6 +937,7 @@ export type ClerkOptions = PendingSessionOptions &
   SignInFallbackRedirectUrl &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
+  NewSubscriptionRedirectUrl &
   LegacyRedirectProps &
   AfterSignOutUrl &
   AfterMultiSessionSingleSignOutUrl & {
@@ -1110,6 +1234,10 @@ export type SignInProps = RoutingOptions & {
    * Control whether OAuth flows use redirects or popups.
    */
   oauthFlow?: 'auto' | 'redirect' | 'popup';
+  /**
+   * Optional for `oauth_<provider>` or `enterprise_sso` strategies. The value to pass to the [OIDC prompt parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.) in the generated OAuth redirect URL.
+   */
+  oidcPrompt?: string;
 } & TransferableOption &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
@@ -1247,6 +1375,10 @@ export type SignUpProps = RoutingOptions & {
    * Control whether OAuth flows use redirects or popups.
    */
   oauthFlow?: 'auto' | 'redirect' | 'popup';
+  /**
+   * Optional for `oauth_<provider>` or `enterprise_sso` strategies. The value to pass to the [OIDC prompt parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.) in the generated OAuth redirect URL.
+   */
+  oidcPrompt?: string;
 } & SignInFallbackRedirectUrl &
   SignInForceRedirectUrl &
   LegacyRedirectProps &
@@ -1275,6 +1407,12 @@ export type UserProfileProps = RoutingOptions & {
    * @experimental
    **/
   __experimental_startPath?: string;
+  /**
+   * Specify options for the underlying <APIKeys /> component.
+   * e.g. <UserProfile apiKeysProps={{ showDescription: true }} />
+   * @experimental
+   **/
+  apiKeysProps?: APIKeysProps;
 };
 
 export type UserProfileModalProps = WithoutRouting<UserProfileProps>;
@@ -1295,6 +1433,17 @@ export type OrganizationProfileProps = RoutingOptions & {
    * Provide custom pages and links to be rendered inside the OrganizationProfile.
    */
   customPages?: CustomPage[];
+  /**
+   * Specify on which page the organization profile modal will open.
+   * @experimental
+   **/
+  __experimental_startPath?: string;
+  /**
+   * Specify options for the underlying <APIKeys /> component.
+   * e.g. <OrganizationProfile apiKeysProps={{ showDescription: true }} />
+   * @experimental
+   **/
+  apiKeysProps?: APIKeysProps;
 };
 
 export type OrganizationProfileModalProps = WithoutRouting<OrganizationProfileProps>;
@@ -1560,45 +1709,177 @@ export type WaitlistProps = {
 
 export type WaitlistModalProps = WaitlistProps;
 
-type __experimental_PricingTableDefaultProps = {
-  layout?: 'default';
+type PricingTableDefaultProps = {
+  /**
+   * The position of the CTA button.
+   * @default 'bottom'
+   */
   ctaPosition?: 'top' | 'bottom';
+  /**
+   * Whether to collapse features on the pricing table.
+   * @default false
+   */
   collapseFeatures?: boolean;
+  /**
+   * Full URL or path to navigate to after checkout is complete and the user clicks the "Continue" button.
+   * @default undefined
+   */
+  newSubscriptionRedirectUrl?: string;
 };
 
-type __experimental_PricingTableMatrixProps = {
-  layout?: 'matrix';
-  highlightPlan?: string;
-};
-
-type __experimental_PricingTableBaseProps = {
+type PricingTableBaseProps = {
+  /**
+   * Whether to show pricing table for organizations.
+   * @default false
+   */
+  forOrganizations?: boolean;
+  /**
+   * Customisation options to fully match the Clerk components to your own brand.
+   * These options serve as overrides and will be merged with the global `appearance`
+   * prop of ClerkProvider (if one is provided)
+   */
   appearance?: PricingTableTheme;
-  checkoutProps?: Pick<__experimental_CheckoutProps, 'appearance'>;
+  /*
+   * Specify options for the underlying <Checkout /> component.
+   * e.g. <PricingTable checkoutProps={{appearance: {variables: {colorText: 'blue'}}}} />
+   */
+  checkoutProps?: Pick<__internal_CheckoutProps, 'appearance'>;
 };
 
-export type __experimental_PricingTableProps = __experimental_PricingTableBaseProps &
-  (__experimental_PricingTableDefaultProps | __experimental_PricingTableMatrixProps);
+type PortalRoot = HTMLElement | null | undefined;
 
-export type __experimental_CheckoutProps = {
+export type PricingTableProps = PricingTableBaseProps & PricingTableDefaultProps;
+
+export type APIKeysProps = {
+  /**
+   * The type of API key to filter by.
+   * Currently, only 'api_key' is supported.
+   * @default 'api_key'
+   */
+  type?: 'api_key';
+  /**
+   * The number of API keys to show per page.
+   * @default 5
+   */
+  perPage?: number;
+  /**
+   * Customisation options to fully match the Clerk components to your own brand.
+   * These options serve as overrides and will be merged with the global `appearance`
+   * prop of ClerkProvider (if one is provided)
+   */
+  appearance?: APIKeysTheme;
+  /**
+   * Whether to show the description field in the API key creation form.
+   * @default false
+   */
+  showDescription?: boolean;
+};
+
+export type GetAPIKeysParams = {
+  subject?: string;
+};
+
+export type CreateAPIKeyParams = {
+  type?: 'api_key';
+  name: string;
+  subject?: string;
+  secondsUntilExpiration?: number;
+  description?: string;
+};
+
+export type RevokeAPIKeyParams = {
+  apiKeyID: string;
+  revocationReason?: string;
+};
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+ * @see https://clerk.com/docs/billing/overview
+ *
+ * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+ * @example
+ * ```tsx
+ * <ClerkProvider clerkJsVersion="x.x.x" />
+ * ```
+ */
+export type __internal_CheckoutProps = {
   appearance?: CheckoutTheme;
   planId?: string;
-  planPeriod?: __experimental_CommerceSubscriptionPlanPeriod;
-  subscriberType?: __experimental_CommerceSubscriberType;
+  planPeriod?: CommerceSubscriptionPlanPeriod;
+  subscriberType?: CommercePayerType;
   onSubscriptionComplete?: () => void;
   portalId?: string;
+  portalRoot?: PortalRoot;
+  /**
+   * Full URL or path to navigate to after checkout is complete and the user clicks the "Continue" button.
+   * @default undefined
+   */
+  newSubscriptionRedirectUrl?: string;
+  onClose?: () => void;
 };
 
-export type __experimental_SubscriptionDetailsProps = {
-  appearance?: SubscriptionDetailTheme;
-  subscription?: __experimental_CommerceSubscriptionResource;
-  subscriberType?: __experimental_CommerceSubscriberType;
-  setPlanPeriod?: (p: __experimental_CommerceSubscriptionPlanPeriod) => void;
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+ * @see https://clerk.com/docs/billing/overview
+ *
+ * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+ * @example
+ * ```tsx
+ * <ClerkProvider clerkJsVersion="x.x.x" />
+ * ```
+ */
+export type __internal_PlanDetailsProps = {
+  appearance?: PlanDetailTheme;
+  plan?: CommercePlanResource;
+  planId?: string;
+  initialPlanPeriod?: CommerceSubscriptionPlanPeriod;
+  portalId?: string;
+  portalRoot?: PortalRoot;
+};
+
+export type __internal_SubscriptionDetailsProps = {
+  /**
+   * The subscriber type to display the subscription details for.
+   * If `org` is provided, the subscription details will be displayed for the active organization.
+   * @default 'user'
+   */
+  for?: CommercePayerType;
+  appearance?: SubscriptionDetailsTheme;
   onSubscriptionCancel?: () => void;
   portalId?: string;
+  portalRoot?: PortalRoot;
 };
 
-export type __experimental_PaymentSourcesProps = {
-  subscriberType?: __experimental_CommerceSubscriberType;
+export type __internal_OAuthConsentProps = {
+  appearance?: OAuthConsentTheme;
+  /**
+   * Name of the OAuth application.
+   */
+  oAuthApplicationName: string;
+  /**
+   * Logo URL of the OAuth application.
+   */
+  oAuthApplicationLogoUrl?: string;
+  /**
+   * Scopes requested by the OAuth application.
+   */
+  scopes: {
+    scope: string;
+    description: string | null;
+    requires_consent: boolean;
+  }[];
+  /**
+   * Full URL or path to navigate to after the user allows access.
+   */
+  redirectUrl: string;
+  /**
+   * Called when user allows access.
+   */
+  onAllow: () => void;
+  /**
+   * Called when user denies access.
+   */
+  onDeny: () => void;
 };
 
 export interface HandleEmailLinkVerificationParams {
@@ -1619,18 +1900,22 @@ export interface HandleEmailLinkVerificationParams {
   onVerifiedOnOtherDevice?: () => void;
 }
 
-type ButtonPropsModal<T extends SignInProps | SignUpProps> = {
+type SignInButtonPropsModal = {
   mode: 'modal';
-  appearance?: T['appearance'];
+  appearance?: SignInProps['appearance'];
+};
+
+type SignUpButtonPropsModal = {
+  mode: 'modal';
+  appearance?: SignUpProps['appearance'];
+  unsafeMetadata?: SignUpUnsafeMetadata;
 };
 
 type ButtonPropsRedirect = {
   mode?: 'redirect';
 };
 
-type ButtonProps<T extends SignInProps | SignUpProps> = ButtonPropsModal<T> | ButtonPropsRedirect;
-
-export type SignInButtonProps = ButtonProps<SignInProps> &
+export type SignInButtonProps = (SignInButtonPropsModal | ButtonPropsRedirect) &
   Pick<
     SignInProps,
     | 'fallbackRedirectUrl'
@@ -1642,9 +1927,7 @@ export type SignInButtonProps = ButtonProps<SignInProps> &
     | 'oauthFlow'
   >;
 
-export type SignUpButtonProps = {
-  unsafeMetadata?: SignUpUnsafeMetadata;
-} & ButtonProps<SignUpProps> &
+export type SignUpButtonProps = (SignUpButtonPropsModal | ButtonPropsRedirect) &
   Pick<
     SignUpProps,
     | 'fallbackRedirectUrl'
@@ -1722,7 +2005,7 @@ export interface AuthenticateWithGoogleOneTapParams {
   legalAccepted?: boolean;
 }
 
-export interface NextTaskParams {
+export interface __internal_NavigateToTaskIfAvailableParams {
   /**
    * Full URL or path to navigate to after successfully resolving all tasks
    * @default undefined

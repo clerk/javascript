@@ -1,11 +1,16 @@
 import { useClerk, useReverification, useUser } from '@clerk/shared/react';
 
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { Form } from '@/ui/elements/Form';
+import { FormButtons } from '@/ui/elements/FormButtons';
+import type { FormProps } from '@/ui/elements/FormContainer';
+import { FormContainer } from '@/ui/elements/FormContainer';
+import { handleError } from '@/ui/utils/errorHandler';
+import { useFormControl } from '@/ui/utils/useFormControl';
+
 import { useSignOutContext } from '../../contexts';
 import { Col, localizationKeys, Text, useLocalizations } from '../../customizables';
-import type { FormProps } from '../../elements';
-import { Form, FormButtons, FormContainer, useCardState, withCardStateProvider } from '../../elements';
 import { useMultipleSessions } from '../../hooks/useMultipleSessions';
-import { handleError, useFormControl } from '../../utils';
 
 type DeleteUserFormProps = FormProps;
 export const DeleteUserForm = withCardStateProvider((props: DeleteUserFormProps) => {

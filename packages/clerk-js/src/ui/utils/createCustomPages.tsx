@@ -1,9 +1,16 @@
 import type { CustomPage, EnvironmentResource, LoadedClerk } from '@clerk/types';
 
-import { disabledBillingFeature, hasPaidOrgPlans, hasPaidUserPlans, isValidUrl } from '../../utils';
+import {
+  canViewOrManageAPIKeys,
+  disabledAPIKeysFeature,
+  disabledBillingFeature,
+  hasPaidOrgPlans,
+  hasPaidUserPlans,
+  isValidUrl,
+} from '../../utils';
 import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID, USER_PROFILE_NAVBAR_ROUTE_ID } from '../constants';
-import type { NavbarRoute } from '../elements';
-import { CreditCard, Organization, TickShield, User, Users } from '../icons';
+import type { NavbarRoute } from '../elements/Navbar';
+import { Code, CreditCard, Organization, TickShield, User, Users } from '../icons';
 import { localizationKeys } from '../localization';
 import { ExternalElementMounter } from './ExternalElementMounter';
 import { isDevelopmentSDK } from './runtimeEnvironment';
@@ -43,7 +50,7 @@ type GetDefaultRoutesReturnType = {
 
 type CreateCustomPagesParams = {
   customPages: CustomPage[];
-  getDefaultRoutes: ({ commerce }: { commerce: boolean }) => GetDefaultRoutesReturnType;
+  getDefaultRoutes: ({ commerce, apiKeys }: { commerce: boolean; apiKeys: boolean }) => GetDefaultRoutesReturnType;
   setFirstPathToRoot: (routes: NavbarRoute[]) => NavbarRoute[];
   excludedPathsFromDuplicateWarning: string[];
 };
@@ -93,6 +100,7 @@ const createCustomPages = (
     commerce:
       !disabledBillingFeature(clerk, environment) &&
       (organization ? hasPaidOrgPlans(clerk, environment) : hasPaidUserPlans(clerk, environment)),
+    apiKeys: !disabledAPIKeysFeature(clerk, environment) && (organization ? canViewOrManageAPIKeys(clerk) : true),
   });
 
   if (isDevelopmentSDK(clerk)) {
@@ -245,7 +253,13 @@ const assertExternalLinkAsRoot = (routes: NavbarRoute[]) => {
   }
 };
 
-const getUserProfileDefaultRoutes = ({ commerce }: { commerce: boolean }): GetDefaultRoutesReturnType => {
+const getUserProfileDefaultRoutes = ({
+  commerce,
+  apiKeys,
+}: {
+  commerce: boolean;
+  apiKeys: boolean;
+}): GetDefaultRoutesReturnType => {
   const INITIAL_ROUTES: NavbarRoute[] = [
     {
       name: localizationKeys('userProfile.navbar.account'),
@@ -268,6 +282,14 @@ const getUserProfileDefaultRoutes = ({ commerce }: { commerce: boolean }): GetDe
       path: 'billing',
     });
   }
+  if (apiKeys) {
+    INITIAL_ROUTES.push({
+      name: localizationKeys('userProfile.navbar.apiKeys'),
+      id: USER_PROFILE_NAVBAR_ROUTE_ID.API_KEYS,
+      icon: Code,
+      path: 'api-keys',
+    });
+  }
 
   const pageToRootNavbarRouteMap: Record<string, NavbarRoute> = {
     profile: INITIAL_ROUTES.find(r => r.id === USER_PROFILE_NAVBAR_ROUTE_ID.ACCOUNT) as NavbarRoute,
@@ -285,7 +307,13 @@ const getUserProfileDefaultRoutes = ({ commerce }: { commerce: boolean }): GetDe
   return { INITIAL_ROUTES, pageToRootNavbarRouteMap, validReorderItemLabels };
 };
 
-const getOrganizationProfileDefaultRoutes = ({ commerce }: { commerce: boolean }): GetDefaultRoutesReturnType => {
+const getOrganizationProfileDefaultRoutes = ({
+  commerce,
+  apiKeys,
+}: {
+  commerce: boolean;
+  apiKeys: boolean;
+}): GetDefaultRoutesReturnType => {
   const INITIAL_ROUTES: NavbarRoute[] = [
     {
       name: localizationKeys('organizationProfile.navbar.general'),
@@ -306,6 +334,14 @@ const getOrganizationProfileDefaultRoutes = ({ commerce }: { commerce: boolean }
       id: USER_PROFILE_NAVBAR_ROUTE_ID.BILLING,
       icon: CreditCard,
       path: 'organization-billing',
+    });
+  }
+  if (apiKeys) {
+    INITIAL_ROUTES.push({
+      name: localizationKeys('organizationProfile.navbar.apiKeys'),
+      id: ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.API_KEYS,
+      icon: Code,
+      path: 'organization-api-keys',
     });
   }
 

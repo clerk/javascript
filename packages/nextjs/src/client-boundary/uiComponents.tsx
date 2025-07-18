@@ -22,7 +22,8 @@ export {
   UserButton,
   GoogleOneTap,
   Waitlist,
-  __experimental_PricingTable,
+  PricingTable,
+  APIKeys,
 } from '@clerk/clerk-react';
 
 // The assignment of UserProfile with BaseUserProfile props is used

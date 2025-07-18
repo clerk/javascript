@@ -4,7 +4,7 @@ import React from 'react';
 
 import { Button, descriptors, Flex, useLocalizations } from '../customizables';
 import type { PropsOfComponent } from '../styledSystem';
-import { getValidChildren } from '../utils';
+import { getValidChildren } from '../utils/getValidReactChildren';
 
 type TabsContextValue = {
   selectedIndex: number;
@@ -105,7 +105,7 @@ export const TabsList = (props: TabsListProps) => {
         t => ({
           borderBottomStyle: t.borderStyles.$solid,
           borderBottomWidth: t.borderWidths.$normal,
-          borderColor: t.colors.$neutralAlpha100,
+          borderColor: t.colors.$borderAlpha100,
         }),
         sx,
       ]}

@@ -4,7 +4,7 @@ import React from 'react';
 
 import { render } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
-import { OrganizationProfile } from '../OrganizationProfile';
+import { OrganizationProfile } from '../';
 
 const { createFixtures } = bindCreateFixtures('OrganizationProfile');
 

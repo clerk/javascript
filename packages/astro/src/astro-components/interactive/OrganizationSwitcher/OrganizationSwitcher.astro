@@ -1,12 +1,15 @@
 ---
-import type { OrganizationProfileProps, OrganizationSwitcherProps, Without } from '@clerk/types'
+import type { OrganizationProfileProps, OrganizationSwitcherProps, Without } from '@clerk/types';
 
 type Props = Without<OrganizationSwitcherProps, 'organizationProfileProps'> & {
-  organizationProfileProps?: Pick<OrganizationProfileProps, 'appearance'>
-}
+  organizationProfileProps?: Pick<OrganizationProfileProps, 'appearance'>;
+};
 
-import InternalUIComponentRenderer from '../InternalUIComponentRenderer.astro'
+import InternalUIComponentRenderer from '../InternalUIComponentRenderer.astro';
 ---
 
-<InternalUIComponentRenderer {...Astro.props} component="organization-switcher" />
+<InternalUIComponentRenderer
+  {...Astro.props}
+  component='organization-switcher'
+/>
 <slot />

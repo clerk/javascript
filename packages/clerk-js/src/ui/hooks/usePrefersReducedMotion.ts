@@ -2,8 +2,14 @@ import { useEffect, useState } from 'react';
 
 const mediaQueryNoPreference = '(prefers-reduced-motion: no-preference)';
 
+// Get the correct initial value instead of defaulting to true
+const getInitialValue = () => {
+  if (typeof window === 'undefined') return true; // SSR fallback
+  return !window.matchMedia(mediaQueryNoPreference).matches;
+};
+
 export function usePrefersReducedMotion() {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(true);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(getInitialValue);
 
   useEffect(() => {
     const mediaQueryList = window.matchMedia(mediaQueryNoPreference);

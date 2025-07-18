@@ -1,9 +1,13 @@
 import { useClerk, useSession } from '@clerk/shared/react';
 import React from 'react';
 
+import { Card } from '@/ui/elements/Card';
+import { useCardState } from '@/ui/elements/contexts';
+import { Form } from '@/ui/elements/Form';
+import { Header } from '@/ui/elements/Header';
+import { handleError } from '@/ui/utils/errorHandler';
+
 import { Button, Col, descriptors, localizationKeys } from '../../customizables';
-import { Card, Form, Header, useCardState } from '../../elements';
-import { handleError } from '../../utils';
 import { useAfterVerification } from './use-after-verification';
 
 type UVFactorOnePasskeysCard = {

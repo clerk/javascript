@@ -17,10 +17,10 @@ export const signInHelper = async ({ signInParams, windowObject }: SignInHelperP
       });
     } else {
       // Assert that the identifier is a test email or phone number
-      if (signInParams.strategy === 'phone_code' && !signInParams.identifier.includes('+155555501')) {
+      if (signInParams.strategy === 'phone_code' && !/^\+1\d{3}55501\d{2}$/.test(signInParams.identifier)) {
         throw new Error(
           `Phone number should be a test phone number.\n
-       Example: +15555550100.\n
+       Example: +1XXX55501XX.\n
        Learn more here: https://clerk.com/docs/testing/test-emails-and-phones#phone-numbers`,
         );
       }

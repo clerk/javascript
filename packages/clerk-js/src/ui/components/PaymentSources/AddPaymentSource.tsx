@@ -1,240 +1,251 @@
-import { useClerk, useOrganization } from '@clerk/shared/react';
-import type {
-  __experimental_CommerceCheckoutResource,
-  __experimental_CommercePaymentSourceResource,
-  ClerkAPIError,
-  ClerkRuntimeError,
-} from '@clerk/types';
-import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
-import type { Appearance as StripeAppearance, Stripe } from '@stripe/stripe-js';
-import { loadStripe } from '@stripe/stripe-js';
-import { useEffect, useRef, useState } from 'react';
+import type { __experimental_useCheckout as useCheckout } from '@clerk/shared/react';
+import {
+  __experimental_PaymentElement as PaymentElement,
+  __experimental_PaymentElementProvider as PaymentElementProvider,
+  __experimental_usePaymentElement as usePaymentElement,
+  createContextAndHook,
+} from '@clerk/shared/react';
+import type { PropsWithChildren } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
-import { clerkUnsupportedEnvironmentWarning } from '../../../core/errors';
-import { useEnvironment, usePaymentSourcesContext } from '../../contexts';
-import { descriptors, Flex, localizationKeys, Spinner, useAppearance } from '../../customizables';
-import { Alert, Form, FormButtons, FormContainer, withCardStateProvider } from '../../elements';
-import { useFetch } from '../../hooks/useFetch';
+import { Card } from '@/ui/elements/Card';
+import { useCardState } from '@/ui/elements/contexts';
+import { Form } from '@/ui/elements/Form';
+import { FormButtons } from '@/ui/elements/FormButtons';
+import { FormContainer } from '@/ui/elements/FormContainer';
+import { resolveComputedCSSColor, resolveComputedCSSProperty } from '@/ui/utils/cssVariables';
+import { handleError } from '@/ui/utils/errorHandler';
+
+import { useSubscriberTypeContext, useSubscriberTypeLocalizationRoot } from '../../contexts';
+import { descriptors, Flex, localizationKeys, Spinner, useAppearance, useLocalizations } from '../../customizables';
 import type { LocalizationKey } from '../../localization';
-import { animations } from '../../styledSystem';
-import { handleError, normalizeColorString } from '../../utils';
+
+const useStripeAppearance = (node: HTMLElement | null) => {
+  const theme = useAppearance().parsedInternalTheme;
+
+  return useMemo(() => {
+    if (!node) {
+      return undefined;
+    }
+    const { colors, fontWeights, fontSizes, radii, space } = theme;
+    return {
+      colorPrimary: resolveComputedCSSColor(node, colors.$primary500, colors.$colorBackground),
+      colorBackground: resolveComputedCSSColor(node, colors.$colorInput, colors.$colorBackground),
+      colorText: resolveComputedCSSColor(node, colors.$colorForeground, colors.$colorBackground),
+      colorTextSecondary: resolveComputedCSSColor(node, colors.$colorMutedForeground, colors.$colorBackground),
+      colorSuccess: resolveComputedCSSColor(node, colors.$success500, colors.$colorBackground),
+      colorDanger: resolveComputedCSSColor(node, colors.$danger500, colors.$colorBackground),
+      colorWarning: resolveComputedCSSColor(node, colors.$warning500, colors.$colorBackground),
+      fontWeightNormal: resolveComputedCSSProperty(node, 'font-weight', fontWeights.$normal.toString()),
+      fontWeightMedium: resolveComputedCSSProperty(node, 'font-weight', fontWeights.$medium.toString()),
+      fontWeightBold: resolveComputedCSSProperty(node, 'font-weight', fontWeights.$bold.toString()),
+      fontSizeXl: resolveComputedCSSProperty(node, 'font-size', fontSizes.$xl),
+      fontSizeLg: resolveComputedCSSProperty(node, 'font-size', fontSizes.$lg),
+      fontSizeSm: resolveComputedCSSProperty(node, 'font-size', fontSizes.$md),
+      fontSizeXs: resolveComputedCSSProperty(node, 'font-size', fontSizes.$sm),
+      borderRadius: resolveComputedCSSProperty(node, 'border-radius', radii.$lg),
+      spacingUnit: resolveComputedCSSProperty(node, 'padding', space.$1),
+    };
+  }, [theme, node]);
+};
 
 type AddPaymentSourceProps = {
-  onSuccess: (paymentSource: __experimental_CommercePaymentSourceResource) => Promise<void>;
-  checkout?: __experimental_CommerceCheckoutResource;
-  submitLabel?: LocalizationKey;
+  onSuccess: (context: { gateway: 'stripe'; paymentToken: string }) => Promise<void>;
+  checkout?: ReturnType<typeof useCheckout>['checkout'];
   cancelAction?: () => void;
 };
 
-export const AddPaymentSource = (props: AddPaymentSourceProps) => {
-  const { checkout, submitLabel, onSuccess, cancelAction } = props;
-  const { __experimental_commerce } = useClerk();
-  const { __experimental_commerceSettings } = useEnvironment();
-  const { organization } = useOrganization();
-  const { subscriberType } = usePaymentSourcesContext();
-
-  const stripePromiseRef = useRef<Promise<Stripe | null> | null>(null);
-  const [stripe, setStripe] = useState<Stripe | null>(null);
-
-  const { colors, fontWeights, fontSizes, radii, space } = useAppearance().parsedInternalTheme;
-  const elementsAppearance: StripeAppearance = {
-    variables: {
-      colorPrimary: normalizeColorString(colors.$primary500),
-      colorBackground: normalizeColorString(colors.$colorInputBackground),
-      colorText: normalizeColorString(colors.$colorText),
-      colorTextSecondary: normalizeColorString(colors.$colorTextSecondary),
-      colorSuccess: normalizeColorString(colors.$success500),
-      colorDanger: normalizeColorString(colors.$danger500),
-      colorWarning: normalizeColorString(colors.$warning500),
-      fontWeightNormal: fontWeights.$normal.toString(),
-      fontWeightMedium: fontWeights.$medium.toString(),
-      fontWeightBold: fontWeights.$bold.toString(),
-      fontSizeXl: fontSizes.$xl,
-      fontSizeLg: fontSizes.$lg,
-      fontSizeSm: fontSizes.$md,
-      fontSizeXs: fontSizes.$sm,
-      borderRadius: radii.$md,
-      spacingUnit: space.$1,
-    },
-  };
-
-  // if we have a checkout, we can use the checkout's client secret and gateway id
-  // otherwise, we need to initialize a new payment source
-  const { data: initializedPaymentSource, invalidate } = useFetch(
-    !checkout ? __experimental_commerce.initializePaymentSource : undefined,
-    {
-      gateway: 'stripe',
-      ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
-    },
-    undefined,
-    'commerce-payment-source-initialize',
-  );
-
-  const externalGatewayId = checkout?.externalGatewayId ?? initializedPaymentSource?.externalGatewayId;
-  const externalClientSecret = checkout?.externalClientSecret ?? initializedPaymentSource?.externalClientSecret;
-
-  const stripePublishableKey = __experimental_commerceSettings.billing.stripePublishableKey;
-
-  useEffect(() => {
-    if (!stripePromiseRef.current && externalGatewayId && stripePublishableKey) {
-      if (__BUILD_DISABLE_RHC__) {
-        clerkUnsupportedEnvironmentWarning('Stripe');
-        return;
-      }
-
-      stripePromiseRef.current = loadStripe(stripePublishableKey, {
-        stripeAccount: externalGatewayId,
-      });
-
-      void stripePromiseRef.current.then(stripeInstance => {
-        setStripe(stripeInstance);
-      });
-    }
-  }, [externalGatewayId, __experimental_commerceSettings]);
-
-  // invalidate the initialized payment source when the component unmounts
-  useEffect(() => {
-    return invalidate;
-  }, [invalidate]);
-
-  if (!stripe || !externalClientSecret) {
-    return (
-      <Flex
-        direction={'row'}
-        align={'center'}
-        justify={'center'}
-        sx={t => ({
-          width: '100%',
-          minHeight: t.sizes.$60,
-        })}
-      >
-        <Spinner
-          size={'lg'}
-          colorScheme={'primary'}
-          elementDescriptor={descriptors.spinner}
-        />
-      </Flex>
-    );
+const [AddPaymentSourceContext, useAddPaymentSourceContext] = createContextAndHook<
+  AddPaymentSourceProps & {
+    headerTitle: LocalizationKey | undefined;
+    headerSubtitle: LocalizationKey | undefined;
+    submitLabel: LocalizationKey | undefined;
+    setHeaderTitle: (title: LocalizationKey) => void;
+    setHeaderSubtitle: (subtitle: LocalizationKey) => void;
+    setSubmitLabel: (label: LocalizationKey) => void;
+    onSuccess: (context: { gateway: 'stripe'; paymentToken: string }) => Promise<void>;
   }
+>('AddPaymentSourceRoot');
+
+const AddPaymentSourceRoot = ({ children, checkout, ...rest }: PropsWithChildren<AddPaymentSourceProps>) => {
+  const subscriberType = useSubscriberTypeContext();
+  const stripeAppearanceNode = useRef<HTMLDivElement | null>(null);
+  const { t } = useLocalizations();
+  const [headerTitle, setHeaderTitle] = useState<LocalizationKey | undefined>(undefined);
+  const [headerSubtitle, setHeaderSubtitle] = useState<LocalizationKey | undefined>(undefined);
+  const [submitLabel, setSubmitLabel] = useState<LocalizationKey | undefined>(undefined);
+  const stripeAppearance = useStripeAppearance(stripeAppearanceNode.current);
 
   return (
-    <Elements
-      stripe={stripe}
-      options={{ clientSecret: externalClientSecret, appearance: elementsAppearance }}
+    <AddPaymentSourceContext.Provider
+      value={{
+        value: {
+          headerTitle,
+          headerSubtitle,
+          submitLabel,
+          setHeaderTitle,
+          setHeaderSubtitle,
+          setSubmitLabel,
+          checkout,
+          ...rest,
+        },
+      }}
     >
-      <AddPaymentSourceForm
-        submitLabel={submitLabel}
-        onSuccess={onSuccess}
-        cancelAction={cancelAction}
-        checkout={checkout}
+      <div
+        ref={stripeAppearanceNode}
+        style={{ display: 'none' }}
       />
-    </Elements>
+      <PaymentElementProvider
+        checkout={checkout}
+        for={subscriberType}
+        stripeAppearance={stripeAppearance}
+        paymentDescription={t(
+          localizationKeys(
+            checkout?.planPeriod === 'month'
+              ? 'commerce.paymentSource.applePayDescription.monthly'
+              : 'commerce.paymentSource.applePayDescription.annual',
+          ),
+        )}
+      >
+        {children}
+      </PaymentElementProvider>
+    </AddPaymentSourceContext.Provider>
   );
 };
 
-const AddPaymentSourceForm = withCardStateProvider(
-  ({ submitLabel, onSuccess, cancelAction, checkout }: AddPaymentSourceProps) => {
-    const { __experimental_commerce } = useClerk();
-    const stripe = useStripe();
-    const elements = useElements();
-    const { displayConfig } = useEnvironment();
-    const { organization } = useOrganization();
-    const { subscriberType } = usePaymentSourcesContext();
-    const [submitError, setSubmitError] = useState<ClerkRuntimeError | ClerkAPIError | string | undefined>();
+const AddPaymentSourceLoading = (props: PropsWithChildren) => {
+  const { isProviderReady } = usePaymentElement();
 
-    const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      if (!stripe || !elements) {
-        return;
-      }
-      setSubmitError(undefined);
+  if (!isProviderReady) {
+    return props.children;
+  }
 
-      try {
-        const { setupIntent, error } = await stripe.confirmSetup({
-          elements,
-          confirmParams: {
-            return_url: '', // TODO(@COMMERCE): need to figure this out
-          },
-          redirect: 'if_required',
-        });
-        if (error) {
-          return; // just return, since stripe will handle the error
-        }
+  return null;
+};
 
-        const paymentSource = await __experimental_commerce.addPaymentSource({
-          gateway: 'stripe',
-          paymentToken: setupIntent.payment_method as string,
-          ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
-        });
+const AddPaymentSourceReady = (props: PropsWithChildren) => {
+  const { isProviderReady } = usePaymentElement();
 
-        void onSuccess(paymentSource);
-      } catch (error) {
-        void handleError(error, [], setSubmitError);
-      }
-    };
+  if (!isProviderReady) {
+    return null;
+  }
 
-    return (
-      <FormContainer
-        headerTitle={
-          checkout ? localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.add') : undefined
-        }
-        headerSubtitle={
-          !checkout
-            ? localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.addSubtitle')
-            : undefined
-        }
-      >
-        <Form.Root
-          onSubmit={onSubmit}
+  return <>{props.children}</>;
+};
+
+const Root = (props: PropsWithChildren<AddPaymentSourceProps>) => {
+  const { children, ...rest } = props;
+
+  return (
+    <AddPaymentSourceRoot {...rest}>
+      <AddPaymentSourceLoading>
+        <Flex
+          direction={'row'}
+          align={'center'}
+          justify={'center'}
           sx={t => ({
-            display: 'flex',
-            flexDirection: 'column',
-            rowGap: t.space.$3,
+            width: '100%',
+            minHeight: t.sizes.$60,
           })}
         >
-          <PaymentElement
-            options={{
-              layout: {
-                type: 'tabs',
-                defaultCollapsed: false,
-              },
-              paymentMethodOrder: ['card', 'apple_pay', 'google_pay'],
-              applePay: checkout
-                ? {
-                    recurringPaymentRequest: {
-                      paymentDescription: `${checkout.planPeriod === 'month' ? 'Monthly' : 'Annual'} payment`,
-                      managementURL: displayConfig.homeUrl, // TODO(@COMMERCE): is this the right URL?
-                      regularBilling: {
-                        amount: checkout.totals.totalDueNow?.amount || checkout.totals.grandTotal.amount,
-                        label: checkout.plan.name,
-                        recurringPaymentIntervalUnit: checkout.planPeriod === 'annual' ? 'year' : 'month',
-                      },
-                    },
-                  }
-                : undefined,
-            }}
+          <Spinner
+            size={'lg'}
+            colorScheme={'primary'}
+            elementDescriptor={descriptors.spinner}
           />
-          {submitError && (
-            <Alert
-              variant='danger'
-              sx={t => ({
-                animation: `${animations.textInBig} ${t.transitionDuration.$slow}`,
-              })}
-            >
-              {typeof submitError === 'string' ? submitError : submitError.message}
-            </Alert>
-          )}
-          <FormButtons
-            submitLabel={
-              submitLabel ??
-              localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.formButtonPrimary__add')
-            }
-            onReset={cancelAction}
-            hideReset={!cancelAction}
-            sx={{ flex: checkout ? 1 : undefined }}
-          />
-        </Form.Root>
-      </FormContainer>
-    );
-  },
-);
+        </Flex>
+      </AddPaymentSourceLoading>
+
+      <AddPaymentSourceReady>
+        <AddPaymentSourceForm>{children}</AddPaymentSourceForm>
+      </AddPaymentSourceReady>
+    </AddPaymentSourceRoot>
+  );
+};
+
+const useSetAndSync = (text: LocalizationKey, setter: (a: any) => void) => {
+  useRef(() => {
+    setter(text);
+  });
+
+  useEffect(() => {
+    setter(text);
+  }, [text, setter]);
+};
+
+const FormHeader = ({ text }: { text: LocalizationKey }) => {
+  const { setHeaderTitle } = useAddPaymentSourceContext();
+  useSetAndSync(text, setHeaderTitle);
+  return null;
+};
+
+const FormSubtitle = ({ text }: { text: LocalizationKey }) => {
+  const { setHeaderSubtitle } = useAddPaymentSourceContext();
+  useSetAndSync(text, setHeaderSubtitle);
+  return null;
+};
+
+const FormButton = ({ text }: { text: LocalizationKey }) => {
+  const { setSubmitLabel } = useAddPaymentSourceContext();
+  useSetAndSync(text, setSubmitLabel);
+  return null;
+};
+
+const AddPaymentSourceForm = ({ children }: PropsWithChildren) => {
+  const { headerTitle, headerSubtitle, submitLabel, checkout, onSuccess, cancelAction } = useAddPaymentSourceContext();
+  const card = useCardState();
+  const localizationRoot = useSubscriberTypeLocalizationRoot();
+
+  const { isFormReady, submit: submitPaymentElement, reset } = usePaymentElement();
+
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    card.setLoading();
+    card.setError(undefined);
+
+    const { data, error } = await submitPaymentElement();
+    if (error) {
+      return; // just return, since stripe will handle the error
+    }
+    try {
+      await onSuccess(data);
+    } catch (error) {
+      void handleError(error, [], card.setError);
+    } finally {
+      card.setIdle();
+      void reset(); // resets the payment intent
+    }
+  };
+
+  return (
+    <FormContainer
+      headerTitle={headerTitle}
+      headerSubtitle={headerSubtitle}
+    >
+      <Form.Root
+        onSubmit={onSubmit}
+        sx={t => ({
+          display: 'flex',
+          flexDirection: 'column',
+          rowGap: t.space.$3,
+        })}
+      >
+        {children}
+        <PaymentElement />
+        <Card.Alert>{card.error}</Card.Alert>
+        <FormButtons
+          isDisabled={!isFormReady}
+          submitLabel={
+            submitLabel ??
+            localizationKeys(`${localizationRoot}.billingPage.paymentSourcesSection.formButtonPrimary__add`)
+          }
+          onReset={cancelAction}
+          hideReset={!cancelAction}
+          sx={{ flex: checkout ? 1 : undefined }}
+        />
+      </Form.Root>
+    </FormContainer>
+  );
+};
+
+export { Root, FormHeader, FormSubtitle, FormButton };

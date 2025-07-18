@@ -1,22 +1,26 @@
 export function Conditionals({
   hasImpersonationRead,
   hasMagicLinksCreate,
+  hasMagicLinksCreateUnscoped,
   hasMagicLinksRead,
   hasImpersonationManage,
   hasAdminRole,
   hasManagerRole,
   hasImpersonationReaderRole,
+  hasImpersonationReaderRoleUnscoped,
   role,
   hasImpersonationFeature,
   hasMagicLinksFeature,
 }: {
   hasImpersonationRead: boolean;
   hasMagicLinksCreate: boolean;
+  hasMagicLinksCreateUnscoped: boolean;
   hasMagicLinksRead: boolean;
   hasImpersonationManage: boolean;
   hasAdminRole: boolean;
   hasManagerRole: boolean;
   hasImpersonationReaderRole: boolean;
+  hasImpersonationReaderRoleUnscoped: boolean;
   role: string | null | undefined;
   hasImpersonationFeature: boolean;
   hasMagicLinksFeature: boolean;
@@ -31,6 +35,11 @@ export function Conditionals({
       <pre>
         {`has({ permission: "org:magic_links:create" }) -> `}
         {hasMagicLinksCreate ? 'true' : 'false'}
+      </pre>
+
+      <pre>
+        {`has({ permission: "magic_links:create" }) -> `}
+        {hasMagicLinksCreateUnscoped ? 'true' : 'false'}
       </pre>
 
       <pre>
@@ -56,6 +65,11 @@ export function Conditionals({
       <pre>
         {`has({ role: "org:impersonation_reader" }) -> `}
         {hasImpersonationReaderRole ? 'true' : 'false'}
+      </pre>
+
+      <pre>
+        {`has({ role: "impersonation_reader" }) -> `}
+        {hasImpersonationReaderRoleUnscoped ? 'true' : 'false'}
       </pre>
 
       <pre>

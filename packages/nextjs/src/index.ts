@@ -34,7 +34,8 @@ export {
   UserProfile,
   GoogleOneTap,
   Waitlist,
-  __experimental_PricingTable,
+  PricingTable,
+  APIKeys,
 } from './client-boundary/uiComponents';
 
 /**
@@ -53,6 +54,11 @@ export {
   useSignUp,
   useUser,
   useReverification,
+  __experimental_usePaymentElement,
+  __experimental_PaymentElementProvider,
+  __experimental_PaymentElement,
+  __experimental_useCheckout,
+  __experimental_CheckoutProvider,
 } from './client-boundary/hooks';
 
 /**

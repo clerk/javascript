@@ -1,7 +1,8 @@
 import { useUser } from '@clerk/shared/react';
 
+import { ProfileSection } from '@/ui/elements/Section';
+
 import { localizationKeys, Text } from '../../customizables';
-import { ProfileSection } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { mqu } from '../../styledSystem';
@@ -41,7 +42,7 @@ export const UsernameSection = () => {
             {user.username && (
               <Text
                 truncate
-                sx={t => ({ color: t.colors.$colorText })}
+                sx={t => ({ color: t.colors.$colorForeground })}
               >
                 {user.username}
               </Text>

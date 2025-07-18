@@ -1,3 +1,5 @@
+import type { PhoneCodeChannel } from 'phoneCodeChannel';
+
 import type { IdentificationLinkResource } from './identificationLink';
 import type { ClerkResource } from './resource';
 import type { PhoneNumberJSONSnapshot } from './snapshots';
@@ -8,6 +10,7 @@ export type PhoneNumberVerificationStrategy = PhoneCodeStrategy;
 
 export type PreparePhoneNumberVerificationParams = {
   strategy: PhoneNumberVerificationStrategy;
+  channel?: PhoneCodeChannel;
 };
 
 export type AttemptPhoneNumberVerificationParams = {

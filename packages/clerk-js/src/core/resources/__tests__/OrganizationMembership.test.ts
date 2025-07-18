@@ -2,7 +2,7 @@ import { OrganizationMembership } from '../internal';
 
 describe('OrganizationMembership', () => {
   it('has the same initial properties', () => {
-    const organizationMemberShip = new OrganizationMembership({
+    const organizationMembership = new OrganizationMembership({
       object: 'organization_membership',
       id: 'test_id',
       created_at: 12345,
@@ -40,6 +40,35 @@ describe('OrganizationMembership', () => {
       },
     });
 
-    expect(organizationMemberShip).toMatchSnapshot();
+    expect(organizationMembership).toMatchObject({
+      id: 'test_id',
+      role: 'admin',
+      roleName: undefined,
+      createdAt: expect.any(Date),
+      updatedAt: expect.any(Date),
+      permissions: [],
+      publicMetadata: {
+        foo: 'bar',
+      },
+      organization: expect.objectContaining({
+        id: 'test_org_id',
+        name: 'test_name',
+        slug: 'test_slug',
+        hasImage: true,
+        membersCount: 1,
+        pendingInvitationsCount: 10,
+        maxAllowedMemberships: 3,
+        adminDeleteEnabled: true,
+        publicMetadata: {
+          public: 'metadata',
+        },
+      }),
+      publicUserData: expect.objectContaining({
+        firstName: 'test_first_name',
+        lastName: 'test_last_name',
+        hasImage: true,
+        identifier: 'test@identifier.gr',
+      }),
+    });
   });
 });
