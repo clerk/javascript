@@ -59,6 +59,8 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
+    "format": "prettier --write .",
+    "format:check": "prettier --cache --check .",
     "lint": "eslint src",
     "lint:attw": "attw --pack . --profile esm-only",
     "lint:publint": "publint",

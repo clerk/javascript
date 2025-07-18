@@ -71,6 +71,8 @@
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "dev:publish": "pnpm dev -- --env.publish",
+    "format": "prettier --write .",
+    "format:check": "prettier --cache --check .",
     "lint": "eslint src",
     "publish:local": "pnpm yalc push --replace  --sig",
     "test": "vitest run",

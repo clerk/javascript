@@ -19,6 +19,8 @@
     "clerk-dev": "bin/cli.js"
   },
   "scripts": {
+    "format": "prettier --write .",
+    "format:check": "prettier --cache --check .",
     "lint": "eslint src"
   },
   "dependencies": {

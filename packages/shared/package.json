@@ -131,6 +131,8 @@
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "dev:publish": "pnpm dev -- --env.publish",
+    "format": "prettier --write .",
+    "format:check": "prettier --cache --check .",
     "postinstall": "node ./scripts/postinstall.mjs",
     "lint": "eslint src",
     "lint:attw": "attw --pack . --profile node16",
