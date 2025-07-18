@@ -116,7 +116,12 @@ export const Protect = ({ children, fallback, treatPendingAsSignedOut, ...restAu
     return unauthorized;
   }
 
-  if (restAuthorizedParams.role || restAuthorizedParams.permission) {
+  if (
+    restAuthorizedParams.role ||
+    restAuthorizedParams.permission ||
+    restAuthorizedParams.feature ||
+    restAuthorizedParams.plan
+  ) {
     if (has?.(restAuthorizedParams)) {
       return authorized;
     }

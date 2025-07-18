@@ -1,10 +1,13 @@
 import { useOrganizationList, useUser } from '@clerk/shared/react';
-import { useContext, useState } from 'react';
+import { useState } from 'react';
+
+import { Action, Actions } from '@/ui/elements/Actions';
+import { Card } from '@/ui/elements/Card';
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { Header } from '@/ui/elements/Header';
 
 import { useEnvironment, useOrganizationListContext } from '../../contexts';
-import { SessionTasksContext } from '../../contexts/components/SessionTasks';
 import { Box, Col, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
-import { Action, Actions, Card, Header, useCardState, withCardStateProvider } from '../../elements';
 import { useInView } from '../../hooks';
 import { Add } from '../../icons';
 import { CreateOrganizationForm } from '../CreateOrganization/CreateOrganizationForm';
@@ -61,7 +64,7 @@ const CreateOrganizationButton = ({
       sx={t => ({
         borderTopWidth: t.borderWidths.$normal,
         borderTopStyle: t.borderStyles.$solid,
-        borderTopColor: t.colors.$neutralAlpha100,
+        borderTopColor: t.colors.$borderAlpha100,
         padding: `${t.space.$5} ${t.space.$5}`,
       })}
       iconSx={t => ({
@@ -112,7 +115,6 @@ export const OrganizationListPage = withCardStateProvider(() => {
 const OrganizationListFlows = ({ showListInitially }: { showListInitially: boolean }) => {
   const { navigateAfterCreateOrganization, skipInvitationScreen, hideSlug } = useOrganizationListContext();
   const [isCreateOrganizationFlow, setCreateOrganizationFlow] = useState(!showListInitially);
-  const sessionTasksContext = useContext(SessionTasksContext);
   return (
     <>
       {!isCreateOrganizationFlow && (
@@ -127,7 +129,6 @@ const OrganizationListFlows = ({ showListInitially }: { showListInitially: boole
         >
           <CreateOrganizationForm
             flow='organizationList'
-            onComplete={sessionTasksContext?.nextTask}
             startPage={{ headerTitle: localizationKeys('organizationList.createOrganization') }}
             skipInvitationScreen={skipInvitationScreen}
             navigateAfterCreateOrganization={org =>
@@ -144,7 +145,7 @@ const OrganizationListFlows = ({ showListInitially }: { showListInitially: boole
   );
 };
 
-const OrganizationListPageList = (props: { onCreateOrganizationClick: () => void }) => {
+export const OrganizationListPageList = (props: { onCreateOrganizationClick: () => void }) => {
   const environment = useEnvironment();
 
   const { ref, userMemberships, userSuggestions, userInvitations } = useOrganizationListInView();

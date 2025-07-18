@@ -1,5 +1,6 @@
+import { ProfileSection } from '@/ui/elements/Section';
+
 import { localizationKeys } from '../../customizables';
-import { ProfileSection } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { mqu } from '../../styledSystem';

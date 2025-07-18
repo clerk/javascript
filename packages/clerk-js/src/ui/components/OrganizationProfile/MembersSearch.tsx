@@ -2,8 +2,10 @@ import type { useOrganization } from '@clerk/shared/react';
 import type { GetMembersParams } from '@clerk/types';
 import { useEffect, useRef } from 'react';
 
+import { Animated } from '@/ui/elements/Animated';
+import { InputWithIcon } from '@/ui/elements/InputWithIcon';
+
 import { descriptors, Flex, Icon, localizationKeys, useLocalizations } from '../../../ui/customizables';
-import { Animated, InputWithIcon } from '../../../ui/elements';
 import { MagnifyingGlass } from '../../../ui/icons';
 import { Spinner } from '../../../ui/primitives';
 import { mqu } from '../../../ui/styledSystem';

@@ -1,12 +1,5 @@
 import { deprecated } from '@clerk/shared/deprecated';
-import type {
-  Autocomplete,
-  CheckAuthorizationWithCustomPermissions,
-  HandleOAuthCallbackParams,
-  OrganizationCustomPermissionKey,
-  OrganizationCustomRoleKey,
-  PendingSessionOptions,
-} from '@clerk/types';
+import type { HandleOAuthCallbackParams, PendingSessionOptions, ProtectProps as _ProtectProps } from '@clerk/types';
 import React from 'react';
 
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
@@ -50,57 +43,34 @@ export const ClerkLoading = ({ children }: React.PropsWithChildren<unknown>) => 
   useAssertWrappedByClerkProvider('ClerkLoading');
 
   const isomorphicClerk = useIsomorphicClerkContext();
-  if (isomorphicClerk.loaded) {
+  if (isomorphicClerk.status !== 'loading') {
+    return null;
+  }
+  return children;
+};
+
+export const ClerkFailed = ({ children }: React.PropsWithChildren<unknown>) => {
+  useAssertWrappedByClerkProvider('ClerkFailed');
+
+  const isomorphicClerk = useIsomorphicClerkContext();
+  if (isomorphicClerk.status !== 'error') {
+    return null;
+  }
+  return children;
+};
+
+export const ClerkDegraded = ({ children }: React.PropsWithChildren<unknown>) => {
+  useAssertWrappedByClerkProvider('ClerkDegraded');
+
+  const isomorphicClerk = useIsomorphicClerkContext();
+  if (isomorphicClerk.status !== 'degraded') {
     return null;
   }
   return children;
 };
 
 export type ProtectProps = React.PropsWithChildren<
-  (
-    | {
-        condition?: never;
-        role: OrganizationCustomRoleKey;
-        permission?: never;
-        feature?: never;
-        plan?: never;
-      }
-    | {
-        condition?: never;
-        role?: never;
-        feature?: never;
-        plan?: never;
-        permission: OrganizationCustomPermissionKey;
-      }
-    | {
-        condition: (has: CheckAuthorizationWithCustomPermissions) => boolean;
-        role?: never;
-        permission?: never;
-        feature?: never;
-        plan?: never;
-      }
-    | {
-        condition?: never;
-        role?: never;
-        permission?: never;
-        feature: Autocomplete<`user:${string}` | `org:${string}`>;
-        plan?: never;
-      }
-    | {
-        condition?: never;
-        role?: never;
-        permission?: never;
-        feature?: never;
-        plan: Autocomplete<`user:${string}` | `org:${string}`>;
-      }
-    | {
-        condition?: never;
-        role?: never;
-        permission?: never;
-        feature?: never;
-        plan?: never;
-      }
-  ) & {
+  _ProtectProps & {
     fallback?: React.ReactNode;
   } & PendingSessionOptions
 >;
@@ -198,7 +168,7 @@ export const RedirectToSignUp = withClerk(({ clerk, ...props }: WithClerkProp<Re
 
 /**
  * @function
- * @deprecated Use [`redirectToUserProfile()`](https://clerk.com/docs/references/javascript/clerk#redirect-to-user-profile) instead, will be removed in the next major version.
+ * @deprecated Use [`redirectToUserProfile()`](https://clerk.com/docs/references/javascript/clerk#redirect-to-user-profile) instead.
  */
 export const RedirectToUserProfile = withClerk(({ clerk }) => {
   React.useEffect(() => {
@@ -211,7 +181,7 @@ export const RedirectToUserProfile = withClerk(({ clerk }) => {
 
 /**
  * @function
- * @deprecated Use [`redirectToOrganizationProfile()`](https://clerk.com/docs/references/javascript/clerk#redirect-to-organization-profile) instead, will be removed in the next major version.
+ * @deprecated Use [`redirectToOrganizationProfile()`](https://clerk.com/docs/references/javascript/clerk#redirect-to-organization-profile) instead.
  */
 export const RedirectToOrganizationProfile = withClerk(({ clerk }) => {
   React.useEffect(() => {
@@ -224,7 +194,7 @@ export const RedirectToOrganizationProfile = withClerk(({ clerk }) => {
 
 /**
  * @function
- * @deprecated Use [`redirectToCreateOrganization()`](https://clerk.com/docs/references/javascript/clerk#redirect-to-create-organization) instead, will be removed in the next major version.
+ * @deprecated Use [`redirectToCreateOrganization()`](https://clerk.com/docs/references/javascript/clerk#redirect-to-create-organization) instead.
  */
 export const RedirectToCreateOrganization = withClerk(({ clerk }) => {
   React.useEffect(() => {

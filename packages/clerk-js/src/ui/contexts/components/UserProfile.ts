@@ -1,12 +1,13 @@
 import { useClerk } from '@clerk/shared/react';
 import { createContext, useContext, useMemo } from 'react';
 
-import type { NavbarRoute } from '../../elements';
+import type { NavbarRoute } from '@/ui/elements/Navbar';
+import type { CustomPageContent } from '@/ui/utils/createCustomPages';
+import { createUserProfileCustomPages } from '@/ui/utils/createCustomPages';
+
 import type { ParsedQueryString } from '../../router';
 import { useRouter } from '../../router';
 import type { UserProfileCtx } from '../../types';
-import type { CustomPageContent } from '../../utils';
-import { createUserProfileCustomPages } from '../../utils';
 import { useEnvironment } from '../EnvironmentContext';
 
 type PagesType = {

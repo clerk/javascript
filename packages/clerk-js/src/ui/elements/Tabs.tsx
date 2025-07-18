@@ -4,7 +4,7 @@ import React from 'react';
 
 import { Button, descriptors, Flex, useLocalizations } from '../customizables';
 import type { PropsOfComponent } from '../styledSystem';
-import { getValidChildren } from '../utils';
+import { getValidChildren } from '../utils/getValidReactChildren';
 
 type TabsContextValue = {
   selectedIndex: number;
@@ -23,16 +23,41 @@ const TabsContextProvider = (props: React.PropsWithChildren<{ value: TabsContext
 };
 
 type TabsProps = PropsWithChildren<{
+  /** The index of the selected tab (controlled mode) */
+  value?: number;
+  /** Callback fired when the selected tab changes (controlled mode) */
+  onChange?: (index: number) => void;
+  /** The index of the tab to be selected on initial render (uncontrolled mode) */
   defaultIndex?: number;
 }>;
 
 export const Tabs = (props: TabsProps) => {
-  const { defaultIndex = 0, children } = props;
+  const { value, onChange, defaultIndex = 0, children } = props;
   const [selectedIndex, setSelectedIndex] = React.useState(defaultIndex);
   const [focusedIndex, setFocusedIndex] = React.useState(-1);
 
+  const handleSelectedIndexChange = React.useCallback(
+    (newIndex: number) => {
+      if (onChange) {
+        onChange(newIndex);
+      } else {
+        setSelectedIndex(newIndex);
+      }
+    },
+    [onChange],
+  );
+
+  const currentIndex = value !== undefined ? value : selectedIndex;
+
   return (
-    <TabsContextProvider value={{ selectedIndex, setSelectedIndex, focusedIndex, setFocusedIndex }}>
+    <TabsContextProvider
+      value={{
+        selectedIndex: currentIndex,
+        setSelectedIndex: handleSelectedIndexChange,
+        focusedIndex,
+        setFocusedIndex,
+      }}
+    >
       {children}
     </TabsContextProvider>
   );
@@ -80,7 +105,7 @@ export const TabsList = (props: TabsListProps) => {
         t => ({
           borderBottomStyle: t.borderStyles.$solid,
           borderBottomWidth: t.borderWidths.$normal,
-          borderColor: t.colors.$neutralAlpha100,
+          borderColor: t.colors.$borderAlpha100,
         }),
         sx,
       ]}

@@ -23,5 +23,28 @@ export const disabledOrganizationsFeature: ComponentGuard = (_, environment) => 
 };
 
 export const disabledBillingFeature: ComponentGuard = (_, environment) => {
-  return !environment?.__experimental_commerceSettings.billing.enabled;
+  return !environment?.commerceSettings.billing.enabled;
+};
+
+export const hasPaidOrgPlans: ComponentGuard = (_, environment) => {
+  return environment?.commerceSettings.billing.hasPaidOrgPlans || false;
+};
+
+export const hasPaidUserPlans: ComponentGuard = (_, environment) => {
+  return environment?.commerceSettings.billing.hasPaidUserPlans || false;
+};
+
+export const disabledAPIKeysFeature: ComponentGuard = (_, environment) => {
+  return !environment?.apiKeysSettings?.enabled;
+};
+
+export const canViewOrManageAPIKeys: ComponentGuard = clerk => {
+  if (!clerk.session) {
+    return false;
+  }
+
+  return (
+    clerk.session.checkAuthorization({ permission: 'org:sys_api_keys:read' }) ||
+    clerk.session.checkAuthorization({ permission: 'org:sys_api_keys:manage' })
+  );
 };

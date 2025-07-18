@@ -70,7 +70,7 @@ export const CardClerkAndPagesTag = React.memo(
                   gap={1}
                   align='center'
                   justify='center'
-                  sx={t => ({ color: t.colors.$colorTextSecondary })}
+                  sx={t => ({ color: t.colors.$colorMutedForeground })}
                 >
                   <>
                     <Text variant='buttonSmall'>Secured by</Text>

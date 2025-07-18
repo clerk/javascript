@@ -2,8 +2,9 @@ import type { DeletedObjectResource } from '@clerk/types';
 import { describe, it } from '@jest/globals';
 import { waitFor } from '@testing-library/react';
 
+import { CardStateProvider } from '@/ui/elements/contexts';
+
 import { render } from '../../../../testUtils';
-import { CardStateProvider } from '../../../elements';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { LeaveOrganizationForm } from '../ActionConfirmationPage';
 

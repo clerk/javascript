@@ -1,20 +1,20 @@
-import type { __experimental_CommerceFeatureJSON, __experimental_CommerceFeatureResource } from '@clerk/types';
+import type { CommerceFeatureJSON, CommerceFeatureJSONSnapshot, CommerceFeatureResource } from '@clerk/types';
 
 import { BaseResource } from './internal';
 
-export class __experimental_CommerceFeature extends BaseResource implements __experimental_CommerceFeatureResource {
+export class CommerceFeature extends BaseResource implements CommerceFeatureResource {
   id!: string;
   name!: string;
   description!: string;
   slug!: string;
   avatarUrl!: string;
 
-  constructor(data: __experimental_CommerceFeatureJSON) {
+  constructor(data: CommerceFeatureJSON) {
     super();
     this.fromJSON(data);
   }
 
-  protected fromJSON(data: __experimental_CommerceFeatureJSON | null): this {
+  protected fromJSON(data: CommerceFeatureJSON | null): this {
     if (!data) {
       return this;
     }
@@ -26,5 +26,16 @@ export class __experimental_CommerceFeature extends BaseResource implements __ex
     this.avatarUrl = data.avatar_url;
 
     return this;
+  }
+
+  public __internal_toSnapshot(): CommerceFeatureJSONSnapshot {
+    return {
+      object: 'commerce_feature',
+      id: this.id,
+      name: this.name,
+      description: this.description,
+      slug: this.slug,
+      avatar_url: this.avatarUrl,
+    };
   }
 }

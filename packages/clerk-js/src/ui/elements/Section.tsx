@@ -7,7 +7,9 @@ import type { ElementDescriptor, ElementId } from '../customizables/elementDescr
 import { Plus } from '../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { mqu } from '../styledSystem';
-import { Animated, ArrowBlockButton, Menu, MenuItem, MenuList, MenuTrigger } from '.';
+import { Animated } from './Animated';
+import { ArrowBlockButton } from './ArrowBlockButton';
+import { Menu, MenuItem, MenuList, MenuTrigger } from './Menu';
 
 type ProfileSectionProps = Omit<PropsOfComponent<typeof Flex>, 'title'> & {
   title: LocalizationKey;
@@ -36,7 +38,7 @@ const ProfileSectionRoot = (props: ProfileSectionProps) => {
           flexDirection: 'row-reverse',
           borderTopWidth: t.borderWidths.$normal,
           borderTopStyle: t.borderStyles.$solid,
-          borderTopColor: t.colors.$neutralAlpha100,
+          borderTopColor: t.colors.$borderAlpha100,
           paddingTop: t.space.$4,
           paddingBottom: t.space.$4,
           gap: t.space.$6,

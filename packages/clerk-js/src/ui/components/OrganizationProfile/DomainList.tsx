@@ -7,9 +7,11 @@ import type {
 } from '@clerk/types';
 import React, { useMemo } from 'react';
 
+import { ProfileSection } from '@/ui/elements/Section';
+import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
+
 import { Protect, withProtect } from '../../common';
 import { Box, descriptors, Flex, localizationKeys, Spinner, Text } from '../../customizables';
-import { ProfileSection, ThreeDotsMenu } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { useInView } from '../../hooks';

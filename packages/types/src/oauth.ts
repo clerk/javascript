@@ -71,8 +71,7 @@ export type OAuthProvider =
   | CustomOauthProvider;
 
 /**
- * @deprecated This utility will be dropped in the next major release.
- * You can import it from `@clerk/shared/oauth`.
+ * @deprecated Use `import { OAUTH_PROVIDERS } from "@clerk/shared/oauth"` instead.
  *
  * @hidden
  */

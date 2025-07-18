@@ -54,23 +54,31 @@ export type { VerifyTokenOptions } from './tokens/verify';
  * JSON types
  */
 export type {
+  ActorTokenJSON,
   AccountlessApplicationJSON,
   ClerkResourceJSON,
   TokenJSON,
   AllowlistIdentifierJSON,
   BlocklistIdentifierJSON,
   ClientJSON,
+  CnameTargetJSON,
+  DomainJSON,
   EmailJSON,
   EmailAddressJSON,
   ExternalAccountJSON,
   IdentificationLinkJSON,
+  InstanceJSON,
+  InstanceRestrictionsJSON,
+  InstanceSettingsJSON,
   InvitationJSON,
   JwtTemplateJSON,
   OauthAccessTokenJSON,
+  OAuthApplicationJSON,
   OrganizationJSON,
   OrganizationDomainJSON,
   OrganizationDomainVerificationJSON,
   OrganizationInvitationJSON,
+  OrganizationSettingsJSON,
   PublicOrganizationDataJSON,
   OrganizationMembershipJSON,
   OrganizationMembershipPublicUserDataJSON,
@@ -81,6 +89,8 @@ export type {
   SignInJSON,
   SignInTokenJSON,
   SignUpJSON,
+  SignUpVerificationJSON,
+  SignUpVerificationsJSON,
   SMSMessageJSON,
   UserJSON,
   VerificationJSON,
@@ -96,24 +106,35 @@ export type {
  * Resources
  */
 export type {
+  APIKey,
+  ActorToken,
   AccountlessApplication,
   AllowlistIdentifier,
   BlocklistIdentifier,
   Client,
+  CnameTarget,
+  Domain,
   EmailAddress,
   ExternalAccount,
+  Instance,
+  InstanceRestrictions,
+  InstanceSettings,
   Invitation,
   JwtTemplate,
   OauthAccessToken,
+  OAuthApplication,
   Organization,
   OrganizationDomain,
   OrganizationDomainVerification,
   OrganizationInvitation,
   OrganizationMembership,
   OrganizationMembershipPublicUserData,
+  OrganizationSettings,
   PhoneNumber,
+  SamlConnection,
   Session,
   SignInToken,
+  SignUpAttempt,
   SMSMessage,
   Token,
   User,
@@ -142,4 +163,5 @@ export type {
 /**
  * Auth objects
  */
-export type { AuthObject } from './tokens/authObjects';
+export type { AuthObject, InvalidTokenAuthObject } from './tokens/authObjects';
+export type { SessionAuthObject, MachineAuthObject } from './tokens/types';

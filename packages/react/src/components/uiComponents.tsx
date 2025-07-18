@@ -1,10 +1,12 @@
 import { logErrorInDevMode } from '@clerk/shared/utils';
 import type {
+  APIKeysProps,
   CreateOrganizationProps,
   GoogleOneTapProps,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationSwitcherProps,
+  PricingTableProps,
   SignInProps,
   SignUpProps,
   UserButtonProps,
@@ -570,4 +572,64 @@ export const Waitlist = withClerk(
     );
   },
   { component: 'Waitlist', renderWhileLoading: true },
+);
+
+export const PricingTable = withClerk(
+  ({ clerk, component, fallback, ...props }: WithClerkProp<PricingTableProps & FallbackProp>) => {
+    const mountingStatus = useWaitForComponentMount(component);
+    const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
+
+    const rendererRootProps = {
+      ...(shouldShowFallback && fallback && { style: { display: 'none' } }),
+    };
+
+    return (
+      <>
+        {shouldShowFallback && fallback}
+        {clerk.loaded && (
+          <ClerkHostRenderer
+            component={component}
+            mount={clerk.mountPricingTable}
+            unmount={clerk.unmountPricingTable}
+            updateProps={(clerk as any).__unstable__updateProps}
+            props={props}
+            rootProps={rendererRootProps}
+          />
+        )}
+      </>
+    );
+  },
+  { component: 'PricingTable', renderWhileLoading: true },
+);
+
+/**
+ * @experimental
+ * This component is in early access and may change in future releases.
+ */
+export const APIKeys = withClerk(
+  ({ clerk, component, fallback, ...props }: WithClerkProp<APIKeysProps & FallbackProp>) => {
+    const mountingStatus = useWaitForComponentMount(component);
+    const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
+
+    const rendererRootProps = {
+      ...(shouldShowFallback && fallback && { style: { display: 'none' } }),
+    };
+
+    return (
+      <>
+        {shouldShowFallback && fallback}
+        {clerk.loaded && (
+          <ClerkHostRenderer
+            component={component}
+            mount={clerk.mountApiKeys}
+            unmount={clerk.unmountApiKeys}
+            updateProps={(clerk as any).__unstable__updateProps}
+            props={props}
+            rootProps={rendererRootProps}
+          />
+        )}
+      </>
+    );
+  },
+  { component: 'ApiKeys', renderWhileLoading: true },
 );

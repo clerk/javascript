@@ -2,6 +2,7 @@ import type { ClerkPaginationRequest } from '@clerk/types';
 
 import { joinPaths } from '../../util/path';
 import type { PaginatedResourceResponse } from '../resources/Deserializer';
+import type { InvitationStatus } from '../resources/Enums';
 import type { Invitation } from '../resources/Invitation';
 import { AbstractAPI } from './AbstractApi';
 
@@ -17,7 +18,7 @@ type CreateParams = {
 
 type GetInvitationListParams = ClerkPaginationRequest<{
   /**
-   * Filters invitations based on their status(accepted, pending, revoked).
+   * Filters invitations based on their status.
    *
    * @example
    * Get all revoked invitations
@@ -27,7 +28,7 @@ type GetInvitationListParams = ClerkPaginationRequest<{
    * await clerkClient.invitations.getInvitationList({ status: 'revoked' })
    * ```
    */
-  status?: 'accepted' | 'pending' | 'revoked';
+  status?: InvitationStatus;
   /**
    * Filters invitations based on `email_address` or `id`.
    *

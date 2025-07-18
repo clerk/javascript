@@ -21,6 +21,7 @@ const Cookies = {
   Handshake: '__clerk_handshake',
   DevBrowser: '__clerk_db_jwt',
   RedirectCount: '__clerk_redirect_count',
+  HandshakeNonce: '__clerk_handshake_nonce',
 } as const;
 
 const QueryParameters = {
@@ -33,6 +34,8 @@ const QueryParameters = {
   HandshakeHelp: '__clerk_help',
   LegacyDevBrowser: '__dev_session',
   HandshakeReason: '__clerk_hs_reason',
+  HandshakeNonce: Cookies.HandshakeNonce,
+  HandshakeFormat: 'format',
 } as const;
 
 const Headers = {
@@ -50,6 +53,7 @@ const Headers = {
   CloudFrontForwardedProto: 'cloudfront-forwarded-proto',
   ContentType: 'content-type',
   ContentSecurityPolicy: 'content-security-policy',
+  ContentSecurityPolicyReportOnly: 'content-security-policy-report-only',
   EnableDebug: 'x-clerk-debug',
   ForwardedHost: 'x-forwarded-host',
   ForwardedPort: 'x-forwarded-port',
@@ -60,7 +64,9 @@ const Headers = {
   Origin: 'origin',
   Referrer: 'referer',
   SecFetchDest: 'sec-fetch-dest',
+  SecFetchSite: 'sec-fetch-site',
   UserAgent: 'user-agent',
+  ReportingEndpoints: 'reporting-endpoints',
 } as const;
 
 const ContentTypes = {

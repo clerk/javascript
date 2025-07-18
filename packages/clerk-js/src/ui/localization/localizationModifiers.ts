@@ -19,6 +19,40 @@ const weekday = (val: Date | string | number, locale?: string, weekday?: 'long' 
   }
 };
 
+/**
+ * Returns a short date string if the current year is the same as the date's year,
+ * otherwise returns a long date string.
+ */
+const shortDate = (val: Date | string | number, locale?: string) => {
+  const date = normalizeDate(val);
+  try {
+    return new Intl.DateTimeFormat(locale || 'en-US', {
+      month: 'short',
+      day: 'numeric',
+      ...(date.getFullYear() !== new Date().getFullYear() ? { year: 'numeric' } : {}),
+    }).format(normalizeDate(val));
+  } catch (e) {
+    console.warn(e);
+    return '';
+  }
+};
+
+/**
+ * Returns a long date string with the year.
+ */
+const longDate = (val: Date | string | number, locale?: string) => {
+  try {
+    return new Intl.DateTimeFormat(locale || 'en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    }).format(normalizeDate(val));
+  } catch (e) {
+    console.warn(e);
+    return '';
+  }
+};
+
 const numeric = (val: Date | number | string, locale?: string) => {
   try {
     return new Intl.DateTimeFormat(locale || 'en-US').format(normalizeDate(val));
@@ -38,4 +72,6 @@ export const MODIFIERS = {
   weekday,
   numeric,
   link,
+  shortDate,
+  longDate,
 } as const;

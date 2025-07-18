@@ -2,9 +2,14 @@ import { useUser } from '@clerk/shared/react';
 import type { TOTPResource } from '@clerk/types';
 import React from 'react';
 
+import { useFieldOTP } from '@/ui/elements/CodeControl';
+import { withCardStateProvider } from '@/ui/elements/contexts';
+import { Form } from '@/ui/elements/Form';
+import { FormButtonContainer } from '@/ui/elements/FormButtons';
+import type { FormProps } from '@/ui/elements/FormContainer';
+import { FormContainer } from '@/ui/elements/FormContainer';
+
 import { Button, Col, descriptors, localizationKeys } from '../../customizables';
-import type { FormProps } from '../../elements';
-import { Form, FormButtonContainer, FormContainer, useFieldOTP, withCardStateProvider } from '../../elements';
 
 type VerifyTOTPProps = FormProps & {
   resourceRef: React.MutableRefObject<TOTPResource | undefined>;

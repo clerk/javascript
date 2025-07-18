@@ -2,12 +2,16 @@
  * Currently representing API DTOs in their JSON form.
  */
 
+import type { APIKeysSettingsJSON } from './apiKeysSettings';
 import type {
-  __experimental_CommercePaymentSourceStatus,
-  __experimental_CommerceSubscriptionPlanPeriod,
-  __experimental_CommerceSubscriptionStatus,
+  CommercePaymentChargeType,
+  CommercePaymentSourceStatus,
+  CommercePaymentStatus,
+  CommerceStatementStatus,
+  CommerceSubscriptionPlanPeriod,
+  CommerceSubscriptionStatus,
 } from './commerce';
-import type { __experimental_CommerceSettingsJSON } from './commerceSettings';
+import type { CommerceSettingsJSON } from './commerceSettings';
 import type { DisplayConfigJSON } from './displayConfig';
 import type { EnterpriseProtocol, EnterpriseProvider } from './enterpriseAccount';
 import type { ActClaim } from './jwtv2';
@@ -17,6 +21,7 @@ import type { OrganizationInvitationStatus } from './organizationInvitation';
 import type { OrganizationCustomRoleKey, OrganizationPermissionKey } from './organizationMembership';
 import type { OrganizationSettingsJSON } from './organizationSettings';
 import type { OrganizationSuggestionStatus } from './organizationSuggestion';
+import type { PhoneCodeChannel } from './phoneCodeChannel';
 import type { SamlIdpSlug } from './saml';
 import type { SessionStatus, SessionTask } from './session';
 import type { SessionVerificationLevel, SessionVerificationStatus } from './sessionVerification';
@@ -66,7 +71,8 @@ export interface ImageJSON {
 
 export interface EnvironmentJSON extends ClerkResourceJSON {
   auth_config: AuthConfigJSON;
-  commerce_settings: __experimental_CommerceSettingsJSON;
+  api_keys_settings: APIKeysSettingsJSON;
+  commerce_settings: CommerceSettingsJSON;
   display_config: DisplayConfigJSON;
   user_settings: UserSettingsJSON;
   organization_settings: OrganizationSettingsJSON;
@@ -260,7 +266,7 @@ export interface UserJSON extends ClerkResourceJSON {
   enterprise_accounts: EnterpriseAccountJSON[];
   passkeys: PasskeyJSON[];
   /**
-   * @deprecated use `enterprise_accounts` instead
+   * @deprecated Use `enterprise_accounts` instead.
    */
   saml_accounts: SamlAccountJSON[];
 
@@ -301,6 +307,7 @@ export interface AuthConfigJSON extends ClerkResourceJSON {
   single_session_mode: boolean;
   claimed_at: number | null;
   reverification: boolean;
+  preferred_channels?: Record<string, PhoneCodeChannel>;
 }
 
 export interface VerificationJSON extends ClerkResourceJSON {
@@ -312,6 +319,7 @@ export interface VerificationJSON extends ClerkResourceJSON {
   external_verification_redirect_url?: string;
   attempts: number;
   expire_at: number;
+  channel?: PhoneCodeChannel;
   error: ClerkAPIErrorJSON;
 }
 
@@ -325,6 +333,7 @@ export interface SignUpVerificationsJSON {
 export interface SignUpVerificationJSON extends VerificationJSON {
   next_action: string;
   supported_strategies: string[];
+  channel?: PhoneCodeChannel;
 }
 
 export interface ClerkAPIErrorJSON {
@@ -342,6 +351,14 @@ export interface ClerkAPIErrorJSON {
         message: string;
       }[];
     };
+    plan?: {
+      amount_formatted: string;
+      annual_monthly_amount_formatted: string;
+      currency_symbol: string;
+      id: string;
+      name: string;
+    };
+    is_plan_upgrade_possible?: boolean;
   };
 }
 
@@ -383,8 +400,9 @@ export interface OrganizationMembershipJSON extends ClerkResourceJSON {
   organization: OrganizationJSON;
   permissions: OrganizationPermissionKey[];
   public_metadata: OrganizationMembershipPublicMetadata;
-  public_user_data: PublicUserDataJSON;
+  public_user_data?: PublicUserDataJSON;
   role: OrganizationCustomRoleKey;
+  role_name: string;
   created_at: number;
   updated_at: number;
 }
@@ -397,6 +415,7 @@ export interface OrganizationInvitationJSON extends ClerkResourceJSON {
   public_metadata: OrganizationInvitationPublicMetadata;
   status: OrganizationInvitationStatus;
   role: OrganizationCustomRoleKey;
+  role_name: string;
   created_at: number;
   updated_at: number;
 }
@@ -583,7 +602,15 @@ export interface WaitlistJSON extends ClerkResourceJSON {
   updated_at: number;
 }
 
-export interface __experimental_CommerceFeatureJSON extends ClerkResourceJSON {
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+ * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+ * @example
+ * ```tsx
+ * <ClerkProvider clerkJsVersion="x.x.x" />
+ * ```
+ */
+export interface CommerceFeatureJSON extends ClerkResourceJSON {
   object: 'commerce_feature';
   id: string;
   name: string;
@@ -592,96 +619,263 @@ export interface __experimental_CommerceFeatureJSON extends ClerkResourceJSON {
   avatar_url: string;
 }
 
-export interface __experimental_CommercePlanJSON extends ClerkResourceJSON {
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+ * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+ * @example
+ * ```tsx
+ * <ClerkProvider clerkJsVersion="x.x.x" />
+ * ```
+ */
+export interface CommercePlanJSON extends ClerkResourceJSON {
   object: 'commerce_plan';
   id: string;
   name: string;
   amount: number;
   amount_formatted: string;
+  annual_amount: number;
+  annual_amount_formatted: string;
   annual_monthly_amount: number;
   annual_monthly_amount_formatted: string;
   currency_symbol: string;
   currency: string;
   description: string;
+  is_default: boolean;
   is_recurring: boolean;
   has_base_fee: boolean;
+  /**
+   * Specifies the subscriber type this plan is designed for.
+   *
+   * Each plan is exclusively created for either individual users or organizations,
+   * and cannot be used interchangeably.
+   *
+   * @type {['user'] | ['org']}
+   * @example
+   * ```ts
+   * // For a user plan
+   * payer_type: ['user']
+   *
+   * // For an organization plan
+   * payer_type: ['org']
+   * ```
+   */
   payer_type: string[];
   publicly_visible: boolean;
   slug: string;
   avatar_url: string;
-  features: __experimental_CommerceFeatureJSON[];
+  features: CommerceFeatureJSON[];
 }
 
-export interface __experimental_CommerceProductJSON extends ClerkResourceJSON {
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+ * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+ * @example
+ * ```tsx
+ * <ClerkProvider clerkJsVersion="x.x.x" />
+ * ```
+ */
+export interface CommerceProductJSON extends ClerkResourceJSON {
   object: 'commerce_product';
   id: string;
   slug: string;
   currency: string;
   is_default: boolean;
-  plans: __experimental_CommercePlanJSON[];
+  plans: CommercePlanJSON[];
 }
 
-export interface __experimental_CommercePaymentSourceJSON extends ClerkResourceJSON {
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+ * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+ * @example
+ * ```tsx
+ * <ClerkProvider clerkJsVersion="x.x.x" />
+ * ```
+ */
+export interface CommercePaymentSourceJSON extends ClerkResourceJSON {
   object: 'commerce_payment_source';
   id: string;
   last4: string;
   payment_method: string;
   card_type: string;
   is_default: boolean;
-  status: __experimental_CommercePaymentSourceStatus;
+  is_removable: boolean;
+  status: CommercePaymentSourceStatus;
   wallet_type: string | null;
 }
 
-export interface __experimental_CommerceInitializedPaymentSourceJSON extends ClerkResourceJSON {
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+ * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+ * @example
+ * ```tsx
+ * <ClerkProvider clerkJsVersion="x.x.x" />
+ * ```
+ */
+export interface CommerceInitializedPaymentSourceJSON extends ClerkResourceJSON {
   object: 'commerce_payment_source_initialize';
   external_client_secret: string;
   external_gateway_id: string;
+  payment_method_order: string[];
 }
 
-export interface __experimental_CommerceInvoiceJSON extends ClerkResourceJSON {
-  object: 'commerce_invoice';
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+ * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+ * @example
+ * ```tsx
+ * <ClerkProvider clerkJsVersion="x.x.x" />
+ * ```
+ */
+export interface CommerceStatementJSON extends ClerkResourceJSON {
+  object: 'commerce_statement';
   id: string;
-  paid_on: number;
-  payment_due_on: number;
-  payment_source_id: string;
-  plan_id: string;
-  status: string;
-  totals: __experimental_CommerceTotalsJSON;
+  status: CommerceStatementStatus;
+  timestamp: number;
+  groups: CommerceStatementGroupJSON[];
+  totals: CommerceStatementTotalsJSON;
 }
 
-export interface __experimental_CommerceSubscriptionJSON extends ClerkResourceJSON {
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+ * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+ * @example
+ * ```tsx
+ * <ClerkProvider clerkJsVersion="x.x.x" />
+ * ```
+ */
+export interface CommerceStatementGroupJSON extends ClerkResourceJSON {
+  object: 'commerce_statement_group';
+  timestamp: number;
+  items: CommercePaymentJSON[];
+}
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+ * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+ * @example
+ * ```tsx
+ * <ClerkProvider clerkJsVersion="x.x.x" />
+ * ```
+ */
+export interface CommercePaymentJSON extends ClerkResourceJSON {
+  object: 'commerce_payment';
+  id: string;
+  amount: CommerceMoneyJSON;
+  paid_at?: number;
+  failed_at?: number;
+  updated_at: number;
+  payment_source: CommercePaymentSourceJSON;
+  subscription: CommerceSubscriptionJSON;
+  subscription_item: CommerceSubscriptionJSON;
+  charge_type: CommercePaymentChargeType;
+  status: CommercePaymentStatus;
+}
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+ * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+ * @example
+ * ```tsx
+ * <ClerkProvider clerkJsVersion="x.x.x" />
+ * ```
+ */
+export interface CommerceSubscriptionJSON extends ClerkResourceJSON {
   object: 'commerce_subscription';
   id: string;
+  amount?: CommerceMoneyJSON;
+  credit?: {
+    amount: CommerceMoneyJSON;
+  };
   payment_source_id: string;
-  plan: __experimental_CommercePlanJSON;
-  plan_period: __experimental_CommerceSubscriptionPlanPeriod;
-  status: __experimental_CommerceSubscriptionStatus;
+  plan: CommercePlanJSON;
+  plan_period: CommerceSubscriptionPlanPeriod;
+  status: CommerceSubscriptionStatus;
+  created_at: number;
+  period_start: number;
+  period_end: number;
+  canceled_at: number | null;
+  past_due_at: number | null;
 }
 
-export interface __experimental_CommerceMoneyJSON {
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+ * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+ * @example
+ * ```tsx
+ * <ClerkProvider clerkJsVersion="x.x.x" />
+ * ```
+ */
+export interface CommerceMoneyJSON {
   amount: number;
   amount_formatted: string;
   currency: string;
   currency_symbol: string;
 }
 
-export interface __experimental_CommerceTotalsJSON {
-  grand_total: __experimental_CommerceMoneyJSON;
-  subtotal: __experimental_CommerceMoneyJSON;
-  tax_total: __experimental_CommerceMoneyJSON;
-  total_due_now?: __experimental_CommerceMoneyJSON;
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+ * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+ * @example
+ * ```tsx
+ * <ClerkProvider clerkJsVersion="x.x.x" />
+ * ```
+ */
+export interface CommerceCheckoutTotalsJSON {
+  grand_total: CommerceMoneyJSON;
+  subtotal: CommerceMoneyJSON;
+  tax_total: CommerceMoneyJSON;
+  total_due_now: CommerceMoneyJSON;
+  credit: CommerceMoneyJSON;
 }
 
-export interface __experimental_CommerceCheckoutJSON extends ClerkResourceJSON {
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+ * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+ * @example
+ * ```tsx
+ * <ClerkProvider clerkJsVersion="x.x.x" />
+ * ```
+ */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface CommerceStatementTotalsJSON extends Omit<CommerceCheckoutTotalsJSON, 'total_due_now'> {}
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+ * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+ * @example
+ * ```tsx
+ * <ClerkProvider clerkJsVersion="x.x.x" />
+ * ```
+ */
+export interface CommerceCheckoutJSON extends ClerkResourceJSON {
   object: 'commerce_checkout';
   id: string;
   external_client_secret: string;
   external_gateway_id: string;
-  invoice?: __experimental_CommerceInvoiceJSON;
-  payment_source?: __experimental_CommercePaymentSourceJSON;
-  plan: __experimental_CommercePlanJSON;
-  plan_period: __experimental_CommerceSubscriptionPlanPeriod;
+  statement_id: string;
+  payment_source?: CommercePaymentSourceJSON;
+  plan: CommercePlanJSON;
+  plan_period: CommerceSubscriptionPlanPeriod;
+  plan_period_start?: number;
   status: string;
-  subscription?: __experimental_CommerceSubscriptionJSON;
-  totals: __experimental_CommerceTotalsJSON;
+  totals: CommerceCheckoutTotalsJSON;
+  is_immediate_plan_change: boolean;
+}
+
+export interface ApiKeyJSON extends ClerkResourceJSON {
+  id: string;
+  type: string;
+  name: string;
+  subject: string;
+  scopes: string[];
+  claims: Record<string, any> | null;
+  revoked: boolean;
+  revocation_reason: string | null;
+  expired: boolean;
+  expiration: number | null;
+  created_by: string | null;
+  description: string | null;
+  last_used_at: number | null;
+  created_at: number;
+  updated_at: number;
 }

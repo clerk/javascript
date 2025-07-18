@@ -1,4 +1,4 @@
-import { useSafeLayoutEffect } from '@clerk/shared/react';
+import { useSafeLayoutEffect } from '@clerk/shared/react/index';
 import type { UseDismissProps, UseFloatingOptions, UseRoleProps } from '@floating-ui/react';
 import {
   FloatingFocusManager,
@@ -16,12 +16,11 @@ import * as React from 'react';
 import { transitionDurationValues, transitionTiming } from '../../ui/foundations/transitions';
 import type { LocalizationKey } from '../customizables';
 import { Box, descriptors, Flex, Heading, Icon, Span, useAppearance } from '../customizables';
-import { usePrefersReducedMotion } from '../hooks';
-import { useScrollLock } from '../hooks/useScrollLock';
+import { useDirection, usePrefersReducedMotion, useScrollLock } from '../hooks';
 import { Close as CloseIcon } from '../icons';
 import type { ThemableCssProp } from '../styledSystem';
 import { common } from '../styledSystem';
-import { colors } from '../utils';
+import { colors } from '../utils/colors';
 import { IconButton } from './IconButton';
 
 type FloatingPortalProps = React.ComponentProps<typeof FloatingPortal>;
@@ -38,6 +37,7 @@ interface DrawerContext {
   context: ReturnType<typeof useFloating>['context'];
   getFloatingProps: ReturnType<typeof useInteractions>['getFloatingProps'];
   portalProps: FloatingPortalProps;
+  direction: ReturnType<typeof useDirection>;
 }
 
 const DrawerContext = React.createContext<DrawerContext | null>(null);
@@ -87,11 +87,14 @@ function Root({
   portalProps,
   dismissProps,
 }: RootProps) {
+  const direction = useDirection();
+
   const { refs, context } = useFloating({
     open,
     onOpenChange,
     transform: false,
     strategy,
+    placement: direction === 'ltr' ? 'right' : 'left',
     ...floatingProps,
   });
 
@@ -111,6 +114,7 @@ function Root({
         refs,
         context,
         getFloatingProps,
+        direction,
       }}
     >
       <FloatingPortal {...portalProps}>{children}</FloatingPortal>
@@ -126,15 +130,18 @@ export const FloatingOverlay = React.forwardRef(function FloatingOverlay(
   props: React.ComponentPropsWithoutRef<typeof Box>,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) {
+  const { strategy } = useDrawerContext();
   const { disableScrollLock, enableScrollLock } = useScrollLock();
 
   useSafeLayoutEffect(() => {
+    if (strategy !== 'fixed') {
+      return;
+    }
     enableScrollLock();
-
     return () => {
       disableScrollLock();
     };
-  }, []);
+  }, [strategy, disableScrollLock, enableScrollLock]);
 
   return (
     <Box
@@ -194,7 +201,7 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
   const prefersReducedMotion = usePrefersReducedMotion();
   const { animations: layoutAnimations } = useAppearance().parsedLayout;
   const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
-  const { strategy, refs, context, getFloatingProps } = useDrawerContext();
+  const { strategy, refs, context, getFloatingProps, direction } = useDrawerContext();
   const mergedRefs = useMergeRefs([ref, refs.setFloating]);
 
   const { isMounted, styles: transitionStyles } = useTransitionStyles(context, {
@@ -217,43 +224,60 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
       outsideElementsInert
       initialFocus={refs.floating}
     >
-      <Flex
+      <Box
         ref={mergedRefs}
-        elementDescriptor={descriptors.drawerContent}
         {...getFloatingProps()}
-        style={transitionStyles}
-        direction='col'
         sx={t => ({
-          // Apply the conditional right offset + the spread of the
-          // box shadow to ensure it is fully offscreen before unmounting
-          '--transform-offset':
-            strategy === 'fixed' ? `calc(100% + ${t.space.$3} + ${t.space.$8x75})` : `calc(100% + ${t.space.$8x75})`,
-          willChange: 'transform',
           position: strategy,
-          insetBlock: strategy === 'fixed' ? t.space.$3 : 0,
-          insetInlineEnd: strategy === 'fixed' ? t.space.$3 : 0,
-          outline: 0,
-          width: t.sizes.$100,
-          backgroundColor: t.colors.$colorBackground,
-          borderStartStartRadius: t.radii.$xl,
-          borderEndStartRadius: t.radii.$xl,
-          borderEndEndRadius: strategy === 'fixed' ? t.radii.$xl : 0,
-          borderStartEndRadius: strategy === 'fixed' ? t.radii.$xl : 0,
-          borderWidth: t.borderWidths.$normal,
-          borderStyle: t.borderStyles.$solid,
-          borderColor: t.colors.$neutralAlpha100,
-          boxShadow: t.shadows.$cardBoxShadow,
-          overflow: 'hidden',
-          zIndex: t.zIndices.$modal,
+          insetBlock: 0,
+          insetInline: 0,
+          pointerEvents: 'none',
+          isolation: 'isolate',
+          // When drawer is within the profile components, we need to ensure it is above the drawer
+          // renders above the profile close button
+          zIndex: strategy === 'absolute' ? t.zIndices.$modal : undefined,
         })}
+        elementDescriptor={descriptors.drawerRoot}
       >
-        {children}
-      </Flex>
+        <Flex
+          elementDescriptor={descriptors.drawerContent}
+          style={transitionStyles}
+          direction='col'
+          sx={t => ({
+            // Apply the conditional right offset + the spread of the
+            // box shadow to ensure it is fully offscreen before unmounting
+            '--transform-offset':
+              strategy === 'fixed'
+                ? `calc((100% + ${t.space.$3} + ${t.space.$8x75}) * ${direction === 'rtl' ? -1 : 1})`
+                : `calc((100% + ${t.space.$8x75}) * ${direction === 'rtl' ? -1 : 1})`,
+            willChange: 'transform',
+            position: strategy,
+            insetBlock: strategy === 'fixed' ? t.space.$3 : 0,
+            insetInlineEnd: strategy === 'fixed' ? t.space.$3 : 0,
+            outline: 0,
+            width: t.sizes.$100,
+            maxWidth: strategy === 'fixed' ? `calc(100% - ${t.space.$6})` : '100%',
+            backgroundColor: t.colors.$colorBackground,
+            borderStartStartRadius: t.radii.$lg,
+            borderEndStartRadius: t.radii.$lg,
+            borderEndEndRadius: strategy === 'fixed' ? t.radii.$lg : 0,
+            borderStartEndRadius: strategy === 'fixed' ? t.radii.$lg : 0,
+            borderWidth: t.borderWidths.$normal,
+            borderStyle: t.borderStyles.$solid,
+            borderColor: t.colors.$borderAlpha100,
+            boxShadow: t.shadows.$cardBoxShadow,
+            overflow: 'hidden',
+            pointerEvents: 'auto',
+          })}
+        >
+          {children}
+        </Flex>
+      </Box>
     </FloatingFocusManager>
   );
 });
 
-Overlay.displayName = 'Drawer.Content';
+Content.displayName = 'Drawer.Content';
 
 /* -------------------------------------------------------------------------------------------------
  * Drawer.Header
@@ -280,9 +304,9 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>(({ title, children,
           ),
           borderBlockEndWidth: t.borderWidths.$normal,
           borderBlockEndStyle: t.borderStyles.$solid,
-          borderBlockEndColor: t.colors.$neutralAlpha100,
-          borderStartStartRadius: t.radii.$xl,
-          borderStartEndRadius: t.radii.$xl,
+          borderBlockEndColor: t.colors.$borderAlpha100,
+          borderStartStartRadius: t.radii.$lg,
+          borderStartEndRadius: t.radii.$lg,
           paddingBlock: title ? t.space.$3 : undefined,
           paddingInline: title ? t.space.$4 : undefined,
         }),
@@ -313,22 +337,27 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>(({ title, children,
  * Drawer.Body
  * -----------------------------------------------------------------------------------------------*/
 
-interface BodyProps {
+interface BodyProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
+  sx?: ThemableCssProp;
 }
 
-const Body = React.forwardRef<HTMLDivElement, BodyProps>(({ children }, ref) => {
+const Body = React.forwardRef<HTMLDivElement, BodyProps>(({ children, ...props }, ref) => {
   return (
     <Box
       ref={ref}
       elementDescriptor={descriptors.drawerBody}
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        flex: 1,
-        overflowY: 'auto',
-        overflowX: 'hidden',
-      }}
+      sx={[
+        () => ({
+          display: 'flex',
+          flexDirection: 'column',
+          flex: 1,
+          overflowY: 'auto',
+          overflowX: 'hidden',
+        }),
+        props.sx,
+      ]}
+      {...props}
     >
       {children}
     </Box>
@@ -339,12 +368,12 @@ const Body = React.forwardRef<HTMLDivElement, BodyProps>(({ children }, ref) => 
  * Drawer.Footer
  * -----------------------------------------------------------------------------------------------*/
 
-interface FooterProps {
+interface FooterProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode;
   sx?: ThemableCssProp;
 }
 
-const Footer = React.forwardRef<HTMLDivElement, FooterProps>(({ children, sx }, ref) => {
+const Footer = React.forwardRef<HTMLDivElement, FooterProps>(({ children, sx, ...props }, ref) => {
   return (
     <Box
       ref={ref}
@@ -359,7 +388,7 @@ const Footer = React.forwardRef<HTMLDivElement, FooterProps>(({ children, sx }, 
           ),
           borderBlockStartWidth: t.borderWidths.$normal,
           borderBlockStartStyle: t.borderStyles.$solid,
-          borderBlockStartColor: t.colors.$neutralAlpha100,
+          borderBlockStartColor: t.colors.$borderAlpha100,
           borderEndStartRadius: t.radii.$xl,
           borderEndEndRadius: t.radii.$xl,
           paddingBlock: t.space.$3,
@@ -367,6 +396,7 @@ const Footer = React.forwardRef<HTMLDivElement, FooterProps>(({ children, sx }, 
         }),
         sx,
       ]}
+      {...props}
     >
       {children}
     </Box>
@@ -393,7 +423,7 @@ const Close = React.forwardRef<HTMLButtonElement>((_, ref) => {
         />
       }
       sx={t => ({
-        color: t.colors.$colorTextSecondary,
+        color: t.colors.$colorMutedForeground,
         padding: t.space.$3,
         marginInlineStart: 'auto',
       })}
@@ -502,7 +532,7 @@ const Confirmation = React.forwardRef<HTMLDivElement, ConfirmationProps>(
               padding: t.space.$4,
               borderStartStartRadius: t.radii.$md,
               borderStartEndRadius: t.radii.$md,
-              boxShadow: `0 0 0 1px ${t.colors.$neutralAlpha100}`,
+              boxShadow: `0 0 0 1px ${t.colors.$borderAlpha100}`,
             })}
           >
             {children}

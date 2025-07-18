@@ -1,10 +1,8 @@
 import { deprecated } from '@clerk/shared/deprecated';
 import type {
-  CheckAuthorizationWithCustomPermissions,
   HandleOAuthCallbackParams,
-  OrganizationCustomPermissionKey,
-  OrganizationCustomRoleKey,
   PendingSessionOptions,
+  ProtectProps as _ProtectProps,
   RedirectOptions,
 } from '@clerk/types';
 import { defineComponent } from 'vue';
@@ -63,7 +61,7 @@ export const RedirectToSignUp = defineComponent((props: RedirectOptions) => {
 });
 
 /**
- * @deprecated Use [`redirectToUserProfile()`](https://clerk.com/docs/references/javascript/clerk/redirect-methods#redirect-to-user-profile) instead, will be removed in the next major version.
+ * @deprecated Use [`redirectToUserProfile()`](https://clerk.com/docs/references/javascript/clerk/redirect-methods#redirect-to-user-profile) instead.
  */
 export const RedirectToUserProfile = defineComponent(() => {
   useClerkLoaded(clerk => {
@@ -75,7 +73,7 @@ export const RedirectToUserProfile = defineComponent(() => {
 });
 
 /**
- * @deprecated Use [`redirectToOrganizationProfile()`](https://clerk.com/docs/references/javascript/clerk/redirect-methods#redirect-to-organization-profile) instead, will be removed in the next major version.
+ * @deprecated Use [`redirectToOrganizationProfile()`](https://clerk.com/docs/references/javascript/clerk/redirect-methods#redirect-to-organization-profile) instead.
  */
 export const RedirectToOrganizationProfile = defineComponent(() => {
   useClerkLoaded(clerk => {
@@ -87,7 +85,7 @@ export const RedirectToOrganizationProfile = defineComponent(() => {
 });
 
 /**
- * @deprecated Use [`redirectToCreateOrganization()`](https://clerk.com/docs/references/javascript/clerk/redirect-methods#redirect-to-create-organization) instead, will be removed in the next major version.
+ * @deprecated Use [`redirectToCreateOrganization()`](https://clerk.com/docs/references/javascript/clerk/redirect-methods#redirect-to-create-organization) instead.
  */
 export const RedirectToCreateOrganization = defineComponent(() => {
   useClerkLoaded(clerk => {
@@ -106,29 +104,7 @@ export const AuthenticateWithRedirectCallback = defineComponent((props: HandleOA
   return () => null;
 });
 
-export type ProtectProps = (
-  | {
-      condition?: never;
-      role: OrganizationCustomRoleKey;
-      permission?: never;
-    }
-  | {
-      condition?: never;
-      role?: never;
-      permission: OrganizationCustomPermissionKey;
-    }
-  | {
-      condition: (has: CheckAuthorizationWithCustomPermissions) => boolean;
-      role?: never;
-      permission?: never;
-    }
-  | {
-      condition?: never;
-      role?: never;
-      permission?: never;
-    }
-) &
-  PendingSessionOptions;
+export type ProtectProps = _ProtectProps & PendingSessionOptions;
 
 export const Protect = defineComponent((props: ProtectProps, { slots }) => {
   const { isLoaded, has, userId } = useAuth({ treatPendingAsSignedOut: props.treatPendingAsSignedOut });
@@ -160,7 +136,7 @@ export const Protect = defineComponent((props: ProtectProps, { slots }) => {
       return slots.fallback?.();
     }
 
-    if (props.role || props.permission) {
+    if (props.role || props.permission || props.feature || props.plan) {
       if (has.value?.(props)) {
         return slots.default?.();
       }

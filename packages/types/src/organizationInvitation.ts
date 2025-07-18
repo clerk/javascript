@@ -26,6 +26,7 @@ export interface OrganizationInvitationResource extends ClerkResource {
   organizationId: string;
   publicMetadata: OrganizationInvitationPublicMetadata;
   role: OrganizationCustomRoleKey;
+  roleName: string;
   status: OrganizationInvitationStatus;
   createdAt: Date;
   updatedAt: Date;
@@ -35,4 +36,4 @@ export interface OrganizationInvitationResource extends ClerkResource {
 /**
  * @inline
  */
-export type OrganizationInvitationStatus = 'pending' | 'accepted' | 'revoked';
+export type OrganizationInvitationStatus = 'pending' | 'accepted' | 'revoked' | 'expired';

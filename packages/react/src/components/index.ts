@@ -9,11 +9,15 @@ export {
   OrganizationList,
   GoogleOneTap,
   Waitlist,
+  PricingTable,
+  APIKeys,
 } from './uiComponents';
 
 export {
   ClerkLoaded,
   ClerkLoading,
+  ClerkDegraded,
+  ClerkFailed,
   SignedOut,
   SignedIn,
   Protect,

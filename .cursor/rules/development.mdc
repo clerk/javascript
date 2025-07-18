@@ -1,0 +1,132 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+Development Practices and Tooling
+
+Development Environment Setup
+- Requires Node.js 18.17.0+ and pnpm 9.15.9+
+- Use `pnpm install` to install all dependencies
+- Environment variables should be set in appropriate `.env` files
+- Use `pnpm dev` to start development mode across all packages
+
+Monorepo Development Workflow
+- Make changes in the relevant package under `/packages/`
+- Use `pnpm dev` to watch for changes and rebuild automatically
+- Test changes using playground applications in `/playground/`
+- Run specific package commands using pnpm workspace syntax: `pnpm --filter @clerk/nextjs build`
+- Use Turbo for efficient builds: `turbo build --filter=@clerk/nextjs`
+
+Code Quality Standards
+- All code must pass ESLint checks with the project's configuration
+- Use Prettier for consistent code formatting
+- TypeScript is required for all packages
+- Follow established naming conventions (PascalCase for components, camelCase for variables)
+- Maintain comprehensive JSDoc comments for public APIs
+
+Testing Requirements
+- Unit tests are required for all new functionality
+- Use Jest for unit testing, Vitest for some packages
+- React Testing Library for component testing
+- Integration tests using Playwright for E2E scenarios
+- Test files should be co-located with source files or in `__tests__` directories
+- Maintain test coverage above established thresholds
+
+Package Development Guidelines
+- Each package should have a clear single responsibility
+- Follow semantic versioning for all packages
+- Use Changesets for version management and changelogs
+- Packages should export TypeScript types alongside runtime code
+- Use tsup for building packages with proper ESM/CJS dual publishing
+
+Framework Integration Patterns
+- Framework packages should provide idiomatic APIs for their respective frameworks
+- Maintain consistency in naming and patterns across framework integrations
+- Provide both high-level components and low-level utilities
+- Ensure SSR/SSG compatibility where applicable
+- Follow framework-specific best practices and conventions
+
+API Design Principles
+- Design APIs to be intuitive and self-documenting
+- Provide sensible defaults to minimize configuration
+- Support both imperative and declarative usage patterns
+- Maintain backward compatibility when possible
+- Use progressive enhancement for advanced features
+
+Build and Bundle Optimization
+- Use tree-shaking friendly exports
+- Minimize bundle sizes through careful dependency management
+- Use dynamic imports for optional features
+- Monitor bundle sizes with bundlewatch
+- Optimize for both development and production builds
+
+Documentation Standards
+- All public APIs must be documented with JSDoc
+- Provide usage examples in documentation
+- Maintain up-to-date README files for each package
+- Use TypeDoc for generating API documentation
+- Include migration guides for breaking changes
+
+Error Handling Patterns
+- Use proper TypeScript error types
+- Provide meaningful error messages to developers
+- Include error recovery suggestions where applicable
+- Log errors appropriately for debugging
+- Use error boundaries in React components
+
+Performance Considerations
+- Lazy load components and features when possible
+- Implement proper caching strategies
+- Minimize re-renders in React components
+- Use efficient data structures and algorithms
+- Profile and optimize critical paths
+
+Security Guidelines
+- Never commit sensitive keys or credentials
+- Use environment variables for configuration
+- Validate all inputs and sanitize outputs
+- Follow OWASP security best practices
+- Regular security audits of dependencies
+
+Debugging and Development Tools
+- Use browser dev tools for client-side debugging
+- Implement proper logging with different levels
+- Use Clerk's development dashboard for testing
+- Leverage source maps for debugging built code
+- Use performance profiling tools when needed
+
+Integration Testing Approach
+- Each framework integration has its own test suite
+- Use real Clerk instances for integration tests
+- Test authentication flows end-to-end
+- Verify proper error handling and edge cases
+- Test across different browsers and environments
+
+Release Process
+- Use Changesets for managing releases
+- Follow semantic versioning strictly
+- Coordinate releases across dependent packages
+- Test releases in staging environments
+- Maintain detailed changelogs
+
+Local Development Tips
+- Use playground applications to test changes quickly
+- Set up multiple test environments for different scenarios
+- Use Verdaccio for local npm registry testing
+- Leverage hot reloading for faster development cycles
+- Use proper IDE setup with TypeScript support
+
+Contribution Guidelines
+- Follow the established PR template
+- Include tests for all new features
+- Update documentation for API changes
+- Ensure all CI checks pass before merging
+- Get proper code review from team members
+
+Package Maintenance
+- Regularly update dependencies
+- Monitor for security vulnerabilities
+- Deprecate features properly with migration paths
+- Maintain compatibility matrices for supported versions
+- Archive packages that are no longer maintained

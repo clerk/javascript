@@ -20,6 +20,7 @@ import OrganizationList from './organization-list';
 import CreateOrganization from './create-organization';
 import OrganizationSwitcher from './organization-switcher';
 import Buttons from './buttons';
+import ClerkStatusPage from './clerk-status';
 
 const Root = () => {
   const navigate = useNavigate();
@@ -113,6 +114,10 @@ const router = createBrowserRouter([
       {
         path: '/create-organization',
         element: <CreateOrganization />,
+      },
+      {
+        path: '/clerk-status',
+        element: <ClerkStatusPage />,
       },
     ],
   },

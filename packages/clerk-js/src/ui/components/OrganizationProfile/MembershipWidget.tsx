@@ -1,9 +1,10 @@
 import { useOrganization } from '@clerk/shared/react';
 
+import { Gauge } from '@/ui/elements/Gauge';
+
 import { runIfFunctionOrReturn } from '../../../utils';
 import { useOrganizationProfileContext } from '../../contexts';
 import { Flex, Icon, Link, Text } from '../../customizables';
-import { Gauge } from '../../elements';
 import { ArrowRightIcon } from '../../icons';
 import { useRouter } from '../../router';
 import { mqu } from '../../styledSystem';

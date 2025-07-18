@@ -13,8 +13,7 @@ export type OKXWalletWeb3Provider = 'okx_wallet';
 export type Web3Provider = MetamaskWeb3Provider | CoinbaseWalletWeb3Provider | OKXWalletWeb3Provider;
 
 /**
- * @deprecated This constant will be dropped in the next major release.
- * You can import it from `@clerk/shared/web3`.
+ * @deprecated Use `import { WEB3_PROVIDERS } from "@clerk/shared/web3"` instead.
  *
  * @hidden
  */

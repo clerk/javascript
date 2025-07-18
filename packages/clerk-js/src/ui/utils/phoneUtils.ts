@@ -1,3 +1,5 @@
+import type { PhoneCodeChannel } from '@clerk/types';
+
 import type { CountryEntry, CountryIso } from '../elements/PhoneInput/countryCodeData';
 import { CodeToCountriesMap, IsoToCountryMap, SubAreaCodeSets } from '../elements/PhoneInput/countryCodeData';
 
@@ -127,4 +129,15 @@ export function getCountryFromPhoneString(phone: string): { number: string; coun
   const number = phoneWithCode.slice(country?.code.length || 0);
 
   return { number, country };
+}
+
+export function getPreferredPhoneCodeChannelByCountry(
+  phoneNumber: string,
+  preferredChannels: Record<string, PhoneCodeChannel>,
+): PhoneCodeChannel | null {
+  if (!preferredChannels) {
+    return null;
+  }
+  const { country } = getCountryFromPhoneString(phoneNumber);
+  return preferredChannels[country.iso.toUpperCase()] || null;
 }

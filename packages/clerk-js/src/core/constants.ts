@@ -36,6 +36,9 @@ export const ERROR_CODES = {
   INVITATION_ACCOUNT_NOT_EXISTS: 'invitation_account_not_exists',
   ORGANIZATION_MEMBERSHIP_QUOTA_EXCEEDED_FOR_SSO: 'organization_membership_quota_exceeded_for_sso',
   CAPTCHA_INVALID: 'captcha_invalid',
+  FRAUD_DEVICE_BLOCKED: 'device_blocked',
+  FRAUD_ACTION_BLOCKED: 'action_blocked',
+  SIGNUP_RATE_LIMIT_EXCEEDED: 'signup_rate_limit_exceeded',
 } as const;
 
 export const SIGN_IN_INITIAL_VALUE_KEYS = ['email_address', 'phone_number', 'username'];
@@ -43,11 +46,11 @@ export const SIGN_UP_INITIAL_VALUE_KEYS = ['email_address', 'phone_number', 'use
 
 export const DEBOUNCE_MS = 350;
 
-export const SIGN_UP_MODES: Record<string, SignUpModes> = {
+export const SIGN_UP_MODES = {
   PUBLIC: 'public',
   RESTRICTED: 'restricted',
   WAITLIST: 'waitlist',
-};
+} satisfies Record<string, SignUpModes>;
 
 // This is the currently supported version of the Frontend API
 export const SUPPORTED_FAPI_VERSION = '2025-04-10';

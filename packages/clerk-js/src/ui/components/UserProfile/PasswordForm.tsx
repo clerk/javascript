@@ -2,20 +2,20 @@ import { useReverification, useSession, useUser } from '@clerk/shared/react';
 import type { UserResource } from '@clerk/types';
 import { useRef } from 'react';
 
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { Form } from '@/ui/elements/Form';
+import { FormButtonContainer, FormButtons } from '@/ui/elements/FormButtons';
+import type { FormProps } from '@/ui/elements/FormContainer';
+import { FormContainer } from '@/ui/elements/FormContainer';
+import { InformationBox } from '@/ui/elements/InformationBox';
+import type { SuccessPage } from '@/ui/elements/SuccessPage';
+import { handleError } from '@/ui/utils/errorHandler';
+import { createPasswordError } from '@/ui/utils/passwordUtils';
+import { useFormControl } from '@/ui/utils/useFormControl';
+
 import { useEnvironment } from '../../contexts';
 import { localizationKeys, useLocalizations } from '../../customizables';
-import type { FormProps, SuccessPage } from '../../elements';
-import {
-  Form,
-  FormButtonContainer,
-  FormButtons,
-  FormContainer,
-  InformationBox,
-  useCardState,
-  withCardStateProvider,
-} from '../../elements';
 import { useConfirmPassword } from '../../hooks';
-import { createPasswordError, handleError, useFormControl } from '../../utils';
 
 const generateSuccessPageText = (userHasPassword: boolean, sessionSignOut: boolean) => {
   const localizedTexts = [];

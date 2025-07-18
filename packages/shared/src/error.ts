@@ -1,26 +1,57 @@
-import type { ClerkAPIError, ClerkAPIErrorJSON } from '@clerk/types';
+import type {
+  ClerkAPIError,
+  ClerkAPIErrorJSON,
+  ClerkAPIResponseError as ClerkAPIResponseErrorInterface,
+} from '@clerk/types';
 
+/**
+ * Checks if the provided error object is an unauthorized error.
+ *
+ * @internal
+ *
+ * @deprecated This is no longer used, and will be removed in the next major version.
+ */
 export function isUnauthorizedError(e: any): boolean {
   const status = e?.status;
   const code = e?.errors?.[0]?.code;
   return code === 'authentication_invalid' && status === 401;
 }
 
+/**
+ * Checks if the provided error object is a captcha error.
+ *
+ * @internal
+ */
 export function isCaptchaError(e: ClerkAPIResponseError): boolean {
   return ['captcha_invalid', 'captcha_not_enabled', 'captcha_missing_token'].includes(e.errors[0].code);
 }
 
+/**
+ * Checks if the provided error is a 4xx error.
+ *
+ * @internal
+ */
 export function is4xxError(e: any): boolean {
   const status = e?.status;
   return !!status && status >= 400 && status < 500;
 }
 
+/**
+ * Checks if the provided error is a network error.
+ *
+ * @internal
+ */
 export function isNetworkError(e: any): boolean {
   // TODO: revise during error handling epic
   const message = (`${e.message}${e.name}` || '').toLowerCase().replace(/\s+/g, '');
   return message.includes('networkerror');
 }
 
+/**
+ * Options for creating a ClerkAPIResponseError.
+ *
+ * @internal
+ */
 interface ClerkAPIResponseOptions {
   data: ClerkAPIErrorJSON[];
   status: number;
@@ -36,10 +67,20 @@ export interface MetamaskError extends Error {
   data?: unknown;
 }
 
+/**
+ * Checks if the provided error is either a ClerkAPIResponseError, a ClerkRuntimeError, or a MetamaskError.
+ *
+ * @internal
+ */
 export function isKnownError(error: any): error is ClerkAPIResponseError | ClerkRuntimeError | MetamaskError {
   return isClerkAPIResponseError(error) || isMetamaskError(error) || isClerkRuntimeError(error);
 }
 
+/**
+ * Checks if the provided error is a ClerkAPIResponseError.
+ *
+ * @internal
+ */
 export function isClerkAPIResponseError(err: any): err is ClerkAPIResponseError {
   return 'clerkError' in err;
 }
@@ -47,8 +88,8 @@ export function isClerkAPIResponseError(err: any): err is ClerkAPIResponseError 
 /**
  * Checks if the provided error object is an instance of ClerkRuntimeError.
  *
- * @param {any} err - The error object to check.
- * @returns {boolean} True if the error is a ClerkRuntimeError, false otherwise.
+ * @param err - The error object to check.
+ * @returns True if the error is a ClerkRuntimeError, false otherwise.
  *
  * @example
  * const error = new ClerkRuntimeError('An error occurred');
@@ -64,26 +105,56 @@ export function isClerkRuntimeError(err: any): err is ClerkRuntimeError {
   return 'clerkRuntimeError' in err;
 }
 
+/**
+ * Checks if the provided error is a Clerk runtime error indicating a reverification was cancelled.
+ *
+ * @internal
+ */
 export function isReverificationCancelledError(err: any) {
   return isClerkRuntimeError(err) && err.code === 'reverification_cancelled';
 }
 
+/**
+ * Checks if the provided error is a Metamask error.
+ *
+ * @internal
+ */
 export function isMetamaskError(err: any): err is MetamaskError {
   return 'code' in err && [4001, 32602, 32603].includes(err.code) && 'message' in err;
 }
 
+/**
+ * Checks if the provided error is clerk api response error indicating a user is locked.
+ *
+ * @internal
+ */
 export function isUserLockedError(err: any) {
   return isClerkAPIResponseError(err) && err.errors?.[0]?.code === 'user_locked';
 }
 
+/**
+ * Checks if the provided error is a clerk api response error indicating a password was pwned.
+ *
+ * @internal
+ */
 export function isPasswordPwnedError(err: any) {
   return isClerkAPIResponseError(err) && err.errors?.[0]?.code === 'form_password_pwned';
 }
 
+/**
+ * Parses an array of ClerkAPIErrorJSON objects into an array of ClerkAPIError objects.
+ *
+ * @internal
+ */
 export function parseErrors(data: ClerkAPIErrorJSON[] = []): ClerkAPIError[] {
   return data.length > 0 ? data.map(parseError) : [];
 }
 
+/**
+ * Parses a ClerkAPIErrorJSON object into a ClerkAPIError object.
+ *
+ * @internal
+ */
 export function parseError(error: ClerkAPIErrorJSON): ClerkAPIError {
   return {
     code: error.code,
@@ -95,10 +166,17 @@ export function parseError(error: ClerkAPIErrorJSON): ClerkAPIError {
       emailAddresses: error?.meta?.email_addresses,
       identifiers: error?.meta?.identifiers,
       zxcvbn: error?.meta?.zxcvbn,
+      plan: error?.meta?.plan,
+      isPlanUpgradePossible: error?.meta?.is_plan_upgrade_possible,
     },
   };
 }
 
+/**
+ * Converts a ClerkAPIError object into a ClerkAPIErrorJSON object.
+ *
+ * @internal
+ */
 export function errorToJSON(error: ClerkAPIError | null): ClerkAPIErrorJSON {
   return {
     code: error?.code || '',
@@ -110,11 +188,13 @@ export function errorToJSON(error: ClerkAPIError | null): ClerkAPIErrorJSON {
       email_addresses: error?.meta?.emailAddresses,
       identifiers: error?.meta?.identifiers,
       zxcvbn: error?.meta?.zxcvbn,
+      plan: error?.meta?.plan,
+      is_plan_upgrade_possible: error?.meta?.isPlanUpgradePossible,
     },
   };
 }
 
-export class ClerkAPIResponseError extends Error {
+export class ClerkAPIResponseError extends Error implements ClerkAPIResponseErrorInterface {
   clerkError: true;
 
   status: number;
@@ -154,6 +234,7 @@ export class ClerkAPIResponseError extends Error {
  * Custom error class for representing Clerk runtime errors.
  *
  * @class ClerkRuntimeError
+ *
  * @example
  *   throw new ClerkRuntimeError('An error occurred', { code: 'password_invalid' });
  */
@@ -192,7 +273,7 @@ export class ClerkRuntimeError extends Error {
   /**
    * Returns a string representation of the error.
    *
-   * @returns {string} A formatted string with the error name and message.
+   * @returns A formatted string with the error name and message.
    */
   public toString = () => {
     return `[${this.name}]\nMessage:${this.message}`;
@@ -210,12 +291,17 @@ export class EmailLinkError extends Error {
   }
 }
 
+/**
+ * Checks if the provided error is an EmailLinkError.
+ *
+ * @internal
+ */
 export function isEmailLinkError(err: Error): err is EmailLinkError {
   return err.name === 'EmailLinkError';
 }
 
 /**
- * @deprecated Please use `EmailLinkErrorCodeStatus` instead.
+ * @deprecated Use `EmailLinkErrorCodeStatus` instead.
  *
  * @hidden
  */
@@ -268,14 +354,19 @@ export interface ErrorThrower {
   throw(message: string): never;
 }
 
+/**
+ * Builds an error thrower.
+ *
+ * @internal
+ */
 export function buildErrorThrower({ packageName, customMessages }: ErrorThrowerOptions): ErrorThrower {
   let pkg = packageName;
 
-  const messages = {
-    ...DefaultMessages,
-    ...customMessages,
-  };
-
+  /**
+   * Builds a message from a raw message and replacements.
+   *
+   * @internal
+   */
   function buildMessage(rawMessage: string, replacements?: Record<string, string | number>) {
     if (!replacements) {
       return `${pkg}: ${rawMessage}`;
@@ -291,6 +382,11 @@ export function buildErrorThrower({ packageName, customMessages }: ErrorThrowerO
 
     return `${pkg}: ${msg}`;
   }
+
+  const messages = {
+    ...DefaultMessages,
+    ...customMessages,
+  };
 
   return {
     setPackageName({ packageName }: ErrorThrowerOptions): ErrorThrower {

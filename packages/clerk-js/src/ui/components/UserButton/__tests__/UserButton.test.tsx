@@ -2,7 +2,7 @@ import { describe } from '@jest/globals';
 
 import { render, waitFor } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
-import { UserButton } from '../UserButton';
+import { UserButton } from '../';
 
 const { createFixtures } = bindCreateFixtures('UserButton');
 

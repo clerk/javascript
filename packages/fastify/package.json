@@ -1,6 +1,6 @@
 {
   "name": "@clerk/fastify",
-  "version": "2.2.5",
+  "version": "2.4.10",
   "description": "Clerk SDK for Fastify",
   "keywords": [
     "auth",
@@ -66,11 +66,11 @@
     "@clerk/backend": "workspace:^",
     "@clerk/shared": "workspace:^",
     "@clerk/types": "workspace:^",
-    "cookies": "0.8.0",
+    "cookies": "0.9.1",
     "fastify-plugin": "^5.0.1"
   },
   "devDependencies": {
-    "fastify": "^5.0.0"
+    "fastify": "^5.4.0"
   },
   "peerDependencies": {
     "fastify": ">=5"

@@ -2,6 +2,7 @@ import React from 'react';
 
 import type { PrimitiveProps, StyleVariants } from '../styledSystem';
 import { createVariants } from '../styledSystem';
+import { common } from '../styledSystem/common';
 import type { BoxProps } from './Box';
 import { Box } from './Box';
 
@@ -12,7 +13,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
       borderCollapse: 'separate',
       borderWidth: theme.borderWidths.$normal,
       borderStyle: theme.borderStyles.$solid,
-      borderColor: theme.colors.$neutralAlpha100,
+      borderColor: theme.colors.$borderAlpha100,
       borderRadius: theme.radii.$lg,
       boxShadow: theme.shadows.$tableBodyShadow,
       width: '100%',
@@ -22,7 +23,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
         borderStyle: 'solid',
         borderLeftWidth: '0px',
         borderRightWidth: '0px',
-        borderColor: theme.colors.$neutralAlpha100,
+        borderColor: theme.colors.$borderAlpha100,
       },
       'td:not(:first-of-type)': {
         paddingLeft: theme.space.$2,
@@ -33,7 +34,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
       'tr > td': {
         borderTopWidth: theme.borderWidths.$normal,
         borderTopStyle: theme.borderStyles.$solid,
-        borderTopColor: theme.colors.$neutralAlpha100,
+        borderTopColor: theme.colors.$borderAlpha100,
         paddingBottom: theme.space.$2,
         paddingTop: theme.space.$2,
         paddingLeft: theme.space.$4,
@@ -45,7 +46,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
         borderStyle: 'solid',
         borderLeftWidth: '0px',
         borderRightWidth: '0px',
-        borderColor: theme.colors.$neutralAlpha100,
+        borderColor: theme.colors.$borderAlpha100,
       },
       'tr:hover td:first-of-type': {
         borderBottomLeftRadius: theme.radii.$lg,
@@ -61,7 +62,18 @@ const { applyVariants, filterProps } = createVariants(theme => {
         display: 'block',
       },
     },
-    variants: {},
+    variants: {
+      tableHeadVisuallyHidden: {
+        true: {
+          thead: {
+            ...common.visuallyHidden(),
+          },
+          'tr:first-of-type td': {
+            borderTop: 'none',
+          },
+        },
+      },
+    },
   };
 });
 

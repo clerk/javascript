@@ -1,3 +1,5 @@
+import type { PhoneCodeChannel } from 'phoneCodeChannel';
+
 import type { FirstNameAttribute, LastNameAttribute, LegalAcceptedAttribute, PasswordAttribute } from './attributes';
 import type { AttemptEmailAddressVerificationParams, PrepareEmailAddressVerificationParams } from './emailAddress';
 import type {
@@ -130,6 +132,7 @@ export type PrepareVerificationParams =
     }
   | {
       strategy: PhoneCodeStrategy;
+      channel?: PhoneCodeChannel;
     }
   | {
       strategy: Web3Strategy;
@@ -176,7 +179,13 @@ export type SignUpCreateParams = Partial<
     externalAccountStrategy: string;
     externalAccountRedirectUrl: string;
     externalAccountActionCompleteRedirectUrl: string;
-    strategy: OAuthStrategy | SamlStrategy | EnterpriseSSOStrategy | TicketStrategy | GoogleOneTapStrategy;
+    strategy:
+      | OAuthStrategy
+      | SamlStrategy
+      | EnterpriseSSOStrategy
+      | TicketStrategy
+      | GoogleOneTapStrategy
+      | PhoneCodeStrategy;
     redirectUrl: string;
     actionCompleteRedirectUrl: string;
     transfer: boolean;
@@ -186,13 +195,14 @@ export type SignUpCreateParams = Partial<
     legalAccepted: boolean;
     oidcPrompt: string;
     oidcLoginHint: string;
+    channel: PhoneCodeChannel;
   } & Omit<SnakeToCamel<Record<SignUpAttributeField | SignUpVerifiableField, string>>, 'legalAccepted'>
 >;
 
 export type SignUpUpdateParams = SignUpCreateParams;
 
 /**
- * @deprecated use `SignUpAuthenticateWithWeb3Params` instead
+ * @deprecated Use `SignUpAuthenticateWithWeb3Params` instead.
  */
 export type SignUpAuthenticateWithMetamaskParams = SignUpAuthenticateWithWeb3Params;
 

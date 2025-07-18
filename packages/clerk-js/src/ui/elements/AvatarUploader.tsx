@@ -2,7 +2,7 @@ import React from 'react';
 
 import type { LocalizationKey } from '../customizables';
 import { Button, Col, descriptors, Flex, localizationKeys, SimpleButton, Text } from '../customizables';
-import { handleError } from '../utils';
+import { handleError } from '../utils/errorHandler';
 import { useCardState } from './contexts';
 
 export type AvatarUploaderProps = {

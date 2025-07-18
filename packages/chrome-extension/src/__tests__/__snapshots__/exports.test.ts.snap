@@ -2,7 +2,10 @@
 
 exports[`public exports should not include a breaking change 1`] = `
 [
+  "APIKeys",
   "AuthenticateWithRedirectCallback",
+  "ClerkDegraded",
+  "ClerkFailed",
   "ClerkLoaded",
   "ClerkLoading",
   "ClerkProvider",
@@ -11,6 +14,7 @@ exports[`public exports should not include a breaking change 1`] = `
   "OrganizationList",
   "OrganizationProfile",
   "OrganizationSwitcher",
+  "PricingTable",
   "Protect",
   "RedirectToCreateOrganization",
   "RedirectToOrganizationProfile",

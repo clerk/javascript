@@ -1,7 +1,8 @@
 import { describe, it } from '@jest/globals';
 
+import { CardStateProvider } from '@/ui/elements/contexts';
+
 import { fireEvent, render, screen, waitFor } from '../../../../testUtils';
-import { CardStateProvider } from '../../../elements';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { runFakeTimers } from '../../../utils/test/runFakeTimers';
 import { PasswordSection } from '../PasswordSection';
@@ -302,18 +303,25 @@ describe('PasswordSection', () => {
       await userEvent.click(getByRole('button', { name: /update password/i }));
       await waitFor(() => getByRole('heading', { name: /update password/i }));
 
+      await waitFor(() => {
+        expect(getByLabelText(/current password/i)).toBeEnabled();
+      });
+
       await userEvent.type(getByLabelText(/current password/i), 'testtest1234');
       await userEvent.type(getByLabelText(/new password/i), 'testtest');
       await userEvent.type(getByLabelText(/confirm password/i), 'testtest');
       await userEvent.click(getByRole('button', { name: /save$/i }));
-      expect(fixtures.clerk.user?.updatePassword).toHaveBeenCalledWith({
-        currentPassword: 'testtest1234',
-        newPassword: 'testtest',
-        signOutOfOtherSessions: true,
+      await waitFor(() => {
+        expect(fixtures.clerk.user?.updatePassword).toHaveBeenCalledWith({
+          currentPassword: 'testtest1234',
+          newPassword: 'testtest',
+          signOutOfOtherSessions: true,
+        });
       });
+
       await waitFor(() => getByRole('button', { name: /update password/i }));
       expect(queryByRole('heading', { name: /update password/i })).not.toBeInTheDocument();
-    });
+    }, 10_000);
 
     it('current password is not required when Reverification enabled', async () => {
       const config = createFixtures.config(f => {

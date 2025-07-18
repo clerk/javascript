@@ -2,9 +2,12 @@ import { useOrganizationList, useUser } from '@clerk/shared/react';
 import type { OrganizationResource } from '@clerk/types';
 import { useContext } from 'react';
 
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { OrganizationPreview } from '@/ui/elements/OrganizationPreview';
+import { PersonalWorkspacePreview } from '@/ui/elements/PersonalWorkspacePreview';
+
 import { useOrganizationListContext } from '../../contexts';
 import { SessionTasksContext } from '../../contexts/components/SessionTasks';
-import { OrganizationPreview, PersonalWorkspacePreview, useCardState, withCardStateProvider } from '../../elements';
 import { localizationKeys } from '../../localization';
 import { OrganizationListPreviewButton, sharedMainIdentifierSx } from './shared';
 
