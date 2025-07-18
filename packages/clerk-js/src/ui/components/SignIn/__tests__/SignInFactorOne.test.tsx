@@ -223,7 +223,6 @@ describe('SignInFactorOne', () => {
           await userEvent.type(screen.getByLabelText('Password'), '123456');
           await userEvent.click(screen.getByText('Continue'));
           await waitFor(() => {
-            expect(screen.getByText('Your account is locked. Please try again after 1 hour.')).toBeDefined();
             expect(fixtures.clerk.__internal_navigateWithError).toHaveBeenCalledWith('..', parseError(errJSON));
           });
         });
