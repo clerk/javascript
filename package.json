@@ -154,7 +154,8 @@
   },
   "pnpm": {
     "onlyBuiltDependencies": [
-      "cypress"
+      "cypress",
+      "msw"
     ],
     "overrides": {
       "jest": "29.7.0",

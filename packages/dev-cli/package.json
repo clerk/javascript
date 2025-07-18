@@ -22,11 +22,11 @@
     "lint": "eslint src"
   },
   "dependencies": {
-    "commander": "^12.1.0",
-    "concurrently": "^9.0.1",
-    "dotenv": "^16.4.5",
+    "commander": "^14.0.0",
+    "concurrently": "^9.2.0",
+    "dotenv": "^17.2.0",
     "globby": "^14.0.2",
-    "jscodeshift": "^0.16.1"
+    "jscodeshift": "^17.3.0"
   },
   "devDependencies": {},
   "engines": {

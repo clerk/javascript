@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.20.1
+
+### Patch Changes
+
+- Expand `vi-VN` localizations ([#6185](https://github.com/clerk/javascript/pull/6185)) by [@namnguyenthanhwork](https://github.com/namnguyenthanhwork)
+
 ## 3.20.0
 
 ### Minor Changes

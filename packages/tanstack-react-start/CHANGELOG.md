@@ -1,5 +1,18 @@
 # @clerk/tanstack-react-start
 
+## 0.21.0
+
+### Minor Changes
+
+- - Fixes serialization errors during handshake ([#6345](https://github.com/clerk/javascript/pull/6345)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  - Bump `@tanstack/react-start` and `@tanstack/react-router` peer dependency to 1.127.0
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/clerk-react@5.35.3
+
 ## 0.20.4
 
 ### Patch Changes
