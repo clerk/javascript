@@ -1,5 +1,18 @@
 # Change Log
 
+## 5.75.0
+
+### Minor Changes
+
+- [Billing Beta] Replace `payerType[]` with `forPayerType` typed as `'org' | 'user'`. ([#6342](https://github.com/clerk/javascript/pull/6342)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Updated dependencies [[`8ff2aef`](https://github.com/clerk/javascript/commit/8ff2aef1403ee5060a76ce3d77cc295d4adc62fb), [`6c5cd88`](https://github.com/clerk/javascript/commit/6c5cd88fa5f5c208f348126e9b9177df8f8fdeb7), [`80abb5d`](https://github.com/clerk/javascript/commit/80abb5d7e90fd18600f9d50c890ea065375c96de), [`4c3d6c1`](https://github.com/clerk/javascript/commit/4c3d6c197976a4235e6324eb70412f7652c97878), [`438e499`](https://github.com/clerk/javascript/commit/438e49943f6f970166df453e02d4c8f804f26345), [`bbfaca8`](https://github.com/clerk/javascript/commit/bbfaca8431f329798bd2867c147f711beb5db33a), [`35da3e8`](https://github.com/clerk/javascript/commit/35da3e85bbc24b1e2d337c8d110f3503be4b4c95), [`10e1060`](https://github.com/clerk/javascript/commit/10e10605b18a58f33a93caed058159c190678e74), [`6080456`](https://github.com/clerk/javascript/commit/60804566d37a2e7ab085bb1fff712bd41c4f7c2d), [`bd84c62`](https://github.com/clerk/javascript/commit/bd84c628f7be467ff1380eed8e5337d6edea1f76), [`305e5e4`](https://github.com/clerk/javascript/commit/305e5e4a25f097abb5ba72810d59b01764d77427)]:
+  - @clerk/localizations@3.20.2
+  - @clerk/types@4.69.0
+  - @clerk/shared@3.13.1
+
 ## 5.74.1
 
 ### Patch Changes

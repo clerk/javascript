@@ -1,5 +1,32 @@
 # Change Log
 
+## 3.20.2
+
+### Patch Changes
+
+- Refine Traditional Chinese (`zh-TW`) translations ([#5683](https://github.com/clerk/javascript/pull/5683)) by [@anilahsu](https://github.com/anilahsu)
+
+- Add Persian (`fa-IR`) language ([#6063](https://github.com/clerk/javascript/pull/6063)) by [@XerxesCoder](https://github.com/XerxesCoder)
+
+- Extend `ru-RU` localization ([#5698](https://github.com/clerk/javascript/pull/5698)) by [@ZharaskhanAman](https://github.com/ZharaskhanAman)
+
+- feat(localizations): Update `sk-SK` localization ([#5497](https://github.com/clerk/javascript/pull/5497)) by [@radblesk](https://github.com/radblesk)
+
+- Add `sr-RS` to the list of exported and available localizations ([#6352](https://github.com/clerk/javascript/pull/6352)) by [@tmilewski](https://github.com/tmilewski)
+
+- feat(localization): Add Hindi, Bengali, Tamil, Telugu, and Malay language support ([#5534](https://github.com/clerk/javascript/pull/5534)) by [@vanikya](https://github.com/vanikya)
+
+- Add missing French locales to support new Clerk's Billing feature ([#5944](https://github.com/clerk/javascript/pull/5944)) by [@bde-maze](https://github.com/bde-maze)
+
+- chore(localizations): Align `en-US` strings for danger zone with other translations ([#5800](https://github.com/clerk/javascript/pull/5800)) by [@joschi](https://github.com/joschi)
+
+- Add Kazakh (kk-KZ) language ([#5684](https://github.com/clerk/javascript/pull/5684)) by [@azekowka](https://github.com/azekowka)
+
+- Update `es-MX` translations ([#5663](https://github.com/clerk/javascript/pull/5663)) by [@LFCisneros](https://github.com/LFCisneros)
+
+- Updated dependencies [[`10e1060`](https://github.com/clerk/javascript/commit/10e10605b18a58f33a93caed058159c190678e74)]:
+  - @clerk/types@4.69.0
+
 ## 3.20.1
 
 ### Patch Changes

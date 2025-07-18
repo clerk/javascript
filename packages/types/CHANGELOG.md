@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.69.0
+
+### Minor Changes
+
+- [Billing Beta] Replace `payerType[]` with `forPayerType` typed as `'org' | 'user'`. ([#6342](https://github.com/clerk/javascript/pull/6342)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 4.68.0
 
 ### Minor Changes
