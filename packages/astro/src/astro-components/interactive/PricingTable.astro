@@ -1,8 +1,11 @@
 ---
-import type { PricingTableProps } from "@clerk/types";
-type Props = PricingTableProps
+import type { PricingTableProps } from '@clerk/types';
+type Props = PricingTableProps;
 
-import InternalUIComponentRenderer from './InternalUIComponentRenderer.astro'
+import InternalUIComponentRenderer from './InternalUIComponentRenderer.astro';
 ---
 
-<InternalUIComponentRenderer {...Astro.props} component="pricing-table" />
+<InternalUIComponentRenderer
+  {...Astro.props}
+  component='pricing-table'
+/>

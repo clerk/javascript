@@ -1,10 +1,18 @@
-import type { AuthObject, ClerkClient } from '@clerk/backend';
-import type { AuthenticateRequestOptions, ClerkRequest, RedirectFun, RequestState } from '@clerk/backend/internal';
+import type { ClerkClient } from '@clerk/backend';
+import type {
+  AuthenticateRequestOptions,
+  ClerkRequest,
+  RedirectFun,
+  RequestState,
+  SignedInAuthObject,
+  SignedOutAuthObject,
+} from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
 import { isHttpOrHttps } from '@clerk/shared/proxy';
 import { handleValueOrFn } from '@clerk/shared/utils';
+import type { PendingSessionOptions } from '@clerk/types';
 import type { APIContext } from 'astro';
 
 import { authAsyncStorage } from '#async-local-storage';
@@ -27,7 +35,7 @@ const CONTROL_FLOW_ERROR = {
   REDIRECT_TO_SIGN_IN: 'CLERK_PROTECT_REDIRECT_TO_SIGN_IN',
 };
 
-type ClerkMiddlewareAuthObject = AuthObject & {
+type ClerkMiddlewareAuthObject = (SignedInAuthObject | SignedOutAuthObject) & {
   redirectToSignIn: (opts?: { returnBackUrl?: URL | string | null }) => Response;
 };
 
@@ -244,8 +252,8 @@ function decorateAstroLocal(clerkRequest: ClerkRequest, context: APIContext, req
   context.locals.authStatus = status;
   context.locals.authMessage = message;
   context.locals.authReason = reason;
-  context.locals.auth = () => {
-    const authObject = getAuth(clerkRequest, context.locals);
+  context.locals.auth = ({ treatPendingAsSignedOut }: PendingSessionOptions = {}) => {
+    const authObject = getAuth(clerkRequest, context.locals, { treatPendingAsSignedOut });
 
     const clerkUrl = clerkRequest.clerkUrl;
 

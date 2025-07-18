@@ -19,6 +19,22 @@ describe('Organization', () => {
       has_image: true,
     });
 
-    expect(organization).toMatchSnapshot();
+    expect(organization).toMatchObject({
+      id: 'test_id',
+      name: 'test_name',
+      slug: 'test_slug',
+      hasImage: true,
+      imageUrl:
+        'https://img.clerk.com/eyJ0eXBlIjoiZGVmYXVsdCIsImlpZCI6Imluc18xbHlXRFppb2JyNjAwQUtVZVFEb1NsckVtb00iLCJyaWQiOiJ1c2VyXzJKbElJQTN2VXNjWXh1N2VUMnhINmFrTGgxOCIsImluaXRpYWxzIjoiREsifQ?width=160',
+      membersCount: 1,
+      pendingInvitationsCount: 10,
+      maxAllowedMemberships: 3,
+      adminDeleteEnabled: true,
+      createdAt: expect.any(Date),
+      updatedAt: expect.any(Date),
+      publicMetadata: {
+        public: 'metadata',
+      },
+    });
   });
 });

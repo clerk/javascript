@@ -2,7 +2,7 @@ import type { WaitlistResource } from '@clerk/types';
 
 import { render, screen } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
-import { Waitlist } from '../Waitlist';
+import { Waitlist } from '../';
 
 const { createFixtures } = bindCreateFixtures('Waitlist');
 

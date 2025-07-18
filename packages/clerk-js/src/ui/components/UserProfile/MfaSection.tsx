@@ -2,15 +2,19 @@ import { useUser } from '@clerk/shared/react';
 import type { PhoneNumberResource, VerificationStrategy } from '@clerk/types';
 import React, { Fragment, useState } from 'react';
 
+import { useCardState } from '@/ui/elements/contexts';
+import { FormattedPhoneNumberText } from '@/ui/elements/FormattedPhoneNumber';
+import type { ProfileSectionActionMenuItemProps } from '@/ui/elements/Section';
+import { ProfileSection } from '@/ui/elements/Section';
+import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
+import { handleError } from '@/ui/utils/errorHandler';
+
 import { useEnvironment } from '../../contexts';
 import { Badge, Flex, Icon, localizationKeys, Text } from '../../customizables';
-import type { ProfileSectionActionMenuItemProps } from '../../elements';
-import { FormattedPhoneNumberText, ProfileSection, ThreeDotsMenu, useCardState } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { AuthApp, DotCircle, Mobile } from '../../icons';
 import type { PropsOfComponent } from '../../styledSystem';
-import { handleError } from '../../utils';
 import { MfaBackupCodeCreateScreen, MfaScreen, RemoveMfaPhoneCodeScreen, RemoveMfaTOTPScreen } from './MfaScreens';
 import { defaultFirst, getSecondFactors, getSecondFactorsAvailableToAdd } from './utils';
 

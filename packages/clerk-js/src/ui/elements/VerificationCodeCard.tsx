@@ -16,6 +16,7 @@ export type VerificationCodeCardProps = {
   inputLabel?: LocalizationKey;
   safeIdentifier?: string | undefined | null;
   resendButton?: LocalizationKey;
+  alternativeMethodsLabel?: LocalizationKey;
   profileImageUrl?: string;
   onCodeEntryFinishedAction: (
     code: string,
@@ -75,7 +76,9 @@ export const VerificationCodeCard = (props: PropsWithChildren<VerificationCodeCa
             {showAlternativeMethods && props.onShowAlternativeMethodsClicked && (
               <Card.Action elementId='alternativeMethods'>
                 <Card.ActionLink
-                  localizationKey={localizationKeys('footerActionLink__useAnotherMethod')}
+                  localizationKey={
+                    props.alternativeMethodsLabel ?? localizationKeys('footerActionLink__useAnotherMethod')
+                  }
                   onClick={props.onShowAlternativeMethodsClicked}
                 />
               </Card.Action>

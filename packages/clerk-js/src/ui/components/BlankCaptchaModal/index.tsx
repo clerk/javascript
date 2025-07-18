@@ -1,5 +1,7 @@
+import { Card } from '@/ui/elements/Card';
+import { withCardStateProvider } from '@/ui/elements/contexts';
+
 import { Flow, useAppearance, useLocalizations } from '../../customizables';
-import { Card, withCardStateProvider } from '../../elements';
 import { Route, Switch } from '../../router';
 
 const BlankCard = withCardStateProvider(() => {

@@ -2,14 +2,21 @@
 import MenuItemRenderer from './MenuItemRenderer.astro';
 
 interface Props {
-  label: string
-  href: string
-  parent?: string
+  label: string;
+  href: string;
+  parent?: string;
 }
 
-const { label, href, parent } = Astro.props
+const { label, href, parent } = Astro.props;
 ---
 
-<MenuItemRenderer label={label} href={href} parent={parent}>
-    <slot name="label-icon" slot="label-icon" />
+<MenuItemRenderer
+  label={label}
+  href={href}
+  parent={parent}
+>
+  <slot
+    name='label-icon'
+    slot='label-icon'
+  />
 </MenuItemRenderer>

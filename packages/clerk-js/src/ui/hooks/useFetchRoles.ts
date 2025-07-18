@@ -2,7 +2,7 @@ import { useOrganization } from '@clerk/shared/react';
 import type { GetRolesParams } from '@clerk/types';
 
 import { useLocalizations } from '../localization';
-import { customRoleLocalizationKey, roleLocalizationKey } from '../utils';
+import { customRoleLocalizationKey, roleLocalizationKey } from '../utils/roleLocalizationKey';
 import { useFetch } from './useFetch';
 
 const getRolesParams = {

@@ -1,8 +1,8 @@
 ---
-import type { HTMLTag, Polymorphic } from 'astro/types'
-import type { SignUpButtonProps } from '@clerk/types'
-import type { ButtonProps } from '../../types'
-import { addUnstyledAttributeToFirstTag, logAsPropUsageDeprecation } from './utils'
+import type { HTMLTag, Polymorphic } from 'astro/types';
+import type { SignUpButtonProps } from '@clerk/types';
+import type { ButtonProps } from '../../types';
+import { addUnstyledAttributeToFirstTag, logAsPropUsageDeprecation } from './utils';
 
 type Props<Tag extends HTMLTag = 'button'> = Polymorphic<ButtonProps<Tag>> & SignUpButtonProps;
 
@@ -11,7 +11,7 @@ import { generateSafeId } from '@clerk/astro/internal';
 const safeId = generateSafeId();
 
 if ('as' in Astro.props) {
-  logAsPropUsageDeprecation()
+  logAsPropUsageDeprecation();
 }
 
 const {
@@ -24,7 +24,7 @@ const {
   mode,
   unsafeMetadata,
   ...props
-} = Astro.props
+} = Astro.props;
 
 const signUpOptions = {
   fallbackRedirectUrl,
@@ -32,13 +32,13 @@ const signUpOptions = {
   signInFallbackRedirectUrl,
   signInForceRedirectUrl,
   unsafeMetadata,
-}
+};
 
-let htmlElement = ''
+let htmlElement = '';
 
 if (asChild) {
-  htmlElement = await Astro.slots.render('default')
-  htmlElement = addUnstyledAttributeToFirstTag(htmlElement, safeId)
+  htmlElement = await Astro.slots.render('default');
+  htmlElement = addUnstyledAttributeToFirstTag(htmlElement, safeId);
 }
 ---
 
@@ -46,17 +46,20 @@ if (asChild) {
   asChild ? (
     <Fragment set:html={htmlElement} />
   ) : (
-    <Tag {...props} data-clerk-unstyled-id={safeId}>
+    <Tag
+      {...props}
+      data-clerk-unstyled-id={safeId}
+    >
       <slot>Sign up</slot>
-    </Tag >
+    </Tag>
   )
 }
 
 <script is:inline define:vars={{ props, signUpOptions, mode, safeId }}>
   const btn = document.querySelector(`[data-clerk-unstyled-id="${safeId}"]`);
 
-  btn.addEventListener("click", () => {
-    const clerk = window.Clerk
+  btn.addEventListener('click', () => {
+    const clerk = window.Clerk;
 
     if (mode === 'modal') {
       return clerk.openSignUp({ ...signUpOptions, appearance: props.appearance });

@@ -1,7 +1,9 @@
 import type { UseUserReturn } from '@clerk/types';
 
-import { useAssertWrappedByClerkProvider, useUserContext } from '../contexts';
+import { eventMethodCalled } from '../../telemetry/events/method-called';
+import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useUserContext } from '../contexts';
 
+const hookName = 'useUser';
 /**
  * The `useUser()` hook provides access to the current user's [`User`](https://clerk.com/docs/references/javascript/user) object, which contains all the data for a single user in your application and provides methods to manage their account. This hook also allows you to check if the user is signed in and if Clerk has loaded and initialized.
  *
@@ -126,9 +128,12 @@ import { useAssertWrappedByClerkProvider, useUserContext } from '../contexts';
  * </Tabs>
  */
 export function useUser(): UseUserReturn {
-  useAssertWrappedByClerkProvider('useUser');
+  useAssertWrappedByClerkProvider(hookName);
 
   const user = useUserContext();
+  const clerk = useClerkInstanceContext();
+
+  clerk.telemetry?.record(eventMethodCalled(hookName));
 
   if (user === undefined) {
     return { isLoaded: false, isSignedIn: undefined, user: undefined };

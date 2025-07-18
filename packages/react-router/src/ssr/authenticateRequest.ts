@@ -2,8 +2,8 @@ import { createClerkClient } from '@clerk/backend';
 import type { AuthenticateRequestOptions, SignedInState, SignedOutState } from '@clerk/backend/internal';
 import { AuthStatus, constants } from '@clerk/backend/internal';
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
+import type { LoaderFunctionArgs } from 'react-router';
 
-import type { LoaderFunctionArgs } from './types';
 import { patchRequest } from './utils';
 
 export async function authenticateRequest(

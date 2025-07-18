@@ -1,6 +1,7 @@
+import { Animated } from '@/ui/elements/Animated';
+
 import { useProtect } from '../../common';
 import { Button, descriptors, Flex, localizationKeys } from '../../customizables';
-import { Animated } from '../../elements';
 import { Action } from '../../elements/Action';
 import { InviteMembersScreen } from './InviteMembersScreen';
 

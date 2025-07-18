@@ -1,9 +1,10 @@
 import { decorateObjectWithResources } from '@clerk/backend/internal';
+import type { LoaderFunctionArgs } from 'react-router';
 
 import { invalidRootLoaderCallbackReturn } from '../utils/errors';
 import { authenticateRequest } from './authenticateRequest';
 import { loadOptions } from './loadOptions';
-import type { LoaderFunctionArgs, LoaderFunctionReturn, RootAuthLoaderCallback, RootAuthLoaderOptions } from './types';
+import type { LoaderFunctionReturn, RootAuthLoaderCallback, RootAuthLoaderOptions } from './types';
 import {
   assertValidHandlerResult,
   injectRequestStateIntoResponse,

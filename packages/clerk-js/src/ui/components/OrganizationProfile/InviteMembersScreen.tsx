@@ -1,10 +1,14 @@
 import { useOrganization } from '@clerk/shared/react';
 
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { FormContainer } from '@/ui/elements/FormContainer';
+import { IconCircle } from '@/ui/elements/IconCircle';
+import { SuccessPage } from '@/ui/elements/SuccessPage';
+
 import { runIfFunctionOrReturn } from '../../../utils';
 import { useWizard, Wizard } from '../../common';
 import { useOrganizationProfileContext } from '../../contexts';
 import { descriptors, Flex, localizationKeys, Text } from '../../customizables';
-import { FormContainer, IconCircle, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { Email } from '../../icons';
 import { BillingWidget } from './BillingWidget';

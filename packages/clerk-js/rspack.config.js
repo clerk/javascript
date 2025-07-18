@@ -41,6 +41,9 @@ const common = ({ mode, variant, disableRHC = false }) => {
   return {
     mode,
     resolve: {
+      alias: {
+        '@': path.resolve(__dirname, './src'),
+      },
       // Attempt to resolve these extensions in order
       // @see https://webpack.js.org/configuration/resolve/#resolveextensions
       extensions: ['.ts', '.tsx', '.mjs', '.js', '.jsx'],
@@ -78,6 +81,7 @@ const common = ({ mode, variant, disableRHC = false }) => {
      * Necessary to prevent the Stripe dependencies from being bundled into
      * SDKs such as Browser Extensions.
      */
+    // TODO: @COMMERCE:  Do we still need this?
     externals: disableRHC ? ['@stripe/stripe-js', '@stripe/react-stripe-js'] : undefined,
     optimization: {
       splitChunks: {
@@ -97,6 +101,12 @@ const common = ({ mode, variant, disableRHC = false }) => {
             name: 'coinbase-wallet-sdk',
             chunks: 'all',
           },
+          stripeVendor: {
+            test: /[\\/]node_modules[\\/](@stripe\/stripe-js)[\\/]/,
+            name: 'stripe-vendors',
+            chunks: 'all',
+            enforce: true,
+          },
           /**
            * Sign up is shared between the SignUp component and the SignIn component.
            */
@@ -104,17 +114,6 @@ const common = ({ mode, variant, disableRHC = false }) => {
             minChunks: 1,
             name: 'signup',
             test: module => !!(module.resource && module.resource.includes('/ui/components/SignUp')),
-          },
-          paymentSources: {
-            minChunks: 1,
-            name: 'paymentSources',
-            test: module =>
-              !!(
-                module.resource &&
-                (module.resource.includes('/ui/components/PaymentSources') ||
-                  // Include `@stripe/react-stripe-js` and `@stripe/stripe-js` in the checkout chunk
-                  module.resource.includes('/node_modules/@stripe'))
-              ),
           },
           common: {
             minChunks: 1,
@@ -546,6 +545,7 @@ const devConfig = ({ mode, env }) => {
   // By default we use https://js.lclclerk.com which is what our local dev proxy looks for.
   const devUrl = new URL(env.devOrigin || 'https://js.lclclerk.com');
   const isSandbox = !!env.sandbox;
+  const port = Number(new URL(env.devOrigin ?? 'http://localhost:4000').port || 4000);
 
   /** @type {() => import('@rspack/core').Configuration} */
   const commonForDev = () => {
@@ -576,7 +576,7 @@ const devConfig = ({ mode, env }) => {
         allowedHosts: ['all'],
         headers: { 'Access-Control-Allow-Origin': '*' },
         host: '0.0.0.0',
-        port: 4000,
+        port,
         hot: true,
         liveReload: false,
         client: { webSocketURL: `auto://${devUrl.host}/ws` },

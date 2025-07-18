@@ -55,6 +55,92 @@ type UpdateMetadataParams = MetadataParams;
 
 type GetOrganizationMembershipListParams = ClerkPaginationRequest<{
   organizationId: string;
+
+  /**
+   * Sorts organizations memberships by phone_number, email_address, created_at, first_name, last_name or username.
+   * By prepending one of those values with + or -, we can choose to sort in ascending (ASC) or descending (DESC) order.
+   */
+  orderBy?: WithSign<'phone_number' | 'email_address' | 'created_at' | 'first_name' | 'last_name' | 'username'>;
+
+  /**
+   * Returns users with the user ids specified. For each user id, the `+` and `-` can be
+   * prepended to the id, which denote whether the respective user id should be included or
+   * excluded from the result set. Accepts up to 100 user ids. Any user ids not found are ignored.
+   */
+  userId?: string[];
+
+  /* Returns users with the specified email addresses. Accepts up to 100 email addresses. Any email addresses not found are ignored. */
+  emailAddress?: string[];
+
+  /* Returns users with the specified phone numbers. Accepts up to 100 phone numbers. Any phone numbers not found are ignored. */
+  phoneNumber?: string[];
+
+  /* Returns users with the specified usernames. Accepts up to 100 usernames. Any usernames not found are ignored. */
+  username?: string[];
+
+  /* Returns users with the specified web3 wallet addresses. Accepts up to 100 web3 wallet addresses. Any web3 wallet addressed not found are ignored. */
+  web3Wallet?: string[];
+
+  /* Returns users with the specified roles. Accepts up to 100 roles. Any roles not found are ignored. */
+  role?: OrganizationMembershipRole[];
+
+  /**
+   * Returns users that match the given query.
+   * For possible matches, we check the email addresses, phone numbers, usernames, web3 wallets, user ids, first and last names.
+   * The query value doesn't need to match the exact value you are looking for, it is capable of partial matches as well.
+   */
+  query?: string;
+
+  /**
+   * Returns users with emails that match the given query, via case-insensitive partial match.
+   * For example, `email_address_query=ello` will match a user with the email `HELLO@example.com`.
+   */
+  emailAddressQuery?: string;
+
+  /**
+   * Returns users with phone numbers that match the given query, via case-insensitive partial match.
+   * For example, `phone_number_query=555` will match a user with the phone number `+1555xxxxxxx`.
+   */
+  phoneNumberQuery?: string;
+
+  /**
+   * Returns users with usernames that match the given query, via case-insensitive partial match.
+   * For example, `username_query=CoolUser` will match a user with the username `SomeCoolUser`.
+   */
+  usernameQuery?: string;
+
+  /* Returns users with names that match the given query, via case-insensitive partial match. */
+  nameQuery?: string;
+
+  /**
+   * Returns users whose last session activity was before the given date (with millisecond precision).
+   * Example: use 1700690400000 to retrieve users whose last session activity was before 2023-11-23.
+   */
+  lastActiveAtBefore?: number;
+  /**
+   * Returns users whose last session activity was after the given date (with millisecond precision).
+   * Example: use 1700690400000 to retrieve users whose last session activity was after 2023-11-23.
+   */
+  lastActiveAtAfter?: number;
+
+  /**
+   * Returns users who have been created before the given date (with millisecond precision).
+   * Example: use 1730160000000 to retrieve users who have been created before 2024-10-29.
+   */
+  createdAtBefore?: number;
+
+  /**
+   * Returns users who have been created after the given date (with millisecond precision).
+   * Example: use 1730160000000 to retrieve users who have been created after 2024-10-29.
+   */
+  createdAtAfter?: number;
+}>;
+
+type GetInstanceOrganizationMembershipListParams = ClerkPaginationRequest<{
+  /**
+   * Sorts organizations memberships by phone_number, email_address, created_at, first_name, last_name or username.
+   * By prepending one of those values with + or -, we can choose to sort in ascending (ASC) or descending (DESC) order.
+   */
   orderBy?: WithSign<'phone_number' | 'email_address' | 'created_at' | 'first_name' | 'last_name' | 'username'>;
 }>;
 
@@ -222,6 +308,14 @@ export class OrganizationAPI extends AbstractAPI {
       method: 'GET',
       path: joinPaths(basePath, organizationId, 'memberships'),
       queryParams,
+    });
+  }
+
+  public async getInstanceOrganizationMembershipList(params: GetInstanceOrganizationMembershipListParams) {
+    return this.request<PaginatedResourceResponse<OrganizationMembership[]>>({
+      method: 'GET',
+      path: '/organization_memberships',
+      queryParams: params,
     });
   }
 

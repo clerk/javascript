@@ -20,7 +20,7 @@ import {
 } from '../customizables';
 import { useEnabledThirdPartyProviders } from '../hooks';
 import { mqu, type PropsOfComponent } from '../styledSystem';
-import { sleep } from '../utils';
+import { sleep } from '../utils/sleep';
 import { useCardState } from './contexts';
 import { distributeStrategiesIntoRows } from './utils';
 

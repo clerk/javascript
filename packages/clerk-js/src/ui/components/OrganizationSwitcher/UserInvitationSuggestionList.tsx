@@ -6,15 +6,19 @@ import type {
 } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
 
+import { Actions } from '@/ui/elements/Actions';
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { OrganizationPreview } from '@/ui/elements/OrganizationPreview';
+import { PreviewButton } from '@/ui/elements/PreviewButton';
+import { handleError } from '@/ui/utils/errorHandler';
+
 import { InfiniteListSpinner } from '../../common';
 import { useAcceptedInvitations } from '../../contexts';
 import { Box, Button, descriptors, Flex, localizationKeys, Text } from '../../customizables';
-import { Actions, OrganizationPreview, PreviewButton, useCardState, withCardStateProvider } from '../../elements';
 import { useInView } from '../../hooks';
 import { SwitchArrowRight } from '../../icons';
 import type { PropsOfComponent } from '../../styledSystem';
 import { common } from '../../styledSystem';
-import { handleError } from '../../utils';
 import { organizationListParams, populateCacheUpdateItem } from './utils';
 
 const useFetchInvitations = () => {
@@ -116,9 +120,9 @@ const Preview = (
         elementId='organizationSwitcherListedOrganization'
         organization={publicOrganizationData}
         sx={t => ({
-          color: t.colors.$colorTextSecondary,
+          color: t.colors.$colorMutedForeground,
           ':hover': {
-            color: t.colors.$colorTextSecondary,
+            color: t.colors.$colorMutedForeground,
           },
         })}
       />
@@ -164,7 +168,10 @@ const InvitationPreview = withCardStateProvider(
     };
 
     if (status === 'accepted') {
-      if (acceptedOrganization?.id && activeOrganization?.id === acceptedOrganization.id) {
+      if (
+        invitation.publicOrganizationData.id === activeOrganization?.id ||
+        (acceptedOrganization?.id && activeOrganization?.id === acceptedOrganization.id)
+      ) {
         // Hide the Accepted invitation that looks like a membership when the organization is already active
         return null;
       }
@@ -179,9 +186,9 @@ const InvitationPreview = withCardStateProvider(
             elementId='organizationSwitcherListedOrganization'
             organization={publicOrganizationData}
             sx={t => ({
-              color: t.colors.$colorTextSecondary,
+              color: t.colors.$colorMutedForeground,
               ':hover': {
-                color: t.colors.$colorTextSecondary,
+                color: t.colors.$colorMutedForeground,
               },
             })}
           />

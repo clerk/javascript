@@ -29,10 +29,30 @@ export interface ClerkAPIError {
       }[];
     };
     permissions?: string[];
+    plan?: {
+      amount_formatted: string;
+      annual_monthly_amount_formatted: string;
+      currency_symbol: string;
+      id: string;
+      name: string;
+    };
+    isPlanUpgradePossible?: boolean;
   };
 }
 
 export interface ClerkRuntimeError {
   code: string;
   message: string;
+}
+
+/**
+ * Interface representing a Clerk API Response Error.
+ */
+export interface ClerkAPIResponseError extends Error {
+  clerkError: true;
+  status: number;
+  message: string;
+  clerkTraceId?: string;
+  retryAfter?: number;
+  errors: ClerkAPIError[];
 }

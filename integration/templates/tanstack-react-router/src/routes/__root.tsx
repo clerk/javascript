@@ -18,7 +18,12 @@ export const Route = createRootRoute({
 function RootComponent() {
   return (
     <ClerkProvider>
-      <Outlet />
+      <div className='p-2'>
+        <div className='border-b'>I'm a layout</div>
+        <div>
+          <Outlet />
+        </div>
+      </div>
       <TanStackRouterDevtools position='bottom-right' />
     </ClerkProvider>
   );

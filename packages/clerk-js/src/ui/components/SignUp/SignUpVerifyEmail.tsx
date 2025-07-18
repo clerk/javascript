@@ -1,5 +1,6 @@
+import { withCardStateProvider } from '@/ui/elements/contexts';
+
 import { useEnvironment } from '../../contexts';
-import { withCardStateProvider } from '../../elements';
 import { SignUpEmailCodeCard } from './SignUpEmailCodeCard';
 import { SignUpEmailLinkCard } from './SignUpEmailLinkCard';
 
