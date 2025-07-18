@@ -1,26 +1,161 @@
+/*
+ * =====================================================================================
+ * DISCLAIMER:
+ * =====================================================================================
+ * This localization file is a community contribution and is not officially maintained
+ * by Clerk. It has been provided by the community and may not be fully aligned
+ * with the current or future states of the main application. Clerk does not guarantee
+ * the accuracy, completeness, or timeliness of the translations in this file.
+ * Use of this file is at your own risk and discretion.
+ * =====================================================================================
+ */
+
 import type { LocalizationResource } from '@clerk/types';
 
 export const msMY: LocalizationResource = {
   locale: 'ms-MY',
-  __experimental_commerce: {
-    billedAnnually: 'Dibilkan secara tahunan',
-    free: 'Percuma',
-    getStarted: 'Mulakan',
-    manageMembership: 'Urus keahlian',
-    month: 'Bulan',
-    switchPlan: 'Tukar ke pelan ini',
+  apiKeys: {
+    action__add: undefined,
+    action__search: undefined,
+    createdAndExpirationStatus__expiresOn: undefined,
+    createdAndExpirationStatus__never: undefined,
+    detailsTitle__emptyRow: undefined,
+    formButtonPrimary__add: undefined,
+    formFieldCaption__expiration__expiresOn: undefined,
+    formFieldCaption__expiration__never: undefined,
+    formFieldOption__expiration__180d: undefined,
+    formFieldOption__expiration__1d: undefined,
+    formFieldOption__expiration__1y: undefined,
+    formFieldOption__expiration__30d: undefined,
+    formFieldOption__expiration__60d: undefined,
+    formFieldOption__expiration__7d: undefined,
+    formFieldOption__expiration__90d: undefined,
+    formFieldOption__expiration__never: undefined,
+    formHint: undefined,
+    formTitle: undefined,
+    lastUsed__days: undefined,
+    lastUsed__hours: undefined,
+    lastUsed__minutes: undefined,
+    lastUsed__months: undefined,
+    lastUsed__seconds: undefined,
+    lastUsed__years: undefined,
+    menuAction__revoke: undefined,
+    revokeConfirmation: {
+      confirmationText: undefined,
+      formButtonPrimary__revoke: undefined,
+      formHint: undefined,
+      formTitle: undefined,
+    },
   },
   backButton: 'Kembali',
+  badge__activePlan: undefined,
+  badge__canceledEndsAt: undefined,
   badge__currentPlan: 'Pelan Semasa',
   badge__default: 'Lalai',
+  badge__endsAt: undefined,
   badge__expired: 'Tamat tempoh',
   badge__otherImpersonatorDevice: 'Peranti penyamar lain',
+  badge__pastDueAt: undefined,
+  badge__pastDuePlan: undefined,
   badge__primary: 'Utama',
+  badge__renewsAt: undefined,
   badge__requiresAction: 'Memerlukan tindakan',
+  badge__startsAt: undefined,
   badge__thisDevice: 'Peranti ini',
   badge__unverified: 'Belum disahkan',
+  badge__upcomingPlan: undefined,
   badge__userDevice: 'Peranti pengguna',
   badge__you: 'Anda',
+  commerce: {
+    addPaymentMethod: undefined,
+    alwaysFree: undefined,
+    annually: undefined,
+    availableFeatures: undefined,
+    billedAnnually: 'Dibilkan secara tahunan',
+    billedMonthlyOnly: undefined,
+    cancelSubscription: undefined,
+    cancelSubscriptionAccessUntil: undefined,
+    cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionTitle: undefined,
+    cannotSubscribeMonthly: undefined,
+    cannotSubscribeUnrecoverable: undefined,
+    checkout: {
+      description__paymentSuccessful: undefined,
+      description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      lineItems: {
+        title__paymentMethod: undefined,
+        title__statementId: undefined,
+        title__subscriptionBegins: undefined,
+        title__totalPaid: undefined,
+      },
+      pastDueNotice: undefined,
+      perMonth: undefined,
+      title: undefined,
+      title__paymentSuccessful: undefined,
+      title__subscriptionSuccessful: undefined,
+    },
+    credit: undefined,
+    creditRemainder: undefined,
+    defaultFreePlanActive: undefined,
+    free: 'Percuma',
+    getStarted: 'Mulakan',
+    keepSubscription: undefined,
+    manage: undefined,
+    manageSubscription: 'Urus keahlian',
+    month: 'Bulan',
+    monthly: undefined,
+    pastDue: undefined,
+    pay: undefined,
+    paymentMethods: undefined,
+    paymentSource: {
+      applePayDescription: {
+        annual: undefined,
+        monthly: undefined,
+      },
+      dev: {
+        anyNumbers: undefined,
+        cardNumber: undefined,
+        cvcZip: undefined,
+        developmentMode: undefined,
+        expirationDate: undefined,
+        testCardInfo: undefined,
+      },
+    },
+    popular: undefined,
+    pricingTable: {
+      billingCycle: undefined,
+      included: undefined,
+    },
+    reSubscribe: undefined,
+    seeAllFeatures: undefined,
+    subscribe: undefined,
+    subscriptionDetails: {
+      beginsOn: undefined,
+      currentBillingCycle: undefined,
+      endsOn: undefined,
+      nextPaymentAmount: undefined,
+      nextPaymentOn: undefined,
+      pastDueAt: undefined,
+      renewsAt: undefined,
+      subscribedOn: undefined,
+      title: undefined,
+    },
+    subtotal: undefined,
+    switchPlan: 'Tukar ke pelan ini',
+    switchToAnnual: undefined,
+    switchToAnnualWithAnnualPrice: undefined,
+    switchToMonthly: undefined,
+    switchToMonthlyWithPrice: undefined,
+    totalDue: undefined,
+    totalDueToday: undefined,
+    viewFeatures: undefined,
+    year: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'Cipta organisasi',
     invitePage: {
@@ -37,6 +172,7 @@ export const msMY: LocalizationResource = {
     sameDay: "Hari ini pada {{ date | timeString('ms-MY') }}",
   },
   dividerText: 'atau',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'Gunakan kaedah lain',
   footerPageLink__help: 'Bantuan',
   footerPageLink__privacy: 'Privasi',
@@ -49,6 +185,9 @@ export const msMY: LocalizationResource = {
   formFieldError__verificationLinkExpired: 'Pautan pengesahan telah tamat tempoh. Sila minta pautan baharu.',
   formFieldHintText__optional: 'Pilihan',
   formFieldHintText__slug: 'Slug adalah ID mesra manusia yang mestilah unik. Ia sering digunakan dalam URL.',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'Masukkan kod sandaran',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Padam akaun',
   formFieldInputPlaceholder__emailAddress: 'Masukkan alamat e-mel anda',
@@ -63,6 +202,9 @@ export const msMY: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Masukkan kata laluan anda',
   formFieldInputPlaceholder__phoneNumber: 'Masukkan nombor telefon anda',
   formFieldInputPlaceholder__username: undefined,
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Aktifkan jemputan automatik untuk domain ini',
   formFieldLabel__backupCode: 'Kod sandaran',
   formFieldLabel__confirmDeletion: 'Pengesahan',
@@ -108,10 +250,72 @@ export const msMY: LocalizationResource = {
     titleWithoutPersonal: 'Pilih organisasi',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: 'Jemputan automatik',
     badge__automaticSuggestion: 'Cadangan automatik',
     badge__manualInvitation: 'Tiada pendaftaran automatik',
     badge__unverified: 'Belum disahkan',
+    billingPage: {
+      paymentHistorySection: {
+        empty: undefined,
+        notFound: undefined,
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        tableHeader__status: undefined,
+      },
+      paymentSourcesSection: {
+        actionLabel__default: 'Jadikan lalai',
+        actionLabel__remove: 'Keluarkan',
+        add: 'Tambah sumber pembayaran baharu',
+        addSubtitle: 'Tambah sumber pembayaran baharu ke akaun anda.',
+        cancelButton: 'Batal',
+        formButtonPrimary__add: 'Tambah Kaedah Pembayaran',
+        formButtonPrimary__pay: 'Bayar {{amount}}',
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: '{{identifier}} akan dikeluarkan dari akaun ini.',
+          messageLine2:
+            'Anda tidak akan dapat menggunakan sumber pembayaran ini lagi dan langganan berulang yang bergantung padanya tidak akan berfungsi lagi.',
+          successMessage: '{{paymentSource}} telah dikeluarkan dari akaun anda.',
+          title: 'Keluarkan sumber pembayaran',
+        },
+        title: 'Pilihan tersedia',
+      },
+      start: {
+        headerTitle__payments: undefined,
+        headerTitle__plans: 'Pelan',
+        headerTitle__statements: 'Invois',
+        headerTitle__subscriptions: undefined,
+      },
+      statementsSection: {
+        empty: undefined,
+        itemCaption__paidForPlan: undefined,
+        itemCaption__proratedCredit: undefined,
+        itemCaption__subscribedAndPaidForPlan: undefined,
+        notFound: undefined,
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+        totalPaid: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        tableHeader__edit: undefined,
+        tableHeader__plan: undefined,
+        tableHeader__startDate: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: 'Pengebilan & Pembayaran',
+    },
     createDomainPage: {
       subtitle:
         'Tambahkan domain untuk pengesahan. Pengguna dengan alamat e-mel di domain ini boleh menyertai organisasi secara automatik atau meminta untuk menyertai.',
@@ -169,11 +373,18 @@ export const msMY: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
+      billing: 'Pengebilan',
       description: 'Urus organisasi anda.',
       general: 'Am',
       members: 'Ahli',
       title: 'Organisasi',
-      billing: 'Pengebilan',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -361,6 +572,12 @@ export const msMY: LocalizationResource = {
       subtitle: 'Menghadapi masalah? Anda boleh menggunakan mana-mana kaedah ini untuk mendaftar masuk.',
       title: 'Gunakan kaedah lain',
     },
+    alternativePhoneCodeProvider: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     backupCodeMfa: {
       subtitle: 'Kod sandaran anda adalah kod yang anda terima semasa menyediakan pengesahan dua langkah.',
       title: 'Masukkan kod sandaran',
@@ -469,6 +686,12 @@ export const msMY: LocalizationResource = {
       actionLink__use_username: 'Gunakan nama pengguna',
       actionText: 'Tidak mempunyai akaun?',
       actionText__join_waitlist: 'Mahu akses awal?',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'Selamat kembali! Sila daftar masuk untuk meneruskan',
       subtitleCombined: undefined,
       title: 'Daftar masuk ke {{applicationName}}',
@@ -482,6 +705,11 @@ export const msMY: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Masukkan kata laluan anda',
   signUp: {
+    alternativePhoneCodeProvider: {
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     continue: {
       actionLink: 'Daftar masuk',
       actionText: 'Sudah mempunyai akaun?',
@@ -553,6 +781,12 @@ export const msMY: LocalizationResource = {
       actionLink__use_email: 'Gunakan e-mel sebaliknya',
       actionLink__use_phone: 'Gunakan telefon sebaliknya',
       actionText: 'Sudah mempunyai akaun?',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'Selamat datang! Sila isi butiran untuk memulakan.',
       subtitleCombined: 'Selamat datang! Sila isi butiran untuk memulakan.',
       title: 'Cipta akaun anda',
@@ -620,6 +854,7 @@ export const msMY: LocalizationResource = {
       sentencePrefix: 'Kata laluan anda mesti mengandungi',
     },
     phone_number_exists: 'Nombor telefon ini telah diambil. Sila cuba yang lain.',
+    session_exists: undefined,
     web3_missing_identifier: 'Sambungan Dompet Web3 tidak dapat dijumpai. Sila pasang satu untuk meneruskan.',
     zxcvbn: {
       couldBeStronger: 'Kata laluan anda berfungsi, tetapi boleh lebih kuat. Cuba tambah lebih banyak aksara.',
@@ -668,30 +903,8 @@ export const msMY: LocalizationResource = {
     action__signOutAll: 'Daftar keluar dari semua akaun',
   },
   userProfile: {
-    __experimental_billingPage: {
-      start: {
-        headerTitle__invoices: 'Invois',
-        headerTitle__paymentSources: 'Sumber Pembayaran',
-        headerTitle__plans: 'Pelan',
-      },
-      title: 'Pengebilan & Pembayaran',
-      paymentSourcesSection: {
-        title: 'Pilihan tersedia',
-        add: 'Tambah sumber pembayaran baharu',
-        addSubtitle: 'Tambah sumber pembayaran baharu ke akaun anda.',
-        cancelButton: 'Batal',
-        actionLabel__default: 'Jadikan lalai',
-        actionLabel__remove: 'Keluarkan',
-        formButtonPrimary__add: 'Tambah Kaedah Pembayaran',
-        formButtonPrimary__pay: 'Bayar {{amount}}',
-        removeResource: {
-          title: 'Keluarkan sumber pembayaran',
-          messageLine1: '{{identifier}} akan dikeluarkan dari akaun ini.',
-          messageLine2:
-            'Anda tidak akan dapat menggunakan sumber pembayaran ini lagi dan langganan berulang yang bergantung padanya tidak akan berfungsi lagi.',
-          successMessage: '{{paymentSource}} telah dikeluarkan dari akaun anda.',
-        },
-      },
+    apiKeysPage: {
+      title: undefined,
     },
     backupCodePage: {
       actionLabel__copied: 'Disalin!',
@@ -708,6 +921,65 @@ export const msMY: LocalizationResource = {
         'Anda boleh menggunakan salah satu daripadanya untuk mendaftar masuk ke akaun anda, jika anda kehilangan akses ke peranti pengesahan anda.',
       title: 'Tambah pengesahan kod sandaran',
       title__codelist: 'Kod sandaran',
+    },
+    billingPage: {
+      paymentHistorySection: {
+        empty: undefined,
+        notFound: undefined,
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        tableHeader__status: undefined,
+      },
+      paymentSourcesSection: {
+        actionLabel__default: 'Jadikan lalai',
+        actionLabel__remove: 'Keluarkan',
+        add: 'Tambah sumber pembayaran baharu',
+        addSubtitle: 'Tambah sumber pembayaran baharu ke akaun anda.',
+        cancelButton: 'Batal',
+        formButtonPrimary__add: 'Tambah Kaedah Pembayaran',
+        formButtonPrimary__pay: 'Bayar {{amount}}',
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: '{{identifier}} akan dikeluarkan dari akaun ini.',
+          messageLine2:
+            'Anda tidak akan dapat menggunakan sumber pembayaran ini lagi dan langganan berulang yang bergantung padanya tidak akan berfungsi lagi.',
+          successMessage: '{{paymentSource}} telah dikeluarkan dari akaun anda.',
+          title: 'Keluarkan sumber pembayaran',
+        },
+        title: 'Pilihan tersedia',
+      },
+      start: {
+        headerTitle__payments: undefined,
+        headerTitle__plans: 'Pelan',
+        headerTitle__statements: 'Invois',
+        headerTitle__subscriptions: undefined,
+      },
+      statementsSection: {
+        empty: undefined,
+        itemCaption__paidForPlan: undefined,
+        itemCaption__proratedCredit: undefined,
+        itemCaption__subscribedAndPaidForPlan: undefined,
+        notFound: undefined,
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+        totalPaid: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        tableHeader__edit: undefined,
+        tableHeader__plan: undefined,
+        tableHeader__startDate: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Pilih pembekal untuk menghubungkan akaun anda.',
@@ -817,6 +1089,7 @@ export const msMY: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profil',
+      apiKeys: undefined,
       billing: 'Pengebilan',
       description: 'Urus maklumat akaun anda.',
       security: 'Keselamatan',
@@ -854,6 +1127,9 @@ export const msMY: LocalizationResource = {
       title: 'Tambah nombor telefon',
       verifySubtitle: 'Masukkan kod pengesahan yang dihantar ke {{identifier}}',
       verifyTitle: 'Sahkan nombor telefon',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: 'Saiz yang disyorkan 1:1, sehingga 10MB.',
