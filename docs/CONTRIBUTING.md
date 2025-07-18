@@ -182,7 +182,7 @@ As explained in [documenting your changes](#documenting-your-changes), we use JS
 
 Locally, you can run `pnpm run typedoc:generate` to generate the docs. Afterwards, you can inspect the MDX files inside `.typdoc/docs`.
 
-These files are pushed to [clerk/generated-typedoc](https://github.com/clerk/generated-typedoc) and then used on Clerk's docs. In the docs you can access the files by using a `<Typedoc src="path/to/file" />` component.
+These files are pushed to [clerk/clerk-docs](https://github.com/clerk/clerk-docs/tree/main/clerk-typedoc) and then used on Clerk's docs. In the docs you can access the files by using a `<Typedoc src="path/to/file" />` component.
 
 So if you find a typo that's inside a Typedoc file, you'll need to edit the source file, [open a PR](#opening-a-pull-request), and get it merged to `main`. You can preview your changes with the aforementioned `pnpm typedoc:generate` command.
 

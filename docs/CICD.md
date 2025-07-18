@@ -14,7 +14,7 @@ A stable release will be triggered every time the "ci(repo): Version packages" P
 - All SDKs will be published to `npm`, except for those found in the excluded packages list in `.changeset/config.json`, or any packages with `private: true` set in their `package.json` file.
 - A workflow dispatch will be triggered to update the `clerkjs-proxy` worker in `clerk/sdk-infra-workers`.
 - A workflow dispatch will be triggered to update the `@clerk/nextjs` version in `clerk/dashboard`.
-- A workflow dispatch will be triggered to update the generated docs in `clerk/generated-typedoc`.
+- A workflow dispatch will be triggered to update the typedoc generated docs in `clerk/clerk-docs`.
 
 For details regarding the package versioning/publishing process, refer to the [Publishing docs](https://github.com/clerk/javascript/blob/main/docs/PUBLISH.md).
 
