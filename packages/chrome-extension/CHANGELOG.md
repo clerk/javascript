@@ -1,5 +1,14 @@
 # Change Log
 
+## 2.5.11
+
+### Patch Changes
+
+- Updated dependencies [[`10e1060`](https://github.com/clerk/javascript/commit/10e10605b18a58f33a93caed058159c190678e74)]:
+  - @clerk/clerk-js@5.75.0
+  - @clerk/clerk-react@5.35.4
+  - @clerk/shared@3.13.1
+
 ## 2.5.10
 
 ### Patch Changes
