@@ -1,5 +1,14 @@
 # Change Log
 
+## 5.74.1
+
+### Patch Changes
+
+- Replace the `/subscriptions` FAPI endpoint with `/subscription_items` for cancelling subscription items. ([#6341](https://github.com/clerk/javascript/pull/6341)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`4f2e0ad`](https://github.com/clerk/javascript/commit/4f2e0ad10d8680bdb1dea2bdcbfad45933a06a32)]:
+  - @clerk/localizations@3.20.1
+
 ## 5.74.0
 
 ### Minor Changes

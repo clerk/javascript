@@ -1,5 +1,15 @@
 # Change Log
 
+## 2.5.10
+
+### Patch Changes
+
+- Update dependencies ([#6174](https://github.com/clerk/javascript/pull/6174)) by [@renovate](https://github.com/apps/renovate)
+
+- Updated dependencies [[`7ca080f`](https://github.com/clerk/javascript/commit/7ca080fb18a9bf7797dc8f38ecded41c0eb12677)]:
+  - @clerk/clerk-js@5.74.1
+  - @clerk/clerk-react@5.35.3
+
 ## 2.5.9
 
 ### Patch Changes
