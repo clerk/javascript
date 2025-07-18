@@ -1,26 +1,161 @@
+/*
+ * =====================================================================================
+ * DISCLAIMER:
+ * =====================================================================================
+ * This localization file is a community contribution and is not officially maintained
+ * by Clerk. It has been provided by the community and may not be fully aligned
+ * with the current or future states of the main application. Clerk does not guarantee
+ * the accuracy, completeness, or timeliness of the translations in this file.
+ * Use of this file is at your own risk and discretion.
+ * =====================================================================================
+ */
+
 import type { LocalizationResource } from '@clerk/types';
 
 export const taIN: LocalizationResource = {
   locale: 'ta-IN',
-  __experimental_commerce: {
-    billedAnnually: 'வருடாந்திர கட்டணம்',
-    free: 'இலவசம்',
-    getStarted: 'தொடங்குங்கள்',
-    manageMembership: 'உறுப்பினர் நிர்வாகம்',
-    month: 'மாதம்',
-    switchPlan: 'இந்த திட்டத்திற்கு மாறவும்',
+  apiKeys: {
+    action__add: undefined,
+    action__search: undefined,
+    createdAndExpirationStatus__expiresOn: undefined,
+    createdAndExpirationStatus__never: undefined,
+    detailsTitle__emptyRow: undefined,
+    formButtonPrimary__add: undefined,
+    formFieldCaption__expiration__expiresOn: undefined,
+    formFieldCaption__expiration__never: undefined,
+    formFieldOption__expiration__180d: undefined,
+    formFieldOption__expiration__1d: undefined,
+    formFieldOption__expiration__1y: undefined,
+    formFieldOption__expiration__30d: undefined,
+    formFieldOption__expiration__60d: undefined,
+    formFieldOption__expiration__7d: undefined,
+    formFieldOption__expiration__90d: undefined,
+    formFieldOption__expiration__never: undefined,
+    formHint: undefined,
+    formTitle: undefined,
+    lastUsed__days: undefined,
+    lastUsed__hours: undefined,
+    lastUsed__minutes: undefined,
+    lastUsed__months: undefined,
+    lastUsed__seconds: undefined,
+    lastUsed__years: undefined,
+    menuAction__revoke: undefined,
+    revokeConfirmation: {
+      confirmationText: undefined,
+      formButtonPrimary__revoke: undefined,
+      formHint: undefined,
+      formTitle: undefined,
+    },
   },
   backButton: 'பின்செல்',
+  badge__activePlan: undefined,
+  badge__canceledEndsAt: undefined,
   badge__currentPlan: 'தற்போதைய திட்டம்',
   badge__default: 'இயல்புநிலை',
+  badge__endsAt: undefined,
   badge__expired: 'காலாவதியானது',
   badge__otherImpersonatorDevice: 'மற்ற மாறுவேட சாதனம்',
+  badge__pastDueAt: undefined,
+  badge__pastDuePlan: undefined,
   badge__primary: 'முதன்மை',
+  badge__renewsAt: undefined,
   badge__requiresAction: 'செயல் தேவை',
+  badge__startsAt: undefined,
   badge__thisDevice: 'இந்த சாதனம்',
   badge__unverified: 'சரிபார்க்கப்படாதது',
+  badge__upcomingPlan: undefined,
   badge__userDevice: 'பயனர் சாதனம்',
   badge__you: 'நீங்கள்',
+  commerce: {
+    addPaymentMethod: undefined,
+    alwaysFree: undefined,
+    annually: undefined,
+    availableFeatures: undefined,
+    billedAnnually: 'வருடாந்திர கட்டணம்',
+    billedMonthlyOnly: undefined,
+    cancelSubscription: undefined,
+    cancelSubscriptionAccessUntil: undefined,
+    cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionTitle: undefined,
+    cannotSubscribeMonthly: undefined,
+    cannotSubscribeUnrecoverable: undefined,
+    checkout: {
+      description__paymentSuccessful: undefined,
+      description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      lineItems: {
+        title__paymentMethod: undefined,
+        title__statementId: undefined,
+        title__subscriptionBegins: undefined,
+        title__totalPaid: undefined,
+      },
+      pastDueNotice: undefined,
+      perMonth: undefined,
+      title: undefined,
+      title__paymentSuccessful: undefined,
+      title__subscriptionSuccessful: undefined,
+    },
+    credit: undefined,
+    creditRemainder: undefined,
+    defaultFreePlanActive: undefined,
+    free: 'இலவசம்',
+    getStarted: 'தொடங்குங்கள்',
+    keepSubscription: undefined,
+    manage: undefined,
+    manageSubscription: 'உறுப்பினர் நிர்வாகம்',
+    month: 'மாதம்',
+    monthly: undefined,
+    pastDue: undefined,
+    pay: undefined,
+    paymentMethods: undefined,
+    paymentSource: {
+      applePayDescription: {
+        annual: undefined,
+        monthly: undefined,
+      },
+      dev: {
+        anyNumbers: undefined,
+        cardNumber: undefined,
+        cvcZip: undefined,
+        developmentMode: undefined,
+        expirationDate: undefined,
+        testCardInfo: undefined,
+      },
+    },
+    popular: undefined,
+    pricingTable: {
+      billingCycle: undefined,
+      included: undefined,
+    },
+    reSubscribe: undefined,
+    seeAllFeatures: undefined,
+    subscribe: undefined,
+    subscriptionDetails: {
+      beginsOn: undefined,
+      currentBillingCycle: undefined,
+      endsOn: undefined,
+      nextPaymentAmount: undefined,
+      nextPaymentOn: undefined,
+      pastDueAt: undefined,
+      renewsAt: undefined,
+      subscribedOn: undefined,
+      title: undefined,
+    },
+    subtotal: undefined,
+    switchPlan: 'இந்த திட்டத்திற்கு மாறவும்',
+    switchToAnnual: undefined,
+    switchToAnnualWithAnnualPrice: undefined,
+    switchToMonthly: undefined,
+    switchToMonthlyWithPrice: undefined,
+    totalDue: undefined,
+    totalDueToday: undefined,
+    viewFeatures: undefined,
+    year: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'நிறுவனத்தை உருவாக்கு',
     invitePage: {
@@ -37,6 +172,7 @@ export const taIN: LocalizationResource = {
     sameDay: "இன்று {{ date | timeString('ta-IN') }} மணிக்கு",
   },
   dividerText: 'அல்லது',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'வேறு முறையைப் பயன்படுத்துங்கள்',
   footerPageLink__help: 'உதவி',
   footerPageLink__privacy: 'தனியுரிமை',
@@ -50,6 +186,9 @@ export const taIN: LocalizationResource = {
   formFieldHintText__optional: 'விருப்பமானது',
   formFieldHintText__slug:
     'சிறப்புக்குறி என்பது மனிதர்கள் படிக்கக்கூடிய தனித்துவமான ID ஆகும். இது பெரும்பாலும் URL-களில் பயன்படுத்தப்படுகிறது.',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'காப்புக் குறியீட்டை உள்ளிடவும்',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'கணக்கை நீக்கு',
   formFieldInputPlaceholder__emailAddress: 'உங்கள் மின்னஞ்சல் முகவரியை உள்ளிடவும்',
@@ -64,6 +203,9 @@ export const taIN: LocalizationResource = {
   formFieldInputPlaceholder__password: 'உங்கள் கடவுச்சொல்லை உள்ளிடவும்',
   formFieldInputPlaceholder__phoneNumber: 'உங்கள் தொலைபேசி எண்ணை உள்ளிடவும்',
   formFieldInputPlaceholder__username: undefined,
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'இந்த டொமைனுக்கு தானியங்கி அழைப்புகளை இயக்கவும்',
   formFieldLabel__backupCode: 'காப்புக் குறியீடு',
   formFieldLabel__confirmDeletion: 'உறுதிப்படுத்தல்',
@@ -108,10 +250,72 @@ export const taIN: LocalizationResource = {
     titleWithoutPersonal: 'ஒரு நிறுவனத்தைத் தேர்ந்தெடுக்கவும்',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: 'தானியங்கி அழைப்புகள்',
     badge__automaticSuggestion: 'தானியங்கி பரிந்துரைகள்',
     badge__manualInvitation: 'தானியங்கி சேர்க்கை இல்லை',
     badge__unverified: 'சரிபார்க்கப்படாதது',
+    billingPage: {
+      paymentHistorySection: {
+        empty: undefined,
+        notFound: undefined,
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        tableHeader__status: undefined,
+      },
+      paymentSourcesSection: {
+        actionLabel__default: 'இயல்புநிலையாக்கு',
+        actionLabel__remove: 'நீக்கு',
+        add: 'புதிய கட்டண மூலத்தைச் சேர்க்கவும்',
+        addSubtitle: 'உங்கள் கணக்கில் புதிய கட்டண மூலத்தைச் சேர்க்கவும்.',
+        cancelButton: 'ரத்து செய்',
+        formButtonPrimary__add: 'கட்டண முறையைச் சேர்',
+        formButtonPrimary__pay: '{{amount}} செலுத்து',
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: '{{identifier}} இந்த கணக்கிலிருந்து நீக்கப்படும்.',
+          messageLine2:
+            'இந்த கட்டண மூலத்தை இனி பயன்படுத்த முடியாது மற்றும் அதைச் சார்ந்த எந்த தொடர் சந்தாக்களும் இனி செயல்படாது.',
+          successMessage: '{{paymentSource}} உங்கள் கணக்கிலிருந்து நீக்கப்பட்டது.',
+          title: 'கட்டண மூலத்தை நீக்கு',
+        },
+        title: 'கிடைக்கும் விருப்பங்கள்',
+      },
+      start: {
+        headerTitle__payments: undefined,
+        headerTitle__plans: 'திட்டங்கள்',
+        headerTitle__statements: 'இன்வாய்ஸ்கள்',
+        headerTitle__subscriptions: undefined,
+      },
+      statementsSection: {
+        empty: undefined,
+        itemCaption__paidForPlan: undefined,
+        itemCaption__proratedCredit: undefined,
+        itemCaption__subscribedAndPaidForPlan: undefined,
+        notFound: undefined,
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+        totalPaid: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        tableHeader__edit: undefined,
+        tableHeader__plan: undefined,
+        tableHeader__startDate: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: 'கட்டணம் & செலுத்துதல்கள்',
+    },
     createDomainPage: {
       subtitle:
         'சரிபார்க்க டொமைனைச் சேர்க்கவும். இந்த டொமைனில் மின்னஞ்சல் முகவரிகளைக் கொண்ட பயனர்கள் தானாகவே நிறுவனத்தில் சேரலாம் அல்லது சேர கோரலாம்.',
@@ -170,11 +374,18 @@ export const taIN: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
+      billing: 'கட்டணம்',
       description: 'உங்கள் நிறுவனத்தை நிர்வகிக்கவும்.',
       general: 'பொது',
       members: 'உறுப்பினர்கள்',
       title: 'நிறுவனம்',
-      billing: 'கட்டணம்',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -362,6 +573,12 @@ export const taIN: LocalizationResource = {
       subtitle: 'சிக்கல்கள் உள்ளதா? உள்நுழைய இந்த முறைகளில் எதையும் பயன்படுத்தலாம்.',
       title: 'வேறு முறையைப் பயன்படுத்தவும்',
     },
+    alternativePhoneCodeProvider: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     backupCodeMfa: {
       subtitle: 'உங்கள் காப்புக் குறியீடு இரண்டு-படி அங்கீகாரத்தை அமைக்கும்போது நீங்கள் பெற்றதாகும்.',
       title: 'காப்புக் குறியீட்டை உள்ளிடவும்',
@@ -469,6 +686,12 @@ export const taIN: LocalizationResource = {
       actionLink__use_username: 'பயனர்பெயரைப் பயன்படுத்து',
       actionText: 'கணக்கு இல்லையா?',
       actionText__join_waitlist: 'முன்கூட்டியே அணுகல் வேண்டுமா?',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'மீண்டும் வரவேற்கிறோம்! தொடர உள்நுழையவும்',
       subtitleCombined: undefined,
       title: '{{applicationName}} இல் உள்நுழையவும்',
@@ -482,6 +705,11 @@ export const taIN: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'உங்கள் கடவுச்சொல்லை உள்ளிடவும்',
   signUp: {
+    alternativePhoneCodeProvider: {
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     continue: {
       actionLink: 'உள்நுழை',
       actionText: 'ஏற்கனவே கணக்கு உள்ளதா?',
@@ -552,6 +780,12 @@ export const taIN: LocalizationResource = {
       actionLink__use_email: 'பதிலாக மின்னஞ்சலைப் பயன்படுத்து',
       actionLink__use_phone: 'பதிலாக தொலைபேசியைப் பயன்படுத்து',
       actionText: 'ஏற்கனவே கணக்கு உள்ளதா?',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'வரவேற்கிறோம்! தொடங்க விவரங்களை நிரப்பவும்.',
       subtitleCombined: 'வரவேற்கிறோம்! தொடங்க விவரங்களை நிரப்பவும்.',
       title: 'உங்கள் கணக்கை உருவாக்கவும்',
@@ -620,6 +854,7 @@ export const taIN: LocalizationResource = {
       sentencePrefix: 'உங்கள் கடவுச்சொல்லில் இருக்க வேண்டும்',
     },
     phone_number_exists: 'இந்த தொலைபேசி எண் எடுக்கப்பட்டுள்ளது. வேறொன்றை முயற்சிக்கவும்.',
+    session_exists: undefined,
     web3_missing_identifier: 'Web3 வாலட் நீட்டிப்பு காணப்படவில்லை. தொடர ஒன்றை நிறுவவும்.',
     zxcvbn: {
       couldBeStronger:
@@ -669,30 +904,8 @@ export const taIN: LocalizationResource = {
     action__signOutAll: 'அனைத்து கணக்குகளிலிருந்தும் வெளியேறு',
   },
   userProfile: {
-    __experimental_billingPage: {
-      start: {
-        headerTitle__invoices: 'இன்வாய்ஸ்கள்',
-        headerTitle__paymentSources: 'கட்டண மூலங்கள்',
-        headerTitle__plans: 'திட்டங்கள்',
-      },
-      title: 'கட்டணம் & செலுத்துதல்கள்',
-      paymentSourcesSection: {
-        title: 'கிடைக்கும் விருப்பங்கள்',
-        add: 'புதிய கட்டண மூலத்தைச் சேர்க்கவும்',
-        addSubtitle: 'உங்கள் கணக்கில் புதிய கட்டண மூலத்தைச் சேர்க்கவும்.',
-        cancelButton: 'ரத்து செய்',
-        actionLabel__default: 'இயல்புநிலையாக்கு',
-        actionLabel__remove: 'நீக்கு',
-        formButtonPrimary__add: 'கட்டண முறையைச் சேர்',
-        formButtonPrimary__pay: '{{amount}} செலுத்து',
-        removeResource: {
-          title: 'கட்டண மூலத்தை நீக்கு',
-          messageLine1: '{{identifier}} இந்த கணக்கிலிருந்து நீக்கப்படும்.',
-          messageLine2:
-            'இந்த கட்டண மூலத்தை இனி பயன்படுத்த முடியாது மற்றும் அதைச் சார்ந்த எந்த தொடர் சந்தாக்களும் இனி செயல்படாது.',
-          successMessage: '{{paymentSource}} உங்கள் கணக்கிலிருந்து நீக்கப்பட்டது.',
-        },
-      },
+    apiKeysPage: {
+      title: undefined,
     },
     backupCodePage: {
       actionLabel__copied: 'நகலெடுக்கப்பட்டது!',
@@ -709,6 +922,65 @@ export const taIN: LocalizationResource = {
         'உங்கள் அங்கீகார சாதனத்திற்கான அணுகலை இழந்தால், உங்கள் கணக்கில் உள்நுழைய இவற்றில் ஒன்றைப் பயன்படுத்தலாம்.',
       title: 'காப்புக் குறியீடு சரிபார்ப்பைச் சேர்',
       title__codelist: 'காப்புக் குறியீடுகள்',
+    },
+    billingPage: {
+      paymentHistorySection: {
+        empty: undefined,
+        notFound: undefined,
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        tableHeader__status: undefined,
+      },
+      paymentSourcesSection: {
+        actionLabel__default: 'இயல்புநிலையாக்கு',
+        actionLabel__remove: 'நீக்கு',
+        add: 'புதிய கட்டண மூலத்தைச் சேர்க்கவும்',
+        addSubtitle: 'உங்கள் கணக்கில் புதிய கட்டண மூலத்தைச் சேர்க்கவும்.',
+        cancelButton: 'ரத்து செய்',
+        formButtonPrimary__add: 'கட்டண முறையைச் சேர்',
+        formButtonPrimary__pay: '{{amount}} செலுத்து',
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: '{{identifier}} இந்த கணக்கிலிருந்து நீக்கப்படும்.',
+          messageLine2:
+            'இந்த கட்டண மூலத்தை இனி பயன்படுத்த முடியாது மற்றும் அதைச் சார்ந்த எந்த தொடர் சந்தாக்களும் இனி செயல்படாது.',
+          successMessage: '{{paymentSource}} உங்கள் கணக்கிலிருந்து நீக்கப்பட்டது.',
+          title: 'கட்டண மூலத்தை நீக்கு',
+        },
+        title: 'கிடைக்கும் விருப்பங்கள்',
+      },
+      start: {
+        headerTitle__payments: undefined,
+        headerTitle__plans: 'திட்டங்கள்',
+        headerTitle__statements: 'இன்வாய்ஸ்கள்',
+        headerTitle__subscriptions: undefined,
+      },
+      statementsSection: {
+        empty: undefined,
+        itemCaption__paidForPlan: undefined,
+        itemCaption__proratedCredit: undefined,
+        itemCaption__subscribedAndPaidForPlan: undefined,
+        notFound: undefined,
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+        totalPaid: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        tableHeader__edit: undefined,
+        tableHeader__plan: undefined,
+        tableHeader__startDate: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: 'கட்டணம் & செலுத்துதல்கள்',
     },
     connectedAccountPage: {
       formHint: 'உங்கள் கணக்கை இணைக்க ஒரு வழங்குநரைத் தேர்ந்தெடுக்கவும்.',
@@ -817,6 +1089,7 @@ export const taIN: LocalizationResource = {
     mobileButton__menu: 'மெனு',
     navbar: {
       account: 'சுயவிவரம்',
+      apiKeys: undefined,
       billing: 'கட்டணம்',
       description: 'உங்கள் கணக்கு தகவலை நிர்வகிக்கவும்.',
       security: 'பாதுகாப்பு',
@@ -853,6 +1126,9 @@ export const taIN: LocalizationResource = {
       title: 'தொலைபேசி எண்ணைச் சேர்',
       verifySubtitle: '{{identifier}} க்கு அனுப்பப்பட்ட சரிபார்ப்புக் குறியீட்டை உள்ளிடவும்',
       verifyTitle: 'தொலைபேசி எண்ணை சரிபார்க்கவும்',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: 'பரிந்துரைக்கப்பட்ட அளவு 1:1, 10MB வரை.',
