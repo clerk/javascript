@@ -15,6 +15,11 @@ type PopoverProps = PropsWithChildren<{
   outsideElementsInert?: boolean;
   order?: Array<'reference' | 'floating' | 'content'>;
   portal?: boolean;
+  /**
+   * The root element to render the portal into.
+   * @default document.body
+   */
+  root?: HTMLElement | React.MutableRefObject<HTMLElement | null>;
 }>;
 
 export const Popover = (props: PopoverProps) => {
@@ -26,13 +31,14 @@ export const Popover = (props: PopoverProps) => {
     nodeId,
     isOpen,
     portal = true,
+    root,
     children,
   } = props;
 
   if (portal) {
     return (
       <FloatingNode id={nodeId}>
-        <FloatingPortal>
+        <FloatingPortal root={root}>
           {isOpen && (
             <FloatingFocusManager
               context={context}

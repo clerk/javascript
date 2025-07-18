@@ -33,6 +33,7 @@ const AVAILABLE_COMPONENTS = [
   'organizationSwitcher',
   'waitlist',
   'pricingTable',
+  'apiKeys',
   'oauthConsent',
 ] as const;
 
@@ -92,6 +93,7 @@ const componentControls: Record<(typeof AVAILABLE_COMPONENTS)[number], Component
   organizationSwitcher: buildComponentControls('organizationSwitcher'),
   waitlist: buildComponentControls('waitlist'),
   pricingTable: buildComponentControls('pricingTable'),
+  apiKeys: buildComponentControls('apiKeys'),
   oauthConsent: buildComponentControls('oauthConsent'),
 };
 
@@ -154,16 +156,17 @@ function appearanceVariableOptions() {
     'colorPrimary',
     'colorNeutral',
     'colorBackground',
-    'colorTextOnPrimaryBackground',
+    'colorPrimaryForeground',
+    'colorForeground',
     'colorDanger',
     'colorSuccess',
     'colorWarning',
-    'colorText',
-    'colorTextSecondary',
-    'colorInputText',
-    'colorInputBackground',
+    'colorForeground',
+    'colorMutedForeground',
+    'colorInputForeground',
+    'colorInput',
     'colorShimmer',
-    'spacingUnit',
+    'spacing',
     'borderRadius',
   ] as const;
 
@@ -311,6 +314,9 @@ void (async () => {
     },
     '/pricing-table': () => {
       Clerk.mountPricingTable(app, componentControls.pricingTable.getProps() ?? {});
+    },
+    '/api-keys': () => {
+      Clerk.mountApiKeys(app, componentControls.apiKeys.getProps() ?? {});
     },
     '/oauth-consent': () => {
       const searchParams = new URLSearchParams(window.location.search);

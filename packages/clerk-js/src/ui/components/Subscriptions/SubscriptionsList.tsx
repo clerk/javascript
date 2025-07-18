@@ -1,12 +1,14 @@
-import type { CommerceSubscriptionResource } from '@clerk/types';
-
 import { ProfileSection } from '@/ui/elements/Section';
 
 import { useProtect } from '../../common';
-import { usePlansContext, useSubscriberTypeContext, useSubscriptions } from '../../contexts';
+import {
+  usePlansContext,
+  useSubscriberTypeContext,
+  useSubscriberTypeLocalizationRoot,
+  useSubscriptions,
+} from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import {
-  Badge,
   Button,
   Col,
   Flex,
@@ -23,6 +25,7 @@ import {
 } from '../../customizables';
 import { ArrowsUpDown, CogFilled, Plans, Plus } from '../../icons';
 import { useRouter } from '../../router';
+import { SubscriptionBadge } from './badge';
 
 export function SubscriptionsList({
   title,
@@ -33,24 +36,14 @@ export function SubscriptionsList({
   arrowButtonText: LocalizationKey;
   arrowButtonEmptyText: LocalizationKey;
 }) {
-  const { handleSelectPlan, captionForSubscription, canManageSubscription } = usePlansContext();
+  const { captionForSubscription, openSubscriptionDetails } = usePlansContext();
+  const localizationRoot = useSubscriberTypeLocalizationRoot();
   const subscriberType = useSubscriberTypeContext();
   const { data: subscriptions } = useSubscriptions();
   const canManageBilling = useProtect(
     has => has({ permission: 'org:sys_billing:manage' }) || subscriberType === 'user',
   );
   const { navigate } = useRouter();
-  const handleSelectSubscription = (
-    subscription: CommerceSubscriptionResource,
-    event?: React.MouseEvent<HTMLElement>,
-  ) => {
-    handleSelectPlan({
-      mode: 'modal', // always modal for now
-      plan: subscription.plan,
-      planPeriod: subscription.planPeriod,
-      event,
-    });
-  };
 
   const sortedSubscriptions = subscriptions.sort((a, b) => {
     // alway put active subscriptions first
@@ -79,9 +72,21 @@ export function SubscriptionsList({
         <Table tableHeadVisuallyHidden>
           <Thead>
             <Tr>
-              <Th>Plan</Th>
-              <Th>Start date</Th>
-              <Th>Edit</Th>
+              <Th
+                localizationKey={localizationKeys(
+                  `${localizationRoot}.billingPage.subscriptionsListSection.tableHeader__plan`,
+                )}
+              />
+              <Th
+                localizationKey={localizationKeys(
+                  `${localizationRoot}.billingPage.subscriptionsListSection.tableHeader__startDate`,
+                )}
+              />
+              <Th
+                localizationKey={localizationKeys(
+                  `${localizationRoot}.billingPage.subscriptionsListSection.tableHeader__edit`,
+                )}
+              />
             </Tr>
           </Thead>
           <Tbody>
@@ -107,18 +112,13 @@ export function SubscriptionsList({
                       >
                         {subscription.plan.name}
                       </Text>
-                      {sortedSubscriptions.length > 1 || !!subscription.canceledAt ? (
-                        <Badge
-                          colorScheme={subscription.status === 'active' ? 'secondary' : 'primary'}
-                          localizationKey={
-                            subscription.status === 'active'
-                              ? localizationKeys('badge__activePlan')
-                              : localizationKeys('badge__upcomingPlan')
-                          }
-                        />
+                      {sortedSubscriptions.length > 1 || !!subscription.canceledAtDate ? (
+                        <SubscriptionBadge subscription={subscription} />
                       ) : null}
                     </Flex>
+
                     {(!subscription.plan.isDefault || subscription.status === 'upcoming') && (
+                      // here
                       <Text
                         variant='caption'
                         colorScheme='secondary'
@@ -140,7 +140,7 @@ export function SubscriptionsList({
                     {(subscription.plan.amount > 0 || subscription.plan.annualAmount > 0) && (
                       <Span
                         sx={t => ({
-                          color: t.colors.$colorTextSecondary,
+                          color: t.colors.$colorMutedForeground,
                           textTransform: 'lowercase',
                           ':before': {
                             content: '"/"',
@@ -161,28 +161,26 @@ export function SubscriptionsList({
                     textAlign: 'right',
                   })}
                 >
-                  {canManageSubscription({ subscription }) && subscription.id && !subscription.plan.isDefault && (
-                    <Button
-                      aria-label='Manage subscription'
-                      onClick={event => handleSelectSubscription(subscription, event)}
-                      variant='bordered'
-                      colorScheme='secondary'
-                      isDisabled={!canManageBilling}
+                  <Button
+                    aria-label='Manage subscription'
+                    onClick={event => openSubscriptionDetails(event)}
+                    variant='bordered'
+                    colorScheme='secondary'
+                    isDisabled={!canManageBilling}
+                    sx={t => ({
+                      width: t.sizes.$6,
+                      height: t.sizes.$6,
+                    })}
+                  >
+                    <Icon
+                      icon={CogFilled}
                       sx={t => ({
-                        width: t.sizes.$6,
-                        height: t.sizes.$6,
+                        width: t.sizes.$4,
+                        height: t.sizes.$4,
+                        opacity: t.opacity.$inactive,
                       })}
-                    >
-                      <Icon
-                        icon={CogFilled}
-                        sx={t => ({
-                          width: t.sizes.$4,
-                          height: t.sizes.$4,
-                          opacity: t.opacity.$inactive,
-                        })}
-                      />
-                    </Button>
-                  )}
+                    />
+                  </Button>
                 </Td>
               </Tr>
             ))}

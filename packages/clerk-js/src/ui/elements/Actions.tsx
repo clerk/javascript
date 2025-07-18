@@ -13,7 +13,7 @@ export const Actions = (props: PropsOfComponent<typeof Flex>) => {
     <Col
       sx={[
         t => ({
-          '> button,div': { border: `0 solid ${t.colors.$neutralAlpha100}` },
+          '> button,div': { border: `0 solid ${t.colors.$borderAlpha100}` },
           '>:not([hidden],:empty)~:not([hidden],:empty)': {
             borderTopWidth: '1px',
             borderBottomWidth: '0',

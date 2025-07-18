@@ -2,13 +2,13 @@ import { useClerk } from '@clerk/shared/react';
 import { createContext, useContext, useMemo } from 'react';
 
 import type { NavbarRoute } from '@/ui/elements/Navbar';
+import type { CustomPageContent } from '@/ui/utils/createCustomPages';
+import { createOrganizationProfileCustomPages } from '@/ui/utils/createCustomPages';
 
 import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID } from '../../constants';
 import { useEnvironment } from '../../contexts';
 import { useRouter } from '../../router';
 import type { OrganizationProfileCtx } from '../../types';
-import type { CustomPageContent } from '../../utils';
-import { createOrganizationProfileCustomPages } from '../../utils';
 
 type PagesType = {
   routes: NavbarRoute[];
@@ -23,6 +23,7 @@ export type OrganizationProfileContextType = OrganizationProfileCtx & {
   isMembersPageRoot: boolean;
   isGeneralPageRoot: boolean;
   isBillingPageRoot: boolean;
+  isApiKeysPageRoot: boolean;
 };
 
 export const OrganizationProfileContext = createContext<OrganizationProfileCtx | null>(null);
@@ -50,6 +51,7 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
   const isMembersPageRoot = pages.routes[0].id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.MEMBERS;
   const isGeneralPageRoot = pages.routes[0].id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.GENERAL;
   const isBillingPageRoot = pages.routes[0].id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.BILLING;
+  const isApiKeysPageRoot = pages.routes[0].id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.API_KEYS;
   const navigateToGeneralPageRoot = () =>
     navigate(isGeneralPageRoot ? '../' : isMembersPageRoot ? './organization-general' : '../organization-general');
 
@@ -62,5 +64,6 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
     isMembersPageRoot,
     isGeneralPageRoot,
     isBillingPageRoot,
+    isApiKeysPageRoot,
   };
 };

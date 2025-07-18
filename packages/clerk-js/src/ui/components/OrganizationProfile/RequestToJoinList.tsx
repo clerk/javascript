@@ -3,9 +3,9 @@ import type { OrganizationMembershipRequestResource } from '@clerk/types';
 
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { UserPreview } from '@/ui/elements/UserPreview';
+import { handleError } from '@/ui/utils/errorHandler';
 
 import { Box, Button, descriptors, Flex, localizationKeys, Td } from '../../customizables';
-import { handleError } from '../../utils';
 import { DataTable, RowContainer } from './MemberListTable';
 
 const membershipRequestsParams = {

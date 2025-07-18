@@ -1,0 +1,128 @@
+---
+description: 
+globs: *.jsx, *.tsx
+alwaysApply: false
+---
+When working with React components:
+
+Component Architecture
+
+Component Structure
+- Always use functional components with hooks instead of class components
+- Follow PascalCase naming for components: `UserProfile`, `NavigationMenu`
+- Keep components focused on a single responsibility - split large components
+- Limit component size to 150-200 lines; extract logic into custom hooks
+- Use composition over inheritance - prefer smaller, composable components
+- Export components as named exports for better tree-shaking
+
+File Organization
+- One component per file with matching filename and component name
+- Co-locate related files (component, test, stories) in same directory
+- Use index.ts files for clean imports but avoid deep barrel exports
+- Separate UI components from business logic components
+- Group by feature rather than by file type for larger applications
+
+TypeScript Integration
+
+Type Safety
+- Use proper type definitions for props and state
+- Leverage TypeScript's type inference where possible
+- Use proper event types for handlers
+- Implement proper generic types for reusable components
+- Use proper type guards for conditional rendering
+
+State Management
+
+Local State
+- Use useState for simple state management
+- Use useReducer for complex state logic
+- Implement proper state initialization
+- Use proper state updates with callbacks
+- Implement proper state cleanup
+
+Global State
+- Use Context API for theme/authentication
+- Consider state management solutions for complex state
+- Implement proper state selectors
+- Use proper state normalization
+- Implement proper state persistence
+
+Performance Optimization
+
+Rendering Optimization
+- Use React.memo for expensive components
+- Implement proper useCallback for handlers
+- Use proper useMemo for expensive computations
+- Implement proper virtualization for lists
+- Use proper code splitting with React.lazy
+
+Memory Management
+- Implement proper cleanup in useEffect
+- Use proper refs for DOM access
+- Implement proper event listener cleanup
+- Use proper abort controllers for fetch
+- Implement proper subscription cleanup
+
+Testing
+
+Unit Testing
+- Use React Testing Library
+- Test component behavior, not implementation
+- Use proper test queries
+- Implement proper test isolation
+- Use proper test coverage
+
+Integration Testing
+- Test component interactions
+- Use proper test data
+- Implement proper test setup
+- Use proper test cleanup
+- Implement proper test assertions
+
+Accessibility
+
+Semantic HTML
+- Use proper HTML elements
+- Implement proper ARIA attributes
+- Use proper heading hierarchy
+- Implement proper form labels
+- Use proper button types
+
+Keyboard Navigation
+- Implement proper focus management
+- Use proper keyboard shortcuts
+- Implement proper tab order
+- Use proper skip links
+- Implement proper focus traps
+
+Error Handling
+
+Error Boundaries
+- Implement proper error boundaries
+- Use proper error logging
+- Implement proper error recovery
+- Use proper error messages
+- Implement proper error fallbacks
+
+Form Validation
+- Use proper form validation
+- Implement proper error states
+- Use proper error messages
+- Implement proper form submission
+- Use proper form reset
+
+Code Style
+
+Naming Conventions
+- Use proper component naming
+- Implement proper file naming
+- Use proper prop naming
+- Implement proper state naming
+- Use proper handler naming
+
+Code Organization
+- Use proper file structure
+- Implement proper component structure
+- Use proper hook structure
+- Implement proper utility structure
+- Use proper test structure

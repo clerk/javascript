@@ -1,4 +1,4 @@
-import type { SignUpStatus } from '@clerk/types';
+import type { SignUpStatus, VerificationStatus } from '@clerk/types';
 
 import type {
   ActorTokenStatus,
@@ -34,6 +34,7 @@ export const ObjectType = {
   InstanceRestrictions: 'instance_restrictions',
   InstanceSettings: 'instance_settings',
   Invitation: 'invitation',
+  Machine: 'machine',
   MachineToken: 'machine_to_machine_token',
   JwtTemplate: 'jwt_template',
   OauthAccessToken: 'oauth_access_token',
@@ -588,7 +589,7 @@ export interface UserJSON extends ClerkResourceJSON {
 }
 
 export interface VerificationJSON extends ClerkResourceJSON {
-  status: string;
+  status: VerificationStatus;
   strategy: string;
   attempts: number | null;
   expire_at: number | null;
@@ -698,6 +699,15 @@ export interface SamlAccountConnectionJSON extends ClerkResourceJSON {
   updated_at: number;
 }
 
+export interface MachineJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.Machine;
+  id: string;
+  name: string;
+  instance_id: string;
+  created_at: number;
+  updated_at: number;
+}
+
 export interface MachineTokenJSON extends ClerkResourceJSON {
   object: typeof ObjectType.MachineToken;
   name: string;
@@ -718,6 +728,7 @@ export interface APIKeyJSON extends ClerkResourceJSON {
   object: typeof ObjectType.ApiKey;
   type: string;
   name: string;
+  secret?: string;
   subject: string;
   scopes: string[];
   claims: Record<string, any> | null;

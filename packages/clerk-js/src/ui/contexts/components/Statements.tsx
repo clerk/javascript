@@ -6,9 +6,9 @@ export const useStatementsContext = () => {
   const { data: statements } = useStatements();
   const getStatementById = useCallback(
     (statementId: string) => {
-      return statements?.data.find(statement => statement.id === statementId);
+      return statements.find(statement => statement.id === statementId);
     },
-    [statements?.data],
+    [statements],
   );
 
   return {

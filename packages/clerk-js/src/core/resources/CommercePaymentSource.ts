@@ -88,7 +88,7 @@ export class CommerceInitializedPaymentSource extends BaseResource implements Co
 
     this.externalClientSecret = data.external_client_secret;
     this.externalGatewayId = data.external_gateway_id;
-    this.paymentMethodOrder = data.payment_method_order;
+    this.paymentMethodOrder = data.payment_method_order ?? ['card'];
     return this;
   }
 }

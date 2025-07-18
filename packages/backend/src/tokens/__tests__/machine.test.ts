@@ -3,7 +3,8 @@ import { describe, expect, it } from 'vitest';
 import {
   API_KEY_PREFIX,
   getMachineTokenType,
-  isMachineToken,
+  isMachineTokenByPrefix,
+  isMachineTokenType,
   isTokenTypeAccepted,
   M2M_TOKEN_PREFIX,
   OAUTH_TOKEN_PREFIX,
@@ -11,25 +12,25 @@ import {
 
 describe('isMachineToken', () => {
   it('returns true for tokens with M2M prefix', () => {
-    expect(isMachineToken(`${M2M_TOKEN_PREFIX}some-token-value`)).toBe(true);
+    expect(isMachineTokenByPrefix(`${M2M_TOKEN_PREFIX}some-token-value`)).toBe(true);
   });
 
   it('returns true for tokens with OAuth prefix', () => {
-    expect(isMachineToken(`${OAUTH_TOKEN_PREFIX}some-token-value`)).toBe(true);
+    expect(isMachineTokenByPrefix(`${OAUTH_TOKEN_PREFIX}some-token-value`)).toBe(true);
   });
 
   it('returns true for tokens with API key prefix', () => {
-    expect(isMachineToken(`${API_KEY_PREFIX}some-token-value`)).toBe(true);
+    expect(isMachineTokenByPrefix(`${API_KEY_PREFIX}some-token-value`)).toBe(true);
   });
 
   it('returns false for tokens without a recognized prefix', () => {
-    expect(isMachineToken('unknown_prefix_token')).toBe(false);
-    expect(isMachineToken('session_token_value')).toBe(false);
-    expect(isMachineToken('jwt_token_value')).toBe(false);
+    expect(isMachineTokenByPrefix('unknown_prefix_token')).toBe(false);
+    expect(isMachineTokenByPrefix('session_token_value')).toBe(false);
+    expect(isMachineTokenByPrefix('jwt_token_value')).toBe(false);
   });
 
   it('returns false for empty tokens', () => {
-    expect(isMachineToken('')).toBe(false);
+    expect(isMachineTokenByPrefix('')).toBe(false);
   });
 });
 
@@ -76,5 +77,17 @@ describe('isTokenTypeAccepted', () => {
 
   it('rejects a mismatching token type', () => {
     expect(isTokenTypeAccepted('api_key', 'machine_token')).toBe(false);
+  });
+});
+
+describe('isMachineTokenType', () => {
+  it('returns true for machine token types', () => {
+    expect(isMachineTokenType('api_key')).toBe(true);
+    expect(isMachineTokenType('machine_token')).toBe(true);
+    expect(isMachineTokenType('oauth_token')).toBe(true);
+  });
+
+  it('returns false for non-machine token types', () => {
+    expect(isMachineTokenType('session_token')).toBe(false);
   });
 });

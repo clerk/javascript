@@ -2,11 +2,11 @@ import { getAlternativePhoneCodeProviderData } from '@clerk/shared/alternativePh
 
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { LoadingCard } from '@/ui/elements/LoadingCard';
+import { handleError } from '@/ui/utils/errorHandler';
 
 import { useCoreSignUp } from '../../contexts';
 import { Flow, localizationKeys } from '../../customizables';
 import { useFetch } from '../../hooks';
-import { handleError } from '../../utils';
 import { SignUpVerificationCodeForm } from './SignUpVerificationCodeForm';
 
 export const SignUpPhoneCodeCard = withCardStateProvider(() => {
@@ -58,8 +58,10 @@ export const SignUpPhoneCodeCard = withCardStateProvider(() => {
 
   if (isAlternativePhoneCodeProvider) {
     const provider = getAlternativePhoneCodeProviderData(channel)?.name;
-    cardTitleKey = localizationKeys('signUp.alternativePhoneCodeProvider.title', { provider });
-    cardSubtitleKey = localizationKeys('signUp.alternativePhoneCodeProvider.subtitle', { provider });
+    cardTitleKey = localizationKeys('signUp.alternativePhoneCodeProvider.title', { provider: provider || '' });
+    cardSubtitleKey = localizationKeys('signUp.alternativePhoneCodeProvider.subtitle', {
+      provider: provider || '',
+    });
     resendButtonKey = localizationKeys('signUp.alternativePhoneCodeProvider.resendButton');
   }
 

@@ -2,13 +2,16 @@ import type {
   ClerkPaginatedResponse,
   CommerceBillingNamespace,
   CommerceCheckoutJSON,
+  CommercePaymentJSON,
+  CommercePaymentResource,
+  CommercePlanJSON,
   CommercePlanResource,
-  CommerceProductJSON,
   CommerceStatementJSON,
   CommerceStatementResource,
   CommerceSubscriptionJSON,
   CommerceSubscriptionResource,
   CreateCheckoutParams,
+  GetPaymentAttemptsParams,
   GetPlansParams,
   GetStatementsParams,
   GetSubscriptionsParams,
@@ -18,21 +21,36 @@ import { convertPageToOffsetSearchParams } from '../../../utils/convertPageToOff
 import {
   BaseResource,
   CommerceCheckout,
+  CommercePayment,
   CommercePlan,
   CommerceStatement,
   CommerceSubscription,
 } from '../../resources/internal';
 
 export class CommerceBilling implements CommerceBillingNamespace {
-  getPlans = async (params?: GetPlansParams): Promise<CommercePlanResource[]> => {
-    const { data: products } = (await BaseResource._fetch({
-      path: `/commerce/products`,
+  getPlans = async (params?: GetPlansParams): Promise<ClerkPaginatedResponse<CommercePlanResource>> => {
+    const { for: forParam, ...safeParams } = params || {};
+    const searchParams = { ...safeParams, payer_type: forParam || 'user' };
+    return await BaseResource._fetch({
+      path: `/commerce/plans`,
       method: 'GET',
-      search: { payerType: params?.subscriberType || '' },
-    })) as unknown as ClerkPaginatedResponse<CommerceProductJSON>;
+      search: convertPageToOffsetSearchParams(searchParams),
+    }).then(res => {
+      const { data: plans, total_count } = res as unknown as ClerkPaginatedResponse<CommercePlanJSON>;
 
-    const defaultProduct = products.find(product => product.is_default);
-    return defaultProduct?.plans.map(plan => new CommercePlan(plan)) || [];
+      return {
+        total_count,
+        data: plans.map(plan => new CommercePlan(plan)),
+      };
+    });
+  };
+
+  getPlan = async (params: { id: string }): Promise<CommercePlanResource> => {
+    const plan = (await BaseResource._fetch({
+      path: `/commerce/plans/${params.id}`,
+      method: 'GET',
+    })) as unknown as CommercePlanJSON;
+    return new CommercePlan(plan);
   };
 
   getSubscriptions = async (
@@ -69,6 +87,25 @@ export class CommerceBilling implements CommerceBillingNamespace {
       return {
         total_count,
         data: statements.map(statement => new CommerceStatement(statement)),
+      };
+    });
+  };
+
+  getPaymentAttempts = async (
+    params: GetPaymentAttemptsParams,
+  ): Promise<ClerkPaginatedResponse<CommercePaymentResource>> => {
+    const { orgId, ...rest } = params;
+
+    return await BaseResource._fetch({
+      path: orgId ? `/organizations/${orgId}/commerce/payment_attempts` : `/me/commerce/payment_attempts`,
+      method: 'GET',
+      search: convertPageToOffsetSearchParams(rest),
+    }).then(res => {
+      const { data: payments, total_count } = res as unknown as ClerkPaginatedResponse<CommercePaymentJSON>;
+
+      return {
+        total_count,
+        data: payments.map(payment => new CommercePayment(payment)),
       };
     });
   };

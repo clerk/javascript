@@ -5,7 +5,6 @@ import { descriptors, Flex, Link, localizationKeys, useAppearance } from '../../
 import { useDevMode } from '../../hooks/useDevMode';
 import type { InternalTheme, PropsOfComponent } from '../../styledSystem';
 import { common, mqu } from '../../styledSystem';
-import { colors } from '../../utils';
 import { Card } from '.';
 
 type CardFooterProps = PropsOfComponent<typeof Flex> & {
@@ -32,7 +31,7 @@ export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>((pro
       padding: `${t.space.$4} ${t.space.$8}`,
       borderTopWidth: t.borderWidths.$normal,
       borderTopStyle: t.borderStyles.$solid,
-      borderTopColor: t.colors.$neutralAlpha100,
+      borderTopColor: t.colors.$borderAlpha100,
     },
   });
 
@@ -48,12 +47,9 @@ export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>((pro
       elementDescriptor={descriptors.footer}
       sx={[
         t => ({
-          marginTop: `-${t.space.$2}`,
+          marginTop: `calc(${t.space.$2} * -1)`,
           paddingTop: t.space.$2,
-          background: common.mergedColorsBackground(
-            colors.setAlpha(t.colors.$colorBackground, 1),
-            t.colors.$neutralAlpha50,
-          ),
+          background: common.mutedBackground(t),
           '&:empty': {
             padding: 0,
             marginTop: 0,
