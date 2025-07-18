@@ -16,6 +16,30 @@ vi.mock('../resources/Base', () => {
 const jwt =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NzU4NzY3OTAsImRhdGEiOiJmb29iYXIiLCJpYXQiOjE2NzU4NzY3MzB9.Z1BC47lImYvaAtluJlY-kBo0qOoAk42Xb-gNrB2SxJg';
 
+// Helper function to create JWT with custom exp and iat values using the same structure as the working JWT
+function createJwtWithTtl(ttlSeconds: number): string {
+  // Use the existing JWT as template
+  const baseJwt =
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NzU4NzY3OTAsImRhdGEiOiJmb29iYXIiLCJpYXQiOjE2NzU4NzY3MzB9.Z1BC47lImYvaAtluJlY-kBo0qOoAk42Xb-gNrB2SxJg';
+  const [headerB64, , signature] = baseJwt.split('.');
+
+  // Use the same iat as the original working JWT to maintain consistency with test environment
+  // Original JWT: iat: 1675876730, exp: 1675876790 (60 second TTL)
+  const baseIat = 1675876730;
+  const payload = {
+    exp: baseIat + ttlSeconds,
+    data: 'foobar', // Keep same data as original
+    iat: baseIat,
+  };
+
+  // Encode the new payload using base64url encoding (like JWT standard)
+  const payloadString = JSON.stringify(payload);
+  // Use proper base64url encoding: standard base64 but replace + with -, / with _, and remove padding =
+  const newPayloadB64 = btoa(payloadString).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+
+  return `${headerB64}.${newPayloadB64}.${signature}`;
+}
+
 describe('MemoryTokenCache', () => {
   beforeAll(() => {
     vi.useFakeTimers();
@@ -161,6 +185,81 @@ describe('MemoryTokenCache', () => {
       // 55s since token created
       vi.advanceTimersByTime(1 * 1000);
       expect(cache.get(key, 0)).toBeUndefined();
+    });
+  });
+
+  describe('dynamic TTL calculation', () => {
+    it('calculates expiresIn from JWT exp and iat claims and sets timeout based on calculated TTL', async () => {
+      const cache = SessionTokenCache;
+
+      // Mock Date.now to return a fixed timestamp initially
+      const initialTime = 1675876730000; // Same as our JWT's iat in milliseconds
+      vi.spyOn(Date, 'now').mockImplementation(() => initialTime);
+
+      // Test with a 30-second TTL
+      const shortTtlJwt = createJwtWithTtl(30);
+      const shortTtlToken = new Token({
+        object: 'token',
+        id: 'short-ttl',
+        jwt: shortTtlJwt,
+      });
+
+      const shortTtlKey = { tokenId: 'short-ttl', audience: 'test' };
+      const shortTtlResolver = Promise.resolve(shortTtlToken);
+      cache.set({ ...shortTtlKey, tokenResolver: shortTtlResolver });
+      await shortTtlResolver;
+
+      const cachedEntry = cache.get(shortTtlKey);
+      expect(cachedEntry).toMatchObject(shortTtlKey);
+
+      // Advance both the timer and the mocked current time
+      const advanceBy = 31 * 1000;
+      vi.advanceTimersByTime(advanceBy);
+      vi.spyOn(Date, 'now').mockImplementation(() => initialTime + advanceBy);
+
+      const cachedEntry2 = cache.get(shortTtlKey);
+      expect(cachedEntry2).toBeUndefined();
+    });
+
+    it('handles tokens with TTL greater than 60 seconds correctly', async () => {
+      const cache = SessionTokenCache;
+
+      // Mock Date.now to return a fixed timestamp initially
+      const initialTime = 1675876730000; // Same as our JWT's iat in milliseconds
+      vi.spyOn(Date, 'now').mockImplementation(() => initialTime);
+
+      // Test with a 120-second TTL
+      const longTtlJwt = createJwtWithTtl(120);
+      const longTtlToken = new Token({
+        object: 'token',
+        id: 'long-ttl',
+        jwt: longTtlJwt,
+      });
+
+      const longTtlKey = { tokenId: 'long-ttl', audience: 'test' };
+      const longTtlResolver = Promise.resolve(longTtlToken);
+      cache.set({ ...longTtlKey, tokenResolver: longTtlResolver });
+      await longTtlResolver;
+
+      // Check token is cached initially
+      const cachedEntry = cache.get(longTtlKey);
+      expect(cachedEntry).toMatchObject(longTtlKey);
+
+      // Advance 90 seconds - token should still be cached
+      const firstAdvance = 90 * 1000;
+      vi.advanceTimersByTime(firstAdvance);
+      vi.spyOn(Date, 'now').mockImplementation(() => initialTime + firstAdvance);
+
+      const cachedEntryAfter90s = cache.get(longTtlKey);
+      expect(cachedEntryAfter90s).toMatchObject(longTtlKey);
+
+      // Advance to 121 seconds - token should be removed
+      const secondAdvance = 31 * 1000;
+      vi.advanceTimersByTime(secondAdvance);
+      vi.spyOn(Date, 'now').mockImplementation(() => initialTime + firstAdvance + secondAdvance);
+
+      const cachedEntryAfter121s = cache.get(longTtlKey);
+      expect(cachedEntryAfter121s).toBeUndefined();
     });
   });
 });
