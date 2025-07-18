@@ -13,6 +13,7 @@ export { esCR } from './es-CR';
 export { esES } from './es-ES';
 export { esMX } from './es-MX';
 export { esUY } from './es-UY';
+export { faIR } from './fa-IR';
 export { fiFI } from './fi-FI';
 export { frFR } from './fr-FR';
 export { heIL } from './he-IL';
