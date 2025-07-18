@@ -44,7 +44,7 @@ export function withRedirect<P extends AvailableComponentProps>(
       return null;
     }
 
-    return <Component {...props} />;
+    return <Component {...(props as any)} />;
   };
 
   HOC.displayName = `withRedirect(${displayName})`;
