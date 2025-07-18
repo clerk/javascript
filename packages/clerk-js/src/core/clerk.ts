@@ -2728,19 +2728,25 @@ export class Clerk implements ClerkInterface {
 
   #initOptions = (options?: ClerkOptions): ClerkOptions => {
     let processedOptions = options ? { ...options } : {};
+
+    // Extract cssLayerName from baseTheme if present and move it to appearance level
     if (
       processedOptions.appearance &&
       typeof processedOptions.appearance === 'object' &&
       'baseTheme' in processedOptions.appearance
     ) {
-      const { cssLayerName, ...baseTheme } = (processedOptions.appearance as any).baseTheme;
-      const processedCssLayerName = (processedOptions.appearance as any).cssLayerName || cssLayerName;
+      const appearance = processedOptions.appearance;
+      const { cssLayerName: cssLayerNameFromBaseTheme, ...baseThemeWithoutCssLayer } = appearance.baseTheme;
+
+      // Use existing cssLayerName at appearance level, or fall back to one from baseTheme
+      const finalCssLayerName = appearance.cssLayerName || cssLayerNameFromBaseTheme;
 
       processedOptions = {
         ...processedOptions,
         appearance: {
-          baseTheme,
-          ...(processedCssLayerName && { cssLayerName: processedCssLayerName }),
+          ...appearance,
+          baseTheme: baseThemeWithoutCssLayer,
+          ...(finalCssLayerName && { cssLayerName: finalCssLayerName }),
         },
       };
     }
