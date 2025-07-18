@@ -2733,23 +2733,63 @@ export class Clerk implements ClerkInterface {
     if (
       processedOptions.appearance &&
       typeof processedOptions.appearance === 'object' &&
-      'baseTheme' in processedOptions.appearance
+      'baseTheme' in processedOptions.appearance &&
+      processedOptions.appearance.baseTheme
     ) {
       const appearance = processedOptions.appearance;
-      const { cssLayerName: cssLayerNameFromBaseTheme, ...baseThemeWithoutCssLayer } = appearance.baseTheme;
+      let cssLayerNameFromBaseTheme: string | undefined;
 
-      // Use existing cssLayerName at appearance level, or fall back to one from baseTheme
-      const finalCssLayerName = appearance.cssLayerName || cssLayerNameFromBaseTheme;
+      if (Array.isArray(appearance.baseTheme)) {
+        // Handle array of themes - extract cssLayerName from each and use the first one found
+        appearance.baseTheme.forEach(theme => {
+          if (!cssLayerNameFromBaseTheme && theme.cssLayerName) {
+            cssLayerNameFromBaseTheme = theme.cssLayerName;
+          }
+        });
 
-      processedOptions = {
-        ...processedOptions,
-        appearance: {
-          ...appearance,
-          baseTheme: baseThemeWithoutCssLayer,
-          ...(finalCssLayerName && { cssLayerName: finalCssLayerName }),
-        },
-      };
+        // Create array without cssLayerName properties
+        const processedBaseTheme = appearance.baseTheme.map(theme => {
+          const { cssLayerName, ...rest } = theme;
+          return rest;
+        });
+
+        // Use existing cssLayerName at appearance level, or fall back to one from baseTheme(s)
+        const finalCssLayerName = appearance.cssLayerName || cssLayerNameFromBaseTheme;
+
+        processedOptions = {
+          ...processedOptions,
+          appearance: {
+            ...appearance,
+            baseTheme: processedBaseTheme,
+            ...(finalCssLayerName && { cssLayerName: finalCssLayerName }),
+          },
+        };
+      } else if (appearance.baseTheme) {
+        // Handle single theme - add explicit check to satisfy TypeScript
+        const singleBaseTheme = appearance.baseTheme;
+
+        if (singleBaseTheme.cssLayerName) {
+          cssLayerNameFromBaseTheme = singleBaseTheme.cssLayerName;
+        }
+
+        // Create new theme without cssLayerName
+        const { cssLayerName, ...processedBaseTheme } = singleBaseTheme;
+
+        // Use existing cssLayerName at appearance level, or fall back to one from baseTheme
+        const finalCssLayerName = appearance.cssLayerName || cssLayerNameFromBaseTheme;
+
+        processedOptions = {
+          ...processedOptions,
+          appearance: {
+            ...appearance,
+            baseTheme: processedBaseTheme,
+            ...(finalCssLayerName && { cssLayerName: finalCssLayerName }),
+          },
+        };
+      }
     }
+
+    console.table({ options, processedOptions });
 
     return {
       ...defaultOptions,
