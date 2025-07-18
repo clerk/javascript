@@ -31,9 +31,18 @@ export const createResourceCacheStore = (): IStorage => {
   let queue: KeyValuePair[] = [];
   let isProcessing = false;
 
-  const setItem = SecureStore.setItemAsync;
-  const getItem = SecureStore.getItemAsync;
-  const deleteItem = SecureStore.deleteItemAsync;
+  const secureStoreOpts: SecureStore.SecureStoreOptions = {
+    /**
+     * The data in the keychain item cannot be accessed after a restart until the
+     * device has been unlocked once by the user.
+     *
+     * This may be useful if you need to access the item when the phone is locked.
+     */
+    keychainAccessible: SecureStore.AFTER_FIRST_UNLOCK,
+  };
+  const setItem = (key: string, value: string) => SecureStore.setItemAsync(key, value, secureStoreOpts);
+  const getItem = (key: string) => SecureStore.getItemAsync(key, secureStoreOpts);
+  const deleteItem = (key: string) => SecureStore.deleteItemAsync(key, secureStoreOpts);
 
   const set = (key: string, value: string): Promise<void> => {
     queue.push({ key, value });

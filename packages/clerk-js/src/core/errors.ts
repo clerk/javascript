@@ -3,10 +3,10 @@ const errorPrefix = 'ClerkJS:';
 /**
  * Used to log a warning when a Clerk feature is used in an unsupported environment.
  * (Development Only)
+ * This is a warning and not an error because the application will still work, but the feature will not be available.
  *
  * @param strategy The strategy that is not supported in the current environment.
  * @returns void
- * @note This is a warning and not an error because the application will still work, but the feature will not be available.
  */
 export function clerkUnsupportedEnvironmentWarning(strategy: string) {
   console.warn(`${errorPrefix} ${strategy} is not supported in this environment.`);
@@ -44,10 +44,6 @@ export function clerkUIErrorDOMElementNotFound(): never {
 
 export function clerkMissingFapiClientInResources(): never {
   throw new Error(`${errorPrefix} Missing FAPI client in resources.`);
-}
-
-export function clerkCoreErrorTokenRefreshFailed(message: string): never {
-  throw new Error(`${errorPrefix} Token refresh failed (error='${message}')`);
 }
 
 export function clerkOAuthCallbackDidNotCompleteSignInSignUp(type: 'sign in' | 'sign up'): never {

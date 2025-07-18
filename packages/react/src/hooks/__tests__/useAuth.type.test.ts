@@ -1,7 +1,9 @@
+import type { PendingSessionOptions } from '@clerk/types';
 import { describe, expectTypeOf, it } from 'vitest';
 
 import type { useAuth } from '../useAuth';
 
+type UseAuthParameters = Parameters<typeof useAuth>[0];
 type HasFunction = Exclude<ReturnType<typeof useAuth>['has'], undefined>;
 type ParamsOfHas = Parameters<HasFunction>[0];
 
@@ -25,10 +27,42 @@ describe('useAuth type tests', () => {
       expectTypeOf({ role: 'org:admin', permission: 'some-perm' }).not.toMatchTypeOf<ParamsOfHas>();
     });
 
+    it('has({feature}) is allowed', () => {
+      expectTypeOf({
+        feature: 'org:feature',
+      }).toMatchTypeOf<ParamsOfHas>();
+    });
+
+    it('has({plan}) is allowed', () => {
+      expectTypeOf({
+        plan: 'org:pro',
+      }).toMatchTypeOf<ParamsOfHas>();
+    });
+
+    it('has({feature: string, plan: string}) is NOT allowed', () => {
+      expectTypeOf({ plan: 'org:pro', feature: 'org:feature' }).not.toMatchTypeOf<ParamsOfHas>();
+    });
+
+    it('has({feature: string, permission: string}) is NOT allowed', () => {
+      expectTypeOf({ feature: 'org:pro', permission: 'org:feature' }).not.toMatchTypeOf<ParamsOfHas>();
+    });
+
+    it('has({plan: string, role: string}) is NOT allowed', () => {
+      expectTypeOf({ plan: 'org:pro', role: 'org:feature' }).not.toMatchTypeOf<ParamsOfHas>();
+    });
+
+    it('has({plan: string, reverification}) is allowed', () => {
+      expectTypeOf({ plan: 'org:pro', reverification: 'lax' } as const).toMatchTypeOf<ParamsOfHas>();
+    });
+
+    it('has({feature: string, reverification}) is allowed', () => {
+      expectTypeOf({ feature: 'org:feature', reverification: 'lax' } as const).toMatchTypeOf<ParamsOfHas>();
+    });
+
     it('has with role and re-verification is allowed', () => {
       expectTypeOf({
         role: 'org:admin',
-        __experimental_reverification: {
+        reverification: {
           level: 'first_factor',
           afterMinutes: 10,
         },
@@ -109,6 +143,20 @@ describe('useAuth type tests', () => {
           afterMinutes: 10,
         },
       } as const).not.toMatchTypeOf<ParamsOfHas>();
+    });
+  });
+
+  describe('with parameters', () => {
+    it('allows passing any auth state object', () => {
+      expectTypeOf({ orgId: null }).toMatchTypeOf<UseAuthParameters>();
+    });
+
+    it('do not allow invalid option types', () => {
+      const invalidValue = 5;
+      expectTypeOf({ treatPendingAsSignedOut: invalidValue } satisfies Record<
+        keyof PendingSessionOptions,
+        any
+      >).toMatchTypeOf<UseAuthParameters>();
     });
   });
 });

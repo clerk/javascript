@@ -1,4 +1,5 @@
-import type { LoadClerkJsScriptOptions } from '@clerk/shared/loadClerkJsScript';
+import type { Without } from '@clerk/types';
+import type { PluginOptions } from '@clerk/vue';
 import {
   addComponent,
   addImports,
@@ -11,7 +12,10 @@ import {
   updateRuntimeConfig,
 } from '@nuxt/kit';
 
-export type ModuleOptions = Omit<LoadClerkJsScriptOptions, 'routerPush' | 'routerReplace' | 'publishableKey'> & {
+export type ModuleOptions = Without<
+  PluginOptions,
+  'routerPush' | 'routerReplace' | 'publishableKey' | 'initialState'
+> & {
   publishableKey?: string;
   /**
    * Skip the automatic server middleware registration. When enabled, you'll need to
@@ -26,7 +30,7 @@ export type ModuleOptions = Omit<LoadClerkJsScriptOptions, 'routerPush' | 'route
    * import { clerkMiddleware } from '@clerk/nuxt/server'
    *
    * export default clerkMiddleware((event) => {
-   *   console.log('auth', event.context.auth)
+   *   console.log('auth', event.context.auth())
    * })
    * ```
    */
@@ -63,6 +67,7 @@ export default defineNuxtModule<ModuleOptions>({
           clerkJSUrl: options.clerkJSUrl,
           clerkJSVariant: options.clerkJSVariant,
           clerkJSVersion: options.clerkJSVersion,
+          isSatellite: options.isSatellite,
           // Backend specific variables that are safe to share.
           // We want them to be overridable like the other public keys (e.g NUXT_PUBLIC_CLERK_PROXY_URL)
           proxyUrl: options.proxyUrl,
@@ -74,6 +79,7 @@ export default defineNuxtModule<ModuleOptions>({
       clerk: {
         secretKey: undefined,
         jwtKey: undefined,
+        webhookSigningSecret: undefined,
       },
     });
 
@@ -99,14 +105,18 @@ export default defineNuxtModule<ModuleOptions>({
       });
     }
 
-    // Adds TS support for `event.context.auth` in event handlers
+    // Adds TS support for `event.context.auth()` in event handlers
     addTypeTemplate(
       {
         filename: 'types/clerk.d.ts',
-        getContents: () => `import type { AuthObject } from '@clerk/backend';
+        getContents: () => `import type { SessionAuthObject } from '@clerk/backend';
           declare module 'h3' {
+            type AuthObjectHandler = SessionAuthObject & {
+              (): SessionAuthObject;
+            }
+
             interface H3EventContext {
-              auth: AuthObject;
+              auth: AuthObjectHandler;
             }
           }
         `,
@@ -157,6 +167,7 @@ export default defineNuxtModule<ModuleOptions>({
       'SignedIn',
       'SignedOut',
       'Waitlist',
+      'PricingTable',
     ];
     components.forEach(component => {
       void addComponent({

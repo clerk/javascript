@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-import { CAPTCHA_ELEMENT_ID } from '../../utils/captcha';
+import { CAPTCHA_ELEMENT_ID } from '../../utils/captcha/constants';
 import { Box, useAppearance, useLocalizations } from '../customizables';
 
 /**

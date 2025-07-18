@@ -2,9 +2,12 @@ import { useSession, useUser } from '@clerk/shared/react';
 import type { SignedInSessionResource } from '@clerk/types';
 import React from 'react';
 
+import { PopoverCard } from '@/ui/elements/PopoverCard';
+import { RootBox } from '@/ui/elements/RootBox';
+import { UserPreview } from '@/ui/elements/UserPreview';
+
 import { useEnvironment, useUserButtonContext } from '../../contexts';
 import { descriptors } from '../../customizables';
-import { PopoverCard, RootBox, UserPreview } from '../../elements';
 import type { PropsOfComponent } from '../../styledSystem';
 import { MultiSessionActions, SignOutAllActions, SingleSessionActions } from './SessionActions';
 import { useMultisessionActions } from './useMultisessionActions';

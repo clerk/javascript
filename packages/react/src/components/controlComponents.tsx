@@ -1,13 +1,7 @@
 import { deprecated } from '@clerk/shared/deprecated';
-import type {
-  CheckAuthorizationWithCustomPermissions,
-  HandleOAuthCallbackParams,
-  OrganizationCustomPermissionKey,
-  OrganizationCustomRoleKey,
-} from '@clerk/types';
+import type { HandleOAuthCallbackParams, PendingSessionOptions, ProtectProps as _ProtectProps } from '@clerk/types';
 import React from 'react';
 
-import { useAuthContext } from '../contexts/AuthContext';
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { useSessionContext } from '../contexts/SessionContext';
 import { useAuth } from '../hooks';
@@ -15,20 +9,20 @@ import { useAssertWrappedByClerkProvider } from '../hooks/useAssertWrappedByCler
 import type { RedirectToSignInProps, RedirectToSignUpProps, WithClerkProp } from '../types';
 import { withClerk } from './withClerk';
 
-export const SignedIn = ({ children }: React.PropsWithChildren<unknown>) => {
+export const SignedIn = ({ children, treatPendingAsSignedOut }: React.PropsWithChildren<PendingSessionOptions>) => {
   useAssertWrappedByClerkProvider('SignedIn');
 
-  const { userId } = useAuthContext();
+  const { userId } = useAuth({ treatPendingAsSignedOut });
   if (userId) {
     return children;
   }
   return null;
 };
 
-export const SignedOut = ({ children }: React.PropsWithChildren<unknown>) => {
+export const SignedOut = ({ children, treatPendingAsSignedOut }: React.PropsWithChildren<PendingSessionOptions>) => {
   useAssertWrappedByClerkProvider('SignedOut');
 
-  const { userId } = useAuthContext();
+  const { userId } = useAuth({ treatPendingAsSignedOut });
   if (userId === null) {
     return children;
   }
@@ -49,37 +43,36 @@ export const ClerkLoading = ({ children }: React.PropsWithChildren<unknown>) => 
   useAssertWrappedByClerkProvider('ClerkLoading');
 
   const isomorphicClerk = useIsomorphicClerkContext();
-  if (isomorphicClerk.loaded) {
+  if (isomorphicClerk.status !== 'loading') {
+    return null;
+  }
+  return children;
+};
+
+export const ClerkFailed = ({ children }: React.PropsWithChildren<unknown>) => {
+  useAssertWrappedByClerkProvider('ClerkFailed');
+
+  const isomorphicClerk = useIsomorphicClerkContext();
+  if (isomorphicClerk.status !== 'error') {
+    return null;
+  }
+  return children;
+};
+
+export const ClerkDegraded = ({ children }: React.PropsWithChildren<unknown>) => {
+  useAssertWrappedByClerkProvider('ClerkDegraded');
+
+  const isomorphicClerk = useIsomorphicClerkContext();
+  if (isomorphicClerk.status !== 'degraded') {
     return null;
   }
   return children;
 };
 
 export type ProtectProps = React.PropsWithChildren<
-  (
-    | {
-        condition?: never;
-        role: OrganizationCustomRoleKey;
-        permission?: never;
-      }
-    | {
-        condition?: never;
-        role?: never;
-        permission: OrganizationCustomPermissionKey;
-      }
-    | {
-        condition: (has: CheckAuthorizationWithCustomPermissions) => boolean;
-        role?: never;
-        permission?: never;
-      }
-    | {
-        condition?: never;
-        role?: never;
-        permission?: never;
-      }
-  ) & {
+  _ProtectProps & {
     fallback?: React.ReactNode;
-  }
+  } & PendingSessionOptions
 >;
 
 /**
@@ -94,10 +87,10 @@ export type ProtectProps = React.PropsWithChildren<
  * <Protect fallback={<p>Unauthorized</p>} />
  * ```
  */
-export const Protect = ({ children, fallback, ...restAuthorizedParams }: ProtectProps) => {
+export const Protect = ({ children, fallback, treatPendingAsSignedOut, ...restAuthorizedParams }: ProtectProps) => {
   useAssertWrappedByClerkProvider('Protect');
 
-  const { isLoaded, has, userId } = useAuth();
+  const { isLoaded, has, userId } = useAuth({ treatPendingAsSignedOut });
 
   /**
    * Avoid flickering children or fallback while clerk is loading sessionId or userId
@@ -127,7 +120,12 @@ export const Protect = ({ children, fallback, ...restAuthorizedParams }: Protect
     return unauthorized;
   }
 
-  if (restAuthorizedParams.role || restAuthorizedParams.permission) {
+  if (
+    restAuthorizedParams.role ||
+    restAuthorizedParams.permission ||
+    restAuthorizedParams.feature ||
+    restAuthorizedParams.plan
+  ) {
     if (has(restAuthorizedParams)) {
       return authorized;
     }
@@ -170,7 +168,7 @@ export const RedirectToSignUp = withClerk(({ clerk, ...props }: WithClerkProp<Re
 
 /**
  * @function
- * @deprecated Use [`redirectToUserProfile()`](https://clerk.com/docs/references/javascript/clerk/redirect-methods#redirect-to-user-profile) instead, will be removed in the next major version.
+ * @deprecated Use [`redirectToUserProfile()`](https://clerk.com/docs/references/javascript/clerk#redirect-to-user-profile) instead.
  */
 export const RedirectToUserProfile = withClerk(({ clerk }) => {
   React.useEffect(() => {
@@ -183,7 +181,7 @@ export const RedirectToUserProfile = withClerk(({ clerk }) => {
 
 /**
  * @function
- * @deprecated Use [`redirectToOrganizationProfile()`](https://clerk.com/docs/references/javascript/clerk/redirect-methods#redirect-to-organization-profile) instead, will be removed in the next major version.
+ * @deprecated Use [`redirectToOrganizationProfile()`](https://clerk.com/docs/references/javascript/clerk#redirect-to-organization-profile) instead.
  */
 export const RedirectToOrganizationProfile = withClerk(({ clerk }) => {
   React.useEffect(() => {
@@ -196,7 +194,7 @@ export const RedirectToOrganizationProfile = withClerk(({ clerk }) => {
 
 /**
  * @function
- * @deprecated Use [`redirectToCreateOrganization()`](https://clerk.com/docs/references/javascript/clerk/redirect-methods#redirect-to-create-organization) instead, will be removed in the next major version.
+ * @deprecated Use [`redirectToCreateOrganization()`](https://clerk.com/docs/references/javascript/clerk#redirect-to-create-organization) instead.
  */
 export const RedirectToCreateOrganization = withClerk(({ clerk }) => {
   React.useEffect(() => {

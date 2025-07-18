@@ -14,24 +14,133 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const skSK: LocalizationResource = {
   locale: 'sk-SK',
-  __experimental_commerce: {
-    billedAnnually: 'Ročne',
-    free: 'Bezplatne',
-    getStarted: 'Začať',
-    manageMembership: 'Spravovať členstvo',
-    month: 'Mesiac',
-    switchPlan: 'Zmeniť balík',
+  apiKeys: {
+    action__add: undefined,
+    action__search: undefined,
+    createdAndExpirationStatus__expiresOn: undefined,
+    createdAndExpirationStatus__never: undefined,
+    detailsTitle__emptyRow: undefined,
+    formButtonPrimary__add: undefined,
+    formFieldCaption__expiration__expiresOn: undefined,
+    formFieldCaption__expiration__never: undefined,
+    formFieldOption__expiration__180d: undefined,
+    formFieldOption__expiration__1d: undefined,
+    formFieldOption__expiration__1y: undefined,
+    formFieldOption__expiration__30d: undefined,
+    formFieldOption__expiration__60d: undefined,
+    formFieldOption__expiration__7d: undefined,
+    formFieldOption__expiration__90d: undefined,
+    formFieldOption__expiration__never: undefined,
+    formHint: undefined,
+    formTitle: undefined,
+    lastUsed__days: undefined,
+    lastUsed__hours: undefined,
+    lastUsed__minutes: undefined,
+    lastUsed__months: undefined,
+    lastUsed__seconds: undefined,
+    lastUsed__years: undefined,
+    menuAction__revoke: undefined,
+    revokeConfirmation: {
+      confirmationText: undefined,
+      formButtonPrimary__revoke: undefined,
+      formHint: undefined,
+      formTitle: undefined,
+    },
   },
+
   backButton: 'Späť',
+  badge__activePlan: undefined,
+  badge__canceledEndsAt: undefined,
   badge__currentPlan: 'Aktuálny balík',
   badge__default: 'Predvolené',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
   badge__otherImpersonatorDevice: 'Iné zariadenie zástupcu',
   badge__primary: 'Hlavný',
+  badge__renewsAt: undefined,
   badge__requiresAction: 'Vyžaduje akciu',
+  badge__startsAt: undefined,
   badge__thisDevice: 'Toto zariadenie',
   badge__unverified: 'Nepotvrdené',
+  badge__upcomingPlan: undefined,
   badge__userDevice: 'Zariadenie používateľa',
   badge__you: 'Vy',
+  commerce: {
+    addPaymentMethod: undefined,
+    alwaysFree: undefined,
+    annually: undefined,
+    availableFeatures: undefined,
+    billedAnnually: 'Ročne',
+    billedMonthlyOnly: undefined,
+    cancelSubscription: undefined,
+    cancelSubscriptionAccessUntil: undefined,
+    cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionTitle: undefined,
+    cannotSubscribeMonthly: undefined,
+    checkout: {
+      description__paymentSuccessful: undefined,
+      description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      lineItems: {
+        title__paymentMethod: undefined,
+        title__statementId: undefined,
+        title__subscriptionBegins: undefined,
+        title__totalPaid: undefined,
+      },
+      pastDueNotice: undefined,
+      perMonth: undefined,
+      title: undefined,
+      title__paymentSuccessful: undefined,
+      title__subscriptionSuccessful: undefined,
+    },
+    credit: undefined,
+    creditRemainder: undefined,
+    defaultFreePlanActive: undefined,
+    free: 'Bezplatne',
+    getStarted: 'Začať',
+    keepSubscription: undefined,
+    manage: undefined,
+    manageSubscription: 'Spravovať členstvo',
+    month: 'Mesiac',
+    monthly: undefined,
+    pastDue: undefined,
+    pay: undefined,
+    paymentMethods: undefined,
+    paymentSource: {
+      applePayDescription: {
+        annual: undefined,
+        monthly: undefined,
+      },
+      dev: {
+        anyNumbers: undefined,
+        cardNumber: undefined,
+        cvcZip: undefined,
+        developmentMode: undefined,
+        expirationDate: undefined,
+        testCardInfo: undefined,
+      },
+    },
+    popular: undefined,
+    pricingTable: {
+      billingCycle: undefined,
+      included: undefined,
+    },
+    reSubscribe: undefined,
+    seeAllFeatures: undefined,
+    subscribe: undefined,
+    subtotal: undefined,
+    switchPlan: 'Zmeniť balík',
+    switchToAnnual: undefined,
+    switchToMonthly: undefined,
+    totalDue: undefined,
+    totalDueToday: undefined,
+    viewFeatures: undefined,
+    year: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'Vytvoriť organizáciu',
     invitePage: {
@@ -48,6 +157,7 @@ export const skSK: LocalizationResource = {
     sameDay: "Dnes o {{ date | timeString('sk-SK') }}",
   },
   dividerText: 'alebo',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'Použiť inú metódu',
   footerPageLink__help: 'Pomoc',
   footerPageLink__privacy: 'Ochrana súkromia',
@@ -60,6 +170,9 @@ export const skSK: LocalizationResource = {
   formFieldError__verificationLinkExpired: 'The verification link expired. Please request a new link.',
   formFieldHintText__optional: 'Voliteľné',
   formFieldHintText__slug: 'Slug je čitateľné ID, ktoré musí byť jedinečné. Často sa používa v URL adresách.',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'Zadajte záložný kód',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Odstrániť účet',
   formFieldInputPlaceholder__emailAddress: 'Zadajte svoj e-mail',
@@ -68,13 +181,16 @@ export const skSK: LocalizationResource = {
     'Zadajte alebo vložte jednu alebo viac emailových adries oddelených medzerou alebo čiarkou',
   formFieldInputPlaceholder__firstName: 'Krstné meno',
   formFieldInputPlaceholder__lastName: 'Priezvisko',
-  formFieldInputPlaceholder__organizationDomain: 'priklad.sk', 
+  formFieldInputPlaceholder__organizationDomain: 'priklad.sk',
   formFieldInputPlaceholder__organizationDomainEmailAddress: 'vy@priklad.sk',
   formFieldInputPlaceholder__organizationName: 'Názov organizácie',
   formFieldInputPlaceholder__organizationSlug: 'moja-organizacia',
   formFieldInputPlaceholder__password: 'Zadajte heslo',
   formFieldInputPlaceholder__phoneNumber: 'Zadajte telefónne číslo',
   formFieldInputPlaceholder__username: undefined,
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Povoliť automatické pozvánky pre túto doménu',
   formFieldLabel__backupCode: 'Záložný kód',
   formFieldLabel__confirmDeletion: 'Potvrdenie',
@@ -90,7 +206,7 @@ export const skSK: LocalizationResource = {
   formFieldLabel__organizationDomainDeletePending: 'Zmazať čakajúce pozvánky a návrhy',
   formFieldLabel__organizationDomainEmailAddress: 'Overovacia e-mailová adresa',
   formFieldLabel__organizationDomainEmailAddressDescription:
-      'Zadajte e-mailovú adresu pod touto doménou na prijatie kódu a overenie tejto domény.',
+    'Zadajte e-mailovú adresu pod touto doménou na prijatie kódu a overenie tejto domény.',
   formFieldLabel__organizationName: 'Názov organizácie',
   formFieldLabel__organizationSlug: 'URL adresa',
   formFieldLabel__passkeyName: 'Názov Passkey',
@@ -119,14 +235,75 @@ export const skSK: LocalizationResource = {
     titleWithoutPersonal: 'Vyberte organizáciu',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: 'Kľúče API',
+    },
     badge__automaticInvitation: 'Automatické pozvánky',
     badge__automaticSuggestion: 'Automatické návrhy',
     badge__manualInvitation: 'Bez automatickej registrácie',
     badge__unverified: 'Neoverené',
+    billingPage: {
+      paymentHistorySection: {
+        empty: undefined,
+        notFound: undefined,
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        tableHeader__status: undefined,
+      },
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__payments: undefined,
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      statementsSection: {
+        empty: undefined,
+        itemCaption__paidForPlan: undefined,
+        itemCaption__proratedCredit: undefined,
+        itemCaption__subscribedAndPaidForPlan: undefined,
+        notFound: undefined,
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+        totalPaid: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        tableHeader__edit: undefined,
+        tableHeader__plan: undefined,
+        tableHeader__startDate: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
-        subtitle:
-            'Pridajte doménu na overenie. Používatelia s e-mailovými adresami v tejto doméne sa môžu automaticky pripojiť k organizácii alebo požiadať o pripojenie.',
-        title: 'Pridať doménu',
+      subtitle:
+        'Pridajte doménu na overenie. Používatelia s e-mailovými adresami v tejto doméne sa môžu automaticky pripojiť k organizácii alebo požiadať o pripojenie.',
+      title: 'Pridať doménu',
     },
     invitePage: {
       detailsTitle__inviteFailed: 'Pozvánky sa nepodarilo odoslať. Opravte nasledujúce a skúste to znovu:',
@@ -150,7 +327,7 @@ export const skSK: LocalizationResource = {
       invitationsTab: {
         autoInvitations: {
           headerSubtitle:
-              'Pozvite používateľov prepojením e-mailovej domény s vašou organizáciou. Každý, kto sa zaregistruje s e-mailovou doménou, ktorá sa zhoduje, sa môže k organizácii pripojiť kedykoľvek.',
+            'Pozvite používateľov prepojením e-mailovej domény s vašou organizáciou. Každý, kto sa zaregistruje s e-mailovou doménou, ktorá sa zhoduje, sa môže k organizácii pripojiť kedykoľvek.',
           headerTitle: 'Automatické pozvánky',
           primaryButton: 'Spravovať overené domény',
         },
@@ -179,10 +356,18 @@ export const skSK: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
+      billing: undefined,
       description: 'Spravujte svoju organizáciu.',
       general: 'Všeobecné',
       members: 'Členovia',
       title: 'Organizácia',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -209,7 +394,7 @@ export const skSK: LocalizationResource = {
         menuAction__verify: 'Overiť',
         primaryButton: 'Pridať doménu',
         subtitle:
-           'Umožnite používateľom pripojiť sa k organizácii automaticky alebo požiadať o pripojenie na základe overenej e-mailovej domény.',
+          'Umožnite používateľom pripojiť sa k organizácii automaticky alebo požiadať o pripojenie na základe overenej e-mailovej domény.',
         title: 'Overené domény',
       },
       successMessage: 'Organizácia bola aktualizovaná.',
@@ -239,10 +424,10 @@ export const skSK: LocalizationResource = {
       },
       enrollmentTab: {
         automaticInvitationOption__description:
-            'Používatelia sú automaticky pozývaní na pripojenie sa k organizácii, keď sa zaregistrujú, a môžu sa pripojiť kedykoľvek.',
+          'Používatelia sú automaticky pozývaní na pripojenie sa k organizácii, keď sa zaregistrujú, a môžu sa pripojiť kedykoľvek.',
         automaticInvitationOption__label: 'Automatické pozvánky',
         automaticSuggestionOption__description:
-            'Používatelia dostanú návrh na požiadanie o pripojenie, ale musia byť schválení administrátorom predtým, ako sa môžu pripojiť k organizácii.',
+          'Používatelia dostanú návrh na požiadanie o pripojenie, ale musia byť schválení administrátorom predtým, ako sa môžu pripojiť k organizácii.',
         automaticSuggestionOption__label: 'Automatické návrhy',
         calloutInfoLabel: 'Zmena režimu zápisu ovplyvní iba nových používateľov.',
         calloutInvitationCountLabel: 'Čakajúce pozvánky zaslané používateľom: {{count}}',
@@ -263,7 +448,8 @@ export const skSK: LocalizationResource = {
       formTitle: 'Overovací kód',
       resendButton: 'Nedostali ste kód? Znova odoslať',
       subtitle: 'Doména {{domainName}} musí byť overená cez e-mail.',
-      subtitleVerificationCodeScreen: 'Overovací kód bol zaslaný na {{emailAddress}}. Pre pokračovanie ho zadajte nižšie.',
+      subtitleVerificationCodeScreen:
+        'Overovací kód bol zaslaný na {{emailAddress}}. Pre pokračovanie ho zadajte nižšie.',
       title: 'Overiť doménu',
     },
   },
@@ -292,7 +478,8 @@ export const skSK: LocalizationResource = {
       blockButton__totp: 'Použiť autentifikačnú aplikáciu',
       getHelp: {
         blockButton__emailSupport: 'Podpora cez email',
-        content: 'Ak máte problémy s overením svojho účtu, kontaktujte nás emailom a pokúsime sa vám čo najskôr obnoviť prístup.',
+        content:
+          'Ak máte problémy s overením svojho účtu, kontaktujte nás emailom a pokúsime sa vám čo najskôr obnoviť prístup.',
         title: 'Získať pomoc',
       },
       subtitle: 'Máte problémy? Na overenie môžete použiť jednu z týchto metód.',
@@ -315,7 +502,8 @@ export const skSK: LocalizationResource = {
     },
     passkey: {
       blockButton__passkey: 'Použiť Passkey',
-      subtitle: 'Použitie passkey potvrdí vašu identitu. Vaše zariadenie vás môže vyzvať na potvrdenie odtlačkom, tvárou alebo kódom.',
+      subtitle:
+        'Použitie passkey potvrdí vašu identitu. Vaše zariadenie vás môže vyzvať na potvrdenie odtlačkom, tvárou alebo kódom.',
       title: 'Použiť Passkey',
     },
     password: {
@@ -366,6 +554,12 @@ export const skSK: LocalizationResource = {
       },
       subtitle: 'Máte problémy? Na prihlásenie môžete použiť jednu z týchto metód.',
       title: 'Použiť inú metódu',
+    },
+    alternativePhoneCodeProvider: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     backupCodeMfa: {
       subtitle: 'pre pokračovanie do {{applicationName}}',
@@ -431,7 +625,8 @@ export const skSK: LocalizationResource = {
       title: 'Nie je možné sa prihlásiť',
     },
     passkey: {
-      subtitle: 'Použitie passkey potvrdí vašu identitu. Vaše zariadenie vás môže vyzvať na potvrdenie odtlačkom, tvárou alebo kódom.',
+      subtitle:
+        'Použitie passkey potvrdí vašu identitu. Vaše zariadenie vás môže vyzvať na potvrdenie odtlačkom, tvárou alebo kódom.',
       title: 'Prihlásiť sa pomocou Passkey',
     },
     password: {
@@ -473,7 +668,13 @@ export const skSK: LocalizationResource = {
       actionLink__use_username: 'Použiť užívateľské meno',
       actionText: 'Nemáte účet?',
       actionText__join_waitlist: 'Chcete predbežný prístup?',
-      subtitle: 'Vitajte späť! Pre pokračovanie sa prihláste do svojho účtu.',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      subtitle: 'pre pokračovanie do {{applicationName}}',
       subtitleCombined: undefined,
       title: 'Prihlásiť sa do {{applicationName}}',
       titleCombined: 'Pokračovať do {{applicationName}}',
@@ -486,6 +687,11 @@ export const skSK: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Zadajte svoje heslo',
   signUp: {
+    alternativePhoneCodeProvider: {
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     continue: {
       actionLink: 'Prihlásiť sa',
       actionText: 'Máte účet?',
@@ -525,10 +731,12 @@ export const skSK: LocalizationResource = {
       checkbox: {
         label__onlyPrivacyPolicy: 'Súhlasím s {{ privacyPolicyLink || link("podmienkami o ochrane osobných údajov") }}',
         label__onlyTermsOfService: 'Súhlasím s {{ termsOfServiceLink || link("podmienkami používania") }}',
-        label__termsOfServiceAndPrivacyPolicy: 'Súhlasím s {{ termsOfServiceLink || link("podmienkami používania") }} a {{ privacyPolicyLink || link("podmienkami o ochrane osobných údajov") }}',
+        label__termsOfServiceAndPrivacyPolicy:
+          'Súhlasím s {{ termsOfServiceLink || link("podmienkami používania") }} a {{ privacyPolicyLink || link("podmienkami o ochrane osobných údajov") }}',
       },
       continue: {
-        subtitle: 'Prosím, prečítajte si a súhlaste s našimi podmienkami používania a podmienkami o ochrane osobných údajov.',
+        subtitle:
+          'Prosím, prečítajte si a súhlaste s našimi podmienkami používania a podmienkami o ochrane osobných údajov.',
         title: 'Súhlas s podmienkami',
       },
     },
@@ -544,8 +752,10 @@ export const skSK: LocalizationResource = {
       actionText: 'Máte účet?',
       blockButton__emailSupport: 'Podpora cez email',
       blockButton__joinWaitlist: 'Pridať sa na waitlist',
-      subtitle: 'Registrácie aktuálne nie sú povolené. Ak si myslíte, že by ste mali mať prístup, kontaktujte našu podporu.',
-      subtitleWaitlist: 'Registrácie aktuálne nie sú povolené. Ak chete byť informovaní o spustení medzi prvými, pridajte sa na waitlist.',
+      subtitle:
+        'Registrácie aktuálne nie sú povolené. Ak si myslíte, že by ste mali mať prístup, kontaktujte našu podporu.',
+      subtitleWaitlist:
+        'Registrácie aktuálne nie sú povolené. Ak chete byť informovaní o spustení medzi prvými, pridajte sa na waitlist.',
       title: 'Zablokovaný prístup',
     },
     start: {
@@ -553,6 +763,12 @@ export const skSK: LocalizationResource = {
       actionLink__use_email: 'Použiť email',
       actionLink__use_phone: 'Použiť telefón',
       actionText: 'Máte účet?',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'Vitajte! Pre pokračovanie prosím vyplňte informácie.',
       subtitleCombined: 'Vitajte! Pre pokračovanie prosím vyplňte informácie.',
       title: 'Vytvorte si účet',
@@ -584,12 +800,15 @@ export const skSK: LocalizationResource = {
     form_password_length_too_short: 'Heslo musí mať aspoň 8 znakov.',
     form_password_not_strong_enough: 'Vaše heslo nie je dostatočne silné.',
     form_password_pwned: 'Toto heslo bolo nájdené v rámci úniku dát a nemôže byť použité, prosím zvoľte iné heslo.',
-    form_password_pwned__sign_in: 'Toto heslo bolo nájdené v rámci úniku dát a nemôže byť použité, prosím zvoľte iné heslo.',
+    form_password_pwned__sign_in:
+      'Toto heslo bolo nájdené v rámci úniku dát a nemôže byť použité, prosím zvoľte iné heslo.',
     form_password_size_in_bytes_exceeded:
       'Vaše heslo prekročilo maximálny povolený počet bytov, prosím skráťte ho alebo odstráňte niektoré špeciálne znaky.',
     form_password_validation_failed: 'Nesprávne heslo',
-    form_username_invalid_character: 'Používateľské meno môže obsahovať len písmená, číslice, pomlčky a podčiarkovníky.',
-    form_username_invalid_length: 'Používateľské meno musí mať aspoň {{min_length}} znaky a maximálne {{max_length}} znakov.',
+    form_username_invalid_character:
+      'Používateľské meno môže obsahovať len písmená, číslice, pomlčky a podčiarkovníky.',
+    form_username_invalid_length:
+      'Používateľské meno musí mať aspoň {{min_length}} znaky a maximálne {{max_length}} znakov.',
     identification_deletion_failed: 'Nemôžete odstrániť váš posledný identifikátor.',
     not_allowed_access: 'Nemáte povolený prístup k tejto stránke. Ak si myslíte, že je to chyba, kontaktujte podporu.',
     organization_domain_blocked: undefined,
@@ -613,6 +832,7 @@ export const skSK: LocalizationResource = {
     },
     phone_number_exists: 'Toto telefónne číslo je už obsadené. Skúste prosím iné.',
     web3_missing_identifier: 'Rozšírenie Web3 Peňaženky nebolo nájdené. Je potrebné ho nainštalovať.',
+    session_exists: 'Jste už přihlášen.',
     zxcvbn: {
       couldBeStronger: 'Vaše heslo funguje, ale mohlo by byť silnejšie. Skúste pridať viac znakov.',
       goodPassword: 'Dobrá práca. Toto je vynikajúce heslo.',
@@ -660,13 +880,8 @@ export const skSK: LocalizationResource = {
     action__signOutAll: 'Odhlásiť sa zo všetkých účtov',
   },
   userProfile: {
-    __experimental_billingPage: {
-      start: {
-        headerTitle__invoices: 'Faktúry',
-        headerTitle__paymentSources: 'Platobné metódy',
-        headerTitle__plans: 'Balíky',
-      },
-      title: 'Faturácia a platby',
+    apiKeysPage: {
+      title: 'Kľúče API',
     },
     backupCodePage: {
       actionLabel__copied: 'Skopírované!',
@@ -683,6 +898,64 @@ export const skSK: LocalizationResource = {
         'Použite jeden z týchto kódov na prihlásenie do vášho účtu, ak stratíte prístup k vášmu overovaciemu zariadeniu.',
       title: 'Pridať overovanie pomocou záložných kódov',
       title__codelist: 'Záložné kódy',
+    },
+    billingPage: {
+      paymentHistorySection: {
+        empty: undefined,
+        notFound: undefined,
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        tableHeader__status: undefined,
+      },
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__payments: undefined,
+        headerTitle__plans: 'Balíky',
+        headerTitle__statements: 'Faktúry',
+        headerTitle__subscriptions: undefined,
+      },
+      statementsSection: {
+        empty: undefined,
+        itemCaption__paidForPlan: undefined,
+        itemCaption__proratedCredit: undefined,
+        itemCaption__subscribedAndPaidForPlan: undefined,
+        notFound: undefined,
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+        totalPaid: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        tableHeader__edit: undefined,
+        tableHeader__plan: undefined,
+        tableHeader__startDate: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: 'Faturácia a platby',
     },
     connectedAccountPage: {
       formHint: 'Vyberte poskytovateľa pre pripojenie vášho účtu.',
@@ -791,6 +1064,7 @@ export const skSK: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profil',
+      apiKeys: 'Kľúče API',
       billing: 'Fakturácia',
       description: 'Spravujte údaje svojho účtu a zabezpečenie',
       security: 'Bezpečnosť',
@@ -826,6 +1100,9 @@ export const skSK: LocalizationResource = {
       title: 'Pridať telefónne číslo',
       verifySubtitle: 'Zadajte overovací kód odoslaný na {{identifier}}',
       verifyTitle: 'Overte telefónne číslo',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: 'Nahrajte obrázok vo formátoch JPG, PNG, GIF alebo WEBP s veľkosťou menšou než 10 MB',
@@ -888,7 +1165,7 @@ export const skSK: LocalizationResource = {
         },
       },
       passkeysSection: {
-        menuAction__destructive: 'Odstrániť' ,
+        menuAction__destructive: 'Odstrániť',
         menuAction__rename: 'Premenovať',
         primaryButton: 'Pridať Passkey',
         title: 'Passkey',

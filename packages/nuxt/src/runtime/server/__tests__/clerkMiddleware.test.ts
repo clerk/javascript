@@ -42,7 +42,7 @@ describe('clerkMiddleware(params)', () => {
     app.use(clerkMiddleware());
     app.use(
       '/',
-      eventHandler(event => event.context.auth),
+      eventHandler(event => event.context.auth()),
     );
     const response = await handler(new Request(new URL('/', 'http://localhost')));
 
@@ -56,7 +56,7 @@ describe('clerkMiddleware(params)', () => {
     app.use(clerkMiddleware(MOCK_OPTIONS));
     app.use(
       '/',
-      eventHandler(event => event.context.auth),
+      eventHandler(event => event.context.auth()),
     );
     const response = await handler(new Request(new URL('/', 'http://localhost')));
 
@@ -75,7 +75,7 @@ describe('clerkMiddleware(params)', () => {
     );
     app.use(
       '/',
-      eventHandler(event => event.context.auth),
+      eventHandler(event => event.context.auth()),
     );
     const response = await handler(new Request(new URL('/', 'http://localhost')));
 
@@ -94,7 +94,7 @@ describe('clerkMiddleware(params)', () => {
     );
     app.use(
       '/',
-      eventHandler(event => event.context.auth),
+      eventHandler(event => event.context.auth()),
     );
     const response = await handler(new Request(new URL('/', 'http://localhost')));
 

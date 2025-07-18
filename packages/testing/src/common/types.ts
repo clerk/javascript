@@ -1,5 +1,17 @@
 export type ClerkSetupOptions = {
   /*
+   * Enable debug mode.
+   */
+  debug?: boolean;
+
+  /*
+   * The frontend API URL for your Clerk dev instance, without the protocol.
+   * If provided, it overrides the Frontend API URL parsed from the publishable key.
+   * Example: 'relieved-chamois-66.clerk.accounts.dev'
+   */
+  frontendApiUrl?: string;
+
+  /*
    * The publishable key for your Clerk dev instance.
    * If not provided, the library will look for the key in the following environment variables:
    * - NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
@@ -9,16 +21,19 @@ export type ClerkSetupOptions = {
    * - EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY
    */
   publishableKey?: string;
+
   /*
-   * The frontend API URL for your Clerk dev instance, without the protocol.
-   * If provided, it overrides the Frontend API URL parsed from the publishable key.
-   * Example: 'relieved-chamois-66.clerk.accounts.dev'
+   * The secret key for your Clerk dev instance.
+   * If not provided, the library will look for the key in the following environment variables:
+   * - CLERK_SECRET_KEY
    */
-  frontendApiUrl?: string;
+  secretKey?: string;
+
   /*
-   * Enable debug mode.
+   * Automatic loading of environment variables from .env files.
+   * Default: true
    */
-  debug?: boolean;
+  dotenv?: boolean;
 };
 
 export type ClerkSetupReturn = {

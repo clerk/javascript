@@ -34,9 +34,9 @@ type MapValue<A> = A extends Map<any, infer V> ? V : never;
 /**
  * Selects field-specific feedback, if they exist
  *
- * @note We declare an explicit return type here because TypeScript's inference results in the subtype reduction of the
- *       union used for feedback. Explicitly declaring the return type allows for all members of the union to be
- *       included in the return type.
+ * We declare an explicit return type here because TypeScript's inference results in the subtype reduction of the
+ * union used for feedback. Explicitly declaring the return type allows for all members of the union to be
+ * included in the return type.
  */
 export const fieldFeedbackSelector =
   (name: string | undefined) =>

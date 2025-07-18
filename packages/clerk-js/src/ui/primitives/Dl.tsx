@@ -10,6 +10,9 @@ export const Dl = React.forwardRef<HTMLTableCellElement, DlProps>((props, ref) =
   return (
     <Box
       as='dl'
+      css={{
+        margin: 0,
+      }}
       {...props}
       ref={ref}
     />

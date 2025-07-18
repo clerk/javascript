@@ -2,8 +2,10 @@ import type { UserOrganizationInvitationResource } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
 import { forwardRef } from 'react';
 
+import { OrganizationPreview } from '@/ui/elements/OrganizationPreview';
+import { PreviewButton } from '@/ui/elements/PreviewButton';
+
 import { Box, Button, Col, descriptors, Flex, Spinner } from '../../customizables';
-import { OrganizationPreview, PreviewButton } from '../../elements';
 import { SwitchArrowRight } from '../../icons';
 import type { ThemableCssProp } from '../../styledSystem';
 import { common } from '../../styledSystem';
@@ -17,7 +19,7 @@ export const PreviewListItems = (props: PropsWithChildren) => {
         overflowY: 'auto',
         borderTopWidth: t.borderWidths.$normal,
         borderTopStyle: t.borderStyles.$solid,
-        borderTopColor: t.colors.$neutralAlpha100,
+        borderTopColor: t.colors.$borderAlpha100,
         ...common.unstyledScrollbar(t),
       })}
     >
@@ -31,9 +33,9 @@ const sharedStyles: ThemableCssProp = t => ({
 });
 
 export const sharedMainIdentifierSx: ThemableCssProp = t => ({
-  color: t.colors.$colorText,
+  color: t.colors.$colorForeground,
   ':hover': {
-    color: t.colors.$colorText,
+    color: t.colors.$colorForeground,
   },
 });
 
@@ -52,7 +54,7 @@ export const PreviewListItem = (
           justifyContent: 'space-between',
           borderTopWidth: t.borderWidths.$normal,
           borderTopStyle: t.borderStyles.$solid,
-          borderTopColor: t.colors.$neutralAlpha100,
+          borderTopColor: t.colors.$borderAlpha100,
         }),
         sharedStyles,
       ]}

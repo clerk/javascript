@@ -1,6 +1,4 @@
-import type { PathValue, RecordToPath } from '@clerk/types';
-
-import type { defaultResource } from './defaultEnglishResource';
+import type { __internal_LocalizationResource, PathValue, RecordToPath } from '@clerk/types';
 
 type Value = string | number | boolean | Date;
 type Whitespace = ' ' | '\t' | '\n' | '\r';
@@ -61,20 +59,19 @@ export type GetICUArgs<Text extends string, T extends RemovePipeUtils<Text>> = T
   T extends readonly string[] ? TupleFindBlocks<T> : FindBlocks<T>
 >;
 
-type DefaultLocalizationKey = RecordToPath<typeof defaultResource>;
-type LocalizationKeyToValue<P extends DefaultLocalizationKey> = PathValue<typeof defaultResource, P>;
-
-// @ts-ignore
-type LocalizationKeyToParams<P extends DefaultLocalizationKey> = GetICUArgs<LocalizationKeyToValue<P>>;
+type DefaultLocalizationKey = RecordToPath<__internal_LocalizationResource>;
+type LocalizationKeyToValue<P extends DefaultLocalizationKey> = PathValue<__internal_LocalizationResource, P>;
 
 export type LocalizationKey = {
   key: string;
   params: Record<string, any> | undefined;
 };
 
-export const localizationKeys = <Key extends DefaultLocalizationKey, Params extends LocalizationKeyToParams<Key>>(
+type ExtractArgsFromValue<Value> = Value extends { __params: any } ? [params: Value['__params']] : [];
+
+export const localizationKeys = <Key extends DefaultLocalizationKey, Value extends LocalizationKeyToValue<Key>>(
   key: Key,
-  params?: keyof Params extends never ? never : Params,
+  ...args: ExtractArgsFromValue<Value>
 ): LocalizationKey => {
-  return { key, params } as LocalizationKey;
+  return { key, params: args[0] } as LocalizationKey;
 };

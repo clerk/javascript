@@ -8,12 +8,13 @@ import { Form } from './Form';
 type FormButtonsProps = PropsOfComponent<typeof Form.SubmitButton> & {
   isDisabled?: boolean;
   onReset?: () => void;
+  hideReset?: boolean;
   submitLabel?: LocalizationKey;
   resetLabel?: LocalizationKey;
 };
 
 export const FormButtons = (props: FormButtonsProps) => {
-  const { isDisabled, onReset, submitLabel, resetLabel, ...rest } = props;
+  const { isDisabled, onReset, submitLabel, resetLabel, hideReset, ...rest } = props;
   const { navigateToFlowStart } = useNavigateToFlowStart();
   return (
     <FormButtonContainer>
@@ -23,11 +24,13 @@ export const FormButtons = (props: FormButtonsProps) => {
         localizationKey={submitLabel || localizationKeys('userProfile.formButtonPrimary__save')}
         {...rest}
       />
-      <Form.ResetButton
-        localizationKey={resetLabel || localizationKeys('userProfile.formButtonReset')}
-        block={false}
-        onClick={onReset || navigateToFlowStart}
-      />
+      {!hideReset && (
+        <Form.ResetButton
+          localizationKey={resetLabel || localizationKeys('userProfile.formButtonReset')}
+          block={false}
+          onClick={onReset || navigateToFlowStart}
+        />
+      )}
     </FormButtonContainer>
   );
 };

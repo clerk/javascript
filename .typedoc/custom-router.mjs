@@ -2,6 +2,18 @@
 import { MemberRouter } from 'typedoc-plugin-markdown';
 
 /**
+ * From a filepath divided by `/` only keep the first and last part
+ * @param {string} filePath
+ */
+function flattenDirName(filePath) {
+  const parts = filePath.split('/');
+  if (parts.length > 2) {
+    return `${parts[0]}/${parts[parts.length - 1]}`;
+  }
+  return filePath;
+}
+
+/**
  * @param {string} str
  */
 function toKebabCase(str) {
@@ -27,8 +39,16 @@ class ClerkRouter extends MemberRouter {
     const pages = super.buildPages(project);
 
     const modifiedPages = pages
-      // Do not output README files
-      .filter(page => !page.url.toLocaleLowerCase().endsWith('readme.mdx'));
+      /**
+       * Do not output README files
+       * They can be `readme.mdx` or `readme-1.mdx` & `readme-2.mdx` etc.
+       */
+      .filter(page => {
+        const isExactMatch = page.url.toLocaleLowerCase().endsWith('readme.mdx');
+        const isMatchWithNumber = page.url.toLocaleLowerCase().match(/readme-\d+\.mdx$/);
+
+        return !(isExactMatch || isMatchWithNumber);
+      });
 
     return modifiedPages;
   }
@@ -42,13 +62,15 @@ class ClerkRouter extends MemberRouter {
     let filePath = toKebabCase(original);
 
     /**
-     * For the `@clerk/shared` package it outputs the hooks as for example: shared/react/hooks/use-clerk/functions/use-clerk.mdx.
-     * It also places the interfaces as shared/react/hooks/use-organization/interfaces/use-organization-return.mdx
-     * Group all those .mdx files under shared/react/hooks
+     * By default, the paths are deeply nested, e.g.:
+     * - clerk-react/functions/use-clerk
+     * - shared/react/hooks/use-user
+     *
+     * This should be flattened to:
+     * - clerk-react/use-clerk
+     * - shared/use-user
      */
-    if (filePath.includes('shared/react/hooks')) {
-      filePath = filePath.replace(/\/[^/]+\/(functions|interfaces)\//, '/');
-    }
+    filePath = flattenDirName(filePath);
 
     return filePath;
   }

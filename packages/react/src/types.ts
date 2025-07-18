@@ -24,7 +24,7 @@ declare global {
 export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
   Clerk?: ClerkProp;
   /**
-   * Define the URL that `@clerk/clerk-js` should be hot-loaded from
+   * The URL that `@clerk/clerk-js` should be hot-loaded from.
    */
   clerkJSUrl?: string;
   /**
@@ -32,7 +32,7 @@ export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
    */
   clerkJSVariant?: 'headless' | '';
   /**
-   * Define the npm version for `@clerk/clerk-js`
+   * The npm version for `@clerk/clerk-js`.
    */
   clerkJSVersion?: string;
   /**
@@ -55,7 +55,8 @@ export type ClerkProviderProps = IsomorphicClerkOptions & {
    */
   initialState?: InitialState;
   /**
-   * Indicates to silently fail the initialization process when the publishable keys is not provided, instead of throwing an error. Defaults to `false`.
+   * Indicates to silently fail the initialization process when the publishable keys is not provided, instead of throwing an error.
+   * @default false
    * @internal
    */
   __internal_bypassMissingPublishableKey?: boolean;

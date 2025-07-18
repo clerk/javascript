@@ -1,13 +1,19 @@
 import React from 'react';
 
+import { Card } from '@/ui/elements/Card';
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { Form } from '@/ui/elements/Form';
+import { Header } from '@/ui/elements/Header';
+import { handleError } from '@/ui/utils/errorHandler';
+import { createPasswordError } from '@/ui/utils/passwordUtils';
+import { useFormControl } from '@/ui/utils/useFormControl';
+
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { useCoreSignIn, useEnvironment } from '../../contexts';
 import { Col, descriptors, localizationKeys, useLocalizations } from '../../customizables';
-import { Card, Form, Header, useCardState, withCardStateProvider } from '../../elements';
 import { useConfirmPassword } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router';
-import { createPasswordError, handleError, useFormControl } from '../../utils';
 
 const ResetPasswordInternal = () => {
   const signIn = useCoreSignIn();

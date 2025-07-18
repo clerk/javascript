@@ -39,17 +39,25 @@ declare global {
   }
 }
 
+/**
+ * The `OrganizationMembership` object is the model around an organization membership entity and describes the relationship between users and organizations.
+ * @interface
+ */
 export interface OrganizationMembershipResource extends ClerkResource {
   id: string;
   organization: OrganizationResource;
   permissions: OrganizationPermissionKey[];
   publicMetadata: OrganizationMembershipPublicMetadata;
-  publicUserData: PublicUserData;
+  publicUserData?: PublicUserData;
   role: OrganizationCustomRoleKey;
+  roleName: string;
   createdAt: Date;
   updatedAt: Date;
   destroy: () => Promise<OrganizationMembershipResource>;
   update: (updateParams: UpdateOrganizationMembershipParams) => Promise<OrganizationMembershipResource>;
+  /**
+   * @internal
+   */
   __internal_toSnapshot: () => OrganizationMembershipJSONSnapshot;
 }
 
@@ -60,7 +68,11 @@ export type OrganizationCustomPermissionKey = ClerkAuthorization extends Placeho
   : Base['permission'];
 
 /**
- * OrganizationCustomRoleKey will be string unless the developer has provided their own types through `ClerkAuthorization`
+ * `OrganizationCustomRoleKey` is a type that represents the user's role in an organization. It will be string unless the developer has provided their own types through [`ClerkAuthorization`](https://clerk.com/docs/guides/custom-types#example-custom-roles-and-permissions).
+ *
+ * Clerk provides the [default roles](https://clerk.com/docs/organizations/roles-permissions#default-roles) `org:admin` and `org:member`. However, you can create [custom roles](https://clerk.com/docs/organizations/roles-permissions#custom-roles) as well.
+ *
+ * @interface
  */
 export type OrganizationCustomRoleKey = ClerkAuthorization extends Placeholder
   ? ClerkAuthorization['role'] extends string

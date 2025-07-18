@@ -1,12 +1,15 @@
 import type { SignedInSessionResource } from '@clerk/types';
 
+import { Action, Actions, SmallAction, SmallActions } from '@/ui/elements/Actions';
+import { PreviewButton } from '@/ui/elements/PreviewButton';
+import { UserPreview } from '@/ui/elements/UserPreview';
+
 import type { ElementDescriptor, ElementId } from '../../../ui/customizables/elementDescriptors';
 import { useRouter } from '../../../ui/router';
 import { USER_BUTTON_ITEM_ID } from '../../constants';
 import { useUserButtonContext } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { descriptors, Flex, localizationKeys } from '../../customizables';
-import { Action, Actions, PreviewButton, SmallAction, SmallActions, UserPreview } from '../../elements';
 import { Add, CogFilled, SignOut, SwitchArrowRight } from '../../icons';
 import type { ThemableCssProp } from '../../styledSystem';
 import type { DefaultItemIds, MenuItem } from '../../utils/createCustomMenuItems';
@@ -28,7 +31,7 @@ export const SingleSessionActions = (props: SingleSessionActionsProps) => {
   const commonActionSx: ThemableCssProp = t => ({
     borderTopWidth: t.borderWidths.$normal,
     borderTopStyle: t.borderStyles.$solid,
-    borderTopColor: t.colors.$neutralAlpha100,
+    borderTopColor: t.colors.$borderAlpha100,
     padding: `${t.space.$4} ${t.space.$5}`,
   });
 
@@ -57,7 +60,7 @@ export const SingleSessionActions = (props: SingleSessionActionsProps) => {
       sx={t => ({
         borderTopWidth: t.borderWidths.$normal,
         borderTopStyle: t.borderStyles.$solid,
-        borderTopColor: t.colors.$neutralAlpha100,
+        borderTopColor: t.colors.$borderAlpha100,
       })}
     >
       {menutItems?.map((item: MenuItem) => {
@@ -266,7 +269,7 @@ export const MultiSessionActions = (props: MultiSessionActionsProps) => {
         sx={t => ({
           borderTopStyle: t.borderStyles.$solid,
           borderTopWidth: t.borderWidths.$normal,
-          borderTopColor: t.colors.$neutralAlpha100,
+          borderTopColor: t.colors.$borderAlpha100,
         })}
       >
         {otherSessions.map(session => (

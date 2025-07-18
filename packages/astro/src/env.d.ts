@@ -18,6 +18,7 @@ interface InternalEnv {
   readonly PUBLIC_CLERK_SIGN_UP_URL?: string;
   readonly PUBLIC_CLERK_TELEMETRY_DISABLED?: string;
   readonly PUBLIC_CLERK_TELEMETRY_DEBUG?: string;
+  readonly PUBLIC_CLERK_TREAT_PENDING_AS_SIGNED_OUT?: string;
 }
 
 interface ImportMeta {

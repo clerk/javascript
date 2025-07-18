@@ -1,5 +1,6 @@
 import type {
   InitialState,
+  JwtPayload,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
   OrganizationResource,
@@ -11,8 +12,8 @@ import type {
 /**
  * Derives authentication state based on the current rendering context (SSR or client-side).
  */
-export const deriveState = (clerkLoaded: boolean, state: Resources, initialState: InitialState | undefined) => {
-  if (!clerkLoaded && initialState) {
+export const deriveState = (clerkOperational: boolean, state: Resources, initialState: InitialState | undefined) => {
+  if (!clerkOperational && initialState) {
     return deriveFromSsrInitialState(initialState);
   }
   return deriveFromClientSideState(state);
@@ -23,6 +24,7 @@ const deriveFromSsrInitialState = (initialState: InitialState) => {
   const user = initialState.user as UserResource;
   const sessionId = initialState.sessionId;
   const sessionStatus = initialState.sessionStatus;
+  const sessionClaims = initialState.sessionClaims;
   const session = initialState.session as SignedInSessionResource;
   const organization = initialState.organization as OrganizationResource;
   const orgId = initialState.orgId;
@@ -38,6 +40,7 @@ const deriveFromSsrInitialState = (initialState: InitialState) => {
     sessionId,
     session,
     sessionStatus,
+    sessionClaims,
     organization,
     orgId,
     orgRole,
@@ -54,6 +57,9 @@ const deriveFromClientSideState = (state: Resources) => {
   const sessionId: string | null | undefined = state.session ? state.session.id : state.session;
   const session = state.session;
   const sessionStatus = state.session?.status;
+  const sessionClaims: JwtPayload | null | undefined = state.session
+    ? state.session.lastActiveToken?.jwt?.claims
+    : null;
   const factorVerificationAge: [number, number] | null = state.session ? state.session.factorVerificationAge : null;
   const actor = session?.actor;
   const organization = state.organization;
@@ -71,6 +77,7 @@ const deriveFromClientSideState = (state: Resources) => {
     sessionId,
     session,
     sessionStatus,
+    sessionClaims,
     organization,
     orgId,
     orgRole,

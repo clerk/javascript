@@ -6,7 +6,7 @@ export default function Page() {
   if (!isLoaded) {
     return <p>Loading</p>;
   }
-  if (!has({ role: 'admin' })) {
+  if (!has({ role: 'org:admin' })) {
     return <p>User is not admin</p>;
   }
   return <p>User has access</p>;

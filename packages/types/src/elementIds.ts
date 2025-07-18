@@ -1,4 +1,4 @@
-export type AlertId = 'danger' | 'warning';
+export type AlertId = 'danger' | 'warning' | 'info';
 export type FieldId =
   | 'firstName'
   | 'lastName'
@@ -21,7 +21,10 @@ export type FieldId =
   | 'enrollmentMode'
   | 'affiliationEmailAddress'
   | 'deleteExistingInvitationsSuggestions'
-  | 'legalAccepted';
+  | 'legalAccepted'
+  | 'apiKeyDescription'
+  | 'apiKeyExpirationDate'
+  | 'apiKeyRevokeConfirmation';
 export type ProfileSectionId =
   | 'profile'
   | 'username'
@@ -38,7 +41,9 @@ export type ProfileSectionId =
   | 'organizationProfile'
   | 'organizationDanger'
   | 'organizationDomains'
-  | 'manageVerifiedDomains';
+  | 'manageVerifiedDomains'
+  | 'subscriptionsList'
+  | 'paymentSources';
 export type ProfilePageId = 'account' | 'security' | 'organizationGeneral' | 'organizationMembers' | 'billing';
 
 export type UserPreviewId = 'userButton' | 'personalWorkspace';
@@ -51,4 +56,4 @@ export type OrganizationPreviewId =
 export type CardActionId = 'havingTrouble' | 'alternativeMethods' | 'signUp' | 'signIn' | 'usePasskey' | 'waitlist';
 
 export type MenuId = 'invitation' | 'member' | ProfileSectionId;
-export type SelectId = 'countryCode' | 'role';
+export type SelectId = 'countryCode' | 'role' | 'paymentSource' | 'apiKeyExpiration';

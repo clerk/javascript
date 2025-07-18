@@ -3,7 +3,7 @@ import { describe, it } from '@jest/globals';
 
 import { render, screen } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
-import { UserProfile } from '../UserProfile';
+import { UserProfile } from '../';
 
 const { createFixtures } = bindCreateFixtures('UserProfile');
 

@@ -16,16 +16,24 @@ declare global {
   }
 }
 
+/**
+ * The `OrganizationInvitation` object is the model around an organization invitation.
+ * @interface
+ */
 export interface OrganizationInvitationResource extends ClerkResource {
   id: string;
   emailAddress: string;
   organizationId: string;
   publicMetadata: OrganizationInvitationPublicMetadata;
   role: OrganizationCustomRoleKey;
+  roleName: string;
   status: OrganizationInvitationStatus;
   createdAt: Date;
   updatedAt: Date;
   revoke: () => Promise<OrganizationInvitationResource>;
 }
 
-export type OrganizationInvitationStatus = 'pending' | 'accepted' | 'revoked';
+/**
+ * @inline
+ */
+export type OrganizationInvitationStatus = 'pending' | 'accepted' | 'revoked' | 'expired';

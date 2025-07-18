@@ -1,19 +1,19 @@
 import { useClerk } from '@clerk/shared/react';
 import React, { useEffect, useMemo } from 'react';
 
+import { Card } from '@/ui/elements/Card';
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { Header } from '@/ui/elements/Header';
+import { LoadingCard } from '@/ui/elements/LoadingCard';
+import { SocialButtonsReversibleContainerWithDivider } from '@/ui/elements/ReversibleContainer';
+import { handleError } from '@/ui/utils/errorHandler';
+import type { FormControlState } from '@/ui/utils/useFormControl';
+import { buildRequest, useFormControl } from '@/ui/utils/useFormControl';
+import { createUsernameError } from '@/ui/utils/usernameUtils';
+
 import { SignInContext, useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys, useLocalizations } from '../../customizables';
-import {
-  Card,
-  Header,
-  LoadingCard,
-  SocialButtonsReversibleContainerWithDivider,
-  withCardStateProvider,
-} from '../../elements';
-import { useCardState } from '../../elements/contexts';
 import { useRouter } from '../../router';
-import type { FormControlState } from '../../utils';
-import { buildRequest, createUsernameError, handleError, useFormControl } from '../../utils';
 import { SignUpForm } from './SignUpForm';
 import type { ActiveIdentifier } from './signUpFormHelpers';
 import {
@@ -46,6 +46,7 @@ function SignUpContinueInternal() {
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
     getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
   );
+  const ctx = useSignUpContext();
 
   // TODO: This form should be shared between SignUpStart and SignUpContinue
   const formState = {
@@ -102,7 +103,7 @@ function SignUpContinueInternal() {
 
   useEffect(() => {
     // Redirect to sign-up if there is no persisted sign-up
-    if (!signUp.id) {
+    if (!signUp.id && clerk.__internal_setActiveInProgress !== true) {
       void navigate(displayConfig.signUpUrl);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -179,6 +180,7 @@ function SignUpContinueInternal() {
           verifyPhonePath: './verify-phone-number',
           handleComplete: () => clerk.setActive({ session: res.createdSessionId, redirectUrl: afterSignUpUrl }),
           navigate,
+          oidcPrompt: ctx.oidcPrompt,
         }),
       )
       .catch(err => handleError(err, fieldsToSubmit, card.setError))
@@ -215,6 +217,7 @@ function SignUpContinueInternal() {
                 <SignUpSocialButtons
                   enableOAuthProviders={showOauthProviders}
                   enableWeb3Providers={false}
+                  enableAlternativePhoneCodeProviders={false}
                   continueSignUp
                 />
               )}

@@ -1,6 +1,6 @@
 import { Col, descriptors } from '../customizables';
-import type { CustomPageContent } from '../utils';
-import { ExternalElementMounter } from '../utils';
+import type { CustomPageContent } from '../utils/createCustomPages';
+import { ExternalElementMounter } from '../utils/ExternalElementMounter';
 
 export const CustomPageContentContainer = ({ mount, unmount }: Omit<CustomPageContent, 'url'>) => {
   return (

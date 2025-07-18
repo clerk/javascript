@@ -7,129 +7,7 @@
       name="viewport"
       content="width=device-width,initial-scale=1"
     />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          colors: {
-            inherit: 'inherit',
-            current: 'currentColor',
-            transparent: 'transparent',
-            black: '#000',
-            white: '#fff',
-            gray: {
-              25: '#FAFAFB',
-              50: '#F7F7F8',
-              100: '#EEEEF0',
-              150: '#E3E3E7',
-              200: '#D9D9DE',
-              300: '#B7B8C2',
-              400: '#9394A1',
-              500: '#747686',
-              600: '#5E5F6E',
-              700: '#42434D',
-              750: '#373840',
-              800: '#2F3037',
-              850: '#27272D',
-              900: '#212126',
-              950: '#131316',
-            },
-            purple: {
-              50: '#F4F2FF',
-              100: '#EAE8FF',
-              200: '#D7D4FF',
-              300: '#BAB1FF',
-              400: '#9785FF',
-              500: '#6C47FF',
-              600: '#6430F7',
-              700: '#561EE3',
-              800: '#4818BF',
-              900: '#3C169C',
-              950: '#230B6A',
-              DEFAULT: '#6C47FF',
-            },
-            sky: {
-              50: '#EBFDFF',
-              100: '#CCF9FF',
-              200: '#9FF1FF',
-              300: '#5DE3FF',
-              400: '#3AD4FD',
-              500: '#00AEE3',
-              600: '#0089BE',
-              700: '#056D99',
-              800: '#0E597C',
-              900: '#104A69',
-              950: '#043048',
-            },
-            blue: {
-              50: '#EFF6FF',
-              100: '#DBEAFE',
-              200: '#BFDBFE',
-              300: '#93C5FD',
-              400: '#60A5FA',
-              500: '#3B82F6',
-              600: '#2563EB',
-              700: '#1D4ED8',
-              800: '#1E40AF',
-              900: '#1E3A8A',
-              950: '#0E1A3A',
-            },
-            green: {
-              50: '#F0FDF2',
-              100: '#DCFCE2',
-              200: '#BBF7C6',
-              300: '#86EF9B',
-              400: '#4ADE68',
-              500: '#22C543',
-              600: '#16A332',
-              700: '#15802A',
-              800: '#166527',
-              900: '#145323',
-              950: '#052E0F',
-            },
-            red: {
-              50: '#FEF2F2',
-              100: '#FEF2F2',
-              200: '#FECACA',
-              300: '#FCA5A5',
-              400: '#F87171',
-              500: '#EF4444',
-              600: '#DC2626',
-              700: '#B91C1C',
-              800: '#991B1B',
-              900: '#7F1D1D',
-              950: '#450A0A',
-            },
-            orange: {
-              50: '#FFF6ED',
-              100: '#FFEBD5',
-              200: '#FED1AA',
-              300: '#FDB674',
-              400: '#F98C49',
-              500: '#F36B16',
-              600: '#EA520C',
-              700: '#C23A0C',
-              800: '#9A2F12',
-              900: '#7C2912',
-              950: '#431207',
-            },
-            yellow: {
-              50: '#FEFCE8',
-              100: '#FEF9C3',
-              200: '#FEF18A',
-              300: '#FDE047',
-              400: '#EFD420',
-              500: '#EAB308',
-              600: '#CA8A04',
-              700: '#A16207',
-              800: '#854D0E',
-              900: '#713F12',
-              950: '#422006',
-            },
-          },
-        },
-      };
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   </head>
   <body class="flex min-h-full flex-col overflow-x-hidden bg-gray-50 lg:has-[*[data-sidebar]:not(.hidden)]:px-72">
     <div
@@ -263,6 +141,22 @@
           <li class="relative">
             <a
               class="relative isolate flex w-full rounded-md border border-white px-2 py-[0.4375rem] text-sm hover:bg-gray-50 aria-[current]:bg-gray-50"
+              href="/api-keys"
+            >
+              API Keys
+            </a>
+          </li>
+          <li class="relative">
+            <a
+              class="relative isolate flex w-full rounded-md border border-white px-2 py-[0.4375rem] text-sm hover:bg-gray-50 aria-[current]:bg-gray-50"
+              href="/oauth-consent"
+            >
+              OAuthConsent
+            </a>
+          </li>
+          <li class="relative">
+            <a
+              class="relative isolate flex w-full rounded-md border border-white px-2 py-[0.4375rem] text-sm hover:bg-gray-50 aria-[current]:bg-gray-50"
               href="/open-sign-in"
             >
               Open sign in
@@ -297,6 +191,7 @@
         <label class="flex items-center justify-between border-t border-gray-100 py-2">
           <span class="font-mono text-xs">colorPrimary</span>
           <input
+            class="border border-gray-200"
             type="color"
             id="colorPrimary"
             value="#2F3037"
@@ -305,6 +200,7 @@
         <label class="flex items-center justify-between border-t border-gray-100 py-2">
           <span class="font-mono text-xs">colorNeutral</span>
           <input
+            class="border border-gray-200"
             type="color"
             id="colorNeutral"
             value="#000000"
@@ -313,22 +209,25 @@
         <label class="flex items-center justify-between border-t border-gray-100 py-2">
           <span class="font-mono text-xs">colorBackground</span>
           <input
+            class="border border-gray-200"
             type="color"
             id="colorBackground"
             value="#ffffff"
           />
         </label>
         <label class="flex items-center justify-between border-t border-gray-100 py-2">
-          <span class="font-mono text-xs">colorTextOnPrimaryBackground</span>
+          <span class="font-mono text-xs">colorPrimaryForeground</span>
           <input
+            class="border border-gray-200"
             type="color"
-            id="colorTextOnPrimaryBackground"
+            id="colorPrimaryForeground"
             value="#ffffff"
           />
         </label>
         <label class="flex items-center justify-between border-t border-gray-100 py-2">
           <span class="font-mono text-xs">colorDanger</span>
           <input
+            class="border border-gray-200"
             type="color"
             id="colorDanger"
             value="#EF4444"
@@ -337,6 +236,7 @@
         <label class="flex items-center justify-between border-t border-gray-100 py-2">
           <span class="font-mono text-xs">colorSuccess</span>
           <input
+            class="border border-gray-200"
             type="color"
             id="colorSuccess"
             value="#22C543"
@@ -345,56 +245,62 @@
         <label class="flex items-center justify-between border-t border-gray-100 py-2">
           <span class="font-mono text-xs">colorWarning</span>
           <input
+            class="border border-gray-200"
             type="color"
             id="colorWarning"
             value="#F36B16"
           />
         </label>
         <label class="flex items-center justify-between border-t border-gray-100 py-2">
-          <span class="font-mono text-xs">colorText</span>
+          <span class="font-mono text-xs">colorForeground</span>
           <input
+            class="border border-gray-200"
             type="color"
-            id="colorText"
+            id="colorForeground"
             value="#212126"
           />
         </label>
         <label class="flex items-center justify-between border-t border-gray-100 py-2">
-          <span class="font-mono text-xs">colorTextSecondary</span>
+          <span class="font-mono text-xs">colorMutedForeground</span>
           <input
+            class="border border-gray-200"
             type="color"
-            id="colorTextSecondary"
+            id="colorMutedForeground"
             value="#747686"
           />
         </label>
         <label class="flex items-center justify-between border-t border-gray-100 py-2">
-          <span class="font-mono text-xs">colorInputText</span>
+          <span class="font-mono text-xs">colorInputForeground</span>
           <input
+            class="border border-gray-200"
             type="color"
-            id="colorInputText"
+            id="colorInputForeground"
             value="#000000"
           />
         </label>
         <label class="flex items-center justify-between border-t border-gray-100 py-2">
-          <span class="font-mono text-xs">colorInputBackground</span>
+          <span class="font-mono text-xs">colorInput</span>
           <input
+            class="border border-gray-200"
             type="color"
-            id="colorInputBackground"
+            id="colorInput"
             value="#ffffff"
           />
         </label>
         <label class="flex items-center justify-between border-t border-gray-100 py-2">
           <span class="font-mono text-xs">colorShimmer</span>
           <input
+            class="border border-gray-200"
             type="color"
             id="colorShimmer"
             value="#ffffff"
           />
         </label>
         <label class="flex items-center justify-between border-t border-gray-100 py-2">
-          <span class="font-mono text-xs">spacingUnit</span>
+          <span class="font-mono text-xs">spacing</span>
           <input
             type="text"
-            id="spacingUnit"
+            id="spacing"
             value="1rem"
             class="text-sm outline-none [field-sizing:content]"
           />
@@ -407,6 +313,21 @@
             value="0.375rem"
             class="text-sm outline-none [field-sizing:content]"
           />
+        </label>
+      </fieldset>
+      <fieldset>
+        <div class="mb-2 mt-4 flex items-center justify-between">
+          <legend class="block text-sm">Other options</legend>
+          <button
+            id="resetOtherOptionsBtn"
+            class="text-sm"
+          >
+            Reset
+          </button>
+        </div>
+        <label class="flex items-center justify-between border-t border-gray-100 py-2">
+          <span class="font-mono text-xs">localization</span>
+          <select id="localizationSelect"></select>
         </label>
       </fieldset>
     </div>

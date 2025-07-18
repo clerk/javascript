@@ -55,7 +55,7 @@ export class Client extends BaseResource implements ClientResource {
   }
 
   /**
-   * @deprecated Use `signedInSessions` instead
+   * @deprecated Use `signedInSessions()` instead.
    */
   get activeSessions(): ActiveSessionResource[] {
     return this.sessions.filter(s => s.status === 'active') as ActiveSessionResource[];
@@ -117,7 +117,7 @@ export class Client extends BaseResource implements ClientResource {
       .toString();
   }
 
-  public sendCaptchaToken(params: unknown): Promise<ClientResource> {
+  public __internal_sendCaptchaToken(params: unknown): Promise<ClientResource> {
     return this._basePostBypass({ body: params, path: this.path() + '/verify' });
   }
 

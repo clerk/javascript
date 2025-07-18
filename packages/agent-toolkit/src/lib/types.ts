@@ -1,4 +1,5 @@
-import type { AuthObject, ClerkClient } from '@clerk/backend';
+import type { ClerkClient } from '@clerk/backend';
+import type { SignedInAuthObject, SignedOutAuthObject } from '@clerk/backend/internal';
 
 import type { ClerkTool } from './clerk-tool';
 
@@ -12,7 +13,7 @@ export type ToolkitParams = {
    * @default {}
    */
   authContext?: Pick<
-    AuthObject,
+    SignedInAuthObject | SignedOutAuthObject,
     'userId' | 'sessionId' | 'sessionClaims' | 'orgId' | 'orgRole' | 'orgSlug' | 'orgPermissions' | 'actor'
   >;
   /**

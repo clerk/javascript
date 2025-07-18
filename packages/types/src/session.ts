@@ -26,47 +26,117 @@ import type {
 import type { SessionJSONSnapshot } from './snapshots';
 import type { TokenResource } from './token';
 import type { UserResource } from './user';
+import type { Autocomplete } from './utils';
+
+/**
+ * @inline
+ */
+export type PendingSessionOptions = {
+  /**
+   * A boolean that indicates whether pending sessions are considered as signed out or not.
+   * @default true
+   */
+  treatPendingAsSignedOut?: boolean;
+};
 
 type DisallowSystemPermissions<P extends string> = P extends `${OrganizationSystemPermissionPrefix}${string}`
   ? 'System permissions are not included in session claims and cannot be used on the server-side'
   : P;
 
+/** @inline */
 export type CheckAuthorizationFn<Params> = (isAuthorizedParams: Params) => boolean;
 
+/** @inline */
 export type CheckAuthorizationWithCustomPermissions =
   CheckAuthorizationFn<CheckAuthorizationParamsWithCustomPermissions>;
 
 type WithReverification<T> = T & {
+  /**
+   * The reverification configuration to check for. This feature is currently in public beta. **It is not recommended for production use.**
+   */
   reverification?: ReverificationConfig;
 };
 
 export type CheckAuthorizationParamsWithCustomPermissions = WithReverification<
   | {
+      /**
+       * The [role](https://clerk.com/docs/organizations/roles-permissions) to check for.
+       */
       role: OrganizationCustomRoleKey;
+      /**
+       * The [permission](https://clerk.com/docs/organizations/roles-permissions) to check for.
+       */
       permission?: never;
+      /**
+       * The [feature](https://clerk.com/docs/billing/overview) to check for.
+       */
+      feature?: never;
+      /**
+       * The [plan](https://clerk.com/docs/billing/overview) to check for.
+       */
+      plan?: never;
     }
   | {
       role?: never;
       permission: OrganizationCustomPermissionKey;
+      feature?: never;
+      plan?: never;
     }
-  | { role?: never; permission?: never }
+  | {
+      role?: never;
+      permission?: never;
+      feature: Autocomplete<`user:${string}` | `org:${string}`>;
+      plan?: never;
+    }
+  | {
+      role?: never;
+      permission?: never;
+      feature?: never;
+      plan: Autocomplete<`user:${string}` | `org:${string}`>;
+    }
+  | { role?: never; permission?: never; feature?: never; plan?: never }
 >;
 
 export type CheckAuthorization = CheckAuthorizationFn<CheckAuthorizationParams>;
 
 type CheckAuthorizationParams = WithReverification<
   | {
+      /**
+       * The [role](https://clerk.com/docs/organizations/roles-permissions) to check for.
+       */
       role: OrganizationCustomRoleKey;
+      /**
+       * The [permission](https://clerk.com/docs/organizations/roles-permissions) to check for.
+       */
       permission?: never;
+      /**
+       * The [feature](https://clerk.com/docs/billing/overview) to check for.
+       */
+      feature?: never;
+      /**
+       * The [plan](https://clerk.com/docs/billing/overview) to check for.
+       */
+      plan?: never;
     }
   | {
       role?: never;
       permission: OrganizationPermissionKey;
+      feature?: never;
+      plan?: never;
     }
   | {
       role?: never;
       permission?: never;
+      feature: Autocomplete<`user:${string}` | `org:${string}`>;
+      plan?: never;
     }
+  | {
+      role?: never;
+      permission?: never;
+      feature?: never;
+      plan: Autocomplete<`user:${string}` | `org:${string}`>;
+    }
+  | { role?: never; permission?: never; feature?: never; plan?: never }
 >;
 
 /**
@@ -78,16 +148,47 @@ export type CheckAuthorizationFromSessionClaims = <P extends OrganizationCustomP
   isAuthorizedParams: CheckAuthorizationParamsFromSessionClaims<P>,
 ) => boolean;
 
+/**
+ * @interface
+ */
 export type CheckAuthorizationParamsFromSessionClaims<P extends OrganizationCustomPermissionKey> = WithReverification<
   | {
+      /**
+       * The [role](https://clerk.com/docs/organizations/roles-permissions) to check for.
+       */
       role: OrganizationCustomRoleKey;
+      /**
+       * The [permission](https://clerk.com/docs/organizations/roles-permissions) to check for.
+       */
       permission?: never;
+      /**
+       * The [feature](https://clerk.com/docs/billing/overview) to check for.
+       */
+      feature?: never;
+      /**
+       * The [plan](https://clerk.com/docs/billing/overview) to check for.
+       */
+      plan?: never;
     }
   | {
       role?: never;
       permission: DisallowSystemPermissions<P>;
+      feature?: never;
+      plan?: never;
     }
-  | { role?: never; permission?: never }
+  | {
+      role?: never;
+      permission?: never;
+      feature: Autocomplete<`user:${string}` | `org:${string}`>;
+      plan?: never;
+    }
+  | {
+      role?: never;
+      permission?: never;
+      feature?: never;
+      plan: Autocomplete<`user:${string}` | `org:${string}`>;
+    }
+  | { role?: never; permission?: never; feature?: never; plan?: never }
 >;
 
 /**
@@ -235,6 +336,9 @@ export type GetTokenOptions = {
   leewayInSeconds?: number;
   skipCache?: boolean;
 };
+/**
+ * @inline
+ */
 export type GetToken = (options?: GetTokenOptions) => Promise<string | null>;
 
 export type SessionVerifyCreateParams = {

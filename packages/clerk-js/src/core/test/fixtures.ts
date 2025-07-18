@@ -118,6 +118,7 @@ export const createExternalAccount = (params?: Partial<ExternalAccountJSON>): Ex
     last_name: 'Last name',
     image_url: '',
     username: '',
+    phoneNumber: '',
     verification: {
       status: 'verified',
       strategy: '',

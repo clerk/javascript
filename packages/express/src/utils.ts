@@ -36,3 +36,16 @@ export const loadApiEnv = () => {
     },
   };
 };
+
+export const incomingMessageToRequest = (req: ExpressRequest): Request => {
+  const headers = Object.keys(req.headers).reduce((acc, key) => Object.assign(acc, { [key]: req?.headers[key] }), {});
+  // @ts-ignore Optimistic attempt to get the protocol in case
+  // req extends IncomingMessage in a useful way. No guarantee
+  // it'll work.
+  const protocol = req.connection?.encrypted ? 'https' : 'http';
+  const dummyOriginReqUrl = new URL(req.originalUrl || req.url || '', `${protocol}://clerk-dummy`);
+  return new Request(dummyOriginReqUrl, {
+    method: req.method,
+    headers: new Headers(headers),
+  });
+};

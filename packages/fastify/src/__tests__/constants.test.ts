@@ -21,6 +21,13 @@ describe('constants', () => {
 
   test('from environment variables', () => {
     jest.resetModules();
-    expect(constants).toMatchSnapshot();
+    const { Headers, Cookies, ...localConstants } = constants;
+
+    // Verify imported constants exist but don't snapshot them
+    expect(Headers).toBeDefined();
+    expect(Cookies).toBeDefined();
+
+    // Only snapshot our local constants
+    expect(localConstants).toMatchSnapshot();
   });
 });

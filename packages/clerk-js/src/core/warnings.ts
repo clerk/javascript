@@ -11,9 +11,9 @@ const createMessageForDisabledOrganizations = (
     `The <${componentName}/> cannot be rendered when the feature is turned off. Visit 'dashboard.clerk.com' to enable the feature. Since the feature is turned off, this is no-op.`,
   );
 };
-const createMessageForDisabledCommerce = (componentName: 'PricingTable' | 'Checkout') => {
+const createMessageForDisabledCommerce = (componentName: 'PricingTable' | 'Checkout' | 'PlanDetails') => {
   return formatWarning(
-    `The <${componentName}/> component cannot be rendered when commerce is disabled. Visit 'https://dashboard.clerk.com/last-active?path=commerce/settings' to follow the necessary steps to enable commerce. Since commerce is disabled, this is no-op.`,
+    `The <${componentName}/> component cannot be rendered when billing is disabled. Visit 'https://dashboard.clerk.com/last-active?path=billing/settings' to follow the necessary steps to enable commerce. Since commerce is disabled, this is no-op.`,
   );
 };
 const warnings = {
@@ -34,8 +34,14 @@ const warnings = {
   cannotRenderAnyCommerceComponent: createMessageForDisabledCommerce,
   cannotOpenUserProfile:
     'The UserProfile modal cannot render unless a user is signed in. Since no user is signed in, this is no-op.',
+  cannotOpenCheckout:
+    'The Checkout drawer cannot render unless a user is signed in. Since no user is signed in, this is no-op.',
   cannotOpenSignInOrSignUp:
     'The SignIn or SignUp modals do not render when a user is already signed in, unless the application allows multiple sessions. Since a user is signed in and this application only allows a single session, this is no-op.',
+  cannotRenderAPIKeysComponent:
+    'The <APIKeys/> component cannot be rendered when API keys is disabled. Since API keys is disabled, this is no-op.',
+  cannotRenderAPIKeysComponentForOrgWhenUnauthorized:
+    'The <APIKeys/> component cannot be rendered for an organization unless a user has the required permissions. Since the user does not have the necessary permissions, this is no-op.',
 };
 
 type SerializableWarnings = Serializable<typeof warnings>;

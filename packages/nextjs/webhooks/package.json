@@ -1,0 +1,5 @@
+{
+  "main": "../dist/cjs/webhooks.js",
+  "module": "../dist/esm/webhooks.js",
+  "types": "../dist/types/webhooks.d.ts"
+}

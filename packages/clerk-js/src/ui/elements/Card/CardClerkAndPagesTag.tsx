@@ -70,7 +70,7 @@ export const CardClerkAndPagesTag = React.memo(
                   gap={1}
                   align='center'
                   justify='center'
-                  sx={t => ({ color: t.colors.$colorTextSecondary })}
+                  sx={t => ({ color: t.colors.$colorMutedForeground })}
                 >
                   <>
                     <Text variant='buttonSmall'>Secured by</Text>
@@ -93,7 +93,7 @@ export const CardClerkAndPagesTag = React.memo(
 const LogoMarkIconLink = () => {
   return (
     <Link
-      href='https://www.clerk.com?utm_source=clerk&utm_medium=components'
+      href='https://go.clerk.com/components'
       colorScheme='inherit'
       isExternal
       aria-label='Clerk logo'

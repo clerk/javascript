@@ -1,9 +1,14 @@
 import type { ResetPasswordCodeFactor } from '@clerk/types';
 import React from 'react';
 
+import { Card } from '@/ui/elements/Card';
+import { useCardState } from '@/ui/elements/contexts';
+import { Form } from '@/ui/elements/Form';
+import { Header } from '@/ui/elements/Header';
+import { IdentityPreview } from '@/ui/elements/IdentityPreview';
+
 import { useCoreSignIn } from '../../contexts';
 import { descriptors, Flex, Flow, Icon, localizationKeys } from '../../customizables';
-import { Card, Form, Header, IdentityPreview, useCardState } from '../../elements';
 import { Fingerprint } from '../../icons';
 import { useRouter } from '../../router/RouteContext';
 import { HavingTrouble } from './HavingTrouble';

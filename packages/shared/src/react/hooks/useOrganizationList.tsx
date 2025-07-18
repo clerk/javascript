@@ -1,3 +1,4 @@
+/* eslint-disable jsdoc/require-description-complete-sentence */
 import type {
   ClerkPaginatedResponse,
   CreateOrganizationParams,
@@ -21,29 +22,32 @@ import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
  */
 export type UseOrganizationListParams = {
   /**
-   * If set to `true`, all default properties will be used.
-   *
+   * If set to `true`, all default properties will be used.<br />
    * Otherwise, accepts an object with the following optional properties:
    *
-   * - Any of the properties described in [Shared properties](#shared-properties).
+   * <ul>
+   *  <li>Any of the properties described in [Shared properties](#shared-properties).</li>
+   * </ul>
    */
   userMemberships?: true | PaginatedHookConfig<GetUserOrganizationMembershipParams>;
   /**
-   * If set to `true`, all default properties will be used.
-   *
+   * If set to `true`, all default properties will be used.<br />
    * Otherwise, accepts an object with the following optional properties:
    *
-   * - `status`: A string that filters the invitations by the provided status.
-   * - Any of the properties described in [Shared properties](#shared-properties).
+   * <ul>
+   *  <li>`status`: A string that filters the invitations by the provided status.</li>
+   *  <li>Any of the properties described in [Shared properties](#shared-properties).</li>
+   * </ul>
    */
   userInvitations?: true | PaginatedHookConfig<GetUserOrganizationInvitationsParams>;
   /**
-   * If set to `true`, all default properties will be used.
-   *
+   * If set to `true`, all default properties will be used.<br />
    * Otherwise, accepts an object with the following optional properties:
    *
-   * - `status`: A string that filters the suggestions by the provided status.
-   * - Any of the properties described in [Shared properties](#shared-properties).
+   * <ul>
+   *  <li>`status`: A string that filters the suggestions by the provided status.</li>
+   *  <li>Any of the properties described in [Shared properties](#shared-properties).</li>
+   * </ul>
    */
   userSuggestions?: true | PaginatedHookConfig<GetUserOrganizationSuggestionsParams>;
 };
@@ -72,7 +76,7 @@ const undefinedPaginatedResource = {
 export type UseOrganizationListReturn<T extends UseOrganizationListParams> =
   | {
       /**
-       * A boolean that indicates whether Clerk has completed initialization. Initially `false`, becomes `true` once Clerk loads.
+       * A boolean that indicates whether Clerk has completed initialization and there is an authenticated user. Initially `false`, becomes `true` once Clerk loads with a user.
        */
       isLoaded: false;
       /**
@@ -98,7 +102,7 @@ export type UseOrganizationListReturn<T extends UseOrganizationListParams> =
     }
   | {
       isLoaded: boolean;
-      createOrganization: (params: CreateOrganizationParams) => Promise<OrganizationResource>;
+      createOrganization: (CreateOrganizationParams: CreateOrganizationParams) => Promise<OrganizationResource>;
       setActive: SetActive;
       userMemberships: PaginatedResources<
         OrganizationMembershipResource,

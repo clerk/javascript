@@ -44,8 +44,7 @@ export const SignUpContinueMachine = setup({
 
       for (const key of required.concat(optional) as (keyof SignUpResource)[]) {
         if (key in signUp) {
-          // @ts-expect-error - TS doesn't understand that key is a valid key of SignUpResource
-          progressiveFieldValues.set(key, signUp[key]);
+          progressiveFieldValues.set(key, signUp[key] as string | number | readonly string[] | undefined);
         }
       }
 

@@ -12,24 +12,26 @@ export class CaptchaChallenge {
    * always use the fallback key.
    */
   public async invisible(opts?: Partial<CaptchaOptions>) {
-    const { captchaSiteKey, canUseCaptcha, captchaPublicKeyInvisible } = retrieveCaptchaInfo(this.clerk);
+    const { captchaSiteKey, canUseCaptcha, captchaPublicKeyInvisible, nonce } = retrieveCaptchaInfo(this.clerk);
 
     if (canUseCaptcha && captchaSiteKey && captchaPublicKeyInvisible) {
-      return getCaptchaToken({
-        siteKey: captchaPublicKeyInvisible,
-        invisibleSiteKey: captchaPublicKeyInvisible,
-        widgetType: 'invisible',
-        captchaProvider: 'turnstile',
+      const captchaResult = await getCaptchaToken({
         action: opts?.action,
+        captchaProvider: 'turnstile',
+        invisibleSiteKey: captchaPublicKeyInvisible,
+        nonce: opts?.nonce || nonce || undefined,
+        siteKey: captchaPublicKeyInvisible,
+        widgetType: 'invisible',
       }).catch(e => {
         if (e.captchaError) {
           return { captchaError: e.captchaError };
         }
-        return undefined;
+        return { captchaError: e?.message || e || 'unexpected_captcha_error' };
       });
+      return { ...captchaResult, captchaAction: opts?.action };
     }
 
-    return undefined;
+    return { captchaError: 'captcha_unavailable', captchaAction: opts?.action };
   }
 
   /**
@@ -41,25 +43,30 @@ export class CaptchaChallenge {
    * Managed challenged start as non-interactive and escalate to interactive if necessary.
    */
   public async managedOrInvisible(opts?: Partial<CaptchaOptions>) {
-    const { captchaSiteKey, canUseCaptcha, captchaWidgetType, captchaProvider, captchaPublicKeyInvisible } =
+    const { captchaSiteKey, canUseCaptcha, captchaWidgetType, captchaProvider, captchaPublicKeyInvisible, nonce } =
       retrieveCaptchaInfo(this.clerk);
 
     if (canUseCaptcha && captchaSiteKey && captchaPublicKeyInvisible) {
-      return getCaptchaToken({
+      const captchaResult = await getCaptchaToken({
+        captchaProvider,
+        invisibleSiteKey: captchaPublicKeyInvisible,
+        nonce: nonce || undefined,
         siteKey: captchaSiteKey,
         widgetType: captchaWidgetType,
-        invisibleSiteKey: captchaPublicKeyInvisible,
-        captchaProvider,
         ...opts,
       }).catch(e => {
         if (e.captchaError) {
           return { captchaError: e.captchaError };
         }
-        return undefined;
+        // if captcha action is signup, we return undefined, because we don't want to make the call to FAPI
+        return opts?.action === 'verify' ? { captchaError: e?.message || e || 'unexpected_captcha_error' } : undefined;
       });
+      return opts?.action === 'verify' ? { ...captchaResult, captchaAction: 'verify' } : captchaResult;
     }
 
-    return {};
+    // if captcha action is signup, we return an empty object, because it means that the bot protection is disabled
+    // and the user should be able to sign up without solving a captcha
+    return opts?.action === 'verify' ? { captchaError: 'captcha_unavailable', captchaAction: opts?.action } : {};
   }
 
   /**

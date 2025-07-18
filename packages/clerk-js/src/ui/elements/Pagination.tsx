@@ -5,7 +5,7 @@ import type { ElementDescriptor, ElementId } from '../customizables/elementDescr
 import { CaretLeft, CaretRight } from '../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { mqu } from '../styledSystem';
-import { range } from '../utils';
+import { range } from '../utils/range';
 
 type UsePaginationProps = {
   defaultPage?: number;
@@ -35,7 +35,7 @@ const PageButton = (props: PageButtonProps) => {
       variant='outline'
       sx={t => [
         {
-          color: t.colors.$colorText,
+          color: t.colors.$colorForeground,
           opacity: isActive ? 1 : t.opacity.$inactive,
           padding: `${t.space.$0x5} ${t.space.$0x5}`,
         },

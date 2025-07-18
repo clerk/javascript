@@ -14,6 +14,7 @@ export const withClerkMiddleware = (options: ClerkFastifyOptions) => {
       ...options,
       secretKey: options.secretKey || constants.SECRET_KEY,
       publishableKey: options.publishableKey || constants.PUBLISHABLE_KEY,
+      acceptsToken: 'any',
     });
 
     requestState.headers.forEach((value, key) => reply.header(key, value));

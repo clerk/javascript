@@ -37,11 +37,12 @@ declare global {
   }
 }
 
-export interface JwtPayload extends CustomJwtSessionClaims {
+type JWTPayloadBase = {
   /**
    * Encoded token supporting the `getRawString` method.
    */
   __raw: string;
+
   /**
    * JWT Issuer - [RFC7519#section-4.1.1](https://tools.ietf.org/html/rfc7519#section-4.1.1).
    */
@@ -83,26 +84,6 @@ export interface JwtPayload extends CustomJwtSessionClaims {
   act?: ActClaim;
 
   /**
-   * Active organization ID.
-   */
-  org_id?: string;
-
-  /**
-   * Active organization slug.
-   */
-  org_slug?: string;
-
-  /**
-   * Active organization role.
-   */
-  org_role?: OrganizationCustomRoleKey;
-
-  /**
-   * Active organization permissions
-   */
-  org_permissions?: OrganizationCustomPermissionKey[];
-
-  /**
    * Factor verification age (fva). The tuple represents the minutes that have passed since the last time a first or second factor were verified.
    * This API is experimental and may change at any moment.
    * @experimental
@@ -118,7 +99,90 @@ export interface JwtPayload extends CustomJwtSessionClaims {
    * Any other JWT Claim Set member.
    */
   [propName: string]: unknown;
-}
+};
+
+export type VersionedJwtPayload =
+  | {
+      v?: undefined;
+
+      /**
+       *
+       * Active organization permissions.
+       */
+      org_permissions?: OrganizationCustomPermissionKey[];
+
+      /**
+       * Active organization ID.
+       */
+      org_id?: string;
+
+      /**
+       * Active organization slug.
+       */
+      org_slug?: string;
+
+      /**
+       * Active organization role.
+       */
+      org_role?: OrganizationCustomRoleKey;
+    }
+  | {
+      /**
+       * @experimental
+       *
+       * The version of the JWT payload.
+       */
+      v: 2;
+
+      /**
+       * Features for session.
+       */
+      fea?: string;
+
+      /**
+       * Plans for session.
+       */
+      pla?: string;
+
+      /**
+       * @experimental - This structure is subject to change.
+       *
+       * Active organization information.
+       */
+      o?: {
+        /**
+         * Active organization ID.
+         */
+        id: string;
+
+        /**
+         * Active organization slug.
+         */
+        slg?: string;
+
+        /**
+         * Active organization role.
+         */
+        rol?: OrganizationCustomRoleKey;
+
+        /**
+         * Active organization permissions.
+         */
+        per?: string;
+
+        /**
+         * Feature mapping.
+         */
+        fpm?: string;
+      };
+
+      org_permissions?: never;
+      org_id?: never;
+      org_slug?: never;
+      org_role?: never;
+    };
+
+export type JwtPayload = JWTPayloadBase & CustomJwtSessionClaims & VersionedJwtPayload;
 
 /**
  * JWT Actor - [RFC8693](https://www.rfc-editor.org/rfc/rfc8693.html#name-act-actor-claim).
@@ -130,6 +194,6 @@ export interface ActClaim {
 }
 
 /**
- * Session status
+ * The current state of the session which can only be `active` or `pending`.
  */
 export type SessionStatusClaim = Extract<SessionStatus, 'active' | 'pending'>;

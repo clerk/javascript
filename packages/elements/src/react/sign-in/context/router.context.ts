@@ -11,7 +11,8 @@ import { createContextFromActorRef } from '~/react/utils/create-context-from-act
 
 export type SnapshotState = SnapshotFrom<TSignInRouterMachine>;
 
-export const SignInRouterCtx = createContextFromActorRef<TSignInRouterMachine>('SignInRouterCtx');
+export const SignInRouterCtx: ReturnType<typeof createContextFromActorRef<TSignInRouterMachine>> =
+  createContextFromActorRef<TSignInRouterMachine>('SignInRouterCtx');
 
 function useSignInStep<M extends AnyStateMachine, T = ActorRefFrom<M>>(name: string) {
   return SignInRouterCtx.useSelector(state => state.children[name] as AnyActorRef) as T;

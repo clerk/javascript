@@ -9,7 +9,7 @@ import { useClerkContext } from './useClerkContext';
 type UseSignIn = () => ToComputedRefs<UseSignInReturn>;
 
 /**
- * Returns the current [`SignIn`](https://clerk.com/docs/references/javascript/sign-in/sign-in) object which provides
+ * Returns the current [`SignIn`](https://clerk.com/docs/references/javascript/sign-in) object which provides
  * methods and state for managing the sign-in flow.
  *
  * @example

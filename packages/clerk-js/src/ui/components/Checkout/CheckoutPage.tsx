@@ -1,81 +1,86 @@
-import type { __experimental_CheckoutProps, __experimental_CommerceCheckoutResource } from '@clerk/types';
-import type { Stripe } from '@stripe/stripe-js';
-import { loadStripe } from '@stripe/stripe-js';
-import { useEffect, useRef, useState } from 'react';
+import {
+  __experimental_CheckoutProvider as CheckoutProvider,
+  __experimental_useCheckout as useCheckout,
+} from '@clerk/shared/react';
+import { useEffect, useMemo } from 'react';
 
-import { useEnvironment } from '../../contexts';
-import { Alert, Spinner } from '../../customizables';
-import { useCheckout } from '../../hooks';
-import { CheckoutComplete } from './CheckoutComplete';
-import { CheckoutForm } from './CheckoutForm';
+import { useCheckoutContext } from '@/ui/contexts/components';
 
-export const CheckoutPage = (props: __experimental_CheckoutProps) => {
-  const { planId, planPeriod, orgId, onSubscriptionComplete } = props;
-  const stripePromiseRef = useRef<Promise<Stripe | null> | null>(null);
-  const [stripe, setStripe] = useState<Stripe | null>(null);
-  const { __experimental_commerceSettings } = useEnvironment();
-
-  const { checkout, updateCheckout, isLoading } = useCheckout({
-    planId,
-    planPeriod,
-    orgId,
-  });
+const Initiator = () => {
+  const { checkout } = useCheckout();
 
   useEffect(() => {
-    if (
-      !stripePromiseRef.current &&
-      checkout?.externalGatewayId &&
-      __experimental_commerceSettings.stripePublishableKey
-    ) {
-      stripePromiseRef.current = loadStripe(__experimental_commerceSettings.stripePublishableKey, {
-        stripeAccount: checkout.externalGatewayId,
-      });
-      void stripePromiseRef.current.then(stripeInstance => {
-        setStripe(stripeInstance);
-      });
-    }
-  }, [checkout?.externalGatewayId, __experimental_commerceSettings]);
+    checkout.start().catch(() => null);
+    return checkout.clear;
+  }, []);
+  return null;
+};
 
-  const onCheckoutComplete = (newCheckout: __experimental_CommerceCheckoutResource) => {
-    updateCheckout(newCheckout);
-    onSubscriptionComplete?.();
-  };
-
-  if (isLoading) {
-    return (
-      <Spinner
-        sx={{
-          margin: 'auto',
-        }}
-      />
-    );
-  }
-
-  if (!checkout) {
-    return (
-      <>
-        {/* TODO(@COMMERCE): needs localization */}
-        <Alert
-          colorScheme='danger'
-          sx={{
-            margin: 'auto',
-          }}
-        >
-          There was a problem, please try again later.
-        </Alert>
-      </>
-    );
-  }
-
-  if (checkout?.status === 'completed') {
-    return <CheckoutComplete checkout={checkout} />;
-  }
+const Root = ({ children }: { children: React.ReactNode }) => {
+  const { planId, planPeriod, subscriberType } = useCheckoutContext();
 
   return (
-    <CheckoutForm
-      stripe={stripe}
-      checkout={checkout}
-      onCheckoutComplete={onCheckoutComplete}
-    />
+    <CheckoutProvider
+      for={subscriberType === 'org' ? 'organization' : undefined}
+      planId={
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        planId!
+      }
+      planPeriod={
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        planPeriod!
+      }
+    >
+      <Initiator />
+      {children}
+    </CheckoutProvider>
   );
 };
+
+const Stage = ({
+  children,
+  name,
+}: {
+  children: React.ReactNode;
+  name: ReturnType<typeof useCheckout>['checkout']['status'];
+}) => {
+  const { checkout } = useCheckout();
+  if (checkout.status !== name) {
+    return null;
+  }
+  return children;
+};
+
+const FetchStatus = ({
+  children,
+  status,
+}: {
+  children: React.ReactNode;
+  status: 'idle' | 'fetching' | 'error' | 'invalid_plan_change' | 'missing_payer_email';
+}) => {
+  const { checkout } = useCheckout();
+  const { fetchStatus, error } = checkout;
+
+  const internalFetchStatus = useMemo(() => {
+    if (fetchStatus === 'error' && error?.errors) {
+      const errorCodes = error.errors.map(e => e.code);
+
+      if (errorCodes.includes('missing_payer_email')) {
+        return 'missing_payer_email';
+      }
+
+      if (errorCodes.includes('invalid_plan_change')) {
+        return 'invalid_plan_change';
+      }
+    }
+
+    return fetchStatus;
+  }, [fetchStatus, error]);
+
+  if (internalFetchStatus !== status) {
+    return null;
+  }
+  return children;
+};
+
+export { Root, Stage, FetchStatus };

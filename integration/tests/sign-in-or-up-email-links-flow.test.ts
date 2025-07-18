@@ -33,6 +33,8 @@ testAgainstRunningApps({ withEnv: [] })('sign-in-or-up email links flow', ({ app
     await u.po.signUp.waitForEmailVerificationScreen();
     await u.tabs.runInNewTab(async u => {
       const verificationLink = await u.services.email.getVerificationLinkForEmailAddress(fakeUser.email);
+
+      await u.po.testingToken.setup();
       await u.page.goto(verificationLink);
       await u.po.expect.toBeSignedIn();
       await u.page.close();
@@ -52,6 +54,7 @@ testAgainstRunningApps({ withEnv: [] })('sign-in-or-up email links flow', ({ app
     await page.getByRole('heading', { name: /Check your email/i }).waitFor();
     await u.tabs.runInNewTab(async u => {
       const verificationLink = await u.services.email.getVerificationLinkForEmailAddress(fakeUser.email);
+      await u.po.testingToken.setup();
       await u.page.goto(verificationLink);
       await u.po.expect.toBeSignedIn();
       await u.page.close();

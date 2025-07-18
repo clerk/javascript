@@ -1,11 +1,14 @@
 import { useOrganization, useUser } from '@clerk/shared/react';
 import type { OrganizationMembershipResource } from '@clerk/types';
 
+import { useCardState } from '@/ui/elements/contexts';
+import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
+import { UserPreview } from '@/ui/elements/UserPreview';
+import { handleError } from '@/ui/utils/errorHandler';
+
 import { Protect } from '../../common/Gate';
 import { Badge, Box, descriptors, localizationKeys, Td, Text } from '../../customizables';
-import { ThreeDotsMenu, useCardState, UserPreview } from '../../elements';
 import { useFetchRoles, useLocalizeCustomRoles } from '../../hooks/useFetchRoles';
-import { handleError } from '../../utils';
 import { DataTable, RoleSelect, RowContainer } from './MemberListTable';
 
 type ActiveMembersListProps = {
@@ -76,7 +79,7 @@ const MemberRow = (props: {
   const card = useCardState();
   const { user } = useUser();
 
-  const isCurrentUser = user?.id === membership.publicUserData.userId;
+  const isCurrentUser = user?.id === membership.publicUserData?.userId;
   const unlocalizedRoleLabel = options?.find(a => a.value === membership.role)?.label;
 
   return (
@@ -85,7 +88,7 @@ const MemberRow = (props: {
         <UserPreview
           sx={{ maxWidth: '30ch' }}
           user={membership.publicUserData}
-          subtitle={membership.publicUserData.identifier}
+          subtitle={membership.publicUserData?.identifier}
           badge={isCurrentUser && <Badge localizationKey={localizationKeys('badge__you')} />}
         />
       </Td>
@@ -110,6 +113,7 @@ const MemberRow = (props: {
           <RoleSelect
             isDisabled={card.isLoading || !onRoleChange}
             value={membership.role}
+            fallbackLabel={membership.roleName}
             onChange={onRoleChange}
             roles={options}
           />

@@ -1,8 +1,8 @@
-export * from './useCheckout';
 export * from './useClerkModalStateParams';
 export * from './useClipboard';
 export * from './useDebounce';
 export * from './useDelayedVisibility';
+export * from './useDirection';
 export * from './useEmailLink';
 export * from './useEnabledThirdPartyProviders';
 export * from './useEnterpriseSSOLink';
@@ -12,7 +12,6 @@ export * from './useLoadingStatus';
 export * from './useNavigateToFlowStart';
 export * from './usePassword';
 export * from './usePasswordComplexity';
-export * from './usePlans';
 export * from './usePopover';
 export * from './usePrefersReducedMotion';
 export * from './useResizeObserver';

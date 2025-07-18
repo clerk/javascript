@@ -166,10 +166,10 @@ describe('Clerk singleton', () => {
         getToken: jest.fn(),
         lastActiveToken: { getRawString: () => 'mocked-token' },
       };
-      let eventBusSpy;
+      let eventBusSpy: jest.SpyInstance;
 
       beforeEach(() => {
-        eventBusSpy = jest.spyOn(eventBus, 'dispatch');
+        eventBusSpy = jest.spyOn(eventBus, 'emit');
       });
 
       afterEach(() => {
@@ -500,7 +500,7 @@ describe('Clerk singleton', () => {
       let eventBusSpy;
 
       beforeEach(() => {
-        eventBusSpy = jest.spyOn(eventBus, 'dispatch');
+        eventBusSpy = jest.spyOn(eventBus, 'emit');
       });
 
       afterEach(() => {
@@ -536,35 +536,86 @@ describe('Clerk singleton', () => {
           expect(mockSession.getToken).toHaveBeenCalled();
         });
       });
+    });
 
-      it('navigates to task and set accessors with touched session', async () => {
-        mockClientFetch.mockReturnValue(Promise.resolve({ sessions: [mockSession], signedInSessions: [mockSession] }));
+    describe('with force organization selection enabled', () => {
+      const mockSession = {
+        id: '1',
+        remove: jest.fn(),
+        status: 'active',
+        user: {},
+        touch: jest.fn(() => Promise.resolve()),
+        getToken: jest.fn(),
+        lastActiveToken: { getRawString: () => 'mocked-token' },
+      };
+
+      beforeEach(() => {
+        mockEnvironmentFetch.mockReturnValue(
+          Promise.resolve({
+            userSettings: mockUserSettings,
+            displayConfig: mockDisplayConfig,
+            isSingleSession: () => false,
+            isProduction: () => false,
+            isDevelopmentOrStaging: () => true,
+            organizationSettings: {
+              forceOrganizationSelection: true,
+            },
+          }),
+        );
+      });
+
+      afterEach(() => {
+        mockSession.remove.mockReset();
+        mockSession.touch.mockReset();
+        mockEnvironmentFetch.mockReset();
+
+        // cleanup global window pollution
+        (window as any).__unstable__onBeforeSetActive = null;
+        (window as any).__unstable__onAfterSetActive = null;
+      });
+
+      it('does not update session to personal workspace', async () => {
+        const mockSessionWithOrganization = {
+          id: '1',
+          status: 'active',
+          user: {
+            organizationMemberships: [
+              {
+                id: 'orgmem_id',
+                organization: {
+                  id: 'org_id',
+                  slug: 'some-org-slug',
+                },
+              },
+            ],
+          },
+          touch: jest.fn(),
+          getToken: jest.fn(),
+        };
+
+        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSessionWithOrganization] }));
         const sut = new Clerk(productionPublishableKey);
         await sut.load();
 
-        const executionOrder: string[] = [];
-        mockSession.touch.mockImplementationOnce(() => {
-          sut.session = mockSession as any;
-          executionOrder.push('session.touch');
+        mockSessionWithOrganization.touch.mockImplementationOnce(() => {
+          sut.session = mockSessionWithOrganization as any;
           return Promise.resolve();
         });
-        mockSession.getToken.mockImplementation(() => {
-          executionOrder.push('set cookie');
-          return 'mocked-token';
-        });
-        sut.navigate = jest.fn().mockImplementationOnce(() => {
-          executionOrder.push('navigate');
-          return Promise.resolve();
-        });
+        mockSessionWithOrganization.getToken.mockImplementation(() => 'mocked-token');
 
-        await sut.setActive({ session: mockSession.id });
+        await sut.setActive({ organization: 'some-org-slug' });
 
         await waitFor(() => {
-          expect(executionOrder).toEqual(['session.touch', 'set cookie', 'navigate']);
-          expect(mockSession.touch).toHaveBeenCalled();
-          expect(mockSession.getToken).toHaveBeenCalled();
-          expect(sut.session).toMatchObject(mockSession);
+          expect(mockSessionWithOrganization.touch).toHaveBeenCalled();
+          expect(mockSessionWithOrganization.getToken).toHaveBeenCalled();
+          expect((mockSessionWithOrganization as any as ActiveSessionResource)?.lastActiveOrganizationId).toEqual(
+            'org_id',
+          );
+          expect(sut.session).toMatchObject(mockSessionWithOrganization);
         });
+
+        await sut.setActive({ organization: null });
+        expect(sut.session).toMatchObject(mockSessionWithOrganization);
       });
     });
   });
@@ -626,7 +677,7 @@ describe('Clerk singleton', () => {
             jwt: {},
             getRawString: () => 'updated-jwt',
           } as TokenResource;
-          eventBus.dispatch(events.TokenUpdate, { token });
+          eventBus.emit(events.TokenUpdate, { token });
 
           expect(document.cookie).toContain('updated-jwt');
         });
@@ -2314,7 +2365,7 @@ describe('Clerk singleton', () => {
         await sut.load(mockedLoadOptions);
 
         await sut.setActive({ session: mockResource as any as PendingSessionResource });
-        await sut.__experimental_nextTask();
+        await sut.__internal_navigateToTaskIfAvailable();
 
         expect(mockNavigate.mock.calls[0][0]).toBe('/sign-in#/tasks/add-organization');
       });
@@ -2358,7 +2409,7 @@ describe('Clerk singleton', () => {
         await sut.setActive({ session: mockSession as any as ActiveSessionResource });
 
         const redirectUrlComplete = '/welcome-to-app';
-        await sut.__experimental_nextTask({ redirectUrlComplete });
+        await sut.__internal_navigateToTaskIfAvailable({ redirectUrlComplete });
 
         console.log(mockNavigate.mock.calls);
 

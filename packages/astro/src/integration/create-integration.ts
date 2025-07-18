@@ -19,7 +19,15 @@ type HotloadAstroClerkIntegrationParams = AstroClerkIntegrationParams & {
 
 function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() {
   return (params?: Params): AstroIntegration => {
-    const { proxyUrl, isSatellite, domain, signInUrl, signUpUrl, enableEnvSchema = true } = params || {};
+    const {
+      proxyUrl,
+      isSatellite,
+      domain,
+      signInUrl,
+      signUpUrl,
+      enableEnvSchema = true,
+      treatPendingAsSignedOut,
+    } = params || {};
 
     // These are not provided when the "bundled" integration is used
     const clerkJSUrl = (params as any)?.clerkJSUrl as string | undefined;
@@ -57,6 +65,7 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
                 /**
                  * Convert the integration params to environment variable in order for it to be readable from the server
                  */
+                ...buildEnvVarFromOption(treatPendingAsSignedOut, 'PUBLIC_CLERK_TREAT_PENDING_AS_SIGNED_OUT'),
                 ...buildEnvVarFromOption(signInUrl, 'PUBLIC_CLERK_SIGN_IN_URL'),
                 ...buildEnvVarFromOption(signUpUrl, 'PUBLIC_CLERK_SIGN_UP_URL'),
                 ...buildEnvVarFromOption(isSatellite, 'PUBLIC_CLERK_IS_SATELLITE'),
@@ -116,10 +125,7 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
             'page',
             `
             ${command === 'dev' ? `console.log("${packageName}","Initialize Clerk: page")` : ''}
-            import { removeNetlifyCacheBustParam, runInjectionScript, swapDocument } from "${buildImportPath}";
-
-            // Fix an issue with infinite redirect in Netlify and Clerk dev instance
-            removeNetlifyCacheBustParam();
+            import { runInjectionScript, swapDocument } from "${buildImportPath}";
 
             // Taken from https://github.com/withastro/astro/blob/e10b03e88c22592fbb42d7245b65c4f486ab736d/packages/astro/src/transitions/router.ts#L39.
             // Importing it directly from astro:transitions/client breaks custom client-side routing

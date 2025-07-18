@@ -87,6 +87,8 @@ const performSignUpVerificationLinkSameDevice = async (
   await u.po.signUp.waitForEmailVerificationScreen();
   await u.tabs.runInNewTab(async u => {
     const verificationLink = await u.services.email.getVerificationLinkForEmailAddress(fakeUser.email);
+
+    await u.po.testingToken.setup();
     await u.page.goto(verificationLink);
     await u.po.expect.toBeSignedIn();
     await u.page.close();
@@ -109,6 +111,8 @@ const performSignUpVerificationLinkDifferentDevice = async (
   await u.po.signUp.waitForEmailVerificationScreen();
   await u.tabs.runInNewBrowser(async u => {
     const verificationLink = await u.services.email.getVerificationLinkForEmailAddress(fakeUser.email);
+
+    await u.po.testingToken.setup();
     await u.page.goto(verificationLink);
     await u.po.expect.toBeSignedOut();
     await u.page.pause();

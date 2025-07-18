@@ -1,0 +1,21 @@
+---
+import { Protect, PricingTable } from '@clerk/astro/components';
+import Layout from '../layouts/Layout.astro';
+
+const newSubscriptionRedirectUrl = Astro.url.searchParams.get('newSubscriptionRedirectUrl');
+---
+
+<Layout title='Pricing Table'>
+  <div class='w-full flex justify-center'>
+    <Protect plan='free_user'>
+      <p>user in free</p>
+    </Protect>
+    <Protect plan='pro'>
+      <p>user in pro</p>
+    </Protect>
+    <Protect plan='plus'>
+      <p>user in plus</p>
+    </Protect>
+    <PricingTable newSubscriptionRedirectUrl={newSubscriptionRedirectUrl} />
+  </div>
+</Layout>

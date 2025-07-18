@@ -9,7 +9,7 @@ import { auth } from './auth';
  * Under the hood, this helper:
  * - calls `fetch()`, so it is automatically deduped per request.
  * - uses the [`GET /v1/users/{user_id}`](https://clerk.com/docs/reference/backend-api/tag/Users#operation/GetUser) endpoint.
- * - counts towards the [Backend API request rate limit](https://clerk.com/docs/backend-requests/resources/rate-limits#rate-limits).
+ * - counts towards the [Backend API request rate limit](https://clerk.com/docs/backend-requests/resources/rate-limits).
  *
  * @example
  * ```tsx {{ filename: 'app/page.tsx' }}

@@ -51,14 +51,14 @@ const { applyVariants, filterProps } = createVariants(
             [vars.accent]: theme.colors.$primary500,
             [vars.accentHover]: theme.colors.$primaryHover,
             [vars.border]: theme.colors.$primary500,
-            [vars.accentContrast]: theme.colors.$colorTextOnPrimaryBackground,
+            [vars.accentContrast]: theme.colors.$colorPrimaryForeground,
             [vars.alpha]: theme.colors.$neutralAlpha50,
           },
           secondary: {
             [vars.accent]: theme.colors.$colorBackground,
             [vars.accentHover]: `color-mix(in srgb, ${vars.accent}, ${theme.colors.$neutralAlpha50})`,
             [vars.border]: theme.colors.$primary500,
-            [vars.accentContrast]: theme.colors.$colorText,
+            [vars.accentContrast]: theme.colors.$colorForeground,
             [vars.alpha]: theme.colors.$neutralAlpha50,
           },
           neutral: {
@@ -96,7 +96,7 @@ const { applyVariants, filterProps } = createVariants(
           outline: {
             borderWidth: theme.borderWidths.$normal,
             borderStyle: theme.borderStyles.$solid,
-            borderColor: theme.colors.$neutralAlpha100,
+            borderColor: theme.colors.$borderAlpha100,
             color: theme.colors.$neutralAlpha600,
             '&:hover': { backgroundColor: theme.colors.$neutralAlpha50 },
             '&:focus': props.hoverAsFocus ? { backgroundColor: theme.colors.$neutralAlpha50 } : undefined,
@@ -105,7 +105,7 @@ const { applyVariants, filterProps } = createVariants(
           bordered: {
             borderWidth: theme.borderWidths.$normal,
             borderStyle: theme.borderStyles.$solid,
-            borderColor: theme.colors.$neutralAlpha100,
+            borderColor: theme.colors.$borderAlpha100,
             color: vars.accentContrast,
             backgroundColor: vars.accent,
             '&:hover': { backgroundColor: vars.accentHover },

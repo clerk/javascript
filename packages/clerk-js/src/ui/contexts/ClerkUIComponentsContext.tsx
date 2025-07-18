@@ -1,6 +1,7 @@
 import type {
-  __experimental_CheckoutProps,
-  __experimental_PricingTableProps,
+  __internal_OAuthConsentProps,
+  APIKeysProps,
+  PricingTableProps,
   UserButtonProps,
   WaitlistProps,
 } from '@clerk/types';
@@ -8,15 +9,17 @@ import type { ReactNode } from 'react';
 
 import type { AvailableComponentName, AvailableComponentProps } from '../types';
 import {
-  __experimental_CheckoutContext,
-  __experimental_PricingTableContext,
+  ApiKeysContext,
   CreateOrganizationContext,
   GoogleOneTapContext,
+  OAuthConsentContext,
   OrganizationListContext,
   OrganizationProfileContext,
   OrganizationSwitcherContext,
+  PricingTableContext,
   SignInContext,
   SignUpContext,
+  SubscriberTypeContext,
   UserButtonContext,
   UserProfileContext,
   UserVerificationContext,
@@ -87,17 +90,23 @@ export function ComponentContextProvider({
       );
     case 'PricingTable':
       return (
-        <__experimental_PricingTableContext.Provider
-          value={{ componentName, ...(props as __experimental_PricingTableProps) }}
-        >
-          {children}
-        </__experimental_PricingTableContext.Provider>
+        <SubscriberTypeContext.Provider value={(props as PricingTableProps).forOrganizations ? 'org' : 'user'}>
+          <PricingTableContext.Provider value={{ componentName, ...(props as PricingTableProps) }}>
+            {children}
+          </PricingTableContext.Provider>
+        </SubscriberTypeContext.Provider>
       );
-    case 'Checkout':
+    case 'APIKeys':
       return (
-        <__experimental_CheckoutContext.Provider value={{ componentName, ...(props as __experimental_CheckoutProps) }}>
+        <ApiKeysContext.Provider value={{ componentName, ...(props as APIKeysProps) }}>
           {children}
-        </__experimental_CheckoutContext.Provider>
+        </ApiKeysContext.Provider>
+      );
+    case 'OAuthConsent':
+      return (
+        <OAuthConsentContext.Provider value={{ componentName, ...(props as __internal_OAuthConsentProps) }}>
+          {children}
+        </OAuthConsentContext.Provider>
       );
     default:
       throw new Error(`Unknown component context: ${componentName}`);

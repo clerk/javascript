@@ -1,8 +1,9 @@
 import type { CreateOrganizationModalProps } from '@clerk/types';
 
+import { withCardStateProvider } from '@/ui/elements/contexts';
+
 import { CreateOrganizationContext, withCoreUserGuard } from '../../contexts';
 import { Flow } from '../../customizables';
-import { withCardStateProvider } from '../../elements';
 import { Route, Switch } from '../../router';
 import type { CreateOrganizationCtx } from '../../types';
 import { CreateOrganizationPage } from './CreateOrganizationPage';
