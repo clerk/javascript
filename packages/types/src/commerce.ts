@@ -85,7 +85,7 @@ export interface CommerceBillingNamespace {
  * <ClerkProvider clerkJsVersion="x.x.x" />
  * ```
  */
-export type CommerceSubscriberType = 'org' | 'user';
+export type CommercePayerType = 'org' | 'user';
 
 /**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
@@ -214,7 +214,7 @@ export type GetPlansParams = ClerkPaginationParams<{
    * <ClerkProvider clerkJsVersion="x.x.x" />
    * ```
    */
-  for?: CommerceSubscriberType;
+  for?: CommercePayerType;
 }>;
 
 /**
@@ -356,18 +356,8 @@ export interface CommercePlanResource extends ClerkResource {
    *
    * Each plan is exclusively created for either individual users or organizations,
    * and cannot be used interchangeably.
-   *
-   * @type {['user'] | ['org']}
-   * @example
-   * ```ts
-   * // For a user plan
-   * payerType: ['user']
-   *
-   * // For an organization plan
-   * payerType: ['org']
-   * ```
    */
-  payerType: string[];
+  forPayerType: CommercePayerType;
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
    * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
