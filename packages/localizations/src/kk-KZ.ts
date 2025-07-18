@@ -1,45 +1,161 @@
+/*
+ * =====================================================================================
+ * DISCLAIMER:
+ * =====================================================================================
+ * This localization file is a community contribution and is not officially maintained
+ * by Clerk. It has been provided by the community and may not be fully aligned
+ * with the current or future states of the main application. Clerk does not guarantee
+ * the accuracy, completeness, or timeliness of the translations in this file.
+ * Use of this file is at your own risk and discretion.
+ * =====================================================================================
+ */
+
 import type { LocalizationResource } from '@clerk/types';
 
 export const kkKZ: LocalizationResource = {
   locale: 'kk-KZ',
-  __experimental_commerce: {
+  apiKeys: {
+    action__add: undefined,
+    action__search: undefined,
+    createdAndExpirationStatus__expiresOn: undefined,
+    createdAndExpirationStatus__never: undefined,
+    detailsTitle__emptyRow: undefined,
+    formButtonPrimary__add: undefined,
+    formFieldCaption__expiration__expiresOn: undefined,
+    formFieldCaption__expiration__never: undefined,
+    formFieldOption__expiration__180d: undefined,
+    formFieldOption__expiration__1d: undefined,
+    formFieldOption__expiration__1y: undefined,
+    formFieldOption__expiration__30d: undefined,
+    formFieldOption__expiration__60d: undefined,
+    formFieldOption__expiration__7d: undefined,
+    formFieldOption__expiration__90d: undefined,
+    formFieldOption__expiration__never: undefined,
+    formHint: undefined,
+    formTitle: undefined,
+    lastUsed__days: undefined,
+    lastUsed__hours: undefined,
+    lastUsed__minutes: undefined,
+    lastUsed__months: undefined,
+    lastUsed__seconds: undefined,
+    lastUsed__years: undefined,
+    menuAction__revoke: undefined,
+    revokeConfirmation: {
+      confirmationText: undefined,
+      formButtonPrimary__revoke: undefined,
+      formHint: undefined,
+      formTitle: undefined,
+    },
+  },
+  backButton: 'Артқа',
+  badge__activePlan: undefined,
+  badge__canceledEndsAt: undefined,
+  badge__currentPlan: 'Ағымдағы жоспар',
+  badge__default: 'Әдепкі бойынша',
+  badge__endsAt: "{{ date | shortDate('kk-KZ') }} күні аяқталады",
+  badge__expired: 'Мерзімі біткен',
+  badge__otherImpersonatorDevice: 'Басқа эмуляциялаушы құрылғы',
+  badge__pastDueAt: undefined,
+  badge__pastDuePlan: undefined,
+  badge__primary: 'Негізгі',
+  badge__renewsAt: undefined,
+  badge__requiresAction: 'Әрекет қажет',
+  badge__startsAt: "{{ date | shortDate('kk-KZ') }} күні басталады",
+  badge__thisDevice: 'Осы құрылғы',
+  badge__unverified: 'Расталмаған',
+  badge__upcomingPlan: 'Алдағы жоспар',
+  badge__userDevice: 'Пайдаланушы құрылғысы',
+  badge__you: 'Сіз',
+  commerce: {
+    addPaymentMethod: undefined,
+    alwaysFree: undefined,
+    annually: undefined,
+    availableFeatures: undefined,
     billedAnnually: 'Жыл сайын ақы төленеді',
+    billedMonthlyOnly: undefined,
     cancelSubscription: 'Жазылымды болдырмау',
+    cancelSubscriptionAccessUntil: undefined,
+    cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionTitle: undefined,
+    cannotSubscribeMonthly: undefined,
+    cannotSubscribeUnrecoverable: undefined,
     checkout: {
       description__paymentSuccessful: 'Сіздің жаңа жазылымыңыз дайын.',
       description__subscriptionSuccessful: 'Сіздің жаңа жазылымыңыз дайын.',
+      downgradeNotice: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
       lineItems: {
-        title__invoiceId: 'Шоттың ID нөмірі',
         title__paymentMethod: 'Төлем әдісі',
+        title__statementId: 'Шоттың ID нөмірі',
         title__subscriptionBegins: 'Жазылым басталады',
         title__totalPaid: 'Жалпы төленді',
       },
+      pastDueNotice: undefined,
+      perMonth: undefined,
+      title: undefined,
       title__paymentSuccessful: 'Төлем сәтті аяқталды!',
       title__subscriptionSuccessful: 'Сәтті!',
     },
+    credit: undefined,
+    creditRemainder: undefined,
+    defaultFreePlanActive: undefined,
     free: 'Тегін',
     getStarted: 'Бастау',
     keepSubscription: 'Жазылымды сақтау',
     manage: 'Басқару',
     manageSubscription: 'Жазылымды басқару',
     month: 'Ай',
+    monthly: undefined,
+    pastDue: undefined,
+    pay: undefined,
+    paymentMethods: undefined,
+    paymentSource: {
+      applePayDescription: {
+        annual: undefined,
+        monthly: undefined,
+      },
+      dev: {
+        anyNumbers: undefined,
+        cardNumber: undefined,
+        cvcZip: undefined,
+        developmentMode: undefined,
+        expirationDate: undefined,
+        testCardInfo: undefined,
+      },
+    },
+    popular: undefined,
+    pricingTable: {
+      billingCycle: undefined,
+      included: undefined,
+    },
     reSubscribe: 'Қайта жазылу',
+    seeAllFeatures: undefined,
+    subscribe: undefined,
+    subscriptionDetails: {
+      beginsOn: undefined,
+      currentBillingCycle: undefined,
+      endsOn: undefined,
+      nextPaymentAmount: undefined,
+      nextPaymentOn: undefined,
+      pastDueAt: undefined,
+      renewsAt: undefined,
+      subscribedOn: undefined,
+      title: undefined,
+    },
+    subtotal: undefined,
     switchPlan: 'Осы жоспарға ауысу',
+    switchToAnnual: undefined,
+    switchToAnnualWithAnnualPrice: undefined,
+    switchToMonthly: undefined,
+    switchToMonthlyWithPrice: undefined,
+    totalDue: undefined,
+    totalDueToday: undefined,
+    viewFeatures: undefined,
+    year: undefined,
   },
-  backButton: 'Артқа',
-  badge__currentPlan: 'Ағымдағы жоспар',
-  badge__default: 'Әдепкі бойынша',
-  badge__endsAt: "{{ date | shortDate('en-US') }} күні аяқталады",
-  badge__expired: 'Мерзімі біткен',
-  badge__otherImpersonatorDevice: 'Басқа эмуляциялаушы құрылғы',
-  badge__primary: 'Негізгі',
-  badge__requiresAction: 'Әрекет қажет',
-  badge__startsAt: "{{ date | shortDate('en-US') }} күні басталады",
-  badge__thisDevice: 'Осы құрылғы',
-  badge__unverified: 'Расталмаған',
-  badge__upcomingPlan: 'Алдағы жоспар',
-  badge__userDevice: 'Пайдаланушы құрылғысы',
-  badge__you: 'Сіз',
   createOrganization: {
     formButtonSubmit: 'Ұйым құру',
     invitePage: {
@@ -48,14 +164,15 @@ export const kkKZ: LocalizationResource = {
     title: 'Ұйым құру',
   },
   dates: {
-    lastDay: "Кеше {{ date | timeString('en-US') }}",
-    next6Days: "{{ date | weekday('en-US','long') }} {{ date | timeString('en-US') }}",
-    nextDay: "Ертең {{ date | timeString('en-US') }}",
-    numeric: "{{ date | numeric('en-US') }}",
-    previous6Days: "Өткен {{ date | weekday('en-US','long') }} {{ date | timeString('en-US') }}",
-    sameDay: "Бүгін {{ date | timeString('en-US') }}",
+    lastDay: "Кеше {{ date | timeString('kk-KZ') }}",
+    next6Days: "{{ date | weekday('kk-KZ','long') }} {{ date | timeString('kk-KZ') }}",
+    nextDay: "Ертең {{ date | timeString('kk-KZ') }}",
+    numeric: "{{ date | numeric('kk-KZ') }}",
+    previous6Days: "Өткен {{ date | weekday('kk-KZ','long') }} {{ date | timeString('kk-KZ') }}",
+    sameDay: "Бүгін {{ date | timeString('kk-KZ') }}",
   },
   dividerText: 'немесе',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'Басқа әдісті қолдану',
   footerPageLink__help: 'Көмек',
   footerPageLink__privacy: 'Құпиялық',
@@ -68,10 +185,14 @@ export const kkKZ: LocalizationResource = {
   formFieldError__verificationLinkExpired: 'Растау сілтемесінің мерзімі бітті. Жаңа сілтеме сұраңыз.',
   formFieldHintText__optional: 'Қосымша',
   formFieldHintText__slug: 'Slug - бұл бірегей ID. URL мекенжайларында жиі қолданылады.',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'Сақтық кодын енгізіңіз',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Есепті жою',
   formFieldInputPlaceholder__emailAddress: 'Электрондық поштаны енгізіңіз',
   formFieldInputPlaceholder__emailAddress_username: 'Электрондық поштаны немесе пайдаланушы атын енгізіңіз',
+  formFieldInputPlaceholder__emailAddresses: undefined,
   formFieldInputPlaceholder__firstName: 'Аты',
   formFieldInputPlaceholder__lastName: 'Тегі',
   formFieldInputPlaceholder__organizationDomain: 'webfilter.com',
@@ -81,6 +202,9 @@ export const kkKZ: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Құпия сөзді енгізіңіз',
   formFieldInputPlaceholder__phoneNumber: 'Телефон нөмірін енгізіңіз',
   formFieldInputPlaceholder__username: undefined,
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Бұл доменге автошақыруларды қосу',
   formFieldLabel__backupCode: 'Сақтық коды',
   formFieldLabel__confirmDeletion: 'Растау',
@@ -125,18 +249,78 @@ export const kkKZ: LocalizationResource = {
     titleWithoutPersonal: 'Ұйымды таңдаңыз',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: 'Автошақырулар',
     badge__automaticSuggestion: 'Автоұсыныстар',
     badge__manualInvitation: 'Автоқосылу жоқ',
     badge__unverified: 'Расталмаған',
+    billingPage: {
+      paymentHistorySection: {
+        empty: undefined,
+        notFound: undefined,
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        tableHeader__status: undefined,
+      },
+      paymentSourcesSection: {
+        actionLabel__default: 'Әдепкі ету',
+        actionLabel__remove: 'Жою',
+        add: 'Жаңа төлем әдісін қосу',
+        addSubtitle: 'Есептік жазбаңызға жаңа төлем әдісін қосыңыз.',
+        cancelButton: 'Болдырмау',
+        formButtonPrimary__add: 'Төлем әдісін қосу',
+        formButtonPrimary__pay: '{{amount}} төлеу',
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: '{{identifier}} есептік жазбадан жойылады.',
+          messageLine2: 'Бұл төлем әдісін қолдана алмайсыз және оған тәуелді жазылымдар жұмыс істемейді.',
+          successMessage: '{{paymentSource}} жойылды.',
+          title: 'Төлем әдісін жою',
+        },
+        title: 'Қолжетімді опциялар',
+      },
+      start: {
+        headerTitle__payments: undefined,
+        headerTitle__plans: 'Жоспарлар',
+        headerTitle__statements: 'Шот-фактуралар',
+        headerTitle__subscriptions: 'Жазылымдар',
+      },
+      statementsSection: {
+        empty: undefined,
+        itemCaption__paidForPlan: undefined,
+        itemCaption__proratedCredit: undefined,
+        itemCaption__subscribedAndPaidForPlan: undefined,
+        notFound: undefined,
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+        totalPaid: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        tableHeader__edit: undefined,
+        tableHeader__plan: undefined,
+        tableHeader__startDate: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: 'Басқару',
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: 'Төлемдер мен есеп айырысу',
+    },
     createDomainPage: {
       subtitle:
         'Ұйымға автоқосылу үшін доменді қосыңыз. Осы домендегі электрондық поштасы бар пайдаланушылар автоматты түрде қосыла алады.',
       title: 'Домен қосу',
     },
     invitePage: {
-      detailsTitle__inviteFailed:
-        'Келесі электрондық пошталарға шақыру жіберілмеді: {{email_addresses}}.',
+      detailsTitle__inviteFailed: 'Келесі электрондық пошталарға шақыру жіберілмеді: {{email_addresses}}.',
       formButtonPrimary__continue: 'Шақыруларды жіберу',
       selectDropdown__role: 'Рөлді таңдау',
       subtitle: 'Бірнеше электрондық поштаны енгізіңіз немесе қойыңыз.',
@@ -156,8 +340,7 @@ export const kkKZ: LocalizationResource = {
       detailsTitle__emptyRow: 'Көрсету үшін мүшелер жоқ',
       invitationsTab: {
         autoInvitations: {
-          headerSubtitle:
-            'Электрондық пошта доменін қосып, пайдаланушыларды автошақыру арқылы ұйымға қосыңыз.',
+          headerSubtitle: 'Электрондық пошта доменін қосып, пайдаланушыларды автошақыру арқылы ұйымға қосыңыз.',
           headerTitle: 'Автошақырулар',
           primaryButton: 'Расталған домендерді басқару',
         },
@@ -169,8 +352,7 @@ export const kkKZ: LocalizationResource = {
       },
       requestsTab: {
         autoSuggestions: {
-          headerSubtitle:
-            'Домен бойынша тіркелген пайдаланушылар ұйымыңызға қосылу сұрауын көре алады.',
+          headerSubtitle: 'Домен бойынша тіркелген пайдаланушылар ұйымыңызға қосылу сұрауын көре алады.',
           headerTitle: 'Автоұсыныстар',
           primaryButton: 'Расталған домендерді басқару',
         },
@@ -186,11 +368,18 @@ export const kkKZ: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: 'Төлемдер',
       description: 'Ұйымыңызды басқарыңыз.',
       general: 'Жалпы',
       members: 'Мүшелер',
       title: 'Ұйым',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -203,8 +392,7 @@ export const kkKZ: LocalizationResource = {
         },
         leaveOrganization: {
           actionDescription: 'Жалғастыру үшін "{{organizationName}}" деп енгізіңіз.',
-          messageLine1:
-            'Бұл ұйымнан шығуға сенімдісіз бе? Ұйымға және қосымшаларға қол жеткізе алмайсыз.',
+          messageLine1: 'Бұл ұйымнан шығуға сенімдісіз бе? Ұйымға және қосымшаларға қол жеткізе алмайсыз.',
           messageLine2: 'Бұл әрекет қайтымсыз.',
           successMessage: 'Сіз ұйымнан шықтыңыз.',
           title: 'Ұйымнан шығу',
@@ -247,8 +435,7 @@ export const kkKZ: LocalizationResource = {
       enrollmentTab: {
         automaticInvitationOption__description: 'Пайдаланушылар тіркелген кезде автошақырылады.',
         automaticInvitationOption__label: 'Автошақырулар',
-        automaticSuggestionOption__description:
-          'Пайдаланушыларға ұсыныс жіберіледі, бірақ әкімші растауы керек.',
+        automaticSuggestionOption__description: 'Пайдаланушыларға ұсыныс жіберіледі, бірақ әкімші растауы керек.',
         automaticSuggestionOption__label: 'Автоұсыныстар',
         calloutInfoLabel: 'Тіркеу режимі жаңа пайдаланушыларға ғана әсер етеді.',
         calloutInvitationCountLabel: 'Күтудегі шақырулар: {{count}}',
@@ -298,8 +485,7 @@ export const kkKZ: LocalizationResource = {
       blockButton__totp: 'Аутентификатор қолдану',
       getHelp: {
         blockButton__emailSupport: 'Қолдау қызметіне хабарласу',
-        content:
-          'Есептік жазбаны растауда қиындық туындаса, бізге хабарласыңыз.',
+        content: 'Есептік жазбаны растауда қиындық туындаса, бізге хабарласыңыз.',
         title: 'Көмек алу',
       },
       subtitle: 'Растау әдісін өзгерту',
@@ -368,12 +554,17 @@ export const kkKZ: LocalizationResource = {
       blockButton__totp: 'Аутентификатор қолдану',
       getHelp: {
         blockButton__emailSupport: 'Қолдау қызметіне хабарласу',
-        content:
-          'Кіруде қиындық туындаса, бізге хабарласыңыз.',
+        content: 'Кіруде қиындық туындаса, бізге хабарласыңыз.',
         title: 'Көмек алу',
       },
       subtitle: 'Кіру әдісін өзгерту',
       title: 'Басқа әдісті қолдану',
+    },
+    alternativePhoneCodeProvider: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     backupCodeMfa: {
       subtitle: 'Екі қадамды растау кезінде алынған сақтық кодын енгізіңіз',
@@ -387,8 +578,7 @@ export const kkKZ: LocalizationResource = {
     },
     emailLink: {
       clientMismatch: {
-        subtitle:
-          'Бастапқы құрылғыда растау сілтемесін ашыңыз.',
+        subtitle: 'Бастапқы құрылғыда растау сілтемесін ашыңыз.',
         title: 'Сілтеме осы құрылғыға жарамсыз',
       },
       expired: {
@@ -440,7 +630,8 @@ export const kkKZ: LocalizationResource = {
       title: 'Кіру мүмкін емес',
     },
     passkey: {
-      subtitle: 'Құпия кілт арқылы тұлғаңыз расталады. Құрылғыңыз саусақ ізі, бет бейнесі немесе экран құлыптамасын сұрауы мүмкін.',
+      subtitle:
+        'Құпия кілт арқылы тұлғаңыз расталады. Құрылғыңыз саусақ ізі, бет бейнесі немесе экран құлыптамасын сұрауы мүмкін.',
       title: 'Құпия кілт қолдану',
     },
     password: {
@@ -482,6 +673,12 @@ export const kkKZ: LocalizationResource = {
       actionLink__use_username: 'Пайдаланушы атын қолдану',
       actionText: 'Есептік жазбаңыз жоқ па?',
       actionText__join_waitlist: 'Ерте қол жеткізгіңіз келе ме?',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'Қош келдіңіз! Жалғастыру үшін кіріңіз',
       subtitleCombined: undefined,
       title: '{{applicationName}} қолдану үшін кіріңіз',
@@ -495,6 +692,11 @@ export const kkKZ: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Құпия сөзді енгізіңіз',
   signUp: {
+    alternativePhoneCodeProvider: {
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     continue: {
       actionLink: 'Кіру',
       actionText: 'Есептік жазбаңыз бар ма?',
@@ -510,8 +712,7 @@ export const kkKZ: LocalizationResource = {
     },
     emailLink: {
       clientMismatch: {
-        subtitle:
-          'Растау сілтемесін бастапқы құрылғыда ашыңыз.',
+        subtitle: 'Растау сілтемесін бастапқы құрылғыда ашыңыз.',
         title: 'Сілтеме осы құрылғыға жарамсыз',
       },
       formSubtitle: 'Электрондық поштаңызға жіберілген сілтемені қолданыңыз',
@@ -564,6 +765,12 @@ export const kkKZ: LocalizationResource = {
       actionLink__use_email: 'Электрондық поштаны қолдану',
       actionLink__use_phone: 'Телефон нөмірін қолдану',
       actionText: 'Есептік жазбаңыз бар ма?',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'Қош келдіңіз! Тіркелу үшін ақпаратты толтырыңыз.',
       subtitleCombined: 'Қош келдіңіз! Тіркелу үшін ақпаратты толтырыңыз.',
       title: 'Есептік жазбаны құру',
@@ -574,10 +781,8 @@ export const kkKZ: LocalizationResource = {
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ұйымға қазірдің өзінде қосылған.',
-    captcha_invalid:
-      'Қауіпсіздік тексерілуі сәтсіз аяқталды. Браузерді өзгерту немесе кеңейтулерді өшіруге тырысыңыз.',
-    captcha_unavailable:
-      'Бот тексерілуі сәтсіз аяқталды. Бетті жаңартып немесе қолдау қызметіне хабарласыңыз.',
+    captcha_invalid: 'Қауіпсіздік тексерілуі сәтсіз аяқталды. Браузерді өзгерту немесе кеңейтулерді өшіруге тырысыңыз.',
+    captcha_unavailable: 'Бот тексерілуі сәтсіз аяқталды. Бетті жаңартып немесе қолдау қызметіне хабарласыңыз.',
     form_code_incorrect: undefined,
     form_identifier_exists__email_address: 'Бұл электрондық пошта тіркелген. Басқасын қолданыңыз.',
     form_identifier_exists__phone_number: 'Бұл телефон нөмірі тіркелген. Басқасын қолданыңыз.',
@@ -594,10 +799,8 @@ export const kkKZ: LocalizationResource = {
     form_password_incorrect: 'Құпия сөз қате.',
     form_password_length_too_short: 'Құпия сөз тым қысқа. Кемінде 8 таңба болуы керек.',
     form_password_not_strong_enough: 'Құпия сөз әлсіз.',
-    form_password_pwned:
-      'Бұл құпия сөз қауіпсіздік бұзылуынан табылды. Басқа құпия сөзді қолданыңыз.',
-    form_password_pwned__sign_in:
-      'Бұл құпия сөз қауіпсіз емес. Құпия сөзді өзгертуге болады.',
+    form_password_pwned: 'Бұл құпия сөз қауіпсіздік бұзылуынан табылды. Басқа құпия сөзді қолданыңыз.',
+    form_password_pwned__sign_in: 'Бұл құпия сөз қауіпсіз емес. Құпия сөзді өзгертуге болады.',
     form_password_size_in_bytes_exceeded:
       'Құпия сөзде тым көп байт бар. Оны қысқартыңыз немесе арнайы таңбаларды алып тастаңыз.',
     form_password_validation_failed: 'Құпия сөз қате',
@@ -605,16 +808,12 @@ export const kkKZ: LocalizationResource = {
       'Пайдаланушы атында жарамсыз таңбалар бар. Тек әріптер, сандар және астыңғы сызықшаларды қолданыңыз.',
     form_username_invalid_length: 'Пайдаланушы аты {{min_length}} пен {{max_length}} арасында болуы керек.',
     identification_deletion_failed: 'Соңғы идентификацияны жою мүмкін емес.',
-    not_allowed_access:
-      'Бұл бетке қол жеткізуге рұқсат жоқ. Қате болса, қолдау қызметіне хабарласыңыз.',
+    not_allowed_access: 'Бұл бетке қол жеткізуге рұқсат жоқ. Қате болса, қолдау қызметіне хабарласыңыз.',
     organization_domain_blocked: 'Бұл электрондық пошта домені бұғатталған. Басқасын қолданыңыз.',
     organization_domain_common: 'Бұл жалпы электрондық пошта домені. Басқасын қолданыңыз.',
-    organization_domain_exists_for_enterprise_connection:
-      'Бұл домен ұйымыңыздың SSO үшін қолданылады.',
-    organization_membership_quota_exceeded:
-      'Ұйым мүшеліктерінің шектеуіне жеттіңіз.',
-    organization_minimum_permissions_needed:
-      'Ұйымда кемінде бір әкімші болуы керек.',
+    organization_domain_exists_for_enterprise_connection: 'Бұл домен ұйымыңыздың SSO үшін қолданылады.',
+    organization_membership_quota_exceeded: 'Ұйым мүшеліктерінің шектеуіне жеттіңіз.',
+    organization_minimum_permissions_needed: 'Ұйымда кемінде бір әкімші болуы керек.',
     passkey_already_exists: 'Бұл құрылғыда passkey тіркелген.',
     passkey_not_supported: 'Бұл құрылғыда passkey қолдауы жоқ.',
     passkey_pa_not_supported: 'Тіркеу үшін платформа аутентификаторы қажет.',
@@ -630,6 +829,7 @@ export const kkKZ: LocalizationResource = {
       sentencePrefix: 'Құпия сөзде болуы керек:',
     },
     phone_number_exists: 'Бұл телефон нөмірі тіркелген. Басқасын қолданыңыз.',
+    session_exists: undefined,
     web3_missing_identifier: 'Web3 Wallet кеңейтуі табылмады. Орнатыңыз.',
     zxcvbn: {
       couldBeStronger: 'Құпия сөз әлсіз. Таңбалар санын көбейтіңіз.',
@@ -678,7 +878,30 @@ export const kkKZ: LocalizationResource = {
     action__signOutAll: 'Барлық есептік жазбалардан шығу',
   },
   userProfile: {
-    __experimental_billingPage: {
+    apiKeysPage: {
+      title: undefined,
+    },
+    backupCodePage: {
+      actionLabel__copied: 'Көшірілді!',
+      actionLabel__copy: 'Барлығын көшіру',
+      actionLabel__download: '.txt жүктеу',
+      actionLabel__print: 'Басып шығару',
+      infoText1: 'Бұл есептік жазба үшін сақтық кодтары қосылады.',
+      infoText2: 'Сақтық кодтарын қауіпсіз жерде сақтаңыз. Құрылғыға қол жеткізе алмасаңыз, оларды қолданыңыз.',
+      subtitle__codelist: 'Оларды қауіпсіз сақтаңыз.',
+      successMessage: 'Сақтық кодтары қосылды. Құрылғыға қол жеткізе алмасаңыз, олардың бірін қолданыңыз.',
+      successSubtitle: 'Құрылғыға қол жеткізе алмасаңыз, сақтық кодтарын қолданыңыз.',
+      title: 'Сақтық кодтарын қосу',
+      title__codelist: 'Сақтық кодтары',
+    },
+    billingPage: {
+      paymentHistorySection: {
+        empty: undefined,
+        notFound: undefined,
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        tableHeader__status: undefined,
+      },
       paymentSourcesSection: {
         actionLabel__default: 'Әдепкі ету',
         actionLabel__remove: 'Жою',
@@ -687,56 +910,61 @@ export const kkKZ: LocalizationResource = {
         cancelButton: 'Болдырмау',
         formButtonPrimary__add: 'Төлем әдісін қосу',
         formButtonPrimary__pay: '{{amount}} төлеу',
+        payWithTestCardButton: undefined,
         removeResource: {
           messageLine1: '{{identifier}} есептік жазбадан жойылады.',
-          messageLine2:
-            'Бұл төлем әдісін қолдана алмайсыз және оған тәуелді жазылымдар жұмыс істемейді.',
+          messageLine2: 'Бұл төлем әдісін қолдана алмайсыз және оған тәуелді жазылымдар жұмыс істемейді.',
           successMessage: '{{paymentSource}} жойылды.',
           title: 'Төлем әдісін жою',
         },
         title: 'Қолжетімді опциялар',
       },
       start: {
-        headerTitle__invoices: 'Шот-фактуралар',
-        headerTitle__paymentSources: 'Төлем әдістері',
+        headerTitle__payments: undefined,
         headerTitle__plans: 'Жоспарлар',
+        headerTitle__statements: 'Шот-фактуралар',
         headerTitle__subscriptions: 'Жазылымдар',
+      },
+      statementsSection: {
+        empty: undefined,
+        itemCaption__paidForPlan: undefined,
+        itemCaption__proratedCredit: undefined,
+        itemCaption__subscribedAndPaidForPlan: undefined,
+        notFound: undefined,
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+        totalPaid: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        tableHeader__edit: undefined,
+        tableHeader__plan: undefined,
+        tableHeader__startDate: undefined,
+        title: undefined,
       },
       subscriptionsSection: {
         actionLabel__default: 'Басқару',
       },
+      switchPlansSection: {
+        title: undefined,
+      },
       title: 'Төлемдер мен есеп айырысу',
-    },
-    backupCodePage: {
-      actionLabel__copied: 'Көшірілді!',
-      actionLabel__copy: 'Барлығын көшіру',
-      actionLabel__download: '.txt жүктеу',
-      actionLabel__print: 'Басып шығару',
-      infoText1: 'Бұл есептік жазба үшін сақтық кодтары қосылады.',
-      infoText2:
-        'Сақтық кодтарын қауіпсіз жерде сақтаңыз. Құрылғыға қол жеткізе алмасаңыз, оларды қолданыңыз.',
-      subtitle__codelist: 'Оларды қауіпсіз сақтаңыз.',
-      successMessage:
-        'Сақтық кодтары қосылды. Құрылғыға қол жеткізе алмасаңыз, олардың бірін қолданыңыз.',
-      successSubtitle:
-        'Құрылғыға қол жеткізе алмасаңыз, сақтық кодтарын қолданыңыз.',
-      title: 'Сақтық кодтарын қосу',
-      title__codelist: 'Сақтық кодтары',
     },
     connectedAccountPage: {
       formHint: 'Қосылатын провайдерді таңдаңыз.',
       formHint__noAccounts: 'Қолжетімді провайдерлер жоқ.',
       removeResource: {
         messageLine1: '{{identifier}} есептік жазбадан жойылады.',
-        messageLine2:
-          'Бұл есептік жазбаны қолдана алмайсыз және тәуелді мүмкіндіктер жұмыс істемейді.',
+        messageLine2: 'Бұл есептік жазбаны қолдана алмайсыз және тәуелді мүмкіндіктер жұмыс істемейді.',
         successMessage: '{{connectedAccount}} жойылды.',
         title: 'Қосылған есептік жазбаны жою',
       },
       socialButtonsBlockButton: '{{provider|titleize}}',
       successMessage: 'Провайдер есептік жазбаңызға қосылды',
       title: 'Қосылған есептік жазбаны қосу',
-    },    
+    },
     deletePage: {
       actionDescription: 'Жалғастыру үшін "Есептік жазбаны жою" деп енгізіңіз.',
       confirm: 'Есептік жазбаны жою',
@@ -749,21 +977,21 @@ export const kkKZ: LocalizationResource = {
         formHint: 'Растау коды осы электрондық пошта мекенжайына жіберіледі.',
         formSubtitle: '{{identifier}} жіберілген растау кодын енгізіңіз',
         formTitle: 'Растау коды',
-        resendButton: "Код алмадыңыз ба? Қайта жіберу",
+        resendButton: 'Код алмадыңыз ба? Қайта жіберу',
         successMessage: '{{identifier}} электрондық поштасы есептік жазбаңызға қосылды.',
       },
       emailLink: {
         formHint: 'Растау сілтемесі осы электрондық пошта мекенжайына жіберіледі.',
         formSubtitle: '{{identifier}} жіберілген электрондық хаттағы растау сілтемесін басыңыз',
         formTitle: 'Растау сілтемесі',
-        resendButton: "Сілтеме алмадыңыз ба? Қайта жіберу",
+        resendButton: 'Сілтеме алмадыңыз ба? Қайта жіберу',
         successMessage: '{{identifier}} электрондық поштасы есептік жазбаңызға қосылды.',
       },
       enterpriseSSOLink: {
         formButton: 'Кіру үшін басыңыз',
         formSubtitle: '{{identifier}} арқылы кіруді аяқтаңыз',
       },
-      formHint: "Электрондық поштаны есептік жазбаға қоспас бұрын растау қажет.",
+      formHint: 'Электрондық поштаны есептік жазбаға қоспас бұрын растау қажет.',
       removeResource: {
         messageLine1: '{{identifier}} есептік жазбадан жойылады.',
         messageLine2: 'Бұл электрондық пошта арқылы кіре алмайсыз.',
@@ -796,8 +1024,7 @@ export const kkKZ: LocalizationResource = {
         'SMS коды арқылы екі қадамды растау үшін бар нөмірді таңдаңыз немесе жаңасын қосыңыз.',
       subtitle__unavailablePhoneNumbers:
         'SMS коды арқылы екі қадамды растау үшін қолжетімді нөмірлер жоқ, жаңа нөмір қосыңыз.',
-      successMessage1:
-        'Кіру кезінде осы телефон нөміріне жіберілген растау кодын енгізу қажет болады.',
+      successMessage1: 'Кіру кезінде осы телефон нөміріне жіберілген растау кодын енгізу қажет болады.',
       successMessage2:
         'Сақтық кодтарын қауіпсіз жерге сақтаңыз. Аутентификация құрылғысына қол жеткізе алмасаңыз, сақтық кодтары арқылы кіре аласыз.',
       successTitle: 'SMS коды арқылы растау қосылды',
@@ -807,14 +1034,11 @@ export const kkKZ: LocalizationResource = {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: 'Орнына QR кодын сканерлеу',
         buttonUnableToScan__nonPrimary: 'QR кодын сканерлей алмайсыз ба?',
-        infoText__ableToScan:
-          'Аутентификатор қолданбасында жаңа кіру әдісін орнатып, төмендегі QR кодын сканерлеңіз.',
-        infoText__unableToScan:
-          'Аутентификатор қолданбасында жаңа кіру әдісін орнатып, төмендегі Кілтті енгізіңіз.',
+        infoText__ableToScan: 'Аутентификатор қолданбасында жаңа кіру әдісін орнатып, төмендегі QR кодын сканерлеңіз.',
+        infoText__unableToScan: 'Аутентификатор қолданбасында жаңа кіру әдісін орнатып, төмендегі Кілтті енгізіңіз.',
         inputLabel__unableToScan1:
           'Уақыт не Бір реттік құпия сөздер қосылғанын тексеріп, есептік жазбаны байланыстырыңыз.',
-        inputLabel__unableToScan2:
-          'Аутентификаторыңыз TOTP URI қолдаса, толық URI мекенжайын да көшіре аласыз.',
+        inputLabel__unableToScan2: 'Аутентификаторыңыз TOTP URI қолдаса, толық URI мекенжайын да көшіре аласыз.',
       },
       removeResource: {
         messageLine1: 'Осы аутентификатордан растау кодтары енді талап етілмейді.',
@@ -831,6 +1055,7 @@ export const kkKZ: LocalizationResource = {
     mobileButton__menu: 'Мәзір',
     navbar: {
       account: 'Профиль',
+      apiKeys: undefined,
       billing: 'Төлемдер',
       description: 'Есептік жазба ақпаратын басқару.',
       security: 'Қауіпсіздік',
@@ -845,153 +1070,154 @@ export const kkKZ: LocalizationResource = {
       title__rename: 'Құпия кілт атауын өзгерту',
     },
     passwordPage: {
-        checkboxInfoText__signOutOfOtherSessions: 'Ескі құпия сөзді қолданған барлық басқа құрылғылардан шығу ұсынылады.',
-        readonly: 'Кәсіпорын байланысы арқылы кіретін болғандықтан, құпия сөзді өзгерту мүмкін емес.',
-        successMessage__set: 'Құпия сөз орнатылды.',
-        successMessage__signOutOfOtherSessions: 'Барлық басқа құрылғылардан шықтыңыз.',
-        successMessage__update: 'Құпия сөз жаңартылды.',
-        title__set: 'Құпия сөзді орнату',
-        title__update: 'Құпия сөзді жаңарту',
+      checkboxInfoText__signOutOfOtherSessions: 'Ескі құпия сөзді қолданған барлық басқа құрылғылардан шығу ұсынылады.',
+      readonly: 'Кәсіпорын байланысы арқылы кіретін болғандықтан, құпия сөзді өзгерту мүмкін емес.',
+      successMessage__set: 'Құпия сөз орнатылды.',
+      successMessage__signOutOfOtherSessions: 'Барлық басқа құрылғылардан шықтыңыз.',
+      successMessage__update: 'Құпия сөз жаңартылды.',
+      title__set: 'Құпия сөзді орнату',
+      title__update: 'Құпия сөзді жаңарту',
+    },
+    phoneNumberPage: {
+      infoText: 'Растау коды осы телефон нөміріне SMS арқылы жіберіледі. SMS жіберу ақысы болуы мүмкін.',
+      removeResource: {
+        messageLine1: '{{identifier}} есептік жазбадан жойылады.',
+        messageLine2: 'Бұл телефон нөмірі арқылы кіре алмайсыз.',
+        successMessage: '{{phoneNumber}} жойылды.',
+        title: 'Телефон нөмірін жою',
       },
-      phoneNumberPage: {
-        infoText: 'Растау коды осы телефон нөміріне SMS арқылы жіберіледі. SMS жіберу ақысы болуы мүмкін.',
-        removeResource: {
-          messageLine1: '{{identifier}} есептік жазбадан жойылады.',
-          messageLine2: 'Бұл телефон нөмірі арқылы кіре алмайсыз.',
-          successMessage: '{{phoneNumber}} жойылды.',
-          title: 'Телефон нөмірін жою',
+      successMessage: '{{identifier}} есептік жазбаға қосылды.',
+      title: 'Телефон нөмірін қосу',
+      verifySubtitle: '{{identifier}} нөміріне жіберілген кодты енгізіңіз',
+      verifyTitle: 'Телефон нөмірін растау',
+    },
+    plansPage: {
+      title: undefined,
+    },
+    profilePage: {
+      fileDropAreaHint: 'Ұсынылатын өлшемі 1:1, максимум 10MB.',
+      imageFormDestructiveActionSubtitle: 'Жою',
+      imageFormSubtitle: 'Жүктеу',
+      imageFormTitle: 'Профиль суреті',
+      readonly: 'Профиль ақпараты кәсіпорын байланысы арқылы берілген және өзгертілмейді.',
+      successMessage: 'Профиль жаңартылды.',
+      title: 'Профильді жаңарту',
+    },
+    start: {
+      activeDevicesSection: {
+        destructiveAction: 'Құрылғыдан шығу',
+        title: 'Белсенді құрылғылар',
+      },
+      connectedAccountsSection: {
+        actionLabel__connectionFailed: 'Қайта қосу',
+        actionLabel__reauthorize: 'Қазір рұқсат беру',
+        destructiveActionTitle: 'Жою',
+        primaryButton: 'Есептік жазбаны қосу',
+        subtitle__disconnected: 'Бұл есептік жазба ажыратылды.',
+        subtitle__reauthorize: 'Рұқсаттар өзгерді. Функционалдық шектеулерден аулақ болу үшін қайта рұқсат беріңіз',
+        title: 'Қосылған есептік жазбалар',
+      },
+      dangerSection: {
+        deleteAccountButton: 'Есептік жазбаны жою',
+        title: 'Есептік жазбаны жою',
+      },
+      emailAddressesSection: {
+        destructiveAction: 'Электрондық поштаны жою',
+        detailsAction__nonPrimary: 'Негізгі ретінде орнату',
+        detailsAction__primary: 'Растауды аяқтау',
+        detailsAction__unverified: 'Растау',
+        primaryButton: 'Электрондық поштаны қосу',
+        title: 'Электрондық пошталар',
+      },
+      enterpriseAccountsSection: {
+        title: 'Кәсіпорын есептік жазбалары',
+      },
+      headerTitle__account: 'Профиль мәліметтері',
+      headerTitle__security: 'Қауіпсіздік',
+      mfaSection: {
+        backupCodes: {
+          actionLabel__regenerate: 'Қайта жасау',
+          headerTitle: 'Сақтық кодтары',
+          subtitle__regenerate: 'Жаңа сақтық кодтарын алыңыз. Алдыңғы кодтар жойылады және қолданылмайды.',
+          title__regenerate: 'Сақтық кодтарын қайта жасау',
         },
-        successMessage: '{{identifier}} есептік жазбаға қосылды.',
-        title: 'Телефон нөмірін қосу',
-        verifySubtitle: '{{identifier}} нөміріне жіберілген кодты енгізіңіз',
-        verifyTitle: 'Телефон нөмірін растау',
-      },
-      profilePage: {
-        fileDropAreaHint: 'Ұсынылатын өлшемі 1:1, максимум 10MB.',
-        imageFormDestructiveActionSubtitle: 'Жою',
-        imageFormSubtitle: 'Жүктеу',
-        imageFormTitle: 'Профиль суреті',
-        readonly: 'Профиль ақпараты кәсіпорын байланысы арқылы берілген және өзгертілмейді.',
-        successMessage: 'Профиль жаңартылды.',
-        title: 'Профильді жаңарту',
-      },
-      start: {
-        activeDevicesSection: {
-          destructiveAction: 'Құрылғыдан шығу',
-          title: 'Белсенді құрылғылар',
+        phoneCode: {
+          actionLabel__setDefault: 'Әдепкі ретінде орнату',
+          destructiveActionLabel: 'Жою',
         },
-        connectedAccountsSection: {
-          actionLabel__connectionFailed: 'Қайта қосу',
-          actionLabel__reauthorize: 'Қазір рұқсат беру',
+        primaryButton: 'Екі қадамды растауды қосу',
+        title: 'Екі қадамды растау',
+        totp: {
           destructiveActionTitle: 'Жою',
-          primaryButton: 'Есептік жазбаны қосу',
-          subtitle__disconnected: 'Бұл есептік жазба ажыратылды.',
-          subtitle__reauthorize:
-            'Рұқсаттар өзгерді. Функционалдық шектеулерден аулақ болу үшін қайта рұқсат беріңіз',
-          title: 'Қосылған есептік жазбалар',
+          headerTitle: 'Аутентификатор қолданбасы',
         },
-        dangerSection: {
-          deleteAccountButton: 'Есептік жазбаны жою',
-          title: 'Есептік жазбаны жою',
-        },
-        emailAddressesSection: {
-            destructiveAction: 'Электрондық поштаны жою',
-            detailsAction__nonPrimary: 'Негізгі ретінде орнату',
-            detailsAction__primary: 'Растауды аяқтау',
-            detailsAction__unverified: 'Растау',
-            primaryButton: 'Электрондық поштаны қосу',
-            title: 'Электрондық пошталар',
-          },
-        enterpriseAccountsSection: {
-            title: 'Кәсіпорын есептік жазбалары',
-          },
-        headerTitle__account: 'Профиль мәліметтері',
-        headerTitle__security: 'Қауіпсіздік',
-        mfaSection: {
-            backupCodes: {
-              actionLabel__regenerate: 'Қайта жасау',
-              headerTitle: 'Сақтық кодтары',
-              subtitle__regenerate:
-                'Жаңа сақтық кодтарын алыңыз. Алдыңғы кодтар жойылады және қолданылмайды.',
-              title__regenerate: 'Сақтық кодтарын қайта жасау',
-            },
-            phoneCode: {
-              actionLabel__setDefault: 'Әдепкі ретінде орнату',
-              destructiveActionLabel: 'Жою',
-            },
-            primaryButton: 'Екі қадамды растауды қосу',
-            title: 'Екі қадамды растау',
-            totp: {
-              destructiveActionTitle: 'Жою',
-              headerTitle: 'Аутентификатор қолданбасы',
-            },
-          },
-        passkeysSection: {
-            menuAction__destructive: 'Жою',
-            menuAction__rename: 'Атауын өзгерту',
-            primaryButton: 'Құпия кілтті қосу',
-            title: 'Құпия кілттер',
-          },
-        passwordSection: {
-            primaryButton__setPassword: 'Құпия сөзді орнату',
-            primaryButton__updatePassword: 'Құпия сөзді жаңарту',
-            title: 'Құпия сөз',
-          },
-        phoneNumbersSection: {
-            destructiveAction: 'Телефон нөмірін жою',
-            detailsAction__nonPrimary: 'Негізгі ретінде орнату',
-            detailsAction__primary: 'Растауды аяқтау',
-            detailsAction__unverified: 'Телефон нөмірін растау',
-            primaryButton: 'Телефон нөмірін қосу',
-            title: 'Телефон нөмірлері',
-          },
-        profileSection: {
-            primaryButton: 'Профильді жаңарту',
-            title: 'Профиль',
-          },
-        usernameSection: {
-            primaryButton__setUsername: 'Пайдаланушы атын орнату',
-            primaryButton__updateUsername: 'Пайдаланушы атын жаңарту',
-            title: 'Пайдаланушы аты',
-          },
-        web3WalletsSection: {
-            destructiveAction: 'Әптәпқалманы жою',
-            detailsAction__nonPrimary: 'Негізгі ретінде орнату',
-            primaryButton: 'Әптәпқалманы қосу',
-            title: 'Web3 әптәпқалмалары',
-          },
       },
-      usernamePage: {
-        successMessage: 'Пайдаланушы аты жаңартылды.',
-        title__set: 'Пайдаланушы атын орнату',
-        title__update: 'Пайдаланушы атын жаңарту',
+      passkeysSection: {
+        menuAction__destructive: 'Жою',
+        menuAction__rename: 'Атауын өзгерту',
+        primaryButton: 'Құпия кілтті қосу',
+        title: 'Құпия кілттер',
       },
-      web3WalletPage: {
-        removeResource: {
-          messageLine1: '{{identifier}} есептік жазбадан жойылады.',
-          messageLine2: 'Бұл әптәпқалма арқылы кіре алмайсыз.',
-          successMessage: '{{web3Wallet}} жойылды.',
-          title: 'Web3 әптәпқалманы жою',
-        },
-        subtitle__availableWallets: 'Есептік жазбаға қосылатын Web3 әптәпқалманы таңдаңыз.',
-        subtitle__unavailableWallets: 'Қолжетімді Web3 әптәпқалмалар жоқ.',
-        successMessage: 'Әптәпқалма есептік жазбаға қосылды.',
-        title: 'Web3 әптәпқалманы қосу',
-        web3WalletButtonsBlockButton: '{{provider|titleize}}',
+      passwordSection: {
+        primaryButton__setPassword: 'Құпия сөзді орнату',
+        primaryButton__updatePassword: 'Құпия сөзді жаңарту',
+        title: 'Құпия сөз',
+      },
+      phoneNumbersSection: {
+        destructiveAction: 'Телефон нөмірін жою',
+        detailsAction__nonPrimary: 'Негізгі ретінде орнату',
+        detailsAction__primary: 'Растауды аяқтау',
+        detailsAction__unverified: 'Телефон нөмірін растау',
+        primaryButton: 'Телефон нөмірін қосу',
+        title: 'Телефон нөмірлері',
+      },
+      profileSection: {
+        primaryButton: 'Профильді жаңарту',
+        title: 'Профиль',
+      },
+      usernameSection: {
+        primaryButton__setUsername: 'Пайдаланушы атын орнату',
+        primaryButton__updateUsername: 'Пайдаланушы атын жаңарту',
+        title: 'Пайдаланушы аты',
+      },
+      web3WalletsSection: {
+        destructiveAction: 'Әптәпқалманы жою',
+        detailsAction__nonPrimary: 'Негізгі ретінде орнату',
+        primaryButton: 'Әптәпқалманы қосу',
+        title: 'Web3 әптәпқалмалары',
       },
     },
-    waitlist: {
-      start: {
-        actionLink: 'Кіру',
-        actionText: 'Есептік жазбаңыз бар ма?',
-        formButton: 'Күту тізіміне қосылу',
-        subtitle: 'Электрондық поштаңызды енгізіңіз, біз сізбен хабарласамыз',
-        title: 'Күту тізіміне қосылу',
-      },
-      success: {
-        message: 'Жақында бетке қайта бағытталасыз...',
-        subtitle: 'Даяр болған кезде хабарласамыз',
-        title: 'Күту тізіміне қосылғаныңыз үшін рақмет!',
-      },
+    usernamePage: {
+      successMessage: 'Пайдаланушы аты жаңартылды.',
+      title__set: 'Пайдаланушы атын орнату',
+      title__update: 'Пайдаланушы атын жаңарту',
     },
-  } as const;
+    web3WalletPage: {
+      removeResource: {
+        messageLine1: '{{identifier}} есептік жазбадан жойылады.',
+        messageLine2: 'Бұл әптәпқалма арқылы кіре алмайсыз.',
+        successMessage: '{{web3Wallet}} жойылды.',
+        title: 'Web3 әптәпқалманы жою',
+      },
+      subtitle__availableWallets: 'Есептік жазбаға қосылатын Web3 әптәпқалманы таңдаңыз.',
+      subtitle__unavailableWallets: 'Қолжетімді Web3 әптәпқалмалар жоқ.',
+      successMessage: 'Әптәпқалма есептік жазбаға қосылды.',
+      title: 'Web3 әптәпқалманы қосу',
+      web3WalletButtonsBlockButton: '{{provider|titleize}}',
+    },
+  },
+  waitlist: {
+    start: {
+      actionLink: 'Кіру',
+      actionText: 'Есептік жазбаңыз бар ма?',
+      formButton: 'Күту тізіміне қосылу',
+      subtitle: 'Электрондық поштаңызды енгізіңіз, біз сізбен хабарласамыз',
+      title: 'Күту тізіміне қосылу',
+    },
+    success: {
+      message: 'Жақында бетке қайта бағытталасыз...',
+      subtitle: 'Даяр болған кезде хабарласамыз',
+      title: 'Күту тізіміне қосылғаныңыз үшін рақмет!',
+    },
+  },
+} as const;
