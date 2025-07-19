@@ -16,7 +16,7 @@ export const withHavingTrouble = <P extends AlternativeMethodsProps>(
 
   return (
     <Component
-      {...(props as unknown as P)}
+      {...(props as any)}
       onHavingTroubleClick={toggleHavingTrouble}
     />
   );
