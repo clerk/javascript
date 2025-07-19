@@ -1,3 +1,4 @@
+import type { ClerkAPIResponseError } from './api';
 import type { APIKeysNamespace } from './apiKeys';
 import type {
   APIKeysTheme,
@@ -12,6 +13,7 @@ import type {
   PricingTableTheme,
   SignInTheme,
   SignUpTheme,
+  SubscriptionDetailsTheme,
   UserButtonTheme,
   UserProfileTheme,
   UserVerificationTheme,
@@ -20,9 +22,11 @@ import type {
 import type { ClientResource } from './client';
 import type {
   CommerceBillingNamespace,
+  CommerceCheckoutResource,
+  CommercePayerType,
   CommercePlanResource,
-  CommerceSubscriberType,
   CommerceSubscriptionPlanPeriod,
+  ConfirmCheckoutParams,
 } from './commerce';
 import type { CustomMenuItem } from './customMenuItems';
 import type { CustomPage } from './customPages';
@@ -54,6 +58,44 @@ import type { TelemetryCollector } from './telemetry';
 import type { UserResource } from './user';
 import type { Autocomplete, DeepPartial, DeepSnakeToCamel } from './utils';
 import type { WaitlistResource } from './waitlist';
+
+type __experimental_CheckoutStatus = 'awaiting_initialization' | 'awaiting_confirmation' | 'completed';
+
+export type __experimental_CheckoutCacheState = Readonly<{
+  isStarting: boolean;
+  isConfirming: boolean;
+  error: ClerkAPIResponseError | null;
+  checkout: CommerceCheckoutResource | null;
+  fetchStatus: 'idle' | 'fetching' | 'error';
+  status: __experimental_CheckoutStatus;
+}>;
+
+export type __experimental_CheckoutOptions = {
+  for?: 'organization';
+  planPeriod: CommerceSubscriptionPlanPeriod;
+  planId: string;
+};
+
+type CheckoutResult =
+  | {
+      data: CommerceCheckoutResource;
+      error: null;
+    }
+  | {
+      data: null;
+      error: ClerkAPIResponseError;
+    };
+
+export type __experimental_CheckoutInstance = {
+  confirm: (params: ConfirmCheckoutParams) => Promise<CheckoutResult>;
+  start: () => Promise<CheckoutResult>;
+  clear: () => void;
+  finalize: (params?: { redirectUrl: string }) => void;
+  subscribe: (listener: (state: __experimental_CheckoutCacheState) => void) => () => void;
+  getState: () => __experimental_CheckoutCacheState;
+};
+
+type __experimental_CheckoutFunction = (options: __experimental_CheckoutOptions) => __experimental_CheckoutInstance;
 
 /**
  * @inline
@@ -184,7 +226,16 @@ export interface Clerk {
   /** Current User. */
   user: UserResource | null | undefined;
 
-  /** Billing Object */
+  /**
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+   * @see https://clerk.com/docs/billing/overview
+   *
+   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+   * @example
+   * ```tsx
+   * <ClerkProvider clerkJsVersion="x.x.x" />
+   * ```
+   */
   billing: CommerceBillingNamespace;
 
   telemetry: TelemetryCollector | undefined;
@@ -223,15 +274,27 @@ export interface Clerk {
 
   /**
    * Opens the Clerk PlanDetails drawer component in a drawer.
-   * @param props Optional subscription details drawer configuration parameters.
+   * @param props `plan` or `planId` parameters are required.
    */
-  __internal_openPlanDetails: (props?: __internal_PlanDetailsProps) => void;
+  __internal_openPlanDetails: (props: __internal_PlanDetailsProps) => void;
 
   /**
    * Closes the Clerk PlanDetails drawer.
    */
   __internal_closePlanDetails: () => void;
 
+  /**
+   * Opens the Clerk SubscriptionDetails drawer component in a drawer.
+   * @param props Optional configuration parameters.
+   */
+  __internal_openSubscriptionDetails: (props?: __internal_SubscriptionDetailsProps) => void;
+
+  /**
+   * Closes the Clerk SubscriptionDetails drawer.
+   */
+  __internal_closeSubscriptionDetails: () => void;
+
+  /**
   /** Opens the Clerk UserVerification component in a modal.
    * @param props Optional user verification configuration parameters.
    */
@@ -752,12 +815,10 @@ export interface Clerk {
   joinWaitlist: (params: JoinWaitlistParams) => Promise<WaitlistResource>;
 
   /**
-   * Navigates to the next task or redirects to completion URL.
-   * If the current session has pending tasks, it navigates to the next task.
-   * If all tasks are complete, it navigates to the provided completion URL or defaults to the origin redirect URL (either from sign-in or sign-up).
-   * @experimental
+   * Navigates to the current task or redirects to `redirectUrlComplete` once the session is `active`.
+   * @internal
    */
-  __experimental_navigateToTask: (params?: NextTaskParams) => Promise<void>;
+  __internal_navigateToTaskIfAvailable: (params?: __internal_NavigateToTaskIfAvailableParams) => Promise<void>;
 
   /**
    * This is an optional function.
@@ -786,6 +847,13 @@ export interface Clerk {
    * This API is in early access and may change in future releases.
    */
   apiKeys: APIKeysNamespace;
+
+  /**
+   * Checkout API
+   * @experimental
+   * This API is in early access and may change in future releases.
+   */
+  __experimental_checkout: __experimental_CheckoutFunction;
 }
 
 export type HandleOAuthCallbackParams = TransferableOption &
@@ -1724,11 +1792,21 @@ export type RevokeAPIKeyParams = {
   revocationReason?: string;
 };
 
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+ * @see https://clerk.com/docs/billing/overview
+ *
+ * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+ * @example
+ * ```tsx
+ * <ClerkProvider clerkJsVersion="x.x.x" />
+ * ```
+ */
 export type __internal_CheckoutProps = {
   appearance?: CheckoutTheme;
   planId?: string;
   planPeriod?: CommerceSubscriptionPlanPeriod;
-  subscriberType?: CommerceSubscriberType;
+  subscriberType?: CommercePayerType;
   onSubscriptionComplete?: () => void;
   portalId?: string;
   portalRoot?: PortalRoot;
@@ -1740,11 +1818,33 @@ export type __internal_CheckoutProps = {
   onClose?: () => void;
 };
 
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+ * @see https://clerk.com/docs/billing/overview
+ *
+ * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+ * @example
+ * ```tsx
+ * <ClerkProvider clerkJsVersion="x.x.x" />
+ * ```
+ */
 export type __internal_PlanDetailsProps = {
   appearance?: PlanDetailTheme;
   plan?: CommercePlanResource;
-  subscriberType?: CommerceSubscriberType;
+  planId?: string;
   initialPlanPeriod?: CommerceSubscriptionPlanPeriod;
+  portalId?: string;
+  portalRoot?: PortalRoot;
+};
+
+export type __internal_SubscriptionDetailsProps = {
+  /**
+   * The subscriber type to display the subscription details for.
+   * If `org` is provided, the subscription details will be displayed for the active organization.
+   * @default 'user'
+   */
+  for?: CommercePayerType;
+  appearance?: SubscriptionDetailsTheme;
   onSubscriptionCancel?: () => void;
   portalId?: string;
   portalRoot?: PortalRoot;
@@ -1800,18 +1900,22 @@ export interface HandleEmailLinkVerificationParams {
   onVerifiedOnOtherDevice?: () => void;
 }
 
-type ButtonPropsModal<T extends SignInProps | SignUpProps> = {
+type SignInButtonPropsModal = {
   mode: 'modal';
-  appearance?: T['appearance'];
+  appearance?: SignInProps['appearance'];
+};
+
+type SignUpButtonPropsModal = {
+  mode: 'modal';
+  appearance?: SignUpProps['appearance'];
+  unsafeMetadata?: SignUpUnsafeMetadata;
 };
 
 type ButtonPropsRedirect = {
   mode?: 'redirect';
 };
 
-type ButtonProps<T extends SignInProps | SignUpProps> = ButtonPropsModal<T> | ButtonPropsRedirect;
-
-export type SignInButtonProps = ButtonProps<SignInProps> &
+export type SignInButtonProps = (SignInButtonPropsModal | ButtonPropsRedirect) &
   Pick<
     SignInProps,
     | 'fallbackRedirectUrl'
@@ -1823,9 +1927,7 @@ export type SignInButtonProps = ButtonProps<SignInProps> &
     | 'oauthFlow'
   >;
 
-export type SignUpButtonProps = {
-  unsafeMetadata?: SignUpUnsafeMetadata;
-} & ButtonProps<SignUpProps> &
+export type SignUpButtonProps = (SignUpButtonPropsModal | ButtonPropsRedirect) &
   Pick<
     SignUpProps,
     | 'fallbackRedirectUrl'
@@ -1903,7 +2005,7 @@ export interface AuthenticateWithGoogleOneTapParams {
   legalAccepted?: boolean;
 }
 
-export interface NextTaskParams {
+export interface __internal_NavigateToTaskIfAvailableParams {
   /**
    * Full URL or path to navigate to after successfully resolving all tasks
    * @default undefined

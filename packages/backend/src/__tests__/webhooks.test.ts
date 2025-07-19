@@ -217,4 +217,35 @@ describe('verifyWebhook', () => {
     // All should be treated as missing
     await expect(verifyWebhook(mockRequest)).rejects.toThrow('svix-id, svix-timestamp, svix-signature');
   });
+
+  it('should parse event_attributes', async () => {
+    const clerkPayload = JSON.stringify({
+      type: 'user.created',
+      data: { id: 'user_123', email: 'test@example.com' },
+      event_attributes: {
+        http_request: {
+          client_ip: '127.0.0.1',
+          user_agent: 'Mozilla/5.0 (Test)',
+        },
+      },
+    });
+    const svixId = 'msg_123';
+    const svixTimestamp = (Date.now() / 1000).toString();
+    const validSignature = createValidSignature(svixId, svixTimestamp, clerkPayload);
+
+    const mockRequest = new Request('https://clerk.com/webhooks', {
+      method: 'POST',
+      body: clerkPayload,
+      headers: new Headers({
+        'svix-id': svixId,
+        'svix-timestamp': svixTimestamp,
+        'svix-signature': validSignature,
+      }),
+    });
+
+    const result = await verifyWebhook(mockRequest, { signingSecret: mockSecret });
+    expect(result).toHaveProperty('type', 'user.created');
+    expect(result).toHaveProperty('event_attributes.http_request.client_ip', '127.0.0.1');
+    expect(result).toHaveProperty('event_attributes.http_request.user_agent', 'Mozilla/5.0 (Test)');
+  });
 });

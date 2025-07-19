@@ -76,6 +76,10 @@ export const applicationConfig = () => {
       }
       return self;
     },
+    /**
+     * Creates a new application directory and copies the template files (and any overrides) to it.
+     * The application directory is created in the `constants.TMP_DIR` directory.
+     */
     commit: async (opts?: { stableHash?: string }) => {
       const { stableHash } = opts || {};
       logger.info(`Creating project "${name}"`);

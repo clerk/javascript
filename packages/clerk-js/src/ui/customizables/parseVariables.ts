@@ -1,12 +1,30 @@
 import type { Theme } from '@clerk/types';
 
-import { spaceScaleKeys } from '../foundations/sizes';
-import type { fontSizes, fontWeights } from '../foundations/typography';
+import { createShadowSet, generateShadow } from '../foundations/shadows';
+import { BORDER_RADIUS_SCALE_RATIOS, spaceScaleKeys } from '../foundations/sizes';
+import { FONT_SIZE_SCALE_RATIOS, type FontSizeKey, type fontWeights } from '../foundations/typography';
 import { colors } from '../utils/colors';
 import { colorOptionToThemedAlphaScale, colorOptionToThemedLightnessScale } from '../utils/colors/scales';
+import { createAlphaColorMixString } from '../utils/colors/utils';
 import { cssSupports } from '../utils/cssSupports';
 import { fromEntries } from '../utils/fromEntries';
 import { removeUndefinedProps } from '../utils/removeUndefinedProps';
+
+const createMutedForegroundColor = (variables: NonNullable<Theme['variables']>) => {
+  if (variables.colorMutedForeground) {
+    return colors.toHslaString(variables.colorMutedForeground);
+  }
+
+  if (variables.colorTextSecondary) {
+    return colors.toHslaString(variables.colorTextSecondary);
+  }
+
+  if (variables.colorForeground) {
+    return colors.makeTransparent(variables.colorForeground, 0.35);
+  }
+
+  return colors.makeTransparent(variables.colorText, 0.35);
+};
 
 export const createColorScales = (theme: Theme) => {
   const variables = removeInvalidValues(theme.variables || {});
@@ -21,6 +39,10 @@ export const createColorScales = (theme: Theme) => {
   const primaryAlphaScale = colorOptionToThemedAlphaScale(primaryScale?.primary500, 'primaryAlpha');
   const successAlphaScale = colorOptionToThemedAlphaScale(successScale?.success500, 'successAlpha');
   const warningAlphaScale = colorOptionToThemedAlphaScale(warningScale?.warning500, 'warningAlpha');
+  const borderAlphaScale = colorOptionToThemedAlphaScale(
+    variables.colorBorder || variables.colorNeutral,
+    'borderAlpha',
+  );
 
   return removeUndefinedProps({
     ...dangerScale,
@@ -32,15 +54,37 @@ export const createColorScales = (theme: Theme) => {
     ...primaryAlphaScale,
     ...successAlphaScale,
     ...warningAlphaScale,
+    ...borderAlphaScale,
     primaryHover: colors.adjustForLightness(primaryScale?.primary500),
-    colorTextOnPrimaryBackground: colors.toHslaString(variables.colorTextOnPrimaryBackground),
-    colorText: colors.toHslaString(variables.colorText),
-    colorTextSecondary:
-      colors.toHslaString(variables.colorTextSecondary) || colors.makeTransparent(variables.colorText, 0.35),
-    colorInputText: colors.toHslaString(variables.colorInputText),
+    colorPrimaryForeground: variables.colorPrimaryForeground
+      ? colors.toHslaString(variables.colorPrimaryForeground)
+      : variables.colorTextOnPrimaryBackground
+        ? colors.toHslaString(variables.colorTextOnPrimaryBackground)
+        : undefined,
+    colorForeground: variables.colorForeground
+      ? colors.toHslaString(variables.colorForeground)
+      : colors.toHslaString(variables.colorText),
+    colorMutedForeground: createMutedForegroundColor(variables),
+    colorInputForeground: variables.colorInputForeground
+      ? colors.toHslaString(variables.colorInputForeground)
+      : colors.toHslaString(variables.colorInputText),
     colorBackground: colors.toHslaString(variables.colorBackground),
-    colorInputBackground: colors.toHslaString(variables.colorInputBackground),
+    colorInput: variables.colorInput
+      ? colors.toHslaString(variables.colorInput)
+      : colors.toHslaString(variables.colorInputBackground),
     colorShimmer: colors.toHslaString(variables.colorShimmer),
+    colorMuted: variables.colorMuted ? colors.toHslaString(variables.colorMuted) : undefined,
+    colorRing: variables.colorRing ? colors.makeTransparent(colors.toHslaString(variables.colorRing), 0.85) : undefined,
+    colorShadow: variables.colorShadow ? colors.toHslaString(variables.colorShadow) : undefined,
+    colorModalBackdrop: variables.colorModalBackdrop
+      ? colors.makeTransparent(colors.toHslaString(variables.colorModalBackdrop), 0.27)
+      : undefined,
+    avatarBackground: neutralAlphaScale?.neutralAlpha400
+      ? colors.toHslaString(neutralAlphaScale.neutralAlpha400)
+      : undefined,
+    avatarBorder: neutralAlphaScale?.neutralAlpha200
+      ? colors.toHslaString(neutralAlphaScale.neutralAlpha200)
+      : undefined,
   });
 };
 
@@ -95,23 +139,24 @@ export const createRadiiUnits = (theme: Theme) => {
 
   const md = borderRadius === 'none' ? '0' : borderRadius;
   return {
-    sm: `calc(${md} * 0.66)`,
+    sm: `calc(${md} * ${BORDER_RADIUS_SCALE_RATIOS.sm})`,
     md,
-    lg: `calc(${md} * 1.33)`,
-    xl: `calc(${md} * 2)`,
+    lg: `calc(${md} * ${BORDER_RADIUS_SCALE_RATIOS.lg})`,
+    xl: `calc(${md} * ${BORDER_RADIUS_SCALE_RATIOS.xl})`,
   };
 };
 
 export const createSpaceScale = (theme: Theme) => {
-  const { spacingUnit } = theme.variables || {};
-  if (spacingUnit === undefined) {
+  const { spacing, spacingUnit } = theme.variables || {};
+  const spacingValue = spacing ?? spacingUnit;
+  if (spacingValue === undefined) {
     return;
   }
   return fromEntries(
     spaceScaleKeys.map(k => {
       const num = Number.parseFloat(k.replace('x', '.'));
       const percentage = (num / 0.5) * 0.125;
-      return [k, `calc(${spacingUnit} * ${percentage})`];
+      return [k, `calc(${spacingValue} * ${percentage})`];
     }),
   );
 };
@@ -119,21 +164,32 @@ export const createSpaceScale = (theme: Theme) => {
 // We want to keep the same ratio between the font sizes we have for the default theme
 // This is directly related to the fontSizes object in the theme default foundations
 // ref: src/ui/foundations/typography.ts
-export const createFontSizeScale = (theme: Theme): Record<keyof typeof fontSizes, string> | undefined => {
+export const createFontSizeScale = (theme: Theme): Partial<Record<FontSizeKey, string>> | undefined => {
   const { fontSize } = theme.variables || {};
   if (fontSize === undefined) {
     return;
   }
-  return {
-    xs: `calc(${fontSize} * 0.8)`,
-    sm: `calc(${fontSize} * 0.9)`,
-    md: fontSize,
-    lg: `calc(${fontSize} * 1.3)`,
-    xl: `calc(${fontSize} * 1.85)`,
-  };
+
+  if (typeof fontSize === 'object') {
+    // When fontSize is an object, filter out undefined values and return only defined properties
+    return removeUndefinedProps(
+      Object.fromEntries(
+        Object.entries(FONT_SIZE_SCALE_RATIOS).map(([key, _ratio]) => [key, fontSize[key as FontSizeKey] ?? undefined]),
+      ) as Record<FontSizeKey, string | undefined>,
+    );
+  }
+
+  // When fontSize is a string, calculate all sizes based on the base value and fractions for precision
+  // Using fractions instead of decimal ratios to avoid floating-point precision issues
+  return Object.fromEntries(
+    Object.entries(FONT_SIZE_SCALE_RATIOS).map(([key, fraction]) => [
+      key,
+      fraction === '1' ? fontSize : `calc(${fontSize} * ${fraction})`,
+    ]),
+  ) as Record<FontSizeKey, string>;
 };
 
-export const createFontWeightScale = (theme: Theme): Record<keyof typeof fontWeights, any> => {
+export const createFontWeightScale = (theme: Theme): Partial<Record<keyof typeof fontWeights, string | number>> => {
   const { fontWeight } = theme.variables || {};
   return removeUndefinedProps({ ...fontWeight });
 };
@@ -141,4 +197,21 @@ export const createFontWeightScale = (theme: Theme): Record<keyof typeof fontWei
 export const createFonts = (theme: Theme) => {
   const { fontFamily, fontFamilyButtons } = theme.variables || {};
   return removeUndefinedProps({ main: fontFamily, buttons: fontFamilyButtons });
+};
+
+export const createShadowsUnits = (theme: Theme) => {
+  const { colorShadow } = theme.variables || {};
+  if (!colorShadow) {
+    return;
+  }
+
+  const shadowColor = colors.toHslaString(colorShadow);
+  if (!shadowColor) {
+    return;
+  }
+
+  return createShadowSet(
+    shadowColor,
+    generateShadow((color, alpha) => createAlphaColorMixString(color, alpha * 100)),
+  );
 };

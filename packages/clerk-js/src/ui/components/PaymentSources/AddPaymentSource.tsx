@@ -1,10 +1,10 @@
+import type { __experimental_useCheckout as useCheckout } from '@clerk/shared/react';
 import {
   __experimental_PaymentElement as PaymentElement,
   __experimental_PaymentElementProvider as PaymentElementProvider,
   __experimental_usePaymentElement as usePaymentElement,
   createContextAndHook,
 } from '@clerk/shared/react';
-import type { CommerceCheckoutResource } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
@@ -30,9 +30,9 @@ const useStripeAppearance = (node: HTMLElement | null) => {
     const { colors, fontWeights, fontSizes, radii, space } = theme;
     return {
       colorPrimary: resolveComputedCSSColor(node, colors.$primary500, colors.$colorBackground),
-      colorBackground: resolveComputedCSSColor(node, colors.$colorInputBackground, colors.$colorBackground),
-      colorText: resolveComputedCSSColor(node, colors.$colorText, colors.$colorBackground),
-      colorTextSecondary: resolveComputedCSSColor(node, colors.$colorTextSecondary, colors.$colorBackground),
+      colorBackground: resolveComputedCSSColor(node, colors.$colorInput, colors.$colorBackground),
+      colorText: resolveComputedCSSColor(node, colors.$colorForeground, colors.$colorBackground),
+      colorTextSecondary: resolveComputedCSSColor(node, colors.$colorMutedForeground, colors.$colorBackground),
       colorSuccess: resolveComputedCSSColor(node, colors.$success500, colors.$colorBackground),
       colorDanger: resolveComputedCSSColor(node, colors.$danger500, colors.$colorBackground),
       colorWarning: resolveComputedCSSColor(node, colors.$warning500, colors.$colorBackground),
@@ -51,7 +51,7 @@ const useStripeAppearance = (node: HTMLElement | null) => {
 
 type AddPaymentSourceProps = {
   onSuccess: (context: { gateway: 'stripe'; paymentToken: string }) => Promise<void>;
-  checkout?: CommerceCheckoutResource;
+  checkout?: ReturnType<typeof useCheckout>['checkout'];
   cancelAction?: () => void;
 };
 

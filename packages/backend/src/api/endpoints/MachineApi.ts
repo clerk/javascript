@@ -21,6 +21,14 @@ type GetMachineListParams = {
 };
 
 export class MachineApi extends AbstractAPI {
+  async get(machineId: string) {
+    this.requireId(machineId);
+    return this.request<Machine>({
+      method: 'GET',
+      path: joinPaths(basePath, machineId),
+    });
+  }
+
   async list(queryParams: GetMachineListParams = {}) {
     return this.request<PaginatedResourceResponse<Machine[]>>({
       method: 'GET',
@@ -51,14 +59,6 @@ export class MachineApi extends AbstractAPI {
     this.requireId(machineId);
     return this.request<Machine>({
       method: 'DELETE',
-      path: joinPaths(basePath, machineId),
-    });
-  }
-
-  async get(machineId: string) {
-    this.requireId(machineId);
-    return this.request<Machine>({
-      method: 'GET',
       path: joinPaths(basePath, machineId),
     });
   }

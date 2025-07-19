@@ -41,7 +41,7 @@ export const UserProfileSection = () => {
               user={userWithoutIdentifiers}
               size='lg'
               mainIdentifierVariant='subtitle'
-              sx={t => ({ color: t.colors.$colorText })}
+              sx={t => ({ color: t.colors.$colorForeground })}
             />
 
             <Action.Trigger value='edit'>
