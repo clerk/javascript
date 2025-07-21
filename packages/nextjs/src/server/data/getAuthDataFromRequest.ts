@@ -40,9 +40,11 @@ export const getAuthDataFromRequestSync = (
   req: RequestLike,
   { treatPendingAsSignedOut = true, ...opts }: GetAuthDataFromRequestOptions = {},
 ): SignedInAuthObject | SignedOutAuthObject => {
-  const { authStatus, authMessage, authReason, authToken, authSignature } = getAuthHeaders(req);
+  const { authStatus, authMessage, authReason, authRequestData, authToken, authSignature } = getAuthHeaders(req);
 
   opts.logger?.debug('headers', { authStatus, authMessage, authReason });
+
+  opts.logger?.debug('authRequestData', { authRequestData });
 
   const encryptedRequestData = getHeader(req, constants.Headers.ClerkRequestData);
   const decryptedRequestData = decryptClerkRequestData(encryptedRequestData);
@@ -159,6 +161,7 @@ const getAuthHeaders = (req: RequestLike) => {
   const authMessage = getAuthKeyFromRequest(req, 'AuthMessage');
   const authReason = getAuthKeyFromRequest(req, 'AuthReason');
   const authSignature = getAuthKeyFromRequest(req, 'AuthSignature');
+  const authRequestData = getHeader(req, constants.Headers.ClerkRequestData);
 
   return {
     authStatus,
@@ -166,5 +169,6 @@ const getAuthHeaders = (req: RequestLike) => {
     authMessage,
     authReason,
     authSignature,
+    authRequestData,
   };
 };

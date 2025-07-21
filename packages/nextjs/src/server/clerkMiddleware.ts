@@ -265,7 +265,14 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
             }
           : {};
 
-      decorateRequest(clerkRequest, handlerResult, requestState, resolvedParams, keylessKeysForRequestData);
+      decorateRequest(
+        clerkRequest,
+        handlerResult,
+        requestState,
+        resolvedParams,
+        keylessKeysForRequestData,
+        authObject.tokenType === 'session_token' ? null : authObject,
+      );
 
       return handlerResult;
     });
