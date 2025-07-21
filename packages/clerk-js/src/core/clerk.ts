@@ -2216,7 +2216,6 @@ export class Clerk implements ClerkInterface {
 
   __internal_navigateWithError(to: string, err: ClerkAPIError) {
     this.__internal_last_error = err;
-    eventBus.emit(events.ErrorUserLocked, null);
     return this.navigate(to);
   }
 

@@ -6,7 +6,6 @@ export const events = {
   UserSignOut: 'user:signOut',
   EnvironmentUpdate: 'environment:update',
   SessionTokenResolved: 'session:tokenResolved',
-  ErrorUserLocked: 'error:user_locked',
 } as const;
 
 type TokenUpdatePayload = { token: TokenResource | null };
@@ -16,7 +15,6 @@ type InternalEvents = {
   [events.UserSignOut]: null;
   [events.EnvironmentUpdate]: null;
   [events.SessionTokenResolved]: null;
-  [events.ErrorUserLocked]: null;
 };
 
 export const eventBus = createEventBus<InternalEvents>();
