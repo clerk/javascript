@@ -224,7 +224,7 @@ export function encryptClerkRequestData(
  */
 export function decryptClerkRequestData(
   encryptedRequestData?: string | undefined | null,
-): Partial<AuthenticateRequestOptions> {
+): Partial<AuthenticateRequestOptions> & { authObject?: AuthObject } {
   if (!encryptedRequestData) {
     return {};
   }

@@ -1,6 +1,5 @@
 import type { AuthObject } from '@clerk/backend';
 import {
-  authenticatedMachineObject,
   type AuthenticateRequestOptions,
   AuthStatus,
   constants,
@@ -15,7 +14,6 @@ import {
   signedOutAuthObject,
   TokenType,
   unauthenticatedMachineObject,
-  verifyMachineAuthToken,
 } from '@clerk/backend/internal';
 import { decodeJwt } from '@clerk/backend/jwt';
 import type { PendingSessionOptions } from '@clerk/types';
@@ -40,11 +38,9 @@ export const getAuthDataFromRequestSync = (
   req: RequestLike,
   { treatPendingAsSignedOut = true, ...opts }: GetAuthDataFromRequestOptions = {},
 ): SignedInAuthObject | SignedOutAuthObject => {
-  const { authStatus, authMessage, authReason, authRequestData, authToken, authSignature } = getAuthHeaders(req);
+  const { authStatus, authMessage, authReason, authToken, authSignature } = getAuthHeaders(req);
 
   opts.logger?.debug('headers', { authStatus, authMessage, authReason });
-
-  opts.logger?.debug('authRequestData', { authRequestData });
 
   const encryptedRequestData = getHeader(req, constants.Headers.ClerkRequestData);
   const decryptedRequestData = decryptClerkRequestData(encryptedRequestData);
@@ -82,11 +78,12 @@ export const getAuthDataFromRequestSync = (
   return authObject;
 };
 
-const handleMachineToken = async (
+const handleMachineToken = (
   bearerToken: string | undefined,
+  authObject: AuthObject | undefined,
   acceptsToken: NonNullable<AuthenticateRequestOptions['acceptsToken']>,
   options: GetAuthDataFromRequestOptions,
-): Promise<AuthObject | null> => {
+): AuthObject | null => {
   const hasMachineToken = bearerToken && isMachineTokenByPrefix(bearerToken);
 
   const acceptsOnlySessionToken =
@@ -106,10 +103,6 @@ const handleMachineToken = async (
       return getAuthObjectForAcceptedToken({ authObject, acceptsToken });
     }
 
-    const { data, errors } = await verifyMachineAuthToken(bearerToken, options);
-    const authObject = errors
-      ? unauthenticatedMachineObject(machineTokenType, options)
-      : authenticatedMachineObject(machineTokenType, bearerToken, data);
     return getAuthObjectForAcceptedToken({ authObject, acceptsToken });
   }
 
@@ -127,11 +120,14 @@ export const getAuthDataFromRequestAsync = async (
   const { authStatus, authMessage, authReason } = getAuthHeaders(req);
   opts.logger?.debug('headers', { authStatus, authMessage, authReason });
 
+  const encryptedRequestData = getHeader(req, constants.Headers.ClerkRequestData);
+  const decryptedRequestData = decryptClerkRequestData(encryptedRequestData);
+
   const bearerToken = getHeader(req, constants.Headers.Authorization)?.replace('Bearer ', '');
   const acceptsToken = opts.acceptsToken || TokenType.SessionToken;
   const options = {
-    secretKey: opts?.secretKey || SECRET_KEY,
-    publishableKey: PUBLISHABLE_KEY,
+    secretKey: opts?.secretKey || decryptedRequestData.secretKey || SECRET_KEY,
+    publishableKey: decryptedRequestData.publishableKey || PUBLISHABLE_KEY,
     apiUrl: API_URL,
     authStatus,
     authMessage,
@@ -139,7 +135,7 @@ export const getAuthDataFromRequestAsync = async (
   };
 
   // If the request has a machine token in header, handle it first.
-  const machineAuthObject = await handleMachineToken(bearerToken, acceptsToken, options);
+  const machineAuthObject = handleMachineToken(bearerToken, decryptedRequestData.authObject, acceptsToken, options);
   if (machineAuthObject) {
     return machineAuthObject;
   }
@@ -161,7 +157,6 @@ const getAuthHeaders = (req: RequestLike) => {
   const authMessage = getAuthKeyFromRequest(req, 'AuthMessage');
   const authReason = getAuthKeyFromRequest(req, 'AuthReason');
   const authSignature = getAuthKeyFromRequest(req, 'AuthSignature');
-  const authRequestData = getHeader(req, constants.Headers.ClerkRequestData);
 
   return {
     authStatus,
@@ -169,6 +164,5 @@ const getAuthHeaders = (req: RequestLike) => {
     authMessage,
     authReason,
     authSignature,
-    authRequestData,
   };
 };
