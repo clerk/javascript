@@ -16,6 +16,9 @@ export const shadcn = experimental_createTheme({
     colorPrimaryForeground: 'var(--primary-foreground)',
     colorRing: 'var(--ring)',
     fontWeight: {
+      normal: 'var(--font-weight-normal)',
+      medium: 'var(--font-weight-medium)',
+      semibold: 'var(--font-weight-semibold)',
       bold: 'var(--font-weight-semibold)',
     },
   },
@@ -24,7 +27,7 @@ export const shadcn = experimental_createTheme({
     cardBox: 'shadow-sm border',
     popoverBox: 'shadow-sm border',
     button: {
-      '&::after': {
+      '&[data-variant="solid"]::after': {
         display: 'none',
       },
     },
