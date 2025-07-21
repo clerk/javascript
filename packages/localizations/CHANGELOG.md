@@ -1,5 +1,22 @@
 # Change Log
 
+## 3.20.1
+
+### Patch Changes
+
+- Expand `vi-VN` localizations ([#6185](https://github.com/clerk/javascript/pull/6185)) by [@namnguyenthanhwork](https://github.com/namnguyenthanhwork)
+
+## 3.20.0
+
+### Minor Changes
+
+- Improve invalid plan change callout for monthly-only plans ([#6248](https://github.com/clerk/javascript/pull/6248)) by [@aeliox](https://github.com/aeliox)
+
+### Patch Changes
+
+- Updated dependencies [[`d2f6f9e`](https://github.com/clerk/javascript/commit/d2f6f9e02036a4288916fcce14f24be5d56561c4), [`a329836`](https://github.com/clerk/javascript/commit/a329836a6c64f0a551a277ccae07043456a70523), [`6041c39`](https://github.com/clerk/javascript/commit/6041c39a31e787a6065dbc3f21e1c569982a06de), [`3f1270d`](https://github.com/clerk/javascript/commit/3f1270db86a21ead0ed6f0bd4f9986485203e973)]:
+  - @clerk/types@4.68.0
+
 ## 3.19.2
 
 ### Patch Changes

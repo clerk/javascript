@@ -1,5 +1,22 @@
 # Change Log
 
+## 4.68.0
+
+### Minor Changes
+
+- [Billing Beta] Update `clerk.billing.getPlans()` to return paginated data and introduce the `usePlans()` hook. ([#6327](https://github.com/clerk/javascript/pull/6327)) by [@panteliselef](https://github.com/panteliselef)
+
+- Improve invalid plan change callout for monthly-only plans ([#6248](https://github.com/clerk/javascript/pull/6248)) by [@aeliox](https://github.com/aeliox)
+
+### Patch Changes
+
+- Ensure proper typing for `SignUpButton` and only allow `unsafeMetadata={...}` when `mode="modal"` ([#6340](https://github.com/clerk/javascript/pull/6340)) by [@tmilewski](https://github.com/tmilewski)
+
+- - Render parsed `colorRing` at 15% vs 100% ([#6334](https://github.com/clerk/javascript/pull/6334)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  - Render parsed `colorModalBackdrop` at 73% vs 100%
+  - Ensure `avatarBackground` and `avatarBorder` render with parsed neutral colors when `colorNeutral` is passed in via variables prop
+
 ## 4.67.0
 
 ### Minor Changes

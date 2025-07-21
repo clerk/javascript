@@ -7,15 +7,8 @@ export type { SignUpButtonProps };
 
 export const SignUpButton = withClerk(
   ({ clerk, children, ...props }: WithClerkProp<React.PropsWithChildren<SignUpButtonProps>>) => {
-    const {
-      fallbackRedirectUrl,
-      forceRedirectUrl,
-      signInFallbackRedirectUrl,
-      signInForceRedirectUrl,
-      mode,
-      unsafeMetadata,
-      ...rest
-    } = props;
+    const { fallbackRedirectUrl, forceRedirectUrl, signInFallbackRedirectUrl, signInForceRedirectUrl, mode, ...rest } =
+      props;
 
     children = normalizeWithDefaultValue(children, 'Sign up');
     const child = assertSingleChild(children)('SignUpButton');
@@ -26,7 +19,6 @@ export const SignUpButton = withClerk(
         forceRedirectUrl,
         signInFallbackRedirectUrl,
         signInForceRedirectUrl,
-        unsafeMetadata,
       };
 
       if (!clerk) {
@@ -34,7 +26,11 @@ export const SignUpButton = withClerk(
       }
 
       if (mode === 'modal') {
-        return clerk.openSignUp({ ...opts, appearance: props.appearance });
+        return clerk.openSignUp({
+          ...opts,
+          appearance: props.appearance,
+          unsafeMetadata: props.unsafeMetadata,
+        });
       }
 
       return clerk.redirectToSignUp({

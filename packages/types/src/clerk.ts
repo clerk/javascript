@@ -23,8 +23,8 @@ import type { ClientResource } from './client';
 import type {
   CommerceBillingNamespace,
   CommerceCheckoutResource,
+  CommercePayerType,
   CommercePlanResource,
-  CommerceSubscriberType,
   CommerceSubscriptionPlanPeriod,
   ConfirmCheckoutParams,
 } from './commerce';
@@ -1806,7 +1806,7 @@ export type __internal_CheckoutProps = {
   appearance?: CheckoutTheme;
   planId?: string;
   planPeriod?: CommerceSubscriptionPlanPeriod;
-  subscriberType?: CommerceSubscriberType;
+  subscriberType?: CommercePayerType;
   onSubscriptionComplete?: () => void;
   portalId?: string;
   portalRoot?: PortalRoot;
@@ -1843,7 +1843,7 @@ export type __internal_SubscriptionDetailsProps = {
    * If `org` is provided, the subscription details will be displayed for the active organization.
    * @default 'user'
    */
-  for?: CommerceSubscriberType;
+  for?: CommercePayerType;
   appearance?: SubscriptionDetailsTheme;
   onSubscriptionCancel?: () => void;
   portalId?: string;
@@ -1900,18 +1900,22 @@ export interface HandleEmailLinkVerificationParams {
   onVerifiedOnOtherDevice?: () => void;
 }
 
-type ButtonPropsModal<T extends SignInProps | SignUpProps> = {
+type SignInButtonPropsModal = {
   mode: 'modal';
-  appearance?: T['appearance'];
+  appearance?: SignInProps['appearance'];
+};
+
+type SignUpButtonPropsModal = {
+  mode: 'modal';
+  appearance?: SignUpProps['appearance'];
+  unsafeMetadata?: SignUpUnsafeMetadata;
 };
 
 type ButtonPropsRedirect = {
   mode?: 'redirect';
 };
 
-type ButtonProps<T extends SignInProps | SignUpProps> = ButtonPropsModal<T> | ButtonPropsRedirect;
-
-export type SignInButtonProps = ButtonProps<SignInProps> &
+export type SignInButtonProps = (SignInButtonPropsModal | ButtonPropsRedirect) &
   Pick<
     SignInProps,
     | 'fallbackRedirectUrl'
@@ -1923,9 +1927,7 @@ export type SignInButtonProps = ButtonProps<SignInProps> &
     | 'oauthFlow'
   >;
 
-export type SignUpButtonProps = {
-  unsafeMetadata?: SignUpUnsafeMetadata;
-} & ButtonProps<SignUpProps> &
+export type SignUpButtonProps = (SignUpButtonPropsModal | ButtonPropsRedirect) &
   Pick<
     SignUpProps,
     | 'fallbackRedirectUrl'

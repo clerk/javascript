@@ -1,5 +1,28 @@
 # @clerk/tanstack-react-start
 
+## 0.21.0
+
+### Minor Changes
+
+- - Fixes serialization errors during handshake ([#6345](https://github.com/clerk/javascript/pull/6345)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  - Bump `@tanstack/react-start` and `@tanstack/react-router` peer dependency to 1.127.0
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/clerk-react@5.35.3
+
+## 0.20.4
+
+### Patch Changes
+
+- Updated dependencies [[`d2f6f9e`](https://github.com/clerk/javascript/commit/d2f6f9e02036a4288916fcce14f24be5d56561c4), [`a329836`](https://github.com/clerk/javascript/commit/a329836a6c64f0a551a277ccae07043456a70523), [`5fbf8df`](https://github.com/clerk/javascript/commit/5fbf8df84b6d47082a76047451274790b8579b2d), [`6041c39`](https://github.com/clerk/javascript/commit/6041c39a31e787a6065dbc3f21e1c569982a06de), [`3f1270d`](https://github.com/clerk/javascript/commit/3f1270db86a21ead0ed6f0bd4f9986485203e973), [`1d9c409`](https://github.com/clerk/javascript/commit/1d9c409d10cc88667e354664d66c5f74b8bf4ca7), [`df49349`](https://github.com/clerk/javascript/commit/df4934983ee60246cd9df217afd7384aad556387)]:
+  - @clerk/clerk-react@5.35.3
+  - @clerk/types@4.68.0
+  - @clerk/shared@3.13.0
+  - @clerk/backend@2.5.0
+
 ## 0.20.3
 
 ### Patch Changes
