@@ -7,7 +7,7 @@ import { OrganizationPreview } from '@/ui/elements/OrganizationPreview';
 import { PersonalWorkspacePreview } from '@/ui/elements/PersonalWorkspacePreview';
 
 import { useOrganizationListContext } from '../../contexts';
-import { SessionTasksContext } from '../../contexts/components/SessionTasks';
+import { CurrentTaskContext } from '../../contexts/components/CurrentTask';
 import { localizationKeys } from '../../localization';
 import { OrganizationListPreviewButton, sharedMainIdentifierSx } from './shared';
 
@@ -15,7 +15,7 @@ export const MembershipPreview = withCardStateProvider((props: { organization: O
   const card = useCardState();
   const { navigateAfterSelectOrganization } = useOrganizationListContext();
   const { isLoaded, setActive } = useOrganizationList();
-  const sessionTasksContext = useContext(SessionTasksContext);
+  const sessionTasksContext = useContext(CurrentTaskContext);
 
   if (!isLoaded) {
     return null;

@@ -2,7 +2,7 @@ import { useOrganization, useOrganizationList } from '@clerk/shared/react';
 import type { CreateOrganizationParams, OrganizationResource } from '@clerk/types';
 import React, { useContext } from 'react';
 
-import { SessionTasksContext } from '@/ui/contexts/components/SessionTasks';
+import { CurrentTaskContext } from '@/ui/contexts/components/CurrentTask';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Form } from '@/ui/elements/Form';
 import { FormButtonContainer } from '@/ui/elements/FormButtons';
@@ -40,7 +40,7 @@ type CreateOrganizationFormProps = {
 export const CreateOrganizationForm = withCardStateProvider((props: CreateOrganizationFormProps) => {
   const card = useCardState();
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
-  const sessionTasksContext = useContext(SessionTasksContext);
+  const sessionTasksContext = useContext(CurrentTaskContext);
 
   const lastCreatedOrganizationRef = React.useRef<OrganizationResource | null>(null);
   const { createOrganization, isLoaded, setActive, userMemberships } = useOrganizationList({

@@ -8,14 +8,14 @@ import { LoadingCardContainer } from '@/ui/elements/LoadingCard';
 
 import { SESSION_TASK_ROUTE_BY_KEY } from '../../../core/sessionTasks';
 import { SignInContext, SignUpContext } from '../../../ui/contexts';
-import { SessionTasksContext, useSessionTasksContext } from '../../contexts/components/SessionTasks';
+import { CurrentTaskContext, useCurrentTaskContext } from '../../contexts/components/CurrentTask';
 import { Route, Switch, useRouter } from '../../router';
 import { ForceOrganizationSelectionTask } from './tasks/ForceOrganizationSelection';
 
 const SessionTasksStart = () => {
   const clerk = useClerk();
   const { navigate } = useRouter();
-  const { redirectUrlComplete } = useSessionTasksContext();
+  const { redirectUrlComplete } = useCurrentTaskContext();
 
   useEffect(() => {
     // Simulates additional latency to avoid a abrupt UI transition when navigating to the next task
@@ -48,9 +48,6 @@ function SessionTaskRoutes(): JSX.Element {
   );
 }
 
-/**
- * @internal
- */
 export const SessionTask = withCardStateProvider(() => {
   const clerk = useClerk();
   const { navigate } = useRouter();
@@ -105,8 +102,8 @@ export const SessionTask = withCardStateProvider(() => {
   }
 
   return (
-    <SessionTasksContext.Provider value={{ nextTask, redirectUrlComplete, currentTaskContainer }}>
+    <CurrentTaskContext.Provider value={{ nextTask, redirectUrlComplete, currentTaskContainer }}>
       <SessionTaskRoutes />
-    </SessionTasksContext.Provider>
+    </CurrentTaskContext.Provider>
   );
 });

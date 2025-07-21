@@ -3,7 +3,7 @@ import type { PropsWithChildren } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
 import { OrganizationListContext } from '@/ui/contexts';
-import { useSessionTasksContext } from '@/ui/contexts/components/SessionTasks';
+import { useCurrentTaskContext } from '@/ui/contexts/components/CurrentTask';
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 
@@ -104,7 +104,7 @@ const CreateOrganizationPage = ({ currentFlow }: CommonPageProps) => {
 
 const FlowCard = ({ children }: PropsWithChildren) => {
   const card = useCardState();
-  const { currentTaskContainer } = useSessionTasksContext();
+  const { currentTaskContainer } = useCurrentTaskContext();
 
   return (
     <Card.Root ref={currentTaskContainer}>
