@@ -105,6 +105,7 @@ type IsomorphicLoadedClerk = Without<
   | 'apiKeys'
   | '__internal_setComponentNavigationContext'
   | '__internal_setActiveInProgress'
+  | '__internal_hasAfterAuthFlows'
 > & {
   client: ClientResource | undefined;
   billing: CommerceBillingNamespace | undefined;
