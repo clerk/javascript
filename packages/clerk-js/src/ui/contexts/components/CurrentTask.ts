@@ -8,8 +8,8 @@ import { useSignUpContext } from './SignUp';
 export const CurrentTaskContext = createContext<CurrentTaskCtx | null>(null);
 
 export type CurrentTaskContextType = CurrentTaskCtx & {
-  nextTask: (opts?: { redirectUrlComplete?: string }) => Promise<void>;
   currentTaskContainer: React.RefObject<HTMLDivElement>;
+  navigateToTaskIfAvailable: () => Promise<void>;
 };
 
 export const useCurrentTaskContext = (): CurrentTaskContextType => {
@@ -19,11 +19,11 @@ export const useCurrentTaskContext = (): CurrentTaskContextType => {
   const signUpCtx = useSignUpContext();
   const currentTaskContainer = useRef<HTMLDivElement>(null);
 
-  const defaultRedirectUrlComplete = signInCtx.afterSignInUrl ?? signUpCtx.afterSignUpUrl;
+  const redirectUrlComplete = ctx?.redirectUrlComplete ?? signInCtx.afterSignInUrl ?? signUpCtx.afterSignUpUrl;
 
-  const nextTask = ({ redirectUrlComplete }: { redirectUrlComplete?: string } = {}) => {
+  const navigateToTaskIfAvailable = () => {
     return clerk.__internal_navigateToTaskIfAvailable({
-      redirectUrlComplete: redirectUrlComplete ?? defaultRedirectUrlComplete,
+      redirectUrlComplete,
     });
   };
 
@@ -33,7 +33,8 @@ export const useCurrentTaskContext = (): CurrentTaskContextType => {
 
   return {
     ...ctx,
-    nextTask,
     currentTaskContainer,
+    redirectUrlComplete,
+    navigateToTaskIfAvailable,
   };
 };

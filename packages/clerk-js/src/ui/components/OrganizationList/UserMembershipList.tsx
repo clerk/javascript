@@ -25,8 +25,8 @@ export const MembershipPreview = withCardStateProvider((props: { organization: O
         organization,
       });
 
-      if (currentTaskCtx?.nextTask) {
-        return currentTaskCtx?.nextTask();
+      if (currentTaskCtx) {
+        return currentTaskCtx?.navigateToTaskIfAvailable();
       }
 
       await navigateAfterSelectOrganization(organization);

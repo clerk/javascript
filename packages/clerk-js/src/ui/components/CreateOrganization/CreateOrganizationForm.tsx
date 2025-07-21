@@ -92,7 +92,7 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
       void userMemberships.revalidate?.();
 
       if (currentTaskCtx) {
-        await currentTaskCtx.nextTask();
+        await currentTaskCtx.navigateToTaskIfAvailable();
         return;
       }
 
