@@ -53,13 +53,24 @@
         "default": "./dist/errors.js"
       }
     },
+    "./experimental": {
+      "import": {
+        "types": "./dist/experimental.d.mts",
+        "default": "./dist/experimental.mjs"
+      },
+      "require": {
+        "types": "./dist/experimental.d.ts",
+        "default": "./dist/experimental.js"
+      }
+    },
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
   "files": [
     "dist",
     "internal",
-    "errors"
+    "errors",
+    "experimental"
   ],
   "scripts": {
     "build": "tsup",

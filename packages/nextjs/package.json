@@ -49,6 +49,11 @@
       "types": "./dist/types/webhooks.d.ts",
       "import": "./dist/esm/webhooks.js",
       "require": "./dist/cjs/webhooks.js"
+    },
+    "./experimental": {
+      "types": "./dist/types/experimental.d.ts",
+      "import": "./dist/esm/experimental.js",
+      "require": "./dist/cjs/experimental.js"
     }
   },
   "types": "./dist/types/index.d.ts",
