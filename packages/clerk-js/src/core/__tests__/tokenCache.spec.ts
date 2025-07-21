@@ -1,5 +1,5 @@
 import type { TokenResource } from '@clerk/types';
-import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { Token } from '../resources/internal';
 import { SessionTokenCache } from '../tokenCache';
@@ -189,12 +189,18 @@ describe('MemoryTokenCache', () => {
   });
 
   describe('dynamic TTL calculation', () => {
+    let dateNowSpy: ReturnType<typeof vi.spyOn>;
+
+    afterEach(() => {
+      dateNowSpy.mockRestore();
+    });
+
     it('calculates expiresIn from JWT exp and iat claims and sets timeout based on calculated TTL', async () => {
       const cache = SessionTokenCache;
 
       // Mock Date.now to return a fixed timestamp initially
       const initialTime = 1675876730000; // Same as our JWT's iat in milliseconds
-      vi.spyOn(Date, 'now').mockImplementation(() => initialTime);
+      dateNowSpy = vi.spyOn(Date, 'now').mockImplementation(() => initialTime);
 
       // Test with a 30-second TTL
       const shortTtlJwt = createJwtWithTtl(30);
@@ -215,7 +221,7 @@ describe('MemoryTokenCache', () => {
       // Advance both the timer and the mocked current time
       const advanceBy = 31 * 1000;
       vi.advanceTimersByTime(advanceBy);
-      vi.spyOn(Date, 'now').mockImplementation(() => initialTime + advanceBy);
+      dateNowSpy.mockImplementation(() => initialTime + advanceBy);
 
       const cachedEntry2 = cache.get(shortTtlKey);
       expect(cachedEntry2).toBeUndefined();
@@ -226,7 +232,7 @@ describe('MemoryTokenCache', () => {
 
       // Mock Date.now to return a fixed timestamp initially
       const initialTime = 1675876730000; // Same as our JWT's iat in milliseconds
-      vi.spyOn(Date, 'now').mockImplementation(() => initialTime);
+      dateNowSpy = vi.spyOn(Date, 'now').mockImplementation(() => initialTime);
 
       // Test with a 120-second TTL
       const longTtlJwt = createJwtWithTtl(120);
@@ -248,7 +254,7 @@ describe('MemoryTokenCache', () => {
       // Advance 90 seconds - token should still be cached
       const firstAdvance = 90 * 1000;
       vi.advanceTimersByTime(firstAdvance);
-      vi.spyOn(Date, 'now').mockImplementation(() => initialTime + firstAdvance);
+      dateNowSpy.mockImplementation(() => initialTime + firstAdvance);
 
       const cachedEntryAfter90s = cache.get(longTtlKey);
       expect(cachedEntryAfter90s).toMatchObject(longTtlKey);
@@ -256,7 +262,7 @@ describe('MemoryTokenCache', () => {
       // Advance to 121 seconds - token should be removed
       const secondAdvance = 31 * 1000;
       vi.advanceTimersByTime(secondAdvance);
-      vi.spyOn(Date, 'now').mockImplementation(() => initialTime + firstAdvance + secondAdvance);
+      dateNowSpy.mockImplementation(() => initialTime + firstAdvance + secondAdvance);
 
       const cachedEntryAfter121s = cache.get(longTtlKey);
       expect(cachedEntryAfter121s).toBeUndefined();
