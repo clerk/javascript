@@ -779,7 +779,7 @@ export interface CommercePayeeJSON {
   id: string;
   gateway_type: string;
   gateway_external_id: string;
-  gateway_status: string;
+  gateway_status: 'active' | 'pending' | 'restricted' | 'disconnected';
 }
 
 export interface CommerceAmountJSON {
@@ -801,7 +801,7 @@ export interface CommercePaymentSourceJSON {
   gateway_external_id: string;
   gateway_external_account_id?: string;
   payment_method: string;
-  status: string;
+  status: 'active' | 'disconnected';
   card_type?: string;
   last4?: string;
 }
@@ -829,7 +829,7 @@ export interface CommercePlanJSON {
   is_recurring: boolean;
   is_prorated: boolean;
   amount: number;
-  period: string;
+  period: 'month' | 'annual';
   interval: number;
   has_base_fee: boolean;
   currency: string;
@@ -839,10 +839,10 @@ export interface CommercePlanJSON {
 
 export interface CommerceSubscriptionItemJSON extends ClerkResourceJSON {
   object: typeof ObjectType.CommerceSubscriptionItem;
-  status: string;
+  status: 'abandoned' | 'active' | 'canceled' | 'ended' | 'expired' | 'incomplete' | 'past_due' | 'upcoming';
   credit: CommerceSubscriptionCreditJSON;
   proration_date: string;
-  plan_period: string;
+  plan_period: 'month' | 'annual';
   period_start?: number;
   period_end?: number;
   canceled_at?: number;
@@ -861,14 +861,14 @@ export interface CommercePaymentAttemptJSON extends ClerkResourceJSON {
   payment_id: string;
   statement_id: string;
   gateway_external_id: string;
-  status: string;
+  status: 'pending' | 'paid' | 'failed';
   created_at: number;
   updated_at: number;
   paid_at?: number;
   failed_at?: number;
   failed_reason?: CommercePaymentFailedReasonJSON;
   billing_date: number;
-  charge_type: string;
+  charge_type: 'checkout' | 'recurring';
   payee: CommercePayeeJSON;
   payer: CommercePayerJSON;
   totals: CommerceTotalsJSON;
@@ -878,7 +878,7 @@ export interface CommercePaymentAttemptJSON extends ClerkResourceJSON {
 
 export interface CommerceSubscriptionJSON extends ClerkResourceJSON {
   object: typeof ObjectType.CommerceSubscription;
-  status: string;
+  status: 'abandoned' | 'active' | 'canceled' | 'ended' | 'expired' | 'incomplete' | 'past_due' | 'upcoming';
   active_at?: number;
   canceled_at?: number;
   created_at: number;
