@@ -1,5 +1,5 @@
-import { useEnvironment } from '../contexts';
 import { useFetch } from '.';
+import { useEnvironment } from '../contexts';
 
 /**
  * Preloads tasks based on the environment settings
@@ -11,7 +11,7 @@ export function usePreloadTasks() {
   const hasTasks = organizationSettings.forceOrganizationSelection;
 
   void useFetch(
-    hasTasks ? () => import(/* webpackChunkName: "sessionTasks" */ '../components/SessionTasks') : undefined,
+    hasTasks ? () => import(/* webpackChunkName: "sessionTasks" */ '../components/CurrentTask') : undefined,
     'preloadComponent',
     {
       staleTime: Infinity,

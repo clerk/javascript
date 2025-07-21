@@ -1,8 +1,8 @@
 import { createContext, useContext } from 'react';
 
-import type { SessionTasksCtx } from '../../types';
+import type { CurrentTaskCtx } from '../../types';
 
-export const CurrentTaskContext = createContext<SessionTasksCtx | null>(null);
+export const CurrentTaskContext = createContext<CurrentTaskCtx | null>(null);
 
 export const useCurrentTaskContext = () => {
   const context = useContext(CurrentTaskContext);

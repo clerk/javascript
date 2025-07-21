@@ -7,7 +7,7 @@ import { withCardStateProvider } from '@/ui/elements/contexts';
 import { LoadingCardContainer } from '@/ui/elements/LoadingCard';
 
 import { SESSION_TASK_ROUTE_BY_KEY } from '../../../core/sessionTasks';
-import { SignInContext, SignUpContext } from '../../../ui/contexts';
+import { SignInContext, SignUpContext } from '../../contexts';
 import { CurrentTaskContext, useCurrentTaskContext } from '../../contexts/components/CurrentTask';
 import { Route, Switch, useRouter } from '../../router';
 import { ForceOrganizationSelectionTask } from './tasks/ForceOrganizationSelection';
