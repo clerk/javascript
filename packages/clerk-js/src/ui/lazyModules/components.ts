@@ -149,6 +149,7 @@ export const ClerkComponents = {
   APIKeys,
   OAuthConsent,
   SubscriptionDetails,
+  CurrentTask,
 };
 
 export type ClerkComponentName = keyof typeof ClerkComponents;

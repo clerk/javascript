@@ -1163,6 +1163,29 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls.ensureMounted().then(controls => controls.unmountComponent({ node }));
   };
 
+  public mountCurrentTask = (node: HTMLDivElement): void => {
+    this.assertComponentsReady(this.#componentControls);
+
+    void this.#componentControls.ensureMounted({ preloadHint: 'CurrentTask' }).then(controls =>
+      controls.mountComponent({
+        name: 'CurrentTask',
+        appearanceKey: 'currentTask',
+        node,
+      }),
+    );
+
+    this.telemetry?.record(eventPrebuiltComponentMounted('CurrentTask'));
+  };
+
+  public unmountCurrentTask = (node: HTMLDivElement): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted().then(controls =>
+      controls.unmountComponent({
+        node,
+      }),
+    );
+  };
+
   /**
    * `setActive` can be used to set the active session and/or organization.
    */

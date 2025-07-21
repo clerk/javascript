@@ -1028,4 +1028,8 @@ export type Appearance<T = Theme> = T &
      * Theme overrides that only apply to the `<OAuthConsent />` component
      */
     __internal_oauthConsent?: T;
+    /**
+     * Theme overrides that only apply to the `<CurrentTask />` component
+     */
+    currentTask?: T;
   };
