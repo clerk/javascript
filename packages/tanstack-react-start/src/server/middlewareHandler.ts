@@ -2,6 +2,7 @@ import type { AnyRouter } from '@tanstack/react-router';
 import type { CustomizeStartHandler, HandlerCallback, RequestHandler } from '@tanstack/react-start/server';
 
 import { authenticateRequest } from './authenticateRequest';
+import { ClerkHandshakeRedirect } from './errors';
 import { loadOptions } from './loadOptions';
 import type { LoaderOptions } from './types';
 import { getResponseClerkState } from './utils';
@@ -33,9 +34,12 @@ export function createClerkHandler<TRouter extends AnyRouter>(
 
         await router.load();
       } catch (error) {
-        if (error instanceof Response) {
+        if (error instanceof ClerkHandshakeRedirect) {
           // returning the response
-          return error;
+          return new Response(null, {
+            status: error.status,
+            headers: error.headers,
+          });
         }
 
         // rethrowing the error if it is not a Response

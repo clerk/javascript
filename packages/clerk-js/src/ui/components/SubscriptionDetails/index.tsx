@@ -29,6 +29,7 @@ import {
   Col,
   descriptors,
   Flex,
+  Flow,
   Heading,
   localizationKeys,
   Spinner,
@@ -54,13 +55,17 @@ const SubscriptionForCancellationContext = React.createContext<{
 
 export const SubscriptionDetails = (props: __internal_SubscriptionDetailsProps) => {
   return (
-    <Drawer.Content>
-      <SubscriptionDetailsContext.Provider value={{ componentName: 'SubscriptionDetails', ...props }}>
-        <SubscriberTypeContext.Provider value={props.for}>
-          <SubscriptionDetailsInternal {...props} />
-        </SubscriberTypeContext.Provider>
-      </SubscriptionDetailsContext.Provider>
-    </Drawer.Content>
+    <Flow.Root flow='subscriptionDetails'>
+      <Flow.Part>
+        <Drawer.Content>
+          <SubscriptionDetailsContext.Provider value={{ componentName: 'SubscriptionDetails', ...props }}>
+            <SubscriberTypeContext.Provider value={props.for}>
+              <SubscriptionDetailsInternal {...props} />
+            </SubscriberTypeContext.Provider>
+          </SubscriptionDetailsContext.Provider>
+        </Drawer.Content>
+      </Flow.Part>
+    </Flow.Root>
   );
 };
 

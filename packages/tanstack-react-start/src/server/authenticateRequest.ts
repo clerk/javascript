@@ -4,6 +4,7 @@ import { AuthStatus, constants } from '@clerk/backend/internal';
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
 
 import { errorThrower } from '../utils';
+import { ClerkHandshakeRedirect } from './errors';
 import { patchRequest } from './utils';
 
 export async function authenticateRequest(
@@ -41,9 +42,9 @@ export async function authenticateRequest(
       requestStateHeaders: requestState.headers,
       publishableKey: requestState.publishableKey,
     });
+
     // triggering a handshake redirect
-    // eslint-disable-next-line @typescript-eslint/only-throw-error
-    throw new Response(null, { status: 307, headers: requestState.headers });
+    throw new ClerkHandshakeRedirect(307, requestState.headers);
   }
 
   if (requestState.status === AuthStatus.Handshake) {

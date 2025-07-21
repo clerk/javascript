@@ -111,8 +111,8 @@ export class CommerceSubscriptionItem extends BaseResource implements CommerceSu
     const json = (
       await BaseResource._fetch({
         path: orgId
-          ? `/organizations/${orgId}/commerce/subscriptions/${this.id}`
-          : `/me/commerce/subscriptions/${this.id}`,
+          ? `/organizations/${orgId}/commerce/subscription_items/${this.id}`
+          : `/me/commerce/subscription_items/${this.id}`,
         method: 'DELETE',
       })
     )?.response as unknown as DeletedObjectJSON;

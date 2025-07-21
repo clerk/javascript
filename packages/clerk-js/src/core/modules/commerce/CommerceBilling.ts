@@ -6,7 +6,6 @@ import type {
   CommercePaymentResource,
   CommercePlanJSON,
   CommercePlanResource,
-  CommerceProductJSON,
   CommerceStatementJSON,
   CommerceStatementResource,
   CommerceSubscriptionItemJSON,
@@ -33,15 +32,21 @@ import {
 } from '../../resources/internal';
 
 export class CommerceBilling implements CommerceBillingNamespace {
-  getPlans = async (params?: GetPlansParams): Promise<CommercePlanResource[]> => {
-    const { data: products } = (await BaseResource._fetch({
-      path: `/commerce/products`,
+  getPlans = async (params?: GetPlansParams): Promise<ClerkPaginatedResponse<CommercePlanResource>> => {
+    const { for: forParam, ...safeParams } = params || {};
+    const searchParams = { ...safeParams, payer_type: forParam || 'user' };
+    return await BaseResource._fetch({
+      path: `/commerce/plans`,
       method: 'GET',
-      search: { payerType: params?.subscriberType || '' },
-    })) as unknown as ClerkPaginatedResponse<CommerceProductJSON>;
+      search: convertPageToOffsetSearchParams(searchParams),
+    }).then(res => {
+      const { data: plans, total_count } = res as unknown as ClerkPaginatedResponse<CommercePlanJSON>;
 
-    const defaultProduct = products.find(product => product.is_default);
-    return defaultProduct?.plans.map(plan => new CommercePlan(plan)) || [];
+      return {
+        total_count,
+        data: plans.map(plan => new CommercePlan(plan)),
+      };
+    });
   };
 
   // Inconsistent API
