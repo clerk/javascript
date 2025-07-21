@@ -1,6 +1,6 @@
 /**
  * The `TelemetryCollector` class handles collection of telemetry events from Clerk SDKs. Telemetry is opt-out and can be disabled by setting a CLERK_TELEMETRY_DISABLED environment variable.
- * The `ClerkProvider` also accepts a `telemetry` prop that will be passed to the collector during initialization:
+ * The `ClerkProvider` also accepts a `telemetry` prop that will be passed to the collector during initialization:.
  *
  * ```jsx
  * <ClerkProvider telemetry={false}>
@@ -8,10 +8,11 @@
  * </ClerkProvider>
  * ```
  *
- * For more information, please see the telemetry documentation page: https://clerk.com/docs/telemetry
+ * For more information, please see the telemetry documentation page: https://clerk.com/docs/telemetry.
  */
 import type {
   InstanceType,
+  SDKMetadata,
   TelemetryCollector as TelemetryCollectorInterface,
   TelemetryEvent,
   TelemetryEventRaw,
@@ -23,30 +24,21 @@ import { TelemetryEventThrottler } from './throttler';
 import type { TelemetryCollectorOptions } from './types';
 
 /**
- * Interface describing the expected structure of window.Clerk
+ * Local interface for window.Clerk to avoid global type pollution.
+ * This is only used within this module and doesn't affect other packages.
  */
-interface WindowClerk {
-  constructor: {
-    sdkMetadata?: {
-      name?: string;
-      version?: string;
+interface WindowWithClerk extends Window {
+  Clerk?: {
+    constructor?: {
+      sdkMetadata?: SDKMetadata;
     };
   };
 }
 
 /**
- * Extend the Window interface to include the Clerk property
+ * Type guard to check if window.Clerk exists and has the expected structure.
  */
-declare global {
-  interface Window {
-    Clerk?: WindowClerk;
-  }
-}
-
-/**
- * Type guard to check if window.Clerk exists and has the expected structure
- */
-function isWindowClerkWithMetadata(clerk: unknown): clerk is WindowClerk {
+function isWindowClerkWithMetadata(clerk: unknown): clerk is { constructor: { sdkMetadata?: SDKMetadata } } {
   return (
     typeof clerk === 'object' &&
     clerk !== null &&
@@ -270,18 +262,22 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
       version: this.#metadata.sdkVersion,
     };
 
-    if (typeof window !== 'undefined' && window.Clerk) {
-      const windowClerk = window.Clerk;
+    if (typeof window !== 'undefined') {
+      const windowWithClerk = window as WindowWithClerk;
 
-      if (isWindowClerkWithMetadata(windowClerk) && windowClerk.constructor.sdkMetadata) {
-        const { name, version } = windowClerk.constructor.sdkMetadata;
+      if (windowWithClerk.Clerk) {
+        const windowClerk = windowWithClerk.Clerk;
 
-        // Only update properties if they exist to avoid overwriting with undefined
-        if (name !== undefined) {
-          sdkMetadata.name = name;
-        }
-        if (version !== undefined) {
-          sdkMetadata.version = version;
+        if (isWindowClerkWithMetadata(windowClerk) && windowClerk.constructor.sdkMetadata) {
+          const { name, version } = windowClerk.constructor.sdkMetadata;
+
+          // Only update properties if they exist to avoid overwriting with undefined
+          if (name !== undefined) {
+            sdkMetadata.name = name;
+          }
+          if (version !== undefined) {
+            sdkMetadata.version = version;
+          }
         }
       }
     }
