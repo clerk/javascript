@@ -18,10 +18,10 @@ export const itIT: LocalizationResource = {
     action__add: 'Aggiungi nuova chiave',
     action__search: 'Cerca chiavi',
     createdAndExpirationStatus__expiresOn:
-    "Creata {{ createdDate | shortDate('it-IT') }} • Scadenza {{ expiresDate | longDate('it-IT') }}",
+      "Creata {{ createdDate | shortDate('it-IT') }} • Scadenza {{ expiresDate | longDate('it-IT') }}",
     createdAndExpirationStatus__never: "Creata {{ createdDate | shortDate('it-IT') }} • Nessuna scadenza",
-    detailsTitle__emptyRow: "Nessuna chiave API trovata",
-    formButtonPrimary__add: "Crea chiave",
+    detailsTitle__emptyRow: 'Nessuna chiave API trovata',
+    formButtonPrimary__add: 'Crea chiave',
     formFieldCaption__expiration__expiresOn: 'Scadenza {{ date }}',
     formFieldCaption__expiration__never: 'Questa chiave non ha scadenza',
     formFieldOption__expiration__180d: '180 Giorni',
@@ -57,14 +57,14 @@ export const itIT: LocalizationResource = {
   badge__expired: 'Scaduto',
   badge__otherImpersonatorDevice: 'Altro dispositivo impersonato',
   badge__pastDueAt: "Scaduto {{ date | shortDate('it-IT') }}",
-  badge__pastDuePlan: "Scaduto",
+  badge__pastDuePlan: 'Scaduto',
   badge__primary: 'Primario',
   badge__renewsAt: "Si rinnova {{ date | shortDate('it-IT') }}",
   badge__requiresAction: 'Richiede azione',
   badge__startsAt: "Inizia {{ date | shortDate('it-IT') }}",
   badge__thisDevice: 'Questo dispositivo',
   badge__unverified: 'Non verificato',
-  badge__upcomingPlan: "In arrivo",
+  badge__upcomingPlan: 'In arrivo',
   badge__userDevice: 'Dispositivo utente',
   badge__you: 'Tu',
   commerce: {
@@ -89,7 +89,8 @@ export const itIT: LocalizationResource = {
       downgradeNotice:
         'Manterrai il tuo abbonamento attuale e le sue funzionalità fino alla fine del ciclo di fatturazione, quindi passerai a questo abbonamento.',
       emailForm: {
-        subtitle: 'Prima di completare l\'acquisto devi aggiungere un indirizzo email a cui verranno inviate le ricevute.',
+        subtitle:
+          "Prima di completare l'acquisto devi aggiungere un indirizzo email a cui verranno inviate le ricevute.",
         title: 'Aggiungi un indirizzo email',
       },
       lineItems: {
@@ -177,7 +178,7 @@ export const itIT: LocalizationResource = {
     sameDay: "Oggi alle {{ date | timeString('it-IT') }}",
   },
   dividerText: 'oppure',
-  footerActionLink__alternativePhoneCodeProvider: "Alrimenti invia codice tramite SMS",
+  footerActionLink__alternativePhoneCodeProvider: 'Alrimenti invia codice tramite SMS',
   footerActionLink__useAnotherMethod: 'Utilizzo un altro metodo',
   footerPageLink__help: 'Aiuto',
   footerPageLink__privacy: 'Privacy',
@@ -191,14 +192,14 @@ export const itIT: LocalizationResource = {
   formFieldHintText__optional: 'Opzionale',
   formFieldHintText__slug:
     'Uno slug è un identificativo leggibile dall’uomo che deve essere univoco. Spesso viene usato negli URL.',
-  formFieldInputPlaceholder__apiKeyDescription: "Spiega come mai stai generando questa chiave API",
-  formFieldInputPlaceholder__apiKeyExpirationDate: "Seleziona una data",
-  formFieldInputPlaceholder__apiKeyName: "Inserisci il nome della tua chiave segreta",
+  formFieldInputPlaceholder__apiKeyDescription: 'Spiega come mai stai generando questa chiave API',
+  formFieldInputPlaceholder__apiKeyExpirationDate: 'Seleziona una data',
+  formFieldInputPlaceholder__apiKeyName: 'Inserisci il nome della tua chiave segreta',
   formFieldInputPlaceholder__backupCode: 'Inserisci il codice di backup',
-  formFieldInputPlaceholder__confirmDeletionUserAccount: "Elimina Account",
+  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Elimina Account',
   formFieldInputPlaceholder__emailAddress: "Inserisci l'indirizzo email",
   formFieldInputPlaceholder__emailAddress_username: "Inserisci l'indirizzo email o il nome utente",
-  formFieldInputPlaceholder__emailAddresses: "esempio@email.com, esempio2@email.com",
+  formFieldInputPlaceholder__emailAddresses: 'esempio@email.com, esempio2@email.com',
   formFieldInputPlaceholder__firstName: 'Inserisci il tuo nome',
   formFieldInputPlaceholder__lastName: 'Inserisci il tuo cognome',
   formFieldInputPlaceholder__organizationDomain: "Inserisci il dominio dell'organizzazione",
@@ -209,9 +210,9 @@ export const itIT: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Inserisci la tua password',
   formFieldInputPlaceholder__phoneNumber: 'Inserisci il numero di telefono',
   formFieldInputPlaceholder__username: 'Inserisci il nome utente',
-  formFieldLabel__apiKeyDescription: "Descrizione",
-  formFieldLabel__apiKeyExpiration: "Scadenza",
-  formFieldLabel__apiKeyName: "Nome chiave segreta",
+  formFieldLabel__apiKeyDescription: 'Descrizione',
+  formFieldLabel__apiKeyExpiration: 'Scadenza',
+  formFieldLabel__apiKeyName: 'Nome chiave segreta',
   formFieldLabel__automaticInvitations: 'Abilita inviti automatici per questo dominio',
   formFieldLabel__backupCode: 'Codice di backup',
   formFieldLabel__confirmDeletion: 'Conferma',
@@ -257,7 +258,7 @@ export const itIT: LocalizationResource = {
   },
   organizationProfile: {
     apiKeysPage: {
-      title: "Chiavi API",
+      title: 'Chiavi API',
     },
     badge__automaticInvitation: 'Inviti automatici',
     badge__automaticSuggestion: 'Suggerimenti automatici',
@@ -298,7 +299,7 @@ export const itIT: LocalizationResource = {
       statementsSection: {
         empty: 'Nessun estratto conto da visualizzare',
         itemCaption__paidForPlan: 'Pagato per il piano {{plan}} {{period}}',
-        itemCaption__proratedCredit: 'Credito proporzionale per l\'utilizzo parziale dell\'abbonamento precedente',
+        itemCaption__proratedCredit: "Credito proporzionale per l'utilizzo parziale dell'abbonamento precedente",
         itemCaption__subscribedAndPaidForPlan: 'Abbonato e pagato per il piano {{plan}} {{period}}',
         notFound: 'Estratto conto non trovato',
         tableHeader__amount: 'Importo',
@@ -378,8 +379,8 @@ export const itIT: LocalizationResource = {
       },
     },
     navbar: {
-      apiKeys: "Chiavi API",
-      billing: "Fatturazione",
+      apiKeys: 'Chiavi API',
+      billing: 'Fatturazione',
       description: 'Gestisci la tua organizzazione.',
       general: 'Generale',
       members: 'Membri',
@@ -387,9 +388,9 @@ export const itIT: LocalizationResource = {
     },
     plansPage: {
       alerts: {
-        noPermissionsToManageBilling: "Non hai i permessi per gestire la fatturazione di questa organizzazione",
+        noPermissionsToManageBilling: 'Non hai i permessi per gestire la fatturazione di questa organizzazione',
       },
-      title: "Piani",
+      title: 'Piani',
     },
     profilePage: {
       dangerSection: {
@@ -950,7 +951,7 @@ export const itIT: LocalizationResource = {
       statementsSection: {
         empty: 'Nessun estratto conto da visualizzare',
         itemCaption__paidForPlan: 'Pagato per il piano {{plan}} {{period}}',
-        itemCaption__proratedCredit: 'Credito proporzionale per l\'utilizzo parziale dell\'abbonamento precedente',
+        itemCaption__proratedCredit: "Credito proporzionale per l'utilizzo parziale dell'abbonamento precedente",
         itemCaption__subscribedAndPaidForPlan: 'Abbonato e pagato per il piano {{plan}} {{period}}',
         notFound: 'Estratto conto non trovato',
         tableHeader__amount: 'Importo',
