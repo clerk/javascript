@@ -485,8 +485,6 @@ export class Clerk implements ClerkInterface {
 
       // Notify other tabs that user is signing out.
       eventBus.emit(events.UserSignOut, null);
-      // Clean up cookies
-      eventBus.emit(events.TokenUpdate, { token: null });
 
       this.#setTransitiveState();
 
