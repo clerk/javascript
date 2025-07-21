@@ -40,6 +40,7 @@ import type {
   CreateOrganizationParams,
   CreateOrganizationProps,
   CredentialReturn,
+  CurrentTaskProps,
   DomainOrProxyUrl,
   EnvironmentJSON,
   EnvironmentJSONSnapshot,
@@ -1163,7 +1164,7 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls.ensureMounted().then(controls => controls.unmountComponent({ node }));
   };
 
-  public mountCurrentTask = (node: HTMLDivElement): void => {
+  public mountCurrentTask = (node: HTMLDivElement, props: CurrentTaskProps): void => {
     this.assertComponentsReady(this.#componentControls);
 
     void this.#componentControls.ensureMounted({ preloadHint: 'CurrentTask' }).then(controls =>
@@ -1171,6 +1172,7 @@ export class Clerk implements ClerkInterface {
         name: 'CurrentTask',
         appearanceKey: 'currentTask',
         node,
+        props,
       }),
     );
 

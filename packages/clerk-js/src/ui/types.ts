@@ -6,6 +6,7 @@ import type {
   __internal_UserVerificationProps,
   APIKeysProps,
   CreateOrganizationProps,
+  CurrentTaskProps,
   GoogleOneTapProps,
   NewSubscriptionRedirectUrl,
   OrganizationListProps,
@@ -53,7 +54,8 @@ export type AvailableComponentProps =
   | __internal_UserVerificationProps
   | __internal_SubscriptionDetailsProps
   | __internal_PlanDetailsProps
-  | APIKeysProps;
+  | APIKeysProps
+  | CurrentTaskProps;
 
 type ComponentMode = 'modal' | 'mounted';
 type SignInMode = 'modal' | 'redirect';
@@ -131,10 +133,8 @@ export type CheckoutCtx = __internal_CheckoutProps & {
   componentName: 'Checkout';
 } & NewSubscriptionRedirectUrl;
 
-export type CurrentTaskCtx = {
-  nextTask: () => Promise<void>;
-  redirectUrlComplete?: string;
-  currentTaskContainer: React.RefObject<HTMLDivElement> | null;
+export type CurrentTaskCtx = CurrentTaskProps & {
+  componentName: 'CurrentTask';
 };
 
 export type OAuthConsentCtx = __internal_OAuthConsentProps & {
@@ -166,5 +166,6 @@ export type AvailableComponentCtx =
   | APIKeysCtx
   | OAuthConsentCtx
   | SubscriptionDetailsCtx
-  | PlanDetailsCtx;
+  | PlanDetailsCtx
+  | CurrentTaskCtx;
 export type AvailableComponentName = AvailableComponentCtx['componentName'];

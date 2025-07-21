@@ -5,6 +5,7 @@ import type {
   Appearance,
   CheckoutTheme,
   CreateOrganizationTheme,
+  CurrentTaskTheme,
   OAuthConsentTheme,
   OrganizationListTheme,
   OrganizationProfileTheme,
@@ -1779,6 +1780,19 @@ export type APIKeysProps = {
    * @default false
    */
   showDescription?: boolean;
+};
+
+export type CurrentTaskProps = {
+  /**
+   * Full URL or path to navigate to after successfully resolving all tasks
+   */
+  redirectUrlComplete: string;
+  /**
+   * Customisation options to fully match the Clerk components to your own brand.
+   * These options serve as overrides and will be merged with the global `appearance`
+   * prop of ClerkProvider (if one is provided)
+   */
+  appearance?: CurrentTaskTheme;
 };
 
 export type GetAPIKeysParams = {

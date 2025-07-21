@@ -13,13 +13,13 @@ import {
 import { Flow } from '@/ui/customizables';
 import { useFetch } from '@/ui/hooks';
 import { usePreloadCurrentTask } from '@/ui/hooks/usePreloadCurrentTask';
-import { CurrentTask } from '@/ui/lazyModules/components';
 import { Route, Switch, useRouter, VIRTUAL_ROUTER_BASE_PATH } from '@/ui/router';
 import type { SignUpCtx } from '@/ui/types';
 import { normalizeRoutingOptions } from '@/utils/normalizeRoutingOptions';
 
 import {
   LazySignUpContinue,
+  LazySignUpCurrentTask,
   LazySignUpSSOCallback,
   LazySignUpStart,
   LazySignUpVerifyEmail,
@@ -29,6 +29,7 @@ import {
 import { ResetPassword } from './ResetPassword';
 import { ResetPasswordSuccess } from './ResetPasswordSuccess';
 import { SignInAccountSwitcher } from './SignInAccountSwitcher';
+import { SignInCurrentTask } from './SignInCurrentTask';
 import { SignInFactorOne } from './SignInFactorOne';
 import { SignInFactorTwo } from './SignInFactorTwo';
 import { SignInSSOCallback } from './SignInSSOCallback';
@@ -132,7 +133,7 @@ function SignInRoutes(): JSX.Element {
                 <LazySignUpVerifyPhone />
               </Route>
               <Route path='tasks'>
-                <CurrentTask />
+                <LazySignUpCurrentTask />
               </Route>
               <Route index>
                 <LazySignUpContinue />
@@ -144,7 +145,7 @@ function SignInRoutes(): JSX.Element {
           </Route>
         )}
         <Route path='tasks'>
-          <CurrentTask />
+          <SignInCurrentTask />
         </Route>
         <Route index>
           <SignInStart />

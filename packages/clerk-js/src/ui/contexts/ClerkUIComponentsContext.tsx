@@ -1,6 +1,7 @@
 import type {
   __internal_OAuthConsentProps,
   APIKeysProps,
+  CurrentTaskProps,
   PricingTableProps,
   UserButtonProps,
   WaitlistProps,
@@ -25,6 +26,7 @@ import {
   UserVerificationContext,
   WaitlistContext,
 } from './components';
+import { CurrentTaskContext } from './components/CurrentTask';
 
 export function ComponentContextProvider({
   componentName,
@@ -107,6 +109,12 @@ export function ComponentContextProvider({
         <OAuthConsentContext.Provider value={{ componentName, ...(props as __internal_OAuthConsentProps) }}>
           {children}
         </OAuthConsentContext.Provider>
+      );
+    case 'CurrentTask':
+      return (
+        <CurrentTaskContext.Provider value={{ componentName, ...(props as CurrentTaskProps) }}>
+          {children}
+        </CurrentTaskContext.Provider>
       );
     default:
       throw new Error(`Unknown component context: ${componentName}`);

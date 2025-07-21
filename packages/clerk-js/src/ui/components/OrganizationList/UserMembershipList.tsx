@@ -1,13 +1,12 @@
 import { useOrganizationList, useUser } from '@clerk/shared/react';
 import type { OrganizationResource } from '@clerk/types';
-import { useContext } from 'react';
 
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { OrganizationPreview } from '@/ui/elements/OrganizationPreview';
 import { PersonalWorkspacePreview } from '@/ui/elements/PersonalWorkspacePreview';
 
 import { useOrganizationListContext } from '../../contexts';
-import { CurrentTaskContext } from '../../contexts/components/CurrentTask';
+import { useCurrentTaskContext } from '../../contexts/components/CurrentTask';
 import { localizationKeys } from '../../localization';
 import { OrganizationListPreviewButton, sharedMainIdentifierSx } from './shared';
 
@@ -15,7 +14,7 @@ export const MembershipPreview = withCardStateProvider((props: { organization: O
   const card = useCardState();
   const { navigateAfterSelectOrganization } = useOrganizationListContext();
   const { isLoaded, setActive } = useOrganizationList();
-  const sessionTasksContext = useContext(CurrentTaskContext);
+  const currentTaskCtx = useCurrentTaskContext();
 
   if (!isLoaded) {
     return null;
@@ -26,8 +25,8 @@ export const MembershipPreview = withCardStateProvider((props: { organization: O
         organization,
       });
 
-      if (sessionTasksContext?.nextTask) {
-        return sessionTasksContext?.nextTask();
+      if (currentTaskCtx?.nextTask) {
+        return currentTaskCtx?.nextTask();
       }
 
       await navigateAfterSelectOrganization(organization);

@@ -2,13 +2,13 @@ import { useClerk } from '@clerk/shared/react';
 import type { SignUpModalProps, SignUpProps } from '@clerk/types';
 import React from 'react';
 
-import { CurrentTask } from '../../../ui/lazyModules/components';
 import { SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
 import { SignUpContext, useSignUpContext, withCoreSessionSwitchGuard } from '../../contexts';
 import { Flow } from '../../customizables';
 import { usePreloadCurrentTask } from '../../hooks/usePreloadCurrentTask';
 import { Route, Switch, useRouter, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
 import { SignUpContinue } from './SignUpContinue';
+import { SignUpCurrentTask } from './SignUpCurrentTask';
 import { SignUpSSOCallback } from './SignUpSSOCallback';
 import { SignUpStart } from './SignUpStart';
 import { SignUpVerifyEmail } from './SignUpVerifyEmail';
@@ -85,7 +85,7 @@ function SignUpRoutes(): JSX.Element {
           </Route>
         </Route>
         <Route path='tasks'>
-          <CurrentTask />
+          <SignUpCurrentTask />
         </Route>
         <Route index>
           <SignUpStart />
@@ -131,4 +131,4 @@ export const SignUpModal = (props: SignUpModalProps): JSX.Element => {
   );
 };
 
-export { SignUpContinue, SignUpSSOCallback, SignUpStart, SignUpVerifyEmail, SignUpVerifyPhone };
+export { SignUpContinue, SignUpCurrentTask, SignUpSSOCallback, SignUpStart, SignUpVerifyEmail, SignUpVerifyPhone };

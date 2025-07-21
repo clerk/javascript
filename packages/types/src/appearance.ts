@@ -956,6 +956,7 @@ export type PlanDetailTheme = Theme;
 export type SubscriptionDetailsTheme = Theme;
 export type APIKeysTheme = Theme;
 export type OAuthConsentTheme = Theme;
+export type CurrentTaskTheme = Theme;
 
 type GlobalAppearanceOptions = {
   /**
