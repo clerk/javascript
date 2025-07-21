@@ -13,7 +13,7 @@ export type DevBrowserCookieHandler = {
 };
 
 const getCookieAttributes = (): { sameSite: string; secure: boolean } => {
-  const sameSite = 'None';
+  const sameSite = inCrossOriginIframe() ? 'None' : 'Lax';
   const secure = getSecureAttribute(sameSite);
   return { sameSite, secure };
 };
