@@ -19,7 +19,7 @@ export const itIT: LocalizationResource = {
     action__search: 'Cerca chiavi',
     createdAndExpirationStatus__expiresOn:
     "Creata {{ createdDate | shortDate('it-IT') }} • Scadenza {{ expiresDate | longDate('it-IT') }}",
-    createdAndExpirationStatus__never: "Creata {{ createdDate | shortDate('en-US') }} • Nessuna scadenza",
+    createdAndExpirationStatus__never: "Creata {{ createdDate | shortDate('it-IT') }} • Nessuna scadenza",
     detailsTitle__emptyRow: "Nessuna chiave API trovata",
     formButtonPrimary__add: "Crea chiave",
     formFieldCaption__expiration__expiresOn: 'Scadenza {{ date }}',
