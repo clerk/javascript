@@ -233,6 +233,7 @@ const SocialButtonBlock = forwardRef((props: SocialButtonProps, ref: Ref<HTMLBut
       variant='outline'
       block
       isLoading={isLoading}
+      hoverAsFocus
       ref={ref}
       {...rest}
       sx={theme => [

@@ -95,15 +95,17 @@ const { applyVariants, filterProps } = createVariants(
           outline: {
             borderWidth: theme.borderWidths.$normal,
             borderStyle: theme.borderStyles.$solid,
-            borderColor: theme.colors.$borderAlpha100,
+            borderColor: theme.colors.$borderAlpha150,
             color: theme.colors.$neutralAlpha600,
             '&:hover': { backgroundColor: theme.colors.$neutralAlpha50 },
-            '&:focus': props.hoverAsFocus ? { backgroundColor: theme.colors.$neutralAlpha50 } : undefined,
+            '&:focus': props.hoverAsFocus
+              ? { backgroundColor: theme.colors.$neutralAlpha50, borderColor: theme.colors.$borderAlpha300 }
+              : undefined,
           },
           bordered: {
             borderWidth: theme.borderWidths.$normal,
             borderStyle: theme.borderStyles.$solid,
-            borderColor: theme.colors.$borderAlpha100,
+            borderColor: theme.colors.$borderAlpha150,
             color: vars.accentContrast,
             backgroundColor: vars.accent,
             '&:hover': { backgroundColor: vars.accentHover },

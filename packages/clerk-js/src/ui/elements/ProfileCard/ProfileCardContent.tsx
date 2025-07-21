@@ -41,7 +41,7 @@ export const ProfileCardContent = (props: ProfileCardContentProps) => {
         overflow: 'hidden',
         borderWidth: t.borderWidths.$normal,
         borderStyle: t.borderStyles.$solid,
-        borderColor: t.colors.$borderAlpha100,
+        borderColor: t.colors.$borderAlpha150,
         marginBlock: '-1px',
         marginInlineEnd: '-1px',
       })}
