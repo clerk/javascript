@@ -12,7 +12,11 @@ import { CurrentTaskContext, useCurrentTaskContext } from '../../contexts/compon
 import { Route, Switch, useRouter } from '../../router';
 import { ForceOrganizationSelectionTask } from './tasks/ForceOrganizationSelection';
 
-const SessionTasksStart = () => {
+/**
+ * Used by server-side redirects from `@clerk/backend` in order to determine
+ * which task to resolve when reaching the client
+ */
+const CurrentTaskStart = () => {
   const clerk = useClerk();
   const { navigate } = useRouter();
   const { redirectUrlComplete } = useCurrentTaskContext();
@@ -35,20 +39,20 @@ const SessionTasksStart = () => {
   );
 };
 
-function SessionTaskRoutes(): JSX.Element {
+function CurrentTaskRoutes(): JSX.Element {
   return (
     <Switch>
       <Route path={SESSION_TASK_ROUTE_BY_KEY['org']}>
         <ForceOrganizationSelectionTask />
       </Route>
       <Route index>
-        <SessionTasksStart />
+        <CurrentTaskStart />
       </Route>
     </Switch>
   );
 }
 
-export const SessionTask = withCardStateProvider(() => {
+export const CurrentTask = withCardStateProvider(() => {
   const clerk = useClerk();
   const { navigate } = useRouter();
   const signInContext = useContext(SignInContext);
@@ -103,7 +107,7 @@ export const SessionTask = withCardStateProvider(() => {
 
   return (
     <CurrentTaskContext.Provider value={{ nextTask, redirectUrlComplete, currentTaskContainer }}>
-      <SessionTaskRoutes />
+      <CurrentTaskRoutes />
     </CurrentTaskContext.Provider>
   );
 });

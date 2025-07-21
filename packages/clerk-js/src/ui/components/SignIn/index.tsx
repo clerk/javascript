@@ -12,8 +12,8 @@ import {
 } from '@/ui/contexts';
 import { Flow } from '@/ui/customizables';
 import { useFetch } from '@/ui/hooks';
-import { usePreloadTasks } from '@/ui/hooks/usePreloadTasks';
-import { SessionTasks as LazySessionTasks } from '@/ui/lazyModules/components';
+import { usePreloadCurrentTask } from '@/ui/hooks/usePreloadCurrentTask';
+import { CurrentTask } from '@/ui/lazyModules/components';
 import { Route, Switch, useRouter, VIRTUAL_ROUTER_BASE_PATH } from '@/ui/router';
 import type { SignUpCtx } from '@/ui/types';
 import { normalizeRoutingOptions } from '@/utils/normalizeRoutingOptions';
@@ -132,7 +132,7 @@ function SignInRoutes(): JSX.Element {
                 <LazySignUpVerifyPhone />
               </Route>
               <Route path='tasks'>
-                <LazySessionTasks />
+                <CurrentTask />
               </Route>
               <Route index>
                 <LazySignUpContinue />
@@ -144,7 +144,7 @@ function SignInRoutes(): JSX.Element {
           </Route>
         )}
         <Route path='tasks'>
-          <LazySessionTasks />
+          <CurrentTask />
         </Route>
         <Route index>
           <SignInStart />
@@ -181,7 +181,7 @@ function SignInRoot() {
    */
   usePreloadSignUp(signInContext.isCombinedFlow);
 
-  usePreloadTasks();
+  usePreloadCurrentTask();
 
   React.useEffect(() => {
     return __internal_setComponentNavigationContext?.({ indexPath, navigate });

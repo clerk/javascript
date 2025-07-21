@@ -19,7 +19,7 @@ const componentImportPaths = {
   KeylessPrompt: () => import(/* webpackChunkName: "keylessPrompt" */ '../components/KeylessPrompt'),
   PricingTable: () => import(/* webpackChunkName: "pricingTable" */ '../components/PricingTable'),
   Checkout: () => import(/* webpackChunkName: "checkout" */ '../components/Checkout'),
-  SessionTasks: () => import(/* webpackChunkName: "sessionTasks" */ '../components/CurrentTask'),
+  CurrentTask: () => import(/* webpackChunkName: "currentTask" */ '../components/CurrentTask'),
   PlanDetails: () => import(/* webpackChunkName: "planDetails" */ '../components/Plans/PlanDetails'),
   SubscriptionDetails: () => import(/* webpackChunkName: "subscriptionDetails" */ '../components/SubscriptionDetails'),
   APIKeys: () => import(/* webpackChunkName: "apiKeys" */ '../components/ApiKeys/ApiKeys'),
@@ -115,8 +115,8 @@ export const OAuthConsent = lazy(() =>
   componentImportPaths.OAuthConsent().then(module => ({ default: module.OAuthConsent })),
 );
 
-export const SessionTasks = lazy(() =>
-  componentImportPaths.SessionTasks().then(module => ({ default: module.SessionTask })),
+export const CurrentTask = lazy(() =>
+  componentImportPaths.CurrentTask().then(module => ({ default: module.CurrentTask })),
 );
 
 export const preloadComponent = async (component: unknown) => {
