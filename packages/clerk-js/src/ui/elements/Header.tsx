@@ -93,7 +93,7 @@ const BackLink = React.memo((props: PropsOfComponent<typeof Link>): JSX.Element 
     >
       <Icon
         icon={ArrowLeftIcon}
-        sx={t => ({ color: t.colors.$colorText })}
+        sx={t => ({ color: t.colors.$colorForeground })}
       />
       {children}
     </Link>

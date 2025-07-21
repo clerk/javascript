@@ -108,7 +108,6 @@ export function ComponentContextProvider({
           {children}
         </OAuthConsentContext.Provider>
       );
-
     default:
       throw new Error(`Unknown component context: ${componentName}`);
   }

@@ -13,6 +13,7 @@ import type {
   PricingTableTheme,
   SignInTheme,
   SignUpTheme,
+  SubscriptionDetailsTheme,
   UserButtonTheme,
   UserProfileTheme,
   UserVerificationTheme,
@@ -22,8 +23,8 @@ import type { ClientResource } from './client';
 import type {
   CommerceBillingNamespace,
   CommerceCheckoutResource,
+  CommercePayerType,
   CommercePlanResource,
-  CommerceSubscriberType,
   CommerceSubscriptionPlanPeriod,
   ConfirmCheckoutParams,
 } from './commerce';
@@ -273,15 +274,27 @@ export interface Clerk {
 
   /**
    * Opens the Clerk PlanDetails drawer component in a drawer.
-   * @param props Optional subscription details drawer configuration parameters.
+   * @param props `plan` or `planId` parameters are required.
    */
-  __internal_openPlanDetails: (props?: __internal_PlanDetailsProps) => void;
+  __internal_openPlanDetails: (props: __internal_PlanDetailsProps) => void;
 
   /**
    * Closes the Clerk PlanDetails drawer.
    */
   __internal_closePlanDetails: () => void;
 
+  /**
+   * Opens the Clerk SubscriptionDetails drawer component in a drawer.
+   * @param props Optional configuration parameters.
+   */
+  __internal_openSubscriptionDetails: (props?: __internal_SubscriptionDetailsProps) => void;
+
+  /**
+   * Closes the Clerk SubscriptionDetails drawer.
+   */
+  __internal_closeSubscriptionDetails: () => void;
+
+  /**
   /** Opens the Clerk UserVerification component in a modal.
    * @param props Optional user verification configuration parameters.
    */
@@ -802,12 +815,10 @@ export interface Clerk {
   joinWaitlist: (params: JoinWaitlistParams) => Promise<WaitlistResource>;
 
   /**
-   * Navigates to the next task or redirects to completion URL.
-   * If the current session has pending tasks, it navigates to the next task.
-   * If all tasks are complete, it navigates to the provided completion URL or defaults to the origin redirect URL (either from sign-in or sign-up).
-   * @experimental
+   * Navigates to the current task or redirects to `redirectUrlComplete` once the session is `active`.
+   * @internal
    */
-  __experimental_navigateToTask: (params?: NextTaskParams) => Promise<void>;
+  __internal_navigateToTaskIfAvailable: (params?: __internal_NavigateToTaskIfAvailableParams) => Promise<void>;
 
   /**
    * This is an optional function.
@@ -1795,7 +1806,7 @@ export type __internal_CheckoutProps = {
   appearance?: CheckoutTheme;
   planId?: string;
   planPeriod?: CommerceSubscriptionPlanPeriod;
-  subscriberType?: CommerceSubscriberType;
+  subscriberType?: CommercePayerType;
   onSubscriptionComplete?: () => void;
   portalId?: string;
   portalRoot?: PortalRoot;
@@ -1820,8 +1831,20 @@ export type __internal_CheckoutProps = {
 export type __internal_PlanDetailsProps = {
   appearance?: PlanDetailTheme;
   plan?: CommercePlanResource;
-  subscriberType?: CommerceSubscriberType;
+  planId?: string;
   initialPlanPeriod?: CommerceSubscriptionPlanPeriod;
+  portalId?: string;
+  portalRoot?: PortalRoot;
+};
+
+export type __internal_SubscriptionDetailsProps = {
+  /**
+   * The subscriber type to display the subscription details for.
+   * If `org` is provided, the subscription details will be displayed for the active organization.
+   * @default 'user'
+   */
+  for?: CommercePayerType;
+  appearance?: SubscriptionDetailsTheme;
   onSubscriptionCancel?: () => void;
   portalId?: string;
   portalRoot?: PortalRoot;
@@ -1877,18 +1900,22 @@ export interface HandleEmailLinkVerificationParams {
   onVerifiedOnOtherDevice?: () => void;
 }
 
-type ButtonPropsModal<T extends SignInProps | SignUpProps> = {
+type SignInButtonPropsModal = {
   mode: 'modal';
-  appearance?: T['appearance'];
+  appearance?: SignInProps['appearance'];
+};
+
+type SignUpButtonPropsModal = {
+  mode: 'modal';
+  appearance?: SignUpProps['appearance'];
+  unsafeMetadata?: SignUpUnsafeMetadata;
 };
 
 type ButtonPropsRedirect = {
   mode?: 'redirect';
 };
 
-type ButtonProps<T extends SignInProps | SignUpProps> = ButtonPropsModal<T> | ButtonPropsRedirect;
-
-export type SignInButtonProps = ButtonProps<SignInProps> &
+export type SignInButtonProps = (SignInButtonPropsModal | ButtonPropsRedirect) &
   Pick<
     SignInProps,
     | 'fallbackRedirectUrl'
@@ -1900,9 +1927,7 @@ export type SignInButtonProps = ButtonProps<SignInProps> &
     | 'oauthFlow'
   >;
 
-export type SignUpButtonProps = {
-  unsafeMetadata?: SignUpUnsafeMetadata;
-} & ButtonProps<SignUpProps> &
+export type SignUpButtonProps = (SignUpButtonPropsModal | ButtonPropsRedirect) &
   Pick<
     SignUpProps,
     | 'fallbackRedirectUrl'
@@ -1980,7 +2005,7 @@ export interface AuthenticateWithGoogleOneTapParams {
   legalAccepted?: boolean;
 }
 
-export interface NextTaskParams {
+export interface __internal_NavigateToTaskIfAvailableParams {
   /**
    * Full URL or path to navigate to after successfully resolving all tasks
    * @default undefined
