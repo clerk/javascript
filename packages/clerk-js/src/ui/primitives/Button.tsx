@@ -80,7 +80,6 @@ const { applyVariants, filterProps } = createVariants(
           solid: {
             backgroundColor: vars.accent,
             color: vars.accentContrast,
-            boxShadow: theme.shadows.$buttonShadow,
             borderWidth: theme.borderWidths.$normal,
             borderStyle: theme.borderStyles.$solid,
             borderColor: vars.accent,
@@ -100,7 +99,6 @@ const { applyVariants, filterProps } = createVariants(
             color: theme.colors.$neutralAlpha600,
             '&:hover': { backgroundColor: theme.colors.$neutralAlpha50 },
             '&:focus': props.hoverAsFocus ? { backgroundColor: theme.colors.$neutralAlpha50 } : undefined,
-            boxShadow: theme.shadows.$outlineButtonShadow,
           },
           bordered: {
             borderWidth: theme.borderWidths.$normal,

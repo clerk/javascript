@@ -2,7 +2,6 @@ import { fastDeepMergeAndReplace } from '@clerk/shared/utils';
 import type { Appearance, CaptchaAppearanceOptions, DeepPartial, Elements, Layout, Theme } from '@clerk/types';
 
 import { createInternalTheme, defaultInternalTheme } from '../foundations';
-import { polishedAppearance } from '../polishedAppearance';
 import type { InternalTheme } from '../styledSystem';
 import {
   createColorScales,
@@ -83,7 +82,7 @@ export const parseAppearance = (cascade: AppearanceCascade): ParsedAppearance =>
       return !!a.simpleStyles;
     })
   ) {
-    appearanceList.unshift(polishedAppearance);
+    // appearanceList.unshift(polishedAppearance);
   }
 
   const parsedElements = parseElements(
