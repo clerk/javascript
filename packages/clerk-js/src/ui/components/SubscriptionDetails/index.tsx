@@ -39,7 +39,7 @@ import { SubscriptionBadge } from '../Subscriptions/badge';
 
 const isFreePlan = (plan: CommercePlanResource) => !plan.hasBaseFee;
 
-// We cannot derive the state of confrimation modal from the existance subscription, as it will make the animation laggy when the confimation closes.
+// We cannot derive the state of confirmation modal from the existence subscription, as it will make the animation laggy when the confirmation closes.
 const SubscriptionForCancellationContext = React.createContext<{
   subscription: CommerceSubscriptionItemResource | null;
   setSubscription: (subscription: CommerceSubscriptionItemResource | null) => void;
@@ -265,8 +265,8 @@ const SubscriptionDetailsFooter = withCardStateProvider(() => {
                   ? localizationKeys('commerce.cancelSubscriptionNoCharge')
                   : localizationKeys('commerce.cancelSubscriptionAccessUntil', {
                       plan: selectedSubscription.plan.name,
-                      // @ts-expect-error this will always be defined in this state
-                      date: subscription.periodEndDate,
+                      // this will always be defined in this state
+                      date: selectedSubscription.periodEndDate as Date,
                     })
               }
             />
@@ -306,7 +306,7 @@ function SubscriptionDetailsSummary() {
       </LineItems.Group>
       <LineItems.Group>
         <LineItems.Title description={localizationKeys('commerce.subscriptionDetails.nextPaymentOn')} />
-        <LineItems.Description text={formatDate(subscription.nextPayment.time)} />
+        <LineItems.Description text={formatDate(subscription.nextPayment.date)} />
       </LineItems.Group>
       <LineItems.Group>
         <LineItems.Title description={localizationKeys('commerce.subscriptionDetails.nextPaymentAmount')} />

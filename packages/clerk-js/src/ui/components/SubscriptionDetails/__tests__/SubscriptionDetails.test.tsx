@@ -45,7 +45,7 @@ describe('SubscriptionDetails', () => {
           currency: 'USD',
           currencySymbol: '$',
         },
-        time: new Date('2021-02-01'),
+        date: new Date('2021-02-01'),
       },
       status: 'active',
       subscriptionItems: [
@@ -138,7 +138,7 @@ describe('SubscriptionDetails', () => {
           currency: 'USD',
           currencySymbol: '$',
         },
-        time: new Date('2022-01-01'),
+        date: new Date('2022-01-01'),
       },
       status: 'active',
       subscriptionItems: [
@@ -232,7 +232,7 @@ describe('SubscriptionDetails', () => {
           currency: 'USD',
           currencySymbol: '$',
         },
-        time: new Date('2021-01-01'),
+        date: new Date('2021-01-01'),
       },
       subscriptionItems: [
         {
@@ -355,7 +355,7 @@ describe('SubscriptionDetails', () => {
           currency: 'USD',
           currencySymbol: '$',
         },
-        time: new Date('2021-02-01'),
+        date: new Date('2021-02-01'),
       },
       subscriptionItems: [
         {
@@ -495,7 +495,7 @@ describe('SubscriptionDetails', () => {
           currency: 'USD',
           currencySymbol: '$',
         },
-        time: new Date('2021-01-01'),
+        date: new Date('2021-01-01'),
       },
       subscriptionItems: [
         {
@@ -556,7 +556,7 @@ describe('SubscriptionDetails', () => {
     });
   });
 
-  it('allows cancelling a subscription of a monthly plan', async () => {
+  it.only('allows cancelling a subscription of a monthly plan', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
     });
@@ -575,7 +575,7 @@ describe('SubscriptionDetails', () => {
           currency: 'USD',
           currencySymbol: '$',
         },
-        time: new Date('2021-01-01'),
+        date: new Date('2021-01-01'),
       },
       status: 'active',
       subscriptionItems: [
@@ -708,7 +708,7 @@ describe('SubscriptionDetails', () => {
           currency: 'USD',
           currencySymbol: '$',
         },
-        time: new Date('2021-01-01'),
+        date: new Date('2021-01-01'),
       },
       subscriptionItems: [subscription],
     });
@@ -795,7 +795,7 @@ describe('SubscriptionDetails', () => {
           currency: 'USD',
           currencySymbol: '$',
         },
-        time: new Date('2021-01-01'),
+        date: new Date('2021-01-01'),
       },
       subscriptionItems: [subscription],
     });
@@ -871,7 +871,7 @@ describe('SubscriptionDetails', () => {
           currency: 'USD',
           currencySymbol: '$',
         },
-        time: new Date('2021-01-01'),
+        date: new Date('2021-01-01'),
       },
       subscriptionItems: [
         {

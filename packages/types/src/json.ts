@@ -807,17 +807,22 @@ export interface CommerceSubscriptionItemJSON extends ClerkResourceJSON {
 export interface CommerceSubscriptionJSON extends ClerkResourceJSON {
   object: 'commerce_subscription';
   id: string;
+  /**
+   * Describes the details for the next payment cycle. It is `undefined` for subscription items that are cancelled or on the free plan.
+   */
   next_payment?: {
     amount: CommerceMoneyJSON;
-    // This need to change to `date` probably
-    time: number;
+    date: number;
   };
-  status: CommerceSubscriptionStatus;
+  /**
+   * Due to the free plan subscription item, the top level subscription can either be `active` or `past_due`.
+   */
+  status: Extract<CommerceSubscriptionStatus, 'active' | 'past_due'>;
   created_at: number;
   active_at: number;
   update_at: number | null;
   past_due_at: number | null;
-  subscription_items: CommerceSubscriptionItemJSON[];
+  subscription_items: CommerceSubscriptionItemJSON[] | null;
 }
 
 /**

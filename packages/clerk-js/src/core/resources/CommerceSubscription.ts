@@ -17,18 +17,14 @@ import { BaseResource, CommercePlan, DeletedObject } from './internal';
 
 export class CommerceSubscription extends BaseResource implements CommerceSubscriptionResource {
   id!: string;
-  status!: CommerceSubscriptionStatus;
+  status!: Extract<CommerceSubscriptionStatus, 'active' | 'past_due'>;
   activeAt!: Date;
   createdAt!: Date;
   pastDueAt!: Date | null;
   updatedAt!: Date | null;
-  //TODO(@COMMERCE): Why can this be undefined ?
   nextPayment: {
-    //TODO(@COMMERCE): Why can this be undefined ?
     amount: CommerceMoney;
-    //TODO(@COMMERCE): This need to change to `date` probably
-    //TODO(@COMMERCE): Why can this be undefined ?
-    time: Date;
+    date: Date;
   } | null = null;
   subscriptionItems!: CommerceSubscriptionItemResource[];
 
@@ -51,10 +47,10 @@ export class CommerceSubscription extends BaseResource implements CommerceSubscr
     this.nextPayment = data.next_payment
       ? {
           amount: commerceMoneyFromJSON(data.next_payment.amount),
-          time: unixEpochToDate(data.next_payment.time),
+          date: unixEpochToDate(data.next_payment.date),
         }
       : null;
-    this.subscriptionItems = data.subscription_items.map(item => new CommerceSubscriptionItem(item));
+    this.subscriptionItems = (data.subscription_items || []).map(item => new CommerceSubscriptionItem(item));
     return this;
   }
 }
@@ -110,7 +106,6 @@ export class CommerceSubscriptionItem extends BaseResource implements CommerceSu
     return this;
   }
 
-  //TODO(@COMMERCE): shouldn't this change to `subscriptions_items` ?
   public async cancel(params: CancelSubscriptionParams) {
     const { orgId } = params;
     const json = (

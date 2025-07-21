@@ -1140,7 +1140,6 @@ export interface CommerceSubscriptionResource extends ClerkResource {
      * ```
      */
     amount: CommerceMoney;
-    // This need to change to `date` probably
     /**
      * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
      * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
@@ -1149,9 +1148,8 @@ export interface CommerceSubscriptionResource extends ClerkResource {
      * <ClerkProvider clerkJsVersion="x.x.x" />
      * ```
      */
-    time: Date;
+    date: Date;
   } | null;
-  // Is this for all items, or for at least one ?
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
    * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
@@ -1159,12 +1157,11 @@ export interface CommerceSubscriptionResource extends ClerkResource {
    * ```tsx
    * <ClerkProvider clerkJsVersion="x.x.x" />
    * ```
+   *
+   * When at least one subscription item is past due, this property will get populated.
    */
   pastDueAt: Date | null;
 
-  // When does this change ? what if an item is active and one is upcoming ?
-  // What if one is active and one is past due ?
-  // What if one is past due and one upcoming ?
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
    * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
@@ -1172,10 +1169,11 @@ export interface CommerceSubscriptionResource extends ClerkResource {
    * ```tsx
    * <ClerkProvider clerkJsVersion="x.x.x" />
    * ```
+   *
+   * Due to the free plan subscription item, the top level subscription can either be `active` or `past_due`.
    */
-  status: CommerceSubscriptionStatus;
+  status: Extract<CommerceSubscriptionStatus, 'active' | 'past_due'>;
 
-  // Can this ever be null ?
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
    * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
