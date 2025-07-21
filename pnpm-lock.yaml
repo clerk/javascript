@@ -800,7 +800,7 @@ importers:
         version: 1.15.3
     devDependencies:
       nuxt:
-        specifier: ^3.17.6
+        specifier: ^3.17.7
         version: 3.17.7(@netlify/blobs@9.1.2)(@parcel/watcher@2.5.1)(@types/node@24.0.14)(@vue/compiler-sfc@3.5.17)(db0@0.3.2)(eslint@9.27.0(jiti@2.4.2))(ioredis@5.6.1)(lightningcss@1.27.0)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.45.0)(terser@5.43.1)(tsx@4.19.2)(typescript@5.8.3)(vite@6.3.5(@types/node@24.0.14)(jiti@2.4.2)(lightningcss@1.27.0)(terser@5.43.1)(tsx@4.19.2)(yaml@2.8.0))(vue-tsc@2.2.10(typescript@5.8.3))(yaml@2.8.0)
       typescript:
         specifier: catalog:repo
