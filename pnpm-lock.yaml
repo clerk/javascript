@@ -556,7 +556,7 @@ importers:
         specifier: ^17.2.0
         version: 17.2.0
       globby:
-        specifier: ^14.0.2
+        specifier: ^14.1.0
         version: 14.1.0
       jscodeshift:
         specifier: ^17.3.0
