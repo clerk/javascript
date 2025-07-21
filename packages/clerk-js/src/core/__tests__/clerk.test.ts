@@ -2331,7 +2331,7 @@ describe('Clerk singleton', () => {
     });
   });
 
-  describe('nextTask', () => {
+  describe('__internal_navigateToTaskIfAvailable', () => {
     describe('with `pending` session status', () => {
       const mockSession = {
         id: '1',

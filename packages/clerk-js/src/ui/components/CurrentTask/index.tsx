@@ -17,12 +17,12 @@ import { ForceOrganizationSelectionTask } from './tasks/ForceOrganizationSelecti
  */
 const CurrentTaskStart = () => {
   const clerk = useClerk();
-  const { nextTask } = useCurrentTaskContext();
+  const { navigateToTaskIfAvailable } = useCurrentTaskContext();
 
   useEffect(() => {
     // Simulates additional latency to avoid a abrupt UI transition when navigating to the next task
     const timeoutId = setTimeout(() => {
-      void nextTask();
+      void navigateToTaskIfAvailable();
     }, 500);
     return () => clearTimeout(timeoutId);
   }, [clerk]);
