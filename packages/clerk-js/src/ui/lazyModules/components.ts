@@ -103,6 +103,8 @@ export const PricingTable = lazy(() =>
   componentImportPaths.PricingTable().then(module => ({ default: module.PricingTable })),
 );
 
+export const APIKeys = lazy(() => componentImportPaths.APIKeys().then(module => ({ default: module.APIKeys })));
+
 export const Checkout = lazy(() => componentImportPaths.Checkout().then(module => ({ default: module.Checkout })));
 
 export const TaskSelectOrganization = lazy(() =>
@@ -116,8 +118,6 @@ export const PlanDetails = lazy(() =>
 export const SubscriptionDetails = lazy(() =>
   componentImportPaths.SubscriptionDetails().then(module => ({ default: module.SubscriptionDetails })),
 );
-
-export const APIKeys = lazy(() => componentImportPaths.APIKeys().then(module => ({ default: module.APIKeys })));
 
 export const OAuthConsent = lazy(() =>
   componentImportPaths.OAuthConsent().then(module => ({ default: module.OAuthConsent })),
