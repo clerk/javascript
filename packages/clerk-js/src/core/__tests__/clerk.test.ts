@@ -2350,7 +2350,7 @@ describe('Clerk singleton', () => {
         reload: jest.fn(() => Promise.resolve(mockSession)),
       };
 
-      beforeAll(() => {
+      beforeEach(() => {
         mockResource.touch.mockReturnValueOnce(Promise.resolve());
         mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockResource] }));
       });
