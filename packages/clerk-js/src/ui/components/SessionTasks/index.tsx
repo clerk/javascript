@@ -38,7 +38,7 @@ const SessionTasksStart = () => {
 function SessionTaskRoutes(): JSX.Element {
   return (
     <Switch>
-      <Route path={INTERNAL_SESSION_TASK_ROUTE_BY_KEY['org']}>
+      <Route path={INTERNAL_SESSION_TASK_ROUTE_BY_KEY['select-organization']}>
         <ForceOrganizationSelectionTask />
       </Route>
       <Route index>

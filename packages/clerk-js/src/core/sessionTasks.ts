@@ -8,7 +8,7 @@ import type {
 import { buildURL } from '../utils';
 
 export const INTERNAL_SESSION_TASK_ROUTE_BY_KEY: Record<SessionTask['key'], string> = {
-  org: 'add-organization',
+  'select-organization': 'select-organization',
 } as const;
 
 interface NavigateToTaskOptions {
