@@ -2331,7 +2331,7 @@ describe('Clerk singleton', () => {
     });
   });
 
-  describe('nextTask', () => {
+  describe('navigateToTask', () => {
     describe('with `pending` session status', () => {
       const mockSession = {
         id: '1',
@@ -2350,7 +2350,7 @@ describe('Clerk singleton', () => {
         reload: jest.fn(() => Promise.resolve(mockSession)),
       };
 
-      beforeAll(() => {
+      beforeEach(() => {
         mockResource.touch.mockReturnValueOnce(Promise.resolve());
         mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockResource] }));
       });
@@ -2360,7 +2360,7 @@ describe('Clerk singleton', () => {
         mockResource.touch.mockReset();
       });
 
-      it('navigates to next task', async () => {
+      it('navigates to next task with default internal routing for AIOs', async () => {
         const sut = new Clerk(productionPublishableKey);
         await sut.load(mockedLoadOptions);
 
@@ -2368,6 +2368,21 @@ describe('Clerk singleton', () => {
         await sut.__internal_navigateToTaskIfAvailable();
 
         expect(mockNavigate.mock.calls[0][0]).toBe('/sign-in#/tasks/add-organization');
+      });
+
+      it('navigates to next task with custom routing from clerk options', async () => {
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load({
+          ...mockedLoadOptions,
+          taskUrls: {
+            org: '/onboarding/select-organization',
+          },
+        });
+
+        await sut.setActive({ session: mockResource as any as PendingSessionResource });
+        await sut.__internal_navigateToTaskIfAvailable();
+
+        expect(mockNavigate.mock.calls[0][0]).toBe('/onboarding/select-organization');
       });
     });
 

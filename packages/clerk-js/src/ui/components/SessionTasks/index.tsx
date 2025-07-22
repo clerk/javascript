@@ -6,7 +6,7 @@ import { Card } from '@/ui/elements/Card';
 import { withCardStateProvider } from '@/ui/elements/contexts';
 import { LoadingCardContainer } from '@/ui/elements/LoadingCard';
 
-import { SESSION_TASK_ROUTE_BY_KEY } from '../../../core/sessionTasks';
+import { INTERNAL_SESSION_TASK_ROUTE_BY_KEY } from '../../../core/sessionTasks';
 import { SignInContext, SignUpContext } from '../../../ui/contexts';
 import { SessionTasksContext, useSessionTasksContext } from '../../contexts/components/SessionTasks';
 import { Route, Switch, useRouter } from '../../router';
@@ -38,7 +38,7 @@ const SessionTasksStart = () => {
 function SessionTaskRoutes(): JSX.Element {
   return (
     <Switch>
-      <Route path={SESSION_TASK_ROUTE_BY_KEY['org']}>
+      <Route path={INTERNAL_SESSION_TASK_ROUTE_BY_KEY['org']}>
         <ForceOrganizationSelectionTask />
       </Route>
       <Route index>

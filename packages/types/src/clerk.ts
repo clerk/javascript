@@ -48,7 +48,7 @@ import type {
   SignUpFallbackRedirectUrl,
   SignUpForceRedirectUrl,
 } from './redirects';
-import type { PendingSessionOptions, SignedInSessionResource } from './session';
+import type { PendingSessionOptions, SessionTask, SignedInSessionResource } from './session';
 import type { SessionVerificationLevel } from './sessionVerification';
 import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
@@ -1050,6 +1050,14 @@ export type ClerkOptions = PendingSessionOptions &
      * @internal
      */
     __internal_keyless_dismissPrompt?: (() => Promise<void>) | null;
+
+    /**
+     * Customize the URL paths users are redirected to after sign-in or sign-up when specific
+     * session tasks need to be completed.
+     *
+     * @default undefined - Uses Clerk's default task flow URLs
+     */
+    taskUrls?: Record<SessionTask['key'], string>;
   };
 
 export interface NavigateOptions {
