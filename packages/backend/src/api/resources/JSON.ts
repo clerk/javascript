@@ -843,7 +843,7 @@ export interface CommerceSubscriptionItemJSON extends ClerkResourceJSON {
   credit: CommerceSubscriptionCreditJSON;
   proration_date: string;
   plan_period: 'month' | 'annual';
-  period_start?: number;
+  period_start: number;
   period_end?: number;
   canceled_at?: number;
   past_due_at?: number;
