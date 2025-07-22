@@ -41,7 +41,7 @@ export class CommerceSubscription extends BaseResource implements CommerceSubscr
     this.id = data.id;
     this.status = data.status;
     this.createdAt = unixEpochToDate(data.created_at);
-    this.updatedAt = data.update_at ? unixEpochToDate(data.update_at) : null;
+    this.updatedAt = data.updated_at ? unixEpochToDate(data.updated_at) : null;
     this.activeAt = unixEpochToDate(data.active_at);
     this.pastDueAt = data.past_due_at ? unixEpochToDate(data.past_due_at) : null;
     this.nextPayment = data.next_payment

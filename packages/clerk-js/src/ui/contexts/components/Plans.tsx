@@ -59,7 +59,10 @@ export const useSubscription = () => {
     for: subscriberType === 'org' ? 'organization' : 'user',
     keepPreviousData: true,
   });
-  const subscriptionItems = useMemo(() => subscription.data?.subscriptionItems || [], [subscription.data]);
+  const subscriptionItems = useMemo(
+    () => subscription.data?.subscriptionItems || [],
+    [subscription.data?.subscriptionItems],
+  );
 
   return {
     ...subscription,

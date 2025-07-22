@@ -2,7 +2,14 @@ import { useCallback } from 'react';
 
 import { eventMethodCalled } from '../../telemetry/events';
 import { useSWR } from '../clerk-swr';
-import { useClerkInstanceContext, useOrganizationContext, useUserContext } from '../contexts';
+import {
+  useAssertWrappedByClerkProvider,
+  useClerkInstanceContext,
+  useOrganizationContext,
+  useUserContext,
+} from '../contexts';
+
+const hookName = 'useSubscription';
 
 type UseSubscriptionParams = {
   for?: 'organization' | 'user';
@@ -18,16 +25,19 @@ type UseSubscriptionParams = {
  * @internal
  */
 export const useSubscription = (params?: UseSubscriptionParams) => {
+  useAssertWrappedByClerkProvider(hookName);
+
   const clerk = useClerkInstanceContext();
   const user = useUserContext();
   const { organization } = useOrganizationContext();
-  clerk.telemetry?.record(eventMethodCalled('useSubscription'));
+
+  clerk.telemetry?.record(eventMethodCalled(hookName));
 
   const swr = useSWR(
     user?.id
       ? {
           type: 'commerce-subscription',
-          userId: user?.id,
+          userId: user.id,
           args: { orgId: params?.for === 'organization' ? organization?.id : undefined },
         }
       : null,

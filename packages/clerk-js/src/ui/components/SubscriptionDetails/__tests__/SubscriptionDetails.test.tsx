@@ -556,7 +556,7 @@ describe('SubscriptionDetails', () => {
     });
   });
 
-  it.only('allows cancelling a subscription of a monthly plan', async () => {
+  it('allows cancelling a subscription of a monthly plan', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
     });

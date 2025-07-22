@@ -806,7 +806,7 @@ export interface CommerceSubscriptionJSON extends ClerkResourceJSON {
   status: Extract<CommerceSubscriptionStatus, 'active' | 'past_due'>;
   created_at: number;
   active_at: number;
-  update_at: number | null;
+  updated_at: number | null;
   past_due_at: number | null;
   subscription_items: CommerceSubscriptionItemJSON[] | null;
 }
