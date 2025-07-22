@@ -1,15 +1,32 @@
-import { createContext, useContext } from 'react';
+import { useClerk } from '@clerk/shared/react/index';
+import { createContext, useCallback, useContext } from 'react';
 
-import type { SessionTasksCtx } from '../../types';
+import type { SessionTasksCtx, TaskSelectOrganizationCtx } from '../../types';
 
 export const SessionTasksContext = createContext<SessionTasksCtx | null>(null);
 
-export const useSessionTasksContext = () => {
-  const context = useContext(SessionTasksContext);
+export type SessionTasksContextType = SessionTasksCtx & {
+  navigateToTaskIfAvailable: () => Promise<void>;
+};
 
-  if (context === null) {
+export const useSessionTasksContext = (): SessionTasksContextType => {
+  const clerk = useClerk();
+  const ctx = useContext(SessionTasksContext);
+
+  if (ctx === null) {
     throw new Error('Clerk: useSessionTasksContext called outside of the mounted SessionTasks component.');
   }
 
-  return context;
+  const redirectUrlComplete = ctx.redirectUrlComplete;
+
+  const navigateToTaskIfAvailable = useCallback(() => {
+    return clerk.__internal_navigateToTaskIfAvailable({ redirectUrlComplete });
+  }, [clerk, redirectUrlComplete]);
+
+  return {
+    ...ctx,
+    navigateToTaskIfAvailable,
+  };
 };
+
+export const TaskSelectOrganizationContext = createContext<TaskSelectOrganizationCtx | null>(null);

@@ -1,9 +1,9 @@
 import { useOrganizationList } from '@clerk/shared/react/index';
 import type { PropsWithChildren } from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 
 import { OrganizationListContext } from '@/ui/contexts';
-import { useSessionTasksContext } from '@/ui/contexts/components/SessionTasks';
+import { TaskSelectOrganizationContext, useSessionTasksContext } from '@/ui/contexts/components/SessionTasks';
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 
@@ -12,10 +12,7 @@ import { CreateOrganizationForm } from '../../CreateOrganization/CreateOrganizat
 import { OrganizationListPageList } from '../../OrganizationList/OrganizationListPage';
 import { organizationListParams } from '../../OrganizationSwitcher/utils';
 
-/**
- * @internal
- */
-export const ForceOrganizationSelectionTask = withCardStateProvider(() => {
+export const TaskSelectOrganization = withCardStateProvider(() => {
   const { userMemberships, userInvitations, userSuggestions } = useOrganizationList(organizationListParams);
   const currentFlow = useRef<'create-organization' | 'organization-selection'>();
 
@@ -46,6 +43,7 @@ type CommonPageProps = {
 
 const OrganizationSelectionPage = ({ currentFlow }: CommonPageProps) => {
   const [showCreateOrganizationForm, setShowCreateOrganizationForm] = useState(false);
+  const ctx = useContext(TaskSelectOrganizationContext);
 
   useEffect(() => {
     currentFlow.current = 'organization-selection';
@@ -56,6 +54,7 @@ const OrganizationSelectionPage = ({ currentFlow }: CommonPageProps) => {
       value={{
         componentName: 'OrganizationList',
         skipInvitationScreen: true,
+        appearance: ctx?.appearance,
       }}
     >
       <FlowCard>
