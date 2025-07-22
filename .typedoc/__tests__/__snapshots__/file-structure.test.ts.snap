@@ -106,6 +106,7 @@ exports[`Typedoc output > should have a deliberate file structure 1`] = `
   "types/server-get-token.mdx",
   "types/session-resource.mdx",
   "types/session-status-claim.mdx",
+  "types/session-task.mdx",
   "types/session-verification-level.mdx",
   "types/session-verification-types.mdx",
   "types/set-active-params.mdx",
