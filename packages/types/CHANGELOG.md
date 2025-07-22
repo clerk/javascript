@@ -1,5 +1,31 @@
 # Change Log
 
+## 4.69.0
+
+### Minor Changes
+
+- [Billing Beta] Replace `payerType[]` with `forPayerType` typed as `'org' | 'user'`. ([#6342](https://github.com/clerk/javascript/pull/6342)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add optional `cssLayerName` to `BaseTheme` object ([#6322](https://github.com/clerk/javascript/pull/6322)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Introduce `__internal_hasAfterAuthFlows` flag ([#6366](https://github.com/clerk/javascript/pull/6366)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Adjust the cases in which the Billing item shows within the `UserProfile` and `OrgProfile` components ([#6315](https://github.com/clerk/javascript/pull/6315)) by [@aeliox](https://github.com/aeliox)
+
+- Add `taskUrls` option to customize task flow URLs: ([#6373](https://github.com/clerk/javascript/pull/6373)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  ```tsx
+  <ClerkProvider
+    taskUrls={{
+      org: '/my-custom-org-selector',
+    }}
+  />
+  ```
+
+- Rename `org` session task key to `select-organization` ([#6372](https://github.com/clerk/javascript/pull/6372)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
 ## 4.68.0
 
 ### Minor Changes
