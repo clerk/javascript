@@ -14,6 +14,7 @@ import type {
   SignInTheme,
   SignUpTheme,
   SubscriptionDetailsTheme,
+  TaskSelectOrganizationTheme,
   UserButtonTheme,
   UserProfileTheme,
   UserVerificationTheme,
@@ -2035,6 +2036,15 @@ export type SignUpButtonProps = (SignUpButtonPropsModal | ButtonPropsRedirect) &
     | 'initialValues'
     | 'oauthFlow'
   >;
+
+export type TaskSelectOrganizationProps = {
+  /**
+   * Full URL or path to navigate to after successfully resolving all tasks
+   * @default undefined
+   */
+  redirectUrlComplete: string;
+  appearance?: TaskSelectOrganizationTheme;
+};
 
 export type CreateOrganizationInvitationParams = {
   emailAddress: string;

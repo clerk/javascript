@@ -30,9 +30,9 @@ import type {
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
-  Clerk as ClerkInterface,
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
+  Clerk as ClerkInterface,
   ClerkOptions,
   ClientJSONSnapshot,
   ClientResource,
@@ -1160,6 +1160,26 @@ export class Clerk implements ClerkInterface {
    * @param targetNode Target node to unmount the ApiKeys component from.
    */
   public unmountApiKeys = (node: HTMLDivElement) => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted().then(controls => controls.unmountComponent({ node }));
+  };
+
+  public mountTaskSelectOrganization = (node: HTMLDivElement, props?: APIKeysProps) => {
+    this.assertComponentsReady(this.#componentControls);
+
+    void this.#componentControls.ensureMounted({ preloadHint: 'TaskSelectOrganization' }).then(controls =>
+      controls.mountComponent({
+        name: 'TaskSelectOrganization',
+        appearanceKey: 'taskSelectOrganization',
+        node,
+        props,
+      }),
+    );
+
+    this.telemetry?.record(eventPrebuiltComponentMounted('TaskSelectOrganization', props));
+  };
+
+  public unmountTaskSelectOrganization = (node: HTMLDivElement) => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls.ensureMounted().then(controls => controls.unmountComponent({ node }));
   };
