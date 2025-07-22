@@ -27,7 +27,7 @@ export function navigateToTask(
   routeKey: keyof typeof INTERNAL_SESSION_TASK_ROUTE_BY_KEY,
   { componentNavigationContext, globalNavigate, options, environment }: NavigateToTaskOptions,
 ) {
-  const taskRoute = options.taskUrls?.[routeKey] ?? `/tasks/${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[routeKey]}`;
+  const taskRoute = `/tasks/${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[routeKey]}`;
 
   if (componentNavigationContext) {
     return componentNavigationContext.navigate(componentNavigationContext.indexPath + taskRoute);
@@ -45,5 +45,5 @@ export function navigateToTask(
     { stringify: true },
   );
 
-  return globalNavigate(sessionTaskUrl);
+  return globalNavigate(options.taskUrls?.[routeKey] ?? sessionTaskUrl);
 }

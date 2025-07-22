@@ -12,5 +12,3 @@ Add `taskUrls` option to customize task flow URLs:
   }}
 />
 ```
-
-**Breaking**: Task key renamed from `'select-organization'` to `'org'`.

@@ -43,13 +43,16 @@ export function buildSessionTaskRedirectUrl({
     return null;
   }
 
-  return buildRedirectUrl({
-    routing,
-    baseUrl,
-    path,
-    endpoint: taskUrls?.[task.key] ?? `/tasks/${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[task.key]}`,
-    authQueryString: null,
-  });
+  return (
+    taskUrls?.[task.key] ??
+    buildRedirectUrl({
+      routing,
+      baseUrl,
+      path,
+      endpoint: `/tasks/${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[task.key]}`,
+      authQueryString: null,
+    })
+  );
 }
 
 export function buildSSOCallbackURL(
