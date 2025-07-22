@@ -83,7 +83,7 @@ export const OrganizationProfileRoutes = () => {
             </Route>
           </Switch>
         </Route>
-        {commerceSettings.billing.enabled && commerceSettings.billing.hasPaidOrgPlans && (
+        {commerceSettings.billing.organization.enabled ? (
           <Protect
             condition={has =>
               has({ permission: 'org:sys_billing:read' }) || has({ permission: 'org:sys_billing:manage' })
@@ -96,11 +96,13 @@ export const OrganizationProfileRoutes = () => {
                     <OrganizationBillingPage />
                   </Suspense>
                 </Route>
-                <Route path='plans'>
-                  <Suspense fallback={''}>
-                    <OrganizationPlansPage />
-                  </Suspense>
-                </Route>
+                {commerceSettings.billing.organization.hasPaidPlans ? (
+                  <Route path='plans'>
+                    <Suspense fallback={''}>
+                      <OrganizationPlansPage />
+                    </Suspense>
+                  </Route>
+                ) : null}
                 <Route path='statement/:statementId'>
                   <Suspense fallback={''}>
                     <OrganizationStatementPage />
@@ -114,7 +116,7 @@ export const OrganizationProfileRoutes = () => {
               </Switch>
             </Route>
           </Protect>
-        )}
+        ) : null}
         {apiKeysSettings.enabled && (
           <Protect
             condition={has =>
