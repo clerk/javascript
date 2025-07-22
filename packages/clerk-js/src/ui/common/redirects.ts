@@ -1,6 +1,6 @@
-import type { SessionTask } from '@clerk/types';
+import type { ClerkOptions, SessionTask } from '@clerk/types';
 
-import { SESSION_TASK_ROUTE_BY_KEY } from '../../core/sessionTasks';
+import { INTERNAL_SESSION_TASK_ROUTE_BY_KEY } from '../../core/sessionTasks';
 import { buildURL } from '../../utils/url';
 import type { SignInContextType, SignUpContextType, UserProfileContextType } from './../contexts';
 
@@ -33,9 +33,11 @@ export function buildSessionTaskRedirectUrl({
   path,
   baseUrl,
   task,
+  taskUrls,
 }: Pick<SignInContextType | SignUpContextType, 'routing' | 'path'> & {
   baseUrl: string;
   task?: SessionTask;
+  taskUrls?: ClerkOptions['taskUrls'];
 }) {
   if (!task) {
     return null;
@@ -45,7 +47,7 @@ export function buildSessionTaskRedirectUrl({
     routing,
     baseUrl,
     path,
-    endpoint: `/tasks/${SESSION_TASK_ROUTE_BY_KEY[task.key]}`,
+    endpoint: taskUrls?.[task.key] ?? `/tasks/${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[task.key]}`,
     authQueryString: null,
   });
 }

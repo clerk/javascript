@@ -48,7 +48,7 @@ import type {
   SignUpFallbackRedirectUrl,
   SignUpForceRedirectUrl,
 } from './redirects';
-import type { PendingSessionOptions, SignedInSessionResource } from './session';
+import type { PendingSessionOptions, SessionTask, SignedInSessionResource } from './session';
 import type { SessionVerificationLevel } from './sessionVerification';
 import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
@@ -56,7 +56,7 @@ import type { ClientJSONSnapshot, EnvironmentJSONSnapshot } from './snapshots';
 import type { Web3Strategy } from './strategies';
 import type { TelemetryCollector } from './telemetry';
 import type { UserResource } from './user';
-import type { Autocomplete, DeepPartial, DeepSnakeToCamel } from './utils';
+import type { Autocomplete, CamelCase, DeepPartial, DeepSnakeToCamel } from './utils';
 import type { WaitlistResource } from './waitlist';
 
 type __experimental_CheckoutStatus = 'awaiting_initialization' | 'awaiting_confirmation' | 'completed';
@@ -1050,6 +1050,14 @@ export type ClerkOptions = PendingSessionOptions &
      * @internal
      */
     __internal_keyless_dismissPrompt?: (() => Promise<void>) | null;
+
+    /**
+     * Customize the URL paths users are redirected to after sign-in or sign-up when specific
+     * session tasks need to be completed.
+     *
+     * @default undefined - Uses Clerk's default task flow URLs
+     */
+    taskUrls?: Record<CamelCase<SessionTask['key']>, string>;
   };
 
 export interface NavigateOptions {
