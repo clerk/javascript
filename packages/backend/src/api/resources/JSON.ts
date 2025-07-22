@@ -827,7 +827,6 @@ export interface CommercePlanJSON {
   description?: string;
   is_default: boolean;
   is_recurring: boolean;
-  is_prorated: boolean;
   amount: number;
   period: 'month' | 'annual';
   interval: number;
