@@ -31,7 +31,9 @@ type SamlConnectionListParams = ClerkPaginationRequest<{
 type CreateSamlConnectionParams = {
   name: string;
   provider: SamlIdpSlug;
+  /** @deprecated Use `domains` array instead. This field will be removed in a future API version. */
   domain: string;
+  domains: string[];
   organizationId?: string;
   idpEntityId?: string;
   idpSsoUrl?: string;
@@ -49,7 +51,9 @@ type CreateSamlConnectionParams = {
 type UpdateSamlConnectionParams = {
   name?: string;
   provider?: SamlIdpSlug;
+  /** @deprecated Use `domains` array instead. This field will be removed in a future API version. */
   domain?: string;
+  domains?: string[];
   organizationId?: string;
   idpEntityId?: string;
   idpSsoUrl?: string;
