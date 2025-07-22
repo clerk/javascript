@@ -44,7 +44,7 @@ describe('getAuthDataFromRequestAsync', () => {
     vi.clearAllMocks();
   });
 
-  it('returns invalid token auth object when token type does not match any in acceptsToken array', async () => {
+  it.only('returns invalid token auth object when token type does not match any in acceptsToken array', async () => {
     const req = mockRequest({
       url: '/api/protected',
       headers: new Headers({

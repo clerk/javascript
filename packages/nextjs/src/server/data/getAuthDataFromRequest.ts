@@ -1,22 +1,24 @@
-import type { AuthObject } from '@clerk/backend';
+import type { AuthObject, MachineAuthObject } from '@clerk/backend';
+import type {
+  AuthenticateRequestOptions,
+  MachineTokenType,
+  SignedInAuthObject,
+  SignedOutAuthObject,
+} from '@clerk/backend/internal';
 import {
-  type AuthenticateRequestOptions,
   AuthStatus,
   constants,
   getAuthObjectForAcceptedToken,
   getAuthObjectFromJwt,
-  getMachineTokenType,
   invalidTokenAuthObject,
   isMachineTokenByPrefix,
   isTokenTypeAccepted,
-  type SignedInAuthObject,
-  type SignedOutAuthObject,
   signedOutAuthObject,
   TokenType,
-  unauthenticatedMachineObject,
 } from '@clerk/backend/internal';
 import { decodeJwt } from '@clerk/backend/jwt';
 import type { PendingSessionOptions } from '@clerk/types';
+import type { AuthenticateContext } from 'node_modules/@clerk/backend/dist/tokens/authenticateContext';
 
 import type { LoggerNoCommit } from '../../utils/debugLogger';
 import { API_URL, API_VERSION, PUBLISHABLE_KEY, SECRET_KEY } from '../constants';
@@ -80,30 +82,29 @@ export const getAuthDataFromRequestSync = (
 
 const handleMachineToken = (
   bearerToken: string | undefined,
-  authObject: AuthObject | undefined,
+  rawAuthObject: AuthObject | undefined,
   acceptsToken: NonNullable<AuthenticateRequestOptions['acceptsToken']>,
-  options: GetAuthDataFromRequestOptions,
-): AuthObject | null => {
+  options: Partial<AuthenticateContext>,
+): MachineAuthObject<MachineTokenType> | null => {
   const hasMachineToken = bearerToken && isMachineTokenByPrefix(bearerToken);
 
   const acceptsOnlySessionToken =
     acceptsToken === TokenType.SessionToken ||
     (Array.isArray(acceptsToken) && acceptsToken.length === 1 && acceptsToken[0] === TokenType.SessionToken);
 
-  if (hasMachineToken && !acceptsOnlySessionToken) {
-    const machineTokenType = getMachineTokenType(bearerToken);
-
-    // Early return if the token type is not accepted to save on the verify call
-    if (Array.isArray(acceptsToken) && !acceptsToken.includes(machineTokenType)) {
-      return invalidTokenAuthObject();
-    }
-    // Early return for scalar acceptsToken if it does not match the machine token type
-    if (!Array.isArray(acceptsToken) && acceptsToken !== 'any' && machineTokenType !== acceptsToken) {
-      const authObject = unauthenticatedMachineObject(acceptsToken, options);
-      return getAuthObjectForAcceptedToken({ authObject, acceptsToken });
-    }
-
-    return getAuthObjectForAcceptedToken({ authObject, acceptsToken });
+  if (hasMachineToken && rawAuthObject && !acceptsOnlySessionToken) {
+    const authObject = getAuthObjectForAcceptedToken({
+      authObject: {
+        ...rawAuthObject,
+        debug: () => options,
+      },
+      acceptsToken,
+    });
+    return {
+      ...authObject,
+      getToken: () => (authObject.isAuthenticated ? Promise.resolve(bearerToken) : Promise.resolve(null)),
+      has: () => false,
+    } as MachineAuthObject<MachineTokenType>;
   }
 
   return null;

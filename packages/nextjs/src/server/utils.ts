@@ -195,7 +195,7 @@ export function encryptClerkRequestData(
     return !Object.values(obj).some(v => v !== undefined);
   };
 
-  if (isEmpty(requestData) && isEmpty(keylessModeKeys)) {
+  if (isEmpty(requestData) && isEmpty(keylessModeKeys) && !authObject) {
     return;
   }
 
@@ -213,7 +213,7 @@ export function encryptClerkRequestData(
     : ENCRYPTION_KEY || SECRET_KEY || KEYLESS_ENCRYPTION_KEY;
 
   return AES.encrypt(
-    JSON.stringify({ ...keylessModeKeys, ...requestData, authObject }),
+    JSON.stringify({ ...keylessModeKeys, ...requestData, authObject: authObject ?? undefined }),
     maybeKeylessEncryptionKey,
   ).toString();
 }
