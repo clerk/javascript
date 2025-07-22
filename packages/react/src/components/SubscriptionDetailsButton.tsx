@@ -6,8 +6,40 @@ import type { WithClerkProp } from '../types';
 import { assertSingleChild, normalizeWithDefaultValue, safeExecute } from '../utils';
 import { withClerk } from './withClerk';
 
-export type { __internal_SubscriptionDetailsProps };
-
+/**
+ * @experimental A button component that opens the Clerk Subscription Details drawer when clicked. This component must be rendered
+ * inside a `<SignedIn />` component to ensure the user is authenticated.
+ *
+ * @example
+ * ```tsx
+ * import { SignedIn } from '@clerk/clerk-react';
+ * import { SubscriptionDetailsButton } from '@clerk/clerk-react/experimental';
+ *
+ * // Basic usage with default "Subscription details" text
+ * function BasicSubscriptionDetails() {
+ *   return (
+ *     <SubscriptionDetailsButton />
+ *   );
+ * }
+ *
+ * // Custom button with organization subscription
+ * function OrganizationSubscriptionDetails() {
+ *   return (
+ *     <SubscriptionDetailsButton
+ *       for="org"
+ *       onSubscriptionCancel={() => console.log('Subscription canceled')}
+ *     >
+ *       <button>View Organization Subscription</button>
+ *     </SubscriptionDetailsButton>
+ *   );
+ * }
+ * ```
+ *
+ * @throws {Error} When rendered outside of a `<SignedIn />` component
+ * @throws {Error} When `for="org"` is used without an active organization context
+ *
+ * @see https://clerk.com/docs/billing/overview
+ */
 export const SubscriptionDetailsButton = withClerk(
   ({ clerk, children, ...props }: WithClerkProp<React.PropsWithChildren<__internal_SubscriptionDetailsProps>>) => {
     const { for: forProp, appearance, onSubscriptionCancel, portalId, portalRoot, ...rest } = props;

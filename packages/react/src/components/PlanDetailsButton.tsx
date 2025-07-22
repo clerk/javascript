@@ -5,8 +5,34 @@ import type { WithClerkProp } from '../types';
 import { assertSingleChild, normalizeWithDefaultValue, safeExecute } from '../utils';
 import { withClerk } from './withClerk';
 
-export type { __internal_PlanDetailsProps };
-
+/**
+ * @experimental A button component that opens the Clerk Plan Details drawer when clicked. This component is part of
+ * Clerk's Billing feature which is available under a public beta.
+ *
+ * @example
+ * ```tsx
+ * import { SignedIn } from '@clerk/clerk-react';
+ * import { PlanDetailsButton } from '@clerk/clerk-react/experimental';
+ *
+ * // Basic usage with default "Plan details" text
+ * function BasicPlanDetails() {
+ *   return (
+ *     <PlanDetailsButton planId="plan_123" />
+ *   );
+ * }
+ *
+ * // Custom button with custom text
+ * function CustomPlanDetails() {
+ *   return (
+ *     <PlanDetailsButton planId="plan_123">
+ *       <button>View Plan Details</button>
+ *     </PlanDetailsButton>
+ *   );
+ * }
+ * ```
+ *
+ * @see https://clerk.com/docs/billing/overview
+ */
 export const PlanDetailsButton = withClerk(
   ({ clerk, children, ...props }: WithClerkProp<React.PropsWithChildren<__internal_PlanDetailsProps>>) => {
     const { plan, planId, appearance, initialPlanPeriod, portalId, portalRoot, ...rest } = props;

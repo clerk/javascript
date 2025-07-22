@@ -6,8 +6,44 @@ import type { WithClerkProp } from '../types';
 import { assertSingleChild, normalizeWithDefaultValue, safeExecute } from '../utils';
 import { withClerk } from './withClerk';
 
-export type { __internal_CheckoutProps };
-
+/**
+ * @experimental A button component that opens the Clerk Checkout drawer when clicked. This component must be rendered
+ * inside a `<SignedIn />` component to ensure the user is authenticated.
+ *
+ * @example
+ * ```tsx
+ * import { SignedIn } from '@clerk/clerk-react';
+ * import { CheckoutButton } from '@clerk/clerk-react/experimental';
+ *
+ * // Basic usage with default "Checkout" text
+ * function BasicCheckout() {
+ *   return (
+ *     <SignedIn>
+ *       <CheckoutButton planId="plan_123" />
+ *     </SignedIn>
+ *   );
+ * }
+ *
+ * // Custom button with organization subscription
+ * function OrganizationCheckout() {
+ *   return (
+ *     <SignedIn>
+ *       <CheckoutButton
+ *         planId="plan_123"
+ *         planPeriod="month"
+ *         subscriberType="org"
+ *         onSubscriptionComplete={() => console.log('Subscription completed!')}
+ *       >
+ *         <button className="custom-button">Subscribe Now</button>
+ *       </CheckoutButton>
+ *     </SignedIn>
+ *   );
+ * }
+ * ```
+ *
+ * @throws {Error} When rendered outside of a `<SignedIn />` component
+ * @throws {Error} When `subscriberType="org"` is used without an active organization context
+ */
 export const CheckoutButton = withClerk(
   ({ clerk, children, ...props }: WithClerkProp<React.PropsWithChildren<__internal_CheckoutProps>>) => {
     const {
