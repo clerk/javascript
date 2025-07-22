@@ -13,8 +13,12 @@ export type SessionCookieHandler = {
   get: () => string | undefined;
 };
 
-const getCookieAttributes = (): { sameSite: string; secure: boolean; partitioned: boolean } => {
-  const sameSite = __BUILD_VARIANT_CHIPS__ ? 'None' : inCrossOriginIframe() ? 'None' : 'Lax';
+const getCookieAttributes = ({
+  isProduction,
+}: {
+  isProduction: boolean;
+}): { sameSite: string; secure: boolean; partitioned: boolean } => {
+  const sameSite = __BUILD_VARIANT_CHIPS__ ? 'None' : inCrossOriginIframe() ? 'None' : isProduction ? 'Lax' : 'None';
   const secure = getSecureAttribute(sameSite);
   const partitioned = __BUILD_VARIANT_CHIPS__ && secure;
   return { sameSite, secure, partitioned };
@@ -25,25 +29,29 @@ const getCookieAttributes = (): { sameSite: string; secure: boolean; partitioned
  * The cookie is used by the Clerk backend SDKs to identify
  * the authenticated user.
  */
-export const createSessionCookie = (cookieSuffix: string): SessionCookieHandler => {
+export const createSessionCookie = ({
+  cookieSuffix,
+  isProduction,
+}: {
+  cookieSuffix: string;
+  isProduction: boolean;
+}): SessionCookieHandler => {
   const sessionCookie = createCookieHandler(SESSION_COOKIE_NAME);
   const suffixedSessionCookie = createCookieHandler(getSuffixedCookieName(SESSION_COOKIE_NAME, cookieSuffix));
 
   const remove = () => {
-    const attributes = getCookieAttributes();
+    const attributes = getCookieAttributes({ isProduction });
     sessionCookie.remove(attributes);
     suffixedSessionCookie.remove(attributes);
   };
 
   const set = (token: string) => {
     const expires = addYears(Date.now(), 1);
-    const { sameSite, secure, partitioned } = getCookieAttributes();
+    const { sameSite, secure, partitioned } = getCookieAttributes({ isProduction });
 
-    // If setting Partitioned to true, remove the existing session cookies.
-    // This is to avoid conflicts with the same cookie name without Partitioned attribute.
-    if (partitioned) {
-      remove();
-    }
+    // Remove existing cookies to prevent conflicts when SameSite attributes change
+    sessionCookie.remove();
+    suffixedSessionCookie.remove();
 
     sessionCookie.set(token, { expires, sameSite, secure, partitioned });
     suffixedSessionCookie.set(token, { expires, sameSite, secure, partitioned });
