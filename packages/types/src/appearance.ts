@@ -812,11 +812,16 @@ export type Theme = {
   /**
    * A theme used as the base theme for the components.
    * For further customisation, you can use the {@link Theme.layout}, {@link Theme.variables} and {@link Theme.elements} props.
+   * Set to `false` to disable the base theme.
    * @example
    * import { dark } from "@clerk/themes";
    * appearance={{ baseTheme: dark }}
+   *
+   * @example
+   * // Disable base theme
+   * appearance={{ baseTheme: false }}
    */
-  baseTheme?: BaseTheme | BaseTheme[];
+  baseTheme?: BaseTheme | BaseTheme[] | false;
   /**
    * Configuration options that affect the layout of the components, allowing
    * customizations that hard to implement with just CSS.

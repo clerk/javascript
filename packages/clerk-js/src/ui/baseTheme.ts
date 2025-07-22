@@ -93,7 +93,7 @@ const inputStyles = (theme: InternalTheme) => ({
   }),
 });
 
-export const polishedAppearance: Appearance = {
+export const baseTheme: Appearance = {
   elements: ({ theme }: { theme: InternalTheme }): Elements => {
     return {
       button: {

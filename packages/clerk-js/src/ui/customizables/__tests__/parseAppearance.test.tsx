@@ -338,7 +338,7 @@ describe('AppearanceProvider layout flows', () => {
     expect(result.current.parsedLayout.socialButtonsVariant).toBe('blockButton');
   });
 
-  it('removes the polishedAppearance when simpleStyles is passed to globalAppearance', () => {
+  it('removes the baseTheme when simpleStyles is passed to globalAppearance', () => {
     const wrapper = ({ children }) => (
       <AppearanceProvider
         appearanceKey='signIn'
@@ -359,7 +359,7 @@ describe('AppearanceProvider layout flows', () => {
     expect(result.current.parsedElements[0]['alert'].backgroundColor).toBe(themeAColor);
   });
 
-  it('removes the polishedAppearance when simpleStyles is passed to appearance', () => {
+  it('removes the baseTheme when simpleStyles is passed to appearance', () => {
     const wrapper = ({ children }) => (
       <AppearanceProvider
         appearanceKey='signIn'
@@ -378,6 +378,72 @@ describe('AppearanceProvider layout flows', () => {
     const { result } = renderHook(() => useAppearance(), { wrapper });
     //notice the "0" index, not "1" as it would be without simpleStyles
     expect(result.current.parsedElements[0]['alert'].backgroundColor).toBe(themeBColor);
+  });
+
+  it('removes the baseTheme when baseTheme is set to false in globalAppearance', () => {
+    const wrapper = ({ children }) => (
+      <AppearanceProvider
+        appearanceKey='signIn'
+        globalAppearance={{
+          baseTheme: false,
+          elements: {
+            alert: { backgroundColor: themeAColor },
+          },
+        }}
+      >
+        {children}
+      </AppearanceProvider>
+    );
+
+    const { result } = renderHook(() => useAppearance(), { wrapper });
+    //notice the "0" index, not "1" as it would be without baseTheme
+    expect(result.current.parsedElements[0]['alert'].backgroundColor).toBe(themeAColor);
+  });
+
+  it('removes the baseTheme when baseTheme is set to false in appearance', () => {
+    const wrapper = ({ children }) => (
+      <AppearanceProvider
+        appearanceKey='signIn'
+        appearance={{
+          baseTheme: false,
+          elements: {
+            alert: { backgroundColor: themeBColor },
+          },
+        }}
+      >
+        {children}
+      </AppearanceProvider>
+    );
+
+    const { result } = renderHook(() => useAppearance(), { wrapper });
+    //notice the "0" index, not "1" as it would be without baseTheme
+    expect(result.current.parsedElements[0]['alert'].backgroundColor).toBe(themeBColor);
+  });
+
+  it('removes the baseTheme when baseTheme is set to false even with globalAppearance', () => {
+    const wrapper = ({ children }) => (
+      <AppearanceProvider
+        appearanceKey='signIn'
+        globalAppearance={{
+          elements: {
+            alert: { backgroundColor: themeAColor },
+          },
+        }}
+        appearance={{
+          baseTheme: false,
+          elements: {
+            alert: { backgroundColor: themeBColor },
+          },
+        }}
+      >
+        {children}
+      </AppearanceProvider>
+    );
+
+    const { result } = renderHook(() => useAppearance(), { wrapper });
+    //notice the "0" index for first element and "1" for second - baseTheme is disabled
+    expect(result.current.parsedElements[0]['alert'].backgroundColor).toBe(themeAColor);
+    expect(result.current.parsedElements[1]['alert'].backgroundColor).toBe(themeBColor);
   });
 });
 

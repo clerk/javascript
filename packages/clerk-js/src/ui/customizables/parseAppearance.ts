@@ -1,6 +1,7 @@
 import { fastDeepMergeAndReplace } from '@clerk/shared/utils';
 import type { Appearance, CaptchaAppearanceOptions, DeepPartial, Elements, Layout, Theme } from '@clerk/types';
 
+import { baseTheme } from '../baseTheme';
 import { createInternalTheme, defaultInternalTheme } from '../foundations';
 import type { InternalTheme } from '../styledSystem';
 import {
@@ -80,9 +81,10 @@ export const parseAppearance = (cascade: AppearanceCascade): ParsedAppearance =>
     !appearanceList.find(a => {
       //@ts-expect-error not public api
       return !!a.simpleStyles;
-    })
+    }) &&
+    !appearanceList.find(a => a.baseTheme === false)
   ) {
-    // appearanceList.unshift(polishedAppearance);
+    appearanceList.unshift(baseTheme);
   }
 
   const parsedElements = parseElements(
@@ -103,9 +105,12 @@ const expand = (theme: Theme | undefined, cascade: any[]) => {
     return;
   }
 
-  (Array.isArray(theme.baseTheme) ? theme.baseTheme : [theme.baseTheme]).forEach(baseTheme =>
-    expand(baseTheme as Theme, cascade),
-  );
+  // Only expand baseTheme if it's not false
+  if (theme.baseTheme !== false) {
+    (Array.isArray(theme.baseTheme) ? theme.baseTheme : [theme.baseTheme]).forEach(baseTheme =>
+      expand(baseTheme as Theme, cascade),
+    );
+  }
 
   cascade.push(theme);
 };
