@@ -35,14 +35,14 @@ describe('createClientUatCookie', () => {
   });
 
   it('should create both suffixed and non-suffixed cookie handlers', () => {
-    createClientUatCookie(mockCookieSuffix);
+    createClientUatCookie({ cookieSuffix: mockCookieSuffix, isProduction: false });
     expect(createCookieHandler).toHaveBeenCalledTimes(2);
     expect(createCookieHandler).toHaveBeenCalledWith('__client_uat');
     expect(createCookieHandler).toHaveBeenCalledWith('__client_uat_test-suffix');
   });
 
   it('should set cookies with correct parameters in non-cross-origin context', () => {
-    const cookieHandler = createClientUatCookie(mockCookieSuffix);
+    const cookieHandler = createClientUatCookie({ cookieSuffix: mockCookieSuffix, isProduction: false });
     cookieHandler.set({
       id: 'test-client',
       updatedAt: new Date('2024-01-01'),
@@ -53,22 +53,17 @@ describe('createClientUatCookie', () => {
     expect(mockSet).toHaveBeenCalledWith('1704067200', {
       domain: mockDomain,
       expires: mockExpires,
-      sameSite: 'Strict',
+      sameSite: 'None',
       secure: true,
       partitioned: false,
     });
   });
 
-  it('should set cookies with None sameSite in cross-origin context', () => {
-    (inCrossOriginIframe as jest.Mock).mockReturnValue(true);
-    const cookieHandler = createClientUatCookie(mockCookieSuffix);
-    cookieHandler.set({
-      id: 'test-client',
-      updatedAt: new Date('2024-01-01'),
-      signedInSessions: ['session1'],
-    });
+  it('should set value to 0 when client is undefined', () => {
+    const cookieHandler = createClientUatCookie({ cookieSuffix: mockCookieSuffix, isProduction: false });
+    cookieHandler.set(undefined);
 
-    expect(mockSet).toHaveBeenCalledWith('1704067200', {
+    expect(mockSet).toHaveBeenCalledWith('0', {
       domain: mockDomain,
       expires: mockExpires,
       sameSite: 'None',
@@ -77,21 +72,8 @@ describe('createClientUatCookie', () => {
     });
   });
 
-  it('should set value to 0 when client is undefined', () => {
-    const cookieHandler = createClientUatCookie(mockCookieSuffix);
-    cookieHandler.set(undefined);
-
-    expect(mockSet).toHaveBeenCalledWith('0', {
-      domain: mockDomain,
-      expires: mockExpires,
-      sameSite: 'Strict',
-      secure: true,
-      partitioned: false,
-    });
-  });
-
   it('should set value to 0 when client has no signed in sessions', () => {
-    const cookieHandler = createClientUatCookie(mockCookieSuffix);
+    const cookieHandler = createClientUatCookie({ cookieSuffix: mockCookieSuffix, isProduction: false });
     cookieHandler.set({
       id: 'test-client',
       updatedAt: new Date('2024-01-01'),
@@ -101,7 +83,7 @@ describe('createClientUatCookie', () => {
     expect(mockSet).toHaveBeenCalledWith('0', {
       domain: mockDomain,
       expires: mockExpires,
-      sameSite: 'Strict',
+      sameSite: 'None',
       secure: true,
       partitioned: false,
     });
@@ -110,7 +92,7 @@ describe('createClientUatCookie', () => {
   it('should get cookie value from suffixed cookie first, then fallback to non-suffixed', () => {
     mockGet.mockImplementationOnce(() => '1234567890').mockImplementationOnce(() => '9876543210');
 
-    const cookieHandler = createClientUatCookie(mockCookieSuffix);
+    const cookieHandler = createClientUatCookie({ cookieSuffix: mockCookieSuffix, isProduction: false });
     const result = cookieHandler.get();
 
     expect(result).toBe(1234567890);
@@ -119,9 +101,26 @@ describe('createClientUatCookie', () => {
   it('should return 0 when no cookie value is present', () => {
     mockGet.mockImplementationOnce(() => undefined).mockImplementationOnce(() => undefined);
 
-    const cookieHandler = createClientUatCookie(mockCookieSuffix);
+    const cookieHandler = createClientUatCookie({ cookieSuffix: mockCookieSuffix, isProduction: false });
     const result = cookieHandler.get();
 
     expect(result).toBe(0);
+  });
+
+  it('should set SameSite=Strict in production', () => {
+    const cookieHandler = createClientUatCookie({ cookieSuffix: mockCookieSuffix, isProduction: true });
+    cookieHandler.set({
+      id: 'test-client',
+      updatedAt: new Date('2024-01-01'),
+      signedInSessions: ['session1'],
+    });
+
+    expect(mockSet).toHaveBeenCalledWith('1704067200', {
+      domain: mockDomain,
+      expires: mockExpires,
+      sameSite: 'Strict',
+      secure: true,
+      partitioned: false,
+    });
   });
 });
