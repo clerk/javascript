@@ -20,7 +20,13 @@ export type ClientUatCookieHandler = {
  * The cookie is used as hint from the Clerk Backend packages to identify
  * if the user is authenticated or not.
  */
-export const createClientUatCookie = (cookieSuffix: string): ClientUatCookieHandler => {
+export const createClientUatCookie = ({
+  cookieSuffix,
+  isProduction,
+}: {
+  cookieSuffix: string;
+  isProduction: boolean;
+}): ClientUatCookieHandler => {
   const clientUatCookie = createCookieHandler(CLIENT_UAT_COOKIE_NAME);
   const suffixedClientUatCookie = createCookieHandler(getSuffixedCookieName(CLIENT_UAT_COOKIE_NAME, cookieSuffix));
 
@@ -37,7 +43,13 @@ export const createClientUatCookie = (cookieSuffix: string): ClientUatCookieHand
      * Generally, this is handled by redirectWithAuth() being called and relying on the dev browser ID in the URL,
      * but if that isn't used we rely on this. In production, nothing is cross-domain and Lax is used when client_uat is set from FAPI.
      */
-    const sameSite = __BUILD_VARIANT_CHIPS__ ? 'None' : inCrossOriginIframe() ? 'None' : 'Strict';
+    const sameSite = __BUILD_VARIANT_CHIPS__
+      ? 'None'
+      : inCrossOriginIframe()
+        ? 'None'
+        : isProduction
+          ? 'Strict'
+          : 'None';
     const secure = getSecureAttribute(sameSite);
     const partitioned = __BUILD_VARIANT_CHIPS__ && secure;
     const domain = getCookieDomain();
