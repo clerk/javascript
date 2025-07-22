@@ -94,8 +94,8 @@ import {
   createAllowedRedirectOrigins,
   createBeforeUnloadTracker,
   createPageLifecycle,
+  disabledAllBillingFeatures,
   disabledAPIKeysFeature,
-  disabledBillingFeature,
   disabledOrganizationsFeature,
   errorThrower,
   generateSignatureWithCoinbaseWallet,
@@ -577,7 +577,7 @@ export class Clerk implements ClerkInterface {
 
   public __internal_openCheckout = (props?: __internal_CheckoutProps): void => {
     this.assertComponentsReady(this.#componentControls);
-    if (disabledBillingFeature(this, this.environment)) {
+    if (disabledAllBillingFeatures(this, this.environment)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderAnyCommerceComponent('Checkout'), {
           code: CANNOT_RENDER_BILLING_DISABLED_ERROR_CODE,
@@ -606,7 +606,7 @@ export class Clerk implements ClerkInterface {
 
   public __internal_openPlanDetails = (props: __internal_PlanDetailsProps): void => {
     this.assertComponentsReady(this.#componentControls);
-    if (disabledBillingFeature(this, this.environment)) {
+    if (disabledAllBillingFeatures(this, this.environment)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderAnyCommerceComponent('PlanDetails'), {
           code: CANNOT_RENDER_BILLING_DISABLED_ERROR_CODE,
@@ -1061,7 +1061,7 @@ export class Clerk implements ClerkInterface {
 
   public mountPricingTable = (node: HTMLDivElement, props?: PricingTableProps): void => {
     this.assertComponentsReady(this.#componentControls);
-    if (disabledBillingFeature(this, this.environment)) {
+    if (disabledAllBillingFeatures(this, this.environment)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderAnyCommerceComponent('PricingTable'), {
           code: CANNOT_RENDER_BILLING_DISABLED_ERROR_CODE,
@@ -2524,6 +2524,10 @@ export class Clerk implements ClerkInterface {
 
     this.#emit();
   };
+
+  get __internal_hasAfterAuthFlows() {
+    return !!this.environment?.organizationSettings?.forceOrganizationSelection;
+  }
 
   #defaultSession = (client: ClientResource): SignedInSessionResource | null => {
     if (client.lastActiveSessionId) {
