@@ -7,7 +7,7 @@ import { TaskSelectOrganizationContext, useSessionTasksContext } from '@/ui/cont
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 
-import { Box, descriptors, Flex, localizationKeys, Spinner } from '../../../customizables';
+import { Box, descriptors, Flex, Flow, localizationKeys, Spinner } from '../../../customizables';
 import { CreateOrganizationForm } from '../../CreateOrganization/CreateOrganizationForm';
 import { OrganizationListPageList } from '../../OrganizationList/OrganizationListPage';
 import { organizationListParams } from '../../OrganizationSwitcher/utils';
@@ -106,13 +106,15 @@ const FlowCard = ({ children }: PropsWithChildren) => {
   const { currentTaskContainer } = useSessionTasksContext();
 
   return (
-    <Card.Root ref={currentTaskContainer}>
-      <Card.Content sx={t => ({ padding: `${t.space.$8} ${t.space.$none} ${t.space.$none}` })}>
-        <Card.Alert sx={t => ({ margin: `${t.space.$none} ${t.space.$5}` })}>{card.error}</Card.Alert>
-        {children}
-      </Card.Content>
-      <Card.Footer />
-    </Card.Root>
+    <Flow.Root flow='taskSelectOrganization'>
+      <Card.Root ref={currentTaskContainer}>
+        <Card.Content sx={t => ({ padding: `${t.space.$8} ${t.space.$none} ${t.space.$none}` })}>
+          <Card.Alert sx={t => ({ margin: `${t.space.$none} ${t.space.$5}` })}>{card.error}</Card.Alert>
+          {children}
+        </Card.Content>
+        <Card.Footer />
+      </Card.Root>
+    </Flow.Root>
   );
 };
 

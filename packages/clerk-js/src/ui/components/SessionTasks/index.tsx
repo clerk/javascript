@@ -10,18 +10,20 @@ import { INTERNAL_SESSION_TASK_ROUTE_BY_KEY } from '../../../core/sessionTasks';
 import { SignInContext, SignUpContext } from '../../../ui/contexts';
 import { SessionTasksContext, useSessionTasksContext } from '../../contexts/components/SessionTasks';
 import { Route, Switch, useRouter } from '../../router';
-import { TaskSelectOrganization } from './tasks/ForceOrganizationSelection';
+import { TaskSelectOrganization } from './tasks/TaskSelectOrganization';
 
 const SessionTasksStart = () => {
-  const { navigateToTaskIfAvailable } = useSessionTasksContext();
+  const clerk = useClerk();
+  const { navigate } = useRouter();
+  const { redirectUrlComplete } = useSessionTasksContext();
 
   useEffect(() => {
     // Simulates additional latency to avoid a abrupt UI transition when navigating to the next task
     const timeoutId = setTimeout(() => {
-      void navigateToTaskIfAvailable();
+      void clerk.__internal_navigateToTaskIfAvailable({ redirectUrlComplete });
     }, 500);
     return () => clearTimeout(timeoutId);
-  }, [navigateToTaskIfAvailable]);
+  }, [navigate, clerk, redirectUrlComplete]);
 
   return (
     <Card.Root>
@@ -91,12 +93,7 @@ export const SessionTask = withCardStateProvider(() => {
   }
 
   return (
-    <SessionTasksContext.Provider
-      value={{
-        redirectUrlComplete,
-        currentTaskContainer,
-      }}
-    >
+    <SessionTasksContext.Provider value={{ redirectUrlComplete, currentTaskContainer }}>
       <SessionTaskRoutes />
     </SessionTasksContext.Provider>
   );

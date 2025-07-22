@@ -1,8 +1,8 @@
-import { useOrganization, useOrganizationList } from '@clerk/shared/react';
+import { useClerk, useOrganization, useOrganizationList } from '@clerk/shared/react';
 import type { CreateOrganizationParams, OrganizationResource } from '@clerk/types';
-import React from 'react';
+import React, { useContext } from 'react';
 
-import { useSessionTasksContext } from '@/ui/contexts/components/SessionTasks';
+import { SessionTasksContext } from '@/ui/contexts/components/SessionTasks';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Form } from '@/ui/elements/Form';
 import { FormButtonContainer } from '@/ui/elements/FormButtons';
@@ -40,7 +40,8 @@ type CreateOrganizationFormProps = {
 export const CreateOrganizationForm = withCardStateProvider((props: CreateOrganizationFormProps) => {
   const card = useCardState();
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
-  const sessionTasksContext = useSessionTasksContext();
+  const sessionTasksContext = useContext(SessionTasksContext);
+  const clerk = useClerk();
 
   const lastCreatedOrganizationRef = React.useRef<OrganizationResource | null>(null);
   const { createOrganization, isLoaded, setActive, userMemberships } = useOrganizationList({
@@ -92,7 +93,9 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
       void userMemberships.revalidate?.();
 
       if (sessionTasksContext) {
-        await sessionTasksContext.navigateToTaskIfAvailable();
+        await clerk.__internal_navigateToTaskIfAvailable({
+          redirectUrlComplete: sessionTasksContext.redirectUrlComplete,
+        });
         return;
       }
 

@@ -5,7 +5,12 @@ const formatWarning = (msg: string) => {
 };
 
 const createMessageForDisabledOrganizations = (
-  componentName: 'OrganizationProfile' | 'OrganizationSwitcher' | 'OrganizationList' | 'CreateOrganization',
+  componentName:
+    | 'OrganizationProfile'
+    | 'OrganizationSwitcher'
+    | 'OrganizationList'
+    | 'CreateOrganization'
+    | 'TaskSelectOrganization',
 ) => {
   return formatWarning(
     `The <${componentName}/> cannot be rendered when the feature is turned off. Visit 'dashboard.clerk.com' to enable the feature. Since the feature is turned off, this is no-op.`,

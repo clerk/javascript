@@ -21,9 +21,7 @@ const componentImportPaths = {
   Checkout: () => import(/* webpackChunkName: "checkout" */ '../components/Checkout'),
   SessionTasks: () => import(/* webpackChunkName: "sessionTasks" */ '../components/SessionTasks'),
   TaskSelectOrganization: () =>
-    import(
-      /* webpackChunkName: "taskSelectOrganization" */ '../components/SessionTasks/tasks/ForceOrganizationSelection'
-    ),
+    import(/* webpackChunkName: "taskSelectOrganization" */ '../components/SessionTasks/tasks/TaskSelectOrganization'),
   PlanDetails: () => import(/* webpackChunkName: "planDetails" */ '../components/Plans/PlanDetails'),
   SubscriptionDetails: () => import(/* webpackChunkName: "subscriptionDetails" */ '../components/SubscriptionDetails'),
   APIKeys: () => import(/* webpackChunkName: "apiKeys" */ '../components/ApiKeys/ApiKeys'),

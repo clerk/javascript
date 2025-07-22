@@ -1,6 +1,6 @@
 ---
-'@clerk/clerk-js': patch
-'@clerk/types': patch
+'@clerk/clerk-js': minor
+'@clerk/types': minor
 ---
 
 Export `<TaskSelectOrganization />` component.
@@ -9,13 +9,13 @@ It allows you to eject the organization selection task flow from the default `Si
 
 Usage example:
 ```tsx
-<ClerkProvider taskUrls={{ 'select-organization': '/choose-organization' }}>
+<ClerkProvider taskUrls={{ 'select-organization': '/onboarding/select-organization' }}>
   <App />
 </ClerkProvider>
 ```
 
 ```tsx
-function ChooseOrganizationPage() {
-  return <TaskSelectOrganization redirectUrlComplete="/dashboard" />
+function OnboardingSelectOrganization() {
+  return <TaskSelectOrganization redirectUrlComplete="/dashboard/onboarding-complete" />
 }
 ```

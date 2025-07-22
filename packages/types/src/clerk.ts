@@ -559,6 +559,21 @@ export interface Clerk {
   __internal_unmountOAuthConsent: (targetNode: HTMLDivElement) => void;
 
   /**
+   * Mounts a TaskSelectOrganization component at the target element.
+   * @param targetNode Target node to mount the TaskSelectOrganization component.
+   * @param props configuration parameters.
+   */
+  mountTaskSelectOrganization: (targetNode: HTMLDivElement, props?: TaskSelectOrganizationProps) => void;
+
+  /**
+   * Unmount a TaskSelectOrganization component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @param targetNode Target node to unmount the TaskSelectOrganization component from.
+   */
+  unmountTaskSelectOrganization: (targetNode: HTMLDivElement) => void;
+
+  /**
    * @internal
    * Loads Stripe libraries for commerce functionality
    */
