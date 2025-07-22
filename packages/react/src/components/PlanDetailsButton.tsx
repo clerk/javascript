@@ -9,8 +9,7 @@ export type { __internal_PlanDetailsProps };
 
 export const PlanDetailsButton = withClerk(
   ({ clerk, children, ...props }: WithClerkProp<React.PropsWithChildren<__internal_PlanDetailsProps>>) => {
-    // const { signUpFallbackRedirectUrl, forceRedirectUrl, fallbackRedirectUrl, signUpForceRedirectUrl, mode, ...rest } =
-    //   props;
+    const { plan, planId, appearance, initialPlanPeriod, portalId, portalRoot, ...rest } = props;
     children = normalizeWithDefaultValue(children, 'Plan details');
     const child = assertSingleChild(children)('PlanDetailsButton');
 
@@ -19,16 +18,14 @@ export const PlanDetailsButton = withClerk(
         return;
       }
 
-      return clerk.__internal_openPlanDetails(props);
-
-      // if (mode === 'modal') {
-      //   return clerk.openSignIn({ ...opts, appearance: props.appearance });
-      // }
-      // return clerk.redirectToSignIn({
-      //   ...opts,
-      //   signInFallbackRedirectUrl: fallbackRedirectUrl,
-      //   signInForceRedirectUrl: forceRedirectUrl,
-      // });
+      return clerk.__internal_openPlanDetails({
+        plan,
+        planId,
+        appearance,
+        initialPlanPeriod,
+        portalId,
+        portalRoot,
+      });
     };
 
     const wrappedChildClickHandler: React.MouseEventHandler = async e => {
@@ -38,8 +35,8 @@ export const PlanDetailsButton = withClerk(
       return clickHandler();
     };
 
-    const childProps = { ...props, onClick: wrappedChildClickHandler };
+    const childProps = { ...rest, onClick: wrappedChildClickHandler };
     return React.cloneElement(child as React.ReactElement<unknown>, childProps);
   },
-  'SignInButton',
+  { component: 'PlanDetailsButton', renderWhileLoading: true },
 );
