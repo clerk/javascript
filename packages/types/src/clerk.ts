@@ -56,7 +56,7 @@ import type { ClientJSONSnapshot, EnvironmentJSONSnapshot } from './snapshots';
 import type { Web3Strategy } from './strategies';
 import type { TelemetryCollector } from './telemetry';
 import type { UserResource } from './user';
-import type { Autocomplete, CamelCase, DeepPartial, DeepSnakeToCamel } from './utils';
+import type { Autocomplete, DeepPartial, DeepSnakeToCamel } from './utils';
 import type { WaitlistResource } from './waitlist';
 
 type __experimental_CheckoutStatus = 'awaiting_initialization' | 'awaiting_confirmation' | 'completed';
@@ -1057,7 +1057,7 @@ export type ClerkOptions = PendingSessionOptions &
      *
      * @default undefined - Uses Clerk's default task flow URLs
      */
-    taskUrls?: Record<CamelCase<SessionTask['key']>, string>;
+    taskUrls?: Record<SessionTask['key'], string>;
   };
 
 export interface NavigateOptions {
