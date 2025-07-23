@@ -1,15 +1,19 @@
-import type { AuthenticatedMachineObject, SignedOutAuthObject } from '@clerk/backend/internal';
-import { constants, verifyMachineAuthToken } from '@clerk/backend/internal';
+import type { MachineAuthObject } from '@clerk/backend';
+import type { AuthenticatedMachineObject, MachineTokenType, SignedOutAuthObject } from '@clerk/backend/internal';
+import { constants } from '@clerk/backend/internal';
 import { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { getAuthDataFromRequestAsync, getAuthDataFromRequestSync } from '../data/getAuthDataFromRequest';
+import { getAuthDataFromRequest } from '../data/getAuthDataFromRequest';
+import { encryptClerkRequestData } from '../utils';
 
-vi.mock('@clerk/backend/internal', async () => {
-  const actual = await vi.importActual('@clerk/backend/internal');
+vi.mock(import('../constants.js'), async importOriginal => {
+  const actual = await importOriginal();
   return {
     ...actual,
-    verifyMachineAuthToken: vi.fn(),
+    ENCRYPTION_KEY: 'encryption-key',
+    PUBLISHABLE_KEY: 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA',
+    SECRET_KEY: 'sk_test_xxxxxxxxxxxxxxxxxx',
   };
 });
 
@@ -17,42 +21,57 @@ type MockRequestParams = {
   url: string;
   appendDevBrowserCookie?: boolean;
   method?: string;
-  headers?: any;
+  headers?: Headers;
+  machineAuthObject?: Partial<MachineAuthObject<MachineTokenType>>;
 };
 
 const mockRequest = (params: MockRequestParams) => {
-  const { url, appendDevBrowserCookie = false, method = 'GET', headers = new Headers() } = params;
+  const { url, appendDevBrowserCookie = false, method = 'GET', headers = new Headers(), machineAuthObject } = params;
   const headersWithCookie = new Headers(headers);
+
   if (appendDevBrowserCookie) {
     headersWithCookie.append('cookie', '__clerk_db_jwt=test_jwt');
   }
+
+  // Add encrypted auth object header if provided
+  if (machineAuthObject) {
+    const encryptedData = encryptClerkRequestData(
+      {}, // requestData
+      {}, // keylessModeKeys
+      // @ts-expect-error - mock machine auth object
+      machineAuthObject,
+    );
+    if (encryptedData) {
+      headersWithCookie.set(constants.Headers.ClerkRequestData, encryptedData);
+    }
+  }
+
   return new NextRequest(new URL(url, 'https://www.clerk.com').toString(), { method, headers: headersWithCookie });
 };
 
-const machineTokenErrorMock = [
-  {
-    message: 'Token type mismatch',
-    code: 'token-invalid',
-    status: 401,
-    name: 'MachineTokenVerificationError',
-    getFullMessage: () => 'Token type mismatch',
-  },
-];
+// Helper function to create mock machine auth objects
+const createMockMachineAuthObject = <T extends MachineTokenType>(data: Partial<MachineAuthObject<T>>) => data;
 
-describe('getAuthDataFromRequestAsync', () => {
+describe('getAuthDataFromRequest', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('returns invalid token auth object when token type does not match any in acceptsToken array', async () => {
+  it('returns invalid token auth object when token type does not match any in acceptsToken array', () => {
+    const machineAuthObject = createMockMachineAuthObject({
+      tokenType: 'api_key',
+      isAuthenticated: true,
+    });
+
     const req = mockRequest({
       url: '/api/protected',
       headers: new Headers({
         [constants.Headers.Authorization]: 'Bearer ak_xxx',
       }),
+      machineAuthObject,
     });
 
-    const auth = await getAuthDataFromRequestAsync(req, {
+    const auth = getAuthDataFromRequest(req, {
       acceptsToken: ['machine_token', 'oauth_token', 'session_token'],
     });
 
@@ -60,25 +79,76 @@ describe('getAuthDataFromRequestAsync', () => {
     expect(auth.isAuthenticated).toBe(false);
   });
 
-  it('returns unauthenticated auth object when token type does not match single acceptsToken', async () => {
+  it('handles mixed token types in acceptsToken array', () => {
+    const machineAuthObject = createMockMachineAuthObject({
+      tokenType: 'api_key',
+      isAuthenticated: true,
+      id: 'ak_id123',
+    });
+
     const req = mockRequest({
       url: '/api/protected',
       headers: new Headers({
         [constants.Headers.Authorization]: 'Bearer ak_xxx',
       }),
+      machineAuthObject,
     });
 
-    const auth = await getAuthDataFromRequestAsync(req, { acceptsToken: 'oauth_token' });
+    const auth = getAuthDataFromRequest(req, {
+      acceptsToken: ['api_key', 'session_token'],
+    });
+
+    expect(auth.tokenType).toBe('api_key');
+    expect(auth.isAuthenticated).toBe(true);
+  });
+
+  it('falls back to session logic when machine token is not accepted', () => {
+    const machineAuthObject = createMockMachineAuthObject({
+      tokenType: 'api_key',
+      isAuthenticated: true,
+    });
+
+    const req = mockRequest({
+      url: '/api/protected',
+      headers: new Headers({
+        [constants.Headers.Authorization]: 'Bearer ak_xxx',
+      }),
+      machineAuthObject,
+    });
+
+    const auth = getAuthDataFromRequest(req, {
+      acceptsToken: 'session_token',
+    });
+
+    expect(auth.tokenType).toBe('session_token');
+    expect(auth.isAuthenticated).toBe(false);
+  });
+
+  it('returns unauthenticated auth object when token type does not match single acceptsToken', () => {
+    const machineAuthObject = createMockMachineAuthObject({
+      tokenType: 'api_key',
+      isAuthenticated: true,
+    });
+
+    const req = mockRequest({
+      url: '/api/protected',
+      headers: new Headers({
+        [constants.Headers.Authorization]: 'Bearer ak_xxx',
+      }),
+      machineAuthObject,
+    });
+
+    const auth = getAuthDataFromRequest(req, { acceptsToken: 'oauth_token' });
 
     expect(auth.tokenType).toBe('oauth_token');
     expect(auth.isAuthenticated).toBe(false);
   });
 
-  it('returns authenticated auth object for any valid token type', async () => {
-    vi.mocked(verifyMachineAuthToken).mockResolvedValueOnce({
-      data: { id: 'ak_id123', subject: 'user_12345' } as any,
+  it('returns authenticated auth object for any valid token type', () => {
+    const machineAuthObject = createMockMachineAuthObject({
       tokenType: 'api_key',
-      errors: undefined,
+      id: 'ak_id123',
+      isAuthenticated: true,
     });
 
     const req = mockRequest({
@@ -86,30 +156,33 @@ describe('getAuthDataFromRequestAsync', () => {
       headers: new Headers({
         [constants.Headers.Authorization]: 'Bearer ak_xxx',
       }),
+      machineAuthObject,
     });
 
-    const auth = await getAuthDataFromRequestAsync(req, { acceptsToken: 'any' });
+    const auth = getAuthDataFromRequest(req, { acceptsToken: 'any' });
 
     expect(auth.tokenType).toBe('api_key');
     expect((auth as AuthenticatedMachineObject<'api_key'>).id).toBe('ak_id123');
     expect(auth.isAuthenticated).toBe(true);
   });
 
-  it('returns authenticated object when token type exists in acceptsToken array', async () => {
-    vi.mocked(verifyMachineAuthToken).mockResolvedValueOnce({
-      data: { id: 'ak_id123', subject: 'user_12345' } as any,
+  it('returns authenticated object when token type exists in acceptsToken array', () => {
+    const machineAuthObject = createMockMachineAuthObject({
       tokenType: 'api_key',
-      errors: undefined,
+      id: 'ak_id123',
+      subject: 'user_12345',
+      isAuthenticated: true,
     });
 
     const req = mockRequest({
       url: '/api/protected',
       headers: new Headers({
-        [constants.Headers.Authorization]: 'Bearer ak_secret123',
+        [constants.Headers.Authorization]: 'Bearer ak_xxx',
       }),
+      machineAuthObject,
     });
 
-    const auth = await getAuthDataFromRequestAsync(req, {
+    const auth = getAuthDataFromRequest(req, {
       acceptsToken: ['api_key', 'machine_token'],
     });
 
@@ -136,11 +209,11 @@ describe('getAuthDataFromRequestAsync', () => {
     },
   ])(
     'returns authenticated $tokenType object when token is valid and acceptsToken is $tokenType',
-    async ({ tokenType, token, data }) => {
-      vi.mocked(verifyMachineAuthToken).mockResolvedValueOnce({
-        data: data as any,
+    ({ tokenType, token, data }) => {
+      const machineAuthObject = createMockMachineAuthObject({
         tokenType,
-        errors: undefined,
+        isAuthenticated: true,
+        ...data,
       });
 
       const req = mockRequest({
@@ -148,9 +221,10 @@ describe('getAuthDataFromRequestAsync', () => {
         headers: new Headers({
           [constants.Headers.Authorization]: `Bearer ${token}`,
         }),
+        machineAuthObject,
       });
 
-      const auth = await getAuthDataFromRequestAsync(req, { acceptsToken: tokenType });
+      const auth = getAuthDataFromRequest(req, { acceptsToken: tokenType });
 
       expect(auth.tokenType).toBe(tokenType);
       expect(auth.isAuthenticated).toBe(true);
@@ -173,27 +247,28 @@ describe('getAuthDataFromRequestAsync', () => {
       token: 'mt_123',
       data: undefined,
     },
-  ])('returns unauthenticated $tokenType object when token is invalid', async ({ tokenType, token, data }) => {
-    vi.mocked(verifyMachineAuthToken).mockResolvedValueOnce({
-      data: data as any,
+  ])('returns unauthenticated $tokenType object when token is invalid', ({ tokenType, token }) => {
+    const machineAuthObject = createMockMachineAuthObject({
       tokenType,
-      errors: machineTokenErrorMock as any,
+      isAuthenticated: false,
     });
 
+    // For invalid tokens, we don't include encrypted auth object
     const req = mockRequest({
       url: '/api/protected',
       headers: new Headers({
         [constants.Headers.Authorization]: `Bearer ${token}`,
       }),
+      machineAuthObject,
     });
 
-    const auth = await getAuthDataFromRequestAsync(req, { acceptsToken: tokenType });
+    const auth = getAuthDataFromRequest(req, { acceptsToken: tokenType });
 
     expect(auth.tokenType).toBe(tokenType);
     expect(auth.isAuthenticated).toBe(false);
   });
 
-  it('falls back to session token handling', async () => {
+  it('falls back to session token handling when no encrypted auth object is present', () => {
     const req = mockRequest({
       url: '/api/protected',
       headers: new Headers({
@@ -201,15 +276,13 @@ describe('getAuthDataFromRequestAsync', () => {
       }),
     });
 
-    const auth = await getAuthDataFromRequestAsync(req);
+    const auth = getAuthDataFromRequest(req);
     expect(auth.tokenType).toBe('session_token');
     expect((auth as SignedOutAuthObject).userId).toBeNull();
     expect(auth.isAuthenticated).toBe(false);
   });
-});
 
-describe('getAuthDataFromRequestSync', () => {
-  it('only accepts session tokens', () => {
+  it('only accepts session tokens when encrypted auth object is not present', () => {
     const req = mockRequest({
       url: '/api/protected',
       headers: new Headers({
@@ -217,12 +290,12 @@ describe('getAuthDataFromRequestSync', () => {
       }),
     });
 
-    const auth = getAuthDataFromRequestSync(req, {
+    const auth = getAuthDataFromRequest(req, {
       acceptsToken: 'api_key',
     });
 
     expect(auth.tokenType).toBe('session_token');
-    expect(auth.userId).toBeNull();
+    expect((auth as SignedOutAuthObject).userId).toBeNull();
     expect(auth.isAuthenticated).toBe(false);
   });
 });
