@@ -1,5 +1,44 @@
 # Change Log
 
+## 5.75.0
+
+### Minor Changes
+
+- [Billing Beta] Replace `payerType[]` with `forPayerType` typed as `'org' | 'user'`. ([#6342](https://github.com/clerk/javascript/pull/6342)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add optional `cssLayerName` to `BaseTheme` object ([#6322](https://github.com/clerk/javascript/pull/6322)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Fix authentication state resolution when creating checkout instance ([#6370](https://github.com/clerk/javascript/pull/6370)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Introduce `__internal_hasAfterAuthFlows` flag ([#6366](https://github.com/clerk/javascript/pull/6366)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Adjust the cases in which the Billing item shows within the `UserProfile` and `OrgProfile` components ([#6315](https://github.com/clerk/javascript/pull/6315)) by [@aeliox](https://github.com/aeliox)
+
+- Refactor UserPreview to use min-height vs empty element to remove extra leading space ([#6363](https://github.com/clerk/javascript/pull/6363)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Adds missing error message when an account is locked in hash routing mode. ([#6336](https://github.com/clerk/javascript/pull/6336)) by [@bratsos](https://github.com/bratsos)
+
+- Add `taskUrls` option to customize task flow URLs: ([#6373](https://github.com/clerk/javascript/pull/6373)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  ```tsx
+  <ClerkProvider
+    taskUrls={{
+      org: '/my-custom-org-selector',
+    }}
+  />
+  ```
+
+- Improve the contrast of nav bar buttons within profile components. ([#6351](https://github.com/clerk/javascript/pull/6351)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Rename `org` session task key to `select-organization` ([#6372](https://github.com/clerk/javascript/pull/6372)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`8ff2aef`](https://github.com/clerk/javascript/commit/8ff2aef1403ee5060a76ce3d77cc295d4adc62fb), [`fecc99d`](https://github.com/clerk/javascript/commit/fecc99d43cb7db5b99863829acb234cbce0da264), [`6c5cd88`](https://github.com/clerk/javascript/commit/6c5cd88fa5f5c208f348126e9b9177df8f8fdeb7), [`959d63d`](https://github.com/clerk/javascript/commit/959d63de27e5bfe27b46699b441dfd4e48616bf8), [`80abb5d`](https://github.com/clerk/javascript/commit/80abb5d7e90fd18600f9d50c890ea065375c96de), [`4c3d6c1`](https://github.com/clerk/javascript/commit/4c3d6c197976a4235e6324eb70412f7652c97878), [`438e499`](https://github.com/clerk/javascript/commit/438e49943f6f970166df453e02d4c8f804f26345), [`bbfaca8`](https://github.com/clerk/javascript/commit/bbfaca8431f329798bd2867c147f711beb5db33a), [`35da3e8`](https://github.com/clerk/javascript/commit/35da3e85bbc24b1e2d337c8d110f3503be4b4c95), [`10e1060`](https://github.com/clerk/javascript/commit/10e10605b18a58f33a93caed058159c190678e74), [`92c44dd`](https://github.com/clerk/javascript/commit/92c44dd9d51e771a928a8da7004bdb8f8bdbaf58), [`a04a8f5`](https://github.com/clerk/javascript/commit/a04a8f5f81241ee41d93cd64793beca9d6296abb), [`6080456`](https://github.com/clerk/javascript/commit/60804566d37a2e7ab085bb1fff712bd41c4f7c2d), [`bd84c62`](https://github.com/clerk/javascript/commit/bd84c628f7be467ff1380eed8e5337d6edea1f76), [`305e5e4`](https://github.com/clerk/javascript/commit/305e5e4a25f097abb5ba72810d59b01764d77427), [`4954747`](https://github.com/clerk/javascript/commit/49547473383c561c1a6e7d3cfe6ead1519859463), [`c61855c`](https://github.com/clerk/javascript/commit/c61855c51d9c129d48c4543da3719939ad82f623), [`43ea069`](https://github.com/clerk/javascript/commit/43ea069c570dc64503fc82356ad28a2e43689d45)]:
+  - @clerk/localizations@3.20.2
+  - @clerk/types@4.69.0
+  - @clerk/shared@3.14.0
+
 ## 5.74.1
 
 ### Patch Changes
