@@ -134,7 +134,7 @@ export type CheckoutCtx = __internal_CheckoutProps & {
 } & NewSubscriptionRedirectUrl;
 
 export type SessionTasksCtx = {
-  redirectUrlComplete?: string;
+  redirectUrlComplete: string;
   currentTaskContainer?: React.RefObject<HTMLDivElement> | null;
 };
 

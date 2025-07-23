@@ -2055,9 +2055,8 @@ export type SignUpButtonProps = (SignUpButtonPropsModal | ButtonPropsRedirect) &
 export type TaskSelectOrganizationProps = {
   /**
    * Full URL or path to navigate to after successfully resolving all tasks
-   * @default undefined
    */
-  redirectUrlComplete?: string;
+  redirectUrlComplete: string;
   appearance?: TaskSelectOrganizationTheme;
 };
 
@@ -2131,8 +2130,9 @@ export interface AuthenticateWithGoogleOneTapParams {
 export interface __internal_NavigateToTaskIfAvailableParams {
   /**
    * Full URL or path to navigate to after successfully resolving all tasks
+   * @default undefined
    */
-  redirectUrlComplete: string;
+  redirectUrlComplete?: string;
 }
 
 export interface LoadedClerk extends Clerk {
