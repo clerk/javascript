@@ -109,7 +109,12 @@ export const getAuthDataFromRequest = (req: RequestLike, opts: GetAuthDataFromRe
 
   // Handle machine tokens first (from encrypted request data)
   // Machine tokens are passed via x-clerk-request-data header from middleware
-  const machineAuthObject = handleMachineToken(bearerToken, decryptedRequestData.authObject, acceptsToken, options);
+  const machineAuthObject = handleMachineToken(
+    bearerToken,
+    decryptedRequestData.machineAuthObject,
+    acceptsToken,
+    options,
+  );
   if (machineAuthObject) {
     return machineAuthObject;
   }
