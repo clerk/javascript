@@ -129,7 +129,6 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
           justifyContent: 'center',
           flexWrap: 'wrap',
           gap: 'var(--gap)',
-          marginBottom: t.space.$4,
           '& > *': {
             flex: '0 0 var(--item-width)',
             [mqu.sm]: {
