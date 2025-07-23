@@ -33,6 +33,38 @@ export type GetAuthDataFromRequestOptions = {
 } & PendingSessionOptions;
 
 /**
+ * Extracts auth headers from the request
+ */
+const getAuthHeaders = (req: RequestLike) => {
+  return {
+    authStatus: getAuthKeyFromRequest(req, 'AuthStatus'),
+    authToken: getAuthKeyFromRequest(req, 'AuthToken'),
+    authMessage: getAuthKeyFromRequest(req, 'AuthMessage'),
+    authReason: getAuthKeyFromRequest(req, 'AuthReason'),
+    authSignature: getAuthKeyFromRequest(req, 'AuthSignature'),
+  };
+};
+
+/**
+ * Creates auth options object with fallbacks from encrypted request data
+ */
+const createAuthOptions = (req: RequestLike, opts: GetAuthDataFromRequestOptions, treatPendingAsSignedOut = true) => {
+  const encryptedRequestData = getHeader(req, constants.Headers.ClerkRequestData);
+  const decryptedRequestData = decryptClerkRequestData(encryptedRequestData);
+
+  return {
+    secretKey: opts?.secretKey || decryptedRequestData.secretKey || SECRET_KEY,
+    publishableKey: decryptedRequestData.publishableKey || PUBLISHABLE_KEY,
+    apiUrl: API_URL,
+    apiVersion: API_VERSION,
+    authStatus: getAuthKeyFromRequest(req, 'AuthStatus'),
+    authMessage: getAuthKeyFromRequest(req, 'AuthMessage'),
+    authReason: getAuthKeyFromRequest(req, 'AuthReason'),
+    treatPendingAsSignedOut,
+  };
+};
+
+/**
  * Given a request object, builds an auth object from the request data. Used in server-side environments to get access
  * to auth data for a given request.
  */
@@ -44,19 +76,7 @@ export const getSessionAuthDataFromRequest = (
 
   opts.logger?.debug('headers', { authStatus, authMessage, authReason });
 
-  const encryptedRequestData = getHeader(req, constants.Headers.ClerkRequestData);
-  const decryptedRequestData = decryptClerkRequestData(encryptedRequestData);
-
-  const options = {
-    secretKey: opts?.secretKey || decryptedRequestData.secretKey || SECRET_KEY,
-    publishableKey: decryptedRequestData.publishableKey || PUBLISHABLE_KEY,
-    apiUrl: API_URL,
-    apiVersion: API_VERSION,
-    authStatus,
-    authMessage,
-    authReason,
-    treatPendingAsSignedOut,
-  };
+  const options = createAuthOptions(req, opts, treatPendingAsSignedOut);
 
   // Only accept session tokens in this function.
   // Machine tokens are not supported and will result in a signed-out state.
@@ -98,14 +118,7 @@ export const getAuthDataFromRequest = (req: RequestLike, opts: GetAuthDataFromRe
   const bearerToken = getHeader(req, constants.Headers.Authorization)?.replace('Bearer ', '');
   const acceptsToken = opts.acceptsToken || TokenType.SessionToken;
 
-  const options = {
-    secretKey: opts?.secretKey || decryptedRequestData.secretKey || SECRET_KEY,
-    publishableKey: decryptedRequestData.publishableKey || PUBLISHABLE_KEY,
-    apiUrl: API_URL,
-    authStatus,
-    authMessage,
-    authReason,
-  };
+  const options = createAuthOptions(req, opts);
 
   // Handle machine tokens first (from encrypted request data)
   // Machine tokens are passed via x-clerk-request-data header from middleware
@@ -157,20 +170,4 @@ const handleMachineToken = (
   }
 
   return null;
-};
-
-const getAuthHeaders = (req: RequestLike) => {
-  const authStatus = getAuthKeyFromRequest(req, 'AuthStatus');
-  const authToken = getAuthKeyFromRequest(req, 'AuthToken');
-  const authMessage = getAuthKeyFromRequest(req, 'AuthMessage');
-  const authReason = getAuthKeyFromRequest(req, 'AuthReason');
-  const authSignature = getAuthKeyFromRequest(req, 'AuthSignature');
-
-  return {
-    authStatus,
-    authToken,
-    authMessage,
-    authReason,
-    authSignature,
-  };
 };

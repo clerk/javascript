@@ -58,7 +58,7 @@ describe('getAuthDataFromRequest', () => {
   });
 
   it('returns invalid token auth object when token type does not match any in acceptsToken array', () => {
-    const mockAuthObject = createMockMachineAuthObject({
+    const machineAuthObject = createMockMachineAuthObject({
       tokenType: 'api_key',
       isAuthenticated: true,
     });
@@ -68,7 +68,7 @@ describe('getAuthDataFromRequest', () => {
       headers: new Headers({
         [constants.Headers.Authorization]: 'Bearer ak_xxx',
       }),
-      machineAuthObject: mockAuthObject,
+      machineAuthObject,
     });
 
     const auth = getAuthDataFromRequest(req, {
@@ -80,7 +80,7 @@ describe('getAuthDataFromRequest', () => {
   });
 
   it('handles mixed token types in acceptsToken array', () => {
-    const mockAuthObject = createMockMachineAuthObject({
+    const machineAuthObject = createMockMachineAuthObject({
       tokenType: 'api_key',
       isAuthenticated: true,
       id: 'ak_id123',
@@ -91,7 +91,7 @@ describe('getAuthDataFromRequest', () => {
       headers: new Headers({
         [constants.Headers.Authorization]: 'Bearer ak_xxx',
       }),
-      machineAuthObject: mockAuthObject,
+      machineAuthObject,
     });
 
     const auth = getAuthDataFromRequest(req, {
@@ -103,7 +103,7 @@ describe('getAuthDataFromRequest', () => {
   });
 
   it('falls back to session logic when machine token is not accepted', () => {
-    const mockAuthObject = createMockMachineAuthObject({
+    const machineAuthObject = createMockMachineAuthObject({
       tokenType: 'api_key',
       isAuthenticated: true,
     });
@@ -113,7 +113,7 @@ describe('getAuthDataFromRequest', () => {
       headers: new Headers({
         [constants.Headers.Authorization]: 'Bearer ak_xxx',
       }),
-      machineAuthObject: mockAuthObject,
+      machineAuthObject,
     });
 
     const auth = getAuthDataFromRequest(req, {
@@ -125,7 +125,7 @@ describe('getAuthDataFromRequest', () => {
   });
 
   it('returns unauthenticated auth object when token type does not match single acceptsToken', () => {
-    const mockAuthObject = createMockMachineAuthObject({
+    const machineAuthObject = createMockMachineAuthObject({
       tokenType: 'api_key',
       isAuthenticated: true,
     });
@@ -135,7 +135,7 @@ describe('getAuthDataFromRequest', () => {
       headers: new Headers({
         [constants.Headers.Authorization]: 'Bearer ak_xxx',
       }),
-      machineAuthObject: mockAuthObject,
+      machineAuthObject,
     });
 
     const auth = getAuthDataFromRequest(req, { acceptsToken: 'oauth_token' });
@@ -145,7 +145,7 @@ describe('getAuthDataFromRequest', () => {
   });
 
   it('returns authenticated auth object for any valid token type', () => {
-    const mockAuthObject = createMockMachineAuthObject({
+    const machineAuthObject = createMockMachineAuthObject({
       tokenType: 'api_key',
       id: 'ak_id123',
       isAuthenticated: true,
@@ -156,7 +156,7 @@ describe('getAuthDataFromRequest', () => {
       headers: new Headers({
         [constants.Headers.Authorization]: 'Bearer ak_xxx',
       }),
-      machineAuthObject: mockAuthObject,
+      machineAuthObject,
     });
 
     const auth = getAuthDataFromRequest(req, { acceptsToken: 'any' });
@@ -167,7 +167,7 @@ describe('getAuthDataFromRequest', () => {
   });
 
   it('returns authenticated object when token type exists in acceptsToken array', () => {
-    const mockAuthObject = createMockMachineAuthObject({
+    const machineAuthObject = createMockMachineAuthObject({
       tokenType: 'api_key',
       id: 'ak_id123',
       subject: 'user_12345',
@@ -179,7 +179,7 @@ describe('getAuthDataFromRequest', () => {
       headers: new Headers({
         [constants.Headers.Authorization]: 'Bearer ak_xxx',
       }),
-      machineAuthObject: mockAuthObject,
+      machineAuthObject,
     });
 
     const auth = getAuthDataFromRequest(req, {
@@ -210,7 +210,7 @@ describe('getAuthDataFromRequest', () => {
   ])(
     'returns authenticated $tokenType object when token is valid and acceptsToken is $tokenType',
     ({ tokenType, token, data }) => {
-      const mockAuthObject = createMockMachineAuthObject({
+      const machineAuthObject = createMockMachineAuthObject({
         tokenType,
         isAuthenticated: true,
         ...data,
@@ -221,7 +221,7 @@ describe('getAuthDataFromRequest', () => {
         headers: new Headers({
           [constants.Headers.Authorization]: `Bearer ${token}`,
         }),
-        machineAuthObject: mockAuthObject,
+        machineAuthObject,
       });
 
       const auth = getAuthDataFromRequest(req, { acceptsToken: tokenType });
@@ -248,7 +248,7 @@ describe('getAuthDataFromRequest', () => {
       data: undefined,
     },
   ])('returns unauthenticated $tokenType object when token is invalid', ({ tokenType, token }) => {
-    const mockAuthObject = createMockMachineAuthObject({
+    const machineAuthObject = createMockMachineAuthObject({
       tokenType,
       isAuthenticated: false,
     });
@@ -259,7 +259,7 @@ describe('getAuthDataFromRequest', () => {
       headers: new Headers({
         [constants.Headers.Authorization]: `Bearer ${token}`,
       }),
-      machineAuthObject: mockAuthObject,
+      machineAuthObject,
     });
 
     const auth = getAuthDataFromRequest(req, { acceptsToken: tokenType });
