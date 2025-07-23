@@ -1,4 +1,4 @@
-import { createContextAndHook } from '@clerk/shared/react';
+import { createContextAndHook, useClerk } from '@clerk/shared/react';
 import type { PropsWithChildren } from 'react';
 import React, { useCallback } from 'react';
 
@@ -41,6 +41,7 @@ type UseFieldOTP = <R = unknown>(params: {
 
 export const useFieldOTP: UseFieldOTP = params => {
   const card = useCardState();
+  const clerk = useClerk();
   const {
     id = 'code',
     onCodeEntryFinished: paramsOnCodeEntryFinished,
@@ -84,8 +85,10 @@ export const useFieldOTP: UseFieldOTP = params => {
     [codeControl, paramsOnResendCodeClicked],
   );
 
+  const setActiveInProgressForAfterAuth = clerk.__internal_setActiveInProgress && clerk.__internal_hasAfterAuthFlows;
+
   return {
-    isLoading: status.isLoading,
+    isLoading: status.isLoading || setActiveInProgressForAfterAuth,
     otpControl: codeControl,
     onResendCode: paramsOnResendCodeClicked ? onResendCode : undefined,
     onFakeContinue,

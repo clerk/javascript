@@ -30,9 +30,9 @@ import type {
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
+  Clerk as ClerkInterface,
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
-  Clerk as ClerkInterface,
   ClerkOptions,
   ClientJSONSnapshot,
   ClientResource,
@@ -1322,7 +1322,6 @@ export class Clerk implements ClerkInterface {
 
     await tracker.track(async () => {
       if (!this.environment) {
-        // Typescript is not happy because since thinks this.client might have changed to undefined because the function is asynchronous.
         return;
       }
 

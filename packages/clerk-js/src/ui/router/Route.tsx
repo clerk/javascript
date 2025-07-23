@@ -30,8 +30,9 @@ const RouteGuard = ({ canActivate, children }: React.PropsWithChildren<RouteGuar
   const { navigateToFlowStart } = useNavigateToFlowStart();
   const clerk = useClerk();
 
-  const isNavigatingToTasks = clerk.__internal_setActiveInProgress && !!clerk.__internal_hasAfterAuthFlows;
-  const canActivateResult = canActivate(clerk) || isNavigatingToTasks;
+  // Do not unmount SignIn/SignUp routes while `setActive` is in-progress for after-auth tasks navigation
+  const setActiveInProgressForAfterAuth = clerk.__internal_setActiveInProgress && !!clerk.__internal_hasAfterAuthFlows;
+  const canActivateResult = canActivate(clerk) || setActiveInProgressForAfterAuth;
 
   React.useEffect(() => {
     if (!canActivateResult) {
@@ -46,7 +47,6 @@ const RouteGuard = ({ canActivate, children }: React.PropsWithChildren<RouteGuar
 
 export function Route(props: RouteProps): JSX.Element | null {
   const router = useRouter();
-  const clerk = useClerk();
 
   if (!props.children) {
     return null;
@@ -99,9 +99,6 @@ export function Route(props: RouteProps): JSX.Element | null {
         pathFromFullPath(router.fullPath).replace('/' + router.basePath, '')
       : router.flowStartPath) || router.startPath;
 
-  // Do not unmount SignIn/SignUp routes while `setActive` is in-progress for tasks navigation
-  const canActivate = props.canActivate;
-
   return (
     <RouteContext.Provider
       value={{
@@ -128,7 +125,7 @@ export function Route(props: RouteProps): JSX.Element | null {
         urlStateParam: router.urlStateParam,
       }}
     >
-      {canActivate ? <RouteGuard canActivate={canActivate}>{props.children}</RouteGuard> : props.children}
+      {props.canActivate ? <RouteGuard canActivate={props.canActivate}>{props.children}</RouteGuard> : props.children}
     </RouteContext.Provider>
   );
 }
