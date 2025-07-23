@@ -121,6 +121,7 @@ export const useSignUpContext = (): SignUpContextType => {
     path: ctx.path,
     routing: ctx.routing,
     baseUrl: signUpUrl,
+    taskUrls: clerk.__internal_getOption('taskUrls'),
   });
 
   return {
