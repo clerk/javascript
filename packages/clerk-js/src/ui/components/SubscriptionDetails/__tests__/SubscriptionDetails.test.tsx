@@ -225,15 +225,7 @@ describe('SubscriptionDetails', () => {
       pastDueAt: null,
       id: 'sub_123',
       status: 'active',
-      nextPayment: {
-        amount: {
-          amount: 1000,
-          amountFormatted: '10.00',
-          currency: 'USD',
-          currencySymbol: '$',
-        },
-        date: new Date('2021-01-01'),
-      },
+      nextPayment: null,
       subscriptionItems: [
         {
           id: 'sub_123',
@@ -488,15 +480,7 @@ describe('SubscriptionDetails', () => {
       pastDueAt: null,
       id: 'sub_123',
       status: 'active',
-      nextPayment: {
-        amount: {
-          amount: 1000,
-          amountFormatted: '10.00',
-          currency: 'USD',
-          currencySymbol: '$',
-        },
-        date: new Date('2021-01-01'),
-      },
+      nextPayment: null,
       subscriptionItems: [
         {
           id: 'test_active',

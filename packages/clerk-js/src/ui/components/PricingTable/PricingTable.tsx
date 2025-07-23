@@ -12,8 +12,7 @@ const PricingTableRoot = (props: PricingTableProps) => {
   const clerk = useClerk();
   const { mode = 'mounted', signInMode = 'redirect' } = usePricingTableContext();
   const isCompact = mode === 'modal';
-  const { subscriptionItems, data } = useSubscription();
-  console.log(subscriptionItems, data?.updatedAt);
+  const { subscriptionItems } = useSubscription();
   const { data: plans } = usePlans();
   const { handleSelectPlan } = usePlansContext();
 
