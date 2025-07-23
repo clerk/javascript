@@ -99,10 +99,12 @@ describe('CheckoutButton', () => {
       const props = {
         planId: 'test_plan',
         planPeriod: 'month' as const,
-        appearance: {} as Theme,
         onSubscriptionComplete: vi.fn(),
         newSubscriptionRedirectUrl: '/success',
-        onClose: vi.fn(),
+        drawer: {
+          appearance: {} as Theme,
+          onClose: vi.fn(),
+        },
       };
 
       render(<CheckoutButton {...props} />);
@@ -110,7 +112,15 @@ describe('CheckoutButton', () => {
       await userEvent.click(screen.getByText('Checkout'));
 
       await waitFor(() => {
-        expect(mockOpenCheckout).toHaveBeenCalledWith(expect.objectContaining(props));
+        expect(mockOpenCheckout).toHaveBeenCalledWith(
+          expect.objectContaining({
+            ...props.drawer,
+            planId: props.planId,
+            onSubscriptionComplete: props.onSubscriptionComplete,
+            newSubscriptionRedirectUrl: props.newSubscriptionRedirectUrl,
+            planPeriod: props.planPeriod,
+          }),
+        );
       });
     });
 
@@ -170,15 +180,19 @@ describe('CheckoutButton', () => {
     it('handles portal configuration correctly', async () => {
       const portalProps = {
         planId: 'test_plan',
-        portalId: 'custom-portal',
-        portalRoot: document.createElement('div'),
+        drawer: {
+          portalId: 'custom-portal',
+          portalRoot: document.createElement('div'),
+        },
       };
 
       render(<CheckoutButton {...portalProps} />);
 
       await userEvent.click(screen.getByText('Checkout'));
       await waitFor(() => {
-        expect(mockOpenCheckout).toHaveBeenCalledWith(expect.objectContaining(portalProps));
+        expect(mockOpenCheckout).toHaveBeenCalledWith(
+          expect.objectContaining({ ...portalProps.drawer, planId: portalProps.planId }),
+        );
       });
     });
   });

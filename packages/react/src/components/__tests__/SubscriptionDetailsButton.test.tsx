@@ -120,8 +120,10 @@ describe('SubscriptionDetailsButton', () => {
       const onSubscriptionCancel = vi.fn();
       const props = {
         for: 'user' as const,
-        appearance: {} as Theme,
         onSubscriptionCancel,
+        drawer: {
+          appearance: {} as Theme,
+        },
       };
 
       render(<SubscriptionDetailsButton {...props} />);
@@ -129,7 +131,13 @@ describe('SubscriptionDetailsButton', () => {
       await userEvent.click(screen.getByText('Subscription details'));
 
       await waitFor(() => {
-        expect(mockOpenSubscriptionDetails).toHaveBeenCalledWith(expect.objectContaining(props));
+        expect(mockOpenSubscriptionDetails).toHaveBeenCalledWith(
+          expect.objectContaining({
+            ...props.drawer,
+            for: props.for,
+            onSubscriptionCancel: props.onSubscriptionCancel,
+          }),
+        );
       });
     });
 
@@ -175,8 +183,10 @@ describe('SubscriptionDetailsButton', () => {
 
     it('handles portal configuration correctly', async () => {
       const portalProps = {
-        portalId: 'custom-portal',
-        portalRoot: document.createElement('div'),
+        drawer: {
+          portalId: 'custom-portal',
+          portalRoot: document.createElement('div'),
+        },
       };
 
       render(<SubscriptionDetailsButton {...portalProps} />);
@@ -184,7 +194,11 @@ describe('SubscriptionDetailsButton', () => {
       await userEvent.click(screen.getByText('Subscription details'));
 
       await waitFor(() => {
-        expect(mockOpenSubscriptionDetails).toHaveBeenCalledWith(expect.objectContaining(portalProps));
+        expect(mockOpenSubscriptionDetails).toHaveBeenCalledWith(
+          expect.objectContaining({
+            ...portalProps.drawer,
+          }),
+        );
       });
     });
   });

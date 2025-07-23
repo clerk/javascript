@@ -1,4 +1,4 @@
-import type { __internal_CheckoutProps } from '@clerk/types';
+import type { __experimental_CheckoutButtonProps } from '@clerk/types';
 import React from 'react';
 
 import { useAuth } from '../hooks';
@@ -45,19 +45,9 @@ import { withClerk } from './withClerk';
  * @throws {Error} When `subscriberType="org"` is used without an active organization context
  */
 export const CheckoutButton = withClerk(
-  ({ clerk, children, ...props }: WithClerkProp<React.PropsWithChildren<__internal_CheckoutProps>>) => {
-    const {
-      appearance,
-      planId,
-      planPeriod,
-      subscriberType,
-      onSubscriptionComplete,
-      portalId,
-      portalRoot,
-      newSubscriptionRedirectUrl,
-      onClose,
-      ...rest
-    } = props;
+  ({ clerk, children, ...props }: WithClerkProp<React.PropsWithChildren<__experimental_CheckoutButtonProps>>) => {
+    const { planId, planPeriod, subscriberType, onSubscriptionComplete, newSubscriptionRedirectUrl, drawer, ...rest } =
+      props;
 
     const { userId, orgId } = useAuth();
 
@@ -78,15 +68,12 @@ export const CheckoutButton = withClerk(
       }
 
       return clerk.__internal_openCheckout({
-        appearance,
         planId,
         planPeriod,
         subscriberType,
         onSubscriptionComplete,
-        portalId,
-        portalRoot,
         newSubscriptionRedirectUrl,
-        onClose,
+        ...drawer,
       });
     };
 

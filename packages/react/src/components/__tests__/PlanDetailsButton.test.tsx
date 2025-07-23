@@ -93,8 +93,10 @@ describe('PlanDetailsButton', () => {
     it('calls clerk.__internal_openPlanDetails with planId when clicked', async () => {
       const props = {
         planId: 'test_plan',
-        appearance: {} as Theme,
         initialPlanPeriod: 'month' as const,
+        drawer: {
+          appearance: {} as Theme,
+        },
       };
 
       render(<PlanDetailsButton {...props} />);
@@ -102,14 +104,18 @@ describe('PlanDetailsButton', () => {
       await userEvent.click(screen.getByText('Plan details'));
 
       await waitFor(() => {
-        expect(mockOpenPlanDetails).toHaveBeenCalledWith(expect.objectContaining(props));
+        expect(mockOpenPlanDetails).toHaveBeenCalledWith(
+          expect.objectContaining({ ...props.drawer, planId: props.planId }),
+        );
       });
     });
 
     it('calls clerk.__internal_openPlanDetails with plan object when clicked', async () => {
       const props = {
         plan: mockPlanResource,
-        appearance: {} as Theme,
+        drawer: {
+          appearance: {} as Theme,
+        },
       };
 
       render(<PlanDetailsButton {...props} />);
@@ -117,7 +123,9 @@ describe('PlanDetailsButton', () => {
       await userEvent.click(screen.getByText('Plan details'));
 
       await waitFor(() => {
-        expect(mockOpenPlanDetails).toHaveBeenCalledWith(expect.objectContaining(props));
+        expect(mockOpenPlanDetails).toHaveBeenCalledWith(
+          expect.objectContaining({ ...props.drawer, plan: props.plan }),
+        );
       });
     });
 
@@ -144,8 +152,10 @@ describe('PlanDetailsButton', () => {
     it('handles portal configuration correctly', async () => {
       const portalProps = {
         planId: 'test_plan',
-        portalId: 'custom-portal',
-        portalRoot: document.createElement('div'),
+        drawer: {
+          portalId: 'custom-portal',
+          portalRoot: document.createElement('div'),
+        },
       };
 
       render(<PlanDetailsButton {...portalProps} />);
@@ -153,7 +163,9 @@ describe('PlanDetailsButton', () => {
       await userEvent.click(screen.getByText('Plan details'));
 
       await waitFor(() => {
-        expect(mockOpenPlanDetails).toHaveBeenCalledWith(expect.objectContaining(portalProps));
+        expect(mockOpenPlanDetails).toHaveBeenCalledWith(
+          expect.objectContaining({ ...portalProps.drawer, planId: portalProps.planId }),
+        );
       });
     });
   });

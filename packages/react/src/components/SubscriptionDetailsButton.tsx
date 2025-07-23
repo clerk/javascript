@@ -1,4 +1,4 @@
-import type { __internal_SubscriptionDetailsProps } from '@clerk/types';
+import type { __experimental_SubscriptionDetailsButtonProps } from '@clerk/types';
 import React from 'react';
 
 import { useAuth } from '../hooks';
@@ -41,8 +41,12 @@ import { withClerk } from './withClerk';
  * @see https://clerk.com/docs/billing/overview
  */
 export const SubscriptionDetailsButton = withClerk(
-  ({ clerk, children, ...props }: WithClerkProp<React.PropsWithChildren<__internal_SubscriptionDetailsProps>>) => {
-    const { for: forProp, appearance, onSubscriptionCancel, portalId, portalRoot, ...rest } = props;
+  ({
+    clerk,
+    children,
+    ...props
+  }: WithClerkProp<React.PropsWithChildren<__experimental_SubscriptionDetailsButtonProps>>) => {
+    const { for: forProp, drawer, onSubscriptionCancel, ...rest } = props;
     children = normalizeWithDefaultValue(children, 'Subscription details');
     const child = assertSingleChild(children)('SubscriptionDetailsButton');
 
@@ -65,10 +69,8 @@ export const SubscriptionDetailsButton = withClerk(
 
       return clerk.__internal_openSubscriptionDetails({
         for: forProp,
-        appearance,
         onSubscriptionCancel,
-        portalId,
-        portalRoot,
+        ...drawer,
       });
     };
 
