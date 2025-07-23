@@ -108,7 +108,6 @@ describe('SamlConnectionAPI', () => {
           validateHeaders(async ({ request }) => {
             const body = await request.json();
 
-            console.log(body);
             expect(body).toEqual({
               name: 'Test Connection',
               provider: 'saml_custom',
@@ -177,7 +176,6 @@ describe('SamlConnectionAPI', () => {
           validateHeaders(async ({ request }) => {
             const body = await request.json();
 
-            console.log(body);
             expect(body).toEqual({
               name: 'Test Connection',
               provider: 'saml_custom',
