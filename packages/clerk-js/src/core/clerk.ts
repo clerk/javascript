@@ -30,9 +30,9 @@ import type {
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
-  Clerk as ClerkInterface,
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
+  Clerk as ClerkInterface,
   ClerkOptions,
   ClientJSONSnapshot,
   ClientResource,
@@ -1318,15 +1318,28 @@ export class Clerk implements ClerkInterface {
       eventBus.emit(events.TokenUpdate, { token: null });
     }
 
-    // Only triggers navigation for internal AIO components routing or custom URLs
-    const shouldNavigateOnSetActive = this.#componentNavigationContext;
-    if (newSession?.currentTask && shouldNavigateOnSetActive) {
-      await navigateToTask(session.currentTask.key, {
-        options: this.#options,
-        environment: this.environment,
-        globalNavigate: this.navigate,
-        componentNavigationContext: this.#componentNavigationContext,
-      });
+    const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
+
+    await tracker.track(async () => {
+      if (!this.environment) {
+        // Typescript is not happy because since thinks this.client might have changed to undefined because the function is asynchronous.
+        return;
+      }
+
+      // Only triggers navigation for internal AIO components routing or custom URLs
+      const shouldNavigateOnSetActive = this.#componentNavigationContext;
+      if (newSession?.currentTask && shouldNavigateOnSetActive) {
+        await navigateToTask(session.currentTask.key, {
+          options: this.#options,
+          environment: this.environment,
+          globalNavigate: this.navigate,
+          componentNavigationContext: this.#componentNavigationContext,
+        });
+      }
+    });
+
+    if (tracker.isUnloading()) {
+      return;
     }
 
     this.#setAccessors(session);
