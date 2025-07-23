@@ -94,7 +94,7 @@ describe('PlanDetailsButton', () => {
       const props = {
         planId: 'test_plan',
         initialPlanPeriod: 'month' as const,
-        drawer: {
+        planDetailsProps: {
           appearance: {} as Theme,
         },
       };
@@ -105,7 +105,7 @@ describe('PlanDetailsButton', () => {
 
       await waitFor(() => {
         expect(mockOpenPlanDetails).toHaveBeenCalledWith(
-          expect.objectContaining({ ...props.drawer, planId: props.planId }),
+          expect.objectContaining({ ...props.planDetailsProps, planId: props.planId }),
         );
       });
     });
@@ -113,7 +113,7 @@ describe('PlanDetailsButton', () => {
     it('calls clerk.__internal_openPlanDetails with plan object when clicked', async () => {
       const props = {
         plan: mockPlanResource,
-        drawer: {
+        planDetailsProps: {
           appearance: {} as Theme,
         },
       };
@@ -124,7 +124,7 @@ describe('PlanDetailsButton', () => {
 
       await waitFor(() => {
         expect(mockOpenPlanDetails).toHaveBeenCalledWith(
-          expect.objectContaining({ ...props.drawer, plan: props.plan }),
+          expect.objectContaining({ ...props.planDetailsProps, plan: props.plan }),
         );
       });
     });
@@ -152,7 +152,7 @@ describe('PlanDetailsButton', () => {
     it('handles portal configuration correctly', async () => {
       const portalProps = {
         planId: 'test_plan',
-        drawer: {
+        planDetailsProps: {
           portalId: 'custom-portal',
           portalRoot: document.createElement('div'),
         },
@@ -164,7 +164,7 @@ describe('PlanDetailsButton', () => {
 
       await waitFor(() => {
         expect(mockOpenPlanDetails).toHaveBeenCalledWith(
-          expect.objectContaining({ ...portalProps.drawer, planId: portalProps.planId }),
+          expect.objectContaining({ ...portalProps.planDetailsProps, planId: portalProps.planId }),
         );
       });
     });

@@ -1847,7 +1847,7 @@ export type __experimental_CheckoutButtonProps = {
   planPeriod?: CommerceSubscriptionPlanPeriod;
   subscriberType?: CommercePayerType;
   onSubscriptionComplete?: () => void;
-  drawer?: {
+  checkoutProps?: {
     appearance?: CheckoutTheme;
     portalId?: string;
     portalRoot?: HTMLElement | null | undefined;
@@ -1893,7 +1893,7 @@ export type __experimental_PlanDetailsButtonProps = {
   plan?: CommercePlanResource;
   planId?: string;
   initialPlanPeriod?: CommerceSubscriptionPlanPeriod;
-  drawer?: {
+  planDetailsProps?: {
     appearance?: PlanDetailTheme;
     portalId?: string;
     portalRoot?: PortalRoot;
@@ -1941,7 +1941,7 @@ export type __experimental_SubscriptionDetailsButtonProps = {
    */
   for?: CommercePayerType;
   onSubscriptionCancel?: () => void;
-  drawer?: {
+  subscriptionDetailsProps?: {
     appearance?: SubscriptionDetailsTheme;
     portalId?: string;
     portalRoot?: PortalRoot;

@@ -46,8 +46,15 @@ import { withClerk } from './withClerk';
  */
 export const CheckoutButton = withClerk(
   ({ clerk, children, ...props }: WithClerkProp<React.PropsWithChildren<__experimental_CheckoutButtonProps>>) => {
-    const { planId, planPeriod, subscriberType, onSubscriptionComplete, newSubscriptionRedirectUrl, drawer, ...rest } =
-      props;
+    const {
+      planId,
+      planPeriod,
+      subscriberType,
+      onSubscriptionComplete,
+      newSubscriptionRedirectUrl,
+      checkoutProps,
+      ...rest
+    } = props;
 
     const { userId, orgId } = useAuth();
 
@@ -73,7 +80,7 @@ export const CheckoutButton = withClerk(
         subscriberType,
         onSubscriptionComplete,
         newSubscriptionRedirectUrl,
-        ...drawer,
+        ...checkoutProps,
       });
     };
 

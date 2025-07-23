@@ -46,7 +46,7 @@ export const SubscriptionDetailsButton = withClerk(
     children,
     ...props
   }: WithClerkProp<React.PropsWithChildren<__experimental_SubscriptionDetailsButtonProps>>) => {
-    const { for: forProp, drawer, onSubscriptionCancel, ...rest } = props;
+    const { for: forProp, subscriptionDetailsProps, onSubscriptionCancel, ...rest } = props;
     children = normalizeWithDefaultValue(children, 'Subscription details');
     const child = assertSingleChild(children)('SubscriptionDetailsButton');
 
@@ -70,7 +70,7 @@ export const SubscriptionDetailsButton = withClerk(
       return clerk.__internal_openSubscriptionDetails({
         for: forProp,
         onSubscriptionCancel,
-        ...drawer,
+        ...subscriptionDetailsProps,
       });
     };
 
