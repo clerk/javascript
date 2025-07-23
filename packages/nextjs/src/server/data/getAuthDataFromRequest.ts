@@ -36,7 +36,7 @@ export type GetAuthDataFromRequestOptions = {
  * Given a request object, builds an auth object from the request data. Used in server-side environments to get access
  * to auth data for a given request.
  */
-export const getAuthDataFromRequestSync = (
+export const getSessionAuthDataFromRequest = (
   req: RequestLike,
   { treatPendingAsSignedOut = true, ...opts }: GetAuthDataFromRequestOptions = {},
 ): SignedInAuthObject | SignedOutAuthObject => {
@@ -58,8 +58,8 @@ export const getAuthDataFromRequestSync = (
     treatPendingAsSignedOut,
   };
 
-  // Only accept session tokens in the synchronous version.
-  // Machine tokens are not supported in this function. Any machine token input will result in a signed-out state.
+  // Only accept session tokens in this function.
+  // Machine tokens are not supported and will result in a signed-out state.
   if (!isTokenTypeAccepted(TokenType.SessionToken, opts.acceptsToken || TokenType.SessionToken)) {
     return signedOutAuthObject(options);
   }
@@ -78,6 +78,50 @@ export const getAuthDataFromRequestSync = (
   }
 
   return authObject;
+};
+
+/**
+ * Given a request object, builds an auth object from the request data. Used in server-side environments to get access
+ * to auth data for a given request.
+ *
+ * This function handles both session tokens and machine tokens:
+ * - Session tokens: Decoded from JWT and validated
+ * - Machine tokens: Retrieved from encrypted request data (x-clerk-request-data header)
+ */
+export const getAuthDataFromRequest = (req: RequestLike, opts: GetAuthDataFromRequestOptions = {}): AuthObject => {
+  const { authStatus, authMessage, authReason } = getAuthHeaders(req);
+  opts.logger?.debug('headers', { authStatus, authMessage, authReason });
+
+  const encryptedRequestData = getHeader(req, constants.Headers.ClerkRequestData);
+  const decryptedRequestData = decryptClerkRequestData(encryptedRequestData);
+
+  const bearerToken = getHeader(req, constants.Headers.Authorization)?.replace('Bearer ', '');
+  const acceptsToken = opts.acceptsToken || TokenType.SessionToken;
+
+  const options = {
+    secretKey: opts?.secretKey || decryptedRequestData.secretKey || SECRET_KEY,
+    publishableKey: decryptedRequestData.publishableKey || PUBLISHABLE_KEY,
+    apiUrl: API_URL,
+    authStatus,
+    authMessage,
+    authReason,
+  };
+
+  // Handle machine tokens first (from encrypted request data)
+  // Machine tokens are passed via x-clerk-request-data header from middleware
+  const machineAuthObject = handleMachineToken(bearerToken, decryptedRequestData.authObject, acceptsToken, options);
+  if (machineAuthObject) {
+    return machineAuthObject;
+  }
+
+  // If a random token is present and acceptsToken is an array that does NOT include session_token,
+  // return invalid token auth object.
+  if (bearerToken && Array.isArray(acceptsToken) && !acceptsToken.includes(TokenType.SessionToken)) {
+    return invalidTokenAuthObject();
+  }
+
+  // Fallback to session logic for all other cases
+  return getSessionAuthDataFromRequest(req, opts);
 };
 
 const handleMachineToken = (
@@ -108,48 +152,6 @@ const handleMachineToken = (
   }
 
   return null;
-};
-
-/**
- * Given a request object, builds an auth object from the request data. Used in server-side environments to get access
- * to auth data for a given request.
- */
-export const getAuthDataFromRequestAsync = async (
-  req: RequestLike,
-  opts: GetAuthDataFromRequestOptions = {},
-): Promise<AuthObject> => {
-  const { authStatus, authMessage, authReason } = getAuthHeaders(req);
-  opts.logger?.debug('headers', { authStatus, authMessage, authReason });
-
-  const encryptedRequestData = getHeader(req, constants.Headers.ClerkRequestData);
-  const decryptedRequestData = decryptClerkRequestData(encryptedRequestData);
-
-  const bearerToken = getHeader(req, constants.Headers.Authorization)?.replace('Bearer ', '');
-  const acceptsToken = opts.acceptsToken || TokenType.SessionToken;
-  const options = {
-    secretKey: opts?.secretKey || decryptedRequestData.secretKey || SECRET_KEY,
-    publishableKey: decryptedRequestData.publishableKey || PUBLISHABLE_KEY,
-    apiUrl: API_URL,
-    authStatus,
-    authMessage,
-    authReason,
-  };
-
-  // If the request has a machine token in header, handle it first.
-  const machineAuthObject = handleMachineToken(bearerToken, decryptedRequestData.authObject, acceptsToken, options);
-  if (machineAuthObject) {
-    return machineAuthObject;
-  }
-
-  // If a random token is present and acceptsToken is an array that does NOT include session_token,
-  // return invalid token auth object.
-  if (bearerToken && Array.isArray(acceptsToken) && !acceptsToken.includes(TokenType.SessionToken)) {
-    return invalidTokenAuthObject();
-  }
-
-  // Fallback to session logic for all other cases
-  const authObject = getAuthDataFromRequestSync(req, opts);
-  return getAuthObjectForAcceptedToken({ authObject, acceptsToken });
 };
 
 const getAuthHeaders = (req: RequestLike) => {
