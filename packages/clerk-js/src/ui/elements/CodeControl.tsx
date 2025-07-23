@@ -85,6 +85,8 @@ export const useFieldOTP: UseFieldOTP = params => {
     [codeControl, paramsOnResendCodeClicked],
   );
 
+  // While `setActive` is executing for after-auth navigation within `SignIn` and `SignUp`
+  // and the OTP routes keep mounted, it should still display the loading status
   const setActiveInProgressForAfterAuth = clerk.__internal_setActiveInProgress && clerk.__internal_hasAfterAuthFlows;
 
   return {
