@@ -295,7 +295,7 @@ export interface Clerk {
   __internal_closeSubscriptionDetails: () => void;
 
   /**
-  /** Opens the Clerk UserVerification component in a modal.
+   * Opens the Clerk UserVerification component in a modal.
    * @param props Optional user verification configuration parameters.
    */
   __internal_openReverification: (props?: __internal_UserVerificationModalProps) => void;
@@ -1842,6 +1842,34 @@ export type __internal_CheckoutProps = {
  * <ClerkProvider clerkJsVersion="x.x.x" />
  * ```
  */
+export type __experimental_CheckoutButtonProps = {
+  planId: string;
+  planPeriod?: CommerceSubscriptionPlanPeriod;
+  subscriberType?: CommercePayerType;
+  onSubscriptionComplete?: () => void;
+  checkoutProps?: {
+    appearance?: CheckoutTheme;
+    portalId?: string;
+    portalRoot?: HTMLElement | null | undefined;
+    onClose?: () => void;
+  };
+  /**
+   * Full URL or path to navigate to after checkout is complete and the user clicks the "Continue" button.
+   * @default undefined
+   */
+  newSubscriptionRedirectUrl?: string;
+};
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+ * @see https://clerk.com/docs/billing/overview
+ *
+ * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+ * @example
+ * ```tsx
+ * <ClerkProvider clerkJsVersion="x.x.x" />
+ * ```
+ */
 export type __internal_PlanDetailsProps = {
   appearance?: PlanDetailTheme;
   plan?: CommercePlanResource;
@@ -1851,6 +1879,37 @@ export type __internal_PlanDetailsProps = {
   portalRoot?: PortalRoot;
 };
 
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+ * @see https://clerk.com/docs/billing/overview
+ *
+ * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+ * @example
+ * ```tsx
+ * <ClerkProvider clerkJsVersion="x.x.x" />
+ * ```
+ */
+export type __experimental_PlanDetailsButtonProps = {
+  plan?: CommercePlanResource;
+  planId?: string;
+  initialPlanPeriod?: CommerceSubscriptionPlanPeriod;
+  planDetailsProps?: {
+    appearance?: PlanDetailTheme;
+    portalId?: string;
+    portalRoot?: PortalRoot;
+  };
+};
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+ * @see https://clerk.com/docs/billing/overview
+ *
+ * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+ * @example
+ * ```tsx
+ * <ClerkProvider clerkJsVersion="x.x.x" />
+ * ```
+ */
 export type __internal_SubscriptionDetailsProps = {
   /**
    * The subscriber type to display the subscription details for.
@@ -1862,6 +1921,31 @@ export type __internal_SubscriptionDetailsProps = {
   onSubscriptionCancel?: () => void;
   portalId?: string;
   portalRoot?: PortalRoot;
+};
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+ * @see https://clerk.com/docs/billing/overview
+ *
+ * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+ * @example
+ * ```tsx
+ * <ClerkProvider clerkJsVersion="x.x.x" />
+ * ```
+ */
+export type __experimental_SubscriptionDetailsButtonProps = {
+  /**
+   * The subscriber type to display the subscription details for.
+   * If `org` is provided, the subscription details will be displayed for the active organization.
+   * @default 'user'
+   */
+  for?: CommercePayerType;
+  onSubscriptionCancel?: () => void;
+  subscriptionDetailsProps?: {
+    appearance?: SubscriptionDetailsTheme;
+    portalId?: string;
+    portalRoot?: PortalRoot;
+  };
 };
 
 export type __internal_OAuthConsentProps = {
