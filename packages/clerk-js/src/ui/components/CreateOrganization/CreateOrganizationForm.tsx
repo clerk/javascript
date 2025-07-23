@@ -90,14 +90,14 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
       lastCreatedOrganizationRef.current = organization;
       await setActive({ organization });
 
-      void userMemberships.revalidate?.();
-
       if (sessionTasksContext) {
         await clerk.__internal_navigateToTaskIfAvailable({
           redirectUrlComplete: sessionTasksContext.redirectUrlComplete,
         });
         return;
       }
+
+      void userMemberships.revalidate?.();
 
       if (props.skipInvitationScreen ?? organization.maxAllowedMemberships === 1) {
         return completeFlow();

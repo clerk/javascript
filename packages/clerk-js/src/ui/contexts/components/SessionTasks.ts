@@ -15,3 +15,15 @@ export const useSessionTasksContext = (): SessionTasksCtx => {
 };
 
 export const TaskSelectOrganizationContext = createContext<TaskSelectOrganizationCtx | null>(null);
+
+export const useTaskSelectOrganizationContext = (): TaskSelectOrganizationCtx => {
+  const context = useContext(TaskSelectOrganizationContext);
+
+  if (context === null) {
+    throw new Error(
+      'Clerk: useTaskSelectOrganizationContext called outside of the mounted TaskSelectOrganization component.',
+    );
+  }
+
+  return context;
+};

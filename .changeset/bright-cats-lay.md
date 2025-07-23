@@ -1,9 +1,8 @@
 ---
 '@clerk/clerk-js': minor
-'@clerk/types': minor
 ---
 
-Export `<TaskSelectOrganization />` component.
+Introduce `<TaskSelectOrganization />` component.
 
 It allows you to eject the organization selection task flow from the default `SignIn` and `SignUp` components and render it on custom URL paths using `taskUrls`.
 

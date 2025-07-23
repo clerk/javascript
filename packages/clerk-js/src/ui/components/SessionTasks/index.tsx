@@ -8,7 +8,11 @@ import { LoadingCardContainer } from '@/ui/elements/LoadingCard';
 
 import { INTERNAL_SESSION_TASK_ROUTE_BY_KEY } from '../../../core/sessionTasks';
 import { SignInContext, SignUpContext } from '../../../ui/contexts';
-import { SessionTasksContext, useSessionTasksContext } from '../../contexts/components/SessionTasks';
+import {
+  SessionTasksContext,
+  TaskSelectOrganizationContext,
+  useSessionTasksContext,
+} from '../../contexts/components/SessionTasks';
 import { Route, Switch, useRouter } from '../../router';
 import { TaskSelectOrganization } from './tasks/TaskSelectOrganization';
 
@@ -36,10 +40,16 @@ const SessionTasksStart = () => {
 };
 
 function SessionTaskRoutes(): JSX.Element {
+  const ctx = useSessionTasksContext();
+
   return (
     <Switch>
       <Route path={INTERNAL_SESSION_TASK_ROUTE_BY_KEY['select-organization']}>
-        <TaskSelectOrganization />
+        <TaskSelectOrganizationContext.Provider
+          value={{ componentName: 'TaskSelectOrganization', redirectUrlComplete: ctx.redirectUrlComplete }}
+        >
+          <TaskSelectOrganization />
+        </TaskSelectOrganizationContext.Provider>
       </Route>
       <Route index>
         <SessionTasksStart />
