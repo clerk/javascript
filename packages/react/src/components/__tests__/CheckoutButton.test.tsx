@@ -101,7 +101,7 @@ describe('CheckoutButton', () => {
         planPeriod: 'month' as const,
         onSubscriptionComplete: vi.fn(),
         newSubscriptionRedirectUrl: '/success',
-        planDetailsProps: {
+        checkoutProps: {
           appearance: {} as Theme,
           onClose: vi.fn(),
         },
@@ -114,7 +114,7 @@ describe('CheckoutButton', () => {
       await waitFor(() => {
         expect(mockOpenCheckout).toHaveBeenCalledWith(
           expect.objectContaining({
-            ...props.planDetailsProps,
+            ...props.checkoutProps,
             planId: props.planId,
             onSubscriptionComplete: props.onSubscriptionComplete,
             newSubscriptionRedirectUrl: props.newSubscriptionRedirectUrl,
@@ -180,7 +180,7 @@ describe('CheckoutButton', () => {
     it('handles portal configuration correctly', async () => {
       const portalProps = {
         planId: 'test_plan',
-        planDetailsProps: {
+        checkoutProps: {
           portalId: 'custom-portal',
           portalRoot: document.createElement('div'),
         },
@@ -191,7 +191,7 @@ describe('CheckoutButton', () => {
       await userEvent.click(screen.getByText('Checkout'));
       await waitFor(() => {
         expect(mockOpenCheckout).toHaveBeenCalledWith(
-          expect.objectContaining({ ...portalProps.planDetailsProps, planId: portalProps.planId }),
+          expect.objectContaining({ ...portalProps.checkoutProps, planId: portalProps.planId }),
         );
       });
     });

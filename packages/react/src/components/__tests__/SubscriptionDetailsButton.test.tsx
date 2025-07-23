@@ -121,7 +121,7 @@ describe('SubscriptionDetailsButton', () => {
       const props = {
         for: 'user' as const,
         onSubscriptionCancel,
-        planDetailsProps: {
+        subscriptionDetailsProps: {
           appearance: {} as Theme,
         },
       };
@@ -133,7 +133,7 @@ describe('SubscriptionDetailsButton', () => {
       await waitFor(() => {
         expect(mockOpenSubscriptionDetails).toHaveBeenCalledWith(
           expect.objectContaining({
-            ...props.planDetailsProps,
+            ...props.subscriptionDetailsProps,
             for: props.for,
             onSubscriptionCancel: props.onSubscriptionCancel,
           }),
@@ -183,7 +183,7 @@ describe('SubscriptionDetailsButton', () => {
 
     it('handles portal configuration correctly', async () => {
       const portalProps = {
-        planDetailsProps: {
+        subscriptionDetailsProps: {
           portalId: 'custom-portal',
           portalRoot: document.createElement('div'),
         },
@@ -196,7 +196,7 @@ describe('SubscriptionDetailsButton', () => {
       await waitFor(() => {
         expect(mockOpenSubscriptionDetails).toHaveBeenCalledWith(
           expect.objectContaining({
-            ...portalProps.planDetailsProps,
+            ...portalProps.subscriptionDetailsProps,
           }),
         );
       });
