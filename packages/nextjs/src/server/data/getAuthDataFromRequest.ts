@@ -18,7 +18,6 @@ import {
 } from '@clerk/backend/internal';
 import { decodeJwt } from '@clerk/backend/jwt';
 import type { PendingSessionOptions } from '@clerk/types';
-import type { AuthenticateContext } from 'node_modules/@clerk/backend/dist/tokens/authenticateContext';
 
 import type { LoggerNoCommit } from '../../utils/debugLogger';
 import { API_URL, API_VERSION, PUBLISHABLE_KEY, SECRET_KEY } from '../constants';
@@ -146,7 +145,7 @@ const handleMachineToken = (
   bearerToken: string | undefined,
   rawAuthObject: AuthObject | undefined,
   acceptsToken: NonNullable<AuthenticateRequestOptions['acceptsToken']>,
-  options: Partial<AuthenticateContext>,
+  options: Record<string, any>,
 ): MachineAuthObject<MachineTokenType> | null => {
   const hasMachineToken = bearerToken && isMachineTokenByPrefix(bearerToken);
 
