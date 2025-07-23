@@ -21,8 +21,8 @@ type MockRequestParams = {
   url: string;
   appendDevBrowserCookie?: boolean;
   method?: string;
-  headers?: any;
-  machineAuthObject?: any; // Allow any auth object type for testing
+  headers?: Headers;
+  machineAuthObject?: Partial<MachineAuthObject<MachineTokenType>>;
 };
 
 const mockRequest = (params: MockRequestParams) => {
@@ -38,7 +38,8 @@ const mockRequest = (params: MockRequestParams) => {
     const encryptedData = encryptClerkRequestData(
       {}, // requestData
       {}, // keylessModeKeys
-      machineAuthObject, // authObject
+      // @ts-expect-error - mock machine auth object
+      machineAuthObject,
     );
     if (encryptedData) {
       headersWithCookie.set(constants.Headers.ClerkRequestData, encryptedData);
