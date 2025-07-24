@@ -1289,6 +1289,7 @@ export class Clerk implements ClerkInterface {
 
       this.#setAccessors(newSession);
       this.#emit();
+
       await onAfterSetActive();
     } finally {
       this.__internal_setActiveInProgress = false;
