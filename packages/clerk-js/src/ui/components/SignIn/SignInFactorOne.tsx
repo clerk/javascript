@@ -5,6 +5,7 @@ import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { ErrorCard } from '@/ui/elements/ErrorCard';
 import { LoadingCard } from '@/ui/elements/LoadingCard';
 
+import { useClerk } from '@clerk/shared/react/index';
 import { withRedirectToAfterSignIn } from '../../common';
 import { useCoreSignIn, useEnvironment } from '../../contexts';
 import { useAlternativeStrategies } from '../../hooks/useAlternativeStrategies';
@@ -82,14 +83,20 @@ function SignInFactorOneInternal(): JSX.Element {
 
   const [isPasswordPwned, setIsPasswordPwned] = React.useState(false);
 
+  const { __internal_setActiveInProgress } = useClerk();
+
   React.useEffect(() => {
     // Handle the case where a user lands on alternative methods screen,
     // clicks a social button but then navigates back to sign in.
     // SignIn status resets to 'needs_identifier'
-    if (signIn.status === 'needs_identifier' || signIn.status === null) {
+    if ((signIn.status === 'needs_identifier' || signIn.status === null) && !__internal_setActiveInProgress) {
       void router.navigate('../');
     }
-  }, []);
+  }, [__internal_setActiveInProgress]);
+
+  if (__internal_setActiveInProgress) {
+    return <LoadingCard />;
+  }
 
   if (!currentFactor && signIn.status) {
     return (
