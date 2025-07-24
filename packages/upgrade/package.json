@@ -19,6 +19,8 @@
     "build": "pnpm clean && NODE_ENV=production babel --keep-file-extension --out-dir=dist src --copy-files",
     "clean": "rm -rf dist/*",
     "dev": "babel --keep-file-extension --out-dir=dist --watch src --copy-files",
+    "format": "node ../../scripts/format-package.mjs",
+    "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src/",
     "lint:publint": "publint",
     "test": "vitest run",
