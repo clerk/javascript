@@ -206,7 +206,6 @@ const PaymentElementInternalRoot = (props: PropsWithChildren) => {
         key={externalClientSecret}
         stripe={stripe}
         options={{
-          loader: 'never',
           clientSecret: externalClientSecret,
           appearance: {
             variables: stripeAppearance,
