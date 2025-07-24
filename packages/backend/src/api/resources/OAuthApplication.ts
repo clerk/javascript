@@ -46,7 +46,7 @@ export class OAuthApplication {
      */
     readonly isPublic: boolean, // NOTE: `public` is reserved
     /**
-     * Scopes for the new OAuth application. Available scopes are `profile`, `email`, `public_metadata`, `private_metadata`. Defaults to `profile email`. Provide the requested scopes as a string, separated by spaces.
+     * Scopes for the new OAuth application.
      */
     readonly scopes: string,
     /**
