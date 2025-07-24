@@ -17,7 +17,7 @@ async function getExistingFiles() {
   for (const pattern of ROOT_FILE_PATTERNS) {
     try {
       const matches = await globby(pattern, {
-        ignore: ['node_modules/**', 'packages/**'],
+        ignore: ['node_modules/**', '**/node_modules/**', 'packages/**'],
       });
       existingFiles.push(...matches);
     } catch {
@@ -30,12 +30,14 @@ async function getExistingFiles() {
       const matches = await globby(pattern, {
         ignore: [
           'node_modules/**',
+          '**/node_modules/**',
           '**/dist/**',
           '**/build/**',
           '**/coverage/**',
           '**/.turbo/**',
           '**/.next/**',
           '**/.tsup/**',
+          '**/.cache/**',
         ],
       });
       existingFiles.push(...matches);
@@ -49,6 +51,7 @@ async function getExistingFiles() {
 
 async function formatNonWorkspaceFiles() {
   const isCheck = process.argv.includes('--check');
+  const isVerbose = process.argv.includes('--verbose');
   const baseArgs = isCheck
     ? ['prettier', '--cache', '--check', '--ignore-unknown', '--ignore-path', '.prettierignore']
     : ['prettier', '--write', '--ignore-unknown', '--ignore-path', '.prettierignore'];
@@ -64,6 +67,15 @@ async function formatNonWorkspaceFiles() {
     }
 
     console.log(`📁 Found ${existingFiles.length} files/directories to format`);
+
+    if (isVerbose) {
+      console.log('\n📄 Files to be formatted:');
+      existingFiles.forEach((file, index) => {
+        console.log(`  ${index + 1}. ${file}`);
+      });
+      console.log('');
+    }
+
     await $`pnpm ${baseArgs} ${existingFiles}`;
     console.log(`✅ Non-workspace files ${isCheck ? 'check passed' : 'formatted successfully'}`);
   } catch (error) {
