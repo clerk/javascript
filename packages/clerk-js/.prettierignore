@@ -1,5 +1,0 @@
-dist/
-coverage/
-node_modules/
-.turbo/
-*.js.map 
