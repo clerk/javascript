@@ -21,17 +21,15 @@ interface NavigateToTaskOptions {
  * as internal component routing or framework router-based navigation.
  * @internal
  */
-export async function navigateToTask(
+export function navigateToTask(
   routeKey: keyof typeof INTERNAL_SESSION_TASK_ROUTE_BY_KEY,
-  { globalNavigate, options, environment }: NavigateToTaskOptions,
+  { componentNavigationContext, globalNavigate, options, environment }: NavigateToTaskOptions,
 ) {
   const taskRoute = `/tasks/${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[routeKey]}`;
 
-  // TODO -> Verify if routing is modal
-  // if (componentNavigationContext) {
-  //   await componentNavigationContext.navigate(componentNavigationContext.indexPath + taskRoute);
-  //   return;
-  // }
+  if (componentNavigationContext?.routing === 'virtual') {
+    return componentNavigationContext.navigate(componentNavigationContext.indexPath + taskRoute);
+  }
 
   // Use the framework's native navigation function to maintain proper router state and caching.
   // This ensures that subsequent navigation calls (e.g., Next.js router.refresh, router.push)

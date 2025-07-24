@@ -1298,6 +1298,7 @@ export type __internal_UserVerificationProps = RoutingOptions & {
 export type __internal_UserVerificationModalProps = WithoutRouting<__internal_UserVerificationProps>;
 
 export type __internal_ComponentNavigationContext = {
+  routing?: RoutingStrategy;
   /**
    * The `navigate` reference within the component router context
    */

@@ -30,9 +30,9 @@ import type {
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
-  Clerk as ClerkInterface,
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
+  Clerk as ClerkInterface,
   ClerkOptions,
   ClientJSONSnapshot,
   ClientResource,
@@ -1317,8 +1317,6 @@ export class Clerk implements ClerkInterface {
     if (!token) {
       eventBus.emit(events.TokenUpdate, { token: null });
     }
-
-    // debugger;
 
     const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
 

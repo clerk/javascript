@@ -30,7 +30,7 @@ function SignUpRoutes(): JSX.Element {
   const signUpContext = useSignUpContext();
 
   React.useEffect(() => {
-    return __internal_setComponentNavigationContext?.({ indexPath, navigate });
+    return __internal_setComponentNavigationContext?.({ indexPath, navigate, routing: signUpContext.routing });
   }, [indexPath, navigate]);
 
   return (

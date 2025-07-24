@@ -184,7 +184,7 @@ function SignInRoot() {
   usePreloadTasks();
 
   React.useEffect(() => {
-    return __internal_setComponentNavigationContext?.({ indexPath, navigate });
+    return __internal_setComponentNavigationContext?.({ indexPath, navigate, routing: signInContext.routing });
   }, [indexPath, navigate]);
 
   return (
