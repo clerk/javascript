@@ -86,6 +86,8 @@ const PlanDetailsInternal = ({
     () => clerk.billing.getPlan({ id: planId || initialPlan?.id }),
     {
       fallbackData: initialPlan,
+      revalidateOnFocus: false,
+      shouldRetryOnError: false,
       keepPreviousData: true,
     },
   );
