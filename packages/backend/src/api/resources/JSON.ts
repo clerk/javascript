@@ -312,6 +312,11 @@ export interface OAuthApplicationJSON extends ClerkResourceJSON {
   instance_id: string;
   name: string;
   client_id: string;
+  client_uri: string | null;
+  client_image_url: string | null;
+  dynamically_registered: boolean;
+  consent_screen_enabled: boolean;
+  pkce_required: boolean;
   public: boolean;
   scopes: string;
   redirect_uris: Array<string>;

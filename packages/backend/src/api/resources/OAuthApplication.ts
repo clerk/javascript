@@ -10,7 +10,7 @@ export class OAuthApplication {
      */
     readonly id: string,
     /**
-     * The instance ID of the OAuth application.
+     * The ID of the instance that this OAuth application belongs to.
      */
     readonly instanceId: string,
     /**
@@ -18,9 +18,29 @@ export class OAuthApplication {
      */
     readonly name: string,
     /**
-     * The client ID of the client.
+     * The ID of the client associated with the OAuth application.
      */
     readonly clientId: string,
+    /**
+     * The public-facing URL of the OAuth application, often shown on consent screens.
+     */
+    readonly clientUri: string | null,
+    /**
+     * The URL of the image or logo representing the OAuth application.
+     */
+    readonly clientImageUrl: string | null,
+    /**
+     * Specifies whether the OAuth application is dynamically registered.
+     */
+    readonly dynamicallyRegistered: boolean,
+    /**
+     * Specifies whether the consent screen should be displayed in the authentication flow. Cannot be disabled for dynamically registered OAuth applications.
+     */
+    readonly consentScreenEnabled: boolean,
+    /**
+     * Specifies whether the Proof Key of Code Exchange (PKCE) flow should be required in the authentication flow.
+     */
+    readonly pkceRequired: boolean,
     /**
      * Indicates whether the client is public. If true, the Proof Key of Code Exchange (PKCE) flow can be used.
      */
@@ -34,23 +54,23 @@ export class OAuthApplication {
      */
     readonly redirectUris: Array<string>,
     /**
-     *
+     * The URL used to authorize the user and obtain an authorization code.
      */
     readonly authorizeUrl: string,
     /**
-     *
+     * The URL used by the client to exchange an authorization code for an access token.
      */
     readonly tokenFetchUrl: string,
     /**
-     *
+     * The URL where the client can retrieve user information using an access token.
      */
     readonly userInfoUrl: string,
     /**
-     *
+     * The OpenID Connect discovery endpoint URL for this OAuth application.
      */
     readonly discoveryUrl: string,
     /**
-     *
+     * The URL used to introspect and validate issued access tokens.
      */
     readonly tokenIntrospectionUrl: string,
     /**
@@ -62,7 +82,7 @@ export class OAuthApplication {
      */
     readonly updatedAt: number,
     /**
-     * The client secret.
+     * The client secret associated with the OAuth application. Empty if public client.
      */
     readonly clientSecret?: string,
   ) {}
@@ -73,6 +93,11 @@ export class OAuthApplication {
       data.instance_id,
       data.name,
       data.client_id,
+      data.client_uri,
+      data.client_image_url,
+      data.dynamically_registered,
+      data.consent_screen_enabled,
+      data.pkce_required,
       data.public,
       data.scopes,
       data.redirect_uris,
