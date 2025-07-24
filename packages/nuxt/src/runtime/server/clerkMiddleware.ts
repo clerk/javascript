@@ -1,11 +1,12 @@
 import type { AuthenticateRequestOptions } from '@clerk/backend/internal';
-import { AuthStatus, constants } from '@clerk/backend/internal';
+import { AuthStatus, constants, getAuthObjectForAcceptedToken, TokenType } from '@clerk/backend/internal';
 import { deprecated } from '@clerk/shared/deprecated';
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
 import type { EventHandler } from 'h3';
 import { createError, eventHandler, setResponseHeader } from 'h3';
 
 import { clerkClient } from './clerkClient';
+import type { GetAuthOptions } from './getAuth';
 import { createInitialState, toWebRequest } from './utils';
 
 function parseHandlerAndOptions(args: unknown[]) {
@@ -81,7 +82,10 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
   return eventHandler(async event => {
     const clerkRequest = toWebRequest(event);
 
-    const requestState = await clerkClient(event).authenticateRequest(clerkRequest, options);
+    const requestState = await clerkClient(event).authenticateRequest(clerkRequest, {
+      ...options,
+      acceptsToken: 'any',
+    });
 
     const locationHeader = requestState.headers.get(constants.Headers.Location);
     if (locationHeader) {
@@ -105,7 +109,10 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
     }
 
     const authObject = requestState.toAuth();
-    const authHandler = () => authObject;
+    const authHandler = (options?: GetAuthOptions) => {
+      const acceptsToken = options?.acceptsToken ?? TokenType.SessionToken;
+      return getAuthObjectForAcceptedToken({ authObject, acceptsToken });
+    };
 
     const auth = new Proxy(Object.assign(authHandler, authObject), {
       get(target, prop: string, receiver) {
