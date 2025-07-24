@@ -1,10 +1,11 @@
-import { OrganizationListContext } from '@/ui/contexts';
+import { OrganizationListContext, withCoreSessionSwitchGuard } from '@/ui/contexts';
 import { useTaskSelectOrganizationContext } from '@/ui/contexts/components/SessionTasks';
 import { withCardStateProvider } from '@/ui/elements/contexts';
 
 import { OrganizationList } from '../../OrganizationList';
+import { withTaskGuard } from './withTaskGuard';
 
-export const TaskSelectOrganization = withCardStateProvider(() => {
+const TaskSelectOrganizationInternal = () => {
   const ctx = useTaskSelectOrganizationContext();
 
   return (
@@ -18,4 +19,8 @@ export const TaskSelectOrganization = withCardStateProvider(() => {
       <OrganizationList />
     </OrganizationListContext.Provider>
   );
-});
+};
+
+export const TaskSelectOrganization = withCoreSessionSwitchGuard(
+  withTaskGuard(withCardStateProvider(TaskSelectOrganizationInternal)),
+);
