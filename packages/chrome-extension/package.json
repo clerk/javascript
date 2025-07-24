@@ -1,6 +1,6 @@
 {
   "name": "@clerk/chrome-extension",
-  "version": "2.5.3",
+  "version": "2.5.12",
   "description": "Clerk SDK for Chrome extensions",
   "keywords": [
     "auth",
@@ -38,6 +38,8 @@
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "dev:publish": "pnpm dev -- --env.publish",
+    "format": "node ../../scripts/format-package.mjs",
+    "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src",
     "lint:attw": "attw --pack . --profile node16",
     "lint:publint": "publint",
@@ -51,12 +53,12 @@
     "@clerk/clerk-js": "workspace:^",
     "@clerk/clerk-react": "workspace:^",
     "@clerk/shared": "workspace:^",
-    "webextension-polyfill": "^0.10.0"
+    "webextension-polyfill": "~0.12.0"
   },
   "devDependencies": {
-    "@types/chrome": "*",
-    "@types/webextension-polyfill": "^0.10.7",
-    "type-fest": "^4.8.3"
+    "@types/chrome": "^0.1.1",
+    "@types/webextension-polyfill": "^0.12.3",
+    "type-fest": "^4.41.0"
   },
   "peerDependencies": {
     "react": "catalog:peer-react",

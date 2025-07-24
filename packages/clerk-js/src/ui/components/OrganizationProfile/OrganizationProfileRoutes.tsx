@@ -83,7 +83,7 @@ export const OrganizationProfileRoutes = () => {
             </Route>
           </Switch>
         </Route>
-        {commerceSettings.billing.enabled && commerceSettings.billing.hasPaidOrgPlans && (
+        {commerceSettings.billing.organization.enabled ? (
           <Protect
             condition={has =>
               has({ permission: 'org:sys_billing:read' }) || has({ permission: 'org:sys_billing:manage' })
@@ -96,11 +96,13 @@ export const OrganizationProfileRoutes = () => {
                     <OrganizationBillingPage />
                   </Suspense>
                 </Route>
-                <Route path='plans'>
-                  <Suspense fallback={''}>
-                    <OrganizationPlansPage />
-                  </Suspense>
-                </Route>
+                {commerceSettings.billing.organization.hasPaidPlans ? (
+                  <Route path='plans'>
+                    <Suspense fallback={''}>
+                      <OrganizationPlansPage />
+                    </Suspense>
+                  </Route>
+                ) : null}
                 <Route path='statement/:statementId'>
                   <Suspense fallback={''}>
                     <OrganizationStatementPage />
@@ -114,17 +116,23 @@ export const OrganizationProfileRoutes = () => {
               </Switch>
             </Route>
           </Protect>
-        )}
+        ) : null}
         {apiKeysSettings.enabled && (
-          <Route path={isApiKeysPageRoot ? undefined : 'organization-api-keys'}>
-            <Switch>
-              <Route index>
-                <Suspense fallback={''}>
-                  <OrganizationAPIKeysPage />
-                </Suspense>
-              </Route>
-            </Switch>
-          </Route>
+          <Protect
+            condition={has =>
+              has({ permission: 'org:sys_api_keys:read' }) || has({ permission: 'org:sys_api_keys:manage' })
+            }
+          >
+            <Route path={isApiKeysPageRoot ? undefined : 'organization-api-keys'}>
+              <Switch>
+                <Route index>
+                  <Suspense fallback={''}>
+                    <OrganizationAPIKeysPage />
+                  </Suspense>
+                </Route>
+              </Switch>
+            </Route>
+          </Protect>
         )}
       </Route>
     </Switch>

@@ -12,14 +12,4 @@ const isUnauthorized =
 const hasProtectFallback = Astro.slots.has('protect-fallback');
 ---
 
-{
-  isUnauthorized ? (
-    hasProtectFallback ? (
-      <slot name="protect-fallback" />
-    ) : (
-      <slot name="fallback" />
-    )
-  ) : (
-    <slot />
-  )
-}
+{isUnauthorized ? hasProtectFallback ? <slot name='protect-fallback' /> : <slot name='fallback' /> : <slot />}

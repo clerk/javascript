@@ -15,6 +15,7 @@ import {
   getAuthObjectForAcceptedToken,
   isMachineTokenByPrefix,
   isTokenTypeAccepted,
+  makeAuthObjectSerializable,
   TokenType,
 } from '@clerk/backend/internal';
 import { parsePublishableKey } from '@clerk/shared/keys';
@@ -379,7 +380,14 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
             }
           : {};
 
-      decorateRequest(clerkRequest, handlerResult, requestState, resolvedParams, keylessKeysForRequestData);
+      decorateRequest(
+        clerkRequest,
+        handlerResult,
+        requestState,
+        resolvedParams,
+        keylessKeysForRequestData,
+        authObject.tokenType === 'session_token' ? null : makeAuthObjectSerializable(authObject),
+      );
 
       // Final middleware summary
       logger.debug('🏁 Middleware complete', () => ({

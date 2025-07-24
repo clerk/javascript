@@ -1,5 +1,83 @@
 # @clerk/testing
 
+## 1.10.6
+
+### Patch Changes
+
+- Updated dependencies [[`cd59c0e`](https://github.com/clerk/javascript/commit/cd59c0e5512a341dd8fb420aca583333c8243aa5), [`cd59c0e`](https://github.com/clerk/javascript/commit/cd59c0e5512a341dd8fb420aca583333c8243aa5)]:
+  - @clerk/types@4.70.0
+  - @clerk/shared@3.15.0
+  - @clerk/backend@2.5.2
+
+## 1.10.5
+
+### Patch Changes
+
+- Updated dependencies [[`fecc99d`](https://github.com/clerk/javascript/commit/fecc99d43cb7db5b99863829acb234cbce0da264), [`959d63d`](https://github.com/clerk/javascript/commit/959d63de27e5bfe27b46699b441dfd4e48616bf8), [`10e1060`](https://github.com/clerk/javascript/commit/10e10605b18a58f33a93caed058159c190678e74), [`92c44dd`](https://github.com/clerk/javascript/commit/92c44dd9d51e771a928a8da7004bdb8f8bdbaf58), [`a04a8f5`](https://github.com/clerk/javascript/commit/a04a8f5f81241ee41d93cd64793beca9d6296abb), [`c61855c`](https://github.com/clerk/javascript/commit/c61855c51d9c129d48c4543da3719939ad82f623), [`43ea069`](https://github.com/clerk/javascript/commit/43ea069c570dc64503fc82356ad28a2e43689d45)]:
+  - @clerk/types@4.69.0
+  - @clerk/shared@3.14.0
+  - @clerk/backend@2.5.1
+
+## 1.10.4
+
+### Patch Changes
+
+- Adding subscription details page object. ([#6333](https://github.com/clerk/javascript/pull/6333)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`d2f6f9e`](https://github.com/clerk/javascript/commit/d2f6f9e02036a4288916fcce14f24be5d56561c4), [`a329836`](https://github.com/clerk/javascript/commit/a329836a6c64f0a551a277ccae07043456a70523), [`5fbf8df`](https://github.com/clerk/javascript/commit/5fbf8df84b6d47082a76047451274790b8579b2d), [`6041c39`](https://github.com/clerk/javascript/commit/6041c39a31e787a6065dbc3f21e1c569982a06de), [`3f1270d`](https://github.com/clerk/javascript/commit/3f1270db86a21ead0ed6f0bd4f9986485203e973), [`1d9c409`](https://github.com/clerk/javascript/commit/1d9c409d10cc88667e354664d66c5f74b8bf4ca7), [`df49349`](https://github.com/clerk/javascript/commit/df4934983ee60246cd9df217afd7384aad556387)]:
+  - @clerk/types@4.68.0
+  - @clerk/shared@3.13.0
+  - @clerk/backend@2.5.0
+
+## 1.10.3
+
+### Patch Changes
+
+- Updated dependencies [[`2a90b68`](https://github.com/clerk/javascript/commit/2a90b689550ae960496c9292ca23e0225e3425cd), [`af50905`](https://github.com/clerk/javascript/commit/af50905ea497ed3286c8c4c374498e06ca6ee82b)]:
+  - @clerk/types@4.67.0
+  - @clerk/shared@3.12.3
+  - @clerk/backend@2.4.5
+
+## 1.10.2
+
+### Patch Changes
+
+- Updated dependencies [[`8ee859c`](https://github.com/clerk/javascript/commit/8ee859ce00d1d5747c14a80fe7166303e64a4f1f)]:
+  - @clerk/shared@3.12.2
+  - @clerk/types@4.66.1
+  - @clerk/backend@2.4.4
+
+## 1.10.1
+
+### Patch Changes
+
+- Updated dependencies [[`025e304`](https://github.com/clerk/javascript/commit/025e304c4d6402dfd750ee51ac9c8fc2dea1f353), [`dedf487`](https://github.com/clerk/javascript/commit/dedf48703986d547d5b28155b0182a51030cffeb), [`b96114e`](https://github.com/clerk/javascript/commit/b96114e438638896ba536bb7a17b09cdadcd9407)]:
+  - @clerk/types@4.66.0
+  - @clerk/backend@2.4.3
+  - @clerk/shared@3.12.1
+
+## 1.10.0
+
+### Minor Changes
+
+- Relax Cypress peer dependency to support v14 ([#6274](https://github.com/clerk/javascript/pull/6274)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Updated dependencies [[`2be6a53`](https://github.com/clerk/javascript/commit/2be6a53959cb8a3127c2eb5d1aeb4248872d2c24), [`f6a1c35`](https://github.com/clerk/javascript/commit/f6a1c35bd5fb4bd2a3cd45bdaf9defe6be59d4a9), [`6826d0b`](https://github.com/clerk/javascript/commit/6826d0bbd03e844d49224565878a4326684f06b4), [`f6a1c35`](https://github.com/clerk/javascript/commit/f6a1c35bd5fb4bd2a3cd45bdaf9defe6be59d4a9), [`8fdb209`](https://github.com/clerk/javascript/commit/8fdb20913b0b0f88244099f6c6a7b979e0f79327), [`97a07f7`](https://github.com/clerk/javascript/commit/97a07f78b4b0c3dc701a2610097ec7d6232f79e7), [`e3da9f4`](https://github.com/clerk/javascript/commit/e3da9f4a17a2a5f71d7e02a81b86d6002c93cc59)]:
+  - @clerk/types@4.65.0
+  - @clerk/shared@3.12.0
+  - @clerk/backend@2.4.2
+
+## 1.9.3
+
+### Patch Changes
+
+- Updated dependencies [[`f42c4fe`](https://github.com/clerk/javascript/commit/f42c4fedfdab873129b876eba38b3677f190b460), [`ec207dc`](https://github.com/clerk/javascript/commit/ec207dcd2a13340cfa4e3b80d3d52d1b4e7d5f23), [`ec207dc`](https://github.com/clerk/javascript/commit/ec207dcd2a13340cfa4e3b80d3d52d1b4e7d5f23), [`0e0cc1f`](https://github.com/clerk/javascript/commit/0e0cc1fa85347d727a4fd3718fe45b0f0244ddd9)]:
+  - @clerk/types@4.64.0
+  - @clerk/shared@3.11.0
+  - @clerk/backend@2.4.1
+
 ## 1.9.2
 
 ### Patch Changes

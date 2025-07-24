@@ -326,8 +326,15 @@ export interface PublicUserData {
   userId?: string;
 }
 
+/**
+ * Represents a required action that a user must complete
+ * before their session becomes fully active
+ */
 export interface SessionTask {
-  key: 'org';
+  /**
+   * The unique identifier for the type of task that needs to be completed
+   */
+  key: 'select-organization';
 }
 
 export type GetTokenOptions = {

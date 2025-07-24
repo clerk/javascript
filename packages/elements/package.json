@@ -1,6 +1,6 @@
 {
   "name": "@clerk/elements",
-  "version": "0.23.37",
+  "version": "0.23.45",
   "description": "Clerk Elements",
   "keywords": [
     "clerk",
@@ -63,6 +63,8 @@
     "build:declarations": "tsc -p tsconfig.declarations.json",
     "dev": "tsup --env.NODE_ENV development --watch",
     "dev:example": "concurrently \"pnpm dev\" \"pnpm app:dev\"",
+    "format": "node ../../scripts/format-package.mjs",
+    "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src",
     "lint:attw": "attw --pack . --profile node16",
     "lint:publint": "publint",
@@ -76,14 +78,14 @@
     "@radix-ui/primitive": "^1.1.2",
     "@radix-ui/react-form": "^0.1.7",
     "@radix-ui/react-slot": "^1.2.3",
-    "@xstate/react": "^5.0.5",
+    "@xstate/react": "^6.0.0",
     "client-only": "^0.0.1",
     "tslib": "catalog:repo",
-    "xstate": "^5.19.4"
+    "xstate": "^5.20.1"
   },
   "devDependencies": {
     "@statelyai/inspect": "^0.4.0",
-    "concurrently": "^8.2.2",
+    "concurrently": "^9.2.0",
     "next": "14.2.30",
     "type-fest": "^4.41.0"
   },

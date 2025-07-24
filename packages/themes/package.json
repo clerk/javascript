@@ -1,6 +1,6 @@
 {
   "name": "@clerk/themes",
-  "version": "2.2.54",
+  "version": "2.4.1",
   "description": "Themes for the Clerk auth components",
   "keywords": [
     "react",
@@ -34,6 +34,8 @@
     "build": "tsc -p tsconfig.build.json",
     "clean": "rimraf ./dist",
     "dev": "tsc -p tsconfig.build.json --watch",
+    "format": "node ../../scripts/format-package.mjs",
+    "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src",
     "lint:attw": "attw --pack . --profile node16"
   },

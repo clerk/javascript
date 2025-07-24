@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-react",
-  "version": "5.32.4",
+  "version": "5.36.0",
   "description": "Clerk React library",
   "keywords": [
     "clerk",
@@ -53,13 +53,24 @@
         "default": "./dist/errors.js"
       }
     },
+    "./experimental": {
+      "import": {
+        "types": "./dist/experimental.d.mts",
+        "default": "./dist/experimental.mjs"
+      },
+      "require": {
+        "types": "./dist/experimental.d.ts",
+        "default": "./dist/experimental.js"
+      }
+    },
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
   "files": [
     "dist",
     "internal",
-    "errors"
+    "errors",
+    "experimental"
   ],
   "scripts": {
     "build": "tsup",
@@ -68,6 +79,8 @@
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "dev:publish": "pnpm dev --env.publish",
+    "format": "node ../../scripts/format-package.mjs",
+    "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src",
     "lint:attw": "attw --pack . --profile node16",
     "lint:publint": "publint",

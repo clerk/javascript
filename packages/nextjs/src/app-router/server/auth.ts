@@ -179,7 +179,11 @@ export const auth: AuthFn = (async (options?: AuthOptions) => {
     });
   };
 
-  return Object.assign(authObject, { redirectToSignIn, redirectToSignUp });
+  if (authObject.tokenType === TokenType.SessionToken) {
+    return Object.assign(authObject, { redirectToSignIn, redirectToSignUp });
+  }
+
+  return authObject;
 }) as AuthFn;
 
 auth.protect = async (...args: any[]) => {

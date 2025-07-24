@@ -6,7 +6,7 @@ import { Card } from '@/ui/elements/Card';
 import { withCardStateProvider } from '@/ui/elements/contexts';
 import { LoadingCardContainer } from '@/ui/elements/LoadingCard';
 
-import { SESSION_TASK_ROUTE_BY_KEY } from '../../../core/sessionTasks';
+import { INTERNAL_SESSION_TASK_ROUTE_BY_KEY } from '../../../core/sessionTasks';
 import { SignInContext, SignUpContext } from '../../../ui/contexts';
 import { SessionTasksContext, useSessionTasksContext } from '../../contexts/components/SessionTasks';
 import { Route, Switch, useRouter } from '../../router';
@@ -20,7 +20,7 @@ const SessionTasksStart = () => {
   useEffect(() => {
     // Simulates additional latency to avoid a abrupt UI transition when navigating to the next task
     const timeoutId = setTimeout(() => {
-      void clerk.__experimental_navigateToTask({ redirectUrlComplete });
+      void clerk.__internal_navigateToTaskIfAvailable({ redirectUrlComplete });
     }, 500);
     return () => clearTimeout(timeoutId);
   }, [navigate, clerk, redirectUrlComplete]);
@@ -38,7 +38,7 @@ const SessionTasksStart = () => {
 function SessionTaskRoutes(): JSX.Element {
   return (
     <Switch>
-      <Route path={SESSION_TASK_ROUTE_BY_KEY['org']}>
+      <Route path={INTERNAL_SESSION_TASK_ROUTE_BY_KEY['select-organization']}>
         <ForceOrganizationSelectionTask />
       </Route>
       <Route index>
@@ -84,7 +84,9 @@ export const SessionTask = withCardStateProvider(() => {
 
   const nextTask = useCallback(() => {
     setIsNavigatingToTask(true);
-    return clerk.__experimental_navigateToTask({ redirectUrlComplete }).finally(() => setIsNavigatingToTask(false));
+    return clerk
+      .__internal_navigateToTaskIfAvailable({ redirectUrlComplete })
+      .finally(() => setIsNavigatingToTask(false));
   }, [clerk, redirectUrlComplete]);
 
   if (!clerk.session?.currentTask) {

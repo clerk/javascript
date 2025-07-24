@@ -233,12 +233,21 @@ export class SignIn extends BaseResource implements SignInResource {
   ): Promise<void> => {
     const { strategy, redirectUrl, redirectUrlComplete, identifier, oidcPrompt, continueSignIn } = params || {};
 
+    const redirectUrlWithAuthToken = SignIn.clerk.buildUrlWithAuth(redirectUrl);
+
+    // When after-auth is enabled, redirect to SSO callback route.
+    // This ensures organization selection tasks are displayed after sign-in,
+    // rather than redirecting to potentially unprotected pages while the session is pending.
+    const actionCompleteRedirectUrl = SignIn.clerk.__internal_hasAfterAuthFlows
+      ? redirectUrlWithAuthToken
+      : redirectUrlComplete;
+
     if (!this.id || !continueSignIn) {
       await this.create({
         strategy,
         identifier,
-        redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectUrl),
-        actionCompleteRedirectUrl: redirectUrlComplete,
+        redirectUrl: redirectUrlWithAuthToken,
+        actionCompleteRedirectUrl,
       });
     }
 
@@ -246,7 +255,7 @@ export class SignIn extends BaseResource implements SignInResource {
       await this.prepareFirstFactor({
         strategy,
         redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectUrl),
-        actionCompleteRedirectUrl: redirectUrlComplete,
+        actionCompleteRedirectUrl,
         oidcPrompt,
       });
     }
