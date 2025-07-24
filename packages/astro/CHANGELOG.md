@@ -241,7 +241,7 @@
 
   ```astro
   ---
-  import { CreateOrganization } from '@clerk/astro/components';
+  import { CreateOrganization } from '@clerk/astro/components'
   ---
 
   <CreateOrganization />
@@ -585,8 +585,8 @@
   Regular usage without server islands:
 
   ```astro
-  <Protect role='admin'>
-    <p slot='fallback'>Not an admin</p>
+  <Protect role="admin">
+    <p slot="fallback">Not an admin</p>
     <p>You're an admin</p>
   </Protect>
   ```
@@ -594,12 +594,9 @@
   Example with server islands:
 
   ```astro
-  <Protect
-    server:defer
-    role='admin'
-  >
-    <p slot='fallback'>Loading...</p>
-    <p slot='protect-fallback'>Not an admin</p>
+  <Protect server:defer role="admin">
+    <p slot="fallback">Loading...</p>
+    <p slot="protect-fallback">Not an admin</p>
     <p>You're an admin</p>
   </Protect>
   ```
@@ -1234,7 +1231,7 @@
 
   ```astro
   ---
-  import { SignInButton } from '@clerk/components/astro';
+  import { SignInButton } from '@clerk/components/astro'
   ---
 
   <SignInButton asChild>
