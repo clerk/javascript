@@ -38,18 +38,19 @@ export const PlanDetails = (props: __internal_PlanDetailsProps) => {
 
 const BodyFiller = ({ children }: { children: React.ReactNode }) => {
   return (
-    <Drawer.Body>
-      <Flex
-        align={'center'}
-        justify={'center'}
-        sx={t => ({
-          height: '100%',
-          padding: t.space.$4,
-          fontSize: t.fontSizes.$md,
-        })}
-      >
-        {children}
-      </Flex>
+    <Drawer.Body
+      sx={t => ({
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flex: 1,
+        overflowY: 'auto',
+        padding: t.space.$4,
+        gap: t.space.$4,
+      })}
+    >
+      {children}
     </Drawer.Body>
   );
 };
