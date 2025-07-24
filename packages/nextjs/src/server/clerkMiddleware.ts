@@ -195,6 +195,11 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
 
       const locationHeader = requestState.headers.get(constants.Headers.Location);
       if (locationHeader) {
+        logger.debug('redirect', () => ({
+          location: locationHeader,
+          // @ts-expect-error : FIXME
+          headers: JSON.stringify(Object.fromEntries(requestState.headers)),
+        }));
         const res = NextResponse.redirect(locationHeader);
         requestState.headers.forEach((value, key) => {
           res.headers.set(key, value);
