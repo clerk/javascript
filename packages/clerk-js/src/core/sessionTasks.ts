@@ -31,10 +31,12 @@ export function navigateToTask(
     return componentNavigationContext.navigate(componentNavigationContext.indexPath + taskRoute);
   }
 
+  const taskUrl = options.taskUrls?.[routeKey] ?? resolveTaskUrl(taskRoute, options, environment);
+
   // Use the framework's native navigation function to maintain proper router state and caching.
   // This ensures that subsequent navigation calls (e.g., Next.js router.refresh, router.push)
   // work correctly and don't cause unnecessary re-renders or cache invalidation.
-  return globalNavigate(options.taskUrls?.[routeKey] ?? resolveTaskUrl(taskRoute, options, environment));
+  return globalNavigate(taskUrl);
 }
 
 /**

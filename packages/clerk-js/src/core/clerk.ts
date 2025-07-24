@@ -30,9 +30,9 @@ import type {
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
+  Clerk as ClerkInterface,
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
-  Clerk as ClerkInterface,
   ClerkOptions,
   ClientJSONSnapshot,
   ClientResource,
@@ -505,7 +505,6 @@ export class Clerk implements ClerkInterface {
 
       this.#setAccessors();
       this.#emit();
-
       await onAfterSetActive();
     };
 
@@ -1232,7 +1231,6 @@ export class Clerk implements ClerkInterface {
 
       if (newSession?.status === 'pending') {
         await this.#handlePendingSession(newSession);
-        await onAfterSetActive();
         return;
       }
 
@@ -1298,6 +1296,11 @@ export class Clerk implements ClerkInterface {
   };
 
   #handlePendingSession = async (session: PendingSessionResource) => {
+    const onAfterSetActive: SetActiveHook =
+      typeof window !== 'undefined' && typeof window.__unstable__onAfterSetActive === 'function'
+        ? window.__unstable__onAfterSetActive
+        : noop;
+
     if (!this.environment) {
       return;
     }
@@ -1343,6 +1346,7 @@ export class Clerk implements ClerkInterface {
 
     this.#setAccessors(session);
     this.#emit();
+    await onAfterSetActive();
   };
 
   public __internal_navigateToTaskIfAvailable = async ({
