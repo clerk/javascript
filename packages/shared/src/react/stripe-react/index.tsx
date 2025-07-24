@@ -430,7 +430,10 @@ const createElementComponent = (type: StripeElementType, isServer: boolean): Fun
         <div
           id={id}
           data-clerk='true'
-          style={{ height: isReady ? 'unset' : '0px' }}
+          style={{
+            height: isReady ? 'unset' : '0px',
+            visibility: isReady ? 'visible' : 'hidden',
+          }}
           className={className}
           ref={domNode}
         />
