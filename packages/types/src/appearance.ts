@@ -956,6 +956,7 @@ export type PlanDetailTheme = Theme;
 export type SubscriptionDetailsTheme = Theme;
 export type APIKeysTheme = Theme;
 export type OAuthConsentTheme = Theme;
+export type TaskSelectOrganizationTheme = Theme;
 
 type GlobalAppearanceOptions = {
   /**
@@ -1028,4 +1029,8 @@ export type Appearance<T = Theme> = T &
      * Theme overrides that only apply to the `<OAuthConsent />` component
      */
     __internal_oauthConsent?: T;
+    /**
+     * Theme overrides that only apply to the `<TaskSelectOrganization />` component
+     */
+    taskSelectOrganization?: T;
   };
