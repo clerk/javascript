@@ -34,7 +34,7 @@ export interface CommerceBillingNamespace {
    * <ClerkProvider clerkJsVersion="x.x.x" />
    * ```
    */
-  getPlans: (params?: GetPlansParams) => Promise<CommercePlanResource[]>;
+  getPlans: (params?: GetPlansParams) => Promise<ClerkPaginatedResponse<CommercePlanResource>>;
 
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
@@ -54,7 +54,20 @@ export interface CommerceBillingNamespace {
    * <ClerkProvider clerkJsVersion="x.x.x" />
    * ```
    */
-  getSubscriptions: (params: GetSubscriptionsParams) => Promise<ClerkPaginatedResponse<CommerceSubscriptionResource>>;
+  getSubscription: (params: GetSubscriptionParams) => Promise<CommerceSubscriptionResource>;
+
+  /**
+   * @deprecated Use `getSubscription` to fetch a single subscription with its items
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+   * @example
+   * ```tsx
+   * <ClerkProvider clerkJsVersion="x.x.x" />
+   * ```
+   */
+  getSubscriptions: (
+    params: GetSubscriptionsParams,
+  ) => Promise<ClerkPaginatedResponse<CommerceSubscriptionItemResource>>;
 
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
@@ -85,7 +98,7 @@ export interface CommerceBillingNamespace {
  * <ClerkProvider clerkJsVersion="x.x.x" />
  * ```
  */
-export type CommerceSubscriberType = 'org' | 'user';
+export type CommercePayerType = 'org' | 'user';
 
 /**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
@@ -95,7 +108,7 @@ export type CommerceSubscriberType = 'org' | 'user';
  * <ClerkProvider clerkJsVersion="x.x.x" />
  * ```
  */
-export type CommerceSubscriptionStatus = 'active' | 'ended' | 'upcoming';
+export type CommerceSubscriptionStatus = 'active' | 'ended' | 'upcoming' | 'past_due';
 
 /**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
@@ -205,7 +218,7 @@ export interface CommerceProductResource extends ClerkResource {
  * <ClerkProvider clerkJsVersion="x.x.x" />
  * ```
  */
-export interface GetPlansParams {
+export type GetPlansParams = ClerkPaginationParams<{
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
    * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
@@ -214,8 +227,8 @@ export interface GetPlansParams {
    * <ClerkProvider clerkJsVersion="x.x.x" />
    * ```
    */
-  subscriberType?: CommerceSubscriberType;
-}
+  for?: CommercePayerType;
+}>;
 
 /**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
@@ -356,18 +369,8 @@ export interface CommercePlanResource extends ClerkResource {
    *
    * Each plan is exclusively created for either individual users or organizations,
    * and cannot be used interchangeably.
-   *
-   * @type {['user'] | ['org']}
-   * @example
-   * ```ts
-   * // For a user plan
-   * payerType: ['user']
-   *
-   * // For an organization plan
-   * payerType: ['org']
-   * ```
    */
-  payerType: string[];
+  forPayerType: CommercePayerType;
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
    * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
@@ -754,6 +757,7 @@ export interface CommercePaymentResource extends ClerkResource {
    */
   paymentSource: CommercePaymentSourceResource;
   /**
+   * @deprecated Use `subscriptionItem` instead.
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
    * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
    * @example
@@ -761,7 +765,7 @@ export interface CommercePaymentResource extends ClerkResource {
    * <ClerkProvider clerkJsVersion="x.x.x" />
    * ```
    */
-  subscription: CommerceSubscriptionResource;
+  subscription: CommerceSubscriptionItemResource;
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
    * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
@@ -770,7 +774,7 @@ export interface CommercePaymentResource extends ClerkResource {
    * <ClerkProvider clerkJsVersion="x.x.x" />
    * ```
    */
-  subscriptionItem: CommerceSubscriptionResource;
+  subscriptionItem: CommerceSubscriptionItemResource;
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
    * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
@@ -917,6 +921,18 @@ export type GetSubscriptionsParams = WithOptionalOrgType<ClerkPaginationParams>;
  * <ClerkProvider clerkJsVersion="x.x.x" />
  * ```
  */
+export type GetSubscriptionParams = {
+  orgId?: string;
+};
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+ * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+ * @example
+ * ```tsx
+ * <ClerkProvider clerkJsVersion="x.x.x" />
+ * ```
+ */
 export type CancelSubscriptionParams = WithOptionalOrgType<unknown>;
 
 /**
@@ -927,7 +943,7 @@ export type CancelSubscriptionParams = WithOptionalOrgType<unknown>;
  * <ClerkProvider clerkJsVersion="x.x.x" />
  * ```
  */
-export interface CommerceSubscriptionResource extends ClerkResource {
+export interface CommerceSubscriptionItemResource extends ClerkResource {
   id: string;
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
@@ -937,6 +953,7 @@ export interface CommerceSubscriptionResource extends ClerkResource {
    * <ClerkProvider clerkJsVersion="x.x.x" />
    * ```
    */
+  //TODO(@COMMERCE): should this be nullable ?
   paymentSourceId: string;
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
@@ -974,6 +991,15 @@ export interface CommerceSubscriptionResource extends ClerkResource {
    * ```
    */
   createdAt: Date;
+  /**
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+   * @example
+   * ```tsx
+   * <ClerkProvider clerkJsVersion="x.x.x" />
+   * ```
+   */
+  pastDueAt: Date | null;
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
    * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
@@ -1050,6 +1076,115 @@ export interface CommerceSubscriptionResource extends ClerkResource {
    * ```
    */
   cancel: (params: CancelSubscriptionParams) => Promise<DeletedObjectResource>;
+}
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+ * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+ * @example
+ * ```tsx
+ * <ClerkProvider clerkJsVersion="x.x.x" />
+ * ```
+ */
+export interface CommerceSubscriptionResource extends ClerkResource {
+  /**
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+   * @example
+   * ```tsx
+   * <ClerkProvider clerkJsVersion="x.x.x" />
+   * ```
+   */
+  id: string;
+  /**
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+   * @example
+   * ```tsx
+   * <ClerkProvider clerkJsVersion="x.x.x" />
+   * ```
+   */
+  activeAt: Date;
+  /**
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+   * @example
+   * ```tsx
+   * <ClerkProvider clerkJsVersion="x.x.x" />
+   * ```
+   */
+  createdAt: Date;
+  /**
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+   * @example
+   * ```tsx
+   * <ClerkProvider clerkJsVersion="x.x.x" />
+   * ```
+   */
+  nextPayment: {
+    /**
+     * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+     * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+     * @example
+     * ```tsx
+     * <ClerkProvider clerkJsVersion="x.x.x" />
+     * ```
+     */
+    amount: CommerceMoney;
+    /**
+     * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+     * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+     * @example
+     * ```tsx
+     * <ClerkProvider clerkJsVersion="x.x.x" />
+     * ```
+     */
+    date: Date;
+  } | null;
+  /**
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+   * @example
+   * ```tsx
+   * <ClerkProvider clerkJsVersion="x.x.x" />
+   * ```
+   *
+   * When at least one subscription item is past due, this property will get populated.
+   */
+  pastDueAt: Date | null;
+
+  /**
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+   * @example
+   * ```tsx
+   * <ClerkProvider clerkJsVersion="x.x.x" />
+   * ```
+   *
+   * Due to the free plan subscription item, the top level subscription can either be `active` or `past_due`.
+   */
+  status: Extract<CommerceSubscriptionStatus, 'active' | 'past_due'>;
+
+  /**
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+   * @example
+   * ```tsx
+   * <ClerkProvider clerkJsVersion="x.x.x" />
+   * ```
+   */
+  subscriptionItems: CommerceSubscriptionItemResource[];
+
+  /**
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+   * @example
+   * ```tsx
+   * <ClerkProvider clerkJsVersion="x.x.x" />
+   * ```
+   */
+  updatedAt: Date | null;
 }
 
 /**

@@ -19,6 +19,9 @@ type CommerceHookConfig<TResource extends ClerkResource, TParams extends PagesOr
   useFetcher: (
     param: 'organization' | 'user',
   ) => ((params: TParams) => Promise<ClerkPaginatedResponse<TResource>>) | undefined;
+  options?: {
+    unauthenticated?: boolean;
+  };
 };
 
 /**
@@ -35,10 +38,11 @@ type CommerceHookConfig<TResource extends ClerkResource, TParams extends PagesOr
  *
  * @internal
  */
-export function createCommerceHook<TResource extends ClerkResource, TParams extends PagesOrInfiniteOptions>({
+export function createCommercePaginatedHook<TResource extends ClerkResource, TParams extends PagesOrInfiniteOptions>({
   hookName,
   resourceType,
   useFetcher,
+  options,
 }: CommerceHookConfig<TResource, TParams>) {
   type HookParams = PaginatedHookConfig<PagesOrInfiniteOptions> & {
     for: 'organization' | 'user';
@@ -76,7 +80,7 @@ export function createCommerceHook<TResource extends ClerkResource, TParams exte
             ...(_for === 'organization' ? { orgId: organization?.id } : {}),
           } as TParams);
 
-    const isClerkLoaded = !!(clerk.loaded && user);
+    const isClerkLoaded = !!(clerk.loaded && (options?.unauthenticated ? true : user));
 
     const isEnabled = !!hookParams && isClerkLoaded;
 

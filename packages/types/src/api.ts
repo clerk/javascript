@@ -36,6 +36,7 @@ export interface ClerkAPIError {
       id: string;
       name: string;
     };
+    isPlanUpgradePossible?: boolean;
   };
 }
 

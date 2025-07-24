@@ -235,11 +235,10 @@ export class SignIn extends BaseResource implements SignInResource {
 
     const redirectUrlWithAuthToken = SignIn.clerk.buildUrlWithAuth(redirectUrl);
 
-    // When force organization selection is enabled, redirect to SSO callback route.
+    // When after-auth is enabled, redirect to SSO callback route.
     // This ensures organization selection tasks are displayed after sign-in,
     // rather than redirecting to potentially unprotected pages while the session is pending.
-    const actionCompleteRedirectUrl = SignIn.clerk.__unstable__environment?.organizationSettings
-      .forceOrganizationSelection
+    const actionCompleteRedirectUrl = SignIn.clerk.__internal_hasAfterAuthFlows
       ? redirectUrlWithAuthToken
       : redirectUrlComplete;
 

@@ -1,6 +1,8 @@
 import type {
   CancelSubscriptionParams,
   CommerceMoney,
+  CommerceSubscriptionItemJSON,
+  CommerceSubscriptionItemResource,
   CommerceSubscriptionJSON,
   CommerceSubscriptionPlanPeriod,
   CommerceSubscriptionResource,
@@ -15,21 +17,16 @@ import { BaseResource, CommercePlan, DeletedObject } from './internal';
 
 export class CommerceSubscription extends BaseResource implements CommerceSubscriptionResource {
   id!: string;
-  paymentSourceId!: string;
-  plan!: CommercePlan;
-  planPeriod!: CommerceSubscriptionPlanPeriod;
-  status!: CommerceSubscriptionStatus;
+  status!: Extract<CommerceSubscriptionStatus, 'active' | 'past_due'>;
+  activeAt!: Date;
   createdAt!: Date;
-  periodStartDate!: Date;
-  periodEndDate!: Date | null;
-  canceledAtDate!: Date | null;
-  periodStart!: number;
-  periodEnd!: number;
-  canceledAt!: number | null;
-  amount?: CommerceMoney;
-  credit?: {
+  pastDueAt!: Date | null;
+  updatedAt!: Date | null;
+  nextPayment: {
     amount: CommerceMoney;
-  };
+    date: Date;
+  } | null = null;
+  subscriptionItems!: CommerceSubscriptionItemResource[];
 
   constructor(data: CommerceSubscriptionJSON) {
     super();
@@ -37,6 +34,53 @@ export class CommerceSubscription extends BaseResource implements CommerceSubscr
   }
 
   protected fromJSON(data: CommerceSubscriptionJSON | null): this {
+    if (!data) {
+      return this;
+    }
+
+    this.id = data.id;
+    this.status = data.status;
+    this.createdAt = unixEpochToDate(data.created_at);
+    this.updatedAt = data.updated_at ? unixEpochToDate(data.updated_at) : null;
+    this.activeAt = unixEpochToDate(data.active_at);
+    this.pastDueAt = data.past_due_at ? unixEpochToDate(data.past_due_at) : null;
+    this.nextPayment = data.next_payment
+      ? {
+          amount: commerceMoneyFromJSON(data.next_payment.amount),
+          date: unixEpochToDate(data.next_payment.date),
+        }
+      : null;
+    this.subscriptionItems = (data.subscription_items || []).map(item => new CommerceSubscriptionItem(item));
+    return this;
+  }
+}
+
+export class CommerceSubscriptionItem extends BaseResource implements CommerceSubscriptionItemResource {
+  id!: string;
+  paymentSourceId!: string;
+  plan!: CommercePlan;
+  planPeriod!: CommerceSubscriptionPlanPeriod;
+  status!: CommerceSubscriptionStatus;
+  createdAt!: Date;
+  pastDueAt!: Date | null;
+  periodStartDate!: Date;
+  periodEndDate!: Date | null;
+  canceledAtDate!: Date | null;
+  periodStart!: number;
+  periodEnd!: number;
+  canceledAt!: number | null;
+  //TODO(@COMMERCE): Why can this be undefined ?
+  amount?: CommerceMoney;
+  credit?: {
+    amount: CommerceMoney;
+  };
+
+  constructor(data: CommerceSubscriptionItemJSON) {
+    super();
+    this.fromJSON(data);
+  }
+
+  protected fromJSON(data: CommerceSubscriptionItemJSON | null): this {
     if (!data) {
       return this;
     }
@@ -51,6 +95,8 @@ export class CommerceSubscription extends BaseResource implements CommerceSubscr
     this.canceledAt = data.canceled_at;
 
     this.createdAt = unixEpochToDate(data.created_at);
+    this.pastDueAt = data.past_due_at ? unixEpochToDate(data.past_due_at) : null;
+
     this.periodStartDate = unixEpochToDate(data.period_start);
     this.periodEndDate = data.period_end ? unixEpochToDate(data.period_end) : null;
     this.canceledAtDate = data.canceled_at ? unixEpochToDate(data.canceled_at) : null;
@@ -65,8 +111,8 @@ export class CommerceSubscription extends BaseResource implements CommerceSubscr
     const json = (
       await BaseResource._fetch({
         path: orgId
-          ? `/organizations/${orgId}/commerce/subscriptions/${this.id}`
-          : `/me/commerce/subscriptions/${this.id}`,
+          ? `/organizations/${orgId}/commerce/subscription_items/${this.id}`
+          : `/me/commerce/subscription_items/${this.id}`,
         method: 'DELETE',
       })
     )?.response as unknown as DeletedObjectJSON;

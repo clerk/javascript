@@ -7,8 +7,8 @@ import type {
 
 import { buildURL } from '../utils';
 
-export const SESSION_TASK_ROUTE_BY_KEY: Record<SessionTask['key'], string> = {
-  org: 'add-organization',
+export const INTERNAL_SESSION_TASK_ROUTE_BY_KEY: Record<SessionTask['key'], string> = {
+  'select-organization': 'select-organization',
 } as const;
 
 interface NavigateToTaskOptions {
@@ -24,10 +24,10 @@ interface NavigateToTaskOptions {
  * @internal
  */
 export function navigateToTask(
-  routeKey: keyof typeof SESSION_TASK_ROUTE_BY_KEY,
+  routeKey: keyof typeof INTERNAL_SESSION_TASK_ROUTE_BY_KEY,
   { componentNavigationContext, globalNavigate, options, environment }: NavigateToTaskOptions,
 ) {
-  const taskRoute = `/tasks/${SESSION_TASK_ROUTE_BY_KEY[routeKey]}`;
+  const taskRoute = `/tasks/${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[routeKey]}`;
 
   if (componentNavigationContext) {
     return componentNavigationContext.navigate(componentNavigationContext.indexPath + taskRoute);
@@ -38,7 +38,6 @@ export function navigateToTask(
   const isReferrerSignUpUrl = window.location.href.startsWith(signUpUrl);
 
   const sessionTaskUrl = buildURL(
-    // TODO - Accept custom URL option for custom flows in order to eject out of `signInUrl/signUpUrl`
     {
       base: isReferrerSignUpUrl ? signUpUrl : signInUrl,
       hashPath: taskRoute,
@@ -46,5 +45,5 @@ export function navigateToTask(
     { stringify: true },
   );
 
-  return globalNavigate(sessionTaskUrl);
+  return globalNavigate(options.taskUrls?.[routeKey] ?? sessionTaskUrl);
 }
