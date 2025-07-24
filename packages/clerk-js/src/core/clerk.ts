@@ -1318,15 +1318,29 @@ export class Clerk implements ClerkInterface {
       eventBus.emit(events.TokenUpdate, { token: null });
     }
 
-    // Only triggers navigation for internal AIO components routing or custom URLs
-    const shouldNavigateOnSetActive = this.#componentNavigationContext;
-    if (newSession?.currentTask && shouldNavigateOnSetActive) {
-      await navigateToTask(session.currentTask.key, {
-        options: this.#options,
-        environment: this.environment,
-        globalNavigate: this.navigate,
-        componentNavigationContext: this.#componentNavigationContext,
-      });
+    // debugger;
+
+    const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
+
+    await tracker.track(async () => {
+      if (!this.environment) {
+        return;
+      }
+
+      // Only triggers navigation for AIO components routing or custom URLs
+      const shouldNavigateOnSetActive = this.#componentNavigationContext;
+      if (newSession?.currentTask && shouldNavigateOnSetActive) {
+        await navigateToTask(session.currentTask.key, {
+          options: this.#options,
+          environment: this.environment,
+          globalNavigate: this.navigate,
+          componentNavigationContext: this.#componentNavigationContext,
+        });
+      }
+    });
+
+    if (tracker.isUnloading()) {
+      return;
     }
 
     this.#setAccessors(session);
@@ -1341,26 +1355,30 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
-    if (session.status === 'pending') {
-      await navigateToTask(session.currentTask.key, {
-        options: this.#options,
-        environment: this.environment,
-        globalNavigate: this.navigate,
-        componentNavigationContext: this.#componentNavigationContext,
-      });
-      return;
-    }
+    const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
 
-    if (redirectUrlComplete) {
-      const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
-
-      await tracker.track(async () => {
-        await this.navigate(redirectUrlComplete);
-      });
-
-      if (tracker.isUnloading()) {
+    await tracker.track(async () => {
+      if (!this.environment) {
         return;
       }
+
+      if (session.status === 'pending') {
+        await navigateToTask(session.currentTask.key, {
+          options: this.#options,
+          environment: this.environment,
+          globalNavigate: this.navigate,
+          componentNavigationContext: this.#componentNavigationContext,
+        });
+        return;
+      }
+
+      if (redirectUrlComplete) {
+        await this.navigate(redirectUrlComplete);
+      }
+    });
+
+    if (tracker.isUnloading()) {
+      return;
     }
   };
 
