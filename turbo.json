@@ -157,6 +157,8 @@
         "**/*.css",
         "**/*.scss",
         "**/*.html",
+        ".prettierignore",
+        "prettier.config.mjs",
         "!**/__snapshots__/**",
         "!CHANGELOG.md",
         "!coverage/**",
@@ -164,8 +166,7 @@
         "!examples/**",
         "!node_modules/**"
       ],
-      "outputs": [],
-      "cache": false
+      "outputs": []
     },
     "format:check": {
       "inputs": [
@@ -181,6 +182,8 @@
         "**/*.css",
         "**/*.scss",
         "**/*.html",
+        ".prettierignore",
+        "prettier.config.mjs",
         "!**/__snapshots__/**",
         "!CHANGELOG.md",
         "!coverage/**",

@@ -19,8 +19,8 @@
     "clerk-dev": "bin/cli.js"
   },
   "scripts": {
-    "format": "prettier --write .",
-    "format:check": "prettier --cache --check .",
+    "format": "node ../../scripts/format-package.mjs",
+    "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src"
   },
   "dependencies": {
