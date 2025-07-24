@@ -195,7 +195,12 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
 
       const locationHeader = requestState.headers.get(constants.Headers.Location);
       if (locationHeader) {
-        return NextResponse.next({ status: 307, headers: requestState.headers });
+        const res = NextResponse.redirect(locationHeader);
+        requestState.headers.forEach((value, key) => {
+          res.headers.set(key, value);
+        });
+
+        return res;
       } else if (requestState.status === AuthStatus.Handshake) {
         throw new Error('Clerk: handshake status without redirect');
       }
