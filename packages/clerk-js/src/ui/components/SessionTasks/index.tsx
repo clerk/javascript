@@ -7,7 +7,7 @@ import { withCardStateProvider } from '@/ui/elements/contexts';
 import { LoadingCardContainer } from '@/ui/elements/LoadingCard';
 
 import { INTERNAL_SESSION_TASK_ROUTE_BY_KEY } from '../../../core/sessionTasks';
-import { SignInContext, SignUpContext } from '../../../ui/contexts';
+import { SignInContext, SignUpContext, withCoreSessionSwitchGuard } from '../../../ui/contexts';
 import { SessionTasksContext, useSessionTasksContext } from '../../contexts/components/SessionTasks';
 import { Route, Switch, useRouter } from '../../router';
 import { ForceOrganizationSelectionTask } from './tasks/ForceOrganizationSelection';
@@ -51,7 +51,7 @@ function SessionTaskRoutes(): JSX.Element {
 /**
  * @internal
  */
-export const SessionTask = withCardStateProvider(() => {
+export const SessionTaskInternal = () => {
   const clerk = useClerk();
   const { navigate } = useRouter();
   const signInContext = useContext(SignInContext);
@@ -71,15 +71,13 @@ export const SessionTask = withCardStateProvider(() => {
       return;
     }
 
-    // Tasks can only exist on pending sessions, but we check both conditions
-    // here to be defensive and ensure proper redirection
-    const task = clerk.session?.currentTask;
-    if (!task || clerk.session?.status === 'active') {
+    // Tasks can only exist on pending sessions
+    if (clerk.session?.status === 'active') {
       void navigate(redirectUrlComplete);
       return;
     }
 
-    clerk.telemetry?.record(eventComponentMounted('SessionTask', { task: task.key }));
+    clerk.telemetry?.record(eventComponentMounted('SessionTask'));
   }, [clerk, navigate, isNavigatingToTask, redirectUrlComplete]);
 
   const nextTask = useCallback(() => {
@@ -109,4 +107,6 @@ export const SessionTask = withCardStateProvider(() => {
       <SessionTaskRoutes />
     </SessionTasksContext.Provider>
   );
-});
+};
+
+export const SessionTask = withCoreSessionSwitchGuard(withCardStateProvider(SessionTaskInternal));
