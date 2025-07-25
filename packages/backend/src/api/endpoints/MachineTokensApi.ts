@@ -24,6 +24,11 @@ type RevokeMachineTokenParams = {
   revocationReason?: string | null;
 };
 
+type VerifyMachineTokenParams = {
+  machineSecret?: string | null;
+  secret: string;
+};
+
 export class MachineTokensApi extends AbstractAPI {
   #requireMachineSecret(machineSecret?: string | null): asserts machineSecret is string {
     if (!machineSecret) {
@@ -82,12 +87,20 @@ export class MachineTokensApi extends AbstractAPI {
     return this.request<MachineToken>(requestOptions);
   }
 
-  async verifySecret(machineSecret: string) {
+  async verifySecret(params: VerifyMachineTokenParams) {
+    const { machineSecret, secret } = params;
+
     const requestOptions: ClerkBackendApiRequestOptions = {
       method: 'POST',
       path: joinPaths(basePath, 'verify'),
-      bodyParams: { secret: machineSecret },
+      bodyParams: { secret },
     };
+
+    if (machineSecret) {
+      requestOptions.headerParams = {
+        Authorization: `Bearer ${machineSecret}`,
+      };
+    }
 
     return this.request<MachineToken>(requestOptions);
   }
