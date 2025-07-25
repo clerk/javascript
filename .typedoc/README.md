@@ -71,7 +71,7 @@ To generate the Typedoc MDX files inside `.typedoc/docs` run the following scrip
 pnpm run typedoc:generate
 ```
 
-The `.typedoc/docs` folder is inside the `.gitignore` on purpose. Its contents will be pushed to [clerk/generated-typedoc](https://github.com/clerk/generated-typedoc) in CI. You can use it to debug and tweak the output locally before it gets published.
+The `.typedoc/docs` folder is inside the `.gitignore` on purpose. Its contents will be pushed to [clerk/clerk-docs](https://github.com/clerk/clerk-docs/tree/main/clerk-typedoc) in CI. You can use it to debug and tweak the output locally before it gets published.
 
 ### Adding a package to the Typedoc output
 
