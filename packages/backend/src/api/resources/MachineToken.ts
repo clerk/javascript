@@ -3,7 +3,6 @@ import type { MachineTokenJSON } from './JSON';
 export class MachineToken {
   constructor(
     readonly id: string,
-    readonly name: string,
     readonly subject: string,
     readonly scopes: string[],
     readonly claims: Record<string, any> | null,
@@ -11,8 +10,6 @@ export class MachineToken {
     readonly revocationReason: string | null,
     readonly expired: boolean,
     readonly expiration: number | null,
-    readonly createdBy: string | null,
-    readonly creationReason: string | null,
     readonly createdAt: number,
     readonly updatedAt: number,
     readonly secret?: string,
@@ -21,7 +18,6 @@ export class MachineToken {
   static fromJSON(data: MachineTokenJSON): MachineToken {
     return new MachineToken(
       data.id,
-      data.name,
       data.subject,
       data.scopes,
       data.claims,
@@ -29,8 +25,6 @@ export class MachineToken {
       data.revocation_reason,
       data.expired,
       data.expiration,
-      data.created_by,
-      data.creation_reason,
       data.created_at,
       data.updated_at,
       data.secret,

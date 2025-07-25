@@ -714,7 +714,6 @@ export interface MachineJSON extends ClerkResourceJSON {
 
 export interface MachineTokenJSON extends ClerkResourceJSON {
   object: typeof ObjectType.MachineToken;
-  name: string;
   secret?: string;
   subject: string;
   scopes: string[];
@@ -723,8 +722,6 @@ export interface MachineTokenJSON extends ClerkResourceJSON {
   revocation_reason: string | null;
   expired: boolean;
   expiration: number | null;
-  created_by: string | null;
-  creation_reason: string | null;
   created_at: number;
   updated_at: number;
 }
