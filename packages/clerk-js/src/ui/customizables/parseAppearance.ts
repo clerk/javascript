@@ -1,7 +1,7 @@
 import { fastDeepMergeAndReplace } from '@clerk/shared/utils';
 import type { Appearance, CaptchaAppearanceOptions, DeepPartial, Elements, Layout, Theme } from '@clerk/types';
 
-import { baseTheme } from '../baseTheme';
+import { baseTheme, getBaseTheme } from '../baseTheme';
 import { createInternalTheme, defaultInternalTheme } from '../foundations';
 import type { InternalTheme } from '../styledSystem';
 import {
@@ -21,7 +21,7 @@ export type ParsedCaptcha = Required<CaptchaAppearanceOptions>;
 
 type PublicAppearanceTopLevelKey = keyof Omit<
   Appearance,
-  'baseTheme' | 'elements' | 'layout' | 'variables' | 'captcha' | 'cssLayerName'
+  'baseTheme' | 'theme' | 'elements' | 'layout' | 'variables' | 'captcha' | 'cssLayerName'
 >;
 
 export type AppearanceCascade = {
@@ -81,8 +81,7 @@ export const parseAppearance = (cascade: AppearanceCascade): ParsedAppearance =>
     !appearanceList.find(a => {
       //@ts-expect-error not public api
       return !!a.simpleStyles;
-    }) &&
-    !appearanceList.find(a => a.baseTheme === false)
+    })
   ) {
     appearanceList.unshift(baseTheme);
   }
@@ -105,11 +104,17 @@ const expand = (theme: Theme | undefined, cascade: any[]) => {
     return;
   }
 
-  // Only expand baseTheme if it's not false
-  if (theme.baseTheme !== false) {
-    (Array.isArray(theme.baseTheme) ? theme.baseTheme : [theme.baseTheme]).forEach(baseTheme =>
-      expand(baseTheme as Theme, cascade),
-    );
+  // Use new 'theme' property if available, otherwise fall back to deprecated 'baseTheme'
+  const themeProperty = theme.theme !== undefined ? theme.theme : theme.baseTheme;
+
+  if (themeProperty !== undefined) {
+    (Array.isArray(themeProperty) ? themeProperty : [themeProperty]).forEach(baseTheme => {
+      if (typeof baseTheme === 'string') {
+        expand(getBaseTheme(baseTheme), cascade);
+      } else {
+        expand(baseTheme as Theme, cascade);
+      }
+    });
   }
 
   cascade.push(theme);

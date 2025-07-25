@@ -806,22 +806,34 @@ export type Variables = {
 };
 
 export type BaseThemeTaggedType = { __type: 'prebuilt_appearance' };
-export type BaseTheme = BaseThemeTaggedType;
+export type BaseTheme = BaseThemeTaggedType | 'clerk' | 'simple';
 
 export type Theme = {
   /**
+   * A theme used as the base theme for the components.
+   * For further customisation, you can use the {@link Theme.layout}, {@link Theme.variables} and {@link Theme.elements} props.
+   *
+   * Supports both object-based themes and string-based themes:
+   * @example
+   * import { dark } from "@clerk/themes";
+   * appearance={{ theme: dark }}
+   *
+   * @example
+   * // Use string-based theme
+   * appearance={{ theme: 'clerk' }}
+   * appearance={{ theme: 'simple' }}
+   */
+  theme?: BaseTheme | BaseTheme[];
+  /**
+   * @deprecated Use `theme` instead. This property will be removed in a future version.
    * A theme used as the base theme for the components.
    * For further customisation, you can use the {@link Theme.layout}, {@link Theme.variables} and {@link Theme.elements} props.
    * Set to `false` to disable the base theme.
    * @example
    * import { dark } from "@clerk/themes";
    * appearance={{ baseTheme: dark }}
-   *
-   * @example
-   * // Disable base theme
-   * appearance={{ baseTheme: false }}
    */
-  baseTheme?: BaseTheme | BaseTheme[] | false;
+  baseTheme?: BaseTheme | BaseTheme[];
   /**
    * Configuration options that affect the layout of the components, allowing
    * customizations that hard to implement with just CSS.
@@ -843,7 +855,7 @@ export type Theme = {
   /**
    * The appearance of the CAPTCHA widget.
    * This will be used to style the CAPTCHA widget.
-   * Eg: `theme: 'dark'`
+   * Eg: `captcha: { theme: 'dark' }`
    */
   captcha?: CaptchaAppearanceOptions;
 };
