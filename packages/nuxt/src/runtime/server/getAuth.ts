@@ -1,11 +1,10 @@
-import type { AuthenticateRequestOptions, GetAuthFn } from '@clerk/backend/internal';
+import type { GetAuthFn } from '@clerk/backend/internal';
 import type { H3Event } from 'h3';
 
 import { moduleRegistrationRequired } from './errors';
+import type { AuthOptions } from './types';
 
-export type GetAuthOptions = { acceptsToken?: AuthenticateRequestOptions['acceptsToken'] };
-
-export const getAuth: GetAuthFn<H3Event> = ((event: H3Event, options?: GetAuthOptions) => {
+export const getAuth: GetAuthFn<H3Event> = ((event: H3Event, options?: AuthOptions) => {
   const authObject = event.context.auth(options);
 
   if (!authObject) {

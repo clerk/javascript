@@ -6,7 +6,7 @@ import type { EventHandler } from 'h3';
 import { createError, eventHandler, setResponseHeader } from 'h3';
 
 import { clerkClient } from './clerkClient';
-import type { GetAuthOptions } from './getAuth';
+import type { AuthFn, AuthOptions } from './types';
 import { createInitialState, toWebRequest } from './utils';
 
 function parseHandlerAndOptions(args: unknown[]) {
@@ -109,10 +109,10 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
     }
 
     const authObject = requestState.toAuth();
-    const authHandler = (options?: GetAuthOptions) => {
+    const authHandler: AuthFn = ((options?: AuthOptions) => {
       const acceptsToken = options?.acceptsToken ?? TokenType.SessionToken;
       return getAuthObjectForAcceptedToken({ authObject, acceptsToken });
-    };
+    }) as AuthFn;
 
     const auth = new Proxy(Object.assign(authHandler, authObject), {
       get(target, prop: string, receiver) {
