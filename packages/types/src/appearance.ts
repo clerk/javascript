@@ -828,7 +828,6 @@ export type Theme = {
    * @deprecated Use `theme` instead. This property will be removed in a future version.
    * A theme used as the base theme for the components.
    * For further customisation, you can use the {@link Theme.layout}, {@link Theme.variables} and {@link Theme.elements} props.
-   * Set to `false` to disable the base theme.
    * @example
    * import { dark } from "@clerk/themes";
    * appearance={{ baseTheme: dark }}
