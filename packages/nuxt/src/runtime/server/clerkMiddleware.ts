@@ -109,6 +109,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
     }
 
     const authObject = requestState.toAuth();
+    console.log('authObject', authObject);
     const authHandler: AuthFn = ((options?: AuthOptions) => {
       const acceptsToken = options?.acceptsToken ?? TokenType.SessionToken;
       return getAuthObjectForAcceptedToken({ authObject, acceptsToken });

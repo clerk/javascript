@@ -6,6 +6,16 @@ import { clerkMiddleware } from '../clerkMiddleware';
 const AUTH_RESPONSE = {
   userId: 'user_2jZSstSbxtTndD9P7q4kDl0VVZa',
   sessionId: 'sess_2jZSstSbxtTndD9P7q4kDl0VVZa',
+  tokenType: 'session_token',
+  isAuthenticated: true,
+  sessionStatus: 'active',
+  sessionClaims: {},
+  actor: null,
+  factorVerificationAge: null,
+  orgId: null,
+  orgRole: null,
+  orgSlug: null,
+  orgPermissions: null,
 };
 
 const MOCK_OPTIONS = {
@@ -22,7 +32,10 @@ vi.mock('#imports', () => {
 });
 
 const authenticateRequestMock = vi.fn().mockResolvedValue({
-  toAuth: () => AUTH_RESPONSE,
+  toAuth: () => {
+    console.log('Mock toAuth() called, returning:', AUTH_RESPONSE);
+    return AUTH_RESPONSE;
+  },
   headers: new Headers(),
 });
 
