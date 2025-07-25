@@ -100,6 +100,17 @@ export type {
   PaginatedResponseJSON,
   TestingTokenJSON,
   WebhooksSvixJSON,
+  CommercePayerJSON,
+  CommercePayeeJSON,
+  CommerceAmountJSON,
+  CommerceTotalsJSON,
+  CommercePaymentSourceJSON,
+  CommercePaymentFailedReasonJSON,
+  CommerceSubscriptionCreditJSON,
+  CommercePlanJSON,
+  CommerceSubscriptionItemJSON,
+  CommercePaymentAttemptJSON,
+  CommerceSubscriptionJSON,
 } from './api/resources/JSON';
 
 /**

@@ -2,6 +2,7 @@
 
 import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
+
 import { $ } from 'zx';
 
 const is1PasswordInstalled = await $`op --version`.then(res => res.exitCode === 0).catch(() => false);
@@ -19,7 +20,7 @@ const envItem = await $`op read 'op://Shared/JS SDKs integration tests/add more/
 
     return null;
   })
-  .catch(err => {
+  .catch(() => {
     return null;
   });
 
@@ -31,7 +32,7 @@ const keysItem = await $`op read 'op://Shared/JS SDKs integration tests/add more
 
     return null;
   })
-  .catch(err => {
+  .catch(() => {
     return null;
   });
 

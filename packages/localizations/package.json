@@ -1,6 +1,6 @@
 {
   "name": "@clerk/localizations",
-  "version": "3.20.1",
+  "version": "3.20.3",
   "description": "Localizations for the Clerk components",
   "keywords": [
     "react",
@@ -100,6 +100,8 @@
     "postbuild": "node ../../scripts/subpath-workaround.mjs localizations",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
+    "format": "node ../../scripts/format-package.mjs",
+    "format:check": "node ../../scripts/format-package.mjs --check",
     "generate": "tsc src/utils/generate.ts && node src/utils/generate.js && prettier --write src/*.ts",
     "lint": "eslint src",
     "lint:attw": "attw --pack . --profile node16"

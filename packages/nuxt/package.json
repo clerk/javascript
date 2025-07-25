@@ -1,6 +1,6 @@
 {
   "name": "@clerk/nuxt",
-  "version": "1.7.11",
+  "version": "1.7.13",
   "description": "Clerk SDK for Nuxt",
   "keywords": [
     "clerk",
@@ -59,6 +59,8 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
+    "format": "node ../../scripts/format-package.mjs",
+    "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src",
     "lint:attw": "attw --pack . --profile esm-only",
     "lint:publint": "publint",

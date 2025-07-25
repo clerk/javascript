@@ -1,4 +1,8 @@
-import type { CommercePaymentSourceMethods, CommerceSubscriptionResource, GetSubscriptionsParams } from './commerce';
+import type {
+  CommercePaymentSourceMethods,
+  CommerceSubscriptionItemResource,
+  GetSubscriptionsParams,
+} from './commerce';
 import type { OrganizationDomainResource, OrganizationEnrollmentMode } from './organizationDomain';
 import type { OrganizationInvitationResource, OrganizationInvitationStatus } from './organizationInvitation';
 import type { OrganizationCustomRoleKey, OrganizationMembershipResource } from './organizationMembership';
@@ -59,7 +63,9 @@ export interface OrganizationResource extends ClerkResource, CommercePaymentSour
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
    */
-  getSubscriptions: (params?: GetSubscriptionsParams) => Promise<ClerkPaginatedResponse<CommerceSubscriptionResource>>;
+  getSubscriptions: (
+    params?: GetSubscriptionsParams,
+  ) => Promise<ClerkPaginatedResponse<CommerceSubscriptionItemResource>>;
   addMember: (params: AddMemberParams) => Promise<OrganizationMembershipResource>;
   inviteMember: (params: InviteMemberParams) => Promise<OrganizationInvitationResource>;
   inviteMembers: (params: InviteMembersParams) => Promise<OrganizationInvitationResource[]>;

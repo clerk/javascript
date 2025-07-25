@@ -1,6 +1,6 @@
 {
   "name": "@clerk/backend",
-  "version": "2.5.0",
+  "version": "2.5.2",
   "description": "Clerk Backend SDK - REST Client for Backend API & JWT verification utilities",
   "homepage": "https://clerk.com/",
   "bugs": {
@@ -93,6 +93,8 @@
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "dev:publish": "pnpm dev -- --env.publish",
+    "format": "node ../../scripts/format-package.mjs",
+    "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src",
     "lint:attw": "attw --pack . --profile node16 --ignore-rules false-cjs",
     "lint:publint": "publint",

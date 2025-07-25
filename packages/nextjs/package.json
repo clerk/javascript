@@ -1,6 +1,6 @@
 {
   "name": "@clerk/nextjs",
-  "version": "6.25.4",
+  "version": "6.26.0",
   "description": "Clerk SDK for NextJS",
   "keywords": [
     "clerk",
@@ -49,6 +49,11 @@
       "types": "./dist/types/webhooks.d.ts",
       "import": "./dist/esm/webhooks.js",
       "require": "./dist/cjs/webhooks.js"
+    },
+    "./experimental": {
+      "types": "./dist/types/experimental.d.ts",
+      "import": "./dist/esm/experimental.js",
+      "require": "./dist/cjs/experimental.js"
     }
   },
   "types": "./dist/types/index.d.ts",
@@ -64,6 +69,8 @@
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "dev:publish": "pnpm dev -- --env.publish",
+    "format": "node ../../scripts/format-package.mjs",
+    "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src",
     "lint:attw": "attw --pack . --profile node16 --ignore-rules unexpected-module-syntax",
     "lint:publint": "publint",

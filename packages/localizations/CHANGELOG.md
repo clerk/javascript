@@ -1,5 +1,41 @@
 # Change Log
 
+## 3.20.3
+
+### Patch Changes
+
+- Updated dependencies [[`cd59c0e`](https://github.com/clerk/javascript/commit/cd59c0e5512a341dd8fb420aca583333c8243aa5)]:
+  - @clerk/types@4.70.0
+
+## 3.20.2
+
+### Patch Changes
+
+- Refine Traditional Chinese (`zh-TW`) translations ([#5683](https://github.com/clerk/javascript/pull/5683)) by [@anilahsu](https://github.com/anilahsu)
+
+- Add Persian (`fa-IR`) language ([#6063](https://github.com/clerk/javascript/pull/6063)) by [@XerxesCoder](https://github.com/XerxesCoder)
+
+- Extend `ru-RU` localization ([#5698](https://github.com/clerk/javascript/pull/5698)) by [@ZharaskhanAman](https://github.com/ZharaskhanAman)
+
+- feat(localizations): Update `sk-SK` localization ([#5497](https://github.com/clerk/javascript/pull/5497)) by [@radblesk](https://github.com/radblesk)
+
+- Add `sr-RS` to the list of exported and available localizations ([#6352](https://github.com/clerk/javascript/pull/6352)) by [@tmilewski](https://github.com/tmilewski)
+
+- feat(localization): Add Hindi, Bengali, Tamil, Telugu, and Malay language support ([#5534](https://github.com/clerk/javascript/pull/5534)) by [@vanikya](https://github.com/vanikya)
+
+- Add missing French locales to support new Clerk's Billing feature ([#5944](https://github.com/clerk/javascript/pull/5944)) by [@bde-maze](https://github.com/bde-maze)
+
+- chore(localizations): Align `en-US` strings for danger zone with other translations ([#5800](https://github.com/clerk/javascript/pull/5800)) by [@joschi](https://github.com/joschi)
+
+- Add Kazakh (kk-KZ) language ([#5684](https://github.com/clerk/javascript/pull/5684)) by [@azekowka](https://github.com/azekowka)
+
+- Update `es-MX` translations ([#5663](https://github.com/clerk/javascript/pull/5663)) by [@LFCisneros](https://github.com/LFCisneros)
+
+- Add Italian translations related to commerce and api keys. ([#6362](https://github.com/clerk/javascript/pull/6362)) by [@matteoblonde](https://github.com/matteoblonde)
+
+- Updated dependencies [[`fecc99d`](https://github.com/clerk/javascript/commit/fecc99d43cb7db5b99863829acb234cbce0da264), [`10e1060`](https://github.com/clerk/javascript/commit/10e10605b18a58f33a93caed058159c190678e74), [`92c44dd`](https://github.com/clerk/javascript/commit/92c44dd9d51e771a928a8da7004bdb8f8bdbaf58), [`a04a8f5`](https://github.com/clerk/javascript/commit/a04a8f5f81241ee41d93cd64793beca9d6296abb), [`c61855c`](https://github.com/clerk/javascript/commit/c61855c51d9c129d48c4543da3719939ad82f623), [`43ea069`](https://github.com/clerk/javascript/commit/43ea069c570dc64503fc82356ad28a2e43689d45)]:
+  - @clerk/types@4.69.0
+
 ## 3.20.1
 
 ### Patch Changes

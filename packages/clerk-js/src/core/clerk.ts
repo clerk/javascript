@@ -76,6 +76,7 @@ import type {
   SignUpProps,
   SignUpRedirectOptions,
   SignUpResource,
+  TaskSelectOrganizationProps,
   UnsubscribeCallback,
   UserButtonProps,
   UserProfileProps,
@@ -94,8 +95,8 @@ import {
   createAllowedRedirectOrigins,
   createBeforeUnloadTracker,
   createPageLifecycle,
+  disabledAllBillingFeatures,
   disabledAPIKeysFeature,
-  disabledBillingFeature,
   disabledOrganizationsFeature,
   errorThrower,
   generateSignatureWithCoinbaseWallet,
@@ -112,6 +113,7 @@ import {
   isRedirectForFAPIInitiatedFlow,
   noOrganizationExists,
   noUserExists,
+  processCssLayerNameExtraction,
   removeClerkQueryParam,
   requiresUserInput,
   sessionExistsAndSingleSessionModeEnabled,
@@ -576,7 +578,7 @@ export class Clerk implements ClerkInterface {
 
   public __internal_openCheckout = (props?: __internal_CheckoutProps): void => {
     this.assertComponentsReady(this.#componentControls);
-    if (disabledBillingFeature(this, this.environment)) {
+    if (disabledAllBillingFeatures(this, this.environment)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderAnyCommerceComponent('Checkout'), {
           code: CANNOT_RENDER_BILLING_DISABLED_ERROR_CODE,
@@ -605,7 +607,7 @@ export class Clerk implements ClerkInterface {
 
   public __internal_openPlanDetails = (props: __internal_PlanDetailsProps): void => {
     this.assertComponentsReady(this.#componentControls);
-    if (disabledBillingFeature(this, this.environment)) {
+    if (disabledAllBillingFeatures(this, this.environment)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderAnyCommerceComponent('PlanDetails'), {
           code: CANNOT_RENDER_BILLING_DISABLED_ERROR_CODE,
@@ -1060,7 +1062,7 @@ export class Clerk implements ClerkInterface {
 
   public mountPricingTable = (node: HTMLDivElement, props?: PricingTableProps): void => {
     this.assertComponentsReady(this.#componentControls);
-    if (disabledBillingFeature(this, this.environment)) {
+    if (disabledAllBillingFeatures(this, this.environment)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderAnyCommerceComponent('PricingTable'), {
           code: CANNOT_RENDER_BILLING_DISABLED_ERROR_CODE,
@@ -1163,6 +1165,35 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls.ensureMounted().then(controls => controls.unmountComponent({ node }));
   };
 
+  public mountTaskSelectOrganization = (node: HTMLDivElement, props?: TaskSelectOrganizationProps) => {
+    this.assertComponentsReady(this.#componentControls);
+
+    if (disabledOrganizationsFeature(this, this.environment)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('TaskSelectOrganization'), {
+          code: CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE,
+        });
+      }
+      return;
+    }
+
+    void this.#componentControls.ensureMounted({ preloadHint: 'TaskSelectOrganization' }).then(controls =>
+      controls.mountComponent({
+        name: 'TaskSelectOrganization',
+        appearanceKey: 'taskSelectOrganization',
+        node,
+        props,
+      }),
+    );
+
+    this.telemetry?.record(eventPrebuiltComponentMounted('TaskSelectOrganization', props));
+  };
+
+  public unmountTaskSelectOrganization = (node: HTMLDivElement) => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted().then(controls => controls.unmountComponent({ node }));
+  };
+
   /**
    * `setActive` can be used to set the active session and/or organization.
    */
@@ -1224,16 +1255,15 @@ export class Clerk implements ClerkInterface {
         }
       }
 
+      if (newSession?.status === 'pending') {
+        await this.#handlePendingSession(newSession);
+        return;
+      }
+
       /**
        * Hint to each framework, that the user will be signed out when `{session: null}` is provided.
        */
       await onBeforeSetActive(newSession === null ? 'sign-out' : undefined);
-
-      if (newSession?.status === 'pending') {
-        await this.#handlePendingSession(newSession);
-        await onAfterSetActive();
-        return;
-      }
 
       //1. setLastActiveSession to passed user session (add a param).
       //   Note that this will also update the session's active organization
@@ -1317,7 +1347,7 @@ export class Clerk implements ClerkInterface {
       eventBus.emit(events.TokenUpdate, { token: null });
     }
 
-    // Only triggers navigation for internal AIO components routing
+    // Only triggers navigation for internal AIO components routing or custom URLs
     const shouldNavigateOnSetActive = this.#componentNavigationContext;
     if (newSession?.currentTask && shouldNavigateOnSetActive) {
       await navigateToTask(session.currentTask.key, {
@@ -2524,6 +2554,10 @@ export class Clerk implements ClerkInterface {
     this.#emit();
   };
 
+  get __internal_hasAfterAuthFlows() {
+    return !!this.environment?.organizationSettings?.forceOrganizationSelection;
+  }
+
   #defaultSession = (client: ClientResource): SignedInSessionResource | null => {
     if (client.lastActiveSessionId) {
       const currentSession = client.signedInSessions.find(s => s.id === client.lastActiveSessionId);
@@ -2727,9 +2761,16 @@ export class Clerk implements ClerkInterface {
   };
 
   #initOptions = (options?: ClerkOptions): ClerkOptions => {
+    const processedOptions = options ? { ...options } : {};
+
+    // Extract cssLayerName from baseTheme if present and move it to appearance level
+    if (processedOptions.appearance) {
+      processedOptions.appearance = processCssLayerNameExtraction(processedOptions.appearance);
+    }
+
     return {
       ...defaultOptions,
-      ...options,
+      ...processedOptions,
       allowedRedirectOrigins: createAllowedRedirectOrigins(
         options?.allowedRedirectOrigins,
         this.frontendApi,
