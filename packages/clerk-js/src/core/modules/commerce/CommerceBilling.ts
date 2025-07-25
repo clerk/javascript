@@ -8,12 +8,15 @@ import type {
   CommercePlanResource,
   CommerceStatementJSON,
   CommerceStatementResource,
+  CommerceSubscriptionItemJSON,
+  CommerceSubscriptionItemResource,
   CommerceSubscriptionJSON,
   CommerceSubscriptionResource,
   CreateCheckoutParams,
   GetPaymentAttemptsParams,
   GetPlansParams,
   GetStatementsParams,
+  GetSubscriptionParams,
   GetSubscriptionsParams,
 } from '@clerk/types';
 
@@ -25,6 +28,7 @@ import {
   CommercePlan,
   CommerceStatement,
   CommerceSubscription,
+  CommerceSubscriptionItem,
 } from '../../resources/internal';
 
 export class CommerceBilling implements CommerceBillingNamespace {
@@ -45,6 +49,7 @@ export class CommerceBilling implements CommerceBillingNamespace {
     });
   };
 
+  // Inconsistent API
   getPlan = async (params: { id: string }): Promise<CommercePlanResource> => {
     const plan = (await BaseResource._fetch({
       path: `/commerce/plans/${params.id}`,
@@ -53,9 +58,16 @@ export class CommerceBilling implements CommerceBillingNamespace {
     return new CommercePlan(plan);
   };
 
+  getSubscription = async (params: GetSubscriptionParams): Promise<CommerceSubscriptionResource> => {
+    return await BaseResource._fetch({
+      path: params.orgId ? `/organizations/${params.orgId}/commerce/subscription` : `/me/commerce/subscription`,
+      method: 'GET',
+    }).then(res => new CommerceSubscription(res?.response as CommerceSubscriptionJSON));
+  };
+
   getSubscriptions = async (
     params: GetSubscriptionsParams,
-  ): Promise<ClerkPaginatedResponse<CommerceSubscriptionResource>> => {
+  ): Promise<ClerkPaginatedResponse<CommerceSubscriptionItemResource>> => {
     const { orgId, ...rest } = params;
 
     return await BaseResource._fetch({
@@ -64,11 +76,11 @@ export class CommerceBilling implements CommerceBillingNamespace {
       search: convertPageToOffsetSearchParams(rest),
     }).then(res => {
       const { data: subscriptions, total_count } =
-        res?.response as unknown as ClerkPaginatedResponse<CommerceSubscriptionJSON>;
+        res?.response as unknown as ClerkPaginatedResponse<CommerceSubscriptionItemJSON>;
 
       return {
         total_count,
-        data: subscriptions.map(subscription => new CommerceSubscription(subscription)),
+        data: subscriptions.map(subscription => new CommerceSubscriptionItem(subscription)),
       };
     });
   };

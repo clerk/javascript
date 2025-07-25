@@ -44,6 +44,7 @@ import type {
   SignUpProps,
   SignUpRedirectOptions,
   SignUpResource,
+  TaskSelectOrganizationProps,
   UnsubscribeCallback,
   UserButtonProps,
   UserProfileProps,
@@ -105,6 +106,7 @@ type IsomorphicLoadedClerk = Without<
   | 'apiKeys'
   | '__internal_setComponentNavigationContext'
   | '__internal_setActiveInProgress'
+  | '__internal_hasAfterAuthFlows'
 > & {
   client: ClientResource | undefined;
   billing: CommerceBillingNamespace | undefined;
@@ -140,6 +142,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountPricingTableNodes = new Map<HTMLDivElement, PricingTableProps | undefined>();
   private premountApiKeysNodes = new Map<HTMLDivElement, APIKeysProps | undefined>();
   private premountOAuthConsentNodes = new Map<HTMLDivElement, __internal_OAuthConsentProps | undefined>();
+  private premountTaskSelectOrganizationNodes = new Map<HTMLDivElement, TaskSelectOrganizationProps | undefined>();
   // A separate Map of `addListener` method calls to handle multiple listeners.
   private premountAddListenerCalls = new Map<
     ListenerCallback,
@@ -628,6 +631,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
     this.premountOAuthConsentNodes.forEach((props, node) => {
       clerkjs.__internal_mountOAuthConsent(node, props);
+    });
+
+    this.premountTaskSelectOrganizationNodes.forEach((props, node) => {
+      clerkjs.mountTaskSelectOrganization(node, props);
     });
 
     /**
@@ -1124,6 +1131,22 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.clerkjs.__internal_unmountOAuthConsent(node);
     } else {
       this.premountOAuthConsentNodes.delete(node);
+    }
+  };
+
+  mountTaskSelectOrganization = (node: HTMLDivElement, props?: TaskSelectOrganizationProps): void => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.mountTaskSelectOrganization(node, props);
+    } else {
+      this.premountTaskSelectOrganizationNodes.set(node, props);
+    }
+  };
+
+  unmountTaskSelectOrganization = (node: HTMLDivElement): void => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.unmountTaskSelectOrganization(node);
+    } else {
+      this.premountTaskSelectOrganizationNodes.delete(node);
     }
   };
 

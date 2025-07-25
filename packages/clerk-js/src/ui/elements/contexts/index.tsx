@@ -3,8 +3,9 @@ import type { ClerkAPIError, ClerkRuntimeError } from '@clerk/types';
 import { FloatingTree, useFloatingParentNodeId } from '@floating-ui/react';
 import React from 'react';
 
+import { useRouter } from '@/ui/router';
+
 import { useLocalizations } from '../../customizables';
-import { useSafeState } from '../../hooks';
 
 type Status = 'idle' | 'loading' | 'error';
 type Metadata = string | undefined;
@@ -18,12 +19,21 @@ const [CardStateCtx, _useCardState] = createContextAndHook<CardStateCtxValue>('C
 
 export const CardStateProvider = (props: React.PropsWithChildren<any>) => {
   const { translateError } = useLocalizations();
+  const router = useRouter();
 
-  const [state, setState] = useSafeState<State>({
+  const [state, setState] = React.useState<State>(() => ({
     status: 'idle',
     metadata: undefined,
     error: translateError(window?.Clerk?.__internal_last_error || undefined),
-  });
+  }));
+
+  React.useEffect(() => {
+    const error = window?.Clerk?.__internal_last_error;
+
+    if (error) {
+      setState(s => ({ ...s, error: translateError(error) }));
+    }
+  }, [translateError, setState, router.currentPath]);
 
   const value = React.useMemo(() => ({ value: { state, setState } }), [state, setState]);
   return <CardStateCtx.Provider value={value}>{props.children}</CardStateCtx.Provider>;
@@ -89,7 +99,8 @@ export type FlowMetadata = {
     | 'pricingTable'
     | 'apiKeys'
     | 'oauthConsent'
-    | 'subscriptionDetails';
+    | 'subscriptionDetails'
+    | 'taskSelectOrganization';
   part?:
     | 'start'
     | 'emailCode'

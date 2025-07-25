@@ -750,8 +750,8 @@ export interface CommercePaymentJSON extends ClerkResourceJSON {
   failed_at?: number;
   updated_at: number;
   payment_source: CommercePaymentSourceJSON;
-  subscription: CommerceSubscriptionJSON;
-  subscription_item: CommerceSubscriptionJSON;
+  subscription: CommerceSubscriptionItemJSON;
+  subscription_item: CommerceSubscriptionItemJSON;
   charge_type: CommercePaymentChargeType;
   status: CommercePaymentStatus;
 }
@@ -764,8 +764,8 @@ export interface CommercePaymentJSON extends ClerkResourceJSON {
  * <ClerkProvider clerkJsVersion="x.x.x" />
  * ```
  */
-export interface CommerceSubscriptionJSON extends ClerkResourceJSON {
-  object: 'commerce_subscription';
+export interface CommerceSubscriptionItemJSON extends ClerkResourceJSON {
+  object: 'commerce_subscription_item';
   id: string;
   amount?: CommerceMoneyJSON;
   credit?: {
@@ -780,6 +780,35 @@ export interface CommerceSubscriptionJSON extends ClerkResourceJSON {
   period_end: number;
   canceled_at: number | null;
   past_due_at: number | null;
+}
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+ * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+ * @example
+ * ```tsx
+ * <ClerkProvider clerkJsVersion="x.x.x" />
+ * ```
+ */
+export interface CommerceSubscriptionJSON extends ClerkResourceJSON {
+  object: 'commerce_subscription';
+  id: string;
+  /**
+   * Describes the details for the next payment cycle. It is `undefined` for subscription items that are cancelled or on the free plan.
+   */
+  next_payment?: {
+    amount: CommerceMoneyJSON;
+    date: number;
+  };
+  /**
+   * Due to the free plan subscription item, the top level subscription can either be `active` or `past_due`.
+   */
+  status: Extract<CommerceSubscriptionStatus, 'active' | 'past_due'>;
+  created_at: number;
+  active_at: number;
+  updated_at: number | null;
+  past_due_at: number | null;
+  subscription_items: CommerceSubscriptionItemJSON[] | null;
 }
 
 /**

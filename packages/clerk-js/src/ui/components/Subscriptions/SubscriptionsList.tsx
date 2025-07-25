@@ -1,11 +1,14 @@
+import { useMemo } from 'react';
+
 import { ProfileSection } from '@/ui/elements/Section';
 
 import { useProtect } from '../../common';
 import {
+  useEnvironment,
   usePlansContext,
   useSubscriberTypeContext,
   useSubscriberTypeLocalizationRoot,
-  useSubscriptions,
+  useSubscription,
 } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import {
@@ -39,24 +42,29 @@ export function SubscriptionsList({
   const { captionForSubscription, openSubscriptionDetails } = usePlansContext();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
   const subscriberType = useSubscriberTypeContext();
-  const { data: subscriptions } = useSubscriptions();
+  const { subscriptionItems } = useSubscription();
   const canManageBilling = useProtect(
     has => has({ permission: 'org:sys_billing:manage' }) || subscriberType === 'user',
   );
   const { navigate } = useRouter();
+  const { commerceSettings } = useEnvironment();
 
-  const sortedSubscriptions = subscriptions.sort((a, b) => {
-    // alway put active subscriptions first
-    if (a.status === 'active' && b.status !== 'active') {
-      return -1;
-    }
+  const sortedSubscriptions = useMemo(
+    () =>
+      subscriptionItems.sort((a, b) => {
+        // always put active subscriptions first
+        if (a.status === 'active' && b.status !== 'active') {
+          return -1;
+        }
 
-    if (b.status === 'active' && a.status !== 'active') {
-      return 1;
-    }
+        if (b.status === 'active' && a.status !== 'active') {
+          return 1;
+        }
 
-    return 1;
-  });
+        return 1;
+      }),
+    [subscriptionItems],
+  );
 
   return (
     <ProfileSection.Root
@@ -68,7 +76,7 @@ export function SubscriptionsList({
         paddingTop: t.space.$1,
       })}
     >
-      {subscriptions.length > 0 && (
+      {subscriptionItems.length > 0 && (
         <Table tableHeadVisuallyHidden>
           <Thead>
             <Tr>
@@ -188,22 +196,25 @@ export function SubscriptionsList({
         </Table>
       )}
 
-      <ProfileSection.ArrowButton
-        id='subscriptionsList'
-        textLocalizationKey={subscriptions.length > 0 ? arrowButtonText : arrowButtonEmptyText}
-        sx={[
-          t => ({
-            justifyContent: 'start',
-            height: t.sizes.$8,
-          }),
-        ]}
-        leftIcon={subscriptions.length > 0 ? ArrowsUpDown : Plus}
-        leftIconSx={t => ({
-          width: t.sizes.$4,
-          height: t.sizes.$4,
-        })}
-        onClick={() => void navigate('plans')}
-      />
+      {(commerceSettings.billing.user.hasPaidPlans && subscriberType === 'user') ||
+      (commerceSettings.billing.organization.hasPaidPlans && subscriberType === 'org') ? (
+        <ProfileSection.ArrowButton
+          id='subscriptionsList'
+          textLocalizationKey={subscriptionItems.length > 0 ? arrowButtonText : arrowButtonEmptyText}
+          sx={[
+            t => ({
+              justifyContent: 'start',
+              height: t.sizes.$8,
+            }),
+          ]}
+          leftIcon={subscriptionItems.length > 0 ? ArrowsUpDown : Plus}
+          leftIconSx={t => ({
+            width: t.sizes.$4,
+            height: t.sizes.$4,
+          })}
+          onClick={() => void navigate('plans')}
+        />
+      ) : null}
     </ProfileSection.Root>
   );
 }
