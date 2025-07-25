@@ -131,7 +131,18 @@ const parseLayout = (appearanceList: Appearance[]) => {
 const parseCaptcha = (appearanceList: Appearance[]) => {
   return {
     ...defaultCaptchaOptions,
-    ...appearanceList.reduce((acc, appearance) => ({ ...acc, ...appearance.captcha }), {}),
+    ...appearanceList.reduce((acc, appearance) => {
+      if (appearance.captcha) {
+        const { theme: captchaTheme, size, language } = appearance.captcha;
+        return {
+          ...acc,
+          ...(captchaTheme && { theme: captchaTheme }),
+          ...(size && { size }),
+          ...(language && { language }),
+        };
+      }
+      return acc;
+    }, {} as Partial<CaptchaAppearanceOptions>),
   };
 };
 
