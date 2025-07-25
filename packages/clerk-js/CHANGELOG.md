@@ -1,5 +1,54 @@
 # Change Log
 
+## 5.77.0
+
+### Minor Changes
+
+- Introduce `<TaskSelectOrganization />` component. ([#6376](https://github.com/clerk/javascript/pull/6376)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  It allows you to eject the organization selection task flow from the default `SignIn` and `SignUp` components and render it on custom URL paths using `taskUrls`.
+
+  Usage example:
+
+  ```tsx
+  <ClerkProvider taskUrls={{ 'select-organization': '/onboarding/select-organization' }}>
+    <App />
+  </ClerkProvider>
+  ```
+
+  ```tsx
+  function OnboardingSelectOrganization() {
+    return <TaskSelectOrganization redirectUrlComplete='/dashboard/onboarding-complete' />;
+  }
+  ```
+
+### Patch Changes
+
+- Remove cache revalidation hooks from pending session handling. This fixes unmounting issues from `SignIn` and `SignUp` AIOs during after-auth flows. ([#6389](https://github.com/clerk/javascript/pull/6389)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`b0fdc9e`](https://github.com/clerk/javascript/commit/b0fdc9eaf764ca0c17cbe0810b7d240f6d9db0b6)]:
+  - @clerk/types@4.70.1
+  - @clerk/localizations@3.20.4
+  - @clerk/shared@3.15.1
+
+## 5.76.0
+
+### Minor Changes
+
+- [Billing Beta] Introduce top level subscription. ([#6317](https://github.com/clerk/javascript/pull/6317)) by [@panteliselef](https://github.com/panteliselef)
+
+  Updated `CommerceSubscriptionJSON` to describe the top level subscription and renamed the existing type to `CommerceSubscriptionItemJSON`.
+  Deprecated `billing.getSubscriptions()` in favour of `billing.getSubscription`.
+
+- [Billing Beta] Replace `useSubscriptionItems` with `useSubscription`. ([#6317](https://github.com/clerk/javascript/pull/6317)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Updated dependencies [[`cd59c0e`](https://github.com/clerk/javascript/commit/cd59c0e5512a341dd8fb420aca583333c8243aa5), [`cd59c0e`](https://github.com/clerk/javascript/commit/cd59c0e5512a341dd8fb420aca583333c8243aa5)]:
+  - @clerk/types@4.70.0
+  - @clerk/shared@3.15.0
+  - @clerk/localizations@3.20.3
+
 ## 5.75.0
 
 ### Minor Changes

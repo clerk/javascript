@@ -1,5 +1,20 @@
 # Change Log
 
+## 4.70.1
+
+### Patch Changes
+
+- Add TypeScript types for `<TaskSelectOrganization />` component. ([#6376](https://github.com/clerk/javascript/pull/6376)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+## 4.70.0
+
+### Minor Changes
+
+- [Billing Beta] Introduce top level subscription. ([#6317](https://github.com/clerk/javascript/pull/6317)) by [@panteliselef](https://github.com/panteliselef)
+
+  Updated `CommerceSubscriptionJSON` to describe the top level subscription and renamed the existing type to `CommerceSubscriptionItemJSON`.
+  Deprecated `billing.getSubscriptions()` in favour of `billing.getSubscription`.
+
 ## 4.69.0
 
 ### Minor Changes

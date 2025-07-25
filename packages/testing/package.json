@@ -1,6 +1,6 @@
 {
   "name": "@clerk/testing",
-  "version": "1.10.5",
+  "version": "1.10.7",
   "description": "Utilities to help you create E2E test suites for apps using Clerk",
   "keywords": [
     "auth",
@@ -69,6 +69,8 @@
     "build": "tsup --env.NODE_ENV production",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
+    "format": "node ../../scripts/format-package.mjs",
+    "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src"
   },
   "dependencies": {
