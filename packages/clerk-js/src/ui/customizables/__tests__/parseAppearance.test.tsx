@@ -496,8 +496,8 @@ describe('AppearanceProvider theme flows', () => {
     );
 
     const { result } = renderHook(() => useAppearance(), { wrapper });
-    // Should not include base theme styles due to simpleStyles flag
-    expect(result.current.parsedElements.length).toBe(1); // Only the simple theme itself
+    // Should include both simple theme and base theme (2 elements total)
+    expect(result.current.parsedElements.length).toBe(2);
   });
 
   it('theme property takes precedence over deprecated baseTheme', () => {
@@ -514,8 +514,8 @@ describe('AppearanceProvider theme flows', () => {
     );
 
     const { result } = renderHook(() => useAppearance(), { wrapper });
-    // Should use simple theme (no base theme due to simpleStyles)
-    expect(result.current.parsedElements.length).toBe(1);
+    // Should include both simple theme and base theme (2 elements total)
+    expect(result.current.parsedElements.length).toBe(2);
   });
 
   it('maintains backward compatibility with baseTheme property', () => {
@@ -531,8 +531,8 @@ describe('AppearanceProvider theme flows', () => {
     );
 
     const { result } = renderHook(() => useAppearance(), { wrapper });
-    // Should work the same as theme: 'simple'
-    expect(result.current.parsedElements.length).toBe(1);
+    // Should work the same as theme: 'simple' (2 elements total)
+    expect(result.current.parsedElements.length).toBe(2);
   });
 
   it('supports object-based themes with new theme property', () => {

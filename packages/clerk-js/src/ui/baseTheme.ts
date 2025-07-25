@@ -270,6 +270,7 @@ const clerkTheme: Appearance = {
 const simpleTheme: Appearance = {
   //@ts-expect-error not public api
   simpleStyles: true,
+  elements: {},
 } satisfies Appearance;
 
 export const getBaseTheme = (theme: 'clerk' | 'simple' = 'clerk'): Appearance => {
