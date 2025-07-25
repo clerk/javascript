@@ -109,7 +109,9 @@ const { applyVariants, filterProps } = createVariants(
             color: vars.accentContrast,
             backgroundColor: vars.accent,
             '&:hover': { backgroundColor: vars.accentHover },
-            '&:focus': props.hoverAsFocus ? { backgroundColor: vars.accentHover } : undefined,
+            '&:focus': props.hoverAsFocus
+              ? { backgroundColor: vars.accentHover, borderColor: theme.colors.$borderAlpha300 }
+              : undefined,
           },
           ghost: {
             color: vars.accent,
