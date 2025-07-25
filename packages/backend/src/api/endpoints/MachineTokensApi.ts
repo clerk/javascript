@@ -8,19 +8,16 @@ const basePath = '/m2m_tokens';
 type WithMachineSecret<T> = T & { machineSecret?: string | null };
 
 type CreateMachineTokenParams = WithMachineSecret<{
-  name: string;
-  subject: string;
   claims?: Record<string, any> | null;
-  scopes?: string[];
-  createdBy?: string | null;
   secondsUntilExpiration?: number | null;
 }>;
 
 type UpdateMachineTokenParams = WithMachineSecret<
   {
     m2mTokenId: string;
+    revocationReason?: string | null;
     revoked?: boolean;
-  } & Pick<CreateMachineTokenParams, 'secondsUntilExpiration' | 'claims' | 'scopes'>
+  } & Pick<CreateMachineTokenParams, 'secondsUntilExpiration' | 'claims'>
 >;
 
 type RevokeMachineTokenParams = WithMachineSecret<{
