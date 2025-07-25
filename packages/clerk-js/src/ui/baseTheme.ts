@@ -268,7 +268,7 @@ const clerkTheme: Appearance = {
 } satisfies Appearance;
 
 const simpleTheme: Appearance = {
-  //@ts-expect-error not public api
+  // @ts-expect-error Internal API for simple theme detection
   simpleStyles: true,
   elements: {},
 } satisfies Appearance;
