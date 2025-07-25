@@ -1,5 +1,17 @@
 # Change Log
 
+## 5.36.0
+
+### Minor Changes
+
+- Expose `<CheckoutButton/>`, `<SubscriptionDetailsButton/>`, `<PlanDetailsButton/>` from `@clerk/clerk-react/experimental`. ([#6365](https://github.com/clerk/javascript/pull/6365)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Updated dependencies [[`cd59c0e`](https://github.com/clerk/javascript/commit/cd59c0e5512a341dd8fb420aca583333c8243aa5), [`cd59c0e`](https://github.com/clerk/javascript/commit/cd59c0e5512a341dd8fb420aca583333c8243aa5)]:
+  - @clerk/types@4.70.0
+  - @clerk/shared@3.15.0
+
 ## 5.35.4
 
 ### Patch Changes
