@@ -1,4 +1,4 @@
-import { useOrganizationList, useUser } from '@clerk/shared/react';
+import { useClerk, useOrganizationList, useUser } from '@clerk/shared/react';
 import type { OrganizationResource } from '@clerk/types';
 import { useContext } from 'react';
 
@@ -15,6 +15,7 @@ export const MembershipPreview = withCardStateProvider((props: { organization: O
   const card = useCardState();
   const { navigateAfterSelectOrganization } = useOrganizationListContext();
   const { isLoaded, setActive } = useOrganizationList();
+  const clerk = useClerk();
   const sessionTasksContext = useContext(SessionTasksContext);
 
   if (!isLoaded) {
@@ -26,8 +27,10 @@ export const MembershipPreview = withCardStateProvider((props: { organization: O
         organization,
       });
 
-      if (sessionTasksContext?.nextTask) {
-        return sessionTasksContext?.nextTask();
+      if (sessionTasksContext) {
+        return clerk.__internal_navigateToTaskIfAvailable({
+          redirectUrlComplete: sessionTasksContext.redirectUrlComplete,
+        });
       }
 
       await navigateAfterSelectOrganization(organization);
