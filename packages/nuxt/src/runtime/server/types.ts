@@ -9,6 +9,9 @@ import type {
 
 export type AuthOptions = { acceptsToken?: AuthenticateRequestOptions['acceptsToken'] };
 
+/**
+ * @internal This type is used to define the `auth` function in the event context.
+ */
 export interface AuthFn {
   /**
    * @example
