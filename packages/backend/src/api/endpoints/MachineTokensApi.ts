@@ -5,29 +5,29 @@ import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/m2m_tokens';
 
-type WithMachineSecret<T> = T & { machineSecret?: string | null };
-
-type CreateMachineTokenParams = WithMachineSecret<{
+type CreateMachineTokenParams = {
+  machineSecret: string;
   claims?: Record<string, any> | null;
   secondsUntilExpiration?: number | null;
-}>;
+};
 
-type UpdateMachineTokenParams = WithMachineSecret<
-  {
-    m2mTokenId: string;
-    revocationReason?: string | null;
-    revoked?: boolean;
-  } & Pick<CreateMachineTokenParams, 'secondsUntilExpiration' | 'claims'>
->;
-
-type RevokeMachineTokenParams = WithMachineSecret<{
+type UpdateMachineTokenParams = {
+  machineSecret: string;
   m2mTokenId: string;
   revocationReason?: string | null;
-}>;
+  revoked?: boolean;
+} & Pick<CreateMachineTokenParams, 'secondsUntilExpiration' | 'claims'>;
 
-type VerifyMachineTokenParams = WithMachineSecret<{
+type RevokeMachineTokenParams = {
+  machineSecret?: string | null;
+  m2mTokenId: string;
+  revocationReason?: string | null;
+};
+
+type VerifyMachineTokenParams = {
+  machineSecret?: string | null;
   secret: string;
-}>;
+};
 
 export class MachineTokensApi extends AbstractAPI {
   #requireMachineSecret(machineSecret?: string | null): asserts machineSecret is string {
@@ -38,7 +38,9 @@ export class MachineTokensApi extends AbstractAPI {
 
   async create(params: CreateMachineTokenParams) {
     const { machineSecret, ...bodyParams } = params;
+
     this.#requireMachineSecret(machineSecret);
+
     return this.request<MachineToken>({
       method: 'POST',
       path: basePath,
@@ -51,8 +53,10 @@ export class MachineTokensApi extends AbstractAPI {
 
   async update(params: UpdateMachineTokenParams) {
     const { m2mTokenId, machineSecret, ...bodyParams } = params;
+
     this.#requireMachineSecret(machineSecret);
     this.requireId(m2mTokenId);
+
     return this.request<MachineToken>({
       method: 'PATCH',
       path: joinPaths(basePath, m2mTokenId),
@@ -65,6 +69,7 @@ export class MachineTokensApi extends AbstractAPI {
 
   async revoke(params: RevokeMachineTokenParams) {
     const { m2mTokenId, machineSecret, ...bodyParams } = params;
+
     this.requireId(m2mTokenId);
 
     const requestOptions: ClerkBackendApiRequestOptions = {
@@ -82,20 +87,12 @@ export class MachineTokensApi extends AbstractAPI {
     return this.request<MachineToken>(requestOptions);
   }
 
-  async verifySecret(params: VerifyMachineTokenParams) {
-    const { secret, machineSecret } = params;
-
+  async verifySecret(machineSecret: VerifyMachineTokenParams) {
     const requestOptions: ClerkBackendApiRequestOptions = {
       method: 'POST',
       path: joinPaths(basePath, 'verify'),
-      bodyParams: { secret },
+      bodyParams: { secret: machineSecret },
     };
-
-    if (machineSecret) {
-      requestOptions.headerParams = {
-        Authorization: `Bearer ${machineSecret}`,
-      };
-    }
 
     return this.request<MachineToken>(requestOptions);
   }
