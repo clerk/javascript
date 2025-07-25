@@ -58,8 +58,9 @@ const PopoverCardContent = (props: PropsOfComponent<typeof Flex>) => {
           zIndex: t.zIndices.$card,
           borderWidth: t.borderWidths.$normal,
           borderStyle: t.borderStyles.$solid,
-          borderColor: t.colors.$borderAlpha50,
-          boxShadow: t.shadows.$cardContentShadow,
+          borderColor: t.colors.$borderAlpha150,
+          marginInline: '-1px',
+          marginBlockStart: '-1px',
         }),
         sx,
       ]}

@@ -211,6 +211,7 @@ const SocialButtonIcon = forwardRef((props: SocialButtonProps, ref: Ref<HTMLButt
       textVariant='buttonLarge'
       variant='outline'
       colorScheme='neutral'
+      hoverAsFocus
       sx={t => ({
         minHeight: t.sizes.$8,
         width: '100%',
@@ -233,6 +234,7 @@ const SocialButtonBlock = forwardRef((props: SocialButtonProps, ref: Ref<HTMLBut
       variant='outline'
       block
       isLoading={isLoading}
+      hoverAsFocus
       ref={ref}
       {...rest}
       sx={theme => [

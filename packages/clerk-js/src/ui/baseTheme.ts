@@ -93,7 +93,7 @@ const inputStyles = (theme: InternalTheme) => ({
   }),
 });
 
-export const polishedAppearance: Appearance = {
+const clerkTheme: Appearance = {
   elements: ({ theme }: { theme: InternalTheme }): Elements => {
     return {
       button: {
@@ -266,3 +266,21 @@ export const polishedAppearance: Appearance = {
     };
   },
 } satisfies Appearance;
+
+const simpleTheme: Appearance = {
+  // @ts-expect-error Internal API for simple theme detection
+  simpleStyles: true,
+  elements: {},
+} satisfies Appearance;
+
+export const getBaseTheme = (theme: 'clerk' | 'simple' = 'clerk'): Appearance => {
+  switch (theme) {
+    case 'simple':
+      return simpleTheme;
+    case 'clerk':
+    default:
+      return clerkTheme;
+  }
+};
+
+export const baseTheme = clerkTheme;
