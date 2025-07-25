@@ -30,7 +30,7 @@ describe('SignUpEmailLinkFlowComplete', () => {
   });
 
   describe('Success', () => {
-    it('shows the success message when successfully verified', async () => {
+    it('handles verification and redirects instead of showing success message', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withEmailAddress({ required: true });
       });
@@ -38,7 +38,32 @@ describe('SignUpEmailLinkFlowComplete', () => {
         render(<SignUpEmailLinkFlowComplete />, { wrapper });
         timers.runOnlyPendingTimers();
         await waitFor(() => expect(fixtures.clerk.handleEmailLinkVerification).toHaveBeenCalled());
-        screen.getByText(/success/i);
+        // The component should not show a success message since it should redirect
+        expect(screen.queryByText(/success/i)).not.toBeInTheDocument();
+      });
+    });
+
+    it('allows custom onVerifiedOnOtherDevice behavior', async () => {
+      const customHandler = jest.fn();
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress({ required: true });
+      });
+
+      // Mock handleEmailLinkVerification to call onVerifiedOnOtherDevice
+      fixtures.clerk.handleEmailLinkVerification.mockImplementationOnce(async options => {
+        // Simulate verification happening on a different device
+        if (options.onVerifiedOnOtherDevice) {
+          options.onVerifiedOnOtherDevice();
+        }
+        return null; // Return null to indicate no redirect happened
+      });
+
+      await runFakeTimers(async timers => {
+        render(<SignUpEmailLinkFlowComplete onVerifiedOnOtherDevice={customHandler} />, { wrapper });
+        timers.runOnlyPendingTimers();
+        await waitFor(() => expect(fixtures.clerk.handleEmailLinkVerification).toHaveBeenCalled());
+        // The custom handler should be called when verification happens on a different device
+        expect(customHandler).toHaveBeenCalled();
       });
     });
   });

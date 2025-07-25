@@ -1,5 +1,6 @@
 import { EmailLinkErrorCodeStatus, isEmailLinkError } from '@clerk/shared/error';
 import { useClerk } from '@clerk/shared/react';
+import { noop } from '@clerk/shared/utils';
 import React from 'react';
 
 import { completeSignUpFlow } from '../../utils';
@@ -11,16 +12,18 @@ import type { EmailLinkUIStatus } from './EmailLinkStatusCard';
 import { EmailLinkStatusCard } from './EmailLinkStatusCard';
 
 export type EmailLinkVerifyProps = {
-  redirectUrlComplete?: string;
+  continuePath?: string;
+  onVerifiedOnOtherDevice?: () => void;
   redirectUrl?: string;
+  redirectUrlComplete?: string;
+  texts: Record<EmailLinkUIStatus, { title: LocalizationKey; subtitle: LocalizationKey }>;
   verifyEmailPath?: string;
   verifyPhonePath?: string;
-  continuePath?: string;
-  texts: Record<EmailLinkUIStatus, { title: LocalizationKey; subtitle: LocalizationKey }>;
 };
 
 export const EmailLinkVerify = (props: EmailLinkVerifyProps) => {
-  const { redirectUrl, redirectUrlComplete, verifyEmailPath, verifyPhonePath, continuePath } = props;
+  const { redirectUrl, redirectUrlComplete, verifyEmailPath, verifyPhonePath, continuePath, onVerifiedOnOtherDevice } =
+    props;
   const { handleEmailLinkVerification } = useClerk();
   const { navigate } = useRouter();
   const signUp = useCoreSignUp();
@@ -30,7 +33,17 @@ export const EmailLinkVerify = (props: EmailLinkVerifyProps) => {
     try {
       // Avoid loading flickering
       await sleep(750);
-      await handleEmailLinkVerification({ redirectUrlComplete, redirectUrl }, navigate);
+      const result = await handleEmailLinkVerification(
+        {
+          onVerifiedOnOtherDevice: onVerifiedOnOtherDevice || noop,
+          redirectUrlComplete,
+          redirectUrl,
+        },
+        navigate,
+      );
+
+      if (result !== null) return;
+
       setVerificationStatus('verified_switch_tab');
       await sleep(750);
       await completeSignUpFlow({
