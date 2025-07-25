@@ -1,15 +1,20 @@
-import type { GetAuthFn } from '@clerk/backend/internal';
+import type { SessionAuthObject } from '@clerk/backend';
+import { deprecated } from '@clerk/shared/deprecated';
 import type { H3Event } from 'h3';
 
 import { moduleRegistrationRequired } from './errors';
-import type { AuthOptions } from './types';
 
-export const getAuth: GetAuthFn<H3Event> = ((event: H3Event, options?: AuthOptions) => {
-  const authObject = event.context.auth(options);
+/**
+ * @deprecated Use `event.context.auth()` instead.
+ */
+export function getAuth(event: H3Event): SessionAuthObject {
+  deprecated('getAuth', 'Use `event.context.auth()` instead.');
+
+  const authObject = event.context.auth();
 
   if (!authObject) {
     throw new Error(moduleRegistrationRequired);
   }
 
   return authObject;
-}) as GetAuthFn<H3Event>;
+}

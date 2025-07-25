@@ -12,7 +12,7 @@ export type AuthOptions = { acceptsToken?: AuthenticateRequestOptions['acceptsTo
 export interface AuthFn {
   /**
    * @example
-   * const auth = event.locals.auth({ acceptsToken: ['session_token', 'api_key'] })
+   * const auth = event.context.auth({ acceptsToken: ['session_token', 'api_key'] })
    */
   <T extends TokenType[]>(
     options: AuthOptions & { acceptsToken: T },
@@ -22,7 +22,7 @@ export interface AuthFn {
 
   /**
    * @example
-   * const auth = event.locals.auth({ acceptsToken: 'session_token' })
+   * const auth = event.context.auth({ acceptsToken: 'session_token' })
    */
   <T extends TokenType>(
     options: AuthOptions & { acceptsToken: T },
@@ -30,13 +30,13 @@ export interface AuthFn {
 
   /**
    * @example
-   * const auth = event.locals.auth({ acceptsToken: 'any' })
+   * const auth = event.context.auth({ acceptsToken: 'any' })
    */
   (options: AuthOptions & { acceptsToken: 'any' }): AuthObject;
 
   /**
    * @example
-   * const auth = event.locals.auth()
+   * const auth = event.context.auth()
    */
   (): SessionAuthObject;
 }
