@@ -340,7 +340,7 @@ ${developmentError.getFullMessage()}`,
 
   private getOrganizationSyncQueryParams(toActivate: OrganizationSyncTarget): Map<string, string> {
     const ret = new Map();
-    if (toActivate.type === 'personalAccount') {
+    if (toActivate.type === 'personalWorkspace') {
       ret.set('organization_id', '');
     }
     if (toActivate.type === 'organization') {

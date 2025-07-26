@@ -83,7 +83,7 @@ describe('HandshakeService', () => {
   let mockAuthenticateContext: AuthenticateContext;
   let mockOrganizationMatcher: OrganizationMatcher;
   let mockOptions: {
-    organizationSyncOptions?: { organizationPatterns?: string[]; personalAccountPatterns?: string[] };
+    organizationSyncOptions?: { organizationPatterns?: string[]; personalWorkspacePatterns?: string[] };
   };
   let handshakeService: HandshakeService;
 
@@ -104,13 +104,13 @@ describe('HandshakeService', () => {
 
     mockOrganizationMatcher = new OrganizationMatcher({
       organizationPatterns: ['/org/:id'],
-      personalAccountPatterns: ['/account'],
+      personalWorkspacePatterns: ['/account'],
     });
 
     mockOptions = {
       organizationSyncOptions: {
         organizationPatterns: ['/org/:id'],
-        personalAccountPatterns: ['/account'],
+        personalWorkspacePatterns: ['/account'],
       },
     };
 

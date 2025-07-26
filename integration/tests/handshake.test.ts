@@ -1197,9 +1197,9 @@ test.describe('Client handshake with organization activation @nextjs', () => {
       },
     },
 
-    // ---------------- Personal account tests ----------------
+    // ---------------- Personal workspace tests ----------------
     {
-      name: 'Active session, org a in session, but *the personal account* is requested => attempts to activate PWS',
+      name: 'Active session, org a in session, but *the personal workspace* is requested => attempts to activate PWS',
       when: {
         initialAuthState: 'active',
         initialSessionClaims: new Map<string, string>([['org_id', 'org_a']]),
@@ -1210,7 +1210,7 @@ test.describe('Client handshake with organization activation @nextjs', () => {
             '/organizations-by-slug/:slug',
             '/organizations-by-slug/:id/(.*)',
           ],
-          personalAccountPatterns: ['/personal-account', '/personal-account/(.*)'],
+          personalWorkspacePatterns: ['/personal-account', '/personal-account/(.*)'],
         },
         appRequestPath: '/personal-account',
         tokenAppearsIn: 'cookie',
@@ -1218,13 +1218,13 @@ test.describe('Client handshake with organization activation @nextjs', () => {
       },
       then: {
         expectStatus: 307,
-        fapiOrganizationIdParamValue: '', // <-- Empty string indicates personal account
+        fapiOrganizationIdParamValue: '', // <-- Empty string indicates personal workspace
       },
     },
 
     // ---------------- No activation required tests ----------------
     {
-      name: 'Active session, nothing session, and the personal account is requested => nothing to activate!',
+      name: 'Active session, nothing session, and the personal workspace is requested => nothing to activate!',
       when: {
         initialAuthState: 'active',
         initialSessionClaims: new Map<string, string>([
@@ -1232,7 +1232,7 @@ test.describe('Client handshake with organization activation @nextjs', () => {
         ]),
         orgSyncOptions: {
           organizationPatterns: ['/organizations-by-slug/:slug', '/organizations-by-slug/:id/(.*)'],
-          personalAccountPatterns: ['/personal-account', '/personal-account/(.*)'],
+          personalWorkspacePatterns: ['/personal-account', '/personal-account/(.*)'],
         },
         appRequestPath: '/personal-account',
         tokenAppearsIn: 'cookie',
@@ -1250,7 +1250,7 @@ test.describe('Client handshake with organization activation @nextjs', () => {
         initialSessionClaims: new Map<string, string>([['org_id', 'org_a']]),
         orgSyncOptions: {
           organizationPatterns: ['/organizations-by-id/:id', '/organizations-by-id/:id/(.*)'],
-          personalAccountPatterns: ['/personal-account', '/personal-account/(.*)'],
+          personalWorkspacePatterns: ['/personal-account', '/personal-account/(.*)'],
         },
         appRequestPath: '/organizations-by-id/org_a',
         tokenAppearsIn: 'cookie',
@@ -1387,7 +1387,7 @@ test.describe('Client handshake with an organization activation avoids infinite 
 
   const organizationSyncOptions = {
     organizationPatterns: ['/organizations-by-id/:id', '/organizations-by-id/:id/(.*)'],
-    personalAccountPatterns: ['/personal-account', '/personal-account/(.*)'],
+    personalWorkspacePatterns: ['/personal-account', '/personal-account/(.*)'],
   };
 
   test('Sets the redirect loop tracking cookie', async () => {

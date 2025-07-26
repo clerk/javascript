@@ -423,13 +423,13 @@ describe('getOrganizationSyncTarget', () => {
       },
     },
     {
-      name: 'Can activate the personal account',
+      name: 'Can activate the personal workspace',
       whenOrgSyncOptions: {
-        personalAccountPatterns: ['/personal-account'],
+        personalWorkspacePatterns: ['/personal-account'],
       },
       whenAppRequestPath: '/personal-account',
       thenExpectActivationEntity: {
-        type: 'personalAccount',
+        type: 'personalWorkspace',
       },
     },
     {
@@ -444,9 +444,9 @@ describe('getOrganizationSyncTarget', () => {
       },
     },
     {
-      name: 'org match match precedes personal account',
+      name: 'org match match precedes personal workspace',
       whenOrgSyncOptions: {
-        personalAccountPatterns: ['/', '/(.*)'], // Personal account captures everything
+        personalWorkspacePatterns: ['/', '/(.*)'], // Personal workspace captures everything
         organizationPatterns: ['/orgs/:slug'], // that isn't org scoped
       },
       whenAppRequestPath: '/orgs/my-org',
@@ -456,13 +456,13 @@ describe('getOrganizationSyncTarget', () => {
       },
     },
     {
-      name: 'personal account may contain path tokens',
+      name: 'personal workspace may contain path tokens',
       whenOrgSyncOptions: {
-        personalAccountPatterns: ['/user/:any', '/user/:any/(.*)'],
+        personalWorkspacePatterns: ['/user/:any', '/user/:any/(.*)'],
       },
       whenAppRequestPath: '/user/123/home',
       thenExpectActivationEntity: {
-        type: 'personalAccount',
+        type: 'personalWorkspace',
       },
     },
     {
@@ -474,7 +474,7 @@ describe('getOrganizationSyncTarget', () => {
           '/orgs-by-slug/:slug',
           '/orgs-by-slug/:slug/(.*)',
         ],
-        personalAccountPatterns: ['/personal-account', '/personal-account/(.*)'],
+        personalWorkspacePatterns: ['/personal-account', '/personal-account/(.*)'],
       },
       whenAppRequestPath: '/orgs-by-slug/org_bar/sub-resource',
       thenExpectActivationEntity: {

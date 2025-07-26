@@ -5,11 +5,11 @@ import type { OrganizationSyncOptions, OrganizationSyncTarget } from './types';
 
 export class OrganizationMatcher {
   private readonly organizationPattern: MatchFunction | null;
-  private readonly personalAccountPattern: MatchFunction | null;
+  private readonly personalWorkspacePatterns: MatchFunction | null;
 
   constructor(options?: OrganizationSyncOptions) {
     this.organizationPattern = this.createMatcher(options?.organizationPatterns);
-    this.personalAccountPattern = this.createMatcher(options?.personalAccountPatterns);
+    this.personalWorkspacePatterns = this.createMatcher(options?.personalWorkspacePatterns);
   }
 
   private createMatcher(pattern?: string[]): MatchFunction | null {
@@ -25,7 +25,7 @@ export class OrganizationMatcher {
     const orgTarget = this.findOrganizationTarget(url);
     if (orgTarget) return orgTarget;
 
-    return this.findPersonalAccountTarget(url);
+    return this.findPersonalWorkspaceTarget(url);
   }
 
   private findOrganizationTarget(url: URL): OrganizationSyncTarget | null {
@@ -46,14 +46,14 @@ export class OrganizationMatcher {
     }
   }
 
-  private findPersonalAccountTarget(url: URL): OrganizationSyncTarget | null {
-    if (!this.personalAccountPattern) return null;
+  private findPersonalWorkspaceTarget(url: URL): OrganizationSyncTarget | null {
+    if (!this.personalWorkspacePatterns) return null;
 
     try {
-      const result = this.personalAccountPattern(url.pathname);
-      return result ? { type: 'personalAccount' } : null;
+      const result = this.personalWorkspacePatterns(url.pathname);
+      return result ? { type: 'personalWorkspace' } : null;
     } catch (e) {
-      console.error('Failed to match personal account pattern:', e);
+      console.error('Failed to match personal workspace pattern:', e);
       return null;
     }
   }

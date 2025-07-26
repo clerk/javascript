@@ -17,9 +17,9 @@ describe('OrganizationMatcher', () => {
       expect(matcher).toBeInstanceOf(OrganizationMatcher);
     });
 
-    it('should create matcher with personal account patterns', () => {
+    it('should create matcher with personal workspace patterns', () => {
       const matcher = new OrganizationMatcher({
-        personalAccountPatterns: ['/account'],
+        personalWorkspacePatterns: ['/account'],
       });
       expect(matcher).toBeInstanceOf(OrganizationMatcher);
     });
@@ -32,10 +32,10 @@ describe('OrganizationMatcher', () => {
       }).toThrow(/Invalid pattern/);
     });
 
-    it('should throw error for invalid personal account pattern', () => {
+    it('should throw error for invalid personal workspace pattern', () => {
       expect(() => {
         new OrganizationMatcher({
-          personalAccountPatterns: ['/account/***'], // Definitely invalid pattern
+          personalWorkspacePatterns: ['/account/***'], // Definitely invalid pattern
         });
       }).toThrow(/Invalid pattern/);
     });
@@ -70,20 +70,20 @@ describe('OrganizationMatcher', () => {
       });
     });
 
-    it('should find personal account', () => {
+    it('should find personal workspace', () => {
       const matcher = new OrganizationMatcher({
-        personalAccountPatterns: ['/account'],
+        personalWorkspacePatterns: ['/account'],
       });
       const url = new URL('http://localhost:3000/account');
       expect(matcher.findTarget(url)).toEqual({
-        type: 'personalAccount',
+        type: 'personalWorkspace',
       });
     });
 
-    it('should prioritize organization over personal account', () => {
+    it('should prioritize organization over personal workspace', () => {
       const matcher = new OrganizationMatcher({
         organizationPatterns: ['/orgs/:id'],
-        personalAccountPatterns: ['/orgs/:id'], // Same pattern
+        personalWorkspacePatterns: ['/orgs/:id'], // Same pattern
       });
       const url = new URL('http://localhost:3000/orgs/123');
       expect(matcher.findTarget(url)).toEqual({

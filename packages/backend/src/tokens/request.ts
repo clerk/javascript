@@ -360,8 +360,8 @@ export const authenticateRequest: AuthenticateRequest = (async (
         mustActivate = true;
       }
     }
-    // Activate the personal account?
-    if (organizationSyncTarget.type === 'personalAccount' && auth.orgId) {
+    // Activate the personal workspace?
+    if (organizationSyncTarget.type === 'personalWorkspace' && auth.orgId) {
       mustActivate = true;
     }
     if (!mustActivate) {
