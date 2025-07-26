@@ -2,9 +2,9 @@ import type { MembershipRole } from '@clerk/types';
 import { describe } from '@jest/globals';
 import { waitFor } from '@testing-library/react';
 
+import { OrganizationSwitcher } from '../';
 import { act, render } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
-import { OrganizationSwitcher } from '../';
 import {
   createFakeUserOrganizationInvitation,
   createFakeUserOrganizationMembership,
@@ -31,7 +31,7 @@ describe('OrganizationSwitcher', () => {
       });
       props.setProps({ hidePersonal: false });
       const { getByText } = await act(() => render(<OrganizationSwitcher />, { wrapper }));
-      expect(getByText('Personal account')).toBeInTheDocument();
+      expect(getByText('Personal workspace')).toBeInTheDocument();
     });
 
     it('does not show the personal workspace when disabled', async () => {
@@ -148,7 +148,7 @@ describe('OrganizationSwitcher', () => {
       const { getByText, queryByRole } = render(<OrganizationSwitcher />, { wrapper });
       await waitFor(() => {
         expect(queryByRole('button', { name: 'Open organization switcher' })).toBeNull();
-        expect(getByText('Personal account')).toBeInTheDocument();
+        expect(getByText('Personal workspace')).toBeInTheDocument();
       });
     });
 
@@ -195,7 +195,7 @@ describe('OrganizationSwitcher', () => {
       const { getAllByText, getByText, getByRole, userEvent } = render(<OrganizationSwitcher />, { wrapper });
       await userEvent.click(getByRole('button'));
       expect(getAllByText('Org1')).not.toBeNull();
-      expect(getByText('Personal account')).toBeInTheDocument();
+      expect(getByText('Personal workspace')).toBeInTheDocument();
       expect(getByText('Org2')).toBeInTheDocument();
     });
 
@@ -450,7 +450,7 @@ describe('OrganizationSwitcher', () => {
       fixtures.clerk.setActive.mockReturnValueOnce(Promise.resolve());
       const { getByRole, getByText, userEvent } = render(<OrganizationSwitcher />, { wrapper });
       await userEvent.click(getByRole('button'));
-      await userEvent.click(getByText(/Personal account/i));
+      await userEvent.click(getByText(/Personal workspace/i));
 
       expect(fixtures.clerk.setActive).toHaveBeenCalledWith(
         expect.objectContaining({

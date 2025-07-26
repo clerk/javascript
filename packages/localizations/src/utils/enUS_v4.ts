@@ -529,7 +529,7 @@ export const enUS_v4: any = {
     action__addAccount: 'Add account',
   },
   organizationSwitcher: {
-    personalWorkspace: 'Personal account',
+    personalWorkspace: 'Personal workspace',
     notSelected: 'No organization selected',
     action__createOrganization: 'Create Organization',
     action__manageOrganization: 'Manage Organization',
