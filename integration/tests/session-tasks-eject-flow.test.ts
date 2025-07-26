@@ -96,6 +96,7 @@ return (
     await u.po.expect.toBeSignedIn();
 
     // Complete the organization selection task
+    await u.page.waitForAppUrl('/onboarding/select-organization');
     const fakeOrganization = Object.assign(u.services.organizations.createFakeOrganization(), {
       slug: u.services.organizations.createFakeOrganization().slug + '-eject-flow',
     });
