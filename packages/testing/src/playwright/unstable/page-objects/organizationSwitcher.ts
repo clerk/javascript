@@ -18,8 +18,8 @@ export const createOrganizationSwitcherComponentPageObject = (testArgs: { page: 
     expectNoOrganizationSelected: () => {
       return expect(page.getByText(/No organization selected/i)).toBeVisible();
     },
-    expectPersonalAccount: () => {
-      return expect(page.getByText(/personal account/i)).toBeVisible();
+    expectPersonalWorkspace: () => {
+      return expect(page.getByText(/personal workspace/i)).toBeVisible();
     },
     toggleTrigger: () => {
       return page.locator('.cl-organizationSwitcherTrigger').click();

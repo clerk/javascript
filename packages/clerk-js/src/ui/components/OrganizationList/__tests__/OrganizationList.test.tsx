@@ -1,5 +1,6 @@
 import { describe } from '@jest/globals';
 
+import { OrganizationList } from '../';
 import { render, waitFor } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { createFakeOrganization } from '../../CreateOrganization/__tests__/CreateOrganization.test';
@@ -7,7 +8,6 @@ import {
   createFakeUserOrganizationInvitation,
   createFakeUserOrganizationMembership,
 } from '../../OrganizationSwitcher/__tests__/utlis';
-import { OrganizationList } from '../';
 
 const { createFixtures } = bindCreateFixtures('OrganizationList');
 
@@ -28,14 +28,13 @@ describe('OrganizationList', () => {
       expect(queryByRole('heading', { name: /choose an account/i })).toBeInTheDocument();
       // Subheader
       expect(queryByText('to continue to TestApp')).toBeInTheDocument();
-      //
-      expect(queryByText('Personal account')).toBeInTheDocument();
+      expect(queryByText('Personal workspace')).toBeInTheDocument();
       expect(queryByRole('menuitem', { name: 'Create organization' })).toBeInTheDocument();
     });
   });
 
-  describe('Personal Account', () => {
-    it('hides the personal account with data to list', async () => {
+  describe('Personal workspace', () => {
+    it('hides the personal workspace with data to list', async () => {
       const { wrapper, props, fixtures } = await createFixtures(f => {
         f.withOrganizations();
         f.withUser({
@@ -73,7 +72,7 @@ describe('OrganizationList', () => {
         // Subheader
         expect(queryByText('to continue to TestApp')).toBeInTheDocument();
         // No personal
-        expect(queryByText('Personal account')).not.toBeInTheDocument();
+        expect(queryByText('Personal workspace')).not.toBeInTheDocument();
         // Display membership
         expect(queryByText('Org1')).toBeInTheDocument();
 
@@ -81,7 +80,7 @@ describe('OrganizationList', () => {
       });
     });
 
-    it('hides the personal account with no data to list', async () => {
+    it('hides the personal workspace with no data to list', async () => {
       const { wrapper, props } = await createFixtures(f => {
         f.withOrganizations();
         f.withUser({
@@ -96,7 +95,7 @@ describe('OrganizationList', () => {
         // Header
         expect(queryByRole('heading', { name: /Create organization/i })).toBeInTheDocument();
 
-        expect(queryByText('Personal account')).not.toBeInTheDocument();
+        expect(queryByText('Personal workspace')).not.toBeInTheDocument();
 
         // Form fields of CreateOrganizationForm
         expect(queryByLabelText(/name/i)).toBeInTheDocument();
@@ -187,7 +186,7 @@ describe('OrganizationList', () => {
     });
 
     describe('with force organization selection setting on environment', () => {
-      it('does not show the personal account', async () => {
+      it('does not show the personal workspace', async () => {
         const { wrapper } = await createFixtures(f => {
           f.withOrganizations();
           f.withForceOrganizationSelection();
@@ -199,7 +198,7 @@ describe('OrganizationList', () => {
         const { queryByText } = render(<OrganizationList />, { wrapper });
 
         await waitFor(() => {
-          expect(queryByText('Personal account')).not.toBeInTheDocument();
+          expect(queryByText('Personal workspace')).not.toBeInTheDocument();
         });
       });
     });
@@ -340,7 +339,7 @@ describe('OrganizationList', () => {
 
         await waitFor(async () => {
           fixtures.clerk.setActive.mockReturnValueOnce(Promise.resolve());
-          await userEvent.click(getByText(/Personal account/i));
+          await userEvent.click(getByText(/Personal workspace/i));
 
           expect(fixtures.router.navigate).toHaveBeenCalledWith(`/user/test_user_id`);
           expect(fixtures.clerk.setActive).toHaveBeenCalledWith(

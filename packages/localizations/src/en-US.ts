@@ -468,7 +468,7 @@ export const enUS: LocalizationResource = {
     action__manageOrganization: 'Manage',
     action__suggestionsAccept: 'Request to join',
     notSelected: 'No organization selected',
-    personalWorkspace: 'Personal account',
+    personalWorkspace: 'Personal workspace',
     suggestionsAcceptedLabel: 'Pending approval',
   },
   paginationButton__next: 'Next',

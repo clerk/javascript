@@ -474,7 +474,7 @@ export const enGB: LocalizationResource = {
     action__manageOrganization: 'Manage',
     action__suggestionsAccept: 'Request to join',
     notSelected: 'No organisation selected',
-    personalWorkspace: 'Personal account',
+    personalWorkspace: 'Personal workspace',
     suggestionsAcceptedLabel: 'Pending approval',
   },
   paginationButton__next: 'Next',
