@@ -452,20 +452,22 @@ export const authenticateRequest: AuthenticateRequest = (async (
       return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.DevBrowserSync, '');
     }
 
-    const isRequestEligibleForMultiDomainSync =
-      authenticateContext.isSatellite && authenticateContext.secFetchDest === 'document';
-
     /**
      * Begin multi-domain sync flows
      */
-    if (authenticateContext.instanceType === 'production' && isRequestEligibleForMultiDomainSync) {
+    if (
+      authenticateContext.instanceType === 'production' &&
+      authenticateContext.isSatellite &&
+      authenticateContext.secFetchDest === 'document'
+    ) {
       return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.SatelliteCookieNeedsSyncing, '');
     }
 
     // Multi-domain development sync flow
     if (
       authenticateContext.instanceType === 'development' &&
-      isRequestEligibleForMultiDomainSync &&
+      authenticateContext.isSatellite &&
+      authenticateContext.secFetchDest === 'document' &&
       !authenticateContext.clerkUrl.searchParams.has(constants.QueryParameters.ClerkSynced)
     ) {
       // initiate MD sync
