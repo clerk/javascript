@@ -18,8 +18,14 @@ export const createOrganizationSwitcherComponentPageObject = (testArgs: { page: 
     expectNoOrganizationSelected: () => {
       return expect(page.getByText(/No organization selected/i)).toBeVisible();
     },
+    /**
+     * @deprecated Use `expectPersonalWorkspace` instead
+     */
+    expectPersonalAccount: () => {
+      return expect(page.getByText(/personal (workspace|account)/i)).toBeVisible();
+    },
     expectPersonalWorkspace: () => {
-      return expect(page.getByText(/personal workspace/i)).toBeVisible();
+      return expect(page.getByText(/personal (workspace|account)/i)).toBeVisible();
     },
     toggleTrigger: () => {
       return page.locator('.cl-organizationSwitcherTrigger').click();
