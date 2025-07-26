@@ -1608,9 +1608,9 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
     __experimental_asStandalone?: boolean | ((opened: boolean) => void);
 
     /**
-     * By default, users can switch between organization and their personal account.
-     * This option controls whether OrganizationSwitcher will include the user's personal account
-     * in the organization list. Setting this to `false` will hide the personal account entry,
+     * By default, users can switch between organization and their personal workspace.
+     * This option controls whether OrganizationSwitcher will include the user's personal workspace
+     * in the organization list. Setting this to `false` will hide the personal workspace entry,
      * and users will only be able to switch between organizations.
      * @default true
      */
@@ -1700,9 +1700,9 @@ export type OrganizationListProps = {
    */
   skipInvitationScreen?: boolean;
   /**
-   * By default, users can switch between organization and their personal account.
-   * This option controls whether OrganizationList will include the user's personal account
-   * in the organization list. Setting this to `false` will hide the personal account entry,
+   * By default, users can switch between organization and their personal workspace.
+   * This option controls whether OrganizationList will include the user's personal workspace
+   * in the organization list. Setting this to `false` will hide the personal workspace entry,
    * and users will only be able to switch between organizations.
    * @default true
    */
