@@ -4,12 +4,12 @@ export default async function Home() {
   const { orgId } = await auth();
 
   if (orgId != null) {
-    console.log('Oh no, this page should only activate on the personal account!');
+    console.log('Oh no, this page should only activate on the personal workspace!');
   }
 
   return (
     <>
-      <p>Welcome to your personal account</p>
+      <p>Welcome to your personal workspace</p>
     </>
   );
 }
