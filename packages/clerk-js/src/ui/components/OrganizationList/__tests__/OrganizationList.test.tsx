@@ -1,6 +1,5 @@
 import { describe } from '@jest/globals';
 
-import { OrganizationList } from '../';
 import { render, waitFor } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { createFakeOrganization } from '../../CreateOrganization/__tests__/CreateOrganization.test';
@@ -8,6 +7,7 @@ import {
   createFakeUserOrganizationInvitation,
   createFakeUserOrganizationMembership,
 } from '../../OrganizationSwitcher/__tests__/utlis';
+import { OrganizationList } from '../';
 
 const { createFixtures } = bindCreateFixtures('OrganizationList');
 
