@@ -39,10 +39,10 @@ type CreateSamlConnectionParams = {
   idpMetadataUrl?: string;
   idpMetadata?: string;
   attributeMapping?: {
-    emailAddress?: string;
-    firstName?: string;
-    lastName?: string;
-    userId?: string;
+    email_address?: string;
+    first_name?: string;
+    last_name?: string;
+    user_id?: string;
   };
 };
 
@@ -57,10 +57,10 @@ type UpdateSamlConnectionParams = {
   idpMetadataUrl?: string;
   idpMetadata?: string;
   attributeMapping?: {
-    emailAddress?: string;
-    firstName?: string;
-    lastName?: string;
-    userId?: string;
+    email_address?: string;
+    first_name?: string;
+    last_name?: string;
+    user_id?: string;
   };
   active?: boolean;
   syncUserAttributes?: boolean;
@@ -102,6 +102,7 @@ export class SamlConnectionAPI extends AbstractAPI {
       bodyParams: params,
     });
   }
+
   public async deleteSamlConnection(samlConnectionId: string) {
     this.requireId(samlConnectionId);
     return this.request<SamlConnection>({
