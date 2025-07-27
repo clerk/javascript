@@ -22,5 +22,10 @@ export const getAuth: GetAuthFn<ExpressRequest> = ((req: ExpressRequest, options
 
   const authObject = req.auth(options);
 
+  console.log('Calling getAuthObjectForAcceptedToken with:', {
+    authObject,
+    acceptsToken: options?.acceptsToken,
+  });
+
   return getAuthObjectForAcceptedToken({ authObject, acceptsToken: options?.acceptsToken });
 }) as GetAuthFn<ExpressRequest>;
