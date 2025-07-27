@@ -102,7 +102,7 @@ export const authenticateAndDecorateRequest = (options: ClerkMiddlewareOptions =
         options,
       });
 
-      if (enableHandshake && requestState.status === AuthStatus.Handshake) {
+      if (enableHandshake) {
         const err = setResponseHeaders(requestState, response);
         if (err) {
           return next(err);
