@@ -70,25 +70,49 @@ describe('OrganizationMatcher', () => {
       });
     });
 
-    it('should find personal workspace', () => {
-      const matcher = new OrganizationMatcher({
-        personalWorkspacePatterns: ['/account'],
-      });
-      const url = new URL('http://localhost:3000/account');
-      expect(matcher.findTarget(url)).toEqual({
-        type: 'personalWorkspace',
-      });
-    });
+    describe('should find personal workspace', () => {
+      describe('with `personalWorkspacePatterns`', () => {
+        const matcher = new OrganizationMatcher({
+          personalWorkspacePatterns: ['/account'],
+        });
+        const url = new URL('http://localhost:3000/account');
+        expect(matcher.findTarget(url)).toEqual({
+          type: 'personalWorkspace',
+        });
 
-    it('should prioritize organization over personal workspace', () => {
-      const matcher = new OrganizationMatcher({
-        organizationPatterns: ['/orgs/:id'],
-        personalWorkspacePatterns: ['/orgs/:id'], // Same pattern
+        it('should prioritize organization over personal workspace', () => {
+          const matcher = new OrganizationMatcher({
+            organizationPatterns: ['/orgs/:id'],
+            personalWorkspacePatterns: ['/orgs/:id'], // Same pattern
+          });
+          const url = new URL('http://localhost:3000/orgs/123');
+          expect(matcher.findTarget(url)).toEqual({
+            type: 'organization',
+            organizationId: '123',
+          });
+        });
       });
-      const url = new URL('http://localhost:3000/orgs/123');
-      expect(matcher.findTarget(url)).toEqual({
-        type: 'organization',
-        organizationId: '123',
+
+      describe('with `personalAccountPatterns` (deprecated)', () => {
+        const matcher = new OrganizationMatcher({
+          personalAccountPatterns: ['/account'],
+        });
+        const url = new URL('http://localhost:3000/account');
+        expect(matcher.findTarget(url)).toEqual({
+          type: 'personalWorkspace',
+        });
+
+        it('should prioritize organization over personal account', () => {
+          const matcher = new OrganizationMatcher({
+            organizationPatterns: ['/orgs/:id'],
+            personalAccountPatterns: ['/orgs/:id'], // Same pattern
+          });
+          const url = new URL('http://localhost:3000/orgs/123');
+          expect(matcher.findTarget(url)).toEqual({
+            type: 'organization',
+            organizationId: '123',
+          });
+        });
       });
     });
 
