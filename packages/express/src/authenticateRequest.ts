@@ -113,7 +113,7 @@ export const authenticateAndDecorateRequest = (options: ClerkMiddlewareOptions =
       }
 
       if (!enableHandshake && requestState.status === AuthStatus.Handshake) {
-        const auth = signedOutAuthObject();
+        const auth = () => signedOutAuthObject();
         Object.assign(request, { auth });
         return next();
       }
