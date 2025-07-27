@@ -51,11 +51,16 @@ export const authenticateRequest = (opts: AuthenticateRequestParams) => {
   });
 };
 
-const setResponseHeaders = (requestState: RequestState, res: Response): Error | undefined => {
+const setResponseHeaders = (requestState: RequestState, res: Response, handleHandshake: boolean): Error | undefined => {
   if (requestState.headers) {
     requestState.headers.forEach((value, key) => res.appendHeader(key, value));
   }
-  return setResponseForHandshake(requestState, res);
+
+  if (handleHandshake) {
+    return setResponseForHandshake(requestState, res);
+  }
+
+  return;
 };
 
 /**
@@ -102,14 +107,12 @@ export const authenticateAndDecorateRequest = (options: ClerkMiddlewareOptions =
         options,
       });
 
-      if (enableHandshake) {
-        const err = setResponseHeaders(requestState, response);
-        if (err) {
-          return next(err);
-        }
-        if (response.writableEnded) {
-          return;
-        }
+      const err = setResponseHeaders(requestState, response, enableHandshake);
+      if (err) {
+        return next(err);
+      }
+      if (response.writableEnded) {
+        return;
       }
 
       // TODO: For developers coming from the clerk-sdk-node package, we gave them examples

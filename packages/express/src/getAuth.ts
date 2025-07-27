@@ -22,10 +22,6 @@ export const getAuth: GetAuthFn<ExpressRequest> = ((req: ExpressRequest, options
 
   const authObject = req.auth(options);
 
-  // @ts-expect-error: todo
-  console.log('tokenType from req.auth.tokenType:', req.auth.tokenType);
-  console.log('tokenType from req.auth().tokenType:', authObject.tokenType);
-
   console.log('Calling getAuthObjectForAcceptedToken with:', {
     authObject,
     acceptsToken: options?.acceptsToken,
