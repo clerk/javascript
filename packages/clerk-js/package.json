@@ -94,7 +94,7 @@
     "@svgr/webpack": "^6.5.1",
     "@swc/jest": "0.2.39",
     "@types/cloudflare-turnstile": "^0.2.2",
-    "@types/node": "^22.16.4",
+    "@types/node": "^22.16.5",
     "@types/webpack-env": "^1.18.8",
     "jsdom": "^24.1.3",
     "webpack-merge": "^5.10.0"
