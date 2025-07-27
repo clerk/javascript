@@ -1,5 +1,5 @@
 import type { RequestState } from '@clerk/backend/internal';
-import { AuthStatus, createClerkRequest } from '@clerk/backend/internal';
+import { AuthStatus, createClerkRequest, signedOutAuthObject } from '@clerk/backend/internal';
 import { deprecated } from '@clerk/shared/deprecated';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps, isProxyUrlRelative, isValidProxyUrl } from '@clerk/shared/proxy';
@@ -51,16 +51,11 @@ export const authenticateRequest = (opts: AuthenticateRequestParams) => {
   });
 };
 
-const setResponseHeaders = (requestState: RequestState, res: Response, handleHandshake: boolean): Error | undefined => {
+const setResponseHeaders = (requestState: RequestState, res: Response): Error | undefined => {
   if (requestState.headers) {
     requestState.headers.forEach((value, key) => res.appendHeader(key, value));
   }
-
-  if (handleHandshake) {
-    return setResponseForHandshake(requestState, res);
-  }
-
-  return;
+  return setResponseForHandshake(requestState, res);
 };
 
 /**
@@ -107,12 +102,20 @@ export const authenticateAndDecorateRequest = (options: ClerkMiddlewareOptions =
         options,
       });
 
-      const err = setResponseHeaders(requestState, response, enableHandshake);
-      if (err) {
-        return next(err);
+      if (enableHandshake && requestState.status === AuthStatus.Handshake) {
+        const err = setResponseHeaders(requestState, response);
+        if (err) {
+          return next(err);
+        }
+        if (response.writableEnded) {
+          return;
+        }
       }
-      if (response.writableEnded) {
-        return;
+
+      if (!enableHandshake && requestState.status === AuthStatus.Handshake) {
+        const auth = signedOutAuthObject();
+        Object.assign(request, { auth });
+        return next();
       }
 
       // TODO: For developers coming from the clerk-sdk-node package, we gave them examples
