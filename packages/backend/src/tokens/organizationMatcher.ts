@@ -9,7 +9,9 @@ export class OrganizationMatcher {
 
   constructor(options?: OrganizationSyncOptions) {
     this.organizationPattern = this.createMatcher(options?.organizationPatterns);
-    this.personalWorkspacePatterns = this.createMatcher(options?.personalWorkspacePatterns);
+    this.personalWorkspacePatterns = this.createMatcher(
+      options?.personalWorkspacePatterns || options?.personalAccountPatterns,
+    );
   }
 
   private createMatcher(pattern?: string[]): MatchFunction | null {

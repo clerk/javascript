@@ -361,7 +361,10 @@ export const authenticateRequest: AuthenticateRequest = (async (
       }
     }
     // Activate the personal workspace?
-    if (organizationSyncTarget.type === 'personalWorkspace' && auth.orgId) {
+    if (
+      (organizationSyncTarget.type === 'personalWorkspace' || organizationSyncTarget.type === 'personalAccount') &&
+      auth.orgId
+    ) {
       mustActivate = true;
     }
     if (!mustActivate) {
