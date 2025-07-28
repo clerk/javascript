@@ -1,23 +1,25 @@
 import type { RequestHandler } from 'express';
+import type { Mock } from 'vitest';
+import { vi } from 'vitest';
 
 import { clerkMiddleware } from '../clerkMiddleware';
 import { requireAuth } from '../requireAuth';
 import type { ExpressRequestWithAuth } from '../types';
 import { mockRequestWithAuth, runMiddleware } from './helpers';
 
-let mockAuthenticateAndDecorateRequest: jest.Mock;
-let mockAuthenticateRequest: jest.Mock;
+let mockAuthenticateAndDecorateRequest: Mock;
+let mockAuthenticateRequest: Mock;
 
-jest.mock('../authenticateRequest', () => ({
+vi.mock('../authenticateRequest', () => ({
   authenticateAndDecorateRequest: (options = {}) => mockAuthenticateAndDecorateRequest(options),
   authenticateRequest: (options = {}) => mockAuthenticateRequest(options),
 }));
 
 describe('requireAuth', () => {
   beforeEach(() => {
-    mockAuthenticateAndDecorateRequest = jest.fn();
-    mockAuthenticateRequest = jest.fn();
-    jest.clearAllMocks();
+    mockAuthenticateAndDecorateRequest = vi.fn();
+    mockAuthenticateRequest = vi.fn();
+    vi.clearAllMocks();
   });
 
   it('should redirect to sign-in page when user is not authenticated', async () => {
