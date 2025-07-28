@@ -21,8 +21,18 @@ type CreateMachineParams = {
 };
 
 type UpdateMachineParams = {
+  /**
+   * The ID of the machine to update.
+   */
   machineId: string;
+  /**
+   * The name of the machine.
+   */
   name: string;
+  /**
+   * The default time-to-live (TTL) in seconds for tokens created by this machine.
+   */
+  defaultTokenTtl?: number;
 };
 
 type GetMachineListParams = {
