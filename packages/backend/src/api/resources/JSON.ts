@@ -35,6 +35,7 @@ export const ObjectType = {
   InstanceSettings: 'instance_settings',
   Invitation: 'invitation',
   Machine: 'machine',
+  MachineScope: 'machine_scope',
   MachineToken: 'machine_to_machine_token',
   JwtTemplate: 'jwt_template',
   OauthAccessToken: 'oauth_access_token',
@@ -710,6 +711,14 @@ export interface MachineJSON extends ClerkResourceJSON {
   instance_id: string;
   created_at: number;
   updated_at: number;
+}
+
+export interface MachineScopeJSON {
+  object: typeof ObjectType.MachineScope;
+  from_machine_id: string;
+  to_machine_id: string;
+  created_at?: number;
+  deleted?: boolean;
 }
 
 export interface MachineTokenJSON extends ClerkResourceJSON {

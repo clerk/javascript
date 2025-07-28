@@ -16,6 +16,7 @@ import {
   Invitation,
   JwtTemplate,
   Machine,
+  MachineScope,
   MachineToken,
   OauthAccessToken,
   OAuthApplication,
@@ -135,6 +136,8 @@ function jsonToObject(item: any): any {
       return JwtTemplate.fromJSON(item);
     case ObjectType.Machine:
       return Machine.fromJSON(item);
+    case ObjectType.MachineScope:
+      return MachineScope.fromJSON(item);
     case ObjectType.MachineToken:
       return MachineToken.fromJSON(item);
     case ObjectType.OauthAccessToken:
