@@ -43,6 +43,7 @@ const LineGroup = (props: PropsWithChildren) => {
 const PaymentElementSkeleton = () => {
   return (
     <Box
+      aria-label='Loading...'
       sx={{
         position: 'relative',
         minHeight: 0,
