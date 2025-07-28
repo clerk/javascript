@@ -82,6 +82,9 @@ export class SamlConnectionAPI extends AbstractAPI {
       method: 'POST',
       path: basePath,
       bodyParams: params,
+      options: {
+        deepSnakecaseBodyParamKeys: true,
+      },
     });
   }
 
@@ -100,6 +103,9 @@ export class SamlConnectionAPI extends AbstractAPI {
       method: 'PATCH',
       path: joinPaths(basePath, samlConnectionId),
       bodyParams: params,
+      options: {
+        deepSnakecaseBodyParamKeys: true,
+      },
     });
   }
   public async deleteSamlConnection(samlConnectionId: string) {
