@@ -19,11 +19,11 @@ describe('MachineTokenAPI', () => {
     scopes: [],
     secret: m2mSecret,
     revoked: false,
-    revocationReason: null,
+    revocation_reason: null,
     expired: false,
     expiration: 1753746916590,
-    createdAt: 1753743316590,
-    updatedAt: 1753743316590,
+    created_at: 1753743316590,
+    updated_at: 1753743316590,
   };
 
   it('creates a machine-to-machine token', async () => {
@@ -33,8 +33,8 @@ describe('MachineTokenAPI', () => {
     };
 
     server.use(
-      http.get(
-        `https://api.clerk.test/m2m_tokens`,
+      http.post(
+        'https://api.clerk.test/m2m_tokens',
         validateHeaders(() => {
           return HttpResponse.json(mockM2MToken);
         }),
@@ -47,25 +47,52 @@ describe('MachineTokenAPI', () => {
     expect(response.secret).toBe(m2mSecret);
   });
 
+  it('handles missing machine secret', async () => {
+    server.use(
+      http.get(
+        `https://api.clerk.test/m2m_tokens`,
+        validateHeaders(() => {
+          return HttpResponse.json(mockM2MToken);
+        }),
+      ),
+    );
+
+    // @ts-expect-error - machineSecret is required
+    const response = await apiClient.machineTokens.create({}).catch(err => err);
+
+    expect(response.message).toBe('A machine secret is required.');
+  });
+
   it('revokes a machine-to-machine token', async () => {
     const revokeParams = {
       machineSecret: 'ak_xxxxx',
       m2mTokenId: m2mId,
+      revocationReason: 'revoked by test',
+    };
+
+    const mockRevokedM2MToken = {
+      object: 'machine_to_machine_token',
+      id: m2mId,
+      subject: 'mch_xxxxx',
+      scopes: [],
+      revoked: true,
+      revocation_reason: 'revoked by test',
+      expired: false,
+      expiration: 1753746916590,
+      created_at: 1753743316590,
+      updated_at: 1753743316590,
     };
 
     server.use(
       http.post(`https://api.clerk.test/m2m_tokens/${m2mId}/revoke`, () => {
-        return HttpResponse.json({
-          ...mockM2MToken,
-          revoked: true,
-          revocationReason: 'revoked by test',
-        });
+        return HttpResponse.json(mockRevokedM2MToken);
       }),
     );
 
     const response = await apiClient.machineTokens.revoke(revokeParams);
 
     expect(response.revoked).toBe(true);
+    expect(response.secret).toBeUndefined();
     expect(response.revocationReason).toBe('revoked by test');
   });
 
