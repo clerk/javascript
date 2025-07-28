@@ -56,7 +56,7 @@ import type { ClientJSONSnapshot, EnvironmentJSONSnapshot } from './snapshots';
 import type { Web3Strategy } from './strategies';
 import type { TelemetryCollector } from './telemetry';
 import type { UserResource } from './user';
-import type { Autocomplete, DeepPartial, DeepSnakeToCamel } from './utils';
+import type { Autocomplete, DeepPartial, DeepSnakeToCamel, FlattenUnionType } from './utils';
 import type { WaitlistResource } from './waitlist';
 
 type __experimental_CheckoutStatus = 'awaiting_initialization' | 'awaiting_confirmation' | 'completed';
@@ -1870,10 +1870,18 @@ export type __experimental_CheckoutButtonProps = {
  * <ClerkProvider clerkJsVersion="x.x.x" />
  * ```
  */
-export type __internal_PlanDetailsProps = {
+export type __internal_PlanDetailsProps = (
+  | {
+      planId: string;
+    }
+  | {
+      /**
+       * The plan object will be used as initial data until the plan is fetched from the server.
+       */
+      plan: CommercePlanResource;
+    }
+) & {
   appearance?: PlanDetailTheme;
-  plan?: CommercePlanResource;
-  planId?: string;
   initialPlanPeriod?: CommerceSubscriptionPlanPeriod;
   portalId?: string;
   portalRoot?: PortalRoot;
@@ -1889,9 +1897,17 @@ export type __internal_PlanDetailsProps = {
  * <ClerkProvider clerkJsVersion="x.x.x" />
  * ```
  */
-export type __experimental_PlanDetailsButtonProps = {
-  plan?: CommercePlanResource;
-  planId?: string;
+export type __experimental_PlanDetailsButtonProps = (
+  | {
+      planId: string;
+    }
+  | {
+      /**
+       * The plan object will be used as initial data until the plan is fetched from the server.
+       */
+      plan: CommercePlanResource;
+    }
+) & {
   initialPlanPeriod?: CommerceSubscriptionPlanPeriod;
   planDetailsProps?: {
     appearance?: PlanDetailTheme;
@@ -2114,3 +2130,9 @@ export interface __internal_NavigateToTaskIfAvailableParams {
 export interface LoadedClerk extends Clerk {
   client: ClientResource;
 }
+
+type Prettify<T> = {
+  [K in keyof T]: T[K];
+} & {};
+
+type _B = Prettify<FlattenUnionType<__internal_PlanDetailsProps>>;

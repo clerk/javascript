@@ -113,3 +113,35 @@ export type Without<T, W> = {
  * Value contains: { a:string, b: string }
  */
 export type Override<T, U> = Omit<T, keyof U> & U;
+
+/**
+ * Utility type that flattens a discriminated union type by making all discriminated properties optional
+ * and preserving the common properties as they are. Also handles intersection types.
+ *
+ * @example
+ * type Example = FlattenUnionType<{ a: string } | { b: number } & { c: boolean }>
+ * // Result: { a?: string; b?: number; c: boolean }
+ */
+// export type FlattenUnionType<T> = {
+//   [P in keyof UnionToIntersection<T>]?: (UnionToIntersection<T>)[P]
+// } & {
+//   [P in keyof T]: T[P]
+// }[keyof T];
+
+// type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (k: infer I) => void ? I : never;
+
+// Converts a union of two types into an intersection
+// i.e. A | B -> A & B
+type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (k: infer I) => void ? I : never;
+
+// Flattens two union types into a single type with optional values
+// i.e. FlattenUnion<{ a: number, c: number } | { b: string, c: number }> = { a?: number, b?: string, c: number }
+export type FlattenUnionType<T> = {
+  [K in keyof UnionToIntersection<T>]: K extends keyof T
+    ? T[K] extends any[]
+      ? T[K]
+      : T[K] extends object
+        ? FlattenUnionType<T[K]>
+        : T[K]
+    : UnionToIntersection<T>[K] | undefined;
+};
