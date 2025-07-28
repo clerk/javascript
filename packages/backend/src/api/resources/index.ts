@@ -32,6 +32,7 @@ export * from './Invitation';
 export * from './JSON';
 export * from './Machine';
 export * from './MachineScope';
+export * from './MachineSecretKey';
 export * from './MachineToken';
 export * from './JwtTemplate';
 export * from './OauthAccessToken';

@@ -2,6 +2,7 @@ import { joinPaths } from '../../util/path';
 import type { PaginatedResourceResponse } from '../resources/Deserializer';
 import type { Machine } from '../resources/Machine';
 import type { MachineScope } from '../resources/MachineScope';
+import type { MachineSecretKey } from '../resources/MachineSecretKey';
 import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/machines';
@@ -82,6 +83,14 @@ export class MachineApi extends AbstractAPI {
     return this.request<Machine>({
       method: 'DELETE',
       path: joinPaths(basePath, machineId),
+    });
+  }
+
+  async getSecretKey(machineId: string) {
+    this.requireId(machineId);
+    return this.request<MachineSecretKey>({
+      method: 'GET',
+      path: joinPaths(basePath, machineId, 'secret_key'),
     });
   }
 

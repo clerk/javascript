@@ -36,6 +36,7 @@ export const ObjectType = {
   Invitation: 'invitation',
   Machine: 'machine',
   MachineScope: 'machine_scope',
+  MachineSecretKey: 'machine_secret_key',
   MachineToken: 'machine_to_machine_token',
   JwtTemplate: 'jwt_template',
   OauthAccessToken: 'oauth_access_token',
@@ -719,6 +720,11 @@ export interface MachineScopeJSON {
   to_machine_id: string;
   created_at?: number;
   deleted?: boolean;
+}
+
+export interface MachineSecretKeyJSON {
+  object: typeof ObjectType.MachineSecretKey;
+  secret: string;
 }
 
 export interface MachineTokenJSON extends ClerkResourceJSON {
