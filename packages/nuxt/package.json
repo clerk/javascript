@@ -1,6 +1,6 @@
 {
   "name": "@clerk/nuxt",
-  "version": "1.7.11",
+  "version": "1.7.14",
   "description": "Clerk SDK for Nuxt",
   "keywords": [
     "clerk",
@@ -59,6 +59,8 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
+    "format": "node ../../scripts/format-package.mjs",
+    "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src",
     "lint:attw": "attw --pack . --profile esm-only",
     "lint:publint": "publint",
@@ -71,8 +73,8 @@
     "@clerk/shared": "workspace:^",
     "@clerk/types": "workspace:^",
     "@clerk/vue": "workspace:^",
-    "@nuxt/kit": "^3.17.6",
-    "@nuxt/schema": "^3.17.6",
+    "@nuxt/kit": "^3.17.7",
+    "@nuxt/schema": "^3.17.7",
     "h3": "^1.15.3"
   },
   "devDependencies": {

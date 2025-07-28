@@ -15,6 +15,7 @@ import {
   getAuthObjectForAcceptedToken,
   isMachineTokenByPrefix,
   isTokenTypeAccepted,
+  makeAuthObjectSerializable,
   TokenType,
 } from '@clerk/backend/internal';
 import { parsePublishableKey } from '@clerk/shared/keys';
@@ -194,7 +195,14 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
 
       const locationHeader = requestState.headers.get(constants.Headers.Location);
       if (locationHeader) {
-        return new Response(null, { status: 307, headers: requestState.headers });
+        const res = NextResponse.redirect(locationHeader);
+        requestState.headers.forEach((value, key) => {
+          if (key === constants.Headers.Location) {
+            return;
+          }
+          res.headers.append(key, value);
+        });
+        return res;
       } else if (requestState.status === AuthStatus.Handshake) {
         throw new Error('Clerk: handshake status without redirect');
       }
@@ -265,7 +273,14 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
             }
           : {};
 
-      decorateRequest(clerkRequest, handlerResult, requestState, resolvedParams, keylessKeysForRequestData);
+      decorateRequest(
+        clerkRequest,
+        handlerResult,
+        requestState,
+        resolvedParams,
+        keylessKeysForRequestData,
+        authObject.tokenType === 'session_token' ? null : makeAuthObjectSerializable(authObject),
+      );
 
       return handlerResult;
     });

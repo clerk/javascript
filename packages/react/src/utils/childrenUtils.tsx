@@ -5,7 +5,16 @@ import { multipleChildrenInButtonComponent } from '../errors/messages';
 
 export const assertSingleChild =
   (children: React.ReactNode) =>
-  (name: 'SignInButton' | 'SignUpButton' | 'SignOutButton' | 'SignInWithMetamaskButton') => {
+  (
+    name:
+      | 'SignInButton'
+      | 'SignUpButton'
+      | 'SignOutButton'
+      | 'SignInWithMetamaskButton'
+      | 'CheckoutButton'
+      | 'SubscriptionDetailsButton'
+      | 'PlanDetailsButton',
+  ) => {
     try {
       return React.Children.only(children);
     } catch {

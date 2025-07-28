@@ -334,7 +334,7 @@ export interface SessionTask {
   /**
    * The unique identifier for the type of task that needs to be completed
    */
-  key: 'org';
+  key: 'select-organization';
 }
 
 export type GetTokenOptions = {
