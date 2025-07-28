@@ -6,7 +6,18 @@ import { AbstractAPI } from './AbstractApi';
 const basePath = '/machines';
 
 type CreateMachineParams = {
+  /**
+   * The name of the machine.
+   */
   name: string;
+  /**
+   * Array of machine IDs that this machine will have access to.
+   */
+  scopedMachines?: string[];
+  /**
+   * The default time-to-live (TTL) in seconds for tokens created by this machine.
+   */
+  defaultTokenTtl?: number;
 };
 
 type UpdateMachineParams = {
