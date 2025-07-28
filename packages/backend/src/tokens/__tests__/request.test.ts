@@ -1411,7 +1411,6 @@ describe('tokens.authenticateRequest(options)', () => {
         {
           referer: 'https://satellite.com/signin',
           'sec-fetch-dest': 'document',
-          origin: 'https://primary.com',
         },
         {
           __session: mockJwt,
@@ -1441,7 +1440,6 @@ describe('tokens.authenticateRequest(options)', () => {
           referer: 'https://satellite.com/signin',
           'sec-fetch-dest': 'document',
           'sec-fetch-site': 'cross-site',
-          origin: 'https://primary.com',
         },
         {
           __session: mockJwt,
@@ -1468,9 +1466,9 @@ describe('tokens.authenticateRequest(options)', () => {
     test('does not trigger handshake when referer is same origin', async () => {
       const request = mockRequestWithCookies(
         {
+          host: 'primary.com',
           referer: 'https://primary.com/signin',
           'sec-fetch-dest': 'document',
-          origin: 'https://primary.com',
         },
         {
           __session: mockJwt,
