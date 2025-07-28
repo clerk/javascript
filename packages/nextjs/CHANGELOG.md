@@ -1,5 +1,36 @@
 # Change Log
 
+## 6.27.1
+
+### Patch Changes
+
+- Fixes an issue where `clerkMiddleware()` would not properly redirect or set cookies in some environments. ([#6388](https://github.com/clerk/javascript/pull/6388)) by [@brkalow](https://github.com/brkalow)
+
+## 6.27.0
+
+### Minor Changes
+
+- Expose commerce hooks and components under the experimental module. ([#6383](https://github.com/clerk/javascript/pull/6383)) by [@panteliselef](https://github.com/panteliselef)
+
+  - PaymentElementProvider,
+  - usePaymentElement,
+  - PaymentElement,
+  - usePaymentAttempts,
+  - useStatements,
+  - usePaymentMethods,
+  - usePlans,
+  - useSubscription,
+  - CheckoutProvider,
+  - useCheckout,
+
+### Patch Changes
+
+- Updated dependencies [[`2bbeaf3`](https://github.com/clerk/javascript/commit/2bbeaf30faa0f961b766c87c17e424ba9ecc4517), [`cfa7882`](https://github.com/clerk/javascript/commit/cfa78827cea6e81ce671ae204f529d2f93e3304d), [`b0fdc9e`](https://github.com/clerk/javascript/commit/b0fdc9eaf764ca0c17cbe0810b7d240f6d9db0b6)]:
+  - @clerk/backend@2.6.0
+  - @clerk/clerk-react@5.37.0
+  - @clerk/types@4.70.1
+  - @clerk/shared@3.15.1
+
 ## 6.26.0
 
 ### Minor Changes

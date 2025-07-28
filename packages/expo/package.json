@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-expo",
-  "version": "2.14.11",
+  "version": "2.14.12",
   "description": "Clerk React Native/Expo library",
   "keywords": [
     "react",
@@ -71,6 +71,8 @@
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "dev:publish": "pnpm dev -- --env.publish",
+    "format": "node ../../scripts/format-package.mjs",
+    "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src",
     "publish:local": "pnpm yalc push --replace  --sig",
     "test": "vitest run",

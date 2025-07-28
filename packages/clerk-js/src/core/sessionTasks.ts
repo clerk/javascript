@@ -27,23 +27,25 @@ export function navigateToTask(
   routeKey: keyof typeof INTERNAL_SESSION_TASK_ROUTE_BY_KEY,
   { componentNavigationContext, globalNavigate, options, environment }: NavigateToTaskOptions,
 ) {
-  const taskRoute = `/tasks/${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[routeKey]}`;
+  const customTaskUrl = options?.taskUrls?.[routeKey];
+  const internalTaskRoute = `/tasks/${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[routeKey]}`;
 
-  if (componentNavigationContext) {
-    return componentNavigationContext.navigate(componentNavigationContext.indexPath + taskRoute);
+  if (componentNavigationContext && !customTaskUrl) {
+    return componentNavigationContext.navigate(componentNavigationContext.indexPath + internalTaskRoute);
   }
 
   const signInUrl = options['signInUrl'] || environment.displayConfig.signInUrl;
   const signUpUrl = options['signUpUrl'] || environment.displayConfig.signUpUrl;
   const isReferrerSignUpUrl = window.location.href.startsWith(signUpUrl);
 
-  const sessionTaskUrl = buildURL(
-    {
-      base: isReferrerSignUpUrl ? signUpUrl : signInUrl,
-      hashPath: taskRoute,
-    },
-    { stringify: true },
+  return globalNavigate(
+    customTaskUrl ??
+      buildURL(
+        {
+          base: isReferrerSignUpUrl ? signUpUrl : signInUrl,
+          hashPath: internalTaskRoute,
+        },
+        { stringify: true },
+      ),
   );
-
-  return globalNavigate(options.taskUrls?.[routeKey] ?? sessionTaskUrl);
 }
