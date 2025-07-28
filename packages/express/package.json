@@ -1,6 +1,6 @@
 {
   "name": "@clerk/express",
-  "version": "1.7.10",
+  "version": "1.7.13",
   "description": "Clerk server SDK for usage with Express",
   "keywords": [
     "clerk",
@@ -57,6 +57,8 @@
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "dev:publish": "pnpm dev -- --env.publish",
+    "format": "node ../../scripts/format-package.mjs",
+    "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src",
     "lint:attw": "attw --pack . --profile node16",
     "lint:publint": "publint",

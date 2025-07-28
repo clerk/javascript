@@ -1,4 +1,4 @@
-import { useOrganization, useOrganizationList } from '@clerk/shared/react';
+import { useClerk, useOrganization, useOrganizationList } from '@clerk/shared/react';
 import type { CreateOrganizationParams, OrganizationResource } from '@clerk/types';
 import React, { useContext } from 'react';
 
@@ -41,6 +41,7 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
   const card = useCardState();
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
   const sessionTasksContext = useContext(SessionTasksContext);
+  const clerk = useClerk();
 
   const lastCreatedOrganizationRef = React.useRef<OrganizationResource | null>(null);
   const { createOrganization, isLoaded, setActive, userMemberships } = useOrganizationList({
@@ -89,12 +90,14 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
       lastCreatedOrganizationRef.current = organization;
       await setActive({ organization });
 
-      void userMemberships.revalidate?.();
-
       if (sessionTasksContext) {
-        await sessionTasksContext.nextTask();
+        await clerk.__internal_navigateToTaskIfAvailable({
+          redirectUrlComplete: sessionTasksContext.redirectUrlComplete,
+        });
         return;
       }
+
+      void userMemberships.revalidate?.();
 
       if (props.skipInvitationScreen ?? organization.maxAllowedMemberships === 1) {
         return completeFlow();

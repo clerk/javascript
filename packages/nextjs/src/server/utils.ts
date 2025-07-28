@@ -1,3 +1,4 @@
+import type { AuthObject } from '@clerk/backend';
 import type { AuthenticateRequestOptions, ClerkRequest, RequestState } from '@clerk/backend/internal';
 import { constants } from '@clerk/backend/internal';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
@@ -53,6 +54,7 @@ export function decorateRequest(
   requestState: RequestState,
   requestData: AuthenticateRequestOptions,
   keylessMode: Pick<AuthenticateRequestOptions, 'publishableKey' | 'secretKey'>,
+  machineAuthObject: AuthObject | null,
 ): Response {
   const { reason, message, status, token } = requestState;
   // pass-through case, convert to next()
@@ -87,7 +89,7 @@ export function decorateRequest(
   }
 
   if (rewriteURL) {
-    const clerkRequestData = encryptClerkRequestData(requestData, keylessMode);
+    const clerkRequestData = encryptClerkRequestData(requestData, keylessMode, machineAuthObject);
 
     setRequestHeadersOnNextResponse(res, req, {
       [constants.Headers.AuthStatus]: status,
@@ -184,6 +186,7 @@ const KEYLESS_ENCRYPTION_KEY = 'clerk_keyless_dummy_key';
 export function encryptClerkRequestData(
   requestData: Partial<AuthenticateRequestOptions>,
   keylessModeKeys: Pick<AuthenticateRequestOptions, 'publishableKey' | 'secretKey'>,
+  machineAuthObject: AuthObject | null,
 ) {
   const isEmpty = (obj: Record<string, any> | undefined) => {
     if (!obj) {
@@ -192,7 +195,7 @@ export function encryptClerkRequestData(
     return !Object.values(obj).some(v => v !== undefined);
   };
 
-  if (isEmpty(requestData) && isEmpty(keylessModeKeys)) {
+  if (isEmpty(requestData) && isEmpty(keylessModeKeys) && !machineAuthObject) {
     return;
   }
 
@@ -209,7 +212,10 @@ export function encryptClerkRequestData(
     ? ENCRYPTION_KEY || assertKey(SECRET_KEY, () => errorThrower.throwMissingSecretKeyError())
     : ENCRYPTION_KEY || SECRET_KEY || KEYLESS_ENCRYPTION_KEY;
 
-  return AES.encrypt(JSON.stringify({ ...keylessModeKeys, ...requestData }), maybeKeylessEncryptionKey).toString();
+  return AES.encrypt(
+    JSON.stringify({ ...keylessModeKeys, ...requestData, machineAuthObject: machineAuthObject ?? undefined }),
+    maybeKeylessEncryptionKey,
+  ).toString();
 }
 
 /**
@@ -218,7 +224,7 @@ export function encryptClerkRequestData(
  */
 export function decryptClerkRequestData(
   encryptedRequestData?: string | undefined | null,
-): Partial<AuthenticateRequestOptions> {
+): Partial<AuthenticateRequestOptions> & { machineAuthObject?: AuthObject } {
   if (!encryptedRequestData) {
     return {};
   }
