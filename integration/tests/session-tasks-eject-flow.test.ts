@@ -27,6 +27,27 @@ return (
 }`,
       )
       .addFile(
+        'src/middleware.ts',
+        () => `import { clerkClient, clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
+        import { NextResponse } from 'next/server';
+
+        const isProtectedRoute = createRouteMatcher(['/page-protected']);
+
+        export default clerkMiddleware(async (auth, request) => {
+          if (isProtectedRoute(request)) {
+            await auth.protect();
+          }
+        }, {
+          taskUrls: {
+            'select-organization': '/onboarding/select-organization'
+          }
+        });
+
+        export const config = {
+          matcher: ['/((?!.*\\\\..*|_next).*)', '/', '/(api|trpc)(.*)'],
+        };`,
+      )
+      .addFile(
         'src/app/layout.tsx',
         () => `import './globals.css';
 import { Inter } from 'next/font/google';
@@ -105,5 +126,28 @@ return (
 
     // Verify redirect to completion page
     await u.page.waitForAppUrl('/');
+  });
+
+  test('redirects to task url on `auth.protect`', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+
+    // Performs sign-in
+    await u.po.signIn.goTo();
+    await u.po.signIn.setIdentifier(user.email);
+    await u.po.signIn.continue();
+    await u.po.signIn.setPassword(user.password);
+    await u.po.signIn.continue();
+    await u.po.expect.toBeSignedIn();
+
+    // Redirects back to tasks when accessing protected route by `auth.protect`
+    await u.page.goToRelative('/page-protected');
+
+    // Resolves task
+    const fakeOrganization = Object.assign(u.services.organizations.createFakeOrganization(), {
+      slug: u.services.organizations.createFakeOrganization().slug + '-with-sign-in-password',
+    });
+    await u.po.signIn.waitForMounted();
+    await u.po.sessionTask.resolveForceOrganizationSelectionTask(fakeOrganization);
+    await u.po.expect.toHaveResolvedTask();
   });
 });
