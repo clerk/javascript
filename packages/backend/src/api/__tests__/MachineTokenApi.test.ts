@@ -35,7 +35,8 @@ describe('MachineTokenAPI', () => {
     server.use(
       http.post(
         'https://api.clerk.test/m2m_tokens',
-        validateHeaders(() => {
+        validateHeaders(({ request }) => {
+          expect(request.headers.get('Authorization')).toBe('Bearer ak_xxxxx');
           return HttpResponse.json(mockM2MToken);
         }),
       ),
@@ -49,7 +50,7 @@ describe('MachineTokenAPI', () => {
 
   it('handles missing machine secret', async () => {
     server.use(
-      http.get(
+      http.post(
         `https://api.clerk.test/m2m_tokens`,
         validateHeaders(() => {
           return HttpResponse.json(mockM2MToken);
@@ -99,7 +100,6 @@ describe('MachineTokenAPI', () => {
   it('verifies a machine-to-machine token', async () => {
     const verifyParams = {
       machineSecret: 'ak_xxxxx',
-      m2mTokenId: m2mId,
       secret: m2mSecret,
     };
 
