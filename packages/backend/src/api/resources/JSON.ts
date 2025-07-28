@@ -734,7 +734,6 @@ export interface MachineTokenJSON extends ClerkResourceJSON {
   secret?: string;
   subject: string;
   scopes: string[];
-  claims: Record<string, any> | null;
   revoked: boolean;
   revocation_reason: string | null;
   expired: boolean;

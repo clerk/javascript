@@ -7,16 +7,8 @@ const basePath = '/m2m_tokens';
 
 type CreateMachineTokenParams = {
   machineSecret: string;
-  claims?: Record<string, any> | null;
   secondsUntilExpiration?: number | null;
 };
-
-type UpdateMachineTokenParams = {
-  machineSecret: string;
-  m2mTokenId: string;
-  revocationReason?: string | null;
-  revoked?: boolean;
-} & Pick<CreateMachineTokenParams, 'secondsUntilExpiration' | 'claims'>;
 
 type RevokeMachineTokenParams = {
   machineSecret?: string | null;
@@ -29,7 +21,7 @@ type VerifyMachineTokenParams = {
   secret: string;
 };
 
-export class MachineTokensApi extends AbstractAPI {
+export class MachineTokenApi extends AbstractAPI {
   #requireMachineSecret(machineSecret?: string | null): asserts machineSecret is string {
     if (!machineSecret) {
       throw new Error('A machine secret is required.');
@@ -45,22 +37,9 @@ export class MachineTokensApi extends AbstractAPI {
       method: 'POST',
       path: basePath,
       bodyParams,
-      headerParams: {
-        Authorization: `Bearer ${machineSecret}`,
+      options: {
+        skipSecretKeyAuthorization: true,
       },
-    });
-  }
-
-  async update(params: UpdateMachineTokenParams) {
-    const { m2mTokenId, machineSecret, ...bodyParams } = params;
-
-    this.#requireMachineSecret(machineSecret);
-    this.requireId(m2mTokenId);
-
-    return this.request<MachineToken>({
-      method: 'PATCH',
-      path: joinPaths(basePath, m2mTokenId),
-      bodyParams,
       headerParams: {
         Authorization: `Bearer ${machineSecret}`,
       },
@@ -79,6 +58,9 @@ export class MachineTokensApi extends AbstractAPI {
     };
 
     if (machineSecret) {
+      requestOptions.options = {
+        skipSecretKeyAuthorization: true,
+      };
       requestOptions.headerParams = {
         Authorization: `Bearer ${machineSecret}`,
       };
@@ -97,6 +79,9 @@ export class MachineTokensApi extends AbstractAPI {
     };
 
     if (machineSecret) {
+      requestOptions.options = {
+        skipSecretKeyAuthorization: true,
+      };
       requestOptions.headerParams = {
         Authorization: `Bearer ${machineSecret}`,
       };

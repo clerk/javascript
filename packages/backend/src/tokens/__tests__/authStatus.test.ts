@@ -125,9 +125,8 @@ describe('signed-out', () => {
       expect(token).toBeNull();
       expect(signedOutAuthObject.tokenType).toBe('machine_token');
       expect(signedOutAuthObject.id).toBeNull();
-      expect(signedOutAuthObject.name).toBeNull();
       expect(signedOutAuthObject.subject).toBeNull();
-      expect(signedOutAuthObject.claims).toBeNull();
+      expect(signedOutAuthObject.scopes).toBeNull();
     });
   });
 });

@@ -12,7 +12,7 @@ export * from './IdPOAuthAccessTokenApi';
 export * from './InstanceApi';
 export * from './InvitationApi';
 export * from './MachineApi';
-export * from './MachineTokensApi';
+export * from './MachineTokenApi';
 export * from './JwksApi';
 export * from './JwtTemplatesApi';
 export * from './OrganizationApi';

@@ -366,7 +366,6 @@ describe('authenticatedMachineObject', () => {
       expect(authObject.id).toBe('m2m_ey966f1b1xf93586b2debdcadb0b3bd1');
       expect(authObject.subject).toBe('mch_2vYVtestTESTtestTESTtestTESTtest');
       expect(authObject.scopes).toEqual(['read:foo', 'write:bar']);
-      expect(authObject.claims).toEqual({ foo: 'bar' });
       expect(authObject.machineId).toBe('mch_2vYVtestTESTtestTESTtestTESTtest');
     });
   });
@@ -377,10 +376,8 @@ describe('unauthenticatedMachineObject', () => {
     const authObject = unauthenticatedMachineObject('machine_token');
     expect(authObject.tokenType).toBe('machine_token');
     expect(authObject.id).toBeNull();
-    expect(authObject.name).toBeNull();
     expect(authObject.subject).toBeNull();
     expect(authObject.scopes).toBeNull();
-    expect(authObject.claims).toBeNull();
   });
 
   it('has() always returns false', () => {
