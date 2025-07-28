@@ -370,6 +370,14 @@ export default tseslint.config([
     },
   },
   {
+    name: 'packages/clerk-js - vitest',
+    files: ['packages/clerk-js/src/**/*.spec.{ts,tsx}'],
+    rules: {
+      'jest/unbound-method': 'off',
+      '@typescript-eslint/unbound-method': 'off',
+    },
+  },
+  {
     name: 'packages/expo-passkeys',
     files: ['packages/expo-passkeys/src/**/*'],
     rules: {
@@ -432,7 +440,10 @@ export default tseslint.config([
       ...pluginJsDoc.configs['flat/recommended-typescript'].rules,
       'jsdoc/check-examples': 'off',
       'jsdoc/informative-docs': 'warn',
-      'jsdoc/check-tag-names': ['warn', { definedTags: ['inline', 'unionReturnHeadings'], typed: false }],
+      'jsdoc/check-tag-names': [
+        'warn',
+        { definedTags: ['inline', 'unionReturnHeadings', 'displayFunctionSignature', 'paramExtension'], typed: false },
+      ],
       'jsdoc/require-hyphen-before-param-description': 'warn',
       'jsdoc/require-description': 'warn',
       'jsdoc/require-description-complete-sentence': 'warn',

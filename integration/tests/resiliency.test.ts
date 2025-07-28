@@ -184,8 +184,9 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
       await expect(page.getByText('Clerk is NOT loaded', { exact: true })).toBeVisible();
 
       // Wait for loading to complete and verify final state
+      // Account for the new 15-second script loading timeout plus buffer for UI updates
       await expect(page.getByText('Status: error', { exact: true })).toBeVisible({
-        timeout: 10_000,
+        timeout: 16_000,
       });
       await expect(page.getByText('Clerk is out', { exact: true })).toBeVisible();
       await expect(page.getByText('Clerk is ready or degraded (loaded)')).toBeHidden();

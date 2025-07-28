@@ -16,7 +16,7 @@ function Root({ children }: { children: React.ReactNode }) {
       sx={t => ({
         borderWidth: t.borderWidths.$normal,
         borderStyle: t.borderStyles.$solid,
-        borderColor: t.colors.$neutralAlpha100,
+        borderColor: t.colors.$borderAlpha100,
         borderRadius: t.radii.$lg,
         overflow: 'clip',
       })}
@@ -54,7 +54,7 @@ function Header({ title, id, status }: { title: string | LocalizationKey; id: st
             display: 'flex',
             alignItems: 'center',
             gap: t.space.$0x25,
-            color: t.colors.$colorTextSecondary,
+            color: t.colors.$colorMutedForeground,
           })}
         >
           <CopyButton
@@ -116,7 +116,7 @@ function SectionHeader({ text }: { text: string | LocalizationKey }) {
         background: t.colors.$neutralAlpha50,
         borderBlockWidth: t.borderWidths.$normal,
         borderBlockStyle: t.borderStyles.$solid,
-        borderBlockColor: t.colors.$neutralAlpha100,
+        borderBlockColor: t.colors.$borderAlpha100,
       })}
     >
       <Heading
@@ -154,7 +154,7 @@ function SectionContentItem({ children }: { children: React.ReactNode }) {
         '&:not(:first-child)': {
           borderBlockStartWidth: t.borderWidths.$normal,
           borderBlockStartStyle: t.borderStyles.$solid,
-          borderBlockStartColor: t.colors.$neutralAlpha100,
+          borderBlockStartColor: t.colors.$borderAlpha100,
         },
       })}
     >
@@ -175,8 +175,8 @@ function SectionContentDetailsHeader({
 }: {
   title: string | LocalizationKey;
   description: string | LocalizationKey;
-  secondaryTitle: string | LocalizationKey;
-  secondaryDescription: string | LocalizationKey;
+  secondaryTitle?: string | LocalizationKey;
+  secondaryDescription?: string | LocalizationKey;
 }) {
   return (
     <Box
@@ -212,6 +212,7 @@ function SectionContentDetailsHeader({
           colorScheme='secondary'
           elementDescriptor={descriptors.statementSectionContentDetailsHeaderDescription}
           localizationKey={description}
+          sx={{ textTransform: 'lowercase' }}
         />
       </Box>
       <Box
@@ -220,17 +221,21 @@ function SectionContentDetailsHeader({
           textAlign: 'right',
         }}
       >
-        <Text
-          variant='h3'
-          elementDescriptor={descriptors.statementSectionContentDetailsHeaderSecondaryTitle}
-          localizationKey={secondaryTitle}
-        />
-        <Text
-          variant='caption'
-          colorScheme='secondary'
-          elementDescriptor={descriptors.statementSectionContentDetailsHeaderSecondaryDescription}
-          localizationKey={secondaryDescription}
-        />
+        {secondaryTitle && (
+          <Text
+            variant='h3'
+            elementDescriptor={descriptors.statementSectionContentDetailsHeaderSecondaryTitle}
+            localizationKey={secondaryTitle}
+          />
+        )}
+        {secondaryDescription && (
+          <Text
+            variant='caption'
+            colorScheme='secondary'
+            elementDescriptor={descriptors.statementSectionContentDetailsHeaderSecondaryDescription}
+            localizationKey={secondaryDescription}
+          />
+        )}
       </Box>
     </Box>
   );
@@ -250,7 +255,7 @@ function SectionContentDetailsList({ children }: { children: React.ReactNode }) 
         padding: 0,
         borderWidth: t.borderWidths.$normal,
         borderStyle: t.borderStyles.$solid,
-        borderColor: t.colors.$neutralAlpha100,
+        borderColor: t.colors.$borderAlpha100,
         borderRadius: t.radii.$md,
         overflow: 'hidden',
       })}
@@ -294,7 +299,7 @@ function SectionContentDetailsListItem({
         '&:not(:first-child)': {
           borderBlockStartWidth: t.borderWidths.$normal,
           borderBlockStartStyle: t.borderStyles.$solid,
-          borderBlockStartColor: t.colors.$neutralAlpha100,
+          borderBlockStartColor: t.colors.$borderAlpha100,
         },
       })}
     >
@@ -324,7 +329,7 @@ function SectionContentDetailsListItem({
           display: 'flex',
           alignItems: 'center',
           gap: t.space.$0x25,
-          color: t.colors.$colorTextSecondary,
+          color: t.colors.$colorMutedForeground,
         })}
       >
         {typeof value === 'string' ? (
@@ -371,7 +376,7 @@ function Footer({ label, value }: { label: string | LocalizationKey; value: stri
         background: t.colors.$neutralAlpha25,
         borderBlockStartWidth: t.borderWidths.$normal,
         borderBlockStartStyle: t.borderStyles.$solid,
-        borderBlockStartColor: t.colors.$neutralAlpha100,
+        borderBlockStartColor: t.colors.$borderAlpha100,
         display: 'flex',
         justifyContent: 'space-between',
       })}
@@ -423,7 +428,7 @@ function CopyButton({ text, copyLabel = 'Copy' }: { text: string; copyLabel?: st
         borderRadius: t.radii.$sm,
         '&:focus-visible': {
           outline: '2px solid',
-          outlineColor: t.colors.$neutralAlpha200,
+          outlineColor: t.colors.$colorRing,
         },
       })}
       focusRing={false}

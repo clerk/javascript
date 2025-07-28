@@ -1,11 +1,10 @@
-import type { AuthObject } from '@clerk/backend';
+import type { AuthObject, InvalidTokenAuthObject, MachineAuthObject, SessionAuthObject } from '@clerk/backend';
 import type {
-  AuthenticatedMachineObject,
   AuthenticateRequestOptions,
+  InferAuthObjectFromToken,
+  InferAuthObjectFromTokenArray,
   RedirectFun,
-  SignedInAuthObject,
-  SignedOutAuthObject,
-  UnauthenticatedMachineObject,
+  SessionTokenType,
 } from '@clerk/backend/internal';
 import { constants, createClerkRequest, createRedirect, TokenType } from '@clerk/backend/internal';
 import type { PendingSessionOptions } from '@clerk/types';
@@ -18,7 +17,6 @@ import { getAuthKeyFromRequest, getHeader } from '../../server/headers-utils';
 import { unauthorized } from '../../server/nextErrors';
 import type { AuthProtect } from '../../server/protect';
 import { createProtect } from '../../server/protect';
-import type { InferAuthObjectFromToken, InferAuthObjectFromTokenArray } from '../../server/types';
 import { decryptClerkRequestData } from '../../server/utils';
 import { isNextWithUnstableServerActions } from '../../utils/sdk-versions';
 import { buildRequestLike } from './utils';
@@ -26,7 +24,7 @@ import { buildRequestLike } from './utils';
 /**
  * `Auth` object of the currently active user and the `redirectToSignIn()` method.
  */
-type SessionAuth<TRedirect> = (SignedInAuthObject | SignedOutAuthObject) & {
+type SessionAuthWithRedirect<TRedirect> = SessionAuthObject & {
   /**
    * The `auth()` helper returns the `redirectToSignIn()` method, which you can use to redirect the user to the sign-in page.
    *
@@ -48,10 +46,6 @@ type SessionAuth<TRedirect> = (SignedInAuthObject | SignedOutAuthObject) & {
   redirectToSignUp: RedirectFun<TRedirect>;
 };
 
-type MachineAuth<T extends TokenType> = (AuthenticatedMachineObject | UnauthenticatedMachineObject) & {
-  tokenType: T;
-};
-
 export type AuthOptions = PendingSessionOptions & { acceptsToken?: AuthenticateRequestOptions['acceptsToken'] };
 
 export interface AuthFn<TRedirect = ReturnType<typeof redirect>> {
@@ -61,7 +55,14 @@ export interface AuthFn<TRedirect = ReturnType<typeof redirect>> {
    */
   <T extends TokenType[]>(
     options: AuthOptions & { acceptsToken: T },
-  ): Promise<InferAuthObjectFromTokenArray<T, SessionAuth<TRedirect>, MachineAuth<T[number]>>>;
+  ): Promise<
+    | InferAuthObjectFromTokenArray<
+        T,
+        SessionAuthWithRedirect<TRedirect>,
+        MachineAuthObject<Exclude<T[number], SessionTokenType>>
+      >
+    | InvalidTokenAuthObject
+  >;
 
   /**
    * @example
@@ -69,7 +70,9 @@ export interface AuthFn<TRedirect = ReturnType<typeof redirect>> {
    */
   <T extends TokenType>(
     options: AuthOptions & { acceptsToken: T },
-  ): Promise<InferAuthObjectFromToken<T, SessionAuth<TRedirect>, MachineAuth<T>>>;
+  ): Promise<
+    InferAuthObjectFromToken<T, SessionAuthWithRedirect<TRedirect>, MachineAuthObject<Exclude<T, SessionTokenType>>>
+  >;
 
   /**
    * @example
@@ -81,7 +84,7 @@ export interface AuthFn<TRedirect = ReturnType<typeof redirect>> {
    * @example
    * const authObject = await auth()
    */
-  (options?: PendingSessionOptions): Promise<SessionAuth<TRedirect>>;
+  (options?: PendingSessionOptions): Promise<SessionAuthWithRedirect<TRedirect>>;
 
   /**
    * `auth` includes a single property, the `protect()` method, which you can use in two ways:
@@ -176,7 +179,11 @@ export const auth: AuthFn = (async (options?: AuthOptions) => {
     });
   };
 
-  return Object.assign(authObject, { redirectToSignIn, redirectToSignUp });
+  if (authObject.tokenType === TokenType.SessionToken) {
+    return Object.assign(authObject, { redirectToSignIn, redirectToSignUp });
+  }
+
+  return authObject;
 }) as AuthFn;
 
 auth.protect = async (...args: any[]) => {
@@ -184,7 +191,8 @@ auth.protect = async (...args: any[]) => {
   require('server-only');
 
   const request = await buildRequestLike();
-  const authObject = await auth();
+  const requestedToken = args?.[0]?.token || args?.[1]?.token || TokenType.SessionToken;
+  const authObject = await auth({ acceptsToken: requestedToken });
 
   const protect = createProtect({
     request,

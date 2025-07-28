@@ -1,7 +1,7 @@
 /* eslint-disable jsdoc/require-description-complete-sentence */
 import type {
   ClerkPaginatedResponse,
-  CommerceSubscriptionResource,
+  CommerceSubscriptionItemResource,
   GetDomainsParams,
   GetInvitationsParams,
   GetMembershipRequestParams,
@@ -67,6 +67,7 @@ export type UseOrganizationParams = {
    */
   invitations?: true | PaginatedHookConfig<GetInvitationsParams>;
   /**
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
    * If set to `true`, all default properties will be used.<br />
    * Otherwise, accepts an object with the following optional properties:
    * <ul>
@@ -111,9 +112,10 @@ export type UseOrganizationReturn<T extends UseOrganizationParams> =
        */
       invitations: PaginatedResourcesWithDefault<OrganizationInvitationResource>;
       /**
+       * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
        * Includes a paginated list of the organization's subscriptions.
        */
-      subscriptions: PaginatedResourcesWithDefault<CommerceSubscriptionResource>;
+      subscriptions: PaginatedResourcesWithDefault<CommerceSubscriptionItemResource>;
     }
   | {
       isLoaded: true;
@@ -123,7 +125,7 @@ export type UseOrganizationReturn<T extends UseOrganizationParams> =
       membershipRequests: PaginatedResourcesWithDefault<OrganizationMembershipRequestResource>;
       memberships: PaginatedResourcesWithDefault<OrganizationMembershipResource>;
       invitations: PaginatedResourcesWithDefault<OrganizationInvitationResource>;
-      subscriptions: PaginatedResourcesWithDefault<CommerceSubscriptionResource>;
+      subscriptions: PaginatedResourcesWithDefault<CommerceSubscriptionItemResource>;
     }
   | {
       isLoaded: boolean;
@@ -146,7 +148,7 @@ export type UseOrganizationReturn<T extends UseOrganizationParams> =
         T['invitations'] extends { infinite: true } ? true : false
       > | null;
       subscriptions: PaginatedResources<
-        CommerceSubscriptionResource,
+        CommerceSubscriptionItemResource,
         T['subscriptions'] extends { infinite: true } ? true : false
       > | null;
     };
@@ -463,7 +465,7 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
 
   const subscriptions = usePagesOrInfinite<
     GetSubscriptionsParams,
-    ClerkPaginatedResponse<CommerceSubscriptionResource>
+    ClerkPaginatedResponse<CommerceSubscriptionItemResource>
   >(
     {
       ...subscriptionsParams,

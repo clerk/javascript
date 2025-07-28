@@ -126,6 +126,7 @@ export const useSignInContext = (): SignInContextType => {
     path: ctx.path,
     routing: ctx.routing,
     baseUrl: signInUrl,
+    taskUrls: clerk.__internal_getOption('taskUrls'),
   });
 
   return {

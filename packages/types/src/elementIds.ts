@@ -21,7 +21,10 @@ export type FieldId =
   | 'enrollmentMode'
   | 'affiliationEmailAddress'
   | 'deleteExistingInvitationsSuggestions'
-  | 'legalAccepted';
+  | 'legalAccepted'
+  | 'apiKeyDescription'
+  | 'apiKeyExpirationDate'
+  | 'apiKeyRevokeConfirmation';
 export type ProfileSectionId =
   | 'profile'
   | 'username'
@@ -53,4 +56,4 @@ export type OrganizationPreviewId =
 export type CardActionId = 'havingTrouble' | 'alternativeMethods' | 'signUp' | 'signIn' | 'usePasskey' | 'waitlist';
 
 export type MenuId = 'invitation' | 'member' | ProfileSectionId;
-export type SelectId = 'countryCode' | 'role' | 'paymentSource';
+export type SelectId = 'countryCode' | 'role' | 'paymentSource' | 'apiKeyExpiration';

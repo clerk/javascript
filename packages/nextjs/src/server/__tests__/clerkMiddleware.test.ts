@@ -477,7 +477,7 @@ describe('clerkMiddleware(params)', () => {
       const req = mockRequest({
         url: '/api/protected',
         headers: new Headers({
-          [constants.Headers.Authorization]: 'Bearer api_key_xxxxxxxxxxxxxxxxxx',
+          [constants.Headers.Authorization]: 'Bearer ak_123',
         }),
       });
 
@@ -485,7 +485,7 @@ describe('clerkMiddleware(params)', () => {
         publishableKey,
         status: AuthStatus.SignedIn,
         headers: new Headers(),
-        toAuth: () => ({ tokenType: TokenType.ApiKey, id: 'api_key_xxxxxxxxxxxxxxxxxx' }),
+        toAuth: () => ({ tokenType: TokenType.ApiKey, id: 'ak_123', isAuthenticated: true }),
       });
 
       const resp = await clerkMiddleware(async auth => {
@@ -525,7 +525,7 @@ describe('clerkMiddleware(params)', () => {
       const req = mockRequest({
         url: '/protected',
         headers: new Headers({
-          [constants.Headers.Authorization]: 'Bearer api_key_xxxxxxxxxxxxxxxxxx',
+          [constants.Headers.Authorization]: 'Bearer ak_123',
         }),
       });
 
@@ -552,7 +552,7 @@ describe('clerkMiddleware(params)', () => {
       const req = mockRequest({
         url: '/protected',
         headers: new Headers({
-          [constants.Headers.Authorization]: 'Bearer oauth_token_xxxxxxxxxxxxxxxxxx',
+          [constants.Headers.Authorization]: 'Bearer oat_123',
         }),
       });
 
@@ -658,7 +658,7 @@ describe('clerkMiddleware(params)', () => {
       const req = mockRequest({
         url: '/api/protected',
         headers: new Headers({
-          [constants.Headers.Authorization]: 'Bearer m2m_xxxxxxxxxxxxxxxxxx',
+          [constants.Headers.Authorization]: 'Bearer m2m_123',
         }),
       });
 
@@ -681,7 +681,7 @@ describe('clerkMiddleware(params)', () => {
       const req = mockRequest({
         url: '/api/protected',
         headers: new Headers({
-          [constants.Headers.Authorization]: 'Bearer api_key_xxx',
+          [constants.Headers.Authorization]: 'Bearer ak_123',
         }),
       });
 
@@ -689,7 +689,7 @@ describe('clerkMiddleware(params)', () => {
         publishableKey,
         status: AuthStatus.SignedIn,
         headers: new Headers(),
-        toAuth: () => ({ tokenType: TokenType.ApiKey, id: 'api_key_xxxxxxxxxxxxxxxxxx' }),
+        toAuth: () => ({ tokenType: TokenType.ApiKey, id: 'ak_123', isAuthenticated: true }),
       });
 
       const resp = await clerkMiddleware(async auth => {
@@ -705,7 +705,7 @@ describe('clerkMiddleware(params)', () => {
       const req = mockRequest({
         url: '/api/protected',
         headers: new Headers({
-          [constants.Headers.Authorization]: 'Bearer api_key_xxx',
+          [constants.Headers.Authorization]: 'Bearer ak_123',
         }),
       });
 

@@ -62,7 +62,7 @@ export const RemoveDomainForm = (props: RemoveDomainFormProps) => {
     <RemoveResourceForm
       title={localizationKeys('organizationProfile.removeDomainPage.title')}
       messageLine1={localizationKeys('organizationProfile.removeDomainPage.messageLine1', {
-        domain: ref.current?.name,
+        domain: ref.current?.name || '',
       })}
       messageLine2={localizationKeys('organizationProfile.removeDomainPage.messageLine2')}
       deleteResource={() =>

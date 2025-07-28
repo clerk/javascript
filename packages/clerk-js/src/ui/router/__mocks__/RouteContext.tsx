@@ -1,11 +1,12 @@
 import { noop } from '@clerk/shared/utils';
+import { vi } from 'vitest';
 
 export const useRouter = () => ({
-  resolve: jest.fn(() => ({
+  resolve: vi.fn(() => ({
     toURL: {
       href: 'http://test.host/test-href',
     },
   })),
-  matches: jest.fn(noop),
-  navigate: jest.fn(noop),
+  matches: vi.fn(noop),
+  navigate: vi.fn(noop),
 });

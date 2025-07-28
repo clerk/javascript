@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-expo",
-  "version": "2.12.0",
+  "version": "2.14.12",
   "description": "Clerk React Native/Expo library",
   "keywords": [
     "react",
@@ -71,6 +71,8 @@
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "dev:publish": "pnpm dev -- --env.publish",
+    "format": "node ../../scripts/format-package.mjs",
+    "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src",
     "publish:local": "pnpm yalc push --replace  --sig",
     "test": "vitest run",
@@ -92,7 +94,7 @@
     "expo-local-authentication": "^13.8.0",
     "expo-secure-store": "^12.8.1",
     "expo-web-browser": "^12.8.2",
-    "react-native": "^0.79.2"
+    "react-native": "^0.80.1"
   },
   "peerDependencies": {
     "@clerk/expo-passkeys": ">=0.0.6",

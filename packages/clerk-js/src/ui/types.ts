@@ -2,7 +2,9 @@ import type {
   __internal_CheckoutProps,
   __internal_OAuthConsentProps,
   __internal_PlanDetailsProps,
+  __internal_SubscriptionDetailsProps,
   __internal_UserVerificationProps,
+  APIKeysProps,
   CreateOrganizationProps,
   GoogleOneTapProps,
   NewSubscriptionRedirectUrl,
@@ -16,24 +18,25 @@ import type {
   SignUpFallbackRedirectUrl,
   SignUpForceRedirectUrl,
   SignUpProps,
+  TaskSelectOrganizationProps,
   UserButtonProps,
   UserProfileProps,
   WaitlistProps,
 } from '@clerk/types';
 
 export type {
+  __internal_OAuthConsentProps,
+  __internal_UserVerificationProps,
+  CreateOrganizationProps,
   GoogleOneTapProps,
+  OrganizationListProps,
+  OrganizationProfileProps,
+  OrganizationSwitcherProps,
   SignInProps,
   SignUpProps,
   UserButtonProps,
   UserProfileProps,
-  OrganizationSwitcherProps,
-  OrganizationProfileProps,
-  CreateOrganizationProps,
-  OrganizationListProps,
   WaitlistProps,
-  __internal_UserVerificationProps,
-  __internal_OAuthConsentProps,
 };
 
 export type AvailableComponentProps =
@@ -49,9 +52,13 @@ export type AvailableComponentProps =
   | PricingTableProps
   | __internal_CheckoutProps
   | __internal_UserVerificationProps
-  | __internal_PlanDetailsProps;
+  | __internal_SubscriptionDetailsProps
+  | __internal_PlanDetailsProps
+  | APIKeysProps
+  | TaskSelectOrganizationProps;
 
 type ComponentMode = 'modal' | 'mounted';
+type SignInMode = 'modal' | 'redirect';
 
 export type SignInCtx = SignInProps & {
   componentName: 'SignIn';
@@ -114,6 +121,12 @@ export type WaitlistCtx = WaitlistProps & {
 export type PricingTableCtx = PricingTableProps & {
   componentName: 'PricingTable';
   mode?: ComponentMode;
+  signInMode?: SignInMode;
+};
+
+export type APIKeysCtx = APIKeysProps & {
+  componentName: 'APIKeys';
+  mode?: ComponentMode;
 };
 
 export type CheckoutCtx = __internal_CheckoutProps & {
@@ -121,12 +134,24 @@ export type CheckoutCtx = __internal_CheckoutProps & {
 } & NewSubscriptionRedirectUrl;
 
 export type SessionTasksCtx = {
-  nextTask: () => Promise<void>;
-  redirectUrlComplete?: string;
+  redirectUrlComplete: string;
+  currentTaskContainer?: React.RefObject<HTMLDivElement> | null;
+};
+
+export type TaskSelectOrganizationCtx = TaskSelectOrganizationProps & {
+  componentName: 'TaskSelectOrganization';
 };
 
 export type OAuthConsentCtx = __internal_OAuthConsentProps & {
   componentName: 'OAuthConsent';
+};
+
+export type SubscriptionDetailsCtx = __internal_SubscriptionDetailsProps & {
+  componentName: 'SubscriptionDetails';
+};
+
+export type PlanDetailsCtx = __internal_PlanDetailsProps & {
+  componentName: 'PlanDetails';
 };
 
 export type AvailableComponentCtx =
@@ -143,5 +168,9 @@ export type AvailableComponentCtx =
   | WaitlistCtx
   | PricingTableCtx
   | CheckoutCtx
-  | OAuthConsentCtx;
+  | APIKeysCtx
+  | OAuthConsentCtx
+  | SubscriptionDetailsCtx
+  | PlanDetailsCtx
+  | TaskSelectOrganizationCtx;
 export type AvailableComponentName = AvailableComponentCtx['componentName'];

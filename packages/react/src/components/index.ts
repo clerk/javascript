@@ -1,36 +1,38 @@
 export {
-  SignUp,
-  SignIn,
-  UserProfile,
-  UserButton,
-  OrganizationSwitcher,
-  OrganizationProfile,
+  APIKeys,
   CreateOrganization,
-  OrganizationList,
   GoogleOneTap,
-  Waitlist,
+  OrganizationList,
+  OrganizationProfile,
+  OrganizationSwitcher,
   PricingTable,
+  SignIn,
+  SignUp,
+  TaskSelectOrganization,
+  UserButton,
+  UserProfile,
+  Waitlist,
 } from './uiComponents';
 
 export {
-  ClerkLoaded,
-  ClerkLoading,
+  AuthenticateWithRedirectCallback,
   ClerkDegraded,
   ClerkFailed,
-  SignedOut,
-  SignedIn,
+  ClerkLoaded,
+  ClerkLoading,
   Protect,
+  RedirectToCreateOrganization,
+  RedirectToOrganizationProfile,
   RedirectToSignIn,
   RedirectToSignUp,
   RedirectToUserProfile,
-  AuthenticateWithRedirectCallback,
-  RedirectToCreateOrganization,
-  RedirectToOrganizationProfile,
+  SignedIn,
+  SignedOut,
 } from './controlComponents';
 
 export type { ProtectProps } from './controlComponents';
 
 export { SignInButton } from './SignInButton';
-export { SignUpButton } from './SignUpButton';
-export { SignOutButton } from './SignOutButton';
 export { SignInWithMetamaskButton } from './SignInWithMetamaskButton';
+export { SignOutButton } from './SignOutButton';
+export { SignUpButton } from './SignUpButton';

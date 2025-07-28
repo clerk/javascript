@@ -12,11 +12,11 @@ import {
   constants,
   createClerkRequest,
   createRedirect,
-  isMachineToken,
+  getAuthObjectForAcceptedToken,
+  isMachineTokenByPrefix,
   isTokenTypeAccepted,
-  signedOutAuthObject,
+  makeAuthObjectSerializable,
   TokenType,
-  unauthenticatedMachineObject,
 } from '@clerk/backend/internal';
 import { parsePublishableKey } from '@clerk/shared/keys';
 import { notFound as nextjsNotFound } from 'next/navigation';
@@ -195,7 +195,14 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
 
       const locationHeader = requestState.headers.get(constants.Headers.Location);
       if (locationHeader) {
-        return new Response(null, { status: 307, headers: requestState.headers });
+        const res = NextResponse.redirect(locationHeader);
+        requestState.headers.forEach((value, key) => {
+          if (key === constants.Headers.Location) {
+            return;
+          }
+          res.headers.append(key, value);
+        });
+        return res;
       } else if (requestState.status === AuthStatus.Handshake) {
         throw new Error('Clerk: handshake status without redirect');
       }
@@ -207,7 +214,7 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       const redirectToSignUp = createMiddlewareRedirectToSignUp(clerkRequest);
       const protect = await createMiddlewareProtect(clerkRequest, authObject, redirectToSignIn);
 
-      const authHandler = createMiddlewareAuthHandler(requestState, redirectToSignIn, redirectToSignUp);
+      const authHandler = createMiddlewareAuthHandler(authObject, redirectToSignIn, redirectToSignUp);
       authHandler.protect = protect;
 
       let handlerResult: Response = NextResponse.next();
@@ -266,7 +273,14 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
             }
           : {};
 
-      decorateRequest(clerkRequest, handlerResult, requestState, resolvedParams, keylessKeysForRequestData);
+      decorateRequest(
+        clerkRequest,
+        handlerResult,
+        requestState,
+        resolvedParams,
+        keylessKeysForRequestData,
+        authObject.tokenType === 'session_token' ? null : makeAuthObjectSerializable(authObject),
+      );
 
       return handlerResult;
     });
@@ -288,7 +302,7 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       /**
        * In keyless mode, if the publishable key is missing, let the request through, to render `<ClerkProvider/>` that will resume the flow gracefully.
        */
-      if (isMissingPublishableKey && !isMachineToken(authHeader)) {
+      if (isMissingPublishableKey && !isMachineTokenByPrefix(authHeader)) {
         const res = NextResponse.next();
         setRequestHeadersOnNextResponse(res, request, {
           [constants.Headers.AuthStatus]: 'signed-out',
@@ -382,7 +396,7 @@ const createMiddlewareRedirectToSignUp = (
 
 const createMiddlewareProtect = (
   clerkRequest: ClerkRequest,
-  authObject: AuthObject,
+  rawAuthObject: AuthObject,
   redirectToSignIn: RedirectFun<Response>,
 ) => {
   return (async (params: any, options: any) => {
@@ -392,6 +406,9 @@ const createMiddlewareProtect = (
       nextjsRedirectError(url, {
         redirectUrl: url,
       });
+
+    const requestedToken = params?.token || options?.token || TokenType.SessionToken;
+    const authObject = getAuthObjectForAcceptedToken({ authObject: rawAuthObject, acceptsToken: requestedToken });
 
     return createProtect({
       request: clerkRequest,
@@ -410,42 +427,23 @@ const createMiddlewareProtect = (
  * - For machine tokens: validates token type and returns appropriate auth object
  */
 const createMiddlewareAuthHandler = (
-  requestState: RequestState,
+  rawAuthObject: AuthObject,
   redirectToSignIn: RedirectFun<Response>,
   redirectToSignUp: RedirectFun<Response>,
 ): ClerkMiddlewareAuth => {
   const authHandler = async (options?: GetAuthOptions) => {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const authObject = requestState.toAuth(options)!;
-
-    const authObjWithMethods = Object.assign(
-      authObject,
-      authObject.tokenType === TokenType.SessionToken
-        ? {
-            redirectToSignIn,
-            redirectToSignUp,
-          }
-        : {},
-    );
-
     const acceptsToken = options?.acceptsToken ?? TokenType.SessionToken;
 
-    if (acceptsToken === 'any') {
-      return authObjWithMethods;
+    const authObject = getAuthObjectForAcceptedToken({ authObject: rawAuthObject, acceptsToken });
+
+    if (authObject.tokenType === TokenType.SessionToken && isTokenTypeAccepted(TokenType.SessionToken, acceptsToken)) {
+      return Object.assign(authObject, {
+        redirectToSignIn,
+        redirectToSignUp,
+      });
     }
 
-    if (!isTokenTypeAccepted(authObject.tokenType, acceptsToken)) {
-      if (authObject.tokenType === TokenType.SessionToken) {
-        return {
-          ...signedOutAuthObject(),
-          redirectToSignIn,
-          redirectToSignUp,
-        };
-      }
-      return unauthenticatedMachineObject(authObject.tokenType);
-    }
-
-    return authObjWithMethods;
+    return authObject;
   };
 
   return authHandler as ClerkMiddlewareAuth;
@@ -465,7 +463,7 @@ const handleControlFlowErrors = (
   requestState: RequestState,
 ): Response => {
   if (isNextjsUnauthorizedError(e)) {
-    const response = NextResponse.next({ status: 401 });
+    const response = new NextResponse(null, { status: 401 });
 
     // RequestState.toAuth() returns a session_token type by default.
     // We need to cast it to the correct type to check for OAuth tokens.

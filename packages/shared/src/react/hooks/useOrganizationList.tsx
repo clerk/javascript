@@ -76,7 +76,7 @@ const undefinedPaginatedResource = {
 export type UseOrganizationListReturn<T extends UseOrganizationListParams> =
   | {
       /**
-       * A boolean that indicates whether Clerk has completed initialization and there is an authenicated user. Initially `false`, becomes `true` once Clerk loads with a user
+       * A boolean that indicates whether Clerk has completed initialization and there is an authenticated user. Initially `false`, becomes `true` once Clerk loads with a user.
        */
       isLoaded: false;
       /**

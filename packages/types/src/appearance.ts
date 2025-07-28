@@ -54,12 +54,21 @@ export type CssColorOrAlphaScale = string | AlphaColorScale;
 type CssColor = string | TransparentColor | BuiltInColors;
 type CssLengthUnit = string;
 
+type FontSizeScale = {
+  xs?: string;
+  sm?: string;
+  md?: string;
+  lg?: string;
+  xl?: string;
+};
+
 type FontWeightNamedValue = CSS.Properties['fontWeight'];
 type FontWeightNumericValue = 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900;
 
 type FontWeightScale = {
   normal?: FontWeightNamedValue | FontWeightNumericValue;
   medium?: FontWeightNamedValue | FontWeightNumericValue;
+  semibold?: FontWeightNamedValue | FontWeightNumericValue;
   bold?: FontWeightNamedValue | FontWeightNumericValue;
 };
 
@@ -217,6 +226,7 @@ export type ElementsConfig = {
   otpCodeField: WithOptions;
   otpCodeFieldInputs: WithOptions;
   otpCodeFieldInput: WithOptions;
+  otpCodeFieldInputContainer: WithOptions;
   otpCodeFieldErrorText: WithOptions;
 
   dividerRow: WithOptions;
@@ -458,6 +468,10 @@ export type ElementsConfig = {
   tabListContainer: WithOptions;
 
   tableHead: WithOptions;
+  tableBody: WithOptions;
+  tableRow: WithOptions;
+  tableHeaderCell: WithOptions;
+  tableBodyCell: WithOptions;
 
   paginationButton: WithOptions;
   paginationButtonIcon: WithOptions;
@@ -507,8 +521,22 @@ export type ElementsConfig = {
   statementCopyButton: WithOptions;
   menuButton: WithOptions<MenuId>;
   menuButtonEllipsis: WithOptions;
+  menuButtonEllipsisBordered: WithOptions;
   menuList: WithOptions<MenuId>;
   menuItem: WithOptions<MenuId>;
+
+  paymentAttemptRoot: WithOptions;
+  paymentAttemptHeader: WithOptions;
+  paymentAttemptHeaderTitleContainer: WithOptions;
+  paymentAttemptHeaderTitle: WithOptions;
+  paymentAttemptHeaderBadge: WithOptions;
+  paymentAttemptBody: WithOptions;
+  paymentAttemptFooter: WithOptions;
+  paymentAttemptFooterLabel: WithOptions;
+  paymentAttemptFooterValueContainer: WithOptions;
+  paymentAttemptFooterCurrency: WithOptions;
+  paymentAttemptFooterValue: WithOptions;
+  paymentAttemptCopyButton: WithOptions;
 
   modalBackdrop: WithOptions;
   modalContent: WithOptions;
@@ -572,6 +600,35 @@ export type ElementsConfig = {
   notificationBadge: WithOptions;
   buttonArrowIcon: WithOptions;
   spinner: WithOptions;
+
+  apiKeys: WithOptions;
+  apiKeysHeader: WithOptions;
+  apiKeysSearchBox: WithOptions;
+  apiKeysSearchInput: WithOptions;
+  apiKeysAddButton: WithOptions;
+  apiKeysTable: WithOptions;
+  apiKeysCopyButton: WithOptions<string>;
+  apiKeysRevealButton: WithOptions<string>;
+  apiKeysCreateForm: WithOptions;
+  apiKeysCreateFormNameInput: WithOptions;
+  apiKeysCreateFormDescriptionInput: WithOptions;
+  apiKeysCreateFormExpirationInput: WithOptions;
+  apiKeysCreateFormSubmitButton: WithOptions;
+  apiKeysCreateFormExpirationCaption: WithOptions;
+  apiKeysRevokeModal: WithOptions;
+  apiKeysRevokeModalInput: WithOptions;
+  apiKeysRevokeModalSubmitButton: WithOptions;
+
+  subscriptionDetailsCard: WithOptions;
+  subscriptionDetailsCardHeader: WithOptions;
+  subscriptionDetailsCardBadge: WithOptions;
+  subscriptionDetailsCardTitle: WithOptions;
+  subscriptionDetailsCardBody: WithOptions;
+  subscriptionDetailsCardFooter: WithOptions;
+  subscriptionDetailsCardActions: WithOptions;
+  subscriptionDetailsDetailRow: WithOptions;
+  subscriptionDetailsDetailRowLabel: WithOptions;
+  subscriptionDetailsDetailRowValue: WithOptions;
 };
 
 export type Elements = {
@@ -587,9 +644,16 @@ export type Variables = {
   /**
    * The color of text appearing on top of an element that with a background color of {@link Variables.colorPrimary},
    * eg: solid primary buttons.
+   * @deprecated Use {@link Variables.colorPrimaryForeground} instead.
    * @default 'white'
    */
   colorTextOnPrimaryBackground?: CssColor;
+  /**
+   * The color of text appearing on top of an element that with a background color of {@link Variables.colorPrimary},
+   * eg: solid primary buttons.
+   * @default 'white'
+   */
+  colorPrimaryForeground?: CssColor;
   /**
    * The color used to indicate errors or destructive actions. Set this to your brand's danger color.
    * @default '#EF4444'
@@ -614,15 +678,33 @@ export type Variables = {
   colorNeutral?: CssColorOrAlphaScale;
   /**
    * The default text color.
+   * @deprecated Use {@link Variables.colorForeground} instead.
    * @default '#212126'
    */
   colorText?: CssColor;
+  /**
+   * The default text color.
+   * @default 'inherit'
+   */
+  colorForeground?: CssColor;
+  /**
+   * The background color for elements of lower importance, eg: a muted background.
+   * his color is a lighter shade of {@link Variables.background} and {@link Variables.colorNeutral}.
+   */
+  colorMuted?: CssColor;
+  /**
+   * The text color for elements of lower importance, eg: a subtitle text.
+   * This color is a lighter shade of {@link Variables.colorText}.
+   * @deprecated Use {@link Variables.colorMutedForeground} instead.
+   * @default '#747686'
+   */
+  colorTextSecondary?: CssColor;
   /**
    * The text color for elements of lower importance, eg: a subtitle text.
    * This color is a lighter shade of {@link Variables.colorText}.
    * @default '#747686'
    */
-  colorTextSecondary?: CssColor;
+  colorMutedForeground?: CssColor;
   /**
    * The background color for the card container.
    * @default 'white'
@@ -630,19 +712,51 @@ export type Variables = {
   colorBackground?: CssColor;
   /**
    * The default text color inside input elements. To customise the input background color instead, use {@link Variables.colorInputBackground}.
+   * @deprecated Use {@link Variables.colorInputForeground} instead.
    * @default 'black'
    */
   colorInputText?: CssColor;
   /**
+   * The default text color inside input elements. To customise the input background color instead, use {@link Variables.colorInputBackground}.
+   * @default 'black'
+   */
+  colorInputForeground?: CssColor;
+  /**
    * The background color for all input elements.
+   * @deprecated Use {@link Variables.colorInput} instead.
    * @default 'white'
    */
   colorInputBackground?: CssColor;
+  /**
+   * The background color for all input elements.
+   * @default 'white'
+   */
+  colorInput?: CssColor;
   /**
    * The color of the avatar shimmer
    * @default 'rgba(255, 255, 255, 0.36)'
    */
   colorShimmer?: CssColor;
+  /**
+   * The color of the ring when an interactive element is focused rendered at 15% opacity.
+   * @default {@link Variables.colorNeutral} at 15% opacity
+   */
+  colorRing?: CssColor;
+  /**
+   * The base shadow color used in the components.
+   * @default '#000000'
+   */
+  colorShadow?: CssColor;
+  /**
+   * The base border color used in the components.
+   * @default {@link Variables.colorNeutral}
+   */
+  colorBorder?: CssColor;
+  /**
+   * The background color of the modal backdrop rendered at 73% opacity.
+   * @default {@link Variables.colorNeutral} at 73% opacity
+   */
+  colorModalBackdrop?: CssColor;
   /**
    * The default font that will be used in all components.
    * This can be the name of a custom font loaded by your code or the name of a web-safe font ((@link WebSafeFont})
@@ -663,7 +777,7 @@ export type Variables = {
    * By default, this value is relative to the root fontSize of the html element.
    * @default '0.8125rem'
    */
-  fontSize?: CssLengthUnit;
+  fontSize?: CssLengthUnit | FontSizeScale;
   /**
    * The font weight the components will use. By default, the components will use the 400, 500, 600 and 700 weights
    * for normal, medium, semibold and bold text respectively.
@@ -680,13 +794,19 @@ export type Variables = {
   borderRadius?: CssLengthUnit;
   /**
    * The base spacing unit that all margins, paddings and gaps between the elements are derived from.
+   * @deprecated Use {@link Variables.spacing} instead.
    * @default '1rem'
    */
   spacingUnit?: CssLengthUnit;
+  /**
+   * The base spacing that all margins, paddings and gaps between the elements are derived from.
+   * @default '1rem'
+   */
+  spacing?: CssLengthUnit;
 };
 
 export type BaseThemeTaggedType = { __type: 'prebuilt_appearance' };
-export type BaseTheme = BaseThemeTaggedType;
+export type BaseTheme = BaseThemeTaggedType & { cssLayerName?: string };
 
 export type Theme = {
   /**
@@ -833,7 +953,10 @@ export type WaitlistTheme = Theme;
 export type PricingTableTheme = Theme;
 export type CheckoutTheme = Theme;
 export type PlanDetailTheme = Theme;
+export type SubscriptionDetailsTheme = Theme;
+export type APIKeysTheme = Theme;
 export type OAuthConsentTheme = Theme;
+export type TaskSelectOrganizationTheme = Theme;
 
 type GlobalAppearanceOptions = {
   /**
@@ -899,7 +1022,15 @@ export type Appearance<T = Theme> = T &
      */
     checkout?: T;
     /**
+     * Theme overrides that only apply to the `<APIKeys />` component
+     */
+    apiKeys?: T;
+    /**
      * Theme overrides that only apply to the `<OAuthConsent />` component
      */
     __internal_oauthConsent?: T;
+    /**
+     * Theme overrides that only apply to the `<TaskSelectOrganization />` component
+     */
+    taskSelectOrganization?: T;
   };

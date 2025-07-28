@@ -1,8 +1,16 @@
-import type { __internal_OAuthConsentProps, PricingTableProps, UserButtonProps, WaitlistProps } from '@clerk/types';
+import type {
+  __internal_OAuthConsentProps,
+  APIKeysProps,
+  PricingTableProps,
+  TaskSelectOrganizationProps,
+  UserButtonProps,
+  WaitlistProps,
+} from '@clerk/types';
 import type { ReactNode } from 'react';
 
 import type { AvailableComponentName, AvailableComponentProps } from '../types';
 import {
+  ApiKeysContext,
   CreateOrganizationContext,
   GoogleOneTapContext,
   OAuthConsentContext,
@@ -18,6 +26,7 @@ import {
   UserVerificationContext,
   WaitlistContext,
 } from './components';
+import { SessionTasksContext, TaskSelectOrganizationContext } from './components/SessionTasks';
 
 export function ComponentContextProvider({
   componentName,
@@ -89,13 +98,28 @@ export function ComponentContextProvider({
           </PricingTableContext.Provider>
         </SubscriberTypeContext.Provider>
       );
+    case 'APIKeys':
+      return (
+        <ApiKeysContext.Provider value={{ componentName, ...(props as APIKeysProps) }}>
+          {children}
+        </ApiKeysContext.Provider>
+      );
     case 'OAuthConsent':
       return (
         <OAuthConsentContext.Provider value={{ componentName, ...(props as __internal_OAuthConsentProps) }}>
           {children}
         </OAuthConsentContext.Provider>
       );
-
+    case 'TaskSelectOrganization':
+      return (
+        <TaskSelectOrganizationContext.Provider
+          value={{ componentName: 'TaskSelectOrganization', ...(props as TaskSelectOrganizationProps) }}
+        >
+          <SessionTasksContext.Provider value={{ ...(props as TaskSelectOrganizationProps) }}>
+            {children}
+          </SessionTasksContext.Provider>
+        </TaskSelectOrganizationContext.Provider>
+      );
     default:
       throw new Error(`Unknown component context: ${componentName}`);
   }

@@ -1,0 +1,221 @@
+---
+description: Coding rules for Clerk-JS UI and AIO Components
+globs: packages/clerk-js/src/ui/**/*.ts,packages/clerk-js/src/ui/**/*.tsx
+alwaysApply: false
+---
+# Clerk-JS UI Patterns & Architecture
+
+## 1. Element Descriptors System
+The UI system uses a powerful element descriptor pattern for styling and customization. Element descriptors are the foundation of Clerk's theming system, allowing developers to customize any component through the `appearance.elements` configuration. Each descriptor generates a unique, stable CSS class that can be targeted for styling, ensuring consistent theming across the entire application.
+
+### How to add new descriptors
+- Scan the provided files for places that require a descriptor.
+- Element descriptors should be always be camelCase
+- First add them as types in `packages/types/src/appearance.ts` then build the package
+- After append them to `APPEARANCE_KEYS` in `packages/clerk-js/src/ui/customizables/elementDescriptors.ts`
+- Use them in the original files.
+- If linting errors occur try to `cd ./packages/types && pnpm build`.
+
+### Basic Usage
+```tsx
+// Basic component with descriptor
+// Use when you need to style a basic component that maps to a single appearance element
+<Box elementDescriptor={descriptors.formButtonPrimary} />
+// Generated class: "cl-formButtonPrimary"
+
+// Multiple descriptors
+// Use when a component needs to inherit styles from multiple appearance elements
+// Example: An icon that is both an icon and specifically an initials-based icon
+<Box elementDescriptor={[descriptors.icon, descriptors.iconInitials]} />
+// Generated classes: "cl-icon cl-iconInitials"
+
+// With element ID
+// Use when you need to style a specific instance/variant of a component
+// Example: A social button for a specific provider like Google, GitHub, etc.
+<Box
+  elementDescriptor={descriptors.icon}
+  elementId={descriptors.icon.setId('google')}
+/>
+// Generated classes: "cl-icon cl-icon__google"
+```
+
+### State Classes
+Element descriptors automatically handle state classes:
+```tsx
+<Box
+  elementDescriptor={descriptors.socialButtonsIconButton}
+  isLoading={true}  // Adds 'cl-loading' class
+  isActive={true}   // Adds 'cl-active' class
+  hasError={true}   // Adds 'cl-error' class
+  isOpen={true}     // Adds 'cl-open' class
+/>
+```
+
+## 2. Form Handling Pattern
+
+### Form State Management
+```tsx
+// Form root with context
+const FormRoot = (props: FormProps) => {
+  const card = useCardState();
+  const status = useLoadingStatus();
+  const [submittedWithEnter, setSubmittedWithEnter] = useState(false);
+
+  return (
+    <FormState.Provider value={{
+      isLoading: status.isLoading,
+      isDisabled: card.isLoading || status.isLoading,
+      submittedWithEnter
+    }}>
+      <FormPrim elementDescriptor={descriptors.form} {...props} />
+    </FormState.Provider>
+  );
+};
+```
+
+### Form Controls
+```tsx
+// Using form controls with validation and localization
+const emailField = useFormControl('email', initialValue, {
+  type: 'email',
+  label: localizationKeys('formFieldLabel__email'),
+  placeholder: localizationKeys('formFieldInputPlaceholder__email'),
+  buildErrorMessage: errors => createEmailError(errors)
+});
+
+// Usage in JSX
+<Form.ControlRow elementId={emailField.id}>
+  <Form.PlainInput {...emailField.props} />
+</Form.ControlRow>
+```
+
+### Form Submission
+```tsx
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  status.setLoading();
+  card.setLoading();
+  card.setError(undefined);
+
+  try {
+    await submitData();
+    onSuccess();
+  } catch (error) {
+    handleError(error, [emailField], card.setError);
+  } finally {
+    status.setIdle();
+    card.setIdle();
+  }
+};
+```
+
+## 3. Localization Pattern
+
+Attention: Hard coded values are not allowed to be rendered. All values should be localized with the methods provided below.
+
+### Basic Usage
+```tsx
+// Using the localization hook
+const { t, translateError, locale } = useLocalizations();
+
+// Translating a key
+const translatedText = t(localizationKeys('formButtonPrimary'));
+
+// Translating with parameters
+const translatedWithParams = t(localizationKeys('unstable__errors.passwordComplexity.minimumLength', {
+  length: minLength
+}));
+```
+
+### Component Integration
+```tsx
+// Component with localization
+<Button
+  elementDescriptor={descriptors.formButtonPrimary}
+  localizationKey={localizationKeys('formButtonPrimary')}
+/>
+
+// Error translation
+const errorMessage = translateError(apiError);
+```
+
+## 4. Styled System Pattern
+
+### Basic Usage
+```tsx
+// Using the styled system
+<Box
+  sx={theme => ({
+    backgroundColor: theme.colors.$primary100,
+    padding: theme.space.$4,
+    borderRadius: theme.radii.$md
+  })}
+/>
+
+// With responsive values
+<Flex
+  direction={['column', 'row']}
+  gap={[2, 4, 6]}
+/>
+```
+
+## 5. Common UI Patterns
+
+### Card Pattern
+```tsx
+const MyCard = () => (
+  <Card>
+    <Card.Root>
+      <Card.Header>
+        <Card.Title>Title</Card.Title>
+      </Card.Header>
+      <Card.Content>Content</Card.Content>
+      <Card.Footer>Footer</Card.Footer>
+    </Card.Root>
+  </Card>
+);
+```
+
+### Form Container Pattern
+```tsx
+const MyForm = () => (
+  <FormContainer
+    headerTitle={localizationKeys('page.title')}
+    headerSubtitle={localizationKeys('page.subtitle')}
+  >
+    <Form.Root onSubmit={handleSubmit}>
+      <Form.ControlRow>
+        {/* Form fields */}
+      </Form.ControlRow>
+      <FormButtons
+        isDisabled={!isValid}
+        onReset={handleReset}
+      />
+    </Form.Root>
+  </FormContainer>
+);
+```
+
+## 6. Best Practices
+
+1. **State Management**
+   - Use `useCardState` for card-level state
+   - Use `useFormState` for form-level state
+   - Use `useLoadingStatus` for loading states
+
+2. **Error Handling**
+   - Always use `handleError` utility for API errors
+   - Provide field states for proper error mapping
+   - Use `translateError` for localized error messages
+
+3. **Styling**
+   - Use element descriptors for consistent styling
+   - Use the styled system for custom styles
+   - Follow the theme token system
+
+4. **Forms**
+   - Use `useFormControl` for form field state
+   - Implement proper validation
+   - Handle loading and error states
+   - Use localization keys for labels and placeholders
