@@ -1,5 +1,5 @@
 import type { MatchFunction } from '@clerk/shared/pathToRegexp';
-import type { PendingSessionOptions } from '@clerk/types';
+import type { PendingSessionOptions, SessionTask } from '@clerk/types';
 
 import type { ApiClient, APIKey, IdPOAuthAccessToken, MachineToken } from '../api';
 import type {
@@ -67,6 +67,13 @@ export type AuthenticateRequestOptions = {
    * @default 'session_token'
    */
   acceptsToken?: TokenType | TokenType[] | 'any';
+  /**
+   * Customize the URL paths users are redirected to after sign-in or sign-up when specific
+   * session tasks need to be completed.
+   *
+   * @default undefined - Uses Clerk's default task flow URLs
+   */
+  taskUrls?: Record<SessionTask['key'], string>;
 } & VerifyTokenOptions;
 
 /**
