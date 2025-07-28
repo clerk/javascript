@@ -49,9 +49,11 @@ export const createSessionCookie = ({
     const expires = addYears(Date.now(), 1);
     const { sameSite, secure, partitioned } = getCookieAttributes({ isProduction });
 
-    // Remove existing cookies to prevent conflicts when SameSite attributes change
-    sessionCookie.remove();
-    suffixedSessionCookie.remove();
+    // If setting Partitioned to true, remove the existing session cookies.
+    // This is to avoid conflicts with the same cookie name without Partitioned attribute.
+    if (partitioned) {
+      remove();
+    }
 
     sessionCookie.set(token, { expires, sameSite, secure, partitioned });
     suffixedSessionCookie.set(token, { expires, sameSite, secure, partitioned });

@@ -79,6 +79,30 @@ describe('createSessionCookie', () => {
     expect(mockRemove).toHaveBeenCalledWith(expectedAttributes);
   });
 
+  it('should remove cookies with the same attributes as set', () => {
+    const cookieHandler = createSessionCookie(mockCookieSuffix);
+    cookieHandler.set(mockToken);
+    cookieHandler.remove();
+
+    const expectedAttributes = {
+      sameSite: 'Lax',
+      secure: true,
+      partitioned: false,
+    };
+
+    expect(mockSet).toHaveBeenCalledWith(mockToken, {
+      expires: mockExpires,
+      sameSite: 'Lax',
+      secure: true,
+      partitioned: false,
+    });
+
+    expect(mockRemove).toHaveBeenCalledWith(expectedAttributes);
+    expect(mockRemove).toHaveBeenCalledTimes(2);
+    expect(mockRemove).toHaveBeenNthCalledWith(1, expectedAttributes);
+    expect(mockRemove).toHaveBeenNthCalledWith(2, expectedAttributes);
+  });
+
   it('should get cookie value from suffixed cookie first, then fallback to non-suffixed', () => {
     mockGet.mockImplementationOnce(() => 'suffixed-value').mockImplementationOnce(() => 'non-suffixed-value');
 

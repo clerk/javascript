@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "5.74.1",
+  "version": "5.77.0",
   "description": "Clerk JS library",
   "keywords": [
     "clerk",
@@ -44,6 +44,8 @@
     "dev:headless": "rspack serve --config rspack.config.js --env variant=\"clerk.headless.browser\"",
     "dev:origin": "rspack serve --config rspack.config.js --env devOrigin=http://localhost:${PORT:-4000}",
     "dev:sandbox": "rspack serve --config rspack.config.js --env devOrigin=http://localhost:${PORT:-4000} --env sandbox=1",
+    "format": "node ../../scripts/format-package.mjs",
+    "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src",
     "lint:attw": "attw --pack . --profile node16 --ignore-rules named-exports",
     "lint:publint": "publint || true",
@@ -86,13 +88,13 @@
     "@clerk/testing": "workspace:^",
     "@emotion/jest": "^11.13.0",
     "@rsdoctor/rspack-plugin": "^0.4.13",
-    "@rspack/cli": "^1.4.8",
-    "@rspack/core": "^1.4.8",
+    "@rspack/cli": "^1.4.9",
+    "@rspack/core": "^1.4.9",
     "@rspack/plugin-react-refresh": "^1.4.3",
     "@svgr/webpack": "^6.5.1",
     "@swc/jest": "0.2.39",
     "@types/cloudflare-turnstile": "^0.2.2",
-    "@types/node": "^22.15.33",
+    "@types/node": "^22.16.5",
     "@types/webpack-env": "^1.18.8",
     "jsdom": "^24.1.3",
     "webpack-merge": "^5.10.0"

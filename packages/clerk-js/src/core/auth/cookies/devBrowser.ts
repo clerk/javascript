@@ -33,10 +33,6 @@ export const createDevBrowserCookie = ({ cookieSuffix }: { cookieSuffix: string 
     const expires = addYears(Date.now(), 1);
     const { sameSite, secure } = getCookieAttributes();
 
-    // Remove existing cookies to prevent conflicts when SameSite attributes change
-    devBrowserCookie.remove();
-    suffixedDevBrowserCookie.remove();
-
     suffixedDevBrowserCookie.set(jwt, { expires, sameSite, secure });
     devBrowserCookie.set(jwt, { expires, sameSite, secure });
   };
