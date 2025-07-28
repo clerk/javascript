@@ -9,6 +9,7 @@ const buildUrl = (
   _targetUrl: string | URL,
   _returnBackUrl?: string | URL | null,
   _devBrowserToken?: string | null,
+  _isSatellite?: boolean,
 ) => {
   if (_baseUrl === '') {
     return legacyBuildUrl(_targetUrl.toString(), _returnBackUrl?.toString());
@@ -19,12 +20,16 @@ const buildUrl = (
   const res = new URL(_targetUrl, baseUrl);
   const isCrossOriginRedirect = `${baseUrl.hostname}:${baseUrl.port}` !== `${res.hostname}:${res.port}`;
 
-  if (returnBackUrl) {
+  // For satellite domains, always use the baseUrl (satellite domain) as the redirect target
+  // if no explicit returnBackUrl is provided
+  const redirectTarget = returnBackUrl || (_isSatellite ? baseUrl : undefined);
+
+  if (redirectTarget) {
     if (isCrossOriginRedirect) {
-      returnBackUrl.searchParams.delete(constants.QueryParameters.ClerkSynced);
+      redirectTarget.searchParams.delete(constants.QueryParameters.ClerkSynced);
     }
 
-    res.searchParams.set('redirect_url', returnBackUrl.toString());
+    res.searchParams.set('redirect_url', redirectTarget.toString());
   }
   // For cross-origin redirects, we need to pass the dev browser token for URL session syncing
   if (isCrossOriginRedirect && _devBrowserToken) {
@@ -69,7 +74,7 @@ export type RedirectFun<ReturnType> = (params?: RedirectToParams) => ReturnType;
 /**
  * @internal
  */
-type CreateRedirect = <ReturnType>(params: {
+export type CreateRedirect = <ReturnType>(params: {
   publishableKey: string;
   devBrowserToken?: string;
   redirectAdapter: RedirectAdapter<ReturnType>;
@@ -77,13 +82,14 @@ type CreateRedirect = <ReturnType>(params: {
   signInUrl?: URL | string;
   signUpUrl?: URL | string;
   sessionStatus?: SessionStatusClaim | null;
+  isSatellite?: boolean;
 }) => {
   redirectToSignIn: RedirectFun<ReturnType>;
   redirectToSignUp: RedirectFun<ReturnType>;
 };
 
 export const createRedirect: CreateRedirect = params => {
-  const { publishableKey, redirectAdapter, signInUrl, signUpUrl, baseUrl, sessionStatus } = params;
+  const { publishableKey, redirectAdapter, signInUrl, signUpUrl, baseUrl, sessionStatus, isSatellite } = params;
   const parsedPublishableKey = parsePublishableKey(publishableKey);
   const frontendApi = parsedPublishableKey?.frontendApi;
   const isDevelopment = parsedPublishableKey?.instanceType === 'development';
@@ -92,7 +98,7 @@ export const createRedirect: CreateRedirect = params => {
 
   const redirectToTasks = (url: string | URL, { returnBackUrl }: RedirectToParams) => {
     return redirectAdapter(
-      buildUrl(baseUrl, `${url}/tasks`, returnBackUrl, isDevelopment ? params.devBrowserToken : null),
+      buildUrl(baseUrl, `${url}/tasks`, returnBackUrl, isDevelopment ? params.devBrowserToken : null, isSatellite),
     );
   };
 
@@ -119,7 +125,9 @@ export const createRedirect: CreateRedirect = params => {
       return redirectToTasks(targetUrl, { returnBackUrl });
     }
 
-    return redirectAdapter(buildUrl(baseUrl, targetUrl, returnBackUrl, isDevelopment ? params.devBrowserToken : null));
+    return redirectAdapter(
+      buildUrl(baseUrl, targetUrl, returnBackUrl, isDevelopment ? params.devBrowserToken : null, isSatellite),
+    );
   };
 
   const redirectToSignIn = ({ returnBackUrl }: RedirectToParams = {}) => {
@@ -134,7 +142,9 @@ export const createRedirect: CreateRedirect = params => {
       return redirectToTasks(targetUrl, { returnBackUrl });
     }
 
-    return redirectAdapter(buildUrl(baseUrl, targetUrl, returnBackUrl, isDevelopment ? params.devBrowserToken : null));
+    return redirectAdapter(
+      buildUrl(baseUrl, targetUrl, returnBackUrl, isDevelopment ? params.devBrowserToken : null, isSatellite),
+    );
   };
 
   return { redirectToSignUp, redirectToSignIn };

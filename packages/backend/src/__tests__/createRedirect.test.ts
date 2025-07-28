@@ -14,6 +14,7 @@ describe('redirect(redirectAdapter)', () => {
         publishableKey: '',
         baseUrl: 'http://www.clerk.com',
         sessionStatus,
+        isSatellite: false,
       });
       expect(Object.keys(helpers).sort()).toEqual(['redirectToSignIn', 'redirectToSignUp']);
     });
@@ -25,6 +26,7 @@ describe('redirect(redirectAdapter)', () => {
         signUpUrl: 'http://signin.url:3001/sign-up',
         baseUrl: 'http://www.clerk.com',
         sessionStatus,
+        isSatellite: false,
       } as any);
 
       expect(() => redirectToSignIn({ returnBackUrl })).toThrowError(
@@ -41,6 +43,7 @@ describe('redirect(redirectAdapter)', () => {
         redirectAdapter: redirectAdapterSpy,
         publishableKey: 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA',
         sessionStatus: 'active',
+        isSatellite: false,
       });
 
       const result = redirectToSignUp({ returnBackUrl });
@@ -57,6 +60,7 @@ describe('redirect(redirectAdapter)', () => {
         redirectAdapter: redirectAdapterSpy,
         publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
         sessionStatus: 'active',
+        isSatellite: false,
       });
 
       const result = redirectToSignUp({ returnBackUrl });
@@ -73,6 +77,7 @@ describe('redirect(redirectAdapter)', () => {
         redirectAdapter: redirectAdapterSpy,
         publishableKey: 'pk_test_aW5jbHVkZWQua2F0eWRpZC05Mi5jbGVyay5hY2NvdW50cy5kZXYk',
         sessionStatus: 'active',
+        isSatellite: false,
       });
 
       const result = redirectToSignUp({ returnBackUrl });
@@ -90,6 +95,7 @@ describe('redirect(redirectAdapter)', () => {
         redirectAdapter: redirectAdapterSpy,
         publishableKey: 'pk_test_aW5jbHVkZWQua2F0eWRpZC05Mi5jbGVyay5hY2NvdW50cy5kZXYk',
         sessionStatus: 'active',
+        isSatellite: false,
       });
 
       const result = redirectToSignUp({ returnBackUrl });
@@ -112,6 +118,7 @@ describe('redirect(redirectAdapter)', () => {
         publishableKey: 'pk_test_Y2xlcmsubGNsLmRldiQ',
         sessionStatus: 'active',
         signUpUrl,
+        isSatellite: false,
       });
 
       const result = redirectToSignUp({ returnBackUrl });
@@ -128,6 +135,7 @@ describe('redirect(redirectAdapter)', () => {
         redirectAdapter: redirectAdapterSpy,
         publishableKey: 'pk_test_aW5jbHVkZWQua2F0eWRpZC05Mi5jbGVyay5hY2NvdW50c3N0YWdlLmRldiQ',
         sessionStatus: 'active',
+        isSatellite: false,
       });
 
       const result = redirectToSignUp({ returnBackUrl });
@@ -144,6 +152,7 @@ describe('redirect(redirectAdapter)', () => {
         redirectAdapter: redirectAdapterSpy,
         publishableKey: 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA',
         sessionStatus: 'active',
+        isSatellite: false,
       });
 
       const result = redirectToSignIn({ returnBackUrl });
@@ -160,6 +169,7 @@ describe('redirect(redirectAdapter)', () => {
         redirectAdapter: redirectAdapterSpy,
         publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
         sessionStatus: 'active',
+        isSatellite: false,
       });
 
       const result = redirectToSignIn({ returnBackUrl });
@@ -176,6 +186,7 @@ describe('redirect(redirectAdapter)', () => {
         redirectAdapter: redirectAdapterSpy,
         publishableKey: 'pk_test_aW5jbHVkZWQua2F0eWRpZC05Mi5jbGVyay5hY2NvdW50cy5kZXYk',
         sessionStatus: 'active',
+        isSatellite: false,
       });
 
       const result = redirectToSignIn({ returnBackUrl });
@@ -192,6 +203,7 @@ describe('redirect(redirectAdapter)', () => {
         signUpUrl: 'http://signin.url:3001/sign-up',
         baseUrl: 'http://www.clerk.com',
         publishableKey: '',
+        isSatellite: false,
         sessionStatus: 'active',
       });
 
@@ -208,6 +220,7 @@ describe('redirect(redirectAdapter)', () => {
         baseUrl: 'http://current.url:3000',
         publishableKey: '',
         sessionStatus: 'active',
+        isSatellite: false,
       });
 
       const result = redirectToSignUp({ returnBackUrl });
@@ -223,6 +236,7 @@ describe('redirect(redirectAdapter)', () => {
         baseUrl: 'http://www.clerk.com',
         publishableKey: '',
         sessionStatus: 'active',
+        isSatellite: false,
       });
 
       const result = redirectToSignUp({ returnBackUrl });
@@ -237,6 +251,7 @@ describe('redirect(redirectAdapter)', () => {
         publishableKey: '',
         baseUrl: 'http://www.clerk.com',
         sessionStatus: 'active',
+        isSatellite: false,
       });
 
       expect(() => redirectToSignUp({ returnBackUrl })).toThrowError(
@@ -253,6 +268,7 @@ describe('redirect(redirectAdapter)', () => {
         signUpUrl: 'http://signin.url:3001/sign-up',
         publishableKey: '',
         sessionStatus: 'active',
+        isSatellite: false,
       });
 
       const result = redirectToSignIn();
@@ -269,6 +285,7 @@ describe('redirect(redirectAdapter)', () => {
         signUpUrl: '/sign-up',
         publishableKey: '',
         sessionStatus: 'active',
+        isSatellite: false,
       });
 
       const result = redirectToSignIn({ returnBackUrl });
@@ -285,6 +302,7 @@ describe('redirect(redirectAdapter)', () => {
         publishableKey: '',
         baseUrl: 'http://www.clerk.com',
         sessionStatus: 'active',
+        isSatellite: false,
       });
 
       const result = redirectToSignIn({ returnBackUrl });
@@ -301,6 +319,7 @@ describe('redirect(redirectAdapter)', () => {
         redirectAdapter: redirectAdapterSpy,
         publishableKey: 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA',
         sessionStatus: 'pending',
+        isSatellite: false,
       });
 
       const result = redirectToSignIn({ returnBackUrl });
@@ -317,6 +336,7 @@ describe('redirect(redirectAdapter)', () => {
         redirectAdapter: redirectAdapterSpy,
         publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
         sessionStatus: 'pending',
+        isSatellite: false,
       });
 
       const result = redirectToSignUp({ returnBackUrl });
@@ -334,6 +354,7 @@ describe('redirect(redirectAdapter)', () => {
         redirectAdapter: redirectAdapterSpy,
         publishableKey: 'pk_test_aW5jbHVkZWQua2F0eWRpZC05Mi5jbGVyay5hY2NvdW50cy5kZXYk',
         sessionStatus: 'pending',
+        isSatellite: false,
       });
 
       const result = redirectToSignUp({ returnBackUrl });
@@ -354,12 +375,47 @@ describe('redirect(redirectAdapter)', () => {
         redirectAdapter: redirectAdapterSpy,
         publishableKey: 'pk_test_Y2xlcmsubGNsLmRldiQ',
         sessionStatus: 'pending',
+        isSatellite: false,
       });
 
       const result = redirectToSignUp({ returnBackUrl });
       expect(result).toBe('redirectAdapterValue');
       expect(redirectAdapterSpy).toHaveBeenCalledWith(
         `https://accounts.lcl.dev/sign-up/tasks?redirect_url=${encodedUrl}&__clerk_db_jwt=deadbeef`,
+      );
+    });
+
+    it('includes redirect_url for satellite domains even without returnBackUrl', () => {
+      const redirectAdapterSpy = vi.fn().mockImplementation(_url => 'redirectAdapterValue');
+      const { redirectToSignUp } = createRedirect({
+        baseUrl: 'https://satellite.example.com',
+        redirectAdapter: redirectAdapterSpy,
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+        sessionStatus: 'active',
+        isSatellite: true,
+      });
+
+      const result = redirectToSignUp();
+      expect(result).toBe('redirectAdapterValue');
+      expect(redirectAdapterSpy).toHaveBeenCalledWith(
+        `https://accounts.example.com/sign-up?redirect_url=https%3A%2F%2Fsatellite.example.com%2F`,
+      );
+    });
+
+    it('includes redirect_url for satellite domains with returnBackUrl', () => {
+      const redirectAdapterSpy = vi.fn().mockImplementation(_url => 'redirectAdapterValue');
+      const { redirectToSignUp } = createRedirect({
+        baseUrl: 'https://satellite.example.com',
+        redirectAdapter: redirectAdapterSpy,
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+        sessionStatus: 'active',
+        isSatellite: true,
+      });
+
+      const result = redirectToSignUp({ returnBackUrl: 'https://satellite.example.com/protected' });
+      expect(result).toBe('redirectAdapterValue');
+      expect(redirectAdapterSpy).toHaveBeenCalledWith(
+        `https://accounts.example.com/sign-up?redirect_url=https%3A%2F%2Fsatellite.example.com%2Fprotected`,
       );
     });
   });

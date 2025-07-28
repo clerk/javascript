@@ -244,7 +244,13 @@ describe('clerkMiddleware(params)', () => {
     const decryptedData = decryptClerkRequestData(requestData);
 
     expect(resp?.headers.get('x-middleware-request-x-clerk-request-data')).toBeDefined();
-    expect(decryptedData).toEqual(options);
+    expect(decryptedData).toEqual({
+      ...options,
+      acceptsToken: 'any',
+      domain: '',
+      isSatellite: false,
+      proxyUrl: '',
+    });
   });
 
   describe('allows access to request object to define options via callback', () => {
@@ -272,7 +278,13 @@ describe('clerkMiddleware(params)', () => {
       const decryptedData = decryptClerkRequestData(requestData);
 
       expect(resp?.headers.get('x-middleware-request-x-clerk-request-data')).toBeDefined();
-      expect(decryptedData).toEqual({ ...options, domain: 'www.clerk.com' });
+      expect(decryptedData).toEqual({
+        ...options,
+        domain: 'www.clerk.com',
+        acceptsToken: 'any',
+        isSatellite: false,
+        proxyUrl: '',
+      });
     });
 
     it('with asynchronous callback', async () => {
@@ -306,7 +318,13 @@ describe('clerkMiddleware(params)', () => {
       const decryptedData = decryptClerkRequestData(requestData);
 
       expect(resp?.headers.get('x-middleware-request-x-clerk-request-data')).toBeDefined();
-      expect(decryptedData).toEqual({ ...options, domain: 'www.clerk.com' });
+      expect(decryptedData).toEqual({
+        ...options,
+        domain: 'www.clerk.com',
+        acceptsToken: 'any',
+        isSatellite: false,
+        proxyUrl: '',
+      });
     });
   });
 

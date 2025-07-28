@@ -1,6 +1,6 @@
 export { constants } from './constants';
 export { createRedirect } from './createRedirect';
-export type { RedirectFun } from './createRedirect';
+export type { RedirectFun, CreateRedirect } from './createRedirect';
 
 export type { CreateAuthenticateRequestOptions } from './tokens/factory';
 export { createAuthenticateRequest } from './tokens/factory';

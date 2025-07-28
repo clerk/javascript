@@ -273,11 +273,14 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
             }
           : {};
 
+      // Ensure resolvedParams includes the isSatellite property from createAuthenticateRequestOptions
+      const resolvedParamsWithSatellite = createAuthenticateRequestOptions(clerkRequest, options);
+
       decorateRequest(
         clerkRequest,
         handlerResult,
         requestState,
-        resolvedParams,
+        resolvedParamsWithSatellite || {},
         keylessKeysForRequestData,
         authObject.tokenType === 'session_token' ? null : makeAuthObjectSerializable(authObject),
       );
@@ -506,6 +509,7 @@ const handleControlFlowErrors = (
       signUpUrl: requestState.signUpUrl,
       publishableKey: requestState.publishableKey,
       sessionStatus: requestState.toAuth()?.sessionStatus,
+      isSatellite: requestState.isSatellite,
     });
 
     const { returnBackUrl } = e;
