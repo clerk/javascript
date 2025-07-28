@@ -80,19 +80,19 @@ describe('createSessionCookie', () => {
   });
 
   it('should remove cookies with the same attributes as set', () => {
-    const cookieHandler = createSessionCookie(mockCookieSuffix);
+    const cookieHandler = createSessionCookie({ cookieSuffix: mockCookieSuffix, isProduction: false });
     cookieHandler.set(mockToken);
     cookieHandler.remove();
 
     const expectedAttributes = {
-      sameSite: 'Lax',
+      sameSite: 'None',
       secure: true,
       partitioned: false,
     };
 
     expect(mockSet).toHaveBeenCalledWith(mockToken, {
       expires: mockExpires,
-      sameSite: 'Lax',
+      sameSite: 'None',
       secure: true,
       partitioned: false,
     });
