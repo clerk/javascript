@@ -429,7 +429,6 @@ const createElementComponent = (type: StripeElementType, isServer: boolean): Fun
         {!isReady && fallback}
         <div
           id={id}
-          data-clerk='true'
           style={{
             height: isReady ? 'unset' : '0px',
             visibility: isReady ? 'visible' : 'hidden',
