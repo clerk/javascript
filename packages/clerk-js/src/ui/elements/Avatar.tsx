@@ -15,6 +15,11 @@ type AvatarProps = PropsOfComponent<typeof Flex> & {
   rounded?: boolean;
   boxElementDescriptor?: ElementDescriptor;
   imageElementDescriptor?: ElementDescriptor;
+  /**
+   * URL of the external link to navigate to when the avatar is clicked.
+   * Opens in a new tab.
+   */
+  externalLinkUrl?: string;
 };
 
 export const Avatar = (props: AvatarProps) => {
@@ -28,6 +33,7 @@ export const Avatar = (props: AvatarProps) => {
     sx,
     boxElementDescriptor,
     imageElementDescriptor,
+    externalLinkUrl,
   } = props;
   const [error, setError] = React.useState(false);
 
@@ -65,7 +71,17 @@ export const Avatar = (props: AvatarProps) => {
         sx,
       ]}
     >
-      {ImgOrFallback}
+      {externalLinkUrl && externalLinkUrl.trim() ? (
+        <a
+          href={externalLinkUrl}
+          target='_blank'
+          rel='noopener noreferrer'
+        >
+          {ImgOrFallback}
+        </a>
+      ) : (
+        ImgOrFallback
+      )}
 
       {/* /**
        * This Box is the "shimmer" effect for the avatar.
