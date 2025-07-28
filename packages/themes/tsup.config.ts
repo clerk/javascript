@@ -1,0 +1,32 @@
+import { cp, mkdir, readdir } from 'fs/promises';
+import { extname, join } from 'path';
+import { defineConfig } from 'tsup';
+
+export default defineConfig({
+  entry: ['./src/**/*.{ts,tsx}'],
+  format: ['cjs', 'esm'],
+  bundle: false,
+  clean: true,
+  minify: false,
+  sourcemap: false,
+  dts: true,
+  tsconfig: './tsconfig.build.json',
+  target: 'es2020',
+  onSuccess: async () => {
+    // Ensure dist/themes directory exists
+    await mkdir('./dist/themes', { recursive: true });
+
+    // Copy all CSS files from src/themes to dist/themes
+    try {
+      const files = await readdir('./src/themes');
+      const cssFiles = files.filter(file => extname(file) === '.css');
+
+      for (const cssFile of cssFiles) {
+        await cp(join('./src/themes', cssFile), join('./dist/themes', cssFile));
+        console.log(`✓ Copied ${cssFile}`);
+      }
+    } catch (error) {
+      // No CSS files found, that's ok
+    }
+  },
+});
