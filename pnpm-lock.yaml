@@ -790,10 +790,10 @@ importers:
         specifier: workspace:^
         version: link:../vue
       '@nuxt/kit':
-        specifier: ^3.17.6
+        specifier: ^3.17.7
         version: 3.17.7(magicast@0.3.5)
       '@nuxt/schema':
-        specifier: ^3.17.6
+        specifier: ^3.17.7
         version: 3.17.7
       h3:
         specifier: ^1.15.3
