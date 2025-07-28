@@ -8,13 +8,7 @@ import { assertValidSecretKey } from '../util/optionsAssertions';
 import { joinPaths } from '../util/path';
 import { deserialize } from './resources/Deserializer';
 
-export type ClerkBackendApiRequestOptions = {
-  method: 'GET' | 'POST' | 'PATCH' | 'DELETE' | 'PUT';
-  queryParams?: Record<string, unknown>;
-  headerParams?: Record<string, string>;
-  bodyParams?: Record<string, unknown> | Array<Record<string, unknown>>;
-  formData?: FormData;
-} & (
+type ClerkBackendApiRequestOptionsUrlOrPath =
   | {
       url: string;
       path?: string;
@@ -22,8 +16,33 @@ export type ClerkBackendApiRequestOptions = {
   | {
       url?: string;
       path: string;
+    };
+
+type ClerkBackendApiRequestOptionsBodyParams =
+  | {
+      bodyParams: Record<string, unknown> | Array<Record<string, unknown>>;
+      options?: {
+        /**
+         * If true, snakecases the keys of the bodyParams object recursively.
+         * @default false
+         */
+        deepSnakecaseBodyParamKeys?: boolean;
+      };
     }
-);
+  | {
+      bodyParams?: never;
+      options?: {
+        deepSnakecaseBodyParamKeys?: never;
+      };
+    };
+
+export type ClerkBackendApiRequestOptions = {
+  method: 'GET' | 'POST' | 'PATCH' | 'DELETE' | 'PUT';
+  queryParams?: Record<string, unknown>;
+  headerParams?: Record<string, string>;
+  formData?: FormData;
+} & ClerkBackendApiRequestOptionsUrlOrPath &
+  ClerkBackendApiRequestOptionsBodyParams;
 
 export type ClerkBackendApiResponse<T> =
   | {
@@ -78,7 +97,8 @@ export function buildRequest(options: BuildRequestOptions) {
       userAgent = USER_AGENT,
       skipApiVersionInUrl = false,
     } = options;
-    const { path, method, queryParams, headerParams, bodyParams, formData } = requestOptions;
+    const { path, method, queryParams, headerParams, bodyParams, formData, options: opts } = requestOptions;
+    const { deepSnakecaseBodyParamKeys = false } = opts || {};
 
     if (requireSecretKey) {
       assertValidSecretKey(secretKey);
@@ -130,7 +150,8 @@ export function buildRequest(options: BuildRequestOptions) {
             return null;
           }
 
-          const formatKeys = (object: Parameters<typeof snakecaseKeys>[0]) => snakecaseKeys(object, { deep: false });
+          const formatKeys = (object: Parameters<typeof snakecaseKeys>[0]) =>
+            snakecaseKeys(object, { deep: deepSnakecaseBodyParamKeys });
 
           return {
             body: JSON.stringify(Array.isArray(bodyParams) ? bodyParams.map(formatKeys) : formatKeys(bodyParams)),
