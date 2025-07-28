@@ -17,10 +17,11 @@ vi.mock('../authenticateRequest', () => ({
 
 describe('requireAuth', () => {
   beforeEach(() => {
-    mockAuthenticateAndDecorateRequest = vi.fn();
-    mockAuthenticateRequest = vi.fn();
-    vi.clearAllMocks();
-  });
+beforeEach(() => {
+  vi.clearAllMocks();
+  mockAuthenticateAndDecorateRequest = vi.fn();
+  mockAuthenticateRequest = vi.fn();
+});
 
   it('should redirect to sign-in page when user is not authenticated', async () => {
     process.env.CLERK_SIGN_IN_URL = '/sign-in';
