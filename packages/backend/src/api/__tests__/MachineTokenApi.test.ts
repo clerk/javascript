@@ -12,7 +12,8 @@ describe('MachineTokenAPI', () => {
     object: 'machine_to_machine_token',
     id: m2mId,
     subject: 'mch_xxxxx',
-    scopes: [],
+    scopes: ['mch_1xxxxx', 'mch_2xxxxx'],
+    claims: { foo: 'bar' },
     secret: m2mSecret,
     revoked: false,
     revocation_reason: null,
@@ -47,6 +48,8 @@ describe('MachineTokenAPI', () => {
 
       expect(response.id).toBe(m2mId);
       expect(response.secret).toBe(m2mSecret);
+      expect(response.scopes).toEqual(['mch_1xxxxx', 'mch_2xxxxx']);
+      expect(response.claims).toEqual({ foo: 'bar' });
     });
 
     it('does not accept an instance secret as authorization header', async () => {
@@ -76,7 +79,8 @@ describe('MachineTokenAPI', () => {
       object: 'machine_to_machine_token',
       id: m2mId,
       subject: 'mch_xxxxx',
-      scopes: [],
+      scopes: ['mch_1xxxxx', 'mch_2xxxxx'],
+      claims: { foo: 'bar' },
       revoked: true,
       revocation_reason: 'revoked by test',
       expired: false,
@@ -111,6 +115,8 @@ describe('MachineTokenAPI', () => {
       expect(response.revoked).toBe(true);
       expect(response.secret).toBeUndefined();
       expect(response.revocationReason).toBe('revoked by test');
+      expect(response.scopes).toEqual(['mch_1xxxxx', 'mch_2xxxxx']);
+      expect(response.claims).toEqual({ foo: 'bar' });
     });
 
     it('revokes a m2m token using instance secret', async () => {
@@ -191,6 +197,8 @@ describe('MachineTokenAPI', () => {
 
       expect(response.id).toBe(m2mId);
       expect(response.secret).toBe(m2mSecret);
+      expect(response.scopes).toEqual(['mch_1xxxxx', 'mch_2xxxxx']);
+      expect(response.claims).toEqual({ foo: 'bar' });
     });
 
     it('verifies a m2m token using instance secret', async () => {
@@ -217,6 +225,8 @@ describe('MachineTokenAPI', () => {
 
       expect(response.id).toBe(m2mId);
       expect(response.secret).toBe(m2mSecret);
+      expect(response.scopes).toEqual(['mch_1xxxxx', 'mch_2xxxxx']);
+      expect(response.claims).toEqual({ foo: 'bar' });
     });
 
     it('requires a machine secret or instance secret to verify a m2m token', async () => {
