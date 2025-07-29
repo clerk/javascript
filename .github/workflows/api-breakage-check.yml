@@ -1,0 +1,234 @@
+name: SNAPI API Breakage Check
+
+on:
+  pull_request:
+    paths:
+      - 'packages/**'
+      - 'tools/snapi/**'
+  push:
+    branches:
+      - main
+    paths:
+      - 'packages/**'
+      - 'tools/snapi/**'
+  workflow_dispatch: # Keep workflow_dispatch
+
+concurrency:
+  group: snapi-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  detect-api-changes:
+    runs-on: ubuntu-latest # Changed from blacksmith runner for simplicity, adjust if needed
+    timeout-minutes: 15 # Adjusted timeout
+    permissions:
+      contents: read
+      pull-requests: write
+      statuses: write
+      # id-token: write # Not needed if not using WIF for GCS
+
+    # env: # GCS env vars removed
+      # GCS_PROJECT_ID: ${{ secrets.GCS_PROJECT_ID }}
+      # GCS_BUCKET: ${{ secrets.GCS_BUCKET }}
+      # TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+      # TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Need full history
+
+      - name: Setup
+        id: config
+        uses: ./.github/actions/init-blacksmith
+        with:
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }} # Keep turbo if init-blacksmith needs it
+          turbo-token: ${{ secrets.TURBO_TOKEN }} # Keep turbo if init-blacksmith needs it
+
+      # GCS Auth step removed
+      # - name: Authenticate to Google Cloud
+      #   uses: 'google-github-actions/auth@v2'
+      #   with:
+      #     workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+      #     service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Build packages
+        run: pnpm build
+
+      - name: Build Snapi
+        run: pnpm turbo build --filter=@clerk/snapi
+
+      # Storage health check removed
+      # - name: Check storage health
+      #   id: storage-health
+      #   run: |
+      #     echo "GCS_PROJECT_ID: $GCS_PROJECT_ID"
+      #     echo "GCS_BUCKET: $GCS_BUCKET"
+      #     if ! pnpm snapi storage health --ci; then
+      #       echo "::error::Storage health check failed"
+      #       exit 1
+      #     fi
+
+      - name: Download LATEST baseline from main (for PRs)
+        if: github.event_name == 'pull_request'
+        uses: dawidd6/action-download-artifact@v6 # Using v6, check for latest stable
+        with:
+          workflow: ${{ github.workflow_id }} # Use workflow_id for more robust self-referencing
+          branch: main 
+          name: api-baseline-latest-main
+          path: .api-snapshots/baseline # Download to a 'baseline' subdirectory
+          if_no_artifact_found: warn # Don't fail if not found, just warn
+          github_token: ${{ secrets.GITHUB_TOKEN }} 
+
+      - name: Generate and store initial snapshots if needed
+        if: github.event_name == 'pull_request'
+        id: initial-snapshots
+        run: |
+          # Check if baseline directory is empty
+          if [ ! "$(ls -A .api-snapshots/baseline)" ]; then
+            echo "No baseline snapshots found. Generating initial snapshots..."
+            # Generate current snapshots with --no-cleanup to prevent premature deletion
+            pnpm snapi:snapshot --config snapi.config.json --no-cleanup
+            
+            # Copy current snapshots to baseline
+            mkdir -p .api-snapshots/baseline
+            cp -r .api-snapshots/current/* .api-snapshots/baseline/
+            
+            # Upload initial snapshots as artifacts
+            echo "COMMIT_SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
+            echo "initial_snapshots_generated=true" >> $GITHUB_OUTPUT
+            echo "Uploading initial snapshots as artifacts..."
+          else
+            echo "Baseline snapshots found, skipping initial snapshot generation."
+            echo "initial_snapshots_generated=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload initial snapshots (if generated)
+        if: github.event_name == 'pull_request' && steps.initial-snapshots.outputs.initial_snapshots_generated == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-baseline-${{ env.COMMIT_SHA }}
+          path: .api-snapshots/
+          retention-days: 90
+
+      - name: Run API breakage detection (PR)
+        if: github.event_name == 'pull_request'
+        id: api-check-pr
+        run: |
+          # Ensure baseline directory exists if artifact wasn't downloaded, to prevent errors if SNAPI expects it
+          mkdir -p .api-snapshots/baseline 
+          # Generate current snapshots
+          pnpm snapi:snapshot --config snapi.config.json
+          
+          # Run breaking changes detection
+          echo "🔍 Detecting API changes..."
+          if pnpm snapi:check --config snapi.config.json --format markdown --output api-changes-report.md; then
+            echo "api_check_passed=true" >> $GITHUB_OUTPUT
+          else
+            echo "api_check_passed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Update baseline cache and upload LATEST (main branch)
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: |
+          pnpm snapi:snapshot --config snapi.config.json --force
+          echo "COMMIT_SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
+
+      - name: Upload commit-specific baseline snapshots (main branch)
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-baseline-${{ env.COMMIT_SHA }}
+          path: .api-snapshots/
+          retention-days: 90
+
+      - name: Upload LATEST baseline snapshot (main branch)
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-baseline-latest-main
+          path: .api-snapshots/ # This should contain the generated snapshots
+          retention-days: 90 # Adjust as needed, this will be overwritten frequently
+
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            
+            // Read the generated report
+            let reportContent = '';
+            try {
+              reportContent = fs.readFileSync('api-changes-report.md', 'utf8');
+            } catch (error) {
+              reportContent = '❌ **Error**: Could not generate API changes report.\n\n' + error.message;
+            }
+            
+            // Find existing comment
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number
+            });
+            
+            const existingComment = comments.data.find(
+              comment => comment.user.login === 'github-actions[bot]' && 
+                        comment.body.includes('API Changes Report')
+            );
+            
+            const commentBody = `## 🔍 API Changes Report
+            
+            ${reportContent}
+            
+            ---
+            <sub>🤖 This comment was automatically generated by the API Breakage Detector</sub>`;
+            
+            if (existingComment) {
+              // Update existing comment
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existingComment.id,
+                body: commentBody
+              });
+            } else {
+              // Create new comment
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: commentBody
+              });
+            }
+
+      - name: Set commit status
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const apiCheckPassed = '${{ steps.api-check-pr.outputs.api_check_passed }}' === 'true';
+            
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.payload.pull_request.head.sha,
+              state: apiCheckPassed ? 'success' : 'failure',
+              target_url: `${context.payload.pull_request.html_url}/checks`,
+              description: apiCheckPassed ? 
+                'No breaking API changes detected' : 
+                'Breaking API changes detected - review required',
+              context: 'snapi'
+            });
+
+      - name: Upload API snapshots and reports (debug)
+        if: always() # Keep this for debugging all runs
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-debug-${{ github.run_id }}
+          path: |
+            .api-snapshots/
+            api-changes-report.md
+          retention-days: 7 
