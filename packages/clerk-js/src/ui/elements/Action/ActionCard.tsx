@@ -24,13 +24,12 @@ export const ActionCard = (props: ActionCardProps) => {
       elementDescriptor={descriptors.actionCard}
       sx={[
         t => ({
-          boxShadow: t.shadows.$actionCardShadow,
           gap: t.space.$4,
           borderRadius: t.radii.$lg,
           padding: `${t.space.$4} ${t.space.$5}`,
           borderWidth: t.borderWidths.$normal,
           borderStyle: t.borderStyles.$solid,
-          borderColor: t.colors.$borderAlpha100,
+          borderColor: t.colors.$borderAlpha150,
           ...styles(t)[variant],
         }),
         sx,
