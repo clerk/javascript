@@ -1189,7 +1189,7 @@ export const jaJP: LocalizationResource = {
         title: '電話番号',
       },
       profileSection: {
-        primaryButton: undefined,
+        primaryButton: 'プロフィールを更新',
         title: 'プロフィール',
       },
       usernameSection: {
