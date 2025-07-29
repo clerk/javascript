@@ -40,5 +40,7 @@
 .cl-providerIcon__apple,
 .cl-providerIcon__github,
 .cl-providerIcon__okx_wallet {
-  filter: invert(1);
+  @variant dark {
+    filter: invert(1);
+  }
 }
