@@ -305,6 +305,7 @@ export const ptBR: LocalizationResource = {
         totalPaid: 'Total pago',
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'Assinar um plano',
         actionLabel__switchPlan: 'Mudar de plano',
         tableHeader__edit: 'Editar',
@@ -963,6 +964,7 @@ export const ptBR: LocalizationResource = {
         totalPaid: 'Total pago',
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'Assinar um plano',
         actionLabel__switchPlan: 'Mudar de plano',
         tableHeader__edit: 'Editar',

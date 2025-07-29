@@ -305,6 +305,7 @@ export const faIR: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'در یک طرح مشترک شوید',
         actionLabel__switchPlan: 'تغییر طرح',
         tableHeader__edit: undefined,
@@ -960,6 +961,7 @@ export const faIR: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'در یک طرح مشترک شوید',
         actionLabel__switchPlan: 'تغییر طرح',
         tableHeader__edit: undefined,
