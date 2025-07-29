@@ -79,8 +79,9 @@ function checkTokenTypeMismatch(
 ): UnauthenticatedState<MachineTokenType> | null {
   const mismatch = !isTokenTypeAccepted(parsedTokenType, acceptsToken);
   if (mismatch) {
+    const tokenTypeToReturn = (typeof acceptsToken === 'string' ? acceptsToken : parsedTokenType) as MachineTokenType;
     return signedOut({
-      tokenType: parsedTokenType,
+      tokenType: tokenTypeToReturn,
       authenticateContext,
       reason: AuthErrorReason.TokenTypeMismatch,
     });
@@ -143,16 +144,20 @@ export const authenticateRequest: AuthenticateRequest = (async (
   // Default tokenType is session_token for backwards compatibility.
   const acceptsToken = options.acceptsToken ?? TokenType.SessionToken;
 
-  if (acceptsToken !== TokenType.MachineToken) {
-    assertValidSecretKey(authenticateContext.secretKey);
+  // Machine tokens are header-only and don't require session-based validation
+  // (secret key, publishable key, cookies, handshake flows, etc.)
+  if (acceptsToken === TokenType.MachineToken) {
+    return authenticateMachineRequestWithTokenInHeader();
+  }
 
-    if (authenticateContext.isSatellite) {
-      assertSignInUrlExists(authenticateContext.signInUrl, authenticateContext.secretKey);
-      if (authenticateContext.signInUrl && authenticateContext.origin) {
-        assertSignInUrlFormatAndOrigin(authenticateContext.signInUrl, authenticateContext.origin);
-      }
-      assertProxyUrlOrDomain(authenticateContext.proxyUrl || authenticateContext.domain);
+  assertValidSecretKey(authenticateContext.secretKey);
+
+  if (authenticateContext.isSatellite) {
+    assertSignInUrlExists(authenticateContext.signInUrl, authenticateContext.secretKey);
+    if (authenticateContext.signInUrl && authenticateContext.origin) {
+      assertSignInUrlFormatAndOrigin(authenticateContext.signInUrl, authenticateContext.origin);
     }
+    assertProxyUrlOrDomain(authenticateContext.proxyUrl || authenticateContext.domain);
   }
 
   const organizationMatcher = new OrganizationMatcher(options.organizationSyncOptions);
@@ -772,11 +777,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
   }
 
   // Machine requests cannot have the token in the cookie, it must be in header.
-  if (
-    acceptsToken === TokenType.OAuthToken ||
-    acceptsToken === TokenType.ApiKey ||
-    acceptsToken === TokenType.MachineToken
-  ) {
+  if (acceptsToken === TokenType.OAuthToken || acceptsToken === TokenType.ApiKey) {
     return signedOut({
       tokenType: acceptsToken,
       authenticateContext,
