@@ -1,5 +1,11 @@
 # Change Log
 
+## 6.27.1
+
+### Patch Changes
+
+- Fixes an issue where `clerkMiddleware()` would not properly redirect or set cookies in some environments. ([#6388](https://github.com/clerk/javascript/pull/6388)) by [@brkalow](https://github.com/brkalow)
+
 ## 6.27.0
 
 ### Minor Changes
