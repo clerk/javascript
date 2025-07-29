@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/consistent-type-imports */
-import type { CommerceCheckoutResource, EnvironmentResource } from '@clerk/types';
+import type { CommerceCheckoutResource, EnvironmentResource, ForPayerType } from '@clerk/types';
 import type { Stripe, StripeElements } from '@stripe/stripe-js';
 import { type PropsWithChildren, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import React from 'react';
@@ -63,10 +63,10 @@ const useInternalEnvironment = () => {
   return clerk.__unstable__environment as unknown as EnvironmentResource | null | undefined;
 };
 
-const usePaymentSourceUtils = (forResource: 'org' | 'user') => {
+const usePaymentSourceUtils = (forResource: ForPayerType = 'user') => {
   const { organization } = useOrganization();
   const { user } = useUser();
-  const resource = forResource === 'org' ? organization : user;
+  const resource = forResource === 'organization' ? organization : user;
   const stripeClerkLibs = useStripeLibsContext();
 
   const { data: initializedPaymentSource, trigger: initializePaymentSource } = useSWRMutation(
@@ -138,8 +138,12 @@ type internalStripeAppearance = {
 type PaymentElementProviderProps = {
   checkout?: CommerceCheckoutResource | ReturnType<typeof useCheckout>['checkout'];
   stripeAppearance?: internalStripeAppearance;
-  // TODO(@COMMERCE): What can we do to remove this ?
-  for: 'org' | 'user';
+  /**
+   * Default to `user` if not provided.
+   *
+   * @default 'user'
+   */
+  for?: ForPayerType;
   paymentDescription?: string;
 };
 
@@ -229,7 +233,7 @@ const PaymentElement = ({ fallback }: { fallback?: ReactNode }) => {
     stripe,
     externalClientSecret,
     paymentDescription,
-    for: subscriberType,
+    for: _for,
   } = usePaymentElementContext();
   const environment = useInternalEnvironment();
 
@@ -242,7 +246,7 @@ const PaymentElement = ({ fallback }: { fallback?: ReactNode }) => {
       recurringPaymentRequest: {
         paymentDescription: paymentDescription || '',
         managementURL:
-          subscriberType === 'org'
+          _for === 'organization'
             ? environment?.displayConfig.organizationProfileUrl || ''
             : environment?.displayConfig.userProfileUrl || '',
         regularBilling: {
@@ -252,7 +256,7 @@ const PaymentElement = ({ fallback }: { fallback?: ReactNode }) => {
         },
       },
     } as const;
-  }, [checkout, paymentDescription, subscriberType, environment]);
+  }, [checkout, paymentDescription, _for, environment]);
 
   const options = useMemo(() => {
     return {

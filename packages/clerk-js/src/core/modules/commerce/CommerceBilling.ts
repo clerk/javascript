@@ -34,7 +34,7 @@ import {
 export class CommerceBilling implements CommerceBillingNamespace {
   getPlans = async (params?: GetPlansParams): Promise<ClerkPaginatedResponse<CommercePlanResource>> => {
     const { for: forParam, ...safeParams } = params || {};
-    const searchParams = { ...safeParams, payer_type: forParam || 'user' };
+    const searchParams = { ...safeParams, payer_type: forParam === 'organization' ? 'org' : 'user' };
     return await BaseResource._fetch({
       path: `/commerce/plans`,
       method: 'GET',
