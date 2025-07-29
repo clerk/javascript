@@ -1,6 +1,6 @@
 {
   "name": "@clerk/express",
-  "version": "1.7.13",
+  "version": "1.7.14",
   "description": "Clerk server SDK for usage with Express",
   "keywords": [
     "clerk",
@@ -63,9 +63,8 @@
     "lint:attw": "attw --pack . --profile node16",
     "lint:publint": "publint",
     "publish:local": "pnpm yalc push --replace  --sig",
-    "test": "jest",
-    "test:cache:clear": "jest --clearCache --useStderr",
-    "test:ci": "jest --maxWorkers=70%"
+    "test": "vitest run",
+    "test:watch": "vitest watch"
   },
   "dependencies": {
     "@clerk/backend": "workspace:^",

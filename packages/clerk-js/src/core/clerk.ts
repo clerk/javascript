@@ -485,10 +485,8 @@ export class Clerk implements ClerkInterface {
     const executeSignOut = async () => {
       const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
 
-      // Notify other tabs that user is signing out.
+      // Notify other tabs that user is signing out and clean up cookies.
       eventBus.emit(events.UserSignOut, null);
-      // Clean up cookies
-      eventBus.emit(events.TokenUpdate, { token: null });
 
       this.#setTransitiveState();
 
@@ -1327,6 +1325,29 @@ export class Clerk implements ClerkInterface {
   };
 
   #handlePendingSession = async (session: PendingSessionResource) => {
+    /**
+     * Do not revalidate server cache when `setActive` is called with a pending
+     * session within components, to avoid flash of content and unmount during
+     * internal navigation
+     */
+    const shouldInvalidateCache = !this.#componentNavigationContext;
+
+    const onBeforeSetActive: SetActiveHook =
+      shouldInvalidateCache &&
+      typeof window !== 'undefined' &&
+      typeof window.__unstable__onBeforeSetActive === 'function'
+        ? window.__unstable__onBeforeSetActive
+        : noop;
+
+    const onAfterSetActive: SetActiveHook =
+      shouldInvalidateCache &&
+      typeof window !== 'undefined' &&
+      typeof window.__unstable__onAfterSetActive === 'function'
+        ? window.__unstable__onAfterSetActive
+        : noop;
+
+    await onBeforeSetActive();
+
     if (!this.environment) {
       return;
     }
@@ -1360,6 +1381,8 @@ export class Clerk implements ClerkInterface {
 
     this.#setAccessors(session);
     this.#emit();
+
+    await onAfterSetActive();
   };
 
   public __internal_navigateToTaskIfAvailable = async ({

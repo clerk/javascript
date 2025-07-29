@@ -189,7 +189,7 @@ const SubscriptionDetailsFooter = withCardStateProvider(() => {
     setLoading();
 
     await selectedSubscription
-      .cancel({ orgId: subscriberType === 'org' ? organization?.id : undefined })
+      .cancel({ orgId: subscriberType === 'organization' ? organization?.id : undefined })
       .then(() => {
         onSubscriptionCancel?.();
         if (setIsOpen) {
@@ -381,7 +381,7 @@ const SubscriptionCardActions = ({ subscription }: { subscription: CommerceSubsc
               openCheckout({
                 planId: subscription.plan.id,
                 planPeriod: subscription.planPeriod === 'month' ? 'annual' : 'month',
-                subscriberType,
+                for: subscriberType,
               });
             },
           }
@@ -403,7 +403,7 @@ const SubscriptionCardActions = ({ subscription }: { subscription: CommerceSubsc
               openCheckout({
                 planId: subscription.plan.id,
                 planPeriod: subscription.planPeriod,
-                subscriberType,
+                for: subscriberType,
               });
             },
           }

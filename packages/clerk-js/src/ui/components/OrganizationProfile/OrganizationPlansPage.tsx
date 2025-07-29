@@ -53,7 +53,7 @@ const OrganizationPlansPageInternal = () => {
 
 export const OrganizationPlansPage = () => {
   return (
-    <SubscriberTypeContext.Provider value='org'>
+    <SubscriberTypeContext.Provider value='organization'>
       <OrganizationPlansPageInternal />
     </SubscriberTypeContext.Provider>
   );

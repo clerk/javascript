@@ -1,6 +1,6 @@
 {
   "name": "@clerk/fastify",
-  "version": "2.4.13",
+  "version": "2.4.14",
   "description": "Clerk SDK for Fastify",
   "keywords": [
     "auth",
@@ -61,8 +61,8 @@
     "lint:attw": "attw --pack . --profile node16 --ignore-rules unexpected-module-syntax",
     "lint:publint": "publint",
     "publish:local": "pnpm yalc push --replace  --sig",
-    "test": "jest",
-    "test:cache:clear": "jest --clearCache --useStderr"
+    "test": "vitest run",
+    "test:watch": "vitest watch"
   },
   "dependencies": {
     "@clerk/backend": "workspace:^",
