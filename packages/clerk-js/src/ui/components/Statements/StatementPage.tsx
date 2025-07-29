@@ -34,12 +34,16 @@ export const StatementPage = () => {
     error,
   } = useSWR(
     params.statementId
-      ? { type: 'statement', id: params.statementId, orgId: subscriberType === 'org' ? organization?.id : undefined }
+      ? {
+          type: 'statement',
+          id: params.statementId,
+          orgId: subscriberType === 'organization' ? organization?.id : undefined,
+        }
       : null,
     () =>
       clerk.billing.getStatement({
         id: params.statementId,
-        orgId: subscriberType === 'org' ? organization?.id : undefined,
+        orgId: subscriberType === 'organization' ? organization?.id : undefined,
       }),
   );
 

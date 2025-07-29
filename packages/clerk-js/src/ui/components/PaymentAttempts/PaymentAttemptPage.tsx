@@ -42,13 +42,13 @@ export const PaymentAttemptPage = () => {
       ? {
           type: 'payment-attempt',
           id: params.paymentAttemptId,
-          orgId: subscriberType === 'org' ? organization?.id : undefined,
+          orgId: subscriberType === 'organization' ? organization?.id : undefined,
         }
       : null,
     () =>
       clerk.billing.getPaymentAttempt({
         id: params.paymentAttemptId,
-        orgId: subscriberType === 'org' ? organization?.id : undefined,
+        orgId: subscriberType === 'organization' ? organization?.id : undefined,
       }),
   );
 
