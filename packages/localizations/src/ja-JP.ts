@@ -425,7 +425,7 @@ export const jaJP: LocalizationResource = {
       headerTitle__general: '一般',
       headerTitle__members: 'メンバー',
       profileSection: {
-        primaryButton: undefined,
+        primaryButton: 'プロフィールを更新',
         title: '組織プロフィール',
         uploadAction__title: 'ロゴ',
       },
