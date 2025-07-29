@@ -1259,6 +1259,17 @@ describe('tokens.authenticateRequest(options)', () => {
       expect(requestState).toBeMachineAuthenticated();
     });
 
+    test('throws an error if acceptsToken is machine_token but machineSecret or secretKey is not provided', async () => {
+      const request = mockRequest({ authorization: `Bearer ${mockTokens.machine_token}` });
+
+      await expect(
+        authenticateRequest(request, mockOptions({ acceptsToken: 'machine_token', secretKey: undefined })),
+      ).rejects.toThrow(
+        'Machine token authentication requires either a machine secret or a Clerk secret key. ' +
+          'Provide either the `machineSecret` option or ensure Clerk secret key is set.',
+      );
+    });
+
     describe('Any Token Type Authentication', () => {
       test.each(tokenTypes)('accepts %s when acceptsToken is "any"', async tokenType => {
         const mockToken = mockTokens[tokenType];

@@ -55,3 +55,18 @@ clerkClient.machineTokens.verifySecret({
     secret: 'mt_secret_xxxxx',
 })
 ```
+
+To verify machine-to-machine tokens using when using `authenticateRequest()` with a machine secret, use the `machineSecret` option:
+
+```ts
+const clerkClient = createClerkClient()
+
+const authReq = await clerkClient.authenticateRequest(c.req.raw, {
+  acceptsToken: 'machine_token',
+  machineSecret: 'ak_xxxxx'
+})
+
+if (authReq.isAuthenticated) {
+    // ... do something
+}
+```
