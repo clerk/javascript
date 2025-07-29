@@ -91,7 +91,7 @@ export type __experimental_CheckoutInstance = {
   confirm: (params: ConfirmCheckoutParams) => Promise<CheckoutResult>;
   start: () => Promise<CheckoutResult>;
   clear: () => void;
-  finalize: (params?: { redirectUrl: string }) => void;
+  finalize: (params?: { redirectUrl: string }) => Promise<void>;
   subscribe: (listener: (state: __experimental_CheckoutCacheState) => void) => () => void;
   getState: () => __experimental_CheckoutCacheState;
 };
