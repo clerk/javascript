@@ -1,4 +1,5 @@
 import type { Request, RequestHandler, Response } from 'express';
+import { vi } from 'vitest';
 
 import { clerkMiddleware } from '../clerkMiddleware';
 import { getAuth } from '../getAuth';
@@ -121,7 +122,7 @@ describe('clerkMiddleware', () => {
       headers: { host: 'example.com' },
     } as Request;
     const res = {} as Response;
-    const mockNext = jest.fn();
+    const mockNext = vi.fn();
 
     clerkMiddleware()(req, res, mockNext);
 
