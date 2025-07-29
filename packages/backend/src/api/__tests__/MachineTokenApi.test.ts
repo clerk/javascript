@@ -23,7 +23,7 @@ describe('MachineTokenAPI', () => {
   };
 
   describe('create', () => {
-    it('accepts a machine secret as authorization header', async () => {
+    it('creates a m2m token using machine secret', async () => {
       const apiClient = createBackendApiClient({
         apiUrl: 'https://api.clerk.test',
       });
@@ -58,8 +58,7 @@ describe('MachineTokenAPI', () => {
       server.use(
         http.post(
           'https://api.clerk.test/m2m_tokens',
-          validateHeaders(({ request }) => {
-            expect(request.headers.get('Authorization')).toBe('Bearer sk_xxxxx');
+          validateHeaders(() => {
             return HttpResponse.json(mockM2MToken);
           }),
         ),
@@ -86,7 +85,7 @@ describe('MachineTokenAPI', () => {
       updated_at: 1753743316590,
     };
 
-    it('accepts a machine secret as authorization header', async () => {
+    it('revokes a m2m token using machine secret', async () => {
       const apiClient = createBackendApiClient({
         apiUrl: 'https://api.clerk.test',
       });
@@ -98,9 +97,13 @@ describe('MachineTokenAPI', () => {
       };
 
       server.use(
-        http.post(`https://api.clerk.test/m2m_tokens/${m2mId}/revoke`, () => {
-          return HttpResponse.json(mockRevokedM2MToken);
-        }),
+        http.post(
+          `https://api.clerk.test/m2m_tokens/${m2mId}/revoke`,
+          validateHeaders(({ request }) => {
+            expect(request.headers.get('Authorization')).toBe('Bearer ak_xxxxx');
+            return HttpResponse.json(mockRevokedM2MToken);
+          }),
+        ),
       );
 
       const response = await apiClient.machineTokens.revoke(revokeParams);
@@ -110,7 +113,7 @@ describe('MachineTokenAPI', () => {
       expect(response.revocationReason).toBe('revoked by test');
     });
 
-    it('accepts an instance secret as authorization header', async () => {
+    it('revokes a m2m token using instance secret', async () => {
       const apiClient = createBackendApiClient({
         apiUrl: 'https://api.clerk.test',
         secretKey: 'sk_xxxxx',
@@ -135,9 +138,13 @@ describe('MachineTokenAPI', () => {
       };
 
       server.use(
-        http.post(`https://api.clerk.test/m2m_tokens/${m2mId}/revoke`, () => {
-          return HttpResponse.json(mockRevokedM2MToken);
-        }),
+        http.post(
+          `https://api.clerk.test/m2m_tokens/${m2mId}/revoke`,
+          validateHeaders(({ request }) => {
+            expect(request.headers.get('Authorization')).toBe('Bearer sk_xxxxx');
+            return HttpResponse.json(mockRevokedM2MToken);
+          }),
+        ),
       );
 
       const response = await apiClient.machineTokens.revoke(revokeParams);
@@ -147,7 +154,7 @@ describe('MachineTokenAPI', () => {
       expect(response.revocationReason).toBe('revoked by test');
     });
 
-    it('requires a machine secret or instance secret', async () => {
+    it('requires a machine secret or instance secret to revoke a m2m token', async () => {
       const apiClient = createBackendApiClient({
         apiUrl: 'https://api.clerk.test',
       });
@@ -185,7 +192,7 @@ describe('MachineTokenAPI', () => {
   });
 
   describe('verifySecret', () => {
-    it('accepts a machine secret as authorization header', async () => {
+    it('verifies a m2m token using machine secret', async () => {
       const apiClient = createBackendApiClient({
         apiUrl: 'https://api.clerk.test',
       });
@@ -196,9 +203,13 @@ describe('MachineTokenAPI', () => {
       };
 
       server.use(
-        http.post('https://api.clerk.test/m2m_tokens/verify', () => {
-          return HttpResponse.json(mockM2MToken);
-        }),
+        http.post(
+          'https://api.clerk.test/m2m_tokens/verify',
+          validateHeaders(({ request }) => {
+            expect(request.headers.get('Authorization')).toBe('Bearer ak_xxxxx');
+            return HttpResponse.json(mockM2MToken);
+          }),
+        ),
       );
 
       const response = await apiClient.machineTokens.verifySecret(verifyParams);
@@ -207,7 +218,7 @@ describe('MachineTokenAPI', () => {
       expect(response.secret).toBe(m2mSecret);
     });
 
-    it('accepts an instance secret as authorization header', async () => {
+    it('verifies a m2m token using instance secret', async () => {
       const apiClient = createBackendApiClient({
         apiUrl: 'https://api.clerk.test',
         secretKey: 'sk_xxxxx',
@@ -218,9 +229,13 @@ describe('MachineTokenAPI', () => {
       };
 
       server.use(
-        http.post('https://api.clerk.test/m2m_tokens/verify', () => {
-          return HttpResponse.json(mockM2MToken);
-        }),
+        http.post(
+          'https://api.clerk.test/m2m_tokens/verify',
+          validateHeaders(({ request }) => {
+            expect(request.headers.get('Authorization')).toBe('Bearer sk_xxxxx');
+            return HttpResponse.json(mockM2MToken);
+          }),
+        ),
       );
 
       const response = await apiClient.machineTokens.verifySecret(verifyParams);
@@ -229,7 +244,7 @@ describe('MachineTokenAPI', () => {
       expect(response.secret).toBe(m2mSecret);
     });
 
-    it('requires a machine secret or instance secret', async () => {
+    it('requires a machine secret or instance secret to verify a m2m token', async () => {
       const apiClient = createBackendApiClient({
         apiUrl: 'https://api.clerk.test',
       });
@@ -239,20 +254,24 @@ describe('MachineTokenAPI', () => {
       };
 
       server.use(
-        http.post('https://api.clerk.test/m2m_tokens/verify', () => {
-          return HttpResponse.json(
-            {
-              errors: [
-                {
-                  code: 'authorization_header_format_invalid',
-                  message: 'Invalid Authorization header format',
-                  long_message: `Invalid Authorization header format. Must be "Bearer <YOUR_API_KEY>"`,
-                },
-              ],
-            },
-            { status: 401 },
-          );
-        }),
+        http.post(
+          'https://api.clerk.test/m2m_tokens/verify',
+          validateHeaders(({ request }) => {
+            expect(request.headers.get('Authorization')).toBeNull();
+            return HttpResponse.json(
+              {
+                errors: [
+                  {
+                    code: 'authorization_header_format_invalid',
+                    message: 'Invalid Authorization header format',
+                    long_message: `Invalid Authorization header format. Must be "Bearer <YOUR_API_KEY>"`,
+                  },
+                ],
+              },
+              { status: 401 },
+            );
+          }),
+        ),
       );
 
       const errResponse = await apiClient.machineTokens.verifySecret(verifyParams).catch(err => err);
