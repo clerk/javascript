@@ -26,7 +26,14 @@ export default defineConfig({
         console.log(`✓ Copied ${cssFile}`);
       }
     } catch (error) {
-      // No CSS files found, that's ok
+      // Handle specific errors gracefully, log unexpected ones
+      if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
+        // Directory doesn't exist or no CSS files found, that's ok
+        console.log('ℹ No themes directory or CSS files found, skipping copy');
+      } else {
+        // Log unexpected errors to avoid hiding real issues
+        console.warn('⚠ Warning: Failed to copy CSS files:', error);
+      }
     }
   },
 });
