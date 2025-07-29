@@ -158,6 +158,7 @@ export const ptBR: LocalizationResource = {
     totalDue: 'Total devido',
     totalDueToday: 'Total devido hoje',
     viewFeatures: 'Ver recursos',
+    viewPayment: undefined,
     year: 'Ano',
   },
   createOrganization: {

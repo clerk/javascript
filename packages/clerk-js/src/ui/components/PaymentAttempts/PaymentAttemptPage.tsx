@@ -1,10 +1,13 @@
+import { useClerk, useOrganization } from '@clerk/shared/react';
+import useSWR from 'swr';
+
+import { Alert } from '@/ui/elements/Alert';
 import { Header } from '@/ui/elements/Header';
 import { LineItems } from '@/ui/elements/LineItems';
 import { formatDate } from '@/ui/utils/formatDate';
 import { truncateWithEndVisible } from '@/ui/utils/truncateTextWithEndVisible';
 
-import { usePaymentAttemptsContext, useStatements } from '../../contexts';
-import { useSubscriberTypeLocalizationRoot } from '../../contexts/components';
+import { useSubscriberTypeContext, useSubscriberTypeLocalizationRoot } from '../../contexts/components';
 import {
   Badge,
   Box,
@@ -16,6 +19,7 @@ import {
   Span,
   Spinner,
   Text,
+  useLocalizations,
 } from '../../customizables';
 import { useClipboard } from '../../hooks';
 import { Check, Copy } from '../../icons';
@@ -23,11 +27,31 @@ import { useRouter } from '../../router';
 
 export const PaymentAttemptPage = () => {
   const { params, navigate } = useRouter();
-  const { isLoading } = useStatements();
-  const { getPaymentAttemptById } = usePaymentAttemptsContext();
+  const subscriberType = useSubscriberTypeContext();
+  const { organization } = useOrganization();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
+  const { t, translateError } = useLocalizations();
+  const clerk = useClerk();
 
-  const paymentAttempt = params.paymentAttemptId ? getPaymentAttemptById(params.paymentAttemptId) : null;
+  const {
+    data: paymentAttempt,
+    isLoading,
+    error,
+  } = useSWR(
+    params.paymentAttemptId
+      ? {
+          type: 'payment-attempt',
+          id: params.paymentAttemptId,
+          orgId: subscriberType === 'organization' ? organization?.id : undefined,
+        }
+      : null,
+    () =>
+      clerk.billing.getPaymentAttempt({
+        id: params.paymentAttemptId,
+        orgId: subscriberType === 'organization' ? organization?.id : undefined,
+      }),
+  );
+
   const subscriptionItem = paymentAttempt?.subscriptionItem;
 
   if (isLoading) {
@@ -61,10 +85,15 @@ export const PaymentAttemptPage = () => {
         </Header.BackLink>
       </Header.Root>
       {!paymentAttempt ? (
-        <Text
-          localizationKey={localizationKeys(`${localizationRoot}.billingPage.paymentHistorySection.notFound`)}
-          sx={{ textAlign: 'center' }}
-        />
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+          <Alert
+            variant='danger'
+            colorScheme='danger'
+          >
+            {translateError(error.errors[0]) ||
+              t(localizationKeys(`${localizationRoot}.billingPage.paymentHistorySection.notFound`))}
+          </Alert>
+        </Box>
       ) : (
         <Box
           elementDescriptor={descriptors.paymentAttemptRoot}

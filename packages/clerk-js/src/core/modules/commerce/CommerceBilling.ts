@@ -103,6 +103,18 @@ export class CommerceBilling implements CommerceBillingNamespace {
     });
   };
 
+  getStatement = async (params: { id: string; orgId?: string }): Promise<CommerceStatementResource> => {
+    const statement = (
+      await BaseResource._fetch({
+        path: params.orgId
+          ? `/organizations/${params.orgId}/commerce/statements/${params.id}`
+          : `/me/commerce/statements/${params.id}`,
+        method: 'GET',
+      })
+    )?.response as unknown as CommerceStatementJSON;
+    return new CommerceStatement(statement);
+  };
+
   getPaymentAttempts = async (
     params: GetPaymentAttemptsParams,
   ): Promise<ClerkPaginatedResponse<CommercePaymentResource>> => {
@@ -120,6 +132,16 @@ export class CommerceBilling implements CommerceBillingNamespace {
         data: payments.map(payment => new CommercePayment(payment)),
       };
     });
+  };
+
+  getPaymentAttempt = async (params: { id: string; orgId?: string }): Promise<CommercePaymentResource> => {
+    const paymentAttempt = (await BaseResource._fetch({
+      path: params.orgId
+        ? `/organizations/${params.orgId}/commerce/payment_attempts/${params.id}`
+        : `/me/commerce/payment_attempts/${params.id}`,
+      method: 'GET',
+    })) as unknown as CommercePaymentJSON;
+    return new CommercePayment(paymentAttempt);
   };
 
   startCheckout = async (params: CreateCheckoutParams) => {
