@@ -1388,8 +1388,6 @@ export class Clerk implements ClerkInterface {
   public __internal_navigateToTaskIfAvailable = async ({
     redirectUrlComplete,
   }: __internal_NavigateToTaskIfAvailableParams = {}): Promise<void> => {
-    debugger;
-
     const session = this.session;
     if (!session || !this.environment) {
       return;
