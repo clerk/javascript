@@ -1801,6 +1801,10 @@ export class Clerk implements ClerkInterface {
       }
     }
 
+    if (this.session?.currentTask) {
+      return this.__internal_navigateToTaskIfAvailable();
+    }
+
     const { displayConfig } = this.environment;
     const { firstFactorVerification } = signIn;
     const { externalAccount } = signUp.verifications;
@@ -1990,6 +1994,10 @@ export class Clerk implements ClerkInterface {
 
     if (su.externalAccountStatus === 'verified' && su.status === 'missing_requirements') {
       return navigateToNextStepSignUp({ missingFields: signUp.missingFields });
+    }
+
+    if (this.__internal_hasAfterAuthFlows && this.isSignedIn) {
+      return navigate(redirectUrls.getAfterSignInUrl());
     }
 
     return navigateToSignIn();
