@@ -24,7 +24,7 @@ type VerifyMachineTokenParams = {
 export class MachineTokenApi extends AbstractAPI {
   #requireMachineSecret(machineSecret?: string | null): asserts machineSecret is string {
     if (!machineSecret) {
-      throw new Error('A machine secret is required.');
+      throw new Error('Missing machine secret.');
     }
   }
 

@@ -67,6 +67,12 @@ export type AuthenticateRequestOptions = {
    * @default 'session_token'
    */
   acceptsToken?: TokenType | TokenType[] | 'any';
+  /**
+   * The machine secret to use when verifying machine-to-machine tokens.
+   * This will override the instance secret key.
+   * @internal
+   */
+  machineSecret?: string;
 } & VerifyTokenOptions;
 
 /**

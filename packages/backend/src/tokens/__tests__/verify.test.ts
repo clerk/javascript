@@ -97,7 +97,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
     expect(data.claims).toEqual({ foo: 'bar' });
   });
 
-  it('verifies provided Machine token', async () => {
+  it('verifies provided Machine token with instance secret key', async () => {
     const token = 'mt_8XOIucKvqHVr5tYP123456789abcdefghij';
 
     server.use(
@@ -121,7 +121,38 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
     const data = result.data as MachineToken;
     expect(data.id).toBe('m2m_ey966f1b1xf93586b2debdcadb0b3bd1');
     expect(data.subject).toBe('mch_2vYVtestTESTtestTESTtestTESTtest');
-    expect(data.scopes).toEqual(['read:foo', 'write:bar']);
+    expect(data.claims).toEqual({ foo: 'bar' });
+    expect(data.scopes).toEqual(['mch_1xxxxx', 'mch_2xxxxx']);
+  });
+
+  it('verifies provided Machine token with machine secret', async () => {
+    const token = 'mt_8XOIucKvqHVr5tYP123456789abcdefghij';
+
+    server.use(
+      http.post(
+        'https://api.clerk.test/m2m_tokens/verify',
+        validateHeaders(({ request }) => {
+          expect(request.headers.get('Authorization')).toBe('Bearer ak_xxxxx');
+          return HttpResponse.json(mockVerificationResults.machine_token);
+        }),
+      ),
+    );
+
+    const result = await verifyMachineAuthToken(token, {
+      apiUrl: 'https://api.clerk.test',
+      // @ts-expect-error - machineSecret from options
+      machineSecret: 'ak_xxxxx',
+    });
+
+    expect(result.tokenType).toBe('machine_token');
+    expect(result.data).toBeDefined();
+    expect(result.errors).toBeUndefined();
+
+    const data = result.data as MachineToken;
+    expect(data.id).toBe('m2m_ey966f1b1xf93586b2debdcadb0b3bd1');
+    expect(data.subject).toBe('mch_2vYVtestTESTtestTESTtestTESTtest');
+    expect(data.claims).toEqual({ foo: 'bar' });
+    expect(data.scopes).toEqual(['mch_1xxxxx', 'mch_2xxxxx']);
   });
 
   it('verifies provided OAuth token', async () => {

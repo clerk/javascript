@@ -60,6 +60,14 @@ function assertSignInUrlFormatAndOrigin(_signInUrl: string, origin: string) {
   }
 }
 
+function assertMachineSecretOrSecretKey(authenticateContext: AuthenticateContext) {
+  if (!authenticateContext.machineSecret && !authenticateContext.secretKey) {
+    throw new Error(
+      'Machine token authentication requires either a machine secret or a Clerk secret key. ' +
+        'Provide either the `machineSecret` option or ensure Clerk secret key is set.',
+    );
+  }
+}
 function isRequestEligibleForRefresh(
   err: TokenVerificationError,
   authenticateContext: { refreshTokenInCookie?: string },
@@ -144,20 +152,22 @@ export const authenticateRequest: AuthenticateRequest = (async (
   // Default tokenType is session_token for backwards compatibility.
   const acceptsToken = options.acceptsToken ?? TokenType.SessionToken;
 
-  // Machine tokens are header-only and don't require session-based validation
-  // (secret key, publishable key, cookies, handshake flows, etc.)
-  if (acceptsToken === TokenType.MachineToken) {
-    return authenticateMachineRequestWithTokenInHeader();
+  // machine-to-machine tokens can accept a machine secret or a secret key
+  if (acceptsToken !== TokenType.MachineToken) {
+    assertValidSecretKey(authenticateContext.secretKey);
+
+    if (authenticateContext.isSatellite) {
+      assertSignInUrlExists(authenticateContext.signInUrl, authenticateContext.secretKey);
+      if (authenticateContext.signInUrl && authenticateContext.origin) {
+        assertSignInUrlFormatAndOrigin(authenticateContext.signInUrl, authenticateContext.origin);
+      }
+      assertProxyUrlOrDomain(authenticateContext.proxyUrl || authenticateContext.domain);
+    }
   }
 
-  assertValidSecretKey(authenticateContext.secretKey);
-
-  if (authenticateContext.isSatellite) {
-    assertSignInUrlExists(authenticateContext.signInUrl, authenticateContext.secretKey);
-    if (authenticateContext.signInUrl && authenticateContext.origin) {
-      assertSignInUrlFormatAndOrigin(authenticateContext.signInUrl, authenticateContext.origin);
-    }
-    assertProxyUrlOrDomain(authenticateContext.proxyUrl || authenticateContext.domain);
+  // Make sure a machine secret or instance secret key is provided if acceptsToken is machine_token
+  if (acceptsToken === TokenType.MachineToken) {
+    assertMachineSecretOrSecretKey(authenticateContext);
   }
 
   const organizationMatcher = new OrganizationMatcher(options.organizationSyncOptions);
@@ -777,7 +787,11 @@ export const authenticateRequest: AuthenticateRequest = (async (
   }
 
   // Machine requests cannot have the token in the cookie, it must be in header.
-  if (acceptsToken === TokenType.OAuthToken || acceptsToken === TokenType.ApiKey) {
+  if (
+    acceptsToken === TokenType.OAuthToken ||
+    acceptsToken === TokenType.ApiKey ||
+    acceptsToken === TokenType.MachineToken
+  ) {
     return signedOut({
       tokenType: acceptsToken,
       authenticateContext,

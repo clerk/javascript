@@ -1242,6 +1242,23 @@ describe('tokens.authenticateRequest(options)', () => {
       });
     });
 
+    test('accepts machine secret when verifying machine-to-machine token', async () => {
+      server.use(
+        http.post(mockMachineAuthResponses.machine_token.endpoint, ({ request }) => {
+          expect(request.headers.get('Authorization')).toBe('Bearer ak_xxxxx');
+          return HttpResponse.json(mockVerificationResults.machine_token);
+        }),
+      );
+
+      const request = mockRequest({ authorization: `Bearer ${mockTokens.machine_token}` });
+      const requestState = await authenticateRequest(
+        request,
+        mockOptions({ acceptsToken: 'machine_token', machineSecret: 'ak_xxxxx' }),
+      );
+
+      expect(requestState).toBeMachineAuthenticated();
+    });
+
     describe('Any Token Type Authentication', () => {
       test.each(tokenTypes)('accepts %s when acceptsToken is "any"', async tokenType => {
         const mockToken = mockTokens[tokenType];
@@ -1281,12 +1298,12 @@ describe('tokens.authenticateRequest(options)', () => {
         const result = await authenticateRequest(request, mockOptions({ acceptsToken: 'oauth_token' }));
 
         expect(result).toBeMachineUnauthenticated({
-          tokenType: 'api_key',
+          tokenType: 'oauth_token',
           reason: AuthErrorReason.TokenTypeMismatch,
           message: '',
         });
         expect(result.toAuth()).toBeMachineUnauthenticatedToAuth({
-          tokenType: 'api_key',
+          tokenType: 'oauth_token',
           isAuthenticated: false,
         });
       });
@@ -1296,12 +1313,12 @@ describe('tokens.authenticateRequest(options)', () => {
         const result = await authenticateRequest(request, mockOptions({ acceptsToken: 'machine_token' }));
 
         expect(result).toBeMachineUnauthenticated({
-          tokenType: 'oauth_token',
+          tokenType: 'machine_token',
           reason: AuthErrorReason.TokenTypeMismatch,
           message: '',
         });
         expect(result.toAuth()).toBeMachineUnauthenticatedToAuth({
-          tokenType: 'oauth_token',
+          tokenType: 'machine_token',
           isAuthenticated: false,
         });
       });
@@ -1311,12 +1328,12 @@ describe('tokens.authenticateRequest(options)', () => {
         const result = await authenticateRequest(request, mockOptions({ acceptsToken: 'api_key' }));
 
         expect(result).toBeMachineUnauthenticated({
-          tokenType: 'machine_token',
+          tokenType: 'api_key',
           reason: AuthErrorReason.TokenTypeMismatch,
           message: '',
         });
         expect(result.toAuth()).toBeMachineUnauthenticatedToAuth({
-          tokenType: 'machine_token',
+          tokenType: 'api_key',
           isAuthenticated: false,
         });
       });

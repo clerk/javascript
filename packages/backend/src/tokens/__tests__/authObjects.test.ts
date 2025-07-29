@@ -365,7 +365,7 @@ describe('authenticatedMachineObject', () => {
       expect(authObject.tokenType).toBe('machine_token');
       expect(authObject.id).toBe('m2m_ey966f1b1xf93586b2debdcadb0b3bd1');
       expect(authObject.subject).toBe('mch_2vYVtestTESTtestTESTtestTESTtest');
-      expect(authObject.scopes).toEqual(['read:foo', 'write:bar']);
+      expect(authObject.scopes).toEqual(['mch_1xxxxx', 'mch_2xxxxx']);
       expect(authObject.machineId).toBe('mch_2vYVtestTESTtestTESTtestTESTtest');
     });
   });

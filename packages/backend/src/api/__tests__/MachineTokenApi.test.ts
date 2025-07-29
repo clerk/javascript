@@ -67,7 +67,7 @@ describe('MachineTokenAPI', () => {
       // @ts-expect-error - machineSecret is required
       const response = await apiClient.machineTokens.create({}).catch(err => err);
 
-      expect(response.message).toBe('A machine secret is required.');
+      expect(response.message).toBe('Missing machine secret.');
     });
   });
 

@@ -200,13 +200,16 @@ function handleClerkAPIError(
   };
 }
 
-async function verifyMachineToken(
+export async function verifyMachineToken(
   secret: string,
-  options: VerifyTokenOptions,
+  options: VerifyTokenOptions & { machineSecret?: string },
 ): Promise<MachineTokenReturnType<MachineToken, MachineTokenVerificationError>> {
   try {
     const client = createBackendApiClient(options);
-    const verifiedToken = await client.machineTokens.verifySecret({ secret });
+    const verifiedToken = await client.machineTokens.verifySecret({
+      secret,
+      machineSecret: options.machineSecret,
+    });
     return { data: verifiedToken, tokenType: TokenType.MachineToken, errors: undefined };
   } catch (err: any) {
     return handleClerkAPIError(TokenType.MachineToken, err, 'Machine token not found');
