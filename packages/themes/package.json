@@ -45,7 +45,7 @@
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src",
-    "lint:attw": "attw --pack . --profile node16"
+    "lint:attw": "attw --pack . --exclude-entrypoints shadcn.css --profile node16"
   },
   "dependencies": {
     "@clerk/types": "workspace:^",
