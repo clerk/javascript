@@ -160,6 +160,7 @@ export const itIT: LocalizationResource = {
     totalDue: 'Totale dovuto',
     totalDueToday: 'Totale dovuto oggi',
     viewFeatures: 'Visualizza funzionalità',
+    viewPayment: undefined,
     year: 'Anno',
   },
   createOrganization: {
