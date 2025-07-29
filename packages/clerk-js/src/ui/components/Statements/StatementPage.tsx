@@ -14,7 +14,6 @@ import {
   SimpleButton,
   Span,
   Spinner,
-  Text,
   useLocalizations,
 } from '../../customizables';
 import { ArrowRightIcon, Plus, RotateLeftRight } from '../../icons';
@@ -56,19 +55,6 @@ export const StatementPage = () => {
     );
   }
 
-  if (error) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-        <Alert
-          variant='danger'
-          colorScheme='danger'
-        >
-          {translateError(error)}
-        </Alert>
-      </Box>
-    );
-  }
-
   return (
     <>
       <Header.Root
@@ -90,10 +76,15 @@ export const StatementPage = () => {
         </Header.BackLink>
       </Header.Root>
       {!statement ? (
-        <Text
-          localizationKey={localizationKeys(`${localizationRoot}.billingPage.statementsSection.notFound`)}
-          sx={{ textAlign: 'center' }}
-        />
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+          <Alert
+            variant='danger'
+            colorScheme='danger'
+          >
+            {translateError(error.errors[0]) ||
+              t(localizationKeys(`${localizationRoot}.billingPage.statementsSection.notFound`))}
+          </Alert>
+        </Box>
       ) : (
         <Statement.Root>
           <Statement.Header

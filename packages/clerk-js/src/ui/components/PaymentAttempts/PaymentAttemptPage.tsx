@@ -30,7 +30,7 @@ export const PaymentAttemptPage = () => {
   const subscriberType = useSubscriberTypeContext();
   const { organization } = useOrganization();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
-  const { translateError } = useLocalizations();
+  const { t, translateError } = useLocalizations();
   const clerk = useClerk();
 
   const {
@@ -66,19 +66,6 @@ export const PaymentAttemptPage = () => {
     );
   }
 
-  if (error) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-        <Alert
-          variant='danger'
-          colorScheme='danger'
-        >
-          {translateError(error)}
-        </Alert>
-      </Box>
-    );
-  }
-
   return (
     <>
       <Header.Root
@@ -98,10 +85,15 @@ export const PaymentAttemptPage = () => {
         </Header.BackLink>
       </Header.Root>
       {!paymentAttempt ? (
-        <Text
-          localizationKey={localizationKeys(`${localizationRoot}.billingPage.paymentHistorySection.notFound`)}
-          sx={{ textAlign: 'center' }}
-        />
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+          <Alert
+            variant='danger'
+            colorScheme='danger'
+          >
+            {translateError(error.errors[0]) ||
+              t(localizationKeys(`${localizationRoot}.billingPage.paymentHistorySection.notFound`))}
+          </Alert>
+        </Box>
       ) : (
         <Box
           elementDescriptor={descriptors.paymentAttemptRoot}
