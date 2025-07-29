@@ -13,6 +13,13 @@ export type SessionCookieHandler = {
   get: () => string | undefined;
 };
 
+const getCookieAttributes = (): { sameSite: string; secure: boolean; partitioned: boolean } => {
+  const sameSite = __BUILD_VARIANT_CHIPS__ ? 'None' : inCrossOriginIframe() ? 'None' : 'Lax';
+  const secure = getSecureAttribute(sameSite);
+  const partitioned = __BUILD_VARIANT_CHIPS__ && secure;
+  return { sameSite, secure, partitioned };
+};
+
 /**
  * Create a short-lived JS cookie to store the current user JWT.
  * The cookie is used by the Clerk backend SDKs to identify
@@ -23,15 +30,14 @@ export const createSessionCookie = (cookieSuffix: string): SessionCookieHandler 
   const suffixedSessionCookie = createCookieHandler(getSuffixedCookieName(SESSION_COOKIE_NAME, cookieSuffix));
 
   const remove = () => {
-    sessionCookie.remove();
-    suffixedSessionCookie.remove();
+    const attributes = getCookieAttributes();
+    sessionCookie.remove(attributes);
+    suffixedSessionCookie.remove(attributes);
   };
 
   const set = (token: string) => {
     const expires = addYears(Date.now(), 1);
-    const sameSite = __BUILD_VARIANT_CHIPS__ ? 'None' : inCrossOriginIframe() ? 'None' : 'Lax';
-    const secure = getSecureAttribute(sameSite);
-    const partitioned = __BUILD_VARIANT_CHIPS__ && secure;
+    const { sameSite, secure, partitioned } = getCookieAttributes();
 
     // If setting Partitioned to true, remove the existing session cookies.
     // This is to avoid conflicts with the same cookie name without Partitioned attribute.

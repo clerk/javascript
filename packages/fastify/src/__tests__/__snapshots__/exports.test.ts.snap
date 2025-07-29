@@ -1,4 +1,14 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`/api public exports > should not include a breaking change 1`] = `
+[
+  "clerkClient",
+  "clerkPlugin",
+  "createClerkClient",
+  "getAuth",
+  "verifyToken",
+]
+`;
 
 exports[`/api public exports should not include a breaking change 1`] = `
 [

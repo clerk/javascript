@@ -63,9 +63,8 @@
     "lint:attw": "attw --pack . --profile node16",
     "lint:publint": "publint",
     "publish:local": "pnpm yalc push --replace  --sig",
-    "test": "jest",
-    "test:cache:clear": "jest --clearCache --useStderr",
-    "test:ci": "jest --maxWorkers=70%"
+    "test": "vitest run",
+    "test:watch": "vitest watch"
   },
   "dependencies": {
     "@clerk/backend": "workspace:^",

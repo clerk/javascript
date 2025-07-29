@@ -68,6 +68,8 @@ export class AuthCookieService {
       this.setClientUatCookieForDevelopmentInstances();
     });
 
+    eventBus.on(events.UserSignOut, () => this.handleSignOut());
+
     this.refreshTokenOnFocus();
     this.startPollingForToken();
 
@@ -210,6 +212,12 @@ export class AuthCookieService {
     // Treat any other error as a noop
     // TODO(debug-logs): Once debug logs is available log this error.
     // --------
+  }
+
+  private handleSignOut() {
+    this.activeCookie.remove();
+    this.sessionCookie.remove();
+    this.setClientUatCookieForDevelopmentInstances();
   }
 
   /**
