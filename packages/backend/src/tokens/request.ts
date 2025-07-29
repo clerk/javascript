@@ -139,17 +139,20 @@ export const authenticateRequest: AuthenticateRequest = (async (
   options: AuthenticateRequestOptions,
 ): Promise<RequestState<TokenType> | UnauthenticatedState<null>> => {
   const authenticateContext = await createAuthenticateContext(createClerkRequest(request), options);
-  assertValidSecretKey(authenticateContext.secretKey);
 
   // Default tokenType is session_token for backwards compatibility.
   const acceptsToken = options.acceptsToken ?? TokenType.SessionToken;
 
-  if (authenticateContext.isSatellite) {
-    assertSignInUrlExists(authenticateContext.signInUrl, authenticateContext.secretKey);
-    if (authenticateContext.signInUrl && authenticateContext.origin) {
-      assertSignInUrlFormatAndOrigin(authenticateContext.signInUrl, authenticateContext.origin);
+  if (acceptsToken !== TokenType.MachineToken) {
+    assertValidSecretKey(authenticateContext.secretKey);
+
+    if (authenticateContext.isSatellite) {
+      assertSignInUrlExists(authenticateContext.signInUrl, authenticateContext.secretKey);
+      if (authenticateContext.signInUrl && authenticateContext.origin) {
+        assertSignInUrlFormatAndOrigin(authenticateContext.signInUrl, authenticateContext.origin);
+      }
+      assertProxyUrlOrDomain(authenticateContext.proxyUrl || authenticateContext.domain);
     }
-    assertProxyUrlOrDomain(authenticateContext.proxyUrl || authenticateContext.domain);
   }
 
   const organizationMatcher = new OrganizationMatcher(options.organizationSyncOptions);
