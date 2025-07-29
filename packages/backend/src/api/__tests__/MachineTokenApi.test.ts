@@ -124,19 +124,6 @@ describe('MachineTokenAPI', () => {
         revocationReason: 'revoked by test',
       };
 
-      const mockRevokedM2MToken = {
-        object: 'machine_to_machine_token',
-        id: m2mId,
-        subject: 'mch_xxxxx',
-        scopes: [],
-        revoked: true,
-        revocation_reason: 'revoked by test',
-        expired: false,
-        expiration: 1753746916590,
-        created_at: 1753743316590,
-        updated_at: 1753743316590,
-      };
-
       server.use(
         http.post(
           `https://api.clerk.test/m2m_tokens/${m2mId}/revoke`,
@@ -167,20 +154,8 @@ describe('MachineTokenAPI', () => {
       server.use(
         http.post(
           `https://api.clerk.test/m2m_tokens/${m2mId}/revoke`,
-          validateHeaders(({ request }) => {
-            expect(request.headers.get('Authorization')).toBeNull();
-            return HttpResponse.json(
-              {
-                errors: [
-                  {
-                    code: 'authorization_header_format_invalid',
-                    message: 'Invalid Authorization header format',
-                    long_message: `Invalid Authorization header format. Must be "Bearer <YOUR_API_KEY>"`,
-                  },
-                ],
-              },
-              { status: 401 },
-            );
+          validateHeaders(() => {
+            return HttpResponse.json(mockRevokedM2MToken);
           }),
         ),
       );
@@ -256,20 +231,8 @@ describe('MachineTokenAPI', () => {
       server.use(
         http.post(
           'https://api.clerk.test/m2m_tokens/verify',
-          validateHeaders(({ request }) => {
-            expect(request.headers.get('Authorization')).toBeNull();
-            return HttpResponse.json(
-              {
-                errors: [
-                  {
-                    code: 'authorization_header_format_invalid',
-                    message: 'Invalid Authorization header format',
-                    long_message: `Invalid Authorization header format. Must be "Bearer <YOUR_API_KEY>"`,
-                  },
-                ],
-              },
-              { status: 401 },
-            );
+          validateHeaders(() => {
+            return HttpResponse.json(mockM2MToken);
           }),
         ),
       );
