@@ -1,5 +1,30 @@
 # Change Log
 
+## 2.6.1
+
+### Patch Changes
+
+- Adds scoping and secret key retrieval to machines BAPI methods: ([#6417](https://github.com/clerk/javascript/pull/6417)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  ```ts
+  // Creates a new machine scope
+  clerkClient.machines.createScope('machine_id', 'to_machine_id');
+
+  // Deletes a machine scope
+  clerkClient.machines.deleteScope('machine_id', 'other_machine_id');
+
+  // Retrieve a secret key
+  clerkClient.machines.getSecretKey('machine_id');
+  ```
+
+- Fix SAML Connection `attributeMapping` keys not being converted from camelCase to snake_case. ([#6418](https://github.com/clerk/javascript/pull/6418)) by [@tmilewski](https://github.com/tmilewski)
+
+- Fixes an issue where the Clerk SDK was improperly detecting the request's origin. ([#6393](https://github.com/clerk/javascript/pull/6393)) by [@brkalow](https://github.com/brkalow)
+
+- Updated dependencies [[`e404456`](https://github.com/clerk/javascript/commit/e4044566bca81f63c8e9c630fdec0f498ad6fc08), [`2803133`](https://github.com/clerk/javascript/commit/28031330a9810946feb44b93be10c067fb3b63ba), [`f1d9d34`](https://github.com/clerk/javascript/commit/f1d9d3482a796dd5f7796ede14159850e022cba2), [`d58b959`](https://github.com/clerk/javascript/commit/d58b9594cf65158e87dbaa90d632c45f543373e1), [`822ba1f`](https://github.com/clerk/javascript/commit/822ba1fd5e7daf665120cf183e4600a227098d53), [`d4d2612`](https://github.com/clerk/javascript/commit/d4d2612483baf356c389ef0ba5084059025481f2)]:
+  - @clerk/types@4.71.0
+  - @clerk/shared@3.16.0
+
 ## 2.6.0
 
 ### Minor Changes
