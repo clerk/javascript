@@ -200,7 +200,7 @@ function handleClerkAPIError(
   };
 }
 
-export async function verifyMachineToken(
+async function verifyMachineToken(
   secret: string,
   options: VerifyTokenOptions & { machineSecret?: string },
 ): Promise<MachineTokenReturnType<MachineToken, MachineTokenVerificationError>> {
