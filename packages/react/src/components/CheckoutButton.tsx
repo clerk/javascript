@@ -49,7 +49,7 @@ export const CheckoutButton = withClerk(
     const {
       planId,
       planPeriod,
-      subscriberType,
+      for: _for,
       onSubscriptionComplete,
       newSubscriptionRedirectUrl,
       checkoutProps,
@@ -62,7 +62,7 @@ export const CheckoutButton = withClerk(
       throw new Error('Ensure that `<CheckoutButton />` is rendered inside a `<SignedIn />` component.');
     }
 
-    if (orgId === null && subscriberType === 'org') {
+    if (orgId === null && _for === 'organization') {
       throw new Error('Wrap `<CheckoutButton for="organization" />` with a check for an active organization.');
     }
 
@@ -77,7 +77,7 @@ export const CheckoutButton = withClerk(
       return clerk.__internal_openCheckout({
         planId,
         planPeriod,
-        subscriberType,
+        for: _for,
         onSubscriptionComplete,
         newSubscriptionRedirectUrl,
         ...checkoutProps,

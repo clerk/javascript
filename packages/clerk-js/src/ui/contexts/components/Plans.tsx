@@ -25,7 +25,7 @@ import { useSubscriberTypeContext } from './SubscriberType';
 export const usePaymentMethods = () => {
   const subscriberType = useSubscriberTypeContext();
   return __experimental_usePaymentMethods({
-    for: subscriberType === 'org' ? 'organization' : 'user',
+    for: subscriberType,
     initialPage: 1,
     pageSize: 10,
     keepPreviousData: true,
@@ -35,7 +35,7 @@ export const usePaymentMethods = () => {
 export const usePaymentAttempts = () => {
   const subscriberType = useSubscriberTypeContext();
   return __experimental_usePaymentAttempts({
-    for: subscriberType === 'org' ? 'organization' : 'user',
+    for: subscriberType,
     initialPage: 1,
     pageSize: 10,
     keepPreviousData: true,
@@ -45,7 +45,7 @@ export const usePaymentAttempts = () => {
 export const useStatements = (params?: { mode: 'cache' }) => {
   const subscriberType = useSubscriberTypeContext();
   return __experimental_useStatements({
-    for: subscriberType === 'org' ? 'organization' : 'user',
+    for: subscriberType,
     initialPage: 1,
     pageSize: 10,
     keepPreviousData: true,
@@ -56,7 +56,7 @@ export const useStatements = (params?: { mode: 'cache' }) => {
 export const useSubscription = () => {
   const subscriberType = useSubscriberTypeContext();
   const subscription = __experimental_useSubscription({
-    for: subscriberType === 'org' ? 'organization' : 'user',
+    for: subscriberType,
     keepPreviousData: true,
   });
   const subscriptionItems = useMemo(
@@ -74,7 +74,7 @@ export const usePlans = (params?: { mode: 'cache' }) => {
   const subscriberType = useSubscriberTypeContext();
 
   return __experimental_usePlans({
-    for: subscriberType === 'org' ? 'organization' : 'user',
+    for: subscriberType,
     initialPage: 1,
     pageSize: 50,
     keepPreviousData: true,
@@ -303,7 +303,7 @@ export const usePlansContext = () => {
         planId: plan.id,
         // if the plan doesn't support annual, use monthly
         planPeriod: planPeriod === 'annual' && plan.annualMonthlyAmount === 0 ? 'month' : planPeriod,
-        subscriberType,
+        for: subscriberType,
         onSubscriptionComplete: () => {
           revalidateAll();
         },

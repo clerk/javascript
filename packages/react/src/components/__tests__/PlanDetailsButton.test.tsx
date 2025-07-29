@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom/vitest';
 
-import type { CommercePayerType, CommercePlanResource, Theme } from '@clerk/types';
+import type { CommercePayerResourceType, CommercePlanResource, Theme } from '@clerk/types';
 import { render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import React from 'react';
@@ -43,7 +43,7 @@ const mockPlanResource: CommercePlanResource = {
   isRecurring: true,
   currency: 'USD',
   isDefault: false,
-  forPayerType: 'user' as CommercePayerType,
+  forPayerType: 'user' as CommercePayerResourceType,
   publiclyVisible: true,
   slug: 'test-plan',
   avatarUrl: 'https://example.com/avatar.png',
