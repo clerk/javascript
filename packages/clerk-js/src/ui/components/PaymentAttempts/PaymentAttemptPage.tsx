@@ -1,10 +1,12 @@
+import { useClerk, useOrganization } from '@clerk/shared/react';
+import useSWR from 'swr';
+
 import { Header } from '@/ui/elements/Header';
 import { LineItems } from '@/ui/elements/LineItems';
 import { formatDate } from '@/ui/utils/formatDate';
 import { truncateWithEndVisible } from '@/ui/utils/truncateTextWithEndVisible';
 
-import { usePaymentAttemptsContext, useStatements } from '../../contexts';
-import { useSubscriberTypeLocalizationRoot } from '../../contexts/components';
+import { useSubscriberTypeContext, useSubscriberTypeLocalizationRoot } from '../../contexts/components';
 import {
   Badge,
   Box,
@@ -23,11 +25,20 @@ import { useRouter } from '../../router';
 
 export const PaymentAttemptPage = () => {
   const { params, navigate } = useRouter();
-  const { isLoading } = useStatements();
-  const { getPaymentAttemptById } = usePaymentAttemptsContext();
+  const subscriberType = useSubscriberTypeContext();
+  const { organization } = useOrganization();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
+  const clerk = useClerk();
 
-  const paymentAttempt = params.paymentAttemptId ? getPaymentAttemptById(params.paymentAttemptId) : null;
+  const { data: paymentAttempt, isLoading } = useSWR(
+    params.paymentAttemptId ? { type: 'payment-attempt', id: params.paymentAttemptId } : null,
+    () =>
+      clerk.billing.getPaymentAttempt({
+        id: params.paymentAttemptId,
+        orgId: subscriberType === 'org' ? organization?.id : undefined,
+      }),
+  );
+
   const subscriptionItem = paymentAttempt?.subscriptionItem;
 
   if (isLoading) {
