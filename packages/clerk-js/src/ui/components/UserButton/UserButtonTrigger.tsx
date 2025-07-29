@@ -42,6 +42,7 @@ export const UserButtonTrigger = withAvatarShimmer(
             boxElementDescriptor={descriptors.userButtonAvatarBox}
             imageElementDescriptor={descriptors.userButtonAvatarImage}
             {...user}
+            key={`user-avatar-${user?.imageUrl || 'no-image'}`}
             size={theme => theme.sizes.$7}
           />
         </Flex>
