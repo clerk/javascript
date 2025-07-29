@@ -90,8 +90,9 @@ export const PaymentAttemptPage = () => {
             variant='danger'
             colorScheme='danger'
           >
-            {translateError(error.errors[0]) ||
-              t(localizationKeys(`${localizationRoot}.billingPage.paymentHistorySection.notFound`))}
+            {error
+              ? translateError(error.errors[0])
+              : t(localizationKeys(`${localizationRoot}.billingPage.paymentHistorySection.notFound`))}
           </Alert>
         </Box>
       ) : (

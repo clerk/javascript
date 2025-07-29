@@ -85,8 +85,9 @@ export const StatementPage = () => {
             variant='danger'
             colorScheme='danger'
           >
-            {translateError(error.errors[0]) ||
-              t(localizationKeys(`${localizationRoot}.billingPage.statementsSection.notFound`))}
+            {error
+              ? translateError(error.errors[0])
+              : t(localizationKeys(`${localizationRoot}.billingPage.statementsSection.notFound`))}
           </Alert>
         </Box>
       ) : (
