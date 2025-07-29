@@ -1,4 +1,4 @@
-import type { ClerkPaginatedResponse, ClerkResource } from '@clerk/types';
+import type { ClerkPaginatedResponse, ClerkResource, ForPayerType } from '@clerk/types';
 
 import { eventMethodCalled } from '../../telemetry/events/method-called';
 import {
@@ -17,8 +17,8 @@ type CommerceHookConfig<TResource extends ClerkResource, TParams extends PagesOr
   hookName: string;
   resourceType: string;
   useFetcher: (
-    param: 'organization' | 'user',
-  ) => ((params: TParams) => Promise<ClerkPaginatedResponse<TResource>>) | undefined;
+    param: ForPayerType,
+  ) => ((params: TParams & { orgId?: string }) => Promise<ClerkPaginatedResponse<TResource>>) | undefined;
   options?: {
     unauthenticated?: boolean;
   };
@@ -45,13 +45,13 @@ export function createCommercePaginatedHook<TResource extends ClerkResource, TPa
   options,
 }: CommerceHookConfig<TResource, TParams>) {
   type HookParams = PaginatedHookConfig<PagesOrInfiniteOptions> & {
-    for: 'organization' | 'user';
+    for: ForPayerType;
   };
 
   return function useCommerceHook<T extends HookParams>(
-    params: T,
+    params?: T,
   ): PaginatedResources<TResource, T extends { infinite: true } ? true : false> {
-    const { for: _for, ...paginationParams } = params;
+    const { for: _for, ...paginationParams } = params || ({ for: 'user' } as T);
 
     useAssertWrappedByClerkProvider(hookName);
 

@@ -13,7 +13,7 @@ export const Checkout = (props: __internal_CheckoutProps) => {
   return (
     <Flow.Root flow='checkout'>
       <Flow.Part>
-        <SubscriberTypeContext.Provider value={props.subscriberType || 'user'}>
+        <SubscriberTypeContext.Provider value={props.for || 'user'}>
           <CheckoutContext.Provider
             value={{
               componentName: 'Checkout',
