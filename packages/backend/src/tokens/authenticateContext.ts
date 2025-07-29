@@ -69,7 +69,9 @@ class AuthenticateContext implements AuthenticateContext {
     // Even though the options are assigned to this later in this function
     // we set the publishableKey here because it is being used in cookies/headers/handshake-values
     // as part of getMultipleAppsCookie
-    this.initPublishableKeyValues(options);
+    if (options.acceptsToken !== 'machine_token') {
+      this.initPublishableKeyValues(options);
+    }
     this.initHeaderValues();
     // initCookieValues should be used before initHandshakeValues because it depends on suffixedCookies
     this.initCookieValues();
