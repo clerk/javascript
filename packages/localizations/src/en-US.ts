@@ -295,6 +295,7 @@ export const enUS: LocalizationResource = {
       },
       subscriptionsListSection: {
         actionLabel__newSubscription: 'Subscribe to a plan',
+        actionLabel__manageSubscription: 'Manage',
         actionLabel__switchPlan: 'Switch plans',
         tableHeader__edit: 'Edit',
         tableHeader__plan: 'Plan',
@@ -948,6 +949,7 @@ export const enUS: LocalizationResource = {
       },
       subscriptionsListSection: {
         actionLabel__newSubscription: 'Subscribe to a plan',
+        actionLabel__manageSubscription: 'Manage',
         actionLabel__switchPlan: 'Switch plans',
         tableHeader__edit: 'Edit',
         tableHeader__plan: 'Plan',

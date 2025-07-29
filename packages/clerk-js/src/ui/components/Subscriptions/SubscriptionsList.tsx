@@ -1,8 +1,9 @@
+import type { CommercePlanResource } from '@clerk/types';
 import { useMemo } from 'react';
 
+import { useProtect } from '@/ui/common/Gate';
 import { ProfileSection } from '@/ui/elements/Section';
 
-import { useProtect } from '../../common';
 import {
   useEnvironment,
   usePlansContext,
@@ -11,43 +12,42 @@ import {
   useSubscription,
 } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
-import {
-  Button,
-  Col,
-  Flex,
-  Icon,
-  localizationKeys,
-  Span,
-  Table,
-  Tbody,
-  Td,
-  Text,
-  Th,
-  Thead,
-  Tr,
-} from '../../customizables';
+import { Col, Flex, Icon, localizationKeys, Span, Table, Tbody, Td, Text, Th, Thead, Tr } from '../../customizables';
 import { ArrowsUpDown, CogFilled, Plans, Plus } from '../../icons';
 import { useRouter } from '../../router';
 import { SubscriptionBadge } from './badge';
 
+const isFreePlan = (plan: CommercePlanResource) => !plan.hasBaseFee;
+
 export function SubscriptionsList({
   title,
-  arrowButtonText,
-  arrowButtonEmptyText,
+  switchPlansLabel,
+  newSubscriptionLabel,
+  manageSubscriptionLabel,
 }: {
   title: LocalizationKey;
-  arrowButtonText: LocalizationKey;
-  arrowButtonEmptyText: LocalizationKey;
+  switchPlansLabel: LocalizationKey;
+  newSubscriptionLabel: LocalizationKey;
+  manageSubscriptionLabel: LocalizationKey;
 }) {
   const { captionForSubscription, openSubscriptionDetails } = usePlansContext();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
   const subscriberType = useSubscriberTypeContext();
-  const { subscriptionItems } = useSubscription();
-  const canManageBilling = useProtect(
-    has => has({ permission: 'org:sys_billing:manage' }) || subscriberType === 'user',
-  );
+  const { subscriptionItems, data: subscription } = useSubscription();
+  const canManageBilling =
+    useProtect(has => has({ permission: 'org:sys_billing:manage' })) || subscriberType === 'user';
   const { navigate } = useRouter();
   const { commerceSettings } = useEnvironment();
+
+  const billingPlansExist =
+    (commerceSettings.billing.user.hasPaidPlans && subscriberType === 'user') ||
+    (commerceSettings.billing.organization.hasPaidPlans && subscriberType === 'organization');
+
+  const hasActiveFreePlan = useMemo(() => {
+    return subscriptionItems.some(sub => isFreePlan(sub.plan) && sub.status === 'active');
+  }, [subscriptionItems]);
+
+  const isManageButtonVisible = canManageBilling && !!subscription && !hasActiveFreePlan;
 
   const sortedSubscriptions = useMemo(
     () =>
@@ -88,11 +88,6 @@ export function SubscriptionsList({
               <Th
                 localizationKey={localizationKeys(
                   `${localizationRoot}.billingPage.subscriptionsListSection.tableHeader__startDate`,
-                )}
-              />
-              <Th
-                localizationKey={localizationKeys(
-                  `${localizationRoot}.billingPage.subscriptionsListSection.tableHeader__edit`,
                 )}
               />
             </Tr>
@@ -164,57 +159,53 @@ export function SubscriptionsList({
                     )}
                   </Text>
                 </Td>
-                <Td
-                  sx={_ => ({
-                    textAlign: 'right',
-                  })}
-                >
-                  <Button
-                    aria-label='Manage subscription'
-                    onClick={event => openSubscriptionDetails(event)}
-                    variant='bordered'
-                    colorScheme='secondary'
-                    isDisabled={!canManageBilling}
-                    sx={t => ({
-                      width: t.sizes.$6,
-                      height: t.sizes.$6,
-                    })}
-                  >
-                    <Icon
-                      icon={CogFilled}
-                      sx={t => ({
-                        width: t.sizes.$4,
-                        height: t.sizes.$4,
-                        opacity: t.opacity.$inactive,
-                      })}
-                    />
-                  </Button>
-                </Td>
               </Tr>
             ))}
           </Tbody>
         </Table>
       )}
 
-      {(commerceSettings.billing.user.hasPaidPlans && subscriberType === 'user') ||
-      (commerceSettings.billing.organization.hasPaidPlans && subscriberType === 'organization') ? (
-        <ProfileSection.ArrowButton
-          id='subscriptionsList'
-          textLocalizationKey={subscriptionItems.length > 0 ? arrowButtonText : arrowButtonEmptyText}
-          sx={[
-            t => ({
-              justifyContent: 'start',
-              height: t.sizes.$8,
-            }),
-          ]}
-          leftIcon={subscriptionItems.length > 0 ? ArrowsUpDown : Plus}
-          leftIconSx={t => ({
-            width: t.sizes.$4,
-            height: t.sizes.$4,
-          })}
-          onClick={() => void navigate('plans')}
-        />
-      ) : null}
+      <ProfileSection.ButtonGroup id='subscriptionsList'>
+        {billingPlansExist ? (
+          <ProfileSection.ArrowButton
+            id='subscriptionsList'
+            textLocalizationKey={subscriptionItems.length > 0 ? switchPlansLabel : newSubscriptionLabel}
+            sx={[
+              t => ({
+                justifyContent: 'start',
+                height: t.sizes.$8,
+                width: isManageButtonVisible ? 'unset' : undefined,
+              }),
+            ]}
+            leftIcon={subscriptionItems.length > 0 ? ArrowsUpDown : Plus}
+            leftIconSx={t => ({
+              width: t.sizes.$4,
+              height: t.sizes.$4,
+            })}
+            onClick={() => void navigate('plans')}
+          />
+        ) : null}
+
+        {isManageButtonVisible ? (
+          <ProfileSection.ArrowButton
+            id='subscriptionsList'
+            textLocalizationKey={manageSubscriptionLabel}
+            sx={[
+              t => ({
+                justifyContent: 'start',
+                height: t.sizes.$8,
+                width: 'unset',
+              }),
+            ]}
+            leftIcon={CogFilled}
+            leftIconSx={t => ({
+              width: t.sizes.$4,
+              height: t.sizes.$4,
+            })}
+            onClick={event => openSubscriptionDetails(event)}
+          />
+        ) : null}
+      </ProfileSection.ButtonGroup>
     </ProfileSection.Root>
   );
 }

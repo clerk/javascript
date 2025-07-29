@@ -859,6 +859,7 @@ export type __internal_LocalizationResource = {
         tableHeader__edit: LocalizationValue;
         title: LocalizationValue;
         actionLabel__newSubscription: LocalizationValue;
+        actionLabel__manageSubscription: LocalizationValue;
         actionLabel__switchPlan: LocalizationValue;
       };
       paymentHistorySection: {
@@ -1086,6 +1087,7 @@ export type __internal_LocalizationResource = {
         tableHeader__edit: LocalizationValue;
         title: LocalizationValue;
         actionLabel__newSubscription: LocalizationValue;
+        actionLabel__manageSubscription: LocalizationValue;
         actionLabel__switchPlan: LocalizationValue;
       };
       paymentHistorySection: {
