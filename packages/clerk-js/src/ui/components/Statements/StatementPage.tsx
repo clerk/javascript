@@ -1,6 +1,7 @@
 import { useClerk, useOrganization } from '@clerk/shared/react';
 import useSWR from 'swr';
 
+import { Alert } from '@/ui/elements/Alert';
 import { Header } from '@/ui/elements/Header';
 import { formatDate } from '@/ui/utils/formatDate';
 
@@ -25,11 +26,17 @@ export const StatementPage = () => {
   const subscriberType = useSubscriberTypeContext();
   const { organization } = useOrganization();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
-  const { t } = useLocalizations();
+  const { t, translateError } = useLocalizations();
   const clerk = useClerk();
 
-  const { data: statement, isLoading } = useSWR(
-    params.statementId ? { type: 'statement', id: params.statementId } : null,
+  const {
+    data: statement,
+    isLoading,
+    error,
+  } = useSWR(
+    params.statementId
+      ? { type: 'statement', id: params.statementId, orgId: subscriberType === 'org' ? organization?.id : undefined }
+      : null,
     () =>
       clerk.billing.getStatement({
         id: params.statementId,
@@ -45,6 +52,19 @@ export const StatementPage = () => {
           sx={{ margin: 'auto', display: 'block' }}
           elementDescriptor={descriptors.spinner}
         />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+        <Alert
+          variant='danger'
+          colorScheme='danger'
+        >
+          {translateError(error)}
+        </Alert>
       </Box>
     );
   }

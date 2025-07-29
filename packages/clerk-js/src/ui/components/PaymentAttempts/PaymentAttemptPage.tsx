@@ -1,6 +1,7 @@
 import { useClerk, useOrganization } from '@clerk/shared/react';
 import useSWR from 'swr';
 
+import { Alert } from '@/ui/elements/Alert';
 import { Header } from '@/ui/elements/Header';
 import { LineItems } from '@/ui/elements/LineItems';
 import { formatDate } from '@/ui/utils/formatDate';
@@ -18,6 +19,7 @@ import {
   Span,
   Spinner,
   Text,
+  useLocalizations,
 } from '../../customizables';
 import { useClipboard } from '../../hooks';
 import { Check, Copy } from '../../icons';
@@ -28,10 +30,21 @@ export const PaymentAttemptPage = () => {
   const subscriberType = useSubscriberTypeContext();
   const { organization } = useOrganization();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
+  const { translateError } = useLocalizations();
   const clerk = useClerk();
 
-  const { data: paymentAttempt, isLoading } = useSWR(
-    params.paymentAttemptId ? { type: 'payment-attempt', id: params.paymentAttemptId } : null,
+  const {
+    data: paymentAttempt,
+    isLoading,
+    error,
+  } = useSWR(
+    params.paymentAttemptId
+      ? {
+          type: 'payment-attempt',
+          id: params.paymentAttemptId,
+          orgId: subscriberType === 'org' ? organization?.id : undefined,
+        }
+      : null,
     () =>
       clerk.billing.getPaymentAttempt({
         id: params.paymentAttemptId,
@@ -49,6 +62,19 @@ export const PaymentAttemptPage = () => {
           sx={{ margin: 'auto', display: 'block' }}
           elementDescriptor={descriptors.spinner}
         />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+        <Alert
+          variant='danger'
+          colorScheme='danger'
+        >
+          {translateError(error)}
+        </Alert>
       </Box>
     );
   }
