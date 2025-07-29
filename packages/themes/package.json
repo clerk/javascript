@@ -30,8 +30,7 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
-    "./shadcn.css": "./dist/themes/shadcn.css",
-    "./shadcn-source.css": "./dist/themes/shadcn-source.css"
+    "./shadcn.css": "./dist/themes/shadcn.css"
   },
   "main": "dist/index.cjs",
   "module": "dist/index.js",
@@ -46,7 +45,7 @@
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src",
-    "lint:attw": "attw --pack . --exclude-entrypoints shadcn.css shadcn-source.css --profile node16"
+    "lint:attw": "attw --pack . --exclude-entrypoints shadcn.css --profile node16"
   },
   "dependencies": {
     "@clerk/types": "workspace:^",
