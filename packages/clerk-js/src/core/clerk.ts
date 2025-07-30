@@ -31,6 +31,7 @@ import type {
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
   Clerk as ClerkInterface,
+  Clerk as ClerkInterface,
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
   ClerkOptions,
@@ -2376,8 +2377,8 @@ export class Clerk implements ClerkInterface {
     this.#authService = await AuthCookieService.create(
       this,
       this.#fapiClient,
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      this.#instanceType!,
+
+      this.#instanceType,
       this.#publicEventBus,
     );
 
@@ -2617,7 +2618,9 @@ export class Clerk implements ClerkInterface {
       }
       this.#touchThrottledUntil = Date.now() + 5_000;
 
-      void this.#touchCurrentSession(this.session);
+      if (this.#options.touchSession) {
+        void this.#touchCurrentSession(this.session);
+      }
     });
 
     /**
@@ -2648,7 +2651,7 @@ export class Clerk implements ClerkInterface {
 
   // TODO: Be more conservative about touches. Throttle, don't touch when only one user, etc
   #touchCurrentSession = async (session?: SignedInSessionResource | null): Promise<void> => {
-    if (!session || !this.#options.touchSession) {
+    if (!session) {
       return Promise.resolve();
     }
 
