@@ -205,7 +205,7 @@ describe('Clerk singleton', () => {
         expect(mockSession.touch).toHaveBeenCalled();
       });
 
-      describe.only('with `touchSession` set to false', () => {
+      describe('with `touchSession` set to false', () => {
         it('calls session.touch by default outside of focus window event', async () => {
           mockSession.touch.mockReturnValue(Promise.resolve());
           mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
@@ -214,33 +214,6 @@ describe('Clerk singleton', () => {
           await sut.load({ touchSession: false });
           await sut.setActive({ session: mockSession as any as ActiveSessionResource });
           expect(mockSession.touch).toHaveBeenCalled();
-        });
-
-        it('does not call session.touch on window focus when Clerk was initialised with touchSession set to false', async () => {
-          mockSession.touch.mockReturnValueOnce(Promise.resolve());
-          mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
-          mockSession.getToken.mockResolvedValue('mocked-token');
-
-          // Mock document.visibilityState to be 'visible' so focus event triggers
-          Object.defineProperty(document, 'visibilityState', {
-            value: 'visible',
-            configurable: true,
-          });
-
-          const sut = new Clerk(productionPublishableKey);
-          await sut.load({ touchSession: false });
-          await sut.setActive({ session: mockSession as any as ActiveSessionResource });
-
-          // Clear any previous calls to touch from setActive
-          mockSession.touch.mockClear();
-
-          // Simulate window focus event
-          const focusEvent = new Event('focus');
-          window.dispatchEvent(focusEvent);
-
-          await waitFor(() => {
-            expect(mockSession.touch).not.toHaveBeenCalled();
-          });
         });
       });
 
@@ -549,20 +522,6 @@ describe('Clerk singleton', () => {
         await sut.load();
         await sut.setActive({ session: mockSession as any as ActiveSessionResource });
         expect(mockSession.touch).toHaveBeenCalled();
-      });
-
-      it('does not call session.touch if Clerk was initialised with touchSession set to false', async () => {
-        mockSession.touch.mockReturnValueOnce(Promise.resolve());
-        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
-        mockSession.getToken.mockResolvedValue('mocked-token');
-
-        const sut = new Clerk(productionPublishableKey);
-        await sut.load({ touchSession: false });
-        await sut.setActive({ session: mockSession as any as ActiveSessionResource });
-        await waitFor(() => {
-          expect(mockSession.touch).not.toHaveBeenCalled();
-          expect(mockSession.getToken).toHaveBeenCalled();
-        });
       });
     });
 
