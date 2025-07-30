@@ -214,12 +214,12 @@ async function verifyMachineToken(
 }
 
 async function verifyOAuthToken(
-  secret: string,
+  accessToken: string,
   options: VerifyTokenOptions,
 ): Promise<MachineTokenReturnType<IdPOAuthAccessToken, MachineTokenVerificationError>> {
   try {
     const client = createBackendApiClient(options);
-    const verifiedToken = await client.idPOAuthAccessToken.verifySecret(secret);
+    const verifiedToken = await client.idPOAuthAccessToken.verifyAccessToken(accessToken);
     return { data: verifiedToken, tokenType: TokenType.OAuthToken, errors: undefined };
   } catch (err: any) {
     return handleClerkAPIError(TokenType.OAuthToken, err, 'OAuth token not found');

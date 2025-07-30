@@ -1,11 +1,5 @@
-import { useOrganization } from '@clerk/shared/react';
-import type {
-  CommerceCheckoutResource,
-  CommerceMoney,
-  CommercePaymentSourceResource,
-  ConfirmCheckoutParams,
-} from '@clerk/types';
-import type { SetupIntent } from '@stripe/stripe-js';
+import { __experimental_useCheckout as useCheckout, useOrganization } from '@clerk/shared/react';
+import type { CommerceMoney, CommercePaymentSourceResource, ConfirmCheckoutParams } from '@clerk/types';
 import { useMemo, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';
@@ -14,29 +8,29 @@ import { Drawer } from '@/ui/elements/Drawer';
 import { LineItems } from '@/ui/elements/LineItems';
 import { SegmentedControl } from '@/ui/elements/SegmentedControl';
 import { Select, SelectButton, SelectOptionList } from '@/ui/elements/Select';
+import { Tooltip } from '@/ui/elements/Tooltip';
+import { handleError } from '@/ui/utils/errorHandler';
 
 import { DevOnly } from '../../common/DevOnly';
-import { useCheckoutContext, usePaymentSources } from '../../contexts';
+import { useCheckoutContext, usePaymentMethods } from '../../contexts';
 import { Box, Button, Col, descriptors, Flex, Form, localizationKeys, Text } from '../../customizables';
-import { ChevronUpDown } from '../../icons';
-import { handleError } from '../../utils';
+import { ChevronUpDown, InformationCircle } from '../../icons';
 import * as AddPaymentSource from '../PaymentSources/AddPaymentSource';
 import { PaymentSourceRow } from '../PaymentSources/PaymentSourceRow';
-import { useCheckoutContextRoot } from './CheckoutPage';
 
 type PaymentMethodSource = 'existing' | 'new';
 
 const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
 
 export const CheckoutForm = withCardStateProvider(() => {
-  const ctx = useCheckoutContextRoot();
-  const { checkout } = ctx;
+  const { checkout } = useCheckout();
 
-  if (!checkout) {
+  const { id, plan, totals, isImmediatePlanChange, planPeriod } = checkout;
+
+  if (!id) {
     return null;
   }
 
-  const { plan, planPeriod, totals, isImmediatePlanChange } = checkout;
   const showCredits = !!totals.credit?.amount && totals.credit.amount > 0;
   const showPastDue = !!totals.pastDue?.amount && totals.pastDue.amount > 0;
   const showDowngradeInfo = !isImmediatePlanChange;
@@ -49,7 +43,7 @@ export const CheckoutForm = withCardStateProvider(() => {
           padding: t.space.$4,
           borderBottomWidth: t.borderWidths.$normal,
           borderBottomStyle: t.borderStyles.$solid,
-          borderBottomColor: t.colors.$neutralAlpha100,
+          borderBottomColor: t.colors.$borderAlpha100,
         })}
       >
         <LineItems.Root>
@@ -79,7 +73,15 @@ export const CheckoutForm = withCardStateProvider(() => {
           )}
           {showPastDue && (
             <LineItems.Group variant='tertiary'>
-              <LineItems.Title title={localizationKeys('commerce.pastDue')} />
+              <Tooltip.Root>
+                <Tooltip.Trigger>
+                  <LineItems.Title
+                    title={localizationKeys('commerce.pastDue')}
+                    icon={InformationCircle}
+                  />
+                </Tooltip.Trigger>
+                <Tooltip.Content text={localizationKeys('commerce.checkout.pastDueNotice')} />
+              </Tooltip.Root>
               <LineItems.Description text={`${totals.pastDue?.currencySymbol}${totals.pastDue?.amountFormatted}`} />
             </LineItems.Group>
           )}
@@ -106,73 +108,58 @@ export const CheckoutForm = withCardStateProvider(() => {
         </Box>
       )}
 
-      <CheckoutFormElements checkout={checkout} />
+      <CheckoutFormElements />
     </Drawer.Body>
   );
 });
 
 const useCheckoutMutations = () => {
   const { organization } = useOrganization();
-  const { subscriberType } = useCheckoutContext();
-  const { updateCheckout, checkout } = useCheckoutContextRoot();
+  const { for: _for, onSubscriptionComplete } = useCheckoutContext();
+  const { checkout } = useCheckout();
+  const { id, confirm } = checkout;
   const card = useCardState();
 
-  if (!checkout) {
+  if (!id) {
     throw new Error('Checkout not found');
   }
 
   const confirmCheckout = async (params: ConfirmCheckoutParams) => {
     card.setLoading();
     card.setError(undefined);
-    try {
-      const newCheckout = await checkout.confirm({
-        ...params,
-        ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
-      });
-      updateCheckout(newCheckout);
-    } catch (error) {
+
+    const { data, error } = await confirm({
+      ...params,
+      // TODO(@COMMERCE): Come back to this, this should not be needed
+      ...(_for === 'organization' ? { orgId: organization?.id } : {}),
+    });
+
+    if (error) {
       handleError(error, [], card.setError);
-    } finally {
-      card.setIdle();
+    } else if (data) {
+      onSubscriptionComplete?.();
     }
+    card.setIdle();
   };
 
-  const payWithExistingPaymentSource = async (e: React.FormEvent<HTMLFormElement>) => {
+  const payWithExistingPaymentSource = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const data = new FormData(e.currentTarget);
     const paymentSourceId = data.get('payment_source_id') as string;
 
-    await confirmCheckout({
+    return confirmCheckout({
       paymentSourceId,
-      ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
     });
   };
 
-  const addPaymentSourceAndPay = async (ctx: { stripeSetupIntent?: SetupIntent }) => {
-    await confirmCheckout({
+  const addPaymentSourceAndPay = (ctx: { gateway: 'stripe'; paymentToken: string }) => confirmCheckout(ctx);
+
+  const payWithTestCard = () =>
+    confirmCheckout({
       gateway: 'stripe',
-      paymentToken: ctx.stripeSetupIntent?.payment_method as string,
-      ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
+      useTestCard: true,
     });
-  };
-
-  const payWithTestCard = async () => {
-    card.setLoading();
-    card.setError(undefined);
-    try {
-      const newCheckout = await checkout.confirm({
-        gateway: 'stripe',
-        useTestCard: true,
-        ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
-      });
-      updateCheckout(newCheckout);
-    } catch (error) {
-      handleError(error, [], card.setError);
-    } finally {
-      card.setIdle();
-    }
-  };
 
   return {
     payWithExistingPaymentSource,
@@ -181,13 +168,18 @@ const useCheckoutMutations = () => {
   };
 };
 
-const CheckoutFormElements = ({ checkout }: { checkout: CommerceCheckoutResource }) => {
-  const { data } = usePaymentSources();
-  const { data: paymentSources } = data || { data: [] };
+const CheckoutFormElements = () => {
+  const { checkout } = useCheckout();
+  const { id, totals } = checkout;
+  const { data: paymentSources } = usePaymentMethods();
 
   const [paymentMethodSource, setPaymentMethodSource] = useState<PaymentMethodSource>(() =>
     paymentSources.length > 0 ? 'existing' : 'new',
   );
+
+  if (!id) {
+    return null;
+  }
 
   return (
     <Col
@@ -196,7 +188,7 @@ const CheckoutFormElements = ({ checkout }: { checkout: CommerceCheckoutResource
       sx={t => ({ padding: t.space.$4 })}
     >
       {/* only show if there are payment sources and there is a total due now */}
-      {paymentSources.length > 0 && checkout.totals.totalDueNow.amount > 0 && (
+      {paymentSources.length > 0 && totals.totalDueNow.amount > 0 && (
         <SegmentedControl.Root
           aria-label='Payment method source'
           value={paymentMethodSource}
@@ -217,9 +209,8 @@ const CheckoutFormElements = ({ checkout }: { checkout: CommerceCheckoutResource
 
       {paymentMethodSource === 'existing' && (
         <ExistingPaymentSourceForm
-          checkout={checkout}
           paymentSources={paymentSources}
-          totalDueNow={checkout.totals.totalDueNow}
+          totalDueNow={totals.totalDueNow}
         />
       )}
 
@@ -240,7 +231,7 @@ export const PayWithTestPaymentSource = () => {
         borderRadius: t.radii.$md,
         borderWidth: t.borderWidths.$normal,
         borderStyle: t.borderStyles.$solid,
-        borderColor: t.colors.$neutralAlpha100,
+        borderColor: t.colors.$borderAlpha100,
         display: 'flex',
         flexDirection: 'column',
         rowGap: t.space.$2,
@@ -287,9 +278,10 @@ export const PayWithTestPaymentSource = () => {
 
 const AddPaymentSourceForCheckout = withCardStateProvider(() => {
   const { addPaymentSourceAndPay } = useCheckoutMutations();
-  const { checkout } = useCheckoutContextRoot();
+  const { checkout } = useCheckout();
+  const { id, totals } = checkout;
 
-  if (!checkout) {
+  if (!id) {
     return null;
   }
 
@@ -302,10 +294,10 @@ const AddPaymentSourceForCheckout = withCardStateProvider(() => {
         <PayWithTestPaymentSource />
       </DevOnly>
 
-      {checkout.totals.totalDueNow.amount > 0 ? (
+      {totals.totalDueNow.amount > 0 ? (
         <AddPaymentSource.FormButton
           text={localizationKeys('commerce.pay', {
-            amount: `${checkout.totals.totalDueNow.currencySymbol}${checkout.totals.totalDueNow.amountFormatted}`,
+            amount: `${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`,
           })}
         />
       ) : (
@@ -317,18 +309,19 @@ const AddPaymentSourceForCheckout = withCardStateProvider(() => {
 
 const ExistingPaymentSourceForm = withCardStateProvider(
   ({
-    checkout,
     totalDueNow,
     paymentSources,
   }: {
-    checkout: CommerceCheckoutResource;
     totalDueNow: CommerceMoney;
     paymentSources: CommercePaymentSourceResource[];
   }) => {
+    const { checkout } = useCheckout();
+    const { paymentSource } = checkout;
+
     const { payWithExistingPaymentSource } = useCheckoutMutations();
     const card = useCardState();
     const [selectedPaymentSource, setSelectedPaymentSource] = useState<CommercePaymentSourceResource | undefined>(
-      checkout.paymentSource || paymentSources.find(p => p.isDefault),
+      paymentSource || paymentSources.find(p => p.isDefault),
     );
 
     const options = useMemo(() => {
@@ -354,7 +347,7 @@ const ExistingPaymentSourceForm = withCardStateProvider(
           rowGap: t.space.$4,
         })}
       >
-        {checkout.totals.totalDueNow.amount > 0 ? (
+        {totalDueNow.amount > 0 ? (
           <Select
             elementId='paymentSource'
             options={options}
@@ -383,7 +376,7 @@ const ExistingPaymentSourceForm = withCardStateProvider(
             <SelectOptionList
               sx={t => ({
                 paddingBlock: t.space.$1,
-                color: t.colors.$colorText,
+                color: t.colors.$colorForeground,
               })}
             />
           </Select>

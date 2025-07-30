@@ -1,6 +1,5 @@
 import type { ClerkOptions, ClientJSON, EnvironmentJSON, LoadedClerk } from '@clerk/types';
 import { jest } from '@jest/globals';
-import React from 'react';
 
 import { FlowMetadataProvider } from '@/ui/elements/contexts';
 
@@ -75,6 +74,7 @@ const unboundCreateFixtures = (
       session: clerkMock.session,
       signIn: clerkMock.client.signIn,
       signUp: clerkMock.client.signUp,
+      billing: clerkMock.billing,
       environment: environmentMock,
       router: routerMock,
       options: optionsMock,
@@ -90,7 +90,7 @@ const unboundCreateFixtures = (
     const MockClerkProvider = (props: any) => {
       const { children } = props;
 
-      const componentsWithoutContext = ['UsernameSection', 'UserProfileSection'];
+      const componentsWithoutContext = ['UsernameSection', 'UserProfileSection', 'SubscriptionDetails', 'PlanDetails'];
       const contextWrappedChildren = !componentsWithoutContext.includes(componentName) ? (
         <ComponentContextProvider
           componentName={componentName}

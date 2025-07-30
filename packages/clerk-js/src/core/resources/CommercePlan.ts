@@ -1,4 +1,9 @@
-import type { CommercePlanJSON, CommercePlanJSONSnapshot, CommercePlanResource } from '@clerk/types';
+import type {
+  CommercePayerResourceType,
+  CommercePlanJSON,
+  CommercePlanJSONSnapshot,
+  CommercePlanResource,
+} from '@clerk/types';
 
 import { BaseResource, CommerceFeature } from './internal';
 
@@ -17,7 +22,7 @@ export class CommercePlan extends BaseResource implements CommercePlanResource {
   isDefault!: boolean;
   isRecurring!: boolean;
   hasBaseFee!: boolean;
-  payerType!: string[];
+  forPayerType!: CommercePayerResourceType;
   publiclyVisible!: boolean;
   slug!: string;
   avatarUrl!: string;
@@ -47,7 +52,7 @@ export class CommercePlan extends BaseResource implements CommercePlanResource {
     this.isDefault = data.is_default;
     this.isRecurring = data.is_recurring;
     this.hasBaseFee = data.has_base_fee;
-    this.payerType = data.payer_type;
+    this.forPayerType = data.for_payer_type;
     this.publiclyVisible = data.publicly_visible;
     this.slug = data.slug;
     this.avatarUrl = data.avatar_url;
@@ -73,7 +78,7 @@ export class CommercePlan extends BaseResource implements CommercePlanResource {
       is_default: this.isDefault,
       is_recurring: this.isRecurring,
       has_base_fee: this.hasBaseFee,
-      payer_type: this.payerType,
+      for_payer_type: this.forPayerType,
       publicly_visible: this.publiclyVisible,
       slug: this.slug,
       avatar_url: this.avatarUrl,

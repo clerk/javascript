@@ -326,8 +326,14 @@ export interface PublicUserData {
   userId?: string;
 }
 
+/**
+ * Represents the current pending task of a session.
+ */
 export interface SessionTask {
-  key: 'org';
+  /**
+   * A unique identifier for the task
+   */
+  key: 'select-organization';
 }
 
 export type GetTokenOptions = {

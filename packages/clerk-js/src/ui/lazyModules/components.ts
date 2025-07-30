@@ -20,7 +20,11 @@ const componentImportPaths = {
   PricingTable: () => import(/* webpackChunkName: "pricingTable" */ '../components/PricingTable'),
   Checkout: () => import(/* webpackChunkName: "checkout" */ '../components/Checkout'),
   SessionTasks: () => import(/* webpackChunkName: "sessionTasks" */ '../components/SessionTasks'),
-  PlanDetails: () => import(/* webpackChunkName: "planDetails" */ '../components/Plans'),
+  TaskSelectOrganization: () =>
+    import(/* webpackChunkName: "taskSelectOrganization" */ '../components/SessionTasks/tasks/TaskSelectOrganization'),
+  PlanDetails: () => import(/* webpackChunkName: "planDetails" */ '../components/Plans/PlanDetails'),
+  SubscriptionDetails: () => import(/* webpackChunkName: "subscriptionDetails" */ '../components/SubscriptionDetails'),
+  APIKeys: () => import(/* webpackChunkName: "apiKeys" */ '../components/ApiKeys/ApiKeys'),
   OAuthConsent: () => import(/* webpackChunkName: "oauthConsent" */ '../components/OAuthConsent/OAuthConsent'),
 } as const;
 
@@ -97,10 +101,20 @@ export const PricingTable = lazy(() =>
   componentImportPaths.PricingTable().then(module => ({ default: module.PricingTable })),
 );
 
+export const APIKeys = lazy(() => componentImportPaths.APIKeys().then(module => ({ default: module.APIKeys })));
+
 export const Checkout = lazy(() => componentImportPaths.Checkout().then(module => ({ default: module.Checkout })));
+
+export const TaskSelectOrganization = lazy(() =>
+  componentImportPaths.TaskSelectOrganization().then(module => ({ default: module.TaskSelectOrganization })),
+);
 
 export const PlanDetails = lazy(() =>
   componentImportPaths.PlanDetails().then(module => ({ default: module.PlanDetails })),
+);
+
+export const SubscriptionDetails = lazy(() =>
+  componentImportPaths.SubscriptionDetails().then(module => ({ default: module.SubscriptionDetails })),
 );
 
 export const OAuthConsent = lazy(() =>
@@ -138,7 +152,10 @@ export const ClerkComponents = {
   PricingTable,
   Checkout,
   PlanDetails,
+  APIKeys,
   OAuthConsent,
+  SubscriptionDetails,
+  TaskSelectOrganization,
 };
 
 export type ClerkComponentName = keyof typeof ClerkComponents;

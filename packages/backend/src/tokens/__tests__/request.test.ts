@@ -16,7 +16,7 @@ import type { AuthReason } from '../authStatus';
 import { AuthErrorReason, AuthStatus } from '../authStatus';
 import { OrganizationMatcher } from '../organizationMatcher';
 import { authenticateRequest, RefreshTokenErrorReason } from '../request';
-import type { MachineTokenType } from '../tokenTypes';
+import { type MachineTokenType, TokenType } from '../tokenTypes';
 import type { AuthenticateRequestOptions } from '../types';
 
 const PK_TEST = 'pk_test_Y2xlcmsuaW5zcGlyZWQucHVtYS03NC5sY2wuZGV2JA';
@@ -236,7 +236,7 @@ expect.extend({
   toBeMachineUnauthenticated(
     received,
     expected: {
-      tokenType: MachineTokenType;
+      tokenType: MachineTokenType | null;
       reason: AuthReason;
       message: string;
     },
@@ -246,6 +246,7 @@ expect.extend({
       received.tokenType === expected.tokenType &&
       received.reason === expected.reason &&
       received.message === expected.message &&
+      !received.isAuthenticated &&
       !received.token;
 
     if (pass) {
@@ -264,15 +265,11 @@ expect.extend({
   toBeMachineUnauthenticatedToAuth(
     received,
     expected: {
-      tokenType: MachineTokenType;
+      tokenType: MachineTokenType | null;
     },
   ) {
     const pass =
-      received.tokenType === expected.tokenType &&
-      !received.claims &&
-      !received.subject &&
-      !received.name &&
-      !received.id;
+      received.tokenType === expected.tokenType && !received.isAuthenticated && !received.name && !received.id;
 
     if (pass) {
       return {
@@ -1203,7 +1200,7 @@ describe('tokens.authenticateRequest(options)', () => {
     });
 
     // Test each token type with parameterized tests
-    const tokenTypes = ['api_key', 'oauth_token', 'machine_token'] as const;
+    const tokenTypes = [TokenType.ApiKey, TokenType.OAuthToken, TokenType.MachineToken];
 
     describe.each(tokenTypes)('%s Authentication', tokenType => {
       const mockToken = mockTokens[tokenType];
@@ -1240,6 +1237,7 @@ describe('tokens.authenticateRequest(options)', () => {
         });
         expect(requestState.toAuth()).toBeMachineUnauthenticatedToAuth({
           tokenType,
+          isAuthenticated: false,
         });
       });
     });
@@ -1289,6 +1287,7 @@ describe('tokens.authenticateRequest(options)', () => {
         });
         expect(result.toAuth()).toBeMachineUnauthenticatedToAuth({
           tokenType: 'api_key',
+          isAuthenticated: false,
         });
       });
 
@@ -1303,6 +1302,7 @@ describe('tokens.authenticateRequest(options)', () => {
         });
         expect(result.toAuth()).toBeMachineUnauthenticatedToAuth({
           tokenType: 'oauth_token',
+          isAuthenticated: false,
         });
       });
 
@@ -1317,6 +1317,7 @@ describe('tokens.authenticateRequest(options)', () => {
         });
         expect(result.toAuth()).toBeMachineUnauthenticatedToAuth({
           tokenType: 'machine_token',
+          isAuthenticated: false,
         });
       });
 
@@ -1328,9 +1329,11 @@ describe('tokens.authenticateRequest(options)', () => {
           tokenType: 'machine_token',
           reason: AuthErrorReason.TokenTypeMismatch,
           message: '',
+          isAuthenticated: false,
         });
         expect(result.toAuth()).toBeMachineUnauthenticatedToAuth({
           tokenType: 'machine_token',
+          isAuthenticated: false,
         });
       });
     });
@@ -1360,12 +1363,13 @@ describe('tokens.authenticateRequest(options)', () => {
         );
 
         expect(requestState).toBeMachineUnauthenticated({
-          tokenType: 'machine_token',
+          tokenType: null,
           reason: AuthErrorReason.TokenTypeMismatch,
           message: '',
         });
         expect(requestState.toAuth()).toBeMachineUnauthenticatedToAuth({
-          tokenType: 'machine_token',
+          tokenType: null,
+          isAuthenticated: false,
         });
       });
     });
@@ -1389,6 +1393,188 @@ describe('tokens.authenticateRequest(options)', () => {
           reason: 'No token in header',
           message: '',
         });
+      });
+    });
+  });
+
+  describe('Cross-origin sync', () => {
+    beforeEach(() => {
+      server.use(
+        http.get('https://api.clerk.test/v1/jwks', () => {
+          return HttpResponse.json(mockJwks);
+        }),
+      );
+    });
+
+    test('triggers handshake for cross-origin document request on primary domain', async () => {
+      const request = mockRequestWithCookies(
+        {
+          referer: 'https://satellite.com/signin',
+          'sec-fetch-dest': 'document',
+        },
+        {
+          __session: mockJwt,
+          __client_uat: '12345',
+        },
+        'https://primary.com/dashboard',
+      );
+
+      const requestState = await authenticateRequest(request, {
+        ...mockOptions(),
+        publishableKey: PK_LIVE,
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+
+      expect(requestState).toMatchHandshake({
+        reason: AuthErrorReason.PrimaryDomainCrossOriginSync,
+        domain: 'primary.com',
+        signInUrl: 'https://primary.com/sign-in',
+      });
+    });
+
+    test('triggers handshake for cross-site document request on primary domain', async () => {
+      const request = mockRequestWithCookies(
+        {
+          referer: 'https://satellite.com/signin',
+          'sec-fetch-dest': 'document',
+          'sec-fetch-site': 'cross-site',
+        },
+        {
+          __session: mockJwt,
+          __client_uat: '12345',
+        },
+        'https://primary.com/dashboard',
+      );
+
+      const requestState = await authenticateRequest(request, {
+        ...mockOptions(),
+        publishableKey: PK_LIVE,
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+
+      expect(requestState).toMatchHandshake({
+        reason: AuthErrorReason.PrimaryDomainCrossOriginSync,
+        domain: 'primary.com',
+        signInUrl: 'https://primary.com/sign-in',
+      });
+    });
+
+    test('does not trigger handshake when referer is same origin', async () => {
+      const request = mockRequestWithCookies(
+        {
+          host: 'primary.com',
+          referer: 'https://primary.com/signin',
+          'sec-fetch-dest': 'document',
+        },
+        {
+          __session: mockJwt,
+          __client_uat: '12345',
+        },
+        'https://primary.com/dashboard',
+      );
+
+      const requestState = await authenticateRequest(request, {
+        ...mockOptions(),
+        publishableKey: PK_LIVE,
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+
+      expect(requestState).toBeSignedIn({
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+    });
+
+    test('does not trigger handshake when no referer header', async () => {
+      const request = mockRequestWithCookies(
+        {
+          'sec-fetch-dest': 'document',
+          origin: 'https://primary.com',
+        },
+        {
+          __session: mockJwt,
+          __client_uat: '12345',
+        },
+        'https://primary.com/dashboard',
+      );
+
+      const requestState = await authenticateRequest(request, {
+        ...mockOptions(),
+        publishableKey: PK_LIVE,
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+
+      expect(requestState).toBeSignedIn({
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+    });
+
+    test('does not trigger handshake for non-document requests', async () => {
+      const request = mockRequestWithCookies(
+        {
+          referer: 'https://satellite.com/signin',
+          'sec-fetch-dest': 'empty',
+          origin: 'https://primary.com',
+        },
+        {
+          __session: mockJwt,
+          __client_uat: '12345',
+        },
+        'https://primary.com/api/data',
+      );
+
+      const requestState = await authenticateRequest(request, {
+        ...mockOptions(),
+        publishableKey: PK_LIVE,
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+
+      expect(requestState).toBeSignedIn({
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+    });
+
+    test('does not trigger handshake when referer header contains invalid URL format', async () => {
+      const request = mockRequestWithCookies(
+        {
+          referer: 'invalid-url-format',
+          'sec-fetch-dest': 'document',
+          origin: 'https://primary.com',
+        },
+        {
+          __session: mockJwt,
+          __client_uat: '12345',
+        },
+        'https://primary.com/dashboard',
+      );
+
+      const requestState = await authenticateRequest(request, {
+        ...mockOptions(),
+        publishableKey: PK_LIVE,
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+
+      expect(requestState).toBeSignedIn({
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
       });
     });
   });

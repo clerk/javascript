@@ -1,3 +1,5 @@
+import type { VerificationStatus } from '@clerk/types';
+
 import type { OrganizationDomainVerificationJSON, VerificationJSON } from './JSON';
 
 /**
@@ -16,7 +18,7 @@ export class Verification {
      *  <li>`expired`: The verification has expired.</li>
      * </ul>
      */
-    readonly status: string,
+    readonly status: VerificationStatus,
     /**
      * The strategy pertaining to the parent sign-up or sign-in attempt.
      */

@@ -100,12 +100,24 @@ export type {
   PaginatedResponseJSON,
   TestingTokenJSON,
   WebhooksSvixJSON,
+  CommercePayerJSON,
+  CommercePayeeJSON,
+  CommerceAmountJSON,
+  CommerceTotalsJSON,
+  CommercePaymentSourceJSON,
+  CommercePaymentFailedReasonJSON,
+  CommerceSubscriptionCreditJSON,
+  CommercePlanJSON,
+  CommerceSubscriptionItemJSON,
+  CommercePaymentAttemptJSON,
+  CommerceSubscriptionJSON,
 } from './api/resources/JSON';
 
 /**
  * Resources
  */
 export type {
+  APIKey,
   ActorToken,
   AccountlessApplication,
   AllowlistIdentifier,
@@ -130,6 +142,7 @@ export type {
   OrganizationMembershipPublicUserData,
   OrganizationSettings,
   PhoneNumber,
+  SamlConnection,
   Session,
   SignInToken,
   SignUpAttempt,
@@ -161,5 +174,5 @@ export type {
 /**
  * Auth objects
  */
-export type { AuthObject } from './tokens/authObjects';
+export type { AuthObject, InvalidTokenAuthObject } from './tokens/authObjects';
 export type { SessionAuthObject, MachineAuthObject } from './tokens/types';

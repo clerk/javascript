@@ -12,17 +12,19 @@ import React from 'react';
 import { useEnforceCorrectRoutingProps } from './hooks/useEnforceRoutingProps';
 
 export {
+  APIKeys,
   CreateOrganization,
+  GoogleOneTap,
   OrganizationList,
   OrganizationSwitcher,
+  PricingTable,
   SignInButton,
   SignInWithMetamaskButton,
   SignOutButton,
   SignUpButton,
+  TaskSelectOrganization,
   UserButton,
-  GoogleOneTap,
   Waitlist,
-  PricingTable,
 } from '@clerk/clerk-react';
 
 // The assignment of UserProfile with BaseUserProfile props is used

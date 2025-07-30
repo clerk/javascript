@@ -1,11 +1,8 @@
 import { deprecated } from '@clerk/shared/deprecated';
 import type {
-  Autocomplete,
-  CheckAuthorizationWithCustomPermissions,
   HandleOAuthCallbackParams,
-  OrganizationCustomPermissionKey,
-  OrganizationCustomRoleKey,
   PendingSessionOptions,
+  ProtectProps as _ProtectProps,
   RedirectOptions,
 } from '@clerk/types';
 import { defineComponent } from 'vue';
@@ -63,6 +60,21 @@ export const RedirectToSignUp = defineComponent((props: RedirectOptions) => {
   return () => null;
 });
 
+export const RedirectToTask = defineComponent((props: RedirectOptions) => {
+  const { sessionCtx } = useClerkContext();
+
+  useClerkLoaded(clerk => {
+    if (!sessionCtx.value) {
+      void clerk.redirectToSignIn(props);
+      return;
+    }
+
+    void clerk.__internal_navigateToTaskIfAvailable();
+  });
+
+  return () => null;
+});
+
 /**
  * @deprecated Use [`redirectToUserProfile()`](https://clerk.com/docs/references/javascript/clerk/redirect-methods#redirect-to-user-profile) instead.
  */
@@ -107,51 +119,7 @@ export const AuthenticateWithRedirectCallback = defineComponent((props: HandleOA
   return () => null;
 });
 
-export type ProtectProps = (
-  | {
-      condition?: never;
-      role: OrganizationCustomRoleKey;
-      permission?: never;
-      feature?: never;
-      plan?: never;
-    }
-  | {
-      condition?: never;
-      role?: never;
-      feature?: never;
-      plan?: never;
-      permission: OrganizationCustomPermissionKey;
-    }
-  | {
-      condition: (has: CheckAuthorizationWithCustomPermissions) => boolean;
-      role?: never;
-      permission?: never;
-      feature?: never;
-      plan?: never;
-    }
-  | {
-      condition?: never;
-      role?: never;
-      permission?: never;
-      feature: Autocomplete<`user:${string}` | `org:${string}`>;
-      plan?: never;
-    }
-  | {
-      condition?: never;
-      role?: never;
-      permission?: never;
-      feature?: never;
-      plan: Autocomplete<`user:${string}` | `org:${string}`>;
-    }
-  | {
-      condition?: never;
-      role?: never;
-      permission?: never;
-      feature?: never;
-      plan?: never;
-    }
-) &
-  PendingSessionOptions;
+export type ProtectProps = _ProtectProps & PendingSessionOptions;
 
 export const Protect = defineComponent((props: ProtectProps, { slots }) => {
   const { isLoaded, has, userId } = useAuth({ treatPendingAsSignedOut: props.treatPendingAsSignedOut });

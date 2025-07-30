@@ -5,7 +5,7 @@ import { useCallback, useMemo } from 'react';
 import type { UsePasswordCbs, UsePasswordConfig } from '../../utils/passwords/password';
 import { createValidatePassword } from '../../utils/passwords/password';
 import { localizationKeys, useLocalizations } from '../localization';
-import type { FormControlState } from '../utils';
+import type { FormControlState } from '../utils/useFormControl';
 import { generateErrorTextUtil } from './usePasswordComplexity';
 
 export const usePassword = (config: UsePasswordConfig, callbacks?: UsePasswordCbs) => {

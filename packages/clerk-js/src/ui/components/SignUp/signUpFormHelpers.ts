@@ -192,8 +192,10 @@ function getEmailAddressField({
       return;
     }
 
+    const { emailShouldBeRequired } = determineRequiredIdentifier(attributes);
+
     return {
-      required: Boolean(attributes.email_address?.required),
+      required: emailShouldBeRequired,
       disabled: !!hasTicket && !!hasEmail,
     };
   }
@@ -234,8 +236,10 @@ function getPhoneNumberField({
       return;
     }
 
+    const { phoneShouldBeRequired } = determineRequiredIdentifier(attributes);
+
     return {
-      required: Boolean(attributes.phone_number?.required),
+      required: phoneShouldBeRequired,
     };
   }
 
@@ -298,5 +302,126 @@ function getGenericField(fieldKey: FieldKey, attributes: Partial<Attributes>): F
   return {
     // @ts-expect-error - TS doesn't know that the key exists
     required: attributes[attrKey]?.required,
+  };
+}
+
+type Outcome = 'email' | 'phone' | 'username' | 'mirrorServer' | 'none';
+
+type SignUpAttributeField = {
+  enabled: boolean;
+  required: boolean;
+  firstFactor: boolean;
+};
+
+type Context = {
+  passwordRequired: boolean;
+  email: SignUpAttributeField;
+  phone: SignUpAttributeField;
+  username: SignUpAttributeField;
+};
+
+const outcomePredicates: Record<Outcome, ((ctx: Context) => boolean)[]> = {
+  mirrorServer: [
+    // If password is not required, then field requirements are determined by the server.
+    ctx => !ctx.passwordRequired,
+    // If any of the identifiers are already required by the server, then we don't need to do anything.
+    ctx => ctx.email.required || ctx.phone.required || (ctx.username.required && ctx.username.firstFactor),
+  ],
+  none: [
+    // If none of the identifiers are enabled, then none can be required.
+    ctx => !ctx.email.enabled && !ctx.phone.enabled && !ctx.username.enabled,
+  ],
+  email: [
+    // If email is the only enabled identifier, it should be required.
+    ctx => ctx.email.enabled && !ctx.phone.enabled && !ctx.username.enabled,
+    // If email is enabled but not required, and phone is enabled and not required, then email should be required.
+    ctx => ctx.email.enabled && !ctx.email.required && ctx.phone.enabled && !ctx.phone.required,
+    // If username is a first factor but not required, email can be used as an alternative.
+    ctx => ctx.username.firstFactor && !ctx.username.required && ctx.email.enabled && !ctx.email.required,
+    // If username is required but not a first factor, and both email and phone are enabled, then email is a valid identifier.
+    ctx => ctx.username.required && !ctx.username.firstFactor && ctx.email.enabled && ctx.phone.enabled,
+  ],
+  phone: [
+    ctx => ctx.phone.enabled && !ctx.email.required && !ctx.phone.required,
+    // If username is a first factor but not required, phone can be used as an alternative.
+    ctx => ctx.username.firstFactor && !ctx.username.required && ctx.phone.enabled && !ctx.phone.required,
+    // If phone is the only first factor, it should be required.
+    ctx => ctx.phone.firstFactor && !ctx.email.firstFactor && !ctx.username.firstFactor,
+    // If username is required but not a first factor, and both email and phone are enabled, then phone is a valid identifier.
+    ctx => ctx.username.required && !ctx.username.firstFactor && ctx.phone.enabled && ctx.email.enabled,
+    // If email is not enabled, but phone and username are, phone should be available.
+    ctx => !ctx.email.enabled && ctx.phone.enabled && ctx.username.enabled,
+  ],
+  username: [
+    // If username is the only first factor, it should be required.
+    ctx => ctx.username.enabled && ctx.username.firstFactor && !ctx.email.enabled && !ctx.phone.enabled,
+    // If username is required but not a first factor, and both email and phone are enabled, it should be required.
+    ctx => ctx.username.required && !ctx.username.firstFactor && ctx.email.enabled && ctx.phone.enabled,
+  ],
+};
+
+/**
+ * When password is required, we need to ensure at least one identifier
+ * (email, phone, or username) is also required
+ */
+export function determineRequiredIdentifier(attributes: Partial<Attributes>): {
+  emailShouldBeRequired: boolean;
+  phoneShouldBeRequired: boolean;
+  usernameShouldBeRequired: boolean;
+} {
+  const ctx = {
+    passwordRequired: Boolean(attributes.password?.enabled && attributes.password.required),
+    email: {
+      enabled: Boolean(attributes.email_address?.enabled),
+      required: Boolean(attributes.email_address?.required),
+      firstFactor: Boolean(attributes.email_address?.used_for_first_factor),
+    },
+    phone: {
+      enabled: Boolean(attributes.phone_number?.enabled),
+      required: Boolean(attributes.phone_number?.required),
+      firstFactor: Boolean(attributes.phone_number?.used_for_first_factor),
+    },
+    username: {
+      enabled: Boolean(attributes.username?.enabled),
+      required: Boolean(attributes.username?.required),
+      firstFactor: Boolean(attributes.username?.used_for_first_factor),
+    },
+  };
+
+  const outcomeMet = (outcome: Outcome) => outcomePredicates[outcome].some(predicate => predicate(ctx));
+
+  if (outcomeMet('mirrorServer')) {
+    return {
+      emailShouldBeRequired: ctx.email.required,
+      phoneShouldBeRequired: ctx.phone.required,
+      usernameShouldBeRequired: ctx.username.required,
+    };
+  }
+
+  if (outcomeMet('none')) {
+    return {
+      emailShouldBeRequired: false,
+      phoneShouldBeRequired: false,
+      usernameShouldBeRequired: false,
+    };
+  }
+
+  const emailShouldBeRequired = outcomeMet('email');
+  const phoneShouldBeRequired = outcomeMet('phone');
+  const usernameShouldBeRequired = outcomeMet('username');
+
+  // If password is required and no identifier is enabled, then email is the default.
+  if (ctx.passwordRequired && !emailShouldBeRequired && !phoneShouldBeRequired && !usernameShouldBeRequired) {
+    return {
+      emailShouldBeRequired: true,
+      phoneShouldBeRequired: false,
+      usernameShouldBeRequired: false,
+    };
+  }
+
+  return {
+    emailShouldBeRequired,
+    phoneShouldBeRequired,
+    usernameShouldBeRequired,
   };
 }

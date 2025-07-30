@@ -1,27 +1,66 @@
 import type { EnhancedPage } from './app';
 import { common } from './common';
 
+type BillingPeriod = 'monthly' | 'annually';
+
 export const createPricingTablePageObject = (testArgs: { page: EnhancedPage }) => {
   const { page } = testArgs;
+
+  const locators = {
+    toggle: (planSlug: string) => page.locator(`.cl-pricingTableCard__${planSlug} .cl-pricingTableCardPeriodToggle`),
+    indicator: (planSlug: string) => page.locator(`.cl-pricingTableCard__${planSlug} .cl-switchIndicator`),
+    badge: (planSlug: string) => page.locator(`.cl-pricingTableCard__${planSlug} .cl-badge`),
+    footer: (planSlug: string) => page.locator(`.cl-pricingTableCard__${planSlug} .cl-pricingTableCardFooter`),
+  };
+
+  const ensurePricingPeriod = async (planSlug: string, period: BillingPeriod): Promise<void> => {
+    async function waitForAttribute(selector: string, attribute: string, value: string, timeout = 5000) {
+      return page
+        .waitForFunction(
+          ({ sel, attr, val }) => {
+            const element = document.querySelector(sel);
+            return element?.getAttribute(attr) === val;
+          },
+          { sel: selector, attr: attribute, val: value },
+          { timeout },
+        )
+        .then(() => {
+          return true;
+        })
+        .catch(() => {
+          return false;
+        });
+    }
+
+    const isAnnually = await waitForAttribute(
+      `.cl-pricingTableCard__${planSlug} .cl-switchIndicator`,
+      'data-checked',
+      'true',
+      500,
+    );
+
+    if (isAnnually && period === 'monthly') {
+      await locators.toggle(planSlug).click();
+    }
+
+    if (!isAnnually && period === 'annually') {
+      await locators.toggle(planSlug).click();
+    }
+  };
+
   const self = {
     ...common(testArgs),
     waitForMounted: (selector = '.cl-pricingTable-root') => {
       return page.waitForSelector(selector, { state: 'attached' });
     },
-    // clickManageSubscription: async () => {
-    //   await page.getByText('Manage subscription').click();
-    // },
     clickResubscribe: async () => {
       await page.getByText('Re-subscribe').click();
     },
     waitToBeActive: async ({ planSlug }: { planSlug: string }) => {
-      return page
-        .locator(`.cl-pricingTableCard__${planSlug} .cl-badge`)
-        .getByText('Active')
-        .waitFor({ state: 'visible' });
+      return locators.badge(planSlug).getByText('Active').waitFor({ state: 'visible' });
     },
     getPlanCardCTA: ({ planSlug }: { planSlug: string }) => {
-      return page.locator(`.cl-pricingTableCard__${planSlug} .cl-pricingTableCardFooter`).getByRole('button', {
+      return locators.footer(planSlug).getByRole('button', {
         name: /get|switch|subscribe/i,
       });
     },
@@ -32,25 +71,17 @@ export const createPricingTablePageObject = (testArgs: { page: EnhancedPage }) =
     }: {
       planSlug: string;
       shouldSwitch?: boolean;
-      period?: 'monthly' | 'annually';
+      period?: BillingPeriod;
     }) => {
       const targetButtonName =
         shouldSwitch === true ? 'Switch to this plan' : shouldSwitch === false ? /subscribe/i : /get|switch|subscribe/i;
 
       if (period) {
-        await page.locator(`.cl-pricingTableCard__${planSlug} .cl-pricingTableCardPeriodToggle`).click();
-
-        const billedAnnuallyChecked = await page
-          .locator(`.cl-pricingTableCard__${planSlug} .cl-switchIndicator`)
-          .getAttribute('data-checked');
-
-        if (billedAnnuallyChecked === 'true' && period === 'monthly') {
-          await page.locator(`.cl-pricingTableCard__${planSlug} .cl-pricingTableCardPeriodToggle`).click();
-        }
+        await ensurePricingPeriod(planSlug, period);
       }
 
-      await page
-        .locator(`.cl-pricingTableCard__${planSlug} .cl-pricingTableCardFooter`)
+      await locators
+        .footer(planSlug)
         .getByRole('button', {
           name: targetButtonName,
         })

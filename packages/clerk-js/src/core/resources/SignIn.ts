@@ -61,7 +61,6 @@ import {
   clerkInvalidStrategy,
   clerkMissingOptionError,
   clerkMissingWebAuthnPublicKeyOptions,
-  clerkUnsupportedEnvironmentWarning,
   clerkVerifyEmailAddressCalledBeforeCreate,
   clerkVerifyPasskeyCalledBeforeCreate,
   clerkVerifyWeb3WalletCalledBeforeCreate,
@@ -232,25 +231,36 @@ export class SignIn extends BaseResource implements SignInResource {
     params: AuthenticateWithRedirectParams,
     navigateCallback: (url: URL | string) => void,
   ): Promise<void> => {
-    const { strategy, redirectUrl, redirectUrlComplete, identifier, oidcPrompt } = params || {};
+    const { strategy, redirectUrl, redirectUrlComplete, identifier, oidcPrompt, continueSignIn } = params || {};
 
-    const { firstFactorVerification } =
-      (strategy === 'saml' || strategy === 'enterprise_sso') && this.id
-        ? await this.prepareFirstFactor({
-            strategy,
-            redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectUrl),
-            actionCompleteRedirectUrl: redirectUrlComplete,
-            oidcPrompt,
-          })
-        : await this.create({
-            strategy,
-            identifier,
-            redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectUrl),
-            actionCompleteRedirectUrl: redirectUrlComplete,
-            oidcPrompt,
-          });
+    const redirectUrlWithAuthToken = SignIn.clerk.buildUrlWithAuth(redirectUrl);
 
-    const { status, externalVerificationRedirectURL } = firstFactorVerification;
+    // When after-auth is enabled, redirect to SSO callback route.
+    // This ensures organization selection tasks are displayed after sign-in,
+    // rather than redirecting to potentially unprotected pages while the session is pending.
+    const actionCompleteRedirectUrl = SignIn.clerk.__internal_hasAfterAuthFlows
+      ? redirectUrlWithAuthToken
+      : redirectUrlComplete;
+
+    if (!this.id || !continueSignIn) {
+      await this.create({
+        strategy,
+        identifier,
+        redirectUrl: redirectUrlWithAuthToken,
+        actionCompleteRedirectUrl,
+      });
+    }
+
+    if (strategy === 'saml' || strategy === 'enterprise_sso') {
+      await this.prepareFirstFactor({
+        strategy,
+        redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectUrl),
+        actionCompleteRedirectUrl,
+        oidcPrompt,
+      });
+    }
+
+    const { status, externalVerificationRedirectURL } = this.firstFactorVerification;
 
     if (status === 'unverified' && externalVerificationRedirectURL) {
       navigateCallback(externalVerificationRedirectURL);
@@ -274,11 +284,6 @@ export class SignIn extends BaseResource implements SignInResource {
   };
 
   public authenticateWithWeb3 = async (params: AuthenticateWithWeb3Params): Promise<SignInResource> => {
-    if (__BUILD_DISABLE_RHC__) {
-      clerkUnsupportedEnvironmentWarning('Web3');
-      return this;
-    }
-
     const { identifier, generateSignature, strategy = 'web3_metamask_signature' } = params || {};
     const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
 
@@ -325,11 +330,6 @@ export class SignIn extends BaseResource implements SignInResource {
   };
 
   public authenticateWithMetamask = async (): Promise<SignInResource> => {
-    if (__BUILD_DISABLE_RHC__) {
-      clerkUnsupportedEnvironmentWarning('Metamask');
-      return this;
-    }
-
     const identifier = await getMetamaskIdentifier();
     return this.authenticateWithWeb3({
       identifier,
@@ -339,11 +339,6 @@ export class SignIn extends BaseResource implements SignInResource {
   };
 
   public authenticateWithCoinbaseWallet = async (): Promise<SignInResource> => {
-    if (__BUILD_DISABLE_RHC__) {
-      clerkUnsupportedEnvironmentWarning('Coinbase Wallet');
-      return this;
-    }
-
     const identifier = await getCoinbaseWalletIdentifier();
     return this.authenticateWithWeb3({
       identifier,
@@ -353,11 +348,6 @@ export class SignIn extends BaseResource implements SignInResource {
   };
 
   public authenticateWithOKXWallet = async (): Promise<SignInResource> => {
-    if (__BUILD_DISABLE_RHC__) {
-      clerkUnsupportedEnvironmentWarning('OKX Wallet');
-      return this;
-    }
-
     const identifier = await getOKXWalletIdentifier();
     return this.authenticateWithWeb3({
       identifier,

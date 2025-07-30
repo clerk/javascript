@@ -133,7 +133,7 @@ jobs:
     name: Static analysis
     permissions:
       contents: read
-      actions: write   # needed for actions/upload-artifact
+      actions: write # needed for actions/upload-artifact
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     defaults:
       run:
@@ -193,7 +193,7 @@ jobs:
     name: Unit Tests
     permissions:
       contents: read
-      actions: write   # needed for actions/upload-artifact
+      actions: write # needed for actions/upload-artifact
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     defaults:
       run:
@@ -208,9 +208,9 @@ jobs:
       matrix:
         include:
           - node-version: 18
-            test-filter: "--filter=@clerk/astro --filter=@clerk/backend --filter=@clerk/express --filter=@clerk/nextjs --filter=@clerk/clerk-react --filter=@clerk/shared --filter=@clerk/remix --filter=@clerk/tanstack-react-start --filter=@clerk/elements --filter=@clerk/vue --filter=@clerk/nuxt --filter=@clerk/clerk-expo"
+            test-filter: '--filter=@clerk/astro --filter=@clerk/backend --filter=@clerk/express --filter=@clerk/nextjs --filter=@clerk/clerk-react --filter=@clerk/shared --filter=@clerk/remix --filter=@clerk/tanstack-react-start --filter=@clerk/elements --filter=@clerk/vue --filter=@clerk/nuxt --filter=@clerk/clerk-expo'
           - node-version: 22
-            test-filter: "**"
+            test-filter: '**'
 
     steps:
       - name: Checkout Repo
@@ -266,7 +266,7 @@ jobs:
     name: Integration Tests
     permissions:
       contents: read
-      actions: write   # needed for actions/upload-artifact
+      actions: write # needed for actions/upload-artifact
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     defaults:
       run:
@@ -276,12 +276,26 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test-name: ['generic', 'express', 'quickstart', 'ap-flows', 'elements', 'localhost', 'sessions', 'astro', 'expo-web', 'tanstack-react-start', 'tanstack-react-router', 'vue', 'nuxt', 'react-router', 'billing']
+        test-name:
+          [
+            'generic',
+            'express',
+            'quickstart',
+            'ap-flows',
+            'elements',
+            'localhost',
+            'sessions',
+            'astro',
+            'expo-web',
+            'tanstack-react-start',
+            'tanstack-react-router',
+            'vue',
+            'nuxt',
+            'react-router',
+            'billing',
+          ]
         test-project: ['chrome']
         include:
-          - test-name: 'nextjs'
-            test-project: 'chrome'
-            next-version: '13'
           - test-name: 'nextjs'
             test-project: 'chrome'
             next-version: '14'
@@ -350,16 +364,16 @@ jobs:
           INTEGRATION_CERTS: '${{secrets.INTEGRATION_CERTS}}'
           INTEGRATION_ROOT_CA: '${{secrets.INTEGRATION_ROOT_CA}}'
         with:
-            script: |
-                const fs = require('fs');
-                const path = require('path');
-                const rootCa = process.env.INTEGRATION_ROOT_CA;
-                console.log('rootCa', rootCa);
-                fs.writeFileSync(path.join(process.env.GITHUB_WORKSPACE, 'integration/certs', 'rootCA.pem'), rootCa);
-                const certs = JSON.parse(process.env.INTEGRATION_CERTS);
-                for (const [name, cert] of Object.entries(certs)) {
-                    fs.writeFileSync(path.join(process.env.GITHUB_WORKSPACE, 'integration/certs', name), cert);
-                }
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            const rootCa = process.env.INTEGRATION_ROOT_CA;
+            console.log('rootCa', rootCa);
+            fs.writeFileSync(path.join(process.env.GITHUB_WORKSPACE, 'integration/certs', 'rootCA.pem'), rootCa);
+            const certs = JSON.parse(process.env.INTEGRATION_CERTS);
+            for (const [name, cert] of Object.entries(certs)) {
+                fs.writeFileSync(path.join(process.env.GITHUB_WORKSPACE, 'integration/certs', name), cert);
+            }
 
       - name: LS certs
         if: ${{ steps.task-status.outputs.affected == '1' }}
@@ -380,7 +394,6 @@ jobs:
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
           MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
           NODE_EXTRA_CA_CERTS: ${{ github.workspace }}/integration/certs/rootCA.pem
-
 
       - name: Upload test-results
         if: ${{ cancelled() || failure() }}

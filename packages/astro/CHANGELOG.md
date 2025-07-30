@@ -1,5 +1,198 @@
 # @clerk/astro
 
+## 2.10.12
+
+### Patch Changes
+
+- Updated dependencies [[`e404456`](https://github.com/clerk/javascript/commit/e4044566bca81f63c8e9c630fdec0f498ad6fc08), [`2803133`](https://github.com/clerk/javascript/commit/28031330a9810946feb44b93be10c067fb3b63ba), [`f1d9d34`](https://github.com/clerk/javascript/commit/f1d9d3482a796dd5f7796ede14159850e022cba2), [`0bdd0df`](https://github.com/clerk/javascript/commit/0bdd0dfdae49e2548081e68767addf9065b2b8f9), [`d58b959`](https://github.com/clerk/javascript/commit/d58b9594cf65158e87dbaa90d632c45f543373e1), [`232d7d3`](https://github.com/clerk/javascript/commit/232d7d37cd1bc2a4e106f1972dc395373502168d), [`822ba1f`](https://github.com/clerk/javascript/commit/822ba1fd5e7daf665120cf183e4600a227098d53), [`af615b8`](https://github.com/clerk/javascript/commit/af615b89838e46bd441d41da6a6dde29e3edf595), [`d4d2612`](https://github.com/clerk/javascript/commit/d4d2612483baf356c389ef0ba5084059025481f2)]:
+  - @clerk/types@4.71.0
+  - @clerk/shared@3.16.0
+  - @clerk/backend@2.6.1
+
+## 2.10.11
+
+### Patch Changes
+
+- Updated dependencies [[`2bbeaf3`](https://github.com/clerk/javascript/commit/2bbeaf30faa0f961b766c87c17e424ba9ecc4517), [`b0fdc9e`](https://github.com/clerk/javascript/commit/b0fdc9eaf764ca0c17cbe0810b7d240f6d9db0b6)]:
+  - @clerk/backend@2.6.0
+  - @clerk/types@4.70.1
+  - @clerk/shared@3.15.1
+
+## 2.10.10
+
+### Patch Changes
+
+- Updated dependencies [[`cd59c0e`](https://github.com/clerk/javascript/commit/cd59c0e5512a341dd8fb420aca583333c8243aa5), [`cd59c0e`](https://github.com/clerk/javascript/commit/cd59c0e5512a341dd8fb420aca583333c8243aa5)]:
+  - @clerk/types@4.70.0
+  - @clerk/shared@3.15.0
+  - @clerk/backend@2.5.2
+
+## 2.10.9
+
+### Patch Changes
+
+- Updated dependencies [[`fecc99d`](https://github.com/clerk/javascript/commit/fecc99d43cb7db5b99863829acb234cbce0da264), [`959d63d`](https://github.com/clerk/javascript/commit/959d63de27e5bfe27b46699b441dfd4e48616bf8), [`10e1060`](https://github.com/clerk/javascript/commit/10e10605b18a58f33a93caed058159c190678e74), [`92c44dd`](https://github.com/clerk/javascript/commit/92c44dd9d51e771a928a8da7004bdb8f8bdbaf58), [`a04a8f5`](https://github.com/clerk/javascript/commit/a04a8f5f81241ee41d93cd64793beca9d6296abb), [`c61855c`](https://github.com/clerk/javascript/commit/c61855c51d9c129d48c4543da3719939ad82f623), [`43ea069`](https://github.com/clerk/javascript/commit/43ea069c570dc64503fc82356ad28a2e43689d45)]:
+  - @clerk/types@4.69.0
+  - @clerk/shared@3.14.0
+  - @clerk/backend@2.5.1
+
+## 2.10.8
+
+### Patch Changes
+
+- Ensure proper typing for `SignUpButton` and only allow `unsafeMetadata={...}` when `mode="modal"` ([#6340](https://github.com/clerk/javascript/pull/6340)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`d2f6f9e`](https://github.com/clerk/javascript/commit/d2f6f9e02036a4288916fcce14f24be5d56561c4), [`a329836`](https://github.com/clerk/javascript/commit/a329836a6c64f0a551a277ccae07043456a70523), [`5fbf8df`](https://github.com/clerk/javascript/commit/5fbf8df84b6d47082a76047451274790b8579b2d), [`6041c39`](https://github.com/clerk/javascript/commit/6041c39a31e787a6065dbc3f21e1c569982a06de), [`3f1270d`](https://github.com/clerk/javascript/commit/3f1270db86a21ead0ed6f0bd4f9986485203e973), [`1d9c409`](https://github.com/clerk/javascript/commit/1d9c409d10cc88667e354664d66c5f74b8bf4ca7), [`df49349`](https://github.com/clerk/javascript/commit/df4934983ee60246cd9df217afd7384aad556387)]:
+  - @clerk/types@4.68.0
+  - @clerk/shared@3.13.0
+  - @clerk/backend@2.5.0
+
+## 2.10.7
+
+### Patch Changes
+
+- Updated dependencies [[`2a90b68`](https://github.com/clerk/javascript/commit/2a90b689550ae960496c9292ca23e0225e3425cd), [`af50905`](https://github.com/clerk/javascript/commit/af50905ea497ed3286c8c4c374498e06ca6ee82b)]:
+  - @clerk/types@4.67.0
+  - @clerk/shared@3.12.3
+  - @clerk/backend@2.4.5
+
+## 2.10.6
+
+### Patch Changes
+
+- Updated dependencies [[`8ee859c`](https://github.com/clerk/javascript/commit/8ee859ce00d1d5747c14a80fe7166303e64a4f1f)]:
+  - @clerk/shared@3.12.2
+  - @clerk/types@4.66.1
+  - @clerk/backend@2.4.4
+
+## 2.10.5
+
+### Patch Changes
+
+- Updated dependencies [[`025e304`](https://github.com/clerk/javascript/commit/025e304c4d6402dfd750ee51ac9c8fc2dea1f353), [`dedf487`](https://github.com/clerk/javascript/commit/dedf48703986d547d5b28155b0182a51030cffeb), [`b96114e`](https://github.com/clerk/javascript/commit/b96114e438638896ba536bb7a17b09cdadcd9407)]:
+  - @clerk/types@4.66.0
+  - @clerk/backend@2.4.3
+  - @clerk/shared@3.12.1
+
+## 2.10.4
+
+### Patch Changes
+
+- Updated dependencies [[`2be6a53`](https://github.com/clerk/javascript/commit/2be6a53959cb8a3127c2eb5d1aeb4248872d2c24), [`f6a1c35`](https://github.com/clerk/javascript/commit/f6a1c35bd5fb4bd2a3cd45bdaf9defe6be59d4a9), [`6826d0b`](https://github.com/clerk/javascript/commit/6826d0bbd03e844d49224565878a4326684f06b4), [`f6a1c35`](https://github.com/clerk/javascript/commit/f6a1c35bd5fb4bd2a3cd45bdaf9defe6be59d4a9), [`8fdb209`](https://github.com/clerk/javascript/commit/8fdb20913b0b0f88244099f6c6a7b979e0f79327), [`97a07f7`](https://github.com/clerk/javascript/commit/97a07f78b4b0c3dc701a2610097ec7d6232f79e7), [`e3da9f4`](https://github.com/clerk/javascript/commit/e3da9f4a17a2a5f71d7e02a81b86d6002c93cc59)]:
+  - @clerk/types@4.65.0
+  - @clerk/shared@3.12.0
+  - @clerk/backend@2.4.2
+
+## 2.10.3
+
+### Patch Changes
+
+- Updated dependencies [[`f42c4fe`](https://github.com/clerk/javascript/commit/f42c4fedfdab873129b876eba38b3677f190b460), [`ec207dc`](https://github.com/clerk/javascript/commit/ec207dcd2a13340cfa4e3b80d3d52d1b4e7d5f23), [`ec207dc`](https://github.com/clerk/javascript/commit/ec207dcd2a13340cfa4e3b80d3d52d1b4e7d5f23), [`0e0cc1f`](https://github.com/clerk/javascript/commit/0e0cc1fa85347d727a4fd3718fe45b0f0244ddd9)]:
+  - @clerk/types@4.64.0
+  - @clerk/shared@3.11.0
+  - @clerk/backend@2.4.1
+
+## 2.10.2
+
+### Patch Changes
+
+- Updated dependencies [[`c2f24da`](https://github.com/clerk/javascript/commit/c2f24dab96c052b2748a210eef45540f788654aa), [`abd8446`](https://github.com/clerk/javascript/commit/abd844609dad263d974da7fbf5e3575afce73abe), [`8387a39`](https://github.com/clerk/javascript/commit/8387a392a04906f0f10d84c61cfee36f23942f85), [`feba23c`](https://github.com/clerk/javascript/commit/feba23c85d1ff94930de61f3b6961e2ebb2f65ce), [`f2a6641`](https://github.com/clerk/javascript/commit/f2a66419b1813abc86ea98fde7475861995a1486), [`de9c01a`](https://github.com/clerk/javascript/commit/de9c01ac683f52c1919e1584faba087f92a0ca22), [`a8638b0`](https://github.com/clerk/javascript/commit/a8638b02f0daff780f3aef038983714db21db558), [`3b4b3cb`](https://github.com/clerk/javascript/commit/3b4b3cb941a1a503ce51e086e7bdd663c2a1ddc2)]:
+  - @clerk/backend@2.4.0
+  - @clerk/shared@3.10.2
+  - @clerk/types@4.63.0
+
+## 2.10.1
+
+### Patch Changes
+
+- Extract internal `ProtectProps` type to shared types to eliminate duplication across SDKs ([#6197](https://github.com/clerk/javascript/pull/6197)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`02a1f42`](https://github.com/clerk/javascript/commit/02a1f42dfdb28ea956d6cbd3fbabe10093d2fad8), [`edc0bfd`](https://github.com/clerk/javascript/commit/edc0bfdae929dad78a99dfd6275aad947d9ddd73)]:
+  - @clerk/shared@3.10.1
+  - @clerk/types@4.62.1
+  - @clerk/backend@2.3.1
+
+## 2.10.0
+
+### Minor Changes
+
+- Introduce feature or plan based authorization ([#6188](https://github.com/clerk/javascript/pull/6188)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  ## `<Protect />`
+
+  ### Plan
+
+  ```html
+  <Protect plan="my-plan" />
+  ```
+
+  ### Feature
+
+  ```html
+  <Protect feature="my-feature" />
+  ```
+
+  ### Scoped per user or per org
+
+  ```html
+  <Protect feature="org:my-feature" />
+  <Protect feature="user:my-feature" />
+  <Protect plan="org:my-plan" />
+  <Protect plan="user:my-plan" />
+  ```
+
+  ## `useAuth()` in React
+
+  ### Plan
+
+  ```ts
+  const { has } = useAuth();
+  has({ plan: 'my-plan' });
+  ```
+
+  ### Feature
+
+  ```ts
+  const { has } = useAuth();
+  has({ feature: 'my-feature' });
+  ```
+
+  ### Scoped per user or per org
+
+  ```ts
+  const { has } = useAuth();
+
+  has({ feature: 'org:my-feature' });
+  has({ feature: 'user:my-feature' });
+  has({ plan: 'user:my-plan' });
+  has({ plan: 'org:my-plan' });
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`f1be1fe`](https://github.com/clerk/javascript/commit/f1be1fe3d575c11acd04fc7aadcdec8f89829894), [`8bfdf94`](https://github.com/clerk/javascript/commit/8bfdf94646c54a5e13fcb81ebcb9df0209dbc6a1), [`bffb42a`](https://github.com/clerk/javascript/commit/bffb42aaf266a188b9ae7d16ace3024d468a3bd4), [`084e7cc`](https://github.com/clerk/javascript/commit/084e7cc5f6f6d101059bc8a6d60dc73f3262ef2f)]:
+  - @clerk/types@4.62.0
+  - @clerk/backend@2.3.0
+  - @clerk/shared@3.10.0
+
+## 2.9.2
+
+### Patch Changes
+
+- Updated dependencies [[`b495279`](https://github.com/clerk/javascript/commit/b4952796e3c7dee4ab4726de63a17b7f4265ce37), [`c3fa15d`](https://github.com/clerk/javascript/commit/c3fa15d60642b4fcbcf26e21caaca0fc60975795), [`628583a`](https://github.com/clerk/javascript/commit/628583a27ffd72521475e06f91e6f592ee87ba47), [`52d5e57`](https://github.com/clerk/javascript/commit/52d5e5768d54725b4d20d028135746493e05d44c), [`15a945c`](https://github.com/clerk/javascript/commit/15a945c02a9f6bc8d2f7d1e3534217100bf45936), [`10f3dda`](https://github.com/clerk/javascript/commit/10f3dda2beff0ce71a52c2f15c07094110078be2), [`72629b0`](https://github.com/clerk/javascript/commit/72629b06fb1fe720fa2a61462306a786a913e9a8), [`2692124`](https://github.com/clerk/javascript/commit/2692124a79369a9289ee18009667231d7e27b9ed)]:
+  - @clerk/types@4.61.0
+  - @clerk/backend@2.2.0
+  - @clerk/shared@3.9.8
+
+## 2.9.1
+
+### Patch Changes
+
+- Updated dependencies [[`19e9e11`](https://github.com/clerk/javascript/commit/19e9e11af04f13fd12975fbf7016fe0583202056), [`18bcb64`](https://github.com/clerk/javascript/commit/18bcb64a3e8b6d352d7933ed094d68214e6e80fb), [`2148166`](https://github.com/clerk/javascript/commit/214816654850272297056eebad3d846b7f8125c9), [`4319257`](https://github.com/clerk/javascript/commit/4319257dc424f121231a26bef2068cef1e78afd4), [`607d333`](https://github.com/clerk/javascript/commit/607d3331f893bc98d1a8894f57b1cb9021e71b86), [`138f733`](https://github.com/clerk/javascript/commit/138f733f13121487268a4f96e6eb2cffedc6e238), [`4118ed7`](https://github.com/clerk/javascript/commit/4118ed7c8fb13ca602401f8d663e7bcd6f6abee4), [`d832d91`](https://github.com/clerk/javascript/commit/d832d9179ff615f2799c832ec5fd9f3d79c6a940), [`6842ff1`](https://github.com/clerk/javascript/commit/6842ff1c903eaa0db161f533365a2e680995ce83), [`48be55b`](https://github.com/clerk/javascript/commit/48be55b61a86e014dd407414764d24bb43fd26f3), [`183e382`](https://github.com/clerk/javascript/commit/183e3823e4ff70e856b00a347369c38a4264105a), [`2c6f805`](https://github.com/clerk/javascript/commit/2c6f805a9e6e4685990f9a8abc740b2d0859a453), [`97749d5`](https://github.com/clerk/javascript/commit/97749d570bc687c7e05cd800a50e0ae4180a371d)]:
+  - @clerk/types@4.60.1
+  - @clerk/backend@2.1.0
+  - @clerk/shared@3.9.7
+
 ## 2.9.0
 
 ### Minor Changes
@@ -131,7 +324,7 @@
 
   ```astro
   ---
-  import { CreateOrganization } from '@clerk/astro/components'
+  import { CreateOrganization } from '@clerk/astro/components';
   ---
 
   <CreateOrganization />
@@ -475,8 +668,8 @@
   Regular usage without server islands:
 
   ```astro
-  <Protect role="admin">
-    <p slot="fallback">Not an admin</p>
+  <Protect role='admin'>
+    <p slot='fallback'>Not an admin</p>
     <p>You're an admin</p>
   </Protect>
   ```
@@ -484,9 +677,12 @@
   Example with server islands:
 
   ```astro
-  <Protect server:defer role="admin">
-    <p slot="fallback">Loading...</p>
-    <p slot="protect-fallback">Not an admin</p>
+  <Protect
+    server:defer
+    role='admin'
+  >
+    <p slot='fallback'>Loading...</p>
+    <p slot='protect-fallback'>Not an admin</p>
     <p>You're an admin</p>
   </Protect>
   ```
@@ -1121,7 +1317,7 @@
 
   ```astro
   ---
-  import { SignInButton } from '@clerk/components/astro'
+  import { SignInButton } from '@clerk/components/astro';
   ---
 
   <SignInButton asChild>

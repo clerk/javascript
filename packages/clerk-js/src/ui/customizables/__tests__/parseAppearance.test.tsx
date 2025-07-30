@@ -15,17 +15,17 @@ const themeA = {
     colorSuccess: themeAColor,
     colorWarning: themeAColor,
     colorBackground: themeAColor,
-    colorInputBackground: themeAColor,
-    colorInputText: themeAColor,
+    colorInput: themeAColor,
+    colorInputForeground: themeAColor,
     colorText: themeAColor,
-    colorTextOnPrimaryBackground: themeAColor,
+    colorPrimaryForeground: themeAColor,
     colorTextSecondary: themeAColor,
     borderRadius: '1rem',
     fontFamily: 'Comic Sans',
     fontFamilyButtons: 'Comic Sans',
     fontSize: '1rem',
     fontWeight: { normal: 600 },
-    spacingUnit: 'px',
+    spacing: '1px',
   },
 } as const;
 
@@ -37,17 +37,17 @@ const themeB = {
     colorSuccess: themeBColor,
     colorWarning: themeBColor,
     colorBackground: themeBColor,
-    colorInputBackground: themeBColor,
-    colorInputText: themeBColor,
+    colorInput: themeBColor,
+    colorInputForeground: themeBColor,
     colorText: themeBColor,
-    colorTextOnPrimaryBackground: themeBColor,
+    colorPrimaryForeground: themeBColor,
     colorTextSecondary: themeBColor,
     borderRadius: '2rem',
     fontFamily: 'Arial',
     fontFamilyButtons: 'Arial',
     fontSize: '2rem',
     fontWeight: { normal: 700 },
-    spacingUnit: 'px',
+    spacing: '2px',
   },
 } as const;
 
@@ -79,17 +79,17 @@ describe('AppearanceProvider internalTheme flows', () => {
     expect(result.current.parsedInternalTheme.colors.$success500).toBe(knownColors[themeAColor]);
     expect(result.current.parsedInternalTheme.colors.$warning500).toBe(knownColors[themeAColor]);
     expect(result.current.parsedInternalTheme.colors.$colorBackground).toBe(knownColors[themeAColor]);
-    expect(result.current.parsedInternalTheme.colors.$colorInputBackground).toBe(knownColors[themeAColor]);
-    expect(result.current.parsedInternalTheme.colors.$colorInputText).toBe(knownColors[themeAColor]);
-    expect(result.current.parsedInternalTheme.colors.$colorText).toBe(knownColors[themeAColor]);
-    expect(result.current.parsedInternalTheme.colors.$colorTextOnPrimaryBackground).toBe(knownColors[themeAColor]);
-    expect(result.current.parsedInternalTheme.colors.$colorTextSecondary).toBe(knownColors[themeAColor]);
+    expect(result.current.parsedInternalTheme.colors.$colorInput).toBe(knownColors[themeAColor]);
+    expect(result.current.parsedInternalTheme.colors.$colorInputForeground).toBe(knownColors[themeAColor]);
+    expect(result.current.parsedInternalTheme.colors.$colorForeground).toBe(knownColors[themeAColor]);
+    expect(result.current.parsedInternalTheme.colors.$colorPrimaryForeground).toBe(knownColors[themeAColor]);
+    expect(result.current.parsedInternalTheme.colors.$colorMutedForeground).toBe(knownColors[themeAColor]);
     expect(result.current.parsedInternalTheme.radii.$md).toBe(themeA.variables.borderRadius);
     expect(result.current.parsedInternalTheme.fonts.$main).toBe(themeA.variables.fontFamily);
     expect(result.current.parsedInternalTheme.fonts.$buttons).toBe(themeA.variables.fontFamily);
     expect(result.current.parsedInternalTheme.fontSizes.$md).toBe('1rem');
     expect(result.current.parsedInternalTheme.fontWeights.$normal).toBe(themeA.variables.fontWeight.normal);
-    expect(result.current.parsedInternalTheme.space.$1).toContain(themeA.variables.spacingUnit);
+    expect(result.current.parsedInternalTheme.space.$1).toContain(themeA.variables.spacing);
   });
 
   it('sets the theme correctly from the appearance prop', () => {
@@ -109,17 +109,17 @@ describe('AppearanceProvider internalTheme flows', () => {
     expect(result.current.parsedInternalTheme.colors.$success500).toBe(knownColors[themeBColor]);
     expect(result.current.parsedInternalTheme.colors.$warning500).toBe(knownColors[themeBColor]);
     expect(result.current.parsedInternalTheme.colors.$colorBackground).toBe(knownColors[themeBColor]);
-    expect(result.current.parsedInternalTheme.colors.$colorInputBackground).toBe(knownColors[themeBColor]);
-    expect(result.current.parsedInternalTheme.colors.$colorInputText).toBe(knownColors[themeBColor]);
-    expect(result.current.parsedInternalTheme.colors.$colorText).toBe(knownColors[themeBColor]);
-    expect(result.current.parsedInternalTheme.colors.$colorTextOnPrimaryBackground).toBe(knownColors[themeBColor]);
-    expect(result.current.parsedInternalTheme.colors.$colorTextSecondary).toBe(knownColors[themeBColor]);
+    expect(result.current.parsedInternalTheme.colors.$colorInput).toBe(knownColors[themeBColor]);
+    expect(result.current.parsedInternalTheme.colors.$colorInputForeground).toBe(knownColors[themeBColor]);
+    expect(result.current.parsedInternalTheme.colors.$colorForeground).toBe(knownColors[themeBColor]);
+    expect(result.current.parsedInternalTheme.colors.$colorPrimaryForeground).toBe(knownColors[themeBColor]);
+    expect(result.current.parsedInternalTheme.colors.$colorMutedForeground).toBe(knownColors[themeBColor]);
     expect(result.current.parsedInternalTheme.radii.$md).toBe(themeB.variables.borderRadius);
     expect(result.current.parsedInternalTheme.fonts.$main).toBe(themeB.variables.fontFamily);
     expect(result.current.parsedInternalTheme.fonts.$buttons).toBe(themeB.variables.fontFamily);
     expect(result.current.parsedInternalTheme.fontSizes.$md).toBe('2rem');
     expect(result.current.parsedInternalTheme.fontWeights.$normal).toBe(themeB.variables.fontWeight.normal);
-    expect(result.current.parsedInternalTheme.space.$1).toContain(themeB.variables.spacingUnit);
+    expect(result.current.parsedInternalTheme.space.$1).toContain(themeB.variables.spacing);
   });
 
   it('merges the globalAppearance with the appearance in the theme', () => {
@@ -140,17 +140,17 @@ describe('AppearanceProvider internalTheme flows', () => {
     expect(result.current.parsedInternalTheme.colors.$success500).toBe(knownColors[themeBColor]);
     expect(result.current.parsedInternalTheme.colors.$warning500).toBe(knownColors[themeBColor]);
     expect(result.current.parsedInternalTheme.colors.$colorBackground).toBe(knownColors[themeBColor]);
-    expect(result.current.parsedInternalTheme.colors.$colorInputBackground).toBe(knownColors[themeBColor]);
-    expect(result.current.parsedInternalTheme.colors.$colorInputText).toBe(knownColors[themeBColor]);
-    expect(result.current.parsedInternalTheme.colors.$colorText).toBe(knownColors[themeBColor]);
-    expect(result.current.parsedInternalTheme.colors.$colorTextOnPrimaryBackground).toBe(knownColors[themeBColor]);
-    expect(result.current.parsedInternalTheme.colors.$colorTextSecondary).toBe(knownColors[themeBColor]);
+    expect(result.current.parsedInternalTheme.colors.$colorInput).toBe(knownColors[themeBColor]);
+    expect(result.current.parsedInternalTheme.colors.$colorInputForeground).toBe(knownColors[themeBColor]);
+    expect(result.current.parsedInternalTheme.colors.$colorForeground).toBe(knownColors[themeBColor]);
+    expect(result.current.parsedInternalTheme.colors.$colorPrimaryForeground).toBe(knownColors[themeBColor]);
+    expect(result.current.parsedInternalTheme.colors.$colorMutedForeground).toBe(knownColors[themeBColor]);
     expect(result.current.parsedInternalTheme.radii.$md).toBe(themeB.variables.borderRadius);
     expect(result.current.parsedInternalTheme.fonts.$main).toBe(themeB.variables.fontFamily);
     expect(result.current.parsedInternalTheme.fonts.$buttons).toBe(themeB.variables.fontFamily);
     expect(result.current.parsedInternalTheme.fontSizes.$md).toBe('2rem');
     expect(result.current.parsedInternalTheme.fontWeights.$normal).toBe(themeB.variables.fontWeight.normal);
-    expect(result.current.parsedInternalTheme.space.$1).toContain(themeB.variables.spacingUnit);
+    expect(result.current.parsedInternalTheme.space.$1).toContain(themeB.variables.spacing);
   });
 });
 
@@ -338,7 +338,7 @@ describe('AppearanceProvider layout flows', () => {
     expect(result.current.parsedLayout.socialButtonsVariant).toBe('blockButton');
   });
 
-  it('removes the polishedAppearance when simpleStyles is passed to globalAppearance', () => {
+  it('removes the baseTheme when simpleStyles is passed to globalAppearance', () => {
     const wrapper = ({ children }) => (
       <AppearanceProvider
         appearanceKey='signIn'
@@ -359,7 +359,7 @@ describe('AppearanceProvider layout flows', () => {
     expect(result.current.parsedElements[0]['alert'].backgroundColor).toBe(themeAColor);
   });
 
-  it('removes the polishedAppearance when simpleStyles is passed to appearance', () => {
+  it('removes the baseTheme when simpleStyles is passed to appearance', () => {
     const wrapper = ({ children }) => (
       <AppearanceProvider
         appearanceKey='signIn'
@@ -462,5 +462,126 @@ describe('AppearanceProvider captcha', () => {
     expect(result.current.parsedCaptcha.theme).toBe('auto');
     expect(result.current.parsedCaptcha.size).toBe('normal');
     expect(result.current.parsedCaptcha.language).toBe('');
+  });
+});
+
+describe('AppearanceProvider theme flows', () => {
+  it('supports string-based theme property with "clerk" value', () => {
+    const wrapper = ({ children }) => (
+      <AppearanceProvider
+        appearanceKey='signIn'
+        appearance={{
+          theme: 'clerk',
+        }}
+      >
+        {children}
+      </AppearanceProvider>
+    );
+
+    const { result } = renderHook(() => useAppearance(), { wrapper });
+    // Should include clerk theme styles (baseTheme will be included)
+    expect(result.current.parsedElements.length).toBeGreaterThan(0);
+  });
+
+  it('supports string-based theme property with "simple" value', () => {
+    const wrapper = ({ children }) => (
+      <AppearanceProvider
+        appearanceKey='signIn'
+        appearance={{
+          theme: 'simple',
+        }}
+      >
+        {children}
+      </AppearanceProvider>
+    );
+
+    const { result } = renderHook(() => useAppearance(), { wrapper });
+    // Should include both simple theme and base theme (2 elements total)
+    expect(result.current.parsedElements.length).toBe(2);
+  });
+
+  it('theme property takes precedence over deprecated baseTheme', () => {
+    const wrapper = ({ children }) => (
+      <AppearanceProvider
+        appearanceKey='signIn'
+        appearance={{
+          theme: 'simple',
+          baseTheme: 'clerk', // This should be ignored
+        }}
+      >
+        {children}
+      </AppearanceProvider>
+    );
+
+    const { result } = renderHook(() => useAppearance(), { wrapper });
+    // Should include both simple theme and base theme (2 elements total)
+    expect(result.current.parsedElements.length).toBe(2);
+  });
+
+  it('maintains backward compatibility with baseTheme property', () => {
+    const wrapper = ({ children }) => (
+      <AppearanceProvider
+        appearanceKey='signIn'
+        appearance={{
+          baseTheme: 'simple',
+        }}
+      >
+        {children}
+      </AppearanceProvider>
+    );
+
+    const { result } = renderHook(() => useAppearance(), { wrapper });
+    // Should work the same as theme: 'simple' (2 elements total)
+    expect(result.current.parsedElements.length).toBe(2);
+  });
+
+  it('supports object-based themes with new theme property', () => {
+    const customTheme = {
+      elements: {
+        card: { backgroundColor: 'red' },
+      },
+    };
+
+    const wrapper = ({ children }) => (
+      <AppearanceProvider
+        appearanceKey='signIn'
+        appearance={{
+          theme: customTheme,
+        }}
+      >
+        {children}
+      </AppearanceProvider>
+    );
+
+    const { result } = renderHook(() => useAppearance(), { wrapper });
+    // Should include base theme + custom theme
+    expect(result.current.parsedElements.length).toBeGreaterThan(1);
+    expect(result.current.parsedElements.some(el => el.card?.backgroundColor === 'red')).toBe(true);
+  });
+
+  it('supports array-based themes with new theme property', () => {
+    const themeA = {
+      elements: { card: { backgroundColor: 'red' } },
+    };
+    const themeB = {
+      elements: { card: { color: 'blue' } },
+    };
+
+    const wrapper = ({ children }) => (
+      <AppearanceProvider
+        appearanceKey='signIn'
+        appearance={{
+          theme: [themeA, themeB],
+        }}
+      >
+        {children}
+      </AppearanceProvider>
+    );
+
+    const { result } = renderHook(() => useAppearance(), { wrapper });
+    // Should include base theme + both custom themes
+    expect(result.current.parsedElements.length).toBeGreaterThan(2);
+    expect(result.current.parsedElements.some(el => el.card?.backgroundColor === 'red')).toBe(true);
+    expect(result.current.parsedElements.some(el => el.card?.color === 'blue')).toBe(true);
   });
 });

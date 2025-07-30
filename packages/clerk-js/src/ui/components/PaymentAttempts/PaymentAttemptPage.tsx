@@ -1,7 +1,13 @@
+import { useClerk, useOrganization } from '@clerk/shared/react';
+import useSWR from 'swr';
+
+import { Alert } from '@/ui/elements/Alert';
 import { Header } from '@/ui/elements/Header';
 import { LineItems } from '@/ui/elements/LineItems';
+import { formatDate } from '@/ui/utils/formatDate';
+import { truncateWithEndVisible } from '@/ui/utils/truncateTextWithEndVisible';
 
-import { usePaymentAttemptsContext, useStatements } from '../../contexts';
+import { useSubscriberTypeContext, useSubscriberTypeLocalizationRoot } from '../../contexts/components';
 import {
   Badge,
   Box,
@@ -13,18 +19,39 @@ import {
   Span,
   Spinner,
   Text,
+  useLocalizations,
 } from '../../customizables';
 import { useClipboard } from '../../hooks';
 import { Check, Copy } from '../../icons';
 import { useRouter } from '../../router';
-import { truncateWithEndVisible } from '../../utils/truncateTextWithEndVisible';
 
 export const PaymentAttemptPage = () => {
   const { params, navigate } = useRouter();
-  const { isLoading } = useStatements();
-  const { getPaymentAttemptById } = usePaymentAttemptsContext();
+  const subscriberType = useSubscriberTypeContext();
+  const { organization } = useOrganization();
+  const localizationRoot = useSubscriberTypeLocalizationRoot();
+  const { t, translateError } = useLocalizations();
+  const clerk = useClerk();
 
-  const paymentAttempt = params.paymentAttemptId ? getPaymentAttemptById(params.paymentAttemptId) : null;
+  const {
+    data: paymentAttempt,
+    isLoading,
+    error,
+  } = useSWR(
+    params.paymentAttemptId
+      ? {
+          type: 'payment-attempt',
+          id: params.paymentAttemptId,
+          orgId: subscriberType === 'organization' ? organization?.id : undefined,
+        }
+      : null,
+    () =>
+      clerk.billing.getPaymentAttempt({
+        id: params.paymentAttemptId,
+        orgId: subscriberType === 'organization' ? organization?.id : undefined,
+      }),
+  );
+
   const subscriptionItem = paymentAttempt?.subscriptionItem;
 
   if (isLoading) {
@@ -39,168 +66,178 @@ export const PaymentAttemptPage = () => {
     );
   }
 
-  if (!paymentAttempt) {
-    return <Text>Payment attempt not found</Text>;
-  }
-
   return (
     <>
       <Header.Root
         sx={t => ({
           borderBlockEndWidth: t.borderWidths.$normal,
           borderBlockEndStyle: t.borderStyles.$solid,
-          borderBlockEndColor: t.colors.$neutralAlpha100,
+          borderBlockEndColor: t.colors.$borderAlpha100,
           marginBlockEnd: t.space.$4,
           paddingBlockEnd: t.space.$4,
         })}
       >
         <Header.BackLink onClick={() => void navigate('../../', { searchParams: new URLSearchParams('tab=payments') })}>
           <Header.Title
-            localizationKey={localizationKeys('organizationProfile.billingPage.start.headerTitle__payments')}
+            localizationKey={localizationKeys(`${localizationRoot}.billingPage.start.headerTitle__payments`)}
             textVariant='h2'
           />
         </Header.BackLink>
       </Header.Root>
-
-      <Box
-        elementDescriptor={descriptors.paymentAttemptRoot}
-        as='article'
-        sx={t => ({
-          borderWidth: t.borderWidths.$normal,
-          borderStyle: t.borderStyles.$solid,
-          borderColor: t.colors.$neutralAlpha100,
-          borderRadius: t.radii.$lg,
-          overflow: 'clip',
-        })}
-      >
-        <Box
-          elementDescriptor={descriptors.paymentAttemptHeader}
-          as='header'
-          sx={t => ({
-            padding: t.space.$4,
-            background: t.colors.$neutralAlpha25,
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'flex-start',
-          })}
-        >
-          <Span elementDescriptor={descriptors.paymentAttemptHeaderTitleContainer}>
-            <Heading
-              elementDescriptor={descriptors.paymentAttemptHeaderTitle}
-              textVariant='h2'
-              localizationKey={new Date(
-                paymentAttempt.paidAt || paymentAttempt.failedAt || paymentAttempt.updatedAt,
-              ).toLocaleString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-            />
-            <Span
-              sx={t => ({
-                display: 'flex',
-                alignItems: 'center',
-                gap: t.space.$0x25,
-                color: t.colors.$colorTextSecondary,
-              })}
-            >
-              <CopyButton
-                copyLabel='Copy payment attempt ID'
-                text={paymentAttempt.id}
-              />
-              <Text
-                colorScheme='secondary'
-                variant='subtitle'
-              >
-                {truncateWithEndVisible(paymentAttempt.id)}
-              </Text>
-            </Span>
-          </Span>
-          <Badge
-            elementDescriptor={descriptors.paymentAttemptHeaderBadge}
-            colorScheme={
-              paymentAttempt.status === 'paid' ? 'success' : paymentAttempt.status === 'failed' ? 'danger' : 'primary'
-            }
-            sx={{ textTransform: 'capitalize' }}
+      {!paymentAttempt ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+          <Alert
+            variant='danger'
+            colorScheme='danger'
           >
-            {paymentAttempt.status}
-          </Badge>
+            {error
+              ? translateError(error.errors[0])
+              : t(localizationKeys(`${localizationRoot}.billingPage.paymentHistorySection.notFound`))}
+          </Alert>
         </Box>
+      ) : (
         <Box
-          elementDescriptor={descriptors.paymentAttemptBody}
+          elementDescriptor={descriptors.paymentAttemptRoot}
+          as='article'
           sx={t => ({
-            padding: t.space.$4,
+            borderWidth: t.borderWidths.$normal,
+            borderStyle: t.borderStyles.$solid,
+            borderColor: t.colors.$borderAlpha100,
+            borderRadius: t.radii.$lg,
+            overflow: 'clip',
           })}
         >
-          {subscriptionItem && (
-            <LineItems.Root>
-              <LineItems.Group>
-                <LineItems.Title title={subscriptionItem.plan.name} />
-                <LineItems.Description
-                  prefix={subscriptionItem.planPeriod === 'annual' ? 'x12' : undefined}
-                  text={`${subscriptionItem.plan.currencySymbol}${subscriptionItem.planPeriod === 'month' ? subscriptionItem.plan.amountFormatted : subscriptionItem.plan.annualMonthlyAmountFormatted}`}
-                />
-              </LineItems.Group>
-              <LineItems.Group
-                borderTop
-                variant='tertiary'
+          <Box
+            elementDescriptor={descriptors.paymentAttemptHeader}
+            as='header'
+            sx={t => ({
+              padding: t.space.$4,
+              background: t.colors.$neutralAlpha25,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'flex-start',
+            })}
+          >
+            <Span elementDescriptor={descriptors.paymentAttemptHeaderTitleContainer}>
+              <Heading
+                elementDescriptor={descriptors.paymentAttemptHeaderTitle}
+                textVariant='h2'
+                localizationKey={formatDate(
+                  paymentAttempt.paidAt || paymentAttempt.failedAt || paymentAttempt.updatedAt,
+                  'long',
+                )}
+              />
+              <Span
+                sx={t => ({
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: t.space.$0x25,
+                  color: t.colors.$colorMutedForeground,
+                })}
               >
-                <LineItems.Title title={localizationKeys('commerce.subtotal')} />
-                <LineItems.Description
-                  text={`${subscriptionItem.amount?.currencySymbol}${subscriptionItem.amount?.amountFormatted}`}
+                <CopyButton
+                  copyLabel='Copy payment attempt ID'
+                  text={paymentAttempt.id}
                 />
-              </LineItems.Group>
-              {subscriptionItem.credit && subscriptionItem.credit.amount.amount > 0 && (
-                <LineItems.Group variant='tertiary'>
-                  <LineItems.Title title={localizationKeys('commerce.credit')} />
+                <Text
+                  colorScheme='secondary'
+                  variant='subtitle'
+                >
+                  {truncateWithEndVisible(paymentAttempt.id)}
+                </Text>
+              </Span>
+            </Span>
+            <Badge
+              elementDescriptor={descriptors.paymentAttemptHeaderBadge}
+              colorScheme={
+                paymentAttempt.status === 'paid' ? 'success' : paymentAttempt.status === 'failed' ? 'danger' : 'primary'
+              }
+              sx={{ textTransform: 'capitalize' }}
+            >
+              {paymentAttempt.status}
+            </Badge>
+          </Box>
+          <Box
+            elementDescriptor={descriptors.paymentAttemptBody}
+            sx={t => ({
+              padding: t.space.$4,
+            })}
+          >
+            {subscriptionItem && (
+              <LineItems.Root>
+                <LineItems.Group>
+                  <LineItems.Title title={subscriptionItem.plan.name} />
                   <LineItems.Description
-                    text={`- ${subscriptionItem.credit.amount.currencySymbol}${subscriptionItem.credit.amount.amountFormatted}`}
+                    prefix={subscriptionItem.planPeriod === 'annual' ? 'x12' : undefined}
+                    text={`${subscriptionItem.plan.currencySymbol}${subscriptionItem.planPeriod === 'month' ? subscriptionItem.plan.amountFormatted : subscriptionItem.plan.annualMonthlyAmountFormatted}`}
                   />
                 </LineItems.Group>
-              )}
-            </LineItems.Root>
-          )}
-        </Box>
-        <Box
-          elementDescriptor={descriptors.paymentAttemptFooter}
-          as='footer'
-          sx={t => ({
-            paddingInline: t.space.$4,
-            paddingBlock: t.space.$3,
-            background: t.colors.$neutralAlpha25,
-            borderBlockStartWidth: t.borderWidths.$normal,
-            borderBlockStartStyle: t.borderStyles.$solid,
-            borderBlockStartColor: t.colors.$neutralAlpha100,
-            display: 'flex',
-            justifyContent: 'space-between',
-          })}
-        >
-          <Text
-            variant='h3'
-            localizationKey={'Total due'}
-            elementDescriptor={descriptors.paymentAttemptFooterLabel}
-          />
-          <Span
-            elementDescriptor={descriptors.paymentAttemptFooterValueContainer}
+                <LineItems.Group
+                  borderTop
+                  variant='tertiary'
+                >
+                  <LineItems.Title title={localizationKeys('commerce.subtotal')} />
+                  <LineItems.Description
+                    text={`${subscriptionItem.amount?.currencySymbol}${subscriptionItem.amount?.amountFormatted}`}
+                  />
+                </LineItems.Group>
+                {subscriptionItem.credit && subscriptionItem.credit.amount.amount > 0 && (
+                  <LineItems.Group variant='tertiary'>
+                    <LineItems.Title title={localizationKeys('commerce.credit')} />
+                    <LineItems.Description
+                      text={`- ${subscriptionItem.credit.amount.currencySymbol}${subscriptionItem.credit.amount.amountFormatted}`}
+                    />
+                  </LineItems.Group>
+                )}
+              </LineItems.Root>
+            )}
+          </Box>
+          <Box
+            elementDescriptor={descriptors.paymentAttemptFooter}
+            as='footer'
             sx={t => ({
+              paddingInline: t.space.$4,
+              paddingBlock: t.space.$3,
+              background: t.colors.$neutralAlpha25,
+              borderBlockStartWidth: t.borderWidths.$normal,
+              borderBlockStartStyle: t.borderStyles.$solid,
+              borderBlockStartColor: t.colors.$borderAlpha100,
               display: 'flex',
-              alignItems: 'center',
-              gap: t.space.$2x5,
+              justifyContent: 'space-between',
             })}
           >
             <Text
-              variant='caption'
-              colorScheme='secondary'
-              elementDescriptor={descriptors.paymentAttemptFooterCurrency}
-            >
-              USD
-            </Text>
-            <Text
               variant='h3'
-              elementDescriptor={descriptors.paymentAttemptFooterValue}
+              localizationKey={localizationKeys('commerce.totalDue')}
+              elementDescriptor={descriptors.paymentAttemptFooterLabel}
+            />
+            <Span
+              elementDescriptor={descriptors.paymentAttemptFooterValueContainer}
+              sx={t => ({
+                display: 'flex',
+                alignItems: 'center',
+                gap: t.space.$2x5,
+              })}
             >
-              {paymentAttempt.amount.currencySymbol}
-              {paymentAttempt.amount.amountFormatted}
-            </Text>
-          </Span>
+              <Text
+                variant='caption'
+                colorScheme='secondary'
+                elementDescriptor={descriptors.paymentAttemptFooterCurrency}
+                sx={{ textTransform: 'uppercase' }}
+              >
+                {paymentAttempt.amount.currency}
+              </Text>
+              <Text
+                variant='h3'
+                elementDescriptor={descriptors.paymentAttemptFooterValue}
+              >
+                {paymentAttempt.amount.currencySymbol}
+                {paymentAttempt.amount.amountFormatted}
+              </Text>
+            </Span>
+          </Box>
         </Box>
-      </Box>
+      )}
     </>
   );
 };
@@ -221,7 +258,7 @@ function CopyButton({ text, copyLabel = 'Copy' }: { text: string; copyLabel?: st
         borderRadius: t.radii.$sm,
         '&:focus-visible': {
           outline: '2px solid',
-          outlineColor: t.colors.$neutralAlpha200,
+          outlineColor: t.colors.$colorRing,
         },
       })}
       focusRing={false}

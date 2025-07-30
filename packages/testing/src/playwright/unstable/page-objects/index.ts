@@ -1,5 +1,6 @@
 import type { Page } from '@playwright/test';
 
+import { createAPIKeysComponentPageObject } from './apiKeys';
 import { createAppPageObject } from './app';
 import { createCheckoutPageObject } from './checkout';
 import { createClerkPageObject } from './clerk';
@@ -11,6 +12,7 @@ import { createPricingTablePageObject } from './pricingTable';
 import { createSessionTaskComponentPageObject } from './sessionTask';
 import { createSignInComponentPageObject } from './signIn';
 import { createSignUpComponentPageObject } from './signUp';
+import { createSubscriptionDetailsPageObject } from './subscriptionDetails';
 import { createTestingTokenPageObject } from './testingToken';
 import { createUserButtonPageObject } from './userButton';
 import { createUserProfileComponentPageObject } from './userProfile';
@@ -46,5 +48,7 @@ export const createPageObjects = ({
     userProfile: createUserProfileComponentPageObject(testArgs),
     userVerification: createUserVerificationComponentPageObject(testArgs),
     waitlist: createWaitlistComponentPageObject(testArgs),
+    apiKeys: createAPIKeysComponentPageObject(testArgs),
+    subscriptionDetails: createSubscriptionDetailsPageObject(testArgs),
   };
 };

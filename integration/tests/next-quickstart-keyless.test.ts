@@ -77,12 +77,21 @@ test.describe('Keyless mode @quickstart', () => {
     const [newPage] = await Promise.all([context.waitForEvent('page'), claim.click()]);
 
     await newPage.waitForLoadState();
+
     await newPage.waitForURL(url => {
       const urlToReturnTo = `${dashboardUrl}apps/claim?token=`;
+
+      const signUpForceRedirectUrl = url.searchParams.get('sign_up_force_redirect_url');
+
+      const signUpForceRedirectUrlCheck =
+        signUpForceRedirectUrl?.startsWith(urlToReturnTo) ||
+        (signUpForceRedirectUrl?.startsWith(`${dashboardUrl}organization-selection`) &&
+          signUpForceRedirectUrl?.includes(encodeURIComponent('apps/claim?token=')));
+
       return (
         url.pathname === '/apps/claim/sign-in' &&
         url.searchParams.get('sign_in_force_redirect_url')?.startsWith(urlToReturnTo) &&
-        url.searchParams.get('sign_up_force_redirect_url')?.startsWith(urlToReturnTo)
+        signUpForceRedirectUrlCheck
       );
     });
   });

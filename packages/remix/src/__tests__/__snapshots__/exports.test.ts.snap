@@ -2,6 +2,7 @@
 
 exports[`root public exports > should not change unexpectedly 1`] = `
 [
+  "APIKeys",
   "AuthenticateWithRedirectCallback",
   "ClerkApp",
   "ClerkDegraded",
@@ -20,6 +21,7 @@ exports[`root public exports > should not change unexpectedly 1`] = `
   "RedirectToOrganizationProfile",
   "RedirectToSignIn",
   "RedirectToSignUp",
+  "RedirectToTask",
   "RedirectToUserProfile",
   "SignIn",
   "SignInButton",
@@ -29,10 +31,16 @@ exports[`root public exports > should not change unexpectedly 1`] = `
   "SignUpButton",
   "SignedIn",
   "SignedOut",
+  "TaskSelectOrganization",
   "UserButton",
   "UserProfile",
   "Waitlist",
   "WithClerkState",
+  "__experimental_CheckoutProvider",
+  "__experimental_PaymentElement",
+  "__experimental_PaymentElementProvider",
+  "__experimental_useCheckout",
+  "__experimental_usePaymentElement",
   "useAuth",
   "useClerk",
   "useEmailLink",

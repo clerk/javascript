@@ -19,11 +19,12 @@ type ModalProps = React.PropsWithChildren<{
   containerSx?: ThemableCssProp;
   canCloseModal?: boolean;
   style?: React.CSSProperties;
+  portalRoot?: HTMLElement | React.MutableRefObject<HTMLElement | null>;
 }>;
 
 export const Modal = withFloatingTree((props: ModalProps) => {
   const { disableScrollLock, enableScrollLock } = useScrollLock();
-  const { handleClose, handleOpen, contentSx, containerSx, canCloseModal, id, style } = props;
+  const { handleClose, handleOpen, contentSx, containerSx, canCloseModal, id, style, portalRoot } = props;
   const overlayRef = useRef<HTMLDivElement>(null);
   const { floating, isOpen, context, nodeId, toggle } = usePopover({
     defaultOpen: true,
@@ -55,6 +56,7 @@ export const Modal = withFloatingTree((props: ModalProps) => {
       context={context}
       isOpen={isOpen}
       outsideElementsInert
+      root={portalRoot}
     >
       <ModalContext.Provider value={modalCtx}>
         <Flex
@@ -66,7 +68,7 @@ export const Modal = withFloatingTree((props: ModalProps) => {
             t => ({
               animation: `${animations.fadeIn} 150ms ${t.transitionTiming.$common}`,
               zIndex: t.zIndices.$modal,
-              backgroundColor: t.colors.$modalBackdrop,
+              backgroundColor: t.colors.$colorModalBackdrop,
               alignItems: 'flex-start',
               justifyContent: 'center',
               overflow: 'auto',

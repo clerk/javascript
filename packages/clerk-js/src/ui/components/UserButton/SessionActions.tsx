@@ -31,7 +31,7 @@ export const SingleSessionActions = (props: SingleSessionActionsProps) => {
   const commonActionSx: ThemableCssProp = t => ({
     borderTopWidth: t.borderWidths.$normal,
     borderTopStyle: t.borderStyles.$solid,
-    borderTopColor: t.colors.$neutralAlpha100,
+    borderTopColor: t.colors.$borderAlpha100,
     padding: `${t.space.$4} ${t.space.$5}`,
   });
 
@@ -60,7 +60,7 @@ export const SingleSessionActions = (props: SingleSessionActionsProps) => {
       sx={t => ({
         borderTopWidth: t.borderWidths.$normal,
         borderTopStyle: t.borderStyles.$solid,
-        borderTopColor: t.colors.$neutralAlpha100,
+        borderTopColor: t.colors.$borderAlpha100,
       })}
     >
       {menutItems?.map((item: MenuItem) => {
@@ -182,6 +182,7 @@ export const MultiSessionActions = (props: MultiSessionActionsProps) => {
               icon={CogFilled}
               label={localizationKeys('userButton.action__manageAccount')}
               onClick={handleManageAccountClicked}
+              focusRing
             />
             <SmallAction
               elementDescriptor={descriptors.userButtonPopoverActionButton}
@@ -193,6 +194,7 @@ export const MultiSessionActions = (props: MultiSessionActionsProps) => {
               icon={SignOut}
               label={localizationKeys('userButton.action__signOut')}
               onClick={handleSignOutSessionClicked(session)}
+              focusRing
             />
           </Flex>
         </SmallActions>
@@ -269,7 +271,7 @@ export const MultiSessionActions = (props: MultiSessionActionsProps) => {
         sx={t => ({
           borderTopStyle: t.borderStyles.$solid,
           borderTopWidth: t.borderWidths.$normal,
-          borderTopColor: t.colors.$neutralAlpha100,
+          borderTopColor: t.colors.$borderAlpha100,
         })}
       >
         {otherSessions.map(session => (

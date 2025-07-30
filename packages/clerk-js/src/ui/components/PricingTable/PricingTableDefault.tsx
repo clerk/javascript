@@ -4,11 +4,11 @@ import * as React from 'react';
 
 import { Switch } from '@/ui/elements/Switch';
 import { Tooltip } from '@/ui/elements/Tooltip';
+import { getClosestProfileScrollBox } from '@/ui/utils/getClosestProfileScrollBox';
 
 import { useProtect } from '../../common';
 import { usePlansContext, usePricingTableContext, useSubscriberTypeContext } from '../../contexts';
 import {
-  Badge,
   Box,
   Button,
   Col,
@@ -23,7 +23,7 @@ import {
 } from '../../customizables';
 import { Check, Plus } from '../../icons';
 import { common, InternalThemeProvider } from '../../styledSystem';
-import { colors, getClosestProfileScrollBox } from '../../utils';
+import { SubscriptionBadge } from '../Subscriptions/badge';
 
 interface PricingTableDefaultProps {
   plans?: CommercePlanResource[] | null;
@@ -118,7 +118,6 @@ function Card(props: CardProps) {
 
     clerk.__internal_openPlanDetails({
       plan,
-      subscriberType,
       initialPlanPeriod: planPeriod,
       portalRoot,
     });
@@ -128,7 +127,7 @@ function Card(props: CardProps) {
     () => activeOrUpcomingSubscriptionBasedOnPlanPeriod(plan, planPeriod),
     [plan, planPeriod, activeOrUpcomingSubscriptionBasedOnPlanPeriod],
   );
-  const isPlanActive = subscription?.status === 'active';
+
   const hasFeatures = plan.features.length > 0;
   const showStatusRow = !!subscription;
 
@@ -142,7 +141,7 @@ function Card(props: CardProps) {
     shouldShowFooter = true;
     shouldShowFooterNotice = true;
   } else if (subscription.status === 'active') {
-    if (subscription.canceledAt) {
+    if (subscription.canceledAtDate) {
       shouldShowFooter = true;
       shouldShowFooterNotice = false;
     } else if (planPeriod !== subscription.planPeriod && plan.annualMonthlyAmount > 0) {
@@ -167,14 +166,10 @@ function Card(props: CardProps) {
         gap: 0,
         gridTemplateRows: 'subgrid',
         gridRow: 'span 5',
-        background: common.mergedColorsBackground(
-          colors.setAlpha(t.colors.$colorBackground, 1),
-          t.colors.$neutralAlpha50,
-        ),
+        background: common.mutedBackground(t),
         borderWidth: t.borderWidths.$normal,
         borderStyle: t.borderStyles.$solid,
-        borderColor: t.colors.$neutralAlpha100,
-        boxShadow: !isCompact ? t.shadows.$cardBoxShadow : t.shadows.$tableBodyShadow,
+        borderColor: t.colors.$borderAlpha150,
         borderRadius: t.radii.$xl,
         overflow: 'hidden',
         textAlign: 'left',
@@ -186,21 +181,7 @@ function Card(props: CardProps) {
         isCompact={isCompact}
         planPeriod={planPeriod}
         setPlanPeriod={setPlanPeriod}
-        badge={
-          showStatusRow ? (
-            isPlanActive ? (
-              <Badge
-                colorScheme='secondary'
-                localizationKey={localizationKeys('badge__activePlan')}
-              />
-            ) : (
-              <Badge
-                colorScheme='primary'
-                localizationKey={localizationKeys('badge__upcomingPlan')}
-              />
-            )
-          ) : undefined
-        }
+        badge={showStatusRow ? <SubscriptionBadge subscription={subscription} /> : undefined}
       />
       <Box
         elementDescriptor={descriptors.pricingTableCardBody}
@@ -223,7 +204,7 @@ function Card(props: CardProps) {
               backgroundColor: hasFeatures ? t.colors.$colorBackground : 'transparent',
               borderTopWidth: hasFeatures ? t.borderWidths.$normal : 0,
               borderTopStyle: t.borderStyles.$solid,
-              borderTopColor: t.colors.$neutralAlpha100,
+              borderTopColor: t.colors.$borderAlpha150,
             })}
             data-variant={isCompact ? 'compact' : 'default'}
           >
@@ -243,15 +224,17 @@ function Card(props: CardProps) {
               padding: isCompact ? t.space.$3 : t.space.$4,
               borderTopWidth: t.borderWidths.$normal,
               borderTopStyle: t.borderStyles.$solid,
-              borderTopColor: t.colors.$neutralAlpha100,
+              borderTopColor: t.colors.$borderAlpha150,
               order: ctaPosition === 'top' ? -1 : undefined,
             })}
           >
-            {shouldShowFooterNotice ? (
+            {shouldShowFooterNotice && subscription ? (
               <Text
                 elementDescriptor={descriptors.pricingTableCardFooterNotice}
                 variant={isCompact ? 'buttonSmall' : 'buttonLarge'}
-                localizationKey={localizationKeys('badge__startsAt', { date: subscription?.periodStart })}
+                localizationKey={localizationKeys('badge__startsAt', {
+                  date: subscription?.periodStartDate,
+                })}
                 colorScheme='secondary'
                 sx={t => ({
                   paddingBlock: t.space.$1x5,
