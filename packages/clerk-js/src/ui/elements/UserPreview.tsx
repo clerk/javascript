@@ -116,6 +116,7 @@ export const UserPreview = (props: UserPreviewProps) => {
               {...samlAccount}
               name={name}
               avatarUrl={imageUrl}
+              key={`user-preview-avatar-${imageUrl || 'no-image'}`}
               size={getAvatarSizes}
               sx={avatarSx}
               rounded={rounded}
