@@ -80,7 +80,6 @@ export const useCheckout = (options?: Params): __experimental_UseCheckoutReturn 
         id: null,
         externalClientSecret: null,
         externalGatewayId: null,
-        statement_id: null,
         status: null,
         totals: null,
         isImmediatePlanChange: null,

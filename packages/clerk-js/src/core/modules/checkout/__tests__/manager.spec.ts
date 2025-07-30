@@ -10,7 +10,6 @@ const createMockCheckoutResource = (overrides: Partial<CommerceCheckoutResource>
   status: 'pending',
   externalClientSecret: 'cs_test_123',
   externalGatewayId: 'gateway_123',
-  statement_id: 'stmt_123',
   totals: {
     totalDueNow: { amount: 1000, currency: 'USD', currencySymbol: '$', amountFormatted: '10.00' },
     credit: { amount: 0, currency: 'USD', currencySymbol: '$', amountFormatted: '0.00' },
