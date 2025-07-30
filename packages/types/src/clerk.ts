@@ -166,6 +166,11 @@ export interface Clerk {
   version: string | undefined;
 
   /**
+   * The version of the Clerk Frontend API that the SDK is using.
+   */
+  apiVersion: string | undefined;
+
+  /**
    * If present, contains information about the SDK that the host application is using.
    * For example, if Clerk is loaded through `@clerk/nextjs`, this would be `{ name: '@clerk/nextjs', version: '1.0.0' }`
    */

@@ -126,7 +126,13 @@ import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
 import { RedirectUrls } from '../utils/redirectUrls';
 import { AuthCookieService } from './auth/AuthCookieService';
 import { CaptchaHeartbeat } from './auth/CaptchaHeartbeat';
-import { CLERK_SATELLITE_URL, CLERK_SUFFIXED_COOKIES, CLERK_SYNCED, ERROR_CODES } from './constants';
+import {
+  CLERK_SATELLITE_URL,
+  CLERK_SUFFIXED_COOKIES,
+  CLERK_SYNCED,
+  ERROR_CODES,
+  SUPPORTED_FAPI_VERSION,
+} from './constants';
 import {
   clerkErrorInitFailed,
   clerkInvalidSignInUrlFormat,
@@ -273,6 +279,10 @@ export class Clerk implements ClerkInterface {
 
   get sdkMetadata(): SDKMetadata {
     return Clerk.sdkMetadata;
+  }
+
+  get apiVersion(): string {
+    return SUPPORTED_FAPI_VERSION;
   }
 
   get loaded(): boolean {
