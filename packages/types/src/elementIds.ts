@@ -53,7 +53,14 @@ export type OrganizationPreviewId =
   | 'organizationSwitcherListedOrganization'
   | 'organizationSwitcherActiveOrganization';
 
-export type CardActionId = 'havingTrouble' | 'alternativeMethods' | 'signUp' | 'signIn' | 'usePasskey' | 'waitlist';
+export type CardActionId =
+  | 'havingTrouble'
+  | 'alternativeMethods'
+  | 'signUp'
+  | 'signIn'
+  | 'usePasskey'
+  | 'waitlist'
+  | 'signOut';
 
 export type MenuId = 'invitation' | 'member' | ProfileSectionId;
 export type SelectId = 'countryCode' | 'role' | 'paymentSource' | 'apiKeyExpiration';
