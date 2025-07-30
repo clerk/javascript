@@ -86,7 +86,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref)
 
   const typeProps =
     type === 'email'
-      ? { type: 'text', pattern: '^.*@[a-zA-Z0-9\\-]+\\.[a-zA-Z0-9\\-\\.]+$', inputMode: 'email' }
+      ? { type: 'text', pattern: '^.*@[a-zA-Z0-9\\-]+\\.[a-zA-Z0-9\\-\\.]+$', inputmode: 'email' }
       : { type: type || 'text' };
 
   const passwordManagerProps = ignorePasswordManager
