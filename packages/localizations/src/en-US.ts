@@ -9,6 +9,10 @@ export const enUS: LocalizationResource = {
       actionLink: 'Sign out',
       actionText: 'Signed in as {{emailAddress}}',
     },
+    createOrganizationScreen: {
+      formButtonSubmit: 'Create organization',
+      formButtonReset: 'Cancel',
+    },
   },
   apiKeys: {
     action__add: 'Add new key',
