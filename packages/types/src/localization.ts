@@ -1209,6 +1209,10 @@ export type __internal_LocalizationResource = {
       actionText: LocalizationValue<'emailAddress'>;
       actionLink: LocalizationValue;
     };
+    createOrganizationScreen: {
+      formButtonSubmit: LocalizationValue;
+      formButtonReset: LocalizationValue;
+    };
   };
 };
 

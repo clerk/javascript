@@ -17,7 +17,10 @@ import { MembershipPreview, PersonalAccountPreview } from './UserMembershipList'
 import { SuggestionPreview } from './UserSuggestionList';
 import { organizationListParams } from './utils';
 
-const useOrganizationListInView = () => {
+/**
+ * @internal
+ */
+export const useOrganizationListInView = () => {
   const { userMemberships, userInvitations, userSuggestions } = useOrganizationList(organizationListParams);
 
   const { ref } = useInView({
