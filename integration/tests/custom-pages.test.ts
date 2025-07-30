@@ -9,7 +9,7 @@ const CUSTOM_BUTTON_PAGE = '/custom-user-button';
 const CUSTOM_BUTTON_TRIGGER_PAGE = '/custom-user-button-trigger';
 const CUSTOM_BUTTON_DYNAMIC_LABELS_PAGE = '/custom-user-button-dynamic-labels';
 const CUSTOM_BUTTON_DYNAMIC_LABELS_AND_CUSTOM_PAGES_PAGE = '/custom-user-button-dynamic-labels-and-custom-pages';
-const CUSTOM_BUTTON_DYNAMIC_ITEMS_PAGE = '/custom-user-button/with-dynamic-items';
+const CUSTOM_BUTTON_DYNAMIC_ITEMS_PAGE = '/custom-user-button-dynamic-items';
 
 async function waitForMountedComponent(
   component: 'UserButton' | 'UserProfile',
