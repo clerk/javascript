@@ -41,6 +41,7 @@ import type {
 } from '@clerk/types';
 
 import {
+  buildURL,
   generateSignatureWithCoinbaseWallet,
   generateSignatureWithMetamask,
   generateSignatureWithOKXWallet,
@@ -239,7 +240,10 @@ export class SignIn extends BaseResource implements SignInResource {
     // This ensures organization selection tasks are displayed after sign-in,
     // rather than redirecting to potentially unprotected pages while the session is pending.
     const actionCompleteRedirectUrl = SignIn.clerk.__internal_hasAfterAuthFlows
-      ? redirectUrlWithAuthToken
+      ? buildURL({
+          base: redirectUrlWithAuthToken,
+          search: `?redirect_url=${redirectUrlComplete}`,
+        }).toString()
       : redirectUrlComplete;
 
     if (!this.id || !continueSignIn) {
