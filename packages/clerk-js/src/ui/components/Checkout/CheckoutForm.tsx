@@ -115,7 +115,7 @@ export const CheckoutForm = withCardStateProvider(() => {
 
 const useCheckoutMutations = () => {
   const { organization } = useOrganization();
-  const { subscriberType, onSubscriptionComplete } = useCheckoutContext();
+  const { for: _for, onSubscriptionComplete } = useCheckoutContext();
   const { checkout } = useCheckout();
   const { id, confirm } = checkout;
   const card = useCardState();
@@ -130,7 +130,8 @@ const useCheckoutMutations = () => {
 
     const { data, error } = await confirm({
       ...params,
-      ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
+      // TODO(@COMMERCE): Come back to this, this should not be needed
+      ...(_for === 'organization' ? { orgId: organization?.id } : {}),
     });
 
     if (error) {

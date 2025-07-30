@@ -1,3 +1,4 @@
+import type { ForPayerType } from '@clerk/types';
 import { useCallback } from 'react';
 
 import { eventMethodCalled } from '../../telemetry/events';
@@ -12,7 +13,7 @@ import {
 const hookName = 'useSubscription';
 
 type UseSubscriptionParams = {
-  for?: 'organization' | 'user';
+  for?: ForPayerType;
   /**
    * If `true`, the previous data will be kept in the cache until new data is fetched.
    *

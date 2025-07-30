@@ -186,6 +186,7 @@ export type __internal_LocalizationResource = {
     defaultFreePlanActive: LocalizationValue;
     viewFeatures: LocalizationValue;
     seeAllFeatures: LocalizationValue;
+    viewPayment: LocalizationValue;
     availableFeatures: LocalizationValue;
     subtotal: LocalizationValue;
     credit: LocalizationValue;

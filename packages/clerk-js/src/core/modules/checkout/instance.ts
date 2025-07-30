@@ -64,7 +64,7 @@ function createCheckoutInstance(
 
   const finalize = (params?: { redirectUrl: string }) => {
     const { redirectUrl } = params || {};
-    void clerk.setActive({ session: clerk.session?.id, redirectUrl });
+    return clerk.setActive({ session: clerk.session?.id, redirectUrl });
   };
 
   const clear = () => manager.clearCheckout();

@@ -54,8 +54,8 @@ describe('SubscriptionDetailsButton', () => {
       // Mock useAuth to return userId but no orgId
       (useAuth as any).mockReturnValue({ userId: 'user_123', orgId: null });
 
-      // Expect the component to throw an error when for="org"
-      expect(() => render(<SubscriptionDetailsButton for='org' />)).toThrow(
+      // Expect the component to throw an error when for="organization"
+      expect(() => render(<SubscriptionDetailsButton for='organization' />)).toThrow(
         'Wrap `<SubscriptionDetailsButton for="organization" />` with a check for an active organization.',
       );
     });
@@ -73,7 +73,7 @@ describe('SubscriptionDetailsButton', () => {
       (useAuth as any).mockReturnValue({ userId: 'user_123', orgId: 'org_123' });
 
       // Component should render without throwing
-      expect(() => render(<SubscriptionDetailsButton for='org' />)).not.toThrow();
+      expect(() => render(<SubscriptionDetailsButton for='organization' />)).not.toThrow();
     });
   });
 

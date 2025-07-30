@@ -24,10 +24,10 @@ import type { ClientResource } from './client';
 import type {
   CommerceBillingNamespace,
   CommerceCheckoutResource,
-  CommercePayerType,
   CommercePlanResource,
   CommerceSubscriptionPlanPeriod,
   ConfirmCheckoutParams,
+  ForPayerType,
 } from './commerce';
 import type { CustomMenuItem } from './customMenuItems';
 import type { CustomPage } from './customPages';
@@ -72,7 +72,7 @@ export type __experimental_CheckoutCacheState = Readonly<{
 }>;
 
 export type __experimental_CheckoutOptions = {
-  for?: 'organization';
+  for?: ForPayerType;
   planPeriod: CommerceSubscriptionPlanPeriod;
   planId: string;
 };
@@ -91,7 +91,7 @@ export type __experimental_CheckoutInstance = {
   confirm: (params: ConfirmCheckoutParams) => Promise<CheckoutResult>;
   start: () => Promise<CheckoutResult>;
   clear: () => void;
-  finalize: (params?: { redirectUrl: string }) => void;
+  finalize: (params?: { redirectUrl: string }) => Promise<void>;
   subscribe: (listener: (state: __experimental_CheckoutCacheState) => void) => () => void;
   getState: () => __experimental_CheckoutCacheState;
 };
@@ -1836,7 +1836,7 @@ export type __internal_CheckoutProps = {
   appearance?: CheckoutTheme;
   planId?: string;
   planPeriod?: CommerceSubscriptionPlanPeriod;
-  subscriberType?: CommercePayerType;
+  for?: ForPayerType;
   onSubscriptionComplete?: () => void;
   portalId?: string;
   portalRoot?: PortalRoot;
@@ -1861,7 +1861,7 @@ export type __internal_CheckoutProps = {
 export type __experimental_CheckoutButtonProps = {
   planId: string;
   planPeriod?: CommerceSubscriptionPlanPeriod;
-  subscriberType?: CommercePayerType;
+  for?: ForPayerType;
   onSubscriptionComplete?: () => void;
   checkoutProps?: {
     appearance?: CheckoutTheme;
@@ -1929,10 +1929,10 @@ export type __experimental_PlanDetailsButtonProps = {
 export type __internal_SubscriptionDetailsProps = {
   /**
    * The subscriber type to display the subscription details for.
-   * If `org` is provided, the subscription details will be displayed for the active organization.
+   * If `organization` is provided, the subscription details will be displayed for the active organization.
    * @default 'user'
    */
-  for?: CommercePayerType;
+  for?: ForPayerType;
   appearance?: SubscriptionDetailsTheme;
   onSubscriptionCancel?: () => void;
   portalId?: string;
@@ -1952,10 +1952,10 @@ export type __internal_SubscriptionDetailsProps = {
 export type __experimental_SubscriptionDetailsButtonProps = {
   /**
    * The subscriber type to display the subscription details for.
-   * If `org` is provided, the subscription details will be displayed for the active organization.
+   * If `organization` is provided, the subscription details will be displayed for the active organization.
    * @default 'user'
    */
-  for?: CommercePayerType;
+  for?: ForPayerType;
   onSubscriptionCancel?: () => void;
   subscriptionDetailsProps?: {
     appearance?: SubscriptionDetailsTheme;
