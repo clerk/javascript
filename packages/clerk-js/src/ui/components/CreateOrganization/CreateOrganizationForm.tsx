@@ -1,8 +1,7 @@
-import { useClerk, useOrganization, useOrganizationList } from '@clerk/shared/react';
+import { useOrganization, useOrganizationList } from '@clerk/shared/react';
 import type { CreateOrganizationParams, OrganizationResource } from '@clerk/types';
-import React, { useContext } from 'react';
+import React from 'react';
 
-import { SessionTasksContext } from '@/ui/contexts/components/SessionTasks';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Form } from '@/ui/elements/Form';
 import { FormButtonContainer } from '@/ui/elements/FormButtons';
@@ -40,8 +39,6 @@ type CreateOrganizationFormProps = {
 export const CreateOrganizationForm = withCardStateProvider((props: CreateOrganizationFormProps) => {
   const card = useCardState();
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
-  const sessionTasksContext = useContext(SessionTasksContext);
-  const clerk = useClerk();
 
   const lastCreatedOrganizationRef = React.useRef<OrganizationResource | null>(null);
   const { createOrganization, isLoaded, setActive, userMemberships } = useOrganizationList({
@@ -90,13 +87,6 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
       lastCreatedOrganizationRef.current = organization;
       await setActive({ organization });
 
-      if (sessionTasksContext) {
-        await clerk.__internal_navigateToTaskIfAvailable({
-          redirectUrlComplete: sessionTasksContext.redirectUrlComplete,
-        });
-        return;
-      }
-
       void userMemberships.revalidate?.();
 
       if (props.skipInvitationScreen ?? organization.maxAllowedMemberships === 1) {
@@ -111,8 +101,8 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
 
   const completeFlow = () => {
     // We are confident that lastCreatedOrganizationRef.current will never be null
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    void props.navigateAfterCreateOrganization?.(lastCreatedOrganizationRef.current!);
+
+    void props.navigateAfterCreateOrganization?.(lastCreatedOrganizationRef.current);
 
     props.onComplete?.();
   };
