@@ -25,7 +25,7 @@ const AddScreen = withCardStateProvider(({ onSuccess }: { onSuccess: () => void 
   const localizationRoot = useSubscriberTypeLocalizationRoot();
 
   const onAddPaymentSourceSuccess = async (context: { gateway: 'stripe'; paymentToken: string }) => {
-    const resource = subscriberType === 'org' ? clerk?.organization : clerk.user;
+    const resource = subscriberType === 'organization' ? clerk?.organization : clerk.user;
     await resource?.addPaymentSource(context);
     onSuccess();
     close();
@@ -72,7 +72,7 @@ const RemoveScreen = ({
 
   const removePaymentSource = async () => {
     await paymentSource
-      .remove({ orgId: subscriberType === 'org' ? organization?.id : undefined })
+      .remove({ orgId: subscriberType === 'organization' ? organization?.id : undefined })
       .then(revalidate)
       .catch((error: Error) => {
         handleError(error, [], card.setError);
@@ -108,7 +108,7 @@ export const PaymentSources = withCardStateProvider(() => {
   const clerk = useClerk();
   const subscriberType = useSubscriberTypeContext();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
-  const resource = subscriberType === 'org' ? clerk?.organization : clerk.user;
+  const resource = subscriberType === 'organization' ? clerk?.organization : clerk.user;
 
   const { data: paymentMethods, isLoading, revalidate: revalidatePaymentMethods } = usePaymentMethods();
 
@@ -209,7 +209,7 @@ const PaymentSourceMenu = ({
       isDestructive: false,
       onClick: () => {
         paymentSource
-          .makeDefault({ orgId: subscriberType === 'org' ? organization?.id : undefined })
+          .makeDefault({ orgId: subscriberType === 'organization' ? organization?.id : undefined })
           .then(revalidate)
           .catch((error: Error) => {
             handleError(error, [], card.setError);

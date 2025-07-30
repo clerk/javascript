@@ -10,7 +10,6 @@ const createMockCheckoutResource = (overrides: Partial<CommerceCheckoutResource>
   status: 'pending',
   externalClientSecret: 'cs_test_123',
   externalGatewayId: 'gateway_123',
-  statement_id: 'stmt_123',
   totals: {
     totalDueNow: { amount: 1000, currency: 'USD', currencySymbol: '$', amountFormatted: '10.00' },
     credit: { amount: 0, currency: 'USD', currencySymbol: '$', amountFormatted: '0.00' },
@@ -72,7 +71,7 @@ describe('createCheckoutManager', () => {
         error: null,
         checkout: null,
         fetchStatus: 'idle',
-        status: 'awaiting_initialization',
+        status: 'needs_initialization',
       });
     });
 
@@ -138,7 +137,7 @@ describe('createCheckoutManager', () => {
         isStarting: false,
         error: null,
         fetchStatus: 'idle',
-        status: 'awaiting_confirmation',
+        status: 'needs_confirmation',
       });
 
       expect(listener1).toHaveBeenCalledWith(expectedState);
@@ -186,7 +185,7 @@ describe('createCheckoutManager', () => {
           checkout: mockCheckout,
           error: null,
           fetchStatus: 'idle',
-          status: 'awaiting_confirmation',
+          status: 'needs_confirmation',
         }),
       );
     });
@@ -230,7 +229,7 @@ describe('createCheckoutManager', () => {
           isStarting: false,
           error: mockError,
           fetchStatus: 'error',
-          status: 'awaiting_initialization',
+          status: 'needs_initialization',
         }),
       );
     });
@@ -473,7 +472,7 @@ describe('createCheckoutManager', () => {
         error: null,
         checkout: null,
         fetchStatus: 'idle',
-        status: 'awaiting_initialization',
+        status: 'needs_initialization',
       });
 
       // Should notify listeners
@@ -515,7 +514,7 @@ describe('createCheckoutManager', () => {
       manager.clearCheckout();
       state = manager.getCacheState();
       expect(state.checkout).toBeNull();
-      expect(state.status).toBe('awaiting_initialization');
+      expect(state.status).toBe('needs_initialization');
     });
   });
 
@@ -554,17 +553,17 @@ describe('createCheckoutManager', () => {
     });
 
     it('should derive status based on checkout state', async () => {
-      // Initially awaiting initialization
-      expect(manager.getCacheState().status).toBe('awaiting_initialization');
+      // Initially needs initialization
+      expect(manager.getCacheState().status).toBe('needs_initialization');
 
-      // After starting checkout - awaiting confirmation
+      // After starting checkout - needs confirmation
       const pendingCheckout = createMockCheckoutResource({ status: 'pending' });
       const startOperation: MockedFunction<() => Promise<CommerceCheckoutResource>> = vi
         .fn()
         .mockResolvedValue(pendingCheckout);
 
       await manager.executeOperation('start', startOperation);
-      expect(manager.getCacheState().status).toBe('awaiting_confirmation');
+      expect(manager.getCacheState().status).toBe('needs_confirmation');
 
       // After completing checkout - completed
       const completedCheckout = createMockCheckoutResource({ status: 'completed' });
@@ -631,7 +630,7 @@ describe('createCheckoutManager', () => {
       const state2 = manager2.getCacheState();
 
       expect(state1.checkout?.id).toBe('checkout1');
-      expect(state1.status).toBe('awaiting_confirmation');
+      expect(state1.status).toBe('needs_confirmation');
 
       expect(state2.checkout?.id).toBe('checkout2');
       expect(state2.isStarting).toBe(false);

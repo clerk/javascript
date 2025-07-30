@@ -1,4 +1,9 @@
-import type { CommercePayerType, CommercePlanJSON, CommercePlanJSONSnapshot, CommercePlanResource } from '@clerk/types';
+import type {
+  CommercePayerResourceType,
+  CommercePlanJSON,
+  CommercePlanJSONSnapshot,
+  CommercePlanResource,
+} from '@clerk/types';
 
 import { BaseResource, CommerceFeature } from './internal';
 
@@ -17,7 +22,7 @@ export class CommercePlan extends BaseResource implements CommercePlanResource {
   isDefault!: boolean;
   isRecurring!: boolean;
   hasBaseFee!: boolean;
-  forPayerType!: CommercePayerType;
+  forPayerType!: CommercePayerResourceType;
   publiclyVisible!: boolean;
   slug!: string;
   avatarUrl!: string;

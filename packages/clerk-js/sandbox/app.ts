@@ -192,6 +192,8 @@ function appearanceVariableOptions() {
   const updateVariables = () => {
     void Clerk.__unstable__updateProps({
       appearance: {
+        // Preserve existing appearance properties like baseTheme
+        ...Clerk.__internal_getOption('appearance'),
         variables: Object.fromEntries(
           Object.entries(variableInputs).map(([key, input]) => {
             sessionStorage.setItem(key, input.value);

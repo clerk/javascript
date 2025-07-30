@@ -158,6 +158,7 @@ export const csCZ: LocalizationResource = {
     totalDue: 'Celkem k zaplacení',
     totalDueToday: 'Celkem k zaplacení dnes',
     viewFeatures: 'Zobrazit funkce',
+    viewPayment: undefined,
     year: 'Rok',
   },
   createOrganization: {

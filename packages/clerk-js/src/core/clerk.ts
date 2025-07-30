@@ -1325,6 +1325,29 @@ export class Clerk implements ClerkInterface {
   };
 
   #handlePendingSession = async (session: PendingSessionResource) => {
+    /**
+     * Do not revalidate server cache when `setActive` is called with a pending
+     * session within components, to avoid flash of content and unmount during
+     * internal navigation
+     */
+    const shouldInvalidateCache = !this.#componentNavigationContext;
+
+    const onBeforeSetActive: SetActiveHook =
+      shouldInvalidateCache &&
+      typeof window !== 'undefined' &&
+      typeof window.__unstable__onBeforeSetActive === 'function'
+        ? window.__unstable__onBeforeSetActive
+        : noop;
+
+    const onAfterSetActive: SetActiveHook =
+      shouldInvalidateCache &&
+      typeof window !== 'undefined' &&
+      typeof window.__unstable__onAfterSetActive === 'function'
+        ? window.__unstable__onAfterSetActive
+        : noop;
+
+    await onBeforeSetActive();
+
     if (!this.environment) {
       return;
     }
@@ -1358,6 +1381,8 @@ export class Clerk implements ClerkInterface {
 
     this.#setAccessors(session);
     this.#emit();
+
+    await onAfterSetActive();
   };
 
   public __internal_navigateToTaskIfAvailable = async ({
@@ -1854,10 +1879,11 @@ export class Clerk implements ClerkInterface {
     };
 
     if (si.status === 'complete') {
-      return this.setActive({
+      await this.setActive({
         session: si.sessionId,
         redirectUrl: redirectUrls.getAfterSignInUrl(),
       });
+      return this.__internal_navigateToTaskIfAvailable();
     }
 
     const userExistsButNeedsToSignIn =
@@ -1867,10 +1893,11 @@ export class Clerk implements ClerkInterface {
       const res = await signIn.create({ transfer: true });
       switch (res.status) {
         case 'complete':
-          return this.setActive({
+          await this.setActive({
             session: res.createdSessionId,
             redirectUrl: redirectUrls.getAfterSignInUrl(),
           });
+          return this.__internal_navigateToTaskIfAvailable();
         case 'needs_first_factor':
           return navigateToFactorOne();
         case 'needs_second_factor':
@@ -1916,10 +1943,11 @@ export class Clerk implements ClerkInterface {
       const res = await signUp.create({ transfer: true });
       switch (res.status) {
         case 'complete':
-          return this.setActive({
+          await this.setActive({
             session: res.createdSessionId,
             redirectUrl: redirectUrls.getAfterSignUpUrl(),
           });
+          return this.__internal_navigateToTaskIfAvailable();
         case 'missing_requirements':
           return navigateToNextStepSignUp({ missingFields: res.missingFields });
         default:
@@ -1928,10 +1956,11 @@ export class Clerk implements ClerkInterface {
     }
 
     if (su.status === 'complete') {
-      return this.setActive({
+      await this.setActive({
         session: su.sessionId,
         redirectUrl: redirectUrls.getAfterSignUpUrl(),
       });
+      return this.__internal_navigateToTaskIfAvailable();
     }
 
     if (si.status === 'needs_second_factor') {
@@ -1965,6 +1994,10 @@ export class Clerk implements ClerkInterface {
 
     if (su.externalAccountStatus === 'verified' && su.status === 'missing_requirements') {
       return navigateToNextStepSignUp({ missingFields: signUp.missingFields });
+    }
+
+    if (this.__internal_hasAfterAuthFlows) {
+      return this.__internal_navigateToTaskIfAvailable({ redirectUrlComplete: redirectUrls.getAfterSignInUrl() });
     }
 
     return navigateToSignIn();

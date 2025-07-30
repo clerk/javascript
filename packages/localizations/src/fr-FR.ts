@@ -156,6 +156,7 @@ export const frFR: LocalizationResource = {
     totalDue: undefined,
     totalDueToday: "Total dû aujourd'hui",
     viewFeatures: 'Voir les fonctionnalités',
+    viewPayment: undefined,
     year: 'An',
   },
   createOrganization: {
