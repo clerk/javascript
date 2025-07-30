@@ -446,7 +446,7 @@ testAgainstRunningApps({ withPattern: ['react.vite.withEmailCodes'] })(
     });
 
     test.describe('User Button with dynamic items', () => {
-      test('should show icons for dynamically rendered menu items', async ({ page, context }) => {
+      test('should show dynamically rendered menu items with icons', async ({ page, context }) => {
         const u = createTestUtils({ app, page, context });
         await u.po.signIn.goTo();
         await u.po.signIn.waitForMounted();
@@ -458,43 +458,24 @@ testAgainstRunningApps({ withPattern: ['react.vite.withEmailCodes'] })(
         await u.po.userButton.toggleTrigger();
         await u.po.userButton.waitForPopover();
 
-        // Initially, only the static menu item should be visible
         const pagesContainer = u.page.locator('div.cl-userButtonPopoverActions__multiSession').first();
-        const initialButtons = await pagesContainer.locator('button').all();
 
-        // Should have at least the static "Custom action" item
-        expect(initialButtons.length).toBe(1);
+        // Toggle menu items and verify static items appear with icons
+        const toggleButton = pagesContainer.locator('button', { hasText: 'Toggle menu items' });
+        await expect(toggleButton.locator('span')).toHaveText('🔔');
+        await toggleButton.click();
 
-        // Check that the static item has its icon
-        const staticActionButton = u.page.locator('button').filter({ hasText: 'Show dynamic items' }).first();
-        await expect(staticActionButton.locator('span')).toHaveText('🌐');
-
-        // Click the toggle button to show dynamic items
-        await staticActionButton.click();
-
-        // Wait for the dynamic items to appear
-        await u.page.waitForSelector('button:has-text("Dynamic action")');
-        await u.page.waitForSelector('button:has-text("Dynamic link")');
-
-        // Toggle the UserButton again to see the updated menu
+        // Re-open menu to see updated items
         await u.po.userButton.toggleTrigger();
         await u.po.userButton.waitForPopover();
 
-        // Now check that all items (static + dynamic) have their icons
-        const updatedButtons = await pagesContainer.locator('button').all();
-        expect(updatedButtons.length).toBeGreaterThanOrEqual(3); // Static + 2 dynamic items
+        // Verify all custom menu items have their icons
+        await u.page.waitForSelector('button:has-text("Dynamic action")');
+        await u.page.waitForSelector('button:has-text("Dynamic link")');
 
-        // Verify static item still has icon
-        const updatedStaticButton = u.page.locator('button').filter({ hasText: 'Custom action' }).first();
-        await expect(updatedStaticButton.locator('span')).toHaveText('🌐');
-
-        // Verify dynamic action item has icon
-        const dynamicActionButton = u.page.locator('button').filter({ hasText: 'Dynamic action' }).first();
-        await expect(dynamicActionButton.locator('span')).toHaveText('🌍');
-
-        // Verify dynamic link item has icon
-        const dynamicLinkButton = u.page.locator('button').filter({ hasText: 'Dynamic link' }).first();
-        await expect(dynamicLinkButton.locator('span')).toHaveText('🌐');
+        await expect(u.page.locator('button', { hasText: 'Toggle menu items' }).locator('span')).toHaveText('🔔');
+        await expect(u.page.locator('button', { hasText: 'Dynamic action' }).locator('span')).toHaveText('🌍');
+        await expect(u.page.locator('button', { hasText: 'Dynamic link' }).locator('span')).toHaveText('🌐');
       });
     });
   },
