@@ -197,6 +197,7 @@ export function SubscriptionsList({
                 width: 'unset',
               }),
             ]}
+            rightIcon={null}
             leftIcon={CogFilled}
             leftIconSx={t => ({
               width: t.sizes.$4,
