@@ -119,14 +119,24 @@ export default defineConfig(overrideOptions => {
    */
   const vendorsEsm: Options = {
     ...esm,
-    entry: ['./src/vendor/crypto-es.js'],
+    bundle: true,
+    minify: true,
+    entry: ['./src/vendor/*.js'],
     outDir: './dist/esm/vendor',
+    legacyOutput: false,
+    outExtension: () => ({
+      js: '.js',
+    }),
+    sourcemap: false,
   };
 
   const vendorsCjs: Options = {
     ...cjs,
-    entry: ['./src/vendor/crypto-es.js'],
+    bundle: true,
+    minify: true,
+    entry: ['./src/vendor/*.js'],
     outDir: './dist/cjs/vendor',
+    sourcemap: false,
   };
 
   const copyPackageJson = (format: 'esm' | 'cjs') => `cp ./package.${format}.json ./dist/${format}/package.json`;
