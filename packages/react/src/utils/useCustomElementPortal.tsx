@@ -16,13 +16,30 @@ export type UseCustomElementPortalReturn = {
 // This function takes a component as prop, and returns functions that mount and unmount
 // the given component into a given node
 export const useCustomElementPortal = (elements: UseCustomElementPortalParams[]) => {
-  const initialState = Array(elements.length).fill(null);
-  const [nodes, setNodes] = useState<(Element | null)[]>(initialState);
+  const [nodes, setNodes] = useState<(Element | null)[]>([]);
 
   return elements.map((el, index) => ({
     id: el.id,
-    mount: (node: Element) => setNodes(prevState => prevState.map((n, i) => (i === index ? node : n))),
-    unmount: () => setNodes(prevState => prevState.map((n, i) => (i === index ? null : n))),
+    mount: (node: Element) => {
+      setNodes(prevState => {
+        const newState = [...prevState];
+        // Ensure array is long enough for the index
+        while (newState.length <= index) {
+          newState.push(null);
+        }
+        newState[index] = node;
+        return newState;
+      });
+    },
+    unmount: () => {
+      setNodes(prevState => {
+        const newState = [...prevState];
+        if (index < newState.length) {
+          newState[index] = null;
+        }
+        return newState;
+      });
+    },
     portal: () => <>{nodes[index] ? createPortal(el.component, nodes[index]) : null}</>,
   }));
 };
