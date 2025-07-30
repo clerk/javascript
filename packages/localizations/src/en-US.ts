@@ -2,6 +2,14 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const enUS: LocalizationResource = {
   locale: 'en-US',
+  taskSelectOrganization: {
+    title: 'Setup your account',
+    subtitle: 'Tell us a bit about your organization',
+    signOut: {
+      actionLink: 'Sign out',
+      actionText: 'Signed in as {{emailAddress}}',
+    },
+  },
   apiKeys: {
     action__add: 'Add new key',
     action__search: 'Search keys',
