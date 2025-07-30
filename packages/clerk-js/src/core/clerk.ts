@@ -400,7 +400,6 @@ export class Clerk implements ClerkInterface {
     });
     this.#publicEventBus.emit(clerkEvents.Status, 'loading');
     this.#publicEventBus.prioritizedOn(clerkEvents.Status, s => (this.#status = s));
-
     // This line is used for the piggy-backing mechanism
     BaseResource.clerk = this;
   }
@@ -1896,7 +1895,7 @@ export class Clerk implements ClerkInterface {
             session: res.createdSessionId,
             redirectUrl: redirectUrls.getAfterSignInUrl(),
           });
-          return this.__internal_navigateToTaskIfAvailable();
+          return this.__internal_navigateToTaskIfAvailable({ redirectUrlComplete: redirectUrls.getAfterSignInUrl() });
         case 'needs_first_factor':
           return navigateToFactorOne();
         case 'needs_second_factor':
@@ -1959,7 +1958,7 @@ export class Clerk implements ClerkInterface {
         session: su.sessionId,
         redirectUrl: redirectUrls.getAfterSignUpUrl(),
       });
-      return this.__internal_navigateToTaskIfAvailable();
+      return this.__internal_navigateToTaskIfAvailable({ redirectUrlComplete: redirectUrls.getAfterSignUpUrl() });
     }
 
     if (si.status === 'needs_second_factor') {
@@ -1996,11 +1995,7 @@ export class Clerk implements ClerkInterface {
     }
 
     if (this.__internal_hasAfterAuthFlows) {
-      if (this.session?.currentTask) {
-        return this.__internal_navigateToTaskIfAvailable({ redirectUrlComplete: redirectUrls.getAfterSignInUrl() });
-      }
-
-      return navigate(redirectUrls.getAfterSignInUrl());
+      return this.__internal_navigateToTaskIfAvailable({ redirectUrlComplete: redirectUrls.getAfterSignInUrl() });
     }
 
     return navigateToSignIn();
