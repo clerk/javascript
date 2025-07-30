@@ -330,8 +330,8 @@ void (async () => {
           scopes,
           oAuthApplicationName: searchParams.get('oauth-application-name'),
           redirectUrl: searchParams.get('redirect_uri'),
-          oAuthApplicationLogoUrl: 'https://picsum.photos/48/48',
-          oAuthApplicationUrl: 'https://google.com',
+          oAuthApplicationLogoUrl: searchParams.get('logo-url'),
+          oAuthApplicationUrl: searchParams.get('app-url'),
         },
       );
     },
