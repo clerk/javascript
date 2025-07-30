@@ -74,18 +74,21 @@ const usePaymentSourceUtils = (forResource: ForPayerType = 'user') => {
       key: 'commerce-payment-source-initialize',
       resourceId: resource?.id,
     },
-    () =>
-      resource?.initializePaymentSource({
+    () => {
+      return resource?.initializePaymentSource({
         gateway: 'stripe',
-      }),
+      });
+    },
   );
+
   const environment = useInternalEnvironment();
 
   useEffect(() => {
+    if (!resource?.id) return;
     initializePaymentSource().catch(() => {
       // ignore errors
     });
-  }, []);
+  }, [resource?.id]);
 
   const externalGatewayId = initializedPaymentSource?.externalGatewayId;
   const externalClientSecret = initializedPaymentSource?.externalClientSecret;
