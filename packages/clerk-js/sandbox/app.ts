@@ -1,5 +1,5 @@
-import * as l from '../../localizations';
 import type { Clerk as ClerkType } from '../';
+import * as l from '../../localizations';
 
 const AVAILABLE_LOCALES = Object.keys(l) as (keyof typeof l)[];
 
@@ -35,6 +35,7 @@ const AVAILABLE_COMPONENTS = [
   'pricingTable',
   'apiKeys',
   'oauthConsent',
+  'taskSelectOrganization',
 ] as const;
 
 const COMPONENT_PROPS_NAMESPACE = 'clerk-js-sandbox';
@@ -95,6 +96,7 @@ const componentControls: Record<(typeof AVAILABLE_COMPONENTS)[number], Component
   pricingTable: buildComponentControls('pricingTable'),
   apiKeys: buildComponentControls('apiKeys'),
   oauthConsent: buildComponentControls('oauthConsent'),
+  taskSelectOrganization: buildComponentControls('taskSelectOrganization'),
 };
 
 declare global {
@@ -334,6 +336,9 @@ void (async () => {
           redirectUrl: searchParams.get('redirect_uri'),
         },
       );
+    },
+    '/task-select-organization': () => {
+      Clerk.mountTaskSelectOrganization(app, componentControls.taskSelectOrganization.getProps() ?? {});
     },
     '/open-sign-in': () => {
       mountOpenSignInButton(app, componentControls.signIn.getProps() ?? {});
