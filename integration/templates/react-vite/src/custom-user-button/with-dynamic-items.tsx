@@ -1,6 +1,6 @@
 import { UserButton } from '@clerk/clerk-react';
 import { PageContextProvider } from '../PageContext.tsx';
-import React from 'react';
+import React, { Fragment } from 'react';
 
 export default function Page() {
   const [showDynamicItem, setShowDynamicItem] = React.useState(false);
@@ -10,27 +10,26 @@ export default function Page() {
       <UserButton>
         <UserButton.MenuItems>
           <UserButton.Action
-            label='Custom action'
+            label='Show dynamic items'
             labelIcon={<span>🌐</span>}
-            onClick={() => {}}
+            onClick={() => setShowDynamicItem(prev => !prev)}
           />
-          {showDynamicItem && (
-            <>
-              <UserButton.Action
-                label='Dynamic action'
-                labelIcon={<span>🌍</span>}
-                onClick={() => {}}
-              />
-              <UserButton.Link
-                href={'/user'}
-                label='Dynamic link'
-                labelIcon={<span>🌐</span>}
-              />
-            </>
-          )}
+          {showDynamicItem ? (
+            <UserButton.Action
+              label='Dynamic action'
+              labelIcon={<span>🌍</span>}
+              onClick={() => {}}
+            />
+          ) : null}
+          {showDynamicItem ? (
+            <UserButton.Link
+              href={'/user'}
+              label='Dynamic link'
+              labelIcon={<span>🌐</span>}
+            />
+          ) : null}
         </UserButton.MenuItems>
       </UserButton>
-      <button onClick={() => setShowDynamicItem(prev => !prev)}>Show dynamic items</button>
     </PageContextProvider>
   );
 }

@@ -466,12 +466,11 @@ testAgainstRunningApps({ withPattern: ['react.vite.withEmailCodes'] })(
         expect(initialButtons.length).toBe(1);
 
         // Check that the static item has its icon
-        const staticActionButton = u.page.locator('button').filter({ hasText: 'Custom action' }).first();
+        const staticActionButton = u.page.locator('button').filter({ hasText: 'Show dynamic items' }).first();
         await expect(staticActionButton.locator('span')).toHaveText('🌐');
 
         // Click the toggle button to show dynamic items
-        const toggleButton = await u.page.waitForSelector('button:has-text("Show dynamic items")');
-        await toggleButton.click();
+        await staticActionButton.click();
 
         // Wait for the dynamic items to appear
         await u.page.waitForSelector('button:has-text("Dynamic action")');
