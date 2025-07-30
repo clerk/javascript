@@ -1,24 +1,10 @@
-import { OrganizationListContext, withCoreSessionSwitchGuard } from '@/ui/contexts';
-import { useTaskSelectOrganizationContext } from '@/ui/contexts/components/SessionTasks';
+import { withCoreSessionSwitchGuard } from '@/ui/contexts';
 import { withCardStateProvider } from '@/ui/elements/contexts';
 
-import { OrganizationList } from '../../OrganizationList';
 import { withTaskGuard } from './withTaskGuard';
 
 const TaskSelectOrganizationInternal = () => {
-  const ctx = useTaskSelectOrganizationContext();
-
-  return (
-    <OrganizationListContext.Provider
-      value={{
-        componentName: 'OrganizationList',
-        skipInvitationScreen: true,
-        appearance: ctx?.appearance,
-      }}
-    >
-      <OrganizationList />
-    </OrganizationListContext.Provider>
-  );
+  return <p>TODO - build UI</p>;
 };
 
 export const TaskSelectOrganization = withCoreSessionSwitchGuard(
