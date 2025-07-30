@@ -191,7 +191,7 @@ export type UseSessionReturn =
     }
   | {
       isLoaded: true;
-      isSignedIn: true;
+      isSignedIn: boolean;
       session: SignedInSessionResource;
     };
 

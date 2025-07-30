@@ -326,7 +326,7 @@ const Components = (props: ComponentsProps) => {
       setState(s => {
         function handleCloseModalForExperimentalUserVerification() {
           const modal = s[`${name}Modal`] || {};
-          if ('afterVerificationCancelled' in modal && notify) {
+          if (modal && typeof modal === 'object' && 'afterVerificationCancelled' in modal && notify) {
             modal.afterVerificationCancelled?.();
           }
         }
