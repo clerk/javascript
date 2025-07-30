@@ -1,4 +1,4 @@
-import { useClerk, useOrganization, useOrganizationList } from '@clerk/shared/react';
+import { useOrganization, useOrganizationList } from '@clerk/shared/react';
 import type { CreateOrganizationParams, OrganizationResource } from '@clerk/types';
 import React from 'react';
 
@@ -39,7 +39,6 @@ type CreateOrganizationFormProps = {
 export const CreateOrganizationForm = withCardStateProvider((props: CreateOrganizationFormProps) => {
   const card = useCardState();
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
-  const clerk = useClerk();
 
   const lastCreatedOrganizationRef = React.useRef<OrganizationResource | null>(null);
   const { createOrganization, isLoaded, setActive, userMemberships } = useOrganizationList({
