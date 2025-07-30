@@ -81,11 +81,12 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref)
 
   /**
    * type="email" will not allow characters like this one "ö", instead remove type email and provide a pattern that accepts any character before the "@" symbol
+   * inputMode="email" ensures the email keyboard appears on mobile devices
    */
 
   const typeProps =
     type === 'email'
-      ? { type: 'text', pattern: '^.*@[a-zA-Z0-9\\-]+\\.[a-zA-Z0-9\\-\\.]+$' }
+      ? { type: 'text', pattern: '^.*@[a-zA-Z0-9\\-]+\\.[a-zA-Z0-9\\-\\.]+$', inputmode: 'email' }
       : { type: type || 'text' };
 
   const passwordManagerProps = ignorePasswordManager
