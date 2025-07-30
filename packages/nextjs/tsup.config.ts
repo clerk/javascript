@@ -1,9 +1,60 @@
+import { readdir, readFile, writeFile } from 'fs/promises';
+import { join } from 'path';
 import type { Options } from 'tsup';
 import { defineConfig } from 'tsup';
 
 import { runAfterLast } from '../../scripts/utils';
-// @ts-ignore
 import { name, version } from './package.json';
+
+async function addJsExtensionsToEsmFiles() {
+  const distDir = './dist/esm';
+
+  async function findJsFiles(dir: string): Promise<string[]> {
+    const files: string[] = [];
+    const entries = await readdir(dir, { withFileTypes: true });
+
+    for (const entry of entries) {
+      const fullPath = join(dir, entry.name);
+      if (entry.isDirectory()) {
+        files.push(...(await findJsFiles(fullPath)));
+      } else if (entry.name.endsWith('.js')) {
+        files.push(fullPath);
+      }
+    }
+
+    return files;
+  }
+
+  function addJsExtensions(content: string): string {
+    return content.replace(/from\s+['"](\.\.?\/[^'"]*?)['"]/g, (match, importPath) => {
+      if (importPath.match(/\.[a-zA-Z0-9]+$/)) {
+        return match;
+      }
+      return `from '${importPath}.js'`;
+    });
+  }
+
+  try {
+    const files = await findJsFiles(distDir);
+    let processedCount = 0;
+
+    for (const file of files) {
+      const content = await readFile(file, 'utf8');
+      const updatedContent = addJsExtensions(content);
+
+      if (content !== updatedContent) {
+        await writeFile(file, updatedContent);
+        processedCount++;
+      }
+    }
+
+    if (processedCount > 0) {
+      console.log(`Added .js extensions to ${processedCount} ESM files`);
+    }
+  } catch (error) {
+    console.error('Error adding .js extensions:', error);
+  }
+}
 
 export default defineConfig(overrideOptions => {
   const isProd = overrideOptions.env?.NODE_ENV === 'production';
@@ -36,6 +87,10 @@ export default defineConfig(overrideOptions => {
   const esm: Options = {
     ...common,
     format: 'esm',
+    outExtension: () => ({
+      js: '.js',
+    }),
+    onSuccess: addJsExtensionsToEsmFiles,
   };
 
   const cjs: Options = {
@@ -64,24 +119,14 @@ export default defineConfig(overrideOptions => {
    */
   const vendorsEsm: Options = {
     ...esm,
-    bundle: true,
-    minify: true,
-    entry: ['./src/vendor/*.js'],
+    entry: ['./src/vendor/crypto-es.js'],
     outDir: './dist/esm/vendor',
-    legacyOutput: false,
-    outExtension: () => ({
-      js: '.js',
-    }),
-    sourcemap: false,
   };
 
   const vendorsCjs: Options = {
     ...cjs,
-    bundle: true,
-    minify: true,
-    entry: ['./src/vendor/*.js'],
+    entry: ['./src/vendor/crypto-es.js'],
     outDir: './dist/cjs/vendor',
-    sourcemap: false,
   };
 
   const copyPackageJson = (format: 'esm' | 'cjs') => `cp ./package.${format}.json ./dist/${format}/package.json`;
