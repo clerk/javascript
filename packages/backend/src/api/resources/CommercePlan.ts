@@ -78,7 +78,6 @@ export class CommercePlan {
   ) {}
 
   static fromJSON(data: CommercePlanJSON): CommercePlan {
-    console.log('data', data);
     const formatAmountJSON = (fee: CommercePlanJSON['fee']) => {
       return {
         amount: fee.amount,
