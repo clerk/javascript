@@ -20,6 +20,7 @@ import { OrganizationPreview } from '@/ui/elements/OrganizationPreview';
 import { Add } from '@/ui/icons';
 import { handleError } from '@/ui/utils/errorHandler';
 
+// TODO -> Do not use stuff from OrganizationList
 import { useOrganizationListInView } from '../../../OrganizationList/OrganizationListPage';
 import {
   OrganizationListPreviewButton,
@@ -44,7 +45,6 @@ export const SelectOrganizationScreen = withCardStateProvider(
     const userInvitationsData = userInvitations.data?.filter(a => !!a);
     const userSuggestionsData = userSuggestions.data?.filter(a => !!a);
 
-    // TODO -> Set organization as active
     return (
       <Col elementDescriptor={descriptors.main}>
         <OrganizationPreviewListItems elementDescriptor={descriptors.taskSelectOrganizationPreviewItems}>
