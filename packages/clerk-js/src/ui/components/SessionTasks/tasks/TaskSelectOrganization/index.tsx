@@ -1,4 +1,4 @@
-import { useUser } from '@clerk/shared/react';
+import { useClerk, useUser } from '@clerk/shared/react';
 import { useState } from 'react';
 
 import { withCoreSessionSwitchGuard } from '@/ui/contexts';
@@ -6,6 +6,7 @@ import { descriptors, Flex, Flow, localizationKeys, Spinner } from '@/ui/customi
 import { Card } from '@/ui/elements/Card';
 import { withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
+import { useRouter } from '@/ui/router';
 import { getIdentifier } from '@/utils/user';
 
 import { useOrganizationListInView } from '../../../OrganizationList/OrganizationListPage';
@@ -14,14 +15,18 @@ import { CreateOrganizationScreen } from './CreateOrganizationScreen';
 import { SelectOrganizationScreen } from './SelectOrganizationScreen';
 
 const TaskSelectOrganizationInternal = () => {
+  const clerk = useClerk();
   const { user } = useUser();
   const { userMemberships, userSuggestions, userInvitations } = useOrganizationListInView();
+  const { navigate } = useRouter();
 
   const isLoading = userMemberships?.isLoading || userInvitations?.isLoading || userSuggestions?.isLoading;
   const hasExistingResources = !!(userMemberships?.count || userInvitations?.count || userSuggestions?.count);
 
+  const navigateAfterSignOut = () => navigate(clerk.buildAfterSignOutUrl());
+
   const handleSignOut = () => {
-    /* TODO - trigger sign out */
+    void clerk.signOut(navigateAfterSignOut);
   };
 
   return (
