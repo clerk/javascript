@@ -2,6 +2,7 @@ import { useClerk, useOrganizationList, useUser } from '@clerk/shared/react';
 import type { CreateOrganizationParams } from '@clerk/types';
 import React, { useState } from 'react';
 
+import { OrganizationAvatarUploader } from '@/ui/common/organizations/OrganizationAvatarUploader';
 import { withCoreSessionSwitchGuard } from '@/ui/contexts';
 import { useSessionTasksContext } from '@/ui/contexts/components/SessionTasks';
 import { Col, descriptors, Flex, Flow, Icon, localizationKeys, Spinner } from '@/ui/customizables';
@@ -24,7 +25,6 @@ import { PreviewListItems, PreviewListSpinner } from '../../OrganizationList/sha
 import { InvitationPreview } from '../../OrganizationList/UserInvitationList';
 import { MembershipPreview } from '../../OrganizationList/UserMembershipList';
 import { SuggestionPreview } from '../../OrganizationList/UserSuggestionList';
-import { OrganizationProfileAvatarUploader } from '../../OrganizationProfile/OrganizationProfileAvatarUploader';
 import { organizationListParams } from '../../OrganizationSwitcher/utils';
 import { withTaskGuard } from './withTaskGuard';
 
@@ -178,16 +178,17 @@ const CreateOrganizationScreen = withCardStateProvider((props: CreateOrganizatio
     <FormContainer>
       <Form.Root onSubmit={onSubmit}>
         <Col>
-          <OrganizationProfileAvatarUploader
+          <OrganizationAvatarUploader
             organization={{ name: nameField.value }}
-            // TODO - Fix type of `onAvatarChange`
             onAvatarChange={async file => setFile(file)}
             onAvatarRemove={file ? onAvatarRemove : null}
+            actionTitle={localizationKeys('taskSelectOrganization.createOrganizationScreen.action__uploadAvatar')}
+            imageTitle={localizationKeys('taskSelectOrganization.createOrganizationScreen.avatarLabel')}
+            elementDescriptor={descriptors.organizationAvatarUploaderContainer}
             avatarPreviewPlaceholder={
               <IconButton
                 variant='ghost'
                 aria-label='Upload organization logo'
-                // TODO -> Update to icon from Figma
                 icon={
                   <Icon
                     size='md'
@@ -268,7 +269,8 @@ const OrganizationListScreen = withCardStateProvider(({ onCreateOrganizationClic
   const isLoading = userMemberships?.isLoading || userInvitations?.isLoading || userSuggestions?.isLoading;
   const hasNextPage = userMemberships?.hasNextPage || userInvitations?.hasNextPage || userSuggestions?.hasNextPage;
 
-  // Solve weird bug with swr while running unit tests
+  // Filter out falsy values that can occur when SWR infinite loading resolves pages out of order
+  // This happens when concurrent requests resolve in unexpected order, leaving undefined/null items in the data array
   const userInvitationsData = userInvitations.data?.filter(a => !!a);
   const userSuggestionsData = userSuggestions.data?.filter(a => !!a);
 

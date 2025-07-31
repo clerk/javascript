@@ -1212,6 +1212,8 @@ export type __internal_LocalizationResource = {
     createOrganizationScreen: {
       formButtonSubmit: LocalizationValue;
       formButtonReset: LocalizationValue;
+      action__uploadAvatar: LocalizationValue;
+      avatarLabel: LocalizationValue;
     };
     organizationListScreen: {
       action__createOrganization: LocalizationValue;
