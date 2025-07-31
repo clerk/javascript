@@ -1,5 +1,5 @@
-import type { Clerk as ClerkType } from '../';
 import * as l from '../../localizations';
+import type { Clerk as ClerkType } from '../';
 
 const AVAILABLE_LOCALES = Object.keys(l) as (keyof typeof l)[];
 
