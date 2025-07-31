@@ -7,7 +7,7 @@ export const enUS: LocalizationResource = {
     subtitle: 'Tell us a bit about your organization',
     signOut: {
       actionLink: 'Sign out',
-      actionText: 'Signed in as {{emailAddress}}',
+      actionText: 'Signed in as {{identifier}}',
     },
     createOrganizationScreen: {
       formButtonSubmit: 'Create organization',

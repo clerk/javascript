@@ -1206,7 +1206,7 @@ export type __internal_LocalizationResource = {
     title: LocalizationValue;
     subtitle: LocalizationValue;
     signOut: {
-      actionText: LocalizationValue<'emailAddress'>;
+      actionText: LocalizationValue<'identifier'>;
       actionLink: LocalizationValue;
     };
     createOrganizationScreen: {
