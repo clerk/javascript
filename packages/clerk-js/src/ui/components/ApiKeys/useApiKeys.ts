@@ -1,5 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import useSWR from 'swr';
 
 export const useApiKeys = ({
@@ -16,14 +16,17 @@ export const useApiKeys = ({
   const cacheKey = {
     key: 'api-keys',
     subject,
+    perPage,
   };
   const {
-    data: apiKeys,
+    data: apiKeysResource,
     isLoading,
     mutate,
-  } = useSWR(enabled ? cacheKey : null, () => clerk.apiKeys.getAll({ subject }));
+  } = useSWR(enabled ? cacheKey : null, () => clerk.apiKeys.getAll({ subject, perPage }));
+  const apiKeys = useMemo(() => apiKeysResource?.data ?? [], [apiKeysResource]);
   const [search, setSearch] = useState('');
-  const filteredApiKeys = (apiKeys ?? []).filter(key => key.name.toLowerCase().includes(search.toLowerCase()));
+
+  const filteredApiKeys = apiKeys.filter(key => key.name.toLowerCase().includes(search.toLowerCase()));
 
   const {
     page,

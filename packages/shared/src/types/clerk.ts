@@ -1968,6 +1968,7 @@ export type APIKeysProps = {
 
 export type GetAPIKeysParams = {
   subject?: string;
+  perPage?: number;
 };
 
 export type CreateAPIKeyParams = {
