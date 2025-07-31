@@ -7,7 +7,6 @@ import { Card } from '@/ui/elements/Card';
 import { withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
 import { useMultipleSessions } from '@/ui/hooks/useMultipleSessions';
-import { getIdentifier } from '@/utils/user';
 
 import { useOrganizationListInView } from '../../../OrganizationList/OrganizationListPage';
 import { withTaskGuard } from '../withTaskGuard';
@@ -22,9 +21,6 @@ const TaskSelectOrganizationInternal = () => {
   const { otherSessions } = useMultipleSessions({ user });
   const { navigateAfterSignOut, navigateAfterMultiSessionSingleSignOutUrl } = useSignOutContext();
 
-  const isLoading = userMemberships?.isLoading || userInvitations?.isLoading || userSuggestions?.isLoading;
-  const hasExistingResources = !!(userMemberships?.count || userInvitations?.count || userSuggestions?.count);
-
   const handleSignOut = () => {
     if (otherSessions.length === 0) {
       return signOut(navigateAfterSignOut);
@@ -33,12 +29,32 @@ const TaskSelectOrganizationInternal = () => {
     return signOut(navigateAfterMultiSessionSingleSignOutUrl, { sessionId: session?.id });
   };
 
+  const isLoading = userMemberships?.isLoading || userInvitations?.isLoading || userSuggestions?.isLoading;
+  const hasExistingResources = !!(userMemberships?.count || userInvitations?.count || userSuggestions?.count);
+  const identifier = user?.primaryEmailAddress?.emailAddress ?? user?.username;
+
   return (
     <Flow.Root flow='taskSelectOrganization'>
       <Card.Root>
-        {!isLoading && user ? (
-          <>
-            <Card.Content sx={t => ({ padding: `${t.space.$8} ${t.space.$none} ${t.space.$none}`, gap: t.space.$6 })}>
+        <Card.Content sx={t => ({ padding: `${t.space.$8} ${t.space.$none} ${t.space.$none}`, gap: t.space.$6 })}>
+          {isLoading ? (
+            <Flex
+              direction={'row'}
+              align={'center'}
+              justify={'center'}
+              sx={t => ({
+                height: '100%',
+                minHeight: t.sizes.$100,
+              })}
+            >
+              <Spinner
+                size={'lg'}
+                colorScheme={'primary'}
+                elementDescriptor={descriptors.spinner}
+              />
+            </Flex>
+          ) : (
+            <>
               <Header.Root
                 showLogo
                 sx={t => ({ padding: `${t.space.$none} ${t.space.$8}` })}
@@ -48,43 +64,25 @@ const TaskSelectOrganizationInternal = () => {
               </Header.Root>
 
               <TaskSelectOrganizationFlows initialFlow={hasExistingResources ? 'select' : 'create'} />
-            </Card.Content>
+            </>
+          )}
+        </Card.Content>
 
-            <Card.Footer>
-              <Card.Action elementId='signOut'>
-                <Card.ActionText
-                  localizationKey={localizationKeys('taskSelectOrganization.signOut.actionText', {
-                    // TODO -> Change this key name to identifier
-                    // TODO -> what happens if the user does not email address? only username or phonenumber
-                    // Signed in as +55482323232
-                    emailAddress: user.primaryEmailAddress?.emailAddress || getIdentifier(user),
-                  })}
-                />
-                <Card.ActionLink
-                  onClick={void handleSignOut}
-                  localizationKey={localizationKeys('taskSelectOrganization.signOut.actionLink')}
-                />
-              </Card.Action>
-            </Card.Footer>
-          </>
-        ) : (
-          // TODO -> Improve loading UI to keep consistent height with SignIn/SignUp
-          <Flex
-            direction={'row'}
-            align={'center'}
-            justify={'center'}
-            sx={t => ({
-              height: '100%',
-              minHeight: t.sizes.$100,
-            })}
-          >
-            <Spinner
-              size={'lg'}
-              colorScheme={'primary'}
-              elementDescriptor={descriptors.spinner}
+        <Card.Footer>
+          <Card.Action elementId='signOut'>
+            {identifier && (
+              <Card.ActionText
+                localizationKey={localizationKeys('taskSelectOrganization.signOut.actionText', {
+                  identifier,
+                })}
+              />
+            )}
+            <Card.ActionLink
+              onClick={handleSignOut}
+              localizationKey={localizationKeys('taskSelectOrganization.signOut.actionLink')}
             />
-          </Flex>
-        )}
+          </Card.Action>
+        </Card.Footer>
       </Card.Root>
     </Flow.Root>
   );
