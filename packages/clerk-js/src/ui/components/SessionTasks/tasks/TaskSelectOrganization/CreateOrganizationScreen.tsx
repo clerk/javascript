@@ -1,5 +1,4 @@
 import { useClerk, useOrganizationList } from '@clerk/shared/react';
-import type { CreateOrganizationParams } from '@clerk/types';
 import React, { useState } from 'react';
 
 import { OrganizationAvatarUploader } from '@/ui/common/organizations/OrganizationAvatarUploader';
@@ -19,7 +18,6 @@ import { organizationListParams } from '../../../OrganizationSwitcher/utils';
 
 type CreateOrganizationScreenProps = {
   onCancel?: () => void;
-  hideSlug?: boolean;
 };
 
 export const CreateOrganizationScreen = withCardStateProvider((props: CreateOrganizationScreenProps) => {
@@ -50,15 +48,7 @@ export const CreateOrganizationScreen = withCardStateProvider((props: CreateOrga
     }
 
     try {
-      const createOrgParams: CreateOrganizationParams = { name: nameField.value };
-
-      if (!props.hideSlug) {
-        // TODO -> Should we always show the slug
-        // should it be exposed as a prop on TaskSelectOrganization
-        createOrgParams.slug = slugField.value;
-      }
-
-      const organization = await createOrganization(createOrgParams);
+      const organization = await createOrganization({ name: nameField.value, slug: slugField.value });
 
       if (file) {
         await organization.setLogo({ file });
@@ -144,22 +134,19 @@ export const CreateOrganizationScreen = withCardStateProvider((props: CreateOrga
               {...nameField.props}
               onChange={onChangeName}
               isRequired
-              // TODO -> Remove auto focus?
               autoFocus
               ignorePasswordManager
             />
           </Form.ControlRow>
-          {!props.hideSlug && (
-            <Form.ControlRow elementId={slugField.id}>
-              <Form.PlainInput
-                {...slugField.props}
-                onChange={event => updateSlugField(event.target.value)}
-                isRequired
-                pattern='^(?=.*[a-z0-9])[a-z0-9\-]+$'
-                ignorePasswordManager
-              />
-            </Form.ControlRow>
-          )}
+          <Form.ControlRow elementId={slugField.id}>
+            <Form.PlainInput
+              {...slugField.props}
+              onChange={event => updateSlugField(event.target.value)}
+              isRequired
+              pattern='^(?=.*[a-z0-9])[a-z0-9\-]+$'
+              ignorePasswordManager
+            />
+          </Form.ControlRow>
         </Flex>
 
         <FormButtonContainer sx={t => ({ marginTop: t.space.$none, flexDirection: 'column' })}>
