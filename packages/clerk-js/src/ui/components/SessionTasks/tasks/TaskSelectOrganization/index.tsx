@@ -34,7 +34,7 @@ const TaskSelectOrganizationInternal = () => {
       <Card.Root>
         {!isLoading && user ? (
           <>
-            <Card.Content sx={t => ({ padding: `${t.space.$8} ${t.space.$none} ${t.space.$none}` })}>
+            <Card.Content sx={t => ({ padding: `${t.space.$8} ${t.space.$none} ${t.space.$none}`, gap: t.space.$6 })}>
               <Header.Root
                 showLogo
                 sx={t => ({ padding: `${t.space.$none} ${t.space.$8}` })}
