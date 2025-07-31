@@ -7,9 +7,12 @@ import type {
 import React, { useState } from 'react';
 
 import {
+  OrganizationPreviewButton,
   OrganizationPreviewListItem,
   OrganizationPreviewListItemButton,
   OrganizationPreviewListItems,
+  OrganizationPreviewSpinner,
+  sharedMainIdentifierSx,
 } from '@/ui/common/organizations/OrganizationPreview';
 import { organizationListParams, populateCacheUpdateItem } from '@/ui/components/OrganizationSwitcher/utils';
 import { useSessionTasksContext } from '@/ui/contexts/components/SessionTasks';
@@ -20,14 +23,6 @@ import { OrganizationPreview } from '@/ui/elements/OrganizationPreview';
 import { useOrganizationListInView } from '@/ui/hooks/useOrganizationListInView';
 import { Add } from '@/ui/icons';
 import { handleError } from '@/ui/utils/errorHandler';
-
-// TODO -> Do not use stuff from OrganizationList
-import {
-  OrganizationListPreviewButton,
-  PreviewListItem,
-  PreviewListSpinner,
-  sharedMainIdentifierSx,
-} from '../../../OrganizationList/shared';
 
 type SelectOrganizationScreenProps = {
   onCreateOrganizationClick: () => void;
@@ -44,6 +39,8 @@ export const SelectOrganizationScreen = withCardStateProvider(
     // This happens when concurrent requests resolve in unexpected order, leaving undefined/null items in the data array
     const userInvitationsData = userInvitations.data?.filter(a => !!a);
     const userSuggestionsData = userSuggestions.data?.filter(a => !!a);
+
+    console.log({ userMemberships, userInvitations });
 
     return (
       <Col elementDescriptor={descriptors.main}>
@@ -80,7 +77,7 @@ export const SelectOrganizationScreen = withCardStateProvider(
                 );
               })}
 
-            {(hasNextPage || isLoading) && <PreviewListSpinner ref={ref} />}
+            {(hasNextPage || isLoading) && <OrganizationPreviewSpinner ref={ref} />}
 
             <CreateOrganizationButton onCreateOrganizationClick={onCreateOrganizationClick} />
           </Actions>
@@ -111,13 +108,16 @@ const MembershipPreview = withCardStateProvider((props: { organization: Organiza
   };
 
   return (
-    <OrganizationListPreviewButton onClick={() => handleOrganizationClicked(props.organization)}>
+    <OrganizationPreviewButton
+      elementDescriptor={descriptors.taskSelectOrganizationPreviewButton}
+      onClick={() => handleOrganizationClicked(props.organization)}
+    >
       <OrganizationPreview
         elementId='taskSelectOrganization'
         mainIdentifierSx={sharedMainIdentifierSx}
         organization={props.organization}
       />
-    </OrganizationListPreviewButton>
+    </OrganizationPreviewButton>
   );
 });
 
@@ -193,13 +193,17 @@ const SuggestionPreview = withCardStateProvider((props: OrganizationSuggestionRe
   }
 
   return (
-    <PreviewListItem organizationData={props.publicOrganizationData}>
+    <OrganizationPreviewListItem
+      organizationData={props.publicOrganizationData}
+      elementId='taskSelectOrganization'
+      elementDescriptor={descriptors.taskSelectOrganizationPreviewItem}
+    >
       <OrganizationPreviewListItemButton
         onClick={handleAccept}
         isLoading={card.isLoading}
         localizationKey={localizationKeys('taskSelectOrganization.selectOrganizationScreen.action__suggestionsAccept')}
       />
-    </PreviewListItem>
+    </OrganizationPreviewListItem>
   );
 });
 

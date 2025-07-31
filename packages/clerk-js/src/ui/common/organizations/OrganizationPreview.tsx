@@ -82,7 +82,7 @@ export const OrganizationPreviewListItem = ({
   );
 };
 
-export const OrganizationPreviewListSpinner = forwardRef<HTMLDivElement>((_, ref) => {
+export const OrganizationPreviewSpinner = forwardRef<HTMLDivElement>((_, ref) => {
   return (
     <Box
       ref={ref}
@@ -122,16 +122,14 @@ export const OrganizationPreviewListItemButton = (props: Parameters<typeof Butto
   );
 };
 
-type OrganizationListPreviewButtonProps = PropsWithChildren<{
+type OrganizationPreviewButtonProps = PropsWithChildren<{
   onClick: () => void | Promise<void>;
-  elementDescription: ElementDescriptor;
+  elementDescriptor: ElementDescriptor;
 }>;
 
-// TODO - Reuse those components on OrganizationList as well
-export const OrganizationListPreviewButton = (props: OrganizationListPreviewButtonProps) => {
+export const OrganizationPreviewButton = (props: OrganizationPreviewButtonProps) => {
   return (
     <PreviewButton
-      elementDescriptor={props.elementDescription}
       sx={[sharedStyles]}
       icon={SwitchArrowRight}
       {...props}
