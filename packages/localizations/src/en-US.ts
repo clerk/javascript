@@ -13,6 +13,9 @@ export const enUS: LocalizationResource = {
       formButtonSubmit: 'Create organization',
       formButtonReset: 'Cancel',
     },
+    organizationListScreen: {
+      action__createOrganization: 'Create organization',
+    },
   },
   apiKeys: {
     action__add: 'Add new key',

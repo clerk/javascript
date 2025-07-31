@@ -338,7 +338,12 @@ void (async () => {
       );
     },
     '/task-select-organization': () => {
-      Clerk.mountTaskSelectOrganization(app, componentControls.taskSelectOrganization.getProps() ?? {});
+      Clerk.mountTaskSelectOrganization(
+        app,
+        componentControls.taskSelectOrganization.getProps() ?? {
+          redirectUrlComplete: '/user-profile',
+        },
+      );
     },
     '/open-sign-in': () => {
       mountOpenSignInButton(app, componentControls.signIn.getProps() ?? {});
