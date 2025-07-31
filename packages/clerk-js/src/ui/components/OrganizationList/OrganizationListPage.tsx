@@ -161,7 +161,8 @@ export const OrganizationListPageList = (props: { onCreateOrganizationClick: () 
     props.onCreateOrganizationClick();
   };
 
-  // Solve weird bug with swr while running unit tests
+  // Filter out falsy values that can occur when SWR infinite loading resolves pages out of order
+  // This happens when concurrent requests resolve in unexpected order, leaving undefined/null items in the data array
   const userInvitationsData = userInvitations.data?.filter(a => !!a);
   const userSuggestionsData = userSuggestions.data?.filter(a => !!a);
 
