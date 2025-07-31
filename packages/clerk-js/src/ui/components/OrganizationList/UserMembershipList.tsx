@@ -1,13 +1,14 @@
 import { useOrganizationList, useUser } from '@clerk/shared/react';
 import type { OrganizationResource } from '@clerk/types';
 
+import { sharedMainIdentifierSx } from '@/ui/common/organizations/OrganizationPreview';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { OrganizationPreview } from '@/ui/elements/OrganizationPreview';
 import { PersonalWorkspacePreview } from '@/ui/elements/PersonalWorkspacePreview';
 
 import { useOrganizationListContext } from '../../contexts';
 import { localizationKeys } from '../../localization';
-import { OrganizationListPreviewButton, sharedMainIdentifierSx } from './shared';
+import { OrganizationListPreviewButton } from './shared';
 
 export const MembershipPreview = withCardStateProvider((props: { organization: OrganizationResource }) => {
   const card = useCardState();

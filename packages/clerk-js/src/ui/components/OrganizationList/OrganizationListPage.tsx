@@ -1,6 +1,7 @@
 import { useUser } from '@clerk/shared/react';
 import { useState } from 'react';
 
+import { OrganizationPreviewSpinner } from '@/ui/common/organizations/OrganizationPreview';
 import { Action, Actions } from '@/ui/elements/Actions';
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
@@ -11,7 +12,7 @@ import { useEnvironment, useOrganizationListContext } from '../../contexts';
 import { Box, Col, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
 import { Add } from '../../icons';
 import { CreateOrganizationForm } from '../CreateOrganization/CreateOrganizationForm';
-import { PreviewListItems, PreviewListSpinner } from './shared';
+import { PreviewListItems } from './shared';
 import { InvitationPreview } from './UserInvitationList';
 import { MembershipPreview, PersonalAccountPreview } from './UserMembershipList';
 import { SuggestionPreview } from './UserSuggestionList';
@@ -188,7 +189,7 @@ export const OrganizationListPageList = (props: { onCreateOrganizationClick: () 
                 );
               })}
 
-            {(hasNextPage || isLoading) && <PreviewListSpinner ref={ref} />}
+            {(hasNextPage || isLoading) && <OrganizationPreviewSpinner ref={ref} />}
 
             <CreateOrganizationButton onCreateOrganizationClick={onCreateOrganizationClick} />
           </Actions>
