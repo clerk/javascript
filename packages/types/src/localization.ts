@@ -1213,6 +1213,9 @@ export type __internal_LocalizationResource = {
       formButtonSubmit: LocalizationValue;
       formButtonReset: LocalizationValue;
     };
+    organizationListScreen: {
+      action__createOrganization: LocalizationValue;
+    };
   };
 };
 
