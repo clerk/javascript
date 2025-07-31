@@ -1022,6 +1022,12 @@ export type ClerkOptions = PendingSessionOptions &
         };
 
     /**
+     * Optional endpoint URL for debug telemetry data when client_debug_mode is enabled.
+     * This endpoint will receive debug logs and performance metrics for debugging purposes.
+     */
+    debugTelemetryEndpoint?: string;
+
+    /**
      * Contains information about the SDK that the host application is using. You don't need to set this value yourself unless you're [developing an SDK](https://clerk.com/docs/references/sdk/overview).
      */
     sdkMetadata?: SDKMetadata;

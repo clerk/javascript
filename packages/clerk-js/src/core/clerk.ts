@@ -197,12 +197,13 @@ export class Clerk implements ClerkInterface {
 
   public static version: string = __PKG_VERSION__;
   public static sdkMetadata: SDKMetadata = {
-    name: __PKG_NAME__,
+    name: '@clerk/clerk-js',
     version: __PKG_VERSION__,
-    environment: process.env.NODE_ENV || 'production',
   };
+
   private static _billing: CommerceBillingNamespace;
   private static _apiKeys: APIKeysNamespace;
+  private static _debugLoggerInitialized = false;
   private _checkout: ClerkInterface['__experimental_checkout'] | undefined;
 
   public client: ClientResource | undefined;
@@ -211,6 +212,7 @@ export class Clerk implements ClerkInterface {
   public user: UserResource | null | undefined;
   public __internal_country?: string | null;
   public telemetry: TelemetryCollector | undefined;
+  public debugLogger?: any; // Will be typed properly after dynamic import
 
   protected internal_last_error: ClerkAPIError | null = null;
   // converted to protected environment to support `updateEnvironment` type assertion
@@ -1480,6 +1482,7 @@ export class Clerk implements ClerkInterface {
     const customNavigate =
       options?.replace && this.#options.routerReplace ? this.#options.routerReplace : this.#options.routerPush;
 
+    this.debugLogger?.info(`Clerk is navigating to: ${toURL}`);
     if (this.#options.routerDebug) {
       console.log(`Clerk is navigating to: ${toURL}`);
     }
@@ -2197,6 +2200,28 @@ export class Clerk implements ClerkInterface {
 
   public updateEnvironment(environment: EnvironmentResource): asserts this is { environment: EnvironmentResource } {
     this.environment = environment;
+
+    // Initialize debug module if client_debug_mode is enabled and not already initialized
+    if (environment.clientDebugMode && !Clerk._debugLoggerInitialized) {
+      this.#initializeDebugModule();
+    }
+  }
+
+  async #initializeDebugModule(): Promise<void> {
+    if (Clerk._debugLoggerInitialized) {
+      return;
+    }
+
+    try {
+      const { createLogger } = await import('./modules/debug');
+
+      const { logger } = createLogger({});
+      this.debugLogger = logger;
+
+      Clerk._debugLoggerInitialized = true;
+    } catch (error) {
+      console.error('Failed to initialize debug module:', error);
+    }
   }
 
   __internal_setCountry = (country: string | null) => {
@@ -2837,5 +2862,12 @@ export class Clerk implements ClerkInterface {
     }
 
     return allowedProtocols;
+  }
+
+  /**
+   * @internal
+   */
+  public static __internal_resetDebugLogger(): void {
+    Clerk._debugLoggerInitialized = false;
   }
 }
