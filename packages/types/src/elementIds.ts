@@ -51,7 +51,8 @@ export type OrganizationPreviewId =
   | 'organizationSwitcherTrigger'
   | 'organizationList'
   | 'organizationSwitcherListedOrganization'
-  | 'organizationSwitcherActiveOrganization';
+  | 'organizationSwitcherActiveOrganization'
+  | 'taskSelectOrganization';
 
 export type CardActionId =
   | 'havingTrouble'
