@@ -1,51 +1,20 @@
-import { useOrganizationList, useUser } from '@clerk/shared/react';
+import { useUser } from '@clerk/shared/react';
 import { useState } from 'react';
 
 import { Action, Actions } from '@/ui/elements/Actions';
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
+import { useOrganizationListInView } from '@/ui/hooks/useOrganizationListInView';
 
 import { useEnvironment, useOrganizationListContext } from '../../contexts';
 import { Box, Col, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
-import { useInView } from '../../hooks';
 import { Add } from '../../icons';
 import { CreateOrganizationForm } from '../CreateOrganization/CreateOrganizationForm';
 import { PreviewListItems, PreviewListSpinner } from './shared';
 import { InvitationPreview } from './UserInvitationList';
 import { MembershipPreview, PersonalAccountPreview } from './UserMembershipList';
 import { SuggestionPreview } from './UserSuggestionList';
-import { organizationListParams } from './utils';
-
-/**
- * @internal
- */
-export const useOrganizationListInView = () => {
-  const { userMemberships, userInvitations, userSuggestions } = useOrganizationList(organizationListParams);
-
-  const { ref } = useInView({
-    threshold: 0,
-    onChange: inView => {
-      if (!inView) {
-        return;
-      }
-      if (userMemberships.hasNextPage) {
-        userMemberships.fetchNext?.();
-      } else if (userInvitations.hasNextPage) {
-        userInvitations.fetchNext?.();
-      } else {
-        userSuggestions.fetchNext?.();
-      }
-    },
-  });
-
-  return {
-    userMemberships,
-    userInvitations,
-    userSuggestions,
-    ref,
-  };
-};
 
 const CreateOrganizationButton = ({
   onCreateOrganizationClick,

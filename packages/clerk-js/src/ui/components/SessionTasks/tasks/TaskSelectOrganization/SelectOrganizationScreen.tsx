@@ -17,11 +17,11 @@ import { Col, descriptors, localizationKeys, Text } from '@/ui/customizables';
 import { Action, Actions } from '@/ui/elements/Actions';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { OrganizationPreview } from '@/ui/elements/OrganizationPreview';
+import { useOrganizationListInView } from '@/ui/hooks/useOrganizationListInView';
 import { Add } from '@/ui/icons';
 import { handleError } from '@/ui/utils/errorHandler';
 
 // TODO -> Do not use stuff from OrganizationList
-import { useOrganizationListInView } from '../../../OrganizationList/OrganizationListPage';
 import {
   OrganizationListPreviewButton,
   PreviewListItem,
