@@ -27,6 +27,7 @@ interface AuthenticateContext extends AuthenticateRequestOptions {
 
   // handshake-related values
   devBrowserToken: string | undefined;
+  handshakeFormat: 'nonce' | 'token' | undefined;
   handshakeNonce: string | undefined;
   handshakeRedirectLoopCounter: number;
   handshakeToken: string | undefined;
@@ -242,6 +243,10 @@ class AuthenticateContext implements AuthenticateContext {
     this.handshakeRedirectLoopCounter = Number(this.getCookie(constants.Cookies.RedirectCount)) || 0;
     this.handshakeNonce =
       this.getQueryParam(constants.QueryParameters.HandshakeNonce) || this.getCookie(constants.Cookies.HandshakeNonce);
+    this.handshakeFormat =
+      (this.getQueryParam(constants.QueryParameters.HandshakeFormat) as 'nonce' | 'token') ||
+      (this.getCookie(constants.Cookies.HandshakeFormat) as 'nonce' | 'token') ||
+      'nonce';
   }
 
   private getQueryParam(name: string) {
@@ -311,6 +316,23 @@ class AuthenticateContext implements AuthenticateContext {
 
   private sessionExpired(jwt: Jwt | undefined): boolean {
     return !!jwt && jwt?.payload.exp <= (Date.now() / 1000) >> 0;
+  }
+
+  /**
+   * Checks if the current context can handle nonce-based handshakes
+   * by reading the handshake format from cookies or query parameters
+   * @returns true if nonce handshakes are supported, false otherwise
+   */
+  public canHandleNonceHandshake(): boolean {
+    return this.handshakeFormat === 'nonce';
+  }
+
+  /**
+   * Gets the handshake format from the request context, defaulting to 'token' if not specified
+   * @returns The handshake format ('nonce' or 'token')
+   */
+  public getHandshakeFormat(): 'nonce' | 'token' {
+    return this.handshakeFormat || 'token';
   }
 }
 
