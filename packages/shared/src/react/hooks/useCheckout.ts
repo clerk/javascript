@@ -2,11 +2,11 @@ import type {
   __experimental_CheckoutCacheState,
   __experimental_CheckoutInstance,
   CommerceCheckoutResource,
-  CommerceSubscriptionPlanPeriod,
 } from '@clerk/types';
 import { useMemo, useSyncExternalStore } from 'react';
 
 import type { ClerkAPIResponseError } from '../..';
+import type { __experimental_CheckoutProvider } from '../contexts';
 import { useCheckoutContext } from '../contexts';
 import { useClerk } from './useClerk';
 import { useOrganization } from './useOrganization';
@@ -45,13 +45,9 @@ type __experimental_UseCheckoutReturn = {
   };
 };
 
-type UseCheckoutOptions = {
-  for?: 'organization';
-  planPeriod: CommerceSubscriptionPlanPeriod;
-  planId: string;
-};
+type Params = Parameters<typeof __experimental_CheckoutProvider>[0];
 
-export const useCheckout = (options?: UseCheckoutOptions): __experimental_UseCheckoutReturn => {
+export const useCheckout = (options?: Params): __experimental_UseCheckoutReturn => {
   const contextOptions = useCheckoutContext();
   const { for: forOrganization, planId, planPeriod } = options || contextOptions;
 
@@ -84,7 +80,6 @@ export const useCheckout = (options?: UseCheckoutOptions): __experimental_UseChe
         id: null,
         externalClientSecret: null,
         externalGatewayId: null,
-        statement_id: null,
         status: null,
         totals: null,
         isImmediatePlanChange: null,

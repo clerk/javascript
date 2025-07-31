@@ -157,6 +157,7 @@ export const deDE: LocalizationResource = {
     totalDue: undefined,
     totalDueToday: 'Heute fällig',
     viewFeatures: 'Funktionen anzeigen',
+    viewPayment: undefined,
     year: 'Jahr',
   },
   createOrganization: {

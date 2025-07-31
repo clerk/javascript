@@ -182,6 +182,7 @@ export const MultiSessionActions = (props: MultiSessionActionsProps) => {
               icon={CogFilled}
               label={localizationKeys('userButton.action__manageAccount')}
               onClick={handleManageAccountClicked}
+              focusRing
             />
             <SmallAction
               elementDescriptor={descriptors.userButtonPopoverActionButton}
@@ -193,6 +194,7 @@ export const MultiSessionActions = (props: MultiSessionActionsProps) => {
               icon={SignOut}
               label={localizationKeys('userButton.action__signOut')}
               onClick={handleSignOutSessionClicked(session)}
+              focusRing
             />
           </Flex>
         </SmallActions>

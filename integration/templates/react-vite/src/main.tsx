@@ -13,6 +13,7 @@ import UserButtonCustom from './custom-user-button';
 import UserButtonCustomDynamicLabels from './custom-user-button/with-dynamic-labels.tsx';
 import UserButtonCustomDynamicLabelsAndCustomPages from './custom-user-button/with-dynamic-label-and-custom-pages.tsx';
 import UserButtonCustomTrigger from './custom-user-button-trigger';
+import UserButtonCustomDynamicItems from './custom-user-button/with-dynamic-items.tsx';
 import UserButton from './user-button';
 import Waitlist from './waitlist';
 import OrganizationProfile from './organization-profile';
@@ -82,6 +83,10 @@ const router = createBrowserRouter([
       {
         path: '/custom-user-button',
         element: <UserButtonCustom />,
+      },
+      {
+        path: '/custom-user-button-dynamic-items',
+        element: <UserButtonCustomDynamicItems />,
       },
       {
         path: '/custom-user-button-dynamic-labels',
