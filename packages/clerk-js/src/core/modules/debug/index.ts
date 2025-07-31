@@ -28,11 +28,18 @@ export interface ConsoleLoggerOptions {
 
 /**
  * Singleton instance for managing debug logger initialization
+ *
+ * Race Condition Fix:
+ * - Uses a promise cache (initializationPromise) to prevent multiple concurrent initializations
+ * - If initialization is already in progress, subsequent calls wait for the same promise
+ * - If initialization fails, the promise cache is cleared to allow retries
+ * - This ensures only one initialization process runs at a time, even with concurrent calls
  */
 class DebugLoggerManager {
   private static instance: DebugLoggerManager;
   private initialized = false;
   private logger: any = null;
+  private initializationPromise: Promise<any> | null = null;
 
   private constructor() {}
 
@@ -48,14 +55,32 @@ class DebugLoggerManager {
 
   /**
    * Initializes the debug logger if not already initialized
+   * Uses a promise cache to prevent race conditions during concurrent initialization
    * @param options - Configuration options for the logger
    * @returns The debug logger instance
    */
   async initialize(options: LoggerOptions = {}): Promise<any> {
+    // If already initialized, return the logger immediately
     if (this.initialized && this.logger) {
       return this.logger;
     }
 
+    // If initialization is in progress, wait for the existing promise
+    if (this.initializationPromise) {
+      return this.initializationPromise;
+    }
+
+    // Start initialization and cache the promise
+    this.initializationPromise = this.performInitialization(options);
+    return this.initializationPromise;
+  }
+
+  /**
+   * Performs the actual initialization logic
+   * @param options - Configuration options for the logger
+   * @returns Promise resolving to the debug logger instance
+   */
+  private async performInitialization(options: LoggerOptions): Promise<any> {
     try {
       const { endpoint, logLevel = 'info', filters } = options;
 
@@ -70,6 +95,7 @@ class DebugLoggerManager {
       return this.logger;
     } catch (error) {
       console.error('Failed to initialize debug module:', error);
+      this.initializationPromise = null;
       return null;
     }
   }
@@ -94,6 +120,7 @@ class DebugLoggerManager {
   reset(): void {
     this.initialized = false;
     this.logger = null;
+    this.initializationPromise = null;
   }
 }
 

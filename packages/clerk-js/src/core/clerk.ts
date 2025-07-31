@@ -160,6 +160,32 @@ type SetActiveHook = (intent?: 'sign-out') => void | Promise<void>;
 
 export type ClerkCoreBroadcastChannelEvent = { type: 'signout' };
 
+/**
+ * Interface for the debug logger with all available logging methods
+ */
+interface DebugLoggerInterface {
+  debug(message: string, context?: Record<string, unknown>, source?: string): void;
+  error(message: string, context?: Record<string, unknown>, source?: string): void;
+  info(message: string, context?: Record<string, unknown>, source?: string): void;
+  trace(message: string, context?: Record<string, unknown>, source?: string): void;
+  warn(message: string, context?: Record<string, unknown>, source?: string): void;
+}
+
+/**
+ * Type guard to check if an object implements the DebugLoggerInterface
+ */
+function _isDebugLogger(obj: unknown): obj is DebugLoggerInterface {
+  return (
+    typeof obj === 'object' &&
+    obj !== null &&
+    typeof (obj as DebugLoggerInterface).debug === 'function' &&
+    typeof (obj as DebugLoggerInterface).error === 'function' &&
+    typeof (obj as DebugLoggerInterface).info === 'function' &&
+    typeof (obj as DebugLoggerInterface).trace === 'function' &&
+    typeof (obj as DebugLoggerInterface).warn === 'function'
+  );
+}
+
 declare global {
   interface Window {
     Clerk?: Clerk;
@@ -211,7 +237,7 @@ export class Clerk implements ClerkInterface {
   public user: UserResource | null | undefined;
   public __internal_country?: string | null;
   public telemetry: TelemetryCollector | undefined;
-  public debugLogger?: any; // Will be typed properly after dynamic import
+  public debugLogger?: DebugLoggerInterface; // Properly typed debug logger interface
 
   protected internal_last_error: ClerkAPIError | null = null;
   // converted to protected environment to support `updateEnvironment` type assertion
