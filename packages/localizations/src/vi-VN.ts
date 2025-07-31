@@ -158,6 +158,7 @@ export const viVN: LocalizationResource = {
     totalDue: 'Tổng cần thanh toán',
     totalDueToday: 'Tổng cần thanh toán hôm nay',
     viewFeatures: 'Xem tính năng',
+    viewPayment: undefined,
     year: 'Năm',
   },
   createOrganization: {

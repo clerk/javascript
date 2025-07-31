@@ -158,6 +158,7 @@ export const faIR: LocalizationResource = {
     totalDue: undefined,
     totalDueToday: 'سررسید کل امروز',
     viewFeatures: 'مشاهده ویژگی ها',
+    viewPayment: undefined,
     year: 'سال',
   },
   createOrganization: {

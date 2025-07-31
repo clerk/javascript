@@ -99,7 +99,8 @@ export type FlowMetadata = {
     | 'pricingTable'
     | 'apiKeys'
     | 'oauthConsent'
-    | 'subscriptionDetails';
+    | 'subscriptionDetails'
+    | 'taskSelectOrganization';
   part?:
     | 'start'
     | 'emailCode'
