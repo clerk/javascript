@@ -166,15 +166,24 @@ export interface Clerk {
   version: string | undefined;
 
   /**
-   * The version of the Clerk Frontend API that the SDK is using.
-   */
-  apiVersion: string | undefined;
-
-  /**
    * If present, contains information about the SDK that the host application is using.
    * For example, if Clerk is loaded through `@clerk/nextjs`, this would be `{ name: '@clerk/nextjs', version: '1.0.0' }`
    */
   sdkMetadata: SDKMetadata | undefined;
+
+  /**
+   * Returns a snapshot of data through the `info` property. It can be used during debugging sessions.
+   */
+  debug: () => {
+    info: {
+      version: string;
+      frontendApi: {
+        version: string;
+        host: string;
+      };
+      loadedOptions?: ClerkOptions;
+    };
+  };
 
   /**
    * If true the bootstrapping of Clerk.load() has completed successfully.

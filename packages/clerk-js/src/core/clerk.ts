@@ -281,8 +281,17 @@ export class Clerk implements ClerkInterface {
     return Clerk.sdkMetadata;
   }
 
-  get apiVersion(): string {
-    return SUPPORTED_FAPI_VERSION;
+  debug() {
+    return {
+      info: Object.freeze({
+        version: this.version,
+        frontendApi: Object.freeze({
+          version: SUPPORTED_FAPI_VERSION,
+          host: this.frontendApi,
+        }),
+        loadedOptions: { ...this.#options },
+      }),
+    };
   }
 
   get loaded(): boolean {
