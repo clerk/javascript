@@ -12,10 +12,12 @@ export const enUS: LocalizationResource = {
     createOrganizationScreen: {
       formButtonSubmit: 'Create organization',
       formButtonReset: 'Cancel',
+      action__uploadAvatar: 'Logo',
+      avatarLabel: 'Logo',
     },
     selectOrganizationScreen: {
-      action__createOrganization: 'Create organization',
       suggestionsAcceptedLabel: 'Pending approval',
+      action__createOrganization: 'Create organization',
       action__suggestionsAccept: 'Request to join',
       action__invitationAccept: 'Join',
     },
