@@ -7,10 +7,8 @@ import { useMemo, useSyncExternalStore } from 'react';
 
 import type { ClerkAPIResponseError } from '../..';
 import type { __experimental_CheckoutProvider } from '../contexts';
-import { useCheckoutContext } from '../contexts';
+import { useAuthContext, useCheckoutContext } from '../contexts';
 import { useClerk } from './useClerk';
-import { useOrganization } from './useOrganization';
-import { useUser } from './useUser';
 
 /**
  * Utility type that removes function properties from a type.
@@ -52,20 +50,27 @@ export const useCheckout = (options?: Params): __experimental_UseCheckoutReturn 
   const { for: forOrganization, planId, planPeriod } = options || contextOptions;
 
   const clerk = useClerk();
-  const { organization } = useOrganization();
-  const { user } = useUser();
+  // const { organization } = useOrganization();
+  // const { user } = useUser();
+  const { orgId, userId } = useAuthContext();
 
-  if (!user) {
+  if (!userId) {
     throw new Error('Clerk: User is not authenticated');
   }
 
-  if (forOrganization === 'organization' && !organization) {
+  if (forOrganization === 'organization' && !orgId) {
     throw new Error('Clerk: Use `setActive` to set the organization');
   }
 
   const manager = useMemo(
     () => clerk.__experimental_checkout({ planId, planPeriod, for: forOrganization }),
-    [user.id, organization?.id, planId, planPeriod, forOrganization],
+    [userId, orgId, planId, planPeriod, forOrganization],
+  );
+
+  console.log('manager', manager);
+  console.log(
+    'clerk.__experimental_checkout',
+    clerk.__experimental_checkout({ planId, planPeriod, for: forOrganization }),
   );
 
   const managerProperties = useSyncExternalStore(

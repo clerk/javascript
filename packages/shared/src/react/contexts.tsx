@@ -1,12 +1,17 @@
 'use client';
 
 import type {
+  ActClaim,
   ClerkOptions,
   ClientResource,
   CommerceSubscriptionPlanPeriod,
   ForPayerType,
+  JwtPayload,
   LoadedClerk,
+  OrganizationCustomPermissionKey,
+  OrganizationCustomRoleKey,
   OrganizationResource,
+  SessionStatusClaim,
   SignedInSessionResource,
   UserResource,
 } from '@clerk/types';
@@ -102,6 +107,21 @@ Learn more: https://clerk.com/docs/components/clerk-provider`.trim(),
   }
 }
 
+export type AuthContextValue = {
+  userId: string | null | undefined;
+  sessionId: string | null | undefined;
+  sessionStatus: SessionStatusClaim | null | undefined;
+  sessionClaims: JwtPayload | null | undefined;
+  actor: ActClaim | null | undefined;
+  orgId: string | null | undefined;
+  orgRole: OrganizationCustomRoleKey | null | undefined;
+  orgSlug: string | null | undefined;
+  orgPermissions: OrganizationCustomPermissionKey[] | null | undefined;
+  factorVerificationAge: [number, number] | null;
+};
+
+const [AuthContext, useAuthContext] = createContextAndHook<AuthContextValue>('AuthContext');
+
 export {
   ClientContext,
   useClientContext,
@@ -118,4 +138,6 @@ export {
   useCheckoutContext,
   __experimental_CheckoutProvider,
   useAssertWrappedByClerkProvider,
+  AuthContext,
+  useAuthContext,
 };
