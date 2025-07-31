@@ -197,13 +197,12 @@ export class Clerk implements ClerkInterface {
 
   public static version: string = __PKG_VERSION__;
   public static sdkMetadata: SDKMetadata = {
-    name: '@clerk/clerk-js',
+    name: __PKG_NAME__,
     version: __PKG_VERSION__,
   };
 
   private static _billing: CommerceBillingNamespace;
   private static _apiKeys: APIKeysNamespace;
-  private static _debugLoggerInitialized = false;
   private _checkout: ClerkInterface['__experimental_checkout'] | undefined;
 
   public client: ClientResource | undefined;
@@ -2201,24 +2200,16 @@ export class Clerk implements ClerkInterface {
   public updateEnvironment(environment: EnvironmentResource): asserts this is { environment: EnvironmentResource } {
     this.environment = environment;
 
-    // Initialize debug module if client_debug_mode is enabled and not already initialized
-    if (environment.clientDebugMode && !Clerk._debugLoggerInitialized) {
+    // Initialize debug module if client_debug_mode is enabled
+    if (environment.clientDebugMode) {
       this.#initializeDebugModule();
     }
   }
 
   async #initializeDebugModule(): Promise<void> {
-    if (Clerk._debugLoggerInitialized) {
-      return;
-    }
-
     try {
-      const { createLogger } = await import('./modules/debug');
-
-      const { logger } = createLogger({});
-      this.debugLogger = logger;
-
-      Clerk._debugLoggerInitialized = true;
+      const { getDebugLogger } = await import('./modules/debug');
+      this.debugLogger = await getDebugLogger({});
     } catch (error) {
       console.error('Failed to initialize debug module:', error);
     }
@@ -2867,7 +2858,9 @@ export class Clerk implements ClerkInterface {
   /**
    * @internal
    */
-  public static __internal_resetDebugLogger(): void {
-    Clerk._debugLoggerInitialized = false;
+  public static async __internal_resetDebugLogger(): Promise<void> {
+    // This method is now handled by the debug module itself
+    const { __internal_resetDebugLogger } = await import('./modules/debug');
+    __internal_resetDebugLogger();
   }
 }

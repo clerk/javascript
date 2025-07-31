@@ -27,6 +27,87 @@ export interface ConsoleLoggerOptions {
 }
 
 /**
+ * Singleton instance for managing debug logger initialization
+ */
+class DebugLoggerManager {
+  private static instance: DebugLoggerManager;
+  private initialized = false;
+  private logger: any = null;
+
+  private constructor() {}
+
+  /**
+   * Gets the singleton instance
+   */
+  static getInstance(): DebugLoggerManager {
+    if (!DebugLoggerManager.instance) {
+      DebugLoggerManager.instance = new DebugLoggerManager();
+    }
+    return DebugLoggerManager.instance;
+  }
+
+  /**
+   * Initializes the debug logger if not already initialized
+   * @param options - Configuration options for the logger
+   * @returns The debug logger instance
+   */
+  async initialize(options: LoggerOptions = {}): Promise<any> {
+    if (this.initialized && this.logger) {
+      return this.logger;
+    }
+
+    try {
+      const { endpoint, logLevel = 'info', filters } = options;
+
+      const transports = [{ transport: new ConsoleTransport() }, { transport: new TelemetryTransport(endpoint) }];
+
+      const transportInstances = transports.map(t => t.transport);
+      const compositeTransport = new CompositeTransport(transportInstances);
+      const logger = new DebugLogger(compositeTransport, logLevel, filters);
+
+      this.logger = logger;
+      this.initialized = true;
+      return this.logger;
+    } catch (error) {
+      console.error('Failed to initialize debug module:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Gets the current logger instance
+   */
+  getLogger(): any {
+    return this.logger;
+  }
+
+  /**
+   * Checks if the debug logger is initialized
+   */
+  isInitialized(): boolean {
+    return this.initialized;
+  }
+
+  /**
+   * Resets the initialization state (for testing purposes)
+   */
+  reset(): void {
+    this.initialized = false;
+    this.logger = null;
+  }
+}
+
+/**
+ * Gets or initializes the debug logger
+ * @param options - Configuration options for the logger
+ * @returns Promise resolving to the debug logger instance
+ */
+export async function getDebugLogger(options: LoggerOptions = {}): Promise<any> {
+  const manager = DebugLoggerManager.getInstance();
+  return manager.initialize(options);
+}
+
+/**
  * Creates a composite logger with both console and telemetry transports
  * @param options - Configuration options for the logger
  * @returns Object containing the logger and composite transport
@@ -78,4 +159,12 @@ export function createCompositeLogger(options: CompositeLoggerOptions) {
 
   const logger = new DebugLogger(compositeTransport, logLevel, filters);
   return { logger, transport: compositeTransport };
+}
+
+/**
+ * @internal
+ * Resets the debug logger manager (for testing purposes)
+ */
+export function __internal_resetDebugLogger(): void {
+  DebugLoggerManager.getInstance().reset();
 }
