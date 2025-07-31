@@ -144,6 +144,7 @@ export type {
   Token,
   User,
   TestingToken,
+  CommercePlan,
 } from './api/resources';
 
 /**
