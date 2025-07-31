@@ -5,39 +5,10 @@ settings:
   excludeLinksFromLockfile: false
 
 catalogs:
-  peer-react:
-    react:
-      specifier: ^18.0.0 || ^19.0.0 || ^19.0.0-0
-      version: 18.3.1
-    react-dom:
-      specifier: ^18.0.0 || ^19.0.0 || ^19.0.0-0
-      version: 18.3.1
-  react:
-    '@types/react':
-      specifier: 18.3.23
-      version: 18.3.23
-    '@types/react-dom':
-      specifier: 18.3.7
-      version: 18.3.7
-    react:
-      specifier: 18.3.1
-      version: 18.3.1
-    react-dom:
-      specifier: 18.3.1
-      version: 18.3.1
   repo:
     tslib:
       specifier: 2.8.1
       version: 2.8.1
-    tsup:
-      specifier: 8.5.0
-      version: 8.5.0
-    typescript:
-      specifier: 5.8.3
-      version: 5.8.3
-    zx:
-      specifier: 8.7.1
-      version: 8.7.1
 
 overrides:
   jest: 29.7.0
@@ -473,6 +444,9 @@ importers:
       '@zxcvbn-ts/language-common':
         specifier: 3.0.4
         version: 3.0.4
+      alien-signals:
+        specifier: ^2.0.5
+        version: 2.0.5
       browser-tabs-lock:
         specifier: 1.3.0
         version: 1.3.0
@@ -5868,6 +5842,9 @@ packages:
 
   alien-signals@1.0.9:
     resolution: {integrity: sha512-2dQYgGZHrW4pOYv0BWiw4cH/ElhwmLnQDcj/fdnRRF2OO3YBqgJXSleI1EbbXdQsuC5oCvr6+VKAOEElsmcx4Q==}
+
+  alien-signals@2.0.5:
+    resolution: {integrity: sha512-PdJB6+06nUNAClInE3Dweq7/2xVAYM64vvvS1IHVHSJmgeOtEdrAGyp7Z2oJtYm0B342/Exd2NT0uMJaThcjLQ==}
 
   anser@1.4.10:
     resolution: {integrity: sha512-hCv9AqTQ8ycjpSd3upOJd7vFwW1JaoYQ7tpham03GJ1ca8/65rqn0RpaWpItOAd6ylW9wAw6luXYPJIyPFVOww==}
@@ -13302,7 +13279,7 @@ packages:
   superagent@8.1.2:
     resolution: {integrity: sha512-6WTxW1EB6yCxV5VFOIPQruWGHqc3yI7hEmZK6h+pyk69Lk/Ut7rLUY6W/ONF2MjBuGjvmMiIpsrVJ2vjrHlslA==}
     engines: {node: '>=6.4.0 <13 || >=14'}
-    deprecated: Please upgrade to superagent v10.2.2+, see release notes at https://github.com/forwardemail/superagent/releases/tag/v10.2.2 - maintenance is supported by Forward Email @ https://forwardemail.net
+    deprecated: Please upgrade to v9.0.0+ as we have fixed a public vulnerability with formidable dependency. Note that v9.0.0+ requires Node.js v14.18.0+. See https://github.com/ladjs/superagent/pull/1800 for insight. This project is supported and maintained by the team at Forward Email @ https://forwardemail.net
 
   superjson@1.13.3:
     resolution: {integrity: sha512-mJiVjfd2vokfDxsQPOwJ/PtanO87LhpYY88ubI5dUB1Ab58Txbyje3+jpm+/83R/fevaq/107NNhtYBLuoTrFg==}
@@ -21108,6 +21085,8 @@ snapshots:
       require-from-string: 2.0.2
 
   alien-signals@1.0.9: {}
+
+  alien-signals@2.0.5: {}
 
   anser@1.4.10: {}
 
