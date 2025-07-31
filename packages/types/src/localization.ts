@@ -1215,8 +1215,11 @@ export type __internal_LocalizationResource = {
       action__uploadAvatar: LocalizationValue;
       avatarLabel: LocalizationValue;
     };
-    organizationListScreen: {
+    selectOrganizationScreen: {
+      suggestionsAcceptedLabel: LocalizationValue;
+      action__suggestionsAccept: LocalizationValue;
       action__createOrganization: LocalizationValue;
+      action__invitationAccept: LocalizationValue;
     };
   };
 };

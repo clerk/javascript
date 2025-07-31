@@ -13,8 +13,11 @@ export const enUS: LocalizationResource = {
       formButtonSubmit: 'Create organization',
       formButtonReset: 'Cancel',
     },
-    organizationListScreen: {
+    selectOrganizationScreen: {
       action__createOrganization: 'Create organization',
+      suggestionsAcceptedLabel: 'Pending approval',
+      action__suggestionsAccept: 'Request to join',
+      action__invitationAccept: 'Join',
     },
   },
   apiKeys: {

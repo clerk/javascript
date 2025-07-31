@@ -9,22 +9,21 @@ import React, { useState } from 'react';
 import {
   OrganizationPreviewListItem,
   OrganizationPreviewListItemButton,
+  OrganizationPreviewListItems,
 } from '@/ui/common/organizations/OrganizationPreview';
 import { organizationListParams, populateCacheUpdateItem } from '@/ui/components/OrganizationSwitcher/utils';
 import { useSessionTasksContext } from '@/ui/contexts/components/SessionTasks';
-import { Col, descriptors, localizationKeys } from '@/ui/customizables';
+import { Col, descriptors, localizationKeys, Text } from '@/ui/customizables';
 import { Action, Actions } from '@/ui/elements/Actions';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { OrganizationPreview } from '@/ui/elements/OrganizationPreview';
 import { Add } from '@/ui/icons';
 import { handleError } from '@/ui/utils/errorHandler';
 
-import { Text } from '../../../customizables';
 import { useOrganizationListInView } from '../../../OrganizationList/OrganizationListPage';
 import {
   OrganizationListPreviewButton,
   PreviewListItem,
-  PreviewListItems,
   PreviewListSpinner,
   sharedMainIdentifierSx,
 } from '../../../OrganizationList/shared';
@@ -48,7 +47,7 @@ export const SelectOrganizationScreen = withCardStateProvider(
     // TODO -> Set organization as active
     return (
       <Col elementDescriptor={descriptors.main}>
-        <PreviewListItems>
+        <OrganizationPreviewListItems elementDescriptor={descriptors.taskSelectOrganizationPreviewItems}>
           <Actions role='menu'>
             {(userMemberships.count || 0) > 0 &&
               userMemberships.data?.map(inv => {
@@ -85,7 +84,7 @@ export const SelectOrganizationScreen = withCardStateProvider(
 
             <CreateOrganizationButton onCreateOrganizationClick={onCreateOrganizationClick} />
           </Actions>
-        </PreviewListItems>
+        </OrganizationPreviewListItems>
       </Col>
     );
   },
@@ -157,11 +156,12 @@ const InvitationPreview = withCardStateProvider((props: UserOrganizationInvitati
     <OrganizationPreviewListItem
       organizationData={props.publicOrganizationData}
       elementId='taskSelectOrganization'
+      elementDescriptor={descriptors.taskSelectOrganizationPreviewItem}
     >
       <OrganizationPreviewListItemButton
         isLoading={card.isLoading}
         onClick={handleAccept}
-        localizationKey={localizationKeys('organizationList.action__invitationAccept')}
+        localizationKey={localizationKeys('taskSelectOrganization.selectOrganizationScreen.action__invitationAccept')}
       />
     </OrganizationPreviewListItem>
   );
@@ -187,7 +187,7 @@ const SuggestionPreview = withCardStateProvider((props: OrganizationSuggestionRe
     return (
       <Text
         colorScheme='secondary'
-        localizationKey={localizationKeys('organizationList.suggestionsAcceptedLabel')}
+        localizationKey={localizationKeys('taskSelectOrganization.selectOrganizationScreen.suggestionsAcceptedLabel')}
       />
     );
   }
@@ -197,7 +197,7 @@ const SuggestionPreview = withCardStateProvider((props: OrganizationSuggestionRe
       <OrganizationPreviewListItemButton
         onClick={handleAccept}
         isLoading={card.isLoading}
-        localizationKey={localizationKeys('organizationList.action__suggestionsAccept')}
+        localizationKey={localizationKeys('taskSelectOrganization.selectOrganizationScreen.action__suggestionsAccept')}
       />
     </PreviewListItem>
   );
@@ -218,7 +218,7 @@ const CreateOrganizationButton = ({
     <Action
       elementDescriptor={descriptors.taskSelectOrganizationCreateOrganizationActionButton}
       icon={Add}
-      label={localizationKeys('taskSelectOrganization.organizationListScreen.action__createOrganization')}
+      label={localizationKeys('taskSelectOrganization.selectOrganizationScreen.action__createOrganization')}
       onClick={onCreateOrganizationClick}
       sx={t => ({
         borderTopWidth: t.borderWidths.$normal,

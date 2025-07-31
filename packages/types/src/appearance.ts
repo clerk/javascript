@@ -351,6 +351,8 @@ export type ElementsConfig = {
   organizationListPreviewItemActionButton: WithOptions;
   organizationListCreateOrganizationActionButton: WithOptions;
 
+  taskSelectOrganizationPreviewItem: WithOptions;
+  taskSelectOrganizationPreviewItems: WithOptions;
   taskSelectOrganizationCreateOrganizationActionButton: WithOptions;
 
   // TODO: Test this idea. Instead of userButtonUserPreview, have a userPreview__userButton instead
