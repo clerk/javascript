@@ -29,14 +29,18 @@ const TaskSelectOrganizationInternal = () => {
       <Card.Root>
         {!isLoading && user ? (
           <>
-            <Card.Content>
-              <Header.Root showLogo>
+            <Card.Content sx={t => ({ padding: `${t.space.$8} ${t.space.$none} ${t.space.$none}` })}>
+              <Header.Root
+                showLogo
+                sx={t => ({ padding: `${t.space.$none} ${t.space.$8}` })}
+              >
                 <Header.Title localizationKey={localizationKeys('taskSelectOrganization.title')} />
                 <Header.Subtitle localizationKey={localizationKeys('taskSelectOrganization.subtitle')} />
               </Header.Root>
 
               <TaskSelectOrganizationFlows initialFlow={hasExistingResources ? 'select' : 'create'} />
             </Card.Content>
+
             <Card.Footer>
               <Card.Action elementId='signOut'>
                 <Card.ActionText
