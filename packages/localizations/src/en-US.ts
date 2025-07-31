@@ -147,6 +147,7 @@ export const enUS: LocalizationResource = {
     totalDue: 'Total due',
     totalDueToday: 'Total Due Today',
     viewFeatures: 'View features',
+    viewPayment: 'View payment',
     year: 'Year',
   },
   createOrganization: {

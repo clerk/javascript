@@ -923,6 +923,118 @@ describe('Clerk singleton', () => {
       mockEnvironmentFetch.mockReset();
     });
 
+    describe('with after-auth flows', () => {
+      beforeEach(() => {
+        mockClientFetch.mockReset();
+        mockEnvironmentFetch.mockReturnValue(
+          Promise.resolve({
+            userSettings: mockUserSettings,
+            displayConfig: mockDisplayConfig,
+            isSingleSession: () => false,
+            isProduction: () => false,
+            isDevelopmentOrStaging: () => true,
+            organizationSettings: {
+              forceOrganizationSelection: true,
+            },
+          }),
+        );
+      });
+
+      it('redirects to pending task', async () => {
+        const mockSession = {
+          id: '1',
+          status: 'pending',
+          user: {},
+          tasks: [{ key: 'select-organization' }],
+          currentTask: { key: 'select-organization', __internal_getUrl: () => 'https://sut/tasks/select-organization' },
+          lastActiveToken: { getRawString: () => 'mocked-token' },
+        };
+
+        const mockResource = {
+          ...mockSession,
+          remove: jest.fn(),
+          touch: jest.fn(() => Promise.resolve()),
+          getToken: jest.fn(),
+          reload: jest.fn(() => Promise.resolve(mockSession)),
+        };
+
+        mockResource.touch.mockReturnValueOnce(Promise.resolve());
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({
+            signedInSessions: [mockResource],
+            signIn: new SignIn(null),
+            signUp: new SignUp({
+              status: 'complete',
+            } as any as SignUpJSON),
+          }),
+        );
+
+        const mockSetActive = jest.fn();
+        const mockSignUpCreate = jest
+          .fn()
+          .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load(mockedLoadOptions);
+        if (!sut.client) {
+          fail('we should always have a client');
+        }
+        sut.client.signUp.create = mockSignUpCreate;
+        sut.setActive = mockSetActive;
+
+        await sut.handleRedirectCallback();
+
+        await waitFor(() => {
+          expect(mockNavigate.mock.calls[0][0]).toBe('/sign-in#/tasks/select-organization');
+        });
+      });
+
+      it('redirects to after sign-in URL when task has been resolved', async () => {
+        const mockSession = {
+          id: '1',
+          status: 'active',
+          user: {},
+          lastActiveToken: { getRawString: () => 'mocked-token' },
+        };
+
+        const mockResource = {
+          ...mockSession,
+          remove: jest.fn(),
+          touch: jest.fn(() => Promise.resolve()),
+          getToken: jest.fn(),
+          reload: jest.fn(() => Promise.resolve(mockSession)),
+        };
+
+        mockResource.touch.mockReturnValueOnce(Promise.resolve());
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({
+            signedInSessions: [mockResource],
+            signIn: new SignIn(null),
+            signUp: new SignUp(null),
+          }),
+        );
+
+        const mockSetActive = jest.fn();
+        const mockSignUpCreate = jest
+          .fn()
+          .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load(mockedLoadOptions);
+        if (!sut.client) {
+          fail('we should always have a client');
+        }
+        sut.client.signUp.create = mockSignUpCreate;
+        sut.setActive = mockSetActive;
+
+        await sut.handleRedirectCallback();
+
+        await waitFor(() => {
+          expect(mockNavigate.mock.calls[0][0]).toBe('/');
+        });
+      });
+    });
+
     it('creates a new user and calls setActive if the user was not found during sso signup', async () => {
       mockEnvironmentFetch.mockReturnValue(
         Promise.resolve({

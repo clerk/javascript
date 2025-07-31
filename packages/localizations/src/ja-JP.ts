@@ -154,6 +154,7 @@ export const jaJP: LocalizationResource = {
     totalDue: undefined,
     totalDueToday: undefined,
     viewFeatures: undefined,
+    viewPayment: undefined,
     year: undefined,
   },
   createOrganization: {
@@ -425,7 +426,7 @@ export const jaJP: LocalizationResource = {
       headerTitle__general: '一般',
       headerTitle__members: 'メンバー',
       profileSection: {
-        primaryButton: undefined,
+        primaryButton: 'プロフィールを更新',
         title: '組織プロフィール',
         uploadAction__title: 'ロゴ',
       },
@@ -1189,7 +1190,7 @@ export const jaJP: LocalizationResource = {
         title: '電話番号',
       },
       profileSection: {
-        primaryButton: undefined,
+        primaryButton: 'プロフィールを更新',
         title: 'プロフィール',
       },
       usernameSection: {

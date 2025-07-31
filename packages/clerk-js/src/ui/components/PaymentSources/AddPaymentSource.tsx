@@ -19,6 +19,7 @@ import { handleError } from '@/ui/utils/errorHandler';
 import { useSubscriberTypeContext, useSubscriberTypeLocalizationRoot } from '../../contexts';
 import { descriptors, Flex, localizationKeys, Spinner, useAppearance, useLocalizations } from '../../customizables';
 import type { LocalizationKey } from '../../localization';
+import { PaymentElementSkeleton } from './PaymentElementSkeleton';
 
 const useStripeAppearance = (node: HTMLElement | null) => {
   const theme = useAppearance().parsedInternalTheme;
@@ -231,7 +232,7 @@ const AddPaymentSourceForm = ({ children }: PropsWithChildren) => {
         })}
       >
         {children}
-        <PaymentElement />
+        <PaymentElement fallback={<PaymentElementSkeleton />} />
         <Card.Alert>{card.error}</Card.Alert>
         <FormButtons
           isDisabled={!isFormReady}

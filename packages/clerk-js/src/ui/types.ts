@@ -18,24 +18,25 @@ import type {
   SignUpFallbackRedirectUrl,
   SignUpForceRedirectUrl,
   SignUpProps,
+  TaskSelectOrganizationProps,
   UserButtonProps,
   UserProfileProps,
   WaitlistProps,
 } from '@clerk/types';
 
 export type {
+  __internal_OAuthConsentProps,
+  __internal_UserVerificationProps,
+  CreateOrganizationProps,
   GoogleOneTapProps,
+  OrganizationListProps,
+  OrganizationProfileProps,
+  OrganizationSwitcherProps,
   SignInProps,
   SignUpProps,
   UserButtonProps,
   UserProfileProps,
-  OrganizationSwitcherProps,
-  OrganizationProfileProps,
-  CreateOrganizationProps,
-  OrganizationListProps,
   WaitlistProps,
-  __internal_UserVerificationProps,
-  __internal_OAuthConsentProps,
 };
 
 export type AvailableComponentProps =
@@ -53,7 +54,8 @@ export type AvailableComponentProps =
   | __internal_UserVerificationProps
   | __internal_SubscriptionDetailsProps
   | __internal_PlanDetailsProps
-  | APIKeysProps;
+  | APIKeysProps
+  | TaskSelectOrganizationProps;
 
 type ComponentMode = 'modal' | 'mounted';
 type SignInMode = 'modal' | 'redirect';
@@ -132,9 +134,12 @@ export type CheckoutCtx = __internal_CheckoutProps & {
 } & NewSubscriptionRedirectUrl;
 
 export type SessionTasksCtx = {
-  nextTask: () => Promise<void>;
-  redirectUrlComplete?: string;
-  currentTaskContainer: React.RefObject<HTMLDivElement> | null;
+  redirectUrlComplete: string;
+  currentTaskContainer?: React.RefObject<HTMLDivElement> | null;
+};
+
+export type TaskSelectOrganizationCtx = TaskSelectOrganizationProps & {
+  componentName: 'TaskSelectOrganization';
 };
 
 export type OAuthConsentCtx = __internal_OAuthConsentProps & {
@@ -166,5 +171,6 @@ export type AvailableComponentCtx =
   | APIKeysCtx
   | OAuthConsentCtx
   | SubscriptionDetailsCtx
-  | PlanDetailsCtx;
+  | PlanDetailsCtx
+  | TaskSelectOrganizationCtx;
 export type AvailableComponentName = AvailableComponentCtx['componentName'];

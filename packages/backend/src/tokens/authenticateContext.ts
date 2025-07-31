@@ -174,7 +174,7 @@ class AuthenticateContext implements AuthenticateContext {
    * @returns {boolean} True if referrer exists and is from a different origin, false otherwise.
    */
   public isCrossOriginReferrer(): boolean {
-    if (!this.referrer || !this.origin) {
+    if (!this.referrer || !this.clerkUrl.origin) {
       return false;
     }
 
@@ -184,7 +184,7 @@ class AuthenticateContext implements AuthenticateContext {
       }
 
       const referrerOrigin = new URL(this.referrer).origin;
-      return referrerOrigin !== this.origin;
+      return referrerOrigin !== this.clerkUrl.origin;
     } catch {
       // Invalid referrer URL format
       return false;

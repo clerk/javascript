@@ -1,5 +1,33 @@
 # Change Log
 
+## 4.71.0
+
+### Minor Changes
+
+- [Billing Beta]: Replace `org` for `organization` as payer type for billing APIs. ([#6423](https://github.com/clerk/javascript/pull/6423)) by [@panteliselef](https://github.com/panteliselef)
+
+  This applies for all billing APIs, except the resources classes that represent data from Frontend API.
+
+- Refactor base theme approach to enable opting into simple theme. ([#6371](https://github.com/clerk/javascript/pull/6371)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  ```tsx
+  appearance={{
+    theme: 'simple' // removes Clerk base theme
+  }}
+  ```
+
+### Patch Changes
+
+- Update JSDocs for `SessionTask` to align with Clerk documentation ([#6396](https://github.com/clerk/javascript/pull/6396)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Make `.finalize()` from useCheckout to return a Promise. ([#6422](https://github.com/clerk/javascript/pull/6422)) by [@panteliselef](https://github.com/panteliselef)
+
+## 4.70.1
+
+### Patch Changes
+
+- Add TypeScript types for `<TaskSelectOrganization />` component. ([#6376](https://github.com/clerk/javascript/pull/6376)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
 ## 4.70.0
 
 ### Minor Changes
