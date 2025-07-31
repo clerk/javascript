@@ -7,8 +7,8 @@ import { Card } from '@/ui/elements/Card';
 import { withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
 import { useMultipleSessions } from '@/ui/hooks/useMultipleSessions';
+import { useOrganizationListInView } from '@/ui/hooks/useOrganizationListInView';
 
-import { useOrganizationListInView } from '../../../OrganizationList/OrganizationListPage';
 import { withTaskGuard } from '../withTaskGuard';
 import { CreateOrganizationScreen } from './CreateOrganizationScreen';
 import { SelectOrganizationScreen } from './SelectOrganizationScreen';
