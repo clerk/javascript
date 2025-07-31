@@ -20,6 +20,10 @@ const TaskSelectOrganizationInternal = () => {
   const isLoading = userMemberships?.isLoading || userInvitations?.isLoading || userSuggestions?.isLoading;
   const hasExistingResources = !!(userMemberships?.count || userInvitations?.count || userSuggestions?.count);
 
+  const handleSignOut = () => {
+    /* TODO - trigger sign out */
+  };
+
   return (
     <Flow.Root flow='taskSelectOrganization'>
       <Card.Root>
@@ -43,7 +47,10 @@ const TaskSelectOrganizationInternal = () => {
                     emailAddress: user.primaryEmailAddress?.emailAddress || getIdentifier(user),
                   })}
                 />
-                <Card.ActionLink localizationKey={localizationKeys('taskSelectOrganization.signOut.actionLink')} />
+                <Card.ActionLink
+                  onClick={handleSignOut}
+                  localizationKey={localizationKeys('taskSelectOrganization.signOut.actionLink')}
+                />
               </Card.Action>
             </Card.Footer>
           </>

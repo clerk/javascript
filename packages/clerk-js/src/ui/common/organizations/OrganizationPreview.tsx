@@ -11,10 +11,14 @@ import { SwitchArrowRight } from '../../icons';
 import type { ThemableCssProp } from '../../styledSystem';
 import { common } from '../../styledSystem';
 
-export const OrganizationPreviewListItems = (props: PropsWithChildren) => {
+type OrganizationPreviewListItemsProps = PropsWithChildren<{
+  elementDescriptor: ElementDescriptor;
+}>;
+
+export const OrganizationPreviewListItems = ({ elementDescriptor, children }: OrganizationPreviewListItemsProps) => {
   return (
     <Col
-      elementDescriptor={descriptors.organizationListPreviewItems}
+      elementDescriptor={elementDescriptor}
       sx={t => ({
         maxHeight: `calc(8 * ${t.sizes.$12})`,
         overflowY: 'auto',
@@ -24,7 +28,7 @@ export const OrganizationPreviewListItems = (props: PropsWithChildren) => {
         ...common.unstyledScrollbar(t),
       })}
     >
-      {props.children}
+      {children}
     </Col>
   );
 };
@@ -42,12 +46,14 @@ export const sharedMainIdentifierSx: ThemableCssProp = t => ({
 
 type OrganizationPreviewListItemProps = PropsWithChildren<{
   elementId: React.ComponentProps<typeof OrganizationPreview>['elementId'];
+  elementDescriptor: React.ComponentProps<typeof OrganizationPreview>['elementDescriptor'];
   organizationData: UserOrganizationInvitationResource['publicOrganizationData'];
 }>;
 
 export const OrganizationPreviewListItem = ({
   children,
   elementId,
+  elementDescriptor,
   organizationData,
 }: OrganizationPreviewListItemProps) => {
   return (
@@ -64,7 +70,7 @@ export const OrganizationPreviewListItem = ({
         }),
         sharedStyles,
       ]}
-      elementDescriptor={descriptors.organizationListPreviewItem}
+      elementDescriptor={elementDescriptor}
     >
       <OrganizationPreview
         elementId={elementId}
