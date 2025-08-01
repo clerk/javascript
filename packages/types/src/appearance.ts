@@ -552,6 +552,7 @@ export type ElementsConfig = {
   profileSectionSubtitleText: WithOptions<ProfileSectionId>;
   profileSectionContent: WithOptions<ProfileSectionId>;
   profileSectionPrimaryButton: WithOptions<ProfileSectionId>;
+  profileSectionButtonGroup: WithOptions<ProfileSectionId>;
   profilePage: WithOptions<ProfilePageId>;
 
   // TODO: review
