@@ -172,6 +172,20 @@ export interface Clerk {
   sdkMetadata: SDKMetadata | undefined;
 
   /**
+   * Returns a snapshot of data through the `info` property. It can be used during debugging sessions.
+   */
+  debug: () => {
+    info: {
+      version: string;
+      frontendApi: {
+        version: string;
+        host: string;
+      };
+      loadedOptions?: ClerkOptions;
+    };
+  };
+
+  /**
    * If true the bootstrapping of Clerk.load() has completed successfully.
    */
   loaded: boolean;
