@@ -91,7 +91,7 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
         {...rest}
       >
         {previewElement}
-        <Col gap={1}>
+        <Col gap={2}>
           <Flex
             elementDescriptor={descriptors.avatarImageActions}
             gap={2}
