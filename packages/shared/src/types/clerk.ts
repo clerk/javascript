@@ -38,6 +38,7 @@ import type { LocalizationResource } from './localization';
 import type { OAuthProvider, OAuthScope } from './oauth';
 import type { OrganizationResource } from './organization';
 import type { OrganizationCustomRoleKey } from './organizationMembership';
+import type { ClerkPaginationParams } from './pagination';
 import type {
   AfterMultiSessionSingleSignOutUrl,
   AfterSignOutUrl,
@@ -1966,10 +1967,9 @@ export type APIKeysProps = {
   showDescription?: boolean;
 };
 
-export type GetAPIKeysParams = {
+export type GetAPIKeysParams = ClerkPaginationParams<{
   subject?: string;
-  perPage?: number;
-};
+}>;
 
 export type CreateAPIKeyParams = {
   type?: 'api_key';

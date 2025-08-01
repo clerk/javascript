@@ -66,7 +66,7 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
     startingRow,
     endingRow,
     cacheKey,
-  } = useApiKeys({ subject, perPage, enabled: isOrg ? canReadAPIKeys : true });
+  } = useApiKeys({ subject, pageSize: perPage, enabled: isOrg ? canReadAPIKeys : true });
   const card = useCardState();
   const clerk = useClerk();
   const {

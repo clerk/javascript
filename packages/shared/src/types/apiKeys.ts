@@ -1,5 +1,5 @@
 import type { CreateAPIKeyParams, GetAPIKeysParams, RevokeAPIKeyParams } from './clerk';
-import type { ClerkPaginatedResponse, ClerkPaginationParams } from './pagination';
+import type { ClerkPaginatedResponse } from './pagination';
 import type { ClerkResource } from './resource';
 
 export interface APIKeyResource extends ClerkResource {
@@ -27,7 +27,7 @@ export interface APIKeysNamespace {
    *
    * Retrieves all API keys for the current user or organization.
    */
-  getAll(params?: ClerkPaginationParams<GetAPIKeysParams>): Promise<ClerkPaginatedResponse<APIKeyResource>>;
+  getAll(params?: GetAPIKeysParams): Promise<ClerkPaginatedResponse<APIKeyResource>>;
   /**
    * @experimental This API is in early access and may change in future releases.
    *

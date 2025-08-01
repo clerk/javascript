@@ -4,11 +4,13 @@ import useSWR from 'swr';
 
 export const useApiKeys = ({
   subject,
-  perPage = 5,
+  pageSize = 5,
+  initialPage = 1,
   enabled,
 }: {
   subject: string;
-  perPage?: number;
+  pageSize?: number;
+  initialPage?: number;
   enabled: boolean;
 }) => {
   const clerk = useClerk();
@@ -16,13 +18,14 @@ export const useApiKeys = ({
   const cacheKey = {
     key: 'api-keys',
     subject,
-    perPage,
+    initialPage,
+    pageSize,
   };
   const {
     data: apiKeysResource,
     isLoading,
     mutate,
-  } = useSWR(enabled ? cacheKey : null, () => clerk.apiKeys.getAll({ subject, perPage }));
+  } = useSWR(enabled ? cacheKey : null, () => clerk.apiKeys.getAll({ subject, pageSize, initialPage }));
   const apiKeys = useMemo(() => apiKeysResource?.data ?? [], [apiKeysResource]);
   const [search, setSearch] = useState('');
 
@@ -36,7 +39,7 @@ export const useApiKeys = ({
     startingRow,
     endingRow,
     paginatedItems: paginatedApiKeys,
-  } = useClientSidePagination(filteredApiKeys, perPage);
+  } = useClientSidePagination(filteredApiKeys, pageSize);
 
   return {
     apiKeys: paginatedApiKeys,
@@ -53,7 +56,6 @@ export const useApiKeys = ({
     endingRow,
   };
 };
-
 const useClientSidePagination = <T>(items: T[], itemsPerPage: number) => {
   const [page, setPage] = useState(1);
 
