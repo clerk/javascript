@@ -31,7 +31,12 @@ describe('Helper Functions', () => {
     });
 
     it('should handle consecutive capitals', () => {
-      expect(toKebabCase('XMLParser')).toBe('-x-m-l-parser');
+      expect(toKebabCase('XMLParser')).toBe('x-m-l-parser');
+    });
+
+    it('should not add leading hyphen for strings starting with uppercase', () => {
+      expect(toKebabCase('ColorBackground')).toBe('color-background');
+      expect(toKebabCase('Primary')).toBe('primary');
     });
   });
 

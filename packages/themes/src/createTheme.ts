@@ -37,9 +37,10 @@ type ThemeOptions = {
 /**
  * Converts camelCase to kebab-case for CSS variables
  * @example toKebabCase('colorBackground') => 'color-background'
+ * @example toKebabCase('XMLParser') => 'x-m-l-parser' (no leading hyphen)
  */
 export function toKebabCase(str: string): string {
-  return str.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`);
+  return str.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`).replace(/^-/, '');
 }
 
 /**
