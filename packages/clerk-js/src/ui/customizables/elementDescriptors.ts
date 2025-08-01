@@ -212,6 +212,11 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'organizationListPreviewItemActionButton',
   'organizationListCreateOrganizationActionButton',
 
+  'taskSelectOrganizationPreviewItem',
+  'taskSelectOrganizationPreviewItems',
+  'taskSelectOrganizationCreateOrganizationActionButton',
+  'taskSelectOrganizationPreviewButton',
+
   'userPreview',
   'userPreviewAvatarContainer',
   'userPreviewAvatarBox',

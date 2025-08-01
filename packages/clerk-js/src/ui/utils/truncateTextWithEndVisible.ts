@@ -32,7 +32,7 @@ export function truncateWithEndVisible(str: string, maxLength = 20, endChars = 5
 
   const beginLength = maxLength - endChars - ELLIPSIS_LENGTH;
   const beginPortion = chars.slice(0, beginLength).join('');
-  const endPortion = chars.slice(-endChars).join('');
+  const endPortion = endChars > 0 ? chars.slice(-endChars).join('') : '';
 
   return beginPortion + ELLIPSIS + endPortion;
 }

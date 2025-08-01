@@ -1202,6 +1202,26 @@ export type __internal_LocalizationResource = {
     formFieldCaption__expiration__never: LocalizationValue;
     formFieldCaption__expiration__expiresOn: LocalizationValue<'date'>;
   };
+  taskSelectOrganization: {
+    title: LocalizationValue;
+    subtitle: LocalizationValue;
+    signOut: {
+      actionText: LocalizationValue<'identifier'>;
+      actionLink: LocalizationValue;
+    };
+    createOrganization: {
+      formButtonSubmit: LocalizationValue;
+      formButtonReset: LocalizationValue;
+      uploadAction__title: LocalizationValue;
+      imageFormTitle: LocalizationValue;
+    };
+    selectOrganization: {
+      suggestionsAcceptedLabel: LocalizationValue;
+      action__suggestionsAccept: LocalizationValue;
+      action__createOrganization: LocalizationValue;
+      action__invitationAccept: LocalizationValue;
+    };
+  };
 };
 
 type WithParamName<T> = T &

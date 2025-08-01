@@ -351,6 +351,11 @@ export type ElementsConfig = {
   organizationListPreviewItemActionButton: WithOptions;
   organizationListCreateOrganizationActionButton: WithOptions;
 
+  taskSelectOrganizationPreviewItem: WithOptions;
+  taskSelectOrganizationPreviewItems: WithOptions;
+  taskSelectOrganizationCreateOrganizationActionButton: WithOptions;
+  taskSelectOrganizationPreviewButton: WithOptions;
+
   // TODO: Test this idea. Instead of userButtonUserPreview, have a userPreview__userButton instead
   // Same for other repeated selectors, eg avatar
   userPreview: WithOptions<UserPreviewId>;

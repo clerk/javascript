@@ -35,6 +35,7 @@ const AVAILABLE_COMPONENTS = [
   'pricingTable',
   'apiKeys',
   'oauthConsent',
+  'taskSelectOrganization',
 ] as const;
 
 const COMPONENT_PROPS_NAMESPACE = 'clerk-js-sandbox';
@@ -95,6 +96,7 @@ const componentControls: Record<(typeof AVAILABLE_COMPONENTS)[number], Component
   pricingTable: buildComponentControls('pricingTable'),
   apiKeys: buildComponentControls('apiKeys'),
   oauthConsent: buildComponentControls('oauthConsent'),
+  taskSelectOrganization: buildComponentControls('taskSelectOrganization'),
 };
 
 declare global {
@@ -332,6 +334,14 @@ void (async () => {
           scopes,
           oAuthApplicationName: searchParams.get('oauth-application-name'),
           redirectUrl: searchParams.get('redirect_uri'),
+        },
+      );
+    },
+    '/task-select-organization': () => {
+      Clerk.mountTaskSelectOrganization(
+        app,
+        componentControls.taskSelectOrganization.getProps() ?? {
+          redirectUrlComplete: '/user-profile',
         },
       );
     },
