@@ -1,14 +1,14 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import {
+  convertTuplesToCssVariables,
   createThemeFactory,
   createThemeObject,
   experimental_createTheme,
   mergeThemeConfigurations,
   normalizeDarkModeSelector,
-  processElements,
-  processTupleVariables,
   resolveBaseTheme,
+  resolveElementsConfiguration,
   toKebabCase,
   transformSelectorForNesting,
 } from '../createTheme';
@@ -47,8 +47,15 @@ describe('Helper Functions', () => {
       expect(transformSelectorForNesting('.custom-selector')).toBe('.custom-selector &');
     });
 
+    it('should transform ID selectors to use CSS nesting', () => {
+      expect(transformSelectorForNesting('#dark')).toBe('#dark &');
+      expect(transformSelectorForNesting('#theme-dark')).toBe('#theme-dark &');
+      expect(transformSelectorForNesting('#custom-selector')).toBe('#custom-selector &');
+    });
+
     it('should not transform selectors that already contain &', () => {
       expect(transformSelectorForNesting('.dark &')).toBe('.dark &');
+      expect(transformSelectorForNesting('#theme &')).toBe('#theme &');
       expect(transformSelectorForNesting('.theme & .dark')).toBe('.theme & .dark');
     });
 
@@ -61,15 +68,20 @@ describe('Helper Functions', () => {
       );
     });
 
-    it('should not transform non-class selectors', () => {
+    it('should not transform non-class/non-ID selectors', () => {
       expect(transformSelectorForNesting('[data-theme="dark"]')).toBe('[data-theme="dark"]');
       expect(transformSelectorForNesting('html')).toBe('html');
-      expect(transformSelectorForNesting('#dark-theme')).toBe('#dark-theme');
+      expect(transformSelectorForNesting('body')).toBe('body');
     });
 
     it('should handle complex class selectors', () => {
       expect(transformSelectorForNesting('.dark.active')).toBe('.dark.active &');
       expect(transformSelectorForNesting('.theme-dark .nested')).toBe('.theme-dark .nested &');
+    });
+
+    it('should handle complex ID selectors', () => {
+      expect(transformSelectorForNesting('#dark-theme')).toBe('#dark-theme &');
+      expect(transformSelectorForNesting('#theme .nested')).toBe('#theme .nested &');
     });
   });
 
@@ -95,7 +107,7 @@ describe('Helper Functions', () => {
     });
   });
 
-  describe('processTupleVariables', () => {
+  describe('convertTuplesToCssVariables', () => {
     it('should process tuple variables and generate CSS with default selector', () => {
       const variables = {
         colorBackground: ['#ffffff', '#000000'],
@@ -103,7 +115,7 @@ describe('Helper Functions', () => {
         fontFamily: 'Arial', // Non-tuple should pass through
       };
 
-      const result = processTupleVariables(variables, '.dark');
+      const result = convertTuplesToCssVariables(variables, '.dark');
 
       expect(result.processedVariables).toEqual({
         colorBackground: 'var(--clerk-color-background)',
@@ -124,7 +136,7 @@ describe('Helper Functions', () => {
         colorBackground: ['#fff', '#000'],
       };
 
-      const result = processTupleVariables(variables, '[data-theme="dark"]');
+      const result = convertTuplesToCssVariables(variables, '[data-theme="dark"]');
 
       expect(result.cssString).toContain('[data-theme="dark"] {');
       expect(result.cssString).toContain('--clerk-color-background: #000;');
@@ -136,7 +148,7 @@ describe('Helper Functions', () => {
       };
 
       // Must be explicit - no fallbacks
-      const result = processTupleVariables(variables, '@media (prefers-color-scheme: dark)');
+      const result = convertTuplesToCssVariables(variables, '@media (prefers-color-scheme: dark)');
 
       expect(result.cssString).toContain('@media (prefers-color-scheme: dark)');
       expect(result.cssString).toContain(':root {');
@@ -148,7 +160,7 @@ describe('Helper Functions', () => {
         colorBackground: ['#fff', '#000'],
       };
 
-      const result = processTupleVariables(variables, '@media (prefers-color-scheme: dark)');
+      const result = convertTuplesToCssVariables(variables, '@media (prefers-color-scheme: dark)');
 
       expect(result.cssString).toContain('@media (prefers-color-scheme: dark) {');
       expect(result.cssString).toContain('      :root {'); // Check for nested :root
@@ -164,7 +176,7 @@ describe('Helper Functions', () => {
         colorSecondary: '#red', // Non-tuple should pass through
       };
 
-      const result = processTupleVariables(variables, null);
+      const result = convertTuplesToCssVariables(variables, null);
 
       expect(result.processedVariables).toEqual({
         colorBackground: '#fff', // Light value only
@@ -175,7 +187,7 @@ describe('Helper Functions', () => {
     });
 
     it('should handle empty variables', () => {
-      const result = processTupleVariables({});
+      const result = convertTuplesToCssVariables({});
       expect(result.processedVariables).toEqual({});
       expect(result.cssString).toBeNull();
     });
@@ -187,7 +199,7 @@ describe('Helper Functions', () => {
         colorSecondary: ['#red', '#darkred'], // Valid tuple
       };
 
-      const result = processTupleVariables(variables, '.dark');
+      const result = convertTuplesToCssVariables(variables, '.dark');
 
       expect(result.processedVariables).toEqual({
         colorBackground: [],
@@ -203,7 +215,7 @@ describe('Helper Functions', () => {
         colorPrimaryForeground: ['#000', '#fff'],
       };
 
-      const result = processTupleVariables(variables, '.dark');
+      const result = convertTuplesToCssVariables(variables, '.dark');
 
       expect(result.processedVariables.colorPrimaryForeground).toBe('var(--clerk-color-primary-foreground)');
       expect(result.cssString).toContain('--clerk-color-primary-foreground: #000;');
@@ -211,9 +223,9 @@ describe('Helper Functions', () => {
     });
   });
 
-  describe('processElements', () => {
+  describe('resolveElementsConfiguration', () => {
     it('should return undefined for no elements', () => {
-      expect(processElements(undefined, '.dark')).toBeUndefined();
+      expect(resolveElementsConfiguration(undefined, '.dark')).toBeUndefined();
     });
 
     it('should return static elements as-is', () => {
@@ -222,7 +234,7 @@ describe('Helper Functions', () => {
         input: { borderColor: 'blue' },
       };
 
-      const result = processElements(elements, '.dark');
+      const result = resolveElementsConfiguration(elements, '.dark');
       expect(result).toEqual(elements);
     });
 
@@ -231,7 +243,7 @@ describe('Helper Functions', () => {
         button: { backgroundColor: 'red' },
       });
 
-      const result = processElements(elementsFn, '.custom-dark');
+      const result = resolveElementsConfiguration(elementsFn, '.custom-dark');
 
       expect(elementsFn).toHaveBeenCalledWith('.custom-dark &'); // Now transformed with &
       expect(result).toEqual({ button: { backgroundColor: 'red' } });
@@ -245,11 +257,11 @@ describe('Helper Functions', () => {
       // Mock console.warn to avoid test output noise
       const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-      const result = processElements(elementsFn, '.dark');
+      const result = resolveElementsConfiguration(elementsFn, '.dark');
 
       expect(result).toBeUndefined();
       expect(consoleWarnSpy).toHaveBeenCalledWith(
-        'Failed to call elements function with darkModeSelector:',
+        '[Clerk Theme] Failed to call elements function with darkModeSelector:',
         expect.any(Error),
       );
 
@@ -261,7 +273,7 @@ describe('Helper Functions', () => {
         button: { backgroundColor: 'red' },
       });
 
-      const result = processElements(elementsFn, null);
+      const result = resolveElementsConfiguration(elementsFn, null);
 
       expect(elementsFn).not.toHaveBeenCalled(); // Function should not be called when opted out
       expect(result).toBeUndefined();
@@ -310,7 +322,10 @@ describe('Helper Functions', () => {
       const result = resolveBaseTheme(baseThemeFactory as any);
 
       expect(result).toBe(baseThemeFactory);
-      expect(consoleWarnSpy).toHaveBeenCalledWith('Failed to call baseTheme factory function:', expect.any(Error));
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        '[Clerk Theme] Failed to call baseTheme factory function:',
+        expect.any(Error),
+      );
 
       consoleWarnSpy.mockRestore();
     });

@@ -21,7 +21,7 @@ export type VariablesWithTuples = {
 
 type ProcessedVariables = {
   cssString: string | null;
-  processedVariables: Record<string, any>;
+  processedVariables: Record<string, string | number | undefined>;
 };
 
 type ThemeConfiguration = {
@@ -34,13 +34,22 @@ type ThemeOptions = {
   darkModeSelector?: string | false;
 };
 
+const CAMEL_CASE_REGEX = /[A-Z]/g;
+const LEADING_HYPHEN_REGEX = /^-/;
+const CSS_VAR_PREFIX = '--clerk-';
+const THEME_TYPE = 'prebuilt_appearance';
+const MEDIA_QUERY_PREFIX = '@media';
+const CLASS_SELECTOR_PREFIX = '.';
+const ID_SELECTOR_PREFIX = '#';
+const INTERNAL_GLOBAL_CSS_KEY = '__internal_globalCss';
+
 /**
  * Converts camelCase to kebab-case for CSS variables
  * @example toKebabCase('colorBackground') => 'color-background'
  * @example toKebabCase('XMLParser') => 'x-m-l-parser' (no leading hyphen)
  */
 export function toKebabCase(str: string): string {
-  return str.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`).replace(/^-/, '');
+  return str.replace(CAMEL_CASE_REGEX, letter => `-${letter.toLowerCase()}`).replace(LEADING_HYPHEN_REGEX, '');
 }
 
 /**
@@ -64,18 +73,18 @@ export function normalizeDarkModeSelector(selector?: string | false): string | n
 }
 
 /**
- * Processes variables with tuple values and generates CSS for light/dark modes
- * Converts tuples like ['#ffffff', '#000000'] to CSS variables and selectors
+ * Converts tuple variables to CSS variables and generates theme CSS
+ * Transforms tuples like ['#ffffff', '#000000'] into CSS custom properties
  * @param variables - Variables object that may contain tuples
  * @param darkModeSelector - Dark mode selector string, or null to opt out of CSS generation
  */
-export function processTupleVariables(
-  variables: Record<string, any>,
+export function convertTuplesToCssVariables(
+  variables: Record<string, string | [string, string] | number | undefined>,
   darkModeSelector?: string | null,
 ): ProcessedVariables {
   const lightRules: string[] = [];
   const darkRules: string[] = [];
-  const processedVariables: Record<string, any> = {};
+  const processedVariables: Record<string, string | number | undefined> = {};
 
   for (const [key, value] of Object.entries(variables)) {
     if (Array.isArray(value) && value.length === 2) {
@@ -87,7 +96,7 @@ export function processTupleVariables(
         processedVariables[key] = lightValue;
       } else {
         // Generate CSS and use CSS variable reference
-        const cssVarName = `--clerk-${toKebabCase(key)}`;
+        const cssVarName = `${CSS_VAR_PREFIX}${toKebabCase(key)}`;
 
         // Add CSS rules for light and dark modes
         lightRules.push(`    ${cssVarName}: ${lightValue};`);
@@ -110,7 +119,7 @@ export function processTupleVariables(
     const normalizedSelector = darkModeSelector as string;
 
     // Check if it's a media query
-    if (normalizedSelector.startsWith('@media')) {
+    if (normalizedSelector.startsWith(MEDIA_QUERY_PREFIX)) {
       // Media query - wrap dark rules in :root
       cssString = `
     :root {
@@ -141,10 +150,14 @@ ${darkRules.join('\n')}
 /**
  * Transforms a CSS selector for proper nesting context
  * Class selectors like '.dark' become '.dark &' for parent-child relationship
+ * ID selectors like '#theme' become '#theme &' for parent-child relationship
  */
 export function transformSelectorForNesting(selector: string): string {
-  // If it's a class selector, append & for proper CSS nesting
-  if (selector.startsWith('.') && !selector.includes('&')) {
+  // If it's a class or ID selector, append & for proper CSS nesting
+  if (
+    (selector.startsWith(CLASS_SELECTOR_PREFIX) || selector.startsWith(ID_SELECTOR_PREFIX)) &&
+    !selector.includes('&')
+  ) {
     return `${selector} &`;
   }
   // For media queries and other selectors, return as-is
@@ -152,9 +165,9 @@ export function transformSelectorForNesting(selector: string): string {
 }
 
 /**
- * Processes elements - handles both static elements and function-based elements
+ * Resolves elements configuration - handles both static elements and function-based elements
  */
-export function processElements(
+export function resolveElementsConfiguration(
   elements: Elements | DarkModeElementsFunction | undefined,
   darkModeSelector: string | null,
 ): Elements | undefined {
@@ -176,7 +189,7 @@ export function processElements(
       const selector = transformSelectorForNesting(rawSelector);
       return (elements as DarkModeElementsFunction)(selector);
     } catch (error) {
-      console.warn('Failed to call elements function with darkModeSelector:', error);
+      console.warn('[Clerk Theme] Failed to call elements function with darkModeSelector:', error);
       return undefined;
     }
   }
@@ -198,7 +211,7 @@ export function resolveBaseTheme(baseTheme: BaseTheme | undefined, options?: The
     try {
       return (baseTheme as any)(options);
     } catch (error) {
-      console.warn('Failed to call baseTheme factory function:', error);
+      console.warn('[Clerk Theme] Failed to call baseTheme factory function:', error);
       return baseTheme as BaseTheme; // Fallback to treating it as static theme
     }
   }
@@ -249,7 +262,7 @@ export function createThemeObject(
 ): BaseTheme {
   const result = {
     ...config,
-    __type: 'prebuilt_appearance',
+    __type: THEME_TYPE,
   } as BaseTheme;
 
   // Only set variables/elements if they have content
@@ -257,7 +270,7 @@ export function createThemeObject(
   if (elements) (result as any).elements = elements;
 
   // Include global CSS string if it exists (for media query styles)
-  if (globalCss) (result as any).__internal_globalCss = globalCss;
+  if (globalCss) (result as any)[INTERNAL_GLOBAL_CSS_KEY] = globalCss;
 
   return result;
 }
@@ -273,7 +286,7 @@ export function createThemeFactory(config: ThemeConfiguration): (options?: Theme
     const resolvedBaseTheme = resolveBaseTheme(config.baseTheme, options);
 
     // Process elements (static or function-based)
-    const processedElements = processElements(config.elements, darkModeSelector);
+    const processedElements = resolveElementsConfiguration(config.elements, darkModeSelector);
 
     // Merge configurations
     const { mergedVariables, mergedElements, mergedConfig } = mergeThemeConfigurations(resolvedBaseTheme, {
@@ -286,7 +299,7 @@ export function createThemeFactory(config: ThemeConfiguration): (options?: Theme
     let finalVariables = mergedVariables;
 
     if (mergedVariables) {
-      const { cssString, processedVariables } = processTupleVariables(mergedVariables, darkModeSelector);
+      const { cssString, processedVariables } = convertTuplesToCssVariables(mergedVariables, darkModeSelector);
       globalCssString = cssString;
       finalVariables = processedVariables;
     }
