@@ -19,4 +19,5 @@ catalogs:
     tslib: 2.8.1
     tsup: 8.5.0
     typescript: 5.8.3
+    vitest: 3.0.5
     zx: 8.7.1
