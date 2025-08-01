@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 
 import { OrganizationAvatarUploader } from '@/ui/common/organizations/OrganizationAvatarUploader';
 import { useSessionTasksContext } from '@/ui/contexts/components/SessionTasks';
-import { Col, descriptors, Flex, Icon, localizationKeys } from '@/ui/customizables';
+import { descriptors, Icon, localizationKeys } from '@/ui/customizables';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Form } from '@/ui/elements/Form';
 import { FormButtonContainer } from '@/ui/elements/FormButtons';
@@ -82,84 +82,75 @@ export const CreateOrganizationScreen = withCardStateProvider((props: CreateOrga
     <FormContainer>
       <Form.Root
         onSubmit={onSubmit}
-        sx={t => ({ padding: `${t.space.$none} ${t.space.$10} ${t.space.$8}`, gap: t.space.$8 })}
+        sx={t => ({ padding: `${t.space.$none} ${t.space.$10} ${t.space.$8}` })}
       >
-        <Flex
-          direction='col'
-          gap={6}
-        >
-          <Col>
-            <OrganizationAvatarUploader
-              organization={{ name: nameField.value }}
-              onAvatarChange={async file => setFile(file)}
-              onAvatarRemove={file ? onAvatarRemove : null}
-              actionTitle={localizationKeys('taskSelectOrganization.createOrganizationScreen.action__uploadAvatar')}
-              imageTitle={localizationKeys('taskSelectOrganization.createOrganizationScreen.avatarLabel')}
-              elementDescriptor={descriptors.organizationAvatarUploaderContainer}
-              avatarPreviewPlaceholder={
-                <IconButton
-                  variant='ghost'
-                  aria-label='Upload organization logo'
-                  icon={
-                    <Icon
-                      size='md'
-                      icon={Organization}
-                      sx={t => ({
-                        color: t.colors.$colorMutedForeground,
-                        transitionDuration: t.transitionDuration.$controls,
-                      })}
-                    />
-                  }
+        <OrganizationAvatarUploader
+          organization={{ name: nameField.value }}
+          onAvatarChange={async file => setFile(file)}
+          onAvatarRemove={file ? onAvatarRemove : null}
+          actionTitle={localizationKeys('taskSelectOrganization.createOrganizationScreen.action__uploadAvatar')}
+          imageTitle={localizationKeys('taskSelectOrganization.createOrganizationScreen.avatarLabel')}
+          elementDescriptor={descriptors.organizationAvatarUploaderContainer}
+          avatarPreviewPlaceholder={
+            <IconButton
+              variant='ghost'
+              aria-label='Upload organization logo'
+              icon={
+                <Icon
+                  size='md'
+                  icon={Organization}
                   sx={t => ({
-                    width: t.sizes.$16,
-                    height: t.sizes.$16,
-                    borderRadius: t.radii.$md,
-                    borderWidth: t.borderWidths.$normal,
-                    borderStyle: t.borderStyles.$dashed,
-                    borderColor: t.colors.$borderAlpha200,
-                    backgroundColor: t.colors.$neutralAlpha50,
-                    ':hover': {
-                      backgroundColor: t.colors.$neutralAlpha50,
-                      svg: {
-                        transform: 'scale(1.2)',
-                      },
-                    },
+                    color: t.colors.$colorMutedForeground,
+                    transitionDuration: t.transitionDuration.$controls,
                   })}
                 />
               }
+              sx={t => ({
+                width: t.sizes.$16,
+                height: t.sizes.$16,
+                borderRadius: t.radii.$md,
+                borderWidth: t.borderWidths.$normal,
+                borderStyle: t.borderStyles.$dashed,
+                borderColor: t.colors.$borderAlpha200,
+                backgroundColor: t.colors.$neutralAlpha50,
+                ':hover': {
+                  backgroundColor: t.colors.$neutralAlpha50,
+                  svg: {
+                    transform: 'scale(1.2)',
+                  },
+                },
+              })}
             />
-          </Col>
-          <Form.ControlRow elementId={nameField.id}>
-            <Form.PlainInput
-              {...nameField.props}
-              onChange={onChangeName}
-              isRequired
-              autoFocus
-              ignorePasswordManager
-            />
-          </Form.ControlRow>
-          <Form.ControlRow elementId={slugField.id}>
-            <Form.PlainInput
-              {...slugField.props}
-              onChange={event => updateSlugField(event.target.value)}
-              isRequired
-              pattern='^(?=.*[a-z0-9])[a-z0-9\-]+$'
-              ignorePasswordManager
-            />
-          </Form.ControlRow>
-        </Flex>
+          }
+        />
+        <Form.ControlRow elementId={nameField.id}>
+          <Form.PlainInput
+            {...nameField.props}
+            onChange={onChangeName}
+            isRequired
+            autoFocus
+            ignorePasswordManager
+          />
+        </Form.ControlRow>
+        <Form.ControlRow elementId={slugField.id}>
+          <Form.PlainInput
+            {...slugField.props}
+            onChange={event => updateSlugField(event.target.value)}
+            isRequired
+            pattern='^(?=.*[a-z0-9])[a-z0-9\-]+$'
+            ignorePasswordManager
+          />
+        </Form.ControlRow>
 
-        <FormButtonContainer sx={t => ({ marginTop: t.space.$none, flexDirection: 'column' })}>
+        <FormButtonContainer sx={() => ({ flexDirection: 'column' })}>
           <Form.SubmitButton
-            block={false}
-            sx={() => ({ width: '100%' })}
+            block
             isDisabled={isSubmitButtonDisabled}
             localizationKey={localizationKeys('taskSelectOrganization.createOrganizationScreen.formButtonSubmit')}
           />
           {props.onCancel && (
             <Form.ResetButton
               localizationKey={localizationKeys('taskSelectOrganization.createOrganizationScreen.formButtonReset')}
-              block={false}
               onClick={props.onCancel}
             />
           )}

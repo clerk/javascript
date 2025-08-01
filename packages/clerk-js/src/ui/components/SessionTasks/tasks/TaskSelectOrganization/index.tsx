@@ -37,7 +37,7 @@ const TaskSelectOrganizationInternal = () => {
   return (
     <Flow.Root flow='taskSelectOrganization'>
       <Card.Root>
-        <Card.Content sx={t => ({ padding: `${t.space.$8} ${t.space.$none} ${t.space.$none}`, gap: t.space.$6 })}>
+        <Card.Content sx={t => ({ padding: `${t.space.$8} ${t.space.$none} ${t.space.$none}`, gap: t.space.$8 })}>
           {isLoading ? (
             <Flex
               direction={'row'}
