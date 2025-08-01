@@ -66,6 +66,7 @@ import {
   clerkVerifyPasskeyCalledBeforeCreate,
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from '../errors';
+import { eventBus } from '../events';
 import { BaseResource, UserData, Verification } from './internal';
 
 export class SignIn extends BaseResource implements SignInResource {
@@ -451,6 +452,8 @@ export class SignIn extends BaseResource implements SignInResource {
       this.createdSessionId = data.created_session_id;
       this.userData = new UserData(data.user_data);
     }
+
+    eventBus.emit('signin:update', { resource: this });
     return this;
   }
 
