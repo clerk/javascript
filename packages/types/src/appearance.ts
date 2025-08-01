@@ -805,7 +805,10 @@ export type Variables = {
   spacing?: CssLengthUnit;
 };
 
-export type BaseThemeTaggedType = { __type: 'prebuilt_appearance' };
+export type BaseThemeTaggedType = {
+  __type: 'prebuilt_appearance';
+  __internal_globalCss?: string;
+};
 export type BaseTheme = (BaseThemeTaggedType | 'clerk' | 'simple') & { cssLayerName?: string };
 
 export type Theme = {
