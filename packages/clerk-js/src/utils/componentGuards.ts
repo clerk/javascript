@@ -10,6 +10,17 @@ export const sessionExistsAndSingleSessionModeEnabled: ComponentGuard = (clerk, 
   return !!(clerk.session && environment?.authConfig.singleSessionMode);
 };
 
+export const sessionExistsAndRedirectUrlPresent: ComponentGuard = (clerk) => {
+  if (!clerk.session) {
+    return false;
+  }
+  
+  const urlParams = new URLSearchParams(window.location.search);
+  const redirectUrl = urlParams.get('redirect_url');
+  
+  return !!redirectUrl;
+};
+
 export const noUserExists: ComponentGuard = clerk => {
   return !clerk.user;
 };

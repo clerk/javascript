@@ -6,7 +6,7 @@ import React from 'react';
 
 import { warnings } from '../../core/warnings';
 import type { ComponentGuard } from '../../utils';
-import { sessionExistsAndSingleSessionModeEnabled } from '../../utils';
+import { sessionExistsAndSingleSessionModeEnabled, sessionExistsAndRedirectUrlPresent } from '../../utils';
 import { useEnvironment, useOptions, useSignInContext, useSignUpContext } from '../contexts';
 import { useRouter } from '../router';
 import type { AvailableComponentProps } from '../types';
@@ -58,9 +58,18 @@ export const withRedirectToAfterSignIn = <P extends AvailableComponentProps>(Com
 
   const HOC = (props: P) => {
     const signInCtx = useSignInContext();
+    
+    // Combined guard: redirect if user is signed in AND either:
+    // 1. Single session mode is enabled, OR
+    // 2. There's a redirect_url in the query parameters
+    const combinedGuard: ComponentGuard = (clerk, environment) => {
+      return sessionExistsAndSingleSessionModeEnabled(clerk, environment) || 
+             sessionExistsAndRedirectUrlPresent(clerk);
+    };
+    
     return withRedirect(
       Component,
-      sessionExistsAndSingleSessionModeEnabled,
+      combinedGuard,
       ({ clerk }) => signInCtx.sessionTaskUrl || signInCtx.afterSignInUrl || clerk.buildAfterSignInUrl(),
       signInCtx.sessionTaskUrl
         ? warnings.cannotRenderSignInComponentWhenTaskExists
@@ -79,9 +88,18 @@ export const withRedirectToAfterSignUp = <P extends AvailableComponentProps>(Com
 
   const HOC = (props: P) => {
     const signUpCtx = useSignUpContext();
+    
+    // Combined guard: redirect if user is signed in AND either:
+    // 1. Single session mode is enabled, OR
+    // 2. There's a redirect_url in the query parameters
+    const combinedGuard: ComponentGuard = (clerk, environment) => {
+      return sessionExistsAndSingleSessionModeEnabled(clerk, environment) || 
+             sessionExistsAndRedirectUrlPresent(clerk);
+    };
+    
     return withRedirect(
       Component,
-      sessionExistsAndSingleSessionModeEnabled,
+      combinedGuard,
       ({ clerk }) => signUpCtx.sessionTaskUrl || signUpCtx.afterSignUpUrl || clerk.buildAfterSignUpUrl(),
       signUpCtx.sessionTaskUrl
         ? warnings.cannotRenderSignUpComponentWhenTaskExists
