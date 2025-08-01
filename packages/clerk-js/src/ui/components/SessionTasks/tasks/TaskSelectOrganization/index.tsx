@@ -72,7 +72,8 @@ const TaskSelectOrganizationInternal = () => {
           <Card.Action
             elementId='signOut'
             gap={2}
-            sx={() => ({ display: 'flex' })}
+            justify='center'
+            sx={() => ({ width: '100%' })}
           >
             {identifier && (
               <Card.ActionText
