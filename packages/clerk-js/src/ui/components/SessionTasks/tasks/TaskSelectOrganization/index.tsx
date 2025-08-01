@@ -70,7 +70,10 @@ const TaskSelectOrganizationInternal = () => {
         </Card.Content>
 
         <Card.Footer>
-          <Card.Action elementId='signOut'>
+          <Card.Action
+            elementId='signOut'
+            gap={2}
+          >
             {identifier && (
               <Card.ActionText
                 localizationKey={localizationKeys('taskSelectOrganization.signOut.actionText', {
