@@ -29,6 +29,7 @@ import {
   WaitlistEntryAPI,
   WebhookAPI,
 } from './endpoints';
+import { BillingAPI } from './endpoints/BillingApi';
 import { buildRequest } from './request';
 
 export type CreateBackendApiOptions = Parameters<typeof buildRequest>[0];
@@ -52,6 +53,7 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
     ),
     betaFeatures: new BetaFeaturesAPI(request),
     blocklistIdentifiers: new BlocklistIdentifierAPI(request),
+    billing: new BillingAPI(request),
     clients: new ClientAPI(request),
     domains: new DomainAPI(request),
     emailAddresses: new EmailAddressAPI(request),
