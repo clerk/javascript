@@ -5,18 +5,25 @@ export type DarkModeElementsFunction = (darkModeSelector: string) => Elements;
 // Support for tuple values in variables like ['#ffffff', '#212126'] (light, dark)
 export type VariableValue = string | readonly [light: string, dark: string];
 
-// Extended Variables type that supports tuple values for color properties
+// Extract all color variable keys from Variables type
+type ColorVariableKeys = {
+  [K in keyof Variables]: K extends `color${string}` ? K : never;
+}[keyof Variables];
+
+// Manually exclude deprecated color variables (marked with @deprecated in Variables type)
+type DeprecatedColorVariables =
+  | 'colorTextOnPrimaryBackground' // @deprecated Use colorPrimaryForeground instead
+  | 'colorText' // @deprecated Use colorForeground instead
+  | 'colorTextSecondary' // @deprecated Use colorMutedForeground instead
+  | 'colorInputText' // @deprecated Use colorInputForeground instead
+  | 'colorInputBackground'; // @deprecated Use colorInput instead
+
+// Get all non-deprecated color variables that should support tuple values
+type NonDeprecatedColorVariables = Exclude<ColorVariableKeys, DeprecatedColorVariables>;
+
+// Extended Variables type that supports tuple values for all non-deprecated color properties
 export type VariablesWithTuples = {
-  [K in keyof Variables]: K extends
-    | 'colorBackground'
-    | 'colorPrimary'
-    | 'colorNeutral'
-    | 'colorForeground'
-    | 'colorInput'
-    | 'colorInputForeground'
-    | 'colorPrimaryForeground'
-    ? string | [string, string]
-    : Variables[K];
+  [K in keyof Variables]: K extends NonDeprecatedColorVariables ? string | [string, string] : Variables[K];
 };
 
 type ProcessedVariables = {

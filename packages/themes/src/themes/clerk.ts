@@ -9,6 +9,7 @@ export const clerk = experimental_createTheme({
     colorForeground: ['#000000', '#ffffff'],
     colorInputForeground: ['#000000', '#ffffff'],
     colorInput: ['#ffffff', '#26262B'],
+    colorModalBackdrop: ['#000000', '#000000'],
   },
   elements: darkModeSelector => {
     return {

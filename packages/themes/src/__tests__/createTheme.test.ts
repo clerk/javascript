@@ -991,5 +991,89 @@ describe('experimental_createTheme', () => {
         button: { backgroundColor: 'red' }, // Static elements still work
       });
     });
+
+    it('should automatically detect and support all non-deprecated color variables', () => {
+      // This test verifies that our automatic color variable detection
+      // stays in sync with the Variables type from @clerk/types
+
+      // Test variables that should definitely work (known non-deprecated colors)
+      const knownColorVars = {
+        colorBackground: ['#fff', '#000'] as [string, string],
+        colorPrimary: ['#blue', '#darkblue'] as [string, string],
+        colorDanger: ['#red', '#darkred'] as [string, string],
+        colorSuccess: ['#green', '#darkgreen'] as [string, string],
+        colorNeutral: ['#gray', '#darkgray'] as [string, string],
+      };
+
+      // This should compile without errors due to automatic detection
+      const theme = experimental_createTheme({
+        variables: knownColorVars,
+      })({ darkModeSelector: '.dark' });
+
+      // All should be converted to CSS variables
+      expect(theme.variables?.colorBackground).toBe('var(--clerk-color-background)');
+      expect(theme.variables?.colorPrimary).toBe('var(--clerk-color-primary)');
+      expect(theme.variables?.colorDanger).toBe('var(--clerk-color-danger)');
+      expect(theme.variables?.colorSuccess).toBe('var(--clerk-color-success)');
+      expect(theme.variables?.colorNeutral).toBe('var(--clerk-color-neutral)');
+
+      // Should generate CSS for all
+      const css = (theme as any).__internal_globalCss;
+      expect(css).toContain('--clerk-color-background: #fff;');
+      expect(css).toContain('--clerk-color-background: #000;');
+    });
+
+    it('should support tuple values for all non-deprecated color variables', () => {
+      const theme = experimental_createTheme({
+        variables: {
+          // All non-deprecated color variables should support tuples
+          colorBackground: ['#ffffff', '#1a1a1a'],
+          colorForeground: ['#1a1a1a', '#ffffff'],
+          colorMuted: ['#f8f9fa', '#2d2d2d'],
+          colorMutedForeground: ['#6c757d', '#adb5bd'],
+          colorPrimary: ['#007bff', '#0d6efd'],
+          colorPrimaryForeground: ['#ffffff', '#000000'],
+          colorDanger: ['#dc3545', '#e74c3c'],
+          colorSuccess: ['#28a745', '#2ecc71'],
+          colorWarning: ['#ffc107', '#f39c12'],
+          colorNeutral: ['#6c757d', '#95a5a6'],
+          colorInput: ['#ffffff', '#2c2c2c'],
+          colorInputForeground: ['#1a1a1a', '#ffffff'],
+          colorShimmer: ['rgba(0,0,0,0.1)', 'rgba(255,255,255,0.2)'],
+          colorRing: ['rgba(0,123,255,0.25)', 'rgba(13,110,253,0.25)'],
+          colorShadow: ['rgba(0,0,0,0.175)', 'rgba(0,0,0,0.5)'],
+          colorBorder: ['#dee2e6', '#495057'],
+          colorModalBackdrop: ['rgba(0,0,0,0.5)', 'rgba(0,0,0,0.8)'],
+        },
+      })({ darkModeSelector: '.dark' });
+
+      // All tuple variables should be converted to CSS variables
+      expect(theme.variables?.colorBackground).toBe('var(--clerk-color-background)');
+      expect(theme.variables?.colorForeground).toBe('var(--clerk-color-foreground)');
+      expect(theme.variables?.colorMuted).toBe('var(--clerk-color-muted)');
+      expect(theme.variables?.colorMutedForeground).toBe('var(--clerk-color-muted-foreground)');
+      expect(theme.variables?.colorPrimary).toBe('var(--clerk-color-primary)');
+      expect(theme.variables?.colorPrimaryForeground).toBe('var(--clerk-color-primary-foreground)');
+      expect(theme.variables?.colorDanger).toBe('var(--clerk-color-danger)');
+      expect(theme.variables?.colorSuccess).toBe('var(--clerk-color-success)');
+      expect(theme.variables?.colorWarning).toBe('var(--clerk-color-warning)');
+      expect(theme.variables?.colorNeutral).toBe('var(--clerk-color-neutral)');
+      expect(theme.variables?.colorInput).toBe('var(--clerk-color-input)');
+      expect(theme.variables?.colorInputForeground).toBe('var(--clerk-color-input-foreground)');
+      expect(theme.variables?.colorShimmer).toBe('var(--clerk-color-shimmer)');
+      expect(theme.variables?.colorRing).toBe('var(--clerk-color-ring)');
+      expect(theme.variables?.colorShadow).toBe('var(--clerk-color-shadow)');
+      expect(theme.variables?.colorBorder).toBe('var(--clerk-color-border)');
+      expect(theme.variables?.colorModalBackdrop).toBe('var(--clerk-color-modal-backdrop)');
+
+      // Should generate comprehensive CSS
+      const css = (theme as any).__internal_globalCss;
+      expect(css).toContain('--clerk-color-background: #ffffff;');
+      expect(css).toContain('--clerk-color-background: #1a1a1a;');
+      expect(css).toContain('--clerk-color-danger: #dc3545;');
+      expect(css).toContain('--clerk-color-danger: #e74c3c;');
+      expect(css).toContain('--clerk-color-modal-backdrop: rgba(0,0,0,0.5);');
+      expect(css).toContain('--clerk-color-modal-backdrop: rgba(0,0,0,0.8);');
+    });
   });
 });
