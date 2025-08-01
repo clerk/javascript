@@ -1,20 +1,7 @@
 import type { Appearance, BaseTheme, DeepPartial, Elements, Theme } from '@clerk/types';
 
-import type { InternalTheme } from '../../clerk-js/src/ui/foundations';
-
-type LegacyElementsFunction = (params: { theme: InternalTheme }) => Elements;
 export type DarkModeElementsFunction = (darkModeSelector: string) => Elements;
 
-// Conditional type to properly infer function parameter types
-type InferElementsFunction<T> = T extends { elements: infer E }
-  ? E extends (darkModeSelector: any) => Elements
-    ? (darkModeSelector: string) => Elements
-    : E extends (params: { theme: InternalTheme }) => Elements
-      ? (params: { theme: InternalTheme }) => Elements
-      : E
-  : Elements | undefined;
-
-// Function overloads for proper type inference
 export function experimental_createTheme<T extends { elements: (darkModeSelector: any) => Elements }>(
   appearance: Appearance<T & DeepPartial<Theme> & { baseTheme?: BaseTheme }>,
 ): BaseTheme & ((options?: { darkModeSelector?: string }) => BaseTheme);
@@ -23,33 +10,65 @@ export function experimental_createTheme<T extends DeepPartial<Theme> & { baseTh
 ): BaseTheme & ((options?: { darkModeSelector?: string }) => BaseTheme);
 export function experimental_createTheme(appearance: any) {
   const createTheme = (options?: { darkModeSelector?: string }) => {
-    console.log('darkModeSelector:', options?.darkModeSelector);
+    // Handle empty string darkModeSelector
+    const darkModeSelector = (options?.darkModeSelector && options.darkModeSelector.trim()) || '.dark';
 
-    const darkModeSelector = options?.darkModeSelector || '.dark';
+    // Process baseTheme if provided
+    let baseThemeData: any = {};
+    if (appearance.baseTheme) {
+      if (typeof appearance.baseTheme === 'function') {
+        // If baseTheme is a factory function, call it with the same options
+        baseThemeData = appearance.baseTheme(options);
+      } else {
+        // If baseTheme is a static theme object
+        baseThemeData = appearance.baseTheme;
+      }
+    }
 
     // Process elements - if it's a function expecting darkModeSelector, call it
     let processedElements = appearance.elements;
     if (typeof appearance.elements === 'function') {
-      // Check function parameter count - darkModeSelector functions have 1 param, legacy have 1 object param
-      // We differentiate by checking if first parameter name suggests it's darkModeSelector
-      const functionString = appearance.elements.toString();
-      const isLegacyFunction =
-        functionString.includes('{') && (functionString.includes('theme') || functionString.includes('params'));
+      // Try to call the function as a darkModeSelector function first
+      // This handles both regular functions and mocked functions
+      try {
+        // Most functions expecting darkModeSelector have length 1
+        // Legacy functions typically have complex parameter destructuring
+        const functionString = appearance.elements.toString();
+        const isLegacyFunction =
+          functionString.includes('{') && (functionString.includes('theme') || functionString.includes('params'));
 
-      if (!isLegacyFunction && appearance.elements.length === 1) {
-        // New darkModeSelector function - call it with the selector
-        processedElements = (appearance.elements as DarkModeElementsFunction)(darkModeSelector);
-      } else {
-        // Legacy function - leave as-is for now
+        if (!isLegacyFunction) {
+          // Assume it's a darkModeSelector function and call it
+          processedElements = (appearance.elements as DarkModeElementsFunction)(darkModeSelector);
+        } else {
+          // Legacy function - leave as-is for now
+          processedElements = appearance.elements;
+        }
+      } catch (error) {
+        // If calling fails, leave as-is (might be legacy function)
         processedElements = appearance.elements;
       }
     }
 
-    return {
+    // Merge baseTheme data with current appearance, avoiding empty objects
+    const mergedVariables =
+      baseThemeData.variables || appearance.variables
+        ? { ...baseThemeData.variables, ...appearance.variables }
+        : undefined;
+    const mergedElements =
+      baseThemeData.elements || processedElements ? { ...baseThemeData.elements, ...processedElements } : undefined;
+
+    const result = {
+      ...baseThemeData,
       ...appearance,
-      elements: processedElements,
       __type: 'prebuilt_appearance',
     } as BaseTheme;
+
+    // Only set variables/elements if they have content
+    if (mergedVariables) (result as any).variables = mergedVariables;
+    if (mergedElements) (result as any).elements = mergedElements;
+
+    return result;
   };
 
   // Create the default theme (backwards compatibility)

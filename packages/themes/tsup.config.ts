@@ -3,7 +3,7 @@ import { extname, join } from 'path';
 import { defineConfig } from 'tsup';
 
 export default defineConfig({
-  entry: ['./src/**/*.{ts,tsx}'],
+  entry: ['./src/**/*.{ts,tsx}', '!./src/**/*.test.{ts,tsx}', '!./src/**/__tests__/**'],
   format: ['cjs', 'esm'],
   bundle: false,
   clean: true,
