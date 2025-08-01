@@ -37,7 +37,6 @@ export const useApiKeys = ({
   const totalCount = useMemo(() => apiKeysResource?.total_count ?? 0, [apiKeysResource]);
   const [search, setSearch] = useState('');
 
-  // For now, we'll keep client-side filtering as mentioned in the requirements
   const filteredApiKeys = apiKeys.filter(key => key.name.toLowerCase().includes(search.toLowerCase()));
 
   // Calculate pagination values based on server response
@@ -47,7 +46,9 @@ export const useApiKeys = ({
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    setSearch(''); // Reset search when changing pages
+    // Reset search when changing pages
+    // TODO(rob): Server-side search is not implemented
+    setSearch('');
   };
 
   return {
