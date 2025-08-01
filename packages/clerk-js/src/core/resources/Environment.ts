@@ -20,6 +20,7 @@ export class Environment extends BaseResource implements EnvironmentResource {
   authConfig: AuthConfigResource = new AuthConfig();
   displayConfig: DisplayConfigResource = new DisplayConfig();
   maintenanceMode: boolean = false;
+  clientDebugMode: boolean = false;
   pathRoot = '/environment';
   userSettings: UserSettingsResource = new UserSettings();
   organizationSettings: OrganizationSettingsResource = new OrganizationSettings();
@@ -48,6 +49,7 @@ export class Environment extends BaseResource implements EnvironmentResource {
     this.authConfig = new AuthConfig(data.auth_config);
     this.displayConfig = new DisplayConfig(data.display_config);
     this.maintenanceMode = this.withDefault(data.maintenance_mode, this.maintenanceMode);
+    this.clientDebugMode = this.withDefault(data.client_debug_mode, this.clientDebugMode);
     this.organizationSettings = new OrganizationSettings(data.organization_settings);
     this.userSettings = new UserSettings(data.user_settings);
     this.commerceSettings = new CommerceSettings(data.commerce_settings);
@@ -88,6 +90,7 @@ export class Environment extends BaseResource implements EnvironmentResource {
       display_config: this.displayConfig.__internal_toSnapshot(),
       id: this.id ?? '',
       maintenance_mode: this.maintenanceMode,
+      client_debug_mode: this.clientDebugMode,
       organization_settings: this.organizationSettings.__internal_toSnapshot(),
       user_settings: this.userSettings.__internal_toSnapshot(),
       commerce_settings: this.commerceSettings.__internal_toSnapshot(),

@@ -160,6 +160,32 @@ type SetActiveHook = (intent?: 'sign-out') => void | Promise<void>;
 
 export type ClerkCoreBroadcastChannelEvent = { type: 'signout' };
 
+/**
+ * Interface for the debug logger with all available logging methods
+ */
+interface DebugLoggerInterface {
+  debug(message: string, context?: Record<string, unknown>, source?: string): void;
+  error(message: string, context?: Record<string, unknown>, source?: string): void;
+  info(message: string, context?: Record<string, unknown>, source?: string): void;
+  trace(message: string, context?: Record<string, unknown>, source?: string): void;
+  warn(message: string, context?: Record<string, unknown>, source?: string): void;
+}
+
+/**
+ * Type guard to check if an object implements the DebugLoggerInterface
+ */
+function _isDebugLogger(obj: unknown): obj is DebugLoggerInterface {
+  return (
+    typeof obj === 'object' &&
+    obj !== null &&
+    typeof (obj as DebugLoggerInterface).debug === 'function' &&
+    typeof (obj as DebugLoggerInterface).error === 'function' &&
+    typeof (obj as DebugLoggerInterface).info === 'function' &&
+    typeof (obj as DebugLoggerInterface).trace === 'function' &&
+    typeof (obj as DebugLoggerInterface).warn === 'function'
+  );
+}
+
 declare global {
   interface Window {
     Clerk?: Clerk;
@@ -199,8 +225,8 @@ export class Clerk implements ClerkInterface {
   public static sdkMetadata: SDKMetadata = {
     name: __PKG_NAME__,
     version: __PKG_VERSION__,
-    environment: process.env.NODE_ENV || 'production',
   };
+
   private static _billing: CommerceBillingNamespace;
   private static _apiKeys: APIKeysNamespace;
   private _checkout: ClerkInterface['__experimental_checkout'] | undefined;
@@ -211,6 +237,7 @@ export class Clerk implements ClerkInterface {
   public user: UserResource | null | undefined;
   public __internal_country?: string | null;
   public telemetry: TelemetryCollector | undefined;
+  public debugLogger?: DebugLoggerInterface; // Properly typed debug logger interface
 
   protected internal_last_error: ClerkAPIError | null = null;
   // converted to protected environment to support `updateEnvironment` type assertion
@@ -1480,6 +1507,7 @@ export class Clerk implements ClerkInterface {
     const customNavigate =
       options?.replace && this.#options.routerReplace ? this.#options.routerReplace : this.#options.routerPush;
 
+    this.debugLogger?.info(`Clerk is navigating to: ${toURL}`);
     if (this.#options.routerDebug) {
       console.log(`Clerk is navigating to: ${toURL}`);
     }
@@ -2197,6 +2225,20 @@ export class Clerk implements ClerkInterface {
 
   public updateEnvironment(environment: EnvironmentResource): asserts this is { environment: EnvironmentResource } {
     this.environment = environment;
+
+    // Initialize debug module if client_debug_mode is enabled
+    if (environment.clientDebugMode) {
+      this.#initializeDebugModule();
+    }
+  }
+
+  async #initializeDebugModule(): Promise<void> {
+    try {
+      const { getDebugLogger } = await import('./modules/debug');
+      this.debugLogger = await getDebugLogger({});
+    } catch (error) {
+      console.error('Failed to initialize debug module:', error);
+    }
   }
 
   __internal_setCountry = (country: string | null) => {
@@ -2839,5 +2881,14 @@ export class Clerk implements ClerkInterface {
     }
 
     return allowedProtocols;
+  }
+
+  /**
+   * @internal
+   */
+  public static async __internal_resetDebugLogger(): Promise<void> {
+    // This method is now handled by the debug module itself
+    const { __internal_resetDebugLogger } = await import('./modules/debug');
+    __internal_resetDebugLogger();
   }
 }
