@@ -17,7 +17,7 @@ import { common } from '@/ui/styledSystem';
 import { colors } from '@/ui/utils/colors';
 
 export function OAuthConsentInternal() {
-  const { scopes, oAuthApplicationName, oAuthApplicationLogoUrl, redirectUrl, onDeny, onAllow } =
+  const { scopes, oAuthApplicationName, oAuthApplicationLogoUrl, oAuthApplicationUrl, redirectUrl, onDeny, onAllow } =
     useOAuthConsentContext();
   const { user } = useUser();
   const { applicationName, logoImageUrl } = useEnvironment().displayConfig;
@@ -44,6 +44,7 @@ export function OAuthConsentInternal() {
               <ConnectionHeader>
                 <Avatar
                   imageUrl={oAuthApplicationLogoUrl}
+                  externalLinkUrl={oAuthApplicationUrl}
                   size={t => t.space.$12}
                   rounded={false}
                 />
@@ -61,6 +62,7 @@ export function OAuthConsentInternal() {
                 >
                   <Avatar
                     imageUrl={oAuthApplicationLogoUrl}
+                    externalLinkUrl={oAuthApplicationUrl}
                     size={t => t.space.$12}
                     rounded={false}
                   />
