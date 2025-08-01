@@ -35,6 +35,7 @@ export type ParsedAppearance = {
   parsedInternalTheme: ParsedInternalTheme;
   parsedLayout: ParsedLayout;
   parsedCaptcha: ParsedCaptcha;
+  hasPrebuiltTheme: boolean;
 };
 
 const defaultLayout: ParsedLayout = {
@@ -69,13 +70,26 @@ export const parseAppearance = (cascade: AppearanceCascade): ParsedAppearance =>
   const { globalAppearance, appearance: componentAppearance, appearanceKey } = cascade;
 
   const appearanceList: Appearance[] = [];
-  [globalAppearance, globalAppearance?.[appearanceKey as PublicAppearanceTopLevelKey], componentAppearance].forEach(a =>
-    expand(a, appearanceList),
+  [globalAppearance, globalAppearance?.[appearanceKey as PublicAppearanceTopLevelKey], componentAppearance].forEach(
+    a => {
+      if (a && typeof a === 'object') {
+        expand(a, appearanceList);
+      }
+    },
   );
 
   const parsedInternalTheme = parseVariables(appearanceList);
   const parsedLayout = parseLayout(appearanceList);
   const parsedCaptcha = parseCaptcha(appearanceList);
+
+  // Check if any theme in the cascade has __type: 'prebuilt_appearance'
+  const hasPrebuiltTheme = appearanceList.some(appearance => {
+    if (appearance.theme) {
+      const themes = Array.isArray(appearance.theme) ? appearance.theme : [appearance.theme];
+      return themes.some(theme => theme && typeof theme === 'object' && theme.__type === 'prebuilt_appearance');
+    }
+    return false;
+  });
 
   if (
     !appearanceList.find(a => {
@@ -96,7 +110,7 @@ export const parseAppearance = (cascade: AppearanceCascade): ParsedAppearance =>
       return res;
     }),
   );
-  return { parsedElements, parsedInternalTheme, parsedLayout, parsedCaptcha };
+  return { parsedElements, parsedInternalTheme, parsedLayout, parsedCaptcha, hasPrebuiltTheme };
 };
 
 const expand = (theme: Theme | undefined, cascade: any[]) => {

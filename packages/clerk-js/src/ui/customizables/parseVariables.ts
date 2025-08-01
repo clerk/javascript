@@ -92,13 +92,27 @@ export const removeInvalidValues = (variables: NonNullable<Theme['variables']>):
   // Check for modern color support. If present, we can simply return the variables as-is since we support everything
   // CSS supports.
   if (cssSupports.modernColor()) {
-    return variables;
+    // Filter out tuple values - they are handled by CSS variables, not internal theme processing
+    const processedVariables: any = {};
+    for (const [key, value] of Object.entries(variables)) {
+      // Skip tuple values - they should only be handled by CSS variables
+      if (Array.isArray(value) && value.length === 2) {
+        continue;
+      }
+      processedVariables[key] = value;
+    }
+    return processedVariables as NonNullable<Theme['variables']>;
   }
 
   // If not, we need to remove any values that are specified with CSS variables, as our color scale generation only
   // supports CSS variables using modern CSS functionality.
   const validVariables: Theme['variables'] = Object.fromEntries(
     Object.entries(variables).filter(([key, value]) => {
+      // Skip tuple values - they are handled by CSS variables
+      if (Array.isArray(value) && value.length === 2) {
+        return false;
+      }
+
       if (typeof value === 'string') {
         const isValid = !value.startsWith('var(');
         if (!isValid) {

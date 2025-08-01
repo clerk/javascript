@@ -27,6 +27,7 @@ export const generateClassName = (
   elemDescriptors: ElementDescriptor[],
   elemId: ElementId | undefined,
   props: PropsWithState | undefined,
+  hasPrebuiltTheme?: boolean,
 ) => {
   const state = getElementState(props);
   let className = '';
@@ -38,7 +39,7 @@ export const generateClassName = (
   className = addClerkTargettableRequiredAttribute(className, props as any);
 
   className = addUserProvidedClassnames(className, parsedElements, elemDescriptors, elemId, state);
-  addUserProvidedStyleRules(css, parsedElements, elemDescriptors, elemId, state);
+  addUserProvidedStyleRules(css, parsedElements, elemDescriptors, elemId, state, hasPrebuiltTheme);
   return { className, css };
 };
 
@@ -83,10 +84,11 @@ const addUserProvidedStyleRules = (
   elemDescriptors: ElementDescriptor[],
   elemId: ElementId | undefined,
   state: ElementState | undefined,
+  hasPrebuiltTheme?: boolean,
 ) => {
   for (let j = 0; j < elemDescriptors.length; j++) {
     for (let i = 0; i < parsedElements.length; i++) {
-      addRulesFromElements(css, parsedElements[i], elemDescriptors[j], elemId, state);
+      addRulesFromElements(css, parsedElements[i], elemDescriptors[j], elemId, state, hasPrebuiltTheme);
     }
   }
 };
@@ -127,14 +129,48 @@ const getElementState = (props: PropsWithState | undefined): ElementState | unde
 
 const addStringClassname = (cn: string, val?: unknown) => (typeof val === 'string' ? cn + ' ' + val : cn);
 
-const addStyleRuleObject = (css: unknown[], val: unknown, specificity = 0) => {
+// Utility to transform class-based dark mode selectors to work with Emotion CSS-in-JS
+const transformDarkModeSelectors = (styleObject: Record<string, any>): Record<string, any> => {
+  const transformedStyles: Record<string, any> = {};
+
+  for (const [key, value] of Object.entries(styleObject)) {
+    // Check if this is a class-based dark mode selector (starts with . and not @media)
+    if (key.startsWith('.') && !key.startsWith('@media')) {
+      // Transform .dark to proper parent selector format for Emotion
+      // Instead of nested { ".dark": { ... } }, we want { [`${key} &`]: { ... } }
+      transformedStyles[`${key} &`] = value;
+    } else {
+      // Keep other selectors (like @media queries) as-is
+      transformedStyles[key] = value;
+    }
+  }
+
+  return transformedStyles;
+};
+
+const addStyleRuleObject = (css: unknown[], val: unknown, specificity = 0, hasPrebuiltTheme?: boolean) => {
   if (specificity) {
     if (val && typeof val === 'object') {
       css.push({ ['&'.repeat(specificity)]: val });
     }
   } else {
     if (val && typeof val === 'object') {
-      css.push(val);
+      // Only transform dark mode selectors for prebuilt themes
+      if (hasPrebuiltTheme) {
+        // Check if the style object contains dark mode selectors and transform them
+        const hasClassSelectors = Object.keys(val as Record<string, any>).some(
+          key => key.startsWith('.') && !key.startsWith('@media'),
+        );
+
+        if (hasClassSelectors) {
+          css.push(transformDarkModeSelectors(val as Record<string, any>));
+        } else {
+          css.push(val);
+        }
+      } else {
+        // For non-prebuilt themes, use the original behavior
+        css.push(val);
+      }
     }
   }
 };
@@ -181,21 +217,23 @@ const addRulesFromElements = (
   elemDescriptor: ElementDescriptor,
   elemId: ElementId | undefined,
   state: ElementState | undefined,
+  hasPrebuiltTheme?: boolean,
 ) => {
   if (!elements) {
     return;
   }
 
   type Key = keyof typeof elements;
-  addStyleRuleObject(css, elements[elemDescriptor.objectKey as Key]);
+  addStyleRuleObject(css, elements[elemDescriptor.objectKey as Key], 0, hasPrebuiltTheme);
   if (elemId) {
-    addStyleRuleObject(css, elements[elemDescriptor.getObjectKeyWithId(elemId) as Key]);
+    addStyleRuleObject(css, elements[elemDescriptor.getObjectKeyWithId(elemId) as Key], 0, hasPrebuiltTheme);
   }
   if (state) {
     addStyleRuleObject(
       css,
       elements[elemDescriptor.getObjectKeyWithState(state) as Key],
       STATE_PROP_TO_SPECIFICITY[state],
+      hasPrebuiltTheme,
     );
   }
   if (elemId && state) {
@@ -203,6 +241,7 @@ const addRulesFromElements = (
       css,
       elements[elemDescriptor.getObjectKeyWithIdAndState(elemId, state) as Key],
       STATE_PROP_TO_SPECIFICITY[state],
+      hasPrebuiltTheme,
     );
   }
 };

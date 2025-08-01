@@ -51,7 +51,7 @@ export type ColorScaleWithRequiredBase<T = string> = Partial<ColorScale<T>> & { 
 
 export type CssColorOrScale = string | ColorScaleWithRequiredBase;
 export type CssColorOrAlphaScale = string | AlphaColorScale;
-type CssColor = string | TransparentColor | BuiltInColors;
+export type CssColor = string | TransparentColor | BuiltInColors;
 type CssLengthUnit = string;
 
 type FontSizeScale = {
@@ -805,7 +805,15 @@ export type Variables = {
   spacing?: CssLengthUnit;
 };
 
-export type BaseThemeTaggedType = { __type: 'prebuilt_appearance' };
+export type BaseThemeTaggedType = {
+  __type: 'prebuilt_appearance';
+  variables?: Variables;
+  __internal?: {
+    originalVariables?: any;
+    darkModeSelector?: string;
+    supportsDarkMode?: boolean;
+  };
+};
 export type BaseTheme = (BaseThemeTaggedType | 'clerk' | 'simple') & { cssLayerName?: string };
 
 export type Theme = {
@@ -981,6 +989,13 @@ type GlobalAppearanceOptions = {
    * For more information on CSS layers, see the [MDN documentation on @layer](https://developer.mozilla.org/en-US/docs/Web/CSS/@layer).
    */
   cssLayerName?: string;
+  /**
+   * Controls dark mode CSS selector generation.
+   * When set to a string (e.g., '.dark'), generates CSS variables for both light and dark modes.
+   * When set to false, disables dark mode CSS variable generation.
+   * @default false
+   */
+  darkSelector?: string | false;
 };
 
 export type Appearance<T = Theme> = T &
