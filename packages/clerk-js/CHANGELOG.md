@@ -1,5 +1,22 @@
 # Change Log
 
+## 5.79.1
+
+### Patch Changes
+
+- Fix invalid DOM element prop being passed down to Input ([#6458](https://github.com/clerk/javascript/pull/6458)) by [@jacekradko](https://github.com/jacekradko)
+
+- Fix iframe detetction and ensure we prefer the oauth popup flow when in an iframe. ([#6455](https://github.com/clerk/javascript/pull/6455)) by [@brkalow](https://github.com/brkalow)
+
+- Fix `touchSession` option to only affect session touch behavior to window focus events. ([#6444](https://github.com/clerk/javascript/pull/6444)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  Previously, when `touchSession: false` was provided, it incorrectly prevented session touching during `setActive()` calls when switching sessions or selecting organizations.
+
+- Updated dependencies [[`f93965f`](https://github.com/clerk/javascript/commit/f93965f64c81030f9fcf9d1cc4e4984d30cd12ec)]:
+  - @clerk/localizations@3.20.7
+  - @clerk/types@4.72.1
+  - @clerk/shared@3.17.1
+
 ## 5.79.0
 
 ### Minor Changes

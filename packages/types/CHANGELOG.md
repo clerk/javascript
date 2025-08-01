@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.72.1
+
+### Patch Changes
+
+- Add types for `form_param_type_invalid` errors. ([#6457](https://github.com/clerk/javascript/pull/6457)) by [@dstaley](https://github.com/dstaley)
+
 ## 4.72.0
 
 ### Minor Changes

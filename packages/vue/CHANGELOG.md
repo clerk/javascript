@@ -1,5 +1,15 @@
 # @clerk/vue
 
+## 1.9.2
+
+### Patch Changes
+
+- Remove `treatPendingAsSignedOut` from `useSession` and always return pending session ([#6459](https://github.com/clerk/javascript/pull/6459)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`f93965f`](https://github.com/clerk/javascript/commit/f93965f64c81030f9fcf9d1cc4e4984d30cd12ec)]:
+  - @clerk/types@4.72.1
+  - @clerk/shared@3.17.1
+
 ## 1.9.1
 
 ### Patch Changes
