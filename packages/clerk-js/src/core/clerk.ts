@@ -2619,7 +2619,9 @@ export class Clerk implements ClerkInterface {
       }
       this.#touchThrottledUntil = Date.now() + 5_000;
 
-      void this.#touchCurrentSession(this.session);
+      if (this.#options.touchSession) {
+        void this.#touchCurrentSession(this.session);
+      }
     });
 
     /**
@@ -2650,7 +2652,7 @@ export class Clerk implements ClerkInterface {
 
   // TODO: Be more conservative about touches. Throttle, don't touch when only one user, etc
   #touchCurrentSession = async (session?: SignedInSessionResource | null): Promise<void> => {
-    if (!session || !this.#options.touchSession) {
+    if (!session) {
       return Promise.resolve();
     }
 

@@ -1,21 +1,71 @@
 import { useClerk } from '@clerk/shared/react';
-import type { __internal_PlanDetailsProps, CommercePlanResource, CommerceSubscriptionPlanPeriod } from '@clerk/types';
+import type {
+  __internal_PlanDetailsProps,
+  ClerkAPIResponseError,
+  CommercePlanResource,
+  CommerceSubscriptionPlanPeriod,
+} from '@clerk/types';
 import * as React from 'react';
 import { useMemo, useState } from 'react';
 import useSWR from 'swr';
 
+import { Alert } from '@/ui/elements/Alert';
 import { Avatar } from '@/ui/elements/Avatar';
 import { Drawer } from '@/ui/elements/Drawer';
 import { Switch } from '@/ui/elements/Switch';
 
 import { SubscriberTypeContext } from '../../contexts';
-import { Box, Col, descriptors, Flex, Heading, localizationKeys, Span, Spinner, Text } from '../../customizables';
+import {
+  Box,
+  Col,
+  descriptors,
+  Flex,
+  Heading,
+  localizationKeys,
+  Span,
+  Spinner,
+  Text,
+  useLocalizations,
+} from '../../customizables';
 
 export const PlanDetails = (props: __internal_PlanDetailsProps) => {
   return (
     <Drawer.Content>
       <PlanDetailsInternal {...props} />
     </Drawer.Content>
+  );
+};
+
+const BodyFiller = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <Drawer.Body
+      sx={t => ({
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flex: 1,
+        overflowY: 'auto',
+        padding: t.space.$4,
+        gap: t.space.$4,
+      })}
+    >
+      {children}
+    </Drawer.Body>
+  );
+};
+
+const PlanDetailsError = ({ error }: { error: ClerkAPIResponseError }) => {
+  const { translateError } = useLocalizations();
+  return (
+    <BodyFiller>
+      <Alert
+        variant='danger'
+        colorScheme='danger'
+      >
+        {translateError(error.errors[0])}
+      </Alert>
+    </BodyFiller>
   );
 };
 
@@ -27,27 +77,32 @@ const PlanDetailsInternal = ({
   const clerk = useClerk();
   const [planPeriod, setPlanPeriod] = useState<CommerceSubscriptionPlanPeriod>(initialPlanPeriod);
 
-  const { data: plan, isLoading } = useSWR(
+  const {
+    data: plan,
+    isLoading,
+    error,
+  } = useSWR<CommercePlanResource, ClerkAPIResponseError>(
     planId || initialPlan ? { type: 'plan', id: planId || initialPlan?.id } : null,
     // @ts-expect-error we are handling it above
     () => clerk.billing.getPlan({ id: planId || initialPlan?.id }),
     {
       fallbackData: initialPlan,
+      revalidateOnFocus: false,
+      shouldRetryOnError: false,
+      keepPreviousData: true,
     },
   );
 
   if (isLoading && !initialPlan) {
     return (
-      <Flex
-        justify='center'
-        align='center'
-        sx={{
-          height: '100%',
-        }}
-      >
+      <BodyFiller>
         <Spinner />
-      </Flex>
+      </BodyFiller>
     );
+  }
+
+  if (!plan && error) {
+    return <PlanDetailsError error={error} />;
   }
 
   if (!plan) {
