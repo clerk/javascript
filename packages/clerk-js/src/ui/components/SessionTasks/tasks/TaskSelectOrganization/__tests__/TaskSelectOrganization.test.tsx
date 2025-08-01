@@ -1,7 +1,8 @@
 import { describe } from '@jest/globals';
 import userEvent from '@testing-library/user-event';
 
-import { bindCreateFixtures, render } from '@/testUtils';
+import { bindCreateFixtures, render, waitFor } from '@/testUtils';
+import { createFakeUserOrganizationMembership } from '@/ui/components/OrganizationSwitcher/__tests__/utlis';
 
 import { TaskSelectOrganization } from '../';
 
@@ -20,9 +21,11 @@ describe('TaskSelectOrganization', () => {
 
     const { queryByText, queryByRole } = render(<TaskSelectOrganization />, { wrapper });
 
-    expect(queryByText('Setup your account')).not.toBeInTheDocument();
-    expect(queryByText('Tell us a bit about your organization')).not.toBeInTheDocument();
-    expect(queryByRole('button', { name: /sign out/i })).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(queryByText('Setup your account')).not.toBeInTheDocument();
+      expect(queryByText('Tell us a bit about your organization')).not.toBeInTheDocument();
+      expect(queryByRole('button', { name: /sign out/i })).not.toBeInTheDocument();
+    });
   });
 
   it('renders component when session task exists', async () => {
@@ -38,9 +41,11 @@ describe('TaskSelectOrganization', () => {
 
     const { getByText, getByRole } = render(<TaskSelectOrganization />, { wrapper });
 
-    expect(getByText('Setup your account')).toBeInTheDocument();
-    expect(getByText('Tell us a bit about your organization')).toBeInTheDocument();
-    expect(getByRole('button', { name: /sign out/i })).toBeInTheDocument();
+    await waitFor(() => {
+      expect(getByText('Setup your account')).toBeInTheDocument();
+      expect(getByText('Tell us a bit about your organization')).toBeInTheDocument();
+      expect(getByRole('link', { name: /sign out/i })).toBeInTheDocument();
+    });
   });
 
   it('shows create organization screen when user has no existing resources', async () => {
@@ -56,62 +61,109 @@ describe('TaskSelectOrganization', () => {
 
     const { getByRole, getByText } = render(<TaskSelectOrganization />, { wrapper });
 
-    // Should show create organization form by default when no existing resources
-    expect(getByRole('textbox', { name: /name/i })).toBeInTheDocument();
-    expect(getByText('Create organization')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(getByRole('textbox', { name: /name/i })).toBeInTheDocument();
+      expect(getByText('Create organization')).toBeInTheDocument();
+    });
   });
 
   it('shows select organization screen when user has existing organizations', async () => {
-    const { wrapper } = await createFixtures(f => {
+    const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
       f.withForceOrganizationSelection();
       f.withUser({
         email_addresses: ['test@clerk.com'],
         create_organization_enabled: true,
-        organization_memberships: [{ name: 'Test Org', slug: 'test-org' }],
         tasks: [{ key: 'select-organization' }],
       });
     });
+
+    fixtures.clerk.user?.getOrganizationMemberships.mockReturnValueOnce(
+      Promise.resolve({
+        data: [
+          createFakeUserOrganizationMembership({
+            id: '1',
+            organization: {
+              id: '1',
+              name: 'Existing Org',
+              slug: 'org1',
+              membersCount: 1,
+              adminDeleteEnabled: false,
+              maxAllowedMemberships: 1,
+              pendingInvitationsCount: 1,
+            },
+          }),
+        ],
+        total_count: 1,
+      }),
+    );
 
     const { getByText, queryByRole } = render(<TaskSelectOrganization />, { wrapper });
 
-    expect(getByText('Test Org')).toBeInTheDocument();
-    expect(getByText('Create organization')).toBeInTheDocument();
-    expect(queryByRole('textbox', { name: /name/i })).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(getByText('Existing Org')).toBeInTheDocument();
+      expect(getByText('Create organization')).toBeInTheDocument();
+      expect(queryByRole('textbox', { name: /name/i })).not.toBeInTheDocument();
+    });
   });
 
   it('allows switching between select and create organization screens', async () => {
-    const { wrapper } = await createFixtures(f => {
+    const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
       f.withForceOrganizationSelection();
       f.withUser({
         email_addresses: ['test@clerk.com'],
         create_organization_enabled: true,
-        organization_memberships: [{ name: 'Existing Org', slug: 'existing-org' }],
         tasks: [{ key: 'select-organization' }],
       });
     });
 
+    fixtures.clerk.user?.getOrganizationMemberships.mockReturnValueOnce(
+      Promise.resolve({
+        data: [
+          createFakeUserOrganizationMembership({
+            id: '1',
+            organization: {
+              id: '1',
+              name: 'Existing Org',
+              slug: 'org1',
+              membersCount: 1,
+              adminDeleteEnabled: false,
+              maxAllowedMemberships: 1,
+              pendingInvitationsCount: 1,
+            },
+          }),
+        ],
+        total_count: 1,
+      }),
+    );
+
     const { getByText, getByRole, queryByRole, queryByText } = render(<TaskSelectOrganization />, { wrapper });
 
-    expect(getByText('Existing Org')).toBeInTheDocument();
-    expect(getByText('Create organization')).toBeInTheDocument();
-    expect(queryByRole('textbox', { name: /name/i })).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(getByText('Existing Org')).toBeInTheDocument();
+      expect(getByText('Create organization')).toBeInTheDocument();
+      expect(queryByRole('textbox', { name: /name/i })).not.toBeInTheDocument();
+    });
 
     const createButton = getByText('Create organization');
     await userEvent.click(createButton);
 
-    expect(getByRole('textbox', { name: /name/i })).toBeInTheDocument();
-    expect(getByRole('button', { name: /create organization/i })).toBeInTheDocument();
-    expect(getByRole('button', { name: /cancel/i })).toBeInTheDocument();
-    expect(queryByText('Existing Org')).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(getByRole('textbox', { name: /name/i })).toBeInTheDocument();
+      expect(getByRole('button', { name: /create organization/i })).toBeInTheDocument();
+      expect(getByRole('button', { name: /cancel/i })).toBeInTheDocument();
+      expect(queryByText('Existing Org')).not.toBeInTheDocument();
+    });
 
     const cancelButton = getByRole('button', { name: /cancel/i });
     await userEvent.click(cancelButton);
 
-    expect(getByText('Existing Org')).toBeInTheDocument();
-    expect(getByText('Create organization')).toBeInTheDocument();
-    expect(queryByRole('textbox', { name: /name/i })).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(getByText('Existing Org')).toBeInTheDocument();
+      expect(getByText('Create organization')).toBeInTheDocument();
+      expect(queryByRole('textbox', { name: /name/i })).not.toBeInTheDocument();
+    });
   });
 
   it('displays user identifier in sign out section', async () => {
@@ -127,8 +179,10 @@ describe('TaskSelectOrganization', () => {
 
     const { getByText } = render(<TaskSelectOrganization />, { wrapper });
 
-    expect(getByText(/user@test\.com/)).toBeInTheDocument();
-    expect(getByText('Sign out')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(getByText(/user@test\.com/)).toBeInTheDocument();
+      expect(getByText('Sign out')).toBeInTheDocument();
+    });
   });
 
   it('handles sign out correctly', async () => {
@@ -143,7 +197,7 @@ describe('TaskSelectOrganization', () => {
     });
 
     const { getByRole } = render(<TaskSelectOrganization />, { wrapper });
-    const signOutButton = getByRole('button', { name: /sign out/i });
+    const signOutButton = getByRole('link', { name: /sign out/i });
 
     await userEvent.click(signOutButton);
 
