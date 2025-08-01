@@ -8,7 +8,6 @@ import { withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
 import { useMultipleSessions } from '@/ui/hooks/useMultipleSessions';
 import { useOrganizationListInView } from '@/ui/hooks/useOrganizationListInView';
-import { truncateWithEndVisible } from '@/ui/utils/truncateTextWithEndVisible';
 
 import { withTaskGuard } from '../withTaskGuard';
 import { CreateOrganizationScreen } from './CreateOrganizationScreen';
@@ -73,15 +72,18 @@ const TaskSelectOrganizationInternal = () => {
           <Card.Action
             elementId='signOut'
             gap={2}
+            sx={() => ({ width: '100%' })}
           >
             {identifier && (
               <Card.ActionText
+                truncate
                 localizationKey={localizationKeys('taskSelectOrganization.signOut.actionText', {
-                  identifier: truncateWithEndVisible(identifier, 30, 0),
+                  identifier,
                 })}
               />
             )}
             <Card.ActionLink
+              sx={() => ({ flexShrink: 0 })}
               onClick={handleSignOut}
               localizationKey={localizationKeys('taskSelectOrganization.signOut.actionLink')}
             />
