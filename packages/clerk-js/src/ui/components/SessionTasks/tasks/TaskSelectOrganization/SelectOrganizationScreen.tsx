@@ -159,7 +159,7 @@ const InvitationPreview = withCardStateProvider((props: UserOrganizationInvitati
       <OrganizationPreviewListItemButton
         isLoading={card.isLoading}
         onClick={handleAccept}
-        localizationKey={localizationKeys('taskSelectOrganization.selectOrganizationScreen.action__invitationAccept')}
+        localizationKey={localizationKeys('taskSelectOrganization.selectOrganization.action__invitationAccept')}
       />
     </OrganizationPreviewListItem>
   );
@@ -185,7 +185,7 @@ const SuggestionPreview = withCardStateProvider((props: OrganizationSuggestionRe
     return (
       <Text
         colorScheme='secondary'
-        localizationKey={localizationKeys('taskSelectOrganization.selectOrganizationScreen.suggestionsAcceptedLabel')}
+        localizationKey={localizationKeys('taskSelectOrganization.selectOrganization.suggestionsAcceptedLabel')}
       />
     );
   }
@@ -199,7 +199,7 @@ const SuggestionPreview = withCardStateProvider((props: OrganizationSuggestionRe
       <OrganizationPreviewListItemButton
         onClick={handleAccept}
         isLoading={card.isLoading}
-        localizationKey={localizationKeys('taskSelectOrganization.selectOrganizationScreen.action__suggestionsAccept')}
+        localizationKey={localizationKeys('taskSelectOrganization.selectOrganization.action__suggestionsAccept')}
       />
     </OrganizationPreviewListItem>
   );
@@ -220,7 +220,7 @@ const CreateOrganizationButton = ({
     <Action
       elementDescriptor={descriptors.taskSelectOrganizationCreateOrganizationActionButton}
       icon={Add}
-      label={localizationKeys('taskSelectOrganization.selectOrganizationScreen.action__createOrganization')}
+      label={localizationKeys('taskSelectOrganization.selectOrganization.action__createOrganization')}
       onClick={onCreateOrganizationClick}
       sx={t => ({
         borderTopWidth: t.borderWidths.$normal,

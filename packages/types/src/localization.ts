@@ -1209,13 +1209,13 @@ export type __internal_LocalizationResource = {
       actionText: LocalizationValue<'identifier'>;
       actionLink: LocalizationValue;
     };
-    createOrganizationScreen: {
+    createOrganization: {
       formButtonSubmit: LocalizationValue;
       formButtonReset: LocalizationValue;
-      action__uploadAvatar: LocalizationValue;
-      avatarLabel: LocalizationValue;
+      uploadAction__title: LocalizationValue;
+      imageFormTitle: LocalizationValue;
     };
-    selectOrganizationScreen: {
+    selectOrganization: {
       suggestionsAcceptedLabel: LocalizationValue;
       action__suggestionsAccept: LocalizationValue;
       action__createOrganization: LocalizationValue;

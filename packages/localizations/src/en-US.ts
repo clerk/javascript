@@ -9,13 +9,13 @@ export const enUS: LocalizationResource = {
       actionLink: 'Sign out',
       actionText: 'Signed in as {{identifier}}',
     },
-    createOrganizationScreen: {
+    createOrganization: {
       formButtonSubmit: 'Create organization',
       formButtonReset: 'Cancel',
-      action__uploadAvatar: 'Logo',
-      avatarLabel: 'Logo',
+      uploadAction__title: 'Logo',
+      imageFormTitle: 'Logo',
     },
-    selectOrganizationScreen: {
+    selectOrganization: {
       suggestionsAcceptedLabel: 'Pending approval',
       action__createOrganization: 'Create organization',
       action__suggestionsAccept: 'Request to join',

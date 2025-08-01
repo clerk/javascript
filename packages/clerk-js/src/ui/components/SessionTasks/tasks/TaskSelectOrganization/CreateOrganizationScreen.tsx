@@ -88,8 +88,8 @@ export const CreateOrganizationScreen = withCardStateProvider((props: CreateOrga
           organization={{ name: nameField.value }}
           onAvatarChange={async file => setFile(file)}
           onAvatarRemove={file ? onAvatarRemove : null}
-          actionTitle={localizationKeys('taskSelectOrganization.createOrganizationScreen.action__uploadAvatar')}
-          imageTitle={localizationKeys('taskSelectOrganization.createOrganizationScreen.avatarLabel')}
+          actionTitle={localizationKeys('taskSelectOrganization.createOrganization.uploadAction__title')}
+          imageTitle={localizationKeys('taskSelectOrganization.createOrganization.imageFormTitle')}
           elementDescriptor={descriptors.organizationAvatarUploaderContainer}
           avatarPreviewPlaceholder={
             <IconButton
@@ -146,11 +146,11 @@ export const CreateOrganizationScreen = withCardStateProvider((props: CreateOrga
           <Form.SubmitButton
             block
             isDisabled={isSubmitButtonDisabled}
-            localizationKey={localizationKeys('taskSelectOrganization.createOrganizationScreen.formButtonSubmit')}
+            localizationKey={localizationKeys('taskSelectOrganization.createOrganization.formButtonSubmit')}
           />
           {props.onCancel && (
             <Form.ResetButton
-              localizationKey={localizationKeys('taskSelectOrganization.createOrganizationScreen.formButtonReset')}
+              localizationKey={localizationKeys('taskSelectOrganization.createOrganization.formButtonReset')}
               onClick={props.onCancel}
             />
           )}
