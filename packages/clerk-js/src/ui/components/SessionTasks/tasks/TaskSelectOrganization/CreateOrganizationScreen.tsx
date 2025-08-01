@@ -9,7 +9,7 @@ import { Form } from '@/ui/elements/Form';
 import { FormButtonContainer } from '@/ui/elements/FormButtons';
 import { FormContainer } from '@/ui/elements/FormContainer';
 import { IconButton } from '@/ui/elements/IconButton';
-import { Organization } from '@/ui/icons';
+import { Upload } from '@/ui/icons';
 import { createSlug } from '@/ui/utils/createSlug';
 import { handleError } from '@/ui/utils/errorHandler';
 import { useFormControl } from '@/ui/utils/useFormControl';
@@ -98,7 +98,7 @@ export const CreateOrganizationScreen = withCardStateProvider((props: CreateOrga
               icon={
                 <Icon
                   size='md'
-                  icon={Organization}
+                  icon={Upload}
                   sx={t => ({
                     color: t.colors.$colorMutedForeground,
                     transitionDuration: t.transitionDuration.$controls,
