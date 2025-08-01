@@ -40,8 +40,6 @@ export const SelectOrganizationScreen = withCardStateProvider(
     const userInvitationsData = userInvitations.data?.filter(a => !!a);
     const userSuggestionsData = userSuggestions.data?.filter(a => !!a);
 
-    console.log({ userMemberships, userInvitations });
-
     return (
       <Col elementDescriptor={descriptors.main}>
         <OrganizationPreviewListItems elementDescriptor={descriptors.taskSelectOrganizationPreviewItems}>
