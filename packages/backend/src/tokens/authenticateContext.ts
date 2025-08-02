@@ -6,6 +6,7 @@ import { runtime } from '../runtime';
 import { assertValidPublishableKey } from '../util/optionsAssertions';
 import { getCookieSuffix, getSuffixedCookieName, parsePublishableKey } from '../util/shared';
 import type { ClerkRequest } from './clerkRequest';
+import { TokenType } from './tokenTypes';
 import type { AuthenticateRequestOptions } from './types';
 
 interface AuthenticateContext extends AuthenticateRequestOptions {
@@ -68,8 +69,11 @@ class AuthenticateContext implements AuthenticateContext {
   ) {
     // Even though the options are assigned to this later in this function
     // we set the publishableKey here because it is being used in cookies/headers/handshake-values
-    // as part of getMultipleAppsCookie
-    this.initPublishableKeyValues(options);
+    // as part of getMultipleAppsCookie.
+    // Machine tokens don't require publishable keys.
+    if (options.acceptsToken !== TokenType.MachineToken) {
+      this.initPublishableKeyValues(options);
+    }
     this.initHeaderValues();
     // initCookieValues should be used before initHandshakeValues because it depends on suffixedCookies
     this.initCookieValues();

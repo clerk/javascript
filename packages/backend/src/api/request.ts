@@ -27,12 +27,19 @@ type ClerkBackendApiRequestOptionsBodyParams =
          * @default false
          */
         deepSnakecaseBodyParamKeys?: boolean;
+        /**
+         * If true, skips adding the instance secret key to the authorization header.
+         * Useful when you need to provide custom authorization (e.g., machine secrets).
+         * @default false
+         */
+        skipSecretKeyAuthorization?: boolean;
       };
     }
   | {
       bodyParams?: never;
       options?: {
-        deepSnakecaseBodyParamKeys?: never;
+        deepSnakecaseBodyParamKeys?: boolean;
+        skipSecretKeyAuthorization?: never;
       };
     };
 
@@ -98,7 +105,7 @@ export function buildRequest(options: BuildRequestOptions) {
       skipApiVersionInUrl = false,
     } = options;
     const { path, method, queryParams, headerParams, bodyParams, formData, options: opts } = requestOptions;
-    const { deepSnakecaseBodyParamKeys = false } = opts || {};
+    const { deepSnakecaseBodyParamKeys = false, skipSecretKeyAuthorization = false } = opts || {};
 
     if (requireSecretKey) {
       assertValidSecretKey(secretKey);
@@ -124,12 +131,12 @@ export function buildRequest(options: BuildRequestOptions) {
     // Build headers
     const headers = new Headers({
       'Clerk-API-Version': SUPPORTED_BAPI_VERSION,
-      'User-Agent': userAgent,
+      [constants.Headers.UserAgent]: userAgent,
       ...headerParams,
     });
 
-    if (secretKey) {
-      headers.set('Authorization', `Bearer ${secretKey}`);
+    if (secretKey && !skipSecretKeyAuthorization) {
+      headers.set(constants.Headers.Authorization, `Bearer ${secretKey}`);
     }
 
     let res: Response | undefined;

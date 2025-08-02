@@ -14,7 +14,7 @@ import {
   JwksAPI,
   JwtTemplatesApi,
   MachineApi,
-  MachineTokensApi,
+  MachineTokenApi,
   OAuthApplicationsApi,
   OrganizationAPI,
   PhoneNumberAPI,
@@ -66,10 +66,11 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
     jwks: new JwksAPI(request),
     jwtTemplates: new JwtTemplatesApi(request),
     machines: new MachineApi(request),
-    machineTokens: new MachineTokensApi(
+    machineTokens: new MachineTokenApi(
       buildRequest({
         ...options,
         skipApiVersionInUrl: true,
+        requireSecretKey: false,
       }),
     ),
     oauthApplications: new OAuthApplicationsApi(request),

@@ -96,7 +96,6 @@ type MachineObjectExtendedProperties<TAuthenticated extends boolean> = {
         | { name: string; claims: Claims | null; userId: null; orgId: string }
     : { name: null; claims: null; userId: null; orgId: null };
   machine_token: {
-    name: TAuthenticated extends true ? string : null;
     claims: TAuthenticated extends true ? Claims | null : null;
     machineId: TAuthenticated extends true ? string : null;
   };
@@ -285,7 +284,6 @@ export function authenticatedMachineObject<T extends MachineTokenType>(
       return {
         ...baseObject,
         tokenType,
-        name: result.name,
         claims: result.claims,
         scopes: result.scopes,
         machineId: result.subject,
@@ -339,7 +337,6 @@ export function unauthenticatedMachineObject<T extends MachineTokenType>(
       return {
         ...baseObject,
         tokenType,
-        name: null,
         claims: null,
         scopes: null,
         machineId: null,
