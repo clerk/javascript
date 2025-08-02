@@ -30,9 +30,9 @@ import type {
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
-  Clerk as ClerkInterface,
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
+  Clerk as ClerkInterface,
   ClerkOptions,
   ClientJSONSnapshot,
   ClientResource,
@@ -1580,20 +1580,30 @@ export class Clerk implements ClerkInterface {
   }
 
   public buildAfterMultiSessionSingleSignOutUrl(): string {
-    if (!this.#options.afterMultiSessionSingleSignOutUrl) {
+    if (this.#options.afterMultiSessionSingleSignOutUrl) {
+      return this.buildUrlWithAuth(this.#options.afterMultiSessionSingleSignOutUrl);
+    }
+
+    if (this.#options.signInUrl) {
       return this.buildUrlWithAuth(
         buildURL(
           {
-            base: this.#options.signInUrl
-              ? `${this.#options.signInUrl}/choose`
-              : this.environment?.displayConfig.afterSignOutOneUrl,
+            base: this.#options.signInUrl,
+            hashPath: 'choose',
           },
           { stringify: true },
         ),
       );
     }
 
-    return this.buildUrlWithAuth(this.#options.afterMultiSessionSingleSignOutUrl);
+    return this.buildUrlWithAuth(
+      buildURL(
+        {
+          base: this.environment?.displayConfig.afterSignOutOneUrl,
+        },
+        { stringify: true },
+      ),
+    );
   }
 
   public buildCreateOrganizationUrl(): string {
