@@ -36,8 +36,8 @@ catalogs:
       specifier: 5.8.3
       version: 5.8.3
     zx:
-      specifier: 8.7.1
-      version: 8.7.1
+      specifier: 8.7.2
+      version: 8.7.2
 
 overrides:
   jest: 29.7.0
@@ -312,7 +312,7 @@ importers:
         version: 1.0.0-pre.53(patch_hash=2737a4bf8dd6ebdc410626225fe706ae0bb73b142e398279afff04d1b02dfc1f)
       zx:
         specifier: catalog:repo
-        version: 8.7.1
+        version: 8.7.2
 
   packages/agent-toolkit:
     dependencies:
@@ -14948,8 +14948,8 @@ packages:
   zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
 
-  zx@8.7.1:
-    resolution: {integrity: sha512-28u1w2LlIfvyvJvYe6pmCipesk8oL5AFMVp+P/U445LcaPgzrU5lNDtAPd6nJvWmoCNyXZz37R/xKOGokccjsw==}
+  zx@8.7.2:
+    resolution: {integrity: sha512-4Wtl46msLFx6QW6GjLu1aRnFhavukT4VSp4tdXvfRIBRNW3RP7Si3RlRFD7YeQeecQBacVFRQQgm5LTvE/YEGQ==}
     engines: {node: '>= 12.17.0'}
     hasBin: true
 
@@ -32239,4 +32239,4 @@ snapshots:
 
   zwitch@2.0.4: {}
 
-  zx@8.7.1: {}
+  zx@8.7.2: {}
