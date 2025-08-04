@@ -2,7 +2,7 @@ import { DebugLogger } from './logger';
 import { type CompositeLoggerOptions, CompositeTransport } from './transports/composite';
 import { ConsoleTransport } from './transports/console';
 import { type TelemetryLoggerOptions, TelemetryTransport } from './transports/telemetry';
-import type { DebugLogFilter, DebugLogLevel } from './types';
+import type { DebugLogFilter, DebugLogLevel, DebugTransport } from './types';
 import { isValidLogLevel, VALID_LOG_LEVELS } from './types';
 
 /**
@@ -234,7 +234,9 @@ export function createCompositeLogger(
     const { transports, logLevel, filters } = options;
     const finalLogLevel = logLevel ?? DEFAULT_LOG_LEVEL;
 
-    const transportInstances = transports.map((t: any) => t.transport);
+    const transportInstances = transports.map(
+      (t: { transport: DebugTransport; options?: Record<string, unknown> }) => t.transport,
+    );
     const compositeTransport = new CompositeTransport(transportInstances);
 
     const logger = new DebugLogger(compositeTransport, finalLogLevel, filters);
