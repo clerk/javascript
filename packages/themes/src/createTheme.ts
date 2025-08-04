@@ -95,37 +95,27 @@ export function convertTuplesToCssVariables(
 
   for (const [key, value] of Object.entries(variables)) {
     if (Array.isArray(value) && value.length === 2) {
-      // This is a tuple [light, dark]
       const [lightValue, darkValue] = value;
 
       if (darkModeSelector === null) {
-        // Opted out of dark mode - use light value only
         processedVariables[key] = lightValue;
       } else {
-        // Generate CSS and use CSS variable reference
         const cssVarName = `${CSS_VAR_PREFIX}${toKebabCase(key)}`;
 
-        // Add CSS rules for light and dark modes
         lightRules.push(`    ${cssVarName}: ${lightValue};`);
         darkRules.push(`    ${cssVarName}: ${darkValue};`);
 
-        // Replace tuple with CSS variable reference in variables object
         processedVariables[key] = `var(${cssVarName})`;
       }
     } else {
-      // Not a tuple - pass through as is
       processedVariables[key] = value;
     }
   }
 
-  // Generate CSS string - handle media queries vs regular selectors
   let cssString: string | null = null;
   if (lightRules.length > 0 && darkModeSelector !== null) {
-    // Use the explicit selector provided (no fallbacks)
-    // darkModeSelector is guaranteed to be string here due to null check above
     const normalizedSelector = darkModeSelector as string;
 
-    // Check if it's a media query
     if (normalizedSelector.startsWith(MEDIA_QUERY_PREFIX)) {
       // Media query - wrap dark rules in :root
       cssString = `
@@ -201,7 +191,6 @@ export function resolveElementsConfiguration(
     }
   }
 
-  // Static elements - return as-is
   return elements;
 }
 
@@ -223,7 +212,6 @@ export function resolveBaseTheme(baseTheme: BaseTheme | undefined, options?: The
     }
   }
 
-  // Static theme - return as-is
   return baseTheme;
 }
 
@@ -249,7 +237,6 @@ export function mergeThemeConfigurations(
   const mergedElements =
     resolvedBase.elements || childConfig.elements ? { ...resolvedBase.elements, ...childConfig.elements } : undefined;
 
-  // Merge the entire configuration
   const mergedConfig = {
     ...resolvedBase,
     ...childConfig,
@@ -289,19 +276,15 @@ export function createThemeFactory(config: ThemeConfiguration): (options?: Theme
   return (options?: ThemeOptions) => {
     const darkModeSelector = normalizeDarkModeSelector(options?.darkModeSelector);
 
-    // Resolve base theme if provided
     const resolvedBaseTheme = resolveBaseTheme(config.baseTheme, options);
 
-    // Process elements (static or function-based)
     const processedElements = resolveElementsConfiguration(config.elements, darkModeSelector);
 
-    // Merge configurations
     const { mergedVariables, mergedElements, mergedConfig } = mergeThemeConfigurations(resolvedBaseTheme, {
       ...config,
       elements: processedElements,
     });
 
-    // Process tuple variables and generate CSS
     let globalCssString: string | null = null;
     let finalVariables = mergedVariables;
 
@@ -311,7 +294,6 @@ export function createThemeFactory(config: ThemeConfiguration): (options?: Theme
       finalVariables = processedVariables;
     }
 
-    // Create final theme object
     return createThemeObject(mergedConfig, finalVariables, mergedElements, globalCssString);
   };
 }
@@ -325,13 +307,10 @@ export function experimental_createTheme<T extends { variables?: VariablesWithTu
   appearance: Appearance<T>,
 ): BaseTheme & ((options?: ThemeOptions) => BaseTheme);
 export function experimental_createTheme(appearance: any) {
-  // Create theme factory
   const themeFactory = createThemeFactory(appearance);
 
-  // Create the default theme (backwards compatibility)
   const defaultTheme = themeFactory();
 
-  // Make the default theme callable as a factory function
   const callableTheme = Object.assign(themeFactory, defaultTheme);
 
   return callableTheme as BaseTheme & typeof themeFactory;
