@@ -8,6 +8,7 @@ const basePath = '/m2m_tokens';
 type CreateMachineTokenParams = {
   machineSecret: string;
   secondsUntilExpiration?: number | null;
+  claims?: Record<string, unknown> | null;
 };
 
 type RevokeMachineTokenParams = {
@@ -29,14 +30,17 @@ export class MachineTokenApi extends AbstractAPI {
   }
 
   async create(params: CreateMachineTokenParams) {
-    const { machineSecret, ...bodyParams } = params;
+    const { machineSecret, claims = null, secondsUntilExpiration = null } = params;
 
     this.#requireMachineSecret(machineSecret);
 
     return this.request<MachineToken>({
       method: 'POST',
       path: basePath,
-      bodyParams,
+      bodyParams: {
+        secondsUntilExpiration,
+        claims,
+      },
       options: {
         skipSecretKeyAuthorization: true,
       },
@@ -47,14 +51,16 @@ export class MachineTokenApi extends AbstractAPI {
   }
 
   async revoke(params: RevokeMachineTokenParams) {
-    const { m2mTokenId, machineSecret, ...bodyParams } = params;
+    const { m2mTokenId, machineSecret, revocationReason = null } = params;
 
     this.requireId(m2mTokenId);
 
     const requestOptions: ClerkBackendApiRequestOptions = {
       method: 'POST',
       path: joinPaths(basePath, m2mTokenId, 'revoke'),
-      bodyParams,
+      bodyParams: {
+        revocationReason,
+      },
     };
 
     if (machineSecret) {
