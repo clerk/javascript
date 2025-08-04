@@ -801,7 +801,7 @@ interface CommercePayeeJSON {
   gateway_status: 'active' | 'pending' | 'restricted' | 'disconnected';
 }
 
-interface CommerceAmountJSON {
+interface CommerceFeeJSON {
   amount: number;
   amount_formatted: string;
   currency: string;
@@ -809,9 +809,9 @@ interface CommerceAmountJSON {
 }
 
 interface CommerceTotalsJSON {
-  subtotal: CommerceAmountJSON;
-  tax_total: CommerceAmountJSON;
-  grand_total: CommerceAmountJSON;
+  subtotal: CommerceFeeJSON;
+  tax_total: CommerceFeeJSON;
+  grand_total: CommerceFeeJSON;
 }
 
 export interface FeatureJSON extends ClerkResourceJSON {
@@ -831,17 +831,11 @@ export interface CommercePlanJSON extends ClerkResourceJSON {
   description?: string;
   is_default: boolean;
   is_recurring: boolean;
-  amount: number;
-  period: 'month' | 'annual';
-  // What is this ?
-  interval: number;
   has_base_fee: boolean;
-  currency: string;
-  annual_monthly_amount: number;
   publicly_visible: boolean;
-  fee: CommerceAmountJSON;
-  annual_fee: CommerceAmountJSON;
-  annual_monthly_fee: CommerceAmountJSON;
+  fee: CommerceFeeJSON;
+  annual_fee: CommerceFeeJSON;
+  annual_monthly_fee: CommerceFeeJSON;
   for_payer_type: 'org' | 'user';
   features: FeatureJSON[];
 }
@@ -850,7 +844,7 @@ export interface CommerceSubscriptionItemJSON extends ClerkResourceJSON {
   object: typeof ObjectType.CommerceSubscriptionItem;
   status: 'abandoned' | 'active' | 'canceled' | 'ended' | 'expired' | 'incomplete' | 'past_due' | 'upcoming';
   credit: {
-    amount: CommerceAmountJSON;
+    amount: CommerceFeeJSON;
     cycle_days_remaining: number;
     cycle_days_total: number;
     cycle_remaining_percent: number;
@@ -864,7 +858,7 @@ export interface CommerceSubscriptionItemJSON extends ClerkResourceJSON {
   lifetime_paid: number;
   next_payment_amount: number;
   next_payment_date: number;
-  amount: CommerceAmountJSON;
+  amount: CommerceFeeJSON;
   plan: {
     id: string;
     instance_id: string;
