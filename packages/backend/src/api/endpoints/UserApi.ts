@@ -92,24 +92,70 @@ type CreateUserParams = {
   (UserPasswordHashingParams | object);
 
 type UpdateUserParams = {
+  /** The first name to assign to the user. */
   firstName?: string;
+
+  /** The last name of the user. */
   lastName?: string;
+
+  /** The username to give to the user. It must be unique across your instance. */
   username?: string;
+
+  /** The plaintext password to give the user. Must be at least 8 characters long, and can not be in any list of hacked passwords. */
   password?: string;
+
+  /** Set it to true if you're updating the user's password and want to skip any password policy settings check. This parameter can only be used when providing a password. */
   skipPasswordChecks?: boolean;
+
+  /** Set to true to sign out the user from all their active sessions once their password is updated. This parameter can only be used when providing a password. */
   signOutOfOtherSessions?: boolean;
+
+  /** The ID of the email address to set as primary. It must be verified, and present on the current user. */
   primaryEmailAddressID?: string;
+
+  /** If set to true, the user will be notified that their primary email address has changed. By default, no notification is sent. */
+  notifyPrimaryEmailAddressChanged?: boolean;
+
+  /** The ID of the phone number to set as primary. It must be verified, and present on the current user. */
   primaryPhoneNumberID?: string;
+
+  /** The ID of the web3 wallets to set as primary. It must be verified, and present on the current user. */
   primaryWeb3WalletID?: string;
+
+  /** The ID of the image to set as the user's profile image */
   profileImageID?: string;
+
+  /**
+   * In case TOTP is configured on the instance, you can provide the secret to enable it on the specific user without the need to reset it.
+   * Please note that currently the supported options are:
+   * - Period: 30 seconds
+   * - Code length: 6 digits
+   * - Algorithm: SHA1
+   */
   totpSecret?: string;
+
+  /** If Backup Codes are configured on the instance, you can provide them to enable it on the specific user without the need to reset them. You must provide the backup codes in plain format or the corresponding bcrypt digest. */
   backupCodes?: string[];
+
+  /** The ID of the user as used in your external systems or your previous authentication solution. Must be unique across your instance. */
   externalId?: string;
+
+  /** A custom timestamp denoting when the user signed up to the application, specified in RFC3339 format (e.g. 2012-10-20T07:15:20.902Z). */
   createdAt?: Date;
+
+  /** When set to true all legal checks are skipped. It is not recommended to skip legal checks unless you are migrating a user to Clerk. */
   skipLegalChecks?: boolean;
+
+  /** A custom timestamp denoting when the user accepted legal requirements, specified in RFC3339 format (e.g. 2012-10-20T07:15:20.902Z). */
   legalAcceptedAt?: Date;
+
+  /** If true, the user can delete themselves with the Frontend API. */
   deleteSelfEnabled?: boolean;
+
+  /** If true, the user can create organizations with the Frontend API. */
   createOrganizationEnabled?: boolean;
+
+  /** The maximum number of organizations the user can create. 0 means unlimited. */
   createOrganizationsLimit?: number;
 } & UserMetadataParams &
   (UserPasswordHashingParams | object);

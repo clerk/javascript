@@ -2,18 +2,16 @@ import { useClerk, useOrganization, useOrganizationList, useUser } from '@clerk/
 import type { OrganizationResource } from '@clerk/types';
 import React from 'react';
 
+import { Actions, SmallAction } from '@/ui/elements/Actions';
+import { useCardState } from '@/ui/elements/contexts';
+import { OrganizationPreview } from '@/ui/elements/OrganizationPreview';
+import { PersonalWorkspacePreview } from '@/ui/elements/PersonalWorkspacePreview';
+import { PopoverCard } from '@/ui/elements/PopoverCard';
+
 import { runIfFunctionOrReturn } from '../../../utils';
 import { NotificationCountBadge, withProtect } from '../../common';
 import { useEnvironment, useOrganizationSwitcherContext } from '../../contexts';
 import { descriptors, Flex, localizationKeys } from '../../customizables';
-import {
-  Actions,
-  OrganizationPreview,
-  PersonalWorkspacePreview,
-  PopoverCard,
-  SmallAction,
-  useCardState,
-} from '../../elements';
 import { RootBox } from '../../elements/RootBox';
 import { Billing, CogFilled } from '../../icons';
 import { useRouter } from '../../router';
@@ -119,6 +117,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
         label={localizationKeys('organizationSwitcher.action__manageOrganization')}
         onClick={() => handleItemClick()}
         trailing={<NotificationCountBadgeManageButton />}
+        focusRing
       />
     );
 
@@ -127,6 +126,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
         icon={Billing}
         label={runIfFunctionOrReturn(__unstable_manageBillingLabel) || 'Upgrade'}
         onClick={() => router.navigate(runIfFunctionOrReturn(__unstable_manageBillingUrl))}
+        focusRing
       />
     );
 
@@ -148,7 +148,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
             sx={t => ({
               borderBottomWidth: t.borderWidths.$normal,
               borderBottomStyle: t.borderStyles.$solid,
-              borderBottomColor: t.colors.$neutralAlpha100,
+              borderBottomColor: t.colors.$borderAlpha100,
             })}
           >
             <Flex

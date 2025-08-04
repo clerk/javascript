@@ -39,13 +39,14 @@ export const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>((p
           zIndex: t.zIndices.$card,
           borderWidth: t.borderWidths.$normal,
           borderStyle: t.borderStyles.$solid,
-          borderColor: t.colors.$neutralAlpha50,
-          boxShadow: t.shadows.$cardContentShadow,
+          borderColor: t.colors.$borderAlpha150,
           borderRadius: t.radii.$lg,
           position: 'relative',
           padding: `${t.space.$8} ${t.space.$10}`,
           justifyContent: 'center',
           alignContent: 'center',
+          marginBlockStart: '-1px',
+          marginInline: '-1px',
         }),
         sx,
       ]}
@@ -66,7 +67,7 @@ export const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>((p
             />
           }
           sx={t => ({
-            color: t.colors.$colorTextSecondary,
+            color: t.colors.$colorMutedForeground,
             zIndex: t.zIndices.$modal,
             position: 'absolute',
             top: t.space.$2,

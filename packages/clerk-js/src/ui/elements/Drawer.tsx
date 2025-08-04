@@ -20,7 +20,7 @@ import { useDirection, usePrefersReducedMotion, useScrollLock } from '../hooks';
 import { Close as CloseIcon } from '../icons';
 import type { ThemableCssProp } from '../styledSystem';
 import { common } from '../styledSystem';
-import { colors } from '../utils';
+import { colors } from '../utils/colors';
 import { IconButton } from './IconButton';
 
 type FloatingPortalProps = React.ComponentProps<typeof FloatingPortal>;
@@ -264,8 +264,7 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
             borderStartEndRadius: strategy === 'fixed' ? t.radii.$lg : 0,
             borderWidth: t.borderWidths.$normal,
             borderStyle: t.borderStyles.$solid,
-            borderColor: t.colors.$neutralAlpha100,
-            boxShadow: t.shadows.$cardBoxShadow,
+            borderColor: t.colors.$borderAlpha150,
             overflow: 'hidden',
             pointerEvents: 'auto',
           })}
@@ -304,7 +303,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>(({ title, children,
           ),
           borderBlockEndWidth: t.borderWidths.$normal,
           borderBlockEndStyle: t.borderStyles.$solid,
-          borderBlockEndColor: t.colors.$neutralAlpha100,
+          borderBlockEndColor: t.colors.$borderAlpha150,
           borderStartStartRadius: t.radii.$lg,
           borderStartEndRadius: t.radii.$lg,
           paddingBlock: title ? t.space.$3 : undefined,
@@ -339,6 +338,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>(({ title, children,
 
 interface BodyProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
+  sx?: ThemableCssProp;
 }
 
 const Body = React.forwardRef<HTMLDivElement, BodyProps>(({ children, ...props }, ref) => {
@@ -346,13 +346,16 @@ const Body = React.forwardRef<HTMLDivElement, BodyProps>(({ children, ...props }
     <Box
       ref={ref}
       elementDescriptor={descriptors.drawerBody}
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        flex: 1,
-        overflowY: 'auto',
-        overflowX: 'hidden',
-      }}
+      sx={[
+        () => ({
+          display: 'flex',
+          flexDirection: 'column',
+          flex: 1,
+          overflowY: 'auto',
+          overflowX: 'hidden',
+        }),
+        props.sx,
+      ]}
       {...props}
     >
       {children}
@@ -384,7 +387,7 @@ const Footer = React.forwardRef<HTMLDivElement, FooterProps>(({ children, sx, ..
           ),
           borderBlockStartWidth: t.borderWidths.$normal,
           borderBlockStartStyle: t.borderStyles.$solid,
-          borderBlockStartColor: t.colors.$neutralAlpha100,
+          borderBlockStartColor: t.colors.$borderAlpha100,
           borderEndStartRadius: t.radii.$xl,
           borderEndEndRadius: t.radii.$xl,
           paddingBlock: t.space.$3,
@@ -419,7 +422,7 @@ const Close = React.forwardRef<HTMLButtonElement>((_, ref) => {
         />
       }
       sx={t => ({
-        color: t.colors.$colorTextSecondary,
+        color: t.colors.$colorMutedForeground,
         padding: t.space.$3,
         marginInlineStart: 'auto',
       })}
@@ -528,7 +531,7 @@ const Confirmation = React.forwardRef<HTMLDivElement, ConfirmationProps>(
               padding: t.space.$4,
               borderStartStartRadius: t.radii.$md,
               borderStartEndRadius: t.radii.$md,
-              boxShadow: `0 0 0 1px ${t.colors.$neutralAlpha100}`,
+              boxShadow: `0 0 0 1px ${t.colors.$borderAlpha100}`,
             })}
           >
             {children}

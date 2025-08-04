@@ -1,10 +1,13 @@
 import { useOrganization, useOrganizationList, useUser } from '@clerk/shared/react';
 import { forwardRef } from 'react';
 
+import { OrganizationPreview } from '@/ui/elements/OrganizationPreview';
+import { PersonalWorkspacePreview } from '@/ui/elements/PersonalWorkspacePreview';
+import { withAvatarShimmer } from '@/ui/elements/withAvatarShimmer';
+
 import { NotificationCountBadge, useProtect } from '../../common';
 import { useEnvironment, useOrganizationSwitcherContext } from '../../contexts';
 import { Button, descriptors, Icon, localizationKeys } from '../../customizables';
-import { OrganizationPreview, PersonalWorkspacePreview, withAvatarShimmer } from '../../elements';
 import { ChevronDown } from '../../icons';
 import type { PropsOfComponent } from '../../styledSystem';
 import { organizationListParams } from './utils';
@@ -64,7 +67,7 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
             gap={3}
             user={userWithoutIdentifiers}
             showAvatar={!hidePersonal}
-            sx={t => ({ color: t.colors.$colorTextSecondary })}
+            sx={t => ({ color: t.colors.$colorMutedForeground })}
             title={
               hidePersonal
                 ? localizationKeys('organizationSwitcher.notSelected')
@@ -110,8 +113,8 @@ const NotificationCountBadgeSwitcherTrigger = () => {
     <NotificationCountBadge
       containerSx={t => ({
         position: 'absolute',
-        top: `-${t.space.$2}`,
-        right: `-${t.space.$2}`,
+        top: `calc(${t.space.$2} * -1)`,
+        right: `calc(${t.space.$2} * -1)`,
       })}
       notificationCount={notificationCount}
     />

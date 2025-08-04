@@ -1,13 +1,18 @@
+import { useClerk } from '@clerk/shared/react';
 import type { SignInFactor } from '@clerk/types';
 import React from 'react';
 
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { ErrorCard } from '@/ui/elements/ErrorCard';
+import { LoadingCard } from '@/ui/elements/LoadingCard';
+
 import { withRedirectToAfterSignIn } from '../../common';
 import { useCoreSignIn, useEnvironment } from '../../contexts';
-import { ErrorCard, LoadingCard, useCardState, withCardStateProvider } from '../../elements';
 import { useAlternativeStrategies } from '../../hooks/useAlternativeStrategies';
 import { localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
 import { AlternativeMethods } from './AlternativeMethods';
+import { SignInFactorOneAlternativePhoneCodeCard } from './SignInFactorOneAlternativePhoneCodeCard';
 import { SignInFactorOneEmailCodeCard } from './SignInFactorOneEmailCodeCard';
 import { SignInFactorOneEmailLinkCard } from './SignInFactorOneEmailLinkCard';
 import { SignInFactorOneForgotPasswordCard } from './SignInFactorOneForgotPasswordCard';
@@ -28,10 +33,14 @@ const factorKey = (factor: SignInFactor | null | undefined) => {
   if ('phoneNumberId' in factor) {
     key += factor.phoneNumberId;
   }
+  if ('channel' in factor) {
+    key += factor.channel;
+  }
   return key;
 };
 
 function SignInFactorOneInternal(): JSX.Element {
+  const { __internal_setActiveInProgress } = useClerk();
   const signIn = useCoreSignIn();
   const { preferredSignInStrategy } = useEnvironment().displayConfig;
   const availableFactors = signIn.supportedFirstFactors;
@@ -39,16 +48,26 @@ function SignInFactorOneInternal(): JSX.Element {
   const card = useCardState();
   const { supportedFirstFactors, firstFactorVerification } = useCoreSignIn();
 
-  const alternativePhoneCodeChannel = firstFactorVerification.channel;
-
   const lastPreparedFactorKeyRef = React.useRef('');
   const [{ currentFactor }, setFactor] = React.useState<{
     currentFactor: SignInFactor | undefined | null;
     prevCurrentFactor: SignInFactor | undefined | null;
-  }>(() => ({
-    currentFactor: determineStartingSignInFactor(availableFactors, signIn.identifier, preferredSignInStrategy),
-    prevCurrentFactor: undefined,
-  }));
+  }>(() => {
+    const factor = determineStartingSignInFactor(availableFactors, signIn.identifier, preferredSignInStrategy);
+    if (
+      factor?.strategy === 'phone_code' &&
+      !!firstFactorVerification.channel &&
+      firstFactorVerification.channel !== 'sms'
+    ) {
+      // This is only applied to phone_code with channel that is not 'sms'
+      // because we don't want to send the channel parameter when its value is 'sms'
+      factor.channel = firstFactorVerification.channel;
+    }
+    return {
+      currentFactor: factor,
+      prevCurrentFactor: undefined,
+    };
+  });
 
   const { hasAnyStrategy } = useAlternativeStrategies({
     filterOutFactor: currentFactor,
@@ -66,21 +85,27 @@ function SignInFactorOneInternal(): JSX.Element {
   const [isPasswordPwned, setIsPasswordPwned] = React.useState(false);
 
   React.useEffect(() => {
+    if (__internal_setActiveInProgress) {
+      return;
+    }
+
     // Handle the case where a user lands on alternative methods screen,
     // clicks a social button but then navigates back to sign in.
     // SignIn status resets to 'needs_identifier'
     if (signIn.status === 'needs_identifier' || signIn.status === null) {
       void router.navigate('../');
     }
-  }, []);
+  }, [__internal_setActiveInProgress]);
 
-  if (!currentFactor && signIn.status) {
-    return (
+  if (!currentFactor) {
+    return signIn.status ? (
       <ErrorCard
         cardTitle={localizationKeys('signIn.noAvailableMethods.title')}
         cardSubtitle={localizationKeys('signIn.noAvailableMethods.subtitle')}
         message={localizationKeys('signIn.noAvailableMethods.message')}
       />
+    ) : (
+      <LoadingCard />
     );
   }
 
@@ -155,14 +180,28 @@ function SignInFactorOneInternal(): JSX.Element {
         />
       );
     case 'phone_code':
-      return (
-        <SignInFactorOnePhoneCodeCard
-          factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
-          onFactorPrepare={handleFactorPrepare}
-          factor={{ ...currentFactor, channel: alternativePhoneCodeChannel }}
-          onShowAlternativeMethodsClicked={toggleAllStrategies}
-        />
-      );
+      if (currentFactor.channel && currentFactor.channel !== 'sms') {
+        // Alternative phone code provider (e.g. WhatsApp)
+        return (
+          <SignInFactorOneAlternativePhoneCodeCard
+            factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
+            onFactorPrepare={handleFactorPrepare}
+            factor={currentFactor}
+            onChangePhoneCodeChannel={selectFactor}
+          />
+        );
+      } else {
+        // SMS
+        return (
+          <SignInFactorOnePhoneCodeCard
+            factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
+            onFactorPrepare={handleFactorPrepare}
+            factor={currentFactor}
+            onShowAlternativeMethodsClicked={toggleAllStrategies}
+          />
+        );
+      }
+
     case 'email_link':
       return (
         <SignInFactorOneEmailLinkCard

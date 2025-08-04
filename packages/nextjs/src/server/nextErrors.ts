@@ -155,6 +155,20 @@ function isRedirectToSignUpError(error: unknown): error is RedirectError<{ retur
   return false;
 }
 
+function isNextjsUnauthorizedError(error: unknown): error is HTTPAccessFallbackError {
+  return whichHTTPAccessFallbackError(error) === HTTPAccessErrorStatusCodes.UNAUTHORIZED;
+}
+
+/**
+ * In-house implementation of experimental `unauthorized()`
+ * https://github.com/vercel/next.js/blob/canary/packages/next/src/client/components/unauthorized.ts
+ */
+function unauthorized(): never {
+  const error = new Error(HTTP_ERROR_FALLBACK_ERROR_CODE) as HTTPAccessFallbackError;
+  error.digest = `${HTTP_ERROR_FALLBACK_ERROR_CODE};${HTTPAccessErrorStatusCodes.UNAUTHORIZED}`;
+  throw error;
+}
+
 export {
   isNextjsNotFoundError,
   isLegacyNextjsNotFoundError,
@@ -164,4 +178,6 @@ export {
   isNextjsRedirectError,
   isRedirectToSignInError,
   isRedirectToSignUpError,
+  isNextjsUnauthorizedError,
+  unauthorized,
 };

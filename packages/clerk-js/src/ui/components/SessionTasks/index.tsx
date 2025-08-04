@@ -1,19 +1,22 @@
 import { useClerk } from '@clerk/shared/react';
 import { eventComponentMounted } from '@clerk/shared/telemetry';
-import type { SessionTask } from '@clerk/types';
-import { useCallback, useContext, useEffect } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 
-import { SESSION_TASK_ROUTE_BY_KEY } from '../../../core/sessionTasks';
-import { OrganizationListContext, SignInContext, SignUpContext } from '../../../ui/contexts';
-import { Card, LoadingCardContainer, withCardStateProvider } from '../../../ui/elements';
+import { Card } from '@/ui/elements/Card';
+import { withCardStateProvider } from '@/ui/elements/contexts';
+import { LoadingCardContainer } from '@/ui/elements/LoadingCard';
+
+import { INTERNAL_SESSION_TASK_ROUTE_BY_KEY } from '../../../core/sessionTasks';
+import { SignInContext, SignUpContext } from '../../../ui/contexts';
 import {
-  SessionTasksContext as SessionTasksContext,
+  SessionTasksContext,
+  TaskSelectOrganizationContext,
   useSessionTasksContext,
 } from '../../contexts/components/SessionTasks';
 import { Route, Switch, useRouter } from '../../router';
-import { OrganizationList } from '../OrganizationList';
+import { TaskSelectOrganization } from './tasks/TaskSelectOrganization';
 
-const SessionTasksStart = withCardStateProvider(() => {
+const SessionTasksStart = () => {
   const clerk = useClerk();
   const { navigate } = useRouter();
   const { redirectUrlComplete } = useSessionTasksContext();
@@ -21,7 +24,7 @@ const SessionTasksStart = withCardStateProvider(() => {
   useEffect(() => {
     // Simulates additional latency to avoid a abrupt UI transition when navigating to the next task
     const timeoutId = setTimeout(() => {
-      void clerk.__experimental_navigateToTask({ redirectUrlComplete });
+      void clerk.__internal_navigateToTaskIfAvailable({ redirectUrlComplete });
     }, 500);
     return () => clearTimeout(timeoutId);
   }, [navigate, clerk, redirectUrlComplete]);
@@ -34,20 +37,19 @@ const SessionTasksStart = withCardStateProvider(() => {
       <Card.Footer />
     </Card.Root>
   );
-});
+};
 
 function SessionTaskRoutes(): JSX.Element {
+  const ctx = useSessionTasksContext();
+
   return (
     <Switch>
-      <Route path={SESSION_TASK_ROUTE_BY_KEY['org']}>
-        <OrganizationListContext.Provider
-          value={{
-            componentName: 'OrganizationList',
-            skipInvitationScreen: true,
-          }}
+      <Route path={INTERNAL_SESSION_TASK_ROUTE_BY_KEY['select-organization']}>
+        <TaskSelectOrganizationContext.Provider
+          value={{ componentName: 'TaskSelectOrganization', redirectUrlComplete: ctx.redirectUrlComplete }}
         >
-          <OrganizationList />
-        </OrganizationListContext.Provider>
+          <TaskSelectOrganization />
+        </TaskSelectOrganizationContext.Provider>
       </Route>
       <Route index>
         <SessionTasksStart />
@@ -59,19 +61,25 @@ function SessionTaskRoutes(): JSX.Element {
 /**
  * @internal
  */
-export function SessionTask(): JSX.Element {
+export const SessionTask = withCardStateProvider(() => {
   const clerk = useClerk();
   const { navigate } = useRouter();
   const signInContext = useContext(SignInContext);
   const signUpContext = useContext(SignUpContext);
+  const currentTaskContainer = useRef<HTMLDivElement>(null);
 
   const redirectUrlComplete =
     signInContext?.afterSignInUrl ?? signUpContext?.afterSignUpUrl ?? clerk?.buildAfterSignInUrl();
 
+  // If there are no pending tasks, navigate away from the tasks flow.
+  // This handles cases where a user with an active session returns to the tasks URL,
+  // for example by using browser back navigation. Since there are no pending tasks,
+  // we redirect them to their intended destination.
   useEffect(() => {
+    // Tasks can only exist on pending sessions, but we check both conditions
+    // here to be defensive and ensure proper redirection
     const task = clerk.session?.currentTask;
-
-    if (!task) {
+    if (!task || clerk.session?.status === 'active') {
       void navigate(redirectUrlComplete);
       return;
     }
@@ -79,14 +87,24 @@ export function SessionTask(): JSX.Element {
     clerk.telemetry?.record(eventComponentMounted('SessionTask', { task: task.key }));
   }, [clerk, navigate, redirectUrlComplete]);
 
-  const nextTask = useCallback(
-    () => clerk.__experimental_navigateToTask({ redirectUrlComplete }),
-    [clerk, redirectUrlComplete],
-  );
+  if (!clerk.session?.currentTask) {
+    return (
+      <Card.Root
+        sx={() => ({
+          minHeight: currentTaskContainer ? currentTaskContainer.current?.offsetHeight : undefined,
+        })}
+      >
+        <Card.Content sx={() => ({ flex: 1 })}>
+          <LoadingCardContainer />
+        </Card.Content>
+        <Card.Footer />
+      </Card.Root>
+    );
+  }
 
   return (
-    <SessionTasksContext.Provider value={{ nextTask, redirectUrlComplete }}>
+    <SessionTasksContext.Provider value={{ redirectUrlComplete, currentTaskContainer }}>
       <SessionTaskRoutes />
     </SessionTasksContext.Provider>
   );
-}
+});

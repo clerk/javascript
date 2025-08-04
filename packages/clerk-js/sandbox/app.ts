@@ -33,6 +33,8 @@ const AVAILABLE_COMPONENTS = [
   'organizationSwitcher',
   'waitlist',
   'pricingTable',
+  'apiKeys',
+  'oauthConsent',
 ] as const;
 
 const COMPONENT_PROPS_NAMESPACE = 'clerk-js-sandbox';
@@ -91,6 +93,8 @@ const componentControls: Record<(typeof AVAILABLE_COMPONENTS)[number], Component
   organizationSwitcher: buildComponentControls('organizationSwitcher'),
   waitlist: buildComponentControls('waitlist'),
   pricingTable: buildComponentControls('pricingTable'),
+  apiKeys: buildComponentControls('apiKeys'),
+  oauthConsent: buildComponentControls('oauthConsent'),
 };
 
 declare global {
@@ -152,16 +156,17 @@ function appearanceVariableOptions() {
     'colorPrimary',
     'colorNeutral',
     'colorBackground',
-    'colorTextOnPrimaryBackground',
+    'colorPrimaryForeground',
+    'colorForeground',
     'colorDanger',
     'colorSuccess',
     'colorWarning',
-    'colorText',
-    'colorTextSecondary',
-    'colorInputText',
-    'colorInputBackground',
+    'colorForeground',
+    'colorMutedForeground',
+    'colorInputForeground',
+    'colorInput',
     'colorShimmer',
-    'spacingUnit',
+    'spacing',
     'borderRadius',
   ] as const;
 
@@ -187,6 +192,8 @@ function appearanceVariableOptions() {
   const updateVariables = () => {
     void Clerk.__unstable__updateProps({
       appearance: {
+        // Preserve existing appearance properties like baseTheme
+        ...Clerk.__internal_getOption('appearance'),
         variables: Object.fromEntries(
           Object.entries(variableInputs).map(([key, input]) => {
             sessionStorage.setItem(key, input.value);
@@ -309,6 +316,24 @@ void (async () => {
     },
     '/pricing-table': () => {
       Clerk.mountPricingTable(app, componentControls.pricingTable.getProps() ?? {});
+    },
+    '/api-keys': () => {
+      Clerk.mountApiKeys(app, componentControls.apiKeys.getProps() ?? {});
+    },
+    '/oauth-consent': () => {
+      const searchParams = new URLSearchParams(window.location.search);
+      const scopes = (searchParams.get('scopes')?.split(',') ?? []).map(scope => ({
+        scope,
+        description: `Grants access to your ${scope}`,
+      }));
+      Clerk.__internal_mountOAuthConsent(
+        app,
+        componentControls.oauthConsent.getProps() ?? {
+          scopes,
+          oAuthApplicationName: searchParams.get('oauth-application-name'),
+          redirectUrl: searchParams.get('redirect_uri'),
+        },
+      );
     },
     '/open-sign-in': () => {
       mountOpenSignInButton(app, componentControls.signIn.getProps() ?? {});

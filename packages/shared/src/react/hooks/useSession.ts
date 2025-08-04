@@ -1,10 +1,11 @@
-import type { PendingSessionOptions, UseSessionReturn } from '@clerk/types';
+import type { UseSessionReturn } from '@clerk/types';
 
-import { useAssertWrappedByClerkProvider, useSessionContext } from '../contexts';
-import { useClerk } from './useClerk';
+import { eventMethodCalled } from '../../telemetry/events/method-called';
+import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useSessionContext } from '../contexts';
 
-type UseSession = (options?: PendingSessionOptions) => UseSessionReturn;
+type UseSession = () => UseSessionReturn;
 
+const hookName = `useSession`;
 /**
  * The `useSession()` hook provides access to the current user's [`Session`](https://clerk.com/docs/references/javascript/session) object, as well as helpers for setting the active session.
  *
@@ -54,23 +55,21 @@ type UseSession = (options?: PendingSessionOptions) => UseSessionReturn;
  * </Tab>
  * </Tabs>
  */
-export const useSession: UseSession = (options = {}) => {
-  useAssertWrappedByClerkProvider('useSession');
+export const useSession: UseSession = () => {
+  useAssertWrappedByClerkProvider(hookName);
 
   const session = useSessionContext();
-  const clerk = useClerk();
+  const clerk = useClerkInstanceContext();
+
+  clerk.telemetry?.record(eventMethodCalled(hookName));
 
   if (session === undefined) {
     return { isLoaded: false, isSignedIn: undefined, session: undefined };
   }
 
-  const pendingAsSignedOut =
-    session?.status === 'pending' &&
-    (options.treatPendingAsSignedOut ?? clerk.__internal_getOption('treatPendingAsSignedOut'));
-  const isSignedOut = session === null || pendingAsSignedOut;
-  if (isSignedOut) {
+  if (session === null) {
     return { isLoaded: true, isSignedIn: false, session: null };
   }
 
-  return { isLoaded: true, isSignedIn: true, session };
+  return { isLoaded: true, isSignedIn: clerk.isSignedIn, session };
 };

@@ -207,7 +207,8 @@ const Content = React.forwardRef<
               paddingBlock: t.space.$1,
               paddingInline: t.space.$1x5,
               borderRadius: t.radii.$md,
-              backgroundColor: t.colors.$primary500,
+              backgroundColor: t.colors.$black,
+              color: t.colors.$white,
               maxWidth: t.sizes.$60,
             }),
             sx,
@@ -216,8 +217,8 @@ const Content = React.forwardRef<
           <Text
             elementDescriptor={descriptors.tooltipText}
             localizationKey={text}
-            colorScheme='onPrimaryBg'
             variant='body'
+            colorScheme='inherit'
           />
         </Box>
       </Box>

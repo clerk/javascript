@@ -1,46 +1,32 @@
+import { Card } from '@/ui/elements/Card';
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { Header } from '@/ui/elements/Header';
+import { Tab, TabPanel, TabPanels, Tabs, TabsList } from '@/ui/elements/Tabs';
+
 import { Protect } from '../../common';
-import {
-  PlansContextProvider,
-  StatementsContextProvider,
-  SubscriberTypeContext,
-  useSubscriptions,
-} from '../../contexts';
+import { SubscriberTypeContext } from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
-import {
-  Card,
-  Header,
-  Tab,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  TabsList,
-  useCardState,
-  withCardStateProvider,
-} from '../../elements';
 import { useTabState } from '../../hooks/useTabState';
+import { PaymentAttemptsList } from '../PaymentAttempts';
 import { PaymentSources } from '../PaymentSources';
 import { StatementsList } from '../Statements';
 import { SubscriptionsList } from '../Subscriptions';
 
 const orgTabMap = {
-  0: 'plans',
+  0: 'subscriptions',
   1: 'statements',
-  2: 'payment-methods',
+  2: 'payments',
 } as const;
 
 const OrganizationBillingPageInternal = withCardStateProvider(() => {
   const card = useCardState();
-  const { data: subscriptions } = useSubscriptions('org');
-  const { selectedTab, handleTabChange } = useTabState(orgTabMap);
 
-  if (!Array.isArray(subscriptions?.data)) {
-    return null;
-  }
+  const { selectedTab, handleTabChange } = useTabState(orgTabMap);
 
   return (
     <Col
       elementDescriptor={descriptors.page}
-      sx={t => ({ gap: t.space.$8, color: t.colors.$colorText })}
+      sx={t => ({ gap: t.space.$8, color: t.colors.$colorForeground })}
     >
       <Col
         elementDescriptor={descriptors.profilePage}
@@ -65,6 +51,7 @@ const OrganizationBillingPageInternal = withCardStateProvider(() => {
               localizationKey={localizationKeys('organizationProfile.billingPage.start.headerTitle__subscriptions')}
             />
             <Tab localizationKey={localizationKeys('organizationProfile.billingPage.start.headerTitle__statements')} />
+            <Tab localizationKey={localizationKeys('organizationProfile.billingPage.start.headerTitle__payments')} />
           </TabsList>
           <TabPanels>
             <TabPanel sx={{ width: '100%', flexDirection: 'column' }}>
@@ -82,9 +69,10 @@ const OrganizationBillingPageInternal = withCardStateProvider(() => {
               </Protect>
             </TabPanel>
             <TabPanel sx={{ width: '100%' }}>
-              <StatementsContextProvider>
-                <StatementsList />
-              </StatementsContextProvider>
+              <StatementsList />
+            </TabPanel>
+            <TabPanel sx={{ width: '100%' }}>
+              <PaymentAttemptsList />
             </TabPanel>
           </TabPanels>
         </Tabs>
@@ -95,10 +83,8 @@ const OrganizationBillingPageInternal = withCardStateProvider(() => {
 
 export const OrganizationBillingPage = () => {
   return (
-    <SubscriberTypeContext.Provider value='org'>
-      <PlansContextProvider>
-        <OrganizationBillingPageInternal />
-      </PlansContextProvider>
+    <SubscriberTypeContext.Provider value='organization'>
+      <OrganizationBillingPageInternal />
     </SubscriberTypeContext.Provider>
   );
 };

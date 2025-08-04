@@ -1,6 +1,5 @@
 .cache
 .changeset
-.github
 .idea
 .next
 .temp_integration
@@ -9,8 +8,10 @@
 .vscode
 .yalc
 /**/scripts/info.js
+*.map
+*.min.js
+*.bundle.js
 build
-coverage
 coverage
 dist
 /packages/nextjs/examples

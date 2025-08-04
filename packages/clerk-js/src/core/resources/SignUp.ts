@@ -42,7 +42,6 @@ import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import {
   clerkInvalidFAPIResponse,
   clerkMissingOptionError,
-  clerkUnsupportedEnvironmentWarning,
   clerkVerifyEmailAddressCalledBeforeCreate,
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from '../errors';
@@ -183,11 +182,6 @@ export class SignUp extends BaseResource implements SignUpResource {
       legalAccepted?: boolean;
     },
   ): Promise<SignUpResource> => {
-    if (__BUILD_DISABLE_RHC__) {
-      clerkUnsupportedEnvironmentWarning('Web3');
-      return this;
-    }
-
     const {
       generateSignature,
       identifier,
@@ -237,11 +231,6 @@ export class SignUp extends BaseResource implements SignUpResource {
       legalAccepted?: boolean;
     },
   ): Promise<SignUpResource> => {
-    if (__BUILD_DISABLE_RHC__) {
-      clerkUnsupportedEnvironmentWarning('Metamask');
-      return this;
-    }
-
     const identifier = await getMetamaskIdentifier();
     return this.authenticateWithWeb3({
       identifier,
@@ -257,11 +246,6 @@ export class SignUp extends BaseResource implements SignUpResource {
       legalAccepted?: boolean;
     },
   ): Promise<SignUpResource> => {
-    if (__BUILD_DISABLE_RHC__) {
-      clerkUnsupportedEnvironmentWarning('Coinbase Wallet');
-      return this;
-    }
-
     const identifier = await getCoinbaseWalletIdentifier();
     return this.authenticateWithWeb3({
       identifier,
@@ -277,11 +261,6 @@ export class SignUp extends BaseResource implements SignUpResource {
       legalAccepted?: boolean;
     },
   ): Promise<SignUpResource> => {
-    if (__BUILD_DISABLE_RHC__) {
-      clerkUnsupportedEnvironmentWarning('OKX Wallet');
-      return this;
-    }
-
     const identifier = await getOKXWalletIdentifier();
     return this.authenticateWithWeb3({
       identifier,
@@ -309,11 +288,20 @@ export class SignUp extends BaseResource implements SignUpResource {
       oidcPrompt,
     } = params;
 
+    const redirectUrlWithAuthToken = SignUp.clerk.buildUrlWithAuth(redirectUrl);
+
+    // When force after-auth is enabled, redirect to SSO callback route.
+    // This ensures organization selection tasks are displayed after sign-up,
+    // rather than redirecting to potentially unprotected pages while the session is pending.
+    const actionCompleteRedirectUrl = SignUp.clerk.__internal_hasAfterAuthFlows
+      ? redirectUrlWithAuthToken
+      : redirectUrlComplete;
+
     const authenticateFn = () => {
       const authParams = {
         strategy,
-        redirectUrl: SignUp.clerk.buildUrlWithAuth(redirectUrl),
-        actionCompleteRedirectUrl: redirectUrlComplete,
+        redirectUrl: redirectUrlWithAuthToken,
+        actionCompleteRedirectUrl,
         unsafeMetadata,
         emailAddress,
         legalAccepted,

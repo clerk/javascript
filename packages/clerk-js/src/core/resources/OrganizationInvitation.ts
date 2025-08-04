@@ -17,6 +17,7 @@ export class OrganizationInvitation extends BaseResource implements Organization
   publicMetadata: OrganizationInvitationPublicMetadata = {};
   status!: OrganizationInvitationStatus;
   role!: OrganizationCustomRoleKey;
+  roleName!: string;
   createdAt!: Date;
   updatedAt!: Date;
 
@@ -67,6 +68,7 @@ export class OrganizationInvitation extends BaseResource implements Organization
       this.organizationId = data.organization_id;
       this.publicMetadata = data.public_metadata;
       this.role = data.role;
+      this.roleName = data.role_name;
       this.status = data.status;
       this.createdAt = unixEpochToDate(data.created_at);
       this.updatedAt = unixEpochToDate(data.updated_at);

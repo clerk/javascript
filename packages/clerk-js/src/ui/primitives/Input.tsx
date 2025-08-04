@@ -2,7 +2,7 @@ import React from 'react';
 
 import type { PrimitiveProps, RequiredProp, StyleVariants } from '../styledSystem';
 import { common, createVariants, mqu } from '../styledSystem';
-import { sanitizeInputProps, useFormField } from './hooks';
+import { sanitizeInputProps, useFormField } from './hooks/useFormField';
 import { useInput } from './hooks/useInput';
 
 const { applyVariants, filterProps } = createVariants((theme, props) => ({
@@ -10,8 +10,8 @@ const { applyVariants, filterProps } = createVariants((theme, props) => ({
     boxSizing: 'border-box',
     margin: 0,
     padding: `${theme.space.$1x5} ${theme.space.$3}`,
-    backgroundColor: theme.colors.$colorInputBackground,
-    color: theme.colors.$colorInputText,
+    backgroundColor: theme.colors.$colorInput,
+    color: theme.colors.$colorInputForeground,
     // outline support for Windows contrast themes
     outline: 'transparent solid 2px',
     outlineOffset: '2px',
@@ -32,7 +32,7 @@ const { applyVariants, filterProps } = createVariants((theme, props) => ({
       animationName: 'onAutoFillStart',
     },
     '::placeholder': {
-      color: theme.colors.$colorTextSecondary,
+      color: theme.colors.$colorMutedForeground,
     },
   },
   variants: {
@@ -81,12 +81,13 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref)
 
   /**
    * type="email" will not allow characters like this one "ö", instead remove type email and provide a pattern that accepts any character before the "@" symbol
+   * inputMode="email" ensures the email keyboard appears on mobile devices
    */
 
   const typeProps =
     type === 'email'
-      ? { type: 'text', pattern: '^.*@[a-zA-Z0-9\\-]+\\.[a-zA-Z0-9\\-\\.]+$' }
-      : { type: type || 'text' };
+      ? { type: 'text' as const, pattern: '^.*@[a-zA-Z0-9\\-]+\\.[a-zA-Z0-9\\-\\.]+$', inputMode: 'email' as const }
+      : { type: type || ('text' as const) };
 
   const passwordManagerProps = ignorePasswordManager
     ? {
@@ -131,6 +132,27 @@ export const RadioInput = React.forwardRef<HTMLInputElement, InputProps>((props,
       {...props}
       type='radio'
       ref={ref}
+    />
+  );
+});
+
+export type TextareaProps = PrimitiveProps<'textarea'> & StyleVariants<typeof applyVariants> & OwnProps & RequiredProp;
+
+export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>((props, ref) => {
+  const { isDisabled, hasError, focusRing, isRequired, ...rest } = props;
+  const _disabled = isDisabled || props.isDisabled;
+  const _required = isRequired || props.isRequired;
+  const _hasError = hasError || props.hasError;
+
+  return (
+    <textarea
+      {...rest}
+      ref={ref}
+      disabled={_disabled}
+      required={_required}
+      aria-invalid={_hasError}
+      aria-required={_required}
+      css={applyVariants(props)}
     />
   );
 });

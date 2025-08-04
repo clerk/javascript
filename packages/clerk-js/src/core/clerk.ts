@@ -15,10 +15,17 @@ import {
 import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
 import { allSettled, handleValueOrFn, noop } from '@clerk/shared/utils';
 import type {
+  __experimental_CheckoutInstance,
+  __experimental_CheckoutOptions,
   __internal_CheckoutProps,
   __internal_ComponentNavigationContext,
+  __internal_NavigateToTaskIfAvailableParams,
+  __internal_OAuthConsentProps,
   __internal_PlanDetailsProps,
+  __internal_SubscriptionDetailsProps,
   __internal_UserVerificationModalProps,
+  APIKeysNamespace,
+  APIKeysProps,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
@@ -44,7 +51,6 @@ import type {
   JoinWaitlistParams,
   ListenerCallback,
   NavigateOptions,
-  NextTaskParams,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationResource,
@@ -70,6 +76,7 @@ import type {
   SignUpProps,
   SignUpRedirectOptions,
   SignUpResource,
+  TaskSelectOrganizationProps,
   UnsubscribeCallback,
   UserButtonProps,
   UserProfileProps,
@@ -83,11 +90,13 @@ import type { MountComponentRenderer } from '../ui/Components';
 import {
   ALLOWED_PROTOCOLS,
   buildURL,
+  canViewOrManageAPIKeys,
   completeSignUpFlow,
   createAllowedRedirectOrigins,
   createBeforeUnloadTracker,
   createPageLifecycle,
-  disabledBillingFeature,
+  disabledAllBillingFeatures,
+  disabledAPIKeysFeature,
   disabledOrganizationsFeature,
   errorThrower,
   generateSignatureWithCoinbaseWallet,
@@ -104,6 +113,7 @@ import {
   isRedirectForFAPIInitiatedFlow,
   noOrganizationExists,
   noUserExists,
+  processCssLayerNameExtraction,
   removeClerkQueryParam,
   requiresUserInput,
   sessionExistsAndSingleSessionModeEnabled,
@@ -131,6 +141,8 @@ import { eventBus, events } from './events';
 import type { FapiClient, FapiRequestCallback } from './fapiClient';
 import { createFapiClient } from './fapiClient';
 import { createClientFromJwt } from './jwt-client';
+import { APIKeys } from './modules/apiKeys';
+import { createCheckoutInstance } from './modules/checkout/instance';
 import { CommerceBilling } from './modules/commerce';
 import {
   BaseResource,
@@ -162,6 +174,8 @@ const CANNOT_RENDER_USER_MISSING_ERROR_CODE = 'cannot_render_user_missing';
 const CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE = 'cannot_render_organizations_disabled';
 const CANNOT_RENDER_ORGANIZATION_MISSING_ERROR_CODE = 'cannot_render_organization_missing';
 const CANNOT_RENDER_SINGLE_SESSION_ENABLED_ERROR_CODE = 'cannot_render_single_session_enabled';
+const CANNOT_RENDER_API_KEYS_DISABLED_ERROR_CODE = 'cannot_render_api_keys_disabled';
+const CANNOT_RENDER_API_KEYS_ORG_UNAUTHORIZED_ERROR_CODE = 'cannot_render_api_keys_org_unauthorized';
 const defaultOptions: ClerkOptions = {
   polling: true,
   standardBrowser: true,
@@ -188,6 +202,8 @@ export class Clerk implements ClerkInterface {
     environment: process.env.NODE_ENV || 'production',
   };
   private static _billing: CommerceBillingNamespace;
+  private static _apiKeys: APIKeysNamespace;
+  private _checkout: ClerkInterface['__experimental_checkout'] | undefined;
 
   public client: ClientResource | undefined;
   public session: SignedInSessionResource | null | undefined;
@@ -323,6 +339,20 @@ export class Clerk implements ClerkInterface {
     return Clerk._billing;
   }
 
+  get apiKeys(): APIKeysNamespace {
+    if (!Clerk._apiKeys) {
+      Clerk._apiKeys = new APIKeys();
+    }
+    return Clerk._apiKeys;
+  }
+
+  __experimental_checkout(options: __experimental_CheckoutOptions): __experimental_CheckoutInstance {
+    if (!this._checkout) {
+      this._checkout = params => createCheckoutInstance(this, params);
+    }
+    return this._checkout(options);
+  }
+
   public __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K] {
     return this.#options[key];
   }
@@ -455,10 +485,8 @@ export class Clerk implements ClerkInterface {
     const executeSignOut = async () => {
       const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
 
-      // Notify other tabs that user is signing out.
+      // Notify other tabs that user is signing out and clean up cookies.
       eventBus.emit(events.UserSignOut, null);
-      // Clean up cookies
-      eventBus.emit(events.TokenUpdate, { token: null });
 
       this.#setTransitiveState();
 
@@ -548,7 +576,7 @@ export class Clerk implements ClerkInterface {
 
   public __internal_openCheckout = (props?: __internal_CheckoutProps): void => {
     this.assertComponentsReady(this.#componentControls);
-    if (disabledBillingFeature(this, this.environment)) {
+    if (disabledAllBillingFeatures(this, this.environment)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderAnyCommerceComponent('Checkout'), {
           code: CANNOT_RENDER_BILLING_DISABLED_ERROR_CODE,
@@ -575,9 +603,9 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls.ensureMounted().then(controls => controls.closeDrawer('checkout'));
   };
 
-  public __internal_openPlanDetails = (props?: __internal_PlanDetailsProps): void => {
+  public __internal_openPlanDetails = (props: __internal_PlanDetailsProps): void => {
     this.assertComponentsReady(this.#componentControls);
-    if (disabledBillingFeature(this, this.environment)) {
+    if (disabledAllBillingFeatures(this, this.environment)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderAnyCommerceComponent('PlanDetails'), {
           code: CANNOT_RENDER_BILLING_DISABLED_ERROR_CODE,
@@ -588,11 +616,25 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls
       .ensureMounted({ preloadHint: 'PlanDetails' })
       .then(controls => controls.openDrawer('planDetails', props || {}));
+
+    this.telemetry?.record(eventPrebuiltComponentOpened(`PlanDetails`, props));
   };
 
   public __internal_closePlanDetails = (): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls.ensureMounted().then(controls => controls.closeDrawer('planDetails'));
+  };
+
+  public __internal_openSubscriptionDetails = (props?: __internal_SubscriptionDetailsProps): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls
+      .ensureMounted({ preloadHint: 'SubscriptionDetails' })
+      .then(controls => controls.openDrawer('subscriptionDetails', props || {}));
+  };
+
+  public __internal_closeSubscriptionDetails = (): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted().then(controls => controls.closeDrawer('subscriptionDetails'));
   };
 
   public __internal_openReverification = (props?: __internal_UserVerificationModalProps): void => {
@@ -629,6 +671,16 @@ export class Clerk implements ClerkInterface {
     return this.#componentControls
       .ensureMounted({ preloadHint: 'BlankCaptchaModal' })
       .then(controls => controls.closeModal('blankCaptcha'));
+  };
+
+  public __internal_loadStripeJs = async () => {
+    if (__BUILD_DISABLE_RHC__) {
+      clerkUnsupportedEnvironmentWarning('Stripe');
+      return { loadStripe: () => Promise.resolve(null) };
+    }
+
+    const { loadStripe } = await import('@stripe/stripe-js');
+    return loadStripe;
   };
 
   public openSignUp = (props?: SignUpProps): void => {
@@ -1008,7 +1060,7 @@ export class Clerk implements ClerkInterface {
 
   public mountPricingTable = (node: HTMLDivElement, props?: PricingTableProps): void => {
     this.assertComponentsReady(this.#componentControls);
-    if (disabledBillingFeature(this, this.environment)) {
+    if (disabledAllBillingFeatures(this, this.environment)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderAnyCommerceComponent('PricingTable'), {
           code: CANNOT_RENDER_BILLING_DISABLED_ERROR_CODE,
@@ -1035,6 +1087,109 @@ export class Clerk implements ClerkInterface {
         node,
       }),
     );
+  };
+
+  public __internal_mountOAuthConsent = (node: HTMLDivElement, props?: __internal_OAuthConsentProps) => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted({ preloadHint: 'OAuthConsent' }).then(controls =>
+      controls.mountComponent({
+        name: 'OAuthConsent',
+        appearanceKey: '__internal_oauthConsent',
+        node,
+        props,
+      }),
+    );
+  };
+
+  public __internal_unmountOAuthConsent = (node: HTMLDivElement) => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted().then(controls => controls.unmountComponent({ node }));
+  };
+
+  /**
+   * @experimental
+   * This API is in early access and may change in future releases.
+   *
+   * Mount a api keys component at the target element.
+   * @param targetNode Target to mount the APIKeys component.
+   * @param props Configuration parameters.
+   */
+  public mountApiKeys = (node: HTMLDivElement, props?: APIKeysProps) => {
+    this.assertComponentsReady(this.#componentControls);
+
+    logger.warnOnce('Clerk: <APIKeys /> component is in early access and not yet recommended for production use.');
+
+    if (disabledAPIKeysFeature(this, this.environment)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderAPIKeysComponent, {
+          code: CANNOT_RENDER_API_KEYS_DISABLED_ERROR_CODE,
+        });
+      }
+      return;
+    }
+
+    if (this.organization && !canViewOrManageAPIKeys(this)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderAPIKeysComponentForOrgWhenUnauthorized, {
+          code: CANNOT_RENDER_API_KEYS_ORG_UNAUTHORIZED_ERROR_CODE,
+        });
+      }
+      return;
+    }
+
+    void this.#componentControls.ensureMounted({ preloadHint: 'APIKeys' }).then(controls =>
+      controls.mountComponent({
+        name: 'APIKeys',
+        appearanceKey: 'apiKeys',
+        node,
+        props,
+      }),
+    );
+
+    this.telemetry?.record(eventPrebuiltComponentMounted('APIKeys', props));
+  };
+
+  /**
+   * @experimental
+   * This API is in early access and may change in future releases.
+   *
+   * Unmount a api keys component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @param targetNode Target node to unmount the ApiKeys component from.
+   */
+  public unmountApiKeys = (node: HTMLDivElement) => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted().then(controls => controls.unmountComponent({ node }));
+  };
+
+  public mountTaskSelectOrganization = (node: HTMLDivElement, props?: TaskSelectOrganizationProps) => {
+    this.assertComponentsReady(this.#componentControls);
+
+    if (disabledOrganizationsFeature(this, this.environment)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('TaskSelectOrganization'), {
+          code: CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE,
+        });
+      }
+      return;
+    }
+
+    void this.#componentControls.ensureMounted({ preloadHint: 'TaskSelectOrganization' }).then(controls =>
+      controls.mountComponent({
+        name: 'TaskSelectOrganization',
+        appearanceKey: 'taskSelectOrganization',
+        node,
+        props,
+      }),
+    );
+
+    this.telemetry?.record(eventPrebuiltComponentMounted('TaskSelectOrganization', props));
+  };
+
+  public unmountTaskSelectOrganization = (node: HTMLDivElement) => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted().then(controls => controls.unmountComponent({ node }));
   };
 
   /**
@@ -1085,17 +1240,22 @@ export class Clerk implements ClerkInterface {
           const matchingOrganization = newSession.user.organizationMemberships.find(
             mem => mem.organization.slug === organizationIdOrSlug,
           );
-          newSession.lastActiveOrganizationId = matchingOrganization?.organization.id || null;
+
+          const newLastActiveOrganizationId = matchingOrganization?.organization.id || null;
+          const isPersonalWorkspace = newLastActiveOrganizationId === null;
+
+          // Do not update in-memory to personal workspace if force organization selection is enabled
+          if (this.environment?.organizationSettings?.forceOrganizationSelection && isPersonalWorkspace) {
+            return;
+          }
+
+          newSession.lastActiveOrganizationId = newLastActiveOrganizationId;
         }
       }
 
       if (newSession?.status === 'pending') {
         await this.#handlePendingSession(newSession);
         return;
-      }
-
-      if (session?.lastActiveToken) {
-        eventBus.emit(events.TokenUpdate, { token: session.lastActiveToken });
       }
 
       /**
@@ -1165,6 +1325,29 @@ export class Clerk implements ClerkInterface {
   };
 
   #handlePendingSession = async (session: PendingSessionResource) => {
+    /**
+     * Do not revalidate server cache when `setActive` is called with a pending
+     * session within components, to avoid flash of content and unmount during
+     * internal navigation
+     */
+    const shouldInvalidateCache = !this.#componentNavigationContext;
+
+    const onBeforeSetActive: SetActiveHook =
+      shouldInvalidateCache &&
+      typeof window !== 'undefined' &&
+      typeof window.__unstable__onBeforeSetActive === 'function'
+        ? window.__unstable__onBeforeSetActive
+        : noop;
+
+    const onAfterSetActive: SetActiveHook =
+      shouldInvalidateCache &&
+      typeof window !== 'undefined' &&
+      typeof window.__unstable__onAfterSetActive === 'function'
+        ? window.__unstable__onAfterSetActive
+        : noop;
+
+    await onBeforeSetActive();
+
     if (!this.environment) {
       return;
     }
@@ -1185,8 +1368,9 @@ export class Clerk implements ClerkInterface {
       eventBus.emit(events.TokenUpdate, { token: null });
     }
 
-    // Only triggers navigation for internal routing, in order to not affect custom flows
-    if (newSession?.currentTask && this.#componentNavigationContext) {
+    // Only triggers navigation for internal AIO components routing or custom URLs
+    const shouldNavigateOnSetActive = this.#componentNavigationContext;
+    if (newSession?.currentTask && shouldNavigateOnSetActive) {
       await navigateToTask(session.currentTask.key, {
         options: this.#options,
         environment: this.environment,
@@ -1197,10 +1381,14 @@ export class Clerk implements ClerkInterface {
 
     this.#setAccessors(session);
     this.#emit();
+
+    await onAfterSetActive();
   };
 
-  public __experimental_navigateToTask = async ({ redirectUrlComplete }: NextTaskParams = {}): Promise<void> => {
-    const session = await this.session?.reload();
+  public __internal_navigateToTaskIfAvailable = async ({
+    redirectUrlComplete,
+  }: __internal_NavigateToTaskIfAvailableParams = {}): Promise<void> => {
+    const session = this.session;
     if (!session || !this.environment) {
       return;
     }
@@ -1215,21 +1403,17 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
-    const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
-    const defaultRedirectUrlComplete = this.client?.signUp ? this.buildAfterSignUpUrl() : this.buildAfterSignInUrl();
+    if (redirectUrlComplete) {
+      const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
 
-    this.#setTransitiveState();
+      await tracker.track(async () => {
+        await this.navigate(redirectUrlComplete);
+      });
 
-    await tracker.track(async () => {
-      await this.navigate(redirectUrlComplete ?? defaultRedirectUrlComplete);
-    });
-
-    if (tracker.isUnloading()) {
-      return;
+      if (tracker.isUnloading()) {
+        return;
+      }
     }
-
-    this.#setAccessors(session);
-    this.#emit();
   };
 
   public addListener = (listener: ListenerCallback): UnsubscribeCallback => {
@@ -1695,10 +1879,11 @@ export class Clerk implements ClerkInterface {
     };
 
     if (si.status === 'complete') {
-      return this.setActive({
+      await this.setActive({
         session: si.sessionId,
         redirectUrl: redirectUrls.getAfterSignInUrl(),
       });
+      return this.__internal_navigateToTaskIfAvailable();
     }
 
     const userExistsButNeedsToSignIn =
@@ -1708,10 +1893,11 @@ export class Clerk implements ClerkInterface {
       const res = await signIn.create({ transfer: true });
       switch (res.status) {
         case 'complete':
-          return this.setActive({
+          await this.setActive({
             session: res.createdSessionId,
             redirectUrl: redirectUrls.getAfterSignInUrl(),
           });
+          return this.__internal_navigateToTaskIfAvailable();
         case 'needs_first_factor':
           return navigateToFactorOne();
         case 'needs_second_factor':
@@ -1757,10 +1943,11 @@ export class Clerk implements ClerkInterface {
       const res = await signUp.create({ transfer: true });
       switch (res.status) {
         case 'complete':
-          return this.setActive({
+          await this.setActive({
             session: res.createdSessionId,
             redirectUrl: redirectUrls.getAfterSignUpUrl(),
           });
+          return this.__internal_navigateToTaskIfAvailable();
         case 'missing_requirements':
           return navigateToNextStepSignUp({ missingFields: res.missingFields });
         default:
@@ -1769,10 +1956,11 @@ export class Clerk implements ClerkInterface {
     }
 
     if (su.status === 'complete') {
-      return this.setActive({
+      await this.setActive({
         session: su.sessionId,
         redirectUrl: redirectUrls.getAfterSignUpUrl(),
       });
+      return this.__internal_navigateToTaskIfAvailable();
     }
 
     if (si.status === 'needs_second_factor') {
@@ -1806,6 +1994,10 @@ export class Clerk implements ClerkInterface {
 
     if (su.externalAccountStatus === 'verified' && su.status === 'missing_requirements') {
       return navigateToNextStepSignUp({ missingFields: signUp.missingFields });
+    }
+
+    if (this.__internal_hasAfterAuthFlows) {
+      return this.__internal_navigateToTaskIfAvailable({ redirectUrlComplete: redirectUrls.getAfterSignInUrl() });
     }
 
     return navigateToSignIn();
@@ -1885,11 +2077,6 @@ export class Clerk implements ClerkInterface {
   };
 
   public authenticateWithMetamask = async (props: AuthenticateWithMetamaskParams = {}): Promise<void> => {
-    if (__BUILD_DISABLE_RHC__) {
-      clerkUnsupportedEnvironmentWarning('Metamask');
-      return;
-    }
-
     await this.authenticateWithWeb3({
       ...props,
       strategy: 'web3_metamask_signature',
@@ -1897,11 +2084,6 @@ export class Clerk implements ClerkInterface {
   };
 
   public authenticateWithCoinbaseWallet = async (props: AuthenticateWithCoinbaseWalletParams = {}): Promise<void> => {
-    if (__BUILD_DISABLE_RHC__) {
-      clerkUnsupportedEnvironmentWarning('Coinbase Wallet');
-      return;
-    }
-
     await this.authenticateWithWeb3({
       ...props,
       strategy: 'web3_coinbase_wallet_signature',
@@ -1909,11 +2091,6 @@ export class Clerk implements ClerkInterface {
   };
 
   public authenticateWithOKXWallet = async (props: AuthenticateWithOKXWalletParams = {}): Promise<void> => {
-    if (__BUILD_DISABLE_RHC__) {
-      clerkUnsupportedEnvironmentWarning('OKX Wallet');
-      return;
-    }
-
     await this.authenticateWithWeb3({
       ...props,
       strategy: 'web3_okx_wallet_signature',
@@ -1929,11 +2106,6 @@ export class Clerk implements ClerkInterface {
     legalAccepted,
     secondFactorUrl,
   }: ClerkAuthenticateWithWeb3Params): Promise<void> => {
-    if (__BUILD_DISABLE_RHC__) {
-      clerkUnsupportedEnvironmentWarning('Web3');
-      return;
-    }
-
     if (!this.client || !this.environment) {
       return;
     }
@@ -2413,6 +2585,10 @@ export class Clerk implements ClerkInterface {
     this.#emit();
   };
 
+  get __internal_hasAfterAuthFlows() {
+    return !!this.environment?.organizationSettings?.forceOrganizationSelection;
+  }
+
   #defaultSession = (client: ClientResource): SignedInSessionResource | null => {
     if (client.lastActiveSessionId) {
       const currentSession = client.signedInSessions.find(s => s.id === client.lastActiveSessionId);
@@ -2434,12 +2610,16 @@ export class Clerk implements ClerkInterface {
         return;
       }
 
-      if (this.#touchThrottledUntil > Date.now()) {
+      // In multi-session apps, it's possible that different tabs will have different active sessions. It's critical that the tab's active session is touched in this case so the session is properly updated on the backend, and so we avoid any throttling when multi-session mode is enabled.
+      const multisessionMode = this.environment && !this.environment.authConfig.singleSessionMode;
+      if (!multisessionMode && this.#touchThrottledUntil > Date.now()) {
         return;
       }
       this.#touchThrottledUntil = Date.now() + 5_000;
 
-      void this.#touchCurrentSession(this.session);
+      if (this.#options.touchSession) {
+        void this.#touchCurrentSession(this.session);
+      }
     });
 
     /**
@@ -2470,7 +2650,7 @@ export class Clerk implements ClerkInterface {
 
   // TODO: Be more conservative about touches. Throttle, don't touch when only one user, etc
   #touchCurrentSession = async (session?: SignedInSessionResource | null): Promise<void> => {
-    if (!session || !this.#options.touchSession) {
+    if (!session) {
       return Promise.resolve();
     }
 
@@ -2614,9 +2794,16 @@ export class Clerk implements ClerkInterface {
   };
 
   #initOptions = (options?: ClerkOptions): ClerkOptions => {
+    const processedOptions = options ? { ...options } : {};
+
+    // Extract cssLayerName from baseTheme if present and move it to appearance level
+    if (processedOptions.appearance) {
+      processedOptions.appearance = processCssLayerNameExtraction(processedOptions.appearance);
+    }
+
     return {
       ...defaultOptions,
-      ...options,
+      ...processedOptions,
       allowedRedirectOrigins: createAllowedRedirectOrigins(
         options?.allowedRedirectOrigins,
         this.frontendApi,

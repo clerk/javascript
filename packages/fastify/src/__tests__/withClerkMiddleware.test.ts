@@ -1,13 +1,15 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import Fastify from 'fastify';
+import { vi } from 'vitest';
 
 import { clerkPlugin, getAuth } from '../index';
 
-const authenticateRequestMock = jest.fn();
+const authenticateRequestMock = vi.fn();
 
-jest.mock('@clerk/backend', () => {
+vi.mock('@clerk/backend', async () => {
+  const actual = await vi.importActual('@clerk/backend');
   return {
-    ...jest.requireActual('@clerk/backend'),
+    ...actual,
     createClerkClient: () => {
       return {
         authenticateRequest: (...args: any) => authenticateRequestMock(...args),
@@ -18,14 +20,16 @@ jest.mock('@clerk/backend', () => {
 
 describe('withClerkMiddleware(options)', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.restoreAllMocks();
+    vi.clearAllMocks();
+    vi.restoreAllMocks();
   });
 
   test('handles signin with Authorization Bearer', async () => {
     authenticateRequestMock.mockResolvedValueOnce({
       headers: new Headers(),
-      toAuth: () => 'mockedAuth',
+      toAuth: () => ({
+        tokenType: 'session_token',
+      }),
     });
     const fastify = Fastify();
     await fastify.register(clerkPlugin);
@@ -50,8 +54,8 @@ describe('withClerkMiddleware(options)', () => {
     });
 
     expect(response.statusCode).toEqual(200);
-    expect(response.body).toEqual(JSON.stringify({ auth: 'mockedAuth' }));
-    expect(authenticateRequestMock).toBeCalledWith(
+    expect(response.body).toEqual(JSON.stringify({ auth: { tokenType: 'session_token' } }));
+    expect(authenticateRequestMock).toHaveBeenCalledWith(
       expect.any(Request),
       expect.objectContaining({
         secretKey: 'TEST_SECRET_KEY',
@@ -62,7 +66,9 @@ describe('withClerkMiddleware(options)', () => {
   test('handles signin with cookie', async () => {
     authenticateRequestMock.mockResolvedValueOnce({
       headers: new Headers(),
-      toAuth: () => 'mockedAuth',
+      toAuth: () => ({
+        tokenType: 'session_token',
+      }),
     });
     const fastify = Fastify();
     await fastify.register(clerkPlugin);
@@ -87,8 +93,8 @@ describe('withClerkMiddleware(options)', () => {
     });
 
     expect(response.statusCode).toEqual(200);
-    expect(response.body).toEqual(JSON.stringify({ auth: 'mockedAuth' }));
-    expect(authenticateRequestMock).toBeCalledWith(
+    expect(response.body).toEqual(JSON.stringify({ auth: { tokenType: 'session_token' } }));
+    expect(authenticateRequestMock).toHaveBeenCalledWith(
       expect.any(Request),
       expect.objectContaining({
         secretKey: 'TEST_SECRET_KEY',
@@ -107,7 +113,9 @@ describe('withClerkMiddleware(options)', () => {
         'x-clerk-auth-reason': 'auth-reason',
         'x-clerk-auth-status': 'handshake',
       }),
-      toAuth: () => 'mockedAuth',
+      toAuth: () => ({
+        tokenType: 'session_token',
+      }),
     });
     const fastify = Fastify();
     await fastify.register(clerkPlugin);
@@ -137,7 +145,9 @@ describe('withClerkMiddleware(options)', () => {
   test('handles signout case by populating the req.auth', async () => {
     authenticateRequestMock.mockResolvedValueOnce({
       headers: new Headers(),
-      toAuth: () => 'mockedAuth',
+      toAuth: () => ({
+        tokenType: 'session_token',
+      }),
     });
     const fastify = Fastify();
     await fastify.register(clerkPlugin);
@@ -154,8 +164,8 @@ describe('withClerkMiddleware(options)', () => {
     });
 
     expect(response.statusCode).toEqual(200);
-    expect(response.body).toEqual(JSON.stringify({ auth: 'mockedAuth' }));
-    expect(authenticateRequestMock).toBeCalledWith(
+    expect(response.body).toEqual(JSON.stringify({ auth: { tokenType: 'session_token' } }));
+    expect(authenticateRequestMock).toHaveBeenCalledWith(
       expect.any(Request),
       expect.objectContaining({
         secretKey: 'TEST_SECRET_KEY',

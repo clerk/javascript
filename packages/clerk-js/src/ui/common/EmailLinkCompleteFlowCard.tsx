@@ -1,4 +1,4 @@
-import { withCardStateProvider } from '../elements';
+import { withCardStateProvider } from '../elements/contexts';
 import { localizationKeys } from '../localization';
 import type { EmailLinkVerifyProps } from './EmailLinkVerify';
 import { EmailLinkVerify } from './EmailLinkVerify';

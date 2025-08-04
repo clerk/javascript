@@ -1,5 +1,6 @@
-import { PlansContextProvider, PricingTableContext, SubscriberTypeContext } from '../../contexts';
-import { Header } from '../../elements';
+import { Header } from '@/ui/elements/Header';
+
+import { PricingTableContext, SubscriberTypeContext } from '../../contexts';
 import { localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
 import { PricingTable } from '../PricingTable/PricingTable';
@@ -13,12 +14,14 @@ const PlansPageInternal = () => {
         sx={t => ({
           borderBottomWidth: t.borderWidths.$normal,
           borderBottomStyle: t.borderStyles.$solid,
-          borderBottomColor: t.colors.$neutralAlpha100,
+          borderBottomColor: t.colors.$borderAlpha100,
           marginBlockEnd: t.space.$4,
           paddingBlockEnd: t.space.$4,
         })}
       >
-        <Header.BackLink onClick={() => void navigate('../', { searchParams: new URLSearchParams('tab=plans') })}>
+        <Header.BackLink
+          onClick={() => void navigate('../', { searchParams: new URLSearchParams('tab=subscriptions') })}
+        >
           <Header.Title
             localizationKey={localizationKeys('userProfile.plansPage.title')}
             textVariant='h2'
@@ -36,9 +39,7 @@ const PlansPageInternal = () => {
 export const PlansPage = () => {
   return (
     <SubscriberTypeContext.Provider value='user'>
-      <PlansContextProvider>
-        <PlansPageInternal />
-      </PlansContextProvider>
+      <PlansPageInternal />
     </SubscriberTypeContext.Provider>
   );
 };

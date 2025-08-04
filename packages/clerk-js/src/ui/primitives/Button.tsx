@@ -51,14 +51,14 @@ const { applyVariants, filterProps } = createVariants(
             [vars.accent]: theme.colors.$primary500,
             [vars.accentHover]: theme.colors.$primaryHover,
             [vars.border]: theme.colors.$primary500,
-            [vars.accentContrast]: theme.colors.$colorTextOnPrimaryBackground,
+            [vars.accentContrast]: theme.colors.$colorPrimaryForeground,
             [vars.alpha]: theme.colors.$neutralAlpha50,
           },
           secondary: {
             [vars.accent]: theme.colors.$colorBackground,
             [vars.accentHover]: `color-mix(in srgb, ${vars.accent}, ${theme.colors.$neutralAlpha50})`,
             [vars.border]: theme.colors.$primary500,
-            [vars.accentContrast]: theme.colors.$colorText,
+            [vars.accentContrast]: theme.colors.$colorForeground,
             [vars.alpha]: theme.colors.$neutralAlpha50,
           },
           neutral: {
@@ -80,7 +80,6 @@ const { applyVariants, filterProps } = createVariants(
           solid: {
             backgroundColor: vars.accent,
             color: vars.accentContrast,
-            boxShadow: theme.shadows.$buttonShadow,
             borderWidth: theme.borderWidths.$normal,
             borderStyle: theme.borderStyles.$solid,
             borderColor: vars.accent,
@@ -96,20 +95,23 @@ const { applyVariants, filterProps } = createVariants(
           outline: {
             borderWidth: theme.borderWidths.$normal,
             borderStyle: theme.borderStyles.$solid,
-            borderColor: theme.colors.$neutralAlpha100,
+            borderColor: theme.colors.$borderAlpha150,
             color: theme.colors.$neutralAlpha600,
             '&:hover': { backgroundColor: theme.colors.$neutralAlpha50 },
-            '&:focus': props.hoverAsFocus ? { backgroundColor: theme.colors.$neutralAlpha50 } : undefined,
-            boxShadow: theme.shadows.$outlineButtonShadow,
+            '&:focus': props.hoverAsFocus
+              ? { backgroundColor: theme.colors.$neutralAlpha50, borderColor: theme.colors.$borderAlpha300 }
+              : undefined,
           },
           bordered: {
             borderWidth: theme.borderWidths.$normal,
             borderStyle: theme.borderStyles.$solid,
-            borderColor: theme.colors.$neutralAlpha100,
+            borderColor: theme.colors.$borderAlpha150,
             color: vars.accentContrast,
             backgroundColor: vars.accent,
             '&:hover': { backgroundColor: vars.accentHover },
-            '&:focus': props.hoverAsFocus ? { backgroundColor: vars.accentHover } : undefined,
+            '&:focus': props.hoverAsFocus
+              ? { backgroundColor: vars.accentHover, borderColor: theme.colors.$borderAlpha300 }
+              : undefined,
           },
           ghost: {
             color: vars.accent,

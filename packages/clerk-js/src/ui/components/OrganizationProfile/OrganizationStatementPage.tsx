@@ -3,7 +3,7 @@ import { StatementPage } from '../Statements';
 
 export const OrganizationStatementPage = () => {
   return (
-    <SubscriberTypeContext.Provider value='org'>
+    <SubscriberTypeContext.Provider value='organization'>
       <StatementPage />
     </SubscriberTypeContext.Provider>
   );

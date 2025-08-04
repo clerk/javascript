@@ -17,6 +17,7 @@ export class CommercePaymentSource extends BaseResource implements CommercePayme
   paymentMethod!: string;
   cardType!: string;
   isDefault!: boolean;
+  isRemovable!: boolean;
   status!: CommercePaymentSourceStatus;
   walletType: string | undefined;
 
@@ -35,6 +36,7 @@ export class CommercePaymentSource extends BaseResource implements CommercePayme
     this.paymentMethod = data.payment_method;
     this.cardType = data.card_type;
     this.isDefault = data.is_default;
+    this.isRemovable = data.is_removable;
     this.status = data.status;
     this.walletType = data.wallet_type ?? undefined;
 
@@ -72,6 +74,7 @@ export class CommercePaymentSource extends BaseResource implements CommercePayme
 export class CommerceInitializedPaymentSource extends BaseResource implements CommerceInitializedPaymentSourceResource {
   externalClientSecret!: string;
   externalGatewayId!: string;
+  paymentMethodOrder!: string[];
 
   constructor(data: CommerceInitializedPaymentSourceJSON) {
     super();
@@ -85,7 +88,7 @@ export class CommerceInitializedPaymentSource extends BaseResource implements Co
 
     this.externalClientSecret = data.external_client_secret;
     this.externalGatewayId = data.external_gateway_id;
-
+    this.paymentMethodOrder = data.payment_method_order ?? ['card'];
     return this;
   }
 }
