@@ -11,8 +11,15 @@ export function usesHttps() {
 }
 
 export function inIframe() {
-  // checks if the current window is an iframe
-  return inBrowser() && window.self !== window.top;
+  if (!inBrowser()) return false;
+
+  try {
+    // checks if the current window is an iframe
+    return window.self !== window.top;
+  } catch {
+    // Cross-origin access denied - we're definitely in an iframe
+    return true;
+  }
 }
 
 export function inCrossOriginIframe() {

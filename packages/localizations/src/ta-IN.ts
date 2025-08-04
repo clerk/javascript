@@ -813,6 +813,9 @@ export const taIN: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'கடைசி பெயர் 256 எழுத்துகளை மீறக்கூடாது.',
     form_param_max_length_exceeded__name: 'பெயர் 256 எழுத்துகளை மீறக்கூடாது.',
     form_param_nil: 'இந்த புலம் தேவை மற்றும் காலியாக இருக்க முடியாது.',
+    form_param_type_invalid: undefined,
+    form_param_type_invalid__email_address: undefined,
+    form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'உள்ளிடப்பட்ட மதிப்பு தவறானது. அதை திருத்தவும்.',
     form_password_incorrect: 'நீங்கள் உள்ளிட்ட கடவுச்சொல் தவறானது. மீண்டும் முயற்சிக்கவும்.',
     form_password_length_too_short:
