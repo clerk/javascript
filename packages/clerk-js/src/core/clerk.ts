@@ -1388,6 +1388,16 @@ export class Clerk implements ClerkInterface {
   public __internal_navigateToTaskIfAvailable = async ({
     redirectUrlComplete,
   }: __internal_NavigateToTaskIfAvailableParams = {}): Promise<void> => {
+    const onBeforeSetActive: SetActiveHook =
+      typeof window !== 'undefined' && typeof window.__unstable__onBeforeSetActive === 'function'
+        ? window.__unstable__onBeforeSetActive
+        : noop;
+
+    const onAfterSetActive: SetActiveHook =
+      typeof window !== 'undefined' && typeof window.__unstable__onAfterSetActive === 'function'
+        ? window.__unstable__onAfterSetActive
+        : noop;
+
     const session = this.session;
     if (!session || !this.environment) {
       return;
@@ -1403,17 +1413,30 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
+    await onBeforeSetActive();
+
     if (redirectUrlComplete) {
       const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
 
       await tracker.track(async () => {
-        await this.navigate(redirectUrlComplete);
+        if (!this.client) {
+          return;
+        }
+
+        if (this.client.isEligibleForTouch()) {
+          const absoluteRedirectUrl = new URL(redirectUrlComplete, window.location.href);
+          await this.navigate(this.buildUrlWithAuth(this.client.buildTouchUrl({ redirectUrl: absoluteRedirectUrl })));
+        } else {
+          await this.navigate(redirectUrlComplete);
+        }
       });
 
       if (tracker.isUnloading()) {
         return;
       }
     }
+
+    await onAfterSetActive();
   };
 
   public addListener = (listener: ListenerCallback): UnsubscribeCallback => {
