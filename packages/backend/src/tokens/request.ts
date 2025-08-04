@@ -68,6 +68,7 @@ function assertMachineSecretOrSecretKey(authenticateContext: AuthenticateContext
     );
   }
 }
+
 function isRequestEligibleForRefresh(
   err: TokenVerificationError,
   authenticateContext: { refreshTokenInCookie?: string },
