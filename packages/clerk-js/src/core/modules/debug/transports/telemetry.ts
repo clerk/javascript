@@ -77,7 +77,7 @@ export class TelemetryTransport implements DebugTransport {
       this.flush().catch(err => {
         console.error('Failed to flush telemetry data:', err);
       });
-      this.startFlushTimer(); // Restart timer
+      this.startFlushTimer();
     }, this.flushInterval);
   }
 }

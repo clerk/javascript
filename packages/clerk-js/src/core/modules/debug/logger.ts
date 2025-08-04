@@ -1,6 +1,11 @@
 import type { DebugLogEntry, DebugLogFilter, DebugLogLevel, DebugTransport } from './types';
 
 /**
+ * Default log level for debug logging
+ */
+const DEFAULT_LOG_LEVEL: DebugLogLevel = 'debug';
+
+/**
  * Minimal debug logger interface for engineers
  */
 export class DebugLogger {
@@ -8,9 +13,9 @@ export class DebugLogger {
   private readonly logLevel: DebugLogLevel;
   private readonly filters?: DebugLogFilter[];
 
-  constructor(transport: DebugTransport, logLevel: DebugLogLevel = 'info', filters?: DebugLogFilter[]) {
+  constructor(transport: DebugTransport, logLevel?: DebugLogLevel, filters?: DebugLogFilter[]) {
     this.transport = transport;
-    this.logLevel = logLevel;
+    this.logLevel = logLevel ?? DEFAULT_LOG_LEVEL;
     this.filters = filters;
   }
 

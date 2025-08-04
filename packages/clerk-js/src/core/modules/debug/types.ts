@@ -4,6 +4,11 @@
 export type DebugLogLevel = 'error' | 'warn' | 'info' | 'debug' | 'trace';
 
 /**
+ * Valid debug log levels
+ */
+export const VALID_LOG_LEVELS: readonly DebugLogLevel[] = ['error', 'warn', 'info', 'debug', 'trace'] as const;
+
+/**
  * Debug event types that can be tracked
  */
 export type DebugEventType = 'navigation' | 'custom_event';
@@ -86,11 +91,16 @@ export interface DebugLogFilter {
 }
 
 /**
+ * Validates if a value is a valid debug log level
+ */
+export function isValidLogLevel(level: unknown): level is DebugLogLevel {
+  return typeof level === 'string' && VALID_LOG_LEVELS.includes(level as DebugLogLevel);
+}
+
+/**
  * Type guard for checking if an object is a DebugLogEntry
  */
 export function isDebugLogEntry(obj: unknown): obj is DebugLogEntry {
-  const validLevels: DebugLogLevel[] = ['error', 'warn', 'info', 'debug', 'trace'];
-
   return (
     typeof obj === 'object' &&
     obj !== null &&
@@ -101,7 +111,7 @@ export function isDebugLogEntry(obj: unknown): obj is DebugLogEntry {
     typeof (obj as DebugLogEntry).id === 'string' &&
     typeof (obj as DebugLogEntry).timestamp === 'number' &&
     typeof (obj as DebugLogEntry).level === 'string' &&
-    validLevels.includes((obj as DebugLogEntry).level) &&
+    isValidLogLevel((obj as DebugLogEntry).level) &&
     typeof (obj as DebugLogEntry).message === 'string'
   );
 }

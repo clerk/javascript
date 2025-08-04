@@ -3,6 +3,26 @@ import { type CompositeLoggerOptions, CompositeTransport } from './transports/co
 import { ConsoleTransport } from './transports/console';
 import { type TelemetryLoggerOptions, TelemetryTransport } from './transports/telemetry';
 import type { DebugLogFilter, DebugLogLevel } from './types';
+import { isValidLogLevel, VALID_LOG_LEVELS } from './types';
+
+/**
+ * Default log level for debug logging
+ */
+export const DEFAULT_LOG_LEVEL: DebugLogLevel = 'debug';
+
+/**
+ * Validates logger options and throws if invalid
+ * @param options - The options to validate
+ * @throws Error if invalid log level is provided
+ */
+function validateLoggerOptions<T extends { logLevel?: unknown }>(options: T): void {
+  const { logLevel } = options;
+
+  if (logLevel !== undefined && !isValidLogLevel(logLevel)) {
+    const levelString = typeof logLevel === 'string' ? logLevel : JSON.stringify(logLevel);
+    throw new Error(`Invalid log level: "${levelString}". Valid levels are: ${VALID_LOG_LEVELS.join(', ')}`);
+  }
+}
 
 export type * from './types';
 
@@ -60,17 +80,14 @@ class DebugLoggerManager {
    * @returns The debug logger instance
    */
   async initialize(options: LoggerOptions = {}): Promise<DebugLogger | null> {
-    // If already initialized, return the logger immediately
     if (this.initialized && this.logger) {
       return this.logger;
     }
 
-    // If initialization is in progress, wait for the existing promise
     if (this.initializationPromise) {
       return this.initializationPromise;
     }
 
-    // Start initialization and cache the promise
     this.initializationPromise = this.performInitialization(options);
     return this.initializationPromise;
   }
@@ -82,13 +99,15 @@ class DebugLoggerManager {
    */
   private async performInitialization(options: LoggerOptions): Promise<DebugLogger | null> {
     try {
-      const { endpoint, logLevel = 'info', filters } = options;
+      validateLoggerOptions(options);
+      const { endpoint, logLevel, filters } = options;
+      const finalLogLevel = logLevel ?? DEFAULT_LOG_LEVEL;
 
       const transports = [{ transport: new ConsoleTransport() }, { transport: new TelemetryTransport(endpoint) }];
 
       const transportInstances = transports.map(t => t.transport);
       const compositeTransport = new CompositeTransport(transportInstances);
-      const logger = new DebugLogger(compositeTransport, logLevel, filters);
+      const logger = new DebugLogger(compositeTransport, finalLogLevel, filters);
 
       this.logger = logger;
       this.initialized = true;
@@ -139,14 +158,25 @@ export async function getDebugLogger(options: LoggerOptions = {}): Promise<Debug
  * @param options - Configuration options for the logger
  * @returns Object containing the logger and composite transport
  */
-export function createLogger(options: { endpoint?: string; logLevel?: DebugLogLevel; filters?: DebugLogFilter[] }) {
-  const { endpoint, logLevel = 'info', filters } = options;
+export function createLogger(options: {
+  endpoint?: string;
+  logLevel?: DebugLogLevel;
+  filters?: DebugLogFilter[];
+}): { logger: DebugLogger; transport: CompositeTransport } | null {
+  try {
+    validateLoggerOptions(options);
+    const { endpoint, logLevel, filters } = options;
+    const finalLogLevel = logLevel ?? DEFAULT_LOG_LEVEL;
 
-  return createCompositeLogger({
-    transports: [{ transport: new ConsoleTransport() }, { transport: new TelemetryTransport(endpoint) }],
-    logLevel,
-    filters,
-  });
+    return createCompositeLogger({
+      transports: [{ transport: new ConsoleTransport() }, { transport: new TelemetryTransport(endpoint) }],
+      logLevel: finalLogLevel,
+      filters,
+    });
+  } catch (error) {
+    console.error('Failed to create logger:', error);
+    return null;
+  }
 }
 
 /**
@@ -154,11 +184,20 @@ export function createLogger(options: { endpoint?: string; logLevel?: DebugLogLe
  * @param options - Configuration options for the console logger
  * @returns Object containing the logger and console transport
  */
-export function createConsoleLogger(options: ConsoleLoggerOptions) {
-  const { logLevel = 'info', filters } = options;
-  const transport = new ConsoleTransport();
-  const logger = new DebugLogger(transport, logLevel, filters);
-  return { logger, transport };
+export function createConsoleLogger(
+  options: ConsoleLoggerOptions,
+): { logger: DebugLogger; transport: ConsoleTransport } | null {
+  try {
+    validateLoggerOptions(options);
+    const { logLevel, filters } = options;
+    const finalLogLevel = logLevel ?? DEFAULT_LOG_LEVEL;
+    const transport = new ConsoleTransport();
+    const logger = new DebugLogger(transport, finalLogLevel, filters);
+    return { logger, transport };
+  } catch (error) {
+    console.error('Failed to create console logger:', error);
+    return null;
+  }
 }
 
 /**
@@ -166,11 +205,20 @@ export function createConsoleLogger(options: ConsoleLoggerOptions) {
  * @param options - Configuration options for the telemetry logger
  * @returns Object containing the logger and telemetry transport
  */
-export function createTelemetryLogger(options: TelemetryLoggerOptions) {
-  const { endpoint, logLevel = 'info', filters } = options;
-  const transport = new TelemetryTransport(endpoint);
-  const logger = new DebugLogger(transport, logLevel, filters);
-  return { logger, transport };
+export function createTelemetryLogger(
+  options: TelemetryLoggerOptions,
+): { logger: DebugLogger; transport: TelemetryTransport } | null {
+  try {
+    validateLoggerOptions(options);
+    const { endpoint, logLevel, filters } = options;
+    const finalLogLevel = logLevel ?? DEFAULT_LOG_LEVEL;
+    const transport = new TelemetryTransport(endpoint);
+    const logger = new DebugLogger(transport, finalLogLevel, filters);
+    return { logger, transport };
+  } catch (error) {
+    console.error('Failed to create telemetry logger:', error);
+    return null;
+  }
 }
 
 /**
@@ -178,14 +226,23 @@ export function createTelemetryLogger(options: TelemetryLoggerOptions) {
  * @param options - Configuration options for the composite logger
  * @returns Object containing the logger and composite transport
  */
-export function createCompositeLogger(options: CompositeLoggerOptions) {
-  const { transports, logLevel = 'info', filters } = options;
+export function createCompositeLogger(
+  options: CompositeLoggerOptions,
+): { logger: DebugLogger; transport: CompositeTransport } | null {
+  try {
+    validateLoggerOptions(options);
+    const { transports, logLevel, filters } = options;
+    const finalLogLevel = logLevel ?? DEFAULT_LOG_LEVEL;
 
-  const transportInstances = transports.map(t => t.transport);
-  const compositeTransport = new CompositeTransport(transportInstances);
+    const transportInstances = transports.map((t: any) => t.transport);
+    const compositeTransport = new CompositeTransport(transportInstances);
 
-  const logger = new DebugLogger(compositeTransport, logLevel, filters);
-  return { logger, transport: compositeTransport };
+    const logger = new DebugLogger(compositeTransport, finalLogLevel, filters);
+    return { logger, transport: compositeTransport };
+  } catch (error) {
+    console.error('Failed to create composite logger:', error);
+    return null;
+  }
 }
 
 /**
