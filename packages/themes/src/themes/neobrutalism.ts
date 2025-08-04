@@ -20,7 +20,6 @@ const shadowStyle = {
 };
 
 export const neobrutalism = experimental_createTheme({
-  //@ts-expect-error not public api
   simpleStyles: true,
   variables: {
     colorPrimary: '#DF1B1B',
