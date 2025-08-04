@@ -7,7 +7,9 @@ import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/commerce';
 
-type GetOrganizationListParams = ClerkPaginationRequest<unknown>;
+type GetOrganizationListParams = ClerkPaginationRequest<{
+  payerType: 'org' | 'user';
+}>;
 
 export class BillingAPI extends AbstractAPI {
   public async getPlanList(params?: GetOrganizationListParams) {
