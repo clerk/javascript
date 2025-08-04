@@ -157,6 +157,7 @@ export const deDE: LocalizationResource = {
     totalDue: undefined,
     totalDueToday: 'Heute fällig',
     viewFeatures: 'Funktionen anzeigen',
+    viewPayment: undefined,
     year: 'Jahr',
   },
   createOrganization: {
@@ -816,6 +817,9 @@ export const deDE: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'Der Nachname sollte nicht mehr als 256 Zeichen umfassen.',
     form_param_max_length_exceeded__name: 'Der Name sollte nicht länger als 256 Zeichen sein.',
     form_param_nil: 'Ein erforderliches Feld wurde nicht ausgefüllt. Bitte überprüfen Sie Ihre Eingaben.',
+    form_param_type_invalid: undefined,
+    form_param_type_invalid__email_address: undefined,
+    form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Der eingegebene Wert ist ungültig.',
     form_password_incorrect: 'Das eingegebene Passwort ist falsch.',
     form_password_length_too_short: 'Das Passwort ist zu kurz. Es muss mindestens 8 Zeichen lang sein.',

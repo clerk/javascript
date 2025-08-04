@@ -154,6 +154,7 @@ export const plPL: LocalizationResource = {
     totalDue: undefined,
     totalDueToday: undefined,
     viewFeatures: undefined,
+    viewPayment: undefined,
     year: undefined,
   },
   createOrganization: {
@@ -810,6 +811,9 @@ export const plPL: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'Nazwisko nie powinno przekraczać 256 znaków.',
     form_param_max_length_exceeded__name: 'Nazwa nie powinna przekraczać 256 znaków.',
     form_param_nil: 'To pole jest wymagane i nie może być puste.',
+    form_param_type_invalid: undefined,
+    form_param_type_invalid__email_address: undefined,
+    form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Wprowadzona wartość jest nieprawidłowa. Popraw ją.',
     form_password_incorrect: 'Wprowadzone hasło jest nieprawidłowe. Spróbuj ponownie.',
     form_password_length_too_short: 'Twoje hasło jest zbyt krótkie. Musi mieć co najmniej 8 znaków.',

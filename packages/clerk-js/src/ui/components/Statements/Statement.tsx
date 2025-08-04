@@ -1,3 +1,5 @@
+import React from 'react';
+
 import type { LocalizationKey } from '../../customizables';
 import { Badge, Box, Button, descriptors, Heading, Icon, Span, Text } from '../../customizables';
 import { useClipboard } from '../../hooks';
@@ -279,7 +281,7 @@ function SectionContentDetailsListItem({
   icon?: React.ReactNode;
   label: string | LocalizationKey;
   labelIcon?: React.ComponentType;
-  value: string | LocalizationKey;
+  value: string | LocalizationKey | React.ReactElement;
   valueTruncated?: boolean;
   valueCopyable?: boolean;
 }) {
@@ -348,12 +350,14 @@ function SectionContentDetailsListItem({
               {valueTruncated ? truncateWithEndVisible(value) : value}
             </Text>
           </>
+        ) : React.isValidElement(value) ? (
+          value
         ) : (
           <Text
             elementDescriptor={descriptors.statementSectionContentDetailsListItemValue}
             colorScheme='secondary'
             variant='caption'
-            localizationKey={value}
+            localizationKey={value as LocalizationKey}
           />
         )}
       </Span>

@@ -158,6 +158,7 @@ export const csCZ: LocalizationResource = {
     totalDue: 'Celkem k zaplacení',
     totalDueToday: 'Celkem k zaplacení dnes',
     viewFeatures: 'Zobrazit funkce',
+    viewPayment: undefined,
     year: 'Rok',
   },
   createOrganization: {
@@ -815,6 +816,9 @@ export const csCZ: LocalizationResource = {
     form_param_max_length_exceeded__last_name: undefined,
     form_param_max_length_exceeded__name: undefined,
     form_param_nil: undefined,
+    form_param_type_invalid: undefined,
+    form_param_type_invalid__email_address: undefined,
+    form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: 'Vaše heslo je příliš krátké. Musí mít alespoň 8 znaků.',

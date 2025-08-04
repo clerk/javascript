@@ -40,7 +40,7 @@ export function MountedCheckoutDrawer({
         <Checkout
           planId={checkoutDrawer.props.planId}
           planPeriod={checkoutDrawer.props.planPeriod}
-          subscriberType={checkoutDrawer.props.subscriberType}
+          for={checkoutDrawer.props.for}
           onSubscriptionComplete={checkoutDrawer.props.onSubscriptionComplete}
           portalRoot={checkoutDrawer.props.portalRoot}
           appearance={checkoutDrawer.props.appearance}

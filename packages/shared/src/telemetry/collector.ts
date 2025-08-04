@@ -40,11 +40,7 @@ interface WindowWithClerk extends Window {
  */
 function isWindowClerkWithMetadata(clerk: unknown): clerk is { constructor: { sdkMetadata?: SDKMetadata } } {
   return (
-    typeof clerk === 'object' &&
-    clerk !== null &&
-    'constructor' in clerk &&
-    typeof clerk.constructor === 'object' &&
-    clerk.constructor !== null
+    typeof clerk === 'object' && clerk !== null && 'constructor' in clerk && typeof clerk.constructor === 'function'
   );
 }
 

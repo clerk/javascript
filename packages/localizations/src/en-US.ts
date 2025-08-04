@@ -147,6 +147,7 @@ export const enUS: LocalizationResource = {
     totalDue: 'Total due',
     totalDueToday: 'Total Due Today',
     viewFeatures: 'View features',
+    viewPayment: 'View payment',
     year: 'Year',
   },
   createOrganization: {
@@ -801,6 +802,9 @@ export const enUS: LocalizationResource = {
     form_param_max_length_exceeded__last_name: undefined,
     form_param_max_length_exceeded__name: undefined,
     form_param_nil: undefined,
+    form_param_type_invalid: undefined,
+    form_param_type_invalid__email_address: undefined,
+    form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: 'Your password is too short. It must be at least 8 characters long.',

@@ -25,6 +25,7 @@ export {
   RedirectToOrganizationProfile,
   RedirectToSignIn,
   RedirectToSignUp,
+  RedirectToTask,
   RedirectToUserProfile,
   SignedIn,
   SignedOut,

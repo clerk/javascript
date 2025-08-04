@@ -154,6 +154,7 @@ export const nlBE: LocalizationResource = {
     totalDue: undefined,
     totalDueToday: undefined,
     viewFeatures: undefined,
+    viewPayment: undefined,
     year: undefined,
   },
   createOrganization: {
@@ -805,6 +806,9 @@ export const nlBE: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'Achternaam moet minder dan 256 tekens bevatten.',
     form_param_max_length_exceeded__name: 'Naam moet minder dan 256 tekens bevatten.',
     form_param_nil: 'Dit veld mag niet leeg zijn.',
+    form_param_type_invalid: undefined,
+    form_param_type_invalid__email_address: undefined,
+    form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'De waarde die je hebt ingevoerd is ongeldig.',
     form_password_incorrect: 'Het wachtwoord is incorrect.',
     form_password_length_too_short: 'Het wachtwoord is te kort.',

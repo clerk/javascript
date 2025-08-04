@@ -46,7 +46,7 @@ export const SubscriptionDetailsButton = withClerk(
     children,
     ...props
   }: WithClerkProp<React.PropsWithChildren<__experimental_SubscriptionDetailsButtonProps>>) => {
-    const { for: forProp, subscriptionDetailsProps, onSubscriptionCancel, ...rest } = props;
+    const { for: _for, subscriptionDetailsProps, onSubscriptionCancel, ...rest } = props;
     children = normalizeWithDefaultValue(children, 'Subscription details');
     const child = assertSingleChild(children)('SubscriptionDetailsButton');
 
@@ -56,7 +56,7 @@ export const SubscriptionDetailsButton = withClerk(
       throw new Error('Ensure that `<SubscriptionDetailsButton />` is rendered inside a `<SignedIn />` component.');
     }
 
-    if (orgId === null && forProp === 'org') {
+    if (orgId === null && _for === 'organization') {
       throw new Error(
         'Wrap `<SubscriptionDetailsButton for="organization" />` with a check for an active organization.',
       );
@@ -68,7 +68,7 @@ export const SubscriptionDetailsButton = withClerk(
       }
 
       return clerk.__internal_openSubscriptionDetails({
-        for: forProp,
+        for: _for,
         onSubscriptionCancel,
         ...subscriptionDetailsProps,
       });
