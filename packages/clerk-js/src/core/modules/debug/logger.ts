@@ -79,43 +79,61 @@ export class DebugLogger {
         return false;
       }
 
-      if (filter.source) {
-        if (typeof filter.source === 'string') {
-          if (source !== filter.source) {
-            return false;
-          }
-        } else if (filter.source instanceof RegExp) {
-          if (!source || !filter.source.test(source)) {
-            return false;
-          }
-        }
+      if (filter.source && !this.matchesSource(filter.source, source)) {
+        return false;
       }
 
-      if (filter.includePatterns && filter.includePatterns.length > 0) {
-        const matchesInclude = filter.includePatterns.some(pattern => {
-          if (typeof pattern === 'string') {
-            return message.includes(pattern);
-          }
-          return pattern.test(message);
-        });
-        if (!matchesInclude) {
-          return false;
-        }
+      if (
+        filter.includePatterns &&
+        filter.includePatterns.length > 0 &&
+        !this.shouldInclude(message, filter.includePatterns)
+      ) {
+        return false;
       }
 
-      if (filter.excludePatterns && filter.excludePatterns.length > 0) {
-        const matchesExclude = filter.excludePatterns.some(pattern => {
-          if (typeof pattern === 'string') {
-            return message.includes(pattern);
-          }
-          return pattern.test(message);
-        });
-        if (matchesExclude) {
-          return false;
-        }
+      if (
+        filter.excludePatterns &&
+        filter.excludePatterns.length > 0 &&
+        this.shouldExclude(message, filter.excludePatterns)
+      ) {
+        return false;
       }
 
       return true;
     });
+  }
+
+  /**
+   * Checks if a source matches the given pattern (string or RegExp)
+   */
+  private matchesSource(pattern: string | RegExp, source?: string): boolean {
+    if (typeof pattern === 'string') {
+      return source === pattern;
+    }
+    return source !== undefined && pattern.test(source);
+  }
+
+  /**
+   * Checks if a message should be included based on the given patterns
+   */
+  private shouldInclude(message: string, patterns: (string | RegExp)[]): boolean {
+    return patterns.some(pattern => this.matchesPattern(message, pattern));
+  }
+
+  /**
+   * Checks if a message should be excluded based on the given patterns
+   */
+  private shouldExclude(message: string, patterns: (string | RegExp)[]): boolean {
+    return patterns.some(pattern => this.matchesPattern(message, pattern));
+  }
+
+  /**
+   * Checks if a message matches a given pattern (string or RegExp)
+   */
+  private matchesPattern(message: string, pattern: string | RegExp): boolean {
+    if (typeof pattern === 'string') {
+      return message.includes(pattern);
+    }
+    return pattern.test(message);
   }
 }
