@@ -89,6 +89,8 @@ export interface DebugLogFilter {
  * Type guard for checking if an object is a DebugLogEntry
  */
 export function isDebugLogEntry(obj: unknown): obj is DebugLogEntry {
+  const validLevels: DebugLogLevel[] = ['error', 'warn', 'info', 'debug', 'trace'];
+
   return (
     typeof obj === 'object' &&
     obj !== null &&
@@ -99,6 +101,7 @@ export function isDebugLogEntry(obj: unknown): obj is DebugLogEntry {
     typeof (obj as DebugLogEntry).id === 'string' &&
     typeof (obj as DebugLogEntry).timestamp === 'number' &&
     typeof (obj as DebugLogEntry).level === 'string' &&
+    validLevels.includes((obj as DebugLogEntry).level) &&
     typeof (obj as DebugLogEntry).message === 'string'
   );
 }
@@ -107,6 +110,8 @@ export function isDebugLogEntry(obj: unknown): obj is DebugLogEntry {
  * Type guard for checking if an object is DebugData
  */
 export function isDebugData(obj: unknown): obj is DebugData {
+  const validEventTypes: DebugEventType[] = ['navigation', 'custom_event'];
+
   return (
     typeof obj === 'object' &&
     obj !== null &&
@@ -114,6 +119,7 @@ export function isDebugData(obj: unknown): obj is DebugData {
     'eventId' in obj &&
     'timestamp' in obj &&
     typeof (obj as DebugData).eventType === 'string' &&
+    validEventTypes.includes((obj as DebugData).eventType) &&
     typeof (obj as DebugData).eventId === 'string' &&
     typeof (obj as DebugData).timestamp === 'number'
   );

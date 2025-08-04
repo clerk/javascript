@@ -2235,7 +2235,10 @@ export class Clerk implements ClerkInterface {
   async #initializeDebugModule(): Promise<void> {
     try {
       const { getDebugLogger } = await import('./modules/debug');
-      this.debugLogger = await getDebugLogger({});
+      const logger = await getDebugLogger({});
+      if (_isDebugLogger(logger)) {
+        this.debugLogger = logger;
+      }
     } catch (error) {
       console.error('Failed to initialize debug module:', error);
     }

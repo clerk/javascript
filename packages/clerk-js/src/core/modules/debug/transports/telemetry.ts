@@ -1,8 +1,8 @@
-import type { DebugData, DebugLogEntry, DebugLogFilter, DebugTransport } from '../types';
+import type { DebugData, DebugLogEntry, DebugLogFilter, DebugLogLevel, DebugTransport } from '../types';
 
 export interface TelemetryLoggerOptions {
   endpoint?: string;
-  logLevel?: 'error' | 'warn' | 'info' | 'debug' | 'trace';
+  logLevel?: DebugLogLevel;
   filters?: DebugLogFilter[];
 }
 
