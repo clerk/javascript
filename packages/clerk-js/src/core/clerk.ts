@@ -1600,14 +1600,7 @@ export class Clerk implements ClerkInterface {
       );
     }
 
-    return this.buildUrlWithAuth(
-      buildURL(
-        {
-          base: this.environment.displayConfig.afterSignOutOneUrl,
-        },
-        { stringify: true },
-      ),
-    );
+    return this.buildUrlWithAuth(this.environment.displayConfig.afterSignOutOneUrl);
   }
 
   public buildCreateOrganizationUrl(): string {
