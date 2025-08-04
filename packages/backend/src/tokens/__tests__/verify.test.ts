@@ -140,8 +140,8 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
 
     const result = await verifyMachineAuthToken(token, {
       apiUrl: 'https://api.clerk.test',
-      // @ts-expect-error - machineSecret from options
-      machineSecret: 'ak_xxxxx',
+      // @ts-expect-error: Machine secret key is only visible in createClerkClient()
+      machineSecretKey: 'ak_xxxxx',
     });
 
     expect(result.tokenType).toBe('machine_token');

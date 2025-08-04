@@ -202,14 +202,11 @@ function handleClerkAPIError(
 
 async function verifyMachineToken(
   secret: string,
-  options: VerifyTokenOptions & { machineSecret?: string },
+  options: VerifyTokenOptions & { machineSecretKey?: string },
 ): Promise<MachineTokenReturnType<MachineToken, MachineTokenVerificationError>> {
   try {
     const client = createBackendApiClient(options);
-    const verifiedToken = await client.machineTokens.verifySecret({
-      secret,
-      machineSecret: options.machineSecret,
-    });
+    const verifiedToken = await client.machineTokens.verifySecret({ secret });
     return { data: verifiedToken, tokenType: TokenType.MachineToken, errors: undefined };
   } catch (err: any) {
     return handleClerkAPIError(TokenType.MachineToken, err, 'Machine token not found');

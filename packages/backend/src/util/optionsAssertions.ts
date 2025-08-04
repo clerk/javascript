@@ -11,3 +11,9 @@ export function assertValidSecretKey(val: unknown): asserts val is string {
 export function assertValidPublishableKey(val: unknown): asserts val is string {
   parsePublishableKey(val as string | undefined, { fatal: true });
 }
+
+export function assertValidMachineSecretKey(val: unknown): asserts val is string {
+  if (!val || typeof val !== 'string') {
+    throw Error('Missing Clerk Machine Secret Key.');
+  }
+}

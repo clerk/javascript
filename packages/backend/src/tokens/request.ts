@@ -64,7 +64,7 @@ function assertMachineSecretOrSecretKey(authenticateContext: AuthenticateContext
   if (!authenticateContext.machineSecret && !authenticateContext.secretKey) {
     throw new Error(
       'Machine token authentication requires either a machine secret or a Clerk secret key. ' +
-        'Provide either the `machineSecret` option or ensure Clerk secret key is set.',
+        'Provide either the `machineSecretKey` option or ensure Clerk secret key is set.',
     );
   }
 }

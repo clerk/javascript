@@ -4,7 +4,7 @@ import snakecaseKeys from 'snakecase-keys';
 
 import { API_URL, API_VERSION, constants, SUPPORTED_BAPI_VERSION, USER_AGENT } from '../constants';
 import { runtime } from '../runtime';
-import { assertValidSecretKey } from '../util/optionsAssertions';
+import { assertValidMachineSecretKey, assertValidSecretKey } from '../util/optionsAssertions';
 import { joinPaths } from '../util/path';
 import { deserialize } from './resources/Deserializer';
 
@@ -28,18 +28,17 @@ type ClerkBackendApiRequestOptionsBodyParams =
          */
         deepSnakecaseBodyParamKeys?: boolean;
         /**
-         * If true, skips adding the instance secret key to the authorization header.
-         * Useful when you need to provide custom authorization (e.g., machine secrets).
+         * If true, requires a machine secret key to be provided.
          * @default false
          */
-        skipSecretKeyAuthorization?: boolean;
+        requireMachineSecretKey?: boolean;
       };
     }
   | {
       bodyParams?: never;
       options?: {
         deepSnakecaseBodyParamKeys?: boolean;
-        skipSecretKeyAuthorization?: never;
+        requireMachineSecretKey?: boolean;
       };
     };
 
@@ -92,12 +91,24 @@ type BuildRequestOptions = {
    * @default false
    */
   skipApiVersionInUrl?: boolean;
+  /* Machine secret key */
+  machineSecretKey?: string;
+  /**
+   * If true, uses machineSecretKey for authorization instead of secretKey.
+   *
+   * Note: This is only used for machine-to-machine tokens.
+   *
+   * @default false
+   */
+  useMachineSecretKey?: boolean;
 };
 
 export function buildRequest(options: BuildRequestOptions) {
   const requestFn = async <T>(requestOptions: ClerkBackendApiRequestOptions): Promise<ClerkBackendApiResponse<T>> => {
     const {
       secretKey,
+      machineSecretKey,
+      useMachineSecretKey = false,
       requireSecretKey = true,
       apiUrl = API_URL,
       apiVersion = API_VERSION,
@@ -105,10 +116,14 @@ export function buildRequest(options: BuildRequestOptions) {
       skipApiVersionInUrl = false,
     } = options;
     const { path, method, queryParams, headerParams, bodyParams, formData, options: opts } = requestOptions;
-    const { deepSnakecaseBodyParamKeys = false, skipSecretKeyAuthorization = false } = opts || {};
+    const { deepSnakecaseBodyParamKeys = false, requireMachineSecretKey = false } = opts || {};
 
     if (requireSecretKey) {
       assertValidSecretKey(secretKey);
+    }
+
+    if (requireMachineSecretKey) {
+      assertValidMachineSecretKey(machineSecretKey);
     }
 
     const url = skipApiVersionInUrl ? joinPaths(apiUrl, path) : joinPaths(apiUrl, apiVersion, path);
@@ -135,7 +150,11 @@ export function buildRequest(options: BuildRequestOptions) {
       ...headerParams,
     });
 
-    if (secretKey && !skipSecretKeyAuthorization) {
+    // When useMachineSecretKey is true and machineSecretKey is provided, use machine auth
+    // Otherwise, fall back to regular secretKey auth for all existing APIs
+    if (useMachineSecretKey && machineSecretKey) {
+      headers.set(constants.Headers.Authorization, `Bearer ${machineSecretKey}`);
+    } else if (secretKey) {
       headers.set(constants.Headers.Authorization, `Bearer ${secretKey}`);
     }
 

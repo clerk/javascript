@@ -27,12 +27,8 @@ describe('MachineTokenAPI', () => {
     it('creates a m2m token using machine secret', async () => {
       const apiClient = createBackendApiClient({
         apiUrl: 'https://api.clerk.test',
+        machineSecretKey: 'ak_xxxxx',
       });
-
-      const createParams = {
-        machineSecret: 'ak_xxxxx',
-        secondsUntilExpiration: 3600,
-      };
 
       server.use(
         http.post(
@@ -44,7 +40,9 @@ describe('MachineTokenAPI', () => {
         ),
       );
 
-      const response = await apiClient.machineTokens.create(createParams);
+      const response = await apiClient.machineTokens.create({
+        secondsUntilExpiration: 3600,
+      });
 
       expect(response.id).toBe(m2mId);
       expect(response.secret).toBe(m2mSecret);
@@ -67,10 +65,9 @@ describe('MachineTokenAPI', () => {
         ),
       );
 
-      // @ts-expect-error - machineSecret is required
-      const response = await apiClient.machineTokens.create({}).catch(err => err);
+      const response = await apiClient.machineTokens.create().catch(err => err);
 
-      expect(response.message).toBe('Missing machine secret.');
+      expect(response.message).toBe('Missing Clerk Machine Secret Key.');
     });
   });
 
@@ -92,13 +89,8 @@ describe('MachineTokenAPI', () => {
     it('revokes a m2m token using machine secret', async () => {
       const apiClient = createBackendApiClient({
         apiUrl: 'https://api.clerk.test',
+        machineSecretKey: 'ak_xxxxx',
       });
-
-      const revokeParams = {
-        machineSecret: 'ak_xxxxx',
-        m2mTokenId: m2mId,
-        revocationReason: 'revoked by test',
-      };
 
       server.use(
         http.post(
@@ -110,7 +102,10 @@ describe('MachineTokenAPI', () => {
         ),
       );
 
-      const response = await apiClient.machineTokens.revoke(revokeParams);
+      const response = await apiClient.machineTokens.revoke({
+        m2mTokenId: m2mId,
+        revocationReason: 'revoked by test',
+      });
 
       expect(response.revoked).toBe(true);
       expect(response.secret).toBeUndefined();
@@ -125,11 +120,6 @@ describe('MachineTokenAPI', () => {
         secretKey: 'sk_xxxxx',
       });
 
-      const revokeParams = {
-        m2mTokenId: m2mId,
-        revocationReason: 'revoked by test',
-      };
-
       server.use(
         http.post(
           `https://api.clerk.test/m2m_tokens/${m2mId}/revoke`,
@@ -140,7 +130,10 @@ describe('MachineTokenAPI', () => {
         ),
       );
 
-      const response = await apiClient.machineTokens.revoke(revokeParams);
+      const response = await apiClient.machineTokens.revoke({
+        m2mTokenId: m2mId,
+        revocationReason: 'revoked using instance secret',
+      });
 
       expect(response.revoked).toBe(true);
       expect(response.secret).toBeUndefined();
@@ -152,11 +145,6 @@ describe('MachineTokenAPI', () => {
         apiUrl: 'https://api.clerk.test',
       });
 
-      const revokeParams = {
-        m2mTokenId: m2mId,
-        revocationReason: 'revoked by test',
-      };
-
       server.use(
         http.post(
           `https://api.clerk.test/m2m_tokens/${m2mId}/revoke`,
@@ -166,7 +154,12 @@ describe('MachineTokenAPI', () => {
         ),
       );
 
-      const errResponse = await apiClient.machineTokens.revoke(revokeParams).catch(err => err);
+      const errResponse = await apiClient.machineTokens
+        .revoke({
+          m2mTokenId: m2mId,
+          revocationReason: 'revoked by test',
+        })
+        .catch(err => err);
 
       expect(errResponse.status).toBe(401);
     });
@@ -176,12 +169,8 @@ describe('MachineTokenAPI', () => {
     it('verifies a m2m token using machine secret', async () => {
       const apiClient = createBackendApiClient({
         apiUrl: 'https://api.clerk.test',
+        machineSecretKey: 'ak_xxxxx',
       });
-
-      const verifyParams = {
-        machineSecret: 'ak_xxxxx',
-        secret: m2mSecret,
-      };
 
       server.use(
         http.post(
@@ -193,7 +182,9 @@ describe('MachineTokenAPI', () => {
         ),
       );
 
-      const response = await apiClient.machineTokens.verifySecret(verifyParams);
+      const response = await apiClient.machineTokens.verifySecret({
+        secret: m2mSecret,
+      });
 
       expect(response.id).toBe(m2mId);
       expect(response.secret).toBe(m2mSecret);
@@ -207,10 +198,6 @@ describe('MachineTokenAPI', () => {
         secretKey: 'sk_xxxxx',
       });
 
-      const verifyParams = {
-        secret: m2mSecret,
-      };
-
       server.use(
         http.post(
           'https://api.clerk.test/m2m_tokens/verify',
@@ -221,7 +208,9 @@ describe('MachineTokenAPI', () => {
         ),
       );
 
-      const response = await apiClient.machineTokens.verifySecret(verifyParams);
+      const response = await apiClient.machineTokens.verifySecret({
+        secret: m2mSecret,
+      });
 
       expect(response.id).toBe(m2mId);
       expect(response.secret).toBe(m2mSecret);
@@ -234,10 +223,6 @@ describe('MachineTokenAPI', () => {
         apiUrl: 'https://api.clerk.test',
       });
 
-      const verifyParams = {
-        secret: m2mSecret,
-      };
-
       server.use(
         http.post(
           'https://api.clerk.test/m2m_tokens/verify',
@@ -247,7 +232,11 @@ describe('MachineTokenAPI', () => {
         ),
       );
 
-      const errResponse = await apiClient.machineTokens.verifySecret(verifyParams).catch(err => err);
+      const errResponse = await apiClient.machineTokens
+        .verifySecret({
+          secret: m2mSecret,
+        })
+        .catch(err => err);
 
       expect(errResponse.status).toBe(401);
     });

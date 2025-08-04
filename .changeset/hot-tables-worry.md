@@ -9,10 +9,12 @@ Adds machine-to-machine endpoints to the Backend SDK:
 A machine secret is required when creating M2M tokens.
 
 ```ts
-const clerkClient = createClerkClient()
+const clerkClient = createClerkClient({
+    machineSecretKey: process.env.CLERK_MACHINE_SECRET_KEY
+})
 
 clerkClient.machineTokens.create({
-    machineSecret: 'ak_xxxxx',
+    secondsUntilExpiration: 3600,
 })
 ```
 
@@ -22,9 +24,8 @@ You can revoke tokens using either a machine secret or instance secret:
 
 ```ts
 // Using machine secret
-const clerkClient = createClerkClient()
+const clerkClient = createClerkClient({ machineSecretKey: process.env.CLERK_MACHINE_SECRET_KEY })
 clerkClient.machineTokens.revoke({
-    machineSecret: 'ak_xxxxx',
     m2mTokenId: 'mt_xxxxx',
     revocationReason: 'Revoked by user',
 })
@@ -43,9 +44,8 @@ You can verify tokens using either a machine secret or instance secret:
 
 ```ts
 // Using machine secret
-const clerkClient = createClerkClient()
+const clerkClient = createClerkClient({ machineSecretKey: process.env.CLERK_MACHINE_SECRET_KEY })
 clerkClient.machineTokens.verifySecret({
-    machineSecret: 'ak_xxxxx',
     secret: 'mt_secret_xxxxx',
 })
 
@@ -59,11 +59,12 @@ clerkClient.machineTokens.verifySecret({
 To verify machine-to-machine tokens using when using `authenticateRequest()` with a machine secret, use the `machineSecret` option:
 
 ```ts
-const clerkClient = createClerkClient()
+const clerkClient = createClerkClient({
+    machineSecretKey: process.env.CLERK_MACHINE_SECRET_KEY
+})
 
 const authReq = await clerkClient.authenticateRequest(c.req.raw, {
   acceptsToken: 'machine_token',
-  machineSecret: 'ak_xxxxx'
 })
 
 if (authReq.isAuthenticated) {
