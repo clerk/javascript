@@ -1265,8 +1265,8 @@ describe('tokens.authenticateRequest(options)', () => {
       await expect(
         authenticateRequest(request, mockOptions({ acceptsToken: 'machine_token', secretKey: undefined })),
       ).rejects.toThrow(
-        'Machine token authentication requires either a machine secret or a Clerk secret key. ' +
-          'Provide either the `machineSecretKey` option or ensure Clerk secret key is set.',
+        'Machine token authentication requires either a Machine secret key or a Clerk secret key. ' +
+          'Ensure a Clerk secret key or Machine secret key is set.',
       );
     });
 
