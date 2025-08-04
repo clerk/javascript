@@ -714,6 +714,7 @@ export interface MachineJSON extends ClerkResourceJSON {
   updated_at: number;
   default_token_ttl: number;
   scoped_machines: MachineJSON[];
+  secret_key?: string;
 }
 
 export interface MachineScopeJSON {
