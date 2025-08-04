@@ -1,11 +1,12 @@
-import type { SignInResource } from './signIn';
+import type { SignInBetaResource } from './signIn';
 
 export interface State {
   signInSignal: {
     (): {
-      resource: SignInResource | null;
+      errors: unknown;
+      signIn: SignInBetaResource | null;
     };
-    (value: { resource: SignInResource | null }): void;
+    (value: { errors: unknown; signIn: SignInBetaResource | null }): void;
   };
   __internal_effect: (callback: () => void) => () => void;
   __internal_computed: <T>(getter: (previousValue?: T) => T) => () => T;

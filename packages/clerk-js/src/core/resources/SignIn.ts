@@ -30,6 +30,7 @@ import type {
   SignInIdentifier,
   SignInJSON,
   SignInJSONSnapshot,
+  SignInBetaResource,
   SignInResource,
   SignInSecondFactor,
   SignInStartEmailLinkFlowParams,
@@ -83,9 +84,14 @@ export class SignIn extends BaseResource implements SignInResource {
   createdSessionId: string | null = null;
   userData: UserData = new UserData(null);
 
+  __internal_beta: SignInBeta | null = new SignInBeta(this);
+  __internal_basePost;
+
   constructor(data: SignInJSON | SignInJSONSnapshot | null = null) {
     super();
     this.fromJSON(data);
+
+    this.__internal_basePost = this._basePost;
   }
 
   create = (params: SignInCreateParams): Promise<this> => {
@@ -471,5 +477,28 @@ export class SignIn extends BaseResource implements SignInResource {
       created_session_id: this.createdSessionId,
       user_data: this.userData.__internal_toSnapshot(),
     };
+  }
+}
+
+class SignInBeta implements SignInBetaResource {
+  constructor(readonly resource: SignIn) {}
+
+  get status() {
+    return this.resource.status;
+  }
+
+  async password({ identifier, password }: { identifier: string; password: string }): Promise<{ error: unknown }> {
+    eventBus.emit('signin:error', null);
+    try {
+      await this.resource.__internal_basePost({
+        path: this.resource.pathRoot,
+        body: { identifier, password },
+      });
+    } catch (err) {
+      eventBus.emit('signin:error', err);
+      return { error: err };
+    }
+
+    return { error: null };
   }
 }

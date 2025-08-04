@@ -1,10 +1,10 @@
-import type { SignInResource } from '@clerk/types';
+import type { SignInBetaResource } from '@clerk/types';
 import { useCallback, useSyncExternalStore } from 'react';
 
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvider';
 
-function useClerkSignal(signal: 'signIn'): { isLoaded: boolean; signIn: SignInResource | null } {
+function useClerkSignal(signal: 'signIn'): { errors: unknown; signIn: SignInBetaResource | null } | null {
   useAssertWrappedByClerkProvider('useSignInSignal');
 
   const clerk = useIsomorphicClerkContext();
@@ -36,7 +36,7 @@ function useClerkSignal(signal: 'signIn'): { isLoaded: boolean; signIn: SignInRe
 
     switch (signal) {
       case 'signIn':
-        return clerk.__internal_state.signInSignal().resource;
+        return clerk.__internal_state.signInSignal();
       default:
         throw new Error(`Unknown signal: ${signal}`);
     }
@@ -44,10 +44,7 @@ function useClerkSignal(signal: 'signIn'): { isLoaded: boolean; signIn: SignInRe
 
   const value = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 
-  return {
-    isLoaded: clerk.loaded,
-    [signal]: value,
-  };
+  return value;
 }
 
 export function useSignInSignal() {

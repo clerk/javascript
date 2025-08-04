@@ -125,6 +125,11 @@ export interface SignInResource extends ClerkResource {
   __internal_toSnapshot: () => SignInJSONSnapshot;
 }
 
+export interface SignInBetaResource {
+  status: SignInStatus | null;
+  password: (params: { identifier: string; password: string }) => Promise<{ error: unknown }>;
+}
+
 export type SignInStatus =
   | 'needs_identifier'
   | 'needs_first_factor'
