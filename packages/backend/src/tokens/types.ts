@@ -72,7 +72,7 @@ export type AuthenticateRequestOptions = {
    * This will override the Clerk secret key.
    * @internal
    */
-  machineSecret?: string;
+  machineSecretKey?: string;
 } & VerifyTokenOptions;
 
 /**
