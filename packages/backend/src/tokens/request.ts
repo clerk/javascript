@@ -61,7 +61,7 @@ function assertSignInUrlFormatAndOrigin(_signInUrl: string, origin: string) {
 }
 
 function assertMachineSecretOrSecretKey(authenticateContext: AuthenticateContext) {
-  if (!authenticateContext.machineSecret && !authenticateContext.secretKey) {
+  if (!authenticateContext.machineSecretKey && !authenticateContext.secretKey) {
     throw new Error(
       'Machine token authentication requires either a Machine secret key or a Clerk secret key. ' +
         'Ensure a Clerk secret key or Machine secret key is set.',
