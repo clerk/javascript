@@ -69,15 +69,12 @@ export class MachineApi extends AbstractAPI {
   }
 
   async update(params: UpdateMachineParams) {
-    const { machineId, name = null, defaultTokenTtl = null } = params;
+    const { machineId, ...bodyParams } = params;
     this.requireId(machineId);
     return this.request<Machine>({
       method: 'PATCH',
       path: joinPaths(basePath, machineId),
-      bodyParams: {
-        name,
-        defaultTokenTtl,
-      },
+      bodyParams,
     });
   }
 
