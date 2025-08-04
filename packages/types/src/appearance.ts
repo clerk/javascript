@@ -21,8 +21,9 @@ import type { Web3Provider } from './web3';
 type CSSProperties = CSS.PropertiesFallback<number | string>;
 type CSSPropertiesWithMultiValues = { [K in keyof CSSProperties]: CSSProperties[K] };
 type CSSPseudos = { [K in CSS.Pseudos as `&${K}`]?: CSSObject };
+type CSSDarkMode = { darkMode?: Omit<CSSObject, 'darkMode'> };
 
-interface CSSObject extends CSSPropertiesWithMultiValues, CSSPseudos {}
+interface CSSObject extends CSSPropertiesWithMultiValues, CSSPseudos, CSSDarkMode {}
 
 type UserDefinedStyle = string | CSSObject;
 
@@ -809,6 +810,20 @@ export type BaseThemeTaggedType = { __type: 'prebuilt_appearance' };
 export type BaseTheme = (BaseThemeTaggedType | 'clerk' | 'simple') & { cssLayerName?: string };
 
 export type Theme = {
+  /**
+   * CSS selector or media query for dark mode. When provided, elements with darkMode properties
+   * will apply dark mode styles when this selector matches.
+   * @example
+   * // CSS class selector
+   * darkModeSelector: '.dark'
+   * @example
+   * // CSS attribute selector
+   * darkModeSelector: '[data-theme="dark"]'
+   * @example
+   * // Media query
+   * darkModeSelector: '@media (prefers-color-scheme: dark)'
+   */
+  darkModeSelector?: string;
   /**
    * A theme used as the base theme for the components.
    * For further customisation, you can use the {@link Theme.layout}, {@link Theme.variables} and {@link Theme.elements} props.

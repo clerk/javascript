@@ -52,7 +52,7 @@ export const makeCustomizable = <P,>(
 
   const customizableComponent = React.forwardRef((props: Customizable<any>, ref) => {
     const { elementDescriptor, elementId, sx, className, ...restProps } = props;
-    const { parsedElements } = useAppearance();
+    const { parsedElements, darkModeSelector } = useAppearance();
     const descriptors = [
       defaultDescriptor,
       ...(Array.isArray(elementDescriptor) ? elementDescriptor : [elementDescriptor]),
@@ -69,7 +69,7 @@ export const makeCustomizable = <P,>(
       );
     }
 
-    const generatedStyles = generateClassName(parsedElements, descriptors, elementId, props);
+    const generatedStyles = generateClassName(parsedElements, descriptors, elementId, props, darkModeSelector);
     const generatedClassname = appendEmojiSeparator(generatedStyles.className, className);
     generatedStyles.css.unshift(defaultStyles, sx);
 

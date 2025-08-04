@@ -27,6 +27,7 @@ export const generateClassName = (
   elemDescriptors: ElementDescriptor[],
   elemId: ElementId | undefined,
   props: PropsWithState | undefined,
+  darkModeSelector?: string,
 ) => {
   const state = getElementState(props);
   let className = '';
@@ -38,7 +39,7 @@ export const generateClassName = (
   className = addClerkTargettableRequiredAttribute(className, props as any);
 
   className = addUserProvidedClassnames(className, parsedElements, elemDescriptors, elemId, state);
-  addUserProvidedStyleRules(css, parsedElements, elemDescriptors, elemId, state);
+  addUserProvidedStyleRules(css, parsedElements, elemDescriptors, elemId, state, darkModeSelector);
   return { className, css };
 };
 
@@ -83,10 +84,11 @@ const addUserProvidedStyleRules = (
   elemDescriptors: ElementDescriptor[],
   elemId: ElementId | undefined,
   state: ElementState | undefined,
+  darkModeSelector?: string,
 ) => {
   for (let j = 0; j < elemDescriptors.length; j++) {
     for (let i = 0; i < parsedElements.length; i++) {
-      addRulesFromElements(css, parsedElements[i], elemDescriptors[j], elemId, state);
+      addRulesFromElements(css, parsedElements[i], elemDescriptors[j], elemId, state, darkModeSelector);
     }
   }
 };
@@ -127,15 +129,28 @@ const getElementState = (props: PropsWithState | undefined): ElementState | unde
 
 const addStringClassname = (cn: string, val?: unknown) => (typeof val === 'string' ? cn + ' ' + val : cn);
 
-const addStyleRuleObject = (css: unknown[], val: unknown, specificity = 0) => {
+const addStyleRuleObject = (css: unknown[], val: unknown, specificity = 0, darkModeSelector?: string) => {
+  if (!val || typeof val !== 'object') return;
+
+  const { darkMode, ...lightStyles } = val as any;
+
+  // Add light mode styles (existing logic)
   if (specificity) {
-    if (val && typeof val === 'object') {
-      css.push({ ['&'.repeat(specificity)]: val });
-    }
+    css.push({ ['&'.repeat(specificity)]: lightStyles });
   } else {
-    if (val && typeof val === 'object') {
-      css.push(val);
+    css.push(lightStyles);
+  }
+
+  // Add dark mode styles if darkMode property exists and darkModeSelector is provided
+  if (darkMode && darkModeSelector && typeof darkMode === 'object') {
+    let transformedSelector = darkModeSelector;
+    if (!darkModeSelector.startsWith('@media')) {
+      transformedSelector = `${darkModeSelector} &`; // For class/attribute selectors
     }
+    const darkModeStyles = specificity
+      ? { ['&'.repeat(specificity)]: { [transformedSelector]: darkMode } }
+      : { [transformedSelector]: darkMode };
+    css.push(darkModeStyles);
   }
 };
 
@@ -181,21 +196,23 @@ const addRulesFromElements = (
   elemDescriptor: ElementDescriptor,
   elemId: ElementId | undefined,
   state: ElementState | undefined,
+  darkModeSelector?: string,
 ) => {
   if (!elements) {
     return;
   }
 
   type Key = keyof typeof elements;
-  addStyleRuleObject(css, elements[elemDescriptor.objectKey as Key]);
+  addStyleRuleObject(css, elements[elemDescriptor.objectKey as Key], 0, darkModeSelector);
   if (elemId) {
-    addStyleRuleObject(css, elements[elemDescriptor.getObjectKeyWithId(elemId) as Key]);
+    addStyleRuleObject(css, elements[elemDescriptor.getObjectKeyWithId(elemId) as Key], 0, darkModeSelector);
   }
   if (state) {
     addStyleRuleObject(
       css,
       elements[elemDescriptor.getObjectKeyWithState(state) as Key],
       STATE_PROP_TO_SPECIFICITY[state],
+      darkModeSelector,
     );
   }
   if (elemId && state) {
@@ -203,6 +220,7 @@ const addRulesFromElements = (
       css,
       elements[elemDescriptor.getObjectKeyWithIdAndState(elemId, state) as Key],
       STATE_PROP_TO_SPECIFICITY[state],
+      darkModeSelector,
     );
   }
 };
