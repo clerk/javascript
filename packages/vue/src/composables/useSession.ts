@@ -1,11 +1,11 @@
-import type { PendingSessionOptions, UseSessionReturn } from '@clerk/types';
+import type { UseSessionReturn } from '@clerk/types';
 import { computed } from 'vue';
 
 import type { ToComputedRefs } from '../utils';
 import { toComputedRefs } from '../utils';
 import { useClerkContext } from './useClerkContext';
 
-type UseSession = (options?: PendingSessionOptions) => ToComputedRefs<UseSessionReturn>;
+type UseSession = () => ToComputedRefs<UseSessionReturn>;
 
 /**
  * Returns the current [`Session`](https://clerk.com/docs/references/javascript/session) object which provides
@@ -32,23 +32,20 @@ type UseSession = (options?: PendingSessionOptions) => ToComputedRefs<UseSession
  *   </div>
  * </template>
  */
-export const useSession: UseSession = (options = {}) => {
-  const { sessionCtx, ...clerkContext } = useClerkContext();
+export const useSession: UseSession = () => {
+  const { sessionCtx, clerk } = useClerkContext();
 
   const result = computed<UseSessionReturn>(() => {
     if (sessionCtx.value === undefined) {
       return { isLoaded: false, isSignedIn: undefined, session: undefined };
     }
 
-    const pendingAsSignedOut =
-      sessionCtx.value?.status === 'pending' &&
-      (options.treatPendingAsSignedOut ?? clerkContext.treatPendingAsSignedOut);
-    const isSignedOut = sessionCtx.value === null || pendingAsSignedOut;
+    const isSignedOut = sessionCtx.value === null;
     if (isSignedOut) {
       return { isLoaded: true, isSignedIn: false, session: null };
     }
 
-    return { isLoaded: true, isSignedIn: true, session: sessionCtx.value };
+    return { isLoaded: true, isSignedIn: !!clerk.value?.isSignedIn, session: sessionCtx.value };
   });
 
   return toComputedRefs(result);

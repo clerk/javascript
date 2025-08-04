@@ -1,5 +1,36 @@
 # Change Log
 
+## 5.79.0
+
+### Minor Changes
+
+- [Billing Beta]: Update prefix for checkout status ([#6438](https://github.com/clerk/javascript/pull/6438)) by [@panteliselef](https://github.com/panteliselef)
+
+  Replaces `awaiting_` with `needs_`.
+
+- [Billing Beta] Remove `statement_id` from the checkout resource. ([#6437](https://github.com/clerk/javascript/pull/6437)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Add `inputmode="email"` to email fields to help prompt mobile devices to use a virtual keyboard optimized for entering email addresses. ([#6440](https://github.com/clerk/javascript/pull/6440)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix TelemetryCollector logic for clerk-js in browser to properly populate sdkMetadata for telemetry events. ([#6448](https://github.com/clerk/javascript/pull/6448)) by [@panteliselef](https://github.com/panteliselef)
+
+- Display alert on plan details error ([#6384](https://github.com/clerk/javascript/pull/6384)) by [@panteliselef](https://github.com/panteliselef)
+
+- Added proper type checking before using the in operator to prevent errors when modal state contains non-object values ([#6433](https://github.com/clerk/javascript/pull/6433)) by [@jacekradko](https://github.com/jacekradko)
+
+- Refactor billing statement page and payment attempt page data loading ([#6420](https://github.com/clerk/javascript/pull/6420)) by [@aeliox](https://github.com/aeliox)
+
+- Added temporary patch for API keys pagination compatibility ([#6451](https://github.com/clerk/javascript/pull/6451)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fix SSO callback for after-auth custom flows ([#6430](https://github.com/clerk/javascript/pull/6430)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`7a46679`](https://github.com/clerk/javascript/commit/7a46679a004739a7f712097c5779e9f5c068722e), [`05cc5ec`](https://github.com/clerk/javascript/commit/05cc5ecd82ecdbcc9922d3286224737a81813be0), [`22c35ef`](https://github.com/clerk/javascript/commit/22c35efb59226df2efaa2891fa4775c13312f4c6), [`c69de58`](https://github.com/clerk/javascript/commit/c69de58d7c01257eedc0ffe5162c91c5a8daeef6), [`e8d816a`](https://github.com/clerk/javascript/commit/e8d816a3350e862c3e9e1d4f8c96c047a0a016a2), [`aa9f185`](https://github.com/clerk/javascript/commit/aa9f185e21b58f8a6e03ea44ce29ee09ad2477d9), [`af0e123`](https://github.com/clerk/javascript/commit/af0e12393c9412281626e20dafb1b3a15558f6d9), [`3d1d871`](https://github.com/clerk/javascript/commit/3d1d8711405646cf3c2aabe99e08337a1028703a)]:
+  - @clerk/shared@3.17.0
+  - @clerk/types@4.72.0
+  - @clerk/localizations@3.20.6
+
 ## 5.78.0
 
 ### Minor Changes
