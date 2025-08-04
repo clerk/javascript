@@ -1,11 +1,7 @@
 import { Feature } from './Feature';
 import type { CommercePlanJSON } from './JSON';
 
-/**
- * The Backend `Organization` object is similar to the [`Organization`](https://clerk.com/docs/references/javascript/organization) object as it holds information about an organization, as well as methods for managing it. However, the Backend `Organization` object is different in that it is used in the [Backend API](https://clerk.com/docs/reference/backend-api/tag/Organizations#operation/ListOrganizations){{ target: '_blank' }} and is not directly accessible from the Frontend API.
- */
-
-type CommerceAmount = {
+type CommerceFee = {
   amount: number;
   amountFormatted: string;
   currency: string;
@@ -15,65 +11,60 @@ type CommerceAmount = {
 export class CommercePlan {
   constructor(
     /**
-     * The unique identifier for the organization.
+     * The unique identifier for the plan.
      */
     readonly id: string,
     /**
-     * The name of the organization.
+     * The id of the product the plan belongs to.
      */
     readonly productId: string,
     /**
-     * The URL-friendly identifier of the user's active organization. If supplied, it must be unique for the instance.
+     * The name of the plan.
      */
     readonly name: string,
     /**
-     * Holds the organization's logo. Compatible with Clerk's [Image Optimization](https://clerk.com/docs/guides/image-optimization).
+     * The URL-friendly identifier of the plan.
      */
     readonly slug: string,
     /**
-     * Whether the organization has an image.
+     * The description of the plan.
      */
     readonly description: string | undefined,
     /**
-     * The date when the organization was first created.
+     * Whether the plan is the default plan.
      */
     readonly isDefault: boolean,
     /**
-     * The date when the organization was last updated.
+     * Whether the plan is recurring.
      */
     readonly isRecurring: boolean,
     /**
-     * Metadata that can be read from the Frontend API and [Backend API](https://clerk.com/docs/reference/backend-api){{ target: '_blank' }} and can be set only from the Backend API.
-     */
-    readonly amount: number,
-    /**
-     * Metadata that can be read and set only from the [Backend API](https://clerk.com/docs/reference/backend-api){{ target: '_blank' }}.
-     */
-    readonly period: 'month' | 'annual',
-    /**
-     * The maximum number of memberships allowed in the organization.
-     */
-    readonly interval: number,
-    /**
-     * Whether the organization allows admins to delete users.
+     * Whether the plan has a base fee.
      */
     readonly hasBaseFee: boolean,
     /**
-     * The number of members in the organization.
-     */
-    readonly currency: string,
-    /**
-     * The ID of the user who created the organization.
-     */
-    readonly annualMonthlyAmount: number,
-    /**
-     * Whether the organization allows admins to delete users.
+     * Whether the plan is displayed in the `<PriceTable/>` component.
      */
     readonly publiclyVisible: boolean,
-    readonly fee: CommerceAmount,
-    readonly annualFee: CommerceAmount,
-    readonly annualMonthlyFee: CommerceAmount,
+    /**
+     * The monthly fee of the plan.
+     */
+    readonly fee: CommerceFee,
+    /**
+     * The annual fee of the plan.
+     */
+    readonly annualFee: CommerceFee,
+    /**
+     * The annual fee of the plan on a monthly basis.
+     */
+    readonly annualMonthlyFee: CommerceFee,
+    /**
+     * The type of payer for the plan.
+     */
     readonly forPayerType: 'org' | 'user',
+    /**
+     * The features the plan offers.
+     */
     readonly features: Feature[],
   ) {}
 
@@ -94,12 +85,7 @@ export class CommercePlan {
       data.description,
       data.is_default,
       data.is_recurring,
-      data.amount,
-      data.period,
-      data.interval,
       data.has_base_fee,
-      data.currency,
-      data.annual_monthly_amount,
       data.publicly_visible,
       formatAmountJSON(data.fee),
       formatAmountJSON(data.annual_fee),
