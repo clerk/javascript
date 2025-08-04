@@ -6,6 +6,9 @@ import packageJSON from './package.json';
 
 export default defineConfig({
   source: {
+    entry: {
+      index: ['./src/**', '!src/**/*.md', '!src/**/__tests__/**/*'],
+    },
     define: {
       __DEV__: false,
       __PKG_NAME__: JSON.stringify(packageJSON.name),
