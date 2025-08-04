@@ -38,8 +38,8 @@ export interface ConsoleLoggerOptions {
 class DebugLoggerManager {
   private static instance: DebugLoggerManager;
   private initialized = false;
-  private logger: any = null;
-  private initializationPromise: Promise<any> | null = null;
+  private logger: DebugLogger | null = null;
+  private initializationPromise: Promise<DebugLogger | null> | null = null;
 
   private constructor() {}
 
@@ -59,7 +59,7 @@ class DebugLoggerManager {
    * @param options - Configuration options for the logger
    * @returns The debug logger instance
    */
-  async initialize(options: LoggerOptions = {}): Promise<any> {
+  async initialize(options: LoggerOptions = {}): Promise<DebugLogger | null> {
     // If already initialized, return the logger immediately
     if (this.initialized && this.logger) {
       return this.logger;
@@ -80,7 +80,7 @@ class DebugLoggerManager {
    * @param options - Configuration options for the logger
    * @returns Promise resolving to the debug logger instance
    */
-  private async performInitialization(options: LoggerOptions): Promise<any> {
+  private async performInitialization(options: LoggerOptions): Promise<DebugLogger | null> {
     try {
       const { endpoint, logLevel = 'info', filters } = options;
 
@@ -103,7 +103,7 @@ class DebugLoggerManager {
   /**
    * Gets the current logger instance
    */
-  getLogger(): any {
+  getLogger(): DebugLogger | null {
     return this.logger;
   }
 
@@ -129,7 +129,7 @@ class DebugLoggerManager {
  * @param options - Configuration options for the logger
  * @returns Promise resolving to the debug logger instance
  */
-export async function getDebugLogger(options: LoggerOptions = {}): Promise<any> {
+export async function getDebugLogger(options: LoggerOptions = {}): Promise<DebugLogger | null> {
   const manager = DebugLoggerManager.getInstance();
   return manager.initialize(options);
 }
