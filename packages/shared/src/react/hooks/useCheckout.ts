@@ -28,21 +28,40 @@ type ForceNull<T> = {
 
 type CheckoutProperties = Omit<RemoveFunctions<CommerceCheckoutResource>, 'pathRoot' | 'status'>;
 
-type NullableCheckoutProperties = CheckoutProperties | ForceNull<CheckoutProperties>;
+type FetchStatusAndError =
+  | {
+      error: ClerkAPIResponseError;
+      fetchStatus: 'error';
+    }
+  | {
+      error: null;
+      fetchStatus: 'idle' | 'fetching';
+    };
+
+/**
+ * @internal
+ * On status === 'needs_initialization', all properties are null.
+ * On status === 'needs_confirmation' or 'completed', all properties are defined the same as the CommerceCheckoutResource.
+ */
+type CheckoutPropertiesPerStatus =
+  | ({
+      status: Extract<__experimental_CheckoutCacheState['status'], 'needs_initialization'>;
+    } & ForceNull<CheckoutProperties>)
+  | ({
+      status: Extract<__experimental_CheckoutCacheState['status'], 'needs_confirmation' | 'completed'>;
+    } & CheckoutProperties);
 
 type __experimental_UseCheckoutReturn = {
-  checkout: NullableCheckoutProperties & {
-    confirm: __experimental_CheckoutInstance['confirm'];
-    start: __experimental_CheckoutInstance['start'];
-    isStarting: boolean;
-    isConfirming: boolean;
-    error: ClerkAPIResponseError | null;
-    status: __experimental_CheckoutCacheState['status'];
-    clear: () => void;
-    finalize: (params?: { redirectUrl: string }) => void;
-    fetchStatus: 'idle' | 'fetching' | 'error';
-    getState: () => __experimental_CheckoutCacheState;
-  };
+  checkout: FetchStatusAndError &
+    CheckoutPropertiesPerStatus & {
+      confirm: __experimental_CheckoutInstance['confirm'];
+      start: __experimental_CheckoutInstance['start'];
+      clear: () => void;
+      finalize: (params?: { redirectUrl: string }) => void;
+      getState: () => __experimental_CheckoutCacheState;
+      isStarting: boolean;
+      isConfirming: boolean;
+    };
 };
 
 type Params = Parameters<typeof __experimental_CheckoutProvider>[0];
@@ -78,7 +97,7 @@ export const useCheckout = (options?: Params): __experimental_UseCheckoutReturn 
     () => manager.getState(),
   );
 
-  const properties = useMemo<NullableCheckoutProperties>(() => {
+  const properties = useMemo<CheckoutProperties | ForceNull<CheckoutProperties>>(() => {
     if (!managerProperties.checkout) {
       return {
         id: null,
@@ -119,5 +138,5 @@ export const useCheckout = (options?: Params): __experimental_UseCheckoutReturn 
 
   return {
     checkout,
-  };
+  } as __experimental_UseCheckoutReturn;
 };
