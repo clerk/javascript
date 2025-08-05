@@ -4,7 +4,7 @@ import snakecaseKeys from 'snakecase-keys';
 
 import { API_URL, API_VERSION, constants, SUPPORTED_BAPI_VERSION, USER_AGENT } from '../constants';
 import { runtime } from '../runtime';
-import { assertValidMachineSecretKey, assertValidSecretKey } from '../util/optionsAssertions';
+import { assertValidSecretKey } from '../util/optionsAssertions';
 import { joinPaths } from '../util/path';
 import { deserialize } from './resources/Deserializer';
 
@@ -27,18 +27,12 @@ type ClerkBackendApiRequestOptionsBodyParams =
          * @default false
          */
         deepSnakecaseBodyParamKeys?: boolean;
-        /**
-         * If true, requires a machine secret key to be provided.
-         * @default false
-         */
-        requireMachineSecretKey?: boolean;
       };
     }
   | {
       bodyParams?: never;
       options?: {
         deepSnakecaseBodyParamKeys?: boolean;
-        requireMachineSecretKey?: boolean;
       };
     };
 
@@ -116,14 +110,10 @@ export function buildRequest(options: BuildRequestOptions) {
       skipApiVersionInUrl = false,
     } = options;
     const { path, method, queryParams, headerParams, bodyParams, formData, options: opts } = requestOptions;
-    const { deepSnakecaseBodyParamKeys = false, requireMachineSecretKey = false } = opts || {};
+    const { deepSnakecaseBodyParamKeys = false } = opts || {};
 
     if (requireSecretKey) {
       assertValidSecretKey(secretKey);
-    }
-
-    if (requireMachineSecretKey) {
-      assertValidMachineSecretKey(machineSecretKey);
     }
 
     const url = skipApiVersionInUrl ? joinPaths(apiUrl, path) : joinPaths(apiUrl, apiVersion, path);
@@ -150,12 +140,14 @@ export function buildRequest(options: BuildRequestOptions) {
       ...headerParams,
     });
 
-    // When useMachineSecretKey is true and machineSecretKey is provided, use machine auth
-    // Otherwise, fall back to regular secretKey auth for all existing APIs
-    if (useMachineSecretKey && machineSecretKey) {
-      headers.set(constants.Headers.Authorization, `Bearer ${machineSecretKey}`);
-    } else if (secretKey) {
-      headers.set(constants.Headers.Authorization, `Bearer ${secretKey}`);
+    // If Authorization header already exists, preserve it.
+    // Otherwise, use machine secret key if enabled, or fall back to regular secret key
+    if (!headers.has(constants.Headers.Authorization)) {
+      if (useMachineSecretKey && machineSecretKey) {
+        headers.set(constants.Headers.Authorization, `Bearer ${machineSecretKey}`);
+      } else if (secretKey) {
+        headers.set(constants.Headers.Authorization, `Bearer ${secretKey}`);
+      }
     }
 
     let res: Response | undefined;

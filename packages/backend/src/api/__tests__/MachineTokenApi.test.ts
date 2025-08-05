@@ -60,14 +60,29 @@ describe('MachineTokenAPI', () => {
         http.post(
           'https://api.clerk.test/m2m_tokens',
           validateHeaders(() => {
-            return HttpResponse.json(mockM2MToken);
+            return HttpResponse.json(
+              {
+                errors: [
+                  {
+                    message:
+                      'The provided Machine Secret Key is invalid. Make sure that your Machine Secret Key is correct.',
+                    code: 'machine_secret_key_invalid',
+                  },
+                ],
+              },
+              { status: 401 },
+            );
           }),
         ),
       );
 
-      const response = await apiClient.machineTokens.create().catch(err => err);
+      const errResponse = await apiClient.machineTokens.create().catch(err => err);
 
-      expect(response.message).toBe('Missing Clerk Machine Secret Key.');
+      expect(errResponse.status).toBe(401);
+      expect(errResponse.errors[0].code).toBe('machine_secret_key_invalid');
+      expect(errResponse.errors[0].message).toBe(
+        'The provided Machine Secret Key is invalid. Make sure that your Machine Secret Key is correct.',
+      );
     });
   });
 

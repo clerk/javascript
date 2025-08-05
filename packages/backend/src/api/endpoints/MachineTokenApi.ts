@@ -1,3 +1,4 @@
+import type { ClerkBackendApiRequestOptions } from '../../api/request';
 import { joinPaths } from '../../util/path';
 import type { MachineToken } from '../resources/MachineToken';
 import { AbstractAPI } from './AbstractApi';
@@ -5,57 +6,85 @@ import { AbstractAPI } from './AbstractApi';
 const basePath = '/m2m_tokens';
 
 type CreateMachineTokenParams = {
+  machineSecretKey?: string;
   secondsUntilExpiration?: number | null;
   claims?: Record<string, unknown> | null;
 };
 
 type RevokeMachineTokenParams = {
+  machineSecretKey?: string;
   m2mTokenId: string;
   revocationReason?: string | null;
 };
 
 type VerifyMachineTokenParams = {
+  machineSecretKey?: string;
   secret: string;
 };
 
 export class MachineTokenApi extends AbstractAPI {
-  async create(params?: CreateMachineTokenParams) {
-    const { claims = null, secondsUntilExpiration = null } = params || {};
+  #createRequestOptions(options: ClerkBackendApiRequestOptions, machineSecretKey?: string) {
+    if (machineSecretKey) {
+      return {
+        ...options,
+        headerParams: {
+          Authorization: `Bearer ${machineSecretKey}`,
+        },
+      };
+    }
 
-    return this.request<MachineToken>({
-      method: 'POST',
-      path: basePath,
-      bodyParams: {
-        secondsUntilExpiration,
-        claims,
+    return options;
+  }
+
+  async create(params?: CreateMachineTokenParams) {
+    const { claims = null, machineSecretKey, secondsUntilExpiration = null } = params || {};
+
+    const requestOptions = this.#createRequestOptions(
+      {
+        method: 'POST',
+        path: basePath,
+        bodyParams: {
+          secondsUntilExpiration,
+          claims,
+        },
       },
-      options: {
-        requireMachineSecretKey: true,
-      },
-    });
+      machineSecretKey,
+    );
+
+    return this.request<MachineToken>(requestOptions);
   }
 
   async revoke(params: RevokeMachineTokenParams) {
-    const { m2mTokenId, revocationReason = null } = params;
+    const { m2mTokenId, revocationReason = null, machineSecretKey } = params;
 
     this.requireId(m2mTokenId);
 
-    return this.request<MachineToken>({
-      method: 'POST',
-      path: joinPaths(basePath, m2mTokenId, 'revoke'),
-      bodyParams: {
-        revocationReason,
+    const requestOptions = this.#createRequestOptions(
+      {
+        method: 'POST',
+        path: joinPaths(basePath, m2mTokenId, 'revoke'),
+        bodyParams: {
+          revocationReason,
+        },
       },
-    });
+      machineSecretKey,
+    );
+
+    return this.request<MachineToken>(requestOptions);
   }
 
   async verifySecret(params: VerifyMachineTokenParams) {
-    const { secret } = params;
+    const { secret, machineSecretKey } = params;
 
-    return this.request<MachineToken>({
-      method: 'POST',
-      path: joinPaths(basePath, 'verify'),
-      bodyParams: { secret },
-    });
+    const requestOptions = this.#createRequestOptions(
+      {
+        method: 'POST',
+        path: joinPaths(basePath, 'verify'),
+        bodyParams: { secret },
+      },
+      machineSecretKey,
+    );
+
+    return this.request<MachineToken>(requestOptions);
   }
 }
