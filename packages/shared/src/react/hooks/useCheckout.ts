@@ -53,14 +53,18 @@ export const useCheckout = (options?: Params): __experimental_UseCheckoutReturn 
 
   const clerk = useClerk();
   const { organization } = useOrganization();
-  const { user } = useUser();
+  const { isLoaded, user } = useUser();
+
+  if (!isLoaded) {
+    throw new Error('Clerk: Ensure that `useCheckout` is inside a component wrapped with `<ClerkLoaded />`.');
+  }
 
   if (!user) {
-    throw new Error('Clerk: User is not authenticated');
+    throw new Error('Clerk: Ensure that `useCheckout` is inside a component wrapped with `<SignedIn />`.');
   }
 
   if (forOrganization === 'organization' && !organization) {
-    throw new Error('Clerk: Use `setActive` to set the organization');
+    throw new Error('Clerk: Wrap your flow with a check for an active organization');
   }
 
   const manager = useMemo(
