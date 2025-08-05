@@ -1210,10 +1210,14 @@ export type __internal_LocalizationResource = {
       actionLink: LocalizationValue;
     };
     createOrganization: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
       formButtonSubmit: LocalizationValue;
       formButtonReset: LocalizationValue;
     };
     selectOrganization: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
       suggestionsAcceptedLabel: LocalizationValue;
       action__suggestionsAccept: LocalizationValue;
       action__createOrganization: LocalizationValue;

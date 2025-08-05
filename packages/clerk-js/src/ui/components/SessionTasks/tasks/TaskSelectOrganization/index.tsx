@@ -5,7 +5,6 @@ import { useSignOutContext, withCoreSessionSwitchGuard } from '@/ui/contexts';
 import { descriptors, Flex, Flow, localizationKeys, Spinner } from '@/ui/customizables';
 import { Card } from '@/ui/elements/Card';
 import { withCardStateProvider } from '@/ui/elements/contexts';
-import { Header } from '@/ui/elements/Header';
 import { useMultipleSessions } from '@/ui/hooks/useMultipleSessions';
 import { useOrganizationListInView } from '@/ui/hooks/useOrganizationListInView';
 
@@ -36,7 +35,7 @@ const TaskSelectOrganizationInternal = () => {
   return (
     <Flow.Root flow='taskSelectOrganization'>
       <Card.Root>
-        <Card.Content sx={t => ({ padding: `${t.space.$8} ${t.space.$none} ${t.space.$none}`, gap: t.space.$8 })}>
+        <Card.Content sx={t => ({ padding: `${t.space.$8} ${t.space.$none} ${t.space.$none}`, gap: t.space.$7 })}>
           {isLoading ? (
             <Flex
               direction={'row'}
@@ -54,17 +53,7 @@ const TaskSelectOrganizationInternal = () => {
               />
             </Flex>
           ) : (
-            <>
-              <Header.Root
-                showLogo
-                sx={t => ({ padding: `${t.space.$none} ${t.space.$8}` })}
-              >
-                <Header.Title localizationKey={localizationKeys('taskSelectOrganization.title')} />
-                <Header.Subtitle localizationKey={localizationKeys('taskSelectOrganization.subtitle')} />
-              </Header.Root>
-
-              <TaskSelectOrganizationFlows initialFlow={hasExistingResources ? 'select' : 'create'} />
-            </>
+            <TaskSelectOrganizationFlows initialFlow={hasExistingResources ? 'select' : 'create'} />
           )}
         </Card.Content>
 

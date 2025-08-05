@@ -19,6 +19,7 @@ import { useSessionTasksContext } from '@/ui/contexts/components/SessionTasks';
 import { Col, descriptors, localizationKeys, Text } from '@/ui/customizables';
 import { Action, Actions } from '@/ui/elements/Actions';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { Header } from '@/ui/elements/Header';
 import { OrganizationPreview } from '@/ui/elements/OrganizationPreview';
 import { useOrganizationListInView } from '@/ui/hooks/useOrganizationListInView';
 import { Add } from '@/ui/icons';
@@ -41,46 +42,55 @@ export const SelectOrganizationScreen = withCardStateProvider(
     const userSuggestionsData = userSuggestions.data?.filter(a => !!a);
 
     return (
-      <Col elementDescriptor={descriptors.main}>
-        <OrganizationPreviewListItems elementDescriptor={descriptors.taskSelectOrganizationPreviewItems}>
-          <Actions role='menu'>
-            {(userMemberships.count || 0) > 0 &&
-              userMemberships.data?.map(inv => {
-                return (
-                  <MembershipPreview
-                    key={inv.id}
-                    {...inv}
-                  />
-                );
-              })}
+      <>
+        <Header.Root
+          showLogo
+          sx={t => ({ padding: `${t.space.$none} ${t.space.$8}` })}
+        >
+          <Header.Title localizationKey={localizationKeys('taskSelectOrganization.selectOrganization.title')} />
+          <Header.Subtitle localizationKey={localizationKeys('taskSelectOrganization.selectOrganization.subtitle')} />
+        </Header.Root>
+        <Col elementDescriptor={descriptors.main}>
+          <OrganizationPreviewListItems elementDescriptor={descriptors.taskSelectOrganizationPreviewItems}>
+            <Actions role='menu'>
+              {(userMemberships.count || 0) > 0 &&
+                userMemberships.data?.map(inv => {
+                  return (
+                    <MembershipPreview
+                      key={inv.id}
+                      {...inv}
+                    />
+                  );
+                })}
 
-            {!userMemberships.hasNextPage &&
-              userInvitationsData?.map(inv => {
-                return (
-                  <InvitationPreview
-                    key={inv.id}
-                    {...inv}
-                  />
-                );
-              })}
+              {!userMemberships.hasNextPage &&
+                userInvitationsData?.map(inv => {
+                  return (
+                    <InvitationPreview
+                      key={inv.id}
+                      {...inv}
+                    />
+                  );
+                })}
 
-            {!userMemberships.hasNextPage &&
-              !userInvitations.hasNextPage &&
-              userSuggestionsData?.map(inv => {
-                return (
-                  <SuggestionPreview
-                    key={inv.id}
-                    {...inv}
-                  />
-                );
-              })}
+              {!userMemberships.hasNextPage &&
+                !userInvitations.hasNextPage &&
+                userSuggestionsData?.map(inv => {
+                  return (
+                    <SuggestionPreview
+                      key={inv.id}
+                      {...inv}
+                    />
+                  );
+                })}
 
-            {(hasNextPage || isLoading) && <OrganizationPreviewSpinner ref={ref} />}
+              {(hasNextPage || isLoading) && <OrganizationPreviewSpinner ref={ref} />}
 
-            <CreateOrganizationButton onCreateOrganizationClick={onCreateOrganizationClick} />
-          </Actions>
-        </OrganizationPreviewListItems>
-      </Col>
+              <CreateOrganizationButton onCreateOrganizationClick={onCreateOrganizationClick} />
+            </Actions>
+          </OrganizationPreviewListItems>
+        </Col>
+      </>
     );
   },
 );

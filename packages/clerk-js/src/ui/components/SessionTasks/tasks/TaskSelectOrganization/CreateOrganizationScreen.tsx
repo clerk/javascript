@@ -6,6 +6,7 @@ import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Form } from '@/ui/elements/Form';
 import { FormButtonContainer } from '@/ui/elements/FormButtons';
 import { FormContainer } from '@/ui/elements/FormContainer';
+import { Header } from '@/ui/elements/Header';
 import { createSlug } from '@/ui/utils/createSlug';
 import { handleError } from '@/ui/utils/errorHandler';
 import { useFormControl } from '@/ui/utils/useFormControl';
@@ -65,44 +66,53 @@ export const CreateOrganizationScreen = withCardStateProvider((props: CreateOrga
   const isSubmitButtonDisabled = !nameField.value || !isLoaded;
 
   return (
-    <FormContainer>
-      <Form.Root
-        onSubmit={onSubmit}
-        sx={t => ({ padding: `${t.space.$none} ${t.space.$10} ${t.space.$8}` })}
+    <>
+      <Header.Root
+        showLogo
+        sx={t => ({ padding: `${t.space.$none} ${t.space.$8}` })}
       >
-        <Form.ControlRow elementId={nameField.id}>
-          <Form.PlainInput
-            {...nameField.props}
-            onChange={onChangeName}
-            isRequired
-            autoFocus
-            ignorePasswordManager
-          />
-        </Form.ControlRow>
-        <Form.ControlRow elementId={slugField.id}>
-          <Form.PlainInput
-            {...slugField.props}
-            onChange={event => updateSlugField(event.target.value)}
-            isRequired
-            pattern='^(?=.*[a-z0-9])[a-z0-9\-]+$'
-            ignorePasswordManager
-          />
-        </Form.ControlRow>
-
-        <FormButtonContainer sx={() => ({ flexDirection: 'column' })}>
-          <Form.SubmitButton
-            block
-            isDisabled={isSubmitButtonDisabled}
-            localizationKey={localizationKeys('taskSelectOrganization.createOrganization.formButtonSubmit')}
-          />
-          {props.onCancel && (
-            <Form.ResetButton
-              localizationKey={localizationKeys('taskSelectOrganization.createOrganization.formButtonReset')}
-              onClick={props.onCancel}
+        <Header.Title localizationKey={localizationKeys('taskSelectOrganization.createOrganization.title')} />
+        <Header.Subtitle localizationKey={localizationKeys('taskSelectOrganization.createOrganization.subtitle')} />
+      </Header.Root>
+      <FormContainer>
+        <Form.Root
+          onSubmit={onSubmit}
+          sx={t => ({ padding: `${t.space.$none} ${t.space.$10} ${t.space.$8}` })}
+        >
+          <Form.ControlRow elementId={nameField.id}>
+            <Form.PlainInput
+              {...nameField.props}
+              onChange={onChangeName}
+              isRequired
+              autoFocus
+              ignorePasswordManager
             />
-          )}
-        </FormButtonContainer>
-      </Form.Root>
-    </FormContainer>
+          </Form.ControlRow>
+          <Form.ControlRow elementId={slugField.id}>
+            <Form.PlainInput
+              {...slugField.props}
+              onChange={event => updateSlugField(event.target.value)}
+              isRequired
+              pattern='^(?=.*[a-z0-9])[a-z0-9\-]+$'
+              ignorePasswordManager
+            />
+          </Form.ControlRow>
+
+          <FormButtonContainer sx={() => ({ flexDirection: 'column' })}>
+            <Form.SubmitButton
+              block
+              isDisabled={isSubmitButtonDisabled}
+              localizationKey={localizationKeys('taskSelectOrganization.createOrganization.formButtonSubmit')}
+            />
+            {props.onCancel && (
+              <Form.ResetButton
+                localizationKey={localizationKeys('taskSelectOrganization.createOrganization.formButtonReset')}
+                onClick={props.onCancel}
+              />
+            )}
+          </FormButtonContainer>
+        </Form.Root>
+      </FormContainer>
+    </>
   );
 });
