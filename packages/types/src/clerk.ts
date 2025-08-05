@@ -57,7 +57,7 @@ import type { ClientJSONSnapshot, EnvironmentJSONSnapshot } from './snapshots';
 import type { Web3Strategy } from './strategies';
 import type { TelemetryCollector } from './telemetry';
 import type { UserResource } from './user';
-import type { Autocomplete, DeepPartial, DeepSnakeToCamel, FlattenUnionType } from './utils';
+import type { Autocomplete, DeepPartial, DeepSnakeToCamel } from './utils';
 import type { WaitlistResource } from './waitlist';
 
 type __experimental_CheckoutStatus = 'needs_initialization' | 'needs_confirmation' | 'completed';
@@ -2154,9 +2154,3 @@ export interface __internal_NavigateToTaskIfAvailableParams {
 export interface LoadedClerk extends Clerk {
   client: ClientResource;
 }
-
-type Prettify<T> = {
-  [K in keyof T]: T[K];
-} & {};
-
-type _B = Prettify<FlattenUnionType<__internal_PlanDetailsProps>>;

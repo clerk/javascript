@@ -114,29 +114,11 @@ export type Without<T, W> = {
  */
 export type Override<T, U> = Omit<T, keyof U> & U;
 
-/**
- * Utility type that flattens a discriminated union type by making all discriminated properties optional
- * and preserving the common properties as they are. Also handles intersection types.
- *
- * @example
- * type Example = FlattenUnionType<{ a: string } | { b: number } & { c: boolean }>
- * // Result: { a?: string; b?: number; c: boolean }
- */
-// export type FlattenUnionType<T> = {
-//   [P in keyof UnionToIntersection<T>]?: (UnionToIntersection<T>)[P]
-// } & {
-//   [P in keyof T]: T[P]
-// }[keyof T];
-
-// type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (k: infer I) => void ? I : never;
-
 // Converts a union of two types into an intersection
 // i.e. A | B -> A & B
 type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (k: infer I) => void ? I : never;
 
-// Flattens two union types into a single type with optional values
-// i.e. FlattenUnion<{ a: number, c: number } | { b: string, c: number }> = { a?: number, b?: string, c: number }
-export type FlattenUnionType<T> = {
+type FlattenUnionTypeInternal<T> = {
   [K in keyof UnionToIntersection<T>]: K extends keyof T
     ? T[K] extends any[]
       ? T[K]
@@ -145,3 +127,21 @@ export type FlattenUnionType<T> = {
         : T[K]
     : UnionToIntersection<T>[K] | undefined;
 };
+
+// Convert properties with `| undefined` to optional properties
+type UndefinedToOptional<T> = {
+  [K in keyof T as undefined extends T[K] ? K : never]?: Exclude<T[K], undefined>;
+} & {
+  [K in keyof T as undefined extends T[K] ? never : K]: T[K];
+};
+
+/**
+ * Flattens a union type into a single type with all properties, making unioned properties optional.
+ *
+ * @example
+ * type A = { a: number; c: number };
+ * type B = { b: string; c: number };
+ * type Result = FlattenUnionType<A | B>;
+ * // Result: { a?: number; b?: string; c: number }
+ */
+export type FlattenUnionType<T> = UndefinedToOptional<FlattenUnionTypeInternal<T>>;
