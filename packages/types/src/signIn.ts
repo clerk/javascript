@@ -125,9 +125,20 @@ export interface SignInResource extends ClerkResource {
   __internal_toSnapshot: () => SignInJSONSnapshot;
 }
 
-export interface SignInBetaResource {
+export interface SignInFutureResource {
   status: SignInStatus | null;
+  create: (params: { identifier: string }) => Promise<{ error: unknown }>;
   password: (params: { identifier: string; password: string }) => Promise<{ error: unknown }>;
+  emailCode: {
+    sendCode: (params: { email: string }) => Promise<{ error: unknown }>;
+    verifyCode: (params: { code: string }) => Promise<{ error: unknown }>;
+  };
+  sso: (params: {
+    flow?: 'auto' | 'modal';
+    strategy: OAuthStrategy | 'saml' | 'enterprise_sso';
+    redirectUrl: string;
+    redirectUrlComplete: string;
+  }) => Promise<{ error: unknown }>;
 }
 
 export type SignInStatus =

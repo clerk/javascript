@@ -1,8 +1,10 @@
 import type { State as StateInterface } from '@clerk/types';
 import { computed, effect } from 'alien-signals';
 
-import { eventBus, type SignInUpdatePayload } from './events';
+import { eventBus } from './events';
 import { signInComputedSignal, signInErrorSignal, signInSignal } from './signals';
+import { BaseResource } from './resources/Base';
+import { SignIn } from './resources/SignIn';
 
 export class State implements StateInterface {
   signInResourceSignal = signInSignal;
@@ -13,15 +15,19 @@ export class State implements StateInterface {
   __internal_computed = computed;
 
   constructor() {
-    eventBus.on('signin:update', this.onSignInUpdated);
-    eventBus.on('signin:error', this.onSignInError);
+    eventBus.on('resource:update', this.onResourceUpdated);
+    eventBus.on('resource:error', this.onResourceError);
   }
 
-  private onSignInUpdated = (payload: SignInUpdatePayload) => {
-    this.signInResourceSignal({ resource: payload.resource });
+  private onResourceError = (payload: { resource: BaseResource; error: unknown }) => {
+    if (payload.resource instanceof SignIn) {
+      this.signInErrorSignal({ errors: payload.error });
+    }
   };
 
-  private onSignInError = (error: unknown) => {
-    this.signInErrorSignal({ errors: error });
+  private onResourceUpdated = (payload: { resource: BaseResource }) => {
+    if (payload.resource instanceof SignIn) {
+      this.signInResourceSignal({ resource: payload.resource });
+    }
   };
 }

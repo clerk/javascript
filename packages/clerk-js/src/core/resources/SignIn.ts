@@ -30,7 +30,7 @@ import type {
   SignInIdentifier,
   SignInJSON,
   SignInJSONSnapshot,
-  SignInBetaResource,
+  SignInFutureResource,
   SignInResource,
   SignInSecondFactor,
   SignInStartEmailLinkFlowParams,
@@ -39,6 +39,7 @@ import type {
   Web3Provider,
   Web3SignatureConfig,
   Web3SignatureFactor,
+  OAuthStrategy,
 } from '@clerk/types';
 
 import {
@@ -84,7 +85,7 @@ export class SignIn extends BaseResource implements SignInResource {
   createdSessionId: string | null = null;
   userData: UserData = new UserData(null);
 
-  __internal_beta: SignInBeta | null = new SignInBeta(this);
+  __internal_beta: SignInFuture | null = new SignInFuture(this);
   __internal_basePost;
 
   constructor(data: SignInJSON | SignInJSONSnapshot | null = null) {
@@ -459,7 +460,7 @@ export class SignIn extends BaseResource implements SignInResource {
       this.userData = new UserData(data.user_data);
     }
 
-    eventBus.emit('signin:update', { resource: this });
+    eventBus.emit('resource:update', { resource: this });
     return this;
   }
 
@@ -480,22 +481,128 @@ export class SignIn extends BaseResource implements SignInResource {
   }
 }
 
-class SignInBeta implements SignInBetaResource {
+class SignInFuture implements SignInFutureResource {
+  emailCode = {
+    sendCode: this.sendEmailCode.bind(this),
+    verifyCode: this.verifyEmailCode.bind(this),
+  };
+
   constructor(readonly resource: SignIn) {}
 
   get status() {
     return this.resource.status;
   }
 
+  async create(params: {
+    identifier?: string;
+    strategy?: OAuthStrategy | 'saml' | 'enterprise_sso';
+    redirectUrl?: string;
+    actionCompleteRedirectUrl?: string;
+  }): Promise<{ error: unknown }> {
+    eventBus.emit('resource:error', { resource: this.resource, error: null });
+    try {
+      await this.resource.__internal_basePost({
+        path: this.resource.pathRoot,
+        body: params,
+      });
+
+      return { error: null };
+    } catch (err) {
+      eventBus.emit('resource:error', { resource: this.resource, error: err });
+      return { error: err };
+    }
+  }
+
   async password({ identifier, password }: { identifier: string; password: string }): Promise<{ error: unknown }> {
-    eventBus.emit('signin:error', null);
+    eventBus.emit('resource:error', { resource: this.resource, error: null });
     try {
       await this.resource.__internal_basePost({
         path: this.resource.pathRoot,
         body: { identifier, password },
       });
     } catch (err) {
-      eventBus.emit('signin:error', err);
+      eventBus.emit('resource:error', { resource: this.resource, error: err });
+      return { error: err };
+    }
+
+    return { error: null };
+  }
+
+  async sendEmailCode({ email }: { email: string }): Promise<{ error: unknown }> {
+    eventBus.emit('resource:error', { resource: this.resource, error: null });
+    try {
+      if (!this.resource.id) {
+        await this.create({ identifier: email });
+      }
+
+      const emailCodeFactor = this.resource.supportedFirstFactors?.find(f => f.strategy === 'email_code');
+
+      if (!emailCodeFactor) {
+        throw new Error('Email code factor not found');
+      }
+
+      const { emailAddressId } = emailCodeFactor;
+      await this.resource.__internal_basePost({
+        body: { emailAddressId, strategy: 'email_code' },
+        action: 'prepare_first_factor',
+      });
+    } catch (err: unknown) {
+      eventBus.emit('resource:error', { resource: this.resource, error: err });
+      return { error: err };
+    }
+
+    return { error: null };
+  }
+
+  async verifyEmailCode({ code }: { code: string }): Promise<{ error: unknown }> {
+    eventBus.emit('resource:error', { resource: this.resource, error: null });
+    try {
+      await this.resource.__internal_basePost({
+        body: { code, strategy: 'email_code' },
+        action: 'attempt_first_factor',
+      });
+    } catch (err: unknown) {
+      eventBus.emit('resource:error', { resource: this.resource, error: err });
+      return { error: err };
+    }
+
+    return { error: null };
+  }
+
+  async sso({
+    flow = 'auto',
+    strategy,
+    redirectUrl,
+    redirectUrlComplete,
+  }: {
+    flow?: 'auto' | 'modal';
+    strategy: OAuthStrategy | 'saml' | 'enterprise_sso';
+    redirectUrl: string;
+    redirectUrlComplete: string;
+  }): Promise<{ error: unknown }> {
+    eventBus.emit('resource:error', { resource: this.resource, error: null });
+    try {
+      if (flow !== 'auto') {
+        throw new Error('modal flow is not supported yet');
+      }
+
+      const redirectUrlWithAuthToken = SignIn.clerk.buildUrlWithAuth(redirectUrl);
+
+      if (!this.resource.id) {
+        await this.create({
+          strategy,
+          redirectUrl: redirectUrlWithAuthToken,
+          actionCompleteRedirectUrl: redirectUrlComplete,
+        });
+      }
+
+      const { status, externalVerificationRedirectURL } = this.resource.firstFactorVerification;
+
+      if (status === 'unverified' && externalVerificationRedirectURL) {
+        windowNavigate(externalVerificationRedirectURL);
+      }
+    } catch (err: unknown) {
+      eventBus.emit('resource:error', { resource: this.resource, error: err });
       return { error: err };
     }
 

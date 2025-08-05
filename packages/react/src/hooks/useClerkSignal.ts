@@ -1,10 +1,10 @@
-import type { SignInBetaResource } from '@clerk/types';
+import type { SignInFutureResource } from '@clerk/types';
 import { useCallback, useSyncExternalStore } from 'react';
 
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvider';
 
-function useClerkSignal(signal: 'signIn'): { errors: unknown; signIn: SignInBetaResource | null } | null {
+function useClerkSignal(signal: 'signIn'): { errors: unknown; signIn: SignInFutureResource | null } | null {
   useAssertWrappedByClerkProvider('useSignInSignal');
 
   const clerk = useIsomorphicClerkContext();

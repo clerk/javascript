@@ -1,27 +1,28 @@
 import { createEventBus } from '@clerk/shared/eventBus';
 import type { TokenResource } from '@clerk/types';
 
-import type { SignIn } from './resources';
+import { BaseResource } from './resources/Base';
 
 export const events = {
   TokenUpdate: 'token:update',
   UserSignOut: 'user:signOut',
   EnvironmentUpdate: 'environment:update',
   SessionTokenResolved: 'session:tokenResolved',
-  SignInUpdate: 'signin:update',
-  SignInError: 'signin:error',
+  ResourceUpdate: 'resource:update',
+  ResourceError: 'resource:error',
 } as const;
 
 type TokenUpdatePayload = { token: TokenResource | null };
-export type SignInUpdatePayload = { resource: SignIn };
+export type ResourceUpdatePayload = { resource: BaseResource };
+export type ResourceErrorPayload = { resource: BaseResource; error: unknown };
 
 type InternalEvents = {
   [events.TokenUpdate]: TokenUpdatePayload;
   [events.UserSignOut]: null;
   [events.EnvironmentUpdate]: null;
   [events.SessionTokenResolved]: null;
-  [events.SignInUpdate]: SignInUpdatePayload;
-  [events.SignInError]: any;
+  [events.ResourceUpdate]: ResourceUpdatePayload;
+  [events.ResourceError]: ResourceErrorPayload;
 };
 
 export const eventBus = createEventBus<InternalEvents>();
