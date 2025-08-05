@@ -142,11 +142,12 @@ export function buildRequest(options: BuildRequestOptions) {
 
     // If Authorization header already exists, preserve it.
     // Otherwise, use machine secret key if enabled, or fall back to regular secret key
-    if (!headers.has(constants.Headers.Authorization)) {
+    const authorizationHeader = constants.Headers.Authorization;
+    if (!headers.has(authorizationHeader)) {
       if (useMachineSecretKey && machineSecretKey) {
-        headers.set(constants.Headers.Authorization, `Bearer ${machineSecretKey}`);
+        headers.set(authorizationHeader, `Bearer ${machineSecretKey}`);
       } else if (secretKey) {
-        headers.set(constants.Headers.Authorization, `Bearer ${secretKey}`);
+        headers.set(authorizationHeader, `Bearer ${secretKey}`);
       }
     }
 
