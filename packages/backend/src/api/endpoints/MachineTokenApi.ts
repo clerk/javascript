@@ -6,18 +6,27 @@ import { AbstractAPI } from './AbstractApi';
 const basePath = '/m2m_tokens';
 
 type CreateMachineTokenParams = {
+  /**
+   * Custom machine secret key for authentication.
+   */
   machineSecretKey?: string;
   secondsUntilExpiration?: number | null;
   claims?: Record<string, unknown> | null;
 };
 
 type RevokeMachineTokenParams = {
+  /**
+   * Custom machine secret key for authentication.
+   */
   machineSecretKey?: string;
   m2mTokenId: string;
   revocationReason?: string | null;
 };
 
 type VerifyMachineTokenParams = {
+  /**
+   * Custom machine secret key for authentication.
+   */
   machineSecretKey?: string;
   secret: string;
 };
