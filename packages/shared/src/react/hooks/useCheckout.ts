@@ -108,6 +108,7 @@ export const useCheckout = (options?: Params): __experimental_UseCheckoutReturn 
       };
     }
     const {
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       reload,
       confirm,
       pathRoot,
