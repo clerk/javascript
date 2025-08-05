@@ -19,4 +19,4 @@ catalogs:
     tslib: 2.8.1
     tsup: 8.5.0
     typescript: 5.8.3
-    zx: 8.7.1
+    zx: 8.7.2

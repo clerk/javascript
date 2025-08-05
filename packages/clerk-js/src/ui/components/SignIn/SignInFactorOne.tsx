@@ -1,3 +1,4 @@
+import { useClerk } from '@clerk/shared/react';
 import type { SignInFactor } from '@clerk/types';
 import React from 'react';
 
@@ -39,6 +40,7 @@ const factorKey = (factor: SignInFactor | null | undefined) => {
 };
 
 function SignInFactorOneInternal(): JSX.Element {
+  const { __internal_setActiveInProgress } = useClerk();
   const signIn = useCoreSignIn();
   const { preferredSignInStrategy } = useEnvironment().displayConfig;
   const availableFactors = signIn.supportedFirstFactors;
@@ -83,21 +85,27 @@ function SignInFactorOneInternal(): JSX.Element {
   const [isPasswordPwned, setIsPasswordPwned] = React.useState(false);
 
   React.useEffect(() => {
+    if (__internal_setActiveInProgress) {
+      return;
+    }
+
     // Handle the case where a user lands on alternative methods screen,
     // clicks a social button but then navigates back to sign in.
     // SignIn status resets to 'needs_identifier'
     if (signIn.status === 'needs_identifier' || signIn.status === null) {
       void router.navigate('../');
     }
-  }, []);
+  }, [__internal_setActiveInProgress]);
 
-  if (!currentFactor && signIn.status) {
-    return (
+  if (!currentFactor) {
+    return signIn.status ? (
       <ErrorCard
         cardTitle={localizationKeys('signIn.noAvailableMethods.title')}
         cardSubtitle={localizationKeys('signIn.noAvailableMethods.subtitle')}
         message={localizationKeys('signIn.noAvailableMethods.message')}
       />
+    ) : (
+      <LoadingCard />
     );
   }
 
