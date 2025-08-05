@@ -1,15 +1,11 @@
 import { useClerk, useOrganizationList } from '@clerk/shared/react';
-import React, { useState } from 'react';
 
-import { OrganizationAvatarUploader } from '@/ui/common/organizations/OrganizationAvatarUploader';
 import { useSessionTasksContext } from '@/ui/contexts/components/SessionTasks';
-import { descriptors, Icon, localizationKeys } from '@/ui/customizables';
+import { localizationKeys } from '@/ui/customizables';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Form } from '@/ui/elements/Form';
 import { FormButtonContainer } from '@/ui/elements/FormButtons';
 import { FormContainer } from '@/ui/elements/FormContainer';
-import { IconButton } from '@/ui/elements/IconButton';
-import { Upload } from '@/ui/icons';
 import { createSlug } from '@/ui/utils/createSlug';
 import { handleError } from '@/ui/utils/errorHandler';
 import { useFormControl } from '@/ui/utils/useFormControl';
@@ -28,7 +24,6 @@ export const CreateOrganizationScreen = withCardStateProvider((props: CreateOrga
     userMemberships: organizationListParams.userMemberships,
   });
 
-  const [file, setFile] = useState<File | null>();
   const nameField = useFormControl('name', '', {
     type: 'text',
     label: localizationKeys('formFieldLabel__organizationName'),
@@ -50,21 +45,12 @@ export const CreateOrganizationScreen = withCardStateProvider((props: CreateOrga
     try {
       const organization = await createOrganization({ name: nameField.value, slug: slugField.value });
 
-      if (file) {
-        await organization.setLogo({ file });
-      }
-
       await setActive({ organization });
 
       await __internal_navigateToTaskIfAvailable({ redirectUrlComplete });
     } catch (err) {
       handleError(err, [nameField, slugField], card.setError);
     }
-  };
-
-  const onAvatarRemove = () => {
-    card.setIdle();
-    return setFile(null);
   };
 
   const onChangeName = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -84,45 +70,6 @@ export const CreateOrganizationScreen = withCardStateProvider((props: CreateOrga
         onSubmit={onSubmit}
         sx={t => ({ padding: `${t.space.$none} ${t.space.$10} ${t.space.$8}` })}
       >
-        <OrganizationAvatarUploader
-          organization={{ name: nameField.value }}
-          onAvatarChange={async file => setFile(file)}
-          onAvatarRemove={file ? onAvatarRemove : null}
-          actionTitle={localizationKeys('taskSelectOrganization.createOrganization.uploadAction__title')}
-          imageTitle={localizationKeys('taskSelectOrganization.createOrganization.imageFormTitle')}
-          elementDescriptor={descriptors.organizationAvatarUploaderContainer}
-          avatarPreviewPlaceholder={
-            <IconButton
-              variant='ghost'
-              aria-label='Upload organization logo'
-              icon={
-                <Icon
-                  size='md'
-                  icon={Upload}
-                  sx={t => ({
-                    color: t.colors.$colorMutedForeground,
-                    transitionDuration: t.transitionDuration.$controls,
-                  })}
-                />
-              }
-              sx={t => ({
-                width: t.sizes.$16,
-                height: t.sizes.$16,
-                borderRadius: t.radii.$md,
-                borderWidth: t.borderWidths.$normal,
-                borderStyle: t.borderStyles.$dashed,
-                borderColor: t.colors.$borderAlpha200,
-                backgroundColor: t.colors.$neutralAlpha50,
-                ':hover': {
-                  backgroundColor: t.colors.$neutralAlpha50,
-                  svg: {
-                    transform: 'scale(1.2)',
-                  },
-                },
-              })}
-            />
-          }
-        />
         <Form.ControlRow elementId={nameField.id}>
           <Form.PlainInput
             {...nameField.props}

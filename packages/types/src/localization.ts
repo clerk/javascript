@@ -1212,8 +1212,6 @@ export type __internal_LocalizationResource = {
     createOrganization: {
       formButtonSubmit: LocalizationValue;
       formButtonReset: LocalizationValue;
-      uploadAction__title: LocalizationValue;
-      imageFormTitle: LocalizationValue;
     };
     selectOrganization: {
       suggestionsAcceptedLabel: LocalizationValue;

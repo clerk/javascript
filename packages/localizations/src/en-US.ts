@@ -12,8 +12,6 @@ export const enUS: LocalizationResource = {
     createOrganization: {
       formButtonSubmit: 'Create organization',
       formButtonReset: 'Cancel',
-      uploadAction__title: 'Logo',
-      imageFormTitle: 'Logo',
     },
     selectOrganization: {
       suggestionsAcceptedLabel: 'Pending approval',
