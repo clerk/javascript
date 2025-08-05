@@ -136,7 +136,7 @@ type UndefinedToOptional<T> = {
 };
 
 /**
- * Flattens a union type into a single type with all properties, making unioned properties optional.
+ * Flattens a union type into a single type with all properties, making union properties optional.
  *
  * @example
  * type A = { a: number; c: number };
