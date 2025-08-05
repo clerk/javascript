@@ -62,7 +62,7 @@ const FetchStatus = ({
   const { fetchStatus, error } = checkout;
 
   const internalFetchStatus = useMemo(() => {
-    if (fetchStatus === 'error' && error?.errors) {
+    if (fetchStatus === 'error') {
       const errorCodes = error.errors.map(e => e.code);
 
       if (errorCodes.includes('missing_payer_email')) {
@@ -75,7 +75,7 @@ const FetchStatus = ({
     }
 
     return fetchStatus;
-  }, [fetchStatus, error]);
+  }, [fetchStatus]);
 
   if (internalFetchStatus !== status) {
     return null;
