@@ -24,7 +24,7 @@ describe('MachineTokenAPI', () => {
   };
 
   describe('create', () => {
-    it('creates a m2m token using machine secret', async () => {
+    it('creates a m2m token using machine secret key in backend client', async () => {
       const apiClient = createBackendApiClient({
         apiUrl: 'https://api.clerk.test',
         machineSecretKey: 'ak_xxxxx',
@@ -41,6 +41,32 @@ describe('MachineTokenAPI', () => {
       );
 
       const response = await apiClient.machineTokens.create({
+        secondsUntilExpiration: 3600,
+      });
+
+      expect(response.id).toBe(m2mId);
+      expect(response.secret).toBe(m2mSecret);
+      expect(response.scopes).toEqual(['mch_1xxxxx', 'mch_2xxxxx']);
+      expect(response.claims).toEqual({ foo: 'bar' });
+    });
+
+    it('creates a m2m token using machine secret key option', async () => {
+      const apiClient = createBackendApiClient({
+        apiUrl: 'https://api.clerk.test',
+      });
+
+      server.use(
+        http.post(
+          'https://api.clerk.test/m2m_tokens',
+          validateHeaders(({ request }) => {
+            expect(request.headers.get('Authorization')).toBe('Bearer ak_xxxxx');
+            return HttpResponse.json(mockM2MToken);
+          }),
+        ),
+      );
+
+      const response = await apiClient.machineTokens.create({
+        machineSecretKey: 'ak_xxxxx',
         secondsUntilExpiration: 3600,
       });
 
