@@ -1,4 +1,4 @@
-import type { __experimental_PlanDetailsButtonProps } from '@clerk/types';
+import type { __experimental_PlanDetailsButtonProps, FlattenUnionType } from '@clerk/types';
 import React from 'react';
 
 import type { WithClerkProp } from '../types';
@@ -35,7 +35,8 @@ import { withClerk } from './withClerk';
  */
 export const PlanDetailsButton = withClerk(
   ({ clerk, children, ...props }: WithClerkProp<React.PropsWithChildren<__experimental_PlanDetailsButtonProps>>) => {
-    const { plan, planId, initialPlanPeriod, planDetailsProps, ...rest } = props;
+    const { plan, planId, initialPlanPeriod, planDetailsProps, ...rest } =
+      props as FlattenUnionType<__experimental_PlanDetailsButtonProps>;
     children = normalizeWithDefaultValue(children, 'Plan details');
     const child = assertSingleChild(children)('PlanDetailsButton');
 
@@ -45,6 +46,7 @@ export const PlanDetailsButton = withClerk(
       }
 
       return clerk.__internal_openPlanDetails({
+        // @ts-expect-error - plan is not required
         plan,
         planId,
         initialPlanPeriod,
