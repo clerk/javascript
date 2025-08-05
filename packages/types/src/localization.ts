@@ -186,6 +186,7 @@ export type __internal_LocalizationResource = {
     defaultFreePlanActive: LocalizationValue;
     viewFeatures: LocalizationValue;
     seeAllFeatures: LocalizationValue;
+    viewPayment: LocalizationValue;
     availableFeatures: LocalizationValue;
     subtotal: LocalizationValue;
     credit: LocalizationValue;
@@ -1225,6 +1226,9 @@ type UnstableErrors = WithParamName<{
   form_username_invalid_character: LocalizationValue;
   form_param_format_invalid: LocalizationValue;
   form_param_format_invalid__email_address: LocalizationValue;
+  form_param_type_invalid: LocalizationValue;
+  form_param_type_invalid__phone_number: LocalizationValue;
+  form_param_type_invalid__email_address: LocalizationValue;
   form_password_length_too_short: LocalizationValue;
   form_param_nil: LocalizationValue;
   form_code_incorrect: LocalizationValue;

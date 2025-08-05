@@ -154,6 +154,7 @@ export const bgBG: LocalizationResource = {
     totalDue: undefined,
     totalDueToday: undefined,
     viewFeatures: undefined,
+    viewPayment: undefined,
     year: undefined,
   },
   createOrganization: {
@@ -803,6 +804,9 @@ export const bgBG: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'Фамилията не трябва да е по-дълга от 256 символа.',
     form_param_max_length_exceeded__name: 'Името не трябва да надвишава 256 символа.',
     form_param_nil: undefined,
+    form_param_type_invalid: undefined,
+    form_param_type_invalid__email_address: undefined,
+    form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: 'Невалидна парола. Моля, опитайте отново.',
     form_password_length_too_short: 'Паролата е твърде кратка. Моля, въведете поне 8 символа.',

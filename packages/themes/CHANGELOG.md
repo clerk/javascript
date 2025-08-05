@@ -1,5 +1,28 @@
 # Change Log
 
+## 2.4.4
+
+### Patch Changes
+
+- Add `shadcn.css` export for importing within stylesheets to resolve Tailwind not picking up the elements class names used within the shadcn theme. ([#6415](https://github.com/clerk/javascript/pull/6415)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`22c35ef`](https://github.com/clerk/javascript/commit/22c35efb59226df2efaa2891fa4775c13312f4c6), [`e8d816a`](https://github.com/clerk/javascript/commit/e8d816a3350e862c3e9e1d4f8c96c047a0a016a2), [`aa9f185`](https://github.com/clerk/javascript/commit/aa9f185e21b58f8a6e03ea44ce29ee09ad2477d9), [`af0e123`](https://github.com/clerk/javascript/commit/af0e12393c9412281626e20dafb1b3a15558f6d9), [`3d1d871`](https://github.com/clerk/javascript/commit/3d1d8711405646cf3c2aabe99e08337a1028703a)]:
+  - @clerk/types@4.72.0
+
+## 2.4.3
+
+### Patch Changes
+
+- Updated dependencies [[`e404456`](https://github.com/clerk/javascript/commit/e4044566bca81f63c8e9c630fdec0f498ad6fc08), [`d58b959`](https://github.com/clerk/javascript/commit/d58b9594cf65158e87dbaa90d632c45f543373e1), [`822ba1f`](https://github.com/clerk/javascript/commit/822ba1fd5e7daf665120cf183e4600a227098d53), [`d4d2612`](https://github.com/clerk/javascript/commit/d4d2612483baf356c389ef0ba5084059025481f2)]:
+  - @clerk/types@4.71.0
+
+## 2.4.2
+
+### Patch Changes
+
+- Updated dependencies [[`b0fdc9e`](https://github.com/clerk/javascript/commit/b0fdc9eaf764ca0c17cbe0810b7d240f6d9db0b6)]:
+  - @clerk/types@4.70.1
+
 ## 2.4.1
 
 ### Patch Changes

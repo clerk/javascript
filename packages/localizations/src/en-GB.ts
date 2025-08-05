@@ -154,6 +154,7 @@ export const enGB: LocalizationResource = {
     totalDue: undefined,
     totalDueToday: undefined,
     viewFeatures: undefined,
+    viewPayment: undefined,
     year: undefined,
   },
   createOrganization: {
@@ -807,6 +808,9 @@ export const enGB: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'Last name should not exceed 256 characters.',
     form_param_max_length_exceeded__name: 'Name should not exceed 256 characters.',
     form_param_nil: 'This field is required and cannot be empty.',
+    form_param_type_invalid: undefined,
+    form_param_type_invalid__email_address: undefined,
+    form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'The value entered is invalid. Please correct it.',
     form_password_incorrect: 'The password you entered is incorrect. Please try again.',
     form_password_length_too_short: 'Your password is too short. It must be at least 8 characters long.',

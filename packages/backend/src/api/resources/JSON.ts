@@ -35,6 +35,8 @@ export const ObjectType = {
   InstanceSettings: 'instance_settings',
   Invitation: 'invitation',
   Machine: 'machine',
+  MachineScope: 'machine_scope',
+  MachineSecretKey: 'machine_secret_key',
   MachineToken: 'machine_to_machine_token',
   JwtTemplate: 'jwt_template',
   OauthAccessToken: 'oauth_access_token',
@@ -63,6 +65,10 @@ export const ObjectType = {
   TestingToken: 'testing_token',
   Role: 'role',
   Permission: 'permission',
+  CommercePayer: 'commerce_payer',
+  CommercePaymentAttempt: 'commerce_payment_attempt',
+  CommerceSubscription: 'commerce_subscription',
+  CommerceSubscriptionItem: 'commerce_subscription_item',
 } as const;
 
 export type ObjectType = (typeof ObjectType)[keyof typeof ObjectType];
@@ -706,6 +712,21 @@ export interface MachineJSON extends ClerkResourceJSON {
   instance_id: string;
   created_at: number;
   updated_at: number;
+  default_token_ttl: number;
+  scoped_machines: MachineJSON[];
+}
+
+export interface MachineScopeJSON {
+  object: typeof ObjectType.MachineScope;
+  from_machine_id: string;
+  to_machine_id: string;
+  created_at?: number;
+  deleted?: boolean;
+}
+
+export interface MachineSecretKeyJSON {
+  object: typeof ObjectType.MachineSecretKey;
+  secret: string;
 }
 
 export interface MachineTokenJSON extends ClerkResourceJSON {
@@ -755,6 +776,136 @@ export interface IdPOAuthAccessTokenJSON extends ClerkResourceJSON {
   expiration: number | null;
   created_at: number;
   updated_at: number;
+}
+
+export interface CommercePayerJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.CommercePayer;
+  instance_id: string;
+  user_id?: string;
+  first_name?: string;
+  last_name?: string;
+  email: string;
+  organization_id?: string;
+  organization_name?: string;
+  image_url: string;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface CommercePayeeJSON {
+  id: string;
+  gateway_type: string;
+  gateway_external_id: string;
+  gateway_status: 'active' | 'pending' | 'restricted' | 'disconnected';
+}
+
+export interface CommerceAmountJSON {
+  amount: number;
+  amount_formatted: string;
+  currency: string;
+  currency_symbol: string;
+}
+
+export interface CommerceTotalsJSON {
+  subtotal: CommerceAmountJSON;
+  tax_total: CommerceAmountJSON;
+  grand_total: CommerceAmountJSON;
+}
+
+export interface CommercePaymentSourceJSON {
+  id: string;
+  gateway: string;
+  gateway_external_id: string;
+  gateway_external_account_id?: string;
+  payment_method: string;
+  status: 'active' | 'disconnected';
+  card_type?: string;
+  last4?: string;
+}
+
+export interface CommercePaymentFailedReasonJSON {
+  code: string;
+  decline_code: string;
+}
+
+export interface CommerceSubscriptionCreditJSON {
+  amount: CommerceAmountJSON;
+  cycle_days_remaining: number;
+  cycle_days_total: number;
+  cycle_remaining_percent: number;
+}
+
+export interface CommercePlanJSON {
+  id: string;
+  instance_id: string;
+  product_id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  is_default: boolean;
+  is_recurring: boolean;
+  amount: number;
+  period: 'month' | 'annual';
+  interval: number;
+  has_base_fee: boolean;
+  currency: string;
+  annual_monthly_amount: number;
+  publicly_visible: boolean;
+}
+
+export interface CommerceSubscriptionItemJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.CommerceSubscriptionItem;
+  status: 'abandoned' | 'active' | 'canceled' | 'ended' | 'expired' | 'incomplete' | 'past_due' | 'upcoming';
+  credit: CommerceSubscriptionCreditJSON;
+  proration_date: string;
+  plan_period: 'month' | 'annual';
+  period_start: number;
+  period_end?: number;
+  canceled_at?: number;
+  past_due_at?: number;
+  lifetime_paid: number;
+  next_payment_amount: number;
+  next_payment_date: number;
+  amount: CommerceAmountJSON;
+  plan: CommercePlanJSON;
+  plan_id: string;
+}
+
+export interface CommercePaymentAttemptJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.CommercePaymentAttempt;
+  instance_id: string;
+  payment_id: string;
+  statement_id: string;
+  gateway_external_id: string;
+  status: 'pending' | 'paid' | 'failed';
+  created_at: number;
+  updated_at: number;
+  paid_at?: number;
+  failed_at?: number;
+  failed_reason?: CommercePaymentFailedReasonJSON;
+  billing_date: number;
+  charge_type: 'checkout' | 'recurring';
+  payee: CommercePayeeJSON;
+  payer: CommercePayerJSON;
+  totals: CommerceTotalsJSON;
+  payment_source: CommercePaymentSourceJSON;
+  subscription_items: CommerceSubscriptionItemJSON[];
+}
+
+export interface CommerceSubscriptionJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.CommerceSubscription;
+  status: 'abandoned' | 'active' | 'canceled' | 'ended' | 'expired' | 'incomplete' | 'past_due' | 'upcoming';
+  active_at?: number;
+  canceled_at?: number;
+  created_at: number;
+  ended_at?: number;
+  past_due_at?: number;
+  updated_at: number;
+  latest_payment_id: string;
+  payer_id: string;
+  payer: CommercePayerJSON;
+  payment_source_id: string;
+  items: CommerceSubscriptionItemJSON[];
 }
 
 export interface WebhooksSvixJSON {

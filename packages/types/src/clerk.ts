@@ -14,6 +14,7 @@ import type {
   SignInTheme,
   SignUpTheme,
   SubscriptionDetailsTheme,
+  TaskSelectOrganizationTheme,
   UserButtonTheme,
   UserProfileTheme,
   UserVerificationTheme,
@@ -23,10 +24,10 @@ import type { ClientResource } from './client';
 import type {
   CommerceBillingNamespace,
   CommerceCheckoutResource,
-  CommercePayerType,
   CommercePlanResource,
   CommerceSubscriptionPlanPeriod,
   ConfirmCheckoutParams,
+  ForPayerType,
 } from './commerce';
 import type { CustomMenuItem } from './customMenuItems';
 import type { CustomPage } from './customPages';
@@ -59,7 +60,7 @@ import type { UserResource } from './user';
 import type { Autocomplete, DeepPartial, DeepSnakeToCamel, FlattenUnionType } from './utils';
 import type { WaitlistResource } from './waitlist';
 
-type __experimental_CheckoutStatus = 'awaiting_initialization' | 'awaiting_confirmation' | 'completed';
+type __experimental_CheckoutStatus = 'needs_initialization' | 'needs_confirmation' | 'completed';
 
 export type __experimental_CheckoutCacheState = Readonly<{
   isStarting: boolean;
@@ -71,7 +72,7 @@ export type __experimental_CheckoutCacheState = Readonly<{
 }>;
 
 export type __experimental_CheckoutOptions = {
-  for?: 'organization';
+  for?: ForPayerType;
   planPeriod: CommerceSubscriptionPlanPeriod;
   planId: string;
 };
@@ -90,7 +91,7 @@ export type __experimental_CheckoutInstance = {
   confirm: (params: ConfirmCheckoutParams) => Promise<CheckoutResult>;
   start: () => Promise<CheckoutResult>;
   clear: () => void;
-  finalize: (params?: { redirectUrl: string }) => void;
+  finalize: (params?: { redirectUrl: string }) => Promise<void>;
   subscribe: (listener: (state: __experimental_CheckoutCacheState) => void) => () => void;
   getState: () => __experimental_CheckoutCacheState;
 };
@@ -556,6 +557,21 @@ export interface Clerk {
    * @param targetNode Target node to unmount the OAuth consent component from.
    */
   __internal_unmountOAuthConsent: (targetNode: HTMLDivElement) => void;
+
+  /**
+   * Mounts a TaskSelectOrganization component at the target element.
+   * @param targetNode Target node to mount the TaskSelectOrganization component.
+   * @param props configuration parameters.
+   */
+  mountTaskSelectOrganization: (targetNode: HTMLDivElement, props?: TaskSelectOrganizationProps) => void;
+
+  /**
+   * Unmount a TaskSelectOrganization component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @param targetNode Target node to unmount the TaskSelectOrganization component from.
+   */
+  unmountTaskSelectOrganization: (targetNode: HTMLDivElement) => void;
 
   /**
    * @internal
@@ -1820,7 +1836,7 @@ export type __internal_CheckoutProps = {
   appearance?: CheckoutTheme;
   planId?: string;
   planPeriod?: CommerceSubscriptionPlanPeriod;
-  subscriberType?: CommercePayerType;
+  for?: ForPayerType;
   onSubscriptionComplete?: () => void;
   portalId?: string;
   portalRoot?: PortalRoot;
@@ -1845,7 +1861,7 @@ export type __internal_CheckoutProps = {
 export type __experimental_CheckoutButtonProps = {
   planId: string;
   planPeriod?: CommerceSubscriptionPlanPeriod;
-  subscriberType?: CommercePayerType;
+  for?: ForPayerType;
   onSubscriptionComplete?: () => void;
   checkoutProps?: {
     appearance?: CheckoutTheme;
@@ -1929,10 +1945,10 @@ export type __experimental_PlanDetailsButtonProps = (
 export type __internal_SubscriptionDetailsProps = {
   /**
    * The subscriber type to display the subscription details for.
-   * If `org` is provided, the subscription details will be displayed for the active organization.
+   * If `organization` is provided, the subscription details will be displayed for the active organization.
    * @default 'user'
    */
-  for?: CommercePayerType;
+  for?: ForPayerType;
   appearance?: SubscriptionDetailsTheme;
   onSubscriptionCancel?: () => void;
   portalId?: string;
@@ -1952,10 +1968,10 @@ export type __internal_SubscriptionDetailsProps = {
 export type __experimental_SubscriptionDetailsButtonProps = {
   /**
    * The subscriber type to display the subscription details for.
-   * If `org` is provided, the subscription details will be displayed for the active organization.
+   * If `organization` is provided, the subscription details will be displayed for the active organization.
    * @default 'user'
    */
-  for?: CommercePayerType;
+  for?: ForPayerType;
   onSubscriptionCancel?: () => void;
   subscriptionDetailsProps?: {
     appearance?: SubscriptionDetailsTheme;
@@ -2051,6 +2067,14 @@ export type SignUpButtonProps = (SignUpButtonPropsModal | ButtonPropsRedirect) &
     | 'initialValues'
     | 'oauthFlow'
   >;
+
+export type TaskSelectOrganizationProps = {
+  /**
+   * Full URL or path to navigate to after successfully resolving all tasks
+   */
+  redirectUrlComplete: string;
+  appearance?: TaskSelectOrganizationTheme;
+};
 
 export type CreateOrganizationInvitationParams = {
   emailAddress: string;

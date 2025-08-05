@@ -60,6 +60,21 @@ export const RedirectToSignUp = defineComponent((props: RedirectOptions) => {
   return () => null;
 });
 
+export const RedirectToTask = defineComponent((props: RedirectOptions) => {
+  const { sessionCtx } = useClerkContext();
+
+  useClerkLoaded(clerk => {
+    if (!sessionCtx.value) {
+      void clerk.redirectToSignIn(props);
+      return;
+    }
+
+    void clerk.__internal_navigateToTaskIfAvailable();
+  });
+
+  return () => null;
+});
+
 /**
  * @deprecated Use [`redirectToUserProfile()`](https://clerk.com/docs/references/javascript/clerk/redirect-methods#redirect-to-user-profile) instead.
  */

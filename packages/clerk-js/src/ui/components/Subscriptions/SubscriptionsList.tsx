@@ -197,7 +197,7 @@ export function SubscriptionsList({
       )}
 
       {(commerceSettings.billing.user.hasPaidPlans && subscriberType === 'user') ||
-      (commerceSettings.billing.organization.hasPaidPlans && subscriberType === 'org') ? (
+      (commerceSettings.billing.organization.hasPaidPlans && subscriberType === 'organization') ? (
         <ProfileSection.ArrowButton
           id='subscriptionsList'
           textLocalizationKey={subscriptionItems.length > 0 ? arrowButtonText : arrowButtonEmptyText}

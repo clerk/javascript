@@ -4,7 +4,7 @@
 
 import type { APIKeysSettingsJSON } from './apiKeysSettings';
 import type {
-  CommercePayerType,
+  CommercePayerResourceType,
   CommercePaymentChargeType,
   CommercePaymentSourceStatus,
   CommercePaymentStatus,
@@ -644,7 +644,7 @@ export interface CommercePlanJSON extends ClerkResourceJSON {
   is_default: boolean;
   is_recurring: boolean;
   has_base_fee: boolean;
-  for_payer_type: CommercePayerType;
+  for_payer_type: CommercePayerResourceType;
   publicly_visible: boolean;
   slug: string;
   avatar_url: string;
@@ -866,7 +866,6 @@ export interface CommerceCheckoutJSON extends ClerkResourceJSON {
   id: string;
   external_client_secret: string;
   external_gateway_id: string;
-  statement_id: string;
   payment_source?: CommercePaymentSourceJSON;
   plan: CommercePlanJSON;
   plan_period: CommerceSubscriptionPlanPeriod;

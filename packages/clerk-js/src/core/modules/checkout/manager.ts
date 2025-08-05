@@ -36,8 +36,8 @@ const createManagerCache = <CacheKey, CacheState>() => {
 const managerCache = createManagerCache<CheckoutKey, __experimental_CheckoutCacheState>();
 
 const CHECKOUT_STATUS = {
-  AWAITING_INITIALIZATION: 'awaiting_initialization',
-  AWAITING_CONFIRMATION: 'awaiting_confirmation',
+  NEEDS_INITIALIZATION: 'needs_initialization',
+  NEEDS_CONFIRMATION: 'needs_confirmation',
   COMPLETED: 'completed',
 } as const;
 
@@ -61,8 +61,8 @@ function deriveCheckoutState(
 
   const status = (() => {
     if (baseState.checkout?.status === CHECKOUT_STATUS.COMPLETED) return CHECKOUT_STATUS.COMPLETED;
-    if (baseState.checkout) return CHECKOUT_STATUS.AWAITING_CONFIRMATION;
-    return CHECKOUT_STATUS.AWAITING_INITIALIZATION;
+    if (baseState.checkout) return CHECKOUT_STATUS.NEEDS_CONFIRMATION;
+    return CHECKOUT_STATUS.NEEDS_INITIALIZATION;
   })();
 
   return {

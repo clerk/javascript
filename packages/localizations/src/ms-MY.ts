@@ -154,6 +154,7 @@ export const msMY: LocalizationResource = {
     totalDue: undefined,
     totalDueToday: undefined,
     viewFeatures: undefined,
+    viewPayment: undefined,
     year: undefined,
   },
   createOrganization: {
@@ -814,6 +815,9 @@ export const msMY: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'Nama terakhir tidak boleh melebihi 256 aksara.',
     form_param_max_length_exceeded__name: 'Nama tidak boleh melebihi 256 aksara.',
     form_param_nil: 'Medan ini diperlukan dan tidak boleh kosong.',
+    form_param_type_invalid: undefined,
+    form_param_type_invalid__email_address: undefined,
+    form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Nilai yang dimasukkan tidak sah. Sila betulkannya.',
     form_password_incorrect: 'Kata laluan yang anda masukkan tidak betul. Sila cuba lagi.',
     form_password_length_too_short: 'Kata laluan anda terlalu pendek. Ia mesti sekurang-kurangnya 8 aksara panjang.',

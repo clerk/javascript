@@ -76,6 +76,7 @@ import type {
   SignUpProps,
   SignUpRedirectOptions,
   SignUpResource,
+  TaskSelectOrganizationProps,
   UnsubscribeCallback,
   UserButtonProps,
   UserProfileProps,
@@ -484,10 +485,8 @@ export class Clerk implements ClerkInterface {
     const executeSignOut = async () => {
       const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
 
-      // Notify other tabs that user is signing out.
+      // Notify other tabs that user is signing out and clean up cookies.
       eventBus.emit(events.UserSignOut, null);
-      // Clean up cookies
-      eventBus.emit(events.TokenUpdate, { token: null });
 
       this.#setTransitiveState();
 
@@ -1164,6 +1163,35 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls.ensureMounted().then(controls => controls.unmountComponent({ node }));
   };
 
+  public mountTaskSelectOrganization = (node: HTMLDivElement, props?: TaskSelectOrganizationProps) => {
+    this.assertComponentsReady(this.#componentControls);
+
+    if (disabledOrganizationsFeature(this, this.environment)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('TaskSelectOrganization'), {
+          code: CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE,
+        });
+      }
+      return;
+    }
+
+    void this.#componentControls.ensureMounted({ preloadHint: 'TaskSelectOrganization' }).then(controls =>
+      controls.mountComponent({
+        name: 'TaskSelectOrganization',
+        appearanceKey: 'taskSelectOrganization',
+        node,
+        props,
+      }),
+    );
+
+    this.telemetry?.record(eventPrebuiltComponentMounted('TaskSelectOrganization', props));
+  };
+
+  public unmountTaskSelectOrganization = (node: HTMLDivElement) => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted().then(controls => controls.unmountComponent({ node }));
+  };
+
   /**
    * `setActive` can be used to set the active session and/or organization.
    */
@@ -1225,16 +1253,15 @@ export class Clerk implements ClerkInterface {
         }
       }
 
+      if (newSession?.status === 'pending') {
+        await this.#handlePendingSession(newSession);
+        return;
+      }
+
       /**
        * Hint to each framework, that the user will be signed out when `{session: null}` is provided.
        */
       await onBeforeSetActive(newSession === null ? 'sign-out' : undefined);
-
-      if (newSession?.status === 'pending') {
-        await this.#handlePendingSession(newSession);
-        await onAfterSetActive();
-        return;
-      }
 
       //1. setLastActiveSession to passed user session (add a param).
       //   Note that this will also update the session's active organization
@@ -1298,6 +1325,29 @@ export class Clerk implements ClerkInterface {
   };
 
   #handlePendingSession = async (session: PendingSessionResource) => {
+    /**
+     * Do not revalidate server cache when `setActive` is called with a pending
+     * session within components, to avoid flash of content and unmount during
+     * internal navigation
+     */
+    const shouldInvalidateCache = !this.#componentNavigationContext;
+
+    const onBeforeSetActive: SetActiveHook =
+      shouldInvalidateCache &&
+      typeof window !== 'undefined' &&
+      typeof window.__unstable__onBeforeSetActive === 'function'
+        ? window.__unstable__onBeforeSetActive
+        : noop;
+
+    const onAfterSetActive: SetActiveHook =
+      shouldInvalidateCache &&
+      typeof window !== 'undefined' &&
+      typeof window.__unstable__onAfterSetActive === 'function'
+        ? window.__unstable__onAfterSetActive
+        : noop;
+
+    await onBeforeSetActive();
+
     if (!this.environment) {
       return;
     }
@@ -1331,6 +1381,8 @@ export class Clerk implements ClerkInterface {
 
     this.#setAccessors(session);
     this.#emit();
+
+    await onAfterSetActive();
   };
 
   public __internal_navigateToTaskIfAvailable = async ({
@@ -1528,20 +1580,27 @@ export class Clerk implements ClerkInterface {
   }
 
   public buildAfterMultiSessionSingleSignOutUrl(): string {
-    if (!this.#options.afterMultiSessionSingleSignOutUrl) {
+    if (!this.environment) {
+      return '';
+    }
+
+    if (this.#options.afterMultiSessionSingleSignOutUrl) {
+      return this.buildUrlWithAuth(this.#options.afterMultiSessionSingleSignOutUrl);
+    }
+
+    if (this.#options.signInUrl) {
       return this.buildUrlWithAuth(
         buildURL(
           {
-            base: this.#options.signInUrl
-              ? `${this.#options.signInUrl}/choose`
-              : this.environment?.displayConfig.afterSignOutOneUrl,
+            base: this.#options.signInUrl,
+            hashPath: 'choose',
           },
           { stringify: true },
         ),
       );
     }
 
-    return this.buildUrlWithAuth(this.#options.afterMultiSessionSingleSignOutUrl);
+    return this.buildUrlWithAuth(this.environment.displayConfig.afterSignOutOneUrl);
   }
 
   public buildCreateOrganizationUrl(): string {
@@ -1827,10 +1886,11 @@ export class Clerk implements ClerkInterface {
     };
 
     if (si.status === 'complete') {
-      return this.setActive({
+      await this.setActive({
         session: si.sessionId,
         redirectUrl: redirectUrls.getAfterSignInUrl(),
       });
+      return this.__internal_navigateToTaskIfAvailable();
     }
 
     const userExistsButNeedsToSignIn =
@@ -1840,10 +1900,11 @@ export class Clerk implements ClerkInterface {
       const res = await signIn.create({ transfer: true });
       switch (res.status) {
         case 'complete':
-          return this.setActive({
+          await this.setActive({
             session: res.createdSessionId,
             redirectUrl: redirectUrls.getAfterSignInUrl(),
           });
+          return this.__internal_navigateToTaskIfAvailable();
         case 'needs_first_factor':
           return navigateToFactorOne();
         case 'needs_second_factor':
@@ -1889,10 +1950,11 @@ export class Clerk implements ClerkInterface {
       const res = await signUp.create({ transfer: true });
       switch (res.status) {
         case 'complete':
-          return this.setActive({
+          await this.setActive({
             session: res.createdSessionId,
             redirectUrl: redirectUrls.getAfterSignUpUrl(),
           });
+          return this.__internal_navigateToTaskIfAvailable();
         case 'missing_requirements':
           return navigateToNextStepSignUp({ missingFields: res.missingFields });
         default:
@@ -1901,10 +1963,11 @@ export class Clerk implements ClerkInterface {
     }
 
     if (su.status === 'complete') {
-      return this.setActive({
+      await this.setActive({
         session: su.sessionId,
         redirectUrl: redirectUrls.getAfterSignUpUrl(),
       });
+      return this.__internal_navigateToTaskIfAvailable();
     }
 
     if (si.status === 'needs_second_factor') {
@@ -1938,6 +2001,10 @@ export class Clerk implements ClerkInterface {
 
     if (su.externalAccountStatus === 'verified' && su.status === 'missing_requirements') {
       return navigateToNextStepSignUp({ missingFields: signUp.missingFields });
+    }
+
+    if (this.__internal_hasAfterAuthFlows) {
+      return this.__internal_navigateToTaskIfAvailable({ redirectUrlComplete: redirectUrls.getAfterSignInUrl() });
     }
 
     return navigateToSignIn();
@@ -2557,7 +2624,9 @@ export class Clerk implements ClerkInterface {
       }
       this.#touchThrottledUntil = Date.now() + 5_000;
 
-      void this.#touchCurrentSession(this.session);
+      if (this.#options.touchSession) {
+        void this.#touchCurrentSession(this.session);
+      }
     });
 
     /**
@@ -2588,7 +2657,7 @@ export class Clerk implements ClerkInterface {
 
   // TODO: Be more conservative about touches. Throttle, don't touch when only one user, etc
   #touchCurrentSession = async (session?: SignedInSessionResource | null): Promise<void> => {
-    if (!session || !this.#options.touchSession) {
+    if (!session) {
       return Promise.resolve();
     }
 

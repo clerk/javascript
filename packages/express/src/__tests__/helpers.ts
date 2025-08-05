@@ -2,6 +2,7 @@ import type { AuthObject } from '@clerk/backend';
 import type { Application, Request as ExpressRequest, RequestHandler, Response as ExpressResponse } from 'express';
 import express from 'express';
 import supertest from 'supertest';
+import { vi } from 'vitest';
 
 import type { ExpressRequestWithAuth } from '../types';
 
@@ -16,9 +17,9 @@ export function runMiddleware(middleware: RequestHandler | RequestHandler[], hea
 
 export function mockResponse(): ExpressResponse {
   return {
-    status: jest.fn().mockReturnThis(),
-    send: jest.fn().mockReturnThis(),
-    redirect: jest.fn().mockReturnThis(),
+    status: vi.fn().mockReturnThis(),
+    send: vi.fn().mockReturnThis(),
+    redirect: vi.fn().mockReturnThis(),
   } as unknown as ExpressResponse;
 }
 

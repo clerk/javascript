@@ -806,10 +806,26 @@ export type Variables = {
 };
 
 export type BaseThemeTaggedType = { __type: 'prebuilt_appearance' };
-export type BaseTheme = BaseThemeTaggedType & { cssLayerName?: string };
+export type BaseTheme = (BaseThemeTaggedType | 'clerk' | 'simple') & { cssLayerName?: string };
 
 export type Theme = {
   /**
+   * A theme used as the base theme for the components.
+   * For further customisation, you can use the {@link Theme.layout}, {@link Theme.variables} and {@link Theme.elements} props.
+   *
+   * Supports both object-based themes and string-based themes:
+   * @example
+   * import { dark } from "@clerk/themes";
+   * appearance={{ theme: dark }}
+   *
+   * @example
+   * // Use string-based theme
+   * appearance={{ theme: 'clerk' }}
+   * appearance={{ theme: 'simple' }}
+   */
+  theme?: BaseTheme | BaseTheme[];
+  /**
+   * @deprecated Use `theme` instead. This property will be removed in a future version.
    * A theme used as the base theme for the components.
    * For further customisation, you can use the {@link Theme.layout}, {@link Theme.variables} and {@link Theme.elements} props.
    * @example
@@ -838,7 +854,7 @@ export type Theme = {
   /**
    * The appearance of the CAPTCHA widget.
    * This will be used to style the CAPTCHA widget.
-   * Eg: `theme: 'dark'`
+   * Eg: `captcha: { theme: 'dark' }`
    */
   captcha?: CaptchaAppearanceOptions;
 };
@@ -956,6 +972,7 @@ export type PlanDetailTheme = Theme;
 export type SubscriptionDetailsTheme = Theme;
 export type APIKeysTheme = Theme;
 export type OAuthConsentTheme = Theme;
+export type TaskSelectOrganizationTheme = Theme;
 
 type GlobalAppearanceOptions = {
   /**
@@ -1028,4 +1045,8 @@ export type Appearance<T = Theme> = T &
      * Theme overrides that only apply to the `<OAuthConsent />` component
      */
     __internal_oauthConsent?: T;
+    /**
+     * Theme overrides that only apply to the `<TaskSelectOrganization />` component
+     */
+    taskSelectOrganization?: T;
   };

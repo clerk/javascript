@@ -154,6 +154,7 @@ export const zhTW: LocalizationResource = {
     totalDue: undefined,
     totalDueToday: undefined,
     viewFeatures: undefined,
+    viewPayment: undefined,
     year: undefined,
   },
   createOrganization: {
@@ -792,6 +793,9 @@ export const zhTW: LocalizationResource = {
     form_param_max_length_exceeded__last_name: '姓氏不應超過 256 個字元。',
     form_param_max_length_exceeded__name: '名稱不應超過 256 個字元。',
     form_param_nil: undefined,
+    form_param_type_invalid: undefined,
+    form_param_type_invalid__email_address: undefined,
+    form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: undefined,

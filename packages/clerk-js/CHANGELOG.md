@@ -1,5 +1,98 @@
 # Change Log
 
+## 5.79.0
+
+### Minor Changes
+
+- [Billing Beta]: Update prefix for checkout status ([#6438](https://github.com/clerk/javascript/pull/6438)) by [@panteliselef](https://github.com/panteliselef)
+
+  Replaces `awaiting_` with `needs_`.
+
+- [Billing Beta] Remove `statement_id` from the checkout resource. ([#6437](https://github.com/clerk/javascript/pull/6437)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Add `inputmode="email"` to email fields to help prompt mobile devices to use a virtual keyboard optimized for entering email addresses. ([#6440](https://github.com/clerk/javascript/pull/6440)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix TelemetryCollector logic for clerk-js in browser to properly populate sdkMetadata for telemetry events. ([#6448](https://github.com/clerk/javascript/pull/6448)) by [@panteliselef](https://github.com/panteliselef)
+
+- Display alert on plan details error ([#6384](https://github.com/clerk/javascript/pull/6384)) by [@panteliselef](https://github.com/panteliselef)
+
+- Added proper type checking before using the in operator to prevent errors when modal state contains non-object values ([#6433](https://github.com/clerk/javascript/pull/6433)) by [@jacekradko](https://github.com/jacekradko)
+
+- Refactor billing statement page and payment attempt page data loading ([#6420](https://github.com/clerk/javascript/pull/6420)) by [@aeliox](https://github.com/aeliox)
+
+- Added temporary patch for API keys pagination compatibility ([#6451](https://github.com/clerk/javascript/pull/6451)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fix SSO callback for after-auth custom flows ([#6430](https://github.com/clerk/javascript/pull/6430)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`7a46679`](https://github.com/clerk/javascript/commit/7a46679a004739a7f712097c5779e9f5c068722e), [`05cc5ec`](https://github.com/clerk/javascript/commit/05cc5ecd82ecdbcc9922d3286224737a81813be0), [`22c35ef`](https://github.com/clerk/javascript/commit/22c35efb59226df2efaa2891fa4775c13312f4c6), [`c69de58`](https://github.com/clerk/javascript/commit/c69de58d7c01257eedc0ffe5162c91c5a8daeef6), [`e8d816a`](https://github.com/clerk/javascript/commit/e8d816a3350e862c3e9e1d4f8c96c047a0a016a2), [`aa9f185`](https://github.com/clerk/javascript/commit/aa9f185e21b58f8a6e03ea44ce29ee09ad2477d9), [`af0e123`](https://github.com/clerk/javascript/commit/af0e12393c9412281626e20dafb1b3a15558f6d9), [`3d1d871`](https://github.com/clerk/javascript/commit/3d1d8711405646cf3c2aabe99e08337a1028703a)]:
+  - @clerk/shared@3.17.0
+  - @clerk/types@4.72.0
+  - @clerk/localizations@3.20.6
+
+## 5.78.0
+
+### Minor Changes
+
+- [Billing Beta]: Replace `org` for `organization` as payer type for billing APIs. ([#6423](https://github.com/clerk/javascript/pull/6423)) by [@panteliselef](https://github.com/panteliselef)
+
+  This applies for all billing APIs, except the resources classes that represent data from Frontend API.
+
+- Refactor base theme approach to enable opting into simple theme. ([#6371](https://github.com/clerk/javascript/pull/6371)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  ```tsx
+  appearance={{
+    theme: 'simple' // removes Clerk base theme
+  }}
+  ```
+
+### Patch Changes
+
+- Fixes an issue where cookies were not properly cleared on sign out when using non-default cookie attributes. ([#6368](https://github.com/clerk/javascript/pull/6368)) by [@brkalow](https://github.com/brkalow)
+
+- Make `.finalize()` from useCheckout to return a Promise. ([#6422](https://github.com/clerk/javascript/pull/6422)) by [@panteliselef](https://github.com/panteliselef)
+
+- Fix server-side session cache not being invalidated for after-auth custom flows ([#6425](https://github.com/clerk/javascript/pull/6425)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Improve CLS when PaymentElement mounts in Checkout. ([#6387](https://github.com/clerk/javascript/pull/6387)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`e404456`](https://github.com/clerk/javascript/commit/e4044566bca81f63c8e9c630fdec0f498ad6fc08), [`2803133`](https://github.com/clerk/javascript/commit/28031330a9810946feb44b93be10c067fb3b63ba), [`f1d9d34`](https://github.com/clerk/javascript/commit/f1d9d3482a796dd5f7796ede14159850e022cba2), [`d58b959`](https://github.com/clerk/javascript/commit/d58b9594cf65158e87dbaa90d632c45f543373e1), [`822ba1f`](https://github.com/clerk/javascript/commit/822ba1fd5e7daf665120cf183e4600a227098d53), [`d4d2612`](https://github.com/clerk/javascript/commit/d4d2612483baf356c389ef0ba5084059025481f2)]:
+  - @clerk/types@4.71.0
+  - @clerk/shared@3.16.0
+  - @clerk/localizations@3.20.5
+
+## 5.77.0
+
+### Minor Changes
+
+- Introduce `<TaskSelectOrganization />` component. ([#6376](https://github.com/clerk/javascript/pull/6376)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  It allows you to eject the organization selection task flow from the default `SignIn` and `SignUp` components and render it on custom URL paths using `taskUrls`.
+
+  Usage example:
+
+  ```tsx
+  <ClerkProvider taskUrls={{ 'select-organization': '/onboarding/select-organization' }}>
+    <App />
+  </ClerkProvider>
+  ```
+
+  ```tsx
+  function OnboardingSelectOrganization() {
+    return <TaskSelectOrganization redirectUrlComplete='/dashboard/onboarding-complete' />;
+  }
+  ```
+
+### Patch Changes
+
+- Remove cache revalidation hooks from pending session handling. This fixes unmounting issues from `SignIn` and `SignUp` AIOs during after-auth flows. ([#6389](https://github.com/clerk/javascript/pull/6389)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`b0fdc9e`](https://github.com/clerk/javascript/commit/b0fdc9eaf764ca0c17cbe0810b7d240f6d9db0b6)]:
+  - @clerk/types@4.70.1
+  - @clerk/localizations@3.20.4
+  - @clerk/shared@3.15.1
+
 ## 5.76.0
 
 ### Minor Changes
