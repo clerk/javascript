@@ -22,6 +22,7 @@ export const commonEnvs = () => {
     // Server-only environment variables
     API_VERSION: getEnvVariable('CLERK_API_VERSION') || 'v1',
     SECRET_KEY: getEnvVariable('CLERK_SECRET_KEY'),
+    MACHINE_SECRET_KEY: getEnvVariable('CLERK_MACHINE_SECRET_KEY'),
     ENCRYPTION_KEY: getEnvVariable('CLERK_ENCRYPTION_KEY'),
     CLERK_JWT_KEY: getEnvVariable('CLERK_JWT_KEY'),
     API_URL: getEnvVariable('CLERK_API_URL') || apiUrlFromPublishableKey(publicEnvs.publishableKey),

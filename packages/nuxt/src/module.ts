@@ -78,6 +78,7 @@ export default defineNuxtModule<ModuleOptions>({
       // Private keys available only on within server-side
       clerk: {
         secretKey: undefined,
+        machineSecretKey: undefined,
         jwtKey: undefined,
         webhookSigningSecret: undefined,
       },
