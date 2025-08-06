@@ -67,8 +67,8 @@ class AuthenticateContext implements AuthenticateContext {
     private clerkRequest: ClerkRequest,
     options: AuthenticateRequestOptions,
   ) {
-    if (options.acceptsToken === TokenType.MachineToken) {
-      // For machine tokens, we only need to set the header values.
+    if (options.acceptsToken === TokenType.MachineToken || options.acceptsToken === TokenType.ApiKey) {
+      // For non-session tokens, we only want to set the header values.
       this.initHeaderValues();
     } else {
       // Even though the options are assigned to this later in this function
