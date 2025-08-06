@@ -18,7 +18,7 @@ export class CommerceCheckout extends BaseResource implements CommerceCheckoutRe
   plan!: CommercePlan;
   planPeriod!: CommerceSubscriptionPlanPeriod;
   planPeriodStart!: number | undefined;
-  status!: string;
+  status!: 'needs_confirmation' | 'completed';
   totals!: CommerceCheckoutTotals;
   isImmediatePlanChange!: boolean;
 
