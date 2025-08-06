@@ -1,7 +1,7 @@
 import type { MatchFunction } from '@clerk/shared/pathToRegexp';
 import type { PendingSessionOptions } from '@clerk/types';
 
-import type { ApiClient, APIKey, IdPOAuthAccessToken, MachineToken } from '../api';
+import type { ApiClient, APIKey, IdPOAuthAccessToken, M2MToken } from '../api';
 import type {
   AuthenticatedMachineObject,
   AuthObject,
@@ -142,7 +142,7 @@ export type OrganizationSyncOptions = {
  */
 type Pattern = string;
 
-export type MachineAuthType = MachineToken | APIKey | IdPOAuthAccessToken;
+export type MachineAuthType = M2MToken | APIKey | IdPOAuthAccessToken;
 
 export type OrganizationSyncTargetMatchers = {
   OrganizationMatcher: MatchFunction<Partial<Record<string, string | string[]>>> | null;

@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { server, validateHeaders } from '../../mock-server';
 import { createBackendApiClient } from '../factory';
 
-describe('MachineTokenAPI', () => {
+describe('M2MToken', () => {
   const m2mId = 'mt_xxxxx';
   const m2mSecret = 'mt_secret_xxxxx';
 
@@ -40,7 +40,7 @@ describe('MachineTokenAPI', () => {
         ),
       );
 
-      const response = await apiClient.machineTokens.create({
+      const response = await apiClient.m2mTokens.create({
         secondsUntilExpiration: 3600,
       });
 
@@ -65,7 +65,7 @@ describe('MachineTokenAPI', () => {
         ),
       );
 
-      const response = await apiClient.machineTokens.create({
+      const response = await apiClient.m2mTokens.create({
         machineSecretKey: 'ak_xxxxx',
         secondsUntilExpiration: 3600,
       });
@@ -102,7 +102,7 @@ describe('MachineTokenAPI', () => {
         ),
       );
 
-      const errResponse = await apiClient.machineTokens.create().catch(err => err);
+      const errResponse = await apiClient.m2mTokens.create().catch(err => err);
 
       expect(errResponse.status).toBe(401);
       expect(errResponse.errors[0].code).toBe('machine_secret_key_invalid');
@@ -143,7 +143,7 @@ describe('MachineTokenAPI', () => {
         ),
       );
 
-      const response = await apiClient.machineTokens.revoke({
+      const response = await apiClient.m2mTokens.revoke({
         m2mTokenId: m2mId,
         revocationReason: 'revoked by test',
       });
@@ -171,7 +171,7 @@ describe('MachineTokenAPI', () => {
         ),
       );
 
-      const response = await apiClient.machineTokens.revoke({
+      const response = await apiClient.m2mTokens.revoke({
         m2mTokenId: m2mId,
         revocationReason: 'revoked by test',
       });
@@ -195,7 +195,7 @@ describe('MachineTokenAPI', () => {
         ),
       );
 
-      const errResponse = await apiClient.machineTokens
+      const errResponse = await apiClient.m2mTokens
         .revoke({
           m2mTokenId: m2mId,
           revocationReason: 'revoked by test',
@@ -223,7 +223,7 @@ describe('MachineTokenAPI', () => {
         ),
       );
 
-      const response = await apiClient.machineTokens.verifySecret({
+      const response = await apiClient.m2mTokens.verifySecret({
         secret: m2mSecret,
       });
 
@@ -249,7 +249,7 @@ describe('MachineTokenAPI', () => {
         ),
       );
 
-      const response = await apiClient.machineTokens.verifySecret({
+      const response = await apiClient.m2mTokens.verifySecret({
         secret: m2mSecret,
       });
 
@@ -273,7 +273,7 @@ describe('MachineTokenAPI', () => {
         ),
       );
 
-      const errResponse = await apiClient.machineTokens
+      const errResponse = await apiClient.m2mTokens
         .verifySecret({
           secret: m2mSecret,
         })

@@ -1,7 +1,7 @@
 export const mockTokens = {
   api_key: 'ak_LCWGdaM8mv8K4PC/57IICZQXAeWfCgF30DZaFXHoGn9=',
   oauth_token: 'oat_8XOIucKvqHVr5tYP123456789abcdefghij',
-  machine_token: 'mt_8XOIucKvqHVr5tYP123456789abcdefghij',
+  m2m_token: 'mt_8XOIucKvqHVr5tYP123456789abcdefghij',
 } as const;
 
 export const mockVerificationResults = {
@@ -36,7 +36,7 @@ export const mockVerificationResults = {
     createdAt: 1744928754551,
     updatedAt: 1744928754551,
   },
-  machine_token: {
+  m2m_token: {
     id: 'm2m_ey966f1b1xf93586b2debdcadb0b3bd1',
     subject: 'mch_2vYVtestTESTtestTESTtestTESTtest',
     scopes: ['mch_1xxxxx', 'mch_2xxxxx'],
@@ -60,7 +60,7 @@ export const mockMachineAuthResponses = {
     endpoint: 'https://api.clerk.test/oauth_applications/access_tokens/verify',
     errorMessage: 'OAuth token not found',
   },
-  machine_token: {
+  m2m_token: {
     endpoint: 'https://api.clerk.test/m2m_tokens/verify',
     errorMessage: 'Machine token not found',
   },

@@ -35,7 +35,7 @@ export function isMachineTokenByPrefix(token: string): boolean {
  */
 export function getMachineTokenType(token: string): MachineTokenType {
   if (token.startsWith(M2M_TOKEN_PREFIX)) {
-    return TokenType.MachineToken;
+    return TokenType.M2MToken;
   }
 
   if (token.startsWith(OAUTH_TOKEN_PREFIX)) {
@@ -79,5 +79,5 @@ export const isTokenTypeAccepted = (
  * @returns true if the type is a machine token type
  */
 export function isMachineTokenType(type: string): type is MachineTokenType {
-  return type === TokenType.ApiKey || type === TokenType.MachineToken || type === TokenType.OAuthToken;
+  return type === TokenType.ApiKey || type === TokenType.M2MToken || type === TokenType.OAuthToken;
 }

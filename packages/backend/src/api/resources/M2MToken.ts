@@ -1,6 +1,6 @@
-import type { MachineTokenJSON } from './JSON';
+import type { M2MTokenJSON } from './JSON';
 
-export class MachineToken {
+export class M2MToken {
   constructor(
     readonly id: string,
     readonly subject: string,
@@ -15,8 +15,8 @@ export class MachineToken {
     readonly secret?: string,
   ) {}
 
-  static fromJSON(data: MachineTokenJSON): MachineToken {
-    return new MachineToken(
+  static fromJSON(data: M2MTokenJSON): M2MToken {
+    return new M2MToken(
       data.id,
       data.subject,
       data.scopes,

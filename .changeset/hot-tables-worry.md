@@ -72,7 +72,7 @@ const clerkClient = createClerkClient({
 const authReq = await clerkClient.authenticateRequest(c.req.raw, {
   // or pass as an option here
   // machineSecretKey: process.env.CLERK_MACHINE_SECRET_KEY
-  acceptsToken: 'machine_token',
+  acceptsToken: 'm2m_token',
 })
 
 if (authReq.isAuthenticated) {
