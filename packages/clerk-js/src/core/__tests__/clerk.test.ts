@@ -483,17 +483,17 @@ describe('Clerk singleton', () => {
         touch: jest.fn(() => Promise.resolve()),
         getToken: jest.fn(),
         lastActiveToken: { getRawString: () => 'mocked-token' },
-        tasks: [{ key: 'select-organization' }],
-        currentTask: { key: 'select-organization', __internal_getUrl: () => 'https://sut/tasks/select-organization' },
+        tasks: [{ key: 'choose-organization' }],
+        currentTask: { key: 'choose-organization', __internal_getUrl: () => 'https://sut/tasks/choose-organization' },
         reload: jest.fn(() =>
           Promise.resolve({
             id: '1',
             status: 'pending',
             user: {},
-            tasks: [{ key: 'select-organization' }],
+            tasks: [{ key: 'choose-organization' }],
             currentTask: {
-              key: 'select-organization',
-              __internal_getUrl: () => 'https://sut/tasks/select-organization',
+              key: 'choose-organization',
+              __internal_getUrl: () => 'https://sut/tasks/choose-organization',
             },
           }),
         ),
@@ -929,8 +929,8 @@ describe('Clerk singleton', () => {
           id: '1',
           status: 'pending',
           user: {},
-          tasks: [{ key: 'select-organization' }],
-          currentTask: { key: 'select-organization', __internal_getUrl: () => 'https://sut/tasks/select-organization' },
+          tasks: [{ key: 'choose-organization' }],
+          currentTask: { key: 'choose-organization', __internal_getUrl: () => 'https://sut/tasks/choose-organization' },
           lastActiveToken: { getRawString: () => 'mocked-token' },
         };
 
@@ -970,7 +970,7 @@ describe('Clerk singleton', () => {
         await sut.handleRedirectCallback();
 
         await waitFor(() => {
-          expect(mockNavigate.mock.calls[0][0]).toBe('/sign-in#/tasks/select-organization');
+          expect(mockNavigate.mock.calls[0][0]).toBe('/sign-in#/tasks/choose-organization');
         });
       });
 
@@ -2438,8 +2438,8 @@ describe('Clerk singleton', () => {
         id: '1',
         status: 'pending',
         user: {},
-        tasks: [{ key: 'select-organization' }],
-        currentTask: { key: 'select-organization', __internal_getUrl: () => 'https://sut/tasks/select-organization' },
+        tasks: [{ key: 'choose-organization' }],
+        currentTask: { key: 'choose-organization', __internal_getUrl: () => 'https://sut/tasks/choose-organization' },
         lastActiveToken: { getRawString: () => 'mocked-token' },
       };
 
@@ -2473,7 +2473,7 @@ describe('Clerk singleton', () => {
         await sut.setActive({ session: mockResource as any as PendingSessionResource });
         await sut.__internal_navigateToTaskIfAvailable();
 
-        expect(mockNavigate.mock.calls[0][0]).toBe('/sign-in#/tasks/select-organization');
+        expect(mockNavigate.mock.calls[0][0]).toBe('/sign-in#/tasks/choose-organization');
       });
 
       it('navigates to next task with custom routing from clerk options', async () => {
@@ -2481,14 +2481,14 @@ describe('Clerk singleton', () => {
         await sut.load({
           ...mockedLoadOptions,
           taskUrls: {
-            'select-organization': '/onboarding/select-organization',
+            'choose-organization': '/onboarding/choose-organization',
           },
         });
 
         await sut.setActive({ session: mockResource as any as PendingSessionResource });
         await sut.__internal_navigateToTaskIfAvailable();
 
-        expect(mockNavigate.mock.calls[0][0]).toBe('/onboarding/select-organization');
+        expect(mockNavigate.mock.calls[0][0]).toBe('/onboarding/choose-organization');
       });
     });
 

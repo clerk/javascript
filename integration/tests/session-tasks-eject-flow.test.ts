@@ -20,7 +20,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 
 export function Provider({ children }: { children: any }) {
 return (
-  <ClerkProvider taskUrls={{ 'select-organization': '/onboarding/select-organization' }}>
+  <ClerkProvider taskUrls={{ 'choose-organization': '/onboarding/choose-organization' }}>
     {children}
   </ClerkProvider>
 )
@@ -50,7 +50,7 @@ return (
 }`,
       )
       .addFile(
-        'src/app/onboarding/select-organization/page.tsx',
+        'src/app/onboarding/choose-organization/page.tsx',
         () => `
 import { TaskChooseOrganization } from '@clerk/nextjs';
 
