@@ -13,5 +13,5 @@ export const signInComputedSignal = computed(() => {
     return { errors: null, signIn: null };
   }
 
-  return { errors, signIn: signIn.__internal_beta };
+  return { errors, signIn: signIn.__internal_future };
 });

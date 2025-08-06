@@ -85,7 +85,7 @@ export class SignIn extends BaseResource implements SignInResource {
   createdSessionId: string | null = null;
   userData: UserData = new UserData(null);
 
-  __internal_beta: SignInFuture | null = new SignInFuture(this);
+  __internal_future: SignInFuture | null = new SignInFuture(this);
   __internal_basePost;
 
   constructor(data: SignInJSON | SignInJSONSnapshot | null = null) {
