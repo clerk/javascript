@@ -2,7 +2,7 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const enUS: LocalizationResource = {
   locale: 'en-US',
-  taskSelectOrganization: {
+  taskChooseOrganization: {
     signOut: {
       actionLink: 'Sign out',
       actionText: 'Signed in as {{identifier}}',
@@ -13,7 +13,7 @@ export const enUS: LocalizationResource = {
       formButtonSubmit: 'Create new organization',
       formButtonReset: 'Cancel',
     },
-    selectOrganization: {
+    chooseOrganization: {
       title: 'Choose an organization',
       subtitle: 'Select the organization with which you wish to continue',
       suggestionsAcceptedLabel: 'Pending approval',

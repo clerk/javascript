@@ -25,12 +25,12 @@ import { useOrganizationListInView } from '@/ui/hooks/useOrganizationListInView'
 import { Add } from '@/ui/icons';
 import { handleError } from '@/ui/utils/errorHandler';
 
-type SelectOrganizationScreenProps = {
+type ChooseOrganizationScreenProps = {
   onCreateOrganizationClick: () => void;
 };
 
-export const SelectOrganizationScreen = withCardStateProvider(
-  ({ onCreateOrganizationClick }: SelectOrganizationScreenProps) => {
+export const ChooseOrganizationScreen = withCardStateProvider(
+  ({ onCreateOrganizationClick }: ChooseOrganizationScreenProps) => {
     const { ref, userMemberships, userSuggestions, userInvitations } = useOrganizationListInView();
 
     const isLoading = userMemberships?.isLoading || userInvitations?.isLoading || userSuggestions?.isLoading;
@@ -47,11 +47,11 @@ export const SelectOrganizationScreen = withCardStateProvider(
           showLogo
           sx={t => ({ padding: `${t.space.$none} ${t.space.$8}` })}
         >
-          <Header.Title localizationKey={localizationKeys('taskSelectOrganization.selectOrganization.title')} />
-          <Header.Subtitle localizationKey={localizationKeys('taskSelectOrganization.selectOrganization.subtitle')} />
+          <Header.Title localizationKey={localizationKeys('taskChooseOrganization.chooseOrganization.title')} />
+          <Header.Subtitle localizationKey={localizationKeys('taskChooseOrganization.chooseOrganization.subtitle')} />
         </Header.Root>
         <Col elementDescriptor={descriptors.main}>
-          <OrganizationPreviewListItems elementDescriptor={descriptors.taskSelectOrganizationPreviewItems}>
+          <OrganizationPreviewListItems elementDescriptor={descriptors.taskChooseOrganizationPreviewItems}>
             <Actions role='menu'>
               {(userMemberships.count || 0) > 0 &&
                 userMemberships.data?.map(inv => {
@@ -117,11 +117,11 @@ const MembershipPreview = withCardStateProvider((props: { organization: Organiza
 
   return (
     <OrganizationPreviewButton
-      elementDescriptor={descriptors.taskSelectOrganizationPreviewButton}
+      elementDescriptor={descriptors.taskChooseOrganizationPreviewButton}
       onClick={() => handleOrganizationClicked(props.organization)}
     >
       <OrganizationPreview
-        elementId='taskSelectOrganization'
+        elementId='taskChooseOrganization'
         mainIdentifierSx={sharedMainIdentifierSx}
         organization={props.organization}
       />
@@ -163,13 +163,13 @@ const InvitationPreview = withCardStateProvider((props: UserOrganizationInvitati
   return (
     <OrganizationPreviewListItem
       organizationData={props.publicOrganizationData}
-      elementId='taskSelectOrganization'
-      elementDescriptor={descriptors.taskSelectOrganizationPreviewItem}
+      elementId='taskChooseOrganization'
+      elementDescriptor={descriptors.taskChooseOrganizationPreviewItem}
     >
       <OrganizationPreviewListItemButton
         isLoading={card.isLoading}
         onClick={handleAccept}
-        localizationKey={localizationKeys('taskSelectOrganization.selectOrganization.action__invitationAccept')}
+        localizationKey={localizationKeys('taskChooseOrganization.chooseOrganization.action__invitationAccept')}
       />
     </OrganizationPreviewListItem>
   );
@@ -195,7 +195,7 @@ const SuggestionPreview = withCardStateProvider((props: OrganizationSuggestionRe
     return (
       <Text
         colorScheme='secondary'
-        localizationKey={localizationKeys('taskSelectOrganization.selectOrganization.suggestionsAcceptedLabel')}
+        localizationKey={localizationKeys('taskChooseOrganization.chooseOrganization.suggestionsAcceptedLabel')}
       />
     );
   }
@@ -203,13 +203,13 @@ const SuggestionPreview = withCardStateProvider((props: OrganizationSuggestionRe
   return (
     <OrganizationPreviewListItem
       organizationData={props.publicOrganizationData}
-      elementId='taskSelectOrganization'
-      elementDescriptor={descriptors.taskSelectOrganizationPreviewItem}
+      elementId='taskChooseOrganization'
+      elementDescriptor={descriptors.taskChooseOrganizationPreviewItem}
     >
       <OrganizationPreviewListItemButton
         onClick={handleAccept}
         isLoading={card.isLoading}
-        localizationKey={localizationKeys('taskSelectOrganization.selectOrganization.action__suggestionsAccept')}
+        localizationKey={localizationKeys('taskChooseOrganization.chooseOrganization.action__suggestionsAccept')}
       />
     </OrganizationPreviewListItem>
   );
@@ -228,9 +228,9 @@ const CreateOrganizationButton = ({
 
   return (
     <Action
-      elementDescriptor={descriptors.taskSelectOrganizationCreateOrganizationActionButton}
+      elementDescriptor={descriptors.taskChooseOrganizationCreateOrganizationActionButton}
       icon={Add}
-      label={localizationKeys('taskSelectOrganization.selectOrganization.action__createOrganization')}
+      label={localizationKeys('taskChooseOrganization.chooseOrganization.action__createOrganization')}
       onClick={onCreateOrganizationClick}
       sx={t => ({
         borderTopWidth: t.borderWidths.$normal,

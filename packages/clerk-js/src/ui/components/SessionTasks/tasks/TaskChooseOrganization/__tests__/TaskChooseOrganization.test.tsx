@@ -4,11 +4,11 @@ import userEvent from '@testing-library/user-event';
 import { bindCreateFixtures, render, waitFor } from '@/testUtils';
 import { createFakeUserOrganizationMembership } from '@/ui/components/OrganizationSwitcher/__tests__/utlis';
 
-import { TaskSelectOrganization } from '../';
+import { TaskChooseOrganization } from '..';
 
-const { createFixtures } = bindCreateFixtures('TaskSelectOrganization');
+const { createFixtures } = bindCreateFixtures('TaskChooseOrganization');
 
-describe('TaskSelectOrganization', () => {
+describe('TaskChooseOrganization', () => {
   it('does not render component without existing session task', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withOrganizations();
@@ -19,7 +19,7 @@ describe('TaskSelectOrganization', () => {
       });
     });
 
-    const { queryByText, queryByRole } = render(<TaskSelectOrganization />, { wrapper });
+    const { queryByText, queryByRole } = render(<TaskChooseOrganization />, { wrapper });
 
     await waitFor(() => {
       expect(queryByText('Setup your account')).not.toBeInTheDocument();
@@ -39,7 +39,7 @@ describe('TaskSelectOrganization', () => {
       });
     });
 
-    const { getByText, getByRole } = render(<TaskSelectOrganization />, { wrapper });
+    const { getByText, getByRole } = render(<TaskChooseOrganization />, { wrapper });
 
     await waitFor(() => {
       expect(getByText('Setup your account')).toBeInTheDocument();
@@ -59,7 +59,7 @@ describe('TaskSelectOrganization', () => {
       });
     });
 
-    const { getByRole, getByText } = render(<TaskSelectOrganization />, { wrapper });
+    const { getByRole, getByText } = render(<TaskChooseOrganization />, { wrapper });
 
     await waitFor(() => {
       expect(getByRole('textbox', { name: /name/i })).toBeInTheDocument();
@@ -98,7 +98,7 @@ describe('TaskSelectOrganization', () => {
       }),
     );
 
-    const { getByText, queryByRole } = render(<TaskSelectOrganization />, { wrapper });
+    const { getByText, queryByRole } = render(<TaskChooseOrganization />, { wrapper });
 
     await waitFor(() => {
       expect(getByText('Existing Org')).toBeInTheDocument();
@@ -138,7 +138,7 @@ describe('TaskSelectOrganization', () => {
       }),
     );
 
-    const { getByText, getByRole, queryByRole, queryByText } = render(<TaskSelectOrganization />, { wrapper });
+    const { getByText, getByRole, queryByRole, queryByText } = render(<TaskChooseOrganization />, { wrapper });
 
     await waitFor(() => {
       expect(getByText('Existing Org')).toBeInTheDocument();
@@ -177,7 +177,7 @@ describe('TaskSelectOrganization', () => {
       });
     });
 
-    const { getByText } = render(<TaskSelectOrganization />, { wrapper });
+    const { getByText } = render(<TaskChooseOrganization />, { wrapper });
 
     await waitFor(() => {
       expect(getByText(/user@test\.com/)).toBeInTheDocument();
@@ -196,7 +196,7 @@ describe('TaskSelectOrganization', () => {
       });
     });
 
-    const { getByRole } = render(<TaskSelectOrganization />, { wrapper });
+    const { getByRole } = render(<TaskChooseOrganization />, { wrapper });
     const signOutButton = getByRole('link', { name: /sign out/i });
 
     await userEvent.click(signOutButton);
@@ -215,7 +215,7 @@ describe('TaskSelectOrganization', () => {
       });
     });
 
-    const { getByText } = render(<TaskSelectOrganization />, { wrapper });
+    const { getByText } = render(<TaskChooseOrganization />, { wrapper });
 
     expect(getByText(/testuser/)).toBeInTheDocument();
   });

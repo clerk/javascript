@@ -1202,7 +1202,7 @@ export type __internal_LocalizationResource = {
     formFieldCaption__expiration__never: LocalizationValue;
     formFieldCaption__expiration__expiresOn: LocalizationValue<'date'>;
   };
-  taskSelectOrganization: {
+  taskChooseOrganization: {
     title: LocalizationValue;
     subtitle: LocalizationValue;
     signOut: {
@@ -1215,7 +1215,7 @@ export type __internal_LocalizationResource = {
       formButtonSubmit: LocalizationValue;
       formButtonReset: LocalizationValue;
     };
-    selectOrganization: {
+    chooseOrganization: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
       suggestionsAcceptedLabel: LocalizationValue;

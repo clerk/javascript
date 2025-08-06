@@ -2,7 +2,7 @@ import type {
   __internal_OAuthConsentProps,
   APIKeysProps,
   PricingTableProps,
-  TaskSelectOrganizationProps,
+  TaskChooseOrganizationProps,
   UserButtonProps,
   WaitlistProps,
 } from '@clerk/types';
@@ -26,7 +26,7 @@ import {
   UserVerificationContext,
   WaitlistContext,
 } from './components';
-import { SessionTasksContext, TaskSelectOrganizationContext } from './components/SessionTasks';
+import { SessionTasksContext, TaskChooseOrganizationContext } from './components/SessionTasks';
 
 export function ComponentContextProvider({
   componentName,
@@ -110,15 +110,15 @@ export function ComponentContextProvider({
           {children}
         </OAuthConsentContext.Provider>
       );
-    case 'TaskSelectOrganization':
+    case 'TaskChooseOrganization':
       return (
-        <TaskSelectOrganizationContext.Provider
-          value={{ componentName: 'TaskSelectOrganization', ...(props as TaskSelectOrganizationProps) }}
+        <TaskChooseOrganizationContext.Provider
+          value={{ componentName: 'TaskChooseOrganization', ...(props as TaskChooseOrganizationProps) }}
         >
-          <SessionTasksContext.Provider value={{ ...(props as TaskSelectOrganizationProps) }}>
+          <SessionTasksContext.Provider value={{ ...(props as TaskChooseOrganizationProps) }}>
             {children}
           </SessionTasksContext.Provider>
-        </TaskSelectOrganizationContext.Provider>
+        </TaskChooseOrganizationContext.Provider>
       );
     default:
       throw new Error(`Unknown component context: ${componentName}`);

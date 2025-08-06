@@ -9,10 +9,10 @@ import { useMultipleSessions } from '@/ui/hooks/useMultipleSessions';
 import { useOrganizationListInView } from '@/ui/hooks/useOrganizationListInView';
 
 import { withTaskGuard } from '../withTaskGuard';
+import { ChooseOrganizationScreen } from './ChooseOrganizationScreen';
 import { CreateOrganizationScreen } from './CreateOrganizationScreen';
-import { SelectOrganizationScreen } from './SelectOrganizationScreen';
 
-const TaskSelectOrganizationInternal = () => {
+const TaskChooseOrganizationInternal = () => {
   const { signOut } = useClerk();
   const { user } = useUser();
   const { session } = useSession();
@@ -33,7 +33,7 @@ const TaskSelectOrganizationInternal = () => {
   const identifier = user?.primaryEmailAddress?.emailAddress ?? user?.username;
 
   return (
-    <Flow.Root flow='taskSelectOrganization'>
+    <Flow.Root flow='taskChooseOrganization'>
       <Card.Root>
         <Card.Content sx={t => ({ padding: `${t.space.$8} ${t.space.$none} ${t.space.$none}`, gap: t.space.$7 })}>
           {isLoading ? (
@@ -53,7 +53,7 @@ const TaskSelectOrganizationInternal = () => {
               />
             </Flex>
           ) : (
-            <TaskSelectOrganizationFlows initialFlow={hasExistingResources ? 'select' : 'create'} />
+            <TaskChooseOrganizationFlows initialFlow={hasExistingResources ? 'choose' : 'create'} />
           )}
         </Card.Content>
 
@@ -67,7 +67,7 @@ const TaskSelectOrganizationInternal = () => {
             {identifier && (
               <Card.ActionText
                 truncate
-                localizationKey={localizationKeys('taskSelectOrganization.signOut.actionText', {
+                localizationKey={localizationKeys('taskChooseOrganization.signOut.actionText', {
                   identifier,
                 })}
               />
@@ -75,7 +75,7 @@ const TaskSelectOrganizationInternal = () => {
             <Card.ActionLink
               sx={() => ({ flexShrink: 0 })}
               onClick={handleSignOut}
-              localizationKey={localizationKeys('taskSelectOrganization.signOut.actionLink')}
+              localizationKey={localizationKeys('taskChooseOrganization.signOut.actionLink')}
             />
           </Card.Action>
         </Card.Footer>
@@ -84,24 +84,24 @@ const TaskSelectOrganizationInternal = () => {
   );
 };
 
-type TaskSelectOrganizationFlowsProps = {
-  initialFlow: 'create' | 'select';
+type TaskChooseOrganizationFlowsProps = {
+  initialFlow: 'create' | 'choose';
 };
 
-const TaskSelectOrganizationFlows = withCardStateProvider((props: TaskSelectOrganizationFlowsProps) => {
+const TaskChooseOrganizationFlows = withCardStateProvider((props: TaskChooseOrganizationFlowsProps) => {
   const [currentFlow, setCurrentFlow] = useState(props.initialFlow);
 
   if (currentFlow === 'create') {
     return (
       <CreateOrganizationScreen
-        onCancel={props.initialFlow === 'select' ? () => setCurrentFlow('select') : undefined}
+        onCancel={props.initialFlow === 'choose' ? () => setCurrentFlow('choose') : undefined}
       />
     );
   }
 
-  return <SelectOrganizationScreen onCreateOrganizationClick={() => setCurrentFlow('create')} />;
+  return <ChooseOrganizationScreen onCreateOrganizationClick={() => setCurrentFlow('create')} />;
 });
 
-export const TaskSelectOrganization = withCoreSessionSwitchGuard(
-  withTaskGuard(withCardStateProvider(TaskSelectOrganizationInternal)),
+export const TaskChooseOrganization = withCoreSessionSwitchGuard(
+  withTaskGuard(withCardStateProvider(TaskChooseOrganizationInternal)),
 );

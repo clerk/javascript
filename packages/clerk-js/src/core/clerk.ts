@@ -30,9 +30,9 @@ import type {
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
-  Clerk as ClerkInterface,
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
+  Clerk as ClerkInterface,
   ClerkOptions,
   ClientJSONSnapshot,
   ClientResource,
@@ -76,7 +76,7 @@ import type {
   SignUpProps,
   SignUpRedirectOptions,
   SignUpResource,
-  TaskSelectOrganizationProps,
+  TaskChooseOrganizationProps,
   UnsubscribeCallback,
   UserButtonProps,
   UserProfileProps,
@@ -1163,31 +1163,31 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls.ensureMounted().then(controls => controls.unmountComponent({ node }));
   };
 
-  public mountTaskSelectOrganization = (node: HTMLDivElement, props?: TaskSelectOrganizationProps) => {
+  public mountTaskChooseOrganization = (node: HTMLDivElement, props?: TaskChooseOrganizationProps) => {
     this.assertComponentsReady(this.#componentControls);
 
     if (disabledOrganizationsFeature(this, this.environment)) {
       if (this.#instanceType === 'development') {
-        throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('TaskSelectOrganization'), {
+        throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('TaskChooseOrganization'), {
           code: CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE,
         });
       }
       return;
     }
 
-    void this.#componentControls.ensureMounted({ preloadHint: 'TaskSelectOrganization' }).then(controls =>
+    void this.#componentControls.ensureMounted({ preloadHint: 'TaskChooseOrganization' }).then(controls =>
       controls.mountComponent({
-        name: 'TaskSelectOrganization',
-        appearanceKey: 'taskSelectOrganization',
+        name: 'TaskChooseOrganization',
+        appearanceKey: 'taskChooseOrganization',
         node,
         props,
       }),
     );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted('TaskSelectOrganization', props));
+    this.telemetry?.record(eventPrebuiltComponentMounted('TaskChooseOrganization', props));
   };
 
-  public unmountTaskSelectOrganization = (node: HTMLDivElement) => {
+  public unmountTaskChooseOrganization = (node: HTMLDivElement) => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls.ensureMounted().then(controls => controls.unmountComponent({ node }));
   };

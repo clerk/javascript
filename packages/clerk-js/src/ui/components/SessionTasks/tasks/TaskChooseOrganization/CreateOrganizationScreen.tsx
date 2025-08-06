@@ -71,8 +71,8 @@ export const CreateOrganizationScreen = withCardStateProvider((props: CreateOrga
         showLogo
         sx={t => ({ padding: `${t.space.$none} ${t.space.$8}` })}
       >
-        <Header.Title localizationKey={localizationKeys('taskSelectOrganization.createOrganization.title')} />
-        <Header.Subtitle localizationKey={localizationKeys('taskSelectOrganization.createOrganization.subtitle')} />
+        <Header.Title localizationKey={localizationKeys('taskChooseOrganization.createOrganization.title')} />
+        <Header.Subtitle localizationKey={localizationKeys('taskChooseOrganization.createOrganization.subtitle')} />
       </Header.Root>
       <FormContainer>
         <Form.Root
@@ -102,11 +102,11 @@ export const CreateOrganizationScreen = withCardStateProvider((props: CreateOrga
             <Form.SubmitButton
               block
               isDisabled={isSubmitButtonDisabled}
-              localizationKey={localizationKeys('taskSelectOrganization.createOrganization.formButtonSubmit')}
+              localizationKey={localizationKeys('taskChooseOrganization.createOrganization.formButtonSubmit')}
             />
             {props.onCancel && (
               <Form.ResetButton
-                localizationKey={localizationKeys('taskSelectOrganization.createOrganization.formButtonReset')}
+                localizationKey={localizationKeys('taskChooseOrganization.createOrganization.formButtonReset')}
                 onClick={props.onCancel}
               />
             )}

@@ -52,7 +52,7 @@ export type OrganizationPreviewId =
   | 'organizationList'
   | 'organizationSwitcherListedOrganization'
   | 'organizationSwitcherActiveOrganization'
-  | 'taskSelectOrganization';
+  | 'taskChooseOrganization';
 
 export type CardActionId =
   | 'havingTrouble'
