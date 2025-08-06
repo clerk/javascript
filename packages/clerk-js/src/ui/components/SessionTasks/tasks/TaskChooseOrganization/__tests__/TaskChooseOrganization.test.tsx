@@ -67,7 +67,7 @@ describe('TaskChooseOrganization', () => {
     });
   });
 
-  it('shows select organization screen when user has existing organizations', async () => {
+  it('shows choose organization screen when user has existing organizations', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
       f.withForceOrganizationSelection();
@@ -107,7 +107,7 @@ describe('TaskChooseOrganization', () => {
     });
   });
 
-  it('allows switching between select and create organization screens', async () => {
+  it('allows switching between choose and create organization screens', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
       f.withForceOrganizationSelection();
