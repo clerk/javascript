@@ -437,6 +437,24 @@ export interface CommercePlanResource extends ClerkResource {
    * ```
    */
   features: CommerceFeatureResource[];
+  /**
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+   * @example
+   * ```tsx
+   * <ClerkProvider clerkJsVersion="x.x.x" />
+   * ```
+   */
+  freeTrialDays: number | null;
+  /**
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+   * @example
+   * ```tsx
+   * <ClerkProvider clerkJsVersion="x.x.x" />
+   * ```
+   */
+  freeTrialEnabled: boolean;
   __internal_toSnapshot: () => CommercePlanJSONSnapshot;
 }
 
@@ -1106,6 +1124,25 @@ export interface CommerceSubscriptionItemResource extends ClerkResource {
    * ```
    */
   cancel: (params: CancelSubscriptionParams) => Promise<DeletedObjectResource>;
+  // /**
+  //  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+  //  * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+  //  * @example
+  //  * ```tsx
+  //  * <ClerkProvider clerkJsVersion="x.x.x" />
+  //  * ```
+  //  */
+  // isFreeTrial: boolean;
+
+  /**
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+   * @example
+   * ```tsx
+   * <ClerkProvider clerkJsVersion="x.x.x" />
+   * ```
+   */
+  freeTrialEndsAt: Date | null;
 }
 
 /**
@@ -1215,6 +1252,16 @@ export interface CommerceSubscriptionResource extends ClerkResource {
    * ```
    */
   updatedAt: Date | null;
+
+  /**
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+   * @example
+   * ```tsx
+   * <ClerkProvider clerkJsVersion="x.x.x" />
+   * ```
+   */
+  eligibleForFreeTrial?: boolean;
 }
 
 /**
