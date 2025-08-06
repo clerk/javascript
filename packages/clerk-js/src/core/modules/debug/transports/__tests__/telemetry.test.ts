@@ -1,5 +1,6 @@
+import type { TelemetryCollector } from '@clerk/shared/telemetry';
+
 import type { DebugLogEntry } from '../../types';
-import { TelemetryCollector } from '@clerk/shared/telemetry';
 import { TelemetryTransport } from '../telemetry';
 
 describe('TelemetryTransport', () => {
