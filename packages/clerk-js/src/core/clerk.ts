@@ -1582,20 +1582,27 @@ export class Clerk implements ClerkInterface {
   }
 
   public buildAfterMultiSessionSingleSignOutUrl(): string {
-    if (!this.#options.afterMultiSessionSingleSignOutUrl) {
+    if (!this.environment) {
+      return '';
+    }
+
+    if (this.#options.afterMultiSessionSingleSignOutUrl) {
+      return this.buildUrlWithAuth(this.#options.afterMultiSessionSingleSignOutUrl);
+    }
+
+    if (this.#options.signInUrl) {
       return this.buildUrlWithAuth(
         buildURL(
           {
-            base: this.#options.signInUrl
-              ? `${this.#options.signInUrl}/choose`
-              : this.environment?.displayConfig.afterSignOutOneUrl,
+            base: this.#options.signInUrl,
+            hashPath: 'choose',
           },
           { stringify: true },
         ),
       );
     }
 
-    return this.buildUrlWithAuth(this.#options.afterMultiSessionSingleSignOutUrl);
+    return this.buildUrlWithAuth(this.environment.displayConfig.afterSignOutOneUrl);
   }
 
   public buildCreateOrganizationUrl(): string {

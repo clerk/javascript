@@ -279,9 +279,9 @@ export const PayWithTestPaymentSource = () => {
 const AddPaymentSourceForCheckout = withCardStateProvider(() => {
   const { addPaymentSourceAndPay } = useCheckoutMutations();
   const { checkout } = useCheckout();
-  const { id, totals } = checkout;
+  const { status, totals } = checkout;
 
-  if (!id) {
+  if (status === 'needs_initialization') {
     return null;
   }
 
