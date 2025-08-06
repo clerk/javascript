@@ -1,6 +1,6 @@
-import type { ClerkBackendApiRequestOptions } from '../../api/request';
 import { joinPaths } from '../../util/path';
-import type { MachineToken } from '../resources/MachineToken';
+import type { ClerkBackendApiRequestOptions } from '../request';
+import type { M2MToken } from '../resources/M2MToken';
 import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/m2m_tokens';
@@ -34,7 +34,7 @@ type VerifyMachineTokenParams = {
   secret: string;
 };
 
-export class MachineTokenApi extends AbstractAPI {
+export class M2MTokenApi extends AbstractAPI {
   #createRequestOptions(options: ClerkBackendApiRequestOptions, machineSecretKey?: string) {
     if (machineSecretKey) {
       return {
@@ -64,7 +64,7 @@ export class MachineTokenApi extends AbstractAPI {
       machineSecretKey,
     );
 
-    return this.request<MachineToken>(requestOptions);
+    return this.request<M2MToken>(requestOptions);
   }
 
   async revoke(params: RevokeMachineTokenParams) {
@@ -83,7 +83,7 @@ export class MachineTokenApi extends AbstractAPI {
       machineSecretKey,
     );
 
-    return this.request<MachineToken>(requestOptions);
+    return this.request<M2MToken>(requestOptions);
   }
 
   async verifySecret(params: VerifyMachineTokenParams) {
@@ -98,6 +98,6 @@ export class MachineTokenApi extends AbstractAPI {
       machineSecretKey,
     );
 
-    return this.request<MachineToken>(requestOptions);
+    return this.request<M2MToken>(requestOptions);
   }
 }

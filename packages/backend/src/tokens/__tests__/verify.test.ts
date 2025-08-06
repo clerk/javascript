@@ -1,7 +1,7 @@
 import { http, HttpResponse } from 'msw';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { APIKey, IdPOAuthAccessToken, MachineToken } from '../../api';
+import type { APIKey, IdPOAuthAccessToken, M2MToken } from '../../api';
 import { mockJwks, mockJwt, mockJwtPayload } from '../../fixtures';
 import { mockVerificationResults } from '../../fixtures/machine';
 import { server, validateHeaders } from '../../mock-server';
@@ -104,7 +104,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       http.post(
         'https://api.clerk.test/m2m_tokens/verify',
         validateHeaders(() => {
-          return HttpResponse.json(mockVerificationResults.machine_token);
+          return HttpResponse.json(mockVerificationResults.m2m_token);
         }),
       ),
     );
@@ -114,11 +114,11 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       secretKey: 'a-valid-key',
     });
 
-    expect(result.tokenType).toBe('machine_token');
+    expect(result.tokenType).toBe('m2m_token');
     expect(result.data).toBeDefined();
     expect(result.errors).toBeUndefined();
 
-    const data = result.data as MachineToken;
+    const data = result.data as M2MToken;
     expect(data.id).toBe('m2m_ey966f1b1xf93586b2debdcadb0b3bd1');
     expect(data.subject).toBe('mch_2vYVtestTESTtestTESTtestTESTtest');
     expect(data.claims).toEqual({ foo: 'bar' });
@@ -133,7 +133,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
         'https://api.clerk.test/m2m_tokens/verify',
         validateHeaders(({ request }) => {
           expect(request.headers.get('Authorization')).toBe('Bearer ak_xxxxx');
-          return HttpResponse.json(mockVerificationResults.machine_token);
+          return HttpResponse.json(mockVerificationResults.m2m_token);
         }),
       ),
     );
@@ -144,11 +144,11 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       machineSecretKey: 'ak_xxxxx',
     });
 
-    expect(result.tokenType).toBe('machine_token');
+    expect(result.tokenType).toBe('m2m_token');
     expect(result.data).toBeDefined();
     expect(result.errors).toBeUndefined();
 
-    const data = result.data as MachineToken;
+    const data = result.data as M2MToken;
     expect(data.id).toBe('m2m_ey966f1b1xf93586b2debdcadb0b3bd1');
     expect(data.subject).toBe('mch_2vYVtestTESTtestTESTtestTESTtest');
     expect(data.claims).toEqual({ foo: 'bar' });
@@ -241,7 +241,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
         secretKey: 'a-valid-key',
       });
 
-      expect(result.tokenType).toBe('machine_token');
+      expect(result.tokenType).toBe('m2m_token');
       expect(result.data).toBeUndefined();
       expect(result.errors).toBeDefined();
       expect(result.errors?.[0].message).toBe('Machine token not found');
@@ -262,7 +262,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
         secretKey: 'a-valid-key',
       });
 
-      expect(result.tokenType).toBe('machine_token');
+      expect(result.tokenType).toBe('m2m_token');
       expect(result.data).toBeUndefined();
       expect(result.errors).toBeDefined();
       expect(result.errors?.[0].message).toBe('Unexpected error');

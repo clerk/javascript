@@ -15,10 +15,10 @@ import {
   InstanceSettings,
   Invitation,
   JwtTemplate,
+  M2MToken,
   Machine,
   MachineScope,
   MachineSecretKey,
-  MachineToken,
   OauthAccessToken,
   OAuthApplication,
   Organization,
@@ -141,8 +141,8 @@ function jsonToObject(item: any): any {
       return MachineScope.fromJSON(item);
     case ObjectType.MachineSecretKey:
       return MachineSecretKey.fromJSON(item);
-    case ObjectType.MachineToken:
-      return MachineToken.fromJSON(item);
+    case ObjectType.M2MToken:
+      return M2MToken.fromJSON(item);
     case ObjectType.OauthAccessToken:
       return OauthAccessToken.fromJSON(item);
     case ObjectType.OAuthApplication:

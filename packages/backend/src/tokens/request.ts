@@ -154,7 +154,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
   const acceptsToken = options.acceptsToken ?? TokenType.SessionToken;
 
   // machine-to-machine tokens can accept a machine secret or a secret key
-  if (acceptsToken !== TokenType.MachineToken) {
+  if (acceptsToken !== TokenType.M2MToken) {
     assertValidSecretKey(authenticateContext.secretKey);
 
     if (authenticateContext.isSatellite) {
@@ -166,8 +166,8 @@ export const authenticateRequest: AuthenticateRequest = (async (
     }
   }
 
-  // Make sure a machine secret or instance secret key is provided if acceptsToken is machine_token
-  if (acceptsToken === TokenType.MachineToken) {
+  // Make sure a machine secret or instance secret key is provided if acceptsToken is m2m_token
+  if (acceptsToken === TokenType.M2MToken) {
     assertMachineSecretOrSecretKey(authenticateContext);
   }
 
@@ -791,7 +791,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
   if (
     acceptsToken === TokenType.OAuthToken ||
     acceptsToken === TokenType.ApiKey ||
-    acceptsToken === TokenType.MachineToken
+    acceptsToken === TokenType.M2MToken
   ) {
     return signedOut({
       tokenType: acceptsToken,
