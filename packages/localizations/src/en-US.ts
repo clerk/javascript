@@ -17,7 +17,7 @@ export const enUS: LocalizationResource = {
       title: 'Choose an organization',
       subtitle: 'Select the organization with which you wish to continue',
       suggestionsAcceptedLabel: 'Pending approval',
-      action__createOrganization: 'Create organization',
+      action__createOrganization: 'Create new organization',
       action__suggestionsAccept: 'Request to join',
       action__invitationAccept: 'Join',
     },
