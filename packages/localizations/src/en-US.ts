@@ -10,12 +10,12 @@ export const enUS: LocalizationResource = {
     createOrganization: {
       title: 'Setup your account',
       subtitle: 'Tell us a bit about your organization',
-      formButtonSubmit: 'Create organization',
+      formButtonSubmit: 'Create new organization',
       formButtonReset: 'Cancel',
     },
     selectOrganization: {
-      title: 'Choose an account',
-      subtitle: 'Select the account with which you wish to continue',
+      title: 'Choose an organization',
+      subtitle: 'Select the organization with which you wish to continue',
       suggestionsAcceptedLabel: 'Pending approval',
       action__createOrganization: 'Create organization',
       action__suggestionsAccept: 'Request to join',

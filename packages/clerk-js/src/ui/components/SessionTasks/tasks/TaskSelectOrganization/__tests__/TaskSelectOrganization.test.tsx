@@ -63,7 +63,7 @@ describe('TaskSelectOrganization', () => {
 
     await waitFor(() => {
       expect(getByRole('textbox', { name: /name/i })).toBeInTheDocument();
-      expect(getByText('Create organization')).toBeInTheDocument();
+      expect(getByText('Create new organization')).toBeInTheDocument();
     });
   });
 
@@ -102,7 +102,7 @@ describe('TaskSelectOrganization', () => {
 
     await waitFor(() => {
       expect(getByText('Existing Org')).toBeInTheDocument();
-      expect(getByText('Create organization')).toBeInTheDocument();
+      expect(getByText('Create new organization')).toBeInTheDocument();
       expect(queryByRole('textbox', { name: /name/i })).not.toBeInTheDocument();
     });
   });
@@ -142,16 +142,16 @@ describe('TaskSelectOrganization', () => {
 
     await waitFor(() => {
       expect(getByText('Existing Org')).toBeInTheDocument();
-      expect(getByText('Create organization')).toBeInTheDocument();
+      expect(getByText('Create new organization')).toBeInTheDocument();
       expect(queryByRole('textbox', { name: /name/i })).not.toBeInTheDocument();
     });
 
-    const createButton = getByText('Create organization');
+    const createButton = getByText('Create new organization');
     await userEvent.click(createButton);
 
     await waitFor(() => {
       expect(getByRole('textbox', { name: /name/i })).toBeInTheDocument();
-      expect(getByRole('button', { name: /create organization/i })).toBeInTheDocument();
+      expect(getByRole('button', { name: /create new organization/i })).toBeInTheDocument();
       expect(getByRole('button', { name: /cancel/i })).toBeInTheDocument();
       expect(queryByText('Existing Org')).not.toBeInTheDocument();
     });
@@ -161,7 +161,7 @@ describe('TaskSelectOrganization', () => {
 
     await waitFor(() => {
       expect(getByText('Existing Org')).toBeInTheDocument();
-      expect(getByText('Create organization')).toBeInTheDocument();
+      expect(getByText('Create new organization')).toBeInTheDocument();
       expect(queryByRole('textbox', { name: /name/i })).not.toBeInTheDocument();
     });
   });
