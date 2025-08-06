@@ -14,6 +14,8 @@ const clerkClient = createClerkClient({
 })
 
 clerkClient.machineTokens.create({
+    // or pass as an option here
+    // machineSecretKey: process.env.CLERK_MACHINE_SECRET_KEY
     secondsUntilExpiration: 3600,
 })
 ```
@@ -26,6 +28,8 @@ You can revoke tokens using either a machine secret or instance secret:
 // Using machine secret
 const clerkClient = createClerkClient({ machineSecretKey: process.env.CLERK_MACHINE_SECRET_KEY })
 clerkClient.machineTokens.revoke({
+    // or pass as an option here
+    // machineSecretKey: process.env.CLERK_MACHINE_SECRET_KEY
     m2mTokenId: 'mt_xxxxx',
     revocationReason: 'Revoked by user',
 })
@@ -46,6 +50,8 @@ You can verify tokens using either a machine secret or instance secret:
 // Using machine secret
 const clerkClient = createClerkClient({ machineSecretKey: process.env.CLERK_MACHINE_SECRET_KEY })
 clerkClient.machineTokens.verifySecret({
+    // or pass as an option here
+    // machineSecretKey: process.env.CLERK_MACHINE_SECRET_KEY
     secret: 'mt_secret_xxxxx',
 })
 
@@ -64,6 +70,8 @@ const clerkClient = createClerkClient({
 })
 
 const authReq = await clerkClient.authenticateRequest(c.req.raw, {
+  // or pass as an option here
+  // machineSecretKey: process.env.CLERK_MACHINE_SECRET_KEY
   acceptsToken: 'machine_token',
 })
 
