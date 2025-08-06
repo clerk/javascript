@@ -67,17 +67,20 @@ class AuthenticateContext implements AuthenticateContext {
     private clerkRequest: ClerkRequest,
     options: AuthenticateRequestOptions,
   ) {
-    // Even though the options are assigned to this later in this function
-    // we set the publishableKey here because it is being used in cookies/headers/handshake-values
-    // as part of getMultipleAppsCookie.
-    // Machine tokens don't require publishable keys.
-    if (options.acceptsToken !== TokenType.MachineToken) {
+    if (options.acceptsToken === TokenType.MachineToken) {
+      // For machine tokens, we only need to set the header values.
+      this.initHeaderValues();
+    } else {
+      // Even though the options are assigned to this later in this function
+      // we set the publishableKey here because it is being used in cookies/headers/handshake-values
+      // as part of getMultipleAppsCookie.
       this.initPublishableKeyValues(options);
+      this.initHeaderValues();
+      // initCookieValues should be used before initHandshakeValues because it depends on suffixedCookies
+      this.initCookieValues();
+      this.initHandshakeValues();
     }
-    this.initHeaderValues();
-    // initCookieValues should be used before initHandshakeValues because it depends on suffixedCookies
-    this.initCookieValues();
-    this.initHandshakeValues();
+
     Object.assign(this, options);
     this.clerkUrl = this.clerkRequest.clerkUrl;
   }
