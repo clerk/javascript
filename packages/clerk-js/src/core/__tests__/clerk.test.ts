@@ -950,6 +950,7 @@ describe('Clerk singleton', () => {
             signUp: new SignUp({
               status: 'complete',
             } as any as SignUpJSON),
+            isEligibleForTouch: () => false,
           }),
         );
 
@@ -995,6 +996,7 @@ describe('Clerk singleton', () => {
             signedInSessions: [mockResource],
             signIn: new SignIn(null),
             signUp: new SignUp(null),
+            isEligibleForTouch: () => false,
           }),
         );
 
@@ -2451,7 +2453,12 @@ describe('Clerk singleton', () => {
 
       beforeEach(() => {
         mockResource.touch.mockReturnValueOnce(Promise.resolve());
-        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockResource] }));
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({
+            signedInSessions: [mockResource],
+            isEligibleForTouch: () => false,
+          }),
+        );
       });
 
       afterEach(() => {
@@ -2516,7 +2523,12 @@ describe('Clerk singleton', () => {
 
       it('navigates to redirect url on completion', async () => {
         mockSession.touch.mockReturnValue(Promise.resolve());
-        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({
+            signedInSessions: [mockSession],
+            isEligibleForTouch: () => false,
+          }),
+        );
 
         const sut = new Clerk(productionPublishableKey);
         await sut.load(mockedLoadOptions);

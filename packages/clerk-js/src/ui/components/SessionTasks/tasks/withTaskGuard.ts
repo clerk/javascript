@@ -2,7 +2,7 @@ import type { ComponentType } from 'react';
 
 import { warnings } from '@/core/warnings';
 import { withRedirect } from '@/ui/common';
-import { useTaskSelectOrganizationContext } from '@/ui/contexts/components/SessionTasks';
+import { useSessionTasksContext } from '@/ui/contexts/components/SessionTasks';
 import type { AvailableComponentProps } from '@/ui/types';
 
 export const withTaskGuard = <P extends AvailableComponentProps>(Component: ComponentType<P>) => {
@@ -10,11 +10,12 @@ export const withTaskGuard = <P extends AvailableComponentProps>(Component: Comp
   Component.displayName = displayName;
 
   const HOC = (props: P) => {
-    const ctx = useTaskSelectOrganizationContext();
+    const ctx = useSessionTasksContext();
     return withRedirect(
       Component,
       clerk => !clerk.session?.currentTask,
-      ({ clerk }) => ctx.redirectUrlComplete || clerk.buildAfterSignInUrl(),
+      ({ clerk }) =>
+        !clerk.session ? clerk.buildSignInUrl() : (ctx.redirectUrlComplete ?? clerk.buildAfterSignInUrl()),
       warnings.cannotRenderComponentWhenTaskDoesNotExist,
     )(props);
   };
