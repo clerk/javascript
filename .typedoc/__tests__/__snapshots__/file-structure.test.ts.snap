@@ -125,6 +125,7 @@ exports[`Typedoc output > should have a deliberate file structure 1`] = `
   "types/sign-up-resource.mdx",
   "types/signed-in-session-resource.mdx",
   "types/state-selectors.mdx",
+  "types/telemetry-log-entry.mdx",
   "types/use-auth-return.mdx",
   "types/use-session-list-return.mdx",
   "types/use-session-return.mdx",
