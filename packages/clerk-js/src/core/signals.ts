@@ -1,4 +1,4 @@
-import { signal, computed } from 'alien-signals';
+import { computed, signal } from 'alien-signals';
 
 import type { SignIn } from './resources/SignIn';
 

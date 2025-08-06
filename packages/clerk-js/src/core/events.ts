@@ -1,7 +1,7 @@
 import { createEventBus } from '@clerk/shared/eventBus';
 import type { TokenResource } from '@clerk/types';
 
-import { BaseResource } from './resources/Base';
+import type { BaseResource } from './resources/Base';
 
 export const events = {
   TokenUpdate: 'token:update',

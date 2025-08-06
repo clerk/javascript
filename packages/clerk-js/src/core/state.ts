@@ -2,9 +2,9 @@ import type { State as StateInterface } from '@clerk/types';
 import { computed, effect } from 'alien-signals';
 
 import { eventBus } from './events';
-import { signInComputedSignal, signInErrorSignal, signInSignal } from './signals';
-import { BaseResource } from './resources/Base';
+import type { BaseResource } from './resources/Base';
 import { SignIn } from './resources/SignIn';
+import { signInComputedSignal, signInErrorSignal, signInSignal } from './signals';
 
 export class State implements StateInterface {
   signInResourceSignal = signInSignal;

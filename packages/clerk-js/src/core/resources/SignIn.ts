@@ -16,6 +16,7 @@ import type {
   EmailCodeConfig,
   EmailLinkConfig,
   EnterpriseSSOConfig,
+  OAuthStrategy,
   PassKeyConfig,
   PasskeyFactor,
   PhoneCodeConfig,
@@ -27,10 +28,10 @@ import type {
   SamlConfig,
   SignInCreateParams,
   SignInFirstFactor,
+  SignInFutureResource,
   SignInIdentifier,
   SignInJSON,
   SignInJSONSnapshot,
-  SignInFutureResource,
   SignInResource,
   SignInSecondFactor,
   SignInStartEmailLinkFlowParams,
@@ -39,7 +40,6 @@ import type {
   Web3Provider,
   Web3SignatureConfig,
   Web3SignatureFactor,
-  OAuthStrategy,
 } from '@clerk/types';
 
 import {
@@ -86,13 +86,11 @@ export class SignIn extends BaseResource implements SignInResource {
   userData: UserData = new UserData(null);
 
   __internal_future: SignInFuture | null = new SignInFuture(this);
-  __internal_basePost;
+  __internal_basePost = this._basePost.bind(this);
 
   constructor(data: SignInJSON | SignInJSONSnapshot | null = null) {
     super();
     this.fromJSON(data);
-
-    this.__internal_basePost = this._basePost;
   }
 
   create = (params: SignInCreateParams): Promise<this> => {
