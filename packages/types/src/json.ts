@@ -870,7 +870,7 @@ export interface CommerceCheckoutJSON extends ClerkResourceJSON {
   plan: CommercePlanJSON;
   plan_period: CommerceSubscriptionPlanPeriod;
   plan_period_start?: number;
-  status: string;
+  status: 'needs_confirmation' | 'completed';
   totals: CommerceCheckoutTotalsJSON;
   is_immediate_plan_change: boolean;
 }

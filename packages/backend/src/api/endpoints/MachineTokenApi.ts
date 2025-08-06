@@ -28,6 +28,9 @@ type VerifyMachineTokenParams = {
    * Custom machine secret key for authentication.
    */
   machineSecretKey?: string;
+  /**
+   * Machine-to-machine token secret to verify.
+   */
   secret: string;
 };
 
@@ -37,6 +40,7 @@ export class MachineTokenApi extends AbstractAPI {
       return {
         ...options,
         headerParams: {
+          ...options.headerParams,
           Authorization: `Bearer ${machineSecretKey}`,
         },
       };
