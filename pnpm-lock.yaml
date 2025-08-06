@@ -474,8 +474,8 @@ importers:
         specifier: 3.0.4
         version: 3.0.4
       alien-signals:
-        specifier: ^2.0.5
-        version: 2.0.5
+        specifier: 2.0.6
+        version: 2.0.6
       browser-tabs-lock:
         specifier: 1.3.0
         version: 1.3.0
@@ -5882,8 +5882,8 @@ packages:
   alien-signals@1.0.9:
     resolution: {integrity: sha512-2dQYgGZHrW4pOYv0BWiw4cH/ElhwmLnQDcj/fdnRRF2OO3YBqgJXSleI1EbbXdQsuC5oCvr6+VKAOEElsmcx4Q==}
 
-  alien-signals@2.0.5:
-    resolution: {integrity: sha512-PdJB6+06nUNAClInE3Dweq7/2xVAYM64vvvS1IHVHSJmgeOtEdrAGyp7Z2oJtYm0B342/Exd2NT0uMJaThcjLQ==}
+  alien-signals@2.0.6:
+    resolution: {integrity: sha512-P3TxJSe31bUHBiblg59oU1PpaWPtmxF9GhJ/cB7OkgJ0qN/ifFSKUI25/v8ZhsT+lIG6ac8DpTOplXxORX6F3Q==}
 
   anser@1.4.10:
     resolution: {integrity: sha512-hCv9AqTQ8ycjpSd3upOJd7vFwW1JaoYQ7tpham03GJ1ca8/65rqn0RpaWpItOAd6ylW9wAw6luXYPJIyPFVOww==}
@@ -21139,7 +21139,7 @@ snapshots:
 
   alien-signals@1.0.9: {}
 
-  alien-signals@2.0.5: {}
+  alien-signals@2.0.6: {}
 
   anser@1.4.10: {}
 
