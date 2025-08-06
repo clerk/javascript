@@ -85,7 +85,7 @@ test.describe('Keyless mode @quickstart', () => {
 
       const signUpForceRedirectUrlCheck =
         signUpForceRedirectUrl?.startsWith(urlToReturnTo) ||
-        (signUpForceRedirectUrl?.startsWith(`${dashboardUrl}organization-selection`) &&
+        (signUpForceRedirectUrl?.startsWith(`${dashboardUrl}workspace-selection`) &&
           signUpForceRedirectUrl?.includes(encodeURIComponent('apps/claim?token=')));
 
       return (
