@@ -1,4 +1,5 @@
 ---
+"@clerk/astro": patch
 "@clerk/express": patch
 "@clerk/fastify": patch
 "@clerk/nextjs": patch
