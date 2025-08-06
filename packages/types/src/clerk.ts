@@ -228,6 +228,12 @@ export interface Clerk {
   /** Current User. */
   user: UserResource | null | undefined;
 
+  /**
+   * @experimental This experimental API is subject to change.
+   *
+   * Entrypoint for Clerk's Signal API containing resource signals along with accessible versions of `computed()` and
+   * `effect()` that can be used to subscribe to changes from Signals.
+   */
   __internal_state: State | undefined;
 
   /**

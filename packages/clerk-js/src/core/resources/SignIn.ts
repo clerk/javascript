@@ -85,7 +85,19 @@ export class SignIn extends BaseResource implements SignInResource {
   createdSessionId: string | null = null;
   userData: UserData = new UserData(null);
 
+  /**
+   * @experimental This experimental API is subject to change.
+   *
+   * An instance of `SignInFuture`, which has a different API than `SignIn`, intended to be used in custom flows.
+   */
   __internal_future: SignInFuture | null = new SignInFuture(this);
+
+  /**
+   * @internal Only used for internal purposes, and is not intended to be used directly.
+   *
+   * This property is used to provide access to underlying Client methods to `SignInFuture`, which wraps an instance
+   * of `SignIn`.
+   */
   __internal_basePost = this._basePost.bind(this);
 
   constructor(data: SignInJSON | SignInJSONSnapshot | null = null) {
