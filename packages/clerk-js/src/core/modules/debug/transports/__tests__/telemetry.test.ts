@@ -1,6 +1,6 @@
-import { TelemetryTransport } from '../telemetry';
-import { TelemetryCollector } from '@clerk/shared/telemetry';
 import type { DebugLogEntry } from '../../types';
+import { TelemetryCollector } from '@clerk/shared/telemetry';
+import { TelemetryTransport } from '../telemetry';
 
 describe('TelemetryTransport', () => {
   let mockCollector: jest.Mocked<TelemetryCollector>;
@@ -12,7 +12,7 @@ describe('TelemetryTransport', () => {
       record: jest.fn(),
       isEnabled: true,
       isDebug: false,
-    } as any;
+    } as jest.Mocked<TelemetryCollector>;
 
     transport = new TelemetryTransport(mockCollector);
   });

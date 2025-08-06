@@ -61,6 +61,30 @@ type TelemetryMetadata = Required<
   instanceType: InstanceType;
 };
 
+/**
+ * Structure of log data sent to the telemetry endpoint.
+ */
+type TelemetryLogData = {
+  /** Service that generated the log */
+  sdk: string;
+  /** The version of the SDK where the event originated from */
+  sdkv: string;
+  /** The version of Clerk where the event originated from */
+  cv: string;
+  /** Log level (info, warn, error, debug, etc.) */
+  lvl: string;
+  /** Log message */
+  msg: string;
+  /** Instance ID */
+  iid: string;
+  /** Timestamp when log was generated */
+  ts: string;
+  /** Primary key */
+  pk: string | null;
+  /** Additional payload for the log */
+  payload: Record<string, unknown> | null;
+};
+
 const DEFAULT_CONFIG: Partial<TelemetryCollectorConfig> = {
   samplingRate: 1,
   maxBufferSize: 5,
@@ -75,8 +99,9 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
   #eventThrottler: TelemetryEventThrottler;
   #metadata: TelemetryMetadata = {} as TelemetryMetadata;
   #buffer: TelemetryEvent[] = [];
-  #logBuffer: any[] = [];
+  #logBuffer: TelemetryLogData[] = [];
   #pendingFlush: any;
+  #pendingLogFlush: any;
 
   constructor(options: TelemetryCollectorOptions) {
     this.#config = {
@@ -172,7 +197,7 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
 
     const sdkMetadata = this.#getSDKMetadata();
 
-    const logData = {
+    const logData: TelemetryLogData = {
       sdk: sdkMetadata.name,
       sdkv: sdkMetadata.version,
       cv: this.#metadata.clerkVersion ?? '',
@@ -238,17 +263,18 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
     if ('requestIdleCallback' in window) {
       this.#pendingFlush = requestIdleCallback(() => {
         this.#flush();
+        this.#pendingFlush = null;
       });
     } else {
       // This is not an ideal solution, but it at least waits until the next tick
       this.#pendingFlush = setTimeout(() => {
         this.#flush();
+        this.#pendingFlush = null;
       }, 0);
     }
   }
 
   #scheduleLogFlush(): void {
-    // On the server, we want to flush immediately as we have less guarantees about the lifecycle of the process
     if (typeof window === 'undefined') {
       this.#flushLogs();
       return;
@@ -256,19 +282,27 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
 
     const isBufferFull = this.#logBuffer.length >= this.#config.maxBufferSize;
     if (isBufferFull) {
-      // If the buffer is full, flush immediately to make sure we minimize the chance of event loss.
+      if (this.#pendingLogFlush) {
+        const cancel = typeof cancelIdleCallback !== 'undefined' ? cancelIdleCallback : clearTimeout;
+        cancel(this.#pendingLogFlush);
+      }
       this.#flushLogs();
       return;
     }
 
-    // Schedule flush for logs
+    if (this.#pendingLogFlush) {
+      return;
+    }
+
     if ('requestIdleCallback' in window) {
-      requestIdleCallback(() => {
+      this.#pendingLogFlush = requestIdleCallback(() => {
         this.#flushLogs();
+        this.#pendingLogFlush = null;
       });
     } else {
-      setTimeout(() => {
+      this.#pendingLogFlush = setTimeout(() => {
         this.#flushLogs();
+        this.#pendingLogFlush = null;
       }, 0);
     }
   }
@@ -349,7 +383,6 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
         if (isWindowClerkWithMetadata(windowClerk) && windowClerk.constructor.sdkMetadata) {
           const { name, version } = windowClerk.constructor.sdkMetadata;
 
-          // Only update properties if they exist to avoid overwriting with undefined
           if (name !== undefined) {
             sdkMetadata.name = name;
           }
