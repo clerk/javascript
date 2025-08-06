@@ -300,7 +300,7 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
     this.#logBuffer = [];
 
     try {
-      fetch(new URL('/v1/log', this.#config.endpoint), {
+      fetch(new URL('/v1/logs', this.#config.endpoint), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
