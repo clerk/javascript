@@ -9,7 +9,6 @@ import type {
   ClerkOptions,
   CreateOrganizationProps,
   EnvironmentResource,
-  FlattenUnionType,
   GoogleOneTapProps,
   OrganizationProfileProps,
   SignInProps,
@@ -113,7 +112,7 @@ export type ComponentControls = {
     props: T extends 'checkout'
       ? __internal_CheckoutProps
       : T extends 'planDetails'
-        ? FlattenUnionType<__internal_PlanDetailsProps>
+        ? __internal_PlanDetailsProps
         : T extends 'subscriptionDetails'
           ? __internal_SubscriptionDetailsProps
           : never,
@@ -162,7 +161,7 @@ interface ComponentsState {
   };
   planDetailsDrawer: {
     open: false;
-    props: null | FlattenUnionType<__internal_PlanDetailsProps>;
+    props: null | __internal_PlanDetailsProps;
   };
   subscriptionDetailsDrawer: {
     open: false;

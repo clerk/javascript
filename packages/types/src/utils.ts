@@ -113,35 +113,3 @@ export type Without<T, W> = {
  * Value contains: { a:string, b: string }
  */
 export type Override<T, U> = Omit<T, keyof U> & U;
-
-// Converts a union of two types into an intersection
-// i.e. A | B -> A & B
-type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (k: infer I) => void ? I : never;
-
-type FlattenUnionTypeInternal<T> = {
-  [K in keyof UnionToIntersection<T>]: K extends keyof T
-    ? T[K] extends any[]
-      ? T[K]
-      : T[K] extends object
-        ? FlattenUnionType<T[K]>
-        : T[K]
-    : UnionToIntersection<T>[K] | undefined;
-};
-
-// Convert properties with `| undefined` to optional properties
-type UndefinedToOptional<T> = {
-  [K in keyof T as undefined extends T[K] ? K : never]?: Exclude<T[K], undefined>;
-} & {
-  [K in keyof T as undefined extends T[K] ? never : K]: T[K];
-};
-
-/**
- * Flattens a union type into a single type with all properties, making union properties optional.
- *
- * @example
- * type A = { a: number; c: number };
- * type B = { b: string; c: number };
- * type Result = FlattenUnionType<A | B>;
- * // Result: { a?: number; b?: string; c: number }
- */
-export type FlattenUnionType<T> = UndefinedToOptional<FlattenUnionTypeInternal<T>>;

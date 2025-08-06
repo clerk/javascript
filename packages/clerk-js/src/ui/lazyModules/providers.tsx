@@ -76,7 +76,7 @@ export const LazyComponentRenderer = (props: LazyComponentRendererProps) => {
     >
       <Portal
         node={props.node}
-        component={ClerkComponents[props.componentName as ClerkComponentName]}
+        component={ClerkComponents[props.componentName as ClerkComponentName] as React.ComponentType<any>}
         props={props.componentProps}
         componentName={props.componentName}
       />

@@ -1889,12 +1889,14 @@ export type __experimental_CheckoutButtonProps = {
 export type __internal_PlanDetailsProps = (
   | {
       planId: string;
+      plan?: never;
     }
   | {
       /**
        * The plan object will be used as initial data until the plan is fetched from the server.
        */
       plan: CommercePlanResource;
+      planId?: never;
     }
 ) & {
   appearance?: PlanDetailTheme;
@@ -1916,12 +1918,14 @@ export type __internal_PlanDetailsProps = (
 export type __experimental_PlanDetailsButtonProps = (
   | {
       planId: string;
+      plan?: never;
     }
   | {
       /**
        * The plan object will be used as initial data until the plan is fetched from the server.
        */
       plan: CommercePlanResource;
+      planId?: never;
     }
 ) & {
   initialPlanPeriod?: CommerceSubscriptionPlanPeriod;

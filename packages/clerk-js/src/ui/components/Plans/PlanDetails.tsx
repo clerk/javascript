@@ -4,7 +4,6 @@ import type {
   ClerkAPIResponseError,
   CommercePlanResource,
   CommerceSubscriptionPlanPeriod,
-  FlattenUnionType,
 } from '@clerk/types';
 import * as React from 'react';
 import { useMemo, useState } from 'react';
@@ -29,7 +28,7 @@ import {
   useLocalizations,
 } from '../../customizables';
 
-export const PlanDetails = (props: FlattenUnionType<__internal_PlanDetailsProps>) => {
+export const PlanDetails = (props: __internal_PlanDetailsProps) => {
   return (
     <Drawer.Content>
       <PlanDetailsInternal {...props} />
@@ -74,7 +73,7 @@ const PlanDetailsInternal = ({
   planId,
   plan: initialPlan,
   initialPlanPeriod = 'month',
-}: FlattenUnionType<__internal_PlanDetailsProps>) => {
+}: __internal_PlanDetailsProps) => {
   const clerk = useClerk();
   const [planPeriod, setPlanPeriod] = useState<CommerceSubscriptionPlanPeriod>(initialPlanPeriod);
 
