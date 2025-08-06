@@ -22,7 +22,7 @@ export {
   SignInWithMetamaskButton,
   SignOutButton,
   SignUpButton,
-  TaskSelectOrganization,
+  TaskChooseOrganization,
   UserButton,
   Waitlist,
 } from '@clerk/clerk-react';

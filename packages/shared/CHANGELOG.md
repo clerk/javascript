@@ -1,5 +1,18 @@
 # Change Log
 
+## 3.18.0
+
+### Minor Changes
+
+- [Billing Beta] Stricter return type of `useCheckout` to improve inference of other properties. ([#6473](https://github.com/clerk/javascript/pull/6473)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Improve `useCheckout` error messages on mount. ([#6475](https://github.com/clerk/javascript/pull/6475)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`f93965f`](https://github.com/clerk/javascript/commit/f93965f64c81030f9fcf9d1cc4e4984d30cd12ec), [`7b6dcee`](https://github.com/clerk/javascript/commit/7b6dceea5bfd7f1cc1bf24126aa715307e24ae7f)]:
+  - @clerk/types@4.73.0
+
 ## 3.17.0
 
 ### Minor Changes

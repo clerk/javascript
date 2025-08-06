@@ -18,7 +18,7 @@ import type {
   SignUpFallbackRedirectUrl,
   SignUpForceRedirectUrl,
   SignUpProps,
-  TaskSelectOrganizationProps,
+  TaskChooseOrganizationProps,
   UserButtonProps,
   UserProfileProps,
   WaitlistProps,
@@ -55,7 +55,7 @@ export type AvailableComponentProps =
   | __internal_SubscriptionDetailsProps
   | __internal_PlanDetailsProps
   | APIKeysProps
-  | TaskSelectOrganizationProps;
+  | TaskChooseOrganizationProps;
 
 type ComponentMode = 'modal' | 'mounted';
 type SignInMode = 'modal' | 'redirect';
@@ -138,8 +138,8 @@ export type SessionTasksCtx = {
   currentTaskContainer?: React.RefObject<HTMLDivElement> | null;
 };
 
-export type TaskSelectOrganizationCtx = TaskSelectOrganizationProps & {
-  componentName: 'TaskSelectOrganization';
+export type TaskChooseOrganizationCtx = TaskChooseOrganizationProps & {
+  componentName: 'TaskChooseOrganization';
 };
 
 export type OAuthConsentCtx = __internal_OAuthConsentProps & {
@@ -172,5 +172,5 @@ export type AvailableComponentCtx =
   | OAuthConsentCtx
   | SubscriptionDetailsCtx
   | PlanDetailsCtx
-  | TaskSelectOrganizationCtx;
+  | TaskChooseOrganizationCtx;
 export type AvailableComponentName = AvailableComponentCtx['componentName'];

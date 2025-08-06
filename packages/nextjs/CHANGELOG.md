@@ -1,5 +1,35 @@
 # Change Log
 
+## 6.29.0
+
+### Minor Changes
+
+- [Billing Beta] Stricter return type of `useCheckout` to improve inference of other properties. ([#6473](https://github.com/clerk/javascript/pull/6473)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Propagate `treatPendingAsSignedOut` to `auth` from `clerkMiddleware` ([#6477](https://github.com/clerk/javascript/pull/6477)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  ```ts
+  export default clerkMiddleware(async (auth, req) => {
+    // If the session has a `pending` status, `userId` will be `null` by default, treated as a signed-out state
+    const { userId } = await auth();
+  });
+  ```
+
+  ```ts
+  export default clerkMiddleware(async (auth, req) => {
+    // If the session has a `pending` status, `userId` will be defined, treated as a signed-in state
+    const { userId } = await auth({ treatPendingAsSignedOut: false });
+  });
+  ```
+
+- Updated dependencies [[`9368daf`](https://github.com/clerk/javascript/commit/9368dafb119b5a8ec6a9d6d82270e72bab6d8f1e), [`f93965f`](https://github.com/clerk/javascript/commit/f93965f64c81030f9fcf9d1cc4e4984d30cd12ec), [`7b6dcee`](https://github.com/clerk/javascript/commit/7b6dceea5bfd7f1cc1bf24126aa715307e24ae7f), [`ef87617`](https://github.com/clerk/javascript/commit/ef87617ae1fd125c806a33bfcfdf09c885319fa8)]:
+  - @clerk/shared@3.18.0
+  - @clerk/clerk-react@5.39.0
+  - @clerk/types@4.73.0
+  - @clerk/backend@2.6.3
+
 ## 6.28.1
 
 ### Patch Changes

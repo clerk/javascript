@@ -9,7 +9,7 @@ export const createSessionTaskComponentPageObject = (testArgs: { page: EnhancedP
   const self = {
     ...common(testArgs),
     resolveForceOrganizationSelectionTask: async (fakeOrganization: { name: string; slug: string }) => {
-      const createOrganizationButton = page.getByRole('button', { name: /create organization/i });
+      const createOrganizationButton = page.getByRole('button', { name: /create new organization/i });
 
       await expect(createOrganizationButton).toBeVisible();
 

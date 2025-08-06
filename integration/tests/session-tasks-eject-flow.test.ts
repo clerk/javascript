@@ -52,11 +52,11 @@ return (
       .addFile(
         'src/app/onboarding/select-organization/page.tsx',
         () => `
-import { TaskSelectOrganization } from '@clerk/nextjs';
+import { TaskChooseOrganization } from '@clerk/nextjs';
 
 export default function Page() {
 return (
-  <TaskSelectOrganization redirectUrlComplete='/'/>
+  <TaskChooseOrganization redirectUrlComplete='/'/>
 );
 }`,
       )

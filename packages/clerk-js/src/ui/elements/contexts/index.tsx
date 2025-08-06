@@ -100,7 +100,7 @@ export type FlowMetadata = {
     | 'apiKeys'
     | 'oauthConsent'
     | 'subscriptionDetails'
-    | 'taskSelectOrganization';
+    | 'taskChooseOrganization';
   part?:
     | 'start'
     | 'emailCode'

@@ -20,8 +20,8 @@ const componentImportPaths = {
   PricingTable: () => import(/* webpackChunkName: "pricingTable" */ '../components/PricingTable'),
   Checkout: () => import(/* webpackChunkName: "checkout" */ '../components/Checkout'),
   SessionTasks: () => import(/* webpackChunkName: "sessionTasks" */ '../components/SessionTasks'),
-  TaskSelectOrganization: () =>
-    import(/* webpackChunkName: "taskSelectOrganization" */ '../components/SessionTasks/tasks/TaskSelectOrganization'),
+  TaskChooseOrganization: () =>
+    import(/* webpackChunkName: "taskChooseOrganization" */ '../components/SessionTasks/tasks/TaskChooseOrganization'),
   PlanDetails: () => import(/* webpackChunkName: "planDetails" */ '../components/Plans/PlanDetails'),
   SubscriptionDetails: () => import(/* webpackChunkName: "subscriptionDetails" */ '../components/SubscriptionDetails'),
   APIKeys: () => import(/* webpackChunkName: "apiKeys" */ '../components/ApiKeys/ApiKeys'),
@@ -105,8 +105,8 @@ export const APIKeys = lazy(() => componentImportPaths.APIKeys().then(module => 
 
 export const Checkout = lazy(() => componentImportPaths.Checkout().then(module => ({ default: module.Checkout })));
 
-export const TaskSelectOrganization = lazy(() =>
-  componentImportPaths.TaskSelectOrganization().then(module => ({ default: module.TaskSelectOrganization })),
+export const TaskChooseOrganization = lazy(() =>
+  componentImportPaths.TaskChooseOrganization().then(module => ({ default: module.TaskChooseOrganization })),
 );
 
 export const PlanDetails = lazy(() =>
@@ -155,7 +155,7 @@ export const ClerkComponents = {
   APIKeys,
   OAuthConsent,
   SubscriptionDetails,
-  TaskSelectOrganization,
+  TaskChooseOrganization,
 };
 
 export type ClerkComponentName = keyof typeof ClerkComponents;
