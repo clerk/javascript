@@ -1,45 +1,34 @@
+import type { TelemetryCollector } from '@clerk/shared/telemetry';
+
 import { DebugLogger } from './logger';
-import { type CompositeLoggerOptions, CompositeTransport } from './transports/composite';
+import { CompositeTransport } from './transports/composite';
 import { ConsoleTransport } from './transports/console';
-import { type TelemetryLoggerOptions, TelemetryTransport } from './transports/telemetry';
-import type { DebugLogFilter, DebugLogLevel, DebugTransport } from './types';
-import { isValidLogLevel, VALID_LOG_LEVELS } from './types';
+import { TelemetryTransport } from './transports/telemetry';
+import type { DebugLogFilter, DebugLogLevel } from './types';
+
+const DEFAULT_LOG_LEVEL: DebugLogLevel = 'info';
 
 /**
- * Default log level for debug logging
- */
-export const DEFAULT_LOG_LEVEL: DebugLogLevel = 'debug';
-
-/**
- * Validates logger options and throws if invalid
- * @param options - The options to validate
- * @throws Error if invalid log level is provided
+ * Validates logger options
  */
 function validateLoggerOptions<T extends { logLevel?: unknown }>(options: T): void {
-  const { logLevel } = options;
-
-  if (logLevel !== undefined && !isValidLogLevel(logLevel)) {
-    const levelString = typeof logLevel === 'string' ? logLevel : JSON.stringify(logLevel);
-    throw new Error(`Invalid log level: "${levelString}". Valid levels are: ${VALID_LOG_LEVELS.join(', ')}`);
+  if (options.logLevel && typeof options.logLevel !== 'string') {
+    throw new Error('logLevel must be a string');
   }
 }
 
-export type * from './types';
-
-export { ConsoleTransport, TelemetryTransport, CompositeTransport };
-export type { TelemetryLoggerOptions, CompositeLoggerOptions };
-
 /**
- * Options for configuring a logger with endpoint, filters, and log level
+ * Options for configuring the debug logger
  */
 export interface LoggerOptions {
   endpoint?: string;
   filters?: DebugLogFilter[];
   logLevel?: DebugLogLevel;
+  telemetryCollector?: TelemetryCollector;
 }
 
 /**
- * Options for configuring a console logger with filters and log level
+ * Options for console-only logger configuration
  */
 export interface ConsoleLoggerOptions {
   filters?: DebugLogFilter[];
@@ -47,13 +36,26 @@ export interface ConsoleLoggerOptions {
 }
 
 /**
- * Singleton instance for managing debug logger initialization
- *
- * Race Condition Fix:
- * - Uses a promise cache (initializationPromise) to prevent multiple concurrent initializations
- * - If initialization is already in progress, subsequent calls wait for the same promise
- * - If initialization fails, the promise cache is cleared to allow retries
- * - This ensures only one initialization process runs at a time, even with concurrent calls
+ * Options for telemetry logger configuration
+ */
+export interface TelemetryLoggerOptions {
+  endpoint?: string;
+  logLevel?: DebugLogLevel;
+  filters?: DebugLogFilter[];
+  telemetryCollector?: TelemetryCollector;
+}
+
+/**
+ * Options for composite logger configuration
+ */
+export interface CompositeLoggerOptions {
+  transports: Array<{ transport: ConsoleTransport | TelemetryTransport }>;
+  logLevel?: DebugLogLevel;
+  filters?: DebugLogFilter[];
+}
+
+/**
+ * Singleton manager for the debug logger
  */
 class DebugLoggerManager {
   private static instance: DebugLoggerManager;
@@ -74,13 +76,12 @@ class DebugLoggerManager {
   }
 
   /**
-   * Initializes the debug logger if not already initialized
-   * Uses a promise cache to prevent race conditions during concurrent initialization
+   * Initializes the debug logger with the given options
    * @param options - Configuration options for the logger
-   * @returns The debug logger instance
+   * @returns Promise resolving to the debug logger instance
    */
   async initialize(options: LoggerOptions = {}): Promise<DebugLogger | null> {
-    if (this.initialized && this.logger) {
+    if (this.initialized) {
       return this.logger;
     }
 
@@ -100,10 +101,13 @@ class DebugLoggerManager {
   private async performInitialization(options: LoggerOptions): Promise<DebugLogger | null> {
     try {
       validateLoggerOptions(options);
-      const { endpoint, logLevel, filters } = options;
+      const { logLevel, filters, telemetryCollector } = options;
       const finalLogLevel = logLevel ?? DEFAULT_LOG_LEVEL;
 
-      const transports = [{ transport: new ConsoleTransport() }, { transport: new TelemetryTransport(endpoint) }];
+      const transports = [
+        { transport: new ConsoleTransport() },
+        { transport: new TelemetryTransport(telemetryCollector) },
+      ];
 
       const transportInstances = transports.map(t => t.transport);
       const compositeTransport = new CompositeTransport(transportInstances);
@@ -162,14 +166,15 @@ export function createLogger(options: {
   endpoint?: string;
   logLevel?: DebugLogLevel;
   filters?: DebugLogFilter[];
+  telemetryCollector?: TelemetryCollector;
 }): { logger: DebugLogger; transport: CompositeTransport } | null {
   try {
     validateLoggerOptions(options);
-    const { endpoint, logLevel, filters } = options;
+    const { logLevel, filters, telemetryCollector } = options;
     const finalLogLevel = logLevel ?? DEFAULT_LOG_LEVEL;
 
     return createCompositeLogger({
-      transports: [{ transport: new ConsoleTransport() }, { transport: new TelemetryTransport(endpoint) }],
+      transports: [{ transport: new ConsoleTransport() }, { transport: new TelemetryTransport(telemetryCollector) }],
       logLevel: finalLogLevel,
       filters,
     });
@@ -210,9 +215,9 @@ export function createTelemetryLogger(
 ): { logger: DebugLogger; transport: TelemetryTransport } | null {
   try {
     validateLoggerOptions(options);
-    const { endpoint, logLevel, filters } = options;
+    const { logLevel, filters, telemetryCollector } = options;
     const finalLogLevel = logLevel ?? DEFAULT_LOG_LEVEL;
-    const transport = new TelemetryTransport(endpoint);
+    const transport = new TelemetryTransport(telemetryCollector);
     const logger = new DebugLogger(transport, finalLogLevel, filters);
     return { logger, transport };
   } catch (error) {
@@ -234,12 +239,10 @@ export function createCompositeLogger(
     const { transports, logLevel, filters } = options;
     const finalLogLevel = logLevel ?? DEFAULT_LOG_LEVEL;
 
-    const transportInstances = transports.map(
-      (t: { transport: DebugTransport; options?: Record<string, unknown> }) => t.transport,
-    );
+    const transportInstances = transports.map(t => t.transport);
     const compositeTransport = new CompositeTransport(transportInstances);
-
     const logger = new DebugLogger(compositeTransport, finalLogLevel, filters);
+
     return { logger, transport: compositeTransport };
   } catch (error) {
     console.error('Failed to create composite logger:', error);
@@ -248,9 +251,9 @@ export function createCompositeLogger(
 }
 
 /**
- * @internal
- * Resets the debug logger manager (for testing purposes)
+ * Internal function to reset the debug logger (for testing purposes)
  */
 export function __internal_resetDebugLogger(): void {
-  DebugLoggerManager.getInstance().reset();
+  const manager = DebugLoggerManager.getInstance();
+  manager.reset();
 }

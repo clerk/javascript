@@ -16,6 +16,7 @@ import type {
   TelemetryCollector as TelemetryCollectorInterface,
   TelemetryEvent,
   TelemetryEventRaw,
+  TelemetryLogEntry,
 } from '@clerk/types';
 
 import { parsePublishableKey } from '../keys';
@@ -74,6 +75,7 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
   #eventThrottler: TelemetryEventThrottler;
   #metadata: TelemetryMetadata = {} as TelemetryMetadata;
   #buffer: TelemetryEvent[] = [];
+  #logBuffer: any[] = [];
   #pendingFlush: any;
 
   constructor(options: TelemetryCollectorOptions) {
@@ -158,8 +160,41 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
     this.#scheduleFlush();
   }
 
+  /**
+   * Records a telemetry log entry if logging is enabled and not in debug mode.
+   *
+   * @param entry - The telemetry log entry to record.
+   */
+  recordLog(entry: TelemetryLogEntry): void {
+    if (!this.#shouldRecordLog(entry)) {
+      return;
+    }
+
+    const sdkMetadata = this.#getSDKMetadata();
+
+    const logData = {
+      sdk: sdkMetadata.name,
+      sdkv: sdkMetadata.version,
+      cv: this.#metadata.clerkVersion ?? '',
+      lvl: entry.level,
+      msg: entry.message,
+      iid: entry.id,
+      ts: new Date(entry.timestamp).toISOString(),
+      pk: this.#metadata.publishableKey || null,
+      payload: entry.context || null,
+    };
+
+    this.#logBuffer.push(logData);
+
+    this.#scheduleLogFlush();
+  }
+
   #shouldRecord(preparedPayload: TelemetryEvent, eventSamplingRate?: number) {
     return this.isEnabled && !this.isDebug && this.#shouldBeSampled(preparedPayload, eventSamplingRate);
+  }
+
+  #shouldRecordLog(_entry: TelemetryLogEntry): boolean {
+    return this.isEnabled;
   }
 
   #shouldBeSampled(preparedPayload: TelemetryEvent, eventSamplingRate?: number) {
@@ -212,6 +247,32 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
     }
   }
 
+  #scheduleLogFlush(): void {
+    // On the server, we want to flush immediately as we have less guarantees about the lifecycle of the process
+    if (typeof window === 'undefined') {
+      this.#flushLogs();
+      return;
+    }
+
+    const isBufferFull = this.#logBuffer.length >= this.#config.maxBufferSize;
+    if (isBufferFull) {
+      // If the buffer is full, flush immediately to make sure we minimize the chance of event loss.
+      this.#flushLogs();
+      return;
+    }
+
+    // Schedule flush for logs
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(() => {
+        this.#flushLogs();
+      });
+    } else {
+      setTimeout(() => {
+        this.#flushLogs();
+      }, 0);
+    }
+  }
+
   #flush(): void {
     fetch(new URL('/v1/event', this.#config.endpoint), {
       method: 'POST',
@@ -228,6 +289,27 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
         this.#buffer = [];
       })
       .catch(() => void 0);
+  }
+
+  #flushLogs(): void {
+    if (this.#logBuffer.length === 0) {
+      return;
+    }
+
+    const entries = [...this.#logBuffer];
+    this.#logBuffer = [];
+
+    try {
+      fetch(new URL('/v1/log', this.#config.endpoint), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(entries),
+      }).catch(() => void 0);
+    } catch (error) {
+      console.error('Failed to send telemetry log data:', error);
+    }
   }
 
   /**
