@@ -37,6 +37,7 @@ export class MachineTokenApi extends AbstractAPI {
       return {
         ...options,
         headerParams: {
+          ...options.headerParams,
           Authorization: `Bearer ${machineSecretKey}`,
         },
       };

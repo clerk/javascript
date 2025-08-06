@@ -173,7 +173,7 @@ describe('MachineTokenAPI', () => {
 
       const response = await apiClient.machineTokens.revoke({
         m2mTokenId: m2mId,
-        revocationReason: 'revoked using instance secret',
+        revocationReason: 'revoked by test',
       });
 
       expect(response.revoked).toBe(true);
