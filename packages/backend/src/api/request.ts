@@ -32,7 +32,7 @@ type ClerkBackendApiRequestOptionsBodyParams =
   | {
       bodyParams?: never;
       options?: {
-        deepSnakecaseBodyParamKeys?: boolean;
+        deepSnakecaseBodyParamKeys?: never;
       };
     };
 
