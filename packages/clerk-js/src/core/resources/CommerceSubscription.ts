@@ -27,6 +27,7 @@ export class CommerceSubscription extends BaseResource implements CommerceSubscr
     date: Date;
   } | null = null;
   subscriptionItems!: CommerceSubscriptionItemResource[];
+  eligibleForFreeTrial?: boolean;
 
   constructor(data: CommerceSubscriptionJSON) {
     super();
@@ -51,6 +52,7 @@ export class CommerceSubscription extends BaseResource implements CommerceSubscr
         }
       : null;
     this.subscriptionItems = (data.subscription_items || []).map(item => new CommerceSubscriptionItem(item));
+    this.eligibleForFreeTrial = data.eligible_for_free_trial;
     return this;
   }
 }
@@ -74,6 +76,7 @@ export class CommerceSubscriptionItem extends BaseResource implements CommerceSu
   credit?: {
     amount: CommerceMoney;
   };
+  isFreeTrial = false;
 
   constructor(data: CommerceSubscriptionItemJSON) {
     super();
@@ -103,6 +106,8 @@ export class CommerceSubscriptionItem extends BaseResource implements CommerceSu
 
     this.amount = data.amount ? commerceMoneyFromJSON(data.amount) : undefined;
     this.credit = data.credit && data.credit.amount ? { amount: commerceMoneyFromJSON(data.credit.amount) } : undefined;
+
+    this.isFreeTrial = data.is_free_trial;
     return this;
   }
 

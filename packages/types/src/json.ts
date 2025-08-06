@@ -780,6 +780,7 @@ export interface CommerceSubscriptionItemJSON extends ClerkResourceJSON {
   period_end: number;
   canceled_at: number | null;
   past_due_at: number | null;
+  is_free_trial: boolean;
 }
 
 /**
@@ -809,6 +810,7 @@ export interface CommerceSubscriptionJSON extends ClerkResourceJSON {
   updated_at: number | null;
   past_due_at: number | null;
   subscription_items: CommerceSubscriptionItemJSON[] | null;
+  eligible_for_free_trial?: boolean;
 }
 
 /**
