@@ -1,0 +1,39 @@
+{
+  "name": "@clerk/ui",
+  "version": "0.0.1",
+  "description": "CLI tool designed to simplify the process of installing Clerk shadcn/ui components",
+  "homepage": "https://clerk.com/",
+  "bugs": {
+    "url": "https://github.com/clerk/javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/ui-cli"
+  },
+  "license": "MIT",
+  "author": "Clerk",
+  "type": "module",
+  "main": "bin/cli.js",
+  "bin": {
+    "ui": "bin/cli.js"
+  },
+  "scripts": {
+    "format": "node ../../scripts/format-package.mjs",
+    "format:check": "node ../../scripts/format-package.mjs --check",
+    "lint": "eslint src"
+  },
+  "dependencies": {
+    "concurrently": "^9.2.0",
+    "dotenv": "^17.2.0",
+    "globby": "^14.1.0",
+    "jscodeshift": "^17.3.0"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=18.17.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
