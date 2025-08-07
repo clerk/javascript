@@ -229,6 +229,7 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
       body: JSON.stringify({
         events: eventsToSend,
       }),
+      keepalive: true,
       headers: {
         'Content-Type': 'application/json',
       },
