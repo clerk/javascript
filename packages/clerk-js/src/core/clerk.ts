@@ -110,12 +110,12 @@ import {
   isError,
   isOrganizationId,
   isRedirectForFAPIInitiatedFlow,
+  isSignedInAndSingleSessionModeEnabled,
   noOrganizationExists,
   noUserExists,
   processCssLayerNameExtraction,
   removeClerkQueryParam,
   requiresUserInput,
-  sessionExistsAndSingleSessionModeEnabled,
   stripOrigin,
   windowNavigate,
 } from '../utils';
@@ -552,7 +552,7 @@ export class Clerk implements ClerkInterface {
 
   public openSignIn = (props?: SignInProps): void => {
     this.assertComponentsReady(this.#componentControls);
-    if (sessionExistsAndSingleSessionModeEnabled(this, this.environment)) {
+    if (isSignedInAndSingleSessionModeEnabled(this, this.environment)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotOpenSignInOrSignUp, {
           code: CANNOT_RENDER_SINGLE_SESSION_ENABLED_ERROR_CODE,
@@ -686,7 +686,7 @@ export class Clerk implements ClerkInterface {
 
   public openSignUp = (props?: SignUpProps): void => {
     this.assertComponentsReady(this.#componentControls);
-    if (sessionExistsAndSingleSessionModeEnabled(this, this.environment)) {
+    if (isSignedInAndSingleSessionModeEnabled(this, this.environment)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotOpenSignInOrSignUp, {
           code: CANNOT_RENDER_SINGLE_SESSION_ENABLED_ERROR_CODE,
@@ -1263,6 +1263,8 @@ export class Clerk implements ClerkInterface {
         }
       }
 
+      debugger;
+
       if (newSession?.status === 'pending') {
         await this.#handlePendingSession(newSession, onPendingSession);
         return;
@@ -1335,6 +1337,8 @@ export class Clerk implements ClerkInterface {
   };
 
   #handlePendingSession = async (session: PendingSessionResource, onPendingSession?: OnPendingSessionFn) => {
+    debugger;
+
     if (!this.environment) {
       return;
     }
@@ -1357,11 +1361,12 @@ export class Clerk implements ClerkInterface {
 
     if (currentSession.status === 'pending') {
       const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
-      const onPendingSessionHook = this.__internal_getOption('onPendingSession') ?? onPendingSession;
-      const taskUrls = this.__internal_getOption('taskUrls');
+      const onPendingSessionHook = this.#options['onPendingSession'] ?? onPendingSession;
+      const taskUrls = this.#options['taskUrls'];
 
       await tracker.track(async () => {
         if (onPendingSessionHook) {
+          debugger;
           await onPendingSessionHook({ session: currentSession });
         } else if (taskUrls) {
           await this.navigate(taskUrls[session.currentTask.key]);

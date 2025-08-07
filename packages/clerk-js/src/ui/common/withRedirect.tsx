@@ -6,7 +6,7 @@ import React from 'react';
 
 import { warnings } from '../../core/warnings';
 import type { ComponentGuard } from '../../utils';
-import { sessionExistsAndSingleSessionModeEnabled } from '../../utils';
+import { isSignedInAndSingleSessionModeEnabled } from '../../utils';
 import { useEnvironment, useOptions, useSignInContext, useSignUpContext } from '../contexts';
 import { useRouter } from '../router';
 import type { AvailableComponentProps } from '../types';
@@ -60,11 +60,9 @@ export const withRedirectToAfterSignIn = <P extends AvailableComponentProps>(Com
     const signInCtx = useSignInContext();
     return withRedirect(
       Component,
-      sessionExistsAndSingleSessionModeEnabled,
-      ({ clerk }) => signInCtx.sessionTaskUrl || signInCtx.afterSignInUrl || clerk.buildAfterSignInUrl(),
-      signInCtx.sessionTaskUrl
-        ? warnings.cannotRenderSignInComponentWhenTaskExists
-        : warnings.cannotRenderSignInComponentWhenSessionExists,
+      isSignedInAndSingleSessionModeEnabled,
+      ({ clerk }) => signInCtx.afterSignInUrl || clerk.buildAfterSignInUrl(),
+      warnings.cannotRenderSignInComponentWhenSessionExists,
     )(props);
   };
 
@@ -81,11 +79,9 @@ export const withRedirectToAfterSignUp = <P extends AvailableComponentProps>(Com
     const signUpCtx = useSignUpContext();
     return withRedirect(
       Component,
-      sessionExistsAndSingleSessionModeEnabled,
-      ({ clerk }) => signUpCtx.sessionTaskUrl || signUpCtx.afterSignUpUrl || clerk.buildAfterSignUpUrl(),
-      signUpCtx.sessionTaskUrl
-        ? warnings.cannotRenderSignUpComponentWhenTaskExists
-        : warnings.cannotRenderSignUpComponentWhenSessionExists,
+      isSignedInAndSingleSessionModeEnabled,
+      ({ clerk }) => signUpCtx.afterSignUpUrl || clerk.buildAfterSignUpUrl(),
+      warnings.cannotRenderSignUpComponentWhenSessionExists,
     )(props);
   };
 
