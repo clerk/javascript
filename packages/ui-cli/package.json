@@ -23,8 +23,6 @@
     "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src"
   },
-  "dependencies": {},
-  "devDependencies": {},
   "engines": {
     "node": ">=18.17.0"
   },

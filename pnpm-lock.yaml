@@ -1029,6 +1029,8 @@ importers:
         specifier: 3.1.3
         version: 3.1.3
 
+  packages/ui-cli: {}
+
   packages/upgrade:
     dependencies:
       '@inkjs/ui':
