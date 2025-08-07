@@ -21,7 +21,6 @@ exports[`root public exports > should not change unexpectedly 1`] = `
   "RedirectToOrganizationProfile",
   "RedirectToSignIn",
   "RedirectToSignUp",
-  "RedirectToTask",
   "RedirectToUserProfile",
   "SignIn",
   "SignInButton",
