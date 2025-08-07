@@ -3,8 +3,6 @@ import { isAbsoluteUrl } from '@clerk/shared/url';
 import type { OnPendingSessionFn } from '@clerk/types';
 import { createContext, useContext, useMemo } from 'react';
 
-import { navigateToTask } from '@/core/sessionTasks';
-
 import { SIGN_IN_INITIAL_VALUE_KEYS } from '../../../core/constants';
 import { buildURL } from '../../../utils';
 import { RedirectUrls } from '../../../utils/redirectUrls';
@@ -120,13 +118,11 @@ export const useSignInContext = (): SignInContextType => {
   const signUpContinueUrl = buildURL({ base: signUpUrl, hashPath: '/continue' }, { stringify: true });
 
   const onPendingSession: OnPendingSessionFn = async ({ session }) => {
-    switch (session.currentTask?.key) {
+    const currentTaskKey = session.currentTask.key;
+
+    switch (currentTaskKey) {
       case 'choose-organization': {
-        // TODO - preserve redirect_url
-        await navigateToTask(session, {
-          navigate,
-          baseUrl: signInUrl,
-        });
+        await navigate(`../tasks/${currentTaskKey}`);
       }
     }
   };
