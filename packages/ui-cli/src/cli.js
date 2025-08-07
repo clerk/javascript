@@ -11,18 +11,19 @@ export default function cli() {
   const packageNames = args.slice(1);
 
   for (const packageName of packageNames) {
-    if (!packageName.trim()) {
+    const trimmedPackageName = packageName.trim();
+    if (!trimmedPackageName) {
       continue;
     }
 
-    console.log(`Adding ${packageName} component...`);
+    console.log(`Adding ${trimmedPackageName} component...`);
 
-    const url = new URL(`r/${packageName}.json`, 'https://clerk.com');
+    const url = new URL(`r/${trimmedPackageName}.json`, 'https://clerk.com');
 
     try {
       execSync(`npx -y shadcn@latest add ${url.toString()}`, { stdio: 'inherit' });
     } catch {
-      console.error(`\nError: Failed to add component "${packageName}"`);
+      console.error(`\nError: Failed to add component "${trimmedPackageName}"`);
       console.error(`Could not fetch component from: ${url.toString()}`);
       console.error('Please ensure:');
       console.error('  - The component name is correct');
