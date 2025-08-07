@@ -5,7 +5,7 @@ import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/m2m_tokens';
 
-type CreateMachineTokenParams = {
+type CreateM2MTokenParams = {
   /**
    * Custom machine secret key for authentication.
    */
@@ -14,16 +14,19 @@ type CreateMachineTokenParams = {
   claims?: Record<string, unknown> | null;
 };
 
-type RevokeMachineTokenParams = {
+type RevokeM2MTokenParams = {
   /**
    * Custom machine secret key for authentication.
    */
   machineSecretKey?: string;
+  /**
+   * Machine-to-machine token ID to revoke.
+   */
   m2mTokenId: string;
   revocationReason?: string | null;
 };
 
-type VerifyMachineTokenParams = {
+type VerifyM2MTokenParams = {
   /**
    * Custom machine secret key for authentication.
    */
@@ -49,7 +52,7 @@ export class M2MTokenApi extends AbstractAPI {
     return options;
   }
 
-  async create(params?: CreateMachineTokenParams) {
+  async create(params?: CreateM2MTokenParams) {
     const { claims = null, machineSecretKey, secondsUntilExpiration = null } = params || {};
 
     const requestOptions = this.#createRequestOptions(
@@ -67,7 +70,7 @@ export class M2MTokenApi extends AbstractAPI {
     return this.request<M2MToken>(requestOptions);
   }
 
-  async revoke(params: RevokeMachineTokenParams) {
+  async revoke(params: RevokeM2MTokenParams) {
     const { m2mTokenId, revocationReason = null, machineSecretKey } = params;
 
     this.requireId(m2mTokenId);
@@ -86,7 +89,7 @@ export class M2MTokenApi extends AbstractAPI {
     return this.request<M2MToken>(requestOptions);
   }
 
-  async verifySecret(params: VerifyMachineTokenParams) {
+  async verifySecret(params: VerifyM2MTokenParams) {
     const { secret, machineSecretKey } = params;
 
     const requestOptions = this.#createRequestOptions(
