@@ -840,12 +840,6 @@ export interface Clerk {
   joinWaitlist: (params: JoinWaitlistParams) => Promise<WaitlistResource>;
 
   /**
-   * Navigates to the current task or redirects to `redirectUrlComplete` once the session is `active`.
-   * @internal
-   */
-  __internal_navigateToTaskIfAvailable: (params?: __internal_NavigateToTaskIfAvailableParams) => Promise<void>;
-
-  /**
    * This is an optional function.
    * This function is used to load cached Client and Environment resources if Clerk fails to load them from the Frontend API.
    * @internal
@@ -2157,14 +2151,6 @@ export interface AuthenticateWithOKXWalletParams {
 export interface AuthenticateWithGoogleOneTapParams {
   token: string;
   legalAccepted?: boolean;
-}
-
-export interface __internal_NavigateToTaskIfAvailableParams {
-  /**
-   * Full URL or path to navigate to after successfully resolving all tasks
-   * @default undefined
-   */
-  redirectUrlComplete?: string;
 }
 
 export interface LoadedClerk extends Clerk {
