@@ -213,21 +213,26 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
   }
 
   #flush(): void {
+    // Capture the current buffer and clear it immediately to avoid closure references
+    const eventsToSend = [...this.#buffer];
+    this.#buffer = [];
+
+    this.#pendingFlush = null;
+
+    if (eventsToSend.length === 0) {
+      return;
+    }
+
     fetch(new URL('/v1/event', this.#config.endpoint), {
       method: 'POST',
       // TODO: We send an array here with that idea that we can eventually send multiple events.
       body: JSON.stringify({
-        events: this.#buffer,
+        events: eventsToSend,
       }),
       headers: {
         'Content-Type': 'application/json',
       },
-    })
-      .catch(() => void 0)
-      .then(() => {
-        this.#buffer = [];
-      })
-      .catch(() => void 0);
+    }).catch(() => void 0);
   }
 
   /**
