@@ -19,7 +19,6 @@ import type {
   __experimental_CheckoutOptions,
   __internal_CheckoutProps,
   __internal_ComponentNavigationContext,
-  __internal_NavigateToTaskIfAvailableParams,
   __internal_OAuthConsentProps,
   __internal_PlanDetailsProps,
   __internal_SubscriptionDetailsProps,
@@ -30,9 +29,9 @@ import type {
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
-  Clerk as ClerkInterface,
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
+  Clerk as ClerkInterface,
   ClerkOptions,
   ClientJSONSnapshot,
   ClientResource,
@@ -1367,9 +1366,7 @@ export class Clerk implements ClerkInterface {
       eventBus.emit(events.TokenUpdate, { token: null });
     }
 
-    // Only triggers navigation for internal AIO components routing or custom URLs
-    const shouldNavigateOnSetActive = this.#componentNavigationContext;
-    if (newSession?.currentTask && shouldNavigateOnSetActive) {
+    if (newSession?.currentTask) {
       await navigateToTask(session.currentTask.key, {
         options: this.#options,
         environment: this.environment,
@@ -1380,60 +1377,6 @@ export class Clerk implements ClerkInterface {
 
     this.#setAccessors(session);
     this.#emit();
-
-    await onAfterSetActive();
-  };
-
-  public __internal_navigateToTaskIfAvailable = async ({
-    redirectUrlComplete,
-  }: __internal_NavigateToTaskIfAvailableParams = {}): Promise<void> => {
-    const onBeforeSetActive: SetActiveHook =
-      typeof window !== 'undefined' && typeof window.__unstable__onBeforeSetActive === 'function'
-        ? window.__unstable__onBeforeSetActive
-        : noop;
-
-    const onAfterSetActive: SetActiveHook =
-      typeof window !== 'undefined' && typeof window.__unstable__onAfterSetActive === 'function'
-        ? window.__unstable__onAfterSetActive
-        : noop;
-
-    const session = this.session;
-    if (!session || !this.environment) {
-      return;
-    }
-
-    if (session.status === 'pending') {
-      await navigateToTask(session.currentTask.key, {
-        options: this.#options,
-        environment: this.environment,
-        globalNavigate: this.navigate,
-        componentNavigationContext: this.#componentNavigationContext,
-      });
-      return;
-    }
-
-    await onBeforeSetActive();
-
-    if (redirectUrlComplete) {
-      const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
-
-      await tracker.track(async () => {
-        if (!this.client) {
-          return;
-        }
-
-        if (this.client.isEligibleForTouch()) {
-          const absoluteRedirectUrl = new URL(redirectUrlComplete, window.location.href);
-          await this.navigate(this.buildUrlWithAuth(this.client.buildTouchUrl({ redirectUrl: absoluteRedirectUrl })));
-        } else {
-          await this.navigate(redirectUrlComplete);
-        }
-      });
-
-      if (tracker.isUnloading()) {
-        return;
-      }
-    }
 
     await onAfterSetActive();
   };
@@ -1908,11 +1851,10 @@ export class Clerk implements ClerkInterface {
     };
 
     if (si.status === 'complete') {
-      await this.setActive({
+      return this.setActive({
         session: si.sessionId,
         redirectUrl: redirectUrls.getAfterSignInUrl(),
       });
-      return this.__internal_navigateToTaskIfAvailable();
     }
 
     const userExistsButNeedsToSignIn =
@@ -1922,11 +1864,10 @@ export class Clerk implements ClerkInterface {
       const res = await signIn.create({ transfer: true });
       switch (res.status) {
         case 'complete':
-          await this.setActive({
+          return this.setActive({
             session: res.createdSessionId,
             redirectUrl: redirectUrls.getAfterSignInUrl(),
           });
-          return this.__internal_navigateToTaskIfAvailable();
         case 'needs_first_factor':
           return navigateToFactorOne();
         case 'needs_second_factor':
@@ -1972,11 +1913,10 @@ export class Clerk implements ClerkInterface {
       const res = await signUp.create({ transfer: true });
       switch (res.status) {
         case 'complete':
-          await this.setActive({
+          return this.setActive({
             session: res.createdSessionId,
             redirectUrl: redirectUrls.getAfterSignUpUrl(),
           });
-          return this.__internal_navigateToTaskIfAvailable();
         case 'missing_requirements':
           return navigateToNextStepSignUp({ missingFields: res.missingFields });
         default:
@@ -1985,11 +1925,10 @@ export class Clerk implements ClerkInterface {
     }
 
     if (su.status === 'complete') {
-      await this.setActive({
+      return this.setActive({
         session: su.sessionId,
         redirectUrl: redirectUrls.getAfterSignUpUrl(),
       });
-      return this.__internal_navigateToTaskIfAvailable();
     }
 
     if (si.status === 'needs_second_factor') {
@@ -2023,10 +1962,6 @@ export class Clerk implements ClerkInterface {
 
     if (su.externalAccountStatus === 'verified' && su.status === 'missing_requirements') {
       return navigateToNextStepSignUp({ missingFields: signUp.missingFields });
-    }
-
-    if (this.__internal_hasAfterAuthFlows) {
-      return this.__internal_navigateToTaskIfAvailable({ redirectUrlComplete: redirectUrls.getAfterSignInUrl() });
     }
 
     return navigateToSignIn();

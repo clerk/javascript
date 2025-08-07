@@ -12,7 +12,6 @@ export {
   RedirectToOrganizationProfile,
   RedirectToSignIn,
   RedirectToSignUp,
-  RedirectToTask,
   RedirectToUserProfile,
 } from './client-boundary/controlComponents';
 
