@@ -104,7 +104,6 @@ type IsomorphicLoadedClerk = Without<
   | '__internal_reloadInitialResources'
   | 'billing'
   | 'apiKeys'
-  | '__internal_setComponentNavigationContext'
   | '__internal_setActiveInProgress'
   | '__internal_hasAfterAuthFlows'
 > & {
