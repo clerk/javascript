@@ -333,7 +333,7 @@ export interface SessionTask {
   /**
    * A unique identifier for the task
    */
-  key: 'select-organization';
+  key: 'choose-organization';
 }
 
 export type GetTokenOptions = {

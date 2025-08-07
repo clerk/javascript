@@ -35,7 +35,7 @@ describe('TaskChooseOrganization', () => {
       f.withUser({
         email_addresses: ['test@clerk.com'],
         create_organization_enabled: true,
-        tasks: [{ key: 'select-organization' }],
+        tasks: [{ key: 'choose-organization' }],
       });
     });
 
@@ -55,7 +55,7 @@ describe('TaskChooseOrganization', () => {
       f.withUser({
         email_addresses: ['test@clerk.com'],
         create_organization_enabled: true,
-        tasks: [{ key: 'select-organization' }],
+        tasks: [{ key: 'choose-organization' }],
       });
     });
 
@@ -74,7 +74,7 @@ describe('TaskChooseOrganization', () => {
       f.withUser({
         email_addresses: ['test@clerk.com'],
         create_organization_enabled: true,
-        tasks: [{ key: 'select-organization' }],
+        tasks: [{ key: 'choose-organization' }],
       });
     });
 
@@ -114,7 +114,7 @@ describe('TaskChooseOrganization', () => {
       f.withUser({
         email_addresses: ['test@clerk.com'],
         create_organization_enabled: true,
-        tasks: [{ key: 'select-organization' }],
+        tasks: [{ key: 'choose-organization' }],
       });
     });
 
@@ -173,7 +173,7 @@ describe('TaskChooseOrganization', () => {
       f.withUser({
         email_addresses: ['user@test.com'],
         create_organization_enabled: true,
-        tasks: [{ key: 'select-organization' }],
+        tasks: [{ key: 'choose-organization' }],
       });
     });
 
@@ -192,7 +192,7 @@ describe('TaskChooseOrganization', () => {
       f.withUser({
         email_addresses: ['test@clerk.com'],
         create_organization_enabled: true,
-        tasks: [{ key: 'select-organization' }],
+        tasks: [{ key: 'choose-organization' }],
       });
     });
 
@@ -211,7 +211,7 @@ describe('TaskChooseOrganization', () => {
       f.withUser({
         username: 'testuser',
         create_organization_enabled: true,
-        tasks: [{ key: 'select-organization' }],
+        tasks: [{ key: 'choose-organization' }],
       });
     });
 
