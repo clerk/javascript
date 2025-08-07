@@ -44,6 +44,7 @@ import type {
   SignUpProps,
   SignUpRedirectOptions,
   SignUpResource,
+  State,
   TaskChooseOrganizationProps,
   UnsubscribeCallback,
   UserButtonProps,
@@ -712,6 +713,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   get billing(): CommerceBillingNamespace | undefined {
     return this.clerkjs?.billing;
+  }
+
+  get __internal_state(): State | undefined {
+    return this.clerkjs?.__internal_state;
   }
 
   get apiKeys(): APIKeysNamespace | undefined {
