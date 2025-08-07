@@ -44,7 +44,7 @@ function SessionTaskRoutes(): JSX.Element {
 
   return (
     <Switch>
-      <Route path={INTERNAL_SESSION_TASK_ROUTE_BY_KEY['select-organization']}>
+      <Route path={INTERNAL_SESSION_TASK_ROUTE_BY_KEY['choose-organization']}>
         <TaskChooseOrganizationContext.Provider
           value={{ componentName: 'TaskChooseOrganization', redirectUrlComplete: ctx.redirectUrlComplete }}
         >
