@@ -4,6 +4,8 @@
 
 Adds machine-to-machine endpoints to the Backend SDK:
 
+**Note:** Renamed from "machine_tokens" to "m2m_tokens" for clarity and consistency with canonical terminology. This avoids confusion with other machine-related concepts like machine secrets.
+
 ### Create M2M Tokens
 
 A machine secret is required when creating M2M tokens.
@@ -13,7 +15,7 @@ const clerkClient = createClerkClient({
     machineSecretKey: process.env.CLERK_MACHINE_SECRET_KEY
 })
 
-clerkClient.machineTokens.create({
+clerkClient.m2mTokens.create({
     // or pass as an option here
     // machineSecretKey: process.env.CLERK_MACHINE_SECRET_KEY
     secondsUntilExpiration: 3600,
@@ -27,7 +29,7 @@ You can revoke tokens using either a machine secret or instance secret:
 ```ts
 // Using machine secret
 const clerkClient = createClerkClient({ machineSecretKey: process.env.CLERK_MACHINE_SECRET_KEY })
-clerkClient.machineTokens.revoke({
+clerkClient.m2mTokens.revoke({
     // or pass as an option here
     // machineSecretKey: process.env.CLERK_MACHINE_SECRET_KEY
     m2mTokenId: 'mt_xxxxx',
@@ -36,7 +38,7 @@ clerkClient.machineTokens.revoke({
 
 // Using instance secret (default)
 const clerkClient = createClerkClient({ secretKey: 'sk_xxxx' })
-clerkClient.machineTokens.revoke({
+clerkClient.m2mTokens.revoke({
     m2mTokenId: 'mt_xxxxx',
     revocationReason: 'Revoked by user',
 })
@@ -49,7 +51,7 @@ You can verify tokens using either a machine secret or instance secret:
 ```ts
 // Using machine secret
 const clerkClient = createClerkClient({ machineSecretKey: process.env.CLERK_MACHINE_SECRET_KEY })
-clerkClient.machineTokens.verifySecret({
+clerkClient.m2mTokens.verifySecret({
     // or pass as an option here
     // machineSecretKey: process.env.CLERK_MACHINE_SECRET_KEY
     secret: 'mt_secret_xxxxx',
@@ -57,7 +59,7 @@ clerkClient.machineTokens.verifySecret({
 
 // Using instance secret (default)
 const clerkClient = createClerkClient({ secretKey: 'sk_xxxx' })
-clerkClient.machineTokens.verifySecret({
+clerkClient.m2mTokens.verifySecret({
     secret: 'mt_secret_xxxxx',
 })
 ```
