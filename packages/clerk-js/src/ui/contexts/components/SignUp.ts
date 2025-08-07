@@ -1,5 +1,6 @@
 import { useClerk } from '@clerk/shared/react';
 import { isAbsoluteUrl } from '@clerk/shared/url';
+import type { OnPendingSessionFn } from '@clerk/types';
 import { createContext, useContext, useMemo } from 'react';
 
 import { SIGN_UP_INITIAL_VALUE_KEYS } from '../../../core/constants';
@@ -25,6 +26,7 @@ export type SignUpContextType = Omit<SignUpCtx, 'fallbackRedirectUrl' | 'forceRe
   isCombinedFlow: boolean;
   emailLinkRedirectUrl: string;
   ssoCallbackUrl: string;
+  onPendingSession: OnPendingSessionFn;
 };
 
 export const SignUpContext = createContext<SignUpCtx | null>(null);
@@ -110,6 +112,16 @@ export const useSignUpContext = (): SignUpContextType => {
   // TODO: Avoid building this url again to remove duplicate code. Get it from window.Clerk instead.
   const secondFactorUrl = buildURL({ base: signInUrl, hashPath: '/factor-two' }, { stringify: true });
 
+  const onPendingSession: OnPendingSessionFn = async ({ session }) => {
+    const currentTaskKey = session.currentTask.key;
+
+    switch (currentTaskKey) {
+      case 'choose-organization': {
+        await navigate(`../tasks/${currentTaskKey}`);
+      }
+    }
+  };
+
   return {
     ...ctx,
     oauthFlow: ctx.oauthFlow || 'auto',
@@ -127,5 +139,6 @@ export const useSignUpContext = (): SignUpContextType => {
     initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },
     authQueryString,
     isCombinedFlow,
+    onPendingSession,
   };
 };
