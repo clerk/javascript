@@ -98,7 +98,6 @@ export const ChooseOrganizationScreen = withCardStateProvider(
 const MembershipPreview = withCardStateProvider((props: { organization: OrganizationResource }) => {
   const card = useCardState();
   const { redirectUrlComplete } = useSessionTasksContext();
-  const { __internal_navigateToTaskIfAvailable } = useClerk();
   const { isLoaded, setActive } = useOrganizationList();
 
   if (!isLoaded) {
@@ -110,8 +109,6 @@ const MembershipPreview = withCardStateProvider((props: { organization: Organiza
       await setActive({
         organization,
       });
-
-      await __internal_navigateToTaskIfAvailable({ redirectUrlComplete });
     });
   };
 
