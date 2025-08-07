@@ -10,6 +10,9 @@ export const KeylessCreatorOrReader = (props: NextClerkProviderProps) => {
   const isNotFoundRoute = segments[0]?.startsWith('/_not-found') || false;
   const [state, fetchKeys] = React.useActionState(createOrReadKeylessAction, null);
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as any).__clerk_keyless = true;
+    }
     if (isNotFoundRoute) {
       return;
     }

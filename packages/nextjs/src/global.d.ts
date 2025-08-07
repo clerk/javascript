@@ -45,6 +45,9 @@ interface Window {
   next?: {
     version: string;
   };
+
+  /** Set to true only when running in Next.js keyless mode on the client. */
+  __clerk_keyless?: boolean;
 }
 
 declare const PACKAGE_NAME: string;

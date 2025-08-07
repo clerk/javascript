@@ -12,6 +12,7 @@ import { ClerkNextOptionsProvider, useClerkNextOptions } from '../../client-boun
 import type { NextClerkProviderProps } from '../../types';
 import { ClerkJSScript } from '../../utils/clerk-js-script';
 import { canUseKeyless } from '../../utils/feature-flags';
+import { KeylessTelemetryEnhancer } from '../../utils/keyless-telemetry-enhancer';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
 import { RouterTelemetry } from '../../utils/router-telemetry';
 import { isNextWithUnstableServerActions } from '../../utils/sdk-versions';
@@ -42,13 +43,6 @@ const NextClientClerkProvider = (props: NextClerkProviderProps) => {
   const push = useAwaitablePush();
   const replace = useAwaitableReplace();
   const [isPending, startTransition] = useTransition();
-
-  // Set global keyless flag for telemetry boosting
-  useEffect(() => {
-    if (canUseKeyless && typeof window !== 'undefined') {
-      (window as any).__clerk_keyless = true;
-    }
-  }, []);
 
   // Avoid rendering nested ClerkProviders by checking for the existence of the ClerkNextOptions context provider
   const isNested = Boolean(useClerkNextOptions());
@@ -128,6 +122,7 @@ const NextClientClerkProvider = (props: NextClerkProviderProps) => {
   return (
     <ClerkNextOptionsProvider options={mergedProps}>
       <ReactClerkProvider {...mergedProps}>
+        <KeylessTelemetryEnhancer />
         <RouterTelemetry />
         <ClerkJSScript router='app' />
         {children}
