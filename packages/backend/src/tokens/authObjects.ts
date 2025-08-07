@@ -11,7 +11,7 @@ import type {
   SharedSignedInAuthObjectProperties,
 } from '@clerk/types';
 
-import type { APIKey, CreateBackendApiOptions, IdPOAuthAccessToken, MachineToken } from '../api';
+import type { APIKey, CreateBackendApiOptions, IdPOAuthAccessToken, M2MToken } from '../api';
 import { createBackendApiClient } from '../api';
 import { isTokenTypeAccepted } from '../internal';
 import type { AuthenticateContext } from './authenticateContext';
@@ -95,8 +95,7 @@ type MachineObjectExtendedProperties<TAuthenticated extends boolean> = {
         | { name: string; claims: Claims | null; userId: string; orgId: null }
         | { name: string; claims: Claims | null; userId: null; orgId: string }
     : { name: null; claims: null; userId: null; orgId: null };
-  machine_token: {
-    name: TAuthenticated extends true ? string : null;
+  m2m_token: {
     claims: TAuthenticated extends true ? Claims | null : null;
     machineId: TAuthenticated extends true ? string : null;
   };
@@ -280,12 +279,11 @@ export function authenticatedMachineObject<T extends MachineTokenType>(
         orgId: result.subject.startsWith('org_') ? result.subject : null,
       } as unknown as AuthenticatedMachineObject<T>;
     }
-    case TokenType.MachineToken: {
-      const result = verificationResult as MachineToken;
+    case TokenType.M2MToken: {
+      const result = verificationResult as M2MToken;
       return {
         ...baseObject,
         tokenType,
-        name: result.name,
         claims: result.claims,
         scopes: result.scopes,
         machineId: result.subject,
@@ -335,11 +333,10 @@ export function unauthenticatedMachineObject<T extends MachineTokenType>(
         orgId: null,
       } as unknown as UnauthenticatedMachineObject<T>;
     }
-    case TokenType.MachineToken: {
+    case TokenType.M2MToken: {
       return {
         ...baseObject,
         tokenType,
-        name: null,
         claims: null,
         scopes: null,
         machineId: null,

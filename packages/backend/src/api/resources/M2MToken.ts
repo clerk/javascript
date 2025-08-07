@@ -1,9 +1,8 @@
-import type { MachineTokenJSON } from './JSON';
+import type { M2MTokenJSON } from './JSON';
 
-export class MachineToken {
+export class M2MToken {
   constructor(
     readonly id: string,
-    readonly name: string,
     readonly subject: string,
     readonly scopes: string[],
     readonly claims: Record<string, any> | null,
@@ -11,16 +10,14 @@ export class MachineToken {
     readonly revocationReason: string | null,
     readonly expired: boolean,
     readonly expiration: number | null,
-    readonly createdBy: string | null,
-    readonly creationReason: string | null,
     readonly createdAt: number,
     readonly updatedAt: number,
+    readonly secret?: string,
   ) {}
 
-  static fromJSON(data: MachineTokenJSON) {
-    return new MachineToken(
+  static fromJSON(data: M2MTokenJSON): M2MToken {
+    return new M2MToken(
       data.id,
-      data.name,
       data.subject,
       data.scopes,
       data.claims,
@@ -28,10 +25,9 @@ export class MachineToken {
       data.revocation_reason,
       data.expired,
       data.expiration,
-      data.created_by,
-      data.creation_reason,
       data.created_at,
       data.updated_at,
+      data.secret,
     );
   }
 }

@@ -13,12 +13,14 @@ export async function authenticateRequest(
 ): Promise<AuthenticatedState | UnauthenticatedState> {
   const { audience, authorizedParties } = opts;
 
-  const { apiUrl, secretKey, jwtKey, proxyUrl, isSatellite, domain, publishableKey, acceptsToken } = opts;
+  const { apiUrl, secretKey, jwtKey, proxyUrl, isSatellite, domain, publishableKey, acceptsToken, machineSecretKey } =
+    opts;
   const { signInUrl, signUpUrl, afterSignInUrl, afterSignUpUrl } = opts;
 
   const requestState = await createClerkClient({
     apiUrl,
     secretKey,
+    machineSecretKey,
     jwtKey,
     proxyUrl,
     isSatellite,
