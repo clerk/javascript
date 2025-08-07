@@ -99,7 +99,9 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
   #eventThrottler: TelemetryEventThrottler;
   #metadata: TelemetryMetadata = {} as TelemetryMetadata;
   #buffer: TelemetryEvent[] = [];
+  #flushPromise: Promise<Response | undefined> | null = null;
   #logBuffer: TelemetryLogData[] = [];
+  #logFlushPromise: Promise<Response | undefined> | null = null;
   #pendingFlush: any;
   #pendingLogFlush: any;
 
@@ -308,41 +310,50 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
   }
 
   #flush(): void {
-    fetch(new URL('/v1/event', this.#config.endpoint), {
+    if (this.#flushPromise) return;
+    if (this.#buffer.length === 0) return;
+
+    const eventsToSend = [...this.#buffer];
+    this.#buffer = [];
+
+    this.#flushPromise = fetch(new URL('/v1/event', this.#config.endpoint), {
       method: 'POST',
       // TODO: We send an array here with that idea that we can eventually send multiple events.
       body: JSON.stringify({
-        events: this.#buffer,
+        events: eventsToSend,
       }),
       headers: {
         'Content-Type': 'application/json',
       },
     })
       .catch(() => void 0)
-      .then(() => {
-        this.#buffer = [];
-      })
-      .catch(() => void 0);
+      .finally(() => {
+        this.#flushPromise = null;
+      });
   }
 
   #flushLogs(): void {
-    if (this.#logBuffer.length === 0) {
-      return;
-    }
+    if (this.#logFlushPromise) return;
+    if (this.#logBuffer.length === 0) return;
 
     const entries = [...this.#logBuffer];
     this.#logBuffer = [];
 
     try {
-      fetch(new URL('/v1/logs', this.#config.endpoint), {
+      this.#logFlushPromise = fetch(new URL('/v1/logs', this.#config.endpoint), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(entries),
-      }).catch(() => void 0);
+      })
+        .catch(() => void 0)
+        .finally(() => {
+          this.#logFlushPromise = null;
+        });
     } catch (error) {
       console.error('Failed to send telemetry log data:', error);
+      this.#logFlushPromise = null;
     }
   }
 
