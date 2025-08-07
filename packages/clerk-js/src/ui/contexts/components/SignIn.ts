@@ -3,15 +3,12 @@ import { isAbsoluteUrl } from '@clerk/shared/url';
 import type { OnPendingSessionFn } from '@clerk/types';
 import { createContext, useContext, useMemo } from 'react';
 
+import { navigateToTask } from '@/core/sessionTasks';
+
 import { SIGN_IN_INITIAL_VALUE_KEYS } from '../../../core/constants';
 import { buildURL } from '../../../utils';
 import { RedirectUrls } from '../../../utils/redirectUrls';
-import {
-  buildRedirectUrl,
-  buildSessionTaskRedirectUrl,
-  MAGIC_LINK_VERIFY_PATH_ROUTE,
-  SSO_CALLBACK_PATH_ROUTE,
-} from '../../common/redirects';
+import { buildRedirectUrl, MAGIC_LINK_VERIFY_PATH_ROUTE, SSO_CALLBACK_PATH_ROUTE } from '../../common/redirects';
 import { useEnvironment, useOptions } from '../../contexts';
 import type { ParsedQueryString } from '../../router';
 import { useRouter } from '../../router';
@@ -27,7 +24,6 @@ export type SignInContextType = Omit<SignInCtx, 'fallbackRedirectUrl' | 'forceRe
   authQueryString: string | null;
   afterSignUpUrl: string;
   afterSignInUrl: string;
-  sessionTaskUrl: string | null;
   transferable: boolean;
   waitlistUrl: string;
   emailLinkRedirectUrl: string;
@@ -123,19 +119,14 @@ export const useSignInContext = (): SignInContextType => {
 
   const signUpContinueUrl = buildURL({ base: signUpUrl, hashPath: '/continue' }, { stringify: true });
 
-  const sessionTaskUrl = buildSessionTaskRedirectUrl({
-    task: clerk.session?.currentTask,
-    path: ctx.path,
-    routing: ctx.routing,
-    baseUrl: signInUrl,
-    taskUrls: clerk.__internal_getOption('taskUrls'),
-  });
-
   const onPendingSession: OnPendingSessionFn = async ({ session }) => {
     switch (session.currentTask?.key) {
       case 'choose-organization': {
         // TODO - preserve redirect_url
-        await navigate(buildURL({ base: signInUrl, hashPath: '/tasks/choose-organization' }, { stringify: true }));
+        await navigateToTask(session, {
+          navigate,
+          baseUrl: signInUrl,
+        });
       }
     }
   };
@@ -152,7 +143,6 @@ export const useSignInContext = (): SignInContextType => {
     afterSignUpUrl,
     emailLinkRedirectUrl,
     ssoCallbackUrl,
-    sessionTaskUrl,
     navigateAfterSignIn,
     signUpContinueUrl,
     queryParams,

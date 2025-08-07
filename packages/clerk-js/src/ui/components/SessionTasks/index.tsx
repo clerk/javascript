@@ -39,7 +39,7 @@ const SessionTasksStart = () => {
   );
 };
 
-function SessionTaskRoutes(): JSX.Element {
+function SessionTasksRoutes(): JSX.Element {
   const ctx = useSessionTasksContext();
 
   return (
@@ -61,7 +61,7 @@ function SessionTaskRoutes(): JSX.Element {
 /**
  * @internal
  */
-export const SessionTask = withCardStateProvider(() => {
+export const SessionTasks = withCardStateProvider(() => {
   const clerk = useClerk();
   const { navigate } = useRouter();
   const signInContext = useContext(SignInContext);
@@ -104,7 +104,7 @@ export const SessionTask = withCardStateProvider(() => {
 
   return (
     <SessionTasksContext.Provider value={{ redirectUrlComplete, currentTaskContainer }}>
-      <SessionTaskRoutes />
+      <SessionTasksRoutes />
     </SessionTasksContext.Provider>
   );
 });

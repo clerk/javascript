@@ -6,7 +6,6 @@ import { SessionTasks as LazySessionTasks } from '../../../ui/lazyModules/compon
 import { SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
 import { SignUpContext, useSignUpContext, withCoreSessionSwitchGuard } from '../../contexts';
 import { Flow } from '../../customizables';
-import { usePreloadTasks } from '../../hooks/usePreloadTasks';
 import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
 import { SignUpContinue } from './SignUpContinue';
 import { SignUpSSOCallback } from './SignUpSSOCallback';
@@ -23,8 +22,6 @@ function RedirectToSignUp() {
 }
 
 function SignUpRoutes(): JSX.Element {
-  usePreloadTasks();
-
   const signUpContext = useSignUpContext();
 
   return (
