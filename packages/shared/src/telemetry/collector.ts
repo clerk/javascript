@@ -46,7 +46,7 @@ function isWindowClerkWithMetadata(clerk: unknown): clerk is { constructor: { sd
 
 type TelemetryCollectorConfig = Pick<
   TelemetryCollectorOptions,
-  'samplingRate' | 'disabled' | 'debug' | 'maxBufferSize' | 'isKeyless'
+  'samplingRate' | 'disabled' | 'debug' | 'maxBufferSize'
 > & {
   endpoint: string;
 };
@@ -82,7 +82,6 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
       samplingRate: options.samplingRate ?? DEFAULT_CONFIG.samplingRate,
       disabled: options.disabled ?? false,
       debug: options.debug ?? false,
-      isKeyless: options.isKeyless ?? false,
       endpoint: DEFAULT_CONFIG.endpoint,
     } as Required<TelemetryCollectorConfig>;
 
@@ -166,14 +165,8 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
   #shouldBeSampled(preparedPayload: TelemetryEvent, eventSamplingRate?: number) {
     const randomSeed = Math.random();
 
-    // For keyless mode, boost sampling rate for COMPONENT_MOUNTED events to 100%
-    let effectiveSamplingRate = this.#config.samplingRate;
-    if (this.#config.isKeyless && preparedPayload.event === 'COMPONENT_MOUNTED') {
-      effectiveSamplingRate = 1.0; // 100% sampling for keyless COMPONENT_MOUNTED events
-    }
-
     const toBeSampled =
-      randomSeed <= effectiveSamplingRate &&
+      randomSeed <= this.#config.samplingRate &&
       (typeof eventSamplingRate === 'undefined' || randomSeed <= eventSamplingRate);
 
     if (!toBeSampled) {
@@ -293,6 +286,7 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
    */
   #preparePayload(event: TelemetryEvent['event'], payload: TelemetryEvent['payload']): TelemetryEvent {
     const sdkMetadata = this.#getSDKMetadata();
+    const isKeyless = typeof window !== 'undefined' && (window as any).__clerk_keyless === true;
 
     return {
       event,
@@ -302,7 +296,7 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
       sdkv: sdkMetadata.version,
       ...(this.#metadata.publishableKey ? { pk: this.#metadata.publishableKey } : {}),
       ...(this.#metadata.secretKey ? { sk: this.#metadata.secretKey } : {}),
-      ...(this.#config.isKeyless ? { keyless: true } : {}),
+      ...(isKeyless ? { keyless: true } : {}),
       payload,
     };
   }

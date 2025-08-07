@@ -317,4 +317,87 @@ describe('TelemetryCollector', () => {
       fetchSpy.mockRestore();
     });
   });
+
+  describe('keyless mode detection', () => {
+    beforeEach(() => {
+      // Clean up any existing keyless flag
+      delete (global as any).window;
+    });
+
+    test('includes keyless flag in payload when window.__clerk_keyless is true', () => {
+      // Mock the global window object directly
+      (global as any).window = {
+        __clerk_keyless: true,
+      };
+
+      const collector = new TelemetryCollector({
+        publishableKey: TEST_PK,
+        debug: true,
+      });
+
+      const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+      const consoleGroupSpy = jest.spyOn(console, 'groupCollapsed').mockImplementation(() => {});
+
+      collector.record({ event: 'TEST_EVENT', payload: {} });
+
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          keyless: true,
+        }),
+      );
+
+      consoleSpy.mockRestore();
+      consoleGroupSpy.mockRestore();
+    });
+
+    test('does not include keyless flag when window.__clerk_keyless is false or undefined', () => {
+      // Mock the global window object without keyless flag
+      (global as any).window = {
+        __clerk_keyless: false,
+      };
+
+      const collector = new TelemetryCollector({
+        publishableKey: TEST_PK,
+        debug: true,
+      });
+
+      const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+      const consoleGroupSpy = jest.spyOn(console, 'groupCollapsed').mockImplementation(() => {});
+
+      collector.record({ event: 'TEST_EVENT', payload: {} });
+
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.not.objectContaining({
+          keyless: expect.anything(),
+        }),
+      );
+
+      consoleSpy.mockRestore();
+      consoleGroupSpy.mockRestore();
+    });
+
+    test('does not include keyless flag in server environment', () => {
+      // Simulate server environment by removing window
+      delete (global as any).window;
+
+      const collector = new TelemetryCollector({
+        publishableKey: TEST_PK,
+        debug: true,
+      });
+
+      const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+      const consoleGroupSpy = jest.spyOn(console, 'groupCollapsed').mockImplementation(() => {});
+
+      collector.record({ event: 'TEST_EVENT', payload: {} });
+
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.not.objectContaining({
+          keyless: expect.anything(),
+        }),
+      );
+
+      consoleSpy.mockRestore();
+      consoleGroupSpy.mockRestore();
+    });
+  });
 });

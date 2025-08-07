@@ -18,11 +18,6 @@ export type NextClerkProviderProps = Without<ClerkProviderProps, 'publishableKey
          * Telemetry events are only logged to the console and not sent to Clerk
          */
         debug?: boolean;
-        /**
-         * If true, indicates the SDK is running in keyless mode (Next.js specific).
-         * @internal
-         */
-        isKeyless?: boolean;
       };
   /**
    * If set to true, the NextJS middleware will be invoked

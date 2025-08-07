@@ -35,8 +35,4 @@ export type TelemetryCollectorOptions = {
    * The version of the SDK being used.
    */
   sdkVersion?: string;
-  /**
-   * If true, indicates the SDK is running in keyless mode (Next.js specific).
-   */
-  isKeyless?: boolean;
 };

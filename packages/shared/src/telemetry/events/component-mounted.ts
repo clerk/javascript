@@ -24,9 +24,13 @@ function createPrebuiltComponentEvent(event: typeof EVENT_COMPONENT_MOUNTED | ty
     additionalPayload?: TelemetryEventRaw['payload'],
     samplingRateOverride?: number,
   ): TelemetryEventRaw<EventPrebuiltComponent> {
+    // Check for keyless mode and boost sampling rate if no override provided
+    const isKeyless = typeof window !== 'undefined' && (window as any).__clerk_keyless === true;
+    const effectiveSamplingRate = samplingRateOverride ?? (isKeyless ? 1.0 : EVENT_SAMPLING_RATE);
+
     return {
       event,
-      eventSamplingRate: samplingRateOverride ?? EVENT_SAMPLING_RATE,
+      eventSamplingRate: effectiveSamplingRate,
       payload: {
         component,
         appearanceProp: Boolean(props?.appearance),
@@ -106,9 +110,13 @@ export function eventComponentMounted(
   props: TelemetryEventRaw['payload'] = {},
   samplingRateOverride?: number,
 ): TelemetryEventRaw<EventComponentMounted> {
+  // Check for keyless mode and boost sampling rate if no override provided
+  const isKeyless = typeof window !== 'undefined' && (window as any).__clerk_keyless === true;
+  const effectiveSamplingRate = samplingRateOverride ?? (isKeyless ? 1.0 : EVENT_SAMPLING_RATE);
+
   return {
     event: EVENT_COMPONENT_MOUNTED,
-    eventSamplingRate: samplingRateOverride ?? EVENT_SAMPLING_RATE,
+    eventSamplingRate: effectiveSamplingRate,
     payload: {
       component,
       ...props,

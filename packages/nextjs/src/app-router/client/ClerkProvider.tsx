@@ -43,6 +43,13 @@ const NextClientClerkProvider = (props: NextClerkProviderProps) => {
   const replace = useAwaitableReplace();
   const [isPending, startTransition] = useTransition();
 
+  // Set global keyless flag for telemetry boosting
+  useEffect(() => {
+    if (canUseKeyless && typeof window !== 'undefined') {
+      (window as any).__clerk_keyless = true;
+    }
+  }, []);
+
   // Avoid rendering nested ClerkProviders by checking for the existence of the ClerkNextOptions context provider
   const isNested = Boolean(useClerkNextOptions());
   if (isNested) {
@@ -116,14 +123,6 @@ const NextClientClerkProvider = (props: NextClerkProviderProps) => {
     routerPush: push,
     // @ts-expect-error Error because of the stricter types of internal `replace`
     routerReplace: replace,
-    // Pass keyless flag to telemetry for boosted sampling of COMPONENT_MOUNTED events
-    telemetry:
-      props.telemetry === false
-        ? false
-        : {
-            ...props.telemetry,
-            isKeyless: canUseKeyless,
-          },
   });
 
   return (
