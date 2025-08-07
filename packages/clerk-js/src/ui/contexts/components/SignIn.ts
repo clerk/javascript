@@ -1,5 +1,6 @@
 import { useClerk } from '@clerk/shared/react';
 import { isAbsoluteUrl } from '@clerk/shared/url';
+import type { OnPendingSessionFn } from '@clerk/types';
 import { createContext, useContext, useMemo } from 'react';
 
 import { SIGN_IN_INITIAL_VALUE_KEYS } from '../../../core/constants';
@@ -32,6 +33,7 @@ export type SignInContextType = Omit<SignInCtx, 'fallbackRedirectUrl' | 'forceRe
   emailLinkRedirectUrl: string;
   ssoCallbackUrl: string;
   isCombinedFlow: boolean;
+  onPendingSession: OnPendingSessionFn;
 };
 
 export const SignInContext = createContext<SignInCtx | null>(null);
@@ -129,6 +131,15 @@ export const useSignInContext = (): SignInContextType => {
     taskUrls: clerk.__internal_getOption('taskUrls'),
   });
 
+  const onPendingSession: OnPendingSessionFn = async ({ session }) => {
+    switch (session.currentTask?.key) {
+      case 'choose-organization': {
+        // TODO - preserve redirect_url
+        await navigate(buildURL({ base: signInUrl, hashPath: '/tasks/choose-organization' }, { stringify: true }));
+      }
+    }
+  };
+
   return {
     ...(ctx as SignInCtx),
     transferable: ctx.transferable ?? true,
@@ -148,5 +159,6 @@ export const useSignInContext = (): SignInContextType => {
     initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },
     authQueryString,
     isCombinedFlow,
+    onPendingSession,
   };
 };

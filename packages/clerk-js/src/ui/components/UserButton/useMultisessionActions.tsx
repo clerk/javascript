@@ -1,6 +1,8 @@
 import { useClerk } from '@clerk/shared/react';
 import type { SignedInSessionResource, UserButtonProps, UserResource } from '@clerk/types';
 
+import { navigateToTask } from '@/core/sessionTasks';
+import { useEnvironment } from '@/ui/contexts';
 import { useCardState } from '@/ui/elements/contexts';
 import { sleep } from '@/ui/utils/sleep';
 
@@ -23,6 +25,7 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
   const card = useCardState();
   const { signedInSessions, otherSessions } = useMultipleSessions({ user: opts.user });
   const { navigate } = useRouter();
+  const { displayConfig } = useEnvironment();
 
   const handleSignOutSessionClicked = (session: SignedInSessionResource) => () => {
     if (otherSessions.length === 0) {
@@ -70,7 +73,17 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
   const handleSessionClicked = (session: SignedInSessionResource) => async () => {
     card.setLoading();
 
-    return setActive({ session, redirectUrl: opts.afterSwitchSessionUrl }).finally(() => {
+    return setActive({
+      session,
+      redirectUrl: opts.afterSwitchSessionUrl,
+      onPendingSession: async ({ session }) => {
+        await navigateToTask(session, {
+          baseUrl: displayConfig.signInUrl,
+          navigate: navigate,
+          // TODO -> Pass `clerk` into callback so we can access the taskUrls here
+        });
+      },
+    }).finally(() => {
       card.setIdle();
       opts.actionCompleteCallback?.();
     });
