@@ -2,7 +2,9 @@ import { isClerkRuntimeError, isUserLockedError } from '@clerk/shared/error';
 import { useClerk } from '@clerk/shared/react';
 import { useCallback, useEffect } from 'react';
 
+import { navigateToTask } from '@/core/sessionTasks';
 import { useCardState } from '@/ui/elements/contexts';
+import { useRouter } from '@/ui/router';
 import { handleError } from '@/ui/utils/errorHandler';
 
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
@@ -15,8 +17,9 @@ function useHandleAuthenticateWithPasskey(onSecondFactor: () => Promise<unknown>
   // @ts-expect-error -- private method for the time being
   const { setActive, __internal_navigateWithError } = useClerk();
   const supportEmail = useSupportEmail();
-  const { afterSignInUrl } = useSignInContext();
+  const { afterSignInUrl, signInUrl } = useSignInContext();
   const { authenticateWithPasskey } = useCoreSignIn();
+  const { navigate } = useRouter();
 
   useEffect(() => {
     return () => {
@@ -29,7 +32,15 @@ function useHandleAuthenticateWithPasskey(onSecondFactor: () => Promise<unknown>
       const res = await authenticateWithPasskey(...args);
       switch (res.status) {
         case 'complete':
-          return setActive({ session: res.createdSessionId, redirectUrl: afterSignInUrl });
+          return setActive({
+            session: res.createdSessionId,
+            redirectUrl: afterSignInUrl,
+            onPendingSession: ({ session }) =>
+              navigateToTask(session, {
+                baseUrl: signInUrl,
+                navigate: navigate,
+              }),
+          });
         case 'needs_second_factor':
           return onSecondFactor();
         default:

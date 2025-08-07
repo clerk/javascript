@@ -84,7 +84,7 @@ function SignInStartInternal(): JSX.Element {
   const signIn = useCoreSignIn();
   const { navigate } = useRouter();
   const ctx = useSignInContext();
-  const { afterSignInUrl, signUpUrl, waitlistUrl, isCombinedFlow } = ctx;
+  const { afterSignInUrl, signUpUrl, waitlistUrl, isCombinedFlow, onPendingSession } = ctx;
   const supportEmail = useSupportEmail();
   const identifierAttributes = useMemo<SignInStartIdentifier[]>(
     () => groupIdentifiers(userSettings.enabledFirstFactorIdentifiers),
@@ -236,6 +236,7 @@ function SignInStartInternal(): JSX.Element {
             return clerk.setActive({
               session: res.createdSessionId,
               redirectUrl: afterSignInUrl,
+              onPendingSession,
             });
           default: {
             console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
@@ -387,6 +388,7 @@ function SignInStartInternal(): JSX.Element {
           return clerk.setActive({
             session: res.createdSessionId,
             redirectUrl: afterSignInUrl,
+            onPendingSession,
           });
         default: {
           console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
