@@ -68,9 +68,8 @@ export type AuthenticateRequestOptions = {
    */
   acceptsToken?: TokenType | TokenType[] | 'any';
   /**
-   * The machine secret to use when verifying machine-to-machine tokens.
+   * The machine secret key to use when verifying machine-to-machine tokens.
    * This will override the Clerk secret key.
-   * @internal
    */
   machineSecretKey?: string;
 } & VerifyTokenOptions;
