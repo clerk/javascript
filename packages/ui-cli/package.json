@@ -23,12 +23,7 @@
     "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src"
   },
-  "dependencies": {
-    "concurrently": "^9.2.0",
-    "dotenv": "^17.2.0",
-    "globby": "^14.1.0",
-    "jscodeshift": "^17.3.0"
-  },
+  "dependencies": {},
   "devDependencies": {},
   "engines": {
     "node": ">=18.17.0"
