@@ -49,7 +49,7 @@ import type {
   SignUpFallbackRedirectUrl,
   SignUpForceRedirectUrl,
 } from './redirects';
-import type { PendingSessionOptions, SessionTask, SignedInSessionResource } from './session';
+import type { PendingSessionOptions, PendingSessionResource, SessionTask, SignedInSessionResource } from './session';
 import type { SessionVerificationLevel } from './sessionVerification';
 import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
@@ -626,13 +626,6 @@ export interface Clerk {
   __internal_addNavigationListener: (callback: () => void) => UnsubscribeCallback;
 
   /**
-   * Registers the internal navigation context from UI components in order to
-   * be triggered from `Clerk` methods
-   * @internal
-   */
-  __internal_setComponentNavigationContext: (context: __internal_ComponentNavigationContext) => () => void;
-
-  /**
    * Set the active session and organization explicitly.
    *
    * If the session param is `null`, the active session is deleted.
@@ -956,6 +949,8 @@ type ClerkOptionsNavigation =
       routerDebug?: boolean;
     };
 
+export type OnPendingSessionFn = (opts: { session: PendingSessionResource }) => Promise<unknown>;
+
 export type ClerkOptions = PendingSessionOptions &
   ClerkOptionsNavigation &
   SignInForceRedirectUrl &
@@ -1077,6 +1072,11 @@ export type ClerkOptions = PendingSessionOptions &
      * @default undefined - Uses Clerk's default task flow URLs
      */
     taskUrls?: Record<SessionTask['key'], string>;
+
+    /**
+     * Event handler for session transitions to `pending`
+     */
+    onPendingSession?: OnPendingSessionFn;
   };
 
 export interface NavigateOptions {
@@ -1201,6 +1201,8 @@ export type SetActiveParams = {
    * The full URL or path to redirect to just before the active session and/or organization is set.
    */
   redirectUrl?: string;
+
+  onPendingSession?: OnPendingSessionFn;
 };
 
 /**

@@ -18,7 +18,6 @@ import type {
   __experimental_CheckoutInstance,
   __experimental_CheckoutOptions,
   __internal_CheckoutProps,
-  __internal_ComponentNavigationContext,
   __internal_OAuthConsentProps,
   __internal_PlanDetailsProps,
   __internal_SubscriptionDetailsProps,
@@ -50,6 +49,7 @@ import type {
   JoinWaitlistParams,
   ListenerCallback,
   NavigateOptions,
+  OnPendingSessionFn,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationResource,
@@ -233,7 +233,6 @@ export class Clerk implements ClerkInterface {
   #options: ClerkOptions = {};
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
-  #componentNavigationContext: __internal_ComponentNavigationContext | null = null;
   #publicEventBus = createClerkEventBus();
 
   public __internal_getCachedResources:
@@ -1196,7 +1195,13 @@ export class Clerk implements ClerkInterface {
   /**
    * `setActive` can be used to set the active session and/or organization.
    */
-  public setActive = async ({ session, organization, beforeEmit, redirectUrl }: SetActiveParams): Promise<void> => {
+  public setActive = async ({
+    session,
+    organization,
+    beforeEmit,
+    redirectUrl,
+    onPendingSession,
+  }: SetActiveParams): Promise<void> => {
     this.__internal_setActiveInProgress = true;
     try {
       if (!this.client) {
@@ -1255,7 +1260,7 @@ export class Clerk implements ClerkInterface {
       }
 
       if (newSession?.status === 'pending') {
-        await this.#handlePendingSession(newSession);
+        await this.#handlePendingSession(newSession, onPendingSession);
         return;
       }
 
@@ -1325,41 +1330,18 @@ export class Clerk implements ClerkInterface {
     }
   };
 
-  #handlePendingSession = async (session: PendingSessionResource) => {
-    /**
-     * Do not revalidate server cache when `setActive` is called with a pending
-     * session within components, to avoid flash of content and unmount during
-     * internal navigation
-     */
-    const shouldInvalidateCache = !this.#componentNavigationContext;
-
-    const onBeforeSetActive: SetActiveHook =
-      shouldInvalidateCache &&
-      typeof window !== 'undefined' &&
-      typeof window.__unstable__onBeforeSetActive === 'function'
-        ? window.__unstable__onBeforeSetActive
-        : noop;
-
-    const onAfterSetActive: SetActiveHook =
-      shouldInvalidateCache &&
-      typeof window !== 'undefined' &&
-      typeof window.__unstable__onAfterSetActive === 'function'
-        ? window.__unstable__onAfterSetActive
-        : noop;
-
-    await onBeforeSetActive();
-
+  #handlePendingSession = async (session: PendingSessionResource, onPendingSession?: OnPendingSessionFn) => {
     if (!this.environment) {
       return;
     }
 
-    let newSession: SignedInSessionResource | null = session;
+    let currentSession: SignedInSessionResource | null = session;
 
-    // Handles multi-session scenario when switching between `pending` sessions
-    // and satisfying task requirements such as organization selection
     if (inActiveBrowserTab() || !this.#options.standardBrowser) {
+      // Handles multi-session scenario when switching between `pending` sessions
+      // and satisfying task requirements such as organization selection
       await this.#touchCurrentSession(session);
-      newSession = this.#getSessionFromClient(session.id) ?? session;
+      currentSession = this.#getSessionFromClient(session.id) ?? session;
     }
 
     // Syncs __session and __client_uat, in case the `pending` session
@@ -1369,19 +1351,26 @@ export class Clerk implements ClerkInterface {
       eventBus.emit(events.TokenUpdate, { token: null });
     }
 
-    if (newSession?.currentTask) {
-      await navigateToTask(session.currentTask.key, {
-        options: this.#options,
-        environment: this.environment,
-        globalNavigate: this.navigate,
-        componentNavigationContext: this.#componentNavigationContext,
+    if (currentSession.status === 'pending') {
+      const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
+      const onPendingSessionHook = this.__internal_getOption('onPendingSession') ?? onPendingSession;
+      const taskUrls = this.__internal_getOption('taskUrls');
+
+      await tracker.track(async () => {
+        if (onPendingSessionHook) {
+          await onPendingSessionHook({ session: currentSession });
+        } else if (taskUrls) {
+          await this.navigate(taskUrls[session.currentTask.key]);
+        }
       });
+
+      if (tracker.isUnloading()) {
+        return;
+      }
     }
 
-    this.#setAccessors(session);
+    this.#setAccessors(currentSession);
     this.#emit();
-
-    await onAfterSetActive();
   };
 
   public addListener = (listener: ListenerCallback): UnsubscribeCallback => {
@@ -1416,12 +1405,6 @@ export class Clerk implements ClerkInterface {
       this.#navigationListeners = this.#navigationListeners.filter(l => l !== listener);
     };
     return unsubscribe;
-  };
-
-  public __internal_setComponentNavigationContext = (context: __internal_ComponentNavigationContext) => {
-    this.#componentNavigationContext = context;
-
-    return () => (this.#componentNavigationContext = null);
   };
 
   public navigate = async (to: string | undefined, options?: NavigateOptions): Promise<unknown> => {
@@ -1853,10 +1836,18 @@ export class Clerk implements ClerkInterface {
       });
     };
 
+    const onPendingSession: OnPendingSessionFn = ({ session }) =>
+      navigateToTask(session, {
+        baseUrl: displayConfig.signInUrl,
+        navigate: this.navigate,
+        options: this.#options,
+      });
+
     if (si.status === 'complete') {
       return this.setActive({
         session: si.sessionId,
         redirectUrl: redirectUrls.getAfterSignInUrl(),
+        onPendingSession,
       });
     }
 
@@ -1870,6 +1861,7 @@ export class Clerk implements ClerkInterface {
           return this.setActive({
             session: res.createdSessionId,
             redirectUrl: redirectUrls.getAfterSignInUrl(),
+            onPendingSession,
           });
         case 'needs_first_factor':
           return navigateToFactorOne();
@@ -1919,6 +1911,7 @@ export class Clerk implements ClerkInterface {
           return this.setActive({
             session: res.createdSessionId,
             redirectUrl: redirectUrls.getAfterSignUpUrl(),
+            onPendingSession,
           });
         case 'missing_requirements':
           return navigateToNextStepSignUp({ missingFields: res.missingFields });
@@ -2144,6 +2137,12 @@ export class Clerk implements ClerkInterface {
           await this.setActive({
             session: signInOrSignUp.createdSessionId,
             redirectUrl,
+            onPendingSession: ({ session }) =>
+              navigateToTask(session, {
+                baseUrl: displayConfig.signInUrl,
+                navigate: this.navigate,
+                options: this.#options,
+              }),
           });
         }
         break;
