@@ -79,12 +79,23 @@ export type UserService = {
 };
 
 /**
+ * Temporary limited range of area codes until FAPI is updated to allow all area codes when used with a test phone number.
+ */
+function random9xxAreaCode() {
+  const codes = [
+    901, 902, 903, 904, 905, 906, 907, 908, 909, 910, 912, 913, 914, 915, 916, 917, 918, 919, 920, 925, 927, 928, 929,
+    930, 931, 934, 935, 936, 937, 938, 939, 940, 941, 945, 947, 948, 949, 951, 952, 954, 956, 959, 970, 971, 972, 973,
+    978, 979, 980, 984, 985, 986, 989,
+  ];
+  return codes[Math.floor(Math.random() * codes.length)];
+}
+
+/**
  * This generates a random fictional number that can be verified using the 424242 code.
- * Allowing 10^5 combinations should be enough entropy for e2e purposes.
  * @see https://clerk.com/docs/testing/e2e-testing#phone-numbers
  */
 export function fakerPhoneNumber() {
-  return `+1###55501##`.replace(/#+/g, m => faker.string.numeric(m.length));
+  return `+1${random9xxAreaCode()}55501${faker.string.numeric(2)}`;
 }
 
 export const createUserService = (clerkClient: ClerkClient) => {
