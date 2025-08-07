@@ -4,6 +4,7 @@ export const API_VERSION = 'v1';
 export const USER_AGENT = `${PACKAGE_NAME}@${PACKAGE_VERSION}`;
 export const MAX_CACHE_LAST_UPDATED_AT_SECONDS = 5 * 60;
 export const SUPPORTED_BAPI_VERSION = '2025-04-10';
+export const SUPPORTED_HANDSHAKE_FORMAT = 'nonce';
 
 const Attributes = {
   AuthToken: '__clerkAuthToken',
@@ -21,6 +22,7 @@ const Cookies = {
   Handshake: '__clerk_handshake',
   DevBrowser: '__clerk_db_jwt',
   RedirectCount: '__clerk_redirect_count',
+  HandshakeFormat: '__clerk_handshake_format',
   HandshakeNonce: '__clerk_handshake_nonce',
 } as const;
 
@@ -33,9 +35,9 @@ const QueryParameters = {
   Handshake: Cookies.Handshake,
   HandshakeHelp: '__clerk_help',
   LegacyDevBrowser: '__dev_session',
-  HandshakeReason: '__clerk_hs_reason',
-  HandshakeNonce: Cookies.HandshakeNonce,
   HandshakeFormat: 'format',
+  HandshakeNonce: Cookies.HandshakeNonce,
+  HandshakeReason: '__clerk_hs_reason',
 } as const;
 
 const Headers = {
