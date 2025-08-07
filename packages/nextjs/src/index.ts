@@ -34,7 +34,7 @@ export {
   SignOutButton,
   SignUp,
   SignUpButton,
-  TaskSelectOrganization,
+  TaskChooseOrganization,
   UserButton,
   UserProfile,
   Waitlist,

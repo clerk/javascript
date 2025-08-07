@@ -1,22 +1,19 @@
-import { useClerk, useOrganizationList, useUser } from '@clerk/shared/react';
+import { useOrganizationList, useUser } from '@clerk/shared/react';
 import type { OrganizationResource } from '@clerk/types';
-import { useContext } from 'react';
 
+import { sharedMainIdentifierSx } from '@/ui/common/organizations/OrganizationPreview';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { OrganizationPreview } from '@/ui/elements/OrganizationPreview';
 import { PersonalWorkspacePreview } from '@/ui/elements/PersonalWorkspacePreview';
 
 import { useOrganizationListContext } from '../../contexts';
-import { SessionTasksContext } from '../../contexts/components/SessionTasks';
 import { localizationKeys } from '../../localization';
-import { OrganizationListPreviewButton, sharedMainIdentifierSx } from './shared';
+import { OrganizationListPreviewButton } from './shared';
 
 export const MembershipPreview = withCardStateProvider((props: { organization: OrganizationResource }) => {
   const card = useCardState();
   const { navigateAfterSelectOrganization } = useOrganizationListContext();
   const { isLoaded, setActive } = useOrganizationList();
-  const clerk = useClerk();
-  const sessionTasksContext = useContext(SessionTasksContext);
 
   if (!isLoaded) {
     return null;
@@ -26,12 +23,6 @@ export const MembershipPreview = withCardStateProvider((props: { organization: O
       await setActive({
         organization,
       });
-
-      if (sessionTasksContext) {
-        return clerk.__internal_navigateToTaskIfAvailable({
-          redirectUrlComplete: sessionTasksContext.redirectUrlComplete,
-        });
-      }
 
       await navigateAfterSelectOrganization(organization);
     });

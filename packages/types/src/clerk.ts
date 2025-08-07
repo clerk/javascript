@@ -14,7 +14,7 @@ import type {
   SignInTheme,
   SignUpTheme,
   SubscriptionDetailsTheme,
-  TaskSelectOrganizationTheme,
+  TaskChooseOrganizationTheme,
   UserButtonTheme,
   UserProfileTheme,
   UserVerificationTheme,
@@ -568,19 +568,19 @@ export interface Clerk {
   __internal_unmountOAuthConsent: (targetNode: HTMLDivElement) => void;
 
   /**
-   * Mounts a TaskSelectOrganization component at the target element.
-   * @param targetNode Target node to mount the TaskSelectOrganization component.
+   * Mounts a TaskChooseOrganization component at the target element.
+   * @param targetNode Target node to mount the TaskChooseOrganization component.
    * @param props configuration parameters.
    */
-  mountTaskSelectOrganization: (targetNode: HTMLDivElement, props?: TaskSelectOrganizationProps) => void;
+  mountTaskChooseOrganization: (targetNode: HTMLDivElement, props?: TaskChooseOrganizationProps) => void;
 
   /**
-   * Unmount a TaskSelectOrganization component from the target element.
+   * Unmount a TaskChooseOrganization component from the target element.
    * If there is no component mounted at the target node, results in a noop.
    *
-   * @param targetNode Target node to unmount the TaskSelectOrganization component from.
+   * @param targetNode Target node to unmount the TaskChooseOrganization component from.
    */
-  unmountTaskSelectOrganization: (targetNode: HTMLDivElement) => void;
+  unmountTaskChooseOrganization: (targetNode: HTMLDivElement) => void;
 
   /**
    * @internal
@@ -2061,12 +2061,12 @@ export type SignUpButtonProps = (SignUpButtonPropsModal | ButtonPropsRedirect) &
     | 'oauthFlow'
   >;
 
-export type TaskSelectOrganizationProps = {
+export type TaskChooseOrganizationProps = {
   /**
    * Full URL or path to navigate to after successfully resolving all tasks
    */
   redirectUrlComplete: string;
-  appearance?: TaskSelectOrganizationTheme;
+  appearance?: TaskChooseOrganizationTheme;
 };
 
 export type CreateOrganizationInvitationParams = {

@@ -76,7 +76,7 @@ import type {
   SignUpProps,
   SignUpRedirectOptions,
   SignUpResource,
-  TaskSelectOrganizationProps,
+  TaskChooseOrganizationProps,
   UnsubscribeCallback,
   UserButtonProps,
   UserProfileProps,
@@ -1165,31 +1165,31 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls.ensureMounted().then(controls => controls.unmountComponent({ node }));
   };
 
-  public mountTaskSelectOrganization = (node: HTMLDivElement, props?: TaskSelectOrganizationProps) => {
+  public mountTaskChooseOrganization = (node: HTMLDivElement, props?: TaskChooseOrganizationProps) => {
     this.assertComponentsReady(this.#componentControls);
 
     if (disabledOrganizationsFeature(this, this.environment)) {
       if (this.#instanceType === 'development') {
-        throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('TaskSelectOrganization'), {
+        throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('TaskChooseOrganization'), {
           code: CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE,
         });
       }
       return;
     }
 
-    void this.#componentControls.ensureMounted({ preloadHint: 'TaskSelectOrganization' }).then(controls =>
+    void this.#componentControls.ensureMounted({ preloadHint: 'TaskChooseOrganization' }).then(controls =>
       controls.mountComponent({
-        name: 'TaskSelectOrganization',
-        appearanceKey: 'taskSelectOrganization',
+        name: 'TaskChooseOrganization',
+        appearanceKey: 'taskChooseOrganization',
         node,
         props,
       }),
     );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted('TaskSelectOrganization', props));
+    this.telemetry?.record(eventPrebuiltComponentMounted('TaskChooseOrganization', props));
   };
 
-  public unmountTaskSelectOrganization = (node: HTMLDivElement) => {
+  public unmountTaskChooseOrganization = (node: HTMLDivElement) => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls.ensureMounted().then(controls => controls.unmountComponent({ node }));
   };
@@ -1390,6 +1390,16 @@ export class Clerk implements ClerkInterface {
   public __internal_navigateToTaskIfAvailable = async ({
     redirectUrlComplete,
   }: __internal_NavigateToTaskIfAvailableParams = {}): Promise<void> => {
+    const onBeforeSetActive: SetActiveHook =
+      typeof window !== 'undefined' && typeof window.__unstable__onBeforeSetActive === 'function'
+        ? window.__unstable__onBeforeSetActive
+        : noop;
+
+    const onAfterSetActive: SetActiveHook =
+      typeof window !== 'undefined' && typeof window.__unstable__onAfterSetActive === 'function'
+        ? window.__unstable__onAfterSetActive
+        : noop;
+
     const session = this.session;
     if (!session || !this.environment) {
       return;
@@ -1405,17 +1415,30 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
+    await onBeforeSetActive();
+
     if (redirectUrlComplete) {
       const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
 
       await tracker.track(async () => {
-        await this.navigate(redirectUrlComplete);
+        if (!this.client) {
+          return;
+        }
+
+        if (this.client.isEligibleForTouch()) {
+          const absoluteRedirectUrl = new URL(redirectUrlComplete, window.location.href);
+          await this.navigate(this.buildUrlWithAuth(this.client.buildTouchUrl({ redirectUrl: absoluteRedirectUrl })));
+        } else {
+          await this.navigate(redirectUrlComplete);
+        }
       });
 
       if (tracker.isUnloading()) {
         return;
       }
     }
+
+    await onAfterSetActive();
   };
 
   public addListener = (listener: ListenerCallback): UnsubscribeCallback => {
