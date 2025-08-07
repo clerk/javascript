@@ -339,22 +339,17 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
     const entries = [...this.#logBuffer];
     this.#logBuffer = [];
 
-    try {
-      this.#logFlushPromise = fetch(new URL('/v1/logs', this.#config.endpoint), {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(entries),
-      })
-        .catch(() => void 0)
-        .finally(() => {
-          this.#logFlushPromise = null;
-        });
-    } catch (error) {
-      console.error('Failed to send telemetry log data:', error);
-      this.#logFlushPromise = null;
-    }
+    this.#logFlushPromise = fetch(new URL('/v1/logs', this.#config.endpoint), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(entries),
+    })
+      .catch(() => void 0)
+      .finally(() => {
+        this.#logFlushPromise = null;
+      });
   }
 
   /**
