@@ -12,6 +12,10 @@ type GetOrganizationListParams = ClerkPaginationRequest<{
 }>;
 
 export class BillingAPI extends AbstractAPI {
+  /**
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+   * It is advised to pin the SDK version to avoid breaking changes.
+   */
   public async getPlanList(params?: GetOrganizationListParams) {
     return this.request<PaginatedResourceResponse<CommercePlan[]>>({
       method: 'GET',
