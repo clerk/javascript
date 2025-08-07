@@ -24,7 +24,7 @@ const SessionTasksStart = () => {
   useEffect(() => {
     // Simulates additional latency to avoid a abrupt UI transition when navigating to the next task
     const timeoutId = setTimeout(() => {
-      void clerk.__internal_navigateToTaskIfAvailable({ redirectUrlComplete });
+      // TODO - call setActive?
     }, 500);
     return () => clearTimeout(timeoutId);
   }, [navigate, clerk, redirectUrlComplete]);
