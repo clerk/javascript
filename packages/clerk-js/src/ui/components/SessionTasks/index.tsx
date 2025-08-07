@@ -10,11 +10,11 @@ import { INTERNAL_SESSION_TASK_ROUTE_BY_KEY } from '../../../core/sessionTasks';
 import { SignInContext, SignUpContext } from '../../../ui/contexts';
 import {
   SessionTasksContext,
-  TaskSelectOrganizationContext,
+  TaskChooseOrganizationContext,
   useSessionTasksContext,
 } from '../../contexts/components/SessionTasks';
 import { Route, Switch, useRouter } from '../../router';
-import { TaskSelectOrganization } from './tasks/TaskSelectOrganization';
+import { TaskChooseOrganization } from './tasks/TaskChooseOrganization';
 
 const SessionTasksStart = () => {
   const clerk = useClerk();
@@ -44,12 +44,12 @@ function SessionTaskRoutes(): JSX.Element {
 
   return (
     <Switch>
-      <Route path={INTERNAL_SESSION_TASK_ROUTE_BY_KEY['select-organization']}>
-        <TaskSelectOrganizationContext.Provider
-          value={{ componentName: 'TaskSelectOrganization', redirectUrlComplete: ctx.redirectUrlComplete }}
+      <Route path={INTERNAL_SESSION_TASK_ROUTE_BY_KEY['choose-organization']}>
+        <TaskChooseOrganizationContext.Provider
+          value={{ componentName: 'TaskChooseOrganization', redirectUrlComplete: ctx.redirectUrlComplete }}
         >
-          <TaskSelectOrganization />
-        </TaskSelectOrganizationContext.Provider>
+          <TaskChooseOrganization />
+        </TaskChooseOrganizationContext.Provider>
       </Route>
       <Route index>
         <SessionTasksStart />

@@ -351,6 +351,11 @@ export type ElementsConfig = {
   organizationListPreviewItemActionButton: WithOptions;
   organizationListCreateOrganizationActionButton: WithOptions;
 
+  taskChooseOrganizationPreviewItem: WithOptions;
+  taskChooseOrganizationPreviewItems: WithOptions;
+  taskChooseOrganizationCreateOrganizationActionButton: WithOptions;
+  taskChooseOrganizationPreviewButton: WithOptions;
+
   // TODO: Test this idea. Instead of userButtonUserPreview, have a userPreview__userButton instead
   // Same for other repeated selectors, eg avatar
   userPreview: WithOptions<UserPreviewId>;
@@ -972,7 +977,7 @@ export type PlanDetailTheme = Theme;
 export type SubscriptionDetailsTheme = Theme;
 export type APIKeysTheme = Theme;
 export type OAuthConsentTheme = Theme;
-export type TaskSelectOrganizationTheme = Theme;
+export type TaskChooseOrganizationTheme = Theme;
 
 type GlobalAppearanceOptions = {
   /**
@@ -1046,7 +1051,7 @@ export type Appearance<T = Theme> = T &
      */
     __internal_oauthConsent?: T;
     /**
-     * Theme overrides that only apply to the `<TaskSelectOrganization />` component
+     * Theme overrides that only apply to the `<TaskChooseOrganization />` component
      */
-    taskSelectOrganization?: T;
+    taskChooseOrganization?: T;
   };
