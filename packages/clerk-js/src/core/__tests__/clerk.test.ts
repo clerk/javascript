@@ -2471,7 +2471,6 @@ describe('Clerk singleton', () => {
         await sut.load(mockedLoadOptions);
 
         await sut.setActive({ session: mockResource as any as PendingSessionResource });
-        await sut.__internal_navigateToTaskIfAvailable();
 
         expect(mockNavigate.mock.calls[0][0]).toBe('/sign-in#/tasks/choose-organization');
       });
@@ -2486,7 +2485,6 @@ describe('Clerk singleton', () => {
         });
 
         await sut.setActive({ session: mockResource as any as PendingSessionResource });
-        await sut.__internal_navigateToTaskIfAvailable();
 
         expect(mockNavigate.mock.calls[0][0]).toBe('/onboarding/choose-organization');
       });
@@ -2535,7 +2533,6 @@ describe('Clerk singleton', () => {
         await sut.setActive({ session: mockSession as any as ActiveSessionResource });
 
         const redirectUrlComplete = '/welcome-to-app';
-        await sut.__internal_navigateToTaskIfAvailable({ redirectUrlComplete });
 
         console.log(mockNavigate.mock.calls);
 
