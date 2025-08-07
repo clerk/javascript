@@ -99,9 +99,7 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
   #eventThrottler: TelemetryEventThrottler;
   #metadata: TelemetryMetadata = {} as TelemetryMetadata;
   #buffer: TelemetryEvent[] = [];
-  #flushPromise: Promise<Response | undefined> | null = null;
   #logBuffer: TelemetryLogData[] = [];
-  #logFlushPromise: Promise<Response | undefined> | null = null;
   #pendingFlush: any;
   #pendingLogFlush: any;
 
@@ -221,7 +219,7 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
   }
 
   #shouldRecordLog(_entry: TelemetryLogEntry): boolean {
-    return this.isEnabled;
+    return this.isEnabled && !this.isDebug;
   }
 
   #shouldBeSampled(preparedPayload: TelemetryEvent, eventSamplingRate?: number) {
@@ -310,46 +308,48 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
   }
 
   #flush(): void {
-    if (this.#flushPromise) return;
-    if (this.#buffer.length === 0) return;
-
+    // Capture the current buffer and clear it immediately to avoid closure references
     const eventsToSend = [...this.#buffer];
     this.#buffer = [];
 
-    this.#flushPromise = fetch(new URL('/v1/event', this.#config.endpoint), {
+    this.#pendingFlush = null;
+
+    if (eventsToSend.length === 0) {
+      return;
+    }
+
+    fetch(new URL('/v1/event', this.#config.endpoint), {
       method: 'POST',
       // TODO: We send an array here with that idea that we can eventually send multiple events.
       body: JSON.stringify({
         events: eventsToSend,
       }),
+      keepalive: true,
       headers: {
         'Content-Type': 'application/json',
       },
-    })
-      .catch(() => void 0)
-      .finally(() => {
-        this.#flushPromise = null;
-      });
+    }).catch(() => void 0);
   }
 
   #flushLogs(): void {
-    if (this.#logFlushPromise) return;
-    if (this.#logBuffer.length === 0) return;
-
-    const entries = [...this.#logBuffer];
+    // Capture the current buffer and clear it immediately to avoid closure references
+    const entriesToSend = [...this.#logBuffer];
     this.#logBuffer = [];
 
-    this.#logFlushPromise = fetch(new URL('/v1/logs', this.#config.endpoint), {
+    this.#pendingLogFlush = null;
+
+    if (entriesToSend.length === 0) {
+      return;
+    }
+
+    fetch(new URL('/v1/logs', this.#config.endpoint), {
       method: 'POST',
+      body: JSON.stringify(entriesToSend),
+      keepalive: true,
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(entries),
-    })
-      .catch(() => void 0)
-      .finally(() => {
-        this.#logFlushPromise = null;
-      });
+    }).catch(() => void 0);
   }
 
   /**
