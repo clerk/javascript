@@ -474,6 +474,7 @@ describe('Clerk singleton', () => {
       });
     });
 
+    // TODO -> Refactor tests
     describe('with `pending` session status', () => {
       const mockSession = {
         id: '1',
@@ -525,6 +526,7 @@ describe('Clerk singleton', () => {
       });
     });
 
+    // TODO -> Refactor tests
     describe('with force organization selection enabled', () => {
       const mockSession = {
         id: '1',

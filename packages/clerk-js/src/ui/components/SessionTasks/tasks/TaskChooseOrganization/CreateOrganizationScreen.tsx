@@ -45,7 +45,7 @@ export const CreateOrganizationScreen = withCardStateProvider((props: CreateOrga
     try {
       const organization = await createOrganization({ name: nameField.value, slug: slugField.value });
 
-      await setActive({ organization });
+      await setActive({ organization, redirectUrl: redirectUrlComplete });
     } catch (err) {
       handleError(err, [nameField, slugField], card.setError);
     }
