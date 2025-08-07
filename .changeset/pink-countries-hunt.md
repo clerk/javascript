@@ -14,5 +14,5 @@ Add ability to define a machine secret key to Clerk BAPI client function
 ```ts
 const clerkClient = createClerkClient({ machineSecretKey: 'ak_xxxxx' })
 
-clerkClient.machineTokens.create({...})
+clerkClient.m2mTokens.create({...})
 ```
