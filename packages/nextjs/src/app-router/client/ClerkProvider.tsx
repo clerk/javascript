@@ -116,6 +116,14 @@ const NextClientClerkProvider = (props: NextClerkProviderProps) => {
     routerPush: push,
     // @ts-expect-error Error because of the stricter types of internal `replace`
     routerReplace: replace,
+    // Pass keyless flag to telemetry for boosted sampling of COMPONENT_MOUNTED events
+    telemetry:
+      props.telemetry === false
+        ? false
+        : {
+            ...props.telemetry,
+            isKeyless: canUseKeyless,
+          },
   });
 
   return (

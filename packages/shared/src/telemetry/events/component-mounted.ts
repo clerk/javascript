@@ -22,10 +22,11 @@ function createPrebuiltComponentEvent(event: typeof EVENT_COMPONENT_MOUNTED | ty
     component: string,
     props?: Record<string, any>,
     additionalPayload?: TelemetryEventRaw['payload'],
+    samplingRateOverride?: number,
   ): TelemetryEventRaw<EventPrebuiltComponent> {
     return {
       event,
-      eventSamplingRate: EVENT_SAMPLING_RATE,
+      eventSamplingRate: samplingRateOverride ?? EVENT_SAMPLING_RATE,
       payload: {
         component,
         appearanceProp: Boolean(props?.appearance),
@@ -44,6 +45,7 @@ function createPrebuiltComponentEvent(event: typeof EVENT_COMPONENT_MOUNTED | ty
  * @param component - The name of the component.
  * @param props - The props passed to the component. Will be filtered to a known list of props.
  * @param additionalPayload - Additional data to send with the event.
+ * @param samplingRateOverride - Optional sampling rate override. If not provided, uses the default sampling rate.
  *
  * @example
  * telemetry.record(eventPrebuiltComponentMounted('SignUp', props));
@@ -52,8 +54,14 @@ export function eventPrebuiltComponentMounted(
   component: string,
   props?: Record<string, any>,
   additionalPayload?: TelemetryEventRaw['payload'],
+  samplingRateOverride?: number,
 ): TelemetryEventRaw<EventPrebuiltComponent> {
-  return createPrebuiltComponentEvent(EVENT_COMPONENT_MOUNTED)(component, props, additionalPayload);
+  return createPrebuiltComponentEvent(EVENT_COMPONENT_MOUNTED)(
+    component,
+    props,
+    additionalPayload,
+    samplingRateOverride,
+  );
 }
 
 /**
@@ -62,6 +70,7 @@ export function eventPrebuiltComponentMounted(
  * @param component - The name of the component.
  * @param props - The props passed to the component. Will be filtered to a known list of props.
  * @param additionalPayload - Additional data to send with the event.
+ * @param samplingRateOverride - Optional sampling rate override. If not provided, uses the default sampling rate.
  *
  * @example
  * telemetry.record(eventPrebuiltComponentOpened('GoogleOneTap', props));
@@ -70,8 +79,14 @@ export function eventPrebuiltComponentOpened(
   component: string,
   props?: Record<string, any>,
   additionalPayload?: TelemetryEventRaw['payload'],
+  samplingRateOverride?: number,
 ): TelemetryEventRaw<EventPrebuiltComponent> {
-  return createPrebuiltComponentEvent(EVENT_COMPONENT_OPENED)(component, props, additionalPayload);
+  return createPrebuiltComponentEvent(EVENT_COMPONENT_OPENED)(
+    component,
+    props,
+    additionalPayload,
+    samplingRateOverride,
+  );
 }
 
 /**
@@ -81,6 +96,7 @@ export function eventPrebuiltComponentOpened(
  *
  * @param component - The name of the component.
  * @param props - The props passed to the component. Ideally you only pass a handful of props here.
+ * @param samplingRateOverride - Optional sampling rate override. If not provided, uses the default sampling rate.
  *
  * @example
  * telemetry.record(eventComponentMounted('SignUp', props));
@@ -88,10 +104,11 @@ export function eventPrebuiltComponentOpened(
 export function eventComponentMounted(
   component: string,
   props: TelemetryEventRaw['payload'] = {},
+  samplingRateOverride?: number,
 ): TelemetryEventRaw<EventComponentMounted> {
   return {
     event: EVENT_COMPONENT_MOUNTED,
-    eventSamplingRate: EVENT_SAMPLING_RATE,
+    eventSamplingRate: samplingRateOverride ?? EVENT_SAMPLING_RATE,
     payload: {
       component,
       ...props,
