@@ -1886,10 +1886,20 @@ export type __experimental_CheckoutButtonProps = {
  * <ClerkProvider clerkJsVersion="x.x.x" />
  * ```
  */
-export type __internal_PlanDetailsProps = {
+export type __internal_PlanDetailsProps = (
+  | {
+      planId: string;
+      plan?: never;
+    }
+  | {
+      /**
+       * The plan object will be used as initial data until the plan is fetched from the server.
+       */
+      plan: CommercePlanResource;
+      planId?: never;
+    }
+) & {
   appearance?: PlanDetailTheme;
-  plan?: CommercePlanResource;
-  planId?: string;
   initialPlanPeriod?: CommerceSubscriptionPlanPeriod;
   portalId?: string;
   portalRoot?: PortalRoot;
@@ -1905,9 +1915,19 @@ export type __internal_PlanDetailsProps = {
  * <ClerkProvider clerkJsVersion="x.x.x" />
  * ```
  */
-export type __experimental_PlanDetailsButtonProps = {
-  plan?: CommercePlanResource;
-  planId?: string;
+export type __experimental_PlanDetailsButtonProps = (
+  | {
+      planId: string;
+      plan?: never;
+    }
+  | {
+      /**
+       * The plan object will be used as initial data until the plan is fetched from the server.
+       */
+      plan: CommercePlanResource;
+      planId?: never;
+    }
+) & {
   initialPlanPeriod?: CommerceSubscriptionPlanPeriod;
   planDetailsProps?: {
     appearance?: PlanDetailTheme;
