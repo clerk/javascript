@@ -9,7 +9,7 @@ import type {
   PricingTableProps,
   SignInProps,
   SignUpProps,
-  TaskSelectOrganizationProps,
+  TaskChooseOrganizationProps,
   UserButtonProps,
   UserProfileProps,
   WaitlistProps,
@@ -635,8 +635,8 @@ export const APIKeys = withClerk(
   { component: 'ApiKeys', renderWhileLoading: true },
 );
 
-export const TaskSelectOrganization = withClerk(
-  ({ clerk, component, fallback, ...props }: WithClerkProp<TaskSelectOrganizationProps & FallbackProp>) => {
+export const TaskChooseOrganization = withClerk(
+  ({ clerk, component, fallback, ...props }: WithClerkProp<TaskChooseOrganizationProps & FallbackProp>) => {
     const mountingStatus = useWaitForComponentMount(component);
     const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
 
@@ -650,8 +650,8 @@ export const TaskSelectOrganization = withClerk(
         {clerk.loaded && (
           <ClerkHostRenderer
             component={component}
-            mount={clerk.mountTaskSelectOrganization}
-            unmount={clerk.unmountTaskSelectOrganization}
+            mount={clerk.mountTaskChooseOrganization}
+            unmount={clerk.unmountTaskChooseOrganization}
             updateProps={(clerk as any).__unstable__updateProps}
             props={props}
             rootProps={rendererRootProps}
@@ -660,5 +660,5 @@ export const TaskSelectOrganization = withClerk(
       </>
     );
   },
-  { component: 'TaskSelectOrganization', renderWhileLoading: true },
+  { component: 'TaskChooseOrganization', renderWhileLoading: true },
 );
