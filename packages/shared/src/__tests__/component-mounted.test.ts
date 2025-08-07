@@ -1,5 +1,3 @@
-import type { TelemetryEventRaw } from '@clerk/types';
-
 import {
   eventComponentMounted,
   eventPrebuiltComponentMounted,
