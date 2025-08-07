@@ -29,12 +29,18 @@ export async function watch({ js }) {
     throw new Error(NULL_ROOT_ERROR);
   }
 
+  // Sometimes, the turbo daemon can get stuck in a weird state, so we clean it up before starting the watchers.
+  await concurrently([{ name: 'turbo-daemon-clean', command: 'turbo daemon clean', cwd, env: { ...process.env } }])
+    .result;
+
   /** @type {import('concurrently').ConcurrentlyCommandInput} */
   const clerkJsCommand = {
     name: 'clerk-js',
     command: 'turbo run dev --filter=@clerk/clerk-js -- --env devOrigin=http://localhost:4000',
     cwd,
-    env: { TURBO_UI: '0', ...process.env },
+    // Turborepo is supposed to use the daemon by default in `watch` mode, but only when attached to a PTY. Since we're
+    // redirecting stdout, we have to force it to use the daemon.
+    env: { TURBO_UI: '0', TURBO_DAEMON: 'true', ...process.env },
   };
 
   /** @type {import('concurrently').ConcurrentlyCommandInput} */
