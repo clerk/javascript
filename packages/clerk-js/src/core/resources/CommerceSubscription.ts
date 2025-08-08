@@ -1,6 +1,6 @@
 import type {
   CancelSubscriptionParams,
-  CommerceMoney,
+  CommerceFee,
   CommerceSubscriptionItemJSON,
   CommerceSubscriptionItemResource,
   CommerceSubscriptionJSON,
@@ -12,7 +12,7 @@ import type {
 
 import { unixEpochToDate } from '@/utils/date';
 
-import { commerceMoneyFromJSON } from '../../utils';
+import { commerceFeeFromJSON } from '../../utils';
 import { BaseResource, CommercePlan, DeletedObject } from './internal';
 
 export class CommerceSubscription extends BaseResource implements CommerceSubscriptionResource {
@@ -23,7 +23,7 @@ export class CommerceSubscription extends BaseResource implements CommerceSubscr
   pastDueAt!: Date | null;
   updatedAt!: Date | null;
   nextPayment: {
-    amount: CommerceMoney;
+    amount: CommerceFee;
     date: Date;
   } | null = null;
   subscriptionItems!: CommerceSubscriptionItemResource[];
@@ -46,7 +46,7 @@ export class CommerceSubscription extends BaseResource implements CommerceSubscr
     this.pastDueAt = data.past_due_at ? unixEpochToDate(data.past_due_at) : null;
     this.nextPayment = data.next_payment
       ? {
-          amount: commerceMoneyFromJSON(data.next_payment.amount),
+          amount: commerceFeeFromJSON(data.next_payment.amount),
           date: unixEpochToDate(data.next_payment.date),
         }
       : null;
@@ -70,9 +70,9 @@ export class CommerceSubscriptionItem extends BaseResource implements CommerceSu
   periodEnd!: number;
   canceledAt!: number | null;
   //TODO(@COMMERCE): Why can this be undefined ?
-  amount?: CommerceMoney;
+  amount?: CommerceFee;
   credit?: {
-    amount: CommerceMoney;
+    amount: CommerceFee;
   };
 
   constructor(data: CommerceSubscriptionItemJSON) {
@@ -101,8 +101,8 @@ export class CommerceSubscriptionItem extends BaseResource implements CommerceSu
     this.periodEndDate = data.period_end ? unixEpochToDate(data.period_end) : null;
     this.canceledAtDate = data.canceled_at ? unixEpochToDate(data.canceled_at) : null;
 
-    this.amount = data.amount ? commerceMoneyFromJSON(data.amount) : undefined;
-    this.credit = data.credit && data.credit.amount ? { amount: commerceMoneyFromJSON(data.credit.amount) } : undefined;
+    this.amount = data.amount ? commerceFeeFromJSON(data.amount) : undefined;
+    this.credit = data.credit && data.credit.amount ? { amount: commerceFeeFromJSON(data.credit.amount) } : undefined;
     return this;
   }
 

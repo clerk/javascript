@@ -218,15 +218,26 @@ interface HeaderProps {
   closeSlot?: React.ReactNode;
 }
 
+/**
+ * Only remove decimal places if they are '00', to match previous behavior.
+ */
+function normalizeFormatted(formatted: string) {
+  return formatted.endsWith('.00') ? formatted.slice(0, -3) : formatted;
+}
+
 const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
   const { plan, closeSlot, planPeriod, setPlanPeriod } = props;
 
-  const getPlanFee = useMemo(() => {
-    if (plan.annualMonthlyAmount <= 0) {
-      return plan.amountFormatted;
+  const fee = useMemo(() => {
+    if (plan.annualMonthlyFee.amount <= 0) {
+      return plan.fee;
     }
-    return planPeriod === 'annual' ? plan.annualMonthlyAmountFormatted : plan.amountFormatted;
+    return planPeriod === 'annual' ? plan.annualMonthlyFee : plan.fee;
   }, [plan, planPeriod]);
+
+  const feeFormatted = React.useMemo(() => {
+    return normalizeFormatted(fee.amountFormatted);
+  }, [fee.amountFormatted]);
 
   return (
     <Box
@@ -305,8 +316,8 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
             variant='h1'
             colorScheme='body'
           >
-            {plan.currencySymbol}
-            {getPlanFee}
+            {fee.currencySymbol}
+            {feeFormatted}
           </Text>
           <Text
             elementDescriptor={descriptors.planDetailFeePeriod}
@@ -324,7 +335,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
         </>
       </Flex>
 
-      {plan.annualMonthlyAmount > 0 ? (
+      {plan.annualMonthlyFee.amount > 0 ? (
         <Box
           elementDescriptor={descriptors.planDetailPeriodToggle}
           sx={t => ({

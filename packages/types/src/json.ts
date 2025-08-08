@@ -632,6 +632,9 @@ export interface CommercePlanJSON extends ClerkResourceJSON {
   object: 'commerce_plan';
   id: string;
   name: string;
+  fee: CommerceFeeJSON;
+  annual_fee: CommerceFeeJSON;
+  annual_monthly_fee: CommerceFeeJSON;
   amount: number;
   amount_formatted: string;
   annual_amount: number;
@@ -745,7 +748,7 @@ export interface CommerceStatementGroupJSON extends ClerkResourceJSON {
 export interface CommercePaymentJSON extends ClerkResourceJSON {
   object: 'commerce_payment';
   id: string;
-  amount: CommerceMoneyJSON;
+  amount: CommerceFeeJSON;
   paid_at?: number;
   failed_at?: number;
   updated_at: number;
@@ -767,9 +770,9 @@ export interface CommercePaymentJSON extends ClerkResourceJSON {
 export interface CommerceSubscriptionItemJSON extends ClerkResourceJSON {
   object: 'commerce_subscription_item';
   id: string;
-  amount?: CommerceMoneyJSON;
+  amount?: CommerceFeeJSON;
   credit?: {
-    amount: CommerceMoneyJSON;
+    amount: CommerceFeeJSON;
   };
   payment_source_id: string;
   plan: CommercePlanJSON;
@@ -797,7 +800,7 @@ export interface CommerceSubscriptionJSON extends ClerkResourceJSON {
    * Describes the details for the next payment cycle. It is `undefined` for subscription items that are cancelled or on the free plan.
    */
   next_payment?: {
-    amount: CommerceMoneyJSON;
+    amount: CommerceFeeJSON;
     date: number;
   };
   /**
@@ -819,7 +822,7 @@ export interface CommerceSubscriptionJSON extends ClerkResourceJSON {
  * <ClerkProvider clerkJsVersion="x.x.x" />
  * ```
  */
-export interface CommerceMoneyJSON {
+export interface CommerceFeeJSON {
   amount: number;
   amount_formatted: string;
   currency: string;
@@ -835,11 +838,11 @@ export interface CommerceMoneyJSON {
  * ```
  */
 export interface CommerceCheckoutTotalsJSON {
-  grand_total: CommerceMoneyJSON;
-  subtotal: CommerceMoneyJSON;
-  tax_total: CommerceMoneyJSON;
-  total_due_now: CommerceMoneyJSON;
-  credit: CommerceMoneyJSON;
+  grand_total: CommerceFeeJSON;
+  subtotal: CommerceFeeJSON;
+  tax_total: CommerceFeeJSON;
+  total_due_now: CommerceFeeJSON;
+  credit: CommerceFeeJSON;
 }
 
 /**

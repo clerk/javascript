@@ -1,13 +1,13 @@
 import type {
   CommerceCheckoutTotals,
   CommerceCheckoutTotalsJSON,
-  CommerceMoney,
-  CommerceMoneyJSON,
+  CommerceFee,
+  CommerceFeeJSON,
   CommerceStatementTotals,
   CommerceStatementTotalsJSON,
 } from '@clerk/types';
 
-export const commerceMoneyFromJSON = (data: CommerceMoneyJSON): CommerceMoney => {
+export const commerceFeeFromJSON = (data: CommerceFeeJSON): CommerceFee => {
   return {
     amount: data.amount,
     amountFormatted: data.amount_formatted,
@@ -18,22 +18,22 @@ export const commerceMoneyFromJSON = (data: CommerceMoneyJSON): CommerceMoney =>
 
 export const commerceTotalsFromJSON = <T extends CommerceStatementTotalsJSON | CommerceCheckoutTotalsJSON>(data: T) => {
   const totals = {
-    grandTotal: commerceMoneyFromJSON(data.grand_total),
-    subtotal: commerceMoneyFromJSON(data.subtotal),
-    taxTotal: commerceMoneyFromJSON(data.tax_total),
+    grandTotal: commerceFeeFromJSON(data.grand_total),
+    subtotal: commerceFeeFromJSON(data.subtotal),
+    taxTotal: commerceFeeFromJSON(data.tax_total),
   };
   if ('total_due_now' in data) {
     // @ts-ignore
-    totals['totalDueNow'] = commerceMoneyFromJSON(data.total_due_now);
+    totals['totalDueNow'] = commerceFeeFromJSON(data.total_due_now);
   }
   if ('credit' in data) {
     // @ts-ignore
-    totals['credit'] = commerceMoneyFromJSON(data.credit);
+    totals['credit'] = commerceFeeFromJSON(data.credit);
   }
   if ('past_due' in data) {
     // @ts-ignore
-    totals['pastDue'] = commerceMoneyFromJSON(data.past_due);
+    totals['pastDue'] = commerceFeeFromJSON(data.past_due);
   }
 
-  return totals as T extends { total_due_now: CommerceMoneyJSON } ? CommerceCheckoutTotals : CommerceStatementTotals;
+  return totals as T extends { total_due_now: CommerceFeeJSON } ? CommerceCheckoutTotals : CommerceStatementTotals;
 };

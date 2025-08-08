@@ -205,11 +205,11 @@ export const usePlansContext = () => {
       const subscription =
         sub ?? (plan ? activeOrUpcomingSubscriptionWithPlanPeriod(plan, selectedPlanPeriod) : undefined);
       let _selectedPlanPeriod = selectedPlanPeriod;
-      if (_selectedPlanPeriod === 'annual' && sub?.plan.annualMonthlyAmount === 0) {
+      if (_selectedPlanPeriod === 'annual' && sub?.plan.annualMonthlyFee.amount === 0) {
         _selectedPlanPeriod = 'month';
       }
 
-      const isEligibleForSwitchToAnnual = (plan?.annualMonthlyAmount ?? 0) > 0;
+      const isEligibleForSwitchToAnnual = (plan?.annualMonthlyFee.amount ?? 0) > 0;
 
       const getLocalizationKey = () => {
         // Handle subscription cases
@@ -302,7 +302,7 @@ export const usePlansContext = () => {
       clerk.__internal_openCheckout({
         planId: plan.id,
         // if the plan doesn't support annual, use monthly
-        planPeriod: planPeriod === 'annual' && plan.annualMonthlyAmount === 0 ? 'month' : planPeriod,
+        planPeriod: planPeriod === 'annual' && plan.annualMonthlyFee.amount === 0 ? 'month' : planPeriod,
         for: subscriberType,
         onSubscriptionComplete: () => {
           revalidateAll();
