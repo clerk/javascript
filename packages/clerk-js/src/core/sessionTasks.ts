@@ -1,4 +1,5 @@
-import type { SessionResource, SessionTask } from '@clerk/types';
+import { logger } from '@clerk/shared/logger';
+import type { ClerkOptions, SessionResource, SessionTask, SetActiveParams } from '@clerk/types';
 
 import { buildURL } from '../utils';
 
@@ -41,4 +42,20 @@ export function navigateIfTaskExists(
   }
 
   return navigate(buildTaskURL(currentTask, { base: baseUrl }));
+}
+
+export function warnMissingPendingTaskHandlers(options: Record<string, unknown>) {
+  const taskOptions = ['taskUrls', 'navigate'] as Array<
+    keyof (Pick<SetActiveParams, 'navigate'> & Pick<ClerkOptions, 'taskUrls'>)
+  >;
+
+  const hasAtLeastOneTaskOption = Object.keys(options).some(option => taskOptions.includes(option as any));
+  if (hasAtLeastOneTaskOption) {
+    return;
+  }
+
+  // TODO - Link to after-auth docs once it gets released
+  logger.warnOnce(
+    `Clerk: Session has pending tasks but no handling is configured. To handle pending tasks automatically, provide either "taskUrls" for navigation to custom URLs or "navigate" for programmatic navigation. Without these options, users may get stuck on incomplete flows.`,
+  );
 }
