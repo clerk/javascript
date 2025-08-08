@@ -1,4 +1,5 @@
 import { logger } from '@clerk/shared/logger';
+import type { ClerkOptions } from '@clerk/types';
 
 export function assertNoLegacyProp(props: Record<string, any>) {
   const legacyProps = ['redirectUrl', 'afterSignInUrl', 'afterSignUpUrl', 'after_sign_in_url', 'after_sign_up_url'];
@@ -22,4 +23,18 @@ export function warnForNewPropShadowingLegacyProp(
       `Clerk: The "${newKey}" prop ("${newValue}") has priority over the legacy "${legacyKey}" (or "redirectUrl") ("${legacyValue}"), which will be completely ignored in this case. "${legacyKey}" (or "redirectUrl" prop) should be replaced with the new "fallbackRedirectUrl" or "forceRedirectUrl" props instead. Learn more: https://clerk.com/docs/guides/custom-redirects#redirect-url-props`,
     );
   }
+}
+
+export function warnNoTaskOptions(options: ClerkOptions) {
+  const taskOptions = ['taskUrls', 'onPendingSession'];
+
+  const hasAtLeastOneTaskOption = Object.keys(options).some(option => taskOptions.includes(option));
+  if (hasAtLeastOneTaskOption) {
+    return;
+  }
+
+  logger.warnOnce(
+    // TODO - Link to after-auth docs once it gets released
+    `Clerk: After-auth is enabled and no task options configured. Consider providing "taskUrls" or "onPendingSession" to handle pending session tasks.`,
+  );
 }
