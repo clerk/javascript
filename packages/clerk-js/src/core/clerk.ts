@@ -119,7 +119,7 @@ import {
   stripOrigin,
   windowNavigate,
 } from '../utils';
-import { assertNoLegacyProp } from '../utils/assertNoLegacyProp';
+import { assertNoLegacyProp, warnNoTaskOptions } from '../utils/assertNoLegacyProp';
 import { CLERK_ENVIRONMENT_STORAGE_ENTRY, SafeLocalStorage } from '../utils/localStorage';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
 import { RedirectUrls } from '../utils/redirectUrls';
@@ -431,6 +431,10 @@ export class Clerk implements ClerkInterface {
     });
 
     assertNoLegacyProp(this.#options);
+
+    if (this.__internal_hasAfterAuthFlows) {
+      warnNoTaskOptions(this.#options);
+    }
 
     if (this.#options.sdkMetadata) {
       Clerk.sdkMetadata = this.#options.sdkMetadata;
