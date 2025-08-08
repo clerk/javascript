@@ -1929,6 +1929,7 @@ export class Clerk implements ClerkInterface {
       return this.setActive({
         session: su.sessionId,
         redirectUrl: redirectUrls.getAfterSignUpUrl(),
+        onPendingSession,
       });
     }
 
@@ -1953,6 +1954,7 @@ export class Clerk implements ClerkInterface {
         return this.setActive({
           session: sessionId,
           redirectUrl: redirectUrls.getAfterSignInUrl(),
+          onPendingSession,
         });
       }
     }
