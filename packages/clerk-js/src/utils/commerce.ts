@@ -16,23 +16,27 @@ export const commerceFeeFromJSON = (data: CommerceFeeJSON): CommerceFee => {
   };
 };
 
-export const commerceTotalsFromJSON = <T extends CommerceStatementTotalsJSON | CommerceCheckoutTotalsJSON>(data: T) => {
-  const totals = {
+const hasPastDue = (data: unknown): data is { past_due: CommerceFeeJSON } => {
+  return typeof data === 'object' && data !== null && 'past_due' in data;
+};
+
+export const commerceTotalsFromJSON = <T extends CommerceStatementTotalsJSON | CommerceCheckoutTotalsJSON>(
+  data: T,
+): T extends { total_due_now: CommerceFeeJSON } ? CommerceCheckoutTotals : CommerceStatementTotals => {
+  const totals: Partial<CommerceCheckoutTotals & CommerceStatementTotals> = {
     grandTotal: commerceFeeFromJSON(data.grand_total),
     subtotal: commerceFeeFromJSON(data.subtotal),
     taxTotal: commerceFeeFromJSON(data.tax_total),
   };
+
   if ('total_due_now' in data) {
-    // @ts-ignore
-    totals['totalDueNow'] = commerceFeeFromJSON(data.total_due_now);
+    totals.totalDueNow = commerceFeeFromJSON(data.total_due_now);
   }
   if ('credit' in data) {
-    // @ts-ignore
-    totals['credit'] = commerceFeeFromJSON(data.credit);
+    totals.credit = commerceFeeFromJSON(data.credit);
   }
-  if ('past_due' in data) {
-    // @ts-ignore
-    totals['pastDue'] = commerceFeeFromJSON(data.past_due);
+  if (hasPastDue(data)) {
+    totals.pastDue = commerceFeeFromJSON(data.past_due);
   }
 
   return totals as T extends { total_due_now: CommerceFeeJSON } ? CommerceCheckoutTotals : CommerceStatementTotals;
