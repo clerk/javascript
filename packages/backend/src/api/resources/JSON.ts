@@ -69,6 +69,8 @@ export const ObjectType = {
   CommercePaymentAttempt: 'commerce_payment_attempt',
   CommerceSubscription: 'commerce_subscription',
   CommerceSubscriptionItem: 'commerce_subscription_item',
+  CommercePlan: 'commerce_plan',
+  Feature: 'feature',
 } as const;
 
 export type ObjectType = (typeof ObjectType)[keyof typeof ObjectType];
@@ -791,71 +793,65 @@ export interface CommercePayerJSON extends ClerkResourceJSON {
   updated_at: number;
 }
 
-export interface CommercePayeeJSON {
+interface CommercePayeeJSON {
   id: string;
   gateway_type: string;
   gateway_external_id: string;
   gateway_status: 'active' | 'pending' | 'restricted' | 'disconnected';
 }
 
-export interface CommerceAmountJSON {
+interface CommerceFeeJSON {
   amount: number;
   amount_formatted: string;
   currency: string;
   currency_symbol: string;
 }
 
-export interface CommerceTotalsJSON {
-  subtotal: CommerceAmountJSON;
-  tax_total: CommerceAmountJSON;
-  grand_total: CommerceAmountJSON;
+interface CommerceTotalsJSON {
+  subtotal: CommerceFeeJSON;
+  tax_total: CommerceFeeJSON;
+  grand_total: CommerceFeeJSON;
 }
 
-export interface CommercePaymentSourceJSON {
+export interface FeatureJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.Feature;
+  name: string;
+  description: string;
+  slug: string;
+  avatar_url: string;
+}
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+ * It is advised to pin the SDK version to avoid breaking changes.
+ */
+export interface CommercePlanJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.CommercePlan;
   id: string;
-  gateway: string;
-  gateway_external_id: string;
-  gateway_external_account_id?: string;
-  payment_method: string;
-  status: 'active' | 'disconnected';
-  card_type?: string;
-  last4?: string;
-}
-
-export interface CommercePaymentFailedReasonJSON {
-  code: string;
-  decline_code: string;
-}
-
-export interface CommerceSubscriptionCreditJSON {
-  amount: CommerceAmountJSON;
-  cycle_days_remaining: number;
-  cycle_days_total: number;
-  cycle_remaining_percent: number;
-}
-
-export interface CommercePlanJSON {
-  id: string;
-  instance_id: string;
   product_id: string;
   name: string;
   slug: string;
   description?: string;
   is_default: boolean;
   is_recurring: boolean;
-  amount: number;
-  period: 'month' | 'annual';
-  interval: number;
   has_base_fee: boolean;
-  currency: string;
-  annual_monthly_amount: number;
   publicly_visible: boolean;
+  fee: CommerceFeeJSON;
+  annual_fee: CommerceFeeJSON;
+  annual_monthly_fee: CommerceFeeJSON;
+  for_payer_type: 'org' | 'user';
+  features: FeatureJSON[];
 }
 
 export interface CommerceSubscriptionItemJSON extends ClerkResourceJSON {
   object: typeof ObjectType.CommerceSubscriptionItem;
   status: 'abandoned' | 'active' | 'canceled' | 'ended' | 'expired' | 'incomplete' | 'past_due' | 'upcoming';
-  credit: CommerceSubscriptionCreditJSON;
+  credit: {
+    amount: CommerceFeeJSON;
+    cycle_days_remaining: number;
+    cycle_days_total: number;
+    cycle_remaining_percent: number;
+  };
   proration_date: string;
   plan_period: 'month' | 'annual';
   period_start: number;
@@ -865,8 +861,24 @@ export interface CommerceSubscriptionItemJSON extends ClerkResourceJSON {
   lifetime_paid: number;
   next_payment_amount: number;
   next_payment_date: number;
-  amount: CommerceAmountJSON;
-  plan: CommercePlanJSON;
+  amount: CommerceFeeJSON;
+  plan: {
+    id: string;
+    instance_id: string;
+    product_id: string;
+    name: string;
+    slug: string;
+    description?: string;
+    is_default: boolean;
+    is_recurring: boolean;
+    amount: number;
+    period: 'month' | 'annual';
+    interval: number;
+    has_base_fee: boolean;
+    currency: string;
+    annual_monthly_amount: number;
+    publicly_visible: boolean;
+  };
   plan_id: string;
 }
 
@@ -881,13 +893,25 @@ export interface CommercePaymentAttemptJSON extends ClerkResourceJSON {
   updated_at: number;
   paid_at?: number;
   failed_at?: number;
-  failed_reason?: CommercePaymentFailedReasonJSON;
+  failed_reason?: {
+    code: string;
+    decline_code: string;
+  };
   billing_date: number;
   charge_type: 'checkout' | 'recurring';
   payee: CommercePayeeJSON;
   payer: CommercePayerJSON;
   totals: CommerceTotalsJSON;
-  payment_source: CommercePaymentSourceJSON;
+  payment_source: {
+    id: string;
+    gateway: string;
+    gateway_external_id: string;
+    gateway_external_account_id?: string;
+    payment_method: string;
+    status: 'active' | 'disconnected';
+    card_type?: string;
+    last4?: string;
+  };
   subscription_items: CommerceSubscriptionItemJSON[];
 }
 

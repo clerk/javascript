@@ -57,6 +57,7 @@ export * from './User';
 export * from './Verification';
 export * from './WaitlistEntry';
 export * from './Web3Wallet';
+export * from './CommercePlan';
 
 export type {
   EmailWebhookEvent,

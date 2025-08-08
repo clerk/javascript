@@ -101,12 +101,6 @@ export type {
   TestingTokenJSON,
   WebhooksSvixJSON,
   CommercePayerJSON,
-  CommercePayeeJSON,
-  CommerceAmountJSON,
-  CommerceTotalsJSON,
-  CommercePaymentSourceJSON,
-  CommercePaymentFailedReasonJSON,
-  CommerceSubscriptionCreditJSON,
   CommercePlanJSON,
   CommerceSubscriptionItemJSON,
   CommercePaymentAttemptJSON,
@@ -150,6 +144,7 @@ export type {
   Token,
   User,
   TestingToken,
+  CommercePlan,
 } from './api/resources';
 
 /**
