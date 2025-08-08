@@ -49,7 +49,7 @@ import type {
   SignUpFallbackRedirectUrl,
   SignUpForceRedirectUrl,
 } from './redirects';
-import type { PendingSessionOptions, SessionTask, SignedInSessionResource } from './session';
+import type { PendingSessionOptions, SessionResource, SessionTask, SignedInSessionResource } from './session';
 import type { SessionVerificationLevel } from './sessionVerification';
 import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
@@ -949,7 +949,10 @@ type ClerkOptionsNavigation =
       routerDebug?: boolean;
     };
 
-export type SetActiveNavigate = () => Promise<unknown>;
+/**
+ * A custom navigation function to be called just before the session and/or organization is set.
+ */
+export type SetActiveNavigate = ({ session }: { session: SessionResource }) => Promise<unknown>;
 
 export type ClerkOptions = PendingSessionOptions &
   ClerkOptionsNavigation &
@@ -1193,12 +1196,26 @@ export type SetActiveParams = {
   beforeEmit?: BeforeEmitCallback;
 
   /**
-   * The full URL or path to redirect to just before the active session and/or organization is set.
+   * The full URL or path to redirect to just before the session and/or organization is set.
    */
   redirectUrl?: string;
 
   /**
-   * TODO
+   * A custom navigation function to be called just before the session and/or organization is set.
+   *
+   * When provided, it takes precedence
+   * over the `redirectUrl` parameter for navigation.
+   *
+   * @example
+   * ```typescript
+   * await clerk.setActive({
+   *   session,
+   *   navigate: async () => {
+   *     // Custom navigation logic
+   *     router.push('/dashboard');
+   *   }
+   * });
+   * ```
    */
   navigate?: SetActiveNavigate;
 };

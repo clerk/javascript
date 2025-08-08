@@ -180,7 +180,7 @@ function SignUpContinueInternal() {
           verifyEmailPath: './verify-email-address',
           verifyPhonePath: './verify-phone-number',
           handleComplete: () =>
-            clerk.setActive({ session: res.createdSessionId, redirectUrl: afterSignUpUrl, onPendingSession }),
+            clerk.setActive({ session: res.createdSessionId, redirectUrl: afterSignUpUrl, navigate: onPendingSession }),
           navigate,
           oidcPrompt: ctx.oidcPrompt,
         }),

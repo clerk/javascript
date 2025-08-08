@@ -1,4 +1,4 @@
-import type { ClerkOptions, PendingSessionResource, SessionTask } from '@clerk/types';
+import type { SessionResource, SessionTask } from '@clerk/types';
 
 import { buildURL } from '../utils';
 
@@ -26,18 +26,19 @@ export function buildTaskURL(task: SessionTask, opts: Pick<Parameters<typeof bui
  * @internal
  */
 export function navigateToTask(
-  session: PendingSessionResource,
+  session: SessionResource,
   {
-    options,
     navigate,
     baseUrl,
   }: {
     navigate: (to: string) => Promise<unknown>;
     baseUrl: string;
-    options?: ClerkOptions;
   },
 ) {
-  const currentTaskKey = session.currentTask.key;
+  const currentTask = session.currentTask;
+  if (!currentTask) {
+    return;
+  }
 
-  return navigate(options?.taskUrls?.[currentTaskKey] ?? buildTaskURL(session.currentTask, { base: baseUrl }));
+  return navigate(buildTaskURL(currentTask, { base: baseUrl }));
 }

@@ -44,7 +44,7 @@ export const SignUpVerificationCodeForm = (props: SignInFactorOneCodeFormProps) 
           verifyPhonePath: '../verify-phone-number',
           continuePath: '../continue',
           handleComplete: () =>
-            setActive({ session: res.createdSessionId, redirectUrl: afterSignUpUrl, onPendingSession }),
+            setActive({ session: res.createdSessionId, redirectUrl: afterSignUpUrl, navigate: onPendingSession }),
           navigate,
         });
       })

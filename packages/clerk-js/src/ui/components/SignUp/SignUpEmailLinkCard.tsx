@@ -57,7 +57,7 @@ export const SignUpEmailLinkCard = () => {
         verifyEmailPath: '../verify-email-address',
         verifyPhonePath: '../verify-phone-number',
         handleComplete: () =>
-          setActive({ session: su.createdSessionId, redirectUrl: afterSignUpUrl, onPendingSession }),
+          setActive({ session: su.createdSessionId, redirectUrl: afterSignUpUrl, navigate: onPendingSession }),
         navigate,
       });
     }
