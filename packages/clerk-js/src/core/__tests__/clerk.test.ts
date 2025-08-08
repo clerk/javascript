@@ -1503,7 +1503,7 @@ describe('Clerk singleton', () => {
       mockClientFetch.mockReturnValue(
         Promise.resolve({
           sessions: [mockSession],
-          signedInSessions: [],
+          signedInSessions: [mockSession],
           signIn: new SignIn(null),
           signUp: new SignUp({
             status: 'missing_requirements',
@@ -1543,7 +1543,7 @@ describe('Clerk singleton', () => {
       const mockSession = {
         id: sessionId,
         remove: jest.fn(),
-        status,
+        status: 'active',
         user: {},
         touch: jest.fn(() => Promise.resolve()),
         getToken: jest.fn(),
@@ -1564,7 +1564,7 @@ describe('Clerk singleton', () => {
       mockClientFetch.mockReturnValue(
         Promise.resolve({
           sessions: [mockSession],
-          signedInSessions: [],
+          signedInSessions: [mockSession],
           signIn: new SignIn(null),
           signUp: new SignUp({
             status: 'missing_requirements',

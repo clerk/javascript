@@ -107,12 +107,12 @@ export const SessionTasks = withCardStateProvider(() => {
   }
 
   const navigateOnSetActive = async ({ session }: { session: SessionResource }) => {
-    const currentTaskKey = session.currentTask?.key;
-    if (!currentTaskKey) {
+    const currentTask = session.currentTask;
+    if (!currentTask) {
       return navigate(redirectUrlComplete);
     }
 
-    return navigate(`./${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[currentTaskKey]}`);
+    return navigate(`./${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[currentTask.key]}`);
   };
 
   return (
