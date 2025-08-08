@@ -1,6 +1,6 @@
 import { createContext, useContext } from 'react';
 
-import type { SessionTasksCtx, TaskSelectOrganizationCtx } from '../../types';
+import type { SessionTasksCtx, TaskChooseOrganizationCtx } from '../../types';
 
 export const SessionTasksContext = createContext<SessionTasksCtx | null>(null);
 
@@ -14,14 +14,14 @@ export const useSessionTasksContext = (): SessionTasksCtx => {
   return context;
 };
 
-export const TaskSelectOrganizationContext = createContext<TaskSelectOrganizationCtx | null>(null);
+export const TaskChooseOrganizationContext = createContext<TaskChooseOrganizationCtx | null>(null);
 
-export const useTaskSelectOrganizationContext = (): TaskSelectOrganizationCtx => {
-  const context = useContext(TaskSelectOrganizationContext);
+export const useTaskChooseOrganizationContext = (): TaskChooseOrganizationCtx => {
+  const context = useContext(TaskChooseOrganizationContext);
 
   if (context === null) {
     throw new Error(
-      'Clerk: useTaskSelectOrganizationContext called outside of the mounted TaskSelectOrganization component.',
+      'Clerk: useTaskChooseOrganizationContext called outside of the mounted TaskChooseOrganization component.',
     );
   }
 
