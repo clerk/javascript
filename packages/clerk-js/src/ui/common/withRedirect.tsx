@@ -89,3 +89,57 @@ export const withRedirectToAfterSignUp = <P extends AvailableComponentProps>(Com
 
   return HOC;
 };
+
+export const withRedirectToSignInTask = <P extends AvailableComponentProps>(Component: ComponentType<P>) => {
+  const displayName = Component.displayName || Component.name || 'Component';
+  Component.displayName = displayName;
+
+  const HOC = (props: P) => {
+    const signInCtx = useSignInContext();
+
+    return withRedirect(
+      Component,
+      clerk => !!clerk.session?.currentTask,
+      ({ clerk }) => {
+        const currentTask = clerk.session?.currentTask;
+        if (!currentTask || !signInCtx?.taskUrl) {
+          return '';
+        }
+
+        return signInCtx?.taskUrl;
+      },
+      undefined,
+    )(props);
+  };
+
+  HOC.displayName = `withRedirectToAfterSignIn(${displayName})`;
+
+  return HOC;
+};
+
+export const withRedirectToSignUpTask = <P extends AvailableComponentProps>(Component: ComponentType<P>) => {
+  const displayName = Component.displayName || Component.name || 'Component';
+  Component.displayName = displayName;
+
+  const HOC = (props: P) => {
+    const signUpCtx = useSignUpContext();
+
+    return withRedirect(
+      Component,
+      clerk => !!clerk.session?.currentTask,
+      ({ clerk }) => {
+        const currentTask = clerk.session?.currentTask;
+        if (!currentTask || !signUpCtx?.taskUrl) {
+          return '';
+        }
+
+        return signUpCtx?.taskUrl;
+      },
+      undefined,
+    )(props);
+  };
+
+  HOC.displayName = `withRedirectToAfterSignIn(${displayName})`;
+
+  return HOC;
+};
