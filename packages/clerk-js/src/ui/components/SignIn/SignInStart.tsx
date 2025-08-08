@@ -237,7 +237,7 @@ function SignInStartInternal(): JSX.Element {
             return clerk.setActive({
               session: res.createdSessionId,
               redirectUrl: afterSignInUrl,
-              onPendingSession,
+              navigate: onPendingSession,
             });
           default: {
             console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
@@ -389,7 +389,7 @@ function SignInStartInternal(): JSX.Element {
           return clerk.setActive({
             session: res.createdSessionId,
             redirectUrl: afterSignInUrl,
-            onPendingSession,
+            navigate: onPendingSession,
           });
         default: {
           console.error(clerkInvalidFAPIResponse(res.status, supportEmail));

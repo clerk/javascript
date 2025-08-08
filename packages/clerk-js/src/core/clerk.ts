@@ -28,9 +28,9 @@ import type {
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
+  Clerk as ClerkInterface,
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
-  Clerk as ClerkInterface,
   ClerkOptions,
   ClientJSONSnapshot,
   ClientResource,
@@ -49,7 +49,6 @@ import type {
   JoinWaitlistParams,
   ListenerCallback,
   NavigateOptions,
-  OnPendingSessionFn,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationResource,
@@ -62,6 +61,7 @@ import type {
   RedirectOptions,
   Resources,
   SDKMetadata,
+  SetActiveNavigate,
   SetActiveParams,
   SignedInSessionResource,
   SignInProps,
@@ -1293,7 +1293,9 @@ export class Clerk implements ClerkInterface {
         });
       }
 
-      const shouldNavigate = (redirectUrl || setActiveNavigate) && !beforeEmit;
+      const taskUrl =
+        sessionIsPending && this.session?.currentTask && this.#options.taskUrls?.[this.session?.currentTask.key];
+      const shouldNavigate = (redirectUrl || taskUrl || setActiveNavigate) && !beforeEmit;
       if (shouldNavigate) {
         await tracker.track(async () => {
           if (!this.client) {
@@ -1301,19 +1303,17 @@ export class Clerk implements ClerkInterface {
             return;
           }
 
-          if (sessionIsPending) {
+          if (!sessionIsPending) {
             this.#setTransitiveState();
           }
 
-          if (setActiveNavigate) {
-            await setActiveNavigate();
+          if (taskUrl) {
+            await this.navigate(taskUrl);
             return;
           }
 
-          const taskUrl =
-            sessionIsPending && this.session?.currentTask && this.#options.taskUrls?.[this.session?.currentTask.key];
-          if (taskUrl) {
-            await this.navigate(taskUrl);
+          if (setActiveNavigate && newSession) {
+            await setActiveNavigate({ session: newSession });
             return;
           }
 
@@ -1814,18 +1814,18 @@ export class Clerk implements ClerkInterface {
       });
     };
 
-    const onPendingSession: OnPendingSessionFn = ({ session }) =>
-      navigateToTask(session, {
+    const setActiveNavigate: SetActiveNavigate = async ({ session }) => {
+      await navigateToTask(session, {
         baseUrl: displayConfig.signInUrl,
         navigate: this.navigate,
-        options: this.#options,
       });
+    };
 
     if (si.status === 'complete') {
       return this.setActive({
         session: si.sessionId,
         redirectUrl: redirectUrls.getAfterSignInUrl(),
-        onPendingSession,
+        navigate: setActiveNavigate,
       });
     }
 
@@ -1839,7 +1839,7 @@ export class Clerk implements ClerkInterface {
           return this.setActive({
             session: res.createdSessionId,
             redirectUrl: redirectUrls.getAfterSignInUrl(),
-            onPendingSession,
+            navigate: setActiveNavigate,
           });
         case 'needs_first_factor':
           return navigateToFactorOne();
@@ -1889,7 +1889,7 @@ export class Clerk implements ClerkInterface {
           return this.setActive({
             session: res.createdSessionId,
             redirectUrl: redirectUrls.getAfterSignUpUrl(),
-            onPendingSession,
+            navigate: setActiveNavigate,
           });
         case 'missing_requirements':
           return navigateToNextStepSignUp({ missingFields: res.missingFields });
@@ -1902,7 +1902,7 @@ export class Clerk implements ClerkInterface {
       return this.setActive({
         session: su.sessionId,
         redirectUrl: redirectUrls.getAfterSignUpUrl(),
-        onPendingSession,
+        navigate: setActiveNavigate,
       });
     }
 
@@ -1927,7 +1927,7 @@ export class Clerk implements ClerkInterface {
         return this.setActive({
           session: sessionId,
           redirectUrl: redirectUrls.getAfterSignInUrl(),
-          onPendingSession,
+          navigate: setActiveNavigate,
         });
       }
     }
@@ -2117,12 +2117,12 @@ export class Clerk implements ClerkInterface {
           await this.setActive({
             session: signInOrSignUp.createdSessionId,
             redirectUrl,
-            onPendingSession: ({ session }) =>
-              navigateToTask(session, {
+            navigate: async ({ session }) => {
+              await navigateToTask(session, {
                 baseUrl: displayConfig.signInUrl,
                 navigate: this.navigate,
-                options: this.#options,
-              }),
+              });
+            },
           });
         }
         break;
@@ -2339,8 +2339,8 @@ export class Clerk implements ClerkInterface {
     this.#authService = await AuthCookieService.create(
       this,
       this.#fapiClient,
-
-      this.#instanceType,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      this.#instanceType!,
       this.#publicEventBus,
     );
 
