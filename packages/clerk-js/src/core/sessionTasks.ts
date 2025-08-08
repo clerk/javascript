@@ -25,7 +25,7 @@ export function buildTaskURL(task: SessionTask, opts: Pick<Parameters<typeof bui
 /**
  * @internal
  */
-export function navigateToTask(
+export function navigateIfTaskExists(
   session: SessionResource,
   {
     navigate,
