@@ -1256,10 +1256,11 @@ export class Clerk implements ClerkInterface {
         }
       }
 
-      /**
-       * Hint to each framework, that the user will be signed out when `{session: null}` is provided.
-       */
+      // Do not revalidate server cache for pending sessions to avoid unmount of `SignIn/SignUp` AIOs when navigating to task
       if (!sessionIsPending) {
+        /**
+         * Hint to each framework, that the user will be signed out when `{session: null}` is provided.
+         */
         await onBeforeSetActive(newSession === null ? 'sign-out' : undefined);
       }
 
@@ -1295,7 +1296,8 @@ export class Clerk implements ClerkInterface {
         });
       }
 
-      if ((redirectUrl || setActiveNavigate) && !beforeEmit) {
+      const shouldNavigate = (redirectUrl || setActiveNavigate) && !beforeEmit;
+      if (shouldNavigate) {
         await tracker.track(async () => {
           if (!this.client) {
             // Typescript is not happy because since thinks this.client might have changed to undefined because the function is asynchronous.
@@ -1311,18 +1313,27 @@ export class Clerk implements ClerkInterface {
             return;
           }
 
-          if (redirectUrl) {
-            if (!this.client.isEligibleForTouch()) {
-              await this.navigate(redirectUrl);
-              return;
-            }
-
-            const absoluteRedirectUrl = new URL(redirectUrl, window.location.href);
-            const redirectUrlWithAuth = this.buildUrlWithAuth(
-              this.client.buildTouchUrl({ redirectUrl: absoluteRedirectUrl }),
-            );
-            await this.navigate(redirectUrlWithAuth);
+          const taskUrl =
+            sessionIsPending && this.session?.currentTask && this.#options.taskUrls?.[this.session?.currentTask.key];
+          if (taskUrl) {
+            await this.navigate(taskUrl);
+            return;
           }
+
+          if (!redirectUrl) {
+            return;
+          }
+
+          if (!this.client.isEligibleForTouch()) {
+            await this.navigate(redirectUrl);
+            return;
+          }
+
+          const absoluteRedirectUrl = new URL(redirectUrl, window.location.href);
+          const redirectUrlWithAuth = this.buildUrlWithAuth(
+            this.client.buildTouchUrl({ redirectUrl: absoluteRedirectUrl }),
+          );
+          await this.navigate(redirectUrlWithAuth);
         });
       }
 
@@ -1333,6 +1344,8 @@ export class Clerk implements ClerkInterface {
 
       this.#setAccessors(newSession);
       this.#emit();
+
+      // Do not revalidate server cache for pending sessions to avoid unmount of `SignIn/SignUp` AIOs when navigating to task
       if (!sessionIsPending) {
         await onAfterSetActive();
       }
