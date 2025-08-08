@@ -17,6 +17,7 @@ import { Box, Button, Col, descriptors, Flex, Form, localizationKeys, Text } fro
 import { ChevronUpDown, InformationCircle } from '../../icons';
 import * as AddPaymentSource from '../PaymentSources/AddPaymentSource';
 import { PaymentSourceRow } from '../PaymentSources/PaymentSourceRow';
+import { SubscriptionBadge } from '../Subscriptions/badge';
 
 type PaymentMethodSource = 'existing' | 'new';
 
@@ -25,7 +26,7 @@ const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
 export const CheckoutForm = withCardStateProvider(() => {
   const { checkout } = useCheckout();
 
-  const { id, plan, totals, isImmediatePlanChange, planPeriod } = checkout;
+  const { id, plan, totals, isImmediatePlanChange, planPeriod, freeTrialEndsAt } = checkout;
 
   if (!id) {
     return null;
@@ -51,6 +52,11 @@ export const CheckoutForm = withCardStateProvider(() => {
             <LineItems.Title
               title={plan.name}
               description={planPeriod === 'annual' ? localizationKeys('commerce.billedAnnually') : undefined}
+              badge={
+                plan.freeTrialEnabled && plan.freeTrialDays ? (
+                  <SubscriptionBadge subscription={{ status: 'free_trial' }} />
+                ) : null
+              }
             />
             <LineItems.Description
               prefix={planPeriod === 'annual' ? 'x12' : undefined}
@@ -85,6 +91,20 @@ export const CheckoutForm = withCardStateProvider(() => {
               <LineItems.Description text={`${totals.pastDue?.currencySymbol}${totals.pastDue?.amountFormatted}`} />
             </LineItems.Group>
           )}
+
+          {freeTrialEndsAt && plan.freeTrialDays && (
+            <LineItems.Group variant='tertiary'>
+              <LineItems.Title
+                title={localizationKeys('commerce.checkout.totalDueAfterTrial', {
+                  days: plan.freeTrialDays,
+                })}
+              />
+              <LineItems.Description
+                text={`${totals.grandTotal?.currencySymbol}${totals.grandTotal?.amountFormatted}`}
+              />
+            </LineItems.Group>
+          )}
+
           <LineItems.Group borderTop>
             <LineItems.Title title={localizationKeys('commerce.totalDueToday')} />
             <LineItems.Description text={`${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`} />
