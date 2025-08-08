@@ -1,15 +1,39 @@
 import type { SignInFutureResource } from './signIn';
 
+interface FieldError {
+  code: string;
+  longMessage?: string;
+  message: string;
+}
+
+interface FieldErrors {
+  firstName: FieldError | null;
+  lastName: FieldError | null;
+  emailAddress: FieldError | null;
+  identifier: FieldError | null;
+  phoneNumber: FieldError | null;
+  password: FieldError | null;
+  username: FieldError | null;
+  code: FieldError | null;
+  captcha: FieldError | null;
+  legalAccepted: FieldError | null;
+}
+
+export interface Errors {
+  fields: FieldErrors;
+  raw: any[];
+  global: any[]; // does not include any errors that could be parsed as a field error
+}
+
 export interface State {
   /**
    * A Signal that updates when the underlying `SignIn` resource changes, including errors.
    */
   signInSignal: {
     (): {
-      errors: unknown;
+      errors: Errors;
       signIn: SignInFutureResource | null;
     };
-    (value: { errors: unknown; signIn: SignInFutureResource | null }): void;
   };
 
   /**
