@@ -28,9 +28,9 @@ import type {
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
-  Clerk as ClerkInterface,
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
+  Clerk as ClerkInterface,
   ClerkOptions,
   ClientJSONSnapshot,
   ClientResource,
@@ -1319,7 +1319,10 @@ export class Clerk implements ClerkInterface {
           }
 
           if (taskUrl) {
-            await this.navigate(taskUrl);
+            const taskUrlWithRedirect = redirectUrl
+              ? buildURL({ base: taskUrl, hashSearchParams: { redirectUrl } }, { stringify: true })
+              : taskUrl;
+            await this.navigate(taskUrlWithRedirect);
             return;
           }
 
@@ -2350,8 +2353,8 @@ export class Clerk implements ClerkInterface {
     this.#authService = await AuthCookieService.create(
       this,
       this.#fapiClient,
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      this.#instanceType!,
+
+      this.#instanceType,
       this.#publicEventBus,
     );
 
