@@ -11,9 +11,14 @@ It's useful for handling pending session tasks for after-auth flows:
 await clerk.setActive({
   session,
   navigate: async ({ session }) => {
-    if (session.currentTask.key === 'choose-organization') {
+    const currentTask = session.currentTask;
+
+    if (currentTask) {
       await router.push('/onboarding/choose-organization')
+      return;
     }
+
+    await navigate('/dashboard')
   }
 });
 ```
