@@ -38,7 +38,7 @@ function SignUpContinueInternal() {
     unsafeMetadata,
     initialValues = {},
     isCombinedFlow: _isCombinedFlow,
-    onPendingSession,
+    navigateOnSetActive,
   } = useSignUpContext();
   const signUp = useCoreSignUp();
   const isWithinSignInContext = !!React.useContext(SignInContext);
@@ -180,7 +180,12 @@ function SignUpContinueInternal() {
           verifyEmailPath: './verify-email-address',
           verifyPhonePath: './verify-phone-number',
           handleComplete: () =>
-            clerk.setActive({ session: res.createdSessionId, redirectUrl: afterSignUpUrl, navigate: onPendingSession }),
+            clerk.setActive({
+              session: res.createdSessionId,
+              navigate: async ({ session }) => {
+                await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl });
+              },
+            }),
           navigate,
           oidcPrompt: ctx.oidcPrompt,
         }),

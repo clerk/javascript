@@ -1,6 +1,6 @@
 import { useClerk } from '@clerk/shared/react';
 import { isAbsoluteUrl } from '@clerk/shared/url';
-import type { SetActiveNavigate } from '@clerk/types';
+import type { SessionResource } from '@clerk/types';
 import { createContext, useContext, useMemo } from 'react';
 
 import { buildTaskURL, INTERNAL_SESSION_TASK_ROUTE_BY_KEY } from '@/core/sessionTasks';
@@ -29,7 +29,7 @@ export type SignInContextType = Omit<SignInCtx, 'fallbackRedirectUrl' | 'forceRe
   emailLinkRedirectUrl: string;
   ssoCallbackUrl: string;
   isCombinedFlow: boolean;
-  onPendingSession: SetActiveNavigate;
+  navigateOnSetActive: (opts: { session: SessionResource; redirectUrl: string }) => Promise<unknown>;
   taskUrl: string | null;
 };
 
@@ -120,10 +120,10 @@ export const useSignInContext = (): SignInContextType => {
 
   const signUpContinueUrl = buildURL({ base: signUpUrl, hashPath: '/continue' }, { stringify: true });
 
-  const onPendingSession: SetActiveNavigate = async ({ session }) => {
+  const navigateOnSetActive = async ({ session, redirectUrl }: { session: SessionResource; redirectUrl: string }) => {
     const currentTaskKey = session.currentTask?.key;
     if (!currentTaskKey) {
-      return;
+      return navigate(redirectUrl);
     }
 
     return navigate(`../tasks/${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[currentTaskKey]}`);
@@ -152,7 +152,7 @@ export const useSignInContext = (): SignInContextType => {
     initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },
     authQueryString,
     isCombinedFlow,
-    onPendingSession,
+    navigateOnSetActive,
     taskUrl,
   };
 };
