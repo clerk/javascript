@@ -1,5 +1,6 @@
 import { useClerk } from '@clerk/shared/react';
 import { eventComponentMounted } from '@clerk/shared/telemetry';
+import type { SetActiveNavigate } from '@clerk/types';
 import { useContext, useEffect, useRef } from 'react';
 
 import { Card } from '@/ui/elements/Card';
@@ -27,7 +28,6 @@ const SessionTasksStart = () => {
       const currentTaskKey = clerk.session?.currentTask?.key;
       if (!currentTaskKey) return;
 
-      // TODO -> Fix navigation here
       void navigate(`./${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[currentTaskKey]}`);
     }, 500);
     return () => clearTimeout(timeoutId);
@@ -106,8 +106,17 @@ export const SessionTasks = withCardStateProvider(() => {
     );
   }
 
+  const onPendingSession: SetActiveNavigate = async ({ session }) => {
+    const currentTaskKey = session.currentTask?.key;
+    if (!currentTaskKey) {
+      return;
+    }
+
+    return navigate(`./${currentTaskKey}`);
+  };
+
   return (
-    <SessionTasksContext.Provider value={{ redirectUrlComplete, currentTaskContainer }}>
+    <SessionTasksContext.Provider value={{ redirectUrlComplete, currentTaskContainer, onPendingSession }}>
       <SessionTasksRoutes />
     </SessionTasksContext.Provider>
   );
