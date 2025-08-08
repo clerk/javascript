@@ -1,6 +1,6 @@
 import { useClerk } from '@clerk/shared/react';
 import { eventComponentMounted } from '@clerk/shared/telemetry';
-import type { SetActiveNavigate } from '@clerk/types';
+import type { SessionResource } from '@clerk/types';
 import { useContext, useEffect, useRef } from 'react';
 
 import { Card } from '@/ui/elements/Card';
@@ -106,17 +106,17 @@ export const SessionTasks = withCardStateProvider(() => {
     );
   }
 
-  const onPendingSession: SetActiveNavigate = async ({ session }) => {
+  const navigateOnSetActive = async ({ session }: { session: SessionResource }) => {
     const currentTaskKey = session.currentTask?.key;
     if (!currentTaskKey) {
-      return;
+      return navigate(redirectUrlComplete);
     }
 
     return navigate(`./${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[currentTaskKey]}`);
   };
 
   return (
-    <SessionTasksContext.Provider value={{ redirectUrlComplete, currentTaskContainer, onPendingSession }}>
+    <SessionTasksContext.Provider value={{ redirectUrlComplete, currentTaskContainer, navigateOnSetActive }}>
       <SessionTasksRoutes />
     </SessionTasksContext.Provider>
   );

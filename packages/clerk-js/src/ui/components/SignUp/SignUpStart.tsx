@@ -43,7 +43,7 @@ function SignUpStartInternal(): JSX.Element {
   const { setActive } = useClerk();
   const ctx = useSignUpContext();
   const isWithinSignInContext = !!React.useContext(SignInContext);
-  const { afterSignUpUrl, signInUrl, unsafeMetadata, onPendingSession } = ctx;
+  const { afterSignUpUrl, signInUrl, unsafeMetadata, navigateOnSetActive } = ctx;
   const isCombinedFlow = !!(ctx.isCombinedFlow && !!isWithinSignInContext);
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(() =>
     getInitialActiveIdentifier(attributes, userSettings.signUp.progressive, {
@@ -168,8 +168,9 @@ function SignUpStartInternal(): JSX.Element {
             removeClerkQueryParam('__clerk_invitation_token');
             return setActive({
               session: signUp.createdSessionId,
-              redirectUrl: afterSignUpUrl,
-              navigate: onPendingSession,
+              navigate: async ({ session }) => {
+                await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl });
+              },
             });
           },
           navigate,
@@ -339,7 +340,12 @@ function SignUpStartInternal(): JSX.Element {
           verifyEmailPath: 'verify-email-address',
           verifyPhonePath: 'verify-phone-number',
           handleComplete: () =>
-            setActive({ session: res.createdSessionId, redirectUrl: afterSignUpUrl, navigate: onPendingSession }),
+            setActive({
+              session: res.createdSessionId,
+              navigate: async ({ session }) => {
+                await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl });
+              },
+            }),
           navigate,
           redirectUrl,
           redirectUrlComplete,

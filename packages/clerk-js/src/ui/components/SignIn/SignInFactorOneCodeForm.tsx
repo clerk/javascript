@@ -35,7 +35,7 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
   const signIn = useCoreSignIn();
   const card = useCardState();
   const { navigate } = useRouter();
-  const { afterSignInUrl, onPendingSession } = useSignInContext();
+  const { afterSignInUrl, navigateOnSetActive } = useSignInContext();
   const { setActive } = useClerk();
   const supportEmail = useSupportEmail();
   const clerk = useClerk();
@@ -106,8 +106,9 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
           case 'complete':
             return setActive({
               session: res.createdSessionId,
-              redirectUrl: afterSignInUrl,
-              navigate: onPendingSession,
+              navigate: async ({ session }) => {
+                await navigateOnSetActive({ session, redirectUrl: afterSignInUrl });
+              },
             });
           case 'needs_second_factor':
             return navigate('../factor-two');

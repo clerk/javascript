@@ -34,7 +34,7 @@ export const SignInFactorOneAlternativeChannelCodeForm = (props: SignInFactorOne
   const signIn = useCoreSignIn();
   const card = useCardState();
   const { navigate } = useRouter();
-  const { afterSignInUrl, onPendingSession } = useSignInContext();
+  const { afterSignInUrl, navigateOnSetActive } = useSignInContext();
   const { setActive } = useClerk();
   const supportEmail = useSupportEmail();
   const clerk = useClerk();
@@ -67,8 +67,9 @@ export const SignInFactorOneAlternativeChannelCodeForm = (props: SignInFactorOne
           case 'complete':
             return setActive({
               session: res.createdSessionId,
-              redirectUrl: afterSignInUrl,
-              navigate: onPendingSession,
+              navigate: async ({ session }) => {
+                await navigateOnSetActive({ session, redirectUrl: afterSignInUrl });
+              },
             });
           case 'needs_second_factor':
             return navigate('../factor-two');

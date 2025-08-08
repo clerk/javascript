@@ -1,6 +1,6 @@
 import { useClerk } from '@clerk/shared/react';
 import { isAbsoluteUrl } from '@clerk/shared/url';
-import type { SetActiveNavigate } from '@clerk/types';
+import type { SessionResource } from '@clerk/types';
 import { createContext, useContext, useMemo } from 'react';
 
 import { buildTaskURL, INTERNAL_SESSION_TASK_ROUTE_BY_KEY } from '@/core/sessionTasks';
@@ -28,7 +28,7 @@ export type SignUpContextType = Omit<SignUpCtx, 'fallbackRedirectUrl' | 'forceRe
   isCombinedFlow: boolean;
   emailLinkRedirectUrl: string;
   ssoCallbackUrl: string;
-  onPendingSession: SetActiveNavigate;
+  navigateOnSetActive: (opts: { session: SessionResource; redirectUrl: string }) => Promise<unknown>;
   taskUrl: string | null;
 };
 
@@ -115,10 +115,10 @@ export const useSignUpContext = (): SignUpContextType => {
   // TODO: Avoid building this url again to remove duplicate code. Get it from window.Clerk instead.
   const secondFactorUrl = buildURL({ base: signInUrl, hashPath: '/factor-two' }, { stringify: true });
 
-  const onPendingSession: SetActiveNavigate = async ({ session }) => {
+  const navigateOnSetActive = async ({ session, redirectUrl }: { session: SessionResource; redirectUrl: string }) => {
     const currentTaskKey = session.currentTask?.key;
     if (!currentTaskKey) {
-      return;
+      return navigate(redirectUrl);
     }
 
     return navigate(`../tasks/${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[currentTaskKey]}`);
@@ -146,7 +146,7 @@ export const useSignUpContext = (): SignUpContextType => {
     initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },
     authQueryString,
     isCombinedFlow,
-    onPendingSession,
+    navigateOnSetActive,
     taskUrl,
   };
 };
