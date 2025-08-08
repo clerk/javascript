@@ -3,6 +3,8 @@ import { isAbsoluteUrl } from '@clerk/shared/url';
 import type { OnPendingSessionFn } from '@clerk/types';
 import { createContext, useContext, useMemo } from 'react';
 
+import { buildTaskURL } from '@/core/sessionTasks';
+
 import { SIGN_UP_INITIAL_VALUE_KEYS } from '../../../core/constants';
 import { buildURL } from '../../../utils';
 import { RedirectUrls } from '../../../utils/redirectUrls';
@@ -27,6 +29,7 @@ export type SignUpContextType = Omit<SignUpCtx, 'fallbackRedirectUrl' | 'forceRe
   emailLinkRedirectUrl: string;
   ssoCallbackUrl: string;
   onPendingSession: OnPendingSessionFn;
+  taskUrl: string | null;
 };
 
 export const SignUpContext = createContext<SignUpCtx | null>(null);
@@ -122,6 +125,11 @@ export const useSignUpContext = (): SignUpContextType => {
     }
   };
 
+  const taskUrl = clerk.session?.currentTask
+    ? (clerk.__internal_getOption('taskUrls')?.[clerk.session?.currentTask.key] ??
+      buildTaskURL(clerk.session?.currentTask, { base: signUpUrl }))
+    : null;
+
   return {
     ...ctx,
     oauthFlow: ctx.oauthFlow || 'auto',
@@ -140,5 +148,6 @@ export const useSignUpContext = (): SignUpContextType => {
     authQueryString,
     isCombinedFlow,
     onPendingSession,
+    taskUrl,
   };
 };

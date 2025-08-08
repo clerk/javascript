@@ -2,6 +2,8 @@ import { useClerk } from '@clerk/shared/react';
 import type { SignUpModalProps, SignUpProps } from '@clerk/types';
 import React from 'react';
 
+import { usePreloadTasks } from '@/ui/hooks/usePreloadTasks';
+
 import { SessionTasks as LazySessionTasks } from '../../../ui/lazyModules/components';
 import { SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
 import { SignUpContext, useSignUpContext, withCoreSessionSwitchGuard } from '../../contexts';
@@ -22,6 +24,8 @@ function RedirectToSignUp() {
 }
 
 function SignUpRoutes(): JSX.Element {
+  usePreloadTasks();
+
   const signUpContext = useSignUpContext();
 
   return (

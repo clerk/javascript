@@ -6,7 +6,7 @@ import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { ErrorCard } from '@/ui/elements/ErrorCard';
 import { LoadingCard } from '@/ui/elements/LoadingCard';
 
-import { withRedirectToAfterSignIn } from '../../common';
+import { withRedirectToAfterSignIn, withRedirectToSignInTask } from '../../common';
 import { useCoreSignIn, useEnvironment } from '../../contexts';
 import { useAlternativeStrategies } from '../../hooks/useAlternativeStrategies';
 import { localizationKeys } from '../../localization';
@@ -251,4 +251,6 @@ function SignInFactorOneInternal(): JSX.Element {
   }
 }
 
-export const SignInFactorOne = withRedirectToAfterSignIn(withCardStateProvider(SignInFactorOneInternal));
+export const SignInFactorOne = withRedirectToSignInTask(
+  withRedirectToAfterSignIn(withCardStateProvider(SignInFactorOneInternal)),
+);

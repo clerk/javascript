@@ -30,6 +30,7 @@ import {
   getIdentifierControlDisplayValues,
   groupIdentifiers,
   withRedirectToAfterSignIn,
+  withRedirectToSignInTask,
 } from '../../common';
 import { useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
@@ -678,4 +679,6 @@ const InstantPasswordRow = ({ field }: { field?: FormControlState<'password'> })
   );
 };
 
-export const SignInStart = withRedirectToAfterSignIn(withCardStateProvider(SignInStartInternal));
+export const SignInStart = withRedirectToSignInTask(
+  withRedirectToAfterSignIn(withCardStateProvider(SignInStartInternal)),
+);
