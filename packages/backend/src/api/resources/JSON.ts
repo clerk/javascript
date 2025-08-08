@@ -37,7 +37,7 @@ export const ObjectType = {
   Machine: 'machine',
   MachineScope: 'machine_scope',
   MachineSecretKey: 'machine_secret_key',
-  MachineToken: 'machine_to_machine_token',
+  M2MToken: 'machine_to_machine_token',
   JwtTemplate: 'jwt_template',
   OauthAccessToken: 'oauth_access_token',
   IdpOAuthAccessToken: 'clerk_idp_oauth_access_token',
@@ -716,6 +716,7 @@ export interface MachineJSON extends ClerkResourceJSON {
   updated_at: number;
   default_token_ttl: number;
   scoped_machines: MachineJSON[];
+  secret_key?: string;
 }
 
 export interface MachineScopeJSON {
@@ -731,9 +732,9 @@ export interface MachineSecretKeyJSON {
   secret: string;
 }
 
-export interface MachineTokenJSON extends ClerkResourceJSON {
-  object: typeof ObjectType.MachineToken;
-  name: string;
+export interface M2MTokenJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.M2MToken;
+  secret?: string;
   subject: string;
   scopes: string[];
   claims: Record<string, any> | null;
@@ -741,8 +742,6 @@ export interface MachineTokenJSON extends ClerkResourceJSON {
   revocation_reason: string | null;
   expired: boolean;
   expiration: number | null;
-  created_by: string | null;
-  creation_reason: string | null;
   created_at: number;
   updated_at: number;
 }
