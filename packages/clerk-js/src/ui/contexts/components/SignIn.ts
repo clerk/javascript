@@ -3,7 +3,7 @@ import { isAbsoluteUrl } from '@clerk/shared/url';
 import type { SetActiveNavigate } from '@clerk/types';
 import { createContext, useContext, useMemo } from 'react';
 
-import { buildTaskURL } from '@/core/sessionTasks';
+import { buildTaskURL, INTERNAL_SESSION_TASK_ROUTE_BY_KEY } from '@/core/sessionTasks';
 
 import { SIGN_IN_INITIAL_VALUE_KEYS } from '../../../core/constants';
 import { buildURL } from '../../../utils';
@@ -126,7 +126,7 @@ export const useSignInContext = (): SignInContextType => {
       return;
     }
 
-    return navigate(`../tasks/${currentTaskKey}`);
+    return navigate(`../tasks/${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[currentTaskKey]}`);
   };
 
   const taskUrl = clerk.session?.currentTask
