@@ -1074,7 +1074,7 @@ export type ClerkOptions = PendingSessionOptions &
     taskUrls?: Record<SessionTask['key'], string>;
 
     /**
-     * Event handler for session transitions to `pending`
+     * Event handler called when a session transitions to `pending` status after successful sign-in.
      */
     onPendingSession?: OnPendingSessionFn;
   };
@@ -1202,6 +1202,9 @@ export type SetActiveParams = {
    */
   redirectUrl?: string;
 
+  /**
+   * Event handler called when a session transitions to `pending` status after successful sign-in.
+   */
   onPendingSession?: OnPendingSessionFn;
 };
 

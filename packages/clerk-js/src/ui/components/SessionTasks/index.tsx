@@ -27,7 +27,10 @@ const SessionTasksStart = () => {
       const currentTaskKey = clerk.session?.currentTask?.key;
       if (!currentTaskKey) return;
 
-      void navigate(`./${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[currentTaskKey]}`);
+      void navigate(
+        clerk.__internal_getOption('taskUrls')?.[currentTaskKey] ??
+          `./${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[currentTaskKey]}`,
+      );
     }, 500);
     return () => clearTimeout(timeoutId);
   }, [navigate, clerk, redirectUrlComplete]);
