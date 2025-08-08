@@ -75,8 +75,12 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
 
     return setActive({
       session,
-      redirectUrl: opts.afterSwitchSessionUrl,
       navigate: async ({ session }) => {
+        if (!session.currentTask && opts.afterSwitchSessionUrl) {
+          await navigate(opts.afterSwitchSessionUrl);
+          return;
+        }
+
         await navigateIfTaskExists(session, {
           baseUrl: opts.signInUrl ?? displayConfig.signInUrl,
           navigate,
