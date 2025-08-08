@@ -17,11 +17,13 @@ type BuildTimeOptions = Partial<
     | 'proxyUrl'
     | 'publishableKey'
     | 'secretKey'
+    | 'machineSecretKey'
   >
 >;
 
 const defaultOptions = {
   secretKey: '',
+  machineSecretKey: '',
   jwtKey: '',
   apiUrl: undefined,
   apiVersion: undefined,

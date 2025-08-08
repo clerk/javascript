@@ -221,6 +221,8 @@ exports[`Typedoc output > should have a deliberate file structure 1`] = `
   "backend/auth-object.mdx",
   "backend/authenticate-request-options.mdx",
   "backend/client.mdx",
+  "backend/commerce-plan-json.mdx",
+  "backend/commerce-plan.mdx",
   "backend/email-address.mdx",
   "backend/external-account.mdx",
   "backend/get-auth-fn.mdx",

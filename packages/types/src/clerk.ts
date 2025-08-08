@@ -14,7 +14,7 @@ import type {
   SignInTheme,
   SignUpTheme,
   SubscriptionDetailsTheme,
-  TaskSelectOrganizationTheme,
+  TaskChooseOrganizationTheme,
   UserButtonTheme,
   UserProfileTheme,
   UserVerificationTheme,
@@ -54,6 +54,7 @@ import type { SessionVerificationLevel } from './sessionVerification';
 import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
 import type { ClientJSONSnapshot, EnvironmentJSONSnapshot } from './snapshots';
+import type { State } from './state';
 import type { Web3Strategy } from './strategies';
 import type { TelemetryCollector } from './telemetry';
 import type { UserResource } from './user';
@@ -226,6 +227,14 @@ export interface Clerk {
 
   /** Current User. */
   user: UserResource | null | undefined;
+
+  /**
+   * @experimental This experimental API is subject to change.
+   *
+   * Entrypoint for Clerk's Signal API containing resource signals along with accessible versions of `computed()` and
+   * `effect()` that can be used to subscribe to changes from Signals.
+   */
+  __internal_state: State | undefined;
 
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
@@ -559,19 +568,19 @@ export interface Clerk {
   __internal_unmountOAuthConsent: (targetNode: HTMLDivElement) => void;
 
   /**
-   * Mounts a TaskSelectOrganization component at the target element.
-   * @param targetNode Target node to mount the TaskSelectOrganization component.
+   * Mounts a TaskChooseOrganization component at the target element.
+   * @param targetNode Target node to mount the TaskChooseOrganization component.
    * @param props configuration parameters.
    */
-  mountTaskSelectOrganization: (targetNode: HTMLDivElement, props?: TaskSelectOrganizationProps) => void;
+  mountTaskChooseOrganization: (targetNode: HTMLDivElement, props?: TaskChooseOrganizationProps) => void;
 
   /**
-   * Unmount a TaskSelectOrganization component from the target element.
+   * Unmount a TaskChooseOrganization component from the target element.
    * If there is no component mounted at the target node, results in a noop.
    *
-   * @param targetNode Target node to unmount the TaskSelectOrganization component from.
+   * @param targetNode Target node to unmount the TaskChooseOrganization component from.
    */
-  unmountTaskSelectOrganization: (targetNode: HTMLDivElement) => void;
+  unmountTaskChooseOrganization: (targetNode: HTMLDivElement) => void;
 
   /**
    * @internal
@@ -1886,10 +1895,20 @@ export type __experimental_CheckoutButtonProps = {
  * <ClerkProvider clerkJsVersion="x.x.x" />
  * ```
  */
-export type __internal_PlanDetailsProps = {
+export type __internal_PlanDetailsProps = (
+  | {
+      planId: string;
+      plan?: never;
+    }
+  | {
+      /**
+       * The plan object will be used as initial data until the plan is fetched from the server.
+       */
+      plan: CommercePlanResource;
+      planId?: never;
+    }
+) & {
   appearance?: PlanDetailTheme;
-  plan?: CommercePlanResource;
-  planId?: string;
   initialPlanPeriod?: CommerceSubscriptionPlanPeriod;
   portalId?: string;
   portalRoot?: PortalRoot;
@@ -1905,9 +1924,19 @@ export type __internal_PlanDetailsProps = {
  * <ClerkProvider clerkJsVersion="x.x.x" />
  * ```
  */
-export type __experimental_PlanDetailsButtonProps = {
-  plan?: CommercePlanResource;
-  planId?: string;
+export type __experimental_PlanDetailsButtonProps = (
+  | {
+      planId: string;
+      plan?: never;
+    }
+  | {
+      /**
+       * The plan object will be used as initial data until the plan is fetched from the server.
+       */
+      plan: CommercePlanResource;
+      planId?: never;
+    }
+) & {
   initialPlanPeriod?: CommerceSubscriptionPlanPeriod;
   planDetailsProps?: {
     appearance?: PlanDetailTheme;
@@ -2056,12 +2085,12 @@ export type SignUpButtonProps = (SignUpButtonPropsModal | ButtonPropsRedirect) &
     | 'oauthFlow'
   >;
 
-export type TaskSelectOrganizationProps = {
+export type TaskChooseOrganizationProps = {
   /**
    * Full URL or path to navigate to after successfully resolving all tasks
    */
   redirectUrlComplete: string;
-  appearance?: TaskSelectOrganizationTheme;
+  appearance?: TaskChooseOrganizationTheme;
 };
 
 export type CreateOrganizationInvitationParams = {
