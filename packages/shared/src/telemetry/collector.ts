@@ -16,6 +16,7 @@ import type {
   TelemetryCollector as TelemetryCollectorInterface,
   TelemetryEvent,
   TelemetryEventRaw,
+  TelemetryLogEntry,
 } from '@clerk/types';
 
 import { parsePublishableKey } from '../keys';
@@ -60,6 +61,30 @@ type TelemetryMetadata = Required<
   instanceType: InstanceType;
 };
 
+/**
+ * Structure of log data sent to the telemetry endpoint.
+ */
+type TelemetryLogData = {
+  /** Service that generated the log */
+  sdk: string;
+  /** The version of the SDK where the event originated from */
+  sdkv: string;
+  /** The version of Clerk where the event originated from */
+  cv: string;
+  /** Log level (info, warn, error, debug, etc.) */
+  lvl: string;
+  /** Log message */
+  msg: string;
+  /** Instance ID */
+  iid: string;
+  /** Timestamp when log was generated */
+  ts: string;
+  /** Primary key */
+  pk: string | null;
+  /** Additional payload for the log */
+  payload: Record<string, unknown> | null;
+};
+
 const DEFAULT_CONFIG: Partial<TelemetryCollectorConfig> = {
   samplingRate: 1,
   maxBufferSize: 5,
@@ -74,7 +99,9 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
   #eventThrottler: TelemetryEventThrottler;
   #metadata: TelemetryMetadata = {} as TelemetryMetadata;
   #buffer: TelemetryEvent[] = [];
+  #logBuffer: TelemetryLogData[] = [];
   #pendingFlush: any;
+  #pendingLogFlush: any;
 
   constructor(options: TelemetryCollectorOptions) {
     this.#config = {
@@ -158,8 +185,41 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
     this.#scheduleFlush();
   }
 
+  /**
+   * Records a telemetry log entry if logging is enabled and not in debug mode.
+   *
+   * @param entry - The telemetry log entry to record.
+   */
+  recordLog(entry: TelemetryLogEntry): void {
+    if (!this.#shouldRecordLog(entry)) {
+      return;
+    }
+
+    const sdkMetadata = this.#getSDKMetadata();
+
+    const logData: TelemetryLogData = {
+      sdk: sdkMetadata.name,
+      sdkv: sdkMetadata.version,
+      cv: this.#metadata.clerkVersion ?? '',
+      lvl: entry.level,
+      msg: entry.message,
+      iid: entry.id,
+      ts: new Date(entry.timestamp).toISOString(),
+      pk: this.#metadata.publishableKey || null,
+      payload: entry.context || null,
+    };
+
+    this.#logBuffer.push(logData);
+
+    this.#scheduleLogFlush();
+  }
+
   #shouldRecord(preparedPayload: TelemetryEvent, eventSamplingRate?: number) {
     return this.isEnabled && !this.isDebug && this.#shouldBeSampled(preparedPayload, eventSamplingRate);
+  }
+
+  #shouldRecordLog(_entry: TelemetryLogEntry): boolean {
+    return this.isEnabled && !this.isDebug;
   }
 
   #shouldBeSampled(preparedPayload: TelemetryEvent, eventSamplingRate?: number) {
@@ -203,11 +263,46 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
     if ('requestIdleCallback' in window) {
       this.#pendingFlush = requestIdleCallback(() => {
         this.#flush();
+        this.#pendingFlush = null;
       });
     } else {
       // This is not an ideal solution, but it at least waits until the next tick
       this.#pendingFlush = setTimeout(() => {
         this.#flush();
+        this.#pendingFlush = null;
+      }, 0);
+    }
+  }
+
+  #scheduleLogFlush(): void {
+    if (typeof window === 'undefined') {
+      this.#flushLogs();
+      return;
+    }
+
+    const isBufferFull = this.#logBuffer.length >= this.#config.maxBufferSize;
+    if (isBufferFull) {
+      if (this.#pendingLogFlush) {
+        const cancel = typeof cancelIdleCallback !== 'undefined' ? cancelIdleCallback : clearTimeout;
+        cancel(this.#pendingLogFlush);
+      }
+      this.#flushLogs();
+      return;
+    }
+
+    if (this.#pendingLogFlush) {
+      return;
+    }
+
+    if ('requestIdleCallback' in window) {
+      this.#pendingLogFlush = requestIdleCallback(() => {
+        this.#flushLogs();
+        this.#pendingLogFlush = null;
+      });
+    } else {
+      this.#pendingLogFlush = setTimeout(() => {
+        this.#flushLogs();
+        this.#pendingLogFlush = null;
       }, 0);
     }
   }
@@ -229,6 +324,27 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
       body: JSON.stringify({
         events: eventsToSend,
       }),
+      keepalive: true,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).catch(() => void 0);
+  }
+
+  #flushLogs(): void {
+    // Capture the current buffer and clear it immediately to avoid closure references
+    const entriesToSend = [...this.#logBuffer];
+    this.#logBuffer = [];
+
+    this.#pendingLogFlush = null;
+
+    if (entriesToSend.length === 0) {
+      return;
+    }
+
+    fetch(new URL('/v1/logs', this.#config.endpoint), {
+      method: 'POST',
+      body: JSON.stringify(entriesToSend),
       keepalive: true,
       headers: {
         'Content-Type': 'application/json',
@@ -273,7 +389,6 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
         if (isWindowClerkWithMetadata(windowClerk) && windowClerk.constructor.sdkMetadata) {
           const { name, version } = windowClerk.constructor.sdkMetadata;
 
-          // Only update properties if they exist to avoid overwriting with undefined
           if (name !== undefined) {
             sdkMetadata.name = name;
           }
