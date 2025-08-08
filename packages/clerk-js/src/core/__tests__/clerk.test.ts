@@ -535,6 +535,32 @@ describe('Clerk singleton', () => {
         expect(mockSession.touch).toHaveBeenCalled();
       });
 
+      it('does not call __unstable__onBeforeSetActive before session.touch', async () => {
+        mockSession.touch.mockReturnValueOnce(Promise.resolve());
+        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
+
+        const onBeforeSetActive = jest.fn();
+        (window as any).__unstable__onBeforeSetActive = onBeforeSetActive;
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+        await sut.setActive({ session: mockSession as any as ActiveSessionResource });
+        expect(onBeforeSetActive).not.toHaveBeenCalled();
+      });
+
+      it('does not call __unstable__onAfterSetActive after session.touch', async () => {
+        mockSession.touch.mockReturnValueOnce(Promise.resolve());
+        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
+
+        const onAfterSetActive = jest.fn();
+        (window as any).__unstable__onAfterSetActive = onAfterSetActive;
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+        await sut.setActive({ session: mockSession as any as ActiveSessionResource });
+        expect(onAfterSetActive).not.toHaveBeenCalled();
+      });
+
       it('navigate to `taskUrl` option', async () => {
         mockSession.touch.mockReturnValue(Promise.resolve());
         mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
