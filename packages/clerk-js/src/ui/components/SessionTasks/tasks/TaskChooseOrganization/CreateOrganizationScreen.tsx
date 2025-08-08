@@ -19,7 +19,7 @@ type CreateOrganizationScreenProps = {
 
 export const CreateOrganizationScreen = withCardStateProvider((props: CreateOrganizationScreenProps) => {
   const card = useCardState();
-  const { redirectUrlComplete } = useSessionTasksContext();
+  const { redirectUrlComplete, onPendingSession } = useSessionTasksContext();
   const { createOrganization, isLoaded, setActive } = useOrganizationList({
     userMemberships: organizationListParams.userMemberships,
   });
@@ -45,7 +45,7 @@ export const CreateOrganizationScreen = withCardStateProvider((props: CreateOrga
     try {
       const organization = await createOrganization({ name: nameField.value, slug: slugField.value });
 
-      await setActive({ organization, redirectUrl: redirectUrlComplete });
+      await setActive({ organization, redirectUrl: redirectUrlComplete, navigate: onPendingSession });
     } catch (err) {
       handleError(err, [nameField, slugField], card.setError);
     }
