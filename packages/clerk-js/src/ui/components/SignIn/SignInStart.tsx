@@ -199,7 +199,6 @@ function SignInStartInternal(): JSX.Element {
     }
   }, [identifierField.value, identifierAttributes]);
 
-  // TODO -> Maybe navigate on a effect here?
   useEffect(() => {
     if (!organizationTicket) {
       return;
