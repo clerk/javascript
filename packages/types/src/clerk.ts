@@ -1069,11 +1069,6 @@ export type ClerkOptions = ClerkOptionsNavigation &
      * @default undefined - Uses Clerk's default task flow URLs
      */
     taskUrls?: Record<SessionTask['key'], string>;
-
-    /**
-     * Event handler called when a session transitions to `pending` status after successful sign-in.
-     */
-    onPendingSession?: OnPendingSessionFn;
   };
 
 export interface NavigateOptions {
@@ -1200,9 +1195,9 @@ export type SetActiveParams = {
   redirectUrl?: string;
 
   /**
-   * Event handler called when a session transitions to `pending` status after successful sign-in.
+   * TODO
    */
-  onPendingSession?: OnPendingSessionFn;
+  navigate?: SetActiveNavigate;
 };
 
 /**
