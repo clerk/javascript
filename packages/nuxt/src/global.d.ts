@@ -10,6 +10,7 @@ declare module 'nuxt/schema' {
   interface RuntimeConfig {
     clerk: {
       secretKey?: string;
+      machineSecretKey?: string;
       jwtKey?: string;
       webhookSigningSecret?: string;
     };

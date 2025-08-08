@@ -158,6 +158,7 @@ export const ptBR: LocalizationResource = {
     totalDue: 'Total devido',
     totalDueToday: 'Total devido hoje',
     viewFeatures: 'Ver recursos',
+    viewPayment: undefined,
     year: 'Ano',
   },
   createOrganization: {
@@ -816,6 +817,9 @@ export const ptBR: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'O sobrenome não deve exceder 256 caracteres.',
     form_param_max_length_exceeded__name: 'O nome não deve exceder 256 caracteres.',
     form_param_nil: undefined,
+    form_param_type_invalid: undefined,
+    form_param_type_invalid__email_address: undefined,
+    form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: 'Senha incorreta.',
     form_password_length_too_short: 'Sua senha é muito curta. Por favor, tente novamente.',

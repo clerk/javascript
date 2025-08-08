@@ -158,6 +158,7 @@ export const viVN: LocalizationResource = {
     totalDue: 'Tổng cần thanh toán',
     totalDueToday: 'Tổng cần thanh toán hôm nay',
     viewFeatures: 'Xem tính năng',
+    viewPayment: undefined,
     year: 'Năm',
   },
   createOrganization: {
@@ -813,6 +814,9 @@ export const viVN: LocalizationResource = {
     form_param_max_length_exceeded__last_name: undefined,
     form_param_max_length_exceeded__name: undefined,
     form_param_nil: undefined,
+    form_param_type_invalid: undefined,
+    form_param_type_invalid__email_address: undefined,
+    form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: 'Mật khẩu của bạn quá ngắn. Nó phải có ít nhất 8 ký tự.',

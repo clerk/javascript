@@ -154,6 +154,7 @@ export const caES: LocalizationResource = {
     totalDue: undefined,
     totalDueToday: undefined,
     viewFeatures: undefined,
+    viewPayment: undefined,
     year: undefined,
   },
   createOrganization: {
@@ -805,6 +806,9 @@ export const caES: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'Els cognoms no han de superar els 256 caràcters.',
     form_param_max_length_exceeded__name: 'El nom no ha de superar els 256 caràcters.',
     form_param_nil: 'El valor del camp no pot ser nul. Si us plau, completa aquest camp.',
+    form_param_type_invalid: undefined,
+    form_param_type_invalid__email_address: undefined,
+    form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: 'La contrasenya introduïda és incorrecta.',
     form_password_length_too_short: 'La teva contrasenya ha de tenir almenys 8 caràcters.',

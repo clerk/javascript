@@ -154,6 +154,7 @@ export const mnMN: LocalizationResource = {
     totalDue: undefined,
     totalDueToday: undefined,
     viewFeatures: undefined,
+    viewPayment: undefined,
     year: undefined,
   },
   createOrganization: {
@@ -806,6 +807,9 @@ export const mnMN: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'Овог 256 тэмдэгтээс хэтрэхгүй байх ёстой.',
     form_param_max_length_exceeded__name: 'Нэр 256 тэмдэгтээс хэтрэхгүй байх ёстой.',
     form_param_nil: 'Параметр байхгүй байна.',
+    form_param_type_invalid: undefined,
+    form_param_type_invalid__email_address: undefined,
+    form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: 'Нууц үг буруу байна.',
     form_password_length_too_short: 'Нууц үгийн урт хэт богино байна.',

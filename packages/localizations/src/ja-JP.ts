@@ -154,6 +154,7 @@ export const jaJP: LocalizationResource = {
     totalDue: undefined,
     totalDueToday: undefined,
     viewFeatures: undefined,
+    viewPayment: undefined,
     year: undefined,
   },
   createOrganization: {
@@ -426,7 +427,7 @@ export const jaJP: LocalizationResource = {
       headerTitle__general: '一般',
       headerTitle__members: 'メンバー',
       profileSection: {
-        primaryButton: undefined,
+        primaryButton: 'プロフィールを更新',
         title: '組織プロフィール',
         uploadAction__title: 'ロゴ',
       },
@@ -806,6 +807,9 @@ export const jaJP: LocalizationResource = {
     form_param_max_length_exceeded__last_name: '姓は256文字を超えることはできません。',
     form_param_max_length_exceeded__name: '名前は256文字を超えることはできません。',
     form_param_nil: 'パラメータが存在しません。',
+    form_param_type_invalid: undefined,
+    form_param_type_invalid__email_address: undefined,
+    form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: 'パスワードが正しくありません。',
     form_password_length_too_short: 'パスワードの長さが短すぎます。',
@@ -1191,7 +1195,7 @@ export const jaJP: LocalizationResource = {
         title: '電話番号',
       },
       profileSection: {
-        primaryButton: undefined,
+        primaryButton: 'プロフィールを更新',
         title: 'プロフィール',
       },
       usernameSection: {

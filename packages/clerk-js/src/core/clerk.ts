@@ -76,7 +76,7 @@ import type {
   SignUpProps,
   SignUpRedirectOptions,
   SignUpResource,
-  TaskSelectOrganizationProps,
+  TaskChooseOrganizationProps,
   UnsubscribeCallback,
   UserButtonProps,
   UserProfileProps,
@@ -154,6 +154,7 @@ import {
   Waitlist,
 } from './resources/internal';
 import { navigateToTask } from './sessionTasks';
+import { State } from './state';
 import { warnings } from './warnings';
 
 type SetActiveHook = (intent?: 'sign-out') => void | Promise<void>;
@@ -211,6 +212,7 @@ export class Clerk implements ClerkInterface {
   public user: UserResource | null | undefined;
   public __internal_country?: string | null;
   public telemetry: TelemetryCollector | undefined;
+  public readonly __internal_state: State = new State();
 
   protected internal_last_error: ClerkAPIError | null = null;
   // converted to protected environment to support `updateEnvironment` type assertion
@@ -1163,31 +1165,31 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls.ensureMounted().then(controls => controls.unmountComponent({ node }));
   };
 
-  public mountTaskSelectOrganization = (node: HTMLDivElement, props?: TaskSelectOrganizationProps) => {
+  public mountTaskChooseOrganization = (node: HTMLDivElement, props?: TaskChooseOrganizationProps) => {
     this.assertComponentsReady(this.#componentControls);
 
     if (disabledOrganizationsFeature(this, this.environment)) {
       if (this.#instanceType === 'development') {
-        throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('TaskSelectOrganization'), {
+        throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('TaskChooseOrganization'), {
           code: CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE,
         });
       }
       return;
     }
 
-    void this.#componentControls.ensureMounted({ preloadHint: 'TaskSelectOrganization' }).then(controls =>
+    void this.#componentControls.ensureMounted({ preloadHint: 'TaskChooseOrganization' }).then(controls =>
       controls.mountComponent({
-        name: 'TaskSelectOrganization',
-        appearanceKey: 'taskSelectOrganization',
+        name: 'TaskChooseOrganization',
+        appearanceKey: 'taskChooseOrganization',
         node,
         props,
       }),
     );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted('TaskSelectOrganization', props));
+    this.telemetry?.record(eventPrebuiltComponentMounted('TaskChooseOrganization', props));
   };
 
-  public unmountTaskSelectOrganization = (node: HTMLDivElement) => {
+  public unmountTaskChooseOrganization = (node: HTMLDivElement) => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls.ensureMounted().then(controls => controls.unmountComponent({ node }));
   };
@@ -1388,6 +1390,16 @@ export class Clerk implements ClerkInterface {
   public __internal_navigateToTaskIfAvailable = async ({
     redirectUrlComplete,
   }: __internal_NavigateToTaskIfAvailableParams = {}): Promise<void> => {
+    const onBeforeSetActive: SetActiveHook =
+      typeof window !== 'undefined' && typeof window.__unstable__onBeforeSetActive === 'function'
+        ? window.__unstable__onBeforeSetActive
+        : noop;
+
+    const onAfterSetActive: SetActiveHook =
+      typeof window !== 'undefined' && typeof window.__unstable__onAfterSetActive === 'function'
+        ? window.__unstable__onAfterSetActive
+        : noop;
+
     const session = this.session;
     if (!session || !this.environment) {
       return;
@@ -1403,17 +1415,30 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
+    await onBeforeSetActive();
+
     if (redirectUrlComplete) {
       const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
 
       await tracker.track(async () => {
-        await this.navigate(redirectUrlComplete);
+        if (!this.client) {
+          return;
+        }
+
+        if (this.client.isEligibleForTouch()) {
+          const absoluteRedirectUrl = new URL(redirectUrlComplete, window.location.href);
+          await this.navigate(this.buildUrlWithAuth(this.client.buildTouchUrl({ redirectUrl: absoluteRedirectUrl })));
+        } else {
+          await this.navigate(redirectUrlComplete);
+        }
       });
 
       if (tracker.isUnloading()) {
         return;
       }
     }
+
+    await onAfterSetActive();
   };
 
   public addListener = (listener: ListenerCallback): UnsubscribeCallback => {
@@ -1580,20 +1605,27 @@ export class Clerk implements ClerkInterface {
   }
 
   public buildAfterMultiSessionSingleSignOutUrl(): string {
-    if (!this.#options.afterMultiSessionSingleSignOutUrl) {
+    if (!this.environment) {
+      return '';
+    }
+
+    if (this.#options.afterMultiSessionSingleSignOutUrl) {
+      return this.buildUrlWithAuth(this.#options.afterMultiSessionSingleSignOutUrl);
+    }
+
+    if (this.#options.signInUrl) {
       return this.buildUrlWithAuth(
         buildURL(
           {
-            base: this.#options.signInUrl
-              ? `${this.#options.signInUrl}/choose`
-              : this.environment?.displayConfig.afterSignOutOneUrl,
+            base: this.#options.signInUrl,
+            hashPath: 'choose',
           },
           { stringify: true },
         ),
       );
     }
 
-    return this.buildUrlWithAuth(this.#options.afterMultiSessionSingleSignOutUrl);
+    return this.buildUrlWithAuth(this.environment.displayConfig.afterSignOutOneUrl);
   }
 
   public buildCreateOrganizationUrl(): string {
@@ -1879,10 +1911,11 @@ export class Clerk implements ClerkInterface {
     };
 
     if (si.status === 'complete') {
-      return this.setActive({
+      await this.setActive({
         session: si.sessionId,
         redirectUrl: redirectUrls.getAfterSignInUrl(),
       });
+      return this.__internal_navigateToTaskIfAvailable();
     }
 
     const userExistsButNeedsToSignIn =
@@ -1892,10 +1925,11 @@ export class Clerk implements ClerkInterface {
       const res = await signIn.create({ transfer: true });
       switch (res.status) {
         case 'complete':
-          return this.setActive({
+          await this.setActive({
             session: res.createdSessionId,
             redirectUrl: redirectUrls.getAfterSignInUrl(),
           });
+          return this.__internal_navigateToTaskIfAvailable();
         case 'needs_first_factor':
           return navigateToFactorOne();
         case 'needs_second_factor':
@@ -1941,10 +1975,11 @@ export class Clerk implements ClerkInterface {
       const res = await signUp.create({ transfer: true });
       switch (res.status) {
         case 'complete':
-          return this.setActive({
+          await this.setActive({
             session: res.createdSessionId,
             redirectUrl: redirectUrls.getAfterSignUpUrl(),
           });
+          return this.__internal_navigateToTaskIfAvailable();
         case 'missing_requirements':
           return navigateToNextStepSignUp({ missingFields: res.missingFields });
         default:
@@ -1953,10 +1988,11 @@ export class Clerk implements ClerkInterface {
     }
 
     if (su.status === 'complete') {
-      return this.setActive({
+      await this.setActive({
         session: su.sessionId,
         redirectUrl: redirectUrls.getAfterSignUpUrl(),
       });
+      return this.__internal_navigateToTaskIfAvailable();
     }
 
     if (si.status === 'needs_second_factor') {
@@ -1990,6 +2026,10 @@ export class Clerk implements ClerkInterface {
 
     if (su.externalAccountStatus === 'verified' && su.status === 'missing_requirements') {
       return navigateToNextStepSignUp({ missingFields: signUp.missingFields });
+    }
+
+    if (this.__internal_hasAfterAuthFlows) {
+      return this.__internal_navigateToTaskIfAvailable({ redirectUrlComplete: redirectUrls.getAfterSignInUrl() });
     }
 
     return navigateToSignIn();
@@ -2609,7 +2649,9 @@ export class Clerk implements ClerkInterface {
       }
       this.#touchThrottledUntil = Date.now() + 5_000;
 
-      void this.#touchCurrentSession(this.session);
+      if (this.#options.touchSession) {
+        void this.#touchCurrentSession(this.session);
+      }
     });
 
     /**
@@ -2640,7 +2682,7 @@ export class Clerk implements ClerkInterface {
 
   // TODO: Be more conservative about touches. Throttle, don't touch when only one user, etc
   #touchCurrentSession = async (session?: SignedInSessionResource | null): Promise<void> => {
-    if (!session || !this.#options.touchSession) {
+    if (!session) {
       return Promise.resolve();
     }
 

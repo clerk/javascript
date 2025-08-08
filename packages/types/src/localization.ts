@@ -186,6 +186,7 @@ export type __internal_LocalizationResource = {
     defaultFreePlanActive: LocalizationValue;
     viewFeatures: LocalizationValue;
     seeAllFeatures: LocalizationValue;
+    viewPayment: LocalizationValue;
     availableFeatures: LocalizationValue;
     subtotal: LocalizationValue;
     credit: LocalizationValue;
@@ -1203,6 +1204,28 @@ export type __internal_LocalizationResource = {
     formFieldCaption__expiration__never: LocalizationValue;
     formFieldCaption__expiration__expiresOn: LocalizationValue<'date'>;
   };
+  taskChooseOrganization: {
+    title: LocalizationValue;
+    subtitle: LocalizationValue;
+    signOut: {
+      actionText: LocalizationValue<'identifier'>;
+      actionLink: LocalizationValue;
+    };
+    createOrganization: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      formButtonSubmit: LocalizationValue;
+      formButtonReset: LocalizationValue;
+    };
+    chooseOrganization: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      suggestionsAcceptedLabel: LocalizationValue;
+      action__suggestionsAccept: LocalizationValue;
+      action__createOrganization: LocalizationValue;
+      action__invitationAccept: LocalizationValue;
+    };
+  };
 };
 
 type WithParamName<T> = T &
@@ -1227,6 +1250,9 @@ type UnstableErrors = WithParamName<{
   form_username_invalid_character: LocalizationValue;
   form_param_format_invalid: LocalizationValue;
   form_param_format_invalid__email_address: LocalizationValue;
+  form_param_type_invalid: LocalizationValue;
+  form_param_type_invalid__phone_number: LocalizationValue;
+  form_param_type_invalid__email_address: LocalizationValue;
   form_password_length_too_short: LocalizationValue;
   form_param_nil: LocalizationValue;
   form_code_incorrect: LocalizationValue;

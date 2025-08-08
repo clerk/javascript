@@ -205,17 +205,15 @@ describe('Clerk singleton', () => {
         expect(mockSession.touch).toHaveBeenCalled();
       });
 
-      it('does not call session.touch if Clerk was initialised with touchSession set to false', async () => {
-        mockSession.touch.mockReturnValueOnce(Promise.resolve());
-        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
-        mockSession.getToken.mockResolvedValue('mocked-token');
+      describe('with `touchSession` set to false', () => {
+        it('calls session.touch by default outside of focus window event', async () => {
+          mockSession.touch.mockReturnValue(Promise.resolve());
+          mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
 
-        const sut = new Clerk(productionPublishableKey);
-        await sut.load({ touchSession: false });
-        await sut.setActive({ session: mockSession as any as ActiveSessionResource });
-        await waitFor(() => {
-          expect(mockSession.touch).not.toHaveBeenCalled();
-          expect(mockSession.getToken).toHaveBeenCalled();
+          const sut = new Clerk(productionPublishableKey);
+          await sut.load({ touchSession: false });
+          await sut.setActive({ session: mockSession as any as ActiveSessionResource });
+          expect(mockSession.touch).toHaveBeenCalled();
         });
       });
 
@@ -485,17 +483,17 @@ describe('Clerk singleton', () => {
         touch: jest.fn(() => Promise.resolve()),
         getToken: jest.fn(),
         lastActiveToken: { getRawString: () => 'mocked-token' },
-        tasks: [{ key: 'select-organization' }],
-        currentTask: { key: 'select-organization', __internal_getUrl: () => 'https://sut/tasks/select-organization' },
+        tasks: [{ key: 'choose-organization' }],
+        currentTask: { key: 'choose-organization', __internal_getUrl: () => 'https://sut/tasks/choose-organization' },
         reload: jest.fn(() =>
           Promise.resolve({
             id: '1',
             status: 'pending',
             user: {},
-            tasks: [{ key: 'select-organization' }],
+            tasks: [{ key: 'choose-organization' }],
             currentTask: {
-              key: 'select-organization',
-              __internal_getUrl: () => 'https://sut/tasks/select-organization',
+              key: 'choose-organization',
+              __internal_getUrl: () => 'https://sut/tasks/choose-organization',
             },
           }),
         ),
@@ -524,20 +522,6 @@ describe('Clerk singleton', () => {
         await sut.load();
         await sut.setActive({ session: mockSession as any as ActiveSessionResource });
         expect(mockSession.touch).toHaveBeenCalled();
-      });
-
-      it('does not call session.touch if Clerk was initialised with touchSession set to false', async () => {
-        mockSession.touch.mockReturnValueOnce(Promise.resolve());
-        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
-        mockSession.getToken.mockResolvedValue('mocked-token');
-
-        const sut = new Clerk(productionPublishableKey);
-        await sut.load({ touchSession: false });
-        await sut.setActive({ session: mockSession as any as ActiveSessionResource });
-        await waitFor(() => {
-          expect(mockSession.touch).not.toHaveBeenCalled();
-          expect(mockSession.getToken).toHaveBeenCalled();
-        });
       });
     });
 
@@ -921,6 +905,120 @@ describe('Clerk singleton', () => {
     beforeEach(() => {
       mockClientFetch.mockReset();
       mockEnvironmentFetch.mockReset();
+    });
+
+    describe('with after-auth flows', () => {
+      beforeEach(() => {
+        mockClientFetch.mockReset();
+        mockEnvironmentFetch.mockReturnValue(
+          Promise.resolve({
+            userSettings: mockUserSettings,
+            displayConfig: mockDisplayConfig,
+            isSingleSession: () => false,
+            isProduction: () => false,
+            isDevelopmentOrStaging: () => true,
+            organizationSettings: {
+              forceOrganizationSelection: true,
+            },
+          }),
+        );
+      });
+
+      it('redirects to pending task', async () => {
+        const mockSession = {
+          id: '1',
+          status: 'pending',
+          user: {},
+          tasks: [{ key: 'choose-organization' }],
+          currentTask: { key: 'choose-organization', __internal_getUrl: () => 'https://sut/tasks/choose-organization' },
+          lastActiveToken: { getRawString: () => 'mocked-token' },
+        };
+
+        const mockResource = {
+          ...mockSession,
+          remove: jest.fn(),
+          touch: jest.fn(() => Promise.resolve()),
+          getToken: jest.fn(),
+          reload: jest.fn(() => Promise.resolve(mockSession)),
+        };
+
+        mockResource.touch.mockReturnValueOnce(Promise.resolve());
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({
+            signedInSessions: [mockResource],
+            signIn: new SignIn(null),
+            signUp: new SignUp({
+              status: 'complete',
+            } as any as SignUpJSON),
+            isEligibleForTouch: () => false,
+          }),
+        );
+
+        const mockSetActive = jest.fn();
+        const mockSignUpCreate = jest
+          .fn()
+          .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load(mockedLoadOptions);
+        if (!sut.client) {
+          fail('we should always have a client');
+        }
+        sut.client.signUp.create = mockSignUpCreate;
+        sut.setActive = mockSetActive;
+
+        await sut.handleRedirectCallback();
+
+        await waitFor(() => {
+          expect(mockNavigate.mock.calls[0][0]).toBe('/sign-in#/tasks/choose-organization');
+        });
+      });
+
+      it('redirects to after sign-in URL when task has been resolved', async () => {
+        const mockSession = {
+          id: '1',
+          status: 'active',
+          user: {},
+          lastActiveToken: { getRawString: () => 'mocked-token' },
+        };
+
+        const mockResource = {
+          ...mockSession,
+          remove: jest.fn(),
+          touch: jest.fn(() => Promise.resolve()),
+          getToken: jest.fn(),
+          reload: jest.fn(() => Promise.resolve(mockSession)),
+        };
+
+        mockResource.touch.mockReturnValueOnce(Promise.resolve());
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({
+            signedInSessions: [mockResource],
+            signIn: new SignIn(null),
+            signUp: new SignUp(null),
+            isEligibleForTouch: () => false,
+          }),
+        );
+
+        const mockSetActive = jest.fn();
+        const mockSignUpCreate = jest
+          .fn()
+          .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load(mockedLoadOptions);
+        if (!sut.client) {
+          fail('we should always have a client');
+        }
+        sut.client.signUp.create = mockSignUpCreate;
+        sut.setActive = mockSetActive;
+
+        await sut.handleRedirectCallback();
+
+        await waitFor(() => {
+          expect(mockNavigate.mock.calls[0][0]).toBe('/');
+        });
+      });
     });
 
     it('creates a new user and calls setActive if the user was not found during sso signup', async () => {
@@ -2340,8 +2438,8 @@ describe('Clerk singleton', () => {
         id: '1',
         status: 'pending',
         user: {},
-        tasks: [{ key: 'select-organization' }],
-        currentTask: { key: 'select-organization', __internal_getUrl: () => 'https://sut/tasks/select-organization' },
+        tasks: [{ key: 'choose-organization' }],
+        currentTask: { key: 'choose-organization', __internal_getUrl: () => 'https://sut/tasks/choose-organization' },
         lastActiveToken: { getRawString: () => 'mocked-token' },
       };
 
@@ -2355,7 +2453,12 @@ describe('Clerk singleton', () => {
 
       beforeEach(() => {
         mockResource.touch.mockReturnValueOnce(Promise.resolve());
-        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockResource] }));
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({
+            signedInSessions: [mockResource],
+            isEligibleForTouch: () => false,
+          }),
+        );
       });
 
       afterEach(() => {
@@ -2370,7 +2473,7 @@ describe('Clerk singleton', () => {
         await sut.setActive({ session: mockResource as any as PendingSessionResource });
         await sut.__internal_navigateToTaskIfAvailable();
 
-        expect(mockNavigate.mock.calls[0][0]).toBe('/sign-in#/tasks/select-organization');
+        expect(mockNavigate.mock.calls[0][0]).toBe('/sign-in#/tasks/choose-organization');
       });
 
       it('navigates to next task with custom routing from clerk options', async () => {
@@ -2378,14 +2481,14 @@ describe('Clerk singleton', () => {
         await sut.load({
           ...mockedLoadOptions,
           taskUrls: {
-            'select-organization': '/onboarding/select-organization',
+            'choose-organization': '/onboarding/choose-organization',
           },
         });
 
         await sut.setActive({ session: mockResource as any as PendingSessionResource });
         await sut.__internal_navigateToTaskIfAvailable();
 
-        expect(mockNavigate.mock.calls[0][0]).toBe('/onboarding/select-organization');
+        expect(mockNavigate.mock.calls[0][0]).toBe('/onboarding/choose-organization');
       });
     });
 
@@ -2420,7 +2523,12 @@ describe('Clerk singleton', () => {
 
       it('navigates to redirect url on completion', async () => {
         mockSession.touch.mockReturnValue(Promise.resolve());
-        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({
+            signedInSessions: [mockSession],
+            isEligibleForTouch: () => false,
+          }),
+        );
 
         const sut = new Clerk(productionPublishableKey);
         await sut.load(mockedLoadOptions);

@@ -1,5 +1,55 @@
 # Change Log
 
+## 1.8.11
+
+### Patch Changes
+
+- Introduce `TaskChooseOrganization` component which replaces `TaskSelectOrganization` with a new UI that make the experience similar to the previous `SignIn` and `SignUp` steps ([#6446](https://github.com/clerk/javascript/pull/6446)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Add ability to define a machine secret key to Clerk BAPI client function ([#6479](https://github.com/clerk/javascript/pull/6479)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  ```ts
+  const clerkClient = createClerkClient({ machineSecretKey: 'ak_xxxxx' })
+
+  clerkClient.m2mTokens.create({...})
+  ```
+
+- Updated dependencies [[`1ad16da`](https://github.com/clerk/javascript/commit/1ad16daa49795a861ae277001831230580b6b9f4), [`4edef81`](https://github.com/clerk/javascript/commit/4edef81dd423a0471e3f579dd6b36094aa8546aa), [`6ff416f`](https://github.com/clerk/javascript/commit/6ff416f4b35fc01ba7dca61abe4698d7d1460dee), [`e82f177`](https://github.com/clerk/javascript/commit/e82f1775de889eb9cac444cb26b69fb5de1e2d05), [`696f8e1`](https://github.com/clerk/javascript/commit/696f8e11a3e5391e6b5a97d98e929b8973575b9a), [`f318d22`](https://github.com/clerk/javascript/commit/f318d22cf83caaef272bcf532561a03ca72575e7), [`0d27281`](https://github.com/clerk/javascript/commit/0d272815b216f7a7538b5633cb397d6cd2695b73), [`1cc66ab`](https://github.com/clerk/javascript/commit/1cc66aba1c0adac24323876e4cc3d96be888b07b)]:
+  - @clerk/clerk-react@5.40.0
+  - @clerk/types@4.74.0
+  - @clerk/backend@2.7.0
+  - @clerk/shared@3.18.1
+
+## 1.8.10
+
+### Patch Changes
+
+- Updated dependencies [[`9368daf`](https://github.com/clerk/javascript/commit/9368dafb119b5a8ec6a9d6d82270e72bab6d8f1e), [`f93965f`](https://github.com/clerk/javascript/commit/f93965f64c81030f9fcf9d1cc4e4984d30cd12ec), [`7b6dcee`](https://github.com/clerk/javascript/commit/7b6dceea5bfd7f1cc1bf24126aa715307e24ae7f), [`ef87617`](https://github.com/clerk/javascript/commit/ef87617ae1fd125c806a33bfcfdf09c885319fa8)]:
+  - @clerk/shared@3.18.0
+  - @clerk/clerk-react@5.39.0
+  - @clerk/types@4.73.0
+  - @clerk/backend@2.6.3
+
+## 1.8.9
+
+### Patch Changes
+
+- Updated dependencies [[`7a46679`](https://github.com/clerk/javascript/commit/7a46679a004739a7f712097c5779e9f5c068722e), [`05cc5ec`](https://github.com/clerk/javascript/commit/05cc5ecd82ecdbcc9922d3286224737a81813be0), [`22c35ef`](https://github.com/clerk/javascript/commit/22c35efb59226df2efaa2891fa4775c13312f4c6), [`8c7e5bb`](https://github.com/clerk/javascript/commit/8c7e5bb887e95e38a186a18609dd6fc93b6a3cda), [`e8d816a`](https://github.com/clerk/javascript/commit/e8d816a3350e862c3e9e1d4f8c96c047a0a016a2), [`aa9f185`](https://github.com/clerk/javascript/commit/aa9f185e21b58f8a6e03ea44ce29ee09ad2477d9), [`af0e123`](https://github.com/clerk/javascript/commit/af0e12393c9412281626e20dafb1b3a15558f6d9), [`241bbbd`](https://github.com/clerk/javascript/commit/241bbbd5ad3915419fe222861a2eeb0132a294e0), [`3d1d871`](https://github.com/clerk/javascript/commit/3d1d8711405646cf3c2aabe99e08337a1028703a)]:
+  - @clerk/shared@3.17.0
+  - @clerk/clerk-react@5.38.1
+  - @clerk/types@4.72.0
+  - @clerk/backend@2.6.2
+
+## 1.8.8
+
+### Patch Changes
+
+- Updated dependencies [[`e404456`](https://github.com/clerk/javascript/commit/e4044566bca81f63c8e9c630fdec0f498ad6fc08), [`2803133`](https://github.com/clerk/javascript/commit/28031330a9810946feb44b93be10c067fb3b63ba), [`f1d9d34`](https://github.com/clerk/javascript/commit/f1d9d3482a796dd5f7796ede14159850e022cba2), [`0bdd0df`](https://github.com/clerk/javascript/commit/0bdd0dfdae49e2548081e68767addf9065b2b8f9), [`d58b959`](https://github.com/clerk/javascript/commit/d58b9594cf65158e87dbaa90d632c45f543373e1), [`232d7d3`](https://github.com/clerk/javascript/commit/232d7d37cd1bc2a4e106f1972dc395373502168d), [`f6375f0`](https://github.com/clerk/javascript/commit/f6375f01e8d8a06e12d4a71285912e9dda7b6f20), [`822ba1f`](https://github.com/clerk/javascript/commit/822ba1fd5e7daf665120cf183e4600a227098d53), [`af615b8`](https://github.com/clerk/javascript/commit/af615b89838e46bd441d41da6a6dde29e3edf595), [`d4d2612`](https://github.com/clerk/javascript/commit/d4d2612483baf356c389ef0ba5084059025481f2)]:
+  - @clerk/types@4.71.0
+  - @clerk/shared@3.16.0
+  - @clerk/backend@2.6.1
+  - @clerk/clerk-react@5.38.0
+
 ## 1.8.7
 
 ### Patch Changes

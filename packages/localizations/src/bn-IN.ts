@@ -154,6 +154,7 @@ export const bnIN: LocalizationResource = {
     totalDue: undefined,
     totalDueToday: undefined,
     viewFeatures: undefined,
+    viewPayment: undefined,
     year: undefined,
   },
   createOrganization: {
@@ -812,6 +813,9 @@ export const bnIN: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'নামের শেষ অংশ ২৫৬ অক্ষরের বেশি হওয়া উচিত নয়।',
     form_param_max_length_exceeded__name: 'নাম ২৫৬ অক্ষরের বেশি হওয়া উচিত নয়।',
     form_param_nil: 'এই ক্ষেত্রটি প্রয়োজনীয় এবং খালি রাখা যাবে না।',
+    form_param_type_invalid: undefined,
+    form_param_type_invalid__email_address: undefined,
+    form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'লেখা মানটি অবৈধ। দয়া করে এটি সংশোধন করুন।',
     form_password_incorrect: 'আপনি যে পাসওয়ার্ড লিখেছেন তা ভুল। দয়া করে আবার চেষ্টা করুন।',
     form_password_length_too_short: 'আপনার পাসওয়ার্ড খুব ছোট। এটি কমপক্ষে ৮ অক্ষর দীর্ঘ হতে হবে।',

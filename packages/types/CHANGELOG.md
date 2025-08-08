@@ -1,5 +1,69 @@
 # Change Log
 
+## 4.74.0
+
+### Minor Changes
+
+- [Billing Beta] Update `PlanDetailsProps` to reflect that either `planId` or `plan` is allowed. ([#6472](https://github.com/clerk/javascript/pull/6472)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Introduce `TaskChooseOrganization` component which replaces `TaskSelectOrganization` with a new UI that make the experience similar to the previous `SignIn` and `SignUp` steps ([#6446](https://github.com/clerk/javascript/pull/6446)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- [Experimental] Signals ([#6450](https://github.com/clerk/javascript/pull/6450)) by [@dstaley](https://github.com/dstaley)
+
+- Rename task key from `select-organization` to `choose-organization` ([#6482](https://github.com/clerk/javascript/pull/6482)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+## 4.73.0
+
+### Minor Changes
+
+- [Billing Beta] Update checkout.status type to be `'needs_confirmation' | 'completed'` instead of `string`. ([#6474](https://github.com/clerk/javascript/pull/6474)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Add types for `form_param_type_invalid` errors. ([#6457](https://github.com/clerk/javascript/pull/6457)) by [@dstaley](https://github.com/dstaley)
+
+## 4.72.0
+
+### Minor Changes
+
+- [Billing Beta]: Update prefix for checkout status ([#6438](https://github.com/clerk/javascript/pull/6438)) by [@panteliselef](https://github.com/panteliselef)
+
+  Replaces `awaiting_` with `needs_`.
+
+- [Billing Beta] Remove `statement_id` from the checkout resource. ([#6437](https://github.com/clerk/javascript/pull/6437)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Fix `UseSessionReturn['session']` JSDocs to not mention active status, since pending sessions are also returned ([#6430](https://github.com/clerk/javascript/pull/6430)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Remove `treatPendingAsSignedOut` from `useSession` and always return pending session ([#6432](https://github.com/clerk/javascript/pull/6432)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Refactor billing statement page and payment attempt page data loading ([#6420](https://github.com/clerk/javascript/pull/6420)) by [@aeliox](https://github.com/aeliox)
+
+## 4.71.0
+
+### Minor Changes
+
+- [Billing Beta]: Replace `org` for `organization` as payer type for billing APIs. ([#6423](https://github.com/clerk/javascript/pull/6423)) by [@panteliselef](https://github.com/panteliselef)
+
+  This applies for all billing APIs, except the resources classes that represent data from Frontend API.
+
+- Refactor base theme approach to enable opting into simple theme. ([#6371](https://github.com/clerk/javascript/pull/6371)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  ```tsx
+  appearance={{
+    theme: 'simple' // removes Clerk base theme
+  }}
+  ```
+
+### Patch Changes
+
+- Update JSDocs for `SessionTask` to align with Clerk documentation ([#6396](https://github.com/clerk/javascript/pull/6396)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Make `.finalize()` from useCheckout to return a Promise. ([#6422](https://github.com/clerk/javascript/pull/6422)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 4.70.1
 
 ### Patch Changes

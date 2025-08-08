@@ -156,6 +156,7 @@ export const frFR: LocalizationResource = {
     totalDue: undefined,
     totalDueToday: "Total dû aujourd'hui",
     viewFeatures: 'Voir les fonctionnalités',
+    viewPayment: undefined,
     year: 'An',
   },
   createOrganization: {
@@ -816,6 +817,9 @@ export const frFR: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'Le nom ne doit pas dépasser 256 caractères.',
     form_param_max_length_exceeded__name: 'Le nom ne doit pas dépasser 256 caractères.',
     form_param_nil: 'Ce champ est requis.',
+    form_param_type_invalid: undefined,
+    form_param_type_invalid__email_address: undefined,
+    form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'La valeur fournie est invalide.',
     form_password_incorrect: 'Mot de passe incorrect',
     form_password_length_too_short: 'Votre mot de passe est trop court.',

@@ -1,5 +1,113 @@
 # Change Log
 
+## 5.81.0
+
+### Minor Changes
+
+- [Billing Beta] Update `PlanDetailsProps` to reflect that either `planId` or `plan` is allowed. ([#6472](https://github.com/clerk/javascript/pull/6472)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Introduce `TaskChooseOrganization` component which replaces `TaskSelectOrganization` with a new UI that make the experience similar to the previous `SignIn` and `SignUp` steps ([#6446](https://github.com/clerk/javascript/pull/6446)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- [Experimental] Signals ([#6450](https://github.com/clerk/javascript/pull/6450)) by [@dstaley](https://github.com/dstaley)
+
+- Rename task key from `select-organization` to `choose-organization` ([#6482](https://github.com/clerk/javascript/pull/6482)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`1ad16da`](https://github.com/clerk/javascript/commit/1ad16daa49795a861ae277001831230580b6b9f4), [`4edef81`](https://github.com/clerk/javascript/commit/4edef81dd423a0471e3f579dd6b36094aa8546aa), [`696f8e1`](https://github.com/clerk/javascript/commit/696f8e11a3e5391e6b5a97d98e929b8973575b9a), [`f318d22`](https://github.com/clerk/javascript/commit/f318d22cf83caaef272bcf532561a03ca72575e7), [`1cc66ab`](https://github.com/clerk/javascript/commit/1cc66aba1c0adac24323876e4cc3d96be888b07b)]:
+  - @clerk/localizations@3.20.8
+  - @clerk/types@4.74.0
+  - @clerk/shared@3.18.1
+
+## 5.80.0
+
+### Minor Changes
+
+- [Billing Beta] Update checkout.status type to be `'needs_confirmation' | 'completed'` instead of `string`. ([#6474](https://github.com/clerk/javascript/pull/6474)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- [Billing Beta] Stricter return type of `useCheckout` to improve inference of other properties. ([#6473](https://github.com/clerk/javascript/pull/6473)) by [@panteliselef](https://github.com/panteliselef)
+
+- Guard against navigation to root sign-in route during `setActive` in `SignInFactorOne` ([#6462](https://github.com/clerk/javascript/pull/6462)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Fix invalid DOM element prop being passed down to Input ([#6458](https://github.com/clerk/javascript/pull/6458)) by [@jacekradko](https://github.com/jacekradko)
+
+- Fix iframe detetction and ensure we prefer the oauth popup flow when in an iframe. ([#6455](https://github.com/clerk/javascript/pull/6455)) by [@brkalow](https://github.com/brkalow)
+
+- Fix multi-session navigation for hash routing ([#6461](https://github.com/clerk/javascript/pull/6461)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Fix `touchSession` option to only affect session touch behavior to window focus events. ([#6444](https://github.com/clerk/javascript/pull/6444)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  Previously, when `touchSession: false` was provided, it incorrectly prevented session touching during `setActive()` calls when switching sessions or selecting organizations.
+
+- Updated dependencies [[`9368daf`](https://github.com/clerk/javascript/commit/9368dafb119b5a8ec6a9d6d82270e72bab6d8f1e), [`f93965f`](https://github.com/clerk/javascript/commit/f93965f64c81030f9fcf9d1cc4e4984d30cd12ec), [`7b6dcee`](https://github.com/clerk/javascript/commit/7b6dceea5bfd7f1cc1bf24126aa715307e24ae7f), [`ef87617`](https://github.com/clerk/javascript/commit/ef87617ae1fd125c806a33bfcfdf09c885319fa8)]:
+  - @clerk/shared@3.18.0
+  - @clerk/localizations@3.20.7
+  - @clerk/types@4.73.0
+
+## 5.79.0
+
+### Minor Changes
+
+- [Billing Beta]: Update prefix for checkout status ([#6438](https://github.com/clerk/javascript/pull/6438)) by [@panteliselef](https://github.com/panteliselef)
+
+  Replaces `awaiting_` with `needs_`.
+
+- [Billing Beta] Remove `statement_id` from the checkout resource. ([#6437](https://github.com/clerk/javascript/pull/6437)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Add `inputmode="email"` to email fields to help prompt mobile devices to use a virtual keyboard optimized for entering email addresses. ([#6440](https://github.com/clerk/javascript/pull/6440)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix TelemetryCollector logic for clerk-js in browser to properly populate sdkMetadata for telemetry events. ([#6448](https://github.com/clerk/javascript/pull/6448)) by [@panteliselef](https://github.com/panteliselef)
+
+- Display alert on plan details error ([#6384](https://github.com/clerk/javascript/pull/6384)) by [@panteliselef](https://github.com/panteliselef)
+
+- Added proper type checking before using the in operator to prevent errors when modal state contains non-object values ([#6433](https://github.com/clerk/javascript/pull/6433)) by [@jacekradko](https://github.com/jacekradko)
+
+- Refactor billing statement page and payment attempt page data loading ([#6420](https://github.com/clerk/javascript/pull/6420)) by [@aeliox](https://github.com/aeliox)
+
+- Added temporary patch for API keys pagination compatibility ([#6451](https://github.com/clerk/javascript/pull/6451)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fix SSO callback for after-auth custom flows ([#6430](https://github.com/clerk/javascript/pull/6430)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`7a46679`](https://github.com/clerk/javascript/commit/7a46679a004739a7f712097c5779e9f5c068722e), [`05cc5ec`](https://github.com/clerk/javascript/commit/05cc5ecd82ecdbcc9922d3286224737a81813be0), [`22c35ef`](https://github.com/clerk/javascript/commit/22c35efb59226df2efaa2891fa4775c13312f4c6), [`c69de58`](https://github.com/clerk/javascript/commit/c69de58d7c01257eedc0ffe5162c91c5a8daeef6), [`e8d816a`](https://github.com/clerk/javascript/commit/e8d816a3350e862c3e9e1d4f8c96c047a0a016a2), [`aa9f185`](https://github.com/clerk/javascript/commit/aa9f185e21b58f8a6e03ea44ce29ee09ad2477d9), [`af0e123`](https://github.com/clerk/javascript/commit/af0e12393c9412281626e20dafb1b3a15558f6d9), [`3d1d871`](https://github.com/clerk/javascript/commit/3d1d8711405646cf3c2aabe99e08337a1028703a)]:
+  - @clerk/shared@3.17.0
+  - @clerk/types@4.72.0
+  - @clerk/localizations@3.20.6
+
+## 5.78.0
+
+### Minor Changes
+
+- [Billing Beta]: Replace `org` for `organization` as payer type for billing APIs. ([#6423](https://github.com/clerk/javascript/pull/6423)) by [@panteliselef](https://github.com/panteliselef)
+
+  This applies for all billing APIs, except the resources classes that represent data from Frontend API.
+
+- Refactor base theme approach to enable opting into simple theme. ([#6371](https://github.com/clerk/javascript/pull/6371)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  ```tsx
+  appearance={{
+    theme: 'simple' // removes Clerk base theme
+  }}
+  ```
+
+### Patch Changes
+
+- Fixes an issue where cookies were not properly cleared on sign out when using non-default cookie attributes. ([#6368](https://github.com/clerk/javascript/pull/6368)) by [@brkalow](https://github.com/brkalow)
+
+- Make `.finalize()` from useCheckout to return a Promise. ([#6422](https://github.com/clerk/javascript/pull/6422)) by [@panteliselef](https://github.com/panteliselef)
+
+- Fix server-side session cache not being invalidated for after-auth custom flows ([#6425](https://github.com/clerk/javascript/pull/6425)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Improve CLS when PaymentElement mounts in Checkout. ([#6387](https://github.com/clerk/javascript/pull/6387)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`e404456`](https://github.com/clerk/javascript/commit/e4044566bca81f63c8e9c630fdec0f498ad6fc08), [`2803133`](https://github.com/clerk/javascript/commit/28031330a9810946feb44b93be10c067fb3b63ba), [`f1d9d34`](https://github.com/clerk/javascript/commit/f1d9d3482a796dd5f7796ede14159850e022cba2), [`d58b959`](https://github.com/clerk/javascript/commit/d58b9594cf65158e87dbaa90d632c45f543373e1), [`822ba1f`](https://github.com/clerk/javascript/commit/822ba1fd5e7daf665120cf183e4600a227098d53), [`d4d2612`](https://github.com/clerk/javascript/commit/d4d2612483baf356c389ef0ba5084059025481f2)]:
+  - @clerk/types@4.71.0
+  - @clerk/shared@3.16.0
+  - @clerk/localizations@3.20.5
+
 ## 5.77.0
 
 ### Minor Changes

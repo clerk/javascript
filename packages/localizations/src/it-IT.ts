@@ -160,6 +160,7 @@ export const itIT: LocalizationResource = {
     totalDue: 'Totale dovuto',
     totalDueToday: 'Totale dovuto oggi',
     viewFeatures: 'Visualizza funzionalità',
+    viewPayment: undefined,
     year: 'Anno',
   },
   createOrganization: {
@@ -814,6 +815,9 @@ export const itIT: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'Il cognome non deve superare i 256 caratteri.',
     form_param_max_length_exceeded__name: 'Il nome non deve superare i 256 caratteri.',
     form_param_nil: 'Questo campo è obbligatorio.',
+    form_param_type_invalid: undefined,
+    form_param_type_invalid__email_address: undefined,
+    form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Valore non valido.',
     form_password_incorrect: 'Password errata.',
     form_password_length_too_short: 'La password deve avere almeno 8 caratteri.',

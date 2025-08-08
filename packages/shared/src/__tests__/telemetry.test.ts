@@ -150,6 +150,38 @@ describe('TelemetryCollector', () => {
     expect(fetchSpy).toHaveBeenCalled();
   });
 
+  test('events are isolated between batches (no shared buffer reference)', () => {
+    const collector = new TelemetryCollector({
+      maxBufferSize: 2,
+      publishableKey: TEST_PK,
+    });
+    const capturedBatches: TelemetryEvent[] = [];
+
+    fetchSpy.mockImplementation((_, options) => {
+      capturedBatches.push(JSON.parse(options.body).events);
+      return Promise.resolve({ ok: true });
+    });
+
+    // First batch
+    collector.record({ event: 'A', payload: { id: 1 } });
+    collector.record({ event: 'B', payload: { id: 2 } });
+
+    // Second batch
+    collector.record({ event: 'C', payload: { id: 3 } });
+    collector.record({ event: 'D', payload: { id: 4 } });
+
+    // If there's a closure leak, events might be mixed or duplicated
+    expect(capturedBatches[0]).toEqual([
+      expect.objectContaining({ event: 'A', payload: { id: 1 } }),
+      expect.objectContaining({ event: 'B', payload: { id: 2 } }),
+    ]);
+
+    expect(capturedBatches[1]).toEqual([
+      expect.objectContaining({ event: 'C', payload: { id: 3 } }),
+      expect.objectContaining({ event: 'D', payload: { id: 4 } }),
+    ]);
+  });
+
   describe('with server-side sampling', () => {
     test('does not send events if the random seed does not exceed the event-specific sampling rate', async () => {
       windowSpy.mockImplementation(() => undefined);

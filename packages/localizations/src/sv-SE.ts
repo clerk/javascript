@@ -154,6 +154,7 @@ export const svSE: LocalizationResource = {
     totalDue: undefined,
     totalDueToday: undefined,
     viewFeatures: undefined,
+    viewPayment: undefined,
     year: undefined,
   },
   createOrganization: {
@@ -809,6 +810,9 @@ export const svSE: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'Efternamnet får inte överskrida 256 tecken.',
     form_param_max_length_exceeded__name: 'Namnet får inte överskrida 256 tecken.',
     form_param_nil: 'Parametern får inte vara tom.',
+    form_param_type_invalid: undefined,
+    form_param_type_invalid__email_address: undefined,
+    form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: 'Lösenordet är felaktigt.',
     form_password_length_too_short: 'Lösenordet är för kort.',

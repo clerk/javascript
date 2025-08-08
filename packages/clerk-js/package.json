@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "5.77.0",
+  "version": "5.81.0",
   "description": "Clerk JS library",
   "keywords": [
     "clerk",
@@ -75,6 +75,7 @@
     "@swc/helpers": "^0.5.17",
     "@zxcvbn-ts/core": "3.0.4",
     "@zxcvbn-ts/language-common": "3.0.4",
+    "alien-signals": "2.0.6",
     "browser-tabs-lock": "1.3.0",
     "copy-to-clipboard": "3.3.3",
     "core-js": "3.41.0",
@@ -88,13 +89,13 @@
     "@clerk/testing": "workspace:^",
     "@emotion/jest": "^11.13.0",
     "@rsdoctor/rspack-plugin": "^0.4.13",
-    "@rspack/cli": "^1.4.9",
-    "@rspack/core": "^1.4.9",
+    "@rspack/cli": "^1.4.10",
+    "@rspack/core": "^1.4.10",
     "@rspack/plugin-react-refresh": "^1.4.3",
     "@svgr/webpack": "^6.5.1",
     "@swc/jest": "0.2.39",
     "@types/cloudflare-turnstile": "^0.2.2",
-    "@types/node": "^22.16.5",
+    "@types/node": "^22.17.0",
     "@types/webpack-env": "^1.18.8",
     "jsdom": "^24.1.3",
     "webpack-merge": "^5.10.0"

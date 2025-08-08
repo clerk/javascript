@@ -866,12 +866,11 @@ export interface CommerceCheckoutJSON extends ClerkResourceJSON {
   id: string;
   external_client_secret: string;
   external_gateway_id: string;
-  statement_id: string;
   payment_source?: CommercePaymentSourceJSON;
   plan: CommercePlanJSON;
   plan_period: CommerceSubscriptionPlanPeriod;
   plan_period_start?: number;
-  status: string;
+  status: 'needs_confirmation' | 'completed';
   totals: CommerceCheckoutTotalsJSON;
   is_immediate_plan_change: boolean;
 }
