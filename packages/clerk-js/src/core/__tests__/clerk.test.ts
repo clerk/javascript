@@ -444,6 +444,18 @@ describe('Clerk singleton', () => {
         expect(sut.navigate).toHaveBeenCalledWith('/redirect-url-path');
       });
 
+      it('calls `navigate`', async () => {
+        mockSession.touch.mockReturnValue(Promise.resolve());
+        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
+        const navigate = jest.fn();
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+        await sut.setActive({ session: mockSession as any as PendingSessionResource, navigate });
+        expect(mockSession.touch).toHaveBeenCalled();
+        expect(navigate).toHaveBeenCalled();
+      });
+
       mockNativeRuntime(() => {
         it('calls session.touch in a non-standard browser', async () => {
           mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
@@ -484,7 +496,7 @@ describe('Clerk singleton', () => {
         getToken: jest.fn(),
         lastActiveToken: { getRawString: () => 'mocked-token' },
         tasks: [{ key: 'choose-organization' }],
-        currentTask: { key: 'choose-organization', __internal_getUrl: () => 'https://sut/tasks/choose-organization' },
+        currentTask: { key: 'choose-organization' },
         reload: jest.fn(() =>
           Promise.resolve({
             id: '1',
@@ -493,7 +505,6 @@ describe('Clerk singleton', () => {
             tasks: [{ key: 'choose-organization' }],
             currentTask: {
               key: 'choose-organization',
-              __internal_getUrl: () => 'https://sut/tasks/choose-organization',
             },
           }),
         ),
@@ -524,33 +535,7 @@ describe('Clerk singleton', () => {
         expect(mockSession.touch).toHaveBeenCalled();
       });
 
-      it('calls `onPendingSession` from clerk options', async () => {
-        mockSession.touch.mockReturnValue(Promise.resolve());
-        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
-        const onPendingSession = jest.fn();
-
-        const sut = new Clerk(productionPublishableKey);
-        await sut.load({
-          onPendingSession,
-        });
-        await sut.setActive({ session: mockSession as any as PendingSessionResource });
-        expect(mockSession.touch).toHaveBeenCalled();
-        expect(onPendingSession).toHaveBeenCalled();
-      });
-
-      it('calls `onPendingSession` as argument', async () => {
-        mockSession.touch.mockReturnValue(Promise.resolve());
-        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
-        const onPendingSession = jest.fn();
-
-        const sut = new Clerk(productionPublishableKey);
-        await sut.load();
-        await sut.setActive({ session: mockSession as any as PendingSessionResource, onPendingSession });
-        expect(mockSession.touch).toHaveBeenCalled();
-        expect(onPendingSession).toHaveBeenCalled();
-      });
-
-      it('if `onPendingSession` is not defined, navigate to `taskUrl` option', async () => {
+      it('navigate to `taskUrl` option', async () => {
         mockSession.touch.mockReturnValue(Promise.resolve());
         mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
 
@@ -564,6 +549,18 @@ describe('Clerk singleton', () => {
         await sut.setActive({ session: mockSession as any as PendingSessionResource });
         expect(mockSession.touch).toHaveBeenCalled();
         expect(sut.navigate).toHaveBeenCalledWith('/choose-organization');
+      });
+
+      it('calls `navigate`', async () => {
+        mockSession.touch.mockReturnValue(Promise.resolve());
+        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
+        const navigate = jest.fn();
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+        await sut.setActive({ session: mockSession as any as PendingSessionResource, navigate });
+        expect(mockSession.touch).toHaveBeenCalled();
+        expect(navigate).toHaveBeenCalled();
       });
     });
 
@@ -972,7 +969,7 @@ describe('Clerk singleton', () => {
           status: 'pending',
           user: {},
           tasks: [{ key: 'choose-organization' }],
-          currentTask: { key: 'choose-organization', __internal_getUrl: () => 'https://sut/tasks/choose-organization' },
+          currentTask: { key: 'choose-organization' },
           lastActiveToken: { getRawString: () => 'mocked-token' },
         };
 
