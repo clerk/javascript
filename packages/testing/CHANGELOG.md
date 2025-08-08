@@ -1,5 +1,16 @@
 # @clerk/testing
 
+## 1.10.11
+
+### Patch Changes
+
+- Introduce `TaskChooseOrganization` component which replaces `TaskSelectOrganization` with a new UI that make the experience similar to the previous `SignIn` and `SignUp` steps ([#6446](https://github.com/clerk/javascript/pull/6446)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`1ad16da`](https://github.com/clerk/javascript/commit/1ad16daa49795a861ae277001831230580b6b9f4), [`4edef81`](https://github.com/clerk/javascript/commit/4edef81dd423a0471e3f579dd6b36094aa8546aa), [`6ff416f`](https://github.com/clerk/javascript/commit/6ff416f4b35fc01ba7dca61abe4698d7d1460dee), [`e82f177`](https://github.com/clerk/javascript/commit/e82f1775de889eb9cac444cb26b69fb5de1e2d05), [`696f8e1`](https://github.com/clerk/javascript/commit/696f8e11a3e5391e6b5a97d98e929b8973575b9a), [`f318d22`](https://github.com/clerk/javascript/commit/f318d22cf83caaef272bcf532561a03ca72575e7), [`0d27281`](https://github.com/clerk/javascript/commit/0d272815b216f7a7538b5633cb397d6cd2695b73), [`1cc66ab`](https://github.com/clerk/javascript/commit/1cc66aba1c0adac24323876e4cc3d96be888b07b)]:
+  - @clerk/types@4.74.0
+  - @clerk/backend@2.7.0
+  - @clerk/shared@3.18.1
+
 ## 1.10.10
 
 ### Patch Changes
