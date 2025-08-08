@@ -166,7 +166,11 @@ function SignUpStartInternal(): JSX.Element {
           handleComplete: () => {
             removeClerkQueryParam('__clerk_ticket');
             removeClerkQueryParam('__clerk_invitation_token');
-            return setActive({ session: signUp.createdSessionId, redirectUrl: afterSignUpUrl, onPendingSession });
+            return setActive({
+              session: signUp.createdSessionId,
+              redirectUrl: afterSignUpUrl,
+              navigate: onPendingSession,
+            });
           },
           navigate,
           oidcPrompt,
@@ -335,7 +339,7 @@ function SignUpStartInternal(): JSX.Element {
           verifyEmailPath: 'verify-email-address',
           verifyPhonePath: 'verify-phone-number',
           handleComplete: () =>
-            setActive({ session: res.createdSessionId, redirectUrl: afterSignUpUrl, onPendingSession }),
+            setActive({ session: res.createdSessionId, redirectUrl: afterSignUpUrl, navigate: onPendingSession }),
           navigate,
           redirectUrl,
           redirectUrlComplete,
