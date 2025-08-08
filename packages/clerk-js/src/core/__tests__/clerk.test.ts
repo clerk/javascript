@@ -474,7 +474,6 @@ describe('Clerk singleton', () => {
       });
     });
 
-    // TODO -> Refactor tests
     describe('with `pending` session status', () => {
       const mockSession = {
         id: '1',
@@ -521,12 +520,53 @@ describe('Clerk singleton', () => {
 
         const sut = new Clerk(productionPublishableKey);
         await sut.load();
-        await sut.setActive({ session: mockSession as any as ActiveSessionResource });
+        await sut.setActive({ session: mockSession as any as PendingSessionResource });
         expect(mockSession.touch).toHaveBeenCalled();
+      });
+
+      it('calls `onPendingSession` from clerk options', async () => {
+        mockSession.touch.mockReturnValue(Promise.resolve());
+        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
+        const onPendingSession = jest.fn();
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load({
+          onPendingSession,
+        });
+        await sut.setActive({ session: mockSession as any as PendingSessionResource });
+        expect(mockSession.touch).toHaveBeenCalled();
+        expect(onPendingSession).toHaveBeenCalled();
+      });
+
+      it('calls `onPendingSession` as argument', async () => {
+        mockSession.touch.mockReturnValue(Promise.resolve());
+        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
+        const onPendingSession = jest.fn();
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+        await sut.setActive({ session: mockSession as any as PendingSessionResource, onPendingSession });
+        expect(mockSession.touch).toHaveBeenCalled();
+        expect(onPendingSession).toHaveBeenCalled();
+      });
+
+      it('if `onPendingSession` is not defined, navigate to `taskUrl` option', async () => {
+        mockSession.touch.mockReturnValue(Promise.resolve());
+        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
+
+        const sut = new Clerk(productionPublishableKey);
+        sut.navigate = jest.fn();
+        await sut.load({
+          taskUrls: {
+            'choose-organization': '/choose-organization',
+          },
+        });
+        await sut.setActive({ session: mockSession as any as PendingSessionResource });
+        expect(mockSession.touch).toHaveBeenCalled();
+        expect(sut.navigate).toHaveBeenCalledWith('/choose-organization');
       });
     });
 
-    // TODO -> Refactor tests
     describe('with force organization selection enabled', () => {
       const mockSession = {
         id: '1',
@@ -909,7 +949,7 @@ describe('Clerk singleton', () => {
       mockEnvironmentFetch.mockReset();
     });
 
-    describe('with after-auth flows', () => {
+    describe('with pending session', () => {
       beforeEach(() => {
         mockClientFetch.mockReset();
         mockEnvironmentFetch.mockReturnValue(
@@ -926,7 +966,7 @@ describe('Clerk singleton', () => {
         );
       });
 
-      it('redirects to pending task', async () => {
+      it('navigates to task', async () => {
         const mockSession = {
           id: '1',
           status: 'pending',
@@ -956,7 +996,6 @@ describe('Clerk singleton', () => {
           }),
         );
 
-        const mockSetActive = jest.fn();
         const mockSignUpCreate = jest
           .fn()
           .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
@@ -967,58 +1006,11 @@ describe('Clerk singleton', () => {
           fail('we should always have a client');
         }
         sut.client.signUp.create = mockSignUpCreate;
-        sut.setActive = mockSetActive;
 
         await sut.handleRedirectCallback();
 
         await waitFor(() => {
           expect(mockNavigate.mock.calls[0][0]).toBe('/sign-in#/tasks/choose-organization');
-        });
-      });
-
-      it('redirects to after sign-in URL when task has been resolved', async () => {
-        const mockSession = {
-          id: '1',
-          status: 'active',
-          user: {},
-          lastActiveToken: { getRawString: () => 'mocked-token' },
-        };
-
-        const mockResource = {
-          ...mockSession,
-          remove: jest.fn(),
-          touch: jest.fn(() => Promise.resolve()),
-          getToken: jest.fn(),
-          reload: jest.fn(() => Promise.resolve(mockSession)),
-        };
-
-        mockResource.touch.mockReturnValueOnce(Promise.resolve());
-        mockClientFetch.mockReturnValue(
-          Promise.resolve({
-            signedInSessions: [mockResource],
-            signIn: new SignIn(null),
-            signUp: new SignUp(null),
-            isEligibleForTouch: () => false,
-          }),
-        );
-
-        const mockSetActive = jest.fn();
-        const mockSignUpCreate = jest
-          .fn()
-          .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
-
-        const sut = new Clerk(productionPublishableKey);
-        await sut.load(mockedLoadOptions);
-        if (!sut.client) {
-          fail('we should always have a client');
-        }
-        sut.client.signUp.create = mockSignUpCreate;
-        sut.setActive = mockSetActive;
-
-        await sut.handleRedirectCallback();
-
-        await waitFor(() => {
-          expect(mockNavigate.mock.calls[0][0]).toBe('/');
         });
       });
     });
@@ -2430,115 +2422,6 @@ describe('Clerk singleton', () => {
       expect(BaseResource._fetch).toHaveBeenCalledWith({
         method: 'GET',
         path: '/organizations/org_id',
-      });
-    });
-  });
-
-  describe('navigateToTask', () => {
-    describe('with `pending` session status', () => {
-      const mockSession = {
-        id: '1',
-        status: 'pending',
-        user: {},
-        tasks: [{ key: 'choose-organization' }],
-        currentTask: { key: 'choose-organization', __internal_getUrl: () => 'https://sut/tasks/choose-organization' },
-        lastActiveToken: { getRawString: () => 'mocked-token' },
-      };
-
-      const mockResource = {
-        ...mockSession,
-        remove: jest.fn(),
-        touch: jest.fn(() => Promise.resolve()),
-        getToken: jest.fn(),
-        reload: jest.fn(() => Promise.resolve(mockSession)),
-      };
-
-      beforeEach(() => {
-        mockResource.touch.mockReturnValueOnce(Promise.resolve());
-        mockClientFetch.mockReturnValue(
-          Promise.resolve({
-            signedInSessions: [mockResource],
-            isEligibleForTouch: () => false,
-          }),
-        );
-      });
-
-      afterEach(() => {
-        mockResource.remove.mockReset();
-        mockResource.touch.mockReset();
-      });
-
-      it('navigates to next task with default internal routing for AIOs', async () => {
-        const sut = new Clerk(productionPublishableKey);
-        await sut.load(mockedLoadOptions);
-
-        await sut.setActive({ session: mockResource as any as PendingSessionResource });
-
-        expect(mockNavigate.mock.calls[0][0]).toBe('/sign-in#/tasks/choose-organization');
-      });
-
-      it('navigates to next task with custom routing from clerk options', async () => {
-        const sut = new Clerk(productionPublishableKey);
-        await sut.load({
-          ...mockedLoadOptions,
-          taskUrls: {
-            'choose-organization': '/onboarding/choose-organization',
-          },
-        });
-
-        await sut.setActive({ session: mockResource as any as PendingSessionResource });
-
-        expect(mockNavigate.mock.calls[0][0]).toBe('/onboarding/choose-organization');
-      });
-    });
-
-    describe('with `active` session status', () => {
-      const mockSession = {
-        id: '1',
-        remove: jest.fn(),
-        status: 'active',
-        user: {},
-        touch: jest.fn(() => Promise.resolve()),
-        getToken: jest.fn(),
-        lastActiveToken: { getRawString: () => 'mocked-token' },
-        reload: jest.fn(() =>
-          Promise.resolve({
-            id: '1',
-            remove: jest.fn(),
-            status: 'active',
-            user: {},
-            touch: jest.fn(() => Promise.resolve()),
-            getToken: jest.fn(),
-            lastActiveToken: { getRawString: () => 'mocked-token' },
-          }),
-        ),
-      };
-
-      afterEach(() => {
-        mockSession.remove.mockReset();
-        mockSession.touch.mockReset();
-        (window as any).__unstable__onBeforeSetActive = null;
-        (window as any).__unstable__onAfterSetActive = null;
-      });
-
-      it('navigates to redirect url on completion', async () => {
-        mockSession.touch.mockReturnValue(Promise.resolve());
-        mockClientFetch.mockReturnValue(
-          Promise.resolve({
-            signedInSessions: [mockSession],
-            isEligibleForTouch: () => false,
-          }),
-        );
-
-        const sut = new Clerk(productionPublishableKey);
-        await sut.load(mockedLoadOptions);
-        await sut.setActive({ session: mockSession as any as ActiveSessionResource });
-
-        const redirectUrlComplete = '/welcome-to-app';
-
-        console.log(mockNavigate.mock.calls);
-
-        expect(mockNavigate.mock.calls[0][0]).toBe('/welcome-to-app');
       });
     });
   });
