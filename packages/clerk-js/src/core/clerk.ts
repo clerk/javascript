@@ -28,9 +28,9 @@ import type {
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
+  Clerk as ClerkInterface,
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
-  Clerk as ClerkInterface,
   ClerkOptions,
   ClientJSONSnapshot,
   ClientResource,
@@ -428,10 +428,6 @@ export class Clerk implements ClerkInterface {
     });
 
     assertNoLegacyProp(this.#options);
-
-    if (this.__internal_hasAfterAuthFlows) {
-      warnNoTaskOptions(this.#options);
-    }
 
     if (this.#options.sdkMetadata) {
       Clerk.sdkMetadata = this.#options.sdkMetadata;
@@ -1268,6 +1264,10 @@ export class Clerk implements ClerkInterface {
       }
 
       if (newSession?.status === 'pending') {
+        warnNoTaskOptions({
+          ...this.#options,
+          onPendingSession: this.#options['onPendingSession'] ?? onPendingSession,
+        });
         await this.#handlePendingSession(newSession, onPendingSession);
         return;
       }
@@ -1362,7 +1362,7 @@ export class Clerk implements ClerkInterface {
     if (currentSession.status === 'pending') {
       const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
 
-      const onPendingSessionHook = this.#options['onPendingSession'] ?? onPendingSession;
+      const onPendingSessionHook = onPendingSession ?? this.#options['onPendingSession'];
       const taskUrls = this.#options['taskUrls'];
 
       await tracker.track(async () => {
