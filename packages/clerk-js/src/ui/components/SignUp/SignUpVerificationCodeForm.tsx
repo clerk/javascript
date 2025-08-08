@@ -24,7 +24,7 @@ type SignInFactorOneCodeFormProps = {
 };
 
 export const SignUpVerificationCodeForm = (props: SignInFactorOneCodeFormProps) => {
-  const { afterSignUpUrl, onPendingSession } = useSignUpContext();
+  const { afterSignUpUrl, navigateOnSetActive } = useSignUpContext();
   const { setActive } = useClerk();
   const { navigate } = useRouter();
 
@@ -44,7 +44,12 @@ export const SignUpVerificationCodeForm = (props: SignInFactorOneCodeFormProps) 
           verifyPhonePath: '../verify-phone-number',
           continuePath: '../continue',
           handleComplete: () =>
-            setActive({ session: res.createdSessionId, redirectUrl: afterSignUpUrl, navigate: onPendingSession }),
+            setActive({
+              session: res.createdSessionId,
+              navigate: async ({ session }) => {
+                await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl });
+              },
+            }),
           navigate,
         });
       })

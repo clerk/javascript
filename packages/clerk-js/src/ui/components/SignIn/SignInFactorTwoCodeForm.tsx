@@ -33,7 +33,7 @@ type SignInFactorTwoCodeFormProps = SignInFactorTwoCodeCard & {
 export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => {
   const signIn = useCoreSignIn();
   const card = useCardState();
-  const { afterSignInUrl, onPendingSession } = useSignInContext();
+  const { afterSignInUrl, navigateOnSetActive } = useSignInContext();
   const { setActive } = useClerk();
   const { navigate } = useRouter();
   const supportEmail = useSupportEmail();
@@ -81,8 +81,9 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
             }
             return setActive({
               session: res.createdSessionId,
-              redirectUrl: afterSignInUrl,
-              navigate: onPendingSession,
+              navigate: async ({ session }) => {
+                await navigateOnSetActive({ session, redirectUrl: afterSignInUrl });
+              },
             });
           default:
             return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
