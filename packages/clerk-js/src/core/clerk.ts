@@ -151,7 +151,7 @@ import {
   Organization,
   Waitlist,
 } from './resources/internal';
-import { navigateIfTaskExists } from './sessionTasks';
+import { navigateIfTaskExists, warnMissingPendingTaskHandlers } from './sessionTasks';
 import { State } from './state';
 import { warnings } from './warnings';
 
@@ -1230,6 +1230,10 @@ export class Clerk implements ClerkInterface {
 
       let newSession = session === undefined ? this.session : session;
       const sessionIsPending = newSession?.status === 'pending';
+
+      if (sessionIsPending) {
+        warnMissingPendingTaskHandlers(params);
+      }
 
       // At this point, the `session` variable should contain either an `SignedInSessionResource`
       // ,`null` or `undefined`.
