@@ -1263,8 +1263,6 @@ export class Clerk implements ClerkInterface {
         }
       }
 
-      debugger;
-
       if (newSession?.status === 'pending') {
         await this.#handlePendingSession(newSession, onPendingSession);
         return;
@@ -1337,8 +1335,6 @@ export class Clerk implements ClerkInterface {
   };
 
   #handlePendingSession = async (session: PendingSessionResource, onPendingSession?: OnPendingSessionFn) => {
-    debugger;
-
     if (!this.environment) {
       return;
     }
@@ -1361,12 +1357,12 @@ export class Clerk implements ClerkInterface {
 
     if (currentSession.status === 'pending') {
       const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
+
       const onPendingSessionHook = this.#options['onPendingSession'] ?? onPendingSession;
       const taskUrls = this.#options['taskUrls'];
 
       await tracker.track(async () => {
         if (onPendingSessionHook) {
-          debugger;
           await onPendingSessionHook({ session: currentSession });
         } else if (taskUrls) {
           await this.navigate(taskUrls[session.currentTask.key]);
