@@ -1,7 +1,7 @@
 import type { DeletedObjectResource } from './deletedObject';
 import type { ClerkPaginatedResponse, ClerkPaginationParams } from './pagination';
 import type { ClerkResource } from './resource';
-import type { CommerceFeatureJSONSnapshot, CommercePlanJSONSnapshot } from './snapshots';
+import type { CommerceFeatureJSONSnapshot } from './snapshots';
 
 type WithOptionalOrgType<T> = T & {
   orgId?: string;
@@ -287,7 +287,7 @@ export interface CommercePlanResource extends ClerkResource {
    * <ClerkProvider clerkJsVersion="x.x.x" />
    * ```
    */
-  amount: number;
+  fee: CommerceFee;
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
    * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
@@ -296,7 +296,7 @@ export interface CommercePlanResource extends ClerkResource {
    * <ClerkProvider clerkJsVersion="x.x.x" />
    * ```
    */
-  amountFormatted: string;
+  annualFee: CommerceFee;
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
    * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
@@ -305,52 +305,7 @@ export interface CommercePlanResource extends ClerkResource {
    * <ClerkProvider clerkJsVersion="x.x.x" />
    * ```
    */
-  annualAmount: number;
-  /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
-   */
-  annualAmountFormatted: string;
-  /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
-   */
-  annualMonthlyAmount: number;
-  /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
-   */
-  annualMonthlyAmountFormatted: string;
-  /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
-   */
-  currencySymbol: string;
-  /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
-   */
-  currency: string;
+  annualMonthlyFee: CommerceFee;
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
    * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
@@ -437,7 +392,6 @@ export interface CommercePlanResource extends ClerkResource {
    * ```
    */
   features: CommerceFeatureResource[];
-  __internal_toSnapshot: () => CommercePlanJSONSnapshot;
 }
 
 /**
@@ -749,7 +703,7 @@ export interface CommercePaymentResource extends ClerkResource {
    * <ClerkProvider clerkJsVersion="x.x.x" />
    * ```
    */
-  amount: CommerceMoney;
+  amount: CommerceFee;
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
    * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
@@ -1077,7 +1031,7 @@ export interface CommerceSubscriptionItemResource extends ClerkResource {
    * <ClerkProvider clerkJsVersion="x.x.x" />
    * ```
    */
-  amount?: CommerceMoney;
+  amount?: CommerceFee;
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
    * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
@@ -1095,7 +1049,7 @@ export interface CommerceSubscriptionItemResource extends ClerkResource {
      * <ClerkProvider clerkJsVersion="x.x.x" />
      * ```
      */
-    amount: CommerceMoney;
+    amount: CommerceFee;
   };
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
@@ -1161,7 +1115,7 @@ export interface CommerceSubscriptionResource extends ClerkResource {
      * <ClerkProvider clerkJsVersion="x.x.x" />
      * ```
      */
-    amount: CommerceMoney;
+    amount: CommerceFee;
     /**
      * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
      * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
@@ -1225,7 +1179,7 @@ export interface CommerceSubscriptionResource extends ClerkResource {
  * <ClerkProvider clerkJsVersion="x.x.x" />
  * ```
  */
-export interface CommerceMoney {
+export interface CommerceFee {
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
    * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
@@ -1281,7 +1235,7 @@ export interface CommerceCheckoutTotals {
    * <ClerkProvider clerkJsVersion="x.x.x" />
    * ```
    */
-  subtotal: CommerceMoney;
+  subtotal: CommerceFee;
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
    * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
@@ -1290,7 +1244,7 @@ export interface CommerceCheckoutTotals {
    * <ClerkProvider clerkJsVersion="x.x.x" />
    * ```
    */
-  grandTotal: CommerceMoney;
+  grandTotal: CommerceFee;
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
    * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
@@ -1299,7 +1253,7 @@ export interface CommerceCheckoutTotals {
    * <ClerkProvider clerkJsVersion="x.x.x" />
    * ```
    */
-  taxTotal: CommerceMoney;
+  taxTotal: CommerceFee;
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
    * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
@@ -1308,7 +1262,7 @@ export interface CommerceCheckoutTotals {
    * <ClerkProvider clerkJsVersion="x.x.x" />
    * ```
    */
-  totalDueNow: CommerceMoney;
+  totalDueNow: CommerceFee;
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
    * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
@@ -1317,7 +1271,7 @@ export interface CommerceCheckoutTotals {
    * <ClerkProvider clerkJsVersion="x.x.x" />
    * ```
    */
-  credit: CommerceMoney;
+  credit: CommerceFee;
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
    * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
@@ -1326,7 +1280,7 @@ export interface CommerceCheckoutTotals {
    * <ClerkProvider clerkJsVersion="x.x.x" />
    * ```
    */
-  pastDue: CommerceMoney;
+  pastDue: CommerceFee;
 }
 
 /**

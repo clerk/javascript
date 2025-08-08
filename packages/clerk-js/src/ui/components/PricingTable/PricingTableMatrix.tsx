@@ -60,7 +60,7 @@ export function PricingTableMatrix({
 
   const gridTemplateColumns = React.useMemo(() => `repeat(${plans.length + 1}, minmax(9.375rem,1fr))`, [plans.length]);
 
-  const renderBillingCycleControls = React.useMemo(() => plans.some(plan => plan.annualMonthlyAmount > 0), [plans]);
+  const renderBillingCycleControls = React.useMemo(() => plans.some(plan => plan.annualMonthlyFee.amount > 0), [plans]);
 
   const getAllFeatures = React.useMemo(() => {
     const featuresSet = new Set<string>();
@@ -157,11 +157,11 @@ export function PricingTableMatrix({
               {plans.map(plan => {
                 const highlight = plan.slug === highlightedPlan;
                 const planFee =
-                  plan.annualMonthlyAmount <= 0
-                    ? plan.amountFormatted
+                  plan.annualMonthlyFee.amount <= 0
+                    ? plan.fee
                     : planPeriod === 'annual'
-                      ? plan.annualMonthlyAmountFormatted
-                      : plan.amountFormatted;
+                      ? plan.annualMonthlyFee
+                      : plan.fee;
 
                 return (
                   <Box
@@ -237,8 +237,8 @@ export function PricingTableMatrix({
                               variant='h2'
                               colorScheme='body'
                             >
-                              {plan.currencySymbol}
-                              {planFee}
+                              {planFee.currencySymbol}
+                              {planFee.amountFormatted}
                             </Text>
                             <Text
                               elementDescriptor={descriptors.pricingTableMatrixFeePeriod}
@@ -253,7 +253,7 @@ export function PricingTableMatrix({
                               })}
                               localizationKey={localizationKeys('commerce.month')}
                             />
-                            {plan.annualMonthlyAmount > 0 ? (
+                            {plan.annualMonthlyFee.amount > 0 ? (
                               <Box
                                 elementDescriptor={descriptors.pricingTableMatrixFeePeriodNotice}
                                 sx={[

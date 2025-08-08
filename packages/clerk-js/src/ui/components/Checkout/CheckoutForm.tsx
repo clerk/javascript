@@ -1,5 +1,5 @@
 import { __experimental_useCheckout as useCheckout, useOrganization } from '@clerk/shared/react';
-import type { CommerceMoney, CommercePaymentSourceResource, ConfirmCheckoutParams } from '@clerk/types';
+import type { CommerceFee, CommercePaymentSourceResource, ConfirmCheckoutParams } from '@clerk/types';
 import { useMemo, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';
@@ -35,6 +35,8 @@ export const CheckoutForm = withCardStateProvider(() => {
   const showPastDue = !!totals.pastDue?.amount && totals.pastDue.amount > 0;
   const showDowngradeInfo = !isImmediatePlanChange;
 
+  const fee = planPeriod === 'month' ? plan.fee : plan.annualMonthlyFee;
+
   return (
     <Drawer.Body>
       <Box
@@ -54,7 +56,7 @@ export const CheckoutForm = withCardStateProvider(() => {
             />
             <LineItems.Description
               prefix={planPeriod === 'annual' ? 'x12' : undefined}
-              text={`${plan.currencySymbol}${planPeriod === 'month' ? plan.amountFormatted : plan.annualMonthlyAmountFormatted}`}
+              text={`${fee.currencySymbol}${fee.amountFormatted}`}
               suffix={localizationKeys('commerce.checkout.perMonth')}
             />
           </LineItems.Group>
@@ -308,13 +310,7 @@ const AddPaymentSourceForCheckout = withCardStateProvider(() => {
 });
 
 const ExistingPaymentSourceForm = withCardStateProvider(
-  ({
-    totalDueNow,
-    paymentSources,
-  }: {
-    totalDueNow: CommerceMoney;
-    paymentSources: CommercePaymentSourceResource[];
-  }) => {
+  ({ totalDueNow, paymentSources }: { totalDueNow: CommerceFee; paymentSources: CommercePaymentSourceResource[] }) => {
     const { checkout } = useCheckout();
     const { paymentSource } = checkout;
 

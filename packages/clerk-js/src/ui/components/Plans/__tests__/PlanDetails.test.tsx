@@ -32,17 +32,27 @@ describe('PlanDetails', () => {
   const mockPlan = {
     id: 'plan_123',
     name: 'Test Plan',
-    amount: 1000,
-    amountFormatted: '10.00',
-    annualAmount: 10000,
-    annualAmountFormatted: '100.00',
-    annualMonthlyAmount: 833,
-    annualMonthlyAmountFormatted: '8.33',
-    currencySymbol: '$',
+    fee: {
+      amount: 1000,
+      amountFormatted: '10.00',
+      currencySymbol: '$',
+      currency: 'USD',
+    },
+    annualFee: {
+      amount: 10000,
+      amountFormatted: '100.00',
+      currencySymbol: '$',
+      currency: 'USD',
+    },
+    annualMonthlyFee: {
+      amount: 833,
+      amountFormatted: '8.33',
+      currencySymbol: '$',
+      currency: 'USD',
+    },
     description: 'Test Plan Description',
     hasBaseFee: true,
     isRecurring: true,
-    currency: 'USD',
     isDefault: false,
     payerType: ['user'],
     forPayerType: 'user' as const,
@@ -96,7 +106,7 @@ describe('PlanDetails', () => {
     expect(spinner).toBeNull();
     expect(getByRole('heading', { name: 'Test Plan' })).toBeVisible();
     expect(getByText('Test Plan Description')).toBeVisible();
-    expect(getByText('$10.00')).toBeVisible();
+    expect(getByText('$10')).toBeVisible();
     expect(getByText('Feature 1')).toBeVisible();
     expect(getByText('Feature 1 Description')).toBeVisible();
     expect(getByText('Feature 2')).toBeVisible();
@@ -124,7 +134,7 @@ describe('PlanDetails', () => {
       expect(fixtures.clerk.billing.getPlan).toHaveBeenCalledWith({ id: 'plan_123' });
       expect(getByRole('heading', { name: 'Test Plan' })).toBeVisible();
       expect(getByText('Test Plan Description')).toBeVisible();
-      expect(getByText('$10.00')).toBeVisible();
+      expect(getByText('$10')).toBeVisible();
     });
   });
 
@@ -144,7 +154,7 @@ describe('PlanDetails', () => {
     );
 
     await waitFor(() => {
-      expect(getByText('$10.00')).toBeVisible();
+      expect(getByText('$10')).toBeVisible();
       expect(queryByText('$8.33')).toBeNull();
     });
   });
@@ -169,7 +179,7 @@ describe('PlanDetails', () => {
 
     await waitFor(() => {
       expect(getByText('$8.33')).toBeVisible();
-      expect(queryByText('$10.00')).toBeNull();
+      expect(queryByText('$10')).toBeNull();
     });
   });
 
@@ -189,7 +199,7 @@ describe('PlanDetails', () => {
     );
 
     await waitFor(() => {
-      expect(getByText('$10.00')).toBeVisible();
+      expect(getByText('$10')).toBeVisible();
     });
 
     const switchButton = getByRole('switch', { name: /billed annually/i });
@@ -203,7 +213,24 @@ describe('PlanDetails', () => {
   it('does not show period toggle for plans with no annual pricing', async () => {
     const planWithoutAnnual = {
       ...mockPlan,
-      annualMonthlyAmount: 0,
+      fee: {
+        amount: 0,
+        amountFormatted: '0.00',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
+      annualFee: {
+        amount: 0,
+        amountFormatted: '0.00',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
+      annualMonthlyFee: {
+        amount: 0,
+        amountFormatted: '0.00',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
     };
 
     const { wrapper } = await createFixtures(f => {
@@ -229,9 +256,25 @@ describe('PlanDetails', () => {
   it('shows "Always free" notice for default free plans', async () => {
     const freePlan = {
       ...mockPlan,
-      amount: 0,
-      amountFormatted: '0.00',
-      annualMonthlyAmount: 0,
+
+      fee: {
+        amount: 0,
+        amountFormatted: '0.00',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
+      annualFee: {
+        amount: 0,
+        amountFormatted: '0.00',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
+      annualMonthlyFee: {
+        amount: 0,
+        amountFormatted: '0.00',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
       isDefault: true,
     };
 
