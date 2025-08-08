@@ -1,17 +1,80 @@
+import type { ClerkAPIResponseError, Errors } from '@clerk/types';
 import { computed, signal } from 'alien-signals';
 
 import type { SignIn } from './resources/SignIn';
 
 export const signInSignal = signal<{ resource: SignIn | null }>({ resource: null });
-export const signInErrorSignal = signal<{ errors: unknown }>({ errors: null });
+export const signInErrorSignal = signal<{ error: ClerkAPIResponseError | null }>({ error: null });
 
 export const signInComputedSignal = computed(() => {
   const signIn = signInSignal().resource;
-  const errors = signInErrorSignal().errors;
+  const error = signInErrorSignal().error;
+
+  const errors = errorsToParsedErrors(error);
 
   if (!signIn) {
-    return { errors: null, signIn: null };
+    return { errors, signIn: null };
   }
 
   return { errors, signIn: signIn.__internal_future };
 });
+
+export function errorsToParsedErrors(error: ClerkAPIResponseError | null): Errors {
+  const parsedErrors: Errors = {
+    fields: {
+      firstName: null,
+      lastName: null,
+      emailAddress: null,
+      identifier: null,
+      phoneNumber: null,
+      password: null,
+      username: null,
+      code: null,
+      captcha: null,
+      legalAccepted: null,
+    },
+    raw: error ? error.errors : [],
+    global: [],
+  };
+
+  error?.errors.forEach(error => {
+    if ('meta' in error && error.meta && 'paramName' in error.meta) {
+      switch (error.meta.paramName) {
+        case 'first_name':
+          parsedErrors.fields.firstName = error;
+          break;
+        case 'last_name':
+          parsedErrors.fields.lastName = error;
+          break;
+        case 'email_address':
+          parsedErrors.fields.emailAddress = error;
+          break;
+        case 'identifier':
+          parsedErrors.fields.identifier = error;
+          break;
+        case 'phone_number':
+          parsedErrors.fields.phoneNumber = error;
+          break;
+        case 'password':
+          parsedErrors.fields.password = error;
+          break;
+        case 'username':
+          parsedErrors.fields.username = error;
+          break;
+        case 'code':
+          parsedErrors.fields.code = error;
+          break;
+        case 'captcha':
+          parsedErrors.fields.captcha = error;
+          break;
+        case 'legal_accepted':
+          parsedErrors.fields.legalAccepted = error;
+          break;
+      }
+    } else {
+      parsedErrors.global.push(error);
+    }
+  });
+
+  return parsedErrors;
+}

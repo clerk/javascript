@@ -12,6 +12,7 @@ import type {
   AuthenticateWithPopupParams,
   AuthenticateWithRedirectParams,
   AuthenticateWithWeb3Params,
+  ClerkAPIResponseError,
   CreateEmailLinkFlowReturn,
   EmailCodeConfig,
   EmailLinkConfig,
@@ -557,7 +558,7 @@ class SignInFuture implements SignInFutureResource {
         action: 'prepare_first_factor',
       });
     } catch (err: unknown) {
-      eventBus.emit('resource:error', { resource: this.resource, error: err });
+      eventBus.emit('resource:error', { resource: this.resource, error: err as ClerkAPIResponseError });
       return { error: err };
     }
 
@@ -572,7 +573,7 @@ class SignInFuture implements SignInFutureResource {
         action: 'attempt_first_factor',
       });
     } catch (err: unknown) {
-      eventBus.emit('resource:error', { resource: this.resource, error: err });
+      eventBus.emit('resource:error', { resource: this.resource, error: err as ClerkAPIResponseError });
       return { error: err };
     }
 
@@ -612,7 +613,7 @@ class SignInFuture implements SignInFutureResource {
         windowNavigate(externalVerificationRedirectURL);
       }
     } catch (err: unknown) {
-      eventBus.emit('resource:error', { resource: this.resource, error: err });
+      eventBus.emit('resource:error', { resource: this.resource, error: err as ClerkAPIResponseError });
       return { error: err };
     }
 
