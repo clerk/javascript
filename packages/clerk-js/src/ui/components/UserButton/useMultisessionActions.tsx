@@ -21,7 +21,7 @@ type UseMultisessionActionsParams = {
 } & Pick<UserButtonProps, 'userProfileMode' | 'appearance' | 'userProfileProps'>;
 
 export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
-  const { setActive, signOut, openUserProfile } = useClerk();
+  const { setActive, signOut, openUserProfile, __internal_getOption } = useClerk();
   const card = useCardState();
   const { signedInSessions, otherSessions } = useMultipleSessions({ user: opts.user });
   const { navigate } = useRouter();
@@ -80,7 +80,7 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
         await navigateToTask(session, {
           baseUrl: displayConfig.signInUrl,
           navigate: navigate,
-          // TODO -> Pass `clerk` into callback so we can access the taskUrls here
+          options: { taskUrls: __internal_getOption('taskUrls') },
         });
       },
     }).finally(() => {
