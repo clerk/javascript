@@ -1,3 +1,4 @@
+import { isAbsoluteUrl } from '@clerk/shared/url';
 import React from 'react';
 
 import { Box, descriptors, Flex, Image, Link, Text } from '../customizables';
@@ -16,10 +17,10 @@ type AvatarProps = PropsOfComponent<typeof Flex> & {
   boxElementDescriptor?: ElementDescriptor;
   imageElementDescriptor?: ElementDescriptor;
   /**
-   * URL of the external link to navigate to when the avatar is clicked.
-   * Opens in a new tab.
+   * URL to navigate to when the avatar is clicked.
+   * If it's an absolute URL, it opens in a new tab.
    */
-  externalLinkUrl?: string;
+  linkUrl?: string;
 };
 
 export const Avatar = (props: AvatarProps) => {
@@ -33,7 +34,7 @@ export const Avatar = (props: AvatarProps) => {
     sx,
     boxElementDescriptor,
     imageElementDescriptor,
-    externalLinkUrl,
+    linkUrl,
   } = props;
   const [error, setError] = React.useState(false);
 
@@ -71,10 +72,10 @@ export const Avatar = (props: AvatarProps) => {
         sx,
       ]}
     >
-      {externalLinkUrl && externalLinkUrl.trim() ? (
+      {linkUrl && linkUrl.trim() ? (
         <Link
-          href={externalLinkUrl}
-          isExternal
+          href={linkUrl}
+          isExternal={isAbsoluteUrl(linkUrl)}
         >
           {ImgOrFallback}
         </Link>

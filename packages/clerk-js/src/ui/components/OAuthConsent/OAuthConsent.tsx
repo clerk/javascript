@@ -44,7 +44,7 @@ export function OAuthConsentInternal() {
               <ConnectionHeader>
                 <Avatar
                   imageUrl={oAuthApplicationLogoUrl}
-                  externalLinkUrl={oAuthApplicationUrl}
+                  linkUrl={oAuthApplicationUrl}
                   size={t => t.space.$12}
                   rounded={false}
                 />
