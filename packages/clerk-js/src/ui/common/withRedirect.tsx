@@ -99,20 +99,14 @@ export const withRedirectToSignInTask = <P extends AvailableComponentProps>(Comp
 
     return withRedirect(
       Component,
-      clerk => !!clerk.session?.currentTask,
-      ({ clerk }) => {
-        const currentTask = clerk.session?.currentTask;
-        if (!currentTask || !signInCtx?.taskUrl) {
-          return '';
-        }
-
-        return signInCtx?.taskUrl;
-      },
+      clerk => Boolean(clerk.session?.currentTask && signInCtx?.taskUrl),
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      () => signInCtx.taskUrl!,
       undefined,
     )(props);
   };
 
-  HOC.displayName = `withRedirectToAfterSignIn(${displayName})`;
+  HOC.displayName = `withRedirectToSignInTask(${displayName})`;
 
   return HOC;
 };
@@ -126,20 +120,14 @@ export const withRedirectToSignUpTask = <P extends AvailableComponentProps>(Comp
 
     return withRedirect(
       Component,
-      clerk => !!clerk.session?.currentTask,
-      ({ clerk }) => {
-        const currentTask = clerk.session?.currentTask;
-        if (!currentTask || !signUpCtx?.taskUrl) {
-          return '';
-        }
-
-        return signUpCtx?.taskUrl;
-      },
+      clerk => Boolean(clerk.session?.currentTask && signUpCtx?.taskUrl),
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      () => signUpCtx.taskUrl!,
       undefined,
     )(props);
   };
 
-  HOC.displayName = `withRedirectToAfterSignIn(${displayName})`;
+  HOC.displayName = `withRedirectToSignUpTask(${displayName})`;
 
   return HOC;
 };
