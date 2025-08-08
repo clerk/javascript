@@ -105,6 +105,7 @@ type IsomorphicLoadedClerk = Without<
   | '__internal_reloadInitialResources'
   | 'billing'
   | 'apiKeys'
+  | 'debug'
   | '__internal_setComponentNavigationContext'
   | '__internal_setActiveInProgress'
   | '__internal_hasAfterAuthFlows'
@@ -112,6 +113,7 @@ type IsomorphicLoadedClerk = Without<
   client: ClientResource | undefined;
   billing: CommerceBillingNamespace | undefined;
   apiKeys: APIKeysNamespace | undefined;
+  debug: ReturnType<LoadedClerk['debug']>;
 };
 
 export class IsomorphicClerk implements IsomorphicLoadedClerk {
@@ -651,6 +653,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   get version() {
     return this.clerkjs?.version;
+  }
+
+  get debug() {
+    return this.clerkjs?.debug?.() as ReturnType<LoadedClerk['debug']>;
   }
 
   get client(): ClientResource | undefined {
