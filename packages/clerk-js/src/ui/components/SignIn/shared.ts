@@ -34,8 +34,12 @@ function useHandleAuthenticateWithPasskey(onSecondFactor: () => Promise<unknown>
         case 'complete':
           return setActive({
             session: res.createdSessionId,
-            redirectUrl: afterSignInUrl,
             navigate: async ({ session }) => {
+              if (!session.currentTask) {
+                await navigate(afterSignInUrl);
+                return;
+              }
+
               await navigateIfTaskExists(session, {
                 baseUrl: signInUrl,
                 navigate: navigate,
