@@ -49,7 +49,7 @@ import type {
   SignUpFallbackRedirectUrl,
   SignUpForceRedirectUrl,
 } from './redirects';
-import type { PendingSessionOptions, SessionTask, SignedInSessionResource } from './session';
+import type { SessionTask, SignedInSessionResource } from './session';
 import type { SessionVerificationLevel } from './sessionVerification';
 import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
@@ -962,8 +962,7 @@ type ClerkOptionsNavigation =
       routerDebug?: boolean;
     };
 
-export type ClerkOptions = PendingSessionOptions &
-  ClerkOptionsNavigation &
+export type ClerkOptions = ClerkOptionsNavigation &
   SignInForceRedirectUrl &
   SignInFallbackRedirectUrl &
   SignUpForceRedirectUrl &

@@ -15,7 +15,7 @@ import { useCallback, useSyncExternalStore } from 'react';
 
 import { authAsyncStorage } from '#async-local-storage';
 
-import { $authStore, $clerkStore } from '../stores/external';
+import { $authStore } from '../stores/external';
 import { $clerk, $csrState } from '../stores/internal';
 
 /**
@@ -87,7 +87,6 @@ type UseAuth = (options?: PendingSessionOptions) => UseAuthReturn;
  */
 export const useAuth: UseAuth = ({ treatPendingAsSignedOut } = {}) => {
   const authContext = useAuthStore();
-  const clerkContext = useStore($clerkStore);
 
   const getToken: GetToken = useCallback(createGetToken(), []);
   const signOut: SignOut = useCallback(createSignOut(), []);
@@ -117,11 +116,7 @@ export const useAuth: UseAuth = ({ treatPendingAsSignedOut } = {}) => {
       has,
     },
     options: {
-      treatPendingAsSignedOut:
-        // Fallback from option provided via SSR / CSR contexts
-        treatPendingAsSignedOut ??
-        clerkContext?.__internal_getOption?.('treatPendingAsSignedOut') ??
-        import.meta.env.PUBLIC_CLERK_TREAT_PENDING_AS_SIGNED_OUT,
+      treatPendingAsSignedOut,
     },
   });
 
