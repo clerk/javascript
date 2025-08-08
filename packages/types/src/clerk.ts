@@ -49,7 +49,7 @@ import type {
   SignUpFallbackRedirectUrl,
   SignUpForceRedirectUrl,
 } from './redirects';
-import type { PendingSessionOptions, PendingSessionResource, SessionTask, SignedInSessionResource } from './session';
+import type { PendingSessionOptions, SessionTask, SignedInSessionResource } from './session';
 import type { SessionVerificationLevel } from './sessionVerification';
 import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
@@ -949,7 +949,7 @@ type ClerkOptionsNavigation =
       routerDebug?: boolean;
     };
 
-export type OnPendingSessionFn = (opts: { session: PendingSessionResource }) => Promise<unknown>;
+export type SetActiveNavigate = () => Promise<unknown>;
 
 export type ClerkOptions = PendingSessionOptions &
   ClerkOptionsNavigation &
@@ -1072,11 +1072,6 @@ export type ClerkOptions = PendingSessionOptions &
      * @default undefined - Uses Clerk's default task flow URLs
      */
     taskUrls?: Record<SessionTask['key'], string>;
-
-    /**
-     * Event handler called when a session transitions to `pending` status after successful sign-in.
-     */
-    onPendingSession?: OnPendingSessionFn;
   };
 
 export interface NavigateOptions {
@@ -1203,9 +1198,9 @@ export type SetActiveParams = {
   redirectUrl?: string;
 
   /**
-   * Event handler called when a session transitions to `pending` status after successful sign-in.
+   * TODO
    */
-  onPendingSession?: OnPendingSessionFn;
+  navigate?: SetActiveNavigate;
 };
 
 /**
