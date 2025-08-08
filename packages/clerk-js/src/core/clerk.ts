@@ -1820,7 +1820,7 @@ export class Clerk implements ClerkInterface {
 
     const setActiveNavigate: SetActiveNavigate = async ({ session }) => {
       await navigateIfTaskExists(session, {
-        baseUrl: displayConfig.signInUrl,
+        baseUrl: params.signInUrl ?? displayConfig.signInUrl,
         navigate: this.navigate,
       });
     };
