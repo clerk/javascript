@@ -176,7 +176,8 @@ export type __internal_LocalizationResource = {
     keepSubscription: LocalizationValue;
     reSubscribe: LocalizationValue;
     subscribe: LocalizationValue;
-    startFreeTrial: LocalizationValue<'days'>;
+    startFreeTrial: LocalizationValue;
+    startFreeTrial__days: LocalizationValue<'days'>;
     switchPlan: LocalizationValue;
     switchToMonthly: LocalizationValue;
     switchToAnnual: LocalizationValue;

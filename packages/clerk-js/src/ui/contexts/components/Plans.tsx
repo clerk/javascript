@@ -214,7 +214,7 @@ export const usePlansContext = () => {
 
       const freeTrialOr = (localizationKey: LocalizationKey): LocalizationKey => {
         if (plan?.freeTrialEnabled && topLevelSubscription?.eligibleForFreeTrial) {
-          return localizationKeys('commerce.startFreeTrial', { days: plan.freeTrialDays ?? 0 });
+          return localizationKeys('commerce.startFreeTrial__days', { days: plan.freeTrialDays ?? 0 });
         }
         return localizationKey;
       };

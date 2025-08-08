@@ -53,7 +53,7 @@ export const CheckoutForm = withCardStateProvider(() => {
               title={plan.name}
               description={planPeriod === 'annual' ? localizationKeys('commerce.billedAnnually') : undefined}
               badge={
-                plan.freeTrialEnabled && plan.freeTrialDays ? (
+                plan.freeTrialEnabled && freeTrialEndsAt ? (
                   <SubscriptionBadge subscription={{ status: 'free_trial' }} />
                 ) : null
               }
@@ -296,14 +296,31 @@ export const PayWithTestPaymentSource = () => {
   );
 };
 
-const AddPaymentSourceForCheckout = withCardStateProvider(() => {
-  const { addPaymentSourceAndPay } = useCheckoutMutations();
+const useSubmitLabel = () => {
   const { checkout } = useCheckout();
-  const { status, totals } = checkout;
+  const { status, freeTrialEndsAt, totals } = checkout;
 
   if (status === 'needs_initialization') {
-    return null;
+    throw new Error('Clerk: Invalid state');
   }
+
+  if (freeTrialEndsAt) {
+    return localizationKeys('commerce.startFreeTrial');
+  }
+
+  if (totals.totalDueNow.amount > 0) {
+    return localizationKeys('commerce.pay', {
+      amount: `${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`,
+    });
+  }
+
+  return localizationKeys('commerce.subscribe');
+};
+
+const AddPaymentSourceForCheckout = withCardStateProvider(() => {
+  const { addPaymentSourceAndPay } = useCheckoutMutations();
+  const submitLabel = useSubmitLabel();
+  const { checkout } = useCheckout();
 
   return (
     <AddPaymentSource.Root
@@ -314,15 +331,7 @@ const AddPaymentSourceForCheckout = withCardStateProvider(() => {
         <PayWithTestPaymentSource />
       </DevOnly>
 
-      {totals.totalDueNow.amount > 0 ? (
-        <AddPaymentSource.FormButton
-          text={localizationKeys('commerce.pay', {
-            amount: `${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`,
-          })}
-        />
-      ) : (
-        <AddPaymentSource.FormButton text={localizationKeys('commerce.subscribe')} />
-      )}
+      <AddPaymentSource.FormButton text={submitLabel} />
     </AddPaymentSource.Root>
   );
 });
@@ -335,8 +344,9 @@ const ExistingPaymentSourceForm = withCardStateProvider(
     totalDueNow: CommerceMoney;
     paymentSources: CommercePaymentSourceResource[];
   }) => {
+    const submitLabel = useSubmitLabel();
     const { checkout } = useCheckout();
-    const { paymentSource } = checkout;
+    const { paymentSource, freeTrialEndsAt } = checkout;
 
     const { payWithExistingPaymentSource } = useCheckoutMutations();
     const card = useCardState();
@@ -358,6 +368,8 @@ const ExistingPaymentSourceForm = withCardStateProvider(
       });
     }, [paymentSources]);
 
+    const isSchedulePayment = totalDueNow.amount > 0 && !freeTrialEndsAt;
+
     return (
       <Form
         onSubmit={payWithExistingPaymentSource}
@@ -367,7 +379,7 @@ const ExistingPaymentSourceForm = withCardStateProvider(
           rowGap: t.space.$4,
         })}
       >
-        {totalDueNow.amount > 0 ? (
+        {isSchedulePayment ? (
           <Select
             elementId='paymentSource'
             options={options}
@@ -417,17 +429,8 @@ const ExistingPaymentSourceForm = withCardStateProvider(
             width: '100%',
           }}
           isLoading={card.isLoading}
-        >
-          <Text
-            localizationKey={
-              totalDueNow.amount > 0
-                ? localizationKeys('commerce.pay', {
-                    amount: `${totalDueNow.currencySymbol}${totalDueNow.amountFormatted}`,
-                  })
-                : localizationKeys('commerce.subscribe')
-            }
-          />
-        </Button>
+          localizationKey={submitLabel}
+        />
       </Form>
     );
   },

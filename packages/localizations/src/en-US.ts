@@ -88,6 +88,7 @@ export const enUS: LocalizationResource = {
         title__subscriptionBegins: 'Subscription begins',
         title__totalPaid: 'Total paid',
       },
+
       totalDueAfterTrial: 'Total Due after trial ends in {{days}} days',
       pastDueNotice: 'Your previous subscription was past due, with no payment.',
       perMonth: 'per month',
@@ -99,13 +100,14 @@ export const enUS: LocalizationResource = {
     creditRemainder: 'Credit for the remainder of your current subscription.',
     defaultFreePlanActive: "You're currently on the Free plan",
     free: 'Free',
-    getStarted: 'Get started',
+    // getStarted: 'Get started',
     keepSubscription: 'Keep subscription',
     manage: 'Manage',
     manageSubscription: 'Manage subscription',
     month: 'Month',
     monthly: 'Monthly',
     pastDue: 'Past due',
+
     pay: 'Pay {{amount}}',
     paymentMethods: 'Payment Methods',
     paymentSource: {
@@ -143,7 +145,8 @@ export const enUS: LocalizationResource = {
     },
     subtotal: 'Subtotal',
     switchPlan: 'Switch to this plan',
-    startFreeTrial: 'Start {{days}}-day free trial',
+    startFreeTrial: 'Start free trial',
+    startFreeTrial__days: 'Start {{days}}-day free trial',
     switchToAnnual: 'Switch to annual',
     switchToAnnualWithAnnualPrice: 'Switch to annual {{currency}}{{price}} / year',
     switchToMonthly: 'Switch to monthly',
