@@ -28,9 +28,9 @@ import type {
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
-  Clerk as ClerkInterface,
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
+  Clerk as ClerkInterface,
   ClerkOptions,
   ClientJSONSnapshot,
   ClientResource,
@@ -54,7 +54,6 @@ import type {
   OrganizationProfileProps,
   OrganizationResource,
   OrganizationSwitcherProps,
-  PendingSessionResource,
   PricingTableProps,
   PublicKeyCredentialCreationOptionsWithoutExtensions,
   PublicKeyCredentialRequestOptionsWithoutExtensions,
@@ -119,7 +118,7 @@ import {
   stripOrigin,
   windowNavigate,
 } from '../utils';
-import { assertNoLegacyProp, warnNoTaskOptions } from '../utils/assertNoLegacyProp';
+import { assertNoLegacyProp } from '../utils/assertNoLegacyProp';
 import { CLERK_ENVIRONMENT_STORAGE_ENTRY, SafeLocalStorage } from '../utils/localStorage';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
 import { RedirectUrls } from '../utils/redirectUrls';
@@ -1195,14 +1194,11 @@ export class Clerk implements ClerkInterface {
   /**
    * `setActive` can be used to set the active session and/or organization.
    */
-  public setActive = async ({
-    session,
-    organization,
-    beforeEmit,
-    redirectUrl,
-    onPendingSession,
-  }: SetActiveParams): Promise<void> => {
+  public setActive = async (params: SetActiveParams): Promise<void> => {
+    const { organization, beforeEmit, redirectUrl, navigate: setActiveNavigate } = params;
+    let { session } = params;
     this.__internal_setActiveInProgress = true;
+
     try {
       if (!this.client) {
         throw new Error('setActive is being called before the client is loaded. Wait for init.');
@@ -1212,6 +1208,10 @@ export class Clerk implements ClerkInterface {
         throw new Error(
           'setActive should either be called with a session param or there should be already an active session.',
         );
+      }
+
+      if (typeof session === 'string') {
+        session = (this.client.sessions.find(x => x.id === session) as SignedInSessionResource) || null;
       }
 
       const onBeforeSetActive: SetActiveHook =
@@ -1224,11 +1224,8 @@ export class Clerk implements ClerkInterface {
           ? window.__unstable__onAfterSetActive
           : noop;
 
-      if (typeof session === 'string') {
-        session = (this.client.sessions.find(x => x.id === session) as SignedInSessionResource) || null;
-      }
-
       let newSession = session === undefined ? this.session : session;
+      const sessionIsPending = newSession?.status === 'pending';
 
       // At this point, the `session` variable should contain either an `SignedInSessionResource`
       // ,`null` or `undefined`.
@@ -1259,19 +1256,12 @@ export class Clerk implements ClerkInterface {
         }
       }
 
-      if (newSession?.status === 'pending') {
-        warnNoTaskOptions({
-          ...this.#options,
-          onPendingSession: this.#options['onPendingSession'] ?? onPendingSession,
-        });
-        await this.#handlePendingSession(newSession, onPendingSession);
-        return;
-      }
-
       /**
        * Hint to each framework, that the user will be signed out when `{session: null}` is provided.
        */
-      await onBeforeSetActive(newSession === null ? 'sign-out' : undefined);
+      if (!sessionIsPending) {
+        await onBeforeSetActive(newSession === null ? 'sign-out' : undefined);
+      }
 
       //1. setLastActiveSession to passed user session (add a param).
       //   Note that this will also update the session's active organization
@@ -1305,17 +1295,29 @@ export class Clerk implements ClerkInterface {
         });
       }
 
-      if (redirectUrl && !beforeEmit) {
+      if ((redirectUrl || setActiveNavigate) && !beforeEmit) {
         await tracker.track(async () => {
           if (!this.client) {
             // Typescript is not happy because since thinks this.client might have changed to undefined because the function is asynchronous.
             return;
           }
-          this.#setTransitiveState();
-          if (this.client.isEligibleForTouch()) {
+
+          if (sessionIsPending) {
+            this.#setTransitiveState();
+          }
+
+          if (setActiveNavigate) {
+            await setActiveNavigate();
+            return;
+          }
+
+          if (redirectUrl && this.client.isEligibleForTouch()) {
             const absoluteRedirectUrl = new URL(redirectUrl, window.location.href);
-            await this.navigate(this.buildUrlWithAuth(this.client.buildTouchUrl({ redirectUrl: absoluteRedirectUrl })));
-          } else {
+            const url = this.buildUrlWithAuth(this.client.buildTouchUrl({ redirectUrl: absoluteRedirectUrl }));
+            await this.navigate(url);
+          }
+
+          if (redirectUrl) {
             await this.navigate(redirectUrl);
           }
         });
@@ -1328,54 +1330,12 @@ export class Clerk implements ClerkInterface {
 
       this.#setAccessors(newSession);
       this.#emit();
-      await onAfterSetActive();
+      if (!sessionIsPending) {
+        await onAfterSetActive();
+      }
     } finally {
       this.__internal_setActiveInProgress = false;
     }
-  };
-
-  #handlePendingSession = async (session: PendingSessionResource, onPendingSession?: OnPendingSessionFn) => {
-    if (!this.environment) {
-      return;
-    }
-
-    let currentSession: SignedInSessionResource | null = session;
-
-    if (inActiveBrowserTab() || !this.#options.standardBrowser) {
-      // Handles multi-session scenario when switching between `pending` sessions
-      // and satisfying task requirements such as organization selection
-      await this.#touchCurrentSession(session);
-      currentSession = this.#getSessionFromClient(session.id) ?? session;
-    }
-
-    // Syncs __session and __client_uat, in case the `pending` session
-    // has expired, it needs to trigger a sign-out
-    const token = await session.getToken();
-    if (!token) {
-      eventBus.emit(events.TokenUpdate, { token: null });
-    }
-
-    if (currentSession.status === 'pending') {
-      const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
-
-      const onPendingSessionHook = onPendingSession ?? this.#options['onPendingSession'];
-      const taskUrls = this.#options['taskUrls'];
-
-      await tracker.track(async () => {
-        if (onPendingSessionHook) {
-          await onPendingSessionHook({ session: currentSession });
-        } else if (taskUrls) {
-          await this.navigate(taskUrls[session.currentTask.key]);
-        }
-      });
-
-      if (tracker.isUnloading()) {
-        return;
-      }
-    }
-
-    this.#setAccessors(currentSession);
-    this.#emit();
   };
 
   public addListener = (listener: ListenerCallback): UnsubscribeCallback => {
