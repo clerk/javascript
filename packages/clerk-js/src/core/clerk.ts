@@ -151,7 +151,7 @@ import {
   Organization,
   Waitlist,
 } from './resources/internal';
-import { navigateToTask } from './sessionTasks';
+import { navigateIfTaskExists } from './sessionTasks';
 import { State } from './state';
 import { warnings } from './warnings';
 
@@ -1815,7 +1815,7 @@ export class Clerk implements ClerkInterface {
     };
 
     const setActiveNavigate: SetActiveNavigate = async ({ session }) => {
-      await navigateToTask(session, {
+      await navigateIfTaskExists(session, {
         baseUrl: displayConfig.signInUrl,
         navigate: this.navigate,
       });
@@ -2118,7 +2118,7 @@ export class Clerk implements ClerkInterface {
             session: signInOrSignUp.createdSessionId,
             redirectUrl,
             navigate: async ({ session }) => {
-              await navigateToTask(session, {
+              await navigateIfTaskExists(session, {
                 baseUrl: displayConfig.signInUrl,
                 navigate: this.navigate,
               });

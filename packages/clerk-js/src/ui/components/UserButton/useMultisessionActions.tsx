@@ -1,7 +1,7 @@
 import { useClerk } from '@clerk/shared/react';
 import type { SignedInSessionResource, UserButtonProps, UserResource } from '@clerk/types';
 
-import { navigateToTask } from '@/core/sessionTasks';
+import { navigateIfTaskExists } from '@/core/sessionTasks';
 import { useEnvironment } from '@/ui/contexts';
 import { useCardState } from '@/ui/elements/contexts';
 import { sleep } from '@/ui/utils/sleep';
@@ -77,7 +77,7 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
       session,
       redirectUrl: opts.afterSwitchSessionUrl,
       navigate: async ({ session }) => {
-        await navigateToTask(session, {
+        await navigateIfTaskExists(session, {
           baseUrl: opts.signInUrl ?? displayConfig.signInUrl,
           navigate,
         });
