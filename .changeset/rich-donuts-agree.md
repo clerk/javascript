@@ -12,9 +12,8 @@ await clerk.setActive({
   session,
   navigate: async ({ session }) => {
     const currentTask = session.currentTask;
-
     if (currentTask) {
-      await router.push('/onboarding/choose-organization')
+      await router.push(`/onboarding/${currentTask.key}`)
       return;
     }
 
