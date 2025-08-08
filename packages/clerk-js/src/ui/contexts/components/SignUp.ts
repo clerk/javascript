@@ -117,10 +117,11 @@ export const useSignUpContext = (): SignUpContextType => {
 
   const onPendingSession: OnPendingSessionFn = async ({ session }) => {
     const currentTaskKey = session.currentTask.key;
+    const customTaskUrl = clerk.__internal_getOption('taskUrls')?.[currentTaskKey];
 
     switch (currentTaskKey) {
       case 'choose-organization': {
-        await navigate(`../tasks/${currentTaskKey}`);
+        await navigate(customTaskUrl ?? `../tasks/${currentTaskKey}`);
       }
     }
   };
