@@ -52,7 +52,11 @@ export const SignInFactorTwoBackupCodeCard = (props: SignInFactorTwoBackupCodeCa
               queryParams.set('createdSessionId', res.createdSessionId);
               return navigate(`../reset-password-success?${queryParams.toString()}`);
             }
-            return setActive({ session: res.createdSessionId, redirectUrl: afterSignInUrl, onPendingSession });
+            return setActive({
+              session: res.createdSessionId,
+              redirectUrl: afterSignInUrl,
+              navigate: onPendingSession,
+            });
           default:
             return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
         }

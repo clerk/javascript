@@ -68,7 +68,7 @@ export const SignInFactorOneAlternativeChannelCodeForm = (props: SignInFactorOne
             return setActive({
               session: res.createdSessionId,
               redirectUrl: afterSignInUrl,
-              onPendingSession,
+              navigate: onPendingSession,
             });
           case 'needs_second_factor':
             return navigate('../factor-two');

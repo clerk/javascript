@@ -35,11 +35,12 @@ function useHandleAuthenticateWithPasskey(onSecondFactor: () => Promise<unknown>
           return setActive({
             session: res.createdSessionId,
             redirectUrl: afterSignInUrl,
-            onPendingSession: ({ session }) =>
-              navigateToTask(session, {
+            navigate: async ({ session }) => {
+              await navigateToTask(session, {
                 baseUrl: signInUrl,
                 navigate: navigate,
-              }),
+              });
+            },
           });
         case 'needs_second_factor':
           return onSecondFactor();

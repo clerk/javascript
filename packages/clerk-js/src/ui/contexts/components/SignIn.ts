@@ -1,6 +1,6 @@
 import { useClerk } from '@clerk/shared/react';
 import { isAbsoluteUrl } from '@clerk/shared/url';
-import type { OnPendingSessionFn } from '@clerk/types';
+import type { SetActiveNavigate } from '@clerk/types';
 import { createContext, useContext, useMemo } from 'react';
 
 import { buildTaskURL } from '@/core/sessionTasks';
@@ -29,7 +29,7 @@ export type SignInContextType = Omit<SignInCtx, 'fallbackRedirectUrl' | 'forceRe
   emailLinkRedirectUrl: string;
   ssoCallbackUrl: string;
   isCombinedFlow: boolean;
-  onPendingSession: OnPendingSessionFn;
+  onPendingSession: SetActiveNavigate;
   taskUrl: string | null;
 };
 
@@ -120,15 +120,13 @@ export const useSignInContext = (): SignInContextType => {
 
   const signUpContinueUrl = buildURL({ base: signUpUrl, hashPath: '/continue' }, { stringify: true });
 
-  const onPendingSession: OnPendingSessionFn = async ({ session }) => {
-    const currentTaskKey = session.currentTask.key;
-    const customTaskUrl = clerk.__internal_getOption('taskUrls')?.[currentTaskKey];
-
-    switch (currentTaskKey) {
-      case 'choose-organization': {
-        await navigate(customTaskUrl ?? `../tasks/${currentTaskKey}`);
-      }
+  const onPendingSession: SetActiveNavigate = async ({ session }) => {
+    const currentTaskKey = session.currentTask?.key;
+    if (!currentTaskKey) {
+      return;
     }
+
+    return navigate(`/tasks/${currentTaskKey}`);
   };
 
   const taskUrl = clerk.session?.currentTask
