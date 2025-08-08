@@ -1,6 +1,7 @@
+import { isAbsoluteUrl } from '@clerk/shared/url';
 import React from 'react';
 
-import { Box, descriptors, Flex, Image, Text } from '../customizables';
+import { Box, descriptors, Flex, Image, Link, Text } from '../customizables';
 import type { ElementDescriptor } from '../customizables/elementDescriptors';
 import type { InternalTheme } from '../foundations';
 import type { PropsOfComponent } from '../styledSystem';
@@ -15,6 +16,11 @@ type AvatarProps = PropsOfComponent<typeof Flex> & {
   rounded?: boolean;
   boxElementDescriptor?: ElementDescriptor;
   imageElementDescriptor?: ElementDescriptor;
+  /**
+   * URL to navigate to when the avatar is clicked.
+   * If it's an absolute URL, it opens in a new tab.
+   */
+  linkUrl?: string;
 };
 
 export const Avatar = (props: AvatarProps) => {
@@ -28,6 +34,7 @@ export const Avatar = (props: AvatarProps) => {
     sx,
     boxElementDescriptor,
     imageElementDescriptor,
+    linkUrl,
   } = props;
   const [error, setError] = React.useState(false);
 
@@ -65,7 +72,16 @@ export const Avatar = (props: AvatarProps) => {
         sx,
       ]}
     >
-      {ImgOrFallback}
+      {linkUrl && linkUrl.trim() ? (
+        <Link
+          href={linkUrl}
+          isExternal={isAbsoluteUrl(linkUrl)}
+        >
+          {ImgOrFallback}
+        </Link>
+      ) : (
+        ImgOrFallback
+      )}
 
       {/* /**
        * This Box is the "shimmer" effect for the avatar.

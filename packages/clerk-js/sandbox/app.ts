@@ -334,6 +334,8 @@ void (async () => {
           scopes,
           oAuthApplicationName: searchParams.get('oauth-application-name'),
           redirectUrl: searchParams.get('redirect_uri'),
+          oAuthApplicationLogoUrl: searchParams.get('logo-url'),
+          oAuthApplicationUrl: searchParams.get('app-url'),
         },
       );
     },
