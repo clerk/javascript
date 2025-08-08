@@ -1311,14 +1311,17 @@ export class Clerk implements ClerkInterface {
             return;
           }
 
-          if (redirectUrl && this.client.isEligibleForTouch()) {
-            const absoluteRedirectUrl = new URL(redirectUrl, window.location.href);
-            const url = this.buildUrlWithAuth(this.client.buildTouchUrl({ redirectUrl: absoluteRedirectUrl }));
-            await this.navigate(url);
-          }
-
           if (redirectUrl) {
-            await this.navigate(redirectUrl);
+            if (!this.client.isEligibleForTouch()) {
+              await this.navigate(redirectUrl);
+              return;
+            }
+
+            const absoluteRedirectUrl = new URL(redirectUrl, window.location.href);
+            const redirectUrlWithAuth = this.buildUrlWithAuth(
+              this.client.buildTouchUrl({ redirectUrl: absoluteRedirectUrl }),
+            );
+            await this.navigate(redirectUrlWithAuth);
           }
         });
       }
@@ -2309,8 +2312,8 @@ export class Clerk implements ClerkInterface {
     this.#authService = await AuthCookieService.create(
       this,
       this.#fapiClient,
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      this.#instanceType!,
+
+      this.#instanceType,
       this.#publicEventBus,
     );
 
