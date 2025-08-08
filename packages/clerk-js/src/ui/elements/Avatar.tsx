@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Box, descriptors, Flex, Image, Text } from '../customizables';
+import { Box, descriptors, Flex, Image, Link, Text } from '../customizables';
 import type { ElementDescriptor } from '../customizables/elementDescriptors';
 import type { InternalTheme } from '../foundations';
 import type { PropsOfComponent } from '../styledSystem';
@@ -72,13 +72,12 @@ export const Avatar = (props: AvatarProps) => {
       ]}
     >
       {externalLinkUrl && externalLinkUrl.trim() ? (
-        <a
+        <Link
           href={externalLinkUrl}
-          target='_blank'
-          rel='noopener noreferrer'
+          isExternal
         >
           {ImgOrFallback}
-        </a>
+        </Link>
       ) : (
         ImgOrFallback
       )}
