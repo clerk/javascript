@@ -122,10 +122,11 @@ export const useSignInContext = (): SignInContextType => {
 
   const onPendingSession: OnPendingSessionFn = async ({ session }) => {
     const currentTaskKey = session.currentTask.key;
+    const customTaskUrl = clerk.__internal_getOption('taskUrls')?.[currentTaskKey];
 
     switch (currentTaskKey) {
       case 'choose-organization': {
-        await navigate(`../tasks/${currentTaskKey}`);
+        await navigate(customTaskUrl ?? `../tasks/${currentTaskKey}`);
       }
     }
   };
@@ -136,7 +137,7 @@ export const useSignInContext = (): SignInContextType => {
     : null;
 
   return {
-    ...(ctx as SignInCtx),
+    ...ctx,
     transferable: ctx.transferable ?? true,
     oauthFlow: ctx.oauthFlow || 'auto',
     componentName,
