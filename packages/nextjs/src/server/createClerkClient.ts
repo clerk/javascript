@@ -5,6 +5,7 @@ import {
   API_VERSION,
   DOMAIN,
   IS_SATELLITE,
+  MACHINE_SECRET_KEY,
   PROXY_URL,
   PUBLISHABLE_KEY,
   SDK_METADATA,
@@ -22,6 +23,7 @@ const clerkClientDefaultOptions = {
   proxyUrl: PROXY_URL,
   domain: DOMAIN,
   isSatellite: IS_SATELLITE,
+  machineSecretKey: MACHINE_SECRET_KEY,
   sdkMetadata: SDK_METADATA,
   telemetry: {
     disabled: TELEMETRY_DISABLED,

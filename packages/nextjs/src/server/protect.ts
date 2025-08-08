@@ -67,7 +67,7 @@ export interface AuthProtect {
 
   /**
    * @example
-   * auth.protect({ token: ['session_token', 'machine_token'] });
+   * auth.protect({ token: ['session_token', 'm2m_token'] });
    */
   <T extends TokenType[]>(
     options?: AuthProtectOptions & { token: T },

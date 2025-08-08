@@ -35,8 +35,8 @@ describe('isMachineToken', () => {
 });
 
 describe('getMachineTokenType', () => {
-  it('returns "machine_token" for tokens with M2M prefix', () => {
-    expect(getMachineTokenType(`${M2M_TOKEN_PREFIX}some-token-value`)).toBe('machine_token');
+  it('returns "m2m_token" for tokens with M2M prefix', () => {
+    expect(getMachineTokenType(`${M2M_TOKEN_PREFIX}some-token-value`)).toBe('m2m_token');
   });
 
   it('returns "oauth_token" for tokens with OAuth prefix', () => {
@@ -65,25 +65,25 @@ describe('getMachineTokenType', () => {
 describe('isTokenTypeAccepted', () => {
   it('accepts any token type', () => {
     expect(isTokenTypeAccepted('api_key', 'any')).toBe(true);
-    expect(isTokenTypeAccepted('machine_token', 'any')).toBe(true);
+    expect(isTokenTypeAccepted('m2m_token', 'any')).toBe(true);
     expect(isTokenTypeAccepted('oauth_token', 'any')).toBe(true);
     expect(isTokenTypeAccepted('session_token', 'any')).toBe(true);
   });
 
   it('accepts a list of token types', () => {
-    expect(isTokenTypeAccepted('api_key', ['api_key', 'machine_token'])).toBe(true);
-    expect(isTokenTypeAccepted('session_token', ['api_key', 'machine_token'])).toBe(false);
+    expect(isTokenTypeAccepted('api_key', ['api_key', 'm2m_token'])).toBe(true);
+    expect(isTokenTypeAccepted('session_token', ['api_key', 'm2m_token'])).toBe(false);
   });
 
   it('rejects a mismatching token type', () => {
-    expect(isTokenTypeAccepted('api_key', 'machine_token')).toBe(false);
+    expect(isTokenTypeAccepted('api_key', 'm2m_token')).toBe(false);
   });
 });
 
 describe('isMachineTokenType', () => {
   it('returns true for machine token types', () => {
     expect(isMachineTokenType('api_key')).toBe(true);
-    expect(isMachineTokenType('machine_token')).toBe(true);
+    expect(isMachineTokenType('m2m_token')).toBe(true);
     expect(isMachineTokenType('oauth_token')).toBe(true);
   });
 

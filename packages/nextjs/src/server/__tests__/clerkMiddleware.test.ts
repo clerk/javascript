@@ -666,7 +666,7 @@ describe('clerkMiddleware(params)', () => {
         publishableKey,
         status: AuthStatus.SignedOut,
         headers: new Headers(),
-        toAuth: () => ({ tokenType: TokenType.MachineToken, id: null }),
+        toAuth: () => ({ tokenType: TokenType.M2MToken, id: null }),
       });
 
       const resp = await clerkMiddleware(async auth => {
@@ -717,7 +717,7 @@ describe('clerkMiddleware(params)', () => {
       });
 
       const resp = await clerkMiddleware(async auth => {
-        await auth.protect({ token: [TokenType.SessionToken, TokenType.MachineToken] });
+        await auth.protect({ token: [TokenType.SessionToken, TokenType.M2MToken] });
       })(req, {} as NextFetchEvent);
 
       expect(resp?.status).toEqual(401);

@@ -2,6 +2,7 @@ import type { AccountlessApplication } from '@clerk/backend';
 
 import { createClerkClientWithOptions } from './createClerkClient';
 import { nodeCwdOrThrow, nodeFsOrThrow, nodePathOrThrow } from './fs/utils';
+import { collectKeylessMetadata, formatMetadataHeaders } from './keyless-custom-headers';
 
 /**
  * The Clerk-specific directory name.
@@ -134,8 +135,14 @@ async function createOrReadKeyless(): Promise<AccountlessApplication | null> {
    * At this step, it is safe to create new keys and store them.
    */
   const client = createClerkClientWithOptions({});
+
+  // Collect metadata
+  const keylessHeaders = await collectKeylessMetadata()
+    .then(formatMetadataHeaders)
+    .catch(() => new Headers());
+
   const accountlessApplication = await client.__experimental_accountlessApplications
-    .createAccountlessApplication()
+    .createAccountlessApplication({ requestHeaders: keylessHeaders })
     .catch(() => null);
 
   if (accountlessApplication) {

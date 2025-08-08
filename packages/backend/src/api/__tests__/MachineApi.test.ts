@@ -127,7 +127,10 @@ describe('MachineAPI', () => {
         validateHeaders(async ({ request }) => {
           const body = await request.json();
           expect(body).toEqual({ name: 'Updated Machine' });
-          return HttpResponse.json(mockMachine);
+          return HttpResponse.json({
+            ...mockMachine,
+            name: 'Updated Machine',
+          });
         }),
       ),
     );
@@ -135,7 +138,7 @@ describe('MachineAPI', () => {
     const response = await apiClient.machines.update(updateParams);
 
     expect(response.id).toBe(machineId);
-    expect(response.name).toBe('Test Machine');
+    expect(response.name).toBe('Updated Machine');
   });
 
   it('deletes a machine', async () => {

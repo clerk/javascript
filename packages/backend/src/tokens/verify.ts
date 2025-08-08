@@ -1,7 +1,7 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
 import type { JwtPayload } from '@clerk/types';
 
-import type { APIKey, IdPOAuthAccessToken, MachineToken } from '../api';
+import type { APIKey, IdPOAuthAccessToken, M2MToken } from '../api';
 import { createBackendApiClient } from '../api/factory';
 import {
   MachineTokenVerificationError,
@@ -202,14 +202,14 @@ function handleClerkAPIError(
 
 async function verifyMachineToken(
   secret: string,
-  options: VerifyTokenOptions,
-): Promise<MachineTokenReturnType<MachineToken, MachineTokenVerificationError>> {
+  options: VerifyTokenOptions & { machineSecretKey?: string },
+): Promise<MachineTokenReturnType<M2MToken, MachineTokenVerificationError>> {
   try {
     const client = createBackendApiClient(options);
-    const verifiedToken = await client.machineTokens.verifySecret(secret);
-    return { data: verifiedToken, tokenType: TokenType.MachineToken, errors: undefined };
+    const verifiedToken = await client.m2mTokens.verifySecret({ secret });
+    return { data: verifiedToken, tokenType: TokenType.M2MToken, errors: undefined };
   } catch (err: any) {
-    return handleClerkAPIError(TokenType.MachineToken, err, 'Machine token not found');
+    return handleClerkAPIError(TokenType.M2MToken, err, 'Machine token not found');
   }
 }
 

@@ -1,7 +1,7 @@
 export const TokenType = {
   SessionToken: 'session_token',
   ApiKey: 'api_key',
-  MachineToken: 'machine_token',
+  M2MToken: 'm2m_token',
   OAuthToken: 'oauth_token',
 } as const;
 

@@ -11,7 +11,7 @@ import { verifyToken as _verifyToken } from './tokens/verify';
 
 export const verifyToken = withLegacyReturn(_verifyToken);
 
-export type ClerkOptions = CreateBackendApiOptions &
+export type ClerkOptions = Omit<CreateBackendApiOptions, 'skipApiVersionInUrl' | 'useMachineSecretKey'> &
   Partial<
     Pick<
       CreateAuthenticateRequestOptions['options'],

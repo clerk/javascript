@@ -190,6 +190,7 @@ function createClerkEnvSchema() {
     PUBLIC_CLERK_TELEMETRY_DISABLED: envField.boolean({ context: 'client', access: 'public', optional: true }),
     PUBLIC_CLERK_TELEMETRY_DEBUG: envField.boolean({ context: 'client', access: 'public', optional: true }),
     CLERK_SECRET_KEY: envField.string({ context: 'server', access: 'secret' }),
+    CLERK_MACHINE_SECRET_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
     CLERK_JWT_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
   };
 }

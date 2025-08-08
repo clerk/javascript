@@ -7,6 +7,7 @@ const clerkClient = (options?: ClerkOptions): ClerkClient => {
   const commonEnv = commonEnvs();
   return createClerkClient({
     secretKey: commonEnv.SECRET_KEY,
+    machineSecretKey: commonEnv.MACHINE_SECRET_KEY,
     publishableKey: commonEnv.PUBLISHABLE_KEY,
     apiUrl: commonEnv.API_URL,
     apiVersion: commonEnv.API_VERSION,

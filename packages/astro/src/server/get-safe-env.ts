@@ -27,6 +27,7 @@ function getSafeEnv(context: ContextOrLocals) {
     proxyUrl: getContextEnvVar('PUBLIC_CLERK_PROXY_URL', context),
     pk: getContextEnvVar('PUBLIC_CLERK_PUBLISHABLE_KEY', context),
     sk: getContextEnvVar('CLERK_SECRET_KEY', context),
+    machineSecretKey: getContextEnvVar('CLERK_MACHINE_SECRET_KEY', context),
     signInUrl: getContextEnvVar('PUBLIC_CLERK_SIGN_IN_URL', context),
     signUpUrl: getContextEnvVar('PUBLIC_CLERK_SIGN_UP_URL', context),
     clerkJsUrl: getContextEnvVar('PUBLIC_CLERK_JS_URL', context),

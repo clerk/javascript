@@ -13,7 +13,7 @@ export async function authenticateRequest(
   const { request } = args;
   const { audience, authorizedParties } = opts;
 
-  const { apiUrl, secretKey, jwtKey, proxyUrl, isSatellite, domain, publishableKey } = opts;
+  const { apiUrl, secretKey, jwtKey, proxyUrl, isSatellite, domain, publishableKey, machineSecretKey } = opts;
   const { signInUrl, signUpUrl, afterSignInUrl, afterSignUpUrl } = opts;
 
   const requestState = await createClerkClient({
@@ -24,6 +24,7 @@ export async function authenticateRequest(
     isSatellite,
     domain,
     publishableKey,
+    machineSecretKey,
     userAgent: `${PACKAGE_NAME}@${PACKAGE_VERSION}`,
   }).authenticateRequest(patchRequest(request), {
     audience,

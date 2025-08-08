@@ -72,7 +72,7 @@ describe('getAuthDataFromRequest', () => {
     });
 
     const auth = getAuthDataFromRequest(req, {
-      acceptsToken: ['machine_token', 'oauth_token', 'session_token'],
+      acceptsToken: ['m2m_token', 'oauth_token', 'session_token'],
     });
 
     expect(auth.tokenType).toBeNull();
@@ -183,7 +183,7 @@ describe('getAuthDataFromRequest', () => {
     });
 
     const auth = getAuthDataFromRequest(req, {
-      acceptsToken: ['api_key', 'machine_token'],
+      acceptsToken: ['api_key', 'm2m_token'],
     });
 
     expect(auth.tokenType).toBe('api_key');
@@ -203,7 +203,7 @@ describe('getAuthDataFromRequest', () => {
       data: { id: 'oat_id123', subject: 'user_12345' },
     },
     {
-      tokenType: 'machine_token' as const,
+      tokenType: 'm2m_token' as const,
       token: 'mt_123',
       data: { id: 'm2m_123', subject: 'mch_123' },
     },
@@ -243,7 +243,7 @@ describe('getAuthDataFromRequest', () => {
       data: undefined,
     },
     {
-      tokenType: 'machine_token' as const,
+      tokenType: 'm2m_token' as const,
       token: 'mt_123',
       data: undefined,
     },

@@ -8,6 +8,7 @@ type CreateClerkClientWithOptions = (context: APIContext, options?: ClerkOptions
 const createClerkClientWithOptions: CreateClerkClientWithOptions = (context, options) =>
   createClerkClient({
     secretKey: getSafeEnv(context).sk,
+    machineSecretKey: getSafeEnv(context).machineSecretKey,
     publishableKey: getSafeEnv(context).pk,
     apiUrl: getSafeEnv(context).apiUrl,
     apiVersion: getSafeEnv(context).apiVersion,

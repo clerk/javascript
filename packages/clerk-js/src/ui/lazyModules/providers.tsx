@@ -5,6 +5,7 @@ import React, { lazy, Suspense } from 'react';
 import type { FlowMetadata } from '../elements/contexts';
 import type { Drawer } from '../elements/Drawer';
 import type { ThemableCssProp } from '../styledSystem';
+import type { AvailableComponentCtx } from '../types';
 import type { ClerkComponentName } from './components';
 import { ClerkComponents } from './components';
 
@@ -76,7 +77,11 @@ export const LazyComponentRenderer = (props: LazyComponentRendererProps) => {
     >
       <Portal
         node={props.node}
-        component={ClerkComponents[props.componentName as ClerkComponentName]}
+        component={
+          ClerkComponents[props.componentName as ClerkComponentName] as React.ComponentType<
+            Omit<AvailableComponentCtx, 'componentName'>
+          >
+        }
         props={props.componentProps}
         componentName={props.componentName}
       />

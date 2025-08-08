@@ -45,6 +45,7 @@ describe('PlanDetails', () => {
     currency: 'USD',
     isDefault: false,
     payerType: ['user'],
+    forPayerType: 'user' as const,
     publiclyVisible: true,
     slug: 'test-plan',
     avatarUrl: 'https://example.com/avatar.png',

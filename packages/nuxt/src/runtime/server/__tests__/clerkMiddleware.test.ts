@@ -195,13 +195,13 @@ describe('clerkMiddleware(params)', () => {
       app.use(clerkMiddleware());
       app.use(
         '/',
-        eventHandler(event => event.context.auth({ acceptsToken: 'machine_token' })),
+        eventHandler(event => event.context.auth({ acceptsToken: 'm2m_token' })),
       );
       const response = await handler(new Request(new URL('/', 'http://localhost')));
 
       expect(response.status).toBe(200);
       const result = await response.json();
-      expect(result.tokenType).toBe('machine_token');
+      expect(result.tokenType).toBe('m2m_token');
       expect(result.isAuthenticated).toBe(false);
       expect(result.id).toBe(null);
     });
@@ -217,7 +217,7 @@ describe('clerkMiddleware(params)', () => {
       app.use(clerkMiddleware());
       app.use(
         '/',
-        eventHandler(event => event.context.auth({ acceptsToken: ['session_token', 'machine_token'] })),
+        eventHandler(event => event.context.auth({ acceptsToken: ['session_token', 'm2m_token'] })),
       );
       const response = await handler(new Request(new URL('/', 'http://localhost')));
 

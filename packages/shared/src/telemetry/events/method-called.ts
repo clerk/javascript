@@ -1,6 +1,7 @@
 import type { TelemetryEventRaw } from '@clerk/types';
 
 const EVENT_METHOD_CALLED = 'METHOD_CALLED';
+const EVENT_SAMPLING_RATE = 0.1;
 
 type EventMethodCalled = {
   method: string;
@@ -15,6 +16,7 @@ export function eventMethodCalled(
 ): TelemetryEventRaw<EventMethodCalled> {
   return {
     event: EVENT_METHOD_CALLED,
+    eventSamplingRate: EVENT_SAMPLING_RATE,
     payload: {
       method,
       ...payload,

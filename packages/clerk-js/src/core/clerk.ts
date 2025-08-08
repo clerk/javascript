@@ -154,6 +154,7 @@ import {
   Waitlist,
 } from './resources/internal';
 import { navigateToTask } from './sessionTasks';
+import { State } from './state';
 import { warnings } from './warnings';
 
 type SetActiveHook = (intent?: 'sign-out') => void | Promise<void>;
@@ -237,7 +238,8 @@ export class Clerk implements ClerkInterface {
   public user: UserResource | null | undefined;
   public __internal_country?: string | null;
   public telemetry: TelemetryCollector | undefined;
-  public debugLogger?: DebugLoggerInterface; // Properly typed debug logger interface
+  public readonly __internal_state: State = new State();
+  public debugLogger?: DebugLoggerInterface;
 
   protected internal_last_error: ClerkAPIError | null = null;
   // converted to protected environment to support `updateEnvironment` type assertion

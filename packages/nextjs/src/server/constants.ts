@@ -5,6 +5,7 @@ export const CLERK_JS_VERSION = process.env.NEXT_PUBLIC_CLERK_JS_VERSION || '';
 export const CLERK_JS_URL = process.env.NEXT_PUBLIC_CLERK_JS_URL || '';
 export const API_VERSION = process.env.CLERK_API_VERSION || 'v1';
 export const SECRET_KEY = process.env.CLERK_SECRET_KEY || '';
+export const MACHINE_SECRET_KEY = process.env.CLERK_MACHINE_SECRET_KEY || '';
 export const PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || '';
 export const ENCRYPTION_KEY = process.env.CLERK_ENCRYPTION_KEY || '';
 export const API_URL = process.env.CLERK_API_URL || apiUrlFromPublishableKey(PUBLISHABLE_KEY);

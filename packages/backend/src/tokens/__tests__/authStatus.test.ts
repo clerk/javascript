@@ -115,7 +115,7 @@ describe('signed-out', () => {
 
     it('returns an unauthenticated machine object with toAuth()', async () => {
       const signedOutAuthObject = signedOut({
-        tokenType: 'machine_token',
+        tokenType: 'm2m_token',
         authenticateContext: {} as AuthenticateContext,
         reason: 'auth-reason',
         message: 'auth-message',
@@ -123,11 +123,11 @@ describe('signed-out', () => {
 
       const token = await signedOutAuthObject.getToken();
       expect(token).toBeNull();
-      expect(signedOutAuthObject.tokenType).toBe('machine_token');
+      expect(signedOutAuthObject.tokenType).toBe('m2m_token');
       expect(signedOutAuthObject.id).toBeNull();
-      expect(signedOutAuthObject.name).toBeNull();
       expect(signedOutAuthObject.subject).toBeNull();
       expect(signedOutAuthObject.claims).toBeNull();
+      expect(signedOutAuthObject.scopes).toBeNull();
     });
   });
 });
