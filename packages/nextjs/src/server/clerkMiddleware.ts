@@ -93,6 +93,15 @@ export interface ClerkMiddlewareOptions extends AuthenticateAnyRequestOptions {
    * When set, automatically injects a Content-Security-Policy header(s) compatible with Clerk.
    */
   contentSecurityPolicy?: ContentSecurityPolicyOptions;
+
+  /**
+   * Configures how to handle missing publishable key errors.
+   * - `'throw'`: Throw an error (default behavior)
+   * - `'fail_open'`: Continue without authentication, log a warning
+   * - `'warn'`: Log a warning but continue
+   * @default 'throw'
+   */
+  missingKeyBehavior?: import('@clerk/shared/error').MissingKeyBehavior;
 }
 
 type ClerkMiddlewareOptionsCallback = (req: NextRequest) => ClerkMiddlewareOptions | Promise<ClerkMiddlewareOptions>;
@@ -143,7 +152,8 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
 
       const publishableKey = assertKey(
         resolvedParams.publishableKey || PUBLISHABLE_KEY || keyless?.publishableKey,
-        () => errorThrower.throwMissingPublishableKeyError(),
+        () => errorThrower.throwMissingPublishableKeyError(resolvedParams.missingKeyBehavior),
+        resolvedParams.missingKeyBehavior,
       );
 
       const secretKey = assertKey(resolvedParams.secretKey || SECRET_KEY || keyless?.secretKey, () =>
@@ -152,8 +162,17 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       const signInUrl = resolvedParams.signInUrl || SIGN_IN_URL;
       const signUpUrl = resolvedParams.signUpUrl || SIGN_UP_URL;
 
+      // In fail-open mode, if we don't have keys, we should skip auth entirely
+      if (
+        !publishableKey &&
+        resolvedParams.missingKeyBehavior !== import('@clerk/shared/error').MissingKeyBehavior.THROW
+      ) {
+        // Return early without authentication
+        return handler ? handler(() => ({}), request, event) : NextResponse.next();
+      }
+
       const options = {
-        publishableKey,
+        publishableKey: publishableKey,
         secretKey,
         signInUrl,
         signUpUrl,

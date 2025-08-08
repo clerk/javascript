@@ -60,6 +60,14 @@ export type ClerkProviderProps = IsomorphicClerkOptions & {
    * @internal
    */
   __internal_bypassMissingPublishableKey?: boolean;
+  /**
+   * Configures how to handle missing publishable key errors.
+   * - `'throw'`: Throw an error (default behavior)
+   * - `'fail_open'`: Continue without authentication, log a warning
+   * - `'warn'`: Log a warning but continue
+   * @default 'throw'
+   */
+  missingKeyBehavior?: import('@clerk/shared/error').MissingKeyBehavior;
 };
 
 export interface BrowserClerkConstructor {

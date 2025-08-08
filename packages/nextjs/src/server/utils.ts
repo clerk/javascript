@@ -148,8 +148,23 @@ export function assertAuthStatus(req: RequestLike, error: string) {
   }
 }
 
-export function assertKey(key: string | undefined, onError: () => never): string {
+export function assertKey(key: string | undefined, onError: () => never): string;
+export function assertKey(
+  key: string | undefined,
+  onError: () => never,
+  behavior: import('@clerk/shared/error').MissingKeyBehavior,
+): string | undefined;
+export function assertKey(
+  key: string | undefined,
+  onError: () => never,
+  behavior?: import('@clerk/shared/error').MissingKeyBehavior,
+): string | undefined {
   if (!key) {
+    if (behavior && behavior !== import('@clerk/shared/error').MissingKeyBehavior.THROW) {
+      // For FAIL_OPEN and WARN modes, just call onError which will handle the behavior
+      onError();
+      return undefined;
+    }
     onError();
   }
 

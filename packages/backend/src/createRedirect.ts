@@ -77,13 +77,21 @@ type CreateRedirect = <ReturnType>(params: {
   signInUrl?: URL | string;
   signUpUrl?: URL | string;
   sessionStatus?: SessionStatusClaim | null;
+  /**
+   * Configures how to handle missing publishable key errors.
+   * - `'throw'`: Throw an error (default behavior)
+   * - `'fail_open'`: Continue without authentication, log a warning
+   * - `'warn'`: Log a warning but continue
+   * @default 'throw'
+   */
+  missingKeyBehavior?: 'throw' | 'fail_open' | 'warn';
 }) => {
   redirectToSignIn: RedirectFun<ReturnType>;
   redirectToSignUp: RedirectFun<ReturnType>;
 };
 
 export const createRedirect: CreateRedirect = params => {
-  const { publishableKey, redirectAdapter, signInUrl, signUpUrl, baseUrl, sessionStatus } = params;
+  const { publishableKey, redirectAdapter, signInUrl, signUpUrl, baseUrl, sessionStatus, missingKeyBehavior } = params;
   const parsedPublishableKey = parsePublishableKey(publishableKey);
   const frontendApi = parsedPublishableKey?.frontendApi;
   const isDevelopment = parsedPublishableKey?.instanceType === 'development';
@@ -98,6 +106,7 @@ export const createRedirect: CreateRedirect = params => {
 
   const redirectToSignUp = ({ returnBackUrl }: RedirectToParams = {}) => {
     if (!signUpUrl && !accountsBaseUrl) {
+      // TODO: Update to use behavior parameter when errorThrower interface is updated
       errorThrower.throwMissingPublishableKeyError();
     }
 
@@ -124,6 +133,7 @@ export const createRedirect: CreateRedirect = params => {
 
   const redirectToSignIn = ({ returnBackUrl }: RedirectToParams = {}) => {
     if (!signInUrl && !accountsBaseUrl) {
+      // TODO: Update to use behavior parameter when errorThrower interface is updated
       errorThrower.throwMissingPublishableKeyError();
     }
 

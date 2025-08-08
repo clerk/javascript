@@ -49,7 +49,9 @@ export async function syncKeylessConfigAction(args: AccountlessApplication & { r
   return;
 }
 
-export async function createOrReadKeylessAction(): Promise<null | Omit<AccountlessApplication, 'secretKey'>> {
+export async function createOrReadKeylessAction(
+  missingKeyBehavior?: import('@clerk/shared/error').MissingKeyBehavior,
+): Promise<null | Omit<AccountlessApplication, 'secretKey'>> {
   if (!canUseKeyless) {
     return null;
   }
@@ -57,7 +59,7 @@ export async function createOrReadKeylessAction(): Promise<null | Omit<Accountle
   const result = await import('../server/keyless-node.js').then(m => m.createOrReadKeyless()).catch(() => null);
 
   if (!result) {
-    errorThrower.throwMissingPublishableKeyError();
+    errorThrower.throwMissingPublishableKeyError(missingKeyBehavior);
     return null;
   }
 
