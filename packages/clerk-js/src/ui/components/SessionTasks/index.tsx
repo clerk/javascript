@@ -24,7 +24,10 @@ const SessionTasksStart = () => {
   useEffect(() => {
     // Simulates additional latency to avoid a abrupt UI transition when navigating to the next task
     const timeoutId = setTimeout(() => {
-      // TODO - call setActive?
+      const currentTaskKey = clerk.session?.currentTask?.key;
+      if (!currentTaskKey) return;
+
+      void navigate(`./${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[currentTaskKey]}`);
     }, 500);
     return () => clearTimeout(timeoutId);
   }, [navigate, clerk, redirectUrlComplete]);
