@@ -112,7 +112,7 @@ export const SessionTasks = withCardStateProvider(() => {
       return;
     }
 
-    return navigate(`./${currentTaskKey}`);
+    return navigate(`./${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[currentTaskKey]}`);
   };
 
   return (
