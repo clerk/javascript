@@ -121,12 +121,12 @@ export const useSignInContext = (): SignInContextType => {
   const signUpContinueUrl = buildURL({ base: signUpUrl, hashPath: '/continue' }, { stringify: true });
 
   const navigateOnSetActive = async ({ session, redirectUrl }: { session: SessionResource; redirectUrl: string }) => {
-    const currentTaskKey = session.currentTask?.key;
-    if (!currentTaskKey) {
+    const currentTask = session.currentTask;
+    if (!currentTask) {
       return navigate(redirectUrl);
     }
 
-    return navigate(`../tasks/${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[currentTaskKey]}`);
+    return navigate(`../tasks/${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[currentTask.key]}`);
   };
 
   const taskUrl = clerk.session?.currentTask
