@@ -2,7 +2,7 @@ import { isClerkRuntimeError, isUserLockedError } from '@clerk/shared/error';
 import { useClerk } from '@clerk/shared/react';
 import { useCallback, useEffect } from 'react';
 
-import { navigateToTask } from '@/core/sessionTasks';
+import { navigateIfTaskExists } from '@/core/sessionTasks';
 import { useCardState } from '@/ui/elements/contexts';
 import { useRouter } from '@/ui/router';
 import { handleError } from '@/ui/utils/errorHandler';
@@ -36,7 +36,7 @@ function useHandleAuthenticateWithPasskey(onSecondFactor: () => Promise<unknown>
             session: res.createdSessionId,
             redirectUrl: afterSignInUrl,
             navigate: async ({ session }) => {
-              await navigateToTask(session, {
+              await navigateIfTaskExists(session, {
                 baseUrl: signInUrl,
                 navigate: navigate,
               });
