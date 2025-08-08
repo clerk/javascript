@@ -7,6 +7,8 @@ import type {
   ConfirmCheckoutParams,
 } from '@clerk/types';
 
+import { unixEpochToDate } from '@/utils/date';
+
 import { commerceTotalsFromJSON } from '../../utils';
 import { BaseResource, CommercePaymentSource, CommercePlan, isClerkAPIResponseError } from './internal';
 
@@ -21,6 +23,7 @@ export class CommerceCheckout extends BaseResource implements CommerceCheckoutRe
   status!: 'needs_confirmation' | 'completed';
   totals!: CommerceCheckoutTotals;
   isImmediatePlanChange!: boolean;
+  freeTrialEndsAt!: Date | null;
 
   constructor(data: CommerceCheckoutJSON, orgId?: string) {
     super();
@@ -43,6 +46,7 @@ export class CommerceCheckout extends BaseResource implements CommerceCheckoutRe
     this.status = data.status;
     this.totals = commerceTotalsFromJSON(data.totals);
     this.isImmediatePlanChange = data.is_immediate_plan_change;
+    this.freeTrialEndsAt = data.free_trial_ends_at ? unixEpochToDate(data.free_trial_ends_at) : null;
     return this;
   }
 

@@ -143,12 +143,14 @@ export type __internal_LocalizationResource = {
   badge__unverified: LocalizationValue;
   badge__requiresAction: LocalizationValue;
   badge__you: LocalizationValue;
+  badge__freeTrial: LocalizationValue;
   badge__currentPlan: LocalizationValue;
   badge__upcomingPlan: LocalizationValue;
   badge__activePlan: LocalizationValue;
   badge__pastDuePlan: LocalizationValue;
   badge__startsAt: LocalizationValue<'date'>;
   badge__pastDueAt: LocalizationValue<'date'>;
+  badge__trialEndsAt: LocalizationValue<'date'>;
   badge__endsAt: LocalizationValue;
   badge__expired: LocalizationValue;
   badge__canceledEndsAt: LocalizationValue<'date'>;
@@ -174,6 +176,8 @@ export type __internal_LocalizationResource = {
     keepSubscription: LocalizationValue;
     reSubscribe: LocalizationValue;
     subscribe: LocalizationValue;
+    startFreeTrial: LocalizationValue;
+    startFreeTrial__days: LocalizationValue<'days'>;
     switchPlan: LocalizationValue;
     switchToMonthly: LocalizationValue;
     switchToAnnual: LocalizationValue;
@@ -252,6 +256,7 @@ export type __internal_LocalizationResource = {
       };
       downgradeNotice: LocalizationValue;
       pastDueNotice: LocalizationValue;
+      totalDueAfterTrial: LocalizationValue<'days'>;
       perMonth: LocalizationValue;
     };
   };

@@ -7,19 +7,21 @@ const keys = {
   active: 'badge__activePlan',
   upcoming: 'badge__upcomingPlan',
   past_due: 'badge__pastDuePlan',
+  free_trial: 'badge__freeTrial',
 };
 
 const colors = {
   active: 'secondary',
   upcoming: 'primary',
   past_due: 'warning',
+  free_trial: 'secondary',
 };
 
-export const SubscriptionBadge = ({
+export const SubscriptionBadge = <T extends { status: CommerceSubscriptionItemResource['status'] }>({
   subscription,
   elementDescriptor,
 }: {
-  subscription: CommerceSubscriptionItemResource;
+  subscription: T | { status: 'free_trial' };
   elementDescriptor?: ElementDescriptor;
 }) => {
   return (

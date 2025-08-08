@@ -649,6 +649,8 @@ export interface CommercePlanJSON extends ClerkResourceJSON {
   slug: string;
   avatar_url: string;
   features: CommerceFeatureJSON[];
+  free_trial_days?: number | null;
+  free_trial_enabled?: boolean;
 }
 
 /**
@@ -780,6 +782,9 @@ export interface CommerceSubscriptionItemJSON extends ClerkResourceJSON {
   period_end: number;
   canceled_at: number | null;
   past_due_at: number | null;
+  // is_free_trial: boolean;
+  // TODO(@COMMERCE): Remove optional after GA.
+  free_trial_ends_at?: number | null;
 }
 
 /**
@@ -809,6 +814,7 @@ export interface CommerceSubscriptionJSON extends ClerkResourceJSON {
   updated_at: number | null;
   past_due_at: number | null;
   subscription_items: CommerceSubscriptionItemJSON[] | null;
+  eligible_for_free_trial?: boolean;
 }
 
 /**
@@ -873,6 +879,8 @@ export interface CommerceCheckoutJSON extends ClerkResourceJSON {
   status: 'needs_confirmation' | 'completed';
   totals: CommerceCheckoutTotalsJSON;
   is_immediate_plan_change: boolean;
+  // TODO(@COMMERCE): Remove optional after GA.
+  free_trial_ends_at?: number | null;
 }
 
 export interface ApiKeyJSON extends ClerkResourceJSON {

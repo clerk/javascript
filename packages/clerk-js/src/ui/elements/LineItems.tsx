@@ -84,9 +84,10 @@ interface TitleProps {
   title?: string | LocalizationKey;
   description?: string | LocalizationKey;
   icon?: React.ComponentType;
+  badge?: React.ReactNode;
 }
 
-const Title = React.forwardRef<HTMLTableCellElement, TitleProps>(({ title, description, icon }, ref) => {
+const Title = React.forwardRef<HTMLTableCellElement, TitleProps>(({ title, description, icon, badge = null }, ref) => {
   const context = React.useContext(GroupContext);
   if (!context) {
     throw new Error('LineItems.Title must be used within LineItems.Group');
@@ -120,6 +121,7 @@ const Title = React.forwardRef<HTMLTableCellElement, TitleProps>(({ title, descr
             />
           ) : null}
           <Span localizationKey={title} />
+          {badge}
         </Span>
       ) : null}
       {description ? (
