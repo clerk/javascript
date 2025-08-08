@@ -1228,7 +1228,7 @@ export class Clerk implements ClerkInterface {
       const sessionIsPending = newSession?.status === 'pending';
 
       if (sessionIsPending) {
-        warnMissingPendingTaskHandlers(params);
+        warnMissingPendingTaskHandlers({ ...this.#options, ...params });
       }
 
       // At this point, the `session` variable should contain either an `SignedInSessionResource`
@@ -1301,7 +1301,7 @@ export class Clerk implements ClerkInterface {
       }
 
       const taskUrl =
-        sessionIsPending && this.session?.currentTask && this.#options.taskUrls?.[this.session?.currentTask.key];
+        sessionIsPending && newSession?.currentTask && this.#options.taskUrls?.[newSession?.currentTask.key];
       const shouldNavigate = (redirectUrl || taskUrl || setActiveNavigate) && !beforeEmit;
       if (shouldNavigate) {
         await tracker.track(async () => {
