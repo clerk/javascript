@@ -1,8 +1,8 @@
 import { deprecated } from '@clerk/shared/deprecated';
 import type {
-  ProtectProps as _ProtectProps,
   HandleOAuthCallbackParams,
   PendingSessionOptions,
+  ProtectProps as _ProtectProps,
   RedirectOptions,
 } from '@clerk/types';
 import { defineComponent } from 'vue';
