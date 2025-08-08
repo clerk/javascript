@@ -950,7 +950,6 @@ type ClerkOptionsNavigation =
     };
 
 /**
- * A custom navigation function to be called just before the session and/or organization is set.
  * @inline
  */
 export type SetActiveNavigate = ({ session }: { session: SessionResource }) => Promise<unknown>;
