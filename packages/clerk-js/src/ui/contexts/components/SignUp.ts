@@ -121,7 +121,7 @@ export const useSignUpContext = (): SignUpContextType => {
       return;
     }
 
-    return navigate(`/tasks/${currentTaskKey}`);
+    return navigate(`../tasks/${currentTaskKey}`);
   };
 
   const taskUrl = clerk.session?.currentTask

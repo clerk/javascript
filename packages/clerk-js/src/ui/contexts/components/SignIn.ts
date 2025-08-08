@@ -126,7 +126,7 @@ export const useSignInContext = (): SignInContextType => {
       return;
     }
 
-    return navigate(`/tasks/${currentTaskKey}`);
+    return navigate(`../tasks/${currentTaskKey}`);
   };
 
   const taskUrl = clerk.session?.currentTask
