@@ -61,7 +61,7 @@ import type {
   RedirectOptions,
   Resources,
   SDKMetadata,
-  SetActiveNavigate,
+  SessionResource,
   SetActiveParams,
   SignedInSessionResource,
   SignInProps,
@@ -1828,7 +1828,12 @@ export class Clerk implements ClerkInterface {
       });
     };
 
-    const setActiveNavigate: SetActiveNavigate = async ({ session }) => {
+    const setActiveNavigate = async ({ session, redirectUrl }: { session: SessionResource; redirectUrl: string }) => {
+      if (!session.currentTask) {
+        await this.navigate(redirectUrl);
+        return;
+      }
+
       await navigateIfTaskExists(session, {
         baseUrl: params.signInUrl ?? displayConfig.signInUrl,
         navigate: this.navigate,
@@ -1838,8 +1843,9 @@ export class Clerk implements ClerkInterface {
     if (si.status === 'complete') {
       return this.setActive({
         session: si.sessionId,
-        redirectUrl: redirectUrls.getAfterSignInUrl(),
-        navigate: setActiveNavigate,
+        navigate: async ({ session }) => {
+          await setActiveNavigate({ session, redirectUrl: redirectUrls.getAfterSignInUrl() });
+        },
       });
     }
 
@@ -1852,8 +1858,9 @@ export class Clerk implements ClerkInterface {
         case 'complete':
           return this.setActive({
             session: res.createdSessionId,
-            redirectUrl: redirectUrls.getAfterSignInUrl(),
-            navigate: setActiveNavigate,
+            navigate: async ({ session }) => {
+              await setActiveNavigate({ session, redirectUrl: redirectUrls.getAfterSignInUrl() });
+            },
           });
         case 'needs_first_factor':
           return navigateToFactorOne();
@@ -1902,8 +1909,9 @@ export class Clerk implements ClerkInterface {
         case 'complete':
           return this.setActive({
             session: res.createdSessionId,
-            redirectUrl: redirectUrls.getAfterSignUpUrl(),
-            navigate: setActiveNavigate,
+            navigate: async ({ session }) => {
+              await setActiveNavigate({ session, redirectUrl: redirectUrls.getAfterSignUpUrl() });
+            },
           });
         case 'missing_requirements':
           return navigateToNextStepSignUp({ missingFields: res.missingFields });
@@ -1915,8 +1923,9 @@ export class Clerk implements ClerkInterface {
     if (su.status === 'complete') {
       return this.setActive({
         session: su.sessionId,
-        redirectUrl: redirectUrls.getAfterSignUpUrl(),
-        navigate: setActiveNavigate,
+        navigate: async ({ session }) => {
+          await setActiveNavigate({ session, redirectUrl: redirectUrls.getAfterSignUpUrl() });
+        },
       });
     }
 
@@ -1940,8 +1949,9 @@ export class Clerk implements ClerkInterface {
       if (sessionId) {
         return this.setActive({
           session: sessionId,
-          redirectUrl: redirectUrls.getAfterSignInUrl(),
-          navigate: setActiveNavigate,
+          navigate: async ({ session }) => {
+            await setActiveNavigate({ session, redirectUrl: redirectUrls.getAfterSignInUrl() });
+          },
         });
       }
     }
@@ -2122,6 +2132,18 @@ export class Clerk implements ClerkInterface {
       }
     }
 
+    const setActiveNavigate = async ({ session, redirectUrl }: { session: SessionResource; redirectUrl: string }) => {
+      if (!session.currentTask) {
+        await this.navigate(redirectUrl);
+        return;
+      }
+
+      await navigateIfTaskExists(session, {
+        baseUrl: displayConfig.signInUrl,
+        navigate: this.navigate,
+      });
+    };
+
     switch (signInOrSignUp.status) {
       case 'needs_second_factor':
         await navigateToFactorTwo();
@@ -2130,12 +2152,8 @@ export class Clerk implements ClerkInterface {
         if (signInOrSignUp.createdSessionId) {
           await this.setActive({
             session: signInOrSignUp.createdSessionId,
-            redirectUrl,
             navigate: async ({ session }) => {
-              await navigateIfTaskExists(session, {
-                baseUrl: displayConfig.signInUrl,
-                navigate: this.navigate,
-              });
+              await setActiveNavigate({ session, redirectUrl: redirectUrl ?? this.buildAfterSignInUrl() });
             },
           });
         }

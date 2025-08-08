@@ -2,6 +2,7 @@ import { useClerk, useOrganizationList, useUser } from '@clerk/shared/react';
 import type {
   OrganizationResource,
   OrganizationSuggestionResource,
+  SetActiveParams,
   UserOrganizationInvitationResource,
 } from '@clerk/types';
 import React, { useState } from 'react';
@@ -97,7 +98,7 @@ export const ChooseOrganizationScreen = withCardStateProvider(
 
 const MembershipPreview = withCardStateProvider((props: { organization: OrganizationResource }) => {
   const card = useCardState();
-  const { redirectUrlComplete, onPendingSession } = useSessionTasksContext();
+  const { redirectUrlComplete, navigateOnSetActive } = useSessionTasksContext();
   const { isLoaded, setActive } = useOrganizationList();
 
   if (!isLoaded) {
@@ -106,11 +107,19 @@ const MembershipPreview = withCardStateProvider((props: { organization: Organiza
 
   const handleOrganizationClicked = (organization: OrganizationResource) => {
     return card.runAsync(async () => {
-      await setActive({
+      const setActiveParams: SetActiveParams = {
         organization,
         redirectUrl: redirectUrlComplete,
-        navigate: onPendingSession,
-      });
+      };
+
+      // TODO - Add `onComplete` or `onNextTask` callbacks for `TaskChooseOrganization` standalone usage
+      if (navigateOnSetActive) {
+        setActiveParams.navigate = async ({ session }) => {
+          await navigateOnSetActive({ session, redirectUrl: redirectUrlComplete });
+        };
+      }
+
+      await setActive(setActiveParams);
     });
   };
 
