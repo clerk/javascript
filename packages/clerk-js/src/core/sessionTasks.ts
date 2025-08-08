@@ -12,20 +12,21 @@ interface NavigateToTaskOptions {
   options?: ClerkOptions;
 }
 
+export function buildTaskURL(task: SessionTask, opts: Pick<Parameters<typeof buildURL>[0], 'base'>) {
+  return buildURL(
+    {
+      base: opts.base,
+      hashPath: `/tasks/${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[task.key]}`,
+    },
+    { stringify: true },
+  );
+}
+
 /**
  * @internal
  */
 export function navigateToTask(session: PendingSessionResource, { options, navigate, baseUrl }: NavigateToTaskOptions) {
   const currentTaskKey = session.currentTask.key;
 
-  return navigate(
-    options?.taskUrls?.[currentTaskKey] ??
-      buildURL(
-        {
-          base: baseUrl,
-          hashPath: `/tasks/${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[currentTaskKey]}`,
-        },
-        { stringify: true },
-      ),
-  );
+  return navigate(options?.taskUrls?.[currentTaskKey] ?? buildTaskURL(session.currentTask, { base: baseUrl }));
 }
