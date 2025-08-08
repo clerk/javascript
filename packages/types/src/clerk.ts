@@ -120,6 +120,7 @@ export type SDKMetadata = {
 export type ListenerCallback = (emission: Resources) => void;
 export type UnsubscribeCallback = () => void;
 export type BeforeEmitCallback = (session?: SignedInSessionResource | null) => void | Promise<any>;
+export type SetActiveNavigate = ({ session }: { session: SessionResource }) => Promise<unknown>;
 
 export type SignOutCallback = () => void | Promise<any>;
 
@@ -949,11 +950,6 @@ type ClerkOptionsNavigation =
       routerDebug?: boolean;
     };
 
-/**
- * @inline
- */
-export type SetActiveNavigate = ({ session }: { session: SessionResource }) => Promise<unknown>;
-
 export type ClerkOptions = ClerkOptionsNavigation &
   ClerkOptionsNavigation &
   SignInForceRedirectUrl &
@@ -1210,8 +1206,13 @@ export type SetActiveParams = {
    * ```typescript
    * await clerk.setActive({
    *   session,
-   *   navigate: async () => {
-   *     // Custom navigation logic
+   *   navigate: async ({ session }) => {
+   *     const currentTask = session.currentTask;
+   *     if (currentTask) {
+   *       await router.push(`/onboarding/${currentTask.key}`)
+   *       return
+   *     }
+   *
    *     router.push('/dashboard');
    *   }
    * });
