@@ -36,7 +36,7 @@ export const SignUpContext = createContext<SignUpCtx | null>(null);
 
 export const useSignUpContext = (): SignUpContextType => {
   const context = useContext(SignUpContext);
-  const { navigate, indexPath } = useRouter();
+  const { navigate, basePath } = useRouter();
   const { displayConfig, userSettings } = useEnvironment();
   const { queryParams, queryString } = useRouter();
   const signUpMode = userSettings.signUp.mode;
@@ -121,7 +121,7 @@ export const useSignUpContext = (): SignUpContextType => {
       return navigate(redirectUrl);
     }
 
-    return navigate(indexPath + `/tasks/${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[currentTask.key]}`);
+    return navigate(`/${basePath}/tasks/${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[currentTask.key]}`);
   };
 
   const taskUrl = clerk.session?.currentTask
