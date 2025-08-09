@@ -9,4 +9,4 @@
 '@clerk/vue': minor
 ---
 
-Remove `RedirectToTask` control component
+Rename `RedirectToTask` control component to `RedirectToTasks`

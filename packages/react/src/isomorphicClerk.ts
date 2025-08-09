@@ -388,6 +388,15 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
+  buildTasksUrl = (): string | void => {
+    const callback = () => this.clerkjs?.buildTasksUrl() || '';
+    if (this.clerkjs && this.loaded) {
+      return callback();
+    } else {
+      this.premountMethodCalls.set('buildTasksUrl', callback);
+    }
+  };
+
   buildUrlWithAuth = (to: string): string | void => {
     const callback = () => this.clerkjs?.buildUrlWithAuth(to) || '';
     if (this.clerkjs && this.loaded) {
@@ -1263,6 +1272,16 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return callback();
     } else {
       this.premountMethodCalls.set('redirectToWaitlist', callback);
+      return;
+    }
+  };
+
+  redirectToTasks = async (opts?: SignInRedirectOptions) => {
+    const callback = () => this.clerkjs?.redirectToTasks(opts as any);
+    if (this.clerkjs && this.loaded) {
+      return callback();
+    } else {
+      this.premountMethodCalls.set('redirectToTasks', callback);
       return;
     }
   };
