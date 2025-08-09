@@ -473,6 +473,7 @@ function SignInStartInternal(): JSX.Element {
         signUpMode: userSettings.signUp.mode,
         redirectUrl,
         redirectUrlComplete,
+        navigateOnSetActive,
         passwordEnabled: userSettings.attributes.password?.required ?? false,
         alternativePhoneCodeChannel:
           alternativePhoneCodeProvider?.channel ||
