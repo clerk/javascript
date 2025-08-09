@@ -1,7 +1,7 @@
 import { logger } from '@clerk/shared/logger';
 import type { ClerkOptions, SessionResource, SessionTask, SetActiveParams } from '@clerk/types';
 
-import { buildURL } from '../utils';
+import { buildURL, forwardClerkQueryParams } from '../utils';
 
 /**
  * @internal
@@ -14,10 +14,13 @@ export const INTERNAL_SESSION_TASK_ROUTE_BY_KEY: Record<SessionTask['key'], stri
  * @internal
  */
 export function buildTasksUrl(task: SessionTask, opts: Pick<Parameters<typeof buildURL>[0], 'base'>) {
+  const params = forwardClerkQueryParams();
+
   return buildURL(
     {
       base: opts.base,
       hashPath: `/tasks/${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[task.key]}`,
+      searchParams: params,
     },
     { stringify: true },
   );

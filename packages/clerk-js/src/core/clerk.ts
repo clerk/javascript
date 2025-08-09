@@ -1990,6 +1990,14 @@ export class Clerk implements ClerkInterface {
       return navigateToNextStepSignUp({ missingFields: signUp.missingFields });
     }
 
+    if (this.session?.currentTask) {
+      await navigateIfTaskExists(this.session, {
+        baseUrl: params.signInUrl ?? displayConfig.signInUrl,
+        navigate: this.navigate,
+      });
+      return;
+    }
+
     return navigateToSignIn();
   };
 

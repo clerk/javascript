@@ -23,7 +23,10 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
     test.afterAll(async () => {
       const u = createTestUtils({ app });
       await u.services.organizations.deleteAll();
+      // Delete the user on the OAuth provider instance.
       await fakeUser.deleteIfExists();
+      // Delete the user on the app instance.
+      await u.services.users.deleteIfExists({ email: fakeUser.email });
       await app.teardown();
     });
 
