@@ -1,19 +1,32 @@
-import type { M2MToken, Machine } from '@clerk/backend';
+import { createClerkClient, type M2MToken, type Machine } from '@clerk/backend';
+import { faker } from '@faker-js/faker';
 import { expect, test } from '@playwright/test';
 
 import type { Application } from '../../models/application';
 import { appConfigs } from '../../presets';
+import { instanceKeys } from '../../presets/envs';
 import { createTestUtils } from '../../testUtils';
 
-test.describe('M2M Token Authentication @machine', () => {
+test.describe('machine-to-machine auth @machine', () => {
   test.describe.configure({ mode: 'parallel' });
   let app: Application;
-
   let primaryApiServer: Machine;
   let emailServer: Machine;
-  let m2mToken: M2MToken;
+  let analyticsServer: Machine;
+  let emailServerM2MToken: M2MToken;
+  let analyticsServerM2MToken: M2MToken;
 
   test.beforeAll(async () => {
+    const fakeCompanyName = faker.company.name();
+
+    // Create primary machine using instance secret key
+    const client = createClerkClient({
+      secretKey: instanceKeys.get('with-api-keys').sk,
+    });
+    primaryApiServer = await client.machines.create({
+      name: `${fakeCompanyName} Primary API Server`,
+    });
+
     app = await appConfigs.express.vite
       .clone()
       .addFile(
@@ -26,67 +39,131 @@ test.describe('M2M Token Authentication @machine', () => {
 
         const app = express();
 
-        app.use(clerkMiddleware());
+        app.use(
+          clerkMiddleware({
+            publishableKey: process.env.VITE_CLERK_PUBLISHABLE_KEY,
+            machineSecretKey: process.env.CLERK_MACHINE_SECRET_KEY,
+          }),
+        );
 
         app.get('/api/protected', (req, res) => {
           const { machineId } = getAuth(req, { acceptsToken: 'm2m_token' });
-          
-          if (machineId) {
-            return res.send('Authorized');
-          } else {
-            return res.status(401).send('Unauthorized');
+          if (!machineId) {
+            res.status(401).send('Unauthorized');
+            return;
           }
+
+          res.send('Protected response');
         });
 
-        const port = parseInt(process.env.PORT as string) || 3002;
-        ViteExpress.listen(app, port, () => console.log(\`Server is listening on port \${port}...\`));
+        ViteExpress.listen(app, process.env.PORT, () => console.log('Server started'));
         `,
       )
       .commit();
 
     await app.setup();
-    await app.withEnv(appConfigs.envs.withAPIKeys);
+
+    // Using the created machine, set a machine secret key using the primary machine's secret key
+    const env = appConfigs.envs.withAPIKeys
+      .clone()
+      .setEnvVariable('private', 'CLERK_MACHINE_SECRET_KEY', primaryApiServer.secretKey);
+    await app.withEnv(env);
     await app.dev();
 
     const u = createTestUtils({ app });
 
-    try {
-      primaryApiServer = await u.services.clerk.machines.create({
-        name: 'Primary API Server',
-      });
+    // Email server can access primary API server
+    emailServer = await u.services.clerk.machines.create({
+      name: `${fakeCompanyName} Email Server`,
+      scopedMachines: [primaryApiServer.id],
+    });
+    emailServerM2MToken = await u.services.clerk.m2mTokens.create({
+      machineSecretKey: emailServer.secretKey,
+      secondsUntilExpiration: 60 * 30,
+    });
 
-      emailServer = await u.services.clerk.machines.create({
-        name: 'Email Server',
-        scopedMachines: [primaryApiServer.id],
-      });
-      m2mToken = await u.services.clerk.m2mTokens.create({
-        machineSecretKey: emailServer.secretKey,
-        secondsUntilExpiration: 60 * 30, // 30 minutes
-      });
-    } catch (error) {
-      console.error('ERROR IN BEFORE ALL', error);
-    }
+    // Analytics server cannot access primary API server
+    analyticsServer = await u.services.clerk.machines.create({
+      name: `${fakeCompanyName} Analytics Server`,
+      // No scoped machines
+    });
+    analyticsServerM2MToken = await u.services.clerk.m2mTokens.create({
+      machineSecretKey: analyticsServer.secretKey,
+      secondsUntilExpiration: 60 * 30,
+    });
   });
 
   test.afterAll(async () => {
     const u = createTestUtils({ app });
-    if (emailServer) {
-      await u.services.clerk.machines.delete(emailServer.id);
-    }
-    if (primaryApiServer) {
-      await u.services.clerk.machines.delete(primaryApiServer.id);
-    }
-    if (m2mToken) {
-      await u.services.clerk.m2mTokens.revoke({
-        m2mTokenId: m2mToken.id,
-      });
-    }
+
+    await u.services.clerk.m2mTokens.revoke({
+      m2mTokenId: emailServerM2MToken.id,
+    });
+    await u.services.clerk.m2mTokens.revoke({
+      m2mTokenId: analyticsServerM2MToken.id,
+    });
+    await u.services.clerk.machines.delete(emailServer.id);
+    await u.services.clerk.machines.delete(primaryApiServer.id);
+    await u.services.clerk.machines.delete(analyticsServer.id);
+
     await app.teardown();
   });
 
-  test('should return 401 if no M2M token is provided', async ({ request }) => {
-    const url = new URL('/api/protected', app.serverUrl);
-    const res = await request.get(url.toString());
+  test('rejects requests with invalid M2M tokens', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+
+    const res = await u.page.request.get(app.serverUrl + '/api/protected', {
+      headers: {
+        Authorization: `Bearer invalid`,
+      },
+    });
     expect(res.status()).toBe(401);
+    expect(await res.text()).toBe('Unauthorized');
+  });
+
+  test('rejects M2M requests when sender machine lacks access to receiver machine', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+
+    const res = await u.page.request.get(app.serverUrl + '/api/protected', {
+      headers: {
+        Authorization: `Bearer ${analyticsServerM2MToken.secret}`,
+      },
+    });
+    expect(res.status()).toBe(401);
+    expect(await res.text()).toBe('Unauthorized');
+  });
+
+  test('authorizes M2M requests when sender machine has proper access to receiver machine', async ({
+    page,
+    context,
+  }) => {
+    const u = createTestUtils({ app, page, context });
+
+    // Email server can access primary API server
+    const res = await u.page.request.get(app.serverUrl + '/api/protected', {
+      headers: {
+        Authorization: `Bearer ${emailServerM2MToken.secret}`,
+      },
+    });
+    expect(res.status()).toBe(200);
+    expect(await res.text()).toBe('Protected response');
+
+    // Analytics server can access primary API server after adding scope
+    await u.services.clerk.machines.createScope(analyticsServer.id, primaryApiServer.id);
+    const m2mToken = await u.services.clerk.m2mTokens.create({
+      machineSecretKey: analyticsServer.secretKey,
+      secondsUntilExpiration: 60 * 30,
+    });
+
+    const res2 = await u.page.request.get(app.serverUrl + '/api/protected', {
+      headers: {
+        Authorization: `Bearer ${m2mToken.secret}`,
+      },
+    });
+    expect(res2.status()).toBe(200);
+    expect(await res2.text()).toBe('Protected response');
+    await u.services.clerk.m2mTokens.revoke({
+      m2mTokenId: m2mToken.id,
+    });
   });
 });
