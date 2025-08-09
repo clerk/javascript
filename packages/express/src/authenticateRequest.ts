@@ -99,6 +99,7 @@ const absoluteProxyUrl = (relativeOrAbsoluteUrl: string, baseUrl: string): strin
 
 export const authenticateAndDecorateRequest = (options: ClerkMiddlewareOptions = {}): RequestHandler => {
   const clerkClient = options.clerkClient || defaultClerkClient;
+  const enableHandshake = options.enableHandshake ?? true;
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   const middleware: RequestHandler = async (request, response, next) => {
@@ -113,12 +114,14 @@ export const authenticateAndDecorateRequest = (options: ClerkMiddlewareOptions =
         options,
       });
 
-      const err = setResponseHeaders(requestState, response);
-      if (err) {
-        return next(err);
-      }
-      if (response.writableEnded) {
-        return;
+      if (enableHandshake) {
+        const err = setResponseHeaders(requestState, response);
+        if (err) {
+          return next(err);
+        }
+        if (response.writableEnded) {
+          return;
+        }
       }
 
       // TODO: For developers coming from the clerk-sdk-node package, we gave them examples
