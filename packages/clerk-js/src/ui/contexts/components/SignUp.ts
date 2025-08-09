@@ -3,7 +3,7 @@ import { isAbsoluteUrl } from '@clerk/shared/url';
 import type { SessionResource } from '@clerk/types';
 import { createContext, useContext, useMemo } from 'react';
 
-import { buildTaskURL, INTERNAL_SESSION_TASK_ROUTE_BY_KEY } from '@/core/sessionTasks';
+import { buildTasksUrl, INTERNAL_SESSION_TASK_ROUTE_BY_KEY } from '@/core/sessionTasks';
 
 import { SIGN_UP_INITIAL_VALUE_KEYS } from '../../../core/constants';
 import { buildURL } from '../../../utils';
@@ -36,7 +36,7 @@ export const SignUpContext = createContext<SignUpCtx | null>(null);
 
 export const useSignUpContext = (): SignUpContextType => {
   const context = useContext(SignUpContext);
-  const { navigate } = useRouter();
+  const { navigate, indexPath } = useRouter();
   const { displayConfig, userSettings } = useEnvironment();
   const { queryParams, queryString } = useRouter();
   const signUpMode = userSettings.signUp.mode;
@@ -121,12 +121,12 @@ export const useSignUpContext = (): SignUpContextType => {
       return navigate(redirectUrl);
     }
 
-    return navigate(`../tasks/${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[currentTask.key]}`);
+    return navigate(indexPath + `/tasks/${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[currentTask.key]}`);
   };
 
   const taskUrl = clerk.session?.currentTask
     ? (clerk.__internal_getOption('taskUrls')?.[clerk.session?.currentTask.key] ??
-      buildTaskURL(clerk.session?.currentTask, { base: signUpUrl }))
+      buildTasksUrl(clerk.session?.currentTask, { base: signUpUrl }))
     : null;
 
   return {

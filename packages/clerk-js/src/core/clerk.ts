@@ -151,7 +151,11 @@ import {
   Organization,
   Waitlist,
 } from './resources/internal';
-import { navigateIfTaskExists, warnMissingPendingTaskHandlers } from './sessionTasks';
+import {
+  INTERNAL_SESSION_TASK_ROUTE_BY_KEY,
+  navigateIfTaskExists,
+  warnMissingPendingTaskHandlers,
+} from './sessionTasks';
 import { State } from './state';
 import { warnings } from './warnings';
 
@@ -1553,6 +1557,28 @@ export class Clerk implements ClerkInterface {
     return this.buildUrlWithAuth(this.environment.displayConfig.organizationProfileUrl);
   }
 
+  public buildTasksUrl(): string {
+    const currentTask = this.session?.currentTask;
+    if (!currentTask) {
+      return '';
+    }
+
+    const customTaskUrl = this.#options.taskUrls?.[currentTask.key];
+    if (customTaskUrl) {
+      return customTaskUrl;
+    }
+
+    return buildURL(
+      {
+        base: this.buildSignInUrl(),
+        hashPath: `/tasks/${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[currentTask.key]}`,
+      },
+      {
+        stringify: true,
+      },
+    );
+  }
+
   #redirectToSatellite = async (): Promise<unknown> => {
     if (!inBrowser()) {
       return;
@@ -1639,6 +1665,13 @@ export class Clerk implements ClerkInterface {
   public redirectToWaitlist = async (): Promise<unknown> => {
     if (inBrowser()) {
       return this.navigate(this.buildWaitlistUrl());
+    }
+    return;
+  };
+
+  public redirectToTasks = async (): Promise<unknown> => {
+    if (inBrowser()) {
+      return this.navigate(this.buildTasksUrl());
     }
     return;
   };

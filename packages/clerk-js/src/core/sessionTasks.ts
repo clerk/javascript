@@ -13,7 +13,7 @@ export const INTERNAL_SESSION_TASK_ROUTE_BY_KEY: Record<SessionTask['key'], stri
 /**
  * @internal
  */
-export function buildTaskURL(task: SessionTask, opts: Pick<Parameters<typeof buildURL>[0], 'base'>) {
+export function buildTasksUrl(task: SessionTask, opts: Pick<Parameters<typeof buildURL>[0], 'base'>) {
   return buildURL(
     {
       base: opts.base,
@@ -41,7 +41,7 @@ export function navigateIfTaskExists(
     return;
   }
 
-  return navigate(buildTaskURL(currentTask, { base: baseUrl }));
+  return navigate(buildTasksUrl(currentTask, { base: baseUrl }));
 }
 
 export function warnMissingPendingTaskHandlers(options: Record<string, unknown>) {
