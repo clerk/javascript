@@ -11,6 +11,28 @@ import { satelliteAndMissingProxyUrlAndDomain, satelliteAndMissingSignInUrl } fr
 import type { AuthenticateRequestParams, ClerkMiddlewareOptions, ExpressRequestWithAuth } from './types';
 import { incomingMessageToRequest, loadApiEnv, loadClientEnv } from './utils';
 
+/**
+ * @internal
+ * Authenticates an Express request by wrapping clerkClient.authenticateRequest.
+ *
+ * This function converts the Express request object into a standard Web Request object.
+ * It handles environment configuration, satellite mode validation, and proxy URL resolution.
+ *
+ * @param opts - Configuration options for request authentication
+ * @param opts.clerkClient - The Clerk client instance to use for authentication
+ * @param opts.request - The Express request object to authenticate
+ * @param opts.options - Optional middleware configuration options
+ * @returns Promise<RequestState> - The authentication state of the request
+ *
+ * @example
+ * ```typescript
+ * const requestState = await authenticateRequest({
+ *   clerkClient,
+ *   request: req,
+ *   options: { secretKey: 'sk_test_...' }
+ * });
+ * ```
+ */
 export const authenticateRequest = (opts: AuthenticateRequestParams) => {
   const { clerkClient, request, options } = opts;
   const { jwtKey, authorizedParties, audience, acceptsToken } = options || {};
