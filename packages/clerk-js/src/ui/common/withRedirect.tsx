@@ -99,7 +99,8 @@ export const withRedirectToSignInTask = <P extends AvailableComponentProps>(Comp
 
     return withRedirect(
       Component,
-      clerk => Boolean(clerk.session?.currentTask && signInCtx?.taskUrl),
+      (clerk, environment) =>
+        !!environment?.authConfig.singleSessionMode && !!(clerk.session?.currentTask && signInCtx?.taskUrl),
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       () => signInCtx.taskUrl!,
       undefined,
@@ -120,7 +121,8 @@ export const withRedirectToSignUpTask = <P extends AvailableComponentProps>(Comp
 
     return withRedirect(
       Component,
-      clerk => Boolean(clerk.session?.currentTask && signUpCtx?.taskUrl),
+      (clerk, environment) =>
+        !!environment?.authConfig.singleSessionMode && !!(clerk.session?.currentTask && signUpCtx?.taskUrl),
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       () => signUpCtx.taskUrl!,
       undefined,
