@@ -17,7 +17,7 @@ export const SignUpEmailLinkCard = () => {
   const { t } = useLocalizations();
   const signUp = useCoreSignUp();
   const signUpContext = useSignUpContext();
-  const { afterSignUpUrl } = signUpContext;
+  const { afterSignUpUrl, navigateOnSetActive } = signUpContext;
   const card = useCardState();
   const { navigate } = useRouter();
   const { setActive } = useClerk();
@@ -56,7 +56,13 @@ export const SignUpEmailLinkCard = () => {
         continuePath: '../continue',
         verifyEmailPath: '../verify-email-address',
         verifyPhonePath: '../verify-phone-number',
-        handleComplete: () => setActive({ session: su.createdSessionId, redirectUrl: afterSignUpUrl }),
+        handleComplete: () =>
+          setActive({
+            session: su.createdSessionId,
+            navigate: async ({ session }) => {
+              await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl });
+            },
+          }),
         navigate,
       });
     }

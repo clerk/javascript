@@ -122,7 +122,7 @@ export const OAuthConsent = lazy(() =>
 );
 
 export const SessionTasks = lazy(() =>
-  componentImportPaths.SessionTasks().then(module => ({ default: module.SessionTask })),
+  componentImportPaths.SessionTasks().then(module => ({ default: module.SessionTasks })),
 );
 
 export const preloadComponent = async (component: unknown) => {

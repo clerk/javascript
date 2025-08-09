@@ -4,7 +4,7 @@ import React from 'react';
 import { withCardStateProvider } from '@/ui/elements/contexts';
 import { LoadingCard } from '@/ui/elements/LoadingCard';
 
-import { withRedirectToAfterSignIn } from '../../common';
+import { withRedirectToAfterSignIn, withRedirectToSignInTask } from '../../common';
 import { useCoreSignIn } from '../../contexts';
 import { SignInFactorTwoAlternativeMethods } from './SignInFactorTwoAlternativeMethods';
 import { SignInFactorTwoBackupCodeCard } from './SignInFactorTwoBackupCodeCard';
@@ -82,4 +82,6 @@ function SignInFactorTwoInternal(): JSX.Element {
   }
 }
 
-export const SignInFactorTwo = withRedirectToAfterSignIn(withCardStateProvider(SignInFactorTwoInternal));
+export const SignInFactorTwo = withRedirectToSignInTask(
+  withRedirectToAfterSignIn(withCardStateProvider(SignInFactorTwoInternal)),
+);

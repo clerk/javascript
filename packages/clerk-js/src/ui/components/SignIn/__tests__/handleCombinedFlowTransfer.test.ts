@@ -40,6 +40,7 @@ describe('handleCombinedFlowTransfer', () => {
       clerk: mockClerk as unknown as LoadedClerk,
       afterSignUpUrl: 'https://test.com',
       passwordEnabled: false,
+      navigateOnSetActive: jest.fn(),
     });
 
     expect(mockCompleteSignUpFlow).toHaveBeenCalled();
@@ -64,6 +65,7 @@ describe('handleCombinedFlowTransfer', () => {
       clerk: mockClerk as unknown as LoadedClerk,
       afterSignUpUrl: 'https://test.com',
       passwordEnabled: false,
+      navigateOnSetActive: jest.fn(),
     });
 
     expect(mockNavigate).not.toHaveBeenCalled();
@@ -90,6 +92,7 @@ describe('handleCombinedFlowTransfer', () => {
       clerk: mockClerk as unknown as LoadedClerk,
       afterSignUpUrl: 'https://test.com',
       passwordEnabled: true,
+      navigateOnSetActive: jest.fn(),
     });
 
     expect(mockNavigate).toHaveBeenCalled();
@@ -116,6 +119,7 @@ describe('handleCombinedFlowTransfer', () => {
       clerk: mockClerk as unknown as LoadedClerk,
       afterSignUpUrl: 'https://test.com',
       passwordEnabled: false,
+      navigateOnSetActive: jest.fn(),
     });
 
     expect(mockNavigate).toHaveBeenCalled();
@@ -142,6 +146,7 @@ describe('handleCombinedFlowTransfer', () => {
       clerk: mockClerk as unknown as LoadedClerk,
       afterSignUpUrl: 'https://test.com',
       passwordEnabled: false,
+      navigateOnSetActive: jest.fn(),
     });
 
     expect(mockNavigate).toHaveBeenCalled();

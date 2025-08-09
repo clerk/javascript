@@ -1,6 +1,3 @@
-import type { ClerkOptions, SessionTask } from '@clerk/types';
-
-import { INTERNAL_SESSION_TASK_ROUTE_BY_KEY } from '../../core/sessionTasks';
 import { buildURL } from '../../utils/url';
 import type { SignInContextType, SignUpContextType, UserProfileContextType } from './../contexts';
 
@@ -26,33 +23,6 @@ export function buildVerificationRedirectUrl({
     endpoint:
       isCombinedFlow && intent === 'sign-up' ? `/create${MAGIC_LINK_VERIFY_PATH_ROUTE}` : MAGIC_LINK_VERIFY_PATH_ROUTE,
   });
-}
-
-export function buildSessionTaskRedirectUrl({
-  routing,
-  path,
-  baseUrl,
-  task,
-  taskUrls,
-}: Pick<SignInContextType | SignUpContextType, 'routing' | 'path'> & {
-  baseUrl: string;
-  task?: SessionTask;
-  taskUrls?: ClerkOptions['taskUrls'];
-}) {
-  if (!task) {
-    return null;
-  }
-
-  return (
-    taskUrls?.[task.key] ??
-    buildRedirectUrl({
-      routing,
-      baseUrl,
-      path,
-      endpoint: `/tasks/${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[task.key]}`,
-      authQueryString: null,
-    })
-  );
 }
 
 export function buildSSOCallbackURL(

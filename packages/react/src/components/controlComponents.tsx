@@ -166,7 +166,7 @@ export const RedirectToSignUp = withClerk(({ clerk, ...props }: WithClerkProp<Re
   return null;
 }, 'RedirectToSignUp');
 
-export const RedirectToTask = withClerk(({ clerk }: WithClerkProp) => {
+export const RedirectToTasks = withClerk(({ clerk }: WithClerkProp) => {
   const { session } = clerk;
 
   React.useEffect(() => {
@@ -175,11 +175,11 @@ export const RedirectToTask = withClerk(({ clerk }: WithClerkProp) => {
       return;
     }
 
-    void clerk.__internal_navigateToTaskIfAvailable();
+    void clerk.redirectToTasks();
   }, []);
 
   return null;
-}, 'RedirectToTask');
+}, 'RedirectToTasks');
 
 /**
  * @function

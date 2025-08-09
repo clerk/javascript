@@ -1,8 +1,8 @@
 import { deprecated } from '@clerk/shared/deprecated';
 import type {
+  ProtectProps as _ProtectProps,
   HandleOAuthCallbackParams,
   PendingSessionOptions,
-  ProtectProps as _ProtectProps,
   RedirectOptions,
 } from '@clerk/types';
 import { defineComponent } from 'vue';
@@ -60,16 +60,17 @@ export const RedirectToSignUp = defineComponent((props: RedirectOptions) => {
   return () => null;
 });
 
-export const RedirectToTask = defineComponent((props: RedirectOptions) => {
+export const RedirectToTasks = defineComponent((props: RedirectOptions) => {
   const { sessionCtx } = useClerkContext();
 
   useClerkLoaded(clerk => {
-    if (!sessionCtx.value) {
+    const currentTask = sessionCtx?.value?.currentTask;
+    if (!sessionCtx.value || !currentTask) {
       void clerk.redirectToSignIn(props);
       return;
     }
 
-    void clerk.__internal_navigateToTaskIfAvailable();
+    void clerk.redirectToTasks();
   });
 
   return () => null;

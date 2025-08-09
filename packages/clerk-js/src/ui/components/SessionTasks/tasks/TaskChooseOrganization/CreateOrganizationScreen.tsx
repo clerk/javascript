@@ -1,4 +1,5 @@
-import { useClerk, useOrganizationList } from '@clerk/shared/react';
+import { useOrganizationList } from '@clerk/shared/react';
+import type { SetActiveParams } from '@clerk/types';
 
 import { useSessionTasksContext } from '@/ui/contexts/components/SessionTasks';
 import { localizationKeys } from '@/ui/customizables';
@@ -19,8 +20,7 @@ type CreateOrganizationScreenProps = {
 
 export const CreateOrganizationScreen = withCardStateProvider((props: CreateOrganizationScreenProps) => {
   const card = useCardState();
-  const { __internal_navigateToTaskIfAvailable } = useClerk();
-  const { redirectUrlComplete } = useSessionTasksContext();
+  const { redirectUrlComplete, navigateOnSetActive } = useSessionTasksContext();
   const { createOrganization, isLoaded, setActive } = useOrganizationList({
     userMemberships: organizationListParams.userMemberships,
   });
@@ -46,9 +46,19 @@ export const CreateOrganizationScreen = withCardStateProvider((props: CreateOrga
     try {
       const organization = await createOrganization({ name: nameField.value, slug: slugField.value });
 
-      await setActive({ organization });
+      const setActiveParams: SetActiveParams = {
+        organization,
+        redirectUrl: redirectUrlComplete,
+      };
 
-      await __internal_navigateToTaskIfAvailable({ redirectUrlComplete });
+      // TODO - Add `onComplete` or `onNextTask` callbacks for `TaskChooseOrganization` standalone usage
+      if (navigateOnSetActive) {
+        setActiveParams.navigate = async ({ session }) => {
+          await navigateOnSetActive({ session, redirectUrl: redirectUrlComplete });
+        };
+      }
+
+      await setActive(setActiveParams);
     } catch (err) {
       handleError(err, [nameField, slugField], card.setError);
     }
