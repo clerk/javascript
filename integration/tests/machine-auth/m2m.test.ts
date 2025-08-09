@@ -119,6 +119,14 @@ test.describe('machine-to-machine auth @machine', () => {
     });
     expect(res.status()).toBe(401);
     expect(await res.text()).toBe('Unauthorized');
+
+    const res2 = await u.page.request.get(app.serverUrl + '/api/protected', {
+      headers: {
+        Authorization: `Bearer mt_xxx`,
+      },
+    });
+    expect(res2.status()).toBe(401);
+    expect(await res2.text()).toBe('Unauthorized');
   });
 
   test('rejects M2M requests when sender machine lacks access to receiver machine', async ({ page, context }) => {
