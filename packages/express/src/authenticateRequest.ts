@@ -19,6 +19,7 @@ export const authenticateRequest = (opts: AuthenticateRequestParams) => {
   const env = { ...loadApiEnv(), ...loadClientEnv() };
 
   const secretKey = options?.secretKey || env.secretKey;
+  const machineSecretKey = options?.machineSecretKey || env.machineSecretKey;
   const publishableKey = options?.publishableKey || env.publishableKey;
 
   const isSatellite = handleValueOrFn(options?.isSatellite, clerkRequest.clerkUrl, env.isSatellite);
@@ -40,6 +41,7 @@ export const authenticateRequest = (opts: AuthenticateRequestParams) => {
   return clerkClient.authenticateRequest(clerkRequest, {
     audience,
     secretKey,
+    machineSecretKey,
     publishableKey,
     jwtKey,
     authorizedParties,
