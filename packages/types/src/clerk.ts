@@ -676,6 +676,11 @@ export interface Clerk {
   buildOrganizationProfileUrl(): string;
 
   /**
+   * Returns the configured url where tasks are mounted.
+   */
+  buildTasksUrl(): string;
+
+  /**
    * Returns the configured afterSignInUrl of the instance.
    */
   buildAfterSignInUrl({ params }?: { params?: URLSearchParams }): string;
@@ -761,6 +766,11 @@ export interface Clerk {
    * Redirects to the configured URL where `<Waitlist/>` is mounted.
    */
   redirectToWaitlist: () => void;
+
+  /**
+   * Redirects to the configured URL where tasks are mounted.
+   */
+  redirectToTasks(): Promise<unknown>;
 
   /**
    * Completes a Google One Tap redirection flow started by
