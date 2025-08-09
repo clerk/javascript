@@ -3,7 +3,6 @@ import { useClerk } from '@clerk/shared/react';
 import { useCallback, useEffect } from 'react';
 
 import { useCardState } from '@/ui/elements/contexts';
-import { useRouter } from '@/ui/router';
 import { handleError } from '@/ui/utils/errorHandler';
 
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
@@ -16,9 +15,8 @@ function useHandleAuthenticateWithPasskey(onSecondFactor: () => Promise<unknown>
   // @ts-expect-error -- private method for the time being
   const { setActive, __internal_navigateWithError } = useClerk();
   const supportEmail = useSupportEmail();
-  const { afterSignInUrl, signInUrl, navigateOnSetActive } = useSignInContext();
+  const { afterSignInUrl, navigateOnSetActive } = useSignInContext();
   const { authenticateWithPasskey } = useCoreSignIn();
-  const { navigate } = useRouter();
 
   useEffect(() => {
     return () => {
