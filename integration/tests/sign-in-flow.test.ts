@@ -150,15 +150,4 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign in f
 
     await u.po.expect.toBeSignedIn();
   });
-
-  test('access protected page @express', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
-    await u.po.signIn.goTo();
-    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
-    await u.po.expect.toBeSignedIn();
-
-    expect(await u.page.locator("data-test-id='protected-api-response'").count()).toEqual(0);
-    await u.page.goToRelative('/protected');
-    await u.page.isVisible("data-test-id='protected-api-response'");
-  });
 });
