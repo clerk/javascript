@@ -2258,6 +2258,23 @@ export class Clerk implements ClerkInterface {
     if (this.session) {
       const session = this.#getSessionFromClient(this.session.id);
 
+      const hasTransitionedToPendingStatus = this.session.status === 'active' && session?.status === 'pending';
+      if (hasTransitionedToPendingStatus) {
+        const onBeforeSetActive: SetActiveHook =
+          typeof window !== 'undefined' && typeof window.__unstable__onBeforeSetActive === 'function'
+            ? window.__unstable__onBeforeSetActive
+            : noop;
+
+        const onAfterSetActive: SetActiveHook =
+          typeof window !== 'undefined' && typeof window.__unstable__onAfterSetActive === 'function'
+            ? window.__unstable__onAfterSetActive
+            : noop;
+
+        // Execute hooks to update server authentication context and trigger
+        // page protections in clerkMiddleware or server components
+        void onBeforeSetActive()?.then?.(() => void onAfterSetActive());
+      }
+
       // Note: this might set this.session to null
       this.#setAccessors(session);
 
