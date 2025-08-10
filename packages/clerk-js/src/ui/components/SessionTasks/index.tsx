@@ -1,6 +1,6 @@
 import { useClerk } from '@clerk/shared/react';
 import { eventComponentMounted } from '@clerk/shared/telemetry';
-import type { SessionResource } from '@clerk/types';
+import type { SessionTask } from '@clerk/types';
 import { useContext, useEffect, useRef } from 'react';
 
 import { Card } from '@/ui/elements/Card';
@@ -20,7 +20,6 @@ import { TaskChooseOrganization } from './tasks/TaskChooseOrganization';
 const SessionTasksStart = () => {
   const clerk = useClerk();
   const { navigate } = useRouter();
-  const { redirectUrlComplete } = useSessionTasksContext();
 
   useEffect(() => {
     // Simulates additional latency to avoid a abrupt UI transition when navigating to the next task
@@ -31,7 +30,7 @@ const SessionTasksStart = () => {
       void navigate(`./${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[currentTaskKey]}`);
     }, 500);
     return () => clearTimeout(timeoutId);
-  }, [navigate, clerk, redirectUrlComplete]);
+  }, [navigate, clerk]);
 
   return (
     <Card.Root>
@@ -44,13 +43,13 @@ const SessionTasksStart = () => {
 };
 
 function SessionTasksRoutes(): JSX.Element {
-  const ctx = useSessionTasksContext();
+  const { onComplete, onNextTask } = useSessionTasksContext();
 
   return (
     <Switch>
       <Route path={INTERNAL_SESSION_TASK_ROUTE_BY_KEY['choose-organization']}>
         <TaskChooseOrganizationContext.Provider
-          value={{ componentName: 'TaskChooseOrganization', redirectUrlComplete: ctx.redirectUrlComplete }}
+          value={{ componentName: 'TaskChooseOrganization', onComplete, onNextTask }}
         >
           <TaskChooseOrganization />
         </TaskChooseOrganizationContext.Provider>
@@ -106,17 +105,16 @@ export const SessionTasks = withCardStateProvider(() => {
     );
   }
 
-  const navigateOnSetActive = async ({ session }: { session: SessionResource }) => {
-    const currentTask = session.currentTask;
-    if (!currentTask) {
-      return navigate(redirectUrlComplete);
-    }
+  const onComplete = async () => {
+    return navigate(redirectUrlComplete);
+  };
 
-    return navigate(`./${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[currentTask.key]}`);
+  const onNextTask = async (task: SessionTask) => {
+    return navigate(`./${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[task.key]}`);
   };
 
   return (
-    <SessionTasksContext.Provider value={{ redirectUrlComplete, currentTaskContainer, navigateOnSetActive }}>
+    <SessionTasksContext.Provider value={{ redirectUrlComplete, currentTaskContainer, onComplete, onNextTask }}>
       <SessionTasksRoutes />
     </SessionTasksContext.Provider>
   );

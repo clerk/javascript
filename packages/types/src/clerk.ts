@@ -2104,10 +2104,8 @@ export type SignUpButtonProps = (SignUpButtonPropsModal | ButtonPropsRedirect) &
   >;
 
 export type TaskChooseOrganizationProps = {
-  /**
-   * Full URL or path to navigate to after successfully resolving all tasks
-   */
-  redirectUrlComplete: string;
+  onComplete: (organization: OrganizationResource) => Promise<unknown>;
+  onNextTask: (nextTask: SessionTask) => Promise<unknown>;
   appearance?: TaskChooseOrganizationTheme;
 };
 

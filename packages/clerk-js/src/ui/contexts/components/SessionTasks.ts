@@ -1,3 +1,4 @@
+import type { OrganizationResource, SessionResource } from '@clerk/types';
 import { createContext, useContext } from 'react';
 
 import type { SessionTasksCtx, TaskChooseOrganizationCtx } from '../../types';
@@ -16,7 +17,11 @@ export const useSessionTasksContext = (): SessionTasksCtx => {
 
 export const TaskChooseOrganizationContext = createContext<TaskChooseOrganizationCtx | null>(null);
 
-export const useTaskChooseOrganizationContext = (): TaskChooseOrganizationCtx => {
+type TaskChooseOrganizationContextType = TaskChooseOrganizationCtx & {
+  navigateOnSetActive: (opts: { session: SessionResource; organization: OrganizationResource }) => Promise<unknown>;
+};
+
+export const useTaskChooseOrganizationContext = (): TaskChooseOrganizationContextType => {
   const context = useContext(TaskChooseOrganizationContext);
 
   if (context === null) {
@@ -25,5 +30,24 @@ export const useTaskChooseOrganizationContext = (): TaskChooseOrganizationCtx =>
     );
   }
 
-  return context;
+  const { onNextTask, onComplete } = context;
+
+  const navigateOnSetActive = ({
+    session,
+    organization,
+  }: {
+    session: SessionResource;
+    organization: OrganizationResource;
+  }) => {
+    if (session.currentTask) {
+      return onNextTask(session.currentTask);
+    }
+
+    return onComplete(organization);
+  };
+
+  return {
+    ...context,
+    navigateOnSetActive,
+  };
 };
