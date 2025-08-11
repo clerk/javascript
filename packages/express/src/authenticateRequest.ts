@@ -11,6 +11,16 @@ import { satelliteAndMissingProxyUrlAndDomain, satelliteAndMissingSignInUrl } fr
 import type { AuthenticateRequestParams, ClerkMiddlewareOptions, ExpressRequestWithAuth } from './types';
 import { incomingMessageToRequest, loadApiEnv, loadClientEnv } from './utils';
 
+/**
+ * @internal
+ * Authenticates an Express request by wrapping clerkClient.authenticateRequest and
+ * converts the express request object into a standard web request object
+ *
+ * @param opts - Configuration options for request authentication
+ * @param opts.clerkClient - The Clerk client instance to use for authentication
+ * @param opts.request - The Express request object to authenticate
+ * @param opts.options - Optional middleware configuration options
+ */
 export const authenticateRequest = (opts: AuthenticateRequestParams) => {
   const { clerkClient, request, options } = opts;
   const { jwtKey, authorizedParties, audience, acceptsToken } = options || {};
@@ -19,6 +29,7 @@ export const authenticateRequest = (opts: AuthenticateRequestParams) => {
   const env = { ...loadApiEnv(), ...loadClientEnv() };
 
   const secretKey = options?.secretKey || env.secretKey;
+  const machineSecretKey = options?.machineSecretKey || env.machineSecretKey;
   const publishableKey = options?.publishableKey || env.publishableKey;
 
   const isSatellite = handleValueOrFn(options?.isSatellite, clerkRequest.clerkUrl, env.isSatellite);
@@ -40,6 +51,7 @@ export const authenticateRequest = (opts: AuthenticateRequestParams) => {
   return clerkClient.authenticateRequest(clerkRequest, {
     audience,
     secretKey,
+    machineSecretKey,
     publishableKey,
     jwtKey,
     authorizedParties,
