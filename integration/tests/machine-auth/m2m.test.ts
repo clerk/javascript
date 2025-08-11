@@ -39,24 +39,19 @@ test.describe('machine-to-machine auth @machine', () => {
 
         const app = express();
 
-        app.use(async (req, res, next) => {
-          const secret = req.get('Authorization')?.split(' ')[1] || '';
+        app.get('/api/protected', async (req, res) => {
+          const secret = req.get('Authorization')?.split(' ')[1];
           
           try {
-            await clerkClient.m2mTokens.verifySecret({ secret });
-          } catch (error) {
+            const m2mToken = await clerkClient.m2mTokens.verifySecret({ secret });
+            res.send('Protected response ' + m2mToken.id);
+          } catch {
             res.status(401).send('Unauthorized');
-            return;
           }
-
-          next();
         });
 
-        app.get('/api/protected', (req, res) => {
-          res.send('Protected response');
-        });
-
-        ViteExpress.listen(app, process.env.PORT, () => console.log('Server started'));
+        const port = parseInt(process.env.PORT as string) || 3002;
+        ViteExpress.listen(app, port, () => console.log('Server started'));
         `,
       )
       .commit();
@@ -154,7 +149,7 @@ test.describe('machine-to-machine auth @machine', () => {
       },
     });
     expect(res.status()).toBe(200);
-    expect(await res.text()).toBe('Protected response');
+    expect(await res.text()).toBe('Protected response ' + emailServerM2MToken.id);
 
     // Analytics server can access primary API server after adding scope
     await u.services.clerk.machines.createScope(analyticsServer.id, primaryApiServer.id);
@@ -169,7 +164,7 @@ test.describe('machine-to-machine auth @machine', () => {
       },
     });
     expect(res2.status()).toBe(200);
-    expect(await res2.text()).toBe('Protected response');
+    expect(await res2.text()).toBe('Protected response ' + m2mToken.id);
     await u.services.clerk.m2mTokens.revoke({
       m2mTokenId: m2mToken.id,
     });
