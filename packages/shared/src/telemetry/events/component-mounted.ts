@@ -27,9 +27,14 @@ function createPrebuiltComponentEvent(event: typeof EVENT_COMPONENT_MOUNTED | ty
     additionalPayload?: TelemetryEventRaw['payload'],
     samplingRate?: number,
   ): TelemetryEventRaw<EventPrebuiltComponent> {
+    const normalizedSampling =
+      typeof samplingRate === 'number' && !Number.isFinite(samplingRate)
+        ? Math.min(1, Math.max(0, samplingRate))
+        : undefined;
+
     return {
       event,
-      eventSamplingRate: samplingRate ?? EVENT_SAMPLING_RATE,
+      eventSamplingRate: normalizedSampling ?? EVENT_SAMPLING_RATE,
       payload: {
         component,
         appearanceProp: Boolean(props?.appearance),
