@@ -2,4 +2,4 @@
 '@clerk/shared': minor
 ---
 
-Update `eventPrebuiltComponentMounted` and `eventPrebuiltComponentOpened` to accept a samplingRate.
+Update TelemetryCollector to accept a `perEventSampling` property for controling per-event sampling rates.
