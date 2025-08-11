@@ -1311,8 +1311,7 @@ export class Clerk implements ClerkInterface {
         newSession?.currentTask &&
         this.#options.taskUrls?.[newSession?.currentTask.key];
 
-      const shouldNavigate = (redirectUrl || taskUrl || setActiveNavigate) && !beforeEmit;
-      if (shouldNavigate) {
+      if (!beforeEmit && (redirectUrl || taskUrl || setActiveNavigate)) {
         await tracker.track(async () => {
           if (!this.client) {
             // Typescript is not happy because since thinks this.client might have changed to undefined because the function is asynchronous.
@@ -1328,28 +1327,18 @@ export class Clerk implements ClerkInterface {
               ? buildURL({ base: taskUrl, hashSearchParams: { redirectUrl } }, { stringify: true })
               : taskUrl;
             await this.navigate(taskUrlWithRedirect);
-            return;
-          }
-
-          if (setActiveNavigate && newSession) {
+          } else if (setActiveNavigate && newSession) {
             await setActiveNavigate({ session: newSession });
-            return;
-          }
-
-          if (!redirectUrl) {
-            return;
-          }
-
-          if (!this.client.isEligibleForTouch()) {
+          } else if (redirectUrl) {
+            if (this.client.isEligibleForTouch()) {
+              const absoluteRedirectUrl = new URL(redirectUrl, window.location.href);
+              const redirectUrlWithAuth = this.buildUrlWithAuth(
+                this.client.buildTouchUrl({ redirectUrl: absoluteRedirectUrl }),
+              );
+              await this.navigate(redirectUrlWithAuth);
+            }
             await this.navigate(redirectUrl);
-            return;
           }
-
-          const absoluteRedirectUrl = new URL(redirectUrl, window.location.href);
-          const redirectUrlWithAuth = this.buildUrlWithAuth(
-            this.client.buildTouchUrl({ redirectUrl: absoluteRedirectUrl }),
-          );
-          await this.navigate(redirectUrlWithAuth);
         });
       }
 
