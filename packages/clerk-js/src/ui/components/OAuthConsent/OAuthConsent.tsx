@@ -322,10 +322,7 @@ function ConnectionItem({ children, ...props }: ComponentProps<typeof Flex>) {
   return (
     <Flex
       {...props}
-      sx={{
-        flex: 1,
-        ...(props.sx || {}),
-      }}
+      sx={[{ flex: 1 }, props.sx]}
     >
       {children}
     </Flex>
