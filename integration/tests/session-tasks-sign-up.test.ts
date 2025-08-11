@@ -1,19 +1,28 @@
+import { createClerkClient } from '@clerk/backend';
 import { expect, test } from '@playwright/test';
 
 import { appConfigs } from '../presets';
+import { instanceKeys } from '../presets/envs';
 import type { FakeUser } from '../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../testUtils';
+import { createUserService } from '../testUtils/usersService';
 
 testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
   'session tasks after sign-up flow @nextjs',
   ({ app }) => {
     test.describe.configure({ mode: 'serial' });
 
-    let fakeUser: FakeUser;
+    let regularFakeUser: FakeUser;
+    let fakeUserForOAuth: FakeUser;
 
     test.beforeEach(() => {
       const u = createTestUtils({ app });
-      fakeUser = u.services.users.createFakeUser({
+      regularFakeUser = u.services.users.createFakeUser({
+        fictionalEmail: true,
+        withPhoneNumber: true,
+        withUsername: true,
+      });
+      fakeUserForOAuth = u.services.users.createFakeUser({
         fictionalEmail: true,
         withPhoneNumber: true,
         withUsername: true,
@@ -23,10 +32,18 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
     test.afterAll(async () => {
       const u = createTestUtils({ app });
       await u.services.organizations.deleteAll();
-      // Delete the user on the OAuth provider instance.
-      await fakeUser.deleteIfExists();
-      // Delete the user on the app instance.
-      await u.services.users.deleteIfExists({ email: fakeUser.email });
+      await regularFakeUser.deleteIfExists();
+
+      // Delete user from OAuth provider instance
+      const client = createClerkClient({
+        secretKey: instanceKeys.get('oauth-provider').sk,
+        publishableKey: instanceKeys.get('oauth-provider').pk,
+      });
+      const users = createUserService(client);
+      await users.deleteIfExists({ email: fakeUserForOAuth.email });
+      // Delete OAuth user from `with-session-tasks` instance
+      await u.services.users.deleteIfExists({ email: fakeUserForOAuth.email });
+
       await app.teardown();
     });
 
@@ -41,8 +58,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
       const u = createTestUtils({ app, page, context });
       await u.po.signUp.goTo();
       await u.po.signUp.signUpWithEmailAndPassword({
-        email: fakeUser.email,
-        password: fakeUser.password,
+        email: regularFakeUser.email,
+        password: regularFakeUser.password,
       });
       await u.po.expect.toBeSignedIn();
 
@@ -71,7 +88,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
       await u.po.signIn.getGoToSignUp().click();
 
       await u.po.signUp.waitForMounted();
-      await u.po.signUp.setEmailAddress(fakeUser.email);
+      await u.po.signUp.setEmailAddress(fakeUserForOAuth.email);
       await u.po.signUp.continue();
       await u.po.signUp.enterTestOtpCode();
 
