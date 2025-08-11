@@ -364,7 +364,7 @@ importers:
         version: 1.0.1
     devDependencies:
       astro:
-        specifier: ^5.12.6
+        specifier: ^5.12.8
         version: 5.12.8(@netlify/blobs@9.1.2)(@types/node@24.0.14)(db0@0.3.2)(ioredis@5.6.1)(jiti@2.4.2)(lightningcss@1.27.0)(rollup@4.45.0)(terser@5.43.1)(tsx@4.19.2)(typescript@5.8.3)(yaml@2.8.0)
 
   packages/backend:
