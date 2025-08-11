@@ -249,8 +249,10 @@ export class SignIn extends BaseResource implements SignInResource {
     params: AuthenticateWithRedirectParams,
     navigateCallback: (url: URL | string) => void,
   ): Promise<void> => {
-    const { strategy, redirectUrl, redirectUrlComplete, identifier, oidcPrompt, continueSignIn } = params || {};
+    const { strategy, redirectUrlComplete, identifier, oidcPrompt, continueSignIn } = params || {};
     const actionCompleteRedirectUrl = redirectUrlComplete;
+
+    const redirectUrl = SignIn.clerk.buildUrlWithAuth(params.redirectUrl);
 
     if (!this.id || !continueSignIn) {
       await this.create({
@@ -264,7 +266,7 @@ export class SignIn extends BaseResource implements SignInResource {
     if (strategy === 'saml' || strategy === 'enterprise_sso') {
       await this.prepareFirstFactor({
         strategy,
-        redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectUrl),
+        redirectUrl,
         actionCompleteRedirectUrl,
         oidcPrompt,
       });
