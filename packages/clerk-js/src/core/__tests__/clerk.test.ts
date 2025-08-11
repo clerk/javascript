@@ -818,7 +818,6 @@ describe('Clerk singleton', () => {
         lastActiveSessionId: '1',
       };
 
-      // Mock the session.remove() method to actually update the client
       mockSession1.remove = jest.fn().mockImplementation(() => {
         mockClient.signedInSessions = mockClient.signedInSessions.filter(s => s.id !== '1');
         mockClient.sessions = mockClient.sessions.filter(s => s.id !== '1');
@@ -831,11 +830,9 @@ describe('Clerk singleton', () => {
       sut.navigate = jest.fn();
       await sut.load();
 
-      // Initially, session1 should be active
       expect(sut.session).toBe(mockSession1);
       expect(sut.isSignedIn).toBe(true);
 
-      // Sign out session1 (the current active session)
       await sut.signOut({ sessionId: '1' });
 
       await waitFor(() => {
@@ -844,8 +841,6 @@ describe('Clerk singleton', () => {
         expect(sut.navigate).toHaveBeenCalledWith('/');
       });
 
-      // After sign-out, the auth state should be restored from the remaining session
-      // The client should be updated to reflect the new state
       expect(mockClient.lastActiveSessionId).toBe('2');
       expect(sut.session).toBe(mockSession2);
       expect(sut.isSignedIn).toBe(true);
