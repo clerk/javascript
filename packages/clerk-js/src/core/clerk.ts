@@ -28,9 +28,9 @@ import type {
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
-  Clerk as ClerkInterface,
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
+  Clerk as ClerkInterface,
   ClerkOptions,
   ClientJSONSnapshot,
   ClientResource,
@@ -1233,9 +1233,7 @@ export class Clerk implements ClerkInterface {
           : noop;
 
       let newSession = session === undefined ? this.session : session;
-      const sessionIsPending = newSession?.status === 'pending';
-
-      if (sessionIsPending) {
+      if (newSession?.status === 'pending') {
         warnMissingPendingTaskHandlers({ ...this.#options, ...params });
       }
 
@@ -1309,7 +1307,10 @@ export class Clerk implements ClerkInterface {
       }
 
       const taskUrl =
-        sessionIsPending && newSession?.currentTask && this.#options.taskUrls?.[newSession?.currentTask.key];
+        newSession?.status === 'pending' &&
+        newSession?.currentTask &&
+        this.#options.taskUrls?.[newSession?.currentTask.key];
+
       const shouldNavigate = (redirectUrl || taskUrl || setActiveNavigate) && !beforeEmit;
       if (shouldNavigate) {
         await tracker.track(async () => {
@@ -1318,7 +1319,7 @@ export class Clerk implements ClerkInterface {
             return;
           }
 
-          if (!sessionIsPending) {
+          if (newSession?.status !== 'pending') {
             this.#setTransitiveState();
           }
 
@@ -1361,7 +1362,8 @@ export class Clerk implements ClerkInterface {
       this.#emit();
 
       // Do not revalidate server cache for pending sessions to avoid unmount of `SignIn/SignUp` AIOs when navigating to task
-      if (!sessionIsPending || newSession?.status === 'active') {
+      // newSession can be mutated by the time we get here (org change session touch)
+      if (newSession?.status !== 'pending') {
         await onAfterSetActive();
       }
     } finally {
