@@ -20,7 +20,11 @@ export const signInComputedSignal = computed(() => {
   return { errors, signIn: signIn.__internal_future };
 });
 
-export function errorsToParsedErrors(error: unknown): Errors {
+/**
+ * Converts an error to a parsed errors object that reports the specific fields that the error pertains to. Will put
+ * generic non-API errors into the global array.
+ */
+function errorsToParsedErrors(error: unknown): Errors {
   const parsedErrors: Errors = {
     fields: {
       firstName: null,
@@ -43,6 +47,8 @@ export function errorsToParsedErrors(error: unknown): Errors {
     parsedErrors.global.push(error);
     return parsedErrors;
   }
+
+  parsedErrors.raw.push(...error.errors);
 
   error.errors.forEach(error => {
     if ('meta' in error && error.meta && 'paramName' in error.meta) {
@@ -76,6 +82,9 @@ export function errorsToParsedErrors(error: unknown): Errors {
           break;
         case 'legal_accepted':
           parsedErrors.fields.legalAccepted = error;
+          break;
+        default:
+          parsedErrors.global.push(error);
           break;
       }
     } else {
