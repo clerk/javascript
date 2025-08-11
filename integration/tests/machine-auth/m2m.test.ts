@@ -33,26 +33,26 @@ test.describe('machine-to-machine auth @machine', () => {
         'src/server/main.ts',
         () => `
         import 'dotenv/config';
-        import { clerkMiddleware, getAuth } from '@clerk/express';
+        import { clerkClient } from '@clerk/express';
         import express from 'express';
         import ViteExpress from 'vite-express';
 
         const app = express();
 
-        app.use(
-          clerkMiddleware({
-            publishableKey: process.env.VITE_CLERK_PUBLISHABLE_KEY,
-            machineSecretKey: process.env.CLERK_MACHINE_SECRET_KEY,
-          }),
-        );
-
-        app.get('/api/protected', (req, res) => {
-          const { machineId } = getAuth(req, { acceptsToken: 'm2m_token' });
-          if (!machineId) {
+        app.use(async (req, res, next) => {
+          const secret = req.get('Authorization')?.split(' ')[1] || '';
+          
+          try {
+            await clerkClient.m2mTokens.verifySecret({ secret });
+          } catch (error) {
             res.status(401).send('Unauthorized');
             return;
           }
 
+          next();
+        });
+
+        app.get('/api/protected', (req, res) => {
           res.send('Protected response');
         });
 
@@ -70,41 +70,41 @@ test.describe('machine-to-machine auth @machine', () => {
     await app.withEnv(env);
     await app.dev();
 
-    const u = createTestUtils({ app });
-
     // Email server can access primary API server
-    emailServer = await u.services.clerk.machines.create({
+    emailServer = await client.machines.create({
       name: `${fakeCompanyName} Email Server`,
       scopedMachines: [primaryApiServer.id],
     });
-    emailServerM2MToken = await u.services.clerk.m2mTokens.create({
+    emailServerM2MToken = await client.m2mTokens.create({
       machineSecretKey: emailServer.secretKey,
       secondsUntilExpiration: 60 * 30,
     });
 
     // Analytics server cannot access primary API server
-    analyticsServer = await u.services.clerk.machines.create({
+    analyticsServer = await client.machines.create({
       name: `${fakeCompanyName} Analytics Server`,
       // No scoped machines
     });
-    analyticsServerM2MToken = await u.services.clerk.m2mTokens.create({
+    analyticsServerM2MToken = await client.m2mTokens.create({
       machineSecretKey: analyticsServer.secretKey,
       secondsUntilExpiration: 60 * 30,
     });
   });
 
   test.afterAll(async () => {
-    const u = createTestUtils({ app });
+    const client = createClerkClient({
+      secretKey: instanceKeys.get('with-api-keys').sk,
+    });
 
-    await u.services.clerk.m2mTokens.revoke({
+    await client.m2mTokens.revoke({
       m2mTokenId: emailServerM2MToken.id,
     });
-    await u.services.clerk.m2mTokens.revoke({
+    await client.m2mTokens.revoke({
       m2mTokenId: analyticsServerM2MToken.id,
     });
-    await u.services.clerk.machines.delete(emailServer.id);
-    await u.services.clerk.machines.delete(primaryApiServer.id);
-    await u.services.clerk.machines.delete(analyticsServer.id);
+    await client.machines.delete(emailServer.id);
+    await client.machines.delete(primaryApiServer.id);
+    await client.machines.delete(analyticsServer.id);
 
     await app.teardown();
   });
