@@ -6,6 +6,7 @@ import React from 'react';
 
 import { createClerkClientWithOptions } from '../../server/createClerkClient';
 import { collectKeylessMetadata, formatMetadataHeaders } from '../../server/keyless-custom-headers';
+import { detectKeylessEnvDrift } from '../../server/keyless-telemetry';
 import type { NextClerkProviderProps } from '../../types';
 import { canUseKeyless } from '../../utils/feature-flags';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
@@ -46,6 +47,11 @@ export const KeylessProvider = async (props: KeylessProviderProps) => {
   const newOrReadKeys = await import('../../server/keyless-node.js')
     .then(mod => mod.createOrReadKeyless())
     .catch(() => null);
+
+  // Detect environment variable drift and fire telemetry events
+  if (newOrReadKeys) {
+    await detectKeylessEnvDrift();
+  }
 
   const { clerkDevelopmentCache, createConfirmationMessage, createKeylessModeMessage } = await import(
     '../../server/keyless-log-cache.js'

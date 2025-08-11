@@ -6,6 +6,7 @@ import { redirect, RedirectType } from 'next/navigation';
 import { errorThrower } from '../server/errorThrower';
 import { detectClerkMiddleware } from '../server/headers-utils';
 import { getKeylessCookieName, getKeylessCookieValue } from '../server/keyless';
+import { detectKeylessEnvDrift } from '../server/keyless-telemetry';
 import { canUseKeyless } from '../utils/feature-flags';
 
 type SetCookieOptions = Parameters<Awaited<ReturnType<typeof cookies>>['set']>[2];
@@ -60,6 +61,9 @@ export async function createOrReadKeylessAction(): Promise<null | Omit<Accountle
     errorThrower.throwMissingPublishableKeyError();
     return null;
   }
+
+  // Detect environment variable drift and fire telemetry events
+  await detectKeylessEnvDrift();
 
   const { clerkDevelopmentCache, createKeylessModeMessage } = await import('../server/keyless-log-cache.js');
 
