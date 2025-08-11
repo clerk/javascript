@@ -33,10 +33,19 @@ const { applyVariants, filterProps } = createVariants(theme => ({
       },
       inherit: { color: 'inherit' },
     },
+    focusRing: {
+      true: {
+        '&:focus': {
+          outline: 'none',
+          ...common.focusRing(theme),
+        },
+      },
+    },
   },
   defaultVariants: {
     colorScheme: 'primary',
     variant: 'body',
+    focusRing: false,
   },
 }));
 

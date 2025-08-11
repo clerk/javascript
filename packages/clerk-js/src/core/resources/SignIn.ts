@@ -517,7 +517,7 @@ class SignInFuture implements SignInFutureResource {
       });
 
       return { error: null };
-    } catch (err) {
+    } catch (err: unknown) {
       eventBus.emit('resource:error', { resource: this.resource, error: err });
       return { error: err };
     }
@@ -530,7 +530,7 @@ class SignInFuture implements SignInFutureResource {
         path: this.resource.pathRoot,
         body: { identifier, password },
       });
-    } catch (err) {
+    } catch (err: unknown) {
       eventBus.emit('resource:error', { resource: this.resource, error: err });
       return { error: err };
     }
