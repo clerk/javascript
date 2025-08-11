@@ -57,7 +57,7 @@ export async function createOrReadKeylessAction(): Promise<null | Omit<Accountle
   const result = await import('../server/keyless-node.js').then(m => m.createOrReadKeyless()).catch(() => null);
 
   if (!result) {
-    errorThrower.throwMissingPublishableKeyError();
+    // In non-keyless scenarios, allow continuing without throwing so the app can render.
     return null;
   }
 
