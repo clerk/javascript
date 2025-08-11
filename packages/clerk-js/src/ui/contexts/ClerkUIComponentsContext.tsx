@@ -26,7 +26,7 @@ import {
   UserVerificationContext,
   WaitlistContext,
 } from './components';
-import { SessionTasksContext, TaskChooseOrganizationContext } from './components/SessionTasks';
+import { TaskChooseOrganizationContext } from './components/SessionTasks';
 
 export function ComponentContextProvider({
   componentName,
@@ -115,9 +115,7 @@ export function ComponentContextProvider({
         <TaskChooseOrganizationContext.Provider
           value={{ componentName: 'TaskChooseOrganization', ...(props as TaskChooseOrganizationProps) }}
         >
-          <SessionTasksContext.Provider value={{ ...(props as TaskChooseOrganizationProps) }}>
-            {children}
-          </SessionTasksContext.Provider>
+          {children}
         </TaskChooseOrganizationContext.Provider>
       );
     default:

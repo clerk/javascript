@@ -3,7 +3,7 @@ import { isAbsoluteUrl } from '@clerk/shared/url';
 import type { SessionResource } from '@clerk/types';
 import { createContext, useContext, useMemo } from 'react';
 
-import { buildTasksUrl, INTERNAL_SESSION_TASK_ROUTE_BY_KEY } from '@/core/sessionTasks';
+import { buildTaskUrl, INTERNAL_SESSION_TASK_ROUTE_BY_KEY } from '@/core/sessionTasks';
 
 import { SIGN_UP_INITIAL_VALUE_KEYS } from '../../../core/constants';
 import { buildURL } from '../../../utils';
@@ -126,7 +126,7 @@ export const useSignUpContext = (): SignUpContextType => {
 
   const taskUrl = clerk.session?.currentTask
     ? (clerk.__internal_getOption('taskUrls')?.[clerk.session?.currentTask.key] ??
-      buildTasksUrl(clerk.session?.currentTask, { base: signUpUrl }))
+      buildTaskUrl(clerk.session?.currentTask, { base: signUpUrl }))
     : null;
 
   return {

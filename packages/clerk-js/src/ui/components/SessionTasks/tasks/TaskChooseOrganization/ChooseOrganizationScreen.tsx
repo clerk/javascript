@@ -2,7 +2,6 @@ import { useClerk, useOrganizationList, useUser } from '@clerk/shared/react';
 import type {
   OrganizationResource,
   OrganizationSuggestionResource,
-  SetActiveParams,
   UserOrganizationInvitationResource,
 } from '@clerk/types';
 import React, { useState } from 'react';
@@ -16,7 +15,7 @@ import {
   sharedMainIdentifierSx,
 } from '@/ui/common/organizations/OrganizationPreview';
 import { organizationListParams, populateCacheUpdateItem } from '@/ui/components/OrganizationSwitcher/utils';
-import { useSessionTasksContext } from '@/ui/contexts/components/SessionTasks';
+import { useTaskChooseOrganizationContext } from '@/ui/contexts/components/SessionTasks';
 import { Col, descriptors, localizationKeys, Text } from '@/ui/customizables';
 import { Action, Actions } from '@/ui/elements/Actions';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
@@ -98,7 +97,7 @@ export const ChooseOrganizationScreen = withCardStateProvider(
 
 const MembershipPreview = withCardStateProvider((props: { organization: OrganizationResource }) => {
   const card = useCardState();
-  const { redirectUrlComplete, navigateOnSetActive } = useSessionTasksContext();
+  const { redirectUrlComplete } = useTaskChooseOrganizationContext();
   const { isLoaded, setActive } = useOrganizationList();
 
   if (!isLoaded) {
@@ -107,19 +106,10 @@ const MembershipPreview = withCardStateProvider((props: { organization: Organiza
 
   const handleOrganizationClicked = (organization: OrganizationResource) => {
     return card.runAsync(async () => {
-      const setActiveParams: SetActiveParams = {
+      await setActive({
         organization,
         redirectUrl: redirectUrlComplete,
-      };
-
-      // TODO - Add `onComplete` or `onNextTask` callbacks for `TaskChooseOrganization` standalone usage
-      if (navigateOnSetActive) {
-        setActiveParams.navigate = async ({ session }) => {
-          await navigateOnSetActive({ session, redirectUrl: redirectUrlComplete });
-        };
-      }
-
-      await setActive(setActiveParams);
+      });
     });
   };
 

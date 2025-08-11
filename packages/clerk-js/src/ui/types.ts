@@ -137,7 +137,7 @@ export type CheckoutCtx = __internal_CheckoutProps & {
 export type SessionTasksCtx = {
   redirectUrlComplete: string;
   currentTaskContainer?: React.RefObject<HTMLDivElement> | null;
-  navigateOnSetActive?: (opts: { session: SessionResource; redirectUrl: string }) => Promise<unknown>;
+  navigateOnSetActive: (opts: { session: SessionResource; redirectUrl: string }) => Promise<unknown>;
 };
 
 export type TaskChooseOrganizationCtx = TaskChooseOrganizationProps & {
