@@ -1,9 +1,7 @@
-import { isExternalUrl } from '@clerk/shared/url';
 import React from 'react';
 
 import { useEnvironment } from '../contexts';
 import { descriptors, Flex, Image, useAppearance } from '../customizables';
-import { Link } from '../primitives';
 import type { PropsOfComponent } from '../styledSystem';
 import { RouterLink } from './RouterLink';
 
@@ -80,22 +78,12 @@ export const ApplicationLogo = (props: ApplicationLogoProps) => {
       ]}
     >
       {logoUrl ? (
-        isExternalUrl(logoUrl) ? (
-          <Link
-            href={logoUrl}
-            isExternal
-            focusRing
-          >
-            {image}
-          </Link>
-        ) : (
-          <RouterLink
-            focusRing
-            to={logoUrl}
-          >
-            {image}
-          </RouterLink>
-        )
+        <RouterLink
+          focusRing
+          to={logoUrl}
+        >
+          {image}
+        </RouterLink>
       ) : (
         image
       )}
