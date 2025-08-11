@@ -95,6 +95,7 @@ export interface UserResource extends ClerkResource, CommercePaymentSourceMethod
   publicMetadata: UserPublicMetadata;
   unsafeMetadata: UserUnsafeMetadata;
   lastSignInAt: Date | null;
+  legalAcceptedAt: Date | null;
   createOrganizationEnabled: boolean;
   createOrganizationsLimit: number | null;
   deleteSelfEnabled: boolean;
