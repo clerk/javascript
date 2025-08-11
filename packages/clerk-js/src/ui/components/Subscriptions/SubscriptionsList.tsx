@@ -120,7 +120,7 @@ export function SubscriptionsList({
                       >
                         {subscription.plan.name}
                       </Text>
-                      {sortedSubscriptions.length > 1 || !!subscription.canceledAtDate ? (
+                      {sortedSubscriptions.length > 1 || !!subscription.canceledAt ? (
                         <SubscriptionBadge subscription={subscription} />
                       ) : null}
                     </Flex>
