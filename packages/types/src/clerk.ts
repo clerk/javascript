@@ -961,7 +961,6 @@ type ClerkOptionsNavigation =
     };
 
 export type ClerkOptions = ClerkOptionsNavigation &
-  ClerkOptionsNavigation &
   SignInForceRedirectUrl &
   SignInFallbackRedirectUrl &
   SignUpForceRedirectUrl &

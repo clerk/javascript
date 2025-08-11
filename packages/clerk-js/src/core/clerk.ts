@@ -1361,7 +1361,7 @@ export class Clerk implements ClerkInterface {
       this.#emit();
 
       // Do not revalidate server cache for pending sessions to avoid unmount of `SignIn/SignUp` AIOs when navigating to task
-      if (!sessionIsPending) {
+      if (!sessionIsPending || newSession?.status === 'active') {
         await onAfterSetActive();
       }
     } finally {
