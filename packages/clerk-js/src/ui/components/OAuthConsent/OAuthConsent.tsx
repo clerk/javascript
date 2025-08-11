@@ -17,14 +17,8 @@ import { common } from '@/ui/styledSystem';
 import { colors } from '@/ui/utils/colors';
 
 export function OAuthConsentInternal() {
-  const {
-    scopes,
-    oAuthApplicationName,
-    oAuthApplicationLogoUrl = 'https://img.clerk.com/eyJ0eXBlIjoicHJveHkiLCJzcmMiOiJodHRwczovL2ltYWdlcy5jbGVyay5kZXYvdXBsb2FkZWQvaW1nXzMxOHVMSERjc0hTNXNaWlF0MlFEeWxpMER0RyJ9?width=400',
-    redirectUrl,
-    onDeny,
-    onAllow,
-  } = useOAuthConsentContext();
+  const { scopes, oAuthApplicationName, oAuthApplicationLogoUrl, redirectUrl, onDeny, onAllow } =
+    useOAuthConsentContext();
   const { user } = useUser();
   const { applicationName, logoImageUrl } = useEnvironment().displayConfig;
   const [isUriModalOpen, setIsUriModalOpen] = useState(false);
