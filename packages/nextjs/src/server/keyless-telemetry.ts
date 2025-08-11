@@ -1,9 +1,12 @@
 import type { TelemetryEventRaw } from '@clerk/types';
+import { promises as fs } from 'fs';
+import { dirname, join } from 'path';
 
 import { createClerkClientWithOptions } from './createClerkClient';
 
 const EVENT_KEYLESS_ENV_DRIFT_DETECTED = 'KEYLESS_ENV_DRIFT_DETECTED';
 const EVENT_SAMPLING_RATE = 1; // 100% sampling rate
+const TELEMETRY_FLAG_FILE = '.clerk/.tmp/telemetry.json';
 
 type EventKeylessEnvDriftPayload = {
   publicKeyMatch: boolean;
@@ -15,14 +18,72 @@ type EventKeylessEnvDriftPayload = {
 };
 
 /**
- * Detects environment variable drift for keyless Next.js applications and fires telemetry events.
+ * Gets the absolute path to the telemetry flag file.
  *
- * This function compares the publishableKey and secretKey values from `.clerk/.tmp/keyless.json`
- * with the `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY` environment variables.
+ * This file is used to track whether telemetry events have already been fired
+ * to prevent duplicate event reporting during the application lifecycle.
  *
- * If there's a mismatch, it fires a `KEYLESS_ENV_DRIFT_DETECTED` event.
- * For local testing purposes, it also fires a `KEYLESS_ENV_DRIFT_NOT_DETECTED` event when
- * keys exist and match the environment variables.
+ * @returns The absolute path to the telemetry flag file in the project's .clerk/.tmp directory
+ */
+function getTelemetryFlagFilePath(): string {
+  return join(process.cwd(), TELEMETRY_FLAG_FILE);
+}
+
+/**
+ * Attempts to create a telemetry flag file to mark that a telemetry event has been fired.
+ *
+ * This function uses the 'wx' flag to create the file atomically - it will only succeed
+ * if the file doesn't already exist. This ensures that telemetry events are only fired
+ * once per application lifecycle, preventing duplicate event reporting.
+ *
+ * @returns Promise<boolean> - Returns true if the flag file was successfully created (meaning
+ *   the event should be fired), false if the file already exists (meaning the event was
+ *   already fired) or if there was an error creating the file
+ */
+async function tryMarkTelemetryEventAsFired(): Promise<boolean> {
+  try {
+    const flagFilePath = getTelemetryFlagFilePath();
+    const flagDirectory = dirname(flagFilePath);
+
+    // Ensure the directory exists before attempting to write the file
+    await fs.mkdir(flagDirectory, { recursive: true });
+
+    const flagData = {
+      firedAt: new Date().toISOString(),
+      event: EVENT_KEYLESS_ENV_DRIFT_DETECTED,
+    };
+    await fs.writeFile(flagFilePath, JSON.stringify(flagData, null, 2), { flag: 'wx' });
+    return true;
+  } catch (error: unknown) {
+    if ((error as { code?: string })?.code === 'EEXIST') {
+      return false;
+    }
+    console.warn('Failed to create telemetry flag file:', error);
+    return false;
+  }
+}
+
+/**
+ * Detects and reports environment drift between keyless configuration and environment variables.
+ *
+ * This function compares the Clerk keys stored in the keyless configuration file (.clerk/clerk.json)
+ * with the keys set in environment variables (NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY and CLERK_SECRET_KEY).
+ * It only reports drift when there's an actual mismatch between existing keys, not when keys are simply missing.
+ *
+ * The function handles several scenarios and only reports drift in specific cases:
+ * - **Normal keyless mode**: env vars missing but keyless file has keys → no drift (expected)
+ * - **No configuration**: neither env vars nor keyless file have keys → no drift (nothing to compare)
+ * - **Actual drift**: env vars exist and don't match keyless file keys → drift detected
+ * - **Empty keyless file**: keyless file exists but has no keys → no drift (nothing to compare)
+ *
+ * Drift is only detected when:
+ * 1. Both environment variables and keyless file contain keys
+ * 2. The keys in environment variables don't match the keys in the keyless file
+ *
+ * Telemetry events are only fired once per application lifecycle using a flag file mechanism
+ * to prevent duplicate reporting.
+ *
+ * @returns Promise<void> - Function completes silently, errors are logged but don't throw
  */
 export async function detectKeylessEnvDrift(): Promise<void> {
   // Only run on server side
@@ -45,31 +106,57 @@ export async function detectKeylessEnvDrift(): Promise<void> {
     const envPublishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
     const envSecretKey = process.env.CLERK_SECRET_KEY;
 
-    // Check if environment variables are missing, and keys exist in keyless file
-    const envVarsMissing = !envPublishableKey && !envSecretKey;
+    // Check the state of environment variables and keyless file
+    const hasEnvVars = Boolean(envPublishableKey || envSecretKey);
     const keylessFileHasKeys = Boolean(keylessFile?.publishableKey && keylessFile?.secretKey);
+    const envVarsMissing = !envPublishableKey && !envSecretKey;
+
+    // Early return conditions - no drift to detect in these scenarios:
+    if (!hasEnvVars && !keylessFileHasKeys) {
+      // Neither env vars nor keyless file have keys - nothing to compare
+      return;
+    }
 
     if (envVarsMissing && keylessFileHasKeys) {
       // Environment variables are missing but keyless file has keys - this is normal for keyless mode
       return;
     }
 
-    // Compare publishable keys
-    const publicKeyMatch = Boolean(envPublishableKey === keylessFile?.publishableKey);
+    if (!keylessFileHasKeys) {
+      // Keyless file doesn't have keys, so no drift can be detected
+      return;
+    }
 
-    // Compare secret keys
-    const secretKeyMatch = Boolean(envSecretKey === keylessFile?.secretKey);
+    // Only proceed with drift detection if we have something meaningful to compare
+    if (!hasEnvVars) {
+      return;
+    }
 
-    // Check if there's a drift (mismatch between env vars and keyless file)
-    const hasDrift = !publicKeyMatch || !secretKeyMatch;
+    // Compare keys only when both sides have values to compare
+    const publicKeyMatch = Boolean(
+      envPublishableKey && keylessFile.publishableKey && envPublishableKey === keylessFile.publishableKey,
+    );
+
+    const secretKeyMatch = Boolean(envSecretKey && keylessFile.secretKey && envSecretKey === keylessFile.secretKey);
+
+    // Determine if there's an actual drift:
+    // Drift occurs when we have env vars that don't match the keyless file keys
+    const hasActualDrift =
+      (envPublishableKey && keylessFile.publishableKey && !publicKeyMatch) ||
+      (envSecretKey && keylessFile.secretKey && !secretKeyMatch);
+
+    // Only fire telemetry if there's an actual drift (not just missing keys)
+    if (!hasActualDrift) {
+      return;
+    }
 
     const payload: EventKeylessEnvDriftPayload = {
       publicKeyMatch,
       secretKeyMatch,
       envVarsMissing,
       keylessFileHasKeys,
-      keylessPublishableKey: keylessFile.publishableKey,
-      envPublishableKey: envPublishableKey as string,
+      keylessPublishableKey: keylessFile.publishableKey ?? '',
+      envPublishableKey: envPublishableKey ?? '',
     };
 
     // Create a clerk client to access telemetry
@@ -78,8 +165,10 @@ export async function detectKeylessEnvDrift(): Promise<void> {
       secretKey: keylessFile.secretKey,
     });
 
-    if (hasDrift) {
-      // Fire drift detected event
+    const shouldFireEvent = await tryMarkTelemetryEventAsFired();
+
+    if (shouldFireEvent) {
+      // Fire drift detected event only if we successfully created the flag
       const driftDetectedEvent: TelemetryEventRaw<EventKeylessEnvDriftPayload> = {
         event: EVENT_KEYLESS_ENV_DRIFT_DETECTED,
         eventSamplingRate: EVENT_SAMPLING_RATE,
