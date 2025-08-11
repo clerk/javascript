@@ -1,8 +1,11 @@
+import { isExternalUrl } from '@clerk/shared/url';
 import React from 'react';
 
 import { useEnvironment } from '../contexts';
 import { descriptors, Flex, Image, useAppearance } from '../customizables';
-import type { PropsOfComponent } from '../styledSystem';
+import { Link } from '../primitives';
+import type { InternalTheme, PropsOfComponent } from '../styledSystem';
+import { common } from '../styledSystem';
 import { RouterLink } from './RouterLink';
 
 const getContainerHeightForImageRatio = (imageRef: React.RefObject<HTMLImageElement>, width: string) => {
@@ -21,15 +24,24 @@ const getContainerHeightForImageRatio = (imageRef: React.RefObject<HTMLImageElem
   return width;
 };
 
-type ApplicationLogoProps = PropsOfComponent<typeof Flex>;
+type ApplicationLogoProps = PropsOfComponent<typeof Flex> & {
+  /**
+   * The URL of the image to display.
+   */
+  src?: string;
+  /**
+   * The URL to navigate to when the logo is clicked.
+   */
+  href?: string;
+};
 
 export const ApplicationLogo = (props: ApplicationLogoProps) => {
   const imageRef = React.useRef<HTMLImageElement>(null);
   const [loaded, setLoaded] = React.useState(false);
   const { logoImageUrl, applicationName, homeUrl } = useEnvironment().displayConfig;
   const { parsedLayout } = useAppearance();
-  const imageSrc = parsedLayout.logoImageUrl || logoImageUrl;
-  const logoUrl = parsedLayout.logoLinkUrl || homeUrl;
+  const imageSrc = props.src || parsedLayout.logoImageUrl || logoImageUrl;
+  const logoUrl = props.href || parsedLayout.logoLinkUrl || homeUrl;
 
   if (!imageSrc) {
     return null;
@@ -65,14 +77,33 @@ export const ApplicationLogo = (props: ApplicationLogoProps) => {
       ]}
     >
       {logoUrl ? (
-        <RouterLink
-          sx={{
-            justifyContent: 'center',
-          }}
-          to={logoUrl}
-        >
-          {image}
-        </RouterLink>
+        isExternalUrl(logoUrl) ? (
+          <Link
+            href={logoUrl}
+            isExternal
+            css={(theme: InternalTheme) => ({
+              '&:focus': {
+                ...common.focusRing(theme),
+                outline: 'none',
+              },
+            })}
+          >
+            {image}
+          </Link>
+        ) : (
+          <RouterLink
+            sx={theme => ({
+              justifyContent: 'center',
+              '&:focus': {
+                ...common.focusRing(theme),
+                outline: 'none',
+              },
+            })}
+            to={logoUrl}
+          >
+            {image}
+          </RouterLink>
+        )
       ) : (
         image
       )}
