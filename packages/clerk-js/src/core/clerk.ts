@@ -541,12 +541,13 @@ export class Clerk implements ClerkInterface {
   };
 
   public openGoogleOneTap = (props?: GoogleOneTapProps): void => {
+    const component = 'GoogleOneTap';
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls
-      .ensureMounted({ preloadHint: 'GoogleOneTap' })
+      .ensureMounted({ preloadHint: component })
       .then(controls => controls.openModal('googleOneTap', props || {}));
 
-    this.telemetry?.record(eventPrebuiltComponentOpened(`GoogleOneTap`, props, undefined, this.telemetrySamplingRate));
+    this.telemetry?.record(eventPrebuiltComponentOpened(component, props, undefined, this.telemetrySamplingRate));
   };
 
   public closeGoogleOneTap = (): void => {
@@ -564,12 +565,13 @@ export class Clerk implements ClerkInterface {
       }
       return;
     }
+    const component = 'SignIn';
     void this.#componentControls
-      .ensureMounted({ preloadHint: 'SignIn' })
+      .ensureMounted({ preloadHint: component })
       .then(controls => controls.openModal('signIn', props || {}));
 
     const additionalData = { withSignUp: props?.withSignUp ?? this.#isCombinedSignInOrUpFlow() };
-    this.telemetry?.record(eventPrebuiltComponentOpened(`SignIn`, props, additionalData, this.telemetrySamplingRate));
+    this.telemetry?.record(eventPrebuiltComponentOpened(component, props, additionalData, this.telemetrySamplingRate));
   };
 
   public closeSignIn = (): void => {
@@ -616,11 +618,12 @@ export class Clerk implements ClerkInterface {
       }
       return;
     }
+    const component = 'PlanDetails';
     void this.#componentControls
-      .ensureMounted({ preloadHint: 'PlanDetails' })
+      .ensureMounted({ preloadHint: component })
       .then(controls => controls.openDrawer('planDetails', props || {}));
 
-    this.telemetry?.record(eventPrebuiltComponentOpened(`PlanDetails`, props, undefined, this.telemetrySamplingRate));
+    this.telemetry?.record(eventPrebuiltComponentOpened(component, props, undefined, this.telemetrySamplingRate));
   };
 
   public __internal_closePlanDetails = (): void => {
@@ -724,7 +727,7 @@ export class Clerk implements ClerkInterface {
       .ensureMounted({ preloadHint: 'UserProfile' })
       .then(controls => controls.openModal('userProfile', props || {}));
 
-    const additionalData = props?.customPages?.length || 0 > 0 ? { customPages: true } : undefined;
+    const additionalData = (props?.customPages?.length || 0) > 0 ? { customPages: true } : undefined;
     this.telemetry?.record(
       eventPrebuiltComponentOpened('UserProfile', props, additionalData, this.telemetrySamplingRate),
     );
@@ -807,9 +810,10 @@ export class Clerk implements ClerkInterface {
 
   public mountSignIn = (node: HTMLDivElement, props?: SignInProps): void => {
     this.assertComponentsReady(this.#componentControls);
-    void this.#componentControls.ensureMounted({ preloadHint: 'SignIn' }).then(controls =>
+    const component = 'SignIn';
+    void this.#componentControls.ensureMounted({ preloadHint: component }).then(controls =>
       controls.mountComponent({
-        name: 'SignIn',
+        name: component,
         appearanceKey: 'signIn',
         node,
         props,
@@ -817,7 +821,7 @@ export class Clerk implements ClerkInterface {
     );
 
     const additionalData = { withSignUp: props?.withSignUp ?? this.#isCombinedSignInOrUpFlow() };
-    this.telemetry?.record(eventPrebuiltComponentMounted(`SignIn`, props, additionalData, this.telemetrySamplingRate));
+    this.telemetry?.record(eventPrebuiltComponentMounted(component, props, additionalData, this.telemetrySamplingRate));
   };
 
   public unmountSignIn = (node: HTMLDivElement): void => {
@@ -831,16 +835,17 @@ export class Clerk implements ClerkInterface {
 
   public mountSignUp = (node: HTMLDivElement, props?: SignUpProps): void => {
     this.assertComponentsReady(this.#componentControls);
-    void this.#componentControls.ensureMounted({ preloadHint: 'SignUp' }).then(controls =>
+    const component = 'SignUp';
+    void this.#componentControls.ensureMounted({ preloadHint: component }).then(controls =>
       controls.mountComponent({
-        name: 'SignUp',
+        name: component,
         appearanceKey: 'signUp',
         node,
         props,
       }),
     );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted(`SignUp`, props, undefined, this.telemetrySamplingRate));
+    this.telemetry?.record(eventPrebuiltComponentMounted(component, props, undefined, this.telemetrySamplingRate));
   };
 
   public unmountSignUp = (node: HTMLDivElement): void => {
@@ -862,19 +867,18 @@ export class Clerk implements ClerkInterface {
       }
       return;
     }
-    void this.#componentControls.ensureMounted({ preloadHint: 'UserProfile' }).then(controls =>
+    const component = 'UserProfile';
+    void this.#componentControls.ensureMounted({ preloadHint: component }).then(controls =>
       controls.mountComponent({
-        name: 'UserProfile',
+        name: component,
         appearanceKey: 'userProfile',
         node,
         props,
       }),
     );
 
-    const additionalData = props?.customPages?.length || 0 > 0 ? { customPages: true } : undefined;
-    this.telemetry?.record(
-      eventPrebuiltComponentMounted('UserProfile', props, additionalData, this.telemetrySamplingRate),
-    );
+    const additionalData = (props?.customPages?.length || 0) > 0 ? { customPages: true } : undefined;
+    this.telemetry?.record(eventPrebuiltComponentMounted(component, props, additionalData, this.telemetrySamplingRate));
   };
 
   public unmountUserProfile = (node: HTMLDivElement): void => {
