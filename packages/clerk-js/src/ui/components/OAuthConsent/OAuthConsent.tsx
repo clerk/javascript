@@ -312,11 +312,11 @@ function ConnectionHeader({ children }: { children: React.ReactNode }) {
   );
 }
 
-function ConnectionItem({ children, ...props }: ComponentProps<typeof Flex>) {
+function ConnectionItem({ children, sx, ...props }: ComponentProps<typeof Flex>) {
   return (
     <Flex
       {...props}
-      sx={[{ flex: 1 }, props.sx]}
+      sx={[{ flex: 1 }, sx]}
     >
       {children}
     </Flex>
