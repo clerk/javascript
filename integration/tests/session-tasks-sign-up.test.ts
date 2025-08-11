@@ -92,11 +92,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
       await u.po.signUp.continue();
       await u.po.signUp.enterTestOtpCode();
 
-      // TODO - Remove this once FAPI changes are deployed to redirect
-      // to `redirect_url` for pending sessions on SSO callback
-      await u.page.waitForAppUrl('/');
-      await u.page.goToRelative('/page-protected');
-
       // Resolves task
       await u.po.signUp.waitForMounted();
       const fakeOrganization = Object.assign(u.services.organizations.createFakeOrganization(), {
