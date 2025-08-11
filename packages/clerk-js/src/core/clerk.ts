@@ -347,6 +347,10 @@ export class Clerk implements ClerkInterface {
     return Clerk._apiKeys;
   }
 
+  private get telemetrySamplingRate(): number | undefined {
+    return this.#options.__internal_keyless_claimKeylessApplicationUrl ? 1 : undefined;
+  }
+
   __experimental_checkout(options: __experimental_CheckoutOptions): __experimental_CheckoutInstance {
     if (!this._checkout) {
       this._checkout = params => createCheckoutInstance(this, params);
@@ -542,7 +546,7 @@ export class Clerk implements ClerkInterface {
       .ensureMounted({ preloadHint: 'GoogleOneTap' })
       .then(controls => controls.openModal('googleOneTap', props || {}));
 
-    this.telemetry?.record(eventPrebuiltComponentOpened(`GoogleOneTap`, props));
+    this.telemetry?.record(eventPrebuiltComponentOpened(`GoogleOneTap`, props, undefined, this.telemetrySamplingRate));
   };
 
   public closeGoogleOneTap = (): void => {
@@ -565,7 +569,7 @@ export class Clerk implements ClerkInterface {
       .then(controls => controls.openModal('signIn', props || {}));
 
     const additionalData = { withSignUp: props?.withSignUp ?? this.#isCombinedSignInOrUpFlow() };
-    this.telemetry?.record(eventPrebuiltComponentOpened(`SignIn`, props, additionalData));
+    this.telemetry?.record(eventPrebuiltComponentOpened(`SignIn`, props, additionalData, this.telemetrySamplingRate));
   };
 
   public closeSignIn = (): void => {
@@ -616,7 +620,7 @@ export class Clerk implements ClerkInterface {
       .ensureMounted({ preloadHint: 'PlanDetails' })
       .then(controls => controls.openDrawer('planDetails', props || {}));
 
-    this.telemetry?.record(eventPrebuiltComponentOpened(`PlanDetails`, props));
+    this.telemetry?.record(eventPrebuiltComponentOpened(`PlanDetails`, props, undefined, this.telemetrySamplingRate));
   };
 
   public __internal_closePlanDetails = (): void => {
@@ -650,7 +654,9 @@ export class Clerk implements ClerkInterface {
       .ensureMounted({ preloadHint: 'UserVerification' })
       .then(controls => controls.openModal('userVerification', props || {}));
 
-    this.telemetry?.record(eventPrebuiltComponentOpened(`UserVerification`, props));
+    this.telemetry?.record(
+      eventPrebuiltComponentOpened(`UserVerification`, props, undefined, this.telemetrySamplingRate),
+    );
   };
 
   public __internal_closeReverification = (): void => {
@@ -696,7 +702,7 @@ export class Clerk implements ClerkInterface {
       .ensureMounted({ preloadHint: 'SignUp' })
       .then(controls => controls.openModal('signUp', props || {}));
 
-    this.telemetry?.record(eventPrebuiltComponentOpened('SignUp', props));
+    this.telemetry?.record(eventPrebuiltComponentOpened('SignUp', props, undefined, this.telemetrySamplingRate));
   };
 
   public closeSignUp = (): void => {
@@ -719,7 +725,9 @@ export class Clerk implements ClerkInterface {
       .then(controls => controls.openModal('userProfile', props || {}));
 
     const additionalData = props?.customPages?.length || 0 > 0 ? { customPages: true } : undefined;
-    this.telemetry?.record(eventPrebuiltComponentOpened('UserProfile', props, additionalData));
+    this.telemetry?.record(
+      eventPrebuiltComponentOpened('UserProfile', props, additionalData, this.telemetrySamplingRate),
+    );
   };
 
   public closeUserProfile = (): void => {
@@ -749,7 +757,9 @@ export class Clerk implements ClerkInterface {
       .ensureMounted({ preloadHint: 'OrganizationProfile' })
       .then(controls => controls.openModal('organizationProfile', props || {}));
 
-    this.telemetry?.record(eventPrebuiltComponentOpened('OrganizationProfile', props));
+    this.telemetry?.record(
+      eventPrebuiltComponentOpened('OrganizationProfile', props, undefined, this.telemetrySamplingRate),
+    );
   };
 
   public closeOrganizationProfile = (): void => {
@@ -771,7 +781,9 @@ export class Clerk implements ClerkInterface {
       .ensureMounted({ preloadHint: 'CreateOrganization' })
       .then(controls => controls.openModal('createOrganization', props || {}));
 
-    this.telemetry?.record(eventPrebuiltComponentOpened('CreateOrganization', props));
+    this.telemetry?.record(
+      eventPrebuiltComponentOpened('CreateOrganization', props, undefined, this.telemetrySamplingRate),
+    );
   };
 
   public closeCreateOrganization = (): void => {
@@ -785,7 +797,7 @@ export class Clerk implements ClerkInterface {
       .ensureMounted({ preloadHint: 'Waitlist' })
       .then(controls => controls.openModal('waitlist', props || {}));
 
-    this.telemetry?.record(eventPrebuiltComponentOpened('Waitlist', props));
+    this.telemetry?.record(eventPrebuiltComponentOpened('Waitlist', props, undefined, this.telemetrySamplingRate));
   };
 
   public closeWaitlist = (): void => {
@@ -805,7 +817,7 @@ export class Clerk implements ClerkInterface {
     );
 
     const additionalData = { withSignUp: props?.withSignUp ?? this.#isCombinedSignInOrUpFlow() };
-    this.telemetry?.record(eventPrebuiltComponentMounted(`SignIn`, props, additionalData));
+    this.telemetry?.record(eventPrebuiltComponentMounted(`SignIn`, props, additionalData, this.telemetrySamplingRate));
   };
 
   public unmountSignIn = (node: HTMLDivElement): void => {
@@ -828,7 +840,7 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted(`SignUp`, props));
+    this.telemetry?.record(eventPrebuiltComponentMounted(`SignUp`, props, undefined, this.telemetrySamplingRate));
   };
 
   public unmountSignUp = (node: HTMLDivElement): void => {
@@ -860,7 +872,9 @@ export class Clerk implements ClerkInterface {
     );
 
     const additionalData = props?.customPages?.length || 0 > 0 ? { customPages: true } : undefined;
-    this.telemetry?.record(eventPrebuiltComponentMounted('UserProfile', props, additionalData));
+    this.telemetry?.record(
+      eventPrebuiltComponentMounted('UserProfile', props, additionalData, this.telemetrySamplingRate),
+    );
   };
 
   public unmountUserProfile = (node: HTMLDivElement): void => {
@@ -900,7 +914,9 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted('OrganizationProfile', props));
+    this.telemetry?.record(
+      eventPrebuiltComponentMounted('OrganizationProfile', props, undefined, this.telemetrySamplingRate),
+    );
   };
 
   public unmountOrganizationProfile = (node: HTMLDivElement) => {
@@ -931,7 +947,9 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted('CreateOrganization', props));
+    this.telemetry?.record(
+      eventPrebuiltComponentMounted('CreateOrganization', props, undefined, this.telemetrySamplingRate),
+    );
   };
 
   public unmountCreateOrganization = (node: HTMLDivElement) => {
@@ -963,10 +981,15 @@ export class Clerk implements ClerkInterface {
     );
 
     this.telemetry?.record(
-      eventPrebuiltComponentMounted('OrganizationSwitcher', {
-        ...props,
-        forceOrganizationSelection: this.environment?.organizationSettings.forceOrganizationSelection,
-      }),
+      eventPrebuiltComponentMounted(
+        'OrganizationSwitcher',
+        {
+          ...props,
+          forceOrganizationSelection: this.environment?.organizationSettings.forceOrganizationSelection,
+        },
+        undefined,
+        this.telemetrySamplingRate,
+      ),
     );
   };
 
@@ -1002,10 +1025,15 @@ export class Clerk implements ClerkInterface {
     );
 
     this.telemetry?.record(
-      eventPrebuiltComponentMounted('OrganizationList', {
-        ...props,
-        forceOrganizationSelection: this.environment?.organizationSettings.forceOrganizationSelection,
-      }),
+      eventPrebuiltComponentMounted(
+        'OrganizationList',
+        {
+          ...props,
+          forceOrganizationSelection: this.environment?.organizationSettings.forceOrganizationSelection,
+        },
+        undefined,
+        this.telemetrySamplingRate,
+      ),
     );
   };
 
@@ -1030,7 +1058,9 @@ export class Clerk implements ClerkInterface {
       ...(props?.__experimental_asStandalone ? { standalone: true } : undefined),
     };
 
-    this.telemetry?.record(eventPrebuiltComponentMounted('UserButton', props, additionalData));
+    this.telemetry?.record(
+      eventPrebuiltComponentMounted('UserButton', props, additionalData, this.telemetrySamplingRate),
+    );
   };
 
   public unmountUserButton = (node: HTMLDivElement): void => {
@@ -1049,7 +1079,7 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted('Waitlist', props));
+    this.telemetry?.record(eventPrebuiltComponentMounted('Waitlist', props, undefined, this.telemetrySamplingRate));
   };
 
   public unmountWaitlist = (node: HTMLDivElement): void => {
@@ -1076,7 +1106,7 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted('PricingTable', props));
+    this.telemetry?.record(eventPrebuiltComponentMounted('PricingTable', props, undefined, this.telemetrySamplingRate));
   };
 
   public unmountPricingTable = (node: HTMLDivElement): void => {
@@ -1145,7 +1175,7 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted('APIKeys', props));
+    this.telemetry?.record(eventPrebuiltComponentMounted('APIKeys', props, undefined, this.telemetrySamplingRate));
   };
 
   /**
@@ -1183,7 +1213,9 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted('TaskChooseOrganization', props));
+    this.telemetry?.record(
+      eventPrebuiltComponentMounted('TaskChooseOrganization', props, undefined, this.telemetrySamplingRate),
+    );
   };
 
   public unmountTaskChooseOrganization = (node: HTMLDivElement) => {

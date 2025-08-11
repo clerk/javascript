@@ -17,15 +17,19 @@ type EventPrebuiltComponent = ComponentMountedBase & {
 
 type EventComponentMounted = ComponentMountedBase & TelemetryEventRaw['payload'];
 
+/**
+ * @internal
+ */
 function createPrebuiltComponentEvent(event: typeof EVENT_COMPONENT_MOUNTED | typeof EVENT_COMPONENT_OPENED) {
   return function (
     component: string,
     props?: Record<string, any>,
     additionalPayload?: TelemetryEventRaw['payload'],
+    samplingRate?: number,
   ): TelemetryEventRaw<EventPrebuiltComponent> {
     return {
       event,
-      eventSamplingRate: EVENT_SAMPLING_RATE,
+      eventSamplingRate: samplingRate ?? EVENT_SAMPLING_RATE,
       payload: {
         component,
         appearanceProp: Boolean(props?.appearance),
@@ -44,7 +48,7 @@ function createPrebuiltComponentEvent(event: typeof EVENT_COMPONENT_MOUNTED | ty
  * @param component - The name of the component.
  * @param props - The props passed to the component. Will be filtered to a known list of props.
  * @param additionalPayload - Additional data to send with the event.
- *
+ * @param samplingRate - The sampling rate for the event.
  * @example
  * telemetry.record(eventPrebuiltComponentMounted('SignUp', props));
  */
@@ -52,8 +56,9 @@ export function eventPrebuiltComponentMounted(
   component: string,
   props?: Record<string, any>,
   additionalPayload?: TelemetryEventRaw['payload'],
+  samplingRate?: number,
 ): TelemetryEventRaw<EventPrebuiltComponent> {
-  return createPrebuiltComponentEvent(EVENT_COMPONENT_MOUNTED)(component, props, additionalPayload);
+  return createPrebuiltComponentEvent(EVENT_COMPONENT_MOUNTED)(component, props, additionalPayload, samplingRate);
 }
 
 /**
@@ -62,7 +67,7 @@ export function eventPrebuiltComponentMounted(
  * @param component - The name of the component.
  * @param props - The props passed to the component. Will be filtered to a known list of props.
  * @param additionalPayload - Additional data to send with the event.
- *
+ * @param samplingRate - The sampling rate for the event.
  * @example
  * telemetry.record(eventPrebuiltComponentOpened('GoogleOneTap', props));
  */
@@ -70,8 +75,9 @@ export function eventPrebuiltComponentOpened(
   component: string,
   props?: Record<string, any>,
   additionalPayload?: TelemetryEventRaw['payload'],
+  samplingRate?: number,
 ): TelemetryEventRaw<EventPrebuiltComponent> {
-  return createPrebuiltComponentEvent(EVENT_COMPONENT_OPENED)(component, props, additionalPayload);
+  return createPrebuiltComponentEvent(EVENT_COMPONENT_OPENED)(component, props, additionalPayload, samplingRate);
 }
 
 /**
@@ -81,7 +87,6 @@ export function eventPrebuiltComponentOpened(
  *
  * @param component - The name of the component.
  * @param props - The props passed to the component. Ideally you only pass a handful of props here.
- *
  * @example
  * telemetry.record(eventComponentMounted('SignUp', props));
  */
