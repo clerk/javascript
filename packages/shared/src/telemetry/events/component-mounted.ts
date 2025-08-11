@@ -47,7 +47,6 @@ function createPrebuiltComponentEvent(event: typeof EVENT_COMPONENT_MOUNTED | ty
  * @param component - The name of the component.
  * @param props - The props passed to the component. Will be filtered to a known list of props.
  * @param additionalPayload - Additional data to send with the event.
- * @param samplingRate - The sampling rate for the event.
  * @example
  * telemetry.record(eventPrebuiltComponentMounted('SignUp', props));
  */
@@ -65,7 +64,6 @@ export function eventPrebuiltComponentMounted(
  * @param component - The name of the component.
  * @param props - The props passed to the component. Will be filtered to a known list of props.
  * @param additionalPayload - Additional data to send with the event.
- * @param samplingRate - The sampling rate for the event.
  * @example
  * telemetry.record(eventPrebuiltComponentOpened('GoogleOneTap', props));
  */

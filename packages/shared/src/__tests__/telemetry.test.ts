@@ -209,7 +209,7 @@ describe('TelemetryCollector', () => {
       const collector = new TelemetryCollector({
         publishableKey: TEST_PK,
         samplingRate: 1.0, // Global sampling rate allows all events
-        eventSampling: false, // Disable event-specific sampling
+        perEventSampling: false, // Disable event-specific sampling
       });
 
       // This event would normally be rejected due to low eventSamplingRate (0.1 < 0.5)
@@ -231,7 +231,7 @@ describe('TelemetryCollector', () => {
       const collector = new TelemetryCollector({
         publishableKey: TEST_PK,
         samplingRate: 1.0, // Global sampling rate allows all events
-        eventSampling: true, // Enable event-specific sampling (default)
+        perEventSampling: true, // Enable event-specific sampling (default)
       });
 
       // This event should be rejected due to low eventSamplingRate (0.1 < 0.5)

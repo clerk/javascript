@@ -439,7 +439,7 @@ export class Clerk implements ClerkInterface {
       this.telemetry = new TelemetryCollector({
         clerkVersion: Clerk.version,
         samplingRate: 1,
-        eventSampling: this.#options.__internal_keyless_claimKeylessApplicationUrl ? false : undefined,
+        perEventSampling: this.#options.__internal_keyless_claimKeylessApplicationUrl ? false : undefined,
         publishableKey: this.publishableKey,
         ...this.#options.telemetry,
       });

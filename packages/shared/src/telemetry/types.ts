@@ -16,7 +16,7 @@ export type TelemetryCollectorOptions = {
    *
    * @default true
    */
-  eventSampling?: boolean;
+  perEventSampling?: boolean;
   /**
    * Set a custom buffer size to control how often events are sent.
    */

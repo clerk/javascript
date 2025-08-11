@@ -46,7 +46,7 @@ function isWindowClerkWithMetadata(clerk: unknown): clerk is { constructor: { sd
 
 type TelemetryCollectorConfig = Pick<
   TelemetryCollectorOptions,
-  'samplingRate' | 'disabled' | 'debug' | 'maxBufferSize' | 'eventSampling'
+  'samplingRate' | 'disabled' | 'debug' | 'maxBufferSize' | 'perEventSampling'
 > & {
   endpoint: string;
 };
@@ -80,7 +80,7 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
     this.#config = {
       maxBufferSize: options.maxBufferSize ?? DEFAULT_CONFIG.maxBufferSize,
       samplingRate: options.samplingRate ?? DEFAULT_CONFIG.samplingRate,
-      eventSampling: options.eventSampling ?? true,
+      perEventSampling: options.perEventSampling ?? true,
       disabled: options.disabled ?? false,
       debug: options.debug ?? false,
       endpoint: DEFAULT_CONFIG.endpoint,
@@ -168,7 +168,7 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
 
     const toBeSampled =
       randomSeed <= this.#config.samplingRate &&
-      (this.#config.eventSampling === false ||
+      (this.#config.perEventSampling === false ||
         typeof eventSamplingRate === 'undefined' ||
         randomSeed <= eventSamplingRate);
 
