@@ -531,8 +531,33 @@ export class Clerk implements ClerkInterface {
 
     await session?.remove();
 
+    if (this.client && this.client.signedInSessions.length > 0) {
+      const nextSession = this.client.signedInSessions[0];
+      if (nextSession) {
+        this.client.lastActiveSessionId = nextSession.id;
+        this.#setAccessors(nextSession);
+        this.#emit();
+      }
+    }
+
     if (shouldSignOutCurrent) {
-      await executeSignOut();
+      const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
+
+      eventBus.emit(events.UserSignOut, null);
+
+      await tracker.track(async () => {
+        if (signOutCallback) {
+          await signOutCallback();
+        } else {
+          await this.navigate(redirectUrl);
+        }
+      });
+
+      if (tracker.isUnloading()) {
+        return;
+      }
+
+      await onAfterSetActive();
     }
   };
 

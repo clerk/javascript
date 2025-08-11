@@ -809,6 +809,47 @@ describe('Clerk singleton', () => {
         expect(sut.navigate).toHaveBeenCalledWith('/after-sign-out');
       });
     });
+
+    it('properly restores auth state from remaining sessions after multisession sign-out', async () => {
+      const mockClient = {
+        signedInSessions: [mockSession1, mockSession2],
+        sessions: [mockSession1, mockSession2],
+        destroy: mockClientDestroy,
+        lastActiveSessionId: '1',
+      };
+
+      // Mock the session.remove() method to actually update the client
+      mockSession1.remove = jest.fn().mockImplementation(() => {
+        mockClient.signedInSessions = mockClient.signedInSessions.filter(s => s.id !== '1');
+        mockClient.sessions = mockClient.sessions.filter(s => s.id !== '1');
+        return Promise.resolve(mockSession1);
+      });
+
+      mockClientFetch.mockReturnValue(Promise.resolve(mockClient));
+
+      const sut = new Clerk(productionPublishableKey);
+      sut.navigate = jest.fn();
+      await sut.load();
+
+      // Initially, session1 should be active
+      expect(sut.session).toBe(mockSession1);
+      expect(sut.isSignedIn).toBe(true);
+
+      // Sign out session1 (the current active session)
+      await sut.signOut({ sessionId: '1' });
+
+      await waitFor(() => {
+        expect(mockSession1.remove).toHaveBeenCalled();
+        expect(mockClientDestroy).not.toHaveBeenCalled();
+        expect(sut.navigate).toHaveBeenCalledWith('/');
+      });
+
+      // After sign-out, the auth state should be restored from the remaining session
+      // The client should be updated to reflect the new state
+      expect(mockClient.lastActiveSessionId).toBe('2');
+      expect(sut.session).toBe(mockSession2);
+      expect(sut.isSignedIn).toBe(true);
+    });
   });
 
   describe('.navigate(to)', () => {
