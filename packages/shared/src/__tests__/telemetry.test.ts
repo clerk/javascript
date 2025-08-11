@@ -200,6 +200,49 @@ describe('TelemetryCollector', () => {
 
       randomSpy.mockRestore();
     });
+
+    test('ignores event-specific sampling rate when eventSampling is false', async () => {
+      windowSpy.mockImplementation(() => undefined);
+
+      const randomSpy = jest.spyOn(Math, 'random').mockReturnValue(0.5);
+
+      const collector = new TelemetryCollector({
+        publishableKey: TEST_PK,
+        samplingRate: 1.0, // Global sampling rate allows all events
+        eventSampling: false, // Disable event-specific sampling
+      });
+
+      // This event would normally be rejected due to low eventSamplingRate (0.1 < 0.5)
+      // but should be sent because eventSampling is disabled
+      collector.record({ event: 'TEST_EVENT', eventSamplingRate: 0.1, payload: {} });
+
+      jest.runAllTimers();
+
+      expect(fetchSpy).toHaveBeenCalled();
+
+      randomSpy.mockRestore();
+    });
+
+    test('respects event-specific sampling rate when eventSampling is true (default)', async () => {
+      windowSpy.mockImplementation(() => undefined);
+
+      const randomSpy = jest.spyOn(Math, 'random').mockReturnValue(0.5);
+
+      const collector = new TelemetryCollector({
+        publishableKey: TEST_PK,
+        samplingRate: 1.0, // Global sampling rate allows all events
+        eventSampling: true, // Enable event-specific sampling (default)
+      });
+
+      // This event should be rejected due to low eventSamplingRate (0.1 < 0.5)
+      collector.record({ event: 'TEST_EVENT', eventSamplingRate: 0.1, payload: {} });
+
+      jest.runAllTimers();
+
+      expect(fetchSpy).not.toHaveBeenCalled();
+
+      randomSpy.mockRestore();
+    });
   });
 
   describe('with client-side throttling', () => {
