@@ -4,8 +4,7 @@ import React from 'react';
 import { useEnvironment } from '../contexts';
 import { descriptors, Flex, Image, useAppearance } from '../customizables';
 import { Link } from '../primitives';
-import type { InternalTheme, PropsOfComponent } from '../styledSystem';
-import { common } from '../styledSystem';
+import type { PropsOfComponent } from '../styledSystem';
 import { RouterLink } from './RouterLink';
 
 const getContainerHeightForImageRatio = (imageRef: React.RefObject<HTMLImageElement>, width: string) => {
@@ -81,24 +80,13 @@ export const ApplicationLogo = (props: ApplicationLogoProps) => {
           <Link
             href={logoUrl}
             isExternal
-            css={(theme: InternalTheme) => ({
-              '&:focus': {
-                ...common.focusRing(theme),
-                outline: 'none',
-              },
-            })}
+            focusRing
           >
             {image}
           </Link>
         ) : (
           <RouterLink
-            sx={theme => ({
-              justifyContent: 'center',
-              '&:focus': {
-                ...common.focusRing(theme),
-                outline: 'none',
-              },
-            })}
+            focusRing
             to={logoUrl}
           >
             {image}
