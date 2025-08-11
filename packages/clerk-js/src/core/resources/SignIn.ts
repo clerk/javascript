@@ -12,7 +12,6 @@ import type {
   AuthenticateWithPopupParams,
   AuthenticateWithRedirectParams,
   AuthenticateWithWeb3Params,
-  ClerkAPIResponseError,
   CreateEmailLinkFlowReturn,
   EmailCodeConfig,
   EmailLinkConfig,
@@ -518,7 +517,7 @@ class SignInFuture implements SignInFutureResource {
       });
 
       return { error: null };
-    } catch (err) {
+    } catch (err: unknown) {
       eventBus.emit('resource:error', { resource: this.resource, error: err });
       return { error: err };
     }
@@ -531,7 +530,7 @@ class SignInFuture implements SignInFutureResource {
         path: this.resource.pathRoot,
         body: { identifier, password },
       });
-    } catch (err) {
+    } catch (err: unknown) {
       eventBus.emit('resource:error', { resource: this.resource, error: err });
       return { error: err };
     }
@@ -558,7 +557,7 @@ class SignInFuture implements SignInFutureResource {
         action: 'prepare_first_factor',
       });
     } catch (err: unknown) {
-      eventBus.emit('resource:error', { resource: this.resource, error: err as ClerkAPIResponseError });
+      eventBus.emit('resource:error', { resource: this.resource, error: err });
       return { error: err };
     }
 
@@ -573,7 +572,7 @@ class SignInFuture implements SignInFutureResource {
         action: 'attempt_first_factor',
       });
     } catch (err: unknown) {
-      eventBus.emit('resource:error', { resource: this.resource, error: err as ClerkAPIResponseError });
+      eventBus.emit('resource:error', { resource: this.resource, error: err });
       return { error: err };
     }
 
@@ -613,7 +612,7 @@ class SignInFuture implements SignInFutureResource {
         windowNavigate(externalVerificationRedirectURL);
       }
     } catch (err: unknown) {
-      eventBus.emit('resource:error', { resource: this.resource, error: err as ClerkAPIResponseError });
+      eventBus.emit('resource:error', { resource: this.resource, error: err });
       return { error: err };
     }
 

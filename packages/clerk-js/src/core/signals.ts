@@ -1,10 +1,11 @@
-import type { ClerkAPIResponseError, Errors } from '@clerk/types';
+import { isClerkAPIResponseError } from '@clerk/shared/error';
+import type { Errors } from '@clerk/types';
 import { computed, signal } from 'alien-signals';
 
 import type { SignIn } from './resources/SignIn';
 
 export const signInSignal = signal<{ resource: SignIn | null }>({ resource: null });
-export const signInErrorSignal = signal<{ error: ClerkAPIResponseError | null }>({ error: null });
+export const signInErrorSignal = signal<{ error: unknown }>({ error: null });
 
 export const signInComputedSignal = computed(() => {
   const signIn = signInSignal().resource;
@@ -19,7 +20,7 @@ export const signInComputedSignal = computed(() => {
   return { errors, signIn: signIn.__internal_future };
 });
 
-export function errorsToParsedErrors(error: ClerkAPIResponseError | null): Errors {
+export function errorsToParsedErrors(error: unknown): Errors {
   const parsedErrors: Errors = {
     fields: {
       firstName: null,
@@ -33,11 +34,17 @@ export function errorsToParsedErrors(error: ClerkAPIResponseError | null): Error
       captcha: null,
       legalAccepted: null,
     },
-    raw: error ? error.errors : [],
+    raw: [],
     global: [],
   };
 
-  error?.errors.forEach(error => {
+  if (!isClerkAPIResponseError(error)) {
+    parsedErrors.raw.push(error);
+    parsedErrors.global.push(error);
+    return parsedErrors;
+  }
+
+  error.errors.forEach(error => {
     if ('meta' in error && error.meta && 'paramName' in error.meta) {
       switch (error.meta.paramName) {
         case 'first_name':

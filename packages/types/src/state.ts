@@ -21,8 +21,8 @@ interface FieldErrors {
 
 export interface Errors {
   fields: FieldErrors;
-  raw: any[];
-  global: any[]; // does not include any errors that could be parsed as a field error
+  raw: unknown[];
+  global: unknown[]; // does not include any errors that could be parsed as a field error
 }
 
 export interface State {

@@ -1,5 +1,5 @@
 import { createEventBus } from '@clerk/shared/eventBus';
-import type { ClerkAPIResponseError, TokenResource } from '@clerk/types';
+import type { TokenResource } from '@clerk/types';
 
 import type { BaseResource } from './resources/Base';
 
@@ -14,7 +14,7 @@ export const events = {
 
 type TokenUpdatePayload = { token: TokenResource | null };
 export type ResourceUpdatePayload = { resource: BaseResource };
-export type ResourceErrorPayload = { resource: BaseResource; error: ClerkAPIResponseError | null };
+export type ResourceErrorPayload = { resource: BaseResource; error: unknown };
 
 type InternalEvents = {
   [events.TokenUpdate]: TokenUpdatePayload;
