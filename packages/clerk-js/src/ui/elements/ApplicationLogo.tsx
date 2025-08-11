@@ -29,6 +29,10 @@ type ApplicationLogoProps = PropsOfComponent<typeof Flex> & {
    */
   src?: string;
   /**
+   * The alt text for the image.
+   */
+  alt?: string;
+  /**
    * The URL to navigate to when the logo is clicked.
    */
   href?: string;
