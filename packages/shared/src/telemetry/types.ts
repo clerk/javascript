@@ -8,11 +8,17 @@ export type TelemetryCollectorOptions = {
    */
   debug?: boolean;
   /**
-   * Sampling rate, 0-1
+   * Sampling rate, 0-1.
    */
   samplingRate?: number;
   /**
-   * Set a custom buffer size to control how often events are sent
+   * If false, the sampling rates provided per event will be ignored and the global sampling rate will be used.
+   *
+   * @default true
+   */
+  perEventSampling?: boolean;
+  /**
+   * Set a custom buffer size to control how often events are sent.
    */
   maxBufferSize?: number;
   /**
