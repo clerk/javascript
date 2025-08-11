@@ -6,6 +6,7 @@ const POPUP_PREFERRED_ORIGINS = [
   '.webcontainer-api.io',
   '.vusercontent.net',
   '.v0.dev',
+  '.v0.app',
 ];
 
 /**
