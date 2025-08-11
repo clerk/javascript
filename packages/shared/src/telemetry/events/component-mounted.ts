@@ -25,16 +25,10 @@ function createPrebuiltComponentEvent(event: typeof EVENT_COMPONENT_MOUNTED | ty
     component: string,
     props?: Record<string, any>,
     additionalPayload?: TelemetryEventRaw['payload'],
-    samplingRate?: number,
   ): TelemetryEventRaw<EventPrebuiltComponent> {
-    const normalizedSampling =
-      typeof samplingRate === 'number' && !Number.isFinite(samplingRate)
-        ? Math.min(1, Math.max(0, samplingRate))
-        : undefined;
-
     return {
       event,
-      eventSamplingRate: normalizedSampling ?? EVENT_SAMPLING_RATE,
+      eventSamplingRate: EVENT_SAMPLING_RATE,
       payload: {
         component,
         appearanceProp: Boolean(props?.appearance),
@@ -61,9 +55,8 @@ export function eventPrebuiltComponentMounted(
   component: string,
   props?: Record<string, any>,
   additionalPayload?: TelemetryEventRaw['payload'],
-  samplingRate?: number,
 ): TelemetryEventRaw<EventPrebuiltComponent> {
-  return createPrebuiltComponentEvent(EVENT_COMPONENT_MOUNTED)(component, props, additionalPayload, samplingRate);
+  return createPrebuiltComponentEvent(EVENT_COMPONENT_MOUNTED)(component, props, additionalPayload);
 }
 
 /**
@@ -80,9 +73,8 @@ export function eventPrebuiltComponentOpened(
   component: string,
   props?: Record<string, any>,
   additionalPayload?: TelemetryEventRaw['payload'],
-  samplingRate?: number,
 ): TelemetryEventRaw<EventPrebuiltComponent> {
-  return createPrebuiltComponentEvent(EVENT_COMPONENT_OPENED)(component, props, additionalPayload, samplingRate);
+  return createPrebuiltComponentEvent(EVENT_COMPONENT_OPENED)(component, props, additionalPayload);
 }
 
 /**
