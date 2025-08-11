@@ -21,7 +21,7 @@ export class State implements StateInterface {
 
   private onResourceError = (payload: { resource: BaseResource; error: unknown }) => {
     if (payload.resource instanceof SignIn) {
-      this.signInErrorSignal({ errors: payload.error });
+      this.signInErrorSignal({ error: payload.error });
     }
   };
 
