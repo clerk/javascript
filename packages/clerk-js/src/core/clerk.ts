@@ -28,9 +28,9 @@ import type {
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
+  Clerk as ClerkInterface,
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
-  Clerk as ClerkInterface,
   ClerkOptions,
   ClientJSONSnapshot,
   ClientResource,
@@ -1267,7 +1267,7 @@ export class Clerk implements ClerkInterface {
       }
 
       // Do not revalidate server cache for pending sessions to avoid unmount of `SignIn/SignUp` AIOs when navigating to task
-      if (!sessionIsPending) {
+      if (newSession?.status !== 'pending') {
         /**
          * Hint to each framework, that the user will be signed out when `{session: null}` is provided.
          */
