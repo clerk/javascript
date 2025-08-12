@@ -62,6 +62,7 @@ export const bgBG: LocalizationResource = {
   badge__requiresAction: 'Изисква действие',
   badge__startsAt: undefined,
   badge__thisDevice: 'Това устройство',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Непотвърден',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Потребителско устройство',
@@ -133,6 +134,7 @@ export const bgBG: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,
@@ -788,6 +790,26 @@ export const bgBG: LocalizationResource = {
   },
   socialButtonsBlockButton: 'Продължи с {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: 'Вие вече сте член на тази организация.',
     captcha_invalid: undefined,

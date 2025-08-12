@@ -62,6 +62,7 @@ export const taIN: LocalizationResource = {
   badge__requiresAction: 'செயல் தேவை',
   badge__startsAt: undefined,
   badge__thisDevice: 'இந்த சாதனம்',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'சரிபார்க்கப்படாதது',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'பயனர் சாதனம்',
@@ -133,6 +134,7 @@ export const taIN: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,
@@ -795,6 +797,26 @@ export const taIN: LocalizationResource = {
   },
   socialButtonsBlockButton: '{{provider|titleize}} மூலம் தொடரவும்',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ஏற்கனவே நிறுவனத்தின் உறுப்பினராக உள்ளார்.',
     captcha_invalid:

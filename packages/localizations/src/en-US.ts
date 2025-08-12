@@ -64,7 +64,6 @@ export const enUS: LocalizationResource = {
   badge__default: 'Default',
   badge__endsAt: "Ends {{ date | shortDate('en-US') }}",
   badge__expired: 'Expired',
-  badge__trialEndsAt: "Trial ends {{ date | shortDate('en-US') }}",
   badge__otherImpersonatorDevice: 'Other impersonator device',
   badge__pastDueAt: "Past due {{ date | shortDate('en-US') }}",
   badge__pastDuePlan: 'Past due',
@@ -73,6 +72,7 @@ export const enUS: LocalizationResource = {
   badge__requiresAction: 'Requires action',
   badge__startsAt: "Starts {{ date | shortDate('en-US') }}",
   badge__thisDevice: 'This device',
+  badge__trialEndsAt: "Trial ends {{ date | shortDate('en-US') }}",
   badge__unverified: 'Unverified',
   badge__upcomingPlan: 'Upcoming',
   badge__userDevice: 'User device',
@@ -153,6 +153,7 @@ export const enUS: LocalizationResource = {
     },
     reSubscribe: 'Resubscribe',
     seeAllFeatures: 'See all features',
+    startFreeTrial: 'Start {{days}}-day free trial',
     subscribe: 'Subscribe',
     subscriptionDetails: {
       beginsOn: 'Begins on',
@@ -814,6 +815,26 @@ export const enUS: LocalizationResource = {
   },
   socialButtonsBlockButton: 'Continue with {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: 'Create new organization',
+      action__invitationAccept: 'Join',
+      action__suggestionsAccept: 'Request to join',
+      subtitle: 'Join an existing organization or create a new one',
+      suggestionsAcceptedLabel: 'Pending approval',
+      title: 'Choose an organization',
+    },
+    createOrganization: {
+      formButtonReset: 'Cancel',
+      formButtonSubmit: 'Create new organization',
+      subtitle: 'Tell us a bit about your organization',
+      title: 'Setup your account',
+    },
+    signOut: {
+      actionLink: 'Sign out',
+      actionText: 'Signed in as {{identifier}}',
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} is already a member of the organization.',
     captcha_invalid: undefined,

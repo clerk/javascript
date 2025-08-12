@@ -62,6 +62,7 @@ export const heIL: LocalizationResource = {
   badge__requiresAction: 'דורש פעולה',
   badge__startsAt: undefined,
   badge__thisDevice: 'מכשיר זה',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'לא מאומת',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'מכשיר משתמש',
@@ -133,6 +134,7 @@ export const heIL: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,
@@ -780,6 +782,26 @@ export const heIL: LocalizationResource = {
   },
   socialButtonsBlockButton: 'המשך עם {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} כבר חבר בארגון',
     captcha_invalid: 'ההרשמה נכשלה עקב כשל באימות האבטחה. אנא רענן את הדף ונסה שוב, או פנה לתמיכה לעזרה נוספת.',

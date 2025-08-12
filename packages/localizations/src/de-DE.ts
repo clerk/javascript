@@ -62,6 +62,7 @@ export const deDE: LocalizationResource = {
   badge__requiresAction: 'Handlung erforderlich',
   badge__startsAt: "Startet am {{ date | shortDate('de-DE') }}",
   badge__thisDevice: 'Dieses Gerät',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Unbestätigt',
   badge__upcomingPlan: 'Bevorstehend',
   badge__userDevice: 'Benutzergerät',
@@ -136,6 +137,7 @@ export const deDE: LocalizationResource = {
     },
     reSubscribe: 'Erneut abonnieren',
     seeAllFeatures: 'Alle Funktionen anzeigen',
+    startFreeTrial: undefined,
     subscribe: 'Abonnieren',
     subscriptionDetails: {
       beginsOn: undefined,
@@ -799,6 +801,26 @@ export const deDE: LocalizationResource = {
   },
   socialButtonsBlockButton: 'Weiter mit {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: 'Sie sind bereits Mitglied in dieser Organisation.',
     captcha_invalid:

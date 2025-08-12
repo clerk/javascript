@@ -62,6 +62,7 @@ export const elGR: LocalizationResource = {
   badge__requiresAction: 'Απαιτεί ενέργεια',
   badge__startsAt: undefined,
   badge__thisDevice: 'Αυτή η συσκευή',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Μη επαληθευμένο',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Συσκευή χρήστη',
@@ -133,6 +134,7 @@ export const elGR: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,
@@ -790,6 +792,26 @@ export const elGR: LocalizationResource = {
   },
   socialButtonsBlockButton: 'Συνέχεια με {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: undefined,
     captcha_invalid:
