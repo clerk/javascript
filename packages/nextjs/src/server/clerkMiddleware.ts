@@ -52,7 +52,7 @@ import type { AuthProtect } from './protect';
 import { createProtect } from './protect';
 import type { NextMiddlewareEvtParam, NextMiddlewareRequestParam, NextMiddlewareReturn } from './types';
 import {
-  assertKey,
+  // assertKey,  // removed direct usage for keys to allow non-throwing behavior
   decorateRequest,
   handleMultiDomainAndProxy,
   redirectAdapter,
@@ -93,6 +93,22 @@ export interface ClerkMiddlewareOptions extends AuthenticateAnyRequestOptions {
    * When set, automatically injects a Content-Security-Policy header(s) compatible with Clerk.
    */
   contentSecurityPolicy?: ContentSecurityPolicyOptions;
+
+  /**
+   * Optional hook invoked when the publishable key is missing. If it returns a response, it will be used as the middleware result.
+   * If it returns void, the request will continue unauthenticated.
+   */
+  onMissingPublishableKey?: (
+    request: NextRequest,
+  ) => NextMiddlewareReturn | Promise<NextMiddlewareReturn> | void | Promise<void>;
+
+  /**
+   * Optional hook invoked when the secret key is missing. If it returns a response, it will be used as the middleware result.
+   * If it returns void, the request will continue unauthenticated.
+   */
+  onMissingSecretKey?: (
+    request: NextRequest,
+  ) => NextMiddlewareReturn | Promise<NextMiddlewareReturn> | void | Promise<void>;
 }
 
 type ClerkMiddlewareOptionsCallback = (req: NextRequest) => ClerkMiddlewareOptions | Promise<ClerkMiddlewareOptions>;
@@ -141,14 +157,48 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
 
       const keyless = await getKeylessCookieValue(name => request.cookies.get(name)?.value);
 
-      const publishableKey = assertKey(
-        resolvedParams.publishableKey || PUBLISHABLE_KEY || keyless?.publishableKey,
-        () => errorThrower.throwMissingPublishableKeyError(),
-      );
+      // Resolve keys without throwing
+      const resolvedPublishableKey = resolvedParams.publishableKey || PUBLISHABLE_KEY || keyless?.publishableKey;
+      const resolvedSecretKey = resolvedParams.secretKey || SECRET_KEY || keyless?.secretKey;
 
-      const secretKey = assertKey(resolvedParams.secretKey || SECRET_KEY || keyless?.secretKey, () =>
-        errorThrower.throwMissingSecretKeyError(),
-      );
+      // Handle missing publishable key
+      if (!resolvedPublishableKey) {
+        if (resolvedParams.onMissingPublishableKey) {
+          const maybeResponse = await resolvedParams.onMissingPublishableKey(request);
+          if (maybeResponse) {
+            return maybeResponse;
+          }
+          // Fall through to allow request to continue unauthenticated
+          const res = NextResponse.next();
+          setRequestHeadersOnNextResponse(res, request, {
+            [constants.Headers.AuthStatus]: 'signed-out',
+          });
+          return res;
+        }
+        // Default behavior remains throwing if no hook is provided
+        return errorThrower.throwMissingPublishableKeyError();
+      }
+
+      // Handle missing secret key
+      if (!resolvedSecretKey) {
+        if (resolvedParams.onMissingSecretKey) {
+          const maybeResponse = await resolvedParams.onMissingSecretKey(request);
+          if (maybeResponse) {
+            return maybeResponse;
+          }
+          // Fall through to allow request to continue unauthenticated
+          const res = NextResponse.next();
+          setRequestHeadersOnNextResponse(res, request, {
+            [constants.Headers.AuthStatus]: 'signed-out',
+          });
+          return res;
+        }
+        // Default behavior remains throwing if no hook is provided
+        return errorThrower.throwMissingSecretKeyError();
+      }
+
+      const publishableKey = resolvedPublishableKey;
+      const secretKey = resolvedSecretKey;
       const signInUrl = resolvedParams.signInUrl || SIGN_IN_URL;
       const signUpUrl = resolvedParams.signUpUrl || SIGN_UP_URL;
 
@@ -158,7 +208,7 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
         signInUrl,
         signUpUrl,
         ...resolvedParams,
-      };
+      } as ClerkMiddlewareOptions;
 
       // Propagates the request data to be accessed on the server application runtime from helpers such as `clerkClient`
       clerkMiddlewareRequestDataStore.set('requestData', options);
@@ -198,7 +248,7 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       const locationHeader = requestState.headers.get(constants.Headers.Location);
       if (locationHeader) {
         const res = NextResponse.redirect(locationHeader);
-        requestState.headers.forEach((value, key) => {
+        requestState.headers.forEach((value: string, key: string) => {
           if (key === constants.Headers.Location) {
             return;
           }
@@ -247,7 +297,7 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       // TODO @nikos: we need to make this more generic
       // and move the logic in clerk/backend
       if (requestState.headers) {
-        requestState.headers.forEach((value, key) => {
+        requestState.headers.forEach((value: string, key: string) => {
           if (key === constants.Headers.ContentSecurityPolicy) {
             logger.debug('Content-Security-Policy detected', () => ({
               value,
@@ -259,7 +309,7 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
 
       if (isRedirect(handlerResult)) {
         logger.debug('handlerResult is redirect');
-        return serverRedirectWithAuth(clerkRequest, handlerResult, options);
+        return serverRedirectWithAuth(clerkRequest, handlerResult, { secretKey });
       }
 
       if (options.debug) {
@@ -270,10 +320,10 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
         // Only pass keyless credentials when there are no explicit keys
         secretKey === keyless?.secretKey
           ? {
-              publishableKey: keyless?.publishableKey,
-              secretKey: keyless?.secretKey,
+              publishableKey: keyless?.publishableKey || '',
+              secretKey: keyless?.secretKey || '',
             }
-          : {};
+          : { publishableKey: '', secretKey: '' };
 
       decorateRequest(
         clerkRequest,
@@ -514,7 +564,7 @@ const handleControlFlowErrors = (
       sessionStatus: requestState.toAuth()?.sessionStatus,
     });
 
-    const { returnBackUrl } = e;
+    const { returnBackUrl } = e as any;
     return redirect[isRedirectToSignIn ? 'redirectToSignIn' : 'redirectToSignUp']({ returnBackUrl });
   }
 
