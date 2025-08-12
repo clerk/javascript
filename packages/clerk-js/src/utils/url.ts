@@ -21,6 +21,9 @@ const DUMMY_URL_BASE = 'http://clerk-dummy';
 
 const BANNED_URI_PROTOCOLS = ['javascript:'] as const;
 
+// Protocols that are dangerous specifically for href attributes in links
+const BANNED_HREF_PROTOCOLS = ['javascript:', 'data:', 'vbscript:', 'blob:'] as const;
+
 const { isDevOrStagingUrl } = createDevOrStagingUrlCache();
 export { isDevOrStagingUrl };
 const accountPortalCache = new Map<string, boolean>();
@@ -276,12 +279,74 @@ export function isDataUri(val?: string): val is string {
   return new URL(val).protocol === 'data:';
 }
 
+/**
+ * Checks if a URL uses javascript: protocol.
+ * This prevents some XSS attacks through javascript: URLs.
+ *
+ * IMPORTANT: This does not check for `data:` or other protocols which
+ * are dangerous if used for links or setting the window location.
+ *
+ * @param val - The URL to check
+ * @returns True if the URL contains a banned protocol, false otherwise
+ */
 export function hasBannedProtocol(val: string | URL) {
   if (!isValidUrl(val)) {
     return false;
   }
   const protocol = new URL(val).protocol;
   return BANNED_URI_PROTOCOLS.some(bp => bp === protocol);
+}
+
+/**
+ * Checks if a URL contains a banned protocol for href attributes in links.
+ * This prevents some XSS attacks through javascript:, data:, vbscript:, and blob: URLs.
+ *
+ * @param val - The URL to check
+ * @returns True if the URL contains a banned protocol, false otherwise
+ */
+export function hasBannedHrefProtocol(val: string | URL) {
+  if (!isValidUrl(val)) {
+    return false;
+  }
+  const protocol = new URL(val).protocol;
+  return BANNED_HREF_PROTOCOLS.some(bp => bp === protocol);
+}
+
+/**
+ * Sanitizes an href value by checking for dangerous protocols.
+ * Returns null if the href contains a dangerous protocol, otherwise returns the original href.
+ * This prevents some XSS attacks through javascript:, data:, vbscript:, and blob: URLs.
+ *
+ * @param href - The href value to sanitize
+ * @returns The sanitized href or null if dangerous
+ */
+export function sanitizeHref(href: string | undefined | null): string | null {
+  if (!href) {
+    return null;
+  }
+
+  // For relative URLs (starting with / or # or ?), allow them through
+  if (href.startsWith('/') || href.startsWith('#') || href.startsWith('?')) {
+    return href;
+  }
+
+  // For relative URLs without leading slash, allow them through
+  if (!href.includes(':')) {
+    return href;
+  }
+
+  // Check if it's a valid URL with a dangerous protocol
+  try {
+    const url = new URL(href);
+    if (hasBannedHrefProtocol(url)) {
+      return null;
+    }
+    return href;
+  } catch {
+    // If URL parsing fails, it's likely a relative URL or malformed
+    // Allow relative URLs through, but be cautious with malformed ones
+    return href;
+  }
 }
 
 export const hasUrlInFragment = (_url: URL | string) => {
