@@ -287,7 +287,7 @@ export interface CommercePlanResource extends ClerkResource {
    * <ClerkProvider clerkJsVersion="x.x.x" />
    * ```
    */
-  fee: CommerceFee;
+  fee: CommerceMoneyAmount;
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
    * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
@@ -296,7 +296,7 @@ export interface CommercePlanResource extends ClerkResource {
    * <ClerkProvider clerkJsVersion="x.x.x" />
    * ```
    */
-  annualFee: CommerceFee;
+  annualFee: CommerceMoneyAmount;
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
    * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
@@ -305,7 +305,7 @@ export interface CommercePlanResource extends ClerkResource {
    * <ClerkProvider clerkJsVersion="x.x.x" />
    * ```
    */
-  annualMonthlyFee: CommerceFee;
+  annualMonthlyFee: CommerceMoneyAmount;
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
    * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
@@ -703,7 +703,7 @@ export interface CommercePaymentResource extends ClerkResource {
    * <ClerkProvider clerkJsVersion="x.x.x" />
    * ```
    */
-  amount: CommerceFee;
+  amount: CommerceMoneyAmount;
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
    * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
@@ -1019,7 +1019,7 @@ export interface CommerceSubscriptionItemResource extends ClerkResource {
    * <ClerkProvider clerkJsVersion="x.x.x" />
    * ```
    */
-  amount?: CommerceFee;
+  amount?: CommerceMoneyAmount;
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
    * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
@@ -1037,7 +1037,7 @@ export interface CommerceSubscriptionItemResource extends ClerkResource {
      * <ClerkProvider clerkJsVersion="x.x.x" />
      * ```
      */
-    amount: CommerceFee;
+    amount: CommerceMoneyAmount;
   };
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
@@ -1112,7 +1112,7 @@ export interface CommerceSubscriptionResource extends ClerkResource {
      * <ClerkProvider clerkJsVersion="x.x.x" />
      * ```
      */
-    amount: CommerceFee;
+    amount: CommerceMoneyAmount;
     /**
      * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
      * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
@@ -1186,7 +1186,7 @@ export interface CommerceSubscriptionResource extends ClerkResource {
  * <ClerkProvider clerkJsVersion="x.x.x" />
  * ```
  */
-export interface CommerceFee {
+export interface CommerceMoneyAmount {
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
    * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
@@ -1242,7 +1242,7 @@ export interface CommerceCheckoutTotals {
    * <ClerkProvider clerkJsVersion="x.x.x" />
    * ```
    */
-  subtotal: CommerceFee;
+  subtotal: CommerceMoneyAmount;
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
    * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
@@ -1251,7 +1251,7 @@ export interface CommerceCheckoutTotals {
    * <ClerkProvider clerkJsVersion="x.x.x" />
    * ```
    */
-  grandTotal: CommerceFee;
+  grandTotal: CommerceMoneyAmount;
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
    * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
@@ -1260,7 +1260,7 @@ export interface CommerceCheckoutTotals {
    * <ClerkProvider clerkJsVersion="x.x.x" />
    * ```
    */
-  taxTotal: CommerceFee;
+  taxTotal: CommerceMoneyAmount;
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
    * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
@@ -1269,7 +1269,7 @@ export interface CommerceCheckoutTotals {
    * <ClerkProvider clerkJsVersion="x.x.x" />
    * ```
    */
-  totalDueNow: CommerceFee;
+  totalDueNow: CommerceMoneyAmount;
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
    * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
@@ -1278,7 +1278,7 @@ export interface CommerceCheckoutTotals {
    * <ClerkProvider clerkJsVersion="x.x.x" />
    * ```
    */
-  credit: CommerceFee;
+  credit: CommerceMoneyAmount;
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
    * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
@@ -1287,7 +1287,7 @@ export interface CommerceCheckoutTotals {
    * <ClerkProvider clerkJsVersion="x.x.x" />
    * ```
    */
-  pastDue: CommerceFee;
+  pastDue: CommerceMoneyAmount;
 }
 
 /**

@@ -1,15 +1,20 @@
-import type { CommerceFee, CommercePayerResourceType, CommercePlanJSON, CommercePlanResource } from '@clerk/types';
+import type {
+  CommerceMoneyAmount,
+  CommercePayerResourceType,
+  CommercePlanJSON,
+  CommercePlanResource,
+} from '@clerk/types';
 
-import { commerceFeeFromJSON } from '@/utils/commerce';
+import { commerceMoneyAmountFromJSON } from '@/utils/commerce';
 
 import { BaseResource, CommerceFeature } from './internal';
 
 export class CommercePlan extends BaseResource implements CommercePlanResource {
   id!: string;
   name!: string;
-  fee!: CommerceFee;
-  annualFee!: CommerceFee;
-  annualMonthlyFee!: CommerceFee;
+  fee!: CommerceMoneyAmount;
+  annualFee!: CommerceMoneyAmount;
+  annualMonthlyFee!: CommerceMoneyAmount;
   description!: string;
   isDefault!: boolean;
   isRecurring!: boolean;
@@ -32,9 +37,9 @@ export class CommercePlan extends BaseResource implements CommercePlanResource {
 
     this.id = data.id;
     this.name = data.name;
-    this.fee = commerceFeeFromJSON(data.fee);
-    this.annualFee = commerceFeeFromJSON(data.annual_fee);
-    this.annualMonthlyFee = commerceFeeFromJSON(data.annual_monthly_fee);
+    this.fee = commerceMoneyAmountFromJSON(data.fee);
+    this.annualFee = commerceMoneyAmountFromJSON(data.annual_fee);
+    this.annualMonthlyFee = commerceMoneyAmountFromJSON(data.annual_monthly_fee);
     this.description = data.description;
     this.isDefault = data.is_default;
     this.isRecurring = data.is_recurring;

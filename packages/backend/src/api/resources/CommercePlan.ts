@@ -1,7 +1,7 @@
 import { Feature } from './Feature';
 import type { CommercePlanJSON } from './JSON';
 
-type CommerceFee = {
+type CommerceMoneyAmount = {
   amount: number;
   amountFormatted: string;
   currency: string;
@@ -53,15 +53,15 @@ export class CommercePlan {
     /**
      * The monthly fee of the plan.
      */
-    readonly fee: CommerceFee,
+    readonly fee: CommerceMoneyAmount,
     /**
      * The annual fee of the plan.
      */
-    readonly annualFee: CommerceFee,
+    readonly annualFee: CommerceMoneyAmount,
     /**
      * The annual fee of the plan on a monthly basis.
      */
-    readonly annualMonthlyFee: CommerceFee,
+    readonly annualMonthlyFee: CommerceMoneyAmount,
     /**
      * The type of payer for the plan.
      */
