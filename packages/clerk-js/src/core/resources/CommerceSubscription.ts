@@ -107,7 +107,7 @@ export class CommerceSubscriptionItem extends BaseResource implements CommerceSu
     this.amount = data.amount ? commerceMoneyFromJSON(data.amount) : undefined;
     this.credit = data.credit && data.credit.amount ? { amount: commerceMoneyFromJSON(data.credit.amount) } : undefined;
 
-    this.isFreeTrial = data.is_free_trial;
+    this.isFreeTrial = this.withDefault(data.is_free_trial, false);
     return this;
   }
 
