@@ -62,6 +62,7 @@ export const elGR: LocalizationResource = {
   badge__requiresAction: 'Απαιτεί ενέργεια',
   badge__startsAt: undefined,
   badge__thisDevice: 'Αυτή η συσκευή',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Μη επαληθευμένο',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Συσκευή χρήστη',
@@ -133,6 +134,7 @@ export const elGR: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,

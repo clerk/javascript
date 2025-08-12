@@ -62,6 +62,7 @@ export const svSE: LocalizationResource = {
   badge__requiresAction: 'Kräver åtgärd',
   badge__startsAt: undefined,
   badge__thisDevice: 'Den här enheten',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Overifierad',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Användarens enhet',
@@ -133,6 +134,7 @@ export const svSE: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,

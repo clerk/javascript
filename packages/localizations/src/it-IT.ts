@@ -63,6 +63,7 @@ export const itIT: LocalizationResource = {
   badge__requiresAction: 'Richiede azione',
   badge__startsAt: "Inizia {{ date | shortDate('it-IT') }}",
   badge__thisDevice: 'Questo dispositivo',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Non verificato',
   badge__upcomingPlan: 'In arrivo',
   badge__userDevice: 'Dispositivo utente',
@@ -139,6 +140,7 @@ export const itIT: LocalizationResource = {
     },
     reSubscribe: 'Riabbonati',
     seeAllFeatures: 'Vedi tutte le funzionalità',
+    startFreeTrial: undefined,
     subscribe: 'Abbonati',
     subscriptionDetails: {
       beginsOn: 'Inizia il',

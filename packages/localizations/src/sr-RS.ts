@@ -62,6 +62,7 @@ export const srRS: LocalizationResource = {
   badge__requiresAction: 'Zahteva akciju',
   badge__startsAt: undefined,
   badge__thisDevice: 'Ovaj uređaj',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Nepotvrđen',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Korisnički uređaj',
@@ -133,6 +134,7 @@ export const srRS: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,

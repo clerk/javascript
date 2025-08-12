@@ -62,6 +62,7 @@ export const enGB: LocalizationResource = {
   badge__requiresAction: 'Requires action',
   badge__startsAt: undefined,
   badge__thisDevice: 'This device',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Unverified',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'User device',
@@ -133,6 +134,7 @@ export const enGB: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,

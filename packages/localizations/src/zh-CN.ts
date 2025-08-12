@@ -62,6 +62,7 @@ export const zhCN: LocalizationResource = {
   badge__requiresAction: '需要操作',
   badge__startsAt: undefined,
   badge__thisDevice: '此设备',
+  badge__trialEndsAt: undefined,
   badge__unverified: '未验证',
   badge__upcomingPlan: undefined,
   badge__userDevice: '用户设备',
@@ -133,6 +134,7 @@ export const zhCN: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,

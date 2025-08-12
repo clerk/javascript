@@ -73,7 +73,7 @@ export class CommerceSubscriptionItem extends BaseResource implements CommerceSu
   credit?: {
     amount: CommerceMoney;
   };
-  isFreeTrial = false;
+  isFreeTrial!: boolean;
 
   constructor(data: CommerceSubscriptionItemJSON) {
     super();

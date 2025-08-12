@@ -62,6 +62,7 @@ export const koKR: LocalizationResource = {
   badge__requiresAction: '조치 필요',
   badge__startsAt: undefined,
   badge__thisDevice: '이 장치',
+  badge__trialEndsAt: undefined,
   badge__unverified: '미확인',
   badge__upcomingPlan: undefined,
   badge__userDevice: '사용자 장치',
@@ -133,6 +134,7 @@ export const koKR: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,

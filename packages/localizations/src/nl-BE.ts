@@ -62,6 +62,7 @@ export const nlBE: LocalizationResource = {
   badge__requiresAction: 'Actie vereist',
   badge__startsAt: undefined,
   badge__thisDevice: 'Dit apparaat',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Ongeverifieerd',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Gebruikersapparaat',
@@ -133,6 +134,7 @@ export const nlBE: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,

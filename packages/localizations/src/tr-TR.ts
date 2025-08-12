@@ -62,6 +62,7 @@ export const trTR: LocalizationResource = {
   badge__requiresAction: 'Eylem gerekli',
   badge__startsAt: undefined,
   badge__thisDevice: 'Bu cihaz',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Doğrulanmamış',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Kullanıcı cihazı',
@@ -133,6 +134,7 @@ export const trTR: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,

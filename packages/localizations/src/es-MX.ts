@@ -62,6 +62,7 @@ export const esMX: LocalizationResource = {
   badge__requiresAction: 'Requiere acción',
   badge__startsAt: "Empieza {{ date | shortDate('en-US') }}",
   badge__thisDevice: 'Este dispositivo',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'No confirmado',
   badge__upcomingPlan: 'Próximo plan',
   badge__userDevice: 'Dispositivo de usuario',
@@ -133,6 +134,7 @@ export const esMX: LocalizationResource = {
     },
     reSubscribe: 'Re-suscribirse',
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,

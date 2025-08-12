@@ -62,6 +62,7 @@ export const teIN: LocalizationResource = {
   badge__requiresAction: 'చర్య అవసరం',
   badge__startsAt: undefined,
   badge__thisDevice: 'ఈ పరికరం',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'ధృవీకరించబడలేదు',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'వినియోగదారు పరికరం',
@@ -133,6 +134,7 @@ export const teIN: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,

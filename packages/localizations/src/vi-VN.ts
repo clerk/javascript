@@ -63,6 +63,7 @@ export const viVN: LocalizationResource = {
   badge__requiresAction: 'Yêu cầu hành động',
   badge__startsAt: "Bắt đầu {{ date | shortDate('vi-VN') }}",
   badge__thisDevice: 'Thiết bị này',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Chưa xác minh',
   badge__upcomingPlan: 'Sắp tới',
   badge__userDevice: 'Thiết bị người dùng',
@@ -137,6 +138,7 @@ export const viVN: LocalizationResource = {
     },
     reSubscribe: 'Đăng ký lại',
     seeAllFeatures: 'Xem tất cả tính năng',
+    startFreeTrial: undefined,
     subscribe: 'Đăng ký',
     subscriptionDetails: {
       beginsOn: undefined,

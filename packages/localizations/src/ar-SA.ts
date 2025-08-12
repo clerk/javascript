@@ -62,6 +62,7 @@ export const arSA: LocalizationResource = {
   badge__requiresAction: 'الإجراء المطلوب',
   badge__startsAt: undefined,
   badge__thisDevice: 'هذا الجهاز',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'لم يتم التحقق منه',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'جهاز المستخدم',
@@ -133,6 +134,7 @@ export const arSA: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,

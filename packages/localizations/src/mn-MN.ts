@@ -62,6 +62,7 @@ export const mnMN: LocalizationResource = {
   badge__requiresAction: 'Үйлдэл шаардлагтай',
   badge__startsAt: undefined,
   badge__thisDevice: 'Энэ төхөөрөмж',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Баталгаажаагүй',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Хэрэглэгчийн төхөөрөмж',
@@ -133,6 +134,7 @@ export const mnMN: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,

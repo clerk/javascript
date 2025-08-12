@@ -62,6 +62,7 @@ export const ruRU: LocalizationResource = {
   badge__requiresAction: 'Требуется действие',
   badge__startsAt: undefined,
   badge__thisDevice: 'Это устройство',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Неверифицированный',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Пользовательское устройство',
@@ -133,6 +134,7 @@ export const ruRU: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,

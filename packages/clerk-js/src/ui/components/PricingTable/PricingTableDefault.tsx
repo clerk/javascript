@@ -147,6 +147,9 @@ function Card(props: CardProps) {
     } else if (planPeriod !== subscription.planPeriod && plan.annualMonthlyAmount > 0) {
       shouldShowFooter = true;
       shouldShowFooterNotice = false;
+    } else if (plan.freeTrialEnabled && subscription.isFreeTrial) {
+      shouldShowFooter = true;
+      shouldShowFooterNotice = true;
     } else {
       shouldShowFooter = false;
       shouldShowFooterNotice = false;
@@ -232,9 +235,13 @@ function Card(props: CardProps) {
               <Text
                 elementDescriptor={descriptors.pricingTableCardFooterNotice}
                 variant={isCompact ? 'buttonSmall' : 'buttonLarge'}
-                localizationKey={localizationKeys('badge__startsAt', {
-                  date: subscription?.periodStart,
-                })}
+                localizationKey={
+                  plan.freeTrialEnabled && subscription.isFreeTrial && subscription.periodEnd
+                    ? localizationKeys('badge__trialEndsAt', {
+                        date: subscription.periodEnd,
+                      })
+                    : localizationKeys('badge__startsAt', { date: subscription?.periodStart })
+                }
                 colorScheme='secondary'
                 sx={t => ({
                   paddingBlock: t.space.$1x5,

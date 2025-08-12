@@ -62,6 +62,7 @@ export const faIR: LocalizationResource = {
   badge__requiresAction: 'نیاز به اقدام دارد',
   badge__startsAt: "شروع می‌شود {{ date | shortDate('en-US') }}",
   badge__thisDevice: 'این دستگاه',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'تایید نشده',
   badge__upcomingPlan: 'به زودی',
   badge__userDevice: 'دستگاه کاربر',
@@ -137,6 +138,7 @@ export const faIR: LocalizationResource = {
     },
     reSubscribe: 'اشتراک مجدد',
     seeAllFeatures: 'مشاهده همه ویژگی‌ها',
+    startFreeTrial: undefined,
     subscribe: 'مشترک شوید',
     subscriptionDetails: {
       beginsOn: undefined,
