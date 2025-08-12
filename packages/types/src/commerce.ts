@@ -1038,7 +1038,7 @@ export interface CommerceSubscriptionItemResource extends ClerkResource {
    * <ClerkProvider clerkJsVersion="x.x.x" />
    * ```
    */
-  periodStartDate: Date;
+  periodStart: Date;
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
    * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
@@ -1047,7 +1047,7 @@ export interface CommerceSubscriptionItemResource extends ClerkResource {
    * <ClerkProvider clerkJsVersion="x.x.x" />
    * ```
    */
-  periodEndDate: Date | null;
+  periodEnd: Date | null;
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
    * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
@@ -1056,19 +1056,7 @@ export interface CommerceSubscriptionItemResource extends ClerkResource {
    * <ClerkProvider clerkJsVersion="x.x.x" />
    * ```
    */
-  canceledAtDate: Date | null;
-  /**
-   * @deprecated Use `periodStartDate` instead
-   */
-  periodStart: number;
-  /**
-   * @deprecated Use `periodEndDate` instead
-   */
-  periodEnd: number;
-  /**
-   * @deprecated Use `canceledAtDate` instead
-   */
-  canceledAt: number | null;
+  canceledAt: Date | null;
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
    * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
