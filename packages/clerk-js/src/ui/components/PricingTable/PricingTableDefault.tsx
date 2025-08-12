@@ -7,7 +7,7 @@ import { Tooltip } from '@/ui/elements/Tooltip';
 import { getClosestProfileScrollBox } from '@/ui/utils/getClosestProfileScrollBox';
 
 import { useProtect } from '../../common';
-import { usePlansContext, usePricingTableContext, useSubscriberTypeContext } from '../../contexts';
+import { normalizeFormatted, usePlansContext, usePricingTableContext, useSubscriberTypeContext } from '../../contexts';
 import {
   Box,
   Button,
@@ -284,13 +284,6 @@ interface CardHeaderProps {
   planPeriod: CommerceSubscriptionPlanPeriod;
   setPlanPeriod: (val: CommerceSubscriptionPlanPeriod) => void;
   badge?: React.ReactNode;
-}
-
-/**
- * Only remove decimal places if they are '00', to match previous behavior.
- */
-function normalizeFormatted(formatted: string) {
-  return formatted.endsWith('.00') ? formatted.slice(0, -3) : formatted;
 }
 
 const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref) => {

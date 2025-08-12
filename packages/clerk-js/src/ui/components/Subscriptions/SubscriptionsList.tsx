@@ -5,6 +5,7 @@ import { ProfileSection } from '@/ui/elements/Section';
 
 import { useProtect } from '../../common';
 import {
+  normalizeFormatted,
   useEnvironment,
   usePlansContext,
   useSubscriberTypeContext,
@@ -127,13 +128,6 @@ export function SubscriptionsList({
       ) : null}
     </ProfileSection.Root>
   );
-}
-
-/**
- * Only remove decimal places if they are '00', to match previous behavior.
- */
-function normalizeFormatted(formatted: string) {
-  return formatted.endsWith('.00') ? formatted.slice(0, -3) : formatted;
 }
 
 function SubscriptionRow({ subscription, length }: { subscription: CommerceSubscriptionItemResource; length: number }) {

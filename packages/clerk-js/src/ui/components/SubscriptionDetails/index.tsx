@@ -22,7 +22,13 @@ import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
 import { handleError } from '@/ui/utils/errorHandler';
 import { formatDate } from '@/ui/utils/formatDate';
 
-import { SubscriberTypeContext, usePlansContext, useSubscriberTypeContext, useSubscription } from '../../contexts';
+import {
+  normalizeFormatted,
+  SubscriberTypeContext,
+  usePlansContext,
+  useSubscriberTypeContext,
+  useSubscription,
+} from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import {
   Button,
@@ -324,12 +330,6 @@ function SubscriptionDetailsSummary() {
   );
 }
 
-/**
- * Only remove decimal places if they are '00', to match previous behavior.
- */
-function normalizeFormatted(formatted: string) {
-  return formatted.endsWith('.00') ? formatted.slice(0, -3) : formatted;
-}
 const SubscriptionCardActions = ({ subscription }: { subscription: CommerceSubscriptionItemResource }) => {
   const { portalRoot } = useSubscriptionDetailsContext();
   const { __internal_openCheckout } = useClerk();

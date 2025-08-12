@@ -14,7 +14,7 @@ import { Avatar } from '@/ui/elements/Avatar';
 import { Drawer } from '@/ui/elements/Drawer';
 import { Switch } from '@/ui/elements/Switch';
 
-import { SubscriberTypeContext } from '../../contexts';
+import { normalizeFormatted, SubscriberTypeContext } from '../../contexts';
 import {
   Box,
   Col,
@@ -216,13 +216,6 @@ interface HeaderProps {
   planPeriod: CommerceSubscriptionPlanPeriod;
   setPlanPeriod: (val: CommerceSubscriptionPlanPeriod) => void;
   closeSlot?: React.ReactNode;
-}
-
-/**
- * Only remove decimal places if they are '00', to match previous behavior.
- */
-function normalizeFormatted(formatted: string) {
-  return formatted.endsWith('.00') ? formatted.slice(0, -3) : formatted;
 }
 
 const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
