@@ -62,6 +62,7 @@ export const svSE: LocalizationResource = {
   badge__requiresAction: 'Kräver åtgärd',
   badge__startsAt: undefined,
   badge__thisDevice: 'Den här enheten',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Overifierad',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Användarens enhet',
@@ -133,6 +134,7 @@ export const svSE: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,
@@ -791,6 +793,26 @@ export const svSE: LocalizationResource = {
   },
   socialButtonsBlockButton: 'Fortsätt med {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} är redan medlem i organisationen.',
     captcha_invalid:

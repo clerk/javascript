@@ -62,6 +62,7 @@ export const zhCN: LocalizationResource = {
   badge__requiresAction: '需要操作',
   badge__startsAt: undefined,
   badge__thisDevice: '此设备',
+  badge__trialEndsAt: undefined,
   badge__unverified: '未验证',
   badge__upcomingPlan: undefined,
   badge__userDevice: '用户设备',
@@ -133,6 +134,7 @@ export const zhCN: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,
@@ -776,6 +778,26 @@ export const zhCN: LocalizationResource = {
   },
   socialButtonsBlockButton: '使用 {{provider|titleize}} 登录',
   socialButtonsBlockButtonManyInView: undefined,
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: undefined,
     captcha_invalid: '由于安全验证失败，注册未成功。请刷新页面重试或联系支持获取更多帮助。',

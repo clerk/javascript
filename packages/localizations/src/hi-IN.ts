@@ -62,6 +62,7 @@ export const hiIN: LocalizationResource = {
   badge__requiresAction: 'कार्रवाई की आवश्यकता है',
   badge__startsAt: undefined,
   badge__thisDevice: 'यह उपकरण',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'असत्यापित',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'उपयोगकर्ता उपकरण',
@@ -133,6 +134,7 @@ export const hiIN: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,
@@ -793,6 +795,26 @@ export const hiIN: LocalizationResource = {
   },
   socialButtonsBlockButton: '{{provider|titleize}} के साथ जारी रखें',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} पहले से ही संगठन का सदस्य है।',
     captcha_invalid:

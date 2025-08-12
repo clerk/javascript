@@ -63,6 +63,7 @@ export const viVN: LocalizationResource = {
   badge__requiresAction: 'Yêu cầu hành động',
   badge__startsAt: "Bắt đầu {{ date | shortDate('vi-VN') }}",
   badge__thisDevice: 'Thiết bị này',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Chưa xác minh',
   badge__upcomingPlan: 'Sắp tới',
   badge__userDevice: 'Thiết bị người dùng',
@@ -137,6 +138,7 @@ export const viVN: LocalizationResource = {
     },
     reSubscribe: 'Đăng ký lại',
     seeAllFeatures: 'Xem tất cả tính năng',
+    startFreeTrial: undefined,
     subscribe: 'Đăng ký',
     subscriptionDetails: {
       beginsOn: undefined,
@@ -796,6 +798,26 @@ export const viVN: LocalizationResource = {
   },
   socialButtonsBlockButton: 'Tiếp tục với {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} đã là thành viên của tổ chức.',
     captcha_invalid: undefined,

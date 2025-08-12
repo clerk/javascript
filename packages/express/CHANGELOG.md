@@ -1,5 +1,16 @@
 # Change Log
 
+## 1.7.18
+
+### Patch Changes
+
+- Deprecates `enableHandshake` option in `clerkMiddleware`. This option is unnecessary for API requests since they don't trigger handshake flows. The option will be removed in a future version. ([#6499](https://github.com/clerk/javascript/pull/6499)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`b72a3dd`](https://github.com/clerk/javascript/commit/b72a3dda2467720e5dc8cab3e7e6a110f3beb79b), [`d93b0ed`](https://github.com/clerk/javascript/commit/d93b0edf4adc57d48a26cb08444192887ccec659), [`6459f7d`](https://github.com/clerk/javascript/commit/6459f7dabe5f163f48ed73106bb901d8187da3e2), [`0ff648a`](https://github.com/clerk/javascript/commit/0ff648aeac0e2f5481596a98c8046d9d58a7bf75), [`9084759`](https://github.com/clerk/javascript/commit/90847593300be605e1ee1c06dac147ce68b25dc7)]:
+  - @clerk/types@4.75.0
+  - @clerk/shared@3.19.0
+  - @clerk/backend@2.7.1
+
 ## 1.7.17
 
 ### Patch Changes

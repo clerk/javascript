@@ -62,6 +62,7 @@ export const thTH: LocalizationResource = {
   badge__requiresAction: 'ต้องการการดำเนินการ',
   badge__startsAt: undefined,
   badge__thisDevice: 'อุปกรณ์นี้',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'ยังไม่ได้ตรวจสอบ',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'อุปกรณ์ผู้ใช้',
@@ -133,6 +134,7 @@ export const thTH: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,
@@ -785,6 +787,26 @@ export const thTH: LocalizationResource = {
   },
   socialButtonsBlockButton: 'ดำเนินการต่อด้วย {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} เป็นสมาชิกขององค์กรอยู่แล้ว',
     captcha_invalid:

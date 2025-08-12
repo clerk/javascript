@@ -62,6 +62,7 @@ export const jaJP: LocalizationResource = {
   badge__requiresAction: 'アクションが必要',
   badge__startsAt: undefined,
   badge__thisDevice: 'このデバイス',
+  badge__trialEndsAt: undefined,
   badge__unverified: '未確認',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'ユーザーデバイス',
@@ -133,6 +134,7 @@ export const jaJP: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,
@@ -788,6 +790,26 @@ export const jaJP: LocalizationResource = {
   },
   socialButtonsBlockButton: '{{provider|titleize}}で続ける',
   socialButtonsBlockButtonManyInView: undefined,
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: undefined,
     captcha_invalid:
