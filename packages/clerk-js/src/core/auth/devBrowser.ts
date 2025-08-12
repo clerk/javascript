@@ -26,7 +26,7 @@ export type CreateDevBrowserOptions = {
 };
 
 export function createDevBrowser({ cookieSuffix, frontendApi, fapiClient }: CreateDevBrowserOptions): DevBrowser {
-  const devBrowserCookie = createDevBrowserCookie(cookieSuffix);
+  const devBrowserCookie = createDevBrowserCookie({ cookieSuffix });
 
   function getDevBrowserJWT() {
     return devBrowserCookie.get();
