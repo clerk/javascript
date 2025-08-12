@@ -133,7 +133,6 @@ export const enUS: LocalizationResource = {
     },
     reSubscribe: 'Resubscribe',
     seeAllFeatures: 'See all features',
-    startFreeTrial: 'Start {{days}}-day free trial',
     subscribe: 'Subscribe',
     subscriptionDetails: {
       beginsOn: 'Begins on',
