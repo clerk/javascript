@@ -777,6 +777,26 @@ export const zhTW: LocalizationResource = {
   },
   socialButtonsBlockButton: '以 {{provider|titleize}} 帳戶登入',
   socialButtonsBlockButtonManyInView: undefined,
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: undefined,
     captcha_invalid: '由於安全驗證失敗，註冊未成功。請重新整理頁面再試一次，或聯絡支援以取得協助。',
