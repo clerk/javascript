@@ -306,6 +306,7 @@ export const csCZ: LocalizationResource = {
         totalPaid: 'Celkem zaplaceno',
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'Přihlásit se k plánu',
         actionLabel__switchPlan: 'Změnit plány',
         tableHeader__edit: 'Upravit',
@@ -964,6 +965,7 @@ export const csCZ: LocalizationResource = {
         totalPaid: 'Celkem zaplaceno',
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'Přihlásit se k plánu',
         actionLabel__switchPlan: 'Změnit plány',
         tableHeader__edit: 'Upravit',

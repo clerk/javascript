@@ -272,7 +272,10 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
 
       await u.page.waitForTimeout(1000);
       await expect(u.po.page.locator('.cl-profileSectionContent__subscriptionsList').getByText('Plus')).toBeVisible();
-      await u.po.page.getByRole('button', { name: 'Manage subscription' }).first().click();
+      await u.po.page
+        .locator('.cl-profileSectionContent__subscriptionsList')
+        .getByRole('button', { name: 'Manage' })
+        .click();
       await u.po.subscriptionDetails.waitForMounted();
       await u.po.subscriptionDetails.root.locator('.cl-menuButtonEllipsisBordered').click();
       await u.po.subscriptionDetails.root.getByText('Cancel subscription').click();
