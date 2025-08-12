@@ -153,7 +153,6 @@ export const enUS: LocalizationResource = {
     },
     reSubscribe: 'Resubscribe',
     seeAllFeatures: 'See all features',
-    startFreeTrial: 'Start {{days}}-day free trial',
     subscribe: 'Subscribe',
     subscriptionDetails: {
       beginsOn: 'Begins on',
@@ -815,26 +814,6 @@ export const enUS: LocalizationResource = {
   },
   socialButtonsBlockButton: 'Continue with {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
-  taskChooseOrganization: {
-    chooseOrganization: {
-      action__createOrganization: 'Create new organization',
-      action__invitationAccept: 'Join',
-      action__suggestionsAccept: 'Request to join',
-      subtitle: 'Join an existing organization or create a new one',
-      suggestionsAcceptedLabel: 'Pending approval',
-      title: 'Choose an organization',
-    },
-    createOrganization: {
-      formButtonReset: 'Cancel',
-      formButtonSubmit: 'Create new organization',
-      subtitle: 'Tell us a bit about your organization',
-      title: 'Setup your account',
-    },
-    signOut: {
-      actionLink: 'Sign out',
-      actionText: 'Signed in as {{identifier}}',
-    },
-  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} is already a member of the organization.',
     captcha_invalid: undefined,
