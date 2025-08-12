@@ -28,9 +28,9 @@ import type {
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
-  Clerk as ClerkInterface,
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
+  Clerk as ClerkInterface,
   ClerkOptions,
   ClientJSONSnapshot,
   ClientResource,
@@ -1755,6 +1755,8 @@ export class Clerk implements ClerkInterface {
       navigate: (to: string) => Promise<unknown>;
     },
   ): Promise<unknown> => {
+    debugger;
+
     if (!this.loaded || !this.environment || !this.client) {
       return;
     }
@@ -1852,14 +1854,25 @@ export class Clerk implements ClerkInterface {
       });
     };
 
-    const setActiveNavigate = async ({ session, redirectUrl }: { session: SessionResource; redirectUrl: string }) => {
+    const signInUrl = params.signInUrl || displayConfig.signInUrl;
+    const signUpUrl = params.signUpUrl || displayConfig.signUpUrl;
+
+    const setActiveNavigate = async ({
+      session,
+      baseUrl,
+      redirectUrl,
+    }: {
+      session: SessionResource;
+      baseUrl: string;
+      redirectUrl: string;
+    }) => {
       if (!session.currentTask) {
         await this.navigate(redirectUrl);
         return;
       }
 
       await navigateIfTaskExists(session, {
-        baseUrl: params.signInUrl ?? displayConfig.signInUrl,
+        baseUrl,
         navigate: this.navigate,
       });
     };
@@ -1868,7 +1881,7 @@ export class Clerk implements ClerkInterface {
       return this.setActive({
         session: si.sessionId,
         navigate: async ({ session }) => {
-          await setActiveNavigate({ session, redirectUrl: redirectUrls.getAfterSignInUrl() });
+          await setActiveNavigate({ session, baseUrl: signInUrl, redirectUrl: redirectUrls.getAfterSignInUrl() });
         },
       });
     }
@@ -1883,7 +1896,7 @@ export class Clerk implements ClerkInterface {
           return this.setActive({
             session: res.createdSessionId,
             navigate: async ({ session }) => {
-              await setActiveNavigate({ session, redirectUrl: redirectUrls.getAfterSignInUrl() });
+              await setActiveNavigate({ session, baseUrl: signUpUrl, redirectUrl: redirectUrls.getAfterSignInUrl() });
             },
           });
         case 'needs_first_factor':
@@ -1934,7 +1947,7 @@ export class Clerk implements ClerkInterface {
           return this.setActive({
             session: res.createdSessionId,
             navigate: async ({ session }) => {
-              await setActiveNavigate({ session, redirectUrl: redirectUrls.getAfterSignUpUrl() });
+              await setActiveNavigate({ session, baseUrl: signUpUrl, redirectUrl: redirectUrls.getAfterSignUpUrl() });
             },
           });
         case 'missing_requirements':
@@ -1948,7 +1961,7 @@ export class Clerk implements ClerkInterface {
       return this.setActive({
         session: su.sessionId,
         navigate: async ({ session }) => {
-          await setActiveNavigate({ session, redirectUrl: redirectUrls.getAfterSignUpUrl() });
+          await setActiveNavigate({ session, baseUrl: signUpUrl, redirectUrl: redirectUrls.getAfterSignUpUrl() });
         },
       });
     }
@@ -1974,7 +1987,11 @@ export class Clerk implements ClerkInterface {
         return this.setActive({
           session: sessionId,
           navigate: async ({ session }) => {
-            await setActiveNavigate({ session, redirectUrl: redirectUrls.getAfterSignInUrl() });
+            await setActiveNavigate({
+              session,
+              baseUrl: suUserAlreadySignedIn ? signUpUrl : signInUrl,
+              redirectUrl: redirectUrls.getAfterSignInUrl(),
+            });
           },
         });
       }
