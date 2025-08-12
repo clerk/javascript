@@ -6,6 +6,12 @@ import type { InternalTheme } from '../../clerk-js/src/ui/foundations';
 
 interface CreateClerkThemeParams extends DeepPartial<Theme> {
   /**
+   * Optional name for the theme, used for telemetry and debugging.
+   * @example 'shadcn', 'neobrutalism', 'custom-dark'
+   */
+  name?: string;
+
+  /**
    * {@link Theme.elements}
    */
   elements?: Elements | ((params: { theme: InternalTheme }) => Elements);
@@ -16,5 +22,7 @@ export const experimental_createTheme = (appearance: Appearance<CreateClerkTheme
   return {
     ...appearance,
     __type: 'prebuilt_appearance',
+    // Include the name in the theme object for telemetry
+    ...(appearance.name && { __themeName: appearance.name }),
   };
 };
