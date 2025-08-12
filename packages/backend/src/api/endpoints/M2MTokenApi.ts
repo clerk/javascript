@@ -10,6 +10,11 @@ type CreateM2MTokenParams = {
    * Custom machine secret key for authentication.
    */
   machineSecretKey?: string;
+  /**
+   * Number of seconds until the token expires.
+   *
+   * @default null - Token does not expire
+   */
   secondsUntilExpiration?: number | null;
   claims?: Record<string, unknown> | null;
 };
