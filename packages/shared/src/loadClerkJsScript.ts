@@ -1,6 +1,6 @@
 import type { ClerkOptions, SDKMetadata, Without } from '@clerk/types';
 
-import { buildErrorThrower } from './error';
+import { buildErrorThrower, MissingKeyBehavior } from './error';
 import { createDevOrStagingUrlCache, parsePublishableKey } from './keys';
 import { loadScript } from './loadScript';
 import { isValidProxyUrl, proxyUrlToAbsoluteURL } from './proxy';
@@ -27,7 +27,7 @@ export function setClerkJsLoadingErrorPackageName(packageName: string) {
 }
 
 type LoadClerkJsScriptOptions = Without<ClerkOptions, 'isSatellite'> & {
-  publishableKey: string;
+  publishableKey?: string;
   clerkJSUrl?: string;
   clerkJSVariant?: 'headless' | '';
   clerkJSVersion?: string;
@@ -41,6 +41,15 @@ type LoadClerkJsScriptOptions = Without<ClerkOptions, 'isSatellite'> & {
    * @default 15000 (15 seconds)
    */
   scriptLoadTimeout?: number;
+  /**
+   * Configures how to handle missing publishable key errors.
+   * - `'throw'`: Throw an error (default behavior)
+   * - `'fail_open'`: Continue without authentication, log a warning
+   * - `'warn'`: Log a warning but continue.
+   *
+   * @default 'throw'
+   */
+  missingKeyBehavior?: MissingKeyBehavior;
 };
 
 /**
@@ -147,8 +156,11 @@ const loadClerkJsScript = async (opts?: LoadClerkJsScriptOptions): Promise<HTMLS
   }
 
   if (!opts?.publishableKey) {
-    errorThrower.throwMissingPublishableKeyError();
-    return null;
+    errorThrower.throwMissingPublishableKeyError(opts?.missingKeyBehavior);
+    // In fail-open or warn mode, we can't load Clerk.js without a key, so return null
+    if (opts?.missingKeyBehavior !== MissingKeyBehavior.THROW) {
+      return null;
+    }
   }
 
   const loadPromise = waitForClerkWithTimeout(timeout);

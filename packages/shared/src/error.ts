@@ -5,6 +5,20 @@ import type {
 } from '@clerk/types';
 
 /**
+ * Defines how to handle missing publishable key errors.
+ *
+ * @public
+ */
+export enum MissingKeyBehavior {
+  /** Throw an error (default behavior). */
+  THROW = 'throw',
+  /** Continue without authentication, fail open. */
+  FAIL_OPEN = 'fail_open',
+  /** Log a warning but continue. */
+  WARN = 'warn',
+}
+
+/**
  * Checks if the provided error object is an unauthorized error.
  *
  * @internal
@@ -345,7 +359,7 @@ export interface ErrorThrower {
 
   throwInvalidProxyUrl(params: { url?: string }): never;
 
-  throwMissingPublishableKeyError(): never;
+  throwMissingPublishableKeyError(behavior?: MissingKeyBehavior): never;
 
   throwMissingSecretKeyError(): never;
 
@@ -409,7 +423,21 @@ export function buildErrorThrower({ packageName, customMessages }: ErrorThrowerO
       throw new Error(buildMessage(messages.InvalidProxyUrlErrorMessage, params));
     },
 
-    throwMissingPublishableKeyError(): never {
+    throwMissingPublishableKeyError(behavior: MissingKeyBehavior = MissingKeyBehavior.THROW): never {
+      if (behavior === MissingKeyBehavior.FAIL_OPEN) {
+        if (typeof console !== 'undefined') {
+          console.warn('[Clerk] Missing publishable key - continuing in fail-open mode');
+        }
+        return undefined as never;
+      }
+
+      if (behavior === MissingKeyBehavior.WARN) {
+        if (typeof console !== 'undefined') {
+          console.warn('[Clerk] Missing publishable key - this may cause authentication issues');
+        }
+        return undefined as never;
+      }
+
       throw new Error(buildMessage(messages.MissingPublishableKeyErrorMessage));
     },
 
