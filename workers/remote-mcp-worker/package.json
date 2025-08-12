@@ -1,0 +1,23 @@
+{
+  "name": "@clerk/remote-mcp-worker",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Cloudflare Worker: Remote MCP server (SSE) for Clerk",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "preview": "wrangler dev --remote",
+    "deploy": "wrangler deploy",
+    "check": "tsc --noEmit",
+    "build": "wrangler deploy --dry-run"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250204.0",
+    "typescript": "^5.5.0",
+    "wrangler": "^3.80.0"
+  }
+}
