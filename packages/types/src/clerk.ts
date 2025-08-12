@@ -1,3 +1,5 @@
+import type { ClerkPaginationParams } from 'pagination';
+
 import type { ClerkAPIResponseError } from './api';
 import type { APIKeysNamespace } from './apiKeys';
 import type {
@@ -1813,9 +1815,9 @@ export type APIKeysProps = {
   showDescription?: boolean;
 };
 
-export type GetAPIKeysParams = {
+export type GetAPIKeysParams = ClerkPaginationParams<{
   subject?: string;
-};
+}>;
 
 export type CreateAPIKeyParams = {
   type?: 'api_key';
