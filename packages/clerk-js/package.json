@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "5.79.0",
+  "version": "5.82.0",
   "description": "Clerk JS library",
   "keywords": [
     "clerk",
@@ -41,6 +41,7 @@
     "bundlewatch": "pnpm --package=bundlewatch -c dlx \"FORCE_COLOR=1 bundlewatch --config bundlewatch.config.json\"",
     "clean": "rimraf ./dist",
     "dev": "rspack serve --config rspack.config.js",
+    "dev:chips": "rspack serve --config rspack.config.js --env variant=\"clerk.chips.browser\"",
     "dev:headless": "rspack serve --config rspack.config.js --env variant=\"clerk.headless.browser\"",
     "dev:origin": "rspack serve --config rspack.config.js --env devOrigin=http://localhost:${PORT:-4000}",
     "dev:sandbox": "rspack serve --config rspack.config.js --env devOrigin=http://localhost:${PORT:-4000} --env sandbox=1",
@@ -75,6 +76,7 @@
     "@swc/helpers": "^0.5.17",
     "@zxcvbn-ts/core": "3.0.4",
     "@zxcvbn-ts/language-common": "3.0.4",
+    "alien-signals": "2.0.6",
     "browser-tabs-lock": "1.3.0",
     "copy-to-clipboard": "3.3.3",
     "core-js": "3.41.0",

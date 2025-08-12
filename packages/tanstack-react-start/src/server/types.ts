@@ -12,6 +12,7 @@ export type LoaderOptions = {
   publishableKey?: string;
   jwtKey?: string;
   secretKey?: string;
+  machineSecretKey?: string;
   signInUrl?: string;
   signUpUrl?: string;
 } & Pick<VerifyTokenOptions, 'audience' | 'authorizedParties'> &

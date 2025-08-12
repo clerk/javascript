@@ -20,7 +20,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 
 export function Provider({ children }: { children: any }) {
 return (
-  <ClerkProvider taskUrls={{ 'select-organization': '/onboarding/select-organization' }}>
+  <ClerkProvider taskUrls={{ 'choose-organization': '/onboarding/choose-organization' }}>
     {children}
   </ClerkProvider>
 )
@@ -50,13 +50,13 @@ return (
 }`,
       )
       .addFile(
-        'src/app/onboarding/select-organization/page.tsx',
+        'src/app/onboarding/choose-organization/page.tsx',
         () => `
-import { TaskSelectOrganization } from '@clerk/nextjs';
+import { TaskChooseOrganization } from '@clerk/nextjs';
 
 export default function Page() {
 return (
-  <TaskSelectOrganization redirectUrlComplete='/'/>
+  <TaskChooseOrganization redirectUrlComplete='/'/>
 );
 }`,
       )
@@ -96,7 +96,7 @@ return (
     await u.po.expect.toBeSignedIn();
 
     // Complete the organization selection task
-    await u.page.waitForAppUrl('/onboarding/select-organization');
+    await u.page.waitForAppUrl('/onboarding/choose-organization');
     const fakeOrganization = Object.assign(u.services.organizations.createFakeOrganization(), {
       slug: u.services.organizations.createFakeOrganization().slug + '-eject-flow',
     });

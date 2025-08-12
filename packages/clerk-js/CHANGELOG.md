@@ -1,5 +1,82 @@
 # Change Log
 
+## 5.82.0
+
+### Minor Changes
+
+- [Billing Beta] Cleanup naming inconsistencies in billing dates. ([#6513](https://github.com/clerk/javascript/pull/6513)) by [@panteliselef](https://github.com/panteliselef)
+
+  ## Migration
+
+  - subscriptionItem.periodStartDate → subscriptionItem.periodStart
+  - subscriptionItem.periodEndDate → subscriptionItem.periodEnd
+  - subscriptionItem.canceledAtDate → subscriptionItem.canceledAt
+
+- [Experimental] Signal Errors ([#6495](https://github.com/clerk/javascript/pull/6495)) by [@dstaley](https://github.com/dstaley)
+
+- Remove `treatPendingAsSignedOut` from Clerk options ([#6497](https://github.com/clerk/javascript/pull/6497)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Use throttling instead of sampling for telemetry events of UI components on keyless apps. ([#6514](https://github.com/clerk/javascript/pull/6514)) by [@panteliselef](https://github.com/panteliselef)
+
+- Refactor ApplicationLogo rendering logic to account for oAuth logos within OAuthConsent component. ([#6518](https://github.com/clerk/javascript/pull/6518)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Trigger Next.js hooks on session status transition from `active` to `pending` to update authentication context state ([#6511](https://github.com/clerk/javascript/pull/6511)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Add `.v0.app` as a preferred popup origin for OAuth flows. ([#6519](https://github.com/clerk/javascript/pull/6519)) by [@brkalow](https://github.com/brkalow)
+
+- Updated dependencies [[`b72a3dd`](https://github.com/clerk/javascript/commit/b72a3dda2467720e5dc8cab3e7e6a110f3beb79b), [`d93b0ed`](https://github.com/clerk/javascript/commit/d93b0edf4adc57d48a26cb08444192887ccec659), [`6459f7d`](https://github.com/clerk/javascript/commit/6459f7dabe5f163f48ed73106bb901d8187da3e2), [`0ff648a`](https://github.com/clerk/javascript/commit/0ff648aeac0e2f5481596a98c8046d9d58a7bf75), [`9084759`](https://github.com/clerk/javascript/commit/90847593300be605e1ee1c06dac147ce68b25dc7)]:
+  - @clerk/types@4.75.0
+  - @clerk/shared@3.19.0
+  - @clerk/localizations@3.20.9
+
+## 5.81.0
+
+### Minor Changes
+
+- [Billing Beta] Update `PlanDetailsProps` to reflect that either `planId` or `plan` is allowed. ([#6472](https://github.com/clerk/javascript/pull/6472)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Introduce `TaskChooseOrganization` component which replaces `TaskSelectOrganization` with a new UI that make the experience similar to the previous `SignIn` and `SignUp` steps ([#6446](https://github.com/clerk/javascript/pull/6446)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- [Experimental] Signals ([#6450](https://github.com/clerk/javascript/pull/6450)) by [@dstaley](https://github.com/dstaley)
+
+- Rename task key from `select-organization` to `choose-organization` ([#6482](https://github.com/clerk/javascript/pull/6482)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`1ad16da`](https://github.com/clerk/javascript/commit/1ad16daa49795a861ae277001831230580b6b9f4), [`4edef81`](https://github.com/clerk/javascript/commit/4edef81dd423a0471e3f579dd6b36094aa8546aa), [`696f8e1`](https://github.com/clerk/javascript/commit/696f8e11a3e5391e6b5a97d98e929b8973575b9a), [`f318d22`](https://github.com/clerk/javascript/commit/f318d22cf83caaef272bcf532561a03ca72575e7), [`1cc66ab`](https://github.com/clerk/javascript/commit/1cc66aba1c0adac24323876e4cc3d96be888b07b)]:
+  - @clerk/localizations@3.20.8
+  - @clerk/types@4.74.0
+  - @clerk/shared@3.18.1
+
+## 5.80.0
+
+### Minor Changes
+
+- [Billing Beta] Update checkout.status type to be `'needs_confirmation' | 'completed'` instead of `string`. ([#6474](https://github.com/clerk/javascript/pull/6474)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- [Billing Beta] Stricter return type of `useCheckout` to improve inference of other properties. ([#6473](https://github.com/clerk/javascript/pull/6473)) by [@panteliselef](https://github.com/panteliselef)
+
+- Guard against navigation to root sign-in route during `setActive` in `SignInFactorOne` ([#6462](https://github.com/clerk/javascript/pull/6462)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Fix invalid DOM element prop being passed down to Input ([#6458](https://github.com/clerk/javascript/pull/6458)) by [@jacekradko](https://github.com/jacekradko)
+
+- Fix iframe detetction and ensure we prefer the oauth popup flow when in an iframe. ([#6455](https://github.com/clerk/javascript/pull/6455)) by [@brkalow](https://github.com/brkalow)
+
+- Fix multi-session navigation for hash routing ([#6461](https://github.com/clerk/javascript/pull/6461)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Fix `touchSession` option to only affect session touch behavior to window focus events. ([#6444](https://github.com/clerk/javascript/pull/6444)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  Previously, when `touchSession: false` was provided, it incorrectly prevented session touching during `setActive()` calls when switching sessions or selecting organizations.
+
+- Updated dependencies [[`9368daf`](https://github.com/clerk/javascript/commit/9368dafb119b5a8ec6a9d6d82270e72bab6d8f1e), [`f93965f`](https://github.com/clerk/javascript/commit/f93965f64c81030f9fcf9d1cc4e4984d30cd12ec), [`7b6dcee`](https://github.com/clerk/javascript/commit/7b6dceea5bfd7f1cc1bf24126aa715307e24ae7f), [`ef87617`](https://github.com/clerk/javascript/commit/ef87617ae1fd125c806a33bfcfdf09c885319fa8)]:
+  - @clerk/shared@3.18.0
+  - @clerk/localizations@3.20.7
+  - @clerk/types@4.73.0
+
 ## 5.79.0
 
 ### Minor Changes
