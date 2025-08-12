@@ -162,7 +162,7 @@ function SubscriptionRow({ subscription, length }: { subscription: CommerceSubsc
             >
               {subscription.plan.name}
             </Text>
-            {length > 1 || !!subscription.canceledAtDate ? <SubscriptionBadge subscription={subscription} /> : null}
+            {length > 1 || subscription.canceledAt !== null ? <SubscriptionBadge subscription={subscription} /> : null}
           </Flex>
 
           {(!subscription.plan.isDefault || subscription.status === 'upcoming') && (
