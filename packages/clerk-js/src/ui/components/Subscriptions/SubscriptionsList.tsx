@@ -120,7 +120,7 @@ export function SubscriptionsList({
                       >
                         {subscription.plan.name}
                       </Text>
-                      {subscription.isFreeTrial || sortedSubscriptions.length > 1 || !!subscription.canceledAtDate ? (
+                      {subscription.isFreeTrial || sortedSubscriptions.length > 1 || !!subscription.canceledAt ? (
                         <SubscriptionBadge
                           subscription={subscription.isFreeTrial ? { status: 'free_trial' } : subscription}
                         />

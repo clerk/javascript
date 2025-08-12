@@ -46,7 +46,7 @@ function isWindowClerkWithMetadata(clerk: unknown): clerk is { constructor: { sd
 
 type TelemetryCollectorConfig = Pick<
   TelemetryCollectorOptions,
-  'samplingRate' | 'disabled' | 'debug' | 'maxBufferSize'
+  'samplingRate' | 'disabled' | 'debug' | 'maxBufferSize' | 'perEventSampling'
 > & {
   endpoint: string;
 };
@@ -80,6 +80,7 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
     this.#config = {
       maxBufferSize: options.maxBufferSize ?? DEFAULT_CONFIG.maxBufferSize,
       samplingRate: options.samplingRate ?? DEFAULT_CONFIG.samplingRate,
+      perEventSampling: options.perEventSampling ?? true,
       disabled: options.disabled ?? false,
       debug: options.debug ?? false,
       endpoint: DEFAULT_CONFIG.endpoint,
@@ -167,7 +168,9 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
 
     const toBeSampled =
       randomSeed <= this.#config.samplingRate &&
-      (typeof eventSamplingRate === 'undefined' || randomSeed <= eventSamplingRate);
+      (this.#config.perEventSampling === false ||
+        typeof eventSamplingRate === 'undefined' ||
+        randomSeed <= eventSamplingRate);
 
     if (!toBeSampled) {
       return false;
@@ -213,21 +216,27 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
   }
 
   #flush(): void {
+    // Capture the current buffer and clear it immediately to avoid closure references
+    const eventsToSend = [...this.#buffer];
+    this.#buffer = [];
+
+    this.#pendingFlush = null;
+
+    if (eventsToSend.length === 0) {
+      return;
+    }
+
     fetch(new URL('/v1/event', this.#config.endpoint), {
       method: 'POST',
       // TODO: We send an array here with that idea that we can eventually send multiple events.
       body: JSON.stringify({
-        events: this.#buffer,
+        events: eventsToSend,
       }),
+      keepalive: true,
       headers: {
         'Content-Type': 'application/json',
       },
-    })
-      .catch(() => void 0)
-      .then(() => {
-        this.#buffer = [];
-      })
-      .catch(() => void 0);
+    }).catch(() => void 0);
   }
 
   /**

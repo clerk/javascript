@@ -36,6 +36,7 @@ import { withClerk } from './withClerk';
 export const PlanDetailsButton = withClerk(
   ({ clerk, children, ...props }: WithClerkProp<React.PropsWithChildren<__experimental_PlanDetailsButtonProps>>) => {
     const { plan, planId, initialPlanPeriod, planDetailsProps, ...rest } = props;
+
     children = normalizeWithDefaultValue(children, 'Plan details');
     const child = assertSingleChild(children)('PlanDetailsButton');
 
@@ -49,7 +50,7 @@ export const PlanDetailsButton = withClerk(
         planId,
         initialPlanPeriod,
         ...planDetailsProps,
-      });
+      } as __experimental_PlanDetailsButtonProps);
     };
 
     const wrappedChildClickHandler: React.MouseEventHandler = async e => {

@@ -1,48 +1,21 @@
-import { useOrganizationList, useUser } from '@clerk/shared/react';
+import { useUser } from '@clerk/shared/react';
 import { useState } from 'react';
 
+import { OrganizationPreviewSpinner } from '@/ui/common/organizations/OrganizationPreview';
 import { Action, Actions } from '@/ui/elements/Actions';
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
+import { useOrganizationListInView } from '@/ui/hooks/useOrganizationListInView';
 
 import { useEnvironment, useOrganizationListContext } from '../../contexts';
 import { Box, Col, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
-import { useInView } from '../../hooks';
 import { Add } from '../../icons';
 import { CreateOrganizationForm } from '../CreateOrganization/CreateOrganizationForm';
-import { PreviewListItems, PreviewListSpinner } from './shared';
+import { PreviewListItems } from './shared';
 import { InvitationPreview } from './UserInvitationList';
 import { MembershipPreview, PersonalAccountPreview } from './UserMembershipList';
 import { SuggestionPreview } from './UserSuggestionList';
-import { organizationListParams } from './utils';
-
-const useOrganizationListInView = () => {
-  const { userMemberships, userInvitations, userSuggestions } = useOrganizationList(organizationListParams);
-
-  const { ref } = useInView({
-    threshold: 0,
-    onChange: inView => {
-      if (!inView) {
-        return;
-      }
-      if (userMemberships.hasNextPage) {
-        userMemberships.fetchNext?.();
-      } else if (userInvitations.hasNextPage) {
-        userInvitations.fetchNext?.();
-      } else {
-        userSuggestions.fetchNext?.();
-      }
-    },
-  });
-
-  return {
-    userMemberships,
-    userInvitations,
-    userSuggestions,
-    ref,
-  };
-};
 
 const CreateOrganizationButton = ({
   onCreateOrganizationClick,
@@ -158,7 +131,8 @@ export const OrganizationListPageList = (props: { onCreateOrganizationClick: () 
     props.onCreateOrganizationClick();
   };
 
-  // Solve weird bug with swr while running unit tests
+  // Filter out falsy values that can occur when SWR infinite loading resolves pages out of order
+  // This happens when concurrent requests resolve in unexpected order, leaving undefined/null items in the data array
   const userInvitationsData = userInvitations.data?.filter(a => !!a);
   const userSuggestionsData = userSuggestions.data?.filter(a => !!a);
 
@@ -215,7 +189,7 @@ export const OrganizationListPageList = (props: { onCreateOrganizationClick: () 
                 );
               })}
 
-            {(hasNextPage || isLoading) && <PreviewListSpinner ref={ref} />}
+            {(hasNextPage || isLoading) && <OrganizationPreviewSpinner ref={ref} />}
 
             <CreateOrganizationButton onCreateOrganizationClick={onCreateOrganizationClick} />
           </Actions>

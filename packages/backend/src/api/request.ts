@@ -85,12 +85,24 @@ type BuildRequestOptions = {
    * @default false
    */
   skipApiVersionInUrl?: boolean;
+  /* Machine secret key */
+  machineSecretKey?: string;
+  /**
+   * If true, uses machineSecretKey for authorization instead of secretKey.
+   *
+   * Note: This is only used for machine-to-machine tokens.
+   *
+   * @default false
+   */
+  useMachineSecretKey?: boolean;
 };
 
 export function buildRequest(options: BuildRequestOptions) {
   const requestFn = async <T>(requestOptions: ClerkBackendApiRequestOptions): Promise<ClerkBackendApiResponse<T>> => {
     const {
       secretKey,
+      machineSecretKey,
+      useMachineSecretKey = false,
       requireSecretKey = true,
       apiUrl = API_URL,
       apiVersion = API_VERSION,
@@ -124,12 +136,19 @@ export function buildRequest(options: BuildRequestOptions) {
     // Build headers
     const headers = new Headers({
       'Clerk-API-Version': SUPPORTED_BAPI_VERSION,
-      'User-Agent': userAgent,
+      [constants.Headers.UserAgent]: userAgent,
       ...headerParams,
     });
 
-    if (secretKey) {
-      headers.set('Authorization', `Bearer ${secretKey}`);
+    // If Authorization header already exists, preserve it.
+    // Otherwise, use machine secret key if enabled, or fall back to regular secret key
+    const authorizationHeader = constants.Headers.Authorization;
+    if (!headers.has(authorizationHeader)) {
+      if (useMachineSecretKey && machineSecretKey) {
+        headers.set(authorizationHeader, `Bearer ${machineSecretKey}`);
+      } else if (secretKey) {
+        headers.set(authorizationHeader, `Bearer ${secretKey}`);
+      }
     }
 
     let res: Response | undefined;
