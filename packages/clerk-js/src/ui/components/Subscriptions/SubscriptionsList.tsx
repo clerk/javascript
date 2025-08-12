@@ -120,8 +120,10 @@ export function SubscriptionsList({
                       >
                         {subscription.plan.name}
                       </Text>
-                      {sortedSubscriptions.length > 1 || !!subscription.canceledAtDate ? (
-                        <SubscriptionBadge subscription={subscription} />
+                      {subscription.isFreeTrial || sortedSubscriptions.length > 1 || !!subscription.canceledAtDate ? (
+                        <SubscriptionBadge
+                          subscription={subscription.isFreeTrial ? { status: 'free_trial' } : subscription}
+                        />
                       ) : null}
                     </Flex>
 

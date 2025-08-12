@@ -76,7 +76,7 @@ export class CommerceSubscriptionItem extends BaseResource implements CommerceSu
   credit?: {
     amount: CommerceMoney;
   };
-  freeTrialEndsAt!: Date | null;
+  isFreeTrial!: boolean;
 
   constructor(data: CommerceSubscriptionItemJSON) {
     super();
@@ -107,7 +107,7 @@ export class CommerceSubscriptionItem extends BaseResource implements CommerceSu
     this.amount = data.amount ? commerceMoneyFromJSON(data.amount) : undefined;
     this.credit = data.credit && data.credit.amount ? { amount: commerceMoneyFromJSON(data.credit.amount) } : undefined;
 
-    this.freeTrialEndsAt = data.free_trial_ends_at ? unixEpochToDate(data.free_trial_ends_at) : null;
+    this.isFreeTrial = this.withDefault(data.is_free_trial, false);
     return this;
   }
 
