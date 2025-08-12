@@ -108,6 +108,7 @@ export const bnIN: LocalizationResource = {
     creditRemainder: undefined,
     defaultFreePlanActive: undefined,
     free: 'বিনামূল্যে',
+    getStarted: 'শুরু করুন',
     keepSubscription: undefined,
     manage: undefined,
     manageSubscription: 'সদস্যতা পরিচালনা করুন',

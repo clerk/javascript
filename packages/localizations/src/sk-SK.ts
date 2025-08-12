@@ -108,6 +108,7 @@ export const skSK: LocalizationResource = {
     creditRemainder: undefined,
     defaultFreePlanActive: undefined,
     free: 'Bezplatne',
+    getStarted: 'Začať',
     keepSubscription: undefined,
     manage: undefined,
     manageSubscription: 'Spravovať členstvo',

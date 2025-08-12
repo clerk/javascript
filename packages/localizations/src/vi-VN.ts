@@ -112,6 +112,7 @@ export const viVN: LocalizationResource = {
     creditRemainder: 'Tín dụng cho phần còn lại của đăng ký hiện tại.',
     defaultFreePlanActive: 'Bạn hiện đang trên gói Miễn phí',
     free: 'Miễn phí',
+    getStarted: 'Bắt đầu',
     keepSubscription: 'Giữ đăng ký',
     manage: 'Quản lý',
     manageSubscription: 'Quản lý đăng ký',

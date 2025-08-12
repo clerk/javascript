@@ -112,6 +112,7 @@ export const faIR: LocalizationResource = {
     creditRemainder: 'اعتبار برای باقیمانده اشتراک فعلی شما.',
     defaultFreePlanActive: 'شما در حال حاضر در طرح رایگان هستید',
     free: 'رایگان',
+    getStarted: 'شروع کنید',
     keepSubscription: 'حفظ اشتراک',
     manage: 'مدیریت',
     manageSubscription: 'مدیریت اشتراک',

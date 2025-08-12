@@ -108,6 +108,7 @@ export const hiIN: LocalizationResource = {
     creditRemainder: undefined,
     defaultFreePlanActive: undefined,
     free: 'मुफ्त',
+    getStarted: 'शुरू करें',
     keepSubscription: undefined,
     manage: undefined,
     manageSubscription: 'सदस्यता प्रबंधित करें',

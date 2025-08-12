@@ -108,6 +108,7 @@ export const esUY: LocalizationResource = {
     creditRemainder: undefined,
     defaultFreePlanActive: undefined,
     free: undefined,
+    getStarted: undefined,
     keepSubscription: undefined,
     manage: undefined,
     manageSubscription: undefined,

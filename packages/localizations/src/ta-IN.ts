@@ -108,6 +108,7 @@ export const taIN: LocalizationResource = {
     creditRemainder: undefined,
     defaultFreePlanActive: undefined,
     free: 'இலவசம்',
+    getStarted: 'தொடங்குங்கள்',
     keepSubscription: undefined,
     manage: undefined,
     manageSubscription: 'உறுப்பினர் நிர்வாகம்',

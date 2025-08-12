@@ -101,6 +101,7 @@ export const enUS: LocalizationResource = {
     creditRemainder: 'Credit for the remainder of your current subscription.',
     defaultFreePlanActive: "You're currently on the Free plan",
     free: 'Free',
+    getStarted: 'Get started',
     keepSubscription: 'Keep subscription',
     manage: 'Manage',
     manageSubscription: 'Manage subscription',

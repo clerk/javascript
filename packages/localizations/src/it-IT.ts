@@ -114,6 +114,7 @@ export const itIT: LocalizationResource = {
     creditRemainder: 'Credito per il resto del tuo abbonamento attuale.',
     defaultFreePlanActive: 'Attualmente sei sul piano Gratuito',
     free: 'Gratuito',
+    getStarted: 'Inizia',
     keepSubscription: 'Mantieni abbonamento',
     manage: 'Gestisci',
     manageSubscription: 'Gestisci abbonamento',

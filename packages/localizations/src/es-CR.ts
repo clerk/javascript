@@ -108,6 +108,7 @@ export const esCR: LocalizationResource = {
     creditRemainder: undefined,
     defaultFreePlanActive: undefined,
     free: 'Gratis',
+    getStarted: 'Empezar',
     keepSubscription: 'Mantener suscripción',
     manage: 'Gestionar',
     manageSubscription: 'Gestionar suscripción',

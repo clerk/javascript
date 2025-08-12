@@ -112,6 +112,7 @@ export const csCZ: LocalizationResource = {
     creditRemainder: 'Kredit za zbytek vašeho současného předplatného.',
     defaultFreePlanActive: 'Aktuálně používáte bezplatný plán',
     free: 'Zdarma',
+    getStarted: 'Začít',
     keepSubscription: 'Ponechat předplatné',
     manage: 'Spravovat',
     manageSubscription: 'Spravovat předplatné',

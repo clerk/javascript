@@ -108,6 +108,7 @@ export const svSE: LocalizationResource = {
     creditRemainder: undefined,
     defaultFreePlanActive: undefined,
     free: undefined,
+    getStarted: undefined,
     keepSubscription: undefined,
     manage: undefined,
     manageSubscription: undefined,

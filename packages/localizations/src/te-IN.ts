@@ -108,6 +108,7 @@ export const teIN: LocalizationResource = {
     creditRemainder: undefined,
     defaultFreePlanActive: undefined,
     free: 'ఉచితం',
+    getStarted: 'ప్రారంభించండి',
     keepSubscription: undefined,
     manage: undefined,
     manageSubscription: 'సభ్యత్వాన్ని నిర్వహించండి',

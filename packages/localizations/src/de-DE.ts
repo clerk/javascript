@@ -111,6 +111,7 @@ export const deDE: LocalizationResource = {
     creditRemainder: 'Verbleibendes Guthaben für den restlichen Abrechnungszeitraum.',
     defaultFreePlanActive: 'Sie nutzen aktuell den kostenlosen Plan.',
     free: 'Kostenlos',
+    getStarted: 'Jetzt starten',
     keepSubscription: 'Abonnement behalten',
     manage: 'Verwalten',
     manageSubscription: 'Mitgliedschaft verwalten',

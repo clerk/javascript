@@ -110,6 +110,7 @@ export const frFR: LocalizationResource = {
     creditRemainder: 'Crédit restant',
     defaultFreePlanActive: 'Vous êtes actuellement sur le plan gratuit',
     free: 'Gratuit',
+    getStarted: 'Commencer',
     keepSubscription: "Conserver l'abonnement",
     manage: 'Gérer',
     manageSubscription: "Gérer l'abonnement",

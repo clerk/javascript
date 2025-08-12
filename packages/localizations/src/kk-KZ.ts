@@ -108,6 +108,7 @@ export const kkKZ: LocalizationResource = {
     creditRemainder: undefined,
     defaultFreePlanActive: undefined,
     free: 'Тегін',
+    getStarted: 'Бастау',
     keepSubscription: 'Жазылымды сақтау',
     manage: 'Басқару',
     manageSubscription: 'Жазылымды басқару',

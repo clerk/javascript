@@ -112,6 +112,7 @@ export const ptBR: LocalizationResource = {
     creditRemainder: 'Crédito para o restante da sua assinatura atual.',
     defaultFreePlanActive: 'Você está atualmente no plano Gratuito',
     free: 'Gratuito',
+    getStarted: 'Começar',
     keepSubscription: 'Manter assinatura',
     manage: 'Gerenciar',
     manageSubscription: 'Gerenciar assinatura',

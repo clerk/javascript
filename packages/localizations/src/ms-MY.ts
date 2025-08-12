@@ -108,6 +108,7 @@ export const msMY: LocalizationResource = {
     creditRemainder: undefined,
     defaultFreePlanActive: undefined,
     free: 'Percuma',
+    getStarted: 'Mulakan',
     keepSubscription: undefined,
     manage: undefined,
     manageSubscription: 'Urus keahlian',
