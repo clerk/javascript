@@ -126,6 +126,8 @@ export type {
   InstanceSettings,
   Invitation,
   JwtTemplate,
+  Machine,
+  M2MToken,
   OauthAccessToken,
   OAuthApplication,
   Organization,

@@ -25,7 +25,7 @@ const PricingTableRoot = (props: PricingTableProps) => {
 
       // don't pay attention to the default plan
       const activeSubscription = subscriptionItems?.find(
-        sub => !sub.canceledAtDate && sub.status === 'active' && !sub.plan.isDefault,
+        sub => !sub.canceledAt && sub.status === 'active' && !sub.plan.isDefault,
       );
       if (activeSubscription) {
         return activeSubscription.planPeriod;
