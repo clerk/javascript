@@ -8,8 +8,10 @@ import { logger } from '@clerk/shared/logger';
 import { CLERK_NETLIFY_CACHE_BUST_PARAM } from '@clerk/shared/netlifyCacheHandler';
 import { isHttpOrHttps, isValidProxyUrl, proxyUrlToAbsoluteURL } from '@clerk/shared/proxy';
 import {
+  analyzeThemeUsage,
   eventPrebuiltComponentMounted,
   eventPrebuiltComponentOpened,
+  eventThemeUsage,
   TelemetryCollector,
 } from '@clerk/shared/telemetry';
 import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
@@ -443,6 +445,12 @@ export class Clerk implements ClerkInterface {
         publishableKey: this.publishableKey,
         ...this.#options.telemetry,
       });
+
+      // Record theme usage telemetry when appearance is provided
+      if (this.#options.appearance) {
+        const themeAnalysis = analyzeThemeUsage(this.#options.appearance);
+        this.telemetry.record(eventThemeUsage(themeAnalysis));
+      }
     }
 
     try {
