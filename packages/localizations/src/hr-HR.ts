@@ -62,6 +62,7 @@ export const hrHR: LocalizationResource = {
   badge__requiresAction: 'Zahtijeva akciju',
   badge__startsAt: undefined,
   badge__thisDevice: 'Ovaj uređaj',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Nepotvrđeno',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Korisnički uređaj',
@@ -133,6 +134,7 @@ export const hrHR: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,
@@ -790,6 +792,26 @@ export const hrHR: LocalizationResource = {
   },
   socialButtonsBlockButton: 'Nastavite s {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} je već član organizacije.',
     captcha_invalid:

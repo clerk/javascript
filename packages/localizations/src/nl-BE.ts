@@ -62,6 +62,7 @@ export const nlBE: LocalizationResource = {
   badge__requiresAction: 'Actie vereist',
   badge__startsAt: undefined,
   badge__thisDevice: 'Dit apparaat',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Ongeverifieerd',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Gebruikersapparaat',
@@ -133,6 +134,7 @@ export const nlBE: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,
@@ -788,6 +790,26 @@ export const nlBE: LocalizationResource = {
   },
   socialButtonsBlockButton: 'Ga verder met {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: 'Ga verder met {{provider|titleize}}',
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: 'Je bent al lid van de organisatie.',
     captcha_invalid:
