@@ -54,17 +54,27 @@ describe('SubscriptionDetails', () => {
           plan: {
             id: 'plan_123',
             name: 'Test Plan',
-            amount: 1000,
-            amountFormatted: '10.00',
-            annualAmount: 10000,
-            annualAmountFormatted: '100.00',
-            annualMonthlyAmount: 8333,
-            annualMonthlyAmountFormatted: '83.33',
-            currencySymbol: '$',
+            fee: {
+              amount: 1000,
+              amountFormatted: '10.00',
+              currencySymbol: '$',
+              currency: 'USD',
+            },
+            annualFee: {
+              amount: 10000,
+              amountFormatted: '100.00',
+              currencySymbol: '$',
+              currency: 'USD',
+            },
+            annualMonthlyFee: {
+              amount: 8333,
+              amountFormatted: '83.33',
+              currencySymbol: '$',
+              currency: 'USD',
+            },
             description: 'Test Plan',
             hasBaseFee: true,
             isRecurring: true,
-            currency: 'USD',
             isDefault: false,
           },
           createdAt: new Date('2021-01-01'),
@@ -116,7 +126,7 @@ describe('SubscriptionDetails', () => {
     await userEvent.click(menuButton);
 
     await waitFor(() => {
-      expect(getByText('Switch to annual $100.00 / year')).toBeVisible();
+      expect(getByText('Switch to annual $100 / year')).toBeVisible();
       expect(getByText('Cancel subscription')).toBeVisible();
     });
   });
@@ -147,17 +157,27 @@ describe('SubscriptionDetails', () => {
           plan: {
             id: 'plan_123',
             name: 'Test Plan',
-            amount: 1000,
-            amountFormatted: '10.00',
-            annualAmount: 10000,
-            annualAmountFormatted: '100.00',
-            annualMonthlyAmount: 8333,
-            annualMonthlyAmountFormatted: '83.33',
-            currencySymbol: '$',
+            fee: {
+              amount: 1000,
+              amountFormatted: '10.00',
+              currencySymbol: '$',
+              currency: 'USD',
+            },
+            annualFee: {
+              amount: 10000,
+              amountFormatted: '100.00',
+              currencySymbol: '$',
+              currency: 'USD',
+            },
+            annualMonthlyFee: {
+              amount: 8333,
+              amountFormatted: '83.33',
+              currencySymbol: '$',
+              currency: 'USD',
+            },
             description: 'Test Plan',
             hasBaseFee: true,
             isRecurring: true,
-            currency: 'USD',
             isDefault: false,
           },
           createdAt: new Date('2021-01-01'),
@@ -209,7 +229,7 @@ describe('SubscriptionDetails', () => {
     await userEvent.click(menuButton);
 
     await waitFor(() => {
-      expect(getByText('Switch to monthly $10.00 / month')).toBeVisible();
+      expect(getByText('Switch to monthly $10 / month')).toBeVisible();
       expect(getByText('Cancel subscription')).toBeVisible();
     });
   });
@@ -232,17 +252,27 @@ describe('SubscriptionDetails', () => {
           plan: {
             id: 'plan_123',
             name: 'Free Plan',
-            amount: 0,
-            amountFormatted: '0.00',
-            annualAmount: 0,
-            annualAmountFormatted: '0.00',
-            annualMonthlyAmount: 0,
-            annualMonthlyAmountFormatted: '0.00',
-            currencySymbol: '$',
+            fee: {
+              amount: 0,
+              amountFormatted: '0.00',
+              currencySymbol: '$',
+              currency: 'USD',
+            },
+            annualFee: {
+              amount: 0,
+              amountFormatted: '0.00',
+              currencySymbol: '$',
+              currency: 'USD',
+            },
+            annualMonthlyFee: {
+              amount: 0,
+              amountFormatted: '0.00',
+              currencySymbol: '$',
+              currency: 'USD',
+            },
             description: 'Free Plan description',
             hasBaseFee: false,
             isRecurring: true,
-            currency: 'USD',
             isDefault: true,
           },
           createdAt: new Date('2021-01-01'),
@@ -294,17 +324,27 @@ describe('SubscriptionDetails', () => {
     const planAnnual = {
       id: 'plan_annual',
       name: 'Annual Plan',
-      amount: 1300,
-      amountFormatted: '13.00',
-      annualAmount: 12000,
-      annualAmountFormatted: '120.00',
-      annualMonthlyAmount: 1000,
-      annualMonthlyAmountFormatted: '10.00',
-      currencySymbol: '$',
+      fee: {
+        amount: 1300,
+        amountFormatted: '13.00',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
+      annualFee: {
+        amount: 12000,
+        amountFormatted: '120.00',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
+      annualMonthlyFee: {
+        amount: 1000,
+        amountFormatted: '10.00',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
       description: 'Annual Plan',
       hasBaseFee: true,
       isRecurring: true,
-      currency: 'USD',
       isDefault: false,
       payerType: ['user'],
       publiclyVisible: true,
@@ -315,17 +355,27 @@ describe('SubscriptionDetails', () => {
     const planMonthly = {
       id: 'plan_monthly',
       name: 'Monthly Plan',
-      amount: 1000,
-      amountFormatted: '10.00',
-      annualAmount: 9000,
-      annualAmountFormatted: '90.00',
-      annualMonthlyAmount: 750,
-      annualMonthlyAmountFormatted: '7.50',
-      currencySymbol: '$',
+      fee: {
+        amount: 1000,
+        amountFormatted: '10.00',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
+      annualFee: {
+        amount: 9099,
+        amountFormatted: '90.99',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
+      annualMonthlyFee: {
+        amount: 750,
+        amountFormatted: '7.50',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
       description: 'Monthly Plan',
       hasBaseFee: true,
       isRecurring: true,
-      currency: 'USD',
       isDefault: false,
       payerType: ['user'],
       publiclyVisible: true,
@@ -412,7 +462,7 @@ describe('SubscriptionDetails', () => {
     await userEvent.click(menuButton);
 
     await waitFor(() => {
-      expect(getByText('Switch to monthly $13.00 / month')).toBeVisible();
+      expect(getByText('Switch to monthly $13 / month')).toBeVisible();
       expect(getByText('Resubscribe')).toBeVisible();
       expect(queryByText('Cancel subscription')).toBeNull();
     });
@@ -420,7 +470,7 @@ describe('SubscriptionDetails', () => {
     await userEvent.click(upcomingMenuButton);
 
     await waitFor(() => {
-      expect(getByText('Switch to annual $90.00 / year')).toBeVisible();
+      expect(getByText('Switch to annual $90.99 / year')).toBeVisible();
       expect(getByText('Cancel subscription')).toBeVisible();
     });
   });
@@ -433,17 +483,28 @@ describe('SubscriptionDetails', () => {
     const planMonthly = {
       id: 'plan_monthly',
       name: 'Monthly Plan',
-      amount: 1000,
-      amountFormatted: '10.00',
-      annualAmount: 9000,
-      annualAmountFormatted: '90.00',
-      annualMonthlyAmount: 750,
-      annualMonthlyAmountFormatted: '7.50',
-      currencySymbol: '$',
+
+      fee: {
+        amount: 1000,
+        amountFormatted: '10.00',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
+      annualFee: {
+        amount: 9000,
+        amountFormatted: '90.00',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
+      annualMonthlyFee: {
+        amount: 750,
+        amountFormatted: '7.50',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
       description: 'Monthly Plan',
       hasBaseFee: true,
       isRecurring: true,
-      currency: 'USD',
       isDefault: false,
       payerType: ['user'],
       publiclyVisible: true,
@@ -455,17 +516,27 @@ describe('SubscriptionDetails', () => {
     const planFreeUpcoming = {
       id: 'plan_free_upcoming',
       name: 'Free Plan (Upcoming)',
-      amount: 0,
-      amountFormatted: '0.00',
-      annualAmount: 0,
-      annualAmountFormatted: '0.00',
-      annualMonthlyAmount: 0,
-      annualMonthlyAmountFormatted: '0.00',
-      currencySymbol: '$',
+      fee: {
+        amount: 0,
+        amountFormatted: '0.00',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
+      annualFee: {
+        amount: 0,
+        amountFormatted: '0.00',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
+      annualMonthlyFee: {
+        amount: 0,
+        amountFormatted: '0.00',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
       description: 'Upcoming Free Plan',
       hasBaseFee: false,
       isRecurring: true,
-      currency: 'USD',
       isDefault: false,
       payerType: ['user'],
       publiclyVisible: true,
@@ -568,17 +639,27 @@ describe('SubscriptionDetails', () => {
           plan: {
             id: 'plan_123',
             name: 'Monthly Plan',
-            amount: 1000,
-            amountFormatted: '10.00',
-            annualAmount: 10000,
-            annualAmountFormatted: '100.00',
-            annualMonthlyAmount: 8333,
-            annualMonthlyAmountFormatted: '83.33',
-            currencySymbol: '$',
+            fee: {
+              amount: 1000,
+              amountFormatted: '10.00',
+              currencySymbol: '$',
+              currency: 'USD',
+            },
+            annualFee: {
+              amount: 10000,
+              amountFormatted: '100.00',
+              currencySymbol: '$',
+              currency: 'USD',
+            },
+            annualMonthlyFee: {
+              amount: 8333,
+              amountFormatted: '83.33',
+              currencySymbol: '$',
+              currency: 'USD',
+            },
             description: 'Monthly Plan',
             hasBaseFee: true,
             isRecurring: true,
-            currency: 'USD',
             isDefault: false,
           },
           createdAt: new Date('2021-01-01'),
@@ -642,13 +723,25 @@ describe('SubscriptionDetails', () => {
     const plan = {
       id: 'plan_annual',
       name: 'Annual Plan',
-      amount: 12000,
-      amountFormatted: '120.00',
-      annualAmount: 12000,
-      annualAmountFormatted: '120.00',
-      annualMonthlyAmount: 1000,
-      annualMonthlyAmountFormatted: '10.00',
-      currencySymbol: '$',
+
+      fee: {
+        amount: 12000,
+        amountFormatted: '120.00',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
+      annualFee: {
+        amount: 12000,
+        amountFormatted: '120.00',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
+      annualMonthlyFee: {
+        amount: 1000,
+        amountFormatted: '10.00',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
       description: 'Annual Plan',
       hasBaseFee: true,
       isRecurring: true,
@@ -732,13 +825,26 @@ describe('SubscriptionDetails', () => {
     const plan = {
       id: 'plan_annual',
       name: 'Annual Plan',
-      amount: 12000,
-      amountFormatted: '120.00',
-      annualAmount: 12000,
-      annualAmountFormatted: '120.00',
-      annualMonthlyAmount: 1000,
-      annualMonthlyAmountFormatted: '10.00',
-      currencySymbol: '$',
+
+      fee: {
+        amount: 12000,
+        amountFormatted: '120.00',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
+      annualFee: {
+        amount: 12000,
+        amountFormatted: '120.00',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
+      annualMonthlyFee: {
+        amount: 1000,
+        amountFormatted: '10.00',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
+
       description: 'Annual Plan',
       hasBaseFee: true,
       isRecurring: true,
@@ -824,17 +930,27 @@ describe('SubscriptionDetails', () => {
     const plan = {
       id: 'plan_monthly',
       name: 'Monthly Plan',
-      amount: 1000,
-      amountFormatted: '10.00',
-      annualAmount: 9000,
-      annualAmountFormatted: '90.00',
-      annualMonthlyAmount: 750,
-      annualMonthlyAmountFormatted: '7.50',
-      currencySymbol: '$',
+      fee: {
+        amount: 1000,
+        amountFormatted: '10.00',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
+      annualFee: {
+        amount: 9000,
+        amountFormatted: '90.00',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
+      annualMonthlyFee: {
+        amount: 750,
+        amountFormatted: '7.50',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
       description: 'Monthly Plan',
       hasBaseFee: true,
       isRecurring: true,
-      currency: 'USD',
       isDefault: false,
       payerType: ['user'],
       publiclyVisible: true,
