@@ -1,4 +1,4 @@
-import type { CommerceSubscriptionResource } from '@clerk/types';
+import type { CommerceSubscriptionItemResource } from '@clerk/types';
 
 import { Badge, localizationKeys } from '@/ui/customizables';
 import type { ElementDescriptor } from '@/ui/customizables/elementDescriptors';
@@ -19,7 +19,7 @@ export const SubscriptionBadge = ({
   subscription,
   elementDescriptor,
 }: {
-  subscription: CommerceSubscriptionResource;
+  subscription: CommerceSubscriptionItemResource;
   elementDescriptor?: ElementDescriptor;
 }) => {
   return (

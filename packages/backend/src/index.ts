@@ -11,7 +11,7 @@ import { verifyToken as _verifyToken } from './tokens/verify';
 
 export const verifyToken = withLegacyReturn(_verifyToken);
 
-export type ClerkOptions = CreateBackendApiOptions &
+export type ClerkOptions = Omit<CreateBackendApiOptions, 'skipApiVersionInUrl' | 'useMachineSecretKey'> &
   Partial<
     Pick<
       CreateAuthenticateRequestOptions['options'],
@@ -100,6 +100,11 @@ export type {
   PaginatedResponseJSON,
   TestingTokenJSON,
   WebhooksSvixJSON,
+  CommercePayerJSON,
+  CommercePlanJSON,
+  CommerceSubscriptionItemJSON,
+  CommercePaymentAttemptJSON,
+  CommerceSubscriptionJSON,
 } from './api/resources/JSON';
 
 /**
@@ -139,6 +144,7 @@ export type {
   Token,
   User,
   TestingToken,
+  CommercePlan,
 } from './api/resources';
 
 /**

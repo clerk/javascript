@@ -13,7 +13,7 @@ export const Checkout = (props: __internal_CheckoutProps) => {
   return (
     <Flow.Root flow='checkout'>
       <Flow.Part>
-        <SubscriberTypeContext.Provider value={props.subscriberType || 'user'}>
+        <SubscriberTypeContext.Provider value={props.for || 'user'}>
           <CheckoutContext.Provider
             value={{
               componentName: 'Checkout',
@@ -23,7 +23,7 @@ export const Checkout = (props: __internal_CheckoutProps) => {
             <Drawer.Content>
               <Drawer.Header title={localizationKeys('commerce.checkout.title')} />
               <CheckoutPage.Root>
-                <CheckoutPage.Stage name='awaiting_initialization'>
+                <CheckoutPage.Stage name='needs_initialization'>
                   <CheckoutPage.FetchStatus status='fetching'>
                     <Spinner
                       sx={{
@@ -49,7 +49,7 @@ export const Checkout = (props: __internal_CheckoutProps) => {
                   <CheckoutComplete />
                 </CheckoutPage.Stage>
 
-                <CheckoutPage.Stage name='awaiting_confirmation'>
+                <CheckoutPage.Stage name='needs_confirmation'>
                   <CheckoutForm />
                 </CheckoutPage.Stage>
               </CheckoutPage.Root>

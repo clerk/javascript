@@ -83,7 +83,7 @@ const OrganizationBillingPageInternal = withCardStateProvider(() => {
 
 export const OrganizationBillingPage = () => {
   return (
-    <SubscriberTypeContext.Provider value='org'>
+    <SubscriberTypeContext.Provider value='organization'>
       <OrganizationBillingPageInternal />
     </SubscriberTypeContext.Provider>
   );

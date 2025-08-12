@@ -1,3 +1,5 @@
+import { vi } from 'vitest';
+
 const clonedEnvVars = {
   CLERK_API_URL: process.env.CLERK_API_URL,
   CLERK_API_VERSION: process.env.CLERK_API_VERSION,
@@ -20,7 +22,7 @@ describe('constants', () => {
   });
 
   test('from environment variables', () => {
-    jest.resetModules();
+    vi.resetModules();
     const { Headers, Cookies, ...localConstants } = constants;
 
     // Verify imported constants exist but don't snapshot them

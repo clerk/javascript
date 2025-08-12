@@ -1,4 +1,4 @@
-import type { AsyncLocalStorage } from 'async_hooks';
+import type { AsyncLocalStorage } from 'node:async_hooks';
 
 const sharedAsyncLocalStorageNotAvailableError = new Error(
   'Invariant: AsyncLocalStorage accessed in runtime where it is not available',

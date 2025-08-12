@@ -19,13 +19,15 @@
     "clerk-dev": "bin/cli.js"
   },
   "scripts": {
+    "format": "node ../../scripts/format-package.mjs",
+    "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src"
   },
   "dependencies": {
     "commander": "^14.0.0",
     "concurrently": "^9.2.0",
-    "dotenv": "^17.2.0",
-    "globby": "^14.0.2",
+    "dotenv": "^17.2.1",
+    "globby": "^14.1.0",
     "jscodeshift": "^17.3.0"
   },
   "devDependencies": {},

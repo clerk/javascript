@@ -178,13 +178,23 @@ If your change can't only be tested by unit tests, you should add/edit an integr
 
 ### Authoring Typedoc information
 
-As explained in [documenting your changes](#documenting-your-changes), we use JSDoc to annotate our public API surface. We then use [Typedoc](https://typedoc.org/) to autogenerate docs from these comments.
+As explained in [documenting your changes](#documenting-your-changes), we use JSDoc to annotate our public API surface. We then use [Typedoc](https://typedoc.org/) to autogenerate MDX docs from these comments.
 
-Locally, you can run `pnpm run typedoc:generate` to generate the docs. Afterwards, you can inspect the MDX files inside `.typdoc/docs`.
+For a comprehensive guide on **authoring** JSDoc/Typedoc comments, see [this guide](https://www.notion.so/clerkdev/Typedoc-JSDoc-1df2b9ab44fe808a8cf2c9cca324ea89?source=copy_link).
 
-These files are pushed to [clerk/generated-typedoc](https://github.com/clerk/generated-typedoc) and then used on Clerk's docs. In the docs you can access the files by using a `<Typedoc src="path/to/file" />` component.
+To review your changes locally, you can run `pnpm run typedoc:generate` to generate the docs. Afterwards, you can inspect the MDX files inside `.typedoc/docs`. But if you want to preview how the Typedoc output will look in Clerk Docs, there's a few things you need to do first:
 
-So if you find a typo that's inside a Typedoc file, you'll need to edit the source file, [open a PR](#opening-a-pull-request), and get it merged to `main`. You can preview your changes with the aforementioned `pnpm typedoc:generate` command.
+Create a PR that includes your changes to any Typedoc comments. Once the PR has been merged and a release is published, a PR will [automatically](https://github.com/clerk/clerk-docs/blob/main/.github/workflows/typedoc.yml) be opened in `clerk-docs` to merge in the Typedoc changes.
+
+Typedoc output is embedded in `clerk-docs` files with the `<Typedoc />` component. For example, if you updated Typedoc comments for the `useAuth()` hook in `clerk/javascript`, you'll need to make sure that in `clerk-docs`, in the `/hooks/use-auth.mdx` file, there's a `<Typedoc />` component linked to the `./clerk-typedoc/clerk-react/use-auth.mdx` file, like:
+
+```mdx
+<Typedoc src='clerk-react/use-auth' />
+```
+
+Read more about this in the [`clerk-docs` CONTRIBUTING.md](https://github.com/clerk/clerk-docs/blob/main/CONTRIBUTING.md#typedoc-).
+
+Then, to preview how the `<Typedoc />` component renders, the `clerk-docs` PR will have a Vercel preview. Or to get local previews set up, see the [section in `clerk/clerk` about setting up local docs](https://github.com/clerk/clerk?tab=readme-ov-file#5-optional-set-up-local-docs).
 
 ## Opening a Pull Request
 

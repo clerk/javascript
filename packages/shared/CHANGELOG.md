@@ -1,5 +1,92 @@
 # Change Log
 
+## 3.18.1
+
+### Patch Changes
+
+- Fix a potential memory leak in `TelemetryCollector` ([#6485](https://github.com/clerk/javascript/pull/6485)) by [@brkalow](https://github.com/brkalow)
+
+- Updated dependencies [[`1ad16da`](https://github.com/clerk/javascript/commit/1ad16daa49795a861ae277001831230580b6b9f4), [`4edef81`](https://github.com/clerk/javascript/commit/4edef81dd423a0471e3f579dd6b36094aa8546aa), [`696f8e1`](https://github.com/clerk/javascript/commit/696f8e11a3e5391e6b5a97d98e929b8973575b9a), [`f318d22`](https://github.com/clerk/javascript/commit/f318d22cf83caaef272bcf532561a03ca72575e7)]:
+  - @clerk/types@4.74.0
+
+## 3.18.0
+
+### Minor Changes
+
+- [Billing Beta] Stricter return type of `useCheckout` to improve inference of other properties. ([#6473](https://github.com/clerk/javascript/pull/6473)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Improve `useCheckout` error messages on mount. ([#6475](https://github.com/clerk/javascript/pull/6475)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`f93965f`](https://github.com/clerk/javascript/commit/f93965f64c81030f9fcf9d1cc4e4984d30cd12ec), [`7b6dcee`](https://github.com/clerk/javascript/commit/7b6dceea5bfd7f1cc1bf24126aa715307e24ae7f)]:
+  - @clerk/types@4.73.0
+
+## 3.17.0
+
+### Minor Changes
+
+- [Billing Beta] Remove `statement_id` from the checkout resource. ([#6437](https://github.com/clerk/javascript/pull/6437)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Fixes a bug which cause initialization of a payment method to never fire. ([#6436](https://github.com/clerk/javascript/pull/6436)) by [@panteliselef](https://github.com/panteliselef)
+
+- Fix TelemetryCollector logic for clerk-js in browser to properly populate sdkMetadata for telemetry events. ([#6448](https://github.com/clerk/javascript/pull/6448)) by [@panteliselef](https://github.com/panteliselef)
+
+- Remove `treatPendingAsSignedOut` from `useSession` and always return pending session ([#6432](https://github.com/clerk/javascript/pull/6432)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`22c35ef`](https://github.com/clerk/javascript/commit/22c35efb59226df2efaa2891fa4775c13312f4c6), [`e8d816a`](https://github.com/clerk/javascript/commit/e8d816a3350e862c3e9e1d4f8c96c047a0a016a2), [`aa9f185`](https://github.com/clerk/javascript/commit/aa9f185e21b58f8a6e03ea44ce29ee09ad2477d9), [`af0e123`](https://github.com/clerk/javascript/commit/af0e12393c9412281626e20dafb1b3a15558f6d9), [`3d1d871`](https://github.com/clerk/javascript/commit/3d1d8711405646cf3c2aabe99e08337a1028703a)]:
+  - @clerk/types@4.72.0
+
+## 3.16.0
+
+### Minor Changes
+
+- [Billing Beta]: Replace `org` for `organization` as payer type for billing APIs. ([#6423](https://github.com/clerk/javascript/pull/6423)) by [@panteliselef](https://github.com/panteliselef)
+
+  This applies for all billing APIs, except the resources classes that represent data from Frontend API.
+
+### Patch Changes
+
+- Improve layout behaviour with `<PaymentElement fallback={} />`. ([#6387](https://github.com/clerk/javascript/pull/6387)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Disables Stripe's loader, and promotes the usage of the `fallback` prop.
+
+- Fixes an issue where cookies were not properly cleared on sign out when using non-default cookie attributes. ([#6368](https://github.com/clerk/javascript/pull/6368)) by [@brkalow](https://github.com/brkalow)
+
+- Updated dependencies [[`e404456`](https://github.com/clerk/javascript/commit/e4044566bca81f63c8e9c630fdec0f498ad6fc08), [`d58b959`](https://github.com/clerk/javascript/commit/d58b9594cf65158e87dbaa90d632c45f543373e1), [`822ba1f`](https://github.com/clerk/javascript/commit/822ba1fd5e7daf665120cf183e4600a227098d53), [`d4d2612`](https://github.com/clerk/javascript/commit/d4d2612483baf356c389ef0ba5084059025481f2)]:
+  - @clerk/types@4.71.0
+
+## 3.15.1
+
+### Patch Changes
+
+- Updated dependencies [[`b0fdc9e`](https://github.com/clerk/javascript/commit/b0fdc9eaf764ca0c17cbe0810b7d240f6d9db0b6)]:
+  - @clerk/types@4.70.1
+
+## 3.15.0
+
+### Minor Changes
+
+- [Billing Beta] Replace `useSubscriptionItems` with `useSubscription`. ([#6317](https://github.com/clerk/javascript/pull/6317)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Updated dependencies [[`cd59c0e`](https://github.com/clerk/javascript/commit/cd59c0e5512a341dd8fb420aca583333c8243aa5)]:
+  - @clerk/types@4.70.0
+
+## 3.14.0
+
+### Minor Changes
+
+- Add timeout-based mechanism to detect when clerk-js fails to load and set the status to `error` on isomorphicClerk ([#6261](https://github.com/clerk/javascript/pull/6261)) by [@jacekradko](https://github.com/jacekradko)
+
+### Patch Changes
+
+- Updated dependencies [[`fecc99d`](https://github.com/clerk/javascript/commit/fecc99d43cb7db5b99863829acb234cbce0da264), [`10e1060`](https://github.com/clerk/javascript/commit/10e10605b18a58f33a93caed058159c190678e74), [`92c44dd`](https://github.com/clerk/javascript/commit/92c44dd9d51e771a928a8da7004bdb8f8bdbaf58), [`a04a8f5`](https://github.com/clerk/javascript/commit/a04a8f5f81241ee41d93cd64793beca9d6296abb), [`c61855c`](https://github.com/clerk/javascript/commit/c61855c51d9c129d48c4543da3719939ad82f623), [`43ea069`](https://github.com/clerk/javascript/commit/43ea069c570dc64503fc82356ad28a2e43689d45)]:
+  - @clerk/types@4.69.0
+
 ## 3.13.0
 
 ### Minor Changes

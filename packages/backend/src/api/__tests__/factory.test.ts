@@ -302,4 +302,133 @@ describe('api.client', () => {
       );
     });
   });
+
+  describe('Authorization header', () => {
+    it('preserves existing Authorization header when provided in headerParams', async () => {
+      const apiClient = createBackendApiClient({
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'sk_test_xxx',
+        machineSecretKey: 'ak_test_xxx',
+        useMachineSecretKey: true,
+      });
+
+      server.use(
+        http.post(
+          'https://api.clerk.test/m2m_tokens/verify',
+          validateHeaders(({ request }) => {
+            expect(request.headers.get('Authorization')).toBe('Bearer ak_test_in_header_params');
+            return HttpResponse.json({
+              object: 'machine_to_machine_token',
+              id: 'mt_test',
+            });
+          }),
+        ),
+      );
+
+      const response = await apiClient.m2mTokens.verifySecret({
+        machineSecretKey: 'ak_test_in_header_params', // this will be added to headerParams.Authorization
+        secret: 'mt_secret_test',
+      });
+      expect(response.id).toBe('mt_test');
+    });
+
+    it('uses machine secret key when useMachineSecretKey is true and no existing Authorization header', async () => {
+      const apiClient = createBackendApiClient({
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'sk_test_123',
+        machineSecretKey: 'ak_test_xxx',
+        useMachineSecretKey: true,
+      });
+
+      server.use(
+        http.post(
+          'https://api.clerk.test/m2m_tokens/verify',
+          validateHeaders(({ request }) => {
+            expect(request.headers.get('Authorization')).toBe('Bearer ak_test_xxx');
+            return HttpResponse.json({
+              object: 'machine_to_machine_token',
+              id: 'mt_test',
+            });
+          }),
+        ),
+      );
+
+      const response = await apiClient.m2mTokens.verifySecret({
+        secret: 'mt_secret_test',
+      });
+      expect(response.id).toBe('mt_test');
+    });
+
+    it('falls back to secret key when useMachineSecretKey is false (default)', async () => {
+      const apiClient = createBackendApiClient({
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'sk_test_xxx',
+        machineSecretKey: 'ak_test_xxx',
+        // useMachineSecretKey: false, this is default
+      });
+
+      server.use(
+        http.get(
+          `https://api.clerk.test/v1/users/user_deadbeef`,
+          validateHeaders(({ request }) => {
+            expect(request.headers.get('Authorization')).toBe('Bearer sk_test_xxx');
+            return HttpResponse.json(userJson);
+          }),
+        ),
+      );
+
+      const response = await apiClient.users.getUser('user_deadbeef');
+
+      expect(response.id).toBe('user_cafebabe');
+    });
+
+    it('falls back to secret key when machineSecretKey is not provided', async () => {
+      const apiClient = createBackendApiClient({
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'sk_test_xxx',
+        useMachineSecretKey: true,
+      });
+
+      server.use(
+        http.get(
+          `https://api.clerk.test/v1/users/user_deadbeef`,
+          validateHeaders(({ request }) => {
+            expect(request.headers.get('Authorization')).toBe('Bearer sk_test_xxx');
+            return HttpResponse.json(userJson);
+          }),
+        ),
+      );
+
+      const response = await apiClient.users.getUser('user_deadbeef');
+
+      expect(response.id).toBe('user_cafebabe');
+    });
+
+    it('prioritizes machine secret key over secret key when both are provided and useMachineSecretKey is true', async () => {
+      const apiClient = createBackendApiClient({
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'sk_test_xxx',
+        machineSecretKey: 'ak_test_xxx',
+        useMachineSecretKey: true,
+      });
+
+      server.use(
+        http.post(
+          'https://api.clerk.test/m2m_tokens/verify',
+          validateHeaders(({ request }) => {
+            expect(request.headers.get('Authorization')).toBe('Bearer ak_test_xxx');
+            return HttpResponse.json({
+              object: 'machine_to_machine_token',
+              id: 'mt_test',
+            });
+          }),
+        ),
+      );
+
+      const response = await apiClient.m2mTokens.verifySecret({
+        secret: 'mt_secret_test',
+      });
+      expect(response.id).toBe('mt_test');
+    });
+  });
 });

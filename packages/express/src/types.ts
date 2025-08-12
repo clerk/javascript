@@ -11,12 +11,9 @@ export type ClerkMiddlewareOptions = AuthenticateRequestOptions & {
   debug?: boolean;
   clerkClient?: ClerkClient;
   /**
-   * Enables Clerk's handshake flow, which helps verify the session state
-   * when a session JWT has expired. It issues a 307 redirect to refresh
-   * the session JWT if the user is still logged in.
-   *
-   * This is useful for server-rendered fullstack applications to handle
-   * expired JWTs securely and maintain session continuity.
+   * @deprecated This option is deprecated as API requests don't trigger handshake flow.
+   * Handshake is only relevant for server-rendered applications with page navigation,
+   * not for API endpoints. This option will be removed in a future version.
    *
    * @default true
    */

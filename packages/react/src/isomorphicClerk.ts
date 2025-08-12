@@ -44,6 +44,8 @@ import type {
   SignUpProps,
   SignUpRedirectOptions,
   SignUpResource,
+  State,
+  TaskChooseOrganizationProps,
   UnsubscribeCallback,
   UserButtonProps,
   UserProfileProps,
@@ -105,6 +107,7 @@ type IsomorphicLoadedClerk = Without<
   | 'apiKeys'
   | '__internal_setComponentNavigationContext'
   | '__internal_setActiveInProgress'
+  | '__internal_hasAfterAuthFlows'
 > & {
   client: ClientResource | undefined;
   billing: CommerceBillingNamespace | undefined;
@@ -140,6 +143,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountPricingTableNodes = new Map<HTMLDivElement, PricingTableProps | undefined>();
   private premountApiKeysNodes = new Map<HTMLDivElement, APIKeysProps | undefined>();
   private premountOAuthConsentNodes = new Map<HTMLDivElement, __internal_OAuthConsentProps | undefined>();
+  private premountTaskChooseOrganizationNodes = new Map<HTMLDivElement, TaskChooseOrganizationProps | undefined>();
   // A separate Map of `addListener` method calls to handle multiple listeners.
   private premountAddListenerCalls = new Map<
     ListenerCallback,
@@ -630,6 +634,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.__internal_mountOAuthConsent(node, props);
     });
 
+    this.premountTaskChooseOrganizationNodes.forEach((props, node) => {
+      clerkjs.mountTaskChooseOrganization(node, props);
+    });
+
     /**
      * Only update status in case `clerk.status` is missing. In any other case, `clerk-js` should be the orchestrator.
      */
@@ -705,6 +713,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   get billing(): CommerceBillingNamespace | undefined {
     return this.clerkjs?.billing;
+  }
+
+  get __internal_state(): State | undefined {
+    return this.clerkjs?.__internal_state;
   }
 
   get apiKeys(): APIKeysNamespace | undefined {
@@ -1124,6 +1136,22 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.clerkjs.__internal_unmountOAuthConsent(node);
     } else {
       this.premountOAuthConsentNodes.delete(node);
+    }
+  };
+
+  mountTaskChooseOrganization = (node: HTMLDivElement, props?: TaskChooseOrganizationProps): void => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.mountTaskChooseOrganization(node, props);
+    } else {
+      this.premountTaskChooseOrganizationNodes.set(node, props);
+    }
+  };
+
+  unmountTaskChooseOrganization = (node: HTMLDivElement): void => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.unmountTaskChooseOrganization(node);
+    } else {
+      this.premountTaskChooseOrganizationNodes.delete(node);
     }
   };
 

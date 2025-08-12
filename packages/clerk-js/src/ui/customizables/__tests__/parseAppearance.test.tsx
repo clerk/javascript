@@ -338,7 +338,7 @@ describe('AppearanceProvider layout flows', () => {
     expect(result.current.parsedLayout.socialButtonsVariant).toBe('blockButton');
   });
 
-  it('removes the polishedAppearance when simpleStyles is passed to globalAppearance', () => {
+  it('removes the baseTheme when simpleStyles is passed to globalAppearance', () => {
     const wrapper = ({ children }) => (
       <AppearanceProvider
         appearanceKey='signIn'
@@ -359,7 +359,7 @@ describe('AppearanceProvider layout flows', () => {
     expect(result.current.parsedElements[0]['alert'].backgroundColor).toBe(themeAColor);
   });
 
-  it('removes the polishedAppearance when simpleStyles is passed to appearance', () => {
+  it('removes the baseTheme when simpleStyles is passed to appearance', () => {
     const wrapper = ({ children }) => (
       <AppearanceProvider
         appearanceKey='signIn'
@@ -462,5 +462,126 @@ describe('AppearanceProvider captcha', () => {
     expect(result.current.parsedCaptcha.theme).toBe('auto');
     expect(result.current.parsedCaptcha.size).toBe('normal');
     expect(result.current.parsedCaptcha.language).toBe('');
+  });
+});
+
+describe('AppearanceProvider theme flows', () => {
+  it('supports string-based theme property with "clerk" value', () => {
+    const wrapper = ({ children }) => (
+      <AppearanceProvider
+        appearanceKey='signIn'
+        appearance={{
+          theme: 'clerk',
+        }}
+      >
+        {children}
+      </AppearanceProvider>
+    );
+
+    const { result } = renderHook(() => useAppearance(), { wrapper });
+    // Should include clerk theme styles (baseTheme will be included)
+    expect(result.current.parsedElements.length).toBeGreaterThan(0);
+  });
+
+  it('supports string-based theme property with "simple" value', () => {
+    const wrapper = ({ children }) => (
+      <AppearanceProvider
+        appearanceKey='signIn'
+        appearance={{
+          theme: 'simple',
+        }}
+      >
+        {children}
+      </AppearanceProvider>
+    );
+
+    const { result } = renderHook(() => useAppearance(), { wrapper });
+    // Should include both simple theme and base theme (2 elements total)
+    expect(result.current.parsedElements.length).toBe(2);
+  });
+
+  it('theme property takes precedence over deprecated baseTheme', () => {
+    const wrapper = ({ children }) => (
+      <AppearanceProvider
+        appearanceKey='signIn'
+        appearance={{
+          theme: 'simple',
+          baseTheme: 'clerk', // This should be ignored
+        }}
+      >
+        {children}
+      </AppearanceProvider>
+    );
+
+    const { result } = renderHook(() => useAppearance(), { wrapper });
+    // Should include both simple theme and base theme (2 elements total)
+    expect(result.current.parsedElements.length).toBe(2);
+  });
+
+  it('maintains backward compatibility with baseTheme property', () => {
+    const wrapper = ({ children }) => (
+      <AppearanceProvider
+        appearanceKey='signIn'
+        appearance={{
+          baseTheme: 'simple',
+        }}
+      >
+        {children}
+      </AppearanceProvider>
+    );
+
+    const { result } = renderHook(() => useAppearance(), { wrapper });
+    // Should work the same as theme: 'simple' (2 elements total)
+    expect(result.current.parsedElements.length).toBe(2);
+  });
+
+  it('supports object-based themes with new theme property', () => {
+    const customTheme = {
+      elements: {
+        card: { backgroundColor: 'red' },
+      },
+    };
+
+    const wrapper = ({ children }) => (
+      <AppearanceProvider
+        appearanceKey='signIn'
+        appearance={{
+          theme: customTheme,
+        }}
+      >
+        {children}
+      </AppearanceProvider>
+    );
+
+    const { result } = renderHook(() => useAppearance(), { wrapper });
+    // Should include base theme + custom theme
+    expect(result.current.parsedElements.length).toBeGreaterThan(1);
+    expect(result.current.parsedElements.some(el => el.card?.backgroundColor === 'red')).toBe(true);
+  });
+
+  it('supports array-based themes with new theme property', () => {
+    const themeA = {
+      elements: { card: { backgroundColor: 'red' } },
+    };
+    const themeB = {
+      elements: { card: { color: 'blue' } },
+    };
+
+    const wrapper = ({ children }) => (
+      <AppearanceProvider
+        appearanceKey='signIn'
+        appearance={{
+          theme: [themeA, themeB],
+        }}
+      >
+        {children}
+      </AppearanceProvider>
+    );
+
+    const { result } = renderHook(() => useAppearance(), { wrapper });
+    // Should include base theme + both custom themes
+    expect(result.current.parsedElements.length).toBeGreaterThan(2);
+    expect(result.current.parsedElements.some(el => el.card?.backgroundColor === 'red')).toBe(true);
+    expect(result.current.parsedElements.some(el => el.card?.color === 'blue')).toBe(true);
   });
 });

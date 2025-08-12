@@ -20,6 +20,8 @@ const componentImportPaths = {
   PricingTable: () => import(/* webpackChunkName: "pricingTable" */ '../components/PricingTable'),
   Checkout: () => import(/* webpackChunkName: "checkout" */ '../components/Checkout'),
   SessionTasks: () => import(/* webpackChunkName: "sessionTasks" */ '../components/SessionTasks'),
+  TaskChooseOrganization: () =>
+    import(/* webpackChunkName: "taskChooseOrganization" */ '../components/SessionTasks/tasks/TaskChooseOrganization'),
   PlanDetails: () => import(/* webpackChunkName: "planDetails" */ '../components/Plans/PlanDetails'),
   SubscriptionDetails: () => import(/* webpackChunkName: "subscriptionDetails" */ '../components/SubscriptionDetails'),
   APIKeys: () => import(/* webpackChunkName: "apiKeys" */ '../components/ApiKeys/ApiKeys'),
@@ -103,6 +105,10 @@ export const APIKeys = lazy(() => componentImportPaths.APIKeys().then(module => 
 
 export const Checkout = lazy(() => componentImportPaths.Checkout().then(module => ({ default: module.Checkout })));
 
+export const TaskChooseOrganization = lazy(() =>
+  componentImportPaths.TaskChooseOrganization().then(module => ({ default: module.TaskChooseOrganization })),
+);
+
 export const PlanDetails = lazy(() =>
   componentImportPaths.PlanDetails().then(module => ({ default: module.PlanDetails })),
 );
@@ -149,6 +155,7 @@ export const ClerkComponents = {
   APIKeys,
   OAuthConsent,
   SubscriptionDetails,
+  TaskChooseOrganization,
 };
 
 export type ClerkComponentName = keyof typeof ClerkComponents;

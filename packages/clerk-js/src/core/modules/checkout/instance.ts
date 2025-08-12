@@ -24,7 +24,7 @@ function createCheckoutInstance(
 ): __experimental_CheckoutInstance {
   const { for: forOrganization, planId, planPeriod } = options;
 
-  if (!clerk.user) {
+  if (!clerk.isSignedIn || !clerk.user) {
     throw new Error('Clerk: User is not authenticated');
   }
 
@@ -64,7 +64,7 @@ function createCheckoutInstance(
 
   const finalize = (params?: { redirectUrl: string }) => {
     const { redirectUrl } = params || {};
-    void clerk.setActive({ session: clerk.session?.id, redirectUrl });
+    return clerk.setActive({ session: clerk.session?.id, redirectUrl });
   };
 
   const clear = () => manager.clearCheckout();

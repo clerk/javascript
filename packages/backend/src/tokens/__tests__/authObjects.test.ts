@@ -346,27 +346,26 @@ describe('authenticatedMachineObject', () => {
 
   describe('Machine Token authentication', () => {
     const debugData = { foo: 'bar' };
-    const token = mockTokens.machine_token;
-    const verificationResult = mockVerificationResults.machine_token;
+    const token = mockTokens.m2m_token;
+    const verificationResult = mockVerificationResults.m2m_token;
 
     it('getToken returns the token passed in', async () => {
-      const authObject = authenticatedMachineObject('machine_token', token, verificationResult, debugData);
+      const authObject = authenticatedMachineObject('m2m_token', token, verificationResult, debugData);
       const retrievedToken = await authObject.getToken();
       expect(retrievedToken).toBe(token);
     });
 
     it('has() always returns false', () => {
-      const authObject = authenticatedMachineObject('machine_token', token, verificationResult, debugData);
+      const authObject = authenticatedMachineObject('m2m_token', token, verificationResult, debugData);
       expect(authObject.has({})).toBe(false);
     });
 
     it('properly initializes properties', () => {
-      const authObject = authenticatedMachineObject('machine_token', token, verificationResult, debugData);
-      expect(authObject.tokenType).toBe('machine_token');
+      const authObject = authenticatedMachineObject('m2m_token', token, verificationResult, debugData);
+      expect(authObject.tokenType).toBe('m2m_token');
       expect(authObject.id).toBe('m2m_ey966f1b1xf93586b2debdcadb0b3bd1');
       expect(authObject.subject).toBe('mch_2vYVtestTESTtestTESTtestTESTtest');
-      expect(authObject.scopes).toEqual(['read:foo', 'write:bar']);
-      expect(authObject.claims).toEqual({ foo: 'bar' });
+      expect(authObject.scopes).toEqual(['mch_1xxxxx', 'mch_2xxxxx']);
       expect(authObject.machineId).toBe('mch_2vYVtestTESTtestTESTtestTESTtest');
     });
   });
@@ -374,22 +373,20 @@ describe('authenticatedMachineObject', () => {
 
 describe('unauthenticatedMachineObject', () => {
   it('properly initializes properties', () => {
-    const authObject = unauthenticatedMachineObject('machine_token');
-    expect(authObject.tokenType).toBe('machine_token');
+    const authObject = unauthenticatedMachineObject('m2m_token');
+    expect(authObject.tokenType).toBe('m2m_token');
     expect(authObject.id).toBeNull();
-    expect(authObject.name).toBeNull();
     expect(authObject.subject).toBeNull();
     expect(authObject.scopes).toBeNull();
-    expect(authObject.claims).toBeNull();
   });
 
   it('has() always returns false', () => {
-    const authObject = unauthenticatedMachineObject('machine_token');
+    const authObject = unauthenticatedMachineObject('m2m_token');
     expect(authObject.has({})).toBe(false);
   });
 
   it('getToken always returns null ', async () => {
-    const authObject = unauthenticatedMachineObject('machine_token');
+    const authObject = unauthenticatedMachineObject('m2m_token');
     const retrievedToken = await authObject.getToken();
     expect(retrievedToken).toBeNull();
   });
@@ -413,7 +410,7 @@ describe('getAuthObjectForAcceptedToken', () => {
   it('returns InvalidTokenAuthObject if acceptsToken is array and token type does not match', () => {
     const result = getAuthObjectForAcceptedToken({
       authObject: machineAuth,
-      acceptsToken: ['machine_token', 'oauth_token'],
+      acceptsToken: ['m2m_token', 'oauth_token'],
     });
     expect((result as InvalidTokenAuthObject).tokenType).toBeNull();
     expect((result as InvalidTokenAuthObject).isAuthenticated).toBe(false);
@@ -432,9 +429,9 @@ describe('getAuthObjectForAcceptedToken', () => {
   });
 
   it('returns unauthenticated object for requested type if acceptsToken is a single value and does not match', () => {
-    const result = getAuthObjectForAcceptedToken({ authObject: machineAuth, acceptsToken: 'machine_token' });
-    expect((result as UnauthenticatedMachineObject<'machine_token'>).tokenType).toBe('machine_token');
-    expect((result as UnauthenticatedMachineObject<'machine_token'>).id).toBeNull();
+    const result = getAuthObjectForAcceptedToken({ authObject: machineAuth, acceptsToken: 'm2m_token' });
+    expect((result as UnauthenticatedMachineObject<'m2m_token'>).tokenType).toBe('m2m_token');
+    expect((result as UnauthenticatedMachineObject<'m2m_token'>).id).toBeNull();
   });
 });
 
