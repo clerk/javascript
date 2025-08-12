@@ -1,5 +1,25 @@
 # Change Log
 
+## 4.75.0
+
+### Minor Changes
+
+- [Billing Beta] Cleanup naming inconsistencies in billing dates. ([#6513](https://github.com/clerk/javascript/pull/6513)) by [@panteliselef](https://github.com/panteliselef)
+
+  ## Migration
+
+  - subscriptionItem.periodStartDate → subscriptionItem.periodStart
+  - subscriptionItem.periodEndDate → subscriptionItem.periodEnd
+  - subscriptionItem.canceledAtDate → subscriptionItem.canceledAt
+
+- [Experimental] Signal Errors ([#6495](https://github.com/clerk/javascript/pull/6495)) by [@dstaley](https://github.com/dstaley)
+
+- Remove `treatPendingAsSignedOut` from Clerk options ([#6497](https://github.com/clerk/javascript/pull/6497)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Add `legalAcceptedAt` to UserResource accessible by `Clerk.user` and `useUser()`. ([#6517](https://github.com/clerk/javascript/pull/6517)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
 ## 4.74.0
 
 ### Minor Changes
