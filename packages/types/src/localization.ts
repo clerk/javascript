@@ -242,10 +242,12 @@ export type __internal_LocalizationResource = {
       title: LocalizationValue;
       title__paymentSuccessful: LocalizationValue;
       title__subscriptionSuccessful: LocalizationValue;
+      title__trialSuccess: LocalizationValue;
       description__paymentSuccessful: LocalizationValue;
       description__subscriptionSuccessful: LocalizationValue;
       lineItems: {
         title__totalPaid: LocalizationValue;
+        title__freeTrialEndsAt: LocalizationValue;
         title__paymentMethod: LocalizationValue;
         title__statementId: LocalizationValue;
         title__subscriptionBegins: LocalizationValue;
