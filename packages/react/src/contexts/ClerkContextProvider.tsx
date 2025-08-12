@@ -6,7 +6,7 @@ import {
   SessionContext,
   UserContext,
 } from '@clerk/shared/react';
-import { analyzeThemeUsage, eventThemeUsage } from '@clerk/shared/telemetry';
+import { eventThemeUsage } from '@clerk/shared/telemetry';
 import type { ClientResource, InitialState, Resources } from '@clerk/types';
 import React from 'react';
 
@@ -123,8 +123,7 @@ const useLoadedIsomorphicClerk = (options: IsomorphicClerkOptions) => {
   // Record theme usage telemetry when appearance changes
   React.useEffect(() => {
     if (options.appearance && isomorphicClerkRef.current.telemetry) {
-      const themeAnalysis = analyzeThemeUsage(options.appearance);
-      isomorphicClerkRef.current.telemetry.record(eventThemeUsage(themeAnalysis));
+      isomorphicClerkRef.current.telemetry.record(eventThemeUsage(options.appearance));
     }
   }, [options.appearance]);
 

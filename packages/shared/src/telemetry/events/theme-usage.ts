@@ -1,4 +1,4 @@
-import type { TelemetryEventRaw } from '@clerk/types';
+import type { Appearance, BaseTheme, TelemetryEventRaw } from '@clerk/types';
 
 const EVENT_THEME_USAGE = 'THEME_USAGE';
 const EVENT_SAMPLING_RATE = 0.1;
@@ -13,14 +13,71 @@ type EventThemeUsage = {
 /**
  * Helper function for `telemetry.record()`. Create a consistent event object for tracking theme usage in ClerkProvider.
  *
- * @param payload - Theme usage data to track.
+ * @param appearance - The appearance prop from ClerkProvider.
  * @example
- * telemetry.record(eventThemeUsage({ themeName: 'shadcn' }));
+ * telemetry.record(eventThemeUsage(appearance));
  */
-export function eventThemeUsage(payload: EventThemeUsage): TelemetryEventRaw<EventThemeUsage> {
+export function eventThemeUsage(appearance?: Appearance): TelemetryEventRaw<EventThemeUsage> {
+  const payload = analyzeThemeUsage(appearance);
+
   return {
     event: EVENT_THEME_USAGE,
     eventSamplingRate: EVENT_SAMPLING_RATE,
     payload,
   };
+}
+
+/**
+ * Analyzes the appearance prop to extract theme usage information for telemetry.
+ *
+ * @internal
+ */
+function analyzeThemeUsage(appearance?: Appearance): EventThemeUsage {
+  if (!appearance || typeof appearance !== 'object') {
+    return {};
+  }
+
+  // Prioritize the new theme property over deprecated baseTheme
+  const themeProperty = appearance.theme || appearance.baseTheme;
+
+  if (!themeProperty) {
+    return {};
+  }
+
+  let themeName: string | undefined;
+
+  if (Array.isArray(themeProperty)) {
+    // Look for the first identifiable theme name in the array
+    for (const theme of themeProperty) {
+      const name = extractThemeName(theme);
+      if (name) {
+        themeName = name;
+        break;
+      }
+    }
+  } else {
+    themeName = extractThemeName(themeProperty);
+  }
+
+  return { themeName };
+}
+
+/**
+ * Extracts the theme name from a theme object.
+ *
+ * @internal
+ */
+function extractThemeName(theme: BaseTheme): string | undefined {
+  if (typeof theme === 'string') {
+    return theme;
+  }
+
+  if (typeof theme === 'object' && theme !== null) {
+    // Check for explicit theme name
+    if ('__themeName' in theme && typeof theme.__themeName === 'string') {
+      return theme.__themeName;
+    }
+  }
+
+  return undefined;
 }
