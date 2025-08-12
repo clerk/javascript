@@ -213,8 +213,14 @@ export const usePlansContext = () => {
       const isEligibleForSwitchToAnnual = (plan?.annualMonthlyAmount ?? 0) > 0;
 
       const freeTrialOr = (localizationKey: LocalizationKey): LocalizationKey => {
-        if (plan?.freeTrialEnabled && topLevelSubscription?.eligibleForFreeTrial) {
-          return localizationKeys('commerce.startFreeTrial', { days: plan.freeTrialDays ?? 0 });
+        if (plan?.freeTrialEnabled) {
+          // Show trial CTA if user is signed out OR if signed in and eligible for free trial
+          const isSignedOut = !session;
+          const isEligibleForTrial = topLevelSubscription?.eligibleForFreeTrial;
+
+          if (isSignedOut || isEligibleForTrial) {
+            return localizationKeys('commerce.startFreeTrial', { days: plan.freeTrialDays ?? 0 });
+          }
         }
         return localizationKey;
       };
