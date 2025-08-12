@@ -47,6 +47,7 @@ export function OAuthConsentInternal() {
                     src={oAuthApplicationLogoUrl}
                     alt={oAuthApplicationName}
                     href={oAuthApplicationUrl}
+                    isExternal
                   />
                 </ConnectionItem>
                 <ConnectionSeparator />
@@ -67,6 +68,7 @@ export function OAuthConsentInternal() {
                     src={oAuthApplicationLogoUrl}
                     alt={oAuthApplicationName}
                     href={oAuthApplicationUrl}
+                    isExternal
                   />
                   <ConnectionIcon
                     size='sm'
