@@ -7,7 +7,7 @@ import { Tooltip } from '@/ui/elements/Tooltip';
 import { getClosestProfileScrollBox } from '@/ui/utils/getClosestProfileScrollBox';
 
 import { useProtect } from '../../common';
-import { usePlansContext, usePricingTableContext, useSubscriberTypeContext } from '../../contexts';
+import { normalizeFormatted, usePlansContext, usePricingTableContext, useSubscriberTypeContext } from '../../contexts';
 import {
   Box,
   Button,
@@ -144,7 +144,7 @@ function Card(props: CardProps) {
     if (subscription.canceledAt) {
       shouldShowFooter = true;
       shouldShowFooterNotice = false;
-    } else if (planPeriod !== subscription.planPeriod && plan.annualMonthlyAmount > 0) {
+    } else if (planPeriod !== subscription.planPeriod && plan.annualMonthlyFee.amount > 0) {
       shouldShowFooter = true;
       shouldShowFooterNotice = false;
     } else if (plan.freeTrialEnabled && subscription.isFreeTrial) {
@@ -295,14 +295,20 @@ interface CardHeaderProps {
 
 const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref) => {
   const { plan, isCompact, planPeriod, setPlanPeriod, badge } = props;
-  const { name, annualMonthlyAmount } = plan;
+  const { name, annualMonthlyFee } = plan;
 
-  const getPlanFee = React.useMemo(() => {
-    if (annualMonthlyAmount <= 0) {
-      return plan.amountFormatted;
+  const planSupportsAnnual = annualMonthlyFee.amount > 0;
+
+  const fee = React.useMemo(() => {
+    if (!planSupportsAnnual) {
+      return plan.fee;
     }
-    return planPeriod === 'annual' ? plan.annualMonthlyAmountFormatted : plan.amountFormatted;
-  }, [annualMonthlyAmount, planPeriod, plan.amountFormatted, plan.annualMonthlyAmountFormatted]);
+    return planPeriod === 'annual' ? plan.annualMonthlyFee : plan.fee;
+  }, [planSupportsAnnual, planPeriod, plan.fee, plan.annualMonthlyFee]);
+
+  const feeFormatted = React.useMemo(() => {
+    return normalizeFormatted(fee.amountFormatted);
+  }, [fee.amountFormatted]);
 
   return (
     <Box
@@ -365,8 +371,8 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
           variant={isCompact ? 'h2' : 'h1'}
           colorScheme='body'
         >
-          {plan.currencySymbol}
-          {getPlanFee}
+          {fee.currencySymbol}
+          {feeFormatted}
         </Text>
         {!plan.isDefault ? (
           <Text
@@ -385,7 +391,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
         ) : null}
       </Flex>
 
-      {annualMonthlyAmount > 0 && setPlanPeriod ? (
+      {planSupportsAnnual && setPlanPeriod ? (
         <Box
           elementDescriptor={descriptors.pricingTableCardPeriodToggle}
           sx={t => ({
