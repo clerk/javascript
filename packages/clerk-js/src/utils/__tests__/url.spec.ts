@@ -175,6 +175,7 @@ describe('sanitizeHref(href)', () => {
     [null, null],
     [undefined, null],
     ['', null],
+    ['     ', null],
 
     // Safe relative URLs
     ['/path/to/page', '/path/to/page'],

@@ -304,7 +304,7 @@ export function hasBannedProtocol(val: string | URL) {
  * @param val - The URL to check
  * @returns True if the URL contains a banned protocol, false otherwise
  */
-export function hasBannedHrefProtocol(val: string | URL) {
+export function hasBannedHrefProtocol(val: string | URL): boolean {
   if (!isValidUrl(val)) {
     return false;
   }
@@ -321,7 +321,7 @@ export function hasBannedHrefProtocol(val: string | URL) {
  * @returns The sanitized href or null if dangerous
  */
 export function sanitizeHref(href: string | undefined | null): string | null {
-  if (!href) {
+  if (!href || href.trim() === '') {
     return null;
   }
 
