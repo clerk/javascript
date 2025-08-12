@@ -92,7 +92,7 @@ export const CheckoutForm = withCardStateProvider(() => {
             </LineItems.Group>
           )}
 
-          {freeTrialEndsAt && plan.freeTrialDays && (
+          {!!freeTrialEndsAt && !!plan.freeTrialDays && (
             <LineItems.Group variant='tertiary'>
               <LineItems.Title
                 title={localizationKeys('commerce.checkout.totalDueAfterTrial', {
