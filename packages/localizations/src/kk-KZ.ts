@@ -62,6 +62,7 @@ export const kkKZ: LocalizationResource = {
   badge__requiresAction: 'Әрекет қажет',
   badge__startsAt: "{{ date | shortDate('kk-KZ') }} күні басталады",
   badge__thisDevice: 'Осы құрылғы',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Расталмаған',
   badge__upcomingPlan: 'Алдағы жоспар',
   badge__userDevice: 'Пайдаланушы құрылғысы',
@@ -133,6 +134,7 @@ export const kkKZ: LocalizationResource = {
     },
     reSubscribe: 'Қайта жазылу',
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,

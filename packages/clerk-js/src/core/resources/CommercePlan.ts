@@ -24,6 +24,8 @@ export class CommercePlan extends BaseResource implements CommercePlanResource {
   slug!: string;
   avatarUrl!: string;
   features!: CommerceFeature[];
+  freeTrialDays!: number | null;
+  freeTrialEnabled!: boolean;
 
   constructor(data: CommercePlanJSON) {
     super();
@@ -48,6 +50,8 @@ export class CommercePlan extends BaseResource implements CommercePlanResource {
     this.publiclyVisible = data.publicly_visible;
     this.slug = data.slug;
     this.avatarUrl = data.avatar_url;
+    this.freeTrialDays = this.withDefault(data.free_trial_days, null);
+    this.freeTrialEnabled = this.withDefault(data.free_trial_enabled, false);
     this.features = (data.features || []).map(feature => new CommerceFeature(feature));
 
     return this;

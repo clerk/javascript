@@ -62,6 +62,7 @@ export const ptBR: LocalizationResource = {
   badge__requiresAction: 'Requer ação',
   badge__startsAt: "Inicia {{ date | shortDate('pt-BR') }}",
   badge__thisDevice: 'Este dispositivo',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Não verificado',
   badge__upcomingPlan: 'Próximo plano',
   badge__userDevice: 'Dispositivo do usuário',
@@ -137,6 +138,7 @@ export const ptBR: LocalizationResource = {
     },
     reSubscribe: 'Assinar novamente',
     seeAllFeatures: 'Ver todos os recursos',
+    startFreeTrial: undefined,
     subscribe: 'Assinar',
     subscriptionDetails: {
       beginsOn: undefined,

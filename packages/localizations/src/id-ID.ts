@@ -62,6 +62,7 @@ export const idID: LocalizationResource = {
   badge__requiresAction: 'Memerlukan tindakan',
   badge__startsAt: undefined,
   badge__thisDevice: 'Perangkat ini',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Belum diverifikasi',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Perangkat pengguna',
@@ -133,6 +134,7 @@ export const idID: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,

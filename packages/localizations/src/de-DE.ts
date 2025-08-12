@@ -62,6 +62,7 @@ export const deDE: LocalizationResource = {
   badge__requiresAction: 'Handlung erforderlich',
   badge__startsAt: "Startet am {{ date | shortDate('de-DE') }}",
   badge__thisDevice: 'Dieses Gerät',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Unbestätigt',
   badge__upcomingPlan: 'Bevorstehend',
   badge__userDevice: 'Benutzergerät',
@@ -136,6 +137,7 @@ export const deDE: LocalizationResource = {
     },
     reSubscribe: 'Erneut abonnieren',
     seeAllFeatures: 'Alle Funktionen anzeigen',
+    startFreeTrial: undefined,
     subscribe: 'Abonnieren',
     subscriptionDetails: {
       beginsOn: undefined,

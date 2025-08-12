@@ -62,6 +62,7 @@ export const bgBG: LocalizationResource = {
   badge__requiresAction: 'Изисква действие',
   badge__startsAt: undefined,
   badge__thisDevice: 'Това устройство',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Непотвърден',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Потребителско устройство',
@@ -133,6 +134,7 @@ export const bgBG: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,

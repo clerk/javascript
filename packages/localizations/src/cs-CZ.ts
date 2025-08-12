@@ -63,6 +63,7 @@ export const csCZ: LocalizationResource = {
   badge__requiresAction: 'Vyžaduje akci',
   badge__startsAt: "Začíná {{ date | shortDate('cs-CZ') }}",
   badge__thisDevice: 'Toto zařízení',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Nepotvrzené',
   badge__upcomingPlan: 'Nadcházející',
   badge__userDevice: 'Zařízení uživatele',
@@ -137,6 +138,7 @@ export const csCZ: LocalizationResource = {
     },
     reSubscribe: 'Znovu se přihlásit',
     seeAllFeatures: 'Zobrazit všechny funkce',
+    startFreeTrial: undefined,
     subscribe: 'Přihlásit se',
     subscriptionDetails: {
       beginsOn: 'Začíná dne',

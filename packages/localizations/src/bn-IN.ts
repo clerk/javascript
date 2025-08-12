@@ -62,6 +62,7 @@ export const bnIN: LocalizationResource = {
   badge__requiresAction: 'কর্ম প্রয়োজন',
   badge__startsAt: undefined,
   badge__thisDevice: 'এই ডিভাইস',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'অযাচাই',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'ব্যবহারকারীর ডিভাইস',
@@ -133,6 +134,7 @@ export const bnIN: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,

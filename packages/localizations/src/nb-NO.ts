@@ -62,6 +62,7 @@ export const nbNO: LocalizationResource = {
   badge__requiresAction: 'Krever handling',
   badge__startsAt: undefined,
   badge__thisDevice: 'Denne enheten',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Ikke verifisert',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Brukerens enhet',
@@ -133,6 +134,7 @@ export const nbNO: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,

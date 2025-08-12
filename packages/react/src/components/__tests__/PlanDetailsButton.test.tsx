@@ -57,6 +57,8 @@ const mockPlanResource: CommercePlanResource = {
   publiclyVisible: true,
   slug: 'test-plan',
   avatarUrl: 'https://example.com/avatar.png',
+  freeTrialDays: 0,
+  freeTrialEnabled: false,
   features: [],
   pathRoot: '',
   reload: vi.fn(),

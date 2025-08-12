@@ -62,6 +62,7 @@ export const huHU: LocalizationResource = {
   badge__requiresAction: 'Beavatkozás szükséges',
   badge__startsAt: undefined,
   badge__thisDevice: 'Ez az eszköz',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Nem ellenőrzött',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Felhasználói eszköz',
@@ -133,6 +134,7 @@ export const huHU: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,

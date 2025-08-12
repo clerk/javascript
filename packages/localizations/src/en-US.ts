@@ -51,6 +51,7 @@ export const enUS: LocalizationResource = {
   badge__requiresAction: 'Requires action',
   badge__startsAt: "Starts {{ date | shortDate('en-US') }}",
   badge__thisDevice: 'This device',
+  badge__trialEndsAt: "Trial ends {{ date | shortDate('en-US') }}",
   badge__unverified: 'Unverified',
   badge__upcomingPlan: 'Upcoming',
   badge__userDevice: 'User device',
@@ -126,6 +127,7 @@ export const enUS: LocalizationResource = {
     },
     reSubscribe: 'Resubscribe',
     seeAllFeatures: 'See all features',
+    startFreeTrial: 'Start {{days}}-day free trial',
     subscribe: 'Subscribe',
     subscriptionDetails: {
       beginsOn: 'Begins on',

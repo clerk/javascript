@@ -62,6 +62,7 @@ export const isIS: LocalizationResource = {
   badge__requiresAction: 'Krefst aðgerða',
   badge__startsAt: undefined,
   badge__thisDevice: 'Þetta tæki',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Óstaðfest',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Notendatæki',
@@ -133,6 +134,7 @@ export const isIS: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,

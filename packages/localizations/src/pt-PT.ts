@@ -62,6 +62,7 @@ export const ptPT: LocalizationResource = {
   badge__requiresAction: 'Requer ação',
   badge__startsAt: undefined,
   badge__thisDevice: 'Este dispositivo',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Não verificado',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Dispositivo do utilizador',
@@ -133,6 +134,7 @@ export const ptPT: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,

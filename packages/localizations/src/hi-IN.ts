@@ -62,6 +62,7 @@ export const hiIN: LocalizationResource = {
   badge__requiresAction: 'कार्रवाई की आवश्यकता है',
   badge__startsAt: undefined,
   badge__thisDevice: 'यह उपकरण',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'असत्यापित',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'उपयोगकर्ता उपकरण',
@@ -133,6 +134,7 @@ export const hiIN: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,
