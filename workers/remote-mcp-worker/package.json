@@ -13,7 +13,9 @@
     "build": "wrangler deploy --dry-run"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.0.0"
+    "@hono/mcp": "^0.1.1",
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "hono": "^4.9.1"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250204.0",
