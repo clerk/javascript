@@ -60,6 +60,15 @@ function assertSignInUrlFormatAndOrigin(_signInUrl: string, origin: string) {
   }
 }
 
+function assertMachineSecretOrSecretKey(authenticateContext: AuthenticateContext) {
+  if (!authenticateContext.machineSecretKey && !authenticateContext.secretKey) {
+    throw new Error(
+      'Machine token authentication requires either a Machine secret key or a Clerk secret key. ' +
+        'Ensure a Clerk secret key or Machine secret key is set.',
+    );
+  }
+}
+
 function isRequestEligibleForRefresh(
   err: TokenVerificationError,
   authenticateContext: { refreshTokenInCookie?: string },
@@ -79,8 +88,9 @@ function checkTokenTypeMismatch(
 ): UnauthenticatedState<MachineTokenType> | null {
   const mismatch = !isTokenTypeAccepted(parsedTokenType, acceptsToken);
   if (mismatch) {
+    const tokenTypeToReturn = (typeof acceptsToken === 'string' ? acceptsToken : parsedTokenType) as MachineTokenType;
     return signedOut({
-      tokenType: parsedTokenType,
+      tokenType: tokenTypeToReturn,
       authenticateContext,
       reason: AuthErrorReason.TokenTypeMismatch,
     });
@@ -139,17 +149,26 @@ export const authenticateRequest: AuthenticateRequest = (async (
   options: AuthenticateRequestOptions,
 ): Promise<RequestState<TokenType> | UnauthenticatedState<null>> => {
   const authenticateContext = await createAuthenticateContext(createClerkRequest(request), options);
-  assertValidSecretKey(authenticateContext.secretKey);
 
   // Default tokenType is session_token for backwards compatibility.
   const acceptsToken = options.acceptsToken ?? TokenType.SessionToken;
 
-  if (authenticateContext.isSatellite) {
-    assertSignInUrlExists(authenticateContext.signInUrl, authenticateContext.secretKey);
-    if (authenticateContext.signInUrl && authenticateContext.origin) {
-      assertSignInUrlFormatAndOrigin(authenticateContext.signInUrl, authenticateContext.origin);
+  // machine-to-machine tokens can accept a machine secret or a secret key
+  if (acceptsToken !== TokenType.M2MToken) {
+    assertValidSecretKey(authenticateContext.secretKey);
+
+    if (authenticateContext.isSatellite) {
+      assertSignInUrlExists(authenticateContext.signInUrl, authenticateContext.secretKey);
+      if (authenticateContext.signInUrl && authenticateContext.origin) {
+        assertSignInUrlFormatAndOrigin(authenticateContext.signInUrl, authenticateContext.origin);
+      }
+      assertProxyUrlOrDomain(authenticateContext.proxyUrl || authenticateContext.domain);
     }
-    assertProxyUrlOrDomain(authenticateContext.proxyUrl || authenticateContext.domain);
+  }
+
+  // Make sure a machine secret or instance secret key is provided if acceptsToken is m2m_token
+  if (acceptsToken === TokenType.M2MToken) {
+    assertMachineSecretOrSecretKey(authenticateContext);
   }
 
   const organizationMatcher = new OrganizationMatcher(options.organizationSyncOptions);
@@ -772,7 +791,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
   if (
     acceptsToken === TokenType.OAuthToken ||
     acceptsToken === TokenType.ApiKey ||
-    acceptsToken === TokenType.MachineToken
+    acceptsToken === TokenType.M2MToken
   ) {
     return signedOut({
       tokenType: acceptsToken,

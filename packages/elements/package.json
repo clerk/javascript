@@ -1,6 +1,6 @@
 {
   "name": "@clerk/elements",
-  "version": "0.23.48",
+  "version": "0.23.51",
   "description": "Clerk Elements",
   "keywords": [
     "clerk",
@@ -81,7 +81,7 @@
     "@xstate/react": "^6.0.0",
     "client-only": "^0.0.1",
     "tslib": "catalog:repo",
-    "xstate": "^5.20.1"
+    "xstate": "^5.20.2"
   },
   "devDependencies": {
     "@statelyai/inspect": "^0.4.0",

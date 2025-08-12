@@ -1,7 +1,7 @@
 import type { MatchFunction } from '@clerk/shared/pathToRegexp';
 import type { PendingSessionOptions } from '@clerk/types';
 
-import type { ApiClient, APIKey, IdPOAuthAccessToken, MachineToken } from '../api';
+import type { ApiClient, APIKey, IdPOAuthAccessToken, M2MToken } from '../api';
 import type {
   AuthenticatedMachineObject,
   AuthObject,
@@ -67,6 +67,11 @@ export type AuthenticateRequestOptions = {
    * @default 'session_token'
    */
   acceptsToken?: TokenType | TokenType[] | 'any';
+  /**
+   * The machine secret key to use when verifying machine-to-machine tokens.
+   * This will override the Clerk secret key.
+   */
+  machineSecretKey?: string;
 } & VerifyTokenOptions;
 
 /**
@@ -136,7 +141,7 @@ export type OrganizationSyncOptions = {
  */
 type Pattern = string;
 
-export type MachineAuthType = MachineToken | APIKey | IdPOAuthAccessToken;
+export type MachineAuthType = M2MToken | APIKey | IdPOAuthAccessToken;
 
 export type OrganizationSyncTargetMatchers = {
   OrganizationMatcher: MatchFunction<Partial<Record<string, string | string[]>>> | null;

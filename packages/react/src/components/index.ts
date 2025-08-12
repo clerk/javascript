@@ -8,7 +8,7 @@ export {
   PricingTable,
   SignIn,
   SignUp,
-  TaskSelectOrganization,
+  TaskChooseOrganization,
   UserButton,
   UserProfile,
   Waitlist,

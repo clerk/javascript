@@ -779,12 +779,14 @@ export interface CommerceSubscriptionItemJSON extends ClerkResourceJSON {
   status: CommerceSubscriptionStatus;
   created_at: number;
   period_start: number;
-  period_end: number;
+  /**
+   * Period end is `null` for subscription items that are on the free plan.
+   */
+  period_end: number | null;
   canceled_at: number | null;
   past_due_at: number | null;
-  // is_free_trial: boolean;
   // TODO(@COMMERCE): Remove optional after GA.
-  free_trial_ends_at?: number | null;
+  is_free_trial?: boolean;
 }
 
 /**

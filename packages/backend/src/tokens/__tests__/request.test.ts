@@ -1200,7 +1200,7 @@ describe('tokens.authenticateRequest(options)', () => {
     });
 
     // Test each token type with parameterized tests
-    const tokenTypes = [TokenType.ApiKey, TokenType.OAuthToken, TokenType.MachineToken];
+    const tokenTypes = [TokenType.ApiKey, TokenType.OAuthToken, TokenType.M2MToken];
 
     describe.each(tokenTypes)('%s Authentication', tokenType => {
       const mockToken = mockTokens[tokenType];
@@ -1242,6 +1242,34 @@ describe('tokens.authenticateRequest(options)', () => {
       });
     });
 
+    test('accepts machine secret when verifying machine-to-machine token', async () => {
+      server.use(
+        http.post(mockMachineAuthResponses.m2m_token.endpoint, ({ request }) => {
+          expect(request.headers.get('Authorization')).toBe('Bearer ak_xxxxx');
+          return HttpResponse.json(mockVerificationResults.m2m_token);
+        }),
+      );
+
+      const request = mockRequest({ authorization: `Bearer ${mockTokens.m2m_token}` });
+      const requestState = await authenticateRequest(
+        request,
+        mockOptions({ acceptsToken: 'm2m_token', machineSecretKey: 'ak_xxxxx' }),
+      );
+
+      expect(requestState).toBeMachineAuthenticated();
+    });
+
+    test('throws an error if acceptsToken is m2m_token but machineSecretKey or secretKey is not provided', async () => {
+      const request = mockRequest({ authorization: `Bearer ${mockTokens.m2m_token}` });
+
+      await expect(
+        authenticateRequest(request, mockOptions({ acceptsToken: 'm2m_token', secretKey: undefined })),
+      ).rejects.toThrow(
+        'Machine token authentication requires either a Machine secret key or a Clerk secret key. ' +
+          'Ensure a Clerk secret key or Machine secret key is set.',
+      );
+    });
+
     describe('Any Token Type Authentication', () => {
       test.each(tokenTypes)('accepts %s when acceptsToken is "any"', async tokenType => {
         const mockToken = mockTokens[tokenType];
@@ -1281,58 +1309,58 @@ describe('tokens.authenticateRequest(options)', () => {
         const result = await authenticateRequest(request, mockOptions({ acceptsToken: 'oauth_token' }));
 
         expect(result).toBeMachineUnauthenticated({
-          tokenType: 'api_key',
+          tokenType: 'oauth_token',
           reason: AuthErrorReason.TokenTypeMismatch,
           message: '',
         });
         expect(result.toAuth()).toBeMachineUnauthenticatedToAuth({
-          tokenType: 'api_key',
+          tokenType: 'oauth_token',
           isAuthenticated: false,
         });
       });
 
       test('returns unauthenticated state when token type mismatches (OAuth token provided, M2M token expected)', async () => {
         const request = mockRequest({ authorization: `Bearer ${mockTokens.oauth_token}` });
-        const result = await authenticateRequest(request, mockOptions({ acceptsToken: 'machine_token' }));
+        const result = await authenticateRequest(request, mockOptions({ acceptsToken: 'm2m_token' }));
 
         expect(result).toBeMachineUnauthenticated({
-          tokenType: 'oauth_token',
+          tokenType: 'm2m_token',
           reason: AuthErrorReason.TokenTypeMismatch,
           message: '',
         });
         expect(result.toAuth()).toBeMachineUnauthenticatedToAuth({
-          tokenType: 'oauth_token',
+          tokenType: 'm2m_token',
           isAuthenticated: false,
         });
       });
 
       test('returns unauthenticated state when token type mismatches (M2M token provided, API key expected)', async () => {
-        const request = mockRequest({ authorization: `Bearer ${mockTokens.machine_token}` });
+        const request = mockRequest({ authorization: `Bearer ${mockTokens.m2m_token}` });
         const result = await authenticateRequest(request, mockOptions({ acceptsToken: 'api_key' }));
 
         expect(result).toBeMachineUnauthenticated({
-          tokenType: 'machine_token',
+          tokenType: 'api_key',
           reason: AuthErrorReason.TokenTypeMismatch,
           message: '',
         });
         expect(result.toAuth()).toBeMachineUnauthenticatedToAuth({
-          tokenType: 'machine_token',
+          tokenType: 'api_key',
           isAuthenticated: false,
         });
       });
 
       test('returns unauthenticated state when session token is provided but machine token is expected', async () => {
         const request = mockRequestWithHeaderAuth();
-        const result = await authenticateRequest(request, mockOptions({ acceptsToken: 'machine_token' }));
+        const result = await authenticateRequest(request, mockOptions({ acceptsToken: 'm2m_token' }));
 
         expect(result).toBeMachineUnauthenticated({
-          tokenType: 'machine_token',
+          tokenType: 'm2m_token',
           reason: AuthErrorReason.TokenTypeMismatch,
           message: '',
           isAuthenticated: false,
         });
         expect(result.toAuth()).toBeMachineUnauthenticatedToAuth({
-          tokenType: 'machine_token',
+          tokenType: 'm2m_token',
           isAuthenticated: false,
         });
       });
@@ -1356,7 +1384,7 @@ describe('tokens.authenticateRequest(options)', () => {
       });
 
       test('returns unauthenticated state when token type is not in the acceptsToken array', async () => {
-        const request = mockRequest({ authorization: `Bearer ${mockTokens.machine_token}` });
+        const request = mockRequest({ authorization: `Bearer ${mockTokens.m2m_token}` });
         const requestState = await authenticateRequest(
           request,
           mockOptions({ acceptsToken: ['api_key', 'oauth_token'] }),

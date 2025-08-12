@@ -141,7 +141,7 @@ function Card(props: CardProps) {
     shouldShowFooter = true;
     shouldShowFooterNotice = true;
   } else if (subscription.status === 'active') {
-    if (subscription.canceledAtDate) {
+    if (subscription.canceledAt) {
       shouldShowFooter = true;
       shouldShowFooterNotice = false;
     } else if (planPeriod !== subscription.planPeriod && plan.annualMonthlyAmount > 0) {

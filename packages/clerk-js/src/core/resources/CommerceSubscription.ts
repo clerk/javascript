@@ -64,13 +64,10 @@ export class CommerceSubscriptionItem extends BaseResource implements CommerceSu
   planPeriod!: CommerceSubscriptionPlanPeriod;
   status!: CommerceSubscriptionStatus;
   createdAt!: Date;
+  periodStart!: Date;
+  periodEnd!: Date | null;
+  canceledAt!: Date | null;
   pastDueAt!: Date | null;
-  periodStartDate!: Date;
-  periodEndDate!: Date | null;
-  canceledAtDate!: Date | null;
-  periodStart!: number;
-  periodEnd!: number;
-  canceledAt!: number | null;
   //TODO(@COMMERCE): Why can this be undefined ?
   amount?: CommerceMoney;
   credit?: {
@@ -93,21 +90,18 @@ export class CommerceSubscriptionItem extends BaseResource implements CommerceSu
     this.plan = new CommercePlan(data.plan);
     this.planPeriod = data.plan_period;
     this.status = data.status;
-    this.periodStart = data.period_start;
-    this.periodEnd = data.period_end;
-    this.canceledAt = data.canceled_at;
 
     this.createdAt = unixEpochToDate(data.created_at);
     this.pastDueAt = data.past_due_at ? unixEpochToDate(data.past_due_at) : null;
 
-    this.periodStartDate = unixEpochToDate(data.period_start);
-    this.periodEndDate = data.period_end ? unixEpochToDate(data.period_end) : null;
-    this.canceledAtDate = data.canceled_at ? unixEpochToDate(data.canceled_at) : null;
+    this.periodStart = unixEpochToDate(data.period_start);
+    this.periodEnd = data.period_end ? unixEpochToDate(data.period_end) : null;
+    this.canceledAt = data.canceled_at ? unixEpochToDate(data.canceled_at) : null;
 
     this.amount = data.amount ? commerceMoneyFromJSON(data.amount) : undefined;
     this.credit = data.credit && data.credit.amount ? { amount: commerceMoneyFromJSON(data.credit.amount) } : undefined;
 
-    this.freeTrialEndsAt = data.free_trial_ends_at ? unixEpochToDate(data.free_trial_ends_at) : null;
+    this.isFreeTrial = this.withDefault(data.is_free_trial, false);
     return this;
   }
 
