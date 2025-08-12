@@ -1208,8 +1208,7 @@ export type SetActiveParams = {
   /**
    * A custom navigation function to be called just before the session and/or organization is set.
    *
-   * When provided, it takes precedence
-   * over the `redirectUrl` parameter for navigation.
+   * When provided, it takes precedence over the `redirectUrl` parameter for navigation.
    *
    * @example
    * ```typescript

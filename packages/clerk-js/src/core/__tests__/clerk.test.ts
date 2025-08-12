@@ -1033,7 +1033,7 @@ describe('Clerk singleton', () => {
         await sut.handleRedirectCallback();
 
         await waitFor(() => {
-          expect(mockNavigate.mock.calls[0][0]).toBe('/sign-in#/tasks/choose-organization');
+          expect(mockNavigate.mock.calls[0][0]).toBe('/sign-up#/tasks/choose-organization');
         });
       });
     });

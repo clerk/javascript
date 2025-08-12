@@ -28,9 +28,9 @@ import type {
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
+  Clerk as ClerkInterface,
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
-  Clerk as ClerkInterface,
   ClerkOptions,
   ClientJSONSnapshot,
   ClientResource,
@@ -1755,8 +1755,6 @@ export class Clerk implements ClerkInterface {
       navigate: (to: string) => Promise<unknown>;
     },
   ): Promise<unknown> => {
-    debugger;
-
     if (!this.loaded || !this.environment || !this.client) {
       return;
     }
@@ -2006,10 +2004,7 @@ export class Clerk implements ClerkInterface {
     }
 
     if (this.session?.currentTask) {
-      await navigateIfTaskExists(this.session, {
-        baseUrl: params.signInUrl ?? displayConfig.signInUrl,
-        navigate: this.navigate,
-      });
+      await this.redirectToTasks();
       return;
     }
 

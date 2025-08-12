@@ -41,8 +41,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
       });
       const users = createUserService(client);
       await users.deleteIfExists({ email: fakeUserForOAuth.email });
-      // Delete OAuth user from `with-session-tasks` instance
-      await u.services.users.deleteIfExists({ email: fakeUserForOAuth.email });
 
       await app.teardown();
     });

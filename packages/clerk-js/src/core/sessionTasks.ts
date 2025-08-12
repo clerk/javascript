@@ -13,6 +13,11 @@ export const INTERNAL_SESSION_TASK_ROUTE_BY_KEY: Record<SessionTask['key'], stri
 /**
  * @internal
  */
+export const getTaskEndpoint = (task: SessionTask) => `/tasks/${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[task.key]}`;
+
+/**
+ * @internal
+ */
 export function buildTaskUrl(task: SessionTask, opts: Pick<Parameters<typeof buildURL>[0], 'base'>) {
   const params = forwardClerkQueryParams();
 
