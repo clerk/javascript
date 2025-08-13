@@ -307,7 +307,7 @@ describe('Checkout', () => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
     });
 
-    const freeTrialEndsAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
+    const freeTrialEndsAt = new Date('2025-08-19');
 
     fixtures.clerk.billing.startCheckout.mockResolvedValue({
       id: 'chk_trial_1',
@@ -329,14 +329,24 @@ describe('Checkout', () => {
         name: 'Pro',
         description: 'Pro plan',
         features: [],
-        amount: 1000,
-        amountFormatted: '10.00',
-        annualAmount: 12000,
-        annualAmountFormatted: '120.00',
-        annualMonthlyAmount: 1000,
-        annualMonthlyAmountFormatted: '10.00',
-        currency: 'USD',
-        currencySymbol: '$',
+        fee: {
+          amount: 1000,
+          amountFormatted: '10.00',
+          currency: 'USD',
+          currencySymbol: '$',
+        },
+        annualFee: {
+          amount: 12000,
+          amountFormatted: '120.00',
+          currency: 'USD',
+          currencySymbol: '$',
+        },
+        annualMonthlyFee: {
+          amount: 1000,
+          amountFormatted: '10.00',
+          currency: 'USD',
+          currencySymbol: '$',
+        },
         slug: 'pro',
         avatarUrl: '',
         publiclyVisible: true,
@@ -346,7 +356,6 @@ describe('Checkout', () => {
         forPayerType: 'user',
         freeTrialDays: 14,
         freeTrialEnabled: true,
-        __internal_toSnapshot: () => ({}) as any,
       },
       paymentSource: undefined,
       confirm: jest.fn(),
@@ -381,7 +390,7 @@ describe('Checkout', () => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
     });
 
-    const freeTrialEndsAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    const freeTrialEndsAt = new Date('2025-08-19');
 
     fixtures.clerk.billing.startCheckout.mockResolvedValue({
       id: 'chk_trial_2',
@@ -403,14 +412,24 @@ describe('Checkout', () => {
         name: 'Pro',
         description: 'Pro plan',
         features: [],
-        amount: 1000,
-        amountFormatted: '10.00',
-        annualAmount: 12000,
-        annualAmountFormatted: '120.00',
-        annualMonthlyAmount: 1000,
-        annualMonthlyAmountFormatted: '10.00',
-        currency: 'USD',
-        currencySymbol: '$',
+        fee: {
+          amount: 1000,
+          amountFormatted: '10.00',
+          currency: 'USD',
+          currencySymbol: '$',
+        },
+        annualFee: {
+          amount: 12000,
+          amountFormatted: '120.00',
+          currency: 'USD',
+          currencySymbol: '$',
+        },
+        annualMonthlyFee: {
+          amount: 1000,
+          amountFormatted: '10.00',
+          currency: 'USD',
+          currencySymbol: '$',
+        },
         slug: 'pro',
         avatarUrl: '',
         publiclyVisible: true,
@@ -420,7 +439,6 @@ describe('Checkout', () => {
         forPayerType: 'user',
         freeTrialDays: 7,
         freeTrialEnabled: true,
-        __internal_toSnapshot: () => ({}) as any,
       },
       paymentSource: undefined,
       confirm: jest.fn(),
