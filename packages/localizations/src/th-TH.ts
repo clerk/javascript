@@ -54,6 +54,7 @@ export const thTH: LocalizationResource = {
   badge__default: 'ค่าเริ่มต้น',
   badge__endsAt: undefined,
   badge__expired: undefined,
+  badge__freeTrial: undefined,
   badge__otherImpersonatorDevice: 'อุปกรณ์ปลอมตัวอื่น',
   badge__pastDueAt: undefined,
   badge__pastDuePlan: undefined,
@@ -89,6 +90,7 @@ export const thTH: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
+        title__freeTrialEndsAt: undefined,
         title__paymentMethod: undefined,
         title__statementId: undefined,
         title__subscriptionBegins: undefined,
@@ -99,6 +101,8 @@ export const thTH: LocalizationResource = {
       title: undefined,
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
+      title__trialSuccess: undefined,
+      totalDueAfterTrial: undefined,
     },
     credit: undefined,
     creditRemainder: undefined,
@@ -135,6 +139,7 @@ export const thTH: LocalizationResource = {
     reSubscribe: undefined,
     seeAllFeatures: undefined,
     startFreeTrial: undefined,
+    startFreeTrial__days: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,

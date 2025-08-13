@@ -143,6 +143,7 @@ export type __internal_LocalizationResource = {
   badge__unverified: LocalizationValue;
   badge__requiresAction: LocalizationValue;
   badge__you: LocalizationValue;
+  badge__freeTrial: LocalizationValue;
   badge__currentPlan: LocalizationValue;
   badge__upcomingPlan: LocalizationValue;
   badge__activePlan: LocalizationValue;
@@ -175,7 +176,8 @@ export type __internal_LocalizationResource = {
     keepSubscription: LocalizationValue;
     reSubscribe: LocalizationValue;
     subscribe: LocalizationValue;
-    startFreeTrial: LocalizationValue<'days'>;
+    startFreeTrial: LocalizationValue;
+    startFreeTrial__days: LocalizationValue<'days'>;
     switchPlan: LocalizationValue;
     switchToMonthly: LocalizationValue;
     switchToAnnual: LocalizationValue;
@@ -240,10 +242,12 @@ export type __internal_LocalizationResource = {
       title: LocalizationValue;
       title__paymentSuccessful: LocalizationValue;
       title__subscriptionSuccessful: LocalizationValue;
+      title__trialSuccess: LocalizationValue;
       description__paymentSuccessful: LocalizationValue;
       description__subscriptionSuccessful: LocalizationValue;
       lineItems: {
         title__totalPaid: LocalizationValue;
+        title__freeTrialEndsAt: LocalizationValue;
         title__paymentMethod: LocalizationValue;
         title__statementId: LocalizationValue;
         title__subscriptionBegins: LocalizationValue;
@@ -254,6 +258,7 @@ export type __internal_LocalizationResource = {
       };
       downgradeNotice: LocalizationValue;
       pastDueNotice: LocalizationValue;
+      totalDueAfterTrial: LocalizationValue<'days'>;
       perMonth: LocalizationValue;
     };
   };

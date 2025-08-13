@@ -54,6 +54,7 @@ export const esMX: LocalizationResource = {
   badge__default: 'Por defecto',
   badge__endsAt: "Termina {{ date | shortDate('en-US') }}",
   badge__expired: 'Caducado',
+  badge__freeTrial: undefined,
   badge__otherImpersonatorDevice: 'Otro dispositivo de imitación',
   badge__pastDueAt: undefined,
   badge__pastDuePlan: undefined,
@@ -89,6 +90,7 @@ export const esMX: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
+        title__freeTrialEndsAt: undefined,
         title__paymentMethod: 'Método de pago',
         title__statementId: 'Número de factura',
         title__subscriptionBegins: 'La suscripción empieza',
@@ -99,6 +101,8 @@ export const esMX: LocalizationResource = {
       title: undefined,
       title__paymentSuccessful: '¡Pago exitoso!',
       title__subscriptionSuccessful: '¡Éxito!',
+      title__trialSuccess: undefined,
+      totalDueAfterTrial: undefined,
     },
     credit: undefined,
     creditRemainder: undefined,
@@ -135,6 +139,7 @@ export const esMX: LocalizationResource = {
     reSubscribe: 'Re-suscribirse',
     seeAllFeatures: undefined,
     startFreeTrial: undefined,
+    startFreeTrial__days: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,

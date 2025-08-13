@@ -884,6 +884,8 @@ export interface CommerceCheckoutJSON extends ClerkResourceJSON {
   status: 'needs_confirmation' | 'completed';
   totals: CommerceCheckoutTotalsJSON;
   is_immediate_plan_change: boolean;
+  // TODO(@COMMERCE): Remove optional after GA.
+  free_trial_ends_at?: number | null;
 }
 
 export interface ApiKeyJSON extends ClerkResourceJSON {

@@ -226,7 +226,7 @@ export const usePlansContext = () => {
           const isEligibleForTrial = topLevelSubscription?.eligibleForFreeTrial;
 
           if (isSignedOut || isEligibleForTrial) {
-            return localizationKeys('commerce.startFreeTrial', { days: plan.freeTrialDays ?? 0 });
+            return localizationKeys('commerce.startFreeTrial__days', { days: plan.freeTrialDays ?? 0 });
           }
         }
         return localizationKey;

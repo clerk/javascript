@@ -54,6 +54,7 @@ export const deDE: LocalizationResource = {
   badge__default: 'Standard',
   badge__endsAt: "Endet am {{ date | shortDate('de-DE') }}",
   badge__expired: 'Abgelaufen',
+  badge__freeTrial: undefined,
   badge__otherImpersonatorDevice: 'Anderes Imitationsgerät',
   badge__pastDueAt: undefined,
   badge__pastDuePlan: undefined,
@@ -92,6 +93,7 @@ export const deDE: LocalizationResource = {
         title: 'E-Mail-Adresse hinzufügen',
       },
       lineItems: {
+        title__freeTrialEndsAt: undefined,
         title__paymentMethod: 'Bezahlmethode',
         title__statementId: 'Statement-ID',
         title__subscriptionBegins: 'Abonnement beginnt',
@@ -102,6 +104,8 @@ export const deDE: LocalizationResource = {
       title: 'Bezahlung',
       title__paymentSuccessful: 'Zahlung erfolgreich!',
       title__subscriptionSuccessful: 'Geschafft!',
+      title__trialSuccess: undefined,
+      totalDueAfterTrial: undefined,
     },
     credit: undefined,
     creditRemainder: 'Verbleibendes Guthaben für den restlichen Abrechnungszeitraum.',
@@ -138,6 +142,7 @@ export const deDE: LocalizationResource = {
     reSubscribe: 'Erneut abonnieren',
     seeAllFeatures: 'Alle Funktionen anzeigen',
     startFreeTrial: undefined,
+    startFreeTrial__days: undefined,
     subscribe: 'Abonnieren',
     subscriptionDetails: {
       beginsOn: undefined,

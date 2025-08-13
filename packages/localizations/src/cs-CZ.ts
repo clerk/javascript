@@ -55,6 +55,7 @@ export const csCZ: LocalizationResource = {
   badge__default: 'Výchozí',
   badge__endsAt: "Končí {{ date | shortDate('cs-CZ') }}",
   badge__expired: 'Vypršelo',
+  badge__freeTrial: undefined,
   badge__otherImpersonatorDevice: 'Jiné zařízení pro simulaci',
   badge__pastDueAt: "Po splatnosti {{ date | shortDate('cs-CZ') }}",
   badge__pastDuePlan: 'Po splatnosti',
@@ -93,6 +94,7 @@ export const csCZ: LocalizationResource = {
         title: 'Přidat e-mailovou adresu',
       },
       lineItems: {
+        title__freeTrialEndsAt: undefined,
         title__paymentMethod: 'Platební metoda',
         title__statementId: 'ID výpisu',
         title__subscriptionBegins: 'Předplatné začíná',
@@ -103,6 +105,8 @@ export const csCZ: LocalizationResource = {
       title: 'Pokladna',
       title__paymentSuccessful: 'Platba byla úspěšná!',
       title__subscriptionSuccessful: 'Úspěch!',
+      title__trialSuccess: undefined,
+      totalDueAfterTrial: undefined,
     },
     credit: 'Kredit',
     creditRemainder: 'Kredit za zbytek vašeho současného předplatného.',
@@ -139,6 +143,7 @@ export const csCZ: LocalizationResource = {
     reSubscribe: 'Znovu se přihlásit',
     seeAllFeatures: 'Zobrazit všechny funkce',
     startFreeTrial: undefined,
+    startFreeTrial__days: undefined,
     subscribe: 'Přihlásit se',
     subscriptionDetails: {
       beginsOn: 'Začíná dne',

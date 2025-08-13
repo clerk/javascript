@@ -1,6 +1,6 @@
 {
   "files": [
-    { "path": "./dist/clerk.js", "maxSize": "622KB" },
+    { "path": "./dist/clerk.js", "maxSize": "622.25KB" },
     { "path": "./dist/clerk.browser.js", "maxSize": "76KB" },
     { "path": "./dist/clerk.legacy.browser.js", "maxSize": "117KB" },
     { "path": "./dist/clerk.headless*.js", "maxSize": "58KB" },
@@ -23,7 +23,7 @@
     { "path": "./dist/waitlist*.js", "maxSize": "1.5KB" },
     { "path": "./dist/keylessPrompt*.js", "maxSize": "6.5KB" },
     { "path": "./dist/pricingTable*.js", "maxSize": "4.02KB" },
-    { "path": "./dist/checkout*.js", "maxSize": "8.5KB" },
+    { "path": "./dist/checkout*.js", "maxSize": "8.75KB" },
     { "path": "./dist/up-billing-page*.js", "maxSize": "3.0KB" },
     { "path": "./dist/op-billing-page*.js", "maxSize": "3.0KB" },
     { "path": "./dist/up-plans-page*.js", "maxSize": "1.0KB" },
