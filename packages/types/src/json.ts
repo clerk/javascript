@@ -632,6 +632,9 @@ export interface CommercePlanJSON extends ClerkResourceJSON {
   object: 'commerce_plan';
   id: string;
   name: string;
+  fee: CommerceMoneyAmountJSON;
+  annual_fee: CommerceMoneyAmountJSON;
+  annual_monthly_fee: CommerceMoneyAmountJSON;
   amount: number;
   amount_formatted: string;
   annual_amount: number;
@@ -649,6 +652,8 @@ export interface CommercePlanJSON extends ClerkResourceJSON {
   slug: string;
   avatar_url: string;
   features: CommerceFeatureJSON[];
+  free_trial_days?: number | null;
+  free_trial_enabled?: boolean;
 }
 
 /**
@@ -745,7 +750,7 @@ export interface CommerceStatementGroupJSON extends ClerkResourceJSON {
 export interface CommercePaymentJSON extends ClerkResourceJSON {
   object: 'commerce_payment';
   id: string;
-  amount: CommerceMoneyJSON;
+  amount: CommerceMoneyAmountJSON;
   paid_at?: number;
   failed_at?: number;
   updated_at: number;
@@ -767,9 +772,9 @@ export interface CommercePaymentJSON extends ClerkResourceJSON {
 export interface CommerceSubscriptionItemJSON extends ClerkResourceJSON {
   object: 'commerce_subscription_item';
   id: string;
-  amount?: CommerceMoneyJSON;
+  amount?: CommerceMoneyAmountJSON;
   credit?: {
-    amount: CommerceMoneyJSON;
+    amount: CommerceMoneyAmountJSON;
   };
   payment_source_id: string;
   plan: CommercePlanJSON;
@@ -777,9 +782,14 @@ export interface CommerceSubscriptionItemJSON extends ClerkResourceJSON {
   status: CommerceSubscriptionStatus;
   created_at: number;
   period_start: number;
-  period_end: number;
+  /**
+   * Period end is `null` for subscription items that are on the free plan.
+   */
+  period_end: number | null;
   canceled_at: number | null;
   past_due_at: number | null;
+  // TODO(@COMMERCE): Remove optional after GA.
+  is_free_trial?: boolean;
 }
 
 /**
@@ -797,7 +807,7 @@ export interface CommerceSubscriptionJSON extends ClerkResourceJSON {
    * Describes the details for the next payment cycle. It is `undefined` for subscription items that are cancelled or on the free plan.
    */
   next_payment?: {
-    amount: CommerceMoneyJSON;
+    amount: CommerceMoneyAmountJSON;
     date: number;
   };
   /**
@@ -809,6 +819,7 @@ export interface CommerceSubscriptionJSON extends ClerkResourceJSON {
   updated_at: number | null;
   past_due_at: number | null;
   subscription_items: CommerceSubscriptionItemJSON[] | null;
+  eligible_for_free_trial?: boolean;
 }
 
 /**
@@ -819,7 +830,7 @@ export interface CommerceSubscriptionJSON extends ClerkResourceJSON {
  * <ClerkProvider clerkJsVersion="x.x.x" />
  * ```
  */
-export interface CommerceMoneyJSON {
+export interface CommerceMoneyAmountJSON {
   amount: number;
   amount_formatted: string;
   currency: string;
@@ -835,11 +846,11 @@ export interface CommerceMoneyJSON {
  * ```
  */
 export interface CommerceCheckoutTotalsJSON {
-  grand_total: CommerceMoneyJSON;
-  subtotal: CommerceMoneyJSON;
-  tax_total: CommerceMoneyJSON;
-  total_due_now: CommerceMoneyJSON;
-  credit: CommerceMoneyJSON;
+  grand_total: CommerceMoneyAmountJSON;
+  subtotal: CommerceMoneyAmountJSON;
+  tax_total: CommerceMoneyAmountJSON;
+  total_due_now: CommerceMoneyAmountJSON;
+  credit: CommerceMoneyAmountJSON;
 }
 
 /**

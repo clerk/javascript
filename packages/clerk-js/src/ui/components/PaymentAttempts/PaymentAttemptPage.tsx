@@ -1,4 +1,5 @@
 import { useClerk, useOrganization } from '@clerk/shared/react';
+import type { CommerceSubscriptionItemResource } from '@clerk/types';
 import useSWR from 'swr';
 
 import { Alert } from '@/ui/elements/Alert';
@@ -157,41 +158,7 @@ export const PaymentAttemptPage = () => {
               {paymentAttempt.status}
             </Badge>
           </Box>
-          <Box
-            elementDescriptor={descriptors.paymentAttemptBody}
-            sx={t => ({
-              padding: t.space.$4,
-            })}
-          >
-            {subscriptionItem && (
-              <LineItems.Root>
-                <LineItems.Group>
-                  <LineItems.Title title={subscriptionItem.plan.name} />
-                  <LineItems.Description
-                    prefix={subscriptionItem.planPeriod === 'annual' ? 'x12' : undefined}
-                    text={`${subscriptionItem.plan.currencySymbol}${subscriptionItem.planPeriod === 'month' ? subscriptionItem.plan.amountFormatted : subscriptionItem.plan.annualMonthlyAmountFormatted}`}
-                  />
-                </LineItems.Group>
-                <LineItems.Group
-                  borderTop
-                  variant='tertiary'
-                >
-                  <LineItems.Title title={localizationKeys('commerce.subtotal')} />
-                  <LineItems.Description
-                    text={`${subscriptionItem.amount?.currencySymbol}${subscriptionItem.amount?.amountFormatted}`}
-                  />
-                </LineItems.Group>
-                {subscriptionItem.credit && subscriptionItem.credit.amount.amount > 0 && (
-                  <LineItems.Group variant='tertiary'>
-                    <LineItems.Title title={localizationKeys('commerce.credit')} />
-                    <LineItems.Description
-                      text={`- ${subscriptionItem.credit.amount.currencySymbol}${subscriptionItem.credit.amount.amountFormatted}`}
-                    />
-                  </LineItems.Group>
-                )}
-              </LineItems.Root>
-            )}
-          </Box>
+          <PaymentAttemptBody subscriptionItem={subscriptionItem} />
           <Box
             elementDescriptor={descriptors.paymentAttemptFooter}
             as='footer'
@@ -241,6 +208,51 @@ export const PaymentAttemptPage = () => {
     </>
   );
 };
+
+function PaymentAttemptBody({ subscriptionItem }: { subscriptionItem: CommerceSubscriptionItemResource | undefined }) {
+  if (!subscriptionItem) {
+    return null;
+  }
+
+  const fee =
+    subscriptionItem.planPeriod === 'month' ? subscriptionItem.plan.fee : subscriptionItem.plan.annualMonthlyFee;
+
+  return (
+    <Box
+      elementDescriptor={descriptors.paymentAttemptBody}
+      sx={t => ({
+        padding: t.space.$4,
+      })}
+    >
+      <LineItems.Root>
+        <LineItems.Group>
+          <LineItems.Title title={subscriptionItem.plan.name} />
+          <LineItems.Description
+            prefix={subscriptionItem.planPeriod === 'annual' ? 'x12' : undefined}
+            text={`${fee.currencySymbol}${fee.amountFormatted}`}
+          />
+        </LineItems.Group>
+        <LineItems.Group
+          borderTop
+          variant='tertiary'
+        >
+          <LineItems.Title title={localizationKeys('commerce.subtotal')} />
+          <LineItems.Description
+            text={`${subscriptionItem.amount?.currencySymbol}${subscriptionItem.amount?.amountFormatted}`}
+          />
+        </LineItems.Group>
+        {subscriptionItem.credit && subscriptionItem.credit.amount.amount > 0 && (
+          <LineItems.Group variant='tertiary'>
+            <LineItems.Title title={localizationKeys('commerce.credit')} />
+            <LineItems.Description
+              text={`- ${subscriptionItem.credit.amount.currencySymbol}${subscriptionItem.credit.amount.amountFormatted}`}
+            />
+          </LineItems.Group>
+        )}
+      </LineItems.Root>
+    </Box>
+  );
+}
 
 function CopyButton({ text, copyLabel = 'Copy' }: { text: string; copyLabel?: string }) {
   const { onCopy, hasCopied } = useClipboard(text);

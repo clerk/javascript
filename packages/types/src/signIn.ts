@@ -133,6 +133,11 @@ export interface SignInFutureResource {
     sendCode: (params: { email: string }) => Promise<{ error: unknown }>;
     verifyCode: (params: { code: string }) => Promise<{ error: unknown }>;
   };
+  resetPasswordEmailCode: {
+    sendCode: () => Promise<{ error: unknown }>;
+    verifyCode: (params: { code: string }) => Promise<{ error: unknown }>;
+    submitPassword: (params: { password: string; signOutOfOtherSessions?: boolean }) => Promise<{ error: unknown }>;
+  };
   sso: (params: {
     flow?: 'auto' | 'modal';
     strategy: OAuthStrategy | 'saml' | 'enterprise_sso';

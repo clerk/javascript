@@ -2543,4 +2543,68 @@ describe('Clerk singleton', () => {
       });
     });
   });
+
+  describe('updateClient', () => {
+    afterEach(() => {
+      // cleanup global window pollution
+      (window as any).__unstable__onBeforeSetActive = null;
+      (window as any).__unstable__onAfterSetActive = null;
+    });
+
+    it('runs server revalidation hooks when session transitions from `active` to `pending`', async () => {
+      const mockOnBeforeSetActive = jest.fn().mockReturnValue(Promise.resolve());
+      const mockOnAfterSetActive = jest.fn().mockReturnValue(Promise.resolve());
+      (window as any).__unstable__onBeforeSetActive = mockOnBeforeSetActive;
+      (window as any).__unstable__onAfterSetActive = mockOnAfterSetActive;
+
+      const mockActiveSession = {
+        id: 'session_1',
+        status: 'active',
+        user: { id: 'user_1' },
+        lastActiveToken: { getRawString: () => 'token_1' },
+      };
+
+      const mockPendingSession = {
+        id: 'session_1',
+        status: 'pending',
+        user: { id: 'user_1' },
+        lastActiveToken: { getRawString: () => 'token_1' },
+      };
+
+      const mockInitialClient = {
+        sessions: [mockActiveSession],
+        signedInSessions: [mockActiveSession],
+        lastActiveSessionId: 'session_1',
+      };
+
+      const mockUpdatedClient = {
+        sessions: [mockPendingSession],
+        signedInSessions: [mockPendingSession],
+        lastActiveSessionId: 'session_1',
+      };
+
+      const sut = new Clerk(productionPublishableKey);
+
+      // Manually set the initial client and session state to simulate active session
+      // without going through load() or setActive()
+      sut.updateClient(mockInitialClient as any);
+
+      // Verify we start with an active session
+      expect(sut.session?.status).toBe('active');
+
+      // Call updateClient with the new client that has pending session
+      sut.updateClient(mockUpdatedClient as any);
+
+      // Verify hooks were called
+      await waitFor(() => {
+        expect(mockOnBeforeSetActive).toHaveBeenCalledTimes(1);
+        expect(mockOnAfterSetActive).toHaveBeenCalledTimes(1);
+      });
+
+      // Verify that onAfterSetActive was called after onBeforeSetActive
+      const beforeCallTime = mockOnBeforeSetActive.mock.invocationCallOrder[0];
+      const afterCallTime = mockOnAfterSetActive.mock.invocationCallOrder[0];
+      expect(afterCallTime).toBeGreaterThan(beforeCallTime);
+    });
+  });
 });

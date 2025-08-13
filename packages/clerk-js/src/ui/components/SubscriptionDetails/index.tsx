@@ -22,7 +22,13 @@ import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
 import { handleError } from '@/ui/utils/errorHandler';
 import { formatDate } from '@/ui/utils/formatDate';
 
-import { SubscriberTypeContext, usePlansContext, useSubscriberTypeContext, useSubscription } from '../../contexts';
+import {
+  normalizeFormatted,
+  SubscriberTypeContext,
+  usePlansContext,
+  useSubscriberTypeContext,
+  useSubscription,
+} from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import {
   Button,
@@ -271,7 +277,7 @@ const SubscriptionDetailsFooter = withCardStateProvider(() => {
                   : localizationKeys('commerce.cancelSubscriptionAccessUntil', {
                       plan: selectedSubscription.plan.name,
                       // this will always be defined in this state
-                      date: selectedSubscription.periodEndDate as Date,
+                      date: selectedSubscription.periodEnd as Date,
                     })
               }
             />
@@ -335,12 +341,12 @@ const SubscriptionCardActions = ({ subscription }: { subscription: CommerceSubsc
   const canManageBilling = subscriberType === 'user' || canOrgManageBilling;
 
   const isSwitchable =
-    ((subscription.planPeriod === 'month' && subscription.plan.annualMonthlyAmount > 0) ||
+    ((subscription.planPeriod === 'month' && subscription.plan.annualMonthlyFee.amount > 0) ||
       subscription.planPeriod === 'annual') &&
     subscription.status !== 'past_due';
   const isFree = isFreePlan(subscription.plan);
-  const isCancellable = subscription.canceledAtDate === null && !isFree && subscription.status !== 'past_due';
-  const isReSubscribable = subscription.canceledAtDate !== null && !isFree;
+  const isCancellable = subscription.canceledAt === null && !isFree && subscription.status !== 'past_due';
+  const isReSubscribable = subscription.canceledAt !== null && !isFree;
 
   const openCheckout = useCallback(
     (params?: __internal_CheckoutProps) => {
@@ -370,12 +376,12 @@ const SubscriptionCardActions = ({ subscription }: { subscription: CommerceSubsc
             label:
               subscription.planPeriod === 'month'
                 ? localizationKeys('commerce.switchToAnnualWithAnnualPrice', {
-                    price: subscription.plan.annualAmountFormatted,
-                    currency: subscription.plan.currencySymbol,
+                    price: normalizeFormatted(subscription.plan.annualFee.amountFormatted),
+                    currency: subscription.plan.annualFee.currencySymbol,
                   })
                 : localizationKeys('commerce.switchToMonthlyWithPrice', {
-                    price: subscription.plan.amountFormatted,
-                    currency: subscription.plan.currencySymbol,
+                    price: normalizeFormatted(subscription.plan.fee.amountFormatted),
+                    currency: subscription.plan.fee.currencySymbol,
                   }),
             onClick: () => {
               openCheckout({
@@ -436,6 +442,8 @@ const SubscriptionCardActions = ({ subscription }: { subscription: CommerceSubsc
 // New component for individual subscription cards
 const SubscriptionCard = ({ subscription }: { subscription: CommerceSubscriptionItemResource }) => {
   const { t } = useLocalizations();
+
+  const fee = subscription.planPeriod === 'month' ? subscription.plan.fee : subscription.plan.annualFee;
 
   return (
     <Col
@@ -500,9 +508,9 @@ const SubscriptionCard = ({ subscription }: { subscription: CommerceSubscription
               textTransform: 'lowercase',
             })}
           >
-            {subscription.planPeriod === 'month'
-              ? `${subscription.plan.currencySymbol}${subscription.plan.amountFormatted} / ${t(localizationKeys('commerce.month'))}`
-              : `${subscription.plan.currencySymbol}${subscription.plan.annualAmountFormatted} / ${t(localizationKeys('commerce.year'))}`}
+            {fee.currencySymbol}
+            {fee.amountFormatted} /{' '}
+            {t(localizationKeys(`commerce.${subscription.planPeriod === 'month' ? 'month' : 'year'}`))}
           </Text>
 
           <SubscriptionCardActions subscription={subscription} />
@@ -523,14 +531,14 @@ const SubscriptionCard = ({ subscription }: { subscription: CommerceSubscription
             value={formatDate(subscription.createdAt)}
           />
           {/* The free plan does not have a period end date */}
-          {subscription.periodEndDate && (
+          {subscription.periodEnd && (
             <DetailRow
               label={
-                subscription.canceledAtDate
+                subscription.canceledAt
                   ? localizationKeys('commerce.subscriptionDetails.endsOn')
                   : localizationKeys('commerce.subscriptionDetails.renewsAt')
               }
-              value={formatDate(subscription.periodEndDate)}
+              value={formatDate(subscription.periodEnd)}
             />
           )}
         </>
@@ -539,7 +547,7 @@ const SubscriptionCard = ({ subscription }: { subscription: CommerceSubscription
       {subscription.status === 'upcoming' ? (
         <DetailRow
           label={localizationKeys('commerce.subscriptionDetails.beginsOn')}
-          value={formatDate(subscription.periodStartDate)}
+          value={formatDate(subscription.periodStart)}
         />
       ) : null}
     </Col>

@@ -62,6 +62,7 @@ export const msMY: LocalizationResource = {
   badge__requiresAction: 'Memerlukan tindakan',
   badge__startsAt: undefined,
   badge__thisDevice: 'Peranti ini',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Belum disahkan',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Peranti pengguna',
@@ -133,6 +134,7 @@ export const msMY: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,
@@ -796,6 +798,26 @@ export const msMY: LocalizationResource = {
   },
   socialButtonsBlockButton: 'Teruskan dengan {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} sudah menjadi ahli organisasi.',
     captcha_invalid:
