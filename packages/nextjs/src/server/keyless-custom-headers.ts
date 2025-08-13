@@ -73,7 +73,7 @@ export function formatMetadataHeaders(metadata: MetadataHeaders): Headers {
   }
 
   if (metadata.host) {
-    headers.set('Clerk-Client-host', metadata.host);
+    headers.set('Clerk-Client-Host', metadata.host);
   }
 
   if (metadata.xPort) {
@@ -85,7 +85,7 @@ export function formatMetadataHeaders(metadata: MetadataHeaders): Headers {
   }
 
   if (metadata.xProtocol) {
-    headers.set('Clerk-X-protocol', metadata.xProtocol);
+    headers.set('Clerk-X-Protocol', metadata.xProtocol);
   }
 
   if (metadata.xClerkAuthStatus) {
