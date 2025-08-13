@@ -14,6 +14,7 @@ export const PROXY_URL = process.env.NEXT_PUBLIC_CLERK_PROXY_URL || '';
 export const IS_SATELLITE = isTruthy(process.env.NEXT_PUBLIC_CLERK_IS_SATELLITE) || false;
 export const SIGN_IN_URL = process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL || '';
 export const SIGN_UP_URL = process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL || '';
+export const WAITLIST_URL = process.env.NEXT_PUBLIC_CLERK_WAITLIST_URL || '';
 export const SDK_METADATA = {
   name: PACKAGE_NAME,
   version: PACKAGE_VERSION,

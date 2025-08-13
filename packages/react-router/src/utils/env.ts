@@ -14,6 +14,7 @@ export const getPublicEnvVariables = (context: AppLoadContext | undefined) => {
     proxyUrl: getValue('CLERK_PROXY_URL'),
     signInUrl: getValue('CLERK_SIGN_IN_URL'),
     signUpUrl: getValue('CLERK_SIGN_UP_URL'),
+    waitlistUrl: getValue('CLERK_WAITLIST_URL'),
     clerkJsUrl: getValue('CLERK_JS_URL'),
     clerkJsVariant: getValue('CLERK_JS_VARIANT') as '' | 'headless' | undefined,
     clerkJsVersion: getValue('CLERK_JS_VERSION'),

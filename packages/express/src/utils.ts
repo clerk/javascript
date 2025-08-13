@@ -24,6 +24,7 @@ export const loadApiEnv = () => {
     domain: process.env.CLERK_DOMAIN || '',
     proxyUrl: process.env.CLERK_PROXY_URL || '',
     signInUrl: process.env.CLERK_SIGN_IN_URL || '',
+    waitlistUrl: process.env.CLERK_WAITLIST_URL || '',
     isSatellite: isTruthy(process.env.CLERK_IS_SATELLITE),
     jwtKey: process.env.CLERK_JWT_KEY || '',
     sdkMetadata: {
