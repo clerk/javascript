@@ -62,6 +62,7 @@ export const ukUA: LocalizationResource = {
   badge__requiresAction: 'Потребує дії',
   badge__startsAt: undefined,
   badge__thisDevice: 'Цей пристрій',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Неперевірений',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Пристрій користувача',
@@ -133,6 +134,7 @@ export const ukUA: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,

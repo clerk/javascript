@@ -2,6 +2,7 @@ import React from 'react';
 
 import { useEnvironment } from '../contexts';
 import { descriptors, Flex, Image, useAppearance } from '../customizables';
+import { Link } from '../primitives';
 import type { PropsOfComponent } from '../styledSystem';
 import { RouterLink } from './RouterLink';
 
@@ -34,10 +35,16 @@ export type ApplicationLogoProps = PropsOfComponent<typeof Flex> & {
    * The URL to navigate to when the logo is clicked.
    */
   href?: string;
+  /**
+   * Whether the href should be treated as an external link.
+   * When true, uses a Link component with target="_blank" and proper security attributes.
+   * When false or undefined, uses RouterLink for internal navigation.
+   */
+  isExternal?: boolean;
 };
 
 export const ApplicationLogo: React.FC<ApplicationLogoProps> = (props: ApplicationLogoProps): JSX.Element | null => {
-  const { src, alt, href, sx, ...rest } = props;
+  const { src, alt, href, isExternal, sx, ...rest } = props;
   const imageRef = React.useRef<HTMLImageElement>(null);
   const [loaded, setLoaded] = React.useState(false);
   const { logoImageUrl, applicationName, homeUrl } = useEnvironment().displayConfig;
@@ -80,12 +87,22 @@ export const ApplicationLogo: React.FC<ApplicationLogoProps> = (props: Applicati
       ]}
     >
       {logoUrl ? (
-        <RouterLink
-          focusRing
-          to={logoUrl}
-        >
-          {image}
-        </RouterLink>
+        isExternal ? (
+          <Link
+            focusRing
+            href={logoUrl}
+            isExternal
+          >
+            {image}
+          </Link>
+        ) : (
+          <RouterLink
+            focusRing
+            to={logoUrl}
+          >
+            {image}
+          </RouterLink>
+        )
       ) : (
         image
       )}

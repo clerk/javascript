@@ -62,6 +62,7 @@ export const heIL: LocalizationResource = {
   badge__requiresAction: 'דורש פעולה',
   badge__startsAt: undefined,
   badge__thisDevice: 'מכשיר זה',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'לא מאומת',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'מכשיר משתמש',
@@ -133,6 +134,7 @@ export const heIL: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,

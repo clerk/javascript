@@ -62,6 +62,7 @@ export const msMY: LocalizationResource = {
   badge__requiresAction: 'Memerlukan tindakan',
   badge__startsAt: undefined,
   badge__thisDevice: 'Peranti ini',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Belum disahkan',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Peranti pengguna',
@@ -133,6 +134,7 @@ export const msMY: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,

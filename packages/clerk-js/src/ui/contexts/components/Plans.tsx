@@ -21,6 +21,13 @@ import type { LocalizationKey } from '../../localization';
 import { localizationKeys } from '../../localization';
 import { useSubscriberTypeContext } from './SubscriberType';
 
+/**
+ * Only remove decimal places if they are '00', to match previous behavior.
+ */
+export function normalizeFormatted(formatted: string) {
+  return formatted.endsWith('.00') ? formatted.slice(0, -3) : formatted;
+}
+
 // TODO(@COMMERCE): Rename payment sources to payment methods at the API level
 export const usePaymentMethods = () => {
   const subscriberType = useSubscriberTypeContext();
@@ -108,7 +115,7 @@ export const usePlansContext = () => {
     return false;
   }, [clerk, subscriberType]);
 
-  const { subscriptionItems, revalidate: revalidateSubscriptions } = useSubscription();
+  const { subscriptionItems, revalidate: revalidateSubscriptions, data: topLevelSubscription } = useSubscription();
 
   // Invalidates cache but does not fetch immediately
   const { data: plans, revalidate: revalidatePlans } = usePlans({ mode: 'cache' });
@@ -187,6 +194,7 @@ export const usePlansContext = () => {
   const buttonPropsForPlan = useCallback(
     ({
       plan,
+      // TODO(@COMMERCE): This needs to be removed.
       subscription: sub,
       isCompact = false,
       selectedPlanPeriod = 'annual',
@@ -205,11 +213,24 @@ export const usePlansContext = () => {
       const subscription =
         sub ?? (plan ? activeOrUpcomingSubscriptionWithPlanPeriod(plan, selectedPlanPeriod) : undefined);
       let _selectedPlanPeriod = selectedPlanPeriod;
-      if (_selectedPlanPeriod === 'annual' && sub?.plan.annualMonthlyAmount === 0) {
+      const isEligibleForSwitchToAnnual = (plan?.annualMonthlyFee.amount ?? 0) > 0;
+
+      if (_selectedPlanPeriod === 'annual' && !isEligibleForSwitchToAnnual) {
         _selectedPlanPeriod = 'month';
       }
 
-      const isEligibleForSwitchToAnnual = (plan?.annualMonthlyAmount ?? 0) > 0;
+      const freeTrialOr = (localizationKey: LocalizationKey): LocalizationKey => {
+        if (plan?.freeTrialEnabled) {
+          // Show trial CTA if user is signed out OR if signed in and eligible for free trial
+          const isSignedOut = !session;
+          const isEligibleForTrial = topLevelSubscription?.eligibleForFreeTrial;
+
+          if (isSignedOut || isEligibleForTrial) {
+            return localizationKeys('commerce.startFreeTrial', { days: plan.freeTrialDays ?? 0 });
+          }
+        }
+        return localizationKey;
+      };
 
       const getLocalizationKey = () => {
         // Handle subscription cases
@@ -246,20 +267,21 @@ export const usePlansContext = () => {
         // Handle non-subscription cases
         const hasNonDefaultSubscriptions =
           subscriptionItems.filter(subscription => !subscription.plan.isDefault).length > 0;
+
         return hasNonDefaultSubscriptions
           ? localizationKeys('commerce.switchPlan')
-          : localizationKeys('commerce.subscribe');
+          : freeTrialOr(localizationKeys('commerce.subscribe'));
       };
 
       return {
-        localizationKey: getLocalizationKey(),
+        localizationKey: freeTrialOr(getLocalizationKey()),
         variant: isCompact ? 'bordered' : 'solid',
         colorScheme: isCompact ? 'secondary' : 'primary',
         isDisabled: !canManageBilling,
         disabled: !canManageBilling,
       };
     },
-    [activeOrUpcomingSubscriptionWithPlanPeriod, canManageBilling, subscriptionItems],
+    [activeOrUpcomingSubscriptionWithPlanPeriod, canManageBilling, subscriptionItems, topLevelSubscription],
   );
 
   const captionForSubscription = useCallback((subscription: CommerceSubscriptionItemResource) => {
@@ -302,7 +324,7 @@ export const usePlansContext = () => {
       clerk.__internal_openCheckout({
         planId: plan.id,
         // if the plan doesn't support annual, use monthly
-        planPeriod: planPeriod === 'annual' && plan.annualMonthlyAmount === 0 ? 'month' : planPeriod,
+        planPeriod: planPeriod === 'annual' && plan.annualMonthlyFee.amount === 0 ? 'month' : planPeriod,
         for: subscriberType,
         onSubscriptionComplete: () => {
           revalidateAll();

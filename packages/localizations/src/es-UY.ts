@@ -62,6 +62,7 @@ export const esUY: LocalizationResource = {
   badge__requiresAction: 'Requiere acción',
   badge__startsAt: undefined,
   badge__thisDevice: 'Este dispositivo',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'No verificado',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Dispositivo del usuario',
@@ -133,6 +134,7 @@ export const esUY: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,

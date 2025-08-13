@@ -62,6 +62,7 @@ export const daDK: LocalizationResource = {
   badge__requiresAction: 'Kræver handling',
   badge__startsAt: undefined,
   badge__thisDevice: 'Denne enhed',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Ikke verificeret',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Brugerenhed',
@@ -133,6 +134,7 @@ export const daDK: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,

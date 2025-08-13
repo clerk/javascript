@@ -62,6 +62,7 @@ export const beBY: LocalizationResource = {
   badge__requiresAction: 'Патрабуецца дзеянне',
   badge__startsAt: undefined,
   badge__thisDevice: 'Гэта прылада',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Не верыфікавана',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Карыстальніцкая прылада',
@@ -133,6 +134,7 @@ export const beBY: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,

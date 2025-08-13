@@ -62,6 +62,7 @@ export const thTH: LocalizationResource = {
   badge__requiresAction: 'ต้องการการดำเนินการ',
   badge__startsAt: undefined,
   badge__thisDevice: 'อุปกรณ์นี้',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'ยังไม่ได้ตรวจสอบ',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'อุปกรณ์ผู้ใช้',
@@ -133,6 +134,7 @@ export const thTH: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,

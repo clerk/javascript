@@ -62,6 +62,7 @@ export const fiFI: LocalizationResource = {
   badge__requiresAction: 'Vaaditaan toimia',
   badge__startsAt: undefined,
   badge__thisDevice: 'Tämä laite',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Vahvistamaton',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Käyttäjän laite',
@@ -133,6 +134,7 @@ export const fiFI: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,

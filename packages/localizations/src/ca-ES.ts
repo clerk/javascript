@@ -62,6 +62,7 @@ export const caES: LocalizationResource = {
   badge__requiresAction: 'Requereix acció',
   badge__startsAt: undefined,
   badge__thisDevice: 'Aquest dispositiu',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'No verificat',
   badge__upcomingPlan: undefined,
   badge__userDevice: "Dispositiu de l'usuari",
@@ -133,6 +134,7 @@ export const caES: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,

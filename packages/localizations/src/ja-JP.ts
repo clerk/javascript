@@ -62,6 +62,7 @@ export const jaJP: LocalizationResource = {
   badge__requiresAction: 'アクションが必要',
   badge__startsAt: undefined,
   badge__thisDevice: 'このデバイス',
+  badge__trialEndsAt: undefined,
   badge__unverified: '未確認',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'ユーザーデバイス',
@@ -133,6 +134,7 @@ export const jaJP: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,

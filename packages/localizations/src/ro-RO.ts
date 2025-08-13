@@ -62,6 +62,7 @@ export const roRO: LocalizationResource = {
   badge__requiresAction: 'Necesită acțiune',
   badge__startsAt: undefined,
   badge__thisDevice: 'Acest dispozitiv',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Nedeclarat',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Dispozitiv de utilizator',
@@ -133,6 +134,7 @@ export const roRO: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,

@@ -62,6 +62,7 @@ export const skSK: LocalizationResource = {
   badge__requiresAction: 'Vyžaduje akciu',
   badge__startsAt: undefined,
   badge__thisDevice: 'Toto zariadenie',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Nepotvrdené',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Zariadenie používateľa',
@@ -133,6 +134,7 @@ export const skSK: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,
