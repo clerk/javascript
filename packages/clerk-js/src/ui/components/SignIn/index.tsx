@@ -131,12 +131,12 @@ function SignInRoutes(): JSX.Element {
               >
                 <LazySignUpVerifyPhone />
               </Route>
-              <Route path='tasks'>
-                <LazySessionTasks />
-              </Route>
               <Route index>
                 <LazySignUpContinue />
               </Route>
+            </Route>
+            <Route path='tasks'>
+              <LazySessionTasks />
             </Route>
             <Route index>
               <LazySignUpStart />

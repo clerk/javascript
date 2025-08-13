@@ -3,7 +3,7 @@ import { isAbsoluteUrl } from '@clerk/shared/url';
 import type { SessionResource } from '@clerk/types';
 import { createContext, useContext, useMemo } from 'react';
 
-import { getTaskEndpoint, INTERNAL_SESSION_TASK_ROUTE_BY_KEY } from '@/core/sessionTasks';
+import { getTaskEndpoint } from '@/core/sessionTasks';
 
 import { SIGN_IN_INITIAL_VALUE_KEYS } from '../../../core/constants';
 import { buildURL } from '../../../utils';
@@ -126,7 +126,10 @@ export const useSignInContext = (): SignInContextType => {
       return navigate(redirectUrl);
     }
 
-    return navigate(`/${basePath}/tasks/${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[currentTask.key]}`);
+    const taskEndpoint = getTaskEndpoint(currentTask);
+    const taskNavigationPath = isCombinedFlow ? '/create' + taskEndpoint : taskEndpoint;
+
+    return navigate(`/${basePath + taskNavigationPath}`);
   };
 
   const taskUrl = clerk.session?.currentTask
@@ -136,7 +139,9 @@ export const useSignInContext = (): SignInContextType => {
         baseUrl: signInUrl,
         authQueryString,
         path: ctx.path,
-        endpoint: getTaskEndpoint(clerk.session?.currentTask),
+        endpoint: isCombinedFlow
+          ? '/create' + getTaskEndpoint(clerk.session?.currentTask)
+          : getTaskEndpoint(clerk.session?.currentTask),
       }))
     : null;
 

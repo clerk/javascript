@@ -440,7 +440,12 @@ function SignInStartInternal(): JSX.Element {
     } else if (alreadySignedInError) {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const sid = alreadySignedInError.meta!.sessionId!;
-      await clerk.setActive({ session: sid, redirectUrl: afterSignInUrl });
+      await clerk.setActive({
+        session: sid,
+        navigate: async ({ session }) => {
+          await navigateOnSetActive({ session, redirectUrl: afterSignInUrl });
+        },
+      });
     } else if (isCombinedFlow && accountDoesNotExistError) {
       const attribute = getSignUpAttributeFromIdentifier(identifierField);
 
