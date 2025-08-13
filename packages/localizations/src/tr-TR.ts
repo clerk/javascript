@@ -62,6 +62,7 @@ export const trTR: LocalizationResource = {
   badge__requiresAction: 'Eylem gerekli',
   badge__startsAt: undefined,
   badge__thisDevice: 'Bu cihaz',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Doğrulanmamış',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Kullanıcı cihazı',
@@ -133,6 +134,7 @@ export const trTR: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,
@@ -789,6 +791,26 @@ export const trTR: LocalizationResource = {
   },
   socialButtonsBlockButton: '{{provider|titleize}} ile giriş yapın',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: 'Bu organizasyonda zaten üyesiniz.',
     captcha_invalid:

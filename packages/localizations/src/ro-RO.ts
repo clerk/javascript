@@ -62,6 +62,7 @@ export const roRO: LocalizationResource = {
   badge__requiresAction: 'Necesită acțiune',
   badge__startsAt: undefined,
   badge__thisDevice: 'Acest dispozitiv',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Nedeclarat',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Dispozitiv de utilizator',
@@ -133,6 +134,7 @@ export const roRO: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,
@@ -789,6 +791,26 @@ export const roRO: LocalizationResource = {
   },
   socialButtonsBlockButton: 'Continuați cu {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: undefined,
     captcha_invalid:
