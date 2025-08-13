@@ -55,6 +55,7 @@ export const csCZ: LocalizationResource = {
   badge__default: 'Výchozí',
   badge__endsAt: "Končí {{ date | shortDate('cs-CZ') }}",
   badge__expired: 'Vypršelo',
+  badge__freeTrial: undefined,
   badge__otherImpersonatorDevice: 'Jiné zařízení pro simulaci',
   badge__pastDueAt: "Po splatnosti {{ date | shortDate('cs-CZ') }}",
   badge__pastDuePlan: 'Po splatnosti',
@@ -63,6 +64,7 @@ export const csCZ: LocalizationResource = {
   badge__requiresAction: 'Vyžaduje akci',
   badge__startsAt: "Začíná {{ date | shortDate('cs-CZ') }}",
   badge__thisDevice: 'Toto zařízení',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Nepotvrzené',
   badge__upcomingPlan: 'Nadcházející',
   badge__userDevice: 'Zařízení uživatele',
@@ -92,6 +94,7 @@ export const csCZ: LocalizationResource = {
         title: 'Přidat e-mailovou adresu',
       },
       lineItems: {
+        title__freeTrialEndsAt: undefined,
         title__paymentMethod: 'Platební metoda',
         title__statementId: 'ID výpisu',
         title__subscriptionBegins: 'Předplatné začíná',
@@ -102,6 +105,8 @@ export const csCZ: LocalizationResource = {
       title: 'Pokladna',
       title__paymentSuccessful: 'Platba byla úspěšná!',
       title__subscriptionSuccessful: 'Úspěch!',
+      title__trialSuccess: undefined,
+      totalDueAfterTrial: undefined,
     },
     credit: 'Kredit',
     creditRemainder: 'Kredit za zbytek vašeho současného předplatného.',
@@ -137,6 +142,8 @@ export const csCZ: LocalizationResource = {
     },
     reSubscribe: 'Znovu se přihlásit',
     seeAllFeatures: 'Zobrazit všechny funkce',
+    startFreeTrial: undefined,
+    startFreeTrial__days: undefined,
     subscribe: 'Přihlásit se',
     subscriptionDetails: {
       beginsOn: 'Začíná dne',
@@ -799,6 +806,26 @@ export const csCZ: LocalizationResource = {
   },
   socialButtonsBlockButton: 'Pokračovat s {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} je již členem organizace.',
     captcha_invalid: undefined,
