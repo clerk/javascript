@@ -15,7 +15,7 @@ import {
   sharedMainIdentifierSx,
 } from '@/ui/common/organizations/OrganizationPreview';
 import { organizationListParams, populateCacheUpdateItem } from '@/ui/components/OrganizationSwitcher/utils';
-import { useSessionTasksContext } from '@/ui/contexts/components/SessionTasks';
+import { useTaskChooseOrganizationContext } from '@/ui/contexts/components/SessionTasks';
 import { Col, descriptors, localizationKeys, Text } from '@/ui/customizables';
 import { Action, Actions } from '@/ui/elements/Actions';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
@@ -97,8 +97,7 @@ export const ChooseOrganizationScreen = withCardStateProvider(
 
 const MembershipPreview = withCardStateProvider((props: { organization: OrganizationResource }) => {
   const card = useCardState();
-  const { redirectUrlComplete } = useSessionTasksContext();
-  const { __internal_navigateToTaskIfAvailable } = useClerk();
+  const { redirectUrlComplete } = useTaskChooseOrganizationContext();
   const { isLoaded, setActive } = useOrganizationList();
 
   if (!isLoaded) {
@@ -109,9 +108,8 @@ const MembershipPreview = withCardStateProvider((props: { organization: Organiza
     return card.runAsync(async () => {
       await setActive({
         organization,
+        redirectUrl: redirectUrlComplete,
       });
-
-      await __internal_navigateToTaskIfAvailable({ redirectUrlComplete });
     });
   };
 

@@ -43,7 +43,6 @@ import type {
 } from '@clerk/types';
 
 import {
-  buildURL,
   generateSignatureWithCoinbaseWallet,
   generateSignatureWithMetamask,
   generateSignatureWithOKXWallet,
@@ -250,25 +249,16 @@ export class SignIn extends BaseResource implements SignInResource {
     params: AuthenticateWithRedirectParams,
     navigateCallback: (url: URL | string) => void,
   ): Promise<void> => {
-    const { strategy, redirectUrl, redirectUrlComplete, identifier, oidcPrompt, continueSignIn } = params || {};
+    const { strategy, redirectUrlComplete, identifier, oidcPrompt, continueSignIn } = params || {};
+    const actionCompleteRedirectUrl = redirectUrlComplete;
 
-    const redirectUrlWithAuthToken = SignIn.clerk.buildUrlWithAuth(redirectUrl);
-
-    // When after-auth is enabled, redirect to SSO callback route.
-    // This ensures organization selection tasks are displayed after sign-in,
-    // rather than redirecting to potentially unprotected pages while the session is pending.
-    const actionCompleteRedirectUrl = SignIn.clerk.__internal_hasAfterAuthFlows
-      ? buildURL({
-          base: redirectUrlWithAuthToken,
-          search: `?redirect_url=${redirectUrlComplete}`,
-        }).toString()
-      : redirectUrlComplete;
+    const redirectUrl = SignIn.clerk.buildUrlWithAuth(params.redirectUrl);
 
     if (!this.id || !continueSignIn) {
       await this.create({
         strategy,
         identifier,
-        redirectUrl: redirectUrlWithAuthToken,
+        redirectUrl,
         actionCompleteRedirectUrl,
       });
     }
@@ -276,7 +266,7 @@ export class SignIn extends BaseResource implements SignInResource {
     if (strategy === 'saml' || strategy === 'enterprise_sso') {
       await this.prepareFirstFactor({
         strategy,
-        redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectUrl),
+        redirectUrl,
         actionCompleteRedirectUrl,
         oidcPrompt,
       });

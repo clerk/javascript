@@ -49,7 +49,7 @@ import type {
   SignUpFallbackRedirectUrl,
   SignUpForceRedirectUrl,
 } from './redirects';
-import type { SessionTask, SignedInSessionResource } from './session';
+import type { SessionResource, SessionTask, SignedInSessionResource } from './session';
 import type { SessionVerificationLevel } from './sessionVerification';
 import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
@@ -120,6 +120,7 @@ export type SDKMetadata = {
 export type ListenerCallback = (emission: Resources) => void;
 export type UnsubscribeCallback = () => void;
 export type BeforeEmitCallback = (session?: SignedInSessionResource | null) => void | Promise<any>;
+export type SetActiveNavigate = ({ session }: { session: SessionResource }) => Promise<unknown>;
 
 export type SignOutCallback = () => void | Promise<any>;
 
@@ -626,13 +627,6 @@ export interface Clerk {
   __internal_addNavigationListener: (callback: () => void) => UnsubscribeCallback;
 
   /**
-   * Registers the internal navigation context from UI components in order to
-   * be triggered from `Clerk` methods
-   * @internal
-   */
-  __internal_setComponentNavigationContext: (context: __internal_ComponentNavigationContext) => () => void;
-
-  /**
    * Set the active session and organization explicitly.
    *
    * If the session param is `null`, the active session is deleted.
@@ -680,6 +674,11 @@ export interface Clerk {
    * Returns the configured url where `<OrganizationProfile />` is mounted or a custom organization-profile page is rendered.
    */
   buildOrganizationProfileUrl(): string;
+
+  /**
+   * Returns the configured url where tasks are mounted.
+   */
+  buildTasksUrl(): string;
 
   /**
    * Returns the configured afterSignInUrl of the instance.
@@ -769,6 +768,11 @@ export interface Clerk {
   redirectToWaitlist: () => void;
 
   /**
+   * Redirects to the configured URL where tasks are mounted.
+   */
+  redirectToTasks(): Promise<unknown>;
+
+  /**
    * Completes a Google One Tap redirection flow started by
    * {@link Clerk.authenticateWithGoogleOneTap}
    */
@@ -838,12 +842,6 @@ export interface Clerk {
   handleUnauthenticated: () => Promise<unknown>;
 
   joinWaitlist: (params: JoinWaitlistParams) => Promise<WaitlistResource>;
-
-  /**
-   * Navigates to the current task or redirects to `redirectUrlComplete` once the session is `active`.
-   * @internal
-   */
-  __internal_navigateToTaskIfAvailable: (params?: __internal_NavigateToTaskIfAvailableParams) => Promise<void>;
 
   /**
    * This is an optional function.
@@ -1203,9 +1201,32 @@ export type SetActiveParams = {
   beforeEmit?: BeforeEmitCallback;
 
   /**
-   * The full URL or path to redirect to just before the active session and/or organization is set.
+   * The full URL or path to redirect to just before the session and/or organization is set.
    */
   redirectUrl?: string;
+
+  /**
+   * A custom navigation function to be called just before the session and/or organization is set.
+   *
+   * When provided, it takes precedence over the `redirectUrl` parameter for navigation.
+   *
+   * @example
+   * ```typescript
+   * await clerk.setActive({
+   *   session,
+   *   navigate: async ({ session }) => {
+   *     const currentTask = session.currentTask;
+   *     if (currentTask) {
+   *       await router.push(`/onboarding/${currentTask.key}`)
+   *       return
+   *     }
+   *
+   *     router.push('/dashboard');
+   *   }
+   * });
+   * ```
+   */
+  navigate?: SetActiveNavigate;
 };
 
 /**
@@ -2157,14 +2178,6 @@ export interface AuthenticateWithOKXWalletParams {
 export interface AuthenticateWithGoogleOneTapParams {
   token: string;
   legalAccepted?: boolean;
-}
-
-export interface __internal_NavigateToTaskIfAvailableParams {
-  /**
-   * Full URL or path to navigate to after successfully resolving all tasks
-   * @default undefined
-   */
-  redirectUrlComplete?: string;
 }
 
 export interface LoadedClerk extends Clerk {
