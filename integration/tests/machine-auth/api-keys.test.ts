@@ -7,7 +7,7 @@ import { appConfigs } from '../../presets';
 import type { FakeAPIKey, FakeUser } from '../../testUtils';
 import { createTestUtils } from '../../testUtils';
 
-test.describe('Next.js API key auth within clerkMiddleware() @nextjs', () => {
+test.describe('Next.js API key auth within clerkMiddleware() @machine', () => {
   test.describe.configure({ mode: 'parallel' });
   let app: Application;
   let fakeUser: FakeUser;

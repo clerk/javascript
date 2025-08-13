@@ -29,14 +29,23 @@ const { applyVariants, filterProps } = createVariants(theme => ({
         '&:active': { color: theme.colors.$danger600 },
       },
       neutral: {
-        color: theme.colors.$colorTextSecondary,
+        color: theme.colors.$colorMutedForeground,
       },
       inherit: { color: 'inherit' },
+    },
+    focusRing: {
+      true: {
+        '&:focus': {
+          outline: 'none',
+          ...common.focusRing(theme),
+        },
+      },
     },
   },
   defaultVariants: {
     colorScheme: 'primary',
     variant: 'body',
+    focusRing: false,
   },
 }));
 

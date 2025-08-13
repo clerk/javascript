@@ -10,6 +10,7 @@ export {
   Protect,
   RedirectToSignIn,
   RedirectToSignUp,
+  RedirectToTask,
   RedirectToUserProfile,
   AuthenticateWithRedirectCallback,
   RedirectToCreateOrganization,

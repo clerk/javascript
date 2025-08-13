@@ -1,6 +1,6 @@
 /**
  * The `TelemetryCollector` class handles collection of telemetry events from Clerk SDKs. Telemetry is opt-out and can be disabled by setting a CLERK_TELEMETRY_DISABLED environment variable.
- * The `ClerkProvider` also accepts a `telemetry` prop that will be passed to the collector during initialization:
+ * The `ClerkProvider` also accepts a `telemetry` prop that will be passed to the collector during initialization:.
  *
  * ```jsx
  * <ClerkProvider telemetry={false}>
@@ -8,10 +8,11 @@
  * </ClerkProvider>
  * ```
  *
- * For more information, please see the telemetry documentation page: https://clerk.com/docs/telemetry
+ * For more information, please see the telemetry documentation page: https://clerk.com/docs/telemetry.
  */
 import type {
   InstanceType,
+  SDKMetadata,
   TelemetryCollector as TelemetryCollectorInterface,
   TelemetryEvent,
   TelemetryEventRaw,
@@ -22,9 +23,30 @@ import { isTruthy } from '../underscore';
 import { TelemetryEventThrottler } from './throttler';
 import type { TelemetryCollectorOptions } from './types';
 
+/**
+ * Local interface for window.Clerk to avoid global type pollution.
+ * This is only used within this module and doesn't affect other packages.
+ */
+interface WindowWithClerk extends Window {
+  Clerk?: {
+    constructor?: {
+      sdkMetadata?: SDKMetadata;
+    };
+  };
+}
+
+/**
+ * Type guard to check if window.Clerk exists and has the expected structure.
+ */
+function isWindowClerkWithMetadata(clerk: unknown): clerk is { constructor: { sdkMetadata?: SDKMetadata } } {
+  return (
+    typeof clerk === 'object' && clerk !== null && 'constructor' in clerk && typeof clerk.constructor === 'function'
+  );
+}
+
 type TelemetryCollectorConfig = Pick<
   TelemetryCollectorOptions,
-  'samplingRate' | 'disabled' | 'debug' | 'maxBufferSize'
+  'samplingRate' | 'disabled' | 'debug' | 'maxBufferSize' | 'perEventSampling'
 > & {
   endpoint: string;
 };
@@ -58,6 +80,7 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
     this.#config = {
       maxBufferSize: options.maxBufferSize ?? DEFAULT_CONFIG.maxBufferSize,
       samplingRate: options.samplingRate ?? DEFAULT_CONFIG.samplingRate,
+      perEventSampling: options.perEventSampling ?? true,
       disabled: options.disabled ?? false,
       debug: options.debug ?? false,
       endpoint: DEFAULT_CONFIG.endpoint,
@@ -98,7 +121,10 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
 
     // In browser or client environments, we most likely pass the disabled option to the collector, but in environments
     // where environment variables are available we also check for `CLERK_TELEMETRY_DISABLED`.
-    if (this.#config.disabled || (typeof process !== 'undefined' && isTruthy(process.env.CLERK_TELEMETRY_DISABLED))) {
+    if (
+      this.#config.disabled ||
+      (typeof process !== 'undefined' && process.env && isTruthy(process.env.CLERK_TELEMETRY_DISABLED))
+    ) {
       return false;
     }
 
@@ -113,7 +139,10 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
   }
 
   get isDebug(): boolean {
-    return this.#config.debug || (typeof process !== 'undefined' && isTruthy(process.env.CLERK_TELEMETRY_DEBUG));
+    return (
+      this.#config.debug ||
+      (typeof process !== 'undefined' && process.env && isTruthy(process.env.CLERK_TELEMETRY_DEBUG))
+    );
   }
 
   record(event: TelemetryEventRaw): void {
@@ -139,7 +168,9 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
 
     const toBeSampled =
       randomSeed <= this.#config.samplingRate &&
-      (typeof eventSamplingRate === 'undefined' || randomSeed <= eventSamplingRate);
+      (this.#config.perEventSampling === false ||
+        typeof eventSamplingRate === 'undefined' ||
+        randomSeed <= eventSamplingRate);
 
     if (!toBeSampled) {
       return false;
@@ -185,21 +216,27 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
   }
 
   #flush(): void {
+    // Capture the current buffer and clear it immediately to avoid closure references
+    const eventsToSend = [...this.#buffer];
+    this.#buffer = [];
+
+    this.#pendingFlush = null;
+
+    if (eventsToSend.length === 0) {
+      return;
+    }
+
     fetch(new URL('/v1/event', this.#config.endpoint), {
       method: 'POST',
       // TODO: We send an array here with that idea that we can eventually send multiple events.
       body: JSON.stringify({
-        events: this.#buffer,
+        events: eventsToSend,
       }),
+      keepalive: true,
       headers: {
         'Content-Type': 'application/json',
       },
-    })
-      .catch(() => void 0)
-      .then(() => {
-        this.#buffer = [];
-      })
-      .catch(() => void 0);
+    }).catch(() => void 0);
   }
 
   /**
@@ -225,15 +262,29 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
    * This is necessary because the sdkMetadata can be set by the host SDK after the TelemetryCollector is instantiated.
    */
   #getSDKMetadata() {
-    let sdkMetadata = {
+    const sdkMetadata = {
       name: this.#metadata.sdk,
       version: this.#metadata.sdkVersion,
     };
 
-    // @ts-expect-error -- The global window.Clerk type is declared in clerk-js, but we can't rely on that here
-    if (typeof window !== 'undefined' && window.Clerk) {
-      // @ts-expect-error -- The global window.Clerk type is declared in clerk-js, but we can't rely on that here
-      sdkMetadata = { ...sdkMetadata, ...window.Clerk.constructor.sdkMetadata };
+    if (typeof window !== 'undefined') {
+      const windowWithClerk = window as WindowWithClerk;
+
+      if (windowWithClerk.Clerk) {
+        const windowClerk = windowWithClerk.Clerk;
+
+        if (isWindowClerkWithMetadata(windowClerk) && windowClerk.constructor.sdkMetadata) {
+          const { name, version } = windowClerk.constructor.sdkMetadata;
+
+          // Only update properties if they exist to avoid overwriting with undefined
+          if (name !== undefined) {
+            sdkMetadata.name = name;
+          }
+          if (version !== undefined) {
+            sdkMetadata.version = version;
+          }
+        }
+      }
     }
 
     return sdkMetadata;

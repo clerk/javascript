@@ -9,13 +9,15 @@ import type { FormProps } from '@/ui/elements/FormContainer';
 import { FormContainer } from '@/ui/elements/FormContainer';
 import { ProfileSection } from '@/ui/elements/Section';
 import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
+import { handleError } from '@/ui/utils/errorHandler';
+import { getRelativeToNowDateKey } from '@/ui/utils/getRelativeToNowDateKey';
+import { useFormControl } from '@/ui/utils/useFormControl';
 
 import { Col, Flex, localizationKeys, Text, useLocalizations } from '../../customizables';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import type { PropsOfComponent } from '../../styledSystem';
 import { mqu } from '../../styledSystem';
-import { getRelativeToNowDateKey, handleError, useFormControl } from '../../utils';
 import { RemovePasskeyForm } from './RemoveResourceForm';
 
 const RemovePasskeyScreen = (props: PasskeyScreenProps) => {

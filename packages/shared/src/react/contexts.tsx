@@ -3,6 +3,8 @@
 import type {
   ClerkOptions,
   ClientResource,
+  CommerceSubscriptionPlanPeriod,
+  ForPayerType,
   LoadedClerk,
   OrganizationResource,
   SignedInSessionResource,
@@ -23,6 +25,21 @@ const [SessionContext, useSessionContext] = createContextAndHook<SignedInSession
 
 const OptionsContext = React.createContext<ClerkOptions>({});
 
+type UseCheckoutOptions = {
+  for?: ForPayerType;
+  planPeriod: CommerceSubscriptionPlanPeriod;
+  planId: string;
+};
+
+const [CheckoutContext, useCheckoutContext] = createContextAndHook<UseCheckoutOptions>('CheckoutContext');
+
+const __experimental_CheckoutProvider = ({ children, ...rest }: PropsWithChildren<UseCheckoutOptions>) => {
+  return <CheckoutContext.Provider value={{ value: rest }}>{children}</CheckoutContext.Provider>;
+};
+
+/**
+ * @internal
+ */
 function useOptionsContext(): ClerkOptions {
   const context = React.useContext(OptionsContext);
   if (context === undefined) {
@@ -61,6 +78,9 @@ const OrganizationProvider = ({
   );
 };
 
+/**
+ * @internal
+ */
 function useAssertWrappedByClerkProvider(displayNameOrFn: string | (() => void)): void {
   const ctx = React.useContext(ClerkInstanceContext);
 
@@ -95,5 +115,7 @@ export {
   useSessionContext,
   ClerkInstanceContext,
   useClerkInstanceContext,
+  useCheckoutContext,
+  __experimental_CheckoutProvider,
   useAssertWrappedByClerkProvider,
 };

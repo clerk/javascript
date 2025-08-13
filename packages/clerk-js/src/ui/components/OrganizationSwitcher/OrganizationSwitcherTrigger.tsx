@@ -67,7 +67,7 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
             gap={3}
             user={userWithoutIdentifiers}
             showAvatar={!hidePersonal}
-            sx={t => ({ color: t.colors.$colorTextSecondary })}
+            sx={t => ({ color: t.colors.$colorMutedForeground })}
             title={
               hidePersonal
                 ? localizationKeys('organizationSwitcher.notSelected')
@@ -113,8 +113,8 @@ const NotificationCountBadgeSwitcherTrigger = () => {
     <NotificationCountBadge
       containerSx={t => ({
         position: 'absolute',
-        top: `-${t.space.$2}`,
-        right: `-${t.space.$2}`,
+        top: `calc(${t.space.$2} * -1)`,
+        right: `calc(${t.space.$2} * -1)`,
       })}
       notificationCount={notificationCount}
     />

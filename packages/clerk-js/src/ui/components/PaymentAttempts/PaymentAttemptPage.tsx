@@ -1,8 +1,14 @@
+import { useClerk, useOrganization } from '@clerk/shared/react';
+import type { CommerceSubscriptionItemResource } from '@clerk/types';
+import useSWR from 'swr';
+
+import { Alert } from '@/ui/elements/Alert';
 import { Header } from '@/ui/elements/Header';
 import { LineItems } from '@/ui/elements/LineItems';
+import { formatDate } from '@/ui/utils/formatDate';
+import { truncateWithEndVisible } from '@/ui/utils/truncateTextWithEndVisible';
 
-import { usePaymentAttemptsContext, useStatements } from '../../contexts';
-import { useSubscriberTypeLocalizationRoot } from '../../contexts/components';
+import { useSubscriberTypeContext, useSubscriberTypeLocalizationRoot } from '../../contexts/components';
 import {
   Badge,
   Box,
@@ -14,19 +20,39 @@ import {
   Span,
   Spinner,
   Text,
+  useLocalizations,
 } from '../../customizables';
 import { useClipboard } from '../../hooks';
 import { Check, Copy } from '../../icons';
 import { useRouter } from '../../router';
-import { formatDate, truncateWithEndVisible } from '../../utils';
 
 export const PaymentAttemptPage = () => {
   const { params, navigate } = useRouter();
-  const { isLoading } = useStatements();
-  const { getPaymentAttemptById } = usePaymentAttemptsContext();
+  const subscriberType = useSubscriberTypeContext();
+  const { organization } = useOrganization();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
+  const { t, translateError } = useLocalizations();
+  const clerk = useClerk();
 
-  const paymentAttempt = params.paymentAttemptId ? getPaymentAttemptById(params.paymentAttemptId) : null;
+  const {
+    data: paymentAttempt,
+    isLoading,
+    error,
+  } = useSWR(
+    params.paymentAttemptId
+      ? {
+          type: 'payment-attempt',
+          id: params.paymentAttemptId,
+          orgId: subscriberType === 'organization' ? organization?.id : undefined,
+        }
+      : null,
+    () =>
+      clerk.billing.getPaymentAttempt({
+        id: params.paymentAttemptId,
+        orgId: subscriberType === 'organization' ? organization?.id : undefined,
+      }),
+  );
+
   const subscriptionItem = paymentAttempt?.subscriptionItem;
 
   if (isLoading) {
@@ -47,7 +73,7 @@ export const PaymentAttemptPage = () => {
         sx={t => ({
           borderBlockEndWidth: t.borderWidths.$normal,
           borderBlockEndStyle: t.borderStyles.$solid,
-          borderBlockEndColor: t.colors.$neutralAlpha100,
+          borderBlockEndColor: t.colors.$borderAlpha100,
           marginBlockEnd: t.space.$4,
           paddingBlockEnd: t.space.$4,
         })}
@@ -60,10 +86,16 @@ export const PaymentAttemptPage = () => {
         </Header.BackLink>
       </Header.Root>
       {!paymentAttempt ? (
-        <Text
-          localizationKey={localizationKeys(`${localizationRoot}.billingPage.paymentHistorySection.notFound`)}
-          sx={{ textAlign: 'center' }}
-        />
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+          <Alert
+            variant='danger'
+            colorScheme='danger'
+          >
+            {error
+              ? translateError(error.errors[0])
+              : t(localizationKeys(`${localizationRoot}.billingPage.paymentHistorySection.notFound`))}
+          </Alert>
+        </Box>
       ) : (
         <Box
           elementDescriptor={descriptors.paymentAttemptRoot}
@@ -71,7 +103,7 @@ export const PaymentAttemptPage = () => {
           sx={t => ({
             borderWidth: t.borderWidths.$normal,
             borderStyle: t.borderStyles.$solid,
-            borderColor: t.colors.$neutralAlpha100,
+            borderColor: t.colors.$borderAlpha100,
             borderRadius: t.radii.$lg,
             overflow: 'clip',
           })}
@@ -101,7 +133,7 @@ export const PaymentAttemptPage = () => {
                   display: 'flex',
                   alignItems: 'center',
                   gap: t.space.$0x25,
-                  color: t.colors.$colorTextSecondary,
+                  color: t.colors.$colorMutedForeground,
                 })}
               >
                 <CopyButton
@@ -126,41 +158,7 @@ export const PaymentAttemptPage = () => {
               {paymentAttempt.status}
             </Badge>
           </Box>
-          <Box
-            elementDescriptor={descriptors.paymentAttemptBody}
-            sx={t => ({
-              padding: t.space.$4,
-            })}
-          >
-            {subscriptionItem && (
-              <LineItems.Root>
-                <LineItems.Group>
-                  <LineItems.Title title={subscriptionItem.plan.name} />
-                  <LineItems.Description
-                    prefix={subscriptionItem.planPeriod === 'annual' ? 'x12' : undefined}
-                    text={`${subscriptionItem.plan.currencySymbol}${subscriptionItem.planPeriod === 'month' ? subscriptionItem.plan.amountFormatted : subscriptionItem.plan.annualMonthlyAmountFormatted}`}
-                  />
-                </LineItems.Group>
-                <LineItems.Group
-                  borderTop
-                  variant='tertiary'
-                >
-                  <LineItems.Title title={localizationKeys('commerce.subtotal')} />
-                  <LineItems.Description
-                    text={`${subscriptionItem.amount?.currencySymbol}${subscriptionItem.amount?.amountFormatted}`}
-                  />
-                </LineItems.Group>
-                {subscriptionItem.credit && subscriptionItem.credit.amount.amount > 0 && (
-                  <LineItems.Group variant='tertiary'>
-                    <LineItems.Title title={localizationKeys('commerce.credit')} />
-                    <LineItems.Description
-                      text={`- ${subscriptionItem.credit.amount.currencySymbol}${subscriptionItem.credit.amount.amountFormatted}`}
-                    />
-                  </LineItems.Group>
-                )}
-              </LineItems.Root>
-            )}
-          </Box>
+          <PaymentAttemptBody subscriptionItem={subscriptionItem} />
           <Box
             elementDescriptor={descriptors.paymentAttemptFooter}
             as='footer'
@@ -170,7 +168,7 @@ export const PaymentAttemptPage = () => {
               background: t.colors.$neutralAlpha25,
               borderBlockStartWidth: t.borderWidths.$normal,
               borderBlockStartStyle: t.borderStyles.$solid,
-              borderBlockStartColor: t.colors.$neutralAlpha100,
+              borderBlockStartColor: t.colors.$borderAlpha100,
               display: 'flex',
               justifyContent: 'space-between',
             })}
@@ -211,6 +209,51 @@ export const PaymentAttemptPage = () => {
   );
 };
 
+function PaymentAttemptBody({ subscriptionItem }: { subscriptionItem: CommerceSubscriptionItemResource | undefined }) {
+  if (!subscriptionItem) {
+    return null;
+  }
+
+  const fee =
+    subscriptionItem.planPeriod === 'month' ? subscriptionItem.plan.fee : subscriptionItem.plan.annualMonthlyFee;
+
+  return (
+    <Box
+      elementDescriptor={descriptors.paymentAttemptBody}
+      sx={t => ({
+        padding: t.space.$4,
+      })}
+    >
+      <LineItems.Root>
+        <LineItems.Group>
+          <LineItems.Title title={subscriptionItem.plan.name} />
+          <LineItems.Description
+            prefix={subscriptionItem.planPeriod === 'annual' ? 'x12' : undefined}
+            text={`${fee.currencySymbol}${fee.amountFormatted}`}
+          />
+        </LineItems.Group>
+        <LineItems.Group
+          borderTop
+          variant='tertiary'
+        >
+          <LineItems.Title title={localizationKeys('commerce.subtotal')} />
+          <LineItems.Description
+            text={`${subscriptionItem.amount?.currencySymbol}${subscriptionItem.amount?.amountFormatted}`}
+          />
+        </LineItems.Group>
+        {subscriptionItem.credit && subscriptionItem.credit.amount.amount > 0 && (
+          <LineItems.Group variant='tertiary'>
+            <LineItems.Title title={localizationKeys('commerce.credit')} />
+            <LineItems.Description
+              text={`- ${subscriptionItem.credit.amount.currencySymbol}${subscriptionItem.credit.amount.amountFormatted}`}
+            />
+          </LineItems.Group>
+        )}
+      </LineItems.Root>
+    </Box>
+  );
+}
+
 function CopyButton({ text, copyLabel = 'Copy' }: { text: string; copyLabel?: string }) {
   const { onCopy, hasCopied } = useClipboard(text);
 
@@ -227,7 +270,7 @@ function CopyButton({ text, copyLabel = 'Copy' }: { text: string; copyLabel?: st
         borderRadius: t.radii.$sm,
         '&:focus-visible': {
           outline: '2px solid',
-          outlineColor: t.colors.$neutralAlpha200,
+          outlineColor: t.colors.$colorRing,
         },
       })}
       focusRing={false}

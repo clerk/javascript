@@ -16,6 +16,10 @@ import { Form } from '@/ui/elements/Form';
 import { Header } from '@/ui/elements/Header';
 import { LoadingCard } from '@/ui/elements/LoadingCard';
 import { SocialButtonsReversibleContainerWithDivider } from '@/ui/elements/ReversibleContainer';
+import { handleError } from '@/ui/utils/errorHandler';
+import { isMobileDevice } from '@/ui/utils/isMobileDevice';
+import type { FormControlState } from '@/ui/utils/useFormControl';
+import { buildRequest, useFormControl } from '@/ui/utils/useFormControl';
 
 import { ERROR_CODES, SIGN_UP_MODES } from '../../../core/constants';
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
@@ -33,8 +37,6 @@ import { CaptchaElement } from '../../elements/CaptchaElement';
 import { useLoadingStatus } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router';
-import type { FormControlState } from '../../utils';
-import { buildRequest, handleError, isMobileDevice, useFormControl } from '../../utils';
 import { handleCombinedFlowTransfer } from './handleCombinedFlowTransfer';
 import { useHandleAuthenticateWithPasskey } from './shared';
 import { SignInAlternativePhoneCodePhoneNumberCard } from './SignInAlternativePhoneCodePhoneNumberCard';
@@ -405,6 +407,7 @@ function SignInStartInternal(): JSX.Element {
       redirectUrl,
       redirectUrlComplete,
       oidcPrompt: ctx.oidcPrompt,
+      continueSignIn: true,
     });
   };
 

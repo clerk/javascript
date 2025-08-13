@@ -180,7 +180,7 @@ export type UseSessionReturn =
        */
       isSignedIn: undefined;
       /**
-       * The current active session for the user.
+       * The current session for the user.
        */
       session: undefined;
     }
@@ -191,7 +191,7 @@ export type UseSessionReturn =
     }
   | {
       isLoaded: true;
-      isSignedIn: true;
+      isSignedIn: boolean;
       session: SignedInSessionResource;
     };
 

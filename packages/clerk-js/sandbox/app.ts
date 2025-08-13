@@ -1,5 +1,5 @@
-import * as l from '../../localizations';
 import type { Clerk as ClerkType } from '../';
+import * as l from '../../localizations';
 
 const AVAILABLE_LOCALES = Object.keys(l) as (keyof typeof l)[];
 
@@ -35,6 +35,7 @@ const AVAILABLE_COMPONENTS = [
   'pricingTable',
   'apiKeys',
   'oauthConsent',
+  'taskChooseOrganization',
 ] as const;
 
 const COMPONENT_PROPS_NAMESPACE = 'clerk-js-sandbox';
@@ -95,6 +96,7 @@ const componentControls: Record<(typeof AVAILABLE_COMPONENTS)[number], Component
   pricingTable: buildComponentControls('pricingTable'),
   apiKeys: buildComponentControls('apiKeys'),
   oauthConsent: buildComponentControls('oauthConsent'),
+  taskChooseOrganization: buildComponentControls('taskChooseOrganization'),
 };
 
 declare global {
@@ -156,16 +158,17 @@ function appearanceVariableOptions() {
     'colorPrimary',
     'colorNeutral',
     'colorBackground',
-    'colorTextOnPrimaryBackground',
+    'colorPrimaryForeground',
+    'colorForeground',
     'colorDanger',
     'colorSuccess',
     'colorWarning',
-    'colorText',
-    'colorTextSecondary',
-    'colorInputText',
-    'colorInputBackground',
+    'colorForeground',
+    'colorMutedForeground',
+    'colorInputForeground',
+    'colorInput',
     'colorShimmer',
-    'spacingUnit',
+    'spacing',
     'borderRadius',
   ] as const;
 
@@ -191,6 +194,8 @@ function appearanceVariableOptions() {
   const updateVariables = () => {
     void Clerk.__unstable__updateProps({
       appearance: {
+        // Preserve existing appearance properties like baseTheme
+        ...Clerk.__internal_getOption('appearance'),
         variables: Object.fromEntries(
           Object.entries(variableInputs).map(([key, input]) => {
             sessionStorage.setItem(key, input.value);
@@ -329,6 +334,14 @@ void (async () => {
           scopes,
           oAuthApplicationName: searchParams.get('oauth-application-name'),
           redirectUrl: searchParams.get('redirect_uri'),
+        },
+      );
+    },
+    '/task-choose-organization': () => {
+      Clerk.mountTaskChooseOrganization(
+        app,
+        componentControls.taskChooseOrganization.getProps() ?? {
+          redirectUrlComplete: '/user-profile',
         },
       );
     },

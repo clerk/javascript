@@ -1,6 +1,6 @@
 {
   "name": "@clerk/fastify",
-  "version": "2.4.1",
+  "version": "2.4.18",
   "description": "Clerk SDK for Fastify",
   "keywords": [
     "auth",
@@ -55,18 +55,20 @@
     "build": "tsup --env.NODE_ENV production",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
+    "format": "node ../../scripts/format-package.mjs",
+    "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src",
     "lint:attw": "attw --pack . --profile node16 --ignore-rules unexpected-module-syntax",
     "lint:publint": "publint",
     "publish:local": "pnpm yalc push --replace  --sig",
-    "test": "jest",
-    "test:cache:clear": "jest --clearCache --useStderr"
+    "test": "vitest run",
+    "test:watch": "vitest watch"
   },
   "dependencies": {
     "@clerk/backend": "workspace:^",
     "@clerk/shared": "workspace:^",
     "@clerk/types": "workspace:^",
-    "cookies": "0.8.0",
+    "cookies": "0.9.1",
     "fastify-plugin": "^5.0.1"
   },
   "devDependencies": {

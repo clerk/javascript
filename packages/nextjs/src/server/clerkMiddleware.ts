@@ -1,11 +1,13 @@
 import type { AuthObject, ClerkClient } from '@clerk/backend';
 import type {
+  AuthenticatedState,
   AuthenticateRequestOptions,
   ClerkRequest,
   RedirectFun,
   RequestState,
   SignedInAuthObject,
   SignedOutAuthObject,
+  UnauthenticatedState,
 } from '@clerk/backend/internal';
 import {
   AuthStatus,
@@ -15,6 +17,7 @@ import {
   getAuthObjectForAcceptedToken,
   isMachineTokenByPrefix,
   isTokenTypeAccepted,
+  makeAuthObjectSerializable,
   TokenType,
 } from '@clerk/backend/internal';
 import { parsePublishableKey } from '@clerk/shared/keys';
@@ -194,7 +197,14 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
 
       const locationHeader = requestState.headers.get(constants.Headers.Location);
       if (locationHeader) {
-        return new Response(null, { status: 307, headers: requestState.headers });
+        const res = NextResponse.redirect(locationHeader);
+        requestState.headers.forEach((value, key) => {
+          if (key === constants.Headers.Location) {
+            return;
+          }
+          res.headers.append(key, value);
+        });
+        return res;
       } else if (requestState.status === AuthStatus.Handshake) {
         throw new Error('Clerk: handshake status without redirect');
       }
@@ -206,7 +216,7 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       const redirectToSignUp = createMiddlewareRedirectToSignUp(clerkRequest);
       const protect = await createMiddlewareProtect(clerkRequest, authObject, redirectToSignIn);
 
-      const authHandler = createMiddlewareAuthHandler(authObject, redirectToSignIn, redirectToSignUp);
+      const authHandler = createMiddlewareAuthHandler(requestState, redirectToSignIn, redirectToSignUp);
       authHandler.protect = protect;
 
       let handlerResult: Response = NextResponse.next();
@@ -265,7 +275,14 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
             }
           : {};
 
-      decorateRequest(clerkRequest, handlerResult, requestState, resolvedParams, keylessKeysForRequestData);
+      decorateRequest(
+        clerkRequest,
+        handlerResult,
+        requestState,
+        resolvedParams,
+        keylessKeysForRequestData,
+        authObject.tokenType === 'session_token' ? null : makeAuthObjectSerializable(authObject),
+      );
 
       return handlerResult;
     });
@@ -412,14 +429,18 @@ const createMiddlewareProtect = (
  * - For machine tokens: validates token type and returns appropriate auth object
  */
 const createMiddlewareAuthHandler = (
-  rawAuthObject: AuthObject,
+  requestState: AuthenticatedState<'session_token'> | UnauthenticatedState<'session_token'>,
   redirectToSignIn: RedirectFun<Response>,
   redirectToSignUp: RedirectFun<Response>,
 ): ClerkMiddlewareAuth => {
   const authHandler = async (options?: GetAuthOptions) => {
+    const rawAuthObject = requestState.toAuth({ treatPendingAsSignedOut: options?.treatPendingAsSignedOut });
     const acceptsToken = options?.acceptsToken ?? TokenType.SessionToken;
 
-    const authObject = getAuthObjectForAcceptedToken({ authObject: rawAuthObject, acceptsToken });
+    const authObject = getAuthObjectForAcceptedToken({
+      authObject: rawAuthObject,
+      acceptsToken,
+    });
 
     if (authObject.tokenType === TokenType.SessionToken && isTokenTypeAccepted(TokenType.SessionToken, acceptsToken)) {
       return Object.assign(authObject, {

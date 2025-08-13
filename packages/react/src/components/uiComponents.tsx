@@ -9,6 +9,7 @@ import type {
   PricingTableProps,
   SignInProps,
   SignUpProps,
+  TaskChooseOrganizationProps,
   UserButtonProps,
   UserProfileProps,
   WaitlistProps,
@@ -632,4 +633,32 @@ export const APIKeys = withClerk(
     );
   },
   { component: 'ApiKeys', renderWhileLoading: true },
+);
+
+export const TaskChooseOrganization = withClerk(
+  ({ clerk, component, fallback, ...props }: WithClerkProp<TaskChooseOrganizationProps & FallbackProp>) => {
+    const mountingStatus = useWaitForComponentMount(component);
+    const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
+
+    const rendererRootProps = {
+      ...(shouldShowFallback && fallback && { style: { display: 'none' } }),
+    };
+
+    return (
+      <>
+        {shouldShowFallback && fallback}
+        {clerk.loaded && (
+          <ClerkHostRenderer
+            component={component}
+            mount={clerk.mountTaskChooseOrganization}
+            unmount={clerk.unmountTaskChooseOrganization}
+            updateProps={(clerk as any).__unstable__updateProps}
+            props={props}
+            rootProps={rendererRootProps}
+          />
+        )}
+      </>
+    );
+  },
+  { component: 'TaskChooseOrganization', renderWhileLoading: true },
 );

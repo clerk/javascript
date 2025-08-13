@@ -6,6 +6,7 @@ import { runtime } from '../runtime';
 import { assertValidPublishableKey } from '../util/optionsAssertions';
 import { getCookieSuffix, getSuffixedCookieName, parsePublishableKey } from '../util/shared';
 import type { ClerkRequest } from './clerkRequest';
+import { TokenType } from './tokenTypes';
 import type { AuthenticateRequestOptions } from './types';
 
 interface AuthenticateContext extends AuthenticateRequestOptions {
@@ -66,14 +67,20 @@ class AuthenticateContext implements AuthenticateContext {
     private clerkRequest: ClerkRequest,
     options: AuthenticateRequestOptions,
   ) {
-    // Even though the options are assigned to this later in this function
-    // we set the publishableKey here because it is being used in cookies/headers/handshake-values
-    // as part of getMultipleAppsCookie
-    this.initPublishableKeyValues(options);
-    this.initHeaderValues();
-    // initCookieValues should be used before initHandshakeValues because it depends on suffixedCookies
-    this.initCookieValues();
-    this.initHandshakeValues();
+    if (options.acceptsToken === TokenType.M2MToken || options.acceptsToken === TokenType.ApiKey) {
+      // For non-session tokens, we only want to set the header values.
+      this.initHeaderValues();
+    } else {
+      // Even though the options are assigned to this later in this function
+      // we set the publishableKey here because it is being used in cookies/headers/handshake-values
+      // as part of getMultipleAppsCookie.
+      this.initPublishableKeyValues(options);
+      this.initHeaderValues();
+      // initCookieValues should be used before initHandshakeValues because it depends on suffixedCookies
+      this.initCookieValues();
+      this.initHandshakeValues();
+    }
+
     Object.assign(this, options);
     this.clerkUrl = this.clerkRequest.clerkUrl;
   }
@@ -165,6 +172,30 @@ class AuthenticateContext implements AuthenticateContext {
     }
 
     return true;
+  }
+
+  /**
+   * Determines if the request came from a different origin based on the referrer header.
+   * Used for cross-origin detection in multi-domain authentication flows.
+   *
+   * @returns {boolean} True if referrer exists and is from a different origin, false otherwise.
+   */
+  public isCrossOriginReferrer(): boolean {
+    if (!this.referrer || !this.clerkUrl.origin) {
+      return false;
+    }
+
+    try {
+      if (this.getHeader(constants.Headers.SecFetchSite) === 'cross-site') {
+        return true;
+      }
+
+      const referrerOrigin = new URL(this.referrer).origin;
+      return referrerOrigin !== this.clerkUrl.origin;
+    } catch {
+      // Invalid referrer URL format
+      return false;
+    }
   }
 
   private initPublishableKeyValues(options: AuthenticateRequestOptions) {

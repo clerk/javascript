@@ -1,121 +1,119 @@
-import { useClerk, useOrganization } from '@clerk/shared/react';
+import { useClerk } from '@clerk/shared/react';
 import type {
   __internal_PlanDetailsProps,
-  ClerkAPIError,
-  ClerkRuntimeError,
+  ClerkAPIResponseError,
   CommercePlanResource,
   CommerceSubscriptionPlanPeriod,
-  CommerceSubscriptionResource,
 } from '@clerk/types';
 import * as React from 'react';
 import { useMemo, useState } from 'react';
+import useSWR from 'swr';
 
 import { Alert } from '@/ui/elements/Alert';
 import { Avatar } from '@/ui/elements/Avatar';
-import { Drawer, useDrawerContext } from '@/ui/elements/Drawer';
+import { Drawer } from '@/ui/elements/Drawer';
 import { Switch } from '@/ui/elements/Switch';
 
-import { useProtect } from '../../common';
-import { SubscriberTypeContext, usePlansContext, useSubscriberTypeContext, useSubscriptions } from '../../contexts';
-import { Badge, Box, Button, Col, descriptors, Flex, Heading, localizationKeys, Span, Text } from '../../customizables';
-import { handleError } from '../../utils';
+import { normalizeFormatted, SubscriberTypeContext } from '../../contexts';
+import {
+  Box,
+  Col,
+  descriptors,
+  Flex,
+  Heading,
+  localizationKeys,
+  Span,
+  Spinner,
+  Text,
+  useLocalizations,
+} from '../../customizables';
 
 export const PlanDetails = (props: __internal_PlanDetailsProps) => {
   return (
-    <SubscriberTypeContext.Provider value={props.subscriberType || 'user'}>
-      <Drawer.Content>
-        <PlanDetailsInternal {...props} />
-      </Drawer.Content>
-    </SubscriberTypeContext.Provider>
+    <Drawer.Content>
+      <PlanDetailsInternal {...props} />
+    </Drawer.Content>
+  );
+};
+
+const BodyFiller = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <Drawer.Body
+      sx={t => ({
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flex: 1,
+        overflowY: 'auto',
+        padding: t.space.$4,
+        gap: t.space.$4,
+      })}
+    >
+      {children}
+    </Drawer.Body>
+  );
+};
+
+const PlanDetailsError = ({ error }: { error: ClerkAPIResponseError }) => {
+  const { translateError } = useLocalizations();
+  return (
+    <BodyFiller>
+      <Alert
+        variant='danger'
+        colorScheme='danger'
+      >
+        {translateError(error.errors[0])}
+      </Alert>
+    </BodyFiller>
   );
 };
 
 const PlanDetailsInternal = ({
-  plan,
-  onSubscriptionCancel,
-  portalRoot,
+  planId,
+  plan: initialPlan,
   initialPlanPeriod = 'month',
 }: __internal_PlanDetailsProps) => {
   const clerk = useClerk();
-  const { organization } = useOrganization();
-  const [showConfirmation, setShowConfirmation] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [cancelError, setCancelError] = useState<ClerkRuntimeError | ClerkAPIError | string | undefined>();
   const [planPeriod, setPlanPeriod] = useState<CommerceSubscriptionPlanPeriod>(initialPlanPeriod);
 
-  const { setIsOpen } = useDrawerContext();
   const {
-    activeOrUpcomingSubscriptionBasedOnPlanPeriod,
-    revalidateAll,
-    buttonPropsForPlan,
-    isDefaultPlanImplicitlyActiveOrUpcoming,
-  } = usePlansContext();
-  const subscriberType = useSubscriberTypeContext();
-  const canManageBilling = useProtect(
-    has => has({ permission: 'org:sys_billing:manage' }) || subscriberType === 'user',
+    data: plan,
+    isLoading,
+    error,
+  } = useSWR<CommercePlanResource, ClerkAPIResponseError>(
+    planId || initialPlan ? { type: 'plan', id: planId || initialPlan?.id } : null,
+    // @ts-expect-error we are handling it above
+    () => clerk.billing.getPlan({ id: planId || initialPlan?.id }),
+    {
+      fallbackData: initialPlan,
+      revalidateOnFocus: false,
+      shouldRetryOnError: false,
+      keepPreviousData: true,
+    },
   );
+
+  if (isLoading && !initialPlan) {
+    return (
+      <BodyFiller>
+        <Spinner />
+      </BodyFiller>
+    );
+  }
+
+  if (!plan && error) {
+    return <PlanDetailsError error={error} />;
+  }
 
   if (!plan) {
     return null;
   }
 
-  const subscription = activeOrUpcomingSubscriptionBasedOnPlanPeriod(plan, planPeriod);
-
-  const handleClose = () => {
-    if (setIsOpen) {
-      setIsOpen(false);
-    }
-  };
-
   const features = plan.features;
   const hasFeatures = features.length > 0;
-  const cancelSubscription = async () => {
-    if (!subscription) {
-      return;
-    }
-
-    setCancelError(undefined);
-    setIsSubmitting(true);
-
-    await subscription
-      .cancel({ orgId: subscriberType === 'org' ? organization?.id : undefined })
-      .then(() => {
-        setIsSubmitting(false);
-        onSubscriptionCancel?.();
-        handleClose();
-      })
-      .catch(error => {
-        handleError(error, [], setCancelError);
-        setIsSubmitting(false);
-      });
-  };
-
-  type Open__internal_CheckoutProps = {
-    planPeriod?: CommerceSubscriptionPlanPeriod;
-  };
-
-  const openCheckout = (props?: Open__internal_CheckoutProps) => {
-    handleClose();
-
-    // if the plan doesn't support annual, use monthly
-    let _planPeriod = props?.planPeriod || planPeriod;
-    if (_planPeriod === 'annual' && plan.annualMonthlyAmount === 0) {
-      _planPeriod = 'month';
-    }
-
-    clerk.__internal_openCheckout({
-      planId: plan.id,
-      planPeriod: _planPeriod,
-      subscriberType: subscriberType,
-      onSubscriptionComplete: () => {
-        void revalidateAll();
-      },
-      portalRoot,
-    });
-  };
 
   return (
-    <>
+    <SubscriberTypeContext.Provider value={plan.forPayerType === 'org' ? 'organization' : 'user'}>
       <Drawer.Header
         sx={t =>
           !hasFeatures
@@ -129,7 +127,6 @@ const PlanDetailsInternal = ({
       >
         <Header
           plan={plan}
-          subscription={subscription}
           planPeriod={planPeriod}
           setPlanPeriod={setPlanPeriod}
           closeSlot={<Drawer.Close />}
@@ -206,128 +203,7 @@ const PlanDetailsInternal = ({
           </Box>
         </Drawer.Body>
       ) : null}
-
-      {(!plan.isDefault && !isDefaultPlanImplicitlyActiveOrUpcoming) || !subscription ? (
-        <Drawer.Footer>
-          {subscription ? (
-            subscription.canceledAt ? (
-              <Button
-                block
-                textVariant='buttonLarge'
-                {...buttonPropsForPlan({ plan })}
-                onClick={() => openCheckout()}
-              />
-            ) : (
-              <Col gap={4}>
-                {!!subscription &&
-                subscription.planPeriod === 'month' &&
-                plan.annualMonthlyAmount > 0 &&
-                planPeriod === 'annual' ? (
-                  <Button
-                    block
-                    variant='bordered'
-                    colorScheme='secondary'
-                    textVariant='buttonLarge'
-                    isDisabled={!canManageBilling}
-                    onClick={() => openCheckout({ planPeriod: 'annual' })}
-                    localizationKey={localizationKeys('commerce.switchToAnnual')}
-                  />
-                ) : null}
-                {!!subscription && subscription.planPeriod === 'annual' && planPeriod === 'month' ? (
-                  <Button
-                    block
-                    variant='bordered'
-                    colorScheme='secondary'
-                    textVariant='buttonLarge'
-                    isDisabled={!canManageBilling}
-                    onClick={() => openCheckout({ planPeriod: 'month' })}
-                    localizationKey={localizationKeys('commerce.switchToMonthly')}
-                  />
-                ) : null}
-                <Button
-                  block
-                  variant='bordered'
-                  colorScheme='danger'
-                  textVariant='buttonLarge'
-                  isDisabled={!canManageBilling}
-                  onClick={() => setShowConfirmation(true)}
-                  localizationKey={localizationKeys('commerce.cancelSubscription')}
-                />
-              </Col>
-            )
-          ) : (
-            <Button
-              block
-              textVariant='buttonLarge'
-              {...buttonPropsForPlan({ plan })}
-              onClick={() => openCheckout()}
-            />
-          )}
-        </Drawer.Footer>
-      ) : null}
-
-      {subscription ? (
-        <Drawer.Confirmation
-          open={showConfirmation}
-          onOpenChange={setShowConfirmation}
-          actionsSlot={
-            <>
-              {!isSubmitting && (
-                <Button
-                  variant='ghost'
-                  size='sm'
-                  textVariant='buttonLarge'
-                  isDisabled={!canManageBilling}
-                  onClick={() => {
-                    setCancelError(undefined);
-                    setShowConfirmation(false);
-                  }}
-                  localizationKey={localizationKeys('commerce.keepSubscription')}
-                />
-              )}
-              <Button
-                variant='solid'
-                colorScheme='danger'
-                size='sm'
-                textVariant='buttonLarge'
-                isLoading={isSubmitting}
-                isDisabled={!canManageBilling}
-                onClick={() => {
-                  setCancelError(undefined);
-                  setShowConfirmation(false);
-                  void cancelSubscription();
-                }}
-                localizationKey={localizationKeys('commerce.cancelSubscription')}
-              />
-            </>
-          }
-        >
-          <Heading
-            elementDescriptor={descriptors.drawerConfirmationTitle}
-            as='h2'
-            textVariant='h3'
-            localizationKey={localizationKeys('commerce.cancelSubscriptionTitle', {
-              plan: `${subscription.status === 'upcoming' ? 'upcoming ' : ''}${subscription.plan.name}`,
-            })}
-          />
-          <Text
-            elementDescriptor={descriptors.drawerConfirmationDescription}
-            colorScheme='secondary'
-            localizationKey={
-              subscription.status === 'upcoming'
-                ? localizationKeys('commerce.cancelSubscriptionNoCharge')
-                : localizationKeys('commerce.cancelSubscriptionAccessUntil', {
-                    plan: subscription.plan.name,
-                    date: subscription.periodEnd,
-                  })
-            }
-          />
-          {cancelError && (
-            <Alert colorScheme='danger'>{typeof cancelError === 'string' ? cancelError : cancelError.message}</Alert>
-          )}
-        </Drawer.Confirmation>
-      ) : null}
-    </>
+    </SubscriberTypeContext.Provider>
   );
 };
 
@@ -337,28 +213,24 @@ const PlanDetailsInternal = ({
 
 interface HeaderProps {
   plan: CommercePlanResource;
-  subscription?: CommerceSubscriptionResource;
   planPeriod: CommerceSubscriptionPlanPeriod;
   setPlanPeriod: (val: CommerceSubscriptionPlanPeriod) => void;
   closeSlot?: React.ReactNode;
 }
 
 const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
-  const { plan, subscription, closeSlot, planPeriod, setPlanPeriod } = props;
+  const { plan, closeSlot, planPeriod, setPlanPeriod } = props;
 
-  const { captionForSubscription, isDefaultPlanImplicitlyActiveOrUpcoming } = usePlansContext();
-  const { data: subscriptions } = useSubscriptions();
-
-  const isImplicitlyActiveOrUpcoming = isDefaultPlanImplicitlyActiveOrUpcoming && plan.isDefault;
-
-  const showBadge = !!subscription;
-
-  const getPlanFee = useMemo(() => {
-    if (plan.annualMonthlyAmount <= 0) {
-      return plan.amountFormatted;
+  const fee = useMemo(() => {
+    if (plan.annualMonthlyFee.amount <= 0) {
+      return plan.fee;
     }
-    return planPeriod === 'annual' ? plan.annualMonthlyAmountFormatted : plan.amountFormatted;
+    return planPeriod === 'annual' ? plan.annualMonthlyFee : plan.fee;
   }, [plan, planPeriod]);
+
+  const feeFormatted = React.useMemo(() => {
+    return normalizeFormatted(fee.amountFormatted);
+  }, [fee.amountFormatted]);
 
   return (
     <Box
@@ -386,38 +258,6 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
         gap={3}
         elementDescriptor={descriptors.planDetailBadgeAvatarTitleDescriptionContainer}
       >
-        {showBadge ? (
-          <Flex
-            align='center'
-            gap={3}
-            elementDescriptor={descriptors.planDetailBadgeContainer}
-            sx={t => ({
-              paddingInlineEnd: t.space.$10,
-            })}
-          >
-            {subscription?.status === 'active' || (isImplicitlyActiveOrUpcoming && subscriptions.length === 0) ? (
-              <Badge
-                elementDescriptor={descriptors.planDetailBadge}
-                localizationKey={localizationKeys('badge__activePlan')}
-                colorScheme={'secondary'}
-              />
-            ) : (
-              <Badge
-                elementDescriptor={descriptors.planDetailBadge}
-                localizationKey={localizationKeys('badge__upcomingPlan')}
-                colorScheme={'primary'}
-              />
-            )}
-            {!!subscription && (
-              <Text
-                elementDescriptor={descriptors.planDetailCaption}
-                variant={'caption'}
-                localizationKey={captionForSubscription(subscription)}
-                colorScheme='secondary'
-              />
-            )}
-          </Flex>
-        ) : null}
         {plan.avatarUrl ? (
           <Avatar
             boxElementDescriptor={descriptors.planDetailAvatar}
@@ -469,8 +309,8 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
             variant='h1'
             colorScheme='body'
           >
-            {plan.currencySymbol}
-            {getPlanFee}
+            {fee.currencySymbol}
+            {feeFormatted}
           </Text>
           <Text
             elementDescriptor={descriptors.planDetailFeePeriod}
@@ -488,7 +328,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
         </>
       </Flex>
 
-      {plan.annualMonthlyAmount > 0 ? (
+      {plan.annualMonthlyFee.amount > 0 ? (
         <Box
           elementDescriptor={descriptors.planDetailPeriodToggle}
           sx={t => ({

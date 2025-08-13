@@ -1,9 +1,11 @@
-import { resolveAuthState } from '@clerk/shared/authorization';
+import { createCheckAuthorization, resolveAuthState } from '@clerk/shared/authorization';
 import { deriveState } from '@clerk/shared/deriveState';
 import type {
   CheckAuthorizationWithCustomPermissions,
   Clerk,
+  ClientResource,
   GetToken,
+  JwtPayload,
   PendingSessionOptions,
   SignOut,
   UseAuthReturn,
@@ -13,7 +15,7 @@ import { useCallback, useSyncExternalStore } from 'react';
 
 import { authAsyncStorage } from '#async-local-storage';
 
-import { $authStore, $clerkStore } from '../stores/external';
+import { $authStore } from '../stores/external';
 import { $clerk, $csrState } from '../stores/internal';
 
 /**
@@ -85,36 +87,25 @@ type UseAuth = (options?: PendingSessionOptions) => UseAuthReturn;
  */
 export const useAuth: UseAuth = ({ treatPendingAsSignedOut } = {}) => {
   const authContext = useAuthStore();
-  const clerkContext = useStore($clerkStore);
 
   const getToken: GetToken = useCallback(createGetToken(), []);
   const signOut: SignOut = useCallback(createSignOut(), []);
 
-  const { userId, orgId, orgRole, orgPermissions } = authContext;
+  const { userId, orgId, orgRole, orgPermissions, factorVerificationAge, sessionClaims } = authContext;
 
   const has = useCallback(
     (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => {
-      if (!params?.permission && !params?.role) {
-        throw new Error(
-          'Missing parameters. `has` from `useAuth` requires a permission or role key to be passed. Example usage: `has({permission: "org:posts:edit"`',
-        );
-      }
-
-      if (!orgId || !userId || !orgRole || !orgPermissions) {
-        return false;
-      }
-
-      if (params.permission) {
-        return orgPermissions.includes(params.permission);
-      }
-
-      if (params.role) {
-        return orgRole === params.role;
-      }
-
-      return false;
+      return createCheckAuthorization({
+        userId,
+        orgId,
+        orgRole,
+        orgPermissions,
+        factorVerificationAge,
+        features: ((sessionClaims as JwtPayload | undefined)?.fea as string) || '',
+        plans: ((sessionClaims as JwtPayload | undefined)?.pla as string) || '',
+      })(params);
     },
-    [orgId, orgRole, userId, orgPermissions],
+    [userId, orgId, orgRole, orgPermissions, factorVerificationAge, sessionClaims],
   );
 
   const payload = resolveAuthState({
@@ -125,11 +116,7 @@ export const useAuth: UseAuth = ({ treatPendingAsSignedOut } = {}) => {
       has,
     },
     options: {
-      treatPendingAsSignedOut:
-        // Fallback from option provided via SSR / CSR contexts
-        treatPendingAsSignedOut ??
-        clerkContext?.__internal_getOption?.('treatPendingAsSignedOut') ??
-        import.meta.env.PUBLIC_CLERK_TREAT_PENDING_AS_SIGNED_OUT,
+      treatPendingAsSignedOut,
     },
   });
 
@@ -170,8 +157,7 @@ function useAuthStore() {
         {
           user: null,
           session: null,
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          client: null!,
+          client: null as unknown as ClientResource,
           organization: null,
         },
         authAsyncStorage.getStore() as any,

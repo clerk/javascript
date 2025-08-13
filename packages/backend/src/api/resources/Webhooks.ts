@@ -1,4 +1,7 @@
 import type {
+  CommercePaymentAttemptJSON,
+  CommerceSubscriptionItemJSON,
+  CommerceSubscriptionJSON,
   DeletedObjectJSON,
   EmailJSON,
   OrganizationDomainJSON,
@@ -13,7 +16,14 @@ import type {
   WaitlistEntryJSON,
 } from './JSON';
 
-type Webhook<EvtType, Data> = { type: EvtType; object: 'event'; data: Data };
+type WebhookEventAttributes = {
+  http_request: {
+    client_ip: string;
+    user_agent: string;
+  };
+};
+
+type Webhook<EvtType, Data> = { type: EvtType; object: 'event'; data: Data; event_attributes: WebhookEventAttributes };
 
 export type UserWebhookEvent =
   | Webhook<'user.created' | 'user.updated', UserJSON>
@@ -55,6 +65,29 @@ export type PermissionWebhookEvent = Webhook<
 
 export type WaitlistEntryWebhookEvent = Webhook<'waitlistEntry.created' | 'waitlistEntry.updated', WaitlistEntryJSON>;
 
+export type CommercePaymentAttemptWebhookEvent = Webhook<
+  'paymentAttempt.created' | 'paymentAttempt.updated',
+  CommercePaymentAttemptJSON
+>;
+
+export type CommerceSubscriptionWebhookEvent = Webhook<
+  'subscription.created' | 'subscription.updated' | 'subscription.active' | 'subscription.past_due',
+  CommerceSubscriptionJSON
+>;
+
+export type CommerceSubscriptionItemWebhookEvent = Webhook<
+  | 'subscriptionItem.created'
+  | 'subscriptionItem.updated'
+  | 'subscriptionItem.active'
+  | 'subscriptionItem.canceled'
+  | 'subscriptionItem.upcoming'
+  | 'subscriptionItem.ended'
+  | 'subscriptionItem.abandoned'
+  | 'subscriptionItem.incomplete'
+  | 'subscriptionItem.past_due',
+  CommerceSubscriptionItemJSON
+>;
+
 export type WebhookEvent =
   | UserWebhookEvent
   | SessionWebhookEvent
@@ -66,6 +99,9 @@ export type WebhookEvent =
   | OrganizationInvitationWebhookEvent
   | RoleWebhookEvent
   | PermissionWebhookEvent
-  | WaitlistEntryWebhookEvent;
+  | WaitlistEntryWebhookEvent
+  | CommercePaymentAttemptWebhookEvent
+  | CommerceSubscriptionWebhookEvent
+  | CommerceSubscriptionItemWebhookEvent;
 
 export type WebhookEventType = WebhookEvent['type'];

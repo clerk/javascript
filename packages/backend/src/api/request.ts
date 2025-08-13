@@ -8,13 +8,7 @@ import { assertValidSecretKey } from '../util/optionsAssertions';
 import { joinPaths } from '../util/path';
 import { deserialize } from './resources/Deserializer';
 
-export type ClerkBackendApiRequestOptions = {
-  method: 'GET' | 'POST' | 'PATCH' | 'DELETE' | 'PUT';
-  queryParams?: Record<string, unknown>;
-  headerParams?: Record<string, string>;
-  bodyParams?: Record<string, unknown> | Array<Record<string, unknown>>;
-  formData?: FormData;
-} & (
+type ClerkBackendApiRequestOptionsUrlOrPath =
   | {
       url: string;
       path?: string;
@@ -22,8 +16,33 @@ export type ClerkBackendApiRequestOptions = {
   | {
       url?: string;
       path: string;
+    };
+
+type ClerkBackendApiRequestOptionsBodyParams =
+  | {
+      bodyParams: Record<string, unknown> | Array<Record<string, unknown>>;
+      options?: {
+        /**
+         * If true, snakecases the keys of the bodyParams object recursively.
+         * @default false
+         */
+        deepSnakecaseBodyParamKeys?: boolean;
+      };
     }
-);
+  | {
+      bodyParams?: never;
+      options?: {
+        deepSnakecaseBodyParamKeys?: never;
+      };
+    };
+
+export type ClerkBackendApiRequestOptions = {
+  method: 'GET' | 'POST' | 'PATCH' | 'DELETE' | 'PUT';
+  queryParams?: Record<string, unknown>;
+  headerParams?: Record<string, string>;
+  formData?: FormData;
+} & ClerkBackendApiRequestOptionsUrlOrPath &
+  ClerkBackendApiRequestOptionsBodyParams;
 
 export type ClerkBackendApiResponse<T> =
   | {
@@ -57,24 +76,47 @@ type BuildRequestOptions = {
    * @default true
    */
   requireSecretKey?: boolean;
+  /**
+   * If true, omits the API version from the request URL path.
+   * This is required for bapi-proxy endpoints, which do not use versioning in the URL.
+   *
+   * Note: API versioning for these endpoints is instead handled via the `Clerk-API-Version` HTTP header.
+   *
+   * @default false
+   */
+  skipApiVersionInUrl?: boolean;
+  /* Machine secret key */
+  machineSecretKey?: string;
+  /**
+   * If true, uses machineSecretKey for authorization instead of secretKey.
+   *
+   * Note: This is only used for machine-to-machine tokens.
+   *
+   * @default false
+   */
+  useMachineSecretKey?: boolean;
 };
 
 export function buildRequest(options: BuildRequestOptions) {
   const requestFn = async <T>(requestOptions: ClerkBackendApiRequestOptions): Promise<ClerkBackendApiResponse<T>> => {
     const {
       secretKey,
+      machineSecretKey,
+      useMachineSecretKey = false,
       requireSecretKey = true,
       apiUrl = API_URL,
       apiVersion = API_VERSION,
       userAgent = USER_AGENT,
+      skipApiVersionInUrl = false,
     } = options;
-    const { path, method, queryParams, headerParams, bodyParams, formData } = requestOptions;
+    const { path, method, queryParams, headerParams, bodyParams, formData, options: opts } = requestOptions;
+    const { deepSnakecaseBodyParamKeys = false } = opts || {};
 
     if (requireSecretKey) {
       assertValidSecretKey(secretKey);
     }
 
-    const url = joinPaths(apiUrl, apiVersion, path);
+    const url = skipApiVersionInUrl ? joinPaths(apiUrl, path) : joinPaths(apiUrl, apiVersion, path);
 
     // Build final URL with search parameters
     const finalUrl = new URL(url);
@@ -92,14 +134,21 @@ export function buildRequest(options: BuildRequestOptions) {
     }
 
     // Build headers
-    const headers: Record<string, any> = {
+    const headers = new Headers({
       'Clerk-API-Version': SUPPORTED_BAPI_VERSION,
-      'User-Agent': userAgent,
+      [constants.Headers.UserAgent]: userAgent,
       ...headerParams,
-    };
+    });
 
-    if (secretKey) {
-      headers.Authorization = `Bearer ${secretKey}`;
+    // If Authorization header already exists, preserve it.
+    // Otherwise, use machine secret key if enabled, or fall back to regular secret key
+    const authorizationHeader = constants.Headers.Authorization;
+    if (!headers.has(authorizationHeader)) {
+      if (useMachineSecretKey && machineSecretKey) {
+        headers.set(authorizationHeader, `Bearer ${machineSecretKey}`);
+      } else if (secretKey) {
+        headers.set(authorizationHeader, `Bearer ${secretKey}`);
+      }
     }
 
     let res: Response | undefined;
@@ -112,7 +161,7 @@ export function buildRequest(options: BuildRequestOptions) {
         });
       } else {
         // Enforce application/json for all non form-data requests
-        headers['Content-Type'] = 'application/json';
+        headers.set('Content-Type', 'application/json');
 
         const buildBody = () => {
           const hasBody = method !== 'GET' && bodyParams && Object.keys(bodyParams).length > 0;
@@ -120,7 +169,8 @@ export function buildRequest(options: BuildRequestOptions) {
             return null;
           }
 
-          const formatKeys = (object: Parameters<typeof snakecaseKeys>[0]) => snakecaseKeys(object, { deep: false });
+          const formatKeys = (object: Parameters<typeof snakecaseKeys>[0]) =>
+            snakecaseKeys(object, { deep: deepSnakecaseBodyParamKeys });
 
           return {
             body: JSON.stringify(Array.isArray(bodyParams) ? bodyParams.map(formatKeys) : formatKeys(bodyParams)),

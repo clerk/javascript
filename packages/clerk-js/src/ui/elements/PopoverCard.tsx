@@ -5,7 +5,7 @@ import { Col, descriptors, Flex, Flow, useAppearance } from '../customizables';
 import type { ElementDescriptor } from '../customizables/elementDescriptors';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { animations, common } from '../styledSystem';
-import { colors } from '../utils';
+import { colors } from '../utils/colors';
 import { Card } from './Card';
 
 const PopoverCardRoot = React.forwardRef<
@@ -58,8 +58,9 @@ const PopoverCardContent = (props: PropsOfComponent<typeof Flex>) => {
           zIndex: t.zIndices.$card,
           borderWidth: t.borderWidths.$normal,
           borderStyle: t.borderStyles.$solid,
-          borderColor: t.colors.$neutralAlpha50,
-          boxShadow: t.shadows.$cardContentShadow,
+          borderColor: t.colors.$borderAlpha150,
+          marginInline: '-1px',
+          marginBlockStart: '-1px',
         }),
         sx,
       ]}
@@ -85,7 +86,7 @@ const PopoverCardFooter = (props: PropsOfComponent<typeof Flex>) => {
             colors.setAlpha(t.colors.$colorBackground, 1),
             t.colors.$neutralAlpha50,
           ),
-          marginTop: `-${t.space.$2}`,
+          marginTop: `calc(${t.space.$2} * -1)`,
           paddingTop: t.space.$2,
           '&:empty': {
             padding: 0,
@@ -95,7 +96,7 @@ const PopoverCardFooter = (props: PropsOfComponent<typeof Flex>) => {
             padding: `${t.space.$4} ${t.space.$8}`,
             borderTopWidth: t.borderWidths.$normal,
             borderTopStyle: t.borderStyles.$solid,
-            borderTopColor: t.colors.$neutralAlpha100,
+            borderTopColor: t.colors.$borderAlpha100,
           },
         }),
         sx,

@@ -1,10 +1,10 @@
 import { useUser } from '@clerk/shared/react';
+import type { ComponentProps } from 'react';
 import { useState } from 'react';
 
 import { useEnvironment, useOAuthConsentContext } from '@/ui/contexts';
 import { Box, Button, Flex, Flow, Grid, Icon, Text } from '@/ui/customizables';
 import { ApplicationLogo } from '@/ui/elements/ApplicationLogo';
-import { Avatar } from '@/ui/elements/Avatar';
 import { Card } from '@/ui/elements/Card';
 import { withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
@@ -14,7 +14,7 @@ import { LockDottedCircle } from '@/ui/icons';
 import { Textarea } from '@/ui/primitives';
 import type { ThemableCssProp } from '@/ui/styledSystem';
 import { common } from '@/ui/styledSystem';
-import * as utils from '@/ui/utils';
+import { colors } from '@/ui/utils/colors';
 
 export function OAuthConsentInternal() {
   const { scopes, oAuthApplicationName, oAuthApplicationLogoUrl, redirectUrl, onDeny, onAllow } =
@@ -42,13 +42,16 @@ export function OAuthConsentInternal() {
             {/* both have avatars */}
             {oAuthApplicationLogoUrl && logoImageUrl && (
               <ConnectionHeader>
-                <Avatar
-                  imageUrl={oAuthApplicationLogoUrl}
-                  size={t => t.space.$12}
-                  rounded={false}
-                />
+                <ConnectionItem justify='end'>
+                  <ApplicationLogo
+                    src={oAuthApplicationLogoUrl}
+                    alt={oAuthApplicationName}
+                  />
+                </ConnectionItem>
                 <ConnectionSeparator />
-                <ApplicationLogo />
+                <ConnectionItem justify='start'>
+                  <ApplicationLogo />
+                </ConnectionItem>
               </ConnectionHeader>
             )}
             {/* only OAuth app has an avatar */}
@@ -59,10 +62,9 @@ export function OAuthConsentInternal() {
                     position: 'relative',
                   }}
                 >
-                  <Avatar
-                    imageUrl={oAuthApplicationLogoUrl}
-                    size={t => t.space.$12}
-                    rounded={false}
+                  <ApplicationLogo
+                    src={oAuthApplicationLogoUrl}
+                    alt={oAuthApplicationName}
                   />
                   <ConnectionIcon
                     size='sm'
@@ -77,31 +79,21 @@ export function OAuthConsentInternal() {
             )}
             {/* only Clerk application has an avatar */}
             {!oAuthApplicationLogoUrl && logoImageUrl && (
-              <Flex
-                justify='center'
-                align='center'
-                gap={4}
-                sx={t => ({
-                  marginBlockEnd: t.space.$6,
-                })}
-              >
-                <ConnectionIcon />
+              <ConnectionHeader>
+                <ConnectionItem justify='end'>
+                  <ConnectionIcon />
+                </ConnectionItem>
                 <ConnectionSeparator />
-                <ApplicationLogo />
-              </Flex>
+                <ConnectionItem justify='start'>
+                  <ApplicationLogo />
+                </ConnectionItem>
+              </ConnectionHeader>
             )}
             {/* no avatars */}
             {!oAuthApplicationLogoUrl && !logoImageUrl && (
-              <Flex
-                justify='center'
-                align='center'
-                gap={4}
-                sx={t => ({
-                  marginBlockEnd: t.space.$6,
-                })}
-              >
+              <ConnectionHeader>
                 <ConnectionIcon />
-              </Flex>
+              </ConnectionHeader>
             )}
             <Header.Title localizationKey={oAuthApplicationName} />
             <Header.Subtitle
@@ -113,7 +105,7 @@ export function OAuthConsentInternal() {
               textAlign: 'left',
               borderWidth: t.borderWidths.$normal,
               borderStyle: t.borderStyles.$solid,
-              borderColor: t.colors.$neutralAlpha100,
+              borderColor: t.colors.$borderAlpha100,
               borderRadius: t.radii.$lg,
               overflow: 'hidden',
             })}
@@ -122,7 +114,7 @@ export function OAuthConsentInternal() {
               sx={t => ({
                 padding: t.space.$3,
                 background: common.mergedColorsBackground(
-                  utils.colors.setAlpha(t.colors.$colorBackground, 1),
+                  colors.setAlpha(t.colors.$colorBackground, 1),
                   t.colors.$neutralAlpha50,
                 ),
               })}
@@ -146,13 +138,13 @@ export function OAuthConsentInternal() {
                     paddingBlock: t.space.$2,
                     borderTopWidth: t.borderWidths.$normal,
                     borderTopStyle: t.borderStyles.$solid,
-                    borderTopColor: t.colors.$neutralAlpha100,
+                    borderTopColor: t.colors.$borderAlpha100,
                     '&::before': {
                       content: '""',
                       display: 'inline-block',
                       width: t.space.$1,
                       height: t.space.$1,
-                      background: t.colors.$colorTextSecondary,
+                      background: t.colors.$colorMutedForeground,
                       borderRadius: t.radii.$circle,
                       transform: 'translateY(-0.1875rem)',
                       marginRight: t.space.$2,
@@ -320,6 +312,17 @@ function ConnectionHeader({ children }: { children: React.ReactNode }) {
   );
 }
 
+function ConnectionItem({ children, sx, ...props }: ComponentProps<typeof Flex>) {
+  return (
+    <Flex
+      {...props}
+      sx={[{ flex: 1 }, sx]}
+    >
+      {children}
+    </Flex>
+  );
+}
+
 function ConnectionIcon({ size = 'md', sx }: { size?: 'sm' | 'md'; sx?: ThemableCssProp }) {
   const scale: ThemableCssProp = t => {
     const value = size === 'sm' ? t.space.$6 : t.space.$12;
@@ -334,13 +337,13 @@ function ConnectionIcon({ size = 'md', sx }: { size?: 'sm' | 'md'; sx?: Themable
       sx={t => [
         {
           background: common.mergedColorsBackground(
-            utils.colors.setAlpha(t.colors.$colorBackground, 1),
+            colors.setAlpha(t.colors.$colorBackground, 1),
             t.colors.$neutralAlpha50,
           ),
           borderRadius: t.radii.$circle,
           borderWidth: t.borderWidths.$normal,
           borderStyle: t.borderStyles.$solid,
-          borderColor: t.colors.$neutralAlpha100,
+          borderColor: t.colors.$borderAlpha100,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -369,7 +372,7 @@ function ConnectionSeparator() {
       height={2}
       aria-hidden
       sx={t => ({
-        color: t.colors.$colorTextSecondary,
+        color: t.colors.$colorMutedForeground,
       })}
     >
       <path

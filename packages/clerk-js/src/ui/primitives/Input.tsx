@@ -10,8 +10,8 @@ const { applyVariants, filterProps } = createVariants((theme, props) => ({
     boxSizing: 'border-box',
     margin: 0,
     padding: `${theme.space.$1x5} ${theme.space.$3}`,
-    backgroundColor: theme.colors.$colorInputBackground,
-    color: theme.colors.$colorInputText,
+    backgroundColor: theme.colors.$colorInput,
+    color: theme.colors.$colorInputForeground,
     // outline support for Windows contrast themes
     outline: 'transparent solid 2px',
     outlineOffset: '2px',
@@ -32,7 +32,7 @@ const { applyVariants, filterProps } = createVariants((theme, props) => ({
       animationName: 'onAutoFillStart',
     },
     '::placeholder': {
-      color: theme.colors.$colorTextSecondary,
+      color: theme.colors.$colorMutedForeground,
     },
   },
   variants: {
@@ -81,12 +81,13 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref)
 
   /**
    * type="email" will not allow characters like this one "ö", instead remove type email and provide a pattern that accepts any character before the "@" symbol
+   * inputMode="email" ensures the email keyboard appears on mobile devices
    */
 
   const typeProps =
     type === 'email'
-      ? { type: 'text', pattern: '^.*@[a-zA-Z0-9\\-]+\\.[a-zA-Z0-9\\-\\.]+$' }
-      : { type: type || 'text' };
+      ? { type: 'text' as const, pattern: '^.*@[a-zA-Z0-9\\-]+\\.[a-zA-Z0-9\\-\\.]+$', inputMode: 'email' as const }
+      : { type: type || ('text' as const) };
 
   const passwordManagerProps = ignorePasswordManager
     ? {

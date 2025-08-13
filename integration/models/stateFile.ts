@@ -2,7 +2,7 @@ import { constants } from '../constants';
 import { fs } from '../scripts';
 import type { EnvironmentConfig } from './environment';
 
-type AppParams = {
+export type AppParams = {
   id: string;
   port: number;
   serverUrl: string;
@@ -83,6 +83,11 @@ const createStateFile = () => {
     return read().clerkJsHttpServerPid;
   };
 
+  const debug = () => {
+    const json = read();
+    console.log('state file', JSON.stringify(json, null, 2));
+  };
+
   return {
     remove,
     setStandAloneApp,
@@ -91,6 +96,7 @@ const createStateFile = () => {
     getClerkJsHttpServerPid,
     addLongRunningApp,
     getLongRunningApps,
+    debug,
   };
 };
 

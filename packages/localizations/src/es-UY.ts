@@ -1,16 +1,164 @@
+/*
+ * =====================================================================================
+ * DISCLAIMER:
+ * =====================================================================================
+ * This localization file is a community contribution and is not officially maintained
+ * by Clerk. It has been provided by the community and may not be fully aligned
+ * with the current or future states of the main application. Clerk does not guarantee
+ * the accuracy, completeness, or timeliness of the translations in this file.
+ * Use of this file is at your own risk and discretion.
+ * =====================================================================================
+ */
+
 import type { LocalizationResource } from '@clerk/types';
 
 export const esUY: LocalizationResource = {
   locale: 'es-UY',
+  apiKeys: {
+    action__add: undefined,
+    action__search: undefined,
+    createdAndExpirationStatus__expiresOn: undefined,
+    createdAndExpirationStatus__never: undefined,
+    detailsTitle__emptyRow: undefined,
+    formButtonPrimary__add: undefined,
+    formFieldCaption__expiration__expiresOn: undefined,
+    formFieldCaption__expiration__never: undefined,
+    formFieldOption__expiration__180d: undefined,
+    formFieldOption__expiration__1d: undefined,
+    formFieldOption__expiration__1y: undefined,
+    formFieldOption__expiration__30d: undefined,
+    formFieldOption__expiration__60d: undefined,
+    formFieldOption__expiration__7d: undefined,
+    formFieldOption__expiration__90d: undefined,
+    formFieldOption__expiration__never: undefined,
+    formHint: undefined,
+    formTitle: undefined,
+    lastUsed__days: undefined,
+    lastUsed__hours: undefined,
+    lastUsed__minutes: undefined,
+    lastUsed__months: undefined,
+    lastUsed__seconds: undefined,
+    lastUsed__years: undefined,
+    menuAction__revoke: undefined,
+    revokeConfirmation: {
+      confirmationText: undefined,
+      formButtonPrimary__revoke: undefined,
+      formHint: undefined,
+      formTitle: undefined,
+    },
+  },
   backButton: 'Atrás',
+  badge__activePlan: undefined,
+  badge__canceledEndsAt: undefined,
+  badge__currentPlan: undefined,
   badge__default: 'Predeterminado',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
   badge__otherImpersonatorDevice: 'Otro dispositivo de suplantación',
+  badge__pastDueAt: undefined,
+  badge__pastDuePlan: undefined,
   badge__primary: 'Principal',
+  badge__renewsAt: undefined,
   badge__requiresAction: 'Requiere acción',
+  badge__startsAt: undefined,
   badge__thisDevice: 'Este dispositivo',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'No verificado',
+  badge__upcomingPlan: undefined,
   badge__userDevice: 'Dispositivo del usuario',
   badge__you: 'Vos',
+  commerce: {
+    addPaymentMethod: undefined,
+    alwaysFree: undefined,
+    annually: undefined,
+    availableFeatures: undefined,
+    billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
+    cancelSubscription: undefined,
+    cancelSubscriptionAccessUntil: undefined,
+    cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionTitle: undefined,
+    cannotSubscribeMonthly: undefined,
+    cannotSubscribeUnrecoverable: undefined,
+    checkout: {
+      description__paymentSuccessful: undefined,
+      description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      lineItems: {
+        title__paymentMethod: undefined,
+        title__statementId: undefined,
+        title__subscriptionBegins: undefined,
+        title__totalPaid: undefined,
+      },
+      pastDueNotice: undefined,
+      perMonth: undefined,
+      title: undefined,
+      title__paymentSuccessful: undefined,
+      title__subscriptionSuccessful: undefined,
+    },
+    credit: undefined,
+    creditRemainder: undefined,
+    defaultFreePlanActive: undefined,
+    free: undefined,
+    getStarted: undefined,
+    keepSubscription: undefined,
+    manage: undefined,
+    manageSubscription: undefined,
+    month: undefined,
+    monthly: undefined,
+    pastDue: undefined,
+    pay: undefined,
+    paymentMethods: undefined,
+    paymentSource: {
+      applePayDescription: {
+        annual: undefined,
+        monthly: undefined,
+      },
+      dev: {
+        anyNumbers: undefined,
+        cardNumber: undefined,
+        cvcZip: undefined,
+        developmentMode: undefined,
+        expirationDate: undefined,
+        testCardInfo: undefined,
+      },
+    },
+    popular: undefined,
+    pricingTable: {
+      billingCycle: undefined,
+      included: undefined,
+    },
+    reSubscribe: undefined,
+    seeAllFeatures: undefined,
+    startFreeTrial: undefined,
+    subscribe: undefined,
+    subscriptionDetails: {
+      beginsOn: undefined,
+      currentBillingCycle: undefined,
+      endsOn: undefined,
+      nextPaymentAmount: undefined,
+      nextPaymentOn: undefined,
+      pastDueAt: undefined,
+      renewsAt: undefined,
+      subscribedOn: undefined,
+      title: undefined,
+    },
+    subtotal: undefined,
+    switchPlan: undefined,
+    switchToAnnual: undefined,
+    switchToAnnualWithAnnualPrice: undefined,
+    switchToMonthly: undefined,
+    switchToMonthlyWithPrice: undefined,
+    totalDue: undefined,
+    totalDueToday: undefined,
+    viewFeatures: undefined,
+    viewPayment: undefined,
+    year: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'Crear organización',
     invitePage: {
@@ -27,6 +175,7 @@ export const esUY: LocalizationResource = {
     sameDay: "Hoy a las {{ date | timeString('es-UY') }}",
   },
   dividerText: 'o',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'Usar otro método',
   footerPageLink__help: 'Ayuda',
   footerPageLink__privacy: 'Privacidad',
@@ -41,6 +190,9 @@ export const esUY: LocalizationResource = {
   formFieldHintText__optional: 'Opcional',
   formFieldHintText__slug:
     'Un slug es una identificación legible por humanos que debe ser única. A menudo se utiliza en URLs.',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'Ingresá el código de respaldo',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Eliminar cuenta',
   formFieldInputPlaceholder__emailAddress: 'Ingresá tu dirección de correo electrónico',
@@ -55,6 +207,9 @@ export const esUY: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Ingresá tu contraseña',
   formFieldInputPlaceholder__phoneNumber: 'Ingresá tu número de teléfono',
   formFieldInputPlaceholder__username: undefined,
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Habilitar invitaciones automáticas para este dominio',
   formFieldLabel__backupCode: 'Código de respaldo',
   formFieldLabel__confirmDeletion: 'Confirmación',
@@ -99,10 +254,71 @@ export const esUY: LocalizationResource = {
     titleWithoutPersonal: 'Elegí una organización',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: 'Invitaciones automáticas',
     badge__automaticSuggestion: 'Sugerencias automáticas',
     badge__manualInvitation: 'Sin inscripción automática',
     badge__unverified: 'No verificado',
+    billingPage: {
+      paymentHistorySection: {
+        empty: undefined,
+        notFound: undefined,
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        tableHeader__status: undefined,
+      },
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__payments: undefined,
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      statementsSection: {
+        empty: undefined,
+        itemCaption__paidForPlan: undefined,
+        itemCaption__proratedCredit: undefined,
+        itemCaption__subscribedAndPaidForPlan: undefined,
+        notFound: undefined,
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+        totalPaid: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        tableHeader__edit: undefined,
+        tableHeader__plan: undefined,
+        tableHeader__startDate: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Agregá el dominio para verificar. Los usuarios con correos electrónicos de este dominio pueden unirse automáticamente a la organización o solicitar unirse.',
@@ -160,10 +376,18 @@ export const esUY: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
+      billing: undefined,
       description: 'Gestioná tu organización.',
       general: 'General',
       members: 'Miembros',
       title: 'Organización',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -268,6 +492,7 @@ export const esUY: LocalizationResource = {
       actionText: '¿No tenés ninguno de estos?',
       blockButton__backupCode: 'Usar un código de respaldo',
       blockButton__emailCode: 'Enviar código por correo a {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Continuar con tu contraseña',
       blockButton__phoneCode: 'Enviar código SMS a {{identifier}}',
       blockButton__totp: 'Usar tu aplicación autenticadora',
@@ -294,6 +519,11 @@ export const esUY: LocalizationResource = {
       message: 'No se puede proceder con la verificación. No hay un factor de autenticación adecuado configurado',
       subtitle: 'Ocurrió un error',
       title: 'No se puede verificar tu cuenta',
+    },
+    passkey: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Usar otro método',
@@ -343,6 +573,12 @@ export const esUY: LocalizationResource = {
       },
       subtitle: '¿Tenés problemas? Podés usar cualquiera de estos métodos para ingresar.',
       title: 'Usar otro método',
+    },
+    alternativePhoneCodeProvider: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     backupCodeMfa: {
       subtitle: 'Tu código de respaldo es el que recibiste al configurar la autenticación de dos pasos.',
@@ -452,6 +688,12 @@ export const esUY: LocalizationResource = {
       actionLink__use_username: 'Usar nombre de usuario',
       actionText: '¿No tenés una cuenta?',
       actionText__join_waitlist: '¿Querés acceso anticipado?',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: '¡Bienvenido de nuevo! Por favor, ingresá para continuar',
       subtitleCombined: undefined,
       title: 'Iniciá sesión en {{applicationName}}',
@@ -465,6 +707,11 @@ export const esUY: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Ingresá tu contraseña',
   signUp: {
+    alternativePhoneCodeProvider: {
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     continue: {
       actionLink: 'Iniciar sesión',
       actionText: '¿Ya tenés una cuenta?',
@@ -536,6 +783,12 @@ export const esUY: LocalizationResource = {
       actionLink__use_email: 'Usar correo en su lugar',
       actionLink__use_phone: 'Usar teléfono en su lugar',
       actionText: '¿Ya tenés una cuenta?',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: '¡Bienvenido! Completá los datos para comenzar.',
       subtitleCombined: '¡Bienvenido! Completá los datos para comenzar.',
       title: 'Creá tu cuenta',
@@ -544,6 +797,26 @@ export const esUY: LocalizationResource = {
   },
   socialButtonsBlockButton: 'Continuar con {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ya es miembro de la organización.',
     captcha_invalid:
@@ -562,6 +835,9 @@ export const esUY: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'El apellido no debe exceder los 256 caracteres.',
     form_param_max_length_exceeded__name: 'El nombre no debe exceder los 256 caracteres.',
     form_param_nil: 'Este campo es obligatorio y no puede estar vacío.',
+    form_param_type_invalid: undefined,
+    form_param_type_invalid__email_address: undefined,
+    form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'El valor ingresado es inválido. Por favor, corregilo.',
     form_password_incorrect: 'La contraseña ingresada es incorrecta. Por favor, intentá de nuevo.',
     form_password_length_too_short: 'Tu contraseña es demasiado corta. Debe tener al menos 8 caracteres.',
@@ -650,6 +926,9 @@ export const esUY: LocalizationResource = {
     action__signOutAll: 'Cerrar sesión en todas las cuentas',
   },
   userProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: '¡Copiado!',
       actionLabel__copy: 'Copiar todo',
@@ -665,6 +944,64 @@ export const esUY: LocalizationResource = {
         'Podés usar uno de ellos para ingresar a tu cuenta si perdés el acceso a tu dispositivo de autenticación.',
       title: 'Agregar verificación con código de respaldo',
       title__codelist: 'Códigos de respaldo',
+    },
+    billingPage: {
+      paymentHistorySection: {
+        empty: undefined,
+        notFound: undefined,
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        tableHeader__status: undefined,
+      },
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__payments: undefined,
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      statementsSection: {
+        empty: undefined,
+        itemCaption__paidForPlan: undefined,
+        itemCaption__proratedCredit: undefined,
+        itemCaption__subscribedAndPaidForPlan: undefined,
+        notFound: undefined,
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+        totalPaid: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        tableHeader__edit: undefined,
+        tableHeader__plan: undefined,
+        tableHeader__startDate: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Seleccioná un proveedor para conectar tu cuenta.',
@@ -773,6 +1110,8 @@ export const esUY: LocalizationResource = {
     mobileButton__menu: 'Menú',
     navbar: {
       account: 'Perfil',
+      apiKeys: undefined,
+      billing: undefined,
       description: 'Gestioná la información de tu cuenta.',
       security: 'Seguridad',
       title: 'Cuenta',
@@ -809,6 +1148,9 @@ export const esUY: LocalizationResource = {
       title: 'Agregar número de teléfono',
       verifySubtitle: 'Ingresá el código de verificación enviado a {{identifier}}',
       verifyTitle: 'Verificar número de teléfono',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: 'Tamaño recomendado 1:1, hasta 10MB.',
@@ -871,9 +1213,9 @@ export const esUY: LocalizationResource = {
         },
       },
       passkeysSection: {
-        primaryButton: 'Agregar una clave de acceso',
         menuAction__destructive: 'Eliminar',
         menuAction__rename: 'Renombrar',
+        primaryButton: 'Agregar una clave de acceso',
         title: 'Claves de acceso',
       },
       passwordSection: {
@@ -900,6 +1242,7 @@ export const esUY: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Eliminar cartera',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Conectar cartera',
         title: 'Carteras Web3',
       },

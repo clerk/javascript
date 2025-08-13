@@ -15,6 +15,7 @@ export const loadOptions = (request: Request, overrides: LoaderOptions = {}) => 
   const clerkRequest = createClerkRequest(patchRequest(request));
   const commonEnv = commonEnvs();
   const secretKey = overrides.secretKey || commonEnv.SECRET_KEY;
+  const machineSecretKey = overrides.machineSecretKey || commonEnv.MACHINE_SECRET_KEY;
   const publishableKey = overrides.publishableKey || commonEnv.PUBLISHABLE_KEY;
   const jwtKey = overrides.jwtKey || commonEnv.CLERK_JWT_KEY;
   const apiUrl = getEnvVariable('CLERK_API_URL') || apiUrlFromPublishableKey(publishableKey);
@@ -52,6 +53,7 @@ export const loadOptions = (request: Request, overrides: LoaderOptions = {}) => 
     // used to append options that are not initialized from env
     ...overrides,
     secretKey,
+    machineSecretKey,
     publishableKey,
     jwtKey,
     apiUrl,

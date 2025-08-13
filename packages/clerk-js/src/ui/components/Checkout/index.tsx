@@ -13,7 +13,7 @@ export const Checkout = (props: __internal_CheckoutProps) => {
   return (
     <Flow.Root flow='checkout'>
       <Flow.Part>
-        <SubscriberTypeContext.Provider value={props.subscriberType || 'user'}>
+        <SubscriberTypeContext.Provider value={props.for || 'user'}>
           <CheckoutContext.Provider
             value={{
               componentName: 'Checkout',
@@ -23,31 +23,33 @@ export const Checkout = (props: __internal_CheckoutProps) => {
             <Drawer.Content>
               <Drawer.Header title={localizationKeys('commerce.checkout.title')} />
               <CheckoutPage.Root>
-                <CheckoutPage.Stage name='pending'>
-                  <Spinner
-                    sx={{
-                      margin: 'auto',
-                    }}
-                  />
+                <CheckoutPage.Stage name='needs_initialization'>
+                  <CheckoutPage.FetchStatus status='fetching'>
+                    <Spinner
+                      sx={{
+                        margin: 'auto',
+                      }}
+                    />
+                  </CheckoutPage.FetchStatus>
+
+                  <CheckoutPage.FetchStatus status='invalid_plan_change'>
+                    <InvalidPlanScreen />
+                  </CheckoutPage.FetchStatus>
+
+                  <CheckoutPage.FetchStatus status='missing_payer_email'>
+                    <AddEmailForm />
+                  </CheckoutPage.FetchStatus>
+
+                  <CheckoutPage.FetchStatus status='error'>
+                    <GenericError />
+                  </CheckoutPage.FetchStatus>
                 </CheckoutPage.Stage>
 
                 <CheckoutPage.Stage name='completed'>
                   <CheckoutComplete />
                 </CheckoutPage.Stage>
 
-                <CheckoutPage.Stage name='error'>
-                  <GenericError />
-                </CheckoutPage.Stage>
-
-                <CheckoutPage.Stage name='invalid_plan_change'>
-                  <InvalidPlanScreen />
-                </CheckoutPage.Stage>
-
-                <CheckoutPage.Stage name='missing_payer_email'>
-                  <AddEmailForm />
-                </CheckoutPage.Stage>
-
-                <CheckoutPage.Stage name='ready'>
+                <CheckoutPage.Stage name='needs_confirmation'>
                   <CheckoutForm />
                 </CheckoutPage.Stage>
               </CheckoutPage.Root>

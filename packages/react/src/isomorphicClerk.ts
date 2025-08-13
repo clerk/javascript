@@ -4,8 +4,10 @@ import { loadClerkJsScript } from '@clerk/shared/loadClerkJsScript';
 import { handleValueOrFn } from '@clerk/shared/utils';
 import type {
   __internal_CheckoutProps,
+  __internal_NavigateToTaskIfAvailableParams,
   __internal_OAuthConsentProps,
   __internal_PlanDetailsProps,
+  __internal_SubscriptionDetailsProps,
   __internal_UserVerificationModalProps,
   __internal_UserVerificationProps,
   APIKeysNamespace,
@@ -29,7 +31,6 @@ import type {
   JoinWaitlistParams,
   ListenerCallback,
   LoadedClerk,
-  NextTaskParams,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationResource,
@@ -43,6 +44,8 @@ import type {
   SignUpProps,
   SignUpRedirectOptions,
   SignUpResource,
+  State,
+  TaskChooseOrganizationProps,
   UnsubscribeCallback,
   UserButtonProps,
   UserProfileProps,
@@ -104,6 +107,7 @@ type IsomorphicLoadedClerk = Without<
   | 'apiKeys'
   | '__internal_setComponentNavigationContext'
   | '__internal_setActiveInProgress'
+  | '__internal_hasAfterAuthFlows'
 > & {
   client: ClientResource | undefined;
   billing: CommerceBillingNamespace | undefined;
@@ -119,7 +123,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private preopenUserVerification?: null | __internal_UserVerificationProps = null;
   private preopenSignIn?: null | SignInProps = null;
   private preopenCheckout?: null | __internal_CheckoutProps = null;
-  private preopenPlanDetails?: null | __internal_PlanDetailsProps = null;
+  private preopenPlanDetails: null | __internal_PlanDetailsProps = null;
+  private preopenSubscriptionDetails: null | __internal_SubscriptionDetailsProps = null;
   private preopenSignUp?: null | SignUpProps = null;
   private preopenUserProfile?: null | UserProfileProps = null;
   private preopenOrganizationProfile?: null | OrganizationProfileProps = null;
@@ -138,6 +143,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountPricingTableNodes = new Map<HTMLDivElement, PricingTableProps | undefined>();
   private premountApiKeysNodes = new Map<HTMLDivElement, APIKeysProps | undefined>();
   private premountOAuthConsentNodes = new Map<HTMLDivElement, __internal_OAuthConsentProps | undefined>();
+  private premountTaskChooseOrganizationNodes = new Map<HTMLDivElement, TaskChooseOrganizationProps | undefined>();
   // A separate Map of `addListener` method calls to handle multiple listeners.
   private premountAddListenerCalls = new Map<
     ListenerCallback,
@@ -560,6 +566,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.__internal_openPlanDetails(this.preopenPlanDetails);
     }
 
+    if (this.preopenSubscriptionDetails !== null) {
+      clerkjs.__internal_openSubscriptionDetails(this.preopenSubscriptionDetails);
+    }
+
     if (this.preopenSignUp !== null) {
       clerkjs.openSignUp(this.preopenSignUp);
     }
@@ -622,6 +632,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
     this.premountOAuthConsentNodes.forEach((props, node) => {
       clerkjs.__internal_mountOAuthConsent(node, props);
+    });
+
+    this.premountTaskChooseOrganizationNodes.forEach((props, node) => {
+      clerkjs.mountTaskChooseOrganization(node, props);
     });
 
     /**
@@ -701,9 +715,17 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     return this.clerkjs?.billing;
   }
 
+  get __internal_state(): State | undefined {
+    return this.clerkjs?.__internal_state;
+  }
+
   get apiKeys(): APIKeysNamespace | undefined {
     return this.clerkjs?.apiKeys;
   }
+
+  __experimental_checkout = (...args: Parameters<Clerk['__experimental_checkout']>) => {
+    return this.clerkjs?.__experimental_checkout(...args);
+  };
 
   __unstable__setEnvironment(...args: any): void {
     if (this.clerkjs && '__unstable__setEnvironment' in this.clerkjs) {
@@ -721,9 +743,9 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  __experimental_navigateToTask = async (params?: NextTaskParams): Promise<void> => {
+  __internal_navigateToTaskIfAvailable = async (params?: __internal_NavigateToTaskIfAvailableParams): Promise<void> => {
     if (this.clerkjs) {
-      return this.clerkjs.__experimental_navigateToTask(params);
+      return this.clerkjs.__internal_navigateToTaskIfAvailable(params);
     } else {
       return Promise.reject();
     }
@@ -772,7 +794,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  __internal_openPlanDetails = (props?: __internal_PlanDetailsProps) => {
+  __internal_openPlanDetails = (props: __internal_PlanDetailsProps) => {
     if (this.clerkjs && this.loaded) {
       this.clerkjs.__internal_openPlanDetails(props);
     } else {
@@ -785,6 +807,22 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.clerkjs.__internal_closePlanDetails();
     } else {
       this.preopenPlanDetails = null;
+    }
+  };
+
+  __internal_openSubscriptionDetails = (props?: __internal_SubscriptionDetailsProps) => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.__internal_openSubscriptionDetails(props);
+    } else {
+      this.preopenSubscriptionDetails = props ?? null;
+    }
+  };
+
+  __internal_closeSubscriptionDetails = () => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.__internal_closeSubscriptionDetails();
+    } else {
+      this.preopenSubscriptionDetails = null;
     }
   };
 
@@ -1101,6 +1139,22 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
+  mountTaskChooseOrganization = (node: HTMLDivElement, props?: TaskChooseOrganizationProps): void => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.mountTaskChooseOrganization(node, props);
+    } else {
+      this.premountTaskChooseOrganizationNodes.set(node, props);
+    }
+  };
+
+  unmountTaskChooseOrganization = (node: HTMLDivElement): void => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.unmountTaskChooseOrganization(node);
+    } else {
+      this.premountTaskChooseOrganizationNodes.delete(node);
+    }
+  };
+
   addListener = (listener: ListenerCallback): UnsubscribeCallback => {
     if (this.clerkjs) {
       return this.clerkjs.addListener(listener);
@@ -1308,6 +1362,11 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   authenticateWithGoogleOneTap = async (params: AuthenticateWithGoogleOneTapParams) => {
     const clerkjs = await this.#waitForClerkJS();
     return clerkjs.authenticateWithGoogleOneTap(params);
+  };
+
+  __internal_loadStripeJs = async () => {
+    const clerkjs = await this.#waitForClerkJS();
+    return clerkjs.__internal_loadStripeJs();
   };
 
   createOrganization = async (params: CreateOrganizationParams): Promise<OrganizationResource | void> => {

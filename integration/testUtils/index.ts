@@ -6,10 +6,11 @@ import type { Application } from '../models/application';
 import { createEmailService } from './emailService';
 import { createInvitationService } from './invitationsService';
 import { createOrganizationsService } from './organizationsService';
-import type { FakeAPIKey, FakeOrganization, FakeUser } from './usersService';
+import type { FakeAPIKey, FakeOrganization, FakeUser, FakeUserWithEmail } from './usersService';
 import { createUserService } from './usersService';
 
-export type { FakeUser, FakeOrganization, FakeAPIKey };
+export type { FakeAPIKey, FakeOrganization, FakeUser, FakeUserWithEmail };
+
 const createClerkClient = (app: Application) => {
   return backendCreateClerkClient({
     apiUrl: app.env.privateVariables.get('CLERK_API_URL'),

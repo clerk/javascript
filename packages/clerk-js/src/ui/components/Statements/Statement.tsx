@@ -1,3 +1,5 @@
+import React from 'react';
+
 import type { LocalizationKey } from '../../customizables';
 import { Badge, Box, Button, descriptors, Heading, Icon, Span, Text } from '../../customizables';
 import { useClipboard } from '../../hooks';
@@ -16,7 +18,7 @@ function Root({ children }: { children: React.ReactNode }) {
       sx={t => ({
         borderWidth: t.borderWidths.$normal,
         borderStyle: t.borderStyles.$solid,
-        borderColor: t.colors.$neutralAlpha100,
+        borderColor: t.colors.$borderAlpha100,
         borderRadius: t.radii.$lg,
         overflow: 'clip',
       })}
@@ -54,7 +56,7 @@ function Header({ title, id, status }: { title: string | LocalizationKey; id: st
             display: 'flex',
             alignItems: 'center',
             gap: t.space.$0x25,
-            color: t.colors.$colorTextSecondary,
+            color: t.colors.$colorMutedForeground,
           })}
         >
           <CopyButton
@@ -116,7 +118,7 @@ function SectionHeader({ text }: { text: string | LocalizationKey }) {
         background: t.colors.$neutralAlpha50,
         borderBlockWidth: t.borderWidths.$normal,
         borderBlockStyle: t.borderStyles.$solid,
-        borderBlockColor: t.colors.$neutralAlpha100,
+        borderBlockColor: t.colors.$borderAlpha100,
       })}
     >
       <Heading
@@ -154,7 +156,7 @@ function SectionContentItem({ children }: { children: React.ReactNode }) {
         '&:not(:first-child)': {
           borderBlockStartWidth: t.borderWidths.$normal,
           borderBlockStartStyle: t.borderStyles.$solid,
-          borderBlockStartColor: t.colors.$neutralAlpha100,
+          borderBlockStartColor: t.colors.$borderAlpha100,
         },
       })}
     >
@@ -255,7 +257,7 @@ function SectionContentDetailsList({ children }: { children: React.ReactNode }) 
         padding: 0,
         borderWidth: t.borderWidths.$normal,
         borderStyle: t.borderStyles.$solid,
-        borderColor: t.colors.$neutralAlpha100,
+        borderColor: t.colors.$borderAlpha100,
         borderRadius: t.radii.$md,
         overflow: 'hidden',
       })}
@@ -279,7 +281,7 @@ function SectionContentDetailsListItem({
   icon?: React.ReactNode;
   label: string | LocalizationKey;
   labelIcon?: React.ComponentType;
-  value: string | LocalizationKey;
+  value: string | LocalizationKey | React.ReactElement;
   valueTruncated?: boolean;
   valueCopyable?: boolean;
 }) {
@@ -299,7 +301,7 @@ function SectionContentDetailsListItem({
         '&:not(:first-child)': {
           borderBlockStartWidth: t.borderWidths.$normal,
           borderBlockStartStyle: t.borderStyles.$solid,
-          borderBlockStartColor: t.colors.$neutralAlpha100,
+          borderBlockStartColor: t.colors.$borderAlpha100,
         },
       })}
     >
@@ -329,7 +331,7 @@ function SectionContentDetailsListItem({
           display: 'flex',
           alignItems: 'center',
           gap: t.space.$0x25,
-          color: t.colors.$colorTextSecondary,
+          color: t.colors.$colorMutedForeground,
         })}
       >
         {typeof value === 'string' ? (
@@ -348,12 +350,14 @@ function SectionContentDetailsListItem({
               {valueTruncated ? truncateWithEndVisible(value) : value}
             </Text>
           </>
+        ) : React.isValidElement(value) ? (
+          value
         ) : (
           <Text
             elementDescriptor={descriptors.statementSectionContentDetailsListItemValue}
             colorScheme='secondary'
             variant='caption'
-            localizationKey={value}
+            localizationKey={value as LocalizationKey}
           />
         )}
       </Span>
@@ -376,7 +380,7 @@ function Footer({ label, value }: { label: string | LocalizationKey; value: stri
         background: t.colors.$neutralAlpha25,
         borderBlockStartWidth: t.borderWidths.$normal,
         borderBlockStartStyle: t.borderStyles.$solid,
-        borderBlockStartColor: t.colors.$neutralAlpha100,
+        borderBlockStartColor: t.colors.$borderAlpha100,
         display: 'flex',
         justifyContent: 'space-between',
       })}
@@ -428,7 +432,7 @@ function CopyButton({ text, copyLabel = 'Copy' }: { text: string; copyLabel?: st
         borderRadius: t.radii.$sm,
         '&:focus-visible': {
           outline: '2px solid',
-          outlineColor: t.colors.$neutralAlpha200,
+          outlineColor: t.colors.$colorRing,
         },
       })}
       focusRing={false}

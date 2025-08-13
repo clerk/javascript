@@ -3,6 +3,7 @@ import * as React from 'react';
 
 import { Avatar } from '@/ui/elements/Avatar';
 import { SegmentedControl } from '@/ui/elements/SegmentedControl';
+import { colors } from '@/ui/utils/colors';
 
 import { usePlansContext } from '../../contexts';
 import {
@@ -22,7 +23,6 @@ import {
 import { usePrefersReducedMotion } from '../../hooks';
 import { Check, InformationCircle } from '../../icons';
 import { common, InternalThemeProvider, mqu, type ThemableCssProp } from '../../styledSystem';
-import { colors } from '../../utils';
 
 interface PricingTableMatrixProps {
   plans: CommercePlanResource[] | undefined;
@@ -60,7 +60,7 @@ export function PricingTableMatrix({
 
   const gridTemplateColumns = React.useMemo(() => `repeat(${plans.length + 1}, minmax(9.375rem,1fr))`, [plans.length]);
 
-  const renderBillingCycleControls = React.useMemo(() => plans.some(plan => plan.annualMonthlyAmount > 0), [plans]);
+  const renderBillingCycleControls = React.useMemo(() => plans.some(plan => plan.annualMonthlyFee.amount > 0), [plans]);
 
   const getAllFeatures = React.useMemo(() => {
     const featuresSet = new Set<string>();
@@ -102,7 +102,7 @@ export function PricingTableMatrix({
               backgroundColor: t.colors.$colorBackground,
               borderBottomWidth: t.borderWidths.$normal,
               borderBottomStyle: t.borderStyles.$solid,
-              borderBottomColor: t.colors.$neutralAlpha100,
+              borderBottomColor: t.colors.$borderAlpha100,
               zIndex: 1,
             })}
           >
@@ -157,11 +157,11 @@ export function PricingTableMatrix({
               {plans.map(plan => {
                 const highlight = plan.slug === highlightedPlan;
                 const planFee =
-                  plan.annualMonthlyAmount <= 0
-                    ? plan.amountFormatted
+                  plan.annualMonthlyFee.amount <= 0
+                    ? plan.fee
                     : planPeriod === 'annual'
-                      ? plan.annualMonthlyAmountFormatted
-                      : plan.amountFormatted;
+                      ? plan.annualMonthlyFee
+                      : plan.fee;
 
                 return (
                   <Box
@@ -237,8 +237,8 @@ export function PricingTableMatrix({
                               variant='h2'
                               colorScheme='body'
                             >
-                              {plan.currencySymbol}
-                              {planFee}
+                              {planFee.currencySymbol}
+                              {planFee.amountFormatted}
                             </Text>
                             <Text
                               elementDescriptor={descriptors.pricingTableMatrixFeePeriod}
@@ -253,7 +253,7 @@ export function PricingTableMatrix({
                               })}
                               localizationKey={localizationKeys('commerce.month')}
                             />
-                            {plan.annualMonthlyAmount > 0 ? (
+                            {plan.annualMonthlyFee.amount > 0 ? (
                               <Box
                                 elementDescriptor={descriptors.pricingTableMatrixFeePeriodNotice}
                                 sx={[
@@ -351,7 +351,7 @@ export function PricingTableMatrix({
                     gridTemplateColumns,
                     borderBottomWidth: t.borderWidths.$normal,
                     borderBottomStyle: t.borderStyles.$solid,
-                    borderBottomColor: t.colors.$neutralAlpha100,
+                    borderBottomColor: t.colors.$borderAlpha100,
                     ':after': {
                       content: '""',
                       position: 'absolute',

@@ -9,7 +9,7 @@ import { Menu } from '../icons';
 import { useRouter } from '../router';
 import type { PropsOfComponent } from '../styledSystem';
 import { animations, common, mqu } from '../styledSystem';
-import { colors } from '../utils';
+import { colors } from '../utils/colors';
 import { Card } from './Card';
 import { withFloatingTree } from './contexts';
 import { DevModeOverlay } from './DevModeNotice';
@@ -154,13 +154,10 @@ const NavbarContainer = (
         width: t.sizes.$57,
         position: 'relative',
         maxWidth: t.space.$57,
-        background: common.mergedColorsBackground(
-          colors.setAlpha(t.colors.$colorBackground, 1),
-          t.colors.$neutralAlpha50,
-        ),
+        background: common.mutedBackground(t),
         padding: `${t.space.$6} ${t.space.$5} ${t.space.$4} ${t.space.$3}`,
-        marginRight: `-${t.space.$2}`,
-        color: t.colors.$colorText,
+        marginRight: `calc(${t.space.$2} * -1)`,
+        color: t.colors.$colorForeground,
         justifyContent: 'space-between',
       })}
     >
@@ -228,7 +225,7 @@ const MobileNavbarContainer = withFloatingTree((props: React.PropsWithChildren<R
           width: '100%',
           zIndex: t.zIndices.$navbar,
           overflow: 'hidden',
-          color: t.colors.$colorText,
+          color: t.colors.$colorForeground,
         })}
       >
         <Col
@@ -248,7 +245,7 @@ const MobileNavbarContainer = withFloatingTree((props: React.PropsWithChildren<R
             animation: `${animations.navbarSlideIn} ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}`,
             borderRightWidth: t.borderWidths.$normal,
             borderRightStyle: t.borderStyles.$solid,
-            borderRightColor: t.colors.$neutralAlpha150,
+            borderRightColor: t.colors.$borderAlpha150,
             boxShadow: t.shadows.$cardContentShadow,
           })}
         >
@@ -282,14 +279,13 @@ const NavButton = (props: NavButtonProps) => {
           gap: t.space.$3,
           justifyContent: 'flex-start',
           backgroundColor: isActive ? t.colors.$neutralAlpha100 : undefined,
-          color: isActive ? t.colors.$primary500 : t.colors.$neutralAlpha600,
+          color: isActive ? t.colors.$primary500 : t.colors.$colorMutedForeground,
           '&:hover': {
             backgroundColor: isActive ? undefined : t.colors.$neutralAlpha25,
           },
           '&:focus': {
             backgroundColor: isActive ? undefined : t.colors.$neutralAlpha50,
           },
-          opacity: isActive ? 1 : 0.6,
         }),
         sx,
       ]}
@@ -327,12 +323,9 @@ export const NavbarMenuButtonRow = ({ navbarTitleLocalizationKey, ...props }: Na
       elementDescriptor={descriptors.navbarMobileMenuRow}
       sx={t => ({
         display: 'none',
-        background: common.mergedColorsBackground(
-          colors.setAlpha(t.colors.$colorBackground, 1),
-          t.colors.$neutralAlpha50,
-        ),
+        background: common.mutedBackground(t),
         padding: `${t.space.$2} ${t.space.$3} ${t.space.$4} ${t.space.$3}`,
-        marginBottom: `-${t.space.$2}`,
+        marginBottom: `calc(${t.space.$2} * -1)`,
         [mqu.md]: {
           display: 'flex',
         },
@@ -346,7 +339,7 @@ export const NavbarMenuButtonRow = ({ navbarTitleLocalizationKey, ...props }: Na
         textVariant='h2'
         variant='ghost'
         sx={t => ({
-          color: t.colors.$colorText,
+          color: t.colors.$colorForeground,
           gap: t.space.$2x5,
           width: 'fit-content',
           alignItems: 'center',

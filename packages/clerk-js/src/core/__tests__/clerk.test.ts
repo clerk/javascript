@@ -205,17 +205,15 @@ describe('Clerk singleton', () => {
         expect(mockSession.touch).toHaveBeenCalled();
       });
 
-      it('does not call session.touch if Clerk was initialised with touchSession set to false', async () => {
-        mockSession.touch.mockReturnValueOnce(Promise.resolve());
-        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
-        mockSession.getToken.mockResolvedValue('mocked-token');
+      describe('with `touchSession` set to false', () => {
+        it('calls session.touch by default outside of focus window event', async () => {
+          mockSession.touch.mockReturnValue(Promise.resolve());
+          mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
 
-        const sut = new Clerk(productionPublishableKey);
-        await sut.load({ touchSession: false });
-        await sut.setActive({ session: mockSession as any as ActiveSessionResource });
-        await waitFor(() => {
-          expect(mockSession.touch).not.toHaveBeenCalled();
-          expect(mockSession.getToken).toHaveBeenCalled();
+          const sut = new Clerk(productionPublishableKey);
+          await sut.load({ touchSession: false });
+          await sut.setActive({ session: mockSession as any as ActiveSessionResource });
+          expect(mockSession.touch).toHaveBeenCalled();
         });
       });
 
@@ -485,15 +483,18 @@ describe('Clerk singleton', () => {
         touch: jest.fn(() => Promise.resolve()),
         getToken: jest.fn(),
         lastActiveToken: { getRawString: () => 'mocked-token' },
-        tasks: [{ key: 'org' }],
-        currentTask: { key: 'org', __internal_getUrl: () => 'https://sut/tasks/add-organization' },
+        tasks: [{ key: 'choose-organization' }],
+        currentTask: { key: 'choose-organization', __internal_getUrl: () => 'https://sut/tasks/choose-organization' },
         reload: jest.fn(() =>
           Promise.resolve({
             id: '1',
             status: 'pending',
             user: {},
-            tasks: [{ key: 'org' }],
-            currentTask: { key: 'org', __internal_getUrl: () => 'https://sut/tasks/add-organization' },
+            tasks: [{ key: 'choose-organization' }],
+            currentTask: {
+              key: 'choose-organization',
+              __internal_getUrl: () => 'https://sut/tasks/choose-organization',
+            },
           }),
         ),
       };
@@ -521,20 +522,6 @@ describe('Clerk singleton', () => {
         await sut.load();
         await sut.setActive({ session: mockSession as any as ActiveSessionResource });
         expect(mockSession.touch).toHaveBeenCalled();
-      });
-
-      it('does not call session.touch if Clerk was initialised with touchSession set to false', async () => {
-        mockSession.touch.mockReturnValueOnce(Promise.resolve());
-        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
-        mockSession.getToken.mockResolvedValue('mocked-token');
-
-        const sut = new Clerk(productionPublishableKey);
-        await sut.load({ touchSession: false });
-        await sut.setActive({ session: mockSession as any as ActiveSessionResource });
-        await waitFor(() => {
-          expect(mockSession.touch).not.toHaveBeenCalled();
-          expect(mockSession.getToken).toHaveBeenCalled();
-        });
       });
     });
 
@@ -918,6 +905,120 @@ describe('Clerk singleton', () => {
     beforeEach(() => {
       mockClientFetch.mockReset();
       mockEnvironmentFetch.mockReset();
+    });
+
+    describe('with after-auth flows', () => {
+      beforeEach(() => {
+        mockClientFetch.mockReset();
+        mockEnvironmentFetch.mockReturnValue(
+          Promise.resolve({
+            userSettings: mockUserSettings,
+            displayConfig: mockDisplayConfig,
+            isSingleSession: () => false,
+            isProduction: () => false,
+            isDevelopmentOrStaging: () => true,
+            organizationSettings: {
+              forceOrganizationSelection: true,
+            },
+          }),
+        );
+      });
+
+      it('redirects to pending task', async () => {
+        const mockSession = {
+          id: '1',
+          status: 'pending',
+          user: {},
+          tasks: [{ key: 'choose-organization' }],
+          currentTask: { key: 'choose-organization', __internal_getUrl: () => 'https://sut/tasks/choose-organization' },
+          lastActiveToken: { getRawString: () => 'mocked-token' },
+        };
+
+        const mockResource = {
+          ...mockSession,
+          remove: jest.fn(),
+          touch: jest.fn(() => Promise.resolve()),
+          getToken: jest.fn(),
+          reload: jest.fn(() => Promise.resolve(mockSession)),
+        };
+
+        mockResource.touch.mockReturnValueOnce(Promise.resolve());
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({
+            signedInSessions: [mockResource],
+            signIn: new SignIn(null),
+            signUp: new SignUp({
+              status: 'complete',
+            } as any as SignUpJSON),
+            isEligibleForTouch: () => false,
+          }),
+        );
+
+        const mockSetActive = jest.fn();
+        const mockSignUpCreate = jest
+          .fn()
+          .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load(mockedLoadOptions);
+        if (!sut.client) {
+          fail('we should always have a client');
+        }
+        sut.client.signUp.create = mockSignUpCreate;
+        sut.setActive = mockSetActive;
+
+        await sut.handleRedirectCallback();
+
+        await waitFor(() => {
+          expect(mockNavigate.mock.calls[0][0]).toBe('/sign-in#/tasks/choose-organization');
+        });
+      });
+
+      it('redirects to after sign-in URL when task has been resolved', async () => {
+        const mockSession = {
+          id: '1',
+          status: 'active',
+          user: {},
+          lastActiveToken: { getRawString: () => 'mocked-token' },
+        };
+
+        const mockResource = {
+          ...mockSession,
+          remove: jest.fn(),
+          touch: jest.fn(() => Promise.resolve()),
+          getToken: jest.fn(),
+          reload: jest.fn(() => Promise.resolve(mockSession)),
+        };
+
+        mockResource.touch.mockReturnValueOnce(Promise.resolve());
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({
+            signedInSessions: [mockResource],
+            signIn: new SignIn(null),
+            signUp: new SignUp(null),
+            isEligibleForTouch: () => false,
+          }),
+        );
+
+        const mockSetActive = jest.fn();
+        const mockSignUpCreate = jest
+          .fn()
+          .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load(mockedLoadOptions);
+        if (!sut.client) {
+          fail('we should always have a client');
+        }
+        sut.client.signUp.create = mockSignUpCreate;
+        sut.setActive = mockSetActive;
+
+        await sut.handleRedirectCallback();
+
+        await waitFor(() => {
+          expect(mockNavigate.mock.calls[0][0]).toBe('/');
+        });
+      });
     });
 
     it('creates a new user and calls setActive if the user was not found during sso signup', async () => {
@@ -2331,14 +2432,14 @@ describe('Clerk singleton', () => {
     });
   });
 
-  describe('nextTask', () => {
+  describe('navigateToTask', () => {
     describe('with `pending` session status', () => {
       const mockSession = {
         id: '1',
         status: 'pending',
         user: {},
-        tasks: [{ key: 'org' }],
-        currentTask: { key: 'org', __internal_getUrl: () => 'https://sut/tasks/add-organization' },
+        tasks: [{ key: 'choose-organization' }],
+        currentTask: { key: 'choose-organization', __internal_getUrl: () => 'https://sut/tasks/choose-organization' },
         lastActiveToken: { getRawString: () => 'mocked-token' },
       };
 
@@ -2350,9 +2451,14 @@ describe('Clerk singleton', () => {
         reload: jest.fn(() => Promise.resolve(mockSession)),
       };
 
-      beforeAll(() => {
+      beforeEach(() => {
         mockResource.touch.mockReturnValueOnce(Promise.resolve());
-        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockResource] }));
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({
+            signedInSessions: [mockResource],
+            isEligibleForTouch: () => false,
+          }),
+        );
       });
 
       afterEach(() => {
@@ -2360,14 +2466,29 @@ describe('Clerk singleton', () => {
         mockResource.touch.mockReset();
       });
 
-      it('navigates to next task', async () => {
+      it('navigates to next task with default internal routing for AIOs', async () => {
         const sut = new Clerk(productionPublishableKey);
         await sut.load(mockedLoadOptions);
 
         await sut.setActive({ session: mockResource as any as PendingSessionResource });
-        await sut.__experimental_navigateToTask();
+        await sut.__internal_navigateToTaskIfAvailable();
 
-        expect(mockNavigate.mock.calls[0][0]).toBe('/sign-in#/tasks/add-organization');
+        expect(mockNavigate.mock.calls[0][0]).toBe('/sign-in#/tasks/choose-organization');
+      });
+
+      it('navigates to next task with custom routing from clerk options', async () => {
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load({
+          ...mockedLoadOptions,
+          taskUrls: {
+            'choose-organization': '/onboarding/choose-organization',
+          },
+        });
+
+        await sut.setActive({ session: mockResource as any as PendingSessionResource });
+        await sut.__internal_navigateToTaskIfAvailable();
+
+        expect(mockNavigate.mock.calls[0][0]).toBe('/onboarding/choose-organization');
       });
     });
 
@@ -2402,19 +2523,88 @@ describe('Clerk singleton', () => {
 
       it('navigates to redirect url on completion', async () => {
         mockSession.touch.mockReturnValue(Promise.resolve());
-        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({
+            signedInSessions: [mockSession],
+            isEligibleForTouch: () => false,
+          }),
+        );
 
         const sut = new Clerk(productionPublishableKey);
         await sut.load(mockedLoadOptions);
         await sut.setActive({ session: mockSession as any as ActiveSessionResource });
 
         const redirectUrlComplete = '/welcome-to-app';
-        await sut.__experimental_navigateToTask({ redirectUrlComplete });
+        await sut.__internal_navigateToTaskIfAvailable({ redirectUrlComplete });
 
         console.log(mockNavigate.mock.calls);
 
         expect(mockNavigate.mock.calls[0][0]).toBe('/welcome-to-app');
       });
+    });
+  });
+
+  describe('updateClient', () => {
+    afterEach(() => {
+      // cleanup global window pollution
+      (window as any).__unstable__onBeforeSetActive = null;
+      (window as any).__unstable__onAfterSetActive = null;
+    });
+
+    it('runs server revalidation hooks when session transitions from `active` to `pending`', async () => {
+      const mockOnBeforeSetActive = jest.fn().mockReturnValue(Promise.resolve());
+      const mockOnAfterSetActive = jest.fn().mockReturnValue(Promise.resolve());
+      (window as any).__unstable__onBeforeSetActive = mockOnBeforeSetActive;
+      (window as any).__unstable__onAfterSetActive = mockOnAfterSetActive;
+
+      const mockActiveSession = {
+        id: 'session_1',
+        status: 'active',
+        user: { id: 'user_1' },
+        lastActiveToken: { getRawString: () => 'token_1' },
+      };
+
+      const mockPendingSession = {
+        id: 'session_1',
+        status: 'pending',
+        user: { id: 'user_1' },
+        lastActiveToken: { getRawString: () => 'token_1' },
+      };
+
+      const mockInitialClient = {
+        sessions: [mockActiveSession],
+        signedInSessions: [mockActiveSession],
+        lastActiveSessionId: 'session_1',
+      };
+
+      const mockUpdatedClient = {
+        sessions: [mockPendingSession],
+        signedInSessions: [mockPendingSession],
+        lastActiveSessionId: 'session_1',
+      };
+
+      const sut = new Clerk(productionPublishableKey);
+
+      // Manually set the initial client and session state to simulate active session
+      // without going through load() or setActive()
+      sut.updateClient(mockInitialClient as any);
+
+      // Verify we start with an active session
+      expect(sut.session?.status).toBe('active');
+
+      // Call updateClient with the new client that has pending session
+      sut.updateClient(mockUpdatedClient as any);
+
+      // Verify hooks were called
+      await waitFor(() => {
+        expect(mockOnBeforeSetActive).toHaveBeenCalledTimes(1);
+        expect(mockOnAfterSetActive).toHaveBeenCalledTimes(1);
+      });
+
+      // Verify that onAfterSetActive was called after onBeforeSetActive
+      const beforeCallTime = mockOnBeforeSetActive.mock.invocationCallOrder[0];
+      const afterCallTime = mockOnAfterSetActive.mock.invocationCallOrder[0];
+      expect(afterCallTime).toBeGreaterThan(beforeCallTime);
     });
   });
 });

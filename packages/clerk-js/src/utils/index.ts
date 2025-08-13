@@ -1,4 +1,5 @@
 export * from './beforeUnloadTracker';
+export * from './appearance';
 export * from './commerce';
 export * from './completeSignUpFlow';
 export * from './componentGuards';
