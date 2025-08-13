@@ -45,7 +45,8 @@ vi.mock('next/headers', () => ({
   })),
 }));
 
-const mockHeaders = headers as unknown as MockedFunction<() => Promise<MockHeaders>>;
+type MockHeadersFn = () => MockHeaders | Promise<MockHeaders>;
+const mockHeaders = headers as unknown as MockedFunction<MockHeadersFn>;
 
 // Type for mocking Next.js headers
 interface MockHeaders {
@@ -66,7 +67,7 @@ function createMockHeaders(customHeaders: Record<string, string | null> = {}): M
   const allHeaders = { ...defaultHeadersObj, ...customHeaders };
 
   return {
-    get: vi.fn((name: string) => allHeaders[name] || null),
+    get: vi.fn((name: string) => allHeaders[name] ?? null),
     has: vi.fn((name: string) => Object.prototype.hasOwnProperty.call(allHeaders, name) && allHeaders[name] !== null),
     forEach: vi.fn((callback: (value: string, key: string) => void) => {
       Object.entries(allHeaders).forEach(([key, value]) => {
@@ -93,16 +94,14 @@ function createMockHeaders(customHeaders: Record<string, string | null> = {}): M
 
 describe('keyless-custom-headers', () => {
   beforeEach(() => {
-    // Reset all mocks before each test
     vi.clearAllMocks();
-    mockHeaders.mockReset();
-    // Default: use the defaultMockHeaders bag
     mockHeaders.mockImplementation(async () => createMockHeaders());
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
     vi.unstubAllEnvs();
+    mockHeaders.mockReset();
   });
 
   describe('formatMetadataHeaders', () => {
