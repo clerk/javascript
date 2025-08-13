@@ -20,6 +20,7 @@ const shadowStyle = {
 };
 
 export const neobrutalism = experimental_createTheme({
+  name: 'neobrutalism',
   //@ts-expect-error not public api
   simpleStyles: true,
   variables: {
