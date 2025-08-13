@@ -653,31 +653,31 @@ export interface Clerk {
   buildUrlWithAuth(to: string): string;
 
   /**
-   * Returns the configured url where <SignIn/> is mounted or a custom sign-in page is rendered.
+   * Returns the configured url where `<SignIn/>` is mounted or a custom sign-in page is rendered.
    *
    * @param opts A {@link RedirectOptions} object
    */
   buildSignInUrl(opts?: RedirectOptions): string;
 
   /**
-   * Returns the configured url where <SignUp/> is mounted or a custom sign-up page is rendered.
+   * Returns the configured url where `<SignUp/>` is mounted or a custom sign-up page is rendered.
    *
    * @param opts A {@link RedirectOptions} object
    */
   buildSignUpUrl(opts?: RedirectOptions): string;
 
   /**
-   * Returns the url where <UserProfile /> is mounted or a custom user-profile page is rendered.
+   * Returns the url where `<UserProfile />` is mounted or a custom user-profile page is rendered.
    */
   buildUserProfileUrl(): string;
 
   /**
-   * Returns the configured url where <CreateOrganization /> is mounted or a custom create-organization page is rendered.
+   * Returns the configured url where `<CreateOrganization />` is mounted or a custom create-organization page is rendered.
    */
   buildCreateOrganizationUrl(): string;
 
   /**
-   * Returns the configured url where <OrganizationProfile /> is mounted or a custom organization-profile page is rendered.
+   * Returns the configured url where `<OrganizationProfile />` is mounted or a custom organization-profile page is rendered.
    */
   buildOrganizationProfileUrl(): string;
 
@@ -707,7 +707,7 @@ export interface Clerk {
   buildAfterMultiSessionSingleSignOutUrl(): string;
 
   /**
-   * Returns the configured url where <Waitlist/> is mounted or a custom waitlist page is rendered.
+   * Returns the configured url where `<Waitlist/>` is mounted or a custom waitlist page is rendered.
    */
   buildWaitlistUrl(opts?: { initialValues?: Record<string, string> }): string;
 
@@ -720,31 +720,31 @@ export interface Clerk {
   redirectWithAuth(to: string): Promise<unknown>;
 
   /**
-   * Redirects to the configured URL where <SignIn/> is mounted.
+   * Redirects to the configured URL where `<SignIn/>` is mounted.
    *
    * @param opts A {@link RedirectOptions} object
    */
   redirectToSignIn(opts?: SignInRedirectOptions): Promise<unknown>;
 
   /**
-   * Redirects to the configured URL where <SignUp/> is mounted.
+   * Redirects to the configured URL where `<SignUp/>` is mounted.
    *
    * @param opts A {@link RedirectOptions} object
    */
   redirectToSignUp(opts?: SignUpRedirectOptions): Promise<unknown>;
 
   /**
-   * Redirects to the configured URL where <UserProfile/> is mounted.
+   * Redirects to the configured URL where `<UserProfile/>` is mounted.
    */
   redirectToUserProfile: () => Promise<unknown>;
 
   /**
-   * Redirects to the configured URL where <OrganizationProfile /> is mounted.
+   * Redirects to the configured URL where `<OrganizationProfile />` is mounted.
    */
   redirectToOrganizationProfile: () => Promise<unknown>;
 
   /**
-   * Redirects to the configured URL where <CreateOrganization /> is mounted.
+   * Redirects to the configured URL where `<CreateOrganization />` is mounted.
    */
   redirectToCreateOrganization: () => Promise<unknown>;
 
@@ -764,7 +764,7 @@ export interface Clerk {
   redirectToAfterSignOut: () => void;
 
   /**
-   * Redirects to the configured URL where <Waitlist/> is mounted.
+   * Redirects to the configured URL where `<Waitlist/>` is mounted.
    */
   redirectToWaitlist: () => void;
 
