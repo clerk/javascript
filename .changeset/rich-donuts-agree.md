@@ -17,7 +17,7 @@ await clerk.setActive({
       return;
     }
 
-    await navigate('/dashboard')
+    await router.push('/dashboard')
   }
 });
 ```

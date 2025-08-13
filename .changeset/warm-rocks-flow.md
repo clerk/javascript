@@ -4,7 +4,6 @@
 '@clerk/nextjs': minor
 '@clerk/clerk-react': minor
 '@clerk/remix': minor
-'@clerk/types': minor
 '@clerk/vue': minor
 ---
 
