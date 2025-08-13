@@ -54,6 +54,7 @@ export const teIN: LocalizationResource = {
   badge__default: 'డిఫాల్ట్',
   badge__endsAt: undefined,
   badge__expired: 'గడువు ముగిసింది',
+  badge__freeTrial: undefined,
   badge__otherImpersonatorDevice: 'ఇతర నకిలీ పరికరం',
   badge__pastDueAt: undefined,
   badge__pastDuePlan: undefined,
@@ -62,6 +63,7 @@ export const teIN: LocalizationResource = {
   badge__requiresAction: 'చర్య అవసరం',
   badge__startsAt: undefined,
   badge__thisDevice: 'ఈ పరికరం',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'ధృవీకరించబడలేదు',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'వినియోగదారు పరికరం',
@@ -88,6 +90,7 @@ export const teIN: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
+        title__freeTrialEndsAt: undefined,
         title__paymentMethod: undefined,
         title__statementId: undefined,
         title__subscriptionBegins: undefined,
@@ -98,6 +101,8 @@ export const teIN: LocalizationResource = {
       title: undefined,
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
+      title__trialSuccess: undefined,
+      totalDueAfterTrial: undefined,
     },
     credit: undefined,
     creditRemainder: undefined,
@@ -133,6 +138,8 @@ export const teIN: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
+    startFreeTrial__days: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,
@@ -795,6 +802,26 @@ export const teIN: LocalizationResource = {
   },
   socialButtonsBlockButton: '{{provider|titleize}}తో కొనసాగించండి',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ఇప్పటికే సంస్థ సభ్యుడు.',
     captcha_invalid:

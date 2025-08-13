@@ -54,6 +54,7 @@ export const frFR: LocalizationResource = {
   badge__default: 'Défaut',
   badge__endsAt: "Termine le {{ date | shortDate('fr-FR') }}",
   badge__expired: 'Expiré',
+  badge__freeTrial: undefined,
   badge__otherImpersonatorDevice: "Autre dispositif d'imitation",
   badge__pastDueAt: undefined,
   badge__pastDuePlan: undefined,
@@ -62,6 +63,7 @@ export const frFR: LocalizationResource = {
   badge__requiresAction: 'Nécessite une action',
   badge__startsAt: "Débute le {{ date | shortDate('fr-FR') }}",
   badge__thisDevice: 'Cet appareil',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Non vérifié',
   badge__upcomingPlan: 'À venir',
   badge__userDevice: 'Appareil utilisateur',
@@ -90,6 +92,7 @@ export const frFR: LocalizationResource = {
         title: 'Ajouter une adresse e-mail',
       },
       lineItems: {
+        title__freeTrialEndsAt: undefined,
         title__paymentMethod: 'Méthode de paiement',
         title__statementId: 'Identifiant du relevé',
         title__subscriptionBegins: "L'abonnement commence",
@@ -100,6 +103,8 @@ export const frFR: LocalizationResource = {
       title: 'Paiement',
       title__paymentSuccessful: 'Le paiement a réussi !',
       title__subscriptionSuccessful: 'Succès !',
+      title__trialSuccess: undefined,
+      totalDueAfterTrial: undefined,
     },
     credit: undefined,
     creditRemainder: 'Crédit restant',
@@ -135,6 +140,8 @@ export const frFR: LocalizationResource = {
     },
     reSubscribe: 'Se réabonner',
     seeAllFeatures: 'Voir toutes les fonctionnalités',
+    startFreeTrial: undefined,
+    startFreeTrial__days: undefined,
     subscribe: "S'abonner",
     subscriptionDetails: {
       beginsOn: undefined,
@@ -798,6 +805,26 @@ export const frFR: LocalizationResource = {
   },
   socialButtonsBlockButton: 'Continuer avec {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: 'Vous êtes déjà membre de cette organisation.',
     captcha_invalid:

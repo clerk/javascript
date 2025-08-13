@@ -54,6 +54,7 @@ export const huHU: LocalizationResource = {
   badge__default: 'Alapértelmezett',
   badge__endsAt: undefined,
   badge__expired: undefined,
+  badge__freeTrial: undefined,
   badge__otherImpersonatorDevice: 'Másik megszemélyesítő eszköz',
   badge__pastDueAt: undefined,
   badge__pastDuePlan: undefined,
@@ -62,6 +63,7 @@ export const huHU: LocalizationResource = {
   badge__requiresAction: 'Beavatkozás szükséges',
   badge__startsAt: undefined,
   badge__thisDevice: 'Ez az eszköz',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Nem ellenőrzött',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Felhasználói eszköz',
@@ -88,6 +90,7 @@ export const huHU: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
+        title__freeTrialEndsAt: undefined,
         title__paymentMethod: undefined,
         title__statementId: undefined,
         title__subscriptionBegins: undefined,
@@ -98,6 +101,8 @@ export const huHU: LocalizationResource = {
       title: undefined,
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
+      title__trialSuccess: undefined,
+      totalDueAfterTrial: undefined,
     },
     credit: undefined,
     creditRemainder: undefined,
@@ -133,6 +138,8 @@ export const huHU: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
+    startFreeTrial__days: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,
@@ -787,6 +794,26 @@ export const huHU: LocalizationResource = {
   },
   socialButtonsBlockButton: 'Folytatás {{provider|titleize}} segítségével',
   socialButtonsBlockButtonManyInView: undefined,
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: undefined,
     captcha_invalid:

@@ -33,7 +33,7 @@ if (typeof window !== 'undefined') {
     })),
   });
 
-  //@ts-expect-error
+  //@ts-expect-error - JSDOM doesn't provide IntersectionObserver, so we mock it for testing
   global.IntersectionObserver = class IntersectionObserver {
     constructor() {}
 
@@ -53,4 +53,18 @@ if (typeof window !== 'undefined') {
       return null;
     }
   };
+
+  // Mock HTMLCanvasElement.prototype.getContext to prevent errors
+  HTMLCanvasElement.prototype.getContext = jest.fn().mockImplementation(((contextType: string) => {
+    if (contextType === '2d') {
+      return {
+        fillRect: jest.fn(),
+        getImageData: jest.fn(() => ({ data: new Uint8ClampedArray([255, 255, 255, 255]) }) as unknown as ImageData),
+      } as unknown as CanvasRenderingContext2D;
+    }
+    if (contextType === 'webgl' || contextType === 'webgl2') {
+      return {} as unknown as WebGLRenderingContext;
+    }
+    return null;
+  }) as any) as jest.MockedFunction<HTMLCanvasElement['getContext']>;
 }

@@ -22,7 +22,13 @@ import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
 import { handleError } from '@/ui/utils/errorHandler';
 import { formatDate } from '@/ui/utils/formatDate';
 
-import { SubscriberTypeContext, usePlansContext, useSubscriberTypeContext, useSubscription } from '../../contexts';
+import {
+  normalizeFormatted,
+  SubscriberTypeContext,
+  usePlansContext,
+  useSubscriberTypeContext,
+  useSubscription,
+} from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import {
   Button,
@@ -335,7 +341,7 @@ const SubscriptionCardActions = ({ subscription }: { subscription: CommerceSubsc
   const canManageBilling = subscriberType === 'user' || canOrgManageBilling;
 
   const isSwitchable =
-    ((subscription.planPeriod === 'month' && subscription.plan.annualMonthlyAmount > 0) ||
+    ((subscription.planPeriod === 'month' && subscription.plan.annualMonthlyFee.amount > 0) ||
       subscription.planPeriod === 'annual') &&
     subscription.status !== 'past_due';
   const isFree = isFreePlan(subscription.plan);
@@ -370,12 +376,12 @@ const SubscriptionCardActions = ({ subscription }: { subscription: CommerceSubsc
             label:
               subscription.planPeriod === 'month'
                 ? localizationKeys('commerce.switchToAnnualWithAnnualPrice', {
-                    price: subscription.plan.annualAmountFormatted,
-                    currency: subscription.plan.currencySymbol,
+                    price: normalizeFormatted(subscription.plan.annualFee.amountFormatted),
+                    currency: subscription.plan.annualFee.currencySymbol,
                   })
                 : localizationKeys('commerce.switchToMonthlyWithPrice', {
-                    price: subscription.plan.amountFormatted,
-                    currency: subscription.plan.currencySymbol,
+                    price: normalizeFormatted(subscription.plan.fee.amountFormatted),
+                    currency: subscription.plan.fee.currencySymbol,
                   }),
             onClick: () => {
               openCheckout({
@@ -436,6 +442,8 @@ const SubscriptionCardActions = ({ subscription }: { subscription: CommerceSubsc
 // New component for individual subscription cards
 const SubscriptionCard = ({ subscription }: { subscription: CommerceSubscriptionItemResource }) => {
   const { t } = useLocalizations();
+
+  const fee = subscription.planPeriod === 'month' ? subscription.plan.fee : subscription.plan.annualFee;
 
   return (
     <Col
@@ -500,9 +508,9 @@ const SubscriptionCard = ({ subscription }: { subscription: CommerceSubscription
               textTransform: 'lowercase',
             })}
           >
-            {subscription.planPeriod === 'month'
-              ? `${subscription.plan.currencySymbol}${subscription.plan.amountFormatted} / ${t(localizationKeys('commerce.month'))}`
-              : `${subscription.plan.currencySymbol}${subscription.plan.annualAmountFormatted} / ${t(localizationKeys('commerce.year'))}`}
+            {fee.currencySymbol}
+            {fee.amountFormatted} /{' '}
+            {t(localizationKeys(`commerce.${subscription.planPeriod === 'month' ? 'month' : 'year'}`))}
           </Text>
 
           <SubscriptionCardActions subscription={subscription} />

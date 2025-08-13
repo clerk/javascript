@@ -1,9 +1,11 @@
+import type { CommerceSubscriptionItemResource } from '@clerk/types';
 import { useMemo } from 'react';
 
 import { ProfileSection } from '@/ui/elements/Section';
 
 import { useProtect } from '../../common';
 import {
+  normalizeFormatted,
   useEnvironment,
   usePlansContext,
   useSubscriberTypeContext,
@@ -39,13 +41,9 @@ export function SubscriptionsList({
   arrowButtonText: LocalizationKey;
   arrowButtonEmptyText: LocalizationKey;
 }) {
-  const { captionForSubscription, openSubscriptionDetails } = usePlansContext();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
   const subscriberType = useSubscriberTypeContext();
   const { subscriptionItems } = useSubscription();
-  const canManageBilling = useProtect(
-    has => has({ permission: 'org:sys_billing:manage' }) || subscriberType === 'user',
-  );
   const { navigate } = useRouter();
   const { commerceSettings } = useEnvironment();
 
@@ -99,98 +97,11 @@ export function SubscriptionsList({
           </Thead>
           <Tbody>
             {sortedSubscriptions.map(subscription => (
-              <Tr key={subscription.id}>
-                <Td>
-                  <Col gap={1}>
-                    <Flex
-                      align='center'
-                      gap={1}
-                    >
-                      <Icon
-                        icon={Plans}
-                        sx={t => ({
-                          width: t.sizes.$4,
-                          height: t.sizes.$4,
-                          opacity: t.opacity.$inactive,
-                        })}
-                      />
-                      <Text
-                        variant='subtitle'
-                        sx={t => ({ marginRight: t.sizes.$1 })}
-                      >
-                        {subscription.plan.name}
-                      </Text>
-                      {sortedSubscriptions.length > 1 || !!subscription.canceledAt ? (
-                        <SubscriptionBadge subscription={subscription} />
-                      ) : null}
-                    </Flex>
-
-                    {(!subscription.plan.isDefault || subscription.status === 'upcoming') && (
-                      // here
-                      <Text
-                        variant='caption'
-                        colorScheme='secondary'
-                        localizationKey={captionForSubscription(subscription)}
-                      />
-                    )}
-                  </Col>
-                </Td>
-                <Td
-                  sx={_ => ({
-                    textAlign: 'right',
-                  })}
-                >
-                  <Text variant='subtitle'>
-                    {subscription.plan.currencySymbol}
-                    {subscription.planPeriod === 'annual'
-                      ? subscription.plan.annualAmountFormatted
-                      : subscription.plan.amountFormatted}
-                    {(subscription.plan.amount > 0 || subscription.plan.annualAmount > 0) && (
-                      <Span
-                        sx={t => ({
-                          color: t.colors.$colorMutedForeground,
-                          textTransform: 'lowercase',
-                          ':before': {
-                            content: '"/"',
-                            marginInline: t.space.$1,
-                          },
-                        })}
-                        localizationKey={
-                          subscription.planPeriod === 'annual'
-                            ? localizationKeys('commerce.year')
-                            : localizationKeys('commerce.month')
-                        }
-                      />
-                    )}
-                  </Text>
-                </Td>
-                <Td
-                  sx={_ => ({
-                    textAlign: 'right',
-                  })}
-                >
-                  <Button
-                    aria-label='Manage subscription'
-                    onClick={event => openSubscriptionDetails(event)}
-                    variant='bordered'
-                    colorScheme='secondary'
-                    isDisabled={!canManageBilling}
-                    sx={t => ({
-                      width: t.sizes.$6,
-                      height: t.sizes.$6,
-                    })}
-                  >
-                    <Icon
-                      icon={CogFilled}
-                      sx={t => ({
-                        width: t.sizes.$4,
-                        height: t.sizes.$4,
-                        opacity: t.opacity.$inactive,
-                      })}
-                    />
-                  </Button>
-                </Td>
-              </Tr>
+              <SubscriptionRow
+                key={subscription.id}
+                subscription={subscription}
+                length={sortedSubscriptions.length}
+              />
             ))}
           </Tbody>
         </Table>
@@ -216,5 +127,107 @@ export function SubscriptionsList({
         />
       ) : null}
     </ProfileSection.Root>
+  );
+}
+
+function SubscriptionRow({ subscription, length }: { subscription: CommerceSubscriptionItemResource; length: number }) {
+  const subscriberType = useSubscriberTypeContext();
+  const canManageBilling =
+    useProtect(has => has({ permission: 'org:sys_billing:manage' })) || subscriberType === 'user';
+  const fee = subscription.planPeriod === 'annual' ? subscription.plan.annualFee : subscription.plan.fee;
+  const { captionForSubscription, openSubscriptionDetails } = usePlansContext();
+
+  const feeFormatted = useMemo(() => {
+    return normalizeFormatted(fee.amountFormatted);
+  }, [fee.amountFormatted]);
+  return (
+    <Tr key={subscription.id}>
+      <Td>
+        <Col gap={1}>
+          <Flex
+            align='center'
+            gap={1}
+          >
+            <Icon
+              icon={Plans}
+              sx={t => ({
+                width: t.sizes.$4,
+                height: t.sizes.$4,
+                opacity: t.opacity.$inactive,
+              })}
+            />
+            <Text
+              variant='subtitle'
+              sx={t => ({ marginRight: t.sizes.$1 })}
+            >
+              {subscription.plan.name}
+            </Text>
+            {length > 1 || subscription.canceledAt !== null ? <SubscriptionBadge subscription={subscription} /> : null}
+          </Flex>
+
+          {(!subscription.plan.isDefault || subscription.status === 'upcoming') && (
+            // here
+            <Text
+              variant='caption'
+              colorScheme='secondary'
+              localizationKey={captionForSubscription(subscription)}
+            />
+          )}
+        </Col>
+      </Td>
+      <Td
+        sx={_ => ({
+          textAlign: 'right',
+        })}
+      >
+        <Text variant='subtitle'>
+          {fee.currencySymbol}
+          {feeFormatted}
+          {fee.amount > 0 && (
+            <Span
+              sx={t => ({
+                color: t.colors.$colorMutedForeground,
+                textTransform: 'lowercase',
+                ':before': {
+                  content: '"/"',
+                  marginInline: t.space.$1,
+                },
+              })}
+              localizationKey={
+                subscription.planPeriod === 'annual'
+                  ? localizationKeys('commerce.year')
+                  : localizationKeys('commerce.month')
+              }
+            />
+          )}
+        </Text>
+      </Td>
+      <Td
+        sx={_ => ({
+          textAlign: 'right',
+        })}
+      >
+        <Button
+          aria-label='Manage subscription'
+          onClick={event => openSubscriptionDetails(event)}
+          variant='bordered'
+          colorScheme='secondary'
+          isDisabled={!canManageBilling}
+          sx={t => ({
+            width: t.sizes.$6,
+            height: t.sizes.$6,
+          })}
+        >
+          <Icon
+            icon={CogFilled}
+            sx={t => ({
+              width: t.sizes.$4,
+              height: t.sizes.$4,
+              opacity: t.opacity.$inactive,
+            })}
+          />
+        </Button>
+      </Td>
+    </Tr>
   );
 }
