@@ -189,7 +189,7 @@ export const deDE: LocalizationResource = {
   footerPageLink__privacy: 'Privatsphäre',
   footerPageLink__terms: 'Bedingungen',
   formButtonPrimary: 'Fortsetzen',
-  formButtonPrimary__verify: 'Verify',
+  formButtonPrimary__verify: 'Verifizieren',
   formFieldAction__forgotPassword: 'Passwort vergessen?',
   formFieldError__matchingPasswords: 'Passwörter stimmen überein.',
   formFieldError__notMatchingPasswords: 'Passwörter stimmen nicht überein.',
@@ -1068,7 +1068,7 @@ export const deDE: LocalizationResource = {
       title: 'E-Mail-Adresse hinzufügen',
       verifyTitle: 'E-Mail Adresse verifizieren',
     },
-    formButtonPrimary__add: 'Add',
+    formButtonPrimary__add: 'Hinzufügen',
     formButtonPrimary__continue: 'Fortsetzen',
     formButtonPrimary__finish: 'Fertig',
     formButtonPrimary__remove: 'Entfernen',
@@ -1092,10 +1092,10 @@ export const deDE: LocalizationResource = {
       subtitle__unavailablePhoneNumbers:
         'Es sind keine Telefonnummern verfügbar, um sich für die SMS-Code-Bestätigung in zwei Schritten zu registrieren.',
       successMessage1:
-        'When signing in, you will need to enter a verification code sent to this phone number as an additional step.',
+        'Wenn Sie sich anmelden, müssen Sie einen Bestätigungscode eingeben, welcher an diese Telefonnummer gesendet wird.',
       successMessage2:
-        'Save these backup codes and store them somewhere safe. If you lose access to your authentication device, you can use backup codes to sign in.',
-      successTitle: 'SMS code verification enabled',
+        'Speichern Sie diese Backup-Codes und bewahren Sie sie an einem sicheren Ort auf. Falls Sie den Zugriff auf Ihr Authentifizierungsgerät verlieren, können Sie sich mit diesen Codes anmelden.',
+      successTitle: 'SMS-Code-Bestätigung aktiviert',
       title: 'SMS-Code-Bestätigung hinzufügen',
     },
     mfaTOTPPage: {
@@ -1162,8 +1162,8 @@ export const deDE: LocalizationResource = {
       },
       successMessage: '{{identifier}} wurde Ihrem Konto hinzugefügt.',
       title: 'Telefonnummer hinzufügen',
-      verifySubtitle: 'Enter the verification code sent to {{identifier}}',
-      verifyTitle: 'Verify phone number',
+      verifySubtitle: 'Geben Sie den Bestätigungscode ein, der an {{identifier}} gesendet wurde',
+      verifyTitle: 'Telefonnummer verifizieren',
     },
     plansPage: {
       title: 'Pläne',
@@ -1173,7 +1173,7 @@ export const deDE: LocalizationResource = {
       imageFormDestructiveActionSubtitle: 'Bild entfernen',
       imageFormSubtitle: 'Bild hochladen',
       imageFormTitle: 'Profilbild',
-      readonly: 'Your profile information has been provided by the enterprise connection and cannot be edited.',
+      readonly: 'Ihre Profilinformationen wurden durch Ihr Unternehmen bereitgestellt und können nicht bearbeitet werden.',
       successMessage: 'Ihr Profil wurde aktualisiert.',
       title: 'Profil aktualisieren',
     },
@@ -1189,7 +1189,7 @@ export const deDE: LocalizationResource = {
         primaryButton: 'Konto verbinden',
         subtitle__disconnected: 'Ihr Konto ist derzeit getrennt. Bitte verbinden Sie es erneut.',
         subtitle__reauthorize:
-          'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
+          'Die erforderlichen Berechtigungen wurden aktualisiert, wodurch Ihre Funktionalität möglicherweise eingeschränkt ist. Bitte autorisieren Sie diese Anwendung erneut, um Probleme zu vermeiden.',
         title: 'Verbundene Konten',
       },
       dangerSection: {
