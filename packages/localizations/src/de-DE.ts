@@ -219,7 +219,7 @@ export const deDE: LocalizationResource = {
   formFieldLabel__apiKeyExpiration: 'Ablaufdatum',
   formFieldLabel__apiKeyName: 'Name',
   formFieldLabel__automaticInvitations: 'Aktivieren Sie automatische Einladungen für diese Domain',
-  formFieldLabel__backupCode: 'Sicherungscode',
+  formFieldLabel__backupCode: 'Wiederherstellungscode',
   formFieldLabel__confirmDeletion: 'Bestätigung',
   formFieldLabel__confirmPassword: 'Passwort bestätigen',
   formFieldLabel__currentPassword: 'Aktuelles Passwort',
@@ -501,7 +501,7 @@ export const deDE: LocalizationResource = {
     alternativeMethods: {
       actionLink: 'Klicken Sie hier, um eine alternative Methode zu verwenden',
       actionText: 'Verwenden Sie eine alternative Verifizierungsmethode',
-      blockButton__backupCode: 'Mit Backup-Code verifizieren',
+      blockButton__backupCode: 'Mit Wiederherstellungscode verifizieren',
       blockButton__emailCode: 'Mit E-Mail-Code verifizieren',
       blockButton__passkey: 'Verwenden Sie Ihren Passkey',
       blockButton__password: 'Mit Passwort verifizieren',
@@ -516,8 +516,9 @@ export const deDE: LocalizationResource = {
       title: 'Verifizierung erforderlich',
     },
     backupCodeMfa: {
-      subtitle: 'Verwenden Sie den Backup-Code, der Ihnen bei der Registrierung zur Verfügung gestellt wurde.',
-      title: 'Backup-Code Verifizierung',
+      subtitle:
+        'Verwenden Sie den Wiederherstellungscode, der Ihnen bei der Registrierung zur Verfügung gestellt wurde.',
+      title: 'Wiederherstellungscode Verifizierung',
     },
     emailCode: {
       formTitle: 'Geben Sie den Code ein, den wir an Ihre E-Mail-Adresse gesendet haben.',
@@ -569,7 +570,7 @@ export const deDE: LocalizationResource = {
     alternativeMethods: {
       actionLink: 'Hilfe',
       actionText: 'Haben Sie keine davon?',
-      blockButton__backupCode: 'Verwenden Sie einen Backup-Code',
+      blockButton__backupCode: 'Verwenden Sie einen Wiederherstellungscode',
       blockButton__emailCode: 'Code an {{identifier}} senden',
       blockButton__emailLink: 'Link senden an {{identifier}}',
       blockButton__passkey: 'Melden Sie sich mit Ihrem Passkey an',
@@ -593,7 +594,7 @@ export const deDE: LocalizationResource = {
     },
     backupCodeMfa: {
       subtitle: 'weiter zu {{applicationName}}',
-      title: 'Geben Sie einen Backup-Code ein',
+      title: 'Geben Sie einen Wiederherstellungscode ein',
     },
     emailCode: {
       formTitle: 'Bestätigungscode',
@@ -948,16 +949,16 @@ export const deDE: LocalizationResource = {
       actionLabel__copy: 'Kopiere alle',
       actionLabel__download: 'Laden Sie .txt herunter',
       actionLabel__print: 'Drucken',
-      infoText1: 'Backup-Codes werden für dieses Konto aktiviert.',
+      infoText1: 'Wiederherstellungscodes werden für dieses Konto aktiviert.',
       infoText2:
-        'Halten Sie die Backup-Codes geheim und bewahren Sie sie sicher auf. Sie können Sicherungscodes neu generieren, wenn Sie vermuten, dass sie kompromittiert wurden.',
+        'Halten Sie die Wiederherstellungscodes geheim und bewahren Sie sie sicher auf. Sie können Wiederherstellungscodes neu generieren, wenn Sie vermuten, dass sie kompromittiert wurden.',
       subtitle__codelist: 'Bewahren Sie die Codes sicher auf und halten Sie sie geheim.',
       successMessage:
-        'Sicherungscodes sind jetzt aktiviert. Sie können eines davon verwenden, um sich bei Ihrem Konto anzumelden, wenn Sie den Zugriff auf Ihr Authentifizierungsgerät verlieren. Jeder Code kann nur einmal verwendet werden.',
+        'Wiederherstellungscodes sind jetzt aktiviert. Sie können eines davon verwenden, um sich bei Ihrem Konto anzumelden, wenn Sie den Zugriff auf Ihr Authentifizierungsgerät verlieren. Jeder Code kann nur einmal verwendet werden.',
       successSubtitle:
         'Sie können diese Codes verwenden, um sich bei Ihrem Konto anzumelden, wenn Sie den Zugriff auf Ihr Authentifizierungsgerät verlieren.',
-      title: 'Backup-Code-Verifizierung hinzufügen',
-      title__codelist: 'Sicherungscodes',
+      title: 'Wiederherstellungscode-Verifizierung hinzufügen',
+      title__codelist: 'Wiederherstellungscodes',
     },
     billingPage: {
       paymentHistorySection: {
@@ -1083,7 +1084,8 @@ export const deDE: LocalizationResource = {
       primaryButton__addPhoneNumber: 'Fügen Sie eine Telefonnummer hinzu',
       removeResource: {
         messageLine1: '{{identifier}} erhält bei der Anmeldung keine Bestätigungscodes mehr.',
-        messageLine2: 'Ihr Konto ist möglicherweise nicht so sicher. Bist du dir sicher, dass du weitermachen willst?',
+        messageLine2:
+          'Ihr Konto ist möglicherweise nicht so sicher. Sind Sie sich sicher, dass Sie fortfahren möchten?',
         successMessage: 'SMS-Code-Bestätigung in zwei Schritten wurde für {{mfaPhoneCode}} entfernt',
         title: 'Entfernen Sie die Bestätigung in zwei Schritten',
       },
@@ -1092,9 +1094,9 @@ export const deDE: LocalizationResource = {
       subtitle__unavailablePhoneNumbers:
         'Es sind keine Telefonnummern verfügbar, um sich für die SMS-Code-Bestätigung in zwei Schritten zu registrieren.',
       successMessage1:
-        'Wenn Sie sich anmelden, müssen Sie einen Bestätigungscode eingeben, welcher an diese Telefonnummer gesendet wird.',
+        'Wenn Sie sich anmelden, müssen Sie einen Bestätigungscode eingeben, der an diese Telefonnummer gesendet wird.',
       successMessage2:
-        'Speichern Sie diese Backup-Codes und bewahren Sie sie an einem sicheren Ort auf. Falls Sie den Zugriff auf Ihr Authentifizierungsgerät verlieren, können Sie sich mit diesen Codes anmelden.',
+        'Speichern Sie diese Wiederherstellungscodes und bewahren Sie sie an einem sicheren Ort auf. Falls Sie den Zugriff auf Ihr Authentifizierungsgerät verlieren, können Sie sich mit diesen Codes anmelden.',
       successTitle: 'SMS-Code-Bestätigung aktiviert',
       title: 'SMS-Code-Bestätigung hinzufügen',
     },
@@ -1173,7 +1175,8 @@ export const deDE: LocalizationResource = {
       imageFormDestructiveActionSubtitle: 'Bild entfernen',
       imageFormSubtitle: 'Bild hochladen',
       imageFormTitle: 'Profilbild',
-      readonly: 'Ihre Profilinformationen wurden durch Ihr Unternehmen bereitgestellt und können nicht bearbeitet werden.',
+      readonly:
+        'Ihre Profilinformationen wurden durch Ihr Unternehmen bereitgestellt und können nicht bearbeitet werden.',
       successMessage: 'Ihr Profil wurde aktualisiert.',
       title: 'Profil aktualisieren',
     },
@@ -1212,10 +1215,10 @@ export const deDE: LocalizationResource = {
       mfaSection: {
         backupCodes: {
           actionLabel__regenerate: 'Codes neu generieren',
-          headerTitle: 'Backup-Codes',
+          headerTitle: 'Wiederherstellungscodes',
           subtitle__regenerate:
-            'Generieren Sie einen neuen Satz sicherer Backup-Codes. Alte Backup-Code werden gelöscht und können nicht mehr verwendet werden.',
-          title__regenerate: 'Backup-Codes neu generieren',
+            'Generieren Sie einen neuen Satz sicherer Wiederherstellungscodes. Alte Wiederherstellungscodes werden gelöscht und können nicht mehr verwendet werden.',
+          title__regenerate: 'Wiederherstellungscodes neu generieren',
         },
         phoneCode: {
           actionLabel__setDefault: 'Als Standard einstellen',
