@@ -22,7 +22,5 @@ export const experimental_createTheme = (appearance: Appearance<CreateClerkTheme
   return {
     ...appearance,
     __type: 'prebuilt_appearance',
-    // Include the name in the theme object for telemetry
-    ...(appearance.name && { __themeName: appearance.name }),
   };
 };

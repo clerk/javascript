@@ -5,7 +5,7 @@ describe('eventThemeUsage', () => {
     const appearance = {
       theme: {
         __type: 'prebuilt_appearance' as const,
-        __themeName: 'shadcn',
+        name: 'shadcn',
         variables: { colorPrimary: 'var(--primary)' },
       },
     };
@@ -39,7 +39,7 @@ describe('eventThemeUsage', () => {
         'clerk' as any, // String themes are valid at runtime
         {
           __type: 'prebuilt_appearance' as const,
-          __themeName: 'shadcn',
+          name: 'shadcn',
         },
       ] as any,
     };
@@ -75,7 +75,7 @@ describe('eventThemeUsage', () => {
       theme: 'clerk' as any, // String themes are valid at runtime
       baseTheme: {
         __type: 'prebuilt_appearance' as const,
-        __themeName: 'shadcn',
+        name: 'shadcn',
       },
     };
 
@@ -92,7 +92,7 @@ describe('eventThemeUsage', () => {
     const appearance = {
       baseTheme: {
         __type: 'prebuilt_appearance' as const,
-        __themeName: 'shadcn',
+        name: 'shadcn',
       },
     };
 

@@ -74,8 +74,8 @@ function extractThemeName(theme: BaseTheme): string | undefined {
 
   if (typeof theme === 'object' && theme !== null) {
     // Check for explicit theme name
-    if ('__themeName' in theme && typeof theme.__themeName === 'string') {
-      return theme.__themeName;
+    if ('name' in theme && typeof theme.name === 'string') {
+      return theme.name;
     }
   }
 
