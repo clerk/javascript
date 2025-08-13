@@ -14,8 +14,6 @@ describe('M2MToken', () => {
     subject: 'mch_xxxxx',
     scopes: ['mch_1xxxxx', 'mch_2xxxxx'],
     claims: { foo: 'bar' },
-    // Deprecated in favor of `token`
-    secret: m2mSecret,
     token: m2mSecret,
     revoked: false,
     revocation_reason: null,
