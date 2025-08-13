@@ -15,6 +15,7 @@ import { canUseKeyless } from '../../utils/feature-flags';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
 import { RouterTelemetry } from '../../utils/router-telemetry';
 import { isNextWithUnstableServerActions } from '../../utils/sdk-versions';
+import { detectKeylessEnvDriftAction } from '../keyless-actions';
 import { invalidateCacheAction } from '../server-actions';
 import { useAwaitablePush } from './useAwaitablePush';
 import { useAwaitableReplace } from './useAwaitableReplace';
@@ -54,6 +55,11 @@ const NextClientClerkProvider = (props: NextClerkProviderProps) => {
       window.__clerk_internal_invalidateCachePromise?.();
     }
   }, [isPending]);
+
+  // Call drift detection on mount (client-side)
+  useSafeLayoutEffect(() => {
+    void detectKeylessEnvDriftAction();
+  }, []);
 
   useSafeLayoutEffect(() => {
     window.__unstable__onBeforeSetActive = intent => {

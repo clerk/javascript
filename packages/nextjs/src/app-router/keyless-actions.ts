@@ -93,3 +93,12 @@ export async function deleteKeylessAction() {
   await import('../server/keyless-node.js').then(m => m.removeKeyless()).catch(() => {});
   return;
 }
+
+export async function detectKeylessEnvDriftAction() {
+  try {
+    const { detectKeylessEnvDrift } = await import('../server/keyless-telemetry.js');
+    await detectKeylessEnvDrift();
+  } catch {
+    // ignore
+  }
+}
