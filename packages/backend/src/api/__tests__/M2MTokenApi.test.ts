@@ -14,7 +14,9 @@ describe('M2MToken', () => {
     subject: 'mch_xxxxx',
     scopes: ['mch_1xxxxx', 'mch_2xxxxx'],
     claims: { foo: 'bar' },
+    // Deprecated in favor of `token`
     secret: m2mSecret,
+    token: m2mSecret,
     revoked: false,
     revocation_reason: null,
     expired: false,
@@ -46,6 +48,7 @@ describe('M2MToken', () => {
 
       expect(response.id).toBe(m2mId);
       expect(response.secret).toBe(m2mSecret);
+      expect(response.token).toBe(m2mSecret);
       expect(response.scopes).toEqual(['mch_1xxxxx', 'mch_2xxxxx']);
       expect(response.claims).toEqual({ foo: 'bar' });
     });
@@ -206,7 +209,84 @@ describe('M2MToken', () => {
     });
   });
 
-  describe('verifySecret', () => {
+  describe('verifyToken', () => {
+    it('verifies a m2m token using machine secret', async () => {
+      const apiClient = createBackendApiClient({
+        apiUrl: 'https://api.clerk.test',
+        machineSecretKey: 'ak_xxxxx',
+      });
+
+      server.use(
+        http.post(
+          'https://api.clerk.test/m2m_tokens/verify',
+          validateHeaders(({ request }) => {
+            expect(request.headers.get('Authorization')).toBe('Bearer ak_xxxxx');
+            return HttpResponse.json(mockM2MToken);
+          }),
+        ),
+      );
+
+      const response = await apiClient.m2mTokens.verifyToken({
+        token: m2mSecret,
+      });
+
+      expect(response.id).toBe(m2mId);
+      expect(response.secret).toBe(m2mSecret);
+      expect(response.scopes).toEqual(['mch_1xxxxx', 'mch_2xxxxx']);
+      expect(response.claims).toEqual({ foo: 'bar' });
+    });
+
+    it('verifies a m2m token using instance secret', async () => {
+      const apiClient = createBackendApiClient({
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'sk_xxxxx',
+      });
+
+      server.use(
+        http.post(
+          'https://api.clerk.test/m2m_tokens/verify',
+          validateHeaders(({ request }) => {
+            expect(request.headers.get('Authorization')).toBe('Bearer sk_xxxxx');
+            return HttpResponse.json(mockM2MToken);
+          }),
+        ),
+      );
+
+      const response = await apiClient.m2mTokens.verifyToken({
+        token: m2mSecret,
+      });
+
+      expect(response.id).toBe(m2mId);
+      expect(response.secret).toBe(m2mSecret);
+      expect(response.scopes).toEqual(['mch_1xxxxx', 'mch_2xxxxx']);
+      expect(response.claims).toEqual({ foo: 'bar' });
+    });
+
+    it('requires a machine secret or instance secret to verify a m2m token', async () => {
+      const apiClient = createBackendApiClient({
+        apiUrl: 'https://api.clerk.test',
+      });
+
+      server.use(
+        http.post(
+          'https://api.clerk.test/m2m_tokens/verify',
+          validateHeaders(() => {
+            return HttpResponse.json(mockM2MToken);
+          }),
+        ),
+      );
+
+      const errResponse = await apiClient.m2mTokens
+        .verifyToken({
+          token: m2mSecret,
+        })
+        .catch(err => err);
+
+      expect(errResponse.status).toBe(401);
+    });
+  });
+
+  describe('verifySecret (deprecated)', () => {
     it('verifies a m2m token using machine secret', async () => {
       const apiClient = createBackendApiClient({
         apiUrl: 'https://api.clerk.test',

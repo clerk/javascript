@@ -1,3 +1,5 @@
+import { deprecated } from '@clerk/shared/deprecated';
+
 import { joinPaths } from '../../util/path';
 import type { ClerkBackendApiRequestOptions } from '../request';
 import type { M2MToken } from '../resources/M2MToken';
@@ -31,7 +33,7 @@ type RevokeM2MTokenParams = {
   revocationReason?: string | null;
 };
 
-type VerifyM2MTokenParams = {
+type VerifyM2MTokenParamsDeprecated = {
   /**
    * Custom machine secret key for authentication.
    */
@@ -40,6 +42,17 @@ type VerifyM2MTokenParams = {
    * Machine-to-machine token secret to verify.
    */
   secret: string;
+};
+
+type VerifyM2MTokenParams = {
+  /**
+   * Custom machine secret key for authentication.
+   */
+  machineSecretKey?: string;
+  /**
+   * Machine-to-machine token to verify.
+   */
+  token: string;
 };
 
 export class M2MTokenApi extends AbstractAPI {
@@ -94,14 +107,36 @@ export class M2MTokenApi extends AbstractAPI {
     return this.request<M2MToken>(requestOptions);
   }
 
-  async verifySecret(params: VerifyM2MTokenParams) {
+  /**
+   * Verify a machine-to-machine token.
+   *
+   * @deprecated Use {@link verifyToken} instead.
+   */
+  async verifySecret(params: VerifyM2MTokenParamsDeprecated) {
     const { secret, machineSecretKey } = params;
+
+    deprecated('verifySecret', 'Use `verifyToken({ token: mt_xxx })` instead');
 
     const requestOptions = this.#createRequestOptions(
       {
         method: 'POST',
         path: joinPaths(basePath, 'verify'),
         bodyParams: { secret },
+      },
+      machineSecretKey,
+    );
+
+    return this.request<M2MToken>(requestOptions);
+  }
+
+  async verifyToken(params: VerifyM2MTokenParams) {
+    const { token, machineSecretKey } = params;
+
+    const requestOptions = this.#createRequestOptions(
+      {
+        method: 'POST',
+        path: joinPaths(basePath, 'verify'),
+        bodyParams: { token },
       },
       machineSecretKey,
     );

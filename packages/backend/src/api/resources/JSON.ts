@@ -734,7 +734,11 @@ export interface MachineSecretKeyJSON {
 
 export interface M2MTokenJSON extends ClerkResourceJSON {
   object: typeof ObjectType.M2MToken;
+  /**
+   * @deprecated Use {@link token} instead.
+   */
   secret?: string;
+  token?: string;
   subject: string;
   scopes: string[];
   claims: Record<string, any> | null;

@@ -12,6 +12,7 @@ export class M2MToken {
     readonly expiration: number | null,
     readonly createdAt: number,
     readonly updatedAt: number,
+    readonly token?: string,
     readonly secret?: string,
   ) {}
 
@@ -27,6 +28,7 @@ export class M2MToken {
       data.expiration,
       data.created_at,
       data.updated_at,
+      data.token,
       data.secret,
     );
   }
