@@ -47,7 +47,6 @@ describe('M2MToken', () => {
       });
 
       expect(response.id).toBe(m2mId);
-      expect(response.secret).toBe(m2mSecret);
       expect(response.token).toBe(m2mSecret);
       expect(response.scopes).toEqual(['mch_1xxxxx', 'mch_2xxxxx']);
       expect(response.claims).toEqual({ foo: 'bar' });
@@ -74,7 +73,7 @@ describe('M2MToken', () => {
       });
 
       expect(response.id).toBe(m2mId);
-      expect(response.secret).toBe(m2mSecret);
+      expect(response.token).toBe(m2mSecret);
       expect(response.scopes).toEqual(['mch_1xxxxx', 'mch_2xxxxx']);
       expect(response.claims).toEqual({ foo: 'bar' });
     });
@@ -152,7 +151,7 @@ describe('M2MToken', () => {
       });
 
       expect(response.revoked).toBe(true);
-      expect(response.secret).toBeUndefined();
+      expect(response.token).toBeUndefined();
       expect(response.revocationReason).toBe('revoked by test');
       expect(response.scopes).toEqual(['mch_1xxxxx', 'mch_2xxxxx']);
       expect(response.claims).toEqual({ foo: 'bar' });
@@ -180,7 +179,7 @@ describe('M2MToken', () => {
       });
 
       expect(response.revoked).toBe(true);
-      expect(response.secret).toBeUndefined();
+      expect(response.token).toBeUndefined();
       expect(response.revocationReason).toBe('revoked by test');
     });
 
@@ -231,7 +230,7 @@ describe('M2MToken', () => {
       });
 
       expect(response.id).toBe(m2mId);
-      expect(response.secret).toBe(m2mSecret);
+      expect(response.token).toBe(m2mSecret);
       expect(response.scopes).toEqual(['mch_1xxxxx', 'mch_2xxxxx']);
       expect(response.claims).toEqual({ foo: 'bar' });
     });
@@ -257,7 +256,7 @@ describe('M2MToken', () => {
       });
 
       expect(response.id).toBe(m2mId);
-      expect(response.secret).toBe(m2mSecret);
+      expect(response.token).toBe(m2mSecret);
       expect(response.scopes).toEqual(['mch_1xxxxx', 'mch_2xxxxx']);
       expect(response.claims).toEqual({ foo: 'bar' });
     });
@@ -308,7 +307,7 @@ describe('M2MToken', () => {
       });
 
       expect(response.id).toBe(m2mId);
-      expect(response.secret).toBe(m2mSecret);
+      expect(response.token).toBe(m2mSecret);
       expect(response.scopes).toEqual(['mch_1xxxxx', 'mch_2xxxxx']);
       expect(response.claims).toEqual({ foo: 'bar' });
     });
@@ -334,7 +333,7 @@ describe('M2MToken', () => {
       });
 
       expect(response.id).toBe(m2mId);
-      expect(response.secret).toBe(m2mSecret);
+      expect(response.token).toBe(m2mSecret);
       expect(response.scopes).toEqual(['mch_1xxxxx', 'mch_2xxxxx']);
       expect(response.claims).toEqual({ foo: 'bar' });
     });
