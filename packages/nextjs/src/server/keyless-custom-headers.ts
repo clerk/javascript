@@ -1,10 +1,18 @@
+'use server';
+
 import { headers } from 'next/headers';
 
 interface MetadataHeaders {
   nodeVersion?: string;
   nextVersion?: string;
   npmConfigUserAgent?: string;
-  userAgent?: string;
+  userAgent: string;
+  port?: string;
+  host: string;
+  xHost: string;
+  xPort: string;
+  xProtocol: string;
+  xClerkAuthStatus: string;
 }
 
 /**
@@ -17,7 +25,13 @@ export async function collectKeylessMetadata(): Promise<MetadataHeaders> {
     nodeVersion: process.version,
     nextVersion: getNextVersion(),
     npmConfigUserAgent: process.env.npm_config_user_agent, // eslint-disable-line
-    userAgent: headerStore.get('User-Agent') ?? undefined,
+    userAgent: headerStore.get('User-Agent') ?? 'unknown user-agent',
+    port: process.env.PORT, // eslint-disable-line
+    host: headerStore.get('host') ?? 'unknown host',
+    xPort: headerStore.get('x-forwarded-port') ?? 'unknown x-forwarded-port',
+    xHost: headerStore.get('x-forwarded-host') ?? 'unknown x-forwarded-host',
+    xProtocol: headerStore.get('x-forwarded-proto') ?? 'unknown x-forwarded-proto',
+    xClerkAuthStatus: headerStore.get('x-clerk-auth-status') ?? 'unknown x-clerk-auth-status',
   };
 }
 
@@ -52,6 +66,30 @@ export function formatMetadataHeaders(metadata: MetadataHeaders): Headers {
 
   if (metadata.userAgent) {
     headers.set('Clerk-Client-User-Agent', metadata.userAgent);
+  }
+
+  if (metadata.port) {
+    headers.set('Clerk-Node-Port', metadata.port);
+  }
+
+  if (metadata.host) {
+    headers.set('Clerk-Client-host', metadata.host);
+  }
+
+  if (metadata.xPort) {
+    headers.set('Clerk-X-Port', metadata.xPort);
+  }
+
+  if (metadata.xHost) {
+    headers.set('Clerk-X-Host', metadata.xHost);
+  }
+
+  if (metadata.xProtocol) {
+    headers.set('Clerk-X-protocol', metadata.xProtocol);
+  }
+
+  if (metadata.xClerkAuthStatus) {
+    headers.set('Clerk-Auth-Status', metadata.xClerkAuthStatus);
   }
 
   return headers;
