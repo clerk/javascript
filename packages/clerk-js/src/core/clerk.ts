@@ -151,11 +151,7 @@ import {
   Organization,
   Waitlist,
 } from './resources/internal';
-import {
-  INTERNAL_SESSION_TASK_ROUTE_BY_KEY,
-  navigateIfTaskExists,
-  warnMissingPendingTaskHandlers,
-} from './sessionTasks';
+import { getTaskEndpoint, navigateIfTaskExists, warnMissingPendingTaskHandlers } from './sessionTasks';
 import { State } from './state';
 import { warnings } from './warnings';
 
@@ -1569,7 +1565,7 @@ export class Clerk implements ClerkInterface {
     return buildURL(
       {
         base: this.buildSignInUrl(),
-        hashPath: `/tasks/${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[currentTask.key]}`,
+        hashPath: getTaskEndpoint(currentTask),
       },
       {
         stringify: true,

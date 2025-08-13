@@ -24,7 +24,7 @@ export function buildTaskUrl(task: SessionTask, opts: Pick<Parameters<typeof bui
   return buildURL(
     {
       base: opts.base,
-      hashPath: `/tasks/${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[task.key]}`,
+      hashPath: getTaskEndpoint(task),
       searchParams: params,
     },
     { stringify: true },

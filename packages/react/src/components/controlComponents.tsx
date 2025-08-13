@@ -167,19 +167,7 @@ export const RedirectToSignUp = withClerk(({ clerk, ...props }: WithClerkProp<Re
 }, 'RedirectToSignUp');
 
 export const RedirectToTasks = withClerk(({ clerk }: WithClerkProp) => {
-  const { session } = clerk;
-
   React.useEffect(() => {
-    if (!session) {
-      void clerk.redirectToSignIn();
-      return;
-    }
-
-    if (!session.currentTask) {
-      void clerk.redirectToAfterSignIn();
-      return;
-    }
-
     void clerk.redirectToTasks();
   }, []);
 
