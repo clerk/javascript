@@ -218,9 +218,69 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
         const customizedModel = model;
         customizedModel.typeParameters = undefined;
 
-        const output = superPartials.memberWithGroups(customizedModel, options);
+        // Extract the Accessors group (if any) and prevent default rendering for it
+        const originalGroups = customizedModel.groups;
+        const accessorsGroup = originalGroups?.find(g => g.title === 'Accessors');
+        const groupsWithoutAccessors = originalGroups?.filter(g => g.title !== 'Accessors');
 
-        return output;
+        customizedModel.groups = groupsWithoutAccessors;
+        const nonAccessorOutput = superPartials.memberWithGroups(customizedModel, options);
+        customizedModel.groups = originalGroups;
+
+        /** @type {string[]} */
+        const md = [nonAccessorOutput];
+
+        if (accessorsGroup && accessorsGroup.children && accessorsGroup.children.length > 0) {
+          md.push('\n\n## Accessors\n');
+          // Table header
+          // This needs to be 'Property' instead of 'Accessor' so that clerk.com renders it correctly
+          md.push('| Property | Type | Description |');
+          md.push('| --- | --- | --- |');
+
+          for (const child of accessorsGroup.children) {
+            /** @type {import('typedoc').DeclarationReflection} */
+            // @ts-ignore - child is a DeclarationReflection for accessor members
+            const decl = child;
+            // Name and anchor id
+            const name = decl.name;
+            const id = name.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+            // Resolve the accessor type from the getter signature
+            /** @type {any} */
+            const getterSig = /** @type {any} */ (decl).getSignature;
+            /** @type {any} */
+            const setterSig = /** @type {any} */ (decl).setSignature;
+            let typeStr = '';
+            if (getterSig?.type) {
+              typeStr = this.partials.someType(getterSig.type);
+            } else if (setterSig?.parameters?.[0]?.type) {
+              typeStr = this.partials.someType(setterSig.parameters[0].type);
+            } else if (decl.type) {
+              typeStr = this.partials.someType(decl.type);
+            }
+
+            // Prefer comment on the getter signature; fallback to declaration comment
+            const summary = getterSig?.comment?.summary ?? decl.comment?.summary ?? setterSig?.comment?.summary;
+            const description = Array.isArray(summary)
+              ? summary.reduce((acc, curr) => acc + (curr.text || ''), '')
+              : '';
+
+            md.push(`| <a id="${id}"></a> \`${escapeChars(name)}\` | ${typeStr} | ${description} |`);
+          }
+        }
+
+        return md.join('\n');
+      },
+      /**
+       * Suppress default per-accessor member rendering; table is rendered in memberWithGroups instead.
+       * @param {import('typedoc').DeclarationReflection} model
+       * @param {{ headingLevel: number, nested?: boolean }} options
+       */
+      member: (model, options) => {
+        if (model.kind === ReflectionKind.Accessor) {
+          return '';
+        }
+        return superPartials.member(model, options);
       },
       /**
        * This hides the "Type parameters" section and the declaration title from the output
@@ -414,24 +474,14 @@ ${tabs}
       hierarchy: () => '',
       /**
        * @param {import('typedoc').DeclarationReflection} model
-       * @param {{ headingLevel: number }} options
        */
-      accessor: (model, options) => {
-        // const defaultOutput = superPartials.accessor(model, options);
-
+      accessor: model => {
+        // Fallback single-row rendering if used directly elsewhere
         const name = model.name;
-
-        const type = model.getSignature?.type?.toString();
-
-        const comment = model.getSignature?.comment?.summary.reduce((acc, curr) => acc + curr.text, '');
-
-        console.log({
-          name,
-          type,
-          comment,
-        });
-
-        return '| ' + '`' + name + '`' + ' | <code>' + type + '</code> | ' + comment + ' |';
+        const typeStr = model.getSignature?.type ? this.partials.someType(model.getSignature.type) : '';
+        const summary = model.getSignature?.comment?.summary ?? model.comment?.summary;
+        const description = Array.isArray(summary) ? summary.reduce((acc, curr) => acc + (curr.text || ''), '') : '';
+        return '| ' + '`' + escapeChars(name) + '`' + ' | ' + typeStr + ' | ' + description + ' |';
       },
     };
   }
