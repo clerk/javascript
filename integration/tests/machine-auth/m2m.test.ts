@@ -40,6 +40,17 @@ test.describe('machine-to-machine auth @machine', () => {
         const app = express();
 
         app.get('/api/protected', async (req, res) => {
+          const token = req.get('Authorization')?.split(' ')[1];
+          
+          try {
+            const m2mToken = await clerkClient.m2mTokens.verifyToken({ token });
+            res.send('Protected response ' + m2mToken.id);
+          } catch {
+            res.status(401).send('Unauthorized');
+          }
+        });
+
+        app.get('/api/protected-deprecated', async (req, res) => {
           const secret = req.get('Authorization')?.split(' ')[1];
           
           try {
@@ -129,7 +140,7 @@ test.describe('machine-to-machine auth @machine', () => {
 
     const res = await u.page.request.get(app.serverUrl + '/api/protected', {
       headers: {
-        Authorization: `Bearer ${analyticsServerM2MToken.secret}`,
+        Authorization: `Bearer ${analyticsServerM2MToken.token}`,
       },
     });
     expect(res.status()).toBe(401);
@@ -145,7 +156,7 @@ test.describe('machine-to-machine auth @machine', () => {
     // Email server can access primary API server
     const res = await u.page.request.get(app.serverUrl + '/api/protected', {
       headers: {
-        Authorization: `Bearer ${emailServerM2MToken.secret}`,
+        Authorization: `Bearer ${emailServerM2MToken.token}`,
       },
     });
     expect(res.status()).toBe(200);
@@ -160,7 +171,7 @@ test.describe('machine-to-machine auth @machine', () => {
 
     const res2 = await u.page.request.get(app.serverUrl + '/api/protected', {
       headers: {
-        Authorization: `Bearer ${m2mToken.secret}`,
+        Authorization: `Bearer ${m2mToken.token}`,
       },
     });
     expect(res2.status()).toBe(200);
@@ -168,5 +179,18 @@ test.describe('machine-to-machine auth @machine', () => {
     await u.services.clerk.m2mTokens.revoke({
       m2mTokenId: m2mToken.id,
     });
+  });
+
+  test('authorizes M2M requests with deprecated verifySecret method', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+
+    // Email server can access primary API server
+    const res = await u.page.request.get(app.serverUrl + '/api/protected-deprecated', {
+      headers: {
+        Authorization: `Bearer ${emailServerM2MToken.token}`,
+      },
+    });
+    expect(res.status()).toBe(200);
+    expect(await res.text()).toBe('Protected response ' + emailServerM2MToken.id);
   });
 });
