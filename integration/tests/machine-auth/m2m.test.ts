@@ -181,7 +181,7 @@ test.describe('machine-to-machine auth @machine', () => {
     });
   });
 
-  test('authorizes M2M requests with deprecated secret property', async ({ page, context }) => {
+  test('authorizes M2M requests with deprecated verifySecret method', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
 
     // Email server can access primary API server
