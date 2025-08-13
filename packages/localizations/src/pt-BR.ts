@@ -1247,7 +1247,7 @@ export const ptBR: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Remover carteira',
-        detailsAction__nonPrimary: 'Conectar carteira',
+        detailsAction__nonPrimary: 'Definir como principal',
         primaryButton: 'Carteiras Web3',
         title: 'Carteiras Web3',
       },
