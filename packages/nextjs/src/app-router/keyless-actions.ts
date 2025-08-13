@@ -95,6 +95,10 @@ export async function deleteKeylessAction() {
 }
 
 export async function detectKeylessEnvDriftAction() {
+  if (!canUseKeyless) {
+    return;
+  }
+
   try {
     const { detectKeylessEnvDrift } = await import('../server/keyless-telemetry.js');
     await detectKeylessEnvDrift();

@@ -44,6 +44,13 @@ const NextClientClerkProvider = (props: NextClerkProviderProps) => {
   const replace = useAwaitableReplace();
   const [isPending, startTransition] = useTransition();
 
+  // Call drift detection on mount (client-side)
+  useSafeLayoutEffect(() => {
+    if (canUseKeyless) {
+      void detectKeylessEnvDriftAction();
+    }
+  }, []);
+
   // Avoid rendering nested ClerkProviders by checking for the existence of the ClerkNextOptions context provider
   const isNested = Boolean(useClerkNextOptions());
   if (isNested) {
@@ -55,11 +62,6 @@ const NextClientClerkProvider = (props: NextClerkProviderProps) => {
       window.__clerk_internal_invalidateCachePromise?.();
     }
   }, [isPending]);
-
-  // Call drift detection on mount (client-side)
-  useSafeLayoutEffect(() => {
-    void detectKeylessEnvDriftAction();
-  }, []);
 
   useSafeLayoutEffect(() => {
     window.__unstable__onBeforeSetActive = intent => {
