@@ -1,0 +1,13 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "npm",
+      "script": "dev:sandbox",
+      "path": "packages/clerk-js",
+      "problemMatcher": [],
+      "label": "Dev: Sandbox",
+      "detail": "npm: dev:sandbox - packages/clerk-js"
+    }
+  ]
+}

@@ -2003,6 +2003,10 @@ export type __internal_OAuthConsentProps = {
    */
   oAuthApplicationLogoUrl?: string;
   /**
+   * URL of the OAuth application.
+   */
+  oAuthApplicationUrl?: string;
+  /**
    * Scopes requested by the OAuth application.
    */
   scopes: {
