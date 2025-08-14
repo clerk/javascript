@@ -325,7 +325,7 @@ describe('api.client', () => {
         ),
       );
 
-      const response = await apiClient.m2mTokens.verifyToken({
+      const response = await apiClient.m2m.verifyToken({
         machineSecretKey: 'ak_test_in_header_params', // this will be added to headerParams.Authorization
         token: 'mt_secret_test',
       });
@@ -353,7 +353,7 @@ describe('api.client', () => {
         ),
       );
 
-      const response = await apiClient.m2mTokens.verifyToken({
+      const response = await apiClient.m2m.verifyToken({
         token: 'mt_secret_test',
       });
       expect(response.id).toBe('mt_test');
@@ -425,7 +425,7 @@ describe('api.client', () => {
         ),
       );
 
-      const response = await apiClient.m2mTokens.verifyToken({
+      const response = await apiClient.m2m.verifyToken({
         token: 'mt_secret_test',
       });
       expect(response.id).toBe('mt_test');

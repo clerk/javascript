@@ -40,7 +40,7 @@ describe('M2MToken', () => {
         ),
       );
 
-      const response = await apiClient.m2mTokens.create({
+      const response = await apiClient.m2m.createToken({
         secondsUntilExpiration: 3600,
       });
 
@@ -65,7 +65,7 @@ describe('M2MToken', () => {
         ),
       );
 
-      const response = await apiClient.m2mTokens.create({
+      const response = await apiClient.m2m.createToken({
         machineSecretKey: 'ak_xxxxx',
         secondsUntilExpiration: 3600,
       });
@@ -102,7 +102,7 @@ describe('M2MToken', () => {
         ),
       );
 
-      const errResponse = await apiClient.m2mTokens.create().catch(err => err);
+      const errResponse = await apiClient.m2m.createToken().catch(err => err);
 
       expect(errResponse.status).toBe(401);
       expect(errResponse.errors[0].code).toBe('machine_secret_key_invalid');
@@ -143,7 +143,7 @@ describe('M2MToken', () => {
         ),
       );
 
-      const response = await apiClient.m2mTokens.revoke({
+      const response = await apiClient.m2m.revokeToken({
         m2mTokenId: m2mId,
         revocationReason: 'revoked by test',
       });
@@ -171,7 +171,7 @@ describe('M2MToken', () => {
         ),
       );
 
-      const response = await apiClient.m2mTokens.revoke({
+      const response = await apiClient.m2m.revokeToken({
         m2mTokenId: m2mId,
         revocationReason: 'revoked by test',
       });
@@ -195,8 +195,8 @@ describe('M2MToken', () => {
         ),
       );
 
-      const errResponse = await apiClient.m2mTokens
-        .revoke({
+      const errResponse = await apiClient.m2m
+        .revokeToken({
           m2mTokenId: m2mId,
           revocationReason: 'revoked by test',
         })
@@ -223,7 +223,7 @@ describe('M2MToken', () => {
         ),
       );
 
-      const response = await apiClient.m2mTokens.verifyToken({
+      const response = await apiClient.m2m.verifyToken({
         token: m2mSecret,
       });
 
@@ -249,7 +249,7 @@ describe('M2MToken', () => {
         ),
       );
 
-      const response = await apiClient.m2mTokens.verifyToken({
+      const response = await apiClient.m2m.verifyToken({
         token: m2mSecret,
       });
 
@@ -273,86 +273,9 @@ describe('M2MToken', () => {
         ),
       );
 
-      const errResponse = await apiClient.m2mTokens
+      const errResponse = await apiClient.m2m
         .verifyToken({
           token: m2mSecret,
-        })
-        .catch(err => err);
-
-      expect(errResponse.status).toBe(401);
-    });
-  });
-
-  describe('verifySecret (deprecated)', () => {
-    it('verifies a m2m token using machine secret', async () => {
-      const apiClient = createBackendApiClient({
-        apiUrl: 'https://api.clerk.test',
-        machineSecretKey: 'ak_xxxxx',
-      });
-
-      server.use(
-        http.post(
-          'https://api.clerk.test/m2m_tokens/verify',
-          validateHeaders(({ request }) => {
-            expect(request.headers.get('Authorization')).toBe('Bearer ak_xxxxx');
-            return HttpResponse.json(mockM2MToken);
-          }),
-        ),
-      );
-
-      const response = await apiClient.m2mTokens.verifySecret({
-        secret: m2mSecret,
-      });
-
-      expect(response.id).toBe(m2mId);
-      expect(response.token).toBe(m2mSecret);
-      expect(response.scopes).toEqual(['mch_1xxxxx', 'mch_2xxxxx']);
-      expect(response.claims).toEqual({ foo: 'bar' });
-    });
-
-    it('verifies a m2m token using instance secret', async () => {
-      const apiClient = createBackendApiClient({
-        apiUrl: 'https://api.clerk.test',
-        secretKey: 'sk_xxxxx',
-      });
-
-      server.use(
-        http.post(
-          'https://api.clerk.test/m2m_tokens/verify',
-          validateHeaders(({ request }) => {
-            expect(request.headers.get('Authorization')).toBe('Bearer sk_xxxxx');
-            return HttpResponse.json(mockM2MToken);
-          }),
-        ),
-      );
-
-      const response = await apiClient.m2mTokens.verifySecret({
-        secret: m2mSecret,
-      });
-
-      expect(response.id).toBe(m2mId);
-      expect(response.token).toBe(m2mSecret);
-      expect(response.scopes).toEqual(['mch_1xxxxx', 'mch_2xxxxx']);
-      expect(response.claims).toEqual({ foo: 'bar' });
-    });
-
-    it('requires a machine secret or instance secret to verify a m2m token', async () => {
-      const apiClient = createBackendApiClient({
-        apiUrl: 'https://api.clerk.test',
-      });
-
-      server.use(
-        http.post(
-          'https://api.clerk.test/m2m_tokens/verify',
-          validateHeaders(() => {
-            return HttpResponse.json(mockM2MToken);
-          }),
-        ),
-      );
-
-      const errResponse = await apiClient.m2mTokens
-        .verifySecret({
-          secret: m2mSecret,
         })
         .catch(err => err);
 
