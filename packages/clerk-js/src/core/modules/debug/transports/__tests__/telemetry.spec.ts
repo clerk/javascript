@@ -1,19 +1,26 @@
 import type { TelemetryCollector } from '@clerk/shared/telemetry';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { MockedFunction } from 'vitest';
 
 import type { DebugLogEntry } from '../../types';
 import { TelemetryTransport } from '../telemetry';
 
 describe('TelemetryTransport', () => {
-  let mockCollector: jest.Mocked<TelemetryCollector>;
+  let mockCollector: {
+    recordLog: MockedFunction<TelemetryCollector['recordLog']>;
+    record: MockedFunction<TelemetryCollector['record']>;
+    isEnabled: boolean;
+    isDebug: boolean;
+  };
   let transport: TelemetryTransport;
 
   beforeEach(() => {
     mockCollector = {
-      recordLog: jest.fn(),
-      record: jest.fn(),
+      recordLog: vi.fn(),
+      record: vi.fn(),
       isEnabled: true,
       isDebug: false,
-    } as jest.Mocked<TelemetryCollector>;
+    };
 
     transport = new TelemetryTransport(mockCollector);
   });
