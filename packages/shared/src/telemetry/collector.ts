@@ -16,6 +16,7 @@ import type {
   TelemetryCollector as TelemetryCollectorInterface,
   TelemetryEvent,
   TelemetryEventRaw,
+  TelemetryLogEntry,
 } from '@clerk/types';
 
 import { parsePublishableKey } from '../keys';
@@ -60,6 +61,35 @@ type TelemetryMetadata = Required<
   instanceType: InstanceType;
 };
 
+/**
+ * Structure of log data sent to the telemetry endpoint.
+ */
+type TelemetryLogData = {
+  /** Service that generated the log. */
+  sdk: string;
+  /** The version of the SDK where the event originated from. */
+  sdkv: string;
+  /** The version of Clerk where the event originated from. */
+  cv: string;
+  /** Log level (info, warn, error, debug, etc.). */
+  lvl: TelemetryLogEntry['level'];
+  /** Log message. */
+  msg: string;
+  /** Instance ID - optional. */
+  iid?: string;
+  /** Timestamp when log was generated. */
+  ts: string;
+  /** Primary key. */
+  pk: string | null;
+  /** Additional payload for the log. */
+  payload: Record<string, unknown> | null;
+};
+
+type TelemetryBufferItem = { kind: 'event'; value: TelemetryEvent } | { kind: 'log'; value: TelemetryLogData };
+
+// Accepted log levels for runtime validation
+const VALID_LOG_LEVELS = new Set<string>(['error', 'warn', 'info', 'debug', 'trace']);
+
 const DEFAULT_CONFIG: Partial<TelemetryCollectorConfig> = {
   samplingRate: 1,
   maxBufferSize: 5,
@@ -73,8 +103,8 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
   #config: Required<TelemetryCollectorConfig>;
   #eventThrottler: TelemetryEventThrottler;
   #metadata: TelemetryMetadata = {} as TelemetryMetadata;
-  #buffer: TelemetryEvent[] = [];
-  #pendingFlush: any;
+  #buffer: TelemetryBufferItem[] = [];
+  #pendingFlush: number | ReturnType<typeof setTimeout> | null = null;
 
   constructor(options: TelemetryCollectorOptions) {
     this.#config = {
@@ -154,13 +184,69 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
       return;
     }
 
-    this.#buffer.push(preparedPayload);
+    this.#buffer.push({ kind: 'event', value: preparedPayload });
+
+    this.#scheduleFlush();
+  }
+
+  /**
+   * Records a telemetry log entry if logging is enabled and not in debug mode.
+   *
+   * @param entry - The telemetry log entry to record.
+   */
+  recordLog(entry: TelemetryLogEntry): void {
+    if (!this.#shouldRecordLog(entry)) {
+      return;
+    }
+
+    const levelIsValid = typeof entry?.level === 'string' && VALID_LOG_LEVELS.has(entry.level);
+    const messageIsValid = typeof entry?.message === 'string' && entry.message.trim().length > 0;
+
+    let normalizedTimestamp: Date | null = null;
+    const timestampInput: unknown = (entry as unknown as { timestamp?: unknown })?.timestamp;
+    if (typeof timestampInput === 'number' || typeof timestampInput === 'string') {
+      const candidate = new Date(timestampInput);
+      if (!Number.isNaN(candidate.getTime())) {
+        normalizedTimestamp = candidate;
+      }
+    }
+
+    if (!levelIsValid || !messageIsValid || normalizedTimestamp === null) {
+      if (this.isDebug && typeof console !== 'undefined') {
+        console.warn('[clerk/telemetry] Dropping invalid telemetry log entry', {
+          levelIsValid,
+          messageIsValid,
+          timestampIsValid: normalizedTimestamp !== null,
+        });
+      }
+      return;
+    }
+
+    const sdkMetadata = this.#getSDKMetadata();
+
+    const logData: TelemetryLogData = {
+      sdk: sdkMetadata.name,
+      sdkv: sdkMetadata.version,
+      cv: this.#metadata.clerkVersion ?? '',
+      lvl: entry.level,
+      msg: entry.message,
+      ts: normalizedTimestamp.toISOString(),
+      pk: this.#metadata.publishableKey || null,
+      payload: this.#sanitizeContext(entry.context),
+    };
+
+    this.#buffer.push({ kind: 'log', value: logData });
 
     this.#scheduleFlush();
   }
 
   #shouldRecord(preparedPayload: TelemetryEvent, eventSamplingRate?: number) {
     return this.isEnabled && !this.isDebug && this.#shouldBeSampled(preparedPayload, eventSamplingRate);
+  }
+
+  #shouldRecordLog(_entry: TelemetryLogEntry): boolean {
+    // Always allow logs from debug logger to be sent. Debug logger itself is already gated elsewhere.
+    return true;
   }
 
   #shouldBeSampled(preparedPayload: TelemetryEvent, eventSamplingRate?: number) {
@@ -191,8 +277,11 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
       // If the buffer is full, flush immediately to make sure we minimize the chance of event loss.
       // Cancel any pending flushes as we're going to flush immediately
       if (this.#pendingFlush) {
-        const cancel = typeof cancelIdleCallback !== 'undefined' ? cancelIdleCallback : clearTimeout;
-        cancel(this.#pendingFlush);
+        if (typeof cancelIdleCallback !== 'undefined') {
+          cancelIdleCallback(Number(this.#pendingFlush));
+        } else {
+          clearTimeout(Number(this.#pendingFlush));
+        }
       }
       this.#flush();
       return;
@@ -206,37 +295,60 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
     if ('requestIdleCallback' in window) {
       this.#pendingFlush = requestIdleCallback(() => {
         this.#flush();
+        this.#pendingFlush = null;
       });
     } else {
       // This is not an ideal solution, but it at least waits until the next tick
       this.#pendingFlush = setTimeout(() => {
         this.#flush();
+        this.#pendingFlush = null;
       }, 0);
     }
   }
 
   #flush(): void {
     // Capture the current buffer and clear it immediately to avoid closure references
-    const eventsToSend = [...this.#buffer];
+    const itemsToSend = [...this.#buffer];
     this.#buffer = [];
 
     this.#pendingFlush = null;
 
-    if (eventsToSend.length === 0) {
+    if (itemsToSend.length === 0) {
       return;
     }
 
-    fetch(new URL('/v1/event', this.#config.endpoint), {
-      method: 'POST',
-      // TODO: We send an array here with that idea that we can eventually send multiple events.
-      body: JSON.stringify({
-        events: eventsToSend,
-      }),
-      keepalive: true,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }).catch(() => void 0);
+    const eventsToSend = itemsToSend
+      .filter(item => item.kind === 'event')
+      .map(item => (item as { kind: 'event'; value: TelemetryEvent }).value);
+
+    const logsToSend = itemsToSend
+      .filter(item => item.kind === 'log')
+      .map(item => (item as { kind: 'log'; value: TelemetryLogData }).value);
+
+    if (eventsToSend.length > 0) {
+      const eventsUrl = new URL('/v1/event', this.#config.endpoint);
+      fetch(eventsUrl, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        keepalive: true,
+        method: 'POST',
+        // TODO: We send an array here with that idea that we can eventually send multiple events.
+        body: JSON.stringify({ events: eventsToSend }),
+      }).catch(() => void 0);
+    }
+
+    if (logsToSend.length > 0) {
+      const logsUrl = new URL('/v1/logs', this.#config.endpoint);
+      fetch(logsUrl, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        keepalive: true,
+        method: 'POST',
+        body: JSON.stringify({ logs: logsToSend }),
+      }).catch(() => void 0);
+    }
   }
 
   /**
@@ -276,7 +388,6 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
         if (isWindowClerkWithMetadata(windowClerk) && windowClerk.constructor.sdkMetadata) {
           const { name, version } = windowClerk.constructor.sdkMetadata;
 
-          // Only update properties if they exist to avoid overwriting with undefined
           if (name !== undefined) {
             sdkMetadata.name = name;
           }
@@ -306,5 +417,27 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
       ...(this.#metadata.secretKey ? { sk: this.#metadata.secretKey } : {}),
       payload,
     };
+  }
+
+  /**
+   * Best-effort sanitization of the context payload. Returns a plain object with JSON-serializable
+   * values or null when the input is missing or not serializable. Arrays are not accepted.
+   */
+  #sanitizeContext(context: unknown): Record<string, unknown> | null {
+    if (context === null || typeof context === 'undefined') {
+      return null;
+    }
+    if (typeof context !== 'object') {
+      return null;
+    }
+    try {
+      const cleaned = JSON.parse(JSON.stringify(context));
+      if (cleaned && typeof cleaned === 'object' && !Array.isArray(cleaned)) {
+        return cleaned as Record<string, unknown>;
+      }
+      return null;
+    } catch {
+      return null;
+    }
   }
 }

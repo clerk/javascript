@@ -71,13 +71,14 @@ export interface ImageJSON {
 }
 
 export interface EnvironmentJSON extends ClerkResourceJSON {
-  auth_config: AuthConfigJSON;
   api_keys_settings: APIKeysSettingsJSON;
+  auth_config: AuthConfigJSON;
+  client_debug_mode?: boolean;
   commerce_settings: CommerceSettingsJSON;
   display_config: DisplayConfigJSON;
-  user_settings: UserSettingsJSON;
-  organization_settings: OrganizationSettingsJSON;
   maintenance_mode: boolean;
+  organization_settings: OrganizationSettingsJSON;
+  user_settings: UserSettingsJSON;
 }
 
 export interface ClientJSON extends ClerkResourceJSON {

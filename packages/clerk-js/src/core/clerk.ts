@@ -84,6 +84,9 @@ import type {
   Web3Provider,
 } from '@clerk/types';
 
+import type { DebugLoggerInterface } from '@/utils/debug';
+import { debugLogger, initDebugLogger } from '@/utils/debug';
+
 import type { MountComponentRenderer } from '../ui/Components';
 import {
   ALLOWED_PROTOCOLS,
@@ -159,6 +162,11 @@ type SetActiveHook = (intent?: 'sign-out') => void | Promise<void>;
 
 export type ClerkCoreBroadcastChannelEvent = { type: 'signout' };
 
+/**
+ * Interface for the debug logger with all available logging methods
+ */
+// DebugLoggerInterface imported from '@/utils/debug'
+
 declare global {
   interface Window {
     Clerk?: Clerk;
@@ -197,8 +205,8 @@ export class Clerk implements ClerkInterface {
   public static sdkMetadata: SDKMetadata = {
     name: __PKG_NAME__,
     version: __PKG_VERSION__,
-    environment: process.env.NODE_ENV || 'production',
   };
+
   private static _billing: CommerceBillingNamespace;
   private static _apiKeys: APIKeysNamespace;
   private _checkout: ClerkInterface['__experimental_checkout'] | undefined;
@@ -210,6 +218,8 @@ export class Clerk implements ClerkInterface {
   public __internal_country?: string | null;
   public telemetry: TelemetryCollector | undefined;
   public readonly __internal_state: State = new State();
+  // Deprecated: use global singleton from `@/utils/debug`
+  public debugLogger?: DebugLoggerInterface;
 
   protected internal_last_error: ClerkAPIError | null = null;
   // converted to protected environment to support `updateEnvironment` type assertion
@@ -404,6 +414,7 @@ export class Clerk implements ClerkInterface {
   public getFapiClient = (): FapiClient => this.#fapiClient;
 
   public load = async (options?: ClerkOptions): Promise<void> => {
+    debugLogger.info('load() start', {}, 'clerk');
     if (this.loaded) {
       return;
     }
@@ -448,10 +459,18 @@ export class Clerk implements ClerkInterface {
       } else {
         await this.#loadInNonStandardBrowser();
       }
-    } catch (e) {
+      if (this.environment?.clientDebugMode) {
+        initDebugLogger({
+          enabled: true,
+          telemetryCollector: this.telemetry,
+        });
+      }
+      debugLogger.info('load() complete', {}, 'clerk');
+    } catch (error) {
       this.#publicEventBus.emit(clerkEvents.Status, 'error');
+      debugLogger.error('load() failed', { error }, 'clerk');
       // bubble up the error
-      throw e;
+      throw error;
     }
   };
 
@@ -477,6 +496,16 @@ export class Clerk implements ClerkInterface {
     const opts = callbackOrOptions && typeof callbackOrOptions === 'object' ? callbackOrOptions : options || {};
 
     const redirectUrl = opts?.redirectUrl || this.buildAfterSignOutUrl();
+    debugLogger.debug(
+      'signOut() start',
+      {
+        hasClient: Boolean(this.client),
+        multiSessionCount: this.client?.signedInSessions.length ?? 0,
+        redirectUrl,
+        sessionTarget: opts?.sessionId ?? null,
+      },
+      'clerk',
+    );
     const signOutCallback = typeof callbackOrOptions === 'function' ? callbackOrOptions : undefined;
 
     const executeSignOut = async () => {
@@ -520,6 +549,7 @@ export class Clerk implements ClerkInterface {
 
       await executeSignOut();
 
+      debugLogger.info('signOut() complete', { redirectUrl: stripOrigin(redirectUrl) }, 'clerk');
       return;
     }
 
@@ -531,6 +561,7 @@ export class Clerk implements ClerkInterface {
 
     if (shouldSignOutCurrent) {
       await executeSignOut();
+      debugLogger.info('signOut() complete', { redirectUrl: stripOrigin(redirectUrl) }, 'clerk');
     }
   };
 
@@ -1202,13 +1233,25 @@ export class Clerk implements ClerkInterface {
     const { organization, beforeEmit, redirectUrl, navigate: setActiveNavigate } = params;
     let { session } = params;
     this.__internal_setActiveInProgress = true;
-
+    debugLogger.debug(
+      'setActive() start',
+      {
+        hasClient: Boolean(this.client),
+        sessionTarget: typeof session === 'string' ? session : (session?.id ?? session ?? null),
+        organizationTarget:
+          typeof organization === 'string' ? organization : (organization?.id ?? organization ?? null),
+        redirectUrl: redirectUrl ?? null,
+      },
+      'clerk',
+    );
     try {
       if (!this.client) {
+        debugLogger.warn('Clerk setActive called before client is loaded', {}, 'clerk');
         throw new Error('setActive is being called before the client is loaded. Wait for init.');
       }
 
       if (session === undefined && !this.session) {
+        debugLogger.warn('Clerk setActive precondition not met: no target session and no active session', {}, 'clerk');
         throw new Error(
           'setActive should either be called with a session param or there should be already an active session.',
         );
@@ -1414,6 +1457,7 @@ export class Clerk implements ClerkInterface {
     const customNavigate =
       options?.replace && this.#options.routerReplace ? this.#options.routerReplace : this.#options.routerPush;
 
+    debugLogger.info(`Clerk is navigating to: ${toURL}`);
     if (this.#options.routerDebug) {
       console.log(`Clerk is navigating to: ${toURL}`);
     }
