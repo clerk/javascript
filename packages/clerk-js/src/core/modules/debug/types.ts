@@ -18,7 +18,6 @@ export type DebugEventType = 'navigation' | 'custom_event';
  */
 export interface DebugLogEntry {
   readonly context?: Record<string, unknown>;
-  readonly id: string;
   readonly level: DebugLogLevel;
   readonly message: string;
   readonly organizationId?: string;
@@ -104,11 +103,9 @@ export function isDebugLogEntry(obj: unknown): obj is DebugLogEntry {
   return (
     typeof obj === 'object' &&
     obj !== null &&
-    'id' in obj &&
     'timestamp' in obj &&
     'level' in obj &&
     'message' in obj &&
-    typeof (obj as DebugLogEntry).id === 'string' &&
     typeof (obj as DebugLogEntry).timestamp === 'number' &&
     typeof (obj as DebugLogEntry).level === 'string' &&
     isValidLogLevel((obj as DebugLogEntry).level) &&

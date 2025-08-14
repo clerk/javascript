@@ -1,5 +1,3 @@
-import { generateUuid } from '@clerk/shared/utils';
-
 import type { DebugLogEntry, DebugLogFilter, DebugLogLevel, DebugTransport } from './types';
 
 /**
@@ -95,7 +93,6 @@ export class DebugLogger {
     }
 
     const entry: DebugLogEntry = {
-      id: generateUuid(),
       timestamp: Date.now(),
       level,
       message,

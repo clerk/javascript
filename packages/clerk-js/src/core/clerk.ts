@@ -549,7 +549,7 @@ export class Clerk implements ClerkInterface {
 
       await executeSignOut();
 
-      debugLogger.info('signOut() complete', { redirectUrl }, 'clerk');
+      debugLogger.info('signOut() complete', { redirectUrl: stripOrigin(redirectUrl) }, 'clerk');
       return;
     }
 
@@ -561,7 +561,7 @@ export class Clerk implements ClerkInterface {
 
     if (shouldSignOutCurrent) {
       await executeSignOut();
-      debugLogger.info('signOut() complete', { redirectUrl }, 'clerk');
+      debugLogger.info('signOut() complete', { redirectUrl: stripOrigin(redirectUrl) }, 'clerk');
     }
   };
 
