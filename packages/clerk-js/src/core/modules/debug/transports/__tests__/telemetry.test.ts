@@ -20,7 +20,6 @@ describe('TelemetryTransport', () => {
 
   it('should send debug log entries to the telemetry collector', async () => {
     const logEntry: DebugLogEntry = {
-      id: 'test-id',
       level: 'info',
       message: 'Test message',
       timestamp: Date.now(),
@@ -34,7 +33,6 @@ describe('TelemetryTransport', () => {
     await transport.send(logEntry);
 
     expect(mockCollector.recordLog).toHaveBeenCalledWith({
-      id: 'test-id',
       level: 'info',
       message: 'Test message',
       timestamp: logEntry.timestamp,
@@ -49,7 +47,6 @@ describe('TelemetryTransport', () => {
   it('should handle missing telemetry collector gracefully', async () => {
     const transportWithoutCollector = new TelemetryTransport();
     const logEntry: DebugLogEntry = {
-      id: 'test-id',
       level: 'info',
       message: 'Test message',
       timestamp: Date.now(),

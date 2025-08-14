@@ -25,7 +25,6 @@ describe('TelemetryCollector.recordLog', () => {
 
     const ts = Date.now();
     collector.recordLog({
-      id: 'abc123',
       level: 'info',
       message: 'Hello world',
       timestamp: ts,
@@ -47,7 +46,7 @@ describe('TelemetryCollector.recordLog', () => {
     const log = body.logs[0];
     expect(log.lvl).toBe('info');
     expect(log.msg).toBe('Hello world');
-    expect(log.iid).toBe('abc123');
+    expect(log.iid).toBeUndefined();
     expect(log.ts).toBe(new Date(ts).toISOString());
     expect(log.pk).toBe(TEST_PK);
     // Function and undefined stripped out
@@ -58,7 +57,6 @@ describe('TelemetryCollector.recordLog', () => {
     const collector = new TelemetryCollector({ publishableKey: TEST_PK });
 
     const base = {
-      id: 'id1',
       level: 'error' as const,
       message: 'msg',
       timestamp: Date.now(),
@@ -97,21 +95,9 @@ describe('TelemetryCollector.recordLog', () => {
   test('drops invalid entries: missing id, invalid level, empty message, invalid timestamp', () => {
     const collector = new TelemetryCollector({ publishableKey: TEST_PK });
 
-    // missing id
-    fetchSpy.mockClear();
-    collector.recordLog({
-      id: '' as unknown as string, // force invalid at runtime
-      level: 'info',
-      message: 'ok',
-      timestamp: Date.now(),
-    } as any);
-    jest.runAllTimers();
-    expect(fetchSpy).not.toHaveBeenCalled();
-
     // invalid level
     fetchSpy.mockClear();
     collector.recordLog({
-      id: 'id',
       level: 'fatal' as unknown as any,
       message: 'ok',
       timestamp: Date.now(),
@@ -122,7 +108,6 @@ describe('TelemetryCollector.recordLog', () => {
     // empty message
     fetchSpy.mockClear();
     collector.recordLog({
-      id: 'id',
       level: 'debug',
       message: '',
       timestamp: Date.now(),
@@ -133,7 +118,6 @@ describe('TelemetryCollector.recordLog', () => {
     // invalid timestamp (NaN)
     fetchSpy.mockClear();
     collector.recordLog({
-      id: 'id',
       level: 'warn',
       message: 'ok',
       timestamp: Number.NaN,
@@ -147,7 +131,6 @@ describe('TelemetryCollector.recordLog', () => {
     const tsString = new Date().toISOString();
 
     collector.recordLog({
-      id: 'abc',
       level: 'trace',
       message: 'ts string',
       // @ts-expect-error testing runtime acceptance of string timestamps

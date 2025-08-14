@@ -336,27 +336,17 @@ describe('DebugLogger', () => {
       expect(mockTransport.sentEntries).toHaveLength(1);
       const entry = mockTransport.sentEntries[0];
 
-      expect(entry).toHaveProperty('id');
       expect(entry).toHaveProperty('timestamp');
       expect(entry).toHaveProperty('level');
       expect(entry).toHaveProperty('message');
       expect(entry).toHaveProperty('context');
       expect(entry).toHaveProperty('source');
 
-      expect(typeof entry.id).toBe('string');
       expect(typeof entry.timestamp).toBe('number');
       expect(entry.level).toBe('info');
       expect(entry.message).toBe('test message');
       expect(entry.context).toEqual(context);
       expect(entry.source).toBe(source);
-    });
-
-    it('should generate unique IDs for each log entry', () => {
-      logger.info('message 1');
-      logger.info('message 2');
-
-      expect(mockTransport.sentEntries).toHaveLength(2);
-      expect(mockTransport.sentEntries[0].id).not.toBe(mockTransport.sentEntries[1].id);
     });
 
     it('should use current timestamp for log entries', () => {
