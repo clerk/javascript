@@ -130,7 +130,7 @@ const MembershipPreview = withCardStateProvider((props: { organization: Organiza
 const InvitationPreview = withCardStateProvider((props: UserOrganizationInvitationResource) => {
   const card = useCardState();
   const { getOrganization } = useClerk();
-  const [acceptInvitation, setAcceptedInvitation] = useState<OrganizationResource | null>(null);
+  const [acceptedInvitation, setAcceptedInvitation] = useState<OrganizationResource | null>(null);
   const { userInvitations, userMemberships } = useOrganizationList({
     userInvitations: organizationListParams.userInvitations,
     userMemberships: organizationListParams.userMemberships,
@@ -163,8 +163,8 @@ const InvitationPreview = withCardStateProvider((props: UserOrganizationInvitati
     return null;
   }
 
-  if (acceptInvitation) {
-    return <MembershipPreview organization={acceptInvitation} />;
+  if (acceptedInvitation) {
+    return <MembershipPreview organization={acceptedInvitation} />;
   }
 
   return (
