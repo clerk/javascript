@@ -175,3 +175,231 @@ describe('PricingTable - trial info', () => {
     });
   });
 });
+
+describe('PricingTable - plans visibility', () => {
+  const testPlan = {
+    id: 'plan_test',
+    name: 'Test Plan',
+    fee: {
+      amount: 1000,
+      amountFormatted: '10.00',
+      currencySymbol: '$',
+      currency: 'USD',
+    },
+    annualFee: {
+      amount: 10000,
+      amountFormatted: '100.00',
+      currencySymbol: '$',
+      currency: 'USD',
+    },
+    annualMonthlyFee: {
+      amount: 833,
+      amountFormatted: '8.33',
+      currencySymbol: '$',
+      currency: 'USD',
+    },
+    description: 'Test plan description',
+    hasBaseFee: true,
+    isRecurring: true,
+    isDefault: false,
+    forPayerType: 'user',
+    publiclyVisible: true,
+    slug: 'test',
+    avatarUrl: '',
+    features: [] as any[],
+    freeTrialEnabled: false,
+    freeTrialDays: 0,
+    __internal_toSnapshot: jest.fn(),
+    pathRoot: '',
+    reload: jest.fn(),
+  } as const;
+
+  it('shows no plans when user is signed in but has no subscription', async () => {
+    const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['test@clerk.com'] });
+    });
+
+    // Provide empty props to the PricingTable context
+    props.setProps({});
+
+    fixtures.clerk.billing.getPlans.mockResolvedValue({ data: [testPlan as any], total_count: 1 });
+    // Mock no subscription for signed-in user - empty subscription object
+    fixtures.clerk.billing.getSubscription.mockResolvedValue({
+      subscriptionItems: [],
+      pathRoot: '',
+      reload: jest.fn(),
+    } as any);
+
+    const { queryByRole } = render(<PricingTable />, { wrapper });
+
+    await waitFor(() => {
+      // Should not show any plans when signed in but no subscription
+      expect(queryByRole('heading', { name: 'Test Plan' })).not.toBeInTheDocument();
+    });
+  });
+
+  it('shows plans when user is signed in and has a subscription', async () => {
+    const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['test@clerk.com'] });
+    });
+
+    // Provide empty props to the PricingTable context
+    props.setProps({});
+
+    fixtures.clerk.billing.getPlans.mockResolvedValue({ data: [testPlan as any], total_count: 1 });
+    // Mock active subscription for signed-in user
+    fixtures.clerk.billing.getSubscription.mockResolvedValue({
+      id: 'sub_active',
+      status: 'active',
+      activeAt: new Date('2021-01-01'),
+      createdAt: new Date('2021-01-01'),
+      nextPayment: null,
+      pastDueAt: null,
+      updatedAt: null,
+      subscriptionItems: [
+        {
+          id: 'si_active',
+          plan: testPlan,
+          createdAt: new Date('2021-01-01'),
+          paymentSourceId: 'src_1',
+          pastDueAt: null,
+          canceledAt: null,
+          periodStart: new Date('2021-01-01'),
+          periodEnd: new Date('2021-01-31'),
+          planPeriod: 'month' as const,
+          status: 'active' as const,
+          isFreeTrial: false,
+          cancel: jest.fn(),
+          pathRoot: '',
+          reload: jest.fn(),
+        },
+      ],
+      pathRoot: '',
+      reload: jest.fn(),
+    });
+
+    const { getByRole } = render(<PricingTable />, { wrapper });
+
+    await waitFor(() => {
+      // Should show plans when signed in and has subscription
+      expect(getByRole('heading', { name: 'Test Plan' })).toBeVisible();
+    });
+  });
+
+  it('shows plans when user is signed out', async () => {
+    const { wrapper, fixtures, props } = await createFixtures();
+
+    // Provide empty props to the PricingTable context
+    props.setProps({});
+
+    fixtures.clerk.billing.getPlans.mockResolvedValue({ data: [testPlan as any], total_count: 1 });
+    // When signed out, getSubscription should throw or return empty response
+    fixtures.clerk.billing.getSubscription.mockRejectedValue(new Error('Unauthenticated'));
+
+    const { getByRole } = render(<PricingTable />, { wrapper });
+
+    await waitFor(() => {
+      // Should show plans when signed out
+      expect(getByRole('heading', { name: 'Test Plan' })).toBeVisible();
+    });
+  });
+
+  it('shows no plans when user is signed in but subscription is null', async () => {
+    const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['test@clerk.com'] });
+    });
+
+    // Provide empty props to the PricingTable context
+    props.setProps({});
+
+    fixtures.clerk.billing.getPlans.mockResolvedValue({ data: [testPlan as any], total_count: 1 });
+    // Mock null subscription response (different from throwing error)
+    fixtures.clerk.billing.getSubscription.mockResolvedValue(null as any);
+
+    const { queryByRole } = render(<PricingTable />, { wrapper });
+
+    await waitFor(() => {
+      // Should not show any plans when signed in but subscription is null
+      expect(queryByRole('heading', { name: 'Test Plan' })).not.toBeInTheDocument();
+    });
+  });
+
+  it('shows no plans when user is signed in but subscription is undefined', async () => {
+    const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['test@clerk.com'] });
+    });
+
+    // Provide empty props to the PricingTable context
+    props.setProps({});
+
+    fixtures.clerk.billing.getPlans.mockResolvedValue({ data: [testPlan as any], total_count: 1 });
+    // Mock undefined subscription response (loading state)
+    fixtures.clerk.billing.getSubscription.mockResolvedValue(undefined as any);
+
+    const { queryByRole } = render(<PricingTable />, { wrapper });
+
+    await waitFor(() => {
+      // Should not show any plans when signed in but subscription is undefined (loading)
+      expect(queryByRole('heading', { name: 'Test Plan' })).not.toBeInTheDocument();
+    });
+  });
+
+  it('prevents flicker by not showing plans while subscription is loading', async () => {
+    const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['test@clerk.com'] });
+    });
+
+    // Provide empty props to the PricingTable context
+    props.setProps({});
+
+    fixtures.clerk.billing.getPlans.mockResolvedValue({ data: [testPlan as any], total_count: 1 });
+
+    // Create a pending promise and capture its resolver
+    let resolveSubscription!: (value: any) => void;
+    const pendingSubscriptionPromise = new Promise<any>(resolve => {
+      resolveSubscription = resolve;
+    });
+    fixtures.clerk.billing.getSubscription.mockReturnValue(pendingSubscriptionPromise);
+
+    const { queryByRole, findByRole } = render(<PricingTable />, { wrapper });
+
+    // Assert no plans render while subscription is pending
+    await waitFor(() => {
+      expect(queryByRole('heading', { name: 'Test Plan' })).not.toBeInTheDocument();
+    });
+
+    // Resolve the subscription with an active subscription object
+    resolveSubscription({
+      id: 'sub_active',
+      status: 'active',
+      activeAt: new Date('2021-01-01'),
+      createdAt: new Date('2021-01-01'),
+      nextPayment: null,
+      pastDueAt: null,
+      updatedAt: null,
+      subscriptionItems: [
+        {
+          id: 'si_active',
+          plan: testPlan,
+          createdAt: new Date('2021-01-01'),
+          paymentSourceId: 'src_1',
+          pastDueAt: null,
+          canceledAt: null,
+          periodStart: new Date('2021-01-01'),
+          periodEnd: new Date('2021-01-31'),
+          planPeriod: 'month' as const,
+          status: 'active' as const,
+          isFreeTrial: false,
+          cancel: jest.fn(),
+          pathRoot: '',
+          reload: jest.fn(),
+        },
+      ],
+      pathRoot: '',
+      reload: jest.fn(),
+    });
+
+    // Assert the plan heading appears after subscription resolves
+    await findByRole('heading', { name: 'Test Plan' });
+  });
+});
