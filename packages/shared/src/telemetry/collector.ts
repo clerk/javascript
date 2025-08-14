@@ -75,8 +75,8 @@ type TelemetryLogData = {
   lvl: string;
   /** Log message. */
   msg: string;
-  /** Instance ID. */
-  iid: string;
+  /** Instance ID (deprecated; omitted). */
+  iid?: string;
   /** Timestamp when log was generated. */
   ts: string;
   /** Primary key. */
@@ -199,7 +199,6 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
       return;
     }
 
-    const idIsValid = typeof entry?.id === 'string' && entry.id.trim().length > 0;
     const levelIsValid = typeof entry?.level === 'string' && VALID_LOG_LEVELS.has(entry.level);
     const messageIsValid = typeof entry?.message === 'string' && entry.message.trim().length > 0;
 
@@ -212,10 +211,9 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
       }
     }
 
-    if (!idIsValid || !levelIsValid || !messageIsValid || normalizedTimestamp === null) {
+    if (!levelIsValid || !messageIsValid || normalizedTimestamp === null) {
       if (this.isDebug && typeof console !== 'undefined') {
         console.warn('[clerk/telemetry] Dropping invalid telemetry log entry', {
-          idIsValid,
           levelIsValid,
           messageIsValid,
           timestampIsValid: normalizedTimestamp !== null,
@@ -232,7 +230,6 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
       cv: this.#metadata.clerkVersion ?? '',
       lvl: entry.level,
       msg: entry.message,
-      iid: entry.id,
       ts: normalizedTimestamp.toISOString(),
       pk: this.#metadata.publishableKey || null,
       payload: this.#sanitizeContext(entry.context),

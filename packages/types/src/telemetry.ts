@@ -48,7 +48,6 @@ export type TelemetryEventRaw<Payload = TelemetryEvent['payload']> = {
  */
 export interface TelemetryLogEntry {
   readonly context?: Record<string, unknown>;
-  readonly id: string;
   readonly level: 'error' | 'warn' | 'info' | 'debug' | 'trace';
   readonly message: string;
   readonly organizationId?: string;

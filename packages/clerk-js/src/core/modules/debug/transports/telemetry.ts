@@ -47,7 +47,6 @@ export class TelemetryTransport implements DebugTransport {
     await Promise.resolve(
       this.collector.recordLog({
         context: entry.context,
-        id: entry.id,
         level: entry.level,
         message: entry.message,
         organizationId: entry.organizationId,
