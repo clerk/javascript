@@ -40,6 +40,10 @@ function errorsToParsedErrors(error: unknown): Errors {
     global: [],
   };
 
+  if (!error) {
+    return parsedErrors;
+  }
+
   if (!isClerkAPIResponseError(error)) {
     parsedErrors.raw.push(error);
     parsedErrors.global.push(error);
