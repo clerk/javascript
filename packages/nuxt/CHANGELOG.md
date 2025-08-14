@@ -1,5 +1,17 @@
 # @clerk/nuxt
 
+## 1.8.7
+
+### Patch Changes
+
+- Fix export of `RedirectToTasks` control component ([#6546](https://github.com/clerk/javascript/pull/6546)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`83757e7`](https://github.com/clerk/javascript/commit/83757e77ffd6b0c3b3dbd48834546af6171c442c), [`5b24129`](https://github.com/clerk/javascript/commit/5b24129ddcfc2f7dc6eb79d8c818b4ff97c68e9a)]:
+  - @clerk/vue@1.11.1
+  - @clerk/shared@3.21.0
+  - @clerk/types@4.78.0
+  - @clerk/backend@2.9.1
+
 ## 1.8.6
 
 ### Patch Changes
