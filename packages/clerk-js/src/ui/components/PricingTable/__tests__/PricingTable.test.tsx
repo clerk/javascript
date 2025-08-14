@@ -125,7 +125,7 @@ describe('PricingTable - trial info', () => {
     await waitFor(() => {
       expect(getByRole('heading', { name: 'Pro' })).toBeVisible();
       // Button text from Plans.buttonPropsForPlan via freeTrialOr
-      expect(getByText('Start free trial')).toBeVisible();
+      expect(getByText('Start 14-day free trial')).toBeVisible();
     });
   });
 
@@ -144,7 +144,7 @@ describe('PricingTable - trial info', () => {
     await waitFor(() => {
       expect(getByRole('heading', { name: 'Pro' })).toBeVisible();
       // Signed out users should see free trial CTA when plan has trial enabled
-      expect(getByText('Start free trial')).toBeVisible();
+      expect(getByText('Start 14-day free trial')).toBeVisible();
     });
   });
 
