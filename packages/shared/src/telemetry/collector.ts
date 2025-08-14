@@ -72,10 +72,10 @@ type TelemetryLogData = {
   /** The version of Clerk where the event originated from. */
   cv: string;
   /** Log level (info, warn, error, debug, etc.). */
-  lvl: string;
+  lvl: TelemetryLogEntry['level'];
   /** Log message. */
   msg: string;
-  /** Instance ID (deprecated; omitted). */
+  /** Instance ID - optional. */
   iid?: string;
   /** Timestamp when log was generated. */
   ts: string;

@@ -9,6 +9,11 @@ export type DebugLogLevel = 'error' | 'warn' | 'info' | 'debug' | 'trace';
 export const VALID_LOG_LEVELS: readonly DebugLogLevel[] = ['error', 'warn', 'info', 'debug', 'trace'] as const;
 
 /**
+ * Valid debug event types
+ */
+export const VALID_EVENT_TYPES: readonly DebugEventType[] = ['navigation', 'custom_event'] as const;
+
+/**
  * Debug event types that can be tracked
  */
 export type DebugEventType = 'navigation' | 'custom_event';
@@ -97,6 +102,13 @@ export function isValidLogLevel(level: unknown): level is DebugLogLevel {
 }
 
 /**
+ * Validates if a value is a valid debug event type
+ */
+export function isValidEventType(eventType: unknown): eventType is DebugEventType {
+  return typeof eventType === 'string' && VALID_EVENT_TYPES.includes(eventType as DebugEventType);
+}
+
+/**
  * Type guard for checking if an object is a DebugLogEntry
  */
 export function isDebugLogEntry(obj: unknown): obj is DebugLogEntry {
@@ -117,8 +129,6 @@ export function isDebugLogEntry(obj: unknown): obj is DebugLogEntry {
  * Type guard for checking if an object is DebugData
  */
 export function isDebugData(obj: unknown): obj is DebugData {
-  const validEventTypes: DebugEventType[] = ['navigation', 'custom_event'];
-
   return (
     typeof obj === 'object' &&
     obj !== null &&
@@ -126,7 +136,7 @@ export function isDebugData(obj: unknown): obj is DebugData {
     'eventId' in obj &&
     'timestamp' in obj &&
     typeof (obj as DebugData).eventType === 'string' &&
-    validEventTypes.includes((obj as DebugData).eventType) &&
+    isValidEventType((obj as DebugData).eventType) &&
     typeof (obj as DebugData).eventId === 'string' &&
     typeof (obj as DebugData).timestamp === 'number'
   );

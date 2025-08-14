@@ -1,16 +1,16 @@
 import { DebugLogger } from '../logger';
-import type { DebugLogFilter } from '../types';
+import type { DebugLogEntry, DebugLogFilter } from '../types';
 
 // Mock transport for testing
 class MockTransport {
-  public sentEntries: any[] = [];
+  public sentEntries: DebugLogEntry[] = [];
 
-  async send(entry: any): Promise<void> {
+  async send(entry: DebugLogEntry): Promise<void> {
     this.sentEntries.push(entry);
   }
 
   reset(): void {
-    this.sentEntries = [];
+    this.sentEntries.length = 0;
   }
 }
 
