@@ -32,8 +32,8 @@ const TaskChooseOrganizationInternal = () => {
   const hasExistingResources = !!(userMemberships?.count || userInvitations?.count || userSuggestions?.count);
   const identifier = user?.primaryEmailAddress?.emailAddress ?? user?.username;
 
-  // Revalidates organization memberships from client piggybacking
   // TODO (ORGS-784): Introduce architecture to invalidate SWR queries based on client piggybacking
+  // Revalidates organization memberships from client piggybacking
   const hasUpdatedOnClient = user?.organizationMemberships?.length !== userMemberships.count;
   useEffect(() => {
     if (!hasUpdatedOnClient) {
