@@ -1,5 +1,59 @@
 # Change Log
 
+## 2.9.0
+
+### Minor Changes
+
+- Remove `secret` in favor of `token` in m2m response. ([#6542](https://github.com/clerk/javascript/pull/6542)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Before:
+
+  ```ts
+  const result = await clerkClient.m2mTokens.create();
+
+  console.log(result.secret);
+  ```
+
+  After:
+
+  ```ts
+  const result = await clerkClient.m2mTokens.create();
+
+  console.log(result.token);
+  ```
+
+- Rename M2M namespace from `m2mTokens` to `m2m` in Backend API client ([#6544](https://github.com/clerk/javascript/pull/6544)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Before:
+
+  ```ts
+  clerkClient.m2mTokens.create();
+
+  clerkClient.m2mTokens.revoke();
+
+  clerkClient.m2mTokens.verifySecret({ secret: 'ak_xxx' });
+  ```
+
+  After:
+
+  ```ts
+  clerkClient.m2m.createToken();
+
+  clerkClient.m2m.revokeToken();
+
+  clerkClient.m2m.verifyToken({ token: 'ak_xxx' });
+  ```
+
+  The `verifySecret()` method is removed. Please use `.verifyToken()` instead.
+
+- Deprecates `clerkClient.m2mTokens.verifySecret({ secret: 'mt_xxx' })` in favor or `clerkClient.m2mTokens.verifyToken({ token: 'mt_xxx' })` ([#6536](https://github.com/clerk/javascript/pull/6536)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Updated dependencies [[`4db1e58`](https://github.com/clerk/javascript/commit/4db1e58d70b60e1e236709b507666715d571e925), [`69498df`](https://github.com/clerk/javascript/commit/69498dfca3e6bb388eb8c94313eac06347dd5a27), [`59f1559`](https://github.com/clerk/javascript/commit/59f15593bab708b9e13eebfff6780c2d52b31b0a)]:
+  - @clerk/types@4.77.0
+  - @clerk/shared@3.20.1
+
 ## 2.8.0
 
 ### Minor Changes
