@@ -326,15 +326,15 @@ const commonForProd = () => {
   };
 };
 
-// /** @type { () => (import('webpack').Configuration) } */
-// const externalsForHeadless = () => {
-//   return {
-//     externals: {
-//       react: 'react',
-//       'react-dom': 'react-dom',
-//     },
-//   };
-// };
+/** @type { () => (import('webpack').Configuration) } */
+const externalsForHeadless = () => {
+  return {
+    externals: {
+      react: 'react',
+      'react-dom': 'react-dom',
+    },
+  };
+};
 
 /**
  *
@@ -399,7 +399,6 @@ const prodConfig = ({ mode, env, analysis }) => {
         splitChunks: false,
       },
     },
-    // externalsForHeadless(),
   );
 
   const clerkHeadlessBrowser = merge(
@@ -407,7 +406,6 @@ const prodConfig = ({ mode, env, analysis }) => {
     common({ mode, variant: variants.clerkHeadlessBrowser }),
     commonForProd(),
     commonForProdChunked(),
-    // externalsForHeadless(),
   );
 
   const clerkCHIPS = merge(
@@ -619,13 +617,11 @@ const devConfig = ({ mode, env }) => {
       entryForVariant(variants.clerkHeadless),
       common({ mode, variant: variants.clerkHeadless }),
       commonForDev(),
-      // externalsForHeadless(),
     ),
     [variants.clerkHeadlessBrowser]: merge(
       entryForVariant(variants.clerkHeadlessBrowser),
       common({ mode, variant: variants.clerkHeadlessBrowser }),
       commonForDev(),
-      // externalsForHeadless(),
     ),
     [variants.clerkCHIPS]: merge(
       entryForVariant(variants.clerkCHIPS),
