@@ -206,7 +206,7 @@ async function verifyM2MToken(
 ): Promise<MachineTokenReturnType<M2MToken, MachineTokenVerificationError>> {
   try {
     const client = createBackendApiClient(options);
-    const verifiedToken = await client.m2mTokens.verifyToken({ token });
+    const verifiedToken = await client.m2m.verifyToken({ token });
     return { data: verifiedToken, tokenType: TokenType.M2MToken, errors: undefined };
   } catch (err: any) {
     return handleClerkAPIError(TokenType.M2MToken, err, 'Machine token not found');

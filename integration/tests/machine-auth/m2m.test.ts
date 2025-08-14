@@ -43,18 +43,7 @@ test.describe('machine-to-machine auth @machine', () => {
           const token = req.get('Authorization')?.split(' ')[1];
           
           try {
-            const m2mToken = await clerkClient.m2mTokens.verifyToken({ token });
-            res.send('Protected response ' + m2mToken.id);
-          } catch {
-            res.status(401).send('Unauthorized');
-          }
-        });
-
-        app.get('/api/protected-deprecated', async (req, res) => {
-          const secret = req.get('Authorization')?.split(' ')[1];
-          
-          try {
-            const m2mToken = await clerkClient.m2mTokens.verifySecret({ secret });
+            const m2mToken = await clerkClient.m2m.verifyToken({ token });
             res.send('Protected response ' + m2mToken.id);
           } catch {
             res.status(401).send('Unauthorized');
@@ -81,7 +70,7 @@ test.describe('machine-to-machine auth @machine', () => {
       name: `${fakeCompanyName} Email Server`,
       scopedMachines: [primaryApiServer.id],
     });
-    emailServerM2MToken = await client.m2mTokens.create({
+    emailServerM2MToken = await client.m2m.createToken({
       machineSecretKey: emailServer.secretKey,
       secondsUntilExpiration: 60 * 30,
     });
@@ -91,7 +80,7 @@ test.describe('machine-to-machine auth @machine', () => {
       name: `${fakeCompanyName} Analytics Server`,
       // No scoped machines
     });
-    analyticsServerM2MToken = await client.m2mTokens.create({
+    analyticsServerM2MToken = await client.m2m.createToken({
       machineSecretKey: analyticsServer.secretKey,
       secondsUntilExpiration: 60 * 30,
     });
@@ -102,10 +91,10 @@ test.describe('machine-to-machine auth @machine', () => {
       secretKey: instanceKeys.get('with-api-keys').sk,
     });
 
-    await client.m2mTokens.revoke({
+    await client.m2m.revokeToken({
       m2mTokenId: emailServerM2MToken.id,
     });
-    await client.m2mTokens.revoke({
+    await client.m2m.revokeToken({
       m2mTokenId: analyticsServerM2MToken.id,
     });
     await client.machines.delete(emailServer.id);
@@ -164,7 +153,7 @@ test.describe('machine-to-machine auth @machine', () => {
 
     // Analytics server can access primary API server after adding scope
     await u.services.clerk.machines.createScope(analyticsServer.id, primaryApiServer.id);
-    const m2mToken = await u.services.clerk.m2mTokens.create({
+    const m2mToken = await u.services.clerk.m2m.createToken({
       machineSecretKey: analyticsServer.secretKey,
       secondsUntilExpiration: 60 * 30,
     });
@@ -176,21 +165,8 @@ test.describe('machine-to-machine auth @machine', () => {
     });
     expect(res2.status()).toBe(200);
     expect(await res2.text()).toBe('Protected response ' + m2mToken.id);
-    await u.services.clerk.m2mTokens.revoke({
+    await u.services.clerk.m2m.revokeToken({
       m2mTokenId: m2mToken.id,
     });
-  });
-
-  test('authorizes M2M requests with deprecated verifySecret method', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
-
-    // Email server can access primary API server
-    const res = await u.page.request.get(app.serverUrl + '/api/protected-deprecated', {
-      headers: {
-        Authorization: `Bearer ${emailServerM2MToken.token}`,
-      },
-    });
-    expect(res.status()).toBe(200);
-    expect(await res.text()).toBe('Protected response ' + emailServerM2MToken.id);
   });
 });
