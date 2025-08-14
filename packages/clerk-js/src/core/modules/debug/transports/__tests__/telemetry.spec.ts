@@ -1,6 +1,6 @@
 import type { TelemetryCollector } from '@clerk/shared/telemetry';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { MockedFunction } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { DebugLogEntry } from '../../types';
 import { TelemetryTransport } from '../telemetry';
