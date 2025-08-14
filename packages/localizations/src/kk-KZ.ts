@@ -54,6 +54,7 @@ export const kkKZ: LocalizationResource = {
   badge__default: 'Әдепкі бойынша',
   badge__endsAt: "{{ date | shortDate('kk-KZ') }} күні аяқталады",
   badge__expired: 'Мерзімі біткен',
+  badge__freeTrial: undefined,
   badge__otherImpersonatorDevice: 'Басқа эмуляциялаушы құрылғы',
   badge__pastDueAt: undefined,
   badge__pastDuePlan: undefined,
@@ -89,6 +90,7 @@ export const kkKZ: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
+        title__freeTrialEndsAt: undefined,
         title__paymentMethod: 'Төлем әдісі',
         title__statementId: 'Шоттың ID нөмірі',
         title__subscriptionBegins: 'Жазылым басталады',
@@ -99,6 +101,8 @@ export const kkKZ: LocalizationResource = {
       title: undefined,
       title__paymentSuccessful: 'Төлем сәтті аяқталды!',
       title__subscriptionSuccessful: 'Сәтті!',
+      title__trialSuccess: undefined,
+      totalDueAfterTrial: undefined,
     },
     credit: undefined,
     creditRemainder: undefined,
@@ -135,6 +139,7 @@ export const kkKZ: LocalizationResource = {
     reSubscribe: 'Қайта жазылу',
     seeAllFeatures: undefined,
     startFreeTrial: undefined,
+    startFreeTrial__days: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,

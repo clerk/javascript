@@ -52,7 +52,7 @@ export class CommerceSubscription extends BaseResource implements CommerceSubscr
         }
       : null;
     this.subscriptionItems = (data.subscription_items || []).map(item => new CommerceSubscriptionItem(item));
-    this.eligibleForFreeTrial = data.eligible_for_free_trial;
+    this.eligibleForFreeTrial = this.withDefault(data.eligible_for_free_trial, false);
     return this;
   }
 }

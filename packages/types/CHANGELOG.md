@@ -1,5 +1,31 @@
 # Change Log
 
+## 4.76.0
+
+### Minor Changes
+
+- [Billing Beta] Replace usage of top level amounts in plan with fees for displaying prices. ([#6490](https://github.com/clerk/javascript/pull/6490)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add support for trials in `<Checkout/>` ([#6494](https://github.com/clerk/javascript/pull/6494)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Added `freeTrialEndsAt` property to `CommerceCheckoutResource` interface.
+
+- Update billing resources with trial properties. ([#6492](https://github.com/clerk/javascript/pull/6492)) by [@panteliselef](https://github.com/panteliselef)
+
+- Update PricingTable with trial info. ([#6493](https://github.com/clerk/javascript/pull/6493)) by [@panteliselef](https://github.com/panteliselef)
+
+- [Experimental] Signals reset password flow ([#6520](https://github.com/clerk/javascript/pull/6520)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Convert LocalizationResource to interface for typedoc documentation ([#6531](https://github.com/clerk/javascript/pull/6531)) by [@NWylynko](https://github.com/NWylynko)
+
+- Add optional `isExternal` to `ApplicationLogo` ([#6447](https://github.com/clerk/javascript/pull/6447)) by [@jfoshee](https://github.com/jfoshee)
+
+  Add optional `oAuthApplicationUrl` parameter to OAuth Consent mounting (which is used to provide a link to the OAuth App homepage).
+
+  Harden `Link` component so it sanitizes the given `href` to avoid dangerous protocols.
+
 ## 4.75.0
 
 ### Minor Changes

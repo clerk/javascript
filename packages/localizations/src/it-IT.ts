@@ -55,6 +55,7 @@ export const itIT: LocalizationResource = {
   badge__default: 'Predefinito',
   badge__endsAt: "Termina {{ date | shortDate('it-IT') }}",
   badge__expired: 'Scaduto',
+  badge__freeTrial: undefined,
   badge__otherImpersonatorDevice: 'Altro dispositivo impersonato',
   badge__pastDueAt: "Scaduto {{ date | shortDate('it-IT') }}",
   badge__pastDuePlan: 'Scaduto',
@@ -95,6 +96,7 @@ export const itIT: LocalizationResource = {
         title: 'Aggiungi un indirizzo email',
       },
       lineItems: {
+        title__freeTrialEndsAt: undefined,
         title__paymentMethod: 'Metodo di pagamento',
         title__statementId: 'ID estratto conto',
         title__subscriptionBegins: 'Inizio abbonamento',
@@ -105,6 +107,8 @@ export const itIT: LocalizationResource = {
       title: 'Checkout',
       title__paymentSuccessful: 'Pagamento riuscito!',
       title__subscriptionSuccessful: 'Successo!',
+      title__trialSuccess: undefined,
+      totalDueAfterTrial: undefined,
     },
     credit: 'Credito',
     creditRemainder: 'Credito per il resto del tuo abbonamento attuale.',
@@ -141,6 +145,7 @@ export const itIT: LocalizationResource = {
     reSubscribe: 'Riabbonati',
     seeAllFeatures: 'Vedi tutte le funzionalità',
     startFreeTrial: undefined,
+    startFreeTrial__days: undefined,
     subscribe: 'Abbonati',
     subscriptionDetails: {
       beginsOn: 'Inizia il',

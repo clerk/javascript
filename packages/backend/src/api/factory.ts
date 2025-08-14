@@ -72,7 +72,7 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
     jwks: new JwksAPI(request),
     jwtTemplates: new JwtTemplatesApi(request),
     machines: new MachineApi(request),
-    m2mTokens: new M2MTokenApi(
+    m2m: new M2MTokenApi(
       buildRequest({
         ...options,
         skipApiVersionInUrl: true,

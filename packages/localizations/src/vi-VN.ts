@@ -55,6 +55,7 @@ export const viVN: LocalizationResource = {
   badge__default: 'Mặc định',
   badge__endsAt: "Kết thúc {{ date | shortDate('vi-VN') }}",
   badge__expired: 'Đã hết hạn',
+  badge__freeTrial: undefined,
   badge__otherImpersonatorDevice: 'Thiết bị giả mạo khác',
   badge__pastDueAt: undefined,
   badge__pastDuePlan: undefined,
@@ -93,6 +94,7 @@ export const viVN: LocalizationResource = {
         title: 'Thêm địa chỉ email',
       },
       lineItems: {
+        title__freeTrialEndsAt: undefined,
         title__paymentMethod: 'Phương thức thanh toán',
         title__statementId: 'ID hóa đơn',
         title__subscriptionBegins: 'Đăng ký bắt đầu',
@@ -103,6 +105,8 @@ export const viVN: LocalizationResource = {
       title: 'Thanh toán',
       title__paymentSuccessful: 'Thanh toán thành công!',
       title__subscriptionSuccessful: 'Thành công!',
+      title__trialSuccess: undefined,
+      totalDueAfterTrial: undefined,
     },
     credit: 'Tín dụng',
     creditRemainder: 'Tín dụng cho phần còn lại của đăng ký hiện tại.',
@@ -139,6 +143,7 @@ export const viVN: LocalizationResource = {
     reSubscribe: 'Đăng ký lại',
     seeAllFeatures: 'Xem tất cả tính năng',
     startFreeTrial: undefined,
+    startFreeTrial__days: undefined,
     subscribe: 'Đăng ký',
     subscriptionDetails: {
       beginsOn: undefined,

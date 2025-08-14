@@ -54,6 +54,7 @@ export const taIN: LocalizationResource = {
   badge__default: 'இயல்புநிலை',
   badge__endsAt: undefined,
   badge__expired: 'காலாவதியானது',
+  badge__freeTrial: undefined,
   badge__otherImpersonatorDevice: 'மற்ற மாறுவேட சாதனம்',
   badge__pastDueAt: undefined,
   badge__pastDuePlan: undefined,
@@ -89,6 +90,7 @@ export const taIN: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
+        title__freeTrialEndsAt: undefined,
         title__paymentMethod: undefined,
         title__statementId: undefined,
         title__subscriptionBegins: undefined,
@@ -99,6 +101,8 @@ export const taIN: LocalizationResource = {
       title: undefined,
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
+      title__trialSuccess: undefined,
+      totalDueAfterTrial: undefined,
     },
     credit: undefined,
     creditRemainder: undefined,
@@ -135,6 +139,7 @@ export const taIN: LocalizationResource = {
     reSubscribe: undefined,
     seeAllFeatures: undefined,
     startFreeTrial: undefined,
+    startFreeTrial__days: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,

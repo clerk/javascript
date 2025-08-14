@@ -75,6 +75,7 @@ export const ptBR: LocalizationResource = {
   badge__default: 'Padrão',
   badge__endsAt: "Termina {{ date | shortDate('pt-BR') }}",
   badge__expired: 'Expirado',
+  badge__freeTrial: undefined,
   badge__otherImpersonatorDevice: 'Personificar outro dispositivo',
   badge__pastDueAt: "Vencido em {{ date | shortDate('pt-BR') }}",
   badge__pastDuePlan: 'Vencido',
@@ -115,6 +116,7 @@ export const ptBR: LocalizationResource = {
         title: 'Adicionar endereço de e-mail',
       },
       lineItems: {
+        title__freeTrialEndsAt: undefined,
         title__paymentMethod: 'Método de pagamento',
         title__statementId: 'ID da declaração',
         title__subscriptionBegins: 'Assinatura começa',
@@ -125,6 +127,8 @@ export const ptBR: LocalizationResource = {
       title: 'Checkout',
       title__paymentSuccessful: 'Pagamento realizado com sucesso!',
       title__subscriptionSuccessful: 'Sucesso!',
+      title__trialSuccess: undefined,
+      totalDueAfterTrial: undefined,
     },
     credit: 'Crédito',
     creditRemainder: 'Crédito para o restante da sua assinatura atual.',
@@ -161,6 +165,7 @@ export const ptBR: LocalizationResource = {
     reSubscribe: 'Assinar novamente',
     seeAllFeatures: 'Ver todos os recursos',
     startFreeTrial: undefined,
+    startFreeTrial__days: undefined,
     subscribe: 'Assinar',
     subscriptionDetails: {
       beginsOn: 'Inicia em',

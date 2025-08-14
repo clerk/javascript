@@ -60,16 +60,9 @@ export const RedirectToSignUp = defineComponent((props: RedirectOptions) => {
   return () => null;
 });
 
-export const RedirectToTask = defineComponent((props: RedirectOptions) => {
-  const { sessionCtx } = useClerkContext();
-
+export const RedirectToTasks = defineComponent(() => {
   useClerkLoaded(clerk => {
-    if (!sessionCtx.value) {
-      void clerk.redirectToSignIn(props);
-      return;
-    }
-
-    void clerk.__internal_navigateToTaskIfAvailable();
+    void clerk.redirectToTasks();
   });
 
   return () => null;
