@@ -26,6 +26,7 @@ import type {
   ResetPasswordParams,
   ResetPasswordPhoneCodeFactorConfig,
   SamlConfig,
+  SetActiveNavigate,
   SignInCreateParams,
   SignInFirstFactor,
   SignInFutureResource,
@@ -637,13 +638,13 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async finalize(): Promise<{ error: unknown }> {
+  async finalize({ navigate }: { navigate?: SetActiveNavigate }): Promise<{ error: unknown }> {
     return runAsyncTask(this.resource, async () => {
       if (!this.resource.createdSessionId) {
         throw new Error('Cannot finalize sign-in without a created session.');
       }
 
-      await SignIn.clerk.setActive({ session: this.resource.createdSessionId });
+      await SignIn.clerk.setActive({ session: this.resource.createdSessionId, navigate });
     });
   }
 }
