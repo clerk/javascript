@@ -493,10 +493,16 @@ class SignInFuture implements SignInFutureResource {
     submitPassword: this.submitResetPassword.bind(this),
   };
 
+  fetchStatus: 'idle' | 'fetching' = 'idle';
+
   constructor(readonly resource: SignIn) {}
 
   get status() {
     return this.resource.status;
+  }
+
+  get availableStrategies() {
+    return this.resource.supportedFirstFactors ?? [];
   }
 
   async sendResetPasswordEmailCode(): Promise<{ error: unknown }> {
@@ -583,12 +589,13 @@ class SignInFuture implements SignInFutureResource {
     }
   }
 
-  async password({ identifier, password }: { identifier: string; password: string }): Promise<{ error: unknown }> {
+  async password({ identifier, password }: { identifier?: string; password: string }): Promise<{ error: unknown }> {
     eventBus.emit('resource:error', { resource: this.resource, error: null });
+    const previousIdentifier = this.resource.identifier;
     try {
       await this.resource.__internal_basePost({
         path: this.resource.pathRoot,
-        body: { identifier, password },
+        body: { identifier: identifier || previousIdentifier, password },
       });
     } catch (err: unknown) {
       eventBus.emit('resource:error', { resource: this.resource, error: err });
@@ -671,6 +678,22 @@ class SignInFuture implements SignInFutureResource {
       if (status === 'unverified' && externalVerificationRedirectURL) {
         windowNavigate(externalVerificationRedirectURL);
       }
+    } catch (err: unknown) {
+      eventBus.emit('resource:error', { resource: this.resource, error: err });
+      return { error: err };
+    }
+
+    return { error: null };
+  }
+
+  async finalize(): Promise<{ error: unknown }> {
+    eventBus.emit('resource:error', { resource: this.resource, error: null });
+    try {
+      if (!this.resource.createdSessionId) {
+        throw new Error('Cannot finalize sign-in without a created session.');
+      }
+
+      await SignIn.clerk.setActive({ session: this.resource.createdSessionId });
     } catch (err: unknown) {
       eventBus.emit('resource:error', { resource: this.resource, error: err });
       return { error: err };
