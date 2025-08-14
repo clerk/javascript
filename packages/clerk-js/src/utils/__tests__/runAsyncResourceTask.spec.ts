@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { eventBus } from '../../core/events';
-import { runAsyncTask } from '../runAsyncTask';
+import { runAsyncResourceTask } from '../runAsyncResourceTask';
 
 describe('runAsyncTask', () => {
   afterEach(() => {
@@ -14,7 +14,7 @@ describe('runAsyncTask', () => {
     const emitSpy = vi.spyOn(eventBus, 'emit');
     const task = vi.fn().mockResolvedValue('ok');
 
-    const { result, error } = await runAsyncTask(resource, task);
+    const { result, error } = await runAsyncResourceTask(resource, task);
 
     expect(task).toHaveBeenCalledTimes(1);
     expect(result).toBe('ok');
@@ -39,7 +39,7 @@ describe('runAsyncTask', () => {
     const thrown = new Error('fail');
     const task = vi.fn().mockRejectedValue(thrown);
 
-    const { result, error } = await runAsyncTask(resource, task);
+    const { result, error } = await runAsyncResourceTask(resource, task);
 
     expect(task).toHaveBeenCalledTimes(1);
     expect(result).toBeUndefined();

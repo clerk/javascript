@@ -59,7 +59,7 @@ import {
   webAuthnGetCredential as webAuthnGetCredentialOnWindow,
 } from '../../utils/passkeys';
 import { createValidatePassword } from '../../utils/passwords/password';
-import { runAsyncTask } from '../../utils/runAsyncTask';
+import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
 import {
   clerkInvalidFAPIResponse,
   clerkInvalidStrategy,
@@ -506,7 +506,7 @@ class SignInFuture implements SignInFutureResource {
   }
 
   async sendResetPasswordEmailCode(): Promise<{ error: unknown }> {
-    return runAsyncTask(this.resource, async () => {
+    return runAsyncResourceTask(this.resource, async () => {
       if (!this.resource.id) {
         throw new Error('Cannot reset password without a sign in.');
       }
@@ -528,7 +528,7 @@ class SignInFuture implements SignInFutureResource {
   }
 
   async verifyResetPasswordEmailCode({ code }: { code: string }): Promise<{ error: unknown }> {
-    return runAsyncTask(this.resource, async () => {
+    return runAsyncResourceTask(this.resource, async () => {
       await this.resource.__internal_basePost({
         body: { code, strategy: 'reset_password_email_code' },
         action: 'attempt_first_factor',
@@ -543,7 +543,7 @@ class SignInFuture implements SignInFutureResource {
     password: string;
     signOutOfOtherSessions?: boolean;
   }): Promise<{ error: unknown }> {
-    return runAsyncTask(this.resource, async () => {
+    return runAsyncResourceTask(this.resource, async () => {
       await this.resource.__internal_basePost({
         body: { password, signOutOfOtherSessions },
         action: 'reset_password',
@@ -557,7 +557,7 @@ class SignInFuture implements SignInFutureResource {
     redirectUrl?: string;
     actionCompleteRedirectUrl?: string;
   }): Promise<{ error: unknown }> {
-    return runAsyncTask(this.resource, async () => {
+    return runAsyncResourceTask(this.resource, async () => {
       await this.resource.__internal_basePost({
         path: this.resource.pathRoot,
         body: params,
@@ -566,7 +566,7 @@ class SignInFuture implements SignInFutureResource {
   }
 
   async password({ identifier, password }: { identifier?: string; password: string }): Promise<{ error: unknown }> {
-    return runAsyncTask(this.resource, async () => {
+    return runAsyncResourceTask(this.resource, async () => {
       const previousIdentifier = this.resource.identifier;
       await this.resource.__internal_basePost({
         path: this.resource.pathRoot,
@@ -576,7 +576,7 @@ class SignInFuture implements SignInFutureResource {
   }
 
   async sendEmailCode({ email }: { email: string }): Promise<{ error: unknown }> {
-    return runAsyncTask(this.resource, async () => {
+    return runAsyncResourceTask(this.resource, async () => {
       if (!this.resource.id) {
         await this.create({ identifier: email });
       }
@@ -596,7 +596,7 @@ class SignInFuture implements SignInFutureResource {
   }
 
   async verifyEmailCode({ code }: { code: string }): Promise<{ error: unknown }> {
-    return runAsyncTask(this.resource, async () => {
+    return runAsyncResourceTask(this.resource, async () => {
       await this.resource.__internal_basePost({
         body: { code, strategy: 'email_code' },
         action: 'attempt_first_factor',
@@ -615,7 +615,7 @@ class SignInFuture implements SignInFutureResource {
     redirectUrl: string;
     redirectUrlComplete: string;
   }): Promise<{ error: unknown }> {
-    return runAsyncTask(this.resource, async () => {
+    return runAsyncResourceTask(this.resource, async () => {
       if (flow !== 'auto') {
         throw new Error('modal flow is not supported yet');
       }
@@ -639,7 +639,7 @@ class SignInFuture implements SignInFutureResource {
   }
 
   async finalize({ navigate }: { navigate?: SetActiveNavigate }): Promise<{ error: unknown }> {
-    return runAsyncTask(this.resource, async () => {
+    return runAsyncResourceTask(this.resource, async () => {
       if (!this.resource.createdSessionId) {
         throw new Error('Cannot finalize sign-in without a created session.');
       }
