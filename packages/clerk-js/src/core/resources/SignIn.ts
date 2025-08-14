@@ -59,6 +59,7 @@ import {
   webAuthnGetCredential as webAuthnGetCredentialOnWindow,
 } from '../../utils/passkeys';
 import { createValidatePassword } from '../../utils/passwords/password';
+import { runAsyncTask } from '../../utils/runAsyncTask';
 import {
   clerkInvalidFAPIResponse,
   clerkInvalidStrategy,
@@ -70,7 +71,6 @@ import {
 } from '../errors';
 import { eventBus } from '../events';
 import { BaseResource, UserData, Verification } from './internal';
-import { runAsyncTask } from '../../utils/runAsyncTask';
 
 export class SignIn extends BaseResource implements SignInResource {
   pathRoot = '/client/sign_ins';
