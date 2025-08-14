@@ -82,6 +82,7 @@
     "core-js": "3.41.0",
     "crypto-js": "^4.2.0",
     "dequal": "2.0.3",
+    "input-otp": "1.4.2",
     "qrcode.react": "4.2.0",
     "regenerator-runtime": "0.14.1",
     "swr": "2.3.4"
