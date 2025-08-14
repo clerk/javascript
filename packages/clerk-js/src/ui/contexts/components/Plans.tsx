@@ -232,13 +232,6 @@ export const usePlansContext = () => {
         return localizationKey;
       };
 
-      const freeTrialOr = (localizationKey: LocalizationKey): LocalizationKey => {
-        if (plan?.freeTrialEnabled && topLevelSubscription?.eligibleForFreeTrial) {
-          return localizationKeys('commerce.startFreeTrial__days', { days: plan.freeTrialDays ?? 0 });
-        }
-        return localizationKey;
-      };
-
       const getLocalizationKey = () => {
         // Handle subscription cases
         if (subscription) {
