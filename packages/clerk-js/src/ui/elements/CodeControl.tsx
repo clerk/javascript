@@ -95,7 +95,6 @@ export const useFieldOTP: UseFieldOTP = params => {
 };
 
 const useCodeControl = (formControl: FormControlState, options?: UseCodeInputOptions) => {
-  const otpControlRef = React.useRef<any>();
   const userOnCodeEnteredCallback = React.useRef<onCodeEntryFinishedCallback>();
   const defaultValue = formControl.value;
   const { feedback, feedbackType, onChange, clearFeedback } = formControl;
@@ -108,6 +107,10 @@ const useCodeControl = (formControl: FormControlState, options?: UseCodeInputOpt
     userOnCodeEnteredCallback.current = cb;
   };
 
+  const reset = React.useCallback(() => {
+    setValues(Array.from({ length }, () => ''));
+  }, [length]);
+
   React.useEffect(() => {
     const len = values.filter(c => c).length;
     if (len === length) {
@@ -117,10 +120,11 @@ const useCodeControl = (formControl: FormControlState, options?: UseCodeInputOpt
       const code = values.join('');
       onChange?.({ target: { value: code } } as any);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [values.toString()]);
 
-  const otpInputProps = { length, values, setValues, feedback, feedbackType, clearFeedback, ref: otpControlRef };
-  return { otpInputProps, onCodeEntryFinished, reset: () => otpControlRef.current?.reset() };
+  const otpInputProps = { length, values, setValues, feedback, feedbackType, clearFeedback };
+  return { otpInputProps, onCodeEntryFinished, reset };
 };
 
 export type OTPInputProps = {
@@ -159,7 +163,7 @@ export const OTPResendButton = () => {
   );
 };
 
-export const OTPCodeControl = React.forwardRef<{ reset: any }>((_, ref) => {
+export const OTPCodeControl = () => {
   const [disabled, setDisabled] = React.useState(false);
   const { otpControl, isLoading, isDisabled } = useOTPInputContext();
   const { feedback, values, setValues, feedbackType, length } = otpControl.otpInputProps;
@@ -208,7 +212,7 @@ export const OTPCodeControl = React.forwardRef<{ reset: any }>((_, ref) => {
       />
     </Box>
   );
-});
+};
 
 function Slot(props: SlotProps & PropsOfComponent<typeof OTPInputSegment> & { isSuccessfullyFilled?: boolean }) {
   const { isSuccessfullyFilled, isActive, ...rest } = props;

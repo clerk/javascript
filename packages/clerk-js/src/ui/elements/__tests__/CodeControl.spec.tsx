@@ -35,7 +35,7 @@ const createOTPComponent = (
         isLoading={otpField.isLoading}
         onResendCode={otpField.onResendCode}
       >
-        <OTPCodeControl ref={null} />
+        <OTPCodeControl />
       </OTPRoot>
     );
   });
@@ -443,7 +443,7 @@ describe('CodeControl', () => {
             isDisabled
             onResendCode={otpField.onResendCode}
           >
-            <OTPCodeControl ref={null} />
+            <OTPCodeControl />
           </OTPRoot>
         );
       });
@@ -472,7 +472,7 @@ describe('CodeControl', () => {
             isLoading
             onResendCode={otpField.onResendCode}
           >
-            <OTPCodeControl ref={null} />
+            <OTPCodeControl />
           </OTPRoot>
         );
       });
@@ -508,7 +508,7 @@ describe('CodeControl', () => {
             isLoading={false}
             onResendCode={otpField.onResendCode}
           >
-            <OTPCodeControl ref={null} />
+            <OTPCodeControl />
           </OTPRoot>
         );
       });
