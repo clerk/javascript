@@ -126,7 +126,6 @@ export interface SignInResource extends ClerkResource {
 }
 
 export interface SignInFutureResource {
-  fetchStatus: 'idle' | 'fetching';
   availableStrategies: SignInFirstFactor[];
   status: SignInStatus | null;
   create: (params: {

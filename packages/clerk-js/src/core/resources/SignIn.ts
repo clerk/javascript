@@ -493,8 +493,6 @@ class SignInFuture implements SignInFutureResource {
     submitPassword: this.submitResetPassword.bind(this),
   };
 
-  fetchStatus: 'idle' | 'fetching' = 'idle';
-
   constructor(readonly resource: SignIn) {}
 
   get status() {
