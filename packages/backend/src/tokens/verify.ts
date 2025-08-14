@@ -200,13 +200,13 @@ function handleClerkAPIError(
   };
 }
 
-async function verifyMachineToken(
-  secret: string,
+async function verifyM2MToken(
+  token: string,
   options: VerifyTokenOptions & { machineSecretKey?: string },
 ): Promise<MachineTokenReturnType<M2MToken, MachineTokenVerificationError>> {
   try {
     const client = createBackendApiClient(options);
-    const verifiedToken = await client.m2mTokens.verifySecret({ secret });
+    const verifiedToken = await client.m2m.verifyToken({ token });
     return { data: verifiedToken, tokenType: TokenType.M2MToken, errors: undefined };
   } catch (err: any) {
     return handleClerkAPIError(TokenType.M2MToken, err, 'Machine token not found');
@@ -247,7 +247,7 @@ async function verifyAPIKey(
  */
 export async function verifyMachineAuthToken(token: string, options: VerifyTokenOptions) {
   if (token.startsWith(M2M_TOKEN_PREFIX)) {
-    return verifyMachineToken(token, options);
+    return verifyM2MToken(token, options);
   }
   if (token.startsWith(OAUTH_TOKEN_PREFIX)) {
     return verifyOAuthToken(token, options);

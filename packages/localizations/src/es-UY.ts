@@ -54,6 +54,7 @@ export const esUY: LocalizationResource = {
   badge__default: 'Predeterminado',
   badge__endsAt: undefined,
   badge__expired: undefined,
+  badge__freeTrial: undefined,
   badge__otherImpersonatorDevice: 'Otro dispositivo de suplantación',
   badge__pastDueAt: undefined,
   badge__pastDuePlan: undefined,
@@ -62,6 +63,7 @@ export const esUY: LocalizationResource = {
   badge__requiresAction: 'Requiere acción',
   badge__startsAt: undefined,
   badge__thisDevice: 'Este dispositivo',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'No verificado',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Dispositivo del usuario',
@@ -88,6 +90,7 @@ export const esUY: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
+        title__freeTrialEndsAt: undefined,
         title__paymentMethod: undefined,
         title__statementId: undefined,
         title__subscriptionBegins: undefined,
@@ -98,6 +101,8 @@ export const esUY: LocalizationResource = {
       title: undefined,
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
+      title__trialSuccess: undefined,
+      totalDueAfterTrial: undefined,
     },
     credit: undefined,
     creditRemainder: undefined,
@@ -133,6 +138,8 @@ export const esUY: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
+    startFreeTrial__days: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,
@@ -795,6 +802,26 @@ export const esUY: LocalizationResource = {
   },
   socialButtonsBlockButton: 'Continuar con {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ya es miembro de la organización.',
     captcha_invalid:

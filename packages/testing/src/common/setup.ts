@@ -1,5 +1,5 @@
 import { createClerkClient } from '@clerk/backend';
-import { isProductionFromSecretKey, parsePublishableKey } from '@clerk/shared/keys';
+import { parsePublishableKey } from '@clerk/shared/keys';
 import dotenv from 'dotenv';
 
 import type { ClerkSetupOptions, ClerkSetupReturn } from './types';
@@ -39,12 +39,6 @@ export const fetchEnvVars = async (options?: ClerkSetupOptions): Promise<ClerkSe
   }
 
   if (secretKey && !testingToken) {
-    if (isProductionFromSecretKey(secretKey)) {
-      throw new Error(
-        'You are using a secret key from a production instance, but Testing Tokens only work in development instances.',
-      );
-    }
-
     log('Fetching testing token from Clerk Backend API...');
 
     try {

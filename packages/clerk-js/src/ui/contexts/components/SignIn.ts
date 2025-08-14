@@ -1,16 +1,14 @@
 import { useClerk } from '@clerk/shared/react';
 import { isAbsoluteUrl } from '@clerk/shared/url';
+import type { SessionResource } from '@clerk/types';
 import { createContext, useContext, useMemo } from 'react';
+
+import { getTaskEndpoint } from '@/core/sessionTasks';
 
 import { SIGN_IN_INITIAL_VALUE_KEYS } from '../../../core/constants';
 import { buildURL } from '../../../utils';
 import { RedirectUrls } from '../../../utils/redirectUrls';
-import {
-  buildRedirectUrl,
-  buildSessionTaskRedirectUrl,
-  MAGIC_LINK_VERIFY_PATH_ROUTE,
-  SSO_CALLBACK_PATH_ROUTE,
-} from '../../common/redirects';
+import { buildRedirectUrl, MAGIC_LINK_VERIFY_PATH_ROUTE, SSO_CALLBACK_PATH_ROUTE } from '../../common/redirects';
 import { useEnvironment, useOptions } from '../../contexts';
 import type { ParsedQueryString } from '../../router';
 import { useRouter } from '../../router';
@@ -26,19 +24,20 @@ export type SignInContextType = Omit<SignInCtx, 'fallbackRedirectUrl' | 'forceRe
   authQueryString: string | null;
   afterSignUpUrl: string;
   afterSignInUrl: string;
-  sessionTaskUrl: string | null;
   transferable: boolean;
   waitlistUrl: string;
   emailLinkRedirectUrl: string;
   ssoCallbackUrl: string;
   isCombinedFlow: boolean;
+  navigateOnSetActive: (opts: { session: SessionResource; redirectUrl: string }) => Promise<unknown>;
+  taskUrl: string | null;
 };
 
 export const SignInContext = createContext<SignInCtx | null>(null);
 
 export const useSignInContext = (): SignInContextType => {
   const context = useContext(SignInContext);
-  const { navigate } = useRouter();
+  const { navigate, basePath } = useRouter();
   const { displayConfig, userSettings } = useEnvironment();
   const { queryParams, queryString } = useRouter();
   const signUpMode = userSettings.signUp.mode;
@@ -121,16 +120,33 @@ export const useSignInContext = (): SignInContextType => {
 
   const signUpContinueUrl = buildURL({ base: signUpUrl, hashPath: '/continue' }, { stringify: true });
 
-  const sessionTaskUrl = buildSessionTaskRedirectUrl({
-    task: clerk.session?.currentTask,
-    path: ctx.path,
-    routing: ctx.routing,
-    baseUrl: signInUrl,
-    taskUrls: clerk.__internal_getOption('taskUrls'),
-  });
+  const navigateOnSetActive = async ({ session, redirectUrl }: { session: SessionResource; redirectUrl: string }) => {
+    const currentTask = session.currentTask;
+    if (!currentTask) {
+      return navigate(redirectUrl);
+    }
+
+    const taskEndpoint = getTaskEndpoint(currentTask);
+    const taskNavigationPath = isCombinedFlow ? '/create' + taskEndpoint : taskEndpoint;
+
+    return navigate(`/${basePath + taskNavigationPath}`);
+  };
+
+  const taskUrl = clerk.session?.currentTask
+    ? (clerk.__internal_getOption('taskUrls')?.[clerk.session?.currentTask.key] ??
+      buildRedirectUrl({
+        routing: ctx.routing,
+        baseUrl: signInUrl,
+        authQueryString,
+        path: ctx.path,
+        endpoint: isCombinedFlow
+          ? '/create' + getTaskEndpoint(clerk.session?.currentTask)
+          : getTaskEndpoint(clerk.session?.currentTask),
+      }))
+    : null;
 
   return {
-    ...(ctx as SignInCtx),
+    ...ctx,
     transferable: ctx.transferable ?? true,
     oauthFlow: ctx.oauthFlow || 'auto',
     componentName,
@@ -141,12 +157,13 @@ export const useSignInContext = (): SignInContextType => {
     afterSignUpUrl,
     emailLinkRedirectUrl,
     ssoCallbackUrl,
-    sessionTaskUrl,
     navigateAfterSignIn,
     signUpContinueUrl,
     queryParams,
     initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },
     authQueryString,
     isCombinedFlow,
+    navigateOnSetActive,
+    taskUrl,
   };
 };

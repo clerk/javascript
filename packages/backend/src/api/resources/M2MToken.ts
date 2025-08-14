@@ -12,7 +12,7 @@ export class M2MToken {
     readonly expiration: number | null,
     readonly createdAt: number,
     readonly updatedAt: number,
-    readonly secret?: string,
+    readonly token?: string,
   ) {}
 
   static fromJSON(data: M2MTokenJSON): M2MToken {
@@ -27,7 +27,7 @@ export class M2MToken {
       data.expiration,
       data.created_at,
       data.updated_at,
-      data.secret,
+      data.token,
     );
   }
 }

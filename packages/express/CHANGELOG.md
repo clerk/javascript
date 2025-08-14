@@ -1,5 +1,34 @@
 # Change Log
 
+## 1.7.20
+
+### Patch Changes
+
+- Updated dependencies [[`4db1e58`](https://github.com/clerk/javascript/commit/4db1e58d70b60e1e236709b507666715d571e925), [`d400782`](https://github.com/clerk/javascript/commit/d400782b7016c1232c0aa1e3399c61b61e4f0709), [`69498df`](https://github.com/clerk/javascript/commit/69498dfca3e6bb388eb8c94313eac06347dd5a27), [`307dc3f`](https://github.com/clerk/javascript/commit/307dc3f05ba1bd3b30b491b198d9e65eebcc95f9), [`2db7431`](https://github.com/clerk/javascript/commit/2db743147827fb69fb8fe73a1e26545aeb7be7aa), [`59f1559`](https://github.com/clerk/javascript/commit/59f15593bab708b9e13eebfff6780c2d52b31b0a)]:
+  - @clerk/types@4.77.0
+  - @clerk/backend@2.9.0
+  - @clerk/shared@3.20.1
+
+## 1.7.19
+
+### Patch Changes
+
+- Updated dependencies [[`15fe106`](https://github.com/clerk/javascript/commit/15fe1060f730a6a4391f3d2451d23edd3218e1ae), [`df63e76`](https://github.com/clerk/javascript/commit/df63e76f2382c601d9a3b52a3a6dfaba26c4f36f), [`173837c`](https://github.com/clerk/javascript/commit/173837c2526aa826b7981ee8d6d4f52c00675da5), [`8b52d7a`](https://github.com/clerk/javascript/commit/8b52d7ae19407e8ab5a5451bd7d34b6bc38417de), [`854dde8`](https://github.com/clerk/javascript/commit/854dde88e642c47b5a29ac8f576c8c1976e5d067), [`ae2e2d6`](https://github.com/clerk/javascript/commit/ae2e2d6b336be6b596cc855e549843beb5bfd2a1), [`037f25a`](https://github.com/clerk/javascript/commit/037f25a8171888168913b186b7edf871e0aaf197), [`f8b38b7`](https://github.com/clerk/javascript/commit/f8b38b7059e498fef3ac1271346be0710aa31c76)]:
+  - @clerk/types@4.76.0
+  - @clerk/backend@2.8.0
+  - @clerk/shared@3.20.0
+
+## 1.7.18
+
+### Patch Changes
+
+- Deprecates `enableHandshake` option in `clerkMiddleware`. This option is unnecessary for API requests since they don't trigger handshake flows. The option will be removed in a future version. ([#6499](https://github.com/clerk/javascript/pull/6499)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`b72a3dd`](https://github.com/clerk/javascript/commit/b72a3dda2467720e5dc8cab3e7e6a110f3beb79b), [`d93b0ed`](https://github.com/clerk/javascript/commit/d93b0edf4adc57d48a26cb08444192887ccec659), [`6459f7d`](https://github.com/clerk/javascript/commit/6459f7dabe5f163f48ed73106bb901d8187da3e2), [`0ff648a`](https://github.com/clerk/javascript/commit/0ff648aeac0e2f5481596a98c8046d9d58a7bf75), [`9084759`](https://github.com/clerk/javascript/commit/90847593300be605e1ee1c06dac147ce68b25dc7)]:
+  - @clerk/types@4.75.0
+  - @clerk/shared@3.19.0
+  - @clerk/backend@2.7.1
+
 ## 1.7.17
 
 ### Patch Changes

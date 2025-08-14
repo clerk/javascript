@@ -54,6 +54,7 @@ export const thTH: LocalizationResource = {
   badge__default: 'ค่าเริ่มต้น',
   badge__endsAt: undefined,
   badge__expired: undefined,
+  badge__freeTrial: undefined,
   badge__otherImpersonatorDevice: 'อุปกรณ์ปลอมตัวอื่น',
   badge__pastDueAt: undefined,
   badge__pastDuePlan: undefined,
@@ -62,6 +63,7 @@ export const thTH: LocalizationResource = {
   badge__requiresAction: 'ต้องการการดำเนินการ',
   badge__startsAt: undefined,
   badge__thisDevice: 'อุปกรณ์นี้',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'ยังไม่ได้ตรวจสอบ',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'อุปกรณ์ผู้ใช้',
@@ -88,6 +90,7 @@ export const thTH: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
+        title__freeTrialEndsAt: undefined,
         title__paymentMethod: undefined,
         title__statementId: undefined,
         title__subscriptionBegins: undefined,
@@ -98,6 +101,8 @@ export const thTH: LocalizationResource = {
       title: undefined,
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
+      title__trialSuccess: undefined,
+      totalDueAfterTrial: undefined,
     },
     credit: undefined,
     creditRemainder: undefined,
@@ -133,6 +138,8 @@ export const thTH: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
+    startFreeTrial__days: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,
@@ -785,6 +792,26 @@ export const thTH: LocalizationResource = {
   },
   socialButtonsBlockButton: 'ดำเนินการต่อด้วย {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} เป็นสมาชิกขององค์กรอยู่แล้ว',
     captcha_invalid:

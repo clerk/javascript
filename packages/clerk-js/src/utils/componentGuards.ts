@@ -6,8 +6,8 @@ export type ComponentGuard = (
   options?: ClerkOptions,
 ) => boolean;
 
-export const sessionExistsAndSingleSessionModeEnabled: ComponentGuard = (clerk, environment) => {
-  return !!(clerk.session && environment?.authConfig.singleSessionMode);
+export const isSignedInAndSingleSessionModeEnabled: ComponentGuard = (clerk, environment) => {
+  return !!(clerk.isSignedIn && environment?.authConfig.singleSessionMode);
 };
 
 export const noUserExists: ComponentGuard = clerk => {

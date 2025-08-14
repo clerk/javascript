@@ -1,5 +1,38 @@
 # Change Log
 
+## 3.20.1
+
+### Patch Changes
+
+- Invalidate organization memberships based on client user ([#6530](https://github.com/clerk/javascript/pull/6530)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Updated dependencies [[`4db1e58`](https://github.com/clerk/javascript/commit/4db1e58d70b60e1e236709b507666715d571e925), [`69498df`](https://github.com/clerk/javascript/commit/69498dfca3e6bb388eb8c94313eac06347dd5a27)]:
+  - @clerk/types@4.77.0
+
+## 3.20.0
+
+### Minor Changes
+
+- Add support for trials in `<Checkout/>` ([#6494](https://github.com/clerk/javascript/pull/6494)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Added `freeTrialEndsAt` property to `CommerceCheckoutResource` interface.
+
+### Patch Changes
+
+- Updated dependencies [[`15fe106`](https://github.com/clerk/javascript/commit/15fe1060f730a6a4391f3d2451d23edd3218e1ae), [`173837c`](https://github.com/clerk/javascript/commit/173837c2526aa826b7981ee8d6d4f52c00675da5), [`8b52d7a`](https://github.com/clerk/javascript/commit/8b52d7ae19407e8ab5a5451bd7d34b6bc38417de), [`854dde8`](https://github.com/clerk/javascript/commit/854dde88e642c47b5a29ac8f576c8c1976e5d067), [`ae2e2d6`](https://github.com/clerk/javascript/commit/ae2e2d6b336be6b596cc855e549843beb5bfd2a1), [`037f25a`](https://github.com/clerk/javascript/commit/037f25a8171888168913b186b7edf871e0aaf197), [`f8b38b7`](https://github.com/clerk/javascript/commit/f8b38b7059e498fef3ac1271346be0710aa31c76)]:
+  - @clerk/types@4.76.0
+
+## 3.19.0
+
+### Minor Changes
+
+- Update TelemetryCollector to accept a `perEventSampling` property for controling per-event sampling rates. ([#6514](https://github.com/clerk/javascript/pull/6514)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Updated dependencies [[`b72a3dd`](https://github.com/clerk/javascript/commit/b72a3dda2467720e5dc8cab3e7e6a110f3beb79b), [`d93b0ed`](https://github.com/clerk/javascript/commit/d93b0edf4adc57d48a26cb08444192887ccec659), [`6459f7d`](https://github.com/clerk/javascript/commit/6459f7dabe5f163f48ed73106bb901d8187da3e2), [`9084759`](https://github.com/clerk/javascript/commit/90847593300be605e1ee1c06dac147ce68b25dc7)]:
+  - @clerk/types@4.75.0
+
 ## 3.18.1
 
 ### Patch Changes

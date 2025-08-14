@@ -10,6 +10,11 @@ type CreateM2MTokenParams = {
    * Custom machine secret key for authentication.
    */
   machineSecretKey?: string;
+  /**
+   * Number of seconds until the token expires.
+   *
+   * @default null - Token does not expire
+   */
   secondsUntilExpiration?: number | null;
   claims?: Record<string, unknown> | null;
 };
@@ -32,9 +37,9 @@ type VerifyM2MTokenParams = {
    */
   machineSecretKey?: string;
   /**
-   * Machine-to-machine token secret to verify.
+   * Machine-to-machine token to verify.
    */
-  secret: string;
+  token: string;
 };
 
 export class M2MTokenApi extends AbstractAPI {
@@ -52,7 +57,7 @@ export class M2MTokenApi extends AbstractAPI {
     return options;
   }
 
-  async create(params?: CreateM2MTokenParams) {
+  async createToken(params?: CreateM2MTokenParams) {
     const { claims = null, machineSecretKey, secondsUntilExpiration = null } = params || {};
 
     const requestOptions = this.#createRequestOptions(
@@ -70,7 +75,7 @@ export class M2MTokenApi extends AbstractAPI {
     return this.request<M2MToken>(requestOptions);
   }
 
-  async revoke(params: RevokeM2MTokenParams) {
+  async revokeToken(params: RevokeM2MTokenParams) {
     const { m2mTokenId, revocationReason = null, machineSecretKey } = params;
 
     this.requireId(m2mTokenId);
@@ -89,14 +94,14 @@ export class M2MTokenApi extends AbstractAPI {
     return this.request<M2MToken>(requestOptions);
   }
 
-  async verifySecret(params: VerifyM2MTokenParams) {
-    const { secret, machineSecretKey } = params;
+  async verifyToken(params: VerifyM2MTokenParams) {
+    const { token, machineSecretKey } = params;
 
     const requestOptions = this.#createRequestOptions(
       {
         method: 'POST',
         path: joinPaths(basePath, 'verify'),
-        bodyParams: { secret },
+        bodyParams: { token },
       },
       machineSecretKey,
     );

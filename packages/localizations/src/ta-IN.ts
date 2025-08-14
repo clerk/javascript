@@ -54,6 +54,7 @@ export const taIN: LocalizationResource = {
   badge__default: 'இயல்புநிலை',
   badge__endsAt: undefined,
   badge__expired: 'காலாவதியானது',
+  badge__freeTrial: undefined,
   badge__otherImpersonatorDevice: 'மற்ற மாறுவேட சாதனம்',
   badge__pastDueAt: undefined,
   badge__pastDuePlan: undefined,
@@ -62,6 +63,7 @@ export const taIN: LocalizationResource = {
   badge__requiresAction: 'செயல் தேவை',
   badge__startsAt: undefined,
   badge__thisDevice: 'இந்த சாதனம்',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'சரிபார்க்கப்படாதது',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'பயனர் சாதனம்',
@@ -88,6 +90,7 @@ export const taIN: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
+        title__freeTrialEndsAt: undefined,
         title__paymentMethod: undefined,
         title__statementId: undefined,
         title__subscriptionBegins: undefined,
@@ -98,6 +101,8 @@ export const taIN: LocalizationResource = {
       title: undefined,
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
+      title__trialSuccess: undefined,
+      totalDueAfterTrial: undefined,
     },
     credit: undefined,
     creditRemainder: undefined,
@@ -133,6 +138,8 @@ export const taIN: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
+    startFreeTrial__days: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,
@@ -795,6 +802,26 @@ export const taIN: LocalizationResource = {
   },
   socialButtonsBlockButton: '{{provider|titleize}} மூலம் தொடரவும்',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ஏற்கனவே நிறுவனத்தின் உறுப்பினராக உள்ளார்.',
     captcha_invalid:

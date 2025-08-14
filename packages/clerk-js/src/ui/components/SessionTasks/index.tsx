@@ -1,5 +1,6 @@
 import { useClerk } from '@clerk/shared/react';
 import { eventComponentMounted } from '@clerk/shared/telemetry';
+import type { SessionResource } from '@clerk/types';
 import { useContext, useEffect, useRef } from 'react';
 
 import { Card } from '@/ui/elements/Card';
@@ -24,7 +25,10 @@ const SessionTasksStart = () => {
   useEffect(() => {
     // Simulates additional latency to avoid a abrupt UI transition when navigating to the next task
     const timeoutId = setTimeout(() => {
-      void clerk.__internal_navigateToTaskIfAvailable({ redirectUrlComplete });
+      const currentTaskKey = clerk.session?.currentTask?.key;
+      if (!currentTaskKey) return;
+
+      void navigate(`./${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[currentTaskKey]}`);
     }, 500);
     return () => clearTimeout(timeoutId);
   }, [navigate, clerk, redirectUrlComplete]);
@@ -39,7 +43,7 @@ const SessionTasksStart = () => {
   );
 };
 
-function SessionTaskRoutes(): JSX.Element {
+function SessionTasksRoutes(): JSX.Element {
   const ctx = useSessionTasksContext();
 
   return (
@@ -61,7 +65,7 @@ function SessionTaskRoutes(): JSX.Element {
 /**
  * @internal
  */
-export const SessionTask = withCardStateProvider(() => {
+export const SessionTasks = withCardStateProvider(() => {
   const clerk = useClerk();
   const { navigate } = useRouter();
   const signInContext = useContext(SignInContext);
@@ -102,9 +106,18 @@ export const SessionTask = withCardStateProvider(() => {
     );
   }
 
+  const navigateOnSetActive = async ({ session }: { session: SessionResource }) => {
+    const currentTask = session.currentTask;
+    if (!currentTask) {
+      return navigate(redirectUrlComplete);
+    }
+
+    return navigate(`./${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[currentTask.key]}`);
+  };
+
   return (
-    <SessionTasksContext.Provider value={{ redirectUrlComplete, currentTaskContainer }}>
-      <SessionTaskRoutes />
+    <SessionTasksContext.Provider value={{ redirectUrlComplete, currentTaskContainer, navigateOnSetActive }}>
+      <SessionTasksRoutes />
     </SessionTasksContext.Provider>
   );
 });

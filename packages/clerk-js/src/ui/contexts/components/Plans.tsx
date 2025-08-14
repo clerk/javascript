@@ -21,6 +21,13 @@ import type { LocalizationKey } from '../../localization';
 import { localizationKeys } from '../../localization';
 import { useSubscriberTypeContext } from './SubscriberType';
 
+/**
+ * Only remove decimal places if they are '00', to match previous behavior.
+ */
+export function normalizeFormatted(formatted: string) {
+  return formatted.endsWith('.00') ? formatted.slice(0, -3) : formatted;
+}
+
 // TODO(@COMMERCE): Rename payment sources to payment methods at the API level
 export const usePaymentMethods = () => {
   const subscriberType = useSubscriberTypeContext();
@@ -108,7 +115,7 @@ export const usePlansContext = () => {
     return false;
   }, [clerk, subscriberType]);
 
-  const { subscriptionItems, revalidate: revalidateSubscriptions } = useSubscription();
+  const { subscriptionItems, revalidate: revalidateSubscriptions, data: topLevelSubscription } = useSubscription();
 
   // Invalidates cache but does not fetch immediately
   const { data: plans, revalidate: revalidatePlans } = usePlans({ mode: 'cache' });
@@ -129,7 +136,7 @@ export const usePlansContext = () => {
   // should the default plan be shown as active
   const isDefaultPlanImplicitlyActiveOrUpcoming = useMemo(() => {
     // are there no subscriptions or are all subscriptions canceled
-    return subscriptionItems.length === 0 || !subscriptionItems.some(subscription => !subscription.canceledAtDate);
+    return subscriptionItems.length === 0 || !subscriptionItems.some(subscription => !subscription.canceledAt);
   }, [subscriptionItems]);
 
   // return the active or upcoming subscription for a plan if it exists
@@ -178,7 +185,7 @@ export const usePlansContext = () => {
     ({ plan, subscription: sub }: { plan?: CommercePlanResource; subscription?: CommerceSubscriptionItemResource }) => {
       const subscription = sub ?? (plan ? activeOrUpcomingSubscription(plan) : undefined);
 
-      return !subscription || !subscription.canceledAtDate;
+      return !subscription || !subscription.canceledAt;
     },
     [activeOrUpcomingSubscription],
   );
@@ -187,6 +194,7 @@ export const usePlansContext = () => {
   const buttonPropsForPlan = useCallback(
     ({
       plan,
+      // TODO(@COMMERCE): This needs to be removed.
       subscription: sub,
       isCompact = false,
       selectedPlanPeriod = 'annual',
@@ -205,16 +213,29 @@ export const usePlansContext = () => {
       const subscription =
         sub ?? (plan ? activeOrUpcomingSubscriptionWithPlanPeriod(plan, selectedPlanPeriod) : undefined);
       let _selectedPlanPeriod = selectedPlanPeriod;
-      if (_selectedPlanPeriod === 'annual' && sub?.plan.annualMonthlyAmount === 0) {
+      const isEligibleForSwitchToAnnual = (plan?.annualMonthlyFee.amount ?? 0) > 0;
+
+      if (_selectedPlanPeriod === 'annual' && !isEligibleForSwitchToAnnual) {
         _selectedPlanPeriod = 'month';
       }
 
-      const isEligibleForSwitchToAnnual = (plan?.annualMonthlyAmount ?? 0) > 0;
+      const freeTrialOr = (localizationKey: LocalizationKey): LocalizationKey => {
+        if (plan?.freeTrialEnabled) {
+          // Show trial CTA if user is signed out OR if signed in and eligible for free trial
+          const isSignedOut = !session;
+          const isEligibleForTrial = topLevelSubscription?.eligibleForFreeTrial;
+
+          if (isSignedOut || isEligibleForTrial) {
+            return localizationKeys('commerce.startFreeTrial__days', { days: plan.freeTrialDays ?? 0 });
+          }
+        }
+        return localizationKey;
+      };
 
       const getLocalizationKey = () => {
         // Handle subscription cases
         if (subscription) {
-          if (_selectedPlanPeriod !== subscription.planPeriod && subscription.canceledAtDate) {
+          if (_selectedPlanPeriod !== subscription.planPeriod && subscription.canceledAt) {
             if (_selectedPlanPeriod === 'month') {
               return localizationKeys('commerce.switchToMonthly');
             }
@@ -224,7 +245,7 @@ export const usePlansContext = () => {
             }
           }
 
-          if (subscription.canceledAtDate) {
+          if (subscription.canceledAt) {
             return localizationKeys('commerce.reSubscribe');
           }
 
@@ -246,20 +267,21 @@ export const usePlansContext = () => {
         // Handle non-subscription cases
         const hasNonDefaultSubscriptions =
           subscriptionItems.filter(subscription => !subscription.plan.isDefault).length > 0;
+
         return hasNonDefaultSubscriptions
           ? localizationKeys('commerce.switchPlan')
-          : localizationKeys('commerce.subscribe');
+          : freeTrialOr(localizationKeys('commerce.subscribe'));
       };
 
       return {
-        localizationKey: getLocalizationKey(),
+        localizationKey: freeTrialOr(getLocalizationKey()),
         variant: isCompact ? 'bordered' : 'solid',
         colorScheme: isCompact ? 'secondary' : 'primary',
         isDisabled: !canManageBilling,
         disabled: !canManageBilling,
       };
     },
-    [activeOrUpcomingSubscriptionWithPlanPeriod, canManageBilling, subscriptionItems],
+    [activeOrUpcomingSubscriptionWithPlanPeriod, canManageBilling, subscriptionItems, topLevelSubscription],
   );
 
   const captionForSubscription = useCallback((subscription: CommerceSubscriptionItemResource) => {
@@ -268,14 +290,16 @@ export const usePlansContext = () => {
     }
 
     if (subscription.status === 'upcoming') {
-      return localizationKeys('badge__startsAt', { date: subscription.periodStartDate });
+      return localizationKeys('badge__startsAt', { date: subscription.periodStart });
     }
-    if (subscription.canceledAtDate) {
+    if (subscription.canceledAt) {
       // @ts-expect-error `periodEndDate` is always defined when `canceledAtDate` exists
-      return localizationKeys('badge__canceledEndsAt', { date: subscription.periodEndDate });
+      return localizationKeys('badge__canceledEndsAt', { date: subscription.periodEnd });
     }
-    if (subscription.periodEndDate) {
-      return localizationKeys('badge__renewsAt', { date: subscription.periodEndDate });
+    if (subscription.periodEnd) {
+      return localizationKeys(subscription.isFreeTrial ? 'badge__trialEndsAt' : 'badge__renewsAt', {
+        date: subscription.periodEnd,
+      });
     }
     return;
   }, []);
@@ -302,7 +326,7 @@ export const usePlansContext = () => {
       clerk.__internal_openCheckout({
         planId: plan.id,
         // if the plan doesn't support annual, use monthly
-        planPeriod: planPeriod === 'annual' && plan.annualMonthlyAmount === 0 ? 'month' : planPeriod,
+        planPeriod: planPeriod === 'annual' && plan.annualMonthlyFee.amount === 0 ? 'month' : planPeriod,
         for: subscriberType,
         onSubscriptionComplete: () => {
           revalidateAll();

@@ -54,6 +54,7 @@ export const hiIN: LocalizationResource = {
   badge__default: 'डिफ़ॉल्ट',
   badge__endsAt: undefined,
   badge__expired: 'समाप्त',
+  badge__freeTrial: undefined,
   badge__otherImpersonatorDevice: 'अन्य प्रतिरूपण उपकरण',
   badge__pastDueAt: undefined,
   badge__pastDuePlan: undefined,
@@ -62,6 +63,7 @@ export const hiIN: LocalizationResource = {
   badge__requiresAction: 'कार्रवाई की आवश्यकता है',
   badge__startsAt: undefined,
   badge__thisDevice: 'यह उपकरण',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'असत्यापित',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'उपयोगकर्ता उपकरण',
@@ -88,6 +90,7 @@ export const hiIN: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
+        title__freeTrialEndsAt: undefined,
         title__paymentMethod: undefined,
         title__statementId: undefined,
         title__subscriptionBegins: undefined,
@@ -98,6 +101,8 @@ export const hiIN: LocalizationResource = {
       title: undefined,
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
+      title__trialSuccess: undefined,
+      totalDueAfterTrial: undefined,
     },
     credit: undefined,
     creditRemainder: undefined,
@@ -133,6 +138,8 @@ export const hiIN: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
+    startFreeTrial__days: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,
@@ -793,6 +800,26 @@ export const hiIN: LocalizationResource = {
   },
   socialButtonsBlockButton: '{{provider|titleize}} के साथ जारी रखें',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} पहले से ही संगठन का सदस्य है।',
     captcha_invalid:

@@ -16,7 +16,7 @@ import { createUsernameError } from '@/ui/utils/usernameUtils';
 
 import { ERROR_CODES, SIGN_UP_MODES } from '../../../core/constants';
 import { getClerkQueryParam, removeClerkQueryParam } from '../../../utils/getClerkQueryParam';
-import { withRedirectToAfterSignUp } from '../../common';
+import { withRedirectToAfterSignUp, withRedirectToSignUpTask } from '../../common';
 import { SignInContext, useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys, useAppearance, useLocalizations } from '../../customizables';
 import { CaptchaElement } from '../../elements/CaptchaElement';
@@ -43,7 +43,7 @@ function SignUpStartInternal(): JSX.Element {
   const { setActive } = useClerk();
   const ctx = useSignUpContext();
   const isWithinSignInContext = !!React.useContext(SignInContext);
-  const { afterSignUpUrl, signInUrl, unsafeMetadata } = ctx;
+  const { afterSignUpUrl, signInUrl, unsafeMetadata, navigateOnSetActive } = ctx;
   const isCombinedFlow = !!(ctx.isCombinedFlow && !!isWithinSignInContext);
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(() =>
     getInitialActiveIdentifier(attributes, userSettings.signUp.progressive, {
@@ -166,7 +166,12 @@ function SignUpStartInternal(): JSX.Element {
           handleComplete: () => {
             removeClerkQueryParam('__clerk_ticket');
             removeClerkQueryParam('__clerk_invitation_token');
-            return setActive({ session: signUp.createdSessionId, redirectUrl: afterSignUpUrl });
+            return setActive({
+              session: signUp.createdSessionId,
+              navigate: async ({ session }) => {
+                await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl });
+              },
+            });
           },
           navigate,
           oidcPrompt,
@@ -334,7 +339,13 @@ function SignUpStartInternal(): JSX.Element {
           signUp: res,
           verifyEmailPath: 'verify-email-address',
           verifyPhonePath: 'verify-phone-number',
-          handleComplete: () => setActive({ session: res.createdSessionId, redirectUrl: afterSignUpUrl }),
+          handleComplete: () =>
+            setActive({
+              session: res.createdSessionId,
+              navigate: async ({ session }) => {
+                await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl });
+              },
+            }),
           navigate,
           redirectUrl,
           redirectUrlComplete,
@@ -448,4 +459,6 @@ function SignUpStartInternal(): JSX.Element {
   );
 }
 
-export const SignUpStart = withRedirectToAfterSignUp(withCardStateProvider(SignUpStartInternal));
+export const SignUpStart = withRedirectToSignUpTask(
+  withRedirectToAfterSignUp(withCardStateProvider(SignUpStartInternal)),
+);
