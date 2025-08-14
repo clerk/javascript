@@ -197,7 +197,7 @@ export const skSK: LocalizationResource = {
   formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
   formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'Zadajte záložný kód',
-  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Odstrániť účet',
+  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Zmazať účet',
   formFieldInputPlaceholder__emailAddress: 'Zadajte svoj e-mail',
   formFieldInputPlaceholder__emailAddress_username: 'Zadajte e-mail alebo používateľské meno',
   formFieldInputPlaceholder__emailAddresses:
