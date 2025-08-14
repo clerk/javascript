@@ -1,10 +1,10 @@
-import { useClerk, useOrganizationList, useUser } from '@clerk/shared/react';
+import { useOrganizationList, useUser, useUserContext } from '@clerk/shared/react';
 import type {
   OrganizationResource,
   OrganizationSuggestionResource,
   UserOrganizationInvitationResource,
 } from '@clerk/types';
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 
 import {
   OrganizationPreviewButton,
@@ -14,7 +14,11 @@ import {
   OrganizationPreviewSpinner,
   sharedMainIdentifierSx,
 } from '@/ui/common/organizations/OrganizationPreview';
-import { organizationListParams, populateCacheUpdateItem } from '@/ui/components/OrganizationSwitcher/utils';
+import {
+  organizationListParams,
+  populateCacheRemoveItem,
+  populateCacheUpdateItem,
+} from '@/ui/components/OrganizationSwitcher/utils';
 import { useTaskChooseOrganizationContext } from '@/ui/contexts/components/SessionTasks';
 import { Col, descriptors, localizationKeys, Text } from '@/ui/customizables';
 import { Action, Actions } from '@/ui/elements/Actions';
@@ -31,6 +35,7 @@ type ChooseOrganizationScreenProps = {
 
 export const ChooseOrganizationScreen = withCardStateProvider(
   ({ onCreateOrganizationClick }: ChooseOrganizationScreenProps) => {
+    const user = useUserContext();
     const { ref, userMemberships, userSuggestions, userInvitations } = useOrganizationListInView();
 
     const isLoading = userMemberships?.isLoading || userInvitations?.isLoading || userSuggestions?.isLoading;
@@ -40,6 +45,15 @@ export const ChooseOrganizationScreen = withCardStateProvider(
     // This happens when concurrent requests resolve in unexpected order, leaving undefined/null items in the data array
     const userInvitationsData = userInvitations.data?.filter(a => !!a);
     const userSuggestionsData = userSuggestions.data?.filter(a => !!a);
+
+    // Revalidates organization memberships from client piggybacking
+    // TODO (add linear ticket): Introduce architecture to invalidate SWR queries based on client piggybacking
+    useEffect(() => {
+      const hasUpdatedOnClient = (user?.organizationMemberships?.length ?? 0) !== (userMemberships.count ?? 0);
+      if (!hasUpdatedOnClient || !userMemberships) return;
+
+      void userMemberships.revalidate?.();
+    }, [userMemberships, user?.organizationMemberships?.length]);
 
     return (
       <>
@@ -129,8 +143,6 @@ const MembershipPreview = withCardStateProvider((props: { organization: Organiza
 
 const InvitationPreview = withCardStateProvider((props: UserOrganizationInvitationResource) => {
   const card = useCardState();
-  const { getOrganization } = useClerk();
-  const [acceptedOrganization, setAcceptedOrganization] = useState<OrganizationResource | null>(null);
   const { userInvitations } = useOrganizationList({
     userInvitations: organizationListParams.userInvitations,
     userMemberships: organizationListParams.userMemberships,
@@ -142,21 +154,13 @@ const InvitationPreview = withCardStateProvider((props: UserOrganizationInvitati
         // When accepting an invitation we don't want to trigger a revalidation as this will cause a layout shift, prefer updating in place
         .runAsync(async () => {
           const updatedItem = await props.accept();
-          const organization = await getOrganization(props.publicOrganizationData.id);
-          return [updatedItem, organization] as const;
-        })
-        .then(([updatedItem, organization]) => {
-          // Update cache in case another listener depends on it
-          void userInvitations?.setData?.(cachedPages => populateCacheUpdateItem(updatedItem, cachedPages, 'negative'));
-          setAcceptedOrganization(organization);
+          await userInvitations?.setData?.(cachedPages => populateCacheRemoveItem(updatedItem, cachedPages));
+          // TODO -> Revalidate cache data for org memberships
+          // await userMemberships?.setData?.(cachedPages => populateCacheUpdateItem(updatedItem, cachedPages));
         })
         .catch(err => handleError(err, [], card.setError))
     );
   };
-
-  if (acceptedOrganization) {
-    return <MembershipPreview organization={acceptedOrganization} />;
-  }
 
   return (
     <OrganizationPreviewListItem
