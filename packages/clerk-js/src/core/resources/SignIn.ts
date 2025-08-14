@@ -700,7 +700,7 @@ class SignInFuture implements SignInFutureResource {
     eventBus.emit('resource:error', { resource: this.resource, error: null });
     try {
       if (!this.resource.createdSessionId) {
-        throw new Error('Cannot finalize sign in without a created session.');
+        throw new Error('Cannot finalize sign-in without a created session.');
       }
 
       await SignIn.clerk.setActive({ session: this.resource.createdSessionId });
