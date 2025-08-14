@@ -1,6 +1,6 @@
-import { useClerk, useOrganizationList } from '@clerk/shared/react';
+import { useOrganizationList } from '@clerk/shared/react';
 
-import { useSessionTasksContext } from '@/ui/contexts/components/SessionTasks';
+import { useTaskChooseOrganizationContext } from '@/ui/contexts/components/SessionTasks';
 import { localizationKeys } from '@/ui/customizables';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Form } from '@/ui/elements/Form';
@@ -19,8 +19,7 @@ type CreateOrganizationScreenProps = {
 
 export const CreateOrganizationScreen = withCardStateProvider((props: CreateOrganizationScreenProps) => {
   const card = useCardState();
-  const { __internal_navigateToTaskIfAvailable } = useClerk();
-  const { redirectUrlComplete } = useSessionTasksContext();
+  const { redirectUrlComplete } = useTaskChooseOrganizationContext();
   const { createOrganization, isLoaded, setActive } = useOrganizationList({
     userMemberships: organizationListParams.userMemberships,
   });
@@ -46,9 +45,10 @@ export const CreateOrganizationScreen = withCardStateProvider((props: CreateOrga
     try {
       const organization = await createOrganization({ name: nameField.value, slug: slugField.value });
 
-      await setActive({ organization });
-
-      await __internal_navigateToTaskIfAvailable({ redirectUrlComplete });
+      await setActive({
+        organization,
+        redirectUrl: redirectUrlComplete,
+      });
     } catch (err) {
       handleError(err, [nameField, slugField], card.setError);
     }

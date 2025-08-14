@@ -6,7 +6,7 @@ import React from 'react';
 
 import { warnings } from '../../core/warnings';
 import type { ComponentGuard } from '../../utils';
-import { sessionExistsAndSingleSessionModeEnabled } from '../../utils';
+import { isSignedInAndSingleSessionModeEnabled } from '../../utils';
 import { useEnvironment, useOptions, useSignInContext, useSignUpContext } from '../contexts';
 import { useRouter } from '../router';
 import type { AvailableComponentProps } from '../types';
@@ -60,11 +60,9 @@ export const withRedirectToAfterSignIn = <P extends AvailableComponentProps>(Com
     const signInCtx = useSignInContext();
     return withRedirect(
       Component,
-      sessionExistsAndSingleSessionModeEnabled,
-      ({ clerk }) => signInCtx.sessionTaskUrl || signInCtx.afterSignInUrl || clerk.buildAfterSignInUrl(),
-      signInCtx.sessionTaskUrl
-        ? warnings.cannotRenderSignInComponentWhenTaskExists
-        : warnings.cannotRenderSignInComponentWhenSessionExists,
+      isSignedInAndSingleSessionModeEnabled,
+      ({ clerk }) => signInCtx.afterSignInUrl || clerk.buildAfterSignInUrl(),
+      warnings.cannotRenderSignInComponentWhenSessionExists,
     )(props);
   };
 
@@ -81,15 +79,57 @@ export const withRedirectToAfterSignUp = <P extends AvailableComponentProps>(Com
     const signUpCtx = useSignUpContext();
     return withRedirect(
       Component,
-      sessionExistsAndSingleSessionModeEnabled,
-      ({ clerk }) => signUpCtx.sessionTaskUrl || signUpCtx.afterSignUpUrl || clerk.buildAfterSignUpUrl(),
-      signUpCtx.sessionTaskUrl
-        ? warnings.cannotRenderSignUpComponentWhenTaskExists
-        : warnings.cannotRenderSignUpComponentWhenSessionExists,
+      isSignedInAndSingleSessionModeEnabled,
+      ({ clerk }) => signUpCtx.afterSignUpUrl || clerk.buildAfterSignUpUrl(),
+      warnings.cannotRenderSignUpComponentWhenSessionExists,
     )(props);
   };
 
   HOC.displayName = `withRedirectToAfterSignUp(${displayName})`;
+
+  return HOC;
+};
+
+export const withRedirectToSignInTask = <P extends AvailableComponentProps>(Component: ComponentType<P>) => {
+  const displayName = Component.displayName || Component.name || 'Component';
+  Component.displayName = displayName;
+
+  const HOC = (props: P) => {
+    const signInCtx = useSignInContext();
+
+    return withRedirect(
+      Component,
+      (clerk, environment) =>
+        !!environment?.authConfig.singleSessionMode && !!(clerk.session?.currentTask && signInCtx?.taskUrl),
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      () => signInCtx.taskUrl!,
+      undefined,
+    )(props);
+  };
+
+  HOC.displayName = `withRedirectToSignInTask(${displayName})`;
+
+  return HOC;
+};
+
+export const withRedirectToSignUpTask = <P extends AvailableComponentProps>(Component: ComponentType<P>) => {
+  const displayName = Component.displayName || Component.name || 'Component';
+  Component.displayName = displayName;
+
+  const HOC = (props: P) => {
+    const signUpCtx = useSignUpContext();
+
+    return withRedirect(
+      Component,
+      (clerk, environment) =>
+        !!environment?.authConfig.singleSessionMode && !!(clerk.session?.currentTask && signUpCtx?.taskUrl),
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      () => signUpCtx.taskUrl!,
+      undefined,
+    )(props);
+  };
+
+  HOC.displayName = `withRedirectToSignUpTask(${displayName})`;
 
   return HOC;
 };

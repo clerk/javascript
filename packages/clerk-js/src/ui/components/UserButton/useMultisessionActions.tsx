@@ -1,6 +1,8 @@
 import { useClerk } from '@clerk/shared/react';
 import type { SignedInSessionResource, UserButtonProps, UserResource } from '@clerk/types';
 
+import { navigateIfTaskExists } from '@/core/sessionTasks';
+import { useEnvironment } from '@/ui/contexts';
 import { useCardState } from '@/ui/elements/contexts';
 import { sleep } from '@/ui/utils/sleep';
 
@@ -19,10 +21,11 @@ type UseMultisessionActionsParams = {
 } & Pick<UserButtonProps, 'userProfileMode' | 'appearance' | 'userProfileProps'>;
 
 export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
-  const { setActive, signOut, openUserProfile, __internal_navigateToTaskIfAvailable } = useClerk();
+  const { setActive, signOut, openUserProfile } = useClerk();
   const card = useCardState();
   const { signedInSessions, otherSessions } = useMultipleSessions({ user: opts.user });
   const { navigate } = useRouter();
+  const { displayConfig } = useEnvironment();
 
   const handleSignOutSessionClicked = (session: SignedInSessionResource) => () => {
     if (otherSessions.length === 0) {
@@ -70,12 +73,23 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
   const handleSessionClicked = (session: SignedInSessionResource) => async () => {
     card.setLoading();
 
-    return setActive({ session, redirectUrl: opts.afterSwitchSessionUrl })
-      .then(() => __internal_navigateToTaskIfAvailable())
-      .finally(() => {
-        card.setIdle();
-        opts.actionCompleteCallback?.();
-      });
+    return setActive({
+      session,
+      navigate: async ({ session }) => {
+        if (!session.currentTask && opts.afterSwitchSessionUrl) {
+          await navigate(opts.afterSwitchSessionUrl);
+          return;
+        }
+
+        await navigateIfTaskExists(session, {
+          baseUrl: opts.signInUrl ?? displayConfig.signInUrl,
+          navigate,
+        });
+      },
+    }).finally(() => {
+      card.setIdle();
+      opts.actionCompleteCallback?.();
+    });
   };
 
   const handleAddAccountClicked = () => {

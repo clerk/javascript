@@ -54,6 +54,7 @@ export const heIL: LocalizationResource = {
   badge__default: 'ברירת מחדל',
   badge__endsAt: undefined,
   badge__expired: undefined,
+  badge__freeTrial: undefined,
   badge__otherImpersonatorDevice: 'מכשיר מחקה אחר',
   badge__pastDueAt: undefined,
   badge__pastDuePlan: undefined,
@@ -62,6 +63,7 @@ export const heIL: LocalizationResource = {
   badge__requiresAction: 'דורש פעולה',
   badge__startsAt: undefined,
   badge__thisDevice: 'מכשיר זה',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'לא מאומת',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'מכשיר משתמש',
@@ -88,6 +90,7 @@ export const heIL: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
+        title__freeTrialEndsAt: undefined,
         title__paymentMethod: undefined,
         title__statementId: undefined,
         title__subscriptionBegins: undefined,
@@ -98,6 +101,8 @@ export const heIL: LocalizationResource = {
       title: undefined,
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
+      title__trialSuccess: undefined,
+      totalDueAfterTrial: undefined,
     },
     credit: undefined,
     creditRemainder: undefined,
@@ -133,6 +138,8 @@ export const heIL: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
+    startFreeTrial__days: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,
@@ -780,6 +787,26 @@ export const heIL: LocalizationResource = {
   },
   socialButtonsBlockButton: 'המשך עם {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} כבר חבר בארגון',
     captcha_invalid: 'ההרשמה נכשלה עקב כשל באימות האבטחה. אנא רענן את הדף ונסה שוב, או פנה לתמיכה לעזרה נוספת.',

@@ -60,7 +60,9 @@ type DeepLocalizationWithoutObjects<T> = {
  * the default english resource object from {@link https://github.com/clerk/javascript Clerk's open source repo}
  * as a starting point.
  */
-export type LocalizationResource = DeepPartial<DeepLocalizationWithoutObjects<__internal_LocalizationResource>>;
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type -- Needs to be an interface for typedoc to link correctly
+export interface LocalizationResource
+  extends DeepPartial<DeepLocalizationWithoutObjects<__internal_LocalizationResource>> {}
 
 export type __internal_LocalizationResource = {
   locale: string;

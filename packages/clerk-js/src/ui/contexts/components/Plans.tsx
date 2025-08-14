@@ -21,6 +21,13 @@ import type { LocalizationKey } from '../../localization';
 import { localizationKeys } from '../../localization';
 import { useSubscriberTypeContext } from './SubscriberType';
 
+/**
+ * Only remove decimal places if they are '00', to match previous behavior.
+ */
+export function normalizeFormatted(formatted: string) {
+  return formatted.endsWith('.00') ? formatted.slice(0, -3) : formatted;
+}
+
 // TODO(@COMMERCE): Rename payment sources to payment methods at the API level
 export const usePaymentMethods = () => {
   const subscriberType = useSubscriberTypeContext();
@@ -206,11 +213,24 @@ export const usePlansContext = () => {
       const subscription =
         sub ?? (plan ? activeOrUpcomingSubscriptionWithPlanPeriod(plan, selectedPlanPeriod) : undefined);
       let _selectedPlanPeriod = selectedPlanPeriod;
-      if (_selectedPlanPeriod === 'annual' && sub?.plan.annualMonthlyAmount === 0) {
+      const isEligibleForSwitchToAnnual = (plan?.annualMonthlyFee.amount ?? 0) > 0;
+
+      if (_selectedPlanPeriod === 'annual' && !isEligibleForSwitchToAnnual) {
         _selectedPlanPeriod = 'month';
       }
 
-      const isEligibleForSwitchToAnnual = (plan?.annualMonthlyAmount ?? 0) > 0;
+      const freeTrialOr = (localizationKey: LocalizationKey): LocalizationKey => {
+        if (plan?.freeTrialEnabled) {
+          // Show trial CTA if user is signed out OR if signed in and eligible for free trial
+          const isSignedOut = !session;
+          const isEligibleForTrial = topLevelSubscription?.eligibleForFreeTrial;
+
+          if (isSignedOut || isEligibleForTrial) {
+            return localizationKeys('commerce.startFreeTrial__days', { days: plan.freeTrialDays ?? 0 });
+          }
+        }
+        return localizationKey;
+      };
 
       const freeTrialOr = (localizationKey: LocalizationKey): LocalizationKey => {
         if (plan?.freeTrialEnabled && topLevelSubscription?.eligibleForFreeTrial) {
@@ -313,7 +333,7 @@ export const usePlansContext = () => {
       clerk.__internal_openCheckout({
         planId: plan.id,
         // if the plan doesn't support annual, use monthly
-        planPeriod: planPeriod === 'annual' && plan.annualMonthlyAmount === 0 ? 'month' : planPeriod,
+        planPeriod: planPeriod === 'annual' && plan.annualMonthlyFee.amount === 0 ? 'month' : planPeriod,
         for: subscriberType,
         onSubscriptionComplete: () => {
           revalidateAll();

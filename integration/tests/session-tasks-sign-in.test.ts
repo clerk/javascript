@@ -83,7 +83,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
       await u.po.signIn.enterTestOtpCode();
 
       // Resolves task
-      await u.po.signIn.waitForMounted();
+      await u.po.signUp.waitForMounted();
       const fakeOrganization = Object.assign(u.services.organizations.createFakeOrganization(), {
         slug: u.services.organizations.createFakeOrganization().slug + '-with-sign-in-sso',
       });

@@ -43,7 +43,6 @@ import type {
 } from '@clerk/types';
 
 import {
-  buildURL,
   generateSignatureWithCoinbaseWallet,
   generateSignatureWithMetamask,
   generateSignatureWithOKXWallet,
@@ -250,25 +249,16 @@ export class SignIn extends BaseResource implements SignInResource {
     params: AuthenticateWithRedirectParams,
     navigateCallback: (url: URL | string) => void,
   ): Promise<void> => {
-    const { strategy, redirectUrl, redirectUrlComplete, identifier, oidcPrompt, continueSignIn } = params || {};
+    const { strategy, redirectUrlComplete, identifier, oidcPrompt, continueSignIn } = params || {};
+    const actionCompleteRedirectUrl = redirectUrlComplete;
 
-    const redirectUrlWithAuthToken = SignIn.clerk.buildUrlWithAuth(redirectUrl);
-
-    // When after-auth is enabled, redirect to SSO callback route.
-    // This ensures organization selection tasks are displayed after sign-in,
-    // rather than redirecting to potentially unprotected pages while the session is pending.
-    const actionCompleteRedirectUrl = SignIn.clerk.__internal_hasAfterAuthFlows
-      ? buildURL({
-          base: redirectUrlWithAuthToken,
-          search: `?redirect_url=${redirectUrlComplete}`,
-        }).toString()
-      : redirectUrlComplete;
+    const redirectUrl = SignIn.clerk.buildUrlWithAuth(params.redirectUrl);
 
     if (!this.id || !continueSignIn) {
       await this.create({
         strategy,
         identifier,
-        redirectUrl: redirectUrlWithAuthToken,
+        redirectUrl,
         actionCompleteRedirectUrl,
       });
     }
@@ -276,7 +266,7 @@ export class SignIn extends BaseResource implements SignInResource {
     if (strategy === 'saml' || strategy === 'enterprise_sso') {
       await this.prepareFirstFactor({
         strategy,
-        redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectUrl),
+        redirectUrl,
         actionCompleteRedirectUrl,
         oidcPrompt,
       });
@@ -497,10 +487,80 @@ class SignInFuture implements SignInFutureResource {
     verifyCode: this.verifyEmailCode.bind(this),
   };
 
+  resetPasswordEmailCode = {
+    sendCode: this.sendResetPasswordEmailCode.bind(this),
+    verifyCode: this.verifyResetPasswordEmailCode.bind(this),
+    submitPassword: this.submitResetPassword.bind(this),
+  };
+
   constructor(readonly resource: SignIn) {}
 
   get status() {
     return this.resource.status;
+  }
+
+  async sendResetPasswordEmailCode(): Promise<{ error: unknown }> {
+    eventBus.emit('resource:error', { resource: this.resource, error: null });
+    try {
+      if (!this.resource.id) {
+        throw new Error('Cannot reset password without a sign in.');
+      }
+
+      const resetPasswordEmailCodeFactor = this.resource.supportedFirstFactors?.find(
+        f => f.strategy === 'reset_password_email_code',
+      );
+
+      if (!resetPasswordEmailCodeFactor) {
+        throw new Error('Reset password email code factor not found');
+      }
+
+      const { emailAddressId } = resetPasswordEmailCodeFactor;
+      await this.resource.__internal_basePost({
+        body: { emailAddressId, strategy: 'reset_password_email_code' },
+        action: 'prepare_first_factor',
+      });
+    } catch (err: unknown) {
+      eventBus.emit('resource:error', { resource: this.resource, error: err });
+      return { error: err };
+    }
+
+    return { error: null };
+  }
+
+  async verifyResetPasswordEmailCode({ code }: { code: string }): Promise<{ error: unknown }> {
+    eventBus.emit('resource:error', { resource: this.resource, error: null });
+    try {
+      await this.resource.__internal_basePost({
+        body: { code, strategy: 'reset_password_email_code' },
+        action: 'attempt_first_factor',
+      });
+    } catch (err: unknown) {
+      eventBus.emit('resource:error', { resource: this.resource, error: err });
+      return { error: err };
+    }
+
+    return { error: null };
+  }
+
+  async submitResetPassword({
+    password,
+    signOutOfOtherSessions = true,
+  }: {
+    password: string;
+    signOutOfOtherSessions?: boolean;
+  }): Promise<{ error: unknown }> {
+    eventBus.emit('resource:error', { resource: this.resource, error: null });
+    try {
+      await this.resource.__internal_basePost({
+        body: { password, signOutOfOtherSessions },
+        action: 'reset_password',
+      });
+    } catch (err: unknown) {
+      eventBus.emit('resource:error', { resource: this.resource, error: err });
+      return { error: err };
+    }
+
+    return { error: null };
   }
 
   async create(params: {

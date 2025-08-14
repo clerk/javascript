@@ -54,6 +54,7 @@ export const ukUA: LocalizationResource = {
   badge__default: 'За замовчуванням',
   badge__endsAt: undefined,
   badge__expired: undefined,
+  badge__freeTrial: undefined,
   badge__otherImpersonatorDevice: 'Інший пристрій-двійник',
   badge__pastDueAt: undefined,
   badge__pastDuePlan: undefined,
@@ -62,6 +63,7 @@ export const ukUA: LocalizationResource = {
   badge__requiresAction: 'Потребує дії',
   badge__startsAt: undefined,
   badge__thisDevice: 'Цей пристрій',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Неперевірений',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Пристрій користувача',
@@ -88,6 +90,7 @@ export const ukUA: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
+        title__freeTrialEndsAt: undefined,
         title__paymentMethod: undefined,
         title__statementId: undefined,
         title__subscriptionBegins: undefined,
@@ -98,6 +101,8 @@ export const ukUA: LocalizationResource = {
       title: undefined,
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
+      title__trialSuccess: undefined,
+      totalDueAfterTrial: undefined,
     },
     credit: undefined,
     creditRemainder: undefined,
@@ -133,6 +138,8 @@ export const ukUA: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
+    startFreeTrial__days: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,
@@ -785,6 +792,26 @@ export const ukUA: LocalizationResource = {
   },
   socialButtonsBlockButton: 'Продовжити за допомогою {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: undefined,
     captcha_invalid:
