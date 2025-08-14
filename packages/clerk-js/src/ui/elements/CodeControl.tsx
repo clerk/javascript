@@ -180,6 +180,8 @@ export const OTPCodeControl = () => {
       sx={{ position: 'relative' }}
     >
       <OTPInput
+        aria-label='Enter verification code'
+        aria-required
         maxLength={length}
         inputMode='numeric'
         pattern={REGEXP_ONLY_DIGITS}
@@ -218,6 +220,7 @@ function Slot(props: SlotProps & PropsOfComponent<typeof OTPInputSegment> & { is
   const { isSuccessfullyFilled, isActive, ...rest } = props;
   return (
     <OTPInputSegment
+      data-testid='otp-input-segment'
       {...rest}
       focusRing={isActive}
       variant='default'
