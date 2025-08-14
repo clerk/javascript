@@ -167,6 +167,9 @@ export async function detectKeylessEnvDrift(): Promise<void> {
     const clerkClient = createClerkClientWithOptions({
       publishableKey: keylessFile.publishableKey,
       secretKey: keylessFile.secretKey,
+      telemetry: {
+        samplingRate: 1,
+      },
     });
 
     const shouldFireEvent = await tryMarkTelemetryEventAsFired();
