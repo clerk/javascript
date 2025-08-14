@@ -19,6 +19,7 @@ export {
   RedirectToSignIn,
   RedirectToSignUp,
   RedirectToUserProfile,
+  RedirectToTasks,
   AuthenticateWithRedirectCallback,
   RedirectToCreateOrganization,
   RedirectToOrganizationProfile,
