@@ -8,6 +8,6 @@ Introduce new helper to allow signing a user in via email address:
 import { clerk } from '@clerk/testing/playwright'
 
 test('sign in', async ({ page }) => {
-  clerk.signIn({ emailAddress: 'foo@bar.com', page })
+  await clerk.signIn({ emailAddress: 'foo@bar.com', page })
 })
 ```
