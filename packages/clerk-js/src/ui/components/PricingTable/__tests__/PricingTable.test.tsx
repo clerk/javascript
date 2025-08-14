@@ -343,4 +343,63 @@ describe('PricingTable - plans visibility', () => {
       expect(queryByRole('heading', { name: 'Test Plan' })).not.toBeInTheDocument();
     });
   });
+
+  it('prevents flicker by not showing plans while subscription is loading', async () => {
+    const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['test@clerk.com'] });
+    });
+
+    // Provide empty props to the PricingTable context
+    props.setProps({});
+
+    fixtures.clerk.billing.getPlans.mockResolvedValue({ data: [testPlan as any], total_count: 1 });
+
+    // Create a pending promise and capture its resolver
+    let resolveSubscription!: (value: any) => void;
+    const pendingSubscriptionPromise = new Promise<any>(resolve => {
+      resolveSubscription = resolve;
+    });
+    fixtures.clerk.billing.getSubscription.mockReturnValue(pendingSubscriptionPromise);
+
+    const { queryByRole, findByRole } = render(<PricingTable />, { wrapper });
+
+    // Assert no plans render while subscription is pending
+    await waitFor(() => {
+      expect(queryByRole('heading', { name: 'Test Plan' })).not.toBeInTheDocument();
+    });
+
+    // Resolve the subscription with an active subscription object
+    resolveSubscription({
+      id: 'sub_active',
+      status: 'active',
+      activeAt: new Date('2021-01-01'),
+      createdAt: new Date('2021-01-01'),
+      nextPayment: null,
+      pastDueAt: null,
+      updatedAt: null,
+      subscriptionItems: [
+        {
+          id: 'si_active',
+          plan: testPlan,
+          createdAt: new Date('2021-01-01'),
+          paymentSourceId: 'src_1',
+          pastDueAt: null,
+          canceledAt: null,
+          periodStart: new Date('2021-01-01'),
+          periodEnd: new Date('2021-01-31'),
+          planPeriod: 'month' as const,
+          status: 'active' as const,
+          isFreeTrial: false,
+          cancel: jest.fn(),
+          pathRoot: '',
+          reload: jest.fn(),
+        },
+      ],
+      pathRoot: '',
+      reload: jest.fn(),
+    });
+
+    // Assert the plan heading appears after subscription resolves
+    await findByRole('heading', { name: 'Test Plan' });
+  });
 });
