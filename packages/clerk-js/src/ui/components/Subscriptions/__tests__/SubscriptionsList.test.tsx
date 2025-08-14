@@ -79,7 +79,7 @@ describe('SubscriptionsList', () => {
     });
   });
 
-  it('displays past due badge when subscription is past due', async () => {
+  it('on past due, no badge, but past due date is shown', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
     });
@@ -133,17 +133,17 @@ describe('SubscriptionsList', () => {
       reload: jest.fn(),
     });
 
-    const { getByText } = render(<SubscriptionsList {...props} />, { wrapper });
+    const { getByText, queryByText } = render(<SubscriptionsList {...props} />, { wrapper });
 
     await waitFor(() => {
       expect(getByText('Pro Plan')).toBeVisible();
       // Past due subscription should show the Past due badge
-      expect(getByText(/^Past due$/)).toBeVisible();
+      expect(queryByText(/^Past due$/)).toBeNull();
       expect(getByText(/Past due Jan 15, 2021/)).toBeVisible();
     });
   });
 
-  it('displays active badge when subscription is active', async () => {
+  it('does not display active badge when subscription is active and it is a single item', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
     });
@@ -197,80 +197,16 @@ describe('SubscriptionsList', () => {
       reload: jest.fn(),
     });
 
-    const { getByText } = render(<SubscriptionsList {...props} />, { wrapper });
-
-    await waitFor(() => {
-      expect(getByText('Pro Plan')).toBeVisible();
-      // Active subscription should show the Active badge
-      expect(getByText(/^Active$/)).toBeVisible();
-    });
-  });
-
-  it('does not display badge when single subscription is canceled', async () => {
-    const { wrapper, fixtures } = await createFixtures(f => {
-      f.withUser({ email_addresses: ['test@clerk.com'] });
-    });
-
-    const canceledSubscription = {
-      id: 'sub_canceled',
-      plan: {
-        id: 'plan_canceled',
-        name: 'Pro Plan',
-        fee: { amount: 2000, amountFormatted: '20.00', currencySymbol: '$', currency: 'USD' },
-        annualFee: { amount: 20000, amountFormatted: '200.00', currencySymbol: '$', currency: 'USD' },
-        annualMonthlyFee: { amount: 1667, amountFormatted: '16.67', currencySymbol: '$', currency: 'USD' },
-        description: 'Pro Plan Description',
-        isDefault: false,
-        isRecurring: true,
-        hasBaseFee: true,
-        forPayerType: 'user' as CommercePayerResourceType,
-        publiclyVisible: true,
-        slug: 'pro-plan',
-        avatarUrl: '',
-        features: [],
-        freeTrialDays: null,
-        freeTrialEnabled: false,
-        pathRoot: '',
-        reload: jest.fn(),
-      },
-      createdAt: new Date('2021-01-01'),
-      periodStart: new Date('2021-01-01'),
-      periodEnd: new Date('2021-02-01'),
-      canceledAt: new Date('2021-01-15'), // This subscription is canceled
-      paymentSourceId: 'src_canceled',
-      planPeriod: 'month' as const,
-      status: 'active' as const,
-      isFreeTrial: false,
-      pastDueAt: null,
-      cancel: jest.fn(),
-      pathRoot: '',
-      reload: jest.fn(),
-    };
-
-    fixtures.clerk.billing.getSubscription.mockResolvedValue({
-      id: 'sub_top',
-      status: 'active',
-      activeAt: new Date('2021-01-01'),
-      createdAt: new Date('2021-01-01'),
-      nextPayment: null,
-      pastDueAt: null,
-      updatedAt: null,
-      subscriptionItems: [canceledSubscription],
-      pathRoot: '',
-      reload: jest.fn(),
-    });
-
     const { getByText, queryByText } = render(<SubscriptionsList {...props} />, { wrapper });
 
     await waitFor(() => {
       expect(getByText('Pro Plan')).toBeVisible();
-      // Single canceled subscription should not show badge (canceledAt !== null means no badge)
+      // Active subscription should show the Active badge
       expect(queryByText(/^Active$/)).toBeNull();
-      expect(queryByText(/^Free trial$/)).toBeNull();
     });
   });
 
-  it('renders upcomming badge when subscription is upcoming', async () => {
+  it('renders upcomming badge when current subscription is canceled but active', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
     });

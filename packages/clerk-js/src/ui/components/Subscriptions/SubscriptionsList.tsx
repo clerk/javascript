@@ -162,7 +162,7 @@ function SubscriptionRow({ subscription, length }: { subscription: CommerceSubsc
             >
               {subscription.plan.name}
             </Text>
-            {subscription.isFreeTrial || length > 1 || subscription.canceledAt === null ? (
+            {subscription.isFreeTrial || length > 1 || !!subscription.canceledAt ? (
               <SubscriptionBadge subscription={subscription.isFreeTrial ? { status: 'free_trial' } : subscription} />
             ) : null}
           </Flex>
