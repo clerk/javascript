@@ -297,7 +297,9 @@ export const usePlansContext = () => {
       return localizationKeys('badge__canceledEndsAt', { date: subscription.periodEnd });
     }
     if (subscription.periodEnd) {
-      return localizationKeys('badge__renewsAt', { date: subscription.periodEnd });
+      return localizationKeys(subscription.isFreeTrial ? 'badge__trialEndsAt' : 'badge__renewsAt', {
+        date: subscription.periodEnd,
+      });
     }
     return;
   }, []);
