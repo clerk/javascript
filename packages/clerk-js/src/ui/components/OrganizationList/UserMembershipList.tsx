@@ -15,6 +15,7 @@ import { OrganizationListPreviewButton } from './shared';
 export const MembershipPreview = (props: { organization: OrganizationResource }) => {
   const { user } = useUser();
   const card = useCardState();
+  const { navigateAfterSelectOrganization } = useOrganizationListContext();
   const { t } = useLocalizations();
   const { isLoaded, setActive } = useOrganizationList();
 
@@ -28,6 +29,8 @@ export const MembershipPreview = (props: { organization: OrganizationResource })
         await setActive({
           organization,
         });
+
+        await navigateAfterSelectOrganization(organization);
       } catch (err) {
         if (!isClerkAPIResponseError(err)) {
           handleError(err, [], card.setError);
@@ -35,7 +38,8 @@ export const MembershipPreview = (props: { organization: OrganizationResource })
         }
 
         switch (err.errors?.[0]?.code) {
-          case 'organization_not_found_or_unauthorized': {
+          case 'organization_not_found_or_unauthorized':
+          case 'not_a_member_in_organization': {
             if (user?.createOrganizationEnabled) {
               card.setError(t(localizationKeys('unstable__errors.organization_not_found_or_unauthorized')));
             } else {
