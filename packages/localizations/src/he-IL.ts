@@ -846,6 +846,8 @@ export const heIL: LocalizationResource = {
     organization_domain_exists_for_enterprise_connection: undefined,
     organization_membership_quota_exceeded: 'הגעת למגבלת החברות בארגון, כולל הזמנות יוצאות דופן.',
     organization_minimum_permissions_needed: 'חייב להיות חבר ארגון אחד לפחות עם ההרשאות המינימליות הנדרשות.',
+    organization_not_found_or_unauthorized: undefined,
+    organization_not_found_or_unauthorized_with_create_organization_disabled: undefined,
     passkey_already_exists: 'מפתח הסיסמה כבר רשום במכשיר זה.',
     passkey_not_supported: 'מפתחות סיסמה אינם נתמכים במכשיר זה.',
     passkey_pa_not_supported: 'ההרשמה דורשת מאמת פלטפורמה אך המכשיר אינו תומך בכך.',

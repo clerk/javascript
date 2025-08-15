@@ -859,6 +859,8 @@ export const isIS: LocalizationResource = {
     organization_domain_exists_for_enterprise_connection: undefined,
     organization_membership_quota_exceeded: undefined,
     organization_minimum_permissions_needed: undefined,
+    organization_not_found_or_unauthorized: undefined,
+    organization_not_found_or_unauthorized_with_create_organization_disabled: undefined,
     passkey_already_exists: 'Lykill er þegar skráður með þessu tæki.',
     passkey_not_supported: 'Lyklar eru ekki studdir á þessu tæki.',
     passkey_pa_not_supported: 'Skráning krefst vettvangs auðkennis en tækið styður það ekki.',

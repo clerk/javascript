@@ -855,6 +855,8 @@ export const nlNL: LocalizationResource = {
     organization_domain_exists_for_enterprise_connection: undefined,
     organization_membership_quota_exceeded: 'Het lidmaatschapsquotum van de organisatie is overschreden.',
     organization_minimum_permissions_needed: 'Minimale machtigingen vereist voor de organisatie.',
+    organization_not_found_or_unauthorized: undefined,
+    organization_not_found_or_unauthorized_with_create_organization_disabled: undefined,
     passkey_already_exists: 'Deze passkey bestaat al.',
     passkey_not_supported: 'Passkeys worden niet ondersteund door deze browser.',
     passkey_pa_not_supported: 'Passkeys worden niet ondersteund door deze browser.',

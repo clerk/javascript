@@ -845,6 +845,8 @@ export const kkKZ: LocalizationResource = {
     organization_domain_exists_for_enterprise_connection: 'Бұл домен ұйымыңыздың SSO үшін қолданылады.',
     organization_membership_quota_exceeded: 'Ұйым мүшеліктерінің шектеуіне жеттіңіз.',
     organization_minimum_permissions_needed: 'Ұйымда кемінде бір әкімші болуы керек.',
+    organization_not_found_or_unauthorized: undefined,
+    organization_not_found_or_unauthorized_with_create_organization_disabled: undefined,
     passkey_already_exists: 'Бұл құрылғыда passkey тіркелген.',
     passkey_not_supported: 'Бұл құрылғыда passkey қолдауы жоқ.',
     passkey_pa_not_supported: 'Тіркеу үшін платформа аутентификаторы қажет.',

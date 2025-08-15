@@ -861,6 +861,8 @@ export const enGB: LocalizationResource = {
       'You have reached your limit of organisation memberships, including outstanding invitations.',
     organization_minimum_permissions_needed:
       'There has to be at least one organisation member with the minimum required permissions.',
+    organization_not_found_or_unauthorized: undefined,
+    organization_not_found_or_unauthorized_with_create_organization_disabled: undefined,
     passkey_already_exists: 'A passkey is already registered with this device.',
     passkey_not_supported: 'Passkeys are not supported on this device.',
     passkey_pa_not_supported: 'Registration requires a platform authenticator but the device does not support it.',

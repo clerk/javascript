@@ -853,6 +853,8 @@ export const arSA: LocalizationResource = {
     organization_domain_exists_for_enterprise_connection: undefined,
     organization_membership_quota_exceeded: undefined,
     organization_minimum_permissions_needed: undefined,
+    organization_not_found_or_unauthorized: undefined,
+    organization_not_found_or_unauthorized_with_create_organization_disabled: undefined,
     passkey_already_exists: 'تم تسجيل مفتاح المرور مسبقاً مع هذا الجهاز',
     passkey_not_supported: 'مفاتيح المرور غير مدعومة على هذا الجهاز',
     passkey_pa_not_supported: 'يتطلب التسجيل أداة مصادقة النظام الأساسي ولكن الجهاز لا يدعمها',

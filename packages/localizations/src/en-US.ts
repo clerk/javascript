@@ -813,10 +813,6 @@ export const enUS: LocalizationResource = {
     },
   },
   unstable__errors: {
-    organization_not_found_or_unauthorized:
-      'You are no longer a member of this organization. Please select or create another organization.',
-    organization_not_found_or_unauthorized_with_create_organization_disabled:
-      'You are no longer a member of this organization. Please select another organization.',
     already_a_member_in_organization: '{{email}} is already a member of the organization.',
     captcha_invalid: undefined,
     captcha_unavailable:
@@ -855,6 +851,10 @@ export const enUS: LocalizationResource = {
     organization_domain_exists_for_enterprise_connection: undefined,
     organization_membership_quota_exceeded: undefined,
     organization_minimum_permissions_needed: undefined,
+    organization_not_found_or_unauthorized:
+      'You are no longer a member of this organization. Please select or create another organization.',
+    organization_not_found_or_unauthorized_with_create_organization_disabled:
+      'You are no longer a member of this organization. Please select another organization.',
     passkey_already_exists: 'A passkey is already registered with this device.',
     passkey_not_supported: 'Passkeys are not supported on this device.',
     passkey_pa_not_supported: 'Registration requires a platform authenticator but the device does not support it.',
