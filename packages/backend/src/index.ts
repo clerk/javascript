@@ -17,7 +17,7 @@ export type ClerkOptions = Omit<CreateBackendApiOptions, 'skipApiVersionInUrl' |
       CreateAuthenticateRequestOptions['options'],
       'audience' | 'jwtKey' | 'proxyUrl' | 'secretKey' | 'publishableKey' | 'domain' | 'isSatellite'
     >
-  > & { sdkMetadata?: SDKMetadata; telemetry?: Pick<TelemetryCollectorOptions, 'disabled' | 'debug'> };
+  > & { sdkMetadata?: SDKMetadata; telemetry?: Pick<TelemetryCollectorOptions, 'disabled' | 'debug' | 'samplingRate'> };
 
 // The current exported type resolves the following issue in packages importing createClerkClient
 // TS4023: Exported variable 'clerkClient' has or is using name 'AuthErrorReason' from external module "/packages/backend/dist/index" but cannot be named.
@@ -31,11 +31,11 @@ export function createClerkClient(options: ClerkOptions): ClerkClient {
   const apiClient = createBackendApiClient(opts);
   const requestState = createAuthenticateRequest({ options: opts, apiClient });
   const telemetry = new TelemetryCollector({
-    ...options.telemetry,
     publishableKey: opts.publishableKey,
     secretKey: opts.secretKey,
     samplingRate: 0.1,
     ...(opts.sdkMetadata ? { sdk: opts.sdkMetadata.name, sdkVersion: opts.sdkMetadata.version } : {}),
+    ...(opts.telemetry || {}),
   });
 
   return {

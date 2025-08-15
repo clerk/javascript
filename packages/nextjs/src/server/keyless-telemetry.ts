@@ -2,6 +2,7 @@ import type { TelemetryEventRaw } from '@clerk/types';
 import { promises as fs } from 'fs';
 import { dirname, join } from 'path';
 
+import { canUseKeyless } from '../utils/feature-flags';
 import { createClerkClientWithOptions } from './createClerkClient';
 
 const EVENT_KEYLESS_ENV_DRIFT_DETECTED = 'KEYLESS_ENV_DRIFT_DETECTED';
@@ -86,6 +87,9 @@ async function tryMarkTelemetryEventAsFired(): Promise<boolean> {
  * @returns Promise<void> - Function completes silently, errors are logged but don't throw
  */
 export async function detectKeylessEnvDrift(): Promise<void> {
+  if (!canUseKeyless) {
+    return;
+  }
   // Only run on server side
   if (typeof window !== 'undefined') {
     return;
@@ -163,6 +167,9 @@ export async function detectKeylessEnvDrift(): Promise<void> {
     const clerkClient = createClerkClientWithOptions({
       publishableKey: keylessFile.publishableKey,
       secretKey: keylessFile.secretKey,
+      telemetry: {
+        samplingRate: 1,
+      },
     });
 
     const shouldFireEvent = await tryMarkTelemetryEventAsFired();
