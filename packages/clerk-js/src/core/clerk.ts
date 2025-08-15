@@ -560,9 +560,8 @@ export class Clerk implements ClerkInterface {
       if (this.session?.id === session.id) {
         this.#setAccessors(null);
         this.#emit();
+        await this.navigate(this.buildAfterMultiSessionSingleSignOutUrl());
       }
-
-      await this.navigate(this.buildAfterMultiSessionSingleSignOutUrl());
     }
     debugLogger.info('signOut() complete', { redirectUrl: this.buildAfterMultiSessionSingleSignOutUrl() }, 'clerk');
   };
