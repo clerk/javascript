@@ -1,3 +1,4 @@
+import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { useClerk, useOrganizationList, useUser } from '@clerk/shared/react';
 import type {
   OrganizationResource,
@@ -16,7 +17,7 @@ import {
 } from '@/ui/common/organizations/OrganizationPreview';
 import { organizationListParams, populateCacheUpdateItem } from '@/ui/components/OrganizationSwitcher/utils';
 import { useTaskChooseOrganizationContext } from '@/ui/contexts/components/SessionTasks';
-import { Col, descriptors, localizationKeys, Text } from '@/ui/customizables';
+import { Col, descriptors, localizationKeys, Text, useLocalizations } from '@/ui/customizables';
 import { Action, Actions } from '@/ui/elements/Actions';
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
@@ -30,7 +31,7 @@ type ChooseOrganizationScreenProps = {
   onCreateOrganizationClick: () => void;
 };
 
-export const ChooseOrganizationScreen = ({ onCreateOrganizationClick }: ChooseOrganizationScreenProps) => {
+export const ChooseOrganizationScreen = (props: ChooseOrganizationScreenProps) => {
   const card = useCardState();
   const { ref, userMemberships, userSuggestions, userInvitations } = useOrganizationListInView();
 
@@ -88,7 +89,13 @@ export const ChooseOrganizationScreen = ({ onCreateOrganizationClick }: ChooseOr
 
             {(hasNextPage || isLoading) && <OrganizationPreviewSpinner ref={ref} />}
 
-            <CreateOrganizationButton onCreateOrganizationClick={onCreateOrganizationClick} />
+            <CreateOrganizationButton
+              onCreateOrganizationClick={() => {
+                // Clear error originated from the list when switching to form
+                card.setError(undefined);
+                props.onCreateOrganizationClick();
+              }}
+            />
           </Actions>
         </OrganizationPreviewListItems>
       </Col>
@@ -97,9 +104,11 @@ export const ChooseOrganizationScreen = ({ onCreateOrganizationClick }: ChooseOr
 };
 
 const MembershipPreview = (props: { organization: OrganizationResource }) => {
+  const { user } = useUser();
   const card = useCardState();
   const { redirectUrlComplete } = useTaskChooseOrganizationContext();
   const { isLoaded, setActive } = useOrganizationList();
+  const { t } = useLocalizations();
 
   if (!isLoaded) {
     return null;
@@ -113,7 +122,31 @@ const MembershipPreview = (props: { organization: OrganizationResource }) => {
           redirectUrl: redirectUrlComplete,
         });
       } catch (err) {
-        handleError(err, [], card.setError);
+        if (!isClerkAPIResponseError(err)) {
+          handleError(err, [], card.setError);
+          return;
+        }
+
+        switch (err.errors?.[0]?.code) {
+          case 'organization_not_found_or_unauthorized':
+          case 'not_a_member_in_organization': {
+            if (user?.createOrganizationEnabled) {
+              card.setError(t(localizationKeys('unstable__errors.organization_not_found_or_unauthorized')));
+            } else {
+              card.setError(
+                t(
+                  localizationKeys(
+                    'unstable__errors.organization_not_found_or_unauthorized_with_create_organization_disabled',
+                  ),
+                ),
+              );
+            }
+            break;
+          }
+          default: {
+            handleError(err, [], card.setError);
+          }
+        }
       }
     });
   };
@@ -135,7 +168,7 @@ const MembershipPreview = (props: { organization: OrganizationResource }) => {
 const InvitationPreview = (props: UserOrganizationInvitationResource) => {
   const card = useCardState();
   const { getOrganization } = useClerk();
-  const [acceptedInvitation, setAcceptedInvitation] = useState<OrganizationResource | null>(null);
+  const [acceptedOrganization, setAcceptedOrganization] = useState<OrganizationResource | null>(null);
   const { userInvitations } = useOrganizationList({
     userInvitations: organizationListParams.userInvitations,
   });
@@ -146,21 +179,20 @@ const InvitationPreview = (props: UserOrganizationInvitationResource) => {
         // When accepting an invitation we don't want to trigger a revalidation as this will cause a layout shift, prefer updating in place
         .runAsync(async () => {
           const updatedItem = await props.accept();
-
           const organization = await getOrganization(props.publicOrganizationData.id);
           return [updatedItem, organization] as const;
         })
         .then(([updatedItem, organization]) => {
           // Update cache in case another listener depends on it
           void userInvitations?.setData?.(cachedPages => populateCacheUpdateItem(updatedItem, cachedPages, 'negative'));
-          setAcceptedInvitation(organization);
+          setAcceptedOrganization(organization);
         })
         .catch(err => handleError(err, [], card.setError))
     );
   };
 
-  if (acceptedInvitation) {
-    return <MembershipPreview organization={acceptedInvitation} />;
+  if (acceptedOrganization) {
+    return <MembershipPreview organization={acceptedOrganization} />;
   }
 
   return (

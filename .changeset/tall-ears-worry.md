@@ -3,4 +3,4 @@
 '@clerk/shared': patch
 ---
 
-Apply revalidation of organization memberships for `TaskChooseOrganization` component
+Add error handling for `setActive` with stale organization data

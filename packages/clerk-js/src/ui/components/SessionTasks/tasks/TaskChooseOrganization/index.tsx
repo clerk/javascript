@@ -1,4 +1,4 @@
-import { useClerk, useSession, useUserContext } from '@clerk/shared/react';
+import { useClerk, useSession, useUser } from '@clerk/shared/react';
 import { useState } from 'react';
 
 import { useSignOutContext, withCoreSessionSwitchGuard } from '@/ui/contexts';
@@ -14,7 +14,7 @@ import { CreateOrganizationScreen } from './CreateOrganizationScreen';
 
 const TaskChooseOrganizationInternal = () => {
   const { signOut } = useClerk();
-  const user = useUserContext();
+  const { user } = useUser();
   const { session } = useSession();
   const { userMemberships, userSuggestions, userInvitations } = useOrganizationListInView();
   const { otherSessions } = useMultipleSessions({ user });

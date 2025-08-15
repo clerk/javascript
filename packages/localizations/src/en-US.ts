@@ -814,7 +814,9 @@ export const enUS: LocalizationResource = {
   },
   unstable__errors: {
     organization_not_found_or_unauthorized:
-      'You are no longer a member of this organization. Please refresh the page to try again.',
+      'You are no longer a member of this organization. Please select or create another organization.',
+    organization_not_found_or_unauthorized_with_create_organization_disabled:
+      'You are no longer a member of this organization. Please select another organization.',
     already_a_member_in_organization: '{{email}} is already a member of the organization.',
     captcha_invalid: undefined,
     captcha_unavailable:
