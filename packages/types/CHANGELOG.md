@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.78.0
+
+### Minor Changes
+
+- [Experimental] Signals: Add support for calling `signIn.password()` without an identifier. ([#6534](https://github.com/clerk/javascript/pull/6534)) by [@dstaley](https://github.com/dstaley)
+
 ## 4.77.0
 
 ### Minor Changes
