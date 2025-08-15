@@ -1,3 +1,4 @@
+import type { SetActiveNavigate } from './clerk';
 import type {
   BackupCodeAttempt,
   BackupCodeFactor,
@@ -126,7 +127,6 @@ export interface SignInResource extends ClerkResource {
 }
 
 export interface SignInFutureResource {
-  fetchStatus: 'idle' | 'fetching';
   availableStrategies: SignInFirstFactor[];
   status: SignInStatus | null;
   create: (params: {
@@ -151,7 +151,7 @@ export interface SignInFutureResource {
     redirectUrl: string;
     redirectUrlComplete: string;
   }) => Promise<{ error: unknown }>;
-  finalize: () => Promise<{ error: unknown }>;
+  finalize: (params: { navigate?: SetActiveNavigate }) => Promise<{ error: unknown }>;
 }
 
 export type SignInStatus =
