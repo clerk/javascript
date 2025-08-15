@@ -240,7 +240,7 @@ function Card(props: CardProps) {
                     ? localizationKeys('badge__trialEndsAt', {
                         date: subscription.periodEnd,
                       })
-                    : localizationKeys('badge__startsAt', { date: subscription?.periodStart })
+                    : localizationKeys('badge__startsAt', { date: subscription.periodStart })
                 }
                 colorScheme='secondary'
                 sx={t => ({

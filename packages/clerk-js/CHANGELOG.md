@@ -1,5 +1,22 @@
 # Change Log
 
+## 5.85.0
+
+### Minor Changes
+
+- [Experimental] Signals: Add support for calling `signIn.password()` without an identifier. ([#6534](https://github.com/clerk/javascript/pull/6534)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Remove flickers from PricingTable when signed in. ([#6535](https://github.com/clerk/javascript/pull/6535)) by [@panteliselef](https://github.com/panteliselef)
+
+- Display trial subscriptions in UserProfile and OrganizationProfile. ([#6526](https://github.com/clerk/javascript/pull/6526)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`5b24129`](https://github.com/clerk/javascript/commit/5b24129ddcfc2f7dc6eb79d8c818b4ff97c68e9a)]:
+  - @clerk/shared@3.21.0
+  - @clerk/types@4.78.0
+  - @clerk/localizations@3.21.2
+
 ## 5.84.0
 
 ### Minor Changes

@@ -1,5 +1,26 @@
 # @clerk/testing
 
+## 1.11.0
+
+### Minor Changes
+
+- Introduce new helper to allow signing a user in via email address: ([#6545](https://github.com/clerk/javascript/pull/6545)) by [@brkalow](https://github.com/brkalow)
+
+  ```ts
+  import { clerk } from '@clerk/testing/playwright';
+
+  test('sign in', async ({ page }) => {
+    await clerk.signIn({ emailAddress: 'foo@bar.com', page });
+  });
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`5b24129`](https://github.com/clerk/javascript/commit/5b24129ddcfc2f7dc6eb79d8c818b4ff97c68e9a)]:
+  - @clerk/shared@3.21.0
+  - @clerk/types@4.78.0
+  - @clerk/backend@2.9.1
+
 ## 1.10.14
 
 ### Patch Changes
