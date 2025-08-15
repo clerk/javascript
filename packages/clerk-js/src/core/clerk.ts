@@ -555,13 +555,14 @@ export class Clerk implements ClerkInterface {
 
     // Multi-session handling
     const session = this.client.signedInSessions.find(s => s.id === opts.sessionId);
-    if (session) {
+    if (session?.id) {
       await session.remove();
+
       if (this.session?.id === session.id) {
         this.#setAccessors(null);
         this.#emit();
-        await this.navigate(this.buildAfterMultiSessionSingleSignOutUrl());
       }
+      await this.navigate(this.buildAfterMultiSessionSingleSignOutUrl());
     }
     debugLogger.info(
       'signOut() complete',
@@ -1576,7 +1577,7 @@ export class Clerk implements ClerkInterface {
         buildURL(
           {
             base: this.#options.signInUrl,
-            hashPath: 'choose',
+            pathname: '/choose',
           },
           { stringify: true },
         ),
