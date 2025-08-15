@@ -109,6 +109,7 @@ export const useCheckout = (options?: Params): __experimental_UseCheckoutReturn 
         planPeriod: null,
         plan: null,
         paymentSource: null,
+        freeTrialEndsAt: null,
       };
     }
     const {

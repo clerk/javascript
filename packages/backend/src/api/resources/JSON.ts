@@ -734,7 +734,7 @@ export interface MachineSecretKeyJSON {
 
 export interface M2MTokenJSON extends ClerkResourceJSON {
   object: typeof ObjectType.M2MToken;
-  secret?: string;
+  token?: string;
   subject: string;
   scopes: string[];
   claims: Record<string, any> | null;
@@ -800,7 +800,7 @@ interface CommercePayeeJSON {
   gateway_status: 'active' | 'pending' | 'restricted' | 'disconnected';
 }
 
-interface CommerceFeeJSON {
+interface CommerceMoneyAmountJSON {
   amount: number;
   amount_formatted: string;
   currency: string;
@@ -808,9 +808,9 @@ interface CommerceFeeJSON {
 }
 
 interface CommerceTotalsJSON {
-  subtotal: CommerceFeeJSON;
-  tax_total: CommerceFeeJSON;
-  grand_total: CommerceFeeJSON;
+  subtotal: CommerceMoneyAmountJSON;
+  tax_total: CommerceMoneyAmountJSON;
+  grand_total: CommerceMoneyAmountJSON;
 }
 
 export interface FeatureJSON extends ClerkResourceJSON {
@@ -836,9 +836,9 @@ export interface CommercePlanJSON extends ClerkResourceJSON {
   is_recurring: boolean;
   has_base_fee: boolean;
   publicly_visible: boolean;
-  fee: CommerceFeeJSON;
-  annual_fee: CommerceFeeJSON;
-  annual_monthly_fee: CommerceFeeJSON;
+  fee: CommerceMoneyAmountJSON;
+  annual_fee: CommerceMoneyAmountJSON;
+  annual_monthly_fee: CommerceMoneyAmountJSON;
   for_payer_type: 'org' | 'user';
   features: FeatureJSON[];
 }
@@ -847,7 +847,7 @@ export interface CommerceSubscriptionItemJSON extends ClerkResourceJSON {
   object: typeof ObjectType.CommerceSubscriptionItem;
   status: 'abandoned' | 'active' | 'canceled' | 'ended' | 'expired' | 'incomplete' | 'past_due' | 'upcoming';
   credit: {
-    amount: CommerceFeeJSON;
+    amount: CommerceMoneyAmountJSON;
     cycle_days_remaining: number;
     cycle_days_total: number;
     cycle_remaining_percent: number;
@@ -861,7 +861,7 @@ export interface CommerceSubscriptionItemJSON extends ClerkResourceJSON {
   lifetime_paid: number;
   next_payment_amount: number;
   next_payment_date: number;
-  amount: CommerceFeeJSON;
+  amount: CommerceMoneyAmountJSON;
   plan: {
     id: string;
     instance_id: string;

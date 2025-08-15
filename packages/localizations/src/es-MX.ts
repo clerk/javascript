@@ -54,6 +54,7 @@ export const esMX: LocalizationResource = {
   badge__default: 'Por defecto',
   badge__endsAt: "Termina {{ date | shortDate('en-US') }}",
   badge__expired: 'Caducado',
+  badge__freeTrial: undefined,
   badge__otherImpersonatorDevice: 'Otro dispositivo de imitación',
   badge__pastDueAt: undefined,
   badge__pastDuePlan: undefined,
@@ -62,6 +63,7 @@ export const esMX: LocalizationResource = {
   badge__requiresAction: 'Requiere acción',
   badge__startsAt: "Empieza {{ date | shortDate('en-US') }}",
   badge__thisDevice: 'Este dispositivo',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'No confirmado',
   badge__upcomingPlan: 'Próximo plan',
   badge__userDevice: 'Dispositivo de usuario',
@@ -88,6 +90,7 @@ export const esMX: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
+        title__freeTrialEndsAt: undefined,
         title__paymentMethod: 'Método de pago',
         title__statementId: 'Número de factura',
         title__subscriptionBegins: 'La suscripción empieza',
@@ -98,6 +101,8 @@ export const esMX: LocalizationResource = {
       title: undefined,
       title__paymentSuccessful: '¡Pago exitoso!',
       title__subscriptionSuccessful: '¡Éxito!',
+      title__trialSuccess: undefined,
+      totalDueAfterTrial: undefined,
     },
     credit: undefined,
     creditRemainder: undefined,
@@ -133,6 +138,8 @@ export const esMX: LocalizationResource = {
     },
     reSubscribe: 'Re-suscribirse',
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
+    startFreeTrial__days: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,
@@ -795,6 +802,26 @@ export const esMX: LocalizationResource = {
   },
   socialButtonsBlockButton: 'Continuar con {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ya es miembro de la organización.',
     captcha_invalid:

@@ -4,7 +4,6 @@ import { loadClerkJsScript } from '@clerk/shared/loadClerkJsScript';
 import { handleValueOrFn } from '@clerk/shared/utils';
 import type {
   __internal_CheckoutProps,
-  __internal_NavigateToTaskIfAvailableParams,
   __internal_OAuthConsentProps,
   __internal_PlanDetailsProps,
   __internal_SubscriptionDetailsProps,
@@ -105,7 +104,6 @@ type IsomorphicLoadedClerk = Without<
   | '__internal_reloadInitialResources'
   | 'billing'
   | 'apiKeys'
-  | '__internal_setComponentNavigationContext'
   | '__internal_setActiveInProgress'
   | '__internal_hasAfterAuthFlows'
 > & {
@@ -387,6 +385,15 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return callback();
     } else {
       this.premountMethodCalls.set('buildWaitlistUrl', callback);
+    }
+  };
+
+  buildTasksUrl = (): string | void => {
+    const callback = () => this.clerkjs?.buildTasksUrl() || '';
+    if (this.clerkjs && this.loaded) {
+      return callback();
+    } else {
+      this.premountMethodCalls.set('buildTasksUrl', callback);
     }
   };
 
@@ -740,14 +747,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     // Handle case where accounts has clerk-react@4 installed, but clerk-js@3 is manually loaded
     if (clerkjs && '__unstable__updateProps' in clerkjs) {
       return (clerkjs as any).__unstable__updateProps(props);
-    }
-  };
-
-  __internal_navigateToTaskIfAvailable = async (params?: __internal_NavigateToTaskIfAvailableParams): Promise<void> => {
-    if (this.clerkjs) {
-      return this.clerkjs.__internal_navigateToTaskIfAvailable(params);
-    } else {
-      return Promise.reject();
     }
   };
 
@@ -1273,6 +1272,16 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return callback();
     } else {
       this.premountMethodCalls.set('redirectToWaitlist', callback);
+      return;
+    }
+  };
+
+  redirectToTasks = async () => {
+    const callback = () => this.clerkjs?.redirectToTasks();
+    if (this.clerkjs && this.loaded) {
+      return callback();
+    } else {
+      this.premountMethodCalls.set('redirectToTasks', callback);
       return;
     }
   };

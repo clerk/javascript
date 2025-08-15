@@ -75,6 +75,7 @@ export const msMY: LocalizationResource = {
   badge__default: 'Lalai',
   badge__endsAt: 'Berakhir {{ date }}',
   badge__expired: 'Tamat tempoh',
+  badge__freeTrial: undefined,
   badge__otherImpersonatorDevice: 'Peranti penyamar lain',
   badge__pastDueAt: 'Lampau tempoh pada {{ date }}',
   badge__pastDuePlan: 'Pelan lampau tempoh',
@@ -83,6 +84,7 @@ export const msMY: LocalizationResource = {
   badge__requiresAction: 'Memerlukan tindakan',
   badge__startsAt: 'Bermula pada {{ date }}',
   badge__thisDevice: 'Peranti ini',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Belum disahkan',
   badge__upcomingPlan: 'Pelan akan datang',
   badge__userDevice: 'Peranti pengguna',
@@ -109,6 +111,7 @@ export const msMY: LocalizationResource = {
         title: 'Alamat e-mel',
       },
       lineItems: {
+        title__freeTrialEndsAt: undefined,
         title__paymentMethod: 'Kaedah pembayaran',
         title__statementId: 'ID penyata',
         title__subscriptionBegins: 'Langganan bermula',
@@ -119,6 +122,8 @@ export const msMY: LocalizationResource = {
       title: 'Bayar',
       title__paymentSuccessful: 'Pembayaran berjaya',
       title__subscriptionSuccessful: 'Langganan berjaya',
+      title__trialSuccess: undefined,
+      totalDueAfterTrial: undefined,
     },
     credit: 'Kredit',
     creditRemainder: 'Baki kredit',
@@ -154,6 +159,8 @@ export const msMY: LocalizationResource = {
     },
     reSubscribe: 'Langganan semula',
     seeAllFeatures: 'Lihat semua ciri',
+    startFreeTrial: undefined,
+    startFreeTrial__days: undefined,
     subscribe: 'Langgan',
     subscriptionDetails: {
       beginsOn: 'Bermula pada {{ date }}',
@@ -817,6 +824,26 @@ export const msMY: LocalizationResource = {
   },
   socialButtonsBlockButton: 'Teruskan dengan {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} sudah menjadi ahli organisasi.',
     captcha_invalid:

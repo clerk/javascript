@@ -1,5 +1,5 @@
 import { __experimental_useCheckout as useCheckout, useOrganization } from '@clerk/shared/react';
-import type { CommerceMoney, CommercePaymentSourceResource, ConfirmCheckoutParams } from '@clerk/types';
+import type { CommerceMoneyAmount, CommercePaymentSourceResource, ConfirmCheckoutParams } from '@clerk/types';
 import { useMemo, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';
@@ -17,6 +17,7 @@ import { Box, Button, Col, descriptors, Flex, Form, localizationKeys, Text } fro
 import { ChevronUpDown, InformationCircle } from '../../icons';
 import * as AddPaymentSource from '../PaymentSources/AddPaymentSource';
 import { PaymentSourceRow } from '../PaymentSources/PaymentSourceRow';
+import { SubscriptionBadge } from '../Subscriptions/badge';
 
 type PaymentMethodSource = 'existing' | 'new';
 
@@ -25,7 +26,7 @@ const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
 export const CheckoutForm = withCardStateProvider(() => {
   const { checkout } = useCheckout();
 
-  const { id, plan, totals, isImmediatePlanChange, planPeriod } = checkout;
+  const { id, plan, totals, isImmediatePlanChange, planPeriod, freeTrialEndsAt } = checkout;
 
   if (!id) {
     return null;
@@ -34,6 +35,8 @@ export const CheckoutForm = withCardStateProvider(() => {
   const showCredits = !!totals.credit?.amount && totals.credit.amount > 0;
   const showPastDue = !!totals.pastDue?.amount && totals.pastDue.amount > 0;
   const showDowngradeInfo = !isImmediatePlanChange;
+
+  const fee = planPeriod === 'month' ? plan.fee : plan.annualMonthlyFee;
 
   return (
     <Drawer.Body>
@@ -51,10 +54,15 @@ export const CheckoutForm = withCardStateProvider(() => {
             <LineItems.Title
               title={plan.name}
               description={planPeriod === 'annual' ? localizationKeys('commerce.billedAnnually') : undefined}
+              badge={
+                plan.freeTrialEnabled && freeTrialEndsAt ? (
+                  <SubscriptionBadge subscription={{ status: 'free_trial' }} />
+                ) : null
+              }
             />
             <LineItems.Description
               prefix={planPeriod === 'annual' ? 'x12' : undefined}
-              text={`${plan.currencySymbol}${planPeriod === 'month' ? plan.amountFormatted : plan.annualMonthlyAmountFormatted}`}
+              text={`${fee.currencySymbol}${fee.amountFormatted}`}
               suffix={localizationKeys('commerce.checkout.perMonth')}
             />
           </LineItems.Group>
@@ -85,6 +93,20 @@ export const CheckoutForm = withCardStateProvider(() => {
               <LineItems.Description text={`${totals.pastDue?.currencySymbol}${totals.pastDue?.amountFormatted}`} />
             </LineItems.Group>
           )}
+
+          {!!freeTrialEndsAt && !!plan.freeTrialDays && (
+            <LineItems.Group variant='tertiary'>
+              <LineItems.Title
+                title={localizationKeys('commerce.checkout.totalDueAfterTrial', {
+                  days: plan.freeTrialDays,
+                })}
+              />
+              <LineItems.Description
+                text={`${totals.grandTotal?.currencySymbol}${totals.grandTotal?.amountFormatted}`}
+              />
+            </LineItems.Group>
+          )}
+
           <LineItems.Group borderTop>
             <LineItems.Title title={localizationKeys('commerce.totalDueToday')} />
             <LineItems.Description text={`${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`} />
@@ -276,14 +298,31 @@ export const PayWithTestPaymentSource = () => {
   );
 };
 
-const AddPaymentSourceForCheckout = withCardStateProvider(() => {
-  const { addPaymentSourceAndPay } = useCheckoutMutations();
+const useSubmitLabel = () => {
   const { checkout } = useCheckout();
-  const { status, totals } = checkout;
+  const { status, freeTrialEndsAt, totals } = checkout;
 
   if (status === 'needs_initialization') {
-    return null;
+    throw new Error('Clerk: Invalid state');
   }
+
+  if (freeTrialEndsAt) {
+    return localizationKeys('commerce.startFreeTrial');
+  }
+
+  if (totals.totalDueNow.amount > 0) {
+    return localizationKeys('commerce.pay', {
+      amount: `${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`,
+    });
+  }
+
+  return localizationKeys('commerce.subscribe');
+};
+
+const AddPaymentSourceForCheckout = withCardStateProvider(() => {
+  const { addPaymentSourceAndPay } = useCheckoutMutations();
+  const submitLabel = useSubmitLabel();
+  const { checkout } = useCheckout();
 
   return (
     <AddPaymentSource.Root
@@ -294,15 +333,7 @@ const AddPaymentSourceForCheckout = withCardStateProvider(() => {
         <PayWithTestPaymentSource />
       </DevOnly>
 
-      {totals.totalDueNow.amount > 0 ? (
-        <AddPaymentSource.FormButton
-          text={localizationKeys('commerce.pay', {
-            amount: `${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`,
-          })}
-        />
-      ) : (
-        <AddPaymentSource.FormButton text={localizationKeys('commerce.subscribe')} />
-      )}
+      <AddPaymentSource.FormButton text={submitLabel} />
     </AddPaymentSource.Root>
   );
 });
@@ -312,11 +343,12 @@ const ExistingPaymentSourceForm = withCardStateProvider(
     totalDueNow,
     paymentSources,
   }: {
-    totalDueNow: CommerceMoney;
+    totalDueNow: CommerceMoneyAmount;
     paymentSources: CommercePaymentSourceResource[];
   }) => {
+    const submitLabel = useSubmitLabel();
     const { checkout } = useCheckout();
-    const { paymentSource } = checkout;
+    const { paymentSource, freeTrialEndsAt } = checkout;
 
     const { payWithExistingPaymentSource } = useCheckoutMutations();
     const card = useCardState();
@@ -338,6 +370,8 @@ const ExistingPaymentSourceForm = withCardStateProvider(
       });
     }, [paymentSources]);
 
+    const isSchedulePayment = totalDueNow.amount > 0 && !freeTrialEndsAt;
+
     return (
       <Form
         onSubmit={payWithExistingPaymentSource}
@@ -347,7 +381,7 @@ const ExistingPaymentSourceForm = withCardStateProvider(
           rowGap: t.space.$4,
         })}
       >
-        {totalDueNow.amount > 0 ? (
+        {isSchedulePayment ? (
           <Select
             elementId='paymentSource'
             options={options}
@@ -397,17 +431,8 @@ const ExistingPaymentSourceForm = withCardStateProvider(
             width: '100%',
           }}
           isLoading={card.isLoading}
-        >
-          <Text
-            localizationKey={
-              totalDueNow.amount > 0
-                ? localizationKeys('commerce.pay', {
-                    amount: `${totalDueNow.currencySymbol}${totalDueNow.amountFormatted}`,
-                  })
-                : localizationKeys('commerce.subscribe')
-            }
-          />
-        </Button>
+          localizationKey={submitLabel}
+        />
       </Form>
     );
   },

@@ -325,9 +325,9 @@ describe('api.client', () => {
         ),
       );
 
-      const response = await apiClient.m2mTokens.verifySecret({
+      const response = await apiClient.m2m.verifyToken({
         machineSecretKey: 'ak_test_in_header_params', // this will be added to headerParams.Authorization
-        secret: 'mt_secret_test',
+        token: 'mt_secret_test',
       });
       expect(response.id).toBe('mt_test');
     });
@@ -353,8 +353,8 @@ describe('api.client', () => {
         ),
       );
 
-      const response = await apiClient.m2mTokens.verifySecret({
-        secret: 'mt_secret_test',
+      const response = await apiClient.m2m.verifyToken({
+        token: 'mt_secret_test',
       });
       expect(response.id).toBe('mt_test');
     });
@@ -404,7 +404,7 @@ describe('api.client', () => {
       expect(response.id).toBe('user_cafebabe');
     });
 
-    it('prioritizes machine secret key over secret key when both are provided and useMachineSecretKey is true', async () => {
+    it('prioritizes machine secret key over instance secret key when both are provided and useMachineSecretKey is true', async () => {
       const apiClient = createBackendApiClient({
         apiUrl: 'https://api.clerk.test',
         secretKey: 'sk_test_xxx',
@@ -425,8 +425,8 @@ describe('api.client', () => {
         ),
       );
 
-      const response = await apiClient.m2mTokens.verifySecret({
-        secret: 'mt_secret_test',
+      const response = await apiClient.m2m.verifyToken({
+        token: 'mt_secret_test',
       });
       expect(response.id).toBe('mt_test');
     });

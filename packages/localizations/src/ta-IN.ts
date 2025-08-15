@@ -75,6 +75,7 @@ export const taIN: LocalizationResource = {
   badge__default: 'இயல்புநிலை',
   badge__endsAt: "{{ date | shortDate('ta-IN') }} முடிவடையும்",
   badge__expired: 'காலாவதியானது',
+  badge__freeTrial: undefined,
   badge__otherImpersonatorDevice: 'மற்ற மாறுவேட சாதனம்',
   badge__pastDueAt: "தாமதமான {{ date | shortDate('ta-IN') }}",
   badge__pastDuePlan: 'தாமதமான',
@@ -83,6 +84,7 @@ export const taIN: LocalizationResource = {
   badge__requiresAction: 'செயல் தேவை',
   badge__startsAt: "{{ date | shortDate('ta-IN') }} தொடங்குகிறது",
   badge__thisDevice: 'இந்த சாதனம்',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'சரிபார்க்கப்படாதது',
   badge__upcomingPlan: 'வரவிருக்கும்',
   badge__userDevice: 'பயனர் சாதனம்',
@@ -113,6 +115,7 @@ export const taIN: LocalizationResource = {
         title: 'மின்னஞ்சல் முகவரியைச் சேர்',
       },
       lineItems: {
+        title__freeTrialEndsAt: undefined,
         title__paymentMethod: 'கட்டண முறை',
         title__statementId: 'அறிக்கை ID',
         title__subscriptionBegins: 'சந்தா தொடங்குகிறது',
@@ -123,6 +126,8 @@ export const taIN: LocalizationResource = {
       title: 'செக்அவுட்',
       title__paymentSuccessful: 'கட்டணம் வெற்றிகரமானது!',
       title__subscriptionSuccessful: 'வெற்றி!',
+      title__trialSuccess: undefined,
+      totalDueAfterTrial: undefined,
     },
     credit: 'கிரெடிட்',
     creditRemainder: 'உங்கள் தற்போதைய சந்தாவின் மீதமுள்ள கிரெடிட்.',
@@ -158,6 +163,8 @@ export const taIN: LocalizationResource = {
     },
     reSubscribe: 'மீண்டும் சந்தா செய்',
     seeAllFeatures: 'அனைத்து அம்சங்களையும் பார்க்கவும்',
+    startFreeTrial: undefined,
+    startFreeTrial__days: undefined,
     subscribe: 'சந்தா செய்',
     subscriptionDetails: {
       beginsOn: 'தொடங்குகிறது',
@@ -820,6 +827,26 @@ export const taIN: LocalizationResource = {
   },
   socialButtonsBlockButton: '{{provider|titleize}} மூலம் தொடரவும்',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ஏற்கனவே நிறுவனத்தின் உறுப்பினராக உள்ளார்.',
     captcha_invalid: 'பாதுகாப்பு சரிபார்ப்புகள் தோல்வியடைந்ததால் பதிவு செய்ய முடியவில்லை. மீண்டும் முயற்சிக்க பக்கத்தை புதுப்பிக்கவும் அல்லது மேலும் உதவிக்கு ஆதரவை தொடர்பு கொள்ளவும்.',

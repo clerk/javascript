@@ -1,5 +1,87 @@
 # Change Log
 
+## 2.9.1
+
+### Patch Changes
+
+- Updated dependencies [[`5b24129`](https://github.com/clerk/javascript/commit/5b24129ddcfc2f7dc6eb79d8c818b4ff97c68e9a)]:
+  - @clerk/shared@3.21.0
+  - @clerk/types@4.78.0
+
+## 2.9.0
+
+### Minor Changes
+
+- Remove `secret` in favor of `token` in m2m response. ([#6542](https://github.com/clerk/javascript/pull/6542)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Before:
+
+  ```ts
+  const result = await clerkClient.m2mTokens.create();
+
+  console.log(result.secret);
+  ```
+
+  After:
+
+  ```ts
+  const result = await clerkClient.m2mTokens.create();
+
+  console.log(result.token);
+  ```
+
+- Rename M2M namespace from `m2mTokens` to `m2m` in Backend API client ([#6544](https://github.com/clerk/javascript/pull/6544)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Before:
+
+  ```ts
+  clerkClient.m2mTokens.create();
+
+  clerkClient.m2mTokens.revoke();
+
+  clerkClient.m2mTokens.verifySecret({ secret: 'ak_xxx' });
+  ```
+
+  After:
+
+  ```ts
+  clerkClient.m2m.createToken();
+
+  clerkClient.m2m.revokeToken();
+
+  clerkClient.m2m.verifyToken({ token: 'ak_xxx' });
+  ```
+
+  The `verifySecret()` method is removed. Please use `.verifyToken()` instead.
+
+- Deprecates `clerkClient.m2mTokens.verifySecret({ secret: 'mt_xxx' })` in favor or `clerkClient.m2mTokens.verifyToken({ token: 'mt_xxx' })` ([#6536](https://github.com/clerk/javascript/pull/6536)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Updated dependencies [[`4db1e58`](https://github.com/clerk/javascript/commit/4db1e58d70b60e1e236709b507666715d571e925), [`69498df`](https://github.com/clerk/javascript/commit/69498dfca3e6bb388eb8c94313eac06347dd5a27), [`59f1559`](https://github.com/clerk/javascript/commit/59f15593bab708b9e13eebfff6780c2d52b31b0a)]:
+  - @clerk/types@4.77.0
+  - @clerk/shared@3.20.1
+
+## 2.8.0
+
+### Minor Changes
+
+- Exports `Machine` and `M2MToken` resource classes ([#6500](https://github.com/clerk/javascript/pull/6500)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Updated dependencies [[`15fe106`](https://github.com/clerk/javascript/commit/15fe1060f730a6a4391f3d2451d23edd3218e1ae), [`173837c`](https://github.com/clerk/javascript/commit/173837c2526aa826b7981ee8d6d4f52c00675da5), [`8b52d7a`](https://github.com/clerk/javascript/commit/8b52d7ae19407e8ab5a5451bd7d34b6bc38417de), [`854dde8`](https://github.com/clerk/javascript/commit/854dde88e642c47b5a29ac8f576c8c1976e5d067), [`ae2e2d6`](https://github.com/clerk/javascript/commit/ae2e2d6b336be6b596cc855e549843beb5bfd2a1), [`037f25a`](https://github.com/clerk/javascript/commit/037f25a8171888168913b186b7edf871e0aaf197), [`f8b38b7`](https://github.com/clerk/javascript/commit/f8b38b7059e498fef3ac1271346be0710aa31c76)]:
+  - @clerk/types@4.76.0
+  - @clerk/shared@3.20.0
+
+## 2.7.1
+
+### Patch Changes
+
+- Updated dependencies [[`b72a3dd`](https://github.com/clerk/javascript/commit/b72a3dda2467720e5dc8cab3e7e6a110f3beb79b), [`d93b0ed`](https://github.com/clerk/javascript/commit/d93b0edf4adc57d48a26cb08444192887ccec659), [`6459f7d`](https://github.com/clerk/javascript/commit/6459f7dabe5f163f48ed73106bb901d8187da3e2), [`0ff648a`](https://github.com/clerk/javascript/commit/0ff648aeac0e2f5481596a98c8046d9d58a7bf75), [`9084759`](https://github.com/clerk/javascript/commit/90847593300be605e1ee1c06dac147ce68b25dc7)]:
+  - @clerk/types@4.75.0
+  - @clerk/shared@3.19.0
+
 ## 2.7.0
 
 ### Minor Changes

@@ -75,6 +75,7 @@ export const bnIN: LocalizationResource = {
   badge__default: 'ডিফল্ট',
   badge__endsAt: "শেষ {{ date | shortDate('bn-IN') }}",
   badge__expired: 'মেয়াদ শেষ',
+  badge__freeTrial: undefined,
   badge__otherImpersonatorDevice: 'অন্য ইমপারসোনেটর ডিভাইস',
   badge__pastDueAt: "মেয়াদ উত্তীর্ণ {{ date | shortDate('bn-IN') }}",
   badge__pastDuePlan: 'মেয়াদ উত্তীর্ণ',
@@ -83,6 +84,7 @@ export const bnIN: LocalizationResource = {
   badge__requiresAction: 'কর্ম প্রয়োজন',
   badge__startsAt: "শুরু {{ date | shortDate('bn-IN') }}",
   badge__thisDevice: 'এই ডিভাইস',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'অযাচাই',
   badge__upcomingPlan: 'আসন্ন',
   badge__userDevice: 'ব্যবহারকারীর ডিভাইস',
@@ -113,10 +115,13 @@ export const bnIN: LocalizationResource = {
         title: 'একটি ইমেইল ঠিকানা যোগ করুন',
       },
       lineItems: {
+        title__freeTrialEndsAt: undefined,
         title__paymentMethod: 'পেমেন্ট পদ্ধতি',
         title__statementId: 'স্টেটমেন্ট আইডি',
         title__subscriptionBegins: 'সাবস্ক্রিপশন শুরু',
         title__totalPaid: 'মোট প্রদান',
+        title__trialSuccess: undefined,
+        totalDueAfterTrial: undefined,
       },
       pastDueNotice: 'আপনার আগের সাবস্ক্রিপশনের মেয়াদ উত্তীর্ণ হয়েছিল, কোনো পেমেন্ট ছাড়াই।',
       perMonth: 'প্রতি মাসে',
@@ -158,7 +163,9 @@ export const bnIN: LocalizationResource = {
     },
     reSubscribe: 'পুনরায় সাবস্ক্রাইব করুন',
     seeAllFeatures: 'সব বৈশিষ্ট্য দেখুন',
-    subscribe: 'সাবস্ক্রাইব করুন',
+    startFreeTrial: undefined,
+    startFreeTrial__days: undefined,
+     subscribe: 'সাবস্ক্রাইব করুন',
     subscriptionDetails: {
       beginsOn: 'শুরু হয়',
       currentBillingCycle: 'বর্তমান বিলিং চক্র',
@@ -818,6 +825,26 @@ export const bnIN: LocalizationResource = {
   },
   socialButtonsBlockButton: '{{provider|titleize}} দিয়ে চালিয়ে যান',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ইতিমধ্যে সংগঠনের একজন সদস্য।',
     captcha_invalid:

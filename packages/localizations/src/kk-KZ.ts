@@ -54,6 +54,7 @@ export const kkKZ: LocalizationResource = {
   badge__default: 'Әдепкі бойынша',
   badge__endsAt: "{{ date | shortDate('kk-KZ') }} күні аяқталады",
   badge__expired: 'Мерзімі біткен',
+  badge__freeTrial: undefined,
   badge__otherImpersonatorDevice: 'Басқа эмуляциялаушы құрылғы',
   badge__pastDueAt: undefined,
   badge__pastDuePlan: undefined,
@@ -62,6 +63,7 @@ export const kkKZ: LocalizationResource = {
   badge__requiresAction: 'Әрекет қажет',
   badge__startsAt: "{{ date | shortDate('kk-KZ') }} күні басталады",
   badge__thisDevice: 'Осы құрылғы',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Расталмаған',
   badge__upcomingPlan: 'Алдағы жоспар',
   badge__userDevice: 'Пайдаланушы құрылғысы',
@@ -88,6 +90,7 @@ export const kkKZ: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
+        title__freeTrialEndsAt: undefined,
         title__paymentMethod: 'Төлем әдісі',
         title__statementId: 'Шоттың ID нөмірі',
         title__subscriptionBegins: 'Жазылым басталады',
@@ -98,6 +101,8 @@ export const kkKZ: LocalizationResource = {
       title: undefined,
       title__paymentSuccessful: 'Төлем сәтті аяқталды!',
       title__subscriptionSuccessful: 'Сәтті!',
+      title__trialSuccess: undefined,
+      totalDueAfterTrial: undefined,
     },
     credit: undefined,
     creditRemainder: undefined,
@@ -133,6 +138,8 @@ export const kkKZ: LocalizationResource = {
     },
     reSubscribe: 'Қайта жазылу',
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
+    startFreeTrial__days: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,
@@ -780,6 +787,26 @@ export const kkKZ: LocalizationResource = {
   },
   socialButtonsBlockButton: '{{provider|titleize}} арқылы жалғастыру',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ұйымға қазірдің өзінде қосылған.',
     captcha_invalid: 'Қауіпсіздік тексерілуі сәтсіз аяқталды. Браузерді өзгерту немесе кеңейтулерді өшіруге тырысыңыз.',

@@ -75,6 +75,7 @@ export const teIN: LocalizationResource = {
   badge__default: 'డిఫాల్ట్',
   badge__endsAt: '{{date}} న ముగుస్తుంది',
   badge__expired: 'గడువు ముగిసింది',
+  badge__freeTrial: undefined,
   badge__otherImpersonatorDevice: 'ఇతర నకిలీ పరికరం',
   badge__pastDueAt: '{{date}} నుండి గడువు దాటింది',
   badge__pastDuePlan: 'గడువు దాటిన ప్లాన్',
@@ -83,6 +84,7 @@ export const teIN: LocalizationResource = {
   badge__requiresAction: 'చర్య అవసరం',
   badge__startsAt: '{{date}} న ప్రారంభమవుతుంది',
   badge__thisDevice: 'ఈ పరికరం',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'ధృవీకరించబడలేదు',
   badge__upcomingPlan: 'రాబోయే ప్లాన్',
   badge__userDevice: 'వినియోగదారు పరికరం',
@@ -109,6 +111,7 @@ export const teIN: LocalizationResource = {
         title: 'ఇమెయిల్ చిరునామా',
       },
       lineItems: {
+        title__freeTrialEndsAt: undefined,
         title__paymentMethod: 'చెల్లింపు పద్ధతి',
         title__statementId: 'స్టేట్‌మెంట్ ID',
         title__subscriptionBegins: 'చందా ప్రారంభమవుతుంది',
@@ -119,6 +122,8 @@ export const teIN: LocalizationResource = {
       title: 'చెక్అవుట్',
       title__paymentSuccessful: 'చెల్లింపు విజయవంతమైంది',
       title__subscriptionSuccessful: 'చందా విజయవంతమైంది',
+        title__trialSuccess: undefined,
+      totalDueAfterTrial: undefined,
     },
     credit: 'క్రెడిట్',
     creditRemainder: 'మిగిలిన క్రెడిట్',
@@ -154,6 +159,8 @@ export const teIN: LocalizationResource = {
     },
     reSubscribe: 'మళ్ళీ చందా చేయండి',
     seeAllFeatures: 'అన్ని లక్షణాలను చూడండి',
+    startFreeTrial: undefined,
+    startFreeTrial__days: undefined,
     subscribe: 'చందా చేయండి',
     subscriptionDetails: {
       beginsOn: 'ప్రారంభమవుతుంది',
@@ -816,6 +823,26 @@ export const teIN: LocalizationResource = {
   },
   socialButtonsBlockButton: '{{provider|titleize}}తో కొనసాగించండి',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ఇప్పటికే సంస్థ సభ్యుడు.',
     captcha_invalid:
