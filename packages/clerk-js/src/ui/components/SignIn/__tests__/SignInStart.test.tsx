@@ -14,6 +14,31 @@ import { SignInStart } from '../SignInStart';
 const { createFixtures } = bindCreateFixtures('SignIn');
 
 describe('SignInStart', () => {
+  const originalWindow = window;
+  const mockGetComputedStyle = jest.fn();
+
+  beforeEach(() => {
+    // Mock window.getComputedStyle
+    mockGetComputedStyle.mockReset();
+    mockGetComputedStyle.mockReturnValue({
+      animationName: '',
+      pointerEvents: 'auto',
+      getPropertyValue: jest.fn().mockReturnValue(''),
+    });
+    Object.defineProperty(window, 'getComputedStyle', {
+      value: mockGetComputedStyle,
+      writable: true,
+    });
+  });
+
+  afterEach(() => {
+    // Restore window
+    Object.defineProperty(global, 'window', {
+      value: originalWindow,
+      writable: true,
+    });
+  });
+
   it('renders the component', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withEmailAddress();
@@ -167,7 +192,7 @@ describe('SignInStart', () => {
         });
       });
 
-      const wrapperBefore = ({ children }) => (
+      const wrapperBefore = ({ children }: { children: React.ReactNode }) => (
         <Wrapper>
           <AppearanceProvider
             appearanceKey={'signIn'}
