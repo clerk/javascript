@@ -15,7 +15,7 @@ export const common = ({ page }: { page: EnhancedPage }) => {
       return page.locator('input[name=confirmPassword]').fill(val);
     },
     enterOtpCode: async (code: string) => {
-      await page.getByRole('textbox', { name: /digit 1/i }).click();
+      await page.getByLabel('Enter verification code').click();
       // We've got a delay here to ensure the prepare call is triggered before the OTP is auto-submitted.
       await page.keyboard.type(code, { delay: 100 });
     },
