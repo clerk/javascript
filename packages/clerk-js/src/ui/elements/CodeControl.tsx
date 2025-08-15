@@ -217,7 +217,8 @@ export const OTPCodeControl = () => {
 };
 
 function Slot(props: SlotProps & PropsOfComponent<typeof OTPInputSegment> & { isSuccessfullyFilled?: boolean }) {
-  const { isSuccessfullyFilled, isActive, ...rest } = props;
+  const { isSuccessfullyFilled, ...otpProps } = props;
+  const { char, hasFakeCaret, isActive, placeholderChar, ...rest } = otpProps;
   return (
     <OTPInputSegment
       data-testid='otp-input-segment'
@@ -246,8 +247,8 @@ function Slot(props: SlotProps & PropsOfComponent<typeof OTPInputSegment> & { is
         },
       })}
     >
-      {props.char !== null && <div>{props.char}</div>}
-      {props.hasFakeCaret && <FakeCaret />}
+      {char !== null && <div>{char}</div>}
+      {hasFakeCaret && <FakeCaret />}
     </OTPInputSegment>
   );
 }
