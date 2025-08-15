@@ -76,11 +76,11 @@ export class Session extends BaseResource implements SessionResource {
 
   remove = (): Promise<SessionResource> => {
     debugLogger.debug(
-      'Session.remove() called',
+      'remove()',
       {
         sessionId: this.id,
       },
-      'session',
+      'Session',
     );
 
     SessionTokenCache.clear();
