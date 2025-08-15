@@ -1577,7 +1577,7 @@ export class Clerk implements ClerkInterface {
         buildURL(
           {
             base: this.#options.signInUrl,
-            pathname: '/choose',
+            hashPath: 'choose',
           },
           { stringify: true },
         ),
