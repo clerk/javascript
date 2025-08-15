@@ -563,7 +563,11 @@ export class Clerk implements ClerkInterface {
         await this.navigate(this.buildAfterMultiSessionSingleSignOutUrl());
       }
     }
-    debugLogger.info('signOut() complete', { redirectUrl: this.buildAfterMultiSessionSingleSignOutUrl() }, 'clerk');
+    debugLogger.info(
+      'signOut() complete',
+      { redirectUrl: stripOrigin(this.buildAfterMultiSessionSingleSignOutUrl()) },
+      'clerk',
+    );
   };
 
   public openGoogleOneTap = (props?: GoogleOneTapProps): void => {
