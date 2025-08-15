@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.78.1
+
+### Patch Changes
+
+- Add error handling for `setActive` with stale organization data ([#6550](https://github.com/clerk/javascript/pull/6550)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
 ## 4.78.0
 
 ### Minor Changes
