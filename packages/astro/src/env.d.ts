@@ -17,6 +17,7 @@ interface InternalEnv {
   readonly PUBLIC_CLERK_PROXY_URL?: string;
   readonly PUBLIC_CLERK_SIGN_IN_URL?: string;
   readonly PUBLIC_CLERK_SIGN_UP_URL?: string;
+  readonly PUBLIC_CLERK_WAITLIST_URL?: string;
   readonly PUBLIC_CLERK_TELEMETRY_DISABLED?: string;
   readonly PUBLIC_CLERK_TELEMETRY_DEBUG?: string;
 }

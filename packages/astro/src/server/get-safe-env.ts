@@ -30,6 +30,7 @@ function getSafeEnv(context: ContextOrLocals) {
     machineSecretKey: getContextEnvVar('CLERK_MACHINE_SECRET_KEY', context),
     signInUrl: getContextEnvVar('PUBLIC_CLERK_SIGN_IN_URL', context),
     signUpUrl: getContextEnvVar('PUBLIC_CLERK_SIGN_UP_URL', context),
+    waitlistUrl: getContextEnvVar('PUBLIC_CLERK_WAITLIST_URL', context),
     clerkJsUrl: getContextEnvVar('PUBLIC_CLERK_JS_URL', context),
     clerkJsVariant: getContextEnvVar('PUBLIC_CLERK_JS_VARIANT', context) as 'headless' | '' | undefined,
     clerkJsVersion: getContextEnvVar('PUBLIC_CLERK_JS_VERSION', context),
@@ -54,6 +55,7 @@ function getClientSafeEnv(context: ContextOrLocals) {
     proxyUrl: getContextEnvVar('PUBLIC_CLERK_PROXY_URL', context),
     signInUrl: getContextEnvVar('PUBLIC_CLERK_SIGN_IN_URL', context),
     signUpUrl: getContextEnvVar('PUBLIC_CLERK_SIGN_UP_URL', context),
+    waitlistUrl: getContextEnvVar('PUBLIC_CLERK_WAITLIST_URL', context),
   };
 }
 
