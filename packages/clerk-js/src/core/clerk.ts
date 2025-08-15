@@ -1574,7 +1574,7 @@ export class Clerk implements ClerkInterface {
         buildURL(
           {
             base: this.#options.signInUrl,
-            pathname: '/choose',
+            hashPath: 'choose',
           },
           { stringify: true },
         ),
@@ -2781,6 +2781,25 @@ export class Clerk implements ClerkInterface {
     );
   };
 
+  /**
+   * Sets up the main accessor properties for the Clerk instance based on the provided session.
+   *
+   * This method updates three key properties:
+   * - `session`: The current signed-in session or null if no session provided
+   * - `organization`: The last active organization from the session (if any)
+   * - `user`: The user associated with the session, or null if no session exists
+   *
+   * @param session - The signed-in session resource to set as the current session. If undefined or null, clears all accessors.
+   *
+   * @example
+   * ```typescript
+   * // Set accessors with an active session
+   * this.#setAccessors(signedInSession);
+   *
+   * // Clear all accessors (sign out)
+   * this.#setAccessors(null);
+   * ```
+   */
   #setAccessors = (session?: SignedInSessionResource | null) => {
     this.session = session || null;
     this.organization = this.#getLastActiveOrganizationFromSession();
