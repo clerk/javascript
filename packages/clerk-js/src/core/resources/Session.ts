@@ -26,6 +26,7 @@ import type {
 } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
+import { debugLogger } from '../../utils/debug';
 import {
   convertJSONToPublicKeyRequestOptions,
   serializePublicKeyCredentialAssertion,
@@ -74,6 +75,14 @@ export class Session extends BaseResource implements SessionResource {
   };
 
   remove = (): Promise<SessionResource> => {
+    debugLogger.debug(
+      'Session.remove() called',
+      {
+        sessionId: this.id,
+      },
+      'session',
+    );
+
     SessionTokenCache.clear();
     return this._basePost({
       action: 'remove',
