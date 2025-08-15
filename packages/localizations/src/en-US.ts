@@ -852,9 +852,9 @@ export const enUS: LocalizationResource = {
     organization_membership_quota_exceeded: undefined,
     organization_minimum_permissions_needed: undefined,
     organization_not_found_or_unauthorized:
-      'You are no longer a member of this organization. Please select or create another organization.',
+      'You are no longer a member of this organization. Please choose or create another one.',
     organization_not_found_or_unauthorized_with_create_organization_disabled:
-      'You are no longer a member of this organization. Please select another organization.',
+      'You are no longer a member of this organization. Please choose another one.',
     passkey_already_exists: 'A passkey is already registered with this device.',
     passkey_not_supported: 'Passkeys are not supported on this device.',
     passkey_pa_not_supported: 'Registration requires a platform authenticator but the device does not support it.',
