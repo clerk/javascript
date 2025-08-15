@@ -555,13 +555,12 @@ export class Clerk implements ClerkInterface {
 
     // Multi-session handling
     const session = this.client.signedInSessions.find(s => s.id === opts.sessionId);
-    const shouldSignOutCurrent = session?.id && this.session?.id === session.id;
-
-    if (shouldSignOutCurrent) {
-      await session?.remove();
-
-      this.#setAccessors(null);
-      this.#emit();
+    if (session) {
+      await session.remove();
+      if (this.session?.id === session.id) {
+        this.#setAccessors(null);
+        this.#emit();
+      }
 
       await this.navigate(this.buildAfterMultiSessionSingleSignOutUrl());
     }
