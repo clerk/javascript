@@ -41,7 +41,7 @@ test.describe('Keyless mode @quickstart', () => {
     await app.teardown();
   });
 
-  test('Navigates to non existed page (/_not-found) without a infinite redirect loop.', async ({ page, context }) => {
+  test('Navigates to non-existent page (/_not-found) without a infinite redirect loop.', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.page.goToAppHome();
     await u.page.waitForClerkJsLoaded();
@@ -51,9 +51,12 @@ test.describe('Keyless mode @quickstart', () => {
 
     const redirectMap = new Map<string, number>();
     page.on('request', request => {
-      const url = request.url();
-      redirectMap.set(url, (redirectMap.get(url) || 0) + 1);
-      expect(redirectMap.get(url)).toBeLessThanOrEqual(1);
+      // Only count GET requests since Next.js server actions are sent with POST requests.
+      if (request.method() === 'GET') {
+        const url = request.url();
+        redirectMap.set(url, (redirectMap.get(url) || 0) + 1);
+        expect(redirectMap.get(url)).toBeLessThanOrEqual(1);
+      }
     });
 
     await u.page.goToRelative('/something');
