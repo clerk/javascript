@@ -872,6 +872,8 @@ export const deDE: LocalizationResource = {
       'Sie haben Ihr Limit an Organisationsmitgliedschaften einschließlich ausstehender Einladungen erreicht.',
     organization_minimum_permissions_needed:
       'Es muss mindestens ein Organisationsmitglied mit den erforderlichen Mindestberechtigungen geben.',
+    organization_not_found_or_unauthorized: undefined,
+    organization_not_found_or_unauthorized_with_create_organization_disabled: undefined,
     passkey_already_exists: 'Auf diesem Gerät ist bereits ein Passkey registriert.',
     passkey_not_supported: 'Passkeys werden auf diesem Gerät nicht unterstützt.',
     passkey_pa_not_supported:

@@ -853,6 +853,8 @@ export const bgBG: LocalizationResource = {
     organization_domain_exists_for_enterprise_connection: undefined,
     organization_membership_quota_exceeded: 'Квотата за членове на организацията е изчерпана.',
     organization_minimum_permissions_needed: 'Трябва да имате минимални разрешения за достъп.',
+    organization_not_found_or_unauthorized: undefined,
+    organization_not_found_or_unauthorized_with_create_organization_disabled: undefined,
     passkey_already_exists: undefined,
     passkey_not_supported: undefined,
     passkey_pa_not_supported: undefined,

@@ -854,6 +854,8 @@ export const thTH: LocalizationResource = {
     organization_domain_exists_for_enterprise_connection: 'โดเมนนี้ถูกใช้สำหรับ SSO ขององค์กรของคุณแล้ว',
     organization_membership_quota_exceeded: 'คุณได้ถึงขีดจำกัดการเป็นสมาชิกองค์กรแล้ว รวมถึงคำเชิญที่รอดำเนินการ',
     organization_minimum_permissions_needed: 'ต้องมีสมาชิกองค์กรอย่างน้อยหนึ่งคนที่มีสิทธิ์ขั้นต่ำที่จำเป็น',
+    organization_not_found_or_unauthorized: undefined,
+    organization_not_found_or_unauthorized_with_create_organization_disabled: undefined,
     passkey_already_exists: 'พาสคีย์ถูกลงทะเบียนกับอุปกรณ์นี้แล้ว',
     passkey_not_supported: 'อุปกรณ์นี้ไม่รองรับพาสคีย์',
     passkey_pa_not_supported: 'การลงทะเบียนต้องใช้ระบบยืนยันตัวตนของแพลตฟอร์ม แต่อุปกรณ์ไม่รองรับ',

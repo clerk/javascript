@@ -865,6 +865,8 @@ export const faIR: LocalizationResource = {
     organization_domain_exists_for_enterprise_connection: 'این دامنه برای اتصال سازمانی موجود است.',
     organization_membership_quota_exceeded: 'حد مجاز عضویت سازمان تجاوز شده است.',
     organization_minimum_permissions_needed: 'حداقل مجوزهای مورد نیاز برای سازمان الزامی است.',
+    organization_not_found_or_unauthorized: undefined,
+    organization_not_found_or_unauthorized_with_create_organization_disabled: undefined,
     passkey_already_exists: 'یک کلید عبور از قبل در این دستگاه ثبت شده است.',
     passkey_not_supported: 'کلیدهای عبور در این دستگاه پشتیبانی نمی‌شوند.',
     passkey_pa_not_supported: 'ثبت نام نیاز به یک احراز هویت کننده پلتفرم دارد اما دستگاه از آن پشتیبانی نمی‌کند.',

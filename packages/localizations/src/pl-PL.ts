@@ -864,6 +864,8 @@ export const plPL: LocalizationResource = {
     organization_membership_quota_exceeded: 'Osiągnięto limit członkostwa w organizacji, w tym zaległych zaproszeń.',
     organization_minimum_permissions_needed:
       'Musi istnieć co najmniej jeden członek organizacji z minimalnymi wymaganymi uprawnieniami.',
+    organization_not_found_or_unauthorized: undefined,
+    organization_not_found_or_unauthorized_with_create_organization_disabled: undefined,
     passkey_already_exists: 'Klucz dostępu jest już zarejestrowany w tym urządzeniu.',
     passkey_not_supported: 'Klucze dostępu nie są obsługiwane przez to urządzenie.',
     passkey_pa_not_supported: 'Rejestracja wymaga platformy uwierzytelniającej, ale urządzenie jej nie obsługuje.',

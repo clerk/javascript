@@ -864,6 +864,8 @@ export const bnIN: LocalizationResource = {
     organization_domain_exists_for_enterprise_connection: 'এই ডোমেন ইতিমধ্যে আপনার সংগঠনের SSO-এর জন্য ব্যবহৃত হচ্ছে',
     organization_membership_quota_exceeded: 'আপনি অপেক্ষিত আমন্ত্রণ সহ সংগঠনের সদস্যতার সীমায় পৌঁছে গেছেন।',
     organization_minimum_permissions_needed: 'অন্তত একজন সংগঠনের সদস্যের ন্যূনতম প্রয়োজনীয় অনুমতি থাকতে হবে।',
+    organization_not_found_or_unauthorized: undefined,
+    organization_not_found_or_unauthorized_with_create_organization_disabled: undefined,
     passkey_already_exists: 'এই ডিভাইসে ইতিমধ্যে একটি পাসকি নিবন্ধিত আছে।',
     passkey_not_supported: 'এই ডিভাইসে পাসকি সমর্থিত নয়।',
     passkey_pa_not_supported:

@@ -865,6 +865,8 @@ export const idID: LocalizationResource = {
       'Anda telah mencapai batas keanggotaan organisasi, termasuk undangan yang belum selesai.',
     organization_minimum_permissions_needed:
       'Harus ada setidaknya satu anggota organisasi dengan izin minimum yang diperlukan.',
+    organization_not_found_or_unauthorized: undefined,
+    organization_not_found_or_unauthorized_with_create_organization_disabled: undefined,
     passkey_already_exists: 'Passkey sudah terdaftar di perangkat ini.',
     passkey_not_supported: 'Passkey tidak didukung di perangkat ini.',
     passkey_pa_not_supported: 'Pendaftaran memerlukan platform autentikator tetapi perangkat tidak mendukungnya.',

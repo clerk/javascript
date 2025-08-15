@@ -858,6 +858,8 @@ export const trTR: LocalizationResource = {
     organization_membership_quota_exceeded: 'Organizasyon üye kotası aşıldı.',
     organization_minimum_permissions_needed:
       'Bu işlemi gerçekleştirmek için gerekli asgari izinlere sahip olmalısınız.',
+    organization_not_found_or_unauthorized: undefined,
+    organization_not_found_or_unauthorized_with_create_organization_disabled: undefined,
     passkey_already_exists: 'Bu hesaba zaten bir geçiş anahtarı bağlı.',
     passkey_not_supported: 'Geçiş anahtarları şu anda desteklenmiyor.',
     passkey_pa_not_supported: 'Bu platform için geçiş anahtarları desteklenmiyor.',

@@ -861,6 +861,8 @@ export const beBY: LocalizationResource = {
     organization_domain_exists_for_enterprise_connection: undefined,
     organization_membership_quota_exceeded: 'Квота ўдзельнікаў арганізацыі перавышана.',
     organization_minimum_permissions_needed: 'Патрабуюцца мінімальныя правы доступу.',
+    organization_not_found_or_unauthorized: undefined,
+    organization_not_found_or_unauthorized_with_create_organization_disabled: undefined,
     passkey_already_exists: 'Passkey ужо існуе. Калі ласка, выкарыстоўвайце іншы.',
     passkey_not_supported: 'Passkey не падтрымліваецца на гэтай платформе.',
     passkey_pa_not_supported: 'Passkey для гэтага прыкладання не падтрымліваецца.',

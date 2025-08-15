@@ -2,7 +2,7 @@ import { useOrganizationList } from '@clerk/shared/react';
 
 import { useTaskChooseOrganizationContext } from '@/ui/contexts/components/SessionTasks';
 import { localizationKeys } from '@/ui/customizables';
-import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { useCardState } from '@/ui/elements/contexts';
 import { Form } from '@/ui/elements/Form';
 import { FormButtonContainer } from '@/ui/elements/FormButtons';
 import { FormContainer } from '@/ui/elements/FormContainer';
@@ -17,7 +17,7 @@ type CreateOrganizationScreenProps = {
   onCancel?: () => void;
 };
 
-export const CreateOrganizationScreen = withCardStateProvider((props: CreateOrganizationScreenProps) => {
+export const CreateOrganizationScreen = (props: CreateOrganizationScreenProps) => {
   const card = useCardState();
   const { redirectUrlComplete } = useTaskChooseOrganizationContext();
   const { createOrganization, isLoaded, setActive } = useOrganizationList({
@@ -74,11 +74,8 @@ export const CreateOrganizationScreen = withCardStateProvider((props: CreateOrga
         <Header.Title localizationKey={localizationKeys('taskChooseOrganization.createOrganization.title')} />
         <Header.Subtitle localizationKey={localizationKeys('taskChooseOrganization.createOrganization.subtitle')} />
       </Header.Root>
-      <FormContainer>
-        <Form.Root
-          onSubmit={onSubmit}
-          sx={t => ({ padding: `${t.space.$none} ${t.space.$10} ${t.space.$8}` })}
-        >
+      <FormContainer sx={t => ({ padding: `${t.space.$none} ${t.space.$10} ${t.space.$8}` })}>
+        <Form.Root onSubmit={onSubmit}>
           <Form.ControlRow elementId={nameField.id}>
             <Form.PlainInput
               {...nameField.props}
@@ -115,4 +112,4 @@ export const CreateOrganizationScreen = withCardStateProvider((props: CreateOrga
       </FormContainer>
     </>
   );
-});
+};

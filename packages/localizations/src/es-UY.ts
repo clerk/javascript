@@ -867,6 +867,8 @@ export const esUY: LocalizationResource = {
       'Has alcanzado el límite de membresías en organizaciones, incluyendo invitaciones pendientes.',
     organization_minimum_permissions_needed:
       'Debe haber al menos un miembro de la organización con los permisos mínimos requeridos.',
+    organization_not_found_or_unauthorized: undefined,
+    organization_not_found_or_unauthorized_with_create_organization_disabled: undefined,
     passkey_already_exists: 'Ya hay una clave de acceso registrada en este dispositivo.',
     passkey_not_supported: 'Las claves de acceso no son compatibles con este dispositivo.',
     passkey_pa_not_supported: 'El registro requiere un autenticador de plataforma, pero el dispositivo no lo soporta.',

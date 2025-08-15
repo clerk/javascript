@@ -855,6 +855,8 @@ export const srRS: LocalizationResource = {
     organization_domain_exists_for_enterprise_connection: undefined,
     organization_membership_quota_exceeded: undefined,
     organization_minimum_permissions_needed: undefined,
+    organization_not_found_or_unauthorized: undefined,
+    organization_not_found_or_unauthorized_with_create_organization_disabled: undefined,
     passkey_already_exists: 'Ključ za prolaz je već registrovan sa ovim uređajem.',
     passkey_not_supported: 'Ključevi za prolaz nisu podržani na ovom uređaju.',
     passkey_pa_not_supported: 'Registracija zahteva platformski autentifikator, ali uređaj to ne podržava.',

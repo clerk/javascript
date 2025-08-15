@@ -861,6 +861,8 @@ export const hrHR: LocalizationResource = {
       'Dostigli ste ograničenje članstava u organizacijama, uključujući otvorene pozivnice.',
     organization_minimum_permissions_needed:
       'Mora postojati barem jedan član organizacije s minimalnim potrebnim dozvolama.',
+    organization_not_found_or_unauthorized: undefined,
+    organization_not_found_or_unauthorized_with_create_organization_disabled: undefined,
     passkey_already_exists: 'Pristupni ključ je već registriran na ovom uređaju.',
     passkey_not_supported: 'Pristupni ključevi nisu podržani na ovom uređaju.',
     passkey_pa_not_supported: 'Registracija zahtijeva platformski autentifikator, ali uređaj ga ne podržava.',
