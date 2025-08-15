@@ -557,21 +557,15 @@ export class Clerk implements ClerkInterface {
     const session = this.client.signedInSessions.find(s => s.id === opts.sessionId);
     const shouldSignOutCurrent = session?.id && this.session?.id === session.id;
 
-    await session?.remove();
-
-    if (this.client && this.client.signedInSessions.length > 0) {
-      const nextSession = this.client.signedInSessions[0];
-      if (nextSession) {
-        this.client.lastActiveSessionId = nextSession.id;
-        this.#setAccessors(nextSession);
-        this.#emit();
-      }
-    }
-
     if (shouldSignOutCurrent) {
-      await executeSignOut();
-      debugLogger.info('signOut() complete', { redirectUrl: stripOrigin(redirectUrl) }, 'clerk');
+      await session?.remove();
+
+      this.#setAccessors(null);
+      this.#emit();
+
+      await this.navigate(this.buildAfterMultiSessionSingleSignOutUrl());
     }
+    debugLogger.info('signOut() complete', { redirectUrl: this.buildAfterMultiSessionSingleSignOutUrl() }, 'clerk');
   };
 
   public openGoogleOneTap = (props?: GoogleOneTapProps): void => {
@@ -1580,7 +1574,7 @@ export class Clerk implements ClerkInterface {
         buildURL(
           {
             base: this.#options.signInUrl,
-            hashPath: 'choose',
+            pathname: '/choose',
           },
           { stringify: true },
         ),
