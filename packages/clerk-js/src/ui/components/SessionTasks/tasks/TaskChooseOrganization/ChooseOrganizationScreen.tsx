@@ -4,7 +4,7 @@ import type {
   OrganizationSuggestionResource,
   UserOrganizationInvitationResource,
 } from '@clerk/types';
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 
 import {
   OrganizationPreviewButton,
@@ -136,11 +136,9 @@ const InvitationPreview = (props: UserOrganizationInvitationResource) => {
   const card = useCardState();
   const { getOrganization } = useClerk();
   const [acceptedInvitation, setAcceptedInvitation] = useState<OrganizationResource | null>(null);
-  const { userInvitations, userMemberships } = useOrganizationList({
+  const { userInvitations } = useOrganizationList({
     userInvitations: organizationListParams.userInvitations,
-    userMemberships: organizationListParams.userMemberships,
   });
-  const organizationId = useRef('');
 
   const handleAccept = () => {
     return (
@@ -148,7 +146,6 @@ const InvitationPreview = (props: UserOrganizationInvitationResource) => {
         // When accepting an invitation we don't want to trigger a revalidation as this will cause a layout shift, prefer updating in place
         .runAsync(async () => {
           const updatedItem = await props.accept();
-          organizationId.current = updatedItem.publicOrganizationData.id;
 
           const organization = await getOrganization(props.publicOrganizationData.id);
           return [updatedItem, organization] as const;
@@ -161,12 +158,6 @@ const InvitationPreview = (props: UserOrganizationInvitationResource) => {
         .catch(err => handleError(err, [], card.setError))
     );
   };
-
-  // Temporary fix to not render duplicated invitations and memberships
-  const hasMembership = userMemberships.data?.some(membership => membership.organization.id === organizationId.current);
-  if (hasMembership) {
-    return null;
-  }
 
   if (acceptedInvitation) {
     return <MembershipPreview organization={acceptedInvitation} />;

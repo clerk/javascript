@@ -1,5 +1,5 @@
 import { useClerk, useSession, useUserContext } from '@clerk/shared/react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { useSignOutContext, withCoreSessionSwitchGuard } from '@/ui/contexts';
 import { descriptors, Flex, Flow, localizationKeys, Spinner } from '@/ui/customizables';
@@ -31,17 +31,6 @@ const TaskChooseOrganizationInternal = () => {
   const isLoading = userMemberships?.isLoading || userInvitations?.isLoading || userSuggestions?.isLoading;
   const hasExistingResources = !!(userMemberships?.count || userInvitations?.count || userSuggestions?.count);
   const identifier = user?.primaryEmailAddress?.emailAddress ?? user?.username;
-
-  // TODO (ORGS-784): Introduce architecture to invalidate SWR queries based on client piggybacking
-  // Revalidates organization memberships from client piggybacking
-  const hasUpdatedOnClient = user?.organizationMemberships?.length !== userMemberships.count;
-  useEffect(() => {
-    if (!hasUpdatedOnClient) {
-      return;
-    }
-
-    void userMemberships?.revalidate?.();
-  }, [hasUpdatedOnClient, userMemberships]);
 
   return (
     <Flow.Root flow='taskChooseOrganization'>
