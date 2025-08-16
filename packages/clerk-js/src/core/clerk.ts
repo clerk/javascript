@@ -24,6 +24,7 @@ import type {
   __internal_UserVerificationModalProps,
   APIKeysNamespace,
   APIKeysProps,
+  AuthenticateWithBaseAccountParams,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
@@ -2139,7 +2140,7 @@ export class Clerk implements ClerkInterface {
     });
   };
 
-  public authenticateWithBaseAccount = async (props: AuthenticateWithCoinbaseWalletParams = {}): Promise<void> => {
+  public authenticateWithBaseAccount = async (props: AuthenticateWithBaseAccountParams = {}): Promise<void> => {
     await this.authenticateWithWeb3({
       ...props,
       strategy: 'web3_base_account_signature',
