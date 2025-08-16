@@ -815,6 +815,11 @@ export interface Clerk {
   authenticateWithOKXWallet: (params?: AuthenticateWithOKXWalletParams) => Promise<unknown>;
 
   /**
+   * Authenticates user using Base Account SDK
+   */
+  authenticateWithBaseAccount: (params?: AuthenticateWithBaseAccountParams) => Promise<unknown>;
+
+  /**
    * Authenticates user using their Web3 Wallet browser extension
    */
   authenticateWithWeb3: (params: ClerkAuthenticateWithWeb3Params) => Promise<unknown>;
@@ -2177,6 +2182,14 @@ export interface AuthenticateWithOKXWalletParams {
 
 export interface AuthenticateWithGoogleOneTapParams {
   token: string;
+  legalAccepted?: boolean;
+}
+
+export interface AuthenticateWithBaseAccountParams {
+  customNavigate?: (to: string) => Promise<unknown>;
+  redirectUrl?: string;
+  signUpContinueUrl?: string;
+  unsafeMetadata?: SignUpUnsafeMetadata;
   legalAccepted?: boolean;
 }
 

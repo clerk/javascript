@@ -12,6 +12,7 @@ import type {
   APIKeysNamespace,
   APIKeysProps,
   AuthenticateWithCoinbaseWalletParams,
+  AuthenticateWithBaseAccountParams,
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
@@ -1347,6 +1348,15 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return callback() as Promise<void>;
     } else {
       this.premountMethodCalls.set('authenticateWithCoinbaseWallet', callback);
+    }
+  };
+
+  authenticateWithBaseAccount = async (params?: AuthenticateWithBaseAccountParams) => {
+    const callback = () => this.clerkjs?.authenticateWithBaseAccount(params);
+    if (this.clerkjs && this.loaded) {
+      return callback() as Promise<void>;
+    } else {
+      this.premountMethodCalls.set('authenticateWithBaseAccount', callback);
     }
   };
 

@@ -44,9 +44,11 @@ import type {
 
 import {
   generateSignatureWithCoinbaseWallet,
+  generateSignatureWithBaseAccount,
   generateSignatureWithMetamask,
   generateSignatureWithOKXWallet,
   getCoinbaseWalletIdentifier,
+  getBaseAccountIdentifier,
   getMetamaskIdentifier,
   getOKXWalletIdentifier,
   windowNavigate,
@@ -356,6 +358,15 @@ export class SignIn extends BaseResource implements SignInResource {
       identifier,
       generateSignature: generateSignatureWithCoinbaseWallet,
       strategy: 'web3_coinbase_wallet_signature',
+    });
+  };
+
+  public authenticateWithBaseAccount = async (): Promise<SignInResource> => {
+    const identifier = await getBaseAccountIdentifier();
+    return this.authenticateWithWeb3({
+      identifier,
+      generateSignature: generateSignatureWithBaseAccount,
+      strategy: 'web3_base_account_signature',
     });
   };
 
