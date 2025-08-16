@@ -100,6 +100,7 @@ import {
   disabledAPIKeysFeature,
   disabledOrganizationsFeature,
   errorThrower,
+  generateSignatureWithBaseAccount,
   generateSignatureWithCoinbaseWallet,
   generateSignatureWithMetamask,
   generateSignatureWithOKXWallet,
@@ -2138,6 +2139,13 @@ export class Clerk implements ClerkInterface {
     });
   };
 
+  public authenticateWithBaseAccount = async (props: AuthenticateWithCoinbaseWalletParams = {}): Promise<void> => {
+    await this.authenticateWithWeb3({
+      ...props,
+      strategy: 'web3_base_account_signature',
+    });
+  };
+
   public authenticateWithOKXWallet = async (props: AuthenticateWithOKXWalletParams = {}): Promise<void> => {
     await this.authenticateWithWeb3({
       ...props,
@@ -2165,9 +2173,11 @@ export class Clerk implements ClerkInterface {
     const generateSignature =
       provider === 'metamask'
         ? generateSignatureWithMetamask
-        : provider === 'coinbase_wallet'
-          ? generateSignatureWithCoinbaseWallet
-          : generateSignatureWithOKXWallet;
+        : strategy === 'web3_base_account_signature'
+          ? generateSignatureWithBaseAccount
+          : provider === 'coinbase_wallet'
+            ? generateSignatureWithCoinbaseWallet
+            : generateSignatureWithOKXWallet;
 
     const makeNavigate = (to: string) => () =>
       customNavigate && typeof customNavigate === 'function' ? customNavigate(to) : this.navigate(to);

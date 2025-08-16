@@ -58,6 +58,10 @@ export async function getOKXWalletIdentifier(): Promise<string> {
   return await getWeb3Identifier({ provider: 'okx_wallet' });
 }
 
+export async function getBaseAccountIdentifier(): Promise<string> {
+  return await getWeb3Identifier({ provider: 'base_account' });
+}
+
 type GenerateSignatureParams = {
   identifier: string;
   nonce: string;
@@ -75,6 +79,10 @@ export async function generateSignatureWithOKXWallet(params: GenerateSignaturePa
   return await generateWeb3Signature({ ...params, provider: 'okx_wallet' });
 }
 
+export async function generateSignatureWithBaseAccount(params: GenerateSignatureParams): Promise<string> {
+  return await generateWeb3Signature({ ...params, provider: 'base_account' });
+}
+
 async function getEthereumProvider(provider: Web3Provider) {
   if (provider === 'coinbase_wallet') {
     if (__BUILD_DISABLE_RHC__) {
@@ -89,6 +97,17 @@ async function getEthereumProvider(provider: Web3Provider) {
       },
     });
     return sdk.getProvider();
+  }
+  if (provider === 'base_account') {
+    try {
+      const { createBaseAccountSDK } = await import('@base-org/account');
+      const sdk = createBaseAccountSDK({
+        appName: typeof document !== 'undefined' ? document.title || 'Clerk' : 'Clerk',
+      });
+      return sdk.getProvider();
+    } catch (e) {
+      return null;
+    }
   }
 
   const injectedWeb3Providers = getInjectedWeb3Providers();

@@ -9,8 +9,13 @@ export interface Web3ProviderData {
 export type MetamaskWeb3Provider = 'metamask';
 export type CoinbaseWalletWeb3Provider = 'coinbase_wallet';
 export type OKXWalletWeb3Provider = 'okx_wallet';
+export type BaseAccountWeb3Provider = 'base_account';
 
-export type Web3Provider = MetamaskWeb3Provider | CoinbaseWalletWeb3Provider | OKXWalletWeb3Provider;
+export type Web3Provider =
+  | MetamaskWeb3Provider
+  | BaseAccountWeb3Provider
+  | CoinbaseWalletWeb3Provider
+  | OKXWalletWeb3Provider;
 
 /**
  * @deprecated Use `import { WEB3_PROVIDERS } from "@clerk/shared/web3"` instead.
@@ -22,6 +27,11 @@ export const WEB3_PROVIDERS: Web3ProviderData[] = [
     provider: 'metamask',
     strategy: 'web3_metamask_signature',
     name: 'MetaMask',
+  },
+  {
+    provider: 'base_account',
+    strategy: 'web3_base_account_signature',
+    name: 'Base Account',
   },
   {
     provider: 'coinbase_wallet',
