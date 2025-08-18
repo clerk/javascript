@@ -3,6 +3,7 @@ import type { Errors } from '@clerk/types';
 import { computed, signal } from 'alien-signals';
 
 import type { SignIn } from './resources/SignIn';
+import type { SignUp } from './resources/SignUp';
 
 export const signInResourceSignal = signal<{ resource: SignIn | null }>({ resource: null });
 export const signInErrorSignal = signal<{ error: unknown }>({ error: null });
@@ -16,6 +17,20 @@ export const signInComputedSignal = computed(() => {
   const errors = errorsToParsedErrors(error);
 
   return { errors, fetchStatus, signIn: signIn ? signIn.__internal_future : null };
+});
+
+export const signUpResourceSignal = signal<{ resource: SignUp | null }>({ resource: null });
+export const signUpErrorSignal = signal<{ error: unknown }>({ error: null });
+export const signUpFetchSignal = signal<{ status: 'idle' | 'fetching' }>({ status: 'idle' });
+
+export const signUpComputedSignal = computed(() => {
+  const signUp = signUpResourceSignal().resource;
+  const error = signUpErrorSignal().error;
+  const fetchStatus = signUpFetchSignal().status;
+
+  const errors = errorsToParsedErrors(error);
+
+  return { errors, fetchStatus, signUp: signUp ? signUp.__internal_future : null };
 });
 
 /**

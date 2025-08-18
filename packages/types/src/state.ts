@@ -1,4 +1,5 @@
 import type { SignInFutureResource } from './signIn';
+import type { SignUpFutureResource } from './signUp';
 
 interface FieldError {
   code: string;
@@ -34,6 +35,17 @@ export interface State {
       errors: Errors;
       fetchStatus: 'idle' | 'fetching';
       signIn: SignInFutureResource | null;
+    };
+  };
+
+  /**
+   * A Signal that updates when the underlying `SignUp` resource changes, including errors.
+   */
+  signUpSignal: {
+    (): {
+      errors: Errors;
+      fetchStatus: 'idle' | 'fetching';
+      signUp: SignUpFutureResource | null;
     };
   };
 
