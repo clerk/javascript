@@ -24,6 +24,8 @@ test.describe('switching instances on localhost same port @localhost', () => {
   });
 
   test('apps can be used without clearing the cookies after instance switch', async ({ context }) => {
+    test.setTimeout(90_000); // Wait for app to be ready
+
     // We need both apps to run on the same port
     const port = await getPort();
     // Create app and user for the 1st app
