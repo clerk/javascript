@@ -14,7 +14,9 @@ import { SignInStart } from '../SignInStart';
 const { createFixtures } = bindCreateFixtures('SignIn');
 
 describe('SignInStart', () => {
-  const originalWindow = window;
+  const originalGetComputedStyle = window.getComputedStyle;
+  const originalLocation = window.location;
+  const originalHistory = window.history;
   const mockGetComputedStyle = jest.fn();
 
   beforeEach(() => {
@@ -28,14 +30,26 @@ describe('SignInStart', () => {
     Object.defineProperty(window, 'getComputedStyle', {
       value: mockGetComputedStyle,
       writable: true,
+      configurable: true,
     });
   });
 
   afterEach(() => {
-    // Restore window
-    Object.defineProperty(global, 'window', {
-      value: originalWindow,
+    // Restore patched globals
+    Object.defineProperty(window, 'getComputedStyle', {
+      value: originalGetComputedStyle,
       writable: true,
+      configurable: true,
+    });
+    Object.defineProperty(window, 'location', {
+      value: originalLocation,
+      writable: true,
+      configurable: true,
+    });
+    Object.defineProperty(window, 'history', {
+      value: originalHistory,
+      writable: true,
+      configurable: true,
     });
   });
 
