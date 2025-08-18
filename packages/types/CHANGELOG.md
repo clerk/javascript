@@ -1,5 +1,15 @@
 # Change Log
 
+## 4.79.0
+
+### Minor Changes
+
+- [Experimental] Signal `fetchStatus` support. ([#6549](https://github.com/clerk/javascript/pull/6549)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Add error handling for `setActive` with stale organization data ([#6550](https://github.com/clerk/javascript/pull/6550)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
 ## 4.78.0
 
 ### Minor Changes

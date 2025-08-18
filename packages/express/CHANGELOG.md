@@ -1,5 +1,14 @@
 # Change Log
 
+## 1.7.22
+
+### Patch Changes
+
+- Updated dependencies [[`413468c`](https://github.com/clerk/javascript/commit/413468c9b9c8fb7576f8e4cbdccff98784e33fef), [`7b7eb1f`](https://github.com/clerk/javascript/commit/7b7eb1fc0235249c5c179239078294118f2947cd)]:
+  - @clerk/shared@3.21.1
+  - @clerk/types@4.79.0
+  - @clerk/backend@2.9.2
+
 ## 1.7.21
 
 ### Patch Changes
