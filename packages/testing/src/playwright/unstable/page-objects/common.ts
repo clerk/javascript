@@ -14,10 +14,15 @@ export const common = ({ page }: { page: EnhancedPage }) => {
     setPasswordConfirmation: (val: string) => {
       return page.locator('input[name=confirmPassword]').fill(val);
     },
-    enterOtpCode: async (code: string) => {
-      await page.getByLabel('Enter verification code').click();
-      // We've got a delay here to ensure the prepare call is triggered before the OTP is auto-submitted.
-      await page.keyboard.type(code, { delay: 100 });
+    enterOtpCode: async (code: string, opts?: { name?: string }) => {
+      const { name = 'Enter verification code' } = opts ?? {};
+
+      const prepareVerificationPromise = page.waitForResponse('**/v1/client/sign_ups/*/prepare_verification**');
+      const attemptVerificationPromise = page.waitForResponse('**/v1/client/sign_ups/*/attempt_verification**');
+
+      await prepareVerificationPromise;
+      await page.getByLabel(name).fill(code);
+      await attemptVerificationPromise;
     },
     enterTestOtpCode: async () => {
       return self.enterOtpCode('424242');
@@ -25,7 +30,7 @@ export const common = ({ page }: { page: EnhancedPage }) => {
     // It's recommended to use .fill instead of .type
     // @see https://playwright.dev/docs/api/class-keyboard#keyboard-type
     fillTestOtpCode: async (name: string) => {
-      return page.getByRole('textbox', { name: name }).fill('424242');
+      return self.enterOtpCode('424242', { name });
     },
     getIdentifierInput: () => {
       return page.locator('input[name=identifier]');
