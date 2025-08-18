@@ -10,11 +10,13 @@ export const events = {
   SessionTokenResolved: 'session:tokenResolved',
   ResourceUpdate: 'resource:update',
   ResourceError: 'resource:error',
+  ResourceFetch: 'resource:fetch',
 } as const;
 
 type TokenUpdatePayload = { token: TokenResource | null };
 export type ResourceUpdatePayload = { resource: BaseResource };
 export type ResourceErrorPayload = { resource: BaseResource; error: unknown };
+export type ResourceFetchPayload = { resource: BaseResource; status: 'idle' | 'fetching' };
 
 type InternalEvents = {
   [events.TokenUpdate]: TokenUpdatePayload;
@@ -23,6 +25,7 @@ type InternalEvents = {
   [events.SessionTokenResolved]: null;
   [events.ResourceUpdate]: ResourceUpdatePayload;
   [events.ResourceError]: ResourceErrorPayload;
+  [events.ResourceFetch]: ResourceFetchPayload;
 };
 
 export const eventBus = createEventBus<InternalEvents>();
