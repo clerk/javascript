@@ -32,6 +32,7 @@ export interface State {
   signInSignal: {
     (): {
       errors: Errors;
+      fetchStatus: 'idle' | 'fetching';
       signIn: SignInFutureResource | null;
     };
   };
