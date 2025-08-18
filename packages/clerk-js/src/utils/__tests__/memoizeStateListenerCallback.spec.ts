@@ -1,42 +1,24 @@
 // TODO: jest fails because of a circular dependency on Client -> Base -> Client
 // This circular dep is a known issue we plan to address soon. Enable the tests then
-import { describe, it } from 'vitest';
 
-describe.skip('memoizeStateListenerCallback', () => {
-  it.skip('runs', () => {
-    // TODO
+import { describe, it, expect, vi } from 'vitest';
+import { memoizeListenerCallback } from '../memoizeStateListenerCallback';
+
+describe('memoizeStateListenerCallback', () => {
+  it('returns same user ref if user obj state has not changed', () => {
+    // Mock user objects (simulate same user, different object refs)
+    const user1 = { id: 'u1', updatedAt: new Date(1), firstName: 'clerk', organizationMemberships: [] };
+    const user2 = { id: 'u1', updatedAt: new Date(1), firstName: 'clerk', organizationMemberships: [] };
+
+    let calledWith: any;
+    const listener = memoizeListenerCallback(
+      vi.fn((e: any) => {
+        calledWith = e.user;
+      }),
+    );
+
+    listener({ user: user1 });
+    listener({ user: user2 });
+    expect(calledWith).toStrictEqual(user1);
   });
 });
-
-// import { Resources, UserJSON } from '@clerk/types';
-//
-// const frontEndApi = '';
-// const path = '';
-//
-// describe('memoizeStateListenerCallback', () => {
-//   it('returns same user ref if user obj state has not changed', () => {
-//     const user1 = new User(frontEndApi, path, {
-//       id: 'u1',
-//       updated_at: 1,
-//       first_name: 'clerk',
-//     } as UserJSON);
-//
-//     const user2 = new User(frontEndApi, path, {
-//       id: 'u1',
-//       updated_at: 1,
-//       first_name: 'clerk',
-//     } as UserJSON);
-//
-//     let calledWith: any;
-//     const listener = memoizeListenerCallback(
-//       jest.fn((e: Resources) => {
-//         console.log(e);
-//         calledWith = e.user;
-//       }),
-//     );
-//
-//     listener(({ user: user1 } as any) as Resources);
-//     listener(({ user: user2 } as any) as Resources);
-//     expect(calledWith).toBe(user1);
-//   });
-// });
