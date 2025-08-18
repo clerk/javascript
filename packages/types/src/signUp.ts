@@ -118,6 +118,10 @@ export interface SignUpResource extends ClerkResource {
   __internal_toSnapshot: () => SignUpJSONSnapshot;
 }
 
+export interface SignUpFutureResource {
+  status: SignUpStatus | null;
+}
+
 export type SignUpStatus = 'missing_requirements' | 'complete' | 'abandoned';
 
 export type SignUpField = SignUpAttributeField | SignUpIdentificationField;
