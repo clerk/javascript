@@ -41,6 +41,7 @@ import { _authenticateWithPopup } from '../../utils/authenticateWithPopup';
 import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
 import { createValidatePassword } from '../../utils/passwords/password';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
+import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
 import {
   clerkInvalidFAPIResponse,
   clerkMissingOptionError,
@@ -49,7 +50,6 @@ import {
 } from '../errors';
 import { eventBus } from '../events';
 import { BaseResource, ClerkRuntimeError, SignUpVerifications } from './internal';
-import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
 
 declare global {
   interface Window {
