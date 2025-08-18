@@ -1,5 +1,12 @@
 import type { EnhancedPage } from './app';
 
+type EnterOtpCodeOptions = {
+  name?: string;
+  awaitRequests?: boolean;
+  awaitPrepare?: boolean;
+  awaitAttempt?: boolean;
+};
+
 export const common = ({ page }: { page: EnhancedPage }) => {
   const self = {
     continue: () => {
@@ -14,23 +21,40 @@ export const common = ({ page }: { page: EnhancedPage }) => {
     setPasswordConfirmation: (val: string) => {
       return page.locator('input[name=confirmPassword]').fill(val);
     },
-    enterOtpCode: async (code: string, opts?: { name?: string }) => {
-      const { name = 'Enter verification code' } = opts ?? {};
+    enterOtpCode: async (code: string, opts?: EnterOtpCodeOptions) => {
+      const {
+        name = 'Enter verification code',
+        awaitAttempt = true,
+        awaitPrepare = true,
+        awaitRequests = true,
+      } = opts ?? {};
 
-      const prepareVerificationPromise = page.waitForResponse('**/v1/client/sign_ups/*/prepare_verification**');
-      const attemptVerificationPromise = page.waitForResponse('**/v1/client/sign_ups/*/attempt_verification**');
+      if (awaitRequests && awaitPrepare) {
+        const prepareVerificationPromise = page.waitForResponse(
+          response =>
+            response.request().method() === 'POST' &&
+            (response.url().includes('prepare_verification') || response.url().includes('prepare_first_factor')),
+        );
+        await prepareVerificationPromise;
+      }
 
-      await prepareVerificationPromise;
       await page.getByLabel(name).fill(code);
-      await attemptVerificationPromise;
+
+      if (awaitRequests && awaitAttempt) {
+        const attemptVerificationPromise = page.waitForResponse(
+          response =>
+            response.request().method() === 'POST' &&
+            (response.url().includes('attempt_verification') || response.url().includes('attempt_first_factor')),
+        );
+        await attemptVerificationPromise;
+      }
     },
-    enterTestOtpCode: async () => {
-      return self.enterOtpCode('424242');
+    enterTestOtpCode: async (opts?: EnterOtpCodeOptions) => {
+      return self.enterOtpCode('424242', opts);
     },
-    // It's recommended to use .fill instead of .type
-    // @see https://playwright.dev/docs/api/class-keyboard#keyboard-type
-    fillTestOtpCode: async (name: string) => {
-      return self.enterOtpCode('424242', { name });
+    // @deprecated Use .enterTestOtpCode({ name: '...' }) instead
+    fillTestOtpCode: async (name: string, opts?: Omit<EnterOtpCodeOptions, 'name'>) => {
+      return self.enterOtpCode('424242', { name, ...opts });
     },
     getIdentifierInput: () => {
       return page.locator('input[name=identifier]');
