@@ -1186,7 +1186,7 @@ describe('SubscriptionDetails', () => {
       ],
     });
 
-    const { getByRole, getByText, getAllByText, userEvent } = render(
+    const { getByRole, getByText, userEvent } = render(
       <Drawer.Root
         open
         onOpenChange={() => {}}
