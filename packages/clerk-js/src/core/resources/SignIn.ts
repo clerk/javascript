@@ -16,6 +16,7 @@ import type {
   EmailCodeConfig,
   EmailLinkConfig,
   EnterpriseSSOConfig,
+  OAuthStrategy,
   PassKeyConfig,
   PasskeyFactor,
   PhoneCodeConfig,
@@ -25,8 +26,10 @@ import type {
   ResetPasswordParams,
   ResetPasswordPhoneCodeFactorConfig,
   SamlConfig,
+  SetActiveNavigate,
   SignInCreateParams,
   SignInFirstFactor,
+  SignInFutureResource,
   SignInIdentifier,
   SignInJSON,
   SignInJSONSnapshot,
@@ -56,6 +59,7 @@ import {
   webAuthnGetCredential as webAuthnGetCredentialOnWindow,
 } from '../../utils/passkeys';
 import { createValidatePassword } from '../../utils/passwords/password';
+import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
 import {
   clerkInvalidFAPIResponse,
   clerkInvalidStrategy,
@@ -65,6 +69,7 @@ import {
   clerkVerifyPasskeyCalledBeforeCreate,
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from '../errors';
+import { eventBus } from '../events';
 import { BaseResource, UserData, Verification } from './internal';
 
 export class SignIn extends BaseResource implements SignInResource {
@@ -80,6 +85,21 @@ export class SignIn extends BaseResource implements SignInResource {
   identifier: string | null = null;
   createdSessionId: string | null = null;
   userData: UserData = new UserData(null);
+
+  /**
+   * @experimental This experimental API is subject to change.
+   *
+   * An instance of `SignInFuture`, which has a different API than `SignIn`, intended to be used in custom flows.
+   */
+  __internal_future: SignInFuture | null = new SignInFuture(this);
+
+  /**
+   * @internal Only used for internal purposes, and is not intended to be used directly.
+   *
+   * This property is used to provide access to underlying Client methods to `SignInFuture`, which wraps an instance
+   * of `SignIn`.
+   */
+  __internal_basePost = this._basePost.bind(this);
 
   constructor(data: SignInJSON | SignInJSONSnapshot | null = null) {
     super();
@@ -231,22 +251,16 @@ export class SignIn extends BaseResource implements SignInResource {
     params: AuthenticateWithRedirectParams,
     navigateCallback: (url: URL | string) => void,
   ): Promise<void> => {
-    const { strategy, redirectUrl, redirectUrlComplete, identifier, oidcPrompt, continueSignIn } = params || {};
+    const { strategy, redirectUrlComplete, identifier, oidcPrompt, continueSignIn } = params || {};
+    const actionCompleteRedirectUrl = redirectUrlComplete;
 
-    const redirectUrlWithAuthToken = SignIn.clerk.buildUrlWithAuth(redirectUrl);
-
-    // When after-auth is enabled, redirect to SSO callback route.
-    // This ensures organization selection tasks are displayed after sign-in,
-    // rather than redirecting to potentially unprotected pages while the session is pending.
-    const actionCompleteRedirectUrl = SignIn.clerk.__internal_hasAfterAuthFlows
-      ? redirectUrlWithAuthToken
-      : redirectUrlComplete;
+    const redirectUrl = SignIn.clerk.buildUrlWithAuth(params.redirectUrl);
 
     if (!this.id || !continueSignIn) {
       await this.create({
         strategy,
         identifier,
-        redirectUrl: redirectUrlWithAuthToken,
+        redirectUrl,
         actionCompleteRedirectUrl,
       });
     }
@@ -254,7 +268,7 @@ export class SignIn extends BaseResource implements SignInResource {
     if (strategy === 'saml' || strategy === 'enterprise_sso') {
       await this.prepareFirstFactor({
         strategy,
-        redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectUrl),
+        redirectUrl,
         actionCompleteRedirectUrl,
         oidcPrompt,
       });
@@ -447,6 +461,8 @@ export class SignIn extends BaseResource implements SignInResource {
       this.createdSessionId = data.created_session_id;
       this.userData = new UserData(data.user_data);
     }
+
+    eventBus.emit('resource:update', { resource: this });
     return this;
   }
 
@@ -464,5 +480,171 @@ export class SignIn extends BaseResource implements SignInResource {
       created_session_id: this.createdSessionId,
       user_data: this.userData.__internal_toSnapshot(),
     };
+  }
+}
+
+class SignInFuture implements SignInFutureResource {
+  emailCode = {
+    sendCode: this.sendEmailCode.bind(this),
+    verifyCode: this.verifyEmailCode.bind(this),
+  };
+
+  resetPasswordEmailCode = {
+    sendCode: this.sendResetPasswordEmailCode.bind(this),
+    verifyCode: this.verifyResetPasswordEmailCode.bind(this),
+    submitPassword: this.submitResetPassword.bind(this),
+  };
+
+  constructor(readonly resource: SignIn) {}
+
+  get status() {
+    return this.resource.status;
+  }
+
+  get availableStrategies() {
+    return this.resource.supportedFirstFactors ?? [];
+  }
+
+  async sendResetPasswordEmailCode(): Promise<{ error: unknown }> {
+    return runAsyncResourceTask(this.resource, async () => {
+      if (!this.resource.id) {
+        throw new Error('Cannot reset password without a sign in.');
+      }
+
+      const resetPasswordEmailCodeFactor = this.resource.supportedFirstFactors?.find(
+        f => f.strategy === 'reset_password_email_code',
+      );
+
+      if (!resetPasswordEmailCodeFactor) {
+        throw new Error('Reset password email code factor not found');
+      }
+
+      const { emailAddressId } = resetPasswordEmailCodeFactor;
+      await this.resource.__internal_basePost({
+        body: { emailAddressId, strategy: 'reset_password_email_code' },
+        action: 'prepare_first_factor',
+      });
+    });
+  }
+
+  async verifyResetPasswordEmailCode({ code }: { code: string }): Promise<{ error: unknown }> {
+    return runAsyncResourceTask(this.resource, async () => {
+      await this.resource.__internal_basePost({
+        body: { code, strategy: 'reset_password_email_code' },
+        action: 'attempt_first_factor',
+      });
+    });
+  }
+
+  async submitResetPassword({
+    password,
+    signOutOfOtherSessions = true,
+  }: {
+    password: string;
+    signOutOfOtherSessions?: boolean;
+  }): Promise<{ error: unknown }> {
+    return runAsyncResourceTask(this.resource, async () => {
+      await this.resource.__internal_basePost({
+        body: { password, signOutOfOtherSessions },
+        action: 'reset_password',
+      });
+    });
+  }
+
+  async create(params: {
+    identifier?: string;
+    strategy?: OAuthStrategy | 'saml' | 'enterprise_sso';
+    redirectUrl?: string;
+    actionCompleteRedirectUrl?: string;
+  }): Promise<{ error: unknown }> {
+    return runAsyncResourceTask(this.resource, async () => {
+      await this.resource.__internal_basePost({
+        path: this.resource.pathRoot,
+        body: params,
+      });
+    });
+  }
+
+  async password({ identifier, password }: { identifier?: string; password: string }): Promise<{ error: unknown }> {
+    return runAsyncResourceTask(this.resource, async () => {
+      const previousIdentifier = this.resource.identifier;
+      await this.resource.__internal_basePost({
+        path: this.resource.pathRoot,
+        body: { identifier: identifier || previousIdentifier, password },
+      });
+    });
+  }
+
+  async sendEmailCode({ email }: { email: string }): Promise<{ error: unknown }> {
+    return runAsyncResourceTask(this.resource, async () => {
+      if (!this.resource.id) {
+        await this.create({ identifier: email });
+      }
+
+      const emailCodeFactor = this.resource.supportedFirstFactors?.find(f => f.strategy === 'email_code');
+
+      if (!emailCodeFactor) {
+        throw new Error('Email code factor not found');
+      }
+
+      const { emailAddressId } = emailCodeFactor;
+      await this.resource.__internal_basePost({
+        body: { emailAddressId, strategy: 'email_code' },
+        action: 'prepare_first_factor',
+      });
+    });
+  }
+
+  async verifyEmailCode({ code }: { code: string }): Promise<{ error: unknown }> {
+    return runAsyncResourceTask(this.resource, async () => {
+      await this.resource.__internal_basePost({
+        body: { code, strategy: 'email_code' },
+        action: 'attempt_first_factor',
+      });
+    });
+  }
+
+  async sso({
+    flow = 'auto',
+    strategy,
+    redirectUrl,
+    redirectUrlComplete,
+  }: {
+    flow?: 'auto' | 'modal';
+    strategy: OAuthStrategy | 'saml' | 'enterprise_sso';
+    redirectUrl: string;
+    redirectUrlComplete: string;
+  }): Promise<{ error: unknown }> {
+    return runAsyncResourceTask(this.resource, async () => {
+      if (flow !== 'auto') {
+        throw new Error('modal flow is not supported yet');
+      }
+
+      const redirectUrlWithAuthToken = SignIn.clerk.buildUrlWithAuth(redirectUrl);
+
+      if (!this.resource.id) {
+        await this.create({
+          strategy,
+          redirectUrl: redirectUrlWithAuthToken,
+          actionCompleteRedirectUrl: redirectUrlComplete,
+        });
+      }
+
+      const { status, externalVerificationRedirectURL } = this.resource.firstFactorVerification;
+
+      if (status === 'unverified' && externalVerificationRedirectURL) {
+        windowNavigate(externalVerificationRedirectURL);
+      }
+    });
+  }
+
+  async finalize({ navigate }: { navigate?: SetActiveNavigate }): Promise<{ error: unknown }> {
+    return runAsyncResourceTask(this.resource, async () => {
+      if (!this.resource.createdSessionId) {
+        throw new Error('Cannot finalize sign-in without a created session.');
+      }
+
+      await SignIn.clerk.setActive({ session: this.resource.createdSessionId, navigate });
+    });
   }
 }

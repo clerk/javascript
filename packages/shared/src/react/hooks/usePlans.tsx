@@ -11,7 +11,10 @@ export const usePlans = createCommercePaginatedHook<CommercePlanResource, GetPla
   resourceType: 'commerce-plans',
   useFetcher: _for => {
     const clerk = useClerkInstanceContext();
-    return params => clerk.billing.getPlans({ ...params, for: _for === 'organization' ? 'org' : 'user' });
+    return ({ orgId, ...rest }) => {
+      // Cleanup `orgId` from the params
+      return clerk.billing.getPlans({ ...rest, for: _for });
+    };
   },
   options: {
     unauthenticated: true,

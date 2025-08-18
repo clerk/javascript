@@ -54,6 +54,7 @@ export const teIN: LocalizationResource = {
   badge__default: 'డిఫాల్ట్',
   badge__endsAt: undefined,
   badge__expired: 'గడువు ముగిసింది',
+  badge__freeTrial: undefined,
   badge__otherImpersonatorDevice: 'ఇతర నకిలీ పరికరం',
   badge__pastDueAt: undefined,
   badge__pastDuePlan: undefined,
@@ -62,6 +63,7 @@ export const teIN: LocalizationResource = {
   badge__requiresAction: 'చర్య అవసరం',
   badge__startsAt: undefined,
   badge__thisDevice: 'ఈ పరికరం',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'ధృవీకరించబడలేదు',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'వినియోగదారు పరికరం',
@@ -88,6 +90,7 @@ export const teIN: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
+        title__freeTrialEndsAt: undefined,
         title__paymentMethod: undefined,
         title__statementId: undefined,
         title__subscriptionBegins: undefined,
@@ -98,6 +101,8 @@ export const teIN: LocalizationResource = {
       title: undefined,
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
+      title__trialSuccess: undefined,
+      totalDueAfterTrial: undefined,
     },
     credit: undefined,
     creditRemainder: undefined,
@@ -133,6 +138,8 @@ export const teIN: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
+    startFreeTrial__days: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,
@@ -154,6 +161,7 @@ export const teIN: LocalizationResource = {
     totalDue: undefined,
     totalDueToday: undefined,
     viewFeatures: undefined,
+    viewPayment: undefined,
     year: undefined,
   },
   createOrganization: {
@@ -794,6 +802,26 @@ export const teIN: LocalizationResource = {
   },
   socialButtonsBlockButton: '{{provider|titleize}}తో కొనసాగించండి',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ఇప్పటికే సంస్థ సభ్యుడు.',
     captcha_invalid:
@@ -812,6 +840,9 @@ export const teIN: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'చివరి పేరు 256 అక్షరాలను మించకూడదు.',
     form_param_max_length_exceeded__name: 'పేరు 256 అక్షరాలను మించకూడదు.',
     form_param_nil: 'ఈ ఫీల్డ్ అవసరం మరియు ఖాళీగా ఉండకూడదు.',
+    form_param_type_invalid: undefined,
+    form_param_type_invalid__email_address: undefined,
+    form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'నమోదు చేసిన విలువ చెల్లనిది. దయచేసి దిద్దుబాటు చేయండి.',
     form_password_incorrect: 'మీరు నమోదు చేసిన పాస్‌వర్డ్ తప్పు. దయచేసి మళ్ళీ ప్రయత్నించండి.',
     form_password_length_too_short: 'మీ పాస్‌వర్డ్ చాలా చిన్నది. ఇది కనీసం 8 అక్షరాల పొడవు ఉండాలి.',
@@ -835,6 +866,8 @@ export const teIN: LocalizationResource = {
     organization_membership_quota_exceeded:
       'మీరు మీ సంస్థ సభ్యత్వాలను, పెండింగ్ ఆహ్వానాలతో సహా పరిమితిని చేరుకున్నారు.',
     organization_minimum_permissions_needed: 'కనీస అవసరమైన అనుమతులు కలిగిన కనీసం ఒక సంస్థ సభ్యుడు ఉండాలి.',
+    organization_not_found_or_unauthorized: undefined,
+    organization_not_found_or_unauthorized_with_create_organization_disabled: undefined,
     passkey_already_exists: 'ఈ పరికరంతో పాస్‌కీ ఇప్పటికే నమోదు చేయబడింది.',
     passkey_not_supported: 'పాస్‌కీలు ఈ పరికరంలో మద్దతు లేవు.',
     passkey_pa_not_supported: 'నమోదు కోసం ప్లాట్‌ఫామ్ ప్రమాణీకరణకర్త అవసరం కానీ పరికరం దానికి మద్దతు ఇవ్వదు.',

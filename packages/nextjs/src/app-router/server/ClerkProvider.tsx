@@ -69,6 +69,15 @@ export async function ClerkProvider(
 
   let output: ReactNode;
 
+  try {
+    const detectKeylessEnvDrift = await import('../../server/keyless-telemetry.js').then(
+      mod => mod.detectKeylessEnvDrift,
+    );
+    await detectKeylessEnvDrift();
+  } catch {
+    // ignore
+  }
+
   if (shouldRunAsKeyless) {
     output = (
       <KeylessProvider

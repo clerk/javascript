@@ -1,5 +1,173 @@
 # Change Log
 
+## 4.79.0
+
+### Minor Changes
+
+- [Experimental] Signal `fetchStatus` support. ([#6549](https://github.com/clerk/javascript/pull/6549)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Add error handling for `setActive` with stale organization data ([#6550](https://github.com/clerk/javascript/pull/6550)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+## 4.78.0
+
+### Minor Changes
+
+- [Experimental] Signals: Add support for calling `signIn.password()` without an identifier. ([#6534](https://github.com/clerk/javascript/pull/6534)) by [@dstaley](https://github.com/dstaley)
+
+## 4.77.0
+
+### Minor Changes
+
+- Add `navigate` parameter to `clerk.setActive()` for custom navigation before the session and/or organization is set. ([#6486](https://github.com/clerk/javascript/pull/6486)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  It's useful for handling pending session tasks for after-auth flows:
+
+  ```typescript
+  await clerk.setActive({
+    session,
+    navigate: async ({ session }) => {
+      const currentTask = session.currentTask;
+      if (currentTask) {
+        await router.push(`/onboarding/${currentTask.key}`);
+        return;
+      }
+
+      await router.push('/dashboard');
+    },
+  });
+  ```
+
+### Patch Changes
+
+- Introduce debugLogger for internal debugging support ([#6452](https://github.com/clerk/javascript/pull/6452)) by [@jacekradko](https://github.com/jacekradko)
+
+## 4.76.0
+
+### Minor Changes
+
+- [Billing Beta] Replace usage of top level amounts in plan with fees for displaying prices. ([#6490](https://github.com/clerk/javascript/pull/6490)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add support for trials in `<Checkout/>` ([#6494](https://github.com/clerk/javascript/pull/6494)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Added `freeTrialEndsAt` property to `CommerceCheckoutResource` interface.
+
+- Update billing resources with trial properties. ([#6492](https://github.com/clerk/javascript/pull/6492)) by [@panteliselef](https://github.com/panteliselef)
+
+- Update PricingTable with trial info. ([#6493](https://github.com/clerk/javascript/pull/6493)) by [@panteliselef](https://github.com/panteliselef)
+
+- [Experimental] Signals reset password flow ([#6520](https://github.com/clerk/javascript/pull/6520)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Convert LocalizationResource to interface for typedoc documentation ([#6531](https://github.com/clerk/javascript/pull/6531)) by [@NWylynko](https://github.com/NWylynko)
+
+- Add optional `isExternal` to `ApplicationLogo` ([#6447](https://github.com/clerk/javascript/pull/6447)) by [@jfoshee](https://github.com/jfoshee)
+
+  Add optional `oAuthApplicationUrl` parameter to OAuth Consent mounting (which is used to provide a link to the OAuth App homepage).
+
+  Harden `Link` component so it sanitizes the given `href` to avoid dangerous protocols.
+
+## 4.75.0
+
+### Minor Changes
+
+- [Billing Beta] Cleanup naming inconsistencies in billing dates. ([#6513](https://github.com/clerk/javascript/pull/6513)) by [@panteliselef](https://github.com/panteliselef)
+
+  ## Migration
+
+  - subscriptionItem.periodStartDate → subscriptionItem.periodStart
+  - subscriptionItem.periodEndDate → subscriptionItem.periodEnd
+  - subscriptionItem.canceledAtDate → subscriptionItem.canceledAt
+
+- [Experimental] Signal Errors ([#6495](https://github.com/clerk/javascript/pull/6495)) by [@dstaley](https://github.com/dstaley)
+
+- Remove `treatPendingAsSignedOut` from Clerk options ([#6497](https://github.com/clerk/javascript/pull/6497)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Add `legalAcceptedAt` to UserResource accessible by `Clerk.user` and `useUser()`. ([#6517](https://github.com/clerk/javascript/pull/6517)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
+## 4.74.0
+
+### Minor Changes
+
+- [Billing Beta] Update `PlanDetailsProps` to reflect that either `planId` or `plan` is allowed. ([#6472](https://github.com/clerk/javascript/pull/6472)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Introduce `TaskChooseOrganization` component which replaces `TaskSelectOrganization` with a new UI that make the experience similar to the previous `SignIn` and `SignUp` steps ([#6446](https://github.com/clerk/javascript/pull/6446)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- [Experimental] Signals ([#6450](https://github.com/clerk/javascript/pull/6450)) by [@dstaley](https://github.com/dstaley)
+
+- Rename task key from `select-organization` to `choose-organization` ([#6482](https://github.com/clerk/javascript/pull/6482)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+## 4.73.0
+
+### Minor Changes
+
+- [Billing Beta] Update checkout.status type to be `'needs_confirmation' | 'completed'` instead of `string`. ([#6474](https://github.com/clerk/javascript/pull/6474)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Add types for `form_param_type_invalid` errors. ([#6457](https://github.com/clerk/javascript/pull/6457)) by [@dstaley](https://github.com/dstaley)
+
+## 4.72.0
+
+### Minor Changes
+
+- [Billing Beta]: Update prefix for checkout status ([#6438](https://github.com/clerk/javascript/pull/6438)) by [@panteliselef](https://github.com/panteliselef)
+
+  Replaces `awaiting_` with `needs_`.
+
+- [Billing Beta] Remove `statement_id` from the checkout resource. ([#6437](https://github.com/clerk/javascript/pull/6437)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Fix `UseSessionReturn['session']` JSDocs to not mention active status, since pending sessions are also returned ([#6430](https://github.com/clerk/javascript/pull/6430)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Remove `treatPendingAsSignedOut` from `useSession` and always return pending session ([#6432](https://github.com/clerk/javascript/pull/6432)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Refactor billing statement page and payment attempt page data loading ([#6420](https://github.com/clerk/javascript/pull/6420)) by [@aeliox](https://github.com/aeliox)
+
+## 4.71.0
+
+### Minor Changes
+
+- [Billing Beta]: Replace `org` for `organization` as payer type for billing APIs. ([#6423](https://github.com/clerk/javascript/pull/6423)) by [@panteliselef](https://github.com/panteliselef)
+
+  This applies for all billing APIs, except the resources classes that represent data from Frontend API.
+
+- Refactor base theme approach to enable opting into simple theme. ([#6371](https://github.com/clerk/javascript/pull/6371)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  ```tsx
+  appearance={{
+    theme: 'simple' // removes Clerk base theme
+  }}
+  ```
+
+### Patch Changes
+
+- Update JSDocs for `SessionTask` to align with Clerk documentation ([#6396](https://github.com/clerk/javascript/pull/6396)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Make `.finalize()` from useCheckout to return a Promise. ([#6422](https://github.com/clerk/javascript/pull/6422)) by [@panteliselef](https://github.com/panteliselef)
+
+## 4.70.1
+
+### Patch Changes
+
+- Add TypeScript types for `<TaskSelectOrganization />` component. ([#6376](https://github.com/clerk/javascript/pull/6376)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+## 4.70.0
+
+### Minor Changes
+
+- [Billing Beta] Introduce top level subscription. ([#6317](https://github.com/clerk/javascript/pull/6317)) by [@panteliselef](https://github.com/panteliselef)
+
+  Updated `CommerceSubscriptionJSON` to describe the top level subscription and renamed the existing type to `CommerceSubscriptionItemJSON`.
+  Deprecated `billing.getSubscriptions()` in favour of `billing.getSubscription`.
+
 ## 4.69.0
 
 ### Minor Changes

@@ -1,6 +1,6 @@
 {
   "name": "@clerk/remix",
-  "version": "4.10.5",
+  "version": "4.11.2",
   "description": "Clerk SDK for Remix",
   "keywords": [
     "clerk",
@@ -67,6 +67,8 @@
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "dev:publish": "pnpm dev -- --env.publish",
+    "format": "node ../../scripts/format-package.mjs",
+    "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src",
     "lint:attw": "attw --pack . --profile node16",
     "lint:publint": "publint",
@@ -83,8 +85,8 @@
     "tslib": "catalog:repo"
   },
   "devDependencies": {
-    "@remix-run/react": "^2.16.8",
-    "@remix-run/server-runtime": "^2.16.8"
+    "@remix-run/react": "^2.17.0",
+    "@remix-run/server-runtime": "^2.17.0"
   },
   "peerDependencies": {
     "@remix-run/react": "^2.0.0",

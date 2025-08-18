@@ -54,6 +54,7 @@ export const msMY: LocalizationResource = {
   badge__default: 'Lalai',
   badge__endsAt: undefined,
   badge__expired: 'Tamat tempoh',
+  badge__freeTrial: undefined,
   badge__otherImpersonatorDevice: 'Peranti penyamar lain',
   badge__pastDueAt: undefined,
   badge__pastDuePlan: undefined,
@@ -62,6 +63,7 @@ export const msMY: LocalizationResource = {
   badge__requiresAction: 'Memerlukan tindakan',
   badge__startsAt: undefined,
   badge__thisDevice: 'Peranti ini',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Belum disahkan',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Peranti pengguna',
@@ -88,6 +90,7 @@ export const msMY: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
+        title__freeTrialEndsAt: undefined,
         title__paymentMethod: undefined,
         title__statementId: undefined,
         title__subscriptionBegins: undefined,
@@ -98,6 +101,8 @@ export const msMY: LocalizationResource = {
       title: undefined,
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
+      title__trialSuccess: undefined,
+      totalDueAfterTrial: undefined,
     },
     credit: undefined,
     creditRemainder: undefined,
@@ -133,6 +138,8 @@ export const msMY: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
+    startFreeTrial__days: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,
@@ -154,6 +161,7 @@ export const msMY: LocalizationResource = {
     totalDue: undefined,
     totalDueToday: undefined,
     viewFeatures: undefined,
+    viewPayment: undefined,
     year: undefined,
   },
   createOrganization: {
@@ -795,6 +803,26 @@ export const msMY: LocalizationResource = {
   },
   socialButtonsBlockButton: 'Teruskan dengan {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} sudah menjadi ahli organisasi.',
     captcha_invalid:
@@ -814,6 +842,9 @@ export const msMY: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'Nama terakhir tidak boleh melebihi 256 aksara.',
     form_param_max_length_exceeded__name: 'Nama tidak boleh melebihi 256 aksara.',
     form_param_nil: 'Medan ini diperlukan dan tidak boleh kosong.',
+    form_param_type_invalid: undefined,
+    form_param_type_invalid__email_address: undefined,
+    form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Nilai yang dimasukkan tidak sah. Sila betulkannya.',
     form_password_incorrect: 'Kata laluan yang anda masukkan tidak betul. Sila cuba lagi.',
     form_password_length_too_short: 'Kata laluan anda terlalu pendek. Ia mesti sekurang-kurangnya 8 aksara panjang.',
@@ -839,6 +870,8 @@ export const msMY: LocalizationResource = {
       'Anda telah mencapai had keahlian organisasi anda, termasuk jemputan tertunggak.',
     organization_minimum_permissions_needed:
       'Mesti ada sekurang-kurangnya satu ahli organisasi dengan kebenaran minimum yang diperlukan.',
+    organization_not_found_or_unauthorized: undefined,
+    organization_not_found_or_unauthorized_with_create_organization_disabled: undefined,
     passkey_already_exists: 'Kunci pas sudah didaftarkan dengan peranti ini.',
     passkey_not_supported: 'Kunci pas tidak disokong pada peranti ini.',
     passkey_pa_not_supported: 'Pendaftaran memerlukan pengesah platform tetapi peranti tidak menyokongnya.',

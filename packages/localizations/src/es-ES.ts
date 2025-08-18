@@ -54,6 +54,7 @@ export const esES: LocalizationResource = {
   badge__default: 'Por defecto',
   badge__endsAt: undefined,
   badge__expired: undefined,
+  badge__freeTrial: undefined,
   badge__otherImpersonatorDevice: 'Otro dispositivo de imitación',
   badge__pastDueAt: undefined,
   badge__pastDuePlan: undefined,
@@ -62,6 +63,7 @@ export const esES: LocalizationResource = {
   badge__requiresAction: 'Requiere acción',
   badge__startsAt: undefined,
   badge__thisDevice: 'Este dispositivo',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'No confirmado',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Dispositivo de usuario',
@@ -88,6 +90,7 @@ export const esES: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
+        title__freeTrialEndsAt: undefined,
         title__paymentMethod: undefined,
         title__statementId: undefined,
         title__subscriptionBegins: undefined,
@@ -98,6 +101,8 @@ export const esES: LocalizationResource = {
       title: undefined,
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
+      title__trialSuccess: undefined,
+      totalDueAfterTrial: undefined,
     },
     credit: undefined,
     creditRemainder: undefined,
@@ -133,6 +138,8 @@ export const esES: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
+    startFreeTrial__days: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,
@@ -154,6 +161,7 @@ export const esES: LocalizationResource = {
     totalDue: undefined,
     totalDueToday: undefined,
     viewFeatures: undefined,
+    viewPayment: undefined,
     year: undefined,
   },
   createOrganization: {
@@ -788,6 +796,26 @@ export const esES: LocalizationResource = {
   },
   socialButtonsBlockButton: 'Continuar con {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ya es miembro de la organización.',
     captcha_invalid:
@@ -807,6 +835,9 @@ export const esES: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'El apellido no debe exceder los 256 caracteres.',
     form_param_max_length_exceeded__name: 'El nombre no debe exceder los 256 caracteres.',
     form_param_nil: 'Este campo es obligatorio.',
+    form_param_type_invalid: undefined,
+    form_param_type_invalid__email_address: undefined,
+    form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Valor inválido.',
     form_password_incorrect: 'Contraseña incorrecta.',
     form_password_length_too_short: 'La contraseña es demasiado corta.',
@@ -828,6 +859,8 @@ export const esES: LocalizationResource = {
       'Has alcanzado tu límite de miembros de la organización, incluyendo invitaciones pendientes.',
     organization_minimum_permissions_needed:
       'Es necesario que haya al menos un miembro de la organización con los permisos mínimos necesarios.',
+    organization_not_found_or_unauthorized: undefined,
+    organization_not_found_or_unauthorized_with_create_organization_disabled: undefined,
     passkey_already_exists: 'Ya existe una clave de acceso.',
     passkey_not_supported: 'Las claves de acceso no son compatibles.',
     passkey_pa_not_supported: 'La clave de acceso no es compatible con la autenticación de dispositivos.',

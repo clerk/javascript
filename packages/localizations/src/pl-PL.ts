@@ -54,6 +54,7 @@ export const plPL: LocalizationResource = {
   badge__default: 'Domyślny',
   badge__endsAt: undefined,
   badge__expired: undefined,
+  badge__freeTrial: undefined,
   badge__otherImpersonatorDevice: 'Inne urządzenie osobiste',
   badge__pastDueAt: undefined,
   badge__pastDuePlan: undefined,
@@ -62,6 +63,7 @@ export const plPL: LocalizationResource = {
   badge__requiresAction: 'Wymaga działania',
   badge__startsAt: undefined,
   badge__thisDevice: 'To urządzenie',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Niezweryfikowany',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Urządzenie użytkownika',
@@ -88,6 +90,7 @@ export const plPL: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
+        title__freeTrialEndsAt: undefined,
         title__paymentMethod: undefined,
         title__statementId: undefined,
         title__subscriptionBegins: undefined,
@@ -98,6 +101,8 @@ export const plPL: LocalizationResource = {
       title: undefined,
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
+      title__trialSuccess: undefined,
+      totalDueAfterTrial: undefined,
     },
     credit: undefined,
     creditRemainder: undefined,
@@ -133,6 +138,8 @@ export const plPL: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
+    startFreeTrial__days: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,
@@ -154,6 +161,7 @@ export const plPL: LocalizationResource = {
     totalDue: undefined,
     totalDueToday: undefined,
     viewFeatures: undefined,
+    viewPayment: undefined,
     year: undefined,
   },
   createOrganization: {
@@ -792,6 +800,26 @@ export const plPL: LocalizationResource = {
   },
   socialButtonsBlockButton: 'Kontynuuj z {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} jest już członkiem organizacji.',
     captcha_invalid:
@@ -810,6 +838,9 @@ export const plPL: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'Nazwisko nie powinno przekraczać 256 znaków.',
     form_param_max_length_exceeded__name: 'Nazwa nie powinna przekraczać 256 znaków.',
     form_param_nil: 'To pole jest wymagane i nie może być puste.',
+    form_param_type_invalid: undefined,
+    form_param_type_invalid__email_address: undefined,
+    form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Wprowadzona wartość jest nieprawidłowa. Popraw ją.',
     form_password_incorrect: 'Wprowadzone hasło jest nieprawidłowe. Spróbuj ponownie.',
     form_password_length_too_short: 'Twoje hasło jest zbyt krótkie. Musi mieć co najmniej 8 znaków.',
@@ -833,6 +864,8 @@ export const plPL: LocalizationResource = {
     organization_membership_quota_exceeded: 'Osiągnięto limit członkostwa w organizacji, w tym zaległych zaproszeń.',
     organization_minimum_permissions_needed:
       'Musi istnieć co najmniej jeden członek organizacji z minimalnymi wymaganymi uprawnieniami.',
+    organization_not_found_or_unauthorized: undefined,
+    organization_not_found_or_unauthorized_with_create_organization_disabled: undefined,
     passkey_already_exists: 'Klucz dostępu jest już zarejestrowany w tym urządzeniu.',
     passkey_not_supported: 'Klucze dostępu nie są obsługiwane przez to urządzenie.',
     passkey_pa_not_supported: 'Rejestracja wymaga platformy uwierzytelniającej, ale urządzenie jej nie obsługuje.',

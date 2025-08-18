@@ -14,6 +14,7 @@ import type {
   SignInTheme,
   SignUpTheme,
   SubscriptionDetailsTheme,
+  TaskChooseOrganizationTheme,
   UserButtonTheme,
   UserProfileTheme,
   UserVerificationTheme,
@@ -23,10 +24,10 @@ import type { ClientResource } from './client';
 import type {
   CommerceBillingNamespace,
   CommerceCheckoutResource,
-  CommercePayerType,
   CommercePlanResource,
   CommerceSubscriptionPlanPeriod,
   ConfirmCheckoutParams,
+  ForPayerType,
 } from './commerce';
 import type { CustomMenuItem } from './customMenuItems';
 import type { CustomPage } from './customPages';
@@ -48,18 +49,19 @@ import type {
   SignUpFallbackRedirectUrl,
   SignUpForceRedirectUrl,
 } from './redirects';
-import type { PendingSessionOptions, SessionTask, SignedInSessionResource } from './session';
+import type { SessionResource, SessionTask, SignedInSessionResource } from './session';
 import type { SessionVerificationLevel } from './sessionVerification';
 import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
 import type { ClientJSONSnapshot, EnvironmentJSONSnapshot } from './snapshots';
+import type { State } from './state';
 import type { Web3Strategy } from './strategies';
 import type { TelemetryCollector } from './telemetry';
 import type { UserResource } from './user';
 import type { Autocomplete, DeepPartial, DeepSnakeToCamel } from './utils';
 import type { WaitlistResource } from './waitlist';
 
-type __experimental_CheckoutStatus = 'awaiting_initialization' | 'awaiting_confirmation' | 'completed';
+type __experimental_CheckoutStatus = 'needs_initialization' | 'needs_confirmation' | 'completed';
 
 export type __experimental_CheckoutCacheState = Readonly<{
   isStarting: boolean;
@@ -71,7 +73,7 @@ export type __experimental_CheckoutCacheState = Readonly<{
 }>;
 
 export type __experimental_CheckoutOptions = {
-  for?: 'organization';
+  for?: ForPayerType;
   planPeriod: CommerceSubscriptionPlanPeriod;
   planId: string;
 };
@@ -90,7 +92,7 @@ export type __experimental_CheckoutInstance = {
   confirm: (params: ConfirmCheckoutParams) => Promise<CheckoutResult>;
   start: () => Promise<CheckoutResult>;
   clear: () => void;
-  finalize: (params?: { redirectUrl: string }) => void;
+  finalize: (params?: { redirectUrl: string }) => Promise<void>;
   subscribe: (listener: (state: __experimental_CheckoutCacheState) => void) => () => void;
   getState: () => __experimental_CheckoutCacheState;
 };
@@ -118,6 +120,7 @@ export type SDKMetadata = {
 export type ListenerCallback = (emission: Resources) => void;
 export type UnsubscribeCallback = () => void;
 export type BeforeEmitCallback = (session?: SignedInSessionResource | null) => void | Promise<any>;
+export type SetActiveNavigate = ({ session }: { session: SessionResource }) => Promise<unknown>;
 
 export type SignOutCallback = () => void | Promise<any>;
 
@@ -225,6 +228,14 @@ export interface Clerk {
 
   /** Current User. */
   user: UserResource | null | undefined;
+
+  /**
+   * @experimental This experimental API is subject to change.
+   *
+   * Entrypoint for Clerk's Signal API containing resource signals along with accessible versions of `computed()` and
+   * `effect()` that can be used to subscribe to changes from Signals.
+   */
+  __internal_state: State | undefined;
 
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
@@ -558,6 +569,21 @@ export interface Clerk {
   __internal_unmountOAuthConsent: (targetNode: HTMLDivElement) => void;
 
   /**
+   * Mounts a TaskChooseOrganization component at the target element.
+   * @param targetNode Target node to mount the TaskChooseOrganization component.
+   * @param props configuration parameters.
+   */
+  mountTaskChooseOrganization: (targetNode: HTMLDivElement, props?: TaskChooseOrganizationProps) => void;
+
+  /**
+   * Unmount a TaskChooseOrganization component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @param targetNode Target node to unmount the TaskChooseOrganization component from.
+   */
+  unmountTaskChooseOrganization: (targetNode: HTMLDivElement) => void;
+
+  /**
    * @internal
    * Loads Stripe libraries for commerce functionality
    */
@@ -601,13 +627,6 @@ export interface Clerk {
   __internal_addNavigationListener: (callback: () => void) => UnsubscribeCallback;
 
   /**
-   * Registers the internal navigation context from UI components in order to
-   * be triggered from `Clerk` methods
-   * @internal
-   */
-  __internal_setComponentNavigationContext: (context: __internal_ComponentNavigationContext) => () => void;
-
-  /**
    * Set the active session and organization explicitly.
    *
    * If the session param is `null`, the active session is deleted.
@@ -628,33 +647,38 @@ export interface Clerk {
   buildUrlWithAuth(to: string): string;
 
   /**
-   * Returns the configured url where <SignIn/> is mounted or a custom sign-in page is rendered.
+   * Returns the configured url where `<SignIn/>` is mounted or a custom sign-in page is rendered.
    *
    * @param opts A {@link RedirectOptions} object
    */
   buildSignInUrl(opts?: RedirectOptions): string;
 
   /**
-   * Returns the configured url where <SignUp/> is mounted or a custom sign-up page is rendered.
+   * Returns the configured url where `<SignUp/>` is mounted or a custom sign-up page is rendered.
    *
    * @param opts A {@link RedirectOptions} object
    */
   buildSignUpUrl(opts?: RedirectOptions): string;
 
   /**
-   * Returns the url where <UserProfile /> is mounted or a custom user-profile page is rendered.
+   * Returns the url where `<UserProfile />` is mounted or a custom user-profile page is rendered.
    */
   buildUserProfileUrl(): string;
 
   /**
-   * Returns the configured url where <CreateOrganization /> is mounted or a custom create-organization page is rendered.
+   * Returns the configured url where `<CreateOrganization />` is mounted or a custom create-organization page is rendered.
    */
   buildCreateOrganizationUrl(): string;
 
   /**
-   * Returns the configured url where <OrganizationProfile /> is mounted or a custom organization-profile page is rendered.
+   * Returns the configured url where `<OrganizationProfile />` is mounted or a custom organization-profile page is rendered.
    */
   buildOrganizationProfileUrl(): string;
+
+  /**
+   * Returns the configured url where tasks are mounted.
+   */
+  buildTasksUrl(): string;
 
   /**
    * Returns the configured afterSignInUrl of the instance.
@@ -682,7 +706,7 @@ export interface Clerk {
   buildAfterMultiSessionSingleSignOutUrl(): string;
 
   /**
-   * Returns the configured url where <Waitlist/> is mounted or a custom waitlist page is rendered.
+   * Returns the configured url where `<Waitlist/>` is mounted or a custom waitlist page is rendered.
    */
   buildWaitlistUrl(opts?: { initialValues?: Record<string, string> }): string;
 
@@ -695,31 +719,31 @@ export interface Clerk {
   redirectWithAuth(to: string): Promise<unknown>;
 
   /**
-   * Redirects to the configured URL where <SignIn/> is mounted.
+   * Redirects to the configured URL where `<SignIn/>` is mounted.
    *
    * @param opts A {@link RedirectOptions} object
    */
   redirectToSignIn(opts?: SignInRedirectOptions): Promise<unknown>;
 
   /**
-   * Redirects to the configured URL where <SignUp/> is mounted.
+   * Redirects to the configured URL where `<SignUp/>` is mounted.
    *
    * @param opts A {@link RedirectOptions} object
    */
   redirectToSignUp(opts?: SignUpRedirectOptions): Promise<unknown>;
 
   /**
-   * Redirects to the configured URL where <UserProfile/> is mounted.
+   * Redirects to the configured URL where `<UserProfile/>` is mounted.
    */
   redirectToUserProfile: () => Promise<unknown>;
 
   /**
-   * Redirects to the configured URL where <OrganizationProfile /> is mounted.
+   * Redirects to the configured URL where `<OrganizationProfile />` is mounted.
    */
   redirectToOrganizationProfile: () => Promise<unknown>;
 
   /**
-   * Redirects to the configured URL where <CreateOrganization /> is mounted.
+   * Redirects to the configured URL where `<CreateOrganization />` is mounted.
    */
   redirectToCreateOrganization: () => Promise<unknown>;
 
@@ -739,9 +763,14 @@ export interface Clerk {
   redirectToAfterSignOut: () => void;
 
   /**
-   * Redirects to the configured URL where <Waitlist/> is mounted.
+   * Redirects to the configured URL where `<Waitlist/>` is mounted.
    */
   redirectToWaitlist: () => void;
+
+  /**
+   * Redirects to the configured URL where tasks are mounted.
+   */
+  redirectToTasks(): Promise<unknown>;
 
   /**
    * Completes a Google One Tap redirection flow started by
@@ -813,12 +842,6 @@ export interface Clerk {
   handleUnauthenticated: () => Promise<unknown>;
 
   joinWaitlist: (params: JoinWaitlistParams) => Promise<WaitlistResource>;
-
-  /**
-   * Navigates to the current task or redirects to `redirectUrlComplete` once the session is `active`.
-   * @internal
-   */
-  __internal_navigateToTaskIfAvailable: (params?: __internal_NavigateToTaskIfAvailableParams) => Promise<void>;
 
   /**
    * This is an optional function.
@@ -937,8 +960,7 @@ type ClerkOptionsNavigation =
       routerDebug?: boolean;
     };
 
-export type ClerkOptions = PendingSessionOptions &
-  ClerkOptionsNavigation &
+export type ClerkOptions = ClerkOptionsNavigation &
   SignInForceRedirectUrl &
   SignInFallbackRedirectUrl &
   SignUpForceRedirectUrl &
@@ -1179,9 +1201,32 @@ export type SetActiveParams = {
   beforeEmit?: BeforeEmitCallback;
 
   /**
-   * The full URL or path to redirect to just before the active session and/or organization is set.
+   * The full URL or path to redirect to just before the session and/or organization is set.
    */
   redirectUrl?: string;
+
+  /**
+   * A custom navigation function to be called just before the session and/or organization is set.
+   *
+   * When provided, it takes precedence over the `redirectUrl` parameter for navigation.
+   *
+   * @example
+   * ```typescript
+   * await clerk.setActive({
+   *   session,
+   *   navigate: async ({ session }) => {
+   *     const currentTask = session.currentTask;
+   *     if (currentTask) {
+   *       await router.push(`/onboarding/${currentTask.key}`)
+   *       return
+   *     }
+   *
+   *     router.push('/dashboard');
+   *   }
+   * });
+   * ```
+   */
+  navigate?: SetActiveNavigate;
 };
 
 /**
@@ -1820,7 +1865,7 @@ export type __internal_CheckoutProps = {
   appearance?: CheckoutTheme;
   planId?: string;
   planPeriod?: CommerceSubscriptionPlanPeriod;
-  subscriberType?: CommercePayerType;
+  for?: ForPayerType;
   onSubscriptionComplete?: () => void;
   portalId?: string;
   portalRoot?: PortalRoot;
@@ -1845,7 +1890,7 @@ export type __internal_CheckoutProps = {
 export type __experimental_CheckoutButtonProps = {
   planId: string;
   planPeriod?: CommerceSubscriptionPlanPeriod;
-  subscriberType?: CommercePayerType;
+  for?: ForPayerType;
   onSubscriptionComplete?: () => void;
   checkoutProps?: {
     appearance?: CheckoutTheme;
@@ -1870,10 +1915,20 @@ export type __experimental_CheckoutButtonProps = {
  * <ClerkProvider clerkJsVersion="x.x.x" />
  * ```
  */
-export type __internal_PlanDetailsProps = {
+export type __internal_PlanDetailsProps = (
+  | {
+      planId: string;
+      plan?: never;
+    }
+  | {
+      /**
+       * The plan object will be used as initial data until the plan is fetched from the server.
+       */
+      plan: CommercePlanResource;
+      planId?: never;
+    }
+) & {
   appearance?: PlanDetailTheme;
-  plan?: CommercePlanResource;
-  planId?: string;
   initialPlanPeriod?: CommerceSubscriptionPlanPeriod;
   portalId?: string;
   portalRoot?: PortalRoot;
@@ -1889,9 +1944,19 @@ export type __internal_PlanDetailsProps = {
  * <ClerkProvider clerkJsVersion="x.x.x" />
  * ```
  */
-export type __experimental_PlanDetailsButtonProps = {
-  plan?: CommercePlanResource;
-  planId?: string;
+export type __experimental_PlanDetailsButtonProps = (
+  | {
+      planId: string;
+      plan?: never;
+    }
+  | {
+      /**
+       * The plan object will be used as initial data until the plan is fetched from the server.
+       */
+      plan: CommercePlanResource;
+      planId?: never;
+    }
+) & {
   initialPlanPeriod?: CommerceSubscriptionPlanPeriod;
   planDetailsProps?: {
     appearance?: PlanDetailTheme;
@@ -1913,10 +1978,10 @@ export type __experimental_PlanDetailsButtonProps = {
 export type __internal_SubscriptionDetailsProps = {
   /**
    * The subscriber type to display the subscription details for.
-   * If `org` is provided, the subscription details will be displayed for the active organization.
+   * If `organization` is provided, the subscription details will be displayed for the active organization.
    * @default 'user'
    */
-  for?: CommercePayerType;
+  for?: ForPayerType;
   appearance?: SubscriptionDetailsTheme;
   onSubscriptionCancel?: () => void;
   portalId?: string;
@@ -1936,10 +2001,10 @@ export type __internal_SubscriptionDetailsProps = {
 export type __experimental_SubscriptionDetailsButtonProps = {
   /**
    * The subscriber type to display the subscription details for.
-   * If `org` is provided, the subscription details will be displayed for the active organization.
+   * If `organization` is provided, the subscription details will be displayed for the active organization.
    * @default 'user'
    */
-  for?: CommercePayerType;
+  for?: ForPayerType;
   onSubscriptionCancel?: () => void;
   subscriptionDetailsProps?: {
     appearance?: SubscriptionDetailsTheme;
@@ -1958,6 +2023,10 @@ export type __internal_OAuthConsentProps = {
    * Logo URL of the OAuth application.
    */
   oAuthApplicationLogoUrl?: string;
+  /**
+   * URL of the OAuth application.
+   */
+  oAuthApplicationUrl?: string;
   /**
    * Scopes requested by the OAuth application.
    */
@@ -2036,6 +2105,14 @@ export type SignUpButtonProps = (SignUpButtonPropsModal | ButtonPropsRedirect) &
     | 'oauthFlow'
   >;
 
+export type TaskChooseOrganizationProps = {
+  /**
+   * Full URL or path to navigate to after successfully resolving all tasks
+   */
+  redirectUrlComplete: string;
+  appearance?: TaskChooseOrganizationTheme;
+};
+
 export type CreateOrganizationInvitationParams = {
   emailAddress: string;
   role: OrganizationCustomRoleKey;
@@ -2101,14 +2178,6 @@ export interface AuthenticateWithOKXWalletParams {
 export interface AuthenticateWithGoogleOneTapParams {
   token: string;
   legalAccepted?: boolean;
-}
-
-export interface __internal_NavigateToTaskIfAvailableParams {
-  /**
-   * Full URL or path to navigate to after successfully resolving all tasks
-   * @default undefined
-   */
-  redirectUrlComplete?: string;
 }
 
 export interface LoadedClerk extends Clerk {

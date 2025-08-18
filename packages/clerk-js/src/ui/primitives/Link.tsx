@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { sanitizeHref } from '../../utils/url';
 import type { PrimitiveProps, StyleVariants } from '../styledSystem';
 import { common, createVariants } from '../styledSystem';
 import { applyDataStateProps } from './applyDataStateProps';
@@ -33,10 +34,19 @@ const { applyVariants, filterProps } = createVariants(theme => ({
       },
       inherit: { color: 'inherit' },
     },
+    focusRing: {
+      true: {
+        '&:focus': {
+          outline: 'none',
+          ...common.focusRing(theme),
+        },
+      },
+    },
   },
   defaultVariants: {
     colorScheme: 'primary',
     variant: 'body',
+    focusRing: false,
   },
 }));
 
@@ -48,9 +58,12 @@ export type LinkProps = PrimitiveProps<'a'> & OwnProps & StyleVariants<typeof ap
 export const Link = (props: LinkProps): JSX.Element => {
   const { isExternal, children, href, onClick, ...rest } = props;
 
+  // Sanitize href to prevent dangerous protocols
+  const sanitizedHref = sanitizeHref(href);
+
   const onClickHandler = onClick
     ? (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
-        if (!href) {
+        if (!sanitizedHref) {
           e.preventDefault();
         }
         onClick(e);
@@ -61,9 +74,9 @@ export const Link = (props: LinkProps): JSX.Element => {
     <a
       {...applyDataStateProps(filterProps(rest))}
       onClick={onClickHandler}
-      href={href || ''}
-      target={href && isExternal ? '_blank' : undefined}
-      rel={href && isExternal ? 'noopener' : undefined}
+      href={sanitizedHref || ''}
+      target={sanitizedHref && isExternal ? '_blank' : undefined}
+      rel={sanitizedHref && isExternal ? 'noopener noreferrer' : undefined}
       css={applyVariants(props) as any}
     >
       {children}

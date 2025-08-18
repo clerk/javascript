@@ -5,7 +5,7 @@ import { Header } from '@/ui/elements/Header';
 import { PreviewButton } from '@/ui/elements/PreviewButton';
 import { UserPreview } from '@/ui/elements/UserPreview';
 
-import { withRedirectToAfterSignIn } from '../../common';
+import { withRedirectToAfterSignIn, withRedirectToSignInTask } from '../../common';
 import { useEnvironment, useSignInContext, useSignOutContext } from '../../contexts';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import { Add, SwitchArrowRight } from '../../icons';
@@ -15,14 +15,14 @@ import { useMultisessionActions } from '../UserButton/useMultisessionActions';
 const SignInAccountSwitcherInternal = () => {
   const card = useCardState();
   const { userProfileUrl } = useEnvironment().displayConfig;
-  const { afterSignInUrl, path: signInPath } = useSignInContext();
+  const { afterSignInUrl, path: signInPath, signInUrl } = useSignInContext();
   const { navigateAfterSignOut } = useSignOutContext();
   const { handleSignOutAllClicked, handleSessionClicked, signedInSessions, handleAddAccountClicked } =
     useMultisessionActions({
       navigateAfterSignOut,
       afterSwitchSessionUrl: afterSignInUrl,
       userProfileUrl,
-      signInUrl: signInPath,
+      signInUrl: signInPath ?? signInUrl,
       user: undefined,
     });
 
@@ -125,4 +125,6 @@ const SignInAccountSwitcherInternal = () => {
     </Flow.Part>
   );
 };
-export const SignInAccountSwitcher = withRedirectToAfterSignIn(withCardStateProvider(SignInAccountSwitcherInternal));
+export const SignInAccountSwitcher = withRedirectToSignInTask(
+  withRedirectToAfterSignIn(withCardStateProvider(SignInAccountSwitcherInternal)),
+);

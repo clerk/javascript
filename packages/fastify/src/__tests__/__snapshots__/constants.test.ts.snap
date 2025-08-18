@@ -1,4 +1,20 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`constants > from environment variables 1`] = `
+{
+  "API_URL": "https://api.clerk.com",
+  "API_VERSION": "v1",
+  "JWT_KEY": "",
+  "MACHINE_SECRET_KEY": "",
+  "PUBLISHABLE_KEY": "",
+  "SDK_METADATA": {
+    "environment": "test",
+    "name": "@clerk/fastify",
+    "version": "0.0.0-test",
+  },
+  "SECRET_KEY": "TEST_SECRET_KEY",
+}
+`;
 
 exports[`constants from environment variables 1`] = `
 {

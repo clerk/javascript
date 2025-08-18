@@ -54,6 +54,7 @@ export const taIN: LocalizationResource = {
   badge__default: 'இயல்புநிலை',
   badge__endsAt: undefined,
   badge__expired: 'காலாவதியானது',
+  badge__freeTrial: undefined,
   badge__otherImpersonatorDevice: 'மற்ற மாறுவேட சாதனம்',
   badge__pastDueAt: undefined,
   badge__pastDuePlan: undefined,
@@ -62,6 +63,7 @@ export const taIN: LocalizationResource = {
   badge__requiresAction: 'செயல் தேவை',
   badge__startsAt: undefined,
   badge__thisDevice: 'இந்த சாதனம்',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'சரிபார்க்கப்படாதது',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'பயனர் சாதனம்',
@@ -88,6 +90,7 @@ export const taIN: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
+        title__freeTrialEndsAt: undefined,
         title__paymentMethod: undefined,
         title__statementId: undefined,
         title__subscriptionBegins: undefined,
@@ -98,6 +101,8 @@ export const taIN: LocalizationResource = {
       title: undefined,
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
+      title__trialSuccess: undefined,
+      totalDueAfterTrial: undefined,
     },
     credit: undefined,
     creditRemainder: undefined,
@@ -133,6 +138,8 @@ export const taIN: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
+    startFreeTrial__days: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,
@@ -154,6 +161,7 @@ export const taIN: LocalizationResource = {
     totalDue: undefined,
     totalDueToday: undefined,
     viewFeatures: undefined,
+    viewPayment: undefined,
     year: undefined,
   },
   createOrganization: {
@@ -794,6 +802,26 @@ export const taIN: LocalizationResource = {
   },
   socialButtonsBlockButton: '{{provider|titleize}} மூலம் தொடரவும்',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ஏற்கனவே நிறுவனத்தின் உறுப்பினராக உள்ளார்.',
     captcha_invalid:
@@ -812,6 +840,9 @@ export const taIN: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'கடைசி பெயர் 256 எழுத்துகளை மீறக்கூடாது.',
     form_param_max_length_exceeded__name: 'பெயர் 256 எழுத்துகளை மீறக்கூடாது.',
     form_param_nil: 'இந்த புலம் தேவை மற்றும் காலியாக இருக்க முடியாது.',
+    form_param_type_invalid: undefined,
+    form_param_type_invalid__email_address: undefined,
+    form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'உள்ளிடப்பட்ட மதிப்பு தவறானது. அதை திருத்தவும்.',
     form_password_incorrect: 'நீங்கள் உள்ளிட்ட கடவுச்சொல் தவறானது. மீண்டும் முயற்சிக்கவும்.',
     form_password_length_too_short:
@@ -839,6 +870,8 @@ export const taIN: LocalizationResource = {
       'நிலுவையிலுள்ள அழைப்புகள் உட்பட, நீங்கள் நிறுவன உறுப்பினர் எண்ணிக்கை வரம்பை அடைந்துவிட்டீர்கள்.',
     organization_minimum_permissions_needed:
       'குறைந்தபட்ச தேவையான அனுமதிகளுடன் குறைந்தது ஒரு நிறுவன உறுப்பினர் இருக்க வேண்டும்.',
+    organization_not_found_or_unauthorized: undefined,
+    organization_not_found_or_unauthorized_with_create_organization_disabled: undefined,
     passkey_already_exists: 'இந்த சாதனத்துடன் ஒரு பாஸ்கீ ஏற்கனவே பதிவு செய்யப்பட்டுள்ளது.',
     passkey_not_supported: 'இந்த சாதனத்தில் பாஸ்கீகள் ஆதரிக்கப்படவில்லை.',
     passkey_pa_not_supported: 'பதிவுக்கு ஒரு தளம் அங்கீகரிப்பாளர் தேவைப்படுகிறது, ஆனால் சாதனம் அதை ஆதரிக்கவில்லை.',

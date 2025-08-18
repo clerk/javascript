@@ -54,6 +54,7 @@ export const hiIN: LocalizationResource = {
   badge__default: 'डिफ़ॉल्ट',
   badge__endsAt: undefined,
   badge__expired: 'समाप्त',
+  badge__freeTrial: undefined,
   badge__otherImpersonatorDevice: 'अन्य प्रतिरूपण उपकरण',
   badge__pastDueAt: undefined,
   badge__pastDuePlan: undefined,
@@ -62,6 +63,7 @@ export const hiIN: LocalizationResource = {
   badge__requiresAction: 'कार्रवाई की आवश्यकता है',
   badge__startsAt: undefined,
   badge__thisDevice: 'यह उपकरण',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'असत्यापित',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'उपयोगकर्ता उपकरण',
@@ -88,6 +90,7 @@ export const hiIN: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
+        title__freeTrialEndsAt: undefined,
         title__paymentMethod: undefined,
         title__statementId: undefined,
         title__subscriptionBegins: undefined,
@@ -98,6 +101,8 @@ export const hiIN: LocalizationResource = {
       title: undefined,
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
+      title__trialSuccess: undefined,
+      totalDueAfterTrial: undefined,
     },
     credit: undefined,
     creditRemainder: undefined,
@@ -133,6 +138,8 @@ export const hiIN: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
+    startFreeTrial__days: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,
@@ -154,6 +161,7 @@ export const hiIN: LocalizationResource = {
     totalDue: undefined,
     totalDueToday: undefined,
     viewFeatures: undefined,
+    viewPayment: undefined,
     year: undefined,
   },
   createOrganization: {
@@ -792,6 +800,26 @@ export const hiIN: LocalizationResource = {
   },
   socialButtonsBlockButton: '{{provider|titleize}} के साथ जारी रखें',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} पहले से ही संगठन का सदस्य है।',
     captcha_invalid:
@@ -810,6 +838,9 @@ export const hiIN: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'अंतिम नाम 256 अक्षरों से अधिक नहीं होना चाहिए।',
     form_param_max_length_exceeded__name: 'नाम 256 अक्षरों से अधिक नहीं होना चाहिए।',
     form_param_nil: 'यह फ़ील्ड आवश्यक है और खाली नहीं हो सकता।',
+    form_param_type_invalid: undefined,
+    form_param_type_invalid__email_address: undefined,
+    form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'दर्ज किया गया मान अमान्य है। कृपया इसे सही करें।',
     form_password_incorrect: 'आपके द्वारा दर्ज किया गया पासवर्ड गलत है। कृपया पुनः प्रयास करें।',
     form_password_length_too_short: 'आपका पासवर्ड बहुत छोटा है। इसमें कम से कम 8 अक्षर होने चाहिए।',
@@ -834,6 +865,8 @@ export const hiIN: LocalizationResource = {
     organization_membership_quota_exceeded:
       'आप अपने संगठन की सदस्यता की सीमा तक पहुंच गए हैं, जिसमें बकाया आमंत्रण भी शामिल हैं।',
     organization_minimum_permissions_needed: 'संगठन के कम से कम एक सदस्य के पास न्यूनतम आवश्यक अनुमतियां होनी चाहिए।',
+    organization_not_found_or_unauthorized: undefined,
+    organization_not_found_or_unauthorized_with_create_organization_disabled: undefined,
     passkey_already_exists: 'इस डिवाइस के साथ पहले से ही एक पासकी पंजीकृत है।',
     passkey_not_supported: 'इस डिवाइस पर पासकी समर्थित नहीं हैं।',
     passkey_pa_not_supported:

@@ -31,7 +31,9 @@ export * from './InstanceSettings';
 export * from './Invitation';
 export * from './JSON';
 export * from './Machine';
-export * from './MachineToken';
+export * from './MachineScope';
+export * from './MachineSecretKey';
+export * from './M2MToken';
 export * from './JwtTemplate';
 export * from './OauthAccessToken';
 export * from './OAuthApplication';
@@ -55,6 +57,7 @@ export * from './User';
 export * from './Verification';
 export * from './WaitlistEntry';
 export * from './Web3Wallet';
+export * from './CommercePlan';
 
 export type {
   EmailWebhookEvent,

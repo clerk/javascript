@@ -5,7 +5,12 @@ const formatWarning = (msg: string) => {
 };
 
 const createMessageForDisabledOrganizations = (
-  componentName: 'OrganizationProfile' | 'OrganizationSwitcher' | 'OrganizationList' | 'CreateOrganization',
+  componentName:
+    | 'OrganizationProfile'
+    | 'OrganizationSwitcher'
+    | 'OrganizationList'
+    | 'CreateOrganization'
+    | 'TaskChooseOrganization',
 ) => {
   return formatWarning(
     `The <${componentName}/> cannot be rendered when the feature is turned off. Visit 'dashboard.clerk.com' to enable the feature. Since the feature is turned off, this is no-op.`,
@@ -23,6 +28,8 @@ const warnings = {
     'The <SignUp/> component cannot render when a user is already signed in, unless the application allows multiple sessions. Since a user is signed in and this application only allows a single session, Clerk is redirecting to the value set in `afterSignUp` URL instead.',
   cannotRenderSignUpComponentWhenTaskExists:
     'The <SignUp/> component cannot render when a user has a pending task, unless the application allows multiple sessions. Since a user is signed in and this application only allows a single session, Clerk is redirecting to the task instead.',
+  cannotRenderComponentWhenTaskDoesNotExist:
+    '<TaskChooseOrganization/> cannot render unless a session task is pending. Clerk is redirecting to the value set in `redirectUrlComplete` instead.',
   cannotRenderSignInComponentWhenSessionExists:
     'The <SignIn/> component cannot render when a user is already signed in, unless the application allows multiple sessions. Since a user is signed in and this application only allows a single session, Clerk is redirecting to the `afterSignIn` URL instead.',
   cannotRenderSignInComponentWhenTaskExists:

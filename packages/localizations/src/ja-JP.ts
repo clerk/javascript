@@ -54,6 +54,7 @@ export const jaJP: LocalizationResource = {
   badge__default: 'デフォルト',
   badge__endsAt: undefined,
   badge__expired: undefined,
+  badge__freeTrial: undefined,
   badge__otherImpersonatorDevice: '他の模倣者デバイス',
   badge__pastDueAt: undefined,
   badge__pastDuePlan: undefined,
@@ -62,6 +63,7 @@ export const jaJP: LocalizationResource = {
   badge__requiresAction: 'アクションが必要',
   badge__startsAt: undefined,
   badge__thisDevice: 'このデバイス',
+  badge__trialEndsAt: undefined,
   badge__unverified: '未確認',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'ユーザーデバイス',
@@ -88,6 +90,7 @@ export const jaJP: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
+        title__freeTrialEndsAt: undefined,
         title__paymentMethod: undefined,
         title__statementId: undefined,
         title__subscriptionBegins: undefined,
@@ -98,6 +101,8 @@ export const jaJP: LocalizationResource = {
       title: undefined,
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
+      title__trialSuccess: undefined,
+      totalDueAfterTrial: undefined,
     },
     credit: undefined,
     creditRemainder: undefined,
@@ -133,6 +138,8 @@ export const jaJP: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
+    startFreeTrial__days: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,
@@ -154,6 +161,7 @@ export const jaJP: LocalizationResource = {
     totalDue: undefined,
     totalDueToday: undefined,
     viewFeatures: undefined,
+    viewPayment: undefined,
     year: undefined,
   },
   createOrganization: {
@@ -425,7 +433,7 @@ export const jaJP: LocalizationResource = {
       headerTitle__general: '一般',
       headerTitle__members: 'メンバー',
       profileSection: {
-        primaryButton: undefined,
+        primaryButton: 'プロフィールを更新',
         title: '組織プロフィール',
         uploadAction__title: 'ロゴ',
       },
@@ -787,6 +795,26 @@ export const jaJP: LocalizationResource = {
   },
   socialButtonsBlockButton: '{{provider|titleize}}で続ける',
   socialButtonsBlockButtonManyInView: undefined,
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: undefined,
     captcha_invalid:
@@ -805,6 +833,9 @@ export const jaJP: LocalizationResource = {
     form_param_max_length_exceeded__last_name: '姓は256文字を超えることはできません。',
     form_param_max_length_exceeded__name: '名前は256文字を超えることはできません。',
     form_param_nil: 'パラメータが存在しません。',
+    form_param_type_invalid: undefined,
+    form_param_type_invalid__email_address: undefined,
+    form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: 'パスワードが正しくありません。',
     form_password_length_too_short: 'パスワードの長さが短すぎます。',
@@ -825,6 +856,8 @@ export const jaJP: LocalizationResource = {
     organization_domain_exists_for_enterprise_connection: undefined,
     organization_membership_quota_exceeded: undefined,
     organization_minimum_permissions_needed: undefined,
+    organization_not_found_or_unauthorized: undefined,
+    organization_not_found_or_unauthorized_with_create_organization_disabled: undefined,
     passkey_already_exists: undefined,
     passkey_not_supported: undefined,
     passkey_pa_not_supported: undefined,
@@ -1189,7 +1222,7 @@ export const jaJP: LocalizationResource = {
         title: '電話番号',
       },
       profileSection: {
-        primaryButton: undefined,
+        primaryButton: 'プロフィールを更新',
         title: 'プロフィール',
       },
       usernameSection: {

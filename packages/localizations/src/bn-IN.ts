@@ -54,6 +54,7 @@ export const bnIN: LocalizationResource = {
   badge__default: 'ডিফল্ট',
   badge__endsAt: undefined,
   badge__expired: 'মেয়াদ শেষ',
+  badge__freeTrial: undefined,
   badge__otherImpersonatorDevice: 'অন্য ইমপারসোনেটর ডিভাইস',
   badge__pastDueAt: undefined,
   badge__pastDuePlan: undefined,
@@ -62,6 +63,7 @@ export const bnIN: LocalizationResource = {
   badge__requiresAction: 'কর্ম প্রয়োজন',
   badge__startsAt: undefined,
   badge__thisDevice: 'এই ডিভাইস',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'অযাচাই',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'ব্যবহারকারীর ডিভাইস',
@@ -88,6 +90,7 @@ export const bnIN: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
+        title__freeTrialEndsAt: undefined,
         title__paymentMethod: undefined,
         title__statementId: undefined,
         title__subscriptionBegins: undefined,
@@ -98,6 +101,8 @@ export const bnIN: LocalizationResource = {
       title: undefined,
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
+      title__trialSuccess: undefined,
+      totalDueAfterTrial: undefined,
     },
     credit: undefined,
     creditRemainder: undefined,
@@ -133,6 +138,8 @@ export const bnIN: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
+    startFreeTrial__days: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,
@@ -154,6 +161,7 @@ export const bnIN: LocalizationResource = {
     totalDue: undefined,
     totalDueToday: undefined,
     viewFeatures: undefined,
+    viewPayment: undefined,
     year: undefined,
   },
   createOrganization: {
@@ -792,6 +800,26 @@ export const bnIN: LocalizationResource = {
   },
   socialButtonsBlockButton: '{{provider|titleize}} দিয়ে চালিয়ে যান',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ইতিমধ্যে সংগঠনের একজন সদস্য।',
     captcha_invalid:
@@ -811,6 +839,9 @@ export const bnIN: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'নামের শেষ অংশ ২৫৬ অক্ষরের বেশি হওয়া উচিত নয়।',
     form_param_max_length_exceeded__name: 'নাম ২৫৬ অক্ষরের বেশি হওয়া উচিত নয়।',
     form_param_nil: 'এই ক্ষেত্রটি প্রয়োজনীয় এবং খালি রাখা যাবে না।',
+    form_param_type_invalid: undefined,
+    form_param_type_invalid__email_address: undefined,
+    form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'লেখা মানটি অবৈধ। দয়া করে এটি সংশোধন করুন।',
     form_password_incorrect: 'আপনি যে পাসওয়ার্ড লিখেছেন তা ভুল। দয়া করে আবার চেষ্টা করুন।',
     form_password_length_too_short: 'আপনার পাসওয়ার্ড খুব ছোট। এটি কমপক্ষে ৮ অক্ষর দীর্ঘ হতে হবে।',
@@ -833,6 +864,8 @@ export const bnIN: LocalizationResource = {
     organization_domain_exists_for_enterprise_connection: 'এই ডোমেন ইতিমধ্যে আপনার সংগঠনের SSO-এর জন্য ব্যবহৃত হচ্ছে',
     organization_membership_quota_exceeded: 'আপনি অপেক্ষিত আমন্ত্রণ সহ সংগঠনের সদস্যতার সীমায় পৌঁছে গেছেন।',
     organization_minimum_permissions_needed: 'অন্তত একজন সংগঠনের সদস্যের ন্যূনতম প্রয়োজনীয় অনুমতি থাকতে হবে।',
+    organization_not_found_or_unauthorized: undefined,
+    organization_not_found_or_unauthorized_with_create_organization_disabled: undefined,
     passkey_already_exists: 'এই ডিভাইসে ইতিমধ্যে একটি পাসকি নিবন্ধিত আছে।',
     passkey_not_supported: 'এই ডিভাইসে পাসকি সমর্থিত নয়।',
     passkey_pa_not_supported:

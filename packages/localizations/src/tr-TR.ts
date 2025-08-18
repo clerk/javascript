@@ -54,6 +54,7 @@ export const trTR: LocalizationResource = {
   badge__default: 'Varsayılan',
   badge__endsAt: undefined,
   badge__expired: undefined,
+  badge__freeTrial: undefined,
   badge__otherImpersonatorDevice: 'Diğer taklit eden cihaz',
   badge__pastDueAt: undefined,
   badge__pastDuePlan: undefined,
@@ -62,6 +63,7 @@ export const trTR: LocalizationResource = {
   badge__requiresAction: 'Eylem gerekli',
   badge__startsAt: undefined,
   badge__thisDevice: 'Bu cihaz',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Doğrulanmamış',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Kullanıcı cihazı',
@@ -88,6 +90,7 @@ export const trTR: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
+        title__freeTrialEndsAt: undefined,
         title__paymentMethod: undefined,
         title__statementId: undefined,
         title__subscriptionBegins: undefined,
@@ -98,6 +101,8 @@ export const trTR: LocalizationResource = {
       title: undefined,
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
+      title__trialSuccess: undefined,
+      totalDueAfterTrial: undefined,
     },
     credit: undefined,
     creditRemainder: undefined,
@@ -133,6 +138,8 @@ export const trTR: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
+    startFreeTrial__days: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,
@@ -154,6 +161,7 @@ export const trTR: LocalizationResource = {
     totalDue: undefined,
     totalDueToday: undefined,
     viewFeatures: undefined,
+    viewPayment: undefined,
     year: undefined,
   },
   createOrganization: {
@@ -788,6 +796,26 @@ export const trTR: LocalizationResource = {
   },
   socialButtonsBlockButton: '{{provider|titleize}} ile giriş yapın',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: 'Bu organizasyonda zaten üyesiniz.',
     captcha_invalid:
@@ -806,6 +834,9 @@ export const trTR: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'Soyad 256 karakteri aşmamalıdır.',
     form_param_max_length_exceeded__name: 'İsim 256 karakteri aşmamalıdır.',
     form_param_nil: 'Parametre boş olamaz.',
+    form_param_type_invalid: undefined,
+    form_param_type_invalid__email_address: undefined,
+    form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Parametre değeri geçersiz.',
     form_password_incorrect: 'Şifre yanlış.',
     form_password_length_too_short: 'Şifre çok kısa.',
@@ -827,6 +858,8 @@ export const trTR: LocalizationResource = {
     organization_membership_quota_exceeded: 'Organizasyon üye kotası aşıldı.',
     organization_minimum_permissions_needed:
       'Bu işlemi gerçekleştirmek için gerekli asgari izinlere sahip olmalısınız.',
+    organization_not_found_or_unauthorized: undefined,
+    organization_not_found_or_unauthorized_with_create_organization_disabled: undefined,
     passkey_already_exists: 'Bu hesaba zaten bir geçiş anahtarı bağlı.',
     passkey_not_supported: 'Geçiş anahtarları şu anda desteklenmiyor.',
     passkey_pa_not_supported: 'Bu platform için geçiş anahtarları desteklenmiyor.',

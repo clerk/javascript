@@ -43,6 +43,7 @@ export const enUS: LocalizationResource = {
   badge__default: 'Default',
   badge__endsAt: "Ends {{ date | shortDate('en-US') }}",
   badge__expired: 'Expired',
+  badge__freeTrial: 'Free trial',
   badge__otherImpersonatorDevice: 'Other impersonator device',
   badge__pastDueAt: "Past due {{ date | shortDate('en-US') }}",
   badge__pastDuePlan: 'Past due',
@@ -51,6 +52,7 @@ export const enUS: LocalizationResource = {
   badge__requiresAction: 'Requires action',
   badge__startsAt: "Starts {{ date | shortDate('en-US') }}",
   badge__thisDevice: 'This device',
+  badge__trialEndsAt: "Trial ends {{ date | shortDate('en-US') }}",
   badge__unverified: 'Unverified',
   badge__upcomingPlan: 'Upcoming',
   badge__userDevice: 'User device',
@@ -81,6 +83,7 @@ export const enUS: LocalizationResource = {
         title: 'Add an email address',
       },
       lineItems: {
+        title__freeTrialEndsAt: 'Trial ends on',
         title__paymentMethod: 'Payment method',
         title__statementId: 'Statement ID',
         title__subscriptionBegins: 'Subscription begins',
@@ -91,6 +94,8 @@ export const enUS: LocalizationResource = {
       title: 'Checkout',
       title__paymentSuccessful: 'Payment was successful!',
       title__subscriptionSuccessful: 'Success!',
+      title__trialSuccess: 'Trial successfully started!',
+      totalDueAfterTrial: 'Total Due after trial ends in {{days}} days',
     },
     credit: 'Credit',
     creditRemainder: 'Credit for the remainder of your current subscription.',
@@ -126,6 +131,8 @@ export const enUS: LocalizationResource = {
     },
     reSubscribe: 'Resubscribe',
     seeAllFeatures: 'See all features',
+    startFreeTrial: 'Start free trial',
+    startFreeTrial__days: 'Start {{days}}-day free trial',
     subscribe: 'Subscribe',
     subscriptionDetails: {
       beginsOn: 'Begins on',
@@ -147,6 +154,7 @@ export const enUS: LocalizationResource = {
     totalDue: 'Total due',
     totalDueToday: 'Total Due Today',
     viewFeatures: 'View features',
+    viewPayment: 'View payment',
     year: 'Year',
   },
   createOrganization: {
@@ -784,6 +792,26 @@ export const enUS: LocalizationResource = {
   },
   socialButtonsBlockButton: 'Continue with {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: 'Create new organization',
+      action__invitationAccept: 'Join',
+      action__suggestionsAccept: 'Request to join',
+      subtitle: 'Join an existing organization or create a new one',
+      suggestionsAcceptedLabel: 'Pending approval',
+      title: 'Choose an organization',
+    },
+    createOrganization: {
+      formButtonReset: 'Cancel',
+      formButtonSubmit: 'Create new organization',
+      subtitle: 'Tell us a bit about your organization',
+      title: 'Setup your account',
+    },
+    signOut: {
+      actionLink: 'Sign out',
+      actionText: 'Signed in as {{identifier}}',
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} is already a member of the organization.',
     captcha_invalid: undefined,
@@ -801,6 +829,9 @@ export const enUS: LocalizationResource = {
     form_param_max_length_exceeded__last_name: undefined,
     form_param_max_length_exceeded__name: undefined,
     form_param_nil: undefined,
+    form_param_type_invalid: undefined,
+    form_param_type_invalid__email_address: undefined,
+    form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: 'Your password is too short. It must be at least 8 characters long.',
@@ -820,6 +851,10 @@ export const enUS: LocalizationResource = {
     organization_domain_exists_for_enterprise_connection: undefined,
     organization_membership_quota_exceeded: undefined,
     organization_minimum_permissions_needed: undefined,
+    organization_not_found_or_unauthorized:
+      'You are no longer a member of this organization. Please choose or create another one.',
+    organization_not_found_or_unauthorized_with_create_organization_disabled:
+      'You are no longer a member of this organization. Please choose another one.',
     passkey_already_exists: 'A passkey is already registered with this device.',
     passkey_not_supported: 'Passkeys are not supported on this device.',
     passkey_pa_not_supported: 'Registration requires a platform authenticator but the device does not support it.',

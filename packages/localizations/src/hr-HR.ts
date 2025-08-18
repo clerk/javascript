@@ -54,6 +54,7 @@ export const hrHR: LocalizationResource = {
   badge__default: 'Zadano',
   badge__endsAt: undefined,
   badge__expired: undefined,
+  badge__freeTrial: undefined,
   badge__otherImpersonatorDevice: 'Drugi uređaj za oponašanje',
   badge__pastDueAt: undefined,
   badge__pastDuePlan: undefined,
@@ -62,6 +63,7 @@ export const hrHR: LocalizationResource = {
   badge__requiresAction: 'Zahtijeva akciju',
   badge__startsAt: undefined,
   badge__thisDevice: 'Ovaj uređaj',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Nepotvrđeno',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Korisnički uređaj',
@@ -88,6 +90,7 @@ export const hrHR: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
+        title__freeTrialEndsAt: undefined,
         title__paymentMethod: undefined,
         title__statementId: undefined,
         title__subscriptionBegins: undefined,
@@ -98,6 +101,8 @@ export const hrHR: LocalizationResource = {
       title: undefined,
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
+      title__trialSuccess: undefined,
+      totalDueAfterTrial: undefined,
     },
     credit: undefined,
     creditRemainder: undefined,
@@ -133,6 +138,8 @@ export const hrHR: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
+    startFreeTrial__days: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,
@@ -154,6 +161,7 @@ export const hrHR: LocalizationResource = {
     totalDue: undefined,
     totalDueToday: undefined,
     viewFeatures: undefined,
+    viewPayment: undefined,
     year: undefined,
   },
   createOrganization: {
@@ -789,6 +797,26 @@ export const hrHR: LocalizationResource = {
   },
   socialButtonsBlockButton: 'Nastavite s {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} je već član organizacije.',
     captcha_invalid:
@@ -807,6 +835,9 @@ export const hrHR: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'Prezime ne smije biti duže od 256 znakova.',
     form_param_max_length_exceeded__name: 'Ime ne smije biti duže od 256 znakova.',
     form_param_nil: undefined,
+    form_param_type_invalid: undefined,
+    form_param_type_invalid__email_address: undefined,
+    form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: undefined,
@@ -830,6 +861,8 @@ export const hrHR: LocalizationResource = {
       'Dostigli ste ograničenje članstava u organizacijama, uključujući otvorene pozivnice.',
     organization_minimum_permissions_needed:
       'Mora postojati barem jedan član organizacije s minimalnim potrebnim dozvolama.',
+    organization_not_found_or_unauthorized: undefined,
+    organization_not_found_or_unauthorized_with_create_organization_disabled: undefined,
     passkey_already_exists: 'Pristupni ključ je već registriran na ovom uređaju.',
     passkey_not_supported: 'Pristupni ključevi nisu podržani na ovom uređaju.',
     passkey_pa_not_supported: 'Registracija zahtijeva platformski autentifikator, ali uređaj ga ne podržava.',

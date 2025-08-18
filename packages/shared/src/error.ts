@@ -82,7 +82,7 @@ export function isKnownError(error: any): error is ClerkAPIResponseError | Clerk
  * @internal
  */
 export function isClerkAPIResponseError(err: any): err is ClerkAPIResponseError {
-  return 'clerkError' in err;
+  return err && 'clerkError' in err;
 }
 
 /**

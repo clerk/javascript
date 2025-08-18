@@ -1,6 +1,6 @@
 {
   "name": "@clerk/vue",
-  "version": "1.8.19",
+  "version": "1.11.2",
   "description": "Clerk SDK for Vue",
   "keywords": [
     "clerk",
@@ -48,6 +48,8 @@
     "build": "tsup --onSuccess \"pnpm build:dts\"",
     "build:dts": "vue-tsc --declaration --emitDeclarationOnly -p tsconfig.build.json",
     "dev": "tsup --watch",
+    "format": "node ../../scripts/format-package.mjs",
+    "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src",
     "lint:attw": "attw --pack . --profile esm-only --ignore-rules internal-resolution-error",
     "lint:publint": "publint",
@@ -65,8 +67,8 @@
     "@vitejs/plugin-vue": "^5.2.4",
     "@vue.ts/tsx-auto-props": "^0.6.0",
     "unplugin-vue": "^6.2.0",
-    "vue": "3.5.17",
-    "vue-tsc": "^2.2.10"
+    "vue": "3.5.18",
+    "vue-tsc": "^2.2.12"
   },
   "peerDependencies": {
     "vue": "^3.2.0"

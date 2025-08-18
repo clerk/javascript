@@ -1,19 +1,51 @@
+import { useClerk, useOrganization } from '@clerk/shared/react';
+import useSWR from 'swr';
+
+import { Alert } from '@/ui/elements/Alert';
 import { Header } from '@/ui/elements/Header';
 import { formatDate } from '@/ui/utils/formatDate';
 
-import { useStatements, useStatementsContext, useSubscriberTypeLocalizationRoot } from '../../contexts';
-import { Box, descriptors, localizationKeys, Spinner, Text, useLocalizations } from '../../customizables';
-import { Plus, RotateLeftRight } from '../../icons';
+import { useSubscriberTypeContext, useSubscriberTypeLocalizationRoot } from '../../contexts/components';
+import {
+  Box,
+  descriptors,
+  Icon,
+  localizationKeys,
+  SimpleButton,
+  Span,
+  Spinner,
+  useLocalizations,
+} from '../../customizables';
+import { ArrowRightIcon, Plus, RotateLeftRight } from '../../icons';
 import { useRouter } from '../../router';
 import { Statement } from './Statement';
 
 export const StatementPage = () => {
   const { params, navigate } = useRouter();
-  const { isLoading } = useStatements();
-  const { getStatementById } = useStatementsContext();
+  const subscriberType = useSubscriberTypeContext();
+  const { organization } = useOrganization();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
-  const { t } = useLocalizations();
-  const statement = params.statementId ? getStatementById(params.statementId) : null;
+  const { t, translateError } = useLocalizations();
+  const clerk = useClerk();
+
+  const {
+    data: statement,
+    isLoading,
+    error,
+  } = useSWR(
+    params.statementId
+      ? {
+          type: 'statement',
+          id: params.statementId,
+          orgId: subscriberType === 'organization' ? organization?.id : undefined,
+        }
+      : null,
+    () =>
+      clerk.billing.getStatement({
+        id: params.statementId,
+        orgId: subscriberType === 'organization' ? organization?.id : undefined,
+      }),
+  );
 
   if (isLoading) {
     return (
@@ -48,10 +80,16 @@ export const StatementPage = () => {
         </Header.BackLink>
       </Header.Root>
       {!statement ? (
-        <Text
-          localizationKey={localizationKeys(`${localizationRoot}.billingPage.statementsSection.notFound`)}
-          sx={{ textAlign: 'center' }}
-        />
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+          <Alert
+            variant='danger'
+            colorScheme='danger'
+          >
+            {error
+              ? translateError(error.errors[0])
+              : t(localizationKeys(`${localizationRoot}.billingPage.statementsSection.notFound`))}
+          </Alert>
+        </Box>
       ) : (
         <Statement.Root>
           <Statement.Header
@@ -91,9 +129,24 @@ export const StatementPage = () => {
                                 )
                           }
                           labelIcon={item.chargeType === 'recurring' ? RotateLeftRight : Plus}
-                          value={item.id}
-                          valueTruncated
-                          valueCopyable
+                          value={
+                            <SimpleButton
+                              onClick={() => void navigate(`../../payment-attempt/${item.id}`)}
+                              variant='link'
+                              colorScheme='primary'
+                              textVariant='buttonSmall'
+                              sx={t => ({
+                                gap: t.space.$1,
+                              })}
+                            >
+                              <Span localizationKey={localizationKeys('commerce.viewPayment')} />
+                              <Icon
+                                icon={ArrowRightIcon}
+                                size='sm'
+                                aria-hidden
+                              />
+                            </SimpleButton>
+                          }
                         />
                         {item.subscriptionItem.credit && item.subscriptionItem.credit.amount.amount > 0 ? (
                           <Statement.SectionContentDetailsListItem

@@ -54,6 +54,7 @@ export const ruRU: LocalizationResource = {
   badge__default: 'По-умолчанию',
   badge__endsAt: undefined,
   badge__expired: undefined,
+  badge__freeTrial: undefined,
   badge__otherImpersonatorDevice: 'Другое устройство',
   badge__pastDueAt: undefined,
   badge__pastDuePlan: undefined,
@@ -62,6 +63,7 @@ export const ruRU: LocalizationResource = {
   badge__requiresAction: 'Требуется действие',
   badge__startsAt: undefined,
   badge__thisDevice: 'Это устройство',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Неверифицированный',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Пользовательское устройство',
@@ -88,6 +90,7 @@ export const ruRU: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
+        title__freeTrialEndsAt: undefined,
         title__paymentMethod: undefined,
         title__statementId: undefined,
         title__subscriptionBegins: undefined,
@@ -98,6 +101,8 @@ export const ruRU: LocalizationResource = {
       title: undefined,
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
+      title__trialSuccess: undefined,
+      totalDueAfterTrial: undefined,
     },
     credit: undefined,
     creditRemainder: undefined,
@@ -133,6 +138,8 @@ export const ruRU: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
+    startFreeTrial__days: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,
@@ -154,6 +161,7 @@ export const ruRU: LocalizationResource = {
     totalDue: undefined,
     totalDueToday: undefined,
     viewFeatures: undefined,
+    viewPayment: undefined,
     year: undefined,
   },
   createOrganization: {
@@ -799,6 +807,26 @@ export const ruRU: LocalizationResource = {
   },
   socialButtonsBlockButton: 'Продолжить с помощью {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} уже является членом организации.',
     captcha_invalid:
@@ -817,6 +845,9 @@ export const ruRU: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'Фамилия не должна превышать 256 символов.',
     form_param_max_length_exceeded__name: 'Имя не должно превышать 256 символов.',
     form_param_nil: undefined,
+    form_param_type_invalid: undefined,
+    form_param_type_invalid__email_address: undefined,
+    form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: undefined,
@@ -839,6 +870,8 @@ export const ruRU: LocalizationResource = {
       'Вы достигли предела количества участий в организациях, включая ожидающие приглашения.',
     organization_minimum_permissions_needed:
       'Должен быть как минимум один участник организации с минимально необходимыми разрешениями.',
+    organization_not_found_or_unauthorized: undefined,
+    organization_not_found_or_unauthorized_with_create_organization_disabled: undefined,
     passkey_already_exists: 'Ключ доступа уже зарегистрирован на этом устройстве.',
     passkey_not_supported: 'Ключи доступа не поддерживаются на этом устройстве.',
     passkey_pa_not_supported: 'Для регистрации требуется платформа аутентификатор, но устройство его не поддерживает.',

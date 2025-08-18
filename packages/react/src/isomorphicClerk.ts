@@ -4,7 +4,6 @@ import { loadClerkJsScript } from '@clerk/shared/loadClerkJsScript';
 import { handleValueOrFn } from '@clerk/shared/utils';
 import type {
   __internal_CheckoutProps,
-  __internal_NavigateToTaskIfAvailableParams,
   __internal_OAuthConsentProps,
   __internal_PlanDetailsProps,
   __internal_SubscriptionDetailsProps,
@@ -44,6 +43,8 @@ import type {
   SignUpProps,
   SignUpRedirectOptions,
   SignUpResource,
+  State,
+  TaskChooseOrganizationProps,
   UnsubscribeCallback,
   UserButtonProps,
   UserProfileProps,
@@ -103,7 +104,6 @@ type IsomorphicLoadedClerk = Without<
   | '__internal_reloadInitialResources'
   | 'billing'
   | 'apiKeys'
-  | '__internal_setComponentNavigationContext'
   | '__internal_setActiveInProgress'
   | '__internal_hasAfterAuthFlows'
 > & {
@@ -141,6 +141,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountPricingTableNodes = new Map<HTMLDivElement, PricingTableProps | undefined>();
   private premountApiKeysNodes = new Map<HTMLDivElement, APIKeysProps | undefined>();
   private premountOAuthConsentNodes = new Map<HTMLDivElement, __internal_OAuthConsentProps | undefined>();
+  private premountTaskChooseOrganizationNodes = new Map<HTMLDivElement, TaskChooseOrganizationProps | undefined>();
   // A separate Map of `addListener` method calls to handle multiple listeners.
   private premountAddListenerCalls = new Map<
     ListenerCallback,
@@ -384,6 +385,15 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return callback();
     } else {
       this.premountMethodCalls.set('buildWaitlistUrl', callback);
+    }
+  };
+
+  buildTasksUrl = (): string | void => {
+    const callback = () => this.clerkjs?.buildTasksUrl() || '';
+    if (this.clerkjs && this.loaded) {
+      return callback();
+    } else {
+      this.premountMethodCalls.set('buildTasksUrl', callback);
     }
   };
 
@@ -631,6 +641,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.__internal_mountOAuthConsent(node, props);
     });
 
+    this.premountTaskChooseOrganizationNodes.forEach((props, node) => {
+      clerkjs.mountTaskChooseOrganization(node, props);
+    });
+
     /**
      * Only update status in case `clerk.status` is missing. In any other case, `clerk-js` should be the orchestrator.
      */
@@ -708,6 +722,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     return this.clerkjs?.billing;
   }
 
+  get __internal_state(): State | undefined {
+    return this.clerkjs?.__internal_state;
+  }
+
   get apiKeys(): APIKeysNamespace | undefined {
     return this.clerkjs?.apiKeys;
   }
@@ -729,14 +747,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     // Handle case where accounts has clerk-react@4 installed, but clerk-js@3 is manually loaded
     if (clerkjs && '__unstable__updateProps' in clerkjs) {
       return (clerkjs as any).__unstable__updateProps(props);
-    }
-  };
-
-  __internal_navigateToTaskIfAvailable = async (params?: __internal_NavigateToTaskIfAvailableParams): Promise<void> => {
-    if (this.clerkjs) {
-      return this.clerkjs.__internal_navigateToTaskIfAvailable(params);
-    } else {
-      return Promise.reject();
     }
   };
 
@@ -1128,6 +1138,22 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
+  mountTaskChooseOrganization = (node: HTMLDivElement, props?: TaskChooseOrganizationProps): void => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.mountTaskChooseOrganization(node, props);
+    } else {
+      this.premountTaskChooseOrganizationNodes.set(node, props);
+    }
+  };
+
+  unmountTaskChooseOrganization = (node: HTMLDivElement): void => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.unmountTaskChooseOrganization(node);
+    } else {
+      this.premountTaskChooseOrganizationNodes.delete(node);
+    }
+  };
+
   addListener = (listener: ListenerCallback): UnsubscribeCallback => {
     if (this.clerkjs) {
       return this.clerkjs.addListener(listener);
@@ -1246,6 +1272,16 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return callback();
     } else {
       this.premountMethodCalls.set('redirectToWaitlist', callback);
+      return;
+    }
+  };
+
+  redirectToTasks = async () => {
+    const callback = () => this.clerkjs?.redirectToTasks();
+    if (this.clerkjs && this.loaded) {
+      return callback();
+    } else {
+      this.premountMethodCalls.set('redirectToTasks', callback);
       return;
     }
   };

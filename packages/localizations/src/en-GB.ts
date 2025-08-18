@@ -54,6 +54,7 @@ export const enGB: LocalizationResource = {
   badge__default: 'Default',
   badge__endsAt: undefined,
   badge__expired: undefined,
+  badge__freeTrial: undefined,
   badge__otherImpersonatorDevice: 'Other impersonator device',
   badge__pastDueAt: undefined,
   badge__pastDuePlan: undefined,
@@ -62,6 +63,7 @@ export const enGB: LocalizationResource = {
   badge__requiresAction: 'Requires action',
   badge__startsAt: undefined,
   badge__thisDevice: 'This device',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Unverified',
   badge__upcomingPlan: undefined,
   badge__userDevice: 'User device',
@@ -88,6 +90,7 @@ export const enGB: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
+        title__freeTrialEndsAt: undefined,
         title__paymentMethod: undefined,
         title__statementId: undefined,
         title__subscriptionBegins: undefined,
@@ -98,6 +101,8 @@ export const enGB: LocalizationResource = {
       title: undefined,
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
+      title__trialSuccess: undefined,
+      totalDueAfterTrial: undefined,
     },
     credit: undefined,
     creditRemainder: undefined,
@@ -133,6 +138,8 @@ export const enGB: LocalizationResource = {
     },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    startFreeTrial: undefined,
+    startFreeTrial__days: undefined,
     subscribe: undefined,
     subscriptionDetails: {
       beginsOn: undefined,
@@ -154,6 +161,7 @@ export const enGB: LocalizationResource = {
     totalDue: undefined,
     totalDueToday: undefined,
     viewFeatures: undefined,
+    viewPayment: undefined,
     year: undefined,
   },
   createOrganization: {
@@ -789,6 +797,26 @@ export const enGB: LocalizationResource = {
   },
   socialButtonsBlockButton: 'Continue with {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} is already a member of the organisation.',
     captcha_invalid:
@@ -807,6 +835,9 @@ export const enGB: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'Last name should not exceed 256 characters.',
     form_param_max_length_exceeded__name: 'Name should not exceed 256 characters.',
     form_param_nil: 'This field is required and cannot be empty.',
+    form_param_type_invalid: undefined,
+    form_param_type_invalid__email_address: undefined,
+    form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'The value entered is invalid. Please correct it.',
     form_password_incorrect: 'The password you entered is incorrect. Please try again.',
     form_password_length_too_short: 'Your password is too short. It must be at least 8 characters long.',
@@ -830,6 +861,8 @@ export const enGB: LocalizationResource = {
       'You have reached your limit of organisation memberships, including outstanding invitations.',
     organization_minimum_permissions_needed:
       'There has to be at least one organisation member with the minimum required permissions.',
+    organization_not_found_or_unauthorized: undefined,
+    organization_not_found_or_unauthorized_with_create_organization_disabled: undefined,
     passkey_already_exists: 'A passkey is already registered with this device.',
     passkey_not_supported: 'Passkeys are not supported on this device.',
     passkey_pa_not_supported: 'Registration requires a platform authenticator but the device does not support it.',
