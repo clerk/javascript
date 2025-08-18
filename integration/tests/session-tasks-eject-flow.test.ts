@@ -11,6 +11,7 @@ test.describe('session tasks eject flow @nextjs', () => {
   let user: FakeUser;
 
   test.beforeAll(async () => {
+    test.setTimeout(90_000); // Wait for app to be ready
     app = await appConfigs.next.appRouter
       .clone()
       .addFile(

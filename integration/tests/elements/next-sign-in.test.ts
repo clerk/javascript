@@ -75,7 +75,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Next.js S
 
     await u.page.getByRole('button', { name: /use another method/i }).click();
     await u.po.signIn.getAltMethodsEmailCodeButton().click();
-    await u.po.signIn.enterTestOtpCode({ name: 'Enter email verification code', awaitAttempt: false });
+    await page.getByRole('textbox', { name: 'Enter email verification code' }).click();
+    await page.keyboard.type('424242', { delay: 100 });
     await u.po.signIn.continue();
 
     await u.page.waitForAppUrl('/');
@@ -108,7 +109,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Next.js S
     await u.page.getByRole('button', { name: /^use phone/i }).click();
     await u.po.signIn.getIdentifierInput().fill(fakeUserWithoutPassword.phoneNumber);
     await u.po.signIn.continue();
-    await u.po.signIn.enterTestOtpCode({ name: 'Enter phone verification code', awaitAttempt: false });
+    await page.getByRole('textbox', { name: 'Enter phone verification code' }).click();
+    await page.keyboard.type('424242', { delay: 100 });
     await u.po.signIn.continue();
 
     await u.po.expect.toBeSignedIn();
@@ -143,7 +145,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Next.js S
     await u.po.signIn.continue();
     await u.page.getByRole('button', { name: /^forgot password/i }).click();
     await u.po.signIn.getResetPassword().click();
-    await u.po.signIn.enterTestOtpCode({ name: 'Enter email verification code', awaitAttempt: false });
+    await page.getByRole('textbox', { name: 'Enter email verification code' }).click();
+    await page.keyboard.type('424242', { delay: 100 });
     await u.po.signIn.continue();
 
     await u.po.signIn.setPassword(`${fakeUserWithPasword.password}_reset`);
@@ -182,7 +185,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Next.js S
 
     await u.page.getByRole('button', { name: /use another method/i }).click();
     await u.po.signIn.getAltMethodsEmailCodeButton().click();
-    await u.po.signIn.enterTestOtpCode({ name: 'Enter email verification code', awaitAttempt: false });
+    await page.getByRole('textbox', { name: 'Enter email verification code' }).click();
+    await page.keyboard.type('424242', { delay: 100 });
     await u.po.signIn.continue();
 
     await u.po.expect.toBeSignedIn();

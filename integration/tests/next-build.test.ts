@@ -24,10 +24,13 @@ function getIndicator(buildOutput: string, type: 'Static' | 'Dynamic') {
 }
 
 test.describe('next build - provider as client component @nextjs', () => {
+  test.skip(() => !process.env.CI, 'Skipping on local runs');
+
   test.describe.configure({ mode: 'parallel' });
   let app: Application;
 
   test.beforeAll(async () => {
+    test.setTimeout(90_000); // Wait for app to be ready
     app = await appConfigs.next.appRouter
       .clone()
       .addFile(
@@ -101,10 +104,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 });
 
 test.describe('next build - dynamic options @nextjs', () => {
+  test.skip(() => !process.env.CI, 'Skipping on local runs');
+
   test.describe.configure({ mode: 'parallel' });
   let app: Application;
 
   test.beforeAll(async () => {
+    test.setTimeout(90_000); // Wait for app to be ready
     app = await appConfigs.next.appRouter
       .clone()
       .addFile(

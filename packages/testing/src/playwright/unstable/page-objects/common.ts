@@ -38,7 +38,15 @@ export const common = ({ page }: { page: EnhancedPage }) => {
         await prepareVerificationPromise;
       }
 
-      await page.getByLabel(name).fill(code);
+      // Handle the case for both OTP input versions
+      const originalInput = page.getByRole('textbox', { name: 'Enter verification code. Digit 1' });
+      if (await originalInput.isVisible()) {
+        console.warn('Using the original OTP input');
+        await originalInput.click();
+        await page.keyboard.type(code, { delay: 100 });
+      } else {
+        await page.getByLabel(name).fill(code);
+      }
 
       if (awaitRequests && awaitAttempt) {
         const attemptVerificationPromise = page.waitForResponse(
