@@ -24,6 +24,7 @@ export interface DisplayConfigJSON {
   captcha_oauth_bypass: OAuthStrategy[] | null;
   captcha_heartbeat?: boolean;
   captcha_heartbeat_interval_ms?: number;
+  two_step_sign_up_create_enabled?: boolean;
   home_url: string;
   instance_environment_type: string;
   logo_image_url: string;
@@ -69,6 +70,7 @@ export interface DisplayConfigResource extends ClerkResource {
   captchaOauthBypass: OAuthStrategy[];
   captchaHeartbeat: boolean;
   captchaHeartbeatIntervalMs?: number;
+  twoStepSignUpCreateEnabled?: boolean;
   homeUrl: string;
   instanceEnvironmentType: string;
   logoImageUrl: string;
