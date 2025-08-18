@@ -1,5 +1,5 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
-import type { Errors } from '@clerk/types';
+import type { Errors, SignInSignal, SignUpSignal } from '@clerk/types';
 import { computed, signal } from 'alien-signals';
 
 import type { SignIn } from './resources/SignIn';
@@ -9,7 +9,7 @@ export const signInResourceSignal = signal<{ resource: SignIn | null }>({ resour
 export const signInErrorSignal = signal<{ error: unknown }>({ error: null });
 export const signInFetchSignal = signal<{ status: 'idle' | 'fetching' }>({ status: 'idle' });
 
-export const signInComputedSignal = computed(() => {
+export const signInComputedSignal: SignInSignal = computed(() => {
   const signIn = signInResourceSignal().resource;
   const error = signInErrorSignal().error;
   const fetchStatus = signInFetchSignal().status;
@@ -23,7 +23,7 @@ export const signUpResourceSignal = signal<{ resource: SignUp | null }>({ resour
 export const signUpErrorSignal = signal<{ error: unknown }>({ error: null });
 export const signUpFetchSignal = signal<{ status: 'idle' | 'fetching' }>({ status: 'idle' });
 
-export const signUpComputedSignal = computed(() => {
+export const signUpComputedSignal: SignUpSignal = computed(() => {
   const signUp = signUpResourceSignal().resource;
   const error = signUpErrorSignal().error;
   const fetchStatus = signUpFetchSignal().status;

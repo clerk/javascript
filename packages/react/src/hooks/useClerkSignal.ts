@@ -1,9 +1,12 @@
+import type { SignInSignal, SignUpSignal } from '@clerk/types';
 import { useCallback, useSyncExternalStore } from 'react';
 
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvider';
 
-function useClerkSignal(signal: 'signIn' | 'signUp') {
+function useClerkSignal(signal: 'signIn'): ReturnType<SignInSignal> | null;
+function useClerkSignal(signal: 'signUp'): ReturnType<SignUpSignal> | null;
+function useClerkSignal(signal: 'signIn' | 'signUp'): ReturnType<SignInSignal> | ReturnType<SignUpSignal> | null {
   useAssertWrappedByClerkProvider('useClerkSignal');
 
   const clerk = useIsomorphicClerkContext();

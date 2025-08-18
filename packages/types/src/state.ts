@@ -26,28 +26,32 @@ export interface Errors {
   global: unknown[]; // does not include any errors that could be parsed as a field error
 }
 
+export interface SignInSignal {
+  (): {
+    errors: Errors;
+    fetchStatus: 'idle' | 'fetching';
+    signIn: SignInFutureResource | null;
+  };
+}
+
+export interface SignUpSignal {
+  (): {
+    errors: Errors;
+    fetchStatus: 'idle' | 'fetching';
+    signUp: SignUpFutureResource | null;
+  };
+}
+
 export interface State {
   /**
    * A Signal that updates when the underlying `SignIn` resource changes, including errors.
    */
-  signInSignal: {
-    (): {
-      errors: Errors;
-      fetchStatus: 'idle' | 'fetching';
-      signIn: SignInFutureResource | null;
-    };
-  };
+  signInSignal: SignInSignal;
 
   /**
    * A Signal that updates when the underlying `SignUp` resource changes, including errors.
    */
-  signUpSignal: {
-    (): {
-      errors: Errors;
-      fetchStatus: 'idle' | 'fetching';
-      signUp: SignUpFutureResource | null;
-    };
-  };
+  signUpSignal: SignUpSignal;
 
   /**
    * @experimental This experimental API is subject to change.
