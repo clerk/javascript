@@ -16,6 +16,7 @@ import type {
   SignUpAuthenticateWithWeb3Params,
   SignUpCreateParams,
   SignUpField,
+  SignUpFutureResource,
   SignUpIdentificationField,
   SignUpJSON,
   SignUpJSONSnapshot,
@@ -45,6 +46,7 @@ import {
   clerkVerifyEmailAddressCalledBeforeCreate,
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from '../errors';
+import { eventBus } from '../events';
 import { BaseResource, ClerkRuntimeError, SignUpVerifications } from './internal';
 
 declare global {
@@ -76,6 +78,21 @@ export class SignUp extends BaseResource implements SignUpResource {
   createdUserId: string | null = null;
   abandonAt: number | null = null;
   legalAcceptedAt: number | null = null;
+
+  /**
+   * @experimental This experimental API is subject to change.
+   *
+   * An instance of `SignUpFuture`, which has a different API than `SignUp`, intended to be used in custom flows.
+   */
+  __internal_future: SignUpFuture | null = new SignUpFuture(this);
+
+  /**
+   * @internal Only used for internal purposes, and is not intended to be used directly.
+   *
+   * This property is used to provide access to underlying Client methods to `SignUpFuture`, which wraps an instance
+   * of `SignUp`.
+   */
+  __internal_basePost = this._basePost.bind(this);
 
   constructor(data: SignUpJSON | SignUpJSONSnapshot | null = null) {
     super();
@@ -389,6 +406,8 @@ export class SignUp extends BaseResource implements SignUpResource {
       this.web3wallet = data.web3_wallet;
       this.legalAcceptedAt = data.legal_accepted_at;
     }
+
+    eventBus.emit('resource:update', { resource: this });
     return this;
   }
 
@@ -447,5 +466,13 @@ export class SignUp extends BaseResource implements SignUpResource {
     }
 
     return false;
+  }
+}
+
+class SignUpFuture implements SignUpFutureResource {
+  constructor(readonly resource: SignUp) {}
+
+  get status() {
+    return this.resource.status;
   }
 }
