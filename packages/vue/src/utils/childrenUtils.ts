@@ -3,14 +3,7 @@ import { h, Text, type VNode } from 'vue';
 import { errorThrower } from '../errors/errorThrower';
 import { multipleChildrenInButtonComponent } from '../errors/messages';
 
-type ButtonName =
-  | 'SignInButton'
-  | 'SignUpButton'
-  | 'SignOutButton'
-  | 'SignInWithMetamaskButton'
-  | 'SubscriptionDetailsButton'
-  | 'CheckoutButton'
-  | 'PlanDetailsButton';
+type ButtonName = 'SignInButton' | 'SignUpButton' | 'SignOutButton' | 'SignInWithMetamaskButton';
 
 export const normalizeWithDefaultValue = (slotContent: VNode[] | undefined, defaultValue: string) => {
   // Render a button with the default value if no slot content is provided
