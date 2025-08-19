@@ -50,7 +50,7 @@ export const CreateOrganizationScreen = (props: CreateOrganizationScreenProps) =
       await setActive({
         organization,
         navigate: async () => {
-          // TODO - Handle next tasks
+          // TODO(after-auth) ORGS-779 - Handle next tasks
           await navigate(redirectUrlComplete);
         },
       });
