@@ -13,9 +13,11 @@ import type {
   PreparePhoneNumberVerificationParams,
   PrepareVerificationParams,
   PrepareWeb3WalletVerificationParams,
+  SetActiveNavigate,
   SignUpAuthenticateWithWeb3Params,
   SignUpCreateParams,
   SignUpField,
+  SignUpFutureResource,
   SignUpIdentificationField,
   SignUpJSON,
   SignUpJSONSnapshot,
@@ -39,12 +41,14 @@ import { _authenticateWithPopup } from '../../utils/authenticateWithPopup';
 import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
 import { createValidatePassword } from '../../utils/passwords/password';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
+import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
 import {
   clerkInvalidFAPIResponse,
   clerkMissingOptionError,
   clerkVerifyEmailAddressCalledBeforeCreate,
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from '../errors';
+import { eventBus } from '../events';
 import { BaseResource, ClerkRuntimeError, SignUpVerifications } from './internal';
 
 declare global {
@@ -76,6 +80,21 @@ export class SignUp extends BaseResource implements SignUpResource {
   createdUserId: string | null = null;
   abandonAt: number | null = null;
   legalAcceptedAt: number | null = null;
+
+  /**
+   * @experimental This experimental API is subject to change.
+   *
+   * An instance of `SignUpFuture`, which has a different API than `SignUp`, intended to be used in custom flows.
+   */
+  __internal_future: SignUpFuture | null = new SignUpFuture(this);
+
+  /**
+   * @internal Only used for internal purposes, and is not intended to be used directly.
+   *
+   * This property is used to provide access to underlying Client methods to `SignUpFuture`, which wraps an instance
+   * of `SignUp`.
+   */
+  __internal_basePost = this._basePost.bind(this);
 
   constructor(data: SignUpJSON | SignUpJSONSnapshot | null = null) {
     super();
@@ -389,6 +408,8 @@ export class SignUp extends BaseResource implements SignUpResource {
       this.web3wallet = data.web3_wallet;
       this.legalAcceptedAt = data.legal_accepted_at;
     }
+
+    eventBus.emit('resource:update', { resource: this });
     return this;
   }
 
@@ -447,5 +468,59 @@ export class SignUp extends BaseResource implements SignUpResource {
     }
 
     return false;
+  }
+}
+
+class SignUpFuture implements SignUpFutureResource {
+  verifications = {
+    sendEmailCode: this.sendEmailCode.bind(this),
+    verifyEmailCode: this.verifyEmailCode.bind(this),
+  };
+
+  constructor(readonly resource: SignUp) {}
+
+  get status() {
+    return this.resource.status;
+  }
+
+  get unverifiedFields() {
+    return this.resource.unverifiedFields;
+  }
+
+  async password({ emailAddress, password }: { emailAddress: string; password: string }): Promise<{ error: unknown }> {
+    return runAsyncResourceTask(this.resource, async () => {
+      await this.resource.__internal_basePost({
+        path: this.resource.pathRoot,
+        body: { emailAddress, password },
+      });
+    });
+  }
+
+  async sendEmailCode(): Promise<{ error: unknown }> {
+    return runAsyncResourceTask(this.resource, async () => {
+      await this.resource.__internal_basePost({
+        body: { strategy: 'email_code' },
+        action: 'prepare_verification',
+      });
+    });
+  }
+
+  async verifyEmailCode({ code }: { code: string }): Promise<{ error: unknown }> {
+    return runAsyncResourceTask(this.resource, async () => {
+      await this.resource.__internal_basePost({
+        body: { strategy: 'email_code', code },
+        action: 'attempt_verification',
+      });
+    });
+  }
+
+  async finalize({ navigate }: { navigate?: SetActiveNavigate }): Promise<{ error: unknown }> {
+    return runAsyncResourceTask(this.resource, async () => {
+      if (!this.resource.createdSessionId) {
+        throw new Error('Cannot finalize sign-up without a created session.');
+      }
+
+      await SignUp.clerk.setActive({ session: this.resource.createdSessionId, navigate });
+    });
   }
 }
