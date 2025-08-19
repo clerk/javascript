@@ -8,6 +8,7 @@ import type {
   AuthenticateWithPopupParams,
   AuthenticateWithRedirectParams,
   AuthenticateWithWeb3Params,
+  CaptchaWidgetType,
   CreateEmailLinkFlowReturn,
   PrepareEmailAddressVerificationParams,
   PreparePhoneNumberVerificationParams,
@@ -487,11 +488,34 @@ class SignUpFuture implements SignUpFutureResource {
     return this.resource.unverifiedFields;
   }
 
+  private async getCaptchaToken(): Promise<{ captchaToken?: string; captchaWidgetType?: CaptchaWidgetType }> {
+    const captchaChallenge = new CaptchaChallenge(SignUp.clerk);
+    const response = await captchaChallenge.managedOrInvisible({ action: 'signup' });
+    if (!response) {
+      throw new Error('Captcha challenge failed');
+    }
+
+    const { captchaError, captchaToken, captchaWidgetType } = response;
+    if (captchaError) {
+      throw new Error(captchaError);
+    }
+
+    return { captchaToken, captchaWidgetType };
+  }
+
   async password({ emailAddress, password }: { emailAddress: string; password: string }): Promise<{ error: unknown }> {
     return runAsyncResourceTask(this.resource, async () => {
+      const { captchaToken, captchaWidgetType } = await this.getCaptchaToken();
+
       await this.resource.__internal_basePost({
         path: this.resource.pathRoot,
-        body: { emailAddress, password },
+        body: {
+          strategy: 'password',
+          emailAddress,
+          password,
+          captchaToken,
+          captchaWidgetType,
+        },
       });
     });
   }
