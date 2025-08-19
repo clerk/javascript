@@ -25,6 +25,7 @@ import { Header } from '@/ui/elements/Header';
 import { OrganizationPreview } from '@/ui/elements/OrganizationPreview';
 import { useOrganizationListInView } from '@/ui/hooks/useOrganizationListInView';
 import { Add } from '@/ui/icons';
+import { useRouter } from '@/ui/router';
 import { handleError } from '@/ui/utils/errorHandler';
 
 type ChooseOrganizationScreenProps = {
@@ -106,6 +107,7 @@ export const ChooseOrganizationScreen = (props: ChooseOrganizationScreenProps) =
 const MembershipPreview = (props: { organization: OrganizationResource }) => {
   const { user } = useUser();
   const card = useCardState();
+  const { navigate } = useRouter();
   const { redirectUrlComplete } = useTaskChooseOrganizationContext();
   const { isLoaded, setActive } = useOrganizationList();
   const { t } = useLocalizations();
@@ -119,7 +121,10 @@ const MembershipPreview = (props: { organization: OrganizationResource }) => {
       try {
         await setActive({
           organization,
-          redirectUrl: redirectUrlComplete,
+          navigate: async () => {
+            // TODO - Handle next tasks
+            await navigate(redirectUrlComplete);
+          },
         });
       } catch (err) {
         if (!isClerkAPIResponseError(err)) {
