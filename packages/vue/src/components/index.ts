@@ -28,6 +28,3 @@ export { default as SignInButton } from './SignInButton.vue';
 export { default as SignUpButton } from './SignUpButton.vue';
 export { default as SignOutButton } from './SignOutButton.vue';
 export { default as SignInWithMetamaskButton } from './SignInWithMetamaskButton.vue';
-export { default as SubscriptionDetailsButton } from './SubscriptionDetailsButton.vue';
-export { default as CheckoutButton } from './CheckoutButton.vue';
-export { default as PlanDetailsButton } from './PlanDetailsButton.vue';
