@@ -28,6 +28,25 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     await expect(u.po.page.getByRole('heading', { name: 'Pro' })).toBeVisible();
   });
 
+  test('renders pricing details of a specific plan', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.po.page.goToRelative('/billing/plan-details-btn');
+
+    await u.po.page.getByRole('button', { name: 'Plan details' }).click();
+
+    await u.po.planDetails.waitForMounted();
+    const { root } = u.po.planDetails;
+    await expect(root.getByRole('heading', { name: 'Plus' })).toBeVisible();
+    await expect(root.getByText('$9.99')).toBeVisible();
+    await expect(root.getByText('This is the Plus plan!')).toBeVisible();
+    await expect(root.getByText('Feature One')).toBeVisible();
+    await expect(root.getByText('First feature')).toBeVisible();
+    await expect(root.getByText('Feature Two')).toBeVisible();
+    await expect(root.getByText('Second feature')).toBeVisible();
+    await expect(root.getByText('Feature Three')).toBeVisible();
+    await expect(root.getByText('Third feature')).toBeVisible();
+  });
+
   test('when signed out, clicking subscribe button navigates to sign in page', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.po.page.goToRelative('/pricing-table');
@@ -64,6 +83,18 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     await expect(u.po.page.getByText('Checkout')).toBeVisible();
   });
 
+  test('when signed in, clicking checkout button open checkout drawer', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.po.signIn.goTo();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+    await u.po.page.goToRelative('/billing/checkout-btn');
+
+    await u.po.page.getByRole('button', { name: 'Checkout Now' }).click();
+    await u.po.checkout.waitForMounted();
+    await u.po.page.getByText(/^Checkout$/).click();
+    await u.po.checkout.fillTestCard();
+  });
+
   test('can subscribe to a plan', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
@@ -84,6 +115,22 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
         timeout: 5_000,
       });
     }
+  });
+
+  test('Displays subscription details drawer', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.po.signIn.goTo();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+    await u.po.page.goToRelative('/billing/subscription-details-btn');
+
+    await u.po.page.getByRole('button', { name: 'Subscription details' }).click();
+
+    await u.po.subscriptionDetails.waitForMounted();
+    await expect(u.po.page.getByText('Plus')).toBeVisible();
+    await expect(u.po.page.getByText('Subscription details')).toBeVisible();
+    await expect(u.po.page.getByText('Current billing cycle')).toBeVisible();
+    await expect(u.po.page.getByText('Next payment on')).toBeVisible();
+    await expect(u.po.page.getByText('Next payment amount')).toBeVisible();
   });
 
   test('can upgrade to a new plan with saved card', async ({ page, context }) => {
