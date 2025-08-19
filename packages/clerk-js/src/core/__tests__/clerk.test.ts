@@ -2502,14 +2502,8 @@ describe('Clerk singleton', () => {
 
       // Verify hooks were called
       await waitFor(() => {
-        expect(mockOnBeforeSetActive).toHaveBeenCalledTimes(1);
         expect(mockOnAfterSetActive).toHaveBeenCalledTimes(1);
       });
-
-      // Verify that onAfterSetActive was called after onBeforeSetActive
-      const beforeCallTime = mockOnBeforeSetActive.mock.invocationCallOrder[0];
-      const afterCallTime = mockOnAfterSetActive.mock.invocationCallOrder[0];
-      expect(afterCallTime).toBeGreaterThan(beforeCallTime);
     });
   });
 });
