@@ -1231,6 +1231,10 @@ export type __internal_LocalizationResource = {
       subtitle: LocalizationValue;
       formButtonSubmit: LocalizationValue;
       formButtonReset: LocalizationValue;
+      formFieldLabel__name: LocalizationValue;
+      formFieldLabel__slug: LocalizationValue;
+      formFieldInputPlaceholder__name: LocalizationValue;
+      formFieldInputPlaceholder__slug: LocalizationValue;
     };
     chooseOrganization: {
       title: LocalizationValue;
