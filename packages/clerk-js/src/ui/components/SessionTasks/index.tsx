@@ -1,14 +1,13 @@
 import { useClerk } from '@clerk/shared/react';
 import { eventComponentMounted } from '@clerk/shared/telemetry';
 import type { SessionResource } from '@clerk/types';
-import { useContext, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { Card } from '@/ui/elements/Card';
 import { withCardStateProvider } from '@/ui/elements/contexts';
 import { LoadingCardContainer } from '@/ui/elements/LoadingCard';
 
 import { INTERNAL_SESSION_TASK_ROUTE_BY_KEY } from '../../../core/sessionTasks';
-import { SignInContext, SignUpContext } from '../../../ui/contexts';
 import {
   SessionTasksContext,
   TaskChooseOrganizationContext,
@@ -62,23 +61,17 @@ function SessionTasksRoutes(): JSX.Element {
   );
 }
 
+type SessionTasksProps = {
+  redirectUrlComplete: string;
+};
+
 /**
  * @internal
  */
-export const SessionTasks = withCardStateProvider(() => {
+export const SessionTasks = withCardStateProvider(({ redirectUrlComplete }: SessionTasksProps) => {
   const clerk = useClerk();
   const { navigate } = useRouter();
-  const signInContext = useContext(SignInContext);
-  const signUpContext = useContext(SignUpContext);
   const currentTaskContainer = useRef<HTMLDivElement>(null);
-  const { queryParams } = useRouter();
-
-  const redirectUrlComplete =
-    signInContext?.afterSignInUrl ??
-    signUpContext?.afterSignUpUrl ??
-    clerk?.buildAfterSignInUrl({
-      params: new URLSearchParams(queryParams),
-    });
 
   // If there are no pending tasks, navigate away from the tasks flow.
   // This handles cases where a user with an active session returns to the tasks URL,
