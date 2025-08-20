@@ -1,23 +1,36 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
-import type { Errors } from '@clerk/types';
+import type { Errors, SignInSignal, SignUpSignal } from '@clerk/types';
 import { computed, signal } from 'alien-signals';
 
 import type { SignIn } from './resources/SignIn';
+import type { SignUp } from './resources/SignUp';
 
-export const signInSignal = signal<{ resource: SignIn | null }>({ resource: null });
+export const signInResourceSignal = signal<{ resource: SignIn | null }>({ resource: null });
 export const signInErrorSignal = signal<{ error: unknown }>({ error: null });
+export const signInFetchSignal = signal<{ status: 'idle' | 'fetching' }>({ status: 'idle' });
 
-export const signInComputedSignal = computed(() => {
-  const signIn = signInSignal().resource;
+export const signInComputedSignal: SignInSignal = computed(() => {
+  const signIn = signInResourceSignal().resource;
   const error = signInErrorSignal().error;
+  const fetchStatus = signInFetchSignal().status;
 
   const errors = errorsToParsedErrors(error);
 
-  if (!signIn) {
-    return { errors, signIn: null };
-  }
+  return { errors, fetchStatus, signIn: signIn ? signIn.__internal_future : null };
+});
 
-  return { errors, signIn: signIn.__internal_future };
+export const signUpResourceSignal = signal<{ resource: SignUp | null }>({ resource: null });
+export const signUpErrorSignal = signal<{ error: unknown }>({ error: null });
+export const signUpFetchSignal = signal<{ status: 'idle' | 'fetching' }>({ status: 'idle' });
+
+export const signUpComputedSignal: SignUpSignal = computed(() => {
+  const signUp = signUpResourceSignal().resource;
+  const error = signUpErrorSignal().error;
+  const fetchStatus = signUpFetchSignal().status;
+
+  const errors = errorsToParsedErrors(error);
+
+  return { errors, fetchStatus, signUp: signUp ? signUp.__internal_future : null };
 });
 
 /**
@@ -41,6 +54,10 @@ function errorsToParsedErrors(error: unknown): Errors {
     raw: [],
     global: [],
   };
+
+  if (!error) {
+    return parsedErrors;
+  }
 
   if (!isClerkAPIResponseError(error)) {
     parsedErrors.raw.push(error);

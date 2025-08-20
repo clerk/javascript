@@ -14,26 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const ptBR: LocalizationResource = {
   locale: 'pt-BR',
-  taskChooseOrganization: {
-    signOut: {
-      actionLink: 'Sair',
-      actionText: 'Conectado como {{identifier}}',
-    },
-    createOrganization: {
-      title: 'Configure sua conta',
-      subtitle: 'Conte-nos um pouco sobre sua organização',
-      formButtonSubmit: 'Criar nova organização',
-      formButtonReset: 'Cancelar',
-    },
-    chooseOrganization: {
-      title: 'Escolha uma organização',
-      subtitle: 'Junte-se a uma organização existente ou crie uma nova',
-      suggestionsAcceptedLabel: 'Aprovação pendente',
-      action__createOrganization: 'Criar nova organização',
-      action__suggestionsAccept: 'Solicitar participação',
-      action__invitationAccept: 'Participar',
-    },
-  },
   apiKeys: {
     action__add: 'Adicionar nova chave',
     action__search: 'Pesquisar chaves',
@@ -827,6 +807,26 @@ export const ptBR: LocalizationResource = {
   },
   socialButtonsBlockButton: 'Continuar com {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: 'Criar nova organização',
+      action__invitationAccept: 'Participar',
+      action__suggestionsAccept: 'Solicitar participação',
+      subtitle: 'Junte-se a uma organização existente ou crie uma nova',
+      suggestionsAcceptedLabel: 'Aprovação pendente',
+      title: 'Escolha uma organização',
+    },
+    createOrganization: {
+      formButtonReset: 'Cancelar',
+      formButtonSubmit: 'Criar nova organização',
+      subtitle: 'Conte-nos um pouco sobre sua organização',
+      title: 'Configure sua conta',
+    },
+    signOut: {
+      actionLink: 'Sair',
+      actionText: 'Conectado como {{identifier}}',
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} já é membro da organização.',
     captcha_invalid:
@@ -869,6 +869,8 @@ export const ptBR: LocalizationResource = {
       'Você chegou ao seu limite de membros da organização, incluindo convites pendentes.',
     organization_minimum_permissions_needed:
       'É necessário que haja pelo menos um membro da organização com as permissões mínimas necessárias.',
+    organization_not_found_or_unauthorized: undefined,
+    organization_not_found_or_unauthorized_with_create_organization_disabled: undefined,
     passkey_already_exists: 'Uma chave de acesso já está registrada neste dispositivo.',
     passkey_not_supported: 'Chaves de acesso não são suportadas neste dispositivo.',
     passkey_pa_not_supported: 'Registro precisa de chave de acesso mas dispositivo não a suporta.',

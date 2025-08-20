@@ -197,7 +197,7 @@ export const skSK: LocalizationResource = {
   formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
   formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'Zadajte záložný kód',
-  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Odstrániť účet',
+  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Zmazať účet',
   formFieldInputPlaceholder__emailAddress: 'Zadajte svoj e-mail',
   formFieldInputPlaceholder__emailAddress_username: 'Zadajte e-mail alebo používateľské meno',
   formFieldInputPlaceholder__emailAddresses:
@@ -862,6 +862,8 @@ export const skSK: LocalizationResource = {
     organization_domain_exists_for_enterprise_connection: undefined,
     organization_membership_quota_exceeded: undefined,
     organization_minimum_permissions_needed: undefined,
+    organization_not_found_or_unauthorized: undefined,
+    organization_not_found_or_unauthorized_with_create_organization_disabled: undefined,
     passkey_already_exists: 'Na tomto zariadení už existuje passkey pre tento účet.',
     passkey_not_supported: 'Váš prehliadač alebo zariadenie nepodporuje passkey.',
     passkey_pa_not_supported: 'Registrácia vyžaduje autentifikátor ale toto zariadenie ho nepodporuje.',

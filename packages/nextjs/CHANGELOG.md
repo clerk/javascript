@@ -1,5 +1,29 @@
 # Change Log
 
+## 6.31.3
+
+### Patch Changes
+
+- Updated dependencies [[`8dc6bad`](https://github.com/clerk/javascript/commit/8dc6bad5c7051b59bd8c73e65d497f6a974bb1c3), [`aa6a3c3`](https://github.com/clerk/javascript/commit/aa6a3c3d3ba2de67a468c996cbf0bff43a09ddb8), [`db50c47`](https://github.com/clerk/javascript/commit/db50c4734920ada6002de8c62c994047eb6cb5a0)]:
+  - @clerk/types@4.80.0
+  - @clerk/clerk-react@5.43.0
+  - @clerk/backend@2.9.3
+  - @clerk/shared@3.21.2
+
+## 6.31.2
+
+### Patch Changes
+
+- Fix keyless drift logic to support client components and ensure only apps on development are included. Change createClerkClient to accept an argument for samplingRate in telemetry options and update the ClerkOptions type. ([#6539](https://github.com/clerk/javascript/pull/6539)) by [@heatlikeheatwave](https://github.com/heatlikeheatwave)
+
+- Import fs methods with nodeFsOrThrow rather than direct import. ([#6555](https://github.com/clerk/javascript/pull/6555)) by [@heatlikeheatwave](https://github.com/heatlikeheatwave)
+
+- Updated dependencies [[`413468c`](https://github.com/clerk/javascript/commit/413468c9b9c8fb7576f8e4cbdccff98784e33fef), [`7b7eb1f`](https://github.com/clerk/javascript/commit/7b7eb1fc0235249c5c179239078294118f2947cd)]:
+  - @clerk/shared@3.21.1
+  - @clerk/types@4.79.0
+  - @clerk/clerk-react@5.42.2
+  - @clerk/backend@2.9.2
+
 ## 6.31.1
 
 ### Patch Changes

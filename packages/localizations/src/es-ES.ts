@@ -859,6 +859,8 @@ export const esES: LocalizationResource = {
       'Has alcanzado tu límite de miembros de la organización, incluyendo invitaciones pendientes.',
     organization_minimum_permissions_needed:
       'Es necesario que haya al menos un miembro de la organización con los permisos mínimos necesarios.',
+    organization_not_found_or_unauthorized: undefined,
+    organization_not_found_or_unauthorized_with_create_organization_disabled: undefined,
     passkey_already_exists: 'Ya existe una clave de acceso.',
     passkey_not_supported: 'Las claves de acceso no son compatibles.',
     passkey_pa_not_supported: 'La clave de acceso no es compatible con la autenticación de dispositivos.',

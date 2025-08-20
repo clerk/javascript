@@ -865,6 +865,8 @@ export const hiIN: LocalizationResource = {
     organization_membership_quota_exceeded:
       'आप अपने संगठन की सदस्यता की सीमा तक पहुंच गए हैं, जिसमें बकाया आमंत्रण भी शामिल हैं।',
     organization_minimum_permissions_needed: 'संगठन के कम से कम एक सदस्य के पास न्यूनतम आवश्यक अनुमतियां होनी चाहिए।',
+    organization_not_found_or_unauthorized: undefined,
+    organization_not_found_or_unauthorized_with_create_organization_disabled: undefined,
     passkey_already_exists: 'इस डिवाइस के साथ पहले से ही एक पासकी पंजीकृत है।',
     passkey_not_supported: 'इस डिवाइस पर पासकी समर्थित नहीं हैं।',
     passkey_pa_not_supported:

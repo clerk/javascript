@@ -870,6 +870,8 @@ export const msMY: LocalizationResource = {
       'Anda telah mencapai had keahlian organisasi anda, termasuk jemputan tertunggak.',
     organization_minimum_permissions_needed:
       'Mesti ada sekurang-kurangnya satu ahli organisasi dengan kebenaran minimum yang diperlukan.',
+    organization_not_found_or_unauthorized: undefined,
+    organization_not_found_or_unauthorized_with_create_organization_disabled: undefined,
     passkey_already_exists: 'Kunci pas sudah didaftarkan dengan peranti ini.',
     passkey_not_supported: 'Kunci pas tidak disokong pada peranti ini.',
     passkey_pa_not_supported: 'Pendaftaran memerlukan pengesah platform tetapi peranti tidak menyokongnya.',

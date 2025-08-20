@@ -64,6 +64,10 @@ export const enUS: LocalizationResource = {
     availableFeatures: 'Available features',
     billedAnnually: 'Billed annually',
     billedMonthlyOnly: 'Only billed monthly',
+    cancelFreeTrial: 'Cancel free trial',
+    cancelFreeTrialTitle: 'Cancel free trial for {{plan}} plan?',
+    cancelFreeTrialDescription:
+      'You’re about to cancel your free trial for the {{plan}} plan. If you cancel now, you’ll lose access to the plan’s features right away and won’t be able to start the trial again.',
     cancelSubscription: 'Cancel subscription',
     cancelSubscriptionAccessUntil:
       "You can keep using '{{plan}}' features until {{ date | longDate('en-US') }}, after which you will no longer have access.",
@@ -103,6 +107,7 @@ export const enUS: LocalizationResource = {
     free: 'Free',
     getStarted: 'Get started',
     keepSubscription: 'Keep subscription',
+    keepFreeTrial: 'Keep free trial',
     manage: 'Manage',
     manageSubscription: 'Manage subscription',
     month: 'Month',
@@ -140,9 +145,13 @@ export const enUS: LocalizationResource = {
       endsOn: 'Ends on',
       nextPaymentAmount: 'Next payment amount',
       nextPaymentOn: 'Next payment on',
+      firstPaymentOn: 'First payment on',
+      firstPaymentAmount: 'First payment amount',
       pastDueAt: 'Past due on',
       renewsAt: 'Renews at',
       subscribedOn: 'Subscribed on',
+      trialStartedOn: 'Trial started on',
+      trialEndsOn: 'Trial ends on',
       title: 'Subscription',
     },
     subtotal: 'Subtotal',
@@ -851,6 +860,10 @@ export const enUS: LocalizationResource = {
     organization_domain_exists_for_enterprise_connection: undefined,
     organization_membership_quota_exceeded: undefined,
     organization_minimum_permissions_needed: undefined,
+    organization_not_found_or_unauthorized:
+      'You are no longer a member of this organization. Please choose or create another one.',
+    organization_not_found_or_unauthorized_with_create_organization_disabled:
+      'You are no longer a member of this organization. Please choose another one.',
     passkey_already_exists: 'A passkey is already registered with this device.',
     passkey_not_supported: 'Passkeys are not supported on this device.',
     passkey_pa_not_supported: 'Registration requires a platform authenticator but the device does not support it.',

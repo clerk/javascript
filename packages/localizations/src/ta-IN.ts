@@ -870,6 +870,8 @@ export const taIN: LocalizationResource = {
       'நிலுவையிலுள்ள அழைப்புகள் உட்பட, நீங்கள் நிறுவன உறுப்பினர் எண்ணிக்கை வரம்பை அடைந்துவிட்டீர்கள்.',
     organization_minimum_permissions_needed:
       'குறைந்தபட்ச தேவையான அனுமதிகளுடன் குறைந்தது ஒரு நிறுவன உறுப்பினர் இருக்க வேண்டும்.',
+    organization_not_found_or_unauthorized: undefined,
+    organization_not_found_or_unauthorized_with_create_organization_disabled: undefined,
     passkey_already_exists: 'இந்த சாதனத்துடன் ஒரு பாஸ்கீ ஏற்கனவே பதிவு செய்யப்பட்டுள்ளது.',
     passkey_not_supported: 'இந்த சாதனத்தில் பாஸ்கீகள் ஆதரிக்கப்படவில்லை.',
     passkey_pa_not_supported: 'பதிவுக்கு ஒரு தளம் அங்கீகரிப்பாளர் தேவைப்படுகிறது, ஆனால் சாதனம் அதை ஆதரிக்கவில்லை.',

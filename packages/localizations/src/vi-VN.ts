@@ -862,6 +862,8 @@ export const viVN: LocalizationResource = {
     organization_domain_exists_for_enterprise_connection: undefined,
     organization_membership_quota_exceeded: undefined,
     organization_minimum_permissions_needed: undefined,
+    organization_not_found_or_unauthorized: undefined,
+    organization_not_found_or_unauthorized_with_create_organization_disabled: undefined,
     passkey_already_exists: 'Mã passkey đã được đăng ký với thiết bị này.',
     passkey_not_supported: 'Mã passkey không được hỗ trợ trên thiết bị này.',
     passkey_pa_not_supported: 'Đăng ký yêu cầu một bộ xác thực nền tảng nhưng thiết bị không hỗ trợ nó.',

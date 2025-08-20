@@ -323,7 +323,6 @@ export function useOrganizationList<T extends UseOrganizationListParams>(params?
     {
       type: 'userMemberships',
       userId: user?.id,
-      memberships: user?.organizationMemberships.length ?? 0,
     },
   );
 

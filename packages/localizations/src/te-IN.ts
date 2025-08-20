@@ -866,6 +866,8 @@ export const teIN: LocalizationResource = {
     organization_membership_quota_exceeded:
       'మీరు మీ సంస్థ సభ్యత్వాలను, పెండింగ్ ఆహ్వానాలతో సహా పరిమితిని చేరుకున్నారు.',
     organization_minimum_permissions_needed: 'కనీస అవసరమైన అనుమతులు కలిగిన కనీసం ఒక సంస్థ సభ్యుడు ఉండాలి.',
+    organization_not_found_or_unauthorized: undefined,
+    organization_not_found_or_unauthorized_with_create_organization_disabled: undefined,
     passkey_already_exists: 'ఈ పరికరంతో పాస్‌కీ ఇప్పటికే నమోదు చేయబడింది.',
     passkey_not_supported: 'పాస్‌కీలు ఈ పరికరంలో మద్దతు లేవు.',
     passkey_pa_not_supported: 'నమోదు కోసం ప్లాట్‌ఫామ్ ప్రమాణీకరణకర్త అవసరం కానీ పరికరం దానికి మద్దతు ఇవ్వదు.',

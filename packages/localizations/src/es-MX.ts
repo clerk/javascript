@@ -864,6 +864,8 @@ export const esMX: LocalizationResource = {
     organization_membership_quota_exceeded:
       'Alcanzaste el limite de miembros en la organización, incluyendo las invitaciones enviadas.',
     organization_minimum_permissions_needed: 'Debe existir al menos un miembro en la organización.',
+    organization_not_found_or_unauthorized: undefined,
+    organization_not_found_or_unauthorized_with_create_organization_disabled: undefined,
     passkey_already_exists: 'Ya se ha registrado una llave de acceso en este dispositivo.',
     passkey_not_supported: 'Las llaves de acceso no son compatibles con este dispositivo.',
     passkey_pa_not_supported:

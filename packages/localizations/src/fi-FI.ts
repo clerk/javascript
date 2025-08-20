@@ -856,6 +856,8 @@ export const fiFI: LocalizationResource = {
     organization_domain_exists_for_enterprise_connection: undefined,
     organization_membership_quota_exceeded: undefined,
     organization_minimum_permissions_needed: undefined,
+    organization_not_found_or_unauthorized: undefined,
+    organization_not_found_or_unauthorized_with_create_organization_disabled: undefined,
     passkey_already_exists: 'Pääsyavain on jo rekisteröity tähän laitteeseen.',
     passkey_not_supported: 'Pääsyavain ei ole tuettu tällä laitteella.',
     passkey_pa_not_supported: 'Rekisteröinti vaatii alustan autentikaattorin, mutta laite ei tue sitä.',
