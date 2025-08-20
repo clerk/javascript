@@ -5,5 +5,5 @@
 </template>
 
 <script setup lang="ts">
-import { PlanDetailsButton } from '@clerk/vue';
+import { PlanDetailsButton } from '@clerk/vue/experimental';
 </script>

@@ -12,5 +12,6 @@
 </template>
 
 <script setup lang="ts">
-import { SignedIn, CheckoutButton } from '@clerk/vue';
+import { SignedIn } from '@clerk/vue';
+import { CheckoutButton } from '@clerk/vue/experimental';
 </script>
