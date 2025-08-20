@@ -194,6 +194,10 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
     return Boolean(this.attributes?.password?.enabled && this.attributes.password?.required);
   }
 
+  get instanceIsPasswordEnabled() {
+    return Boolean(this.attributes?.password?.enabled);
+  }
+
   get hasValidAuthFactor() {
     return Boolean(
       this.attributes?.email_address?.enabled ||

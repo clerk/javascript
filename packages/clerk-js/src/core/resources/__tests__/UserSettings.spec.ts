@@ -55,7 +55,7 @@ describe('UserSettings', () => {
     expect(res).toEqual(['web3_metamask_signature']);
   });
 
-  it('returns if the instance is passwordless or password-based', function () {
+  it('returns if the instance is passwordless or password-enabled or password-required', function () {
     let sut = new UserSettings({
       attributes: {
         password: {
@@ -66,6 +66,7 @@ describe('UserSettings', () => {
     } as any as UserSettingsJSON);
 
     expect(sut.instanceIsPasswordBased).toEqual(true);
+    expect(sut.instanceIsPasswordEnabled).toEqual(true);
 
     sut = new UserSettings({
       attributes: {
@@ -75,7 +76,21 @@ describe('UserSettings', () => {
         },
       },
     } as any as UserSettingsJSON);
+
     expect(sut.instanceIsPasswordBased).toEqual(false);
+    expect(sut.instanceIsPasswordEnabled).toEqual(true);
+
+    sut = new UserSettings({
+      attributes: {
+        password: {
+          enabled: false,
+          required: false,
+        },
+      },
+    } as any as UserSettingsJSON);
+
+    expect(sut.instanceIsPasswordBased).toEqual(false);
+    expect(sut.instanceIsPasswordEnabled).toEqual(false);
   });
 
   it('respects default values for min and max password length', function () {

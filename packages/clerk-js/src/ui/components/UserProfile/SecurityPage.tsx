@@ -14,10 +14,10 @@ import { PasswordSection } from './PasswordSection';
 import { getSecondFactors } from './utils';
 
 export const SecurityPage = withCardStateProvider(() => {
-  const { attributes, instanceIsPasswordBased } = useEnvironment().userSettings;
+  const { attributes, instanceIsPasswordEnabled } = useEnvironment().userSettings;
   const card = useCardState();
   const { user } = useUser();
-  const showPassword = instanceIsPasswordBased;
+  const showPassword = instanceIsPasswordEnabled;
   const showPasskey = attributes.passkey?.enabled;
   const showMfa = getSecondFactors(attributes).length > 0;
   const showDelete = user?.deleteSelfEnabled;
