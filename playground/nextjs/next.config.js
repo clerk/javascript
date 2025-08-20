@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
   // Configure webpack NOT to ignore node_modules changes for HMR
   webpack: config => {
     config.snapshot = {
