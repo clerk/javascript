@@ -29,7 +29,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
   });
 
   test('renders pricing details of a specific plan', async ({ page, context }) => {
-    test.skip(app.name.includes('astro'), 'Still working on it');
+    // test.skip(app.name.includes('astro'), 'Still working on it');
 
     const u = createTestUtils({ app, page, context });
     await u.po.page.goToRelative('/billing/plan-details-btn');

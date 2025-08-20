@@ -14,7 +14,7 @@ export { default as SignUpButton } from './unstyled/SignUpButton.astro';
 export { default as SignOutButton } from './unstyled/SignOutButton.astro';
 export { default as __experimental_SubscriptionDetailsButton } from './unstyled/SubscriptionDetailsButton.astro';
 export { default as __experimental_CheckoutButton } from './unstyled/CheckoutButton.astro';
-export { default as __experimental_PlanDetailsButton } from './unstyled/PlanDetailsButton.astro';
+export { default as PlanDetailsButton } from './unstyled/PlanDetailsButton.astro';
 
 /**
  * UI Components
