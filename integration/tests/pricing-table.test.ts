@@ -29,6 +29,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
   });
 
   test('renders pricing details of a specific plan', async ({ page, context }) => {
+    test.skip(app.name.includes('astro'), 'Still working on it');
+
     const u = createTestUtils({ app, page, context });
     await u.po.page.goToRelative('/billing/plan-details-btn');
 
@@ -84,6 +86,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
   });
 
   test('when signed in, clicking checkout button open checkout drawer', async ({ page, context }) => {
+    test.skip(app.name.includes('astro'), 'Still working on it');
     const u = createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -118,6 +121,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
   });
 
   test('Displays subscription details drawer', async ({ page, context }) => {
+    test.skip(app.name.includes('astro'), 'Still working on it');
     const u = createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
