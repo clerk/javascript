@@ -1214,7 +1214,7 @@ describe('SubscriptionDetails', () => {
       expect(getByText('Cancel free trial for Pro Plan plan?')).toBeVisible();
       expect(
         getByText(
-          'Your Pro Plan trial will remain active until February 1, 2021. After that, you will no longer have access and no charges will apply.',
+          "Your trial will stay active until February 1, 2021. After that, you'll lose access to trial features. You won't be changed.",
         ),
       ).toBeVisible();
       expect(getByText('Keep free trial')).toBeVisible();
