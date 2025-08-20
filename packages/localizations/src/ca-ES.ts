@@ -76,7 +76,8 @@ export const caES: LocalizationResource = {
     billedAnnually: undefined,
     billedMonthlyOnly: undefined,
     cancelFreeTrial: 'Cancel·la la prova gratuïta',
-    cancelFreeTrialAccessUntil: 'Si cancel·les ara, continuaràs amb la prova gratuïta del pla {{plan}} fins al {{date}}.',
+    cancelFreeTrialAccessUntil:
+      'Si cancel·les ara, continuaràs amb la prova gratuïta del pla {{plan}} fins al {{date}}.',
     cancelFreeTrialTitle: 'Cancel·la la prova gratuïta pel pla {{plan}}?',
     cancelSubscription: undefined,
     cancelSubscriptionAccessUntil: undefined,

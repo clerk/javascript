@@ -79,7 +79,6 @@ export const bgBG: LocalizationResource = {
     cancelFreeTrialAccessUntil:
       'Вашият пробен период ще продължи до {{ date | longDate("bg-BG") }}. След това ще загубите достъп до пробните функции. Няма да бъдете таксувани.',
     cancelFreeTrialTitle: 'Отказ от пробния период за {{plan}} план?',
-    keepFreeTrial: 'Запази пробния период',
     cancelSubscription: undefined,
     cancelSubscriptionAccessUntil: undefined,
     cancelSubscriptionNoCharge: undefined,
@@ -114,7 +113,7 @@ export const bgBG: LocalizationResource = {
     defaultFreePlanActive: undefined,
     free: undefined,
     getStarted: undefined,
-    keepFreeTrial: undefined,
+    keepFreeTrial: 'Запази пробния период',
     keepSubscription: undefined,
     manage: undefined,
     manageSubscription: undefined,
