@@ -2,4 +2,4 @@
 '@clerk/clerk-js': patch
 ---
 
-Fix SessionTasks redirectUrlComplete
+Fix incorrect redirect when completing session tasks within `SignIn` and `SignUp` components
