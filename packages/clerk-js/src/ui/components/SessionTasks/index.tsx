@@ -72,18 +72,7 @@ export const SessionTasks = withCardStateProvider(({ redirectUrlComplete }: Sess
   const clerk = useClerk();
   const { navigate } = useRouter();
   const currentTaskContainer = useRef<HTMLDivElement>(null);
-  const { queryParams } = useRouter();
 
-<<<<<<< HEAD
-=======
-  const redirectUrlComplete =
-    signInContext?.afterSignInUrl ??
-    signUpContext?.afterSignUpUrl ??
-    clerk?.buildAfterSignInUrl({
-      params: new URLSearchParams(queryParams),
-    });
-
->>>>>>> 1383bf1a9 (Pass query params to buildAfterSignInUrl)
   // If there are no pending tasks, navigate away from the tasks flow.
   // This handles cases where a user with an active session returns to the tasks URL,
   // for example by using browser back navigation. Since there are no pending tasks,
