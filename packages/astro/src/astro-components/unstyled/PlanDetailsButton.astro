@@ -14,15 +14,7 @@ if ('as' in Astro.props) {
   logAsPropUsageDeprecation();
 }
 
-const {
-  as: Tag = 'button',
-  asChild,
-  plan,
-  planId,
-  initialPlanPeriod,
-  planDetailsProps,
-  ...props
-} = Astro.props;
+const { as: Tag = 'button', asChild, plan, planId, initialPlanPeriod, planDetailsProps, ...props } = Astro.props;
 
 const planDetailsOptions = {
   plan,

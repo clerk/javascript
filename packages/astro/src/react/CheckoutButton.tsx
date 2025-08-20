@@ -1,8 +1,8 @@
 import type { __experimental_CheckoutButtonProps } from '@clerk/types';
 import React from 'react';
 
-import { assertSingleChild, normalizeWithDefaultValue, safeExecute, withClerk } from './utils';
 import type { WithClerkProp } from './utils';
+import { assertSingleChild, normalizeWithDefaultValue, safeExecute, withClerk } from './utils';
 
 export type { __experimental_CheckoutButtonProps as CheckoutButtonProps };
 
@@ -39,9 +39,9 @@ export const CheckoutButton = withClerk(
       });
     };
 
-    const wrappedChildClickHandler: React.MouseEventHandler = async e => {
+    const wrappedChildClickHandler: React.MouseEventHandler = e => {
       if (child && typeof child === 'object' && 'props' in child) {
-        await safeExecute(child.props.onClick)(e);
+        void safeExecute(child.props.onClick)(e);
       }
       return clickHandler();
     };

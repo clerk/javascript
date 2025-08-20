@@ -1,10 +1,12 @@
 ---
-import type { HTMLTag, Polymorphic } from 'astro/types';
 import type { __experimental_SubscriptionDetailsButtonProps } from '@clerk/types';
+
+import type { HTMLTag, Polymorphic } from 'astro/types';
 import type { ButtonProps } from '../../types';
 import { addUnstyledAttributeToFirstTag, logAsPropUsageDeprecation } from './utils';
 
-type Props<Tag extends HTMLTag = 'button'> = Polymorphic<ButtonProps<Tag>> & __experimental_SubscriptionDetailsButtonProps;
+type Props<Tag extends HTMLTag = 'button'> = Polymorphic<ButtonProps<Tag>> &
+  __experimental_SubscriptionDetailsButtonProps;
 
 import { generateSafeId } from '@clerk/astro/internal';
 
