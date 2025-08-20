@@ -813,12 +813,12 @@ export const enUS: LocalizationResource = {
     createOrganization: {
       formButtonReset: 'Cancel',
       formButtonSubmit: 'Continue',
-      subtitle: 'Enter your organization details to continue',
-      title: 'Setup your organization',
-      formFieldLabel__name: 'Name',
-      formFieldLabel__slug: 'Slug',
       formFieldInputPlaceholder__name: 'My Organization',
       formFieldInputPlaceholder__slug: 'my-organization',
+      formFieldLabel__name: 'Name',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Enter your organization details to continue',
+      title: 'Setup your organization',
     },
     signOut: {
       actionLink: 'Sign out',

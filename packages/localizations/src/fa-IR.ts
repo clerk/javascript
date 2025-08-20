@@ -826,6 +826,10 @@ export const faIR: LocalizationResource = {
     createOrganization: {
       formButtonReset: 'گذشتن',
       formButtonSubmit: 'ایجاد سازمان',
+      formFieldInputPlaceholder__name: undefined,
+      formFieldInputPlaceholder__slug: undefined,
+      formFieldLabel__name: undefined,
+      formFieldLabel__slug: undefined,
       subtitle: 'سازمان جدیدی برای شروع کار ایجاد کنید',
       title: 'ایجاد سازمان جدید',
     },
