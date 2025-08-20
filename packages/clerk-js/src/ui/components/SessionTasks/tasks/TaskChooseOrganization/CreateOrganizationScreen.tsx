@@ -7,6 +7,7 @@ import { Form } from '@/ui/elements/Form';
 import { FormButtonContainer } from '@/ui/elements/FormButtons';
 import { FormContainer } from '@/ui/elements/FormContainer';
 import { Header } from '@/ui/elements/Header';
+import { useRouter } from '@/ui/router';
 import { createSlug } from '@/ui/utils/createSlug';
 import { handleError } from '@/ui/utils/errorHandler';
 import { useFormControl } from '@/ui/utils/useFormControl';
@@ -19,6 +20,7 @@ type CreateOrganizationScreenProps = {
 
 export const CreateOrganizationScreen = (props: CreateOrganizationScreenProps) => {
   const card = useCardState();
+  const { navigate } = useRouter();
   const { redirectUrlComplete } = useTaskChooseOrganizationContext();
   const { createOrganization, isLoaded, setActive } = useOrganizationList({
     userMemberships: organizationListParams.userMemberships,
@@ -47,7 +49,10 @@ export const CreateOrganizationScreen = (props: CreateOrganizationScreenProps) =
 
       await setActive({
         organization,
-        redirectUrl: redirectUrlComplete,
+        navigate: async () => {
+          // TODO(after-auth) ORGS-779 - Handle next tasks
+          await navigate(redirectUrlComplete);
+        },
       });
     } catch (err) {
       handleError(err, [nameField, slugField], card.setError);
