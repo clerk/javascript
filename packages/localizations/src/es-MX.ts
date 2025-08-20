@@ -75,9 +75,10 @@ export const esMX: LocalizationResource = {
     availableFeatures: undefined,
     billedAnnually: 'Facturado anualmente',
     billedMonthlyOnly: undefined,
-    cancelFreeTrial: undefined,
-    cancelFreeTrialAccessUntil: undefined,
-    cancelFreeTrialTitle: undefined,
+    cancelFreeTrial: 'Cancelar prueba gratuita',
+    cancelFreeTrialAccessUntil:
+      "Tu prueba gratuita permanecerá activa hasta el {{ date | longDate('es-MX') }}. Después de eso, perderás el acceso a las funciones de prueba y no se te cobrará.",
+    cancelFreeTrialTitle: '¿Cancelar prueba gratuita del plan {{plan}}?',
     cancelSubscription: 'Cancelar suscripción',
     cancelSubscriptionAccessUntil: undefined,
     cancelSubscriptionNoCharge: undefined,
