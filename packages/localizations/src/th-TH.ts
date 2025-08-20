@@ -77,7 +77,7 @@ export const thTH: LocalizationResource = {
     billedMonthlyOnly: undefined,
     cancelFreeTrial: 'ยกเลิกช่วงทดลองใช้ฟรี',
     cancelFreeTrialAccessUntil:
-      'คุณสามารถทดลองใช้งานได้ถึงวันที่ {{ date | longDate(\'th-TH\') }} หลังจากนั้นคุณจะไม่สามารถใช้งานฟีเจอร์ทดลองใช้ฟรีได้ และจะไม่ถูกเรียกเก็บเงิน',
+      "คุณสามารถทดลองใช้งานได้ถึงวันที่ {{ date | longDate('th-TH') }} หลังจากนั้นคุณจะไม่สามารถใช้งานฟีเจอร์ทดลองใช้ฟรีได้ และจะไม่ถูกเรียกเก็บเงิน",
     cancelFreeTrialTitle: 'ยืนยันการยกเลิกช่วงทดลองใช้ฟรีสำหรับแผน {{ plan }}?',
     cancelSubscription: undefined,
     cancelSubscriptionAccessUntil: undefined,
