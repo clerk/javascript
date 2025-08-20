@@ -1,7 +1,7 @@
 ---
 '@clerk/clerk-js': patch
 '@clerk/types': patch
-'@clerk/react': patch
+'@clerk/clerk-react': patch
 '@clerk/vue': patch
 ---
 
