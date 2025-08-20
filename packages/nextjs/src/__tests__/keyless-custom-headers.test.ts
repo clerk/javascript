@@ -67,8 +67,17 @@ function createMockHeaders(customHeaders: Record<string, string | null> = {}): M
   const allHeaders = { ...defaultHeadersObj, ...customHeaders };
 
   return {
-    get: vi.fn((name: string) => allHeaders[name] ?? null),
-    has: vi.fn((name: string) => Object.prototype.hasOwnProperty.call(allHeaders, name) && allHeaders[name] !== null),
+    get: vi.fn((name: string) => {
+      // Use the defaultMockHeaders.get() method for consistent behavior
+      const defaultValue = defaultMockHeaders.get(name);
+      const customValue = customHeaders[name];
+      return customValue !== undefined ? customValue : defaultValue;
+    }),
+    has: vi.fn((name: string) => {
+      const hasDefault = defaultMockHeaders.has(name);
+      const hasCustom = Object.prototype.hasOwnProperty.call(customHeaders, name);
+      return hasDefault || (hasCustom && customHeaders[name] !== null);
+    }),
     forEach: vi.fn((callback: (value: string, key: string) => void) => {
       Object.entries(allHeaders).forEach(([key, value]) => {
         if (value !== null) callback(value, key);
