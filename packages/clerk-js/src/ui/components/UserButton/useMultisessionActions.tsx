@@ -6,7 +6,6 @@ import { useEnvironment } from '@/ui/contexts';
 import { useCardState } from '@/ui/elements/contexts';
 import { sleep } from '@/ui/utils/sleep';
 
-import { buildURL } from '../../../utils';
 import { windowNavigate } from '../../../utils/windowNavigate';
 import { useMultipleSessions } from '../../hooks/useMultipleSessions';
 import { useRouter } from '../../router';
@@ -100,25 +99,7 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
   };
 
   const handleAddAccountClicked = () => {
-    const signInUrl = opts.signInUrl || window.location.href;
-
-    // If we have an afterSwitchSessionUrl, append it as a query parameter
-    if (opts.afterSwitchSessionUrl) {
-      const searchParams = new URLSearchParams();
-      searchParams.set('redirect_url', opts.afterSwitchSessionUrl);
-
-      const url = buildURL(
-        {
-          base: signInUrl,
-          searchParams,
-        },
-        { stringify: true },
-      );
-      windowNavigate(url);
-    } else {
-      windowNavigate(signInUrl);
-    }
-
+    windowNavigate(opts.signInUrl || window.location.href);
     return sleep(2000);
   };
 
