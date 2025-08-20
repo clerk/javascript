@@ -75,6 +75,7 @@ import type {
   SignUpRedirectOptions,
   SignUpResource,
   TaskChooseOrganizationProps,
+  TasksRedirectOptions,
   UnsubscribeCallback,
   UserButtonProps,
   UserProfileProps,
@@ -1595,7 +1596,7 @@ export class Clerk implements ClerkInterface {
     return this.buildUrlWithAuth(this.environment.displayConfig.organizationProfileUrl);
   }
 
-  public buildTasksUrl(): string {
+  public buildTasksUrl(options?: TasksRedirectOptions): string {
     const currentTask = this.session?.currentTask;
     if (!currentTask) {
       return '';
@@ -1608,7 +1609,7 @@ export class Clerk implements ClerkInterface {
 
     return buildURL(
       {
-        base: this.buildSignInUrl(),
+        base: this.buildSignInUrl(options),
         hashPath: getTaskEndpoint(currentTask),
       },
       {
@@ -1707,9 +1708,9 @@ export class Clerk implements ClerkInterface {
     return;
   };
 
-  public redirectToTasks = async (): Promise<unknown> => {
+  public redirectToTasks = async (options?: TasksRedirectOptions): Promise<unknown> => {
     if (inBrowser()) {
-      return this.navigate(this.buildTasksUrl());
+      return this.navigate(this.buildTasksUrl(options));
     }
     return;
   };
@@ -2044,7 +2045,9 @@ export class Clerk implements ClerkInterface {
     }
 
     if (this.session?.currentTask) {
-      await this.redirectToTasks();
+      await this.redirectToTasks({
+        redirectUrl: this.buildAfterSignInUrl(),
+      });
       return;
     }
 
