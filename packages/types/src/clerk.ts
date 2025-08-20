@@ -769,8 +769,10 @@ export interface Clerk {
 
   /**
    * Redirects to the configured URL where tasks are mounted.
+   *
+   * @param opts A {@link RedirectOptions} object
    */
-  redirectToTasks(): Promise<unknown>;
+  redirectToTasks(opts?: TasksRedirectOptions): Promise<unknown>;
 
   /**
    * Completes a Google One Tap redirection flow started by

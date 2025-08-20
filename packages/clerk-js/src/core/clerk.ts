@@ -2045,8 +2045,6 @@ export class Clerk implements ClerkInterface {
     }
 
     if (this.session?.currentTask) {
-      debugger;
-
       await this.redirectToTasks({
         redirectUrl: this.buildAfterSignInUrl(),
       });
