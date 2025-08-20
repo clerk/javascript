@@ -22,8 +22,8 @@ describe('TaskChooseOrganization', () => {
     const { queryByText, queryByRole } = render(<TaskChooseOrganization />, { wrapper });
 
     await waitFor(() => {
-      expect(queryByText('Setup your account')).not.toBeInTheDocument();
-      expect(queryByText('Tell us a bit about your organization')).not.toBeInTheDocument();
+      expect(queryByText('Setup your organization')).not.toBeInTheDocument();
+      expect(queryByText('Enter your organization details to continue')).not.toBeInTheDocument();
       expect(queryByRole('button', { name: /sign out/i })).not.toBeInTheDocument();
     });
   });
@@ -42,8 +42,8 @@ describe('TaskChooseOrganization', () => {
     const { getByText, getByRole } = render(<TaskChooseOrganization />, { wrapper });
 
     await waitFor(() => {
-      expect(getByText('Setup your account')).toBeInTheDocument();
-      expect(getByText('Tell us a bit about your organization')).toBeInTheDocument();
+      expect(getByText('Setup your organization')).toBeInTheDocument();
+      expect(getByText('Enter your organization details to continue')).toBeInTheDocument();
       expect(getByRole('link', { name: /sign out/i })).toBeInTheDocument();
     });
   });
@@ -63,7 +63,7 @@ describe('TaskChooseOrganization', () => {
 
     await waitFor(() => {
       expect(getByRole('textbox', { name: /name/i })).toBeInTheDocument();
-      expect(getByText('Create new organization')).toBeInTheDocument();
+      expect(getByText('Continue')).toBeInTheDocument();
     });
   });
 
@@ -151,7 +151,7 @@ describe('TaskChooseOrganization', () => {
 
     await waitFor(() => {
       expect(getByRole('textbox', { name: /name/i })).toBeInTheDocument();
-      expect(getByRole('button', { name: /create new organization/i })).toBeInTheDocument();
+      expect(getByRole('button', { name: /continue/i })).toBeInTheDocument();
       expect(getByRole('button', { name: /cancel/i })).toBeInTheDocument();
       expect(queryByText('Existing Org')).not.toBeInTheDocument();
     });

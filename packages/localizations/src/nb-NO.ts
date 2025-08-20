@@ -814,6 +814,10 @@ export const nbNO: LocalizationResource = {
     createOrganization: {
       formButtonReset: undefined,
       formButtonSubmit: undefined,
+      formFieldInputPlaceholder__name: undefined,
+      formFieldInputPlaceholder__slug: undefined,
+      formFieldLabel__name: undefined,
+      formFieldLabel__slug: undefined,
       subtitle: undefined,
       title: undefined,
     },
