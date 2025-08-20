@@ -488,7 +488,11 @@ class SignUpFuture implements SignUpFutureResource {
     return this.resource.unverifiedFields;
   }
 
-  private async getCaptchaToken(): Promise<{ captchaToken?: string; captchaWidgetType?: CaptchaWidgetType }> {
+  private async getCaptchaToken(): Promise<{
+    captchaToken?: string;
+    captchaWidgetType?: CaptchaWidgetType;
+    captchaError?: unknown;
+  }> {
     const captchaChallenge = new CaptchaChallenge(SignUp.clerk);
     const response = await captchaChallenge.managedOrInvisible({ action: 'signup' });
     if (!response) {
@@ -496,16 +500,12 @@ class SignUpFuture implements SignUpFutureResource {
     }
 
     const { captchaError, captchaToken, captchaWidgetType } = response;
-    if (captchaError) {
-      throw new Error(captchaError);
-    }
-
-    return { captchaToken, captchaWidgetType };
+    return { captchaToken, captchaWidgetType, captchaError };
   }
 
   async password({ emailAddress, password }: { emailAddress: string; password: string }): Promise<{ error: unknown }> {
     return runAsyncResourceTask(this.resource, async () => {
-      const { captchaToken, captchaWidgetType } = await this.getCaptchaToken();
+      const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
 
       await this.resource.__internal_basePost({
         path: this.resource.pathRoot,
@@ -515,6 +515,7 @@ class SignUpFuture implements SignUpFutureResource {
           password,
           captchaToken,
           captchaWidgetType,
+          captchaError,
         },
       });
     });
