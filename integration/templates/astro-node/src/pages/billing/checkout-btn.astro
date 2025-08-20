@@ -1,0 +1,18 @@
+---
+import { SignedIn } from '@clerk/astro/components';
+import { CheckoutButton } from '@clerk/astro/components';
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="Checkout Button">
+  <main>
+    <SignedIn>
+      <CheckoutButton
+        planId='cplan_2wMjqdlza0hTJc4HLCoBwAiExhF'
+        planPeriod='month'
+      >
+        Checkout Now
+      </CheckoutButton>
+    </SignedIn>
+  </main>
+</Layout>
