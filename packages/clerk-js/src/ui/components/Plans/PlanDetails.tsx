@@ -20,6 +20,7 @@ import {
   Col,
   descriptors,
   Flex,
+  Flow,
   Heading,
   localizationKeys,
   Span,
@@ -30,9 +31,13 @@ import {
 
 export const PlanDetails = (props: __internal_PlanDetailsProps) => {
   return (
-    <Drawer.Content>
-      <PlanDetailsInternal {...props} />
-    </Drawer.Content>
+    <Flow.Root flow='planDetails'>
+      <Flow.Part>
+        <Drawer.Content>
+          <PlanDetailsInternal {...props} />
+        </Drawer.Content>
+      </Flow.Part>
+    </Flow.Root>
   );
 };
 

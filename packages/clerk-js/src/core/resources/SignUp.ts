@@ -13,6 +13,7 @@ import type {
   PreparePhoneNumberVerificationParams,
   PrepareVerificationParams,
   PrepareWeb3WalletVerificationParams,
+  SetActiveNavigate,
   SignUpAuthenticateWithWeb3Params,
   SignUpCreateParams,
   SignUpField,
@@ -40,6 +41,7 @@ import { _authenticateWithPopup } from '../../utils/authenticateWithPopup';
 import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
 import { createValidatePassword } from '../../utils/passwords/password';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
+import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
 import {
   clerkInvalidFAPIResponse,
   clerkMissingOptionError,
@@ -470,9 +472,55 @@ export class SignUp extends BaseResource implements SignUpResource {
 }
 
 class SignUpFuture implements SignUpFutureResource {
+  verifications = {
+    sendEmailCode: this.sendEmailCode.bind(this),
+    verifyEmailCode: this.verifyEmailCode.bind(this),
+  };
+
   constructor(readonly resource: SignUp) {}
 
   get status() {
     return this.resource.status;
+  }
+
+  get unverifiedFields() {
+    return this.resource.unverifiedFields;
+  }
+
+  async password({ emailAddress, password }: { emailAddress: string; password: string }): Promise<{ error: unknown }> {
+    return runAsyncResourceTask(this.resource, async () => {
+      await this.resource.__internal_basePost({
+        path: this.resource.pathRoot,
+        body: { emailAddress, password },
+      });
+    });
+  }
+
+  async sendEmailCode(): Promise<{ error: unknown }> {
+    return runAsyncResourceTask(this.resource, async () => {
+      await this.resource.__internal_basePost({
+        body: { strategy: 'email_code' },
+        action: 'prepare_verification',
+      });
+    });
+  }
+
+  async verifyEmailCode({ code }: { code: string }): Promise<{ error: unknown }> {
+    return runAsyncResourceTask(this.resource, async () => {
+      await this.resource.__internal_basePost({
+        body: { strategy: 'email_code', code },
+        action: 'attempt_verification',
+      });
+    });
+  }
+
+  async finalize({ navigate }: { navigate?: SetActiveNavigate }): Promise<{ error: unknown }> {
+    return runAsyncResourceTask(this.resource, async () => {
+      if (!this.resource.createdSessionId) {
+        throw new Error('Cannot finalize sign-up without a created session.');
+      }
+
+      await SignUp.clerk.setActive({ session: this.resource.createdSessionId, navigate });
+    });
   }
 }

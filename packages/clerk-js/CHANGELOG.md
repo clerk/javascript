@@ -1,5 +1,24 @@
 # Change Log
 
+## 5.87.0
+
+### Minor Changes
+
+- [Experimental] Signal SignUp APIs ([#6571](https://github.com/clerk/javascript/pull/6571)) by [@dstaley](https://github.com/dstaley)
+
+- Update SubscriptionDetails to support free trials ([#6569](https://github.com/clerk/javascript/pull/6569)) by [@panteliselef](https://github.com/panteliselef)
+
+- [Experimental] Signal implementation for SignUp ([#6568](https://github.com/clerk/javascript/pull/6568)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Fix server-side cache revalidation for Next.js when transitioning from `active` to `pending` session ([#6572](https://github.com/clerk/javascript/pull/6572)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`8dc6bad`](https://github.com/clerk/javascript/commit/8dc6bad5c7051b59bd8c73e65d497f6a974bb1c3), [`aa6a3c3`](https://github.com/clerk/javascript/commit/aa6a3c3d3ba2de67a468c996cbf0bff43a09ddb8), [`db50c47`](https://github.com/clerk/javascript/commit/db50c4734920ada6002de8c62c994047eb6cb5a0)]:
+  - @clerk/types@4.80.0
+  - @clerk/localizations@3.22.0
+  - @clerk/shared@3.21.2
+
 ## 5.86.0
 
 ### Minor Changes

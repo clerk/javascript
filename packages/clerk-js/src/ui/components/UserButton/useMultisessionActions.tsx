@@ -18,6 +18,7 @@ type UseMultisessionActionsParams = {
   afterSwitchSessionUrl?: string;
   userProfileUrl?: string;
   signInUrl?: string;
+  taskUrl?: string | null;
 } & Pick<UserButtonProps, 'userProfileMode' | 'appearance' | 'userProfileProps'>;
 
 export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
@@ -78,6 +79,11 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
       navigate: async ({ session }) => {
         if (!session.currentTask && opts.afterSwitchSessionUrl) {
           await navigate(opts.afterSwitchSessionUrl);
+          return;
+        }
+
+        if (opts.taskUrl) {
+          await navigate(opts.taskUrl);
           return;
         }
 

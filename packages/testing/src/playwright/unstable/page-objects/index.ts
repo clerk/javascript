@@ -8,6 +8,7 @@ import { createExpectPageObject } from './expect';
 import { createImpersonationPageObject } from './impersonation';
 import { createKeylessPopoverPageObject } from './keylessPopover';
 import { createOrganizationSwitcherComponentPageObject } from './organizationSwitcher';
+import { createPlanDetailsPageObject } from './planDetails';
 import { createPricingTablePageObject } from './pricingTable';
 import { createSessionTaskComponentPageObject } from './sessionTask';
 import { createSignInComponentPageObject } from './signIn';
@@ -50,5 +51,6 @@ export const createPageObjects = ({
     waitlist: createWaitlistComponentPageObject(testArgs),
     apiKeys: createAPIKeysComponentPageObject(testArgs),
     subscriptionDetails: createSubscriptionDetailsPageObject(testArgs),
+    planDetails: createPlanDetailsPageObject(testArgs),
   };
 };

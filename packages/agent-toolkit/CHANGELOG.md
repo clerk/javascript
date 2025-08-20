@@ -1,5 +1,14 @@
 # @clerk/agent-toolkit
 
+## 0.1.24
+
+### Patch Changes
+
+- Updated dependencies [[`8dc6bad`](https://github.com/clerk/javascript/commit/8dc6bad5c7051b59bd8c73e65d497f6a974bb1c3), [`aa6a3c3`](https://github.com/clerk/javascript/commit/aa6a3c3d3ba2de67a468c996cbf0bff43a09ddb8), [`db50c47`](https://github.com/clerk/javascript/commit/db50c4734920ada6002de8c62c994047eb6cb5a0)]:
+  - @clerk/types@4.80.0
+  - @clerk/backend@2.9.3
+  - @clerk/shared@3.21.2
+
 ## 0.1.23
 
 ### Patch Changes
