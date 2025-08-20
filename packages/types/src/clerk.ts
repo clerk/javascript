@@ -1162,6 +1162,8 @@ export type SignUpInitialValues = {
   username?: string;
 };
 
+export type TasksRedirectOptions = RedirectOptions & RedirectUrlProp;
+
 export type SignInRedirectOptions = RedirectOptions &
   RedirectUrlProp & {
     /**
