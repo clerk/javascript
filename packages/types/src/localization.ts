@@ -189,7 +189,7 @@ export type __internal_LocalizationResource = {
     billedMonthlyOnly: LocalizationValue;
     cancelFreeTrial: LocalizationValue<'plan'>;
     cancelFreeTrialTitle: LocalizationValue<'plan'>;
-    cancelFreeTrialDescription: LocalizationValue<'plan'>;
+    cancelFreeTrialAccessUntil: LocalizationValue<'plan' | 'date'>;
     keepFreeTrial: LocalizationValue;
     alwaysFree: LocalizationValue;
     accountFunds: LocalizationValue;
