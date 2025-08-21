@@ -152,6 +152,7 @@ export interface UserSettingsResource extends ClerkResource {
   alternativePhoneCodeChannels: PhoneCodeChannel[];
   enabledFirstFactorIdentifiers: Attribute[];
   instanceIsPasswordBased: boolean;
+  instanceIsPasswordEnabled: boolean;
   hasValidAuthFactor: boolean;
   __internal_toSnapshot: () => UserSettingsJSONSnapshot;
 }
