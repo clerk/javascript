@@ -1,6 +1,8 @@
 import type { Errors, State } from '@clerk/types';
 
 import type { IsomorphicClerk } from './isomorphicClerk';
+import { inBrowser } from '@clerk/shared';
+import { errorThrower } from './errors/errorThrower';
 
 const defaultErrors = (): Errors => ({
   fields: {
@@ -91,6 +93,9 @@ export class StateProxy implements State {
   private gateMethod<T extends object, K extends keyof T & string>(getTarget: () => T, key: K) {
     type F = Extract<T[K], (...args: unknown[]) => unknown>;
     return (async (...args: Parameters<F>): Promise<ReturnType<F>> => {
+      if (!inBrowser()) {
+        return errorThrower.throw(`Attempted to call a method (${key}) that is not supported on the server.`);
+      }
       if (!this.isomorphicClerk.loaded) {
         await new Promise<void>(resolve => this.isomorphicClerk.addOnLoaded(resolve));
       }
