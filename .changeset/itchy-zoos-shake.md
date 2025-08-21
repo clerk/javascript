@@ -23,17 +23,3 @@ export default defineHandlerCallback(async event => {
   return startHandler(event);
 });
 ```
-
-`getAuth()` is now sync and no longer requires awaiting
-
-```ts
-import { getAuth } from '@clerk/tanstack-react-start/server'
-
-const authStateFn = createServerFn({ method: 'GET' }).handler(() => {
-  const request = getWebRequest()
-
-  const auth = getAuth(request) // no await
-
-  return { userId: auth.userId }
-})
-```
