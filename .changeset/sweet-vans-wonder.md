@@ -2,4 +2,4 @@
 "@clerk/nextjs": patch
 ---
 
-fix(nextjs): Fix for keyless drift detection telemetry event not firing due to usage of async methods in the keyless telemetry logic
+Fix keyless drift detection failing constantly due to usage of invalid methods from the fs module
