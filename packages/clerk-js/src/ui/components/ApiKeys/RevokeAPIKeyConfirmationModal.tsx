@@ -42,6 +42,11 @@ export const RevokeAPIKeyConfirmationModal = ({
 
   const canSubmit = revokeField.value === t(localizationKeys('apiKeys.revokeConfirmation.confirmationText'));
 
+  const handleClose = () => {
+    onClose();
+    revokeField.setValue('');
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!apiKeyId || !canSubmit) return;
@@ -50,12 +55,7 @@ export const RevokeAPIKeyConfirmationModal = ({
     const cacheKey = { key: 'api-keys', subject };
 
     void mutate(cacheKey);
-    onClose();
-  };
-
-  const handleClose = () => {
-    onClose();
-    revokeField.setValue('');
+    handleClose();
   };
 
   if (!isOpen) {
