@@ -1,5 +1,18 @@
 # @clerk/testing
 
+## 1.11.3
+
+### Patch Changes
+
+- Update copies for create organization screen on session tasks ([#6584](https://github.com/clerk/javascript/pull/6584)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Add `planDetails` to the page details object. ([#6573](https://github.com/clerk/javascript/pull/6573)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`e52bf8e`](https://github.com/clerk/javascript/commit/e52bf8ebef74a9e123c69b69acde1340c01d32d7), [`c043c19`](https://github.com/clerk/javascript/commit/c043c1919854aaa5b9cf7f6df5bb517f5617f7a1), [`7bb644a`](https://github.com/clerk/javascript/commit/7bb644ad8a7bf28c6010aad6ae0c36f587529fcc), [`c28d29c`](https://github.com/clerk/javascript/commit/c28d29c79bb4f144d782313ca72df7db91a77340), [`172e054`](https://github.com/clerk/javascript/commit/172e054a3511be12d16ba19037db320c2d9838bf)]:
+  - @clerk/types@4.81.0
+  - @clerk/backend@2.9.4
+  - @clerk/shared@3.22.0
+
 ## 1.11.2
 
 ### Patch Changes
