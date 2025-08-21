@@ -38,9 +38,6 @@ test.describe('sign up and sign in with email code @generic', () => {
         await u.po.signUp.enterTestOtpCode();
         await u.po.expect.toBeSignedIn();
       });
-
-      // TODO: remove
-      test.skip('sign in has been moved to sign in flow test suite, this will be removed', async () => {});
     });
   });
 });
