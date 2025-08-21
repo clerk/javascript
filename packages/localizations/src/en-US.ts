@@ -812,9 +812,13 @@ export const enUS: LocalizationResource = {
     },
     createOrganization: {
       formButtonReset: 'Cancel',
-      formButtonSubmit: 'Create new organization',
-      subtitle: 'Tell us a bit about your organization',
-      title: 'Setup your account',
+      formButtonSubmit: 'Continue',
+      formFieldInputPlaceholder__name: 'My Organization',
+      formFieldInputPlaceholder__slug: 'my-organization',
+      formFieldLabel__name: 'Name',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Enter your organization details to continue',
+      title: 'Setup your organization',
     },
     signOut: {
       actionLink: 'Sign out',

@@ -5,6 +5,7 @@ import type {
   CommerceCheckoutResource,
   CommerceSubscriptionPlanPeriod,
   ConfirmCheckoutParams,
+  SetActiveNavigate,
 } from '@clerk/types';
 import { describe, expectTypeOf, it } from 'vitest';
 
@@ -89,7 +90,7 @@ describe('useCheckout type tests', () => {
         expectTypeOf<ConfirmMethod>().returns.resolves.toEqualTypeOf<CheckoutResult>();
         expectTypeOf<StartMethod>().returns.resolves.toEqualTypeOf<CheckoutResult>();
         expectTypeOf<ClearMethod>().returns.toBeVoid();
-        expectTypeOf<FinalizeMethod>().parameter(0).toEqualTypeOf<{ redirectUrl: string } | undefined>();
+        expectTypeOf<FinalizeMethod>().parameter(0).toEqualTypeOf<{ navigate?: SetActiveNavigate } | undefined>();
         expectTypeOf<GetStateMethod>().returns.toEqualTypeOf<__experimental_CheckoutCacheState>();
       });
 
@@ -245,7 +246,9 @@ describe('useCheckout type tests', () => {
           expectTypeOf<CheckoutObject['confirm']>().toEqualTypeOf<__experimental_CheckoutInstance['confirm']>();
           expectTypeOf<CheckoutObject['start']>().toEqualTypeOf<__experimental_CheckoutInstance['start']>();
           expectTypeOf<CheckoutObject['clear']>().toEqualTypeOf<() => void>();
-          expectTypeOf<CheckoutObject['finalize']>().toEqualTypeOf<(params?: { redirectUrl: string }) => void>();
+          expectTypeOf<CheckoutObject['finalize']>().toEqualTypeOf<
+            (params?: { navigate?: SetActiveNavigate }) => void
+          >();
           expectTypeOf<CheckoutObject['getState']>().toEqualTypeOf<() => __experimental_CheckoutCacheState>();
         });
       });

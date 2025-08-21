@@ -45,6 +45,7 @@ import type {
   SignUpResource,
   State,
   TaskChooseOrganizationProps,
+  TasksRedirectOptions,
   UnsubscribeCallback,
   UserButtonProps,
   UserProfileProps,
@@ -1276,8 +1277,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  redirectToTasks = async () => {
-    const callback = () => this.clerkjs?.redirectToTasks();
+  redirectToTasks = async (opts?: TasksRedirectOptions) => {
+    const callback = () => this.clerkjs?.redirectToTasks(opts);
     if (this.clerkjs && this.loaded) {
       return callback();
     } else {
