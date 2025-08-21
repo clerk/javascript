@@ -1,5 +1,10 @@
 import type { AnyRouter } from '@tanstack/react-router';
-import type { CustomizeStartHandler, HandlerCallback, RequestHandler } from '@tanstack/react-start/server';
+import {
+  type CustomizeStartHandler,
+  getEvent,
+  type HandlerCallback,
+  type RequestHandler,
+} from '@tanstack/react-start/server';
 
 import { authenticateRequest } from './authenticateRequest';
 import { ClerkHandshakeRedirect } from './errors';
@@ -13,6 +18,8 @@ export function createClerkHandler<TRouter extends AnyRouter>(
 ) {
   return (cb: HandlerCallback<TRouter>): RequestHandler => {
     return eventHandler(async ({ request, router, responseHeaders }) => {
+      const event = getEvent();
+
       try {
         const loadedOptions = loadOptions(request, clerkOptions);
 
@@ -20,6 +27,9 @@ export function createClerkHandler<TRouter extends AnyRouter>(
           ...loadedOptions,
           acceptsToken: 'any',
         });
+
+        // Set context for getAuth to use
+        event.context.auth = () => requestState.toAuth();
 
         const { clerkInitialState, headers } = getResponseClerkState(requestState, loadedOptions);
 
