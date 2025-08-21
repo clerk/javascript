@@ -75,6 +75,7 @@ import type {
   SignUpRedirectOptions,
   SignUpResource,
   TaskChooseOrganizationProps,
+  TasksRedirectOptions,
   UnsubscribeCallback,
   UserButtonProps,
   UserProfileProps,
@@ -427,6 +428,21 @@ export class Clerk implements ClerkInterface {
     }
 
     this.#options = this.#initOptions(options);
+
+    // In development mode, if custom router options are provided, warn if both routerPush and routerReplace are not provided
+    if (
+      this.#instanceType === 'development' &&
+      (this.#options.routerPush || this.#options.routerReplace) &&
+      (!this.#options.routerPush || !this.#options.routerReplace)
+    ) {
+      // Typing this.#options as ClerkOptions to ensure proper type checking. TypeScript will infer the type as `never`
+      // since missing both `routerPush` and `routerReplace` is not a valid ClerkOptions.
+      const options = this.#options as ClerkOptions;
+      const missingRouter = !options.routerPush ? 'routerPush' : 'routerReplace';
+      logger.warnOnce(
+        `Clerk: Both \`routerPush\` and \`routerReplace\` need to be defined, but \`${missingRouter}\` is not defined. This may cause issues with navigation in your application.`,
+      );
+    }
 
     /**
      * Listen to `Session.getToken` resolving to emit the updated session
@@ -1595,7 +1611,7 @@ export class Clerk implements ClerkInterface {
     return this.buildUrlWithAuth(this.environment.displayConfig.organizationProfileUrl);
   }
 
-  public buildTasksUrl(): string {
+  public buildTasksUrl(options?: TasksRedirectOptions): string {
     const currentTask = this.session?.currentTask;
     if (!currentTask) {
       return '';
@@ -1608,7 +1624,7 @@ export class Clerk implements ClerkInterface {
 
     return buildURL(
       {
-        base: this.buildSignInUrl(),
+        base: this.buildSignInUrl(options),
         hashPath: getTaskEndpoint(currentTask),
       },
       {
@@ -1707,9 +1723,9 @@ export class Clerk implements ClerkInterface {
     return;
   };
 
-  public redirectToTasks = async (): Promise<unknown> => {
+  public redirectToTasks = async (options?: TasksRedirectOptions): Promise<unknown> => {
     if (inBrowser()) {
-      return this.navigate(this.buildTasksUrl());
+      return this.navigate(this.buildTasksUrl(options));
     }
     return;
   };
@@ -2044,7 +2060,9 @@ export class Clerk implements ClerkInterface {
     }
 
     if (this.session?.currentTask) {
-      await this.redirectToTasks();
+      await this.redirectToTasks({
+        redirectUrl: this.buildAfterSignInUrl(),
+      });
       return;
     }
 
