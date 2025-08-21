@@ -53,6 +53,11 @@ export const RevokeAPIKeyConfirmationModal = ({
     onClose();
   };
 
+  const handleClose = () => {
+    onClose();
+    revokeField.setValue('');
+  };
+
   if (!isOpen) {
     return null;
   }
@@ -60,7 +65,7 @@ export const RevokeAPIKeyConfirmationModal = ({
   return (
     <Modal
       handleOpen={onOpen}
-      handleClose={onClose}
+      handleClose={handleClose}
       canCloseModal={false}
       portalRoot={modalRoot}
       containerSx={[
@@ -107,7 +112,7 @@ export const RevokeAPIKeyConfirmationModal = ({
                 submitLabel={localizationKeys('apiKeys.revokeConfirmation.formButtonPrimary__revoke')}
                 colorScheme='danger'
                 isDisabled={!canSubmit}
-                onReset={onClose}
+                onReset={handleClose}
                 elementDescriptor={descriptors.apiKeysRevokeModalSubmitButton}
               />
             </Form.Root>
