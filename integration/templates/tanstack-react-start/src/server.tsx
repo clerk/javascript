@@ -2,12 +2,13 @@ import { createStartHandler, defineHandlerCallback, defaultStreamHandler } from 
 import { createRouter } from './router';
 import { createClerkHandler } from '@clerk/tanstack-react-start/server';
 
-export default defineHandlerCallback(async event => {
-  const startHandler = await createClerkHandler(
-    createStartHandler({
-      createRouter,
-    }),
-  )(defaultStreamHandler);
+const handlerFactory = createClerkHandler(
+  createStartHandler({
+    createRouter,
+  }),
+);
 
+export default defineHandlerCallback(async event => {
+  const startHandler = await handlerFactory(defaultStreamHandler);
   return startHandler(event);
 });
