@@ -44,18 +44,18 @@ function getTelemetryFlagFilePath(): string {
 async function tryMarkTelemetryEventAsFired(): Promise<boolean> {
   try {
     if (canUseKeyless) {
-      const { mkdir, writeFile } = nodeFsOrThrow();
+      const { mkdirSync, writeFileSync } = nodeFsOrThrow();
       const flagFilePath = getTelemetryFlagFilePath();
       const flagDirectory = dirname(flagFilePath);
 
       // Ensure the directory exists before attempting to write the file
-      await mkdir(flagDirectory, { recursive: true });
+      await mkdirSync(flagDirectory, { recursive: true });
 
       const flagData = {
         firedAt: new Date().toISOString(),
         event: EVENT_KEYLESS_ENV_DRIFT_DETECTED,
       };
-      await writeFile(flagFilePath, JSON.stringify(flagData, null, 2), { flag: 'wx' });
+      await writeFileSync(flagFilePath, JSON.stringify(flagData, null, 2), { flag: 'wx' });
       return true;
     } else {
       return false;
