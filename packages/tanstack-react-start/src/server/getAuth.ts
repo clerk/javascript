@@ -7,7 +7,7 @@ import { clerkHandlerNotConfigured, noFetchFnCtxPassedInGetAuth } from '../utils
 
 type GetAuthOptions = { acceptsToken?: AuthenticateRequestOptions['acceptsToken'] };
 
-export const getAuth: GetAuthFn<Request> = ((request: Request, opts?: GetAuthOptions) => {
+export const getAuth: GetAuthFn<Request, true> = (async (request: Request, opts?: GetAuthOptions) => {
   if (!request) {
     return errorThrower.throw(noFetchFnCtxPassedInGetAuth);
   }
@@ -18,5 +18,8 @@ export const getAuth: GetAuthFn<Request> = ((request: Request, opts?: GetAuthOpt
     return errorThrower.throw(clerkHandlerNotConfigured);
   }
 
-  return getAuthObjectForAcceptedToken({ authObject: authObjectFn(), acceptsToken: opts?.acceptsToken });
-}) as GetAuthFn<Request>;
+  // We're keeping it a promise for now to minimize breaking changes
+  const authObject = await Promise.resolve(authObjectFn());
+
+  return getAuthObjectForAcceptedToken({ authObject, acceptsToken: opts?.acceptsToken });
+}) as GetAuthFn<Request, true>;
