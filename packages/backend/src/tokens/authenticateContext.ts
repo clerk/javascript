@@ -1,3 +1,5 @@
+import { buildAccountsBaseUrl } from '@clerk/shared/buildAccountsBaseUrl';
+import { isCurrentDevAccountPortalOrigin, isLegacyDevAccountPortalOrigin } from '@clerk/shared/url';
 import type { Jwt } from '@clerk/types';
 
 import { constants } from '../constants';
@@ -194,6 +196,56 @@ class AuthenticateContext implements AuthenticateContext {
       return referrerOrigin !== this.clerkUrl.origin;
     } catch {
       // Invalid referrer URL format
+      return false;
+    }
+  }
+
+  /**
+   * Determines if the referrer URL is from a Clerk domain (accounts portal or FAPI).
+   * This includes both development and production account portal domains, as well as FAPI domains
+   * used for redirect-based authentication flows.
+   *
+   * @returns {boolean} True if the referrer is from a Clerk accounts portal or FAPI domain, false otherwise
+   */
+  public isClerkDomain(): boolean {
+    if (!this.referrer) {
+      return false;
+    }
+
+    try {
+      const referrerOrigin = new URL(this.referrer);
+      const referrerHost = referrerOrigin.hostname;
+
+      // Check if referrer is the FAPI domain itself (redirect-based auth flows)
+      if (this.frontendApi) {
+        const fapiHost = this.frontendApi.startsWith('http') ? new URL(this.frontendApi).hostname : this.frontendApi;
+        if (referrerHost === fapiHost) {
+          return true;
+        }
+      }
+
+      // Check for development account portal patterns
+      if (isLegacyDevAccountPortalOrigin(referrerHost) || isCurrentDevAccountPortalOrigin(referrerHost)) {
+        return true;
+      }
+
+      // Check for production account portal by comparing with expected accounts URL
+      const expectedAccountsUrl = buildAccountsBaseUrl(this.frontendApi);
+      if (expectedAccountsUrl) {
+        const expectedAccountsOrigin = new URL(expectedAccountsUrl).origin;
+        if (referrerOrigin.origin === expectedAccountsOrigin) {
+          return true;
+        }
+      }
+
+      // Check for generic production accounts patterns (accounts.*)
+      if (referrerHost.startsWith('accounts.')) {
+        return true;
+      }
+
+      return false;
+    } catch {
+      // Invalid URL format
       return false;
     }
   }

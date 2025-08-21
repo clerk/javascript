@@ -1605,5 +1605,196 @@ describe('tokens.authenticateRequest(options)', () => {
         signInUrl: 'https://primary.com/sign-in',
       });
     });
+
+    test('does not trigger handshake when referer is from production accounts portal', async () => {
+      const request = mockRequestWithCookies(
+        {
+          referer: 'https://accounts.example.com/sign-in',
+          'sec-fetch-dest': 'document',
+          'sec-fetch-site': 'cross-site',
+        },
+        {
+          __session: mockJwt,
+          __client_uat: '12345',
+        },
+        'https://primary.com/dashboard',
+      );
+
+      const requestState = await authenticateRequest(request, {
+        ...mockOptions(),
+        publishableKey: PK_LIVE,
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+
+      expect(requestState).toBeSignedIn({
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+    });
+
+    test('does not trigger handshake when referer is from dev accounts portal (current format)', async () => {
+      const request = mockRequestWithCookies(
+        {
+          referer: 'https://foo-bar-13.accounts.dev/sign-in',
+          'sec-fetch-dest': 'document',
+          'sec-fetch-site': 'cross-site',
+        },
+        {
+          __session: mockJwt,
+          __client_uat: '12345',
+        },
+        'https://primary.com/dashboard',
+      );
+
+      const requestState = await authenticateRequest(request, {
+        ...mockOptions(),
+        publishableKey: PK_LIVE,
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+
+      expect(requestState).toBeSignedIn({
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+    });
+
+    test('does not trigger handshake when referer is from dev accounts portal (legacy format)', async () => {
+      const request = mockRequestWithCookies(
+        {
+          referer: 'https://accounts.foo-bar-13.lcl.dev/sign-in',
+          'sec-fetch-dest': 'document',
+          'sec-fetch-site': 'cross-site',
+        },
+        {
+          __session: mockJwt,
+          __client_uat: '12345',
+        },
+        'https://primary.com/dashboard',
+      );
+
+      const requestState = await authenticateRequest(request, {
+        ...mockOptions(),
+        publishableKey: PK_LIVE,
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+
+      expect(requestState).toBeSignedIn({
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+    });
+
+    test('does not trigger cross-origin handshake when referer is from expected accounts portal derived from frontend API', async () => {
+      const request = mockRequestWithCookies(
+        {
+          referer: 'https://accounts.inspired.puma-74.lcl.dev/sign-in',
+          'sec-fetch-dest': 'document',
+          'sec-fetch-site': 'cross-site',
+        },
+        {
+          __session: mockJwt,
+          __client_uat: '12345',
+        },
+        'https://primary.com/dashboard',
+      );
+
+      const requestState = await authenticateRequest(request, {
+        ...mockOptions(),
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+
+      // Should not trigger the specific cross-origin sync handshake we're trying to prevent
+      expect(requestState.reason).not.toBe(AuthErrorReason.PrimaryDomainCrossOriginSync);
+    });
+
+    test('does not trigger handshake when referer is from FAPI domain (redirect-based auth)', async () => {
+      const request = mockRequestWithCookies(
+        {
+          referer: 'https://clerk.inspired.puma-74.lcl.dev/v1/client/sign_ins/12345/attempt_first_factor',
+          'sec-fetch-dest': 'document',
+          'sec-fetch-site': 'cross-site',
+        },
+        {
+          __session: mockJwt,
+          __client_uat: '12345',
+        },
+        'https://primary.com/dashboard',
+      );
+
+      const requestState = await authenticateRequest(request, {
+        ...mockOptions(),
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+
+      // Should not trigger the specific cross-origin sync handshake we're trying to prevent
+      expect(requestState.reason).not.toBe(AuthErrorReason.PrimaryDomainCrossOriginSync);
+    });
+
+    test('does not trigger handshake when referer is from FAPI domain with https prefix', async () => {
+      const request = mockRequestWithCookies(
+        {
+          referer: 'https://clerk.inspired.puma-74.lcl.dev/sign-in',
+          'sec-fetch-dest': 'document',
+          'sec-fetch-site': 'cross-site',
+        },
+        {
+          __session: mockJwt,
+          __client_uat: '12345',
+        },
+        'https://primary.com/dashboard',
+      );
+
+      const requestState = await authenticateRequest(request, {
+        ...mockOptions(),
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+
+      // Should not trigger the specific cross-origin sync handshake we're trying to prevent
+      expect(requestState.reason).not.toBe(AuthErrorReason.PrimaryDomainCrossOriginSync);
+    });
+
+    test('still triggers handshake for legitimate cross-origin requests from non-accounts domains', async () => {
+      const request = mockRequestWithCookies(
+        {
+          referer: 'https://satellite.com/sign-in',
+          'sec-fetch-dest': 'document',
+          'sec-fetch-site': 'cross-site',
+        },
+        {
+          __session: mockJwt,
+          __client_uat: '12345',
+        },
+        'https://primary.com/dashboard',
+      );
+
+      const requestState = await authenticateRequest(request, {
+        ...mockOptions(),
+        publishableKey: PK_LIVE,
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+
+      expect(requestState).toMatchHandshake({
+        reason: AuthErrorReason.PrimaryDomainCrossOriginSync,
+        domain: 'primary.com',
+        signInUrl: 'https://primary.com/sign-in',
+      });
+    });
   });
 });
