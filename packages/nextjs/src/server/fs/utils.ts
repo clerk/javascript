@@ -11,17 +11,17 @@ function assertNotNullable<T>(value: T, moduleName: string): asserts value is No
   }
 }
 
-const nodeFsOrThrow = () => {
+const nodeFsOrThrow = (): NonNullable<typeof nodeRuntime.fs> => {
   assertNotNullable(nodeRuntime.fs, 'fs');
   return nodeRuntime.fs;
 };
 
-const nodePathOrThrow = () => {
+const nodePathOrThrow = (): NonNullable<typeof nodeRuntime.path> => {
   assertNotNullable(nodeRuntime.path, 'path');
   return nodeRuntime.path;
 };
 
-const nodeCwdOrThrow = () => {
+const nodeCwdOrThrow = (): NonNullable<typeof nodeRuntime.cwd> => {
   assertNotNullable(nodeRuntime.cwd, 'cwd');
   return nodeRuntime.cwd;
 };
