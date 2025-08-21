@@ -56,6 +56,7 @@ import type {
 
 import { errorThrower } from './errors/errorThrower';
 import { unsupportedNonBrowserDomainOrProxyUrlFunction } from './errors/messages';
+import { StateProxy } from './stateProxy';
 import type {
   BrowserClerk,
   BrowserClerkConstructor,
@@ -158,6 +159,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   #proxyUrl: DomainOrProxyUrl['proxyUrl'];
   #publishableKey: string;
   #eventBus = createClerkEventBus();
+  #stateProxy: StateProxy;
 
   get publishableKey(): string {
     return this.#publishableKey;
@@ -250,6 +252,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     this.options = options;
     this.Clerk = Clerk;
     this.mode = inBrowser() ? 'browser' : 'server';
+    this.#stateProxy = new StateProxy(this);
 
     if (!this.options.sdkMetadata) {
       this.options.sdkMetadata = SDK_METADATA;
@@ -723,8 +726,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     return this.clerkjs?.billing;
   }
 
-  get __internal_state(): State | undefined {
-    return this.clerkjs?.__internal_state;
+  get __internal_state(): State {
+    return this.loaded && this.clerkjs ? this.clerkjs.__internal_state : this.#stateProxy;
   }
 
   get apiKeys(): APIKeysNamespace | undefined {
