@@ -1,8 +1,8 @@
+import { inBrowser } from '@clerk/shared/browser';
 import type { Errors, State } from '@clerk/types';
 
-import type { IsomorphicClerk } from './isomorphicClerk';
-import { inBrowser } from '@clerk/shared';
 import { errorThrower } from './errors/errorThrower';
+import type { IsomorphicClerk } from './isomorphicClerk';
 
 const defaultErrors = (): Errors => ({
   fields: {
