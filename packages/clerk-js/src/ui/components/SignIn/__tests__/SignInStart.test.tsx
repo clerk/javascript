@@ -437,7 +437,7 @@ describe('SignInStart', () => {
       it(`calls sign in with identifier again with only the email if the api respondes with the error ${code}`, async () => {
         const { wrapper, fixtures } = await createFixtures(f => {
           f.withEmailAddress();
-          f.withPassword({ required: true });
+          f.withPassword();
         });
 
         const errJSON = {
