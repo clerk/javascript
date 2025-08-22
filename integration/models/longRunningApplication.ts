@@ -46,7 +46,10 @@ export const longRunningApplication = (params: LongRunningApplicationParams) => 
     if (!stateFile.getLongRunningApps() || [port, serverUrl, pid, appDir, env].filter(Boolean).length === 0) {
       return;
     }
-    const data = stateFile.getLongRunningApps()[id] || {};
+    const data = stateFile.getLongRunningApps()?.[id] as import('./stateFile').AppParams | undefined;
+    if (!data) {
+      return;
+    }
     port ||= data.port;
     serverUrl ||= data.serverUrl;
     pid ||= data.pid;
