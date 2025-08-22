@@ -59,12 +59,12 @@ export const CheckoutButton = withClerk(
     const { userId, orgId } = useAuth();
 
     if (userId === null) {
-      throw new Error('Ensure that `<CheckoutButton />` is rendered inside a `<SignedIn />` component.');
+      throw new Error('Clerk: Ensure that `<CheckoutButton />` is rendered inside a `<SignedIn />` component.');
     }
 
     if (orgId === null && _for === 'organization') {
       throw new Error(
-        'Wrap `<CheckoutButton for="organization" />` with a check for an active organization. Retrieve `orgId` from `useAuth()` and confirm it is defined. For SSR, see: https://clerk.com/docs/references/backend/types/auth-object#how-to-access-the-auth-object',
+        'Clerk: Wrap `<CheckoutButton for="organization" />` with a check for an active organization. Retrieve `orgId` from `useAuth()` and confirm it is defined. For SSR, see: https://clerk.com/docs/references/backend/types/auth-object#how-to-access-the-auth-object',
       );
     }
 
