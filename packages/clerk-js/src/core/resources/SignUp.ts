@@ -488,6 +488,26 @@ class SignUpFuture implements SignUpFutureResource {
     return this.resource.unverifiedFields;
   }
 
+  get isTransferable() {
+    return (
+      this.resource.verifications.externalAccount.status === 'transferable' &&
+      this.resource.verifications.externalAccount.error?.code === 'external_account_exists'
+    );
+  }
+
+  get existingSession() {
+    if (
+      (this.resource.verifications.externalAccount.status === 'failed' ||
+        this.resource.verifications.externalAccount.status === 'unverified') &&
+      this.resource.verifications.externalAccount.error?.code === 'identifier_already_signed_in' &&
+      this.resource.verifications.externalAccount.error?.meta?.sessionId
+    ) {
+      return { sessionId: this.resource.verifications.externalAccount.error?.meta?.sessionId };
+    }
+
+    return undefined;
+  }
+
   private async getCaptchaToken(): Promise<{
     captchaToken?: string;
     captchaWidgetType?: CaptchaWidgetType;
@@ -501,6 +521,16 @@ class SignUpFuture implements SignUpFutureResource {
 
     const { captchaError, captchaToken, captchaWidgetType } = response;
     return { captchaToken, captchaWidgetType, captchaError };
+  }
+
+  async create({ transfer }: { transfer?: boolean }): Promise<{ error: unknown }> {
+    return runAsyncResourceTask(this.resource, async () => {
+      const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
+      await this.resource.__internal_basePost({
+        path: this.resource.pathRoot,
+        body: { transfer, captchaToken, captchaWidgetType, captchaError },
+      });
+    });
   }
 
   async password({ emailAddress, password }: { emailAddress: string; password: string }): Promise<{ error: unknown }> {
@@ -536,6 +566,39 @@ class SignUpFuture implements SignUpFutureResource {
         body: { strategy: 'email_code', code },
         action: 'attempt_verification',
       });
+    });
+  }
+
+  async sso({
+    strategy,
+    redirectUrl,
+    redirectUrlComplete,
+  }: {
+    strategy: string;
+    redirectUrl: string;
+    redirectUrlComplete: string;
+  }): Promise<{ error: unknown }> {
+    return runAsyncResourceTask(this.resource, async () => {
+      const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
+      await this.resource.__internal_basePost({
+        path: this.resource.pathRoot,
+        body: {
+          strategy,
+          redirectUrl: SignUp.clerk.buildUrlWithAuth(redirectUrl),
+          redirectUrlComplete,
+          captchaToken,
+          captchaWidgetType,
+          captchaError,
+        },
+      });
+
+      const { status, externalVerificationRedirectURL } = this.resource.verifications.externalAccount;
+
+      if (status === 'unverified' && !!externalVerificationRedirectURL) {
+        windowNavigate(externalVerificationRedirectURL);
+      } else {
+        clerkInvalidFAPIResponse(status, SignUp.fapiClient.buildEmailAddress('support'));
+      }
     });
   }
 

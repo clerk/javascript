@@ -122,11 +122,15 @@ export interface SignUpResource extends ClerkResource {
 export interface SignUpFutureResource {
   status: SignUpStatus | null;
   unverifiedFields: SignUpIdentificationField[];
+  isTransferable: boolean;
+  existingSession?: { sessionId: string };
+  create: (params: { transfer?: boolean }) => Promise<{ error: unknown }>;
   verifications: {
     sendEmailCode: () => Promise<{ error: unknown }>;
     verifyEmailCode: (params: { code: string }) => Promise<{ error: unknown }>;
   };
   password: (params: { emailAddress: string; password: string }) => Promise<{ error: unknown }>;
+  sso: (params: { strategy: string; redirectUrl: string; redirectUrlComplete: string }) => Promise<{ error: unknown }>;
   finalize: (params: { navigate?: SetActiveNavigate }) => Promise<{ error: unknown }>;
 }
 
