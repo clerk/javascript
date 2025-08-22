@@ -210,7 +210,7 @@ const CheckoutFormElements = () => {
       sx={t => ({ padding: t.space.$4 })}
     >
       {/* only show if there are payment sources and there is a total due now */}
-      {paymentSources.length > 0 && (totals.totalDueNow.amount > 0 || freeTrialEndsAt) && (
+      {paymentSources.length > 0 && (totals.totalDueNow.amount > 0 || !!freeTrialEndsAt) && (
         <SegmentedControl.Root
           aria-label='Payment method source'
           value={paymentMethodSource}
