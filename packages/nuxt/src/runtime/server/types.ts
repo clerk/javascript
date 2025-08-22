@@ -8,7 +8,7 @@ import type {
 } from '@clerk/backend/internal';
 import type { PendingSessionOptions } from '@clerk/types';
 
-export type AuthOptions = PendingSessionOptions & { acceptsToken?: AuthenticateRequestOptions['acceptsToken'] };
+export type AuthOptions = PendingSessionOptions & Pick<AuthenticateRequestOptions, 'acceptsToken'>;
 
 /**
  * @internal This type is used to define the `auth` function in the event context.
