@@ -867,12 +867,6 @@ export interface Clerk {
   __internal_setActiveInProgress: boolean;
 
   /**
-   * Internal flag indicating whether after-auth flows are enabled based on instance settings.
-   * @internal
-   */
-  __internal_hasAfterAuthFlows: boolean;
-
-  /**
    * API Keys Object
    * @experimental
    * This API is in early access and may change in future releases.
