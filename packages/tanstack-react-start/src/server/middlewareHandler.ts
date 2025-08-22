@@ -1,5 +1,6 @@
 import { AuthStatus, constants } from '@clerk/backend/internal';
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
+import type { PendingSessionOptions } from '@clerk/types';
 import type { AnyRouter } from '@tanstack/react-router';
 import {
   type CustomizeStartHandler,
@@ -30,7 +31,7 @@ export function createClerkHandler<TRouter extends AnyRouter>(
     });
 
     // Set auth object here so it is available immediately in server functions via getAuth()
-    event.context.auth = () => requestState.toAuth();
+    event.context.auth = (options?: PendingSessionOptions) => requestState.toAuth(options);
 
     return eventHandler(async ({ request, router, responseHeaders }) => {
       const locationHeader = requestState.headers.get(constants.Headers.Location);
