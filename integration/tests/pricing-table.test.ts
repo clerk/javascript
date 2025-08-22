@@ -297,8 +297,45 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       // Verify the user is now shown as having an active free trial
       // The pricing table should show their current plan as active
       await u.po.pricingTable.waitToBeActive({ planSlug: 'trial' });
-      // Verify trial end date is displayed
+
+      await u.po.page.goToRelative('/user');
+      await u.po.userProfile.waitForMounted();
+      await u.po.userProfile.switchToBillingTab();
+
+      await expect(
+        u.po.page
+          .locator('.cl-profileSectionContent__subscriptionsList')
+          .getByText(/Trial/i)
+          .locator('xpath=..')
+          .getByText(/Free trial/i),
+      ).toBeVisible();
+
       await expect(u.po.page.getByText(/Trial ends/i)).toBeVisible();
+
+      await u.po.page.getByRole('button', { name: 'Manage subscription' }).first().click();
+      await u.po.subscriptionDetails.waitForMounted();
+      await u.po.subscriptionDetails.root.locator('.cl-menuButtonEllipsisBordered').click();
+      await u.po.subscriptionDetails.root.getByText('Cancel free trial').click();
+      await u.po.subscriptionDetails.root.locator('.cl-drawerConfirmationRoot').waitFor({ state: 'visible' });
+      await u.po.subscriptionDetails.root.getByRole('button', { name: 'Cancel free trial' }).click();
+      await u.po.subscriptionDetails.waitForUnmounted();
+
+      await expect(
+        u.po.page
+          .locator('.cl-profileSectionContent__subscriptionsList')
+          .getByText(/Trial/i)
+          .locator('xpath=..')
+          .getByText(/Free trial/i),
+      ).toBeVisible();
+
+      // Verify the Free plan with Upcoming status exists
+      await expect(
+        u.po.page
+          .locator('.cl-profileSectionContent__subscriptionsList')
+          .getByText('Free')
+          .locator('xpath=..')
+          .getByText('Upcoming'),
+      ).toBeVisible();
     } finally {
       // Clean up the trial user
       await trialUser.deleteIfExists();
