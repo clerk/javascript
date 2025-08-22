@@ -15,6 +15,7 @@ const authStateFn = createServerFn({ method: 'GET' }).handler(async () => {
   return { userId }
 })
 ```
+
 Nuxt
 
 ```ts
