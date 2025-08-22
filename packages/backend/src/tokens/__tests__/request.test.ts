@@ -1796,5 +1796,36 @@ describe('tokens.authenticateRequest(options)', () => {
         signInUrl: 'https://primary.com/sign-in',
       });
     });
+
+    test('does not trigger handshake when referrer matches current origin despite sec-fetch-site cross-site (redirect chain)', async () => {
+      const request = mockRequestWithCookies(
+        {
+          host: 'primary.com',
+          referer: 'https://primary.com/some-page',
+          'sec-fetch-dest': 'document',
+          'sec-fetch-site': 'cross-site', // This can happen due to redirect chains through Clerk domains
+        },
+        {
+          __session: mockJwt,
+          __client_uat: '12345',
+        },
+        'https://primary.com/dashboard',
+      );
+
+      const requestState = await authenticateRequest(request, {
+        ...mockOptions(),
+        publishableKey: PK_LIVE,
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+
+      // Should not trigger handshake because referrer origin matches current origin
+      expect(requestState).toBeSignedIn({
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+    });
   });
 });

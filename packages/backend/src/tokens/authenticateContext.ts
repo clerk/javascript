@@ -188,10 +188,6 @@ class AuthenticateContext implements AuthenticateContext {
     }
 
     try {
-      if (this.getHeader(constants.Headers.SecFetchSite) === 'cross-site') {
-        return true;
-      }
-
       const referrerOrigin = new URL(this.referrer).origin;
       return referrerOrigin !== this.clerkUrl.origin;
     } catch {
