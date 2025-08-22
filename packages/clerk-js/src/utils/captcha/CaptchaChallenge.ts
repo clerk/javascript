@@ -1,3 +1,5 @@
+import type { CaptchaWidgetType } from '@clerk/types';
+
 import type { Clerk } from '../../core/resources/internal';
 import { getCaptchaToken } from './getCaptchaToken';
 import { retrieveCaptchaInfo } from './retrieveCaptchaInfo';
@@ -42,7 +44,12 @@ export class CaptchaChallenge {
    *
    * Managed challenged start as non-interactive and escalate to interactive if necessary.
    */
-  public async managedOrInvisible(opts?: Partial<CaptchaOptions>) {
+  public async managedOrInvisible(
+    opts?: Partial<CaptchaOptions>,
+  ): Promise<
+    | { captchaError?: string; captchaAction?: string; captchaToken?: string; captchaWidgetType?: CaptchaWidgetType }
+    | undefined
+  > {
     const { captchaSiteKey, canUseCaptcha, captchaWidgetType, captchaProvider, captchaPublicKeyInvisible, nonce } =
       retrieveCaptchaInfo(this.clerk);
 

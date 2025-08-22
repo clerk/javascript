@@ -187,6 +187,10 @@ export type __internal_LocalizationResource = {
     switchToAnnualWithAnnualPrice: LocalizationValue<'price' | 'currency'>;
     billedAnnually: LocalizationValue;
     billedMonthlyOnly: LocalizationValue;
+    cancelFreeTrial: LocalizationValue<'plan'>;
+    cancelFreeTrialTitle: LocalizationValue<'plan'>;
+    cancelFreeTrialAccessUntil: LocalizationValue<'plan' | 'date'>;
+    keepFreeTrial: LocalizationValue;
     alwaysFree: LocalizationValue;
     accountFunds: LocalizationValue;
     defaultFreePlanActive: LocalizationValue;
@@ -212,7 +216,11 @@ export type __internal_LocalizationResource = {
       currentBillingCycle: LocalizationValue;
       nextPaymentOn: LocalizationValue;
       nextPaymentAmount: LocalizationValue;
+      firstPaymentOn: LocalizationValue;
+      firstPaymentAmount: LocalizationValue;
       subscribedOn: LocalizationValue;
+      trialStartedOn: LocalizationValue;
+      trialEndsOn: LocalizationValue;
       endsOn: LocalizationValue;
       renewsAt: LocalizationValue;
       beginsOn: LocalizationValue;
@@ -1223,6 +1231,10 @@ export type __internal_LocalizationResource = {
       subtitle: LocalizationValue;
       formButtonSubmit: LocalizationValue;
       formButtonReset: LocalizationValue;
+      formFieldLabel__name: LocalizationValue;
+      formFieldLabel__slug: LocalizationValue;
+      formFieldInputPlaceholder__name: LocalizationValue;
+      formFieldInputPlaceholder__slug: LocalizationValue;
     };
     chooseOrganization: {
       title: LocalizationValue;
