@@ -2,6 +2,7 @@ import type {
   __experimental_CheckoutCacheState,
   __experimental_CheckoutInstance,
   CommerceCheckoutResource,
+  SetActiveNavigate,
 } from '@clerk/types';
 import { useMemo, useSyncExternalStore } from 'react';
 
@@ -57,7 +58,7 @@ type __experimental_UseCheckoutReturn = {
       confirm: __experimental_CheckoutInstance['confirm'];
       start: __experimental_CheckoutInstance['start'];
       clear: () => void;
-      finalize: (params?: { redirectUrl: string }) => void;
+      finalize: (params?: { navigate?: SetActiveNavigate }) => void;
       getState: () => __experimental_CheckoutCacheState;
       isStarting: boolean;
       isConfirming: boolean;

@@ -827,6 +827,10 @@ export const ptBR: LocalizationResource = {
     createOrganization: {
       formButtonReset: 'Cancelar',
       formButtonSubmit: 'Criar nova organização',
+      formFieldInputPlaceholder__name: undefined,
+      formFieldInputPlaceholder__slug: undefined,
+      formFieldLabel__name: undefined,
+      formFieldLabel__slug: undefined,
       subtitle: 'Conte-nos um pouco sobre sua organização',
       title: 'Configure sua conta',
     },
