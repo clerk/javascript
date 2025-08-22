@@ -31,7 +31,7 @@ import { withClerk } from './withClerk';
  *       <CheckoutButton
  *         planId="plan_123"
  *         planPeriod="month"
- *         subscriberType="org"
+ *         for="organization"
  *         onSubscriptionComplete={() => console.log('Subscription completed!')}
  *       >
  *         <button className="custom-button">Subscribe Now</button>
@@ -42,7 +42,7 @@ import { withClerk } from './withClerk';
  * ```
  *
  * @throws {Error} When rendered outside of a `<SignedIn />` component
- * @throws {Error} When `subscriberType="org"` is used without an active organization context
+ * @throws {Error} When `for="organization"` is used without an active organization context
  */
 export const CheckoutButton = withClerk(
   ({ clerk, children, ...props }: WithClerkProp<React.PropsWithChildren<__experimental_CheckoutButtonProps>>) => {

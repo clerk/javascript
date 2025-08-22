@@ -26,7 +26,7 @@ import { withClerk } from './withClerk';
  * function OrganizationSubscriptionDetails() {
  *   return (
  *     <SubscriptionDetailsButton
- *       for="org"
+ *       for="organization"
  *       onSubscriptionCancel={() => console.log('Subscription canceled')}
  *     >
  *       <button>View Organization Subscription</button>
@@ -36,7 +36,7 @@ import { withClerk } from './withClerk';
  * ```
  *
  * @throws {Error} When rendered outside of a `<SignedIn />` component
- * @throws {Error} When `for="org"` is used without an active organization context
+ * @throws {Error} When `for="organization"` is used without an active organization context
  *
  * @see https://clerk.com/docs/billing/overview
  */
