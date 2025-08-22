@@ -192,7 +192,7 @@ const useCheckoutMutations = () => {
 
 const CheckoutFormElements = () => {
   const { checkout } = useCheckout();
-  const { id, totals } = checkout;
+  const { id, totals, freeTrialEndsAt } = checkout;
   const { data: paymentSources } = usePaymentMethods();
 
   const [paymentMethodSource, setPaymentMethodSource] = useState<PaymentMethodSource>(() =>
@@ -210,7 +210,7 @@ const CheckoutFormElements = () => {
       sx={t => ({ padding: t.space.$4 })}
     >
       {/* only show if there are payment sources and there is a total due now */}
-      {paymentSources.length > 0 && totals.totalDueNow.amount > 0 && (
+      {paymentSources.length > 0 && (totals.totalDueNow.amount > 0 || freeTrialEndsAt) && (
         <SegmentedControl.Root
           aria-label='Payment method source'
           value={paymentMethodSource}
@@ -370,7 +370,7 @@ const ExistingPaymentSourceForm = withCardStateProvider(
       });
     }, [paymentSources]);
 
-    const isSchedulePayment = totalDueNow.amount > 0 && !freeTrialEndsAt;
+    const shouldDefaultBeUsed = totalDueNow.amount === 0 || !freeTrialEndsAt;
 
     return (
       <Form
@@ -381,7 +381,7 @@ const ExistingPaymentSourceForm = withCardStateProvider(
           rowGap: t.space.$4,
         })}
       >
-        {isSchedulePayment ? (
+        {shouldDefaultBeUsed ? (
           <Select
             elementId='paymentSource'
             options={options}
