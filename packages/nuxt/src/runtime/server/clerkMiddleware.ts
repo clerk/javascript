@@ -1,5 +1,5 @@
 import type { AuthenticateRequestOptions } from '@clerk/backend/internal';
-import { AuthStatus, constants, getAuthObjectForAcceptedToken, TokenType } from '@clerk/backend/internal';
+import { AuthStatus, constants, getAuthObjectForAcceptedToken } from '@clerk/backend/internal';
 import { deprecated } from '@clerk/shared/deprecated';
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
 import type { PendingSessionOptions } from '@clerk/types';
@@ -111,8 +111,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
 
     const authObjectFn = (opts?: PendingSessionOptions) => requestState.toAuth(opts);
     const authHandler: AuthFn = ((options?: AuthOptions) => {
-      const acceptsToken = options?.acceptsToken ?? TokenType.SessionToken;
-      return getAuthObjectForAcceptedToken({ authObject: authObjectFn(options), acceptsToken });
+      return getAuthObjectForAcceptedToken({ authObject: authObjectFn(options), acceptsToken: options?.acceptsToken });
     }) as AuthFn;
 
     const auth = new Proxy(authHandler, {
