@@ -62,7 +62,9 @@ describe('CheckoutButton', () => {
             for='organization'
           />,
         ),
-      ).toThrow('Wrap `<CheckoutButton for="organization" />` with a check for an active organization.');
+      ).toThrow(
+        'Wrap `<CheckoutButton for="organization" />` with a check for an active organization. Retrieve `orgId` from `useAuth()` and confirm it is defined.',
+      );
     });
 
     it('renders successfully with authenticated user', () => {

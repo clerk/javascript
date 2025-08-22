@@ -75,6 +75,18 @@ describe('UserSettings', () => {
         },
       },
     } as any as UserSettingsJSON);
+
+    expect(sut.instanceIsPasswordBased).toEqual(true);
+
+    sut = new UserSettings({
+      attributes: {
+        password: {
+          enabled: false,
+          required: false,
+        },
+      },
+    } as any as UserSettingsJSON);
+
     expect(sut.instanceIsPasswordBased).toEqual(false);
   });
 

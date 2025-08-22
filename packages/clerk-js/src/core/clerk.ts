@@ -2677,10 +2677,6 @@ export class Clerk implements ClerkInterface {
     this.#emit();
   };
 
-  get __internal_hasAfterAuthFlows() {
-    return !!this.environment?.organizationSettings?.forceOrganizationSelection;
-  }
-
   #defaultSession = (client: ClientResource): SignedInSessionResource | null => {
     if (client.lastActiveSessionId) {
       const currentSession = client.signedInSessions.find(s => s.id === client.lastActiveSessionId);
