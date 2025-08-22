@@ -1520,6 +1520,31 @@ describe('tokens.authenticateRequest(options)', () => {
       });
     });
 
+    test('does not trigger handshake when referer is same origin', async () => {
+      const request = mockRequestWithCookies(
+        {
+          host: 'localhost:3000',
+          referer: 'http://localhost:3000',
+          'sec-fetch-dest': 'document',
+        },
+        {
+          __clerk_db_jwt: mockJwt,
+          __session: mockJwt,
+          __client_uat: '12345',
+        },
+        'http://localhost:3000',
+      );
+
+      const requestState = await authenticateRequest(request, {
+        ...mockOptions(),
+        signInUrl: 'http://localhost:3000/sign-in',
+      });
+
+      expect(requestState).toBeSignedIn({
+        signInUrl: 'http://localhost:3000/sign-in',
+      });
+    });
+
     test('does not trigger handshake when no referer header', async () => {
       const request = mockRequestWithCookies(
         {
