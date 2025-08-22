@@ -63,7 +63,9 @@ export const CheckoutButton = withClerk(
     }
 
     if (orgId === null && _for === 'organization') {
-      throw new Error('Wrap `<CheckoutButton for="organization" />` with a check for an active organization.');
+      throw new Error(
+        'Wrap `<CheckoutButton for="organization" />` with a check for an active organization. Retrieve `orgId` from `useAuth()` and confirm it is defined. For SSR, see: https://clerk.com/docs/references/backend/types/auth-object#how-to-access-the-auth-object',
+      );
     }
 
     children = normalizeWithDefaultValue(children, 'Checkout');

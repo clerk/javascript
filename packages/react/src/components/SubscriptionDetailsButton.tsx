@@ -58,7 +58,7 @@ export const SubscriptionDetailsButton = withClerk(
 
     if (orgId === null && _for === 'organization') {
       throw new Error(
-        'Wrap `<SubscriptionDetailsButton for="organization" />` with a check for an active organization.',
+        'Wrap `<SubscriptionDetailsButton for="organization" />` with a check for an active organization. Retrieve `orgId` from `useAuth()` and confirm it is defined. For SSR, see: https://clerk.com/docs/references/backend/types/auth-object#how-to-access-the-auth-object',
       );
     }
 
