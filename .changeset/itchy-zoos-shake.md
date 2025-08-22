@@ -2,7 +2,7 @@
 "@clerk/tanstack-react-start": minor
 ---
 
-Reuses existing `Auth` object from the server handler
+Reuses existing `Auth` object from the server handler when using `getAuth()`
 
 The `createClerkHandler` helper now returns a Promise and requires awaiting during setup to ensure authentication context is available at the earliest possible point in the request lifecycle, before any router loaders or server functions execute
 
