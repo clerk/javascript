@@ -63,11 +63,6 @@ export class CommerceSubscriptionItem {
   ) {}
 
   static fromJSON(data: CommerceSubscriptionItemJSON): CommerceSubscriptionItem {
-    console.log('data', data);
-
-    function formatAmountJSON(amount: null): null;
-    function formatAmountJSON(amount: undefined): undefined;
-    function formatAmountJSON(amount: CommerceMoneyAmountJSON): CommerceMoneyAmount;
     function formatAmountJSON(
       amount: CommerceMoneyAmountJSON | null | undefined,
     ): CommerceMoneyAmount | null | undefined;
