@@ -88,7 +88,10 @@ test.describe('root and subdomain production apps @sessions', () => {
 
       await u[0].page.goto(`https://${hosts[0]}`);
       await u[0].po.signIn.goTo();
-      await u[0].po.signIn.signInWithEmailAndInstantPassword(fakeUser);
+      await u[0].po.signIn.signInWithEmailAndInstantPassword({
+        email: fakeUser.email!,
+        password: fakeUser.password!,
+      });
       await u[0].po.expect.toBeSignedIn();
       const tab0User = await u[0].po.clerk.getClientSideUser();
       // make sure that the backend user now matches the user we signed in with on the client
@@ -144,7 +147,10 @@ test.describe('root and subdomain production apps @sessions', () => {
 
       await u[0].page.goto(`https://${hosts[0]}`);
       await u[0].po.signIn.goTo();
-      await u[0].po.signIn.signInWithEmailAndInstantPassword(fakeUser);
+      await u[0].po.signIn.signInWithEmailAndInstantPassword({
+        email: fakeUser.email!,
+        password: fakeUser.password!,
+      });
       await u[0].po.expect.toBeSignedIn();
 
       await u[1].page.goto(`https://${hosts[1]}`);
@@ -225,7 +231,10 @@ test.describe('root and subdomain production apps @sessions', () => {
 
       await u[0].page.goto(`https://${hosts[0]}`);
       await u[0].po.signIn.goTo();
-      await u[0].po.signIn.signInWithEmailAndInstantPassword(fakeUsers[0]);
+      await u[0].po.signIn.signInWithEmailAndInstantPassword({
+        email: fakeUsers[0].email!,
+        password: fakeUsers[0].password!,
+      });
       await u[0].po.expect.toBeSignedIn();
       const tab0User = await u[0].po.clerk.getClientSideUser();
       // make sure that the backend user now matches the user we signed in with on the client
@@ -251,7 +260,10 @@ test.describe('root and subdomain production apps @sessions', () => {
       expect((await u[1].page.evaluate(() => fetch('/api/me').then(r => r.json()))).userId).toBe(null);
 
       await u[1].po.signIn.goTo();
-      await u[1].po.signIn.signInWithEmailAndInstantPassword(fakeUsers[1]);
+      await u[1].po.signIn.signInWithEmailAndInstantPassword({
+        email: fakeUsers[1].email!,
+        password: fakeUsers[1].password!,
+      });
       await u[1].po.expect.toBeSignedIn();
       const tab1User = await u[1].po.clerk.getClientSideUser();
       // make sure that the backend user now matches the user we signed in with on the client
@@ -284,13 +296,19 @@ test.describe('root and subdomain production apps @sessions', () => {
       // signin in tab0
       await u[0].page.goto(`https://${hosts[0]}`);
       await u[0].po.signIn.goTo();
-      await u[0].po.signIn.signInWithEmailAndInstantPassword(fakeUsers[0]);
+      await u[0].po.signIn.signInWithEmailAndInstantPassword({
+        email: fakeUsers[0].email!,
+        password: fakeUsers[0].password!,
+      });
       await u[0].po.expect.toBeSignedIn();
 
       // signin in tab1
       await u[1].page.goto(`https://${hosts[1]}`);
       await u[1].po.signIn.goTo();
-      await u[1].po.signIn.signInWithEmailAndInstantPassword(fakeUsers[1]);
+      await u[1].po.signIn.signInWithEmailAndInstantPassword({
+        email: fakeUsers[1].email!,
+        password: fakeUsers[1].password!,
+      });
       await u[1].po.expect.toBeSignedIn();
 
       // singout from tab0
@@ -357,7 +375,10 @@ test.describe('root and subdomain production apps @sessions', () => {
 
       await u[0].page.goto(`https://${hosts[0]}`);
       await u[0].po.signIn.goTo();
-      await u[0].po.signIn.signInWithEmailAndInstantPassword(fakeUsers[0]);
+      await u[0].po.signIn.signInWithEmailAndInstantPassword({
+        email: fakeUsers[0].email!,
+        password: fakeUsers[0].password!,
+      });
       await u[0].po.expect.toBeSignedIn();
       const tab0User = await u[0].po.clerk.getClientSideUser();
       // make sure that the backend user now matches the user we signed in with on the client
@@ -368,7 +389,10 @@ test.describe('root and subdomain production apps @sessions', () => {
       expect((await u[1].page.evaluate(() => fetch('/api/me').then(r => r.json()))).userId).toBe(null);
 
       await u[1].po.signIn.goTo();
-      await u[1].po.signIn.signInWithEmailAndInstantPassword(fakeUsers[1]);
+      await u[1].po.signIn.signInWithEmailAndInstantPassword({
+        email: fakeUsers[1].email!,
+        password: fakeUsers[1].password!,
+      });
       await u[1].po.expect.toBeSignedIn();
       const tab1User = await u[1].po.clerk.getClientSideUser();
       // make sure that the backend user now matches the user we signed in with on the client
