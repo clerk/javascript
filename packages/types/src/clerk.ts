@@ -92,7 +92,7 @@ export type __experimental_CheckoutInstance = {
   confirm: (params: ConfirmCheckoutParams) => Promise<CheckoutResult>;
   start: () => Promise<CheckoutResult>;
   clear: () => void;
-  finalize: (params?: { redirectUrl: string }) => Promise<void>;
+  finalize: (params?: { navigate?: SetActiveNavigate }) => Promise<void>;
   subscribe: (listener: (state: __experimental_CheckoutCacheState) => void) => () => void;
   getState: () => __experimental_CheckoutCacheState;
 };
@@ -769,8 +769,10 @@ export interface Clerk {
 
   /**
    * Redirects to the configured URL where tasks are mounted.
+   *
+   * @param opts A {@link RedirectOptions} object
    */
-  redirectToTasks(): Promise<unknown>;
+  redirectToTasks(opts?: TasksRedirectOptions): Promise<unknown>;
 
   /**
    * Completes a Google One Tap redirection flow started by
@@ -863,12 +865,6 @@ export interface Clerk {
    * initiated outside of the Clerk class.
    */
   __internal_setActiveInProgress: boolean;
-
-  /**
-   * Internal flag indicating whether after-auth flows are enabled based on instance settings.
-   * @internal
-   */
-  __internal_hasAfterAuthFlows: boolean;
 
   /**
    * API Keys Object
@@ -1161,6 +1157,8 @@ export type SignUpInitialValues = {
   lastName?: string;
   username?: string;
 };
+
+export type TasksRedirectOptions = RedirectOptions & RedirectUrlProp;
 
 export type SignInRedirectOptions = RedirectOptions &
   RedirectUrlProp & {

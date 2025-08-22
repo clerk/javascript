@@ -289,8 +289,9 @@ const SubscriptionDetailsFooter = withCardStateProvider(() => {
               colorScheme='secondary'
               localizationKey={
                 selectedSubscription?.isFreeTrial
-                  ? localizationKeys('commerce.cancelFreeTrialDescription', {
+                  ? localizationKeys('commerce.cancelFreeTrialAccessUntil', {
                       plan: selectedSubscription.plan.name,
+                      date: selectedSubscription.periodEnd as Date,
                     })
                   : selectedSubscription.status === 'upcoming'
                     ? localizationKeys('commerce.cancelSubscriptionNoCharge')
