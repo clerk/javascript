@@ -1,7 +1,7 @@
 import { Feature } from './Feature';
 import type { CommercePlanJSON } from './JSON';
 
-type CommerceMoneyAmount = {
+export type CommerceMoneyAmount = {
   amount: number;
   amountFormatted: string;
   currency: string;

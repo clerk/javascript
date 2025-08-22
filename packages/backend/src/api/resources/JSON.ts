@@ -843,9 +843,44 @@ export interface CommercePlanJSON extends ClerkResourceJSON {
   features: FeatureJSON[];
 }
 
+type CommerceSubscriptionItemStatus =
+  | 'abandoned'
+  | 'active'
+  | 'canceled'
+  | 'ended'
+  | 'expired'
+  | 'incomplete'
+  | 'past_due'
+  | 'upcoming';
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+ * It is advised to pin the SDK version to avoid breaking changes.
+ */
 export interface CommerceSubscriptionItemJSON extends ClerkResourceJSON {
   object: typeof ObjectType.CommerceSubscriptionItem;
-  status: 'abandoned' | 'active' | 'canceled' | 'ended' | 'expired' | 'incomplete' | 'past_due' | 'upcoming';
+  status: CommerceSubscriptionItemStatus;
+  plan_period: 'month' | 'annual';
+  period_start: number;
+  period_end?: number;
+  canceled_at?: number;
+  past_due_at?: number;
+  lifetime_paid: CommerceMoneyAmountJSON;
+  next_payment: {
+    amount: number;
+    date: number;
+  } | null;
+  amount: CommerceMoneyAmountJSON | null;
+  plan: CommercePlanJSON;
+  plan_id: string;
+}
+
+/**
+ * Webhooks specific interface for CommerceSubscriptionItem.
+ */
+export interface CommerceSubscriptionItemWebhookEventJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.CommerceSubscriptionItem;
+  status: CommerceSubscriptionItemStatus;
   credit: {
     amount: CommerceMoneyAmountJSON;
     cycle_days_remaining: number;
@@ -882,7 +917,10 @@ export interface CommerceSubscriptionItemJSON extends ClerkResourceJSON {
   plan_id: string;
 }
 
-export interface CommercePaymentAttemptJSON extends ClerkResourceJSON {
+/**
+ * Webhooks specific interface for CommercePaymentAttempt.
+ */
+export interface CommercePaymentAttemptWebhookEventJSON extends ClerkResourceJSON {
   object: typeof ObjectType.CommercePaymentAttempt;
   instance_id: string;
   payment_id: string;
@@ -912,10 +950,13 @@ export interface CommercePaymentAttemptJSON extends ClerkResourceJSON {
     card_type?: string;
     last4?: string;
   };
-  subscription_items: CommerceSubscriptionItemJSON[];
+  subscription_items: CommerceSubscriptionItemWebhookEventJSON[];
 }
 
-export interface CommerceSubscriptionJSON extends ClerkResourceJSON {
+/**
+ * Webhooks specific interface for CommerceSubscription.
+ */
+export interface CommerceSubscriptionWebhookEventJSON extends ClerkResourceJSON {
   object: typeof ObjectType.CommerceSubscription;
   status: 'abandoned' | 'active' | 'canceled' | 'ended' | 'expired' | 'incomplete' | 'past_due' | 'upcoming';
   active_at?: number;
@@ -928,7 +969,7 @@ export interface CommerceSubscriptionJSON extends ClerkResourceJSON {
   payer_id: string;
   payer: CommercePayerJSON;
   payment_source_id: string;
-  items: CommerceSubscriptionItemJSON[];
+  items: CommerceSubscriptionItemWebhookEventJSON[];
 }
 
 export interface WebhooksSvixJSON {
