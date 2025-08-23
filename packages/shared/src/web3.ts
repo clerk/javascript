@@ -7,6 +7,11 @@ export const WEB3_PROVIDERS: Web3ProviderData[] = [
     name: 'MetaMask',
   },
   {
+    provider: 'base',
+    strategy: 'web3_base_signature',
+    name: 'Base',
+  },
+  {
     provider: 'coinbase_wallet',
     strategy: 'web3_coinbase_wallet_signature',
     name: 'Coinbase Wallet',
