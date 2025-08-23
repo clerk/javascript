@@ -6,11 +6,10 @@ import type { DebugLogLevel } from '@/core/modules/debug/types';
  * Lightweight logger surface that callers can import as a singleton.
  * Methods are no-ops until initialized via `initDebugLogger`.
  */
-export interface DebugLoggerInterface {
+export interface DebugLogger {
   debug(message: string, context?: Record<string, unknown>, source?: string): void;
   error(message: string, context?: Record<string, unknown>, source?: string): void;
   info(message: string, context?: Record<string, unknown>, source?: string): void;
-  trace(message: string, context?: Record<string, unknown>, source?: string): void;
   warn(message: string, context?: Record<string, unknown>, source?: string): void;
 }
 
@@ -21,8 +20,8 @@ type InitOptions = {
 };
 
 let isEnabled = false;
-let realLogger: DebugLoggerInterface | null = null;
-let lastOptions: Omit<InitOptions, 'enabled'> | null = null;
+let realLogger: DebugLogger | null = null;
+let initializationAttempted = false;
 
 type BufferedLogEntry = {
   level: DebugLogLevel;
@@ -36,6 +35,9 @@ const MAX_BUFFERED_LOGS = 200;
 const preInitBuffer: BufferedLogEntry[] = [];
 
 function pushBuffered(level: DebugLogLevel, message: string, context?: Record<string, unknown>, source?: string): void {
+  if (!isEnabled) {
+    return;
+  }
   preInitBuffer.push({ level, message, context, source, ts: Date.now() });
   if (preInitBuffer.length > MAX_BUFFERED_LOGS) {
     preInitBuffer.shift();
@@ -65,9 +67,6 @@ function flushBuffered(): void {
       case 'debug':
         realLogger.debug(entry.message, mergedContext, entry.source);
         break;
-      case 'trace':
-        realLogger.trace(entry.message, mergedContext, entry.source);
-        break;
       default:
         break;
     }
@@ -75,7 +74,7 @@ function flushBuffered(): void {
   preInitBuffer.length = 0;
 }
 
-async function ensureInitialized(): Promise<void> {
+async function ensureInitialized(options?: Omit<InitOptions, 'enabled'>): Promise<void> {
   try {
     if (!isEnabled || realLogger) {
       return;
@@ -83,8 +82,8 @@ async function ensureInitialized(): Promise<void> {
 
     const { getDebugLogger } = await import('@/core/modules/debug');
     const logger = await getDebugLogger({
-      logLevel: lastOptions?.logLevel ?? 'trace',
-      telemetryCollector: lastOptions?.telemetryCollector,
+      logLevel: options?.logLevel ?? 'debug',
+      telemetryCollector: options?.telemetryCollector,
     });
 
     if (logger) {
@@ -92,42 +91,22 @@ async function ensureInitialized(): Promise<void> {
       flushBuffered();
     }
   } catch (error) {
-    const message = 'Debug logger initialization failed';
-    if (isEnabled && realLogger) {
-      try {
-        realLogger.trace(message, { error });
-      } catch {
-        // ignore secondary logging errors
-      }
-    } else {
-      try {
-        // Use a safe, minimal fallback to avoid noisy errors
-        console.debug?.(message, error);
-      } catch {
-        // ignore secondary logging errors
-      }
+    try {
+      console.debug?.('Debug logger initialization failed', error);
+    } catch {
+      void 0;
     }
-    // Silently return to avoid unhandled rejections and preserve behavior
+
     return;
   }
 }
 
 /**
  * @public
- * Initialize or update the global debug logger configuration.
- *
- * Behavior:
- * - Safe to call multiple times; subsequent calls update options and re-initialize if needed
- * - When disabled, the logger becomes a no-op and any existing real logger is cleared
- * - Initialization happens asynchronously; errors are handled internally without throwing
- *
- * Options and defaults:
- * - options.enabled: defaults to true
- * - options.logLevel: defaults to 'trace'
- * - options.telemetryCollector: optional telemetry sink to forward logs
+ * Initialize the global debug logger configuration once.
  *
  * @param options - Configuration options
- * @param options.enabled - Enables the logger; when false, logger is a no-op (default: true)
+ * @param options.enabled - Enables the logger; when false, logger is a no-op (default: false)
  * @param options.logLevel - Minimal level to log; lower-priority logs are ignored (default: 'trace')
  * @param options.telemetryCollector - Collector used by the debug transport for emitting telemetry
  *
@@ -140,40 +119,18 @@ async function ensureInitialized(): Promise<void> {
  * ```
  */
 export function initDebugLogger(options: InitOptions = {}): void {
-  const { enabled = true, ...rest } = options;
-  lastOptions = rest;
-  isEnabled = Boolean(enabled);
-
-  if (!isEnabled) {
-    realLogger = null;
+  if (initializationAttempted) {
     return;
   }
 
-  if (realLogger) {
-    void (async () => {
-      try {
-        const { __internal_resetDebugLogger, getDebugLogger } = await import('@/core/modules/debug');
-        __internal_resetDebugLogger();
-        const logger = await getDebugLogger({
-          logLevel: lastOptions?.logLevel ?? 'trace',
-          telemetryCollector: lastOptions?.telemetryCollector,
-        });
-        if (logger) {
-          realLogger = logger;
-          flushBuffered();
-        }
-      } catch (error) {
-        try {
-          console.debug?.('Debug logger reconfiguration failed', error);
-        } catch {
-          // ignore secondary logging errors
-        }
-      }
-    })();
+  const { enabled = false, ...rest } = options;
+  if (!enabled) {
     return;
   }
 
-  void ensureInitialized();
+  isEnabled = true;
+  initializationAttempted = true;
+  void ensureInitialized(rest);
 }
 
 /**
@@ -190,7 +147,7 @@ export function initDebugLogger(options: InitOptions = {}): void {
  * debugLogger.info('Loaded dashboard', { page: 'home' }, 'ui');
  * ```
  */
-const baseDebugLogger: DebugLoggerInterface = {
+export const debugLogger: Readonly<DebugLogger> = {
   debug(message: string, context?: Record<string, unknown>, source?: string): void {
     if (!realLogger) {
       pushBuffered('debug', message, context, source);
@@ -212,13 +169,6 @@ const baseDebugLogger: DebugLoggerInterface = {
     }
     realLogger.info(message, context, source);
   },
-  trace(message: string, context?: Record<string, unknown>, source?: string): void {
-    if (!realLogger) {
-      pushBuffered('trace', message, context, source);
-      return;
-    }
-    realLogger.trace(message, context, source);
-  },
   warn(message: string, context?: Record<string, unknown>, source?: string): void {
     if (!realLogger) {
       pushBuffered('warn', message, context, source);
@@ -227,5 +177,3 @@ const baseDebugLogger: DebugLoggerInterface = {
     realLogger.warn(message, context, source);
   },
 };
-
-export const debugLogger: Readonly<DebugLoggerInterface> = Object.freeze(baseDebugLogger);

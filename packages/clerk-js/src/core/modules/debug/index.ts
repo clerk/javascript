@@ -1,4 +1,5 @@
 import type { TelemetryCollector } from '@clerk/shared/telemetry';
+import { isProductionEnvironment } from '@clerk/shared/utils';
 
 import { DebugLogger } from './logger';
 import { CompositeTransport } from './transports/composite';
@@ -53,17 +54,12 @@ export interface TelemetryLoggerOptions {
  * Options for composite logger configuration.
  */
 export interface CompositeLoggerOptions {
-  /** Minimum log level to capture. */
   logLevel?: DebugLogLevel;
-  /** Collection of transports used by the composite logger. */
   transports: Array<{ transport: ConsoleTransport | TelemetryTransport }>;
 }
 
 /**
  * Manages a singleton instance of the debug logger.
- *
- * Ensures only one logger is initialized and provides access to it.
- * Handles asynchronous initialization and configuration.
  */
 class DebugLoggerManager {
   private static instance: DebugLoggerManager;
@@ -73,9 +69,6 @@ class DebugLoggerManager {
 
   private constructor() {}
 
-  /**
-   * Get the singleton instance
-   */
   static getInstance(): DebugLoggerManager {
     if (!DebugLoggerManager.instance) {
       DebugLoggerManager.instance = new DebugLoggerManager();
@@ -83,12 +76,6 @@ class DebugLoggerManager {
     return DebugLoggerManager.instance;
   }
 
-  /**
-   * Initialize the debug logger with the given options
-   *
-   * @param options - Configuration options for the logger
-   * @returns Promise resolving to the debug logger instance
-   */
   async initialize(options: LoggerOptions = {}): Promise<DebugLogger | null> {
     if (this.initialized) {
       return this.logger;
@@ -102,12 +89,6 @@ class DebugLoggerManager {
     return this.initializationPromise;
   }
 
-  /**
-   * Performs the actual initialization logic
-   *
-   * @param options - Configuration options for the logger
-   * @returns Promise resolving to the debug logger instance
-   */
   private async performInitialization(options: LoggerOptions): Promise<DebugLogger | null> {
     try {
       validateLoggerOptions(options);
@@ -116,7 +97,7 @@ class DebugLoggerManager {
 
       const transports = [
         { transport: new ConsoleTransport() },
-        { transport: new TelemetryTransport(telemetryCollector) },
+        ...(telemetryCollector ? [{ transport: new TelemetryTransport(telemetryCollector) }] : []),
       ];
 
       const transportInstances = transports.map(t => t.transport);
@@ -133,23 +114,14 @@ class DebugLoggerManager {
     }
   }
 
-  /**
-   * Gets the current logger instance
-   */
   getLogger(): DebugLogger | null {
     return this.logger;
   }
 
-  /**
-   * Checks if the debug logger is initialized
-   */
   isInitialized(): boolean {
     return this.initialized;
   }
 
-  /**
-   * Resets the initialization state
-   */
   reset(): void {
     this.initialized = false;
     this.logger = null;
@@ -170,6 +142,7 @@ export async function getDebugLogger(options: LoggerOptions = {}): Promise<Debug
 
 /**
  * Creates a composite logger with both console and telemetry transports
+ *
  * @param options - Configuration options for the logger
  * @returns Object containing the logger and composite transport
  */
@@ -183,9 +156,16 @@ export function createLogger(options: {
     const { logLevel, telemetryCollector } = options;
     const finalLogLevel = logLevel ?? DEFAULT_LOG_LEVEL;
 
+    const transports = isProductionEnvironment()
+      ? [
+          { transport: new ConsoleTransport() },
+          ...(telemetryCollector ? [{ transport: new TelemetryTransport(telemetryCollector) }] : []),
+        ]
+      : [{ transport: new ConsoleTransport() }];
+
     return createCompositeLogger({
-      transports: [{ transport: new ConsoleTransport() }, { transport: new TelemetryTransport(telemetryCollector) }],
       logLevel: finalLogLevel,
+      transports,
     });
   } catch (error) {
     console.error('Failed to create logger:', error);

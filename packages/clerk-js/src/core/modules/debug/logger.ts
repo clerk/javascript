@@ -58,16 +58,7 @@ export class DebugLogger {
     this.log('info', message, context, source);
   }
 
-  /**
-   * Log a trace message.
-   *
-   * @param message - Text description of the event
-   * @param context - Optional structured context to attach
-   * @param source - Optional logical source identifier
-   */
-  trace(message: string, context?: Record<string, unknown>, source?: string): void {
-    this.log('trace', message, context, source);
-  }
+  // trace level removed
 
   /**
    * Log a warning message.
@@ -99,7 +90,7 @@ export class DebugLogger {
   }
 
   private shouldLogLevel(level: DebugLogLevel): boolean {
-    const levels: DebugLogLevel[] = ['error', 'warn', 'info', 'debug', 'trace'];
+    const levels: DebugLogLevel[] = ['error', 'warn', 'info', 'debug'];
     const currentLevelIndex = levels.indexOf(this.logLevel);
     const messageLevelIndex = levels.indexOf(level);
     return messageLevelIndex <= currentLevelIndex;

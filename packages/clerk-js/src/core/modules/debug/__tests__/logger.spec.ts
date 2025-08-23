@@ -21,7 +21,7 @@ describe('DebugLogger', () => {
 
   beforeEach(() => {
     mockTransport = new MockTransport();
-    logger = new DebugLogger(mockTransport, 'trace');
+    logger = new DebugLogger(mockTransport, 'debug');
   });
 
   afterEach(() => {
@@ -34,14 +34,12 @@ describe('DebugLogger', () => {
       logger.warn('warn message');
       logger.info('info message');
       logger.debug('debug message');
-      logger.trace('trace message');
 
-      expect(mockTransport.sentEntries).toHaveLength(5);
+      expect(mockTransport.sentEntries).toHaveLength(4);
       expect(mockTransport.sentEntries[0].level).toBe('error');
       expect(mockTransport.sentEntries[1].level).toBe('warn');
       expect(mockTransport.sentEntries[2].level).toBe('info');
       expect(mockTransport.sentEntries[3].level).toBe('debug');
-      expect(mockTransport.sentEntries[4].level).toBe('trace');
     });
 
     it('should include context and source in log entries', () => {
@@ -58,7 +56,6 @@ describe('DebugLogger', () => {
     it('should respect log level filtering', () => {
       const infoLogger = new DebugLogger(mockTransport, 'info');
 
-      infoLogger.trace('trace message');
       infoLogger.debug('debug message');
       infoLogger.info('info message');
       infoLogger.warn('warn message');

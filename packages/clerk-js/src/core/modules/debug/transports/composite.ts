@@ -7,7 +7,7 @@ import type { DebugLogEntry, DebugTransport } from '../types';
  * @public
  */
 export interface CompositeLoggerOptions {
-  logLevel?: 'error' | 'warn' | 'info' | 'debug' | 'trace';
+  logLevel?: 'error' | 'warn' | 'info' | 'debug';
   transports: Array<{
     options?: Record<string, unknown>;
     transport: DebugTransport;

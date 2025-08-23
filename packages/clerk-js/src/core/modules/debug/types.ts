@@ -1,12 +1,12 @@
 /**
  * Debug logging levels for different types of information
  */
-export type DebugLogLevel = 'error' | 'warn' | 'info' | 'debug' | 'trace';
+export type DebugLogLevel = 'error' | 'warn' | 'info' | 'debug';
 
 /**
  * Valid debug log levels
  */
-export const VALID_LOG_LEVELS: readonly DebugLogLevel[] = ['error', 'warn', 'info', 'debug', 'trace'] as const;
+export const VALID_LOG_LEVELS: readonly DebugLogLevel[] = ['error', 'warn', 'info', 'debug'] as const;
 
 /**
  * Valid debug event types
