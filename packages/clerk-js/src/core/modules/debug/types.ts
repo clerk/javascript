@@ -75,23 +75,10 @@ export interface ErrorDetails {
  */
 export interface DebugLoggerConfig {
   readonly bufferSize: number;
-  readonly filters?: DebugLogFilter[];
   readonly flushInterval: number;
   readonly logLevel: DebugLogLevel;
   readonly maxLogEntries: number;
   readonly transport?: DebugTransport;
-}
-
-/**
- * Filter configuration for debug logs
- */
-export interface DebugLogFilter {
-  readonly excludePatterns?: (string | RegExp)[];
-  readonly includePatterns?: (string | RegExp)[];
-  readonly level?: DebugLogLevel;
-  readonly sessionId?: string;
-  readonly source?: string | RegExp;
-  readonly userId?: string;
 }
 
 /**

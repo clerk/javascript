@@ -4,7 +4,7 @@ import { DebugLogger } from './logger';
 import { CompositeTransport } from './transports/composite';
 import { ConsoleTransport } from './transports/console';
 import { TelemetryTransport } from './transports/telemetry';
-import type { DebugLogFilter, DebugLogLevel } from './types';
+import type { DebugLogLevel } from './types';
 
 const DEFAULT_LOG_LEVEL: DebugLogLevel = 'info';
 
@@ -23,8 +23,6 @@ function validateLoggerOptions<T extends { logLevel?: unknown }>(options: T): vo
 export interface LoggerOptions {
   /** Optional URL to which telemetry logs will be sent. */
   endpoint?: string;
-  /** Optional array of filters to control which logs are emitted. */
-  filters?: DebugLogFilter[];
   /** Minimum log level to capture. */
   logLevel?: DebugLogLevel;
   /** Optional collector instance for custom telemetry handling. */
@@ -35,8 +33,6 @@ export interface LoggerOptions {
  * Options for console-only logger configuration.
  */
 export interface ConsoleLoggerOptions {
-  /** Optional array of filters to control which logs are emitted. */
-  filters?: DebugLogFilter[];
   /** Minimum log level to capture. */
   logLevel?: DebugLogLevel;
 }
@@ -47,8 +43,6 @@ export interface ConsoleLoggerOptions {
 export interface TelemetryLoggerOptions {
   /** Optional URL to which telemetry logs will be sent. */
   endpoint?: string;
-  /** Optional array of filters to control which logs are emitted. */
-  filters?: DebugLogFilter[];
   /** Minimum log level to capture. */
   logLevel?: DebugLogLevel;
   /** Optional collector instance for custom telemetry handling. */
@@ -59,8 +53,6 @@ export interface TelemetryLoggerOptions {
  * Options for composite logger configuration.
  */
 export interface CompositeLoggerOptions {
-  /** Optional array of filters to control which logs are emitted. */
-  filters?: DebugLogFilter[];
   /** Minimum log level to capture. */
   logLevel?: DebugLogLevel;
   /** Collection of transports used by the composite logger. */
@@ -119,7 +111,7 @@ class DebugLoggerManager {
   private async performInitialization(options: LoggerOptions): Promise<DebugLogger | null> {
     try {
       validateLoggerOptions(options);
-      const { logLevel, filters, telemetryCollector } = options;
+      const { logLevel, telemetryCollector } = options;
       const finalLogLevel = logLevel ?? DEFAULT_LOG_LEVEL;
 
       const transports = [
@@ -129,7 +121,7 @@ class DebugLoggerManager {
 
       const transportInstances = transports.map(t => t.transport);
       const compositeTransport = new CompositeTransport(transportInstances);
-      const logger = new DebugLogger(compositeTransport, finalLogLevel, filters);
+      const logger = new DebugLogger(compositeTransport, finalLogLevel);
 
       this.logger = logger;
       this.initialized = true;
@@ -184,18 +176,16 @@ export async function getDebugLogger(options: LoggerOptions = {}): Promise<Debug
 export function createLogger(options: {
   endpoint?: string;
   logLevel?: DebugLogLevel;
-  filters?: DebugLogFilter[];
   telemetryCollector?: TelemetryCollector;
 }): { logger: DebugLogger; transport: CompositeTransport } | null {
   try {
     validateLoggerOptions(options);
-    const { logLevel, filters, telemetryCollector } = options;
+    const { logLevel, telemetryCollector } = options;
     const finalLogLevel = logLevel ?? DEFAULT_LOG_LEVEL;
 
     return createCompositeLogger({
       transports: [{ transport: new ConsoleTransport() }, { transport: new TelemetryTransport(telemetryCollector) }],
       logLevel: finalLogLevel,
-      filters,
     });
   } catch (error) {
     console.error('Failed to create logger:', error);
@@ -214,10 +204,10 @@ export function createConsoleLogger(
 ): { logger: DebugLogger; transport: ConsoleTransport } | null {
   try {
     validateLoggerOptions(options);
-    const { logLevel, filters } = options;
+    const { logLevel } = options;
     const finalLogLevel = logLevel ?? DEFAULT_LOG_LEVEL;
     const transport = new ConsoleTransport();
-    const logger = new DebugLogger(transport, finalLogLevel, filters);
+    const logger = new DebugLogger(transport, finalLogLevel);
     return { logger, transport };
   } catch (error) {
     console.error('Failed to create console logger:', error);
@@ -236,10 +226,10 @@ export function createTelemetryLogger(
 ): { logger: DebugLogger; transport: TelemetryTransport } | null {
   try {
     validateLoggerOptions(options);
-    const { logLevel, filters, telemetryCollector } = options;
+    const { logLevel, telemetryCollector } = options;
     const finalLogLevel = logLevel ?? DEFAULT_LOG_LEVEL;
     const transport = new TelemetryTransport(telemetryCollector);
-    const logger = new DebugLogger(transport, finalLogLevel, filters);
+    const logger = new DebugLogger(transport, finalLogLevel);
     return { logger, transport };
   } catch (error) {
     console.error('Failed to create telemetry logger:', error);
@@ -258,12 +248,12 @@ export function createCompositeLogger(
 ): { logger: DebugLogger; transport: CompositeTransport } | null {
   try {
     validateLoggerOptions(options);
-    const { transports, logLevel, filters } = options;
+    const { transports, logLevel } = options;
     const finalLogLevel = logLevel ?? DEFAULT_LOG_LEVEL;
 
     const transportInstances = transports.map(t => t.transport);
     const compositeTransport = new CompositeTransport(transportInstances);
-    const logger = new DebugLogger(compositeTransport, finalLogLevel, filters);
+    const logger = new DebugLogger(compositeTransport, finalLogLevel);
 
     return { logger, transport: compositeTransport };
   } catch (error) {

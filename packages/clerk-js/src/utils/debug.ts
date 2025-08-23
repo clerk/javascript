@@ -1,6 +1,6 @@
 import type { TelemetryCollector } from '@clerk/shared/telemetry';
 
-import type { DebugLogFilter, DebugLogLevel } from '@/core/modules/debug/types';
+import type { DebugLogLevel } from '@/core/modules/debug/types';
 
 /**
  * Lightweight logger surface that callers can import as a singleton.
@@ -16,7 +16,6 @@ export interface DebugLoggerInterface {
 
 type InitOptions = {
   enabled?: boolean;
-  filters?: DebugLogFilter[];
   logLevel?: DebugLogLevel;
   telemetryCollector?: TelemetryCollector;
 };
@@ -84,7 +83,6 @@ async function ensureInitialized(): Promise<void> {
 
     const { getDebugLogger } = await import('@/core/modules/debug');
     const logger = await getDebugLogger({
-      filters: lastOptions?.filters,
       logLevel: lastOptions?.logLevel ?? 'trace',
       telemetryCollector: lastOptions?.telemetryCollector,
     });
@@ -126,12 +124,10 @@ async function ensureInitialized(): Promise<void> {
  * Options and defaults:
  * - options.enabled: defaults to true
  * - options.logLevel: defaults to 'trace'
- * - options.filters: optional include/exclude filters and matching rules
  * - options.telemetryCollector: optional telemetry sink to forward logs
  *
  * @param options - Configuration options
  * @param options.enabled - Enables the logger; when false, logger is a no-op (default: true)
- * @param options.filters - Filters applied to log entries (level, source, include/exclude patterns)
  * @param options.logLevel - Minimal level to log; lower-priority logs are ignored (default: 'trace')
  * @param options.telemetryCollector - Collector used by the debug transport for emitting telemetry
  *
@@ -159,7 +155,6 @@ export function initDebugLogger(options: InitOptions = {}): void {
         const { __internal_resetDebugLogger, getDebugLogger } = await import('@/core/modules/debug');
         __internal_resetDebugLogger();
         const logger = await getDebugLogger({
-          filters: lastOptions?.filters,
           logLevel: lastOptions?.logLevel ?? 'trace',
           telemetryCollector: lastOptions?.telemetryCollector,
         });
