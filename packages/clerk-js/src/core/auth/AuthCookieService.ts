@@ -73,8 +73,8 @@ export class AuthCookieService {
     this.refreshTokenOnFocus();
     this.startPollingForToken();
 
-    this.clientUat = createClientUatCookie(cookieSuffix);
-    this.sessionCookie = createSessionCookie(cookieSuffix);
+    this.clientUat = createClientUatCookie({ cookieSuffix, isProduction: this.instanceType === 'production' });
+    this.sessionCookie = createSessionCookie({ cookieSuffix, isProduction: this.instanceType === 'production' });
     this.activeCookie = createCookieHandler('clerk_active_context');
     this.devBrowser = createDevBrowser({
       frontendApi: clerk.frontendApi,
