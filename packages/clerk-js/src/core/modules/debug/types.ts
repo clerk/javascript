@@ -50,9 +50,6 @@ export interface DebugData {
  * Transport interface for sending debug log entries to different destinations
  */
 export interface DebugTransport {
-  /**
-   * Send a single debug log entry
-   */
   send(entry: DebugLogEntry): Promise<void>;
 }
 
@@ -128,22 +125,3 @@ export function isDebugData(obj: unknown): obj is DebugData {
     typeof (obj as DebugData).timestamp === 'number'
   );
 }
-
-/**
- * Utility type for creating partial debug logger configurations
- */
-export type PartialDebugLoggerConfig = Partial<DebugLoggerConfig>;
-
-/**
- * Utility type for creating debug log entries without readonly constraint
- */
-export type MutableDebugLogEntry = {
-  -readonly [K in keyof DebugLogEntry]: DebugLogEntry[K];
-};
-
-/**
- * Utility type for creating debug data without readonly constraint
- */
-export type MutableDebugData = {
-  -readonly [K in keyof DebugData]: DebugData[K];
-};
