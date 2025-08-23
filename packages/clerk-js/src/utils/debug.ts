@@ -82,7 +82,7 @@ async function ensureInitialized(options?: Omit<InitOptions, 'enabled'>): Promis
 
     const { getDebugLogger } = await import('@/core/modules/debug');
     const logger = await getDebugLogger({
-      logLevel: options?.logLevel ?? 'debug',
+      logLevel: options?.logLevel,
       telemetryCollector: options?.telemetryCollector,
     });
 
@@ -107,7 +107,7 @@ async function ensureInitialized(options?: Omit<InitOptions, 'enabled'>): Promis
  *
  * @param options - Configuration options
  * @param options.enabled - Enables the logger; when false, logger is a no-op (default: false)
- * @param options.logLevel - Minimal level to log; lower-priority logs are ignored (default: 'trace')
+ * @param options.logLevel - Minimal level to log; lower-priority logs are ignored. Valid levels: 'error' | 'warn' | 'info' | 'debug'.
  * @param options.telemetryCollector - Collector used by the debug transport for emitting telemetry
  *
  * @example
