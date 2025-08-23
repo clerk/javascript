@@ -41,122 +41,13 @@
 
 ### Installation
 
-```sh
-npm install @clerk/tanstack-react-start
-```
+The fastest way to get started with Clerk is by following the [TanStack React Start Quickstart](https://clerk.com/docs/quickstarts/tanstack-react-start?utm_source=github&utm_medium=clerk_tanstack_react_start).
+
+You'll learn how to install `@clerk/tanstack-react-start`, set up your environment keys, configure `createClerkHandler` and protect your pages.
 
 ## Usage
 
-Make sure the following environment variables are set in a `.env` file:
-
-```sh
-CLERK_PUBLISHABLE_KEY=pk_test_xxx
-CLERK_SECRET_KEY=sk_test_xxx
-```
-
-You can get these from the [API Keys](https://dashboard.clerk.com/last-active?path=api-keys) screen in your Clerk dashboard.
-
-To initialize Clerk with your TanStack Start application, you will need to make one modification to `app/routes/_root.tsx`. Wrap the children of the `RootComponent` with `<ClerkProvider/>`
-
-```tsx
-import { ClerkProvider } from '@clerk/tanstack-react-start'
-import { createRootRoute } from '@tanstack/react-router'
-import { Link, Outlet } from '@tanstack/react-router'
-import { TanStackRouterDevtools } from '@tanstack/router-devtools'
-import { Body, Head, Html, Meta, Scripts } from '@tanstack/start'
-import * as React from 'react'
-import { DefaultCatchBoundary } from '~/components/DefaultCatchBoundary'
-import { NotFound } from '~/components/NotFound'
-
-export const Route = createRootRoute({
-  meta: () => [
-    {
-      charSet: 'utf-8',
-    },
-    {
-      name: 'viewport',
-      content: 'width=device-width, initial-scale=1',
-    },
-  ],
-  errorComponent: (props) => {
-    return (
-      <RootDocument>
-        <DefaultCatchBoundary {...props} />
-      </RootDocument>
-    )
-  },
-  notFoundComponent: () => <NotFound />,
-  component: RootComponent,
-})
-
-function RootComponent() {
-  return (
-    <ClerkProvider>
-      <RootDocument>
-          <Outlet />
-      </RootDocument>
-    </ClerkProvider>
-  )
-}
-
-function RootDocument({ children }: { children: React.ReactNode }) { ... }
-```
-
-### Setup `clerkHandler` in the SSR entrypoint
-
-You will also need to make on more modification to you SSR entrypoint (default: `app/ssr.tsx`):
-
-- Wrap the `createStartHandler` with `createClerkHandler`
-
-```tsx
-import { createStartHandler, defaultStreamHandler } from '@tanstack/start/server';
-import { getRouterManifest } from '@tanstack/start/router-manifest';
-import { createRouter } from './router';
-import { createClerkHandler } from '@clerk/tanstack-react-start/server';
-
-const handler = createStartHandler({
-  createRouter,
-  getRouterManifest,
-});
-
-const clerkHandler = createClerkHandler(handler);
-
-/*
- * // You can also override Clerk options by passing an object as second argument
- * const clerkHandler = createClerkHandler(handler, {
- *   afterSignInUrl: '/dashboard',
- * });
- */
-
-export default clerkHandler(defaultStreamHandler);
-```
-
-After those changes are made, you can use Clerk components in your routes.
-
-For example, in `app/routes/index.tsx`:
-
-```tsx
-import { SignIn, SignedIn, SignedOut, UserButton } from '@clerk/tanstack-react-start';
-import { createFileRoute } from '@tanstack/react-router';
-
-export const Route = createFileRoute('/')({
-  component: Home,
-});
-
-function Home() {
-  return (
-    <div className='p-2'>
-      <h1>Hello Clerk!</h1>
-      <SignedIn>
-        <UserButton />
-      </SignedIn>
-      <SignedOut>
-        <SignIn />
-      </SignedOut>
-    </div>
-  );
-}
-```
+For further information, guides, and examples visit the [TanStack React Start reference documentation](https://clerk.com/docs/references/tanstack-react-start/overview?utm_source=github&utm_medium=clerk_tanstack_react_start).
 
 ## Support
 

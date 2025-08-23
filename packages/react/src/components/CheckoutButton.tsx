@@ -31,7 +31,7 @@ import { withClerk } from './withClerk';
  *       <CheckoutButton
  *         planId="plan_123"
  *         planPeriod="month"
- *         subscriberType="org"
+ *         for="organization"
  *         onSubscriptionComplete={() => console.log('Subscription completed!')}
  *       >
  *         <button className="custom-button">Subscribe Now</button>
@@ -42,7 +42,7 @@ import { withClerk } from './withClerk';
  * ```
  *
  * @throws {Error} When rendered outside of a `<SignedIn />` component
- * @throws {Error} When `subscriberType="org"` is used without an active organization context
+ * @throws {Error} When `for="organization"` is used without an active organization context
  */
 export const CheckoutButton = withClerk(
   ({ clerk, children, ...props }: WithClerkProp<React.PropsWithChildren<__experimental_CheckoutButtonProps>>) => {
@@ -59,11 +59,13 @@ export const CheckoutButton = withClerk(
     const { userId, orgId } = useAuth();
 
     if (userId === null) {
-      throw new Error('Ensure that `<CheckoutButton />` is rendered inside a `<SignedIn />` component.');
+      throw new Error('Clerk: Ensure that `<CheckoutButton />` is rendered inside a `<SignedIn />` component.');
     }
 
     if (orgId === null && _for === 'organization') {
-      throw new Error('Wrap `<CheckoutButton for="organization" />` with a check for an active organization.');
+      throw new Error(
+        'Clerk: Wrap `<CheckoutButton for="organization" />` with a check for an active organization. Retrieve `orgId` from `useAuth()` and confirm it is defined. For SSR, see: https://clerk.com/docs/references/backend/types/auth-object#how-to-access-the-auth-object',
+      );
     }
 
     children = normalizeWithDefaultValue(children, 'Checkout');
