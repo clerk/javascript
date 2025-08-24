@@ -149,7 +149,6 @@ exports[`Typedoc output > should have a deliberate file structure 1`] = `
   "shared/derive-state.mdx",
   "shared/extract-dev-browser-jwt-from-url.mdx",
   "shared/fast-deep-merge-and-replace.mdx",
-  "shared/generate-uuid.mdx",
   "shared/get-clerk-js-major-version-or-tag.mdx",
   "shared/get-cookie-suffix.mdx",
   "shared/get-env-variable.mdx",

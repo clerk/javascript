@@ -9,6 +9,7 @@ import type {
   RedirectUrlProp,
   SignInRedirectOptions,
   SignUpRedirectOptions,
+  TasksRedirectOptions,
   Without,
 } from '@clerk/types';
 import type React from 'react';
@@ -116,6 +117,7 @@ export type SignInWithMetamaskButtonProps = {
 
 export type RedirectToSignInProps = SignInRedirectOptions;
 export type RedirectToSignUpProps = SignUpRedirectOptions;
+export type RedirectToTasksProps = TasksRedirectOptions;
 
 type PageProps<T extends string> =
   | {

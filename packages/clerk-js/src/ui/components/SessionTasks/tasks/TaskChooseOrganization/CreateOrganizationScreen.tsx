@@ -28,13 +28,13 @@ export const CreateOrganizationScreen = (props: CreateOrganizationScreenProps) =
 
   const nameField = useFormControl('name', '', {
     type: 'text',
-    label: localizationKeys('formFieldLabel__organizationName'),
-    placeholder: localizationKeys('formFieldInputPlaceholder__organizationName'),
+    label: localizationKeys('taskChooseOrganization.createOrganization.formFieldLabel__name'),
+    placeholder: localizationKeys('taskChooseOrganization.createOrganization.formFieldInputPlaceholder__name'),
   });
   const slugField = useFormControl('slug', '', {
     type: 'text',
-    label: localizationKeys('formFieldLabel__organizationSlug'),
-    placeholder: localizationKeys('formFieldInputPlaceholder__organizationSlug'),
+    label: localizationKeys('taskChooseOrganization.createOrganization.formFieldLabel__slug'),
+    placeholder: localizationKeys('taskChooseOrganization.createOrganization.formFieldInputPlaceholder__slug'),
   });
 
   const onSubmit = async (e: React.FormEvent) => {

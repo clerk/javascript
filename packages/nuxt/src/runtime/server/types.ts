@@ -6,8 +6,9 @@ import type {
   SessionTokenType,
   TokenType,
 } from '@clerk/backend/internal';
+import type { PendingSessionOptions } from '@clerk/types';
 
-export type AuthOptions = { acceptsToken?: AuthenticateRequestOptions['acceptsToken'] };
+export type AuthOptions = PendingSessionOptions & Pick<AuthenticateRequestOptions, 'acceptsToken'>;
 
 /**
  * @internal This type is used to define the `auth` function in the event context.
@@ -41,5 +42,5 @@ export interface AuthFn {
    * @example
    * const auth = event.context.auth()
    */
-  (): SessionAuthObject;
+  (options?: PendingSessionOptions): SessionAuthObject;
 }

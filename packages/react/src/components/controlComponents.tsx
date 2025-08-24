@@ -6,7 +6,7 @@ import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { useSessionContext } from '../contexts/SessionContext';
 import { useAuth } from '../hooks';
 import { useAssertWrappedByClerkProvider } from '../hooks/useAssertWrappedByClerkProvider';
-import type { RedirectToSignInProps, RedirectToSignUpProps, WithClerkProp } from '../types';
+import type { RedirectToSignInProps, RedirectToSignUpProps, RedirectToTasksProps, WithClerkProp } from '../types';
 import { withClerk } from './withClerk';
 
 export const SignedIn = ({ children, treatPendingAsSignedOut }: React.PropsWithChildren<PendingSessionOptions>) => {
@@ -166,9 +166,9 @@ export const RedirectToSignUp = withClerk(({ clerk, ...props }: WithClerkProp<Re
   return null;
 }, 'RedirectToSignUp');
 
-export const RedirectToTasks = withClerk(({ clerk }: WithClerkProp) => {
+export const RedirectToTasks = withClerk(({ clerk, ...props }: WithClerkProp<RedirectToTasksProps>) => {
   React.useEffect(() => {
-    void clerk.redirectToTasks();
+    void clerk.redirectToTasks(props);
   }, []);
 
   return null;

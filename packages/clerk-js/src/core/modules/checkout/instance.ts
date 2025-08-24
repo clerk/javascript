@@ -2,6 +2,7 @@ import type {
   __experimental_CheckoutCacheState,
   __experimental_CheckoutInstance,
   __experimental_CheckoutOptions,
+  SetActiveNavigate,
 } from '@clerk/types';
 
 import type { Clerk } from '../../clerk';
@@ -62,9 +63,9 @@ function createCheckoutInstance(
     });
   };
 
-  const finalize = (params?: { redirectUrl: string }) => {
-    const { redirectUrl } = params || {};
-    return clerk.setActive({ session: clerk.session?.id, redirectUrl });
+  const finalize = (params?: { navigate?: SetActiveNavigate }) => {
+    const { navigate } = params || {};
+    return clerk.setActive({ session: clerk.session?.id, navigate });
   };
 
   const clear = () => manager.clearCheckout();

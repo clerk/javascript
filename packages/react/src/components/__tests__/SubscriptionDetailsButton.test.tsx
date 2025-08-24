@@ -56,7 +56,7 @@ describe('SubscriptionDetailsButton', () => {
 
       // Expect the component to throw an error when for="organization"
       expect(() => render(<SubscriptionDetailsButton for='organization' />)).toThrow(
-        'Wrap `<SubscriptionDetailsButton for="organization" />` with a check for an active organization.',
+        'Wrap `<SubscriptionDetailsButton for="organization" />` with a check for an active organization. Retrieve `orgId` from `useAuth()` and confirm it is defined.',
       );
     });
 

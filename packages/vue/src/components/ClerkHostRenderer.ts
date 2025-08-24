@@ -1,5 +1,5 @@
 import type { PropType } from 'vue';
-import { defineComponent, h, onScopeDispose, ref, toRef, watchEffect } from 'vue';
+import { defineComponent, h, onUnmounted, ref, watch, watchEffect } from 'vue';
 
 import type { CustomPortalsRendererProps } from '../types';
 import { ClerkLoaded } from './controlComponents';
@@ -44,30 +44,35 @@ export const ClerkHostRenderer = defineComponent({
   },
   setup(props) {
     const portalRef = ref<HTMLDivElement | null>(null);
-    const isPortalMounted = ref(false);
-    // Make the props reactive so the watcher can react to changes
-    const componentProps = toRef(props, 'props');
+    let isPortalMounted = false;
 
     watchEffect(() => {
-      if (!portalRef.value) {
+      // Skip if portal element isn't ready or component is already mounted
+      if (!portalRef.value || isPortalMounted) {
         return;
       }
 
-      if (isPortalMounted.value) {
-        props.updateProps?.({ node: portalRef.value, props: componentProps.value });
-      } else {
-        if (props.mount) {
-          props.mount(portalRef.value, componentProps.value);
-        }
-        if (props.open) {
-          props.open(componentProps.value);
-        }
-        isPortalMounted.value = true;
+      if (props.mount) {
+        props.mount(portalRef.value, props.props);
       }
+      if (props.open) {
+        props.open(props.props);
+      }
+      isPortalMounted = true;
     });
 
-    onScopeDispose(() => {
-      if (isPortalMounted.value && portalRef.value) {
+    watch(
+      () => props.props,
+      newProps => {
+        if (isPortalMounted && props.updateProps && portalRef.value) {
+          props.updateProps({ node: portalRef.value, props: newProps });
+        }
+      },
+      { deep: true },
+    );
+
+    onUnmounted(() => {
+      if (isPortalMounted && portalRef.value) {
         if (props.unmount) {
           props.unmount(portalRef.value);
         }

@@ -41,21 +41,21 @@ function getTelemetryFlagFilePath(): string {
  *   the event should be fired), false if the file already exists (meaning the event was
  *   already fired) or if there was an error creating the file
  */
-async function tryMarkTelemetryEventAsFired(): Promise<boolean> {
+function tryMarkTelemetryEventAsFired(): boolean {
   try {
     if (canUseKeyless) {
-      const { mkdir, writeFile } = nodeFsOrThrow();
+      const { mkdirSync, writeFileSync } = nodeFsOrThrow();
       const flagFilePath = getTelemetryFlagFilePath();
       const flagDirectory = dirname(flagFilePath);
 
       // Ensure the directory exists before attempting to write the file
-      await mkdir(flagDirectory, { recursive: true });
+      mkdirSync(flagDirectory, { recursive: true });
 
       const flagData = {
         firedAt: new Date().toISOString(),
         event: EVENT_KEYLESS_ENV_DRIFT_DETECTED,
       };
-      await writeFile(flagFilePath, JSON.stringify(flagData, null, 2), { flag: 'wx' });
+      writeFileSync(flagFilePath, JSON.stringify(flagData, null, 2), { flag: 'wx' });
       return true;
     } else {
       return false;
@@ -177,7 +177,7 @@ export async function detectKeylessEnvDrift(): Promise<void> {
       },
     });
 
-    const shouldFireEvent = await tryMarkTelemetryEventAsFired();
+    const shouldFireEvent = tryMarkTelemetryEventAsFired();
 
     if (shouldFireEvent) {
       // Fire drift detected event only if we successfully created the flag

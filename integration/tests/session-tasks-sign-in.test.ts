@@ -56,7 +56,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
       await u.po.expect.toHaveResolvedTask();
 
       // Navigates to after sign-in
-      await u.page.waitForAppUrl('/');
+      await u.page.waitForAppUrl('/page-protected');
     });
 
     test('with sso, navigate to task on after sign-in', async ({ page, context }) => {

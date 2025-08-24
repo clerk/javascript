@@ -45,6 +45,7 @@ import type {
   SignUpResource,
   State,
   TaskChooseOrganizationProps,
+  TasksRedirectOptions,
   UnsubscribeCallback,
   UserButtonProps,
   UserProfileProps,
@@ -105,7 +106,6 @@ type IsomorphicLoadedClerk = Without<
   | 'billing'
   | 'apiKeys'
   | '__internal_setActiveInProgress'
-  | '__internal_hasAfterAuthFlows'
 > & {
   client: ClientResource | undefined;
   billing: CommerceBillingNamespace | undefined;
@@ -1276,8 +1276,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  redirectToTasks = async () => {
-    const callback = () => this.clerkjs?.redirectToTasks();
+  redirectToTasks = async (opts?: TasksRedirectOptions) => {
+    const callback = () => this.clerkjs?.redirectToTasks(opts);
     if (this.clerkjs && this.loaded) {
       return callback();
     } else {

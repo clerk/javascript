@@ -60,9 +60,9 @@ export const RedirectToSignUp = defineComponent((props: RedirectOptions) => {
   return () => null;
 });
 
-export const RedirectToTasks = defineComponent(() => {
+export const RedirectToTasks = defineComponent((props: RedirectOptions) => {
   useClerkLoaded(clerk => {
-    void clerk.redirectToTasks();
+    void clerk.redirectToTasks(props);
   });
 
   return () => null;
