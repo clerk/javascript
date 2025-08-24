@@ -1,12 +1,12 @@
 /**
  * Debug logging levels for different types of information
  */
-export type DebugLogLevel = 'error' | 'warn' | 'info' | 'debug' | 'trace';
+export type DebugLogLevel = 'error' | 'warn' | 'info' | 'debug';
 
 /**
  * Valid debug log levels
  */
-export const VALID_LOG_LEVELS: readonly DebugLogLevel[] = ['error', 'warn', 'info', 'debug', 'trace'] as const;
+export const VALID_LOG_LEVELS: readonly DebugLogLevel[] = ['error', 'warn', 'info', 'debug'] as const;
 
 /**
  * Valid debug event types
@@ -50,9 +50,6 @@ export interface DebugData {
  * Transport interface for sending debug log entries to different destinations
  */
 export interface DebugTransport {
-  /**
-   * Send a single debug log entry
-   */
   send(entry: DebugLogEntry): Promise<void>;
 }
 
@@ -75,23 +72,10 @@ export interface ErrorDetails {
  */
 export interface DebugLoggerConfig {
   readonly bufferSize: number;
-  readonly filters?: DebugLogFilter[];
   readonly flushInterval: number;
   readonly logLevel: DebugLogLevel;
   readonly maxLogEntries: number;
   readonly transport?: DebugTransport;
-}
-
-/**
- * Filter configuration for debug logs
- */
-export interface DebugLogFilter {
-  readonly excludePatterns?: (string | RegExp)[];
-  readonly includePatterns?: (string | RegExp)[];
-  readonly level?: DebugLogLevel;
-  readonly sessionId?: string;
-  readonly source?: string | RegExp;
-  readonly userId?: string;
 }
 
 /**
@@ -141,22 +125,3 @@ export function isDebugData(obj: unknown): obj is DebugData {
     typeof (obj as DebugData).timestamp === 'number'
   );
 }
-
-/**
- * Utility type for creating partial debug logger configurations
- */
-export type PartialDebugLoggerConfig = Partial<DebugLoggerConfig>;
-
-/**
- * Utility type for creating debug log entries without readonly constraint
- */
-export type MutableDebugLogEntry = {
-  -readonly [K in keyof DebugLogEntry]: DebugLogEntry[K];
-};
-
-/**
- * Utility type for creating debug data without readonly constraint
- */
-export type MutableDebugData = {
-  -readonly [K in keyof DebugData]: DebugData[K];
-};
