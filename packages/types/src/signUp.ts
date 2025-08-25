@@ -117,6 +117,11 @@ export interface SignUpResource extends ClerkResource {
   authenticateWithCoinbaseWallet: (params?: SignUpAuthenticateWithWeb3Params) => Promise<SignUpResource>;
   authenticateWithOKXWallet: (params?: SignUpAuthenticateWithWeb3Params) => Promise<SignUpResource>;
   __internal_toSnapshot: () => SignUpJSONSnapshot;
+
+  /**
+   * @internal
+   */
+  __internal_future: SignUpFutureResource;
 }
 
 export interface SignUpFutureResource {
@@ -127,7 +132,7 @@ export interface SignUpFutureResource {
     verifyEmailCode: (params: { code: string }) => Promise<{ error: unknown }>;
   };
   password: (params: { emailAddress: string; password: string }) => Promise<{ error: unknown }>;
-  finalize: (params: { navigate?: SetActiveNavigate }) => Promise<{ error: unknown }>;
+  finalize: (params?: { navigate?: SetActiveNavigate }) => Promise<{ error: unknown }>;
 }
 
 export type SignUpStatus = 'missing_requirements' | 'complete' | 'abandoned';

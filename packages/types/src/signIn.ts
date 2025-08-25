@@ -124,6 +124,11 @@ export interface SignInResource extends ClerkResource {
    * @internal
    */
   __internal_toSnapshot: () => SignInJSONSnapshot;
+
+  /**
+   * @internal
+   */
+  __internal_future: SignInFutureResource;
 }
 
 export interface SignInFutureResource {
@@ -151,7 +156,7 @@ export interface SignInFutureResource {
     redirectUrl: string;
     redirectUrlComplete: string;
   }) => Promise<{ error: unknown }>;
-  finalize: (params: { navigate?: SetActiveNavigate }) => Promise<{ error: unknown }>;
+  finalize: (params?: { navigate?: SetActiveNavigate }) => Promise<{ error: unknown }>;
 }
 
 export type SignInStatus =
