@@ -101,6 +101,7 @@ export type {
   TestingTokenJSON,
   WebhooksSvixJSON,
   CommercePlanJSON,
+  CommerceSubscriptionJSON,
   CommerceSubscriptionItemJSON,
 } from './api/resources/JSON';
 
@@ -144,6 +145,7 @@ export type {
   User,
   TestingToken,
   CommercePlan,
+  CommerceSubscription,
   CommerceSubscriptionItem,
 } from './api/resources';
 

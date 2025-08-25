@@ -45,17 +45,37 @@ export class CommerceSubscriptionItem {
      */
     readonly planId: string,
     /**
+     * The date and time the subscription item was created.
+     */
+    readonly createdAt: number,
+    /**
+     * The date and time the subscription item was last updated.
+     */
+    readonly updatedAt: number,
+    /**
      * The end of the current period.
      */
-    readonly periodEnd?: number,
+    readonly periodEnd: number | null,
     /**
      * When the subscription item was canceled.
      */
-    readonly canceledAt?: number,
+    readonly canceledAt: number | null,
     /**
      * When the subscription item became past due.
      */
-    readonly pastDueAt?: number,
+    readonly pastDueAt: number | null,
+    /**
+     * When the subscription item ended.
+     */
+    readonly endedAt: number | null,
+    /**
+     * The payer ID.
+     */
+    readonly payerId: string,
+    /**
+     * The payment source ID.
+     */
+    readonly isFreeTrial?: boolean,
     /**
      * The lifetime amount paid for this subscription item.
      */
@@ -63,9 +83,6 @@ export class CommerceSubscriptionItem {
   ) {}
 
   static fromJSON(data: CommerceSubscriptionItemJSON): CommerceSubscriptionItem {
-    function formatAmountJSON(
-      amount: CommerceMoneyAmountJSON | null | undefined,
-    ): CommerceMoneyAmount | null | undefined;
     function formatAmountJSON(
       amount: CommerceMoneyAmountJSON | null | undefined,
     ): CommerceMoneyAmount | null | undefined {
@@ -90,9 +107,14 @@ export class CommerceSubscriptionItem {
       formatAmountJSON(data.amount),
       CommercePlan.fromJSON(data.plan),
       data.plan_id,
+      data.created_at,
+      data.updated_at,
       data.period_end,
       data.canceled_at,
       data.past_due_at,
+      data.ended_at,
+      data.payer_id,
+      data.is_free_trial,
       formatAmountJSON(data.lifetime_paid),
     );
   }
