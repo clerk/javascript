@@ -85,7 +85,6 @@ import type {
   Web3Provider,
 } from '@clerk/types';
 
-import type { DebugLoggerInterface } from '@/utils/debug';
 import { debugLogger, initDebugLogger } from '@/utils/debug';
 
 import type { MountComponentRenderer } from '../ui/Components';
@@ -163,11 +162,6 @@ type SetActiveHook = (intent?: 'sign-out') => void | Promise<void>;
 
 export type ClerkCoreBroadcastChannelEvent = { type: 'signout' };
 
-/**
- * Interface for the debug logger with all available logging methods
- */
-// DebugLoggerInterface imported from '@/utils/debug'
-
 declare global {
   interface Window {
     Clerk?: Clerk;
@@ -219,8 +213,6 @@ export class Clerk implements ClerkInterface {
   public __internal_country?: string | null;
   public telemetry: TelemetryCollector | undefined;
   public readonly __internal_state: State = new State();
-  // Deprecated: use global singleton from `@/utils/debug`
-  public debugLogger?: DebugLoggerInterface;
 
   protected internal_last_error: ClerkAPIError | null = null;
   // converted to protected environment to support `updateEnvironment` type assertion

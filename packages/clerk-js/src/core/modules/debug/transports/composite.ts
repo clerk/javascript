@@ -1,4 +1,4 @@
-import type { DebugLogEntry, DebugLogFilter, DebugTransport } from '../types';
+import type { DebugLogEntry, DebugTransport } from '../types';
 
 /**
  * Options for configuring a composite debug transport that fans out logs
@@ -7,8 +7,7 @@ import type { DebugLogEntry, DebugLogFilter, DebugTransport } from '../types';
  * @public
  */
 export interface CompositeLoggerOptions {
-  filters?: DebugLogFilter[];
-  logLevel?: 'error' | 'warn' | 'info' | 'debug' | 'trace';
+  logLevel?: 'error' | 'warn' | 'info' | 'debug';
   transports: Array<{
     options?: Record<string, unknown>;
     transport: DebugTransport;

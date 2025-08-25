@@ -38,6 +38,7 @@ import {
 } from '.';
 import { AccountlessApplication } from './AccountlessApplication';
 import { CommercePlan } from './CommercePlan';
+import { CommerceSubscriptionItem } from './CommerceSubscriptionItem';
 import { Feature } from './Feature';
 import type { PaginatedResponseJSON } from './JSON';
 import { ObjectType } from './JSON';
@@ -183,6 +184,8 @@ function jsonToObject(item: any): any {
       return WaitlistEntry.fromJSON(item);
     case ObjectType.CommercePlan:
       return CommercePlan.fromJSON(item);
+    case ObjectType.CommerceSubscriptionItem:
+      return CommerceSubscriptionItem.fromJSON(item);
     case ObjectType.Feature:
       return Feature.fromJSON(item);
     default:

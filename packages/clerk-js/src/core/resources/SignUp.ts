@@ -87,7 +87,7 @@ export class SignUp extends BaseResource implements SignUpResource {
    *
    * An instance of `SignUpFuture`, which has a different API than `SignUp`, intended to be used in custom flows.
    */
-  __internal_future: SignUpFuture | null = new SignUpFuture(this);
+  __internal_future: SignUpFuture = new SignUpFuture(this);
 
   /**
    * @internal Only used for internal purposes, and is not intended to be used directly.
@@ -602,7 +602,7 @@ class SignUpFuture implements SignUpFutureResource {
     });
   }
 
-  async finalize({ navigate }: { navigate?: SetActiveNavigate }): Promise<{ error: unknown }> {
+  async finalize({ navigate }: { navigate?: SetActiveNavigate } = {}): Promise<{ error: unknown }> {
     return runAsyncResourceTask(this.resource, async () => {
       if (!this.resource.createdSessionId) {
         throw new Error('Cannot finalize sign-up without a created session.');
