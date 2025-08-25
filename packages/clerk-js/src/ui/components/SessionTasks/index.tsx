@@ -3,6 +3,7 @@ import { eventComponentMounted } from '@clerk/shared/telemetry';
 import type { SessionResource } from '@clerk/types';
 import { useEffect, useRef } from 'react';
 
+import { PricingTableContext } from '@/ui/contexts';
 import { Card } from '@/ui/elements/Card';
 import { withCardStateProvider } from '@/ui/elements/contexts';
 import { LoadingCardContainer } from '@/ui/elements/LoadingCard';
@@ -14,6 +15,7 @@ import {
   useSessionTasksContext,
 } from '../../contexts/components/SessionTasks';
 import { Route, Switch, useRouter } from '../../router';
+import { PricingTable } from '../PricingTable';
 import { TaskChooseOrganization } from './tasks/TaskChooseOrganization';
 
 const SessionTasksStart = () => {
@@ -53,6 +55,13 @@ function SessionTasksRoutes(): JSX.Element {
         >
           <TaskChooseOrganization />
         </TaskChooseOrganizationContext.Provider>
+      </Route>
+      <Route path={INTERNAL_SESSION_TASK_ROUTE_BY_KEY['choose-paid-subscription']}>
+        <PricingTableContext.Provider value={{ componentName: 'PricingTable' }}>
+          <Card.Root>
+            <PricingTable />
+          </Card.Root>
+        </PricingTableContext.Provider>
       </Route>
       <Route index>
         <SessionTasksStart />
