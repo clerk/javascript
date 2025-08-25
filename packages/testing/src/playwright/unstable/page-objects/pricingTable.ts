@@ -74,7 +74,11 @@ export const createPricingTablePageObject = (testArgs: { page: EnhancedPage }) =
       period?: BillingPeriod;
     }) => {
       const targetButtonName =
-        shouldSwitch === true ? 'Switch to this plan' : shouldSwitch === false ? /subscribe/i : /get|switch|subscribe/i;
+        shouldSwitch === true
+          ? 'Switch to this plan'
+          : shouldSwitch === false
+            ? /subscribe/i
+            : /get|switch|subscribe|Start \d+-day free trial/i;
 
       if (period) {
         await ensurePricingPeriod(planSlug, period);
