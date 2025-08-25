@@ -237,6 +237,7 @@ exports[`Typedoc output > should have a deliberate file structure 1`] = `
   "backend/infer-auth-object-from-token.mdx",
   "backend/invitation-status.mdx",
   "backend/invitation.mdx",
+  "backend/oauth-application.mdx",
   "backend/organization-invitation-status.mdx",
   "backend/organization-invitation.mdx",
   "backend/organization-membership-public-user-data.mdx",
