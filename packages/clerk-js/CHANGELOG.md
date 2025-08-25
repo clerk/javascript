@@ -1,5 +1,24 @@
 # Change Log
 
+## 5.88.1
+
+### Patch Changes
+
+- Clear API keys revoke confirmation field on modal close ([#6604](https://github.com/clerk/javascript/pull/6604)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Remove unused `__internal_hasAfterAuthFlows` property ([#6609](https://github.com/clerk/javascript/pull/6609)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Removing unused debugLogger functionality ([#6615](https://github.com/clerk/javascript/pull/6615)) by [@jacekradko](https://github.com/jacekradko)
+
+- Update `UserSettings.instanceIsPasswordBased` to return true if password is enabled but not required. ([#6599](https://github.com/clerk/javascript/pull/6599)) by [@dmoerner](https://github.com/dmoerner)
+
+- Allow end users to select payment methods during trial checkout. ([#6608](https://github.com/clerk/javascript/pull/6608)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`d52714e`](https://github.com/clerk/javascript/commit/d52714e4cb7f369c74826cd4341c58eb1900abe4), [`ce49740`](https://github.com/clerk/javascript/commit/ce49740d474d6dd9da5096982ea4e9f14cf68f09), [`a26ecae`](https://github.com/clerk/javascript/commit/a26ecae09fd06cd34f094262f038a8eefbb23f7d)]:
+  - @clerk/types@4.81.1
+  - @clerk/shared@3.22.1
+  - @clerk/localizations@3.23.1
+
 ## 5.88.0
 
 ### Minor Changes

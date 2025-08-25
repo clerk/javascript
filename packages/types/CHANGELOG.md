@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.81.1
+
+### Patch Changes
+
+- Remove unused `__internal_hasAfterAuthFlows` property ([#6609](https://github.com/clerk/javascript/pull/6609)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
 ## 4.81.0
 
 ### Minor Changes
