@@ -1,5 +1,6 @@
 import { useOrganizationList } from '@clerk/shared/react';
 
+import { INTERNAL_SESSION_TASK_ROUTE_BY_KEY } from '@/core/sessionTasks';
 import { useTaskChooseOrganizationContext } from '@/ui/contexts/components/SessionTasks';
 import { localizationKeys } from '@/ui/customizables';
 import { useCardState } from '@/ui/elements/contexts';
@@ -49,8 +50,13 @@ export const CreateOrganizationScreen = (props: CreateOrganizationScreenProps) =
 
       await setActive({
         organization,
-        navigate: async () => {
-          // TODO(after-auth) ORGS-779 - Handle next tasks
+        navigate: async ({ session }) => {
+          if (session.currentTask) {
+            // TODO - Move this to session task context
+            await navigate(`../${INTERNAL_SESSION_TASK_ROUTE_BY_KEY['choose-paid-subscription']}`);
+            return;
+          }
+
           await navigate(redirectUrlComplete);
         },
       });
