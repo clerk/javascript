@@ -1,10 +1,11 @@
 import type { TelemetryCollector } from '@clerk/shared/telemetry';
+import { isProductionEnvironment } from '@clerk/shared/utils';
 
 import { DebugLogger } from './logger';
 import { CompositeTransport } from './transports/composite';
 import { ConsoleTransport } from './transports/console';
 import { TelemetryTransport } from './transports/telemetry';
-import type { DebugLogFilter, DebugLogLevel } from './types';
+import type { DebugLogLevel } from './types';
 
 const DEFAULT_LOG_LEVEL: DebugLogLevel = 'info';
 
@@ -23,8 +24,6 @@ function validateLoggerOptions<T extends { logLevel?: unknown }>(options: T): vo
 export interface LoggerOptions {
   /** Optional URL to which telemetry logs will be sent. */
   endpoint?: string;
-  /** Optional array of filters to control which logs are emitted. */
-  filters?: DebugLogFilter[];
   /** Minimum log level to capture. */
   logLevel?: DebugLogLevel;
   /** Optional collector instance for custom telemetry handling. */
@@ -35,8 +34,6 @@ export interface LoggerOptions {
  * Options for console-only logger configuration.
  */
 export interface ConsoleLoggerOptions {
-  /** Optional array of filters to control which logs are emitted. */
-  filters?: DebugLogFilter[];
   /** Minimum log level to capture. */
   logLevel?: DebugLogLevel;
 }
@@ -47,8 +44,6 @@ export interface ConsoleLoggerOptions {
 export interface TelemetryLoggerOptions {
   /** Optional URL to which telemetry logs will be sent. */
   endpoint?: string;
-  /** Optional array of filters to control which logs are emitted. */
-  filters?: DebugLogFilter[];
   /** Minimum log level to capture. */
   logLevel?: DebugLogLevel;
   /** Optional collector instance for custom telemetry handling. */
@@ -59,19 +54,12 @@ export interface TelemetryLoggerOptions {
  * Options for composite logger configuration.
  */
 export interface CompositeLoggerOptions {
-  /** Optional array of filters to control which logs are emitted. */
-  filters?: DebugLogFilter[];
-  /** Minimum log level to capture. */
   logLevel?: DebugLogLevel;
-  /** Collection of transports used by the composite logger. */
   transports: Array<{ transport: ConsoleTransport | TelemetryTransport }>;
 }
 
 /**
  * Manages a singleton instance of the debug logger.
- *
- * Ensures only one logger is initialized and provides access to it.
- * Handles asynchronous initialization and configuration.
  */
 class DebugLoggerManager {
   private static instance: DebugLoggerManager;
@@ -81,9 +69,6 @@ class DebugLoggerManager {
 
   private constructor() {}
 
-  /**
-   * Get the singleton instance
-   */
   static getInstance(): DebugLoggerManager {
     if (!DebugLoggerManager.instance) {
       DebugLoggerManager.instance = new DebugLoggerManager();
@@ -91,12 +76,6 @@ class DebugLoggerManager {
     return DebugLoggerManager.instance;
   }
 
-  /**
-   * Initialize the debug logger with the given options
-   *
-   * @param options - Configuration options for the logger
-   * @returns Promise resolving to the debug logger instance
-   */
   async initialize(options: LoggerOptions = {}): Promise<DebugLogger | null> {
     if (this.initialized) {
       return this.logger;
@@ -110,26 +89,20 @@ class DebugLoggerManager {
     return this.initializationPromise;
   }
 
-  /**
-   * Performs the actual initialization logic
-   *
-   * @param options - Configuration options for the logger
-   * @returns Promise resolving to the debug logger instance
-   */
   private async performInitialization(options: LoggerOptions): Promise<DebugLogger | null> {
     try {
       validateLoggerOptions(options);
-      const { logLevel, filters, telemetryCollector } = options;
+      const { logLevel, telemetryCollector } = options;
       const finalLogLevel = logLevel ?? DEFAULT_LOG_LEVEL;
 
       const transports = [
         { transport: new ConsoleTransport() },
-        { transport: new TelemetryTransport(telemetryCollector) },
+        ...(telemetryCollector ? [{ transport: new TelemetryTransport(telemetryCollector) }] : []),
       ];
 
       const transportInstances = transports.map(t => t.transport);
       const compositeTransport = new CompositeTransport(transportInstances);
-      const logger = new DebugLogger(compositeTransport, finalLogLevel, filters);
+      const logger = new DebugLogger(compositeTransport, finalLogLevel);
 
       this.logger = logger;
       this.initialized = true;
@@ -141,23 +114,14 @@ class DebugLoggerManager {
     }
   }
 
-  /**
-   * Gets the current logger instance
-   */
   getLogger(): DebugLogger | null {
     return this.logger;
   }
 
-  /**
-   * Checks if the debug logger is initialized
-   */
   isInitialized(): boolean {
     return this.initialized;
   }
 
-  /**
-   * Resets the initialization state
-   */
   reset(): void {
     this.initialized = false;
     this.logger = null;
@@ -178,24 +142,30 @@ export async function getDebugLogger(options: LoggerOptions = {}): Promise<Debug
 
 /**
  * Creates a composite logger with both console and telemetry transports
+ *
  * @param options - Configuration options for the logger
  * @returns Object containing the logger and composite transport
  */
 export function createLogger(options: {
   endpoint?: string;
   logLevel?: DebugLogLevel;
-  filters?: DebugLogFilter[];
   telemetryCollector?: TelemetryCollector;
 }): { logger: DebugLogger; transport: CompositeTransport } | null {
   try {
     validateLoggerOptions(options);
-    const { logLevel, filters, telemetryCollector } = options;
+    const { logLevel, telemetryCollector } = options;
     const finalLogLevel = logLevel ?? DEFAULT_LOG_LEVEL;
 
+    const transports = isProductionEnvironment()
+      ? [
+          { transport: new ConsoleTransport() },
+          ...(telemetryCollector ? [{ transport: new TelemetryTransport(telemetryCollector) }] : []),
+        ]
+      : [{ transport: new ConsoleTransport() }];
+
     return createCompositeLogger({
-      transports: [{ transport: new ConsoleTransport() }, { transport: new TelemetryTransport(telemetryCollector) }],
       logLevel: finalLogLevel,
-      filters,
+      transports,
     });
   } catch (error) {
     console.error('Failed to create logger:', error);
@@ -214,10 +184,10 @@ export function createConsoleLogger(
 ): { logger: DebugLogger; transport: ConsoleTransport } | null {
   try {
     validateLoggerOptions(options);
-    const { logLevel, filters } = options;
+    const { logLevel } = options;
     const finalLogLevel = logLevel ?? DEFAULT_LOG_LEVEL;
     const transport = new ConsoleTransport();
-    const logger = new DebugLogger(transport, finalLogLevel, filters);
+    const logger = new DebugLogger(transport, finalLogLevel);
     return { logger, transport };
   } catch (error) {
     console.error('Failed to create console logger:', error);
@@ -236,10 +206,10 @@ export function createTelemetryLogger(
 ): { logger: DebugLogger; transport: TelemetryTransport } | null {
   try {
     validateLoggerOptions(options);
-    const { logLevel, filters, telemetryCollector } = options;
+    const { logLevel, telemetryCollector } = options;
     const finalLogLevel = logLevel ?? DEFAULT_LOG_LEVEL;
     const transport = new TelemetryTransport(telemetryCollector);
-    const logger = new DebugLogger(transport, finalLogLevel, filters);
+    const logger = new DebugLogger(transport, finalLogLevel);
     return { logger, transport };
   } catch (error) {
     console.error('Failed to create telemetry logger:', error);
@@ -258,12 +228,12 @@ export function createCompositeLogger(
 ): { logger: DebugLogger; transport: CompositeTransport } | null {
   try {
     validateLoggerOptions(options);
-    const { transports, logLevel, filters } = options;
+    const { transports, logLevel } = options;
     const finalLogLevel = logLevel ?? DEFAULT_LOG_LEVEL;
 
     const transportInstances = transports.map(t => t.transport);
     const compositeTransport = new CompositeTransport(transportInstances);
-    const logger = new DebugLogger(compositeTransport, finalLogLevel, filters);
+    const logger = new DebugLogger(compositeTransport, finalLogLevel);
 
     return { logger, transport: compositeTransport };
   } catch (error) {

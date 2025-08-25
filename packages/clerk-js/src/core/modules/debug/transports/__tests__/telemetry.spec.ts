@@ -59,7 +59,6 @@ describe('TelemetryTransport', () => {
       timestamp: Date.now(),
     };
 
-    // Should not throw when no collector is provided
     await expect(transportWithoutCollector.send(logEntry)).resolves.toBeUndefined();
   });
 });
