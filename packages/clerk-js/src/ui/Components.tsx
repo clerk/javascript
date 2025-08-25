@@ -21,6 +21,7 @@ import React, { Suspense } from 'react';
 import { clerkUIErrorDOMElementNotFound } from '../core/errors';
 import { buildVirtualRouterUrl } from '../utils';
 import { disambiguateRedirectOptions } from '../utils/disambiguateRedirectOptions';
+import { ViewTransitionStyles } from './components/ViewTransitionStyles';
 import type { AppearanceCascade } from './customizables/parseAppearance'; // NOTE: Using `./hooks` instead of `./hooks/useClerkModalStateParams` will increase the bundle size
 import { useClerkModalStateParams } from './hooks/useClerkModalStateParams';
 import type { ClerkComponentName } from './lazyModules/components';
@@ -564,6 +565,7 @@ const Components = (props: ComponentsProps) => {
         environment={props.environment}
         options={state.options}
       >
+        <ViewTransitionStyles />
         {[...nodes].map(([node, component]) => {
           return (
             <LazyComponentRenderer

@@ -116,9 +116,23 @@ export const BaseRouter = ({
 
       toURL.search = stringifyQueryParams(toQueryParams);
     }
-    const internalNavRes = await internalNavigate(toURL, { metadata: { navigationType: 'internal' } });
-    setRouteParts({ path: toURL.pathname, queryString: toURL.search });
-    return internalNavRes;
+
+    // Check if View Transition API is supported and we're doing internal navigation
+    if ('startViewTransition' in document && toURL.pathname !== currentPath) {
+      // Use View Transition API for smooth height animations
+      const transition = (document as any).startViewTransition(async () => {
+        const internalNavRes = await internalNavigate(toURL, { metadata: { navigationType: 'internal' } });
+        setRouteParts({ path: toURL.pathname, queryString: toURL.search });
+        return internalNavRes;
+      });
+
+      return transition.finished;
+    } else {
+      // Fallback for browsers without View Transition API support
+      const internalNavRes = await internalNavigate(toURL, { metadata: { navigationType: 'internal' } });
+      setRouteParts({ path: toURL.pathname, queryString: toURL.search });
+      return internalNavRes;
+    }
   };
 
   return (

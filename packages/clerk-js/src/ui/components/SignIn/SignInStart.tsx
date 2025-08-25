@@ -37,6 +37,7 @@ import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import { CaptchaElement } from '../../elements/CaptchaElement';
 import { useLoadingStatus } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
+import { useViewTransition } from '../../hooks/useViewTransition';
 import { useRouter } from '../../router';
 import { handleCombinedFlowTransfer } from './handleCombinedFlowTransfer';
 import { useHandleAuthenticateWithPasskey } from './shared';
@@ -84,6 +85,7 @@ function SignInStartInternal(): JSX.Element {
   const { displayConfig, userSettings, authConfig } = useEnvironment();
   const signIn = useCoreSignIn();
   const { navigate } = useRouter();
+  const { withViewTransition } = useViewTransition();
   const ctx = useSignInContext();
   const { afterSignInUrl, signUpUrl, waitlistUrl, isCombinedFlow, navigateOnSetActive } = ctx;
   const supportEmail = useSupportEmail();
@@ -495,7 +497,9 @@ function SignInStartInternal(): JSX.Element {
 
   const handleFirstPartySubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    return signInWithFields(identifierField, instantPasswordField);
+    return withViewTransition(async () => {
+      await signInWithFields(identifierField, instantPasswordField);
+    });
   };
 
   const DynamicField = useMemo(() => {
@@ -589,7 +593,11 @@ function SignInStartInternal(): JSX.Element {
                   <Card.Action elementId={'usePasskey'}>
                     <Card.ActionLink
                       localizationKey={localizationKeys('signIn.start.actionLink__use_passkey')}
-                      onClick={() => authenticateWithPasskey({ flow: 'discoverable' })}
+                      onClick={() =>
+                        withViewTransition(async () => {
+                          await authenticateWithPasskey({ flow: 'discoverable' });
+                        })
+                      }
                     />
                   </Card.Action>
                 )}

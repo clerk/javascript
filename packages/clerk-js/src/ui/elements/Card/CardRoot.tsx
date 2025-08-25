@@ -8,6 +8,7 @@ import { ApplicationLogo } from '../ApplicationLogo';
 import { useFlowMetadata } from '../contexts';
 
 type CardRootProps = PropsOfComponent<typeof Col>;
+
 export const CardRoot = React.forwardRef<HTMLDivElement, CardRootProps>((props, ref) => {
   const { sx, children, ...rest } = props;
   const appearance = useAppearance();
@@ -45,6 +46,7 @@ export const CardRoot = React.forwardRef<HTMLDivElement, CardRootProps>((props, 
             color: t.colors.$colorForeground,
             position: 'relative',
             overflow: 'hidden',
+            viewTransitionName: 'card-root',
           }),
           sx,
         ]}
