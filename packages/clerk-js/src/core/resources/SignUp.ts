@@ -489,6 +489,7 @@ class SignUpFuture implements SignUpFutureResource {
   }
 
   get isTransferable() {
+    // TODO: we can likely remove the error code check as the status should be sufficient
     return (
       this.resource.verifications.externalAccount.status === 'transferable' &&
       this.resource.verifications.externalAccount.error?.code === 'external_account_exists'
