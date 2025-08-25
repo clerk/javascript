@@ -31,7 +31,7 @@ const inputShadowStyles = (
     '&:hover': {
       boxShadow: hoverShadow,
     },
-    '&:focus-within': {
+    '&:focus-within,&[data-focus-within="true"]': {
       boxShadow: [hoverShadow, theme.shadows.$focusRing.replace('{{color}}', colors.focus)].toString(),
     },
   };

@@ -103,7 +103,10 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('component
       await u.page.goToRelative(component.path, { waitUntil: 'commit' });
       await expect(u.page.getByText(component.fallback)).toBeVisible();
 
-      await signOut({ app, page, context });
+      // eslint-disable-next-line playwright/no-conditional-in-test
+      if (component.protected) {
+        await signOut({ app, page, context });
+      }
     });
   }
 });
