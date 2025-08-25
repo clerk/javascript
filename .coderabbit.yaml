@@ -1,0 +1,4 @@
+reviews:
+  auto_review:
+    ignore_title_keywords:
+      - 'ci(repo): Version packages'
