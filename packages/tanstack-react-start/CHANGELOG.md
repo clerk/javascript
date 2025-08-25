@@ -1,5 +1,62 @@
 # @clerk/tanstack-react-start
 
+## 0.23.0
+
+### Minor Changes
+
+- Reuses existing `Auth` object from the server handler when using `getAuth()` ([#6595](https://github.com/clerk/javascript/pull/6595)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  The `createClerkHandler` helper now returns a Promise and requires awaiting during setup to ensure authentication context is available at the earliest possible point in the request lifecycle, before any router loaders or server functions execute
+
+  ```ts
+  // server.ts
+  import { createStartHandler, defineHandlerCallback, defaultStreamHandler } from '@tanstack/react-start/server';
+  import { createRouter } from './router';
+  import { createClerkHandler } from '@clerk/tanstack-react-start/server';
+
+  const handlerFactory = createClerkHandler(
+    createStartHandler({
+      createRouter,
+    }),
+  );
+
+  export default defineHandlerCallback(async event => {
+    const startHandler = await handlerFactory(defaultStreamHandler); // awaited
+    return startHandler(event);
+  });
+  ```
+
+### Patch Changes
+
+- Allows passing of [`treatPendingAsSignedOut`](https://clerk.com/docs/authentication/configuration/session-tasks#session-handling) to auth functions: ([#6612](https://github.com/clerk/javascript/pull/6612)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  TanStack Start
+
+  ```ts
+  const authStateFn = createServerFn({ method: 'GET' }).handler(async () => {
+    const request = getWebRequest();
+    const { userId } = await getAuth(request, { treatPendingAsSignedOut: false }); // defaults to true
+
+    return { userId };
+  });
+  ```
+
+  Nuxt
+
+  ```ts
+  export default eventHandler(event => {
+    const { userId } = event.context.auth({ treatPendingAsSignedOut: false }); // defaults to true
+
+    return { userId };
+  });
+  ```
+
+- Updated dependencies [[`d52714e`](https://github.com/clerk/javascript/commit/d52714e4cb7f369c74826cd4341c58eb1900abe4), [`822e4a1`](https://github.com/clerk/javascript/commit/822e4a19c1ad29309cf6bf91ca1fbbac4464a62b), [`ce49740`](https://github.com/clerk/javascript/commit/ce49740d474d6dd9da5096982ea4e9f14cf68f09), [`a26ecae`](https://github.com/clerk/javascript/commit/a26ecae09fd06cd34f094262f038a8eefbb23f7d), [`453cf86`](https://github.com/clerk/javascript/commit/453cf86381c5df6684b37b003984a6fafc443fb4)]:
+  - @clerk/clerk-react@5.43.2
+  - @clerk/types@4.81.1
+  - @clerk/backend@2.10.0
+  - @clerk/shared@3.22.1
+
 ## 0.22.4
 
 ### Patch Changes

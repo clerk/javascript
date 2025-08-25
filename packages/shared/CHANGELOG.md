@@ -1,5 +1,16 @@
 # Change Log
 
+## 3.22.1
+
+### Patch Changes
+
+- Removed unused generateUuid utility ([#6601](https://github.com/clerk/javascript/pull/6601)) by [@jacekradko](https://github.com/jacekradko)
+
+- Improve assertion error for requiring active organization. ([#6606](https://github.com/clerk/javascript/pull/6606)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`d52714e`](https://github.com/clerk/javascript/commit/d52714e4cb7f369c74826cd4341c58eb1900abe4)]:
+  - @clerk/types@4.81.1
+
 ## 3.22.0
 
 ### Minor Changes
