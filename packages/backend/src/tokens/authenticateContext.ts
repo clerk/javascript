@@ -203,7 +203,7 @@ class AuthenticateContext implements AuthenticateContext {
    *
    * @returns {boolean} True if the referrer is from a Clerk accounts portal or FAPI domain, false otherwise
    */
-  public isClerkDomain(): boolean {
+  public isKnownClerkReferrer(): boolean {
     if (!this.referrer) {
       return false;
     }

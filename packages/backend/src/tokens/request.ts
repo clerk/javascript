@@ -577,7 +577,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
         !authenticateContext.isSatellite && // We're on primary
         authenticateContext.secFetchDest === 'document' && // Document navigation
         authenticateContext.isCrossOriginReferrer() && // Came from different domain
-        !authenticateContext.isClerkDomain(); // Not from Clerk accounts portal or FAPI
+        !authenticateContext.isKnownClerkReferrer(); // Not from Clerk accounts portal or FAPI
 
       if (shouldForceHandshakeForCrossDomain) {
         return handleMaybeHandshakeStatus(
