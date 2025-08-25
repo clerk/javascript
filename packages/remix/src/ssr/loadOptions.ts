@@ -46,6 +46,7 @@ export const loadOptions = (args: LoaderFunctionArgs, overrides: RootAuthLoaderO
     overrides.signUpFallbackRedirectUrl || getEnvVariable('CLERK_SIGN_UP_FALLBACK_REDIRECT_URL', context) || '';
   const afterSignInUrl = overrides.afterSignInUrl || getEnvVariable('CLERK_AFTER_SIGN_IN_URL', context) || '';
   const afterSignUpUrl = overrides.afterSignUpUrl || getEnvVariable('CLERK_AFTER_SIGN_UP_URL', context) || '';
+  const waitlistUrl = overrides.waitlistUrl || getEnvVariable('CLERK_WAITLIST_URL', context) || '';
   const newSubscriptionRedirectUrl =
     overrides.newSubscriptionRedirectUrl || getEnvVariable('CLERK_CHECKOUT_CONTINUE_URL', context) || '';
 
@@ -81,6 +82,7 @@ export const loadOptions = (args: LoaderFunctionArgs, overrides: RootAuthLoaderO
     signUpUrl,
     afterSignInUrl,
     afterSignUpUrl,
+    waitlistUrl,
     signInForceRedirectUrl,
     signUpForceRedirectUrl,
     signInFallbackRedirectUrl,
