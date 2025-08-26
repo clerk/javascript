@@ -67,4 +67,10 @@ if (typeof window !== 'undefined') {
     }
     return null;
   }) as any) as jest.MockedFunction<HTMLCanvasElement['getContext']>;
+
+  // Mock document.elementFromPoint for input-otp library
+  Object.defineProperty(document, 'elementFromPoint', {
+    value: jest.fn().mockReturnValue(null),
+    writable: true,
+  });
 }

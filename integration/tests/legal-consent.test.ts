@@ -57,7 +57,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
       });
 
       // We don't need to fill in the OTP code, because the user is not signed up
-      await expect(page.getByRole('textbox', { name: /digit 1/i })).toBeHidden();
+      await expect(page.getByLabel('Enter verification code')).toBeHidden();
 
       // Check if user is signed out
       await u.po.expect.toBeSignedOut();
