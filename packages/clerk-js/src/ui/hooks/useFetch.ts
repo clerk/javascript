@@ -33,7 +33,7 @@ export const clearFetchCache = () => {
 
 const serialize = (key: unknown) => (typeof key === 'string' ? key : JSON.stringify(key));
 
-export const useCache = <K = any, V = any>(
+const useCache = <K = any, V = any>(
   key: K,
   serializer = serialize,
 ): {

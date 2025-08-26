@@ -665,23 +665,6 @@ export interface CommercePlanJSON extends ClerkResourceJSON {
  * <ClerkProvider clerkJsVersion="x.x.x" />
  * ```
  */
-export interface CommerceProductJSON extends ClerkResourceJSON {
-  object: 'commerce_product';
-  id: string;
-  slug: string;
-  currency: string;
-  is_default: boolean;
-  plans: CommercePlanJSON[];
-}
-
-/**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
- */
 export interface CommercePaymentSourceJSON extends ClerkResourceJSON {
   object: 'commerce_payment_source';
   id: string;
