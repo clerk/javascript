@@ -193,6 +193,7 @@ export const OTPCodeControl = () => {
         render={({ slots }) => (
           <Flex
             align='center'
+            elementDescriptor={descriptors.otpCodeFieldInputs}
             gap={2}
             hasError={feedbackType === 'error'}
             isLoading={isLoading}
