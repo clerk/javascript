@@ -129,7 +129,7 @@ const CustomPortalsRenderer = (props: CustomPortalsRendererProps) => {
 
 export const SignIn = withClerk(
   ({ clerk, component, fallback, ...props }: WithClerkProp<SignInProps & FallbackProp>) => {
-    const mountingStatus = useWaitForComponentMount(component, { selector: '[data-ready="true"]' });
+    const mountingStatus = useWaitForComponentMount(component);
     const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
 
     const rendererRootProps = {
@@ -577,8 +577,9 @@ export const Waitlist = withClerk(
 
 export const PricingTable = withClerk(
   ({ clerk, component, fallback, ...props }: WithClerkProp<PricingTableProps & FallbackProp>) => {
-    const mountingStatus = useWaitForComponentMount(component);
+    const mountingStatus = useWaitForComponentMount(component, { selector: '[data-ready="true"]' });
     const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
+    console.log('shouldShowFallback', shouldShowFallback, mountingStatus);
 
     const rendererRootProps = {
       ...(shouldShowFallback && fallback && { style: { display: 'none' } }),
