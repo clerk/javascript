@@ -4,7 +4,7 @@
 '@clerk/types': minor
 ---
 
-[Billing Beta] `checkout.confirm()` now infers the resource id resulting an less repetition and improved DX.
+[Billing Beta] `checkout.confirm()` now infers the resource id resulting in less repetition and improved DX.
 
 After
 ```tsx
