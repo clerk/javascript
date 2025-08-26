@@ -9,7 +9,6 @@ const createAwaitableMutationObserver = (
 
   return (options: { selector: string; root?: HTMLElement | null; timeout?: number }) =>
     new Promise<void>((resolve, reject) => {
-      console.log('Selector', options.selector);
       const { root = document?.body, selector, timeout = 0 } = options;
 
       if (!root) {
@@ -31,19 +30,15 @@ const createAwaitableMutationObserver = (
       // Set up a MutationObserver to detect when the element has children
       const observer = new MutationObserver(mutationsList => {
         for (const mutation of mutationsList) {
-          console.log('Mutation', mutation);
           if (!elementToWatch && selector) {
             elementToWatch = root?.querySelector(selector);
           }
-          console.log('elementToWatch', elementToWatch);
 
           if (
             (globalOptions.childList && mutation.type === 'childList') ||
             (globalOptions.attributes && mutation.type === 'attributes')
           ) {
-            console.log('isReady', isReady(elementToWatch, selector));
             if (isReady(elementToWatch, selector)) {
-              console.log('disconnecting');
               observer.disconnect();
               resolve();
               return;
@@ -67,17 +62,17 @@ const createAwaitableMutationObserver = (
 const waitForElementChildren = createAwaitableMutationObserver({
   childList: true,
   subtree: true,
-  isReady: (el: HTMLElement | null) => !!el?.childElementCount && el.childElementCount > 0,
+  isReady: (el, selector) => !!el?.childElementCount && el?.matches?.(selector) && el.childElementCount > 0,
 });
 
-const waitForElementAttribute = createAwaitableMutationObserver({
-  attributes: true,
-  // childList: true,
-  // subtree: true,
-  isReady: (el: HTMLElement | null, selector: string) => {
-    return el?.matches?.(selector) ?? false;
-  },
-});
+// const waitForElementAttribute = createAwaitableMutationObserver({
+//   attributes: true,
+//   // childList: true,
+//   // subtree: true,
+//   isReady: (el: HTMLElement | null, selector: string) => {
+//     return el?.matches?.(selector) ?? false;
+//   },
+// });
 
 /**
  * Detect when a Clerk component has mounted by watching DOM updates to an element with a `data-clerk-component="${component}"` property.
@@ -98,11 +93,12 @@ export function useWaitForComponentMount(
       const selector = `[data-clerk-component="${component}"]`;
       const attributeSelector = options?.selector;
       console.log('attributeSelector', attributeSelector, attributeSelector + selector);
-      watcherRef.current = (
-        attributeSelector
-          ? waitForElementAttribute({ selector: attributeSelector + selector })
-          : waitForElementChildren({ selector })
-      )
+      watcherRef.current = waitForElementChildren({
+        selector: attributeSelector ? attributeSelector + selector : selector,
+      })
+        // .then(res => {
+        //   return attributeSelector ? waitForElementAttribute({ selector: attributeSelector + selector }) : res;
+        // })
         .then(() => {
           console.log('rendered', component);
           setStatus('rendered');
