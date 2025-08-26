@@ -47,7 +47,7 @@ export class CommerceSubscription {
     /**
      * Whether the payer is eligible for a free trial.
      */
-    readonly eligibleForFreeTrial: boolean | null,
+    readonly eligibleForFreeTrial: boolean,
   ) {}
 
   static fromJSON(data: CommerceSubscriptionJSON): CommerceSubscription {
@@ -73,7 +73,7 @@ export class CommerceSubscription {
       data.past_due_at ?? null,
       data.subscription_items.map(item => CommerceSubscriptionItem.fromJSON(item)),
       nextPayment,
-      data.eligible_for_free_trial ?? null,
+      data.eligible_for_free_trial ?? false,
     );
   }
 }

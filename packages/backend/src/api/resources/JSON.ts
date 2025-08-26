@@ -986,11 +986,11 @@ export interface CommerceSubscriptionJSON extends ClerkResourceJSON {
   active_at: number | null;
   past_due_at: number | null;
   subscription_items: CommerceSubscriptionItemJSON[];
-  next_payment: {
+  next_payment?: {
     date: number;
     amount: CommerceMoneyAmountJSON;
-  } | null;
-  eligible_for_free_trial?: boolean | null;
+  };
+  eligible_for_free_trial?: boolean;
 }
 
 export interface WebhooksSvixJSON {
