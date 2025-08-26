@@ -544,8 +544,8 @@ export const hiIN: LocalizationResource = {
     emailCode: {
       formTitle: 'सत्यापन कोड',
       resendButton: 'कोड नहीं मिला? फिर से भेजें',
-      subtitle: 'जारी रखने के लिए अपने ईमेल पर भेजे गए कोड को दर्ज करें',
-      title: 'सत्यापन आवश्यक है',
+      subtitle: '{{applicationName}} पर जारी रखने के लिए',
+      title: 'अपने {{provider}} को सत्यापित करें',
     },
     noAvailableMethods: {
       message: 'सत्यापन जारी नहीं रख सकते। कोई उपयुक्त प्रमाणीकरण कारक कॉन्फ़िगर नहीं है',
