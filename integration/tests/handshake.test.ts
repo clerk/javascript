@@ -1437,7 +1437,7 @@ test.describe('Client handshake with an organization activation avoids infinite 
     // Critical cookie: __clerk_redirect_count
     headers.set(
       'Cookie',
-      `${devBrowserCookie} __client_uat=${claims.iat}; __session=${token}; __clerk_redirect_count=1`,
+      `${devBrowserCookie} __client_uat=${claims.iat}; __session=${token}; __clerk_redirect_count=3`,
     );
 
     const res = await fetch(thisApp.serverUrl + '/organizations-by-id/org_a', {
