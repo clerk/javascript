@@ -1,6 +1,6 @@
 {
   "files": [
-    { "path": "./dist/clerk.js", "maxSize": "631KB" },
+    { "path": "./dist/clerk.js", "maxSize": "81*KB" },
     { "path": "./dist/clerk.browser.js", "maxSize": "78KB" },
     { "path": "./dist/clerk.legacy.browser.js", "maxSize": "120KB" },
     { "path": "./dist/clerk.headless*.js", "maxSize": "61KB" },
