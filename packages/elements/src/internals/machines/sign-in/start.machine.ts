@@ -36,6 +36,9 @@ export const SignInStartMachine = setup({
         if (strategy === 'web3_coinbase_wallet_signature') {
           return parent.getSnapshot().context.clerk.client.signIn.authenticateWithCoinbaseWallet();
         }
+        if (strategy === 'web3_base_signature') {
+          return parent.getSnapshot().context.clerk.client.signIn.authenticateWithWallet();
+        }
         if (strategy === 'web3_okx_wallet_signature') {
           return parent.getSnapshot().context.clerk.client.signIn.authenticateWithOKXWallet();
         }
