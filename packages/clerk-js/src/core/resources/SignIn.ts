@@ -505,6 +505,22 @@ class SignInFuture implements SignInFutureResource {
     return this.resource.supportedFirstFactors ?? [];
   }
 
+  get isTransferable() {
+    return this.resource.firstFactorVerification.status === 'transferable';
+  }
+
+  get existingSession() {
+    if (
+      this.resource.firstFactorVerification.status === 'failed' &&
+      this.resource.firstFactorVerification.error?.code === 'identifier_already_signed_in' &&
+      this.resource.firstFactorVerification.error?.meta?.sessionId
+    ) {
+      return { sessionId: this.resource.firstFactorVerification.error?.meta?.sessionId };
+    }
+
+    return undefined;
+  }
+
   async sendResetPasswordEmailCode(): Promise<{ error: unknown }> {
     return runAsyncResourceTask(this.resource, async () => {
       if (!this.resource.id) {
@@ -556,6 +572,7 @@ class SignInFuture implements SignInFutureResource {
     strategy?: OAuthStrategy | 'saml' | 'enterprise_sso';
     redirectUrl?: string;
     actionCompleteRedirectUrl?: string;
+    transfer?: boolean;
   }): Promise<{ error: unknown }> {
     return runAsyncResourceTask(this.resource, async () => {
       await this.resource.__internal_basePost({

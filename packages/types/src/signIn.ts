@@ -134,11 +134,14 @@ export interface SignInResource extends ClerkResource {
 export interface SignInFutureResource {
   availableStrategies: SignInFirstFactor[];
   status: SignInStatus | null;
+  isTransferable: boolean;
+  existingSession?: { sessionId: string };
   create: (params: {
     identifier?: string;
     strategy?: OAuthStrategy | 'saml' | 'enterprise_sso';
     redirectUrl?: string;
     actionCompleteRedirectUrl?: string;
+    transfer?: boolean;
   }) => Promise<{ error: unknown }>;
   password: (params: { identifier?: string; password: string }) => Promise<{ error: unknown }>;
   emailCode: {
