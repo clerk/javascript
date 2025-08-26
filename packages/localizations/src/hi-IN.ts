@@ -62,10 +62,10 @@ export const hiIN: LocalizationResource = {
     lastUsed__years: '{{years}} वर्ष पहले',
     menuAction__revoke: 'कुंजी रद्द करें',
     revokeConfirmation: {
-      confirmationText: 'क्या आप वाकई इस API कुंजी को रद्द करना चाहते हैं?',
+      confirmationText: 'रद्द करें',
       formButtonPrimary__revoke: 'कुंजी रद्द करें',
       formHint: 'यह कार्रवाई पूर्ववत नहीं की जा सकती।',
-      formTitle: 'API कुंजी रद्द करें',
+      formTitle: '"{{apiKeyName}}" API कुंजी रद्द करें',
     },
   },
   backButton: 'वापस',
