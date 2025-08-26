@@ -401,7 +401,6 @@ describe('TelemetryCollector', () => {
         publishableKey: TEST_PK,
       });
 
-      // Test error in #preparePayload by creating a payload that causes JSON.stringify to fail
       const circularPayload = (() => {
         const obj: any = { test: 'value' };
         obj.self = obj;
@@ -427,25 +426,21 @@ describe('TelemetryCollector', () => {
         publishableKey: TEST_PK,
       });
 
-      // Test with a payload that causes issues
       const problematicPayload = (() => {
         const obj: any = { test: 'value' };
         obj.self = obj;
         return obj;
       })();
 
-      // Should not throw
       expect(() => {
         collector.record({ event: 'TEST_EVENT', payload: problematicPayload });
       }).not.toThrow();
 
-      // Should log the error
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         '[clerk/telemetry] Error recording telemetry event',
         expect.any(Error),
       );
 
-      // Test normal operation still works
       expect(() => {
         collector.record({ event: 'TEST_EVENT', payload: { normal: 'data' } });
       }).not.toThrow();
