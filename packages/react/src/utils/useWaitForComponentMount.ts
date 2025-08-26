@@ -1,10 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 
 /**
- * Used to detect when a Clerk component has been added to the DOM.
+ * Used to detect when a Clerk component has been added to the DOM or meets a custom readiness check.
  */
-function waitForElementChildren(options: { selector?: string; root?: HTMLElement | null; timeout?: number }) {
-  const { root = document?.body, selector, timeout = 0 } = options;
+function waitForElementChildren(options: {
+  selector?: string;
+  root?: HTMLElement | null;
+  timeout?: number;
+  check?: (el: HTMLElement | null) => boolean;
+}) {
+  const { root = document?.body, selector, timeout = 0, check } = options;
 
   return new Promise<void>((resolve, reject) => {
     if (!root) {
@@ -17,9 +22,15 @@ function waitForElementChildren(options: { selector?: string; root?: HTMLElement
       elementToWatch = root?.querySelector(selector);
     }
 
-    // Check if the element already has child nodes
-    const isElementAlreadyPresent = elementToWatch?.childElementCount && elementToWatch.childElementCount > 0;
-    if (isElementAlreadyPresent) {
+    const isReady = (el: HTMLElement | null) => {
+      if (typeof check === 'function') {
+        return !!check(el);
+      }
+      return !!(el?.childElementCount && el.childElementCount > 0);
+    };
+
+    // Initial readiness check
+    if (isReady(elementToWatch)) {
       resolve();
       return;
     }
@@ -27,12 +38,12 @@ function waitForElementChildren(options: { selector?: string; root?: HTMLElement
     // Set up a MutationObserver to detect when the element has children
     const observer = new MutationObserver(mutationsList => {
       for (const mutation of mutationsList) {
-        if (mutation.type === 'childList') {
-          if (!elementToWatch && selector) {
-            elementToWatch = root?.querySelector(selector);
-          }
+        if (!elementToWatch && selector) {
+          elementToWatch = root?.querySelector(selector);
+        }
 
-          if (elementToWatch?.childElementCount && elementToWatch.childElementCount > 0) {
+        if (mutation.type === 'childList' || mutation.type === 'attributes') {
+          if (isReady(elementToWatch)) {
             observer.disconnect();
             resolve();
             return;
@@ -41,7 +52,7 @@ function waitForElementChildren(options: { selector?: string; root?: HTMLElement
       }
     });
 
-    observer.observe(root, { childList: true, subtree: true });
+    observer.observe(root, { childList: true, attributes: true, subtree: true });
 
     // Set up an optional timeout to reject the promise if the element never gets child nodes
     if (timeout > 0) {
@@ -66,7 +77,12 @@ export function useWaitForComponentMount(component?: string) {
     }
 
     if (typeof window !== 'undefined' && !watcherRef.current) {
-      watcherRef.current = waitForElementChildren({ selector: `[data-clerk-component="${component}"]` })
+      const selector = `[data-clerk-component="${component}"]`;
+      const needsReadyAttribute = component === 'PricingTable';
+      watcherRef.current = waitForElementChildren({
+        selector,
+        check: needsReadyAttribute ? el => el?.getAttribute('data-ready') === 'true' : undefined,
+      })
         .then(() => {
           setStatus('rendered');
         })

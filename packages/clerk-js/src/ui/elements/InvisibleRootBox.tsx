@@ -1,11 +1,13 @@
 import React from 'react';
 
 import { makeCustomizable } from '../customizables/makeCustomizable';
+import { useFlowMetadata } from './contexts';
 
 type RootBoxProps = React.PropsWithChildren<{ className: string }>;
 
 const _InvisibleRootBox = React.memo((props: RootBoxProps) => {
   const [showSpan, setShowSpan] = React.useState(true);
+  const { setRootElement } = useFlowMetadata();
   const parentRef = React.useRef<HTMLElement | null>(null);
 
   React.useEffect(() => {
@@ -24,7 +26,10 @@ const _InvisibleRootBox = React.memo((props: RootBoxProps) => {
       {props.children}
       {showSpan && (
         <span
-          ref={el => (parentRef.current = el ? el.parentElement : parentRef.current)}
+          ref={el => {
+            parentRef.current = el ? el.parentElement : parentRef.current;
+            setRootElement(parentRef.current);
+          }}
           aria-hidden
           style={{ display: 'none' }}
         />

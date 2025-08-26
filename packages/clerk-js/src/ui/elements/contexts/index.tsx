@@ -125,11 +125,20 @@ export type FlowMetadata = {
     | 'accountSwitcher';
 };
 
-const [FlowMetadataCtx, useFlowMetadata] = createContextAndHook<FlowMetadata>('FlowMetadata');
+const [FlowMetadataCtx, useFlowMetadata] = createContextAndHook<
+  FlowMetadata & {
+    rootElement: HTMLElement | null;
+    setRootElement: React.Dispatch<React.SetStateAction<HTMLElement | null>>;
+  }
+>('FlowMetadata');
 
 export const FlowMetadataProvider = (props: React.PropsWithChildren<FlowMetadata>) => {
   const { flow, part } = props;
-  const value = React.useMemo(() => ({ value: props }), [flow, part]);
+  const [rootElement, setRootElement] = React.useState<HTMLElement | null>(null);
+  const value = React.useMemo(
+    () => ({ value: { ...props, rootElement, setRootElement } }),
+    [flow, part, rootElement, setRootElement],
+  );
   return <FlowMetadataCtx.Provider value={value}>{props.children}</FlowMetadataCtx.Provider>;
 };
 

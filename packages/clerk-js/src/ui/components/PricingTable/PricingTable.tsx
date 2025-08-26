@@ -3,10 +3,31 @@ import type { CommercePlanResource, CommerceSubscriptionPlanPeriod, PricingTable
 import { useEffect, useMemo, useState } from 'react';
 
 import { Flow } from '@/ui/customizables/Flow';
+import { useFlowMetadata } from '@/ui/elements/contexts';
 
 import { usePaymentMethods, usePlans, usePlansContext, usePricingTableContext, useSubscription } from '../../contexts';
 import { PricingTableDefault } from './PricingTableDefault';
 import { PricingTableMatrix } from './PricingTableMatrix';
+
+function SyncRootElement() {
+  const clerk = useClerk();
+  const { data: subscription, isLoading: isSubscriptionLoading } = useSubscription();
+  const { data: plans, isLoading: isPlansLoading } = usePlans();
+  const { rootElement } = useFlowMetadata();
+
+  useEffect(() => {
+    if (isSubscriptionLoading || isPlansLoading) {
+      return;
+    }
+    const isReady = clerk.isSignedIn ? !!subscription : plans.length > 0;
+
+    if (isReady) {
+      rootElement?.setAttribute('data-ready', 'true');
+    }
+  }, [subscription, plans]);
+
+  return null;
+}
 
 const PricingTableRoot = (props: PricingTableProps) => {
   const clerk = useClerk();
@@ -78,6 +99,7 @@ const PricingTableRoot = (props: PricingTableProps) => {
         width: '100%',
       }}
     >
+      <SyncRootElement />
       {mode !== 'modal' && (props as any).layout === 'matrix' ? (
         <PricingTableMatrix
           plans={plansToRender}
