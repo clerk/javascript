@@ -73,10 +73,10 @@ export class CommerceSubscriptionItem {
      */
     readonly payerId: string,
     /**
-     /**
-      * Whether this subscription item is currently in a free trial period.
-      */
-     readonly isFreeTrial?: boolean,
+     * Whether this subscription item is currently in a free trial period.
+     */
+    readonly isFreeTrial?: boolean,
+    /**
      * The lifetime amount paid for this subscription item.
      */
     readonly lifetimePaid?: CommerceMoneyAmount | null,
