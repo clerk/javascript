@@ -96,6 +96,11 @@ const common = ({ mode, variant, disableRHC = false }) => {
             name: 'zxcvbn-common',
             chunks: 'all',
           },
+          baseAccountSDKVendor: {
+            test: /[\\/]node_modules[\\/](@base-org\/account)[\\/]/,
+            name: 'base-account-sdk',
+            chunks: 'all',
+          },
           coinbaseWalletSDKVendor: {
             test: /[\\/]node_modules[\\/](@coinbase\/wallet-sdk|preact|eventemitter3|@noble\/hashes)[\\/]/,
             name: 'coinbase-wallet-sdk',
