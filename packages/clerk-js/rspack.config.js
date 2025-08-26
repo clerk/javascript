@@ -97,7 +97,7 @@ const common = ({ mode, variant, disableRHC = false }) => {
             chunks: 'all',
           },
           baseAccountSDKVendor: {
-            test: /[\\/]node_modules[\\/](@base-org\/account)[\\/]/,
+            test: /[\\/]node_modules[\\/](@base-org\/account|viem)[\\/]/,
             name: 'base-account-sdk',
             chunks: 'all',
           },
