@@ -1,4 +1,4 @@
-import { __experimental_useCheckout as useCheckout, useOrganization } from '@clerk/shared/react';
+import { __experimental_useCheckout as useCheckout } from '@clerk/shared/react';
 import type { CommerceMoneyAmount, CommercePaymentSourceResource, ConfirmCheckoutParams } from '@clerk/types';
 import { useMemo, useState } from 'react';
 
@@ -136,7 +136,6 @@ export const CheckoutForm = withCardStateProvider(() => {
 });
 
 const useCheckoutMutations = () => {
-  const { organization } = useOrganization();
   const { for: _for, onSubscriptionComplete } = useCheckoutContext();
   const { checkout } = useCheckout();
   const { id, confirm } = checkout;
@@ -150,11 +149,7 @@ const useCheckoutMutations = () => {
     card.setLoading();
     card.setError(undefined);
 
-    const { data, error } = await confirm({
-      ...params,
-      // TODO(@COMMERCE): Come back to this, this should not be needed
-      ...(_for === 'organization' ? { orgId: organization?.id } : {}),
-    });
+    const { data, error } = await confirm(params);
 
     if (error) {
       handleError(error, [], card.setError);
