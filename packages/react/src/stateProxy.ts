@@ -43,6 +43,7 @@ export class StateProxy implements State {
       signIn: {
         status: 'needs_identifier' as const,
         availableStrategies: [],
+        isTransferable: false,
 
         create: this.gateMethod(target, 'create'),
         password: this.gateMethod(target, 'password'),
@@ -68,7 +69,10 @@ export class StateProxy implements State {
       signUp: {
         status: 'missing_requirements' as const,
         unverifiedFields: [],
+        isTransferable: false,
 
+        create: this.gateMethod(target, 'create'),
+        sso: this.gateMethod(target, 'sso'),
         password: this.gateMethod(target, 'password'),
         finalize: this.gateMethod(target, 'finalize'),
 
