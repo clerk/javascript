@@ -6,10 +6,10 @@ import { useEffect, useRef, useState } from 'react';
 function waitForElementChildren(options: {
   selector?: string;
   root?: HTMLElement | null;
+  readySelector?: string;
   timeout?: number;
-  check?: (el: HTMLElement | null) => boolean;
 }) {
-  const { root = document?.body, selector, timeout = 0, check } = options;
+  const { root = document?.body, selector, readySelector, timeout = 0 } = options;
 
   return new Promise<void>((resolve, reject) => {
     if (!root) {
@@ -23,8 +23,11 @@ function waitForElementChildren(options: {
     }
 
     const isReady = (el: HTMLElement | null) => {
-      if (typeof check === 'function') {
-        return !!check(el);
+      if (readySelector) {
+        if (el?.matches?.(readySelector)) {
+          return true;
+        }
+        return !!el?.querySelector?.(readySelector);
       }
       return !!(el?.childElementCount && el.childElementCount > 0);
     };
@@ -67,7 +70,10 @@ function waitForElementChildren(options: {
 /**
  * Detect when a Clerk component has mounted by watching DOM updates to an element with a `data-clerk-component="${component}"` property.
  */
-export function useWaitForComponentMount(component?: string) {
+export function useWaitForComponentMount(
+  component?: string,
+  options?: { selector: string },
+): 'rendering' | 'rendered' | 'error' {
   const watcherRef = useRef<Promise<void>>();
   const [status, setStatus] = useState<'rendering' | 'rendered' | 'error'>('rendering');
 
@@ -78,11 +84,8 @@ export function useWaitForComponentMount(component?: string) {
 
     if (typeof window !== 'undefined' && !watcherRef.current) {
       const selector = `[data-clerk-component="${component}"]`;
-      const needsReadyAttribute = component === 'PricingTable';
-      watcherRef.current = waitForElementChildren({
-        selector,
-        check: needsReadyAttribute ? el => el?.getAttribute('data-ready') === 'true' : undefined,
-      })
+      const readySelector = options?.selector;
+      watcherRef.current = waitForElementChildren({ selector, readySelector })
         .then(() => {
           setStatus('rendered');
         })
@@ -90,7 +93,7 @@ export function useWaitForComponentMount(component?: string) {
           setStatus('error');
         });
     }
-  }, [component]);
+  }, [component, options?.selector]);
 
   return status;
 }

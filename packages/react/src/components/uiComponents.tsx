@@ -129,7 +129,7 @@ const CustomPortalsRenderer = (props: CustomPortalsRendererProps) => {
 
 export const SignIn = withClerk(
   ({ clerk, component, fallback, ...props }: WithClerkProp<SignInProps & FallbackProp>) => {
-    const mountingStatus = useWaitForComponentMount(component);
+    const mountingStatus = useWaitForComponentMount(component, { selector: '[data-ready="true"]' });
     const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
 
     const rendererRootProps = {
