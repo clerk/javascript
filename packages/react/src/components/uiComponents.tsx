@@ -579,7 +579,6 @@ export const PricingTable = withClerk(
   ({ clerk, component, fallback, ...props }: WithClerkProp<PricingTableProps & FallbackProp>) => {
     const mountingStatus = useWaitForComponentMount(component, { selector: '[data-ready="true"]' });
     const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
-    console.log('shouldShowFallback', shouldShowFallback, mountingStatus);
 
     const rendererRootProps = {
       ...(shouldShowFallback && fallback && { style: { display: 'none' } }),

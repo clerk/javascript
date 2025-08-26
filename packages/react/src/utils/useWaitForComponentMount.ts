@@ -65,15 +65,6 @@ const waitForElementChildren = createAwaitableMutationObserver({
   isReady: (el, selector) => !!el?.childElementCount && el?.matches?.(selector) && el.childElementCount > 0,
 });
 
-// const waitForElementAttribute = createAwaitableMutationObserver({
-//   attributes: true,
-//   // childList: true,
-//   // subtree: true,
-//   isReady: (el: HTMLElement | null, selector: string) => {
-//     return el?.matches?.(selector) ?? false;
-//   },
-// });
-
 /**
  * Detect when a Clerk component has mounted by watching DOM updates to an element with a `data-clerk-component="${component}"` property.
  */
@@ -90,21 +81,18 @@ export function useWaitForComponentMount(
     }
 
     if (typeof window !== 'undefined' && !watcherRef.current) {
-      const selector = `[data-clerk-component="${component}"]`;
-      const attributeSelector = options?.selector;
-      console.log('attributeSelector', attributeSelector, attributeSelector + selector);
+      const defaultSelector = `[data-clerk-component="${component}"]`;
+      const selector = options?.selector;
       watcherRef.current = waitForElementChildren({
-        selector: attributeSelector ? attributeSelector + selector : selector,
+        selector: selector
+          ? // Allows for `[data-clerk-component="xxxx"][data-some-attribute="123"] .my-class`
+            defaultSelector + selector
+          : defaultSelector,
       })
-        // .then(res => {
-        //   return attributeSelector ? waitForElementAttribute({ selector: attributeSelector + selector }) : res;
-        // })
         .then(() => {
-          console.log('rendered', component);
           setStatus('rendered');
         })
         .catch(() => {
-          console.log('error', component);
           setStatus('error');
         });
     }
