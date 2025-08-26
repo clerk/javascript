@@ -70,6 +70,7 @@ import {
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from '../errors';
 import { eventBus } from '../events';
+import type { Clerk } from './internal';
 import { BaseResource, UserData, Verification } from './internal';
 
 export class SignIn extends BaseResource implements SignInResource {
@@ -91,7 +92,7 @@ export class SignIn extends BaseResource implements SignInResource {
    *
    * An instance of `SignInFuture`, which has a different API than `SignIn`, intended to be used in custom flows.
    */
-  __internal_future: SignInFuture = new SignInFuture(this);
+  __internal_future: SignInFuture = new SignInFuture(this, SignIn.cler);
 
   /**
    * @internal Only used for internal purposes, and is not intended to be used directly.
@@ -495,7 +496,10 @@ class SignInFuture implements SignInFutureResource {
     submitPassword: this.submitResetPassword.bind(this),
   };
 
-  constructor(readonly resource: SignIn) {}
+  constructor(
+    readonly resource: SignIn,
+    private clerk: Clerk,
+  ) {}
 
   get status() {
     return this.resource.status;
@@ -637,7 +641,7 @@ class SignInFuture implements SignInFutureResource {
         throw new Error('modal flow is not supported yet');
       }
 
-      const redirectUrlWithAuthToken = SignIn.clerk.buildUrlWithAuth(redirectUrl);
+      const redirectUrlWithAuthToken = this.clerk.buildUrlWithAuth(redirectUrl);
 
       if (!this.resource.id) {
         await this.create({
@@ -661,7 +665,7 @@ class SignInFuture implements SignInFutureResource {
         throw new Error('Cannot finalize sign-in without a created session.');
       }
 
-      await SignIn.clerk.setActive({ session: this.resource.createdSessionId, navigate });
+      await this.clerk.setActive({ session: this.resource.createdSessionId, navigate });
     });
   }
 }
