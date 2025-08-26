@@ -105,7 +105,7 @@ async function getEthereumProvider(provider: Web3Provider) {
     }
 
     try {
-      const { createBaseAccountSDK } = await import('@base-org/account');
+      const createBaseAccountSDK = await import('@base-org/account').then(mod => mod.createBaseAccountSDK);
       const sdk = createBaseAccountSDK({
         appName: typeof document !== 'undefined' ? document.title || 'Clerk' : 'Clerk',
       });
