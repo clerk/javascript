@@ -49,7 +49,6 @@ describe('TelemetryCollector.recordLog', () => {
     expect(log.iid).toBeUndefined();
     expect(log.ts).toBe(new Date(ts).toISOString());
     expect(log.pk).toBe(TEST_PK);
-    // Function and undefined stripped out
     expect(log.payload).toEqual({ a: 1 });
   });
 
@@ -62,7 +61,6 @@ describe('TelemetryCollector.recordLog', () => {
       timestamp: Date.now(),
     };
 
-    // undefined context
     fetchSpy.mockClear();
     collector.recordLog({ ...base, context: undefined } as any);
     jest.runAllTimers();
@@ -71,7 +69,6 @@ describe('TelemetryCollector.recordLog', () => {
     let body = JSON.parse(initOptions1.body as string);
     expect(body.logs[0].payload).toBeNull();
 
-    // array context
     fetchSpy.mockClear();
     collector.recordLog({ ...base, context: [1, 2, 3] } as any);
     jest.runAllTimers();
@@ -80,7 +77,6 @@ describe('TelemetryCollector.recordLog', () => {
     body = JSON.parse(initOptions2.body as string);
     expect(body.logs[0].payload).toBeNull();
 
-    // circular context
     fetchSpy.mockClear();
     const circular: any = { foo: 'bar' };
     circular.self = circular;
@@ -95,7 +91,6 @@ describe('TelemetryCollector.recordLog', () => {
   test('drops invalid entries: missing id, invalid level, empty message, invalid timestamp', () => {
     const collector = new TelemetryCollector({ publishableKey: TEST_PK });
 
-    // invalid level
     fetchSpy.mockClear();
     collector.recordLog({
       level: 'fatal' as unknown as any,
@@ -105,7 +100,6 @@ describe('TelemetryCollector.recordLog', () => {
     jest.runAllTimers();
     expect(fetchSpy).not.toHaveBeenCalled();
 
-    // empty message
     fetchSpy.mockClear();
     collector.recordLog({
       level: 'debug',
@@ -115,7 +109,6 @@ describe('TelemetryCollector.recordLog', () => {
     jest.runAllTimers();
     expect(fetchSpy).not.toHaveBeenCalled();
 
-    // invalid timestamp (NaN)
     fetchSpy.mockClear();
     collector.recordLog({
       level: 'warn',
@@ -143,5 +136,87 @@ describe('TelemetryCollector.recordLog', () => {
     expect(typeof initOptions4.body).toBe('string');
     const body = JSON.parse(initOptions4.body as string);
     expect(body.logs[0].ts).toBe(new Date(tsString).toISOString());
+  });
+
+  describe('error handling', () => {
+    test('recordLog() method handles circular references in context gracefully', () => {
+      const collector = new TelemetryCollector({ publishableKey: TEST_PK });
+
+      const circularContext = (() => {
+        const obj: any = { test: 'value' };
+        obj.self = obj;
+        return obj;
+      })();
+
+      expect(() => {
+        collector.recordLog({
+          level: 'info',
+          message: 'test message',
+          timestamp: Date.now(),
+          context: circularContext,
+        });
+      }).not.toThrow();
+
+      jest.runAllTimers();
+      expect(fetchSpy).toHaveBeenCalled();
+
+      const [url, init] = fetchSpy.mock.calls[0];
+      expect(String(url)).toMatch('/v1/logs');
+
+      const initOptions = init as RequestInit;
+      const body = JSON.parse(initOptions.body as string);
+      expect(body.logs[0].payload).toBeNull();
+    });
+
+    test('recordLog() method handles non-serializable context gracefully', () => {
+      const collector = new TelemetryCollector({ publishableKey: TEST_PK });
+
+      const nonSerializableContext = {
+        function: () => 'test',
+        undefined: undefined,
+        symbol: Symbol('test'),
+        circular: (() => {
+          const obj: any = { test: 'value' };
+          obj.self = obj;
+          return obj;
+        })(),
+      };
+
+      expect(() => {
+        collector.recordLog({
+          level: 'info',
+          message: 'test message',
+          timestamp: Date.now(),
+          context: nonSerializableContext,
+        });
+      }).not.toThrow();
+
+      jest.runAllTimers();
+      expect(fetchSpy).toHaveBeenCalled();
+
+      const [url, init] = fetchSpy.mock.calls[0];
+      expect(String(url)).toMatch('/v1/logs');
+
+      const initOptions = init as RequestInit;
+      const body = JSON.parse(initOptions.body as string);
+      expect(body.logs[0].payload).toBeNull();
+    });
+
+    test('recordLog() method handles invalid timestamp gracefully', () => {
+      const collector = new TelemetryCollector({ publishableKey: TEST_PK });
+
+      const invalidTimestamp = new Date('invalid date');
+
+      expect(() => {
+        collector.recordLog({
+          level: 'info',
+          message: 'test message',
+          timestamp: invalidTimestamp.getTime(),
+        });
+      }).not.toThrow();
+
+      jest.runAllTimers();
+      expect(fetchSpy).not.toHaveBeenCalled();
+    });
   });
 });
