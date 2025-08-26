@@ -4,7 +4,7 @@ import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
 
-import { useEnvironment } from '../../contexts';
+import { useEnvironment, useUserProfileContext } from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
 import { ConnectedAccountsSection } from './ConnectedAccountsSection';
 import { EmailsSection } from './EmailsSection';
@@ -18,6 +18,7 @@ export const AccountPage = withCardStateProvider(() => {
   const { attributes, social, enterpriseSSO } = useEnvironment().userSettings;
   const card = useCardState();
   const { user } = useUser();
+  const { shouldAllowIdentificationCreation } = useUserProfileContext();
 
   const showUsername = attributes.username?.enabled;
   const showEmail = attributes.email_address?.enabled;
@@ -25,13 +26,6 @@ export const AccountPage = withCardStateProvider(() => {
   const showConnectedAccounts = social && Object.values(social).filter(p => p.enabled).length > 0;
   const showEnterpriseAccounts = user && enterpriseSSO.enabled;
   const showWeb3 = attributes.web3_wallet?.enabled;
-
-  const shouldAllowIdentificationCreation =
-    !showEnterpriseAccounts ||
-    !user.enterpriseAccounts.some(
-      enterpriseAccount =>
-        enterpriseAccount.active && enterpriseAccount.enterpriseConnection?.disableAdditionalIdentifications,
-    );
 
   return (
     <Col

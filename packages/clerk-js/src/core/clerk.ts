@@ -75,6 +75,7 @@ import type {
   SignUpRedirectOptions,
   SignUpResource,
   TaskChooseOrganizationProps,
+  TasksRedirectOptions,
   UnsubscribeCallback,
   UserButtonProps,
   UserProfileProps,
@@ -84,7 +85,6 @@ import type {
   Web3Provider,
 } from '@clerk/types';
 
-import type { DebugLoggerInterface } from '@/utils/debug';
 import { debugLogger, initDebugLogger } from '@/utils/debug';
 
 import type { MountComponentRenderer } from '../ui/Components';
@@ -162,11 +162,6 @@ type SetActiveHook = (intent?: 'sign-out') => void | Promise<void>;
 
 export type ClerkCoreBroadcastChannelEvent = { type: 'signout' };
 
-/**
- * Interface for the debug logger with all available logging methods
- */
-// DebugLoggerInterface imported from '@/utils/debug'
-
 declare global {
   interface Window {
     Clerk?: Clerk;
@@ -218,8 +213,6 @@ export class Clerk implements ClerkInterface {
   public __internal_country?: string | null;
   public telemetry: TelemetryCollector | undefined;
   public readonly __internal_state: State = new State();
-  // Deprecated: use global singleton from `@/utils/debug`
-  public debugLogger?: DebugLoggerInterface;
 
   protected internal_last_error: ClerkAPIError | null = null;
   // converted to protected environment to support `updateEnvironment` type assertion
@@ -427,6 +420,21 @@ export class Clerk implements ClerkInterface {
     }
 
     this.#options = this.#initOptions(options);
+
+    // In development mode, if custom router options are provided, warn if both routerPush and routerReplace are not provided
+    if (
+      this.#instanceType === 'development' &&
+      (this.#options.routerPush || this.#options.routerReplace) &&
+      (!this.#options.routerPush || !this.#options.routerReplace)
+    ) {
+      // Typing this.#options as ClerkOptions to ensure proper type checking. TypeScript will infer the type as `never`
+      // since missing both `routerPush` and `routerReplace` is not a valid ClerkOptions.
+      const options = this.#options as ClerkOptions;
+      const missingRouter = !options.routerPush ? 'routerPush' : 'routerReplace';
+      logger.warnOnce(
+        `Clerk: Both \`routerPush\` and \`routerReplace\` need to be defined, but \`${missingRouter}\` is not defined. This may cause issues with navigation in your application.`,
+      );
+    }
 
     /**
      * Listen to `Session.getToken` resolving to emit the updated session
@@ -1595,7 +1603,7 @@ export class Clerk implements ClerkInterface {
     return this.buildUrlWithAuth(this.environment.displayConfig.organizationProfileUrl);
   }
 
-  public buildTasksUrl(): string {
+  public buildTasksUrl(options?: TasksRedirectOptions): string {
     const currentTask = this.session?.currentTask;
     if (!currentTask) {
       return '';
@@ -1608,7 +1616,7 @@ export class Clerk implements ClerkInterface {
 
     return buildURL(
       {
-        base: this.buildSignInUrl(),
+        base: this.buildSignInUrl(options),
         hashPath: getTaskEndpoint(currentTask),
       },
       {
@@ -1707,9 +1715,9 @@ export class Clerk implements ClerkInterface {
     return;
   };
 
-  public redirectToTasks = async (): Promise<unknown> => {
+  public redirectToTasks = async (options?: TasksRedirectOptions): Promise<unknown> => {
     if (inBrowser()) {
-      return this.navigate(this.buildTasksUrl());
+      return this.navigate(this.buildTasksUrl(options));
     }
     return;
   };
@@ -2044,7 +2052,9 @@ export class Clerk implements ClerkInterface {
     }
 
     if (this.session?.currentTask) {
-      await this.redirectToTasks();
+      await this.redirectToTasks({
+        redirectUrl: this.buildAfterSignInUrl(),
+      });
       return;
     }
 
@@ -2293,11 +2303,6 @@ export class Clerk implements ClerkInterface {
 
       const hasTransitionedToPendingStatus = this.session.status === 'active' && session?.status === 'pending';
       if (hasTransitionedToPendingStatus) {
-        const onBeforeSetActive: SetActiveHook =
-          typeof window !== 'undefined' && typeof window.__unstable__onBeforeSetActive === 'function'
-            ? window.__unstable__onBeforeSetActive
-            : noop;
-
         const onAfterSetActive: SetActiveHook =
           typeof window !== 'undefined' && typeof window.__unstable__onAfterSetActive === 'function'
             ? window.__unstable__onAfterSetActive
@@ -2305,7 +2310,7 @@ export class Clerk implements ClerkInterface {
 
         // Execute hooks to update server authentication context and trigger
         // page protections in clerkMiddleware or server components
-        void onBeforeSetActive()?.then?.(() => void onAfterSetActive());
+        void onAfterSetActive();
       }
 
       // Note: this might set this.session to null
@@ -2663,10 +2668,6 @@ export class Clerk implements ClerkInterface {
 
     this.#emit();
   };
-
-  get __internal_hasAfterAuthFlows() {
-    return !!this.environment?.organizationSettings?.forceOrganizationSelection;
-  }
 
   #defaultSession = (client: ClientResource): SignedInSessionResource | null => {
     if (client.lastActiveSessionId) {

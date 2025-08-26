@@ -1,9 +1,9 @@
 import type { TelemetryEventRaw } from '@clerk/types';
-import { promises as fs } from 'fs';
 import { dirname, join } from 'path';
 
 import { canUseKeyless } from '../utils/feature-flags';
 import { createClerkClientWithOptions } from './createClerkClient';
+import { nodeFsOrThrow } from './fs/utils';
 
 const EVENT_KEYLESS_ENV_DRIFT_DETECTED = 'KEYLESS_ENV_DRIFT_DETECTED';
 const EVENT_SAMPLING_RATE = 1; // 100% sampling rate
@@ -41,20 +41,25 @@ function getTelemetryFlagFilePath(): string {
  *   the event should be fired), false if the file already exists (meaning the event was
  *   already fired) or if there was an error creating the file
  */
-async function tryMarkTelemetryEventAsFired(): Promise<boolean> {
+function tryMarkTelemetryEventAsFired(): boolean {
   try {
-    const flagFilePath = getTelemetryFlagFilePath();
-    const flagDirectory = dirname(flagFilePath);
+    if (canUseKeyless) {
+      const { mkdirSync, writeFileSync } = nodeFsOrThrow();
+      const flagFilePath = getTelemetryFlagFilePath();
+      const flagDirectory = dirname(flagFilePath);
 
-    // Ensure the directory exists before attempting to write the file
-    await fs.mkdir(flagDirectory, { recursive: true });
+      // Ensure the directory exists before attempting to write the file
+      mkdirSync(flagDirectory, { recursive: true });
 
-    const flagData = {
-      firedAt: new Date().toISOString(),
-      event: EVENT_KEYLESS_ENV_DRIFT_DETECTED,
-    };
-    await fs.writeFile(flagFilePath, JSON.stringify(flagData, null, 2), { flag: 'wx' });
-    return true;
+      const flagData = {
+        firedAt: new Date().toISOString(),
+        event: EVENT_KEYLESS_ENV_DRIFT_DETECTED,
+      };
+      writeFileSync(flagFilePath, JSON.stringify(flagData, null, 2), { flag: 'wx' });
+      return true;
+    } else {
+      return false;
+    }
   } catch (error: unknown) {
     if ((error as { code?: string })?.code === 'EEXIST') {
       return false;
@@ -172,7 +177,7 @@ export async function detectKeylessEnvDrift(): Promise<void> {
       },
     });
 
-    const shouldFireEvent = await tryMarkTelemetryEventAsFired();
+    const shouldFireEvent = tryMarkTelemetryEventAsFired();
 
     if (shouldFireEvent) {
       // Fire drift detected event only if we successfully created the flag

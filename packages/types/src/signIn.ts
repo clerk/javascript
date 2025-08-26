@@ -1,3 +1,4 @@
+import type { SetActiveNavigate } from './clerk';
 import type {
   BackupCodeAttempt,
   BackupCodeFactor,
@@ -123,17 +124,24 @@ export interface SignInResource extends ClerkResource {
    * @internal
    */
   __internal_toSnapshot: () => SignInJSONSnapshot;
+
+  /**
+   * @internal
+   */
+  __internal_future: SignInFutureResource;
 }
 
 export interface SignInFutureResource {
-  fetchStatus: 'idle' | 'fetching';
   availableStrategies: SignInFirstFactor[];
   status: SignInStatus | null;
+  isTransferable: boolean;
+  existingSession?: { sessionId: string };
   create: (params: {
     identifier?: string;
     strategy?: OAuthStrategy | 'saml' | 'enterprise_sso';
     redirectUrl?: string;
     actionCompleteRedirectUrl?: string;
+    transfer?: boolean;
   }) => Promise<{ error: unknown }>;
   password: (params: { identifier?: string; password: string }) => Promise<{ error: unknown }>;
   emailCode: {
@@ -151,7 +159,7 @@ export interface SignInFutureResource {
     redirectUrl: string;
     redirectUrlComplete: string;
   }) => Promise<{ error: unknown }>;
-  finalize: () => Promise<{ error: unknown }>;
+  finalize: (params?: { navigate?: SetActiveNavigate }) => Promise<{ error: unknown }>;
 }
 
 export type SignInStatus =

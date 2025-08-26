@@ -26,6 +26,7 @@ import type {
   ResetPasswordParams,
   ResetPasswordPhoneCodeFactorConfig,
   SamlConfig,
+  SetActiveNavigate,
   SignInCreateParams,
   SignInFirstFactor,
   SignInFutureResource,
@@ -58,6 +59,7 @@ import {
   webAuthnGetCredential as webAuthnGetCredentialOnWindow,
 } from '../../utils/passkeys';
 import { createValidatePassword } from '../../utils/passwords/password';
+import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
 import {
   clerkInvalidFAPIResponse,
   clerkInvalidStrategy,
@@ -89,7 +91,7 @@ export class SignIn extends BaseResource implements SignInResource {
    *
    * An instance of `SignInFuture`, which has a different API than `SignIn`, intended to be used in custom flows.
    */
-  __internal_future: SignInFuture | null = new SignInFuture(this);
+  __internal_future: SignInFuture = new SignInFuture(this);
 
   /**
    * @internal Only used for internal purposes, and is not intended to be used directly.
@@ -493,8 +495,6 @@ class SignInFuture implements SignInFutureResource {
     submitPassword: this.submitResetPassword.bind(this),
   };
 
-  fetchStatus: 'idle' | 'fetching' = 'idle';
-
   constructor(readonly resource: SignIn) {}
 
   get status() {
@@ -505,9 +505,24 @@ class SignInFuture implements SignInFutureResource {
     return this.resource.supportedFirstFactors ?? [];
   }
 
+  get isTransferable() {
+    return this.resource.firstFactorVerification.status === 'transferable';
+  }
+
+  get existingSession() {
+    if (
+      this.resource.firstFactorVerification.status === 'failed' &&
+      this.resource.firstFactorVerification.error?.code === 'identifier_already_signed_in' &&
+      this.resource.firstFactorVerification.error?.meta?.sessionId
+    ) {
+      return { sessionId: this.resource.firstFactorVerification.error?.meta?.sessionId };
+    }
+
+    return undefined;
+  }
+
   async sendResetPasswordEmailCode(): Promise<{ error: unknown }> {
-    eventBus.emit('resource:error', { resource: this.resource, error: null });
-    try {
+    return runAsyncResourceTask(this.resource, async () => {
       if (!this.resource.id) {
         throw new Error('Cannot reset password without a sign in.');
       }
@@ -525,27 +540,16 @@ class SignInFuture implements SignInFutureResource {
         body: { emailAddressId, strategy: 'reset_password_email_code' },
         action: 'prepare_first_factor',
       });
-    } catch (err: unknown) {
-      eventBus.emit('resource:error', { resource: this.resource, error: err });
-      return { error: err };
-    }
-
-    return { error: null };
+    });
   }
 
   async verifyResetPasswordEmailCode({ code }: { code: string }): Promise<{ error: unknown }> {
-    eventBus.emit('resource:error', { resource: this.resource, error: null });
-    try {
+    return runAsyncResourceTask(this.resource, async () => {
       await this.resource.__internal_basePost({
         body: { code, strategy: 'reset_password_email_code' },
         action: 'attempt_first_factor',
       });
-    } catch (err: unknown) {
-      eventBus.emit('resource:error', { resource: this.resource, error: err });
-      return { error: err };
-    }
-
-    return { error: null };
+    });
   }
 
   async submitResetPassword({
@@ -555,18 +559,12 @@ class SignInFuture implements SignInFutureResource {
     password: string;
     signOutOfOtherSessions?: boolean;
   }): Promise<{ error: unknown }> {
-    eventBus.emit('resource:error', { resource: this.resource, error: null });
-    try {
+    return runAsyncResourceTask(this.resource, async () => {
       await this.resource.__internal_basePost({
         body: { password, signOutOfOtherSessions },
         action: 'reset_password',
       });
-    } catch (err: unknown) {
-      eventBus.emit('resource:error', { resource: this.resource, error: err });
-      return { error: err };
-    }
-
-    return { error: null };
+    });
   }
 
   async create(params: {
@@ -574,40 +572,28 @@ class SignInFuture implements SignInFutureResource {
     strategy?: OAuthStrategy | 'saml' | 'enterprise_sso';
     redirectUrl?: string;
     actionCompleteRedirectUrl?: string;
+    transfer?: boolean;
   }): Promise<{ error: unknown }> {
-    eventBus.emit('resource:error', { resource: this.resource, error: null });
-    try {
+    return runAsyncResourceTask(this.resource, async () => {
       await this.resource.__internal_basePost({
         path: this.resource.pathRoot,
         body: params,
       });
-
-      return { error: null };
-    } catch (err: unknown) {
-      eventBus.emit('resource:error', { resource: this.resource, error: err });
-      return { error: err };
-    }
+    });
   }
 
   async password({ identifier, password }: { identifier?: string; password: string }): Promise<{ error: unknown }> {
-    eventBus.emit('resource:error', { resource: this.resource, error: null });
-    const previousIdentifier = this.resource.identifier;
-    try {
+    return runAsyncResourceTask(this.resource, async () => {
+      const previousIdentifier = this.resource.identifier;
       await this.resource.__internal_basePost({
         path: this.resource.pathRoot,
         body: { identifier: identifier || previousIdentifier, password },
       });
-    } catch (err: unknown) {
-      eventBus.emit('resource:error', { resource: this.resource, error: err });
-      return { error: err };
-    }
-
-    return { error: null };
+    });
   }
 
   async sendEmailCode({ email }: { email: string }): Promise<{ error: unknown }> {
-    eventBus.emit('resource:error', { resource: this.resource, error: null });
-    try {
+    return runAsyncResourceTask(this.resource, async () => {
       if (!this.resource.id) {
         await this.create({ identifier: email });
       }
@@ -623,27 +609,16 @@ class SignInFuture implements SignInFutureResource {
         body: { emailAddressId, strategy: 'email_code' },
         action: 'prepare_first_factor',
       });
-    } catch (err: unknown) {
-      eventBus.emit('resource:error', { resource: this.resource, error: err });
-      return { error: err };
-    }
-
-    return { error: null };
+    });
   }
 
   async verifyEmailCode({ code }: { code: string }): Promise<{ error: unknown }> {
-    eventBus.emit('resource:error', { resource: this.resource, error: null });
-    try {
+    return runAsyncResourceTask(this.resource, async () => {
       await this.resource.__internal_basePost({
         body: { code, strategy: 'email_code' },
         action: 'attempt_first_factor',
       });
-    } catch (err: unknown) {
-      eventBus.emit('resource:error', { resource: this.resource, error: err });
-      return { error: err };
-    }
-
-    return { error: null };
+    });
   }
 
   async sso({
@@ -657,8 +632,7 @@ class SignInFuture implements SignInFutureResource {
     redirectUrl: string;
     redirectUrlComplete: string;
   }): Promise<{ error: unknown }> {
-    eventBus.emit('resource:error', { resource: this.resource, error: null });
-    try {
+    return runAsyncResourceTask(this.resource, async () => {
       if (flow !== 'auto') {
         throw new Error('modal flow is not supported yet');
       }
@@ -678,27 +652,16 @@ class SignInFuture implements SignInFutureResource {
       if (status === 'unverified' && externalVerificationRedirectURL) {
         windowNavigate(externalVerificationRedirectURL);
       }
-    } catch (err: unknown) {
-      eventBus.emit('resource:error', { resource: this.resource, error: err });
-      return { error: err };
-    }
-
-    return { error: null };
+    });
   }
 
-  async finalize(): Promise<{ error: unknown }> {
-    eventBus.emit('resource:error', { resource: this.resource, error: null });
-    try {
+  async finalize({ navigate }: { navigate?: SetActiveNavigate } = {}): Promise<{ error: unknown }> {
+    return runAsyncResourceTask(this.resource, async () => {
       if (!this.resource.createdSessionId) {
         throw new Error('Cannot finalize sign-in without a created session.');
       }
 
-      await SignIn.clerk.setActive({ session: this.resource.createdSessionId });
-    } catch (err: unknown) {
-      eventBus.emit('resource:error', { resource: this.resource, error: err });
-      return { error: err };
-    }
-
-    return { error: null };
+      await SignIn.clerk.setActive({ session: this.resource.createdSessionId, navigate });
+    });
   }
 }

@@ -1,5 +1,39 @@
 # Change Log
 
+## 4.81.0
+
+### Minor Changes
+
+- [Billing Beta] Rename `cancelFreeTrialDescription` to `cancelFreeTrialAccessUntil`. ([#6582](https://github.com/clerk/javascript/pull/6582)) by [@panteliselef](https://github.com/panteliselef)
+
+- [Billing Beta] Replace `redirectUrl` with `navigate` in `checkout.finalize()` ([#6586](https://github.com/clerk/javascript/pull/6586)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Update copies for create organization screen on session tasks ([#6584](https://github.com/clerk/javascript/pull/6584)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Fix incorrect redirect when completing session tasks within `SignIn` and `SignUp` components ([#6580](https://github.com/clerk/javascript/pull/6580)) by [@iagodahlem](https://github.com/iagodahlem)
+
+## 4.80.0
+
+### Minor Changes
+
+- [Experimental] Signal SignUp APIs ([#6571](https://github.com/clerk/javascript/pull/6571)) by [@dstaley](https://github.com/dstaley)
+
+- Update SubscriptionDetails to support free trials ([#6569](https://github.com/clerk/javascript/pull/6569)) by [@panteliselef](https://github.com/panteliselef)
+
+- [Experimental] Signal implementation for SignUp ([#6568](https://github.com/clerk/javascript/pull/6568)) by [@dstaley](https://github.com/dstaley)
+
+## 4.79.0
+
+### Minor Changes
+
+- [Experimental] Signal `fetchStatus` support. ([#6549](https://github.com/clerk/javascript/pull/6549)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Add error handling for `setActive` with stale organization data ([#6550](https://github.com/clerk/javascript/pull/6550)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
 ## 4.78.0
 
 ### Minor Changes

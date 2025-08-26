@@ -1,5 +1,72 @@
 # Change Log
 
+## 5.88.0
+
+### Minor Changes
+
+- [Experimental] Add support for captcha to Signal SignUp ([#6574](https://github.com/clerk/javascript/pull/6574)) by [@dstaley](https://github.com/dstaley)
+
+- Adding /oauth/authorize-with-immediate-redirect to frontendApiRedirectPathsNoUserInput ([#6579](https://github.com/clerk/javascript/pull/6579)) by [@Ben2W](https://github.com/Ben2W)
+
+- [Billing Beta] Replace `redirectUrl` with `navigate` in `checkout.finalize()` ([#6586](https://github.com/clerk/javascript/pull/6586)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- [Billing Beta] Rename `cancelFreeTrialDescription` to `cancelFreeTrialAccessUntil`. ([#6582](https://github.com/clerk/javascript/pull/6582)) by [@panteliselef](https://github.com/panteliselef)
+
+- Update copies for create organization screen on session tasks ([#6584](https://github.com/clerk/javascript/pull/6584)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Add class `cl-planDetails-root` to the parent div element that containes the plan details drawer. ([#6573](https://github.com/clerk/javascript/pull/6573)) by [@panteliselef](https://github.com/panteliselef)
+
+- Fix incorrect redirect when completing session tasks within `SignIn` and `SignUp` components ([#6580](https://github.com/clerk/javascript/pull/6580)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Hide passkeys section when user has an enterprise account with the disable additional identifiers setting enabled ([#6585](https://github.com/clerk/javascript/pull/6585)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+- Improve multi-session navigation to tasks ([#6575](https://github.com/clerk/javascript/pull/6575)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Update notice when cancelling a trial. ([#6582](https://github.com/clerk/javascript/pull/6582)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add a development-mode warning when exactly one of `routerPush` or `routerReplace` is provided in `ClerkOptions`. Both must be defined together for custom router navigation to work correctly. ([#6578](https://github.com/clerk/javascript/pull/6578)) by [@kduprey](https://github.com/kduprey)
+
+- Updated dependencies [[`e52bf8e`](https://github.com/clerk/javascript/commit/e52bf8ebef74a9e123c69b69acde1340c01d32d7), [`edd0f21`](https://github.com/clerk/javascript/commit/edd0f2102b4a1fb891d83a8a07df78601aeb19d1), [`c043c19`](https://github.com/clerk/javascript/commit/c043c1919854aaa5b9cf7f6df5bb517f5617f7a1), [`c28d29c`](https://github.com/clerk/javascript/commit/c28d29c79bb4f144d782313ca72df7db91a77340), [`172e054`](https://github.com/clerk/javascript/commit/172e054a3511be12d16ba19037db320c2d9838bf)]:
+  - @clerk/localizations@3.23.0
+  - @clerk/types@4.81.0
+  - @clerk/shared@3.22.0
+
+## 5.87.0
+
+### Minor Changes
+
+- [Experimental] Signal SignUp APIs ([#6571](https://github.com/clerk/javascript/pull/6571)) by [@dstaley](https://github.com/dstaley)
+
+- Update SubscriptionDetails to support free trials ([#6569](https://github.com/clerk/javascript/pull/6569)) by [@panteliselef](https://github.com/panteliselef)
+
+- [Experimental] Signal implementation for SignUp ([#6568](https://github.com/clerk/javascript/pull/6568)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Fix server-side cache revalidation for Next.js when transitioning from `active` to `pending` session ([#6572](https://github.com/clerk/javascript/pull/6572)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`8dc6bad`](https://github.com/clerk/javascript/commit/8dc6bad5c7051b59bd8c73e65d497f6a974bb1c3), [`aa6a3c3`](https://github.com/clerk/javascript/commit/aa6a3c3d3ba2de67a468c996cbf0bff43a09ddb8), [`db50c47`](https://github.com/clerk/javascript/commit/db50c4734920ada6002de8c62c994047eb6cb5a0)]:
+  - @clerk/types@4.80.0
+  - @clerk/localizations@3.22.0
+  - @clerk/shared@3.21.2
+
+## 5.86.0
+
+### Minor Changes
+
+- [Experimental] Signal `fetchStatus` support. ([#6549](https://github.com/clerk/javascript/pull/6549)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Add error handling for `setActive` with stale organization data ([#6550](https://github.com/clerk/javascript/pull/6550)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`f7e6d29`](https://github.com/clerk/javascript/commit/f7e6d297c629ddf248623a38d3fcbebfd9e4255d), [`413468c`](https://github.com/clerk/javascript/commit/413468c9b9c8fb7576f8e4cbdccff98784e33fef), [`7b7eb1f`](https://github.com/clerk/javascript/commit/7b7eb1fc0235249c5c179239078294118f2947cd)]:
+  - @clerk/localizations@3.21.3
+  - @clerk/shared@3.21.1
+  - @clerk/types@4.79.0
+
 ## 5.85.0
 
 ### Minor Changes

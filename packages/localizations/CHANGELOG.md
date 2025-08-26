@@ -1,5 +1,42 @@
 # Change Log
 
+## 3.23.0
+
+### Minor Changes
+
+- [Billing Beta] Rename `cancelFreeTrialDescription` to `cancelFreeTrialAccessUntil`. ([#6582](https://github.com/clerk/javascript/pull/6582)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Update account deletion localization in zh-CN ([#6577](https://github.com/clerk/javascript/pull/6577)) by [@dearfad](https://github.com/dearfad)
+
+- Update copies for create organization screen on session tasks ([#6584](https://github.com/clerk/javascript/pull/6584)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Updated dependencies [[`e52bf8e`](https://github.com/clerk/javascript/commit/e52bf8ebef74a9e123c69b69acde1340c01d32d7), [`c043c19`](https://github.com/clerk/javascript/commit/c043c1919854aaa5b9cf7f6df5bb517f5617f7a1), [`c28d29c`](https://github.com/clerk/javascript/commit/c28d29c79bb4f144d782313ca72df7db91a77340), [`172e054`](https://github.com/clerk/javascript/commit/172e054a3511be12d16ba19037db320c2d9838bf)]:
+  - @clerk/types@4.81.0
+
+## 3.22.0
+
+### Minor Changes
+
+- Update SubscriptionDetails to support free trials ([#6569](https://github.com/clerk/javascript/pull/6569)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Updated dependencies [[`8dc6bad`](https://github.com/clerk/javascript/commit/8dc6bad5c7051b59bd8c73e65d497f6a974bb1c3), [`aa6a3c3`](https://github.com/clerk/javascript/commit/aa6a3c3d3ba2de67a468c996cbf0bff43a09ddb8), [`db50c47`](https://github.com/clerk/javascript/commit/db50c4734920ada6002de8c62c994047eb6cb5a0)]:
+  - @clerk/types@4.80.0
+
+## 3.21.3
+
+### Patch Changes
+
+- Fix sk-SK delete confirmation text (#6547) ([#6547](https://github.com/clerk/javascript/pull/6547)) by [@l0st0](https://github.com/l0st0)
+
+- Add error handling for `setActive` with stale organization data ([#6550](https://github.com/clerk/javascript/pull/6550)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`413468c`](https://github.com/clerk/javascript/commit/413468c9b9c8fb7576f8e4cbdccff98784e33fef), [`7b7eb1f`](https://github.com/clerk/javascript/commit/7b7eb1fc0235249c5c179239078294118f2947cd)]:
+  - @clerk/types@4.79.0
+
 ## 3.21.2
 
 ### Patch Changes
