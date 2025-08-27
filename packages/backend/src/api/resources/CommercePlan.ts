@@ -1,16 +1,31 @@
 import { Feature } from './Feature';
 import type { CommercePlanJSON } from './JSON';
 
+/**
+ * The `CommerceMoneyAmount` type represents a monetary value with currency information.
+ * @type
+ */
 export type CommerceMoneyAmount = {
+  /**
+   * The raw amount as a number, usually in the smallest unit of the currency (like cents for USD). For example, `1000` for $10.00.
+   */
   amount: number;
+  /**
+   * The amount as a formatted string. For example, `10` for $10.00.
+   */
   amountFormatted: string;
+  /**
+   * The ISO currency code for this amount. For example, `USD` or `EUR`.
+   */
   currency: string;
+  /**
+   * The symbol for the currency. For example, `$`, `€`, or `£`.
+   */
   currencySymbol: string;
 };
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version to avoid breaking changes.
+ * The `CommercePlan` object is similar to the [`CommercePlanResource`](/docs/references/javascript/types/commerce-plan-resource) object as it holds information about a plan, as well as methods for managing it. However, the `CommercePlan` object is different in that it is used in the [Backend API](TODO){{ target: '_blank' }} and is not directly accessible from the Frontend API.
  */
 export class CommercePlan {
   constructor(
@@ -19,7 +34,7 @@ export class CommercePlan {
      */
     readonly id: string,
     /**
-     * The id of the product the plan belongs to.
+     * The ID of the product the plan belongs to.
      */
     readonly productId: string,
     /**

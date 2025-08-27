@@ -4,8 +4,7 @@ import { type CommerceMoneyAmount, CommercePlan } from './CommercePlan';
 import type { CommerceSubscriptionItemJSON } from './JSON';
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version to avoid breaking changes.
+ * The `CommerceSubscriptionItem` object is similar to the [`CommerceSubscriptionItemResource`](/docs/references/javascript/types/commerce-subscription-item-resource) object as it holds information about a subscription item, as well as methods for managing it. However, the `CommerceSubscriptionItem` object is different in that it is used in the [Backend API](TODO){{ target: '_blank' }} and is not directly accessible from the Frontend API.
  */
 export class CommerceSubscriptionItem {
   constructor(
@@ -22,14 +21,20 @@ export class CommerceSubscriptionItem {
      */
     readonly planPeriod: 'month' | 'annual',
     /**
-     * The start of the current period.
+     * Unix timestamp (milliseconds) when the current period starts.
      */
     readonly periodStart: number,
     /**
      * The next payment information.
      */
     readonly nextPayment: {
+      /**
+       * The amount of the next payment.
+       */
       amount: number;
+      /**
+       * Unix timestamp (milliseconds) when the next payment is scheduled.
+       */
       date: number;
     } | null,
     /**
@@ -45,27 +50,27 @@ export class CommerceSubscriptionItem {
      */
     readonly planId: string,
     /**
-     * The date and time the subscription item was created.
+     * Unix timestamp (milliseconds) when the subscription item was created.
      */
     readonly createdAt: number,
     /**
-     * The date and time the subscription item was last updated.
+     * Unix timestamp (milliseconds) when the subscription item was last updated.
      */
     readonly updatedAt: number,
     /**
-     * The end of the current period.
+     * Unix timestamp (milliseconds) when the current period ends.
      */
     readonly periodEnd: number | null,
     /**
-     * When the subscription item was canceled.
+     * Unix timestamp (milliseconds) when the subscription item was canceled.
      */
     readonly canceledAt: number | null,
     /**
-     * When the subscription item became past due.
+     * Unix timestamp (milliseconds) when the subscription item became past due.
      */
     readonly pastDueAt: number | null,
     /**
-     * When the subscription item ended.
+     * Unix timestamp (milliseconds) when the subscription item ended.
      */
     readonly endedAt: number | null,
     /**

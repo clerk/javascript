@@ -3,8 +3,7 @@ import { CommerceSubscriptionItem } from './CommerceSubscriptionItem';
 import type { CommerceSubscriptionJSON } from './JSON';
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version to avoid breaking changes.
+ * The `CommerceSubscription` object is similar to the [`CommerceSubscriptionResource`](/docs/references/javascript/types/commerce-subscription-resource) object as it holds information about a subscription, as well as methods for managing it. However, the `CommerceSubscription` object is different in that it is used in the [Backend API](TODO){{ target: '_blank' }} and is not directly accessible from the Frontend API.
  */
 export class CommerceSubscription {
   constructor(
@@ -21,11 +20,11 @@ export class CommerceSubscription {
      */
     readonly payerId: string,
     /**
-     * Unix timestamp (milliseconds) of creation.
+     * Unix timestamp (milliseconds) when the subscription was created.
      */
     readonly createdAt: number,
     /**
-     * Unix timestamp (milliseconds) of last update.
+     * Unix timestamp (milliseconds) when the subscription was last updated.
      */
     readonly updatedAt: number,
     /**
