@@ -1,4 +1,4 @@
-import { eventThemeUsage } from '../theme-usage';
+import { EVENT_SAMPLING_RATE, EVENT_THEME_USAGE, eventThemeUsage } from '../theme-usage';
 
 describe('eventThemeUsage', () => {
   it('should create telemetry event with shadcn theme name', () => {
@@ -13,8 +13,8 @@ describe('eventThemeUsage', () => {
     const result = eventThemeUsage(appearance);
 
     expect(result).toEqual({
-      event: 'THEME_USAGE',
-      eventSamplingRate: 0.1,
+      event: EVENT_THEME_USAGE,
+      eventSamplingRate: EVENT_SAMPLING_RATE,
       payload: { themeName: 'shadcn' },
     });
   });
@@ -27,8 +27,8 @@ describe('eventThemeUsage', () => {
     const result = eventThemeUsage(appearance);
 
     expect(result).toEqual({
-      event: 'THEME_USAGE',
-      eventSamplingRate: 0.1,
+      event: EVENT_THEME_USAGE,
+      eventSamplingRate: EVENT_SAMPLING_RATE,
       payload: { themeName: 'clerk' },
     });
   });
@@ -47,8 +47,8 @@ describe('eventThemeUsage', () => {
     const result = eventThemeUsage(appearance);
 
     expect(result).toEqual({
-      event: 'THEME_USAGE',
-      eventSamplingRate: 0.1,
+      event: EVENT_THEME_USAGE,
+      eventSamplingRate: EVENT_SAMPLING_RATE,
       payload: { themeName: 'clerk' },
     });
   });
@@ -64,8 +64,8 @@ describe('eventThemeUsage', () => {
     const result = eventThemeUsage(appearance);
 
     expect(result).toEqual({
-      event: 'THEME_USAGE',
-      eventSamplingRate: 0.1,
+      event: EVENT_THEME_USAGE,
+      eventSamplingRate: EVENT_SAMPLING_RATE,
       payload: { themeName: undefined },
     });
   });
@@ -82,8 +82,8 @@ describe('eventThemeUsage', () => {
     const result = eventThemeUsage(appearance);
 
     expect(result).toEqual({
-      event: 'THEME_USAGE',
-      eventSamplingRate: 0.1,
+      event: EVENT_THEME_USAGE,
+      eventSamplingRate: EVENT_SAMPLING_RATE,
       payload: { themeName: 'clerk' },
     });
   });
@@ -99,8 +99,8 @@ describe('eventThemeUsage', () => {
     const result = eventThemeUsage(appearance);
 
     expect(result).toEqual({
-      event: 'THEME_USAGE',
-      eventSamplingRate: 0.1,
+      event: EVENT_THEME_USAGE,
+      eventSamplingRate: EVENT_SAMPLING_RATE,
       payload: { themeName: 'shadcn' },
     });
   });
@@ -109,8 +109,8 @@ describe('eventThemeUsage', () => {
     const result = eventThemeUsage();
 
     expect(result).toEqual({
-      event: 'THEME_USAGE',
-      eventSamplingRate: 0.1,
+      event: EVENT_THEME_USAGE,
+      eventSamplingRate: EVENT_SAMPLING_RATE,
       payload: {},
     });
   });
@@ -119,8 +119,8 @@ describe('eventThemeUsage', () => {
     const result = eventThemeUsage(null as any);
 
     expect(result).toEqual({
-      event: 'THEME_USAGE',
-      eventSamplingRate: 0.1,
+      event: EVENT_THEME_USAGE,
+      eventSamplingRate: EVENT_SAMPLING_RATE,
       payload: {},
     });
   });

@@ -1,7 +1,7 @@
 import type { Appearance, BaseTheme, TelemetryEventRaw } from '@clerk/types';
 
-const EVENT_THEME_USAGE = 'THEME_USAGE';
-const EVENT_SAMPLING_RATE = 1;
+export const EVENT_THEME_USAGE = 'THEME_USAGE';
+export const EVENT_SAMPLING_RATE = 1;
 
 type EventThemeUsage = {
   /**
