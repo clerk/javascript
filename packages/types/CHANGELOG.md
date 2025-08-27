@@ -1,5 +1,17 @@
 # Change Log
 
+## 4.82.0
+
+### Minor Changes
+
+- [Experimental] Signal transfer support ([#6614](https://github.com/clerk/javascript/pull/6614)) by [@dstaley](https://github.com/dstaley)
+
+- [Experimental] Signals `isLoaded` removal ([#6605](https://github.com/clerk/javascript/pull/6605)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Remove unused `__internal_hasAfterAuthFlows` property ([#6609](https://github.com/clerk/javascript/pull/6609)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
 ## 4.81.0
 
 ### Minor Changes

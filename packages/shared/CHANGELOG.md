@@ -1,5 +1,20 @@
 # Change Log
 
+## 3.22.1
+
+### Patch Changes
+
+- Removed unused generateUuid utility ([#6601](https://github.com/clerk/javascript/pull/6601)) by [@jacekradko](https://github.com/jacekradko)
+
+- Mark `__experimental_mode` as hidden. ([#6634](https://github.com/clerk/javascript/pull/6634)) by [@NWylynko](https://github.com/NWylynko)
+
+- Improve assertion error for requiring active organization. ([#6606](https://github.com/clerk/javascript/pull/6606)) by [@panteliselef](https://github.com/panteliselef)
+
+- Do not allow errors in telemetry to bubble up ([#6640](https://github.com/clerk/javascript/pull/6640)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`d52714e`](https://github.com/clerk/javascript/commit/d52714e4cb7f369c74826cd4341c58eb1900abe4), [`2ed539c`](https://github.com/clerk/javascript/commit/2ed539cc7f08ed4d70c33621563ad386ea8becc5), [`c16a7a5`](https://github.com/clerk/javascript/commit/c16a7a5837fc15e0e044baf9c809b8da6fbac795)]:
+  - @clerk/types@4.82.0
+
 ## 3.22.0
 
 ### Minor Changes

@@ -32,7 +32,9 @@ describe('SecurityPage', () => {
 
   it('renders the Password section if instance is password based', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
-      f.withPassword();
+      f.withPassword({
+        required: true,
+      });
       f.withUser({ email_addresses: ['test@clerk.com'] });
     });
     fixtures.clerk.user?.getSessions.mockReturnValue(Promise.resolve([]));

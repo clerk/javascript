@@ -1,6 +1,6 @@
 {
   "name": "@clerk/types",
-  "version": "4.81.0",
+  "version": "4.82.0",
   "description": "Typings for Clerk libraries.",
   "keywords": [
     "clerk",
