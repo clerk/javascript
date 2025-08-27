@@ -83,19 +83,6 @@ function getRelativeLinkReplacements() {
 
 function getCatchAllReplacements() {
   return [
-    // Robustly remove the full Experimental section (including optional Example/code block)
-    // from the first "**`Experimental`**" until the next heading (## ...) or end of file.
-    // This covers variations in wording/whitespace and ensures the block is stripped.
-    {
-      pattern: /(?:^|\r?\n)\*\*`Experimental`\*\*[\s\S]*?(?=(?:\r?\n##\s)|$)/g,
-      replace: '',
-    },
-    // As a safeguard, remove any leftover Example section that specifically shows ClerkProvider clerkJsVersion snippet
-    {
-      pattern:
-        /(?:^|\r?\n)## Example\r?\n(?:\r?\n)?```tsx[\s\S]*?ClerkProvider\s+clerkJsVersion="[^"]*"[\s\S]*?```(?:\r?\n)?/g,
-      replace: '',
-    },
     {
       pattern: /\(setActiveParams\)/g,
       replace: '([setActiveParams](/docs/references/javascript/types/set-active-params))',

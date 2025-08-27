@@ -52,12 +52,18 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
        * @param {{ headingLevel?: number; showSummary?: boolean; showTags?: boolean; showReturns?: boolean; isTableColumn?: boolean }} [options]
        */
       comment: (model, options) => {
-        if (model?.modifierTags.has('@experimental')) {
-          const originalBlockTags = model.blockTags;
-          model.blockTags = model.blockTags.filter(tag => tag.name !== '@example');
+        if (
+          model.hasModifier('@experimental') &&
+          [ReflectionKind.Class, ReflectionKind.Interface].includes(this.page?.model?.kind)
+        ) {
+          model.removeModifier('@experimental');
+          model.removeTags('@example');
+          model.removeTags('@see');
+
           const res = superPartials.comment(model, options);
-          model.blockTags = originalBlockTags;
-          return res;
+
+          const [line, ...linesToInclude] = res.replace(/^\n\n/, '').split('\n');
+          return linesToInclude.join('\n');
         }
         return superPartials.comment(model, options);
       },
