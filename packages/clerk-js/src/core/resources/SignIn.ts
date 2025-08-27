@@ -16,7 +16,6 @@ import type {
   EmailCodeConfig,
   EmailLinkConfig,
   EnterpriseSSOConfig,
-  OAuthStrategy,
   PassKeyConfig,
   PasskeyFactor,
   PhoneCodeConfig,
@@ -26,10 +25,16 @@ import type {
   ResetPasswordParams,
   ResetPasswordPhoneCodeFactorConfig,
   SamlConfig,
-  SetActiveNavigate,
   SignInCreateParams,
   SignInFirstFactor,
+  SignInFutureCreateParams,
+  SignInFutureEmailCodeSendParams,
+  SignInFutureEmailCodeVerifyParams,
+  SignInFutureFinalizeParams,
+  SignInFuturePasswordParams,
+  SignInFutureResetPasswordSubmitParams,
   SignInFutureResource,
+  SignInFutureSSOParams,
   SignInIdentifier,
   SignInJSON,
   SignInJSONSnapshot,
@@ -543,7 +548,8 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async verifyResetPasswordEmailCode({ code }: { code: string }): Promise<{ error: unknown }> {
+  async verifyResetPasswordEmailCode(params: SignInFutureEmailCodeVerifyParams): Promise<{ error: unknown }> {
+    const { code } = params;
     return runAsyncResourceTask(this.resource, async () => {
       await this.resource.__internal_basePost({
         body: { code, strategy: 'reset_password_email_code' },
@@ -552,13 +558,8 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async submitResetPassword({
-    password,
-    signOutOfOtherSessions = true,
-  }: {
-    password: string;
-    signOutOfOtherSessions?: boolean;
-  }): Promise<{ error: unknown }> {
+  async submitResetPassword(params: SignInFutureResetPasswordSubmitParams): Promise<{ error: unknown }> {
+    const { password, signOutOfOtherSessions = true } = params;
     return runAsyncResourceTask(this.resource, async () => {
       await this.resource.__internal_basePost({
         body: { password, signOutOfOtherSessions },
@@ -567,13 +568,7 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async create(params: {
-    identifier?: string;
-    strategy?: OAuthStrategy | 'saml' | 'enterprise_sso';
-    redirectUrl?: string;
-    actionCompleteRedirectUrl?: string;
-    transfer?: boolean;
-  }): Promise<{ error: unknown }> {
+  async create(params: SignInFutureCreateParams): Promise<{ error: unknown }> {
     return runAsyncResourceTask(this.resource, async () => {
       await this.resource.__internal_basePost({
         path: this.resource.pathRoot,
@@ -582,7 +577,8 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async password({ identifier, password }: { identifier?: string; password: string }): Promise<{ error: unknown }> {
+  async password(params: SignInFuturePasswordParams): Promise<{ error: unknown }> {
+    const { identifier, password } = params;
     return runAsyncResourceTask(this.resource, async () => {
       const previousIdentifier = this.resource.identifier;
       await this.resource.__internal_basePost({
@@ -592,7 +588,8 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async sendEmailCode({ email }: { email: string }): Promise<{ error: unknown }> {
+  async sendEmailCode(params: SignInFutureEmailCodeSendParams): Promise<{ error: unknown }> {
+    const { email } = params;
     return runAsyncResourceTask(this.resource, async () => {
       if (!this.resource.id) {
         await this.create({ identifier: email });
@@ -612,7 +609,8 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async verifyEmailCode({ code }: { code: string }): Promise<{ error: unknown }> {
+  async verifyEmailCode(params: SignInFutureEmailCodeVerifyParams): Promise<{ error: unknown }> {
+    const { code } = params;
     return runAsyncResourceTask(this.resource, async () => {
       await this.resource.__internal_basePost({
         body: { code, strategy: 'email_code' },
@@ -621,17 +619,8 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async sso({
-    flow = 'auto',
-    strategy,
-    redirectUrl,
-    redirectUrlComplete,
-  }: {
-    flow?: 'auto' | 'modal';
-    strategy: OAuthStrategy | 'saml' | 'enterprise_sso';
-    redirectUrl: string;
-    redirectUrlComplete: string;
-  }): Promise<{ error: unknown }> {
+  async sso(params: SignInFutureSSOParams): Promise<{ error: unknown }> {
+    const { flow = 'auto', strategy, redirectUrl, redirectUrlComplete } = params;
     return runAsyncResourceTask(this.resource, async () => {
       if (flow !== 'auto') {
         throw new Error('modal flow is not supported yet');
@@ -655,7 +644,8 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async finalize({ navigate }: { navigate?: SetActiveNavigate } = {}): Promise<{ error: unknown }> {
+  async finalize(params?: SignInFutureFinalizeParams): Promise<{ error: unknown }> {
+    const { navigate } = params || {};
     return runAsyncResourceTask(this.resource, async () => {
       if (!this.resource.createdSessionId) {
         throw new Error('Cannot finalize sign-in without a created session.');
