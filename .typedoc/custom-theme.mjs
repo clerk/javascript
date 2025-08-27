@@ -220,11 +220,31 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
 
         // Extract the Accessors group (if any) and prevent default rendering for it
         const originalGroups = customizedModel.groups;
+
+        const experimentalGroups = originalGroups?.find(g =>
+          g?.owningReflection?.comment?.modifierTags.has('@experimental'),
+        );
+
+        if (experimentalGroups) {
+          const groupsWithoutMethods = originalGroups?.filter(g => g.title === 'Properties');
+
+          customizedModel.groups = groupsWithoutMethods;
+          const nonAccessorOutput = superPartials.memberWithGroups(customizedModel, options);
+          customizedModel.groups = originalGroups;
+
+          return nonAccessorOutput;
+        }
+
         const accessorsGroup = originalGroups?.find(g => g.title === 'Accessors');
         const groupsWithoutAccessors = originalGroups?.filter(g => g.title !== 'Accessors');
 
         customizedModel.groups = groupsWithoutAccessors;
         const nonAccessorOutput = superPartials.memberWithGroups(customizedModel, options);
+
+        if (experimentalGroups) {
+          return nonAccessorOutput;
+        }
+
         customizedModel.groups = originalGroups;
 
         /** @type {string[]} */
