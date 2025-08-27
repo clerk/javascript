@@ -135,6 +135,12 @@ function getCatchAllReplacements() {
       pattern: /\*\*Deprecated\*\*/g,
       replace: '**Deprecated.**',
     },
+    // Remove the standard experimental API notice block (with or without leading/trailing whitespace or newlines)
+    {
+      pattern:
+        /(?:\r?\n)?\*\*`Experimental`\*\*\r?\n\r?\nThis is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change\.\r?\nIt is advised to pin the SDK version to avoid breaking changes\.\r?\n?/g,
+      replace: '',
+    },
     {
       /**
        * By default, `@default` is output with "**Default** `value`". We want to capture the value and place it inside "Defaults to `value`."
