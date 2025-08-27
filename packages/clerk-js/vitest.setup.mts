@@ -65,6 +65,12 @@ if (typeof window !== 'undefined') {
     })),
   });
 
+  // Mock document.elementFromPoint for input-otp library
+  Object.defineProperty(document, 'elementFromPoint', {
+    value: vi.fn().mockReturnValue(null),
+    writable: true,
+  });
+
   // Mock IntersectionObserver
   //@ts-expect-error - Mocking class
   globalThis.IntersectionObserver = class IntersectionObserver {

@@ -176,17 +176,21 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
   }
 
   record(event: TelemetryEventRaw): void {
-    const preparedPayload = this.#preparePayload(event.event, event.payload);
+    try {
+      const preparedPayload = this.#preparePayload(event.event, event.payload);
 
-    this.#logEvent(preparedPayload.event, preparedPayload);
+      this.#logEvent(preparedPayload.event, preparedPayload);
 
-    if (!this.#shouldRecord(preparedPayload, event.eventSamplingRate)) {
-      return;
+      if (!this.#shouldRecord(preparedPayload, event.eventSamplingRate)) {
+        return;
+      }
+
+      this.#buffer.push({ kind: 'event', value: preparedPayload });
+
+      this.#scheduleFlush();
+    } catch (error) {
+      console.error('[clerk/telemetry] Error recording telemetry event', error);
     }
-
-    this.#buffer.push({ kind: 'event', value: preparedPayload });
-
-    this.#scheduleFlush();
   }
 
   /**
@@ -195,49 +199,53 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
    * @param entry - The telemetry log entry to record.
    */
   recordLog(entry: TelemetryLogEntry): void {
-    if (!this.#shouldRecordLog(entry)) {
-      return;
-    }
-
-    const levelIsValid = typeof entry?.level === 'string' && VALID_LOG_LEVELS.has(entry.level);
-    const messageIsValid = typeof entry?.message === 'string' && entry.message.trim().length > 0;
-
-    let normalizedTimestamp: Date | null = null;
-    const timestampInput: unknown = (entry as unknown as { timestamp?: unknown })?.timestamp;
-    if (typeof timestampInput === 'number' || typeof timestampInput === 'string') {
-      const candidate = new Date(timestampInput);
-      if (!Number.isNaN(candidate.getTime())) {
-        normalizedTimestamp = candidate;
+    try {
+      if (!this.#shouldRecordLog(entry)) {
+        return;
       }
-    }
 
-    if (!levelIsValid || !messageIsValid || normalizedTimestamp === null) {
-      if (this.isDebug && typeof console !== 'undefined') {
-        console.warn('[clerk/telemetry] Dropping invalid telemetry log entry', {
-          levelIsValid,
-          messageIsValid,
-          timestampIsValid: normalizedTimestamp !== null,
-        });
+      const levelIsValid = typeof entry?.level === 'string' && VALID_LOG_LEVELS.has(entry.level);
+      const messageIsValid = typeof entry?.message === 'string' && entry.message.trim().length > 0;
+
+      let normalizedTimestamp: Date | null = null;
+      const timestampInput: unknown = (entry as unknown as { timestamp?: unknown })?.timestamp;
+      if (typeof timestampInput === 'number' || typeof timestampInput === 'string') {
+        const candidate = new Date(timestampInput);
+        if (!Number.isNaN(candidate.getTime())) {
+          normalizedTimestamp = candidate;
+        }
       }
-      return;
+
+      if (!levelIsValid || !messageIsValid || normalizedTimestamp === null) {
+        if (this.isDebug && typeof console !== 'undefined') {
+          console.warn('[clerk/telemetry] Dropping invalid telemetry log entry', {
+            levelIsValid,
+            messageIsValid,
+            timestampIsValid: normalizedTimestamp !== null,
+          });
+        }
+        return;
+      }
+
+      const sdkMetadata = this.#getSDKMetadata();
+
+      const logData: TelemetryLogData = {
+        sdk: sdkMetadata.name,
+        sdkv: sdkMetadata.version,
+        cv: this.#metadata.clerkVersion ?? '',
+        lvl: entry.level,
+        msg: entry.message,
+        ts: normalizedTimestamp.toISOString(),
+        pk: this.#metadata.publishableKey || null,
+        payload: this.#sanitizeContext(entry.context),
+      };
+
+      this.#buffer.push({ kind: 'log', value: logData });
+
+      this.#scheduleFlush();
+    } catch (error) {
+      console.error('[clerk/telemetry] Error recording telemetry log entry', error);
     }
-
-    const sdkMetadata = this.#getSDKMetadata();
-
-    const logData: TelemetryLogData = {
-      sdk: sdkMetadata.name,
-      sdkv: sdkMetadata.version,
-      cv: this.#metadata.clerkVersion ?? '',
-      lvl: entry.level,
-      msg: entry.message,
-      ts: normalizedTimestamp.toISOString(),
-      pk: this.#metadata.publishableKey || null,
-      payload: this.#sanitizeContext(entry.context),
-    };
-
-    this.#buffer.push({ kind: 'log', value: logData });
-
-    this.#scheduleFlush();
   }
 
   #shouldRecord(preparedPayload: TelemetryEvent, eventSamplingRate?: number) {
@@ -271,7 +279,6 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
       this.#flush();
       return;
     }
-
     const isBufferFull = this.#buffer.length >= this.#config.maxBufferSize;
     if (isBufferFull) {
       // If the buffer is full, flush immediately to make sure we minimize the chance of event loss.

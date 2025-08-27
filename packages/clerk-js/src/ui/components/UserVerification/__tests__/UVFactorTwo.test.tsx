@@ -30,11 +30,11 @@ describe('UserVerificationFactorTwo', () => {
       supportedSecondFactors: [{ strategy: 'phone_code' }],
     });
 
-    const { getByText, getAllByLabelText } = render(<UserVerificationFactorTwo />, { wrapper });
+    const { getByText, getAllByTestId } = render(<UserVerificationFactorTwo />, { wrapper });
 
     await waitFor(() => {
       getByText('Verification required');
-      const inputs = getAllByLabelText(/digit/i);
+      const inputs = getAllByTestId('otp-input-segment');
       expect(inputs.length).toBe(6);
     });
   });
