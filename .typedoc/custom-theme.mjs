@@ -262,10 +262,6 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
         customizedModel.groups = groupsWithoutAccessors;
         const nonAccessorOutput = superPartials.memberWithGroups(customizedModel, options);
 
-        if (experimentalGroups) {
-          return nonAccessorOutput;
-        }
-
         customizedModel.groups = originalGroups;
 
         /** @type {string[]} */
