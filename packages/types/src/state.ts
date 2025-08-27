@@ -1,5 +1,5 @@
 import type { SignInFutureResource } from './signInFuture';
-import type { SignUpFutureResource } from './signUp';
+import type { SignUpFutureResource } from './signUpFuture';
 
 interface FieldError {
   code: string;
