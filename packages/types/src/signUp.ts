@@ -1,23 +1,33 @@
-import type {
-  AttemptVerificationParams,
-  PrepareVerificationParams,
-  SignUpAuthenticateWithWeb3Params,
-  SignUpCreateParams,
-  SignUpField,
-  SignUpIdentificationField,
-  SignUpStatus,
-  SignUpUpdateParams,
-  SignUpVerificationsResource,
-} from 'signUpCommon';
+import type { PhoneCodeChannel } from 'phoneCodeChannel';
 
+import type { FirstNameAttribute, LastNameAttribute, LegalAcceptedAttribute, PasswordAttribute } from './attributes';
+import type { SetActiveNavigate } from './clerk';
 import type { AttemptEmailAddressVerificationParams, PrepareEmailAddressVerificationParams } from './emailAddress';
+import type {
+  EmailAddressIdentifier,
+  EmailAddressOrPhoneNumberIdentifier,
+  PhoneNumberIdentifier,
+  UsernameIdentifier,
+  Web3WalletIdentifier,
+} from './identifiers';
 import type { ValidatePasswordCallbacks } from './passwords';
 import type { AttemptPhoneNumberVerificationParams, PreparePhoneNumberVerificationParams } from './phoneNumber';
 import type { AuthenticateWithPopupParams, AuthenticateWithRedirectParams } from './redirects';
 import type { ClerkResource } from './resource';
-import type { SignUpFutureResource } from './signUpFuture';
-import type { SignUpJSONSnapshot } from './snapshots';
-import type { CreateEmailLinkFlowReturn, StartEmailLinkFlowParams } from './verification';
+import type { SignUpJSONSnapshot, SignUpVerificationJSONSnapshot, SignUpVerificationsJSONSnapshot } from './snapshots';
+import type {
+  EmailCodeStrategy,
+  EmailLinkStrategy,
+  EnterpriseSSOStrategy,
+  GoogleOneTapStrategy,
+  OAuthStrategy,
+  PhoneCodeStrategy,
+  SamlStrategy,
+  TicketStrategy,
+  Web3Strategy,
+} from './strategies';
+import type { SnakeToCamel } from './utils';
+import type { CreateEmailLinkFlowReturn, StartEmailLinkFlowParams, VerificationResource } from './verification';
 import type {
   AttemptWeb3WalletVerificationParams,
   AuthenticateWithWeb3Params,
@@ -112,4 +122,125 @@ export interface SignUpResource extends ClerkResource {
    * @internal
    */
   __internal_future: SignUpFutureResource;
+}
+
+export interface SignUpFutureResource {
+  status: SignUpStatus | null;
+  unverifiedFields: SignUpIdentificationField[];
+  isTransferable: boolean;
+  existingSession?: { sessionId: string };
+  create: (params: { transfer?: boolean }) => Promise<{ error: unknown }>;
+  verifications: {
+    sendEmailCode: () => Promise<{ error: unknown }>;
+    verifyEmailCode: (params: { code: string }) => Promise<{ error: unknown }>;
+  };
+  password: (params: { emailAddress: string; password: string }) => Promise<{ error: unknown }>;
+  sso: (params: { strategy: string; redirectUrl: string; redirectUrlComplete: string }) => Promise<{ error: unknown }>;
+  finalize: (params?: { navigate?: SetActiveNavigate }) => Promise<{ error: unknown }>;
+}
+
+export type SignUpStatus = 'missing_requirements' | 'complete' | 'abandoned';
+
+export type SignUpField = SignUpAttributeField | SignUpIdentificationField;
+
+export type PrepareVerificationParams =
+  | {
+      strategy: EmailCodeStrategy;
+    }
+  | {
+      strategy: EmailLinkStrategy;
+      redirectUrl?: string;
+    }
+  | {
+      strategy: PhoneCodeStrategy;
+      channel?: PhoneCodeChannel;
+    }
+  | {
+      strategy: Web3Strategy;
+    }
+  | {
+      strategy: OAuthStrategy;
+      redirectUrl?: string;
+      actionCompleteRedirectUrl?: string;
+      oidcPrompt?: string;
+      oidcLoginHint?: string;
+    }
+  | {
+      strategy: SamlStrategy | EnterpriseSSOStrategy;
+      redirectUrl?: string;
+      actionCompleteRedirectUrl?: string;
+    };
+
+export type AttemptVerificationParams =
+  | {
+      strategy: EmailCodeStrategy | PhoneCodeStrategy;
+      code: string;
+    }
+  | {
+      strategy: Web3Strategy;
+      signature: string;
+    };
+
+export type SignUpAttributeField = FirstNameAttribute | LastNameAttribute | PasswordAttribute | LegalAcceptedAttribute;
+
+// TODO: SignUpVerifiableField or SignUpIdentifier?
+export type SignUpVerifiableField =
+  | UsernameIdentifier
+  | EmailAddressIdentifier
+  | PhoneNumberIdentifier
+  | EmailAddressOrPhoneNumberIdentifier
+  | Web3WalletIdentifier;
+
+// TODO: Does it make sense that the identification *field* holds a *strategy*?
+export type SignUpIdentificationField = SignUpVerifiableField | OAuthStrategy | SamlStrategy | EnterpriseSSOStrategy;
+
+// TODO: Replace with discriminated union type
+export type SignUpCreateParams = Partial<
+  {
+    externalAccountStrategy: string;
+    externalAccountRedirectUrl: string;
+    externalAccountActionCompleteRedirectUrl: string;
+    strategy:
+      | OAuthStrategy
+      | SamlStrategy
+      | EnterpriseSSOStrategy
+      | TicketStrategy
+      | GoogleOneTapStrategy
+      | PhoneCodeStrategy;
+    redirectUrl: string;
+    actionCompleteRedirectUrl: string;
+    transfer: boolean;
+    unsafeMetadata: SignUpUnsafeMetadata;
+    ticket: string;
+    token: string;
+    legalAccepted: boolean;
+    oidcPrompt: string;
+    oidcLoginHint: string;
+    channel: PhoneCodeChannel;
+  } & Omit<SnakeToCamel<Record<SignUpAttributeField | SignUpVerifiableField, string>>, 'legalAccepted'>
+>;
+
+export type SignUpUpdateParams = SignUpCreateParams;
+
+/**
+ * @deprecated Use `SignUpAuthenticateWithWeb3Params` instead.
+ */
+export type SignUpAuthenticateWithMetamaskParams = SignUpAuthenticateWithWeb3Params;
+
+export type SignUpAuthenticateWithWeb3Params = {
+  unsafeMetadata?: SignUpUnsafeMetadata;
+};
+
+export interface SignUpVerificationsResource {
+  emailAddress: SignUpVerificationResource;
+  phoneNumber: SignUpVerificationResource;
+  externalAccount: VerificationResource;
+  web3Wallet: VerificationResource;
+  __internal_toSnapshot: () => SignUpVerificationsJSONSnapshot;
+}
+
+export interface SignUpVerificationResource extends VerificationResource {
+  supportedStrategies: string[];
+  nextAction: string;
+  __internal_toSnapshot: () => SignUpVerificationJSONSnapshot;
 }

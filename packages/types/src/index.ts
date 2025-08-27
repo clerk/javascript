@@ -60,7 +60,6 @@ export * from './signInCommon';
 export * from './signInFuture';
 export * from './signUp';
 export * from './signUpCommon';
-export * from './signUpFuture';
 export * from './snapshots';
 export * from './ssr';
 export * from './state';

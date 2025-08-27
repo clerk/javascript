@@ -28,7 +28,6 @@ import type { SessionStatus, SessionTask } from './session';
 import type { SessionVerificationLevel, SessionVerificationStatus } from './sessionVerification';
 import type { SignInJSON } from './signIn';
 import type { SignInFirstFactor, SignInSecondFactor } from './signInCommon';
-import type { SignUpField, SignUpIdentificationField, SignUpStatus } from './signUpCommon';
 import type { BoxShadow, Color, EmUnit, FontWeight, HexColor } from './theme';
 import type { UserSettingsJSON } from './userSettings';
 import type { CamelToSnake } from './utils';

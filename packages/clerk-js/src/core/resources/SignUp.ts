@@ -14,15 +14,11 @@ import type {
   PreparePhoneNumberVerificationParams,
   PrepareVerificationParams,
   PrepareWeb3WalletVerificationParams,
+  SetActiveNavigate,
   SignUpAuthenticateWithWeb3Params,
   SignUpCreateParams,
   SignUpField,
-  SignUpFutureCreateParams,
-  SignUpFutureEmailCodeVerifyParams,
-  SignUpFutureFinalizeParams,
-  SignUpFuturePasswordParams,
   SignUpFutureResource,
-  SignUpFutureSSoParams,
   SignUpIdentificationField,
   SignUpJSON,
   SignUpJSONSnapshot,
@@ -528,8 +524,7 @@ class SignUpFuture implements SignUpFutureResource {
     return { captchaToken, captchaWidgetType, captchaError };
   }
 
-  async create(params: SignUpFutureCreateParams): Promise<{ error: unknown }> {
-    const { transfer } = params;
+  async create({ transfer }: { transfer?: boolean }): Promise<{ error: unknown }> {
     return runAsyncResourceTask(this.resource, async () => {
       const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
       await this.resource.__internal_basePost({
@@ -539,8 +534,7 @@ class SignUpFuture implements SignUpFutureResource {
     });
   }
 
-  async password(params: SignUpFuturePasswordParams): Promise<{ error: unknown }> {
-    const { emailAddress, password } = params;
+  async password({ emailAddress, password }: { emailAddress: string; password: string }): Promise<{ error: unknown }> {
     return runAsyncResourceTask(this.resource, async () => {
       const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
 
@@ -567,8 +561,7 @@ class SignUpFuture implements SignUpFutureResource {
     });
   }
 
-  async verifyEmailCode(params: SignUpFutureEmailCodeVerifyParams): Promise<{ error: unknown }> {
-    const { code } = params;
+  async verifyEmailCode({ code }: { code: string }): Promise<{ error: unknown }> {
     return runAsyncResourceTask(this.resource, async () => {
       await this.resource.__internal_basePost({
         body: { strategy: 'email_code', code },
@@ -577,8 +570,15 @@ class SignUpFuture implements SignUpFutureResource {
     });
   }
 
-  async sso(params: SignUpFutureSSoParams): Promise<{ error: unknown }> {
-    const { strategy, redirectUrl, redirectUrlComplete } = params;
+  async sso({
+    strategy,
+    redirectUrl,
+    redirectUrlComplete,
+  }: {
+    strategy: string;
+    redirectUrl: string;
+    redirectUrlComplete: string;
+  }): Promise<{ error: unknown }> {
     return runAsyncResourceTask(this.resource, async () => {
       const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
       await this.resource.__internal_basePost({
@@ -603,8 +603,7 @@ class SignUpFuture implements SignUpFutureResource {
     });
   }
 
-  async finalize(params?: SignUpFutureFinalizeParams): Promise<{ error: unknown }> {
-    const { navigate } = params || {};
+  async finalize({ navigate }: { navigate?: SetActiveNavigate } = {}): Promise<{ error: unknown }> {
     return runAsyncResourceTask(this.resource, async () => {
       if (!this.resource.createdSessionId) {
         throw new Error('Cannot finalize sign-up without a created session.');
