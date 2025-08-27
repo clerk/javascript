@@ -5,6 +5,7 @@ import type { CommerceSubscriptionItemJSON } from './JSON';
 
 /**
  * The `CommerceSubscriptionItem` object is similar to the [`CommerceSubscriptionItemResource`](/docs/references/javascript/types/commerce-subscription-item-resource) object as it holds information about a subscription item, as well as methods for managing it. However, the `CommerceSubscriptionItem` object is different in that it is used in the [Backend API](TODO){{ target: '_blank' }} and is not directly accessible from the Frontend API.
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version to avoid breaking changes.
  */
 export class CommerceSubscriptionItem {
   constructor(
