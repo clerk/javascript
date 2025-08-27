@@ -1,3 +1,7 @@
+---
+'@clerk/localizations': minor
+---
+
 Complete Romanian (ro-RO) localization
 
 This update:
