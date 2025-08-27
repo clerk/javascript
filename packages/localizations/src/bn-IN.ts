@@ -14,26 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const bnIN: LocalizationResource = {
   locale: 'bn-IN',
-  taskChooseOrganization: {
-    signOut: {
-      actionLink: 'সাইন আউট',
-      actionText: '{{identifier}} হিসাবে সাইন ইন করা হয়েছে',
-    },
-    createOrganization: {
-      title: 'আপনার অ্যাকাউন্ট সেটআপ করুন',
-      subtitle: 'আপনার সংগঠন সম্পর্কে আমাদের একটু বলুন',
-      formButtonSubmit: 'নতুন সংগঠন তৈরি করুন',
-      formButtonReset: 'বাতিল করুন',
-    },
-    chooseOrganization: {
-      title: 'একটি সংগঠন চয়ন করুন',
-      subtitle: 'একটি বিদ্যমান সংগঠনে যোগ দিন বা একটি নতুন তৈরি করুন',
-      suggestionsAcceptedLabel: 'অনুমোদনের অপেক্ষায়',
-      action__createOrganization: 'নতুন সংগঠন তৈরি করুন',
-      action__suggestionsAccept: 'যোগ দেওয়ার অনুরোধ করুন',
-      action__invitationAccept: 'যোগ দিন',
-    },
-  },
   apiKeys: {
     action__add: 'নতুন কী যোগ করুন',
     action__search: 'কী অনুসন্ধান করুন',
@@ -831,27 +811,23 @@ export const bnIN: LocalizationResource = {
   socialButtonsBlockButton: '{{provider|titleize}} দিয়ে চালিয়ে যান',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
-    chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+   chooseOrganization: {
+      title: 'একটি সংগঠন চয়ন করুন',
+      subtitle: 'একটি বিদ্যমান সংগঠনে যোগ দিন বা একটি নতুন তৈরি করুন',
+      suggestionsAcceptedLabel: 'অনুমোদনের অপেক্ষায়',
+      action__createOrganization: 'নতুন সংগঠন তৈরি করুন',
+      action__suggestionsAccept: 'যোগ দেওয়ার অনুরোধ করুন',
+      action__invitationAccept: 'যোগ দিন',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      title: 'আপনার অ্যাকাউন্ট সেটআপ করুন',
+      subtitle: 'আপনার সংগঠন সম্পর্কে আমাদের একটু বলুন',
+      formButtonSubmit: 'নতুন সংগঠন তৈরি করুন',
+      formButtonReset: 'বাতিল করুন',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'সাইন আউট',
+      actionText: '{{identifier}} হিসাবে সাইন ইন করা হয়েছে',
     },
   },
   unstable__errors: {
