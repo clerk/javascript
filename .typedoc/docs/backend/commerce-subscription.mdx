@@ -1,0 +1,60 @@
+**`Experimental`**
+
+This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+It is advised to pin the SDK version to avoid breaking changes.
+
+## Constructors
+
+### Constructor
+
+**`Experimental`**
+
+#### Parameters
+
+| Parameter              | Type                                                                                        | Description                                                          |
+| ---------------------- | ------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| `id`                   | `string`                                                                                    | The unique identifier for the commerce subscription.                 |
+| `status`               | <code>"abandoned" \| "active" \| "ended" \| "canceled" \| "incomplete" \| "past_due"</code> | The current status of the subscription.                              |
+| `payerId`              | `string`                                                                                    | The ID of the payer for this subscription.                           |
+| `createdAt`            | `number`                                                                                    | Unix timestamp (milliseconds) of creation.                           |
+| `updatedAt`            | `number`                                                                                    | Unix timestamp (milliseconds) of last update.                        |
+| `activeAt`             | <code>null \| number</code>                                                                 | Unix timestamp (milliseconds) when the subscription became active.   |
+| `pastDueAt`            | <code>null \| number</code>                                                                 | Unix timestamp (milliseconds) when the subscription became past due. |
+| `subscriptionItems`    | <code>[CommerceSubscriptionItem](commerce-subscription-item.mdx)[]</code>                   | Array of subscription items in this subscription.                    |
+| `nextPayment`          | <code>null \| \{ amount: CommerceMoneyAmount; date: number; \}</code>                       | Information about the next scheduled payment.                        |
+| `eligibleForFreeTrial` | `boolean`                                                                                   | Whether the payer is eligible for a free trial.                      |
+
+#### Returns
+
+`CommerceSubscription`
+
+## Properties
+
+| Property                                                 | Type                                                                                        | Description                                                                             |
+| -------------------------------------------------------- | ------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| <a id="activeat"></a> `activeAt`                         | <code>null \| number</code>                                                                 | **`Experimental`** Unix timestamp (milliseconds) when the subscription became active.   |
+| <a id="createdat"></a> `createdAt`                       | `number`                                                                                    | **`Experimental`** Unix timestamp (milliseconds) of creation.                           |
+| <a id="eligibleforfreetrial"></a> `eligibleForFreeTrial` | `boolean`                                                                                   | **`Experimental`** Whether the payer is eligible for a free trial.                      |
+| <a id="id"></a> `id`                                     | `string`                                                                                    | **`Experimental`** The unique identifier for the commerce subscription.                 |
+| <a id="nextpayment"></a> `nextPayment`                   | <code>null \| \{ amount: CommerceMoneyAmount; date: number; \}</code>                       | **`Experimental`** Information about the next scheduled payment.                        |
+| <a id="pastdueat"></a> `pastDueAt`                       | <code>null \| number</code>                                                                 | **`Experimental`** Unix timestamp (milliseconds) when the subscription became past due. |
+| <a id="payerid"></a> `payerId`                           | `string`                                                                                    | **`Experimental`** The ID of the payer for this subscription.                           |
+| <a id="status"></a> `status`                             | <code>"abandoned" \| "active" \| "ended" \| "canceled" \| "incomplete" \| "past_due"</code> | **`Experimental`** The current status of the subscription.                              |
+| <a id="subscriptionitems"></a> `subscriptionItems`       | <code>[CommerceSubscriptionItem](commerce-subscription-item.mdx)[]</code>                   | **`Experimental`** Array of subscription items in this subscription.                    |
+| <a id="updatedat"></a> `updatedAt`                       | `number`                                                                                    | **`Experimental`** Unix timestamp (milliseconds) of last update.                        |
+
+## Methods
+
+### fromJSON()
+
+**`Experimental`**
+
+#### Parameters
+
+| Parameter | Type                       |
+| --------- | -------------------------- |
+| `data`    | `CommerceSubscriptionJSON` |
+
+#### Returns
+
+`CommerceSubscription`

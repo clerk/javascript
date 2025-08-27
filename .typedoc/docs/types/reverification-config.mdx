@@ -1,0 +1,10 @@
+The `ReverificationConfig` type has the following properties:
+
+## Type declaration
+
+<code>"strict" \| "strict_mfa" \| "moderate" \| "lax"</code>
+
+| Name           | Type                                                             | Description                                                                                                |
+| -------------- | ---------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `afterMinutes` | `SessionVerificationAfterMinutes`                                | The age of the factor level to check for. Value should be greater than or equal to 1 and less than 99,999. |
+| `level`        | <code>"first_factor" \| "second_factor" \| "multi_factor"</code> | The reverification level of credentials to check for.                                                      |

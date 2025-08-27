@@ -1,0 +1,34 @@
+The `Organization` object holds information about an organization, as well as methods for managing it.
+
+To use these methods, you must have the **Organizations** feature [enabled in your app's settings in the Clerk Dashboard](/docs/organizations/overview#enable-organizations-in-your-application).
+
+## Properties
+
+| Property                                                       | Type                                                                                                                                                                                                                                   | Description                                                                                                                                                                                                                                                                                                         | Overrides                                                           |
+| -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| <a id="addpaymentsource"></a> `addPaymentSource`               | <code>(params) => Promise\<[CommercePaymentSourceResource](commerce-payment-source-resource.mdx)\></code>                                                                                                                              | **`Experimental`** This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes. Example: `<ClerkProvider clerkJsVersion="x.x.x" />`. | -                                                                   |
+| <a id="getpaymentsources"></a> `getPaymentSources`             | <code>(params) => Promise\<[ClerkPaginatedResponse](/docs/references/javascript/types/clerk-paginated-response)\<[CommercePaymentSourceResource](commerce-payment-source-resource.mdx)\>\></code>                                      | **`Experimental`** This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes. Example: `<ClerkProvider clerkJsVersion="x.x.x" />`. | -                                                                   |
+| <a id="getsubscriptions"></a> `getSubscriptions`               | <code>(params?) => Promise\<[ClerkPaginatedResponse](/docs/references/javascript/types/clerk-paginated-response)\<[CommerceSubscriptionItemResource](/docs/references/javascript/types/commerce-subscription-item-resource)\>\></code> | **`Experimental`** This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.                                                                                                                                                                     | -                                                                   |
+| <a id="id"></a> `id`                                           | `string`                                                                                                                                                                                                                               | The unique identifier of the resource.                                                                                                                                                                                                                                                                              | [`ClerkResource`](clerk-resource.mdx).[`id`](clerk-resource.mdx#id) |
+| <a id="initializepaymentsource"></a> `initializePaymentSource` | <code>(params) => Promise\<[CommerceInitializedPaymentSourceResource](commerce-initialized-payment-source-resource.mdx)\></code>                                                                                                       | **`Experimental`** This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes. Example: `<ClerkProvider clerkJsVersion="x.x.x" />`. | -                                                                   |
+| <a id="pathroot"></a> `pathRoot`                               | `string`                                                                                                                                                                                                                               | The root path of the resource.                                                                                                                                                                                                                                                                                      | -                                                                   |
+
+## Methods
+
+### reload()
+
+Reload the resource and return the resource itself.
+
+#### Parameters
+
+| Parameter | Type                        |
+| --------- | --------------------------- |
+| `p?`      | `ClerkResourceReloadParams` |
+
+#### Returns
+
+`Promise`\<`OrganizationResource`\>
+
+#### Inherited from
+
+[`ClerkResource`](clerk-resource.mdx).[`reload`](clerk-resource.mdx#reload)

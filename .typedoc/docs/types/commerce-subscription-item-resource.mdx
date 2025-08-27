@@ -1,0 +1,51 @@
+**`Experimental`**
+
+This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+
+## Example
+
+```tsx
+<ClerkProvider clerkJsVersion="x.x.x" />
+```
+
+## Properties
+
+| Property                                       | Type                                                                         | Description                                                                                                                                                                                                                                                                                                         | Overrides                                                           |
+| ---------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| <a id="amount"></a> `amount?`                  | [`CommerceMoneyAmount`](commerce-money-amount.mdx)                           | **`Experimental`** This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes. Example: `<ClerkProvider clerkJsVersion="x.x.x" />`. | -                                                                   |
+| <a id="cancel"></a> `cancel`                   | <code>(params) => Promise\<DeletedObjectResource\></code>                    | **`Experimental`** This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes. Example: `<ClerkProvider clerkJsVersion="x.x.x" />`. | -                                                                   |
+| <a id="canceledat"></a> `canceledAt`           | <code>null \| Date</code>                                                    | **`Experimental`** This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes. Example: `<ClerkProvider clerkJsVersion="x.x.x" />`. | -                                                                   |
+| <a id="createdat"></a> `createdAt`             | `Date`                                                                       | **`Experimental`** This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes. Example: `<ClerkProvider clerkJsVersion="x.x.x" />`. | -                                                                   |
+| <a id="credit"></a> `credit?`                  | <code>\{ amount: [CommerceMoneyAmount](commerce-money-amount.mdx); \}</code> | **`Experimental`** This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes. Example: `<ClerkProvider clerkJsVersion="x.x.x" />`. | -                                                                   |
+| `credit.amount`                                | [`CommerceMoneyAmount`](commerce-money-amount.mdx)                           | **`Experimental`** This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes. Example: `<ClerkProvider clerkJsVersion="x.x.x" />`. | -                                                                   |
+| <a id="id"></a> `id`                           | `string`                                                                     | The unique identifier of the resource.                                                                                                                                                                                                                                                                              | [`ClerkResource`](clerk-resource.mdx).[`id`](clerk-resource.mdx#id) |
+| <a id="isfreetrial"></a> `isFreeTrial`         | `boolean`                                                                    | **`Experimental`** This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes. Example: `<ClerkProvider clerkJsVersion="x.x.x" />`. | -                                                                   |
+| <a id="pastdueat"></a> `pastDueAt`             | <code>null \| Date</code>                                                    | **`Experimental`** This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes. Example: `<ClerkProvider clerkJsVersion="x.x.x" />`. | -                                                                   |
+| <a id="pathroot"></a> `pathRoot`               | `string`                                                                     | The root path of the resource.                                                                                                                                                                                                                                                                                      | -                                                                   |
+| <a id="paymentsourceid"></a> `paymentSourceId` | `string`                                                                     | **`Experimental`** This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes. Example: `<ClerkProvider clerkJsVersion="x.x.x" />`. | -                                                                   |
+| <a id="periodend"></a> `periodEnd`             | <code>null \| Date</code>                                                    | **`Experimental`** This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes. Example: `<ClerkProvider clerkJsVersion="x.x.x" />`. | -                                                                   |
+| <a id="periodstart"></a> `periodStart`         | `Date`                                                                       | **`Experimental`** This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes. Example: `<ClerkProvider clerkJsVersion="x.x.x" />`. | -                                                                   |
+| <a id="plan"></a> `plan`                       | [`CommercePlanResource`](commerce-plan-resource.mdx)                         | **`Experimental`** This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes. Example: `<ClerkProvider clerkJsVersion="x.x.x" />`. | -                                                                   |
+| <a id="planperiod"></a> `planPeriod`           | [`CommerceSubscriptionPlanPeriod`](commerce-subscription-plan-period.mdx)    | **`Experimental`** This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes. Example: `<ClerkProvider clerkJsVersion="x.x.x" />`. | -                                                                   |
+| <a id="status"></a> `status`                   | [`CommerceSubscriptionStatus`](commerce-subscription-status.mdx)             | **`Experimental`** This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes. Example: `<ClerkProvider clerkJsVersion="x.x.x" />`. | -                                                                   |
+
+## Methods
+
+### reload()
+
+Reload the resource and return the resource itself.
+
+#### Parameters
+
+| Parameter | Type                        |
+| --------- | --------------------------- |
+| `p?`      | `ClerkResourceReloadParams` |
+
+#### Returns
+
+`Promise`\<`CommerceSubscriptionItemResource`\>
+
+#### Inherited from
+
+[`ClerkResource`](clerk-resource.mdx).[`reload`](clerk-resource.mdx#reload)

@@ -1,0 +1,21 @@
+Use `<Protect/>` in order to prevent unauthenticated or unauthorized users from accessing the children passed to the component.
+
+Examples:
+
+```
+<Protect permission="a_permission_key" />
+<Protect role="a_role_key" />
+<Protect condition={(has) => has({permission:"a_permission_key"})} />
+<Protect condition={(has) => has({role:"a_role_key"})} />
+<Protect fallback={<p>Unauthorized</p>} />
+```
+
+## Parameters
+
+| Parameter           | Type           |
+| ------------------- | -------------- |
+| `__namedParameters` | `ProtectProps` |
+
+## Returns
+
+`ReactNode`

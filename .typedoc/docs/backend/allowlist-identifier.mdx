@@ -1,0 +1,13 @@
+The Backend `AllowlistIdentifier` object represents an identifier that has been added to the allowlist of your application. The Backend `AllowlistIdentifier` object is used in the [Backend API](/docs/reference/backend-api/tag/Allow-list-Block-list#operation/ListAllowlistIdentifiers) and is not directly accessible from the Frontend API.
+
+## Properties
+
+| Property                                     | Type                                                            | Description                                                                                                               |
+| -------------------------------------------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| <a id="createdat"></a> `createdAt`           | `number`                                                        | The date when the allowlist identifier was first created.                                                                 |
+| <a id="id"></a> `id`                         | `string`                                                        | A unique ID for the allowlist identifier.                                                                                 |
+| <a id="identifier"></a> `identifier`         | `string`                                                        | The [identifier](/docs/authentication/configuration/sign-up-sign-in-options#identifiers) that was added to the allowlist. |
+| <a id="identifiertype"></a> `identifierType` | <code>"email_address" \| "phone_number" \| "web3_wallet"</code> | The type of the allowlist identifier.                                                                                     |
+| <a id="instanceid"></a> `instanceId?`        | `string`                                                        | The ID of the instance that this allowlist identifier belongs to.                                                         |
+| <a id="invitationid"></a> `invitationId?`    | `string`                                                        | The ID of the invitation sent to the identifier.                                                                          |
+| <a id="updatedat"></a> `updatedAt`           | `number`                                                        | The date when the allowlist identifier was last updated.                                                                  |

@@ -1,0 +1,46 @@
+**`Experimental`**
+
+This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+
+## Example
+
+```tsx
+<ClerkProvider clerkJsVersion="x.x.x" />
+```
+
+## Properties
+
+| Property                                   | Type                                                                | Description                                                                                                                                                                                                                                                                                                         | Overrides                                                           |
+| ------------------------------------------ | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| <a id="cardtype"></a> `cardType`           | `string`                                                            | **`Experimental`** This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes. Example: `<ClerkProvider clerkJsVersion="x.x.x" />`. | -                                                                   |
+| <a id="id"></a> `id`                       | `string`                                                            | The unique identifier of the resource.                                                                                                                                                                                                                                                                              | [`ClerkResource`](clerk-resource.mdx).[`id`](clerk-resource.mdx#id) |
+| <a id="isdefault"></a> `isDefault`         | `boolean`                                                           | **`Experimental`** This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes. Example: `<ClerkProvider clerkJsVersion="x.x.x" />`. | -                                                                   |
+| <a id="isremovable"></a> `isRemovable`     | `boolean`                                                           | **`Experimental`** This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes. Example: `<ClerkProvider clerkJsVersion="x.x.x" />`. | -                                                                   |
+| <a id="last4"></a> `last4`                 | `string`                                                            | **`Experimental`**                                                                                                                                                                                                                                                                                                  | -                                                                   |
+| <a id="makedefault"></a> `makeDefault`     | <code>(params?) => Promise\<null\></code>                           | **`Experimental`** This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes. Example: `<ClerkProvider clerkJsVersion="x.x.x" />`. | -                                                                   |
+| <a id="pathroot"></a> `pathRoot`           | `string`                                                            | The root path of the resource.                                                                                                                                                                                                                                                                                      | -                                                                   |
+| <a id="paymentmethod"></a> `paymentMethod` | `string`                                                            | **`Experimental`** This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes. Example: `<ClerkProvider clerkJsVersion="x.x.x" />`. | -                                                                   |
+| <a id="remove"></a> `remove`               | <code>(params?) => Promise\<DeletedObjectResource\></code>          | **`Experimental`** This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes. Example: `<ClerkProvider clerkJsVersion="x.x.x" />`. | -                                                                   |
+| <a id="status"></a> `status`               | [`CommercePaymentSourceStatus`](commerce-payment-source-status.mdx) | **`Experimental`** This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes. Example: `<ClerkProvider clerkJsVersion="x.x.x" />`. | -                                                                   |
+| <a id="wallettype"></a> `walletType`       | <code>undefined \| string</code>                                    | **`Experimental`** This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes. Example: `<ClerkProvider clerkJsVersion="x.x.x" />`. | -                                                                   |
+
+## Methods
+
+### reload()
+
+Reload the resource and return the resource itself.
+
+#### Parameters
+
+| Parameter | Type                        |
+| --------- | --------------------------- |
+| `p?`      | `ClerkResourceReloadParams` |
+
+#### Returns
+
+`Promise`\<`CommercePaymentSourceResource`\>
+
+#### Inherited from
+
+[`ClerkResource`](clerk-resource.mdx).[`reload`](clerk-resource.mdx#reload)

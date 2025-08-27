@@ -1,0 +1,101 @@
+Shared generic overload type for getAuth() helpers across SDKs.
+
+- Parameterized by the request type (RequestType).
+- Handles different accepted token types and their corresponding return types.
+
+## Call Signature
+
+Shared generic overload type for getAuth() helpers across SDKs.
+
+- Parameterized by the request type (RequestType).
+- Handles different accepted token types and their corresponding return types.
+
+### Parameters
+
+| Parameter | Type                                                                                                                                                                                                                                                                       |
+| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `req`     | `RequestType`                                                                                                                                                                                                                                                              |
+| `options` | <code>\{ treatPendingAsSignedOut?: boolean; \}</code> & <code>\{ acceptsToken?: "api_key" \| "session_token" \| "m2m_token" \| "oauth_token" \| ("api_key" \| "session_token" \| "m2m_token" \| "oauth_token")[] \| "any"; \}</code> & <code>\{ acceptsToken: T; \}</code> |
+
+### Returns
+
+`MaybePromise`\<<code>InvalidTokenAuthObject \| [InferAuthObjectFromTokenArray](infer-auth-object-from-token-array.mdx)\<T, SessionAuthObject, MachineAuthObject\<Exclude\<T\[number\], "session_token"\>\>\></code>, `ReturnsPromise`\>
+
+### Example
+
+```ts
+const auth = await getAuth(req, { acceptsToken: ["session_token", "api_key"] });
+```
+
+## Call Signature
+
+Shared generic overload type for getAuth() helpers across SDKs.
+
+- Parameterized by the request type (RequestType).
+- Handles different accepted token types and their corresponding return types.
+
+### Parameters
+
+| Parameter | Type                                                                                                                                                                                                                                                                       |
+| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `req`     | `RequestType`                                                                                                                                                                                                                                                              |
+| `options` | <code>\{ treatPendingAsSignedOut?: boolean; \}</code> & <code>\{ acceptsToken?: "api_key" \| "session_token" \| "m2m_token" \| "oauth_token" \| ("api_key" \| "session_token" \| "m2m_token" \| "oauth_token")[] \| "any"; \}</code> & <code>\{ acceptsToken: T; \}</code> |
+
+### Returns
+
+`MaybePromise`\<[`InferAuthObjectFromToken`](infer-auth-object-from-token.mdx)\<`T`, `SessionAuthObject`, `MachineAuthObject`\<`Exclude`\<`T`, `"session_token"`\>\>\>, `ReturnsPromise`\>
+
+### Example
+
+```ts
+const auth = await getAuth(req, { acceptsToken: "session_token" });
+```
+
+## Call Signature
+
+Shared generic overload type for getAuth() helpers across SDKs.
+
+- Parameterized by the request type (RequestType).
+- Handles different accepted token types and their corresponding return types.
+
+### Parameters
+
+| Parameter | Type                                                                                                                                                                                                                                                                           |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `req`     | `RequestType`                                                                                                                                                                                                                                                                  |
+| `options` | <code>\{ treatPendingAsSignedOut?: boolean; \}</code> & <code>\{ acceptsToken?: "api_key" \| "session_token" \| "m2m_token" \| "oauth_token" \| ("api_key" \| "session_token" \| "m2m_token" \| "oauth_token")[] \| "any"; \}</code> & <code>\{ acceptsToken: "any"; \}</code> |
+
+### Returns
+
+`MaybePromise`\<[`AuthObject`](auth-object.mdx), `ReturnsPromise`\>
+
+### Example
+
+```ts
+const auth = await getAuth(req, { acceptsToken: "any" });
+```
+
+## Call Signature
+
+Shared generic overload type for getAuth() helpers across SDKs.
+
+- Parameterized by the request type (RequestType).
+- Handles different accepted token types and their corresponding return types.
+
+### Parameters
+
+| Parameter                          | Type                                                  | Description                                                                                                |
+| ---------------------------------- | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `req`                              | `RequestType`                                         | -                                                                                                          |
+| `options?`                         | <code>\{ treatPendingAsSignedOut?: boolean; \}</code> | -                                                                                                          |
+| `options.treatPendingAsSignedOut?` | `boolean`                                             | A boolean that indicates whether pending sessions are considered as signed out or not. Defaults to `true`. |
+
+### Returns
+
+`MaybePromise`\<`SessionAuthObject`, `ReturnsPromise`\>
+
+### Example
+
+```ts
+const auth = await getAuth(req);
+```

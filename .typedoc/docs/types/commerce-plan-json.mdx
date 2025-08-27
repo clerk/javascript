@@ -1,0 +1,40 @@
+**`Experimental`**
+
+This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+
+## Example
+
+```tsx
+<ClerkProvider clerkJsVersion="x.x.x" />
+```
+
+## Properties
+
+| Property                                                                       | Type                                                            | Description        | Overrides                  |
+| ------------------------------------------------------------------------------ | --------------------------------------------------------------- | ------------------ | -------------------------- |
+| <a id="amount"></a> `amount`                                                   | `number`                                                        | **`Experimental`** | -                          |
+| <a id="amount_formatted"></a> `amount_formatted`                               | `string`                                                        | **`Experimental`** | -                          |
+| <a id="annual_amount"></a> `annual_amount`                                     | `number`                                                        | **`Experimental`** | -                          |
+| <a id="annual_amount_formatted"></a> `annual_amount_formatted`                 | `string`                                                        | **`Experimental`** | -                          |
+| <a id="annual_fee"></a> `annual_fee`                                           | [`CommerceMoneyAmountJSON`](commerce-money-amount-json.mdx)     | **`Experimental`** | -                          |
+| <a id="annual_monthly_amount"></a> `annual_monthly_amount`                     | `number`                                                        | **`Experimental`** | -                          |
+| <a id="annual_monthly_amount_formatted"></a> `annual_monthly_amount_formatted` | `string`                                                        | **`Experimental`** | -                          |
+| <a id="annual_monthly_fee"></a> `annual_monthly_fee`                           | [`CommerceMoneyAmountJSON`](commerce-money-amount-json.mdx)     | **`Experimental`** | -                          |
+| <a id="avatar_url"></a> `avatar_url`                                           | `string`                                                        | **`Experimental`** | -                          |
+| <a id="currency"></a> `currency`                                               | `string`                                                        | **`Experimental`** | -                          |
+| <a id="currency_symbol"></a> `currency_symbol`                                 | `string`                                                        | **`Experimental`** | -                          |
+| <a id="description"></a> `description`                                         | `string`                                                        | **`Experimental`** | -                          |
+| <a id="features"></a> `features`                                               | <code>[CommerceFeatureJSON](commerce-feature-json.mdx)[]</code> | **`Experimental`** | -                          |
+| <a id="fee"></a> `fee`                                                         | [`CommerceMoneyAmountJSON`](commerce-money-amount-json.mdx)     | **`Experimental`** | -                          |
+| <a id="for_payer_type"></a> `for_payer_type`                                   | [`CommercePayerResourceType`](commerce-payer-resource-type.mdx) | **`Experimental`** | -                          |
+| <a id="free_trial_days"></a> `free_trial_days?`                                | <code>null \| number</code>                                     | **`Experimental`** | -                          |
+| <a id="free_trial_enabled"></a> `free_trial_enabled?`                          | `boolean`                                                       | **`Experimental`** | -                          |
+| <a id="has_base_fee"></a> `has_base_fee`                                       | `boolean`                                                       | **`Experimental`** | -                          |
+| <a id="id"></a> `id`                                                           | `string`                                                        | **`Experimental`** | `ClerkResourceJSON.id`     |
+| <a id="is_default"></a> `is_default`                                           | `boolean`                                                       | **`Experimental`** | -                          |
+| <a id="is_recurring"></a> `is_recurring`                                       | `boolean`                                                       | **`Experimental`** | -                          |
+| <a id="name"></a> `name`                                                       | `string`                                                        | **`Experimental`** | -                          |
+| <a id="object"></a> `object`                                                   | `"commerce_plan"`                                               | **`Experimental`** | `ClerkResourceJSON.object` |
+| <a id="publicly_visible"></a> `publicly_visible`                               | `boolean`                                                       | **`Experimental`** | -                          |
+| <a id="slug"></a> `slug`                                                       | `string`                                                        | **`Experimental`** | -                          |

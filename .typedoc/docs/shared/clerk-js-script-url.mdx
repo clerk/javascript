@@ -1,0 +1,18 @@
+Generates a Clerk JS script URL based on the provided options.
+
+## Parameters
+
+| Parameter | Type                       | Description                                               |
+| --------- | -------------------------- | --------------------------------------------------------- |
+| `opts`    | `LoadClerkJsScriptOptions` | The options to use when building the Clerk JS script URL. |
+
+## Returns
+
+`string` — The complete URL to the Clerk JS script.
+
+## Example
+
+```typescript
+const url = clerkJsScriptUrl({ publishableKey: "pk_test_..." });
+// Returns: "https://example.clerk.accounts.dev/npm/@clerk/clerk-js@5/dist/clerk.browser.js"
+```

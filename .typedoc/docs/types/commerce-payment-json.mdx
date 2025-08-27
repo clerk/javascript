@@ -1,0 +1,26 @@
+**`Experimental`**
+
+This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+
+## Example
+
+```tsx
+<ClerkProvider clerkJsVersion="x.x.x" />
+```
+
+## Properties
+
+| Property                                           | Type                                                                  | Description        | Overrides                  |
+| -------------------------------------------------- | --------------------------------------------------------------------- | ------------------ | -------------------------- |
+| <a id="amount"></a> `amount`                       | [`CommerceMoneyAmountJSON`](commerce-money-amount-json.mdx)           | **`Experimental`** | -                          |
+| <a id="charge_type"></a> `charge_type`             | [`CommercePaymentChargeType`](commerce-payment-charge-type.mdx)       | **`Experimental`** | -                          |
+| <a id="failed_at"></a> `failed_at?`                | `number`                                                              | **`Experimental`** | -                          |
+| <a id="id"></a> `id`                               | `string`                                                              | **`Experimental`** | `ClerkResourceJSON.id`     |
+| <a id="object"></a> `object`                       | `"commerce_payment"`                                                  | **`Experimental`** | `ClerkResourceJSON.object` |
+| <a id="paid_at"></a> `paid_at?`                    | `number`                                                              | **`Experimental`** | -                          |
+| <a id="payment_source"></a> `payment_source`       | [`CommercePaymentSourceJSON`](commerce-payment-source-json.mdx)       | **`Experimental`** | -                          |
+| <a id="status"></a> `status`                       | [`CommercePaymentStatus`](commerce-payment-status.mdx)                | **`Experimental`** | -                          |
+| <a id="subscription"></a> `subscription`           | [`CommerceSubscriptionItemJSON`](commerce-subscription-item-json.mdx) | **`Experimental`** | -                          |
+| <a id="subscription_item"></a> `subscription_item` | [`CommerceSubscriptionItemJSON`](commerce-subscription-item-json.mdx) | **`Experimental`** | -                          |
+| <a id="updated_at"></a> `updated_at`               | `number`                                                              | **`Experimental`** | -                          |

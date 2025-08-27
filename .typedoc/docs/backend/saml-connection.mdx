@@ -1,0 +1,27 @@
+The Backend `SamlConnection` object holds information about a SAML connection for an organization.
+
+## Properties
+
+| Property                                             | Type                        | Description                                                                                                                               |
+| ---------------------------------------------------- | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| <a id="acsurl"></a> `acsUrl`                         | `string`                    | The Assertion Consumer Service (ACS) URL of the connection.                                                                               |
+| <a id="active"></a> `active`                         | `boolean`                   | Indicates whether the connection is active or not.                                                                                        |
+| <a id="allowidpinitiated"></a> `allowIdpInitiated`   | `boolean`                   | Indicates whether the connection allows Identity Provider (IdP) initiated flows or not.                                                   |
+| <a id="allowsubdomains"></a> `allowSubdomains`       | `boolean`                   | Indicates whether users with an email address subdomain are allowed to use this connection in order to authenticate or not.               |
+| <a id="attributemapping"></a> `attributeMapping`     | `AttributeMapping`          | Defines the attribute name mapping between the Identity Provider (IdP) and Clerk's [`User`](/docs/references/javascript/user) properties. |
+| <a id="createdat"></a> `createdAt`                   | `number`                    | The date when the connection was first created.                                                                                           |
+| <a id="domain"></a> `domain`                         | `string`                    | The domain of your organization. Sign in flows using an email with this domain will use the connection.                                   |
+| <a id="id"></a> `id`                                 | `string`                    | The unique identifier for the connection.                                                                                                 |
+| <a id="idpcertificate"></a> `idpCertificate`         | <code>null \| string</code> | The X.509 certificate as provided by the Identity Provider (IdP).                                                                         |
+| <a id="idpentityid"></a> `idpEntityId`               | <code>null \| string</code> | The Entity ID as provided by the Identity Provider (IdP).                                                                                 |
+| <a id="idpmetadata"></a> `idpMetadata`               | <code>null \| string</code> | The XML content of the Identity Provider (IdP) metadata file. If present, it takes priority over the corresponding individual properties. |
+| <a id="idpmetadataurl"></a> `idpMetadataUrl`         | <code>null \| string</code> | The URL which serves the Identity Provider (IdP) metadata. If present, it takes priority over the corresponding individual properties.    |
+| <a id="idpssourl"></a> `idpSsoUrl`                   | <code>null \| string</code> | The Single-Sign On URL as provided by the Identity Provider (IdP).                                                                        |
+| <a id="name"></a> `name`                             | `string`                    | The name to use as a label for the connection.                                                                                            |
+| <a id="organizationid"></a> `organizationId`         | <code>null \| string</code> | The organization ID of the organization.                                                                                                  |
+| <a id="provider"></a> `provider`                     | `string`                    | The Identity Provider (IdP) of the connection.                                                                                            |
+| <a id="spentityid"></a> `spEntityId`                 | `string`                    | The Entity ID as provided by the Service Provider (Clerk).                                                                                |
+| <a id="spmetadataurl"></a> `spMetadataUrl`           | `string`                    | The metadata URL as provided by the Service Provider (Clerk).                                                                             |
+| <a id="syncuserattributes"></a> `syncUserAttributes` | `boolean`                   | Indicates whether the connection syncs user attributes between the Service Provider (SP) and Identity Provider (IdP) or not.              |
+| <a id="updatedat"></a> `updatedAt`                   | `number`                    | The date when the SAML connection was last updated.                                                                                       |
+| <a id="usercount"></a> `userCount`                   | `number`                    | The number of users associated with the connection.                                                                                       |

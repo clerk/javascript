@@ -1,0 +1,9 @@
+## Properties
+
+| Property                                      | Type                                                             | Description                                                                                                                            |
+| --------------------------------------------- | ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| <a id="feature"></a> `feature?`               | `Autocomplete`\<<code> user:${string} \| org:${string} </code>\> | The [feature](/docs/billing/overview) to check for.                                                                                    |
+| <a id="permission"></a> `permission?`         | `DisallowSystemPermissions`\<`P`\>                               | The [permission](/docs/organizations/roles-permissions) to check for.                                                                  |
+| <a id="plan"></a> `plan?`                     | `Autocomplete`\<<code> user:${string} \| org:${string} </code>\> | The [plan](/docs/billing/overview) to check for.                                                                                       |
+| <a id="reverification"></a> `reverification?` | [`ReverificationConfig`](reverification-config.mdx)              | The reverification configuration to check for. This feature is currently in public beta. **It is not recommended for production use.** |
+| <a id="role"></a> `role?`                     | `string`                                                         | The [role](/docs/organizations/roles-permissions) to check for.                                                                        |

@@ -1,0 +1,61 @@
+## Type declaration
+
+| Name            | Type                        | Description                                                                                                                                                                                                |
+| --------------- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `actor`         | `undefined`                 | The JWT actor for the session. Holds identifier for the user that is impersonating the current user. Read more about [impersonation](/docs/users/user-impersonation).                                      |
+| `getToken`      | [`GetToken`](get-token.mdx) | A function that retrieves the current user's session token or a custom JWT template. Returns a promise that resolves to the token. See the [reference doc](/docs/references/javascript/session#get-token). |
+| `has`           | <code>\{ \}</code>          | A function that checks if the user has specific permissions or roles. See the [reference doc](/docs/references/backend/types/auth-object#has).                                                             |
+| `isLoaded`      | `false`                     | A boolean that indicates whether Clerk has completed initialization. Initially `false`, becomes `true` once Clerk loads.                                                                                   |
+| `isSignedIn`    | `undefined`                 | A boolean that indicates whether a user is currently signed in.                                                                                                                                            |
+| `orgId`         | `undefined`                 | The ID of the user's active organization.                                                                                                                                                                  |
+| `orgRole`       | `undefined`                 | The current user's role in their active organization.                                                                                                                                                      |
+| `orgSlug`       | `undefined`                 | The URL-friendly identifier of the user's active organization.                                                                                                                                             |
+| `sessionClaims` | `undefined`                 | The current user's [session claims](/docs/backend-requests/resources/session-tokens).                                                                                                                      |
+| `sessionId`     | `undefined`                 | The ID for the current session.                                                                                                                                                                            |
+| `signOut`       | [`SignOut`](sign-out.mdx)   | A function that signs out the current user. Returns a promise that resolves when complete. See the [reference doc](/docs/references/javascript/clerk#sign-out).                                            |
+| `userId`        | `undefined`                 | The ID of the current user.                                                                                                                                                                                |
+
+| Name            | Type                           |
+| --------------- | ------------------------------ |
+| `actor`         | `null`                         |
+| `getToken`      | [`GetToken`](get-token.mdx)    |
+| `has()`         | <code>(params) => false</code> |
+| `isLoaded`      | `true`                         |
+| `isSignedIn`    | `false`                        |
+| `orgId`         | `null`                         |
+| `orgRole`       | `null`                         |
+| `orgSlug`       | `null`                         |
+| `sessionClaims` | `null`                         |
+| `sessionId`     | `null`                         |
+| `signOut`       | [`SignOut`](sign-out.mdx)      |
+| `userId`        | `null`                         |
+
+| Name            | Type                                                                                         |
+| --------------- | -------------------------------------------------------------------------------------------- |
+| `actor`         | <code>[ActClaim](act-claim.mdx) \| null</code>                                               |
+| `getToken`      | [`GetToken`](get-token.mdx)                                                                  |
+| `has`           | [`CheckAuthorizationWithCustomPermissions`](check-authorization-with-custom-permissions.mdx) |
+| `isLoaded`      | `true`                                                                                       |
+| `isSignedIn`    | `true`                                                                                       |
+| `orgId`         | `null`                                                                                       |
+| `orgRole`       | `null`                                                                                       |
+| `orgSlug`       | `null`                                                                                       |
+| `sessionClaims` | `JwtPayload`                                                                                 |
+| `sessionId`     | `string`                                                                                     |
+| `signOut`       | [`SignOut`](sign-out.mdx)                                                                    |
+| `userId`        | `string`                                                                                     |
+
+| Name            | Type                                                                                         |
+| --------------- | -------------------------------------------------------------------------------------------- |
+| `actor`         | <code>[ActClaim](act-claim.mdx) \| null</code>                                               |
+| `getToken`      | [`GetToken`](get-token.mdx)                                                                  |
+| `has`           | [`CheckAuthorizationWithCustomPermissions`](check-authorization-with-custom-permissions.mdx) |
+| `isLoaded`      | `true`                                                                                       |
+| `isSignedIn`    | `true`                                                                                       |
+| `orgId`         | `string`                                                                                     |
+| `orgRole`       | [`OrganizationCustomRoleKey`](organization-custom-role-key.mdx)                              |
+| `orgSlug`       | <code>string \| null</code>                                                                  |
+| `sessionClaims` | `JwtPayload`                                                                                 |
+| `sessionId`     | `string`                                                                                     |
+| `signOut`       | [`SignOut`](sign-out.mdx)                                                                    |
+| `userId`        | `string`                                                                                     |

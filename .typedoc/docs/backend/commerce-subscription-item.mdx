@@ -1,0 +1,74 @@
+**`Experimental`**
+
+This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+It is advised to pin the SDK version to avoid breaking changes.
+
+## Constructors
+
+### Constructor
+
+**`Experimental`**
+
+#### Parameters
+
+| Parameter       | Type                                                     | Description                                                         |
+| --------------- | -------------------------------------------------------- | ------------------------------------------------------------------- |
+| `id`            | `string`                                                 | The unique identifier for the subscription item.                    |
+| `status`        | `CommerceSubscriptionItemStatus`                         | The status of the subscription item.                                |
+| `planPeriod`    | <code>"month" \| "annual"</code>                         | The plan period for the subscription item.                          |
+| `periodStart`   | `number`                                                 | The start of the current period.                                    |
+| `nextPayment`   | <code>null \| \{ amount: number; date: number; \}</code> | The next payment information.                                       |
+| `amount`        | <code>undefined \| null \| CommerceMoneyAmount</code>    | The current amount for the subscription item.                       |
+| `plan`          | [`CommercePlan`](commerce-plan.mdx)                      | The plan associated with this subscription item.                    |
+| `planId`        | `string`                                                 | The plan ID.                                                        |
+| `createdAt`     | `number`                                                 | The date and time the subscription item was created.                |
+| `updatedAt`     | `number`                                                 | The date and time the subscription item was last updated.           |
+| `periodEnd`     | <code>null \| number</code>                              | The end of the current period.                                      |
+| `canceledAt`    | <code>null \| number</code>                              | When the subscription item was canceled.                            |
+| `pastDueAt`     | <code>null \| number</code>                              | When the subscription item became past due.                         |
+| `endedAt`       | <code>null \| number</code>                              | When the subscription item ended.                                   |
+| `payerId`       | `string`                                                 | The payer ID.                                                       |
+| `isFreeTrial?`  | `boolean`                                                | Whether this subscription item is currently in a free trial period. |
+| `lifetimePaid?` | <code>null \| CommerceMoneyAmount</code>                 | The lifetime amount paid for this subscription item.                |
+
+#### Returns
+
+`CommerceSubscriptionItem`
+
+## Properties
+
+| Property                                  | Type                                                     | Description                                                                            |
+| ----------------------------------------- | -------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| <a id="amount"></a> `amount`              | <code>undefined \| null \| CommerceMoneyAmount</code>    | **`Experimental`** The current amount for the subscription item.                       |
+| <a id="canceledat"></a> `canceledAt`      | <code>null \| number</code>                              | **`Experimental`** When the subscription item was canceled.                            |
+| <a id="createdat"></a> `createdAt`        | `number`                                                 | **`Experimental`** The date and time the subscription item was created.                |
+| <a id="endedat"></a> `endedAt`            | <code>null \| number</code>                              | **`Experimental`** When the subscription item ended.                                   |
+| <a id="id"></a> `id`                      | `string`                                                 | **`Experimental`** The unique identifier for the subscription item.                    |
+| <a id="isfreetrial"></a> `isFreeTrial?`   | `boolean`                                                | **`Experimental`** Whether this subscription item is currently in a free trial period. |
+| <a id="lifetimepaid"></a> `lifetimePaid?` | <code>null \| CommerceMoneyAmount</code>                 | **`Experimental`** The lifetime amount paid for this subscription item.                |
+| <a id="nextpayment"></a> `nextPayment`    | <code>null \| \{ amount: number; date: number; \}</code> | **`Experimental`** The next payment information.                                       |
+| <a id="pastdueat"></a> `pastDueAt`        | <code>null \| number</code>                              | **`Experimental`** When the subscription item became past due.                         |
+| <a id="payerid"></a> `payerId`            | `string`                                                 | **`Experimental`** The payer ID.                                                       |
+| <a id="periodend"></a> `periodEnd`        | <code>null \| number</code>                              | **`Experimental`** The end of the current period.                                      |
+| <a id="periodstart"></a> `periodStart`    | `number`                                                 | **`Experimental`** The start of the current period.                                    |
+| <a id="plan"></a> `plan`                  | [`CommercePlan`](commerce-plan.mdx)                      | **`Experimental`** The plan associated with this subscription item.                    |
+| <a id="planid"></a> `planId`              | `string`                                                 | **`Experimental`** The plan ID.                                                        |
+| <a id="planperiod"></a> `planPeriod`      | <code>"month" \| "annual"</code>                         | **`Experimental`** The plan period for the subscription item.                          |
+| <a id="status"></a> `status`              | `CommerceSubscriptionItemStatus`                         | **`Experimental`** The status of the subscription item.                                |
+| <a id="updatedat"></a> `updatedAt`        | `number`                                                 | **`Experimental`** The date and time the subscription item was last updated.           |
+
+## Methods
+
+### fromJSON()
+
+**`Experimental`**
+
+#### Parameters
+
+| Parameter | Type                                                                  |
+| --------- | --------------------------------------------------------------------- |
+| `data`    | [`CommerceSubscriptionItemJSON`](commerce-subscription-item-json.mdx) |
+
+#### Returns
+
+`CommerceSubscriptionItem`

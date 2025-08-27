@@ -1,0 +1,27 @@
+**`Experimental`**
+
+This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+
+## Example
+
+```tsx
+<ClerkProvider clerkJsVersion="x.x.x" />
+```
+
+## Properties
+
+| Property                                                        | Type                                                                                                | Description                                                                                                                                           | Overrides                  |
+| --------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
+| <a id="active_at"></a> `active_at`                              | `number`                                                                                            | **`Experimental`**                                                                                                                                    | -                          |
+| <a id="created_at"></a> `created_at`                            | `number`                                                                                            | **`Experimental`**                                                                                                                                    | -                          |
+| <a id="eligible_for_free_trial"></a> `eligible_for_free_trial?` | `boolean`                                                                                           | **`Experimental`**                                                                                                                                    | -                          |
+| <a id="id"></a> `id`                                            | `string`                                                                                            | **`Experimental`**                                                                                                                                    | `ClerkResourceJSON.id`     |
+| <a id="next_payment"></a> `next_payment?`                       | <code>\{ amount: [CommerceMoneyAmountJSON](commerce-money-amount-json.mdx); date: number; \}</code> | **`Experimental`** Describes the details for the next payment cycle. It is `undefined` for subscription items that are cancelled or on the free plan. | -                          |
+| `next_payment.amount`                                           | [`CommerceMoneyAmountJSON`](commerce-money-amount-json.mdx)                                         | -                                                                                                                                                     | -                          |
+| `next_payment.date`                                             | `number`                                                                                            | -                                                                                                                                                     | -                          |
+| <a id="object"></a> `object`                                    | `"commerce_subscription"`                                                                           | **`Experimental`**                                                                                                                                    | `ClerkResourceJSON.object` |
+| <a id="past_due_at"></a> `past_due_at`                          | <code>null \| number</code>                                                                         | **`Experimental`**                                                                                                                                    | -                          |
+| <a id="status"></a> `status`                                    | <code>"active" \| "past_due"</code>                                                                 | **`Experimental`** Due to the free plan subscription item, the top level subscription can either be `active` or `past_due`.                           | -                          |
+| <a id="subscription_items"></a> `subscription_items`            | <code>null \| [CommerceSubscriptionItemJSON](commerce-subscription-item-json.mdx)[]</code>          | **`Experimental`**                                                                                                                                    | -                          |
+| <a id="updated_at"></a> `updated_at`                            | <code>null \| number</code>                                                                         | **`Experimental`**                                                                                                                                    | -                          |

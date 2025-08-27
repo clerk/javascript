@@ -1,0 +1,21 @@
+Mark object property as deprecated.
+
+A console WARNING will be displayed when object property is being accessed.
+
+1. Deprecate object property
+   const obj = { something: 'aloha' };
+
+deprecatedObjectProperty(obj, 'something', 'Use `somethingElse` instead.');
+
+## Parameters
+
+| Parameter  | Type                        |
+| ---------- | --------------------------- |
+| `obj`      | `Record`\<`string`, `any`\> |
+| `propName` | `string`                    |
+| `warning`  | `string`                    |
+| `key?`     | `string`                    |
+
+## Returns
+
+`void`

@@ -1,0 +1,5 @@
+The `auth()` helper returns the [`Auth`](/docs/references/backend/types/auth-object) object of the currently active user, as well as the [`redirectToSignIn()`](/docs/references/nextjs/auth#redirect-to-sign-in) method.
+
+- Only available for App Router.
+- Only works on the server-side, such as in Server Components, Route Handlers, and Server Actions.
+- Requires [`clerkMiddleware()`](/docs/references/nextjs/clerk-middleware) to be configured.

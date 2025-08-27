@@ -1,0 +1,28 @@
+Clerk-issued JWT payload
+
+## Deprecated
+
+Use `JwtPayload` instead.
+
+## Indexable
+
+\[`propName`: `string`\]: `unknown`
+
+Any other JWT Claim Set member.
+
+## Properties
+
+| Property                              | Type                                                  | Description                                                                                       |
+| ------------------------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| <a id="act"></a> ~~`act?`~~           | <code>\{ [x: string]: unknown; sub: string; \}</code> | JWT Actor - [RFC8693](https://www.rfc-editor.org/rfc/rfc8693.html#name-act-actor-claim).          |
+| `act.sub`                             | `string`                                              | -                                                                                                 |
+| <a id="azp"></a> ~~`azp?`~~           | `string`                                              | JWT Authorized party - [RFC7800#section-3](https://tools.ietf.org/html/rfc7800#section-3).        |
+| <a id="exp"></a> ~~`exp`~~            | `number`                                              | JWT Expiration Time - [RFC7519#section-4.1.4](https://tools.ietf.org/html/rfc7519#section-4.1.4). |
+| <a id="iat"></a> ~~`iat`~~            | `number`                                              | JWT Issued At - [RFC7519#section-4.1.6](https://tools.ietf.org/html/rfc7519#section-4.1.6).       |
+| <a id="iss"></a> ~~`iss`~~            | `string`                                              | JWT Issuer - [RFC7519#section-4.1.1](https://tools.ietf.org/html/rfc7519#section-4.1.1).          |
+| <a id="nbf"></a> ~~`nbf`~~            | `number`                                              | JWT Not Before - [RFC7519#section-4.1.5](https://tools.ietf.org/html/rfc7519#section-4.1.5).      |
+| <a id="org_id"></a> ~~`org_id?`~~     | `string`                                              | Active organization ID.                                                                           |
+| <a id="org_role"></a> ~~`org_role?`~~ | `string`                                              | Active organization role.                                                                         |
+| <a id="org_slug"></a> ~~`org_slug?`~~ | `string`                                              | Active organization slug.                                                                         |
+| <a id="sid"></a> ~~`sid`~~            | `string`                                              | Session ID                                                                                        |
+| <a id="sub"></a> ~~`sub`~~            | `string`                                              | JWT Subject - [RFC7519#section-4.1.2](https://tools.ietf.org/html/rfc7519#section-4.1.2).         |

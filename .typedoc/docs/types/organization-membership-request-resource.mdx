@@ -1,0 +1,28 @@
+The `OrganizationMembershipRequest` object is the model that describes the request of a user to join an organization.
+
+## Properties
+
+| Property                         | Type     | Description                            | Overrides                                                           |
+| -------------------------------- | -------- | -------------------------------------- | ------------------------------------------------------------------- |
+| <a id="id"></a> `id`             | `string` | The unique identifier of the resource. | [`ClerkResource`](clerk-resource.mdx).[`id`](clerk-resource.mdx#id) |
+| <a id="pathroot"></a> `pathRoot` | `string` | The root path of the resource.         | -                                                                   |
+
+## Methods
+
+### reload()
+
+Reload the resource and return the resource itself.
+
+#### Parameters
+
+| Parameter | Type                        |
+| --------- | --------------------------- |
+| `p?`      | `ClerkResourceReloadParams` |
+
+#### Returns
+
+`Promise`\<`OrganizationMembershipRequestResource`\>
+
+#### Inherited from
+
+[`ClerkResource`](clerk-resource.mdx).[`reload`](clerk-resource.mdx#reload)

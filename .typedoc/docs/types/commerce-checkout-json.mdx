@@ -1,0 +1,27 @@
+**`Experimental`**
+
+This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+
+## Example
+
+```tsx
+<ClerkProvider clerkJsVersion="x.x.x" />
+```
+
+## Properties
+
+| Property                                                         | Type                                                                      | Description        | Overrides                  |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------------- | ------------------ | -------------------------- |
+| <a id="external_client_secret"></a> `external_client_secret`     | `string`                                                                  | **`Experimental`** | -                          |
+| <a id="external_gateway_id"></a> `external_gateway_id`           | `string`                                                                  | **`Experimental`** | -                          |
+| <a id="free_trial_ends_at"></a> `free_trial_ends_at?`            | <code>null \| number</code>                                               | **`Experimental`** | -                          |
+| <a id="id"></a> `id`                                             | `string`                                                                  | **`Experimental`** | `ClerkResourceJSON.id`     |
+| <a id="is_immediate_plan_change"></a> `is_immediate_plan_change` | `boolean`                                                                 | **`Experimental`** | -                          |
+| <a id="object"></a> `object`                                     | `"commerce_checkout"`                                                     | **`Experimental`** | `ClerkResourceJSON.object` |
+| <a id="payment_source"></a> `payment_source?`                    | [`CommercePaymentSourceJSON`](commerce-payment-source-json.mdx)           | **`Experimental`** | -                          |
+| <a id="plan"></a> `plan`                                         | [`CommercePlanJSON`](commerce-plan-json.mdx)                              | **`Experimental`** | -                          |
+| <a id="plan_period"></a> `plan_period`                           | [`CommerceSubscriptionPlanPeriod`](commerce-subscription-plan-period.mdx) | **`Experimental`** | -                          |
+| <a id="plan_period_start"></a> `plan_period_start?`              | `number`                                                                  | **`Experimental`** | -                          |
+| <a id="status"></a> `status`                                     | <code>"completed" \| "needs_confirmation"</code>                          | **`Experimental`** | -                          |
+| <a id="totals"></a> `totals`                                     | [`CommerceCheckoutTotalsJSON`](commerce-checkout-totals-json.mdx)         | **`Experimental`** | -                          |

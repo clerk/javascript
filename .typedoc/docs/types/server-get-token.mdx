@@ -1,0 +1,11 @@
+A function that retrieves a session token or JWT template.
+
+## Parameters
+
+| Parameter  | Type                                                    | Description                               |
+| ---------- | ------------------------------------------------------- | ----------------------------------------- |
+| `options?` | [`ServerGetTokenOptions`](server-get-token-options.mdx) | Configuration options for token retrieval |
+
+## Returns
+
+`Promise`\<<code>string \| null</code>\> — A promise that resolves to the token string, or null if no session exists

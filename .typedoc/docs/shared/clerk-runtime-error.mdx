@@ -1,0 +1,26 @@
+Custom error class for representing Clerk runtime errors.
+
+ClerkRuntimeError
+
+## Example
+
+```ts
+throw new ClerkRuntimeError("An error occurred", { code: "password_invalid" });
+```
+
+## Properties
+
+| Property                       | Type     | Description                                                        | Overrides       |
+| ------------------------------ | -------- | ------------------------------------------------------------------ | --------------- |
+| <a id="code"></a> `code`       | `string` | A unique code identifying the error, can be used for localization. | -               |
+| <a id="message"></a> `message` | `string` | The error message.                                                 | `Error.message` |
+
+## Methods
+
+### toString()
+
+Returns a string representation of the error.
+
+#### Returns
+
+`string` — A formatted string with the error name and message.

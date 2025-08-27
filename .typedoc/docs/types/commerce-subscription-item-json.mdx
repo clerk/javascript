@@ -1,0 +1,30 @@
+**`Experimental`**
+
+This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+
+## Example
+
+```tsx
+<ClerkProvider clerkJsVersion="x.x.x" />
+```
+
+## Properties
+
+| Property                                           | Type                                                                                  | Description                                                                               | Overrides                  |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | -------------------------- |
+| <a id="amount"></a> `amount?`                      | [`CommerceMoneyAmountJSON`](commerce-money-amount-json.mdx)                           | **`Experimental`**                                                                        | -                          |
+| <a id="canceled_at"></a> `canceled_at`             | <code>null \| number</code>                                                           | **`Experimental`**                                                                        | -                          |
+| <a id="created_at"></a> `created_at`               | `number`                                                                              | **`Experimental`**                                                                        | -                          |
+| <a id="credit"></a> `credit?`                      | <code>\{ amount: [CommerceMoneyAmountJSON](commerce-money-amount-json.mdx); \}</code> | **`Experimental`**                                                                        | -                          |
+| `credit.amount`                                    | [`CommerceMoneyAmountJSON`](commerce-money-amount-json.mdx)                           | -                                                                                         | -                          |
+| <a id="id"></a> `id`                               | `string`                                                                              | **`Experimental`**                                                                        | `ClerkResourceJSON.id`     |
+| <a id="is_free_trial"></a> `is_free_trial?`        | `boolean`                                                                             | **`Experimental`**                                                                        | -                          |
+| <a id="object"></a> `object`                       | `"commerce_subscription_item"`                                                        | **`Experimental`**                                                                        | `ClerkResourceJSON.object` |
+| <a id="past_due_at"></a> `past_due_at`             | <code>null \| number</code>                                                           | **`Experimental`**                                                                        | -                          |
+| <a id="payment_source_id"></a> `payment_source_id` | `string`                                                                              | **`Experimental`**                                                                        | -                          |
+| <a id="period_end"></a> `period_end`               | <code>null \| number</code>                                                           | **`Experimental`** Period end is `null` for subscription items that are on the free plan. | -                          |
+| <a id="period_start"></a> `period_start`           | `number`                                                                              | **`Experimental`**                                                                        | -                          |
+| <a id="plan"></a> `plan`                           | [`CommercePlanJSON`](commerce-plan-json.mdx)                                          | **`Experimental`**                                                                        | -                          |
+| <a id="plan_period"></a> `plan_period`             | [`CommerceSubscriptionPlanPeriod`](commerce-subscription-plan-period.mdx)             | **`Experimental`**                                                                        | -                          |
+| <a id="status"></a> `status`                       | [`CommerceSubscriptionStatus`](commerce-subscription-status.mdx)                      | **`Experimental`**                                                                        | -                          |

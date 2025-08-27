@@ -1,0 +1,176 @@
+The `useAuth()` hook provides access to the current user's authentication state and methods to manage the active session.
+
+> [!NOTE]
+> To access auth data server-side, see the [`Auth` object reference doc](/docs/references/backend/types/auth-object).
+
+<If sdk="nextjs">
+By default, Next.js opts all routes into static rendering. If you need to opt a route or routes into dynamic rendering because you need to access the authentication data at request time, you can create a boundary by passing the `dynamic` prop to `<ClerkProvider>`. See the [guide on rendering modes](/docs/references/nextjs/rendering-modes) for more information, including code examples.
+</If>
+
+## Parameters
+
+| Parameter                    | Type                                                                                   | Description                                                                                                                                                                                                                                                                                                     |
+| ---------------------------- | -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `initialAuthStateOrOptions?` | <code>null \| Record\<string, any\> \| \{ treatPendingAsSignedOut?: boolean; \}</code> | An object containing the initial authentication state or options for the `useAuth()` hook. If not provided, the hook will attempt to derive the state from the context. `treatPendingAsSignedOut` is a boolean that indicates whether pending sessions are considered as signed out or not. Defaults to `true`. |
+
+## Returns
+
+This function returns a discriminated union type. There are multiple variants of this type available which you can select by clicking on one of the tabs.
+
+<Tabs items={['Initialization', 'Signed out', 'Signed in (no active organization)', 'Signed in (with active organization)']}>
+<Tab>
+| Name | Type | Description |
+| ------ | ------ | ------ |
+| `actor` | `undefined` | The JWT actor for the session. Holds identifier for the user that is impersonating the current user. Read more about [impersonation](/docs/users/user-impersonation). |
+| `getToken()` | <code>(options?) => Promise\<null \| string\></code> | A function that retrieves the current user's session token or a custom JWT template. Returns a promise that resolves to the token. See the [reference doc](/docs/references/javascript/session#get-token). |
+| `has` | `undefined` | A function that checks if the user has specific permissions or roles. See the [reference doc](/docs/references/backend/types/auth-object#has). |
+| `isLoaded` | `false` | A boolean that indicates whether Clerk has completed initialization. Initially `false`, becomes `true` once Clerk loads. |
+| `isSignedIn` | `undefined` | A boolean that indicates whether a user is currently signed in. |
+| `orgId` | `undefined` | The ID of the user's active organization. |
+| `orgRole` | `undefined` | The current user's role in their active organization. |
+| `orgSlug` | `undefined` | The URL-friendly identifier of the user's active organization. |
+| `sessionClaims` | `undefined` | The current user's [session claims](/docs/backend-requests/resources/session-tokens). |
+| `sessionId` | `undefined` | The ID for the current session. |
+| `signOut()` | <code>\{ (options?): Promise\<void\>; (signOutCallback?, options?): Promise\<void\>; \}</code> | A function that signs out the current user. Returns a promise that resolves when complete. See the [reference doc](/docs/references/javascript/clerk#sign-out). |
+| `userId` | `undefined` | The ID of the current user. |
+</Tab>
+<Tab>
+| Name | Type | Description |
+| ------ | ------ | ------ |
+| `actor` | `null` | The JWT actor for the session. Holds identifier for the user that is impersonating the current user. Read more about [impersonation](/docs/users/user-impersonation). |
+| `getToken()` | <code>(options?) => Promise\<null \| string\></code> | A function that retrieves the current user's session token or a custom JWT template. Returns a promise that resolves to the token. See the [reference doc](/docs/references/javascript/session#get-token). |
+| `has()` | <code>(params) => false</code> | A function that checks if the user has specific permissions or roles. See the [reference doc](/docs/references/backend/types/auth-object#has). |
+| `isLoaded` | `true` | A boolean that indicates whether Clerk has completed initialization. Initially `false`, becomes `true` once Clerk loads. |
+| `isSignedIn` | `false` | A boolean that indicates whether a user is currently signed in. |
+| `orgId` | `null` | The ID of the user's active organization. |
+| `orgRole` | `null` | The current user's role in their active organization. |
+| `orgSlug` | `null` | The URL-friendly identifier of the user's active organization. |
+| `sessionClaims` | `null` | The current user's [session claims](/docs/backend-requests/resources/session-tokens). |
+| `sessionId` | `null` | The ID for the current session. |
+| `signOut()` | <code>\{ (options?): Promise\<void\>; (signOutCallback?, options?): Promise\<void\>; \}</code> | A function that signs out the current user. Returns a promise that resolves when complete. See the [reference doc](/docs/references/javascript/clerk#sign-out). |
+| `userId` | `null` | The ID of the current user. |
+</Tab>
+<Tab>
+| Name | Type | Description |
+| ------ | ------ | ------ |
+| `actor` | <code>null \| \{ [x: string]: unknown; sub: string; \}</code> | The JWT actor for the session. Holds identifier for the user that is impersonating the current user. Read more about [impersonation](/docs/users/user-impersonation). |
+| `getToken()` | <code>(options?) => Promise\<null \| string\></code> | A function that retrieves the current user's session token or a custom JWT template. Returns a promise that resolves to the token. See the [reference doc](/docs/references/javascript/session#get-token). |
+| `has()` | <code>(isAuthorizedParams) => boolean</code> | A function that checks if the user has specific permissions or roles. See the [reference doc](/docs/references/backend/types/auth-object#has). |
+| `isLoaded` | `true` | A boolean that indicates whether Clerk has completed initialization. Initially `false`, becomes `true` once Clerk loads. |
+| `isSignedIn` | `true` | A boolean that indicates whether a user is currently signed in. |
+| `orgId` | `null` | The ID of the user's active organization. |
+| `orgRole` | `null` | The current user's role in their active organization. |
+| `orgSlug` | `null` | The URL-friendly identifier of the user's active organization. |
+| `sessionClaims` | `JwtPayload` | The current user's [session claims](/docs/backend-requests/resources/session-tokens). |
+| `sessionId` | `string` | The ID for the current session. |
+| `signOut()` | <code>\{ (options?): Promise\<void\>; (signOutCallback?, options?): Promise\<void\>; \}</code> | A function that signs out the current user. Returns a promise that resolves when complete. See the [reference doc](/docs/references/javascript/clerk#sign-out). |
+| `userId` | `string` | The ID of the current user. |
+</Tab>
+<Tab>
+| Name | Type | Description |
+| ------ | ------ | ------ |
+| `actor` | <code>null \| \{ [x: string]: unknown; sub: string; \}</code> | The JWT actor for the session. Holds identifier for the user that is impersonating the current user. Read more about [impersonation](/docs/users/user-impersonation). |
+| `getToken()` | <code>(options?) => Promise\<null \| string\></code> | A function that retrieves the current user's session token or a custom JWT template. Returns a promise that resolves to the token. See the [reference doc](/docs/references/javascript/session#get-token). |
+| `has()` | <code>(isAuthorizedParams) => boolean</code> | A function that checks if the user has specific permissions or roles. See the [reference doc](/docs/references/backend/types/auth-object#has). |
+| `isLoaded` | `true` | A boolean that indicates whether Clerk has completed initialization. Initially `false`, becomes `true` once Clerk loads. |
+| `isSignedIn` | `true` | A boolean that indicates whether a user is currently signed in. |
+| `orgId` | `string` | The ID of the user's active organization. |
+| `orgRole` | `OrganizationCustomRoleKey` | The current user's role in their active organization. |
+| `orgSlug` | <code>null \| string</code> | The URL-friendly identifier of the user's active organization. |
+| `sessionClaims` | `JwtPayload` | The current user's [session claims](/docs/backend-requests/resources/session-tokens). |
+| `sessionId` | `string` | The ID for the current session. |
+| `signOut()` | <code>\{ (options?): Promise\<void\>; (signOutCallback?, options?): Promise\<void\>; \}</code> | A function that signs out the current user. Returns a promise that resolves when complete. See the [reference doc](/docs/references/javascript/clerk#sign-out). |
+| `userId` | `string` | The ID of the current user. |
+</Tab>
+</Tabs>
+
+## Example
+
+The following example demonstrates how to use the `useAuth()` hook to access the current auth state, like whether the user is signed in or not. It also includes a basic example for using the `getToken()` method to retrieve a session token for fetching data from an external resource.
+
+<Tabs items={['React', 'Next.js']}>
+<Tab>
+
+```tsx {{ filename: 'src/pages/ExternalDataPage.tsx' }}
+import { useAuth } from "@clerk/clerk-react";
+
+export default function ExternalDataPage() {
+  const { userId, sessionId, getToken, isLoaded, isSignedIn } = useAuth();
+
+  const fetchExternalData = async () => {
+    const token = await getToken();
+
+    // Fetch data from an external API
+    const response = await fetch("https://api.example.com/data", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return response.json();
+  };
+
+  if (!isLoaded) {
+    return <div>Loading...</div>;
+  }
+
+  if (!isSignedIn) {
+    return <div>Sign in to view this page</div>;
+  }
+
+  return (
+    <div>
+      <p>
+        Hello, {userId}! Your current active session is {sessionId}.
+      </p>
+      <button onClick={fetchExternalData}>Fetch Data</button>
+    </div>
+  );
+}
+```
+
+</Tab>
+<Tab>
+
+```tsx {{ filename: 'app/external-data/page.tsx' }}
+"use client";
+
+import { useAuth } from "@clerk/nextjs";
+
+export default function ExternalDataPage() {
+  const { userId, sessionId, getToken, isLoaded, isSignedIn } = useAuth();
+
+  const fetchExternalData = async () => {
+    const token = await getToken();
+
+    // Fetch data from an external API
+    const response = await fetch("https://api.example.com/data", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return response.json();
+  };
+
+  if (!isLoaded) {
+    return <div>Loading...</div>;
+  }
+
+  if (!isSignedIn) {
+    return <div>Sign in to view this page</div>;
+  }
+
+  return (
+    <div>
+      <p>
+        Hello, {userId}! Your current active session is {sessionId}.
+      </p>
+      <button onClick={fetchExternalData}>Fetch Data</button>
+    </div>
+  );
+}
+```
+
+</Tab>
+</Tabs>

@@ -1,0 +1,26 @@
+Hotloads the Clerk JS script with robust failure detection.
+
+Uses a timeout-based approach to ensure absolute certainty about load success/failure.
+If the script fails to load within the timeout period, or loads but doesn't create
+a proper Clerk instance, the promise rejects with an error.
+
+## Parameters
+
+| Parameter | Type                       | Description                                                                                                                            |
+| --------- | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `opts?`   | `LoadClerkJsScriptOptions` | The options used to build the Clerk JS script URL and load the script. Must include a `publishableKey` if no existing script is found. |
+
+## Returns
+
+`Promise`\<<code>null \| HTMLScriptElement</code>\> — Promise that resolves with null if Clerk loads successfully, or rejects with an error.
+
+## Example
+
+```typescript
+try {
+  await loadClerkJsScript({ publishableKey: "pk_test_..." });
+  console.log("Clerk loaded successfully");
+} catch (error) {
+  console.error("Failed to load Clerk:", error.message);
+}
+```

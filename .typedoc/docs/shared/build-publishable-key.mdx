@@ -1,0 +1,11 @@
+Converts a frontend API URL into a base64-encoded publishable key.
+
+## Parameters
+
+| Parameter     | Type     | Description                                       |
+| ------------- | -------- | ------------------------------------------------- |
+| `frontendApi` | `string` | The frontend API URL (e.g., 'clerk.example.com'). |
+
+## Returns
+
+`string` — A base64-encoded publishable key with appropriate prefix (pk*live* or pk*test*).

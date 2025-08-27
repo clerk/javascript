@@ -1,0 +1,23 @@
+> **\_\_internal_SubscriptionDetailsProps** = <code>\{ for?: [ForPayerType](for-payer-type.mdx); \}</code>
+
+**`Experimental`**
+
+This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+
+## See
+
+/docs/billing/overview
+
+It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+
+## Example
+
+```tsx
+<ClerkProvider clerkJsVersion="x.x.x" />
+```
+
+## Properties
+
+| Property                | Type                                 | Description                                                                                                                                                                               |
+| ----------------------- | ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| <a id="for"></a> `for?` | [`ForPayerType`](for-payer-type.mdx) | The subscriber type to display the subscription details for. If `organization` is provided, the subscription details will be displayed for the active organization. Defaults to `'user'`. |

@@ -1,0 +1,18 @@
+**`Experimental`**
+
+This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+
+## Example
+
+```tsx
+<ClerkProvider clerkJsVersion="x.x.x" />
+```
+
+## Properties
+
+| Property                                                       | Type                                                                                                                                                                                              | Description                                                                                                                                                                                                                                                                                                         |
+| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| <a id="addpaymentsource"></a> `addPaymentSource`               | <code>(params) => Promise\<[CommercePaymentSourceResource](commerce-payment-source-resource.mdx)\></code>                                                                                         | **`Experimental`** This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes. Example: `<ClerkProvider clerkJsVersion="x.x.x" />`. |
+| <a id="getpaymentsources"></a> `getPaymentSources`             | <code>(params) => Promise\<[ClerkPaginatedResponse](/docs/references/javascript/types/clerk-paginated-response)\<[CommercePaymentSourceResource](commerce-payment-source-resource.mdx)\>\></code> | **`Experimental`** This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes. Example: `<ClerkProvider clerkJsVersion="x.x.x" />`. |
+| <a id="initializepaymentsource"></a> `initializePaymentSource` | <code>(params) => Promise\<[CommerceInitializedPaymentSourceResource](commerce-initialized-payment-source-resource.mdx)\></code>                                                                  | **`Experimental`** This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes. Example: `<ClerkProvider clerkJsVersion="x.x.x" />`. |

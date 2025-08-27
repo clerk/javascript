@@ -1,0 +1,24 @@
+Checks if the provided error object is an instance of ClerkRuntimeError.
+
+## Parameters
+
+| Parameter | Type  | Description                |
+| --------- | ----- | -------------------------- |
+| `err`     | `any` | The error object to check. |
+
+## Returns
+
+`err is ClerkRuntimeError` — True if the error is a ClerkRuntimeError, false otherwise.
+
+## Example
+
+```ts
+const error = new ClerkRuntimeError("An error occurred");
+if (isClerkRuntimeError(error)) {
+  // Handle ClerkRuntimeError
+  console.error("ClerkRuntimeError:", error.message);
+} else {
+  // Handle other errors
+  console.error("Other error:", error.message);
+}
+```

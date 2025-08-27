@@ -1,0 +1,130 @@
+The `useOrganization()` hook retrieves attributes of the currently active organization.
+
+## Parameters
+
+| Parameter | Type |
+| --------- | ---- |
+| `params?` | `T`  |
+
+## Returns
+
+[`UseOrganizationReturn`](../shared/use-organization-return.mdx)\<`T`\>
+
+## Examples
+
+### Expand and paginate attributes
+
+To keep network usage to a minimum, developers are required to opt-in by specifying which resource they need to fetch and paginate through. By default, the `memberships`, `invitations`, `membershipRequests`, and `domains` attributes are not populated. You must pass `true` or an object with the desired properties to fetch and paginate the data.
+
+```tsx
+// invitations.data will never be populated.
+const { invitations } = useOrganization();
+
+// Use default values to fetch invitations, such as initialPage = 1 and pageSize = 10
+const { invitations } = useOrganization({
+  invitations: true,
+});
+
+// Pass your own values to fetch invitations
+const { invitations } = useOrganization({
+  invitations: {
+    pageSize: 20,
+    initialPage: 2, // skips the first page
+  },
+});
+
+// Aggregate pages in order to render an infinite list
+const { invitations } = useOrganization({
+  invitations: {
+    infinite: true,
+  },
+});
+```
+
+### Infinite pagination
+
+The following example demonstrates how to use the `infinite` property to fetch and append new data to the existing list. The `memberships` attribute will be populated with the first page of the organization's memberships. When the "Load more" button is clicked, the `fetchNext` helper function will be called to append the next page of memberships to the list.
+
+```tsx
+import { useOrganization } from '@clerk/clerk-react'
+
+export default function MemberList() {
+  const { memberships } = useOrganization({
+    memberships: {
+      infinite: true, // Append new data to the existing list
+      keepPreviousData: true, // Persist the cached data until the new data has been fetched
+    },
+  })
+
+  if (!memberships) {
+    // Handle loading state
+    return null
+  }
+
+  return (
+    <div>
+      <h2>Organization members</h2>
+      <ul>
+        {memberships.data?.map((membership) => (
+          <li key={membership.id}>
+            {membership.publicUserData.firstName} {membership.publicUserData.lastName} <
+            {membership.publicUserData.identifier}> :: {membership.role}
+          </li>
+        ))}
+      </ul>
+
+      <button
+        disabled={!memberships.hasNextPage} // Disable the button if there are no more available pages to be fetched
+        onClick={memberships.fetchNext}
+      >
+        Load more
+      </button>
+    </div>
+  )
+}
+```
+
+### Simple pagination
+
+The following example demonstrates how to use the `fetchPrevious` and `fetchNext` helper functions to paginate through the data. The `memberships` attribute will be populated with the first page of the organization's memberships. When the "Previous page" or "Next page" button is clicked, the `fetchPrevious` or `fetchNext` helper function will be called to fetch the previous or next page of memberships.
+
+Notice the difference between this example's pagination and the infinite pagination example above.
+
+```tsx
+import { useOrganization } from '@clerk/clerk-react'
+
+export default function MemberList() {
+  const { memberships } = useOrganization({
+    memberships: {
+      keepPreviousData: true, // Persist the cached data until the new data has been fetched
+    },
+  })
+
+  if (!memberships) {
+    // Handle loading state
+    return null
+  }
+
+  return (
+    <div>
+      <h2>Organization members</h2>
+      <ul>
+        {memberships.data?.map((membership) => (
+          <li key={membership.id}>
+            {membership.publicUserData.firstName} {membership.publicUserData.lastName} <
+            {membership.publicUserData.identifier}> :: {membership.role}
+          </li>
+        ))}
+      </ul>
+
+      <button disabled={!memberships.hasPreviousPage} onClick={memberships.fetchPrevious}>
+        Previous page
+      </button>
+
+      <button disabled={!memberships.hasNextPage} onClick={memberships.fetchNext}>
+        Next page
+      </button>
+    </div>
+  )
+}
+```

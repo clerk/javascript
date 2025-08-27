@@ -97,5 +97,5 @@ scripts/.env
 !scripts/.env.example
 
 # typedoc
-.typedoc/docs
+# .typedoc/docs
 .typedoc/docs.json

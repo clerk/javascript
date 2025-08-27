@@ -1,0 +1,22 @@
+The Backend `ExternalAccount` object is a model around an identification obtained by an external provider (e.g. a social provider such as Google).
+
+External account must be verified, so that you can make sure they can be assigned to their rightful owners. The `ExternalAccount` object holds all necessary state around the verification process.
+
+## Properties
+
+| Property                                         | Type                                                                                     | Description                                                                                               |
+| ------------------------------------------------ | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| <a id="approvedscopes"></a> `approvedScopes`     | `string`                                                                                 | The scopes that the user has granted access to.                                                           |
+| <a id="emailaddress"></a> `emailAddress`         | `string`                                                                                 | The user's email address.                                                                                 |
+| <a id="externalid"></a> `externalId`             | `string`                                                                                 | The unique ID of the user in the provider.                                                                |
+| <a id="firstname"></a> `firstName`               | `string`                                                                                 | The user's first name.                                                                                    |
+| <a id="id"></a> `id`                             | `string`                                                                                 | The unique identifier for this external account.                                                          |
+| <a id="identificationid"></a> `identificationId` | `string`                                                                                 | The identification with which this external account is associated.                                        |
+| <a id="imageurl"></a> `imageUrl`                 | `string`                                                                                 | The user's image URL.                                                                                     |
+| <a id="label"></a> `label`                       | <code>null \| string</code>                                                              | A descriptive label to differentiate multiple external accounts of the same user for the same provider.   |
+| <a id="lastname"></a> `lastName`                 | `string`                                                                                 | The user's last name.                                                                                     |
+| <a id="phonenumber"></a> `phoneNumber`           | <code>null \| string</code>                                                              | The phone number related to this specific external account.                                               |
+| <a id="provider"></a> `provider`                 | `string`                                                                                 | The provider name (e.g., `google`).                                                                       |
+| <a id="publicmetadata"></a> `publicMetadata`     | <code>null \| Record\<string, unknown\></code>                                           | Metadata that can be read from the Frontend API and Backend API and can be set only from the Backend API. |
+| <a id="username"></a> `username`                 | <code>null \| string</code>                                                              | The user's username.                                                                                      |
+| <a id="verification"></a> `verification`         | <code>null \| [Verification](/docs/references/backend/types/backend-verification)</code> | An object holding information on the verification of this external account.                               |
