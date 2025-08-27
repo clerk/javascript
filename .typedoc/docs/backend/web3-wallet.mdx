@@ -1,0 +1,11 @@
+The Backend `Web3Wallet` object describes a Web3 wallet address. The address can be used as a proof of identification for users.
+
+Web3 addresses must be verified to ensure that they can be assigned to their rightful owners. The verification is completed via Web3 wallet browser extensions, such as [Metamask](https://metamask.io/), [Coinbase Wallet](https://www.coinbase.com/wallet), and [OKX Wallet](https://www.okx.com/help/section/faq-web3-wallet). The `Web3Wallet3` object holds all the necessary state around the verification process.
+
+## Properties
+
+| Property                                 | Type                                                                                     | Description                                                            |
+| ---------------------------------------- | ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| <a id="id"></a> `id`                     | `string`                                                                                 | The unique ID for the Web3 wallet.                                     |
+| <a id="verification"></a> `verification` | <code>null \| [Verification](/docs/references/backend/types/backend-verification)</code> | An object holding information on the verification of this Web3 wallet. |
+| <a id="web3wallet"></a> `web3Wallet`     | `string`                                                                                 | The Web3 wallet address, made up of 0x + 40 hexadecimal characters.    |

@@ -1,0 +1,10 @@
+> **ServerGetTokenOptions** = <code>\{ expiresInSeconds?: number; template?: string; \}</code>
+
+Options for retrieving a session token.
+
+## Properties
+
+| Property                                          | Type     | Description                                                                                                                                                                               |
+| ------------------------------------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| <a id="expiresinseconds"></a> `expiresInSeconds?` | `number` | The expiration time for the token in seconds. If provided, the token will expire after the specified number of seconds. Must be a positive integer.                                       |
+| <a id="template"></a> `template?`                 | `string` | The name of a JWT template configured in the Clerk Dashboard. If provided, a JWT will be generated using the specified template. If not provided, the raw session token will be returned. |

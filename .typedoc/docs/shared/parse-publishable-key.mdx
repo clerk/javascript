@@ -1,0 +1,47 @@
+Parses and validates a publishable key, extracting the frontend API and instance type.
+
+## Param
+
+The publishable key to parse.
+
+## Param
+
+Configuration options for parsing.
+
+## Param
+
+## Param
+
+## Param
+
+## Param
+
+## Throws
+
+When options.fatal is true and key is missing or invalid.
+
+## Call Signature
+
+### Parameters
+
+| Parameter | Type                                                           |
+| --------- | -------------------------------------------------------------- |
+| `key`     | <code>undefined \| string</code>                               |
+| `options` | `ParsePublishableKeyOptions` & <code>\{ fatal: true; \}</code> |
+
+### Returns
+
+`PublishableKey`
+
+## Call Signature
+
+### Parameters
+
+| Parameter  | Type                             |
+| ---------- | -------------------------------- |
+| `key`      | <code>undefined \| string</code> |
+| `options?` | `ParsePublishableKeyOptions`     |
+
+### Returns
+
+<code>null \| PublishableKey</code>

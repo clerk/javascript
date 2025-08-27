@@ -1,0 +1,4 @@
+Used to construct a type union containing all the keys (even if nested) of an object defined as const
+const obj = { a: { b: '' }, c: '' } as const;
+type Paths = RecordToPath<typeof obj>
+Paths contains: 'a' | 'a.b' | 'c'

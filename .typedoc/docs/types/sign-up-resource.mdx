@@ -1,0 +1,29 @@
+The `SignUp` object holds the state of the current sign-up and provides helper methods to navigate and complete the sign-up process. Once a sign-up is complete, a new user is created.
+
+## Properties
+
+| Property                         | Type                              | Description                            |
+| -------------------------------- | --------------------------------- | -------------------------------------- |
+| <a id="id"></a> `id?`            | `string`                          | The unique identifier of the resource. |
+| <a id="pathroot"></a> `pathRoot` | `string`                          | The root path of the resource.         |
+| <a id="status"></a> `status`     | <code>null \| SignUpStatus</code> | The current status of the sign-up.     |
+
+## Methods
+
+### reload()
+
+Reload the resource and return the resource itself.
+
+#### Parameters
+
+| Parameter | Type                        |
+| --------- | --------------------------- |
+| `p?`      | `ClerkResourceReloadParams` |
+
+#### Returns
+
+`Promise`\<`SignUpResource`\>
+
+#### Inherited from
+
+[`ClerkResource`](clerk-resource.mdx).[`reload`](clerk-resource.mdx#reload)

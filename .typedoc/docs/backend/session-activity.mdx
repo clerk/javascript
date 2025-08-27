@@ -1,0 +1,14 @@
+The Backend `SessionActivity` object models the activity of a user session, capturing details such as the device type, browser information, and geographical location.
+
+## Properties
+
+| Property                                      | Type      | Description                                                                                        |
+| --------------------------------------------- | --------- | -------------------------------------------------------------------------------------------------- |
+| <a id="browsername"></a> `browserName?`       | `string`  | The name of the browser from which this session activity occurred.                                 |
+| <a id="browserversion"></a> `browserVersion?` | `string`  | The version of the browser from which this session activity occurred.                              |
+| <a id="city"></a> `city?`                     | `string`  | The city from which this session activity occurred. Resolved by IP address geo-location.           |
+| <a id="country"></a> `country?`               | `string`  | The country from which this session activity occurred. Resolved by IP address geo-location.        |
+| <a id="devicetype"></a> `deviceType?`         | `string`  | The type of the device which was used in this session activity.                                    |
+| <a id="id"></a> `id`                          | `string`  | The unique identifier for the session activity record.                                             |
+| <a id="ipaddress"></a> `ipAddress?`           | `string`  | The IP address from which this session activity originated.                                        |
+| <a id="ismobile"></a> `isMobile`              | `boolean` | Will be set to `true` if the session activity came from a mobile device. Set to `false` otherwise. |

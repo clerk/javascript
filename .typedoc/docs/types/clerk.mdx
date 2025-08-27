@@ -1,0 +1,332 @@
+Main Clerk SDK object.
+
+## Properties
+
+| Property                                                                                               | Type                                                                                                                                | Description                                                                                                                                                                                                                                                                                                                                                                                   |
+| ------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| <a id="__experimental_checkout"></a> `__experimental_checkout`                                         | `__experimental_CheckoutFunction`                                                                                                   | **`Experimental`** Checkout API This API is in early access and may change in future releases.                                                                                                                                                                                                                                                                                                |
+| <a id="__experimental_prefetchorganizationswitcher"></a> `__experimental_prefetchOrganizationSwitcher` | <code>() => void</code>                                                                                                             | **`Experimental`** Prefetches the data displayed by an organization switcher. It can be used when `mountOrganizationSwitcher({ asStandalone: true})`, to avoid unwanted loading states. This API is still under active development and may change at any moment.                                                                                                                              |
+| <a id="__internal_closecheckout"></a> `__internal_closeCheckout`                                       | <code>() => void</code>                                                                                                             | Closes the Clerk Checkout drawer.                                                                                                                                                                                                                                                                                                                                                             |
+| <a id="__internal_closeplandetails"></a> `__internal_closePlanDetails`                                 | <code>() => void</code>                                                                                                             | Closes the Clerk PlanDetails drawer.                                                                                                                                                                                                                                                                                                                                                          |
+| <a id="__internal_closereverification"></a> `__internal_closeReverification`                           | <code>() => void</code>                                                                                                             | Closes the Clerk user verification modal.                                                                                                                                                                                                                                                                                                                                                     |
+| <a id="__internal_closesubscriptiondetails"></a> `__internal_closeSubscriptionDetails`                 | <code>() => void</code>                                                                                                             | Closes the Clerk SubscriptionDetails drawer.                                                                                                                                                                                                                                                                                                                                                  |
+| <a id="__internal_mountoauthconsent"></a> `__internal_mountOAuthConsent`                               | <code>(targetNode, oauthConsentProps?) => void</code>                                                                               | Mounts a OAuth consent component at the target element.                                                                                                                                                                                                                                                                                                                                       |
+| <a id="__internal_opencheckout"></a> `__internal_openCheckout`                                         | <code>(props?) => void</code>                                                                                                       | Opens the Clerk Checkout component in a drawer.                                                                                                                                                                                                                                                                                                                                               |
+| <a id="__internal_openplandetails"></a> `__internal_openPlanDetails`                                   | <code>(props) => void</code>                                                                                                        | Opens the Clerk PlanDetails drawer component in a drawer.                                                                                                                                                                                                                                                                                                                                     |
+| <a id="__internal_openreverification"></a> `__internal_openReverification`                             | <code>(props?) => void</code>                                                                                                       | Opens the Clerk UserVerification component in a modal.                                                                                                                                                                                                                                                                                                                                        |
+| <a id="__internal_opensubscriptiondetails"></a> `__internal_openSubscriptionDetails`                   | <code>(props?) => void</code>                                                                                                       | Opens the Clerk SubscriptionDetails drawer component in a drawer.                                                                                                                                                                                                                                                                                                                             |
+| <a id="__internal_setactiveinprogress"></a> `__internal_setActiveInProgress`                           | `boolean`                                                                                                                           | Internal flag indicating whether a `setActive` call is in progress. Used to prevent navigations from being initiated outside of the Clerk class.                                                                                                                                                                                                                                              |
+| <a id="__internal_state"></a> `__internal_state`                                                       | `State`                                                                                                                             | **`Experimental`** This experimental API is subject to change. Entrypoint for Clerk's Signal API containing resource signals along with accessible versions of `computed()` and `effect()` that can be used to subscribe to changes from Signals.                                                                                                                                             |
+| <a id="__internal_unmountoauthconsent"></a> `__internal_unmountOAuthConsent`                           | <code>(targetNode) => void</code>                                                                                                   | Unmounts a OAuth consent component from the target element.                                                                                                                                                                                                                                                                                                                                   |
+| <a id="addlistener"></a> `addListener`                                                                 | <code>(callback) => UnsubscribeCallback</code>                                                                                      | Register a listener that triggers a callback each time important Clerk resources are changed. Allows to hook up at different steps in the sign up, sign in processes. Some important checkpoints: When there is an active session, user === session.user. When there is no active session, user and session will both be null. When a session is loading, user and session will be undefined. |
+| <a id="apikeys"></a> `apiKeys`                                                                         | `APIKeysNamespace`                                                                                                                  | **`Experimental`** API Keys Object This API is in early access and may change in future releases.                                                                                                                                                                                                                                                                                             |
+| <a id="authenticatewithcoinbasewallet"></a> `authenticateWithCoinbaseWallet`                           | <code>(params?) => Promise\<unknown\></code>                                                                                        | Authenticates user using their Coinbase Smart Wallet and browser extension                                                                                                                                                                                                                                                                                                                    |
+| <a id="authenticatewithgoogleonetap"></a> `authenticateWithGoogleOneTap`                               | <code>(params) => Promise\<[SignInResource](sign-in-resource.mdx) \| [SignUpResource](/docs/references/javascript/sign-up)\></code> | Authenticates user using a Google token generated from Google identity services.                                                                                                                                                                                                                                                                                                              |
+| <a id="authenticatewithmetamask"></a> `authenticateWithMetamask`                                       | <code>(params?) => Promise\<unknown\></code>                                                                                        | Authenticates user using their Metamask browser extension                                                                                                                                                                                                                                                                                                                                     |
+| <a id="authenticatewithokxwallet"></a> `authenticateWithOKXWallet`                                     | <code>(params?) => Promise\<unknown\></code>                                                                                        | Authenticates user using their OKX Wallet browser extension                                                                                                                                                                                                                                                                                                                                   |
+| <a id="authenticatewithweb3"></a> `authenticateWithWeb3`                                               | <code>(params) => Promise\<unknown\></code>                                                                                         | Authenticates user using their Web3 Wallet browser extension                                                                                                                                                                                                                                                                                                                                  |
+| <a id="billing"></a> `billing`                                                                         | [`CommerceBillingNamespace`](commerce-billing-namespace.mdx)                                                                        | **`Experimental`** This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. **See** /docs/billing/overview It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes. Example: `<ClerkProvider clerkJsVersion="x.x.x" />`.                                            |
+| <a id="client"></a> `client`                                                                           | <code>undefined \| ClientResource</code>                                                                                            | Client handling most Clerk operations.                                                                                                                                                                                                                                                                                                                                                        |
+| <a id="closecreateorganization"></a> `closeCreateOrganization`                                         | <code>() => void</code>                                                                                                             | Closes the Clerk CreateOrganization modal.                                                                                                                                                                                                                                                                                                                                                    |
+| <a id="closegoogleonetap"></a> `closeGoogleOneTap`                                                     | <code>() => void</code>                                                                                                             | Opens the Google One Tap component. If the component is not already open, results in a noop.                                                                                                                                                                                                                                                                                                  |
+| <a id="closeorganizationprofile"></a> `closeOrganizationProfile`                                       | <code>() => void</code>                                                                                                             | Closes the Clerk OrganizationProfile modal.                                                                                                                                                                                                                                                                                                                                                   |
+| <a id="closesignin"></a> `closeSignIn`                                                                 | <code>() => void</code>                                                                                                             | Closes the Clerk SignIn modal.                                                                                                                                                                                                                                                                                                                                                                |
+| <a id="closesignup"></a> `closeSignUp`                                                                 | <code>() => void</code>                                                                                                             | Closes the Clerk SignUp modal.                                                                                                                                                                                                                                                                                                                                                                |
+| <a id="closeuserprofile"></a> `closeUserProfile`                                                       | <code>() => void</code>                                                                                                             | Closes the Clerk UserProfile modal.                                                                                                                                                                                                                                                                                                                                                           |
+| <a id="closewaitlist"></a> `closeWaitlist`                                                             | <code>() => void</code>                                                                                                             | Closes the Clerk Waitlist modal.                                                                                                                                                                                                                                                                                                                                                              |
+| <a id="createorganization"></a> `createOrganization`                                                   | <code>(params) => Promise\<[OrganizationResource](/docs/references/javascript/organization)\></code>                                | Creates an organization, adding the current user as admin.                                                                                                                                                                                                                                                                                                                                    |
+| <a id="domain"></a> `domain`                                                                           | `string`                                                                                                                            | Clerk Satellite Frontend API string.                                                                                                                                                                                                                                                                                                                                                          |
+| <a id="getorganization"></a> `getOrganization`                                                         | <code>(organizationId) => Promise\<[OrganizationResource](/docs/references/javascript/organization)\></code>                        | Retrieves a single organization by id.                                                                                                                                                                                                                                                                                                                                                        |
+| <a id="handleemaillinkverification"></a> `handleEmailLinkVerification`                                 | <code>(params, customNavigate?) => Promise\<unknown\></code>                                                                        | Completes a Email Link flow started by Clerk.client.signIn.createEmailLinkFlow or Clerk.client.signUp.createEmailLinkFlow                                                                                                                                                                                                                                                                     |
+| <a id="handlegoogleonetapcallback"></a> `handleGoogleOneTapCallback`                                   | <code>(signInOrUp, params, customNavigate?) => Promise\<unknown\></code>                                                            | Completes a Google One Tap redirection flow started by [Clerk.authenticateWithGoogleOneTap](#authenticatewithgoogleonetap)                                                                                                                                                                                                                                                                    |
+| <a id="handleredirectcallback"></a> `handleRedirectCallback`                                           | <code>(params, customNavigate?) => Promise\<unknown\></code>                                                                        | Completes an OAuth or SAML redirection flow started by Clerk.client.signIn.authenticateWithRedirect or Clerk.client.signUp.authenticateWithRedirect                                                                                                                                                                                                                                           |
+| <a id="handleunauthenticated"></a> `handleUnauthenticated`                                             | <code>() => Promise\<unknown\></code>                                                                                               | Handles a 401 response from Frontend API by refreshing the client and session object accordingly                                                                                                                                                                                                                                                                                              |
+| <a id="instancetype"></a> `instanceType`                                                               | <code>undefined \| InstanceType</code>                                                                                              | Clerk Instance type is defined from the Publishable key                                                                                                                                                                                                                                                                                                                                       |
+| <a id="issatellite"></a> `isSatellite`                                                                 | `boolean`                                                                                                                           | Clerk Flag for satellite apps.                                                                                                                                                                                                                                                                                                                                                                |
+| <a id="issignedin"></a> `isSignedIn`                                                                   | `boolean`                                                                                                                           | Indicates whether the current user has a valid signed-in client session                                                                                                                                                                                                                                                                                                                       |
+| <a id="isstandardbrowser"></a> `isStandardBrowser`                                                     | <code>undefined \| boolean</code>                                                                                                   | Clerk flag for loading Clerk in a standard browser setup                                                                                                                                                                                                                                                                                                                                      |
+| <a id="loaded"></a> `loaded`                                                                           | `boolean`                                                                                                                           | If true the bootstrapping of Clerk.load() has completed successfully.                                                                                                                                                                                                                                                                                                                         |
+| <a id="mountapikeys"></a> `mountApiKeys`                                                               | <code>(targetNode, props?) => void</code>                                                                                           | **`Experimental`** This API is in early access and may change in future releases. Mount a api keys component at the target element.                                                                                                                                                                                                                                                           |
+| <a id="mountcreateorganization"></a> `mountCreateOrganization`                                         | <code>(targetNode, props?) => void</code>                                                                                           | Mount a CreateOrganization component at the target element.                                                                                                                                                                                                                                                                                                                                   |
+| <a id="mountorganizationlist"></a> `mountOrganizationList`                                             | <code>(targetNode, props?) => void</code>                                                                                           | Mount an organization list component at the target element.                                                                                                                                                                                                                                                                                                                                   |
+| <a id="mountorganizationprofile"></a> `mountOrganizationProfile`                                       | <code>(targetNode, props?) => void</code>                                                                                           | Mount an organization profile component at the target element.                                                                                                                                                                                                                                                                                                                                |
+| <a id="mountorganizationswitcher"></a> `mountOrganizationSwitcher`                                     | <code>(targetNode, props?) => void</code>                                                                                           | Mount an organization switcher component at the target element.                                                                                                                                                                                                                                                                                                                               |
+| <a id="mountpricingtable"></a> `mountPricingTable`                                                     | <code>(targetNode, props?) => void</code>                                                                                           | Mounts a pricing table component at the target element.                                                                                                                                                                                                                                                                                                                                       |
+| <a id="mountsignin"></a> `mountSignIn`                                                                 | <code>(targetNode, signInProps?) => void</code>                                                                                     | Mounts a sign in flow component at the target element.                                                                                                                                                                                                                                                                                                                                        |
+| <a id="mountsignup"></a> `mountSignUp`                                                                 | <code>(targetNode, signUpProps?) => void</code>                                                                                     | Mounts a sign up flow component at the target element.                                                                                                                                                                                                                                                                                                                                        |
+| <a id="mounttaskchooseorganization"></a> `mountTaskChooseOrganization`                                 | <code>(targetNode, props?) => void</code>                                                                                           | Mounts a TaskChooseOrganization component at the target element.                                                                                                                                                                                                                                                                                                                              |
+| <a id="mountuserbutton"></a> `mountUserButton`                                                         | <code>(targetNode, userButtonProps?) => void</code>                                                                                 | Mount a user button component at the target element.                                                                                                                                                                                                                                                                                                                                          |
+| <a id="mountuserprofile"></a> `mountUserProfile`                                                       | <code>(targetNode, userProfileProps?) => void</code>                                                                                | Mount a user profile component at the target element.                                                                                                                                                                                                                                                                                                                                         |
+| <a id="mountwaitlist"></a> `mountWaitlist`                                                             | <code>(targetNode, props?) => void</code>                                                                                           | Mount a waitlist at the target element.                                                                                                                                                                                                                                                                                                                                                       |
+| <a id="navigate"></a> `navigate`                                                                       | `CustomNavigation`                                                                                                                  | Function used to commit a navigation after certain steps in the Clerk processes.                                                                                                                                                                                                                                                                                                              |
+| <a id="off"></a> `off`                                                                                 | `OffEventListener`                                                                                                                  | Removes an event handler for a specific Clerk event. **Param** The event name to unsubscribe from **Param** The callback function to remove                                                                                                                                                                                                                                                   |
+| <a id="on"></a> `on`                                                                                   | `OnEventListener`                                                                                                                   | Registers an event handler for a specific Clerk event. **Param** The event name to subscribe to **Param** The callback function to execute when the event is dispatched **Param** Optional configuration object **Param** If true and the event was previously dispatched, handler will be called immediately with the latest payload                                                         |
+| <a id="opencreateorganization"></a> `openCreateOrganization`                                           | <code>(props?) => void</code>                                                                                                       | Opens the Clerk CreateOrganization modal.                                                                                                                                                                                                                                                                                                                                                     |
+| <a id="opengoogleonetap"></a> `openGoogleOneTap`                                                       | <code>(props?) => void</code>                                                                                                       | Opens the Google One Tap component.                                                                                                                                                                                                                                                                                                                                                           |
+| <a id="openorganizationprofile"></a> `openOrganizationProfile`                                         | <code>(props?) => void</code>                                                                                                       | Opens the Clerk OrganizationProfile modal.                                                                                                                                                                                                                                                                                                                                                    |
+| <a id="opensignin"></a> `openSignIn`                                                                   | <code>(props?) => void</code>                                                                                                       | Opens the Clerk SignIn component in a modal.                                                                                                                                                                                                                                                                                                                                                  |
+| <a id="opensignup"></a> `openSignUp`                                                                   | <code>(props?) => void</code>                                                                                                       | Opens the Clerk SignUp component in a modal.                                                                                                                                                                                                                                                                                                                                                  |
+| <a id="openuserprofile"></a> `openUserProfile`                                                         | <code>(props?) => void</code>                                                                                                       | Opens the Clerk UserProfile modal.                                                                                                                                                                                                                                                                                                                                                            |
+| <a id="openwaitlist"></a> `openWaitlist`                                                               | <code>(props?) => void</code>                                                                                                       | Opens the Clerk Waitlist modal.                                                                                                                                                                                                                                                                                                                                                               |
+| <a id="organization"></a> `organization`                                                               | <code>undefined \| null \| [OrganizationResource](/docs/references/javascript/organization)</code>                                  | Active Organization                                                                                                                                                                                                                                                                                                                                                                           |
+| <a id="proxyurl"></a> `proxyUrl`                                                                       | <code>undefined \| string</code>                                                                                                    | Clerk Proxy url string.                                                                                                                                                                                                                                                                                                                                                                       |
+| <a id="publishablekey"></a> `publishableKey`                                                           | `string`                                                                                                                            | Clerk Publishable Key string.                                                                                                                                                                                                                                                                                                                                                                 |
+| <a id="redirecttoaftersignin"></a> `redirectToAfterSignIn`                                             | <code>() => void</code>                                                                                                             | Redirects to the configured afterSignIn URL.                                                                                                                                                                                                                                                                                                                                                  |
+| <a id="redirecttoaftersignout"></a> `redirectToAfterSignOut`                                           | <code>() => void</code>                                                                                                             | Redirects to the configured afterSignOut URL.                                                                                                                                                                                                                                                                                                                                                 |
+| <a id="redirecttoaftersignup"></a> `redirectToAfterSignUp`                                             | <code>() => void</code>                                                                                                             | Redirects to the configured afterSignUp URL.                                                                                                                                                                                                                                                                                                                                                  |
+| <a id="redirecttocreateorganization"></a> `redirectToCreateOrganization`                               | <code>() => Promise\<unknown\></code>                                                                                               | Redirects to the configured URL where `<CreateOrganization />` is mounted.                                                                                                                                                                                                                                                                                                                    |
+| <a id="redirecttoorganizationprofile"></a> `redirectToOrganizationProfile`                             | <code>() => Promise\<unknown\></code>                                                                                               | Redirects to the configured URL where `<OrganizationProfile />` is mounted.                                                                                                                                                                                                                                                                                                                   |
+| <a id="redirecttouserprofile"></a> `redirectToUserProfile`                                             | <code>() => Promise\<unknown\></code>                                                                                               | Redirects to the configured URL where `<UserProfile/>` is mounted.                                                                                                                                                                                                                                                                                                                            |
+| <a id="redirecttowaitlist"></a> `redirectToWaitlist`                                                   | <code>() => void</code>                                                                                                             | Redirects to the configured URL where `<Waitlist/>` is mounted.                                                                                                                                                                                                                                                                                                                               |
+| <a id="sdkmetadata"></a> `sdkMetadata`                                                                 | <code>undefined \| \{ environment?: string; name: string; version: string; \}</code>                                                | If present, contains information about the SDK that the host application is using. For example, if Clerk is loaded through `@clerk/nextjs`, this would be `{ name: '@clerk/nextjs', version: '1.0.0' }`                                                                                                                                                                                       |
+| <a id="session"></a> `session`                                                                         | <code>undefined \| null \| [SignedInSessionResource](/docs/references/javascript/session)</code>                                    | Current Session.                                                                                                                                                                                                                                                                                                                                                                              |
+| <a id="setactive"></a> `setActive`                                                                     | <code>([setActiveParams](/docs/references/javascript/types/set-active-params)) => Promise\<void\></code>                            | Set the active session and organization explicitly. If the session param is `null`, the active session is deleted. In a similar fashion, if the organization param is `null`, the current organization is removed as active.                                                                                                                                                                  |
+| <a id="signout"></a> `signOut`                                                                         | <code>\{ (options?): Promise\<void\>; (signOutCallback?, options?): Promise\<void\>; \}</code>                                      | Signs out the current user on single-session instances, or all users on multi-session instances **Param** Optional A callback that runs after sign out completes. **Param** Optional Configuration options, see SignOutOptions                                                                                                                                                                |
+| <a id="status"></a> `status`                                                                           | <code>"error" \| "loading" \| "ready" \| "degraded"</code>                                                                          | Describes the state the clerk singleton operates in: - `"error"`: Clerk failed to initialize. - `"loading"`: Clerk is still attempting to load. - `"ready"`: Clerk singleton is fully operational. - `"degraded"`: Clerk singleton is partially operational.                                                                                                                                  |
+| <a id="unmountapikeys"></a> `unmountApiKeys`                                                           | <code>(targetNode) => void</code>                                                                                                   | **`Experimental`** This API is in early access and may change in future releases. Unmount a api keys component from the target element. If there is no component mounted at the target node, results in a noop.                                                                                                                                                                               |
+| <a id="unmountcreateorganization"></a> `unmountCreateOrganization`                                     | <code>(targetNode) => void</code>                                                                                                   | Unmount the CreateOrganization component from the target node.                                                                                                                                                                                                                                                                                                                                |
+| <a id="unmountorganizationlist"></a> `unmountOrganizationList`                                         | <code>(targetNode) => void</code>                                                                                                   | Unmount the organization list component from the target node.\*                                                                                                                                                                                                                                                                                                                               |
+| <a id="unmountorganizationprofile"></a> `unmountOrganizationProfile`                                   | <code>(targetNode) => void</code>                                                                                                   | Unmount the organization profile component from the target node.                                                                                                                                                                                                                                                                                                                              |
+| <a id="unmountorganizationswitcher"></a> `unmountOrganizationSwitcher`                                 | <code>(targetNode) => void</code>                                                                                                   | Unmount the organization profile component from the target node.\*                                                                                                                                                                                                                                                                                                                            |
+| <a id="unmountpricingtable"></a> `unmountPricingTable`                                                 | <code>(targetNode) => void</code>                                                                                                   | Unmount a pricing table component from the target element. If there is no component mounted at the target node, results in a noop.                                                                                                                                                                                                                                                            |
+| <a id="unmountsignin"></a> `unmountSignIn`                                                             | <code>(targetNode) => void</code>                                                                                                   | Unmount a sign in flow component from the target element. If there is no component mounted at the target node, results in a noop.                                                                                                                                                                                                                                                             |
+| <a id="unmountsignup"></a> `unmountSignUp`                                                             | <code>(targetNode) => void</code>                                                                                                   | Unmount a sign up flow component from the target element. If there is no component mounted at the target node, results in a noop.                                                                                                                                                                                                                                                             |
+| <a id="unmounttaskchooseorganization"></a> `unmountTaskChooseOrganization`                             | <code>(targetNode) => void</code>                                                                                                   | Unmount a TaskChooseOrganization component from the target element. If there is no component mounted at the target node, results in a noop.                                                                                                                                                                                                                                                   |
+| <a id="unmountuserbutton"></a> `unmountUserButton`                                                     | <code>(targetNode) => void</code>                                                                                                   | Unmount a user button component at the target element. If there is no component mounted at the target node, results in a noop.                                                                                                                                                                                                                                                                |
+| <a id="unmountuserprofile"></a> `unmountUserProfile`                                                   | <code>(targetNode) => void</code>                                                                                                   | Unmount a user profile component at the target element. If there is no component mounted at the target node, results in a noop.                                                                                                                                                                                                                                                               |
+| <a id="unmountwaitlist"></a> `unmountWaitlist`                                                         | <code>(targetNode) => void</code>                                                                                                   | Unmount the Waitlist component from the target node.                                                                                                                                                                                                                                                                                                                                          |
+| <a id="user"></a> `user`                                                                               | <code>undefined \| null \| [UserResource](/docs/references/javascript/user)</code>                                                  | Current User.                                                                                                                                                                                                                                                                                                                                                                                 |
+| <a id="version"></a> `version`                                                                         | <code>undefined \| string</code>                                                                                                    | Clerk SDK version number.                                                                                                                                                                                                                                                                                                                                                                     |
+
+## Methods
+
+### buildAfterMultiSessionSingleSignOutUrl()
+
+Returns the configured afterMultiSessionSingleSignOutUrl of the instance.
+
+#### Returns
+
+`string`
+
+---
+
+### buildAfterSignInUrl()
+
+Returns the configured afterSignInUrl of the instance.
+
+#### Parameters
+
+| Parameter                   | Type                                         |
+| --------------------------- | -------------------------------------------- |
+| `__namedParameters?`        | <code>\{ params?: URLSearchParams; \}</code> |
+| `__namedParameters.params?` | `URLSearchParams`                            |
+
+#### Returns
+
+`string`
+
+---
+
+### buildAfterSignOutUrl()
+
+Returns the configured afterSignOutUrl of the instance.
+
+#### Returns
+
+`string`
+
+---
+
+### buildAfterSignUpUrl()
+
+Returns the configured afterSignInUrl of the instance.
+
+#### Parameters
+
+| Parameter                   | Type                                         |
+| --------------------------- | -------------------------------------------- |
+| `__namedParameters?`        | <code>\{ params?: URLSearchParams; \}</code> |
+| `__namedParameters.params?` | `URLSearchParams`                            |
+
+#### Returns
+
+`string`
+
+---
+
+### buildCreateOrganizationUrl()
+
+Returns the configured url where `<CreateOrganization />` is mounted or a custom create-organization page is rendered.
+
+#### Returns
+
+`string`
+
+---
+
+### buildNewSubscriptionRedirectUrl()
+
+Returns the configured newSubscriptionRedirectUrl of the instance.
+
+#### Returns
+
+`string`
+
+---
+
+### buildOrganizationProfileUrl()
+
+Returns the configured url where `<OrganizationProfile />` is mounted or a custom organization-profile page is rendered.
+
+#### Returns
+
+`string`
+
+---
+
+### buildSignInUrl()
+
+Returns the configured url where `<SignIn/>` is mounted or a custom sign-in page is rendered.
+
+#### Parameters
+
+| Parameter | Type                                      | Description                                      |
+| --------- | ----------------------------------------- | ------------------------------------------------ |
+| `opts?`   | [`RedirectOptions`](redirect-options.mdx) | A [RedirectOptions](redirect-options.mdx) object |
+
+#### Returns
+
+`string`
+
+---
+
+### buildSignUpUrl()
+
+Returns the configured url where `<SignUp/>` is mounted or a custom sign-up page is rendered.
+
+#### Parameters
+
+| Parameter | Type                                      | Description                                      |
+| --------- | ----------------------------------------- | ------------------------------------------------ |
+| `opts?`   | [`RedirectOptions`](redirect-options.mdx) | A [RedirectOptions](redirect-options.mdx) object |
+
+#### Returns
+
+`string`
+
+---
+
+### buildTasksUrl()
+
+Returns the configured url where tasks are mounted.
+
+#### Returns
+
+`string`
+
+---
+
+### buildUrlWithAuth()
+
+Decorates the provided url with the auth token for development instances.
+
+#### Parameters
+
+| Parameter | Type     |
+| --------- | -------- |
+| `to`      | `string` |
+
+#### Returns
+
+`string`
+
+---
+
+### buildUserProfileUrl()
+
+Returns the url where `<UserProfile />` is mounted or a custom user-profile page is rendered.
+
+#### Returns
+
+`string`
+
+---
+
+### buildWaitlistUrl()
+
+Returns the configured url where `<Waitlist/>` is mounted or a custom waitlist page is rendered.
+
+#### Parameters
+
+| Parameter             | Type                                                         |
+| --------------------- | ------------------------------------------------------------ |
+| `opts?`               | <code>\{ initialValues?: Record\<string, string\>; \}</code> |
+| `opts.initialValues?` | `Record`\<`string`, `string`\>                               |
+
+#### Returns
+
+`string`
+
+---
+
+### redirectToSignIn()
+
+Redirects to the configured URL where `<SignIn/>` is mounted.
+
+#### Parameters
+
+| Parameter | Type                    | Description                                      |
+| --------- | ----------------------- | ------------------------------------------------ |
+| `opts?`   | `SignInRedirectOptions` | A [RedirectOptions](redirect-options.mdx) object |
+
+#### Returns
+
+`Promise`\<`unknown`\>
+
+---
+
+### redirectToSignUp()
+
+Redirects to the configured URL where `<SignUp/>` is mounted.
+
+#### Parameters
+
+| Parameter | Type                    | Description                                      |
+| --------- | ----------------------- | ------------------------------------------------ |
+| `opts?`   | `SignUpRedirectOptions` | A [RedirectOptions](redirect-options.mdx) object |
+
+#### Returns
+
+`Promise`\<`unknown`\>
+
+---
+
+### redirectToTasks()
+
+Redirects to the configured URL where tasks are mounted.
+
+#### Parameters
+
+| Parameter | Type                   | Description                                      |
+| --------- | ---------------------- | ------------------------------------------------ |
+| `opts?`   | `TasksRedirectOptions` | A [RedirectOptions](redirect-options.mdx) object |
+
+#### Returns
+
+`Promise`\<`unknown`\>
+
+---
+
+### redirectWithAuth()
+
+Redirects to the provided url after decorating it with the auth token for development instances.
+
+#### Parameters
+
+| Parameter | Type     |
+| --------- | -------- |
+| `to`      | `string` |
+
+#### Returns
+
+`Promise`\<`unknown`\>

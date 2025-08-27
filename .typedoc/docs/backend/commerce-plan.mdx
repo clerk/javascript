@@ -1,0 +1,68 @@
+**`Experimental`**
+
+This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+It is advised to pin the SDK version to avoid breaking changes.
+
+## Constructors
+
+### Constructor
+
+**`Experimental`**
+
+#### Parameters
+
+| Parameter          | Type                             | Description                                                     |
+| ------------------ | -------------------------------- | --------------------------------------------------------------- |
+| `id`               | `string`                         | The unique identifier for the plan.                             |
+| `productId`        | `string`                         | The id of the product the plan belongs to.                      |
+| `name`             | `string`                         | The name of the plan.                                           |
+| `slug`             | `string`                         | The URL-friendly identifier of the plan.                        |
+| `description`      | <code>undefined \| string</code> | The description of the plan.                                    |
+| `isDefault`        | `boolean`                        | Whether the plan is the default plan.                           |
+| `isRecurring`      | `boolean`                        | Whether the plan is recurring.                                  |
+| `hasBaseFee`       | `boolean`                        | Whether the plan has a base fee.                                |
+| `publiclyVisible`  | `boolean`                        | Whether the plan is displayed in the `<PriceTable/>` component. |
+| `fee`              | `CommerceMoneyAmount`            | The monthly fee of the plan.                                    |
+| `annualFee`        | `CommerceMoneyAmount`            | The annual fee of the plan.                                     |
+| `annualMonthlyFee` | `CommerceMoneyAmount`            | The annual fee of the plan on a monthly basis.                  |
+| `forPayerType`     | <code>"user" \| "org"</code>     | The type of payer for the plan.                                 |
+| `features`         | <code>Feature[]</code>           | The features the plan offers.                                   |
+
+#### Returns
+
+`CommercePlan`
+
+## Properties
+
+| Property                                         | Type                             | Description                                                                        |
+| ------------------------------------------------ | -------------------------------- | ---------------------------------------------------------------------------------- |
+| <a id="annualfee"></a> `annualFee`               | `CommerceMoneyAmount`            | **`Experimental`** The annual fee of the plan.                                     |
+| <a id="annualmonthlyfee"></a> `annualMonthlyFee` | `CommerceMoneyAmount`            | **`Experimental`** The annual fee of the plan on a monthly basis.                  |
+| <a id="description"></a> `description`           | <code>undefined \| string</code> | **`Experimental`** The description of the plan.                                    |
+| <a id="features"></a> `features`                 | <code>Feature[]</code>           | **`Experimental`** The features the plan offers.                                   |
+| <a id="fee"></a> `fee`                           | `CommerceMoneyAmount`            | **`Experimental`** The monthly fee of the plan.                                    |
+| <a id="forpayertype"></a> `forPayerType`         | <code>"user" \| "org"</code>     | **`Experimental`** The type of payer for the plan.                                 |
+| <a id="hasbasefee"></a> `hasBaseFee`             | `boolean`                        | **`Experimental`** Whether the plan has a base fee.                                |
+| <a id="id"></a> `id`                             | `string`                         | **`Experimental`** The unique identifier for the plan.                             |
+| <a id="isdefault"></a> `isDefault`               | `boolean`                        | **`Experimental`** Whether the plan is the default plan.                           |
+| <a id="isrecurring"></a> `isRecurring`           | `boolean`                        | **`Experimental`** Whether the plan is recurring.                                  |
+| <a id="name"></a> `name`                         | `string`                         | **`Experimental`** The name of the plan.                                           |
+| <a id="productid"></a> `productId`               | `string`                         | **`Experimental`** The id of the product the plan belongs to.                      |
+| <a id="publiclyvisible"></a> `publiclyVisible`   | `boolean`                        | **`Experimental`** Whether the plan is displayed in the `<PriceTable/>` component. |
+| <a id="slug"></a> `slug`                         | `string`                         | **`Experimental`** The URL-friendly identifier of the plan.                        |
+
+## Methods
+
+### fromJSON()
+
+**`Experimental`**
+
+#### Parameters
+
+| Parameter | Type                                         |
+| --------- | -------------------------------------------- |
+| `data`    | [`CommercePlanJSON`](commerce-plan-json.mdx) |
+
+#### Returns
+
+`CommercePlan`

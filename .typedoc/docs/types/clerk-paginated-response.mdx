@@ -1,0 +1,11 @@
+An interface that describes the response of a method that returns a paginated list of resources.
+
+> [!TIP]
+> Clerk's SDKs always use `Promise<ClerkPaginatedResponse<T>>`. If the promise resolves, you will get back the properties. If the promise is rejected, you will receive a `ClerkAPIResponseError` or network error.
+
+## Properties
+
+| Property                               | Type             | Description                                  |
+| -------------------------------------- | ---------------- | -------------------------------------------- |
+| <a id="data"></a> `data`               | <code>T[]</code> | An array that contains the fetched data.     |
+| <a id="total_count"></a> `total_count` | `number`         | The total count of data that exist remotely. |

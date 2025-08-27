@@ -1,0 +1,27 @@
+**`Experimental`**
+
+This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+It is advised to pin the SDK version to avoid breaking changes.
+
+## Properties
+
+| Property                                    | Type                                                     | Description                                                | Overrides                  |
+| ------------------------------------------- | -------------------------------------------------------- | ---------------------------------------------------------- | -------------------------- |
+| <a id="amount"></a> `amount`                | <code>null \| CommerceMoneyAmountJSON</code>             | **`Experimental`**                                         | -                          |
+| <a id="canceled_at"></a> `canceled_at`      | <code>null \| number</code>                              | **`Experimental`**                                         | -                          |
+| <a id="created_at"></a> `created_at`        | `number`                                                 | **`Experimental`**                                         | -                          |
+| <a id="ended_at"></a> `ended_at`            | <code>null \| number</code>                              | **`Experimental`**                                         | -                          |
+| <a id="id"></a> `id`                        | `string`                                                 | **`Experimental`** The unique identifier for the resource. | -                          |
+| <a id="is_free_trial"></a> `is_free_trial?` | `boolean`                                                | **`Experimental`**                                         | -                          |
+| <a id="lifetime_paid"></a> `lifetime_paid`  | `CommerceMoneyAmountJSON`                                | **`Experimental`**                                         | -                          |
+| <a id="next_payment"></a> `next_payment`    | <code>null \| \{ amount: number; date: number; \}</code> | **`Experimental`**                                         | -                          |
+| <a id="object"></a> `object`                | `"commerce_subscription_item"`                           | **`Experimental`** The type of the resource.               | `ClerkResourceJSON.object` |
+| <a id="past_due_at"></a> `past_due_at`      | <code>null \| number</code>                              | **`Experimental`**                                         | -                          |
+| <a id="payer_id"></a> `payer_id`            | `string`                                                 | **`Experimental`**                                         | -                          |
+| <a id="period_end"></a> `period_end`        | <code>null \| number</code>                              | **`Experimental`**                                         | -                          |
+| <a id="period_start"></a> `period_start`    | `number`                                                 | **`Experimental`**                                         | -                          |
+| <a id="plan"></a> `plan`                    | [`CommercePlanJSON`](commerce-plan-json.mdx)             | **`Experimental`**                                         | -                          |
+| <a id="plan_id"></a> `plan_id`              | `string`                                                 | **`Experimental`**                                         | -                          |
+| <a id="plan_period"></a> `plan_period`      | <code>"month" \| "annual"</code>                         | **`Experimental`**                                         | -                          |
+| <a id="status"></a> `status`                | `CommerceSubscriptionItemStatus`                         | **`Experimental`**                                         | -                          |
+| <a id="updated_at"></a> `updated_at`        | `number`                                                 | **`Experimental`**                                         | -                          |

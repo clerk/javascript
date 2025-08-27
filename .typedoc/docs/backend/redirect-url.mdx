@@ -1,0 +1,12 @@
+Redirect URLs are whitelisted URLs that facilitate secure authentication flows in native applications (e.g. React Native, Expo). In these contexts, Clerk ensures that security-critical nonces are passed only to the whitelisted URLs.
+
+The Backend `RedirectUrl` object represents a redirect URL in your application. This object is used in the Backend API.
+
+## Properties
+
+| Property                           | Type     | Description                                                                                                                               |
+| ---------------------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| <a id="createdat"></a> `createdAt` | `number` | The date when the redirect URL was first created.                                                                                         |
+| <a id="id"></a> `id`               | `string` | The unique identifier for the redirect URL.                                                                                               |
+| <a id="updatedat"></a> `updatedAt` | `number` | The date when the redirect URL was last updated.                                                                                          |
+| <a id="url"></a> `url`             | `string` | The full URL value prefixed with `https://` or a custom scheme. Examples: `https://my-app.com/oauth-callback`, `my-app://oauth-callback`. |

@@ -1,0 +1,15 @@
+The Backend `SamlAccount` object describes a SAML account.
+
+## Properties
+
+| Property                                     | Type                                                                                     | Description                                                  |
+| -------------------------------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| <a id="active"></a> `active`                 | `boolean`                                                                                | A boolean that indicates whether the SAML account is active. |
+| <a id="emailaddress"></a> `emailAddress`     | `string`                                                                                 | The email address of the SAML account.                       |
+| <a id="firstname"></a> `firstName`           | `string`                                                                                 | The first name of the SAML account.                          |
+| <a id="id"></a> `id`                         | `string`                                                                                 | The unique identifier for the SAML account.                  |
+| <a id="lastname"></a> `lastName`             | `string`                                                                                 | The last name of the SAML account.                           |
+| <a id="provider"></a> `provider`             | `string`                                                                                 | The provider of the SAML account.                            |
+| <a id="provideruserid"></a> `providerUserId` | <code>null \| string</code>                                                              | The user's ID as used in the provider.                       |
+| <a id="samlconnection"></a> `samlConnection` | <code>null \| SamlAccountConnection</code>                                               | The SAML connection of the SAML account.                     |
+| <a id="verification"></a> `verification`     | <code>null \| [Verification](/docs/references/backend/types/backend-verification)</code> | The verification of the SAML account.                        |

@@ -1,0 +1,13 @@
+A type containing all the possible localization keys the prebuilt Clerk components support.
+Users aiming to customize a few strings can also peak at the `data-localization-key` attribute by inspecting
+the DOM and updating the corresponding key.
+Users aiming to completely localize the components by providing a complete translation can use
+the default english resource object from [Clerk's open source repo](https://github.com/clerk/javascript)
+as a starting point.
+
+## Properties
+
+| Property                                                                              | Type                                                                                                                                     | Description                                                                                                                                                                                                                               |
+| ------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| <a id="roles"></a> `roles?`                                                           | `DeepPartial`\<`DeepLocalizationWithoutObjects`\<<code>\{ [r: string]: string; \}</code>\>\>                                             | **`Experimental`** Add role keys and their localized values, e.g. `roles: { 'org:teacher': 'Teacher'}`.                                                                                                                                   |
+| <a id="socialbuttonsblockbuttonmanyinview"></a> `socialButtonsBlockButtonManyInView?` | `DeepPartial`\<\`$\{string\}\{\{provider\|titleize\}\}$\{string\}\` & <code>\{ \_\_params: UnionToRecordWithPrimitives\<T\>; \}</code>\> | It should be used to provide a shorter variation of `socialButtonsBlockButton`. It is explicitly typed, in order to avoid contributions that use LLM tools to generate translations that misinterpret the correct usage of this property. |

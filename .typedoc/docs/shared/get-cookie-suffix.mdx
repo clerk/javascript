@@ -1,0 +1,13 @@
+Generates a unique cookie suffix based on the publishable key using SHA-1 hashing.
+The suffix is base64-encoded and URL-safe (+ and / characters are replaced).
+
+## Parameters
+
+| Parameter        | Type           | Description                                                                           |
+| ---------------- | -------------- | ------------------------------------------------------------------------------------- |
+| `publishableKey` | `string`       | The publishable key to generate suffix from.                                          |
+| `subtle`         | `SubtleCrypto` | The SubtleCrypto interface to use for hashing (defaults to globalThis.crypto.subtle). |
+
+## Returns
+
+`Promise`\<`string`\> — A promise that resolves to an 8-character URL-safe base64 string.

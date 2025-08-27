@@ -1,0 +1,12 @@
+Verifies any type of machine token by detecting its type from the prefix.
+
+## Parameters
+
+| Parameter | Type                                          | Description                                                               |
+| --------- | --------------------------------------------- | ------------------------------------------------------------------------- |
+| `token`   | `string`                                      | The token to verify (e.g. starts with "m2m*", "oauth*", "api*key*", etc.) |
+| `options` | [`VerifyTokenOptions`](#verify-token-options) | Options including secretKey for BAPI authorization                        |
+
+## Returns
+
+`Promise`\<<code>\{ data?: undefined; errors: \[MachineTokenVerificationError\]; tokenType: "api_key" \| "m2m_token" \| "oauth_token"; \} \| \{ data: M2MToken; errors?: undefined; tokenType: "api_key" \| "m2m_token" \| "oauth_token"; \} \| \{ data: IdPOAuthAccessToken; errors?: undefined; tokenType: "api_key" \| "m2m_token" \| "oauth_token"; \} \| \{ data: APIKey; errors?: undefined; tokenType: "api_key" \| "m2m_token" \| "oauth_token"; \}</code>\>
