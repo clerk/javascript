@@ -1,4 +1,0 @@
-Overrides the type of existing properties
-const obj = { a: string, b: number } as const;
-type Value = Override<typeof obj, { b: string }>
-Value contains: { a:string, b: string }
