@@ -25,6 +25,7 @@ import type {
   __internal_UserVerificationModalProps,
   APIKeysNamespace,
   APIKeysProps,
+  AuthenticateWithBaseParams,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
@@ -43,6 +44,7 @@ import type {
   EnvironmentJSON,
   EnvironmentJSONSnapshot,
   EnvironmentResource,
+  GenerateSignatureParams,
   GoogleOneTapProps,
   HandleEmailLinkVerificationParams,
   HandleOAuthCallbackParams,
@@ -101,6 +103,7 @@ import {
   disabledAPIKeysFeature,
   disabledOrganizationsFeature,
   errorThrower,
+  generateSignatureWithBase,
   generateSignatureWithCoinbaseWallet,
   generateSignatureWithMetamask,
   generateSignatureWithOKXWallet,
@@ -2154,6 +2157,13 @@ export class Clerk implements ClerkInterface {
     });
   };
 
+  public authenticateWithBase = async (props: AuthenticateWithBaseParams = {}): Promise<void> => {
+    await this.authenticateWithWeb3({
+      ...props,
+      strategy: 'web3_base_signature',
+    });
+  };
+
   public authenticateWithOKXWallet = async (props: AuthenticateWithOKXWalletParams = {}): Promise<void> => {
     await this.authenticateWithWeb3({
       ...props,
@@ -2178,12 +2188,21 @@ export class Clerk implements ClerkInterface {
 
     const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
     const identifier = await getWeb3Identifier({ provider });
-    const generateSignature =
-      provider === 'metamask'
-        ? generateSignatureWithMetamask
-        : provider === 'coinbase_wallet'
-          ? generateSignatureWithCoinbaseWallet
-          : generateSignatureWithOKXWallet;
+    let generateSignature: (params: GenerateSignatureParams) => Promise<string>;
+    switch (provider) {
+      case 'metamask':
+        generateSignature = generateSignatureWithMetamask;
+        break;
+      case 'base':
+        generateSignature = generateSignatureWithBase;
+        break;
+      case 'coinbase_wallet':
+        generateSignature = generateSignatureWithCoinbaseWallet;
+        break;
+      default:
+        generateSignature = generateSignatureWithOKXWallet;
+        break;
+    }
 
     const makeNavigate = (to: string) => () =>
       customNavigate && typeof customNavigate === 'function' ? customNavigate(to) : this.navigate(to);
