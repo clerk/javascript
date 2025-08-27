@@ -1,4 +1,4 @@
-import { type CommerceMoneyAmount } from './CommercePlan';
+import { type CommerceMoneyAmount } from '@clerk/types';
 import { CommerceSubscriptionItem } from './CommerceSubscriptionItem';
 import type { CommerceSubscriptionJSON } from './JSON';
 

@@ -1,6 +1,6 @@
-import type { CommerceMoneyAmountJSON } from '@clerk/types';
+import type { CommerceMoneyAmountJSON, CommerceMoneyAmount } from '@clerk/types';
 
-import { type CommerceMoneyAmount, CommercePlan } from './CommercePlan';
+import { CommercePlan } from './CommercePlan';
 import type { CommerceSubscriptionItemJSON } from './JSON';
 
 /**

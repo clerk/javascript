@@ -1134,15 +1134,15 @@ export interface CommerceMoneyAmount {
    */
   amount: number;
   /**
-   * The amount as a formatted string. For example, `10` for $10.00.
+   * The amount as a formatted string. For example, `10.00` for $10.00.
    */
   amountFormatted: string;
   /**
-   * The ISO currency code for this amount. For example, `USD` or `EUR`.
+   * The ISO currency code for this amount. For example, `USD`.
    */
   currency: string;
   /**
-   * The symbol for the currency. For example, `$`, `€`, or `£`.
+   * The symbol for the currency. For example, `$`.
    */
   currencySymbol: string;
 }
