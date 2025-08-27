@@ -16,6 +16,8 @@ const hookName = 'useUser';
  * The following example uses the `useUser()` hook to access the [`User`](https://clerk.com/docs/references/javascript/user) object, which contains the current user's data such as their full name. The `isLoaded` and `isSignedIn` properties are used to handle the loading state and to check if the user is signed in, respectively.
  *
  * ```tsx {{ filename: 'src/Example.tsx' }}
+ * import { useUser } from '@clerk/clerk-react'
+ *
  * export default function Example() {
  *   const { isSignedIn, user, isLoaded } = useUser()
  *
@@ -43,14 +45,14 @@ const hookName = 'useUser';
  * import { useUser } from '@clerk/clerk-react'
  *
  * export default function Home() {
- *   const { isLoaded, user } = useUser()
+ *   const { isSignedIn, isLoaded, user } = useUser()
  *
  *   if (!isLoaded) {
  *     // Handle loading state
  *     return null
  *   }
  *
- *   if (!user) return null
+ *   if (!isSignedIn) return null
  *
  *   const updateUser = async () => {
  *     await user.update({
@@ -62,8 +64,8 @@ const hookName = 'useUser';
  *   return (
  *     <>
  *       <button onClick={updateUser}>Update your name</button>
- *       <p>user.firstName: {user?.firstName}</p>
- *       <p>user.lastName: {user?.lastName}</p>
+ *       <p>user.firstName: {user.firstName}</p>
+ *       <p>user.lastName: {user.lastName}</p>
  *     </>
  *   )
  * }
@@ -88,34 +90,42 @@ const hookName = 'useUser';
  * import { useUser } from '@clerk/clerk-react'
  *
  * export default function Home() {
- *   const { isLoaded, user } = useUser()
+ * import { useUser } from '@clerk/clerk-react';
+ *
+ * export default function Home() {
+ *   const { isSignedIn, isLoaded, user } = useUser();
  *
  *   if (!isLoaded) {
  *     // Handle loading state
- *     return null
+ *     return null;
  *   }
  *
- *   if (!user) return null
+ *   if (!isSignedIn) return null;
  *
  *   const updateUser = async () => {
  *     // Update data via an API endpoint
- *     const updateMetadata = await fetch('/api/updateMetadata')
+ *     const updateMetadata = await fetch('/api/updateMetadata', {
+ *       method: 'POST',
+ *       body: JSON.stringify({
+ *         role: 'admin'
+ *       })
+ *     });
  *
  *     // Check if the update was successful
- *     if (updateMetadata.message !== 'success') {
- *       throw new Error('Error updating')
+ *     if ((await updateMetadata.json()).message !== 'success') {
+ *       throw new Error('Error updating');
  *     }
  *
  *     // If the update was successful, reload the user data
- *     await user.reload()
- *   }
+ *     await user.reload();
+ *   };
  *
  *   return (
  *     <>
  *       <button onClick={updateUser}>Update your metadata</button>
- *       <p>user role: {user?.publicMetadata.role}</p>
+ *       <p>user role: {user.publicMetadata.role}</p>
  *     </>
- *   )
+ *   );
  * }
  * ```
  *
