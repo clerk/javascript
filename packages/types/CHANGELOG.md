@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.83.0
+
+### Minor Changes
+
+- Added support for authentication with Base ([#6556](https://github.com/clerk/javascript/pull/6556)) by [@jacekradko](https://github.com/jacekradko)
+
 ## 4.82.0
 
 ### Minor Changes
