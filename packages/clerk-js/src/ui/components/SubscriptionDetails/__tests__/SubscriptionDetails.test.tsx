@@ -1013,4 +1013,219 @@ describe('SubscriptionDetails', () => {
       expect(queryByRole('button', { name: /Open menu/i })).toBeNull();
     });
   });
+
+  it('active free trial subscription shows correct labels and behavior', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['test@clerk.com'] });
+    });
+
+    fixtures.clerk.billing.getSubscription.mockResolvedValue({
+      activeAt: new Date('2021-01-01'),
+      createdAt: new Date('2021-01-01'),
+      pastDueAt: null,
+      id: 'sub_123',
+      nextPayment: {
+        amount: {
+          amount: 1000,
+          amountFormatted: '10.00',
+          currency: 'USD',
+          currencySymbol: '$',
+        },
+        date: new Date('2021-02-01'),
+      },
+      status: 'active',
+      subscriptionItems: [
+        {
+          id: 'sub_123',
+          plan: {
+            id: 'plan_123',
+            name: 'Pro Plan',
+            fee: {
+              amount: 1000,
+              amountFormatted: '10.00',
+              currencySymbol: '$',
+              currency: 'USD',
+            },
+            annualFee: {
+              amount: 10000,
+              amountFormatted: '100.00',
+              currencySymbol: '$',
+              currency: 'USD',
+            },
+            annualMonthlyFee: {
+              amount: 8333,
+              amountFormatted: '83.33',
+              currencySymbol: '$',
+              currency: 'USD',
+            },
+            description: 'Pro Plan',
+            hasBaseFee: true,
+            isRecurring: true,
+            isDefault: false,
+          },
+          createdAt: new Date('2021-01-01'),
+          periodStart: new Date('2021-01-01'),
+          periodEnd: new Date('2021-02-01'),
+          canceledAt: null,
+          paymentSourceId: 'src_123',
+          planPeriod: 'month',
+          status: 'active',
+          isFreeTrial: true,
+        },
+      ],
+    });
+
+    const { getByRole, getByText, getAllByText, queryByText, userEvent } = render(
+      <Drawer.Root
+        open
+        onOpenChange={() => {}}
+      >
+        <SubscriptionDetails />
+      </Drawer.Root>,
+      { wrapper },
+    );
+
+    await waitFor(() => {
+      expect(getByRole('heading', { name: /Subscription/i })).toBeVisible();
+      expect(getByText('Pro Plan')).toBeVisible();
+      expect(getByText('Free trial')).toBeVisible();
+      expect(getByText('$10.00 / Month')).toBeVisible();
+
+      // Free trial specific labels
+      expect(getByText('Trial started on')).toBeVisible();
+      expect(getByText('January 1, 2021')).toBeVisible();
+      expect(getByText('Trial ends on')).toBeVisible();
+
+      // Should have multiple instances of February 1, 2021 (trial end and first payment)
+      const februaryDates = getAllByText('February 1, 2021');
+      expect(februaryDates.length).toBeGreaterThan(1);
+
+      // Payment related labels should use "first payment" wording
+      expect(getByText('First payment on')).toBeVisible();
+      expect(getByText('First payment amount')).toBeVisible();
+      expect(getByText('$10.00')).toBeVisible();
+
+      // Should not show regular subscription labels
+      expect(queryByText('Subscribed on')).toBeNull();
+      expect(queryByText('Renews at')).toBeNull();
+      expect(queryByText('Next payment on')).toBeNull();
+      expect(queryByText('Next payment amount')).toBeNull();
+    });
+
+    // Test the menu shows free trial specific options
+    const menuButton = getByRole('button', { name: /Open menu/i });
+    expect(menuButton).toBeVisible();
+    await userEvent.click(menuButton);
+
+    await waitFor(() => {
+      expect(getByText('Cancel free trial')).toBeVisible();
+    });
+  });
+
+  it('allows cancelling a free trial with specific dialog text', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['test@clerk.com'] });
+    });
+
+    const cancelSubscriptionMock = jest.fn().mockResolvedValue({});
+
+    fixtures.clerk.billing.getSubscription.mockResolvedValue({
+      activeAt: new Date('2021-01-01'),
+      createdAt: new Date('2021-01-01'),
+      pastDueAt: null,
+      id: 'sub_123',
+      nextPayment: {
+        amount: {
+          amount: 1000,
+          amountFormatted: '10.00',
+          currency: 'USD',
+          currencySymbol: '$',
+        },
+        date: new Date('2021-02-01'),
+      },
+      status: 'active',
+      subscriptionItems: [
+        {
+          id: 'sub_123',
+          plan: {
+            id: 'plan_123',
+            name: 'Pro Plan',
+            fee: {
+              amount: 1000,
+              amountFormatted: '10.00',
+              currencySymbol: '$',
+              currency: 'USD',
+            },
+            annualFee: {
+              amount: 10000,
+              amountFormatted: '100.00',
+              currencySymbol: '$',
+              currency: 'USD',
+            },
+            annualMonthlyFee: {
+              amount: 8333,
+              amountFormatted: '83.33',
+              currencySymbol: '$',
+              currency: 'USD',
+            },
+            description: 'Pro Plan',
+            hasBaseFee: true,
+            isRecurring: true,
+            isDefault: false,
+          },
+          createdAt: new Date('2021-01-01'),
+          periodStart: new Date('2021-01-01'),
+          periodEnd: new Date('2021-02-01'),
+          canceledAt: null,
+          paymentSourceId: 'src_123',
+          planPeriod: 'month',
+          status: 'active',
+          isFreeTrial: true,
+          cancel: cancelSubscriptionMock,
+        },
+      ],
+    });
+
+    const { getByRole, getByText, userEvent } = render(
+      <Drawer.Root
+        open
+        onOpenChange={() => {}}
+      >
+        <SubscriptionDetails />
+      </Drawer.Root>,
+      { wrapper },
+    );
+
+    // Wait for the subscription details to render
+    await waitFor(() => {
+      expect(getByText('Pro Plan')).toBeVisible();
+      expect(getByText('Free trial')).toBeVisible();
+    });
+
+    // Open the menu
+    const menuButton = getByRole('button', { name: /Open menu/i });
+    await userEvent.click(menuButton);
+
+    // Wait for the cancel option to appear and click it
+    await userEvent.click(getByText('Cancel free trial'));
+
+    await waitFor(() => {
+      // Should show free trial specific cancellation dialog
+      expect(getByText('Cancel free trial for Pro Plan plan?')).toBeVisible();
+      expect(
+        getByText(
+          "Your trial will stay active until February 1, 2021. After that, you'll lose access to trial features. You won't be changed.",
+        ),
+      ).toBeVisible();
+      expect(getByText('Keep free trial')).toBeVisible();
+    });
+
+    // Click the cancel button in the dialog
+    await userEvent.click(getByText('Cancel free trial'));
+
+    // Assert that the cancelSubscription method was called
+    await waitFor(() => {
+      expect(cancelSubscriptionMock).toHaveBeenCalled();
+    });
+  });
 });

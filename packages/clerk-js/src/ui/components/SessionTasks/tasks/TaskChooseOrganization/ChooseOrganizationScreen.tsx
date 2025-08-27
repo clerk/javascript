@@ -1,3 +1,4 @@
+import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { useClerk, useOrganizationList, useUser } from '@clerk/shared/react';
 import type {
   OrganizationResource,
@@ -15,91 +16,101 @@ import {
   sharedMainIdentifierSx,
 } from '@/ui/common/organizations/OrganizationPreview';
 import { organizationListParams, populateCacheUpdateItem } from '@/ui/components/OrganizationSwitcher/utils';
-import { useSessionTasksContext } from '@/ui/contexts/components/SessionTasks';
-import { Col, descriptors, localizationKeys, Text } from '@/ui/customizables';
+import { useTaskChooseOrganizationContext } from '@/ui/contexts/components/SessionTasks';
+import { Col, descriptors, localizationKeys, Text, useLocalizations } from '@/ui/customizables';
 import { Action, Actions } from '@/ui/elements/Actions';
+import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
 import { OrganizationPreview } from '@/ui/elements/OrganizationPreview';
 import { useOrganizationListInView } from '@/ui/hooks/useOrganizationListInView';
 import { Add } from '@/ui/icons';
+import { useRouter } from '@/ui/router';
 import { handleError } from '@/ui/utils/errorHandler';
 
 type ChooseOrganizationScreenProps = {
   onCreateOrganizationClick: () => void;
 };
 
-export const ChooseOrganizationScreen = withCardStateProvider(
-  ({ onCreateOrganizationClick }: ChooseOrganizationScreenProps) => {
-    const { ref, userMemberships, userSuggestions, userInvitations } = useOrganizationListInView();
-
-    const isLoading = userMemberships?.isLoading || userInvitations?.isLoading || userSuggestions?.isLoading;
-    const hasNextPage = userMemberships?.hasNextPage || userInvitations?.hasNextPage || userSuggestions?.hasNextPage;
-
-    // Filter out falsy values that can occur when SWR infinite loading resolves pages out of order
-    // This happens when concurrent requests resolve in unexpected order, leaving undefined/null items in the data array
-    const userInvitationsData = userInvitations.data?.filter(a => !!a);
-    const userSuggestionsData = userSuggestions.data?.filter(a => !!a);
-
-    return (
-      <>
-        <Header.Root
-          showLogo
-          sx={t => ({ padding: `${t.space.$none} ${t.space.$8}` })}
-        >
-          <Header.Title localizationKey={localizationKeys('taskChooseOrganization.chooseOrganization.title')} />
-          <Header.Subtitle localizationKey={localizationKeys('taskChooseOrganization.chooseOrganization.subtitle')} />
-        </Header.Root>
-        <Col elementDescriptor={descriptors.main}>
-          <OrganizationPreviewListItems elementDescriptor={descriptors.taskChooseOrganizationPreviewItems}>
-            <Actions role='menu'>
-              {(userMemberships.count || 0) > 0 &&
-                userMemberships.data?.map(inv => {
-                  return (
-                    <MembershipPreview
-                      key={inv.id}
-                      {...inv}
-                    />
-                  );
-                })}
-
-              {!userMemberships.hasNextPage &&
-                userInvitationsData?.map(inv => {
-                  return (
-                    <InvitationPreview
-                      key={inv.id}
-                      {...inv}
-                    />
-                  );
-                })}
-
-              {!userMemberships.hasNextPage &&
-                !userInvitations.hasNextPage &&
-                userSuggestionsData?.map(inv => {
-                  return (
-                    <SuggestionPreview
-                      key={inv.id}
-                      {...inv}
-                    />
-                  );
-                })}
-
-              {(hasNextPage || isLoading) && <OrganizationPreviewSpinner ref={ref} />}
-
-              <CreateOrganizationButton onCreateOrganizationClick={onCreateOrganizationClick} />
-            </Actions>
-          </OrganizationPreviewListItems>
-        </Col>
-      </>
-    );
-  },
-);
-
-const MembershipPreview = withCardStateProvider((props: { organization: OrganizationResource }) => {
+export const ChooseOrganizationScreen = (props: ChooseOrganizationScreenProps) => {
   const card = useCardState();
-  const { redirectUrlComplete } = useSessionTasksContext();
-  const { __internal_navigateToTaskIfAvailable } = useClerk();
+  const { ref, userMemberships, userSuggestions, userInvitations } = useOrganizationListInView();
+
+  const isLoading = userMemberships?.isLoading || userInvitations?.isLoading || userSuggestions?.isLoading;
+  const hasNextPage = userMemberships?.hasNextPage || userInvitations?.hasNextPage || userSuggestions?.hasNextPage;
+
+  // Filter out falsy values that can occur when SWR infinite loading resolves pages out of order
+  // This happens when concurrent requests resolve in unexpected order, leaving undefined/null items in the data array
+  const userInvitationsData = userInvitations.data?.filter(a => !!a);
+  const userSuggestionsData = userSuggestions.data?.filter(a => !!a);
+
+  return (
+    <>
+      <Header.Root
+        showLogo
+        sx={t => ({ padding: `${t.space.$none} ${t.space.$8}` })}
+      >
+        <Header.Title localizationKey={localizationKeys('taskChooseOrganization.chooseOrganization.title')} />
+        <Header.Subtitle localizationKey={localizationKeys('taskChooseOrganization.chooseOrganization.subtitle')} />
+      </Header.Root>
+      <Card.Alert sx={t => ({ margin: `${t.space.$none} ${t.space.$8}` })}>{card.error}</Card.Alert>
+      <Col elementDescriptor={descriptors.main}>
+        <OrganizationPreviewListItems elementDescriptor={descriptors.taskChooseOrganizationPreviewItems}>
+          <Actions role='menu'>
+            {(userMemberships.count || 0) > 0 &&
+              userMemberships.data?.map(inv => {
+                return (
+                  <MembershipPreview
+                    key={inv.id}
+                    {...inv}
+                  />
+                );
+              })}
+
+            {!userMemberships.hasNextPage &&
+              userInvitationsData?.map(inv => {
+                return (
+                  <InvitationPreview
+                    key={inv.id}
+                    {...inv}
+                  />
+                );
+              })}
+
+            {!userMemberships.hasNextPage &&
+              !userInvitations.hasNextPage &&
+              userSuggestionsData?.map(inv => {
+                return (
+                  <SuggestionPreview
+                    key={inv.id}
+                    {...inv}
+                  />
+                );
+              })}
+
+            {(hasNextPage || isLoading) && <OrganizationPreviewSpinner ref={ref} />}
+
+            <CreateOrganizationButton
+              onCreateOrganizationClick={() => {
+                // Clear error originated from the list when switching to form
+                card.setError(undefined);
+                props.onCreateOrganizationClick();
+              }}
+            />
+          </Actions>
+        </OrganizationPreviewListItems>
+      </Col>
+    </>
+  );
+};
+
+const MembershipPreview = (props: { organization: OrganizationResource }) => {
+  const { user } = useUser();
+  const card = useCardState();
+  const { navigate } = useRouter();
+  const { redirectUrlComplete } = useTaskChooseOrganizationContext();
   const { isLoaded, setActive } = useOrganizationList();
+  const { t } = useLocalizations();
 
   if (!isLoaded) {
     return null;
@@ -107,11 +118,41 @@ const MembershipPreview = withCardStateProvider((props: { organization: Organiza
 
   const handleOrganizationClicked = (organization: OrganizationResource) => {
     return card.runAsync(async () => {
-      await setActive({
-        organization,
-      });
+      try {
+        await setActive({
+          organization,
+          navigate: async () => {
+            // TODO(after-auth) ORGS-779 - Handle next tasks
+            await navigate(redirectUrlComplete);
+          },
+        });
+      } catch (err) {
+        if (!isClerkAPIResponseError(err)) {
+          handleError(err, [], card.setError);
+          return;
+        }
 
-      await __internal_navigateToTaskIfAvailable({ redirectUrlComplete });
+        switch (err.errors?.[0]?.code) {
+          case 'organization_not_found_or_unauthorized':
+          case 'not_a_member_in_organization': {
+            if (user?.createOrganizationEnabled) {
+              card.setError(t(localizationKeys('unstable__errors.organization_not_found_or_unauthorized')));
+            } else {
+              card.setError(
+                t(
+                  localizationKeys(
+                    'unstable__errors.organization_not_found_or_unauthorized_with_create_organization_disabled',
+                  ),
+                ),
+              );
+            }
+            break;
+          }
+          default: {
+            handleError(err, [], card.setError);
+          }
+        }
+      }
     });
   };
 
@@ -127,15 +168,14 @@ const MembershipPreview = withCardStateProvider((props: { organization: Organiza
       />
     </OrganizationPreviewButton>
   );
-});
+};
 
-const InvitationPreview = withCardStateProvider((props: UserOrganizationInvitationResource) => {
+const InvitationPreview = (props: UserOrganizationInvitationResource) => {
   const card = useCardState();
   const { getOrganization } = useClerk();
   const [acceptedOrganization, setAcceptedOrganization] = useState<OrganizationResource | null>(null);
   const { userInvitations } = useOrganizationList({
     userInvitations: organizationListParams.userInvitations,
-    userMemberships: organizationListParams.userMemberships,
   });
 
   const handleAccept = () => {
@@ -173,7 +213,7 @@ const InvitationPreview = withCardStateProvider((props: UserOrganizationInvitati
       />
     </OrganizationPreviewListItem>
   );
-});
+};
 
 const SuggestionPreview = withCardStateProvider((props: OrganizationSuggestionResource) => {
   const card = useCardState();

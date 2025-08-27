@@ -1,6 +1,7 @@
 import type { PhoneCodeChannel } from 'phoneCodeChannel';
 
 import type { FirstNameAttribute, LastNameAttribute, LegalAcceptedAttribute, PasswordAttribute } from './attributes';
+import type { SetActiveNavigate } from './clerk';
 import type { AttemptEmailAddressVerificationParams, PrepareEmailAddressVerificationParams } from './emailAddress';
 import type {
   EmailAddressIdentifier,
@@ -116,6 +117,26 @@ export interface SignUpResource extends ClerkResource {
   authenticateWithCoinbaseWallet: (params?: SignUpAuthenticateWithWeb3Params) => Promise<SignUpResource>;
   authenticateWithOKXWallet: (params?: SignUpAuthenticateWithWeb3Params) => Promise<SignUpResource>;
   __internal_toSnapshot: () => SignUpJSONSnapshot;
+
+  /**
+   * @internal
+   */
+  __internal_future: SignUpFutureResource;
+}
+
+export interface SignUpFutureResource {
+  status: SignUpStatus | null;
+  unverifiedFields: SignUpIdentificationField[];
+  isTransferable: boolean;
+  existingSession?: { sessionId: string };
+  create: (params: { transfer?: boolean }) => Promise<{ error: unknown }>;
+  verifications: {
+    sendEmailCode: () => Promise<{ error: unknown }>;
+    verifyEmailCode: (params: { code: string }) => Promise<{ error: unknown }>;
+  };
+  password: (params: { emailAddress: string; password: string }) => Promise<{ error: unknown }>;
+  sso: (params: { strategy: string; redirectUrl: string; redirectUrlComplete: string }) => Promise<{ error: unknown }>;
+  finalize: (params?: { navigate?: SetActiveNavigate }) => Promise<{ error: unknown }>;
 }
 
 export type SignUpStatus = 'missing_requirements' | 'complete' | 'abandoned';

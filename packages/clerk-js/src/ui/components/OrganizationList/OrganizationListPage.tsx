@@ -49,7 +49,6 @@ const CreateOrganizationButton = ({
 };
 
 export const OrganizationListPage = withCardStateProvider(() => {
-  const card = useCardState();
   const { userMemberships, userSuggestions, userInvitations } = useOrganizationListInView();
   const isLoading = userMemberships?.isLoading || userInvitations?.isLoading || userSuggestions?.isLoading;
   const hasAnyData = !!(userMemberships?.count || userInvitations?.count || userSuggestions?.count);
@@ -59,7 +58,6 @@ export const OrganizationListPage = withCardStateProvider(() => {
   return (
     <Card.Root>
       <Card.Content sx={t => ({ padding: `${t.space.$8} ${t.space.$none} ${t.space.$none}` })}>
-        <Card.Alert sx={t => ({ margin: `${t.space.$none} ${t.space.$5}` })}>{card.error}</Card.Alert>
         {isLoading && (
           <Flex
             direction={'row'}
@@ -86,6 +84,7 @@ export const OrganizationListPage = withCardStateProvider(() => {
 });
 
 const OrganizationListFlows = ({ showListInitially }: { showListInitially: boolean }) => {
+  const card = useCardState();
   const { navigateAfterCreateOrganization, skipInvitationScreen, hideSlug } = useOrganizationListContext();
   const [isCreateOrganizationFlow, setCreateOrganizationFlow] = useState(!showListInitially);
   return (
@@ -95,30 +94,35 @@ const OrganizationListFlows = ({ showListInitially }: { showListInitially: boole
       )}
 
       {isCreateOrganizationFlow && (
-        <Box
-          sx={t => ({
-            padding: `${t.space.$none} ${t.space.$5} ${t.space.$5}`,
-          })}
-        >
-          <CreateOrganizationForm
-            flow='organizationList'
-            startPage={{ headerTitle: localizationKeys('organizationList.createOrganization') }}
-            skipInvitationScreen={skipInvitationScreen}
-            navigateAfterCreateOrganization={org =>
-              navigateAfterCreateOrganization(org).then(() => setCreateOrganizationFlow(false))
-            }
-            onCancel={
-              showListInitially && isCreateOrganizationFlow ? () => setCreateOrganizationFlow(false) : undefined
-            }
-            hideSlug={hideSlug}
-          />
-        </Box>
+        <>
+          <Card.Alert sx={t => ({ margin: `${t.space.$none} ${t.space.$5}` })}>{card.error}</Card.Alert>
+
+          <Box
+            sx={t => ({
+              padding: `${t.space.$none} ${t.space.$5} ${t.space.$5}`,
+            })}
+          >
+            <CreateOrganizationForm
+              flow='organizationList'
+              startPage={{ headerTitle: localizationKeys('organizationList.createOrganization') }}
+              skipInvitationScreen={skipInvitationScreen}
+              navigateAfterCreateOrganization={org =>
+                navigateAfterCreateOrganization(org).then(() => setCreateOrganizationFlow(false))
+              }
+              onCancel={
+                showListInitially && isCreateOrganizationFlow ? () => setCreateOrganizationFlow(false) : undefined
+              }
+              hideSlug={hideSlug}
+            />
+          </Box>
+        </>
       )}
     </>
   );
 };
 
 export const OrganizationListPageList = (props: { onCreateOrganizationClick: () => void }) => {
+  const card = useCardState();
   const environment = useEnvironment();
 
   const { ref, userMemberships, userSuggestions, userInvitations } = useOrganizationListInView();
@@ -128,6 +132,8 @@ export const OrganizationListPageList = (props: { onCreateOrganizationClick: () 
   const hasNextPage = userMemberships?.hasNextPage || userInvitations?.hasNextPage || userSuggestions?.hasNextPage;
 
   const onCreateOrganizationClick = () => {
+    // Clear error originated from the list when switching to form
+    card.setError(undefined);
     props.onCreateOrganizationClick();
   };
 
@@ -154,6 +160,7 @@ export const OrganizationListPageList = (props: { onCreateOrganizationClick: () 
           })}
         />
       </Header.Root>
+      <Card.Alert sx={t => ({ margin: `${t.space.$none} ${t.space.$5}` })}>{card.error}</Card.Alert>
       <Col elementDescriptor={descriptors.main}>
         <PreviewListItems>
           <Actions role='menu'>

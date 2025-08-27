@@ -25,9 +25,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Next.js S
       password: fakeUser.password,
     });
 
-    await u.po.signUp.fillTestOtpCode('Enter email verification code');
-    await page.waitForTimeout(2000);
-    // TODO: In original test the input has autoSubmit and this step is not needed. Not used right now because it didn't work.
+    await page.getByRole('textbox', { name: 'Enter email verification code' }).click();
+    await page.keyboard.type('424242', { delay: 100 });
     await u.po.signUp.continue();
 
     await u.page.waitForAppUrl('/');
@@ -54,9 +53,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Next.js S
       password: fakeUser.password,
     });
 
-    await u.po.signUp.fillTestOtpCode('Enter email verification code');
-    await page.waitForTimeout(2000);
-    // TODO: In original test the input has autoSubmit and this step is not needed. Not used right now because it didn't work.
+    await page.getByRole('textbox', { name: 'Enter email verification code' }).click();
+    await page.keyboard.type('424242', { delay: 100 });
     await u.po.signUp.continue();
 
     await u.page.waitForAppUrl('/');
@@ -104,14 +102,12 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Next.js S
       password: fakeUser.password,
     });
 
-    await u.po.signUp.fillTestOtpCode('Enter phone verification code');
-    await page.waitForTimeout(2000);
-    // TODO: In original test the input has autoSubmit and this step is not needed. Not used right now because it didn't work.
+    await page.getByRole('textbox', { name: 'Enter phone verification code' }).click();
+    await page.keyboard.type('424242', { delay: 100 });
     await u.po.signUp.continue();
-    await page.waitForTimeout(2000);
-    await u.po.signUp.fillTestOtpCode('Enter email verification code');
-    await page.waitForTimeout(2000);
-    // TODO: In original test the input has autoSubmit and this step is not needed. Not used right now because it didn't work.
+
+    await page.getByRole('textbox', { name: 'Enter email verification code' }).click();
+    await page.keyboard.type('424242', { delay: 100 });
     await u.po.signUp.continue();
 
     await u.po.expect.toBeSignedIn();
@@ -135,13 +131,12 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Next.js S
       password: fakeUser.password,
     });
 
-    await u.po.signUp.fillTestOtpCode('Enter phone verification code');
-    await page.waitForTimeout(2000);
-    // TODO: In original test the input has autoSubmit and this step is not needed. Not used right now because it didn't work.
+    await page.getByRole('textbox', { name: 'Enter phone verification code' }).click();
+    await page.keyboard.type('424242', { delay: 100 });
     await u.po.signUp.continue();
-    await u.po.signUp.fillTestOtpCode('Enter email verification code');
-    await page.waitForTimeout(2000);
-    // TODO: In original test the input has autoSubmit and this step is not needed. Not used right now because it didn't work.
+
+    await page.getByRole('textbox', { name: 'Enter email verification code' }).click();
+    await page.keyboard.type('424242', { delay: 100 });
     await u.po.signUp.continue();
 
     await u.po.expect.toBeSignedIn();
@@ -166,13 +161,12 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Next.js S
       password: fakeUser.password,
     });
 
-    await u.po.signUp.fillTestOtpCode('Enter phone verification code');
-    await page.waitForTimeout(2000);
-    // TODO: In original test the input has autoSubmit and this step is not needed. Not used right now because it didn't work.
+    await page.getByRole('textbox', { name: 'Enter phone verification code' }).click();
+    await page.keyboard.type('424242', { delay: 100 });
     await u.po.signUp.continue();
-    await u.po.signUp.fillTestOtpCode('Enter email verification code');
-    await page.waitForTimeout(2000);
-    // TODO: In original test the input has autoSubmit and this step is not needed. Not used right now because it didn't work.
+
+    await page.getByRole('textbox', { name: 'Enter email verification code' }).click();
+    await page.keyboard.type('424242', { delay: 100 });
     await u.po.signUp.continue();
 
     await u.po.expect.toBeSignedIn();

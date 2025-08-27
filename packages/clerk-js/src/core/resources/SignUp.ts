@@ -8,14 +8,17 @@ import type {
   AuthenticateWithPopupParams,
   AuthenticateWithRedirectParams,
   AuthenticateWithWeb3Params,
+  CaptchaWidgetType,
   CreateEmailLinkFlowReturn,
   PrepareEmailAddressVerificationParams,
   PreparePhoneNumberVerificationParams,
   PrepareVerificationParams,
   PrepareWeb3WalletVerificationParams,
+  SetActiveNavigate,
   SignUpAuthenticateWithWeb3Params,
   SignUpCreateParams,
   SignUpField,
+  SignUpFutureResource,
   SignUpIdentificationField,
   SignUpJSON,
   SignUpJSONSnapshot,
@@ -39,12 +42,14 @@ import { _authenticateWithPopup } from '../../utils/authenticateWithPopup';
 import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
 import { createValidatePassword } from '../../utils/passwords/password';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
+import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
 import {
   clerkInvalidFAPIResponse,
   clerkMissingOptionError,
   clerkVerifyEmailAddressCalledBeforeCreate,
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from '../errors';
+import { eventBus } from '../events';
 import { BaseResource, ClerkRuntimeError, SignUpVerifications } from './internal';
 
 declare global {
@@ -76,6 +81,21 @@ export class SignUp extends BaseResource implements SignUpResource {
   createdUserId: string | null = null;
   abandonAt: number | null = null;
   legalAcceptedAt: number | null = null;
+
+  /**
+   * @experimental This experimental API is subject to change.
+   *
+   * An instance of `SignUpFuture`, which has a different API than `SignUp`, intended to be used in custom flows.
+   */
+  __internal_future: SignUpFuture = new SignUpFuture(this);
+
+  /**
+   * @internal Only used for internal purposes, and is not intended to be used directly.
+   *
+   * This property is used to provide access to underlying Client methods to `SignUpFuture`, which wraps an instance
+   * of `SignUp`.
+   */
+  __internal_basePost = this._basePost.bind(this);
 
   constructor(data: SignUpJSON | SignUpJSONSnapshot | null = null) {
     super();
@@ -290,18 +310,11 @@ export class SignUp extends BaseResource implements SignUpResource {
 
     const redirectUrlWithAuthToken = SignUp.clerk.buildUrlWithAuth(redirectUrl);
 
-    // When force after-auth is enabled, redirect to SSO callback route.
-    // This ensures organization selection tasks are displayed after sign-up,
-    // rather than redirecting to potentially unprotected pages while the session is pending.
-    const actionCompleteRedirectUrl = SignUp.clerk.__internal_hasAfterAuthFlows
-      ? redirectUrlWithAuthToken
-      : redirectUrlComplete;
-
     const authenticateFn = () => {
       const authParams = {
         strategy,
         redirectUrl: redirectUrlWithAuthToken,
-        actionCompleteRedirectUrl,
+        actionCompleteRedirectUrl: redirectUrlComplete,
         unsafeMetadata,
         emailAddress,
         legalAccepted,
@@ -396,6 +409,8 @@ export class SignUp extends BaseResource implements SignUpResource {
       this.web3wallet = data.web3_wallet;
       this.legalAcceptedAt = data.legal_accepted_at;
     }
+
+    eventBus.emit('resource:update', { resource: this });
     return this;
   }
 
@@ -454,5 +469,147 @@ export class SignUp extends BaseResource implements SignUpResource {
     }
 
     return false;
+  }
+}
+
+class SignUpFuture implements SignUpFutureResource {
+  verifications = {
+    sendEmailCode: this.sendEmailCode.bind(this),
+    verifyEmailCode: this.verifyEmailCode.bind(this),
+  };
+
+  constructor(readonly resource: SignUp) {}
+
+  get status() {
+    return this.resource.status;
+  }
+
+  get unverifiedFields() {
+    return this.resource.unverifiedFields;
+  }
+
+  get isTransferable() {
+    // TODO: we can likely remove the error code check as the status should be sufficient
+    return (
+      this.resource.verifications.externalAccount.status === 'transferable' &&
+      this.resource.verifications.externalAccount.error?.code === 'external_account_exists'
+    );
+  }
+
+  get existingSession() {
+    if (
+      (this.resource.verifications.externalAccount.status === 'failed' ||
+        this.resource.verifications.externalAccount.status === 'unverified') &&
+      this.resource.verifications.externalAccount.error?.code === 'identifier_already_signed_in' &&
+      this.resource.verifications.externalAccount.error?.meta?.sessionId
+    ) {
+      return { sessionId: this.resource.verifications.externalAccount.error?.meta?.sessionId };
+    }
+
+    return undefined;
+  }
+
+  private async getCaptchaToken(): Promise<{
+    captchaToken?: string;
+    captchaWidgetType?: CaptchaWidgetType;
+    captchaError?: unknown;
+  }> {
+    const captchaChallenge = new CaptchaChallenge(SignUp.clerk);
+    const response = await captchaChallenge.managedOrInvisible({ action: 'signup' });
+    if (!response) {
+      throw new Error('Captcha challenge failed');
+    }
+
+    const { captchaError, captchaToken, captchaWidgetType } = response;
+    return { captchaToken, captchaWidgetType, captchaError };
+  }
+
+  async create({ transfer }: { transfer?: boolean }): Promise<{ error: unknown }> {
+    return runAsyncResourceTask(this.resource, async () => {
+      const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
+      await this.resource.__internal_basePost({
+        path: this.resource.pathRoot,
+        body: { transfer, captchaToken, captchaWidgetType, captchaError },
+      });
+    });
+  }
+
+  async password({ emailAddress, password }: { emailAddress: string; password: string }): Promise<{ error: unknown }> {
+    return runAsyncResourceTask(this.resource, async () => {
+      const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
+
+      await this.resource.__internal_basePost({
+        path: this.resource.pathRoot,
+        body: {
+          strategy: 'password',
+          emailAddress,
+          password,
+          captchaToken,
+          captchaWidgetType,
+          captchaError,
+        },
+      });
+    });
+  }
+
+  async sendEmailCode(): Promise<{ error: unknown }> {
+    return runAsyncResourceTask(this.resource, async () => {
+      await this.resource.__internal_basePost({
+        body: { strategy: 'email_code' },
+        action: 'prepare_verification',
+      });
+    });
+  }
+
+  async verifyEmailCode({ code }: { code: string }): Promise<{ error: unknown }> {
+    return runAsyncResourceTask(this.resource, async () => {
+      await this.resource.__internal_basePost({
+        body: { strategy: 'email_code', code },
+        action: 'attempt_verification',
+      });
+    });
+  }
+
+  async sso({
+    strategy,
+    redirectUrl,
+    redirectUrlComplete,
+  }: {
+    strategy: string;
+    redirectUrl: string;
+    redirectUrlComplete: string;
+  }): Promise<{ error: unknown }> {
+    return runAsyncResourceTask(this.resource, async () => {
+      const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
+      await this.resource.__internal_basePost({
+        path: this.resource.pathRoot,
+        body: {
+          strategy,
+          redirectUrl: SignUp.clerk.buildUrlWithAuth(redirectUrl),
+          redirectUrlComplete,
+          captchaToken,
+          captchaWidgetType,
+          captchaError,
+        },
+      });
+
+      const { status, externalVerificationRedirectURL } = this.resource.verifications.externalAccount;
+
+      if (status === 'unverified' && !!externalVerificationRedirectURL) {
+        windowNavigate(externalVerificationRedirectURL);
+      } else {
+        clerkInvalidFAPIResponse(status, SignUp.fapiClient.buildEmailAddress('support'));
+      }
+    });
+  }
+
+  async finalize({ navigate }: { navigate?: SetActiveNavigate } = {}): Promise<{ error: unknown }> {
+    return runAsyncResourceTask(this.resource, async () => {
+      if (!this.resource.createdSessionId) {
+        throw new Error('Cannot finalize sign-up without a created session.');
+      }
+
+      await SignUp.clerk.setActive({ session: this.resource.createdSessionId, navigate });
+    });
   }
 }

@@ -12,9 +12,17 @@ const PricingTableRoot = (props: PricingTableProps) => {
   const clerk = useClerk();
   const { mode = 'mounted', signInMode = 'redirect' } = usePricingTableContext();
   const isCompact = mode === 'modal';
-  const { subscriptionItems } = useSubscription();
+  const { data: subscription, subscriptionItems } = useSubscription();
   const { data: plans } = usePlans();
   const { handleSelectPlan } = usePlansContext();
+
+  const plansToRender = useMemo(() => {
+    return clerk.isSignedIn
+      ? subscription // All users in billing-enabled applications have a subscription
+        ? plans
+        : []
+      : plans;
+  }, [clerk.isSignedIn, plans, subscription]);
 
   const defaultPlanPeriod = useMemo(() => {
     if (isCompact) {
@@ -72,7 +80,7 @@ const PricingTableRoot = (props: PricingTableProps) => {
     >
       {mode !== 'modal' && (props as any).layout === 'matrix' ? (
         <PricingTableMatrix
-          plans={plans}
+          plans={plansToRender}
           planPeriod={planPeriod}
           setPlanPeriod={setPlanPeriod}
           onSelect={selectPlan}
@@ -80,7 +88,7 @@ const PricingTableRoot = (props: PricingTableProps) => {
         />
       ) : (
         <PricingTableDefault
-          plans={plans}
+          plans={plansToRender}
           planPeriod={planPeriod}
           setPlanPeriod={setPlanPeriod}
           onSelect={selectPlan}

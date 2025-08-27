@@ -12,6 +12,7 @@ import type {
   OrganizationProfileProps,
   OrganizationSwitcherProps,
   PricingTableProps,
+  SessionResource,
   SignInFallbackRedirectUrl,
   SignInForceRedirectUrl,
   SignInProps,
@@ -136,6 +137,7 @@ export type CheckoutCtx = __internal_CheckoutProps & {
 export type SessionTasksCtx = {
   redirectUrlComplete: string;
   currentTaskContainer?: React.RefObject<HTMLDivElement> | null;
+  navigateOnSetActive: (opts: { session: SessionResource; redirectUrl: string }) => Promise<unknown>;
 };
 
 export type TaskChooseOrganizationCtx = TaskChooseOrganizationProps & {

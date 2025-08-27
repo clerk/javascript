@@ -1,6 +1,6 @@
 {
   "name": "@clerk/testing",
-  "version": "1.10.12",
+  "version": "1.12.0",
   "description": "Utilities to help you create E2E test suites for apps using Clerk",
   "keywords": [
     "auth",
@@ -81,7 +81,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.54.1",
-    "cypress": "^14.5.3"
+    "cypress": "^14.5.4"
   },
   "peerDependencies": {
     "@playwright/test": "^1",

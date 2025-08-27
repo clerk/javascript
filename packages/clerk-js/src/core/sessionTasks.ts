@@ -1,51 +1,69 @@
-import type {
-  __internal_ComponentNavigationContext,
-  ClerkOptions,
-  EnvironmentResource,
-  SessionTask,
-} from '@clerk/types';
+import { logger } from '@clerk/shared/logger';
+import type { ClerkOptions, SessionResource, SessionTask, SetActiveParams } from '@clerk/types';
 
-import { buildURL } from '../utils';
+import { buildURL, forwardClerkQueryParams } from '../utils';
 
+/**
+ * @internal
+ */
 export const INTERNAL_SESSION_TASK_ROUTE_BY_KEY: Record<SessionTask['key'], string> = {
   'choose-organization': 'choose-organization',
 } as const;
 
-interface NavigateToTaskOptions {
-  componentNavigationContext: __internal_ComponentNavigationContext | null;
-  globalNavigate: (to: string) => Promise<unknown>;
-  options: ClerkOptions;
-  environment: EnvironmentResource;
+/**
+ * @internal
+ */
+export const getTaskEndpoint = (task: SessionTask) => `/tasks/${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[task.key]}`;
+
+/**
+ * @internal
+ */
+export function buildTaskUrl(task: SessionTask, opts: Pick<Parameters<typeof buildURL>[0], 'base'>) {
+  const params = forwardClerkQueryParams();
+
+  return buildURL(
+    {
+      base: opts.base,
+      hashPath: getTaskEndpoint(task),
+      searchParams: params,
+    },
+    { stringify: true },
+  );
 }
 
 /**
- * Handles navigation to the tasks URL based on the application context such
- * as internal component routing or custom flows.
  * @internal
  */
-export function navigateToTask(
-  routeKey: keyof typeof INTERNAL_SESSION_TASK_ROUTE_BY_KEY,
-  { componentNavigationContext, globalNavigate, options, environment }: NavigateToTaskOptions,
+export function navigateIfTaskExists(
+  session: SessionResource,
+  {
+    navigate,
+    baseUrl,
+  }: {
+    navigate: (to: string) => Promise<unknown>;
+    baseUrl: string;
+  },
 ) {
-  const customTaskUrl = options?.taskUrls?.[routeKey];
-  const internalTaskRoute = `/tasks/${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[routeKey]}`;
-
-  if (componentNavigationContext && !customTaskUrl) {
-    return componentNavigationContext.navigate(componentNavigationContext.indexPath + internalTaskRoute);
+  const currentTask = session.currentTask;
+  if (!currentTask) {
+    return;
   }
 
-  const signInUrl = options['signInUrl'] || environment.displayConfig.signInUrl;
-  const signUpUrl = options['signUpUrl'] || environment.displayConfig.signUpUrl;
-  const isReferrerSignUpUrl = window.location.href.startsWith(signUpUrl);
+  return navigate(buildTaskUrl(currentTask, { base: baseUrl }));
+}
 
-  return globalNavigate(
-    customTaskUrl ??
-      buildURL(
-        {
-          base: isReferrerSignUpUrl ? signUpUrl : signInUrl,
-          hashPath: internalTaskRoute,
-        },
-        { stringify: true },
-      ),
+export function warnMissingPendingTaskHandlers(options: Record<string, unknown>) {
+  const taskOptions = ['taskUrls', 'navigate'] as Array<
+    keyof (Pick<SetActiveParams, 'navigate'> & Pick<ClerkOptions, 'taskUrls'>)
+  >;
+
+  const hasAtLeastOneOption = Object.keys(options).some(option => taskOptions.includes(option as any));
+  if (hasAtLeastOneOption) {
+    return;
+  }
+
+  // TODO - Link to after-auth docs once it gets released
+  logger.warnOnce(
+    `Clerk: Session has pending tasks but no handling is configured. To handle pending tasks, provide either "taskUrls" for navigation to custom URLs or "navigate" for programmatic navigation. Without these options, users may get stuck on incomplete flows.`,
   );
 }

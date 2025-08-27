@@ -320,6 +320,11 @@ export interface OAuthApplicationJSON extends ClerkResourceJSON {
   instance_id: string;
   name: string;
   client_id: string;
+  client_uri: string | null;
+  client_image_url: string | null;
+  dynamically_registered: boolean;
+  consent_screen_enabled: boolean;
+  pkce_required: boolean;
   public: boolean;
   scopes: string;
   redirect_uris: Array<string>;
@@ -734,7 +739,7 @@ export interface MachineSecretKeyJSON {
 
 export interface M2MTokenJSON extends ClerkResourceJSON {
   object: typeof ObjectType.M2MToken;
-  secret?: string;
+  token?: string;
   subject: string;
   scopes: string[];
   claims: Record<string, any> | null;
@@ -843,9 +848,49 @@ export interface CommercePlanJSON extends ClerkResourceJSON {
   features: FeatureJSON[];
 }
 
+type CommerceSubscriptionItemStatus =
+  | 'abandoned'
+  | 'active'
+  | 'canceled'
+  | 'ended'
+  | 'expired'
+  | 'incomplete'
+  | 'past_due'
+  | 'upcoming';
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+ * It is advised to pin the SDK version to avoid breaking changes.
+ */
 export interface CommerceSubscriptionItemJSON extends ClerkResourceJSON {
   object: typeof ObjectType.CommerceSubscriptionItem;
-  status: 'abandoned' | 'active' | 'canceled' | 'ended' | 'expired' | 'incomplete' | 'past_due' | 'upcoming';
+  status: CommerceSubscriptionItemStatus;
+  plan_period: 'month' | 'annual';
+  payer_id: string;
+  period_start: number;
+  period_end: number | null;
+  is_free_trial?: boolean;
+  ended_at: number | null;
+  created_at: number;
+  updated_at: number;
+  canceled_at: number | null;
+  past_due_at: number | null;
+  lifetime_paid: CommerceMoneyAmountJSON;
+  next_payment: {
+    amount: number;
+    date: number;
+  } | null;
+  amount: CommerceMoneyAmountJSON | null;
+  plan: CommercePlanJSON;
+  plan_id: string;
+}
+
+/**
+ * Webhooks specific interface for CommerceSubscriptionItem.
+ */
+export interface CommerceSubscriptionItemWebhookEventJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.CommerceSubscriptionItem;
+  status: CommerceSubscriptionItemStatus;
   credit: {
     amount: CommerceMoneyAmountJSON;
     cycle_days_remaining: number;
@@ -882,7 +927,10 @@ export interface CommerceSubscriptionItemJSON extends ClerkResourceJSON {
   plan_id: string;
 }
 
-export interface CommercePaymentAttemptJSON extends ClerkResourceJSON {
+/**
+ * Webhooks specific interface for CommercePaymentAttempt.
+ */
+export interface CommercePaymentAttemptWebhookEventJSON extends ClerkResourceJSON {
   object: typeof ObjectType.CommercePaymentAttempt;
   instance_id: string;
   payment_id: string;
@@ -912,10 +960,13 @@ export interface CommercePaymentAttemptJSON extends ClerkResourceJSON {
     card_type?: string;
     last4?: string;
   };
-  subscription_items: CommerceSubscriptionItemJSON[];
+  subscription_items: CommerceSubscriptionItemWebhookEventJSON[];
 }
 
-export interface CommerceSubscriptionJSON extends ClerkResourceJSON {
+/**
+ * Webhooks specific interface for CommerceSubscription.
+ */
+export interface CommerceSubscriptionWebhookEventJSON extends ClerkResourceJSON {
   object: typeof ObjectType.CommerceSubscription;
   status: 'abandoned' | 'active' | 'canceled' | 'ended' | 'expired' | 'incomplete' | 'past_due' | 'upcoming';
   active_at?: number;
@@ -928,7 +979,23 @@ export interface CommerceSubscriptionJSON extends ClerkResourceJSON {
   payer_id: string;
   payer: CommercePayerJSON;
   payment_source_id: string;
-  items: CommerceSubscriptionItemJSON[];
+  items: CommerceSubscriptionItemWebhookEventJSON[];
+}
+
+export interface CommerceSubscriptionJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.CommerceSubscription;
+  status: 'active' | 'past_due' | 'canceled' | 'ended' | 'abandoned' | 'incomplete';
+  payer_id: string;
+  created_at: number;
+  updated_at: number;
+  active_at: number | null;
+  past_due_at: number | null;
+  subscription_items: CommerceSubscriptionItemJSON[];
+  next_payment?: {
+    date: number;
+    amount: CommerceMoneyAmountJSON;
+  };
+  eligible_for_free_trial?: boolean;
 }
 
 export interface WebhooksSvixJSON {

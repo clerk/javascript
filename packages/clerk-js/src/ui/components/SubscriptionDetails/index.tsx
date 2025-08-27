@@ -243,7 +243,11 @@ const SubscriptionDetailsFooter = withCardStateProvider(() => {
                   setError(undefined);
                   onOpenChange(false);
                 }}
-                localizationKey={localizationKeys('commerce.keepSubscription')}
+                localizationKey={
+                  selectedSubscription?.isFreeTrial
+                    ? localizationKeys('commerce.keepFreeTrial')
+                    : localizationKeys('commerce.keepSubscription')
+                }
               />
             )}
             <Button
@@ -253,7 +257,13 @@ const SubscriptionDetailsFooter = withCardStateProvider(() => {
               textVariant='buttonLarge'
               isLoading={isLoading}
               onClick={() => void cancelSubscription()}
-              localizationKey={localizationKeys('commerce.cancelSubscription')}
+              localizationKey={
+                selectedSubscription?.isFreeTrial
+                  ? localizationKeys('commerce.cancelFreeTrial', {
+                      plan: selectedSubscription.plan.name,
+                    })
+                  : localizationKeys('commerce.cancelSubscription')
+              }
             />
           </>
         }
@@ -264,21 +274,32 @@ const SubscriptionDetailsFooter = withCardStateProvider(() => {
               elementDescriptor={descriptors.drawerConfirmationTitle}
               as='h2'
               textVariant='h3'
-              localizationKey={localizationKeys('commerce.cancelSubscriptionTitle', {
-                plan: `${selectedSubscription.status === 'upcoming' ? 'upcoming ' : ''}${selectedSubscription.plan.name}`,
-              })}
+              localizationKey={
+                selectedSubscription?.isFreeTrial
+                  ? localizationKeys('commerce.cancelFreeTrialTitle', {
+                      plan: selectedSubscription.plan.name,
+                    })
+                  : localizationKeys('commerce.cancelSubscriptionTitle', {
+                      plan: `${selectedSubscription.status === 'upcoming' ? 'upcoming ' : ''}${selectedSubscription.plan.name}`,
+                    })
+              }
             />
             <Text
               elementDescriptor={descriptors.drawerConfirmationDescription}
               colorScheme='secondary'
               localizationKey={
-                selectedSubscription.status === 'upcoming'
-                  ? localizationKeys('commerce.cancelSubscriptionNoCharge')
-                  : localizationKeys('commerce.cancelSubscriptionAccessUntil', {
+                selectedSubscription?.isFreeTrial
+                  ? localizationKeys('commerce.cancelFreeTrialAccessUntil', {
                       plan: selectedSubscription.plan.name,
-                      // this will always be defined in this state
                       date: selectedSubscription.periodEnd as Date,
                     })
+                  : selectedSubscription.status === 'upcoming'
+                    ? localizationKeys('commerce.cancelSubscriptionNoCharge')
+                    : localizationKeys('commerce.cancelSubscriptionAccessUntil', {
+                        plan: selectedSubscription.plan.name,
+                        // this will always be defined in this state
+                        date: selectedSubscription.periodEnd as Date,
+                      })
               }
             />
             <CardAlert>{error}</CardAlert>
@@ -303,6 +324,8 @@ function SubscriptionDetailsSummary() {
     return null;
   }
 
+  const { isFreeTrial } = activeSubscription;
+
   return (
     <LineItems.Root>
       <LineItems.Group>
@@ -316,11 +339,19 @@ function SubscriptionDetailsSummary() {
         />
       </LineItems.Group>
       <LineItems.Group>
-        <LineItems.Title description={localizationKeys('commerce.subscriptionDetails.nextPaymentOn')} />
+        <LineItems.Title
+          description={localizationKeys(
+            `commerce.subscriptionDetails.${isFreeTrial ? 'firstPaymentOn' : 'nextPaymentOn'}`,
+          )}
+        />
         <LineItems.Description text={formatDate(subscription.nextPayment.date)} />
       </LineItems.Group>
       <LineItems.Group>
-        <LineItems.Title description={localizationKeys('commerce.subscriptionDetails.nextPaymentAmount')} />
+        <LineItems.Title
+          description={localizationKeys(
+            `commerce.subscriptionDetails.${isFreeTrial ? 'firstPaymentAmount' : 'nextPaymentAmount'}`,
+          )}
+        />
         <LineItems.Description
           prefix={subscription.nextPayment.amount.currency}
           text={`${subscription.nextPayment.amount.currencySymbol}${subscription.nextPayment.amount.amountFormatted}`}
@@ -395,7 +426,11 @@ const SubscriptionCardActions = ({ subscription }: { subscription: CommerceSubsc
       isCancellable
         ? {
             isDestructive: true,
-            label: localizationKeys('commerce.cancelSubscription'),
+            label: subscription.isFreeTrial
+              ? localizationKeys('commerce.cancelFreeTrial', {
+                  plan: subscription.plan.name,
+                })
+              : localizationKeys('commerce.cancelSubscription'),
             onClick: () => {
               setSubscription(subscription);
               setConfirmationOpen(true);
@@ -489,7 +524,7 @@ const SubscriptionCard = ({ subscription }: { subscription: CommerceSubscription
             {subscription.plan.name}
           </Text>
           <SubscriptionBadge
-            subscription={subscription}
+            subscription={subscription.isFreeTrial ? { status: 'free_trial' } : subscription}
             elementDescriptor={descriptors.subscriptionDetailsCardBadge}
           />
         </Flex>
@@ -527,7 +562,11 @@ const SubscriptionCard = ({ subscription }: { subscription: CommerceSubscription
       {subscription.status === 'active' ? (
         <>
           <DetailRow
-            label={localizationKeys('commerce.subscriptionDetails.subscribedOn')}
+            label={
+              subscription.isFreeTrial
+                ? localizationKeys('commerce.subscriptionDetails.trialStartedOn')
+                : localizationKeys('commerce.subscriptionDetails.subscribedOn')
+            }
             value={formatDate(subscription.createdAt)}
           />
           {/* The free plan does not have a period end date */}
@@ -536,7 +575,9 @@ const SubscriptionCard = ({ subscription }: { subscription: CommerceSubscription
               label={
                 subscription.canceledAt
                   ? localizationKeys('commerce.subscriptionDetails.endsOn')
-                  : localizationKeys('commerce.subscriptionDetails.renewsAt')
+                  : subscription.isFreeTrial
+                    ? localizationKeys('commerce.subscriptionDetails.trialEndsOn')
+                    : localizationKeys('commerce.subscriptionDetails.renewsAt')
               }
               value={formatDate(subscription.periodEnd)}
             />

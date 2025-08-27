@@ -1,3 +1,4 @@
+import { createClerkClient } from '@clerk/backend';
 import type { Clerk, SignOutOptions } from '@clerk/types';
 import type { Page } from '@playwright/test';
 
@@ -15,27 +16,34 @@ type PlaywrightClerkLoadedParams = {
   page: Page;
 };
 
+type PlaywrightClerkSignInParamsWithEmail = {
+  page: Page;
+  emailAddress: string;
+  setupClerkTestingTokenOptions?: SetupClerkTestingTokenOptions;
+};
+
 type ClerkHelperParams = {
   /**
-   * Signs in a user using Clerk. This helper supports only password, phone_code and email_code first factor strategies.
+   * Signs in a user using Clerk. This helper supports multiple sign-in strategies:
+   * 1. Using signInParams object (password, phone_code, email_code strategies)
+   * 2. Using emailAddress for automatic ticket-based sign-in
+   *
    * Multi-factor is not supported.
    * This helper is using the `setupClerkTestingToken` internally.
    * It is required to call `page.goto` before calling this helper, and navigate to a not protected page that loads Clerk.
    *
+   * For strategy-based sign-in:
    * If the strategy is password, the helper will sign in the user using the provided password and identifier.
    * If the strategy is phone_code, you are required to have a user with a test phone number as an identifier (e.g. +15555550100).
    * If the strategy is email_code, you are required to have a user with a test email as an identifier (e.g. your_email+clerk_test@example.com).
    *
-   * @param opts.signInParams.strategy - The sign in strategy. Supported strategies are 'password', 'phone_code' and 'email_code'.
-   * @param opts.signInParams.identifier - The user's identifier. Could be a username, a phone number or an email.
-   * @param opts.signInParams.password - The user's password. Required only if the strategy is 'password'.
-   * @param opts.page - The Playwright page object.
-   * @param opts.setupClerkTestingTokenOptions - The options for the `setupClerkTestingToken` function. Optional.
+   * For email-based sign-in:
+   * The helper finds the user by email, creates a sign-in token using Clerk's backend API, and uses the ticket strategy.
    *
-   * @example
+   * @example Strategy-based sign-in
    * import { clerk } from "@clerk/testing/playwright";
    *
-   *  test("sign in", async ({ page }) => {
+   *  test("sign in with strategy", async ({ page }) => {
    *     await page.goto("/");
    *     await clerk.signIn({
    *       page,
@@ -43,8 +51,20 @@ type ClerkHelperParams = {
    *     });
    *     await page.goto("/protected");
    *   });
+   *
+   * @example Email-based sign-in
+   * import { clerk } from "@clerk/testing/playwright";
+   *
+   *  test("sign in with email", async ({ page }) => {
+   *     await page.goto("/");
+   *     await clerk.signIn({ emailAddress: "bryce@clerk.dev", page });
+   *     await page.goto("/protected");
+   *   });
    */
-  signIn: (opts: PlaywrightClerkSignInParams) => Promise<void>;
+  signIn: {
+    (opts: PlaywrightClerkSignInParams): Promise<void>;
+    (opts: PlaywrightClerkSignInParamsWithEmail): Promise<void>;
+  };
   /**
    * Signs out the current user using Clerk.
    * It is required to call `page.goto` before calling this helper, and navigate to a page that loads Clerk.
@@ -87,16 +107,56 @@ type PlaywrightClerkSignInParams = {
   setupClerkTestingTokenOptions?: SetupClerkTestingTokenOptions;
 };
 
-const signIn = async ({ page, signInParams, setupClerkTestingTokenOptions }: PlaywrightClerkSignInParams) => {
-  const context = page.context();
+const signIn = async (opts: PlaywrightClerkSignInParams | PlaywrightClerkSignInParamsWithEmail) => {
+  const context = opts.page.context();
   if (!context) {
     throw new Error('Page context is not available. Make sure the page is properly initialized.');
   }
 
-  await setupClerkTestingToken({ context, options: setupClerkTestingTokenOptions });
-  await loaded({ page });
+  await setupClerkTestingToken({
+    context,
+    options: 'setupClerkTestingTokenOptions' in opts ? opts.setupClerkTestingTokenOptions : undefined,
+  });
+  await loaded({ page: opts.page });
 
-  await page.evaluate(signInHelper, { signInParams });
+  if ('emailAddress' in opts) {
+    // Email-based sign-in using ticket strategy
+    const { emailAddress, page } = opts;
+
+    const secretKey = process.env.CLERK_SECRET_KEY;
+    if (!secretKey) {
+      throw new Error('CLERK_SECRET_KEY environment variable is required for email-based sign-in');
+    }
+
+    const clerkClient = createClerkClient({ secretKey });
+
+    try {
+      // Find user by email
+      const userList = await clerkClient.users.getUserList({ emailAddress: [emailAddress] });
+      if (!userList.data || userList.data.length === 0) {
+        throw new Error(`No user found with email: ${emailAddress}`);
+      }
+
+      const user = userList.data[0];
+
+      const signInToken = await clerkClient.signInTokens.createSignInToken({
+        userId: user.id,
+        expiresInSeconds: 300, // 5 minutes
+      });
+
+      await page.evaluate(signInHelper, {
+        signInParams: { strategy: 'ticket' as const, ticket: signInToken.token },
+      });
+
+      await page.waitForFunction(() => window.Clerk?.user !== null);
+    } catch (err: any) {
+      throw new Error(`Failed to sign in with email ${emailAddress}: ${err?.message}`);
+    }
+  } else {
+    // Strategy-based sign-in: signIn(opts)
+    const { page, signInParams } = opts;
+    await page.evaluate(signInHelper, { signInParams });
+  }
 };
 
 type PlaywrightClerkSignOutParams = {
@@ -113,7 +173,7 @@ const signOut = async ({ page, signOutOptions }: PlaywrightClerkSignOutParams) =
 };
 
 export const clerk: ClerkHelperParams = {
-  signIn,
+  signIn: signIn as ClerkHelperParams['signIn'],
   signOut,
   loaded,
 };

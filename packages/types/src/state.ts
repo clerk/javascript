@@ -1,4 +1,5 @@
 import type { SignInFutureResource } from './signIn';
+import type { SignUpFutureResource } from './signUp';
 
 interface FieldError {
   code: string;
@@ -25,16 +26,32 @@ export interface Errors {
   global: unknown[]; // does not include any errors that could be parsed as a field error
 }
 
+export interface SignInSignal {
+  (): {
+    errors: Errors;
+    fetchStatus: 'idle' | 'fetching';
+    signIn: SignInFutureResource | null;
+  };
+}
+
+export interface SignUpSignal {
+  (): {
+    errors: Errors;
+    fetchStatus: 'idle' | 'fetching';
+    signUp: SignUpFutureResource | null;
+  };
+}
+
 export interface State {
   /**
    * A Signal that updates when the underlying `SignIn` resource changes, including errors.
    */
-  signInSignal: {
-    (): {
-      errors: Errors;
-      signIn: SignInFutureResource | null;
-    };
-  };
+  signInSignal: SignInSignal;
+
+  /**
+   * A Signal that updates when the underlying `SignUp` resource changes, including errors.
+   */
+  signUpSignal: SignUpSignal;
 
   /**
    * @experimental This experimental API is subject to change.
