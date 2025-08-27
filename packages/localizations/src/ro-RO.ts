@@ -19,8 +19,7 @@ export const roRO: LocalizationResource = {
     action__search: 'Caută chei',
     createdAndExpirationStatus__expiresOn:
       "Creată {{ createdDate | shortDate('ro-RO') }} • Expiră {{ expiresDate | longDate('ro-RO') }}",
-    createdAndExpirationStatus__never:
-      "Creată {{ createdDate | shortDate('ro-RO') }} • Nu expiră niciodată",
+    createdAndExpirationStatus__never: "Creată {{ createdDate | shortDate('ro-RO') }} • Nu expiră niciodată",
     detailsTitle__emptyRow: 'Nu au fost găsite chei API',
     formButtonPrimary__add: 'Creează cheie',
     formFieldCaption__expiration__expiresOn: 'Expiră la {{ date }}',
@@ -33,8 +32,7 @@ export const roRO: LocalizationResource = {
     formFieldOption__expiration__7d: '7 zile',
     formFieldOption__expiration__90d: '90 de zile',
     formFieldOption__expiration__never: 'Niciodată',
-    formHint:
-      'Furnizează un nume pentru a genera o cheie nouă. O vei putea revoca oricând.',
+    formHint: 'Furnizează un nume pentru a genera o cheie nouă. O vei putea revoca oricând.',
     formTitle: 'Adaugă cheie API nouă',
     lastUsed__days: 'acum {{days}}z',
     lastUsed__hours: 'acum {{hours}}h',
@@ -97,8 +95,7 @@ export const roRO: LocalizationResource = {
       downgradeNotice:
         'Vei păstra abonamentul curent și funcțiile sale până la finalul ciclului de facturare, apoi vei fi schimbat la acest abonament.',
       emailForm: {
-        subtitle:
-          'Înainte de a finaliza achiziția, adaugă o adresă de email unde vor fi trimise chitanțele.',
+        subtitle: 'Înainte de a finaliza achiziția, adaugă o adresă de email unde vor fi trimise chitanțele.',
         title: 'Adaugă o adresă de email',
       },
       lineItems: {
@@ -259,8 +256,7 @@ export const roRO: LocalizationResource = {
     action__signOut: 'Deconectează-te',
     title: 'Autentificat ca {{identifier}}',
   },
-  maintenanceMode:
-    'Efectuăm lucrări de mentenanță, dar nu va dura mai mult de câteva minute.',
+  maintenanceMode: 'Efectuăm lucrări de mentenanță, dar nu va dura mai mult de câteva minute.',
   membershipRole__admin: 'Administrator',
   membershipRole__basicMember: 'Membru',
   membershipRole__guestMember: 'Invitat',
@@ -346,8 +342,7 @@ export const roRO: LocalizationResource = {
         'Invitațiile nu au putut fi trimise. Există deja invitații în așteptare pentru următoarele adrese: {{email_addresses}}.',
       formButtonPrimary__continue: 'Trimite invitațiile',
       selectDropdown__role: 'Selectează rolul',
-      subtitle:
-        'Introdu sau lipește una sau mai multe adrese de email, separate prin spații sau virgule.',
+      subtitle: 'Introdu sau lipește una sau mai multe adrese de email, separate prin spații sau virgule.',
       successMessage: 'Invitațiile au fost trimise cu succes',
       title: 'Invită membri noi',
     },
@@ -403,8 +398,7 @@ export const roRO: LocalizationResource = {
     },
     plansPage: {
       alerts: {
-        noPermissionsToManageBilling:
-          'Nu ai permisiuni pentru a gestiona facturarea acestei organizații.',
+        noPermissionsToManageBilling: 'Nu ai permisiuni pentru a gestiona facturarea acestei organizații.',
       },
       title: 'Planuri',
     },
@@ -441,8 +435,7 @@ export const roRO: LocalizationResource = {
     },
     removeDomainPage: {
       messageLine1: 'Domeniul de email {{domain}} va fi eliminat.',
-      messageLine2:
-        'Utilizatorii nu se vor mai putea alătura automat organizației după aceasta.',
+      messageLine2: 'Utilizatorii nu se vor mai putea alătura automat organizației după aceasta.',
       successMessage: '{{domain}} a fost eliminat.',
       title: 'Elimină domeniul',
     },
@@ -469,24 +462,18 @@ export const roRO: LocalizationResource = {
         automaticSuggestionOption__description:
           'Utilizatorii primesc o sugestie de a solicita alăturarea, dar trebuie aprobați de un administrator.',
         automaticSuggestionOption__label: 'Sugestii automate',
-        calloutInfoLabel:
-          'Schimbarea modului de înscriere va afecta doar utilizatorii noi.',
-        calloutInvitationCountLabel:
-          'Invitații în așteptare trimise utilizatorilor: {{count}}',
-        calloutSuggestionCountLabel:
-          'Sugestii în așteptare trimise utilizatorilor: {{count}}',
-        manualInvitationOption__description:
-          'Utilizatorii pot fi invitați doar manual în organizație.',
+        calloutInfoLabel: 'Schimbarea modului de înscriere va afecta doar utilizatorii noi.',
+        calloutInvitationCountLabel: 'Invitații în așteptare trimise utilizatorilor: {{count}}',
+        calloutSuggestionCountLabel: 'Sugestii în așteptare trimise utilizatorilor: {{count}}',
+        manualInvitationOption__description: 'Utilizatorii pot fi invitați doar manual în organizație.',
         manualInvitationOption__label: 'Fără înscriere automată',
-        subtitle:
-          'Alege cum pot utilizatorii din acest domeniu să se alăture organizației.',
+        subtitle: 'Alege cum pot utilizatorii din acest domeniu să se alăture organizației.',
       },
       start: {
         headerTitle__danger: 'Pericol',
         headerTitle__enrollment: 'Opțiuni de înscriere',
       },
-      subtitle:
-        'Domeniul {{domain}} a fost verificat. Continuă selectând modul de înscriere.',
+      subtitle: 'Domeniul {{domain}} a fost verificat. Continuă selectând modul de înscriere.',
       title: 'Actualizează {{domain}}',
     },
     verifyDomainPage: {
@@ -608,8 +595,7 @@ export const roRO: LocalizationResource = {
       title: 'Verifică-ți {{provider}}',
     },
     backupCodeMfa: {
-      subtitle:
-        'Codul de rezervă este cel pe care l-ai primit la configurarea autentificării în doi pași.',
+      subtitle: 'Codul de rezervă este cel pe care l-ai primit la configurarea autentificării în doi pași.',
       title: 'Introdu un cod de rezervă',
     },
     emailCode: {
@@ -666,8 +652,7 @@ export const roRO: LocalizationResource = {
       title: 'Ai uitat parola?',
     },
     noAvailableMethods: {
-      message:
-        'Nu se poate continua autentificarea. Nu există niciun factor de autentificare disponibil.',
+      message: 'Nu se poate continua autentificarea. Nu există niciun factor de autentificare disponibil.',
       subtitle: 'A apărut o eroare',
       title: 'Nu te poți autentifica',
     },
@@ -691,21 +676,17 @@ export const roRO: LocalizationResource = {
     phoneCodeMfa: {
       formTitle: 'Cod de verificare',
       resendButton: 'Nu ai primit un cod? Retrimite',
-      subtitle:
-        'Pentru a continua, introdu codul de verificare trimis pe telefon',
+      subtitle: 'Pentru a continua, introdu codul de verificare trimis pe telefon',
       title: 'Verifică-ți telefonul',
     },
     resetPassword: {
       formButtonPrimary: 'Resetează parola',
-      requiredMessage:
-        'Din motive de securitate, este necesar să îți resetezi parola.',
-      successMessage:
-        'Parola a fost schimbată cu succes. Te autentificăm, te rugăm așteaptă un moment.',
+      requiredMessage: 'Din motive de securitate, este necesar să îți resetezi parola.',
+      successMessage: 'Parola a fost schimbată cu succes. Te autentificăm, te rugăm așteaptă un moment.',
       title: 'Setează parolă nouă',
     },
     resetPasswordMfa: {
-      detailsLabel:
-        'Trebuie să îți verificăm identitatea înainte de a reseta parola.',
+      detailsLabel: 'Trebuie să îți verificăm identitatea înainte de a reseta parola.',
     },
     start: {
       actionLink: 'Înregistrează-te',
@@ -720,8 +701,7 @@ export const roRO: LocalizationResource = {
       alternativePhoneCodeProvider: {
         actionLink: 'Folosește altă metodă',
         label: 'Număr de telefon {{provider}}',
-        subtitle:
-          'Introdu numărul tău de telefon pentru a primi un cod de verificare pe {{provider}}.',
+        subtitle: 'Introdu numărul tău de telefon pentru a primi un cod de verificare pe {{provider}}.',
         title: 'Autentifică-te în {{applicationName}} cu {{provider}}',
       },
       subtitle: 'Bine ai revenit! Te rugăm să te autentifici pentru a continua',
@@ -731,8 +711,7 @@ export const roRO: LocalizationResource = {
     },
     totpMfa: {
       formTitle: 'Cod de verificare',
-      subtitle:
-        'Pentru a continua, introdu codul generat de aplicația ta de autentificare',
+      subtitle: 'Pentru a continua, introdu codul generat de aplicația ta de autentificare',
       title: 'Verificare în doi pași',
     },
   },
@@ -799,8 +778,7 @@ export const roRO: LocalizationResource = {
       actionText: 'Ai deja cont?',
       blockButton__emailSupport: 'Trimite email la suport',
       blockButton__joinWaitlist: 'Înscrie-te pe lista de așteptare',
-      subtitle:
-        'Înregistrările sunt momentan dezactivate. Dacă crezi că ar trebui să ai acces, contactează suportul.',
+      subtitle: 'Înregistrările sunt momentan dezactivate. Dacă crezi că ar trebui să ai acces, contactează suportul.',
       subtitleWaitlist:
         'Înregistrările sunt momentan dezactivate. Pentru a fi primul care află când lansăm, înscrie-te pe lista de așteptare.',
       title: 'Acces restricționat',
@@ -813,8 +791,7 @@ export const roRO: LocalizationResource = {
       alternativePhoneCodeProvider: {
         actionLink: 'Folosește altă metodă',
         label: 'Număr de telefon {{provider}}',
-        subtitle:
-          'Introdu numărul tău de telefon pentru a primi un cod de verificare pe {{provider}}.',
+        subtitle: 'Introdu numărul tău de telefon pentru a primi un cod de verificare pe {{provider}}.',
         title: 'Înregistrează-te în {{applicationName}} cu {{provider}}',
       },
       subtitle: 'Bun venit! Completează detaliile pentru a începe.',
@@ -871,8 +848,7 @@ export const roRO: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
-    form_password_length_too_short:
-      'Parola este prea scurtă. Trebuie să aibă cel puțin 8 caractere.',
+    form_password_length_too_short: 'Parola este prea scurtă. Trebuie să aibă cel puțin 8 caractere.',
     form_password_not_strong_enough: 'Parola ta nu este suficient de puternică.',
     form_password_pwned:
       'Această parolă a fost găsită într-o breșă de securitate și nu poate fi folosită. Te rugăm alege alta.',
@@ -896,12 +872,9 @@ export const roRO: LocalizationResource = {
       'Nu mai ești membru al acestei organizații. Te rugăm alege alta.',
     passkey_already_exists: 'Există deja o cheie de acces înregistrată pe acest dispozitiv.',
     passkey_not_supported: 'Cheile de acces nu sunt acceptate pe acest dispozitiv.',
-    passkey_pa_not_supported:
-      'Înregistrarea necesită un autentificator de platformă, dar dispozitivul nu îl suportă.',
-    passkey_registration_cancelled:
-      'Înregistrarea cheii de acces a fost anulată sau a expirat.',
-    passkey_retrieval_cancelled:
-      'Verificarea cu cheia de acces a fost anulată sau a expirat.',
+    passkey_pa_not_supported: 'Înregistrarea necesită un autentificator de platformă, dar dispozitivul nu îl suportă.',
+    passkey_registration_cancelled: 'Înregistrarea cheii de acces a fost anulată sau a expirat.',
+    passkey_retrieval_cancelled: 'Verificarea cu cheia de acces a fost anulată sau a expirat.',
     passwordComplexity: {
       maximumLength: 'mai puțin de {{length}} caractere',
       minimumLength: '{{length}} sau mai multe caractere',
@@ -913,11 +886,9 @@ export const roRO: LocalizationResource = {
     },
     phone_number_exists: undefined,
     session_exists: undefined,
-    web3_missing_identifier:
-      'Nu am găsit o extensie pentru portofel Web3. Te rugăm instalează una pentru a continua.',
+    web3_missing_identifier: 'Nu am găsit o extensie pentru portofel Web3. Te rugăm instalează una pentru a continua.',
     zxcvbn: {
-      couldBeStronger:
-        'Parola ta funcționează, dar ar putea fi mai puternică. Încearcă să adaugi mai multe caractere.',
+      couldBeStronger: 'Parola ta funcționează, dar ar putea fi mai puternică. Încearcă să adaugi mai multe caractere.',
       goodPassword: 'Parola ta îndeplinește toate cerințele necesare.',
       notEnough: 'Parola ta nu este suficient de puternică.',
       suggestions: {
@@ -928,8 +899,7 @@ export const roRO: LocalizationResource = {
         dates: 'Evită datele și anii asociați cu tine.',
         l33t: "Evită substituțiile previzibile, precum '@' pentru 'a'.",
         longerKeyboardPattern: 'Folosește modele de tastă mai lungi și schimbă direcția.',
-        noNeed:
-          'Poți crea parole puternice fără simboluri, cifre sau litere mari.',
+        noNeed: 'Poți crea parole puternice fără simboluri, cifre sau litere mari.',
         pwned: 'Dacă folosești această parolă în altă parte, ar trebui să o schimbi.',
         recentYears: 'Evită anii recenți.',
         repeated: 'Evită cuvintele și caracterele repetate.',
@@ -941,8 +911,7 @@ export const roRO: LocalizationResource = {
         common: 'Aceasta este o parolă des folosită.',
         commonNames: 'Numele și prenumele comune sunt ușor de ghicit.',
         dates: 'Datele sunt ușor de ghicit.',
-        extendedRepeat:
-          'Modelele repetate de caractere precum „abcabcabc” sunt ușor de ghicit.',
+        extendedRepeat: 'Modelele repetate de caractere precum „abcabcabc” sunt ușor de ghicit.',
         keyPattern: 'Modelele scurte pe tastatură sunt ușor de ghicit.',
         namesByThemselves: 'Numele sau prenumele singure sunt ușor de ghicit.',
         pwned: 'Parola ta a fost expusă într-o breșă de date pe Internet.',
@@ -1048,8 +1017,7 @@ export const roRO: LocalizationResource = {
       formHint__noAccounts: 'Nu există furnizori externi disponibili.',
       removeResource: {
         messageLine1: '{{identifier}} va fi eliminat din acest cont.',
-        messageLine2:
-          'Nu vei mai putea folosi acest cont conectat, iar funcțiile dependente nu vor mai funcționa.',
+        messageLine2: 'Nu vei mai putea folosi acest cont conectat, iar funcțiile dependente nu vor mai funcționa.',
         successMessage: '{{connectedAccount}} a fost eliminat din contul tău.',
         title: 'Elimină contul conectat',
       },
@@ -1112,8 +1080,7 @@ export const roRO: LocalizationResource = {
         successMessage: 'Verificarea în doi pași prin cod SMS a fost eliminată pentru {{mfaPhoneCode}}',
         title: 'Elimină verificarea în doi pași',
       },
-      subtitle__availablePhoneNumbers:
-        'Selectează un număr existent pentru verificare prin SMS sau adaugă unul nou.',
+      subtitle__availablePhoneNumbers: 'Selectează un număr existent pentru verificare prin SMS sau adaugă unul nou.',
       subtitle__unavailablePhoneNumbers:
         'Nu există numere disponibile pentru verificare prin SMS; te rugăm adaugă unul nou.',
       successMessage1:
@@ -1133,8 +1100,7 @@ export const roRO: LocalizationResource = {
           'Adaugă o metodă nouă în aplicația ta de autentificare și introdu Cheia furnizată mai jos.',
         inputLabel__unableToScan1:
           'Asigură-te că parolele „Time-based” sau „One-time” sunt activate, apoi finalizează conectarea contului.',
-        inputLabel__unableToScan2:
-          'Alternativ, dacă aplicația ta suportă URI TOTP, poți copia URI-ul complet.',
+        inputLabel__unableToScan2: 'Alternativ, dacă aplicația ta suportă URI TOTP, poți copia URI-ul complet.',
       },
       removeResource: {
         messageLine1: 'Codurile de verificare din această aplicație nu vor mai fi necesare la autentificare.',
@@ -1168,8 +1134,7 @@ export const roRO: LocalizationResource = {
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'Se recomandă să te deconectezi de pe celelalte dispozitive care ar fi putut folosi parola veche.',
-      readonly:
-        'Parola nu poate fi editată momentan deoarece te poți autentifica doar prin conexiunea enterprise.',
+      readonly: 'Parola nu poate fi editată momentan deoarece te poți autentifica doar prin conexiunea enterprise.',
       successMessage__set: 'Parola a fost setată.',
       successMessage__signOutOfOtherSessions: 'Toate celelalte dispozitive au fost deconectate.',
       successMessage__update: 'Parola a fost actualizată.',
@@ -1198,8 +1163,7 @@ export const roRO: LocalizationResource = {
       imageFormDestructiveActionSubtitle: 'Elimină',
       imageFormSubtitle: 'Încarcă',
       imageFormTitle: 'Imagine de profil',
-      readonly:
-        'Informațiile profilului sunt furnizate de conexiunea enterprise și nu pot fi editate.',
+      readonly: 'Informațiile profilului sunt furnizate de conexiunea enterprise și nu pot fi editate.',
       successMessage: 'Profilul tău a fost actualizat.',
       title: 'Actualizează profilul',
     },
@@ -1322,4 +1286,4 @@ export const roRO: LocalizationResource = {
       title: 'Mulțumim pentru înscriere!',
     },
   },
-} as const;  
+} as const;
