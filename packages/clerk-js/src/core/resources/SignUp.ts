@@ -50,6 +50,7 @@ import {
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from '../errors';
 import { eventBus } from '../events';
+import type { Clerk } from './internal';
 import { BaseResource, ClerkRuntimeError, SignUpVerifications } from './internal';
 
 declare global {
@@ -87,7 +88,7 @@ export class SignUp extends BaseResource implements SignUpResource {
    *
    * An instance of `SignUpFuture`, which has a different API than `SignUp`, intended to be used in custom flows.
    */
-  __internal_future: SignUpFuture = new SignUpFuture(this);
+  __internal_future: SignUpFuture = new SignUpFuture(this, SignUp.clerk);
 
   /**
    * @internal Only used for internal purposes, and is not intended to be used directly.
@@ -478,7 +479,10 @@ class SignUpFuture implements SignUpFutureResource {
     verifyEmailCode: this.verifyEmailCode.bind(this),
   };
 
-  constructor(readonly resource: SignUp) {}
+  constructor(
+    readonly resource: SignUp,
+    private clerk: Clerk,
+  ) {}
 
   get status() {
     return this.resource.status;
@@ -585,7 +589,7 @@ class SignUpFuture implements SignUpFutureResource {
         path: this.resource.pathRoot,
         body: {
           strategy,
-          redirectUrl: SignUp.clerk.buildUrlWithAuth(redirectUrl),
+          redirectUrl: this.clerk.buildUrlWithAuth(redirectUrl),
           redirectUrlComplete,
           captchaToken,
           captchaWidgetType,
@@ -609,7 +613,7 @@ class SignUpFuture implements SignUpFutureResource {
         throw new Error('Cannot finalize sign-up without a created session.');
       }
 
-      await SignUp.clerk.setActive({ session: this.resource.createdSessionId, navigate });
+      await this.clerk.setActive({ session: this.resource.createdSessionId, navigate });
     });
   }
 }
