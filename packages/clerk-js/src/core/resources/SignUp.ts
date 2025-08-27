@@ -30,9 +30,11 @@ import type {
 } from '@clerk/types';
 
 import {
+  generateSignatureWithBase,
   generateSignatureWithCoinbaseWallet,
   generateSignatureWithMetamask,
   generateSignatureWithOKXWallet,
+  getBaseIdentifier,
   getCoinbaseWalletIdentifier,
   getMetamaskIdentifier,
   getOKXWalletIdentifier,
@@ -272,6 +274,21 @@ export class SignUp extends BaseResource implements SignUpResource {
       generateSignature: generateSignatureWithCoinbaseWallet,
       unsafeMetadata: params?.unsafeMetadata,
       strategy: 'web3_coinbase_wallet_signature',
+      legalAccepted: params?.legalAccepted,
+    });
+  };
+
+  public authenticateWithBase = async (
+    params?: SignUpAuthenticateWithWeb3Params & {
+      legalAccepted?: boolean;
+    },
+  ): Promise<SignUpResource> => {
+    const identifier = await getBaseIdentifier();
+    return this.authenticateWithWeb3({
+      identifier,
+      generateSignature: generateSignatureWithBase,
+      unsafeMetadata: params?.unsafeMetadata,
+      strategy: 'web3_base_signature',
       legalAccepted: params?.legalAccepted,
     });
   };
