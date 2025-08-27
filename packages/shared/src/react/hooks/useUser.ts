@@ -90,9 +90,6 @@ const hookName = 'useUser';
  * import { useUser } from '@clerk/clerk-react'
  *
  * export default function Home() {
- * import { useUser } from '@clerk/clerk-react';
- *
- * export default function Home() {
  *   const { isSignedIn, isLoaded, user } = useUser();
  *
  *   if (!isLoaded) {
