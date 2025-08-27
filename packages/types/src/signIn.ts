@@ -153,6 +153,10 @@ export interface SignInFutureResource {
     verifyCode: (params: { code: string }) => Promise<{ error: unknown }>;
     submitPassword: (params: { password: string; signOutOfOtherSessions?: boolean }) => Promise<{ error: unknown }>;
   };
+  phoneCode: {
+    sendCode: (params?: { phoneNumber?: string; channel?: 'sms' | 'whatsapp' }) => Promise<{ error: unknown }>;
+    verifyCode: (params: { code: string }) => Promise<{ error: unknown }>;
+  };
   sso: (params: {
     flow?: 'auto' | 'modal';
     strategy: OAuthStrategy | 'saml' | 'enterprise_sso';

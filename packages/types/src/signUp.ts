@@ -133,6 +133,8 @@ export interface SignUpFutureResource {
   verifications: {
     sendEmailCode: () => Promise<{ error: unknown }>;
     verifyEmailCode: (params: { code: string }) => Promise<{ error: unknown }>;
+    sendPhoneCode: (params?: { phoneNumber?: string; channel?: 'sms' | 'whatsapp' }) => Promise<{ error: unknown }>;
+    verifyPhoneCode: (params: { code: string }) => Promise<{ error: unknown }>;
   };
   password: (params: { emailAddress: string; password: string }) => Promise<{ error: unknown }>;
   sso: (params: { strategy: string; redirectUrl: string; redirectUrlComplete: string }) => Promise<{ error: unknown }>;

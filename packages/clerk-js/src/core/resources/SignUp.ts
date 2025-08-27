@@ -476,6 +476,8 @@ class SignUpFuture implements SignUpFutureResource {
   verifications = {
     sendEmailCode: this.sendEmailCode.bind(this),
     verifyEmailCode: this.verifyEmailCode.bind(this),
+    sendPhoneCode: this.sendPhoneCode.bind(this),
+    verifyPhoneCode: this.verifyPhoneCode.bind(this),
   };
 
   constructor(readonly resource: SignUp) {}
@@ -565,6 +567,38 @@ class SignUpFuture implements SignUpFutureResource {
     return runAsyncResourceTask(this.resource, async () => {
       await this.resource.__internal_basePost({
         body: { strategy: 'email_code', code },
+        action: 'attempt_verification',
+      });
+    });
+  }
+
+  async sendPhoneCode({
+    phoneNumber,
+    channel = 'sms',
+  }: {
+    phoneNumber?: string;
+    channel?: 'sms' | 'whatsapp';
+  } = {}): Promise<{ error: unknown }> {
+    return runAsyncResourceTask(this.resource, async () => {
+      if (!this.resource.id) {
+        const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
+        await this.resource.__internal_basePost({
+          path: this.resource.pathRoot,
+          body: { phoneNumber, captchaToken, captchaWidgetType, captchaError },
+        });
+      }
+
+      await this.resource.__internal_basePost({
+        body: { strategy: 'phone_code', channel },
+        action: 'prepare_verification',
+      });
+    });
+  }
+
+  async verifyPhoneCode({ code }: { code: string }): Promise<{ error: unknown }> {
+    return runAsyncResourceTask(this.resource, async () => {
+      await this.resource.__internal_basePost({
+        body: { strategy: 'phone_code', code },
         action: 'attempt_verification',
       });
     });
