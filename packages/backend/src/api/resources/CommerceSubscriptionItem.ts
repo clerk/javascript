@@ -21,7 +21,7 @@ export class CommerceSubscriptionItem {
      */
     readonly planPeriod: 'month' | 'annual',
     /**
-     * Unix timestamp (milliseconds) when the current period starts.
+     * Unix timestamp (milliseconds) of when the current period starts.
      */
     readonly periodStart: number,
     /**
@@ -33,7 +33,7 @@ export class CommerceSubscriptionItem {
        */
       amount: number;
       /**
-       * Unix timestamp (milliseconds) when the next payment is scheduled.
+       * Unix timestamp (milliseconds) of when the next payment is scheduled.
        */
       date: number;
     } | null,
@@ -50,27 +50,27 @@ export class CommerceSubscriptionItem {
      */
     readonly planId: string,
     /**
-     * Unix timestamp (milliseconds) when the subscription item was created.
+     * Unix timestamp (milliseconds) of when the subscription item was created.
      */
     readonly createdAt: number,
     /**
-     * Unix timestamp (milliseconds) when the subscription item was last updated.
+     * Unix timestamp (milliseconds) of when the subscription item was last updated.
      */
     readonly updatedAt: number,
     /**
-     * Unix timestamp (milliseconds) when the current period ends.
+     * Unix timestamp (milliseconds) of when the current period ends.
      */
     readonly periodEnd: number | null,
     /**
-     * Unix timestamp (milliseconds) when the subscription item was canceled.
+     * Unix timestamp (milliseconds) of when the subscription item was canceled.
      */
     readonly canceledAt: number | null,
     /**
-     * Unix timestamp (milliseconds) when the subscription item became past due.
+     * Unix timestamp (milliseconds) of when the subscription item became past due.
      */
     readonly pastDueAt: number | null,
     /**
-     * Unix timestamp (milliseconds) when the subscription item ended.
+     * Unix timestamp (milliseconds) of when the subscription item ended.
      */
     readonly endedAt: number | null,
     /**

@@ -1273,7 +1273,7 @@ export interface CommerceCheckoutResource extends ClerkResource {
    */
   planPeriod: CommerceSubscriptionPlanPeriod;
   /**
-   * Unix timestamp (milliseconds) when the current period starts.
+   * Unix timestamp (milliseconds) of when the current period starts.
    */
   planPeriodStart?: number;
   /**
@@ -1293,7 +1293,7 @@ export interface CommerceCheckoutResource extends ClerkResource {
    */
   isImmediatePlanChange: boolean;
   /**
-   * Unix timestamp (milliseconds) when the free trial ends.
+   * Unix timestamp (milliseconds) of when the free trial ends.
    */
   freeTrialEndsAt: Date | null;
 }

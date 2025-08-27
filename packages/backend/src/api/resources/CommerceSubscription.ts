@@ -20,19 +20,19 @@ export class CommerceSubscription {
      */
     readonly payerId: string,
     /**
-     * Unix timestamp (milliseconds) when the subscription was created.
+     * Unix timestamp (milliseconds) of when the subscription was created.
      */
     readonly createdAt: number,
     /**
-     * Unix timestamp (milliseconds) when the subscription was last updated.
+     * Unix timestamp (milliseconds) of when the subscription was last updated.
      */
     readonly updatedAt: number,
     /**
-     * Unix timestamp (milliseconds) when the subscription became active.
+     * Unix timestamp (milliseconds) of when the subscription became active.
      */
     readonly activeAt: number | null,
     /**
-     * Unix timestamp (milliseconds) when the subscription became past due.
+     * Unix timestamp (milliseconds) of when the subscription became past due.
      */
     readonly pastDueAt: number | null,
     /**
