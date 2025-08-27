@@ -3,4 +3,5 @@
 '@clerk/types': patch
 ---
 
-export feature type from backend resource
+- Export `Feature` type from backend resource.
+- Re-export canonical `CommerceMoneyAmount` type from `@clerk/types`.
