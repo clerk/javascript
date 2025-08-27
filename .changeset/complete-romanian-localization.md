@@ -1,15 +1,11 @@
----
-'@clerk/localizations': minor
----
+Complete Romanian (ro-RO) localization
 
-Complete Romanian (ro-RO) localization with all missing translations
+This update:
+- Translates missing API key management strings.
+- Adds complete commerce and billing translations.
+- Completes organization profile translations.
+- Adds missing error messages.
+- Includes form labels and placeholders.
+- Ensures ro-RO is included in the package.json files array for publishing.
 
-This update completes the Romanian localization by:
-- Translating all undefined API key management strings
-- Adding complete commerce/billing translations  
-- Completing organization profile translations
-- Adding all missing error messages
-- Including form labels and placeholders
-- Adding ro-RO to package.json files array for proper publishing
-
-The Romanian localization now provides a complete user experience for Romanian-speaking users.
+The Romanian localization now provides a complete experience for Romanian-speaking users.
