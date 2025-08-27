@@ -92,7 +92,7 @@ export class SignIn extends BaseResource implements SignInResource {
    *
    * An instance of `SignInFuture`, which has a different API than `SignIn`, intended to be used in custom flows.
    */
-  __internal_future: SignInFuture = new SignInFuture(this, SignIn.cler);
+  __internal_future: SignInFuture = new SignInFuture(this, SignIn.clerk);
 
   /**
    * @internal Only used for internal purposes, and is not intended to be used directly.
