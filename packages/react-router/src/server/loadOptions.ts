@@ -4,14 +4,16 @@ import { getEnvVariable } from '@clerk/shared/getEnvVariable';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps, isProxyUrlRelative } from '@clerk/shared/proxy';
 import { handleValueOrFn } from '@clerk/shared/utils';
-import type { LoaderFunctionArgs } from 'react-router';
+import type { unstable_MiddlewareFunction } from 'react-router';
 
 import { getPublicEnvVariables } from '../utils/env';
-import { noSecretKeyError, satelliteAndMissingProxyUrlAndDomain, satelliteAndMissingSignInUrl } from '../utils/errors';
-import type { RootAuthLoaderOptions } from './types';
+import type { ClerkMiddlewareOptions } from './types';
 import { patchRequest } from './utils';
 
-export const loadOptions = (args: LoaderFunctionArgs, overrides: RootAuthLoaderOptions = {}) => {
+export type DataFunctionArgs = Parameters<unstable_MiddlewareFunction<Response>>[0];
+
+export const loadOptions = (args: DataFunctionArgs, overrides: ClerkMiddlewareOptions = {}) => {
+  // see https://developers.cloudflare.com/workers/framework-guides/web-apps/react-router/#use-bindings-with-react-router
   const { request, context } = args;
   const clerkRequest = createClerkRequest(patchRequest(request));
 
@@ -55,13 +57,13 @@ export const loadOptions = (args: LoaderFunctionArgs, overrides: RootAuthLoaderO
   }
 
   if (!secretKey) {
-    throw new Error(noSecretKeyError);
+    throw new Error('noSecretKeyError');
   }
   if (isSatellite && !proxyUrl && !domain) {
-    throw new Error(satelliteAndMissingProxyUrlAndDomain);
+    throw new Error('satelliteAndMissingProxyUrlAndDomain');
   }
   if (isSatellite && !isHttpOrHttps(signInUrl) && isDevelopmentFromSecretKey(secretKey)) {
-    throw new Error(satelliteAndMissingSignInUrl);
+    throw new Error('satelliteAndMissingSignInUrl');
   }
 
   return {

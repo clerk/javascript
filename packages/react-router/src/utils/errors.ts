@@ -94,3 +94,31 @@ Example:
 
 <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
 `);
+
+const middlewareMigrationExample = `In the next major release, an error will be thrown if the middleware is not installed.
+
+Example:
+
+import { clerkMiddleware, rootAuthLoader } from '@clerk/react-router/ssr.server'
+import { ClerkProvider } from '@clerk/react-router'
+
+export const middleware: Route.MiddlewareFunction[] = [clerkMiddleware()]
+
+export async function loader(args: Route.LoaderArgs) {
+  return rootAuthLoader(args)
+}
+
+export default function App({ loaderData }: Route.ComponentProps) {
+  return (
+    <ClerkProvider loaderData={loaderData}>
+      <Outlet />
+    </ClerkProvider>
+  )
+}
+`;
+
+export const middlewareMigrationWarning = createErrorMessage(`
+'"clerkMiddleware()" not detected.
+
+${middlewareMigrationExample}
+`);

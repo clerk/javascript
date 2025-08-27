@@ -30,6 +30,10 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./server": {
+      "types": "./dist/server/index.d.ts",
+      "default": "./dist/server/index.js"
+    },
     "./ssr.server": {
       "types": "./dist/ssr/index.d.ts",
       "default": "./dist/ssr/index.js"
@@ -54,6 +58,9 @@
       "*": [
         "dist/*.d.ts",
         "dist/index.d.ts"
+      ],
+      "server": [
+        "dist/server/index.d.ts"
       ],
       "ssr.server": [
         "dist/ssr/index.d.ts"

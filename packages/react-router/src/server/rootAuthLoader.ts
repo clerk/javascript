@@ -1,0 +1,154 @@
+import { decorateObjectWithResources } from '@clerk/backend/internal';
+import type { LoaderFunctionArgs } from 'react-router';
+
+import { invalidRootLoaderCallbackReturn, middlewareMigrationWarning } from '../utils/errors';
+import { requestStateContext } from './clerkMiddleware';
+import { legacyAuthenticateRequest } from './legacyAuthenticateRequest';
+import { loadOptions } from './loadOptions';
+import type { LoaderFunctionReturn, RootAuthLoaderCallback, RootAuthLoaderOptions } from './types';
+import {
+  getResponseClerkState,
+  injectRequestStateIntoResponse,
+  isDataWithResponseInit,
+  isRedirect,
+  isResponse,
+} from './utils';
+
+interface RootAuthLoader {
+  <Options extends RootAuthLoaderOptions, Callback extends RootAuthLoaderCallback<Options>>(
+    /**
+     * Arguments passed to the loader function.
+     */
+    args: LoaderFunctionArgs,
+    /**
+     * A loader function with authentication state made available to it. Allows you to fetch route data based on the user's authentication state.
+     */
+    callback: Callback,
+    options?: Options,
+  ): Promise<ReturnType<Callback>>;
+
+  (args: LoaderFunctionArgs, options?: RootAuthLoaderOptions): Promise<LoaderFunctionReturn>;
+}
+
+/**
+ * Shared logic for processing the root auth loader with a given request state
+ */
+async function processRootAuthLoader(
+  args: LoaderFunctionArgs,
+  requestState: any,
+  handler?: RootAuthLoaderCallback<any>,
+  _options?: RootAuthLoaderOptions,
+): Promise<LoaderFunctionReturn> {
+  if (!handler) {
+    // if the user did not provide a handler, simply inject Clerk's state into an empty object
+    const { clerkState } = getResponseClerkState(requestState, args.context);
+    return {
+      ...clerkState,
+    };
+  }
+
+  // Create args with auth-enhanced request for the handler
+  const argsWithAuth = {
+    ...args,
+    request: Object.assign(args.request, { auth: requestState.toAuth() }),
+  };
+
+  const handlerResult = await handler(argsWithAuth);
+
+  if (isResponse(handlerResult)) {
+    try {
+      // respect and pass-through any redirects without modifying them
+      if (isRedirect(handlerResult)) {
+        return handlerResult;
+      }
+      // clone and try to inject requestState into all json-like responses
+      // if this fails, the user probably didn't return a json object or a valid json string
+      return injectRequestStateIntoResponse(handlerResult, requestState, args.context);
+    } catch {
+      throw new Error(invalidRootLoaderCallbackReturn);
+    }
+  }
+
+  if (isDataWithResponseInit(handlerResult)) {
+    try {
+      // clone and try to inject requestState into all json-like responses
+      // if this fails, the user probably didn't return a json object or a valid json string
+      return injectRequestStateIntoResponse(
+        new Response(JSON.stringify(handlerResult.data), handlerResult.init ?? undefined),
+        requestState,
+        args.context,
+      );
+    } catch {
+      throw new Error(invalidRootLoaderCallbackReturn);
+    }
+  }
+
+  // if the return value of the user's handler is null or a plain object, return an object and inject Clerk's state into it
+  // this supports streaming responses
+  const { clerkState } = getResponseClerkState(requestState, args.context);
+  return {
+    ...handlerResult,
+    ...clerkState,
+  };
+}
+
+/**
+ * Makes authorization state available in your application by wrapping the root loader.
+ *
+ * @see https://clerk.com/docs/references/react-router/root-auth-loader
+ */
+export const rootAuthLoader: RootAuthLoader = async (
+  args: LoaderFunctionArgs,
+  handlerOrOptions: any,
+  options?: any,
+): Promise<LoaderFunctionReturn> => {
+  const handler = typeof handlerOrOptions === 'function' ? handlerOrOptions : undefined;
+  const opts: RootAuthLoaderOptions = options
+    ? options
+    : !!handlerOrOptions && typeof handlerOrOptions !== 'function'
+      ? handlerOrOptions
+      : {};
+
+  const requestState = args.context.get(requestStateContext);
+
+  if (!requestState) {
+    console.warn(middlewareMigrationWarning);
+    return legacyRootAuthLoader(args, handlerOrOptions, opts);
+  }
+
+  return processRootAuthLoader(args, requestState, handler, opts);
+};
+
+/**
+ * Legacy implementation that authenticates requests without middleware.
+ * This maintains backward compatibility for users who haven't migrated to the new middleware system.
+ */
+const legacyRootAuthLoader: RootAuthLoader = async (
+  args: LoaderFunctionArgs,
+  handlerOrOptions: any,
+  options?: any,
+): Promise<LoaderFunctionReturn> => {
+  const handler = typeof handlerOrOptions === 'function' ? handlerOrOptions : undefined;
+  const opts: RootAuthLoaderOptions = options
+    ? options
+    : !!handlerOrOptions && typeof handlerOrOptions !== 'function'
+      ? handlerOrOptions
+      : {};
+
+  const loadedOptions = loadOptions(args, opts);
+  // Note: legacyAuthenticateRequest() will throw a redirect if the auth state is determined to be handshake
+  const _requestState = await legacyAuthenticateRequest(args, loadedOptions);
+  // TODO: Investigate if `authenticateRequest` needs to return the loadedOptions (the new request urls in particular)
+  const requestState = { ...loadedOptions, ..._requestState };
+
+  if (!handler) {
+    // if the user did not provide a handler, simply inject requestState into an empty response
+    return injectRequestStateIntoResponse(new Response(JSON.stringify({})), requestState, args.context);
+  }
+
+  const authObj = requestState.toAuth();
+  const requestWithAuth = Object.assign(args.request, { auth: authObj });
+  await decorateObjectWithResources(requestWithAuth, authObj, loadedOptions);
+
+  return processRootAuthLoader(args, requestState, handler, opts);
+};
