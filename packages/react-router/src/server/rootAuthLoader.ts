@@ -102,6 +102,7 @@ async function processRootAuthLoader(
 
   // Middleware path: return plain object with streaming support
   const { clerkState } = getResponseClerkState(requestState, args.context);
+
   return {
     ...(handlerResult ?? {}),
     ...clerkState,
