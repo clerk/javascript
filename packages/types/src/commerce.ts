@@ -826,6 +826,8 @@ export interface CommerceStatementResource extends ClerkResource {
 
 /**
  * The `CommerceStatementGroup` type represents a group of payment items within a statement.
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version to avoid breaking changes.
  */
 export interface CommerceStatementGroup {
   /**
@@ -1131,6 +1133,8 @@ export interface CommerceSubscriptionResource extends ClerkResource {
 
 /**
  * The `CommerceMoneyAmount` type represents a monetary value with currency information.
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version to avoid breaking changes.
  */
 export interface CommerceMoneyAmount {
   /**
@@ -1185,6 +1189,8 @@ export interface CommerceCheckoutTotals {
 
 /**
  * The `CommerceStatementTotals` type represents the total costs, taxes, and other pricing details for a statement.
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version to avoid breaking changes.
  */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface CommerceStatementTotals extends Omit<CommerceCheckoutTotals, 'totalDueNow'> {}
