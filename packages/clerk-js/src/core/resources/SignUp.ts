@@ -14,11 +14,15 @@ import type {
   PreparePhoneNumberVerificationParams,
   PrepareVerificationParams,
   PrepareWeb3WalletVerificationParams,
-  SetActiveNavigate,
   SignUpAuthenticateWithWeb3Params,
   SignUpCreateParams,
   SignUpField,
+  SignUpFutureCreateParams,
+  SignUpFutureEmailCodeVerifyParams,
+  SignUpFutureFinalizeParams,
+  SignUpFuturePasswordParams,
   SignUpFutureResource,
+  SignUpFutureSSoParams,
   SignUpIdentificationField,
   SignUpJSON,
   SignUpJSONSnapshot,
@@ -30,9 +34,11 @@ import type {
 } from '@clerk/types';
 
 import {
+  generateSignatureWithBase,
   generateSignatureWithCoinbaseWallet,
   generateSignatureWithMetamask,
   generateSignatureWithOKXWallet,
+  getBaseIdentifier,
   getCoinbaseWalletIdentifier,
   getMetamaskIdentifier,
   getOKXWalletIdentifier,
@@ -272,6 +278,21 @@ export class SignUp extends BaseResource implements SignUpResource {
       generateSignature: generateSignatureWithCoinbaseWallet,
       unsafeMetadata: params?.unsafeMetadata,
       strategy: 'web3_coinbase_wallet_signature',
+      legalAccepted: params?.legalAccepted,
+    });
+  };
+
+  public authenticateWithBase = async (
+    params?: SignUpAuthenticateWithWeb3Params & {
+      legalAccepted?: boolean;
+    },
+  ): Promise<SignUpResource> => {
+    const identifier = await getBaseIdentifier();
+    return this.authenticateWithWeb3({
+      identifier,
+      generateSignature: generateSignatureWithBase,
+      unsafeMetadata: params?.unsafeMetadata,
+      strategy: 'web3_base_signature',
       legalAccepted: params?.legalAccepted,
     });
   };
@@ -526,7 +547,8 @@ class SignUpFuture implements SignUpFutureResource {
     return { captchaToken, captchaWidgetType, captchaError };
   }
 
-  async create({ transfer }: { transfer?: boolean }): Promise<{ error: unknown }> {
+  async create(params: SignUpFutureCreateParams): Promise<{ error: unknown }> {
+    const { transfer } = params;
     return runAsyncResourceTask(this.resource, async () => {
       const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
       await this.resource.__internal_basePost({
@@ -536,7 +558,8 @@ class SignUpFuture implements SignUpFutureResource {
     });
   }
 
-  async password({ emailAddress, password }: { emailAddress: string; password: string }): Promise<{ error: unknown }> {
+  async password(params: SignUpFuturePasswordParams): Promise<{ error: unknown }> {
+    const { emailAddress, password } = params;
     return runAsyncResourceTask(this.resource, async () => {
       const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
 
@@ -563,7 +586,8 @@ class SignUpFuture implements SignUpFutureResource {
     });
   }
 
-  async verifyEmailCode({ code }: { code: string }): Promise<{ error: unknown }> {
+  async verifyEmailCode(params: SignUpFutureEmailCodeVerifyParams): Promise<{ error: unknown }> {
+    const { code } = params;
     return runAsyncResourceTask(this.resource, async () => {
       await this.resource.__internal_basePost({
         body: { strategy: 'email_code', code },
@@ -604,23 +628,16 @@ class SignUpFuture implements SignUpFutureResource {
     });
   }
 
-  async sso({
-    strategy,
-    redirectUrl,
-    redirectUrlComplete,
-  }: {
-    strategy: string;
-    redirectUrl: string;
-    redirectUrlComplete: string;
-  }): Promise<{ error: unknown }> {
+  async sso(params: SignUpFutureSSoParams): Promise<{ error: unknown }> {
+    const { strategy, redirectUrl, redirectCallbackUrl } = params;
     return runAsyncResourceTask(this.resource, async () => {
       const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
       await this.resource.__internal_basePost({
         path: this.resource.pathRoot,
         body: {
           strategy,
-          redirectUrl: SignUp.clerk.buildUrlWithAuth(redirectUrl),
-          redirectUrlComplete,
+          redirectUrl: SignUp.clerk.buildUrlWithAuth(redirectCallbackUrl),
+          redirectUrlComplete: redirectUrl,
           captchaToken,
           captchaWidgetType,
           captchaError,
@@ -637,7 +654,8 @@ class SignUpFuture implements SignUpFutureResource {
     });
   }
 
-  async finalize({ navigate }: { navigate?: SetActiveNavigate } = {}): Promise<{ error: unknown }> {
+  async finalize(params?: SignUpFutureFinalizeParams): Promise<{ error: unknown }> {
+    const { navigate } = params || {};
     return runAsyncResourceTask(this.resource, async () => {
       if (!this.resource.createdSessionId) {
         throw new Error('Cannot finalize sign-up without a created session.');
