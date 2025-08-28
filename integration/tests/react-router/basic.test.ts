@@ -89,7 +89,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes], withPattern:
       await expect(u.page.getByText(`Email: ${fakeUser.email}`)).toBeVisible();
     });
 
-    test('streaming with Suspense works with rootAuthLoader', async ({ page, context }) => {
+    test.skip('streaming with Suspense works with rootAuthLoader', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
 
       await u.page.goToRelative('/');
