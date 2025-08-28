@@ -7,7 +7,7 @@ import type { Route } from './+types/root';
 export const unstable_middleware: Route.unstable_MiddlewareFunction[] = [clerkMiddleware()];
 
 export async function loader(args: Route.LoaderArgs) {
-  const nonCriticalData = new Promise(res => setTimeout(() => res('non-critical'), 1500));
+  const nonCriticalData = new Promise(res => setTimeout(() => res('non-critical'), 1000));
 
   return rootAuthLoader(args, () => ({
     nonCriticalData,

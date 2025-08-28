@@ -94,10 +94,11 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes], withPattern:
 
       await u.page.goToRelative('/');
 
-      await expect(page.getByText('Loading...')).toBeVisible();
+      await expect(u.page.getByText('Loading...')).toBeVisible();
 
-      await expect(page.getByText('Non critical value: non-critical')).toBeVisible({ timeout: 3000 });
-      await expect(page.getByText('Loading...')).toBeHidden();
+      // Wait for the streaming content to resolve
+      await expect(u.page.getByText('Non critical value: non-critical')).toBeVisible({ timeout: 3000 });
+      await expect(u.page.getByText('Loading...')).toBeHidden();
     });
   },
 );
