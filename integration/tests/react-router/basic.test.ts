@@ -5,7 +5,7 @@ import type { FakeUser } from '../../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../../testUtils';
 
 testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes], withPattern: ['react-router.node'] })(
-  'basic tests for @react-router',
+  'basic tests for @react-router with middleware',
   ({ app }) => {
     test.describe.configure({ mode: 'parallel' });
 
@@ -87,6 +87,18 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes], withPattern:
       // This also verifies that the server middleware is working.
       await expect(u.page.getByText(`First name: ${fakeUser.firstName}`)).toBeVisible();
       await expect(u.page.getByText(`Email: ${fakeUser.email}`)).toBeVisible();
+    });
+
+    test.skip('streaming with Suspense works with rootAuthLoader', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+
+      await u.page.goToRelative('/');
+
+      await expect(u.page.getByText('Loading...')).toBeVisible();
+
+      // Wait for the streaming content to resolve
+      await expect(u.page.getByText('Non critical value: non-critical')).toBeVisible({ timeout: 3000 });
+      await expect(u.page.getByText('Loading...')).toBeHidden();
     });
   },
 );
