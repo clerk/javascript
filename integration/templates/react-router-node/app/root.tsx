@@ -40,7 +40,7 @@ export default function App({ loaderData }: Route.ComponentProps) {
       <main>
         <Outlet />
         <React.Suspense fallback={<div>Loading...</div>}>
-          <Await resolve={nonCriticalData}>{value => <h3>Non critical value: {value}</h3>}</Await>
+          <Await resolve={loaderData.nonCriticalData}>{value => <h3>Non critical value: {value}</h3>}</Await>
         </React.Suspense>
       </main>
     </ClerkProvider>
