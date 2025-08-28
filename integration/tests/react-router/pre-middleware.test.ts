@@ -91,7 +91,12 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
     await app.dev();
 
     const u = createTestUtils({ app });
-    fakeUser = u.services.users.createFakeUser();
+    fakeUser = u.services.users.createFakeUser({
+      fictionalEmail: true,
+      withPhoneNumber: true,
+      withUsername: true,
+    });
+    await u.services.users.createBapiUser(fakeUser);
   });
 
   test.afterAll(async () => {
