@@ -32,6 +32,8 @@ import type {
   SignInFutureEmailCodeVerifyParams,
   SignInFutureFinalizeParams,
   SignInFuturePasswordParams,
+  SignInFuturePhoneCodeSendParams,
+  SignInFuturePhoneCodeVerifyParams,
   SignInFutureResetPasswordSubmitParams,
   SignInFutureResource,
   SignInFutureSSOParams,
@@ -632,13 +634,8 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async sendPhoneCode({
-    phoneNumber,
-    channel = 'sms',
-  }: {
-    phoneNumber?: string;
-    channel?: 'sms' | 'whatsapp';
-  } = {}): Promise<{ error: unknown }> {
+  async sendPhoneCode(params: SignInFuturePhoneCodeSendParams): Promise<{ error: unknown }> {
+    const { phoneNumber, channel = 'sms' } = params;
     return runAsyncResourceTask(this.resource, async () => {
       if (!this.resource.id) {
         await this.create({ identifier: phoneNumber });
@@ -658,7 +655,8 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async verifyPhoneCode({ code }: { code: string }): Promise<{ error: unknown }> {
+  async verifyPhoneCode(params: SignInFuturePhoneCodeVerifyParams): Promise<{ error: unknown }> {
+    const { code } = params;
     return runAsyncResourceTask(this.resource, async () => {
       await this.resource.__internal_basePost({
         body: { code, strategy: 'phone_code' },

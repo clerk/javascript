@@ -1,4 +1,5 @@
 import type { SetActiveNavigate } from './clerk';
+import type { PhoneCodeChannel } from './phoneCodeChannel';
 import type { SignInFirstFactor, SignInStatus } from './signInCommon';
 import type { OAuthStrategy } from './strategies';
 
@@ -26,6 +27,15 @@ export interface SignInFutureEmailCodeVerifyParams {
 export interface SignInFutureResetPasswordSubmitParams {
   password: string;
   signOutOfOtherSessions?: boolean;
+}
+
+export interface SignInFuturePhoneCodeSendParams {
+  phoneNumber?: string;
+  channel?: PhoneCodeChannel;
+}
+
+export interface SignInFuturePhoneCodeVerifyParams {
+  code: string;
 }
 
 export interface SignInFutureSSOParams {

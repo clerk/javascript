@@ -21,8 +21,10 @@ import type {
   SignUpFutureEmailCodeVerifyParams,
   SignUpFutureFinalizeParams,
   SignUpFuturePasswordParams,
+  SignUpFuturePhoneCodeSendParams,
+  SignUpFuturePhoneCodeVerifyParams,
   SignUpFutureResource,
-  SignUpFutureSSoParams,
+  SignUpFutureSSOParams,
   SignUpIdentificationField,
   SignUpJSON,
   SignUpJSONSnapshot,
@@ -596,13 +598,8 @@ class SignUpFuture implements SignUpFutureResource {
     });
   }
 
-  async sendPhoneCode({
-    phoneNumber,
-    channel = 'sms',
-  }: {
-    phoneNumber?: string;
-    channel?: 'sms' | 'whatsapp';
-  } = {}): Promise<{ error: unknown }> {
+  async sendPhoneCode(params: SignUpFuturePhoneCodeSendParams): Promise<{ error: unknown }> {
+    const { phoneNumber, channel = 'sms' } = params;
     return runAsyncResourceTask(this.resource, async () => {
       if (!this.resource.id) {
         const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
@@ -619,7 +616,8 @@ class SignUpFuture implements SignUpFutureResource {
     });
   }
 
-  async verifyPhoneCode({ code }: { code: string }): Promise<{ error: unknown }> {
+  async verifyPhoneCode(params: SignUpFuturePhoneCodeVerifyParams): Promise<{ error: unknown }> {
+    const { code } = params;
     return runAsyncResourceTask(this.resource, async () => {
       await this.resource.__internal_basePost({
         body: { strategy: 'phone_code', code },
@@ -628,7 +626,7 @@ class SignUpFuture implements SignUpFutureResource {
     });
   }
 
-  async sso(params: SignUpFutureSSoParams): Promise<{ error: unknown }> {
+  async sso(params: SignUpFutureSSOParams): Promise<{ error: unknown }> {
     const { strategy, redirectUrl, redirectCallbackUrl } = params;
     return runAsyncResourceTask(this.resource, async () => {
       const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();

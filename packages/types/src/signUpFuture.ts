@@ -1,4 +1,5 @@
 import type { SetActiveNavigate } from './clerk';
+import type { PhoneCodeChannel } from './phoneCodeChannel';
 import type { SignUpIdentificationField, SignUpStatus } from './signUpCommon';
 
 export interface SignUpFutureCreateParams {
@@ -14,7 +15,16 @@ export interface SignUpFuturePasswordParams {
   password: string;
 }
 
-export interface SignUpFutureSSoParams {
+export interface SignUpFuturePhoneCodeSendParams {
+  phoneNumber?: string;
+  channel?: PhoneCodeChannel;
+}
+
+export interface SignUpFuturePhoneCodeVerifyParams {
+  code: string;
+}
+
+export interface SignUpFutureSSOParams {
   strategy: string;
   /**
    * The URL to redirect to after the user has completed the SSO flow.
@@ -39,8 +49,10 @@ export interface SignUpFutureResource {
   verifications: {
     sendEmailCode: () => Promise<{ error: unknown }>;
     verifyEmailCode: (params: SignUpFutureEmailCodeVerifyParams) => Promise<{ error: unknown }>;
+    sendPhoneCode: (params: SignUpFuturePhoneCodeSendParams) => Promise<{ error: unknown }>;
+    verifyPhoneCode: (params: SignUpFuturePhoneCodeVerifyParams) => Promise<{ error: unknown }>;
   };
   password: (params: SignUpFuturePasswordParams) => Promise<{ error: unknown }>;
-  sso: (params: SignUpFutureSSoParams) => Promise<{ error: unknown }>;
+  sso: (params: SignUpFutureSSOParams) => Promise<{ error: unknown }>;
   finalize: (params?: SignUpFutureFinalizeParams) => Promise<{ error: unknown }>;
 }
