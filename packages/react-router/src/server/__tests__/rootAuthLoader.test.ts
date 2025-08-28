@@ -1,18 +1,16 @@
+import type { LoaderFunctionArgs } from 'react-router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { middlewareMigrationWarning } from '../../utils/errors';
 import { legacyAuthenticateRequest } from '../legacyAuthenticateRequest';
 import { rootAuthLoader } from '../rootAuthLoader';
 
-vi.mock('../legacyAuthenticateRequest', async importOriginal => {
-  // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-  const actual = await importOriginal<typeof import('../legacyAuthenticateRequest')>();
+vi.mock('../legacyAuthenticateRequest', () => {
   return {
-    ...actual,
     legacyAuthenticateRequest: vi.fn().mockResolvedValue({
-      toAuth: vi.fn().mockReturnValue({ userId: '123' }),
+      toAuth: vi.fn().mockReturnValue({ userId: 'user_xxx' }),
       headers: new Headers(),
-      status: 'signed-out',
+      status: 'signed-in',
     }),
   };
 });
@@ -28,14 +26,14 @@ describe('rootAuthLoader', () => {
 
     const mockContext = {
       get: vi.fn().mockReturnValue({
-        toAuth: vi.fn().mockReturnValue({ userId: '123' }),
+        toAuth: vi.fn().mockReturnValue({ userId: 'user_xxx' }),
       }),
     };
 
     const args = {
       context: mockContext,
       request: new Request('http://clerk.com'),
-    } as any;
+    } as LoaderFunctionArgs;
 
     await rootAuthLoader(args, () => ({ data: 'test' }));
 
@@ -50,13 +48,13 @@ describe('rootAuthLoader', () => {
     const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
     const mockContext = {
-      get: vi.fn().mockReturnValue(null), // No middleware context
+      get: vi.fn().mockReturnValue(null),
     };
 
     const args = {
       context: mockContext,
       request: new Request('http://clerk.com'),
-    } as any;
+    } as LoaderFunctionArgs;
 
     await rootAuthLoader(args, () => ({ data: 'test' }));
 

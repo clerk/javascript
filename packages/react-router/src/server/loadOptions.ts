@@ -7,6 +7,7 @@ import { handleValueOrFn } from '@clerk/shared/utils';
 import type { unstable_MiddlewareFunction } from 'react-router';
 
 import { getPublicEnvVariables } from '../utils/env';
+import { noSecretKeyError, satelliteAndMissingProxyUrlAndDomain, satelliteAndMissingSignInUrl } from '../utils/errors';
 import type { ClerkMiddlewareOptions } from './types';
 import { patchRequest } from './utils';
 
@@ -57,13 +58,13 @@ export const loadOptions = (args: DataFunctionArgs, overrides: ClerkMiddlewareOp
   }
 
   if (!secretKey) {
-    throw new Error('noSecretKeyError');
+    throw new Error(noSecretKeyError);
   }
   if (isSatellite && !proxyUrl && !domain) {
-    throw new Error('satelliteAndMissingProxyUrlAndDomain');
+    throw new Error(satelliteAndMissingProxyUrlAndDomain);
   }
   if (isSatellite && !isHttpOrHttps(signInUrl) && isDevelopmentFromSecretKey(secretKey)) {
-    throw new Error('satelliteAndMissingSignInUrl');
+    throw new Error(satelliteAndMissingSignInUrl);
   }
 
   return {

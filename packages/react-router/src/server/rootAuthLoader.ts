@@ -4,7 +4,7 @@ import { logger } from '@clerk/shared/logger';
 import type { LoaderFunctionArgs } from 'react-router';
 
 import { invalidRootLoaderCallbackReturn, middlewareMigrationWarning } from '../utils/errors';
-import { requestStateContext } from './clerkMiddleware';
+import { authFnContext, requestStateContext } from './clerkMiddleware';
 import { legacyAuthenticateRequest } from './legacyAuthenticateRequest';
 import { loadOptions } from './loadOptions';
 import type {
@@ -46,11 +46,8 @@ async function processRootAuthLoader(
   handler?: RootAuthLoaderCallback<any>,
 ): Promise<LoaderFunctionReturn> {
   if (!handler) {
-    // if the user did not provide a handler, simply inject Clerk's state into an empty object
-    const { clerkState } = getResponseClerkState(requestState, args.context);
-    return {
-      ...clerkState,
-    };
+    // if the user did not provide a handler, simply inject requestState into an empty response
+    return injectRequestStateIntoResponse(new Response(JSON.stringify({})), requestState, args.context);
   }
 
   // Create args that has the auth object in the request for backward compatibility
@@ -89,13 +86,22 @@ async function processRootAuthLoader(
     }
   }
 
+  const hasMiddleware = !!args.context.get(authFnContext);
+
   // if the return value of the user's handler is null or a plain object, return an object and inject Clerk's state into it
-  // this supports streaming responses
-  const { clerkState } = getResponseClerkState(requestState, args.context);
-  return {
-    ...handlerResult,
-    ...clerkState,
-  };
+
+  // Support streaming response with middleware. We already set the headers in the middleware.
+  if (hasMiddleware) {
+    const { clerkState } = getResponseClerkState(requestState, args.context);
+    return {
+      ...(handlerResult ?? {}),
+      ...clerkState,
+    };
+  }
+
+  // Does not support streaming response without middleware as we need to set the headers here.
+  const responseBody = JSON.stringify(handlerResult ?? {});
+  return injectRequestStateIntoResponse(new Response(responseBody), requestState, args.context);
 }
 
 /**

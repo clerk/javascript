@@ -1,17 +1,15 @@
+import type { LoaderFunctionArgs } from 'react-router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { getAuth } from '../getAuth';
 import { legacyAuthenticateRequest } from '../legacyAuthenticateRequest';
 
-vi.mock('../legacyAuthenticateRequest', async importOriginal => {
-  // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-  const actual = await importOriginal<typeof import('../legacyAuthenticateRequest')>();
+vi.mock('../legacyAuthenticateRequest', () => {
   return {
-    ...actual,
     legacyAuthenticateRequest: vi.fn().mockResolvedValue({
-      toAuth: vi.fn().mockReturnValue({ userId: '123' }),
+      toAuth: vi.fn().mockReturnValue({ userId: 'user_xxx' }),
       headers: new Headers(),
-      status: 'signed-out',
+      status: 'signed-in',
     }),
   };
 });
@@ -25,7 +23,7 @@ describe('getAuth', () => {
   it('should not call legacyAuthenticateRequest when middleware context exists', async () => {
     const mockContext = {
       get: vi.fn().mockReturnValue((options?: any) => ({
-        userId: '123',
+        userId: 'user_xxx',
         ...options,
       })),
     };
@@ -33,7 +31,7 @@ describe('getAuth', () => {
     const args = {
       context: mockContext,
       request: new Request('http://clerk.com'),
-    } as any;
+    } as LoaderFunctionArgs;
 
     await getAuth(args);
 
@@ -48,7 +46,7 @@ describe('getAuth', () => {
     const args = {
       context: mockContext,
       request: new Request('http://clerk.com'),
-    } as any;
+    } as LoaderFunctionArgs;
 
     await getAuth(args);
 

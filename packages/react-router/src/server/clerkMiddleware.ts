@@ -52,7 +52,7 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): unstable_Midd
 
     if (requestState.headers) {
       requestState.headers.forEach((value, key) => {
-        response.headers.set(key, value);
+        response.headers.append(key, value);
       });
     }
 

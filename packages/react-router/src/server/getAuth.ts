@@ -10,12 +10,8 @@ import { noLoaderArgsPassedInGetAuth } from '../utils/errors';
 import { authFnContext } from './clerkMiddleware';
 import { legacyAuthenticateRequest } from './legacyAuthenticateRequest';
 import { loadOptions } from './loadOptions';
-import type { RootAuthLoaderOptions } from './types';
 
-type GetAuthOptions = PendingSessionOptions & { acceptsToken?: AuthenticateRequestOptions['acceptsToken'] } & Pick<
-    RootAuthLoaderOptions,
-    'secretKey'
-  >;
+type GetAuthOptions = PendingSessionOptions & { acceptsToken?: AuthenticateRequestOptions['acceptsToken'] };
 
 export const getAuth: GetAuthFn<LoaderFunctionArgs, true> = (async (
   args: LoaderFunctionArgs,
