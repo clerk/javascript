@@ -1,5 +1,6 @@
 import type { RequestState } from '@clerk/backend/internal';
 import { decorateObjectWithResources } from '@clerk/backend/internal';
+import { logger } from '@clerk/shared/logger';
 import type { LoaderFunctionArgs } from 'react-router';
 
 import { invalidRootLoaderCallbackReturn, middlewareMigrationWarning } from '../utils/errors';
@@ -117,7 +118,7 @@ export const rootAuthLoader: RootAuthLoader = async (
   const requestState = args.context.get(requestStateContext);
 
   if (!requestState) {
-    console.warn(middlewareMigrationWarning);
+    logger.warnOnce(middlewareMigrationWarning);
     return legacyRootAuthLoader(args, handlerOrOptions, opts);
   }
 
