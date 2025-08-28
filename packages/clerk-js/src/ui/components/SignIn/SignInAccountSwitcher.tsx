@@ -25,6 +25,9 @@ const SignInAccountSwitcherInternal = () => {
       userProfileUrl,
       signInUrl: signInPath ?? signInUrl,
       user: undefined,
+      userProfileMode: 'navigation',
+      appearance: undefined,
+      userProfileProps: undefined,
     });
 
   return (

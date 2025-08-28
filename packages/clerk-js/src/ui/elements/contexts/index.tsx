@@ -123,7 +123,7 @@ export type FlowMetadata = {
     | 'popover'
     | 'complete'
     | 'accountSwitcher'
-    | 'oauthAccountSelect';
+    | 'oauthSelectAccount';
 };
 
 const [FlowMetadataCtx, useFlowMetadata] = createContextAndHook<FlowMetadata>('FlowMetadata');

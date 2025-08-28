@@ -512,8 +512,9 @@ export type __internal_LocalizationResource = {
       action__addAccount: LocalizationValue;
       action__signOutAll: LocalizationValue;
     };
-    oauthAccountSelect: {
+    oauthSelectAccount: {
       title: LocalizationValue;
+      title__emptyState: LocalizationValue;
       subtitle: LocalizationValue;
       subtitle__emptyState: LocalizationValue;
       action__useAnotherAccount: LocalizationValue;

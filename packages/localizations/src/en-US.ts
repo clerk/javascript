@@ -562,10 +562,11 @@ export const enUS: LocalizationResource = {
       subtitle: 'Select the account with which you wish to continue.',
       title: 'Choose an account',
     },
-    oauthAccountSelect: {
-      title: 'Continue with an account',
-      subtitle: 'Choose an account to continue the sign-in with your provider.',
-      subtitle__emptyState: 'To continue, sign in to {{applicationName}}.',
+    oauthSelectAccount: {
+      title: 'Choose an account',
+      title__emptyState: 'Sign in to {{applicationName}}',
+      subtitle: 'To continue with your provider',
+      subtitle__emptyState: 'To continue with your provider',
       action__useAnotherAccount: 'Use another account',
     },
     alternativeMethods: {

@@ -28,7 +28,7 @@ import {
 } from './lazy-sign-up';
 import { ResetPassword } from './ResetPassword';
 import { ResetPasswordSuccess } from './ResetPasswordSuccess';
-import { SignInOAuthAccountSelect } from './SignInOAuthAccountSelect';
+import { SignInOAuthSelectAccount } from './SignInOAuthSelectAccount';
 import { SignInAccountSwitcher } from './SignInAccountSwitcher';
 import { SignInFactorOne } from './SignInFactorOne';
 import { SignInFactorTwo } from './SignInFactorTwo';
@@ -78,8 +78,8 @@ function SignInRoutes(): JSX.Element {
         <Route path='choose'>
           <SignInAccountSwitcher />
         </Route>
-        <Route path='oauth-account-select'>
-          <SignInOAuthAccountSelect />
+        <Route path='oauth-select-account'>
+          <SignInOAuthSelectAccount />
         </Route>
         <Route path='verify'>
           <SignInEmailLinkFlowComplete
