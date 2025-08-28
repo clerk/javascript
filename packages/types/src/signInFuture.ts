@@ -66,6 +66,10 @@ export interface SignInFutureResource {
     sendCode: (params: SignInFutureEmailCodeSendParams) => Promise<{ error: unknown }>;
     verifyCode: (params: SignInFutureEmailCodeVerifyParams) => Promise<{ error: unknown }>;
   };
+  phoneCode: {
+    sendCode: (params: SignInFuturePhoneCodeSendParams) => Promise<{ error: unknown }>;
+    verifyCode: (params: SignInFuturePhoneCodeVerifyParams) => Promise<{ error: unknown }>;
+  };
   resetPasswordEmailCode: {
     sendCode: () => Promise<{ error: unknown }>;
     verifyCode: (params: SignInFutureEmailCodeVerifyParams) => Promise<{ error: unknown }>;
