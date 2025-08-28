@@ -5,6 +5,7 @@ import type { CommerceSubscriptionJSON } from './JSON';
 
 /**
  * The `CommerceSubscription` object is similar to the [`CommerceSubscriptionResource`](/docs/references/javascript/types/commerce-subscription-resource) object as it holds information about a subscription, as well as methods for managing it. However, the `CommerceSubscription` object is different in that it is used in the [Backend API](https://clerk.com/docs/reference/backend-api/tag/billing/get/organizations/%7Borganization_id%7D/billing/subscription){{ target: '_blank' }} and is not directly accessible from the Frontend API.
+ *
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version to avoid breaking changes.
  */
 export class CommerceSubscription {
