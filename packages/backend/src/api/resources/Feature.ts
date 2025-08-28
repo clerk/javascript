@@ -1,7 +1,7 @@
 import type { FeatureJSON } from './JSON';
 
 /**
- * A feature of a subscription plan.
+ * The `Feature` object represents a feature of a subscription plan.
  */
 export class Feature {
   constructor(
