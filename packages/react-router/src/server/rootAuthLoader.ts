@@ -45,9 +45,15 @@ async function processRootAuthLoader(
   requestState: RequestState,
   handler?: RootAuthLoaderCallback<any>,
 ): Promise<LoaderFunctionReturn> {
+  const hasMiddleware = !!args.context.get(authFnContext);
+  const includeClerkHeaders = !hasMiddleware;
+
   if (!handler) {
     // if the user did not provide a handler, simply inject requestState into an empty response
-    return injectRequestStateIntoResponse(new Response(JSON.stringify({})), requestState, args.context);
+    const { clerkState } = getResponseClerkState(requestState, args.context);
+    return {
+      ...clerkState,
+    };
   }
 
   // Create args that has the auth object in the request for backward compatibility
@@ -66,7 +72,7 @@ async function processRootAuthLoader(
       }
       // clone and try to inject requestState into all json-like responses
       // if this fails, the user probably didn't return a json object or a valid json string
-      return injectRequestStateIntoResponse(handlerResult, requestState, args.context);
+      return injectRequestStateIntoResponse(handlerResult, requestState, args.context, includeClerkHeaders);
     } catch {
       throw new Error(invalidRootLoaderCallbackReturn);
     }
@@ -80,28 +86,26 @@ async function processRootAuthLoader(
         new Response(JSON.stringify(handlerResult.data), handlerResult.init ?? undefined),
         requestState,
         args.context,
+        includeClerkHeaders,
       );
     } catch {
       throw new Error(invalidRootLoaderCallbackReturn);
     }
   }
 
-  const hasMiddleware = !!args.context.get(authFnContext);
-
-  // if the return value of the user's handler is null or a plain object, return an object and inject Clerk's state into it
-
-  // Support streaming response with middleware. We already set the headers in the middleware.
-  if (hasMiddleware) {
-    const { clerkState } = getResponseClerkState(requestState, args.context);
-    return {
-      ...(handlerResult ?? {}),
-      ...clerkState,
-    };
+  // If the return value of the user's handler is null or a plain object
+  if (includeClerkHeaders) {
+    // Legacy path: return Response with headers
+    const responseBody = JSON.stringify(handlerResult ?? {});
+    return injectRequestStateIntoResponse(new Response(responseBody), requestState, args.context, includeClerkHeaders);
   }
 
-  // Does not support streaming response without middleware as we need to set the headers here.
-  const responseBody = JSON.stringify(handlerResult ?? {});
-  return injectRequestStateIntoResponse(new Response(responseBody), requestState, args.context);
+  // Middleware path: return plain object with streaming support
+  const { clerkState } = getResponseClerkState(requestState, args.context);
+  return {
+    ...(handlerResult ?? {}),
+    ...clerkState,
+  };
 }
 
 /**
@@ -154,7 +158,7 @@ const legacyRootAuthLoader: RootAuthLoader = async (
 
   if (!handler) {
     // if the user did not provide a handler, simply inject requestState into an empty response
-    return injectRequestStateIntoResponse(new Response(JSON.stringify({})), requestState, args.context);
+    return injectRequestStateIntoResponse(new Response(JSON.stringify({})), requestState, args.context, true);
   }
 
   const authObj = requestState.toAuth();
