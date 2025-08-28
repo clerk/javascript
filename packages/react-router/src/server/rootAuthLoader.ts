@@ -1,3 +1,4 @@
+import type { RequestState } from '@clerk/backend/internal';
 import { decorateObjectWithResources } from '@clerk/backend/internal';
 import type { LoaderFunctionArgs } from 'react-router';
 
@@ -5,7 +6,12 @@ import { invalidRootLoaderCallbackReturn, middlewareMigrationWarning } from '../
 import { requestStateContext } from './clerkMiddleware';
 import { legacyAuthenticateRequest } from './legacyAuthenticateRequest';
 import { loadOptions } from './loadOptions';
-import type { LoaderFunctionReturn, RootAuthLoaderCallback, RootAuthLoaderOptions } from './types';
+import type {
+  LoaderFunctionArgsWithAuth,
+  LoaderFunctionReturn,
+  RootAuthLoaderCallback,
+  RootAuthLoaderOptions,
+} from './types';
 import {
   getResponseClerkState,
   injectRequestStateIntoResponse,
@@ -35,9 +41,8 @@ interface RootAuthLoader {
  */
 async function processRootAuthLoader(
   args: LoaderFunctionArgs,
-  requestState: any,
+  requestState: RequestState,
   handler?: RootAuthLoaderCallback<any>,
-  _options?: RootAuthLoaderOptions,
 ): Promise<LoaderFunctionReturn> {
   if (!handler) {
     // if the user did not provide a handler, simply inject Clerk's state into an empty object
@@ -47,11 +52,11 @@ async function processRootAuthLoader(
     };
   }
 
-  // Create args with auth-enhanced request for the handler
+  // Create args that has the auth object in the request for backward compatibility
   const argsWithAuth = {
     ...args,
     request: Object.assign(args.request, { auth: requestState.toAuth() }),
-  };
+  } as LoaderFunctionArgsWithAuth<any>;
 
   const handlerResult = await handler(argsWithAuth);
 
@@ -116,7 +121,7 @@ export const rootAuthLoader: RootAuthLoader = async (
     return legacyRootAuthLoader(args, handlerOrOptions, opts);
   }
 
-  return processRootAuthLoader(args, requestState, handler, opts);
+  return processRootAuthLoader(args, requestState, handler);
 };
 
 /**
@@ -138,7 +143,6 @@ const legacyRootAuthLoader: RootAuthLoader = async (
   const loadedOptions = loadOptions(args, opts);
   // Note: legacyAuthenticateRequest() will throw a redirect if the auth state is determined to be handshake
   const _requestState = await legacyAuthenticateRequest(args, loadedOptions);
-  // TODO: Investigate if `authenticateRequest` needs to return the loadedOptions (the new request urls in particular)
   const requestState = { ...loadedOptions, ..._requestState };
 
   if (!handler) {
@@ -150,5 +154,5 @@ const legacyRootAuthLoader: RootAuthLoader = async (
   const requestWithAuth = Object.assign(args.request, { auth: authObj });
   await decorateObjectWithResources(requestWithAuth, authObj, loadedOptions);
 
-  return processRootAuthLoader(args, requestState, handler, opts);
+  return processRootAuthLoader(args, requestState, handler);
 };
