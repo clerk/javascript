@@ -31,8 +31,14 @@ export interface SignInFutureResetPasswordSubmitParams {
 export interface SignInFutureSSOParams {
   flow?: 'auto' | 'modal';
   strategy: OAuthStrategy | 'saml' | 'enterprise_sso';
+  /**
+   * The URL to redirect to after the user has completed the SSO flow.
+   */
   redirectUrl: string;
-  redirectUrlComplete: string;
+  /**
+   * TODO @revamp-hooks: This should be handled by FAPI instead.
+   */
+  redirectCallbackUrl: string;
 }
 
 export interface SignInFutureFinalizeParams {

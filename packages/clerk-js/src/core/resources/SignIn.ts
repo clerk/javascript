@@ -620,19 +620,17 @@ class SignInFuture implements SignInFutureResource {
   }
 
   async sso(params: SignInFutureSSOParams): Promise<{ error: unknown }> {
-    const { flow = 'auto', strategy, redirectUrl, redirectUrlComplete } = params;
+    const { flow = 'auto', strategy, redirectUrl, redirectCallbackUrl } = params;
     return runAsyncResourceTask(this.resource, async () => {
       if (flow !== 'auto') {
         throw new Error('modal flow is not supported yet');
       }
 
-      const redirectUrlWithAuthToken = SignIn.clerk.buildUrlWithAuth(redirectUrl);
-
       if (!this.resource.id) {
         await this.create({
           strategy,
-          redirectUrl: redirectUrlWithAuthToken,
-          actionCompleteRedirectUrl: redirectUrlComplete,
+          redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectCallbackUrl),
+          actionCompleteRedirectUrl: redirectUrl,
         });
       }
 

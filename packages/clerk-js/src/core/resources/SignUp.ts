@@ -578,15 +578,15 @@ class SignUpFuture implements SignUpFutureResource {
   }
 
   async sso(params: SignUpFutureSSoParams): Promise<{ error: unknown }> {
-    const { strategy, redirectUrl, redirectUrlComplete } = params;
+    const { strategy, redirectUrl, redirectCallbackUrl } = params;
     return runAsyncResourceTask(this.resource, async () => {
       const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
       await this.resource.__internal_basePost({
         path: this.resource.pathRoot,
         body: {
           strategy,
-          redirectUrl: SignUp.clerk.buildUrlWithAuth(redirectUrl),
-          redirectUrlComplete,
+          redirectUrl: SignUp.clerk.buildUrlWithAuth(redirectCallbackUrl),
+          redirectUrlComplete: redirectUrl,
           captchaToken,
           captchaWidgetType,
           captchaError,

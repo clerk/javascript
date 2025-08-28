@@ -16,8 +16,14 @@ export interface SignUpFuturePasswordParams {
 
 export interface SignUpFutureSSoParams {
   strategy: string;
+  /**
+   * The URL to redirect to after the user has completed the SSO flow.
+   */
   redirectUrl: string;
-  redirectUrlComplete: string;
+  /**
+   * TODO @revamp-hooks: This should be handled by FAPI instead.
+   */
+  redirectCallbackUrl: string;
 }
 
 export interface SignUpFutureFinalizeParams {
