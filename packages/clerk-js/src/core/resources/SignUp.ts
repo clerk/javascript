@@ -21,8 +21,10 @@ import type {
   SignUpFutureEmailCodeVerifyParams,
   SignUpFutureFinalizeParams,
   SignUpFuturePasswordParams,
+  SignUpFuturePhoneCodeSendParams,
+  SignUpFuturePhoneCodeVerifyParams,
   SignUpFutureResource,
-  SignUpFutureSSoParams,
+  SignUpFutureSSOParams,
   SignUpIdentificationField,
   SignUpJSON,
   SignUpJSONSnapshot,
@@ -497,6 +499,8 @@ class SignUpFuture implements SignUpFutureResource {
   verifications = {
     sendEmailCode: this.sendEmailCode.bind(this),
     verifyEmailCode: this.verifyEmailCode.bind(this),
+    sendPhoneCode: this.sendPhoneCode.bind(this),
+    verifyPhoneCode: this.verifyPhoneCode.bind(this),
   };
 
   constructor(readonly resource: SignUp) {}
@@ -594,7 +598,35 @@ class SignUpFuture implements SignUpFutureResource {
     });
   }
 
-  async sso(params: SignUpFutureSSoParams): Promise<{ error: unknown }> {
+  async sendPhoneCode(params: SignUpFuturePhoneCodeSendParams): Promise<{ error: unknown }> {
+    const { phoneNumber, channel = 'sms' } = params;
+    return runAsyncResourceTask(this.resource, async () => {
+      if (!this.resource.id) {
+        const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
+        await this.resource.__internal_basePost({
+          path: this.resource.pathRoot,
+          body: { phoneNumber, captchaToken, captchaWidgetType, captchaError },
+        });
+      }
+
+      await this.resource.__internal_basePost({
+        body: { strategy: 'phone_code', channel },
+        action: 'prepare_verification',
+      });
+    });
+  }
+
+  async verifyPhoneCode(params: SignUpFuturePhoneCodeVerifyParams): Promise<{ error: unknown }> {
+    const { code } = params;
+    return runAsyncResourceTask(this.resource, async () => {
+      await this.resource.__internal_basePost({
+        body: { strategy: 'phone_code', code },
+        action: 'attempt_verification',
+      });
+    });
+  }
+
+  async sso(params: SignUpFutureSSOParams): Promise<{ error: unknown }> {
     const { strategy, redirectUrl, redirectCallbackUrl } = params;
     return runAsyncResourceTask(this.resource, async () => {
       const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();

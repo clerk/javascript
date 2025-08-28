@@ -32,6 +32,8 @@ import type {
   SignInFutureEmailCodeVerifyParams,
   SignInFutureFinalizeParams,
   SignInFuturePasswordParams,
+  SignInFuturePhoneCodeSendParams,
+  SignInFuturePhoneCodeVerifyParams,
   SignInFutureResetPasswordSubmitParams,
   SignInFutureResource,
   SignInFutureSSOParams,
@@ -508,6 +510,11 @@ class SignInFuture implements SignInFutureResource {
     submitPassword: this.submitResetPassword.bind(this),
   };
 
+  phoneCode = {
+    sendCode: this.sendPhoneCode.bind(this),
+    verifyCode: this.verifyPhoneCode.bind(this),
+  };
+
   constructor(readonly resource: SignIn) {}
 
   get status() {
@@ -622,6 +629,37 @@ class SignInFuture implements SignInFutureResource {
     return runAsyncResourceTask(this.resource, async () => {
       await this.resource.__internal_basePost({
         body: { code, strategy: 'email_code' },
+        action: 'attempt_first_factor',
+      });
+    });
+  }
+
+  async sendPhoneCode(params: SignInFuturePhoneCodeSendParams): Promise<{ error: unknown }> {
+    const { phoneNumber, channel = 'sms' } = params;
+    return runAsyncResourceTask(this.resource, async () => {
+      if (!this.resource.id) {
+        await this.create({ identifier: phoneNumber });
+      }
+
+      const phoneCodeFactor = this.resource.supportedFirstFactors?.find(f => f.strategy === 'phone_code');
+
+      if (!phoneCodeFactor) {
+        throw new Error('Phone code factor not found');
+      }
+
+      const { phoneNumberId } = phoneCodeFactor;
+      await this.resource.__internal_basePost({
+        body: { phoneNumberId, strategy: 'phone_code', channel },
+        action: 'prepare_first_factor',
+      });
+    });
+  }
+
+  async verifyPhoneCode(params: SignInFuturePhoneCodeVerifyParams): Promise<{ error: unknown }> {
+    const { code } = params;
+    return runAsyncResourceTask(this.resource, async () => {
+      await this.resource.__internal_basePost({
+        body: { code, strategy: 'phone_code' },
         action: 'attempt_first_factor',
       });
     });

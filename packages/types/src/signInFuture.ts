@@ -1,4 +1,5 @@
 import type { SetActiveNavigate } from './clerk';
+import type { PhoneCodeChannel } from './phoneCodeChannel';
 import type { SignInFirstFactor, SignInStatus } from './signInCommon';
 import type { OAuthStrategy } from './strategies';
 
@@ -28,6 +29,15 @@ export interface SignInFutureResetPasswordSubmitParams {
   signOutOfOtherSessions?: boolean;
 }
 
+export interface SignInFuturePhoneCodeSendParams {
+  phoneNumber?: string;
+  channel?: PhoneCodeChannel;
+}
+
+export interface SignInFuturePhoneCodeVerifyParams {
+  code: string;
+}
+
 export interface SignInFutureSSOParams {
   flow?: 'auto' | 'modal';
   strategy: OAuthStrategy | 'saml' | 'enterprise_sso';
@@ -55,6 +65,10 @@ export interface SignInFutureResource {
   emailCode: {
     sendCode: (params: SignInFutureEmailCodeSendParams) => Promise<{ error: unknown }>;
     verifyCode: (params: SignInFutureEmailCodeVerifyParams) => Promise<{ error: unknown }>;
+  };
+  phoneCode: {
+    sendCode: (params: SignInFuturePhoneCodeSendParams) => Promise<{ error: unknown }>;
+    verifyCode: (params: SignInFuturePhoneCodeVerifyParams) => Promise<{ error: unknown }>;
   };
   resetPasswordEmailCode: {
     sendCode: () => Promise<{ error: unknown }>;
