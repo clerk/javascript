@@ -14,11 +14,17 @@ import type {
   PreparePhoneNumberVerificationParams,
   PrepareVerificationParams,
   PrepareWeb3WalletVerificationParams,
-  SetActiveNavigate,
   SignUpAuthenticateWithWeb3Params,
   SignUpCreateParams,
   SignUpField,
+  SignUpFutureCreateParams,
+  SignUpFutureEmailCodeVerifyParams,
+  SignUpFutureFinalizeParams,
+  SignUpFuturePasswordParams,
+  SignUpFuturePhoneCodeSendParams,
+  SignUpFuturePhoneCodeVerifyParams,
   SignUpFutureResource,
+  SignUpFutureSSOParams,
   SignUpIdentificationField,
   SignUpJSON,
   SignUpJSONSnapshot,
@@ -30,9 +36,11 @@ import type {
 } from '@clerk/types';
 
 import {
+  generateSignatureWithBase,
   generateSignatureWithCoinbaseWallet,
   generateSignatureWithMetamask,
   generateSignatureWithOKXWallet,
+  getBaseIdentifier,
   getCoinbaseWalletIdentifier,
   getMetamaskIdentifier,
   getOKXWalletIdentifier,
@@ -276,6 +284,21 @@ export class SignUp extends BaseResource implements SignUpResource {
     });
   };
 
+  public authenticateWithBase = async (
+    params?: SignUpAuthenticateWithWeb3Params & {
+      legalAccepted?: boolean;
+    },
+  ): Promise<SignUpResource> => {
+    const identifier = await getBaseIdentifier();
+    return this.authenticateWithWeb3({
+      identifier,
+      generateSignature: generateSignatureWithBase,
+      unsafeMetadata: params?.unsafeMetadata,
+      strategy: 'web3_base_signature',
+      legalAccepted: params?.legalAccepted,
+    });
+  };
+
   public authenticateWithOKXWallet = async (
     params?: SignUpAuthenticateWithWeb3Params & {
       legalAccepted?: boolean;
@@ -476,6 +499,8 @@ class SignUpFuture implements SignUpFutureResource {
   verifications = {
     sendEmailCode: this.sendEmailCode.bind(this),
     verifyEmailCode: this.verifyEmailCode.bind(this),
+    sendPhoneCode: this.sendPhoneCode.bind(this),
+    verifyPhoneCode: this.verifyPhoneCode.bind(this),
   };
 
   constructor(readonly resource: SignUp) {}
@@ -524,7 +549,8 @@ class SignUpFuture implements SignUpFutureResource {
     return { captchaToken, captchaWidgetType, captchaError };
   }
 
-  async create({ transfer }: { transfer?: boolean }): Promise<{ error: unknown }> {
+  async create(params: SignUpFutureCreateParams): Promise<{ error: unknown }> {
+    const { transfer } = params;
     return runAsyncResourceTask(this.resource, async () => {
       const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
       await this.resource.__internal_basePost({
@@ -534,7 +560,8 @@ class SignUpFuture implements SignUpFutureResource {
     });
   }
 
-  async password({ emailAddress, password }: { emailAddress: string; password: string }): Promise<{ error: unknown }> {
+  async password(params: SignUpFuturePasswordParams): Promise<{ error: unknown }> {
+    const { emailAddress, password } = params;
     return runAsyncResourceTask(this.resource, async () => {
       const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
 
@@ -561,7 +588,8 @@ class SignUpFuture implements SignUpFutureResource {
     });
   }
 
-  async verifyEmailCode({ code }: { code: string }): Promise<{ error: unknown }> {
+  async verifyEmailCode(params: SignUpFutureEmailCodeVerifyParams): Promise<{ error: unknown }> {
+    const { code } = params;
     return runAsyncResourceTask(this.resource, async () => {
       await this.resource.__internal_basePost({
         body: { strategy: 'email_code', code },
@@ -570,23 +598,44 @@ class SignUpFuture implements SignUpFutureResource {
     });
   }
 
-  async sso({
-    strategy,
-    redirectUrl,
-    redirectUrlComplete,
-  }: {
-    strategy: string;
-    redirectUrl: string;
-    redirectUrlComplete: string;
-  }): Promise<{ error: unknown }> {
+  async sendPhoneCode(params: SignUpFuturePhoneCodeSendParams): Promise<{ error: unknown }> {
+    const { phoneNumber, channel = 'sms' } = params;
+    return runAsyncResourceTask(this.resource, async () => {
+      if (!this.resource.id) {
+        const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
+        await this.resource.__internal_basePost({
+          path: this.resource.pathRoot,
+          body: { phoneNumber, captchaToken, captchaWidgetType, captchaError },
+        });
+      }
+
+      await this.resource.__internal_basePost({
+        body: { strategy: 'phone_code', channel },
+        action: 'prepare_verification',
+      });
+    });
+  }
+
+  async verifyPhoneCode(params: SignUpFuturePhoneCodeVerifyParams): Promise<{ error: unknown }> {
+    const { code } = params;
+    return runAsyncResourceTask(this.resource, async () => {
+      await this.resource.__internal_basePost({
+        body: { strategy: 'phone_code', code },
+        action: 'attempt_verification',
+      });
+    });
+  }
+
+  async sso(params: SignUpFutureSSOParams): Promise<{ error: unknown }> {
+    const { strategy, redirectUrl, redirectCallbackUrl } = params;
     return runAsyncResourceTask(this.resource, async () => {
       const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
       await this.resource.__internal_basePost({
         path: this.resource.pathRoot,
         body: {
           strategy,
-          redirectUrl: SignUp.clerk.buildUrlWithAuth(redirectUrl),
-          redirectUrlComplete,
+          redirectUrl: SignUp.clerk.buildUrlWithAuth(redirectCallbackUrl),
+          redirectUrlComplete: redirectUrl,
           captchaToken,
           captchaWidgetType,
           captchaError,
@@ -603,7 +652,8 @@ class SignUpFuture implements SignUpFutureResource {
     });
   }
 
-  async finalize({ navigate }: { navigate?: SetActiveNavigate } = {}): Promise<{ error: unknown }> {
+  async finalize(params?: SignUpFutureFinalizeParams): Promise<{ error: unknown }> {
+    const { navigate } = params || {};
     return runAsyncResourceTask(this.resource, async () => {
       if (!this.resource.createdSessionId) {
         throw new Error('Cannot finalize sign-up without a created session.');

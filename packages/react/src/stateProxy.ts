@@ -56,6 +56,7 @@ export class StateProxy implements State {
           'verifyCode',
           'submitPassword',
         ] as const),
+        phoneCode: this.wrapMethods(() => target().phoneCode, ['sendCode', 'verifyCode'] as const),
       },
     };
   }
@@ -76,7 +77,12 @@ export class StateProxy implements State {
         password: this.gateMethod(target, 'password'),
         finalize: this.gateMethod(target, 'finalize'),
 
-        verifications: this.wrapMethods(() => target().verifications, ['sendEmailCode', 'verifyEmailCode'] as const),
+        verifications: this.wrapMethods(() => target().verifications, [
+          'sendEmailCode',
+          'verifyEmailCode',
+          'sendPhoneCode',
+          'verifyPhoneCode',
+        ] as const),
       },
     };
   }
