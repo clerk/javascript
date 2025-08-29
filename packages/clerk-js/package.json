@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "5.89.0",
+  "version": "5.90.0",
   "description": "Clerk JS library",
   "keywords": [
     "clerk",
@@ -63,6 +63,7 @@
   },
   "browserslist": "last 2 years",
   "dependencies": {
+    "@base-org/account": "2.0.1",
     "@clerk/localizations": "workspace:^",
     "@clerk/shared": "workspace:^",
     "@clerk/types": "workspace:^",

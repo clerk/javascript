@@ -299,7 +299,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
 
       // Verify the user is now shown as having an active free trial
       // The pricing table should show their current plan as active
-      await u.po.pricingTable.waitToBeActive({ planSlug: 'trial' });
+      await u.po.pricingTable.waitToBeFreeTrial({ planSlug: 'trial' });
 
       await u.po.page.goToRelative('/user');
       await u.po.userProfile.waitForMounted();
