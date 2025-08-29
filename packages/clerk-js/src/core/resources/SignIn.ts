@@ -50,6 +50,8 @@ import type {
   Web3SignatureFactor,
 } from '@clerk/types';
 
+import { debugLogger } from '@/utils/debug';
+
 import {
   generateSignatureWithBase,
   generateSignatureWithCoinbaseWallet,
@@ -115,7 +117,8 @@ export class SignIn extends BaseResource implements SignInResource {
     this.fromJSON(data);
   }
 
-  create = (params: SignInCreateParams): Promise<this> => {
+  create = (params: SignInCreateParams): Promise<SignInResource> => {
+    debugLogger.debug('SignIn.create', { id: this.id, strategy: 'strategy' in params ? params.strategy : undefined });
     return this._basePost({
       path: this.pathRoot,
       body: params,
@@ -129,76 +132,78 @@ export class SignIn extends BaseResource implements SignInResource {
     });
   };
 
-  prepareFirstFactor = (factor: PrepareFirstFactorParams): Promise<SignInResource> => {
+  prepareFirstFactor = (params: PrepareFirstFactorParams): Promise<SignInResource> => {
+    debugLogger.debug('SignIn.prepareFirstFactor', { id: this.id, strategy: params.strategy });
     let config;
-    switch (factor.strategy) {
+    switch (params.strategy) {
       case 'passkey':
         config = {} as PassKeyConfig;
         break;
       case 'email_link':
         config = {
-          emailAddressId: factor.emailAddressId,
-          redirectUrl: factor.redirectUrl,
+          emailAddressId: params.emailAddressId,
+          redirectUrl: params.redirectUrl,
         } as EmailLinkConfig;
         break;
       case 'email_code':
-        config = { emailAddressId: factor.emailAddressId } as EmailCodeConfig;
+        config = { emailAddressId: params.emailAddressId } as EmailCodeConfig;
         break;
       case 'phone_code':
         config = {
-          phoneNumberId: factor.phoneNumberId,
-          default: factor.default,
-          channel: factor.channel,
+          phoneNumberId: params.phoneNumberId,
+          default: params.default,
+          channel: params.channel,
         } as PhoneCodeConfig;
         break;
       case 'web3_metamask_signature':
       case 'web3_base_signature':
       case 'web3_coinbase_wallet_signature':
       case 'web3_okx_wallet_signature':
-        config = { web3WalletId: factor.web3WalletId } as Web3SignatureConfig;
+        config = { web3WalletId: params.web3WalletId } as Web3SignatureConfig;
         break;
       case 'reset_password_phone_code':
-        config = { phoneNumberId: factor.phoneNumberId } as ResetPasswordPhoneCodeFactorConfig;
+        config = { phoneNumberId: params.phoneNumberId } as ResetPasswordPhoneCodeFactorConfig;
         break;
       case 'reset_password_email_code':
-        config = { emailAddressId: factor.emailAddressId } as ResetPasswordEmailCodeFactorConfig;
+        config = { emailAddressId: params.emailAddressId } as ResetPasswordEmailCodeFactorConfig;
         break;
       case 'saml':
         config = {
-          redirectUrl: factor.redirectUrl,
-          actionCompleteRedirectUrl: factor.actionCompleteRedirectUrl,
+          redirectUrl: params.redirectUrl,
+          actionCompleteRedirectUrl: params.actionCompleteRedirectUrl,
         } as SamlConfig;
         break;
       case 'enterprise_sso':
         config = {
-          redirectUrl: factor.redirectUrl,
-          actionCompleteRedirectUrl: factor.actionCompleteRedirectUrl,
-          oidcPrompt: factor.oidcPrompt,
+          redirectUrl: params.redirectUrl,
+          actionCompleteRedirectUrl: params.actionCompleteRedirectUrl,
+          oidcPrompt: params.oidcPrompt,
         } as EnterpriseSSOConfig;
         break;
       default:
-        clerkInvalidStrategy('SignIn.prepareFirstFactor', factor.strategy);
+        clerkInvalidStrategy('SignIn.prepareFirstFactor', params.strategy);
     }
     return this._basePost({
-      body: { ...config, strategy: factor.strategy },
+      body: { ...config, strategy: params.strategy },
       action: 'prepare_first_factor',
     });
   };
 
-  attemptFirstFactor = (attemptFactor: AttemptFirstFactorParams): Promise<SignInResource> => {
+  attemptFirstFactor = (params: AttemptFirstFactorParams): Promise<SignInResource> => {
+    debugLogger.debug('SignIn.attemptFirstFactor', { id: this.id, strategy: params.strategy });
     let config;
-    switch (attemptFactor.strategy) {
+    switch (params.strategy) {
       case 'passkey':
         config = {
-          publicKeyCredential: JSON.stringify(serializePublicKeyCredentialAssertion(attemptFactor.publicKeyCredential)),
+          publicKeyCredential: JSON.stringify(serializePublicKeyCredentialAssertion(params.publicKeyCredential)),
         };
         break;
       default:
-        config = { ...attemptFactor };
+        config = { ...params };
     }
 
     return this._basePost({
-      body: { ...config, strategy: attemptFactor.strategy },
+      body: { ...config, strategy: params.strategy },
       action: 'attempt_first_factor',
     });
   };
@@ -240,6 +245,7 @@ export class SignIn extends BaseResource implements SignInResource {
   };
 
   prepareSecondFactor = (params: PrepareSecondFactorParams): Promise<SignInResource> => {
+    debugLogger.debug('SignIn.prepareSecondFactor', { id: this.id, strategy: params.strategy });
     return this._basePost({
       body: params,
       action: 'prepare_second_factor',
@@ -247,6 +253,7 @@ export class SignIn extends BaseResource implements SignInResource {
   };
 
   attemptSecondFactor = (params: AttemptSecondFactorParams): Promise<SignInResource> => {
+    debugLogger.debug('SignIn.attemptSecondFactor', { id: this.id, strategy: params.strategy });
     return this._basePost({
       body: params,
       action: 'attempt_second_factor',
@@ -465,6 +472,7 @@ export class SignIn extends BaseResource implements SignInResource {
 
   protected fromJSON(data: SignInJSON | SignInJSONSnapshot | null): this {
     if (data) {
+      const previousStatus = this.status;
       this.id = data.id;
       this.status = data.status;
       this.supportedIdentifiers = data.supported_identifiers;
@@ -475,6 +483,11 @@ export class SignIn extends BaseResource implements SignInResource {
       this.secondFactorVerification = new Verification(data.second_factor_verification);
       this.createdSessionId = data.created_session_id;
       this.userData = new UserData(data.user_data);
+
+      // Log status transitions
+      if (previousStatus && this.status && previousStatus !== this.status) {
+        debugLogger.info('SignIn.status', { id: this.id, from: previousStatus, to: this.status });
+      }
     }
 
     eventBus.emit('resource:update', { resource: this });

@@ -35,6 +35,8 @@ import type {
   Web3Provider,
 } from '@clerk/types';
 
+import { debugLogger } from '@/utils/debug';
+
 import {
   generateSignatureWithBase,
   generateSignatureWithCoinbaseWallet,
@@ -110,8 +112,8 @@ export class SignUp extends BaseResource implements SignUpResource {
     this.fromJSON(data);
   }
 
-  create = async (_params: SignUpCreateParams): Promise<SignUpResource> => {
-    let params: Record<string, unknown> = _params;
+  create = async (params: SignUpCreateParams): Promise<SignUpResource> => {
+    debugLogger.debug('SignUp.create', { id: this.id, strategy: params.strategy });
 
     if (!__BUILD_DISABLE_RHC__ && !this.clientBypass() && !this.shouldBypassCaptchaForAttempt(params)) {
       const captchaChallenge = new CaptchaChallenge(SignUp.clerk);
@@ -123,7 +125,10 @@ export class SignUp extends BaseResource implements SignUpResource {
     }
 
     if (params.transfer && this.shouldBypassCaptchaForAttempt(params)) {
-      params.strategy = SignUp.clerk.client?.signIn.firstFactorVerification.strategy;
+      const strategy = SignUp.clerk.client?.signIn.firstFactorVerification.strategy;
+      if (strategy) {
+        params.strategy = strategy as SignUpCreateParams['strategy'];
+      }
     }
 
     return this._basePost({
@@ -133,6 +138,7 @@ export class SignUp extends BaseResource implements SignUpResource {
   };
 
   prepareVerification = (params: PrepareVerificationParams): Promise<this> => {
+    debugLogger.debug('SignUp.prepareVerification', { id: this.id, strategy: params.strategy });
     return this._basePost({
       body: params,
       action: 'prepare_verification',
@@ -140,6 +146,7 @@ export class SignUp extends BaseResource implements SignUpResource {
   };
 
   attemptVerification = (params: AttemptVerificationParams): Promise<SignUpResource> => {
+    debugLogger.debug('SignUp.attemptVerification', { id: this.id, strategy: params.strategy });
     return this._basePost({
       body: params,
       action: 'attempt_verification',
@@ -412,6 +419,7 @@ export class SignUp extends BaseResource implements SignUpResource {
 
   protected fromJSON(data: SignUpJSON | SignUpJSONSnapshot | null): this {
     if (data) {
+      const previousStatus = this.status;
       this.id = data.id;
       this.status = data.status;
       this.requiredFields = data.required_fields;
@@ -431,6 +439,11 @@ export class SignUp extends BaseResource implements SignUpResource {
       this.abandonAt = data.abandon_at;
       this.web3wallet = data.web3_wallet;
       this.legalAcceptedAt = data.legal_accepted_at;
+
+      // Log status transitions
+      if (previousStatus && this.status && previousStatus !== this.status) {
+        debugLogger.info('SignUp.status', { id: this.id, from: previousStatus, to: this.status });
+      }
     }
 
     eventBus.emit('resource:update', { resource: this });
