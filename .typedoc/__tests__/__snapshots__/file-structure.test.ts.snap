@@ -45,8 +45,6 @@ exports[`Typedoc output > should have a deliberate file structure 1`] = `
   "types/commerce-payment-status.mdx",
   "types/commerce-plan-json.mdx",
   "types/commerce-plan-resource.mdx",
-  "types/commerce-product-json.mdx",
-  "types/commerce-product-resource.mdx",
   "types/commerce-statement-group-json.mdx",
   "types/commerce-statement-group.mdx",
   "types/commerce-statement-json.mdx",

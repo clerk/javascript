@@ -200,54 +200,6 @@ export interface CommercePaymentSourceMethods {
  * <ClerkProvider clerkJsVersion="x.x.x" />
  * ```
  */
-export interface CommerceProductResource extends ClerkResource {
-  id: string;
-  /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
-   */
-  slug: string | null;
-  /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
-   */
-  currency: string;
-  /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
-   */
-  isDefault: boolean;
-  /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
-   */
-  plans: CommercePlanResource[];
-}
-
-/**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
- */
 export type GetPlansParams = ClerkPaginationParams<{
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
