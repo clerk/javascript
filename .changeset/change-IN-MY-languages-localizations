@@ -1,7 +1,13 @@
+---
+'@clerk/localizations': minor
+---
+
+Add api-related localizations for th-TH and refine translation context
+
 This updates localizations for hi-IN, bn-IN, ta-IN, te-IN & ms-MY:
 
-Translates missing API key management strings.
-Adds complete commerce and billing translations.
-Completes organization profile translations.
-Adds missing error messages.
-Includes form labels and placeholders.
+- Translates missing API key management strings.
+- Adds complete commerce and billing translations.
+- Completes organization profile translations.
+- Adds missing error messages.
+- Includes form labels and placeholders.
