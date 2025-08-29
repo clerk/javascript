@@ -128,25 +128,27 @@ export class SignUp extends BaseResource implements SignUpResource {
   create = async (params: SignUpCreateParams): Promise<SignUpResource> => {
     debugLogger.debug('SignUp.create', { id: this.id, strategy: params.strategy });
 
+    let finalParams = { ...params };
+
     if (!__BUILD_DISABLE_RHC__ && !this.clientBypass() && !this.shouldBypassCaptchaForAttempt(params)) {
       const captchaChallenge = new CaptchaChallenge(SignUp.clerk);
       const captchaParams = await captchaChallenge.managedOrInvisible({ action: 'signup' });
       if (!captchaParams) {
         throw new ClerkRuntimeError('', { code: 'captcha_unavailable' });
       }
-      params = { ...params, ...captchaParams };
+      finalParams = { ...finalParams, ...captchaParams };
     }
 
-    if (params.transfer && this.shouldBypassCaptchaForAttempt(params)) {
+    if (finalParams.transfer && this.shouldBypassCaptchaForAttempt(finalParams)) {
       const strategy = SignUp.clerk.client?.signIn.firstFactorVerification.strategy;
       if (strategy) {
-        params.strategy = strategy as SignUpCreateParams['strategy'];
+        finalParams = { ...finalParams, strategy: strategy as SignUpCreateParams['strategy'] };
       }
     }
 
     return this._basePost({
       path: this.pathRoot,
-      body: normalizeUnsafeMetadata(params),
+      body: normalizeUnsafeMetadata(finalParams),
     });
   };
 
