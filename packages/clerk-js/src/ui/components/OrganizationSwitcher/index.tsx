@@ -11,7 +11,7 @@ import { OrganizationSwitcherPopover } from './OrganizationSwitcherPopover';
 import { OrganizationSwitcherTrigger } from './OrganizationSwitcherTrigger';
 
 const OrganizationSwitcherWithFloatingTree = withFloatingTree<{ children: ReactElement }>(({ children }) => {
-  const { defaultOpen } = useOrganizationSwitcherContext();
+  const { defaultOpen, trigger } = useOrganizationSwitcherContext();
 
   const { floating, reference, styles, toggle, isOpen, nodeId, context } = usePopover({
     defaultOpen,
@@ -29,6 +29,7 @@ const OrganizationSwitcherWithFloatingTree = withFloatingTree<{ children: ReactE
         isOpen={isOpen}
         aria-controls={isOpen ? switcherButtonMenuId : undefined}
         aria-expanded={isOpen}
+        render={trigger}
       />
       <Popover
         nodeId={nodeId}

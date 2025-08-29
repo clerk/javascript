@@ -1,3 +1,5 @@
+import type * as React from 'react';
+
 import type { ClerkAPIResponseError } from './api';
 import type { APIKeysNamespace } from './apiKeys';
 import type {
@@ -1702,6 +1704,47 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
      * e.g. <UserButton userProfileProps={{appearance: {...}}} />
      */
     organizationProfileProps?: Pick<OrganizationProfileProps, 'appearance' | 'customPages'>;
+
+    /**
+     * Custom render function or element for the organization switcher trigger.
+     * Allows full customization of the trigger button appearance and behavior.
+     *
+     * @example
+     * ```tsx
+     * <OrganizationSwitcher
+     *   trigger={({ loading, image, name, ...triggerProps }) => (
+     *     <button {...triggerProps}>
+     *       {image && <img src={image} alt={name} />}
+     *       <span>{name || 'Select organization'}</span>
+     *       {loading && <Spinner />}
+     *     </button>
+     *   )}
+     * />
+     * ```
+     */
+    trigger?:
+      | React.ReactElement
+      | ((
+          props: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+            ref: React.Ref<HTMLButtonElement>;
+          },
+          state: {
+            /** Whether the organization switcher is currently loading */
+            loading: boolean;
+            /** Whether the popover is open */
+            isOpen: boolean;
+            /** Current organization data */
+            organization: OrganizationResource | null;
+            /** Current user data */
+            user: UserResource | null;
+            /** Organization avatar image URL */
+            image: string | null;
+            /** Organization name or user identifier */
+            name: string | null;
+            /** Number of pending invitations/requests */
+            notificationCount: number;
+          },
+        ) => React.ReactElement);
   };
 
 export type OrganizationListProps = {
