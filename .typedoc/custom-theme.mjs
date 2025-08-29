@@ -47,7 +47,7 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
     this.partials = {
       ...superPartials,
       /**
-       * This hides the "Experimental" section from the output (by default).
+       * This hides the "Experimental" text and "Example" section from the output (by default).
        * @param {import('typedoc').Comment} model
        * @param {{ headingLevel?: number; showSummary?: boolean; showTags?: boolean; showReturns?: boolean; isTableColumn?: boolean }} [options]
        */
@@ -62,8 +62,7 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
 
           const res = superPartials.comment(model, options);
 
-          const [line, ...linesToInclude] = res.replace(/^\n\n/, '').split('\n');
-          return linesToInclude.join('\n');
+          return res.replace(/^\n+/, '');
         }
         return superPartials.comment(model, options);
       },

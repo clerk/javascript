@@ -34,6 +34,7 @@ const typedocPluginMarkdownOptions = {
     hideModifiers: true,
     hideDefaults: true,
     hideInherited: true,
+    hideOverrides: true,
   },
   fileExtension: '.mdx',
   excludeScopesInPaths: true,
