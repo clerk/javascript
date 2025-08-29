@@ -1,4 +1,4 @@
-// @ts-check
+// @ts-check - Enable TypeScript checks for safer MDX post-processing and link rewriting
 import { MarkdownPageEvent } from 'typedoc-plugin-markdown';
 
 /**
