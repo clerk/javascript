@@ -27,6 +27,7 @@ test.describe('Client handshake @generic', () => {
   const devBrowserCookie = '__clerk_db_jwt=needstobeset;';
 
   test.beforeAll('setup local Clerk API mock', async () => {
+    test.setTimeout(90_000); // Wait for app to be ready
     const env = appConfigs.envs.withEmailCodes
       .clone()
       .setEnvVariable('private', 'CLERK_API_URL', `http://localhost:${PORT}`);
@@ -984,6 +985,7 @@ test.describe('Client handshake with organization activation @nextjs', () => {
   let app: Application;
 
   test.beforeAll('setup local jwks server', async () => {
+    test.setTimeout(90_000); // Wait for app to be ready
     // Start the jwks server
     await new Promise<void>(resolve => jwksServer.listen(0, resolve));
     const address = jwksServer.address();
@@ -1367,6 +1369,7 @@ test.describe('Client handshake with an organization activation avoids infinite 
   let thisApp: Application;
 
   test.beforeAll('setup local jwks server', async () => {
+    test.setTimeout(90_000); // Wait for app to be ready
     // Start the jwks server
     await new Promise<void>(resolve => jwksServer.listen(0, resolve));
     const address = jwksServer.address();

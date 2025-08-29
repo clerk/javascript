@@ -59,6 +59,9 @@ export const createPricingTablePageObject = (testArgs: { page: EnhancedPage }) =
     waitToBeActive: async ({ planSlug }: { planSlug: string }) => {
       return locators.badge(planSlug).getByText('Active').waitFor({ state: 'visible' });
     },
+    waitToBeFreeTrial: async ({ planSlug }: { planSlug: string }) => {
+      return locators.badge(planSlug).getByText('Free trial').waitFor({ state: 'visible' });
+    },
     getPlanCardCTA: ({ planSlug }: { planSlug: string }) => {
       return locators.footer(planSlug).getByRole('button', {
         name: /get|switch|subscribe/i,

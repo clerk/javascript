@@ -1,5 +1,33 @@
 # Change Log
 
+## 2.10.1
+
+### Patch Changes
+
+- Updated dependencies [[`600c648`](https://github.com/clerk/javascript/commit/600c648d4087a823341041c90018797fbc0033f0)]:
+  - @clerk/shared@3.23.0
+  - @clerk/types@4.83.0
+
+## 2.10.0
+
+### Minor Changes
+
+- Add missing properties to OAuthApplicationJSON ([#6378](https://github.com/clerk/javascript/pull/6378)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- [Billing Beta] Add `cancelSubscriptionItem` to BillingApi. ([#6611](https://github.com/clerk/javascript/pull/6611)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add `getOrganizationBillingSubscription` to BillingApi. ([#6632](https://github.com/clerk/javascript/pull/6632)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Fixes an issue where a handshake would trigger more than intended in development. ([#6635](https://github.com/clerk/javascript/pull/6635)) by [@brkalow](https://github.com/brkalow)
+
+- Fix logic for forcing a session sync on cross origin requests. ([#6600](https://github.com/clerk/javascript/pull/6600)) by [@brkalow](https://github.com/brkalow)
+
+- Updated dependencies [[`d52714e`](https://github.com/clerk/javascript/commit/d52714e4cb7f369c74826cd4341c58eb1900abe4), [`ce49740`](https://github.com/clerk/javascript/commit/ce49740d474d6dd9da5096982ea4e9f14cf68f09), [`2ed539c`](https://github.com/clerk/javascript/commit/2ed539cc7f08ed4d70c33621563ad386ea8becc5), [`deaafe4`](https://github.com/clerk/javascript/commit/deaafe449773632d690aa2f8cafaf959392622b9), [`a26ecae`](https://github.com/clerk/javascript/commit/a26ecae09fd06cd34f094262f038a8eefbb23f7d), [`c16a7a5`](https://github.com/clerk/javascript/commit/c16a7a5837fc15e0e044baf9c809b8da6fbac795), [`05b6d65`](https://github.com/clerk/javascript/commit/05b6d65c0bc5736443325a5defee4c263ef196af)]:
+  - @clerk/types@4.82.0
+  - @clerk/shared@3.22.1
+
 ## 2.9.4
 
 ### Patch Changes

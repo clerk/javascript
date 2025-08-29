@@ -4,4 +4,4 @@
 '@clerk/types': minor
 ---
 
-[Experimental] Signal transfer support
+[Experimental] Signal phone code support

@@ -4,4 +4,4 @@
 '@clerk/types': minor
 ---
 
-[Experimental] Signals `isLoaded` removal
+[Experimental] Signal MFA support
