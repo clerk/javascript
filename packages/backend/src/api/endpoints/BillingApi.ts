@@ -9,6 +9,7 @@ import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/commerce';
 const organizationBasePath = '/organizations';
+const userBasePath = '/users';
 
 type GetOrganizationListParams = ClerkPaginationRequest<{
   payerType: 'org' | 'user';
@@ -57,6 +58,18 @@ export class BillingAPI extends AbstractAPI {
     return this.request<CommerceSubscription>({
       method: 'GET',
       path: joinPaths(organizationBasePath, organizationId, 'billing', 'subscription'),
+    });
+  }
+
+  /**
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+   * It is advised to pin the SDK version to avoid breaking changes.
+   */
+  public async getUserBillingSubscription(userId: string) {
+    this.requireId(userId);
+    return this.request<CommerceSubscription>({
+      method: 'GET',
+      path: joinPaths(userBasePath, userId, 'billing', 'subscription'),
     });
   }
 }
