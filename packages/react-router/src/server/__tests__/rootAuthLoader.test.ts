@@ -1,4 +1,6 @@
+import { logger } from '@clerk/shared/logger';
 import { data, type LoaderFunctionArgs } from 'react-router';
+import type { MockInstance } from 'vitest';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { middlewareMigrationWarning } from '../../utils/errors';
@@ -35,14 +37,14 @@ describe('rootAuthLoader', () => {
     } as LoaderFunctionArgs;
 
     it('should not call legacyAuthenticateRequest when middleware context exists', async () => {
-      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const warnOnceSpy = vi.spyOn(logger, 'warnOnce').mockImplementation(() => {});
 
       await rootAuthLoader(args, () => ({ data: 'test' }));
 
       expect(legacyAuthenticateRequest).not.toHaveBeenCalled();
-      expect(consoleWarnSpy).not.toHaveBeenCalled();
+      expect(warnOnceSpy).not.toHaveBeenCalled();
 
-      consoleWarnSpy.mockRestore();
+      warnOnceSpy.mockRestore();
     });
 
     it('should handle no callback - returns clerkState only', async () => {
@@ -105,15 +107,21 @@ describe('rootAuthLoader', () => {
       request: new Request('http://clerk.com'),
     } as LoaderFunctionArgs;
 
-    it('should call legacyAuthenticateRequest when middleware context is missing', async () => {
-      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    let warnOnceSpy: MockInstance<(msg: string) => void>;
 
+    beforeEach(() => {
+      warnOnceSpy = vi.spyOn(logger, 'warnOnce').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+      warnOnceSpy.mockRestore();
+    });
+
+    it('should call legacyAuthenticateRequest when middleware context is missing', async () => {
       await rootAuthLoader(args, () => ({ data: 'test' }));
 
       expect(legacyAuthenticateRequest).toHaveBeenCalled();
-      expect(consoleWarnSpy).toHaveBeenCalledWith(middlewareMigrationWarning);
-
-      consoleWarnSpy.mockRestore();
+      expect(warnOnceSpy).toHaveBeenCalledWith(middlewareMigrationWarning);
     });
 
     it('should handle no callback in legacy mode', async () => {

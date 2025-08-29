@@ -14,6 +14,14 @@ import { patchRequest } from './utils';
 export const authFnContext = unstable_createContext<((options?: PendingSessionOptions) => AuthObject) | null>(null);
 export const requestStateContext = unstable_createContext<RequestState<any> | null>(null);
 
+/**
+ * Middleware that integrates Clerk authentication into your React Router application.
+ * It checks the request's cookies and headers for a session JWT and, if found,
+ * attaches the Auth object to a context.
+ *
+ * @example
+ * export const middleware: Route.MiddlewareFunction[clerkMiddleware()]
+ */
 export const clerkMiddleware = (options?: ClerkMiddlewareOptions): unstable_MiddlewareFunction<Response> => {
   return async (args, next) => {
     const clerkRequest = createClerkRequest(patchRequest(args.request));
