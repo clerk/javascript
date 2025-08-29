@@ -89,15 +89,15 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes], withPattern:
       await expect(u.page.getByText(`Email: ${fakeUser.email}`)).toBeVisible();
     });
 
-    test.skip('streaming with Suspense works with rootAuthLoader', async ({ page, context }) => {
+    test('streaming with Suspense works with rootAuthLoader', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
 
       await u.page.goToRelative('/');
 
       await expect(u.page.getByText('Loading...')).toBeVisible();
 
-      // Wait for the streaming content to resolve
-      await expect(u.page.getByText('Non critical value: non-critical')).toBeVisible({ timeout: 3000 });
+      // Wait for the streaming content to resolve (5 second delay + buffer)
+      await expect(u.page.getByText('Non critical value: non-critical')).toBeVisible({ timeout: 8000 });
       await expect(u.page.getByText('Loading...')).toBeHidden();
     });
   },
