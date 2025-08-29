@@ -18,7 +18,7 @@ export async function loader(args: Route.LoaderArgs) {
 
 **After (Recommended):**
 ```tsx
-import { clerkMiddleware, rootAuthLoader } from '@clerk/react-router/ssr.server'
+import { clerkMiddleware, rootAuthLoader } from '@clerk/react-router/server'
 
 export const middleware: Route.MiddlewareFunction[] = [
   clerkMiddleware()
