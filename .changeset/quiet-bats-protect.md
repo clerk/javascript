@@ -2,7 +2,7 @@
 '@clerk/react-router': major
 ---
 
-Introduce React Router middleware support with `clerkMiddleware()` for improved performance and streaming capabilities.
+Introduce [React Router middleware](https://reactrouter.com/how-to/middleware) support with `clerkMiddleware()` for improved performance and streaming capabilities.
 
 Usage of `rootAuthLoader` without the `clerkMiddleware()` installed is now deprecated and will be removed in the next major version.
 
