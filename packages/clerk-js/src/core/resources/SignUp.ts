@@ -72,10 +72,10 @@ export class SignUp extends BaseResource implements SignUpResource {
   pathRoot = '/client/sign_ups';
 
   id: string | undefined;
-  status: SignUpStatus | null = null;
+  private _status: SignUpStatus | null = null;
   requiredFields: SignUpField[] = [];
-  optionalFields: SignUpField[] = [];
   missingFields: SignUpField[] = [];
+  optionalFields: SignUpField[] = [];
   unverifiedFields: SignUpIdentificationField[] = [];
   verifications: SignUpVerifications = new SignUpVerifications(null);
   username: string | null = null;
@@ -91,6 +91,19 @@ export class SignUp extends BaseResource implements SignUpResource {
   createdUserId: string | null = null;
   abandonAt: number | null = null;
   legalAcceptedAt: number | null = null;
+
+  get status(): SignUpStatus | null {
+    return this._status;
+  }
+
+  set status(value: SignUpStatus | null) {
+    const previousStatus = this._status;
+    this._status = value;
+
+    if (value && previousStatus !== value) {
+      debugLogger.info('SignUp.status', { id: this.id, from: previousStatus, to: value });
+    }
+  }
 
   /**
    * @experimental This experimental API is subject to change.
@@ -419,7 +432,6 @@ export class SignUp extends BaseResource implements SignUpResource {
 
   protected fromJSON(data: SignUpJSON | SignUpJSONSnapshot | null): this {
     if (data) {
-      const previousStatus = this.status;
       this.id = data.id;
       this.status = data.status;
       this.requiredFields = data.required_fields;
@@ -439,11 +451,6 @@ export class SignUp extends BaseResource implements SignUpResource {
       this.abandonAt = data.abandon_at;
       this.web3wallet = data.web3_wallet;
       this.legalAcceptedAt = data.legal_accepted_at;
-
-      // Log status transitions
-      if (previousStatus && this.status && previousStatus !== this.status) {
-        debugLogger.info('SignUp.status', { id: this.id, from: previousStatus, to: this.status });
-      }
     }
 
     eventBus.emit('resource:update', { resource: this });

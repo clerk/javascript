@@ -87,7 +87,7 @@ export class SignIn extends BaseResource implements SignInResource {
   pathRoot = '/client/sign_ins';
 
   id?: string;
-  status: SignInStatus | null = null;
+  private _status: SignInStatus | null = null;
   supportedIdentifiers: SignInIdentifier[] = [];
   supportedFirstFactors: SignInFirstFactor[] | null = [];
   supportedSecondFactors: SignInSecondFactor[] | null = null;
@@ -96,6 +96,19 @@ export class SignIn extends BaseResource implements SignInResource {
   identifier: string | null = null;
   createdSessionId: string | null = null;
   userData: UserData = new UserData(null);
+
+  get status(): SignInStatus | null {
+    return this._status;
+  }
+
+  set status(value: SignInStatus | null) {
+    const previousStatus = this._status;
+    this._status = value;
+
+    if (value && previousStatus !== value) {
+      debugLogger.info('SignIn.status', { id: this.id, from: previousStatus, to: value });
+    }
+  }
 
   /**
    * @experimental This experimental API is subject to change.
@@ -472,7 +485,6 @@ export class SignIn extends BaseResource implements SignInResource {
 
   protected fromJSON(data: SignInJSON | SignInJSONSnapshot | null): this {
     if (data) {
-      const previousStatus = this.status;
       this.id = data.id;
       this.status = data.status;
       this.supportedIdentifiers = data.supported_identifiers;
@@ -483,11 +495,6 @@ export class SignIn extends BaseResource implements SignInResource {
       this.secondFactorVerification = new Verification(data.second_factor_verification);
       this.createdSessionId = data.created_session_id;
       this.userData = new UserData(data.user_data);
-
-      // Log status transitions
-      if (previousStatus && this.status && previousStatus !== this.status) {
-        debugLogger.info('SignIn.status', { id: this.id, from: previousStatus, to: this.status });
-      }
     }
 
     eventBus.emit('resource:update', { resource: this });
