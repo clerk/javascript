@@ -1301,15 +1301,14 @@ export const deDE: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: 'Jetzt anmelden',
-      actionText: 'Kein Zugang? Auf die Warteliste setzen!',
-      formButton: 'Zur Warteliste hinzufügen',
-      subtitle: 'Es tut uns leid, aber derzeit sind keine Plätze verfügbar.',
+      actionLink: 'Anmelden',
+      actionText: 'Bereits Zugang?',
+      formButton: 'Warteliste beitreten',
+      subtitle: 'Geben Sie Ihre E-Mail-Adresse ein und wir benachrichtigen Sie, sobald Ihr Zugang verfügbar ist.',
       title: 'Warteliste beitreten',
     },
     success: {
-      message:
-        'Sie wurden erfolgreich auf die Warteliste gesetzt. Wir benachrichtigen Sie, sobald Plätze verfügbar sind.',
+      message: 'Sie wurden erfolgreich auf die Warteliste gesetzt. Wir benachrichtigen Sie, sobald der Zugang freigegeben wird.',
       subtitle: 'Vielen Dank für Ihre Geduld. Sie erhalten eine Benachrichtigung, sobald der Zugang freigegeben wird.',
       title: 'Erfolgreich auf die Warteliste gesetzt',
     },

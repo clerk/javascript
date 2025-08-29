@@ -27,16 +27,19 @@ import type {
   SamlConfig,
   SignInCreateParams,
   SignInFirstFactor,
+  SignInFutureBackupCodeVerifyParams,
   SignInFutureCreateParams,
   SignInFutureEmailCodeSendParams,
   SignInFutureEmailCodeVerifyParams,
   SignInFutureFinalizeParams,
+  SignInFutureMFAPhoneCodeVerifyParams,
   SignInFuturePasswordParams,
   SignInFuturePhoneCodeSendParams,
   SignInFuturePhoneCodeVerifyParams,
   SignInFutureResetPasswordSubmitParams,
   SignInFutureResource,
   SignInFutureSSOParams,
+  SignInFutureTOTPVerifyParams,
   SignInIdentifier,
   SignInJSON,
   SignInJSONSnapshot,
@@ -535,6 +538,13 @@ class SignInFuture implements SignInFutureResource {
     verifyCode: this.verifyPhoneCode.bind(this),
   };
 
+  mfa = {
+    sendPhoneCode: this.sendMFAPhoneCode.bind(this),
+    verifyPhoneCode: this.verifyMFAPhoneCode.bind(this),
+    verifyTOTP: this.verifyTOTP.bind(this),
+    verifyBackupCode: this.verifyBackupCode.bind(this),
+  };
+
   constructor(readonly resource: SignIn) {}
 
   get status() {
@@ -705,6 +715,52 @@ class SignInFuture implements SignInFutureResource {
       if (status === 'unverified' && externalVerificationRedirectURL) {
         windowNavigate(externalVerificationRedirectURL);
       }
+    });
+  }
+
+  async sendMFAPhoneCode(): Promise<{ error: unknown }> {
+    return runAsyncResourceTask(this.resource, async () => {
+      const phoneCodeFactor = this.resource.supportedSecondFactors?.find(f => f.strategy === 'phone_code');
+
+      if (!phoneCodeFactor) {
+        throw new Error('Phone code factor not found');
+      }
+
+      const { phoneNumberId } = phoneCodeFactor;
+      await this.resource.__internal_basePost({
+        body: { phoneNumberId, strategy: 'phone_code' },
+        action: 'prepare_second_factor',
+      });
+    });
+  }
+
+  async verifyMFAPhoneCode(params: SignInFutureMFAPhoneCodeVerifyParams): Promise<{ error: unknown }> {
+    const { code } = params;
+    return runAsyncResourceTask(this.resource, async () => {
+      await this.resource.__internal_basePost({
+        body: { code, strategy: 'phone_code' },
+        action: 'attempt_second_factor',
+      });
+    });
+  }
+
+  async verifyTOTP(params: SignInFutureTOTPVerifyParams): Promise<{ error: unknown }> {
+    const { code } = params;
+    return runAsyncResourceTask(this.resource, async () => {
+      await this.resource.__internal_basePost({
+        body: { code, strategy: 'totp' },
+        action: 'attempt_second_factor',
+      });
+    });
+  }
+
+  async verifyBackupCode(params: SignInFutureBackupCodeVerifyParams): Promise<{ error: unknown }> {
+    const { code } = params;
+    return runAsyncResourceTask(this.resource, async () => {
+      await this.resource.__internal_basePost({
+        body: { code, strategy: 'backup_code' },
+        action: 'attempt_second_factor',
+      });
     });
   }
 

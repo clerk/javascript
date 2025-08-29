@@ -51,6 +51,18 @@ export interface SignInFutureSSOParams {
   redirectCallbackUrl: string;
 }
 
+export interface SignInFutureMFAPhoneCodeVerifyParams {
+  code: string;
+}
+
+export interface SignInFutureTOTPVerifyParams {
+  code: string;
+}
+
+export interface SignInFutureBackupCodeVerifyParams {
+  code: string;
+}
+
 export interface SignInFutureFinalizeParams {
   navigate?: SetActiveNavigate;
 }
@@ -76,5 +88,11 @@ export interface SignInFutureResource {
     submitPassword: (params: SignInFutureResetPasswordSubmitParams) => Promise<{ error: unknown }>;
   };
   sso: (params: SignInFutureSSOParams) => Promise<{ error: unknown }>;
+  mfa: {
+    sendPhoneCode: () => Promise<{ error: unknown }>;
+    verifyPhoneCode: (params: SignInFutureMFAPhoneCodeVerifyParams) => Promise<{ error: unknown }>;
+    verifyTOTP: (params: SignInFutureTOTPVerifyParams) => Promise<{ error: unknown }>;
+    verifyBackupCode: (params: SignInFutureBackupCodeVerifyParams) => Promise<{ error: unknown }>;
+  };
   finalize: (params?: SignInFutureFinalizeParams) => Promise<{ error: unknown }>;
 }
