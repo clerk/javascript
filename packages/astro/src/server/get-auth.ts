@@ -20,7 +20,6 @@ import { getAuthKeyFromRequest } from './utils';
 export const createGetAuth = ({ noAuthStatusMessage }: { noAuthStatusMessage: string }) => {
   const getAuth = (
     req: Request,
-    rawAuthObject: AuthObject,
     locals: APIContext['locals'],
     {
       treatPendingAsSignedOut = true,
@@ -51,7 +50,7 @@ export const createGetAuth = ({ noAuthStatusMessage }: { noAuthStatusMessage: st
 
     // Handle machine tokens first (from raw auth object)
     const bearerToken = req.headers.get(constants.Headers.Authorization)?.replace('Bearer ', '');
-    const machineAuthObject = handleMachineToken(bearerToken, rawAuthObject, acceptsToken, options);
+    const machineAuthObject = handleMachineToken(bearerToken, locals.__internal_authObject, acceptsToken, options);
     if (machineAuthObject) {
       return machineAuthObject;
     }

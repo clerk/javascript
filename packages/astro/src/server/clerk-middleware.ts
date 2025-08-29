@@ -259,8 +259,9 @@ function decorateAstroLocal(
   context.locals.authStatus = status;
   context.locals.authMessage = message;
   context.locals.authReason = reason;
+  context.locals.__internal_authObject = JSON.parse(JSON.stringify(rawAuthObject));
   context.locals.auth = (({ acceptsToken, treatPendingAsSignedOut }: AuthOptions = {}) => {
-    const authObject = getAuth(clerkRequest, rawAuthObject, context.locals, { treatPendingAsSignedOut, acceptsToken });
+    const authObject = getAuth(clerkRequest, context.locals, { treatPendingAsSignedOut, acceptsToken });
 
     if (authObject.tokenType === TokenType.SessionToken) {
       const clerkUrl = clerkRequest.clerkUrl;
