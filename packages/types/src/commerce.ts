@@ -542,7 +542,7 @@ export type MakeDefaultPaymentSourceParams = WithOptionalOrgType<unknown>;
 /**
  * The `CommercePaymentSourceResource` type represents a payment source for a checkout session.
  *
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version to avoid breaking changes.
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface CommercePaymentSourceResource extends ClerkResource {
   /**
@@ -827,7 +827,7 @@ export interface CommerceStatementResource extends ClerkResource {
 /**
  * The `CommerceStatementGroup` type represents a group of payment items within a statement.
  *
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version to avoid breaking changes.
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface CommerceStatementGroup {
   /**
@@ -1134,7 +1134,7 @@ export interface CommerceSubscriptionResource extends ClerkResource {
 /**
  * The `CommerceMoneyAmount` type represents a monetary value with currency information.
  *
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version to avoid breaking changes.
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface CommerceMoneyAmount {
   /**
@@ -1158,7 +1158,7 @@ export interface CommerceMoneyAmount {
 /**
  * The `CommerceCheckoutTotals` type represents the total costs, taxes, and other pricing details for a checkout session.
  *
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version to avoid breaking changes.
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface CommerceCheckoutTotals {
   /**
@@ -1190,7 +1190,7 @@ export interface CommerceCheckoutTotals {
 /**
  * The `CommerceStatementTotals` type represents the total costs, taxes, and other pricing details for a statement.
  *
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version to avoid breaking changes.
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version and the clerk-js version to avoid breaking changes.
  */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface CommerceStatementTotals extends Omit<CommerceCheckoutTotals, 'totalDueNow'> {}
@@ -1226,6 +1226,8 @@ export type CreateCheckoutParams = WithOptionalOrgType<{
 
 /**
  * The `confirm()` method accepts the following parameters. **Only one of `paymentSourceId`, `paymentToken`, or `useTestCard` should be provided.**
+  *
+  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version and the clerk-js version to avoid breaking changes.
  */
 export type ConfirmCheckoutParams = WithOptionalOrgType<
   | {
@@ -1259,7 +1261,7 @@ export type ConfirmCheckoutParams = WithOptionalOrgType<
 /**
  * The `CommerceCheckoutResource` type represents information about a checkout session.
  *
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version to avoid breaking changes.
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface CommerceCheckoutResource extends ClerkResource {
   /**
