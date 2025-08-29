@@ -58,6 +58,7 @@ export * from './Verification';
 export * from './WaitlistEntry';
 export * from './Web3Wallet';
 export * from './CommercePlan';
+export * from './CommerceSubscription';
 export * from './CommerceSubscriptionItem';
 
 export type {

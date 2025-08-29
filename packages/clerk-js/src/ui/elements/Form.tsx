@@ -252,12 +252,11 @@ const RadioGroup = (
 };
 
 const OTPInput = (props: OTPInputProps) => {
-  const { ref, ...restInputProps } = props.otpControl.otpInputProps;
   const { centerAlign = true } = props;
   return (
     // Use Field.Root in order to pass feedback down to Field.Feedback
     // @ts-ignore
-    <Field.Root {...restInputProps}>
+    <Field.Root {...props.otpControl.otpInputProps}>
       <Field.OTPRoot {...props}>
         {/*TODO: Create a descriptor for OTP wrapper*/}
         <Col
@@ -271,7 +270,7 @@ const OTPInput = (props: OTPInputProps) => {
             hasError={props.otpControl.otpInputProps.feedbackType === 'error'}
             direction='col'
           >
-            <Field.OTPCodeControl ref={ref} />
+            <Field.OTPCodeControl />
             <Field.Feedback
               center
               elementDescriptors={{

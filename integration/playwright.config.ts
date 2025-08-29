@@ -13,10 +13,11 @@ export const common: PlaywrightTestConfig = {
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 5 : 0,
-  timeout: 90_000,
   maxFailures: process.env.CI ? 5 : undefined,
   workers: process.env.CI ? '50%' : '70%',
   use: {
+    actionTimeout: 10_000,
+    navigationTimeout: 30_000,
     ignoreHTTPSErrors: true,
     trace: 'retain-on-failure',
     bypassCSP: true, // We probably need to limit this to specific tests
