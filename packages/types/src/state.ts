@@ -109,11 +109,11 @@ export interface SignInSignal {
 
 export interface SignUpSignalValue {
   /**
-   * The errors that occurred during the last fetch of the underlying `SignIn` resource.
+   * The errors that occurred during the last fetch of the underlying `SignUp` resource.
    */
   errors: Errors;
   /**
-   * The fetch status of the underlying `SignIn` resource.
+   * The fetch status of the underlying `SignUp` resource.
    */
   fetchStatus: 'idle' | 'fetching';
   /**
