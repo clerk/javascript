@@ -100,16 +100,28 @@ export class SignIn extends BaseResource implements SignInResource {
   createdSessionId: string | null = null;
   userData: UserData = new UserData(null);
 
+  /**
+   * The current status of the sign-in process.
+   *
+   * @returns The current sign-in status, or null if no status has been set
+   */
   get status(): SignInStatus | null {
     return this._status;
   }
 
+  /**
+   * Sets the sign-in status and logs the transition at debug level.
+   *
+   * @param value - The new status to set. Can be null to clear the status.
+   * @remarks When setting a new status that differs from the previous one,
+   * a debug log entry is created showing the transition from the old to new status.
+   */
   set status(value: SignInStatus | null) {
     const previousStatus = this._status;
     this._status = value;
 
     if (value && previousStatus !== value) {
-      debugLogger.info('SignIn.status', { id: this.id, from: previousStatus, to: value });
+      debugLogger.debug('SignIn.status', { id: this.id, from: previousStatus, to: value });
     }
   }
 

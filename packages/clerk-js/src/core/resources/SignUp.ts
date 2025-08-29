@@ -92,16 +92,28 @@ export class SignUp extends BaseResource implements SignUpResource {
   abandonAt: number | null = null;
   legalAcceptedAt: number | null = null;
 
+  /**
+   * The current status of the sign-up process.
+   *
+   * @returns The current sign-up status, or null if no status has been set
+   */
   get status(): SignUpStatus | null {
     return this._status;
   }
 
+  /**
+   * Sets the sign-up status and logs the transition at debug level.
+   *
+   * @param value - The new status to set. Can be null to clear the status.
+   * @remarks When setting a new status that differs from the previous one,
+   * a debug log entry is created showing the transition from the old to new status.
+   */
   set status(value: SignUpStatus | null) {
     const previousStatus = this._status;
     this._status = value;
 
     if (value && previousStatus !== value) {
-      debugLogger.info('SignUp.status', { id: this.id, from: previousStatus, to: value });
+      debugLogger.debug('SignUp.status', { id: this.id, from: previousStatus, to: value });
     }
   }
 
