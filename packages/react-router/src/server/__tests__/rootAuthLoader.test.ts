@@ -71,8 +71,9 @@ describe('rootAuthLoader', () => {
     it('should handle callback returning data() format', async () => {
       const result = await rootAuthLoader(args, () => data({ message: 'Hello from data()' }));
 
-      expect(result).toBeInstanceOf(Response);
       const response = result as unknown as Response;
+
+      expect(result).toBeInstanceOf(Response);
       expect(await response.json()).toHaveProperty('message', 'Hello from data()');
       expect(legacyAuthenticateRequest).not.toHaveBeenCalled();
     });
@@ -124,37 +125,45 @@ describe('rootAuthLoader', () => {
       expect(warnOnceSpy).toHaveBeenCalledWith(middlewareMigrationWarning);
     });
 
-    it('should handle no callback in legacy mode', async () => {
+    it('should handle no callback', async () => {
       const result = await rootAuthLoader(args);
 
+      const response = result as Response;
+
       expect(result).toBeInstanceOf(Response);
+      expect(await response.json()).toHaveProperty('clerkState');
       expect(legacyAuthenticateRequest).toHaveBeenCalled();
     });
 
-    it('should handle callback returning Response in legacy mode', async () => {
+    it('should handle callback returning Response', async () => {
       const mockResponse = new Response(JSON.stringify({ message: 'Hello' }));
 
-      const result = await rootAuthLoader(args, () => mockResponse);
+      const response = await rootAuthLoader(args, () => mockResponse);
 
-      expect(result).toBeInstanceOf(Response);
+      expect(response).toBeInstanceOf(Response);
+      expect(await response.json()).toHaveProperty('clerkState');
       expect(legacyAuthenticateRequest).toHaveBeenCalled();
     });
 
-    it('should handle callback returning data() format in legacy mode', async () => {
+    it('should handle callback returning data()', async () => {
       const result = await rootAuthLoader(args, () => data({ message: 'Hello from data()' }));
 
-      expect(result).toBeInstanceOf(Response);
+      const response = result as unknown as Response;
+
+      expect(response).toBeInstanceOf(Response);
+      expect(await response.json()).toHaveProperty('clerkState');
       expect(legacyAuthenticateRequest).toHaveBeenCalled();
     });
 
-    it('should handle callback returning plain object in legacy mode', async () => {
+    it('should handle callback returning plain object', async () => {
       const nonCriticalData = new Promise(res => setTimeout(() => res('non-critical'), 5000));
       const plainObject = { message: 'Hello from plain object', nonCriticalData };
 
       const result = await rootAuthLoader(args, () => plainObject);
 
-      expect(result).toBeInstanceOf(Response);
       const response = result as unknown as Response;
+
+      expect(result).toBeInstanceOf(Response);
       const json = await response.json();
       expect(json).toHaveProperty('message', 'Hello from plain object');
       expect(json).toHaveProperty('nonCriticalData', {}); // serialized to {}
@@ -162,11 +171,12 @@ describe('rootAuthLoader', () => {
       expect(legacyAuthenticateRequest).toHaveBeenCalled();
     });
 
-    it('should handle callback returning null in legacy mode', async () => {
+    it('should handle callback returning null', async () => {
       const result = await rootAuthLoader(args, () => null);
 
-      expect(result).toBeInstanceOf(Response);
       const response = result as unknown as Response;
+
+      expect(result).toBeInstanceOf(Response);
       const json = await response.json();
       expect(json).toHaveProperty('clerkState');
       expect(legacyAuthenticateRequest).toHaveBeenCalled();
