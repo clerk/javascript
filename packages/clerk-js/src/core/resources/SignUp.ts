@@ -35,6 +35,8 @@ import type {
   Web3Provider,
 } from '@clerk/types';
 
+import { debugLogger } from '@/utils/debug';
+
 import {
   generateSignatureWithBase,
   generateSignatureWithCoinbaseWallet,
@@ -70,10 +72,10 @@ export class SignUp extends BaseResource implements SignUpResource {
   pathRoot = '/client/sign_ups';
 
   id: string | undefined;
-  status: SignUpStatus | null = null;
+  private _status: SignUpStatus | null = null;
   requiredFields: SignUpField[] = [];
-  optionalFields: SignUpField[] = [];
   missingFields: SignUpField[] = [];
+  optionalFields: SignUpField[] = [];
   unverifiedFields: SignUpIdentificationField[] = [];
   verifications: SignUpVerifications = new SignUpVerifications(null);
   username: string | null = null;
@@ -89,6 +91,31 @@ export class SignUp extends BaseResource implements SignUpResource {
   createdUserId: string | null = null;
   abandonAt: number | null = null;
   legalAcceptedAt: number | null = null;
+
+  /**
+   * The current status of the sign-up process.
+   *
+   * @returns The current sign-up status, or null if no status has been set
+   */
+  get status(): SignUpStatus | null {
+    return this._status;
+  }
+
+  /**
+   * Sets the sign-up status and logs the transition at debug level.
+   *
+   * @param value - The new status to set. Can be null to clear the status.
+   * @remarks When setting a new status that differs from the previous one,
+   * a debug log entry is created showing the transition from the old to new status.
+   */
+  set status(value: SignUpStatus | null) {
+    const previousStatus = this._status;
+    this._status = value;
+
+    if (value && previousStatus !== value) {
+      debugLogger.debug('SignUp.status', { id: this.id, from: previousStatus, to: value });
+    }
+  }
 
   /**
    * @experimental This experimental API is subject to change.
@@ -110,8 +137,10 @@ export class SignUp extends BaseResource implements SignUpResource {
     this.fromJSON(data);
   }
 
-  create = async (_params: SignUpCreateParams): Promise<SignUpResource> => {
-    let params: Record<string, unknown> = _params;
+  create = async (params: SignUpCreateParams): Promise<SignUpResource> => {
+    debugLogger.debug('SignUp.create', { id: this.id, strategy: params.strategy });
+
+    let finalParams = { ...params };
 
     if (!__BUILD_DISABLE_RHC__ && !this.clientBypass() && !this.shouldBypassCaptchaForAttempt(params)) {
       const captchaChallenge = new CaptchaChallenge(SignUp.clerk);
@@ -119,20 +148,24 @@ export class SignUp extends BaseResource implements SignUpResource {
       if (!captchaParams) {
         throw new ClerkRuntimeError('', { code: 'captcha_unavailable' });
       }
-      params = { ...params, ...captchaParams };
+      finalParams = { ...finalParams, ...captchaParams };
     }
 
-    if (params.transfer && this.shouldBypassCaptchaForAttempt(params)) {
-      params.strategy = SignUp.clerk.client?.signIn.firstFactorVerification.strategy;
+    if (finalParams.transfer && this.shouldBypassCaptchaForAttempt(finalParams)) {
+      const strategy = SignUp.clerk.client?.signIn.firstFactorVerification.strategy;
+      if (strategy) {
+        finalParams = { ...finalParams, strategy: strategy as SignUpCreateParams['strategy'] };
+      }
     }
 
     return this._basePost({
       path: this.pathRoot,
-      body: normalizeUnsafeMetadata(params),
+      body: normalizeUnsafeMetadata(finalParams),
     });
   };
 
   prepareVerification = (params: PrepareVerificationParams): Promise<this> => {
+    debugLogger.debug('SignUp.prepareVerification', { id: this.id, strategy: params.strategy });
     return this._basePost({
       body: params,
       action: 'prepare_verification',
@@ -140,6 +173,7 @@ export class SignUp extends BaseResource implements SignUpResource {
   };
 
   attemptVerification = (params: AttemptVerificationParams): Promise<SignUpResource> => {
+    debugLogger.debug('SignUp.attemptVerification', { id: this.id, strategy: params.strategy });
     return this._basePost({
       body: params,
       action: 'attempt_verification',
