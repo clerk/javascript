@@ -47,20 +47,20 @@ export interface SignUpFutureResource {
   /**
    * The status of the current sign-up attempt as a string (for example, `'missing_requirements'`, `'complete'`, `'abandoned'`, etc.)
    */
-  status: SignUpStatus | null;
+  readonly status: SignUpStatus | null;
 
   /**
    * An array of strings representing unverified fields such as `’email_address’`. Can be used to detect when verification is necessary.
    */
-  unverifiedFields: SignUpIdentificationField[];
+  readonly unverifiedFields: SignUpIdentificationField[];
 
   /**
    * Indicates that there is a matching user for provided identifier, and that the sign-up can be transferred to
    * a sign-in.
    */
-  isTransferable: boolean;
+  readonly isTransferable: boolean;
 
-  existingSession?: { sessionId: string };
+  readonly existingSession?: { sessionId: string };
 
   create: (params: SignUpFutureCreateParams) => Promise<{ error: unknown }>;
 

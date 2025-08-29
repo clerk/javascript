@@ -74,21 +74,21 @@ export interface SignInFutureResource {
   /**
    * The list of first-factor strategies that are available for the current sign-in attempt.
    */
-  availableStrategies: SignInFirstFactor[];
+  readonly availableStrategies: SignInFirstFactor[];
 
   /**
    * The status of the current sign-in attempt as a string (for example, `'needs_identifier'`, `'needs_first_factor'`,
    * `'complete'`, etc.)
    */
-  status: SignInStatus | null;
+  readonly status: SignInStatus | null;
 
   /**
    * Indicates that there is not a matching user for the first-factor verification used, and that the sign-in can be
    * transferred to a sign-up.
    */
-  isTransferable: boolean;
+  readonly isTransferable: boolean;
 
-  existingSession?: { sessionId: string };
+  readonly existingSession?: { sessionId: string };
 
   /**
    * Used to supply an identifier for the sign-in attempt. Calling this method will populate data on the sign-in
