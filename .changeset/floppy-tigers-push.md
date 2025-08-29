@@ -9,7 +9,7 @@ You can specify which token types are allowed by using the `acceptsToken` option
 Example usage:
 
 ```ts
-export function GET({ locals }) {
+export const GET: APIRoute = ({ locals }) => {
   const authObject = locals.auth({ acceptsToken: 'any' })
 
   if (authObject.tokenType === 'session_token') {
