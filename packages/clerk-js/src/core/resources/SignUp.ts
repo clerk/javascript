@@ -561,21 +561,30 @@ class SignUpFuture implements SignUpFutureResource {
   }
 
   async password(params: SignUpFuturePasswordParams): Promise<{ error: unknown }> {
-    const { emailAddress, password } = params;
+    if ([params.emailAddress, params.phoneNumber].filter(Boolean).length > 1) {
+      throw new Error('Only one of emailAddress or phoneNumber can be provided');
+    }
+
     return runAsyncResourceTask(this.resource, async () => {
       const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
 
-      await this.resource.__internal_basePost({
-        path: this.resource.pathRoot,
-        body: {
-          strategy: 'password',
-          emailAddress,
-          password,
-          captchaToken,
-          captchaWidgetType,
-          captchaError,
-        },
-      });
+      const body: Record<string, unknown> = {
+        strategy: 'password',
+        password: params.password,
+        captchaToken,
+        captchaWidgetType,
+        captchaError,
+      };
+
+      if (params.phoneNumber) {
+        body.phoneNumber = params.phoneNumber;
+      }
+
+      if (params.emailAddress) {
+        body.emailAddress = params.emailAddress;
+      }
+
+      await this.resource.__internal_basePost({ path: this.resource.pathRoot, body });
     });
   }
 
