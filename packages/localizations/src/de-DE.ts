@@ -1308,7 +1308,8 @@ export const deDE: LocalizationResource = {
       title: 'Warteliste beitreten',
     },
     success: {
-      message: 'Sie wurden erfolgreich auf die Warteliste gesetzt. Wir benachrichtigen Sie, sobald der Zugang freigegeben wird.',
+      message:
+        'Sie wurden erfolgreich auf die Warteliste gesetzt. Wir benachrichtigen Sie, sobald der Zugang freigegeben wird.',
       subtitle: 'Vielen Dank für Ihre Geduld. Sie erhalten eine Benachrichtigung, sobald der Zugang freigegeben wird.',
       title: 'Erfolgreich auf die Warteliste gesetzt',
     },
