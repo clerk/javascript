@@ -62,10 +62,10 @@ export const createGetAuth = ({ noAuthStatusMessage }: { noAuthStatusMessage: st
       return invalidTokenAuthObject();
     }
 
+    // Handle session tokens
     if (authStatus !== AuthStatus.SignedIn) {
       return signedOutAuthObject(options);
     }
-
     return getAuthObjectFromJwt(decodeJwt(authToken as string), { ...options, treatPendingAsSignedOut });
   };
 
@@ -84,6 +84,7 @@ const handleMachineToken = (
     acceptsToken === TokenType.SessionToken ||
     (Array.isArray(acceptsToken) && acceptsToken.length === 1 && acceptsToken[0] === TokenType.SessionToken);
 
+  // Reconstruct machine auth object here since edge middleware serializes auth object
   if (hasMachineToken && rawAuthObject && !acceptsOnlySessionToken) {
     const authObject = getAuthObjectForAcceptedToken({
       authObject: {
