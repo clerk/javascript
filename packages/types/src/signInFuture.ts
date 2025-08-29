@@ -11,10 +11,25 @@ export interface SignInFutureCreateParams {
   transfer?: boolean;
 }
 
-export interface SignInFuturePasswordParams {
-  identifier?: string;
-  password: string;
-}
+export type SignInFuturePasswordParams =
+  | {
+      identifier: string;
+      password: string;
+      email?: never;
+      phoneNumber?: never;
+    }
+  | {
+      password: string;
+      email: string;
+      identifier?: never;
+      phoneNumber?: never;
+    }
+  | {
+      password: string;
+      phoneNumber: string;
+      identifier?: never;
+      email?: never;
+    };
 
 export interface SignInFutureEmailCodeSendParams {
   email: string;
