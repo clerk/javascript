@@ -21,12 +21,10 @@ export const createGetAuth = ({ noAuthStatusMessage }: { noAuthStatusMessage: st
   const getAuth = (
     req: Request,
     locals: APIContext['locals'],
-    {
-      treatPendingAsSignedOut = true,
-      acceptsToken = TokenType.SessionToken,
-      ...opts
-    }: { secretKey?: string } & PendingSessionOptions & Pick<AuthenticateRequestOptions, 'acceptsToken'> = {},
+    opts: { secretKey?: string } & PendingSessionOptions & Pick<AuthenticateRequestOptions, 'acceptsToken'> = {},
   ): AuthObject => {
+    const { treatPendingAsSignedOut = true, acceptsToken = TokenType.SessionToken } = opts;
+
     // When the auth status is set, we trust that the middleware has already run
     // Then, we don't have to re-verify the JWT here,
     // we can just strip out the claims manually.
