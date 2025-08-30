@@ -7,7 +7,14 @@ import type {
   SignedInAuthObject,
   SignedOutAuthObject,
 } from '@clerk/backend/internal';
-import { AuthStatus, constants, createClerkRequest, createRedirect, TokenType } from '@clerk/backend/internal';
+import {
+  AuthStatus,
+  constants,
+  createClerkRequest,
+  createRedirect,
+  signedOutAuthObject,
+  TokenType,
+} from '@clerk/backend/internal';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
 import { isHttpOrHttps } from '@clerk/shared/proxy';
@@ -106,7 +113,9 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
      * ALS is crucial for guaranteeing SSR in UI frameworks like React.
      * This currently powers the `useAuth()` React hook and any other hook or Component that depends on it.
      */
-    return authAsyncStorage.run(context.locals.auth(), async () => {
+    const asyncAuthObject =
+      authObject.tokenType === TokenType.SessionToken ? context.locals.auth() : signedOutAuthObject({});
+    return authAsyncStorage.run(asyncAuthObject, async () => {
       /**
        * Generate SSR page
        */
