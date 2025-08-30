@@ -99,14 +99,12 @@ const middlewareMigrationExample = `In the next major release, an error will be 
 
 Example:
 
-import { clerkMiddleware, rootAuthLoader } from '@clerk/react-router/ssr.server'
+import { clerkMiddleware, rootAuthLoader } from '@clerk/react-router/server'
 import { ClerkProvider } from '@clerk/react-router'
 
 export const middleware: Route.MiddlewareFunction[] = [clerkMiddleware()]
 
-export async function loader(args: Route.LoaderArgs) {
-  return rootAuthLoader(args)
-}
+export const loader = (args: Route.LoaderArgs) => rootAuthLoader(args)
 
 export default function App({ loaderData }: Route.ComponentProps) {
   return (
