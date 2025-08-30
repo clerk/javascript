@@ -1,5 +1,5 @@
-export * from './rootAuthLoader';
-export * from './getAuth';
+export { rootAuthLoader } from '../server/rootAuthLoader';
+export { getAuth } from '../server/getAuth';
 
 /**
  * Re-export resource types from @clerk/backend

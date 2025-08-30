@@ -1,12 +1,12 @@
-import { createClerkClient } from '@clerk/backend';
 import type { AuthenticateRequestOptions, SignedInState, SignedOutState } from '@clerk/backend/internal';
 import { AuthStatus, constants } from '@clerk/backend/internal';
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
 import type { LoaderFunctionArgs } from 'react-router';
 
+import { clerkClient } from './clerkClient';
 import { patchRequest } from './utils';
 
-export async function authenticateRequest(
+export async function legacyAuthenticateRequest(
   args: LoaderFunctionArgs,
   opts: AuthenticateRequestOptions,
 ): Promise<SignedInState | SignedOutState> {
@@ -16,7 +16,7 @@ export async function authenticateRequest(
   const { apiUrl, secretKey, jwtKey, proxyUrl, isSatellite, domain, publishableKey, machineSecretKey } = opts;
   const { signInUrl, signUpUrl, afterSignInUrl, afterSignUpUrl } = opts;
 
-  const requestState = await createClerkClient({
+  const requestState = await clerkClient(args).authenticateRequest(patchRequest(request), {
     apiUrl,
     secretKey,
     jwtKey,
@@ -25,8 +25,6 @@ export async function authenticateRequest(
     domain,
     publishableKey,
     machineSecretKey,
-    userAgent: `${PACKAGE_NAME}@${PACKAGE_VERSION}`,
-  }).authenticateRequest(patchRequest(request), {
     audience,
     authorizedParties,
     signInUrl,
