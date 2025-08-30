@@ -29,8 +29,8 @@ test.describe('Astro machine authentication @machine', () => {
                 status: 401,
             });
 
-        export const GET: APIRoute = async ({ locals }) => {
-            const { userId, tokenType } = await locals.auth({ acceptsToken: 'api_key' });
+        export const GET: APIRoute = ({ locals }) => {
+            const { userId, tokenType } = locals.auth({ acceptsToken: 'api_key' });
 
             if (!userId) {
                 return unautorized();
