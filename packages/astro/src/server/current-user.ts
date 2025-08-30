@@ -7,7 +7,7 @@ import { getAuth } from './get-auth';
 
 export const createCurrentUser = (req: Request, context: APIContext) => {
   return async (): Promise<User | null> => {
-    const authObject = getAuth(req, context.locals);
+    const authObject = getAuth(req, context.locals, { acceptsToken: TokenType.SessionToken });
 
     if (authObject.tokenType !== TokenType.SessionToken) {
       return null;
