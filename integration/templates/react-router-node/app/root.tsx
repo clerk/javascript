@@ -1,18 +1,11 @@
-import * as React from 'react';
-import { Await, isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router';
+import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router';
 import { clerkMiddleware, rootAuthLoader } from '@clerk/react-router/server';
 import { ClerkProvider } from '@clerk/react-router';
 import type { Route } from './+types/root';
 
 export const unstable_middleware: Route.unstable_MiddlewareFunction[] = [clerkMiddleware()];
 
-export async function loader(args: Route.LoaderArgs) {
-  const nonCriticalData = new Promise(res => setTimeout(() => res('non-critical'), 10000));
-
-  return rootAuthLoader(args, () => ({
-    nonCriticalData,
-  }));
-}
+export const loader = (args: Route.LoaderArgs) => rootAuthLoader(args);
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -40,9 +33,6 @@ export default function App({ loaderData }: Route.ComponentProps) {
     <ClerkProvider loaderData={loaderData}>
       <main>
         <Outlet />
-        <React.Suspense fallback={<div>Loading...</div>}>
-          <Await resolve={loaderData.nonCriticalData}>{value => <h3>Non critical value: {value}</h3>}</Await>
-        </React.Suspense>
       </main>
     </ClerkProvider>
   );

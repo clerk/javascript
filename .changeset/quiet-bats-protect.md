@@ -11,34 +11,26 @@ Usage of `rootAuthLoader` without the `clerkMiddleware()` installed is now depre
 ```tsx
 import { rootAuthLoader } from '@clerk/react-router/ssr.server'
 
-export async function loader(args: Route.LoaderArgs) {
-  return rootAuthLoader(args)
-}
+export const loader = (args: Route.LoaderArgs) => rootAuthLoader(args)
 ```
 
 **After (Recommended):**
 ```tsx
 import { clerkMiddleware, rootAuthLoader } from '@clerk/react-router/server'
 
-export const middleware: Route.MiddlewareFunction[] = [
-  clerkMiddleware()
-]
+export const middleware: Route.MiddlewareFunction[] = [clerkMiddleware()]
 
-export async function loader(args: Route.LoaderArgs) {
-  return rootAuthLoader(args)
-}
+export const loader = (args: Route.LoaderArgs) => rootAuthLoader(args)
 ```
 
 **Streaming Support (with middleware):**
 
 ```tsx
-export const middleware: Route.MiddlewareFunction[] = [
-  clerkMiddleware()
-]
+export const middleware: Route.MiddlewareFunction[] = [clerkMiddleware()]
 
-export async function loader(args: Route.LoaderArgs) {
+export const loader = (args: Route.LoaderArgs) => {
   const nonCriticalData = new Promise((res) =>
-    setTimeout(() => res("non-critical"), 5000),
+    setTimeout(() => res('non-critical'), 5000),
   )
 
   return rootAuthLoader(args, () => ({

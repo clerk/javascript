@@ -1,17 +1,26 @@
+import { TokenType } from '@clerk/backend/internal';
 import { logger } from '@clerk/shared/logger';
 import { data, type LoaderFunctionArgs } from 'react-router';
 import type { MockInstance } from 'vitest';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { middlewareMigrationWarning } from '../../utils/errors';
+import { authFnContext, requestStateContext } from '../clerkMiddleware';
 import { legacyAuthenticateRequest } from '../legacyAuthenticateRequest';
 import { rootAuthLoader } from '../rootAuthLoader';
 
 vi.mock('../legacyAuthenticateRequest', () => {
   return {
     legacyAuthenticateRequest: vi.fn().mockResolvedValue({
-      toAuth: vi.fn().mockReturnValue({ userId: 'user_xxx' }),
-      headers: new Headers(),
+      toAuth: vi.fn().mockImplementation(() => ({
+        userId: 'user_xxx',
+        tokenType: TokenType.SessionToken,
+      })),
+      headers: new Headers({
+        'x-clerk-auth-status': 'signed-in',
+        'x-clerk-auth-reason': 'auth-reason',
+        'x-clerk-auth-message': 'auth-message',
+      }),
       status: 'signed-in',
     }),
   };
@@ -25,8 +34,25 @@ describe('rootAuthLoader', () => {
 
   describe('with middleware context', () => {
     const mockContext = {
-      get: vi.fn().mockReturnValue({
-        toAuth: vi.fn().mockReturnValue({ userId: 'user_xxx' }),
+      get: vi.fn().mockImplementation(contextKey => {
+        if (contextKey === requestStateContext) {
+          return {
+            toAuth: vi.fn().mockImplementation(() => ({
+              userId: 'user_xxx',
+              tokenType: TokenType.SessionToken,
+            })),
+            headers: new Headers(),
+            status: 'signed-in',
+          };
+        }
+        if (contextKey === authFnContext) {
+          return vi.fn().mockImplementation((options?: any) => ({
+            userId: 'user_xxx',
+            tokenType: TokenType.SessionToken,
+            ...options,
+          }));
+        }
+        return null;
       }),
       set: vi.fn(),
     };
@@ -47,7 +73,7 @@ describe('rootAuthLoader', () => {
       warnOnceSpy.mockRestore();
     });
 
-    it('should handle no callback - returns clerkState only', async () => {
+    it('should handle no callback', async () => {
       const result = await rootAuthLoader(args);
 
       expect(result).toHaveProperty('clerkState');
@@ -59,22 +85,36 @@ describe('rootAuthLoader', () => {
         headers: { 'Content-Type': 'application/json' },
       });
 
-      const result = await rootAuthLoader(args, () => mockResponse);
+      const response = await rootAuthLoader(args, () => mockResponse);
 
-      expect(result).toBeInstanceOf(Response);
-      const json = await result.json();
+      expect(response).toBeInstanceOf(Response);
+      const json = await response.json();
       expect(json).toHaveProperty('message', 'Hello');
       expect(json).toHaveProperty('clerkState');
+
+      // Headers will be set by middleware
+      expect(response.headers.get('x-clerk-auth-reason')).toBeNull();
+      expect(response.headers.get('x-clerk-auth-status')).toBeNull();
+      expect(response.headers.get('x-clerk-auth-message')).toBeNull();
+
       expect(legacyAuthenticateRequest).not.toHaveBeenCalled();
     });
 
-    it('should handle callback returning data() format', async () => {
+    it('should handle callback returning data()', async () => {
       const result = await rootAuthLoader(args, () => data({ message: 'Hello from data()' }));
 
       const response = result as unknown as Response;
 
-      expect(result).toBeInstanceOf(Response);
-      expect(await response.json()).toHaveProperty('message', 'Hello from data()');
+      expect(response).toBeInstanceOf(Response);
+      const json = await response.json();
+      expect(json).toHaveProperty('message', 'Hello from data()');
+      expect(json).toHaveProperty('clerkState');
+
+      // Headers will be set by middleware
+      expect(response.headers.get('x-clerk-auth-reason')).toBeNull();
+      expect(response.headers.get('x-clerk-auth-status')).toBeNull();
+      expect(response.headers.get('x-clerk-auth-message')).toBeNull();
+
       expect(legacyAuthenticateRequest).not.toHaveBeenCalled();
     });
 
@@ -87,6 +127,7 @@ describe('rootAuthLoader', () => {
       expect(result).toHaveProperty('message', 'Hello from plain object');
       expect(result).toHaveProperty('nonCriticalData', nonCriticalData);
       expect(result).toHaveProperty('clerkState');
+
       expect(legacyAuthenticateRequest).not.toHaveBeenCalled();
     });
 
@@ -98,7 +139,7 @@ describe('rootAuthLoader', () => {
     });
   });
 
-  describe('without middleware context (legacy path)', () => {
+  describe('without middleware context', () => {
     const mockContext = {
       get: vi.fn().mockReturnValue(null),
     };
@@ -133,6 +174,10 @@ describe('rootAuthLoader', () => {
       expect(result).toBeInstanceOf(Response);
       expect(await response.json()).toHaveProperty('clerkState');
       expect(legacyAuthenticateRequest).toHaveBeenCalled();
+
+      expect(response.headers.get('x-clerk-auth-reason')).toBe('auth-reason');
+      expect(response.headers.get('x-clerk-auth-status')).toBe('signed-in');
+      expect(response.headers.get('x-clerk-auth-message')).toBe('auth-message');
     });
 
     it('should handle callback returning Response', async () => {
@@ -142,6 +187,11 @@ describe('rootAuthLoader', () => {
 
       expect(response).toBeInstanceOf(Response);
       expect(await response.json()).toHaveProperty('clerkState');
+
+      expect(response.headers.get('x-clerk-auth-reason')).toBe('auth-reason');
+      expect(response.headers.get('x-clerk-auth-status')).toBe('signed-in');
+      expect(response.headers.get('x-clerk-auth-message')).toBe('auth-message');
+
       expect(legacyAuthenticateRequest).toHaveBeenCalled();
     });
 
@@ -151,7 +201,14 @@ describe('rootAuthLoader', () => {
       const response = result as unknown as Response;
 
       expect(response).toBeInstanceOf(Response);
-      expect(await response.json()).toHaveProperty('clerkState');
+      const json = await response.json();
+      expect(json).toHaveProperty('message', 'Hello from data()');
+      expect(json).toHaveProperty('clerkState');
+
+      expect(response.headers.get('x-clerk-auth-reason')).toBe('auth-reason');
+      expect(response.headers.get('x-clerk-auth-status')).toBe('signed-in');
+      expect(response.headers.get('x-clerk-auth-message')).toBe('auth-message');
+
       expect(legacyAuthenticateRequest).toHaveBeenCalled();
     });
 
@@ -168,6 +225,11 @@ describe('rootAuthLoader', () => {
       expect(json).toHaveProperty('message', 'Hello from plain object');
       expect(json).toHaveProperty('nonCriticalData', {}); // serialized to {}
       expect(json).toHaveProperty('clerkState');
+
+      expect(response.headers.get('x-clerk-auth-reason')).toBe('auth-reason');
+      expect(response.headers.get('x-clerk-auth-status')).toBe('signed-in');
+      expect(response.headers.get('x-clerk-auth-message')).toBe('auth-message');
+
       expect(legacyAuthenticateRequest).toHaveBeenCalled();
     });
 
@@ -177,8 +239,12 @@ describe('rootAuthLoader', () => {
       const response = result as unknown as Response;
 
       expect(result).toBeInstanceOf(Response);
-      const json = await response.json();
-      expect(json).toHaveProperty('clerkState');
+      expect(await response.json()).toHaveProperty('clerkState');
+
+      expect(response.headers.get('x-clerk-auth-reason')).toBe('auth-reason');
+      expect(response.headers.get('x-clerk-auth-status')).toBe('signed-in');
+      expect(response.headers.get('x-clerk-auth-message')).toBe('auth-message');
+
       expect(legacyAuthenticateRequest).toHaveBeenCalled();
     });
   });

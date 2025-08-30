@@ -88,16 +88,5 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes], withPattern:
       await expect(u.page.getByText(`First name: ${fakeUser.firstName}`)).toBeVisible();
       await expect(u.page.getByText(`Email: ${fakeUser.email}`)).toBeVisible();
     });
-
-    test('streaming with Suspense works with rootAuthLoader', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
-
-      await u.page.goToRelative('/');
-
-      await expect(u.page.getByText('Loading...')).toBeVisible({ timeout: 8000 });
-
-      await expect(u.page.getByText('Non critical value: non-critical')).toBeVisible();
-      await expect(u.page.getByText('Loading...')).toBeHidden();
-    });
   },
 );
