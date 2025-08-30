@@ -35,7 +35,7 @@ type SessionAuthObjectWithRedirect = SessionAuthObject & {
 export interface AuthFn {
   /**
    * @example
-   * const auth = await context.locals.auth({ acceptsToken: ['session_token', 'api_key'] })
+   * const auth = context.locals.auth({ acceptsToken: ['session_token', 'api_key'] })
    */
   <T extends TokenType[]>(
     options: AuthOptions & { acceptsToken: T },
@@ -49,7 +49,7 @@ export interface AuthFn {
 
   /**
    * @example
-   * const auth = await context.locals.auth({ acceptsToken: 'session_token' })
+   * const auth = context.locals.auth({ acceptsToken: 'session_token' })
    */
   <T extends TokenType>(
     options: AuthOptions & { acceptsToken: T },
@@ -57,13 +57,13 @@ export interface AuthFn {
 
   /**
    * @example
-   * const auth = await context.locals.auth({ acceptsToken: 'any' })
+   * const auth = context.locals.auth({ acceptsToken: 'any' })
    */
   (options: AuthOptions & { acceptsToken: 'any' }): AuthObject;
 
   /**
    * @example
-   * const auth = await context.locals.auth()
+   * const auth = context.locals.auth()
    */
   (options?: PendingSessionOptions): SessionAuthObjectWithRedirect;
 }
