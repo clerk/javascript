@@ -6,9 +6,8 @@ declare namespace App {
     authStatus: string;
     authMessage: string | null;
     authReason: string | null;
-    auth: () => import('@clerk/astro/server').GetAuthReturn & {
-      redirectToSignIn: import('@clerk/backend/internal').RedirectFun<Response>;
-    };
+    __internal_authObject: import('@clerk/astro/server').AuthObject;
+    auth: import('@clerk/astro/server').AuthFn;
     currentUser: () => Promise<import('@clerk/astro/server').User | null>;
   }
 }

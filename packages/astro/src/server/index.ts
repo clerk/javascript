@@ -38,4 +38,4 @@ export { clerkClient } from './clerk-client';
 /**
  * This will be used to define types of Astro.Locals inside `env.d.ts`
  */
-export type { GetAuthReturn } from './get-auth';
+export type { AuthFn } from './types';

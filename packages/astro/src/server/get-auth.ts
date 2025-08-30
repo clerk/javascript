@@ -1,5 +1,15 @@
-import type { SignedInAuthObject, SignedOutAuthObject } from '@clerk/backend/internal';
-import { AuthStatus, getAuthObjectFromJwt, signedOutAuthObject } from '@clerk/backend/internal';
+import type { AuthObject, MachineAuthObject } from '@clerk/backend';
+import type { AuthenticateRequestOptions, MachineTokenType } from '@clerk/backend/internal';
+import {
+  AuthStatus,
+  constants,
+  getAuthObjectForAcceptedToken,
+  getAuthObjectFromJwt,
+  invalidTokenAuthObject,
+  isMachineTokenByPrefix,
+  signedOutAuthObject,
+  TokenType,
+} from '@clerk/backend/internal';
 import { decodeJwt } from '@clerk/backend/jwt';
 import type { PendingSessionOptions } from '@clerk/types';
 import type { APIContext } from 'astro';
@@ -7,14 +17,14 @@ import type { APIContext } from 'astro';
 import { getSafeEnv } from './get-safe-env';
 import { getAuthKeyFromRequest } from './utils';
 
-export type GetAuthReturn = SignedInAuthObject | SignedOutAuthObject;
-
 export const createGetAuth = ({ noAuthStatusMessage }: { noAuthStatusMessage: string }) => {
-  return (
+  const getAuth = (
     req: Request,
     locals: APIContext['locals'],
-    { treatPendingAsSignedOut = true, ...opts }: { secretKey?: string } & PendingSessionOptions = {},
-  ): GetAuthReturn => {
+    opts: { secretKey?: string } & PendingSessionOptions & Pick<AuthenticateRequestOptions, 'acceptsToken'> = {},
+  ): AuthObject => {
+    const { treatPendingAsSignedOut = true, acceptsToken = TokenType.SessionToken } = opts;
+
     // When the auth status is set, we trust that the middleware has already run
     // Then, we don't have to re-verify the JWT here,
     // we can just strip out the claims manually.
@@ -36,12 +46,58 @@ export const createGetAuth = ({ noAuthStatusMessage }: { noAuthStatusMessage: st
       authReason,
     };
 
+    // Handle machine tokens first (from raw auth object)
+    const bearerToken = req.headers.get(constants.Headers.Authorization)?.replace('Bearer ', '');
+    const machineAuthObject = handleMachineToken(bearerToken, locals.__internal_authObject, acceptsToken, options);
+    if (machineAuthObject) {
+      return machineAuthObject;
+    }
+
+    // If a random token is present and acceptsToken is an array that does NOT include session_token,
+    // return invalid token auth object.
+    if (bearerToken && Array.isArray(acceptsToken) && !acceptsToken.includes(TokenType.SessionToken)) {
+      return invalidTokenAuthObject();
+    }
+
+    // Handle session tokens
     if (authStatus !== AuthStatus.SignedIn) {
       return signedOutAuthObject(options);
     }
-
     return getAuthObjectFromJwt(decodeJwt(authToken as string), { ...options, treatPendingAsSignedOut });
   };
+
+  return getAuth;
+};
+
+const handleMachineToken = (
+  bearerToken: string | undefined,
+  rawAuthObject: AuthObject | undefined,
+  acceptsToken: NonNullable<AuthenticateRequestOptions['acceptsToken']>,
+  options: Record<string, any>,
+): MachineAuthObject<MachineTokenType> | null => {
+  const hasMachineToken = bearerToken && isMachineTokenByPrefix(bearerToken);
+
+  const acceptsOnlySessionToken =
+    acceptsToken === TokenType.SessionToken ||
+    (Array.isArray(acceptsToken) && acceptsToken.length === 1 && acceptsToken[0] === TokenType.SessionToken);
+
+  // Reconstruct machine auth object here since edge middleware serializes auth object
+  if (hasMachineToken && rawAuthObject && !acceptsOnlySessionToken) {
+    const authObject = getAuthObjectForAcceptedToken({
+      authObject: {
+        ...rawAuthObject,
+        debug: () => options,
+      },
+      acceptsToken,
+    });
+    return {
+      ...authObject,
+      getToken: () => (authObject.isAuthenticated ? Promise.resolve(bearerToken) : Promise.resolve(null)),
+      has: () => false,
+    } as MachineAuthObject<MachineTokenType>;
+  }
+
+  return null;
 };
 
 // TODO: Once docs for astro land, update the following message with this line
