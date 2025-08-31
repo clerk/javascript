@@ -54,6 +54,11 @@
       "types": "./dist/types/experimental.d.ts",
       "import": "./dist/esm/experimental.js",
       "require": "./dist/cjs/experimental.js"
+    },
+    "./static": {
+      "types": "./dist/types/static.d.ts",
+      "import": "./dist/esm/static.js",
+      "require": "./dist/cjs/static.js"
     }
   },
   "types": "./dist/types/index.d.ts",
@@ -61,7 +66,8 @@
     "dist",
     "server",
     "errors",
-    "webhooks"
+    "webhooks",
+    "static"
   ],
   "scripts": {
     "build": "pnpm clean && tsup",
