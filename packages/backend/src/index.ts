@@ -119,6 +119,7 @@ export type {
   Domain,
   EmailAddress,
   ExternalAccount,
+  Feature,
   Instance,
   InstanceRestrictions,
   InstanceSettings,

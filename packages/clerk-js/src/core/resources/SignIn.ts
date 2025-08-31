@@ -27,16 +27,19 @@ import type {
   SamlConfig,
   SignInCreateParams,
   SignInFirstFactor,
+  SignInFutureBackupCodeVerifyParams,
   SignInFutureCreateParams,
   SignInFutureEmailCodeSendParams,
   SignInFutureEmailCodeVerifyParams,
   SignInFutureFinalizeParams,
+  SignInFutureMFAPhoneCodeVerifyParams,
   SignInFuturePasswordParams,
   SignInFuturePhoneCodeSendParams,
   SignInFuturePhoneCodeVerifyParams,
   SignInFutureResetPasswordSubmitParams,
   SignInFutureResource,
   SignInFutureSSOParams,
+  SignInFutureTOTPVerifyParams,
   SignInIdentifier,
   SignInJSON,
   SignInJSONSnapshot,
@@ -49,6 +52,8 @@ import type {
   Web3SignatureConfig,
   Web3SignatureFactor,
 } from '@clerk/types';
+
+import { debugLogger } from '@/utils/debug';
 
 import {
   generateSignatureWithBase,
@@ -85,7 +90,7 @@ export class SignIn extends BaseResource implements SignInResource {
   pathRoot = '/client/sign_ins';
 
   id?: string;
-  status: SignInStatus | null = null;
+  private _status: SignInStatus | null = null;
   supportedIdentifiers: SignInIdentifier[] = [];
   supportedFirstFactors: SignInFirstFactor[] | null = [];
   supportedSecondFactors: SignInSecondFactor[] | null = null;
@@ -94,6 +99,31 @@ export class SignIn extends BaseResource implements SignInResource {
   identifier: string | null = null;
   createdSessionId: string | null = null;
   userData: UserData = new UserData(null);
+
+  /**
+   * The current status of the sign-in process.
+   *
+   * @returns The current sign-in status, or null if no status has been set
+   */
+  get status(): SignInStatus | null {
+    return this._status;
+  }
+
+  /**
+   * Sets the sign-in status and logs the transition at debug level.
+   *
+   * @param value - The new status to set. Can be null to clear the status.
+   * @remarks When setting a new status that differs from the previous one,
+   * a debug log entry is created showing the transition from the old to new status.
+   */
+  set status(value: SignInStatus | null) {
+    const previousStatus = this._status;
+    this._status = value;
+
+    if (value && previousStatus !== value) {
+      debugLogger.debug('SignIn.status', { id: this.id, from: previousStatus, to: value });
+    }
+  }
 
   /**
    * @experimental This experimental API is subject to change.
@@ -115,7 +145,8 @@ export class SignIn extends BaseResource implements SignInResource {
     this.fromJSON(data);
   }
 
-  create = (params: SignInCreateParams): Promise<this> => {
+  create = (params: SignInCreateParams): Promise<SignInResource> => {
+    debugLogger.debug('SignIn.create', { id: this.id, strategy: 'strategy' in params ? params.strategy : undefined });
     return this._basePost({
       path: this.pathRoot,
       body: params,
@@ -129,76 +160,78 @@ export class SignIn extends BaseResource implements SignInResource {
     });
   };
 
-  prepareFirstFactor = (factor: PrepareFirstFactorParams): Promise<SignInResource> => {
+  prepareFirstFactor = (params: PrepareFirstFactorParams): Promise<SignInResource> => {
+    debugLogger.debug('SignIn.prepareFirstFactor', { id: this.id, strategy: params.strategy });
     let config;
-    switch (factor.strategy) {
+    switch (params.strategy) {
       case 'passkey':
         config = {} as PassKeyConfig;
         break;
       case 'email_link':
         config = {
-          emailAddressId: factor.emailAddressId,
-          redirectUrl: factor.redirectUrl,
+          emailAddressId: params.emailAddressId,
+          redirectUrl: params.redirectUrl,
         } as EmailLinkConfig;
         break;
       case 'email_code':
-        config = { emailAddressId: factor.emailAddressId } as EmailCodeConfig;
+        config = { emailAddressId: params.emailAddressId } as EmailCodeConfig;
         break;
       case 'phone_code':
         config = {
-          phoneNumberId: factor.phoneNumberId,
-          default: factor.default,
-          channel: factor.channel,
+          phoneNumberId: params.phoneNumberId,
+          default: params.default,
+          channel: params.channel,
         } as PhoneCodeConfig;
         break;
       case 'web3_metamask_signature':
       case 'web3_base_signature':
       case 'web3_coinbase_wallet_signature':
       case 'web3_okx_wallet_signature':
-        config = { web3WalletId: factor.web3WalletId } as Web3SignatureConfig;
+        config = { web3WalletId: params.web3WalletId } as Web3SignatureConfig;
         break;
       case 'reset_password_phone_code':
-        config = { phoneNumberId: factor.phoneNumberId } as ResetPasswordPhoneCodeFactorConfig;
+        config = { phoneNumberId: params.phoneNumberId } as ResetPasswordPhoneCodeFactorConfig;
         break;
       case 'reset_password_email_code':
-        config = { emailAddressId: factor.emailAddressId } as ResetPasswordEmailCodeFactorConfig;
+        config = { emailAddressId: params.emailAddressId } as ResetPasswordEmailCodeFactorConfig;
         break;
       case 'saml':
         config = {
-          redirectUrl: factor.redirectUrl,
-          actionCompleteRedirectUrl: factor.actionCompleteRedirectUrl,
+          redirectUrl: params.redirectUrl,
+          actionCompleteRedirectUrl: params.actionCompleteRedirectUrl,
         } as SamlConfig;
         break;
       case 'enterprise_sso':
         config = {
-          redirectUrl: factor.redirectUrl,
-          actionCompleteRedirectUrl: factor.actionCompleteRedirectUrl,
-          oidcPrompt: factor.oidcPrompt,
+          redirectUrl: params.redirectUrl,
+          actionCompleteRedirectUrl: params.actionCompleteRedirectUrl,
+          oidcPrompt: params.oidcPrompt,
         } as EnterpriseSSOConfig;
         break;
       default:
-        clerkInvalidStrategy('SignIn.prepareFirstFactor', factor.strategy);
+        clerkInvalidStrategy('SignIn.prepareFirstFactor', params.strategy);
     }
     return this._basePost({
-      body: { ...config, strategy: factor.strategy },
+      body: { ...config, strategy: params.strategy },
       action: 'prepare_first_factor',
     });
   };
 
-  attemptFirstFactor = (attemptFactor: AttemptFirstFactorParams): Promise<SignInResource> => {
+  attemptFirstFactor = (params: AttemptFirstFactorParams): Promise<SignInResource> => {
+    debugLogger.debug('SignIn.attemptFirstFactor', { id: this.id, strategy: params.strategy });
     let config;
-    switch (attemptFactor.strategy) {
+    switch (params.strategy) {
       case 'passkey':
         config = {
-          publicKeyCredential: JSON.stringify(serializePublicKeyCredentialAssertion(attemptFactor.publicKeyCredential)),
+          publicKeyCredential: JSON.stringify(serializePublicKeyCredentialAssertion(params.publicKeyCredential)),
         };
         break;
       default:
-        config = { ...attemptFactor };
+        config = { ...params };
     }
 
     return this._basePost({
-      body: { ...config, strategy: attemptFactor.strategy },
+      body: { ...config, strategy: params.strategy },
       action: 'attempt_first_factor',
     });
   };
@@ -240,6 +273,7 @@ export class SignIn extends BaseResource implements SignInResource {
   };
 
   prepareSecondFactor = (params: PrepareSecondFactorParams): Promise<SignInResource> => {
+    debugLogger.debug('SignIn.prepareSecondFactor', { id: this.id, strategy: params.strategy });
     return this._basePost({
       body: params,
       action: 'prepare_second_factor',
@@ -247,6 +281,7 @@ export class SignIn extends BaseResource implements SignInResource {
   };
 
   attemptSecondFactor = (params: AttemptSecondFactorParams): Promise<SignInResource> => {
+    debugLogger.debug('SignIn.attemptSecondFactor', { id: this.id, strategy: params.strategy });
     return this._basePost({
       body: params,
       action: 'attempt_second_factor',
@@ -515,6 +550,13 @@ class SignInFuture implements SignInFutureResource {
     verifyCode: this.verifyPhoneCode.bind(this),
   };
 
+  mfa = {
+    sendPhoneCode: this.sendMFAPhoneCode.bind(this),
+    verifyPhoneCode: this.verifyMFAPhoneCode.bind(this),
+    verifyTOTP: this.verifyTOTP.bind(this),
+    verifyBackupCode: this.verifyBackupCode.bind(this),
+  };
+
   constructor(readonly resource: SignIn) {}
 
   get status() {
@@ -685,6 +727,52 @@ class SignInFuture implements SignInFutureResource {
       if (status === 'unverified' && externalVerificationRedirectURL) {
         windowNavigate(externalVerificationRedirectURL);
       }
+    });
+  }
+
+  async sendMFAPhoneCode(): Promise<{ error: unknown }> {
+    return runAsyncResourceTask(this.resource, async () => {
+      const phoneCodeFactor = this.resource.supportedSecondFactors?.find(f => f.strategy === 'phone_code');
+
+      if (!phoneCodeFactor) {
+        throw new Error('Phone code factor not found');
+      }
+
+      const { phoneNumberId } = phoneCodeFactor;
+      await this.resource.__internal_basePost({
+        body: { phoneNumberId, strategy: 'phone_code' },
+        action: 'prepare_second_factor',
+      });
+    });
+  }
+
+  async verifyMFAPhoneCode(params: SignInFutureMFAPhoneCodeVerifyParams): Promise<{ error: unknown }> {
+    const { code } = params;
+    return runAsyncResourceTask(this.resource, async () => {
+      await this.resource.__internal_basePost({
+        body: { code, strategy: 'phone_code' },
+        action: 'attempt_second_factor',
+      });
+    });
+  }
+
+  async verifyTOTP(params: SignInFutureTOTPVerifyParams): Promise<{ error: unknown }> {
+    const { code } = params;
+    return runAsyncResourceTask(this.resource, async () => {
+      await this.resource.__internal_basePost({
+        body: { code, strategy: 'totp' },
+        action: 'attempt_second_factor',
+      });
+    });
+  }
+
+  async verifyBackupCode(params: SignInFutureBackupCodeVerifyParams): Promise<{ error: unknown }> {
+    const { code } = params;
+    return runAsyncResourceTask(this.resource, async () => {
+      await this.resource.__internal_basePost({
+        body: { code, strategy: 'backup_code' },
+        action: 'attempt_second_factor',
+      });
     });
   }
 

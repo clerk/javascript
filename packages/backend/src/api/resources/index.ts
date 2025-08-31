@@ -60,6 +60,7 @@ export * from './Web3Wallet';
 export * from './CommercePlan';
 export * from './CommerceSubscription';
 export * from './CommerceSubscriptionItem';
+export * from './Feature';
 
 export type {
   EmailWebhookEvent,
