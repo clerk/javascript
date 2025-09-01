@@ -26,8 +26,9 @@ import type { PhoneCodeChannel } from './phoneCodeChannel';
 import type { SamlIdpSlug } from './saml';
 import type { SessionStatus, SessionTask } from './session';
 import type { SessionVerificationLevel, SessionVerificationStatus } from './sessionVerification';
-import type { SignInFirstFactor, SignInJSON, SignInSecondFactor } from './signIn';
-import type { SignUpField, SignUpIdentificationField, SignUpStatus } from './signUp';
+import type { SignInJSON } from './signIn';
+import type { SignInFirstFactor, SignInSecondFactor } from './signInCommon';
+import type { SignUpField, SignUpIdentificationField, SignUpStatus } from './signUpCommon';
 import type { BoxShadow, Color, EmUnit, FontWeight, HexColor } from './theme';
 import type { UserSettingsJSON } from './userSettings';
 import type { CamelToSnake } from './utils';
@@ -665,23 +666,6 @@ export interface CommercePlanJSON extends ClerkResourceJSON {
  * <ClerkProvider clerkJsVersion="x.x.x" />
  * ```
  */
-export interface CommerceProductJSON extends ClerkResourceJSON {
-  object: 'commerce_product';
-  id: string;
-  slug: string;
-  currency: string;
-  is_default: boolean;
-  plans: CommercePlanJSON[];
-}
-
-/**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
- */
 export interface CommercePaymentSourceJSON extends ClerkResourceJSON {
   object: 'commerce_payment_source';
   id: string;
@@ -887,6 +871,33 @@ export interface CommerceCheckoutJSON extends ClerkResourceJSON {
   is_immediate_plan_change: boolean;
   // TODO(@COMMERCE): Remove optional after GA.
   free_trial_ends_at?: number | null;
+  payer: CommercePayerJSON;
+}
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+ * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+ * @example
+ * ```tsx
+ * <ClerkProvider clerkJsVersion="x.x.x" />
+ * ```
+ */
+export interface CommercePayerJSON extends ClerkResourceJSON {
+  object: 'commerce_payer';
+  id: string;
+  created_at: number;
+  updated_at: number;
+  image_url: string | null;
+
+  // User attributes
+  user_id?: string;
+  email?: string;
+  first_name?: string;
+  last_name?: string;
+
+  // Organization attributes
+  organization_id?: string;
+  organization_name?: string;
 }
 
 export interface ApiKeyJSON extends ClerkResourceJSON {

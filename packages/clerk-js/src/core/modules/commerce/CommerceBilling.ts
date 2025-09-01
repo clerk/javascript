@@ -154,6 +154,6 @@ export class CommerceBilling implements CommerceBillingNamespace {
       })
     )?.response as unknown as CommerceCheckoutJSON;
 
-    return new CommerceCheckout(json, orgId);
+    return new CommerceCheckout(json);
   };
 }

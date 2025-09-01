@@ -1,4 +1,5 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
+import { snakeToCamel } from '@clerk/shared/underscore';
 import type { Errors, SignInSignal, SignUpSignal } from '@clerk/types';
 import { computed, signal } from 'alien-signals';
 
@@ -69,44 +70,12 @@ function errorsToParsedErrors(error: unknown): Errors {
 
   error.errors.forEach(error => {
     if ('meta' in error && error.meta && 'paramName' in error.meta) {
-      switch (error.meta.paramName) {
-        case 'first_name':
-          parsedErrors.fields.firstName = error;
-          break;
-        case 'last_name':
-          parsedErrors.fields.lastName = error;
-          break;
-        case 'email_address':
-          parsedErrors.fields.emailAddress = error;
-          break;
-        case 'identifier':
-          parsedErrors.fields.identifier = error;
-          break;
-        case 'phone_number':
-          parsedErrors.fields.phoneNumber = error;
-          break;
-        case 'password':
-          parsedErrors.fields.password = error;
-          break;
-        case 'username':
-          parsedErrors.fields.username = error;
-          break;
-        case 'code':
-          parsedErrors.fields.code = error;
-          break;
-        case 'captcha':
-          parsedErrors.fields.captcha = error;
-          break;
-        case 'legal_accepted':
-          parsedErrors.fields.legalAccepted = error;
-          break;
-        default:
-          parsedErrors.global.push(error);
-          break;
-      }
-    } else {
-      parsedErrors.global.push(error);
+      const name = snakeToCamel(error.meta.paramName);
+      parsedErrors.fields[name as keyof typeof parsedErrors.fields] = error;
+      return;
     }
+
+    parsedErrors.global.push(error);
   });
 
   return parsedErrors;

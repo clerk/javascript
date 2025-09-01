@@ -120,7 +120,7 @@ export type SDKMetadata = {
 export type ListenerCallback = (emission: Resources) => void;
 export type UnsubscribeCallback = () => void;
 export type BeforeEmitCallback = (session?: SignedInSessionResource | null) => void | Promise<any>;
-export type SetActiveNavigate = ({ session }: { session: SessionResource }) => Promise<unknown>;
+export type SetActiveNavigate = ({ session }: { session: SessionResource }) => void | Promise<unknown>;
 
 export type SignOutCallback = () => void | Promise<any>;
 
@@ -817,6 +817,11 @@ export interface Clerk {
   authenticateWithOKXWallet: (params?: AuthenticateWithOKXWalletParams) => Promise<unknown>;
 
   /**
+   * Authenticates user using Base Account SDK
+   */
+  authenticateWithBase: (params?: AuthenticateWithBaseParams) => Promise<unknown>;
+
+  /**
    * Authenticates user using their Web3 Wallet browser extension
    */
   authenticateWithWeb3: (params: ClerkAuthenticateWithWeb3Params) => Promise<unknown>;
@@ -1073,7 +1078,8 @@ export type ClerkOptions = ClerkOptionsNavigation &
      * Customize the URL paths users are redirected to after sign-in or sign-up when specific
      * session tasks need to be completed.
      *
-     * @default undefined - Uses Clerk's default task flow URLs
+     * When `undefined`, it uses Clerk's default task flow URLs.
+     * @default undefined
      */
     taskUrls?: Record<SessionTask['key'], string>;
   };
@@ -2175,6 +2181,14 @@ export interface AuthenticateWithOKXWalletParams {
 
 export interface AuthenticateWithGoogleOneTapParams {
   token: string;
+  legalAccepted?: boolean;
+}
+
+export interface AuthenticateWithBaseParams {
+  customNavigate?: (to: string) => Promise<unknown>;
+  redirectUrl?: string;
+  signUpContinueUrl?: string;
+  unsafeMetadata?: SignUpUnsafeMetadata;
   legalAccepted?: boolean;
 }
 
