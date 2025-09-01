@@ -26,9 +26,7 @@ const _InvisibleRootBox = React.memo((props: RootBoxProps & { isFlowReady?: bool
       {props.children}
       {showSpan && (
         <span
-          ref={el => {
-            parentRef.current = el ? el.parentElement : parentRef.current;
-          }}
+          ref={el => (parentRef.current = el ? el.parentElement : parentRef.current)}
           aria-hidden
           style={{ display: 'none' }}
         />
