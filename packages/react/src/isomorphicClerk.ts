@@ -11,6 +11,7 @@ import type {
   __internal_UserVerificationProps,
   APIKeysNamespace,
   APIKeysProps,
+  AuthenticateWithBaseParams,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
@@ -45,6 +46,7 @@ import type {
   SignUpResource,
   State,
   TaskChooseOrganizationProps,
+  TasksRedirectOptions,
   UnsubscribeCallback,
   UserButtonProps,
   UserProfileProps,
@@ -55,6 +57,7 @@ import type {
 
 import { errorThrower } from './errors/errorThrower';
 import { unsupportedNonBrowserDomainOrProxyUrlFunction } from './errors/messages';
+import { StateProxy } from './stateProxy';
 import type {
   BrowserClerk,
   BrowserClerkConstructor,
@@ -105,7 +108,6 @@ type IsomorphicLoadedClerk = Without<
   | 'billing'
   | 'apiKeys'
   | '__internal_setActiveInProgress'
-  | '__internal_hasAfterAuthFlows'
 > & {
   client: ClientResource | undefined;
   billing: CommerceBillingNamespace | undefined;
@@ -157,6 +159,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   #proxyUrl: DomainOrProxyUrl['proxyUrl'];
   #publishableKey: string;
   #eventBus = createClerkEventBus();
+  #stateProxy: StateProxy;
 
   get publishableKey(): string {
     return this.#publishableKey;
@@ -249,6 +252,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     this.options = options;
     this.Clerk = Clerk;
     this.mode = inBrowser() ? 'browser' : 'server';
+    this.#stateProxy = new StateProxy(this);
 
     if (!this.options.sdkMetadata) {
       this.options.sdkMetadata = SDK_METADATA;
@@ -722,8 +726,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     return this.clerkjs?.billing;
   }
 
-  get __internal_state(): State | undefined {
-    return this.clerkjs?.__internal_state;
+  get __internal_state(): State {
+    return this.loaded && this.clerkjs ? this.clerkjs.__internal_state : this.#stateProxy;
   }
 
   get apiKeys(): APIKeysNamespace | undefined {
@@ -1276,8 +1280,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  redirectToTasks = async () => {
-    const callback = () => this.clerkjs?.redirectToTasks();
+  redirectToTasks = async (opts?: TasksRedirectOptions) => {
+    const callback = () => this.clerkjs?.redirectToTasks(opts);
     if (this.clerkjs && this.loaded) {
       return callback();
     } else {
@@ -1347,6 +1351,15 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return callback() as Promise<void>;
     } else {
       this.premountMethodCalls.set('authenticateWithCoinbaseWallet', callback);
+    }
+  };
+
+  authenticateWithBase = async (params?: AuthenticateWithBaseParams) => {
+    const callback = () => this.clerkjs?.authenticateWithBase(params);
+    if (this.clerkjs && this.loaded) {
+      return callback() as Promise<void>;
+    } else {
+      this.premountMethodCalls.set('authenticateWithBase', callback);
     }
   };
 

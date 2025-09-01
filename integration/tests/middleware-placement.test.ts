@@ -20,6 +20,7 @@ test.describe('next start - missing middleware @quickstart', () => {
   let app: Application;
 
   test.beforeAll(async () => {
+    test.setTimeout(90_000);
     app = await commonSetup.commit();
     await app.setup();
     await app.withEnv(appConfigs.envs.withEmailCodesQuickstart);
@@ -44,6 +45,7 @@ test.describe('next start - invalid middleware at root on src/ @quickstart', () 
   let app: Application;
 
   test.beforeAll(async () => {
+    test.setTimeout(90_000);
     app = await commonSetup.addFile('middleware.ts', () => middlewareFileContents).commit();
     await app.setup();
     await app.withEnv(appConfigs.envs.withEmailCodesQuickstart);
@@ -74,6 +76,7 @@ test.describe('next start - invalid middleware inside app on src/ @quickstart', 
   let app: Application;
 
   test.beforeAll(async () => {
+    test.setTimeout(90_000);
     app = await commonSetup.addFile('src/app/middleware.ts', () => middlewareFileContents).commit();
     await app.setup();
     await app.withEnv(appConfigs.envs.withEmailCodesQuickstart);

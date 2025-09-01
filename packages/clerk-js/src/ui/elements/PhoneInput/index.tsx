@@ -78,7 +78,7 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
         position: 'relative',
         borderRadius: theme.radii.$md,
         zIndex: 1,
-        '&:focus-within': {
+        '&:focus-within,&[data-focus-within="true"]': {
           ...common.borderVariants(theme, { hasError: rest.hasError }).normal['&:focus'],
         },
       })}

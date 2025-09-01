@@ -42,7 +42,7 @@ export class State implements StateInterface {
     }
 
     if (payload.resource instanceof SignUp) {
-      this.signUpResourceSignal({ resource: payload.resource });
+      this.signUpErrorSignal({ error: payload.error });
     }
   };
 

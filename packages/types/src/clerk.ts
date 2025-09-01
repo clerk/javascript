@@ -92,7 +92,7 @@ export type __experimental_CheckoutInstance = {
   confirm: (params: ConfirmCheckoutParams) => Promise<CheckoutResult>;
   start: () => Promise<CheckoutResult>;
   clear: () => void;
-  finalize: (params?: { redirectUrl: string }) => Promise<void>;
+  finalize: (params?: { navigate?: SetActiveNavigate }) => Promise<void>;
   subscribe: (listener: (state: __experimental_CheckoutCacheState) => void) => () => void;
   getState: () => __experimental_CheckoutCacheState;
 };
@@ -120,7 +120,7 @@ export type SDKMetadata = {
 export type ListenerCallback = (emission: Resources) => void;
 export type UnsubscribeCallback = () => void;
 export type BeforeEmitCallback = (session?: SignedInSessionResource | null) => void | Promise<any>;
-export type SetActiveNavigate = ({ session }: { session: SessionResource }) => Promise<unknown>;
+export type SetActiveNavigate = ({ session }: { session: SessionResource }) => void | Promise<unknown>;
 
 export type SignOutCallback = () => void | Promise<any>;
 
@@ -235,7 +235,7 @@ export interface Clerk {
    * Entrypoint for Clerk's Signal API containing resource signals along with accessible versions of `computed()` and
    * `effect()` that can be used to subscribe to changes from Signals.
    */
-  __internal_state: State | undefined;
+  __internal_state: State;
 
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
@@ -769,8 +769,10 @@ export interface Clerk {
 
   /**
    * Redirects to the configured URL where tasks are mounted.
+   *
+   * @param opts A {@link RedirectOptions} object
    */
-  redirectToTasks(): Promise<unknown>;
+  redirectToTasks(opts?: TasksRedirectOptions): Promise<unknown>;
 
   /**
    * Completes a Google One Tap redirection flow started by
@@ -813,6 +815,11 @@ export interface Clerk {
    * Authenticates user using their OKX Wallet browser extension
    */
   authenticateWithOKXWallet: (params?: AuthenticateWithOKXWalletParams) => Promise<unknown>;
+
+  /**
+   * Authenticates user using Base Account SDK
+   */
+  authenticateWithBase: (params?: AuthenticateWithBaseParams) => Promise<unknown>;
 
   /**
    * Authenticates user using their Web3 Wallet browser extension
@@ -863,12 +870,6 @@ export interface Clerk {
    * initiated outside of the Clerk class.
    */
   __internal_setActiveInProgress: boolean;
-
-  /**
-   * Internal flag indicating whether after-auth flows are enabled based on instance settings.
-   * @internal
-   */
-  __internal_hasAfterAuthFlows: boolean;
 
   /**
    * API Keys Object
@@ -1077,7 +1078,8 @@ export type ClerkOptions = ClerkOptionsNavigation &
      * Customize the URL paths users are redirected to after sign-in or sign-up when specific
      * session tasks need to be completed.
      *
-     * @default undefined - Uses Clerk's default task flow URLs
+     * When `undefined`, it uses Clerk's default task flow URLs.
+     * @default undefined
      */
     taskUrls?: Record<SessionTask['key'], string>;
   };
@@ -1161,6 +1163,8 @@ export type SignUpInitialValues = {
   lastName?: string;
   username?: string;
 };
+
+export type TasksRedirectOptions = RedirectOptions & RedirectUrlProp;
 
 export type SignInRedirectOptions = RedirectOptions &
   RedirectUrlProp & {
@@ -2177,6 +2181,14 @@ export interface AuthenticateWithOKXWalletParams {
 
 export interface AuthenticateWithGoogleOneTapParams {
   token: string;
+  legalAccepted?: boolean;
+}
+
+export interface AuthenticateWithBaseParams {
+  customNavigate?: (to: string) => Promise<unknown>;
+  redirectUrl?: string;
+  signUpContinueUrl?: string;
+  unsafeMetadata?: SignUpUnsafeMetadata;
   legalAccepted?: boolean;
 }
 

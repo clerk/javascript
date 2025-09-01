@@ -202,11 +202,6 @@ export const trimLeadingSlash = (path: string): string => {
   return (path || '').replace(/^\/+/, '');
 };
 
-export const stripSameOrigin = (url: URL, baseUrl: URL): string => {
-  const sameOrigin = baseUrl.origin === url.origin;
-  return sameOrigin ? stripOrigin(url) : `${url}`;
-};
-
 export const hasExternalAccountSignUpError = (signUp: SignUpResource): boolean => {
   const { externalAccount } = signUp.verifications;
   return !!externalAccount.error;
@@ -402,6 +397,7 @@ const frontendApiRedirectPathsWithUserInput: string[] = [
 const frontendApiRedirectPathsNoUserInput: string[] = [
   '/v1/verify', // magic links
   '/v1/tickets/accept', // ticket flow
+  '/oauth/authorize-with-immediate-redirect', // OAuth 2 identity provider
 ];
 
 export function isRedirectForFAPIInitiatedFlow(frontendApi: string, redirectUrl: string): boolean {

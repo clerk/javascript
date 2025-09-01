@@ -1,5 +1,82 @@
 # @clerk/tanstack-react-start
 
+## 0.23.1
+
+### Patch Changes
+
+- Updated dependencies [[`600c648`](https://github.com/clerk/javascript/commit/600c648d4087a823341041c90018797fbc0033f0)]:
+  - @clerk/shared@3.23.0
+  - @clerk/clerk-react@5.45.0
+  - @clerk/types@4.83.0
+  - @clerk/backend@2.10.1
+
+## 0.23.0
+
+### Minor Changes
+
+- Reuses existing `Auth` object from the server handler when using `getAuth()` ([#6595](https://github.com/clerk/javascript/pull/6595)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  The `createClerkHandler` helper now returns a Promise and requires awaiting during setup to ensure authentication context is available at the earliest possible point in the request lifecycle, before any router loaders or server functions execute
+
+  ```ts
+  // server.ts
+  import { createStartHandler, defineHandlerCallback, defaultStreamHandler } from '@tanstack/react-start/server';
+  import { createRouter } from './router';
+  import { createClerkHandler } from '@clerk/tanstack-react-start/server';
+
+  const handlerFactory = createClerkHandler(
+    createStartHandler({
+      createRouter,
+    }),
+  );
+
+  export default defineHandlerCallback(async event => {
+    const startHandler = await handlerFactory(defaultStreamHandler); // awaited
+    return startHandler(event);
+  });
+  ```
+
+### Patch Changes
+
+- Allows passing of [`treatPendingAsSignedOut`](https://clerk.com/docs/authentication/configuration/session-tasks#session-handling) to auth functions: ([#6612](https://github.com/clerk/javascript/pull/6612)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  TanStack Start
+
+  ```ts
+  const authStateFn = createServerFn({ method: 'GET' }).handler(async () => {
+    const request = getWebRequest();
+    const { userId } = await getAuth(request, { treatPendingAsSignedOut: false }); // defaults to true
+
+    return { userId };
+  });
+  ```
+
+  Nuxt
+
+  ```ts
+  export default eventHandler(event => {
+    const { userId } = event.context.auth({ treatPendingAsSignedOut: false }); // defaults to true
+
+    return { userId };
+  });
+  ```
+
+- Updated dependencies [[`f49ec31`](https://github.com/clerk/javascript/commit/f49ec3167df8e85344963c1f952d9b886946f127), [`d52714e`](https://github.com/clerk/javascript/commit/d52714e4cb7f369c74826cd4341c58eb1900abe4), [`822e4a1`](https://github.com/clerk/javascript/commit/822e4a19c1ad29309cf6bf91ca1fbbac4464a62b), [`ce49740`](https://github.com/clerk/javascript/commit/ce49740d474d6dd9da5096982ea4e9f14cf68f09), [`ba7f3fd`](https://github.com/clerk/javascript/commit/ba7f3fd71a0a925dfe0fb3b30648df666714d6b8), [`9036427`](https://github.com/clerk/javascript/commit/903642793ae205c5e5d9e9d22ff3e95665641871), [`2ed539c`](https://github.com/clerk/javascript/commit/2ed539cc7f08ed4d70c33621563ad386ea8becc5), [`deaafe4`](https://github.com/clerk/javascript/commit/deaafe449773632d690aa2f8cafaf959392622b9), [`a26ecae`](https://github.com/clerk/javascript/commit/a26ecae09fd06cd34f094262f038a8eefbb23f7d), [`c16a7a5`](https://github.com/clerk/javascript/commit/c16a7a5837fc15e0e044baf9c809b8da6fbac795), [`05b6d65`](https://github.com/clerk/javascript/commit/05b6d65c0bc5736443325a5defee4c263ef196af), [`453cf86`](https://github.com/clerk/javascript/commit/453cf86381c5df6684b37b003984a6fafc443fb4)]:
+  - @clerk/backend@2.10.0
+  - @clerk/clerk-react@5.44.0
+  - @clerk/types@4.82.0
+  - @clerk/shared@3.22.1
+
+## 0.22.4
+
+### Patch Changes
+
+- Updated dependencies [[`e52bf8e`](https://github.com/clerk/javascript/commit/e52bf8ebef74a9e123c69b69acde1340c01d32d7), [`c043c19`](https://github.com/clerk/javascript/commit/c043c1919854aaa5b9cf7f6df5bb517f5617f7a1), [`7bb644a`](https://github.com/clerk/javascript/commit/7bb644ad8a7bf28c6010aad6ae0c36f587529fcc), [`c28d29c`](https://github.com/clerk/javascript/commit/c28d29c79bb4f144d782313ca72df7db91a77340), [`172e054`](https://github.com/clerk/javascript/commit/172e054a3511be12d16ba19037db320c2d9838bf)]:
+  - @clerk/types@4.81.0
+  - @clerk/backend@2.9.4
+  - @clerk/clerk-react@5.43.1
+  - @clerk/shared@3.22.0
+
 ## 0.22.3
 
 ### Patch Changes

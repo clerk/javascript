@@ -1,5 +1,37 @@
 # Change Log
 
+## 4.83.0
+
+### Minor Changes
+
+- Added support for authentication with Base ([#6556](https://github.com/clerk/javascript/pull/6556)) by [@jacekradko](https://github.com/jacekradko)
+
+## 4.82.0
+
+### Minor Changes
+
+- [Experimental] Signal transfer support ([#6614](https://github.com/clerk/javascript/pull/6614)) by [@dstaley](https://github.com/dstaley)
+
+- [Experimental] Signals `isLoaded` removal ([#6605](https://github.com/clerk/javascript/pull/6605)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Remove unused `__internal_hasAfterAuthFlows` property ([#6609](https://github.com/clerk/javascript/pull/6609)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+## 4.81.0
+
+### Minor Changes
+
+- [Billing Beta] Rename `cancelFreeTrialDescription` to `cancelFreeTrialAccessUntil`. ([#6582](https://github.com/clerk/javascript/pull/6582)) by [@panteliselef](https://github.com/panteliselef)
+
+- [Billing Beta] Replace `redirectUrl` with `navigate` in `checkout.finalize()` ([#6586](https://github.com/clerk/javascript/pull/6586)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Update copies for create organization screen on session tasks ([#6584](https://github.com/clerk/javascript/pull/6584)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Fix incorrect redirect when completing session tasks within `SignIn` and `SignUp` components ([#6580](https://github.com/clerk/javascript/pull/6580)) by [@iagodahlem](https://github.com/iagodahlem)
+
 ## 4.80.0
 
 ### Minor Changes

@@ -1,4 +1,4 @@
-import { __experimental_useCheckout as useCheckout, useOrganization } from '@clerk/shared/react';
+import { __experimental_useCheckout as useCheckout } from '@clerk/shared/react';
 import type { CommerceMoneyAmount, CommercePaymentSourceResource, ConfirmCheckoutParams } from '@clerk/types';
 import { useMemo, useState } from 'react';
 
@@ -136,7 +136,6 @@ export const CheckoutForm = withCardStateProvider(() => {
 });
 
 const useCheckoutMutations = () => {
-  const { organization } = useOrganization();
   const { for: _for, onSubscriptionComplete } = useCheckoutContext();
   const { checkout } = useCheckout();
   const { id, confirm } = checkout;
@@ -150,11 +149,7 @@ const useCheckoutMutations = () => {
     card.setLoading();
     card.setError(undefined);
 
-    const { data, error } = await confirm({
-      ...params,
-      // TODO(@COMMERCE): Come back to this, this should not be needed
-      ...(_for === 'organization' ? { orgId: organization?.id } : {}),
-    });
+    const { data, error } = await confirm(params);
 
     if (error) {
       handleError(error, [], card.setError);
@@ -192,7 +187,7 @@ const useCheckoutMutations = () => {
 
 const CheckoutFormElements = () => {
   const { checkout } = useCheckout();
-  const { id, totals } = checkout;
+  const { id, totals, freeTrialEndsAt } = checkout;
   const { data: paymentSources } = usePaymentMethods();
 
   const [paymentMethodSource, setPaymentMethodSource] = useState<PaymentMethodSource>(() =>
@@ -210,7 +205,7 @@ const CheckoutFormElements = () => {
       sx={t => ({ padding: t.space.$4 })}
     >
       {/* only show if there are payment sources and there is a total due now */}
-      {paymentSources.length > 0 && totals.totalDueNow.amount > 0 && (
+      {paymentSources.length > 0 && (totals.totalDueNow.amount > 0 || !!freeTrialEndsAt) && (
         <SegmentedControl.Root
           aria-label='Payment method source'
           value={paymentMethodSource}
@@ -370,7 +365,7 @@ const ExistingPaymentSourceForm = withCardStateProvider(
       });
     }, [paymentSources]);
 
-    const isSchedulePayment = totalDueNow.amount > 0 && !freeTrialEndsAt;
+    const shouldDefaultBeUsed = totalDueNow.amount === 0 || !freeTrialEndsAt;
 
     return (
       <Form
@@ -381,7 +376,7 @@ const ExistingPaymentSourceForm = withCardStateProvider(
           rowGap: t.space.$4,
         })}
       >
-        {isSchedulePayment ? (
+        {shouldDefaultBeUsed ? (
           <Select
             elementId='paymentSource'
             options={options}

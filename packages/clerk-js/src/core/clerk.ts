@@ -24,6 +24,7 @@ import type {
   __internal_UserVerificationModalProps,
   APIKeysNamespace,
   APIKeysProps,
+  AuthenticateWithBaseParams,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
@@ -42,6 +43,7 @@ import type {
   EnvironmentJSON,
   EnvironmentJSONSnapshot,
   EnvironmentResource,
+  GenerateSignatureParams,
   GoogleOneTapProps,
   HandleEmailLinkVerificationParams,
   HandleOAuthCallbackParams,
@@ -75,6 +77,7 @@ import type {
   SignUpRedirectOptions,
   SignUpResource,
   TaskChooseOrganizationProps,
+  TasksRedirectOptions,
   UnsubscribeCallback,
   UserButtonProps,
   UserProfileProps,
@@ -84,7 +87,6 @@ import type {
   Web3Provider,
 } from '@clerk/types';
 
-import type { DebugLoggerInterface } from '@/utils/debug';
 import { debugLogger, initDebugLogger } from '@/utils/debug';
 
 import type { MountComponentRenderer } from '../ui/Components';
@@ -100,6 +102,7 @@ import {
   disabledAPIKeysFeature,
   disabledOrganizationsFeature,
   errorThrower,
+  generateSignatureWithBase,
   generateSignatureWithCoinbaseWallet,
   generateSignatureWithMetamask,
   generateSignatureWithOKXWallet,
@@ -162,11 +165,6 @@ type SetActiveHook = (intent?: 'sign-out') => void | Promise<void>;
 
 export type ClerkCoreBroadcastChannelEvent = { type: 'signout' };
 
-/**
- * Interface for the debug logger with all available logging methods
- */
-// DebugLoggerInterface imported from '@/utils/debug'
-
 declare global {
   interface Window {
     Clerk?: Clerk;
@@ -218,8 +216,6 @@ export class Clerk implements ClerkInterface {
   public __internal_country?: string | null;
   public telemetry: TelemetryCollector | undefined;
   public readonly __internal_state: State = new State();
-  // Deprecated: use global singleton from `@/utils/debug`
-  public debugLogger?: DebugLoggerInterface;
 
   protected internal_last_error: ClerkAPIError | null = null;
   // converted to protected environment to support `updateEnvironment` type assertion
@@ -427,6 +423,21 @@ export class Clerk implements ClerkInterface {
     }
 
     this.#options = this.#initOptions(options);
+
+    // In development mode, if custom router options are provided, warn if both routerPush and routerReplace are not provided
+    if (
+      this.#instanceType === 'development' &&
+      (this.#options.routerPush || this.#options.routerReplace) &&
+      (!this.#options.routerPush || !this.#options.routerReplace)
+    ) {
+      // Typing this.#options as ClerkOptions to ensure proper type checking. TypeScript will infer the type as `never`
+      // since missing both `routerPush` and `routerReplace` is not a valid ClerkOptions.
+      const options = this.#options as ClerkOptions;
+      const missingRouter = !options.routerPush ? 'routerPush' : 'routerReplace';
+      logger.warnOnce(
+        `Clerk: Both \`routerPush\` and \`routerReplace\` need to be defined, but \`${missingRouter}\` is not defined. This may cause issues with navigation in your application.`,
+      );
+    }
 
     /**
      * Listen to `Session.getToken` resolving to emit the updated session
@@ -1595,7 +1606,7 @@ export class Clerk implements ClerkInterface {
     return this.buildUrlWithAuth(this.environment.displayConfig.organizationProfileUrl);
   }
 
-  public buildTasksUrl(): string {
+  public buildTasksUrl(options?: TasksRedirectOptions): string {
     const currentTask = this.session?.currentTask;
     if (!currentTask) {
       return '';
@@ -1608,7 +1619,7 @@ export class Clerk implements ClerkInterface {
 
     return buildURL(
       {
-        base: this.buildSignInUrl(),
+        base: this.buildSignInUrl(options),
         hashPath: getTaskEndpoint(currentTask),
       },
       {
@@ -1707,9 +1718,9 @@ export class Clerk implements ClerkInterface {
     return;
   };
 
-  public redirectToTasks = async (): Promise<unknown> => {
+  public redirectToTasks = async (options?: TasksRedirectOptions): Promise<unknown> => {
     if (inBrowser()) {
-      return this.navigate(this.buildTasksUrl());
+      return this.navigate(this.buildTasksUrl(options));
     }
     return;
   };
@@ -2044,7 +2055,9 @@ export class Clerk implements ClerkInterface {
     }
 
     if (this.session?.currentTask) {
-      await this.redirectToTasks();
+      await this.redirectToTasks({
+        redirectUrl: this.buildAfterSignInUrl(),
+      });
       return;
     }
 
@@ -2138,6 +2151,13 @@ export class Clerk implements ClerkInterface {
     });
   };
 
+  public authenticateWithBase = async (props: AuthenticateWithBaseParams = {}): Promise<void> => {
+    await this.authenticateWithWeb3({
+      ...props,
+      strategy: 'web3_base_signature',
+    });
+  };
+
   public authenticateWithOKXWallet = async (props: AuthenticateWithOKXWalletParams = {}): Promise<void> => {
     await this.authenticateWithWeb3({
       ...props,
@@ -2162,12 +2182,21 @@ export class Clerk implements ClerkInterface {
 
     const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
     const identifier = await getWeb3Identifier({ provider });
-    const generateSignature =
-      provider === 'metamask'
-        ? generateSignatureWithMetamask
-        : provider === 'coinbase_wallet'
-          ? generateSignatureWithCoinbaseWallet
-          : generateSignatureWithOKXWallet;
+    let generateSignature: (params: GenerateSignatureParams) => Promise<string>;
+    switch (provider) {
+      case 'metamask':
+        generateSignature = generateSignatureWithMetamask;
+        break;
+      case 'base':
+        generateSignature = generateSignatureWithBase;
+        break;
+      case 'coinbase_wallet':
+        generateSignature = generateSignatureWithCoinbaseWallet;
+        break;
+      default:
+        generateSignature = generateSignatureWithOKXWallet;
+        break;
+    }
 
     const makeNavigate = (to: string) => () =>
       customNavigate && typeof customNavigate === 'function' ? customNavigate(to) : this.navigate(to);
@@ -2658,10 +2687,6 @@ export class Clerk implements ClerkInterface {
 
     this.#emit();
   };
-
-  get __internal_hasAfterAuthFlows() {
-    return !!this.environment?.organizationSettings?.forceOrganizationSelection;
-  }
 
   #defaultSession = (client: ClientResource): SignedInSessionResource | null => {
     if (client.lastActiveSessionId) {
