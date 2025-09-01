@@ -22,8 +22,8 @@ interface FieldErrors {
 
 export interface Errors {
   fields: FieldErrors;
-  raw: unknown[];
-  global: unknown[]; // does not include any errors that could be parsed as a field error
+  raw: unknown[] | null;
+  global: unknown[] | null;
 }
 
 export interface SignInSignal {
