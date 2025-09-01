@@ -149,6 +149,10 @@ export class HandshakeService {
     url.searchParams.append(constants.QueryParameters.HandshakeReason, reason);
     url.searchParams.append(constants.QueryParameters.HandshakeFormat, 'nonce');
 
+    if (this.authenticateContext.sessionToken) {
+      url.searchParams.append(constants.Cookies.Session, this.authenticateContext.sessionToken);
+    }
+
     if (this.authenticateContext.instanceType === 'development' && this.authenticateContext.devBrowserToken) {
       url.searchParams.append(constants.QueryParameters.DevBrowser, this.authenticateContext.devBrowserToken);
     }
@@ -221,6 +225,7 @@ export class HandshakeService {
       newUrl.searchParams.delete(constants.QueryParameters.Handshake);
       newUrl.searchParams.delete(constants.QueryParameters.HandshakeHelp);
       newUrl.searchParams.delete(constants.QueryParameters.DevBrowser);
+      newUrl.searchParams.delete(constants.QueryParameters.HandshakeNonce);
       headers.append(constants.Headers.Location, newUrl.toString());
       headers.set(constants.Headers.CacheControl, 'no-store');
     }
