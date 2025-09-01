@@ -581,7 +581,6 @@ export const PricingTable = withClerk(
       // This attribute is added to the PricingTable root element after we've successfully fetched the plans asynchronously.
       selector: '[data-component-status="ready"]',
     });
-    console.log('mountingStatus', mountingStatus);
     const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
 
     const rendererRootProps = {
