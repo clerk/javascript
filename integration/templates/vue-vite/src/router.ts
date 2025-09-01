@@ -47,6 +47,22 @@ const routes = [
     path: '/user',
     component: () => import('./views/Profile.vue'),
   },
+  // Billing button routes
+  {
+    name: 'CheckoutBtn',
+    path: '/billing/checkout-btn',
+    component: () => import('./views/billing/CheckoutBtn.vue'),
+  },
+  {
+    name: 'PlanDetailsBtn',
+    path: '/billing/plan-details-btn',
+    component: () => import('./views/billing/PlanDetailsBtn.vue'),
+  },
+  {
+    name: 'SubscriptionDetailsBtn',
+    path: '/billing/subscription-details-btn',
+    component: () => import('./views/billing/SubscriptionDetailsBtn.vue'),
+  },
 ];
 
 const router = createRouter({
