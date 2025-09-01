@@ -1,5 +1,4 @@
 ---
-'@clerk/astro': minor
 '@clerk/vue': minor
 ---
 
