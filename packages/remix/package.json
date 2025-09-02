@@ -1,6 +1,6 @@
 {
   "name": "@clerk/remix",
-  "version": "4.11.5",
+  "version": "4.11.8",
   "description": "Clerk SDK for Remix",
   "keywords": [
     "clerk",

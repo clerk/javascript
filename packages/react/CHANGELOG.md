@@ -1,5 +1,31 @@
 # Change Log
 
+## 5.46.0
+
+### Minor Changes
+
+- [Experimental] Signal phone code support ([#6650](https://github.com/clerk/javascript/pull/6650)) by [@dstaley](https://github.com/dstaley)
+
+- [Experimental] Signal MFA support ([#6659](https://github.com/clerk/javascript/pull/6659)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Updated dependencies [[`2a82737`](https://github.com/clerk/javascript/commit/2a8273705b9764e1a4613d5a0dbb738d0b156c05), [`cda5d7b`](https://github.com/clerk/javascript/commit/cda5d7b79b28dc03ec794ea54e0feb64b148cdd2), [`ba25a5b`](https://github.com/clerk/javascript/commit/ba25a5b5a3fa686a65f52e221d9d1712a389fea9), [`a50cfc8`](https://github.com/clerk/javascript/commit/a50cfc8f1dd168b436499e32fc8b0fc41d28bbff), [`377f67b`](https://github.com/clerk/javascript/commit/377f67b8e552d1a19efbe4530e9306675b7f8eab), [`65b12ee`](https://github.com/clerk/javascript/commit/65b12eeeb57ee80cdd8c36c5949d51f1227a413e), [`263722e`](https://github.com/clerk/javascript/commit/263722e61fd27403b4c8d9794880686771e123f9)]:
+  - @clerk/types@4.84.0
+  - @clerk/shared@3.24.0
+
+## 5.45.0
+
+### Minor Changes
+
+- Added support for authentication with Base ([#6556](https://github.com/clerk/javascript/pull/6556)) by [@jacekradko](https://github.com/jacekradko)
+
+### Patch Changes
+
+- Updated dependencies [[`600c648`](https://github.com/clerk/javascript/commit/600c648d4087a823341041c90018797fbc0033f0)]:
+  - @clerk/shared@3.23.0
+  - @clerk/types@4.83.0
+
 ## 5.44.0
 
 ### Minor Changes

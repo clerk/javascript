@@ -120,7 +120,7 @@ export type SDKMetadata = {
 export type ListenerCallback = (emission: Resources) => void;
 export type UnsubscribeCallback = () => void;
 export type BeforeEmitCallback = (session?: SignedInSessionResource | null) => void | Promise<any>;
-export type SetActiveNavigate = ({ session }: { session: SessionResource }) => Promise<unknown>;
+export type SetActiveNavigate = ({ session }: { session: SessionResource }) => void | Promise<unknown>;
 
 export type SignOutCallback = () => void | Promise<any>;
 
@@ -815,6 +815,11 @@ export interface Clerk {
    * Authenticates user using their OKX Wallet browser extension
    */
   authenticateWithOKXWallet: (params?: AuthenticateWithOKXWalletParams) => Promise<unknown>;
+
+  /**
+   * Authenticates user using Base Account SDK
+   */
+  authenticateWithBase: (params?: AuthenticateWithBaseParams) => Promise<unknown>;
 
   /**
    * Authenticates user using their Web3 Wallet browser extension
@@ -2176,6 +2181,14 @@ export interface AuthenticateWithOKXWalletParams {
 
 export interface AuthenticateWithGoogleOneTapParams {
   token: string;
+  legalAccepted?: boolean;
+}
+
+export interface AuthenticateWithBaseParams {
+  customNavigate?: (to: string) => Promise<unknown>;
+  redirectUrl?: string;
+  signUpContinueUrl?: string;
+  unsafeMetadata?: SignUpUnsafeMetadata;
   legalAccepted?: boolean;
 }
 

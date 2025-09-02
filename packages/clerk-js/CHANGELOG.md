@@ -1,5 +1,59 @@
 # Change Log
 
+## 5.91.1
+
+### Patch Changes
+
+- Add `.lp.dev` to list of origins that prefer the popup SSO flow. ([#6686](https://github.com/clerk/javascript/pull/6686)) by [@brkalow](https://github.com/brkalow)
+
+## 5.91.0
+
+### Minor Changes
+
+- [Experimental] Signal phone code support ([#6650](https://github.com/clerk/javascript/pull/6650)) by [@dstaley](https://github.com/dstaley)
+
+- [Billing Beta] `checkout.confirm()` now infers the resource id resulting in less repetition and improved DX. ([#6642](https://github.com/clerk/javascript/pull/6642)) by [@panteliselef](https://github.com/panteliselef)
+
+  After
+
+  ```tsx
+  const checkout = Clerk.billing.startCheckout({ orgId });
+  checkout.confirm(); // orgId is always implied
+  ```
+
+  Before
+
+  ```tsx
+  const checkout = clerk.billing.startCheckout({ orgId });
+  checkout.confirm({ orgId });
+  ```
+
+- [Experimental] Signal MFA support ([#6659](https://github.com/clerk/javascript/pull/6659)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Display free trial badge `<PricingTable/>`. ([#6656](https://github.com/clerk/javascript/pull/6656)) by [@panteliselef](https://github.com/panteliselef)
+
+- Adding baseline debug logging to SignIn and SignUp components ([#6665](https://github.com/clerk/javascript/pull/6665)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`651dbf8`](https://github.com/clerk/javascript/commit/651dbf888642053257271d96b66c27f5b157d71e), [`2a82737`](https://github.com/clerk/javascript/commit/2a8273705b9764e1a4613d5a0dbb738d0b156c05), [`cda5d7b`](https://github.com/clerk/javascript/commit/cda5d7b79b28dc03ec794ea54e0feb64b148cdd2), [`ba25a5b`](https://github.com/clerk/javascript/commit/ba25a5b5a3fa686a65f52e221d9d1712a389fea9), [`a50cfc8`](https://github.com/clerk/javascript/commit/a50cfc8f1dd168b436499e32fc8b0fc41d28bbff), [`377f67b`](https://github.com/clerk/javascript/commit/377f67b8e552d1a19efbe4530e9306675b7f8eab), [`a1dcda7`](https://github.com/clerk/javascript/commit/a1dcda7b42fec2ae9893c707e07068fb1477ebd1), [`7c3c1f7`](https://github.com/clerk/javascript/commit/7c3c1f74117e9f4aa25fdf05edab717998e12946), [`65b12ee`](https://github.com/clerk/javascript/commit/65b12eeeb57ee80cdd8c36c5949d51f1227a413e), [`263722e`](https://github.com/clerk/javascript/commit/263722e61fd27403b4c8d9794880686771e123f9)]:
+  - @clerk/localizations@3.24.1
+  - @clerk/types@4.84.0
+  - @clerk/shared@3.24.0
+
+## 5.90.0
+
+### Minor Changes
+
+- Added support for authentication with Base ([#6556](https://github.com/clerk/javascript/pull/6556)) by [@jacekradko](https://github.com/jacekradko)
+
+### Patch Changes
+
+- Updated dependencies [[`12b19d4`](https://github.com/clerk/javascript/commit/12b19d4cb5c8da10dcca1a9b3c69aff4c1779bcc), [`823b80f`](https://github.com/clerk/javascript/commit/823b80fe9950e163007db668ee8eb97eaa164638), [`600c648`](https://github.com/clerk/javascript/commit/600c648d4087a823341041c90018797fbc0033f0)]:
+  - @clerk/localizations@3.24.0
+  - @clerk/shared@3.23.0
+  - @clerk/types@4.83.0
+
 ## 5.89.0
 
 ### Minor Changes
