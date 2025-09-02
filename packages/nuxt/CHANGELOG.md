@@ -1,5 +1,12 @@
 # @clerk/nuxt
 
+## 1.8.14
+
+### Patch Changes
+
+- Updated dependencies [[`c1049f0`](https://github.com/clerk/javascript/commit/c1049f0956b9821a1a177c4be64c748122b0f084), [`5e94f0a`](https://github.com/clerk/javascript/commit/5e94f0a87cfcfb6407b916bd72f15a2d7dcc2406)]:
+  - @clerk/backend@2.12.0
+
 ## 1.8.13
 
 ### Patch Changes
