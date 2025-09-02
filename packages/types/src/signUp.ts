@@ -1,3 +1,8 @@
+import type { AttemptEmailAddressVerificationParams, PrepareEmailAddressVerificationParams } from './emailAddress';
+import type { ValidatePasswordCallbacks } from './passwords';
+import type { AttemptPhoneNumberVerificationParams, PreparePhoneNumberVerificationParams } from './phoneNumber';
+import type { AuthenticateWithPopupParams, AuthenticateWithRedirectParams } from './redirects';
+import type { ClerkResource } from './resource';
 import type {
   AttemptVerificationParams,
   PrepareVerificationParams,
@@ -8,13 +13,7 @@ import type {
   SignUpStatus,
   SignUpUpdateParams,
   SignUpVerificationsResource,
-} from 'signUpCommon';
-
-import type { AttemptEmailAddressVerificationParams, PrepareEmailAddressVerificationParams } from './emailAddress';
-import type { ValidatePasswordCallbacks } from './passwords';
-import type { AttemptPhoneNumberVerificationParams, PreparePhoneNumberVerificationParams } from './phoneNumber';
-import type { AuthenticateWithPopupParams, AuthenticateWithRedirectParams } from './redirects';
-import type { ClerkResource } from './resource';
+} from './signUpCommon';
 import type { SignUpFutureResource } from './signUpFuture';
 import type { SignUpJSONSnapshot } from './snapshots';
 import type { CreateEmailLinkFlowReturn, StartEmailLinkFlowParams } from './verification';

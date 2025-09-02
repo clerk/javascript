@@ -3,7 +3,7 @@
 // Copyright (c) Floating UI contributors
 // SPDX-License-Identifier: MIT
 // Avoid Chrome DevTools blue warning.
-export function getPlatform(): string {
+function getPlatform(): string {
   const uaData = (navigator as any).userAgentData as { platform: string } | undefined;
 
   if (uaData?.platform) {

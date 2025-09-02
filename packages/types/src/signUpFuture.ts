@@ -10,10 +10,17 @@ export interface SignUpFutureEmailCodeVerifyParams {
   code: string;
 }
 
-export interface SignUpFuturePasswordParams {
-  emailAddress: string;
-  password: string;
-}
+export type SignUpFuturePasswordParams =
+  | {
+      emailAddress: string;
+      password: string;
+      phoneNumber?: never;
+    }
+  | {
+      phoneNumber: string;
+      password: string;
+      emailAddress?: never;
+    };
 
 export interface SignUpFuturePhoneCodeSendParams {
   phoneNumber?: string;
