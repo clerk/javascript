@@ -1,5 +1,28 @@
 # Change Log
 
+## 3.24.1
+
+### Patch Changes
+
+- Refined German (de-DE) waitlist localization for improved clarity and consistency ([#6631](https://github.com/clerk/javascript/pull/6631)) by [@okikeSolutions](https://github.com/okikeSolutions)
+
+  This update improves the waitlist flow by:
+
+  - Updating action link text from “Jetzt anmelden” to “Anmelden”
+  - Changing action text from “Kein Zugang? Auf die Warteliste setzen!” to “Bereits Zugang?”
+  - Adjusting form button label from “Zur Warteliste hinzufügen” to “Warteliste beitreten”
+  - Clarifying the waitlist start subtitle with instructions to enter an email for notifications
+  - Aligning success subtitles with consistent wording for availability notifications
+
+  The German waitlist localization now offers clearer guidance and a smoother user experience.
+
+- Add api-related localizations for th-TH and refine translation context ([#6657](https://github.com/clerk/javascript/pull/6657)) by [@ttwrpz](https://github.com/ttwrpz)
+
+- Fixed a typo when canceling a free trial. ([#6672](https://github.com/clerk/javascript/pull/6672)) by [@paddycarver](https://github.com/paddycarver)
+
+- Updated dependencies [[`2a82737`](https://github.com/clerk/javascript/commit/2a8273705b9764e1a4613d5a0dbb738d0b156c05), [`cda5d7b`](https://github.com/clerk/javascript/commit/cda5d7b79b28dc03ec794ea54e0feb64b148cdd2), [`ba25a5b`](https://github.com/clerk/javascript/commit/ba25a5b5a3fa686a65f52e221d9d1712a389fea9), [`a50cfc8`](https://github.com/clerk/javascript/commit/a50cfc8f1dd168b436499e32fc8b0fc41d28bbff), [`377f67b`](https://github.com/clerk/javascript/commit/377f67b8e552d1a19efbe4530e9306675b7f8eab), [`65b12ee`](https://github.com/clerk/javascript/commit/65b12eeeb57ee80cdd8c36c5949d51f1227a413e), [`263722e`](https://github.com/clerk/javascript/commit/263722e61fd27403b4c8d9794880686771e123f9)]:
+  - @clerk/types@4.84.0
+
 ## 3.24.0
 
 ### Minor Changes
