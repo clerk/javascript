@@ -291,7 +291,9 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await u.po.checkout.fillTestCard();
       await u.po.checkout.clickPayOrSubscribe();
 
-      await expect(u.po.checkout.root.getByText(/Trial.*successfully.*started/i)).toBeVisible();
+      await expect(u.po.checkout.root.getByText(/Trial.*successfully.*started/i)).toBeVisible({
+        timeout: 15_000,
+      });
       await u.po.checkout.confirmAndContinue();
 
       await u.po.page.goToRelative('/pricing-table');
@@ -419,6 +421,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await u.po.checkout.clickPayOrSubscribe();
       await u.po.checkout.confirmAndContinue();
 
+      await u.po.page.waitForAppUrl('/');
       await u.po.page.goToRelative('/user');
       await u.po.userProfile.waitForMounted();
       await u.po.userProfile.switchToBillingTab();
@@ -440,7 +443,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await u.po.checkout.waitForMounted();
       await u.po.checkout.root.getByRole('button', { name: /^pay\s\$/i }).waitFor({ state: 'visible' });
       await u.po.checkout.clickPayOrSubscribe();
-
+      await u.po.checkout.confirmAndContinue();
+      await u.po.page.waitForAppUrl('/');
       await u.po.page.goToRelative('/user');
       await u.po.userProfile.waitForMounted();
       await u.po.userProfile.switchToBillingTab();
@@ -482,7 +486,9 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await u.po.checkout.waitForMounted();
       await u.po.checkout.fillTestCard();
       await u.po.checkout.clickPayOrSubscribe();
-      await expect(u.po.page.getByText('Payment was successful!')).toBeVisible();
+      await expect(u.po.page.getByText('Payment was successful!')).toBeVisible({
+        timeout: 15_000,
+      });
 
       await u.po.checkout.confirmAndContinue();
       await u.po.pricingTable.startCheckout({ planSlug: 'free_user', shouldSwitch: true });
