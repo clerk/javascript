@@ -31,6 +31,15 @@ export const clearFetchCache = () => {
   requestCache = new Map<string, State>();
 };
 
+/**
+ * Global function to clear the fetch cache.
+ * This is exposed on the window object to allow core modules to clear the cache
+ * without importing from UI modules.
+ */
+if (typeof window !== 'undefined') {
+  (window as any).__clerkClearFetchCache = clearFetchCache;
+}
+
 const serialize = (key: unknown) => (typeof key === 'string' ? key : JSON.stringify(key));
 
 const useCache = <K = any, V = any>(
