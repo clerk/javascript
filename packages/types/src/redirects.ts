@@ -91,6 +91,31 @@ export type AuthenticateWithRedirectParams = {
    * Optional for `oauth_<provider>` or `enterprise_sso` strategies. The value to pass to the [OIDC prompt parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.) in the generated OAuth redirect URL.
    */
   oidcPrompt?: string;
+
+  /**
+   * The URL to redirect to when a sign-in flow is required during OAuth/SAML authentication.
+   * Optional, defaults to the instance-configured sign-in URL.
+   */
+  signInUrl?: string;
+
+  /**
+   * The URL to redirect to when a sign-up flow is required during OAuth/SAML authentication.
+   * Optional, defaults to the instance-configured sign-up URL.
+   */
+  signUpUrl?: string;
+
+  /**
+   * The URL to redirect to when the user has pending session tasks.
+   * Optional, defaults to falling back to signInUrl or signUpUrl.
+   */
+  tasksUrl?: string;
+
+  /**
+   * Whether to automatically transfer between sign-in and sign-up flows when needed.
+   * When true, allows seamless transitions between flows without user intervention.
+   * Defaults to false.
+   */
+  autoTransfer?: boolean;
 };
 
 export type AuthenticateWithPopupParams = AuthenticateWithRedirectParams & { popup: Window | null };

@@ -100,6 +100,10 @@ export type SignUpCreateParams = Partial<
     oidcPrompt: string;
     oidcLoginHint: string;
     channel: PhoneCodeChannel;
+    signInUrl?: string;
+    signUpUrl?: string;
+    tasksUrl?: string;
+    autoTransfer?: boolean;
   } & Omit<SnakeToCamel<Record<SignUpAttributeField | SignUpVerifiableField, string>>, 'legalAccepted'>
 >;
 

@@ -53,7 +53,16 @@ export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) 
         }
 
         return signIn
-          .authenticateWithRedirect({ strategy, redirectUrl, redirectUrlComplete, oidcPrompt: ctx.oidcPrompt })
+          .authenticateWithRedirect({
+            strategy,
+            redirectUrl,
+            redirectUrlComplete,
+            oidcPrompt: ctx.oidcPrompt,
+            signInUrl: ctx.signInUrl,
+            signUpUrl: ctx.signUpUrl,
+            tasksUrl: ctx.tasksUrl,
+            autoTransfer: ctx.autoTransfer,
+          })
           .catch(err => handleError(err, [], card.setError));
       }}
       web3Callback={strategy => {

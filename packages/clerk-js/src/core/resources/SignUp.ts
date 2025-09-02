@@ -363,6 +363,10 @@ export class SignUp extends BaseResource implements SignUpResource {
       emailAddress,
       legalAccepted,
       oidcPrompt,
+      signInUrl,
+      signUpUrl,
+      tasksUrl,
+      autoTransfer,
     } = params;
 
     const redirectUrlWithAuthToken = SignUp.clerk.buildUrlWithAuth(redirectUrl);
@@ -376,6 +380,10 @@ export class SignUp extends BaseResource implements SignUpResource {
         emailAddress,
         legalAccepted,
         oidcPrompt,
+        signInUrl,
+        signUpUrl,
+        tasksUrl,
+        autoTransfer,
       };
       return continueSignUp && this.id ? this.update(authParams) : this.create(authParams);
     };

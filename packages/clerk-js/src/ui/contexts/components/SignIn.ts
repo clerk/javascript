@@ -31,6 +31,9 @@ export type SignInContextType = Omit<SignInCtx, 'fallbackRedirectUrl' | 'forceRe
   isCombinedFlow: boolean;
   navigateOnSetActive: (opts: { session: SessionResource; redirectUrl: string }) => Promise<unknown>;
   taskUrl: string | null;
+  tasksUrl?: string;
+  autoTransfer?: boolean;
+  shouldContinueFlow: boolean;
 };
 
 export const SignInContext = createContext<SignInCtx | null>(null);
@@ -145,6 +148,8 @@ export const useSignInContext = (): SignInContextType => {
       }))
     : null;
 
+  const shouldContinueFlow = queryParams?.__clerk_hint === 'continue';
+
   return {
     ...ctx,
     transferable: ctx.transferable ?? true,
@@ -165,5 +170,8 @@ export const useSignInContext = (): SignInContextType => {
     isCombinedFlow,
     navigateOnSetActive,
     taskUrl,
+    tasksUrl: ctx.tasksUrl,
+    autoTransfer: ctx.autoTransfer ?? false,
+    shouldContinueFlow,
   };
 };

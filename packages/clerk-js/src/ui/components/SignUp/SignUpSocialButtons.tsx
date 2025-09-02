@@ -56,6 +56,10 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
               unsafeMetadata: ctx.unsafeMetadata,
               legalAccepted: props.legalAccepted,
               oidcPrompt: ctx.oidcPrompt,
+              signInUrl: ctx.signInUrl,
+              signUpUrl: ctx.signUpUrl,
+              tasksUrl: ctx.tasksUrl,
+              autoTransfer: ctx.autoTransfer,
             })
             .catch(err => handleError(err, [], card.setError));
         }
@@ -69,6 +73,10 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
             unsafeMetadata: ctx.unsafeMetadata,
             legalAccepted: props.legalAccepted,
             oidcPrompt: ctx.oidcPrompt,
+            signInUrl: ctx.signInUrl,
+            signUpUrl: ctx.signUpUrl,
+            tasksUrl: ctx.tasksUrl,
+            autoTransfer: ctx.autoTransfer,
           })
           .catch(err => handleError(err, [], card.setError));
       }}

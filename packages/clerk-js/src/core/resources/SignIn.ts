@@ -292,7 +292,17 @@ export class SignIn extends BaseResource implements SignInResource {
     params: AuthenticateWithRedirectParams,
     navigateCallback: (url: URL | string) => void,
   ): Promise<void> => {
-    const { strategy, redirectUrlComplete, identifier, oidcPrompt, continueSignIn } = params || {};
+    const {
+      strategy,
+      redirectUrlComplete,
+      identifier,
+      oidcPrompt,
+      continueSignIn,
+      signInUrl,
+      signUpUrl,
+      tasksUrl,
+      autoTransfer,
+    } = params || {};
     const actionCompleteRedirectUrl = redirectUrlComplete;
 
     const redirectUrl = SignIn.clerk.buildUrlWithAuth(params.redirectUrl);
@@ -303,6 +313,10 @@ export class SignIn extends BaseResource implements SignInResource {
         identifier,
         redirectUrl,
         actionCompleteRedirectUrl,
+        signInUrl,
+        signUpUrl,
+        tasksUrl,
+        autoTransfer,
       });
     }
 
@@ -312,6 +326,10 @@ export class SignIn extends BaseResource implements SignInResource {
         redirectUrl,
         actionCompleteRedirectUrl,
         oidcPrompt,
+        signInUrl,
+        signUpUrl,
+        tasksUrl,
+        autoTransfer,
       });
     }
 

@@ -128,6 +128,10 @@ export type SignInCreateParams = (
       identifier?: string;
       oidcPrompt?: string;
       oidcLoginHint?: string;
+      signInUrl?: string;
+      signUpUrl?: string;
+      tasksUrl?: string;
+      autoTransfer?: boolean;
     }
   | {
       strategy: TicketStrategy;

@@ -30,6 +30,9 @@ export type SignUpContextType = Omit<SignUpCtx, 'fallbackRedirectUrl' | 'forceRe
   ssoCallbackUrl: string;
   navigateOnSetActive: (opts: { session: SessionResource; redirectUrl: string }) => Promise<unknown>;
   taskUrl: string | null;
+  tasksUrl?: string;
+  autoTransfer?: boolean;
+  shouldContinueFlow: boolean;
 };
 
 export const SignUpContext = createContext<SignUpCtx | null>(null);
@@ -135,6 +138,8 @@ export const useSignUpContext = (): SignUpContextType => {
       }))
     : null;
 
+  const shouldContinueFlow = queryParams?.__clerk_hint === 'continue';
+
   return {
     ...ctx,
     oauthFlow: ctx.oauthFlow || 'auto',
@@ -154,5 +159,8 @@ export const useSignUpContext = (): SignUpContextType => {
     isCombinedFlow,
     navigateOnSetActive,
     taskUrl,
+    tasksUrl: ctx.tasksUrl,
+    autoTransfer: ctx.autoTransfer ?? false,
+    shouldContinueFlow,
   };
 };

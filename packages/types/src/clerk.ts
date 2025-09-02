@@ -787,6 +787,8 @@ export interface Clerk {
   /**
    * Completes an OAuth or SAML redirection flow started by
    * {@link Clerk.client.signIn.authenticateWithRedirect} or {@link Clerk.client.signUp.authenticateWithRedirect}
+   * @deprecated Consider using server-driven redirects with the new autoTransfer, signInUrl, signUpUrl, and tasksUrl options
+   * on authenticateWithRedirect() instead for OAuth/SAML flows.
    */
   handleRedirectCallback: (
     params: HandleOAuthCallbackParams | HandleSamlCallbackParams,
@@ -1301,6 +1303,19 @@ export type SignInProps = RoutingOptions & {
    * Optional for `oauth_<provider>` or `enterprise_sso` strategies. The value to pass to the [OIDC prompt parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.) in the generated OAuth redirect URL.
    */
   oidcPrompt?: string;
+
+  /**
+   * The URL to redirect to when the user has pending session tasks.
+   * Optional, defaults to falling back to signInUrl or signUpUrl.
+   */
+  tasksUrl?: string;
+
+  /**
+   * Whether to automatically transfer between sign-in and sign-up flows when needed.
+   * When true, allows seamless transitions between flows without user intervention.
+   * Defaults to false.
+   */
+  autoTransfer?: boolean;
 } & TransferableOption &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
@@ -1442,6 +1457,19 @@ export type SignUpProps = RoutingOptions & {
    * Optional for `oauth_<provider>` or `enterprise_sso` strategies. The value to pass to the [OIDC prompt parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.) in the generated OAuth redirect URL.
    */
   oidcPrompt?: string;
+
+  /**
+   * The URL to redirect to when the user has pending session tasks.
+   * Optional, defaults to falling back to signInUrl or signUpUrl.
+   */
+  tasksUrl?: string;
+
+  /**
+   * Whether to automatically transfer between sign-in and sign-up flows when needed.
+   * When true, allows seamless transitions between flows without user intervention.
+   * Defaults to false.
+   */
+  autoTransfer?: boolean;
 } & SignInFallbackRedirectUrl &
   SignInForceRedirectUrl &
   LegacyRedirectProps &
