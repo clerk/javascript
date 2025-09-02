@@ -106,7 +106,6 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
     const authObjectFn = (opts?: PendingSessionOptions) => requestState.toAuth(opts);
 
     const redirectToSignIn = createMiddlewareRedirectToSignIn(clerkRequest);
-    const authObjWithMethods: ClerkMiddlewareAuthObject = Object.assign(authObjectFn(), { redirectToSignIn });
 
     decorateAstroLocal(clerkRequest, authObjectFn, context, requestState);
 
@@ -114,9 +113,11 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
      * ALS is crucial for guaranteeing SSR in UI frameworks like React.
      * This currently powers the `useAuth()` React hook and any other hook or Component that depends on it.
      */
-    const asyncAuthObject =
-      authObjectFn().tokenType === TokenType.SessionToken ? authObjectFn() : signedOutAuthObject({});
-    return authAsyncStorage.run(asyncAuthObject, async () => {
+    const authObjWithMethods: ClerkMiddlewareAuthObject = Object.assign(
+      authObjectFn().tokenType === TokenType.SessionToken ? authObjectFn() : signedOutAuthObject({}),
+      { redirectToSignIn },
+    );
+    return authAsyncStorage.run(authObjWithMethods, async () => {
       /**
        * Generate SSR page
        */
