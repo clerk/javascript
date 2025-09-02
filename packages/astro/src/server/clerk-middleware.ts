@@ -12,6 +12,7 @@ import {
   constants,
   createClerkRequest,
   createRedirect,
+  getAuthObjectForAcceptedToken,
   signedOutAuthObject,
   TokenType,
 } from '@clerk/backend/internal';
@@ -19,6 +20,7 @@ import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
 import { isHttpOrHttps } from '@clerk/shared/proxy';
 import { handleValueOrFn } from '@clerk/shared/utils';
+import type { PendingSessionOptions } from '@clerk/types';
 import type { APIContext } from 'astro';
 
 import { authAsyncStorage } from '#async-local-storage';
@@ -26,7 +28,6 @@ import { authAsyncStorage } from '#async-local-storage';
 import { buildClerkHotloadScript } from './build-clerk-hotload-script';
 import { clerkClient } from './clerk-client';
 import { createCurrentUser } from './current-user';
-import { getAuth } from './get-auth';
 import { getClientSafeEnv, getSafeEnv } from './get-safe-env';
 import { serverRedirectWithAuth } from './server-redirect-with-auth';
 import type {
@@ -102,19 +103,19 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
       throw new Error('Clerk: handshake status without redirect');
     }
 
-    const authObject = requestState.toAuth();
+    const authObjectFn = (opts?: PendingSessionOptions) => requestState.toAuth(opts);
 
     const redirectToSignIn = createMiddlewareRedirectToSignIn(clerkRequest);
-    const authObjWithMethods: ClerkMiddlewareAuthObject = Object.assign(authObject, { redirectToSignIn });
+    const authObjWithMethods: ClerkMiddlewareAuthObject = Object.assign(authObjectFn(), { redirectToSignIn });
 
-    decorateAstroLocal(clerkRequest, authObject, context, requestState);
+    decorateAstroLocal(clerkRequest, authObjectFn, context, requestState);
 
     /**
      * ALS is crucial for guaranteeing SSR in UI frameworks like React.
      * This currently powers the `useAuth()` React hook and any other hook or Component that depends on it.
      */
     const asyncAuthObject =
-      authObject.tokenType === TokenType.SessionToken ? context.locals.auth() : signedOutAuthObject({});
+      authObjectFn().tokenType === TokenType.SessionToken ? authObjectFn() : signedOutAuthObject({});
     return authAsyncStorage.run(asyncAuthObject, async () => {
       /**
        * Generate SSR page
@@ -259,7 +260,7 @@ Check if signInUrl is missing from your configuration or if it is not an absolut
 
 function decorateAstroLocal(
   clerkRequest: ClerkRequest,
-  rawAuthObject: AuthObject,
+  authObjectFn: (opts?: PendingSessionOptions) => AuthObject,
   context: APIContext,
   requestState: RequestState,
 ) {
@@ -268,9 +269,11 @@ function decorateAstroLocal(
   context.locals.authStatus = status;
   context.locals.authMessage = message;
   context.locals.authReason = reason;
-  context.locals.__internal_authObject = JSON.parse(JSON.stringify(rawAuthObject));
   context.locals.auth = (({ acceptsToken, treatPendingAsSignedOut }: AuthOptions = {}) => {
-    const authObject = getAuth(clerkRequest, context.locals, { treatPendingAsSignedOut, acceptsToken });
+    const authObject = getAuthObjectForAcceptedToken({
+      authObject: authObjectFn({ treatPendingAsSignedOut }),
+      acceptsToken,
+    });
 
     if (authObject.tokenType === TokenType.SessionToken) {
       const clerkUrl = clerkRequest.clerkUrl;
@@ -300,7 +303,7 @@ function decorateAstroLocal(
     return authObject;
   }) as AuthFn;
 
-  context.locals.currentUser = createCurrentUser(clerkRequest, context);
+  context.locals.currentUser = createCurrentUser(context);
 }
 
 /**

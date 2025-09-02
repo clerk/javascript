@@ -3,17 +3,11 @@ import { TokenType } from '@clerk/backend/internal';
 import type { APIContext } from 'astro';
 
 import { clerkClient } from './clerk-client';
-import { getAuth } from './get-auth';
 
-export const createCurrentUser = (req: Request, context: APIContext) => {
+export const createCurrentUser = (context: APIContext) => {
   return async (): Promise<User | null> => {
-    const authObject = getAuth(req, context.locals, { acceptsToken: TokenType.SessionToken });
+    const { userId } = context.locals.auth({ acceptsToken: TokenType.SessionToken });
 
-    if (authObject.tokenType !== TokenType.SessionToken) {
-      return null;
-    }
-
-    const { userId } = authObject;
     if (!userId) {
       return null;
     }
