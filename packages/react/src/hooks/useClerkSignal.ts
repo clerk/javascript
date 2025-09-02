@@ -1,22 +1,12 @@
-import type { SignInSignal, SignUpSignal } from '@clerk/types';
+import type { SignInSignalValue, SignUpSignalValue } from '@clerk/types';
 import { useCallback, useSyncExternalStore } from 'react';
 
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvider';
 
-// These types are used to remove the `null` value from the underlying resource. This is safe because IsomorphicClerk
-// always returns a valid resource, even before Clerk is loaded, and if Clerk is loaded, the resource is guaranteed to
-// be non-null
-type NonNullSignInSignal = Omit<ReturnType<SignInSignal>, 'signIn'> & {
-  signIn: NonNullable<ReturnType<SignInSignal>['signIn']>;
-};
-type NonNullSignUpSignal = Omit<ReturnType<SignUpSignal>, 'signUp'> & {
-  signUp: NonNullable<ReturnType<SignUpSignal>['signUp']>;
-};
-
-function useClerkSignal(signal: 'signIn'): NonNullSignInSignal;
-function useClerkSignal(signal: 'signUp'): NonNullSignUpSignal;
-function useClerkSignal(signal: 'signIn' | 'signUp'): NonNullSignInSignal | NonNullSignUpSignal {
+function useClerkSignal(signal: 'signIn'): SignInSignalValue;
+function useClerkSignal(signal: 'signUp'): SignUpSignalValue;
+function useClerkSignal(signal: 'signIn' | 'signUp'): SignInSignalValue | SignUpSignalValue {
   useAssertWrappedByClerkProvider('useClerkSignal');
 
   const clerk = useIsomorphicClerkContext();
@@ -46,9 +36,9 @@ function useClerkSignal(signal: 'signIn' | 'signUp'): NonNullSignInSignal | NonN
   const getSnapshot = useCallback(() => {
     switch (signal) {
       case 'signIn':
-        return clerk.__internal_state.signInSignal() as NonNullSignInSignal;
+        return clerk.__internal_state.signInSignal() as SignInSignalValue;
       case 'signUp':
-        return clerk.__internal_state.signUpSignal() as NonNullSignUpSignal;
+        return clerk.__internal_state.signUpSignal() as SignUpSignalValue;
       default:
         throw new Error(`Unknown signal: ${signal}`);
     }
@@ -59,10 +49,34 @@ function useClerkSignal(signal: 'signIn' | 'signUp'): NonNullSignInSignal | NonN
   return value;
 }
 
+/**
+ * This hook allows you to access the Signal-based `SignIn` resource.
+ *
+ * @experimental This experimental API is subject to change.
+ * @example
+ * import { useSignInSignal } from "@clerk/clerk-react/experimental";
+ *
+ * function SignInForm() {
+ *   const { signIn, errors, fetchStatus } = useSignInSignal();
+ *   //
+ * }
+ */
 export function useSignInSignal() {
   return useClerkSignal('signIn');
 }
 
+/**
+ * This hook allows you to access the Signal-based `SignUp` resource.
+ *
+ * @experimental This experimental API is subject to change.
+ * @example
+ * import { useSignUpSignal } from "@clerk/clerk-react/experimental";
+ *
+ * function SignUpForm() {
+ *   const { signUp, errors, fetchStatus } = useSignUpSignal();
+ *   //
+ * }
+ */
 export function useSignUpSignal() {
   return useClerkSignal('signUp');
 }
