@@ -113,27 +113,29 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
      * ALS is crucial for guaranteeing SSR in UI frameworks like React.
      * This currently powers the `useAuth()` React hook and any other hook or Component that depends on it.
      */
-    const authObjWithMethods: ClerkMiddlewareAuthObject = Object.assign(
-      authObjectFn().tokenType === TokenType.SessionToken ? authObjectFn() : signedOutAuthObject({}),
-      { redirectToSignIn },
-    );
-    return authAsyncStorage.run(authObjWithMethods, async () => {
+    const asyncStorageAuthObject =
+      authObjectFn().tokenType === TokenType.SessionToken ? authObjectFn() : signedOutAuthObject({});
+
+    const authHandler = (opts?: AuthOptions) => {
+      const authObject = getAuthObjectForAcceptedToken({
+        authObject: authObjectFn({ treatPendingAsSignedOut: opts?.treatPendingAsSignedOut }),
+        acceptsToken: opts?.acceptsToken,
+      });
+
+      if (authObject.tokenType === TokenType.SessionToken) {
+        return Object.assign(authObject, { redirectToSignIn });
+      }
+
+      return authObject;
+    };
+
+    return authAsyncStorage.run(asyncStorageAuthObject, async () => {
       /**
        * Generate SSR page
        */
       let handlerResult: Response;
       try {
-        handlerResult =
-          (await handler?.(
-            ((opts?: AuthOptions) => {
-              return getAuthObjectForAcceptedToken({
-                authObject: authObjectFn({ treatPendingAsSignedOut: opts?.treatPendingAsSignedOut }),
-                acceptsToken: opts?.acceptsToken,
-              });
-            }) as AuthFn,
-            context,
-            next,
-          )) || (await next());
+        handlerResult = (await handler?.(authHandler as AuthFn, context, next)) || (await next());
       } catch (e: any) {
         handlerResult = handleControlFlowErrors(e, clerkRequest, requestState, context);
       }
