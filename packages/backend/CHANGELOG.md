@@ -1,5 +1,16 @@
 # Change Log
 
+## 2.12.0
+
+### Minor Changes
+
+- [Billing Beta] Use correct casing for past due events types. ([#6687](https://github.com/clerk/javascript/pull/6687)) by [@panteliselef](https://github.com/panteliselef)
+
+  - `'subscription.past_due'` -> `'subscription.pastDue'`
+  - `'subscriptionItem.past_due'` -> `'subscriptionItem.pastDue'`
+
+- Include `'subscriptionItem.freeTrialEnding'` event in `CommerceSubscriptionItemWebhookEvent`. ([#6684](https://github.com/clerk/javascript/pull/6684)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 2.11.0
 
 ### Minor Changes

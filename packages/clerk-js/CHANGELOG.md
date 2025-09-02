@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.91.1
+
+### Patch Changes
+
+- Add `.lp.dev` to list of origins that prefer the popup SSO flow. ([#6686](https://github.com/clerk/javascript/pull/6686)) by [@brkalow](https://github.com/brkalow)
+
 ## 5.91.0
 
 ### Minor Changes
