@@ -6,7 +6,7 @@ Introduces machine authentication, supporting four token types: `api_key`, `oaut
 
 You can specify which token types are allowed by using the `acceptsToken` option in the `auth()` local. This option can be set to a specific type, an array of types, or `'any'` to accept all supported tokens.
 
-Example usage:
+Example usage in endpoints:
 
 ```ts
 export const GET: APIRoute = ({ locals }) => {
@@ -21,4 +21,20 @@ export const GET: APIRoute = ({ locals }) => {
 
   return new Response(JSON.stringify({}))
 }
+```
+
+In middleware:
+
+```ts
+import { clerkMiddleware, createRouteMatcher } from '@clerk/astro/server';
+
+const isProtectedRoute = createRouteMatcher(['/api(.*)']);
+
+export const onRequest = clerkMiddleware((auth, context) => {
+  const { userId } = auth({ acceptsToken: 'api_key' })
+
+  if (!userId && isProtectedRoute(context.request)) {
+    return new Response('Unauthorized', { status: 401 });
+  }
+});
 ```
