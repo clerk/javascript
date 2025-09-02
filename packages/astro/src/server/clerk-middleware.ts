@@ -125,8 +125,11 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
       try {
         handlerResult =
           (await handler?.(
-            ((opts: AuthOptions) => {
-              return getAuthObjectForAcceptedToken({ authObject: authObjectFn(opts), acceptsToken: opts.acceptsToken });
+            ((opts?: AuthOptions) => {
+              return getAuthObjectForAcceptedToken({
+                authObject: authObjectFn({ treatPendingAsSignedOut: opts?.treatPendingAsSignedOut }),
+                acceptsToken: opts?.acceptsToken,
+              });
             }) as AuthFn,
             context,
             next,
