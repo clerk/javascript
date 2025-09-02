@@ -115,6 +115,7 @@
     "object",
     "oauth",
     "web3",
+    "saml",
     "getEnvVariable",
     "pathMatcher",
     "organization",
