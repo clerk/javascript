@@ -1,43 +1,23 @@
 import { useCallback, useEffect, useRef, useSyncExternalStore } from 'react';
 
-export type State<Data = any, Error = any> = {
-  data: Data | null;
-  error: Error | null;
-  /**
-   * if there's an ongoing request and no "loaded data"
-   */
-  isLoading: boolean;
-  /**
-   * if there's a request or revalidation loading
-   */
-  isValidating: boolean;
-  cachedAt?: number;
-};
-
-/**
- * Global cache for storing status of fetched resources
- */
-let requestCache = new Map<string, State>();
-
-/**
- * A set to store subscribers in order to notify when the value of a key of `requestCache` changes
- */
-const subscribers = new Set<() => void>();
+import { registerClearCallback } from '@/core/cacheClearManager';
+import {
+  clearRequestCache,
+  getCacheEntry,
+  type RequestCacheState,
+  setCacheEntry,
+  subscribe,
+} from '@/core/requestCache';
 
 /**
  * This utility should only be used in tests to clear previously fetched data
  */
 export const clearFetchCache = () => {
-  requestCache = new Map<string, State>();
+  clearRequestCache();
 };
 
-/**
- * Global function to clear the fetch cache.
- * This is exposed on the window object to allow core modules to clear the cache
- * without importing from UI modules.
- */
 if (typeof window !== 'undefined') {
-  (window as any).__clerkClearFetchCache = clearFetchCache;
+  registerClearCallback('useFetch', clearFetchCache);
 }
 
 const serialize = (key: unknown) => (typeof key === 'string' ? key : JSON.stringify(key));
@@ -46,18 +26,18 @@ const useCache = <K = any, V = any>(
   key: K,
   serializer = serialize,
 ): {
-  getCache: () => State<V> | undefined;
-  setCache: (state: State<V> | ((params: State<V>) => State<V>)) => void;
+  getCache: () => RequestCacheState<V> | undefined;
+  setCache: (
+    state: RequestCacheState<V> | ((params: RequestCacheState<V> | undefined) => RequestCacheState<V>),
+  ) => void;
   clearCache: () => void;
   subscribeCache: (callback: () => void) => () => void;
 } => {
   const serializedKey = serializer(key);
-  const get = useCallback(() => requestCache.get(serializedKey), [serializedKey]);
+  const get = useCallback(() => getCacheEntry<V>(serializedKey), [serializedKey]);
   const set = useCallback(
-    (data: State | ((params: State) => State)) => {
-      // @ts-ignore
-      requestCache.set(serializedKey, typeof data === 'function' ? data(get()) : data);
-      subscribers.forEach(callback => callback());
+    (data: RequestCacheState<V> | ((params: RequestCacheState<V> | undefined) => RequestCacheState<V>)) => {
+      setCacheEntry(serializedKey, data);
     },
     [serializedKey],
   );
@@ -71,15 +51,14 @@ const useCache = <K = any, V = any>(
       cachedAt: undefined,
     });
   }, [set]);
-  const subscribe = useCallback((callback: () => void) => {
-    subscribers.add(callback);
-    return () => subscribers.delete(callback);
+  const subscribeCache = useCallback((callback: () => void) => {
+    return subscribe(callback);
   }, []);
 
   return {
     getCache: get,
     setCache: set,
-    subscribeCache: subscribe,
+    subscribeCache,
     clearCache: clear,
   };
 };
@@ -125,11 +104,15 @@ export const useFetch = <K, T>(
   const revalidateCache = useSyncExternalStore(subscribeRevalidationCounter, getRevalidationCounter);
 
   const revalidate = useCallback(() => {
-    setCache(d => ({
+    setCache((d: RequestCacheState<T> | undefined) => ({
+      data: null,
+      error: null,
+      isLoading: false,
+      isValidating: false,
       ...d,
       cachedAt: 0,
     }));
-    setRevalidationCounter(d => ({
+    setRevalidationCounter((d: RequestCacheState<number> | undefined) => ({
       isLoading: false,
       isValidating: false,
       error: null,

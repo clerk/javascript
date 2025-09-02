@@ -525,8 +525,13 @@ export class Clerk implements ClerkInterface {
       // Notify other tabs that user is signing out and clean up cookies.
       eventBus.emit(events.UserSignOut, null);
 
-      if (typeof window !== 'undefined' && (window as any).__clerkClearFetchCache) {
-        (window as any).__clerkClearFetchCache();
+      if (typeof window !== 'undefined') {
+        try {
+          const { clearAllCaches } = await import('./cacheClearManager');
+          clearAllCaches();
+        } catch (error) {
+          debugLogger.debug('CacheClearManager not available during signOut, skipping cache clear', { error }, 'clerk');
+        }
       }
 
       this.#setTransitiveState();
