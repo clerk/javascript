@@ -1,5 +1,34 @@
 # Change Log
 
+## 3.24.0
+
+### Minor Changes
+
+- [Billing Beta] `checkout.confirm()` now infers the resource id resulting in less repetition and improved DX. ([#6642](https://github.com/clerk/javascript/pull/6642)) by [@panteliselef](https://github.com/panteliselef)
+
+  After
+
+  ```tsx
+  const checkout = Clerk.billing.startCheckout({ orgId });
+  checkout.confirm(); // orgId is always implied
+  ```
+
+  Before
+
+  ```tsx
+  const checkout = clerk.billing.startCheckout({ orgId });
+  checkout.confirm({ orgId });
+  ```
+
+### Patch Changes
+
+- The `SAML_IDPS` export was moved from `@clerk/types` to `@clerk/shared/saml` and was marked as deprecated. ([#6682](https://github.com/clerk/javascript/pull/6682)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  Please use `import { SAML_IDPS } from "@clerk/shared/saml"` instead.
+
+- Updated dependencies [[`2a82737`](https://github.com/clerk/javascript/commit/2a8273705b9764e1a4613d5a0dbb738d0b156c05), [`cda5d7b`](https://github.com/clerk/javascript/commit/cda5d7b79b28dc03ec794ea54e0feb64b148cdd2), [`ba25a5b`](https://github.com/clerk/javascript/commit/ba25a5b5a3fa686a65f52e221d9d1712a389fea9), [`a50cfc8`](https://github.com/clerk/javascript/commit/a50cfc8f1dd168b436499e32fc8b0fc41d28bbff), [`377f67b`](https://github.com/clerk/javascript/commit/377f67b8e552d1a19efbe4530e9306675b7f8eab), [`65b12ee`](https://github.com/clerk/javascript/commit/65b12eeeb57ee80cdd8c36c5949d51f1227a413e), [`263722e`](https://github.com/clerk/javascript/commit/263722e61fd27403b4c8d9794880686771e123f9)]:
+  - @clerk/types@4.84.0
+
 ## 3.23.0
 
 ### Minor Changes
