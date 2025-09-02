@@ -84,7 +84,8 @@ export type CommerceSubscriptionItemWebhookEvent = Webhook<
   | 'subscriptionItem.ended'
   | 'subscriptionItem.abandoned'
   | 'subscriptionItem.incomplete'
-  | 'subscriptionItem.past_due',
+  | 'subscriptionItem.past_due'
+  | 'subscriptionItem.freeTrialEnding',
   CommerceSubscriptionItemWebhookEventJSON
 >;
 
