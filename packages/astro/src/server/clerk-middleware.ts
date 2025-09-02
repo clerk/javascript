@@ -49,7 +49,7 @@ type ClerkMiddlewareAuthObject = (SignedInAuthObject | SignedOutAuthObject) & {
 };
 
 type ClerkAstroMiddlewareHandler = (
-  auth: () => ClerkMiddlewareAuthObject,
+  auth: AuthFn,
   context: AstroMiddlewareContextParam,
   next: AstroMiddlewareNextParam,
 ) => AstroMiddlewareReturn | undefined;
@@ -123,7 +123,14 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
        */
       let handlerResult: Response;
       try {
-        handlerResult = (await handler?.(() => authObjWithMethods, context, next)) || (await next());
+        handlerResult =
+          (await handler?.(
+            ((opts: AuthOptions) => {
+              return getAuthObjectForAcceptedToken({ authObject: authObjectFn(opts), acceptsToken: opts.acceptsToken });
+            }) as AuthFn,
+            context,
+            next,
+          )) || (await next());
       } catch (e: any) {
         handlerResult = handleControlFlowErrors(e, clerkRequest, requestState, context);
       }
