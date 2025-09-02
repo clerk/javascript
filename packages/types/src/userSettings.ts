@@ -1,6 +1,5 @@
-import type { PhoneCodeChannel } from 'phoneCodeChannel';
-
 import type { ClerkResourceJSON } from './json';
+import type { PhoneCodeChannel } from './phoneCodeChannel';
 import type { ClerkResource } from './resource';
 import type { UserSettingsJSONSnapshot } from './snapshots';
 import type { OAuthStrategy, Web3Strategy } from './strategies';
