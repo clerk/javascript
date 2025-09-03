@@ -2,7 +2,7 @@ import type { ClerkEventPayload, ForPayerType } from '@clerk/types';
 import { useCallback, useMemo } from 'react';
 
 import { eventMethodCalled } from '../../telemetry/events';
-import { unstable_serialize, useSWR } from '../clerk-swr';
+import { useSWR } from '../clerk-swr';
 import {
   useAssertWrappedByClerkProvider,
   useClerkInstanceContext,
@@ -53,7 +53,7 @@ export const useSubscription = (params?: UseSubscriptionParams) => {
     [user?.id, organization?.id, params?.for],
   );
 
-  const uniqueSWRKey = useMemo(() => unstable_serialize(key), [key]);
+  const serializedKey = useMemo(() => JSON.stringify(key), [key]);
 
   const swr = useSWR(key, key => clerk.billing.getSubscription(key.args), {
     dedupingInterval: 1_000 * 60,
@@ -67,7 +67,7 @@ export const useSubscription = (params?: UseSubscriptionParams) => {
   // `swr.mutate` does not dedupe, N parallel calles will fire N revalidation requests.
   //  To avoid this, we use `useThrottledEvent` to dedupe the revalidation requests.
   useThrottledEvent({
-    uniqueKey: uniqueSWRKey,
+    uniqueKey: serializedKey,
     events: revalidateOnEvents,
     onEvent: revalidate,
     clerk,
