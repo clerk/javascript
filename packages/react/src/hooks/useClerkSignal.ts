@@ -1,31 +1,29 @@
-import type { SignInSignal, SignUpSignal } from '@clerk/types';
+import type { SignInSignalValue, SignUpSignalValue } from '@clerk/types';
 import { useCallback, useSyncExternalStore } from 'react';
 
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvider';
 
-function useClerkSignal(signal: 'signIn'): ReturnType<SignInSignal> | null;
-function useClerkSignal(signal: 'signUp'): ReturnType<SignUpSignal> | null;
-function useClerkSignal(signal: 'signIn' | 'signUp'): ReturnType<SignInSignal> | ReturnType<SignUpSignal> | null {
+function useClerkSignal(signal: 'signIn'): SignInSignalValue;
+function useClerkSignal(signal: 'signUp'): SignUpSignalValue;
+function useClerkSignal(signal: 'signIn' | 'signUp'): SignInSignalValue | SignUpSignalValue {
   useAssertWrappedByClerkProvider('useClerkSignal');
 
   const clerk = useIsomorphicClerkContext();
 
   const subscribe = useCallback(
     (callback: () => void) => {
-      if (!clerk.loaded || !clerk.__internal_state) {
+      if (!clerk.loaded) {
         return () => {};
       }
 
       return clerk.__internal_state.__internal_effect(() => {
         switch (signal) {
           case 'signIn':
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we know that the state is defined
-            clerk.__internal_state!.signInSignal();
+            clerk.__internal_state.signInSignal();
             break;
           case 'signUp':
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we know that the state is defined
-            clerk.__internal_state!.signUpSignal();
+            clerk.__internal_state.signUpSignal();
             break;
           default:
             throw new Error(`Unknown signal: ${signal}`);
@@ -36,15 +34,11 @@ function useClerkSignal(signal: 'signIn' | 'signUp'): ReturnType<SignInSignal> |
     [clerk, clerk.loaded, clerk.__internal_state],
   );
   const getSnapshot = useCallback(() => {
-    if (!clerk.__internal_state) {
-      return null;
-    }
-
     switch (signal) {
       case 'signIn':
-        return clerk.__internal_state.signInSignal();
+        return clerk.__internal_state.signInSignal() as SignInSignalValue;
       case 'signUp':
-        return clerk.__internal_state.signUpSignal();
+        return clerk.__internal_state.signUpSignal() as SignUpSignalValue;
       default:
         throw new Error(`Unknown signal: ${signal}`);
     }
@@ -55,10 +49,34 @@ function useClerkSignal(signal: 'signIn' | 'signUp'): ReturnType<SignInSignal> |
   return value;
 }
 
+/**
+ * This hook allows you to access the Signal-based `SignIn` resource.
+ *
+ * @experimental This experimental API is subject to change.
+ * @example
+ * import { useSignInSignal } from "@clerk/clerk-react/experimental";
+ *
+ * function SignInForm() {
+ *   const { signIn, errors, fetchStatus } = useSignInSignal();
+ *   //
+ * }
+ */
 export function useSignInSignal() {
   return useClerkSignal('signIn');
 }
 
+/**
+ * This hook allows you to access the Signal-based `SignUp` resource.
+ *
+ * @experimental This experimental API is subject to change.
+ * @example
+ * import { useSignUpSignal } from "@clerk/clerk-react/experimental";
+ *
+ * function SignUpForm() {
+ *   const { signUp, errors, fetchStatus } = useSignUpSignal();
+ *   //
+ * }
+ */
 export function useSignUpSignal() {
   return useClerkSignal('signUp');
 }

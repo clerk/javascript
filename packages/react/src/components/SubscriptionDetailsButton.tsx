@@ -26,7 +26,7 @@ import { withClerk } from './withClerk';
  * function OrganizationSubscriptionDetails() {
  *   return (
  *     <SubscriptionDetailsButton
- *       for="org"
+ *       for="organization"
  *       onSubscriptionCancel={() => console.log('Subscription canceled')}
  *     >
  *       <button>View Organization Subscription</button>
@@ -36,7 +36,7 @@ import { withClerk } from './withClerk';
  * ```
  *
  * @throws {Error} When rendered outside of a `<SignedIn />` component
- * @throws {Error} When `for="org"` is used without an active organization context
+ * @throws {Error} When `for="organization"` is used without an active organization context
  *
  * @see https://clerk.com/docs/billing/overview
  */
@@ -53,12 +53,14 @@ export const SubscriptionDetailsButton = withClerk(
     const { userId, orgId } = useAuth();
 
     if (userId === null) {
-      throw new Error('Ensure that `<SubscriptionDetailsButton />` is rendered inside a `<SignedIn />` component.');
+      throw new Error(
+        'Clerk: Ensure that `<SubscriptionDetailsButton />` is rendered inside a `<SignedIn />` component.',
+      );
     }
 
     if (orgId === null && _for === 'organization') {
       throw new Error(
-        'Wrap `<SubscriptionDetailsButton for="organization" />` with a check for an active organization.',
+        'Clerk: Wrap `<SubscriptionDetailsButton for="organization" />` with a check for an active organization. Retrieve `orgId` from `useAuth()` and confirm it is defined. For SSR, see: https://clerk.com/docs/references/backend/types/auth-object#how-to-access-the-auth-object',
       );
     }
 

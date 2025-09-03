@@ -1,5 +1,60 @@
 # Change Log
 
+## 2.12.0
+
+### Minor Changes
+
+- [Billing Beta] Use correct casing for past due events types. ([#6687](https://github.com/clerk/javascript/pull/6687)) by [@panteliselef](https://github.com/panteliselef)
+
+  - `'subscription.past_due'` -> `'subscription.pastDue'`
+  - `'subscriptionItem.past_due'` -> `'subscriptionItem.pastDue'`
+
+- Include `'subscriptionItem.freeTrialEnding'` event in `CommerceSubscriptionItemWebhookEvent`. ([#6684](https://github.com/clerk/javascript/pull/6684)) by [@panteliselef](https://github.com/panteliselef)
+
+## 2.11.0
+
+### Minor Changes
+
+- Get user's subscription via BillingApi. ([#6667](https://github.com/clerk/javascript/pull/6667)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- - Export `Feature` type from backend resource. ([#6649](https://github.com/clerk/javascript/pull/6649)) by [@alexisintech](https://github.com/alexisintech)
+
+  - Re-export canonical `CommerceMoneyAmount` type from `@clerk/types`.
+
+- Updated dependencies [[`2a82737`](https://github.com/clerk/javascript/commit/2a8273705b9764e1a4613d5a0dbb738d0b156c05), [`cda5d7b`](https://github.com/clerk/javascript/commit/cda5d7b79b28dc03ec794ea54e0feb64b148cdd2), [`ba25a5b`](https://github.com/clerk/javascript/commit/ba25a5b5a3fa686a65f52e221d9d1712a389fea9), [`a50cfc8`](https://github.com/clerk/javascript/commit/a50cfc8f1dd168b436499e32fc8b0fc41d28bbff), [`377f67b`](https://github.com/clerk/javascript/commit/377f67b8e552d1a19efbe4530e9306675b7f8eab), [`65b12ee`](https://github.com/clerk/javascript/commit/65b12eeeb57ee80cdd8c36c5949d51f1227a413e), [`263722e`](https://github.com/clerk/javascript/commit/263722e61fd27403b4c8d9794880686771e123f9)]:
+  - @clerk/types@4.84.0
+  - @clerk/shared@3.24.0
+
+## 2.10.1
+
+### Patch Changes
+
+- Updated dependencies [[`600c648`](https://github.com/clerk/javascript/commit/600c648d4087a823341041c90018797fbc0033f0)]:
+  - @clerk/shared@3.23.0
+  - @clerk/types@4.83.0
+
+## 2.10.0
+
+### Minor Changes
+
+- Add missing properties to OAuthApplicationJSON ([#6378](https://github.com/clerk/javascript/pull/6378)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- [Billing Beta] Add `cancelSubscriptionItem` to BillingApi. ([#6611](https://github.com/clerk/javascript/pull/6611)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add `getOrganizationBillingSubscription` to BillingApi. ([#6632](https://github.com/clerk/javascript/pull/6632)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Fixes an issue where a handshake would trigger more than intended in development. ([#6635](https://github.com/clerk/javascript/pull/6635)) by [@brkalow](https://github.com/brkalow)
+
+- Fix logic for forcing a session sync on cross origin requests. ([#6600](https://github.com/clerk/javascript/pull/6600)) by [@brkalow](https://github.com/brkalow)
+
+- Updated dependencies [[`d52714e`](https://github.com/clerk/javascript/commit/d52714e4cb7f369c74826cd4341c58eb1900abe4), [`ce49740`](https://github.com/clerk/javascript/commit/ce49740d474d6dd9da5096982ea4e9f14cf68f09), [`2ed539c`](https://github.com/clerk/javascript/commit/2ed539cc7f08ed4d70c33621563ad386ea8becc5), [`deaafe4`](https://github.com/clerk/javascript/commit/deaafe449773632d690aa2f8cafaf959392622b9), [`a26ecae`](https://github.com/clerk/javascript/commit/a26ecae09fd06cd34f094262f038a8eefbb23f7d), [`c16a7a5`](https://github.com/clerk/javascript/commit/c16a7a5837fc15e0e044baf9c809b8da6fbac795), [`05b6d65`](https://github.com/clerk/javascript/commit/05b6d65c0bc5736443325a5defee4c263ef196af)]:
+  - @clerk/types@4.82.0
+  - @clerk/shared@3.22.1
+
 ## 2.9.4
 
 ### Patch Changes

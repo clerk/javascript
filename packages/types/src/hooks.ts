@@ -1,14 +1,13 @@
-import type { OrganizationCustomRoleKey } from 'organizationMembership';
-import type { SignInResource } from 'signIn';
-
 import type { SetActive, SignOut } from './clerk';
 import type { ActClaim, JwtPayload } from './jwtv2';
+import type { OrganizationCustomRoleKey } from './organizationMembership';
 import type {
   CheckAuthorizationWithCustomPermissions,
   GetToken,
   SessionResource,
   SignedInSessionResource,
 } from './session';
+import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
 import type { UserResource } from './user';
 

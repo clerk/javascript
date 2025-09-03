@@ -577,7 +577,10 @@ export const Waitlist = withClerk(
 
 export const PricingTable = withClerk(
   ({ clerk, component, fallback, ...props }: WithClerkProp<PricingTableProps & FallbackProp>) => {
-    const mountingStatus = useWaitForComponentMount(component);
+    const mountingStatus = useWaitForComponentMount(component, {
+      // This attribute is added to the PricingTable root element after we've successfully fetched the plans asynchronously.
+      selector: '[data-component-status="ready"]',
+    });
     const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
 
     const rendererRootProps = {

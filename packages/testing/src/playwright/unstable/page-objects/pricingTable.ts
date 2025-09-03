@@ -59,6 +59,9 @@ export const createPricingTablePageObject = (testArgs: { page: EnhancedPage }) =
     waitToBeActive: async ({ planSlug }: { planSlug: string }) => {
       return locators.badge(planSlug).getByText('Active').waitFor({ state: 'visible' });
     },
+    waitToBeFreeTrial: async ({ planSlug }: { planSlug: string }) => {
+      return locators.badge(planSlug).getByText('Free trial').waitFor({ state: 'visible' });
+    },
     getPlanCardCTA: ({ planSlug }: { planSlug: string }) => {
       return locators.footer(planSlug).getByRole('button', {
         name: /get|switch|subscribe/i,
@@ -74,7 +77,11 @@ export const createPricingTablePageObject = (testArgs: { page: EnhancedPage }) =
       period?: BillingPeriod;
     }) => {
       const targetButtonName =
-        shouldSwitch === true ? 'Switch to this plan' : shouldSwitch === false ? /subscribe/i : /get|switch|subscribe/i;
+        shouldSwitch === true
+          ? 'Switch to this plan'
+          : shouldSwitch === false
+            ? /subscribe/i
+            : /get|switch|subscribe|Start \d+-day free trial/i;
 
       if (period) {
         await ensurePricingPeriod(planSlug, period);

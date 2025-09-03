@@ -24,6 +24,7 @@ import type {
   __internal_UserVerificationModalProps,
   APIKeysNamespace,
   APIKeysProps,
+  AuthenticateWithBaseParams,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
@@ -42,6 +43,7 @@ import type {
   EnvironmentJSON,
   EnvironmentJSONSnapshot,
   EnvironmentResource,
+  GenerateSignatureParams,
   GoogleOneTapProps,
   HandleEmailLinkVerificationParams,
   HandleOAuthCallbackParams,
@@ -85,7 +87,6 @@ import type {
   Web3Provider,
 } from '@clerk/types';
 
-import type { DebugLoggerInterface } from '@/utils/debug';
 import { debugLogger, initDebugLogger } from '@/utils/debug';
 
 import type { MountComponentRenderer } from '../ui/Components';
@@ -101,6 +102,7 @@ import {
   disabledAPIKeysFeature,
   disabledOrganizationsFeature,
   errorThrower,
+  generateSignatureWithBase,
   generateSignatureWithCoinbaseWallet,
   generateSignatureWithMetamask,
   generateSignatureWithOKXWallet,
@@ -163,11 +165,6 @@ type SetActiveHook = (intent?: 'sign-out') => void | Promise<void>;
 
 export type ClerkCoreBroadcastChannelEvent = { type: 'signout' };
 
-/**
- * Interface for the debug logger with all available logging methods
- */
-// DebugLoggerInterface imported from '@/utils/debug'
-
 declare global {
   interface Window {
     Clerk?: Clerk;
@@ -219,8 +216,6 @@ export class Clerk implements ClerkInterface {
   public __internal_country?: string | null;
   public telemetry: TelemetryCollector | undefined;
   public readonly __internal_state: State = new State();
-  // Deprecated: use global singleton from `@/utils/debug`
-  public debugLogger?: DebugLoggerInterface;
 
   protected internal_last_error: ClerkAPIError | null = null;
   // converted to protected environment to support `updateEnvironment` type assertion
@@ -2156,6 +2151,13 @@ export class Clerk implements ClerkInterface {
     });
   };
 
+  public authenticateWithBase = async (props: AuthenticateWithBaseParams = {}): Promise<void> => {
+    await this.authenticateWithWeb3({
+      ...props,
+      strategy: 'web3_base_signature',
+    });
+  };
+
   public authenticateWithOKXWallet = async (props: AuthenticateWithOKXWalletParams = {}): Promise<void> => {
     await this.authenticateWithWeb3({
       ...props,
@@ -2180,12 +2182,21 @@ export class Clerk implements ClerkInterface {
 
     const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
     const identifier = await getWeb3Identifier({ provider });
-    const generateSignature =
-      provider === 'metamask'
-        ? generateSignatureWithMetamask
-        : provider === 'coinbase_wallet'
-          ? generateSignatureWithCoinbaseWallet
-          : generateSignatureWithOKXWallet;
+    let generateSignature: (params: GenerateSignatureParams) => Promise<string>;
+    switch (provider) {
+      case 'metamask':
+        generateSignature = generateSignatureWithMetamask;
+        break;
+      case 'base':
+        generateSignature = generateSignatureWithBase;
+        break;
+      case 'coinbase_wallet':
+        generateSignature = generateSignatureWithCoinbaseWallet;
+        break;
+      default:
+        generateSignature = generateSignatureWithOKXWallet;
+        break;
+    }
 
     const makeNavigate = (to: string) => () =>
       customNavigate && typeof customNavigate === 'function' ? customNavigate(to) : this.navigate(to);
@@ -2676,10 +2687,6 @@ export class Clerk implements ClerkInterface {
 
     this.#emit();
   };
-
-  get __internal_hasAfterAuthFlows() {
-    return !!this.environment?.organizationSettings?.forceOrganizationSelection;
-  }
 
   #defaultSession = (client: ClientResource): SignedInSessionResource | null => {
     if (client.lastActiveSessionId) {

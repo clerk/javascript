@@ -15,6 +15,7 @@ test.describe('Next.js API key auth within clerkMiddleware() @machine', () => {
   let fakeAPIKey: FakeAPIKey;
 
   test.beforeAll(async () => {
+    test.setTimeout(90_000); // Wait for app to be ready
     app = await appConfigs.next.appRouter
       .clone()
       .addFile(
@@ -105,6 +106,8 @@ test.describe('Next.js API key auth within routes @nextjs', () => {
   let fakeAPIKey: FakeAPIKey;
 
   test.beforeAll(async () => {
+    test.setTimeout(90_000); // Wait for app to be ready
+
     app = await appConfigs.next.appRouter
       .clone()
       .addFile(
