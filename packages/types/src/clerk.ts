@@ -961,7 +961,7 @@ type ClerkOptionsNavigation =
       routerDebug?: boolean;
     };
 
-type ClerkProviderLegacyRedirectProps = {
+type ClerkOptionsLegacyRedirectProps = {
   /**
    * @deprecated Use `signInFallbackRedirectUrl` or `signInForceRedirectUrl` instead.
    */
@@ -982,7 +982,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
   NewSubscriptionRedirectUrl &
-  ClerkProviderLegacyRedirectProps &
+  ClerkOptionsLegacyRedirectProps &
   AfterSignOutUrl &
   AfterMultiSessionSingleSignOutUrl & {
     /**
