@@ -88,6 +88,7 @@ export const useFetch = <K, T>(
   options?: {
     throttleTime?: number;
     onSuccess?: (data: T) => void;
+    onError?: (error: Error) => void;
     staleTime?: number;
   },
   resourceId?: string,
@@ -166,7 +167,7 @@ export const useFetch = <K, T>(
           }, waitTime);
         }
       })
-      .catch((e: Error) => {
+      .catch((e: Error | null) => {
         setCache({
           data: getCache()?.data ?? null,
           isLoading: false,
@@ -174,6 +175,9 @@ export const useFetch = <K, T>(
           error: e,
           cachedAt: Date.now(),
         });
+        if (e) {
+          options?.onError?.(e);
+        }
       });
   }, [serialize(params), setCache, getCache, revalidateCache]);
 
