@@ -41,12 +41,17 @@ export const useSubscription = (params?: UseSubscriptionParams) => {
 
   clerk.telemetry?.record(eventMethodCalled(hookName));
 
+  const isOrganization = params?.for === 'organization';
+  const billingEnabled = isOrganization
+    ? environment?.commerceSettings.billing.organization.enabled
+    : environment?.commerceSettings.billing.user.enabled;
+
   const swr = useSWR(
-    user?.id && environment?.commerceSettings.billing.user.enabled
+    user?.id && billingEnabled
       ? {
           type: 'commerce-subscription',
           userId: user.id,
-          args: { orgId: params?.for === 'organization' ? organization?.id : undefined },
+          args: { orgId: isOrganization ? organization?.id : undefined },
         }
       : null,
     ({ args }) => clerk.billing.getSubscription(args),

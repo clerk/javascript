@@ -85,7 +85,12 @@ export function createCommercePaginatedHook<TResource extends ClerkResource, TPa
 
     const isClerkLoaded = !!(clerk.loaded && (options?.unauthenticated ? true : user));
 
-    const isEnabled = !!hookParams && isClerkLoaded && environment?.commerceSettings.billing.user.enabled;
+    const isOrganization = _for === 'organization';
+    const billingEnabled = isOrganization
+      ? environment?.commerceSettings.billing.organization.enabled
+      : environment?.commerceSettings.billing.user.enabled;
+
+    const isEnabled = !!hookParams && isClerkLoaded && !!billingEnabled;
 
     const result = usePagesOrInfinite<TParams, ClerkPaginatedResponse<TResource>>(
       (hookParams || {}) as TParams,
