@@ -24,13 +24,7 @@ export const SignUpEmailCodeCard = () => {
 
   // TODO: Introduce a useMutation to handle mutating requests
   useFetch(
-    shouldAvoidPrepare
-      ? undefined
-      : () =>
-          signUp.prepareEmailAddressVerification({ strategy: 'email_code' }).catch(err => {
-            handleError(err, [], card.setError);
-            return err;
-          }),
+    shouldAvoidPrepare ? undefined : () => signUp.prepareEmailAddressVerification({ strategy: 'email_code' }),
     {
       name: 'prepare',
       strategy: 'email_code',
@@ -38,6 +32,7 @@ export const SignUpEmailCodeCard = () => {
     },
     {
       staleTime: 100,
+      onError: err => handleError(err, [], card.setError),
     },
   );
 

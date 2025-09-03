@@ -82,25 +82,11 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
       .catch(err => handleError(err, [], card.setError));
   };
 
-  useFetch(
-    shouldAvoidPrepare
-      ? undefined
-      : () =>
-          signIn
-            ?.prepareFirstFactor(props.factor)
-            .then(res => {
-              props.onFactorPrepare();
-              return res;
-            })
-            .catch(err => {
-              handleError(err, [], card.setError);
-              return err;
-            }),
-    cacheKey,
-    {
-      staleTime: 100,
-    },
-  );
+  useFetch(shouldAvoidPrepare ? undefined : () => signIn?.prepareFirstFactor(props.factor), cacheKey, {
+    staleTime: 100,
+    onSuccess: () => props.onFactorPrepare(),
+    onError: err => handleError(err, [], card.setError),
+  });
 
   const action: VerificationCodeCardProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {
     signIn
