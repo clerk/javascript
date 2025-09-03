@@ -830,7 +830,7 @@ export const ptBR: LocalizationResource = {
       formFieldInputPlaceholder__name: 'Minha organização',
       formFieldInputPlaceholder__slug: 'minha-organizacao',
       formFieldLabel__name: 'Nome',
-      formFieldLabel__slug: 'Slug',
+      formFieldLabel__slug: 'Rótulo do URL',
       subtitle: 'Conte-nos um pouco sobre sua organização',
       title: 'Configure sua conta',
     },
