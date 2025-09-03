@@ -88,6 +88,7 @@ export const useFetch = <K, T>(
   options?: {
     throttleTime?: number;
     onSuccess?: (data: T) => void;
+    onError?: (error: Error) => void;
     staleTime?: number;
   },
   resourceId?: string,
@@ -134,6 +135,13 @@ export const useFetch = <K, T>(
       typeof getCache()?.cachedAt === 'undefined' ? true : Date.now() - (getCache()?.cachedAt || 0) >= staleTime;
     const isRequestOnGoing = getCache()?.isValidating ?? false;
 
+    console.log('fetcherMissing', fetcherMissing);
+    console.log('isCacheStale', isCacheStale);
+    console.log('isRequestOnGoing', isRequestOnGoing);
+
+    console.log('toSkip', fetcherMissing || !isCacheStale || isRequestOnGoing);
+    console.log('getCache()', getCache());
+
     if (fetcherMissing || !isCacheStale || isRequestOnGoing) {
       return;
     }
@@ -174,6 +182,7 @@ export const useFetch = <K, T>(
           error: e,
           cachedAt: Date.now(),
         });
+        options?.onError?.(e);
       });
   }, [serialize(params), setCache, getCache, revalidateCache]);
 
