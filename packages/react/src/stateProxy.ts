@@ -68,22 +68,29 @@ export class StateProxy implements State {
   }
 
   private buildSignUpProxy() {
+    const proxy = this;
     const target = () => this.client.signUp.__internal_future;
 
     return {
       errors: defaultErrors(),
       fetchStatus: 'idle' as const,
       signUp: {
-        status: 'missing_requirements' as const,
-        unverifiedFields: [],
-        isTransferable: false,
+        get status() {
+          return proxy.gateProperty(target, 'status', 'missing_requirements');
+        },
+        get unverifiedFields() {
+          return proxy.gateProperty(target, 'unverifiedFields', []);
+        },
+        get isTransferable() {
+          return proxy.gateProperty(target, 'isTransferable', false);
+        },
 
-        create: this.gateMethod(target, 'create'),
-        sso: this.gateMethod(target, 'sso'),
-        password: this.gateMethod(target, 'password'),
-        finalize: this.gateMethod(target, 'finalize'),
+        create: proxy.gateMethod(target, 'create'),
+        sso: proxy.gateMethod(target, 'sso'),
+        password: proxy.gateMethod(target, 'password'),
+        finalize: proxy.gateMethod(target, 'finalize'),
 
-        verifications: this.wrapMethods(() => target().verifications, [
+        verifications: proxy.wrapMethods(() => target().verifications, [
           'sendEmailCode',
           'verifyEmailCode',
           'sendPhoneCode',
@@ -104,6 +111,16 @@ export class StateProxy implements State {
     const c = this.isomorphicClerk.client;
     if (!c) throw new Error('Clerk client not ready');
     return c;
+  }
+
+  private gateProperty<T extends object, K extends keyof T>(getTarget: () => T, key: K, defaultValue: T[K]) {
+    return (() => {
+      if (!inBrowser() || !this.isomorphicClerk.loaded) {
+        return defaultValue;
+      }
+      const t = getTarget();
+      return t[key];
+    })() as T[K];
   }
 
   private gateMethod<T extends object, K extends keyof T & string>(getTarget: () => T, key: K) {
