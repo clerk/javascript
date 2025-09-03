@@ -595,10 +595,6 @@ class SignUpFuture implements SignUpFutureResource {
   }
 
   async password(params: SignUpFuturePasswordParams): Promise<{ error: unknown }> {
-    if ([params.emailAddress, params.phoneNumber].filter(Boolean).length > 1) {
-      throw new Error('Only one of emailAddress or phoneNumber can be provided');
-    }
-
     return runAsyncResourceTask(this.resource, async () => {
       const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
 
