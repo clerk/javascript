@@ -149,7 +149,7 @@ type ClerkEvent = keyof ClerkEventPayload;
 type EventHandler<E extends ClerkEvent> = (payload: ClerkEventPayload[E]) => void;
 export type ClerkEventPayload = {
   status: ClerkStatus;
-  'resource:action': 'checkout.confirm';
+  'resource:action': 'checkout.confirm' | 'subscriptionItem.cancel';
 };
 type OnEventListener = <E extends ClerkEvent>(event: E, handler: EventHandler<E>, opt?: { notify: boolean }) => void;
 type OffEventListener = <E extends ClerkEvent>(event: E, handler: EventHandler<E>) => void;

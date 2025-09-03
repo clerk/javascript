@@ -117,6 +117,8 @@ export class CommerceSubscriptionItem extends BaseResource implements CommerceSu
       })
     )?.response as unknown as DeletedObjectJSON;
 
+    CommerceSubscription.clerk.__internal_eventBus.emit('resource:action', 'subscriptionItem.cancel');
+
     return new DeletedObject(json);
   }
 }

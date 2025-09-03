@@ -1,14 +1,15 @@
 import type { ClerkEventPayload, ForPayerType } from '@clerk/types';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { eventMethodCalled } from '../../telemetry/events';
-import { useSWR } from '../clerk-swr';
+import { unstable_serialize, useSWR } from '../clerk-swr';
 import {
   useAssertWrappedByClerkProvider,
   useClerkInstanceContext,
   useOrganizationContext,
   useUserContext,
 } from '../contexts';
+import { useThrottledEvent } from './useThrottledEvent';
 
 const hookName = 'useSubscription';
 
@@ -22,7 +23,7 @@ type UseSubscriptionParams = {
   keepPreviousData?: boolean;
 };
 
-const revalidateOnEvents: ClerkEventPayload['resource:action'][] = ['checkout.confirm'];
+const revalidateOnEvents: ClerkEventPayload['resource:action'][] = ['checkout.confirm', 'subscriptionItem.cancel'];
 
 /**
  * @internal
@@ -40,38 +41,37 @@ export const useSubscription = (params?: UseSubscriptionParams) => {
 
   clerk.telemetry?.record(eventMethodCalled(hookName));
 
-  const swr = useSWR(
-    user?.id
-      ? {
-          type: 'commerce-subscription',
-          userId: user.id,
-          args: { orgId: params?.for === 'organization' ? organization?.id : undefined },
-        }
-      : null,
-    ({ args }) => clerk.billing.getSubscription(args),
-    {
-      dedupingInterval: 1_000 * 60,
-      keepPreviousData: params?.keepPreviousData,
-    },
+  const key = useMemo(
+    () =>
+      user?.id
+        ? {
+            type: 'commerce-subscription',
+            userId: user.id,
+            args: { orgId: params?.for === 'organization' ? organization?.id : undefined },
+          }
+        : null,
+    [user?.id, organization?.id, params?.for],
   );
+
+  const uniqueSWRKey = useMemo(() => unstable_serialize(key), [key]);
+
+  const swr = useSWR(key, key => clerk.billing.getSubscription(key.args), {
+    dedupingInterval: 1_000 * 60,
+    keepPreviousData: params?.keepPreviousData,
+    revalidateOnFocus: false,
+  });
 
   const revalidate = useCallback(() => swr.mutate(), [swr.mutate]);
 
-  useEffect(() => {
-    const on = clerk.on.bind(clerk);
-    const off = clerk.off.bind(clerk);
-    const handler = (payload: ClerkEventPayload['resource:action']) => {
-      if (revalidateOnEvents.includes(payload)) {
-        // When multiple handlers call `revalidate` the request will fire only once.
-        void revalidate();
-      }
-    };
-
-    on('resource:action', handler);
-    return () => {
-      off('resource:action', handler);
-    };
-  }, [revalidate]);
+  // Maps cache key to event listener instead of matching the hook instance.
+  // `swr.mutate` does not dedupe, N parallel calles will fire N revalidation requests.
+  //  To avoid this, we use `useThrottledEvent` to dedupe the revalidation requests.
+  useThrottledEvent({
+    uniqueKey: uniqueSWRKey,
+    events: revalidateOnEvents,
+    onEvent: revalidate,
+    clerk,
+  });
 
   return {
     data: swr.data,
