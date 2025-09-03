@@ -1,5 +1,4 @@
-import type { PhoneCodeChannel } from 'phoneCodeChannel';
-
+import type { PhoneCodeChannel } from './phoneCodeChannel';
 import type { ClerkResource } from './resource';
 import type { AuthConfigJSONSnapshot } from './snapshots';
 
