@@ -1,4 +1,4 @@
-import type { ForPayerType } from '@clerk/types';
+import type { EnvironmentResource, ForPayerType } from '@clerk/types';
 import { useCallback } from 'react';
 
 import { eventMethodCalled } from '../../telemetry/events';
@@ -36,10 +36,13 @@ export const useSubscription = (params?: UseSubscriptionParams) => {
   const user = useUserContext();
   const { organization } = useOrganizationContext();
 
+  // @ts-expect-error `__unstable__environment` is not typed
+  const environment = clerk.__unstable__environment as unknown as EnvironmentResource | null | undefined;
+
   clerk.telemetry?.record(eventMethodCalled(hookName));
 
   const swr = useSWR(
-    user?.id
+    user?.id && environment?.commerceSettings.billing.user.enabled
       ? {
           type: 'commerce-subscription',
           userId: user.id,
