@@ -872,6 +872,7 @@ export const taIN: LocalizationResource = {
     form_username_invalid_length:
       'உங்கள் பயனர்பெயர் {{min_length}} மற்றும் {{max_length}} எழுத்துகளுக்கு இடையில் இருக்க வேண்டும்.',
     identification_deletion_failed: 'உங்கள் கடைசி அடையாளத்தை நீங்கள் நீக்க முடியாது.',
+    invitations_not_supported: undefined,
     not_allowed_access:
       'இந்த பக்கத்தை அணுக உங்களுக்கு அனுமதி இல்லை. இது பிழை என்று நீங்கள் நம்பினால், ஆதரவைத் தொடர்பு கொள்ளவும்.',
     organization_domain_blocked: 'இது தடுக்கப்பட்ட மின்னஞ்சல் வழங்குநர் டொமைன். வேறொன்றைப் பயன்படுத்தவும்.',

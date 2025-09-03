@@ -861,6 +861,7 @@ export const fiFI: LocalizationResource = {
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
     identification_deletion_failed: 'Et voi poistaa viimeistä henkilöllisyyttäsi.',
+    invitations_not_supported: undefined,
     not_allowed_access:
       "Sähköpostiosoite tai puhelinnumero ei ole sallittu rekisteröityäksesi. Tämä voi johtua siitä, että sähköpostiosoite sisältää '+', '=', '#' tai '.' merkkejä, käyttäät aluetta, joka on sidottu tilapäisyyden sähköpostitilaukseen, tai olet eksplisiittisesti estetty. Jos uskoo, että tämä on virhe, ota yhteyttä tukeen.",
     organization_domain_blocked: undefined,

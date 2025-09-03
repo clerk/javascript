@@ -860,6 +860,7 @@ export const srRS: LocalizationResource = {
     form_username_invalid_character: 'Korisničko ime sadrži nevažeće karaktere.',
     form_username_invalid_length: 'Dužina korisničkog imena nije validna.',
     identification_deletion_failed: 'Ne možeš obrisati svoju poslednju identifikaciju.',
+    invitations_not_supported: undefined,
     not_allowed_access:
       "Adresa e-maila ili broja telefona nije dozvoljena za registraciju. Ovo može biti zbog korišćenja '+', '=', '#' ili '.' u adresi e-maila, korišćenja domena koji je povezan sa vremenskom e-mail uslugom ili eksplicitnom isključenju.",
     organization_domain_blocked: undefined,

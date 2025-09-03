@@ -857,6 +857,7 @@ export const ukUA: LocalizationResource = {
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
     identification_deletion_failed: 'You cannot delete your last identification.',
+    invitations_not_supported: undefined,
     not_allowed_access:
       "Адреса електронної пошти або номер телефону не дозволено для реєстрації. Це може бути пов'язано з використанням '+', '=', '#' або '.' в адресі електронної пошти, використанням домену, пов'язаного з тимчасовою електронною поштою, або явного виключення.",
     organization_domain_blocked: undefined,

@@ -868,6 +868,7 @@ export const hiIN: LocalizationResource = {
       'आपके उपयोगकर्ता नाम में अमान्य वर्ण हैं। कृपया केवल अक्षर, संख्या और अंडरस्कोर का उपयोग करें।',
     form_username_invalid_length: 'आपका उपयोगकर्ता नाम {{min_length}} और {{max_length}} अक्षरों के बीच होना चाहिए।',
     identification_deletion_failed: 'आप अपनी अंतिम पहचान को हटा नहीं सकते।',
+    invitations_not_supported: undefined,
     not_allowed_access:
       'आपके पास इस पेज तक पहुंचने की अनुमति नहीं है। यदि आपका मानना है कि यह एक त्रुटि है, तो कृपया सहायता से संपर्क करें।',
     organization_domain_blocked: 'यह एक ब्लॉक किया गया ईमेल प्रदाता डोमेन है। कृपया दूसरा उपयोग करें।',

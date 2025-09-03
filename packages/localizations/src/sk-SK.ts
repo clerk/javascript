@@ -868,6 +868,7 @@ export const skSK: LocalizationResource = {
     form_username_invalid_length:
       'Používateľské meno musí mať aspoň {{min_length}} znaky a maximálne {{max_length}} znakov.',
     identification_deletion_failed: 'Nemôžete odstrániť váš posledný identifikátor.',
+    invitations_not_supported: undefined,
     not_allowed_access: 'Nemáte povolený prístup k tejto stránke. Ak si myslíte, že je to chyba, kontaktujte podporu.',
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,

@@ -870,6 +870,7 @@ export const csCZ: LocalizationResource = {
     form_username_invalid_character: undefined,
     form_username_invalid_length: 'Vaše uživatelské jméno musí mít mezi {{min_length}} a {{max_length}} znaky.',
     identification_deletion_failed: undefined,
+    invitations_not_supported: undefined,
     not_allowed_access: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,

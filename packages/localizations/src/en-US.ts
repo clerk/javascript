@@ -858,6 +858,8 @@ export const enUS: LocalizationResource = {
     form_username_invalid_character: undefined,
     form_username_invalid_length: 'Your username must be between {{min_length}} and {{max_length}} characters long.',
     identification_deletion_failed: undefined,
+    invitations_not_supported:
+      "This organization doesn't support email invitations. Please contact support to enable this feature.",
     not_allowed_access: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
@@ -924,8 +926,6 @@ export const enUS: LocalizationResource = {
         wordByItself: 'Single words are easy to guess.',
       },
     },
-    invitations_not_supported:
-      "This organization doesn't support email invitations. Please contact support to enable this feature.",
   },
   userButton: {
     action__addAccount: 'Add account',

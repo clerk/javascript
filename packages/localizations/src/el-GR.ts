@@ -863,6 +863,7 @@ export const elGR: LocalizationResource = {
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
     identification_deletion_failed: 'Δεν μπορείτε να διαγράψετε το τελευταίο στοιχείο ταυτοποιησής σας.',
+    invitations_not_supported: undefined,
     not_allowed_access:
       "Η διεύθυνση email ή το τηλέφωνο δεν επιτρέπεται για την εγγραφή. Αυτό μπορεί να οφείλεται στη χρήση '+', '=', '#' ή '.' στην διεύθυνση email σας, χρήση πεδίου που συνδέεται με υπηρεσία email, ή εμφανής αποκλεισμός. Αν πιστεύετε ότι αυτό είναι ένα σφάλμα, παρακαλούμε επικοινωνήστε με την υποστήριξη.",
     organization_domain_blocked: undefined,

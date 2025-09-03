@@ -846,6 +846,7 @@ export const zhTW: LocalizationResource = {
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
     identification_deletion_failed: '您無法刪除最後一個驗證方式。',
+    invitations_not_supported: undefined,
     not_allowed_access: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,

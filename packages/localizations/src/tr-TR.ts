@@ -862,6 +862,7 @@ export const trTR: LocalizationResource = {
     form_username_invalid_character: 'Kullanıcı adı geçersiz karakterler içeriyor.',
     form_username_invalid_length: 'Kullanıcı adı 3 ile 50 karakter arasında olmalıdır.',
     identification_deletion_failed: 'Son kimliğinizi silemezsiniz.',
+    invitations_not_supported: undefined,
     not_allowed_access:
       "E-posta adresiniz veya telefon numaranız kayıt için izin verilmiyor. Bu, e-posta adresinizde '+', '=', '#' veya '.' kullanmanız, geçici e-posta hizmetiyle ilişkilendirilmiş bir alan adı kullanmanız veya açık bir engellemeyle ilgili olabilir.",
     organization_domain_blocked: 'Organizasyon alan adı engellendi.',

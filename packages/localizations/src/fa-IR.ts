@@ -871,6 +871,7 @@ export const faIR: LocalizationResource = {
     form_username_invalid_character: 'نام کاربری شامل کاراکترهای نامعتبر است.',
     form_username_invalid_length: 'نام کاربری شما باید بین {{min_length}} و {{max_length}} کاراکتر باشد.',
     identification_deletion_failed: 'حذف شناسه ناموفق بود.',
+    invitations_not_supported: undefined,
     not_allowed_access: 'دسترسی مجاز نیست.',
     organization_domain_blocked: 'دامنه سازمان مسدود شده است.',
     organization_domain_common: 'دامنه سازمان عمومی است و قابل قبول نیست.',

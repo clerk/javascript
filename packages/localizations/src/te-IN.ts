@@ -870,6 +870,7 @@ export const teIN: LocalizationResource = {
       'మీ వినియోగదారు పేరులో చెల్లని అక్షరాలు ఉన్నాయి. దయచేసి అక్షరాలు, సంఖ్యలు మరియు అండర్‌స్కోర్‌లను మాత్రమే ఉపయోగించండి.',
     form_username_invalid_length: 'మీ వినియోగదారు పేరు {{min_length}} మరియు {{max_length}} అక్షరాల మధ్య ఉండాలి.',
     identification_deletion_failed: 'మీరు మీ చివరి గుర్తింపును తొలగించలేరు.',
+    invitations_not_supported: undefined,
     not_allowed_access:
       'మీకు ఈ పేజీని యాక్సెస్ చేయడానికి అనుమతి లేదు. ఇది లోపం అని మీరు నమ్మితే దయచేసి మద్దతును సంప్రదించండి.',
     organization_domain_blocked: 'ఇది నిరోధించబడిన ఇమెయిల్ ప్రొవైడర్ డొమైన్. దయచేసి వేరొకదాన్ని ఉపయోగించండి.',

@@ -873,6 +873,7 @@ export const msMY: LocalizationResource = {
     form_username_invalid_length:
       'Nama pengguna anda mestilah antara {{min_length}} dan {{max_length}} aksara panjang.',
     identification_deletion_failed: 'Anda tidak boleh memadamkan pengenalan terakhir anda.',
+    invitations_not_supported: undefined,
     not_allowed_access:
       'Anda tidak mempunyai kebenaran untuk mengakses halaman ini. Sila hubungi sokongan jika anda percaya ini adalah kesilapan.',
     organization_domain_blocked: 'Ini adalah domain pembekal e-mel yang disekat. Sila gunakan yang berbeza.',

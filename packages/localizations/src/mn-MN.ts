@@ -861,6 +861,7 @@ export const mnMN: LocalizationResource = {
     form_username_invalid_character: 'Хэрэглэгчийн нэр буруу тэмдэгт агуулж байна.',
     form_username_invalid_length: 'Хэрэглэгчийн нэр буруу байна.',
     identification_deletion_failed: 'Та өөрийн сүүлчийн таниулбараа устгах боломжгүй.',
+    invitations_not_supported: undefined,
     not_allowed_access:
       "Имэйл хаяг эсвэл утасны дугаарыг бүртгүүлэхийг хориглоно. Энэ нь '+', '=', '#' эсвэл '.'-г ашигласантай холбоотой байж болно. түр зуурын цахим шуудангийн үйлчилгээтэй холбогдсон домэйн ашиглах, эсвэл шууд хаагдсан байх. Хэрэв та үүнийг алдаа гэж үзэж байгаа бол дэмжлэгтэй холбогдоно уу.",
     organization_domain_blocked: undefined,

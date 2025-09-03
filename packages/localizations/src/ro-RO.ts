@@ -272,7 +272,9 @@ export const roRO: LocalizationResource = {
     titleWithoutPersonal: 'Alege o organizație',
   },
   organizationProfile: {
-    apiKeysPage: { title: 'Chei API' },
+    apiKeysPage: {
+      title: 'Chei API',
+    },
     badge__automaticInvitation: 'Invitații automate',
     badge__automaticSuggestion: 'Sugestii automate',
     badge__manualInvitation: 'Fără înscriere automată',
@@ -328,8 +330,12 @@ export const roRO: LocalizationResource = {
         tableHeader__startDate: 'Data începerii',
         title: 'Abonament',
       },
-      subscriptionsSection: { actionLabel__default: 'Gestionează' },
-      switchPlansSection: { title: 'Schimbă planurile' },
+      subscriptionsSection: {
+        actionLabel__default: 'Gestionează',
+      },
+      switchPlansSection: {
+        title: 'Schimbă planurile',
+      },
       title: 'Facturare',
     },
     createDomainPage: {
@@ -627,7 +633,9 @@ export const roRO: LocalizationResource = {
       resendButton: 'Nu ai primit un link? Retrimite',
       subtitle: 'pentru a continua la {{applicationName}}',
       title: 'Verifică-ți emailul',
-      unusedTab: { title: 'Poți închide această filă' },
+      unusedTab: {
+        title: 'Poți închide această filă',
+      },
       verified: {
         subtitle: 'Vei fi redirecționat în curând',
         title: 'Autentificat cu succes',
@@ -666,7 +674,9 @@ export const roRO: LocalizationResource = {
       subtitle: 'Introdu parola asociată contului tău',
       title: 'Introdu parola',
     },
-    passwordPwned: { title: 'Parola este compromisă' },
+    passwordPwned: {
+      title: 'Parola este compromisă',
+    },
     phoneCode: {
       formTitle: 'Cod de verificare',
       resendButton: 'Nu ai primit un cod? Retrimite',
@@ -743,11 +753,15 @@ export const roRO: LocalizationResource = {
       },
       formSubtitle: 'Folosește linkul de verificare trimis la adresa ta de email',
       formTitle: 'Link de verificare',
-      loading: { title: 'Înregistrare...' },
+      loading: {
+        title: 'Înregistrare...',
+      },
       resendButton: 'Nu ai primit un link? Retrimite',
       subtitle: 'pentru a continua la {{applicationName}}',
       title: 'Verifică-ți emailul',
-      verified: { title: 'Înregistrare reușită' },
+      verified: {
+        title: 'Înregistrare reușită',
+      },
       verifiedSwitchTab: {
         subtitle: 'Revino în noua filă deschisă pentru a continua',
         subtitleNewTab: 'Revino în fila precedentă pentru a continua',
@@ -860,6 +874,7 @@ export const roRO: LocalizationResource = {
     form_username_invalid_length:
       'Numele de utilizator trebuie să aibă între {{min_length}} și {{max_length}} caractere.',
     identification_deletion_failed: undefined,
+    invitations_not_supported: undefined,
     not_allowed_access: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,

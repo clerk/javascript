@@ -868,6 +868,7 @@ export const viVN: LocalizationResource = {
     form_username_invalid_character: undefined,
     form_username_invalid_length: 'Tên người dùng của bạn phải có giữa {{min_length}} và {{max_length}} ký tự.',
     identification_deletion_failed: undefined,
+    invitations_not_supported: undefined,
     not_allowed_access: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,

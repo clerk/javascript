@@ -875,6 +875,7 @@ export const deDE: LocalizationResource = {
       'Der Benutzername enthält ungültige Zeichen. Bitte verwenden Sie nur alphanumerische Zeichen und Unterstriche.',
     form_username_invalid_length: 'Der Benutzername muss zwischen 3 und 30 Zeichen lang sein.',
     identification_deletion_failed: 'Sie können Ihre letzte Kennung nicht löschen.',
+    invitations_not_supported: undefined,
     not_allowed_access:
       "Die E-Mail-Adresse oder Telefonnummer ist für die Anmeldung nicht zulässig. Dies kann daran liegen, dass Ihre E-Mail-Adresse die Zeichen '+', '=', '#' oder '.' enthält, Sie eine Domain verwenden, die mit einem temporären E-Mail-Dienst verknüpft ist, oder dass Sie explizit gesperrt sind. Wenn Sie glauben, dass dies ein Fehler ist, wenden Sie sich bitte an den Support.",
     organization_domain_blocked: 'Diese E-Mail-Provider-Domain ist gesperrt. Bitte verwenden Sie eine andere.',

@@ -851,6 +851,7 @@ export const kkKZ: LocalizationResource = {
       'Пайдаланушы атында жарамсыз таңбалар бар. Тек әріптер, сандар және астыңғы сызықшаларды қолданыңыз.',
     form_username_invalid_length: 'Пайдаланушы аты {{min_length}} пен {{max_length}} арасында болуы керек.',
     identification_deletion_failed: 'Соңғы идентификацияны жою мүмкін емес.',
+    invitations_not_supported: undefined,
     not_allowed_access: 'Бұл бетке қол жеткізуге рұқсат жоқ. Қате болса, қолдау қызметіне хабарласыңыз.',
     organization_domain_blocked: 'Бұл электрондық пошта домені бұғатталған. Басқасын қолданыңыз.',
     organization_domain_common: 'Бұл жалпы электрондық пошта домені. Басқасын қолданыңыз.',

@@ -851,6 +851,7 @@ export const heIL: LocalizationResource = {
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
     identification_deletion_failed: 'לא ניתן למחוק את הזיהוי האחרון שלך.',
+    invitations_not_supported: undefined,
     not_allowed_access:
       "האימייל או מספר הטלפון אינו מותר להרשמה. זה עשוי להיות בגלל השימוש ב-'+', '=', '#' או '.' בכתובת האימייל שלך, השימוש בתחום המחובר לשירות אימייל זמני או הפרסט בכתובת האימייל שלך. אם מחזרים שגיאה, נא ליצור קשר עם תמיכה.",
     organization_domain_blocked: 'הדומיין של ספק האימייל הזה חסום. אנא נסה אחד שונה.',

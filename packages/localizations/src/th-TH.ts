@@ -861,6 +861,7 @@ export const thTH: LocalizationResource = {
     form_username_invalid_character: undefined,
     form_username_invalid_length: 'ชื่อผู้ใช้ของคุณต้องมีความยาวระหว่าง {{min_length}} ถึง {{max_length}} ตัวอักษร',
     identification_deletion_failed: undefined,
+    invitations_not_supported: undefined,
     not_allowed_access: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
