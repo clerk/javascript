@@ -50,7 +50,7 @@ export const useUserButtonContext = () => {
 
   const menuItems = useMemo(() => {
     return createUserButtonCustomMenuItems(customMenuItems || [], clerk);
-  }, [customMenuItems, clerk]);
+  }, []);
 
   return {
     ...ctx,
