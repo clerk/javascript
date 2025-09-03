@@ -1,62 +1,77 @@
 import { useEffect, useRef, useState } from 'react';
 
-/**
- * Used to detect when a Clerk component has been added to the DOM.
- */
-function waitForElementChildren(options: { selector?: string; root?: HTMLElement | null; timeout?: number }) {
-  const { root = document?.body, selector, timeout = 0 } = options;
+const createAwaitableMutationObserver = (
+  globalOptions: MutationObserverInit & {
+    isReady: (el: HTMLElement | null, selector: string) => boolean;
+  },
+) => {
+  const isReady = globalOptions?.isReady;
 
-  return new Promise<void>((resolve, reject) => {
-    if (!root) {
-      reject(new Error('No root element provided'));
-      return;
-    }
+  return (options: { selector: string; root?: HTMLElement | null; timeout?: number }) =>
+    new Promise<void>((resolve, reject) => {
+      const { root = document?.body, selector, timeout = 0 } = options;
 
-    let elementToWatch: HTMLElement | null = root;
-    if (selector) {
-      elementToWatch = root?.querySelector(selector);
-    }
+      if (!root) {
+        reject(new Error('No root element provided'));
+        return;
+      }
 
-    // Check if the element already has child nodes
-    const isElementAlreadyPresent = elementToWatch?.childElementCount && elementToWatch.childElementCount > 0;
-    if (isElementAlreadyPresent) {
-      resolve();
-      return;
-    }
+      let elementToWatch: HTMLElement | null = root;
+      if (selector) {
+        elementToWatch = root?.querySelector(selector);
+      }
 
-    // Set up a MutationObserver to detect when the element has children
-    const observer = new MutationObserver(mutationsList => {
-      for (const mutation of mutationsList) {
-        if (mutation.type === 'childList') {
+      // Initial readiness check
+      if (isReady(elementToWatch, selector)) {
+        resolve();
+        return;
+      }
+
+      // Set up a MutationObserver to detect when the element has children
+      const observer = new MutationObserver(mutationsList => {
+        for (const mutation of mutationsList) {
           if (!elementToWatch && selector) {
             elementToWatch = root?.querySelector(selector);
           }
 
-          if (elementToWatch?.childElementCount && elementToWatch.childElementCount > 0) {
-            observer.disconnect();
-            resolve();
-            return;
+          if (
+            (globalOptions.childList && mutation.type === 'childList') ||
+            (globalOptions.attributes && mutation.type === 'attributes')
+          ) {
+            if (isReady(elementToWatch, selector)) {
+              observer.disconnect();
+              resolve();
+              return;
+            }
           }
         }
+      });
+
+      observer.observe(root, globalOptions);
+
+      // Set up an optional timeout to reject the promise if the element never gets child nodes
+      if (timeout > 0) {
+        setTimeout(() => {
+          observer.disconnect();
+          reject(new Error(`Timeout waiting for ${selector}`));
+        }, timeout);
       }
     });
+};
 
-    observer.observe(root, { childList: true, subtree: true });
-
-    // Set up an optional timeout to reject the promise if the element never gets child nodes
-    if (timeout > 0) {
-      setTimeout(() => {
-        observer.disconnect();
-        reject(new Error(`Timeout waiting for element children`));
-      }, timeout);
-    }
-  });
-}
+const waitForElementChildren = createAwaitableMutationObserver({
+  childList: true,
+  subtree: true,
+  isReady: (el, selector) => !!el?.childElementCount && el?.matches?.(selector) && el.childElementCount > 0,
+});
 
 /**
  * Detect when a Clerk component has mounted by watching DOM updates to an element with a `data-clerk-component="${component}"` property.
  */
-export function useWaitForComponentMount(component?: string) {
+export function useWaitForComponentMount(
+  component?: string,
+  options?: { selector: string },
+): 'rendering' | 'rendered' | 'error' {
   const watcherRef = useRef<Promise<void>>();
   const [status, setStatus] = useState<'rendering' | 'rendered' | 'error'>('rendering');
 
@@ -66,7 +81,14 @@ export function useWaitForComponentMount(component?: string) {
     }
 
     if (typeof window !== 'undefined' && !watcherRef.current) {
-      watcherRef.current = waitForElementChildren({ selector: `[data-clerk-component="${component}"]` })
+      const defaultSelector = `[data-clerk-component="${component}"]`;
+      const selector = options?.selector;
+      watcherRef.current = waitForElementChildren({
+        selector: selector
+          ? // Allows for `[data-clerk-component="xxxx"][data-some-attribute="123"] .my-class`
+            defaultSelector + selector
+          : defaultSelector,
+      })
         .then(() => {
           setStatus('rendered');
         })
@@ -74,7 +96,7 @@ export function useWaitForComponentMount(component?: string) {
           setStatus('error');
         });
     }
-  }, [component]);
+  }, [component, options?.selector]);
 
   return status;
 }
