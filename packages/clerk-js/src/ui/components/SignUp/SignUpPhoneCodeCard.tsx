@@ -36,7 +36,11 @@ export const SignUpPhoneCodeCard = withCardStateProvider(() => {
     // because the verification is already created on the Start screen
     shouldAvoidPrepare || isAlternativePhoneCodeProvider
       ? undefined
-      : () => signUp.preparePhoneNumberVerification({ strategy: 'phone_code', channel: undefined }),
+      : () =>
+          signUp.preparePhoneNumberVerification({ strategy: 'phone_code', channel: undefined }).catch(err => {
+            handleError(err, [], card.setError);
+            return err;
+          }),
     {
       name: 'signUp.preparePhoneNumberVerification',
       strategy: 'phone_code',
@@ -44,7 +48,6 @@ export const SignUpPhoneCodeCard = withCardStateProvider(() => {
     },
     {
       staleTime: 100,
-      onError: err => handleError(err, [], card.setError),
     },
   );
 
