@@ -1,5 +1,5 @@
-import type { ForPayerType } from '@clerk/types';
-import { useCallback } from 'react';
+import type { ClerkEventPayload, ForPayerType } from '@clerk/types';
+import { useCallback, useEffect } from 'react';
 
 import { eventMethodCalled } from '../../telemetry/events';
 import { useSWR } from '../clerk-swr';
@@ -21,6 +21,8 @@ type UseSubscriptionParams = {
    */
   keepPreviousData?: boolean;
 };
+
+const revalidateOnEvents: ClerkEventPayload['resource:action'][] = ['checkout.confirm'];
 
 /**
  * @internal
@@ -54,6 +56,22 @@ export const useSubscription = (params?: UseSubscriptionParams) => {
   );
 
   const revalidate = useCallback(() => swr.mutate(), [swr.mutate]);
+
+  useEffect(() => {
+    const on = clerk.on.bind(clerk);
+    const off = clerk.off.bind(clerk);
+    const handler = (payload: ClerkEventPayload['resource:action']) => {
+      if (revalidateOnEvents.includes(payload)) {
+        // When multiple handlers call `revalidate` the request will fire only once.
+        void revalidate();
+      }
+    };
+
+    on('resource:action', handler);
+    return () => {
+      off('resource:action', handler);
+    };
+  }, [revalidate]);
 
   return {
     data: swr.data,

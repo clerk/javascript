@@ -239,6 +239,10 @@ export class Clerk implements ClerkInterface {
   #touchThrottledUntil = 0;
   #publicEventBus = createClerkEventBus();
 
+  get __internal_eventBus() {
+    return this.#publicEventBus;
+  }
+
   public __internal_getCachedResources:
     | (() => Promise<{ client: ClientJSONSnapshot | null; environment: EnvironmentJSONSnapshot | null }>)
     | undefined;

@@ -53,11 +53,11 @@ export class CommerceCheckout extends BaseResource implements CommerceCheckoutRe
     return this;
   }
 
-  confirm = (params: ConfirmCheckoutParams): Promise<this> => {
+  confirm = async (params: ConfirmCheckoutParams): Promise<this> => {
     // Retry confirmation in case of a 500 error
     // This will retry up to 3 times with an increasing delay
     // It retries at 2s, 4s, 6s and 8s
-    return retry(
+    const res = await retry(
       () =>
         this._basePatch({
           path: this.payer.organizationId
@@ -84,5 +84,8 @@ export class CommerceCheckout extends BaseResource implements CommerceCheckoutRe
         },
       },
     );
+
+    CommerceCheckout.clerk.__internal_eventBus.emit('resource:action', 'checkout.confirm');
+    return res;
   };
 }
