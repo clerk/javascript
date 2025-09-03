@@ -961,13 +961,28 @@ type ClerkOptionsNavigation =
       routerDebug?: boolean;
     };
 
+type ClerkProviderLegacyRedirectProps = {
+  /**
+   * @deprecated Use `signInFallbackRedirectUrl` or `signInForceRedirectUrl` instead.
+   */
+  afterSignInUrl?: string | null;
+  /**
+   * @deprecated Use `signUpFallbackRedirectUrl` or `signUpForceRedirectUrl` instead.
+   */
+  afterSignUpUrl?: string | null;
+  /**
+   * @deprecated Use `signInFallbackRedirectUrl`, `signInForceRedirectUrl`, `signUpFallbackRedirectUrl`, or `signUpForceRedirectUrl` instead.
+   */
+  redirectUrl?: string | null;
+};
+
 export type ClerkOptions = ClerkOptionsNavigation &
   SignInForceRedirectUrl &
   SignInFallbackRedirectUrl &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
   NewSubscriptionRedirectUrl &
-  LegacyRedirectProps &
+  ClerkProviderLegacyRedirectProps &
   AfterSignOutUrl &
   AfterMultiSessionSingleSignOutUrl & {
     /**

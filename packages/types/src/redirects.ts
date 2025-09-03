@@ -20,11 +20,11 @@ export type AfterMultiSessionSingleSignOutUrl = {
  */
 export type LegacyRedirectProps = {
   /**
-   * @deprecated Use `signInFallbackRedirectUrl` or `signInForceRedirectUrl` instead.
+   * @deprecated Use `fallbackRedirectUrl` or `forceRedirectUrl` instead.
    */
   afterSignInUrl?: string | null;
   /**
-   * @deprecated Use `signUpFallbackRedirectUrl` or `signUpForceRedirectUrl` instead.
+   * @deprecated Use `fallbackRedirectUrl` or `forceRedirectUrl` instead.
    */
   afterSignUpUrl?: string | null;
   /**
