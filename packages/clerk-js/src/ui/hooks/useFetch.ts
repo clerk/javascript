@@ -167,7 +167,7 @@ export const useFetch = <K, T>(
           }, waitTime);
         }
       })
-      .catch((e: Error) => {
+      .catch((e: Error | null) => {
         setCache({
           data: getCache()?.data ?? null,
           isLoading: false,
@@ -175,7 +175,9 @@ export const useFetch = <K, T>(
           error: e,
           cachedAt: Date.now(),
         });
-        options?.onError?.(e);
+        if (e) {
+          options?.onError?.(e);
+        }
       });
   }, [serialize(params), setCache, getCache, revalidateCache]);
 
