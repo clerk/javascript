@@ -1343,4 +1343,5 @@ type UnstableErrors = WithParamName<{
   organization_membership_quota_exceeded: LocalizationValue;
   organization_not_found_or_unauthorized: LocalizationValue;
   organization_not_found_or_unauthorized_with_create_organization_disabled: LocalizationValue;
+  invitations_not_supported: LocalizationValue;
 }>;

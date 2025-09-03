@@ -924,6 +924,8 @@ export const enUS: LocalizationResource = {
         wordByItself: 'Single words are easy to guess.',
       },
     },
+    invitations_not_supported:
+      "This organization doesn't support email invitations. Please contact support to enable this feature.",
   },
   userButton: {
     action__addAccount: 'Add account',
