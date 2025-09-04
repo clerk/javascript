@@ -172,7 +172,7 @@ export function SignUp({ className, ...props }: React.ComponentProps<'div'>) {
                 >
                   Continue
                 </Button>
-                {errors.global.length > 0 && (
+                {errors.global && (
                   <p className='text-sm text-red-600'>{(errors.global[0] as { longMessage: string }).longMessage}</p>
                 )}
                 <div id='clerk-captcha'></div>
