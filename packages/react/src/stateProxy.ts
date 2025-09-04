@@ -68,7 +68,9 @@ export class StateProxy implements State {
   }
 
   private buildSignUpProxy() {
-    const proxy = this;
+    const gateProperty = this.gateProperty.bind(this);
+    const gateMethod = this.gateMethod.bind(this);
+    const wrapMethods = this.wrapMethods.bind(this);
     const target = () => this.client.signUp.__internal_future;
 
     return {
@@ -76,21 +78,21 @@ export class StateProxy implements State {
       fetchStatus: 'idle' as const,
       signUp: {
         get status() {
-          return proxy.gateProperty(target, 'status', 'missing_requirements');
+          return gateProperty(target, 'status', 'missing_requirements');
         },
         get unverifiedFields() {
-          return proxy.gateProperty(target, 'unverifiedFields', []);
+          return gateProperty(target, 'unverifiedFields', []);
         },
         get isTransferable() {
-          return proxy.gateProperty(target, 'isTransferable', false);
+          return gateProperty(target, 'isTransferable', false);
         },
 
-        create: proxy.gateMethod(target, 'create'),
-        sso: proxy.gateMethod(target, 'sso'),
-        password: proxy.gateMethod(target, 'password'),
-        finalize: proxy.gateMethod(target, 'finalize'),
+        create: gateMethod(target, 'create'),
+        sso: gateMethod(target, 'sso'),
+        password: gateMethod(target, 'password'),
+        finalize: gateMethod(target, 'finalize'),
 
-        verifications: proxy.wrapMethods(() => target().verifications, [
+        verifications: wrapMethods(() => target().verifications, [
           'sendEmailCode',
           'verifyEmailCode',
           'sendPhoneCode',
