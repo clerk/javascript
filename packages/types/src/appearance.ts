@@ -198,6 +198,8 @@ export type ElementsConfig = {
 
   socialButtonsRoot: WithOptions;
   socialButtons: WithOptions;
+  socialButtonsLastAuthenticationStrategyContainer: WithOptions;
+  socialButtonsLastAuthenticationStrategyText: WithOptions;
   socialButtonsIconButton: WithOptions<OAuthProvider | Web3Provider | PhoneCodeChannel, LoadingState>;
   socialButtonsBlockButton: WithOptions<OAuthProvider | Web3Provider | PhoneCodeChannel, LoadingState>;
   socialButtonsBlockButtonText: WithOptions<OAuthProvider | Web3Provider | PhoneCodeChannel>;

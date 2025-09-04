@@ -1,4 +1,5 @@
 import { getAlternativePhoneCodeProviderData } from '@clerk/shared/alternativePhoneCode';
+import { useClerk } from '@clerk/shared/react';
 import type { OAuthProvider, OAuthStrategy, PhoneCodeChannel, Web3Provider, Web3Strategy } from '@clerk/types';
 import type { Ref } from 'react';
 import React, { forwardRef, isValidElement } from 'react';
@@ -6,6 +7,7 @@ import React, { forwardRef, isValidElement } from 'react';
 import { ProviderInitialIcon } from '../common';
 import type { LocalizationKey } from '../customizables';
 import {
+  Box,
   Button,
   descriptors,
   Flex,
@@ -62,9 +64,12 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
   const { web3Strategies, authenticatableOauthStrategies, strategyToDisplayData, alternativePhoneCodeChannels } =
     useEnabledThirdPartyProviders();
   const card = useCardState();
+  const clerk = useClerk();
   const { socialButtonsVariant } = useAppearance().parsedLayout;
 
-  const strategies = [
+  type TStrategy = OAuthStrategy | Web3Strategy | PhoneCodeChannel;
+
+  const strategies: TStrategy[] = [
     ...(enableOAuthProviders ? authenticatableOauthStrategies : []),
     ...(enableWeb3Providers ? web3Strategies : []),
     ...(enableAlternativePhoneCodeProviders ? alternativePhoneCodeChannels : []),
@@ -74,8 +79,14 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
     return null;
   }
 
-  const strategyRows = distributeStrategiesIntoRows([...strategies], MAX_STRATEGIES_PER_ROW);
-  const strategyRowOneLength = strategyRows.at(0)?.length ?? 0;
+  // TODO: Remove the default value once the lastAuthenticationStrategy is returned from the API
+  const lastAuthenticationStrategy = (clerk.client?.lastAuthenticationStrategy || 'oauth_facebook') as TStrategy | null;
+  const { strategyRows, lastAuthenticationStrategyPresent } = distributeStrategiesIntoRows<TStrategy>(
+    [...strategies],
+    MAX_STRATEGIES_PER_ROW,
+    lastAuthenticationStrategy,
+  );
+  const strategyRowOneLength = strategyRows.at(lastAuthenticationStrategyPresent ? 1 : 0)?.length ?? 0;
 
   const preferBlockButtons =
     socialButtonsVariant === 'blockButton'
@@ -174,18 +185,55 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
               />
             );
 
-            return (
-              <ButtonElement
-                key={strategy}
-                id={strategyToDisplayData[strategy].id}
-                onClick={onSocialButtonClick(strategy)}
-                isLoading={card.loadingMetadata === strategy}
-                isDisabled={card.isLoading}
-                label={label}
-                textLocalizationKey={localizedText}
-                icon={imageOrInitial}
-              />
-            );
+            const buttonProps = {
+              key: strategy,
+              id: strategyToDisplayData[strategy].id,
+              onClick: onSocialButtonClick(strategy),
+              isLoading: card.loadingMetadata === strategy,
+              isDisabled: card.isLoading,
+              label: label,
+              textLocalizationKey: localizedText,
+              icon: imageOrInitial,
+            };
+
+            if (strategy === lastAuthenticationStrategy) {
+              return (
+                <Box
+                  key={`${strategy}-last-authentication-strategy`}
+                  elementDescriptor={descriptors.socialButtonsLastAuthenticationStrategyContainer}
+                  sx={t => ({
+                    backgroundColor: t.colors.$neutralAlpha25,
+                    borderRadius: t.radii.$md,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: t.space.$1,
+                    padding: t.space.$0x5,
+                    paddingTop: t.space.$1,
+                  })}
+                >
+                  <Text
+                    colorScheme='secondary'
+                    elementDescriptor={descriptors.socialButtonsLastAuthenticationStrategyText}
+                    localizationKey={localizationKeys('socialButtonsLastAuthenticationStrategy')}
+                    sx={t => ({
+                      fontSize: t.fontSizes.$xs,
+                      fontWeight: t.fontWeights.$medium,
+                      lineHeight: t.lineHeights.$normal,
+                    })}
+                  >
+                    Last used
+                  </Text>
+                  <SocialButtonBlock
+                    {...buttonProps}
+                    sx={t => ({ backgroundColor: t.colors.$colorBackground })}
+                  />
+                </Box>
+              );
+            }
+
+            // Key exists in spread props
+            // eslint-disable-next-line react/jsx-key
+            return <ButtonElement {...buttonProps} />;
           })}
         </Grid>
       ))}
@@ -215,6 +263,7 @@ const SocialButtonIcon = forwardRef((props: SocialButtonProps, ref: Ref<HTMLButt
       sx={t => ({
         minHeight: t.sizes.$8,
         width: '100%',
+        backgroundColor: t.colors.$colorBackground,
       })}
       {...rest}
     >
