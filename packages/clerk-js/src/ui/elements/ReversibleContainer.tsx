@@ -19,7 +19,7 @@ export const SocialButtonsReversibleContainerWithDivider = (props: React.PropsWi
   );
 };
 
-export const ReversibleContainer = (props: React.PropsWithChildren<{ reverse?: boolean }>) => {
+const ReversibleContainer = (props: React.PropsWithChildren<{ reverse?: boolean }>) => {
   const { children, reverse } = props;
   return <>{reverse ? React.Children.toArray(children).reverse() : children}</>;
 };

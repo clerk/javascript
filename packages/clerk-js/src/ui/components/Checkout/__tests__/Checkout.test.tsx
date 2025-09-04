@@ -27,6 +27,7 @@ describe('Checkout', () => {
   it('displays spinner when checkout is initializing', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     // Mock billing to prevent actual API calls and stay in loading state
@@ -98,6 +99,7 @@ describe('Checkout', () => {
   it('handles checkout initialization errors gracefully', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     // Mock billing to reject with a Clerk-like error shape
@@ -129,6 +131,7 @@ describe('Checkout', () => {
   it('displays proper loading state during checkout initialization', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     // Mock billing to stay in loading state
@@ -161,6 +164,7 @@ describe('Checkout', () => {
   it('maintains accessibility attributes correctly', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     fixtures.clerk.billing.startCheckout.mockImplementation(() => new Promise(() => {}));
@@ -201,6 +205,7 @@ describe('Checkout', () => {
   it('renders without crashing when all required props are provided', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     // Mock billing to prevent actual API calls
@@ -228,6 +233,7 @@ describe('Checkout', () => {
   it('renders without errors for monthly period', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
     fixtures.clerk.billing.startCheckout.mockImplementation(() => new Promise(() => {}));
     const { baseElement } = render(
@@ -272,6 +278,7 @@ describe('Checkout', () => {
   it('renders with correct CSS classes and structure', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     fixtures.clerk.billing.startCheckout.mockImplementation(() => new Promise(() => {}));
@@ -305,6 +312,7 @@ describe('Checkout', () => {
   it('renders free trial details during confirmation stage', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     const freeTrialEndsAt = new Date('2025-08-19');
@@ -388,6 +396,7 @@ describe('Checkout', () => {
   it('renders trial success details in completed stage', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     const freeTrialEndsAt = new Date('2025-08-19');
@@ -469,6 +478,7 @@ describe('Checkout', () => {
   it('renders existing payment sources during checkout confirmation', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     fixtures.clerk.user?.getPaymentSources.mockResolvedValue({

@@ -1,7 +1,6 @@
 export * from './useClerkModalStateParams';
 export * from './useClipboard';
 export * from './useDebounce';
-export * from './useDelayedVisibility';
 export * from './useDirection';
 export * from './useEmailLink';
 export * from './useEnabledThirdPartyProviders';
@@ -14,7 +13,6 @@ export * from './usePassword';
 export * from './usePasswordComplexity';
 export * from './usePopover';
 export * from './usePrefersReducedMotion';
-export * from './useResizeObserver';
 export * from './useSafeState';
 export * from './useScrollLock';
 export * from './useSearchInput';

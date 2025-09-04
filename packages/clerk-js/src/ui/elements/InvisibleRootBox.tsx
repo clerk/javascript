@@ -4,7 +4,7 @@ import { makeCustomizable } from '../customizables/makeCustomizable';
 
 type RootBoxProps = React.PropsWithChildren<{ className: string }>;
 
-const _InvisibleRootBox = React.memo((props: RootBoxProps) => {
+const _InvisibleRootBox = React.memo((props: RootBoxProps & { isFlowReady?: boolean }) => {
   const [showSpan, setShowSpan] = React.useState(true);
   const parentRef = React.useRef<HTMLElement | null>(null);
 
@@ -16,8 +16,10 @@ const _InvisibleRootBox = React.memo((props: RootBoxProps) => {
     if (showSpan) {
       setShowSpan(false);
     }
-    parent.className = props.className;
-  }, [props.className]);
+
+    parent.setAttribute('class', props.className);
+    parent.setAttribute('data-component-status', props.isFlowReady ? 'ready' : 'awaiting-data');
+  }, [props.className, props.isFlowReady]);
 
   return (
     <>

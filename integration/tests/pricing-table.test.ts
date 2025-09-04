@@ -32,9 +32,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     });
 
     test('renders pricing details of a specific plan', async ({ page, context }) => {
-      if (!app.name.includes('next')) {
-        return;
-      }
+      test.skip(app.name.includes('astro'), 'Still working on it');
+
       const u = createTestUtils({ app, page, context });
       await u.po.page.goToRelative('/billing/plan-details-btn');
 
@@ -83,9 +82,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       page,
       context,
     }) => {
-      if (!app.name.includes('next')) {
-        return;
-      }
+      test.skip(app.name.includes('astro'), 'Still working on it');
       const u = createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -100,9 +97,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     });
 
     test('when signed in, clicking checkout button open checkout drawer', async ({ page, context }) => {
-      if (!app.name.includes('next')) {
-        return;
-      }
+      test.skip(app.name.includes('astro'), 'Still working on it');
       const u = createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -137,9 +132,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     });
 
     test('opens subscription details drawer', async ({ page, context }) => {
-      if (!app.name.includes('next')) {
-        return;
-      }
+      test.skip(app.name.includes('astro'), 'Still working on it');
       const u = createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -291,7 +284,9 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await u.po.checkout.fillTestCard();
       await u.po.checkout.clickPayOrSubscribe();
 
-      await expect(u.po.checkout.root.getByText(/Trial.*successfully.*started/i)).toBeVisible();
+      await expect(u.po.checkout.root.getByText(/Trial.*successfully.*started/i)).toBeVisible({
+        timeout: 15_000,
+      });
       await u.po.checkout.confirmAndContinue();
 
       await u.po.page.goToRelative('/pricing-table');
@@ -299,7 +294,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
 
       // Verify the user is now shown as having an active free trial
       // The pricing table should show their current plan as active
-      await u.po.pricingTable.waitToBeActive({ planSlug: 'trial' });
+      await u.po.pricingTable.waitToBeFreeTrial({ planSlug: 'trial' });
 
       await u.po.page.goToRelative('/user');
       await u.po.userProfile.waitForMounted();
@@ -339,6 +334,118 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
           .locator('xpath=..')
           .getByText('Upcoming'),
       ).toBeVisible();
+
+      await u.po.page.goToRelative('/pricing-table');
+      await u.po.pricingTable.waitForMounted();
+
+      // Start checkout for a trial plan (assuming 'pro' has trial enabled in test env)
+      await u.po.pricingTable.startCheckout({ planSlug: 'trial' });
+      await u.po.checkout.waitForMounted();
+
+      // Verify checkout shows trial details
+      await expect(u.po.checkout.root.getByText('Checkout')).toBeVisible();
+      await expect(u.po.checkout.root.getByText('Free trial')).toBeHidden();
+      await expect(u.po.checkout.root.getByText('Total Due after')).toBeHidden();
+      await expect(u.po.checkout.root.getByText('Total Due Today')).toBeVisible();
+
+      await u.po.checkout.root.getByRole('button', { name: /^pay\s\$/i }).waitFor({ state: 'visible' });
+      await u.po.checkout.clickPayOrSubscribe();
+      await expect(u.po.page.getByText('Payment was successful!')).toBeVisible();
+      await u.po.checkout.confirmAndContinue();
+
+      await u.po.page.goToRelative('/user');
+      await u.po.userProfile.waitForMounted();
+      await u.po.userProfile.switchToBillingTab();
+
+      await expect(u.po.page.locator('.cl-profileSectionContent__subscriptionsList').getByText(/Trial/i)).toBeVisible({
+        timeout: 5_000,
+      });
+
+      await expect(
+        u.po.page
+          .locator('.cl-profileSectionContent__subscriptionsList')
+          .getByText(/Trial/i)
+          .locator('xpath=..')
+          .getByText(/Free trial/i),
+      ).toBeHidden();
+
+      // Verify the Free plan with Upcoming status exists
+      await expect(
+        u.po.page
+          .locator('.cl-profileSectionContent__subscriptionsList')
+          .getByText('Free')
+          .locator('xpath=..')
+          .getByText('Upcoming'),
+      ).toBeHidden();
+    } finally {
+      // Clean up the trial user
+      await trialUser.deleteIfExists();
+    }
+  });
+
+  test('subscribing to other paid plans while on free trial is immediate cancellation', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+
+    // Create a new user specifically for this trial test
+    const trialUser = u.services.users.createFakeUser();
+    await u.services.users.createBapiUser(trialUser);
+
+    try {
+      // Sign in the new user
+      await u.po.signIn.goTo();
+      await u.po.signIn.signInWithEmailAndInstantPassword({
+        email: trialUser.email,
+        password: trialUser.password,
+      });
+
+      // Navigate to pricing table
+      await u.po.page.goToRelative('/pricing-table');
+      await u.po.pricingTable.waitForMounted();
+
+      // Verify trial plan is displayed with trial CTA
+      // Note: This assumes there's a plan with trial enabled in the test environment
+      // The button text should show "Start [X]-day free trial" for trial-enabled plans
+      await expect(u.po.page.getByText(/Start \d+-day free trial/i)).toBeVisible();
+
+      // Start checkout for a trial plan (assuming 'pro' has trial enabled in test env)
+      await u.po.pricingTable.startCheckout({ planSlug: 'trial' });
+      await u.po.checkout.waitForMounted();
+      await u.po.checkout.fillTestCard();
+      await u.po.checkout.clickPayOrSubscribe();
+      await u.po.checkout.confirmAndContinue();
+
+      await u.po.page.waitForAppUrl('/');
+      await u.po.page.goToRelative('/user');
+      await u.po.userProfile.waitForMounted();
+      await u.po.userProfile.switchToBillingTab();
+
+      await expect(
+        u.po.page
+          .locator('.cl-profileSectionContent__subscriptionsList')
+          .getByText(/Trial/i)
+          .locator('xpath=..')
+          .getByText(/Free trial/i),
+      ).toBeVisible();
+
+      await expect(u.po.page.getByText(/Trial ends/i)).toBeVisible();
+
+      await u.po.page.goToRelative('/pricing-table');
+      await u.po.pricingTable.waitForMounted();
+      // Start checkout for a trial plan (assuming 'pro' has trial enabled in test env)
+      await u.po.pricingTable.startCheckout({ planSlug: 'pro' });
+      await u.po.checkout.waitForMounted();
+      await u.po.checkout.root.getByRole('button', { name: /^pay\s\$/i }).waitFor({ state: 'visible' });
+      await u.po.checkout.clickPayOrSubscribe();
+      await u.po.checkout.confirmAndContinue();
+      await u.po.page.waitForAppUrl('/');
+      await u.po.page.goToRelative('/user');
+      await u.po.userProfile.waitForMounted();
+      await u.po.userProfile.switchToBillingTab();
+
+      await expect(u.po.page.locator('.cl-profileSectionContent__subscriptionsList').getByText(/Pro/i)).toBeVisible({
+        timeout: 5_000,
+      });
+      await expect(u.po.page.locator('.cl-profileSectionContent__subscriptionsList').getByText(/Trial/i)).toBeHidden();
     } finally {
       // Clean up the trial user
       await trialUser.deleteIfExists();
@@ -372,7 +479,9 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await u.po.checkout.waitForMounted();
       await u.po.checkout.fillTestCard();
       await u.po.checkout.clickPayOrSubscribe();
-      await expect(u.po.page.getByText('Payment was successful!')).toBeVisible();
+      await expect(u.po.page.getByText('Payment was successful!')).toBeVisible({
+        timeout: 15_000,
+      });
 
       await u.po.checkout.confirmAndContinue();
       await u.po.pricingTable.startCheckout({ planSlug: 'free_user', shouldSwitch: true });

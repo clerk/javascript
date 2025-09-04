@@ -1,22 +1,9 @@
-import { useState } from 'react';
-
 import { Button, descriptors, Flex, Icon, localizationKeys, Text, useLocalizations } from '../customizables';
 import type { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
 import { CaretLeft, CaretRight } from '../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { mqu } from '../styledSystem';
 import { range } from '../utils/range';
-
-type UsePaginationProps = {
-  defaultPage?: number;
-};
-
-export const usePagination = (props?: UsePaginationProps) => {
-  const { defaultPage = 1 } = props || {};
-  const [page, setPage] = useState(defaultPage);
-
-  return { page, changePage: setPage };
-};
 
 export type PageButtonProps = PropsOfComponent<typeof Button> & {
   isActive?: boolean;

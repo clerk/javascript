@@ -71,7 +71,7 @@ export type CommercePaymentAttemptWebhookEvent = Webhook<
 >;
 
 export type CommerceSubscriptionWebhookEvent = Webhook<
-  'subscription.created' | 'subscription.updated' | 'subscription.active' | 'subscription.past_due',
+  'subscription.created' | 'subscription.updated' | 'subscription.active' | 'subscription.pastDue',
   CommerceSubscriptionWebhookEventJSON
 >;
 
@@ -84,7 +84,8 @@ export type CommerceSubscriptionItemWebhookEvent = Webhook<
   | 'subscriptionItem.ended'
   | 'subscriptionItem.abandoned'
   | 'subscriptionItem.incomplete'
-  | 'subscriptionItem.past_due',
+  | 'subscriptionItem.pastDue'
+  | 'subscriptionItem.freeTrialEnding',
   CommerceSubscriptionItemWebhookEventJSON
 >;
 

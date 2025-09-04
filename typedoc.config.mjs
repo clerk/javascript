@@ -40,6 +40,7 @@ const typedocPluginMarkdownOptions = {
   excludeScopesInPaths: true,
   expandObjects: true,
   formatWithPrettier: true,
+  expandParameters: true,
 };
 
 /** @type {import("typedoc-plugin-replace-text").Config} */

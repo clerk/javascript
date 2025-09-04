@@ -7,6 +7,7 @@ const POPUP_PREFERRED_ORIGINS = [
   '.vusercontent.net',
   '.v0.dev',
   '.v0.app',
+  '.lp.dev',
 ];
 
 /**
