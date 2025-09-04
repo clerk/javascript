@@ -2,4 +2,4 @@
 '@clerk/clerk-js': patch
 ---
 
-Fixing an issue where an incorrect FAPI client URLs were generated in an app using a proxy configuration.
+Fix double slash in FAPI client URLs when using a proxy configuration (avoids 308 redirects).
