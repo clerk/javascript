@@ -67,4 +67,22 @@ describe('proxyUrlToAbsoluteURL(url)', () => {
   it('returns empty string if parameter is undefined', () => {
     expect(proxyUrlToAbsoluteURL(undefined)).toBe('');
   });
+
+  it('normalizes URLs with multiple slashes to prevent proxy regressions', () => {
+    expect(proxyUrlToAbsoluteURL('//api//__clerk//')).toBe('https://clerk.com/api/__clerk');
+    expect(proxyUrlToAbsoluteURL('///api///v1///users///')).toBe('https://clerk.com/api/v1/users');
+    expect(proxyUrlToAbsoluteURL('/api//path//to//resource')).toBe('https://clerk.com/api/path/to/resource');
+  });
+
+  it('handles absolute URLs with normalization', () => {
+    expect(proxyUrlToAbsoluteURL('https://example.com//api//path//')).toBe('https://example.com/api/path');
+    expect(proxyUrlToAbsoluteURL('http://localhost:3000///api///test///')).toBe('http://localhost:3000/api/test');
+  });
+
+  it('handles edge cases for proxy configurations', () => {
+    expect(proxyUrlToAbsoluteURL('//')).toBe('https://clerk.com/');
+    expect(proxyUrlToAbsoluteURL('///')).toBe('https://clerk.com/');
+    expect(proxyUrlToAbsoluteURL('/')).toBe('https://clerk.com/');
+    expect(proxyUrlToAbsoluteURL('')).toBe('');
+  });
 });

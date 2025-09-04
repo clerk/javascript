@@ -17,6 +17,7 @@ import {
   isRedirectForFAPIInitiatedFlow,
   isValidUrl,
   mergeFragmentIntoUrl,
+  normalizePath,
   relativeToAbsoluteUrl,
   requiresUserInput,
   sanitizeHref,
@@ -422,6 +423,83 @@ describe('trimLeadingSlash(string)', () => {
     expect(trimLeadingSlash('/foo')).toBe('foo');
     expect(trimLeadingSlash('/foo/')).toBe('foo/');
     expect(trimLeadingSlash('//foo//bar///')).toBe('foo//bar///');
+  });
+});
+
+describe('normalizePath(string)', () => {
+  it('handles empty and null inputs', () => {
+    expect(normalizePath('')).toBe('');
+    expect(normalizePath(null as any)).toBe('');
+    expect(normalizePath(undefined as any)).toBe('');
+  });
+
+  it('handles root path cases', () => {
+    expect(normalizePath('/')).toBe('/');
+    expect(normalizePath('//')).toBe('/');
+    expect(normalizePath('///')).toBe('/');
+    expect(normalizePath('////')).toBe('/');
+  });
+
+  it('normalizes multiple leading slashes', () => {
+    expect(normalizePath('/path')).toBe('/path');
+    expect(normalizePath('//path')).toBe('/path');
+    expect(normalizePath('///path')).toBe('/path');
+    expect(normalizePath('////path')).toBe('/path');
+  });
+
+  it('normalizes multiple trailing slashes', () => {
+    expect(normalizePath('path/')).toBe('path');
+    expect(normalizePath('path//')).toBe('path');
+    expect(normalizePath('path///')).toBe('path');
+    expect(normalizePath('path////')).toBe('path');
+  });
+
+  it('normalizes both leading and trailing slashes', () => {
+    expect(normalizePath('/path/')).toBe('/path');
+    expect(normalizePath('//path//')).toBe('/path');
+    expect(normalizePath('///path///')).toBe('/path');
+    expect(normalizePath('////path////')).toBe('/path');
+  });
+
+  it('preserves internal path structure', () => {
+    expect(normalizePath('/path/to/resource')).toBe('/path/to/resource');
+    expect(normalizePath('//path//to//resource//')).toBe('/path/to/resource');
+    expect(normalizePath('///path///to///resource///')).toBe('/path/to/resource');
+  });
+
+  it('handles relative paths without leading slash', () => {
+    expect(normalizePath('path')).toBe('path');
+    expect(normalizePath('path/')).toBe('path');
+    expect(normalizePath('path//')).toBe('path');
+    expect(normalizePath('path/to/resource')).toBe('path/to/resource');
+    expect(normalizePath('path/to/resource/')).toBe('path/to/resource');
+    expect(normalizePath('path//to//resource//')).toBe('path/to/resource');
+  });
+
+  it('handles edge cases with proxy-like configurations', () => {
+    // These are the types of cases that would cause proxy regressions
+    expect(normalizePath('//api//v1//users//')).toBe('/api/v1/users');
+    expect(normalizePath('///proxy///target///')).toBe('/proxy/target');
+    expect(normalizePath('proxy//path')).toBe('proxy/path');
+  });
+
+  it('handles mixed slash scenarios', () => {
+    expect(normalizePath('//a//b//c//d//')).toBe('/a/b/c/d');
+    expect(normalizePath('a//b//c//d')).toBe('a/b/c/d');
+    expect(normalizePath('//a/b/c//d//')).toBe('/a/b/c/d');
+  });
+
+  it('handles single character paths', () => {
+    expect(normalizePath('a')).toBe('a');
+    expect(normalizePath('/a')).toBe('/a');
+    expect(normalizePath('/a/')).toBe('/a');
+    expect(normalizePath('//a//')).toBe('/a');
+  });
+
+  it('handles absolute URLs correctly', () => {
+    expect(normalizePath('https://example.com//api//path//')).toBe('https://example.com/api/path');
+    expect(normalizePath('http://localhost:3000///api///test///')).toBe('http://localhost:3000/api/test');
+    expect(normalizePath('https://clerk.com/api/__clerk')).toBe('https://clerk.com/api/__clerk');
   });
 });
 
