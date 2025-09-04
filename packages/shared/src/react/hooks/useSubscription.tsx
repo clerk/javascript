@@ -1,5 +1,5 @@
-import type { ForPayerType } from '@clerk/types';
-import { useCallback } from 'react';
+import type { ClerkEventPayload, ForPayerType } from '@clerk/types';
+import { useCallback, useMemo } from 'react';
 
 import { eventMethodCalled } from '../../telemetry/events';
 import { useSWR } from '../clerk-swr';
@@ -9,6 +9,7 @@ import {
   useOrganizationContext,
   useUserContext,
 } from '../contexts';
+import { useThrottledEvent } from './useThrottledEvent';
 
 const hookName = 'useSubscription';
 
@@ -21,6 +22,8 @@ type UseSubscriptionParams = {
    */
   keepPreviousData?: boolean;
 };
+
+const revalidateOnEvents: ClerkEventPayload['resource:action'][] = ['checkout.confirm', 'subscriptionItem.cancel'];
 
 /**
  * @internal
@@ -38,22 +41,37 @@ export const useSubscription = (params?: UseSubscriptionParams) => {
 
   clerk.telemetry?.record(eventMethodCalled(hookName));
 
-  const swr = useSWR(
-    user?.id
-      ? {
-          type: 'commerce-subscription',
-          userId: user.id,
-          args: { orgId: params?.for === 'organization' ? organization?.id : undefined },
-        }
-      : null,
-    ({ args }) => clerk.billing.getSubscription(args),
-    {
-      dedupingInterval: 1_000 * 60,
-      keepPreviousData: params?.keepPreviousData,
-    },
+  const key = useMemo(
+    () =>
+      user?.id
+        ? {
+            type: 'commerce-subscription',
+            userId: user.id,
+            args: { orgId: params?.for === 'organization' ? organization?.id : undefined },
+          }
+        : null,
+    [user?.id, organization?.id, params?.for],
   );
 
+  const serializedKey = useMemo(() => JSON.stringify(key), [key]);
+
+  const swr = useSWR(key, key => clerk.billing.getSubscription(key.args), {
+    dedupingInterval: 1_000 * 60,
+    keepPreviousData: params?.keepPreviousData,
+    revalidateOnFocus: false,
+  });
+
   const revalidate = useCallback(() => swr.mutate(), [swr.mutate]);
+
+  // Maps cache key to event listener instead of matching the hook instance.
+  // `swr.mutate` does not dedupe, N parallel calles will fire N revalidation requests.
+  //  To avoid this, we use `useThrottledEvent` to dedupe the revalidation requests.
+  useThrottledEvent({
+    uniqueKey: serializedKey,
+    events: revalidateOnEvents,
+    onEvent: revalidate,
+    clerk,
+  });
 
   return {
     data: swr.data,

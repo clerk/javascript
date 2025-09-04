@@ -565,6 +565,11 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.on('status', listener, { notify: true });
     });
 
+    this.#eventBus.internal.retrieveListeners('resource:action')?.forEach(listener => {
+      // Since clerkjs exists it will call `this.clerkjs.on('status', listener)`
+      this.on('resource:action', listener, { notify: true });
+    });
+
     if (this.preopenSignIn !== null) {
       clerkjs.openSignIn(this.preopenSignIn);
     }
