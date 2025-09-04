@@ -1,5 +1,13 @@
 # Change Log
 
+## 4.84.1
+
+### Patch Changes
+
+- Fixed incorrect deprecation warnings for legacy redirect props in `<ClerkProvider>`. ([#6699](https://github.com/clerk/javascript/pull/6699)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Update the experimental `Errors` interface to allow null for raw and global error arrays ([#6677](https://github.com/clerk/javascript/pull/6677)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 4.84.0
 
 ### Minor Changes
