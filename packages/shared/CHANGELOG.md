@@ -1,5 +1,14 @@
 # Change Log
 
+## 3.24.1
+
+### Patch Changes
+
+- Disable billing hooks when the feature is turned off. ([#6696](https://github.com/clerk/javascript/pull/6696)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`fced4fc`](https://github.com/clerk/javascript/commit/fced4fc869bb21c77826dfaf281b6640e0f0c006), [`1b1e8b1`](https://github.com/clerk/javascript/commit/1b1e8b1fd33b787f956b17b193e5fd0a4cdc6cec)]:
+  - @clerk/types@4.84.1
+
 ## 3.24.0
 
 ### Minor Changes

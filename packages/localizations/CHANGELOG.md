@@ -1,5 +1,16 @@
 # Change Log
 
+## 3.24.2
+
+### Patch Changes
+
+- Add Traditional Chinese translation for sign in or up combined title ([#6701](https://github.com/clerk/javascript/pull/6701)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Add ptBR missing localization keys for choose organization session task ([#6704](https://github.com/clerk/javascript/pull/6704)) by [@guilherme6191](https://github.com/guilherme6191)
+
+- Updated dependencies [[`fced4fc`](https://github.com/clerk/javascript/commit/fced4fc869bb21c77826dfaf281b6640e0f0c006), [`1b1e8b1`](https://github.com/clerk/javascript/commit/1b1e8b1fd33b787f956b17b193e5fd0a4cdc6cec)]:
+  - @clerk/types@4.84.1
+
 ## 3.24.1
 
 ### Patch Changes

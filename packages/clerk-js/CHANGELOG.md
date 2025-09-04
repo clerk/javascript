@@ -1,5 +1,24 @@
 # Change Log
 
+## 5.91.2
+
+### Patch Changes
+
+- Fixes issue where "prepare" API request would only fire once, preventing end users from receiving fresh otp codes. ([#6695](https://github.com/clerk/javascript/pull/6695)) by [@panteliselef](https://github.com/panteliselef)
+
+- Wait for pricing table data to be ready before hiding its fallback. ([#6644](https://github.com/clerk/javascript/pull/6644)) by [@panteliselef](https://github.com/panteliselef)
+
+- Fix double slash in FAPI client URLs when using a proxy configuration (avoids 308 redirects). ([#6706](https://github.com/clerk/javascript/pull/6706)) by [@jacekradko](https://github.com/jacekradko)
+
+- Hide billing tab when no paid plans exist, the user does not have a current or past subscription. ([#6696](https://github.com/clerk/javascript/pull/6696)) by [@panteliselef](https://github.com/panteliselef)
+
+- Update the experimental `Errors` interface to allow null for raw and global error arrays ([#6677](https://github.com/clerk/javascript/pull/6677)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`6e3f53e`](https://github.com/clerk/javascript/commit/6e3f53e75b6f3e6ec9e1d7e77d7e6deb8ffd3861), [`fced4fc`](https://github.com/clerk/javascript/commit/fced4fc869bb21c77826dfaf281b6640e0f0c006), [`e6e19d2`](https://github.com/clerk/javascript/commit/e6e19d2d2f3b2c4617b25f53830216a1d550e616), [`d0fe6ca`](https://github.com/clerk/javascript/commit/d0fe6ca4af3f08fd14cd8c606cd3e604141e63e3), [`1b1e8b1`](https://github.com/clerk/javascript/commit/1b1e8b1fd33b787f956b17b193e5fd0a4cdc6cec)]:
+  - @clerk/localizations@3.24.2
+  - @clerk/types@4.84.1
+  - @clerk/shared@3.24.1
+
 ## 5.91.1
 
 ### Patch Changes
