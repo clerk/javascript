@@ -614,6 +614,10 @@ class SignUpFuture implements SignUpFutureResource {
         body.emailAddress = params.emailAddress;
       }
 
+      if (params.username) {
+        body.username = params.username;
+      }
+
       await this.resource.__internal_basePost({ path: this.resource.pathRoot, body });
     });
   }

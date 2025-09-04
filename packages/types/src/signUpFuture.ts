@@ -9,9 +9,14 @@ export interface SignUpFutureCreateParams {
 export interface SignUpFutureEmailCodeVerifyParams {
   code: string;
 }
+
 export type SignUpFuturePasswordParams = {
   password: string;
-} & ({ emailAddress: string; phoneNumber?: string } | { phoneNumber: string; emailAddress?: string });
+} & (
+  | { emailAddress: string; phoneNumber?: string; username?: string }
+  | { emailAddress?: string; phoneNumber: string; username?: string }
+  | { emailAddress?: string; phoneNumber?: string; username: string }
+);
 
 export interface SignUpFuturePhoneCodeSendParams {
   phoneNumber?: string;
