@@ -149,7 +149,11 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
 
     if (options.proxyUrl) {
       const proxyBase = new URL(options.proxyUrl);
-      const proxyPath = proxyBase.pathname.slice(1, proxyBase.pathname.length);
+      // Remove leading slash and any trailing slash from the proxy pathname
+      let proxyPath = proxyBase.pathname.slice(1);
+      if (proxyPath.endsWith('/')) {
+        proxyPath = proxyPath.slice(0, -1);
+      }
       return buildUrlUtil(
         {
           base: proxyBase.origin,
