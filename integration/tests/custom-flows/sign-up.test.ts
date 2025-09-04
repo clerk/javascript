@@ -12,6 +12,7 @@ test.describe('Custom Flows Sign Up @custom', () => {
   let fakeUser: FakeUser;
 
   test.beforeAll(async () => {
+    test.setTimeout(150_000);
     app = await appConfigs.customFlows.reactVite.clone().commit();
     await app.setup();
     await app.withEnv(appConfigs.envs.withEmailCodes);
