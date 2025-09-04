@@ -1,5 +1,4 @@
-import type { CommercePlanResource } from '@clerk/types';
-import type { CommerceSubscriptionItemResource } from '@clerk/types';
+import type { CommercePlanResource, CommerceSubscriptionItemResource } from '@clerk/types';
 import { useMemo } from 'react';
 
 import { useProtect } from '@/ui/common/Gate';
@@ -39,6 +38,7 @@ export function SubscriptionsList({
     useProtect(has => has({ permission: 'org:sys_billing:manage' })) || subscriberType === 'user';
   const { navigate } = useRouter();
   const { commerceSettings } = useEnvironment();
+  const { openSubscriptionDetails } = usePlansContext();
 
   const billingPlansExist =
     (commerceSettings.billing.user.hasPaidPlans && subscriberType === 'user') ||
@@ -118,6 +118,7 @@ export function SubscriptionsList({
               }),
             ]}
             leftIcon={subscriptionItems.length > 0 ? ArrowsUpDown : Plus}
+            rightIcon={null}
             leftIconSx={t => ({
               width: t.sizes.$4,
               height: t.sizes.$4,
@@ -152,11 +153,8 @@ export function SubscriptionsList({
 }
 
 function SubscriptionRow({ subscription, length }: { subscription: CommerceSubscriptionItemResource; length: number }) {
-  const subscriberType = useSubscriberTypeContext();
-  const canManageBilling =
-    useProtect(has => has({ permission: 'org:sys_billing:manage' })) || subscriberType === 'user';
   const fee = subscription.planPeriod === 'annual' ? subscription.plan.annualFee : subscription.plan.fee;
-  const { captionForSubscription, openSubscriptionDetails } = usePlansContext();
+  const { captionForSubscription } = usePlansContext();
 
   const feeFormatted = useMemo(() => {
     return normalizeFormatted(fee.amountFormatted);
@@ -224,32 +222,6 @@ function SubscriptionRow({ subscription, length }: { subscription: CommerceSubsc
             />
           )}
         </Text>
-      </Td>
-      <Td
-        sx={_ => ({
-          textAlign: 'right',
-        })}
-      >
-        <Button
-          aria-label='Manage subscription'
-          onClick={event => openSubscriptionDetails(event)}
-          variant='bordered'
-          colorScheme='secondary'
-          isDisabled={!canManageBilling}
-          sx={t => ({
-            width: t.sizes.$6,
-            height: t.sizes.$6,
-          })}
-        >
-          <Icon
-            icon={CogFilled}
-            sx={t => ({
-              width: t.sizes.$4,
-              height: t.sizes.$4,
-              opacity: t.opacity.$inactive,
-            })}
-          />
-        </Button>
       </Td>
     </Tr>
   );
