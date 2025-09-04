@@ -17,8 +17,8 @@ const defaultErrors = (): Errors => ({
     captcha: null,
     legalAccepted: null,
   },
-  raw: [],
-  global: [],
+  raw: null,
+  global: null,
 });
 
 export class StateProxy implements State {

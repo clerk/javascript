@@ -76,11 +76,11 @@ export interface Errors {
   /**
    * The raw, unparsed errors from the Clerk API.
    */
-  raw: unknown[];
+  raw: unknown[] | null;
   /**
    * Parsed errors that are not related to any specific field.
    */
-  global: unknown[]; // does not include any errors that could be parsed as a field error
+  global: unknown[] | null; // does not include any errors that could be parsed as a field error
 }
 
 /**

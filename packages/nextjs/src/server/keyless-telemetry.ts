@@ -1,9 +1,8 @@
 import type { TelemetryEventRaw } from '@clerk/types';
-import { dirname, join } from 'path';
 
 import { canUseKeyless } from '../utils/feature-flags';
 import { createClerkClientWithOptions } from './createClerkClient';
-import { nodeFsOrThrow } from './fs/utils';
+import { nodeFsOrThrow, nodePathOrThrow } from './fs/utils';
 
 const EVENT_KEYLESS_ENV_DRIFT_DETECTED = 'KEYLESS_ENV_DRIFT_DETECTED';
 const EVENT_SAMPLING_RATE = 1; // 100% sampling rate
@@ -27,7 +26,8 @@ type EventKeylessEnvDriftPayload = {
  * @returns The absolute path to the telemetry flag file in the project's .clerk/.tmp directory
  */
 function getTelemetryFlagFilePath(): string {
-  return join(process.cwd(), TELEMETRY_FLAG_FILE);
+  const path = nodePathOrThrow();
+  return path.join(process.cwd(), TELEMETRY_FLAG_FILE);
 }
 
 /**
@@ -45,8 +45,9 @@ function tryMarkTelemetryEventAsFired(): boolean {
   try {
     if (canUseKeyless) {
       const { mkdirSync, writeFileSync } = nodeFsOrThrow();
+      const path = nodePathOrThrow();
       const flagFilePath = getTelemetryFlagFilePath();
-      const flagDirectory = dirname(flagFilePath);
+      const flagDirectory = path.dirname(flagFilePath);
 
       // Ensure the directory exists before attempting to write the file
       mkdirSync(flagDirectory, { recursive: true });
