@@ -293,6 +293,7 @@ jobs:
             'nuxt',
             'react-router',
             'billing',
+            'machine'
           ]
         test-project: ['chrome']
         include:

@@ -1,12 +1,13 @@
-import { useClerk, useOrganizationList } from '@clerk/shared/react';
+import { useOrganizationList } from '@clerk/shared/react';
 
-import { useSessionTasksContext } from '@/ui/contexts/components/SessionTasks';
+import { useTaskChooseOrganizationContext } from '@/ui/contexts/components/SessionTasks';
 import { localizationKeys } from '@/ui/customizables';
-import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { useCardState } from '@/ui/elements/contexts';
 import { Form } from '@/ui/elements/Form';
 import { FormButtonContainer } from '@/ui/elements/FormButtons';
 import { FormContainer } from '@/ui/elements/FormContainer';
 import { Header } from '@/ui/elements/Header';
+import { useRouter } from '@/ui/router';
 import { createSlug } from '@/ui/utils/createSlug';
 import { handleError } from '@/ui/utils/errorHandler';
 import { useFormControl } from '@/ui/utils/useFormControl';
@@ -17,23 +18,23 @@ type CreateOrganizationScreenProps = {
   onCancel?: () => void;
 };
 
-export const CreateOrganizationScreen = withCardStateProvider((props: CreateOrganizationScreenProps) => {
+export const CreateOrganizationScreen = (props: CreateOrganizationScreenProps) => {
   const card = useCardState();
-  const { __internal_navigateToTaskIfAvailable } = useClerk();
-  const { redirectUrlComplete } = useSessionTasksContext();
+  const { navigate } = useRouter();
+  const { redirectUrlComplete } = useTaskChooseOrganizationContext();
   const { createOrganization, isLoaded, setActive } = useOrganizationList({
     userMemberships: organizationListParams.userMemberships,
   });
 
   const nameField = useFormControl('name', '', {
     type: 'text',
-    label: localizationKeys('formFieldLabel__organizationName'),
-    placeholder: localizationKeys('formFieldInputPlaceholder__organizationName'),
+    label: localizationKeys('taskChooseOrganization.createOrganization.formFieldLabel__name'),
+    placeholder: localizationKeys('taskChooseOrganization.createOrganization.formFieldInputPlaceholder__name'),
   });
   const slugField = useFormControl('slug', '', {
     type: 'text',
-    label: localizationKeys('formFieldLabel__organizationSlug'),
-    placeholder: localizationKeys('formFieldInputPlaceholder__organizationSlug'),
+    label: localizationKeys('taskChooseOrganization.createOrganization.formFieldLabel__slug'),
+    placeholder: localizationKeys('taskChooseOrganization.createOrganization.formFieldInputPlaceholder__slug'),
   });
 
   const onSubmit = async (e: React.FormEvent) => {
@@ -46,9 +47,13 @@ export const CreateOrganizationScreen = withCardStateProvider((props: CreateOrga
     try {
       const organization = await createOrganization({ name: nameField.value, slug: slugField.value });
 
-      await setActive({ organization });
-
-      await __internal_navigateToTaskIfAvailable({ redirectUrlComplete });
+      await setActive({
+        organization,
+        navigate: async () => {
+          // TODO(after-auth) ORGS-779 - Handle next tasks
+          await navigate(redirectUrlComplete);
+        },
+      });
     } catch (err) {
       handleError(err, [nameField, slugField], card.setError);
     }
@@ -74,11 +79,8 @@ export const CreateOrganizationScreen = withCardStateProvider((props: CreateOrga
         <Header.Title localizationKey={localizationKeys('taskChooseOrganization.createOrganization.title')} />
         <Header.Subtitle localizationKey={localizationKeys('taskChooseOrganization.createOrganization.subtitle')} />
       </Header.Root>
-      <FormContainer>
-        <Form.Root
-          onSubmit={onSubmit}
-          sx={t => ({ padding: `${t.space.$none} ${t.space.$10} ${t.space.$8}` })}
-        >
+      <FormContainer sx={t => ({ padding: `${t.space.$none} ${t.space.$10} ${t.space.$8}` })}>
+        <Form.Root onSubmit={onSubmit}>
           <Form.ControlRow elementId={nameField.id}>
             <Form.PlainInput
               {...nameField.props}
@@ -115,4 +117,4 @@ export const CreateOrganizationScreen = withCardStateProvider((props: CreateOrga
       </FormContainer>
     </>
   );
-});
+};

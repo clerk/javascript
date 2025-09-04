@@ -60,7 +60,9 @@ type DeepLocalizationWithoutObjects<T> = {
  * the default english resource object from {@link https://github.com/clerk/javascript Clerk's open source repo}
  * as a starting point.
  */
-export type LocalizationResource = DeepPartial<DeepLocalizationWithoutObjects<__internal_LocalizationResource>>;
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type -- Needs to be an interface for typedoc to link correctly
+export interface LocalizationResource
+  extends DeepPartial<DeepLocalizationWithoutObjects<__internal_LocalizationResource>> {}
 
 export type __internal_LocalizationResource = {
   locale: string;
@@ -143,12 +145,14 @@ export type __internal_LocalizationResource = {
   badge__unverified: LocalizationValue;
   badge__requiresAction: LocalizationValue;
   badge__you: LocalizationValue;
+  badge__freeTrial: LocalizationValue;
   badge__currentPlan: LocalizationValue;
   badge__upcomingPlan: LocalizationValue;
   badge__activePlan: LocalizationValue;
   badge__pastDuePlan: LocalizationValue;
   badge__startsAt: LocalizationValue<'date'>;
   badge__pastDueAt: LocalizationValue<'date'>;
+  badge__trialEndsAt: LocalizationValue<'date'>;
   badge__endsAt: LocalizationValue;
   badge__expired: LocalizationValue;
   badge__canceledEndsAt: LocalizationValue<'date'>;
@@ -174,6 +178,8 @@ export type __internal_LocalizationResource = {
     keepSubscription: LocalizationValue;
     reSubscribe: LocalizationValue;
     subscribe: LocalizationValue;
+    startFreeTrial: LocalizationValue;
+    startFreeTrial__days: LocalizationValue<'days'>;
     switchPlan: LocalizationValue;
     switchToMonthly: LocalizationValue;
     switchToAnnual: LocalizationValue;
@@ -181,6 +187,10 @@ export type __internal_LocalizationResource = {
     switchToAnnualWithAnnualPrice: LocalizationValue<'price' | 'currency'>;
     billedAnnually: LocalizationValue;
     billedMonthlyOnly: LocalizationValue;
+    cancelFreeTrial: LocalizationValue<'plan'>;
+    cancelFreeTrialTitle: LocalizationValue<'plan'>;
+    cancelFreeTrialAccessUntil: LocalizationValue<'plan' | 'date'>;
+    keepFreeTrial: LocalizationValue;
     alwaysFree: LocalizationValue;
     accountFunds: LocalizationValue;
     defaultFreePlanActive: LocalizationValue;
@@ -206,7 +216,11 @@ export type __internal_LocalizationResource = {
       currentBillingCycle: LocalizationValue;
       nextPaymentOn: LocalizationValue;
       nextPaymentAmount: LocalizationValue;
+      firstPaymentOn: LocalizationValue;
+      firstPaymentAmount: LocalizationValue;
       subscribedOn: LocalizationValue;
+      trialStartedOn: LocalizationValue;
+      trialEndsOn: LocalizationValue;
       endsOn: LocalizationValue;
       renewsAt: LocalizationValue;
       beginsOn: LocalizationValue;
@@ -238,10 +252,12 @@ export type __internal_LocalizationResource = {
       title: LocalizationValue;
       title__paymentSuccessful: LocalizationValue;
       title__subscriptionSuccessful: LocalizationValue;
+      title__trialSuccess: LocalizationValue;
       description__paymentSuccessful: LocalizationValue;
       description__subscriptionSuccessful: LocalizationValue;
       lineItems: {
         title__totalPaid: LocalizationValue;
+        title__freeTrialEndsAt: LocalizationValue;
         title__paymentMethod: LocalizationValue;
         title__statementId: LocalizationValue;
         title__subscriptionBegins: LocalizationValue;
@@ -252,6 +268,7 @@ export type __internal_LocalizationResource = {
       };
       downgradeNotice: LocalizationValue;
       pastDueNotice: LocalizationValue;
+      totalDueAfterTrial: LocalizationValue<'days'>;
       perMonth: LocalizationValue;
     };
   };
@@ -1216,6 +1233,10 @@ export type __internal_LocalizationResource = {
       subtitle: LocalizationValue;
       formButtonSubmit: LocalizationValue;
       formButtonReset: LocalizationValue;
+      formFieldLabel__name: LocalizationValue;
+      formFieldLabel__slug: LocalizationValue;
+      formFieldInputPlaceholder__name: LocalizationValue;
+      formFieldInputPlaceholder__slug: LocalizationValue;
     };
     chooseOrganization: {
       title: LocalizationValue;
@@ -1322,4 +1343,6 @@ type UnstableErrors = WithParamName<{
   organization_domain_blocked: LocalizationValue;
   organization_domain_exists_for_enterprise_connection: LocalizationValue;
   organization_membership_quota_exceeded: LocalizationValue;
+  organization_not_found_or_unauthorized: LocalizationValue;
+  organization_not_found_or_unauthorized_with_create_organization_disabled: LocalizationValue;
 }>;

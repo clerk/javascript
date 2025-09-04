@@ -200,6 +200,49 @@ describe('TelemetryCollector', () => {
 
       randomSpy.mockRestore();
     });
+
+    test('ignores event-specific sampling rate when eventSampling is false', async () => {
+      windowSpy.mockImplementation(() => undefined);
+
+      const randomSpy = jest.spyOn(Math, 'random').mockReturnValue(0.5);
+
+      const collector = new TelemetryCollector({
+        publishableKey: TEST_PK,
+        samplingRate: 1.0, // Global sampling rate allows all events
+        perEventSampling: false, // Disable event-specific sampling
+      });
+
+      // This event would normally be rejected due to low eventSamplingRate (0.1 < 0.5)
+      // but should be sent because eventSampling is disabled
+      collector.record({ event: 'TEST_EVENT', eventSamplingRate: 0.1, payload: {} });
+
+      jest.runAllTimers();
+
+      expect(fetchSpy).toHaveBeenCalled();
+
+      randomSpy.mockRestore();
+    });
+
+    test('respects event-specific sampling rate when eventSampling is true (default)', async () => {
+      windowSpy.mockImplementation(() => undefined);
+
+      const randomSpy = jest.spyOn(Math, 'random').mockReturnValue(0.5);
+
+      const collector = new TelemetryCollector({
+        publishableKey: TEST_PK,
+        samplingRate: 1.0, // Global sampling rate allows all events
+        perEventSampling: true, // Enable event-specific sampling (default)
+      });
+
+      // This event should be rejected due to low eventSamplingRate (0.1 < 0.5)
+      collector.record({ event: 'TEST_EVENT', eventSamplingRate: 0.1, payload: {} });
+
+      jest.runAllTimers();
+
+      expect(fetchSpy).not.toHaveBeenCalled();
+
+      randomSpy.mockRestore();
+    });
   });
 
   describe('with client-side throttling', () => {
@@ -347,6 +390,65 @@ describe('TelemetryCollector', () => {
       expect(JSON.parse(item)[expectedKey]).toEqual(expect.any(Number));
 
       fetchSpy.mockRestore();
+    });
+  });
+
+  describe('error handling', () => {
+    test('record() method does not bubble up errors from internal operations', () => {
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+      const collector = new TelemetryCollector({
+        publishableKey: TEST_PK,
+      });
+
+      const circularPayload = (() => {
+        const obj: any = { test: 'value' };
+        obj.self = obj;
+        return obj;
+      })();
+
+      expect(() => {
+        collector.record({ event: 'TEST_EVENT', payload: circularPayload });
+      }).not.toThrow();
+
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        '[clerk/telemetry] Error recording telemetry event',
+        expect.any(Error),
+      );
+
+      consoleErrorSpy.mockRestore();
+    });
+
+    test('record() method handles errors gracefully and continues operation', () => {
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+      const collector = new TelemetryCollector({
+        publishableKey: TEST_PK,
+      });
+
+      const problematicPayload = (() => {
+        const obj: any = { test: 'value' };
+        obj.self = obj;
+        return obj;
+      })();
+
+      expect(() => {
+        collector.record({ event: 'TEST_EVENT', payload: problematicPayload });
+      }).not.toThrow();
+
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        '[clerk/telemetry] Error recording telemetry event',
+        expect.any(Error),
+      );
+
+      expect(() => {
+        collector.record({ event: 'TEST_EVENT', payload: { normal: 'data' } });
+      }).not.toThrow();
+
+      jest.runAllTimers();
+      expect(fetchSpy).toHaveBeenCalled();
+
+      consoleErrorSpy.mockRestore();
     });
   });
 });

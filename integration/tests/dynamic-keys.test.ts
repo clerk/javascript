@@ -9,6 +9,7 @@ test.describe('dynamic keys @nextjs', () => {
   let app: Application;
 
   test.beforeAll(async () => {
+    test.setTimeout(90_000); // Wait for app to be ready
     app = await appConfigs.next.appRouter
       .clone()
       .addFile(

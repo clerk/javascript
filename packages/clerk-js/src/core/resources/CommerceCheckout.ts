@@ -3,11 +3,15 @@ import type {
   CommerceCheckoutJSON,
   CommerceCheckoutResource,
   CommerceCheckoutTotals,
+  CommercePayerResource,
   CommerceSubscriptionPlanPeriod,
   ConfirmCheckoutParams,
 } from '@clerk/types';
 
+import { unixEpochToDate } from '@/utils/date';
+
 import { commerceTotalsFromJSON } from '../../utils';
+import { CommercePayer } from './CommercePayer';
 import { BaseResource, CommercePaymentSource, CommercePlan, isClerkAPIResponseError } from './internal';
 
 export class CommerceCheckout extends BaseResource implements CommerceCheckoutResource {
@@ -21,11 +25,12 @@ export class CommerceCheckout extends BaseResource implements CommerceCheckoutRe
   status!: 'needs_confirmation' | 'completed';
   totals!: CommerceCheckoutTotals;
   isImmediatePlanChange!: boolean;
+  freeTrialEndsAt!: Date | null;
+  payer!: CommercePayerResource;
 
-  constructor(data: CommerceCheckoutJSON, orgId?: string) {
+  constructor(data: CommerceCheckoutJSON) {
     super();
     this.fromJSON(data);
-    this.pathRoot = orgId ? `/organizations/${orgId}/commerce/checkouts` : `/me/commerce/checkouts`;
   }
 
   protected fromJSON(data: CommerceCheckoutJSON | null): this {
@@ -43,22 +48,22 @@ export class CommerceCheckout extends BaseResource implements CommerceCheckoutRe
     this.status = data.status;
     this.totals = commerceTotalsFromJSON(data.totals);
     this.isImmediatePlanChange = data.is_immediate_plan_change;
+    this.freeTrialEndsAt = data.free_trial_ends_at ? unixEpochToDate(data.free_trial_ends_at) : null;
+    this.payer = new CommercePayer(data.payer);
     return this;
   }
 
   confirm = (params: ConfirmCheckoutParams): Promise<this> => {
-    const { orgId, ...rest } = params;
-
     // Retry confirmation in case of a 500 error
     // This will retry up to 3 times with an increasing delay
     // It retries at 2s, 4s, 6s and 8s
     return retry(
       () =>
         this._basePatch({
-          path: orgId
-            ? `/organizations/${orgId}/commerce/checkouts/${this.id}/confirm`
+          path: this.payer.organizationId
+            ? `/organizations/${this.payer.organizationId}/commerce/checkouts/${this.id}/confirm`
             : `/me/commerce/checkouts/${this.id}/confirm`,
-          body: rest as any,
+          body: params as any,
         }),
       {
         factor: 1.1,

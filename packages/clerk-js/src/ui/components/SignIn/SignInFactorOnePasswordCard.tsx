@@ -55,7 +55,7 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
   const card = useCardState();
   const { setActive } = useClerk();
   const signIn = useCoreSignIn();
-  const { afterSignInUrl } = useSignInContext();
+  const { afterSignInUrl, navigateOnSetActive } = useSignInContext();
   const supportEmail = useSupportEmail();
   const passwordControl = usePasswordControl(props);
   const { navigate } = useRouter();
@@ -74,7 +74,12 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
       .then(res => {
         switch (res.status) {
           case 'complete':
-            return setActive({ session: res.createdSessionId, redirectUrl: afterSignInUrl });
+            return setActive({
+              session: res.createdSessionId,
+              navigate: async ({ session }) => {
+                await navigateOnSetActive({ session, redirectUrl: afterSignInUrl });
+              },
+            });
           case 'needs_second_factor':
             return navigate('../factor-two');
           default:

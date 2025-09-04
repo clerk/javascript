@@ -1,5 +1,131 @@
 # Change Log
 
+## 3.24.0
+
+### Minor Changes
+
+- [Billing Beta] `checkout.confirm()` now infers the resource id resulting in less repetition and improved DX. ([#6642](https://github.com/clerk/javascript/pull/6642)) by [@panteliselef](https://github.com/panteliselef)
+
+  After
+
+  ```tsx
+  const checkout = Clerk.billing.startCheckout({ orgId });
+  checkout.confirm(); // orgId is always implied
+  ```
+
+  Before
+
+  ```tsx
+  const checkout = clerk.billing.startCheckout({ orgId });
+  checkout.confirm({ orgId });
+  ```
+
+### Patch Changes
+
+- The `SAML_IDPS` export was moved from `@clerk/types` to `@clerk/shared/saml` and was marked as deprecated. ([#6682](https://github.com/clerk/javascript/pull/6682)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  Please use `import { SAML_IDPS } from "@clerk/shared/saml"` instead.
+
+- Updated dependencies [[`2a82737`](https://github.com/clerk/javascript/commit/2a8273705b9764e1a4613d5a0dbb738d0b156c05), [`cda5d7b`](https://github.com/clerk/javascript/commit/cda5d7b79b28dc03ec794ea54e0feb64b148cdd2), [`ba25a5b`](https://github.com/clerk/javascript/commit/ba25a5b5a3fa686a65f52e221d9d1712a389fea9), [`a50cfc8`](https://github.com/clerk/javascript/commit/a50cfc8f1dd168b436499e32fc8b0fc41d28bbff), [`377f67b`](https://github.com/clerk/javascript/commit/377f67b8e552d1a19efbe4530e9306675b7f8eab), [`65b12ee`](https://github.com/clerk/javascript/commit/65b12eeeb57ee80cdd8c36c5949d51f1227a413e), [`263722e`](https://github.com/clerk/javascript/commit/263722e61fd27403b4c8d9794880686771e123f9)]:
+  - @clerk/types@4.84.0
+
+## 3.23.0
+
+### Minor Changes
+
+- Added support for authentication with Base ([#6556](https://github.com/clerk/javascript/pull/6556)) by [@jacekradko](https://github.com/jacekradko)
+
+### Patch Changes
+
+- Updated dependencies [[`600c648`](https://github.com/clerk/javascript/commit/600c648d4087a823341041c90018797fbc0033f0)]:
+  - @clerk/types@4.83.0
+
+## 3.22.1
+
+### Patch Changes
+
+- Removed unused generateUuid utility ([#6601](https://github.com/clerk/javascript/pull/6601)) by [@jacekradko](https://github.com/jacekradko)
+
+- Mark `__experimental_mode` as hidden. ([#6634](https://github.com/clerk/javascript/pull/6634)) by [@NWylynko](https://github.com/NWylynko)
+
+- Improve assertion error for requiring active organization. ([#6606](https://github.com/clerk/javascript/pull/6606)) by [@panteliselef](https://github.com/panteliselef)
+
+- Do not allow errors in telemetry to bubble up ([#6640](https://github.com/clerk/javascript/pull/6640)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`d52714e`](https://github.com/clerk/javascript/commit/d52714e4cb7f369c74826cd4341c58eb1900abe4), [`2ed539c`](https://github.com/clerk/javascript/commit/2ed539cc7f08ed4d70c33621563ad386ea8becc5), [`c16a7a5`](https://github.com/clerk/javascript/commit/c16a7a5837fc15e0e044baf9c809b8da6fbac795)]:
+  - @clerk/types@4.82.0
+
+## 3.22.0
+
+### Minor Changes
+
+- [Billing Beta] Replace `redirectUrl` with `navigate` in `checkout.finalize()` ([#6586](https://github.com/clerk/javascript/pull/6586)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Updated dependencies [[`e52bf8e`](https://github.com/clerk/javascript/commit/e52bf8ebef74a9e123c69b69acde1340c01d32d7), [`c043c19`](https://github.com/clerk/javascript/commit/c043c1919854aaa5b9cf7f6df5bb517f5617f7a1), [`c28d29c`](https://github.com/clerk/javascript/commit/c28d29c79bb4f144d782313ca72df7db91a77340), [`172e054`](https://github.com/clerk/javascript/commit/172e054a3511be12d16ba19037db320c2d9838bf)]:
+  - @clerk/types@4.81.0
+
+## 3.21.2
+
+### Patch Changes
+
+- Updated dependencies [[`8dc6bad`](https://github.com/clerk/javascript/commit/8dc6bad5c7051b59bd8c73e65d497f6a974bb1c3), [`aa6a3c3`](https://github.com/clerk/javascript/commit/aa6a3c3d3ba2de67a468c996cbf0bff43a09ddb8), [`db50c47`](https://github.com/clerk/javascript/commit/db50c4734920ada6002de8c62c994047eb6cb5a0)]:
+  - @clerk/types@4.80.0
+
+## 3.21.1
+
+### Patch Changes
+
+- Add error handling for `setActive` with stale organization data ([#6550](https://github.com/clerk/javascript/pull/6550)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`413468c`](https://github.com/clerk/javascript/commit/413468c9b9c8fb7576f8e4cbdccff98784e33fef), [`7b7eb1f`](https://github.com/clerk/javascript/commit/7b7eb1fc0235249c5c179239078294118f2947cd)]:
+  - @clerk/types@4.79.0
+
+## 3.21.0
+
+### Minor Changes
+
+- [Experimental] Signals: Add support for calling `signIn.password()` without an identifier. ([#6534](https://github.com/clerk/javascript/pull/6534)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Updated dependencies [[`5b24129`](https://github.com/clerk/javascript/commit/5b24129ddcfc2f7dc6eb79d8c818b4ff97c68e9a)]:
+  - @clerk/types@4.78.0
+
+## 3.20.1
+
+### Patch Changes
+
+- Invalidate organization memberships based on client user ([#6530](https://github.com/clerk/javascript/pull/6530)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Updated dependencies [[`4db1e58`](https://github.com/clerk/javascript/commit/4db1e58d70b60e1e236709b507666715d571e925), [`69498df`](https://github.com/clerk/javascript/commit/69498dfca3e6bb388eb8c94313eac06347dd5a27)]:
+  - @clerk/types@4.77.0
+
+## 3.20.0
+
+### Minor Changes
+
+- Add support for trials in `<Checkout/>` ([#6494](https://github.com/clerk/javascript/pull/6494)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Added `freeTrialEndsAt` property to `CommerceCheckoutResource` interface.
+
+### Patch Changes
+
+- Updated dependencies [[`15fe106`](https://github.com/clerk/javascript/commit/15fe1060f730a6a4391f3d2451d23edd3218e1ae), [`173837c`](https://github.com/clerk/javascript/commit/173837c2526aa826b7981ee8d6d4f52c00675da5), [`8b52d7a`](https://github.com/clerk/javascript/commit/8b52d7ae19407e8ab5a5451bd7d34b6bc38417de), [`854dde8`](https://github.com/clerk/javascript/commit/854dde88e642c47b5a29ac8f576c8c1976e5d067), [`ae2e2d6`](https://github.com/clerk/javascript/commit/ae2e2d6b336be6b596cc855e549843beb5bfd2a1), [`037f25a`](https://github.com/clerk/javascript/commit/037f25a8171888168913b186b7edf871e0aaf197), [`f8b38b7`](https://github.com/clerk/javascript/commit/f8b38b7059e498fef3ac1271346be0710aa31c76)]:
+  - @clerk/types@4.76.0
+
+## 3.19.0
+
+### Minor Changes
+
+- Update TelemetryCollector to accept a `perEventSampling` property for controling per-event sampling rates. ([#6514](https://github.com/clerk/javascript/pull/6514)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Updated dependencies [[`b72a3dd`](https://github.com/clerk/javascript/commit/b72a3dda2467720e5dc8cab3e7e6a110f3beb79b), [`d93b0ed`](https://github.com/clerk/javascript/commit/d93b0edf4adc57d48a26cb08444192887ccec659), [`6459f7d`](https://github.com/clerk/javascript/commit/6459f7dabe5f163f48ed73106bb901d8187da3e2), [`9084759`](https://github.com/clerk/javascript/commit/90847593300be605e1ee1c06dac147ce68b25dc7)]:
+  - @clerk/types@4.75.0
+
 ## 3.18.1
 
 ### Patch Changes

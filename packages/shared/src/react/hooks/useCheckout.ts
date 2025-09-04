@@ -2,6 +2,7 @@ import type {
   __experimental_CheckoutCacheState,
   __experimental_CheckoutInstance,
   CommerceCheckoutResource,
+  SetActiveNavigate,
 } from '@clerk/types';
 import { useMemo, useSyncExternalStore } from 'react';
 
@@ -57,7 +58,7 @@ type __experimental_UseCheckoutReturn = {
       confirm: __experimental_CheckoutInstance['confirm'];
       start: __experimental_CheckoutInstance['start'];
       clear: () => void;
-      finalize: (params?: { redirectUrl: string }) => void;
+      finalize: (params?: { navigate?: SetActiveNavigate }) => void;
       getState: () => __experimental_CheckoutCacheState;
       isStarting: boolean;
       isConfirming: boolean;
@@ -83,7 +84,9 @@ export const useCheckout = (options?: Params): __experimental_UseCheckoutReturn 
   }
 
   if (forOrganization === 'organization' && !organization) {
-    throw new Error('Clerk: Wrap your flow with a check for an active organization');
+    throw new Error(
+      'Clerk: Ensure your flow checks for an active organization. Retrieve `orgId` from `useAuth()` and confirm it is defined. For SSR, see: https://clerk.com/docs/references/backend/types/auth-object#how-to-access-the-auth-object',
+    );
   }
 
   const manager = useMemo(
@@ -109,6 +112,8 @@ export const useCheckout = (options?: Params): __experimental_UseCheckoutReturn 
         planPeriod: null,
         plan: null,
         paymentSource: null,
+        freeTrialEndsAt: null,
+        payer: null,
       };
     }
     const {

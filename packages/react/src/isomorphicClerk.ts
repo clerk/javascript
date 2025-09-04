@@ -4,7 +4,6 @@ import { loadClerkJsScript } from '@clerk/shared/loadClerkJsScript';
 import { handleValueOrFn } from '@clerk/shared/utils';
 import type {
   __internal_CheckoutProps,
-  __internal_NavigateToTaskIfAvailableParams,
   __internal_OAuthConsentProps,
   __internal_PlanDetailsProps,
   __internal_SubscriptionDetailsProps,
@@ -12,6 +11,7 @@ import type {
   __internal_UserVerificationProps,
   APIKeysNamespace,
   APIKeysProps,
+  AuthenticateWithBaseParams,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
@@ -46,6 +46,7 @@ import type {
   SignUpResource,
   State,
   TaskChooseOrganizationProps,
+  TasksRedirectOptions,
   UnsubscribeCallback,
   UserButtonProps,
   UserProfileProps,
@@ -56,6 +57,7 @@ import type {
 
 import { errorThrower } from './errors/errorThrower';
 import { unsupportedNonBrowserDomainOrProxyUrlFunction } from './errors/messages';
+import { StateProxy } from './stateProxy';
 import type {
   BrowserClerk,
   BrowserClerkConstructor,
@@ -105,9 +107,7 @@ type IsomorphicLoadedClerk = Without<
   | '__internal_reloadInitialResources'
   | 'billing'
   | 'apiKeys'
-  | '__internal_setComponentNavigationContext'
   | '__internal_setActiveInProgress'
-  | '__internal_hasAfterAuthFlows'
 > & {
   client: ClientResource | undefined;
   billing: CommerceBillingNamespace | undefined;
@@ -159,6 +159,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   #proxyUrl: DomainOrProxyUrl['proxyUrl'];
   #publishableKey: string;
   #eventBus = createClerkEventBus();
+  #stateProxy: StateProxy;
 
   get publishableKey(): string {
     return this.#publishableKey;
@@ -251,6 +252,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     this.options = options;
     this.Clerk = Clerk;
     this.mode = inBrowser() ? 'browser' : 'server';
+    this.#stateProxy = new StateProxy(this);
 
     if (!this.options.sdkMetadata) {
       this.options.sdkMetadata = SDK_METADATA;
@@ -387,6 +389,15 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return callback();
     } else {
       this.premountMethodCalls.set('buildWaitlistUrl', callback);
+    }
+  };
+
+  buildTasksUrl = (): string | void => {
+    const callback = () => this.clerkjs?.buildTasksUrl() || '';
+    if (this.clerkjs && this.loaded) {
+      return callback();
+    } else {
+      this.premountMethodCalls.set('buildTasksUrl', callback);
     }
   };
 
@@ -715,8 +726,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     return this.clerkjs?.billing;
   }
 
-  get __internal_state(): State | undefined {
-    return this.clerkjs?.__internal_state;
+  get __internal_state(): State {
+    return this.loaded && this.clerkjs ? this.clerkjs.__internal_state : this.#stateProxy;
   }
 
   get apiKeys(): APIKeysNamespace | undefined {
@@ -740,14 +751,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     // Handle case where accounts has clerk-react@4 installed, but clerk-js@3 is manually loaded
     if (clerkjs && '__unstable__updateProps' in clerkjs) {
       return (clerkjs as any).__unstable__updateProps(props);
-    }
-  };
-
-  __internal_navigateToTaskIfAvailable = async (params?: __internal_NavigateToTaskIfAvailableParams): Promise<void> => {
-    if (this.clerkjs) {
-      return this.clerkjs.__internal_navigateToTaskIfAvailable(params);
-    } else {
-      return Promise.reject();
     }
   };
 
@@ -1277,6 +1280,16 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
+  redirectToTasks = async (opts?: TasksRedirectOptions) => {
+    const callback = () => this.clerkjs?.redirectToTasks(opts);
+    if (this.clerkjs && this.loaded) {
+      return callback();
+    } else {
+      this.premountMethodCalls.set('redirectToTasks', callback);
+      return;
+    }
+  };
+
   handleRedirectCallback = async (params: HandleOAuthCallbackParams): Promise<void> => {
     const callback = () => this.clerkjs?.handleRedirectCallback(params);
     if (this.clerkjs && this.loaded) {
@@ -1338,6 +1351,15 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return callback() as Promise<void>;
     } else {
       this.premountMethodCalls.set('authenticateWithCoinbaseWallet', callback);
+    }
+  };
+
+  authenticateWithBase = async (params?: AuthenticateWithBaseParams) => {
+    const callback = () => this.clerkjs?.authenticateWithBase(params);
+    if (this.clerkjs && this.loaded) {
+      return callback() as Promise<void>;
+    } else {
+      this.premountMethodCalls.set('authenticateWithBase', callback);
     }
   };
 

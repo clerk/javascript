@@ -1,5 +1,264 @@
 # Change Log
 
+## 5.91.1
+
+### Patch Changes
+
+- Add `.lp.dev` to list of origins that prefer the popup SSO flow. ([#6686](https://github.com/clerk/javascript/pull/6686)) by [@brkalow](https://github.com/brkalow)
+
+## 5.91.0
+
+### Minor Changes
+
+- [Experimental] Signal phone code support ([#6650](https://github.com/clerk/javascript/pull/6650)) by [@dstaley](https://github.com/dstaley)
+
+- [Billing Beta] `checkout.confirm()` now infers the resource id resulting in less repetition and improved DX. ([#6642](https://github.com/clerk/javascript/pull/6642)) by [@panteliselef](https://github.com/panteliselef)
+
+  After
+
+  ```tsx
+  const checkout = Clerk.billing.startCheckout({ orgId });
+  checkout.confirm(); // orgId is always implied
+  ```
+
+  Before
+
+  ```tsx
+  const checkout = clerk.billing.startCheckout({ orgId });
+  checkout.confirm({ orgId });
+  ```
+
+- [Experimental] Signal MFA support ([#6659](https://github.com/clerk/javascript/pull/6659)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Display free trial badge `<PricingTable/>`. ([#6656](https://github.com/clerk/javascript/pull/6656)) by [@panteliselef](https://github.com/panteliselef)
+
+- Adding baseline debug logging to SignIn and SignUp components ([#6665](https://github.com/clerk/javascript/pull/6665)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`651dbf8`](https://github.com/clerk/javascript/commit/651dbf888642053257271d96b66c27f5b157d71e), [`2a82737`](https://github.com/clerk/javascript/commit/2a8273705b9764e1a4613d5a0dbb738d0b156c05), [`cda5d7b`](https://github.com/clerk/javascript/commit/cda5d7b79b28dc03ec794ea54e0feb64b148cdd2), [`ba25a5b`](https://github.com/clerk/javascript/commit/ba25a5b5a3fa686a65f52e221d9d1712a389fea9), [`a50cfc8`](https://github.com/clerk/javascript/commit/a50cfc8f1dd168b436499e32fc8b0fc41d28bbff), [`377f67b`](https://github.com/clerk/javascript/commit/377f67b8e552d1a19efbe4530e9306675b7f8eab), [`a1dcda7`](https://github.com/clerk/javascript/commit/a1dcda7b42fec2ae9893c707e07068fb1477ebd1), [`7c3c1f7`](https://github.com/clerk/javascript/commit/7c3c1f74117e9f4aa25fdf05edab717998e12946), [`65b12ee`](https://github.com/clerk/javascript/commit/65b12eeeb57ee80cdd8c36c5949d51f1227a413e), [`263722e`](https://github.com/clerk/javascript/commit/263722e61fd27403b4c8d9794880686771e123f9)]:
+  - @clerk/localizations@3.24.1
+  - @clerk/types@4.84.0
+  - @clerk/shared@3.24.0
+
+## 5.90.0
+
+### Minor Changes
+
+- Added support for authentication with Base ([#6556](https://github.com/clerk/javascript/pull/6556)) by [@jacekradko](https://github.com/jacekradko)
+
+### Patch Changes
+
+- Updated dependencies [[`12b19d4`](https://github.com/clerk/javascript/commit/12b19d4cb5c8da10dcca1a9b3c69aff4c1779bcc), [`823b80f`](https://github.com/clerk/javascript/commit/823b80fe9950e163007db668ee8eb97eaa164638), [`600c648`](https://github.com/clerk/javascript/commit/600c648d4087a823341041c90018797fbc0033f0)]:
+  - @clerk/localizations@3.24.0
+  - @clerk/shared@3.23.0
+  - @clerk/types@4.83.0
+
+## 5.89.0
+
+### Minor Changes
+
+- Rework the OTP input to use a single transparent input (via `input-otp`) to improve password manager compatibility and iOS/Android SMS-based autofill. Removes individual digit fields; a single invisible input drives the six visual slots. ([#6551](https://github.com/clerk/javascript/pull/6551)) by [@tmilewski](https://github.com/tmilewski)
+
+  If you're using `@clerk/testing`, please ensure that you're using the latest version.
+
+- [Experimental] Signal transfer support ([#6614](https://github.com/clerk/javascript/pull/6614)) by [@dstaley](https://github.com/dstaley)
+
+- [Experimental] Signals `isLoaded` removal ([#6605](https://github.com/clerk/javascript/pull/6605)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Clear API keys revoke confirmation field on modal close ([#6604](https://github.com/clerk/javascript/pull/6604)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Remove unused `__internal_hasAfterAuthFlows` property ([#6609](https://github.com/clerk/javascript/pull/6609)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Removing unused debugLogger functionality ([#6615](https://github.com/clerk/javascript/pull/6615)) by [@jacekradko](https://github.com/jacekradko)
+
+- Allow end users to select payment methods during trial checkout. ([#6608](https://github.com/clerk/javascript/pull/6608)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add support for the user_banned error on OAuth flows ([#6639](https://github.com/clerk/javascript/pull/6639)) by [@dmoerner](https://github.com/dmoerner)
+
+- Updated dependencies [[`d52714e`](https://github.com/clerk/javascript/commit/d52714e4cb7f369c74826cd4341c58eb1900abe4), [`ce49740`](https://github.com/clerk/javascript/commit/ce49740d474d6dd9da5096982ea4e9f14cf68f09), [`2ed539c`](https://github.com/clerk/javascript/commit/2ed539cc7f08ed4d70c33621563ad386ea8becc5), [`deaafe4`](https://github.com/clerk/javascript/commit/deaafe449773632d690aa2f8cafaf959392622b9), [`a26ecae`](https://github.com/clerk/javascript/commit/a26ecae09fd06cd34f094262f038a8eefbb23f7d), [`c16a7a5`](https://github.com/clerk/javascript/commit/c16a7a5837fc15e0e044baf9c809b8da6fbac795), [`05b6d65`](https://github.com/clerk/javascript/commit/05b6d65c0bc5736443325a5defee4c263ef196af)]:
+  - @clerk/types@4.82.0
+  - @clerk/shared@3.22.1
+  - @clerk/localizations@3.23.1
+
+## 5.88.0
+
+### Minor Changes
+
+- [Experimental] Add support for captcha to Signal SignUp ([#6574](https://github.com/clerk/javascript/pull/6574)) by [@dstaley](https://github.com/dstaley)
+
+- Adding /oauth/authorize-with-immediate-redirect to frontendApiRedirectPathsNoUserInput ([#6579](https://github.com/clerk/javascript/pull/6579)) by [@Ben2W](https://github.com/Ben2W)
+
+- [Billing Beta] Replace `redirectUrl` with `navigate` in `checkout.finalize()` ([#6586](https://github.com/clerk/javascript/pull/6586)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- [Billing Beta] Rename `cancelFreeTrialDescription` to `cancelFreeTrialAccessUntil`. ([#6582](https://github.com/clerk/javascript/pull/6582)) by [@panteliselef](https://github.com/panteliselef)
+
+- Update copies for create organization screen on session tasks ([#6584](https://github.com/clerk/javascript/pull/6584)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Add class `cl-planDetails-root` to the parent div element that containes the plan details drawer. ([#6573](https://github.com/clerk/javascript/pull/6573)) by [@panteliselef](https://github.com/panteliselef)
+
+- Fix incorrect redirect when completing session tasks within `SignIn` and `SignUp` components ([#6580](https://github.com/clerk/javascript/pull/6580)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Hide passkeys section when user has an enterprise account with the disable additional identifiers setting enabled ([#6585](https://github.com/clerk/javascript/pull/6585)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+- Improve multi-session navigation to tasks ([#6575](https://github.com/clerk/javascript/pull/6575)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Update notice when cancelling a trial. ([#6582](https://github.com/clerk/javascript/pull/6582)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add a development-mode warning when exactly one of `routerPush` or `routerReplace` is provided in `ClerkOptions`. Both must be defined together for custom router navigation to work correctly. ([#6578](https://github.com/clerk/javascript/pull/6578)) by [@kduprey](https://github.com/kduprey)
+
+- Updated dependencies [[`e52bf8e`](https://github.com/clerk/javascript/commit/e52bf8ebef74a9e123c69b69acde1340c01d32d7), [`edd0f21`](https://github.com/clerk/javascript/commit/edd0f2102b4a1fb891d83a8a07df78601aeb19d1), [`c043c19`](https://github.com/clerk/javascript/commit/c043c1919854aaa5b9cf7f6df5bb517f5617f7a1), [`c28d29c`](https://github.com/clerk/javascript/commit/c28d29c79bb4f144d782313ca72df7db91a77340), [`172e054`](https://github.com/clerk/javascript/commit/172e054a3511be12d16ba19037db320c2d9838bf)]:
+  - @clerk/localizations@3.23.0
+  - @clerk/types@4.81.0
+  - @clerk/shared@3.22.0
+
+## 5.87.0
+
+### Minor Changes
+
+- [Experimental] Signal SignUp APIs ([#6571](https://github.com/clerk/javascript/pull/6571)) by [@dstaley](https://github.com/dstaley)
+
+- Update SubscriptionDetails to support free trials ([#6569](https://github.com/clerk/javascript/pull/6569)) by [@panteliselef](https://github.com/panteliselef)
+
+- [Experimental] Signal implementation for SignUp ([#6568](https://github.com/clerk/javascript/pull/6568)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Fix server-side cache revalidation for Next.js when transitioning from `active` to `pending` session ([#6572](https://github.com/clerk/javascript/pull/6572)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`8dc6bad`](https://github.com/clerk/javascript/commit/8dc6bad5c7051b59bd8c73e65d497f6a974bb1c3), [`aa6a3c3`](https://github.com/clerk/javascript/commit/aa6a3c3d3ba2de67a468c996cbf0bff43a09ddb8), [`db50c47`](https://github.com/clerk/javascript/commit/db50c4734920ada6002de8c62c994047eb6cb5a0)]:
+  - @clerk/types@4.80.0
+  - @clerk/localizations@3.22.0
+  - @clerk/shared@3.21.2
+
+## 5.86.0
+
+### Minor Changes
+
+- [Experimental] Signal `fetchStatus` support. ([#6549](https://github.com/clerk/javascript/pull/6549)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Add error handling for `setActive` with stale organization data ([#6550](https://github.com/clerk/javascript/pull/6550)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`f7e6d29`](https://github.com/clerk/javascript/commit/f7e6d297c629ddf248623a38d3fcbebfd9e4255d), [`413468c`](https://github.com/clerk/javascript/commit/413468c9b9c8fb7576f8e4cbdccff98784e33fef), [`7b7eb1f`](https://github.com/clerk/javascript/commit/7b7eb1fc0235249c5c179239078294118f2947cd)]:
+  - @clerk/localizations@3.21.3
+  - @clerk/shared@3.21.1
+  - @clerk/types@4.79.0
+
+## 5.85.0
+
+### Minor Changes
+
+- [Experimental] Signals: Add support for calling `signIn.password()` without an identifier. ([#6534](https://github.com/clerk/javascript/pull/6534)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Remove flickers from PricingTable when signed in. ([#6535](https://github.com/clerk/javascript/pull/6535)) by [@panteliselef](https://github.com/panteliselef)
+
+- Display trial subscriptions in UserProfile and OrganizationProfile. ([#6526](https://github.com/clerk/javascript/pull/6526)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`5b24129`](https://github.com/clerk/javascript/commit/5b24129ddcfc2f7dc6eb79d8c818b4ff97c68e9a)]:
+  - @clerk/shared@3.21.0
+  - @clerk/types@4.78.0
+  - @clerk/localizations@3.21.2
+
+## 5.84.0
+
+### Minor Changes
+
+- Add `navigate` parameter to `clerk.setActive()` for custom navigation before the session and/or organization is set. ([#6486](https://github.com/clerk/javascript/pull/6486)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  It's useful for handling pending session tasks for after-auth flows:
+
+  ```typescript
+  await clerk.setActive({
+    session,
+    navigate: async ({ session }) => {
+      const currentTask = session.currentTask;
+      if (currentTask) {
+        await router.push(`/onboarding/${currentTask.key}`);
+        return;
+      }
+
+      await router.push('/dashboard');
+    },
+  });
+  ```
+
+### Patch Changes
+
+- Introduce debugLogger for internal debugging support ([#6452](https://github.com/clerk/javascript/pull/6452)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`4db1e58`](https://github.com/clerk/javascript/commit/4db1e58d70b60e1e236709b507666715d571e925), [`69498df`](https://github.com/clerk/javascript/commit/69498dfca3e6bb388eb8c94313eac06347dd5a27), [`59f1559`](https://github.com/clerk/javascript/commit/59f15593bab708b9e13eebfff6780c2d52b31b0a)]:
+  - @clerk/types@4.77.0
+  - @clerk/shared@3.20.1
+  - @clerk/localizations@3.21.1
+
+## 5.83.0
+
+### Minor Changes
+
+- [Billing Beta] Replace usage of top level amounts in plan with fees for displaying prices. ([#6490](https://github.com/clerk/javascript/pull/6490)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add support for trials in `<Checkout/>` ([#6494](https://github.com/clerk/javascript/pull/6494)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Added `freeTrialEndsAt` property to `CommerceCheckoutResource` interface.
+
+- Update billing resources with trial properties. ([#6492](https://github.com/clerk/javascript/pull/6492)) by [@panteliselef](https://github.com/panteliselef)
+
+- Update PricingTable with trial info. ([#6493](https://github.com/clerk/javascript/pull/6493)) by [@panteliselef](https://github.com/panteliselef)
+
+- [Experimental] Signals reset password flow ([#6520](https://github.com/clerk/javascript/pull/6520)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Add optional `isExternal` to `ApplicationLogo` ([#6447](https://github.com/clerk/javascript/pull/6447)) by [@jfoshee](https://github.com/jfoshee)
+
+  Add optional `oAuthApplicationUrl` parameter to OAuth Consent mounting (which is used to provide a link to the OAuth App homepage).
+
+  Harden `Link` component so it sanitizes the given `href` to avoid dangerous protocols.
+
+- Updated dependencies [[`69622af`](https://github.com/clerk/javascript/commit/69622afb07c1ec9665cc22933d3661075b9c8ee0), [`33e7a7b`](https://github.com/clerk/javascript/commit/33e7a7b39c552b485f303656fd951f6493c0d15a), [`15fe106`](https://github.com/clerk/javascript/commit/15fe1060f730a6a4391f3d2451d23edd3218e1ae), [`173837c`](https://github.com/clerk/javascript/commit/173837c2526aa826b7981ee8d6d4f52c00675da5), [`8b52d7a`](https://github.com/clerk/javascript/commit/8b52d7ae19407e8ab5a5451bd7d34b6bc38417de), [`854dde8`](https://github.com/clerk/javascript/commit/854dde88e642c47b5a29ac8f576c8c1976e5d067), [`ae2e2d6`](https://github.com/clerk/javascript/commit/ae2e2d6b336be6b596cc855e549843beb5bfd2a1), [`037f25a`](https://github.com/clerk/javascript/commit/037f25a8171888168913b186b7edf871e0aaf197), [`6f73222`](https://github.com/clerk/javascript/commit/6f732223ad248cd8d5203b0354144c8ce4ee871c), [`f8b38b7`](https://github.com/clerk/javascript/commit/f8b38b7059e498fef3ac1271346be0710aa31c76)]:
+  - @clerk/localizations@3.21.0
+  - @clerk/types@4.76.0
+  - @clerk/shared@3.20.0
+
+## 5.82.0
+
+### Minor Changes
+
+- [Billing Beta] Cleanup naming inconsistencies in billing dates. ([#6513](https://github.com/clerk/javascript/pull/6513)) by [@panteliselef](https://github.com/panteliselef)
+
+  ## Migration
+
+  - subscriptionItem.periodStartDate → subscriptionItem.periodStart
+  - subscriptionItem.periodEndDate → subscriptionItem.periodEnd
+  - subscriptionItem.canceledAtDate → subscriptionItem.canceledAt
+
+- [Experimental] Signal Errors ([#6495](https://github.com/clerk/javascript/pull/6495)) by [@dstaley](https://github.com/dstaley)
+
+- Remove `treatPendingAsSignedOut` from Clerk options ([#6497](https://github.com/clerk/javascript/pull/6497)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Use throttling instead of sampling for telemetry events of UI components on keyless apps. ([#6514](https://github.com/clerk/javascript/pull/6514)) by [@panteliselef](https://github.com/panteliselef)
+
+- Refactor ApplicationLogo rendering logic to account for oAuth logos within OAuthConsent component. ([#6518](https://github.com/clerk/javascript/pull/6518)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Trigger Next.js hooks on session status transition from `active` to `pending` to update authentication context state ([#6511](https://github.com/clerk/javascript/pull/6511)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Add `.v0.app` as a preferred popup origin for OAuth flows. ([#6519](https://github.com/clerk/javascript/pull/6519)) by [@brkalow](https://github.com/brkalow)
+
+- Updated dependencies [[`b72a3dd`](https://github.com/clerk/javascript/commit/b72a3dda2467720e5dc8cab3e7e6a110f3beb79b), [`d93b0ed`](https://github.com/clerk/javascript/commit/d93b0edf4adc57d48a26cb08444192887ccec659), [`6459f7d`](https://github.com/clerk/javascript/commit/6459f7dabe5f163f48ed73106bb901d8187da3e2), [`0ff648a`](https://github.com/clerk/javascript/commit/0ff648aeac0e2f5481596a98c8046d9d58a7bf75), [`9084759`](https://github.com/clerk/javascript/commit/90847593300be605e1ee1c06dac147ce68b25dc7)]:
+  - @clerk/types@4.75.0
+  - @clerk/shared@3.19.0
+  - @clerk/localizations@3.20.9
+
 ## 5.81.0
 
 ### Minor Changes

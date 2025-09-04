@@ -5,6 +5,7 @@ import type { DeletedObject } from '../resources';
 import type { PaginatedResourceResponse } from '../resources/Deserializer';
 import type { OAuthApplication } from '../resources/OAuthApplication';
 import { AbstractAPI } from './AbstractApi';
+import type { WithSign } from './util-types';
 
 const basePath = '/oauth_applications';
 
@@ -36,8 +37,16 @@ type UpdateOAuthApplicationParams = CreateOAuthApplicationParams & {
   oauthApplicationId: string;
 };
 
+type GetOAuthApplicationListParams = ClerkPaginationRequest<{
+  /**
+   * Sorts OAuth applications by name or created_at.
+   * By prepending one of those values with + or -, we can choose to sort in ascending (ASC) or descending (DESC) order.
+   */
+  orderBy?: WithSign<'name' | 'created_at'>;
+}>;
+
 export class OAuthApplicationsApi extends AbstractAPI {
-  public async list(params: ClerkPaginationRequest = {}) {
+  public async list(params: GetOAuthApplicationListParams = {}) {
     return this.request<PaginatedResourceResponse<OAuthApplication[]>>({
       method: 'GET',
       path: basePath,

@@ -1,5 +1,5 @@
 import type {
-  CommerceMoney,
+  CommerceMoneyAmount,
   CommercePaymentChargeType,
   CommercePaymentJSON,
   CommercePaymentResource,
@@ -8,13 +8,13 @@ import type {
   CommerceSubscriptionItemResource,
 } from '@clerk/types';
 
-import { commerceMoneyFromJSON } from '../../utils';
+import { commerceMoneyAmountFromJSON } from '../../utils';
 import { unixEpochToDate } from '../../utils/date';
 import { BaseResource, CommercePaymentSource, CommerceSubscriptionItem } from './internal';
 
 export class CommercePayment extends BaseResource implements CommercePaymentResource {
   id!: string;
-  amount!: CommerceMoney;
+  amount!: CommerceMoneyAmount;
   failedAt?: Date;
   paidAt?: Date;
   updatedAt!: Date;
@@ -38,7 +38,7 @@ export class CommercePayment extends BaseResource implements CommercePaymentReso
     }
 
     this.id = data.id;
-    this.amount = commerceMoneyFromJSON(data.amount);
+    this.amount = commerceMoneyAmountFromJSON(data.amount);
     this.paidAt = data.paid_at ? unixEpochToDate(data.paid_at) : undefined;
     this.failedAt = data.failed_at ? unixEpochToDate(data.failed_at) : undefined;
     this.updatedAt = unixEpochToDate(data.updated_at);

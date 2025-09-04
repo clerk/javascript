@@ -49,7 +49,7 @@ import type {
   SignUpFallbackRedirectUrl,
   SignUpForceRedirectUrl,
 } from './redirects';
-import type { PendingSessionOptions, SessionTask, SignedInSessionResource } from './session';
+import type { SessionResource, SessionTask, SignedInSessionResource } from './session';
 import type { SessionVerificationLevel } from './sessionVerification';
 import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
@@ -92,7 +92,7 @@ export type __experimental_CheckoutInstance = {
   confirm: (params: ConfirmCheckoutParams) => Promise<CheckoutResult>;
   start: () => Promise<CheckoutResult>;
   clear: () => void;
-  finalize: (params?: { redirectUrl: string }) => Promise<void>;
+  finalize: (params?: { navigate?: SetActiveNavigate }) => Promise<void>;
   subscribe: (listener: (state: __experimental_CheckoutCacheState) => void) => () => void;
   getState: () => __experimental_CheckoutCacheState;
 };
@@ -120,6 +120,7 @@ export type SDKMetadata = {
 export type ListenerCallback = (emission: Resources) => void;
 export type UnsubscribeCallback = () => void;
 export type BeforeEmitCallback = (session?: SignedInSessionResource | null) => void | Promise<any>;
+export type SetActiveNavigate = ({ session }: { session: SessionResource }) => void | Promise<unknown>;
 
 export type SignOutCallback = () => void | Promise<any>;
 
@@ -234,7 +235,7 @@ export interface Clerk {
    * Entrypoint for Clerk's Signal API containing resource signals along with accessible versions of `computed()` and
    * `effect()` that can be used to subscribe to changes from Signals.
    */
-  __internal_state: State | undefined;
+  __internal_state: State;
 
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
@@ -626,13 +627,6 @@ export interface Clerk {
   __internal_addNavigationListener: (callback: () => void) => UnsubscribeCallback;
 
   /**
-   * Registers the internal navigation context from UI components in order to
-   * be triggered from `Clerk` methods
-   * @internal
-   */
-  __internal_setComponentNavigationContext: (context: __internal_ComponentNavigationContext) => () => void;
-
-  /**
    * Set the active session and organization explicitly.
    *
    * If the session param is `null`, the active session is deleted.
@@ -653,33 +647,38 @@ export interface Clerk {
   buildUrlWithAuth(to: string): string;
 
   /**
-   * Returns the configured url where <SignIn/> is mounted or a custom sign-in page is rendered.
+   * Returns the configured url where `<SignIn/>` is mounted or a custom sign-in page is rendered.
    *
    * @param opts A {@link RedirectOptions} object
    */
   buildSignInUrl(opts?: RedirectOptions): string;
 
   /**
-   * Returns the configured url where <SignUp/> is mounted or a custom sign-up page is rendered.
+   * Returns the configured url where `<SignUp/>` is mounted or a custom sign-up page is rendered.
    *
    * @param opts A {@link RedirectOptions} object
    */
   buildSignUpUrl(opts?: RedirectOptions): string;
 
   /**
-   * Returns the url where <UserProfile /> is mounted or a custom user-profile page is rendered.
+   * Returns the url where `<UserProfile />` is mounted or a custom user-profile page is rendered.
    */
   buildUserProfileUrl(): string;
 
   /**
-   * Returns the configured url where <CreateOrganization /> is mounted or a custom create-organization page is rendered.
+   * Returns the configured url where `<CreateOrganization />` is mounted or a custom create-organization page is rendered.
    */
   buildCreateOrganizationUrl(): string;
 
   /**
-   * Returns the configured url where <OrganizationProfile /> is mounted or a custom organization-profile page is rendered.
+   * Returns the configured url where `<OrganizationProfile />` is mounted or a custom organization-profile page is rendered.
    */
   buildOrganizationProfileUrl(): string;
+
+  /**
+   * Returns the configured url where tasks are mounted.
+   */
+  buildTasksUrl(): string;
 
   /**
    * Returns the configured afterSignInUrl of the instance.
@@ -707,7 +706,7 @@ export interface Clerk {
   buildAfterMultiSessionSingleSignOutUrl(): string;
 
   /**
-   * Returns the configured url where <Waitlist/> is mounted or a custom waitlist page is rendered.
+   * Returns the configured url where `<Waitlist/>` is mounted or a custom waitlist page is rendered.
    */
   buildWaitlistUrl(opts?: { initialValues?: Record<string, string> }): string;
 
@@ -720,31 +719,31 @@ export interface Clerk {
   redirectWithAuth(to: string): Promise<unknown>;
 
   /**
-   * Redirects to the configured URL where <SignIn/> is mounted.
+   * Redirects to the configured URL where `<SignIn/>` is mounted.
    *
    * @param opts A {@link RedirectOptions} object
    */
   redirectToSignIn(opts?: SignInRedirectOptions): Promise<unknown>;
 
   /**
-   * Redirects to the configured URL where <SignUp/> is mounted.
+   * Redirects to the configured URL where `<SignUp/>` is mounted.
    *
    * @param opts A {@link RedirectOptions} object
    */
   redirectToSignUp(opts?: SignUpRedirectOptions): Promise<unknown>;
 
   /**
-   * Redirects to the configured URL where <UserProfile/> is mounted.
+   * Redirects to the configured URL where `<UserProfile/>` is mounted.
    */
   redirectToUserProfile: () => Promise<unknown>;
 
   /**
-   * Redirects to the configured URL where <OrganizationProfile /> is mounted.
+   * Redirects to the configured URL where `<OrganizationProfile />` is mounted.
    */
   redirectToOrganizationProfile: () => Promise<unknown>;
 
   /**
-   * Redirects to the configured URL where <CreateOrganization /> is mounted.
+   * Redirects to the configured URL where `<CreateOrganization />` is mounted.
    */
   redirectToCreateOrganization: () => Promise<unknown>;
 
@@ -764,9 +763,16 @@ export interface Clerk {
   redirectToAfterSignOut: () => void;
 
   /**
-   * Redirects to the configured URL where <Waitlist/> is mounted.
+   * Redirects to the configured URL where `<Waitlist/>` is mounted.
    */
   redirectToWaitlist: () => void;
+
+  /**
+   * Redirects to the configured URL where tasks are mounted.
+   *
+   * @param opts A {@link RedirectOptions} object
+   */
+  redirectToTasks(opts?: TasksRedirectOptions): Promise<unknown>;
 
   /**
    * Completes a Google One Tap redirection flow started by
@@ -811,6 +817,11 @@ export interface Clerk {
   authenticateWithOKXWallet: (params?: AuthenticateWithOKXWalletParams) => Promise<unknown>;
 
   /**
+   * Authenticates user using Base Account SDK
+   */
+  authenticateWithBase: (params?: AuthenticateWithBaseParams) => Promise<unknown>;
+
+  /**
    * Authenticates user using their Web3 Wallet browser extension
    */
   authenticateWithWeb3: (params: ClerkAuthenticateWithWeb3Params) => Promise<unknown>;
@@ -840,12 +851,6 @@ export interface Clerk {
   joinWaitlist: (params: JoinWaitlistParams) => Promise<WaitlistResource>;
 
   /**
-   * Navigates to the current task or redirects to `redirectUrlComplete` once the session is `active`.
-   * @internal
-   */
-  __internal_navigateToTaskIfAvailable: (params?: __internal_NavigateToTaskIfAvailableParams) => Promise<void>;
-
-  /**
    * This is an optional function.
    * This function is used to load cached Client and Environment resources if Clerk fails to load them from the Frontend API.
    * @internal
@@ -865,12 +870,6 @@ export interface Clerk {
    * initiated outside of the Clerk class.
    */
   __internal_setActiveInProgress: boolean;
-
-  /**
-   * Internal flag indicating whether after-auth flows are enabled based on instance settings.
-   * @internal
-   */
-  __internal_hasAfterAuthFlows: boolean;
 
   /**
    * API Keys Object
@@ -962,14 +961,28 @@ type ClerkOptionsNavigation =
       routerDebug?: boolean;
     };
 
-export type ClerkOptions = PendingSessionOptions &
-  ClerkOptionsNavigation &
+type ClerkOptionsLegacyRedirectProps = {
+  /**
+   * @deprecated Use `signInFallbackRedirectUrl` or `signInForceRedirectUrl` instead.
+   */
+  afterSignInUrl?: string | null;
+  /**
+   * @deprecated Use `signUpFallbackRedirectUrl` or `signUpForceRedirectUrl` instead.
+   */
+  afterSignUpUrl?: string | null;
+  /**
+   * @deprecated Use `signInFallbackRedirectUrl`, `signInForceRedirectUrl`, `signUpFallbackRedirectUrl`, or `signUpForceRedirectUrl` instead.
+   */
+  redirectUrl?: string | null;
+};
+
+export type ClerkOptions = ClerkOptionsNavigation &
   SignInForceRedirectUrl &
   SignInFallbackRedirectUrl &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
   NewSubscriptionRedirectUrl &
-  LegacyRedirectProps &
+  ClerkOptionsLegacyRedirectProps &
   AfterSignOutUrl &
   AfterMultiSessionSingleSignOutUrl & {
     /**
@@ -1080,7 +1093,8 @@ export type ClerkOptions = PendingSessionOptions &
      * Customize the URL paths users are redirected to after sign-in or sign-up when specific
      * session tasks need to be completed.
      *
-     * @default undefined - Uses Clerk's default task flow URLs
+     * When `undefined`, it uses Clerk's default task flow URLs.
+     * @default undefined
      */
     taskUrls?: Record<SessionTask['key'], string>;
   };
@@ -1165,6 +1179,8 @@ export type SignUpInitialValues = {
   username?: string;
 };
 
+export type TasksRedirectOptions = RedirectOptions & RedirectUrlProp;
+
 export type SignInRedirectOptions = RedirectOptions &
   RedirectUrlProp & {
     /**
@@ -1204,9 +1220,32 @@ export type SetActiveParams = {
   beforeEmit?: BeforeEmitCallback;
 
   /**
-   * The full URL or path to redirect to just before the active session and/or organization is set.
+   * The full URL or path to redirect to just before the session and/or organization is set.
    */
   redirectUrl?: string;
+
+  /**
+   * A custom navigation function to be called just before the session and/or organization is set.
+   *
+   * When provided, it takes precedence over the `redirectUrl` parameter for navigation.
+   *
+   * @example
+   * ```typescript
+   * await clerk.setActive({
+   *   session,
+   *   navigate: async ({ session }) => {
+   *     const currentTask = session.currentTask;
+   *     if (currentTask) {
+   *       await router.push(`/onboarding/${currentTask.key}`)
+   *       return
+   *     }
+   *
+   *     router.push('/dashboard');
+   *   }
+   * });
+   * ```
+   */
+  navigate?: SetActiveNavigate;
 };
 
 /**
@@ -2004,6 +2043,10 @@ export type __internal_OAuthConsentProps = {
    */
   oAuthApplicationLogoUrl?: string;
   /**
+   * URL of the OAuth application.
+   */
+  oAuthApplicationUrl?: string;
+  /**
    * Scopes requested by the OAuth application.
    */
   scopes: {
@@ -2156,12 +2199,12 @@ export interface AuthenticateWithGoogleOneTapParams {
   legalAccepted?: boolean;
 }
 
-export interface __internal_NavigateToTaskIfAvailableParams {
-  /**
-   * Full URL or path to navigate to after successfully resolving all tasks
-   * @default undefined
-   */
-  redirectUrlComplete?: string;
+export interface AuthenticateWithBaseParams {
+  customNavigate?: (to: string) => Promise<unknown>;
+  redirectUrl?: string;
+  signUpContinueUrl?: string;
+  unsafeMetadata?: SignUpUnsafeMetadata;
+  legalAccepted?: boolean;
 }
 
 export interface LoadedClerk extends Clerk {

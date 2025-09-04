@@ -14,12 +14,13 @@ import { Avatar } from '@/ui/elements/Avatar';
 import { Drawer } from '@/ui/elements/Drawer';
 import { Switch } from '@/ui/elements/Switch';
 
-import { SubscriberTypeContext } from '../../contexts';
+import { normalizeFormatted, SubscriberTypeContext } from '../../contexts';
 import {
   Box,
   Col,
   descriptors,
   Flex,
+  Flow,
   Heading,
   localizationKeys,
   Span,
@@ -30,9 +31,13 @@ import {
 
 export const PlanDetails = (props: __internal_PlanDetailsProps) => {
   return (
-    <Drawer.Content>
-      <PlanDetailsInternal {...props} />
-    </Drawer.Content>
+    <Flow.Root flow='planDetails'>
+      <Flow.Part>
+        <Drawer.Content>
+          <PlanDetailsInternal {...props} />
+        </Drawer.Content>
+      </Flow.Part>
+    </Flow.Root>
   );
 };
 
@@ -221,12 +226,16 @@ interface HeaderProps {
 const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
   const { plan, closeSlot, planPeriod, setPlanPeriod } = props;
 
-  const getPlanFee = useMemo(() => {
-    if (plan.annualMonthlyAmount <= 0) {
-      return plan.amountFormatted;
+  const fee = useMemo(() => {
+    if (plan.annualMonthlyFee.amount <= 0) {
+      return plan.fee;
     }
-    return planPeriod === 'annual' ? plan.annualMonthlyAmountFormatted : plan.amountFormatted;
+    return planPeriod === 'annual' ? plan.annualMonthlyFee : plan.fee;
   }, [plan, planPeriod]);
+
+  const feeFormatted = React.useMemo(() => {
+    return normalizeFormatted(fee.amountFormatted);
+  }, [fee.amountFormatted]);
 
   return (
     <Box
@@ -305,8 +314,8 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
             variant='h1'
             colorScheme='body'
           >
-            {plan.currencySymbol}
-            {getPlanFee}
+            {fee.currencySymbol}
+            {feeFormatted}
           </Text>
           <Text
             elementDescriptor={descriptors.planDetailFeePeriod}
@@ -324,7 +333,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
         </>
       </Flex>
 
-      {plan.annualMonthlyAmount > 0 ? (
+      {plan.annualMonthlyFee.amount > 0 ? (
         <Box
           elementDescriptor={descriptors.planDetailPeriodToggle}
           sx={t => ({

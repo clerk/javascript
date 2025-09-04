@@ -1,16 +1,9 @@
 import { createClerkClient } from '@clerk/backend';
-import type { AuthenticatedState, AuthenticateRequestOptions, UnauthenticatedState } from '@clerk/backend/internal';
-import { AuthStatus, constants } from '@clerk/backend/internal';
-import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
+import type { AuthenticateRequestOptions, RequestState } from '@clerk/backend/internal';
 
-import { errorThrower } from '../utils';
-import { ClerkHandshakeRedirect } from './errors';
 import { patchRequest } from './utils';
 
-export async function authenticateRequest(
-  request: Request,
-  opts: AuthenticateRequestOptions,
-): Promise<AuthenticatedState | UnauthenticatedState> {
+export async function authenticateRequest(request: Request, opts: AuthenticateRequestOptions): Promise<RequestState> {
   const { audience, authorizedParties } = opts;
 
   const { apiUrl, secretKey, jwtKey, proxyUrl, isSatellite, domain, publishableKey, acceptsToken, machineSecretKey } =
@@ -36,23 +29,6 @@ export async function authenticateRequest(
     afterSignUpUrl,
     acceptsToken,
   });
-
-  const locationHeader = requestState.headers.get(constants.Headers.Location);
-  if (locationHeader) {
-    handleNetlifyCacheInDevInstance({
-      locationHeader,
-      requestStateHeaders: requestState.headers,
-      publishableKey: requestState.publishableKey,
-    });
-
-    // triggering a handshake redirect
-    throw new ClerkHandshakeRedirect(307, requestState.headers);
-  }
-
-  if (requestState.status === AuthStatus.Handshake) {
-    // eslint-disable-next-line @typescript-eslint/only-throw-error
-    throw errorThrower.throw('Clerk: unexpected handshake without redirect');
-  }
 
   return requestState;
 }

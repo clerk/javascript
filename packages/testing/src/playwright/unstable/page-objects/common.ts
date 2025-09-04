@@ -1,5 +1,12 @@
 import type { EnhancedPage } from './app';
 
+type EnterOtpCodeOptions = {
+  name?: string;
+  awaitRequests?: boolean;
+  awaitPrepare?: boolean;
+  awaitAttempt?: boolean;
+};
+
 export const common = ({ page }: { page: EnhancedPage }) => {
   const self = {
     continue: () => {
@@ -14,18 +21,48 @@ export const common = ({ page }: { page: EnhancedPage }) => {
     setPasswordConfirmation: (val: string) => {
       return page.locator('input[name=confirmPassword]').fill(val);
     },
-    enterOtpCode: async (code: string) => {
-      await page.getByRole('textbox', { name: /digit 1/i }).click();
-      // We've got a delay here to ensure the prepare call is triggered before the OTP is auto-submitted.
-      await page.keyboard.type(code, { delay: 100 });
+    enterOtpCode: async (code: string, opts?: EnterOtpCodeOptions) => {
+      const {
+        name = 'Enter verification code',
+        awaitAttempt = true,
+        awaitPrepare = true,
+        awaitRequests = true,
+      } = opts ?? {};
+
+      if (awaitRequests && awaitPrepare) {
+        const prepareVerificationPromise = page.waitForResponse(
+          response =>
+            response.request().method() === 'POST' &&
+            (response.url().includes('prepare_verification') || response.url().includes('prepare_first_factor')),
+        );
+        await prepareVerificationPromise;
+      }
+
+      // Handle the case for both OTP input versions
+      const originalInput = page.getByRole('textbox', { name: 'Enter verification code. Digit 1' });
+      if (await originalInput.isVisible()) {
+        console.warn('Using the original OTP input');
+        await originalInput.click();
+        await page.keyboard.type(code, { delay: 100 });
+      } else {
+        await page.getByLabel(name).fill(code);
+      }
+
+      if (awaitRequests && awaitAttempt) {
+        const attemptVerificationPromise = page.waitForResponse(
+          response =>
+            response.request().method() === 'POST' &&
+            (response.url().includes('attempt_verification') || response.url().includes('attempt_first_factor')),
+        );
+        await attemptVerificationPromise;
+      }
     },
-    enterTestOtpCode: async () => {
-      return self.enterOtpCode('424242');
+    enterTestOtpCode: async (opts?: EnterOtpCodeOptions) => {
+      return self.enterOtpCode('424242', opts);
     },
-    // It's recommended to use .fill instead of .type
-    // @see https://playwright.dev/docs/api/class-keyboard#keyboard-type
-    fillTestOtpCode: async (name: string) => {
-      return page.getByRole('textbox', { name: name }).fill('424242');
+    // @deprecated Use .enterTestOtpCode({ name: '...' }) instead
+    fillTestOtpCode: async (name: string, opts?: Omit<EnterOtpCodeOptions, 'name'>) => {
+      return self.enterOtpCode('424242', { name, ...opts });
     },
     getIdentifierInput: () => {
       return page.locator('input[name=identifier]');

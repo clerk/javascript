@@ -1,7 +1,7 @@
 import type {
-  CommercePaymentAttemptJSON,
-  CommerceSubscriptionItemJSON,
-  CommerceSubscriptionJSON,
+  CommercePaymentAttemptWebhookEventJSON,
+  CommerceSubscriptionItemWebhookEventJSON,
+  CommerceSubscriptionWebhookEventJSON,
   DeletedObjectJSON,
   EmailJSON,
   OrganizationDomainJSON,
@@ -67,12 +67,12 @@ export type WaitlistEntryWebhookEvent = Webhook<'waitlistEntry.created' | 'waitl
 
 export type CommercePaymentAttemptWebhookEvent = Webhook<
   'paymentAttempt.created' | 'paymentAttempt.updated',
-  CommercePaymentAttemptJSON
+  CommercePaymentAttemptWebhookEventJSON
 >;
 
 export type CommerceSubscriptionWebhookEvent = Webhook<
-  'subscription.created' | 'subscription.updated' | 'subscription.active' | 'subscription.past_due',
-  CommerceSubscriptionJSON
+  'subscription.created' | 'subscription.updated' | 'subscription.active' | 'subscription.pastDue',
+  CommerceSubscriptionWebhookEventJSON
 >;
 
 export type CommerceSubscriptionItemWebhookEvent = Webhook<
@@ -84,8 +84,9 @@ export type CommerceSubscriptionItemWebhookEvent = Webhook<
   | 'subscriptionItem.ended'
   | 'subscriptionItem.abandoned'
   | 'subscriptionItem.incomplete'
-  | 'subscriptionItem.past_due',
-  CommerceSubscriptionItemJSON
+  | 'subscriptionItem.pastDue'
+  | 'subscriptionItem.freeTrialEnding',
+  CommerceSubscriptionItemWebhookEventJSON
 >;
 
 export type WebhookEvent =
