@@ -1,8 +1,26 @@
-import type { TelemetryEventRaw } from '@clerk/types';
+import { type TelemetryEventRaw } from '@clerk/types';
 
 const EVENT_COMPONENT_MOUNTED = 'COMPONENT_MOUNTED';
 const EVENT_COMPONENT_OPENED = 'COMPONENT_OPENED';
 const EVENT_SAMPLING_RATE = 0.1;
+/**
+ * Get the sampling rate for component mounted events for account portal from NEXT_PUBLIC_CLERK_TELEMETRY_COMPONENT_MOUNTED_SAMPLE_RATE or CLERK_TELEMETRY_COMPONENT_MOUNTED_SAMPLE_RATE environment variable.
+ *
+ * @internal
+ */
+function getComponentSamplingRate(): number {
+  const samplingRate =
+    process.env.NEXT_PUBLIC_CLERK_TELEMETRY_COMPONENT_MOUNTED_SAMPLE_RATE ||
+    process.env.CLERK_TELEMETRY_COMPONENT_MOUNTED_SAMPLE_RATE;
+  if (samplingRate !== undefined && samplingRate !== null && samplingRate !== '') {
+    const parsedRate = parseFloat(samplingRate);
+    if (!isNaN(parsedRate) && parsedRate >= 0 && parsedRate <= 1) {
+      return parsedRate;
+    }
+  }
+
+  return EVENT_SAMPLING_RATE; // Default sampling rate
+}
 
 type ComponentMountedBase = {
   component: string;
@@ -28,7 +46,7 @@ function createPrebuiltComponentEvent(event: typeof EVENT_COMPONENT_MOUNTED | ty
   ): TelemetryEventRaw<EventPrebuiltComponent> {
     return {
       event,
-      eventSamplingRate: EVENT_SAMPLING_RATE,
+      eventSamplingRate: getComponentSamplingRate(),
       payload: {
         component,
         appearanceProp: Boolean(props?.appearance),
