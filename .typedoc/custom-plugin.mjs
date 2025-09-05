@@ -56,6 +56,10 @@ const LINK_REPLACEMENTS = [
   ['localization-resource', '/docs/customization/localization'],
   ['commerce-subscription-item-resource', '/docs/references/javascript/types/commerce-subscription-item-resource'],
   ['commerce-money-amount', '/docs/references/javascript/types/commerce-money-amount'],
+  ['feature', '/docs/references/backend/types/backend-feature'],
+  ['commerce-plan', '/docs/references/backend/types/backend-commerce-plan'],
+  ['commerce-subscription', '/docs/references/backend/types/backend-commerce-subscription'],
+  ['commerce-subscription-item', '/docs/references/backend/types/backend-commerce-subscription-item'],
 ];
 
 /**

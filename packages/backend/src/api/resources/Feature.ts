@@ -1,7 +1,7 @@
 import type { FeatureJSON } from './JSON';
 
 /**
- * The `Feature` object represents a feature of a subscription plan.
+ * The Backend `Feature` object represents a feature of a subscription plan.
  *
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version to avoid breaking changes.
  */
