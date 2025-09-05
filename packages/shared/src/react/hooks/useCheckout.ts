@@ -8,8 +8,7 @@ import { useMemo, useSyncExternalStore } from 'react';
 
 import type { ClerkAPIResponseError } from '../..';
 import type { __experimental_CheckoutProvider } from '../contexts';
-import { useCheckoutContext } from '../contexts';
-import { useClerk } from './useClerk';
+import { useCheckoutContext, useClerkInstanceContext } from '../contexts';
 import { useOrganization } from './useOrganization';
 import { useUser } from './useUser';
 
@@ -65,40 +64,63 @@ type __experimental_UseCheckoutReturn = {
     };
 };
 
+// type __experimental_UseCheckoutReturnV2 = FetchStatusAndError & {
+//   checkout: CheckoutPropertiesPerStatus & {
+//     confirm: __experimental_CheckoutInstance['confirm'];
+//     start: __experimental_CheckoutInstance['start'];
+//     clear: () => void;
+//     finalize: (params?: { navigate?: SetActiveNavigate }) => void;
+//     getState: () => __experimental_CheckoutCacheState;
+//     isStarting: boolean;
+//     isConfirming: boolean;
+//   };
+// };
+
 type Params = Parameters<typeof __experimental_CheckoutProvider>[0];
 
 export const useCheckout = (options?: Params): __experimental_UseCheckoutReturn => {
   const contextOptions = useCheckoutContext();
   const { for: forOrganization, planId, planPeriod } = options || contextOptions;
 
-  const clerk = useClerk();
   const { organization } = useOrganization();
   const { isLoaded, user } = useUser();
 
-  if (!isLoaded) {
-    throw new Error('Clerk: Ensure that `useCheckout` is inside a component wrapped with `<ClerkLoaded />`.');
-  }
-
-  if (!user) {
+  if (!user && isLoaded) {
     throw new Error('Clerk: Ensure that `useCheckout` is inside a component wrapped with `<SignedIn />`.');
   }
 
-  if (forOrganization === 'organization' && !organization) {
+  if (isLoaded && forOrganization === 'organization' && !organization) {
     throw new Error(
       'Clerk: Ensure your flow checks for an active organization. Retrieve `orgId` from `useAuth()` and confirm it is defined. For SSR, see: https://clerk.com/docs/references/backend/types/auth-object#how-to-access-the-auth-object',
     );
   }
 
-  const manager = useMemo(
-    () => clerk.__experimental_checkout({ planId, planPeriod, for: forOrganization }),
-    [user.id, organization?.id, planId, planPeriod, forOrganization],
-  );
+  const clerk = useClerkInstanceContext();
 
-  const managerProperties = useSyncExternalStore(
-    cb => manager.subscribe(cb),
-    () => manager.getState(),
-    () => manager.getState(),
-  );
+  const manager = useMemo(() => {
+    return clerk.__experimental_checkout({ planId, planPeriod, for: forOrganization });
+  }, [
+    // user?.id, organization?.id,
+    planId,
+    planPeriod,
+    forOrganization,
+  ]);
+
+  // const subscribe = useCallback(
+  //   (callback: () => void) => {
+  //     if (!clerk.loaded) {
+  //       return () => {};
+  //     }
+
+  //     return manager.subscribe(callback);
+  //   },
+  //   [clerk.loaded, manager],
+  // );
+  // const getSnapshot = useCallback(() => {
+  //   return manager.getState();
+  // }, [manager]);
+
+  const managerProperties = useSyncExternalStore(manager.subscribe, manager.getState, manager.getState);
 
   const properties = useMemo<CheckoutProperties | ForceNull<CheckoutProperties>>(() => {
     if (!managerProperties.checkout) {
