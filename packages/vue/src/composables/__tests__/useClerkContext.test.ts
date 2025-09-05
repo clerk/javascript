@@ -7,6 +7,7 @@ import { useClerkContext } from '../useClerkContext';
 
 describe('useClerkContext', () => {
   it('should throw an error if the Clerk plugin is not installed', () => {
+    // Hide missing injection key warning
     const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
     const Component = defineComponent(() => {
