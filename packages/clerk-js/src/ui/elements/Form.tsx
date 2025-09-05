@@ -151,9 +151,7 @@ const CommonInputWrapper = (props: PropsWithChildren<CommonInputProps>) => {
                 onClick={onActionClicked}
               />
             )}
-            {isLastAuthenticationStrategy && !actionLabel && !isOptional && (
-              <LastAuthenticationStrategyBadge>Last used</LastAuthenticationStrategyBadge>
-            )}
+            {isLastAuthenticationStrategy && !actionLabel && !isOptional && <LastAuthenticationStrategyBadge />}
             <Field.Action />
           </Field.LabelRow>
 

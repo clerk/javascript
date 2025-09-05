@@ -8,11 +8,13 @@ export const LastAuthenticationStrategyBadge = ({ sx, ...props }: LastAuthentica
       elementDescriptor={descriptors.lastAuthenticationStrategyBadge}
       localizationKey={localizationKeys('lastAuthenticationStrategy')}
       {...props}
-      sx={t => ({
-        backgroundColor: t.colors.$borderAlpha25,
-        borderRadius: t.radii.$lg,
-        ...sx,
-      })}
+      sx={[
+        t => ({
+          backgroundColor: t.colors.$borderAlpha25,
+          borderRadius: t.radii.$lg,
+        }),
+        sx,
+      ]}
     />
   );
 };
