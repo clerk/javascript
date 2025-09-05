@@ -139,14 +139,6 @@ export const MultiSessionActions = (props: MultiSessionActionsProps) => {
 
   const { menutItems } = useUserButtonContext();
 
-  const commonActionSx: ThemableCssProp = t => ({
-    color: t.colors.$colorForeground,
-  });
-
-  const commonActionIconSx: ThemableCssProp = t => ({
-    color: t.colors.$colorMutedForeground,
-  });
-
   const handleActionClick = async (route: MenuItem) => {
     if (route?.path) {
       await navigate(route.path);
@@ -190,8 +182,6 @@ export const MultiSessionActions = (props: MultiSessionActionsProps) => {
               icon={CogFilled}
               label={localizationKeys('userButton.action__manageAccount')}
               onClick={handleManageAccountClicked}
-              sx={commonActionSx}
-              iconSx={commonActionIconSx}
               focusRing
             />
             <SmallAction
@@ -204,8 +194,6 @@ export const MultiSessionActions = (props: MultiSessionActionsProps) => {
               icon={SignOut}
               label={localizationKeys('userButton.action__signOut')}
               onClick={handleSignOutSessionClicked(session)}
-              sx={commonActionSx}
-              iconSx={commonActionIconSx}
               focusRing
             />
           </Flex>
