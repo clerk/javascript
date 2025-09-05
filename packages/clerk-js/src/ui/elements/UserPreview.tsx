@@ -86,7 +86,16 @@ export const UserPreview = (props: UserPreviewProps) => {
       elementId={descriptors.userPreview.setId(elementId)}
       align='center'
       as='span'
-      sx={[t => ({ minWidth: '0px', width: 'fit-content', gap: t.space.$4 }), sx]}
+      sx={[
+        t => ({
+          minWidth: '0px',
+          width: 'fit-content',
+          gap: t.space.$4,
+          // We reserve space for the avatar if it is not visible
+          minHeight: imageUrl && !showAvatar ? getAvatarSizes(t) : undefined,
+        }),
+        sx,
+      ]}
       {...rest}
     >
       {/*Do not attempt to render or reserve space based on height if image url is not defined*/}
@@ -122,18 +131,7 @@ export const UserPreview = (props: UserPreviewProps) => {
               </Flex>
             )}
           </Flex>
-        ) : (
-          // Reserve layout space when avatar is not visible
-          <Flex
-            elementDescriptor={descriptors.userPreviewAvatarContainer}
-            elementId={descriptors.userPreviewAvatarContainer.setId(elementId)}
-            justify='center'
-            as='span'
-            sx={t => ({
-              height: getAvatarSizes(t),
-            })}
-          />
-        )
+        ) : null
       ) : null}
 
       <Flex
@@ -172,6 +170,7 @@ export const UserPreview = (props: UserPreviewProps) => {
             truncate
             as='span'
             localizationKey={subtitle || identifier}
+            colorScheme='secondary'
           />
         )}
       </Flex>

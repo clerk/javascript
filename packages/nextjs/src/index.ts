@@ -4,14 +4,15 @@
  */
 export {
   AuthenticateWithRedirectCallback,
-  ClerkLoaded,
-  ClerkLoading,
   ClerkDegraded,
   ClerkFailed,
+  ClerkLoaded,
+  ClerkLoading,
   RedirectToCreateOrganization,
   RedirectToOrganizationProfile,
   RedirectToSignIn,
   RedirectToSignUp,
+  RedirectToTasks,
   RedirectToUserProfile,
 } from './client-boundary/controlComponents';
 
@@ -20,22 +21,23 @@ export {
  * If you do, app router will break.
  */
 export {
+  APIKeys,
   CreateOrganization,
+  GoogleOneTap,
   OrganizationList,
   OrganizationProfile,
   OrganizationSwitcher,
+  PricingTable,
   SignIn,
   SignInButton,
   SignInWithMetamaskButton,
   SignOutButton,
   SignUp,
   SignUpButton,
+  TaskChooseOrganization,
   UserButton,
   UserProfile,
-  GoogleOneTap,
   Waitlist,
-  PricingTable,
-  APIKeys,
 } from './client-boundary/uiComponents';
 
 /**
@@ -48,17 +50,12 @@ export {
   useEmailLink,
   useOrganization,
   useOrganizationList,
+  useReverification,
   useSession,
   useSessionList,
   useSignIn,
   useSignUp,
   useUser,
-  useReverification,
-  __experimental_usePaymentElement,
-  __experimental_PaymentElementProvider,
-  __experimental_PaymentElement,
-  __experimental_useCheckout,
-  __experimental_CheckoutProvider,
 } from './client-boundary/hooks';
 
 /**

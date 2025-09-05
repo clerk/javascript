@@ -13,7 +13,8 @@ import {
   InvitationAPI,
   JwksAPI,
   JwtTemplatesApi,
-  MachineTokensApi,
+  M2MTokenApi,
+  MachineApi,
   OAuthApplicationsApi,
   OrganizationAPI,
   PhoneNumberAPI,
@@ -28,6 +29,7 @@ import {
   WaitlistEntryAPI,
   WebhookAPI,
 } from './endpoints';
+import { BillingAPI } from './endpoints/BillingApi';
 import { buildRequest } from './request';
 
 export type CreateBackendApiOptions = Parameters<typeof buildRequest>[0];
@@ -51,6 +53,11 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
     ),
     betaFeatures: new BetaFeaturesAPI(request),
     blocklistIdentifiers: new BlocklistIdentifierAPI(request),
+    /**
+     * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+     * It is advised to pin the SDK version to avoid breaking changes.
+     */
+    billing: new BillingAPI(request),
     clients: new ClientAPI(request),
     domains: new DomainAPI(request),
     emailAddresses: new EmailAddressAPI(request),
@@ -64,10 +71,13 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
     invitations: new InvitationAPI(request),
     jwks: new JwksAPI(request),
     jwtTemplates: new JwtTemplatesApi(request),
-    machineTokens: new MachineTokensApi(
+    machines: new MachineApi(request),
+    m2m: new M2MTokenApi(
       buildRequest({
         ...options,
         skipApiVersionInUrl: true,
+        requireSecretKey: false,
+        useMachineSecretKey: true,
       }),
     ),
     oauthApplications: new OAuthApplicationsApi(request),

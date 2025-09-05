@@ -14,6 +14,7 @@ import type {
   SignInTheme,
   SignUpTheme,
   SubscriptionDetailsTheme,
+  TaskChooseOrganizationTheme,
   UserButtonTheme,
   UserProfileTheme,
   UserVerificationTheme,
@@ -24,9 +25,9 @@ import type {
   CommerceBillingNamespace,
   CommerceCheckoutResource,
   CommercePlanResource,
-  CommerceSubscriberType,
   CommerceSubscriptionPlanPeriod,
   ConfirmCheckoutParams,
+  ForPayerType,
 } from './commerce';
 import type { CustomMenuItem } from './customMenuItems';
 import type { CustomPage } from './customPages';
@@ -48,18 +49,19 @@ import type {
   SignUpFallbackRedirectUrl,
   SignUpForceRedirectUrl,
 } from './redirects';
-import type { PendingSessionOptions, SignedInSessionResource } from './session';
+import type { SessionResource, SessionTask, SignedInSessionResource } from './session';
 import type { SessionVerificationLevel } from './sessionVerification';
 import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
 import type { ClientJSONSnapshot, EnvironmentJSONSnapshot } from './snapshots';
+import type { State } from './state';
 import type { Web3Strategy } from './strategies';
 import type { TelemetryCollector } from './telemetry';
 import type { UserResource } from './user';
 import type { Autocomplete, DeepPartial, DeepSnakeToCamel } from './utils';
 import type { WaitlistResource } from './waitlist';
 
-type __experimental_CheckoutStatus = 'awaiting_initialization' | 'awaiting_confirmation' | 'completed';
+type __experimental_CheckoutStatus = 'needs_initialization' | 'needs_confirmation' | 'completed';
 
 export type __experimental_CheckoutCacheState = Readonly<{
   isStarting: boolean;
@@ -71,7 +73,7 @@ export type __experimental_CheckoutCacheState = Readonly<{
 }>;
 
 export type __experimental_CheckoutOptions = {
-  for?: 'organization';
+  for?: ForPayerType;
   planPeriod: CommerceSubscriptionPlanPeriod;
   planId: string;
 };
@@ -90,7 +92,7 @@ export type __experimental_CheckoutInstance = {
   confirm: (params: ConfirmCheckoutParams) => Promise<CheckoutResult>;
   start: () => Promise<CheckoutResult>;
   clear: () => void;
-  finalize: (params?: { redirectUrl: string }) => void;
+  finalize: (params?: { navigate?: SetActiveNavigate }) => Promise<void>;
   subscribe: (listener: (state: __experimental_CheckoutCacheState) => void) => () => void;
   getState: () => __experimental_CheckoutCacheState;
 };
@@ -118,6 +120,7 @@ export type SDKMetadata = {
 export type ListenerCallback = (emission: Resources) => void;
 export type UnsubscribeCallback = () => void;
 export type BeforeEmitCallback = (session?: SignedInSessionResource | null) => void | Promise<any>;
+export type SetActiveNavigate = ({ session }: { session: SessionResource }) => void | Promise<unknown>;
 
 export type SignOutCallback = () => void | Promise<any>;
 
@@ -227,6 +230,14 @@ export interface Clerk {
   user: UserResource | null | undefined;
 
   /**
+   * @experimental This experimental API is subject to change.
+   *
+   * Entrypoint for Clerk's Signal API containing resource signals along with accessible versions of `computed()` and
+   * `effect()` that can be used to subscribe to changes from Signals.
+   */
+  __internal_state: State;
+
+  /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
    * @see https://clerk.com/docs/billing/overview
    *
@@ -295,7 +306,7 @@ export interface Clerk {
   __internal_closeSubscriptionDetails: () => void;
 
   /**
-  /** Opens the Clerk UserVerification component in a modal.
+   * Opens the Clerk UserVerification component in a modal.
    * @param props Optional user verification configuration parameters.
    */
   __internal_openReverification: (props?: __internal_UserVerificationModalProps) => void;
@@ -558,6 +569,21 @@ export interface Clerk {
   __internal_unmountOAuthConsent: (targetNode: HTMLDivElement) => void;
 
   /**
+   * Mounts a TaskChooseOrganization component at the target element.
+   * @param targetNode Target node to mount the TaskChooseOrganization component.
+   * @param props configuration parameters.
+   */
+  mountTaskChooseOrganization: (targetNode: HTMLDivElement, props?: TaskChooseOrganizationProps) => void;
+
+  /**
+   * Unmount a TaskChooseOrganization component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @param targetNode Target node to unmount the TaskChooseOrganization component from.
+   */
+  unmountTaskChooseOrganization: (targetNode: HTMLDivElement) => void;
+
+  /**
    * @internal
    * Loads Stripe libraries for commerce functionality
    */
@@ -601,13 +627,6 @@ export interface Clerk {
   __internal_addNavigationListener: (callback: () => void) => UnsubscribeCallback;
 
   /**
-   * Registers the internal navigation context from UI components in order to
-   * be triggered from `Clerk` methods
-   * @internal
-   */
-  __internal_setComponentNavigationContext: (context: __internal_ComponentNavigationContext) => () => void;
-
-  /**
    * Set the active session and organization explicitly.
    *
    * If the session param is `null`, the active session is deleted.
@@ -628,33 +647,38 @@ export interface Clerk {
   buildUrlWithAuth(to: string): string;
 
   /**
-   * Returns the configured url where <SignIn/> is mounted or a custom sign-in page is rendered.
+   * Returns the configured url where `<SignIn/>` is mounted or a custom sign-in page is rendered.
    *
    * @param opts A {@link RedirectOptions} object
    */
   buildSignInUrl(opts?: RedirectOptions): string;
 
   /**
-   * Returns the configured url where <SignUp/> is mounted or a custom sign-up page is rendered.
+   * Returns the configured url where `<SignUp/>` is mounted or a custom sign-up page is rendered.
    *
    * @param opts A {@link RedirectOptions} object
    */
   buildSignUpUrl(opts?: RedirectOptions): string;
 
   /**
-   * Returns the url where <UserProfile /> is mounted or a custom user-profile page is rendered.
+   * Returns the url where `<UserProfile />` is mounted or a custom user-profile page is rendered.
    */
   buildUserProfileUrl(): string;
 
   /**
-   * Returns the configured url where <CreateOrganization /> is mounted or a custom create-organization page is rendered.
+   * Returns the configured url where `<CreateOrganization />` is mounted or a custom create-organization page is rendered.
    */
   buildCreateOrganizationUrl(): string;
 
   /**
-   * Returns the configured url where <OrganizationProfile /> is mounted or a custom organization-profile page is rendered.
+   * Returns the configured url where `<OrganizationProfile />` is mounted or a custom organization-profile page is rendered.
    */
   buildOrganizationProfileUrl(): string;
+
+  /**
+   * Returns the configured url where tasks are mounted.
+   */
+  buildTasksUrl(): string;
 
   /**
    * Returns the configured afterSignInUrl of the instance.
@@ -682,7 +706,7 @@ export interface Clerk {
   buildAfterMultiSessionSingleSignOutUrl(): string;
 
   /**
-   * Returns the configured url where <Waitlist/> is mounted or a custom waitlist page is rendered.
+   * Returns the configured url where `<Waitlist/>` is mounted or a custom waitlist page is rendered.
    */
   buildWaitlistUrl(opts?: { initialValues?: Record<string, string> }): string;
 
@@ -695,31 +719,31 @@ export interface Clerk {
   redirectWithAuth(to: string): Promise<unknown>;
 
   /**
-   * Redirects to the configured URL where <SignIn/> is mounted.
+   * Redirects to the configured URL where `<SignIn/>` is mounted.
    *
    * @param opts A {@link RedirectOptions} object
    */
   redirectToSignIn(opts?: SignInRedirectOptions): Promise<unknown>;
 
   /**
-   * Redirects to the configured URL where <SignUp/> is mounted.
+   * Redirects to the configured URL where `<SignUp/>` is mounted.
    *
    * @param opts A {@link RedirectOptions} object
    */
   redirectToSignUp(opts?: SignUpRedirectOptions): Promise<unknown>;
 
   /**
-   * Redirects to the configured URL where <UserProfile/> is mounted.
+   * Redirects to the configured URL where `<UserProfile/>` is mounted.
    */
   redirectToUserProfile: () => Promise<unknown>;
 
   /**
-   * Redirects to the configured URL where <OrganizationProfile /> is mounted.
+   * Redirects to the configured URL where `<OrganizationProfile />` is mounted.
    */
   redirectToOrganizationProfile: () => Promise<unknown>;
 
   /**
-   * Redirects to the configured URL where <CreateOrganization /> is mounted.
+   * Redirects to the configured URL where `<CreateOrganization />` is mounted.
    */
   redirectToCreateOrganization: () => Promise<unknown>;
 
@@ -739,9 +763,16 @@ export interface Clerk {
   redirectToAfterSignOut: () => void;
 
   /**
-   * Redirects to the configured URL where <Waitlist/> is mounted.
+   * Redirects to the configured URL where `<Waitlist/>` is mounted.
    */
   redirectToWaitlist: () => void;
+
+  /**
+   * Redirects to the configured URL where tasks are mounted.
+   *
+   * @param opts A {@link RedirectOptions} object
+   */
+  redirectToTasks(opts?: TasksRedirectOptions): Promise<unknown>;
 
   /**
    * Completes a Google One Tap redirection flow started by
@@ -786,6 +817,11 @@ export interface Clerk {
   authenticateWithOKXWallet: (params?: AuthenticateWithOKXWalletParams) => Promise<unknown>;
 
   /**
+   * Authenticates user using Base Account SDK
+   */
+  authenticateWithBase: (params?: AuthenticateWithBaseParams) => Promise<unknown>;
+
+  /**
    * Authenticates user using their Web3 Wallet browser extension
    */
   authenticateWithWeb3: (params: ClerkAuthenticateWithWeb3Params) => Promise<unknown>;
@@ -813,14 +849,6 @@ export interface Clerk {
   handleUnauthenticated: () => Promise<unknown>;
 
   joinWaitlist: (params: JoinWaitlistParams) => Promise<WaitlistResource>;
-
-  /**
-   * Navigates to the next task or redirects to completion URL.
-   * If the current session has pending tasks, it navigates to the next task.
-   * If all tasks are complete, it navigates to the provided completion URL or defaults to the origin redirect URL (either from sign-in or sign-up).
-   * @internal
-   */
-  __internal_navigateToTaskIfAvailable: (params?: NextTaskParams) => Promise<void>;
 
   /**
    * This is an optional function.
@@ -933,14 +961,28 @@ type ClerkOptionsNavigation =
       routerDebug?: boolean;
     };
 
-export type ClerkOptions = PendingSessionOptions &
-  ClerkOptionsNavigation &
+type ClerkOptionsLegacyRedirectProps = {
+  /**
+   * @deprecated Use `signInFallbackRedirectUrl` or `signInForceRedirectUrl` instead.
+   */
+  afterSignInUrl?: string | null;
+  /**
+   * @deprecated Use `signUpFallbackRedirectUrl` or `signUpForceRedirectUrl` instead.
+   */
+  afterSignUpUrl?: string | null;
+  /**
+   * @deprecated Use `signInFallbackRedirectUrl`, `signInForceRedirectUrl`, `signUpFallbackRedirectUrl`, or `signUpForceRedirectUrl` instead.
+   */
+  redirectUrl?: string | null;
+};
+
+export type ClerkOptions = ClerkOptionsNavigation &
   SignInForceRedirectUrl &
   SignInFallbackRedirectUrl &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
   NewSubscriptionRedirectUrl &
-  LegacyRedirectProps &
+  ClerkOptionsLegacyRedirectProps &
   AfterSignOutUrl &
   AfterMultiSessionSingleSignOutUrl & {
     /**
@@ -1046,6 +1088,15 @@ export type ClerkOptions = PendingSessionOptions &
      * @internal
      */
     __internal_keyless_dismissPrompt?: (() => Promise<void>) | null;
+
+    /**
+     * Customize the URL paths users are redirected to after sign-in or sign-up when specific
+     * session tasks need to be completed.
+     *
+     * When `undefined`, it uses Clerk's default task flow URLs.
+     * @default undefined
+     */
+    taskUrls?: Record<SessionTask['key'], string>;
   };
 
 export interface NavigateOptions {
@@ -1128,6 +1179,8 @@ export type SignUpInitialValues = {
   username?: string;
 };
 
+export type TasksRedirectOptions = RedirectOptions & RedirectUrlProp;
+
 export type SignInRedirectOptions = RedirectOptions &
   RedirectUrlProp & {
     /**
@@ -1167,9 +1220,32 @@ export type SetActiveParams = {
   beforeEmit?: BeforeEmitCallback;
 
   /**
-   * The full URL or path to redirect to just before the active session and/or organization is set.
+   * The full URL or path to redirect to just before the session and/or organization is set.
    */
   redirectUrl?: string;
+
+  /**
+   * A custom navigation function to be called just before the session and/or organization is set.
+   *
+   * When provided, it takes precedence over the `redirectUrl` parameter for navigation.
+   *
+   * @example
+   * ```typescript
+   * await clerk.setActive({
+   *   session,
+   *   navigate: async ({ session }) => {
+   *     const currentTask = session.currentTask;
+   *     if (currentTask) {
+   *       await router.push(`/onboarding/${currentTask.key}`)
+   *       return
+   *     }
+   *
+   *     router.push('/dashboard');
+   *   }
+   * });
+   * ```
+   */
+  navigate?: SetActiveNavigate;
 };
 
 /**
@@ -1808,7 +1884,7 @@ export type __internal_CheckoutProps = {
   appearance?: CheckoutTheme;
   planId?: string;
   planPeriod?: CommerceSubscriptionPlanPeriod;
-  subscriberType?: CommerceSubscriberType;
+  for?: ForPayerType;
   onSubscriptionComplete?: () => void;
   portalId?: string;
   portalRoot?: PortalRoot;
@@ -1830,26 +1906,130 @@ export type __internal_CheckoutProps = {
  * <ClerkProvider clerkJsVersion="x.x.x" />
  * ```
  */
-export type __internal_PlanDetailsProps = {
+export type __experimental_CheckoutButtonProps = {
+  planId: string;
+  planPeriod?: CommerceSubscriptionPlanPeriod;
+  for?: ForPayerType;
+  onSubscriptionComplete?: () => void;
+  checkoutProps?: {
+    appearance?: CheckoutTheme;
+    portalId?: string;
+    portalRoot?: HTMLElement | null | undefined;
+    onClose?: () => void;
+  };
+  /**
+   * Full URL or path to navigate to after checkout is complete and the user clicks the "Continue" button.
+   * @default undefined
+   */
+  newSubscriptionRedirectUrl?: string;
+};
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+ * @see https://clerk.com/docs/billing/overview
+ *
+ * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+ * @example
+ * ```tsx
+ * <ClerkProvider clerkJsVersion="x.x.x" />
+ * ```
+ */
+export type __internal_PlanDetailsProps = (
+  | {
+      planId: string;
+      plan?: never;
+    }
+  | {
+      /**
+       * The plan object will be used as initial data until the plan is fetched from the server.
+       */
+      plan: CommercePlanResource;
+      planId?: never;
+    }
+) & {
   appearance?: PlanDetailTheme;
-  plan?: CommercePlanResource;
-  planId?: string;
   initialPlanPeriod?: CommerceSubscriptionPlanPeriod;
   portalId?: string;
   portalRoot?: PortalRoot;
 };
 
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+ * @see https://clerk.com/docs/billing/overview
+ *
+ * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+ * @example
+ * ```tsx
+ * <ClerkProvider clerkJsVersion="x.x.x" />
+ * ```
+ */
+export type __experimental_PlanDetailsButtonProps = (
+  | {
+      planId: string;
+      plan?: never;
+    }
+  | {
+      /**
+       * The plan object will be used as initial data until the plan is fetched from the server.
+       */
+      plan: CommercePlanResource;
+      planId?: never;
+    }
+) & {
+  initialPlanPeriod?: CommerceSubscriptionPlanPeriod;
+  planDetailsProps?: {
+    appearance?: PlanDetailTheme;
+    portalId?: string;
+    portalRoot?: PortalRoot;
+  };
+};
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+ * @see https://clerk.com/docs/billing/overview
+ *
+ * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+ * @example
+ * ```tsx
+ * <ClerkProvider clerkJsVersion="x.x.x" />
+ * ```
+ */
 export type __internal_SubscriptionDetailsProps = {
   /**
    * The subscriber type to display the subscription details for.
-   * If `org` is provided, the subscription details will be displayed for the active organization.
+   * If `organization` is provided, the subscription details will be displayed for the active organization.
    * @default 'user'
    */
-  for?: CommerceSubscriberType;
+  for?: ForPayerType;
   appearance?: SubscriptionDetailsTheme;
   onSubscriptionCancel?: () => void;
   portalId?: string;
   portalRoot?: PortalRoot;
+};
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+ * @see https://clerk.com/docs/billing/overview
+ *
+ * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+ * @example
+ * ```tsx
+ * <ClerkProvider clerkJsVersion="x.x.x" />
+ * ```
+ */
+export type __experimental_SubscriptionDetailsButtonProps = {
+  /**
+   * The subscriber type to display the subscription details for.
+   * If `organization` is provided, the subscription details will be displayed for the active organization.
+   * @default 'user'
+   */
+  for?: ForPayerType;
+  onSubscriptionCancel?: () => void;
+  subscriptionDetailsProps?: {
+    appearance?: SubscriptionDetailsTheme;
+    portalId?: string;
+    portalRoot?: PortalRoot;
+  };
 };
 
 export type __internal_OAuthConsentProps = {
@@ -1862,6 +2042,10 @@ export type __internal_OAuthConsentProps = {
    * Logo URL of the OAuth application.
    */
   oAuthApplicationLogoUrl?: string;
+  /**
+   * URL of the OAuth application.
+   */
+  oAuthApplicationUrl?: string;
   /**
    * Scopes requested by the OAuth application.
    */
@@ -1902,18 +2086,22 @@ export interface HandleEmailLinkVerificationParams {
   onVerifiedOnOtherDevice?: () => void;
 }
 
-type ButtonPropsModal<T extends SignInProps | SignUpProps> = {
+type SignInButtonPropsModal = {
   mode: 'modal';
-  appearance?: T['appearance'];
+  appearance?: SignInProps['appearance'];
+};
+
+type SignUpButtonPropsModal = {
+  mode: 'modal';
+  appearance?: SignUpProps['appearance'];
+  unsafeMetadata?: SignUpUnsafeMetadata;
 };
 
 type ButtonPropsRedirect = {
   mode?: 'redirect';
 };
 
-type ButtonProps<T extends SignInProps | SignUpProps> = ButtonPropsModal<T> | ButtonPropsRedirect;
-
-export type SignInButtonProps = ButtonProps<SignInProps> &
+export type SignInButtonProps = (SignInButtonPropsModal | ButtonPropsRedirect) &
   Pick<
     SignInProps,
     | 'fallbackRedirectUrl'
@@ -1925,9 +2113,7 @@ export type SignInButtonProps = ButtonProps<SignInProps> &
     | 'oauthFlow'
   >;
 
-export type SignUpButtonProps = {
-  unsafeMetadata?: SignUpUnsafeMetadata;
-} & ButtonProps<SignUpProps> &
+export type SignUpButtonProps = (SignUpButtonPropsModal | ButtonPropsRedirect) &
   Pick<
     SignUpProps,
     | 'fallbackRedirectUrl'
@@ -1937,6 +2123,14 @@ export type SignUpButtonProps = {
     | 'initialValues'
     | 'oauthFlow'
   >;
+
+export type TaskChooseOrganizationProps = {
+  /**
+   * Full URL or path to navigate to after successfully resolving all tasks
+   */
+  redirectUrlComplete: string;
+  appearance?: TaskChooseOrganizationTheme;
+};
 
 export type CreateOrganizationInvitationParams = {
   emailAddress: string;
@@ -2005,12 +2199,12 @@ export interface AuthenticateWithGoogleOneTapParams {
   legalAccepted?: boolean;
 }
 
-export interface NextTaskParams {
-  /**
-   * Full URL or path to navigate to after successfully resolving all tasks
-   * @default undefined
-   */
-  redirectUrlComplete?: string;
+export interface AuthenticateWithBaseParams {
+  customNavigate?: (to: string) => Promise<unknown>;
+  redirectUrl?: string;
+  signUpContinueUrl?: string;
+  unsafeMetadata?: SignUpUnsafeMetadata;
+  legalAccepted?: boolean;
 }
 
 export interface LoadedClerk extends Clerk {

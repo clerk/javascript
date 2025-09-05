@@ -39,6 +39,7 @@ const typedocPluginMarkdownOptions = {
   excludeScopesInPaths: true,
   expandObjects: true,
   formatWithPrettier: true,
+  expandParameters: true,
 };
 
 /** @type {import("typedoc-plugin-replace-text").Config} */
@@ -78,7 +79,7 @@ const typedocPluginReplaceTextOptions = {
 
 /** @type {import("typedoc").TypeDocOptions} */
 const config = {
-  out: './.typedoc/docs',
+  out: './.typedoc/temp-docs',
   entryPointStrategy: 'packages',
   plugin: [
     'typedoc-plugin-replace-text',

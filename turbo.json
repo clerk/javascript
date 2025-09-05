@@ -143,7 +143,54 @@
       ],
       "outputs": []
     },
+    "format": {
+      "inputs": [
+        "**/*.js",
+        "**/*.jsx",
+        "**/*.ts",
+        "**/*.tsx",
+        "**/*.json",
+        "**/*.md",
+        "**/*.mdx",
+        "**/*.vue",
+        "**/*.astro",
+        "**/*.css",
+        "**/*.scss",
+        "**/*.html",
+        ".prettierignore",
+        "prettier.config.mjs",
+        "!**/__snapshots__/**",
+        "!CHANGELOG.md",
+        "!coverage/**",
+        "!dist/**",
+        "!examples/**",
+        "!node_modules/**"
+      ],
+      "outputs": []
+    },
     "format:check": {
+      "inputs": [
+        "**/*.js",
+        "**/*.jsx",
+        "**/*.ts",
+        "**/*.tsx",
+        "**/*.json",
+        "**/*.md",
+        "**/*.mdx",
+        "**/*.vue",
+        "**/*.astro",
+        "**/*.css",
+        "**/*.scss",
+        "**/*.html",
+        ".prettierignore",
+        "prettier.config.mjs",
+        "!**/__snapshots__/**",
+        "!CHANGELOG.md",
+        "!coverage/**",
+        "!dist/**",
+        "!examples/**",
+        "!node_modules/**"
+      ],
       "outputs": []
     },
     "//#test:integration:ap-flows": {
@@ -293,6 +340,29 @@
         "@clerk/backend#build",
         "@clerk/nextjs#build",
         "@clerk/vue#build"
+      ],
+      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
+      "inputs": ["integration/**"],
+      "outputLogs": "new-only"
+    },
+    "//#test:integration:machine": {
+      "dependsOn": [
+        "@clerk/testing#build",
+        "@clerk/clerk-js#build",
+        "@clerk/backend#build",
+        "@clerk/nextjs#build",
+        "@clerk/express#build"
+      ],
+      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
+      "inputs": ["integration/**"],
+      "outputLogs": "new-only"
+    },
+    "//#test:integration:custom": {
+      "dependsOn": [
+        "@clerk/testing#build",
+        "@clerk/clerk-js#build",
+        "@clerk/backend#build",
+        "@clerk/clerk-react#build"
       ],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],

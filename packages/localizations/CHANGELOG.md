@@ -1,5 +1,275 @@
 # Change Log
 
+## 3.24.2
+
+### Patch Changes
+
+- Add Traditional Chinese translation for sign in or up combined title ([#6701](https://github.com/clerk/javascript/pull/6701)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Add ptBR missing localization keys for choose organization session task ([#6704](https://github.com/clerk/javascript/pull/6704)) by [@guilherme6191](https://github.com/guilherme6191)
+
+- Updated dependencies [[`fced4fc`](https://github.com/clerk/javascript/commit/fced4fc869bb21c77826dfaf281b6640e0f0c006), [`1b1e8b1`](https://github.com/clerk/javascript/commit/1b1e8b1fd33b787f956b17b193e5fd0a4cdc6cec)]:
+  - @clerk/types@4.84.1
+
+## 3.24.1
+
+### Patch Changes
+
+- Refined German (de-DE) waitlist localization for improved clarity and consistency ([#6631](https://github.com/clerk/javascript/pull/6631)) by [@okikeSolutions](https://github.com/okikeSolutions)
+
+  This update improves the waitlist flow by:
+
+  - Updating action link text from “Jetzt anmelden” to “Anmelden”
+  - Changing action text from “Kein Zugang? Auf die Warteliste setzen!” to “Bereits Zugang?”
+  - Adjusting form button label from “Zur Warteliste hinzufügen” to “Warteliste beitreten”
+  - Clarifying the waitlist start subtitle with instructions to enter an email for notifications
+  - Aligning success subtitles with consistent wording for availability notifications
+
+  The German waitlist localization now offers clearer guidance and a smoother user experience.
+
+- Add api-related localizations for th-TH and refine translation context ([#6657](https://github.com/clerk/javascript/pull/6657)) by [@ttwrpz](https://github.com/ttwrpz)
+
+- Fixed a typo when canceling a free trial. ([#6672](https://github.com/clerk/javascript/pull/6672)) by [@paddycarver](https://github.com/paddycarver)
+
+- Updated dependencies [[`2a82737`](https://github.com/clerk/javascript/commit/2a8273705b9764e1a4613d5a0dbb738d0b156c05), [`cda5d7b`](https://github.com/clerk/javascript/commit/cda5d7b79b28dc03ec794ea54e0feb64b148cdd2), [`ba25a5b`](https://github.com/clerk/javascript/commit/ba25a5b5a3fa686a65f52e221d9d1712a389fea9), [`a50cfc8`](https://github.com/clerk/javascript/commit/a50cfc8f1dd168b436499e32fc8b0fc41d28bbff), [`377f67b`](https://github.com/clerk/javascript/commit/377f67b8e552d1a19efbe4530e9306675b7f8eab), [`65b12ee`](https://github.com/clerk/javascript/commit/65b12eeeb57ee80cdd8c36c5949d51f1227a413e), [`263722e`](https://github.com/clerk/javascript/commit/263722e61fd27403b4c8d9794880686771e123f9)]:
+  - @clerk/types@4.84.0
+
+## 3.24.0
+
+### Minor Changes
+
+- Complete Romanian (ro-RO) localization ([#6629](https://github.com/clerk/javascript/pull/6629)) by [@5ergiu](https://github.com/5ergiu)
+
+  This update:
+
+  - Translates missing API key management strings.
+  - Adds complete commerce and billing translations.
+  - Completes organization profile translations.
+  - Adds missing error messages.
+  - Includes form labels and placeholders.
+  - Ensures ro-RO is included in the package.json files array for publishing.
+
+  The Romanian localization now provides a complete experience for Romanian-speaking users.
+
+- Improve German (de-DE) localization with all missing translations ([#6538](https://github.com/clerk/javascript/pull/6538)) by [@mwerder](https://github.com/mwerder)
+
+  This update improves the German localization by:
+
+  - Adding missing German translations
+  - Use 'Wiederherstellungscode' instead of 'Backup-Code' in the whole file for consistency
+
+### Patch Changes
+
+- Updated dependencies [[`600c648`](https://github.com/clerk/javascript/commit/600c648d4087a823341041c90018797fbc0033f0)]:
+  - @clerk/types@4.83.0
+
+## 3.23.1
+
+### Patch Changes
+
+- Updated dependencies [[`d52714e`](https://github.com/clerk/javascript/commit/d52714e4cb7f369c74826cd4341c58eb1900abe4), [`2ed539c`](https://github.com/clerk/javascript/commit/2ed539cc7f08ed4d70c33621563ad386ea8becc5), [`c16a7a5`](https://github.com/clerk/javascript/commit/c16a7a5837fc15e0e044baf9c809b8da6fbac795)]:
+  - @clerk/types@4.82.0
+
+## 3.23.0
+
+### Minor Changes
+
+- [Billing Beta] Rename `cancelFreeTrialDescription` to `cancelFreeTrialAccessUntil`. ([#6582](https://github.com/clerk/javascript/pull/6582)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Update account deletion localization in zh-CN ([#6577](https://github.com/clerk/javascript/pull/6577)) by [@dearfad](https://github.com/dearfad)
+
+- Update copies for create organization screen on session tasks ([#6584](https://github.com/clerk/javascript/pull/6584)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Updated dependencies [[`e52bf8e`](https://github.com/clerk/javascript/commit/e52bf8ebef74a9e123c69b69acde1340c01d32d7), [`c043c19`](https://github.com/clerk/javascript/commit/c043c1919854aaa5b9cf7f6df5bb517f5617f7a1), [`c28d29c`](https://github.com/clerk/javascript/commit/c28d29c79bb4f144d782313ca72df7db91a77340), [`172e054`](https://github.com/clerk/javascript/commit/172e054a3511be12d16ba19037db320c2d9838bf)]:
+  - @clerk/types@4.81.0
+
+## 3.22.0
+
+### Minor Changes
+
+- Update SubscriptionDetails to support free trials ([#6569](https://github.com/clerk/javascript/pull/6569)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Updated dependencies [[`8dc6bad`](https://github.com/clerk/javascript/commit/8dc6bad5c7051b59bd8c73e65d497f6a974bb1c3), [`aa6a3c3`](https://github.com/clerk/javascript/commit/aa6a3c3d3ba2de67a468c996cbf0bff43a09ddb8), [`db50c47`](https://github.com/clerk/javascript/commit/db50c4734920ada6002de8c62c994047eb6cb5a0)]:
+  - @clerk/types@4.80.0
+
+## 3.21.3
+
+### Patch Changes
+
+- Fix sk-SK delete confirmation text (#6547) ([#6547](https://github.com/clerk/javascript/pull/6547)) by [@l0st0](https://github.com/l0st0)
+
+- Add error handling for `setActive` with stale organization data ([#6550](https://github.com/clerk/javascript/pull/6550)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`413468c`](https://github.com/clerk/javascript/commit/413468c9b9c8fb7576f8e4cbdccff98784e33fef), [`7b7eb1f`](https://github.com/clerk/javascript/commit/7b7eb1fc0235249c5c179239078294118f2947cd)]:
+  - @clerk/types@4.79.0
+
+## 3.21.2
+
+### Patch Changes
+
+- Updated dependencies [[`5b24129`](https://github.com/clerk/javascript/commit/5b24129ddcfc2f7dc6eb79d8c818b4ff97c68e9a)]:
+  - @clerk/types@4.78.0
+
+## 3.21.1
+
+### Patch Changes
+
+- Updated dependencies [[`4db1e58`](https://github.com/clerk/javascript/commit/4db1e58d70b60e1e236709b507666715d571e925), [`69498df`](https://github.com/clerk/javascript/commit/69498dfca3e6bb388eb8c94313eac06347dd5a27)]:
+  - @clerk/types@4.77.0
+
+## 3.21.0
+
+### Minor Changes
+
+- Complete Persian (fa-IR) localization with all missing translations ([#6533](https://github.com/clerk/javascript/pull/6533)) by [@hamidrezaghanbari](https://github.com/hamidrezaghanbari)
+
+  This update completes the Persian localization by:
+
+  - Translating all undefined API key management strings
+  - Adding complete commerce/billing translations
+  - Completing organization profile translations
+  - Adding all missing error messages
+  - Including form labels and placeholders
+  - Adding fa-IR to package.json files array for proper publishing
+
+  The Persian localization now provides a complete user experience for Persian-speaking users.
+
+- Add support for trials in `<Checkout/>` ([#6494](https://github.com/clerk/javascript/pull/6494)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Added `freeTrialEndsAt` property to `CommerceCheckoutResource` interface.
+
+- Update PricingTable with trial info. ([#6493](https://github.com/clerk/javascript/pull/6493)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- added missing ptBR translations ([#6503](https://github.com/clerk/javascript/pull/6503)) by [@fell-lucas](https://github.com/fell-lucas)
+
+- Add `taskChooseOrganization` to all locales. ([#6527](https://github.com/clerk/javascript/pull/6527)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`15fe106`](https://github.com/clerk/javascript/commit/15fe1060f730a6a4391f3d2451d23edd3218e1ae), [`173837c`](https://github.com/clerk/javascript/commit/173837c2526aa826b7981ee8d6d4f52c00675da5), [`8b52d7a`](https://github.com/clerk/javascript/commit/8b52d7ae19407e8ab5a5451bd7d34b6bc38417de), [`854dde8`](https://github.com/clerk/javascript/commit/854dde88e642c47b5a29ac8f576c8c1976e5d067), [`ae2e2d6`](https://github.com/clerk/javascript/commit/ae2e2d6b336be6b596cc855e549843beb5bfd2a1), [`037f25a`](https://github.com/clerk/javascript/commit/037f25a8171888168913b186b7edf871e0aaf197), [`f8b38b7`](https://github.com/clerk/javascript/commit/f8b38b7059e498fef3ac1271346be0710aa31c76)]:
+  - @clerk/types@4.76.0
+
+## 3.20.9
+
+### Patch Changes
+
+- Updated dependencies [[`b72a3dd`](https://github.com/clerk/javascript/commit/b72a3dda2467720e5dc8cab3e7e6a110f3beb79b), [`d93b0ed`](https://github.com/clerk/javascript/commit/d93b0edf4adc57d48a26cb08444192887ccec659), [`6459f7d`](https://github.com/clerk/javascript/commit/6459f7dabe5f163f48ed73106bb901d8187da3e2), [`9084759`](https://github.com/clerk/javascript/commit/90847593300be605e1ee1c06dac147ce68b25dc7)]:
+  - @clerk/types@4.75.0
+
+## 3.20.8
+
+### Patch Changes
+
+- Introduce `TaskChooseOrganization` component which replaces `TaskSelectOrganization` with a new UI that make the experience similar to the previous `SignIn` and `SignUp` steps ([#6446](https://github.com/clerk/javascript/pull/6446)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`1ad16da`](https://github.com/clerk/javascript/commit/1ad16daa49795a861ae277001831230580b6b9f4), [`4edef81`](https://github.com/clerk/javascript/commit/4edef81dd423a0471e3f579dd6b36094aa8546aa), [`696f8e1`](https://github.com/clerk/javascript/commit/696f8e11a3e5391e6b5a97d98e929b8973575b9a), [`f318d22`](https://github.com/clerk/javascript/commit/f318d22cf83caaef272bcf532561a03ca72575e7)]:
+  - @clerk/types@4.74.0
+
+## 3.20.7
+
+### Patch Changes
+
+- Add types for `form_param_type_invalid` errors. ([#6457](https://github.com/clerk/javascript/pull/6457)) by [@dstaley](https://github.com/dstaley)
+
+- Updated dependencies [[`f93965f`](https://github.com/clerk/javascript/commit/f93965f64c81030f9fcf9d1cc4e4984d30cd12ec), [`7b6dcee`](https://github.com/clerk/javascript/commit/7b6dceea5bfd7f1cc1bf24126aa715307e24ae7f)]:
+  - @clerk/types@4.73.0
+
+## 3.20.6
+
+### Patch Changes
+
+- Add ja-JP translations in `<UserProfile/>`. ([#6426](https://github.com/clerk/javascript/pull/6426)) by [@tsume-ha](https://github.com/tsume-ha)
+
+- Refactor billing statement page and payment attempt page data loading ([#6420](https://github.com/clerk/javascript/pull/6420)) by [@aeliox](https://github.com/aeliox)
+
+- Updated dependencies [[`22c35ef`](https://github.com/clerk/javascript/commit/22c35efb59226df2efaa2891fa4775c13312f4c6), [`e8d816a`](https://github.com/clerk/javascript/commit/e8d816a3350e862c3e9e1d4f8c96c047a0a016a2), [`aa9f185`](https://github.com/clerk/javascript/commit/aa9f185e21b58f8a6e03ea44ce29ee09ad2477d9), [`af0e123`](https://github.com/clerk/javascript/commit/af0e12393c9412281626e20dafb1b3a15558f6d9), [`3d1d871`](https://github.com/clerk/javascript/commit/3d1d8711405646cf3c2aabe99e08337a1028703a)]:
+  - @clerk/types@4.72.0
+
+## 3.20.5
+
+### Patch Changes
+
+- Updated dependencies [[`e404456`](https://github.com/clerk/javascript/commit/e4044566bca81f63c8e9c630fdec0f498ad6fc08), [`d58b959`](https://github.com/clerk/javascript/commit/d58b9594cf65158e87dbaa90d632c45f543373e1), [`822ba1f`](https://github.com/clerk/javascript/commit/822ba1fd5e7daf665120cf183e4600a227098d53), [`d4d2612`](https://github.com/clerk/javascript/commit/d4d2612483baf356c389ef0ba5084059025481f2)]:
+  - @clerk/types@4.71.0
+
+## 3.20.4
+
+### Patch Changes
+
+- Updated dependencies [[`b0fdc9e`](https://github.com/clerk/javascript/commit/b0fdc9eaf764ca0c17cbe0810b7d240f6d9db0b6)]:
+  - @clerk/types@4.70.1
+
+## 3.20.3
+
+### Patch Changes
+
+- Updated dependencies [[`cd59c0e`](https://github.com/clerk/javascript/commit/cd59c0e5512a341dd8fb420aca583333c8243aa5)]:
+  - @clerk/types@4.70.0
+
+## 3.20.2
+
+### Patch Changes
+
+- Refine Traditional Chinese (`zh-TW`) translations ([#5683](https://github.com/clerk/javascript/pull/5683)) by [@anilahsu](https://github.com/anilahsu)
+
+- Add Persian (`fa-IR`) language ([#6063](https://github.com/clerk/javascript/pull/6063)) by [@XerxesCoder](https://github.com/XerxesCoder)
+
+- Extend `ru-RU` localization ([#5698](https://github.com/clerk/javascript/pull/5698)) by [@ZharaskhanAman](https://github.com/ZharaskhanAman)
+
+- feat(localizations): Update `sk-SK` localization ([#5497](https://github.com/clerk/javascript/pull/5497)) by [@radblesk](https://github.com/radblesk)
+
+- Add `sr-RS` to the list of exported and available localizations ([#6352](https://github.com/clerk/javascript/pull/6352)) by [@tmilewski](https://github.com/tmilewski)
+
+- feat(localization): Add Hindi, Bengali, Tamil, Telugu, and Malay language support ([#5534](https://github.com/clerk/javascript/pull/5534)) by [@vanikya](https://github.com/vanikya)
+
+- Add missing French locales to support new Clerk's Billing feature ([#5944](https://github.com/clerk/javascript/pull/5944)) by [@bde-maze](https://github.com/bde-maze)
+
+- chore(localizations): Align `en-US` strings for danger zone with other translations ([#5800](https://github.com/clerk/javascript/pull/5800)) by [@joschi](https://github.com/joschi)
+
+- Add Kazakh (kk-KZ) language ([#5684](https://github.com/clerk/javascript/pull/5684)) by [@azekowka](https://github.com/azekowka)
+
+- Update `es-MX` translations ([#5663](https://github.com/clerk/javascript/pull/5663)) by [@LFCisneros](https://github.com/LFCisneros)
+
+- Add Italian translations related to commerce and api keys. ([#6362](https://github.com/clerk/javascript/pull/6362)) by [@matteoblonde](https://github.com/matteoblonde)
+
+- Updated dependencies [[`fecc99d`](https://github.com/clerk/javascript/commit/fecc99d43cb7db5b99863829acb234cbce0da264), [`10e1060`](https://github.com/clerk/javascript/commit/10e10605b18a58f33a93caed058159c190678e74), [`92c44dd`](https://github.com/clerk/javascript/commit/92c44dd9d51e771a928a8da7004bdb8f8bdbaf58), [`a04a8f5`](https://github.com/clerk/javascript/commit/a04a8f5f81241ee41d93cd64793beca9d6296abb), [`c61855c`](https://github.com/clerk/javascript/commit/c61855c51d9c129d48c4543da3719939ad82f623), [`43ea069`](https://github.com/clerk/javascript/commit/43ea069c570dc64503fc82356ad28a2e43689d45)]:
+  - @clerk/types@4.69.0
+
+## 3.20.1
+
+### Patch Changes
+
+- Expand `vi-VN` localizations ([#6185](https://github.com/clerk/javascript/pull/6185)) by [@namnguyenthanhwork](https://github.com/namnguyenthanhwork)
+
+## 3.20.0
+
+### Minor Changes
+
+- Improve invalid plan change callout for monthly-only plans ([#6248](https://github.com/clerk/javascript/pull/6248)) by [@aeliox](https://github.com/aeliox)
+
+### Patch Changes
+
+- Updated dependencies [[`d2f6f9e`](https://github.com/clerk/javascript/commit/d2f6f9e02036a4288916fcce14f24be5d56561c4), [`a329836`](https://github.com/clerk/javascript/commit/a329836a6c64f0a551a277ccae07043456a70523), [`6041c39`](https://github.com/clerk/javascript/commit/6041c39a31e787a6065dbc3f21e1c569982a06de), [`3f1270d`](https://github.com/clerk/javascript/commit/3f1270db86a21ead0ed6f0bd4f9986485203e973)]:
+  - @clerk/types@4.68.0
+
+## 3.19.2
+
+### Patch Changes
+
+- Updated dependencies [[`2a90b68`](https://github.com/clerk/javascript/commit/2a90b689550ae960496c9292ca23e0225e3425cd)]:
+  - @clerk/types@4.67.0
+
+## 3.19.1
+
+### Patch Changes
+
+- Updated dependencies [[`8ee859c`](https://github.com/clerk/javascript/commit/8ee859ce00d1d5747c14a80fe7166303e64a4f1f)]:
+  - @clerk/types@4.66.1
+
 ## 3.19.0
 
 ### Minor Changes

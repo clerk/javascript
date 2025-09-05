@@ -3,9 +3,8 @@ import type { CustomPage, EnvironmentResource, LoadedClerk } from '@clerk/types'
 import {
   canViewOrManageAPIKeys,
   disabledAPIKeysFeature,
-  disabledBillingFeature,
-  hasPaidOrgPlans,
-  hasPaidUserPlans,
+  disabledOrganizationBillingFeature,
+  disabledUserBillingFeature,
   isValidUrl,
 } from '../../utils';
 import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID, USER_PROFILE_NAVBAR_ROUTE_ID } from '../constants';
@@ -58,6 +57,7 @@ type CreateCustomPagesParams = {
 export const createUserProfileCustomPages = (
   customPages: CustomPage[],
   clerk: LoadedClerk,
+  shouldShowBilling: boolean,
   environment?: EnvironmentResource,
 ) => {
   return createCustomPages(
@@ -68,6 +68,7 @@ export const createUserProfileCustomPages = (
       excludedPathsFromDuplicateWarning: [],
     },
     clerk,
+    shouldShowBilling,
     environment,
   );
 };
@@ -75,6 +76,7 @@ export const createUserProfileCustomPages = (
 export const createOrganizationProfileCustomPages = (
   customPages: CustomPage[],
   clerk: LoadedClerk,
+  shouldShowBilling: boolean,
   environment?: EnvironmentResource,
 ) => {
   return createCustomPages(
@@ -85,6 +87,7 @@ export const createOrganizationProfileCustomPages = (
       excludedPathsFromDuplicateWarning: [],
     },
     clerk,
+    shouldShowBilling,
     environment,
     true,
   );
@@ -93,13 +96,14 @@ export const createOrganizationProfileCustomPages = (
 const createCustomPages = (
   { customPages, getDefaultRoutes, setFirstPathToRoot, excludedPathsFromDuplicateWarning }: CreateCustomPagesParams,
   clerk: LoadedClerk,
+  shouldShowBilling: boolean,
   environment?: EnvironmentResource,
   organization?: boolean,
 ) => {
   const { INITIAL_ROUTES, pageToRootNavbarRouteMap, validReorderItemLabels } = getDefaultRoutes({
-    commerce:
-      !disabledBillingFeature(clerk, environment) &&
-      (organization ? hasPaidOrgPlans(clerk, environment) : hasPaidUserPlans(clerk, environment)),
+    commerce: organization
+      ? !disabledOrganizationBillingFeature(clerk, environment) && shouldShowBilling
+      : !disabledUserBillingFeature(clerk, environment) && shouldShowBilling,
     apiKeys: !disabledAPIKeysFeature(clerk, environment) && (organization ? canViewOrManageAPIKeys(clerk) : true),
   });
 

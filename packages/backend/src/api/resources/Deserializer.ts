@@ -15,7 +15,10 @@ import {
   InstanceSettings,
   Invitation,
   JwtTemplate,
-  MachineToken,
+  M2MToken,
+  Machine,
+  MachineScope,
+  MachineSecretKey,
   OauthAccessToken,
   OAuthApplication,
   Organization,
@@ -34,6 +37,10 @@ import {
   User,
 } from '.';
 import { AccountlessApplication } from './AccountlessApplication';
+import { CommercePlan } from './CommercePlan';
+import { CommerceSubscription } from './CommerceSubscription';
+import { CommerceSubscriptionItem } from './CommerceSubscriptionItem';
+import { Feature } from './Feature';
 import type { PaginatedResponseJSON } from './JSON';
 import { ObjectType } from './JSON';
 import { WaitlistEntry } from './WaitlistEntry';
@@ -132,8 +139,14 @@ function jsonToObject(item: any): any {
       return Invitation.fromJSON(item);
     case ObjectType.JwtTemplate:
       return JwtTemplate.fromJSON(item);
-    case ObjectType.MachineToken:
-      return MachineToken.fromJSON(item);
+    case ObjectType.Machine:
+      return Machine.fromJSON(item);
+    case ObjectType.MachineScope:
+      return MachineScope.fromJSON(item);
+    case ObjectType.MachineSecretKey:
+      return MachineSecretKey.fromJSON(item);
+    case ObjectType.M2MToken:
+      return M2MToken.fromJSON(item);
     case ObjectType.OauthAccessToken:
       return OauthAccessToken.fromJSON(item);
     case ObjectType.OAuthApplication:
@@ -170,6 +183,14 @@ function jsonToObject(item: any): any {
       return User.fromJSON(item);
     case ObjectType.WaitlistEntry:
       return WaitlistEntry.fromJSON(item);
+    case ObjectType.CommercePlan:
+      return CommercePlan.fromJSON(item);
+    case ObjectType.CommerceSubscription:
+      return CommerceSubscription.fromJSON(item);
+    case ObjectType.CommerceSubscriptionItem:
+      return CommerceSubscriptionItem.fromJSON(item);
+    case ObjectType.Feature:
+      return Feature.fromJSON(item);
     default:
       return item;
   }

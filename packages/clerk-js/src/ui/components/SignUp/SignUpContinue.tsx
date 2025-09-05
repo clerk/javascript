@@ -38,6 +38,7 @@ function SignUpContinueInternal() {
     unsafeMetadata,
     initialValues = {},
     isCombinedFlow: _isCombinedFlow,
+    navigateOnSetActive,
   } = useSignUpContext();
   const signUp = useCoreSignUp();
   const isWithinSignInContext = !!React.useContext(SignInContext);
@@ -178,7 +179,13 @@ function SignUpContinueInternal() {
           signUp: res,
           verifyEmailPath: './verify-email-address',
           verifyPhonePath: './verify-phone-number',
-          handleComplete: () => clerk.setActive({ session: res.createdSessionId, redirectUrl: afterSignUpUrl }),
+          handleComplete: () =>
+            clerk.setActive({
+              session: res.createdSessionId,
+              navigate: async ({ session }) => {
+                await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl });
+              },
+            }),
           navigate,
           oidcPrompt: ctx.oidcPrompt,
         }),

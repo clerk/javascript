@@ -2,11 +2,11 @@ import type { User } from '@clerk/backend';
 import type { APIContext } from 'astro';
 
 import { clerkClient } from './clerk-client';
-import { getAuth } from './get-auth';
 
-export const createCurrentUser = (req: Request, context: APIContext) => {
+export const createCurrentUser = (context: APIContext) => {
   return async (): Promise<User | null> => {
-    const { userId } = getAuth(req, context.locals);
+    const { userId } = context.locals.auth();
+
     if (!userId) {
       return null;
     }

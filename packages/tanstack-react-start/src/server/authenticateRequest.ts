@@ -1,23 +1,19 @@
 import { createClerkClient } from '@clerk/backend';
-import type { AuthenticatedState, AuthenticateRequestOptions, UnauthenticatedState } from '@clerk/backend/internal';
-import { AuthStatus, constants } from '@clerk/backend/internal';
-import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
+import type { AuthenticateRequestOptions, RequestState } from '@clerk/backend/internal';
 
-import { errorThrower } from '../utils';
 import { patchRequest } from './utils';
 
-export async function authenticateRequest(
-  request: Request,
-  opts: AuthenticateRequestOptions,
-): Promise<AuthenticatedState | UnauthenticatedState> {
+export async function authenticateRequest(request: Request, opts: AuthenticateRequestOptions): Promise<RequestState> {
   const { audience, authorizedParties } = opts;
 
-  const { apiUrl, secretKey, jwtKey, proxyUrl, isSatellite, domain, publishableKey, acceptsToken } = opts;
+  const { apiUrl, secretKey, jwtKey, proxyUrl, isSatellite, domain, publishableKey, acceptsToken, machineSecretKey } =
+    opts;
   const { signInUrl, signUpUrl, afterSignInUrl, afterSignUpUrl } = opts;
 
   const requestState = await createClerkClient({
     apiUrl,
     secretKey,
+    machineSecretKey,
     jwtKey,
     proxyUrl,
     isSatellite,
@@ -33,23 +29,6 @@ export async function authenticateRequest(
     afterSignUpUrl,
     acceptsToken,
   });
-
-  const locationHeader = requestState.headers.get(constants.Headers.Location);
-  if (locationHeader) {
-    handleNetlifyCacheInDevInstance({
-      locationHeader,
-      requestStateHeaders: requestState.headers,
-      publishableKey: requestState.publishableKey,
-    });
-    // triggering a handshake redirect
-    // eslint-disable-next-line @typescript-eslint/only-throw-error
-    throw new Response(null, { status: 307, headers: requestState.headers });
-  }
-
-  if (requestState.status === AuthStatus.Handshake) {
-    // eslint-disable-next-line @typescript-eslint/only-throw-error
-    throw errorThrower.throw('Clerk: unexpected handshake without redirect');
-  }
 
   return requestState;
 }

@@ -2,6 +2,7 @@ import type {
   __experimental_CheckoutCacheState,
   __experimental_CheckoutInstance,
   __experimental_CheckoutOptions,
+  SetActiveNavigate,
 } from '@clerk/types';
 
 import type { Clerk } from '../../clerk';
@@ -24,7 +25,7 @@ function createCheckoutInstance(
 ): __experimental_CheckoutInstance {
   const { for: forOrganization, planId, planPeriod } = options;
 
-  if (!clerk.user) {
+  if (!clerk.isSignedIn || !clerk.user) {
     throw new Error('Clerk: User is not authenticated');
   }
 
@@ -62,9 +63,9 @@ function createCheckoutInstance(
     });
   };
 
-  const finalize = (params?: { redirectUrl: string }) => {
-    const { redirectUrl } = params || {};
-    void clerk.setActive({ session: clerk.session?.id, redirectUrl });
+  const finalize = (params?: { navigate?: SetActiveNavigate }) => {
+    const { navigate } = params || {};
+    return clerk.setActive({ session: clerk.session?.id, navigate });
   };
 
   const clear = () => manager.clearCheckout();

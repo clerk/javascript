@@ -1200,7 +1200,7 @@ describe('tokens.authenticateRequest(options)', () => {
     });
 
     // Test each token type with parameterized tests
-    const tokenTypes = [TokenType.ApiKey, TokenType.OAuthToken, TokenType.MachineToken];
+    const tokenTypes = [TokenType.ApiKey, TokenType.OAuthToken, TokenType.M2MToken];
 
     describe.each(tokenTypes)('%s Authentication', tokenType => {
       const mockToken = mockTokens[tokenType];
@@ -1242,6 +1242,34 @@ describe('tokens.authenticateRequest(options)', () => {
       });
     });
 
+    test('accepts machine secret when verifying machine-to-machine token', async () => {
+      server.use(
+        http.post(mockMachineAuthResponses.m2m_token.endpoint, ({ request }) => {
+          expect(request.headers.get('Authorization')).toBe('Bearer ak_xxxxx');
+          return HttpResponse.json(mockVerificationResults.m2m_token);
+        }),
+      );
+
+      const request = mockRequest({ authorization: `Bearer ${mockTokens.m2m_token}` });
+      const requestState = await authenticateRequest(
+        request,
+        mockOptions({ acceptsToken: 'm2m_token', machineSecretKey: 'ak_xxxxx' }),
+      );
+
+      expect(requestState).toBeMachineAuthenticated();
+    });
+
+    test('throws an error if acceptsToken is m2m_token but machineSecretKey or secretKey is not provided', async () => {
+      const request = mockRequest({ authorization: `Bearer ${mockTokens.m2m_token}` });
+
+      await expect(
+        authenticateRequest(request, mockOptions({ acceptsToken: 'm2m_token', secretKey: undefined })),
+      ).rejects.toThrow(
+        'Machine token authentication requires either a Machine secret key or a Clerk secret key. ' +
+          'Ensure a Clerk secret key or Machine secret key is set.',
+      );
+    });
+
     describe('Any Token Type Authentication', () => {
       test.each(tokenTypes)('accepts %s when acceptsToken is "any"', async tokenType => {
         const mockToken = mockTokens[tokenType];
@@ -1281,58 +1309,58 @@ describe('tokens.authenticateRequest(options)', () => {
         const result = await authenticateRequest(request, mockOptions({ acceptsToken: 'oauth_token' }));
 
         expect(result).toBeMachineUnauthenticated({
-          tokenType: 'api_key',
+          tokenType: 'oauth_token',
           reason: AuthErrorReason.TokenTypeMismatch,
           message: '',
         });
         expect(result.toAuth()).toBeMachineUnauthenticatedToAuth({
-          tokenType: 'api_key',
+          tokenType: 'oauth_token',
           isAuthenticated: false,
         });
       });
 
       test('returns unauthenticated state when token type mismatches (OAuth token provided, M2M token expected)', async () => {
         const request = mockRequest({ authorization: `Bearer ${mockTokens.oauth_token}` });
-        const result = await authenticateRequest(request, mockOptions({ acceptsToken: 'machine_token' }));
+        const result = await authenticateRequest(request, mockOptions({ acceptsToken: 'm2m_token' }));
 
         expect(result).toBeMachineUnauthenticated({
-          tokenType: 'oauth_token',
+          tokenType: 'm2m_token',
           reason: AuthErrorReason.TokenTypeMismatch,
           message: '',
         });
         expect(result.toAuth()).toBeMachineUnauthenticatedToAuth({
-          tokenType: 'oauth_token',
+          tokenType: 'm2m_token',
           isAuthenticated: false,
         });
       });
 
       test('returns unauthenticated state when token type mismatches (M2M token provided, API key expected)', async () => {
-        const request = mockRequest({ authorization: `Bearer ${mockTokens.machine_token}` });
+        const request = mockRequest({ authorization: `Bearer ${mockTokens.m2m_token}` });
         const result = await authenticateRequest(request, mockOptions({ acceptsToken: 'api_key' }));
 
         expect(result).toBeMachineUnauthenticated({
-          tokenType: 'machine_token',
+          tokenType: 'api_key',
           reason: AuthErrorReason.TokenTypeMismatch,
           message: '',
         });
         expect(result.toAuth()).toBeMachineUnauthenticatedToAuth({
-          tokenType: 'machine_token',
+          tokenType: 'api_key',
           isAuthenticated: false,
         });
       });
 
       test('returns unauthenticated state when session token is provided but machine token is expected', async () => {
         const request = mockRequestWithHeaderAuth();
-        const result = await authenticateRequest(request, mockOptions({ acceptsToken: 'machine_token' }));
+        const result = await authenticateRequest(request, mockOptions({ acceptsToken: 'm2m_token' }));
 
         expect(result).toBeMachineUnauthenticated({
-          tokenType: 'machine_token',
+          tokenType: 'm2m_token',
           reason: AuthErrorReason.TokenTypeMismatch,
           message: '',
           isAuthenticated: false,
         });
         expect(result.toAuth()).toBeMachineUnauthenticatedToAuth({
-          tokenType: 'machine_token',
+          tokenType: 'm2m_token',
           isAuthenticated: false,
         });
       });
@@ -1356,7 +1384,7 @@ describe('tokens.authenticateRequest(options)', () => {
       });
 
       test('returns unauthenticated state when token type is not in the acceptsToken array', async () => {
-        const request = mockRequest({ authorization: `Bearer ${mockTokens.machine_token}` });
+        const request = mockRequest({ authorization: `Bearer ${mockTokens.m2m_token}` });
         const requestState = await authenticateRequest(
           request,
           mockOptions({ acceptsToken: ['api_key', 'oauth_token'] }),
@@ -1411,7 +1439,6 @@ describe('tokens.authenticateRequest(options)', () => {
         {
           referer: 'https://satellite.com/signin',
           'sec-fetch-dest': 'document',
-          origin: 'https://primary.com',
         },
         {
           __session: mockJwt,
@@ -1441,7 +1468,6 @@ describe('tokens.authenticateRequest(options)', () => {
           referer: 'https://satellite.com/signin',
           'sec-fetch-dest': 'document',
           'sec-fetch-site': 'cross-site',
-          origin: 'https://primary.com',
         },
         {
           __session: mockJwt,
@@ -1468,9 +1494,9 @@ describe('tokens.authenticateRequest(options)', () => {
     test('does not trigger handshake when referer is same origin', async () => {
       const request = mockRequestWithCookies(
         {
+          host: 'primary.com',
           referer: 'https://primary.com/signin',
           'sec-fetch-dest': 'document',
-          origin: 'https://primary.com',
         },
         {
           __session: mockJwt,
@@ -1491,6 +1517,31 @@ describe('tokens.authenticateRequest(options)', () => {
         domain: 'primary.com',
         isSatellite: false,
         signInUrl: 'https://primary.com/sign-in',
+      });
+    });
+
+    test('does not trigger handshake when referer is same origin', async () => {
+      const request = mockRequestWithCookies(
+        {
+          host: 'localhost:3000',
+          referer: 'http://localhost:3000',
+          'sec-fetch-dest': 'document',
+        },
+        {
+          __clerk_db_jwt: mockJwt,
+          __session: mockJwt,
+          __client_uat: '12345',
+        },
+        'http://localhost:3000',
+      );
+
+      const requestState = await authenticateRequest(request, {
+        ...mockOptions(),
+        signInUrl: 'http://localhost:3000/sign-in',
+      });
+
+      expect(requestState).toBeSignedIn({
+        signInUrl: 'http://localhost:3000/sign-in',
       });
     });
 
@@ -1573,6 +1624,228 @@ describe('tokens.authenticateRequest(options)', () => {
         signInUrl: 'https://primary.com/sign-in',
       });
 
+      expect(requestState).toBeSignedIn({
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+    });
+
+    test('does not trigger handshake when referer is from production accounts portal', async () => {
+      const request = mockRequestWithCookies(
+        {
+          referer: 'https://accounts.example.com/sign-in',
+          'sec-fetch-dest': 'document',
+          'sec-fetch-site': 'cross-site',
+        },
+        {
+          __session: mockJwt,
+          __client_uat: '12345',
+        },
+        'https://primary.com/dashboard',
+      );
+
+      const requestState = await authenticateRequest(request, {
+        ...mockOptions(),
+        publishableKey: PK_LIVE,
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+
+      expect(requestState).toBeSignedIn({
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+    });
+
+    test('does not trigger handshake when referer is from dev accounts portal (current format)', async () => {
+      const request = mockRequestWithCookies(
+        {
+          referer: 'https://foo-bar-13.accounts.dev/sign-in',
+          'sec-fetch-dest': 'document',
+          'sec-fetch-site': 'cross-site',
+        },
+        {
+          __session: mockJwt,
+          __client_uat: '12345',
+        },
+        'https://primary.com/dashboard',
+      );
+
+      const requestState = await authenticateRequest(request, {
+        ...mockOptions(),
+        publishableKey: PK_LIVE,
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+
+      expect(requestState).toBeSignedIn({
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+    });
+
+    test('does not trigger handshake when referer is from dev accounts portal (legacy format)', async () => {
+      const request = mockRequestWithCookies(
+        {
+          referer: 'https://accounts.foo-bar-13.lcl.dev/sign-in',
+          'sec-fetch-dest': 'document',
+          'sec-fetch-site': 'cross-site',
+        },
+        {
+          __session: mockJwt,
+          __client_uat: '12345',
+        },
+        'https://primary.com/dashboard',
+      );
+
+      const requestState = await authenticateRequest(request, {
+        ...mockOptions(),
+        publishableKey: PK_LIVE,
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+
+      expect(requestState).toBeSignedIn({
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+    });
+
+    test('does not trigger cross-origin handshake when referer is from expected accounts portal derived from frontend API', async () => {
+      const request = mockRequestWithCookies(
+        {
+          referer: 'https://accounts.inspired.puma-74.lcl.dev/sign-in',
+          'sec-fetch-dest': 'document',
+          'sec-fetch-site': 'cross-site',
+        },
+        {
+          __session: mockJwt,
+          __client_uat: '12345',
+        },
+        'https://primary.com/dashboard',
+      );
+
+      const requestState = await authenticateRequest(request, {
+        ...mockOptions(),
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+
+      // Should not trigger the specific cross-origin sync handshake we're trying to prevent
+      expect(requestState.reason).not.toBe(AuthErrorReason.PrimaryDomainCrossOriginSync);
+    });
+
+    test('does not trigger handshake when referer is from FAPI domain (redirect-based auth)', async () => {
+      const request = mockRequestWithCookies(
+        {
+          referer: 'https://clerk.inspired.puma-74.lcl.dev/v1/client/sign_ins/12345/attempt_first_factor',
+          'sec-fetch-dest': 'document',
+          'sec-fetch-site': 'cross-site',
+        },
+        {
+          __session: mockJwt,
+          __client_uat: '12345',
+        },
+        'https://primary.com/dashboard',
+      );
+
+      const requestState = await authenticateRequest(request, {
+        ...mockOptions(),
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+
+      // Should not trigger the specific cross-origin sync handshake we're trying to prevent
+      expect(requestState.reason).not.toBe(AuthErrorReason.PrimaryDomainCrossOriginSync);
+    });
+
+    test('does not trigger handshake when referer is from FAPI domain with https prefix', async () => {
+      const request = mockRequestWithCookies(
+        {
+          referer: 'https://clerk.inspired.puma-74.lcl.dev/sign-in',
+          'sec-fetch-dest': 'document',
+          'sec-fetch-site': 'cross-site',
+        },
+        {
+          __session: mockJwt,
+          __client_uat: '12345',
+        },
+        'https://primary.com/dashboard',
+      );
+
+      const requestState = await authenticateRequest(request, {
+        ...mockOptions(),
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+
+      // Should not trigger the specific cross-origin sync handshake we're trying to prevent
+      expect(requestState.reason).not.toBe(AuthErrorReason.PrimaryDomainCrossOriginSync);
+    });
+
+    test('still triggers handshake for legitimate cross-origin requests from non-accounts domains', async () => {
+      const request = mockRequestWithCookies(
+        {
+          referer: 'https://satellite.com/sign-in',
+          'sec-fetch-dest': 'document',
+          'sec-fetch-site': 'cross-site',
+        },
+        {
+          __session: mockJwt,
+          __client_uat: '12345',
+        },
+        'https://primary.com/dashboard',
+      );
+
+      const requestState = await authenticateRequest(request, {
+        ...mockOptions(),
+        publishableKey: PK_LIVE,
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+
+      expect(requestState).toMatchHandshake({
+        reason: AuthErrorReason.PrimaryDomainCrossOriginSync,
+        domain: 'primary.com',
+        signInUrl: 'https://primary.com/sign-in',
+      });
+    });
+
+    test('does not trigger handshake when referrer matches current origin despite sec-fetch-site cross-site (redirect chain)', async () => {
+      const request = mockRequestWithCookies(
+        {
+          host: 'primary.com',
+          referer: 'https://primary.com/some-page',
+          'sec-fetch-dest': 'document',
+          'sec-fetch-site': 'cross-site', // This can happen due to redirect chains through Clerk domains
+        },
+        {
+          __session: mockJwt,
+          __client_uat: '12345',
+        },
+        'https://primary.com/dashboard',
+      );
+
+      const requestState = await authenticateRequest(request, {
+        ...mockOptions(),
+        publishableKey: PK_LIVE,
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+
+      // Should not trigger handshake because referrer origin matches current origin
       expect(requestState).toBeSignedIn({
         domain: 'primary.com',
         isSatellite: false,

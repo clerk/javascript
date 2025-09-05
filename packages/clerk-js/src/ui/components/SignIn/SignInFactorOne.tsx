@@ -1,3 +1,4 @@
+import { useClerk } from '@clerk/shared/react';
 import type { SignInFactor } from '@clerk/types';
 import React from 'react';
 
@@ -5,7 +6,7 @@ import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { ErrorCard } from '@/ui/elements/ErrorCard';
 import { LoadingCard } from '@/ui/elements/LoadingCard';
 
-import { withRedirectToAfterSignIn } from '../../common';
+import { withRedirectToAfterSignIn, withRedirectToSignInTask } from '../../common';
 import { useCoreSignIn, useEnvironment } from '../../contexts';
 import { useAlternativeStrategies } from '../../hooks/useAlternativeStrategies';
 import { localizationKeys } from '../../localization';
@@ -39,6 +40,7 @@ const factorKey = (factor: SignInFactor | null | undefined) => {
 };
 
 function SignInFactorOneInternal(): JSX.Element {
+  const { __internal_setActiveInProgress } = useClerk();
   const signIn = useCoreSignIn();
   const { preferredSignInStrategy } = useEnvironment().displayConfig;
   const availableFactors = signIn.supportedFirstFactors;
@@ -83,21 +85,27 @@ function SignInFactorOneInternal(): JSX.Element {
   const [isPasswordPwned, setIsPasswordPwned] = React.useState(false);
 
   React.useEffect(() => {
+    if (__internal_setActiveInProgress) {
+      return;
+    }
+
     // Handle the case where a user lands on alternative methods screen,
     // clicks a social button but then navigates back to sign in.
     // SignIn status resets to 'needs_identifier'
     if (signIn.status === 'needs_identifier' || signIn.status === null) {
       void router.navigate('../');
     }
-  }, []);
+  }, [__internal_setActiveInProgress]);
 
-  if (!currentFactor && signIn.status) {
-    return (
+  if (!currentFactor) {
+    return signIn.status ? (
       <ErrorCard
         cardTitle={localizationKeys('signIn.noAvailableMethods.title')}
         cardSubtitle={localizationKeys('signIn.noAvailableMethods.subtitle')}
         message={localizationKeys('signIn.noAvailableMethods.message')}
       />
+    ) : (
+      <LoadingCard />
     );
   }
 
@@ -243,4 +251,6 @@ function SignInFactorOneInternal(): JSX.Element {
   }
 }
 
-export const SignInFactorOne = withRedirectToAfterSignIn(withCardStateProvider(SignInFactorOneInternal));
+export const SignInFactorOne = withRedirectToSignInTask(
+  withRedirectToAfterSignIn(withCardStateProvider(SignInFactorOneInternal)),
+);

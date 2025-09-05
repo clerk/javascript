@@ -1,3 +1,5 @@
+import { buildAccountsBaseUrl } from '@clerk/shared/buildAccountsBaseUrl';
+import { isCurrentDevAccountPortalOrigin, isLegacyDevAccountPortalOrigin } from '@clerk/shared/url';
 import type { Jwt } from '@clerk/types';
 
 import { constants } from '../constants';
@@ -6,6 +8,7 @@ import { runtime } from '../runtime';
 import { assertValidPublishableKey } from '../util/optionsAssertions';
 import { getCookieSuffix, getSuffixedCookieName, parsePublishableKey } from '../util/shared';
 import type { ClerkRequest } from './clerkRequest';
+import { TokenType } from './tokenTypes';
 import type { AuthenticateRequestOptions } from './types';
 
 interface AuthenticateContext extends AuthenticateRequestOptions {
@@ -66,14 +69,20 @@ class AuthenticateContext implements AuthenticateContext {
     private clerkRequest: ClerkRequest,
     options: AuthenticateRequestOptions,
   ) {
-    // Even though the options are assigned to this later in this function
-    // we set the publishableKey here because it is being used in cookies/headers/handshake-values
-    // as part of getMultipleAppsCookie
-    this.initPublishableKeyValues(options);
-    this.initHeaderValues();
-    // initCookieValues should be used before initHandshakeValues because it depends on suffixedCookies
-    this.initCookieValues();
-    this.initHandshakeValues();
+    if (options.acceptsToken === TokenType.M2MToken || options.acceptsToken === TokenType.ApiKey) {
+      // For non-session tokens, we only want to set the header values.
+      this.initHeaderValues();
+    } else {
+      // Even though the options are assigned to this later in this function
+      // we set the publishableKey here because it is being used in cookies/headers/handshake-values
+      // as part of getMultipleAppsCookie.
+      this.initPublishableKeyValues(options);
+      this.initHeaderValues();
+      // initCookieValues should be used before initHandshakeValues because it depends on suffixedCookies
+      this.initCookieValues();
+      this.initHandshakeValues();
+    }
+
     Object.assign(this, options);
     this.clerkUrl = this.clerkRequest.clerkUrl;
   }
@@ -174,19 +183,65 @@ class AuthenticateContext implements AuthenticateContext {
    * @returns {boolean} True if referrer exists and is from a different origin, false otherwise.
    */
   public isCrossOriginReferrer(): boolean {
-    if (!this.referrer || !this.origin) {
+    if (!this.referrer || !this.clerkUrl.origin) {
       return false;
     }
 
     try {
-      if (this.getHeader(constants.Headers.SecFetchSite) === 'cross-site') {
+      const referrerOrigin = new URL(this.referrer).origin;
+      return referrerOrigin !== this.clerkUrl.origin;
+    } catch {
+      // Invalid referrer URL format
+      return false;
+    }
+  }
+
+  /**
+   * Determines if the referrer URL is from a Clerk domain (accounts portal or FAPI).
+   * This includes both development and production account portal domains, as well as FAPI domains
+   * used for redirect-based authentication flows.
+   *
+   * @returns {boolean} True if the referrer is from a Clerk accounts portal or FAPI domain, false otherwise
+   */
+  public isKnownClerkReferrer(): boolean {
+    if (!this.referrer) {
+      return false;
+    }
+
+    try {
+      const referrerOrigin = new URL(this.referrer);
+      const referrerHost = referrerOrigin.hostname;
+
+      // Check if referrer is the FAPI domain itself (redirect-based auth flows)
+      if (this.frontendApi) {
+        const fapiHost = this.frontendApi.startsWith('http') ? new URL(this.frontendApi).hostname : this.frontendApi;
+        if (referrerHost === fapiHost) {
+          return true;
+        }
+      }
+
+      // Check for development account portal patterns
+      if (isLegacyDevAccountPortalOrigin(referrerHost) || isCurrentDevAccountPortalOrigin(referrerHost)) {
         return true;
       }
 
-      const referrerOrigin = new URL(this.referrer).origin;
-      return referrerOrigin !== this.origin;
+      // Check for production account portal by comparing with expected accounts URL
+      const expectedAccountsUrl = buildAccountsBaseUrl(this.frontendApi);
+      if (expectedAccountsUrl) {
+        const expectedAccountsOrigin = new URL(expectedAccountsUrl).origin;
+        if (referrerOrigin.origin === expectedAccountsOrigin) {
+          return true;
+        }
+      }
+
+      // Check for generic production accounts patterns (accounts.*)
+      if (referrerHost.startsWith('accounts.')) {
+        return true;
+      }
+
+      return false;
     } catch {
-      // Invalid referrer URL format
+      // Invalid URL format
       return false;
     }
   }

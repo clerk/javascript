@@ -10,6 +10,7 @@ describe('SubscriptionDetails', () => {
   it('Displays spinner when init loading', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     const { baseElement } = render(
@@ -31,38 +32,62 @@ describe('SubscriptionDetails', () => {
   it('single active monthly subscription', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
-    fixtures.clerk.billing.getSubscriptions.mockResolvedValue({
-      data: [
+    fixtures.clerk.billing.getSubscription.mockResolvedValue({
+      activeAt: new Date('2021-01-01'),
+      createdAt: new Date('2021-01-01'),
+      pastDueAt: null,
+      id: 'sub_123',
+      nextPayment: {
+        amount: {
+          amount: 1000,
+          amountFormatted: '10.00',
+          currency: 'USD',
+          currencySymbol: '$',
+        },
+        date: new Date('2021-02-01'),
+      },
+      status: 'active',
+      subscriptionItems: [
         {
           id: 'sub_123',
           plan: {
             id: 'plan_123',
             name: 'Test Plan',
-            amount: 1000,
-            amountFormatted: '10.00',
-            annualAmount: 10000,
-            annualAmountFormatted: '100.00',
-            annualMonthlyAmount: 8333,
-            annualMonthlyAmountFormatted: '83.33',
-            currencySymbol: '$',
+            fee: {
+              amount: 1000,
+              amountFormatted: '10.00',
+              currencySymbol: '$',
+              currency: 'USD',
+            },
+            annualFee: {
+              amount: 10000,
+              amountFormatted: '100.00',
+              currencySymbol: '$',
+              currency: 'USD',
+            },
+            annualMonthlyFee: {
+              amount: 8333,
+              amountFormatted: '83.33',
+              currencySymbol: '$',
+              currency: 'USD',
+            },
             description: 'Test Plan',
             hasBaseFee: true,
             isRecurring: true,
-            currency: 'USD',
             isDefault: false,
           },
           createdAt: new Date('2021-01-01'),
-          periodStartDate: new Date('2021-01-01'),
-          periodEndDate: new Date('2021-02-01'),
-          canceledAtDate: null,
+          periodStart: new Date('2021-01-01'),
+          periodEnd: new Date('2021-02-01'),
+          canceledAt: null,
           paymentSourceId: 'src_123',
           planPeriod: 'month',
           status: 'active',
         },
       ],
-      total_count: 1,
     });
 
     const { getByRole, getByText, queryByText, getAllByText, userEvent } = render(
@@ -103,7 +128,7 @@ describe('SubscriptionDetails', () => {
     await userEvent.click(menuButton);
 
     await waitFor(() => {
-      expect(getByText('Switch to annual $100.00 / year')).toBeVisible();
+      expect(getByText('Switch to annual $100 / year')).toBeVisible();
       expect(getByText('Cancel subscription')).toBeVisible();
     });
   });
@@ -111,38 +136,62 @@ describe('SubscriptionDetails', () => {
   it('single active annual subscription', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
-    fixtures.clerk.billing.getSubscriptions.mockResolvedValue({
-      data: [
+    fixtures.clerk.billing.getSubscription.mockResolvedValue({
+      activeAt: new Date('2021-01-01'),
+      createdAt: new Date('2021-01-01'),
+      pastDueAt: null,
+      id: 'sub_123',
+      nextPayment: {
+        amount: {
+          amount: 10000,
+          amountFormatted: '100.00',
+          currency: 'USD',
+          currencySymbol: '$',
+        },
+        date: new Date('2022-01-01'),
+      },
+      status: 'active',
+      subscriptionItems: [
         {
           id: 'sub_123',
           plan: {
             id: 'plan_123',
             name: 'Test Plan',
-            amount: 1000,
-            amountFormatted: '10.00',
-            annualAmount: 10000,
-            annualAmountFormatted: '100.00',
-            annualMonthlyAmount: 8333,
-            annualMonthlyAmountFormatted: '83.33',
-            currencySymbol: '$',
+            fee: {
+              amount: 1000,
+              amountFormatted: '10.00',
+              currencySymbol: '$',
+              currency: 'USD',
+            },
+            annualFee: {
+              amount: 10000,
+              amountFormatted: '100.00',
+              currencySymbol: '$',
+              currency: 'USD',
+            },
+            annualMonthlyFee: {
+              amount: 8333,
+              amountFormatted: '83.33',
+              currencySymbol: '$',
+              currency: 'USD',
+            },
             description: 'Test Plan',
             hasBaseFee: true,
             isRecurring: true,
-            currency: 'USD',
             isDefault: false,
           },
           createdAt: new Date('2021-01-01'),
-          periodStartDate: new Date('2021-01-01'),
-          periodEndDate: new Date('2022-01-01'),
-          canceledAtDate: null,
+          periodStart: new Date('2021-01-01'),
+          periodEnd: new Date('2022-01-01'),
+          canceledAt: null,
           paymentSourceId: 'src_123',
           planPeriod: 'annual' as const,
           status: 'active' as const,
         },
       ],
-      total_count: 1,
     });
 
     const { getByRole, getByText, queryByText, getAllByText, userEvent } = render(
@@ -183,7 +232,7 @@ describe('SubscriptionDetails', () => {
     await userEvent.click(menuButton);
 
     await waitFor(() => {
-      expect(getByText('Switch to monthly $10.00 / month')).toBeVisible();
+      expect(getByText('Switch to monthly $10 / month')).toBeVisible();
       expect(getByText('Cancel subscription')).toBeVisible();
     });
   });
@@ -191,38 +240,54 @@ describe('SubscriptionDetails', () => {
   it('active free subscription', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
-    fixtures.clerk.billing.getSubscriptions.mockResolvedValue({
-      data: [
+    fixtures.clerk.billing.getSubscription.mockResolvedValue({
+      activeAt: new Date('2021-01-01'),
+      createdAt: new Date('2021-01-01'),
+      pastDueAt: null,
+      id: 'sub_123',
+      status: 'active',
+      nextPayment: null,
+      subscriptionItems: [
         {
           id: 'sub_123',
           plan: {
             id: 'plan_123',
             name: 'Free Plan',
-            amount: 0,
-            amountFormatted: '0.00',
-            annualAmount: 0,
-            annualAmountFormatted: '0.00',
-            annualMonthlyAmount: 0,
-            annualMonthlyAmountFormatted: '0.00',
-            currencySymbol: '$',
+            fee: {
+              amount: 0,
+              amountFormatted: '0.00',
+              currencySymbol: '$',
+              currency: 'USD',
+            },
+            annualFee: {
+              amount: 0,
+              amountFormatted: '0.00',
+              currencySymbol: '$',
+              currency: 'USD',
+            },
+            annualMonthlyFee: {
+              amount: 0,
+              amountFormatted: '0.00',
+              currencySymbol: '$',
+              currency: 'USD',
+            },
             description: 'Free Plan description',
             hasBaseFee: false,
             isRecurring: true,
-            currency: 'USD',
             isDefault: true,
           },
           createdAt: new Date('2021-01-01'),
-          periodStartDate: new Date('2021-01-01'),
-          periodEndDate: new Date('2021-02-01'),
-          canceledAtDate: null,
+          periodStart: new Date('2021-01-01'),
+          periodEnd: new Date('2021-02-01'),
+          canceledAt: null,
           paymentSourceId: 'src_123',
           planPeriod: 'month' as const,
           status: 'active' as const,
         },
       ],
-      total_count: 1,
     });
 
     const { getByRole, getByText, queryByText, queryByRole } = render(
@@ -258,22 +323,33 @@ describe('SubscriptionDetails', () => {
   it('one active annual and one upcoming monthly subscription', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     const planAnnual = {
       id: 'plan_annual',
       name: 'Annual Plan',
-      amount: 1300,
-      amountFormatted: '13.00',
-      annualAmount: 12000,
-      annualAmountFormatted: '120.00',
-      annualMonthlyAmount: 1000,
-      annualMonthlyAmountFormatted: '10.00',
-      currencySymbol: '$',
+      fee: {
+        amount: 1300,
+        amountFormatted: '13.00',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
+      annualFee: {
+        amount: 12000,
+        amountFormatted: '120.00',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
+      annualMonthlyFee: {
+        amount: 1000,
+        amountFormatted: '10.00',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
       description: 'Annual Plan',
       hasBaseFee: true,
       isRecurring: true,
-      currency: 'USD',
       isDefault: false,
       payerType: ['user'],
       publiclyVisible: true,
@@ -284,17 +360,27 @@ describe('SubscriptionDetails', () => {
     const planMonthly = {
       id: 'plan_monthly',
       name: 'Monthly Plan',
-      amount: 1000,
-      amountFormatted: '10.00',
-      annualAmount: 9000,
-      annualAmountFormatted: '90.00',
-      annualMonthlyAmount: 750,
-      annualMonthlyAmountFormatted: '7.50',
-      currencySymbol: '$',
+      fee: {
+        amount: 1000,
+        amountFormatted: '10.00',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
+      annualFee: {
+        amount: 9099,
+        amountFormatted: '90.99',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
+      annualMonthlyFee: {
+        amount: 750,
+        amountFormatted: '7.50',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
       description: 'Monthly Plan',
       hasBaseFee: true,
       isRecurring: true,
-      currency: 'USD',
       isDefault: false,
       payerType: ['user'],
       publiclyVisible: true,
@@ -303,15 +389,29 @@ describe('SubscriptionDetails', () => {
       features: [],
     };
 
-    fixtures.clerk.billing.getSubscriptions.mockResolvedValue({
-      data: [
+    fixtures.clerk.billing.getSubscription.mockResolvedValue({
+      activeAt: new Date('2021-01-01'),
+      createdAt: new Date('2021-01-01'),
+      pastDueAt: null,
+      id: 'sub_123',
+      status: 'active',
+      nextPayment: {
+        amount: {
+          amount: 1000,
+          amountFormatted: '10.00',
+          currency: 'USD',
+          currencySymbol: '$',
+        },
+        date: new Date('2021-02-01'),
+      },
+      subscriptionItems: [
         {
           id: 'sub_annual',
           plan: planAnnual,
           createdAt: new Date('2021-01-01'),
-          periodStartDate: new Date('2021-01-01'),
-          periodEndDate: new Date('2022-01-01'),
-          canceledAtDate: new Date('2021-04-01'),
+          periodStart: new Date('2021-01-01'),
+          periodEnd: new Date('2022-01-01'),
+          canceledAt: new Date('2021-04-01'),
           paymentSourceId: 'src_annual',
           planPeriod: 'annual' as const,
           status: 'active' as const,
@@ -320,15 +420,14 @@ describe('SubscriptionDetails', () => {
           id: 'sub_monthly',
           plan: planMonthly,
           createdAt: new Date('2022-01-01'),
-          periodStartDate: new Date('2022-02-01'),
-          periodEndDate: new Date('2022-03-01'),
-          canceledAtDate: null,
+          periodStart: new Date('2022-02-01'),
+          periodEnd: new Date('2022-03-01'),
+          canceledAt: null,
           paymentSourceId: 'src_monthly',
           planPeriod: 'month' as const,
           status: 'upcoming' as const,
         },
       ],
-      total_count: 2,
     });
 
     const { getByRole, getByText, getAllByText, queryByText, getAllByRole, userEvent } = render(
@@ -368,7 +467,7 @@ describe('SubscriptionDetails', () => {
     await userEvent.click(menuButton);
 
     await waitFor(() => {
-      expect(getByText('Switch to monthly $13.00 / month')).toBeVisible();
+      expect(getByText('Switch to monthly $13 / month')).toBeVisible();
       expect(getByText('Resubscribe')).toBeVisible();
       expect(queryByText('Cancel subscription')).toBeNull();
     });
@@ -376,7 +475,7 @@ describe('SubscriptionDetails', () => {
     await userEvent.click(upcomingMenuButton);
 
     await waitFor(() => {
-      expect(getByText('Switch to annual $90.00 / year')).toBeVisible();
+      expect(getByText('Switch to annual $90.99 / year')).toBeVisible();
       expect(getByText('Cancel subscription')).toBeVisible();
     });
   });
@@ -384,22 +483,34 @@ describe('SubscriptionDetails', () => {
   it('one active and one upcoming FREE subscription', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     const planMonthly = {
       id: 'plan_monthly',
       name: 'Monthly Plan',
-      amount: 1000,
-      amountFormatted: '10.00',
-      annualAmount: 9000,
-      annualAmountFormatted: '90.00',
-      annualMonthlyAmount: 750,
-      annualMonthlyAmountFormatted: '7.50',
-      currencySymbol: '$',
+
+      fee: {
+        amount: 1000,
+        amountFormatted: '10.00',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
+      annualFee: {
+        amount: 9000,
+        amountFormatted: '90.00',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
+      annualMonthlyFee: {
+        amount: 750,
+        amountFormatted: '7.50',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
       description: 'Monthly Plan',
       hasBaseFee: true,
       isRecurring: true,
-      currency: 'USD',
       isDefault: false,
       payerType: ['user'],
       publiclyVisible: true,
@@ -411,17 +522,27 @@ describe('SubscriptionDetails', () => {
     const planFreeUpcoming = {
       id: 'plan_free_upcoming',
       name: 'Free Plan (Upcoming)',
-      amount: 0,
-      amountFormatted: '0.00',
-      annualAmount: 0,
-      annualAmountFormatted: '0.00',
-      annualMonthlyAmount: 0,
-      annualMonthlyAmountFormatted: '0.00',
-      currencySymbol: '$',
+      fee: {
+        amount: 0,
+        amountFormatted: '0.00',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
+      annualFee: {
+        amount: 0,
+        amountFormatted: '0.00',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
+      annualMonthlyFee: {
+        amount: 0,
+        amountFormatted: '0.00',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
       description: 'Upcoming Free Plan',
       hasBaseFee: false,
       isRecurring: true,
-      currency: 'USD',
       isDefault: false,
       payerType: ['user'],
       publiclyVisible: true,
@@ -430,15 +551,21 @@ describe('SubscriptionDetails', () => {
       features: [],
     };
 
-    fixtures.clerk.billing.getSubscriptions.mockResolvedValue({
-      data: [
+    fixtures.clerk.billing.getSubscription.mockResolvedValue({
+      activeAt: new Date('2021-01-01'),
+      createdAt: new Date('2021-01-01'),
+      pastDueAt: null,
+      id: 'sub_123',
+      status: 'active',
+      nextPayment: null,
+      subscriptionItems: [
         {
           id: 'test_active',
           plan: planMonthly,
           createdAt: new Date('2021-01-01'),
-          periodStartDate: new Date('2021-01-01'),
-          periodEndDate: new Date('2021-02-01'),
-          canceledAtDate: new Date('2021-01-03'),
+          periodStart: new Date('2021-01-01'),
+          periodEnd: new Date('2021-02-01'),
+          canceledAt: new Date('2021-01-03'),
           paymentSourceId: 'src_free_active',
           planPeriod: 'month' as const,
           status: 'active' as const,
@@ -447,14 +574,13 @@ describe('SubscriptionDetails', () => {
           id: 'sub_free_upcoming',
           plan: planFreeUpcoming,
           createdAt: new Date('2021-01-03'),
-          periodStartDate: new Date('2021-02-01'),
-          canceledAtDate: null,
+          periodStart: new Date('2021-02-01'),
+          canceledAt: null,
           paymentSourceId: 'src_free_upcoming',
           planPeriod: 'month' as const,
           status: 'upcoming' as const,
         },
       ],
-      total_count: 2,
     });
 
     const { getByRole, getByText, queryByText, getAllByText } = render(
@@ -494,41 +620,65 @@ describe('SubscriptionDetails', () => {
   it('allows cancelling a subscription of a monthly plan', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     const cancelSubscriptionMock = jest.fn().mockResolvedValue({});
 
-    fixtures.clerk.billing.getSubscriptions.mockResolvedValue({
-      data: [
+    fixtures.clerk.billing.getSubscription.mockResolvedValue({
+      activeAt: new Date('2021-01-01'),
+      createdAt: new Date('2021-01-01'),
+      pastDueAt: null,
+      id: 'sub_123',
+      nextPayment: {
+        amount: {
+          amount: 1000,
+          amountFormatted: '10.00',
+          currency: 'USD',
+          currencySymbol: '$',
+        },
+        date: new Date('2021-01-01'),
+      },
+      status: 'active',
+      subscriptionItems: [
         {
           id: 'sub_123',
           plan: {
             id: 'plan_123',
             name: 'Monthly Plan',
-            amount: 1000,
-            amountFormatted: '10.00',
-            annualAmount: 10000,
-            annualAmountFormatted: '100.00',
-            annualMonthlyAmount: 8333,
-            annualMonthlyAmountFormatted: '83.33',
-            currencySymbol: '$',
+            fee: {
+              amount: 1000,
+              amountFormatted: '10.00',
+              currencySymbol: '$',
+              currency: 'USD',
+            },
+            annualFee: {
+              amount: 10000,
+              amountFormatted: '100.00',
+              currencySymbol: '$',
+              currency: 'USD',
+            },
+            annualMonthlyFee: {
+              amount: 8333,
+              amountFormatted: '83.33',
+              currencySymbol: '$',
+              currency: 'USD',
+            },
             description: 'Monthly Plan',
             hasBaseFee: true,
             isRecurring: true,
-            currency: 'USD',
             isDefault: false,
           },
           createdAt: new Date('2021-01-01'),
-          periodStartDate: new Date('2021-01-01'),
-          periodEndDate: new Date('2021-02-01'),
-          canceledAtDate: null,
+          periodStart: new Date('2021-01-01'),
+          periodEnd: new Date('2021-02-01'),
+          canceledAt: null,
           paymentSourceId: 'src_123',
           planPeriod: 'month' as const,
           status: 'active' as const,
           cancel: cancelSubscriptionMock,
         },
       ],
-      total_count: 1,
     });
 
     const { getByRole, getByText, userEvent } = render(
@@ -575,18 +725,31 @@ describe('SubscriptionDetails', () => {
   it('calls resubscribe when the user clicks Resubscribe for a canceled subscription', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     const plan = {
       id: 'plan_annual',
       name: 'Annual Plan',
-      amount: 12000,
-      amountFormatted: '120.00',
-      annualAmount: 12000,
-      annualAmountFormatted: '120.00',
-      annualMonthlyAmount: 1000,
-      annualMonthlyAmountFormatted: '10.00',
-      currencySymbol: '$',
+
+      fee: {
+        amount: 12000,
+        amountFormatted: '120.00',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
+      annualFee: {
+        amount: 12000,
+        amountFormatted: '120.00',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
+      annualMonthlyFee: {
+        amount: 1000,
+        amountFormatted: '10.00',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
       description: 'Annual Plan',
       hasBaseFee: true,
       isRecurring: true,
@@ -606,9 +769,9 @@ describe('SubscriptionDetails', () => {
       id: 'sub_annual',
       plan,
       createdAt: new Date('2021-01-01'),
-      periodStartDate: new Date('2021-01-01'),
-      periodEndDate: new Date('2022-01-01'),
-      canceledAtDate: new Date('2021-04-01'),
+      periodStart: new Date('2021-01-01'),
+      periodEnd: new Date('2022-01-01'),
+      canceledAt: new Date('2021-04-01'),
       paymentSourceId: 'src_annual',
       planPeriod: 'annual' as const,
       status: 'active' as const,
@@ -618,9 +781,21 @@ describe('SubscriptionDetails', () => {
     };
 
     // Mock getSubscriptions to return the canceled subscription
-    fixtures.clerk.billing.getSubscriptions.mockResolvedValue({
-      data: [subscription],
-      total_count: 1,
+    fixtures.clerk.billing.getSubscription.mockResolvedValue({
+      activeAt: new Date('2021-01-01'),
+      createdAt: new Date('2021-01-01'),
+      pastDueAt: null,
+      id: 'sub_123',
+      nextPayment: {
+        amount: {
+          amount: 1000,
+          amountFormatted: '10.00',
+          currency: 'USD',
+          currencySymbol: '$',
+        },
+        date: new Date('2021-01-01'),
+      },
+      subscriptionItems: [subscription],
     });
 
     const { getByRole, getByText, userEvent } = render(
@@ -653,18 +828,32 @@ describe('SubscriptionDetails', () => {
   it('calls switchToMonthly when the user clicks Switch to monthly for an annual subscription', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     const plan = {
       id: 'plan_annual',
       name: 'Annual Plan',
-      amount: 12000,
-      amountFormatted: '120.00',
-      annualAmount: 12000,
-      annualAmountFormatted: '120.00',
-      annualMonthlyAmount: 1000,
-      annualMonthlyAmountFormatted: '10.00',
-      currencySymbol: '$',
+
+      fee: {
+        amount: 12000,
+        amountFormatted: '120.00',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
+      annualFee: {
+        amount: 12000,
+        amountFormatted: '120.00',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
+      annualMonthlyFee: {
+        amount: 1000,
+        amountFormatted: '10.00',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
+
       description: 'Annual Plan',
       hasBaseFee: true,
       isRecurring: true,
@@ -681,9 +870,9 @@ describe('SubscriptionDetails', () => {
       id: 'sub_annual',
       plan,
       createdAt: new Date('2021-01-01'),
-      periodStartDate: new Date('2021-01-01'),
-      periodEndDate: new Date('2022-01-01'),
-      canceledAtDate: null,
+      periodStart: new Date('2021-01-01'),
+      periodEnd: new Date('2022-01-01'),
+      canceledAt: null,
       paymentSourceId: 'src_annual',
       planPeriod: 'annual' as const,
       status: 'active' as const,
@@ -693,9 +882,21 @@ describe('SubscriptionDetails', () => {
     };
 
     // Mock getSubscriptions to return the annual subscription
-    fixtures.clerk.billing.getSubscriptions.mockResolvedValue({
-      data: [subscription],
-      total_count: 1,
+    fixtures.clerk.billing.getSubscription.mockResolvedValue({
+      activeAt: new Date('2021-01-01'),
+      createdAt: new Date('2021-01-01'),
+      pastDueAt: null,
+      id: 'sub_123',
+      nextPayment: {
+        amount: {
+          amount: 1000,
+          amountFormatted: '10.00',
+          currency: 'USD',
+          currencySymbol: '$',
+        },
+        date: new Date('2021-01-01'),
+      },
+      subscriptionItems: [subscription],
     });
 
     const { getByRole, getByText, userEvent } = render(
@@ -733,22 +934,33 @@ describe('SubscriptionDetails', () => {
   it('past due subscription shows correct status and disables actions', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     const plan = {
       id: 'plan_monthly',
       name: 'Monthly Plan',
-      amount: 1000,
-      amountFormatted: '10.00',
-      annualAmount: 9000,
-      annualAmountFormatted: '90.00',
-      annualMonthlyAmount: 750,
-      annualMonthlyAmountFormatted: '7.50',
-      currencySymbol: '$',
+      fee: {
+        amount: 1000,
+        amountFormatted: '10.00',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
+      annualFee: {
+        amount: 9000,
+        amountFormatted: '90.00',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
+      annualMonthlyFee: {
+        amount: 750,
+        amountFormatted: '7.50',
+        currencySymbol: '$',
+        currency: 'USD',
+      },
       description: 'Monthly Plan',
       hasBaseFee: true,
       isRecurring: true,
-      currency: 'USD',
       isDefault: false,
       payerType: ['user'],
       publiclyVisible: true,
@@ -757,22 +969,34 @@ describe('SubscriptionDetails', () => {
       features: [],
     };
 
-    fixtures.clerk.billing.getSubscriptions.mockResolvedValue({
-      data: [
+    fixtures.clerk.billing.getSubscription.mockResolvedValue({
+      activeAt: new Date('2021-01-01'),
+      createdAt: new Date('2021-01-01'),
+      pastDueAt: null,
+      id: 'sub_123',
+      nextPayment: {
+        amount: {
+          amount: 1000,
+          amountFormatted: '10.00',
+          currency: 'USD',
+          currencySymbol: '$',
+        },
+        date: new Date('2021-01-01'),
+      },
+      subscriptionItems: [
         {
           id: 'sub_past_due',
           plan,
           createdAt: new Date('2021-01-01'),
-          periodStartDate: new Date('2021-01-01'),
-          periodEndDate: new Date('2021-02-01'),
-          canceledAtDate: null,
+          periodStart: new Date('2021-01-01'),
+          periodEnd: new Date('2021-02-01'),
+          canceledAt: null,
           paymentSourceId: 'src_123',
           planPeriod: 'month' as const,
           status: 'past_due' as const,
           pastDueAt: new Date('2021-01-15'),
         },
       ],
-      total_count: 1,
     });
 
     const { getByRole, getByText, queryByText, queryByRole } = render(
@@ -797,6 +1021,223 @@ describe('SubscriptionDetails', () => {
 
       // Menu button should be present but disabled
       expect(queryByRole('button', { name: /Open menu/i })).toBeNull();
+    });
+  });
+
+  it('active free trial subscription shows correct labels and behavior', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
+    });
+
+    fixtures.clerk.billing.getSubscription.mockResolvedValue({
+      activeAt: new Date('2021-01-01'),
+      createdAt: new Date('2021-01-01'),
+      pastDueAt: null,
+      id: 'sub_123',
+      nextPayment: {
+        amount: {
+          amount: 1000,
+          amountFormatted: '10.00',
+          currency: 'USD',
+          currencySymbol: '$',
+        },
+        date: new Date('2021-02-01'),
+      },
+      status: 'active',
+      subscriptionItems: [
+        {
+          id: 'sub_123',
+          plan: {
+            id: 'plan_123',
+            name: 'Pro Plan',
+            fee: {
+              amount: 1000,
+              amountFormatted: '10.00',
+              currencySymbol: '$',
+              currency: 'USD',
+            },
+            annualFee: {
+              amount: 10000,
+              amountFormatted: '100.00',
+              currencySymbol: '$',
+              currency: 'USD',
+            },
+            annualMonthlyFee: {
+              amount: 8333,
+              amountFormatted: '83.33',
+              currencySymbol: '$',
+              currency: 'USD',
+            },
+            description: 'Pro Plan',
+            hasBaseFee: true,
+            isRecurring: true,
+            isDefault: false,
+          },
+          createdAt: new Date('2021-01-01'),
+          periodStart: new Date('2021-01-01'),
+          periodEnd: new Date('2021-02-01'),
+          canceledAt: null,
+          paymentSourceId: 'src_123',
+          planPeriod: 'month',
+          status: 'active',
+          isFreeTrial: true,
+        },
+      ],
+    });
+
+    const { getByRole, getByText, getAllByText, queryByText, userEvent } = render(
+      <Drawer.Root
+        open
+        onOpenChange={() => {}}
+      >
+        <SubscriptionDetails />
+      </Drawer.Root>,
+      { wrapper },
+    );
+
+    await waitFor(() => {
+      expect(getByRole('heading', { name: /Subscription/i })).toBeVisible();
+      expect(getByText('Pro Plan')).toBeVisible();
+      expect(getByText('Free trial')).toBeVisible();
+      expect(getByText('$10.00 / Month')).toBeVisible();
+
+      // Free trial specific labels
+      expect(getByText('Trial started on')).toBeVisible();
+      expect(getByText('January 1, 2021')).toBeVisible();
+      expect(getByText('Trial ends on')).toBeVisible();
+
+      // Should have multiple instances of February 1, 2021 (trial end and first payment)
+      const februaryDates = getAllByText('February 1, 2021');
+      expect(februaryDates.length).toBeGreaterThan(1);
+
+      // Payment related labels should use "first payment" wording
+      expect(getByText('First payment on')).toBeVisible();
+      expect(getByText('First payment amount')).toBeVisible();
+      expect(getByText('$10.00')).toBeVisible();
+
+      // Should not show regular subscription labels
+      expect(queryByText('Subscribed on')).toBeNull();
+      expect(queryByText('Renews at')).toBeNull();
+      expect(queryByText('Next payment on')).toBeNull();
+      expect(queryByText('Next payment amount')).toBeNull();
+    });
+
+    // Test the menu shows free trial specific options
+    const menuButton = getByRole('button', { name: /Open menu/i });
+    expect(menuButton).toBeVisible();
+    await userEvent.click(menuButton);
+
+    await waitFor(() => {
+      expect(getByText('Cancel free trial')).toBeVisible();
+    });
+  });
+
+  it('allows cancelling a free trial with specific dialog text', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
+    });
+
+    const cancelSubscriptionMock = jest.fn().mockResolvedValue({});
+
+    fixtures.clerk.billing.getSubscription.mockResolvedValue({
+      activeAt: new Date('2021-01-01'),
+      createdAt: new Date('2021-01-01'),
+      pastDueAt: null,
+      id: 'sub_123',
+      nextPayment: {
+        amount: {
+          amount: 1000,
+          amountFormatted: '10.00',
+          currency: 'USD',
+          currencySymbol: '$',
+        },
+        date: new Date('2021-02-01'),
+      },
+      status: 'active',
+      subscriptionItems: [
+        {
+          id: 'sub_123',
+          plan: {
+            id: 'plan_123',
+            name: 'Pro Plan',
+            fee: {
+              amount: 1000,
+              amountFormatted: '10.00',
+              currencySymbol: '$',
+              currency: 'USD',
+            },
+            annualFee: {
+              amount: 10000,
+              amountFormatted: '100.00',
+              currencySymbol: '$',
+              currency: 'USD',
+            },
+            annualMonthlyFee: {
+              amount: 8333,
+              amountFormatted: '83.33',
+              currencySymbol: '$',
+              currency: 'USD',
+            },
+            description: 'Pro Plan',
+            hasBaseFee: true,
+            isRecurring: true,
+            isDefault: false,
+          },
+          createdAt: new Date('2021-01-01'),
+          periodStart: new Date('2021-01-01'),
+          periodEnd: new Date('2021-02-01'),
+          canceledAt: null,
+          paymentSourceId: 'src_123',
+          planPeriod: 'month',
+          status: 'active',
+          isFreeTrial: true,
+          cancel: cancelSubscriptionMock,
+        },
+      ],
+    });
+
+    const { getByRole, getByText, userEvent } = render(
+      <Drawer.Root
+        open
+        onOpenChange={() => {}}
+      >
+        <SubscriptionDetails />
+      </Drawer.Root>,
+      { wrapper },
+    );
+
+    // Wait for the subscription details to render
+    await waitFor(() => {
+      expect(getByText('Pro Plan')).toBeVisible();
+      expect(getByText('Free trial')).toBeVisible();
+    });
+
+    // Open the menu
+    const menuButton = getByRole('button', { name: /Open menu/i });
+    await userEvent.click(menuButton);
+
+    // Wait for the cancel option to appear and click it
+    await userEvent.click(getByText('Cancel free trial'));
+
+    await waitFor(() => {
+      // Should show free trial specific cancellation dialog
+      expect(getByText('Cancel free trial for Pro Plan plan?')).toBeVisible();
+      expect(
+        getByText(
+          "Your trial will stay active until February 1, 2021. After that, you'll lose access to trial features. You won't be charged.",
+        ),
+      ).toBeVisible();
+      expect(getByText('Keep free trial')).toBeVisible();
+    });
+
+    // Click the cancel button in the dialog
+    await userEvent.click(getByText('Cancel free trial'));
+
+    // Assert that the cancelSubscription method was called
+    await waitFor(() => {
+      expect(cancelSubscriptionMock).toHaveBeenCalled();
     });
   });
 });

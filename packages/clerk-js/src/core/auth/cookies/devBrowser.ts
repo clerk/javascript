@@ -12,6 +12,12 @@ export type DevBrowserCookieHandler = {
   remove: () => void;
 };
 
+const getCookieAttributes = (): { sameSite: string; secure: boolean } => {
+  const sameSite = inCrossOriginIframe() ? 'None' : 'Lax';
+  const secure = getSecureAttribute(sameSite);
+  return { sameSite, secure };
+};
+
 /**
  * Create a long-lived JS cookie to store the dev browser token
  * ONLY for development instances.
@@ -26,16 +32,16 @@ export const createDevBrowserCookie = (cookieSuffix: string): DevBrowserCookieHa
 
   const set = (jwt: string) => {
     const expires = addYears(Date.now(), 1);
-    const sameSite = inCrossOriginIframe() ? 'None' : 'Lax';
-    const secure = getSecureAttribute(sameSite);
+    const { sameSite, secure } = getCookieAttributes();
 
     suffixedDevBrowserCookie.set(jwt, { expires, sameSite, secure });
     devBrowserCookie.set(jwt, { expires, sameSite, secure });
   };
 
   const remove = () => {
-    suffixedDevBrowserCookie.remove();
-    devBrowserCookie.remove();
+    const attributes = getCookieAttributes();
+    suffixedDevBrowserCookie.remove(attributes);
+    devBrowserCookie.remove(attributes);
   };
 
   return {

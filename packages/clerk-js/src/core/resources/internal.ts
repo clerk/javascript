@@ -10,7 +10,6 @@ export * from './CommerceStatement';
 export * from './CommercePayment';
 export * from './CommercePaymentSource';
 export * from './CommercePlan';
-export * from './CommerceProduct';
 export * from './CommerceSubscription';
 export * from './DeletedObject';
 export * from './DisplayConfig';

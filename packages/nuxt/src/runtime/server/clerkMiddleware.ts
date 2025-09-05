@@ -1,11 +1,13 @@
 import type { AuthenticateRequestOptions } from '@clerk/backend/internal';
-import { AuthStatus, constants } from '@clerk/backend/internal';
+import { AuthStatus, constants, getAuthObjectForAcceptedToken } from '@clerk/backend/internal';
 import { deprecated } from '@clerk/shared/deprecated';
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
+import type { PendingSessionOptions } from '@clerk/types';
 import type { EventHandler } from 'h3';
 import { createError, eventHandler, setResponseHeader } from 'h3';
 
 import { clerkClient } from './clerkClient';
+import type { AuthFn, AuthOptions } from './types';
 import { createInitialState, toWebRequest } from './utils';
 
 function parseHandlerAndOptions(args: unknown[]) {
@@ -81,7 +83,10 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
   return eventHandler(async event => {
     const clerkRequest = toWebRequest(event);
 
-    const requestState = await clerkClient(event).authenticateRequest(clerkRequest, options);
+    const requestState = await clerkClient(event).authenticateRequest(clerkRequest, {
+      ...options,
+      acceptsToken: 'any',
+    });
 
     const locationHeader = requestState.headers.get(constants.Headers.Location);
     if (locationHeader) {
@@ -104,20 +109,24 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
       });
     }
 
-    const authObject = requestState.toAuth();
-    const authHandler = () => authObject;
+    const authObjectFn = (opts?: PendingSessionOptions) => requestState.toAuth(opts);
+    const authHandler: AuthFn = ((options?: AuthOptions) => {
+      return getAuthObjectForAcceptedToken({ authObject: authObjectFn(options), acceptsToken: options?.acceptsToken });
+    }) as AuthFn;
 
-    const auth = new Proxy(Object.assign(authHandler, authObject), {
-      get(target, prop: string, receiver) {
+    const auth = new Proxy(authHandler, {
+      get(target, prop, receiver) {
         deprecated('event.context.auth', 'Use `event.context.auth()` as a function instead.');
-
-        return Reflect.get(target, prop, receiver);
+        // If the property exists on the function, return it
+        if (prop in target) return Reflect.get(target, prop, receiver);
+        // Otherwise, get it from the authObject
+        return authObjectFn()?.[prop as keyof typeof authObjectFn];
       },
     });
 
     event.context.auth = auth;
     // Internal serializable state that will be passed to the client
-    event.context.__clerk_initial_state = createInitialState(authObject);
+    event.context.__clerk_initial_state = createInitialState(authObjectFn());
 
     await handler?.(event);
   });

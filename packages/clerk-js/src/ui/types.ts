@@ -12,30 +12,32 @@ import type {
   OrganizationProfileProps,
   OrganizationSwitcherProps,
   PricingTableProps,
+  SessionResource,
   SignInFallbackRedirectUrl,
   SignInForceRedirectUrl,
   SignInProps,
   SignUpFallbackRedirectUrl,
   SignUpForceRedirectUrl,
   SignUpProps,
+  TaskChooseOrganizationProps,
   UserButtonProps,
   UserProfileProps,
   WaitlistProps,
 } from '@clerk/types';
 
 export type {
+  __internal_OAuthConsentProps,
+  __internal_UserVerificationProps,
+  CreateOrganizationProps,
   GoogleOneTapProps,
+  OrganizationListProps,
+  OrganizationProfileProps,
+  OrganizationSwitcherProps,
   SignInProps,
   SignUpProps,
   UserButtonProps,
   UserProfileProps,
-  OrganizationSwitcherProps,
-  OrganizationProfileProps,
-  CreateOrganizationProps,
-  OrganizationListProps,
   WaitlistProps,
-  __internal_UserVerificationProps,
-  __internal_OAuthConsentProps,
 };
 
 export type AvailableComponentProps =
@@ -53,7 +55,8 @@ export type AvailableComponentProps =
   | __internal_UserVerificationProps
   | __internal_SubscriptionDetailsProps
   | __internal_PlanDetailsProps
-  | APIKeysProps;
+  | APIKeysProps
+  | TaskChooseOrganizationProps;
 
 type ComponentMode = 'modal' | 'mounted';
 type SignInMode = 'modal' | 'redirect';
@@ -132,9 +135,13 @@ export type CheckoutCtx = __internal_CheckoutProps & {
 } & NewSubscriptionRedirectUrl;
 
 export type SessionTasksCtx = {
-  nextTask: () => Promise<void>;
-  redirectUrlComplete?: string;
-  currentTaskContainer: React.RefObject<HTMLDivElement> | null;
+  redirectUrlComplete: string;
+  currentTaskContainer?: React.RefObject<HTMLDivElement> | null;
+  navigateOnSetActive: (opts: { session: SessionResource; redirectUrl: string }) => Promise<unknown>;
+};
+
+export type TaskChooseOrganizationCtx = TaskChooseOrganizationProps & {
+  componentName: 'TaskChooseOrganization';
 };
 
 export type OAuthConsentCtx = __internal_OAuthConsentProps & {
@@ -166,5 +173,6 @@ export type AvailableComponentCtx =
   | APIKeysCtx
   | OAuthConsentCtx
   | SubscriptionDetailsCtx
-  | PlanDetailsCtx;
+  | PlanDetailsCtx
+  | TaskChooseOrganizationCtx;
 export type AvailableComponentName = AvailableComponentCtx['componentName'];

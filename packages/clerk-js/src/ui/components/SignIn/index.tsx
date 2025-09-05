@@ -14,7 +14,7 @@ import { Flow } from '@/ui/customizables';
 import { useFetch } from '@/ui/hooks';
 import { usePreloadTasks } from '@/ui/hooks/usePreloadTasks';
 import { SessionTasks as LazySessionTasks } from '@/ui/lazyModules/components';
-import { Route, Switch, useRouter, VIRTUAL_ROUTER_BASE_PATH } from '@/ui/router';
+import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '@/ui/router';
 import type { SignUpCtx } from '@/ui/types';
 import { normalizeRoutingOptions } from '@/utils/normalizeRoutingOptions';
 
@@ -131,12 +131,12 @@ function SignInRoutes(): JSX.Element {
               >
                 <LazySignUpVerifyPhone />
               </Route>
-              <Route path='tasks'>
-                <LazySessionTasks />
-              </Route>
               <Route index>
                 <LazySignUpContinue />
               </Route>
+            </Route>
+            <Route path='tasks'>
+              <LazySessionTasks redirectUrlComplete={signInContext.afterSignUpUrl} />
             </Route>
             <Route index>
               <LazySignUpStart />
@@ -144,7 +144,7 @@ function SignInRoutes(): JSX.Element {
           </Route>
         )}
         <Route path='tasks'>
-          <LazySessionTasks />
+          <LazySessionTasks redirectUrlComplete={signInContext.afterSignInUrl} />
         </Route>
         <Route index>
           <SignInStart />
@@ -161,9 +161,6 @@ const usePreloadSignUp = (enabled = false) =>
   useFetch(enabled ? preloadSignUp : undefined, 'preloadComponent', { staleTime: Infinity });
 
 function SignInRoot() {
-  const { __internal_setComponentNavigationContext } = useClerk();
-  const { navigate, indexPath } = useRouter();
-
   const signInContext = useSignInContext();
   const normalizedSignUpContext = {
     componentName: 'SignUp',
@@ -182,10 +179,6 @@ function SignInRoot() {
   usePreloadSignUp(signInContext.isCombinedFlow);
 
   usePreloadTasks();
-
-  React.useEffect(() => {
-    return __internal_setComponentNavigationContext?.({ indexPath, navigate });
-  }, [indexPath, navigate]);
 
   return (
     <SignUpContext.Provider value={normalizedSignUpContext}>

@@ -1,7 +1,7 @@
 import type { AuthObject, Organization, Session, User } from '@clerk/backend';
 import { makeAuthObjectSerializable, stripPrivateDataFromObject } from '@clerk/backend/internal';
 
-import { getAuthDataFromRequestSync } from './data/getAuthDataFromRequest';
+import { getAuthDataFromRequest } from './data/getAuthDataFromRequest';
 import type { RequestLike } from './types';
 
 type BuildClerkPropsInitState = { user?: User | null; session?: Session | null; organization?: Organization | null };
@@ -59,7 +59,7 @@ export const buildClerkProps: BuildClerkProps = (req, initialState = {}) => {
 };
 
 export function getDynamicAuthData(req: RequestLike, initialState = {}) {
-  const authObject = getAuthDataFromRequestSync(req);
+  const authObject = getAuthDataFromRequest(req);
 
   return makeAuthObjectSerializable(stripPrivateDataFromObject({ ...authObject, ...initialState })) as AuthObject;
 }

@@ -1,4 +1,16 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`module exports > should not change unless explicitly set 1`] = `
+[
+  "authenticateRequest",
+  "clerkClient",
+  "clerkMiddleware",
+  "createClerkClient",
+  "getAuth",
+  "requireAuth",
+  "verifyToken",
+]
+`;
 
 exports[`module exports should not change unless explicitly set 1`] = `
 [

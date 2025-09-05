@@ -9,6 +9,7 @@ import type {
   PricingTableProps,
   SignInProps,
   SignUpProps,
+  TaskChooseOrganizationProps,
   UserButtonProps,
   UserProfileProps,
   WaitlistProps,
@@ -576,7 +577,10 @@ export const Waitlist = withClerk(
 
 export const PricingTable = withClerk(
   ({ clerk, component, fallback, ...props }: WithClerkProp<PricingTableProps & FallbackProp>) => {
-    const mountingStatus = useWaitForComponentMount(component);
+    const mountingStatus = useWaitForComponentMount(component, {
+      // This attribute is added to the PricingTable root element after we've successfully fetched the plans asynchronously.
+      selector: '[data-component-status="ready"]',
+    });
     const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
 
     const rendererRootProps = {
@@ -632,4 +636,32 @@ export const APIKeys = withClerk(
     );
   },
   { component: 'ApiKeys', renderWhileLoading: true },
+);
+
+export const TaskChooseOrganization = withClerk(
+  ({ clerk, component, fallback, ...props }: WithClerkProp<TaskChooseOrganizationProps & FallbackProp>) => {
+    const mountingStatus = useWaitForComponentMount(component);
+    const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
+
+    const rendererRootProps = {
+      ...(shouldShowFallback && fallback && { style: { display: 'none' } }),
+    };
+
+    return (
+      <>
+        {shouldShowFallback && fallback}
+        {clerk.loaded && (
+          <ClerkHostRenderer
+            component={component}
+            mount={clerk.mountTaskChooseOrganization}
+            unmount={clerk.unmountTaskChooseOrganization}
+            updateProps={(clerk as any).__unstable__updateProps}
+            props={props}
+            rootProps={rendererRootProps}
+          />
+        )}
+      </>
+    );
+  },
+  { component: 'TaskChooseOrganization', renderWhileLoading: true },
 );

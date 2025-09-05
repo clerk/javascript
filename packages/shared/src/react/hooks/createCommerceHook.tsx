@@ -1,4 +1,4 @@
-import type { ClerkPaginatedResponse, ClerkResource } from '@clerk/types';
+import type { ClerkPaginatedResponse, ClerkResource, EnvironmentResource, ForPayerType } from '@clerk/types';
 
 import { eventMethodCalled } from '../../telemetry/events/method-called';
 import {
@@ -17,8 +17,11 @@ type CommerceHookConfig<TResource extends ClerkResource, TParams extends PagesOr
   hookName: string;
   resourceType: string;
   useFetcher: (
-    param: 'organization' | 'user',
-  ) => ((params: TParams) => Promise<ClerkPaginatedResponse<TResource>>) | undefined;
+    param: ForPayerType,
+  ) => ((params: TParams & { orgId?: string }) => Promise<ClerkPaginatedResponse<TResource>>) | undefined;
+  options?: {
+    unauthenticated?: boolean;
+  };
 };
 
 /**
@@ -35,19 +38,20 @@ type CommerceHookConfig<TResource extends ClerkResource, TParams extends PagesOr
  *
  * @internal
  */
-export function createCommerceHook<TResource extends ClerkResource, TParams extends PagesOrInfiniteOptions>({
+export function createCommercePaginatedHook<TResource extends ClerkResource, TParams extends PagesOrInfiniteOptions>({
   hookName,
   resourceType,
   useFetcher,
+  options,
 }: CommerceHookConfig<TResource, TParams>) {
   type HookParams = PaginatedHookConfig<PagesOrInfiniteOptions> & {
-    for: 'organization' | 'user';
+    for: ForPayerType;
   };
 
   return function useCommerceHook<T extends HookParams>(
-    params: T,
+    params?: T,
   ): PaginatedResources<TResource, T extends { infinite: true } ? true : false> {
-    const { for: _for, ...paginationParams } = params;
+    const { for: _for, ...paginationParams } = params || ({ for: 'user' } as T);
 
     useAssertWrappedByClerkProvider(hookName);
 
@@ -62,6 +66,9 @@ export function createCommerceHook<TResource extends ClerkResource, TParams exte
     } as unknown as T);
 
     const clerk = useClerkInstanceContext();
+
+    // @ts-expect-error `__unstable__environment` is not typed
+    const environment = clerk.__unstable__environment as unknown as EnvironmentResource | null | undefined;
     const user = useUserContext();
     const { organization } = useOrganizationContext();
 
@@ -76,9 +83,14 @@ export function createCommerceHook<TResource extends ClerkResource, TParams exte
             ...(_for === 'organization' ? { orgId: organization?.id } : {}),
           } as TParams);
 
-    const isClerkLoaded = !!(clerk.loaded && user);
+    const isClerkLoaded = !!(clerk.loaded && (options?.unauthenticated ? true : user));
 
-    const isEnabled = !!hookParams && isClerkLoaded;
+    const isOrganization = _for === 'organization';
+    const billingEnabled = isOrganization
+      ? environment?.commerceSettings.billing.organization.enabled
+      : environment?.commerceSettings.billing.user.enabled;
+
+    const isEnabled = !!hookParams && isClerkLoaded && !!billingEnabled;
 
     const result = usePagesOrInfinite<TParams, ClerkPaginatedResponse<TResource>>(
       (hookParams || {}) as TParams,

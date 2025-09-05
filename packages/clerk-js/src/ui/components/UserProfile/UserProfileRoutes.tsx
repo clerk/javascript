@@ -38,7 +38,7 @@ const PaymentAttemptPage = lazy(() =>
 );
 
 export const UserProfileRoutes = () => {
-  const { pages } = useUserProfileContext();
+  const { pages, shouldShowBilling } = useUserProfileContext();
   const { apiKeysSettings, commerceSettings } = useEnvironment();
 
   const isAccountPageRoot = pages.routes[0].id === USER_PROFILE_NAVBAR_ROUTE_ID.ACCOUNT;
@@ -80,7 +80,7 @@ export const UserProfileRoutes = () => {
             </Route>
           </Switch>
         </Route>
-        {commerceSettings.billing.enabled && commerceSettings.billing.hasPaidUserPlans && (
+        {commerceSettings.billing.user.enabled && shouldShowBilling ? (
           <Route path={isBillingPageRoot ? undefined : 'billing'}>
             <Switch>
               <Route index>
@@ -88,11 +88,13 @@ export const UserProfileRoutes = () => {
                   <BillingPage />
                 </Suspense>
               </Route>
-              <Route path='plans'>
-                <Suspense fallback={''}>
-                  <PlansPage />
-                </Suspense>
-              </Route>
+              {commerceSettings.billing.user.hasPaidPlans ? (
+                <Route path='plans'>
+                  <Suspense fallback={''}>
+                    <PlansPage />
+                  </Suspense>
+                </Route>
+              ) : null}
               <Route path='statement/:statementId'>
                 <Suspense fallback={''}>
                   <StatementPage />
@@ -105,7 +107,7 @@ export const UserProfileRoutes = () => {
               </Route>
             </Switch>
           </Route>
-        )}
+        ) : null}
         {apiKeysSettings.enabled && (
           <Route path={isAPIKeysPageRoot ? undefined : 'api-keys'}>
             <Switch>

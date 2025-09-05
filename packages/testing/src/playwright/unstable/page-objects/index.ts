@@ -8,10 +8,12 @@ import { createExpectPageObject } from './expect';
 import { createImpersonationPageObject } from './impersonation';
 import { createKeylessPopoverPageObject } from './keylessPopover';
 import { createOrganizationSwitcherComponentPageObject } from './organizationSwitcher';
+import { createPlanDetailsPageObject } from './planDetails';
 import { createPricingTablePageObject } from './pricingTable';
 import { createSessionTaskComponentPageObject } from './sessionTask';
 import { createSignInComponentPageObject } from './signIn';
 import { createSignUpComponentPageObject } from './signUp';
+import { createSubscriptionDetailsPageObject } from './subscriptionDetails';
 import { createTestingTokenPageObject } from './testingToken';
 import { createUserButtonPageObject } from './userButton';
 import { createUserProfileComponentPageObject } from './userProfile';
@@ -48,5 +50,7 @@ export const createPageObjects = ({
     userVerification: createUserVerificationComponentPageObject(testArgs),
     waitlist: createWaitlistComponentPageObject(testArgs),
     apiKeys: createAPIKeysComponentPageObject(testArgs),
+    subscriptionDetails: createSubscriptionDetailsPageObject(testArgs),
+    planDetails: createPlanDetailsPageObject(testArgs),
   };
 };

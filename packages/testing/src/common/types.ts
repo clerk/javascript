@@ -59,6 +59,10 @@ export type ClerkSignInParams =
   | {
       strategy: 'phone_code' | 'email_code';
       identifier: string;
+    }
+  | {
+      strategy: 'ticket';
+      ticket: string;
     };
 
 export type SignInHelperParams = {

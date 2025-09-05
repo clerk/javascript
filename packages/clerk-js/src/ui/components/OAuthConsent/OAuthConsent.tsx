@@ -1,10 +1,10 @@
 import { useUser } from '@clerk/shared/react';
+import type { ComponentProps } from 'react';
 import { useState } from 'react';
 
 import { useEnvironment, useOAuthConsentContext } from '@/ui/contexts';
 import { Box, Button, Flex, Flow, Grid, Icon, Text } from '@/ui/customizables';
 import { ApplicationLogo } from '@/ui/elements/ApplicationLogo';
-import { Avatar } from '@/ui/elements/Avatar';
 import { Card } from '@/ui/elements/Card';
 import { withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
@@ -17,7 +17,7 @@ import { common } from '@/ui/styledSystem';
 import { colors } from '@/ui/utils/colors';
 
 export function OAuthConsentInternal() {
-  const { scopes, oAuthApplicationName, oAuthApplicationLogoUrl, redirectUrl, onDeny, onAllow } =
+  const { scopes, oAuthApplicationName, oAuthApplicationLogoUrl, oAuthApplicationUrl, redirectUrl, onDeny, onAllow } =
     useOAuthConsentContext();
   const { user } = useUser();
   const { applicationName, logoImageUrl } = useEnvironment().displayConfig;
@@ -42,13 +42,18 @@ export function OAuthConsentInternal() {
             {/* both have avatars */}
             {oAuthApplicationLogoUrl && logoImageUrl && (
               <ConnectionHeader>
-                <Avatar
-                  imageUrl={oAuthApplicationLogoUrl}
-                  size={t => t.space.$12}
-                  rounded={false}
-                />
+                <ConnectionItem justify='end'>
+                  <ApplicationLogo
+                    src={oAuthApplicationLogoUrl}
+                    alt={oAuthApplicationName}
+                    href={oAuthApplicationUrl}
+                    isExternal
+                  />
+                </ConnectionItem>
                 <ConnectionSeparator />
-                <ApplicationLogo />
+                <ConnectionItem justify='start'>
+                  <ApplicationLogo />
+                </ConnectionItem>
               </ConnectionHeader>
             )}
             {/* only OAuth app has an avatar */}
@@ -59,10 +64,11 @@ export function OAuthConsentInternal() {
                     position: 'relative',
                   }}
                 >
-                  <Avatar
-                    imageUrl={oAuthApplicationLogoUrl}
-                    size={t => t.space.$12}
-                    rounded={false}
+                  <ApplicationLogo
+                    src={oAuthApplicationLogoUrl}
+                    alt={oAuthApplicationName}
+                    href={oAuthApplicationUrl}
+                    isExternal
                   />
                   <ConnectionIcon
                     size='sm'
@@ -77,31 +83,21 @@ export function OAuthConsentInternal() {
             )}
             {/* only Clerk application has an avatar */}
             {!oAuthApplicationLogoUrl && logoImageUrl && (
-              <Flex
-                justify='center'
-                align='center'
-                gap={4}
-                sx={t => ({
-                  marginBlockEnd: t.space.$6,
-                })}
-              >
-                <ConnectionIcon />
+              <ConnectionHeader>
+                <ConnectionItem justify='end'>
+                  <ConnectionIcon />
+                </ConnectionItem>
                 <ConnectionSeparator />
-                <ApplicationLogo />
-              </Flex>
+                <ConnectionItem justify='start'>
+                  <ApplicationLogo />
+                </ConnectionItem>
+              </ConnectionHeader>
             )}
             {/* no avatars */}
             {!oAuthApplicationLogoUrl && !logoImageUrl && (
-              <Flex
-                justify='center'
-                align='center'
-                gap={4}
-                sx={t => ({
-                  marginBlockEnd: t.space.$6,
-                })}
-              >
+              <ConnectionHeader>
                 <ConnectionIcon />
-              </Flex>
+              </ConnectionHeader>
             )}
             <Header.Title localizationKey={oAuthApplicationName} />
             <Header.Subtitle
@@ -314,6 +310,17 @@ function ConnectionHeader({ children }: { children: React.ReactNode }) {
       sx={t => ({
         marginBlockEnd: t.space.$6,
       })}
+    >
+      {children}
+    </Flex>
+  );
+}
+
+function ConnectionItem({ children, sx, ...props }: ComponentProps<typeof Flex>) {
+  return (
+    <Flex
+      {...props}
+      sx={[{ flex: 1 }, sx]}
     >
       {children}
     </Flex>

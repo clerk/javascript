@@ -3,6 +3,8 @@ import { retry } from '@clerk/shared/retry';
 import { camelToSnake } from '@clerk/shared/underscore';
 import type { ClerkAPIErrorJSON, ClientJSON, InstanceType } from '@clerk/types';
 
+import { debugLogger } from '@/utils/debug';
+
 import { buildEmailAddress as buildEmailAddressUtil, buildURL as buildUrlUtil, stringifyQueryParams } from '../utils';
 import { SUPPORTED_FAPI_VERSION } from './constants';
 import { clerkNetworkError } from './errors';
@@ -147,7 +149,10 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
 
     if (options.proxyUrl) {
       const proxyBase = new URL(options.proxyUrl);
-      const proxyPath = proxyBase.pathname.slice(1, proxyBase.pathname.length);
+      let proxyPath = proxyBase.pathname.slice(1);
+      if (proxyPath.endsWith('/')) {
+        proxyPath = proxyPath.slice(0, -1);
+      }
       return buildUrlUtil(
         {
           base: proxyBase.origin,
@@ -250,12 +255,16 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
         response = new Response('{}', requestInit); // Mock an empty json response
       }
     } catch (e) {
+      debugLogger.error('network error', { error: e, url: urlStr, method }, 'fapiClient');
       clerkNetworkError(urlStr, e);
     }
 
     // 204 No Content responses do not have a body so we should not try to parse it
     const json: FapiResponseJSON<T> | null = response.status !== 204 ? await response.json() : null;
     const fapiResponse: FapiResponse<T> = Object.assign(response, { payload: json });
+    if (!response.ok) {
+      debugLogger.error('request failed', { method, path: requestInit.path, status: response.status }, 'fapiClient');
+    }
     await runAfterResponseCallbacks(requestInit, fapiResponse);
     return fapiResponse;
   }

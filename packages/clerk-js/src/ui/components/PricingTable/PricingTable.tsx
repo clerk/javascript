@@ -2,8 +2,9 @@ import { useClerk } from '@clerk/shared/react';
 import type { CommercePlanResource, CommerceSubscriptionPlanPeriod, PricingTableProps } from '@clerk/types';
 import { useEffect, useMemo, useState } from 'react';
 
-import { usePaymentMethods, usePlans, usePlansContext, usePricingTableContext, useSubscriptions } from '../../contexts';
-import { Flow } from '../../customizables';
+import { Flow } from '@/ui/customizables/Flow';
+
+import { usePaymentMethods, usePlans, usePlansContext, usePricingTableContext, useSubscription } from '../../contexts';
 import { PricingTableDefault } from './PricingTableDefault';
 import { PricingTableMatrix } from './PricingTableMatrix';
 
@@ -11,20 +12,28 @@ const PricingTableRoot = (props: PricingTableProps) => {
   const clerk = useClerk();
   const { mode = 'mounted', signInMode = 'redirect' } = usePricingTableContext();
   const isCompact = mode === 'modal';
-  const { data: subscriptions } = useSubscriptions();
+  const { data: subscription, subscriptionItems } = useSubscription();
   const { data: plans } = usePlans();
   const { handleSelectPlan } = usePlansContext();
 
+  const plansToRender = useMemo(() => {
+    return clerk.isSignedIn
+      ? subscription // All users in billing-enabled applications have a subscription
+        ? plans
+        : []
+      : plans;
+  }, [clerk.isSignedIn, plans, subscription]);
+
   const defaultPlanPeriod = useMemo(() => {
     if (isCompact) {
-      const upcomingSubscription = subscriptions?.find(sub => sub.status === 'upcoming');
+      const upcomingSubscription = subscriptionItems?.find(sub => sub.status === 'upcoming');
       if (upcomingSubscription) {
         return upcomingSubscription.planPeriod;
       }
 
       // don't pay attention to the default plan
-      const activeSubscription = subscriptions?.find(
-        sub => !sub.canceledAtDate && sub.status === 'active' && !sub.plan.isDefault,
+      const activeSubscription = subscriptionItems?.find(
+        sub => !sub.canceledAt && sub.status === 'active' && !sub.plan.isDefault,
       );
       if (activeSubscription) {
         return activeSubscription.planPeriod;
@@ -32,7 +41,7 @@ const PricingTableRoot = (props: PricingTableProps) => {
     }
 
     return 'annual';
-  }, [isCompact, subscriptions]);
+  }, [isCompact, subscriptionItems]);
 
   const [planPeriod, setPlanPeriod] = useState<CommerceSubscriptionPlanPeriod>(defaultPlanPeriod);
 
@@ -65,13 +74,14 @@ const PricingTableRoot = (props: PricingTableProps) => {
   return (
     <Flow.Root
       flow='pricingTable'
+      isFlowReady={clerk.isSignedIn ? !!subscription : plans.length > 0}
       sx={{
         width: '100%',
       }}
     >
       {mode !== 'modal' && (props as any).layout === 'matrix' ? (
         <PricingTableMatrix
-          plans={plans}
+          plans={plansToRender}
           planPeriod={planPeriod}
           setPlanPeriod={setPlanPeriod}
           onSelect={selectPlan}
@@ -79,7 +89,7 @@ const PricingTableRoot = (props: PricingTableProps) => {
         />
       ) : (
         <PricingTableDefault
-          plans={plans}
+          plans={plansToRender}
           planPeriod={planPeriod}
           setPlanPeriod={setPlanPeriod}
           onSelect={selectPlan}

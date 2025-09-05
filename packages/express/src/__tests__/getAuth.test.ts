@@ -32,12 +32,12 @@ describe('getAuth', () => {
   });
 
   it('returns the actual auth object if its tokenType is included in the acceptsToken array', () => {
-    const req = mockRequestWithAuth({ tokenType: 'machine_token', id: 'm2m_1234' });
-    const result = getAuth(req, { acceptsToken: ['machine_token', 'api_key'] });
-    expect(result.tokenType).toBe('machine_token');
+    const req = mockRequestWithAuth({ tokenType: 'm2m_token', id: 'm2m_1234' });
+    const result = getAuth(req, { acceptsToken: ['m2m_token', 'api_key'] });
+    expect(result.tokenType).toBe('m2m_token');
 
-    expect((result as AuthenticatedMachineObject<'machine_token'>).id).toBe('m2m_1234');
-    expect((result as AuthenticatedMachineObject<'machine_token'>).subject).toBeUndefined();
+    expect((result as AuthenticatedMachineObject<'m2m_token'>).id).toBe('m2m_1234');
+    expect((result as AuthenticatedMachineObject<'m2m_token'>).subject).toBeUndefined();
   });
 
   it('returns an unauthenticated auth object when the tokenType does not match acceptsToken', () => {
