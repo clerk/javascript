@@ -803,7 +803,8 @@ export const esES: LocalizationResource = {
     },
   },
   socialButtonsBlockButton: 'Continuar con {{provider|titleize}}',
-  socialButtonsBlockButtonManyInView: undefined,
+  socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
+  lastAuthenticationStrategy: 'último uso',
   taskChooseOrganization: {
     chooseOrganization: {
       action__createOrganization: undefined,

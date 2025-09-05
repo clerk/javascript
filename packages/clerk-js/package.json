@@ -94,7 +94,7 @@
     "@rsdoctor/rspack-plugin": "^0.4.13",
     "@rspack/cli": "^1.4.11",
     "@rspack/core": "^1.4.11",
-    "@rspack/plugin-react-refresh": "^1.4.3",
+    "@rspack/plugin-react-refresh": "^1.5.0",
     "@svgr/webpack": "^6.5.1",
     "@swc/jest": "0.2.39",
     "@types/cloudflare-turnstile": "^0.2.2",

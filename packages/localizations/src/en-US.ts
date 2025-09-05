@@ -801,6 +801,7 @@ export const enUS: LocalizationResource = {
   },
   socialButtonsBlockButton: 'Continue with {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
+  lastAuthenticationStrategy: 'Last used',
   taskChooseOrganization: {
     chooseOrganization: {
       action__createOrganization: 'Create new organization',

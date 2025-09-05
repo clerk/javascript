@@ -81,6 +81,7 @@ export type __internal_LocalizationResource = {
    * translations that misinterpret the correct usage of this property.
    */
   socialButtonsBlockButtonManyInView: LocalizationValue<'provider', `${string}{{provider|titleize}}${string}`>;
+  lastAuthenticationStrategy: LocalizationValue;
   dividerText: LocalizationValue;
   formFieldLabel__emailAddress: LocalizationValue;
   formFieldLabel__emailAddresses: LocalizationValue;
