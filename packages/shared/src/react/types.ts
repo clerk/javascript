@@ -114,6 +114,8 @@ export type PagesOrInfiniteConfig = PaginatedHookConfig<{
    * On `cache` mode, no request will be triggered when the hook is mounted and the data will be fetched from the cache.
    *
    * @default undefined
+   *
+   * @hidden
    */
   __experimental_mode?: 'cache';
 }>;
@@ -139,6 +141,8 @@ export type PagesOrInfiniteOptions = {
    * On `cache` mode, no request will be triggered when the hook is mounted and the data will be fetched from the cache.
    *
    * @default undefined
+   *
+   * @hidden
    */
   __experimental_mode?: 'cache';
 };

@@ -44,6 +44,7 @@ describe('PricingTable - trial info', () => {
 
   it('shows footer notice with trial end date when active subscription is in free trial', async () => {
     const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withBilling();
       f.withUser({ email_addresses: ['test@clerk.com'] });
     });
 
@@ -99,6 +100,7 @@ describe('PricingTable - trial info', () => {
   it('shows CTA "Start N-day free trial" when eligible and plan has trial', async () => {
     const { wrapper, fixtures, props } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     // Provide empty props to the PricingTable context
@@ -130,7 +132,9 @@ describe('PricingTable - trial info', () => {
   });
 
   it('shows CTA "Start N-day free trial" when user is signed out and plan has trial', async () => {
-    const { wrapper, fixtures, props } = await createFixtures();
+    const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withBilling();
+    });
 
     // Provide empty props to the PricingTable context
     props.setProps({});
@@ -149,7 +153,9 @@ describe('PricingTable - trial info', () => {
   });
 
   it('shows CTA "Subscribe" when user is signed out and plan has no trial', async () => {
-    const { wrapper, fixtures, props } = await createFixtures();
+    const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withBilling();
+    });
 
     const nonTrialPlan = {
       ...trialPlan,
@@ -178,6 +184,7 @@ describe('PricingTable - trial info', () => {
   it('shows footer notice with "starts at" when subscription is upcoming and not a free trial', async () => {
     const { wrapper, fixtures, props } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     // Provide empty props to the PricingTable context
@@ -301,6 +308,7 @@ describe('PricingTable - plans visibility', () => {
   it('shows plans when user is signed in and has a subscription', async () => {
     const { wrapper, fixtures, props } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     // Provide empty props to the PricingTable context
@@ -347,7 +355,9 @@ describe('PricingTable - plans visibility', () => {
   });
 
   it('shows plans when user is signed out', async () => {
-    const { wrapper, fixtures, props } = await createFixtures();
+    const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withBilling();
+    });
 
     // Provide empty props to the PricingTable context
     props.setProps({});
@@ -367,6 +377,7 @@ describe('PricingTable - plans visibility', () => {
   it('shows no plans when user is signed in but subscription is null', async () => {
     const { wrapper, fixtures, props } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     // Provide empty props to the PricingTable context
@@ -387,6 +398,7 @@ describe('PricingTable - plans visibility', () => {
   it('shows no plans when user is signed in but subscription is undefined', async () => {
     const { wrapper, fixtures, props } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     // Provide empty props to the PricingTable context
@@ -407,6 +419,7 @@ describe('PricingTable - plans visibility', () => {
   it('prevents flicker by not showing plans while subscription is loading', async () => {
     const { wrapper, fixtures, props } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     // Provide empty props to the PricingTable context

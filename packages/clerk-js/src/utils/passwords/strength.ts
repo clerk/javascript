@@ -2,7 +2,7 @@ import type { PasswordSettingsData, ZxcvbnResult } from '@clerk/types';
 
 import type { zxcvbnFN } from '../zxcvbn';
 
-export type PasswordStrength =
+type PasswordStrength =
   | {
       state: 'excellent';
       result: ZxcvbnResult;

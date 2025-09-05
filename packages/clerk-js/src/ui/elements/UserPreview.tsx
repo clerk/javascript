@@ -170,6 +170,7 @@ export const UserPreview = (props: UserPreviewProps) => {
             truncate
             as='span'
             localizationKey={subtitle || identifier}
+            colorScheme='secondary'
           />
         )}
       </Flex>

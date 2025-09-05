@@ -202,11 +202,6 @@ export const trimLeadingSlash = (path: string): string => {
   return (path || '').replace(/^\/+/, '');
 };
 
-export const stripSameOrigin = (url: URL, baseUrl: URL): string => {
-  const sameOrigin = baseUrl.origin === url.origin;
-  return sameOrigin ? stripOrigin(url) : `${url}`;
-};
-
 export const hasExternalAccountSignUpError = (signUp: SignUpResource): boolean => {
   const { externalAccount } = signUp.verifications;
   return !!externalAccount.error;

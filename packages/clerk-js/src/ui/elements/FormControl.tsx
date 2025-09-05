@@ -17,7 +17,7 @@ import type { ThemableCssProp } from '../styledSystem';
 import { animations } from '../styledSystem';
 import type { FeedbackType, useFormControlFeedback } from '../utils/useFormControl';
 
-export function useFormTextAnimation() {
+function useFormTextAnimation() {
   const prefersReducedMotion = usePrefersReducedMotion();
   const { animations: appearanceAnimations } = useAppearance().parsedLayout;
 
@@ -48,7 +48,7 @@ export function useFormTextAnimation() {
   };
 }
 
-export const useCalculateErrorTextHeight = ({ feedback }: { feedback: string }) => {
+const useCalculateErrorTextHeight = ({ feedback }: { feedback: string }) => {
   const [height, setHeight] = useState(0);
 
   const calculateHeight = useCallback(

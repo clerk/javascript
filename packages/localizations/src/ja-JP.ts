@@ -776,13 +776,15 @@ export const jaJP: LocalizationResource = {
       title: '電話番号を確認',
     },
     restrictedAccess: {
-      actionLink: undefined,
-      actionText: undefined,
-      blockButton__emailSupport: undefined,
-      blockButton__joinWaitlist: undefined,
-      subtitle: undefined,
-      subtitleWaitlist: undefined,
-      title: undefined,
+      actionLink: 'サインイン',
+      actionText: '既にアカウントをお持ちですか？',
+      blockButton__emailSupport: 'サポートに連絡',
+      blockButton__joinWaitlist: '待機リストに参加',
+      subtitle:
+        '現在サインアップは無効になっています。アクセス権限があると思われる場合は、サポートまでご連絡ください。',
+      subtitleWaitlist:
+        '現在サインアップは無効になっています。リリース時に最初に通知を受け取るには、待機リストにご参加ください。',
+      title: 'アクセス制限',
     },
     start: {
       actionLink: 'サインイン',
@@ -1270,16 +1272,16 @@ export const jaJP: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'サインイン',
+      actionText: '既にアクセス権をお持ちですか？',
+      formButton: '待機リストに参加',
+      subtitle: 'メールアドレスを入力していただければ、準備が整い次第お知らせいたします',
+      title: '待機リストに参加',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: '間もなくリダイレクトされます...',
+      subtitle: '準備が整い次第ご連絡いたします',
+      title: '待機リストへの参加ありがとうございます！',
     },
   },
 } as const;

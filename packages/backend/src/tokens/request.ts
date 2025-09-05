@@ -386,7 +386,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
     if (!mustActivate) {
       return null;
     }
-    if (authenticateContext.handshakeRedirectLoopCounter > 0) {
+    if (authenticateContext.handshakeRedirectLoopCounter >= 3) {
       // We have an organization that needs to be activated, but this isn't our first time redirecting.
       // This is because we attempted to activate the organization previously, but the organization
       // must not have been valid (either not found, or not valid for this user), and gave us back
@@ -576,7 +576,8 @@ export const authenticateRequest: AuthenticateRequest = (async (
       const shouldForceHandshakeForCrossDomain =
         !authenticateContext.isSatellite && // We're on primary
         authenticateContext.secFetchDest === 'document' && // Document navigation
-        authenticateContext.isCrossOriginReferrer(); // Came from different domain
+        authenticateContext.isCrossOriginReferrer() && // Came from different domain
+        !authenticateContext.isKnownClerkReferrer(); // Not from Clerk accounts portal or FAPI
 
       if (shouldForceHandshakeForCrossDomain) {
         return handleMaybeHandshakeStatus(

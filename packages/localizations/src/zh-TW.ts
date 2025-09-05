@@ -695,7 +695,7 @@ export const zhTW: LocalizationResource = {
       subtitle: '以繼續前往 {{applicationName}}',
       subtitleCombined: undefined,
       title: '登入',
-      titleCombined: undefined,
+      titleCombined: '繼續前往 {{applicationName}}',
     },
     totpMfa: {
       formTitle: '驗證碼',

@@ -14,6 +14,45 @@ import { SignInStart } from '../SignInStart';
 const { createFixtures } = bindCreateFixtures('SignIn');
 
 describe('SignInStart', () => {
+  const originalGetComputedStyle = window.getComputedStyle;
+  const originalLocation = window.location;
+  const originalHistory = window.history;
+  const mockGetComputedStyle = jest.fn();
+
+  beforeEach(() => {
+    // Mock window.getComputedStyle
+    mockGetComputedStyle.mockReset();
+    mockGetComputedStyle.mockReturnValue({
+      animationName: '',
+      pointerEvents: 'auto',
+      getPropertyValue: jest.fn().mockReturnValue(''),
+    });
+    Object.defineProperty(window, 'getComputedStyle', {
+      value: mockGetComputedStyle,
+      writable: true,
+      configurable: true,
+    });
+  });
+
+  afterEach(() => {
+    // Restore patched globals
+    Object.defineProperty(window, 'getComputedStyle', {
+      value: originalGetComputedStyle,
+      writable: true,
+      configurable: true,
+    });
+    Object.defineProperty(window, 'location', {
+      value: originalLocation,
+      writable: true,
+      configurable: true,
+    });
+    Object.defineProperty(window, 'history', {
+      value: originalHistory,
+      writable: true,
+      configurable: true,
+    });
+  });
+
   it('renders the component', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withEmailAddress();
@@ -167,7 +206,7 @@ describe('SignInStart', () => {
         });
       });
 
-      const wrapperBefore = ({ children }) => (
+      const wrapperBefore = ({ children }: { children: React.ReactNode }) => (
         <Wrapper>
           <AppearanceProvider
             appearanceKey={'signIn'}
@@ -437,7 +476,7 @@ describe('SignInStart', () => {
       it(`calls sign in with identifier again with only the email if the api respondes with the error ${code}`, async () => {
         const { wrapper, fixtures } = await createFixtures(f => {
           f.withEmailAddress();
-          f.withPassword();
+          f.withPassword({ required: true });
         });
 
         const errJSON = {

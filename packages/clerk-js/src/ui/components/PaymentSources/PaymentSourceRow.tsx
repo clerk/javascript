@@ -13,7 +13,7 @@ export const PaymentSourceRow = ({ paymentSource }: { paymentSource: CommercePay
     >
       <Icon
         icon={paymentSource.paymentMethod === 'card' ? CreditCard : GenericPayment}
-        sx={{ alignSelf: 'center' }}
+        sx={t => ({ alignSelf: 'center', color: t.colors.$colorMutedForeground })}
         elementDescriptor={descriptors.paymentSourceRowIcon}
       />
       <Text

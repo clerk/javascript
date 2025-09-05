@@ -184,7 +184,11 @@ function Card(props: CardProps) {
         isCompact={isCompact}
         planPeriod={planPeriod}
         setPlanPeriod={setPlanPeriod}
-        badge={showStatusRow ? <SubscriptionBadge subscription={subscription} /> : undefined}
+        badge={
+          showStatusRow ? (
+            <SubscriptionBadge subscription={subscription.isFreeTrial ? { status: 'free_trial' } : subscription} />
+          ) : undefined
+        }
       />
       <Box
         elementDescriptor={descriptors.pricingTableCardBody}

@@ -32,7 +32,7 @@ export const createCheckoutPageObject = (testArgs: { page: EnhancedPage }) => {
       return page.frameLocator('iframe[src*="elements-inner-payment"]').getByLabel('Card number').waitFor({ state });
     },
     clickPayOrSubscribe: async () => {
-      await self.root.getByRole('button', { name: /subscribe|pay\s\$/i }).click();
+      await self.root.getByRole('button', { name: /subscribe|pay\s\$|start/i }).click();
     },
     waitForSubscribeButton: async () => {
       await self.root.getByRole('button', { name: /^subscribe$/i }).waitFor({ state: 'visible' });

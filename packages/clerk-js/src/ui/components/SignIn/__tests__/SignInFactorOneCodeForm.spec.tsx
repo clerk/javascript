@@ -56,9 +56,11 @@ describe('SignInFactorOneCodeForm', () => {
           name: 'signIn.prepareFirstFactor',
           factorKey: 'phone_code_idn_123',
         },
-        {
+        expect.objectContaining({
           staleTime: 100,
-        },
+          onSuccess: expect.any(Function),
+          onError: expect.any(Function),
+        }),
       );
     });
 
@@ -91,9 +93,11 @@ describe('SignInFactorOneCodeForm', () => {
           name: 'signIn.prepareFirstFactor',
           factorKey: 'phone_code_idn_123_whatsapp',
         },
-        {
+        expect.objectContaining({
           staleTime: 100,
-        },
+          onSuccess: expect.any(Function),
+          onError: expect.any(Function),
+        }),
       );
     });
 
@@ -172,9 +176,9 @@ describe('SignInFactorOneCodeForm', () => {
         f.startSignInWithPhoneNumber({ supportPhoneCode: true });
       });
 
-      renderWithProviders(<SignInFactorOneCodeForm {...defaultProps} />, { wrapper });
+      const { getByLabelText } = renderWithProviders(<SignInFactorOneCodeForm {...defaultProps} />, { wrapper });
 
-      expect(document.querySelector('input[type="text"]')).toBeInTheDocument();
+      expect(getByLabelText('Enter verification code')).toBeInTheDocument();
     });
 
     it('renders email code verification form', async () => {
@@ -197,9 +201,9 @@ describe('SignInFactorOneCodeForm', () => {
         resendButton: localizationKeys('signIn.emailCode.resendButton'),
       };
 
-      renderWithProviders(<SignInFactorOneCodeForm {...emailProps} />, { wrapper });
+      const { getByLabelText } = renderWithProviders(<SignInFactorOneCodeForm {...emailProps} />, { wrapper });
 
-      expect(document.querySelector('input[type="text"]')).toBeInTheDocument();
+      expect(getByLabelText('Enter verification code')).toBeInTheDocument();
     });
   });
 });

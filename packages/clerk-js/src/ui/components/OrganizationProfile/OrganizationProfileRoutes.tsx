@@ -38,7 +38,7 @@ const OrganizationPaymentAttemptPage = lazy(() =>
 );
 
 export const OrganizationProfileRoutes = () => {
-  const { pages, isMembersPageRoot, isGeneralPageRoot, isBillingPageRoot, isApiKeysPageRoot } =
+  const { pages, isMembersPageRoot, isGeneralPageRoot, isBillingPageRoot, isApiKeysPageRoot, shouldShowBilling } =
     useOrganizationProfileContext();
   const { apiKeysSettings, commerceSettings } = useEnvironment();
 
@@ -83,7 +83,7 @@ export const OrganizationProfileRoutes = () => {
             </Route>
           </Switch>
         </Route>
-        {commerceSettings.billing.organization.enabled ? (
+        {commerceSettings.billing.organization.enabled && shouldShowBilling ? (
           <Protect
             condition={has =>
               has({ permission: 'org:sys_billing:read' }) || has({ permission: 'org:sys_billing:manage' })

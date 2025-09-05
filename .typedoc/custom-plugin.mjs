@@ -55,6 +55,7 @@ const LINK_REPLACEMENTS = [
   ['verify-token-options', '#verify-token-options'],
   ['localization-resource', '/docs/customization/localization'],
   ['commerce-subscription-item-resource', '/docs/references/javascript/types/commerce-subscription-item-resource'],
+  ['commerce-money-amount', '/docs/references/javascript/types/commerce-money-amount'],
 ];
 
 /**

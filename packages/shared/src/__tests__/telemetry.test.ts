@@ -392,4 +392,63 @@ describe('TelemetryCollector', () => {
       fetchSpy.mockRestore();
     });
   });
+
+  describe('error handling', () => {
+    test('record() method does not bubble up errors from internal operations', () => {
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+      const collector = new TelemetryCollector({
+        publishableKey: TEST_PK,
+      });
+
+      const circularPayload = (() => {
+        const obj: any = { test: 'value' };
+        obj.self = obj;
+        return obj;
+      })();
+
+      expect(() => {
+        collector.record({ event: 'TEST_EVENT', payload: circularPayload });
+      }).not.toThrow();
+
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        '[clerk/telemetry] Error recording telemetry event',
+        expect.any(Error),
+      );
+
+      consoleErrorSpy.mockRestore();
+    });
+
+    test('record() method handles errors gracefully and continues operation', () => {
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+      const collector = new TelemetryCollector({
+        publishableKey: TEST_PK,
+      });
+
+      const problematicPayload = (() => {
+        const obj: any = { test: 'value' };
+        obj.self = obj;
+        return obj;
+      })();
+
+      expect(() => {
+        collector.record({ event: 'TEST_EVENT', payload: problematicPayload });
+      }).not.toThrow();
+
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        '[clerk/telemetry] Error recording telemetry event',
+        expect.any(Error),
+      );
+
+      expect(() => {
+        collector.record({ event: 'TEST_EVENT', payload: { normal: 'data' } });
+      }).not.toThrow();
+
+      jest.runAllTimers();
+      expect(fetchSpy).toHaveBeenCalled();
+
+      consoleErrorSpy.mockRestore();
+    });
+  });
 });

@@ -23,6 +23,7 @@ test.describe('multiple apps running on localhost using different Clerk instance
   let apps: Array<{ app: Application; serverUrl: string }>;
 
   test.beforeAll(async () => {
+    test.setTimeout(90_000); // Wait for apps to be ready
     apps = await Promise.all([prepareApplication('sessions-dev-1'), prepareApplication('sessions-dev-2')]);
 
     const u = apps.map(a => createTestUtils({ app: a.app }));

@@ -66,7 +66,7 @@ export const enUS: LocalizationResource = {
     billedMonthlyOnly: 'Only billed monthly',
     cancelFreeTrial: 'Cancel free trial',
     cancelFreeTrialAccessUntil:
-      "Your trial will stay active until {{ date | longDate('en-US') }}. After that, you'll lose access to trial features. You won't be changed.",
+      "Your trial will stay active until {{ date | longDate('en-US') }}. After that, you'll lose access to trial features. You won't be charged.",
     cancelFreeTrialTitle: 'Cancel free trial for {{plan}} plan?',
     cancelSubscription: 'Cancel subscription',
     cancelSubscriptionAccessUntil:

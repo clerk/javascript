@@ -222,6 +222,7 @@ export class HandshakeService {
       const newUrl = new URL(this.authenticateContext.clerkUrl);
       newUrl.searchParams.delete(constants.QueryParameters.Handshake);
       newUrl.searchParams.delete(constants.QueryParameters.HandshakeHelp);
+      newUrl.searchParams.delete(constants.QueryParameters.DevBrowser);
       headers.append(constants.Headers.Location, newUrl.toString());
       headers.set(constants.Headers.CacheControl, 'no-store');
     }
@@ -323,7 +324,7 @@ ${developmentError.getFullMessage()}`,
 
     const newCounterValue = this.authenticateContext.handshakeRedirectLoopCounter + 1;
     const cookieName = constants.Cookies.RedirectCount;
-    headers.append('Set-Cookie', `${cookieName}=${newCounterValue}; SameSite=Lax; HttpOnly; Max-Age=3`);
+    headers.append('Set-Cookie', `${cookieName}=${newCounterValue}; SameSite=Lax; HttpOnly; Max-Age=2`);
     return false;
   }
 

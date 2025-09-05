@@ -74,6 +74,7 @@ const PricingTableRoot = (props: PricingTableProps) => {
   return (
     <Flow.Root
       flow='pricingTable'
+      isFlowReady={clerk.isSignedIn ? !!subscription : plans.length > 0}
       sx={{
         width: '100%',
       }}

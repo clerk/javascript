@@ -105,6 +105,14 @@ describe('originPrefersPopup', () => {
         expect(originPrefersPopup()).toBe(true);
       });
 
+      it('should return true for .lp.dev domains', () => {
+        mockLocationOrigin('https://preview.lp.dev');
+        expect(originPrefersPopup()).toBe(true);
+
+        mockLocationOrigin('https://app.lp.dev');
+        expect(originPrefersPopup()).toBe(true);
+      });
+
       it('should handle HTTPS and HTTP protocols', () => {
         mockLocationOrigin('http://localhost.lovable.app');
         expect(originPrefersPopup()).toBe(true);

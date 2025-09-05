@@ -76,6 +76,10 @@ export const useThirdPartyProvider = <
         return ref.send({ type: 'AUTHENTICATE.ENTERPRISE_SSO' });
       }
 
+      if (provider === 'base') {
+        return ref.send({ type: 'AUTHENTICATE.WEB3', strategy: 'web3_base_signature' });
+      }
+
       if (provider === 'metamask') {
         return ref.send({ type: 'AUTHENTICATE.WEB3', strategy: 'web3_metamask_signature' });
       }

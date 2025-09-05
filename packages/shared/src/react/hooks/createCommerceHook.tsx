@@ -1,4 +1,4 @@
-import type { ClerkPaginatedResponse, ClerkResource, ForPayerType } from '@clerk/types';
+import type { ClerkPaginatedResponse, ClerkResource, EnvironmentResource, ForPayerType } from '@clerk/types';
 
 import { eventMethodCalled } from '../../telemetry/events/method-called';
 import {
@@ -66,6 +66,9 @@ export function createCommercePaginatedHook<TResource extends ClerkResource, TPa
     } as unknown as T);
 
     const clerk = useClerkInstanceContext();
+
+    // @ts-expect-error `__unstable__environment` is not typed
+    const environment = clerk.__unstable__environment as unknown as EnvironmentResource | null | undefined;
     const user = useUserContext();
     const { organization } = useOrganizationContext();
 
@@ -82,7 +85,12 @@ export function createCommercePaginatedHook<TResource extends ClerkResource, TPa
 
     const isClerkLoaded = !!(clerk.loaded && (options?.unauthenticated ? true : user));
 
-    const isEnabled = !!hookParams && isClerkLoaded;
+    const isOrganization = _for === 'organization';
+    const billingEnabled = isOrganization
+      ? environment?.commerceSettings.billing.organization.enabled
+      : environment?.commerceSettings.billing.user.enabled;
+
+    const isEnabled = !!hookParams && isClerkLoaded && !!billingEnabled;
 
     const result = usePagesOrInfinite<TParams, ClerkPaginatedResponse<TResource>>(
       (hookParams || {}) as TParams,

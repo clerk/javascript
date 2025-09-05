@@ -7,7 +7,7 @@ import { NavbarMenuButtonRow } from '@/ui/elements/Navbar';
 import { ProfileCard } from '@/ui/elements/ProfileCard';
 
 import { ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
-import { OrganizationProfileContext, withCoreUserGuard } from '../../contexts';
+import { OrganizationProfileContext, SubscriberTypeContext, withCoreUserGuard } from '../../contexts';
 import { Flow, localizationKeys } from '../../customizables';
 import { Route, Switch } from '../../router';
 import type { OrganizationProfileCtx } from '../../types';
@@ -26,7 +26,9 @@ const _OrganizationProfile = (_: OrganizationProfileProps) => {
       <Flow.Part>
         <Switch>
           <Route>
-            <AuthenticatedRoutes />
+            <SubscriberTypeContext.Provider value='organization'>
+              <AuthenticatedRoutes />
+            </SubscriberTypeContext.Provider>
           </Route>
         </Switch>
       </Flow.Part>

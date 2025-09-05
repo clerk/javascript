@@ -6,6 +6,8 @@ import { appConfigs } from '../presets';
 import { killClerkJsHttpServer, parseEnvOptions } from '../scripts';
 
 setup('teardown long running apps', async () => {
+  setup.setTimeout(90_000);
+
   const { appUrl } = parseEnvOptions();
   await killClerkJsHttpServer();
 

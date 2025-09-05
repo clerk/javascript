@@ -1,6 +1,5 @@
-import type { PhoneCodeChannel } from 'phoneCodeChannel';
-
 import type { PublicKeyCredentialWithAuthenticatorAssertionResponse } from './passkey';
+import type { PhoneCodeChannel } from './phoneCodeChannel';
 import type {
   BackupCodeStrategy,
   EmailCodeStrategy,

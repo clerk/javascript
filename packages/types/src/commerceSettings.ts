@@ -1,7 +1,6 @@
-import type { CommerceSettingsJSONSnapshot } from 'snapshots';
-
 import type { ClerkResourceJSON } from './json';
 import type { ClerkResource } from './resource';
+import type { CommerceSettingsJSONSnapshot } from './snapshots';
 
 export interface CommerceSettingsJSON extends ClerkResourceJSON {
   billing: {
