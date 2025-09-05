@@ -4,7 +4,7 @@ import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
 
-import { useEnvironment } from '../../contexts';
+import { useEnvironment, useUserProfileContext } from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
 import { ActiveDevicesSection } from './ActiveDevicesSection';
 import { DeleteSection } from './DeleteSection';
@@ -17,8 +17,9 @@ export const SecurityPage = withCardStateProvider(() => {
   const { attributes, instanceIsPasswordBased } = useEnvironment().userSettings;
   const card = useCardState();
   const { user } = useUser();
+  const { shouldAllowIdentificationCreation } = useUserProfileContext();
   const showPassword = instanceIsPasswordBased;
-  const showPasskey = attributes.passkey?.enabled;
+  const showPasskey = attributes.passkey?.enabled && shouldAllowIdentificationCreation;
   const showMfa = getSecondFactors(attributes).length > 0;
   const showDelete = user?.deleteSelfEnabled;
 

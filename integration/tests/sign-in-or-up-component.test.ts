@@ -9,6 +9,7 @@ test.describe('sign-in-or-up component initialization flow @nextjs', () => {
   let app: Application;
 
   test.beforeAll(async () => {
+    test.setTimeout(90_000); // Wait for app to be ready
     app = await appConfigs.next.appRouter.clone().commit();
     await app.setup();
     await app.withEnv(appConfigs.envs.withEmailCodes);

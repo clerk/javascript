@@ -30,6 +30,7 @@ import {
   getIdentifierControlDisplayValues,
   groupIdentifiers,
   withRedirectToAfterSignIn,
+  withRedirectToSignInTask,
 } from '../../common';
 import { useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
@@ -84,7 +85,7 @@ function SignInStartInternal(): JSX.Element {
   const signIn = useCoreSignIn();
   const { navigate } = useRouter();
   const ctx = useSignInContext();
-  const { afterSignInUrl, signUpUrl, waitlistUrl, isCombinedFlow } = ctx;
+  const { afterSignInUrl, signUpUrl, waitlistUrl, isCombinedFlow, navigateOnSetActive } = ctx;
   const supportEmail = useSupportEmail();
   const identifierAttributes = useMemo<SignInStartIdentifier[]>(
     () => groupIdentifiers(userSettings.enabledFirstFactorIdentifiers),
@@ -235,7 +236,9 @@ function SignInStartInternal(): JSX.Element {
             removeClerkQueryParam('__clerk_ticket');
             return clerk.setActive({
               session: res.createdSessionId,
-              redirectUrl: afterSignInUrl,
+              navigate: async ({ session }) => {
+                await navigateOnSetActive({ session, redirectUrl: afterSignInUrl });
+              },
             });
           default: {
             console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
@@ -286,6 +289,7 @@ function SignInStartInternal(): JSX.Element {
           case ERROR_CODES.FRAUD_DEVICE_BLOCKED:
           case ERROR_CODES.FRAUD_ACTION_BLOCKED:
           case ERROR_CODES.SIGNUP_RATE_LIMIT_EXCEEDED:
+          case ERROR_CODES.USER_BANNED:
             card.setError(error);
             break;
           default:
@@ -386,7 +390,9 @@ function SignInStartInternal(): JSX.Element {
         case 'complete':
           return clerk.setActive({
             session: res.createdSessionId,
-            redirectUrl: afterSignInUrl,
+            navigate: async ({ session }) => {
+              await navigateOnSetActive({ session, redirectUrl: afterSignInUrl });
+            },
           });
         default: {
           console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
@@ -435,7 +441,12 @@ function SignInStartInternal(): JSX.Element {
     } else if (alreadySignedInError) {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const sid = alreadySignedInError.meta!.sessionId!;
-      await clerk.setActive({ session: sid, redirectUrl: afterSignInUrl });
+      await clerk.setActive({
+        session: sid,
+        navigate: async ({ session }) => {
+          await navigateOnSetActive({ session, redirectUrl: afterSignInUrl });
+        },
+      });
     } else if (isCombinedFlow && accountDoesNotExistError) {
       const attribute = getSignUpAttributeFromIdentifier(identifierField);
 
@@ -468,6 +479,7 @@ function SignInStartInternal(): JSX.Element {
         signUpMode: userSettings.signUp.mode,
         redirectUrl,
         redirectUrlComplete,
+        navigateOnSetActive,
         passwordEnabled: userSettings.attributes.password?.required ?? false,
         alternativePhoneCodeChannel:
           alternativePhoneCodeProvider?.channel ||
@@ -675,4 +687,6 @@ const InstantPasswordRow = ({ field }: { field?: FormControlState<'password'> })
   );
 };
 
-export const SignInStart = withRedirectToAfterSignIn(withCardStateProvider(SignInStartInternal));
+export const SignInStart = withRedirectToSignInTask(
+  withRedirectToAfterSignIn(withCardStateProvider(SignInStartInternal)),
+);

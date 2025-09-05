@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom/vitest';
 
-import type { CommercePayerType, CommercePlanResource, Theme } from '@clerk/types';
+import type { CommercePayerResourceType, CommercePlanResource, Theme } from '@clerk/types';
 import { render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import React from 'react';
@@ -31,24 +31,35 @@ vi.mock('../withClerk', () => {
 const mockPlanResource: CommercePlanResource = {
   id: 'plan_123',
   name: 'Test Plan',
-  amount: 1000,
-  amountFormatted: '10.00',
-  annualAmount: 10000,
-  annualAmountFormatted: '100.00',
-  annualMonthlyAmount: 833,
-  annualMonthlyAmountFormatted: '8.33',
-  currencySymbol: '$',
+  fee: {
+    amount: 1000,
+    amountFormatted: '10.00',
+    currencySymbol: '$',
+    currency: 'USD',
+  },
+  annualMonthlyFee: {
+    amount: 833,
+    amountFormatted: '8.33',
+    currencySymbol: '$',
+    currency: 'USD',
+  },
+  annualFee: {
+    amount: 10000,
+    amountFormatted: '100.00',
+    currencySymbol: '$',
+    currency: 'USD',
+  },
   description: 'Test Plan Description',
   hasBaseFee: true,
   isRecurring: true,
-  currency: 'USD',
   isDefault: false,
-  forPayerType: 'user' as CommercePayerType,
+  forPayerType: 'user' as CommercePayerResourceType,
   publiclyVisible: true,
   slug: 'test-plan',
   avatarUrl: 'https://example.com/avatar.png',
+  freeTrialDays: 0,
+  freeTrialEnabled: false,
   features: [],
-  __internal_toSnapshot: vi.fn(),
   pathRoot: '',
   reload: vi.fn(),
 };

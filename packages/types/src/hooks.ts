@@ -1,14 +1,13 @@
-import type { OrganizationCustomRoleKey } from 'organizationMembership';
-import type { SignInResource } from 'signIn';
-
 import type { SetActive, SignOut } from './clerk';
 import type { ActClaim, JwtPayload } from './jwtv2';
+import type { OrganizationCustomRoleKey } from './organizationMembership';
 import type {
   CheckAuthorizationWithCustomPermissions,
   GetToken,
   SessionResource,
   SignedInSessionResource,
 } from './session';
+import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
 import type { UserResource } from './user';
 
@@ -132,7 +131,7 @@ export type UseSignInReturn =
        */
       signIn: undefined;
       /**
-       * A function that sets the active session.
+       * A function that sets the active session. See the [reference doc](https://clerk.com/docs/references/javascript/clerk#set-active).
        */
       setActive: undefined;
     }
@@ -156,7 +155,7 @@ export type UseSignUpReturn =
        */
       signUp: undefined;
       /**
-       * A function that sets the active session.
+       * A function that sets the active session. See the [reference doc](https://clerk.com/docs/references/javascript/clerk#set-active).
        */
       setActive: undefined;
     }
@@ -180,7 +179,7 @@ export type UseSessionReturn =
        */
       isSignedIn: undefined;
       /**
-       * The current active session for the user.
+       * The current session for the user.
        */
       session: undefined;
     }
@@ -191,7 +190,7 @@ export type UseSessionReturn =
     }
   | {
       isLoaded: true;
-      isSignedIn: true;
+      isSignedIn: boolean;
       session: SignedInSessionResource;
     };
 
@@ -209,7 +208,7 @@ export type UseSessionListReturn =
        */
       sessions: undefined;
       /**
-       * A function that sets the active session and/or organization.
+       * A function that sets the active session and/or organization. See the [reference doc](https://clerk.com/docs/references/javascript/clerk#set-active).
        */
       setActive: undefined;
     }

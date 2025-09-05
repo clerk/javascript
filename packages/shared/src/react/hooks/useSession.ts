@@ -1,9 +1,9 @@
-import type { PendingSessionOptions, UseSessionReturn } from '@clerk/types';
+import type { UseSessionReturn } from '@clerk/types';
 
 import { eventMethodCalled } from '../../telemetry/events/method-called';
 import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useSessionContext } from '../contexts';
 
-type UseSession = (options?: PendingSessionOptions) => UseSessionReturn;
+type UseSession = () => UseSessionReturn;
 
 const hookName = `useSession`;
 /**
@@ -55,7 +55,7 @@ const hookName = `useSession`;
  * </Tab>
  * </Tabs>
  */
-export const useSession: UseSession = (options = {}) => {
+export const useSession: UseSession = () => {
   useAssertWrappedByClerkProvider(hookName);
 
   const session = useSessionContext();
@@ -67,13 +67,9 @@ export const useSession: UseSession = (options = {}) => {
     return { isLoaded: false, isSignedIn: undefined, session: undefined };
   }
 
-  const pendingAsSignedOut =
-    session?.status === 'pending' &&
-    (options.treatPendingAsSignedOut ?? clerk.__internal_getOption('treatPendingAsSignedOut'));
-  const isSignedOut = session === null || pendingAsSignedOut;
-  if (isSignedOut) {
+  if (session === null) {
     return { isLoaded: true, isSignedIn: false, session: null };
   }
 
-  return { isLoaded: true, isSignedIn: true, session };
+  return { isLoaded: true, isSignedIn: clerk.isSignedIn, session };
 };

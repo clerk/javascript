@@ -5,6 +5,7 @@ exports[`constants > from environment variables 1`] = `
   "API_URL": "https://api.clerk.com",
   "API_VERSION": "v1",
   "JWT_KEY": "",
+  "MACHINE_SECRET_KEY": "",
   "PUBLISHABLE_KEY": "",
   "SDK_METADATA": {
     "environment": "test",

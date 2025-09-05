@@ -11,13 +11,13 @@ import { verifyToken as _verifyToken } from './tokens/verify';
 
 export const verifyToken = withLegacyReturn(_verifyToken);
 
-export type ClerkOptions = CreateBackendApiOptions &
+export type ClerkOptions = Omit<CreateBackendApiOptions, 'skipApiVersionInUrl' | 'useMachineSecretKey'> &
   Partial<
     Pick<
       CreateAuthenticateRequestOptions['options'],
       'audience' | 'jwtKey' | 'proxyUrl' | 'secretKey' | 'publishableKey' | 'domain' | 'isSatellite'
     >
-  > & { sdkMetadata?: SDKMetadata; telemetry?: Pick<TelemetryCollectorOptions, 'disabled' | 'debug'> };
+  > & { sdkMetadata?: SDKMetadata; telemetry?: Pick<TelemetryCollectorOptions, 'disabled' | 'debug' | 'samplingRate'> };
 
 // The current exported type resolves the following issue in packages importing createClerkClient
 // TS4023: Exported variable 'clerkClient' has or is using name 'AuthErrorReason' from external module "/packages/backend/dist/index" but cannot be named.
@@ -31,11 +31,11 @@ export function createClerkClient(options: ClerkOptions): ClerkClient {
   const apiClient = createBackendApiClient(opts);
   const requestState = createAuthenticateRequest({ options: opts, apiClient });
   const telemetry = new TelemetryCollector({
-    ...options.telemetry,
     publishableKey: opts.publishableKey,
     secretKey: opts.secretKey,
     samplingRate: 0.1,
     ...(opts.sdkMetadata ? { sdk: opts.sdkMetadata.name, sdkVersion: opts.sdkMetadata.version } : {}),
+    ...(opts.telemetry || {}),
   });
 
   return {
@@ -100,17 +100,9 @@ export type {
   PaginatedResponseJSON,
   TestingTokenJSON,
   WebhooksSvixJSON,
-  CommercePayerJSON,
-  CommercePayeeJSON,
-  CommerceAmountJSON,
-  CommerceTotalsJSON,
-  CommercePaymentSourceJSON,
-  CommercePaymentFailedReasonJSON,
-  CommerceSubscriptionCreditJSON,
   CommercePlanJSON,
-  CommerceSubscriptionItemJSON,
-  CommercePaymentAttemptJSON,
   CommerceSubscriptionJSON,
+  CommerceSubscriptionItemJSON,
 } from './api/resources/JSON';
 
 /**
@@ -127,11 +119,14 @@ export type {
   Domain,
   EmailAddress,
   ExternalAccount,
+  Feature,
   Instance,
   InstanceRestrictions,
   InstanceSettings,
   Invitation,
   JwtTemplate,
+  Machine,
+  M2MToken,
   OauthAccessToken,
   OAuthApplication,
   Organization,
@@ -150,6 +145,9 @@ export type {
   Token,
   User,
   TestingToken,
+  CommercePlan,
+  CommerceSubscription,
+  CommerceSubscriptionItem,
 } from './api/resources';
 
 /**
@@ -169,6 +167,9 @@ export type {
   WaitlistEntryWebhookEvent,
   WebhookEvent,
   WebhookEventType,
+  CommercePaymentAttemptWebhookEvent,
+  CommerceSubscriptionWebhookEvent,
+  CommerceSubscriptionItemWebhookEvent,
 } from './api/resources/Webhooks';
 
 /**

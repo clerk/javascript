@@ -10,9 +10,15 @@ export function mapScopeToStrategy<T extends `provider:${Strategy}`>(scope: T): 
   if (scope === 'provider:metamask') {
     return 'web3_metamask_signature';
   }
+
   if (scope === 'provider:coinbase_wallet') {
     return 'web3_coinbase_wallet_signature';
   }
+
+  if (scope === 'provider:base') {
+    return 'web3_base_signature';
+  }
+
   if (scope === 'provider:okx_wallet') {
     return 'web3_okx_wallet_signature';
   }

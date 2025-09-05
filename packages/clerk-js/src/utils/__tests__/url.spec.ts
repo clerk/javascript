@@ -7,6 +7,7 @@ import {
   createAllowedRedirectOrigins,
   getETLDPlusOneFromFrontendApi,
   getSearchParameterFromHash,
+  hasBannedHrefProtocol,
   hasBannedProtocol,
   hasExternalAccountSignUpError,
   isAllowedRedirect,
@@ -18,6 +19,7 @@ import {
   mergeFragmentIntoUrl,
   relativeToAbsoluteUrl,
   requiresUserInput,
+  sanitizeHref,
   trimLeadingSlash,
   trimTrailingSlash,
 } from '../url';
@@ -36,7 +38,7 @@ describe('isDevAccountPortalOrigin(url)', () => {
   ];
 
   test.each(goodUrls)('.isDevAccountPortalOrigin(%s)', (a, expected) => {
-    // @ts-ignore
+    // @ts-ignore - Type assertion for test parameter
     expect(isDevAccountPortalOrigin(a)).toBe(expected);
   });
 });
@@ -144,6 +146,79 @@ describe('hasBannedProtocol(url)', () => {
 
   test.each(cases)('.hasBannedProtocol(%s)', (a, expected) => {
     expect(hasBannedProtocol(a)).toBe(expected);
+  });
+});
+
+describe('hasBannedHrefProtocol(url)', () => {
+  const cases: Array<[string, boolean]> = [
+    ['https://www.clerk.com/', false],
+    ['http://www.clerk.com/', false],
+    ['/sign-in', false],
+    ['/sign-in?test=1', false],
+    ['/?test', false],
+    ['javascript:console.log(document.cookies)', true],
+    ['data:image/png;base64,iVBORw0KGgoAAA5ErkJggg==', true],
+    ['vbscript:alert("xss")', true],
+    ['blob:https://example.com/12345678-1234-1234-1234-123456789012', true],
+    ['ftp://files.example.com/file.txt', false],
+    ['mailto:user@example.com', false],
+  ];
+
+  test.each(cases)('.hasBannedHrefProtocol(%s)', (a, expected) => {
+    expect(hasBannedHrefProtocol(a)).toBe(expected);
+  });
+});
+
+describe('sanitizeHref(href)', () => {
+  const cases: Array<[string | undefined | null, string | null]> = [
+    // Null/undefined/empty cases
+    [null, null],
+    [undefined, null],
+    ['', null],
+    ['     ', null],
+
+    // Safe relative URLs
+    ['/path/to/page', '/path/to/page'],
+    ['#anchor', '#anchor'],
+    ['?query=param', '?query=param'],
+    ['../relative/path', '../relative/path'],
+    ['relative/path', 'relative/path'],
+    ['path/page#anchor', 'path/page#anchor'],
+
+    // Safe absolute URLs
+    ['https://www.clerk.com/', 'https://www.clerk.com/'],
+    ['http://localhost:3000/path', 'http://localhost:3000/path'],
+    ['ftp://files.example.com/file.txt', 'ftp://files.example.com/file.txt'],
+    ['mailto:user@example.com', 'mailto:user@example.com'],
+
+    // Dangerous protocols - should return null
+    ['javascript:alert("xss")', null],
+    ['javascript:console.log(document.cookies)', null],
+    ['data:text/html,<script>alert("xss")</script>', null],
+    ['data:text/html;base64,PHNjcmlwdD5hbGVydCgnWFNTIGZyb20gZGF0YSBVUkknKTwvc2NyaXB0Pg==', null],
+    ['data:image/png;base64,iVBORw0KGgoAAA5ErkJggg==', null],
+    ['vbscript:alert("xss")', null],
+    ['blob:https://example.com/12345678-1234-1234-1234-123456789012', null],
+
+    // Sneaky cases with dangerous protocols
+    ['JAVASCRIPT:alert("xss")', null], // All caps protocol
+    ['JavaScript:alert("xss")', null], // Mixed case
+    ['  javascript:alert("xss")  ', null], // Whitespace
+    ['javascript: alert("xss")  ', null], // Whitespace
+
+    // Malformed URLs that might be relative paths
+    ['not-a-url', 'not-a-url'],
+    ['path:with:colons', 'path:with:colons'],
+  ];
+
+  test.each(cases)('.sanitizeHref(%s)', (href, expected) => {
+    expect(sanitizeHref(href)).toBe(expected);
+  });
+
+  it('handles malformed URLs gracefully', () => {
+    // These should not throw errors and should be allowed as potential relative URLs
+    expect(sanitizeHref(':::invalid:::')).toBe(':::invalid:::');
+    expect(sanitizeHref('malformed:url:here')).toBe('malformed:url:here');
   });
 });
 
@@ -422,6 +497,7 @@ describe('isRedirectForFAPIInitiatedFlow(frontendAp: string, redirectUrl: string
     ['clerk.foo.bar-53.lcl.dev', 'https://clerk.foo.bar-53.lcl.dev/oauth/authorize', true],
     ['clerk.foo.bar-53.lcl.dev', 'https://clerk.foo.bar-53.lcl.dev/v1/verify', true],
     ['clerk.foo.bar-53.lcl.dev', 'https://clerk.foo.bar-53.lcl.dev/v1/tickets/accept', true],
+    ['clerk.foo.bar-53.lcl.dev', 'https://clerk.foo.bar-53.lcl.dev/oauth/authorize-with-immediate-redirect', true],
     ['clerk.foo.bar-53.lcl.dev', 'https://google.com', false],
     ['clerk.foo.bar-53.lcl.dev', 'https://google.com/v1/verify', false],
   ];
@@ -441,6 +517,7 @@ describe('requiresUserInput(redirectUrl: string)', () => {
     ['https://clerk.foo.bar-53.lcl.dev/oauth/authorize', true],
     ['https://clerk.foo.bar-53.lcl.dev/v1/verify', false],
     ['https://clerk.foo.bar-53.lcl.dev/v1/tickets/accept', false],
+    ['https://clerk.foo.bar-53.lcl.dev/oauth/authorize-with-immediate-redirect', false],
     ['https://google.com', false],
     ['https://google.com/v1/verify', false],
   ];

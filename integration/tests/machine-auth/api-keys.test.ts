@@ -7,7 +7,7 @@ import { appConfigs } from '../../presets';
 import type { FakeAPIKey, FakeUser } from '../../testUtils';
 import { createTestUtils } from '../../testUtils';
 
-test.describe('Next.js API key auth within clerkMiddleware() @nextjs', () => {
+test.describe('Next.js API key auth within clerkMiddleware() @machine', () => {
   test.describe.configure({ mode: 'parallel' });
   let app: Application;
   let fakeUser: FakeUser;
@@ -15,6 +15,7 @@ test.describe('Next.js API key auth within clerkMiddleware() @nextjs', () => {
   let fakeAPIKey: FakeAPIKey;
 
   test.beforeAll(async () => {
+    test.setTimeout(90_000); // Wait for app to be ready
     app = await appConfigs.next.appRouter
       .clone()
       .addFile(
@@ -105,6 +106,8 @@ test.describe('Next.js API key auth within routes @nextjs', () => {
   let fakeAPIKey: FakeAPIKey;
 
   test.beforeAll(async () => {
+    test.setTimeout(90_000); // Wait for app to be ready
+
     app = await appConfigs.next.appRouter
       .clone()
       .addFile(

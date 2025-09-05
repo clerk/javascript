@@ -34,7 +34,7 @@ import {
 export class CommerceBilling implements CommerceBillingNamespace {
   getPlans = async (params?: GetPlansParams): Promise<ClerkPaginatedResponse<CommercePlanResource>> => {
     const { for: forParam, ...safeParams } = params || {};
-    const searchParams = { ...safeParams, payer_type: forParam || 'user' };
+    const searchParams = { ...safeParams, payer_type: forParam === 'organization' ? 'org' : 'user' };
     return await BaseResource._fetch({
       path: `/commerce/plans`,
       method: 'GET',
@@ -103,6 +103,18 @@ export class CommerceBilling implements CommerceBillingNamespace {
     });
   };
 
+  getStatement = async (params: { id: string; orgId?: string }): Promise<CommerceStatementResource> => {
+    const statement = (
+      await BaseResource._fetch({
+        path: params.orgId
+          ? `/organizations/${params.orgId}/commerce/statements/${params.id}`
+          : `/me/commerce/statements/${params.id}`,
+        method: 'GET',
+      })
+    )?.response as unknown as CommerceStatementJSON;
+    return new CommerceStatement(statement);
+  };
+
   getPaymentAttempts = async (
     params: GetPaymentAttemptsParams,
   ): Promise<ClerkPaginatedResponse<CommercePaymentResource>> => {
@@ -122,6 +134,16 @@ export class CommerceBilling implements CommerceBillingNamespace {
     });
   };
 
+  getPaymentAttempt = async (params: { id: string; orgId?: string }): Promise<CommercePaymentResource> => {
+    const paymentAttempt = (await BaseResource._fetch({
+      path: params.orgId
+        ? `/organizations/${params.orgId}/commerce/payment_attempts/${params.id}`
+        : `/me/commerce/payment_attempts/${params.id}`,
+      method: 'GET',
+    })) as unknown as CommercePaymentJSON;
+    return new CommercePayment(paymentAttempt);
+  };
+
   startCheckout = async (params: CreateCheckoutParams) => {
     const { orgId, ...rest } = params;
     const json = (
@@ -132,6 +154,6 @@ export class CommerceBilling implements CommerceBillingNamespace {
       })
     )?.response as unknown as CommerceCheckoutJSON;
 
-    return new CommerceCheckout(json, orgId);
+    return new CommerceCheckout(json);
   };
 }

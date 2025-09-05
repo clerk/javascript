@@ -17,6 +17,9 @@ type EventPrebuiltComponent = ComponentMountedBase & {
 
 type EventComponentMounted = ComponentMountedBase & TelemetryEventRaw['payload'];
 
+/**
+ * @internal
+ */
 function createPrebuiltComponentEvent(event: typeof EVENT_COMPONENT_MOUNTED | typeof EVENT_COMPONENT_OPENED) {
   return function (
     component: string,
@@ -44,7 +47,6 @@ function createPrebuiltComponentEvent(event: typeof EVENT_COMPONENT_MOUNTED | ty
  * @param component - The name of the component.
  * @param props - The props passed to the component. Will be filtered to a known list of props.
  * @param additionalPayload - Additional data to send with the event.
- *
  * @example
  * telemetry.record(eventPrebuiltComponentMounted('SignUp', props));
  */
@@ -62,7 +64,6 @@ export function eventPrebuiltComponentMounted(
  * @param component - The name of the component.
  * @param props - The props passed to the component. Will be filtered to a known list of props.
  * @param additionalPayload - Additional data to send with the event.
- *
  * @example
  * telemetry.record(eventPrebuiltComponentOpened('GoogleOneTap', props));
  */
@@ -81,7 +82,6 @@ export function eventPrebuiltComponentOpened(
  *
  * @param component - The name of the component.
  * @param props - The props passed to the component. Ideally you only pass a handful of props here.
- *
  * @example
  * telemetry.record(eventComponentMounted('SignUp', props));
  */

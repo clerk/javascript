@@ -54,6 +54,7 @@ export const deDE: LocalizationResource = {
   badge__default: 'Standard',
   badge__endsAt: "Endet am {{ date | shortDate('de-DE') }}",
   badge__expired: 'Abgelaufen',
+  badge__freeTrial: undefined,
   badge__otherImpersonatorDevice: 'Anderes Imitationsgerät',
   badge__pastDueAt: undefined,
   badge__pastDuePlan: undefined,
@@ -62,6 +63,7 @@ export const deDE: LocalizationResource = {
   badge__requiresAction: 'Handlung erforderlich',
   badge__startsAt: "Startet am {{ date | shortDate('de-DE') }}",
   badge__thisDevice: 'Dieses Gerät',
+  badge__trialEndsAt: undefined,
   badge__unverified: 'Unbestätigt',
   badge__upcomingPlan: 'Bevorstehend',
   badge__userDevice: 'Benutzergerät',
@@ -73,6 +75,9 @@ export const deDE: LocalizationResource = {
     availableFeatures: 'Verfügbare Funktionen',
     billedAnnually: 'Jährlich abgerechnet',
     billedMonthlyOnly: 'Nur monatlich abgerechnet',
+    cancelFreeTrial: undefined,
+    cancelFreeTrialAccessUntil: undefined,
+    cancelFreeTrialTitle: undefined,
     cancelSubscription: 'Abonnement kündigen',
     cancelSubscriptionAccessUntil:
       "Sie haben Zugriff auf '{{plan}}' Funktionen bis zum {{ date | longDate('de-DE') }}. Danach haben Sie keinen Zugriff mehr.",
@@ -91,6 +96,7 @@ export const deDE: LocalizationResource = {
         title: 'E-Mail-Adresse hinzufügen',
       },
       lineItems: {
+        title__freeTrialEndsAt: undefined,
         title__paymentMethod: 'Bezahlmethode',
         title__statementId: 'Statement-ID',
         title__subscriptionBegins: 'Abonnement beginnt',
@@ -101,12 +107,15 @@ export const deDE: LocalizationResource = {
       title: 'Bezahlung',
       title__paymentSuccessful: 'Zahlung erfolgreich!',
       title__subscriptionSuccessful: 'Geschafft!',
+      title__trialSuccess: undefined,
+      totalDueAfterTrial: undefined,
     },
     credit: undefined,
     creditRemainder: 'Verbleibendes Guthaben für den restlichen Abrechnungszeitraum.',
     defaultFreePlanActive: 'Sie nutzen aktuell den kostenlosen Plan.',
     free: 'Kostenlos',
     getStarted: 'Jetzt starten',
+    keepFreeTrial: undefined,
     keepSubscription: 'Abonnement behalten',
     manage: 'Verwalten',
     manageSubscription: 'Mitgliedschaft verwalten',
@@ -136,17 +145,23 @@ export const deDE: LocalizationResource = {
     },
     reSubscribe: 'Erneut abonnieren',
     seeAllFeatures: 'Alle Funktionen anzeigen',
+    startFreeTrial: undefined,
+    startFreeTrial__days: undefined,
     subscribe: 'Abonnieren',
     subscriptionDetails: {
       beginsOn: undefined,
       currentBillingCycle: undefined,
       endsOn: undefined,
+      firstPaymentAmount: undefined,
+      firstPaymentOn: undefined,
       nextPaymentAmount: undefined,
       nextPaymentOn: undefined,
       pastDueAt: undefined,
       renewsAt: undefined,
       subscribedOn: undefined,
       title: undefined,
+      trialEndsOn: undefined,
+      trialStartedOn: undefined,
     },
     subtotal: 'Zwischensumme',
     switchPlan: 'Zu diesem Plan wechseln',
@@ -157,6 +172,7 @@ export const deDE: LocalizationResource = {
     totalDue: undefined,
     totalDueToday: 'Heute fällig',
     viewFeatures: 'Funktionen anzeigen',
+    viewPayment: undefined,
     year: 'Jahr',
   },
   createOrganization: {
@@ -181,7 +197,7 @@ export const deDE: LocalizationResource = {
   footerPageLink__privacy: 'Privatsphäre',
   footerPageLink__terms: 'Bedingungen',
   formButtonPrimary: 'Fortsetzen',
-  formButtonPrimary__verify: 'Verify',
+  formButtonPrimary__verify: 'Verifizieren',
   formFieldAction__forgotPassword: 'Passwort vergessen?',
   formFieldError__matchingPasswords: 'Passwörter stimmen überein.',
   formFieldError__notMatchingPasswords: 'Passwörter stimmen nicht überein.',
@@ -211,7 +227,7 @@ export const deDE: LocalizationResource = {
   formFieldLabel__apiKeyExpiration: 'Ablaufdatum',
   formFieldLabel__apiKeyName: 'Name',
   formFieldLabel__automaticInvitations: 'Aktivieren Sie automatische Einladungen für diese Domain',
-  formFieldLabel__backupCode: 'Sicherungscode',
+  formFieldLabel__backupCode: 'Wiederherstellungscode',
   formFieldLabel__confirmDeletion: 'Bestätigung',
   formFieldLabel__confirmPassword: 'Passwort bestätigen',
   formFieldLabel__currentPassword: 'Aktuelles Passwort',
@@ -493,7 +509,7 @@ export const deDE: LocalizationResource = {
     alternativeMethods: {
       actionLink: 'Klicken Sie hier, um eine alternative Methode zu verwenden',
       actionText: 'Verwenden Sie eine alternative Verifizierungsmethode',
-      blockButton__backupCode: 'Mit Backup-Code verifizieren',
+      blockButton__backupCode: 'Mit Wiederherstellungscode verifizieren',
       blockButton__emailCode: 'Mit E-Mail-Code verifizieren',
       blockButton__passkey: 'Verwenden Sie Ihren Passkey',
       blockButton__password: 'Mit Passwort verifizieren',
@@ -508,8 +524,9 @@ export const deDE: LocalizationResource = {
       title: 'Verifizierung erforderlich',
     },
     backupCodeMfa: {
-      subtitle: 'Verwenden Sie den Backup-Code, der Ihnen bei der Registrierung zur Verfügung gestellt wurde.',
-      title: 'Backup-Code Verifizierung',
+      subtitle:
+        'Verwenden Sie den Wiederherstellungscode, der Ihnen bei der Registrierung zur Verfügung gestellt wurde.',
+      title: 'Wiederherstellungscode Verifizierung',
     },
     emailCode: {
       formTitle: 'Geben Sie den Code ein, den wir an Ihre E-Mail-Adresse gesendet haben.',
@@ -561,7 +578,7 @@ export const deDE: LocalizationResource = {
     alternativeMethods: {
       actionLink: 'Hilfe',
       actionText: 'Haben Sie keine davon?',
-      blockButton__backupCode: 'Verwenden Sie einen Backup-Code',
+      blockButton__backupCode: 'Verwenden Sie einen Wiederherstellungscode',
       blockButton__emailCode: 'Code an {{identifier}} senden',
       blockButton__emailLink: 'Link senden an {{identifier}}',
       blockButton__passkey: 'Melden Sie sich mit Ihrem Passkey an',
@@ -585,7 +602,7 @@ export const deDE: LocalizationResource = {
     },
     backupCodeMfa: {
       subtitle: 'weiter zu {{applicationName}}',
-      title: 'Geben Sie einen Backup-Code ein',
+      title: 'Geben Sie einen Wiederherstellungscode ein',
     },
     emailCode: {
       formTitle: 'Bestätigungscode',
@@ -798,6 +815,30 @@ export const deDE: LocalizationResource = {
   },
   socialButtonsBlockButton: 'Weiter mit {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
+  taskChooseOrganization: {
+    chooseOrganization: {
+      action__createOrganization: undefined,
+      action__invitationAccept: undefined,
+      action__suggestionsAccept: undefined,
+      subtitle: undefined,
+      suggestionsAcceptedLabel: undefined,
+      title: undefined,
+    },
+    createOrganization: {
+      formButtonReset: undefined,
+      formButtonSubmit: undefined,
+      formFieldInputPlaceholder__name: undefined,
+      formFieldInputPlaceholder__slug: undefined,
+      formFieldLabel__name: undefined,
+      formFieldLabel__slug: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+  },
   unstable__errors: {
     already_a_member_in_organization: 'Sie sind bereits Mitglied in dieser Organisation.',
     captcha_invalid:
@@ -816,6 +857,9 @@ export const deDE: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'Der Nachname sollte nicht mehr als 256 Zeichen umfassen.',
     form_param_max_length_exceeded__name: 'Der Name sollte nicht länger als 256 Zeichen sein.',
     form_param_nil: 'Ein erforderliches Feld wurde nicht ausgefüllt. Bitte überprüfen Sie Ihre Eingaben.',
+    form_param_type_invalid: undefined,
+    form_param_type_invalid__email_address: undefined,
+    form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Der eingegebene Wert ist ungültig.',
     form_password_incorrect: 'Das eingegebene Passwort ist falsch.',
     form_password_length_too_short: 'Das Passwort ist zu kurz. Es muss mindestens 8 Zeichen lang sein.',
@@ -841,6 +885,8 @@ export const deDE: LocalizationResource = {
       'Sie haben Ihr Limit an Organisationsmitgliedschaften einschließlich ausstehender Einladungen erreicht.',
     organization_minimum_permissions_needed:
       'Es muss mindestens ein Organisationsmitglied mit den erforderlichen Mindestberechtigungen geben.',
+    organization_not_found_or_unauthorized: undefined,
+    organization_not_found_or_unauthorized_with_create_organization_disabled: undefined,
     passkey_already_exists: 'Auf diesem Gerät ist bereits ein Passkey registriert.',
     passkey_not_supported: 'Passkeys werden auf diesem Gerät nicht unterstützt.',
     passkey_pa_not_supported:
@@ -917,16 +963,16 @@ export const deDE: LocalizationResource = {
       actionLabel__copy: 'Kopiere alle',
       actionLabel__download: 'Laden Sie .txt herunter',
       actionLabel__print: 'Drucken',
-      infoText1: 'Backup-Codes werden für dieses Konto aktiviert.',
+      infoText1: 'Wiederherstellungscodes werden für dieses Konto aktiviert.',
       infoText2:
-        'Halten Sie die Backup-Codes geheim und bewahren Sie sie sicher auf. Sie können Sicherungscodes neu generieren, wenn Sie vermuten, dass sie kompromittiert wurden.',
+        'Halten Sie die Wiederherstellungscodes geheim und bewahren Sie sie sicher auf. Sie können Wiederherstellungscodes neu generieren, wenn Sie vermuten, dass sie kompromittiert wurden.',
       subtitle__codelist: 'Bewahren Sie die Codes sicher auf und halten Sie sie geheim.',
       successMessage:
-        'Sicherungscodes sind jetzt aktiviert. Sie können eines davon verwenden, um sich bei Ihrem Konto anzumelden, wenn Sie den Zugriff auf Ihr Authentifizierungsgerät verlieren. Jeder Code kann nur einmal verwendet werden.',
+        'Wiederherstellungscodes sind jetzt aktiviert. Sie können eines davon verwenden, um sich bei Ihrem Konto anzumelden, wenn Sie den Zugriff auf Ihr Authentifizierungsgerät verlieren. Jeder Code kann nur einmal verwendet werden.',
       successSubtitle:
         'Sie können diese Codes verwenden, um sich bei Ihrem Konto anzumelden, wenn Sie den Zugriff auf Ihr Authentifizierungsgerät verlieren.',
-      title: 'Backup-Code-Verifizierung hinzufügen',
-      title__codelist: 'Sicherungscodes',
+      title: 'Wiederherstellungscode-Verifizierung hinzufügen',
+      title__codelist: 'Wiederherstellungscodes',
     },
     billingPage: {
       paymentHistorySection: {
@@ -1037,7 +1083,7 @@ export const deDE: LocalizationResource = {
       title: 'E-Mail-Adresse hinzufügen',
       verifyTitle: 'E-Mail Adresse verifizieren',
     },
-    formButtonPrimary__add: 'Add',
+    formButtonPrimary__add: 'Hinzufügen',
     formButtonPrimary__continue: 'Fortsetzen',
     formButtonPrimary__finish: 'Fertig',
     formButtonPrimary__remove: 'Entfernen',
@@ -1052,7 +1098,8 @@ export const deDE: LocalizationResource = {
       primaryButton__addPhoneNumber: 'Fügen Sie eine Telefonnummer hinzu',
       removeResource: {
         messageLine1: '{{identifier}} erhält bei der Anmeldung keine Bestätigungscodes mehr.',
-        messageLine2: 'Ihr Konto ist möglicherweise nicht so sicher. Bist du dir sicher, dass du weitermachen willst?',
+        messageLine2:
+          'Ihr Konto ist möglicherweise nicht so sicher. Sind Sie sich sicher, dass Sie fortfahren möchten?',
         successMessage: 'SMS-Code-Bestätigung in zwei Schritten wurde für {{mfaPhoneCode}} entfernt',
         title: 'Entfernen Sie die Bestätigung in zwei Schritten',
       },
@@ -1061,10 +1108,10 @@ export const deDE: LocalizationResource = {
       subtitle__unavailablePhoneNumbers:
         'Es sind keine Telefonnummern verfügbar, um sich für die SMS-Code-Bestätigung in zwei Schritten zu registrieren.',
       successMessage1:
-        'When signing in, you will need to enter a verification code sent to this phone number as an additional step.',
+        'Wenn Sie sich anmelden, müssen Sie einen Bestätigungscode eingeben, der an diese Telefonnummer gesendet wird.',
       successMessage2:
-        'Save these backup codes and store them somewhere safe. If you lose access to your authentication device, you can use backup codes to sign in.',
-      successTitle: 'SMS code verification enabled',
+        'Speichern Sie diese Wiederherstellungscodes und bewahren Sie sie an einem sicheren Ort auf. Falls Sie den Zugriff auf Ihr Authentifizierungsgerät verlieren, können Sie sich mit diesen Codes anmelden.',
+      successTitle: 'SMS-Code-Bestätigung aktiviert',
       title: 'SMS-Code-Bestätigung hinzufügen',
     },
     mfaTOTPPage: {
@@ -1131,8 +1178,8 @@ export const deDE: LocalizationResource = {
       },
       successMessage: '{{identifier}} wurde Ihrem Konto hinzugefügt.',
       title: 'Telefonnummer hinzufügen',
-      verifySubtitle: 'Enter the verification code sent to {{identifier}}',
-      verifyTitle: 'Verify phone number',
+      verifySubtitle: 'Geben Sie den Bestätigungscode ein, der an {{identifier}} gesendet wurde',
+      verifyTitle: 'Telefonnummer verifizieren',
     },
     plansPage: {
       title: 'Pläne',
@@ -1142,7 +1189,8 @@ export const deDE: LocalizationResource = {
       imageFormDestructiveActionSubtitle: 'Bild entfernen',
       imageFormSubtitle: 'Bild hochladen',
       imageFormTitle: 'Profilbild',
-      readonly: 'Your profile information has been provided by the enterprise connection and cannot be edited.',
+      readonly:
+        'Ihre Profilinformationen wurden durch Ihr Unternehmen bereitgestellt und können nicht bearbeitet werden.',
       successMessage: 'Ihr Profil wurde aktualisiert.',
       title: 'Profil aktualisieren',
     },
@@ -1158,7 +1206,7 @@ export const deDE: LocalizationResource = {
         primaryButton: 'Konto verbinden',
         subtitle__disconnected: 'Ihr Konto ist derzeit getrennt. Bitte verbinden Sie es erneut.',
         subtitle__reauthorize:
-          'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
+          'Die erforderlichen Berechtigungen wurden aktualisiert, wodurch Ihre Funktionalität möglicherweise eingeschränkt ist. Bitte autorisieren Sie diese Anwendung erneut, um Probleme zu vermeiden.',
         title: 'Verbundene Konten',
       },
       dangerSection: {
@@ -1181,10 +1229,10 @@ export const deDE: LocalizationResource = {
       mfaSection: {
         backupCodes: {
           actionLabel__regenerate: 'Codes neu generieren',
-          headerTitle: 'Backup-Codes',
+          headerTitle: 'Wiederherstellungscodes',
           subtitle__regenerate:
-            'Generieren Sie einen neuen Satz sicherer Backup-Codes. Alte Backup-Code werden gelöscht und können nicht mehr verwendet werden.',
-          title__regenerate: 'Backup-Codes neu generieren',
+            'Generieren Sie einen neuen Satz sicherer Wiederherstellungscodes. Alte Wiederherstellungscodes werden gelöscht und können nicht mehr verwendet werden.',
+          title__regenerate: 'Wiederherstellungscodes neu generieren',
         },
         phoneCode: {
           actionLabel__setDefault: 'Als Standard einstellen',
@@ -1253,15 +1301,15 @@ export const deDE: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: 'Jetzt anmelden',
-      actionText: 'Kein Zugang? Auf die Warteliste setzen!',
-      formButton: 'Zur Warteliste hinzufügen',
-      subtitle: 'Es tut uns leid, aber derzeit sind keine Plätze verfügbar.',
+      actionLink: 'Anmelden',
+      actionText: 'Bereits Zugang?',
+      formButton: 'Warteliste beitreten',
+      subtitle: 'Geben Sie Ihre E-Mail-Adresse ein und wir benachrichtigen Sie, sobald Ihr Zugang verfügbar ist.',
       title: 'Warteliste beitreten',
     },
     success: {
       message:
-        'Sie wurden erfolgreich auf die Warteliste gesetzt. Wir benachrichtigen Sie, sobald Plätze verfügbar sind.',
+        'Sie wurden erfolgreich auf die Warteliste gesetzt. Wir benachrichtigen Sie, sobald der Zugang freigegeben wird.',
       subtitle: 'Vielen Dank für Ihre Geduld. Sie erhalten eine Benachrichtigung, sobald der Zugang freigegeben wird.',
       title: 'Erfolgreich auf die Warteliste gesetzt',
     },

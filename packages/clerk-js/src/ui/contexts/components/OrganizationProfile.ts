@@ -6,9 +6,10 @@ import type { CustomPageContent } from '@/ui/utils/createCustomPages';
 import { createOrganizationProfileCustomPages } from '@/ui/utils/createCustomPages';
 
 import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID } from '../../constants';
-import { useEnvironment } from '../../contexts';
 import { useRouter } from '../../router';
 import type { OrganizationProfileCtx } from '../../types';
+import { useEnvironment } from '../EnvironmentContext';
+import { useStatements, useSubscription } from './Plans';
 
 type PagesType = {
   routes: NavbarRoute[];
@@ -24,6 +25,7 @@ export type OrganizationProfileContextType = OrganizationProfileCtx & {
   isGeneralPageRoot: boolean;
   isBillingPageRoot: boolean;
   isApiKeysPageRoot: boolean;
+  shouldShowBilling: boolean;
 };
 
 export const OrganizationProfileContext = createContext<OrganizationProfileCtx | null>(null);
@@ -40,9 +42,23 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
 
   const { componentName, customPages, ...ctx } = context;
 
+  const subscription = useSubscription();
+  const statements = useStatements();
+
+  const hasNonFreeSubscription = subscription.data?.subscriptionItems.some(item => item.plan.hasBaseFee);
+
+  // TODO(@BILLING): Remove this when C1s can disable user billing seperately from the organization billing.
+  const shouldShowBilling =
+    // The instance has at lease one visible plan the C2 can choose
+    environment.commerceSettings.billing.organization.hasPaidPlans ||
+    // The C2 has a subscription, it can be active or past due, or scheduled for cancellation.
+    hasNonFreeSubscription ||
+    // The C2 had a subscription in the past
+    Boolean(statements.data.length > 0);
+
   const pages = useMemo(
-    () => createOrganizationProfileCustomPages(customPages || [], clerk, environment),
-    [customPages],
+    () => createOrganizationProfileCustomPages(customPages || [], clerk, shouldShowBilling, environment),
+    [customPages, shouldShowBilling],
   );
 
   const navigateAfterLeaveOrganization = () =>
@@ -65,5 +81,6 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
     isGeneralPageRoot,
     isBillingPageRoot,
     isApiKeysPageRoot,
+    shouldShowBilling,
   };
 };

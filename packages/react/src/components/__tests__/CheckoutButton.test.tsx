@@ -54,15 +54,17 @@ describe('CheckoutButton', () => {
       // Mock useAuth to return userId but no orgId
       (useAuth as any).mockReturnValue({ userId: 'user_123', orgId: null });
 
-      // Expect the component to throw an error when subscriberType is "org"
+      // Expect the component to throw an error when for is "organization"
       expect(() =>
         render(
           <CheckoutButton
             planId='test_plan'
-            subscriberType='org'
+            for='organization'
           />,
         ),
-      ).toThrow('Wrap `<CheckoutButton for="organization" />` with a check for an active organization.');
+      ).toThrow(
+        'Wrap `<CheckoutButton for="organization" />` with a check for an active organization. Retrieve `orgId` from `useAuth()` and confirm it is defined.',
+      );
     });
 
     it('renders successfully with authenticated user', () => {
@@ -82,7 +84,7 @@ describe('CheckoutButton', () => {
         render(
           <CheckoutButton
             planId='test_plan'
-            subscriberType='org'
+            for='organization'
           />,
         ),
       ).not.toThrow();

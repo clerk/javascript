@@ -35,7 +35,7 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
   const signIn = useCoreSignIn();
   const card = useCardState();
   const { navigate } = useRouter();
-  const { afterSignInUrl } = useSignInContext();
+  const { afterSignInUrl, navigateOnSetActive } = useSignInContext();
   const { setActive } = useClerk();
   const supportEmail = useSupportEmail();
   const clerk = useClerk();
@@ -82,19 +82,11 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
       .catch(err => handleError(err, [], card.setError));
   };
 
-  useFetch(
-    shouldAvoidPrepare
-      ? undefined
-      : () =>
-          signIn
-            ?.prepareFirstFactor(props.factor)
-            .then(() => props.onFactorPrepare())
-            .catch(err => handleError(err, [], card.setError)),
-    cacheKey,
-    {
-      staleTime: 100,
-    },
-  );
+  useFetch(shouldAvoidPrepare ? undefined : () => signIn?.prepareFirstFactor(props.factor), cacheKey, {
+    staleTime: 100,
+    onSuccess: () => props.onFactorPrepare(),
+    onError: err => handleError(err, [], card.setError),
+  });
 
   const action: VerificationCodeCardProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {
     signIn
@@ -104,7 +96,12 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
 
         switch (res.status) {
           case 'complete':
-            return setActive({ session: res.createdSessionId, redirectUrl: afterSignInUrl });
+            return setActive({
+              session: res.createdSessionId,
+              navigate: async ({ session }) => {
+                await navigateOnSetActive({ session, redirectUrl: afterSignInUrl });
+              },
+            });
           case 'needs_second_factor':
             return navigate('../factor-two');
           case 'needs_new_password':

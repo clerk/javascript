@@ -9,7 +9,7 @@ type EsbuildPlugin = NonNullable<Options['esbuildPlugins']>[number];
 export default defineConfig(() => {
   return {
     clean: true,
-    entry: ['./src/index.ts', './src/internal.ts', './src/errors.ts'],
+    entry: ['./src/index.ts', './src/experimental.ts', './src/internal.ts', './src/errors.ts'],
     format: ['esm'],
     bundle: true,
     sourcemap: true,
@@ -17,13 +17,13 @@ export default defineConfig(() => {
     dts: false,
     esbuildPlugins: [
       // Adds .vue files support
-      vuePlugin() as EsbuildPlugin,
+      vuePlugin(),
       // Automatically generates runtime props from TypeScript types/interfaces for all
       // control and UI components, adding them to Vue components during build via
       // Object.defineProperty
       autoPropsPlugin({
         include: ['**/*.ts'],
-      }) as EsbuildPlugin,
+      }),
     ],
     define: {
       PACKAGE_NAME: `"${name}"`,
