@@ -1,5 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import useSWR from 'swr';
 
 export const useApiKeys = ({
@@ -12,61 +12,57 @@ export const useApiKeys = ({
   enabled: boolean;
 }) => {
   const clerk = useClerk();
+  const [currentPage, setCurrentPage] = useState(1);
 
   const cacheKey = {
     key: 'api-keys',
     subject,
+    perPage,
+    initialPage: currentPage,
   };
+
   const {
-    data: apiKeys,
+    data: apiKeysResource,
     isLoading,
     mutate,
-  } = useSWR(enabled ? cacheKey : null, () => clerk.apiKeys.getAll({ subject }));
-  const [search, setSearch] = useState('');
-  const filteredApiKeys = (apiKeys ?? []).filter(key => key.name.toLowerCase().includes(search.toLowerCase()));
+  } = useSWR(enabled ? cacheKey : null, () =>
+    clerk.apiKeys.getAll({
+      subject,
+      pageSize: perPage,
+      initialPage: currentPage,
+    }),
+  );
 
-  const {
-    page,
-    setPage,
-    pageCount,
-    itemCount,
-    startingRow,
-    endingRow,
-    paginatedItems: paginatedApiKeys,
-  } = useClientSidePagination(filteredApiKeys, perPage);
+  const apiKeys = useMemo(() => apiKeysResource?.data ?? [], [apiKeysResource]);
+  const totalCount = useMemo(() => apiKeysResource?.total_count ?? 0, [apiKeysResource]);
+  const [search, setSearch] = useState('');
+
+  const filteredApiKeys = apiKeys.filter(key => key.name.toLowerCase().includes(search.toLowerCase()));
+
+  // Calculate pagination values based on server response
+  const pageCount = Math.max(1, Math.ceil(totalCount / perPage));
+  const startingRow = totalCount > 0 ? (currentPage - 1) * perPage + 1 : 0;
+  const endingRow = Math.min(currentPage * perPage, totalCount);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    // Reset search when changing pages
+    // TODO(rob): Server-side search is not implemented
+    setSearch('');
+  };
 
   return {
-    apiKeys: paginatedApiKeys,
+    apiKeys: filteredApiKeys,
     cacheKey,
     mutate,
     isLoading,
     search,
     setSearch,
-    page,
-    setPage,
+    page: currentPage,
+    setPage: handlePageChange,
     pageCount,
-    itemCount,
+    itemCount: totalCount,
     startingRow,
     endingRow,
-  };
-};
-
-const useClientSidePagination = <T>(items: T[], itemsPerPage: number) => {
-  const [page, setPage] = useState(1);
-
-  const itemCount = items.length;
-  const pageCount = Math.max(1, Math.ceil(itemCount / itemsPerPage));
-  const startingRow = itemCount > 0 ? (page - 1) * itemsPerPage + 1 : 0;
-  const endingRow = Math.min(page * itemsPerPage, itemCount);
-  const paginatedItems = items.slice(startingRow - 1, endingRow);
-
-  return {
-    page,
-    setPage,
-    pageCount,
-    itemCount,
-    startingRow,
-    endingRow,
-    paginatedItems,
   };
 };
