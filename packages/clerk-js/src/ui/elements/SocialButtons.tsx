@@ -280,7 +280,7 @@ const SocialButtonBlock = forwardRef((props: SocialButtonProps, ref: Ref<HTMLBut
             padding: t.space.$px,
           })}
         >
-          <LastAuthenticationStrategyBadge>Last used</LastAuthenticationStrategyBadge>
+          <LastAuthenticationStrategyBadge />
         </Box>
       )}
 

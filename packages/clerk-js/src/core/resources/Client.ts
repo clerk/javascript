@@ -83,6 +83,7 @@ export class Client extends BaseResource implements ClientResource {
       this.signUp = new SignUp(null);
       this.signIn = new SignIn(null);
       this.lastActiveSessionId = null;
+      this.lastAuthenticationStrategy = null;
       this.cookieExpiresAt = null;
       this.createdAt = null;
       this.updatedAt = null;
