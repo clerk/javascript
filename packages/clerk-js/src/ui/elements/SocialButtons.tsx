@@ -1,4 +1,5 @@
 import { getAlternativePhoneCodeProviderData } from '@clerk/shared/alternativePhoneCode';
+import { useClerk } from '@clerk/shared/react';
 import type { OAuthProvider, OAuthStrategy, PhoneCodeChannel, Web3Provider, Web3Strategy } from '@clerk/types';
 import type { Ref } from 'react';
 import React, { forwardRef, isValidElement } from 'react';
@@ -6,6 +7,7 @@ import React, { forwardRef, isValidElement } from 'react';
 import { ProviderInitialIcon } from '../common';
 import type { LocalizationKey } from '../customizables';
 import {
+  Box,
   Button,
   descriptors,
   Flex,
@@ -21,6 +23,7 @@ import {
 import { useEnabledThirdPartyProviders } from '../hooks';
 import { mqu, type PropsOfComponent } from '../styledSystem';
 import { sleep } from '../utils/sleep';
+import { LastAuthenticationStrategyBadge } from './Badge';
 import { useCardState } from './contexts';
 import { distributeStrategiesIntoRows } from './utils';
 
@@ -62,9 +65,12 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
   const { web3Strategies, authenticatableOauthStrategies, strategyToDisplayData, alternativePhoneCodeChannels } =
     useEnabledThirdPartyProviders();
   const card = useCardState();
+  const clerk = useClerk();
   const { socialButtonsVariant } = useAppearance().parsedLayout;
 
-  const strategies = [
+  type TStrategy = OAuthStrategy | Web3Strategy | PhoneCodeChannel;
+
+  const strategies: TStrategy[] = [
     ...(enableOAuthProviders ? authenticatableOauthStrategies : []),
     ...(enableWeb3Providers ? web3Strategies : []),
     ...(enableAlternativePhoneCodeProviders ? alternativePhoneCodeChannels : []),
@@ -74,8 +80,13 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
     return null;
   }
 
-  const strategyRows = distributeStrategiesIntoRows([...strategies], MAX_STRATEGIES_PER_ROW);
-  const strategyRowOneLength = strategyRows.at(0)?.length ?? 0;
+  const lastAuthenticationStrategy = clerk.client?.lastAuthenticationStrategy as TStrategy | null;
+  const { strategyRows, lastAuthenticationStrategyPresent } = distributeStrategiesIntoRows<TStrategy>(
+    [...strategies],
+    MAX_STRATEGIES_PER_ROW,
+    lastAuthenticationStrategy,
+  );
+  const strategyRowOneLength = strategyRows.at(lastAuthenticationStrategyPresent ? 1 : 0)?.length ?? 0;
 
   const preferBlockButtons =
     socialButtonsVariant === 'blockButton'
@@ -184,6 +195,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
                 label={label}
                 textLocalizationKey={localizedText}
                 icon={imageOrInitial}
+                lastAuthenticationStrategy={strategy === lastAuthenticationStrategy}
               />
             );
           })}
@@ -198,10 +210,20 @@ type SocialButtonProps = PropsOfComponent<typeof Button> & {
   id: OAuthProvider | Web3Provider | PhoneCodeChannel;
   textLocalizationKey: LocalizationKey | undefined;
   label?: string;
+  lastAuthenticationStrategy?: boolean;
 };
 
 const SocialButtonIcon = forwardRef((props: SocialButtonProps, ref: Ref<HTMLButtonElement> | null): JSX.Element => {
-  const { icon, label, id, textLocalizationKey, ...rest } = props;
+  const { icon, label, id, textLocalizationKey, lastAuthenticationStrategy, ...rest } = props;
+
+  if (lastAuthenticationStrategy) {
+    return (
+      <SocialButtonBlock
+        {...props}
+        ref={ref}
+      />
+    );
+  }
 
   return (
     <Button
@@ -224,7 +246,7 @@ const SocialButtonIcon = forwardRef((props: SocialButtonProps, ref: Ref<HTMLButt
 });
 
 const SocialButtonBlock = forwardRef((props: SocialButtonProps, ref: Ref<HTMLButtonElement> | null): JSX.Element => {
-  const { id, icon, isLoading, label, textLocalizationKey, ...rest } = props;
+  const { id, icon, isLoading, label, textLocalizationKey, lastAuthenticationStrategy, ...rest } = props;
   const isIconElement = isValidElement(icon);
 
   return (
@@ -246,6 +268,22 @@ const SocialButtonBlock = forwardRef((props: SocialButtonProps, ref: Ref<HTMLBut
         props.sx,
       ]}
     >
+      {lastAuthenticationStrategy && (
+        <Box
+          elementDescriptor={descriptors.lastAuthenticationStrategyBadgeContainer}
+          sx={t => ({
+            position: 'absolute',
+            top: '-40%',
+            right: `calc(${t.space.$2x5} * -1)`,
+            borderRadius: t.radii.$lg,
+            backgroundColor: t.colors.$colorBackground,
+            padding: t.space.$px,
+          })}
+        >
+          <LastAuthenticationStrategyBadge>Last used</LastAuthenticationStrategyBadge>
+        </Box>
+      )}
+
       <Flex
         justify='center'
         align='center'

@@ -90,6 +90,7 @@ export interface ClientJSON extends ClerkResourceJSON {
   sign_in: SignInJSON | null;
   captcha_bypass?: boolean; // this is used by the @clerk/testing package
   last_active_session_id: string | null;
+  last_authentication_strategy: string | null;
   cookie_expires_at: number | null;
   created_at: number;
   updated_at: number;
