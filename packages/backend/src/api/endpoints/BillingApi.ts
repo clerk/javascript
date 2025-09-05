@@ -23,6 +23,14 @@ type CancelSubscriptionItemParams = {
   endNow?: boolean;
 };
 
+type ExtendSubscriptionItemFreeTrialParams = {
+  /**
+   * RFC3339 timestamp to extend the free trial to.
+   * Must be in the future and not more than 365 days from the current trial end.
+   */
+  extendTo: Date;
+};
+
 export class BillingAPI extends AbstractAPI {
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
@@ -46,6 +54,22 @@ export class BillingAPI extends AbstractAPI {
       method: 'DELETE',
       path: joinPaths(basePath, 'subscription_items', subscriptionItemId),
       queryParams: params,
+    });
+  }
+
+  /**
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+   * It is advised to pin the SDK version to avoid breaking changes.
+   */
+  public async extendSubscriptionItemFreeTrial(
+    subscriptionItemId: string,
+    params: ExtendSubscriptionItemFreeTrialParams,
+  ) {
+    this.requireId(subscriptionItemId);
+    return this.request<CommerceSubscriptionItem>({
+      method: 'POST',
+      path: joinPaths('/billing', 'subscription_items', subscriptionItemId, 'extend_free_trial'),
+      bodyParams: params,
     });
   }
 
