@@ -1,5 +1,13 @@
 # Change Log
 
+## 3.24.3
+
+### Patch Changes
+
+- Fix formatting of cs-CZ localization strings ([#6717](https://github.com/clerk/javascript/pull/6717)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Add back removed cs-CZ translations for form field errors ([#6713](https://github.com/clerk/javascript/pull/6713)) by [@ToliaGuy](https://github.com/ToliaGuy)
+
 ## 3.24.2
 
 ### Patch Changes

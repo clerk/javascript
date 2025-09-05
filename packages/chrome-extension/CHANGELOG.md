@@ -1,5 +1,13 @@
 # Change Log
 
+## 2.5.30
+
+### Patch Changes
+
+- Updated dependencies [[`aa098bd`](https://github.com/clerk/javascript/commit/aa098bd5b71fd5cdc7e1a17bb19da542446fd43b), [`bddb828`](https://github.com/clerk/javascript/commit/bddb82815d4dbfe574834867d66639d3e342f7f8), [`4a5bd7a`](https://github.com/clerk/javascript/commit/4a5bd7a4d9e96c89af07db69fc140ca2adb87f08)]:
+  - @clerk/clerk-js@5.91.3
+  - @clerk/clerk-react@5.46.2
+
 ## 2.5.29
 
 ### Patch Changes
