@@ -10,6 +10,7 @@ import { isHttpOrHttps, isValidProxyUrl, proxyUrlToAbsoluteURL } from '@clerk/sh
 import {
   eventPrebuiltComponentMounted,
   eventPrebuiltComponentOpened,
+  eventThemeUsage,
   TelemetryCollector,
 } from '@clerk/shared/telemetry';
 import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
@@ -462,6 +463,11 @@ export class Clerk implements ClerkInterface {
         publishableKey: this.publishableKey,
         ...this.#options.telemetry,
       });
+
+      // Record theme usage telemetry when appearance is provided
+      if (this.#options.appearance) {
+        this.telemetry.record(eventThemeUsage(this.#options.appearance));
+      }
     }
 
     try {
