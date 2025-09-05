@@ -13,13 +13,6 @@ import { useOrganization } from './useOrganization';
 import { useUser } from './useUser';
 
 /**
- * Utility type that removes function properties from a type.
- */
-type RemoveFunctions<T> = {
-  [K in keyof T as T[K] extends (...args: any[]) => any ? never : K]: T[K];
-};
-
-/**
  * Utility type that makes all properties `null`.
  */
 type ForceNull<T> = {
@@ -50,6 +43,8 @@ type CheckoutPropertiesPerStatus =
   | ({
       status: Extract<__experimental_CheckoutCacheState['status'], 'needs_confirmation' | 'completed'>;
     } & CheckoutProperties);
+
+// TODO: I think I need to support `start({planId})` from the hook, and this will set the cache key instead.
 
 type __experimental_UseCheckoutReturn = {
   checkout: FetchStatusAndError &

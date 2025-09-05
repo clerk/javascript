@@ -42,6 +42,13 @@ export type Nullable<T, K extends keyof T> = {
 };
 
 /**
+ * Utility type that makes all properties `null`.
+ */
+export type ForceNull<T> = {
+  [K in keyof T]: null;
+};
+
+/**
  * Internal type used by RecordToPath
  */
 type PathImpl<T, Key extends keyof T> = Key extends string
@@ -113,3 +120,10 @@ export type Without<T, W> = {
  * Value contains: { a:string, b: string }
  */
 export type Override<T, U> = Omit<T, keyof U> & U;
+
+/**
+ * Utility type that removes function properties from a type.
+ */
+export type RemoveFunctions<T extends object> = {
+  [K in keyof T as T[K] extends (...args: any[]) => any ? never : K]: T[K];
+};

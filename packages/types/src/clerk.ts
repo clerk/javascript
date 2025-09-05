@@ -22,6 +22,7 @@ import type {
 } from './appearance';
 import type { ClientResource } from './client';
 import type {
+  CheckoutFutureResource,
   CommerceBillingNamespace,
   CommerceCheckoutResource,
   CommercePlanResource,
@@ -60,6 +61,35 @@ import type { TelemetryCollector } from './telemetry';
 import type { UserResource } from './user';
 import type { Autocomplete, DeepPartial, DeepSnakeToCamel } from './utils';
 import type { WaitlistResource } from './waitlist';
+
+interface GlobalErrors {
+  /**
+   * The raw, unparsed errors from the Clerk API.
+   */
+  raw: unknown[] | null;
+  /**
+   * Parsed errors that are not related to any specific field.
+   */
+  global: unknown[] | null; // does not include any errors that could be parsed as a field error
+}
+
+/**
+ * The value returned by the `useSignInSignal` hook.
+ */
+export interface CheckoutSignalValue {
+  /**
+   * Represents the errors that occurred during the last fetch of the parent resource.
+   */
+  errors: GlobalErrors;
+  /**
+   * The fetch status of the underlying `SignIn` resource.
+   */
+  fetchStatus: 'idle' | 'fetching';
+  /**
+   * An instance representing the currently active `SignIn`, with new APIs designed specifically for custom flows.
+   */
+  checkout: CheckoutFutureResource;
+}
 
 type __experimental_CheckoutStatus = 'needs_initialization' | 'needs_confirmation' | 'completed';
 
