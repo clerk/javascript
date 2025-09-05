@@ -19,6 +19,7 @@ export const templates = {
   'nuxt-node': resolve(__dirname, './nuxt-node'),
   'react-router-node': resolve(__dirname, './react-router-node'),
   'react-router-library': resolve(__dirname, './react-router-library'),
+  'custom-flows-react-vite': resolve(__dirname, './custom-flows-react-vite'),
 } as const;
 
 if (new Set([...Object.values(templates)]).size !== Object.values(templates).length) {

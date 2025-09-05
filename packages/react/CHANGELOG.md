@@ -1,5 +1,17 @@
 # Change Log
 
+## 5.46.1
+
+### Patch Changes
+
+- Wait for pricing table data to be ready before hiding its fallback. ([#6644](https://github.com/clerk/javascript/pull/6644)) by [@panteliselef](https://github.com/panteliselef)
+
+- [Experimental] Fix issue with property access for state proxy ([#6700](https://github.com/clerk/javascript/pull/6700)) by [@dstaley](https://github.com/dstaley)
+
+- Updated dependencies [[`fced4fc`](https://github.com/clerk/javascript/commit/fced4fc869bb21c77826dfaf281b6640e0f0c006), [`e6e19d2`](https://github.com/clerk/javascript/commit/e6e19d2d2f3b2c4617b25f53830216a1d550e616), [`1b1e8b1`](https://github.com/clerk/javascript/commit/1b1e8b1fd33b787f956b17b193e5fd0a4cdc6cec)]:
+  - @clerk/types@4.84.1
+  - @clerk/shared@3.24.1
+
 ## 5.46.0
 
 ### Minor Changes
