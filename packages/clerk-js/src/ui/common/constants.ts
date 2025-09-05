@@ -2,6 +2,8 @@ import type {
   Attribute,
   EmailAddressIdentifier,
   EmailCodeStrategy,
+  EmailLinkStrategy,
+  PasswordStrategy,
   PhoneCodeStrategy,
   UsernameIdentifier,
 } from '@clerk/types';
@@ -10,10 +12,12 @@ import type { LocalizationKey } from '../localization/localizationKeys';
 import { localizationKeys } from '../localization/localizationKeys';
 
 export type ValidLastAuthenticationStrategy =
+  | EmailAddressIdentifier
   | EmailCodeStrategy
+  | EmailLinkStrategy
   | PhoneCodeStrategy
-  | UsernameIdentifier
-  | EmailAddressIdentifier;
+  | PasswordStrategy
+  | UsernameIdentifier;
 
 type FirstFactorConfig = {
   label: string | LocalizationKey;
