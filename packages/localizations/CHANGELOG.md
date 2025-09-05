@@ -1,5 +1,68 @@
 # Change Log
 
+## 3.24.2
+
+### Patch Changes
+
+- Add Traditional Chinese translation for sign in or up combined title ([#6701](https://github.com/clerk/javascript/pull/6701)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Add ptBR missing localization keys for choose organization session task ([#6704](https://github.com/clerk/javascript/pull/6704)) by [@guilherme6191](https://github.com/guilherme6191)
+
+- Updated dependencies [[`fced4fc`](https://github.com/clerk/javascript/commit/fced4fc869bb21c77826dfaf281b6640e0f0c006), [`1b1e8b1`](https://github.com/clerk/javascript/commit/1b1e8b1fd33b787f956b17b193e5fd0a4cdc6cec)]:
+  - @clerk/types@4.84.1
+
+## 3.24.1
+
+### Patch Changes
+
+- Refined German (de-DE) waitlist localization for improved clarity and consistency ([#6631](https://github.com/clerk/javascript/pull/6631)) by [@okikeSolutions](https://github.com/okikeSolutions)
+
+  This update improves the waitlist flow by:
+
+  - Updating action link text from “Jetzt anmelden” to “Anmelden”
+  - Changing action text from “Kein Zugang? Auf die Warteliste setzen!” to “Bereits Zugang?”
+  - Adjusting form button label from “Zur Warteliste hinzufügen” to “Warteliste beitreten”
+  - Clarifying the waitlist start subtitle with instructions to enter an email for notifications
+  - Aligning success subtitles with consistent wording for availability notifications
+
+  The German waitlist localization now offers clearer guidance and a smoother user experience.
+
+- Add api-related localizations for th-TH and refine translation context ([#6657](https://github.com/clerk/javascript/pull/6657)) by [@ttwrpz](https://github.com/ttwrpz)
+
+- Fixed a typo when canceling a free trial. ([#6672](https://github.com/clerk/javascript/pull/6672)) by [@paddycarver](https://github.com/paddycarver)
+
+- Updated dependencies [[`2a82737`](https://github.com/clerk/javascript/commit/2a8273705b9764e1a4613d5a0dbb738d0b156c05), [`cda5d7b`](https://github.com/clerk/javascript/commit/cda5d7b79b28dc03ec794ea54e0feb64b148cdd2), [`ba25a5b`](https://github.com/clerk/javascript/commit/ba25a5b5a3fa686a65f52e221d9d1712a389fea9), [`a50cfc8`](https://github.com/clerk/javascript/commit/a50cfc8f1dd168b436499e32fc8b0fc41d28bbff), [`377f67b`](https://github.com/clerk/javascript/commit/377f67b8e552d1a19efbe4530e9306675b7f8eab), [`65b12ee`](https://github.com/clerk/javascript/commit/65b12eeeb57ee80cdd8c36c5949d51f1227a413e), [`263722e`](https://github.com/clerk/javascript/commit/263722e61fd27403b4c8d9794880686771e123f9)]:
+  - @clerk/types@4.84.0
+
+## 3.24.0
+
+### Minor Changes
+
+- Complete Romanian (ro-RO) localization ([#6629](https://github.com/clerk/javascript/pull/6629)) by [@5ergiu](https://github.com/5ergiu)
+
+  This update:
+
+  - Translates missing API key management strings.
+  - Adds complete commerce and billing translations.
+  - Completes organization profile translations.
+  - Adds missing error messages.
+  - Includes form labels and placeholders.
+  - Ensures ro-RO is included in the package.json files array for publishing.
+
+  The Romanian localization now provides a complete experience for Romanian-speaking users.
+
+- Improve German (de-DE) localization with all missing translations ([#6538](https://github.com/clerk/javascript/pull/6538)) by [@mwerder](https://github.com/mwerder)
+
+  This update improves the German localization by:
+
+  - Adding missing German translations
+  - Use 'Wiederherstellungscode' instead of 'Backup-Code' in the whole file for consistency
+
+### Patch Changes
+
+- Updated dependencies [[`600c648`](https://github.com/clerk/javascript/commit/600c648d4087a823341041c90018797fbc0033f0)]:
+  - @clerk/types@4.83.0
+
 ## 3.23.1
 
 ### Patch Changes

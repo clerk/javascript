@@ -17,8 +17,8 @@ const defaultErrors = (): Errors => ({
     captcha: null,
     legalAccepted: null,
   },
-  raw: [],
-  global: [],
+  raw: null,
+  global: null,
 });
 
 export class StateProxy implements State {
@@ -56,27 +56,48 @@ export class StateProxy implements State {
           'verifyCode',
           'submitPassword',
         ] as const),
+        phoneCode: this.wrapMethods(() => target().phoneCode, ['sendCode', 'verifyCode'] as const),
+        mfa: this.wrapMethods(() => target().mfa, [
+          'sendPhoneCode',
+          'verifyPhoneCode',
+          'verifyTOTP',
+          'verifyBackupCode',
+        ] as const),
       },
     };
   }
 
   private buildSignUpProxy() {
+    const gateProperty = this.gateProperty.bind(this);
+    const gateMethod = this.gateMethod.bind(this);
+    const wrapMethods = this.wrapMethods.bind(this);
     const target = () => this.client.signUp.__internal_future;
 
     return {
       errors: defaultErrors(),
       fetchStatus: 'idle' as const,
       signUp: {
-        status: 'missing_requirements' as const,
-        unverifiedFields: [],
-        isTransferable: false,
+        get status() {
+          return gateProperty(target, 'status', 'missing_requirements');
+        },
+        get unverifiedFields() {
+          return gateProperty(target, 'unverifiedFields', []);
+        },
+        get isTransferable() {
+          return gateProperty(target, 'isTransferable', false);
+        },
 
-        create: this.gateMethod(target, 'create'),
-        sso: this.gateMethod(target, 'sso'),
-        password: this.gateMethod(target, 'password'),
-        finalize: this.gateMethod(target, 'finalize'),
+        create: gateMethod(target, 'create'),
+        sso: gateMethod(target, 'sso'),
+        password: gateMethod(target, 'password'),
+        finalize: gateMethod(target, 'finalize'),
 
-        verifications: this.wrapMethods(() => target().verifications, ['sendEmailCode', 'verifyEmailCode'] as const),
+        verifications: wrapMethods(() => target().verifications, [
+          'sendEmailCode',
+          'verifyEmailCode',
+          'sendPhoneCode',
+          'verifyPhoneCode',
+        ] as const),
       },
     };
   }
@@ -92,6 +113,16 @@ export class StateProxy implements State {
     const c = this.isomorphicClerk.client;
     if (!c) throw new Error('Clerk client not ready');
     return c;
+  }
+
+  private gateProperty<T extends object, K extends keyof T>(getTarget: () => T, key: K, defaultValue: T[K]) {
+    return (() => {
+      if (!inBrowser() || !this.isomorphicClerk.loaded) {
+        return defaultValue;
+      }
+      const t = getTarget();
+      return t[key];
+    })() as T[K];
   }
 
   private gateMethod<T extends object, K extends keyof T & string>(getTarget: () => T, key: K) {

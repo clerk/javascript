@@ -1,5 +1,48 @@
 # Change Log
 
+## 2.12.1
+
+### Patch Changes
+
+- Updated dependencies [[`fced4fc`](https://github.com/clerk/javascript/commit/fced4fc869bb21c77826dfaf281b6640e0f0c006), [`e6e19d2`](https://github.com/clerk/javascript/commit/e6e19d2d2f3b2c4617b25f53830216a1d550e616), [`1b1e8b1`](https://github.com/clerk/javascript/commit/1b1e8b1fd33b787f956b17b193e5fd0a4cdc6cec)]:
+  - @clerk/types@4.84.1
+  - @clerk/shared@3.24.1
+
+## 2.12.0
+
+### Minor Changes
+
+- [Billing Beta] Use correct casing for past due events types. ([#6687](https://github.com/clerk/javascript/pull/6687)) by [@panteliselef](https://github.com/panteliselef)
+
+  - `'subscription.past_due'` -> `'subscription.pastDue'`
+  - `'subscriptionItem.past_due'` -> `'subscriptionItem.pastDue'`
+
+- Include `'subscriptionItem.freeTrialEnding'` event in `CommerceSubscriptionItemWebhookEvent`. ([#6684](https://github.com/clerk/javascript/pull/6684)) by [@panteliselef](https://github.com/panteliselef)
+
+## 2.11.0
+
+### Minor Changes
+
+- Get user's subscription via BillingApi. ([#6667](https://github.com/clerk/javascript/pull/6667)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- - Export `Feature` type from backend resource. ([#6649](https://github.com/clerk/javascript/pull/6649)) by [@alexisintech](https://github.com/alexisintech)
+
+  - Re-export canonical `CommerceMoneyAmount` type from `@clerk/types`.
+
+- Updated dependencies [[`2a82737`](https://github.com/clerk/javascript/commit/2a8273705b9764e1a4613d5a0dbb738d0b156c05), [`cda5d7b`](https://github.com/clerk/javascript/commit/cda5d7b79b28dc03ec794ea54e0feb64b148cdd2), [`ba25a5b`](https://github.com/clerk/javascript/commit/ba25a5b5a3fa686a65f52e221d9d1712a389fea9), [`a50cfc8`](https://github.com/clerk/javascript/commit/a50cfc8f1dd168b436499e32fc8b0fc41d28bbff), [`377f67b`](https://github.com/clerk/javascript/commit/377f67b8e552d1a19efbe4530e9306675b7f8eab), [`65b12ee`](https://github.com/clerk/javascript/commit/65b12eeeb57ee80cdd8c36c5949d51f1227a413e), [`263722e`](https://github.com/clerk/javascript/commit/263722e61fd27403b4c8d9794880686771e123f9)]:
+  - @clerk/types@4.84.0
+  - @clerk/shared@3.24.0
+
+## 2.10.1
+
+### Patch Changes
+
+- Updated dependencies [[`600c648`](https://github.com/clerk/javascript/commit/600c648d4087a823341041c90018797fbc0033f0)]:
+  - @clerk/shared@3.23.0
+  - @clerk/types@4.83.0
+
 ## 2.10.0
 
 ### Minor Changes

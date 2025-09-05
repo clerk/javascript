@@ -19,6 +19,7 @@ describe('SubscriptionsList', () => {
   it('displays free trial badge when subscription is in free trial', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     const freeTrialSubscription = {
@@ -82,6 +83,7 @@ describe('SubscriptionsList', () => {
   it('on past due, no badge, but past due date is shown', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     const pastDueSubscription = {
@@ -146,6 +148,7 @@ describe('SubscriptionsList', () => {
   it('does not display active badge when subscription is active and it is a single item', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     const activeSubscription = {
@@ -209,6 +212,7 @@ describe('SubscriptionsList', () => {
   it('renders upcomming badge when current subscription is canceled but active', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     const upcomingSubscription = {

@@ -120,7 +120,7 @@ export type SDKMetadata = {
 export type ListenerCallback = (emission: Resources) => void;
 export type UnsubscribeCallback = () => void;
 export type BeforeEmitCallback = (session?: SignedInSessionResource | null) => void | Promise<any>;
-export type SetActiveNavigate = ({ session }: { session: SessionResource }) => Promise<unknown>;
+export type SetActiveNavigate = ({ session }: { session: SessionResource }) => void | Promise<unknown>;
 
 export type SignOutCallback = () => void | Promise<any>;
 
@@ -961,13 +961,28 @@ type ClerkOptionsNavigation =
       routerDebug?: boolean;
     };
 
+type ClerkOptionsLegacyRedirectProps = {
+  /**
+   * @deprecated Use `signInFallbackRedirectUrl` or `signInForceRedirectUrl` instead.
+   */
+  afterSignInUrl?: string | null;
+  /**
+   * @deprecated Use `signUpFallbackRedirectUrl` or `signUpForceRedirectUrl` instead.
+   */
+  afterSignUpUrl?: string | null;
+  /**
+   * @deprecated Use `signInFallbackRedirectUrl`, `signInForceRedirectUrl`, `signUpFallbackRedirectUrl`, or `signUpForceRedirectUrl` instead.
+   */
+  redirectUrl?: string | null;
+};
+
 export type ClerkOptions = ClerkOptionsNavigation &
   SignInForceRedirectUrl &
   SignInFallbackRedirectUrl &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
   NewSubscriptionRedirectUrl &
-  LegacyRedirectProps &
+  ClerkOptionsLegacyRedirectProps &
   AfterSignOutUrl &
   AfterMultiSessionSingleSignOutUrl & {
     /**

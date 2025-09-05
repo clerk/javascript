@@ -34,14 +34,6 @@ export const disabledAllBillingFeatures: ComponentGuard = (_, environment) => {
   return disabledUserBillingFeature(_, environment) && disabledOrganizationBillingFeature(_, environment);
 };
 
-export const hasPaidOrgPlans: ComponentGuard = (_, environment) => {
-  return environment?.commerceSettings.billing.organization.hasPaidPlans || false;
-};
-
-export const hasPaidUserPlans: ComponentGuard = (_, environment) => {
-  return environment?.commerceSettings.billing.user.hasPaidPlans || false;
-};
-
 export const disabledAPIKeysFeature: ComponentGuard = (_, environment) => {
   return !environment?.apiKeysSettings?.enabled;
 };
