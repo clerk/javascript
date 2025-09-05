@@ -1,24 +1,24 @@
 import { useSignIn, useSignUp } from '@clerk/clerk-react';
 import type { EnterpriseSSOStrategy, OAuthStrategy, SetActive, SignInResource, SignUpResource } from '@clerk/types';
 import * as AuthSession from 'expo-auth-session';
-import * as WebBrowser from 'expo-web-browser';
 import type { AuthSessionOpenOptions } from 'expo-web-browser';
+import * as WebBrowser from 'expo-web-browser';
 
 import { errorThrower } from '../utils/errors';
 
 export type StartSSOFlowParams = {
   redirectUrl?: string;
   unsafeMetadata?: SignUpUnsafeMetadata;
-  options?: AuthSessionOpenOptions;
+  authSessionOptions?: Pick<AuthSessionOpenOptions, 'showInRecents'>;
 } & (
-    | {
+  | {
       strategy: OAuthStrategy;
     }
-    | {
+  | {
       strategy: EnterpriseSSOStrategy;
       identifier: string;
     }
-  );
+);
 
 export type StartSSOFlowReturnType = {
   createdSessionId: string | null;
@@ -43,7 +43,7 @@ export function useSSO() {
       };
     }
 
-    const { strategy, unsafeMetadata, options } = startSSOFlowParams ?? {};
+    const { strategy, unsafeMetadata, authSessionOptions } = startSSOFlowParams ?? {};
 
     /**
      * Creates a redirect URL based on the application platform
@@ -71,7 +71,7 @@ export function useSSO() {
     const authSessionResult = await WebBrowser.openAuthSessionAsync(
       externalVerificationRedirectURL.toString(),
       redirectUrl,
-      options || {},
+      authSessionOptions || {},
     );
     if (authSessionResult.type !== 'success' || !authSessionResult.url) {
       return {
