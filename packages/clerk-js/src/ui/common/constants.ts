@@ -60,6 +60,7 @@ const FirstFactorConfigs = Object.freeze({
     placeholder: '',
     type: 'text',
     action: '',
+    validLastAuthenticationStrategies: new Set([]),
   },
 } as Record<SignInStartIdentifier | 'default', FirstFactorConfig>);
 
