@@ -56,9 +56,11 @@ describe('SignInFactorOneCodeForm', () => {
           name: 'signIn.prepareFirstFactor',
           factorKey: 'phone_code_idn_123',
         },
-        {
+        expect.objectContaining({
           staleTime: 100,
-        },
+          onSuccess: expect.any(Function),
+          onError: expect.any(Function),
+        }),
       );
     });
 
@@ -91,9 +93,11 @@ describe('SignInFactorOneCodeForm', () => {
           name: 'signIn.prepareFirstFactor',
           factorKey: 'phone_code_idn_123_whatsapp',
         },
-        {
+        expect.objectContaining({
           staleTime: 100,
-        },
+          onSuccess: expect.any(Function),
+          onError: expect.any(Function),
+        }),
       );
     });
 

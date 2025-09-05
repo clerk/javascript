@@ -1,6 +1,7 @@
 import type {
   AuthConfigJSON,
   ClientJSON,
+  CommerceSettingsJSON,
   DisplayConfigJSON,
   EnvironmentJSON,
   OrganizationSettingsJSON,
@@ -18,6 +19,7 @@ export const createBaseEnvironmentJSON = (): EnvironmentJSON => {
     display_config: createBaseDisplayConfig(),
     organization_settings: createBaseOrganizationSettings(),
     user_settings: createBaseUserSettings(),
+    commerce_settings: createBaseCommerceSettings(),
     meta: { responseHeaders: { country: 'us' } },
   };
 };
@@ -203,6 +205,27 @@ const createBaseUserSettings = (): UserSettingsJSON => {
     },
     password_settings: passwordSettingsConfig,
     passkey_settings: passkeySettingsConfig,
+  };
+};
+
+const createBaseCommerceSettings = (): CommerceSettingsJSON => {
+  return {
+    object: 'commerce_settings',
+    id: 'commerce_settings_1',
+    billing: {
+      enabled: false,
+      user: {
+        enabled: false,
+        has_paid_plans: false,
+      },
+      organization: {
+        enabled: false,
+        has_paid_plans: false,
+      },
+      has_paid_org_plans: false,
+      has_paid_user_plans: false,
+      stripe_publishable_key: '',
+    },
   };
 };
 
