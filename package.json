@@ -157,8 +157,11 @@
   },
   "pnpm": {
     "onlyBuiltDependencies": [
+      "@parcel/watcher",
       "cypress",
-      "msw"
+      "esbuild",
+      "msw",
+      "sharp"
     ],
     "overrides": {
       "jest": "29.7.0",
