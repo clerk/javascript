@@ -24,7 +24,7 @@ import { buildRequest, useFormControl } from '@/ui/utils/useFormControl';
 import { ERROR_CODES, SIGN_UP_MODES } from '../../../core/constants';
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { getClerkQueryParam, removeClerkQueryParam } from '../../../utils';
-import type { SignInStartIdentifier } from '../../common';
+import type { SignInStartIdentifier, ValidLastAuthenticationStrategy } from '../../common';
 import {
   buildSSOCallbackURL,
   getIdentifierControlDisplayValues,
@@ -517,7 +517,11 @@ function SignInStartInternal(): JSX.Element {
   }
 
   // @ts-expect-error `action` is not typed
-  const { action, ...identifierFieldProps } = identifierField.props;
+  const { action, validLastAuthenticationStrategies, ...identifierFieldProps } = identifierField.props;
+
+  const lastAuthenticationStrategy = clerk.client?.lastAuthenticationStrategy as ValidLastAuthenticationStrategy;
+  const isIdentifierLastAuthenticationStrategy = validLastAuthenticationStrategies?.has(lastAuthenticationStrategy);
+
   return (
     <Flow.Part part='start'>
       {!alternativePhoneCodeProvider ? (
@@ -572,6 +576,7 @@ function SignInStartInternal(): JSX.Element {
                           {...identifierFieldProps}
                           autoFocus={shouldAutofocus}
                           autoComplete={isWebAuthnAutofillSupported ? 'webauthn' : undefined}
+                          isLastAuthenticationStrategy={isIdentifierLastAuthenticationStrategy}
                         />
                       </Form.ControlRow>
                       <InstantPasswordRow field={passwordBasedInstance ? instantPasswordField : undefined} />

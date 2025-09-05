@@ -811,6 +811,7 @@ export const esCR: LocalizationResource = {
   },
   socialButtonsBlockButton: 'Continuar con {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
+  lastAuthenticationStrategy: 'último uso',
   taskChooseOrganization: {
     chooseOrganization: {
       action__createOrganization: undefined,
