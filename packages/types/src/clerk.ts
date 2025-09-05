@@ -1041,6 +1041,11 @@ export type ClerkOptions = ClerkOptionsNavigation &
            * Telemetry events are only logged to the console and not sent to Clerk
            */
           debug?: boolean;
+          /**
+           * If false, the sampling rates provided per telemetry event will be ignored and all events will be sent.
+           * @default true
+           */
+          perEventSampling?: boolean;
         };
 
     /**
