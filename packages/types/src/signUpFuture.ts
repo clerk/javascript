@@ -13,7 +13,8 @@ export interface SignUpFutureCreateParams extends SignUpFutureAdditionalParams {
   transfer?: boolean;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type - This will likely get more properties
+// This will likely get more properties
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface SignUpFutureUpdateParams extends SignUpFutureAdditionalParams {}
 
 export interface SignUpFutureEmailCodeVerifyParams {
