@@ -256,7 +256,9 @@ const _UserButton = withClerk(
       allowForAnyChildren: !!props.__experimental_asProvider,
     });
     const userProfileProps = Object.assign(props.userProfileProps || {}, { customPages });
-    const { customMenuItems, customMenuItemsPortals } = useUserButtonCustomMenuItems(props.children);
+    const { customMenuItems, customMenuItemsPortals } = useUserButtonCustomMenuItems(props.children, {
+      allowForAnyChildren: !!props.__experimental_asProvider,
+    });
     const sanitizedChildren = useSanitizedChildren(props.children);
 
     const passableProps = {
