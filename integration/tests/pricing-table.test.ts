@@ -310,7 +310,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
 
       await expect(u.po.page.getByText(/Trial ends/i)).toBeVisible();
 
-      await u.po.page.getByRole('button', { name: 'Manage subscription' }).first().click();
+      await u.po.page.getByRole('button', { name: 'Manage' }).first().click();
       await u.po.subscriptionDetails.waitForMounted();
       await u.po.subscriptionDetails.root.locator('.cl-menuButtonEllipsisBordered').click();
       await u.po.subscriptionDetails.root.getByText('Cancel free trial').click();
