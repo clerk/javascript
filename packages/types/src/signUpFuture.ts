@@ -2,21 +2,30 @@ import type { SetActiveNavigate } from './clerk';
 import type { PhoneCodeChannel } from './phoneCodeChannel';
 import type { SignUpIdentificationField, SignUpStatus } from './signUpCommon';
 
-export interface SignUpFutureCreateParams {
+interface SignUpFutureAdditionalParams {
+  firstName?: string;
+  lastName?: string;
+  unsafeMetadata?: SignUpUnsafeMetadata;
+  legalAccepted?: boolean;
+}
+
+export interface SignUpFutureCreateParams extends SignUpFutureAdditionalParams {
   transfer?: boolean;
 }
+
+export interface SignUpFutureUpdateParams extends SignUpFutureAdditionalParams {}
 
 export interface SignUpFutureEmailCodeVerifyParams {
   code: string;
 }
 
-export type SignUpFuturePasswordParams = {
+export type SignUpFuturePasswordParams = SignUpFutureAdditionalParams & {
   password: string;
 } & (
-  | { emailAddress: string; phoneNumber?: string; username?: string }
-  | { emailAddress?: string; phoneNumber: string; username?: string }
-  | { emailAddress?: string; phoneNumber?: string; username: string }
-);
+    | { emailAddress: string; phoneNumber?: string; username?: string }
+    | { emailAddress?: string; phoneNumber: string; username?: string }
+    | { emailAddress?: string; phoneNumber?: string; username: string }
+  );
 
 export interface SignUpFuturePhoneCodeSendParams {
   phoneNumber?: string;
@@ -66,6 +75,8 @@ export interface SignUpFutureResource {
   readonly existingSession?: { sessionId: string };
 
   create: (params: SignUpFutureCreateParams) => Promise<{ error: unknown }>;
+
+  update: (params: SignUpFutureUpdateParams) => Promise<{ error: unknown }>;
 
   /**
    *

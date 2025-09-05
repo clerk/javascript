@@ -25,6 +25,7 @@ import type {
   SignUpFuturePhoneCodeVerifyParams,
   SignUpFutureResource,
   SignUpFutureSSOParams,
+  SignUpFutureUpdateParams,
   SignUpIdentificationField,
   SignUpJSON,
   SignUpJSONSnapshot,
@@ -131,6 +132,14 @@ export class SignUp extends BaseResource implements SignUpResource {
    * of `SignUp`.
    */
   __internal_basePost = this._basePost.bind(this);
+
+  /**
+   * @internal Only used for internal purposes, and is not intended to be used directly.
+   *
+   * This property is used to provide access to underlying Client methods to `SignUpFuture`, which wraps an instance
+   * of `SignUp`.
+   */
+  __internal_basePatch = this._basePatch.bind(this);
 
   constructor(data: SignUpJSON | SignUpJSONSnapshot | null = null) {
     super();
@@ -584,12 +593,62 @@ class SignUpFuture implements SignUpFutureResource {
   }
 
   async create(params: SignUpFutureCreateParams): Promise<{ error: unknown }> {
-    const { transfer } = params;
     return runAsyncResourceTask(this.resource, async () => {
       const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
+
+      const body: Record<string, unknown> = {
+        transfer: params.transfer,
+        captchaToken,
+        captchaWidgetType,
+        captchaError,
+      };
+
+      if (params.firstName) {
+        body.firstName = params.firstName;
+      }
+
+      if (params.lastName) {
+        body.lastName = params.lastName;
+      }
+
+      if (params.unsafeMetadata) {
+        body.unsafeMetadata = normalizeUnsafeMetadata(params.unsafeMetadata);
+      }
+
+      if (params.legalAccepted) {
+        body.legalAccepted = params.legalAccepted;
+      }
+
       await this.resource.__internal_basePost({
         path: this.resource.pathRoot,
-        body: { transfer, captchaToken, captchaWidgetType, captchaError },
+        body,
+      });
+    });
+  }
+
+  async update(params: SignUpFutureUpdateParams): Promise<{ error: unknown }> {
+    return runAsyncResourceTask(this.resource, async () => {
+      const body: Record<string, unknown> = {};
+
+      if (params.firstName) {
+        body.firstName = params.firstName;
+      }
+
+      if (params.lastName) {
+        body.lastName = params.lastName;
+      }
+
+      if (params.unsafeMetadata) {
+        body.unsafeMetadata = normalizeUnsafeMetadata(params.unsafeMetadata);
+      }
+
+      if (params.legalAccepted) {
+        body.legalAccepted = params.legalAccepted;
+      }
+
+      await this.resource.__internal_basePatch({
+        path: this.resource.pathRoot,
+        body,
       });
     });
   }
@@ -618,7 +677,26 @@ class SignUpFuture implements SignUpFutureResource {
         body.username = params.username;
       }
 
-      await this.resource.__internal_basePost({ path: this.resource.pathRoot, body });
+      if (params.firstName) {
+        body.firstName = params.firstName;
+      }
+
+      if (params.lastName) {
+        body.lastName = params.lastName;
+      }
+
+      if (params.unsafeMetadata) {
+        body.unsafeMetadata = normalizeUnsafeMetadata(params.unsafeMetadata);
+      }
+
+      if (params.legalAccepted) {
+        body.legalAccepted = params.legalAccepted;
+      }
+
+      await this.resource.__internal_basePost({
+        path: this.resource.pathRoot,
+        body,
+      });
     });
   }
 
