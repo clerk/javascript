@@ -311,6 +311,7 @@ export const enUS: LocalizationResource = {
         totalPaid: 'Total paid',
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: 'Manage',
         actionLabel__newSubscription: 'Subscribe to a plan',
         actionLabel__switchPlan: 'Switch plans',
         tableHeader__edit: 'Edit',
@@ -995,6 +996,7 @@ export const enUS: LocalizationResource = {
         totalPaid: 'Total paid',
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: 'Manage',
         actionLabel__newSubscription: 'Subscribe to a plan',
         actionLabel__switchPlan: 'Switch plans',
         tableHeader__edit: 'Edit',

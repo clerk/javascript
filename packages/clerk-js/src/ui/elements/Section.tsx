@@ -211,6 +211,26 @@ const ProfileSectionArrowButton = forwardRef<HTMLButtonElement, ProfileSectionBu
   );
 });
 
+type ProfileSectionButtonGroupProps = PropsOfComponent<typeof Flex> & {
+  id: ProfileSectionId;
+  disableAnimation?: boolean;
+};
+
+const ProfileSectionButtonGroup = (props: ProfileSectionButtonGroupProps) => {
+  const { children, id, ...rest } = props;
+  return (
+    <Flex
+      elementDescriptor={descriptors.profileSectionButtonGroup}
+      elementId={descriptors.profileSectionButtonGroup.setId(id)}
+      justify='between'
+      gap={2}
+      {...rest}
+    >
+      {children}
+    </Flex>
+  );
+};
+
 export type ProfileSectionActionMenuItemProps = PropsOfComponent<typeof MenuItem> & {
   destructive?: boolean;
   leftIcon?: React.ComponentType | React.ReactElement;
@@ -318,6 +338,7 @@ export const ProfileSection = {
   Item: ProfileSectionItem,
   Button: ProfileSectionButton,
   ArrowButton: ProfileSectionArrowButton,
+  ButtonGroup: ProfileSectionButtonGroup,
   ActionMenu: ProfileSectionActionMenu,
   ActionMenuItem: ProfileSectionActionMenuItem,
 };

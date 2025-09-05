@@ -322,6 +322,7 @@ export const deDE: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'Plan abonnieren',
         actionLabel__switchPlan: 'Plan wechseln',
         tableHeader__edit: undefined,
@@ -1018,6 +1019,7 @@ export const deDE: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'Plan abonnieren',
         actionLabel__switchPlan: 'Plan wechseln',
         tableHeader__edit: undefined,
