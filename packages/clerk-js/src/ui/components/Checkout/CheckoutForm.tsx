@@ -26,9 +26,9 @@ const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
 export const CheckoutForm = withCardStateProvider(() => {
   const { checkout } = useCheckout();
 
-  const { id, plan, totals, isImmediatePlanChange, planPeriod, freeTrialEndsAt } = checkout;
+  const { plan, totals, isImmediatePlanChange, planPeriod, freeTrialEndsAt } = checkout;
 
-  if (!id) {
+  if (!plan) {
     return null;
   }
 
@@ -138,10 +138,10 @@ export const CheckoutForm = withCardStateProvider(() => {
 const useCheckoutMutations = () => {
   const { for: _for, onSubscriptionComplete } = useCheckoutContext();
   const { checkout } = useCheckout();
-  const { id, confirm } = checkout;
+  const { status, confirm } = checkout;
   const card = useCardState();
 
-  if (!id) {
+  if (status !== 'needs_confirmation') {
     throw new Error('Checkout not found');
   }
 
@@ -187,14 +187,14 @@ const useCheckoutMutations = () => {
 
 const CheckoutFormElements = () => {
   const { checkout } = useCheckout();
-  const { id, totals, freeTrialEndsAt } = checkout;
+  const { totals, freeTrialEndsAt } = checkout;
   const { data: paymentSources } = usePaymentMethods();
 
   const [paymentMethodSource, setPaymentMethodSource] = useState<PaymentMethodSource>(() =>
     paymentSources.length > 0 ? 'existing' : 'new',
   );
 
-  if (!id) {
+  if (!totals) {
     return null;
   }
 
