@@ -33,7 +33,7 @@ type UseSession = () => ToComputedRefs<UseSessionReturn>;
  * </template>
  */
 export const useSession: UseSession = () => {
-  const { sessionCtx, clerk } = useClerkContext();
+  const { sessionCtx, clerk } = useClerkContext('useSession');
 
   const result = computed<UseSessionReturn>(() => {
     if (sessionCtx.value === undefined) {
