@@ -1,6 +1,7 @@
 import { useOrganization } from '@clerk/shared/react';
 import type { GetRolesParams } from '@clerk/types';
 
+import { useProtect } from '../common';
 import { useLocalizations } from '../localization';
 import { customRoleLocalizationKey, roleLocalizationKey } from '../utils/roleLocalizationKey';
 import { useFetch } from './useFetch';
@@ -14,9 +15,15 @@ const getRolesParams = {
 };
 export const useFetchRoles = (enabled = true) => {
   const { organization } = useOrganization();
+  const canManageMemberships = useProtect({ permission: 'org:sys_memberships:manage' });
+  const canReadMemberships = useProtect({ permission: 'org:sys_memberships:read' });
+
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const getRoles = ({ pageSize, initialPage }: GetRolesParams) => organization!.getRoles({ pageSize, initialPage });
-  const { data, isLoading } = useFetch(enabled && !!organization?.id ? getRoles : undefined, {
+
+  const hasSystemPermissions = canManageMemberships || canReadMemberships;
+  const shouldFetchRoles = enabled && !!organization?.id && hasSystemPermissions;
+  const { data, isLoading } = useFetch(shouldFetchRoles ? getRoles : undefined, {
     ...getRolesParams,
     orgId: organization?.id,
   });
