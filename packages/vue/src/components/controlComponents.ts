@@ -37,7 +37,7 @@ export const ClerkLoading = defineComponent((_, { slots }) => {
 });
 
 export const RedirectToSignIn = defineComponent((props: RedirectOptions) => {
-  const { sessionCtx, clientCtx } = useClerkContext();
+  const { sessionCtx, clientCtx } = useClerkContext('RedirectToSignIn');
 
   useClerkLoaded(clerk => {
     const hasSignedInSessions = clientCtx.value?.signedInSessions && clientCtx.value.signedInSessions.length > 0;
