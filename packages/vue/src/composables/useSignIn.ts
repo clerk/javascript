@@ -30,7 +30,7 @@ type UseSignIn = () => ToComputedRefs<UseSignInReturn>;
  * </template>
  */
 export const useSignIn: UseSignIn = () => {
-  const { clerk, clientCtx } = useClerkContext();
+  const { clerk, clientCtx } = useClerkContext('useSignIn');
 
   const unwatch = watch(clerk, value => {
     if (value) {

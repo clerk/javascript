@@ -53,7 +53,7 @@ type UseOrganization = () => ToComputedRefs<UseOrganizationReturn>;
  * </template>
  */
 export const useOrganization: UseOrganization = () => {
-  const { clerk, organizationCtx } = useClerkContext();
+  const { clerk, organizationCtx } = useClerkContext('useOrganization');
   const { session } = useSession();
 
   const result = computed<UseOrganizationReturn>(() => {
