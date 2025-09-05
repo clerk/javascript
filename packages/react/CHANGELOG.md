@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.46.2
+
+### Patch Changes
+
+- Removed custom menu item logging from UserButton when asProvider is used. ([#6715](https://github.com/clerk/javascript/pull/6715)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 5.46.1
 
 ### Patch Changes

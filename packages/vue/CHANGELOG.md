@@ -1,5 +1,11 @@
 # @clerk/vue
 
+## 1.12.1
+
+### Patch Changes
+
+- Improved error message when Clerk plugin is not installed ([#6719](https://github.com/clerk/javascript/pull/6719)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 1.12.0
 
 ### Minor Changes

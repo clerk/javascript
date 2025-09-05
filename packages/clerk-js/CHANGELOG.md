@@ -1,5 +1,18 @@
 # Change Log
 
+## 5.91.3
+
+### Patch Changes
+
+- Do not trigger organization roles query when the current user's membership lacks the required permissions (`org:sys_memberships:read` or `org:sys_memberships:manage`). ([#6703](https://github.com/clerk/javascript/pull/6703)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  This fixes an issue where the `OrganizationSwitcher` component was making unnecessary API calls to fetch roles, resulting in HTTP 403 errors.
+
+- Update search icon, payment source icon, and user preview identifier colors. ([#6697](https://github.com/clerk/javascript/pull/6697)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`f689d99`](https://github.com/clerk/javascript/commit/f689d990117383b3f9e5417298dae39a20053cbf), [`465369b`](https://github.com/clerk/javascript/commit/465369bba2a545304649666c4e1714b9a904c948)]:
+  - @clerk/localizations@3.24.3
+
 ## 5.91.2
 
 ### Patch Changes
