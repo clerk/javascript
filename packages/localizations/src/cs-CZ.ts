@@ -852,7 +852,7 @@ export const csCZ: LocalizationResource = {
     form_param_format_invalid__email_address: 'Emailová adresa musí být platná.',
     form_param_format_invalid__phone_number: 'Telefonní číslo musí být ve validním mezinárodním formátu.',
     form_param_max_length_exceeded__first_name: 'Jméno nesmí přesáhnout 256 znaků.',
-    form_param_max_length_exceeded__last_name: 'Příjmení nesmí přesáhnout 256 znaků.',+
+    form_param_max_length_exceeded__last_name: 'Příjmení nesmí přesáhnout 256 znaků.',
     form_param_max_length_exceeded__name: 'Jméno nesmí přesáhnout 256 znaků.',
     form_param_nil: 'Tento parametr je povinný.',
     form_param_value_invalid: 'Tento parametr má neplatnou hodnotu.',
