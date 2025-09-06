@@ -250,6 +250,7 @@ export const fiFI: LocalizationResource = {
     action__signOut: 'Kirjaudu ulos',
     title: 'Kirjautuneena käyttäjänä {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Viimeksi käytetty',
   maintenanceMode: 'Olemme tällä hetkellä huoltotilassa, mutta älä huoli, se ei kestä kauempaa kuin muutama minuutti.',
   membershipRole__admin: 'Ylläpitäjä',
   membershipRole__basicMember: 'Jäsen',

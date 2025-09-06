@@ -250,6 +250,7 @@ export const mnMN: LocalizationResource = {
     action__signOut: 'Гарах',
     title: '{{identifier}}-р нэвтэрсэн',
   },
+  lastAuthenticationStrategy: 'Хамгийн сүүлд ашигласан',
   maintenanceMode: undefined,
   membershipRole__admin: 'Админ',
   membershipRole__basicMember: 'Гишүүн',

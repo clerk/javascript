@@ -249,6 +249,7 @@ export const bnIN: LocalizationResource = {
     action__signOut: 'সাইন আউট',
     title: '{{identifier}} হিসাবে সাইন ইন করা হয়েছে',
   },
+  lastAuthenticationStrategy: 'শেষবার ব্যবহৃত',
   maintenanceMode:
     'আমরা বর্তমানে রক্ষণাবেক্ষণের কাজ করছি, কিন্তু চিন্তা করবেন না, এটি কয়েক মিনিটের বেশি সময় নেবে না।',
   membershipRole__admin: 'অ্যাডমিন',
