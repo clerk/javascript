@@ -26,7 +26,11 @@ const overlayStyles = (t: InternalTheme): ThemableCssProp => [
 ];
 
 export type LastAuthenticationStrategyBadgeProps = PropsOfComponent<typeof Badge> & { overlay?: boolean };
-export const LastAuthenticationStrategyBadge = ({ sx, overlay, ...props }: LastAuthenticationStrategyBadgeProps) => (
+export const LastAuthenticationStrategyBadge = ({
+  sx,
+  overlay,
+  ...props
+}: LastAuthenticationStrategyBadgeProps): JSX.Element => (
   <Badge
     {...props}
     elementDescriptor={descriptors.lastAuthenticationStrategyBadge}
