@@ -1,8 +1,30 @@
 import { Badge, descriptors, localizationKeys } from '../customizables';
-import type { PropsOfComponent } from '../styledSystem';
+import type { InternalTheme, PropsOfComponent, ThemableCssProp } from '../styledSystem';
 
-export type LastAuthenticationStrategyBadgeProps = PropsOfComponent<typeof Badge>;
-export const LastAuthenticationStrategyBadge = ({ sx, ...props }: LastAuthenticationStrategyBadgeProps) => {
+export type LastAuthenticationStrategyBadgeProps = PropsOfComponent<typeof Badge> & { overlay?: boolean };
+export const LastAuthenticationStrategyBadge = ({ sx, overlay, ...props }: LastAuthenticationStrategyBadgeProps) => {
+  const overlayStyles = (t: InternalTheme): ThemableCssProp => [
+    {
+      background: `linear-gradient(${t.colors.$borderAlpha25}),${t.colors.$colorBackground}`,
+      borderColor: t.colors.$colorForeground,
+      boxShadow: 'none',
+      outline: `${t.space.$px} solid ${t.colors.$colorBackground}`,
+      position: 'absolute',
+      top: '-35%',
+      right: `calc(${t.space.$2x5} * -1)`,
+      ':after': {
+        border: `${t.space.$px} solid ${t.colors.$borderAlpha150}`,
+        borderRadius: t.radii.$lg,
+        content: '""',
+        display: 'block',
+        height: '100%',
+        padding: t.space.$px,
+        position: 'absolute',
+        width: '100%',
+      },
+    },
+  ];
+
   return (
     <Badge
       elementDescriptor={descriptors.lastAuthenticationStrategyBadge}
@@ -10,9 +32,10 @@ export const LastAuthenticationStrategyBadge = ({ sx, ...props }: LastAuthentica
       {...props}
       sx={[
         t => ({
-          backgroundColor: t.colors.$borderAlpha25,
+          background: t.colors.$borderAlpha25,
           borderRadius: t.radii.$lg,
         }),
+        overlay && overlayStyles,
         sx,
       ]}
     />
