@@ -7,7 +7,6 @@ import React, { forwardRef, isValidElement } from 'react';
 import { ProviderInitialIcon } from '../common';
 import type { LocalizationKey } from '../customizables';
 import {
-  Box,
   Button,
   descriptors,
   Flex,
@@ -268,21 +267,7 @@ const SocialButtonBlock = forwardRef((props: SocialButtonProps, ref: Ref<HTMLBut
         props.sx,
       ]}
     >
-      {lastAuthenticationStrategy && (
-        <Box
-          elementDescriptor={descriptors.lastAuthenticationStrategyBadgeContainer}
-          sx={t => ({
-            position: 'absolute',
-            top: '-40%',
-            right: `calc(${t.space.$2x5} * -1)`,
-            borderRadius: t.radii.$lg,
-            backgroundColor: t.colors.$colorBackground,
-            padding: t.space.$px,
-          })}
-        >
-          <LastAuthenticationStrategyBadge />
-        </Box>
-      )}
+      {lastAuthenticationStrategy && <LastAuthenticationStrategyBadge overlay />}
 
       <Flex
         justify='center'
