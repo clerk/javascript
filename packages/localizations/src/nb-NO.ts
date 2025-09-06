@@ -250,6 +250,7 @@ export const nbNO: LocalizationResource = {
     action__signOut: 'Logg ut',
     title: 'Logget inn som {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Sist brukt',
   maintenanceMode: undefined,
   membershipRole__admin: 'Administrator',
   membershipRole__basicMember: 'Medlem',

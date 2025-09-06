@@ -253,6 +253,7 @@ export const frFR: LocalizationResource = {
     action__signOut: 'Déconnexion',
     title: 'Connecté en tant que {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Dernière utilisation',
   maintenanceMode:
     'Nous effectuons des travaux de maintenance, mais ne vous en inquiétez pas, cela ne devrait pas prendre plus de quelques minutes.',
   membershipRole__admin: 'Administrateur',

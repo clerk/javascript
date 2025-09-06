@@ -255,6 +255,7 @@ export const faIR: LocalizationResource = {
     action__signOut: 'خروج',
     title: 'با نام کاربری {{identifier}} وارد سیستم شدم',
   },
+  lastAuthenticationStrategy: 'آخرین استفاده',
   maintenanceMode: 'در حال حاضر در حال تعمیر و نگهداری هستیم، اما نگران نباشید، نباید بیشتر از چند دقیقه طول بکشد.',
   membershipRole__admin: 'مدیر',
   membershipRole__basicMember: 'عضو',

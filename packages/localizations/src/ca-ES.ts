@@ -250,6 +250,7 @@ export const caES: LocalizationResource = {
     action__signOut: 'Tanca la sessió',
     title: 'Connectat com a {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Últim ús',
   maintenanceMode: undefined,
   membershipRole__admin: 'Administrador',
   membershipRole__basicMember: 'Membre',

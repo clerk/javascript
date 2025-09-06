@@ -28,16 +28,16 @@ const overlayStyles = (t: InternalTheme): ThemableCssProp => [
 export type LastAuthenticationStrategyBadgeProps = PropsOfComponent<typeof Badge> & { overlay?: boolean };
 export const LastAuthenticationStrategyBadge = ({ sx, overlay, ...props }: LastAuthenticationStrategyBadgeProps) => (
   <Badge
+    {...props}
     elementDescriptor={descriptors.lastAuthenticationStrategyBadge}
     localizationKey={localizationKeys('lastAuthenticationStrategy')}
-    {...props}
     sx={[
       t => ({
         background: t.colors.$borderAlpha25,
         borderRadius: t.radii.$lg,
       }),
       overlay && overlayStyles,
-      sx,
+      ...(Array.isArray(sx) ? sx : sx ? [sx] : []),
     ]}
   />
 );

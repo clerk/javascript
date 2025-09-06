@@ -251,6 +251,7 @@ export const beBY: LocalizationResource = {
     action__signOut: 'Выйсці',
     title: 'Вы ўвайшлі як {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Апошняе выкарыстанне',
   maintenanceMode: 'Рэжым тэхнічнага абслугоўвання',
   membershipRole__admin: 'Адміністратар',
   membershipRole__basicMember: 'Удзельнік',

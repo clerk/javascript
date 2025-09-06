@@ -250,6 +250,7 @@ export const bgBG: LocalizationResource = {
     action__signOut: 'Изход',
     title: 'Влезли сте като {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Последно използвано',
   maintenanceMode: 'Режим на поддръжка',
   membershipRole__admin: 'Админ',
   membershipRole__basicMember: 'Член',

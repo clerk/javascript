@@ -243,6 +243,7 @@ export const enUS: LocalizationResource = {
     action__signOut: 'Sign out',
     title: 'Signed in as {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Last used',
   maintenanceMode:
     "We are currently undergoing maintenance, but don't worry, it shouldn't take more than a few minutes.",
   membershipRole__admin: 'Admin',
@@ -801,7 +802,6 @@ export const enUS: LocalizationResource = {
   },
   socialButtonsBlockButton: 'Continue with {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
-  lastAuthenticationStrategy: 'Last used',
   taskChooseOrganization: {
     chooseOrganization: {
       action__createOrganization: 'Create new organization',

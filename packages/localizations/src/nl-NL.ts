@@ -249,6 +249,7 @@ export const nlNL: LocalizationResource = {
     action__signOut: 'Uitloggen',
     title: 'Ingelogd als {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Laatst gebruikt',
   maintenanceMode: 'Onderhoudsmodus',
   membershipRole__admin: 'Beheerder',
   membershipRole__basicMember: 'Lid',
