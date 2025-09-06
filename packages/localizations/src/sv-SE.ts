@@ -250,6 +250,7 @@ export const svSE: LocalizationResource = {
     action__signOut: 'Logga ut',
     title: 'Inloggad som {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Senast använd',
   maintenanceMode: 'Vi genomför för närvarande underhåll, men oroa dig inte, det bör inte ta mer än några minuter.',
   membershipRole__admin: 'Admin',
   membershipRole__basicMember: 'Medlem',

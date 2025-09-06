@@ -252,6 +252,7 @@ export const ruRU: LocalizationResource = {
     action__signOut: 'Выйти',
     title: 'Вы вошли как {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Последнее использование',
   maintenanceMode:
     'В данный момент мы проводим техническое обслуживание, но не беспокойтесь, это не займет больше нескольких минут.',
   membershipRole__admin: 'Администратор',

@@ -254,6 +254,7 @@ export const csCZ: LocalizationResource = {
     action__signOut: 'Odhlásit se',
     title: 'Přihlášen jako {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Naposledy použito',
   maintenanceMode: 'Momentálně provádíme údržbu, ale nebojte se, nemělo by to trvat déle než pár minut.',
   membershipRole__admin: 'Správce',
   membershipRole__basicMember: 'Člen',

@@ -249,6 +249,7 @@ export const ptPT: LocalizationResource = {
     action__signOut: 'Terminar sessão',
     title: 'Sessão iniciada como {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Último uso',
   maintenanceMode: 'Modo de Manutenção',
   membershipRole__admin: 'Administrador',
   membershipRole__basicMember: 'Membro',

@@ -250,6 +250,7 @@ export const plPL: LocalizationResource = {
     action__signOut: 'Wyloguj',
     title: 'Zalogowano jako {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Ostatnio używany',
   maintenanceMode: 'Aktualnie trwają prace konserwacyjne, ale nie powinno to zająć dłużej niż kilka minut.',
   membershipRole__admin: 'Administrator',
   membershipRole__basicMember: 'Użytkownik',

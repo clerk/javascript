@@ -249,6 +249,7 @@ export const srRS: LocalizationResource = {
     action__signOut: 'Odjavi se',
     title: 'Prijavljeni ste kao {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Poslednje korišćeno',
   maintenanceMode: 'Trenutno smo u modu održavanja, ali ne brinite, neće trajati duže od nekoliko minuta.',
   membershipRole__admin: 'Administrator',
   membershipRole__basicMember: 'Član',

@@ -248,6 +248,7 @@ export const zhCN: LocalizationResource = {
     action__signOut: '退出登录',
     title: '以 {{identifier}} 登录',
   },
+  lastAuthenticationStrategy: '上次使用',
   maintenanceMode: undefined,
   membershipRole__admin: '管理员',
   membershipRole__basicMember: '成员',

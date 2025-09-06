@@ -76,6 +76,8 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'socialButtonsProviderIcon',
   'socialButtonsProviderInitialIcon',
 
+  'lastAuthenticationStrategyBadge',
+
   'enterpriseButtonsProviderIcon',
 
   'providerIcon',

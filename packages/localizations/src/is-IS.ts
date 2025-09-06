@@ -250,6 +250,7 @@ export const isIS: LocalizationResource = {
     action__signOut: 'Skrá út',
     title: 'Skráður inn sem {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Síðast notað',
   maintenanceMode: 'Við erum nú í viðhaldi, en ekki hafa áhyggjur, það ætti ekki að taka meira en nokkrar mínútur.',
   membershipRole__admin: 'Stjórnandi',
   membershipRole__basicMember: 'Meðlimur',

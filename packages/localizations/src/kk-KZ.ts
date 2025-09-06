@@ -249,6 +249,7 @@ export const kkKZ: LocalizationResource = {
     action__signOut: 'Шығу',
     title: '{{identifier}} ретінде кірдіңіз',
   },
+  lastAuthenticationStrategy: 'Соңғы пайдаланылған',
   maintenanceMode: 'Қазір техникалық қызмет көрсету жұмыстары жүріп жатыр, бірақ бірнеше минуттан аспайды.',
   membershipRole__admin: 'Әкімші',
   membershipRole__basicMember: 'Мүше',

@@ -256,6 +256,7 @@ export const ptBR: LocalizationResource = {
     action__signOut: 'Sair',
     title: 'Logado como {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Último uso',
   maintenanceMode: 'Estamos em manutenção, mas não se preocupe, não deve levar mais do que alguns minutos',
   membershipRole__admin: 'Administrador',
   membershipRole__basicMember: 'Membro',
