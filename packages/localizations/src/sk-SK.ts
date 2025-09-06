@@ -250,6 +250,7 @@ export const skSK: LocalizationResource = {
     action__signOut: 'Odhlásiť sa',
     title: 'Prihlásený(á) ako {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Naposledy použité',
   maintenanceMode: undefined,
   membershipRole__admin: 'Správca',
   membershipRole__basicMember: 'Člen',

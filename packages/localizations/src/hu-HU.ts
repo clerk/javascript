@@ -249,6 +249,7 @@ export const huHU: LocalizationResource = {
     action__signOut: 'Kijelentkezés',
     title: 'Bejelntkezve mint {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Utolsó használat',
   maintenanceMode: 'Jelenleg karbantartás alatt állunk, de ne aggódj, ez nem tart tovább pár percnél!',
   membershipRole__admin: 'Adminisztrátor',
   membershipRole__basicMember: 'Tag',

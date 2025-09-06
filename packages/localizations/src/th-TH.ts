@@ -253,6 +253,7 @@ export const thTH: LocalizationResource = {
     action__signOut: 'ออกจากระบบ',
     title: 'เข้าสู่ระบบในนาม {{identifier}}',
   },
+  lastAuthenticationStrategy: 'ใช้ครั้งสุดท้าย',
   maintenanceMode: 'เรากำลังอยู่ในช่วงการบำรุงรักษาระบบ แต่ไม่ต้องกังวล ไม่น่าจะใช้เวลานานกว่าสองสามนาที',
   membershipRole__admin: 'ผู้ดูแลระบบ',
   membershipRole__basicMember: 'สมาชิก',

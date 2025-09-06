@@ -250,6 +250,7 @@ export const ukUA: LocalizationResource = {
     action__signOut: 'Вийти',
     title: 'Ви увійшли як {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Останнє використання',
   maintenanceMode: undefined,
   membershipRole__admin: 'Адміністратор',
   membershipRole__basicMember: 'Член',

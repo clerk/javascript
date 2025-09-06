@@ -250,6 +250,7 @@ export const jaJP: LocalizationResource = {
     action__signOut: 'サインアウト',
     title: '{{identifier}}としてサインイン中',
   },
+  lastAuthenticationStrategy: '最後に使用したもの',
   maintenanceMode: undefined,
   membershipRole__admin: '管理者',
   membershipRole__basicMember: 'メンバー',

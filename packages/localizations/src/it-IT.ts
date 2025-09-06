@@ -257,6 +257,7 @@ export const itIT: LocalizationResource = {
     action__signOut: 'Disconnetti',
     title: 'Accesso tramite {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Ultimo utilizzo',
   maintenanceMode: 'Modalità di manutenzione',
   membershipRole__admin: 'Amministratore',
   membershipRole__basicMember: 'Utente',

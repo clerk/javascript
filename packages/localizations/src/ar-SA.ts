@@ -250,6 +250,7 @@ export const arSA: LocalizationResource = {
     action__signOut: 'تسجيل الخروج',
     title: 'تسجيل الدخول بأسم {{identifier}}',
   },
+  lastAuthenticationStrategy: 'آخر استخدام',
   maintenanceMode: 'نحن نقوم بعمل بعض التعديلات في الوقت الحالي. سوف نعود في غضون دقائق قليلة',
   membershipRole__admin: 'المسؤول',
   membershipRole__basicMember: 'عضو',
