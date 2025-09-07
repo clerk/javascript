@@ -16,14 +16,14 @@ const FirstFactorConfigs = Object.freeze({
     placeholder: localizationKeys('formFieldInputPlaceholder__emailAddress_username'),
     type: 'text',
     action: localizationKeys('signIn.start.actionLink__use_email_username'),
-    validLastAuthenticationStrategies: new Set(['email_code', 'email_link', 'username', 'password']),
+    validLastAuthenticationStrategies: new Set(['email_code', 'email_link', 'email_address', 'username', 'password']),
   },
   email_address: {
     label: localizationKeys('formFieldLabel__emailAddress'),
     placeholder: localizationKeys('formFieldInputPlaceholder__emailAddress'),
     type: 'email',
     action: localizationKeys('signIn.start.actionLink__use_email'),
-    validLastAuthenticationStrategies: new Set(['email_code', 'email_link', 'password']),
+    validLastAuthenticationStrategies: new Set(['email_code', 'email_link', 'email_address', 'password']),
   },
   phone_number: {
     label: localizationKeys('formFieldLabel__phoneNumber'),
