@@ -86,7 +86,7 @@
   },
   "devDependencies": {
     "@statelyai/inspect": "^0.4.0",
-    "concurrently": "^9.2.0",
+    "concurrently": "^9.2.1",
     "next": "14.2.32"
   },
   "peerDependencies": {
