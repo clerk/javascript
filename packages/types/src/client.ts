@@ -18,6 +18,7 @@ export interface ClientResource extends ClerkResource {
   isEligibleForTouch: () => boolean;
   buildTouchUrl: (params: { redirectUrl: URL }) => string;
   lastActiveSessionId: string | null;
+  /** Last authentication strategy used by this client; `null` when unknown or feature disabled. */
   lastAuthenticationStrategy: LastAuthenticationStrategy | null;
   captchaBypass: boolean;
   cookieExpiresAt: Date | null;

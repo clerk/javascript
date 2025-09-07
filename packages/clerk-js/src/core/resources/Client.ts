@@ -24,6 +24,7 @@ export class Client extends BaseResource implements ClientResource {
   lastActiveSessionId: string | null = null;
   captchaBypass = false;
   cookieExpiresAt: Date | null = null;
+  /** Last authentication strategy used by this client; `null` when unknown/disabled. */
   lastAuthenticationStrategy: LastAuthenticationStrategy | null = null;
   createdAt: Date | null = null;
   updatedAt: Date | null = null;
