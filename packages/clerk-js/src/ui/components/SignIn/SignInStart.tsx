@@ -24,7 +24,7 @@ import { buildRequest, useFormControl } from '@/ui/utils/useFormControl';
 import { ERROR_CODES, SIGN_UP_MODES } from '../../../core/constants';
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { getClerkQueryParam, removeClerkQueryParam } from '../../../utils';
-import type { SignInStartIdentifier, ValidLastAuthenticationStrategy } from '../../common';
+import type { SignInStartIdentifier } from '../../common';
 import {
   buildSSOCallbackURL,
   getIdentifierControlDisplayValues,
@@ -519,8 +519,10 @@ function SignInStartInternal(): JSX.Element {
   // @ts-expect-error `action` is not typed
   const { action, validLastAuthenticationStrategies, ...identifierFieldProps } = identifierField.props;
 
-  const lastAuthenticationStrategy = clerk.client?.lastAuthenticationStrategy as ValidLastAuthenticationStrategy;
-  const isIdentifierLastAuthenticationStrategy = validLastAuthenticationStrategies?.has(lastAuthenticationStrategy);
+  const lastAuthenticationStrategy = clerk.client?.lastAuthenticationStrategy;
+  const isIdentifierLastAuthenticationStrategy = lastAuthenticationStrategy
+    ? validLastAuthenticationStrategies?.has(lastAuthenticationStrategy)
+    : false;
 
   return (
     <Flow.Part part='start'>

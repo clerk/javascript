@@ -3,6 +3,7 @@ import type {
   ClientJSON,
   ClientJSONSnapshot,
   ClientResource,
+  LastAuthenticationStrategy,
   SignedInSessionResource,
   SignInResource,
   SignUpResource,
@@ -23,7 +24,7 @@ export class Client extends BaseResource implements ClientResource {
   lastActiveSessionId: string | null = null;
   captchaBypass = false;
   cookieExpiresAt: Date | null = null;
-  lastAuthenticationStrategy: string | null = null;
+  lastAuthenticationStrategy: LastAuthenticationStrategy | null = null;
   createdAt: Date | null = null;
   updatedAt: Date | null = null;
 

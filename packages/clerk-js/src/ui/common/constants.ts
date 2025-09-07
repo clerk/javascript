@@ -1,30 +1,14 @@
-import type {
-  Attribute,
-  EmailAddressIdentifier,
-  EmailCodeStrategy,
-  EmailLinkStrategy,
-  PasswordStrategy,
-  PhoneCodeStrategy,
-  UsernameIdentifier,
-} from '@clerk/types';
+import type { Attribute, LastAuthenticationStrategy } from '@clerk/types';
 
 import type { LocalizationKey } from '../localization/localizationKeys';
 import { localizationKeys } from '../localization/localizationKeys';
-
-export type ValidLastAuthenticationStrategy =
-  | EmailAddressIdentifier
-  | EmailCodeStrategy
-  | EmailLinkStrategy
-  | PhoneCodeStrategy
-  | PasswordStrategy
-  | UsernameIdentifier;
 
 type FirstFactorConfig = {
   label: string | LocalizationKey;
   type: string;
   placeholder: string | LocalizationKey;
   action?: string | LocalizationKey;
-  validLastAuthenticationStrategies: Set<ValidLastAuthenticationStrategy>;
+  validLastAuthenticationStrategies: Set<LastAuthenticationStrategy>;
 };
 const FirstFactorConfigs = Object.freeze({
   email_address_username: {
