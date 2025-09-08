@@ -151,7 +151,9 @@ const CommonInputWrapper = (props: PropsWithChildren<CommonInputProps>) => {
                 onClick={onActionClicked}
               />
             )}
-            {isLastAuthenticationStrategy && !actionLabel && !isOptional && <LastAuthenticationStrategyBadge />}
+            {isLastAuthenticationStrategy && !actionLabel && !isOptional && (
+              <LastAuthenticationStrategyBadgeWithFormState />
+            )}
             <Field.Action />
           </Field.LabelRow>
 
@@ -161,6 +163,20 @@ const CommonInputWrapper = (props: PropsWithChildren<CommonInputProps>) => {
         <Field.Feedback />
       </Col>
     </Field.Root>
+  );
+};
+
+const LastAuthenticationStrategyBadgeWithFormState = (
+  props: PropsOfComponent<typeof LastAuthenticationStrategyBadge>,
+) => {
+  const { isLoading, isDisabled } = useFormState();
+  return (
+    <LastAuthenticationStrategyBadge
+      {...props}
+      sx={t => ({
+        opacity: isDisabled || isLoading ? t.opacity.$disabled : 1,
+      })}
+    />
   );
 };
 
