@@ -30,7 +30,14 @@ import type { SessionVerificationLevel, SessionVerificationStatus } from './sess
 import type { SignInJSON } from './signIn';
 import type { SignInFirstFactor, SignInSecondFactor } from './signInCommon';
 import type { SignUpField, SignUpIdentificationField, SignUpStatus } from './signUpCommon';
-import type { EmailCodeStrategy, EmailLinkStrategy, PasswordStrategy, PhoneCodeStrategy } from './strategies';
+import type {
+  EmailCodeStrategy,
+  EmailLinkStrategy,
+  OAuthStrategy,
+  PasswordStrategy,
+  PhoneCodeStrategy,
+  Web3Strategy,
+} from './strategies';
 import type { BoxShadow, Color, EmUnit, FontWeight, HexColor } from './theme';
 import type { UserSettingsJSON } from './userSettings';
 import type { CamelToSnake } from './utils';
@@ -90,7 +97,9 @@ export type LastAuthenticationStrategy =
   | EmailLinkStrategy
   | PhoneCodeStrategy
   | PasswordStrategy
-  | UsernameIdentifier;
+  | UsernameIdentifier
+  | OAuthStrategy
+  | Web3Strategy;
 
 export interface ClientJSON extends ClerkResourceJSON {
   object: 'client';
