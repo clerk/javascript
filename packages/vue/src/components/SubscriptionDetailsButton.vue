@@ -5,7 +5,8 @@ import { useClerk } from '../composables/useClerk';
 import { useAuth } from '../composables/useAuth';
 import { assertSingleChild, normalizeWithDefaultValue } from '../utils';
 
-const props = defineProps<__experimental_SubscriptionDetailsButtonProps>();
+type SubscriptionDetailsButtonProps = Omit<__experimental_SubscriptionDetailsButtonProps, 'onSubscriptionCancel'>;
+const props = defineProps<SubscriptionDetailsButtonProps>();
 
 const clerk = useClerk();
 const { userId, orgId } = useAuth();
@@ -26,6 +27,8 @@ function getChildComponent() {
   return assertSingleChild(children, 'SubscriptionDetailsButton');
 }
 
+const emit = defineEmits(['subscriptionCancel']);
+
 function clickHandler() {
   if (!clerk.value) {
     return;
@@ -33,7 +36,7 @@ function clickHandler() {
 
   return clerk.value.__internal_openSubscriptionDetails({
     for: props.for,
-    onSubscriptionCancel: props.onSubscriptionCancel,
+    onSubscriptionCancel: () => emit('subscriptionCancel'),
     ...props.subscriptionDetailsProps,
   });
 }
