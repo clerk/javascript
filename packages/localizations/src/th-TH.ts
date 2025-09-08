@@ -320,6 +320,7 @@ export const thTH: LocalizationResource = {
         totalPaid: 'รวมที่ชำระ',
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'สมัครสมาชิกแผน',
         actionLabel__switchPlan: 'เปลี่ยนแผน',
         tableHeader__edit: 'แก้ไข',
@@ -996,6 +997,7 @@ export const thTH: LocalizationResource = {
         totalPaid: 'รวมที่ชำระ',
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'สมัครสมาชิกแผน',
         actionLabel__switchPlan: 'เปลี่ยนแผน',
         tableHeader__edit: 'แก้ไข',
