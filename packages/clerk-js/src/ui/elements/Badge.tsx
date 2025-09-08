@@ -22,7 +22,6 @@ export const LastAuthenticationStrategyBadge = ({
           color: t.colors.$colorMutedForeground,
           height: t.space.$4x5,
           paddingInline: t.space.$1x5,
-          pointerEvents: 'none',
           whiteSpace: 'nowrap',
           boxShadow: `0 0 0 1px ${t.colors.$colorBackground}`,
           ...(overlay && {
@@ -30,6 +29,7 @@ export const LastAuthenticationStrategyBadge = ({
             right: -1,
             top: -1,
             transform: `translate(${t.space.$2x5}, -50%)`,
+            pointerEvents: 'none',
           }),
         }),
         sx,
