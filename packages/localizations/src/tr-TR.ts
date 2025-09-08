@@ -249,7 +249,7 @@ export const trTR: LocalizationResource = {
     action__signOut: 'Çıkış yap',
     title: '{{identifier}} olarak giriş yapıldı',
   },
-  lastAuthenticationStrategy: 'Son kullanım',
+  lastAuthenticationStrategy: 'Son kullanılan',
   maintenanceMode: 'Şu anda bakımdayız, ancak endişelenmeyin, kısa bir süre içinde tamamlanacaktır.',
   membershipRole__admin: 'Yönetici',
   membershipRole__basicMember: 'Üye',

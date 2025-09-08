@@ -13,7 +13,7 @@
 import type { LocalizationResource } from '@clerk/types';
 
 export const nlBE: LocalizationResource = {
-  locale: 'nl-NL',
+  locale: 'nl-BE',
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
