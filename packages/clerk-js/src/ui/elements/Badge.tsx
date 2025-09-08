@@ -1,8 +1,7 @@
-import type { Badge } from '../customizables';
 import { descriptors, localizationKeys, Span } from '../customizables';
 import { common, type PropsOfComponent } from '../styledSystem';
 
-export type LastAuthenticationStrategyBadgeProps = PropsOfComponent<typeof Badge> & { overlay?: boolean };
+export type LastAuthenticationStrategyBadgeProps = PropsOfComponent<typeof Span> & { overlay?: boolean };
 export const LastAuthenticationStrategyBadge = ({
   sx,
   overlay,
