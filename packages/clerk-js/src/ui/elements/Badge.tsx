@@ -27,7 +27,7 @@ export const LastAuthenticationStrategyBadge = ({
             position: 'absolute',
             right: -1,
             top: -1,
-            transform: `translate(${t.space.$2x5}, -50%)`,
+            transform: `translate(${t.space.$2x5}, calc(-50% - ${t.space.$0x5}))`,
             pointerEvents: 'none',
           }),
         }),
