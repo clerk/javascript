@@ -321,6 +321,7 @@ export const viVN: LocalizationResource = {
         totalPaid: 'Tổng thanh toán',
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'Đăng ký gói',
         actionLabel__switchPlan: 'Chuyển gói',
         tableHeader__edit: 'Sửa',
@@ -1003,6 +1004,7 @@ export const viVN: LocalizationResource = {
         totalPaid: 'Tổng thanh toán',
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'Đăng ký gói',
         actionLabel__switchPlan: 'Chuyển gói',
         tableHeader__edit: 'Sửa',

@@ -321,6 +321,7 @@ export const roRO: LocalizationResource = {
         totalPaid: 'Total plătit',
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'Abonează-te la un plan',
         actionLabel__switchPlan: 'Schimbă planurile',
         tableHeader__edit: 'Editează',
@@ -997,6 +998,7 @@ export const roRO: LocalizationResource = {
         totalPaid: 'Total plătit',
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'Abonează-te la un plan',
         actionLabel__switchPlan: 'Schimbă planurile',
         tableHeader__edit: 'Editează',

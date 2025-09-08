@@ -321,6 +321,7 @@ export const frFR: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: "S'abonner à un plan",
         actionLabel__switchPlan: 'Changer de plan',
         tableHeader__edit: undefined,
@@ -1008,6 +1009,7 @@ export const frFR: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: "S'abonner à un plan",
         actionLabel__switchPlan: 'Changer de plan',
         tableHeader__edit: undefined,
