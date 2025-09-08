@@ -251,7 +251,7 @@ export const esCR: LocalizationResource = {
     action__signOut: 'Cerrar',
     title: 'Registrado como {{identifier}}',
   },
-  lastAuthenticationStrategy: 'último uso',
+  lastAuthenticationStrategy: 'Último uso',
   maintenanceMode: 'Actualmente estamos en mantenimiento, pero no te preocupes, no debería llevar más de unos minutos.',
   membershipRole__admin: 'Administrador',
   membershipRole__basicMember: 'Miembro',

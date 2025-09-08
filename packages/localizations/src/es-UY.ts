@@ -251,7 +251,7 @@ export const esUY: LocalizationResource = {
     action__signOut: 'Cerrar sesión',
     title: 'Conectado como {{identifier}}',
   },
-  lastAuthenticationStrategy: 'último uso',
+  lastAuthenticationStrategy: 'Último uso',
   maintenanceMode: 'Actualmente estamos en mantenimiento, pero no te preocupes, no tomará más que unos minutos.',
   membershipRole__admin: 'Administrador',
   membershipRole__basicMember: 'Miembro',

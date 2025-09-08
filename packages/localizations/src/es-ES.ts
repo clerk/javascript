@@ -250,7 +250,7 @@ export const esES: LocalizationResource = {
     action__signOut: 'Cerrar',
     title: 'Registrado como {{identifier}}',
   },
-  lastAuthenticationStrategy: 'último uso',
+  lastAuthenticationStrategy: 'Último uso',
   maintenanceMode: 'Modo de mantenimiento',
   membershipRole__admin: 'Administrador',
   membershipRole__basicMember: 'Miembro',
