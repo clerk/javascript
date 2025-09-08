@@ -250,6 +250,7 @@ export const daDK: LocalizationResource = {
     action__signOut: 'Log ud',
     title: 'Logget ind som {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Sidst brugt',
   maintenanceMode: 'Vedligeholdelsestilstand',
   membershipRole__admin: 'Administrator',
   membershipRole__basicMember: 'Medlem',

@@ -249,6 +249,7 @@ export const heIL: LocalizationResource = {
     action__signOut: 'התנתק',
     title: 'מחובר כ{{identifier}}',
   },
+  lastAuthenticationStrategy: 'בשימוש אחרון',
   maintenanceMode: undefined,
   membershipRole__admin: 'מנהל',
   membershipRole__basicMember: 'חבר',

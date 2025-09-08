@@ -248,6 +248,7 @@ export const zhTW: LocalizationResource = {
     action__signOut: '登出',
     title: '以 {{identifier}} 身份登入',
   },
+  lastAuthenticationStrategy: '上次使用',
   maintenanceMode: undefined,
   membershipRole__admin: '管理員',
   membershipRole__basicMember: '成員',

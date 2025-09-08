@@ -204,6 +204,8 @@ export type ElementsConfig = {
   socialButtonsProviderIcon: WithOptions<OAuthProvider | Web3Provider | PhoneCodeChannel, LoadingState>;
   socialButtonsProviderInitialIcon: WithOptions<OAuthProvider | Web3Provider | PhoneCodeChannel, LoadingState>;
 
+  lastAuthenticationStrategyBadge: WithOptions;
+
   enterpriseButtonsProviderIcon: WithOptions<EnterpriseProvider, LoadingState>;
 
   providerIcon: WithOptions<OAuthProvider | Web3Provider | PhoneCodeChannel | SamlIdpSlug, LoadingState>;

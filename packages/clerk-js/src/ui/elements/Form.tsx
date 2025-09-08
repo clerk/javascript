@@ -7,6 +7,7 @@ import type { LocalizationKey } from '../customizables';
 import { Button, Col, descriptors, Flex, Form as FormPrim, localizationKeys } from '../customizables';
 import { useLoadingStatus } from '../hooks';
 import type { PropsOfComponent } from '../styledSystem';
+import { LastAuthenticationStrategyBadge } from './Badge';
 import type { OTPInputProps } from './CodeControl';
 import { useCardState } from './contexts';
 import { Field } from './FieldControl';
@@ -123,10 +124,12 @@ type CommonInputProps = CommonFieldRootProps & {
   actionLabel?: string | LocalizationKey;
   onActionClicked?: React.MouseEventHandler;
   icon?: React.ComponentType;
+  isLastAuthenticationStrategy?: boolean;
 };
 
 const CommonInputWrapper = (props: PropsWithChildren<CommonInputProps>) => {
-  const { isOptional, icon, actionLabel, children, onActionClicked, ...fieldProps } = props;
+  const { isOptional, isLastAuthenticationStrategy, icon, actionLabel, children, onActionClicked, ...fieldProps } =
+    props;
   return (
     <Field.Root {...fieldProps}>
       <Col
@@ -148,6 +151,9 @@ const CommonInputWrapper = (props: PropsWithChildren<CommonInputProps>) => {
                 onClick={onActionClicked}
               />
             )}
+            {isLastAuthenticationStrategy && !actionLabel && !isOptional && (
+              <LastAuthenticationStrategyBadgeWithFormState />
+            )}
             <Field.Action />
           </Field.LabelRow>
 
@@ -157,6 +163,20 @@ const CommonInputWrapper = (props: PropsWithChildren<CommonInputProps>) => {
         <Field.Feedback />
       </Col>
     </Field.Root>
+  );
+};
+
+const LastAuthenticationStrategyBadgeWithFormState = (
+  props: PropsOfComponent<typeof LastAuthenticationStrategyBadge>,
+) => {
+  const { isLoading, isDisabled } = useFormState();
+  return (
+    <LastAuthenticationStrategyBadge
+      {...props}
+      sx={t => ({
+        opacity: isDisabled || isLoading ? t.opacity.$disabled : 1,
+      })}
+    />
   );
 };
 

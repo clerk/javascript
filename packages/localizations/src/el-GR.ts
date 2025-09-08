@@ -250,6 +250,7 @@ export const elGR: LocalizationResource = {
     action__signOut: 'Αποσύνδεση',
     title: 'Είστε συνδεδεμένος ως {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Τελευταία χρήση',
   maintenanceMode: undefined,
   membershipRole__admin: 'Διαχειριστής',
   membershipRole__basicMember: 'Μέλος',

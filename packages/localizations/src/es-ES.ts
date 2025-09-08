@@ -250,6 +250,7 @@ export const esES: LocalizationResource = {
     action__signOut: 'Cerrar',
     title: 'Registrado como {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Último uso',
   maintenanceMode: 'Modo de mantenimiento',
   membershipRole__admin: 'Administrador',
   membershipRole__basicMember: 'Miembro',
@@ -804,7 +805,7 @@ export const esES: LocalizationResource = {
     },
   },
   socialButtonsBlockButton: 'Continuar con {{provider|titleize}}',
-  socialButtonsBlockButtonManyInView: undefined,
+  socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
     chooseOrganization: {
       action__createOrganization: undefined,

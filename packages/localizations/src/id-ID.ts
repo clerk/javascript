@@ -249,6 +249,7 @@ export const idID: LocalizationResource = {
     action__signOut: 'Keluar',
     title: 'Masuk sebagai {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Terakhir digunakan',
   maintenanceMode:
     'Kami sedang dalam pemeliharaan sistem, tapi jangan khawatir, ini tidak akan memakan waktu lebih dari beberapa menit.',
   membershipRole__admin: 'Admin',
