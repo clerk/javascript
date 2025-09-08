@@ -364,8 +364,8 @@ importers:
         version: 1.0.1
     devDependencies:
       astro:
-        specifier: ^5.13.2
-        version: 5.13.2(@netlify/blobs@9.1.2)(@types/node@24.0.14)(db0@0.3.2)(idb-keyval@6.2.1)(ioredis@5.6.1)(jiti@2.4.2)(lightningcss@1.27.0)(rollup@4.45.0)(terser@5.43.1)(tsx@4.19.2)(typescript@5.8.3)(yaml@2.8.0)
+        specifier: ^5.13.5
+        version: 5.13.5(@netlify/blobs@9.1.2)(@types/node@24.0.14)(db0@0.3.2)(idb-keyval@6.2.1)(ioredis@5.6.1)(jiti@2.4.2)(lightningcss@1.27.0)(rollup@4.45.0)(terser@5.43.1)(tsx@4.19.2)(typescript@5.8.3)(yaml@2.8.0)
 
   packages/backend:
     dependencies:
@@ -6158,8 +6158,8 @@ packages:
     resolution: {integrity: sha512-Z7tMw1ytTXt5jqMcOP+OQteU1VuNK9Y02uuJtKQ1Sv69jXQKKg5cibLwGJow8yzZP+eAc18EmLGPal0bp36rvQ==}
     engines: {node: '>=8'}
 
-  astro@5.13.2:
-    resolution: {integrity: sha512-yjcXY0Ua3EwjpVd3GoUXa65HQ6qgmURBptA+M9GzE0oYvgfuyM7bIbH8IR/TWIbdefVUJR5b7nZ0oVnMytmyfQ==}
+  astro@5.13.5:
+    resolution: {integrity: sha512-XmBzkl13XU97+n/QiOM5uXQdAVe0yKt5gO+Wlgc8dHRwHR499qhMQ5sMFckLJweUINLzcNGjP3F5nG4wV8a2XA==}
     engines: {node: 18.20.8 || ^20.3.0 || >=22.0.0, npm: '>=9.6.5', pnpm: '>=7.1.0'}
     hasBin: true
 
@@ -21554,7 +21554,7 @@ snapshots:
 
   astral-regex@2.0.0: {}
 
-  astro@5.13.2(@netlify/blobs@9.1.2)(@types/node@24.0.14)(db0@0.3.2)(idb-keyval@6.2.1)(ioredis@5.6.1)(jiti@2.4.2)(lightningcss@1.27.0)(rollup@4.45.0)(terser@5.43.1)(tsx@4.19.2)(typescript@5.8.3)(yaml@2.8.0):
+  astro@5.13.5(@netlify/blobs@9.1.2)(@types/node@24.0.14)(db0@0.3.2)(idb-keyval@6.2.1)(ioredis@5.6.1)(jiti@2.4.2)(lightningcss@1.27.0)(rollup@4.45.0)(terser@5.43.1)(tsx@4.19.2)(typescript@5.8.3)(yaml@2.8.0):
     dependencies:
       '@astrojs/compiler': 2.12.2
       '@astrojs/internal-helpers': 0.7.2
