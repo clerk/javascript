@@ -1,5 +1,22 @@
 # @clerk/vue
 
+## 1.13.0
+
+### Minor Changes
+
+- Replaced callback props with event emitters in billing buttons: ([#6733](https://github.com/clerk/javascript/pull/6733)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  props `onSubscriptionComplete` → emit `subscription-complete`
+  props `onSubscriptionCancel` → emit `subscription-cancel`
+
+### Patch Changes
+
+- Improved error message when Clerk plugin is not installed ([#6719](https://github.com/clerk/javascript/pull/6719)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`55490c3`](https://github.com/clerk/javascript/commit/55490c31fadc82bdca6cd5f2b22e5e158aaba0cb), [`e8d21de`](https://github.com/clerk/javascript/commit/e8d21de39b591973dad48fc1d1851c4d28b162fe), [`637f2e8`](https://github.com/clerk/javascript/commit/637f2e8768b76aaf756062b6b5b44bf651f66789)]:
+  - @clerk/types@4.85.0
+  - @clerk/shared@3.24.2
+
 ## 1.12.0
 
 ### Minor Changes
