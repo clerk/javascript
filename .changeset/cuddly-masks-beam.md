@@ -4,5 +4,5 @@
 
 Replaced callback props with event emitters in billing buttons:
 
-props `onSubscriptionComplete` → emit `subscriptionComplete`  
-props `onSubscriptionCancel`   → emit `subscriptionCancel`
+props `onSubscriptionComplete` → emit `subscription-complete`  
+props `onSubscriptionCancel`   → emit `subscription-cancel`

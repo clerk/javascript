@@ -27,7 +27,7 @@ function getChildComponent() {
   return assertSingleChild(children, 'CheckoutButton');
 }
 
-const emit = defineEmits(['subscriptionComplete']);
+const emit = defineEmits<{ (e: 'subscription-complete'): void }>();
 
 function clickHandler() {
   if (!clerk.value) {
@@ -39,8 +39,8 @@ function clickHandler() {
     planPeriod: props.planPeriod,
     for: props.for,
     newSubscriptionRedirectUrl: props.newSubscriptionRedirectUrl,
-    onSubscriptionComplete: () => emit('subscriptionComplete'),
     ...props.checkoutProps,
+    onSubscriptionComplete: () => emit('subscription-complete'),
   });
 }
 </script>

@@ -27,7 +27,7 @@ function getChildComponent() {
   return assertSingleChild(children, 'SubscriptionDetailsButton');
 }
 
-const emit = defineEmits(['subscriptionCancel']);
+const emit = defineEmits<{ (e: 'subscription-cancel'): void }>();
 
 function clickHandler() {
   if (!clerk.value) {
@@ -36,8 +36,8 @@ function clickHandler() {
 
   return clerk.value.__internal_openSubscriptionDetails({
     for: props.for,
-    onSubscriptionCancel: () => emit('subscriptionCancel'),
     ...props.subscriptionDetailsProps,
+    onSubscriptionCancel: () => emit('subscription-cancel'),
   });
 }
 </script>
