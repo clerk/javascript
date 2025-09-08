@@ -424,6 +424,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'profileSectionSubtitleText',
   'profileSectionContent',
   'profileSectionPrimaryButton',
+  'profileSectionButtonGroup',
   'profilePage',
 
   'formattedPhoneNumber',
