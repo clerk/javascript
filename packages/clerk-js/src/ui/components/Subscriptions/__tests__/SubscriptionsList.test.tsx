@@ -9,11 +9,14 @@ const { createFixtures } = bindCreateFixtures('UserProfile');
 
 const props = {
   title: localizationKeys('userProfile.billingPage.subscriptionsListSection.title'),
-  arrowButtonText: localizationKeys('userProfile.billingPage.subscriptionsListSection.actionLabel__switchPlan'),
-  arrowButtonEmptyText: localizationKeys(
+  switchPlansLabel: localizationKeys('userProfile.billingPage.subscriptionsListSection.actionLabel__switchPlan'),
+  newSubscriptionLabel: localizationKeys(
     'userProfile.billingPage.subscriptionsListSection.actionLabel__newSubscription',
   ),
-};
+  manageSubscriptionLabel: localizationKeys(
+    'userProfile.billingPage.subscriptionsListSection.actionLabel__manageSubscription',
+  ),
+} as const;
 
 describe('SubscriptionsList', () => {
   it('shows New subscription CTA and hides Manage when there are no subscriptions', async () => {
@@ -35,18 +38,7 @@ describe('SubscriptionsList', () => {
       reload: jest.fn(),
     });
 
-    const testProps = {
-      title: localizationKeys('userProfile.billingPage.subscriptionsListSection.title'),
-      switchPlansLabel: localizationKeys('userProfile.billingPage.subscriptionsListSection.actionLabel__switchPlan'),
-      newSubscriptionLabel: localizationKeys(
-        'userProfile.billingPage.subscriptionsListSection.actionLabel__newSubscription',
-      ),
-      manageSubscriptionLabel: localizationKeys(
-        'userProfile.billingPage.subscriptionsListSection.actionLabel__manageSubscription',
-      ),
-    } as const;
-
-    const { getByText, queryByText } = render(<SubscriptionsList {...testProps} />, { wrapper });
+    const { getByText, queryByText } = render(<SubscriptionsList {...props} />, { wrapper });
 
     await waitFor(() => {
       expect(getByText('Subscribe to a plan')).toBeVisible();
