@@ -20,6 +20,7 @@ import {
   relativeToAbsoluteUrl,
   requiresUserInput,
   sanitizeHref,
+  stripOrigin,
   trimLeadingSlash,
   trimTrailingSlash,
 } from '../url';
@@ -639,5 +640,34 @@ describe('relativeToAbsoluteUrl', () => {
 
   test.each(cases)('relativeToAbsoluteUrl(%s, %s) === %s', (origin, relative, expected) => {
     expect(relativeToAbsoluteUrl(relative, origin)).toEqual(new URL(expected));
+  });
+});
+
+describe('stripOrigin(url)', () => {
+  it('should strip origin when window.location is available', () => {
+    const originalLocation = window.location;
+    Object.defineProperty(window, 'location', {
+      value: { origin: 'https://example.com' },
+      writable: true,
+    });
+
+    expect(stripOrigin('https://example.com/test?param=1')).toBe('/test?param=1');
+    expect(stripOrigin('/test')).toBe('/test');
+
+    Object.defineProperty(window, 'location', { value: originalLocation });
+  });
+
+  it('should handle undefined window.location gracefully', () => {
+    const originalLocation = window.location;
+    Object.defineProperty(window, 'location', {
+      value: undefined,
+      writable: true,
+    });
+
+    expect(() => stripOrigin('/test')).not.toThrow();
+    expect(stripOrigin('/test')).toBe('/test');
+    expect(stripOrigin('https://example.com/test')).toBe('https://example.com/test');
+
+    Object.defineProperty(window, 'location', { value: originalLocation });
   });
 });
