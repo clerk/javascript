@@ -2655,14 +2655,14 @@ export class Clerk implements ClerkInterface {
       const isServerError = isClerkRuntimeError(err) && err.code === 'network_error';
 
       if (isServerError && this.shouldFallbackToCachedResources()) {
-        // Offline apps: Use cached resources when network fails
+        // Offline support: Use cached resources when network fails
         const cachedResources = await this.__internal_getCachedResources?.();
         environment = new Environment(cachedResources?.environment);
         Client.clearInstance();
         client = Client.getOrCreateInstance(cachedResources?.client);
         ++initializationDegradedCounter;
       } else if (isServerError) {
-        // Non-offline apps: Retry once after 10 seconds for 5xx errors
+        // Retry once after 10 seconds for 5xx errors
         try {
           await new Promise(resolve => setTimeout(resolve, 10000));
           [environment, client] = await Promise.all([
