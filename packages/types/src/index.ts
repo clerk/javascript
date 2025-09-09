@@ -50,6 +50,10 @@ export * from './redirects';
 export * from './resource';
 export * from './role';
 export * from './router';
+/**
+ * TODO @revamp-hooks: Drop this in the next major release.
+ */
+export * from './runtime-values';
 export * from './saml';
 export * from './samlAccount';
 export * from './samlConnection';

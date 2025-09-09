@@ -5,7 +5,8 @@ import { useClerk } from '../composables/useClerk';
 import { useAuth } from '../composables/useAuth';
 import { assertSingleChild, normalizeWithDefaultValue } from '../utils';
 
-const props = defineProps<__experimental_CheckoutButtonProps>();
+type CheckoutButtonProps = Omit<__experimental_CheckoutButtonProps, 'onSubscriptionComplete'>;
+const props = defineProps<CheckoutButtonProps>();
 
 const clerk = useClerk();
 const { userId, orgId } = useAuth();
@@ -26,6 +27,8 @@ function getChildComponent() {
   return assertSingleChild(children, 'CheckoutButton');
 }
 
+const emit = defineEmits<{ (e: 'subscription-complete'): void }>();
+
 function clickHandler() {
   if (!clerk.value) {
     return;
@@ -35,9 +38,9 @@ function clickHandler() {
     planId: props.planId,
     planPeriod: props.planPeriod,
     for: props.for,
-    onSubscriptionComplete: props.onSubscriptionComplete,
     newSubscriptionRedirectUrl: props.newSubscriptionRedirectUrl,
     ...props.checkoutProps,
+    onSubscriptionComplete: () => emit('subscription-complete'),
   });
 }
 </script>

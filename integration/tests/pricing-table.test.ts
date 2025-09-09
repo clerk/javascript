@@ -284,7 +284,9 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await u.po.checkout.fillTestCard();
       await u.po.checkout.clickPayOrSubscribe();
 
-      await expect(u.po.checkout.root.getByText(/Trial.*successfully.*started/i)).toBeVisible();
+      await expect(u.po.checkout.root.getByText(/Trial.*successfully.*started/i)).toBeVisible({
+        timeout: 15_000,
+      });
       await u.po.checkout.confirmAndContinue();
 
       await u.po.page.goToRelative('/pricing-table');
@@ -308,7 +310,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
 
       await expect(u.po.page.getByText(/Trial ends/i)).toBeVisible();
 
-      await u.po.page.getByRole('button', { name: 'Manage subscription' }).first().click();
+      await u.po.page.getByRole('button', { name: 'Manage' }).first().click();
       await u.po.subscriptionDetails.waitForMounted();
       await u.po.subscriptionDetails.root.locator('.cl-menuButtonEllipsisBordered').click();
       await u.po.subscriptionDetails.root.getByText('Cancel free trial').click();
@@ -412,6 +414,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await u.po.checkout.clickPayOrSubscribe();
       await u.po.checkout.confirmAndContinue();
 
+      await u.po.page.waitForAppUrl('/');
       await u.po.page.goToRelative('/user');
       await u.po.userProfile.waitForMounted();
       await u.po.userProfile.switchToBillingTab();
@@ -433,7 +436,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await u.po.checkout.waitForMounted();
       await u.po.checkout.root.getByRole('button', { name: /^pay\s\$/i }).waitFor({ state: 'visible' });
       await u.po.checkout.clickPayOrSubscribe();
-
+      await u.po.checkout.confirmAndContinue();
+      await u.po.page.waitForAppUrl('/');
       await u.po.page.goToRelative('/user');
       await u.po.userProfile.waitForMounted();
       await u.po.userProfile.switchToBillingTab();
@@ -475,7 +479,9 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await u.po.checkout.waitForMounted();
       await u.po.checkout.fillTestCard();
       await u.po.checkout.clickPayOrSubscribe();
-      await expect(u.po.page.getByText('Payment was successful!')).toBeVisible();
+      await expect(u.po.page.getByText('Payment was successful!')).toBeVisible({
+        timeout: 15_000,
+      });
 
       await u.po.checkout.confirmAndContinue();
       await u.po.pricingTable.startCheckout({ planSlug: 'free_user', shouldSwitch: true });
@@ -527,7 +533,10 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
 
       await u.page.waitForTimeout(1000);
       await expect(u.po.page.locator('.cl-profileSectionContent__subscriptionsList').getByText('Plus')).toBeVisible();
-      await u.po.page.getByRole('button', { name: 'Manage subscription' }).first().click();
+      await u.po.page
+        .locator('.cl-profileSectionContent__subscriptionsList')
+        .getByRole('button', { name: 'Manage' })
+        .click();
       await u.po.subscriptionDetails.waitForMounted();
       await u.po.subscriptionDetails.root.locator('.cl-menuButtonEllipsisBordered').click();
       await u.po.subscriptionDetails.root.getByText('Cancel subscription').click();

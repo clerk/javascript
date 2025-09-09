@@ -243,6 +243,7 @@ export const enUS: LocalizationResource = {
     action__signOut: 'Sign out',
     title: 'Signed in as {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Last used',
   maintenanceMode:
     "We are currently undergoing maintenance, but don't worry, it shouldn't take more than a few minutes.",
   membershipRole__admin: 'Admin',
@@ -311,6 +312,7 @@ export const enUS: LocalizationResource = {
         totalPaid: 'Total paid',
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: 'Manage',
         actionLabel__newSubscription: 'Subscribe to a plan',
         actionLabel__switchPlan: 'Switch plans',
         tableHeader__edit: 'Edit',
@@ -995,6 +997,7 @@ export const enUS: LocalizationResource = {
         totalPaid: 'Total paid',
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: 'Manage',
         actionLabel__newSubscription: 'Subscribe to a plan',
         actionLabel__switchPlan: 'Switch plans',
         tableHeader__edit: 'Edit',

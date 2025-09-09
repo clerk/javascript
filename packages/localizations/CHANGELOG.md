@@ -1,5 +1,56 @@
 # Change Log
 
+## 3.25.0
+
+### Minor Changes
+
+- Change placement of the manage subscription button inside `<UserProfile/>` and `<OrganizationProfile/>` ([#6428](https://github.com/clerk/javascript/pull/6428)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Fix formatting of cs-CZ localization strings ([#6717](https://github.com/clerk/javascript/pull/6717)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Introduce "Last Used" functionality to Sign In and Up ([#6722](https://github.com/clerk/javascript/pull/6722)) by [@tmilewski](https://github.com/tmilewski)
+
+- Add back removed cs-CZ translations for form field errors ([#6713](https://github.com/clerk/javascript/pull/6713)) by [@ToliaGuy](https://github.com/ToliaGuy)
+
+- Updated dependencies [[`55490c3`](https://github.com/clerk/javascript/commit/55490c31fadc82bdca6cd5f2b22e5e158aaba0cb), [`e8d21de`](https://github.com/clerk/javascript/commit/e8d21de39b591973dad48fc1d1851c4d28b162fe), [`637f2e8`](https://github.com/clerk/javascript/commit/637f2e8768b76aaf756062b6b5b44bf651f66789)]:
+  - @clerk/types@4.85.0
+
+## 3.24.2
+
+### Patch Changes
+
+- Add Traditional Chinese translation for sign in or up combined title ([#6701](https://github.com/clerk/javascript/pull/6701)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Add ptBR missing localization keys for choose organization session task ([#6704](https://github.com/clerk/javascript/pull/6704)) by [@guilherme6191](https://github.com/guilherme6191)
+
+- Updated dependencies [[`fced4fc`](https://github.com/clerk/javascript/commit/fced4fc869bb21c77826dfaf281b6640e0f0c006), [`1b1e8b1`](https://github.com/clerk/javascript/commit/1b1e8b1fd33b787f956b17b193e5fd0a4cdc6cec)]:
+  - @clerk/types@4.84.1
+
+## 3.24.1
+
+### Patch Changes
+
+- Refined German (de-DE) waitlist localization for improved clarity and consistency ([#6631](https://github.com/clerk/javascript/pull/6631)) by [@okikeSolutions](https://github.com/okikeSolutions)
+
+  This update improves the waitlist flow by:
+
+  - Updating action link text from “Jetzt anmelden” to “Anmelden”
+  - Changing action text from “Kein Zugang? Auf die Warteliste setzen!” to “Bereits Zugang?”
+  - Adjusting form button label from “Zur Warteliste hinzufügen” to “Warteliste beitreten”
+  - Clarifying the waitlist start subtitle with instructions to enter an email for notifications
+  - Aligning success subtitles with consistent wording for availability notifications
+
+  The German waitlist localization now offers clearer guidance and a smoother user experience.
+
+- Add api-related localizations for th-TH and refine translation context ([#6657](https://github.com/clerk/javascript/pull/6657)) by [@ttwrpz](https://github.com/ttwrpz)
+
+- Fixed a typo when canceling a free trial. ([#6672](https://github.com/clerk/javascript/pull/6672)) by [@paddycarver](https://github.com/paddycarver)
+
+- Updated dependencies [[`2a82737`](https://github.com/clerk/javascript/commit/2a8273705b9764e1a4613d5a0dbb738d0b156c05), [`cda5d7b`](https://github.com/clerk/javascript/commit/cda5d7b79b28dc03ec794ea54e0feb64b148cdd2), [`ba25a5b`](https://github.com/clerk/javascript/commit/ba25a5b5a3fa686a65f52e221d9d1712a389fea9), [`a50cfc8`](https://github.com/clerk/javascript/commit/a50cfc8f1dd168b436499e32fc8b0fc41d28bbff), [`377f67b`](https://github.com/clerk/javascript/commit/377f67b8e552d1a19efbe4530e9306675b7f8eab), [`65b12ee`](https://github.com/clerk/javascript/commit/65b12eeeb57ee80cdd8c36c5949d51f1227a413e), [`263722e`](https://github.com/clerk/javascript/commit/263722e61fd27403b4c8d9794880686771e123f9)]:
+  - @clerk/types@4.84.0
+
 ## 3.24.0
 
 ### Minor Changes

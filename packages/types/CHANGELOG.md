@@ -1,5 +1,63 @@
 # Change Log
 
+## 4.85.0
+
+### Minor Changes
+
+- Change placement of the manage subscription button inside `<UserProfile/>` and `<OrganizationProfile/>` ([#6428](https://github.com/clerk/javascript/pull/6428)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Introduce "Last Used" functionality to Sign In and Up ([#6722](https://github.com/clerk/javascript/pull/6722)) by [@tmilewski](https://github.com/tmilewski)
+
+- feat(types): Update telemetry type to accept perEventSampling argument. ([#6723](https://github.com/clerk/javascript/pull/6723)) by [@heatlikeheatwave](https://github.com/heatlikeheatwave)
+
+## 4.84.1
+
+### Patch Changes
+
+- Fixed incorrect deprecation warnings for legacy redirect props in `<ClerkProvider>`. ([#6699](https://github.com/clerk/javascript/pull/6699)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Update the experimental `Errors` interface to allow null for raw and global error arrays ([#6677](https://github.com/clerk/javascript/pull/6677)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+## 4.84.0
+
+### Minor Changes
+
+- [Experimental] Signal phone code support ([#6650](https://github.com/clerk/javascript/pull/6650)) by [@dstaley](https://github.com/dstaley)
+
+- [Billing Beta] Remove CommerceProduct. ([#6636](https://github.com/clerk/javascript/pull/6636)) by [@panteliselef](https://github.com/panteliselef)
+
+- [Billing Beta] `checkout.confirm()` now infers the resource id resulting in less repetition and improved DX. ([#6642](https://github.com/clerk/javascript/pull/6642)) by [@panteliselef](https://github.com/panteliselef)
+
+  After
+
+  ```tsx
+  const checkout = Clerk.billing.startCheckout({ orgId });
+  checkout.confirm(); // orgId is always implied
+  ```
+
+  Before
+
+  ```tsx
+  const checkout = clerk.billing.startCheckout({ orgId });
+  checkout.confirm({ orgId });
+  ```
+
+- [Experimental] Signal MFA support ([#6659](https://github.com/clerk/javascript/pull/6659)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- The `SAML_IDPS` export was moved from `@clerk/types` to `@clerk/shared/saml` and was marked as deprecated. ([#6682](https://github.com/clerk/javascript/pull/6682)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  Please use `import { SAML_IDPS } from "@clerk/shared/saml"` instead.
+
+- fix(types): Change return type of SetActiveNavigate to allow void or Promise ([#6662](https://github.com/clerk/javascript/pull/6662)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- - Export `Feature` type from backend resource. ([#6649](https://github.com/clerk/javascript/pull/6649)) by [@alexisintech](https://github.com/alexisintech)
+
+  - Re-export canonical `CommerceMoneyAmount` type from `@clerk/types`.
+
 ## 4.83.0
 
 ### Minor Changes

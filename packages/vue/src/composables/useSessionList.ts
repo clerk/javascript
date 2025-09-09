@@ -32,7 +32,7 @@ type UseSessionList = () => ToComputedRefs<UseSessionListReturn>;
  * </template>
  */
 export const useSessionList: UseSessionList = () => {
-  const { clerk, clientCtx } = useClerkContext();
+  const { clerk, clientCtx } = useClerkContext('useSessionList');
 
   const result = computed<UseSessionListReturn>(() => {
     if (!clientCtx.value) {

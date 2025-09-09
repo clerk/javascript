@@ -249,6 +249,7 @@ export const hiIN: LocalizationResource = {
     action__signOut: 'साइन आउट',
     title: '{{identifier}} के रूप में साइन इन किया गया',
   },
+  lastAuthenticationStrategy: 'अंतिम समय प्रयोग हुआ',
   maintenanceMode:
     'हम वर्तमान में रखरखाव कर रहे हैं, लेकिन चिंता न करें, इसमें कुछ मिनटों से अधिक समय नहीं लगना चाहिए।',
   membershipRole__admin: 'व्यवस्थापक',
@@ -317,6 +318,7 @@ export const hiIN: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1006,6 +1008,7 @@ export const hiIN: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,

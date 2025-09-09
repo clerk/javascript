@@ -9,16 +9,123 @@ const { createFixtures } = bindCreateFixtures('UserProfile');
 
 const props = {
   title: localizationKeys('userProfile.billingPage.subscriptionsListSection.title'),
-  arrowButtonText: localizationKeys('userProfile.billingPage.subscriptionsListSection.actionLabel__switchPlan'),
-  arrowButtonEmptyText: localizationKeys(
+  switchPlansLabel: localizationKeys('userProfile.billingPage.subscriptionsListSection.actionLabel__switchPlan'),
+  newSubscriptionLabel: localizationKeys(
     'userProfile.billingPage.subscriptionsListSection.actionLabel__newSubscription',
   ),
-};
+  manageSubscriptionLabel: localizationKeys(
+    'userProfile.billingPage.subscriptionsListSection.actionLabel__manageSubscription',
+  ),
+} as const;
 
 describe('SubscriptionsList', () => {
+  it('shows New subscription CTA and hides Manage when there are no subscriptions', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
+    });
+
+    fixtures.clerk.billing.getSubscription.mockResolvedValue({
+      id: 'sub_top_empty',
+      status: 'active',
+      activeAt: new Date('2021-01-01'),
+      createdAt: new Date('2021-01-01'),
+      nextPayment: null,
+      pastDueAt: null,
+      updatedAt: null,
+      subscriptionItems: [],
+      pathRoot: '',
+      reload: jest.fn(),
+    });
+
+    const { getByText, queryByText } = render(<SubscriptionsList {...props} />, { wrapper });
+
+    await waitFor(() => {
+      expect(getByText('Subscribe to a plan')).toBeVisible();
+    });
+
+    expect(queryByText('Manage')).toBeNull();
+  });
+
+  it('shows switch plans CTA and hides Manage when there on free plan', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
+    });
+
+    fixtures.clerk.billing.getSubscription.mockResolvedValue({
+      id: 'sub_top_empty',
+      status: 'active',
+      activeAt: new Date('2021-01-01'),
+      createdAt: new Date('2021-01-01'),
+      nextPayment: null,
+      pastDueAt: null,
+      updatedAt: null,
+      subscriptionItems: [
+        {
+          id: 'sub_free',
+          plan: {
+            id: 'plan_free',
+            name: 'Free Plan',
+            fee: { amount: 0, amountFormatted: '0.00', currencySymbol: '$', currency: 'USD' },
+            annualFee: { amount: 0, amountFormatted: '0.00', currencySymbol: '$', currency: 'USD' },
+            annualMonthlyFee: { amount: 0, amountFormatted: '0.00', currencySymbol: '$', currency: 'USD' },
+            description: 'Free Plan Description',
+            isDefault: true,
+            isRecurring: true,
+            hasBaseFee: false,
+            forPayerType: 'user' as CommercePayerResourceType,
+            publiclyVisible: true,
+            slug: 'free-plan',
+            avatarUrl: '',
+            features: [],
+            freeTrialDays: null,
+            freeTrialEnabled: false,
+            pathRoot: '',
+            reload: jest.fn(),
+          },
+          status: 'active',
+          createdAt: new Date('2021-01-01'),
+          periodStart: new Date('2021-01-01'),
+          periodEnd: new Date('2021-01-15'),
+          canceledAt: null,
+          paymentSourceId: 'src_free',
+          planPeriod: 'month' as const,
+          isFreeTrial: false,
+          pastDueAt: null,
+          cancel: jest.fn(),
+          pathRoot: '',
+          reload: jest.fn(),
+        },
+      ],
+      pathRoot: '',
+      reload: jest.fn(),
+    });
+
+    const testProps = {
+      title: localizationKeys('userProfile.billingPage.subscriptionsListSection.title'),
+      switchPlansLabel: localizationKeys('userProfile.billingPage.subscriptionsListSection.actionLabel__switchPlan'),
+      newSubscriptionLabel: localizationKeys(
+        'userProfile.billingPage.subscriptionsListSection.actionLabel__newSubscription',
+      ),
+      manageSubscriptionLabel: localizationKeys(
+        'userProfile.billingPage.subscriptionsListSection.actionLabel__manageSubscription',
+      ),
+    } as const;
+
+    const { getByText, queryByText } = render(<SubscriptionsList {...testProps} />, { wrapper });
+
+    await waitFor(() => {
+      expect(getByText('Switch plans')).toBeVisible();
+    });
+    expect(queryByText('Subscribe to a plan')).toBeNull();
+    expect(queryByText('Manage')).toBeNull();
+  });
+
   it('displays free trial badge when subscription is in free trial', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     const freeTrialSubscription = {
@@ -82,6 +189,7 @@ describe('SubscriptionsList', () => {
   it('on past due, no badge, but past due date is shown', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     const pastDueSubscription = {
@@ -146,6 +254,7 @@ describe('SubscriptionsList', () => {
   it('does not display active badge when subscription is active and it is a single item', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     const activeSubscription = {
@@ -209,6 +318,7 @@ describe('SubscriptionsList', () => {
   it('renders upcomming badge when current subscription is canceled but active', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     const upcomingSubscription = {

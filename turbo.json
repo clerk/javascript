@@ -356,6 +356,17 @@
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
       "outputLogs": "new-only"
+    },
+    "//#test:integration:custom": {
+      "dependsOn": [
+        "@clerk/testing#build",
+        "@clerk/clerk-js#build",
+        "@clerk/backend#build",
+        "@clerk/clerk-react#build"
+      ],
+      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
+      "inputs": ["integration/**"],
+      "outputLogs": "new-only"
     }
   }
 }

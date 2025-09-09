@@ -250,6 +250,7 @@ export const arSA: LocalizationResource = {
     action__signOut: 'تسجيل الخروج',
     title: 'تسجيل الدخول بأسم {{identifier}}',
   },
+  lastAuthenticationStrategy: 'آخر استخدام',
   maintenanceMode: 'نحن نقوم بعمل بعض التعديلات في الوقت الحالي. سوف نعود في غضون دقائق قليلة',
   membershipRole__admin: 'المسؤول',
   membershipRole__basicMember: 'عضو',
@@ -316,6 +317,7 @@ export const arSA: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -993,6 +995,7 @@ export const arSA: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,

@@ -7,7 +7,7 @@ import { ArrowRightIcon } from '../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 
 type ArrowBlockButtonProps = PropsOfComponent<typeof Button> & {
-  rightIcon?: React.ComponentType;
+  rightIcon?: React.ComponentType | null;
   rightIconSx?: ThemableCssProp;
   leftIcon?: React.ComponentType | React.ReactElement;
   leftIconSx?: ThemableCssProp;
@@ -125,23 +125,25 @@ export const ArrowBlockButton = React.forwardRef<HTMLButtonElement, ArrowBlockBu
         </Text>
         {badge}
       </Flex>
-      <Icon
-        elementDescriptor={arrowElementDescriptor}
-        elementId={arrowElementId}
-        icon={rightIcon}
-        sx={[
-          theme => ({
-            transition: 'all 100ms ease',
-            minWidth: theme.sizes.$4,
-            minHeight: theme.sizes.$4,
-            width: '1em',
-            height: '1em',
-            opacity: `var(--arrow-opacity)`,
-            transform: `var(--arrow-transform)`,
-          }),
-          rightIconSx,
-        ]}
-      />
+      {rightIcon && (
+        <Icon
+          elementDescriptor={arrowElementDescriptor}
+          elementId={arrowElementId}
+          icon={rightIcon}
+          sx={[
+            theme => ({
+              transition: 'all 100ms ease',
+              minWidth: theme.sizes.$4,
+              minHeight: theme.sizes.$4,
+              width: '1em',
+              height: '1em',
+              opacity: `var(--arrow-opacity)`,
+              transform: `var(--arrow-transform)`,
+            }),
+            rightIconSx,
+          ]}
+        />
+      )}
     </SimpleButton>
   );
 });

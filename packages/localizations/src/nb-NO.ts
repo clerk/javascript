@@ -250,6 +250,7 @@ export const nbNO: LocalizationResource = {
     action__signOut: 'Logg ut',
     title: 'Logget inn som {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Sist brukt',
   maintenanceMode: undefined,
   membershipRole__admin: 'Administrator',
   membershipRole__basicMember: 'Medlem',
@@ -316,6 +317,7 @@ export const nbNO: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -995,6 +997,7 @@ export const nbNO: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,

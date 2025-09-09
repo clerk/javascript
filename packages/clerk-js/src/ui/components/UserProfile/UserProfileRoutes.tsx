@@ -38,7 +38,7 @@ const PaymentAttemptPage = lazy(() =>
 );
 
 export const UserProfileRoutes = () => {
-  const { pages } = useUserProfileContext();
+  const { pages, shouldShowBilling } = useUserProfileContext();
   const { apiKeysSettings, commerceSettings } = useEnvironment();
 
   const isAccountPageRoot = pages.routes[0].id === USER_PROFILE_NAVBAR_ROUTE_ID.ACCOUNT;
@@ -80,7 +80,7 @@ export const UserProfileRoutes = () => {
             </Route>
           </Switch>
         </Route>
-        {commerceSettings.billing.user.enabled ? (
+        {commerceSettings.billing.user.enabled && shouldShowBilling ? (
           <Route path={isBillingPageRoot ? undefined : 'billing'}>
             <Switch>
               <Route index>
