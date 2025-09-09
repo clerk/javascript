@@ -249,6 +249,7 @@ export const srRS: LocalizationResource = {
     action__signOut: 'Odjavi se',
     title: 'Prijavljeni ste kao {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Poslednje korišćeno',
   maintenanceMode: 'Trenutno smo u modu održavanja, ali ne brinite, neće trajati duže od nekoliko minuta.',
   membershipRole__admin: 'Administrator',
   membershipRole__basicMember: 'Član',
@@ -315,6 +316,7 @@ export const srRS: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -995,6 +997,7 @@ export const srRS: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,

@@ -32,7 +32,7 @@ type UseUser = () => ToComputedRefs<UseUserReturn>;
  * </template>
  */
 export const useUser: UseUser = () => {
-  const { userCtx } = useClerkContext();
+  const { userCtx } = useClerkContext('useUser');
 
   const result = computed<UseUserReturn>(() => {
     if (userCtx.value === undefined) {

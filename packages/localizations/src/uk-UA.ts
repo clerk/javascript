@@ -250,6 +250,7 @@ export const ukUA: LocalizationResource = {
     action__signOut: 'Вийти',
     title: 'Ви увійшли як {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Останнє використання',
   maintenanceMode: undefined,
   membershipRole__admin: 'Адміністратор',
   membershipRole__basicMember: 'Член',
@@ -316,6 +317,7 @@ export const ukUA: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -992,6 +994,7 @@ export const ukUA: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,

@@ -254,6 +254,7 @@ export const deDE: LocalizationResource = {
     action__signOut: 'Ausloggen',
     title: 'Angemeldet als {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Zuletzt verwendet',
   maintenanceMode:
     'Wir führen derzeit Wartungsarbeiten durch, aber keine Sorge, es sollte nicht länger als ein paar Minuten dauern.',
   membershipRole__admin: 'Administrator',
@@ -322,6 +323,7 @@ export const deDE: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'Plan abonnieren',
         actionLabel__switchPlan: 'Plan wechseln',
         tableHeader__edit: undefined,
@@ -1018,6 +1020,7 @@ export const deDE: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'Plan abonnieren',
         actionLabel__switchPlan: 'Plan wechseln',
         tableHeader__edit: undefined,

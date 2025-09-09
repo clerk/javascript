@@ -249,6 +249,7 @@ export const nlNL: LocalizationResource = {
     action__signOut: 'Uitloggen',
     title: 'Ingelogd als {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Laatst gebruikt',
   maintenanceMode: 'Onderhoudsmodus',
   membershipRole__admin: 'Beheerder',
   membershipRole__basicMember: 'Lid',
@@ -315,6 +316,7 @@ export const nlNL: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -995,6 +997,7 @@ export const nlNL: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,

@@ -18,7 +18,7 @@ import { useClerkContext } from './useClerkContext';
  * </template>
  */
 export const useClerk = () => {
-  const { clerk } = useClerkContext();
+  const { clerk } = useClerkContext('useClerk');
 
   return clerk;
 };
