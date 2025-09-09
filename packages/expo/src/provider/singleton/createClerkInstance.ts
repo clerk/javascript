@@ -4,6 +4,7 @@ import type { BrowserClerk, HeadlessBrowserClerk } from '@clerk/clerk-react';
 import { is4xxError } from '@clerk/shared/error';
 import type {
   ClientJSONSnapshot,
+  ClientResource,
   EnvironmentJSONSnapshot,
   PublicKeyCredentialCreationOptionsWithoutExtensions,
   PublicKeyCredentialRequestOptionsWithoutExtensions,
@@ -153,7 +154,15 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
             environment: EnvironmentJSONSnapshot | null;
           }> => {
             await retryInitializeResourcesFromFAPI();
-            return { client: null, environment: null };
+
+            // @ts-expect-error - This is an internal API
+            const environment = __internal_clerk?.__unstable__environment as EnvironmentResource;
+            const client = __internal_clerk?.client as ClientResource;
+
+            return {
+              client: client.__internal_toSnapshot(),
+              environment: environment.__internal_toSnapshot(),
+            };
           };
         }
       }
