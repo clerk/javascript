@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.92.1
+
+### Patch Changes
+
+- Hides the subscription "Manage" button when no subscription items exist instead of the subscription itself being absent. ([#6734](https://github.com/clerk/javascript/pull/6734)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 5.92.0
 
 ### Minor Changes
