@@ -1,6 +1,8 @@
 import './globalPolyfill';
 
-console.warn(`
+import { logger } from '@clerk/shared/logger';
+
+logger.warnOnce(`
 Clerk - DEPRECATION WARNING: @clerk/remix is now in maintenance mode.
 
 @clerk/remix will only receive security updates. No new features will be added.
