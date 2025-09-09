@@ -2,4 +2,4 @@
 '@clerk/clerk-js': patch
 ---
 
-Ensure Coinbase dependencies aren't bundled for non-RHC environments
+Remove Base for non-RHC environments to ensure Coinbase dependencies aren't bundled.
