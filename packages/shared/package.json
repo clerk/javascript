@@ -150,7 +150,7 @@
     "glob-to-regexp": "0.4.1",
     "js-cookie": "3.0.5",
     "std-env": "^3.9.0",
-    "swr": "2.3.4"
+    "swr": "2.3.6"
   },
   "devDependencies": {
     "@stripe/react-stripe-js": "3.1.1",
