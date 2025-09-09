@@ -1,5 +1,53 @@
 # @clerk/astro
 
+## 2.12.0
+
+### Minor Changes
+
+- Introduces machine authentication, supporting four token types: `api_key`, `oauth_token`, `m2m_token`, and `session_token`. For backwards compatibility, `session_token` remains the default when no token type is specified. This enables machine-to-machine authentication and use cases such as API keys and OAuth integrations. Existing applications continue to work without modification. ([#6671](https://github.com/clerk/javascript/pull/6671)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  You can specify which token types are allowed by using the `acceptsToken` option in the `auth()` local. This option can be set to a specific type, an array of types, or `'any'` to accept all supported tokens.
+
+  Example usage in endpoints:
+
+  ```ts
+  export const GET: APIRoute = ({ locals }) => {
+    const authObject = locals.auth({ acceptsToken: 'any' });
+
+    if (authObject.tokenType === 'session_token') {
+      console.log('this is session token from a user');
+    } else {
+      console.log('this is some other type of machine token (api_key | oauth_token | m2m_token)');
+      console.log('more specifically, a ' + authObject.tokenType);
+    }
+
+    return new Response(JSON.stringify({}));
+  };
+  ```
+
+  In middleware:
+
+  ```ts
+  import { clerkMiddleware, createRouteMatcher } from '@clerk/astro/server';
+
+  const isProtectedRoute = createRouteMatcher(['/api(.*)']);
+
+  export const onRequest = clerkMiddleware((auth, context) => {
+    const { userId } = auth({ acceptsToken: 'api_key' });
+
+    if (!userId && isProtectedRoute(context.request)) {
+      return new Response('Unauthorized', { status: 401 });
+    }
+  });
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`55490c3`](https://github.com/clerk/javascript/commit/55490c31fadc82bdca6cd5f2b22e5e158aaba0cb), [`e8d21de`](https://github.com/clerk/javascript/commit/e8d21de39b591973dad48fc1d1851c4d28b162fe), [`63fa204`](https://github.com/clerk/javascript/commit/63fa2042b821096d4f962832ff3c10ad1b7ddf0e), [`637f2e8`](https://github.com/clerk/javascript/commit/637f2e8768b76aaf756062b6b5b44bf651f66789)]:
+  - @clerk/types@4.85.0
+  - @clerk/backend@2.13.0
+  - @clerk/shared@3.24.2
+
 ## 2.11.11
 
 ### Patch Changes
