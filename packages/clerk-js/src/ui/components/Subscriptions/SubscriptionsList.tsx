@@ -33,7 +33,7 @@ export function SubscriptionsList({
 }) {
   const localizationRoot = useSubscriberTypeLocalizationRoot();
   const subscriberType = useSubscriberTypeContext();
-  const { subscriptionItems, data: subscription } = useSubscription();
+  const { subscriptionItems } = useSubscription();
   const canManageBilling =
     useProtect(has => has({ permission: 'org:sys_billing:manage' })) || subscriberType === 'user';
   const { navigate } = useRouter();
@@ -48,7 +48,7 @@ export function SubscriptionsList({
     return subscriptionItems.some(sub => isFreePlan(sub.plan) && sub.status === 'active');
   }, [subscriptionItems]);
 
-  const isManageButtonVisible = canManageBilling && !!subscription && !hasActiveFreePlan;
+  const isManageButtonVisible = canManageBilling && !hasActiveFreePlan && subscriptionItems.length > 0;
 
   const sortedSubscriptions = useMemo(
     () =>
