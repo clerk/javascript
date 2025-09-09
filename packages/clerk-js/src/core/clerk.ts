@@ -2652,12 +2652,24 @@ export class Clerk implements ClerkInterface {
         Client.getOrCreateInstance().fetch({ fetchMaxTries }),
       ]);
     } catch (err) {
-      if (isClerkRuntimeError(err) && err.code === 'network_error' && this.shouldFallbackToCachedResources()) {
+      const isServerError = isClerkRuntimeError(err) && err.code === 'network_error';
+      if (isServerError && this.shouldFallbackToCachedResources()) {
         const cachedResources = await this.__internal_getCachedResources?.();
         environment = new Environment(cachedResources?.environment);
         Client.clearInstance();
         client = Client.getOrCreateInstance(cachedResources?.client);
         ++initializationDegradedCounter;
+      } else if (isServerError) {
+        try {
+          await new Promise(resolve => setTimeout(resolve, 10000));
+          [environment, client] = await Promise.all([
+            Environment.getInstance().fetch({ touch: false }),
+            Client.getOrCreateInstance().fetch(),
+          ]);
+          ++initializationDegradedCounter;
+        } catch {
+          throw err;
+        }
       } else {
         throw err;
       }
