@@ -82,7 +82,9 @@ const common = ({ mode, variant, disableRHC = false }) => {
      * SDKs such as Browser Extensions.
      */
     // TODO: @COMMERCE:  Do we still need this?
-    externals: disableRHC ? ['@stripe/stripe-js', '@stripe/react-stripe-js'] : undefined,
+    externals: disableRHC
+      ? ['@stripe/stripe-js', '@stripe/react-stripe-js', '@coinbase/wallet-sdk', '@base-org/account']
+      : undefined,
     optimization: {
       splitChunks: {
         cacheGroups: {
@@ -478,6 +480,12 @@ const prodConfig = ({ mode, env, analysis }) => {
     plugins: [
       new rspack.IgnorePlugin({
         resourceRegExp: /^@stripe\/stripe-js$/,
+      }),
+      new rspack.IgnorePlugin({
+        resourceRegExp: /^@coinbase\/wallet-sdk$/,
+      }),
+      new rspack.IgnorePlugin({
+        resourceRegExp: /^@base-org\/account$/,
       }),
       new rspack.optimize.LimitChunkCountPlugin({
         maxChunks: 1,
