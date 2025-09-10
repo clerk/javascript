@@ -148,6 +148,7 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, config, 
   const cacheMode = config.__experimental_mode === 'cache';
   const triggerInfinite = config.infinite ?? false;
   const keepPreviousData = config.keepPreviousData ?? false;
+  const isSignedIn = config.isSignedIn;
 
   const pagesCacheKey = {
     ...cacheKeys,
@@ -159,10 +160,13 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, config, 
   // cacheMode being `true` indicates that the cache key is defined, but the fetcher is not.
   // This allows to ready the cache instead of firing a request.
   const shouldFetch = !triggerInfinite && enabled && (!cacheMode ? !!fetcher : true);
-  const swrKey = shouldFetch ? pagesCacheKey : null;
+  const swrKey = isSignedIn ? pagesCacheKey : shouldFetch ? pagesCacheKey : null;
   const swrFetcher =
     !cacheMode && !!fetcher
       ? (cacheKeyParams: Record<string, unknown>) => {
+          if (isSignedIn === false) {
+            return null;
+          }
           const requestParams = getDifferentKeys(cacheKeyParams, cacheKeys);
           return fetcher({ ...params, ...requestParams });
         }
