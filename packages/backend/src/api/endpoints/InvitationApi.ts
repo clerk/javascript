@@ -17,8 +17,10 @@ type CreateParams = {
   notify?: boolean;
   publicMetadata?: UserPublicMetadata;
   redirectUrl?: string;
-  templateSlug: TemplateSlug;
+  templateSlug?: TemplateSlug;
 };
+
+type CreateBulkParams = Array<CreateParams>;
 
 type GetInvitationListParams = ClerkPaginationRequest<{
   /**
@@ -60,6 +62,14 @@ export class InvitationAPI extends AbstractAPI {
     return this.request<Invitation>({
       method: 'POST',
       path: basePath,
+      bodyParams: params,
+    });
+  }
+
+  public async createInvitationBulk(params: CreateBulkParams) {
+    return this.request<Invitation>({
+      method: 'POST',
+      path: joinPaths(basePath, 'bulk'),
       bodyParams: params,
     });
   }
