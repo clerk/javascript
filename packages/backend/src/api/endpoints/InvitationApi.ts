@@ -20,6 +20,8 @@ type CreateParams = {
   templateSlug: TemplateSlug;
 };
 
+type CreateBulkParams = Array<CreateParams>;
+
 type GetInvitationListParams = ClerkPaginationRequest<{
   /**
    * Filters invitations based on their status.
@@ -57,6 +59,14 @@ export class InvitationAPI extends AbstractAPI {
   }
 
   public async createInvitation(params: CreateParams) {
+    return this.request<Invitation>({
+      method: 'POST',
+      path: basePath,
+      bodyParams: params,
+    });
+  }
+
+  public async createInvitationBulk(params: CreateBulkParams) {
     return this.request<Invitation>({
       method: 'POST',
       path: basePath,
