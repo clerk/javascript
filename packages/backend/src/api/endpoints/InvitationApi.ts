@@ -17,7 +17,7 @@ type CreateParams = {
   notify?: boolean;
   publicMetadata?: UserPublicMetadata;
   redirectUrl?: string;
-  templateSlug: TemplateSlug;
+  templateSlug?: TemplateSlug;
 };
 
 type CreateBulkParams = Array<CreateParams>;
