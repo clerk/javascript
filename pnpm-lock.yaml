@@ -470,6 +470,9 @@ importers:
       '@swc/helpers':
         specifier: ^0.5.17
         version: 0.5.17
+      '@tanstack/query-core':
+        specifier: ^5.87.4
+        version: 5.87.4
       '@zxcvbn-ts/core':
         specifier: 3.0.4
         version: 3.0.4
@@ -922,6 +925,9 @@ importers:
       '@clerk/types':
         specifier: workspace:^
         version: link:../types
+      '@tanstack/react-query':
+        specifier: ^5.87.4
+        version: 5.87.4(react@18.3.1)
       dequal:
         specifier: 2.0.3
         version: 2.0.3
@@ -2917,7 +2923,7 @@ packages:
 
   '@expo/bunyan@4.0.1':
     resolution: {integrity: sha512-+Lla7nYSiHZirgK+U/uYzsLv/X+HaJienbD5AKX1UQZHYfWaP+9uuQluRB4GrEVWF0GZ7vEVp/jzaOT9k/SQlg==}
-    engines: {node: '>=0.10.0'}
+    engines: {'0': node >=0.10.0}
 
   '@expo/cli@0.22.26':
     resolution: {integrity: sha512-I689wc8Fn/AX7aUGiwrh3HnssiORMJtR2fpksX+JIe8Cj/EDleblYMSwRPd0025wrwOV9UN1KM/RuEt/QjCS3Q==}
@@ -4804,6 +4810,14 @@ packages:
   '@tanstack/history@1.131.2':
     resolution: {integrity: sha512-cs1WKawpXIe+vSTeiZUuSBy8JFjEuDgdMKZFRLKwQysKo8y2q6Q1HvS74Yw+m5IhOW1nTZooa6rlgdfXcgFAaw==}
     engines: {node: '>=12'}
+
+  '@tanstack/query-core@5.87.4':
+    resolution: {integrity: sha512-uNsg6zMxraEPDVO2Bn+F3/ctHi+Zsk+MMpcN8h6P7ozqD088F6mFY5TfGM7zuyIrL7HKpDyu6QHfLWiDxh3cuw==}
+
+  '@tanstack/react-query@5.87.4':
+    resolution: {integrity: sha512-T5GT/1ZaNsUXf5I3RhcYuT17I4CPlbZgyLxc/ZGv7ciS6esytlbjb3DgUFO6c8JWYMDpdjSWInyGZUErgzqhcA==}
+    peerDependencies:
+      react: ^18 || ^19
 
   '@tanstack/react-router@1.131.35':
     resolution: {integrity: sha512-2mwHgwoSs4wih67jfl2TjcF4enYpLpY0TljE+Sl1njZ01CWLrrQgjQ6tEuVA24Pm5re4V01A3abKvDtN1miQ9Q==}
@@ -19730,6 +19744,13 @@ snapshots:
       - supports-color
 
   '@tanstack/history@1.131.2': {}
+
+  '@tanstack/query-core@5.87.4': {}
+
+  '@tanstack/react-query@5.87.4(react@18.3.1)':
+    dependencies:
+      '@tanstack/query-core': 5.87.4
+      react: 18.3.1
 
   '@tanstack/react-router@1.131.35(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:

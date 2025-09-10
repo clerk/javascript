@@ -1,5 +1,6 @@
 import type { EnvironmentResource, ForPayerType } from '@clerk/types';
-import { useCallback } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useCallback, useMemo } from 'react';
 
 import { eventMethodCalled } from '../../telemetry/events';
 import { useSWR } from '../clerk-swr';
@@ -29,7 +30,7 @@ type UseSubscriptionParams = {
  *
  * Fetches subscription data for the current user or organization.
  */
-export const useSubscription = (params?: UseSubscriptionParams) => {
+export const useSubscriptionPrev = (params?: UseSubscriptionParams) => {
   useAssertWrappedByClerkProvider(hookName);
 
   const clerk = useClerkInstanceContext();
@@ -68,6 +69,63 @@ export const useSubscription = (params?: UseSubscriptionParams) => {
     error: swr.error,
     isLoading: swr.isLoading,
     isFetching: swr.isValidating,
+    revalidate,
+  };
+};
+
+export const useSubscription = (params?: UseSubscriptionParams) => {
+  useAssertWrappedByClerkProvider(hookName);
+
+  const clerk = useClerkInstanceContext();
+  const user = useUserContext();
+  const { organization } = useOrganizationContext();
+
+  // console.log('cache', cache);
+
+  // @ts-expect-error `__unstable__environment` is not typed
+  const environment = clerk.__unstable__environment as unknown as EnvironmentResource | null | undefined;
+
+  clerk.telemetry?.record(eventMethodCalled(hookName));
+
+  const isOrganization = params?.for === 'organization';
+  const billingEnabled = isOrganization
+    ? environment?.commerceSettings.billing.organization.enabled
+    : environment?.commerceSettings.billing.user.enabled;
+
+  const queryClient = useQueryClient();
+
+  const queryKey = useMemo(() => {
+    return [
+      'commerce-subscription',
+      {
+        userId: user?.id,
+        args: { orgId: isOrganization ? organization?.id : undefined },
+      },
+    ];
+  }, [user?.id, isOrganization, organization?.id]);
+
+  const query = useQuery({
+    queryKey,
+    queryFn: ({ queryKey }) => {
+      const obj = queryKey[1] as {
+        args: {
+          orgId?: string;
+        };
+      };
+      return clerk.billing.getSubscription(obj.args);
+    },
+    staleTime: 1_0000 * 60,
+    enabled: Boolean(user?.id && billingEnabled) && clerk.status === 'ready',
+    // placeholderData
+  });
+
+  const revalidate = useCallback(() => queryClient.invalidateQueries({ queryKey }), [queryClient, queryKey]);
+
+  return {
+    data: query.data,
+    error: query.error,
+    isLoading: query.isLoading,
+    isFetching: query.isFetching,
     revalidate,
   };
 };
