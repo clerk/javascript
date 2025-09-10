@@ -254,7 +254,9 @@ function SignInStartInternal(): JSX.Element {
         // This is necessary because there's a brief delay between initiating the SSO flow
         // and the actual redirect to the external Identity Provider
         const isRedirectingToSSOProvider = hasOnlyEnterpriseSSOFirstFactors(signIn);
-        if (isRedirectingToSSOProvider) return;
+        if (isRedirectingToSSOProvider) {
+          return;
+        }
 
         status.setIdle();
         card.setIdle();

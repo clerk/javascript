@@ -3,6 +3,7 @@ import configPrettier from 'eslint-config-prettier';
 import configTurbo from 'eslint-config-turbo/flat';
 import pluginImport from 'eslint-plugin-import';
 import pluginJest from 'eslint-plugin-jest';
+import pluginJsDoc from 'eslint-plugin-jsdoc';
 import pluginJsxA11y from 'eslint-plugin-jsx-a11y';
 import pluginPlaywright from 'eslint-plugin-playwright';
 import pluginReact from 'eslint-plugin-react';
@@ -11,7 +12,6 @@ import pluginSimpleImportSort from 'eslint-plugin-simple-import-sort';
 import pluginTurbo from 'eslint-plugin-turbo';
 import pluginUnusedImports from 'eslint-plugin-unused-imports';
 import pluginYml from 'eslint-plugin-yml';
-import pluginJsDoc from 'eslint-plugin-jsdoc';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
@@ -175,7 +175,6 @@ export default tseslint.config([
       },
     },
     rules: {
-      curly: ['error', 'all'],
       'no-label-var': 'error',
       'no-undef-init': 'warn',
       'no-restricted-imports': [
@@ -225,15 +224,10 @@ export default tseslint.config([
       'react/self-closing-comp': 'warn',
       'react/prop-types': 'off',
       'react/react-in-jsx-scope': 'off',
-
       'simple-import-sort/imports': 'error',
-
       'sort-imports': 'off',
-
       ...pluginTurbo.configs['flat/recommended'].rules,
-
       'unused-imports/no-unused-imports': 'error',
-
       // TYPESCRIPT RULE DISABLES
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unsafe-argument': 'off',
@@ -458,5 +452,12 @@ export default tseslint.config([
     },
   },
   ...pluginYml.configs['flat/recommended'],
-  configPrettier,
+  {
+    name: 'eslint-prettier',
+    rules: {
+      ...configPrettier.rules,
+      // eslint-config-prettier overrides
+      curly: ['error', 'all'],
+    },
+  },
 ]);
