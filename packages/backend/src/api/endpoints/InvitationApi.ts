@@ -8,12 +8,16 @@ import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/invitations';
 
+type TemplateSlug = 'invitation' | 'waitlist_invitation';
+
 type CreateParams = {
   emailAddress: string;
-  redirectUrl?: string;
-  publicMetadata?: UserPublicMetadata;
-  notify?: boolean;
+  expiresInDays?: number;
   ignoreExisting?: boolean;
+  notify?: boolean;
+  publicMetadata?: UserPublicMetadata;
+  redirectUrl?: string;
+  templateSlug: TemplateSlug;
 };
 
 type GetInvitationListParams = ClerkPaginationRequest<{
