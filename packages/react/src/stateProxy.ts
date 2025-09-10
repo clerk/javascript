@@ -111,7 +111,9 @@ export class StateProxy implements State {
 
   private get client() {
     const c = this.isomorphicClerk.client;
-    if (!c) throw new Error('Clerk client not ready');
+    if (!c) {
+      throw new Error('Clerk client not ready');
+    }
     return c;
   }
 
@@ -122,7 +124,7 @@ export class StateProxy implements State {
       }
       const t = getTarget();
       return t[key];
-    })() as T[K];
+    })();
   }
 
   private gateMethod<T extends object, K extends keyof T & string>(getTarget: () => T, key: K) {

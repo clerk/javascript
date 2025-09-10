@@ -175,7 +175,9 @@ const Overlay = React.forwardRef<HTMLDivElement>((_, ref) => {
     duration: transitionDurationValues.drawer,
   });
 
-  if (!isMounted) return null;
+  if (!isMounted) {
+    return null;
+  }
 
   return (
     <FloatingOverlay
@@ -215,7 +217,9 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
     duration: isMotionSafe ? transitionDurationValues.drawer : 0,
   });
 
-  if (!isMounted) return null;
+  if (!isMounted) {
+    return null;
+  }
 
   return (
     <FloatingFocusManager
@@ -489,7 +493,9 @@ const Confirmation = React.forwardRef<HTMLDivElement, ConfirmationProps>(
       duration: isMotionSafe ? transitionDurationValues.drawer : 0,
     });
 
-    if (!isMounted) return null;
+    if (!isMounted) {
+      return null;
+    }
 
     return (
       <>

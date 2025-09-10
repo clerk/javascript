@@ -49,7 +49,9 @@ export const RevokeAPIKeyConfirmationModal = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!apiKeyId || !canSubmit) return;
+    if (!apiKeyId || !canSubmit) {
+      return;
+    }
 
     await clerk.apiKeys.revoke({ apiKeyID: apiKeyId });
     const cacheKey = { key: 'api-keys', subject };

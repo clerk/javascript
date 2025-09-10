@@ -16,7 +16,9 @@ export const colors = {
    * Lightens a color by a percentage
    */
   lighten: (color: string | undefined, percentage = 0): string | undefined => {
-    if (!color) return undefined;
+    if (!color) {
+      return undefined;
+    }
 
     if (cssSupports.relativeColorSyntax()) {
       // Use relative color syntax for precise lightness control
@@ -37,7 +39,9 @@ export const colors = {
    * Makes a color transparent by a percentage
    */
   makeTransparent: (color: string | undefined, percentage = 0): string | undefined => {
-    if (!color || color.toString() === '') return undefined;
+    if (!color || color.toString() === '') {
+      return undefined;
+    }
 
     if (cssSupports.colorMix()) {
       const alphaPercentage = Math.max((1 - percentage) * 100, MODERN_CSS_LIMITS.MIN_ALPHA_PERCENTAGE);
@@ -51,7 +55,9 @@ export const colors = {
    * Makes a color completely opaque
    */
   makeSolid: (color: string | undefined): string | undefined => {
-    if (!color) return undefined;
+    if (!color) {
+      return undefined;
+    }
 
     if (cssSupports.relativeColorSyntax()) {
       // Set alpha to 1 using relative color syntax
@@ -90,7 +96,9 @@ export const colors = {
    * Adjusts color for better contrast/lightness
    */
   adjustForLightness: (color: string | undefined, lightness = 5): string | undefined => {
-    if (!color) return undefined;
+    if (!color) {
+      return undefined;
+    }
 
     if (cssSupports.colorMix()) {
       // Use color-mix with white for lightness adjustment - more conservative approach
