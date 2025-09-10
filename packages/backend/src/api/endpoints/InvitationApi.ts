@@ -69,7 +69,7 @@ export class InvitationAPI extends AbstractAPI {
   public async createInvitationBulk(params: CreateBulkParams) {
     return this.request<Invitation>({
       method: 'POST',
-      path: basePath,
+      path: joinPaths(basePath, 'bulk'),
       bodyParams: params,
     });
   }
