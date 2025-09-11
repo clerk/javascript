@@ -6,18 +6,25 @@ type ExternalElementMounterProps = {
 };
 
 export const ExternalElementMounter = ({ mount, unmount, ...rest }: ExternalElementMounterProps) => {
-  const nodeRef = useRef(null);
+  const nodeRef = useRef<HTMLDivElement | null>(null);
+
+  const stableMountRef = useRef(mount);
+  const stableUnmountRef = useRef(unmount);
+
+  // Update refs when functions change, but don't trigger re-mount
+  stableMountRef.current = mount;
+  stableUnmountRef.current = unmount;
 
   useEffect(() => {
     let elRef: HTMLDivElement | undefined;
     if (nodeRef.current) {
       elRef = nodeRef.current;
-      mount(nodeRef.current);
+      stableMountRef.current(nodeRef.current);
     }
     return () => {
-      unmount(elRef);
+      stableUnmountRef.current(elRef);
     };
-  }, [nodeRef.current]);
+  }, []);
 
   return (
     <div
