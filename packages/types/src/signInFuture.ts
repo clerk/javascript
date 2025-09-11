@@ -9,6 +9,7 @@ export interface SignInFutureCreateParams {
   redirectUrl?: string;
   actionCompleteRedirectUrl?: string;
   transfer?: boolean;
+  iframeContext?: boolean;
 }
 
 export type SignInFuturePasswordParams =

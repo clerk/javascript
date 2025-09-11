@@ -100,6 +100,7 @@ export type SignUpCreateParams = Partial<
     oidcPrompt: string;
     oidcLoginHint: string;
     channel: PhoneCodeChannel;
+    iframeContext: boolean;
   } & Omit<SnakeToCamel<Record<SignUpAttributeField | SignUpVerifiableField, string>>, 'legalAccepted'>
 >;
 

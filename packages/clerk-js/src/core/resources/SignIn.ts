@@ -54,6 +54,7 @@ import type {
 } from '@clerk/types';
 
 import { debugLogger } from '@/utils/debug';
+import { inIframe } from '@/utils/runtime';
 
 import {
   generateSignatureWithBase,
@@ -298,12 +299,18 @@ export class SignIn extends BaseResource implements SignInResource {
     const redirectUrl = SignIn.clerk.buildUrlWithAuth(params.redirectUrl);
 
     if (!this.id || !continueSignIn) {
-      await this.create({
+      const createParams: SignInCreateParams = {
         strategy,
         identifier,
         redirectUrl,
         actionCompleteRedirectUrl,
-      });
+      };
+
+      if (__BUILD_VARIANT_CHIPS__ && inIframe()) {
+        createParams.iframeContext = true;
+      }
+
+      await this.create(createParams);
     }
 
     if (strategy === 'saml' || strategy === 'enterprise_sso') {
@@ -627,9 +634,15 @@ class SignInFuture implements SignInFutureResource {
 
   async create(params: SignInFutureCreateParams): Promise<{ error: unknown }> {
     return runAsyncResourceTask(this.resource, async () => {
+      const createParams: SignInFutureCreateParams = { ...params };
+
+      if (__BUILD_VARIANT_CHIPS__ && inIframe()) {
+        createParams.iframeContext = true;
+      }
+
       await this.resource.__internal_basePost({
         path: this.resource.pathRoot,
-        body: params,
+        body: createParams,
       });
     });
   }

@@ -128,6 +128,7 @@ export type SignInCreateParams = (
       identifier?: string;
       oidcPrompt?: string;
       oidcLoginHint?: string;
+      iframeContext?: boolean;
     }
   | {
       strategy: TicketStrategy;

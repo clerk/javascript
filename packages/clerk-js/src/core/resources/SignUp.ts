@@ -53,6 +53,7 @@ import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
 import { createValidatePassword } from '../../utils/passwords/password';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
+import { inIframe } from '../../utils/runtime';
 import {
   clerkInvalidFAPIResponse,
   clerkMissingOptionError,
@@ -141,6 +142,10 @@ export class SignUp extends BaseResource implements SignUpResource {
     debugLogger.debug('SignUp.create', { id: this.id, strategy: params.strategy });
 
     let finalParams = { ...params };
+
+    if (__BUILD_VARIANT_CHIPS__ && inIframe()) {
+      finalParams.iframeContext = true;
+    }
 
     if (!__BUILD_DISABLE_RHC__ && !this.clientBypass() && !this.shouldBypassCaptchaForAttempt(params)) {
       const captchaChallenge = new CaptchaChallenge(SignUp.clerk);
@@ -426,8 +431,14 @@ export class SignUp extends BaseResource implements SignUpResource {
   };
 
   update = (params: SignUpUpdateParams): Promise<SignUpResource> => {
+    const finalParams = { ...params };
+
+    if (__BUILD_VARIANT_CHIPS__ && inIframe()) {
+      finalParams.iframeContext = true;
+    }
+
     return this._basePatch({
-      body: normalizeUnsafeMetadata(params),
+      body: normalizeUnsafeMetadata(finalParams),
     });
   };
 
