@@ -30,17 +30,23 @@ vi.mock('next/headers', () => ({
     entries: function* () {
       const entries: [string, string][] = [];
       defaultMockHeaders.forEach((value, key) => entries.push([key, value]));
-      for (const entry of entries) yield entry;
+      for (const entry of entries) {
+        yield entry;
+      }
     },
     keys: function* () {
       const keys: string[] = [];
       defaultMockHeaders.forEach((_, key) => keys.push(key));
-      for (const key of keys) yield key;
+      for (const key of keys) {
+        yield key;
+      }
     },
     values: function* () {
       const values: string[] = [];
       defaultMockHeaders.forEach(value => values.push(value));
-      for (const value of values) yield value;
+      for (const value of values) {
+        yield value;
+      }
     },
   })),
 }));
@@ -80,7 +86,9 @@ function createMockHeaders(customHeaders: Record<string, string | null> = {}): M
     }),
     forEach: vi.fn((callback: (value: string, key: string) => void) => {
       Object.entries(allHeaders).forEach(([key, value]) => {
-        if (value !== null) callback(value, key);
+        if (value !== null) {
+          callback(value, key);
+        }
       });
     }),
     entries: vi.fn(() => {

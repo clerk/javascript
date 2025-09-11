@@ -49,7 +49,16 @@ export type WithClerkProp<T = unknown> = T & {
 // TODO-SHARED: Duplicate from @clerk/clerk-react
 export const assertSingleChild =
   (children: React.ReactNode) =>
-  (name: 'SignInButton' | 'SignUpButton' | 'SignOutButton' | 'SignInWithMetamaskButton') => {
+  (
+    name:
+      | 'SignInButton'
+      | 'SignUpButton'
+      | 'SignOutButton'
+      | 'SignInWithMetamaskButton'
+      | 'SubscriptionDetailsButton'
+      | 'CheckoutButton'
+      | 'PlanDetailsButton',
+  ) => {
     try {
       return React.Children.only(children);
     } catch {

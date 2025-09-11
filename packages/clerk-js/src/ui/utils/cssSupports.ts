@@ -9,7 +9,9 @@ let SUPPORTS_MODERN_COLOR: boolean | undefined;
 
 export const cssSupports = {
   relativeColorSyntax: () => {
-    if (SUPPORTS_RELATIVE_COLOR !== undefined) return SUPPORTS_RELATIVE_COLOR;
+    if (SUPPORTS_RELATIVE_COLOR !== undefined) {
+      return SUPPORTS_RELATIVE_COLOR;
+    }
     try {
       SUPPORTS_RELATIVE_COLOR = CSS.supports(CSS_FEATURE_TESTS.relativeColorSyntax);
     } catch {
@@ -19,7 +21,9 @@ export const cssSupports = {
     return SUPPORTS_RELATIVE_COLOR;
   },
   colorMix: () => {
-    if (SUPPORTS_COLOR_MIX !== undefined) return SUPPORTS_COLOR_MIX;
+    if (SUPPORTS_COLOR_MIX !== undefined) {
+      return SUPPORTS_COLOR_MIX;
+    }
     try {
       SUPPORTS_COLOR_MIX = CSS.supports(CSS_FEATURE_TESTS.colorMix);
     } catch {
@@ -32,7 +36,9 @@ export const cssSupports = {
    * Returns true if either relativeColorSyntax or colorMix is supported
    */
   modernColor() {
-    if (SUPPORTS_MODERN_COLOR !== undefined) return SUPPORTS_MODERN_COLOR;
+    if (SUPPORTS_MODERN_COLOR !== undefined) {
+      return SUPPORTS_MODERN_COLOR;
+    }
     try {
       SUPPORTS_MODERN_COLOR = this.relativeColorSyntax() || this.colorMix();
     } catch {

@@ -118,7 +118,9 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
       get(target, prop, receiver) {
         deprecated('event.context.auth', 'Use `event.context.auth()` as a function instead.');
         // If the property exists on the function, return it
-        if (prop in target) return Reflect.get(target, prop, receiver);
+        if (prop in target) {
+          return Reflect.get(target, prop, receiver);
+        }
         // Otherwise, get it from the authObject
         return authObjectFn()?.[prop as keyof typeof authObjectFn];
       },

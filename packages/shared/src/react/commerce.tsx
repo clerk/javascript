@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/consistent-type-imports */
 import type { CommerceCheckoutResource, EnvironmentResource, ForPayerType } from '@clerk/types';
 import type { Stripe, StripeElements } from '@stripe/stripe-js';
-import { type PropsWithChildren, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
-import React from 'react';
+import React, { type PropsWithChildren, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
@@ -84,7 +83,9 @@ const usePaymentSourceUtils = (forResource: ForPayerType = 'user') => {
   const environment = useInternalEnvironment();
 
   useEffect(() => {
-    if (!resource?.id) return;
+    if (!resource?.id) {
+      return;
+    }
     initializePaymentSource().catch(() => {
       // ignore errors
     });
@@ -388,7 +389,7 @@ const usePaymentElement = (): UsePaymentElementReturn => {
 };
 
 export {
-  PaymentElementProvider as __experimental_PaymentElementProvider,
   PaymentElement as __experimental_PaymentElement,
+  PaymentElementProvider as __experimental_PaymentElementProvider,
   usePaymentElement as __experimental_usePaymentElement,
 };

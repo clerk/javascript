@@ -41,7 +41,9 @@ export const colors = {
    * ```
    */
   toHslaColor: (color: string | undefined): string | HslaColor | undefined => {
-    if (!color) return undefined;
+    if (!color) {
+      return undefined;
+    }
     return cssSupports.modernColor() ? color : legacyColors.toHslaColor(color);
   },
 
@@ -56,8 +58,12 @@ export const colors = {
    * ```
    */
   toHslaString: (color: string | HslaColor | undefined): string | undefined => {
-    if (!color) return undefined;
-    if (cssSupports.modernColor() && typeof color === 'string') return color;
+    if (!color) {
+      return undefined;
+    }
+    if (cssSupports.modernColor() && typeof color === 'string') {
+      return color;
+    }
     return legacyColors.toHslaString(color);
   },
 
@@ -157,4 +163,4 @@ export const colors = {
   },
 };
 
-export { modernColors, legacyColors };
+export { legacyColors, modernColors };

@@ -76,7 +76,9 @@ function waitForClerkWithTimeout(timeoutMs: number): Promise<HTMLScriptElement |
     };
 
     const checkAndResolve = () => {
-      if (resolved) return;
+      if (resolved) {
+        return;
+      }
 
       if (isClerkProperlyLoaded()) {
         resolved = true;
@@ -86,7 +88,9 @@ function waitForClerkWithTimeout(timeoutMs: number): Promise<HTMLScriptElement |
     };
 
     const handleTimeout = () => {
-      if (resolved) return;
+      if (resolved) {
+        return;
+      }
 
       resolved = true;
       cleanup(timeoutId, pollInterval);
@@ -239,5 +243,5 @@ const applyClerkJsScriptAttributes = (options: LoadClerkJsScriptOptions) => (scr
   }
 };
 
-export { loadClerkJsScript, buildClerkJsScriptAttributes, clerkJsScriptUrl };
+export { buildClerkJsScriptAttributes, clerkJsScriptUrl, loadClerkJsScript };
 export type { LoadClerkJsScriptOptions };

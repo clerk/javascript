@@ -133,7 +133,9 @@ export const authenticateAndDecorateRequest = (options: ClerkMiddlewareOptions =
         get(target, prop, receiver) {
           deprecated('req.auth', 'Use `req.auth()` as a function instead.');
           // If the property exists on the function, return it
-          if (prop in target) return Reflect.get(target, prop, receiver);
+          if (prop in target) {
+            return Reflect.get(target, prop, receiver);
+          }
           // Otherwise, get it from the authObject
           return authObject?.[prop as keyof typeof authObject];
         },
