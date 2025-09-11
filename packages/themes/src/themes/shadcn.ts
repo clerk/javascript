@@ -1,6 +1,7 @@
 import { experimental_createTheme } from '../createTheme';
 
 export const shadcn = experimental_createTheme({
+  name: 'shadcn',
   cssLayerName: 'components',
   variables: {
     colorBackground: 'var(--card)',
