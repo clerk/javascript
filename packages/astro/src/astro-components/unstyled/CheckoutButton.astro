@@ -23,6 +23,7 @@ const {
   for: _for,
   newSubscriptionRedirectUrl,
   checkoutProps,
+  clickIdentifier,
   ...props
 } = Astro.props;
 
@@ -31,6 +32,7 @@ const checkoutOptions = {
   planPeriod,
   for: _for,
   newSubscriptionRedirectUrl,
+  clickIdentifier,
   ...checkoutProps,
 };
 
@@ -69,6 +71,8 @@ if (asChild) {
     if (!clerk.organization && checkoutOptions.for === 'organization') {
       throw new Error('Wrap `<CheckoutButton for="organization" />` with a check for an active organization.');
     }
+
+    console.log('checkoutOptions', checkoutOptions);
 
     if (checkoutOptions.clickIdentifier) {
       const clickEvent = new CustomEvent('clerk:subscription-complete', { detail: checkoutOptions.clickIdentifier });

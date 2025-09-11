@@ -16,10 +16,11 @@ if ('as' in Astro.props) {
   logAsPropUsageDeprecation();
 }
 
-const { as: Tag = 'button', asChild, for: _for, subscriptionDetailsProps, ...props } = Astro.props;
+const { as: Tag = 'button', asChild, for: _for, clickIdentifier, subscriptionDetailsProps, ...props } = Astro.props;
 
 const subscriptionDetailsOptions = {
   for: _for,
+  clickIdentifier,
   ...subscriptionDetailsProps,
 };
 
