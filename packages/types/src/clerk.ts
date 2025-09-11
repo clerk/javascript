@@ -1469,7 +1469,7 @@ export type SignUpProps = RoutingOptions & {
    */
   oidcPrompt?: string;
   /**
-   * Optional properties that affect the task steps within `SignIn`.
+   * Optional properties that affect the task steps within `SignUp`.
    */
   tasksProps?: TasksProps;
 } & SignInFallbackRedirectUrl &
