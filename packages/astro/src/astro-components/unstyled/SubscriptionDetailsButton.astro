@@ -6,7 +6,7 @@ import type { ButtonProps } from '../../types';
 import { addUnstyledAttributeToFirstTag, logAsPropUsageDeprecation } from './utils';
 
 type Props<Tag extends HTMLTag = 'button'> = Polymorphic<ButtonProps<Tag>> &
-  __experimental_SubscriptionDetailsButtonProps;
+  Omit<__experimental_SubscriptionDetailsButtonProps, 'onSubscriptionCancel'> & { clickIdentifier?: string };
 
 import { generateSafeId } from '@clerk/astro/internal';
 
@@ -16,18 +16,10 @@ if ('as' in Astro.props) {
   logAsPropUsageDeprecation();
 }
 
-const {
-  as: Tag = 'button',
-  asChild,
-  for: _for,
-  subscriptionDetailsProps,
-  onSubscriptionCancel,
-  ...props
-} = Astro.props;
+const { as: Tag = 'button', asChild, for: _for, subscriptionDetailsProps, ...props } = Astro.props;
 
 const subscriptionDetailsOptions = {
   for: _for,
-  onSubscriptionCancel,
   ...subscriptionDetailsProps,
 };
 
@@ -67,6 +59,12 @@ if (asChild) {
       throw new Error(
         'Wrap `<SubscriptionDetailsButton for="organization" />` with a check for an active organization.',
       );
+    }
+    if (subscriptionDetailsOptions.clickIdentifier) {
+      const clickEvent = new CustomEvent('clerk:subscription-cancel', { detail: subscriptionDetailsOptions.clickIdentifier });
+      subscriptionDetailsOptions.onSubscriptionCancel = () => {
+        document.dispatchEvent(clickEvent);
+      };
     }
 
     return clerk.__internal_openSubscriptionDetails(subscriptionDetailsOptions);

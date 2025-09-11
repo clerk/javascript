@@ -4,7 +4,8 @@ import type { __experimental_CheckoutButtonProps } from '@clerk/types';
 import type { ButtonProps } from '../../types';
 import { addUnstyledAttributeToFirstTag, logAsPropUsageDeprecation } from './utils';
 
-type Props<Tag extends HTMLTag = 'button'> = Polymorphic<ButtonProps<Tag>> & __experimental_CheckoutButtonProps;
+type Props<Tag extends HTMLTag = 'button'> = Polymorphic<ButtonProps<Tag>> &
+  Omit<__experimental_CheckoutButtonProps, 'onSubscriptionComplete'> & { clickIdentifier?: string };
 
 import { generateSafeId } from '@clerk/astro/internal';
 
@@ -20,7 +21,6 @@ const {
   planId,
   planPeriod,
   for: _for,
-  onSubscriptionComplete,
   newSubscriptionRedirectUrl,
   checkoutProps,
   ...props
@@ -30,7 +30,6 @@ const checkoutOptions = {
   planId,
   planPeriod,
   for: _for,
-  onSubscriptionComplete,
   newSubscriptionRedirectUrl,
   ...checkoutProps,
 };
@@ -69,6 +68,13 @@ if (asChild) {
 
     if (!clerk.organization && checkoutOptions.for === 'organization') {
       throw new Error('Wrap `<CheckoutButton for="organization" />` with a check for an active organization.');
+    }
+
+    if (checkoutOptions.clickIdentifier) {
+      const clickEvent = new CustomEvent('clerk:subscription-complete', { detail: checkoutOptions.clickIdentifier });
+      checkoutOptions.onSubscriptionComplete = () => {
+        document.dispatchEvent(clickEvent);
+      };
     }
 
     return clerk.__internal_openCheckout(checkoutOptions);
