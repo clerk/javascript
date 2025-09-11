@@ -61,7 +61,9 @@ if (asChild) {
       );
     }
     if (subscriptionDetailsOptions.clickIdentifier) {
-      const clickEvent = new CustomEvent('clerk:subscription-cancel', { detail: subscriptionDetailsOptions.clickIdentifier });
+      const clickEvent = new CustomEvent('clerk:subscription-cancel', {
+        detail: subscriptionDetailsOptions.clickIdentifier,
+      });
       subscriptionDetailsOptions.onSubscriptionCancel = () => {
         document.dispatchEvent(clickEvent);
       };
