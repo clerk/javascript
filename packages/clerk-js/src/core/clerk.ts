@@ -29,13 +29,13 @@ import type {
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
+  BillingNamespace,
   Clerk as ClerkInterface,
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
   ClerkOptions,
   ClientJSONSnapshot,
   ClientResource,
-  CommerceBillingNamespace,
   CreateOrganizationParams,
   CreateOrganizationProps,
   CredentialReturn,
@@ -147,7 +147,7 @@ import { createFapiClient } from './fapiClient';
 import { createClientFromJwt } from './jwt-client';
 import { APIKeys } from './modules/apiKeys';
 import { createCheckoutInstance } from './modules/checkout/instance';
-import { CommerceBilling } from './modules/commerce';
+import { Billing } from './modules/commerce';
 import {
   BaseResource,
   Client,
@@ -205,7 +205,7 @@ export class Clerk implements ClerkInterface {
     version: __PKG_VERSION__,
   };
 
-  private static _billing: CommerceBillingNamespace;
+  private static _billing: BillingNamespace;
   private static _apiKeys: APIKeysNamespace;
   private _checkout: ClerkInterface['__experimental_checkout'] | undefined;
 
@@ -336,9 +336,9 @@ export class Clerk implements ClerkInterface {
     return this.#options.standardBrowser || false;
   }
 
-  get billing(): CommerceBillingNamespace {
+  get billing(): BillingNamespace {
     if (!Clerk._billing) {
-      Clerk._billing = new CommerceBilling();
+      Clerk._billing = new Billing();
     }
     return Clerk._billing;
   }
@@ -619,7 +619,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#componentControls);
     if (disabledAllBillingFeatures(this, this.environment)) {
       if (this.#instanceType === 'development') {
-        throw new ClerkRuntimeError(warnings.cannotRenderAnyCommerceComponent('Checkout'), {
+        throw new ClerkRuntimeError(warnings.cannotRenderAnyBillingComponent('Checkout'), {
           code: CANNOT_RENDER_BILLING_DISABLED_ERROR_CODE,
         });
       }
@@ -648,7 +648,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#componentControls);
     if (disabledAllBillingFeatures(this, this.environment)) {
       if (this.#instanceType === 'development') {
-        throw new ClerkRuntimeError(warnings.cannotRenderAnyCommerceComponent('PlanDetails'), {
+        throw new ClerkRuntimeError(warnings.cannotRenderAnyBillingComponent('PlanDetails'), {
           code: CANNOT_RENDER_BILLING_DISABLED_ERROR_CODE,
         });
       }
@@ -1107,7 +1107,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#componentControls);
     if (disabledAllBillingFeatures(this, this.environment)) {
       if (this.#instanceType === 'development') {
-        throw new ClerkRuntimeError(warnings.cannotRenderAnyCommerceComponent('PricingTable'), {
+        throw new ClerkRuntimeError(warnings.cannotRenderAnyBillingComponent('PricingTable'), {
           code: CANNOT_RENDER_BILLING_DISABLED_ERROR_CODE,
         });
       }

@@ -1,4 +1,4 @@
-import { type CommerceMoneyAmount } from '@clerk/types';
+import { type BillingMoneyAmount } from '@clerk/types';
 
 import { CommerceSubscriptionItem } from './CommerceSubscriptionItem';
 import type { CommerceSubscriptionJSON } from './JSON';
@@ -45,7 +45,7 @@ export class CommerceSubscription {
     /**
      * Information about the next scheduled payment.
      */
-    readonly nextPayment: { date: number; amount: CommerceMoneyAmount } | null,
+    readonly nextPayment: { date: number; amount: BillingMoneyAmount } | null,
     /**
      * Whether the payer is eligible for a free trial.
      */

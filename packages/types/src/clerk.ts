@@ -22,10 +22,10 @@ import type {
 } from './appearance';
 import type { ClientResource } from './client';
 import type {
-  CommerceBillingNamespace,
-  CommerceCheckoutResource,
-  CommercePlanResource,
-  CommerceSubscriptionPlanPeriod,
+  BillingCheckoutResource,
+  BillingNamespace,
+  BillingPlanResource,
+  BillingSubscriptionPlanPeriod,
   ConfirmCheckoutParams,
   ForPayerType,
 } from './commerce';
@@ -67,20 +67,20 @@ export type __experimental_CheckoutCacheState = Readonly<{
   isStarting: boolean;
   isConfirming: boolean;
   error: ClerkAPIResponseError | null;
-  checkout: CommerceCheckoutResource | null;
+  checkout: BillingCheckoutResource | null;
   fetchStatus: 'idle' | 'fetching' | 'error';
   status: __experimental_CheckoutStatus;
 }>;
 
 export type __experimental_CheckoutOptions = {
   for?: ForPayerType;
-  planPeriod: CommerceSubscriptionPlanPeriod;
+  planPeriod: BillingSubscriptionPlanPeriod;
   planId: string;
 };
 
 type CheckoutResult =
   | {
-      data: CommerceCheckoutResource;
+      data: BillingCheckoutResource;
       error: null;
     }
   | {
@@ -247,7 +247,7 @@ export interface Clerk {
    * <ClerkProvider clerkJsVersion="x.x.x" />
    * ```
    */
-  billing: CommerceBillingNamespace;
+  billing: BillingNamespace;
 
   telemetry: TelemetryCollector | undefined;
 
@@ -1888,7 +1888,7 @@ export type RevokeAPIKeyParams = {
 export type __internal_CheckoutProps = {
   appearance?: CheckoutTheme;
   planId?: string;
-  planPeriod?: CommerceSubscriptionPlanPeriod;
+  planPeriod?: BillingSubscriptionPlanPeriod;
   for?: ForPayerType;
   onSubscriptionComplete?: () => void;
   portalId?: string;
@@ -1913,7 +1913,7 @@ export type __internal_CheckoutProps = {
  */
 export type __experimental_CheckoutButtonProps = {
   planId: string;
-  planPeriod?: CommerceSubscriptionPlanPeriod;
+  planPeriod?: BillingSubscriptionPlanPeriod;
   for?: ForPayerType;
   onSubscriptionComplete?: () => void;
   checkoutProps?: {
@@ -1948,12 +1948,12 @@ export type __internal_PlanDetailsProps = (
       /**
        * The plan object will be used as initial data until the plan is fetched from the server.
        */
-      plan: CommercePlanResource;
+      plan: BillingPlanResource;
       planId?: never;
     }
 ) & {
   appearance?: PlanDetailTheme;
-  initialPlanPeriod?: CommerceSubscriptionPlanPeriod;
+  initialPlanPeriod?: BillingSubscriptionPlanPeriod;
   portalId?: string;
   portalRoot?: PortalRoot;
 };
@@ -1977,11 +1977,11 @@ export type __experimental_PlanDetailsButtonProps = (
       /**
        * The plan object will be used as initial data until the plan is fetched from the server.
        */
-      plan: CommercePlanResource;
+      plan: BillingPlanResource;
       planId?: never;
     }
 ) & {
-  initialPlanPeriod?: CommerceSubscriptionPlanPeriod;
+  initialPlanPeriod?: BillingSubscriptionPlanPeriod;
   planDetailsProps?: {
     appearance?: PlanDetailTheme;
     portalId?: string;

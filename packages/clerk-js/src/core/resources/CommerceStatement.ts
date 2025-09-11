@@ -1,28 +1,28 @@
 import type {
-  CommerceStatementGroupJSON,
-  CommerceStatementJSON,
-  CommerceStatementResource,
-  CommerceStatementStatus,
-  CommerceStatementTotals,
+  BillingStatementGroupJSON,
+  BillingStatementJSON,
+  BillingStatementResource,
+  BillingStatementStatus,
+  BillingStatementTotals,
 } from '@clerk/types';
 
-import { commerceTotalsFromJSON } from '../../utils';
+import { billingTotalsFromJSON } from '../../utils';
 import { unixEpochToDate } from '../../utils/date';
-import { BaseResource, CommercePayment } from './internal';
+import { BaseResource, BillingPayment } from './internal';
 
-export class CommerceStatement extends BaseResource implements CommerceStatementResource {
+export class BillingStatement extends BaseResource implements BillingStatementResource {
   id!: string;
-  status!: CommerceStatementStatus;
+  status!: BillingStatementStatus;
   timestamp!: Date;
-  totals!: CommerceStatementTotals;
-  groups!: CommerceStatementGroup[];
+  totals!: BillingStatementTotals;
+  groups!: BillingStatementGroup[];
 
-  constructor(data: CommerceStatementJSON) {
+  constructor(data: BillingStatementJSON) {
     super();
     this.fromJSON(data);
   }
 
-  protected fromJSON(data: CommerceStatementJSON | null): this {
+  protected fromJSON(data: BillingStatementJSON | null): this {
     if (!data) {
       return this;
     }
@@ -30,29 +30,29 @@ export class CommerceStatement extends BaseResource implements CommerceStatement
     this.id = data.id;
     this.status = data.status;
     this.timestamp = unixEpochToDate(data.timestamp);
-    this.totals = commerceTotalsFromJSON(data.totals);
-    this.groups = data.groups.map(group => new CommerceStatementGroup(group));
+    this.totals = billingTotalsFromJSON(data.totals);
+    this.groups = data.groups.map(group => new BillingStatementGroup(group));
     return this;
   }
 }
 
-export class CommerceStatementGroup {
+export class BillingStatementGroup {
   id!: string;
   timestamp!: Date;
-  items!: CommercePayment[];
+  items!: BillingPayment[];
 
-  constructor(data: CommerceStatementGroupJSON) {
+  constructor(data: BillingStatementGroupJSON) {
     this.fromJSON(data);
   }
 
-  protected fromJSON(data: CommerceStatementGroupJSON | null): this {
+  protected fromJSON(data: BillingStatementGroupJSON | null): this {
     if (!data) {
       return this;
     }
 
     this.id = data.id;
     this.timestamp = unixEpochToDate(data.timestamp);
-    this.items = data.items.map(item => new CommercePayment(item));
+    this.items = data.items.map(item => new BillingPayment(item));
     return this;
   }
 }
