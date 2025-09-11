@@ -2135,6 +2135,11 @@ export type TaskChooseOrganizationProps = {
    */
   redirectUrlComplete: string;
   appearance?: TaskChooseOrganizationTheme;
+  /**
+   * Hides the optional "slug" field in the organization creation screen.
+   * @default false
+   */
+  hideSlug?: boolean;
 };
 
 export type CreateOrganizationInvitationParams = {

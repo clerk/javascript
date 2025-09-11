@@ -21,7 +21,7 @@ type CreateOrganizationScreenProps = {
 export const CreateOrganizationScreen = (props: CreateOrganizationScreenProps) => {
   const card = useCardState();
   const { navigate } = useRouter();
-  const { redirectUrlComplete } = useTaskChooseOrganizationContext();
+  const { redirectUrlComplete, hideSlug } = useTaskChooseOrganizationContext();
   const { createOrganization, isLoaded, setActive } = useOrganizationList({
     userMemberships: organizationListParams.userMemberships,
   });
@@ -45,7 +45,15 @@ export const CreateOrganizationScreen = (props: CreateOrganizationScreenProps) =
     }
 
     try {
-      const organization = await createOrganization({ name: nameField.value, slug: slugField.value });
+      const createOrganizationParams = {
+        name: nameField.value,
+      } as Parameters<typeof createOrganization>[0];
+
+      if (!hideSlug && slugField.value) {
+        createOrganizationParams.slug = slugField.value;
+      }
+
+      const organization = await createOrganization(createOrganizationParams);
 
       await setActive({
         organization,
@@ -90,15 +98,18 @@ export const CreateOrganizationScreen = (props: CreateOrganizationScreenProps) =
               ignorePasswordManager
             />
           </Form.ControlRow>
-          <Form.ControlRow elementId={slugField.id}>
-            <Form.PlainInput
-              {...slugField.props}
-              onChange={event => updateSlugField(event.target.value)}
-              isRequired
-              pattern='^(?=.*[a-z0-9])[a-z0-9\-]+$'
-              ignorePasswordManager
-            />
-          </Form.ControlRow>
+
+          {!hideSlug && (
+            <Form.ControlRow elementId={slugField.id}>
+              <Form.PlainInput
+                {...slugField.props}
+                onChange={event => updateSlugField(event.target.value)}
+                isRequired
+                pattern='^(?=.*[a-z0-9])[a-z0-9\-]+$'
+                ignorePasswordManager
+              />
+            </Form.ControlRow>
+          )}
 
           <FormButtonContainer sx={() => ({ flexDirection: 'column' })}>
             <Form.SubmitButton

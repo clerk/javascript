@@ -63,6 +63,7 @@ describe('TaskChooseOrganization', () => {
 
     await waitFor(() => {
       expect(getByRole('textbox', { name: /name/i })).toBeInTheDocument();
+      expect(getByRole('textbox', { name: /slug/i })).toBeInTheDocument();
       expect(getByText('Continue')).toBeInTheDocument();
     });
   });
@@ -218,5 +219,28 @@ describe('TaskChooseOrganization', () => {
     const { getByText } = render(<TaskChooseOrganization />, { wrapper });
 
     expect(getByText(/testuser/)).toBeInTheDocument();
+  });
+
+  describe('with prop to hide slug', () => {
+    it('does not show slug field on create organization screen', async () => {
+      const { wrapper, props } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withForceOrganizationSelection();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          create_organization_enabled: true,
+          tasks: [{ key: 'choose-organization' }],
+        });
+      });
+
+      props.setProps({ hideSlug: true });
+
+      const { queryByRole } = render(<TaskChooseOrganization />, { wrapper });
+
+      await waitFor(() => {
+        expect(queryByRole('textbox', { name: /name/i })).toBeInTheDocument();
+        expect(queryByRole('textbox', { name: /slug/i })).not.toBeInTheDocument();
+      });
+    });
   });
 });
