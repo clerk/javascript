@@ -2,4 +2,4 @@
 '@clerk/clerk-js': patch
 ---
 
-Hide flows inside UserProfile and OrganizationProfile that are affected by stripe not beeing loaded in environments where remoted hosted code is not permitted.
+Hide flows inside UserProfile and OrganizationProfile that depend on Stripe.js when remotely hosted code is not permitted.
