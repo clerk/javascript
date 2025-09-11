@@ -136,7 +136,10 @@ function SignInRoutes(): JSX.Element {
               </Route>
             </Route>
             <Route path='tasks'>
-              <LazySessionTasks redirectUrlComplete={signInContext.afterSignUpUrl} />
+              <LazySessionTasks
+                redirectUrlComplete={signInContext.afterSignUpUrl}
+                hideSlug={signInContext.tasksProps?.hideSlug}
+              />
             </Route>
             <Route index>
               <LazySignUpStart />
@@ -144,7 +147,10 @@ function SignInRoutes(): JSX.Element {
           </Route>
         )}
         <Route path='tasks'>
-          <LazySessionTasks redirectUrlComplete={signInContext.afterSignInUrl} />
+          <LazySessionTasks
+            redirectUrlComplete={signInContext.afterSignInUrl}
+            hideSlug={signInContext.tasksProps?.hideSlug}
+          />
         </Route>
         <Route index>
           <SignInStart />

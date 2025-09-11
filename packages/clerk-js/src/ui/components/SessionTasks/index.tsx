@@ -1,7 +1,7 @@
 import { useClerk } from '@clerk/shared/react';
 import { eventComponentMounted } from '@clerk/shared/telemetry';
-import type { SessionResource } from '@clerk/types';
-import { useEffect, useRef } from 'react';
+import type { SessionResource, TaskChooseOrganizationProps } from '@clerk/types';
+import { useEffect } from 'react';
 
 import { Card } from '@/ui/elements/Card';
 import { withCardStateProvider } from '@/ui/elements/contexts';
@@ -51,7 +51,11 @@ function SessionTasksRoutes(): JSX.Element {
     <Switch>
       <Route path={INTERNAL_SESSION_TASK_ROUTE_BY_KEY['choose-organization']}>
         <TaskChooseOrganizationContext.Provider
-          value={{ componentName: 'TaskChooseOrganization', redirectUrlComplete: ctx.redirectUrlComplete }}
+          value={{
+            componentName: 'TaskChooseOrganization',
+            redirectUrlComplete: ctx.redirectUrlComplete,
+            hideSlug: ctx.hideSlug,
+          }}
         >
           <TaskChooseOrganization />
         </TaskChooseOrganizationContext.Provider>
@@ -65,15 +69,14 @@ function SessionTasksRoutes(): JSX.Element {
 
 type SessionTasksProps = {
   redirectUrlComplete: string;
-};
+} & Pick<TaskChooseOrganizationProps, 'hideSlug'>;
 
 /**
  * @internal
  */
-export const SessionTasks = withCardStateProvider(({ redirectUrlComplete }: SessionTasksProps) => {
+export const SessionTasks = withCardStateProvider(({ redirectUrlComplete, hideSlug }: SessionTasksProps) => {
   const clerk = useClerk();
   const { navigate } = useRouter();
-  const currentTaskContainer = useRef<HTMLDivElement>(null);
 
   // If there are no pending tasks, navigate away from the tasks flow.
   // This handles cases where a user with an active session returns to the tasks URL,
@@ -93,11 +96,7 @@ export const SessionTasks = withCardStateProvider(({ redirectUrlComplete }: Sess
 
   if (!clerk.session?.currentTask) {
     return (
-      <Card.Root
-        sx={() => ({
-          minHeight: currentTaskContainer ? currentTaskContainer.current?.offsetHeight : undefined,
-        })}
-      >
+      <Card.Root>
         <Card.Content sx={() => ({ flex: 1 })}>
           <LoadingCardContainer />
         </Card.Content>
@@ -116,7 +115,7 @@ export const SessionTasks = withCardStateProvider(({ redirectUrlComplete }: Sess
   };
 
   return (
-    <SessionTasksContext.Provider value={{ redirectUrlComplete, currentTaskContainer, navigateOnSetActive }}>
+    <SessionTasksContext.Provider value={{ hideSlug, redirectUrlComplete, navigateOnSetActive }}>
       <SessionTasksRoutes />
     </SessionTasksContext.Provider>
   );

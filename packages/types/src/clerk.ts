@@ -1262,6 +1262,8 @@ export type RoutingOptions =
   | { path: string | undefined; routing?: Extract<RoutingStrategy, 'path'> }
   | { path?: never; routing?: Extract<RoutingStrategy, 'hash' | 'virtual'> };
 
+type TasksProps = Pick<TaskChooseOrganizationProps, 'hideSlug'>;
+
 export type SignInProps = RoutingOptions & {
   /**
    * Full URL or path to navigate to after successful sign in.
@@ -1321,6 +1323,10 @@ export type SignInProps = RoutingOptions & {
    * Optional for `oauth_<provider>` or `enterprise_sso` strategies. The value to pass to the [OIDC prompt parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.) in the generated OAuth redirect URL.
    */
   oidcPrompt?: string;
+  /**
+   * Optional properties that affect the task steps within `SignIn`.
+   */
+  tasksProps?: TasksProps;
 } & TransferableOption &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
@@ -1462,6 +1468,10 @@ export type SignUpProps = RoutingOptions & {
    * Optional for `oauth_<provider>` or `enterprise_sso` strategies. The value to pass to the [OIDC prompt parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.) in the generated OAuth redirect URL.
    */
   oidcPrompt?: string;
+  /**
+   * Optional properties that affect the task steps within `SignIn`.
+   */
+  tasksProps?: TasksProps;
 } & SignInFallbackRedirectUrl &
   SignInForceRedirectUrl &
   LegacyRedirectProps &

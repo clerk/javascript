@@ -80,7 +80,10 @@ function SignUpRoutes(): JSX.Element {
           </Route>
         </Route>
         <Route path='tasks'>
-          <LazySessionTasks redirectUrlComplete={signUpContext.afterSignUpUrl} />
+          <LazySessionTasks
+            redirectUrlComplete={signUpContext.afterSignUpUrl}
+            hideSlug={signUpContext.tasksProps?.hideSlug}
+          />
         </Route>
         <Route index>
           <SignUpStart />

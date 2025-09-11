@@ -136,9 +136,8 @@ export type CheckoutCtx = __internal_CheckoutProps & {
 
 export type SessionTasksCtx = {
   redirectUrlComplete: string;
-  currentTaskContainer?: React.RefObject<HTMLDivElement> | null;
   navigateOnSetActive: (opts: { session: SessionResource; redirectUrl: string }) => Promise<unknown>;
-};
+} & Pick<TaskChooseOrganizationCtx, 'hideSlug'>;
 
 export type TaskChooseOrganizationCtx = TaskChooseOrganizationProps & {
   componentName: 'TaskChooseOrganization';
