@@ -3,16 +3,16 @@ import type { RequestState } from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest } from '@clerk/backend/internal';
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
 import type { PendingSessionOptions } from '@clerk/types';
-import type { unstable_MiddlewareFunction } from 'react-router';
-import { unstable_createContext } from 'react-router';
+import type { MiddlewareFunction } from 'react-router';
+import { createContext } from 'react-router';
 
 import { clerkClient } from './clerkClient';
 import { loadOptions } from './loadOptions';
 import type { ClerkMiddlewareOptions } from './types';
 import { patchRequest } from './utils';
 
-export const authFnContext = unstable_createContext<((options?: PendingSessionOptions) => AuthObject) | null>(null);
-export const requestStateContext = unstable_createContext<RequestState<any> | null>(null);
+export const authFnContext = createContext<((options?: PendingSessionOptions) => AuthObject) | null>(null);
+export const requestStateContext = createContext<RequestState<any> | null>(null);
 
 /**
  * Middleware that integrates Clerk authentication into your React Router application.
@@ -20,9 +20,9 @@ export const requestStateContext = unstable_createContext<RequestState<any> | nu
  * attaches the Auth object to a context.
  *
  * @example
- * export const middleware: Route.MiddlewareFunction[clerkMiddleware()]
+ * export const middleware: Route.MiddlewareFunction[] = [clerkMiddleware()]
  */
-export const clerkMiddleware = (options?: ClerkMiddlewareOptions): unstable_MiddlewareFunction<Response> => {
+export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareFunction<Response> => {
   return async (args, next) => {
     const clerkRequest = createClerkRequest(patchRequest(args.request));
     const loadedOptions = loadOptions(args, options);
