@@ -7,8 +7,8 @@ vi.mock('../../../utils/runtime', () => ({
   inIframe: vi.fn(),
 }));
 
-const originalBuildVariant = global.__BUILD_VARIANT_CHIPS__;
-global.__BUILD_VARIANT_CHIPS__ = true;
+const originalBuildVariant = (globalThis as any).__BUILD_VARIANT_CHIPS__;
+(globalThis as any).__BUILD_VARIANT_CHIPS__ = true;
 
 describe('SignIn', () => {
   let signIn: SignIn;
@@ -50,7 +50,7 @@ describe('SignIn', () => {
   });
 
   afterEach(() => {
-    global.__BUILD_VARIANT_CHIPS__ = originalBuildVariant;
+    (globalThis as any).__BUILD_VARIANT_CHIPS__ = originalBuildVariant;
   });
 
   describe('authenticateWithRedirectOrPopup', () => {
@@ -115,7 +115,7 @@ describe('SignIn', () => {
     });
 
     it('should not set iframeContext when not CHIPS build', async () => {
-      global.__BUILD_VARIANT_CHIPS__ = false;
+      (globalThis as any).__BUILD_VARIANT_CHIPS__ = false;
 
       vi.mocked(inIframe).mockReturnValue(true);
 
@@ -168,7 +168,7 @@ describe('SignIn', () => {
 
   describe('SignInFuture.create', () => {
     it('should set iframeContext to true when CHIPS build and in iframe', async () => {
-      global.__BUILD_VARIANT_CHIPS__ = true;
+      (globalThis as any).__BUILD_VARIANT_CHIPS__ = true;
       vi.mocked(inIframe).mockReturnValue(true);
 
       const params = {

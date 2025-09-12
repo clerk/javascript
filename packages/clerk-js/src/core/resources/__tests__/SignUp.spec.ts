@@ -142,7 +142,9 @@ describe('SignUp', () => {
 
       await signUp.create(params);
 
-      expect(mockCreate).toHaveBeenCalledWith(expect.not.objectContaining({ iframeContext: true }));
+      expect(mockCreate).toHaveBeenCalledWith(
+        expect.not.objectContaining({ body: expect.objectContaining({ iframeContext: true }) }),
+      );
     });
   });
 
@@ -204,7 +206,9 @@ describe('SignUp', () => {
 
       await signUp.update(params);
 
-      expect(mockUpdate).toHaveBeenCalledWith(expect.not.objectContaining({ iframeContext: true }));
+      expect(mockUpdate).toHaveBeenCalledWith(
+        expect.not.objectContaining({ body: expect.objectContaining({ iframeContext: true }) }),
+      );
     });
   });
 
