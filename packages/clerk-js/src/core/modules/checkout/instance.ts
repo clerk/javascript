@@ -1,4 +1,4 @@
-import type { __experimental_CheckoutOptions, NullableCheckoutSignal } from '@clerk/types';
+import type { __experimental_CheckoutOptions, CheckoutSignalValue } from '@clerk/types';
 
 import { CheckoutFuture, createSignals } from '@/core/resources/CommerceCheckout';
 
@@ -19,7 +19,7 @@ const cache = new Map<CheckoutKey, { resource: CheckoutFuture; signals: ReturnTy
 /**
  * Create a checkout instance with the given options
  */
-function createCheckoutInstance(clerk: Clerk, options: __experimental_CheckoutOptions): NullableCheckoutSignal {
+function createCheckoutInstance(clerk: Clerk, options: __experimental_CheckoutOptions): CheckoutSignalValue {
   const { for: forOrganization, planId, planPeriod } = options;
 
   if (!clerk.isSignedIn || !clerk.user) {
@@ -40,7 +40,7 @@ function createCheckoutInstance(clerk: Clerk, options: __experimental_CheckoutOp
   if (cache.has(checkoutKey)) {
     return (
       cache.get(checkoutKey) as { resource: CheckoutFuture; signals: ReturnType<typeof createSignals> }
-    ).signals.computedSignal();
+    ).signals.computedSignal() as CheckoutSignalValue;
   }
 
   const signals = createSignals();
@@ -51,7 +51,7 @@ function createCheckoutInstance(clerk: Clerk, options: __experimental_CheckoutOp
     planPeriod,
   });
   cache.set(checkoutKey, { resource: checkout, signals });
-  return signals.computedSignal();
+  return signals.computedSignal() as CheckoutSignalValue;
 }
 
 export { createCheckoutInstance };

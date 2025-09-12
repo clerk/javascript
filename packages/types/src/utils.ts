@@ -127,3 +127,7 @@ export type Override<T, U> = Omit<T, keyof U> & U;
 export type RemoveFunctions<T extends object> = {
   [K in keyof T as T[K] extends (...args: any[]) => any ? never : K]: T[K];
 };
+
+export type Prettify<T> = {
+  [K in keyof T]: T[K];
+} & {};

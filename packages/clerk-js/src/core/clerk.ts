@@ -29,6 +29,7 @@ import type {
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
+  CheckoutSignalValue,
   Clerk as ClerkInterface,
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
@@ -51,7 +52,6 @@ import type {
   JoinWaitlistParams,
   ListenerCallback,
   NavigateOptions,
-  NullableCheckoutSignal,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationResource,
@@ -351,7 +351,7 @@ export class Clerk implements ClerkInterface {
     return Clerk._apiKeys;
   }
 
-  __experimental_checkout(options: __experimental_CheckoutOptions): NullableCheckoutSignal {
+  __experimental_checkout(options: __experimental_CheckoutOptions): CheckoutSignalValue {
     if (!this._checkout) {
       this._checkout = (params: any) => createCheckoutInstance(this, params);
     }

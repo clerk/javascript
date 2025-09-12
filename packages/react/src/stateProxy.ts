@@ -1,11 +1,11 @@
 import { inBrowser } from '@clerk/shared/browser';
 import type {
   CheckoutFutureResource,
+  CheckoutSignalValue,
   Clerk,
   CommerceSubscriptionPlanPeriod,
   Errors,
   ForPayerType,
-  NullableCheckoutSignal,
   State,
 } from '@clerk/types';
 
@@ -121,7 +121,7 @@ export class StateProxy implements State {
     };
   }
 
-  private buildCheckoutProxy(params: CheckoutSignalProps): NullableCheckoutSignal {
+  private buildCheckoutProxy(params: CheckoutSignalProps): CheckoutSignalValue {
     const gateProperty = this.gateProperty.bind(this);
     const targetCheckout = () => this.checkout(params);
     const target = () => targetCheckout().checkout as CheckoutFutureResource;
@@ -132,37 +132,39 @@ export class StateProxy implements State {
         global: null,
       },
       fetchStatus: 'idle' as const,
-      // @ts-expect-error - CheckoutFutureResource is not yet defined
       checkout: {
         get status() {
-          return gateProperty(target, 'status', 'needs_initialization');
+          return gateProperty(target, 'status', 'needs_initialization') as 'needs_initialization';
         },
         get externalClientSecret() {
-          return gateProperty(target, 'externalClientSecret', null);
+          return gateProperty(target, 'externalClientSecret', null) as null;
         },
         get externalGatewayId() {
-          return gateProperty(target, 'externalGatewayId', null);
+          return gateProperty(target, 'externalGatewayId', null) as null;
         },
         get paymentSource() {
-          return gateProperty(target, 'paymentSource', null);
+          return gateProperty(target, 'paymentSource', null) as null;
         },
         get plan() {
-          return gateProperty(target, 'plan', null);
+          return gateProperty(target, 'plan', null) as null;
         },
         get planPeriod() {
-          return gateProperty(target, 'planPeriod', null);
+          return gateProperty(target, 'planPeriod', null) as null;
         },
         get totals() {
-          return gateProperty(target, 'totals', null);
+          return gateProperty(target, 'totals', null) as null;
         },
         get isImmediatePlanChange() {
-          return gateProperty(target, 'isImmediatePlanChange', false);
+          return gateProperty(target, 'isImmediatePlanChange', false) as null;
         },
         get freeTrialEndsAt() {
-          return gateProperty(target, 'freeTrialEndsAt', null);
+          return gateProperty(target, 'freeTrialEndsAt', null) as null;
         },
         get payer() {
-          return gateProperty(target, 'payer', null);
+          return gateProperty(target, 'payer', null) as null;
+        },
+        get planPeriodStart() {
+          return gateProperty(target, 'planPeriodStart', null) as null;
         },
 
         start: this.gateMethod<ReturnType<typeof target>, 'start'>(target, 'start'),

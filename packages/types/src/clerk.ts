@@ -88,12 +88,8 @@ export interface CheckoutSignalValue {
   checkout: CheckoutFutureResource;
 }
 
-export type NullableCheckoutSignal = Omit<CheckoutSignalValue, 'checkout'> & {
-  checkout: CheckoutFutureResource | null;
-};
-
 export interface CheckoutSignal {
-  (): NullableCheckoutSignal;
+  (): CheckoutSignalValue;
 }
 
 export type __experimental_CheckoutOptions = {
@@ -102,7 +98,7 @@ export type __experimental_CheckoutOptions = {
   planId: string;
 };
 
-type __experimental_CheckoutFunction = (options: __experimental_CheckoutOptions) => NullableCheckoutSignal;
+type __experimental_CheckoutFunction = (options: __experimental_CheckoutOptions) => CheckoutSignalValue;
 
 /**
  * @inline

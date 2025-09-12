@@ -1,5 +1,6 @@
 import { retry } from '@clerk/shared/retry';
 import type {
+  CheckoutFutureResource,
   CheckoutFutureResourceLax,
   CheckoutSignalValue,
   CommerceCheckoutJSON,
@@ -128,15 +129,16 @@ export const createSignals = () => {
   const resourceSignal = signal<{ resource: CheckoutFuture | null }>({ resource: null });
   const errorSignal = signal<{ error: unknown }>({ error: null });
   const fetchSignal = signal<{ status: 'idle' | 'fetching' }>({ status: 'idle' });
-  // @ts-expect-error - CheckoutSignal is not yet defined
-  const computedSignal: CheckoutSignal = computed(() => {
-    const resource = resourceSignal().resource;
-    const error = errorSignal().error;
-    const fetchStatus = fetchSignal().status;
+  const computedSignal = computed<Omit<CheckoutSignalValue, 'checkout'> & { checkout: CheckoutFutureResource | null }>(
+    () => {
+      const resource = resourceSignal().resource;
+      const error = errorSignal().error;
+      const fetchStatus = fetchSignal().status;
 
-    const errors = errorsToParsedErrors(error);
-    return { errors: errors, fetchStatus, checkout: resource };
-  });
+      const errors = errorsToParsedErrors(error);
+      return { errors: errors, fetchStatus, checkout: resource };
+    },
+  );
 
   return { resourceSignal, errorSignal, fetchSignal, computedSignal };
 };
@@ -208,6 +210,9 @@ export class CheckoutFuture implements CheckoutFutureResourceLax {
 
   async confirm(params: ConfirmCheckoutParams): Promise<{ error: unknown }> {
     return this.runAsyncResourceTask('confirm', async () => {
+      if (!this.resource.id) {
+        throw new Error('Clerk: Call `start` before `confirm`');
+      }
       await this.resource.confirm(params);
     });
   }
@@ -233,7 +238,6 @@ function createRunAsyncResourceTask(
       startBatch();
       signals.errorSignal({ error: null });
       signals.fetchSignal({ status: 'fetching' });
-      // signals.resourceSignal({ resource: null });
       beforeTask?.();
       endBatch();
       startBatch();
@@ -243,7 +247,6 @@ function createRunAsyncResourceTask(
         return { error: null };
       } catch (err) {
         signals.errorSignal({ error: err });
-        endBatch();
         return { error: err };
       } finally {
         pendingOperations.delete(operationType);

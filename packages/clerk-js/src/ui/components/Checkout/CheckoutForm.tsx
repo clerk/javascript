@@ -1,5 +1,10 @@
 import { __experimental_useCheckout as useCheckout } from '@clerk/shared/react';
-import type { CommerceMoneyAmount, CommercePaymentSourceResource, ConfirmCheckoutParams } from '@clerk/types';
+import type {
+  CommerceMoneyAmount,
+  CommercePaymentSourceResource,
+  ConfirmCheckoutParams,
+  RemoveFunctions,
+} from '@clerk/types';
 import { useMemo, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';
@@ -347,10 +352,9 @@ const ExistingPaymentSourceForm = withCardStateProvider(
 
     const { payWithExistingPaymentSource } = useCheckoutMutations();
     const card = useCardState();
-    const [selectedPaymentSource, setSelectedPaymentSource] = useState<CommercePaymentSourceResource | undefined>(
-      // @ts-expect-error - paymentSource is missing functions
-      paymentSource || paymentSources.find(p => p.isDefault),
-    );
+    const [selectedPaymentSource, setSelectedPaymentSource] = useState<
+      RemoveFunctions<CommercePaymentSourceResource> | undefined
+    >(paymentSource || paymentSources.find(p => p.isDefault));
 
     const options = useMemo(() => {
       return paymentSources.map(source => {

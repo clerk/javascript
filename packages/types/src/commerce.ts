@@ -2,7 +2,7 @@ import type { DeletedObjectResource } from './deletedObject';
 import type { ClerkPaginatedResponse, ClerkPaginationParams } from './pagination';
 import type { ClerkResource } from './resource';
 import type { CommerceFeatureJSONSnapshot } from './snapshots';
-import type { ForceNull, RemoveFunctions } from './utils';
+import type { ForceNull, Prettify, RemoveFunctions } from './utils';
 
 type WithOptionalOrgType<T> = T & {
   /**
@@ -1365,11 +1365,11 @@ export interface CheckoutFutureProperties {
   /**
    * The payment source being used for the checkout, such as a credit card or bank account.
    */
-  paymentSource: RemoveFunctions<CommercePaymentSourceResource> | null;
+  paymentSource: Prettify<RemoveFunctions<CommercePaymentSourceResource>> | null;
   /**
    * The subscription plan details for the checkout.
    */
-  plan: RemoveFunctions<CommercePlanResource>;
+  plan: Prettify<RemoveFunctions<CommercePlanResource>>;
   /**
    * The billing period for the plan.
    */
@@ -1398,7 +1398,7 @@ export interface CheckoutFutureProperties {
    * <ClerkProvider clerkJsVersion="x.x.x" />
    * ```
    */
-  payer: RemoveFunctions<CommercePayerResource>;
+  payer: Prettify<RemoveFunctions<CommercePayerResource>>;
 }
 
 type CheckoutPropertiesPerStatus =
