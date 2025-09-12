@@ -116,6 +116,7 @@ export class StateProxy implements State {
         },
 
         create: gateMethod(target, 'create'),
+        update: gateMethod(target, 'update'),
         sso: gateMethod(target, 'sso'),
         password: gateMethod(target, 'password'),
         finalize: gateMethod(target, 'finalize'),
