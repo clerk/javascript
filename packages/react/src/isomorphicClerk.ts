@@ -740,12 +740,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       : this.#stateProxy.checkoutSignal(...args);
   };
 
-  __experimental_checkoutV2 = (...args: Parameters<Clerk['__experimental_checkoutV2']>) => {
-    return this.loaded && this.clerkjs
-      ? this.clerkjs.__experimental_checkoutV2(...args)
-      : this.#stateProxy.checkoutSignalV2(...args);
-  };
-
   __unstable__setEnvironment(...args: any): void {
     if (this.clerkjs && '__unstable__setEnvironment' in this.clerkjs) {
       (this.clerkjs as any).__unstable__setEnvironment(args);

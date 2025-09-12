@@ -14,4 +14,3 @@ export { usePaymentMethods as __experimental_usePaymentMethods } from './usePaym
 export { usePlans as __experimental_usePlans } from './usePlans';
 export { useSubscription as __experimental_useSubscription } from './useSubscription';
 export { useCheckout as __experimental_useCheckout } from './useCheckout';
-export { useCheckoutV2 as __experimental_useCheckoutV2 } from './useCheckout';

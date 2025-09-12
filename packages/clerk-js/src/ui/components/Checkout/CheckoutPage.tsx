@@ -1,6 +1,6 @@
 import {
   __experimental_CheckoutProvider as CheckoutProvider,
-  __experimental_useCheckoutV2 as useCheckout,
+  __experimental_useCheckout as useCheckout,
 } from '@clerk/shared/react';
 import { useEffect, useMemo } from 'react';
 

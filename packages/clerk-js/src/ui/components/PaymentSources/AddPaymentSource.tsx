@@ -1,4 +1,4 @@
-import type { __experimental_useCheckoutV2 as useCheckout } from '@clerk/shared/react';
+import type { __experimental_useCheckout as useCheckout } from '@clerk/shared/react';
 import {
   __experimental_PaymentElement as PaymentElement,
   __experimental_PaymentElementProvider as PaymentElementProvider,

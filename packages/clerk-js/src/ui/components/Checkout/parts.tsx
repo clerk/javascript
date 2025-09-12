@@ -1,4 +1,4 @@
-import { __experimental_useCheckoutV2 as useCheckout } from '@clerk/shared/react';
+import { __experimental_useCheckout as useCheckout } from '@clerk/shared/react';
 import { useMemo } from 'react';
 
 import { Alert } from '@/ui/elements/Alert';

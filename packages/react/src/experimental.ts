@@ -20,5 +20,4 @@ export {
   __experimental_useSubscription as useSubscription,
   __experimental_CheckoutProvider as CheckoutProvider,
   __experimental_useCheckout as useCheckout,
-  __experimental_useCheckoutV2 as useCheckoutV2,
 } from '@clerk/shared/react';

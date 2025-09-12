@@ -1,4 +1,4 @@
-import { __experimental_useCheckoutV2 as useCheckout } from '@clerk/shared/react';
+import { __experimental_useCheckout as useCheckout } from '@clerk/shared/react';
 import type { CommerceMoneyAmount, CommercePaymentSourceResource, ConfirmCheckoutParams } from '@clerk/types';
 import { useMemo, useState } from 'react';
 

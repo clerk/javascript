@@ -16,7 +16,6 @@ import {
 import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
 import { allSettled, handleValueOrFn, noop } from '@clerk/shared/utils';
 import type {
-  __experimental_CheckoutInstance,
   __experimental_CheckoutOptions,
   __internal_CheckoutProps,
   __internal_OAuthConsentProps,
@@ -148,7 +147,7 @@ import type { FapiClient, FapiRequestCallback } from './fapiClient';
 import { createFapiClient } from './fapiClient';
 import { createClientFromJwt } from './jwt-client';
 import { APIKeys } from './modules/apiKeys';
-import { createCheckoutInstance, createCheckoutInstanceV2 } from './modules/checkout/instance';
+import { createCheckoutInstance } from './modules/checkout/instance';
 import { CommerceBilling } from './modules/commerce';
 import {
   BaseResource,
@@ -210,7 +209,6 @@ export class Clerk implements ClerkInterface {
   private static _billing: CommerceBillingNamespace;
   private static _apiKeys: APIKeysNamespace;
   private _checkout: ClerkInterface['__experimental_checkout'] | undefined;
-  private _checkoutV2: ClerkInterface['__experimental_checkoutV2'] | undefined;
 
   public client: ClientResource | undefined;
   public session: SignedInSessionResource | null | undefined;
@@ -353,18 +351,11 @@ export class Clerk implements ClerkInterface {
     return Clerk._apiKeys;
   }
 
-  __experimental_checkout(options: __experimental_CheckoutOptions): __experimental_CheckoutInstance {
+  __experimental_checkout(options: __experimental_CheckoutOptions): NullableCheckoutSignal {
     if (!this._checkout) {
       this._checkout = (params: any) => createCheckoutInstance(this, params);
     }
     return this._checkout(options);
-  }
-
-  __experimental_checkoutV2(options: __experimental_CheckoutOptions): NullableCheckoutSignal {
-    if (!this._checkoutV2) {
-      this._checkoutV2 = (params: any) => createCheckoutInstanceV2(this, params);
-    }
-    return this._checkoutV2(options);
   }
 
   public __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K] {
