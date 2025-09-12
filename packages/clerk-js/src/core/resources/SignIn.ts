@@ -874,19 +874,15 @@ class SignInFuture implements SignInFutureResource {
   }
 
   async finalize(params?: SignInFutureFinalizeParams): Promise<{ error: unknown }> {
-    console.log('finalize', this.resource.createdSessionId);
     const { navigate } = params || {};
     return runAsyncResourceTask(this.resource, async () => {
-      console.log('run async finalize', this.resource.createdSessionId);
       if (!this.resource.createdSessionId) {
-        console.log('no created session id');
         throw new Error('Cannot finalize sign-in without a created session.');
       }
 
-      console.log('reloading client');
+      // Reload the client to prevent an issue where the created session is not picked up.
       await SignIn.clerk.client?.reload();
 
-      console.log('calling setActive');
       await SignIn.clerk.setActive({ session: this.resource.createdSessionId, navigate });
     });
   }
