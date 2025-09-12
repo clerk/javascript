@@ -733,7 +733,7 @@ class SignInFuture implements SignInFutureResource {
       const emailLinkFactor = this.resource.supportedFirstFactors?.find(f => f.strategy === 'email_link');
 
       if (!emailLinkFactor) {
-        throw new Error('Email code factor not found');
+        throw new Error('Email link factor not found');
       }
 
       const { emailAddressId } = emailLinkFactor;
