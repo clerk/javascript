@@ -16,7 +16,6 @@ import {
 import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
 import { allSettled, handleValueOrFn, noop } from '@clerk/shared/utils';
 import type {
-  __experimental_CheckoutInstance,
   __experimental_CheckoutOptions,
   __internal_CheckoutProps,
   __internal_OAuthConsentProps,
@@ -30,6 +29,7 @@ import type {
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
+  CheckoutSignalValue,
   Clerk as ClerkInterface,
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
@@ -351,9 +351,9 @@ export class Clerk implements ClerkInterface {
     return Clerk._apiKeys;
   }
 
-  __experimental_checkout(options: __experimental_CheckoutOptions): __experimental_CheckoutInstance {
+  __experimental_checkout(options: __experimental_CheckoutOptions): CheckoutSignalValue {
     if (!this._checkout) {
-      this._checkout = params => createCheckoutInstance(this, params);
+      this._checkout = (params: any) => createCheckoutInstance(this, params);
     }
     return this._checkout(options);
   }
