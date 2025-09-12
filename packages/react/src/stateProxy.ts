@@ -1,5 +1,12 @@
 import { inBrowser } from '@clerk/shared/browser';
-import type { Errors, State } from '@clerk/types';
+import type {
+  __experimental_CheckoutInstance,
+  Clerk,
+  CommerceSubscriptionPlanPeriod,
+  Errors,
+  ForPayerType,
+  State,
+} from '@clerk/types';
 
 import { errorThrower } from './errors/errorThrower';
 import type { IsomorphicClerk } from './isomorphicClerk';
@@ -21,6 +28,12 @@ const defaultErrors = (): Errors => ({
   global: null,
 });
 
+type CheckoutSignalProps = {
+  for?: ForPayerType;
+  planPeriod: CommerceSubscriptionPlanPeriod;
+  planId: string;
+};
+
 export class StateProxy implements State {
   constructor(private isomorphicClerk: IsomorphicClerk) {}
 
@@ -32,6 +45,10 @@ export class StateProxy implements State {
   }
   signUpSignal() {
     return this.signUpSignalProxy;
+  }
+
+  checkoutSignal(params: CheckoutSignalProps) {
+    return this.buildCheckoutProxy(params);
   }
 
   private buildSignInProxy() {
@@ -103,6 +120,81 @@ export class StateProxy implements State {
     };
   }
 
+  // private buildCheckoutProxy(params: CheckoutSignalProps) {
+  //   const gateProperty = this.gateProperty.bind(this);
+  //   const gateMethod = this.gateMethod.bind(this);
+  //   const target = () => this.checkout(params).getState();
+
+  //   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  //   const targetCheckout = () => this.checkout(params).getState().checkout!;
+  //   const targetMethods = () => this.checkout(params);
+
+  //   return {
+  //     error: null,
+  //     fetchStatus: 'idle' as const,
+  //     getState: gateMethod(targetMethods, 'getState'),
+  //     subscribe: gateMethod(targetMethods, 'subscribe'),
+  //     checkout: {
+  //       get status() {
+  //         return gateProperty(target, 'status', 'needs_initialization');
+  //       },
+  //       get isStarting() {
+  //         return gateProperty(target, 'isStarting', false);
+  //       },
+  //       get isConfirming() {
+  //         return gateProperty(target, 'isConfirming', false);
+  //       },
+  //       get externalClientSecret() {
+  //         // @ts-expect-error
+  //         return gateProperty(targetCheckout, 'externalClientSecret', null);
+  //       },
+  //       get externalGatewayId() {
+  //         // @ts-expect-error
+  //         return gateProperty(targetCheckout, 'externalGatewayId', null);
+  //       },
+  //       get paymentSource() {
+  //         return gateProperty(targetCheckout, 'paymentSource', undefined);
+  //       },
+  //       get plan() {
+  //         // @ts-expect-error
+  //         return gateProperty(targetCheckout, 'plan', null);
+  //       },
+  //       get planPeriod() {
+  //         // @ts-expect-error
+  //         return gateProperty(targetCheckout, 'planPeriod', null);
+  //       },
+
+  //       start: gateMethod(targetMethods, 'start'),
+  //       confirm: gateMethod(targetMethods, 'confirm'),
+  //       clear: gateMethod(targetMethods, 'clear'),
+  //       finalize: gateMethod(targetMethods, 'finalize'),
+  //     },
+  //   };
+  // }
+
+  private buildCheckoutProxy(params: CheckoutSignalProps): __experimental_CheckoutInstance {
+    const gateAsyncMethod = this.gateMethod.bind(this);
+    const gateListenerMethod = this.gateListenerMethod.bind(this);
+    const target = () => this.checkout(params);
+    const gateSyncMethod = this.gateSyncMethod.bind(this);
+
+    return {
+      confirm: gateAsyncMethod(target, 'confirm'),
+      start: gateAsyncMethod(target, 'start'),
+      clear: gateAsyncMethod(target, 'clear'),
+      finalize: gateAsyncMethod(target, 'finalize'),
+      subscribe: gateListenerMethod(target, 'subscribe'),
+      getState: gateSyncMethod(target, 'getState', {
+        isStarting: false,
+        isConfirming: false,
+        error: null,
+        checkout: null,
+        fetchStatus: 'idle',
+        status: 'needs_initialization',
+      }),
+    };
+  }
+
   __internal_effect(_: () => void): () => void {
     throw new Error('__internal_effect called before Clerk is loaded');
   }
@@ -115,6 +207,12 @@ export class StateProxy implements State {
     if (!c) {
       throw new Error('Clerk client not ready');
     }
+    return c;
+  }
+
+  private get checkout(): Clerk['__experimental_checkout'] {
+    const c = this.isomorphicClerk.__experimental_checkout as Clerk['__experimental_checkout'];
+    if (!c) throw new Error('Clerk checkout not ready');
     return c;
   }
 
@@ -140,6 +238,41 @@ export class StateProxy implements State {
       const t = getTarget();
       return (t[key] as (...args: Parameters<F>) => ReturnType<F>).apply(t, args);
     }) as F;
+  }
+
+  private gateListenerMethod<T extends object, K extends keyof T>(
+    getTarget: () => T,
+    key: T[K] extends (...args: any[]) => void ? K : never,
+  ): T[K] {
+    // This method should only be used with keys that point to void-returning functions
+    type F = Extract<T[K], (...args: any[]) => void>;
+    return ((...args: Parameters<F>) => {
+      const resolve = () => {
+        const t = getTarget();
+        return (t[key] as F)(...args);
+      };
+
+      if (!this.isomorphicClerk.loaded) {
+        this.isomorphicClerk.addOnLoaded(resolve);
+        return;
+      }
+
+      resolve();
+    }) as T[K];
+  }
+
+  private gateSyncMethod<
+    T extends object,
+    K extends keyof T & string,
+    Fun extends Extract<T[K], (...args: unknown[]) => unknown>,
+  >(getTarget: () => T, key: K, defaultValue: ReturnType<Fun>) {
+    return ((...args: Parameters<Fun>): ReturnType<Fun> => {
+      if (!this.isomorphicClerk.loaded) {
+        return defaultValue;
+      }
+      const t = getTarget();
+      return (t[key] as (...args: Parameters<Fun>) => ReturnType<Fun>).apply(t, args);
+    }) as Fun;
   }
 
   private wrapMethods<T extends object, K extends readonly (keyof T & string)[]>(
