@@ -114,7 +114,7 @@ export function SubscriptionsList({
               t => ({
                 justifyContent: 'start',
                 height: t.sizes.$8,
-                width: isManageButtonVisible ? 'unset' : undefined,
+                width: 'auto',
               }),
             ]}
             leftIcon={subscriptionItems.length > 0 ? ArrowsUpDown : Plus}
@@ -135,7 +135,7 @@ export function SubscriptionsList({
               t => ({
                 justifyContent: 'start',
                 height: t.sizes.$8,
-                width: 'unset',
+                width: 'auto',
               }),
             ]}
             rightIcon={null}
