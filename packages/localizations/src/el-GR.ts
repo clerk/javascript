@@ -250,6 +250,7 @@ export const elGR: LocalizationResource = {
     action__signOut: 'Αποσύνδεση',
     title: 'Είστε συνδεδεμένος ως {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Τελευταία χρήση',
   maintenanceMode: undefined,
   membershipRole__admin: 'Διαχειριστής',
   membershipRole__basicMember: 'Μέλος',
@@ -316,6 +317,7 @@ export const elGR: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1001,6 +1003,7 @@ export const elGR: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,

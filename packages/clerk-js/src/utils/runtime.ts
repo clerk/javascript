@@ -7,7 +7,9 @@ export function inActiveBrowserTab() {
 }
 
 export function inIframe() {
-  if (!inBrowser()) return false;
+  if (!inBrowser()) {
+    return false;
+  }
 
   try {
     // checks if the current window is an iframe

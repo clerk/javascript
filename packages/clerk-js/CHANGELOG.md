@@ -1,5 +1,32 @@
 # Change Log
 
+## 5.92.1
+
+### Patch Changes
+
+- Hides the subscription "Manage" button when no subscription items exist instead of the subscription itself being absent. ([#6734](https://github.com/clerk/javascript/pull/6734)) by [@panteliselef](https://github.com/panteliselef)
+
+## 5.92.0
+
+### Minor Changes
+
+- Introduce "Last Used" functionality to Sign In and Up ([#6722](https://github.com/clerk/javascript/pull/6722)) by [@tmilewski](https://github.com/tmilewski)
+
+### Patch Changes
+
+- Change placement of the manage subscription button inside `<UserProfile/>` and `<OrganizationProfile/>` ([#6428](https://github.com/clerk/javascript/pull/6428)) by [@panteliselef](https://github.com/panteliselef)
+
+- Do not trigger organization roles query when the current user's membership lacks the required permissions (`org:sys_memberships:read` or `org:sys_memberships:manage`). ([#6703](https://github.com/clerk/javascript/pull/6703)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  This fixes an issue where the `OrganizationSwitcher` component was making unnecessary API calls to fetch roles, resulting in HTTP 403 errors.
+
+- Update search icon, payment source icon, and user preview identifier colors. ([#6697](https://github.com/clerk/javascript/pull/6697)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`55490c3`](https://github.com/clerk/javascript/commit/55490c31fadc82bdca6cd5f2b22e5e158aaba0cb), [`f689d99`](https://github.com/clerk/javascript/commit/f689d990117383b3f9e5417298dae39a20053cbf), [`e8d21de`](https://github.com/clerk/javascript/commit/e8d21de39b591973dad48fc1d1851c4d28b162fe), [`637f2e8`](https://github.com/clerk/javascript/commit/637f2e8768b76aaf756062b6b5b44bf651f66789), [`465369b`](https://github.com/clerk/javascript/commit/465369bba2a545304649666c4e1714b9a904c948)]:
+  - @clerk/localizations@3.25.0
+  - @clerk/types@4.85.0
+  - @clerk/shared@3.24.2
+
 ## 5.91.2
 
 ### Patch Changes

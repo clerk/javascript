@@ -15,6 +15,7 @@ import type {
 import type { CommerceSettingsJSON } from './commerceSettings';
 import type { DisplayConfigJSON } from './displayConfig';
 import type { EnterpriseProtocol, EnterpriseProvider } from './enterpriseAccount';
+import type { EmailAddressIdentifier, UsernameIdentifier } from './identifiers';
 import type { ActClaim } from './jwtv2';
 import type { OAuthProvider } from './oauth';
 import type { OrganizationDomainVerificationStatus, OrganizationEnrollmentMode } from './organizationDomain';
@@ -29,6 +30,14 @@ import type { SessionVerificationLevel, SessionVerificationStatus } from './sess
 import type { SignInJSON } from './signIn';
 import type { SignInFirstFactor, SignInSecondFactor } from './signInCommon';
 import type { SignUpField, SignUpIdentificationField, SignUpStatus } from './signUpCommon';
+import type {
+  EmailCodeStrategy,
+  EmailLinkStrategy,
+  OAuthStrategy,
+  PasswordStrategy,
+  PhoneCodeStrategy,
+  Web3Strategy,
+} from './strategies';
 import type { BoxShadow, Color, EmUnit, FontWeight, HexColor } from './theme';
 import type { UserSettingsJSON } from './userSettings';
 import type { CamelToSnake } from './utils';
@@ -82,6 +91,16 @@ export interface EnvironmentJSON extends ClerkResourceJSON {
   user_settings: UserSettingsJSON;
 }
 
+export type LastAuthenticationStrategy =
+  | EmailAddressIdentifier
+  | EmailCodeStrategy
+  | EmailLinkStrategy
+  | PhoneCodeStrategy
+  | PasswordStrategy
+  | UsernameIdentifier
+  | OAuthStrategy
+  | Web3Strategy;
+
 export interface ClientJSON extends ClerkResourceJSON {
   object: 'client';
   id: string;
@@ -90,6 +109,7 @@ export interface ClientJSON extends ClerkResourceJSON {
   sign_in: SignInJSON | null;
   captcha_bypass?: boolean; // this is used by the @clerk/testing package
   last_active_session_id: string | null;
+  last_authentication_strategy: LastAuthenticationStrategy | null;
   cookie_expires_at: number | null;
   created_at: number;
   updated_at: number;

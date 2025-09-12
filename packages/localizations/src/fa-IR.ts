@@ -255,6 +255,7 @@ export const faIR: LocalizationResource = {
     action__signOut: 'خروج',
     title: 'با نام کاربری {{identifier}} وارد سیستم شدم',
   },
+  lastAuthenticationStrategy: 'آخرین استفاده',
   maintenanceMode: 'در حال حاضر در حال تعمیر و نگهداری هستیم، اما نگران نباشید، نباید بیشتر از چند دقیقه طول بکشد.',
   membershipRole__admin: 'مدیر',
   membershipRole__basicMember: 'عضو',
@@ -322,6 +323,7 @@ export const faIR: LocalizationResource = {
         totalPaid: 'کل پرداختی',
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'در یک طرح مشترک شوید',
         actionLabel__switchPlan: 'تغییر طرح',
         tableHeader__edit: undefined,
@@ -1006,6 +1008,7 @@ export const faIR: LocalizationResource = {
         totalPaid: 'کل پرداختی',
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'در یک طرح مشترک شوید',
         actionLabel__switchPlan: 'تغییر طرح',
         tableHeader__edit: 'ویرایش',

@@ -249,6 +249,7 @@ export const msMY: LocalizationResource = {
     action__signOut: 'Daftar keluar',
     title: 'Didaftarkan sebagai {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Terakhir digunakan',
   maintenanceMode:
     'Kami sedang menjalani penyelenggaraan, tetapi jangan risau, ini tidak sepatutnya mengambil masa lebih daripada beberapa minit.',
   membershipRole__admin: 'Pentadbir',
@@ -317,6 +318,7 @@ export const msMY: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1011,6 +1013,7 @@ export const msMY: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,

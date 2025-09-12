@@ -13,7 +13,7 @@
 import type { LocalizationResource } from '@clerk/types';
 
 export const nlBE: LocalizationResource = {
-  locale: 'nl-NL',
+  locale: 'nl-BE',
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
@@ -249,6 +249,7 @@ export const nlBE: LocalizationResource = {
     action__signOut: 'Uitloggen',
     title: 'Ingelogd als {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Laatst gebruikt',
   maintenanceMode: 'Onderhoudsmodus',
   membershipRole__admin: 'Beheerder',
   membershipRole__basicMember: 'Lid',
@@ -315,6 +316,7 @@ export const nlBE: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -995,6 +997,7 @@ export const nlBE: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,

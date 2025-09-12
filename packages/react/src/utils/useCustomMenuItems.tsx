@@ -15,7 +15,10 @@ import { isThatComponent } from './componentValidation';
 import type { UseCustomElementPortalParams, UseCustomElementPortalReturn } from './useCustomElementPortal';
 import { useCustomElementPortal } from './useCustomElementPortal';
 
-export const useUserButtonCustomMenuItems = (children: React.ReactNode | React.ReactNode[]) => {
+export const useUserButtonCustomMenuItems = (
+  children: React.ReactNode | React.ReactNode[],
+  options?: { allowForAnyChildren?: boolean },
+) => {
   const reorderItemsLabels = ['manageAccount', 'signOut'];
   return useCustomMenuItems({
     children,
@@ -25,6 +28,7 @@ export const useUserButtonCustomMenuItems = (children: React.ReactNode | React.R
     MenuLinkComponent: MenuLink,
     UserProfileLinkComponent: UserProfileLink,
     UserProfilePageComponent: UserProfilePage,
+    allowForAnyChildren: options?.allowForAnyChildren ?? false,
   });
 };
 
@@ -36,6 +40,7 @@ type UseCustomMenuItemsParams = {
   UserProfileLinkComponent?: any;
   UserProfilePageComponent?: any;
   reorderItemsLabels: string[];
+  allowForAnyChildren?: boolean;
 };
 
 type CustomMenuItemType = UserButtonActionProps | UserButtonLinkProps;
@@ -48,6 +53,7 @@ const useCustomMenuItems = ({
   UserProfileLinkComponent,
   UserProfilePageComponent,
   reorderItemsLabels,
+  allowForAnyChildren = false,
 }: UseCustomMenuItemsParams) => {
   const validChildren: CustomMenuItemType[] = [];
   const customMenuItems: CustomMenuItem[] = [];
@@ -59,7 +65,7 @@ const useCustomMenuItems = ({
       !isThatComponent(child, UserProfileLinkComponent) &&
       !isThatComponent(child, UserProfilePageComponent)
     ) {
-      if (child) {
+      if (child && !allowForAnyChildren) {
         logErrorInDevMode(userButtonIgnoredComponent);
       }
       return;

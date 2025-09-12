@@ -254,6 +254,7 @@ export const viVN: LocalizationResource = {
     action__signOut: 'Đăng xuất',
     title: 'Đăng nhập với {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Lần sử dụng cuối cùng',
   maintenanceMode: 'Chúng tôi đang trong quá trình bảo trì, nhưng đừng lo lắng, nó không nên mất quá nhiều thời gian.',
   membershipRole__admin: 'Quản trị viên',
   membershipRole__basicMember: 'Thành viên',
@@ -321,6 +322,7 @@ export const viVN: LocalizationResource = {
         totalPaid: 'Tổng thanh toán',
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'Đăng ký gói',
         actionLabel__switchPlan: 'Chuyển gói',
         tableHeader__edit: 'Sửa',
@@ -1003,6 +1005,7 @@ export const viVN: LocalizationResource = {
         totalPaid: 'Tổng thanh toán',
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'Đăng ký gói',
         actionLabel__switchPlan: 'Chuyển gói',
         tableHeader__edit: 'Sửa',

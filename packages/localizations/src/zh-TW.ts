@@ -248,6 +248,7 @@ export const zhTW: LocalizationResource = {
     action__signOut: '登出',
     title: '以 {{identifier}} 身份登入',
   },
+  lastAuthenticationStrategy: '上次使用',
   maintenanceMode: undefined,
   membershipRole__admin: '管理員',
   membershipRole__basicMember: '成員',
@@ -314,6 +315,7 @@ export const zhTW: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -977,6 +979,7 @@ export const zhTW: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,

@@ -250,6 +250,7 @@ export const bgBG: LocalizationResource = {
     action__signOut: 'Изход',
     title: 'Влезли сте като {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Последно използвано',
   maintenanceMode: 'Режим на поддръжка',
   membershipRole__admin: 'Админ',
   membershipRole__basicMember: 'Член',
@@ -316,6 +317,7 @@ export const bgBG: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -994,6 +996,7 @@ export const bgBG: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,

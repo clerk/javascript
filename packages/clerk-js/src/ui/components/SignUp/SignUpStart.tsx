@@ -187,7 +187,9 @@ function SignUpStartInternal(): JSX.Element {
         // This is necessary because there's a brief delay between initiating the SSO flow
         // and the actual redirect to the external Identity Provider
         const isRedirectingToSSOProvider = signUp.missingFields.some(mf => mf === 'saml' || mf === 'enterprise_sso');
-        if (isRedirectingToSSOProvider) return;
+        if (isRedirectingToSSOProvider) {
+          return;
+        }
 
         status.setIdle();
         card.setIdle();
