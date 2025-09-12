@@ -8,7 +8,7 @@ Example:
 
 ```ts
 clerkClient.machines.list({
-  ...,
+  ...params,
   orderBy: 'name'
 })
 ```
