@@ -43,6 +43,17 @@ type GetMachineListParams = {
   query?: string;
 };
 
+type RotateMachineSecretKeyParams = {
+  /**
+   * The ID of the machine to rotate the secret key for.
+   */
+  machineId: string;
+  /**
+   * The time in seconds that the previous secret key will remain valid after rotation.
+   */
+  previousTokenTtl: number;
+};
+
 export class MachineApi extends AbstractAPI {
   async get(machineId: string) {
     this.requireId(machineId);
@@ -91,6 +102,18 @@ export class MachineApi extends AbstractAPI {
     return this.request<MachineSecretKey>({
       method: 'GET',
       path: joinPaths(basePath, machineId, 'secret_key'),
+    });
+  }
+
+  async rotateSecretKey(params: RotateMachineSecretKeyParams) {
+    const { machineId, previousTokenTtl } = params;
+    this.requireId(machineId);
+    return this.request<MachineSecretKey>({
+      method: 'POST',
+      path: joinPaths(basePath, machineId, 'secret_key', 'rotate'),
+      bodyParams: {
+        previousTokenTtl,
+      },
     });
   }
 
