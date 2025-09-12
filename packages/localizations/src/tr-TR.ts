@@ -249,6 +249,7 @@ export const trTR: LocalizationResource = {
     action__signOut: 'Çıkış yap',
     title: '{{identifier}} olarak giriş yapıldı',
   },
+  lastAuthenticationStrategy: 'Son kullanılan',
   maintenanceMode: 'Şu anda bakımdayız, ancak endişelenmeyin, kısa bir süre içinde tamamlanacaktır.',
   membershipRole__admin: 'Yönetici',
   membershipRole__basicMember: 'Üye',
@@ -315,6 +316,7 @@ export const trTR: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -999,6 +1001,7 @@ export const trTR: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,

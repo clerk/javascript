@@ -252,6 +252,7 @@ export const esMX: LocalizationResource = {
     action__signOut: 'Cerrar',
     title: 'Registrado como {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Último uso',
   maintenanceMode: 'Actualmente estamos en mantenimiento, pero no te preocupes, no debería llevar más de unos minutos.',
   membershipRole__admin: 'Administrador',
   membershipRole__basicMember: 'Miembro',
@@ -318,6 +319,7 @@ export const esMX: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1007,6 +1009,7 @@ export const esMX: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,

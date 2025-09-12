@@ -1,7 +1,10 @@
 import type { User } from '@clerk/backend';
+import type { PendingSessionOptions } from '@clerk/types';
 
 import { clerkClient } from '../../server/clerkClient';
 import { auth } from './auth';
+
+type CurrentUserOptions = PendingSessionOptions;
 
 /**
  * The `currentUser` helper returns the [Backend User](https://clerk.com/docs/references/backend/types/backend-user) object of the currently active user. It can be used in Server Components, Route Handlers, and Server Actions.
@@ -24,11 +27,11 @@ import { auth } from './auth';
  * }
  * ```
  */
-export async function currentUser(): Promise<User | null> {
+export async function currentUser(opts?: CurrentUserOptions): Promise<User | null> {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   require('server-only');
 
-  const { userId } = await auth();
+  const { userId } = await auth({ treatPendingAsSignedOut: opts?.treatPendingAsSignedOut });
   if (!userId) {
     return null;
   }

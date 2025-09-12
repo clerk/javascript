@@ -8,8 +8,6 @@ import type {
   CommercePlanResource,
   CommerceStatementJSON,
   CommerceStatementResource,
-  CommerceSubscriptionItemJSON,
-  CommerceSubscriptionItemResource,
   CommerceSubscriptionJSON,
   CommerceSubscriptionResource,
   CreateCheckoutParams,
@@ -17,7 +15,6 @@ import type {
   GetPlansParams,
   GetStatementsParams,
   GetSubscriptionParams,
-  GetSubscriptionsParams,
 } from '@clerk/types';
 
 import { convertPageToOffsetSearchParams } from '../../../utils/convertPageToOffsetSearchParams';
@@ -28,7 +25,6 @@ import {
   CommercePlan,
   CommerceStatement,
   CommerceSubscription,
-  CommerceSubscriptionItem,
 } from '../../resources/internal';
 
 export class CommerceBilling implements CommerceBillingNamespace {
@@ -63,26 +59,6 @@ export class CommerceBilling implements CommerceBillingNamespace {
       path: params.orgId ? `/organizations/${params.orgId}/commerce/subscription` : `/me/commerce/subscription`,
       method: 'GET',
     }).then(res => new CommerceSubscription(res?.response as CommerceSubscriptionJSON));
-  };
-
-  getSubscriptions = async (
-    params: GetSubscriptionsParams,
-  ): Promise<ClerkPaginatedResponse<CommerceSubscriptionItemResource>> => {
-    const { orgId, ...rest } = params;
-
-    return await BaseResource._fetch({
-      path: orgId ? `/organizations/${orgId}/commerce/subscriptions` : `/me/commerce/subscriptions`,
-      method: 'GET',
-      search: convertPageToOffsetSearchParams(rest),
-    }).then(res => {
-      const { data: subscriptions, total_count } =
-        res?.response as unknown as ClerkPaginatedResponse<CommerceSubscriptionItemJSON>;
-
-      return {
-        total_count,
-        data: subscriptions.map(subscription => new CommerceSubscriptionItem(subscription)),
-      };
-    });
   };
 
   getStatements = async (params: GetStatementsParams): Promise<ClerkPaginatedResponse<CommerceStatementResource>> => {

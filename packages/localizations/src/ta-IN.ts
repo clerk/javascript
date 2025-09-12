@@ -250,6 +250,7 @@ export const taIN: LocalizationResource = {
     action__signOut: 'வெளியேறு',
     title: '{{identifier}} ஆக உள்நுழைந்துள்ளீர்கள்',
   },
+  lastAuthenticationStrategy: 'கடைசியாகப் பயன்படுத்தியது',
   maintenanceMode: 'தற்போது நாங்கள் பராமரிப்பில் உள்ளோம், ஆனால் கவலைப்பட வேண்டாம், இது சில நிமிடங்களுக்கு மேல் ஆகாது.',
   membershipRole__admin: 'நிர்வாகி',
   membershipRole__basicMember: 'உறுப்பினர்',
@@ -317,6 +318,7 @@ export const taIN: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1012,6 +1014,7 @@ export const taIN: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,

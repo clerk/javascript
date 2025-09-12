@@ -257,6 +257,7 @@ export const itIT: LocalizationResource = {
     action__signOut: 'Disconnetti',
     title: 'Accesso tramite {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Ultimo utilizzo',
   maintenanceMode: 'Modalità di manutenzione',
   membershipRole__admin: 'Amministratore',
   membershipRole__basicMember: 'Utente',
@@ -324,6 +325,7 @@ export const itIT: LocalizationResource = {
         totalPaid: 'Totale pagato',
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'Abbonati a un piano',
         actionLabel__switchPlan: 'Cambia piano',
         tableHeader__edit: 'Modifica',
@@ -1005,6 +1007,7 @@ export const itIT: LocalizationResource = {
         totalPaid: 'Totale pagato',
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'Abbonati a un piano',
         actionLabel__switchPlan: 'Cambia piano',
         tableHeader__edit: 'Modifica',

@@ -250,6 +250,7 @@ export const koKR: LocalizationResource = {
     action__signOut: '로그아웃',
     title: '{{identifier}}로 로그인했습니다',
   },
+  lastAuthenticationStrategy: '최근 사용',
   maintenanceMode: undefined,
   membershipRole__admin: '관리자',
   membershipRole__basicMember: '멤버',
@@ -316,6 +317,7 @@ export const koKR: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -988,6 +990,7 @@ export const koKR: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,

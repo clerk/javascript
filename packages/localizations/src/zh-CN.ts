@@ -248,6 +248,7 @@ export const zhCN: LocalizationResource = {
     action__signOut: '退出登录',
     title: '以 {{identifier}} 登录',
   },
+  lastAuthenticationStrategy: '上次使用',
   maintenanceMode: undefined,
   membershipRole__admin: '管理员',
   membershipRole__basicMember: '成员',
@@ -314,6 +315,7 @@ export const zhCN: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -978,6 +980,7 @@ export const zhCN: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
