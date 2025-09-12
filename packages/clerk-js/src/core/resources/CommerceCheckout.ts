@@ -294,7 +294,7 @@ export const createSignals = () => {
     const error = errorSignal().error;
     const fetchStatus = fetchSignal().status;
 
-    console.log('computedSignal', resource, error, fetchStatus);
+    // console.log('computedSignal', resource, error, fetchStatus);
 
     const errors = errorsToParsedErrors(error);
     return { errors: errors, fetchStatus, checkout: resource };
@@ -343,6 +343,14 @@ export class CheckoutFuture implements CheckoutFutureResourceLax {
   }
   get payer() {
     return this.resource.payer;
+  }
+
+  get paymentSource() {
+    return this.resource.paymentSource ?? null;
+  }
+
+  get planPeriodStart() {
+    return this.resource.planPeriodStart;
   }
 
   async start(): Promise<{ error: unknown }> {

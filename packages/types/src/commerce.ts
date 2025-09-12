@@ -1365,7 +1365,7 @@ export interface CheckoutFutureProperties {
   /**
    * The payment source being used for the checkout, such as a credit card or bank account.
    */
-  paymentSource?: RemoveFunctions<CommercePaymentSourceResource>;
+  paymentSource: RemoveFunctions<CommercePaymentSourceResource> | null;
   /**
    * The subscription plan details for the checkout.
    */
@@ -1377,7 +1377,7 @@ export interface CheckoutFutureProperties {
   /**
    * Unix timestamp (milliseconds) of when the current period starts.
    */
-  planPeriodStart?: number;
+  planPeriodStart: number | undefined;
   /**
    * The total costs, taxes, and other pricing details for the checkout.
    */
