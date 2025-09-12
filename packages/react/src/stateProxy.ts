@@ -1,5 +1,6 @@
 import { inBrowser } from '@clerk/shared/browser';
 import type {
+  __experimental_CheckoutInstance,
   CheckoutFutureResource,
   Clerk,
   CommerceSubscriptionPlanPeriod,
@@ -50,6 +51,10 @@ export class StateProxy implements State {
 
   checkoutSignal(params: CheckoutSignalProps) {
     return this.buildCheckoutProxy(params);
+  }
+
+  checkoutSignalV2(params: CheckoutSignalProps) {
+    return this.buildCheckoutProxyV2(params);
   }
 
   private buildSignInProxy() {
@@ -173,12 +178,41 @@ export class StateProxy implements State {
   //   };
   // }
 
-  private buildCheckoutProxy(params: CheckoutSignalProps): NullableCheckoutSignal {
-    const gateProperty = this.gateProperty.bind(this);
-    const target = () => this.checkout(params).checkout as CheckoutFutureResource;
+  private buildCheckoutProxy(params: CheckoutSignalProps): __experimental_CheckoutInstance {
+    const gateAsyncMethod = this.gateMethod.bind(this);
+    const gateListenerMethod = this.gateListenerMethod.bind(this);
+    const target = () => this.checkout(params);
+    const gateSyncMethod = this.gateSyncMethod.bind(this);
 
     return {
-      errors: defaultErrors(),
+      confirm: gateAsyncMethod(target, 'confirm'),
+      start: gateAsyncMethod(target, 'start'),
+      clear: gateAsyncMethod(target, 'clear'),
+      finalize: gateAsyncMethod(target, 'finalize'),
+      subscribe: gateListenerMethod(target, 'subscribe'),
+      getState: gateSyncMethod(target, 'getState', {
+        isStarting: false,
+        isConfirming: false,
+        error: null,
+        checkout: null,
+        fetchStatus: 'idle',
+        status: 'needs_initialization',
+      }),
+    };
+  }
+
+  private buildCheckoutProxyV2(params: CheckoutSignalProps): NullableCheckoutSignal {
+    const gateProperty = this.gateProperty.bind(this);
+    const targetCheckout = () => this.checkoutV2(params);
+
+    console.log('targetCheckout', targetCheckout());
+    const target = () => targetCheckout().checkout as CheckoutFutureResource;
+
+    return {
+      errors: {
+        raw: null,
+        global: null,
+      },
       fetchStatus: 'idle' as const,
       // @ts-expect-error - CheckoutFutureResource is not yet defined
       checkout: {
@@ -213,7 +247,7 @@ export class StateProxy implements State {
           return gateProperty(target, 'payer', null);
         },
 
-        startCheckout: this.gateMethod<ReturnType<typeof target>, 'startCheckout'>(target, 'startCheckout'),
+        start: this.gateMethod<ReturnType<typeof target>, 'start'>(target, 'start'),
         confirm: this.gateMethod<ReturnType<typeof target>, 'confirm'>(target, 'confirm'),
       },
     };
@@ -236,6 +270,12 @@ export class StateProxy implements State {
 
   private get checkout(): Clerk['__experimental_checkout'] {
     const c = this.isomorphicClerk.__experimental_checkout as Clerk['__experimental_checkout'];
+    if (!c) throw new Error('Clerk checkout not ready');
+    return c;
+  }
+
+  private get checkoutV2(): Clerk['__experimental_checkoutV2'] {
+    const c = this.isomorphicClerk.__experimental_checkoutV2 as Clerk['__experimental_checkoutV2'];
     if (!c) throw new Error('Clerk checkout not ready');
     return c;
   }

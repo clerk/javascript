@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/consistent-type-imports */
-import type { CommerceCheckoutResource, EnvironmentResource, ForPayerType } from '@clerk/types';
+import type { CheckoutFutureResource, CommerceCheckoutResource, EnvironmentResource, ForPayerType } from '@clerk/types';
 import type { Stripe, StripeElements } from '@stripe/stripe-js';
 import React, { type PropsWithChildren, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
@@ -140,7 +140,7 @@ type internalStripeAppearance = {
 };
 
 type PaymentElementProviderProps = {
-  checkout?: CommerceCheckoutResource | ReturnType<typeof useCheckout>['checkout'];
+  checkout?: CheckoutFutureResource | CommerceCheckoutResource | ReturnType<typeof useCheckout>['checkout'];
   stripeAppearance?: internalStripeAppearance;
   /**
    * Default to `user` if not provided.

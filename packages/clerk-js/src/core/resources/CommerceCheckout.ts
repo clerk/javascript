@@ -1,7 +1,7 @@
 import { retry } from '@clerk/shared/retry';
 import type {
   CheckoutFutureResourceLax,
-  CheckoutSignal,
+  CheckoutSignalValue,
   CommerceCheckoutJSON,
   CommerceCheckoutResource,
   CommerceCheckoutTotals,
@@ -10,7 +10,7 @@ import type {
   ConfirmCheckoutParams,
   CreateCheckoutParams,
 } from '@clerk/types';
-import { computed, signal } from 'alien-signals';
+import { computed, endBatch, signal, startBatch } from 'alien-signals';
 
 import { unixEpochToDate } from '@/utils/date';
 
@@ -164,21 +164,154 @@ export class CommerceCheckout extends BaseResource implements CommerceCheckoutRe
   };
 }
 
+// export class CheckoutFuture implements CheckoutFutureResourceLax {
+//   private resource = new CommerceCheckout(null);
+//   private readonly config: CreateCheckoutParams;
+//   readonly resourceSignal = signal<{ one: CheckoutFuture | null }>({ one: this });
+//   readonly errorSignal = signal<{ error: unknown }>({ error: null });
+//   readonly fetchSignal = signal<{ status: 'idle' | 'fetching' }>({ status: 'idle' });
+//   // @ts-expect-error - CheckoutSignal is not yet defined
+//   readonly signal: CheckoutSignal = computed(() => {
+//     const resource = this.resourceSignal().one
+//     const error = this.errorSignal().error;
+//     const fetchStatus = this.fetchSignal().status;
+
+//     resource?.confirm.bind(resource)
+//     resource?.start.bind(resource)
+//     return { errors: error, fetchStatus, checkout: resource };
+//   });
+
+//   constructor(config: CreateCheckoutParams) {
+//     this.config = config;
+//   }
+
+//   get status() {
+//     return this.resource.status ?? 'needs_initialization';
+//   }
+
+//   get externalClientSecret() {
+//     return this.resource.externalClientSecret;
+//   }
+
+//   get externalGatewayId() {
+//     return this.resource.externalGatewayId;
+//   }
+
+//   get plan() {
+//     return this.resource.plan;
+//   }
+//   get planPeriod() {
+//     return this.resource.planPeriod;
+//   }
+//   get totals() {
+//     return this.resource.totals;
+//   }
+//   get isImmediatePlanChange() {
+//     return this.resource.isImmediatePlanChange;
+//   }
+//   get freeTrialEndsAt() {
+//     return this.resource.freeTrialEndsAt;
+//   }
+//   get payer() {
+//     return this.resource.payer;
+//   }
+
+//   async start(): Promise<{ error: unknown }> {
+//     return runAsyncResourceTask(this, async () => {
+//       const checkout = (await CommerceCheckout.clerk.billing?.startCheckout(this.config)) as CommerceCheckout;
+//       this.resource = checkout;
+//       this.resourceSignal({ one: this});
+//     });
+//   }
+
+//   async confirm(params: ConfirmCheckoutParams): Promise<{ error: unknown }> {
+//     return runAsyncResourceTask(this, async () => {
+//       await this.resource.confirm(params);
+//       this.resourceSignal({ one: this});
+//     });
+//   }
+// }
+
+// async function runAsyncResourceTask<T>(
+//   source: CheckoutFuture,
+//   task: () => Promise<T>,
+// ): Promise<{ result?: T; error: unknown }> {
+//   console.log('this',source);
+//   source.errorSignal({ error: null });
+//   source.fetchSignal({ status: 'fetching' });
+
+//   try {
+//     const result = await task();
+//     return { result, error: null };
+//   } catch (err) {
+//     source.errorSignal({ error: err });
+//     return { error: err };
+//   } finally {
+//     source.fetchSignal({ status: 'idle' });
+//   }
+// }
+
+function errorsToParsedErrors(error: unknown): CheckoutSignalValue['errors'] {
+  const parsedErrors: CheckoutSignalValue['errors'] = {
+    raw: null,
+    global: null,
+  };
+
+  if (!error) {
+    return parsedErrors;
+  }
+
+  if (!isClerkAPIResponseError(error)) {
+    parsedErrors.raw = [];
+    parsedErrors.global = [];
+    return parsedErrors;
+  }
+
+  error.errors.forEach(error => {
+    if (parsedErrors.raw) {
+      parsedErrors.raw.push(error);
+    } else {
+      parsedErrors.raw = [error];
+    }
+
+    if (parsedErrors.global) {
+      parsedErrors.global.push(error);
+    } else {
+      parsedErrors.global = [error];
+    }
+  });
+
+  return parsedErrors;
+}
+
+export const createSignals = () => {
+  const resourceSignal = signal<{ resource: CheckoutFuture | null }>({ resource: null });
+  const errorSignal = signal<{ error: unknown }>({ error: null });
+  const fetchSignal = signal<{ status: 'idle' | 'fetching' }>({ status: 'idle' });
+  // @ts-expect-error - CheckoutSignal is not yet defined
+  const computedSignal: CheckoutSignal = computed(() => {
+    const resource = resourceSignal().resource;
+    const error = errorSignal().error;
+    const fetchStatus = fetchSignal().status;
+
+    console.log('computedSignal', resource, error, fetchStatus);
+
+    const errors = errorsToParsedErrors(error);
+    return { errors: errors, fetchStatus, checkout: resource };
+  });
+
+  return { resourceSignal, errorSignal, fetchSignal, computedSignal };
+};
+
 export class CheckoutFuture implements CheckoutFutureResourceLax {
   private resource = new CommerceCheckout(null);
   private readonly config: CreateCheckoutParams;
-  readonly resourceSignal = signal<{ resource: CommerceCheckout | null }>({ resource: this.resource });
-  readonly errorSignal = signal<{ error: unknown }>({ error: null });
-  readonly fetchSignal = signal<{ status: 'idle' | 'fetching' }>({ status: 'idle' });
-  readonly signal: CheckoutSignal = computed(() => {
-    const resource = this.resourceSignal().resource;
-    const error = this.errorSignal().error;
-    const fetchStatus = this.fetchSignal().status;
-    return { errors: error, fetchStatus, checkout: resource };
-  });
+  private readonly signals: ReturnType<typeof createSignals>;
 
-  constructor(config: CreateCheckoutParams) {
+  constructor(signals: ReturnType<typeof createSignals>, config: CreateCheckoutParams) {
     this.config = config;
+    this.signals = signals;
+    this.signals.resourceSignal({ resource: this });
   }
 
   get status() {
@@ -212,34 +345,40 @@ export class CheckoutFuture implements CheckoutFutureResourceLax {
     return this.resource.payer;
   }
 
-  async startCheckout(): Promise<{ error: unknown }> {
-    return runAsyncResourceTask(this, async () => {
+  async start(): Promise<{ error: unknown }> {
+    return runAsyncResourceTask(this.signals, async () => {
       const checkout = (await CommerceCheckout.clerk.billing?.startCheckout(this.config)) as CommerceCheckout;
       this.resource = checkout;
+      this.signals.resourceSignal({ resource: this });
     });
   }
 
   async confirm(params: ConfirmCheckoutParams): Promise<{ error: unknown }> {
-    return runAsyncResourceTask(this, async () => {
+    return runAsyncResourceTask(this.signals, async () => {
       await this.resource.confirm(params);
+      this.signals.resourceSignal({ resource: this });
     });
   }
 }
 
 async function runAsyncResourceTask<T>(
-  source: CheckoutFuture,
+  signals: ReturnType<typeof createSignals>,
   task: () => Promise<T>,
 ): Promise<{ result?: T; error: unknown }> {
-  source.errorSignal({ error: null });
-  source.fetchSignal({ status: 'fetching' });
-
+  startBatch();
+  signals.errorSignal({ error: null });
+  signals.fetchSignal({ status: 'fetching' });
+  endBatch();
+  startBatch();
   try {
     const result = await task();
     return { result, error: null };
   } catch (err) {
-    source.errorSignal({ error: err });
+    signals.errorSignal({ error: err });
+    endBatch();
     return { error: err };
   } finally {
-    source.fetchSignal({ status: 'idle' });
+    signals.fetchSignal({ status: 'idle' });
+    endBatch();
   }
 }

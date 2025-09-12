@@ -1,6 +1,6 @@
 import {
   __experimental_CheckoutProvider as CheckoutProvider,
-  __experimental_useCheckout as useCheckout,
+  __experimental_useCheckoutV2 as useCheckout,
 } from '@clerk/shared/react';
 import { useEffect, useMemo } from 'react';
 
@@ -9,9 +9,11 @@ import { useCheckoutContext } from '@/ui/contexts/components';
 const Initiator = () => {
   const { checkout } = useCheckout();
 
+  // const { start } = checkout;
+
   useEffect(() => {
     void checkout.start();
-    return checkout.clear;
+    // return checkout.clear;
   }, []);
   return null;
 };
@@ -56,14 +58,13 @@ const FetchStatus = ({
   status,
 }: {
   children: React.ReactNode;
-  status: 'idle' | 'fetching' | 'error' | 'invalid_plan_change' | 'missing_payer_email';
+  status: 'idle' | 'fetching' | 'generic_error' | 'invalid_plan_change' | 'missing_payer_email';
 }) => {
-  const { checkout } = useCheckout();
-  const { fetchStatus, error } = checkout;
+  const { errors, fetchStatus } = useCheckout();
 
   const internalFetchStatus = useMemo(() => {
-    if (fetchStatus === 'error') {
-      const errorCodes = error.errors.map(e => e.code);
+    if (errors.global) {
+      const errorCodes = errors.global.map(e => e.code);
 
       if (errorCodes.includes('missing_payer_email')) {
         return 'missing_payer_email';
@@ -72,6 +73,8 @@ const FetchStatus = ({
       if (errorCodes.includes('invalid_plan_change')) {
         return 'invalid_plan_change';
       }
+
+      return 'generic_error';
     }
 
     return fetchStatus;

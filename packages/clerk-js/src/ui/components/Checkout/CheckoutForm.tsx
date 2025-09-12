@@ -1,4 +1,4 @@
-import { __experimental_useCheckout as useCheckout } from '@clerk/shared/react';
+import { __experimental_useCheckoutV2 as useCheckout } from '@clerk/shared/react';
 import type { CommerceMoneyAmount, CommercePaymentSourceResource, ConfirmCheckoutParams } from '@clerk/types';
 import { useMemo, useState } from 'react';
 
@@ -138,10 +138,9 @@ export const CheckoutForm = withCardStateProvider(() => {
 const useCheckoutMutations = () => {
   const { for: _for, onSubscriptionComplete } = useCheckoutContext();
   const { checkout } = useCheckout();
-  const { status, confirm } = checkout;
   const card = useCardState();
 
-  if (status !== 'needs_confirmation') {
+  if (checkout.status !== 'needs_confirmation') {
     throw new Error('Checkout not found');
   }
 
@@ -149,11 +148,12 @@ const useCheckoutMutations = () => {
     card.setLoading();
     card.setError(undefined);
 
-    const { data, error } = await confirm(params);
+    const { error } = await checkout.confirm(params);
 
     if (error) {
+      // @ts-expect-error - error is not an Error
       handleError(error, [], card.setError);
-    } else if (data) {
+    } else {
       onSubscriptionComplete?.();
     }
     card.setIdle();
@@ -348,6 +348,7 @@ const ExistingPaymentSourceForm = withCardStateProvider(
     const { payWithExistingPaymentSource } = useCheckoutMutations();
     const card = useCardState();
     const [selectedPaymentSource, setSelectedPaymentSource] = useState<CommercePaymentSourceResource | undefined>(
+      // @ts-expect-error - paymentSource is missing functions
       paymentSource || paymentSources.find(p => p.isDefault),
     );
 

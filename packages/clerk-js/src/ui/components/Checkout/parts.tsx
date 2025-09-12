@@ -1,4 +1,4 @@
-import { __experimental_useCheckout as useCheckout } from '@clerk/shared/react';
+import { __experimental_useCheckoutV2 as useCheckout } from '@clerk/shared/react';
 import { useMemo } from 'react';
 
 import { Alert } from '@/ui/elements/Alert';
@@ -10,7 +10,7 @@ import { Box, descriptors, Flex, localizationKeys, useLocalizations } from '../.
 import { EmailForm } from '../UserProfile/EmailForm';
 
 export const GenericError = () => {
-  const { checkout } = useCheckout();
+  const { errors } = useCheckout();
 
   const { translateError } = useLocalizations();
   const { t } = useLocalizations();
@@ -29,8 +29,8 @@ export const GenericError = () => {
           variant='danger'
           colorScheme='danger'
         >
-          {checkout.error
-            ? translateError(checkout.error.errors[0])
+          {errors.global
+            ? translateError(errors.global[0])
             : t(localizationKeys('unstable__errors.form_param_value_invalid'))}
         </Alert>
       </Flex>
@@ -40,18 +40,19 @@ export const GenericError = () => {
 
 export const InvalidPlanScreen = () => {
   const { planPeriod } = useCheckoutContext();
-  const { checkout } = useCheckout();
-  const error = checkout.error;
+  const { errors } = useCheckout();
 
   const planFromError = useMemo(() => {
-    const _error = error?.errors.find(e => e.code === 'invalid_plan_change');
+    const _error = errors?.global?.find(e => e.code === 'invalid_plan_change');
+    // @ts-expect-error - meta is not yet defined
     return _error?.meta?.plan;
-  }, [error]);
+  }, [errors.global]);
 
   const isPlanUpgradePossible = useMemo(() => {
-    const _error = error?.errors.find(e => e.code === 'invalid_plan_change');
+    const _error = errors?.global?.find(e => e.code === 'invalid_plan_change');
+    // @ts-expect-error - meta is not yet defined
     return _error?.meta?.isPlanUpgradePossible || false;
-  }, [error]);
+  }, [errors.global]);
 
   if (!planFromError) {
     return null;

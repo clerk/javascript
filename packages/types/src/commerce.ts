@@ -1423,7 +1423,7 @@ export type CheckoutFutureResource = CheckoutPropertiesPerStatus & {
    * <ClerkProvider clerkJsVersion="x.x.x" />
    * ```
    */
-  startCheckout: (params: CreateCheckoutParams) => Promise<{ error: unknown }>;
+  start: () => Promise<{ error: unknown }>;
 };
 
 export type CheckoutFutureResourceLax = CheckoutFutureProperties & {
@@ -1442,5 +1442,5 @@ export type CheckoutFutureResourceLax = CheckoutFutureProperties & {
    * <ClerkProvider clerkJsVersion="x.x.x" />
    * ```
    */
-  startCheckout: (params: CreateCheckoutParams) => Promise<{ error: unknown }>;
+  start: () => Promise<{ error: unknown }>;
 };

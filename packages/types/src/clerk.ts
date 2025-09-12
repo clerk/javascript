@@ -55,7 +55,7 @@ import type { SessionVerificationLevel } from './sessionVerification';
 import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
 import type { ClientJSONSnapshot, EnvironmentJSONSnapshot } from './snapshots';
-import type { State } from './state';
+import type { FieldError, State } from './state';
 import type { Web3Strategy } from './strategies';
 import type { TelemetryCollector } from './telemetry';
 import type { UserResource } from './user';
@@ -66,11 +66,11 @@ interface GlobalErrors {
   /**
    * The raw, unparsed errors from the Clerk API.
    */
-  raw: unknown[] | null;
+  raw: FieldError[] | null;
   /**
    * Parsed errors that are not related to any specific field.
    */
-  global: unknown[] | null; // does not include any errors that could be parsed as a field error
+  global: FieldError[] | null; // does not include any errors that could be parsed as a field error
 }
 
 /**
@@ -135,7 +135,9 @@ export type __experimental_CheckoutInstance = {
   getState: () => __experimental_CheckoutCacheState;
 };
 
-type __experimental_CheckoutFunction = (options: __experimental_CheckoutOptions) => NullableCheckoutSignal;
+type __experimental_CheckoutFunction = (options: __experimental_CheckoutOptions) => __experimental_CheckoutInstance;
+
+type __experimental_CheckoutFunctionV2 = (options: __experimental_CheckoutOptions) => NullableCheckoutSignal;
 
 /**
  * @inline
@@ -922,6 +924,13 @@ export interface Clerk {
    * This API is in early access and may change in future releases.
    */
   __experimental_checkout: __experimental_CheckoutFunction;
+
+  /**
+   * Checkout API V2
+   * @experimental
+   * This API is in early access and may change in future releases.
+   */
+  __experimental_checkoutV2: __experimental_CheckoutFunctionV2;
 }
 
 export type HandleOAuthCallbackParams = TransferableOption &
