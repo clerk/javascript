@@ -1,5 +1,34 @@
 # Change Log
 
+## 2.14.0
+
+### Minor Changes
+
+- Adds the ability to create bulk invitations with `.createInvitationBulk([{...}])` ([#6751](https://github.com/clerk/javascript/pull/6751)) by [@tmilewski](https://github.com/tmilewski)
+
+- Add lastAuthenticationStrategy to API resources ([#6748](https://github.com/clerk/javascript/pull/6748)) by [@tmilewski](https://github.com/tmilewski)
+
+### Patch Changes
+
+- Align create params for Invitation and OrganizationInvitation with backend API ([#6750](https://github.com/clerk/javascript/pull/6750)) by [@tmilewski](https://github.com/tmilewski)
+
+- Add machine secret key rotation BAPI method ([#6760](https://github.com/clerk/javascript/pull/6760)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Usage:
+
+  ```ts
+  clerkClient.machines.rotateSecretKey({
+    machineId: 'mch_xxx',
+    previousTokenTtl: 3600,
+  });
+  ```
+
+- Remove `expired` from `OrganizationInvitationStatus` according to latest Backend API spec ([#6753](https://github.com/clerk/javascript/pull/6753)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`23948dc`](https://github.com/clerk/javascript/commit/23948dc777ec6a17bafbae59c253a93143b0e105), [`82b84fe`](https://github.com/clerk/javascript/commit/82b84fed5f207673071ba7354a17f4a76e101201), [`54b4b5a`](https://github.com/clerk/javascript/commit/54b4b5a5f811f612fadf5c47ffda94a750c57a5e), [`50a8622`](https://github.com/clerk/javascript/commit/50a8622c3579306f15e5d40e5ea72b4fe4384ef7), [`23948dc`](https://github.com/clerk/javascript/commit/23948dc777ec6a17bafbae59c253a93143b0e105)]:
+  - @clerk/types@4.86.0
+  - @clerk/shared@3.25.0
+
 ## 2.13.0
 
 ### Minor Changes
