@@ -78,7 +78,7 @@ export const ArrowBlockButton = React.forwardRef<HTMLButtonElement, ArrowBlockBu
       {(isLoading || leftIcon) && (
         <Flex
           as='span'
-          sx={theme => ({ flex: `0 0 ${theme.space.$5}` })}
+          sx={theme => ({ width: theme.space.$5, height: theme.space.$5, flex: 'none' })}
         >
           {isLoading ? (
             <Spinner
