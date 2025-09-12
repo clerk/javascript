@@ -110,3 +110,6 @@ export function createCommercePaginatedHook<TResource extends ClerkResource, TPa
     return result;
   };
 }
+
+// Billing alias factory for paginated hooks
+export const createBillingPaginatedHook = createCommercePaginatedHook;

@@ -1,5 +1,5 @@
 import { useClerk, useOrganization } from '@clerk/shared/react';
-import type { CommerceSubscriptionItemResource } from '@clerk/types';
+import type { BillingSubscriptionItemResource } from '@clerk/types';
 import useSWR from 'swr';
 
 import { Alert } from '@/ui/elements/Alert';
@@ -209,7 +209,7 @@ export const PaymentAttemptPage = () => {
   );
 };
 
-function PaymentAttemptBody({ subscriptionItem }: { subscriptionItem: CommerceSubscriptionItemResource | undefined }) {
+function PaymentAttemptBody({ subscriptionItem }: { subscriptionItem: BillingSubscriptionItemResource | undefined }) {
   if (!subscriptionItem) {
     return null;
   }

@@ -1,4 +1,4 @@
-import type { CommercePlanResource, CommerceSubscriptionItemResource } from '@clerk/types';
+import type { BillingPlanResource, BillingSubscriptionItemResource } from '@clerk/types';
 import { useMemo } from 'react';
 
 import { useProtect } from '@/ui/common/Gate';
@@ -18,7 +18,7 @@ import { ArrowsUpDown, CogFilled, Plans, Plus } from '../../icons';
 import { useRouter } from '../../router';
 import { SubscriptionBadge } from './badge';
 
-const isFreePlan = (plan: CommercePlanResource) => !plan.hasBaseFee;
+const isFreePlan = (plan: BillingPlanResource) => !plan.hasBaseFee;
 
 export function SubscriptionsList({
   title,
@@ -152,7 +152,7 @@ export function SubscriptionsList({
   );
 }
 
-function SubscriptionRow({ subscription, length }: { subscription: CommerceSubscriptionItemResource; length: number }) {
+function SubscriptionRow({ subscription, length }: { subscription: BillingSubscriptionItemResource; length: number }) {
   const fee = subscription.planPeriod === 'annual' ? subscription.plan.annualFee : subscription.plan.fee;
   const { captionForSubscription } = usePlansContext();
 

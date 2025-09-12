@@ -1,14 +1,14 @@
 import type {
   AddPaymentSourceParams,
+  BillingInitializedPaymentSourceJSON,
+  BillingPaymentSourceJSON,
   ClerkPaginatedResponse,
-  CommerceInitializedPaymentSourceJSON,
-  CommercePaymentSourceJSON,
   GetPaymentSourcesParams,
   InitializePaymentSourceParams,
 } from '@clerk/types';
 
 import { convertPageToOffsetSearchParams } from '../../../utils/convertPageToOffsetSearchParams';
-import { BaseResource, CommerceInitializedPaymentSource, CommercePaymentSource } from '../../resources/internal';
+import { BaseResource, BillingInitializedPaymentSource, BillingPaymentSource } from '../../resources/internal';
 
 export const initializePaymentSource = async (params: InitializePaymentSourceParams) => {
   const { orgId, ...rest } = params;
@@ -20,8 +20,8 @@ export const initializePaymentSource = async (params: InitializePaymentSourcePar
       method: 'POST',
       body: rest as any,
     })
-  )?.response as unknown as CommerceInitializedPaymentSourceJSON;
-  return new CommerceInitializedPaymentSource(json);
+  )?.response as unknown as BillingInitializedPaymentSourceJSON;
+  return new BillingInitializedPaymentSource(json);
 };
 
 export const addPaymentSource = async (params: AddPaymentSourceParams) => {
@@ -33,8 +33,8 @@ export const addPaymentSource = async (params: AddPaymentSourceParams) => {
       method: 'POST',
       body: rest as any,
     })
-  )?.response as unknown as CommercePaymentSourceJSON;
-  return new CommercePaymentSource(json);
+  )?.response as unknown as BillingPaymentSourceJSON;
+  return new BillingPaymentSource(json);
 };
 
 export const getPaymentSources = async (params: GetPaymentSourcesParams) => {
@@ -46,10 +46,10 @@ export const getPaymentSources = async (params: GetPaymentSourcesParams) => {
     search: convertPageToOffsetSearchParams(rest),
   }).then(res => {
     const { data: paymentSources, total_count } =
-      res?.response as unknown as ClerkPaginatedResponse<CommercePaymentSourceJSON>;
+      res?.response as unknown as ClerkPaginatedResponse<BillingPaymentSourceJSON>;
     return {
       total_count,
-      data: paymentSources.map(paymentSource => new CommercePaymentSource(paymentSource)),
+      data: paymentSources.map(paymentSource => new BillingPaymentSource(paymentSource)),
     };
   });
 };

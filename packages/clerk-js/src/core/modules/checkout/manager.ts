@@ -1,8 +1,8 @@
 import type {
   __experimental_CheckoutCacheState,
   __experimental_CheckoutInstance,
+  BillingCheckoutResource,
   ClerkAPIResponseError,
-  CommerceCheckoutResource,
 } from '@clerk/types';
 
 type CheckoutKey = string & { readonly __tag: 'CheckoutKey' };
@@ -136,7 +136,7 @@ function createCheckoutManager(cacheKey: CheckoutKey) {
     // Shared operation handler to eliminate duplication
     async executeOperation(
       operationType: 'start' | 'confirm',
-      operationFn: () => Promise<CommerceCheckoutResource>,
+      operationFn: () => Promise<BillingCheckoutResource>,
     ): Promise<CheckoutResult> {
       const operationId = `${cacheKey}-${operationType}`;
       const isRunningField = operationType === 'start' ? 'isStarting' : 'isConfirming';
@@ -151,7 +151,7 @@ function createCheckoutManager(cacheKey: CheckoutKey) {
 
       // Create and store the operation promise
       const operationPromise = (async () => {
-        let data: CommerceCheckoutResource | null = null;
+        let data: BillingCheckoutResource | null = null;
         let error: ClerkAPIResponseError | null = null;
         try {
           // Mark operation as in progress and clear any previous errors

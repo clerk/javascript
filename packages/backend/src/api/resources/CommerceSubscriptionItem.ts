@@ -1,4 +1,4 @@
-import type { CommerceMoneyAmount, CommerceMoneyAmountJSON } from '@clerk/types';
+import type { BillingMoneyAmount, BillingMoneyAmountJSON } from '@clerk/types';
 
 import { CommercePlan } from './CommercePlan';
 import type { CommerceSubscriptionItemJSON } from './JSON';
@@ -42,7 +42,7 @@ export class CommerceSubscriptionItem {
     /**
      * The current amount for the subscription item.
      */
-    readonly amount: CommerceMoneyAmount | null | undefined,
+    readonly amount: BillingMoneyAmount | null | undefined,
     /**
      * The plan associated with this subscription item.
      */
@@ -86,13 +86,13 @@ export class CommerceSubscriptionItem {
     /**
      * The lifetime amount paid for this subscription item.
      */
-    readonly lifetimePaid?: CommerceMoneyAmount | null,
+    readonly lifetimePaid?: BillingMoneyAmount | null,
   ) {}
 
   static fromJSON(data: CommerceSubscriptionItemJSON): CommerceSubscriptionItem {
     function formatAmountJSON(
-      amount: CommerceMoneyAmountJSON | null | undefined,
-    ): CommerceMoneyAmount | null | undefined {
+      amount: BillingMoneyAmountJSON | null | undefined,
+    ): BillingMoneyAmount | null | undefined {
       if (!amount) {
         return amount;
       }

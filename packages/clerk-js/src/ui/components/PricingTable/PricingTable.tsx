@@ -1,5 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
-import type { CommercePlanResource, CommerceSubscriptionPlanPeriod, PricingTableProps } from '@clerk/types';
+import type { BillingPlanResource, BillingSubscriptionPlanPeriod, PricingTableProps } from '@clerk/types';
 import { useEffect, useMemo, useState } from 'react';
 
 import { Flow } from '@/ui/customizables/Flow';
@@ -43,13 +43,13 @@ const PricingTableRoot = (props: PricingTableProps) => {
     return 'annual';
   }, [isCompact, subscriptionItems]);
 
-  const [planPeriod, setPlanPeriod] = useState<CommerceSubscriptionPlanPeriod>(defaultPlanPeriod);
+  const [planPeriod, setPlanPeriod] = useState<BillingSubscriptionPlanPeriod>(defaultPlanPeriod);
 
   useEffect(() => {
     setPlanPeriod(defaultPlanPeriod);
   }, [defaultPlanPeriod]);
 
-  const selectPlan = (plan: CommercePlanResource, event?: React.MouseEvent<HTMLElement>) => {
+  const selectPlan = (plan: BillingPlanResource, event?: React.MouseEvent<HTMLElement>) => {
     if (!clerk.isSignedIn) {
       if (signInMode === 'modal') {
         return clerk.openSignIn();

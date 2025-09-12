@@ -1,9 +1,9 @@
 import { useClerk } from '@clerk/shared/react';
 import type {
   __internal_PlanDetailsProps,
+  BillingPlanResource,
+  BillingSubscriptionPlanPeriod,
   ClerkAPIResponseError,
-  CommercePlanResource,
-  CommerceSubscriptionPlanPeriod,
 } from '@clerk/types';
 import * as React from 'react';
 import { useMemo, useState } from 'react';
@@ -80,13 +80,13 @@ const PlanDetailsInternal = ({
   initialPlanPeriod = 'month',
 }: __internal_PlanDetailsProps) => {
   const clerk = useClerk();
-  const [planPeriod, setPlanPeriod] = useState<CommerceSubscriptionPlanPeriod>(initialPlanPeriod);
+  const [planPeriod, setPlanPeriod] = useState<BillingSubscriptionPlanPeriod>(initialPlanPeriod);
 
   const {
     data: plan,
     isLoading,
     error,
-  } = useSWR<CommercePlanResource, ClerkAPIResponseError>(
+  } = useSWR<BillingPlanResource, ClerkAPIResponseError>(
     planId || initialPlan ? { type: 'plan', id: planId || initialPlan?.id } : null,
     // @ts-expect-error we are handling it above
     () => clerk.billing.getPlan({ id: planId || initialPlan?.id }),
@@ -217,9 +217,9 @@ const PlanDetailsInternal = ({
  * -----------------------------------------------------------------------------------------------*/
 
 interface HeaderProps {
-  plan: CommercePlanResource;
-  planPeriod: CommerceSubscriptionPlanPeriod;
-  setPlanPeriod: (val: CommerceSubscriptionPlanPeriod) => void;
+  plan: BillingPlanResource;
+  planPeriod: BillingSubscriptionPlanPeriod;
+  setPlanPeriod: (val: BillingSubscriptionPlanPeriod) => void;
   closeSlot?: React.ReactNode;
 }
 

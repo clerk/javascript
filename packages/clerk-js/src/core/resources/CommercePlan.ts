@@ -1,47 +1,42 @@
-import type {
-  CommerceMoneyAmount,
-  CommercePayerResourceType,
-  CommercePlanJSON,
-  CommercePlanResource,
-} from '@clerk/types';
+import type { BillingMoneyAmount, BillingPayerResourceType, BillingPlanJSON, BillingPlanResource } from '@clerk/types';
 
-import { commerceMoneyAmountFromJSON } from '@/utils/commerce';
+import { billingMoneyAmountFromJSON } from '@/utils/commerce';
 
-import { BaseResource, CommerceFeature } from './internal';
+import { BaseResource, Feature } from './internal';
 
-export class CommercePlan extends BaseResource implements CommercePlanResource {
+export class BillingPlan extends BaseResource implements BillingPlanResource {
   id!: string;
   name!: string;
-  fee!: CommerceMoneyAmount;
-  annualFee!: CommerceMoneyAmount;
-  annualMonthlyFee!: CommerceMoneyAmount;
+  fee!: BillingMoneyAmount;
+  annualFee!: BillingMoneyAmount;
+  annualMonthlyFee!: BillingMoneyAmount;
   description!: string;
   isDefault!: boolean;
   isRecurring!: boolean;
   hasBaseFee!: boolean;
-  forPayerType!: CommercePayerResourceType;
+  forPayerType!: BillingPayerResourceType;
   publiclyVisible!: boolean;
   slug!: string;
   avatarUrl!: string;
-  features!: CommerceFeature[];
+  features!: Feature[];
   freeTrialDays!: number | null;
   freeTrialEnabled!: boolean;
 
-  constructor(data: CommercePlanJSON) {
+  constructor(data: BillingPlanJSON) {
     super();
     this.fromJSON(data);
   }
 
-  protected fromJSON(data: CommercePlanJSON | null): this {
+  protected fromJSON(data: BillingPlanJSON | null): this {
     if (!data) {
       return this;
     }
 
     this.id = data.id;
     this.name = data.name;
-    this.fee = commerceMoneyAmountFromJSON(data.fee);
-    this.annualFee = commerceMoneyAmountFromJSON(data.annual_fee);
-    this.annualMonthlyFee = commerceMoneyAmountFromJSON(data.annual_monthly_fee);
+    this.fee = billingMoneyAmountFromJSON(data.fee);
+    this.annualFee = billingMoneyAmountFromJSON(data.annual_fee);
+    this.annualMonthlyFee = billingMoneyAmountFromJSON(data.annual_monthly_fee);
     this.description = data.description;
     this.isDefault = data.is_default;
     this.isRecurring = data.is_recurring;
@@ -52,7 +47,7 @@ export class CommercePlan extends BaseResource implements CommercePlanResource {
     this.avatarUrl = data.avatar_url;
     this.freeTrialDays = this.withDefault(data.free_trial_days, null);
     this.freeTrialEnabled = this.withDefault(data.free_trial_enabled, false);
-    this.features = (data.features || []).map(feature => new CommerceFeature(feature));
+    this.features = (data.features || []).map(feature => new Feature(feature));
 
     return this;
   }
