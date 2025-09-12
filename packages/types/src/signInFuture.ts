@@ -2,6 +2,7 @@ import type { SetActiveNavigate } from './clerk';
 import type { PhoneCodeChannel } from './phoneCodeChannel';
 import type { SignInFirstFactor, SignInStatus } from './signInCommon';
 import type { OAuthStrategy } from './strategies';
+import { VerificationResource } from './verification';
 
 export interface SignInFutureCreateParams {
   identifier?: string;
@@ -33,6 +34,11 @@ export type SignInFuturePasswordParams =
 
 export interface SignInFutureEmailCodeSendParams {
   email: string;
+}
+
+export interface SignInFutureEmailLinkSendParams {
+  email: string;
+  redirectUrl: string;
 }
 
 export interface SignInFutureEmailCodeVerifyParams {
@@ -105,6 +111,8 @@ export interface SignInFutureResource {
 
   readonly existingSession?: { sessionId: string };
 
+  readonly firstFactorVerification: VerificationResource;
+
   /**
    * Used to supply an identifier for the sign-in attempt. Calling this method will populate data on the sign-in
    * attempt, such as `signIn.resource.supportedFirstFactors`.
@@ -129,6 +137,41 @@ export interface SignInFutureResource {
      * Used to verify a code sent via email to sign-in
      */
     verifyCode: (params: SignInFutureEmailCodeVerifyParams) => Promise<{ error: unknown }>;
+  };
+
+  /**
+   *
+   */
+  emailLink: {
+    /**
+     * Used to send an email link to sign-in
+     */
+    sendLink: (params: SignInFutureEmailLinkSendParams) => Promise<{ error: unknown }>;
+
+    /**
+     * Will wait for verification to complete or expire
+     */
+    waitForVerification: () => Promise<{ error: unknown }>;
+
+    /**
+     * The verification status
+     */
+    verification: {
+      /**
+       * The verification status
+       */
+      status: 'verified' | 'expired' | 'failed' | 'client_mismatch';
+
+      /**
+       * The created session ID
+       */
+      createdSessionID: string;
+
+      /**
+       * Whether the verification was from the same client
+       */
+      verifiedFromTheSameClient: boolean;
+    } | null;
   };
 
   /**

@@ -31,6 +31,7 @@ import type {
   SignInFutureCreateParams,
   SignInFutureEmailCodeSendParams,
   SignInFutureEmailCodeVerifyParams,
+  SignInFutureEmailLinkSendParams,
   SignInFutureFinalizeParams,
   SignInFutureMFAPhoneCodeVerifyParams,
   SignInFuturePasswordParams,
@@ -61,6 +62,7 @@ import {
   generateSignatureWithMetamask,
   generateSignatureWithOKXWallet,
   getBaseIdentifier,
+  getClerkQueryParam,
   getCoinbaseWalletIdentifier,
   getMetamaskIdentifier,
   getOKXWalletIdentifier,
@@ -85,6 +87,7 @@ import {
 } from '../errors';
 import { eventBus } from '../events';
 import { BaseResource, UserData, Verification } from './internal';
+import { inBrowser } from '@clerk/shared/browser';
 
 export class SignIn extends BaseResource implements SignInResource {
   pathRoot = '/client/sign_ins';
@@ -139,6 +142,14 @@ export class SignIn extends BaseResource implements SignInResource {
    * of `SignIn`.
    */
   __internal_basePost = this._basePost.bind(this);
+
+  /**
+   * @internal Only used for internal purposes, and is not intended to be used directly.
+   *
+   * This property is used to provide access to underlying Client methods to `SignInFuture`, which wraps an instance
+   * of `SignIn`.
+   */
+  __internal_baseGet = this._baseGet.bind(this);
 
   constructor(data: SignInJSON | SignInJSONSnapshot | null = null) {
     super();
@@ -539,6 +550,34 @@ class SignInFuture implements SignInFutureResource {
     verifyCode: this.verifyEmailCode.bind(this),
   };
 
+  emailLink = {
+    sendLink: this.sendEmailLink.bind(this),
+    waitForVerification: this.waitForEmailLinkVerification.bind(this),
+    get verification() {
+      if (!inBrowser()) {
+        return null;
+      }
+
+      const status = getClerkQueryParam('__clerk_status') as 'verified' | 'expired' | 'failed' | 'client_mismatch';
+      const createdSessionID = getClerkQueryParam('__clerk_created_session');
+
+      if (!status || !createdSessionID) {
+        return null;
+      }
+
+      const verifiedFromTheSameClient =
+        status === 'verified' &&
+        typeof SignIn.clerk.client !== 'undefined' &&
+        SignIn.clerk.client.sessions.some(s => s.id === createdSessionID);
+
+      return {
+        status,
+        createdSessionID,
+        verifiedFromTheSameClient,
+      };
+    },
+  };
+
   resetPasswordEmailCode = {
     sendCode: this.sendResetPasswordEmailCode.bind(this),
     verifyCode: this.verifyResetPasswordEmailCode.bind(this),
@@ -581,6 +620,10 @@ class SignInFuture implements SignInFutureResource {
     }
 
     return undefined;
+  }
+
+  get firstFactorVerification() {
+    return this.resource.firstFactorVerification;
   }
 
   async sendResetPasswordEmailCode(): Promise<{ error: unknown }> {
@@ -676,6 +719,56 @@ class SignInFuture implements SignInFutureResource {
       await this.resource.__internal_basePost({
         body: { code, strategy: 'email_code' },
         action: 'attempt_first_factor',
+      });
+    });
+  }
+
+  async sendEmailLink(params: SignInFutureEmailLinkSendParams): Promise<{ error: unknown }> {
+    const { email, redirectUrl } = params;
+    return runAsyncResourceTask(this.resource, async () => {
+      if (!this.resource.id) {
+        await this.create({ identifier: email });
+      }
+
+      const emailLinkFactor = this.resource.supportedFirstFactors?.find(f => f.strategy === 'email_link');
+
+      if (!emailLinkFactor) {
+        throw new Error('Email code factor not found');
+      }
+
+      const { emailAddressId } = emailLinkFactor;
+
+      let verifyUrl = redirectUrl;
+      try {
+        new URL(verifyUrl);
+      } catch (err) {
+        verifyUrl = window.location.origin + verifyUrl;
+      }
+
+      await this.resource.__internal_basePost({
+        body: { emailAddressId, redirectUrl: verifyUrl, strategy: 'email_link' },
+        action: 'prepare_first_factor',
+      });
+    });
+  }
+
+  async waitForEmailLinkVerification(): Promise<{ error: unknown }> {
+    return runAsyncResourceTask(this.resource, async () => {
+      const { run, stop } = Poller();
+      await new Promise((resolve, reject) => {
+        void run(async () => {
+          try {
+            const res = await this.resource.__internal_baseGet();
+            const status = res.firstFactorVerification.status;
+            if (status === 'verified' || status === 'expired') {
+              stop();
+              resolve(res);
+            }
+          } catch (err) {
+            stop();
+            reject(err);
+          }
+        });
       });
     });
   }
@@ -781,12 +874,19 @@ class SignInFuture implements SignInFutureResource {
   }
 
   async finalize(params?: SignInFutureFinalizeParams): Promise<{ error: unknown }> {
+    console.log('finalize', this.resource.createdSessionId);
     const { navigate } = params || {};
     return runAsyncResourceTask(this.resource, async () => {
+      console.log('run async finalize', this.resource.createdSessionId);
       if (!this.resource.createdSessionId) {
+        console.log('no created session id');
         throw new Error('Cannot finalize sign-in without a created session.');
       }
 
+      console.log('reloading client');
+      await SignIn.clerk.client?.reload();
+
+      console.log('calling setActive');
       await SignIn.clerk.setActive({ session: this.resource.createdSessionId, navigate });
     });
   }
