@@ -103,7 +103,7 @@ export type SignUpCreateParams = Partial<
     /**
      * @internal Used to indicate the request is coming from an iframe context.
      */
-    iframeContext: boolean;
+    iframeContext?: boolean;
   } & Omit<SnakeToCamel<Record<SignUpAttributeField | SignUpVerifiableField, string>>, 'legalAccepted'>
 >;
 
