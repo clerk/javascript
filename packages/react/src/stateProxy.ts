@@ -188,7 +188,9 @@ export class StateProxy implements State {
     [K in G[number]]: T[K] extends (...args: any[]) => any ? never : T[K];
   } {
     const out: any = {};
-    for (const m of methods) out[m] = this.gateMethod(getTarget, m as any);
+    for (const m of methods) {
+      out[m] = this.gateMethod(getTarget, m as any);
+    }
     for (const g of getters) {
       Object.defineProperty(out, g, {
         get: () => this.gateProperty(getTarget, g as any, (fallbacks as any)[g]),
