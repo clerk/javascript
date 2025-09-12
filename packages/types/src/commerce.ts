@@ -1425,3 +1425,22 @@ export type CheckoutFutureResource = CheckoutPropertiesPerStatus & {
    */
   startCheckout: (params: CreateCheckoutParams) => Promise<{ error: unknown }>;
 };
+
+export type CheckoutFutureResourceLax = CheckoutFutureProperties & {
+  status: 'needs_initialization' | 'needs_confirmation' | 'completed';
+} & {
+  /**
+   * A function to confirm and finalize the checkout process, usually after payment information has been provided and validated. [Learn more.](#confirm)
+   */
+  confirm: (params: ConfirmCheckoutParams) => Promise<{ error: unknown }>;
+
+  /**
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+   * @example
+   * ```tsx
+   * <ClerkProvider clerkJsVersion="x.x.x" />
+   * ```
+   */
+  startCheckout: (params: CreateCheckoutParams) => Promise<{ error: unknown }>;
+};

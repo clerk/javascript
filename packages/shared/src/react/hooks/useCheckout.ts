@@ -1,10 +1,12 @@
 import type {
   __experimental_CheckoutCacheState,
   __experimental_CheckoutInstance,
+  CheckoutSignalValue,
   CommerceCheckoutResource,
+  RemoveFunctions,
   SetActiveNavigate,
 } from '@clerk/types';
-import { useMemo, useSyncExternalStore } from 'react';
+import { useCallback, useSyncExternalStore } from 'react';
 
 import type { ClerkAPIResponseError } from '../..';
 import type { __experimental_CheckoutProvider } from '../contexts';
@@ -73,7 +75,7 @@ type __experimental_UseCheckoutReturn = {
 
 type Params = Parameters<typeof __experimental_CheckoutProvider>[0];
 
-export const useCheckout = (options?: Params): __experimental_UseCheckoutReturn => {
+export const useCheckout = (options?: Params): CheckoutSignalValue => {
   const contextOptions = useCheckoutContext();
   const { for: forOrganization, planId, planPeriod } = options || contextOptions;
 
@@ -92,7 +94,7 @@ export const useCheckout = (options?: Params): __experimental_UseCheckoutReturn 
 
   const clerk = useClerkInstanceContext();
 
-  const manager = useMemo(() => {
+  const signal = useCallback(() => {
     return clerk.__experimental_checkout({ planId, planPeriod, for: forOrganization });
   }, [
     // user?.id, organization?.id,
@@ -101,64 +103,24 @@ export const useCheckout = (options?: Params): __experimental_UseCheckoutReturn 
     forOrganization,
   ]);
 
-  // const subscribe = useCallback(
-  //   (callback: () => void) => {
-  //     if (!clerk.loaded) {
-  //       return () => {};
-  //     }
+  const subscribe = useCallback(
+    (callback: () => void) => {
+      if (!clerk.loaded) {
+        return () => {};
+      }
 
-  //     return manager.subscribe(callback);
-  //   },
-  //   [clerk.loaded, manager],
-  // );
-  // const getSnapshot = useCallback(() => {
-  //   return manager.getState();
-  // }, [manager]);
+      return clerk.__internal_state.__internal_effect(() => {
+        signal();
+        callback();
+      });
+    },
+    [signal, clerk.loaded, clerk.__internal_state],
+  );
+  const getSnapshot = useCallback(() => {
+    return signal();
+  }, [signal]);
 
-  const managerProperties = useSyncExternalStore(manager.subscribe, manager.getState, manager.getState);
+  const value = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 
-  const properties = useMemo<CheckoutProperties | ForceNull<CheckoutProperties>>(() => {
-    if (!managerProperties.checkout) {
-      return {
-        id: null,
-        externalClientSecret: null,
-        externalGatewayId: null,
-        status: null,
-        totals: null,
-        isImmediatePlanChange: null,
-        planPeriod: null,
-        plan: null,
-        paymentSource: null,
-        freeTrialEndsAt: null,
-        payer: null,
-      };
-    }
-    const {
-      // eslint-disable-next-line @typescript-eslint/unbound-method
-      reload,
-      confirm,
-      pathRoot,
-      // All the above need to be removed from the properties
-      ...rest
-    } = managerProperties.checkout;
-    return rest;
-  }, [managerProperties.checkout]);
-
-  const checkout = {
-    ...properties,
-    getState: manager.getState,
-    start: manager.start,
-    confirm: manager.confirm,
-    clear: manager.clear,
-    finalize: manager.finalize,
-    isStarting: managerProperties.isStarting,
-    isConfirming: managerProperties.isConfirming,
-    error: managerProperties.error,
-    status: managerProperties.status,
-    fetchStatus: managerProperties.fetchStatus,
-  };
-
-  return {
-    checkout,
-  } as __experimental_UseCheckoutReturn;
+  return value as CheckoutSignalValue;
 };

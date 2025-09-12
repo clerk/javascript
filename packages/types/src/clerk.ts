@@ -91,6 +91,14 @@ export interface CheckoutSignalValue {
   checkout: CheckoutFutureResource;
 }
 
+export type NullableCheckoutSignal = Omit<CheckoutSignalValue, 'checkout'> & {
+  checkout: CheckoutFutureResource | null;
+};
+
+export interface CheckoutSignal {
+  (): NullableCheckoutSignal;
+}
+
 type __experimental_CheckoutStatus = 'needs_initialization' | 'needs_confirmation' | 'completed';
 
 export type __experimental_CheckoutCacheState = Readonly<{
@@ -127,7 +135,7 @@ export type __experimental_CheckoutInstance = {
   getState: () => __experimental_CheckoutCacheState;
 };
 
-type __experimental_CheckoutFunction = (options: __experimental_CheckoutOptions) => __experimental_CheckoutInstance;
+type __experimental_CheckoutFunction = (options: __experimental_CheckoutOptions) => NullableCheckoutSignal;
 
 /**
  * @inline
