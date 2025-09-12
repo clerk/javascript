@@ -50,7 +50,7 @@ export interface SignUpFutureResource {
   /**
    * The status of the current sign-up attempt as a string (for example, `'missing_requirements'`, `'complete'`, `'abandoned'`, etc.)
    */
-  readonly status: SignUpStatus | null;
+  readonly status: SignUpStatus;
 
   /**
    * An array of strings representing unverified fields such as `’email_address’`. Can be used to detect when verification is necessary.
