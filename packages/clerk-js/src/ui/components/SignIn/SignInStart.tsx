@@ -254,7 +254,9 @@ function SignInStartInternal(): JSX.Element {
         // This is necessary because there's a brief delay between initiating the SSO flow
         // and the actual redirect to the external Identity Provider
         const isRedirectingToSSOProvider = hasOnlyEnterpriseSSOFirstFactors(signIn);
-        if (isRedirectingToSSOProvider) return;
+        if (isRedirectingToSSOProvider) {
+          return;
+        }
 
         status.setIdle();
         card.setIdle();
@@ -517,7 +519,13 @@ function SignInStartInternal(): JSX.Element {
   }
 
   // @ts-expect-error `action` is not typed
-  const { action, ...identifierFieldProps } = identifierField.props;
+  const { action, validLastAuthenticationStrategies, ...identifierFieldProps } = identifierField.props;
+
+  const lastAuthenticationStrategy = clerk.client?.lastAuthenticationStrategy;
+  const isIdentifierLastAuthenticationStrategy = lastAuthenticationStrategy
+    ? validLastAuthenticationStrategies?.has(lastAuthenticationStrategy)
+    : false;
+
   return (
     <Flow.Part part='start'>
       {!alternativePhoneCodeProvider ? (
@@ -572,6 +580,7 @@ function SignInStartInternal(): JSX.Element {
                           {...identifierFieldProps}
                           autoFocus={shouldAutofocus}
                           autoComplete={isWebAuthnAutofillSupported ? 'webauthn' : undefined}
+                          isLastAuthenticationStrategy={isIdentifierLastAuthenticationStrategy}
                         />
                       </Form.ControlRow>
                       <InstantPasswordRow field={passwordBasedInstance ? instantPasswordField : undefined} />

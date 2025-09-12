@@ -1,5 +1,17 @@
 # Change Log
 
+## 4.85.0
+
+### Minor Changes
+
+- Change placement of the manage subscription button inside `<UserProfile/>` and `<OrganizationProfile/>` ([#6428](https://github.com/clerk/javascript/pull/6428)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Introduce "Last Used" functionality to Sign In and Up ([#6722](https://github.com/clerk/javascript/pull/6722)) by [@tmilewski](https://github.com/tmilewski)
+
+- feat(types): Update telemetry type to accept perEventSampling argument. ([#6723](https://github.com/clerk/javascript/pull/6723)) by [@heatlikeheatwave](https://github.com/heatlikeheatwave)
+
 ## 4.84.1
 
 ### Patch Changes

@@ -256,6 +256,7 @@ export const ptBR: LocalizationResource = {
     action__signOut: 'Sair',
     title: 'Logado como {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Último uso',
   maintenanceMode: 'Estamos em manutenção, mas não se preocupe, não deve levar mais do que alguns minutos',
   membershipRole__admin: 'Administrador',
   membershipRole__basicMember: 'Membro',
@@ -323,6 +324,7 @@ export const ptBR: LocalizationResource = {
         totalPaid: 'Total pago',
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'Assinar um plano',
         actionLabel__switchPlan: 'Mudar de plano',
         tableHeader__edit: 'Editar',
@@ -1011,6 +1013,7 @@ export const ptBR: LocalizationResource = {
         totalPaid: 'Total pago',
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'Assinar um plano',
         actionLabel__switchPlan: 'Mudar de plano',
         tableHeader__edit: 'Editar',

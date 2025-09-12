@@ -250,6 +250,7 @@ export const skSK: LocalizationResource = {
     action__signOut: 'Odhlásiť sa',
     title: 'Prihlásený(á) ako {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Naposledy použité',
   maintenanceMode: undefined,
   membershipRole__admin: 'Správca',
   membershipRole__basicMember: 'Člen',
@@ -316,6 +317,7 @@ export const skSK: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1002,6 +1004,7 @@ export const skSK: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,

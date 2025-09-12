@@ -249,6 +249,7 @@ export const ptPT: LocalizationResource = {
     action__signOut: 'Terminar sessão',
     title: 'Sessão iniciada como {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Último uso',
   maintenanceMode: 'Modo de Manutenção',
   membershipRole__admin: 'Administrador',
   membershipRole__basicMember: 'Membro',
@@ -315,6 +316,7 @@ export const ptPT: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -995,6 +997,7 @@ export const ptPT: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,

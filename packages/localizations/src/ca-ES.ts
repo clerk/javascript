@@ -250,6 +250,7 @@ export const caES: LocalizationResource = {
     action__signOut: 'Tanca la sessió',
     title: 'Connectat com a {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Últim ús',
   maintenanceMode: undefined,
   membershipRole__admin: 'Administrador',
   membershipRole__basicMember: 'Membre',
@@ -316,6 +317,7 @@ export const caES: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -997,6 +999,7 @@ export const caES: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,

@@ -26,7 +26,9 @@ export async function loadScript(src = '', opts: LoadScriptOptions): Promise<HTM
 
       const script = document.createElement('script');
 
-      if (crossOrigin) script.setAttribute('crossorigin', crossOrigin);
+      if (crossOrigin) {
+        script.setAttribute('crossorigin', crossOrigin);
+      }
       script.async = async || false;
       script.defer = defer || false;
 

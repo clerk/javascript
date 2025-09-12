@@ -1,3 +1,5 @@
+import type { LastAuthenticationStrategy } from '@clerk/types';
+
 import type { ClientJSON } from './JSON';
 import { Session } from './Session';
 
@@ -31,6 +33,10 @@ export class Client {
      */
     readonly lastActiveSessionId: string | null,
     /**
+     * The last authentication strategy used by the `Client`.
+     */
+    readonly lastAuthenticationStrategy: LastAuthenticationStrategy | null,
+    /**
      * The date when the `Client` was first created.
      */
     readonly createdAt: number,
@@ -48,6 +54,7 @@ export class Client {
       data.sign_in_id,
       data.sign_up_id,
       data.last_active_session_id,
+      data.last_authentication_strategy,
       data.created_at,
       data.updated_at,
     );

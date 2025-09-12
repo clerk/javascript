@@ -1,11 +1,11 @@
 {
   "files": [
-    { "path": "./dist/clerk.js", "maxSize": "818KB" },
+    { "path": "./dist/clerk.js", "maxSize": "819KB" },
     { "path": "./dist/clerk.browser.js", "maxSize": "79KB" },
-    { "path": "./dist/clerk.legacy.browser.js", "maxSize": "120KB" },
+    { "path": "./dist/clerk.legacy.browser.js", "maxSize": "120.2KB" },
     { "path": "./dist/clerk.headless*.js", "maxSize": "61KB" },
     { "path": "./dist/ui-common*.js", "maxSize": "117.1KB" },
-    { "path": "./dist/ui-common*.legacy.*.js", "maxSize": "118KB" },
+    { "path": "./dist/ui-common*.legacy.*.js", "maxSize": "120KB" },
     { "path": "./dist/vendors*.js", "maxSize": "45KB" },
     { "path": "./dist/coinbase*.js", "maxSize": "38KB" },
     { "path": "./dist/stripe-vendors*.js", "maxSize": "1KB" },

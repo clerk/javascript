@@ -38,7 +38,9 @@ export const CheckoutComplete = () => {
     typeof window === 'undefined' ? true : window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
   const handleMouseMove = (event: React.MouseEvent<HTMLSpanElement>) => {
-    if (!canHover) return;
+    if (!canHover) {
+      return;
+    }
     if (checkoutSuccessRootRef.current) {
       const rect = checkoutSuccessRootRef.current.getBoundingClientRect();
       const domX = event.clientX - rect.left;
@@ -58,7 +60,9 @@ export const CheckoutComplete = () => {
   };
 
   useEffect(() => {
-    if (!canHover) return;
+    if (!canHover) {
+      return;
+    }
     const animate = () => {
       setCurrentPosition(prev => {
         const amt = 0.15;
@@ -70,7 +74,9 @@ export const CheckoutComplete = () => {
     };
     animationRef.current = requestAnimationFrame(animate);
     return () => {
-      if (animationRef.current) cancelAnimationFrame(animationRef.current);
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
     };
   }, [mousePosition, canHover]);
 

@@ -118,6 +118,13 @@ export type PagesOrInfiniteConfig = PaginatedHookConfig<{
    * @hidden
    */
   __experimental_mode?: 'cache';
+
+  /**
+   * @experimental
+   *
+   * @hidden
+   */
+  isSignedIn?: boolean;
 }>;
 
 /**

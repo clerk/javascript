@@ -81,6 +81,8 @@ export type __internal_LocalizationResource = {
    * translations that misinterpret the correct usage of this property.
    */
   socialButtonsBlockButtonManyInView: LocalizationValue<'provider', `${string}{{provider|titleize}}${string}`>;
+  /** Label for the “Last used” badge on authentication strategies. */
+  lastAuthenticationStrategy: LocalizationValue;
   dividerText: LocalizationValue;
   formFieldLabel__emailAddress: LocalizationValue;
   formFieldLabel__emailAddresses: LocalizationValue;
@@ -877,6 +879,7 @@ export type __internal_LocalizationResource = {
         tableHeader__edit: LocalizationValue;
         title: LocalizationValue;
         actionLabel__newSubscription: LocalizationValue;
+        actionLabel__manageSubscription: LocalizationValue;
         actionLabel__switchPlan: LocalizationValue;
       };
       paymentHistorySection: {
@@ -1104,6 +1107,7 @@ export type __internal_LocalizationResource = {
         tableHeader__edit: LocalizationValue;
         title: LocalizationValue;
         actionLabel__newSubscription: LocalizationValue;
+        actionLabel__manageSubscription: LocalizationValue;
         actionLabel__switchPlan: LocalizationValue;
       };
       paymentHistorySection: {

@@ -47,14 +47,21 @@ export const useSubscription = (params?: UseSubscriptionParams) => {
     : environment?.commerceSettings.billing.user.enabled;
 
   const swr = useSWR(
-    user?.id && billingEnabled
+    billingEnabled
       ? {
           type: 'commerce-subscription',
-          userId: user.id,
+          userId: user?.id,
           args: { orgId: isOrganization ? organization?.id : undefined },
         }
       : null,
-    ({ args }) => clerk.billing.getSubscription(args),
+    ({ args, userId }) => {
+      // This allows for supporting keeping previous data between revalidations
+      // but also hides the stale data on sign-out.
+      if (userId) {
+        return clerk.billing.getSubscription(args);
+      }
+      return null;
+    },
     {
       dedupingInterval: 1_000 * 60,
       keepPreviousData: params?.keepPreviousData,

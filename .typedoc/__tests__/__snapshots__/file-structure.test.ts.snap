@@ -75,7 +75,6 @@ exports[`Typedoc output > should have a deliberate file structure 1`] = `
   "types/get-plans-params.mdx",
   "types/get-statements-params.mdx",
   "types/get-subscription-params.mdx",
-  "types/get-subscriptions-params.mdx",
   "types/get-token.mdx",
   "types/id-selectors.mdx",
   "types/initialize-payment-source-params.mdx",

@@ -54,14 +54,22 @@ function deriveCheckoutState(
   baseState: Omit<__experimental_CheckoutCacheState, 'fetchStatus' | 'status'>,
 ): __experimental_CheckoutCacheState {
   const fetchStatus = (() => {
-    if (baseState.isStarting || baseState.isConfirming) return FETCH_STATUS.FETCHING;
-    if (baseState.error) return FETCH_STATUS.ERROR;
+    if (baseState.isStarting || baseState.isConfirming) {
+      return FETCH_STATUS.FETCHING;
+    }
+    if (baseState.error) {
+      return FETCH_STATUS.ERROR;
+    }
     return FETCH_STATUS.IDLE;
   })();
 
   const status = (() => {
-    if (baseState.checkout?.status === CHECKOUT_STATUS.COMPLETED) return CHECKOUT_STATUS.COMPLETED;
-    if (baseState.checkout) return CHECKOUT_STATUS.NEEDS_CONFIRMATION;
+    if (baseState.checkout?.status === CHECKOUT_STATUS.COMPLETED) {
+      return CHECKOUT_STATUS.COMPLETED;
+    }
+    if (baseState.checkout) {
+      return CHECKOUT_STATUS.NEEDS_CONFIRMATION;
+    }
     return CHECKOUT_STATUS.NEEDS_INITIALIZATION;
   })();
 
