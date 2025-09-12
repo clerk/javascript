@@ -249,6 +249,7 @@ export const heIL: LocalizationResource = {
     action__signOut: 'התנתק',
     title: 'מחובר כ{{identifier}}',
   },
+  lastAuthenticationStrategy: 'בשימוש אחרון',
   maintenanceMode: undefined,
   membershipRole__admin: 'מנהל',
   membershipRole__basicMember: 'חבר',
@@ -315,6 +316,7 @@ export const heIL: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -984,6 +986,7 @@ export const heIL: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,

@@ -70,19 +70,6 @@ export interface CommerceBillingNamespace {
   getSubscription: (params: GetSubscriptionParams) => Promise<CommerceSubscriptionResource>;
 
   /**
-   * @deprecated Use `getSubscription` to fetch a single subscription with its items
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
-   */
-  getSubscriptions: (
-    params: GetSubscriptionsParams,
-  ) => Promise<ClerkPaginatedResponse<CommerceSubscriptionItemResource>>;
-
-  /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
    * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
    * @example
@@ -791,16 +778,6 @@ export interface CommerceStatementGroup {
    */
   items: CommercePaymentResource[];
 }
-
-/**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
- */
-export type GetSubscriptionsParams = WithOptionalOrgType<ClerkPaginationParams>;
 
 /**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.

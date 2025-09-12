@@ -1,5 +1,51 @@
 # Change Log
 
+## 5.92.1
+
+### Patch Changes
+
+- Hides the subscription "Manage" button when no subscription items exist instead of the subscription itself being absent. ([#6734](https://github.com/clerk/javascript/pull/6734)) by [@panteliselef](https://github.com/panteliselef)
+
+## 5.92.0
+
+### Minor Changes
+
+- Introduce "Last Used" functionality to Sign In and Up ([#6722](https://github.com/clerk/javascript/pull/6722)) by [@tmilewski](https://github.com/tmilewski)
+
+### Patch Changes
+
+- Change placement of the manage subscription button inside `<UserProfile/>` and `<OrganizationProfile/>` ([#6428](https://github.com/clerk/javascript/pull/6428)) by [@panteliselef](https://github.com/panteliselef)
+
+- Do not trigger organization roles query when the current user's membership lacks the required permissions (`org:sys_memberships:read` or `org:sys_memberships:manage`). ([#6703](https://github.com/clerk/javascript/pull/6703)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  This fixes an issue where the `OrganizationSwitcher` component was making unnecessary API calls to fetch roles, resulting in HTTP 403 errors.
+
+- Update search icon, payment source icon, and user preview identifier colors. ([#6697](https://github.com/clerk/javascript/pull/6697)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`55490c3`](https://github.com/clerk/javascript/commit/55490c31fadc82bdca6cd5f2b22e5e158aaba0cb), [`f689d99`](https://github.com/clerk/javascript/commit/f689d990117383b3f9e5417298dae39a20053cbf), [`e8d21de`](https://github.com/clerk/javascript/commit/e8d21de39b591973dad48fc1d1851c4d28b162fe), [`637f2e8`](https://github.com/clerk/javascript/commit/637f2e8768b76aaf756062b6b5b44bf651f66789), [`465369b`](https://github.com/clerk/javascript/commit/465369bba2a545304649666c4e1714b9a904c948)]:
+  - @clerk/localizations@3.25.0
+  - @clerk/types@4.85.0
+  - @clerk/shared@3.24.2
+
+## 5.91.2
+
+### Patch Changes
+
+- Fixes issue where "prepare" API request would only fire once, preventing end users from receiving fresh otp codes. ([#6695](https://github.com/clerk/javascript/pull/6695)) by [@panteliselef](https://github.com/panteliselef)
+
+- Wait for pricing table data to be ready before hiding its fallback. ([#6644](https://github.com/clerk/javascript/pull/6644)) by [@panteliselef](https://github.com/panteliselef)
+
+- Fix double slash in FAPI client URLs when using a proxy configuration (avoids 308 redirects). ([#6706](https://github.com/clerk/javascript/pull/6706)) by [@jacekradko](https://github.com/jacekradko)
+
+- Hide billing tab when no paid plans exist, the user does not have a current or past subscription. ([#6696](https://github.com/clerk/javascript/pull/6696)) by [@panteliselef](https://github.com/panteliselef)
+
+- Update the experimental `Errors` interface to allow null for raw and global error arrays ([#6677](https://github.com/clerk/javascript/pull/6677)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`6e3f53e`](https://github.com/clerk/javascript/commit/6e3f53e75b6f3e6ec9e1d7e77d7e6deb8ffd3861), [`fced4fc`](https://github.com/clerk/javascript/commit/fced4fc869bb21c77826dfaf281b6640e0f0c006), [`e6e19d2`](https://github.com/clerk/javascript/commit/e6e19d2d2f3b2c4617b25f53830216a1d550e616), [`d0fe6ca`](https://github.com/clerk/javascript/commit/d0fe6ca4af3f08fd14cd8c606cd3e604141e63e3), [`1b1e8b1`](https://github.com/clerk/javascript/commit/1b1e8b1fd33b787f956b17b193e5fd0a4cdc6cec)]:
+  - @clerk/localizations@3.24.2
+  - @clerk/types@4.84.1
+  - @clerk/shared@3.24.1
+
 ## 5.91.1
 
 ### Patch Changes

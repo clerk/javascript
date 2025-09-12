@@ -1,12 +1,10 @@
 /* eslint-disable jsdoc/require-description-complete-sentence */
 import type {
   ClerkPaginatedResponse,
-  CommerceSubscriptionItemResource,
   GetDomainsParams,
   GetInvitationsParams,
   GetMembershipRequestParams,
   GetMembersParams,
-  GetSubscriptionsParams,
   OrganizationDomainResource,
   OrganizationInvitationResource,
   OrganizationMembershipRequestResource,
@@ -66,16 +64,6 @@ export type UseOrganizationParams = {
    * </ul>
    */
   invitations?: true | PaginatedHookConfig<GetInvitationsParams>;
-  /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * If set to `true`, all default properties will be used.<br />
-   * Otherwise, accepts an object with the following optional properties:
-   * <ul>
-   *  <li>`orgId`: A string that filters the subscriptions by the provided organization ID.</li>
-   *  <li>Any of the properties described in [Shared properties](#shared-properties).</li>
-   * </ul>
-   */
-  subscriptions?: true | PaginatedHookConfig<GetSubscriptionsParams>;
 };
 
 /**
@@ -111,11 +99,6 @@ export type UseOrganizationReturn<T extends UseOrganizationParams> =
        * Includes a paginated list of the organization's invitations.
        */
       invitations: PaginatedResourcesWithDefault<OrganizationInvitationResource>;
-      /**
-       * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-       * Includes a paginated list of the organization's subscriptions.
-       */
-      subscriptions: PaginatedResourcesWithDefault<CommerceSubscriptionItemResource>;
     }
   | {
       isLoaded: true;
@@ -125,7 +108,6 @@ export type UseOrganizationReturn<T extends UseOrganizationParams> =
       membershipRequests: PaginatedResourcesWithDefault<OrganizationMembershipRequestResource>;
       memberships: PaginatedResourcesWithDefault<OrganizationMembershipResource>;
       invitations: PaginatedResourcesWithDefault<OrganizationInvitationResource>;
-      subscriptions: PaginatedResourcesWithDefault<CommerceSubscriptionItemResource>;
     }
   | {
       isLoaded: boolean;
@@ -146,10 +128,6 @@ export type UseOrganizationReturn<T extends UseOrganizationParams> =
       invitations: PaginatedResources<
         OrganizationInvitationResource,
         T['invitations'] extends { infinite: true } ? true : false
-      > | null;
-      subscriptions: PaginatedResources<
-        CommerceSubscriptionItemResource,
-        T['subscriptions'] extends { infinite: true } ? true : false
       > | null;
     };
 
@@ -300,7 +278,6 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
     membershipRequests: membershipRequestsListParams,
     memberships: membersListParams,
     invitations: invitationsListParams,
-    subscriptions: subscriptionsListParams,
   } = params || {};
 
   useAssertWrappedByClerkProvider('useOrganization');
@@ -337,13 +314,6 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
     initialPage: 1,
     pageSize: 10,
     status: ['pending'],
-    keepPreviousData: false,
-    infinite: false,
-  });
-
-  const subscriptionsSafeValues = useWithSafeValues(subscriptionsListParams, {
-    initialPage: 1,
-    pageSize: 10,
     keepPreviousData: false,
     infinite: false,
   });
@@ -387,15 +357,6 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
           initialPage: invitationsSafeValues.initialPage,
           pageSize: invitationsSafeValues.pageSize,
           status: invitationsSafeValues.status,
-        };
-
-  const subscriptionsParams =
-    typeof subscriptionsListParams === 'undefined'
-      ? undefined
-      : {
-          initialPage: subscriptionsSafeValues.initialPage,
-          pageSize: subscriptionsSafeValues.pageSize,
-          orgId: organization?.id,
         };
 
   const domains = usePagesOrInfinite<GetDomainsParams, ClerkPaginatedResponse<OrganizationDomainResource>>(
@@ -463,25 +424,6 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
     },
   );
 
-  const subscriptions = usePagesOrInfinite<
-    GetSubscriptionsParams,
-    ClerkPaginatedResponse<CommerceSubscriptionItemResource>
-  >(
-    {
-      ...subscriptionsParams,
-    },
-    organization?.getSubscriptions,
-    {
-      keepPreviousData: subscriptionsSafeValues.keepPreviousData,
-      infinite: subscriptionsSafeValues.infinite,
-      enabled: !!subscriptionsParams,
-    },
-    {
-      type: 'subscriptions',
-      organizationId: organization?.id,
-    },
-  );
-
   if (organization === undefined) {
     return {
       isLoaded: false,
@@ -491,7 +433,6 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
       membershipRequests: undefinedPaginatedResource,
       memberships: undefinedPaginatedResource,
       invitations: undefinedPaginatedResource,
-      subscriptions: undefinedPaginatedResource,
     };
   }
 
@@ -504,7 +445,6 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
       membershipRequests: null,
       memberships: null,
       invitations: null,
-      subscriptions: null,
     };
   }
 
@@ -518,7 +458,6 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
       membershipRequests: undefinedPaginatedResource,
       memberships: undefinedPaginatedResource,
       invitations: undefinedPaginatedResource,
-      subscriptions: undefinedPaginatedResource,
     };
   }
 
@@ -531,6 +470,5 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
     membershipRequests,
     memberships,
     invitations,
-    subscriptions,
   };
 }

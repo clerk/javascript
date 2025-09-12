@@ -10,7 +10,7 @@ import { descriptors } from './index';
 
 type FlowRootProps = React.PropsWithChildren & FlowMetadata & { sx?: ThemableCssProp };
 
-const Root = (props: FlowRootProps) => {
+const Root = (props: FlowRootProps & { isFlowReady?: boolean }) => {
   return (
     <FlowMetadataProvider flow={props.flow}>
       <InternalThemeProvider>

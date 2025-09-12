@@ -256,6 +256,7 @@ export const ptBR: LocalizationResource = {
     action__signOut: 'Sair',
     title: 'Logado como {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Último uso',
   maintenanceMode: 'Estamos em manutenção, mas não se preocupe, não deve levar mais do que alguns minutos',
   membershipRole__admin: 'Administrador',
   membershipRole__basicMember: 'Membro',
@@ -323,6 +324,7 @@ export const ptBR: LocalizationResource = {
         totalPaid: 'Total pago',
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'Assinar um plano',
         actionLabel__switchPlan: 'Mudar de plano',
         tableHeader__edit: 'Editar',
@@ -827,10 +829,10 @@ export const ptBR: LocalizationResource = {
     createOrganization: {
       formButtonReset: 'Cancelar',
       formButtonSubmit: 'Criar nova organização',
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
+      formFieldInputPlaceholder__name: 'Minha organização',
+      formFieldInputPlaceholder__slug: 'minha-organizacao',
+      formFieldLabel__name: 'Nome',
+      formFieldLabel__slug: 'Rótulo do URL',
       subtitle: 'Conte-nos um pouco sobre sua organização',
       title: 'Configure sua conta',
     },
@@ -1011,6 +1013,7 @@ export const ptBR: LocalizationResource = {
         totalPaid: 'Total pago',
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'Assinar um plano',
         actionLabel__switchPlan: 'Mudar de plano',
         tableHeader__edit: 'Editar',

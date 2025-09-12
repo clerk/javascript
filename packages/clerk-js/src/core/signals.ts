@@ -52,8 +52,8 @@ function errorsToParsedErrors(error: unknown): Errors {
       captcha: null,
       legalAccepted: null,
     },
-    raw: [],
-    global: [],
+    raw: null,
+    global: null,
   };
 
   if (!error) {
@@ -61,21 +61,29 @@ function errorsToParsedErrors(error: unknown): Errors {
   }
 
   if (!isClerkAPIResponseError(error)) {
-    parsedErrors.raw.push(error);
-    parsedErrors.global.push(error);
+    parsedErrors.raw = [error];
+    parsedErrors.global = [error];
     return parsedErrors;
   }
 
-  parsedErrors.raw.push(...error.errors);
-
   error.errors.forEach(error => {
+    if (parsedErrors.raw) {
+      parsedErrors.raw.push(error);
+    } else {
+      parsedErrors.raw = [error];
+    }
+
     if ('meta' in error && error.meta && 'paramName' in error.meta) {
       const name = snakeToCamel(error.meta.paramName);
       parsedErrors.fields[name as keyof typeof parsedErrors.fields] = error;
       return;
     }
 
-    parsedErrors.global.push(error);
+    if (parsedErrors.global) {
+      parsedErrors.global.push(error);
+    } else {
+      parsedErrors.global = [error];
+    }
   });
 
   return parsedErrors;

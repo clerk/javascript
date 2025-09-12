@@ -10,6 +10,7 @@ describe('SubscriptionDetails', () => {
   it('Displays spinner when init loading', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     const { baseElement } = render(
@@ -31,6 +32,7 @@ describe('SubscriptionDetails', () => {
   it('single active monthly subscription', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
@@ -134,6 +136,7 @@ describe('SubscriptionDetails', () => {
   it('single active annual subscription', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
@@ -237,6 +240,7 @@ describe('SubscriptionDetails', () => {
   it('active free subscription', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
@@ -319,6 +323,7 @@ describe('SubscriptionDetails', () => {
   it('one active annual and one upcoming monthly subscription', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     const planAnnual = {
@@ -478,6 +483,7 @@ describe('SubscriptionDetails', () => {
   it('one active and one upcoming FREE subscription', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     const planMonthly = {
@@ -614,6 +620,7 @@ describe('SubscriptionDetails', () => {
   it('allows cancelling a subscription of a monthly plan', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     const cancelSubscriptionMock = jest.fn().mockResolvedValue({});
@@ -718,6 +725,7 @@ describe('SubscriptionDetails', () => {
   it('calls resubscribe when the user clicks Resubscribe for a canceled subscription', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     const plan = {
@@ -820,6 +828,7 @@ describe('SubscriptionDetails', () => {
   it('calls switchToMonthly when the user clicks Switch to monthly for an annual subscription', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     const plan = {
@@ -925,6 +934,7 @@ describe('SubscriptionDetails', () => {
   it('past due subscription shows correct status and disables actions', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     const plan = {
@@ -1017,6 +1027,7 @@ describe('SubscriptionDetails', () => {
   it('active free trial subscription shows correct labels and behavior', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
@@ -1125,6 +1136,7 @@ describe('SubscriptionDetails', () => {
   it('allows cancelling a free trial with specific dialog text', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     const cancelSubscriptionMock = jest.fn().mockResolvedValue({});

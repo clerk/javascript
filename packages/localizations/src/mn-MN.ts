@@ -250,6 +250,7 @@ export const mnMN: LocalizationResource = {
     action__signOut: 'Гарах',
     title: '{{identifier}}-р нэвтэрсэн',
   },
+  lastAuthenticationStrategy: 'Хамгийн сүүлд ашигласан',
   maintenanceMode: undefined,
   membershipRole__admin: 'Админ',
   membershipRole__basicMember: 'Гишүүн',
@@ -316,6 +317,7 @@ export const mnMN: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -996,6 +998,7 @@ export const mnMN: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,

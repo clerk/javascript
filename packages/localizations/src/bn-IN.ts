@@ -249,6 +249,7 @@ export const bnIN: LocalizationResource = {
     action__signOut: 'সাইন আউট',
     title: '{{identifier}} হিসাবে সাইন ইন করা হয়েছে',
   },
+  lastAuthenticationStrategy: 'শেষবার ব্যবহৃত',
   maintenanceMode:
     'আমরা বর্তমানে রক্ষণাবেক্ষণের কাজ করছি, কিন্তু চিন্তা করবেন না, এটি কয়েক মিনিটের বেশি সময় নেবে না।',
   membershipRole__admin: 'অ্যাডমিন',
@@ -317,6 +318,7 @@ export const bnIN: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1005,6 +1007,7 @@ export const bnIN: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,

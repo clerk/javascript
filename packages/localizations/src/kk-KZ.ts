@@ -249,6 +249,7 @@ export const kkKZ: LocalizationResource = {
     action__signOut: 'Шығу',
     title: '{{identifier}} ретінде кірдіңіз',
   },
+  lastAuthenticationStrategy: 'Соңғы пайдаланылған',
   maintenanceMode: 'Қазір техникалық қызмет көрсету жұмыстары жүріп жатыр, бірақ бірнеше минуттан аспайды.',
   membershipRole__admin: 'Әкімші',
   membershipRole__basicMember: 'Мүше',
@@ -315,6 +316,7 @@ export const kkKZ: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -982,6 +984,7 @@ export const kkKZ: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,

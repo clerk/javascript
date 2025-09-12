@@ -21,6 +21,13 @@ const fapiClientWithProxy = createFapiClient({
   proxyUrl,
 });
 
+const proxyUrlWithTrailingSlash = 'https://clerk.com/api/__clerk/';
+
+const fapiClientWithProxyTrailingSlash = createFapiClient({
+  ...baseFapiClientOptions,
+  proxyUrl: proxyUrlWithTrailingSlash,
+});
+
 type RecursivePartial<T> = {
   [P in keyof T]?: RecursivePartial<T[P]>;
 };
@@ -76,6 +83,20 @@ describe('buildUrl(options)', () => {
   it('returns the full frontend API URL using proxy url', () => {
     expect(fapiClientWithProxy.buildUrl({ path: '/foo' }).href).toBe(
       `${proxyUrl}/v1/foo?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=test`,
+    );
+  });
+
+  it('returns the correct URL when proxy URL has a trailing slash', () => {
+    // The expected URL should NOT have double slashes after __clerk
+    expect(fapiClientWithProxyTrailingSlash.buildUrl({ path: '/foo' }).href).toBe(
+      `https://clerk.com/api/__clerk/v1/foo?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=test`,
+    );
+  });
+
+  it('handles complex paths correctly with proxy URL with trailing slash', () => {
+    const path = '/client/sign_ins/sia_123/prepare_first_factor';
+    expect(fapiClientWithProxyTrailingSlash.buildUrl({ path }).href).toBe(
+      `https://clerk.com/api/__clerk/v1${path}?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=test`,
     );
   });
 

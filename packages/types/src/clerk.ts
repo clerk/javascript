@@ -961,13 +961,28 @@ type ClerkOptionsNavigation =
       routerDebug?: boolean;
     };
 
+type ClerkOptionsLegacyRedirectProps = {
+  /**
+   * @deprecated Use `signInFallbackRedirectUrl` or `signInForceRedirectUrl` instead.
+   */
+  afterSignInUrl?: string | null;
+  /**
+   * @deprecated Use `signUpFallbackRedirectUrl` or `signUpForceRedirectUrl` instead.
+   */
+  afterSignUpUrl?: string | null;
+  /**
+   * @deprecated Use `signInFallbackRedirectUrl`, `signInForceRedirectUrl`, `signUpFallbackRedirectUrl`, or `signUpForceRedirectUrl` instead.
+   */
+  redirectUrl?: string | null;
+};
+
 export type ClerkOptions = ClerkOptionsNavigation &
   SignInForceRedirectUrl &
   SignInFallbackRedirectUrl &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
   NewSubscriptionRedirectUrl &
-  LegacyRedirectProps &
+  ClerkOptionsLegacyRedirectProps &
   AfterSignOutUrl &
   AfterMultiSessionSingleSignOutUrl & {
     /**
@@ -1026,6 +1041,11 @@ export type ClerkOptions = ClerkOptionsNavigation &
            * Telemetry events are only logged to the console and not sent to Clerk
            */
           debug?: boolean;
+          /**
+           * If false, the sampling rates provided per telemetry event will be ignored and all events will be sent.
+           * @default true
+           */
+          perEventSampling?: boolean;
         };
 
     /**

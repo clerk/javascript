@@ -1,5 +1,5 @@
 ---
-'@clerk/vue': minor
+'@clerk/astro': minor
 ---
 
 Expose billing buttons as experimental

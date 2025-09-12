@@ -29,6 +29,7 @@ export const createEnvironmentFixtureHelpers = (baseEnvironment: EnvironmentJSON
     ...createDisplayConfigFixtureHelpers(baseEnvironment),
     ...createOrganizationSettingsFixtureHelpers(baseEnvironment),
     ...createUserSettingsFixtureHelpers(baseEnvironment),
+    ...createBillingSettingsFixtureHelpers(baseEnvironment),
   };
 };
 
@@ -347,6 +348,21 @@ const createOrganizationSettingsFixtureHelpers = (environment: EnvironmentJSON) 
     os.domains.default_role = defaultRole ?? null;
   };
   return { withOrganizations, withMaxAllowedMemberships, withOrganizationDomains, withForceOrganizationSelection };
+};
+
+const createBillingSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
+  const os = environment.commerce_settings.billing;
+  const withBilling = () => {
+    os.enabled = true;
+    os.user.enabled = true;
+    os.user.has_paid_plans = true;
+    os.organization.enabled = true;
+    os.organization.has_paid_plans = true;
+    os.has_paid_org_plans = true;
+    os.has_paid_user_plans = true;
+  };
+
+  return { withBilling };
 };
 
 const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
