@@ -9,6 +9,10 @@ export interface SignInFutureCreateParams {
   redirectUrl?: string;
   actionCompleteRedirectUrl?: string;
   transfer?: boolean;
+  /**
+   * @internal Used to indicate the request is coming from an iframe context.
+   */
+  iframeContext?: boolean;
 }
 
 export type SignInFuturePasswordParams =

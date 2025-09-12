@@ -128,6 +128,10 @@ export type SignInCreateParams = (
       identifier?: string;
       oidcPrompt?: string;
       oidcLoginHint?: string;
+      /**
+       * @internal Used to indicate the request is coming from an iframe context.
+       */
+      iframeContext?: boolean;
     }
   | {
       strategy: TicketStrategy;
