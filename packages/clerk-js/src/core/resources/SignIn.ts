@@ -1,3 +1,4 @@
+import { inBrowser } from '@clerk/shared/browser';
 import { ClerkWebAuthnError } from '@clerk/shared/error';
 import { Poller } from '@clerk/shared/poller';
 import { deepCamelToSnake, deepSnakeToCamel } from '@clerk/shared/underscore';
@@ -87,7 +88,6 @@ import {
 } from '../errors';
 import { eventBus } from '../events';
 import { BaseResource, UserData, Verification } from './internal';
-import { inBrowser } from '@clerk/shared/browser';
 
 export class SignIn extends BaseResource implements SignInResource {
   pathRoot = '/client/sign_ins';
@@ -741,7 +741,7 @@ class SignInFuture implements SignInFutureResource {
       let verifyUrl = redirectUrl;
       try {
         new URL(verifyUrl);
-      } catch (err) {
+      } catch {
         verifyUrl = window.location.origin + verifyUrl;
       }
 
