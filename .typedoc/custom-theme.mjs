@@ -47,6 +47,26 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
     this.partials = {
       ...superPartials,
       /**
+       * This hides the "Experimental" text and "Example" section from the output (by default).
+       * @param {import('typedoc').Comment} model
+       * @param {{ headingLevel?: number; showSummary?: boolean; showTags?: boolean; showReturns?: boolean; isTableColumn?: boolean }} [options]
+       */
+      comment: (model, options) => {
+        if (
+          model.hasModifier('@experimental') &&
+          [ReflectionKind.Class, ReflectionKind.Interface].includes(this.page?.model?.kind)
+        ) {
+          model.removeModifier('@experimental');
+          model.removeTags('@example');
+          model.removeTags('@see');
+
+          const res = superPartials.comment(model, options);
+
+          return res.replace(/^\n+/, '');
+        }
+        return superPartials.comment(model, options);
+      },
+      /**
        * This hides the "Type parameters" section and the signature title from the output (by default). Shows the signature title if the `@displayFunctionSignature` tag is present.
        * @param {import('typedoc').SignatureReflection} model
        * @param {{ headingLevel: number, nested?: boolean, accessor?: string, multipleSignatures?: boolean; hideTitle?: boolean }} options
@@ -218,13 +238,19 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
         const customizedModel = model;
         customizedModel.typeParameters = undefined;
 
-        // Extract the Accessors group (if any) and prevent default rendering for it
         const originalGroups = customizedModel.groups;
-        const accessorsGroup = originalGroups?.find(g => g.title === 'Accessors');
-        const groupsWithoutAccessors = originalGroups?.filter(g => g.title !== 'Accessors');
+
+        // When an interface extends another interface, typedoc will generate a "Methods" group
+        // We want to hide this group from being rendered
+        const groupsWithoutMethods = originalGroups?.filter(g => g.title !== 'Methods');
+
+        // Extract the Accessors group (if any) and prevent default rendering for it
+        const accessorsGroup = groupsWithoutMethods?.find(g => g.title === 'Accessors');
+        const groupsWithoutAccessors = groupsWithoutMethods?.filter(g => g.title !== 'Accessors');
 
         customizedModel.groups = groupsWithoutAccessors;
         const nonAccessorOutput = superPartials.memberWithGroups(customizedModel, options);
+
         customizedModel.groups = originalGroups;
 
         /** @type {string[]} */
