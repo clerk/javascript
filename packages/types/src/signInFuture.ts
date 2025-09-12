@@ -2,7 +2,7 @@ import type { SetActiveNavigate } from './clerk';
 import type { PhoneCodeChannel } from './phoneCodeChannel';
 import type { SignInFirstFactor, SignInStatus } from './signInCommon';
 import type { OAuthStrategy } from './strategies';
-import { VerificationResource } from './verification';
+import type { VerificationResource } from './verification';
 
 export interface SignInFutureCreateParams {
   identifier?: string;
