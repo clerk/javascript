@@ -94,6 +94,8 @@ export const ArrowBlockButton = React.forwardRef<HTMLButtonElement, ArrowBlockBu
               sx={[
                 theme => ({
                   width: theme.sizes.$5,
+                  // Fixes a bug in Safari where the icon shifts when navigating between routes.
+                  transform: 'translateZ(0)',
                 }),
                 leftIconSx,
               ]}
