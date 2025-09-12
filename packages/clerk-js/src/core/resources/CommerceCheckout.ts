@@ -307,6 +307,7 @@ export class CheckoutFuture implements CheckoutFutureResourceLax {
   private resource = new CommerceCheckout(null);
   private readonly config: CreateCheckoutParams;
   private readonly signals: ReturnType<typeof createSignals>;
+  private readonly pendingOperations = new Map<string, Promise<{ error: unknown }> | null>();
 
   constructor(signals: ReturnType<typeof createSignals>, config: CreateCheckoutParams) {
     this.config = config;
@@ -354,39 +355,66 @@ export class CheckoutFuture implements CheckoutFutureResourceLax {
   }
 
   async start(): Promise<{ error: unknown }> {
-    return runAsyncResourceTask(this.signals, async () => {
-      const checkout = (await CommerceCheckout.clerk.billing?.startCheckout(this.config)) as CommerceCheckout;
-      this.resource = checkout;
-      this.signals.resourceSignal({ resource: this });
-    });
+    return this.runAsyncResourceTask(
+      'start',
+      async () => {
+        const checkout = (await CommerceCheckout.clerk.billing?.startCheckout(this.config)) as CommerceCheckout;
+        this.resource = checkout;
+      },
+      () => {
+        this.resource = new CommerceCheckout(null);
+        this.signals.resourceSignal({ resource: this });
+      },
+    );
   }
 
   async confirm(params: ConfirmCheckoutParams): Promise<{ error: unknown }> {
-    return runAsyncResourceTask(this.signals, async () => {
+    return this.runAsyncResourceTask('confirm', async () => {
       await this.resource.confirm(params);
-      this.signals.resourceSignal({ resource: this });
     });
+  }
+
+  private runAsyncResourceTask<T>(operationType: string, task: () => Promise<T>, beforeTask?: () => void) {
+    return createRunAsyncResourceTask(this, this.signals, this.pendingOperations)(operationType, task, beforeTask);
   }
 }
 
-async function runAsyncResourceTask<T>(
+function createRunAsyncResourceTask(
+  resource: CheckoutFuture,
   signals: ReturnType<typeof createSignals>,
-  task: () => Promise<T>,
-): Promise<{ result?: T; error: unknown }> {
-  startBatch();
-  signals.errorSignal({ error: null });
-  signals.fetchSignal({ status: 'fetching' });
-  endBatch();
-  startBatch();
-  try {
-    const result = await task();
-    return { result, error: null };
-  } catch (err) {
-    signals.errorSignal({ error: err });
-    endBatch();
-    return { error: err };
-  } finally {
-    signals.fetchSignal({ status: 'idle' });
-    endBatch();
-  }
+  pendingOperations: Map<string, Promise<{ error: unknown }> | null>,
+): <T>(operationType: string, task: () => Promise<T>, beforeTask?: () => void) => Promise<{ error: unknown }> {
+  return async (operationType, task, beforeTask?: () => void) => {
+    if (pendingOperations.get(operationType)) {
+      // Wait for the existing operation to complete and return its result
+      // If it fails, all callers should receive the same error
+      return pendingOperations.get(operationType) as Promise<{ error: unknown }>;
+    }
+
+    const operationPromise = (async () => {
+      startBatch();
+      signals.errorSignal({ error: null });
+      signals.fetchSignal({ status: 'fetching' });
+      // signals.resourceSignal({ resource: null });
+      beforeTask?.();
+      endBatch();
+      startBatch();
+      try {
+        await task();
+        signals.resourceSignal({ resource: resource });
+        return { error: null };
+      } catch (err) {
+        signals.errorSignal({ error: err });
+        endBatch();
+        return { error: err };
+      } finally {
+        pendingOperations.delete(operationType);
+        signals.fetchSignal({ status: 'idle' });
+        endBatch();
+      }
+    })();
+
+    pendingOperations.set(operationType, operationPromise);
+    return operationPromise;
+  };
 }
