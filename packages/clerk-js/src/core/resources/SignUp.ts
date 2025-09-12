@@ -615,7 +615,7 @@ class SignUpFuture implements SignUpFutureResource {
         body.unsafeMetadata = normalizeUnsafeMetadata(params.unsafeMetadata);
       }
 
-      if (params.legalAccepted) {
+      if (typeof params.legalAccepted !== 'undefined') {
         body.legalAccepted = params.legalAccepted;
       }
 
@@ -642,7 +642,7 @@ class SignUpFuture implements SignUpFutureResource {
         body.unsafeMetadata = normalizeUnsafeMetadata(params.unsafeMetadata);
       }
 
-      if (params.legalAccepted) {
+      if (typeof params.legalAccepted !== 'undefined') {
         body.legalAccepted = params.legalAccepted;
       }
 
@@ -689,7 +689,7 @@ class SignUpFuture implements SignUpFutureResource {
         body.unsafeMetadata = normalizeUnsafeMetadata(params.unsafeMetadata);
       }
 
-      if (params.legalAccepted) {
+      if (typeof params.legalAccepted !== 'undefined') {
         body.legalAccepted = params.legalAccepted;
       }
 
