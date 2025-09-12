@@ -559,20 +559,20 @@ class SignInFuture implements SignInFutureResource {
       }
 
       const status = getClerkQueryParam('__clerk_status') as 'verified' | 'expired' | 'failed' | 'client_mismatch';
-      const createdSessionID = getClerkQueryParam('__clerk_created_session');
+      const createdSessionId = getClerkQueryParam('__clerk_created_session');
 
-      if (!status || !createdSessionID) {
+      if (!status || !createdSessionId) {
         return null;
       }
 
       const verifiedFromTheSameClient =
         status === 'verified' &&
         typeof SignIn.clerk.client !== 'undefined' &&
-        SignIn.clerk.client.sessions.some(s => s.id === createdSessionID);
+        SignIn.clerk.client.sessions.some(s => s.id === createdSessionId);
 
       return {
         status,
-        createdSessionID,
+        createdSessionId,
         verifiedFromTheSameClient,
       };
     },

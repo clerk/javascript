@@ -165,7 +165,7 @@ export interface SignInFutureResource {
       /**
        * The created session ID
        */
-      createdSessionID: string;
+      createdSessionId: string;
 
       /**
        * Whether the verification was from the same client
