@@ -31,7 +31,7 @@ describe('Checkout', () => {
     });
 
     // Mock billing to prevent actual API calls and stay in loading state
-    fixtures.clerk.billing.startCheckout.mockImplementation(() => new Promise(() => {}));
+    fixtures.clerk.billing.startCheckout.mockResolvedValue({} as any);
 
     const { baseElement } = render(
       <Drawer.Root
@@ -67,7 +67,7 @@ describe('Checkout', () => {
     });
 
     // Mock billing to prevent actual API calls
-    fixtures.clerk.billing.startCheckout.mockImplementation(() => new Promise(() => {}));
+    fixtures.clerk.billing.startCheckout.mockResolvedValue({} as any);
 
     const { baseElement, getByRole } = render(
       <Drawer.Root
@@ -135,7 +135,7 @@ describe('Checkout', () => {
     });
 
     // Mock billing to stay in loading state
-    fixtures.clerk.billing.startCheckout.mockImplementation(() => new Promise(() => {}));
+    fixtures.clerk.billing.startCheckout.mockResolvedValue({} as any);
 
     const { baseElement } = render(
       <Drawer.Root
@@ -167,7 +167,7 @@ describe('Checkout', () => {
       f.withBilling();
     });
 
-    fixtures.clerk.billing.startCheckout.mockImplementation(() => new Promise(() => {}));
+    fixtures.clerk.billing.startCheckout.mockResolvedValue({} as any);
 
     const { baseElement } = render(
       <Drawer.Root
@@ -209,7 +209,7 @@ describe('Checkout', () => {
     });
 
     // Mock billing to prevent actual API calls
-    fixtures.clerk.billing.startCheckout.mockImplementation(() => new Promise(() => {}));
+    fixtures.clerk.billing.startCheckout.mockResolvedValue({} as any);
 
     const { baseElement } = render(
       <Drawer.Root
@@ -235,7 +235,7 @@ describe('Checkout', () => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
       f.withBilling();
     });
-    fixtures.clerk.billing.startCheckout.mockImplementation(() => new Promise(() => {}));
+    fixtures.clerk.billing.startCheckout.mockResolvedValue({} as any);
     const { baseElement } = render(
       <Drawer.Root
         open
@@ -257,7 +257,7 @@ describe('Checkout', () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
     });
-    fixtures.clerk.billing.startCheckout.mockImplementation(() => new Promise(() => {}));
+    fixtures.clerk.billing.startCheckout.mockResolvedValue({} as any);
     const { baseElement } = render(
       <Drawer.Root
         open
@@ -281,7 +281,7 @@ describe('Checkout', () => {
       f.withBilling();
     });
 
-    fixtures.clerk.billing.startCheckout.mockImplementation(() => new Promise(() => {}));
+    fixtures.clerk.billing.startCheckout.mockResolvedValue({} as any);
 
     const { baseElement } = render(
       <Drawer.Root
@@ -316,7 +316,6 @@ describe('Checkout', () => {
     });
 
     const freeTrialEndsAt = new Date('2025-08-19');
-
     fixtures.clerk.billing.startCheckout.mockResolvedValue({
       id: 'chk_trial_1',
       status: 'needs_confirmation',
@@ -472,6 +471,188 @@ describe('Checkout', () => {
       expect(getByText('Trial successfully started!')).toBeVisible();
       expect(getByText('Trial ends on')).toBeVisible();
       expect(getByText('August 19, 2025')).toBeVisible();
+    });
+  });
+
+  it('renders subscription start data on completed stage for downgrades', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
+    });
+
+    fixtures.clerk.billing.startCheckout.mockResolvedValue({
+      id: 'chk_payment_method_2',
+      status: 'completed',
+      externalClientSecret: 'cs_test_payment_method_2',
+      externalGatewayId: 'gw_test',
+      totals: {
+        subtotal: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
+        grandTotal: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
+        taxTotal: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
+        credit: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
+        pastDue: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
+        totalDueNow: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
+      },
+      isImmediatePlanChange: true,
+      planPeriod: 'month',
+      plan: {
+        id: 'plan_trial',
+        name: 'Pro',
+        description: 'Pro plan',
+        features: [],
+        fee: {
+          amount: 1000,
+          amountFormatted: '10.00',
+          currency: 'USD',
+          currencySymbol: '$',
+        },
+        annualFee: {
+          amount: 12000,
+          amountFormatted: '120.00',
+          currency: 'USD',
+          currencySymbol: '$',
+        },
+        annualMonthlyFee: {
+          amount: 1000,
+          amountFormatted: '10.00',
+          currency: 'USD',
+          currencySymbol: '$',
+        },
+        slug: 'pro',
+        avatarUrl: '',
+        publiclyVisible: true,
+        isDefault: true,
+        isRecurring: true,
+        hasBaseFee: false,
+        forPayerType: 'user',
+        freeTrialDays: 7,
+        freeTrialEnabled: true,
+      },
+      paymentSource: {
+        id: 'pm_test_visa',
+        last4: '4242',
+        paymentMethod: 'card',
+        cardType: 'visa',
+        isDefault: true,
+        isRemovable: true,
+        status: 'active',
+        walletType: undefined,
+        remove: jest.fn(),
+        makeDefault: jest.fn(),
+        pathRoot: '/',
+        reload: jest.fn(),
+      },
+      planPeriodStart: new Date('2025-08-19'),
+      confirm: jest.fn(),
+      freeTrialEndsAt: null,
+    } as any);
+
+    const { getByText } = render(
+      <Drawer.Root
+        open
+        onOpenChange={() => {}}
+      >
+        <Checkout
+          planId='plan_payment_method_complete'
+          planPeriod='month'
+        />
+      </Drawer.Root>,
+      { wrapper },
+    );
+
+    await waitFor(() => {
+      expect(getByText('Subscription begins')).toBeVisible();
+      expect(getByText('August 19, 2025')).toBeVisible();
+    });
+  });
+
+  it('renders payment method on completed stage', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
+    });
+
+    fixtures.clerk.billing.startCheckout.mockResolvedValue({
+      id: 'chk_payment_method_2',
+      status: 'completed',
+      externalClientSecret: 'cs_test_payment_method_2',
+      externalGatewayId: 'gw_test',
+      totals: {
+        subtotal: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
+        grandTotal: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
+        taxTotal: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
+        credit: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
+        pastDue: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
+        totalDueNow: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
+      },
+      isImmediatePlanChange: true,
+      planPeriod: 'month',
+      plan: {
+        id: 'plan_trial',
+        name: 'Pro',
+        description: 'Pro plan',
+        features: [],
+        fee: {
+          amount: 1000,
+          amountFormatted: '10.00',
+          currency: 'USD',
+          currencySymbol: '$',
+        },
+        annualFee: {
+          amount: 12000,
+          amountFormatted: '120.00',
+          currency: 'USD',
+          currencySymbol: '$',
+        },
+        annualMonthlyFee: {
+          amount: 1000,
+          amountFormatted: '10.00',
+          currency: 'USD',
+          currencySymbol: '$',
+        },
+        slug: 'pro',
+        avatarUrl: '',
+        publiclyVisible: true,
+        isDefault: true,
+        isRecurring: true,
+        hasBaseFee: false,
+        forPayerType: 'user',
+        freeTrialDays: 7,
+        freeTrialEnabled: true,
+      },
+      paymentSource: {
+        id: 'pm_test_visa',
+        last4: '4242',
+        paymentMethod: 'card',
+        cardType: 'visa',
+        isDefault: true,
+        isRemovable: true,
+        status: 'active',
+        walletType: undefined,
+        remove: jest.fn(),
+        makeDefault: jest.fn(),
+        pathRoot: '/',
+        reload: jest.fn(),
+      },
+      confirm: jest.fn(),
+      freeTrialEndsAt: null,
+    } as any);
+
+    const { getByText } = render(
+      <Drawer.Root
+        open
+        onOpenChange={() => {}}
+      >
+        <Checkout
+          planId='plan_payment_method_complete'
+          planPeriod='month'
+        />
+      </Drawer.Root>,
+      { wrapper },
+    );
+
+    await waitFor(() => {
+      expect(getByText('Visa ⋯ 4242')).toBeVisible();
     });
   });
 
