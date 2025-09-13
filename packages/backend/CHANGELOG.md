@@ -1,5 +1,20 @@
 # Change Log
 
+## 2.14.1
+
+### Patch Changes
+
+- Added missing `orderBy` field to machines list method ([#6767](https://github.com/clerk/javascript/pull/6767)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Example:
+
+  ```ts
+  clerkClient.machines.list({
+    ...params,
+    orderBy: 'name',
+  });
+  ```
+
 ## 2.14.0
 
 ### Minor Changes
