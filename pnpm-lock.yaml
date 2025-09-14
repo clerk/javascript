@@ -119,7 +119,7 @@ importers:
         specifier: ^29.3.1
         version: 29.5.12
       '@types/node':
-        specifier: ^22.17.2
+        specifier: ^22.18.1
         version: 22.18.1
       '@types/react':
         specifier: catalog:react
@@ -541,7 +541,7 @@ importers:
         specifier: ^0.2.2
         version: 0.2.2
       '@types/node':
-        specifier: ^22.17.2
+        specifier: ^22.18.1
         version: 22.18.1
       '@types/webpack-env':
         specifier: ^1.18.8
