@@ -2,4 +2,4 @@
 "@clerk/backend": patch
 ---
 
-Add JSDoc around machines and m2m resource types
+Add JSDoc around Machine and M2M resource types
