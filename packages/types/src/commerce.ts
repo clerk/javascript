@@ -522,7 +522,6 @@ export interface CommerceSubscriptionItemResource extends ClerkResource {
   credit?: {
     /**
      * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://docs.renovatebot.com/dependency-pinning/#what-is-dependency-pinning) the SDK version and the clerk-js version to avoid breaking changes.
-     * ```
      */
     amount: CommerceMoneyAmount;
   };
