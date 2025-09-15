@@ -69,9 +69,9 @@ function buildOrgPermissions({
 }
 
 /**
- * @experimental
- *
  * Resolves the signed-in auth state from JWT claims.
+ *
+ * @experimental
  */
 const __experimental_JWTPayloadToAuthObjectProperties = (claims: JwtPayload): SharedSignedInAuthObjectProperties => {
   let orgId: string | undefined;

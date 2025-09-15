@@ -827,8 +827,7 @@ export interface FeatureJSON extends ClerkResourceJSON {
 }
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version to avoid breaking changes.
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://docs.renovatebot.com/dependency-pinning/#what-is-dependency-pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface CommercePlanJSON extends ClerkResourceJSON {
   object: typeof ObjectType.CommercePlan;
@@ -859,8 +858,7 @@ type CommerceSubscriptionItemStatus =
   | 'upcoming';
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version to avoid breaking changes.
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://docs.renovatebot.com/dependency-pinning/#what-is-dependency-pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface CommerceSubscriptionItemJSON extends ClerkResourceJSON {
   object: typeof ObjectType.CommerceSubscriptionItem;

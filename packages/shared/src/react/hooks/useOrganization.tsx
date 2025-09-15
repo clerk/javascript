@@ -67,13 +67,14 @@ export type UseOrganizationParams = {
    */
   invitations?: true | PaginatedHookConfig<GetInvitationsParams>;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
    * If set to `true`, all default properties will be used.<br />
    * Otherwise, accepts an object with the following optional properties:
    * <ul>
    *  <li>`orgId`: A string that filters the subscriptions by the provided organization ID.</li>
    *  <li>Any of the properties described in [Shared properties](#shared-properties).</li>
    * </ul>
+   *
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://docs.renovatebot.com/dependency-pinning/#what-is-dependency-pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   subscriptions?: true | PaginatedHookConfig<GetSubscriptionsParams>;
 };
@@ -112,8 +113,9 @@ export type UseOrganizationReturn<T extends UseOrganizationParams> =
        */
       invitations: PaginatedResourcesWithDefault<OrganizationInvitationResource>;
       /**
-       * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
        * Includes a paginated list of the organization's subscriptions.
+       *
+       * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://docs.renovatebot.com/dependency-pinning/#what-is-dependency-pinning) the SDK version and the clerk-js version to avoid breaking changes.
        */
       subscriptions: PaginatedResourcesWithDefault<CommerceSubscriptionItemResource>;
     }

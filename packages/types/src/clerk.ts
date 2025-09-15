@@ -230,22 +230,15 @@ export interface Clerk {
   user: UserResource | null | undefined;
 
   /**
-   * @experimental This experimental API is subject to change.
-   *
    * Entrypoint for Clerk's Signal API containing resource signals along with accessible versions of `computed()` and
    * `effect()` that can be used to subscribe to changes from Signals.
+   *
+   * @experimental This experimental API is subject to change.
    */
   __internal_state: State;
 
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * @see https://clerk.com/docs/billing/overview
-   *
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://docs.renovatebot.com/dependency-pinning/#what-is-dependency-pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   billing: CommerceBillingNamespace;
 
@@ -488,8 +481,8 @@ export interface Clerk {
   /**
    * Prefetches the data displayed by an organization switcher.
    * It can be used when `mountOrganizationSwitcher({ asStandalone: true})`, to avoid unwanted loading states.
-   * This API is still under active development and may change at any moment.
-   * @experimental
+   *
+   * @experimental This experimental API is subject to change.
    * @param props Optional user verification configuration parameters.
    */
   __experimental_prefetchOrganizationSwitcher: () => void;
@@ -1871,14 +1864,7 @@ export type RevokeAPIKeyParams = {
 };
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * @see https://clerk.com/docs/billing/overview
- *
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://docs.renovatebot.com/dependency-pinning/#what-is-dependency-pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export type __internal_CheckoutProps = {
   appearance?: CheckoutTheme;
@@ -1897,14 +1883,7 @@ export type __internal_CheckoutProps = {
 };
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * @see https://clerk.com/docs/billing/overview
- *
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://docs.renovatebot.com/dependency-pinning/#what-is-dependency-pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export type __experimental_CheckoutButtonProps = {
   planId: string;
@@ -1925,14 +1904,7 @@ export type __experimental_CheckoutButtonProps = {
 };
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * @see https://clerk.com/docs/billing/overview
- *
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://docs.renovatebot.com/dependency-pinning/#what-is-dependency-pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export type __internal_PlanDetailsProps = (
   | {
@@ -1954,14 +1926,7 @@ export type __internal_PlanDetailsProps = (
 };
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * @see https://clerk.com/docs/billing/overview
- *
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://docs.renovatebot.com/dependency-pinning/#what-is-dependency-pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export type __experimental_PlanDetailsButtonProps = (
   | {
@@ -1985,14 +1950,7 @@ export type __experimental_PlanDetailsButtonProps = (
 };
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * @see https://clerk.com/docs/billing/overview
- *
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://docs.renovatebot.com/dependency-pinning/#what-is-dependency-pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export type __internal_SubscriptionDetailsProps = {
   /**
@@ -2008,14 +1966,7 @@ export type __internal_SubscriptionDetailsProps = {
 };
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * @see https://clerk.com/docs/billing/overview
- *
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://docs.renovatebot.com/dependency-pinning/#what-is-dependency-pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export type __experimental_SubscriptionDetailsButtonProps = {
   /**

@@ -47,26 +47,6 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
     this.partials = {
       ...superPartials,
       /**
-       * This hides the "Experimental" text and "Example" section from the output (by default).
-       * @param {import('typedoc').Comment} model
-       * @param {{ headingLevel?: number; showSummary?: boolean; showTags?: boolean; showReturns?: boolean; isTableColumn?: boolean }} [options]
-       */
-      comment: (model, options) => {
-        if (
-          model.hasModifier('@experimental') &&
-          [ReflectionKind.Class, ReflectionKind.Interface].includes(this.page?.model?.kind)
-        ) {
-          model.removeModifier('@experimental');
-          model.removeTags('@example');
-          model.removeTags('@see');
-
-          const res = superPartials.comment(model, options);
-
-          return res.replace(/^\n+/, '');
-        }
-        return superPartials.comment(model, options);
-      },
-      /**
        * This hides the "Type parameters" section and the signature title from the output (by default). Shows the signature title if the `@displayFunctionSignature` tag is present.
        * @param {import('typedoc').SignatureReflection} model
        * @param {{ headingLevel: number, nested?: boolean, accessor?: string, multipleSignatures?: boolean; hideTitle?: boolean }} options
