@@ -1040,7 +1040,8 @@ export const csCZ: LocalizationResource = {
     deletePage: {
       actionDescription: 'Napište "Smazat účet" níže pro pokračování.',
       confirm: 'Smazat účet',
-      messageLine1: 'Jste si jisti, že chcete smazat svůj účet?',
+      messageLine1:
+        'Jste si jisti, že chcete smazat svůj účet z Clerk? Kontaktujte prosím vlastníka aplikace pro smazání vašich informací z jejich aplikace a dalších služeb.',
       messageLine2: 'Tato akce je trvalá a nevratná.',
       title: 'Smazat účet',
     },

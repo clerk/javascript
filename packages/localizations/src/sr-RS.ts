@@ -1029,7 +1029,8 @@ export const srRS: LocalizationResource = {
     deletePage: {
       actionDescription: 'Upiši "Delete account" ispod da nastaviš.',
       confirm: 'Obriši nalog',
-      messageLine1: 'Da li si siguran da želiš da obrišeš svoj nalog?',
+      messageLine1:
+        'Da li si siguran da želiš da obrišeš svoj nalog iz Clerk-a? Molim te kontaktiraj vlasnika aplikacije da obriše tvoje informacije iz njihove aplikacije i drugih usluga.',
       messageLine2: 'Ova akcija je trajna i nepovratna.',
       title: 'Obriši nalog',
     },

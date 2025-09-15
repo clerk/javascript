@@ -1043,7 +1043,8 @@ export const frFR: LocalizationResource = {
     deletePage: {
       actionDescription: 'Saisissez "Supprimer le compte" ci-dessous pour continuer.',
       confirm: 'Supprimer le compte',
-      messageLine1: 'Êtes-vous sûr(e) de vouloir supprimer votre compte ?',
+      messageLine1:
+        "Êtes-vous sûr(e) de vouloir supprimer votre compte de Clerk ? Veuillez contacter le propriétaire de l'application pour supprimer vos informations de leur application et d'autres services.",
       messageLine2: 'Cette action est définitive et irréversible.',
       title: 'Supprimer le compte',
     },

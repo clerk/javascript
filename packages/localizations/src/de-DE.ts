@@ -1058,7 +1058,8 @@ export const deDE: LocalizationResource = {
     deletePage: {
       actionDescription: 'Geben Sie "Konto löschen" ein, um fortzufahren.',
       confirm: 'Konto löschen',
-      messageLine1: 'Sind Sie sicher, dass Sie ihr Konto löschen möchten?',
+      messageLine1:
+        'Sind Sie sicher, dass Sie Ihr Konto bei Clerk löschen möchten? Bitte kontaktieren Sie den Anwendungsbesitzer, um Ihre Informationen aus deren Anwendung und anderen Diensten zu löschen.',
       messageLine2: 'Diese Aktion ist endgültig und kann nicht rückgängig gemacht werden.',
       title: 'Konto löschen',
     },
