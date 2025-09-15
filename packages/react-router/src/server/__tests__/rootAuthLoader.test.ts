@@ -4,7 +4,7 @@ import { data, type LoaderFunctionArgs } from 'react-router';
 import type { MockInstance } from 'vitest';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { middlewareMigrationWarning } from '../../utils/errors';
+import { v8MiddlewareFlagRequiredWarning } from '../../utils/errors';
 import { authFnContext, requestStateContext } from '../clerkMiddleware';
 import { legacyAuthenticateRequest } from '../legacyAuthenticateRequest';
 import { rootAuthLoader } from '../rootAuthLoader';
@@ -141,7 +141,7 @@ describe('rootAuthLoader', () => {
 
   describe('without middleware context', () => {
     const mockContext = {
-      get: vi.fn().mockReturnValue(null),
+      // No get/set methods - simulates v8_middleware flag not enabled
     };
 
     const args = {
@@ -163,7 +163,7 @@ describe('rootAuthLoader', () => {
       await rootAuthLoader(args, () => ({ data: 'test' }));
 
       expect(legacyAuthenticateRequest).toHaveBeenCalled();
-      expect(warnOnceSpy).toHaveBeenCalledWith(middlewareMigrationWarning);
+      expect(warnOnceSpy).toHaveBeenCalledWith(v8MiddlewareFlagRequiredWarning);
     });
 
     it('should handle no callback', async () => {

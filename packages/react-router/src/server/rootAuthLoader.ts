@@ -3,7 +3,11 @@ import { decorateObjectWithResources } from '@clerk/backend/internal';
 import { logger } from '@clerk/shared/logger';
 import type { LoaderFunctionArgs } from 'react-router';
 
-import { invalidRootLoaderCallbackReturn, middlewareMigrationWarning } from '../utils/errors';
+import {
+  invalidRootLoaderCallbackReturn,
+  middlewareMigrationWarning,
+  v8MiddlewareFlagRequiredWarning,
+} from '../utils/errors';
 import { authFnContext, requestStateContext } from './clerkMiddleware';
 import { legacyAuthenticateRequest } from './legacyAuthenticateRequest';
 import { loadOptions } from './loadOptions';
@@ -127,10 +131,16 @@ export const rootAuthLoader: RootAuthLoader = async (
       ? handlerOrOptions
       : {};
 
-  const requestState = IsOptIntoMiddleware(args.context) && args.context.get(requestStateContext);
+  const hasMiddlewareFlag = IsOptIntoMiddleware(args.context);
+  const requestState = hasMiddlewareFlag && args.context.get(requestStateContext);
 
   if (!requestState) {
-    logger.warnOnce(middlewareMigrationWarning);
+    // Check if v8_middleware flag is not enabled first
+    if (!hasMiddlewareFlag) {
+      logger.warnOnce(v8MiddlewareFlagRequiredWarning);
+    } else {
+      logger.warnOnce(middlewareMigrationWarning);
+    }
     return legacyRootAuthLoader(args, handlerOrOptions, opts);
   }
 

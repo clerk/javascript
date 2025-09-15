@@ -30,7 +30,7 @@ export const requestStateContext = createContext<RequestState<any> | null>(null)
  *   },
  * }
  *
- * // app.tsx
+ * // root.tsx
  * export const middleware: Route.MiddlewareFunction[] = [clerkMiddleware()]
  */
 export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareFunction<Response> => {

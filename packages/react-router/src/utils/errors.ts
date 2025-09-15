@@ -121,6 +121,12 @@ export const middlewareMigrationWarning = createErrorMessage(`
 ${middlewareMigrationExample}
 `);
 
+export const v8MiddlewareFlagRequiredWarning = createErrorMessage(`
+The 'v8_middleware' future flag is required to use the new middleware system.
+
+${middlewareMigrationExample}
+`);
+
 export const v8MiddlewareFlagError = createErrorMessage(`
 Enable the 'v8_middleware' future flag to start using the clerkMiddleware middleware.
 

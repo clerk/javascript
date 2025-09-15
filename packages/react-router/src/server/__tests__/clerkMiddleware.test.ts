@@ -17,6 +17,7 @@ const mockLoadOptions = vi.mocked(loadOptions);
 describe('clerkMiddleware', () => {
   const mockNext = vi.fn();
   const mockContext = {
+    get: vi.fn(),
     set: vi.fn(),
   };
 
@@ -146,5 +147,15 @@ describe('clerkMiddleware', () => {
     expect(result.headers.get('x-clerk-auth-status')).toBe('signed-in');
     expect(result.headers.get('x-clerk-auth-reason')).toBe('auth-reason');
     expect(result.headers.get('x-clerk-auth-message')).toBe('auth-message');
+  });
+
+  it('should throw error when v8_middleware flag is not enabled', async () => {
+    const middleware = clerkMiddleware();
+    const args = {
+      request: new Request('http://clerk.com'),
+      context: {}, // Context without 'get' and 'set' methods
+    } as LoaderFunctionArgs;
+
+    await expect(middleware(args, mockNext)).rejects.toThrow("Enable the 'v8_middleware' future flag");
   });
 });
