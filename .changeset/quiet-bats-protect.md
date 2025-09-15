@@ -15,6 +15,20 @@ export const loader = (args: Route.LoaderArgs) => rootAuthLoader(args)
 ```
 
 **After (Recommended):**
+
+1. Enable the `v8_middleware` future flag:
+
+```ts
+// react-router.config.ts
+export default {
+  future: {
+    v8_middleware: true,
+  },
+} satisfies Config;
+```
+
+2. Use the middleware in your app:
+
 ```tsx
 import { clerkMiddleware, rootAuthLoader } from '@clerk/react-router/server'
 
