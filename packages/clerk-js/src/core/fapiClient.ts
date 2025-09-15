@@ -251,6 +251,8 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
             return overwrittenRequestMethod === 'GET' && iterations < maxTries;
           },
           onBeforeRetry: (iteration: number): void => {
+            // Add the retry attempt to the query string params.
+            // We use params to keep the request simple for CORS.
             url.searchParams.set('_clerk_retry_attempt', iteration.toString());
           },
         });
