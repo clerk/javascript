@@ -6,10 +6,11 @@ import type { PendingSessionOptions } from '@clerk/types';
 import type { MiddlewareFunction } from 'react-router';
 import { createContext } from 'react-router';
 
+import { v8MiddlewareFlagError } from '../utils/errors';
 import { clerkClient } from './clerkClient';
 import { loadOptions } from './loadOptions';
 import type { ClerkMiddlewareOptions } from './types';
-import { patchRequest } from './utils';
+import { IsOptIntoMiddleware, patchRequest } from './utils';
 
 export const authFnContext = createContext<((options?: PendingSessionOptions) => AuthObject) | null>(null);
 export const requestStateContext = createContext<RequestState<any> | null>(null);
@@ -24,6 +25,10 @@ export const requestStateContext = createContext<RequestState<any> | null>(null)
  */
 export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareFunction<Response> => {
   return async (args, next) => {
+    if (!IsOptIntoMiddleware(args.context)) {
+      throw new Error(v8MiddlewareFlagError);
+    }
+
     const clerkRequest = createClerkRequest(patchRequest(args.request));
     const loadedOptions = loadOptions(args, options);
     const { audience, authorizedParties } = loadedOptions;

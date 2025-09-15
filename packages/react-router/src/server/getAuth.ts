@@ -6,6 +6,7 @@ import {
 import type { PendingSessionOptions } from '@clerk/types';
 import type { LoaderFunctionArgs } from 'react-router';
 
+import { IsOptIntoMiddleware } from '../server/utils';
 import { noLoaderArgsPassedInGetAuth } from '../utils/errors';
 import { authFnContext } from './clerkMiddleware';
 import { legacyAuthenticateRequest } from './legacyAuthenticateRequest';
@@ -24,7 +25,7 @@ export const getAuth: GetAuthFn<LoaderFunctionArgs, true> = (async (
   const { acceptsToken, treatPendingAsSignedOut, ...restOptions } = opts || {};
 
   // If the middleware is installed, use the auth function from the context
-  const authObjectFn = args.context.get(authFnContext);
+  const authObjectFn = IsOptIntoMiddleware(args.context) && args.context.get(authFnContext);
   if (authObjectFn) {
     return getAuthObjectForAcceptedToken({
       authObject: authObjectFn({ treatPendingAsSignedOut }),

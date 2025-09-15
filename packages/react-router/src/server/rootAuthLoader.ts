@@ -17,6 +17,7 @@ import {
   getResponseClerkState,
   injectRequestStateIntoResponse,
   isDataWithResponseInit,
+  IsOptIntoMiddleware,
   isRedirect,
   isResponse,
 } from './utils';
@@ -45,7 +46,7 @@ async function processRootAuthLoader(
   requestState: RequestState,
   handler?: RootAuthLoaderCallback<any>,
 ): Promise<LoaderFunctionReturn> {
-  const hasMiddleware = !!args.context.get(authFnContext);
+  const hasMiddleware = IsOptIntoMiddleware(args.context) && !!args.context.get(authFnContext);
   const includeClerkHeaders = !hasMiddleware;
 
   if (!handler) {
@@ -126,7 +127,7 @@ export const rootAuthLoader: RootAuthLoader = async (
       ? handlerOrOptions
       : {};
 
-  const requestState = args.context.get(requestStateContext);
+  const requestState = IsOptIntoMiddleware(args.context) && args.context.get(requestStateContext);
 
   if (!requestState) {
     logger.warnOnce(middlewareMigrationWarning);

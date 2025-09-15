@@ -40,6 +40,14 @@ export function assertValidHandlerResult(val: any, error?: string): asserts val 
   }
 }
 
+/**
+ * `get` and `set` properties will only be available if v8_middleware flag is enabled
+ * See: https://reactrouter.com/upgrading/future#futurev8_middleware
+ */
+export const IsOptIntoMiddleware = (context: AppLoadContext) => {
+  return 'get' in context && 'set' in context;
+};
+
 export const injectRequestStateIntoResponse = async (
   response: Response,
   requestState: RequestStateWithRedirectUrls,

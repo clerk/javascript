@@ -120,3 +120,9 @@ export const middlewareMigrationWarning = createErrorMessage(`
 
 ${middlewareMigrationExample}
 `);
+
+export const v8MiddlewareFlagError = createErrorMessage(`
+Enable the 'v8_middleware' future flag to start using the clerkMiddleware middleware.
+
+For more details, see: https://reactrouter.com/upgrading/future#futurev8_middleware
+`);
