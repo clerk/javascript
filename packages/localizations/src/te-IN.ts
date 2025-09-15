@@ -249,6 +249,7 @@ export const teIN: LocalizationResource = {
     action__signOut: 'సైన్ అవుట్',
     title: '{{identifier}} గా సైన్ ఇన్ చేసారు',
   },
+  lastAuthenticationStrategy: 'చివరిగా ఉపయోగించినది',
   maintenanceMode: 'మేము ప్రస్తుతం నిర్వహణలో ఉన్నాము, కానీ చింతించకండి, ఇది కొన్ని నిమిషాల కంటే ఎక్కువ సమయం తీసుకోదు.',
   membershipRole__admin: 'నిర్వాహకుడు',
   membershipRole__basicMember: 'సభ్యుడు',
@@ -316,6 +317,7 @@ export const teIN: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1008,6 +1010,7 @@ export const teIN: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1039,7 +1042,8 @@ export const teIN: LocalizationResource = {
     deletePage: {
       actionDescription: 'కొనసాగించడానికి క్రింద "Delete account" అని టైప్ చేయండి.',
       confirm: 'ఖాతాను తొలగించండి',
-      messageLine1: 'మీరు ఖచ్చితంగా మీ ఖాతాను తొలగించాలనుకుంటున్నారా?',
+      messageLine1:
+        'మీరు ఖచ్చితంగా Clerk నుండి మీ ఖాతాను తొలగించాలనుకుంటున్నారా? మీ సమాచారాన్ని వారి అప్లికేషన్ మరియు ఇతర సేవల నుండి తొలగించడానికి దయచేసి అప్లికేషన్ యజమానిని సంప్రదించండి.',
       messageLine2: 'ఈ చర్య శాశ్వతం మరియు తిరగదీయలేనిది.',
       title: 'ఖాతాను తొలగించండి',
     },

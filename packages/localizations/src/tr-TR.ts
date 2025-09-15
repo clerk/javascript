@@ -249,6 +249,7 @@ export const trTR: LocalizationResource = {
     action__signOut: 'Çıkış yap',
     title: '{{identifier}} olarak giriş yapıldı',
   },
+  lastAuthenticationStrategy: 'Son kullanılan',
   maintenanceMode: 'Şu anda bakımdayız, ancak endişelenmeyin, kısa bir süre içinde tamamlanacaktır.',
   membershipRole__admin: 'Yönetici',
   membershipRole__basicMember: 'Üye',
@@ -315,6 +316,7 @@ export const trTR: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -999,6 +1001,7 @@ export const trTR: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1031,7 +1034,8 @@ export const trTR: LocalizationResource = {
     deletePage: {
       actionDescription: 'Devam etmek için aşağıya “Hesabı sil” yazın.',
       confirm: 'Hesabı sil',
-      messageLine1: 'Hesabınızı silmek istediğinizden emin misiniz?',
+      messageLine1:
+        "Clerk'teki hesabınızı silmek istediğinizden emin misiniz? Bilgilerinizi uygulamalarından ve diğer hizmetlerinden silmek için lütfen uygulama sahibiyle iletişime geçin.",
       messageLine2: 'Bu işlem kalıcıdır ve geri alınamaz.',
       title: 'Hesabı sil',
     },

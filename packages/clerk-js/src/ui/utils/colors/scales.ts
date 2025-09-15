@@ -112,7 +112,9 @@ function generateLegacyLightnessScale(baseColor: string): ColorScale<string> {
 function processColorInput(
   color: string | ColorScale<string> | CssColorOrScale | undefined,
 ): { baseColor: string; userScale?: ColorScale<string> } | null {
-  if (!color) return null;
+  if (!color) {
+    return null;
+  }
 
   if (typeof color === 'string') {
     return { baseColor: color };
@@ -148,7 +150,9 @@ function processColorInput(
  * Merges user-defined colors with generated scale
  */
 function mergeWithUserScale(generated: ColorScale<string>, userScale?: ColorScale<string>): ColorScale<string> {
-  if (!userScale) return generated;
+  if (!userScale) {
+    return generated;
+  }
 
   return { ...generated, ...userScale };
 }

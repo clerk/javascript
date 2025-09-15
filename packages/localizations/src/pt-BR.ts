@@ -256,6 +256,7 @@ export const ptBR: LocalizationResource = {
     action__signOut: 'Sair',
     title: 'Logado como {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Último uso',
   maintenanceMode: 'Estamos em manutenção, mas não se preocupe, não deve levar mais do que alguns minutos',
   membershipRole__admin: 'Administrador',
   membershipRole__basicMember: 'Membro',
@@ -323,6 +324,7 @@ export const ptBR: LocalizationResource = {
         totalPaid: 'Total pago',
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'Assinar um plano',
         actionLabel__switchPlan: 'Mudar de plano',
         tableHeader__edit: 'Editar',
@@ -1011,6 +1013,7 @@ export const ptBR: LocalizationResource = {
         totalPaid: 'Total pago',
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'Assinar um plano',
         actionLabel__switchPlan: 'Mudar de plano',
         tableHeader__edit: 'Editar',
@@ -1043,7 +1046,8 @@ export const ptBR: LocalizationResource = {
     deletePage: {
       actionDescription: 'Digite Excluir conta abaixo para continuar.',
       confirm: 'Excluir conta',
-      messageLine1: 'Tem certeza de que deseja excluir sua conta?',
+      messageLine1:
+        'Tem certeza de que deseja excluir sua conta do Clerk? Entre em contato com o proprietário do aplicativo para excluir suas informações de seu aplicativo e outros serviços.',
       messageLine2: 'Esta ação é permanente e irreversível.',
       title: 'Excluir conta',
     },

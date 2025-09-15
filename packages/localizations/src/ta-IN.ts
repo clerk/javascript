@@ -250,6 +250,7 @@ export const taIN: LocalizationResource = {
     action__signOut: 'வெளியேறு',
     title: '{{identifier}} ஆக உள்நுழைந்துள்ளீர்கள்',
   },
+  lastAuthenticationStrategy: 'கடைசியாகப் பயன்படுத்தியது',
   maintenanceMode: 'தற்போது நாங்கள் பராமரிப்பில் உள்ளோம், ஆனால் கவலைப்பட வேண்டாம், இது சில நிமிடங்களுக்கு மேல் ஆகாது.',
   membershipRole__admin: 'நிர்வாகி',
   membershipRole__basicMember: 'உறுப்பினர்',
@@ -317,6 +318,7 @@ export const taIN: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1012,6 +1014,7 @@ export const taIN: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1044,7 +1047,8 @@ export const taIN: LocalizationResource = {
     deletePage: {
       actionDescription: 'தொடர கீழே "Delete account" என்று உள்ளிடவும்.',
       confirm: 'கணக்கை நீக்கு',
-      messageLine1: 'உங்கள் கணக்கை நீக்க விரும்புகிறீர்களா?',
+      messageLine1:
+        'Clerk-லிருந்து உங்கள் கணக்கை நீக்க விரும்புகிறீர்களா? உங்கள் தகவலை அவர்களின் பயன்பாடு மற்றும் பிற சேவைகளில் இருந்து நீக்க, பயன்பாட்டின் உரிமையாளரைத் தொடர்பு கொள்ளவும்.',
       messageLine2: 'இந்த செயல் நிரந்தரமானது மற்றும் மாற்ற முடியாதது.',
       title: 'கணக்கை நீக்கு',
     },

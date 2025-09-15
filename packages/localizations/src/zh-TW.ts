@@ -248,6 +248,7 @@ export const zhTW: LocalizationResource = {
     action__signOut: '登出',
     title: '以 {{identifier}} 身份登入',
   },
+  lastAuthenticationStrategy: '上次使用',
   maintenanceMode: undefined,
   membershipRole__admin: '管理員',
   membershipRole__basicMember: '成員',
@@ -314,6 +315,7 @@ export const zhTW: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -977,6 +979,7 @@ export const zhTW: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1008,7 +1011,7 @@ export const zhTW: LocalizationResource = {
     deletePage: {
       actionDescription: '請在下方輸入「Delete account」以繼續。',
       confirm: '刪除帳戶',
-      messageLine1: '您確定要刪除您的帳戶嗎？',
+      messageLine1: '您確定要刪除您在 Clerk 的帳戶嗎？請聯絡應用程式擁有者以從他們的應用程式和其他服務中刪除您的資訊。',
       messageLine2: '此動作將永久生效且無法復原。',
       title: '刪除帳戶',
     },

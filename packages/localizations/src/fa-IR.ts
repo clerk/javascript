@@ -255,6 +255,7 @@ export const faIR: LocalizationResource = {
     action__signOut: 'خروج',
     title: 'با نام کاربری {{identifier}} وارد سیستم شدم',
   },
+  lastAuthenticationStrategy: 'آخرین استفاده',
   maintenanceMode: 'در حال حاضر در حال تعمیر و نگهداری هستیم، اما نگران نباشید، نباید بیشتر از چند دقیقه طول بکشد.',
   membershipRole__admin: 'مدیر',
   membershipRole__basicMember: 'عضو',
@@ -322,6 +323,7 @@ export const faIR: LocalizationResource = {
         totalPaid: 'کل پرداختی',
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'در یک طرح مشترک شوید',
         actionLabel__switchPlan: 'تغییر طرح',
         tableHeader__edit: undefined,
@@ -1006,6 +1008,7 @@ export const faIR: LocalizationResource = {
         totalPaid: 'کل پرداختی',
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'در یک طرح مشترک شوید',
         actionLabel__switchPlan: 'تغییر طرح',
         tableHeader__edit: 'ویرایش',
@@ -1038,7 +1041,8 @@ export const faIR: LocalizationResource = {
     deletePage: {
       actionDescription: 'برای ادامه، عبارت "Delete account" را در زیر تایپ کنید.',
       confirm: 'حذف حساب',
-      messageLine1: 'آیا مطمئن هستید که می‌خواهید حساب کاربری خود را حذف کنید؟',
+      messageLine1:
+        'آیا مطمئن هستید که می‌خواهید حساب کاربری خود را از Clerk حذف کنید؟ لطفاً با صاحب برنامه تماس بگیرید تا اطلاعات شما را از برنامه آنها و سایر خدمات حذف کنند.',
       messageLine2: 'این اقدام دائمی و غیرقابل برگشت است.',
       title: 'حذف حساب',
     },

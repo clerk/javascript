@@ -249,6 +249,7 @@ export const heIL: LocalizationResource = {
     action__signOut: 'התנתק',
     title: 'מחובר כ{{identifier}}',
   },
+  lastAuthenticationStrategy: 'בשימוש אחרון',
   maintenanceMode: undefined,
   membershipRole__admin: 'מנהל',
   membershipRole__basicMember: 'חבר',
@@ -315,6 +316,7 @@ export const heIL: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -984,6 +986,7 @@ export const heIL: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1015,7 +1018,8 @@ export const heIL: LocalizationResource = {
     deletePage: {
       actionDescription: 'הקלד "מחק חשבון" למטה כדי להמשיך.',
       confirm: 'מחק חשבון',
-      messageLine1: 'האם אתה בטוח שאתה רוצה למחוק את החשבון שלך?',
+      messageLine1:
+        'האם אתה בטוח שאתה רוצה למחוק את החשבון שלך מ-Clerk? אנא צור קשר עם בעל האפליקציה כדי למחוק את המידע שלך מהאפליקציה שלהם ומשירותים אחרים.',
       messageLine2: 'פעולה זו היא סופית ובלתי הפיכה.',
       title: 'מחק חשבון',
     },

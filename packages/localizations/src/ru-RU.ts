@@ -252,6 +252,7 @@ export const ruRU: LocalizationResource = {
     action__signOut: 'Выйти',
     title: 'Вы вошли как {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Последнее использование',
   maintenanceMode:
     'В данный момент мы проводим техническое обслуживание, но не беспокойтесь, это не займет больше нескольких минут.',
   membershipRole__admin: 'Администратор',
@@ -319,6 +320,7 @@ export const ruRU: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1011,6 +1013,7 @@ export const ruRU: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1043,7 +1046,8 @@ export const ruRU: LocalizationResource = {
     deletePage: {
       actionDescription: 'Введите "Удалить учетную запись" ниже, чтобы продолжить.',
       confirm: 'Удалить учетную запись',
-      messageLine1: 'Вы уверены, что хотите удалить свою учетную запись?',
+      messageLine1:
+        'Вы уверены, что хотите удалить свою учетную запись из Clerk? Пожалуйста, свяжитесь с владельцем приложения, чтобы удалить вашу информацию из их приложения и других сервисов.',
       messageLine2: 'Это действие является окончательным и необратимым.',
       title: 'Удалить учетную запись',
     },

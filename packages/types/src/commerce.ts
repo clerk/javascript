@@ -40,14 +40,6 @@ export interface CommerceBillingNamespace {
   getSubscription: (params: GetSubscriptionParams) => Promise<CommerceSubscriptionResource>;
 
   /**
-   * @deprecated Use `getSubscription` to fetch a single subscription with its items
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://docs.renovatebot.com/dependency-pinning/#what-is-dependency-pinning) the SDK version and the clerk-js version to avoid breaking changes.
-   */
-  getSubscriptions: (
-    params: GetSubscriptionsParams,
-  ) => Promise<ClerkPaginatedResponse<CommerceSubscriptionItemResource>>;
-
-  /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://docs.renovatebot.com/dependency-pinning/#what-is-dependency-pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   getStatements: (params: GetStatementsParams) => Promise<ClerkPaginatedResponse<CommerceStatementResource>>;
@@ -451,11 +443,6 @@ export interface CommerceStatementGroup {
    */
   items: CommercePaymentResource[];
 }
-
-/**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://docs.renovatebot.com/dependency-pinning/#what-is-dependency-pinning) the SDK version and the clerk-js version to avoid breaking changes.
- */
-export type GetSubscriptionsParams = WithOptionalOrgType<ClerkPaginationParams>;
 
 /**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://docs.renovatebot.com/dependency-pinning/#what-is-dependency-pinning) the SDK version and the clerk-js version to avoid breaking changes.

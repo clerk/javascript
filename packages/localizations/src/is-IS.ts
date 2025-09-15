@@ -250,6 +250,7 @@ export const isIS: LocalizationResource = {
     action__signOut: 'Skrá út',
     title: 'Skráður inn sem {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Síðast notað',
   maintenanceMode: 'Við erum nú í viðhaldi, en ekki hafa áhyggjur, það ætti ekki að taka meira en nokkrar mínútur.',
   membershipRole__admin: 'Stjórnandi',
   membershipRole__basicMember: 'Meðlimur',
@@ -316,6 +317,7 @@ export const isIS: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -999,6 +1001,7 @@ export const isIS: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1031,7 +1034,8 @@ export const isIS: LocalizationResource = {
     deletePage: {
       actionDescription: 'Sláðu inn "Eyða reikningi" hér að neðan til að halda áfram.',
       confirm: 'Eyða reikningi',
-      messageLine1: 'Ertu viss um að þú viljir eyða reikningnum þínum?',
+      messageLine1:
+        'Ertu viss um að þú viljir eyða reikningnum þínum úr Clerk? Vinsamlegast hafðu samband við eiganda forritsins til að eyða upplýsingum þínum úr forriti þeirra og öðrum þjónustum.',
       messageLine2: 'Þessi aðgerð er varanleg og óafturkræf.',
       title: 'Eyða reikningi',
     },

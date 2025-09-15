@@ -251,6 +251,7 @@ export const beBY: LocalizationResource = {
     action__signOut: 'Выйсці',
     title: 'Вы ўвайшлі як {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Апошняе выкарыстанне',
   maintenanceMode: 'Рэжым тэхнічнага абслугоўвання',
   membershipRole__admin: 'Адміністратар',
   membershipRole__basicMember: 'Удзельнік',
@@ -317,6 +318,7 @@ export const beBY: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1002,6 +1004,7 @@ export const beBY: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1034,7 +1037,8 @@ export const beBY: LocalizationResource = {
     deletePage: {
       actionDescription: "Увядзіце 'Выдаліць уліковы запіс' ніжэй, каб працягнуць.",
       confirm: 'Выдаліць уліковы запіс',
-      messageLine1: 'Вы ўпэўнены, што хочаце выдаліць свой уліковы запіс?',
+      messageLine1:
+        'Вы ўпэўнены, што хочаце выдаліць свой уліковы запіс з Clerk? Калі ласка, звярніцеся да ўладальніка дадатка, каб выдаліць вашу інфармацыю з іх дадатка і іншых сэрвісаў.',
       messageLine2: "Гэта дзеянне з'яўляецца бессрочным і неабратным.",
       title: 'Выдаліць уліковы запіс',
     },

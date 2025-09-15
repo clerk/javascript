@@ -1,5 +1,42 @@
 # @clerk/vue
 
+## 1.13.1
+
+### Patch Changes
+
+- Updated dependencies [[`23948dc`](https://github.com/clerk/javascript/commit/23948dc777ec6a17bafbae59c253a93143b0e105), [`82b84fe`](https://github.com/clerk/javascript/commit/82b84fed5f207673071ba7354a17f4a76e101201), [`54b4b5a`](https://github.com/clerk/javascript/commit/54b4b5a5f811f612fadf5c47ffda94a750c57a5e), [`50a8622`](https://github.com/clerk/javascript/commit/50a8622c3579306f15e5d40e5ea72b4fe4384ef7), [`23948dc`](https://github.com/clerk/javascript/commit/23948dc777ec6a17bafbae59c253a93143b0e105)]:
+  - @clerk/types@4.86.0
+  - @clerk/shared@3.25.0
+
+## 1.13.0
+
+### Minor Changes
+
+- Replaced callback props with event emitters in billing buttons: ([#6733](https://github.com/clerk/javascript/pull/6733)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  props `onSubscriptionComplete` → emit `subscription-complete`
+  props `onSubscriptionCancel` → emit `subscription-cancel`
+
+### Patch Changes
+
+- Improved error message when Clerk plugin is not installed ([#6719](https://github.com/clerk/javascript/pull/6719)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`55490c3`](https://github.com/clerk/javascript/commit/55490c31fadc82bdca6cd5f2b22e5e158aaba0cb), [`e8d21de`](https://github.com/clerk/javascript/commit/e8d21de39b591973dad48fc1d1851c4d28b162fe), [`637f2e8`](https://github.com/clerk/javascript/commit/637f2e8768b76aaf756062b6b5b44bf651f66789)]:
+  - @clerk/types@4.85.0
+  - @clerk/shared@3.24.2
+
+## 1.12.0
+
+### Minor Changes
+
+- Expose billing buttons as experimental ([#6680](https://github.com/clerk/javascript/pull/6680)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Updated dependencies [[`fced4fc`](https://github.com/clerk/javascript/commit/fced4fc869bb21c77826dfaf281b6640e0f0c006), [`e6e19d2`](https://github.com/clerk/javascript/commit/e6e19d2d2f3b2c4617b25f53830216a1d550e616), [`1b1e8b1`](https://github.com/clerk/javascript/commit/1b1e8b1fd33b787f956b17b193e5fd0a4cdc6cec)]:
+  - @clerk/types@4.84.1
+  - @clerk/shared@3.24.1
+
 ## 1.11.7
 
 ### Patch Changes

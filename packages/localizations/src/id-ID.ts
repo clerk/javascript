@@ -249,6 +249,7 @@ export const idID: LocalizationResource = {
     action__signOut: 'Keluar',
     title: 'Masuk sebagai {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Terakhir digunakan',
   maintenanceMode:
     'Kami sedang dalam pemeliharaan sistem, tapi jangan khawatir, ini tidak akan memakan waktu lebih dari beberapa menit.',
   membershipRole__admin: 'Admin',
@@ -316,6 +317,7 @@ export const idID: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1005,6 +1007,7 @@ export const idID: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1037,7 +1040,8 @@ export const idID: LocalizationResource = {
     deletePage: {
       actionDescription: 'Ketik "Delete account" di bawah untuk melanjutkan.',
       confirm: 'Hapus akun',
-      messageLine1: 'Anda yakin ingin menghapus akun Anda?',
+      messageLine1:
+        'Anda yakin ingin menghapus akun Anda dari Clerk? Silakan hubungi pemilik aplikasi untuk menghapus informasi Anda dari aplikasi mereka dan layanan lainnya.',
       messageLine2: 'Tindakan ini permanen dan tidak dapat dibatalkan.',
       title: 'Hapus akun',
     },

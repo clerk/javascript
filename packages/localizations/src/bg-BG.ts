@@ -250,6 +250,7 @@ export const bgBG: LocalizationResource = {
     action__signOut: 'Изход',
     title: 'Влезли сте като {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Последно използвано',
   maintenanceMode: 'Режим на поддръжка',
   membershipRole__admin: 'Админ',
   membershipRole__basicMember: 'Член',
@@ -316,6 +317,7 @@ export const bgBG: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -994,6 +996,7 @@ export const bgBG: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1026,7 +1029,8 @@ export const bgBG: LocalizationResource = {
     deletePage: {
       actionDescription: 'Напишете "Изтриване на акаунта" по-долу, за да продължите.',
       confirm: 'Изтриване на акаунта',
-      messageLine1: 'Сигурни ли сте, че искате да изтриете акаунта си?',
+      messageLine1:
+        'Сигурни ли сте, че искате да изтриете акаунта си от Clerk? Моля, свържете се със собственика на приложението, за да изтриете информацията си от тяхното приложение и други услуги.',
       messageLine2: 'Това действие е перманентно и необратимо.',
       title: 'Изтриване на акаунта',
     },

@@ -250,6 +250,7 @@ export const jaJP: LocalizationResource = {
     action__signOut: 'サインアウト',
     title: '{{identifier}}としてサインイン中',
   },
+  lastAuthenticationStrategy: '最後に使用したもの',
   maintenanceMode: undefined,
   membershipRole__admin: '管理者',
   membershipRole__basicMember: 'メンバー',
@@ -316,6 +317,7 @@ export const jaJP: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -997,6 +999,7 @@ export const jaJP: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1028,7 +1031,8 @@ export const jaJP: LocalizationResource = {
     deletePage: {
       actionDescription: '続行するには下記に「Delete account」を入力してください。',
       confirm: 'アカウント削除',
-      messageLine1: 'アカウントを削除してもよろしいですか？',
+      messageLine1:
+        'Clerk からアカウントを削除してもよろしいですか？あなたの情報をアプリケーションや他のサービスから削除するには、アプリケーションの所有者にお問い合わせください。',
       messageLine2: 'この操作は永久的で取り消すことはできません。',
       title: 'アカウントの削除',
     },

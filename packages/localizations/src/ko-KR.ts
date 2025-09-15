@@ -250,6 +250,7 @@ export const koKR: LocalizationResource = {
     action__signOut: '로그아웃',
     title: '{{identifier}}로 로그인했습니다',
   },
+  lastAuthenticationStrategy: '최근 사용',
   maintenanceMode: undefined,
   membershipRole__admin: '관리자',
   membershipRole__basicMember: '멤버',
@@ -316,6 +317,7 @@ export const koKR: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -988,6 +990,7 @@ export const koKR: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1019,7 +1022,8 @@ export const koKR: LocalizationResource = {
     deletePage: {
       actionDescription: '계속하려면 아래에 계정 삭제를 입력하세요.',
       confirm: '계정 삭제',
-      messageLine1: '정말로 계정을 삭제하시겠습니까?',
+      messageLine1:
+        'Clerk에서 계정을 삭제하시겠습니까? 애플리케이션 및 기타 서비스에서 귀하의 정보를 삭제하려면 애플리케이션 소유자에게 문의하시기 바랍니다.',
       messageLine2: '이 작업은 영구적이며 되돌릴 수 없습니다.',
       title: '계정 삭제',
     },

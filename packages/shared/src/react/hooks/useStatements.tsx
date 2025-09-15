@@ -11,6 +11,9 @@ export const useStatements = createCommercePaginatedHook<CommerceStatementResour
   resourceType: 'commerce-statements',
   useFetcher: () => {
     const clerk = useClerkInstanceContext();
-    return clerk.billing.getStatements;
+    if (clerk.loaded) {
+      return clerk.billing.getStatements;
+    }
+    return undefined;
   },
 });

@@ -56,7 +56,9 @@ function buildOrgPermissions({
     }
 
     const permissionBits = featurePermissionMap[featureIndex];
-    if (!permissionBits) continue;
+    if (!permissionBits) {
+      continue;
+    }
 
     for (let permIndex = 0; permIndex < permissionBits.length; permIndex++) {
       if (permissionBits[permIndex] === 1) {

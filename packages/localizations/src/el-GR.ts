@@ -250,6 +250,7 @@ export const elGR: LocalizationResource = {
     action__signOut: 'Αποσύνδεση',
     title: 'Είστε συνδεδεμένος ως {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Τελευταία χρήση',
   maintenanceMode: undefined,
   membershipRole__admin: 'Διαχειριστής',
   membershipRole__basicMember: 'Μέλος',
@@ -316,6 +317,7 @@ export const elGR: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1001,6 +1003,7 @@ export const elGR: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1033,7 +1036,8 @@ export const elGR: LocalizationResource = {
     deletePage: {
       actionDescription: 'Πληκτρολογήστε "Διαγραφή λογαριασμού" παρακάτω για να συνεχίσετε.',
       confirm: 'Διαγραφή λογαριασμού',
-      messageLine1: 'Είστε βέβαιος ότι θέλετε να διαγράψετε τον λογαριασμό σας;',
+      messageLine1:
+        'Είστε βέβαιος ότι θέλετε να διαγράψετε τον λογαριασμό σας από το Clerk; Παρακαλώ επικοινωνήστε με τον ιδιοκτήτη της εφαρμογής για να διαγράψετε τις πληροφορίες σας από την εφαρμογή τους και άλλες υπηρεσίες.',
       messageLine2: 'Αυτή η ενέργεια είναι μόνιμη και μη αναστρέψιμη.',
       title: 'Διαγραφή λογαριασμού',
     },

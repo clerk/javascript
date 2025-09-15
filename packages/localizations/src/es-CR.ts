@@ -251,6 +251,7 @@ export const esCR: LocalizationResource = {
     action__signOut: 'Cerrar',
     title: 'Registrado como {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Último uso',
   maintenanceMode: 'Actualmente estamos en mantenimiento, pero no te preocupes, no debería llevar más de unos minutos.',
   membershipRole__admin: 'Administrador',
   membershipRole__basicMember: 'Miembro',
@@ -317,6 +318,7 @@ export const esCR: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1006,6 +1008,7 @@ export const esCR: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1037,7 +1040,8 @@ export const esCR: LocalizationResource = {
     deletePage: {
       actionDescription: 'Escribe "Eliminar cuenta" a continuación para continuar',
       confirm: 'Eliminar cuenta',
-      messageLine1: '¿Estás seguro que quieres eliminar tu cuenta?',
+      messageLine1:
+        '¿Estás seguro que quieres eliminar tu cuenta de Clerk? Por favor, contacta al propietario de la aplicación para eliminar tu información de su aplicación y otros servicios.',
       messageLine2: 'Esta acción es permanente e irreversible.',
       title: 'Eliminar cuenta',
     },

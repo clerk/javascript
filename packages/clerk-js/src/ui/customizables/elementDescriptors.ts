@@ -76,6 +76,8 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'socialButtonsProviderIcon',
   'socialButtonsProviderInitialIcon',
 
+  'lastAuthenticationStrategyBadge',
+
   'enterpriseButtonsProviderIcon',
 
   'providerIcon',
@@ -424,6 +426,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'profileSectionSubtitleText',
   'profileSectionContent',
   'profileSectionPrimaryButton',
+  'profileSectionButtonGroup',
   'profilePage',
 
   'formattedPhoneNumber',

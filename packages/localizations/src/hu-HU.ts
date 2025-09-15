@@ -249,6 +249,7 @@ export const huHU: LocalizationResource = {
     action__signOut: 'Kijelentkezés',
     title: 'Bejelntkezve mint {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Legutóbb használt',
   maintenanceMode: 'Jelenleg karbantartás alatt állunk, de ne aggódj, ez nem tart tovább pár percnél!',
   membershipRole__admin: 'Adminisztrátor',
   membershipRole__basicMember: 'Tag',
@@ -315,6 +316,7 @@ export const huHU: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -996,6 +998,7 @@ export const huHU: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1028,7 +1031,8 @@ export const huHU: LocalizationResource = {
     deletePage: {
       actionDescription: 'Írd be, hogy "Delete account" a folytatáshoz.',
       confirm: 'Fiók törlése',
-      messageLine1: 'Biztos vagy benne, hogy törölni szeretnéd a fiókod?',
+      messageLine1:
+        'Biztos vagy benne, hogy törölni szeretnéd a fiókod a Clerk-ből? Kérjük, lépj kapcsolatba az alkalmazás tulajdonosával, hogy töröljék az adataidat az alkalmazásukból és más szolgáltatásaikból.',
       messageLine2: 'Ez a művelet végleges és visszafordíthatatlan.',
       title: 'Fiók törlése',
     },

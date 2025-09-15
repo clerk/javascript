@@ -253,6 +253,7 @@ export const thTH: LocalizationResource = {
     action__signOut: 'ออกจากระบบ',
     title: 'เข้าสู่ระบบในนาม {{identifier}}',
   },
+  lastAuthenticationStrategy: 'ใช้ครั้งสุดท้าย',
   maintenanceMode: 'เรากำลังอยู่ในช่วงการบำรุงรักษาระบบ แต่ไม่ต้องกังวล ไม่น่าจะใช้เวลานานกว่าสองสามนาที',
   membershipRole__admin: 'ผู้ดูแลระบบ',
   membershipRole__basicMember: 'สมาชิก',
@@ -320,6 +321,7 @@ export const thTH: LocalizationResource = {
         totalPaid: 'รวมที่ชำระ',
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'สมัครสมาชิกแผน',
         actionLabel__switchPlan: 'เปลี่ยนแผน',
         tableHeader__edit: 'แก้ไข',
@@ -996,6 +998,7 @@ export const thTH: LocalizationResource = {
         totalPaid: 'รวมที่ชำระ',
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'สมัครสมาชิกแผน',
         actionLabel__switchPlan: 'เปลี่ยนแผน',
         tableHeader__edit: 'แก้ไข',
@@ -1027,7 +1030,8 @@ export const thTH: LocalizationResource = {
     deletePage: {
       actionDescription: 'พิมพ์ "Delete account" ด้านล่างเพื่อดำเนินการต่อ',
       confirm: 'Delete account',
-      messageLine1: 'คุณแน่ใจหรือไม่ว่าต้องการลบบัญชีของคุณ?',
+      messageLine1:
+        'คุณแน่ใจหรือไม่ว่าต้องการลบบัญชีของคุณจาก Clerk? กรุณาติดต่อเจ้าของแอปพลิเคชันเพื่อลบข้อมูลของคุณออกจากแอปพลิเคชันและบริการอื่นๆ ของพวกเขา',
       messageLine2: 'การดำเนินการนี้จะถาวรและไม่สามารถยกเลิกได้',
       title: 'ลบบัญชี',
     },

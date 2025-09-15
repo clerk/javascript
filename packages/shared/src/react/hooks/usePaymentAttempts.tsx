@@ -11,6 +11,9 @@ export const usePaymentAttempts = createCommercePaginatedHook<CommercePaymentRes
   resourceType: 'commerce-payment-attempts',
   useFetcher: () => {
     const clerk = useClerkInstanceContext();
-    return clerk.billing.getPaymentAttempts;
+    if (clerk.loaded) {
+      return clerk.billing.getPaymentAttempts;
+    }
+    return undefined;
   },
 });

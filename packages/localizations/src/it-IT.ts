@@ -257,6 +257,7 @@ export const itIT: LocalizationResource = {
     action__signOut: 'Disconnetti',
     title: 'Accesso tramite {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Ultimo utilizzo',
   maintenanceMode: 'Modalità di manutenzione',
   membershipRole__admin: 'Amministratore',
   membershipRole__basicMember: 'Utente',
@@ -324,6 +325,7 @@ export const itIT: LocalizationResource = {
         totalPaid: 'Totale pagato',
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'Abbonati a un piano',
         actionLabel__switchPlan: 'Cambia piano',
         tableHeader__edit: 'Modifica',
@@ -1005,6 +1007,7 @@ export const itIT: LocalizationResource = {
         totalPaid: 'Totale pagato',
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'Abbonati a un piano',
         actionLabel__switchPlan: 'Cambia piano',
         tableHeader__edit: 'Modifica',
@@ -1037,7 +1040,8 @@ export const itIT: LocalizationResource = {
     deletePage: {
       actionDescription: 'Digita "Elimina account" qui sotto per continuare.',
       confirm: 'Elimina account',
-      messageLine1: 'Sei sicuro di voler eliminare il tuo account?',
+      messageLine1:
+        "Sei sicuro di voler eliminare il tuo account da Clerk? Si prega di contattare il proprietario dell'applicazione per eliminare le tue informazioni dalla loro applicazione e da altri servizi.",
       messageLine2: 'Questa azione è permanente e irreversibile.',
       title: 'Elimina account',
     },

@@ -249,6 +249,7 @@ export const msMY: LocalizationResource = {
     action__signOut: 'Daftar keluar',
     title: 'Didaftarkan sebagai {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Terakhir digunakan',
   maintenanceMode:
     'Kami sedang menjalani penyelenggaraan, tetapi jangan risau, ini tidak sepatutnya mengambil masa lebih daripada beberapa minit.',
   membershipRole__admin: 'Pentadbir',
@@ -317,6 +318,7 @@ export const msMY: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1011,6 +1013,7 @@ export const msMY: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1043,7 +1046,8 @@ export const msMY: LocalizationResource = {
     deletePage: {
       actionDescription: 'Taip "Delete account" di bawah untuk meneruskan.',
       confirm: 'Padam akaun',
-      messageLine1: 'Adakah anda pasti mahu memadam akaun anda?',
+      messageLine1:
+        'Adakah anda pasti mahu memadam akaun anda dari Clerk? Sila hubungi pemilik aplikasi untuk memadam maklumat anda dari aplikasi mereka dan perkhidmatan lain.',
       messageLine2: 'Tindakan ini adalah kekal dan tidak boleh dibatalkan.',
       title: 'Padam akaun',
     },

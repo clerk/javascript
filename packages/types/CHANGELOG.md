@@ -1,5 +1,33 @@
 # Change Log
 
+## 4.86.0
+
+### Minor Changes
+
+- [Billing Beta] Removal of Billing experimental methods: `organization.getSubscriptions()` and `billing.getSubscriptions()` ([#6738](https://github.com/clerk/javascript/pull/6738)) by [@mauricioabreu](https://github.com/mauricioabreu)
+
+- [Experimental] Add support for additional params for SignUp ([#6716](https://github.com/clerk/javascript/pull/6716)) by [@dstaley](https://github.com/dstaley)
+
+## 4.85.0
+
+### Minor Changes
+
+- Change placement of the manage subscription button inside `<UserProfile/>` and `<OrganizationProfile/>` ([#6428](https://github.com/clerk/javascript/pull/6428)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Introduce "Last Used" functionality to Sign In and Up ([#6722](https://github.com/clerk/javascript/pull/6722)) by [@tmilewski](https://github.com/tmilewski)
+
+- feat(types): Update telemetry type to accept perEventSampling argument. ([#6723](https://github.com/clerk/javascript/pull/6723)) by [@heatlikeheatwave](https://github.com/heatlikeheatwave)
+
+## 4.84.1
+
+### Patch Changes
+
+- Fixed incorrect deprecation warnings for legacy redirect props in `<ClerkProvider>`. ([#6699](https://github.com/clerk/javascript/pull/6699)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Update the experimental `Errors` interface to allow null for raw and global error arrays ([#6677](https://github.com/clerk/javascript/pull/6677)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 4.84.0
 
 ### Minor Changes

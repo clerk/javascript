@@ -249,6 +249,7 @@ export const hrHR: LocalizationResource = {
     action__signOut: 'Odjava',
     title: 'Prijavljeni ste kao {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Zadnje korišteno',
   maintenanceMode: 'Trenutno provodimo održavanje, ali ne brinite, ne bi trebalo trajati duže od nekoliko minuta.',
   membershipRole__admin: 'Administrator',
   membershipRole__basicMember: 'Član',
@@ -315,6 +316,7 @@ export const hrHR: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1001,6 +1003,7 @@ export const hrHR: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1032,7 +1035,8 @@ export const hrHR: LocalizationResource = {
     deletePage: {
       actionDescription: 'Upišite "Izbriši račun" ispod za nastavak.',
       confirm: 'Izbriši račun',
-      messageLine1: 'Jeste li sigurni da želite izbrisati svoj račun?',
+      messageLine1:
+        'Jeste li sigurni da želite izbrisati svoj račun iz Clerk-a? Molimo vas da kontaktirate vlasnika aplikacije da ukloni vaše informacije iz njihove aplikacije i drugih usluga.',
       messageLine2: 'Ova radnja je trajna i nepovratna.',
       title: 'Izbriši račun',
     },

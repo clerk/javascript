@@ -250,6 +250,7 @@ export const caES: LocalizationResource = {
     action__signOut: 'Tanca la sessió',
     title: 'Connectat com a {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Últim ús',
   maintenanceMode: undefined,
   membershipRole__admin: 'Administrador',
   membershipRole__basicMember: 'Membre',
@@ -316,6 +317,7 @@ export const caES: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -997,6 +999,7 @@ export const caES: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1029,7 +1032,8 @@ export const caES: LocalizationResource = {
     deletePage: {
       actionDescription: 'Escriu "Elimina compte" a continuació per continuar.',
       confirm: 'Elimina compte',
-      messageLine1: 'Estàs segur que vols eliminar el teu compte?',
+      messageLine1:
+        "Estàs segur que vols eliminar el teu compte de Clerk? Si us plau, contacta amb el propietari de l'aplicació per eliminar la teva informació de la seva aplicació i altres serveis.",
       messageLine2: 'Aquesta acció és permanent i irreversible.',
       title: 'Elimina compte',
     },

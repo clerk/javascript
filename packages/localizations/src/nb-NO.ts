@@ -250,6 +250,7 @@ export const nbNO: LocalizationResource = {
     action__signOut: 'Logg ut',
     title: 'Logget inn som {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Sist brukt',
   maintenanceMode: undefined,
   membershipRole__admin: 'Administrator',
   membershipRole__basicMember: 'Medlem',
@@ -316,6 +317,7 @@ export const nbNO: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -995,6 +997,7 @@ export const nbNO: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1027,7 +1030,8 @@ export const nbNO: LocalizationResource = {
     deletePage: {
       actionDescription: 'Skriv inn "Slett konto" under for å fortsette.',
       confirm: 'Slett konto',
-      messageLine1: 'Er du sikker på at du vil slette kontoen din?',
+      messageLine1:
+        'Er du sikker på at du vil slette kontoen din fra Clerk? Vennligst kontakt applikasjonseieren for å slette informasjonen din fra deres applikasjon og andre tjenester.',
       messageLine2: 'Denne handlingen er permanent og kan ikke reverseres.',
       title: 'Slett konto',
     },

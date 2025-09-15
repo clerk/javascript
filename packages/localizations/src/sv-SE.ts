@@ -250,6 +250,7 @@ export const svSE: LocalizationResource = {
     action__signOut: 'Logga ut',
     title: 'Inloggad som {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Senast använd',
   maintenanceMode: 'Vi genomför för närvarande underhåll, men oroa dig inte, det bör inte ta mer än några minuter.',
   membershipRole__admin: 'Admin',
   membershipRole__basicMember: 'Medlem',
@@ -316,6 +317,7 @@ export const svSE: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -998,6 +1000,7 @@ export const svSE: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1030,7 +1033,8 @@ export const svSE: LocalizationResource = {
     deletePage: {
       actionDescription: 'Skriv "Radera konto" nedan för att fortsätta.',
       confirm: 'Radera konto',
-      messageLine1: 'Är du säker på att du vill radera ditt konto?',
+      messageLine1:
+        'Är du säker på att du vill radera ditt konto från Clerk? Vänligen kontakta applikationens ägare för att radera din information från deras applikation och andra tjänster.',
       messageLine2: 'Denna åtgärd är permanent och kan inte ångras.',
       title: 'Radera konto',
     },

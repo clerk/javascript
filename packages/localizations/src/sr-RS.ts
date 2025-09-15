@@ -249,6 +249,7 @@ export const srRS: LocalizationResource = {
     action__signOut: 'Odjavi se',
     title: 'Prijavljeni ste kao {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Poslednje korišćeno',
   maintenanceMode: 'Trenutno smo u modu održavanja, ali ne brinite, neće trajati duže od nekoliko minuta.',
   membershipRole__admin: 'Administrator',
   membershipRole__basicMember: 'Član',
@@ -315,6 +316,7 @@ export const srRS: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -995,6 +997,7 @@ export const srRS: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1026,7 +1029,8 @@ export const srRS: LocalizationResource = {
     deletePage: {
       actionDescription: 'Upiši "Delete account" ispod da nastaviš.',
       confirm: 'Obriši nalog',
-      messageLine1: 'Da li si siguran da želiš da obrišeš svoj nalog?',
+      messageLine1:
+        'Da li si siguran da želiš da obrišeš svoj nalog iz Clerk-a? Molim te kontaktiraj vlasnika aplikacije da obriše tvoje informacije iz njihove aplikacije i drugih usluga.',
       messageLine2: 'Ova akcija je trajna i nepovratna.',
       title: 'Obriši nalog',
     },

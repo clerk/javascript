@@ -250,6 +250,7 @@ export const fiFI: LocalizationResource = {
     action__signOut: 'Kirjaudu ulos',
     title: 'Kirjautuneena käyttäjänä {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Viimeksi käytetty',
   maintenanceMode: 'Olemme tällä hetkellä huoltotilassa, mutta älä huoli, se ei kestä kauempaa kuin muutama minuutti.',
   membershipRole__admin: 'Ylläpitäjä',
   membershipRole__basicMember: 'Jäsen',
@@ -316,6 +317,7 @@ export const fiFI: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -996,6 +998,7 @@ export const fiFI: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1028,7 +1031,8 @@ export const fiFI: LocalizationResource = {
     deletePage: {
       actionDescription: 'Kirjoita "Delete account" poistaaksesi tilisi.',
       confirm: 'Poista tili',
-      messageLine1: 'Oletko varma, että haluat poistaa tilisi?',
+      messageLine1:
+        'Oletko varma, että haluat poistaa tilisi Clerkistä? Ota yhteyttä sovelluksen omistajaan poistaaksesi tietosi heidän sovelluksestaan ja muista palveluista.',
       messageLine2: 'Tämä toiminto on pysyvä ja peruuttamaton.',
       title: 'Poista tili',
     },

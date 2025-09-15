@@ -250,6 +250,7 @@ export const mnMN: LocalizationResource = {
     action__signOut: 'Гарах',
     title: '{{identifier}}-р нэвтэрсэн',
   },
+  lastAuthenticationStrategy: 'Хамгийн сүүлд ашигласан',
   maintenanceMode: undefined,
   membershipRole__admin: 'Админ',
   membershipRole__basicMember: 'Гишүүн',
@@ -316,6 +317,7 @@ export const mnMN: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -996,6 +998,7 @@ export const mnMN: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1028,7 +1031,8 @@ export const mnMN: LocalizationResource = {
     deletePage: {
       actionDescription: 'Үргэлжлүүлэхийн тулд "Delete account" гэж бичнэ үү.',
       confirm: 'Бүртгэл устгах',
-      messageLine1: 'Та бүртгэлээ устгахдаа итгэлтэй байна уу?',
+      messageLine1:
+        'Та Clerk-ээс бүртгэлээ устгахдаа итгэлтэй байна уу? Таны мэдээллийг тэдний аппликэйшн болон бусад үйлчилгээнээс устгахын тулд аппликэйшний эзэнтэй холбогдоно уу.',
       messageLine2: 'Энэ үйлдэл нь байнгын бөгөөд эргэлт буцалтгүй юм.',
       title: 'Бүртгэл устгах',
     },

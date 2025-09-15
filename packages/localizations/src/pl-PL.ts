@@ -250,6 +250,7 @@ export const plPL: LocalizationResource = {
     action__signOut: 'Wyloguj',
     title: 'Zalogowano jako {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Ostatnio używany',
   maintenanceMode: 'Aktualnie trwają prace konserwacyjne, ale nie powinno to zająć dłużej niż kilka minut.',
   membershipRole__admin: 'Administrator',
   membershipRole__basicMember: 'Użytkownik',
@@ -316,6 +317,7 @@ export const plPL: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1004,6 +1006,7 @@ export const plPL: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1036,7 +1039,8 @@ export const plPL: LocalizationResource = {
     deletePage: {
       actionDescription: 'Wpisz "Usuń konto" poniżej aby kontynuować.',
       confirm: 'Usuń konto',
-      messageLine1: 'Czy na pewno chcesz usunąć to konto?',
+      messageLine1:
+        'Czy na pewno chcesz usunąć swoje konto z Clerk? Skontaktuj się z właścicielem aplikacji, aby usunąć swoje informacje z ich aplikacji i innych usług.',
       messageLine2: 'Ta operacja jest nieodwracalna i nie można jej cofnąć.',
       title: 'Usuń konto',
     },

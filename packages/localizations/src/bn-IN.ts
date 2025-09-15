@@ -249,6 +249,7 @@ export const bnIN: LocalizationResource = {
     action__signOut: 'সাইন আউট',
     title: '{{identifier}} হিসাবে সাইন ইন করা হয়েছে',
   },
+  lastAuthenticationStrategy: 'শেষবার ব্যবহৃত',
   maintenanceMode:
     'আমরা বর্তমানে রক্ষণাবেক্ষণের কাজ করছি, কিন্তু চিন্তা করবেন না, এটি কয়েক মিনিটের বেশি সময় নেবে না।',
   membershipRole__admin: 'অ্যাডমিন',
@@ -317,6 +318,7 @@ export const bnIN: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1005,6 +1007,7 @@ export const bnIN: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1037,7 +1040,8 @@ export const bnIN: LocalizationResource = {
     deletePage: {
       actionDescription: 'চালিয়ে যেতে নীচে "Delete account" টাইপ করুন।',
       confirm: 'অ্যাকাউন্ট মুছুন',
-      messageLine1: 'আপনি কি নিশ্চিত যে আপনি আপনার অ্যাকাউন্ট মুছতে চান?',
+      messageLine1:
+        'আপনি কি নিশ্চিত যে আপনি Clerk থেকে আপনার অ্যাকাউন্ট মুছতে চান? আপনার তথ্য তাদের অ্যাপ্লিকেশন এবং অন্যান্য সেবা থেকে মুছে ফেলার জন্য অ্যাপ্লিকেশনের মালিকের সাথে যোগাযোগ করুন।',
       messageLine2: 'এই কার্যটি স্থায়ী এবং অপরিবর্তনীয়।',
       title: 'অ্যাকাউন্ট মুছুন',
     },

@@ -249,6 +249,7 @@ export const hiIN: LocalizationResource = {
     action__signOut: 'साइन आउट',
     title: '{{identifier}} के रूप में साइन इन किया गया',
   },
+  lastAuthenticationStrategy: 'अंतिम समय प्रयोग हुआ',
   maintenanceMode:
     'हम वर्तमान में रखरखाव कर रहे हैं, लेकिन चिंता न करें, इसमें कुछ मिनटों से अधिक समय नहीं लगना चाहिए।',
   membershipRole__admin: 'व्यवस्थापक',
@@ -317,6 +318,7 @@ export const hiIN: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1006,6 +1008,7 @@ export const hiIN: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1037,7 +1040,8 @@ export const hiIN: LocalizationResource = {
     deletePage: {
       actionDescription: 'जारी रखने के लिए नीचे "Delete account" टाइप करें।',
       confirm: 'खाता हटाएं',
-      messageLine1: 'क्या आप वाकई अपना खाता हटाना चाहते हैं?',
+      messageLine1:
+        'क्या आप वाकई Clerk से अपना खाता हटाना चाहते हैं? कृपया अपनी जानकारी को उनके एप्लिकेशन और अन्य सेवाओं से हटाने के लिए एप्लिकेशन के मालिक से संपर्क करें।',
       messageLine2: 'यह कार्रवाई स्थायी और अपरिवर्तनीय है।',
       title: 'खाता हटाएं',
     },

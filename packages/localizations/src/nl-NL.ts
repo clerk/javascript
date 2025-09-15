@@ -249,6 +249,7 @@ export const nlNL: LocalizationResource = {
     action__signOut: 'Uitloggen',
     title: 'Ingelogd als {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Laatst gebruikt',
   maintenanceMode: 'Onderhoudsmodus',
   membershipRole__admin: 'Beheerder',
   membershipRole__basicMember: 'Lid',
@@ -315,6 +316,7 @@ export const nlNL: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -995,6 +997,7 @@ export const nlNL: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1025,11 +1028,12 @@ export const nlNL: LocalizationResource = {
       title: 'Verbind externe account',
     },
     deletePage: {
-      actionDescription: 'Type "Delete account" below to continue.',
-      confirm: 'Delete account',
-      messageLine1: 'Are you sure you want to delete your account?',
-      messageLine2: 'This action is permanent and irreversible.',
-      title: 'Delete account',
+      actionDescription: 'Typ "Account verwijderen" hieronder om door te gaan.',
+      confirm: 'Account verwijderen',
+      messageLine1:
+        'Weet je zeker dat je je account van Clerk wilt verwijderen? Neem contact op met de eigenaar van de applicatie om je informatie uit hun applicatie en andere services te verwijderen.',
+      messageLine2: 'Deze actie is permanent en onherroepelijk.',
+      title: 'Account verwijderen',
     },
     emailAddressPage: {
       emailCode: {

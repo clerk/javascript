@@ -249,6 +249,7 @@ export const kkKZ: LocalizationResource = {
     action__signOut: 'Шығу',
     title: '{{identifier}} ретінде кірдіңіз',
   },
+  lastAuthenticationStrategy: 'Соңғы пайдаланылған',
   maintenanceMode: 'Қазір техникалық қызмет көрсету жұмыстары жүріп жатыр, бірақ бірнеше минуттан аспайды.',
   membershipRole__admin: 'Әкімші',
   membershipRole__basicMember: 'Мүше',
@@ -315,6 +316,7 @@ export const kkKZ: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -982,6 +984,7 @@ export const kkKZ: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1013,7 +1016,8 @@ export const kkKZ: LocalizationResource = {
     deletePage: {
       actionDescription: 'Жалғастыру үшін "Есептік жазбаны жою" деп енгізіңіз.',
       confirm: 'Есептік жазбаны жою',
-      messageLine1: 'Есептік жазбаңызды жойғыңыз келетініне сенімдісіз бе?',
+      messageLine1:
+        'Clerk-тен есептік жазбаңызды жойғыңыз келетініне сенімдісіз бе? Деректеріңізді олардың қолданбасы мен басқа қызметтерден жою үшін қолданба иесімен байланысыңыз.',
       messageLine2: 'Бұл әрекет тұрақты және қайтымсыз.',
       title: 'Есептік жазбаны жою',
     },
