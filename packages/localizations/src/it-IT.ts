@@ -83,6 +83,7 @@ export const itIT: LocalizationResource = {
     cancelSubscriptionAccessUntil:
       "Puoi continuare a utilizzare le funzionalità di '{{plan}}' fino al {{ date | longDate('it-IT') }}, dopodiché non avrai più accesso.",
     cancelSubscriptionNoCharge: 'Non ti verrà addebitato alcun costo per questo abbonamento.',
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: 'Annullare abbonamento {{plan}}?',
     cannotSubscribeMonthly:
       'Non puoi abbonarti a questo piano pagando mensilmente. Per abbonarti a questo piano, devi scegliere di pagare annualmente.',

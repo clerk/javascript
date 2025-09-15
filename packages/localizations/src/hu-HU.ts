@@ -81,6 +81,7 @@ export const huHU: LocalizationResource = {
     cancelSubscription: undefined,
     cancelSubscriptionAccessUntil: undefined,
     cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: undefined,
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,

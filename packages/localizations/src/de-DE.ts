@@ -84,6 +84,7 @@ export const deDE: LocalizationResource = {
     cancelSubscriptionAccessUntil:
       "Sie haben Zugriff auf '{{plan}}' Funktionen bis zum {{ date | longDate('de-DE') }}. Danach haben Sie keinen Zugriff mehr.",
     cancelSubscriptionNoCharge: 'Für dieses Abonnement fallen keine Kosten an.',
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: '{{plan}} Abonnement kündigen?',
     cannotSubscribeMonthly:
       'Sie können diesen Plan nicht monatlich abonnieren, da nur eine jährliche Abrechnung verfügbar ist.',

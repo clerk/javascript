@@ -81,6 +81,7 @@ export const kkKZ: LocalizationResource = {
     cancelSubscription: 'Жазылымды болдырмау',
     cancelSubscriptionAccessUntil: undefined,
     cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: undefined,
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,

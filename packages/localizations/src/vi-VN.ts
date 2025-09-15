@@ -83,6 +83,7 @@ export const viVN: LocalizationResource = {
     cancelSubscriptionAccessUntil:
       "Bạn có thể tiếp tục sử dụng tính năng '{{plan}}' cho đến {{ date | longDate('vi-VN') }}, sau đó bạn sẽ không còn quyền truy cập.",
     cancelSubscriptionNoCharge: 'Bạn sẽ không bị tính phí cho đăng ký này.',
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: 'Hủy đăng ký {{plan}}?',
     cannotSubscribeMonthly:
       'Bạn không thể đăng ký gói này bằng cách thanh toán hàng tháng. Để đăng ký gói này, bạn cần chọn thanh toán hàng năm.',

@@ -295,11 +295,13 @@ const SubscriptionDetailsFooter = withCardStateProvider(() => {
                     })
                   : selectedSubscription.status === 'upcoming'
                     ? localizationKeys('commerce.cancelSubscriptionNoCharge')
-                    : localizationKeys('commerce.cancelSubscriptionAccessUntil', {
-                        plan: selectedSubscription.plan.name,
-                        // this will always be defined in this state
-                        date: selectedSubscription.periodEnd as Date,
-                      })
+                    : selectedSubscription.status === 'past_due'
+                      ? localizationKeys('commerce.cancelSubscriptionPastDue')
+                      : localizationKeys('commerce.cancelSubscriptionAccessUntil', {
+                          plan: selectedSubscription.plan.name,
+                          // this will always be defined in this state
+                          date: selectedSubscription.periodEnd as Date,
+                        })
               }
             />
             <CardAlert>{error}</CardAlert>
@@ -376,7 +378,7 @@ const SubscriptionCardActions = ({ subscription }: { subscription: CommerceSubsc
       subscription.planPeriod === 'annual') &&
     subscription.status !== 'past_due';
   const isFree = isFreePlan(subscription.plan);
-  const isCancellable = subscription.canceledAt === null && !isFree && subscription.status !== 'past_due';
+  const isCancellable = subscription.canceledAt === null && !isFree;
   const isReSubscribable = subscription.canceledAt !== null && !isFree;
 
   const openCheckout = useCallback(
