@@ -171,6 +171,26 @@ describe('MachineAPI', () => {
     expect(response.secret).toBe('ak_test_...');
   });
 
+  it('rotates a machine secret key', async () => {
+    server.use(
+      http.post(
+        `https://api.clerk.test/v1/machines/${machineId}/secret_key/rotate`,
+        validateHeaders(() => {
+          return HttpResponse.json({
+            secret: 'ak_updated_...',
+          });
+        }),
+      ),
+    );
+
+    const response = await apiClient.machines.rotateSecretKey({
+      machineId,
+      previousTokenTtl: 3600,
+    });
+
+    expect(response.secret).toBe('ak_updated_...');
+  });
+
   it('creates a machine scope', async () => {
     server.use(
       http.post(

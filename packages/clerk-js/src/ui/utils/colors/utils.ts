@@ -75,10 +75,14 @@ export function createAlphaColorMixString(color: string, alphaPercentage: number
  * @returns The relative color syntax string
  */
 export function generateRelativeColorSyntax(color: string, shade: ColorShade): string {
-  if (shade === 500) return color;
+  if (shade === 500) {
+    return color;
+  }
 
   const steps = RELATIVE_SHADE_STEPS[shade];
-  if (!steps) return color;
+  if (!steps) {
+    return color;
+  }
 
   const { TARGET_LIGHT, TARGET_DARK, LIGHT_STEPS, DARK_STEPS } = LIGHTNESS_CONFIG;
 
@@ -103,10 +107,14 @@ export function generateRelativeColorSyntax(color: string, shade: ColorShade): s
  * @returns The color-mix string
  */
 export function generateColorMixSyntax(color: string, shade: ColorShade): string {
-  if (shade === 500) return color;
+  if (shade === 500) {
+    return color;
+  }
 
   const mixData = LIGHTNESS_MIX_DATA[shade];
-  if (!mixData.mixColor) return color;
+  if (!mixData.mixColor) {
+    return color;
+  }
 
   return createColorMixString(color, mixData.mixColor, mixData.percentage);
 }
@@ -123,7 +131,9 @@ export function generateAlphaColorMix(color: string, shade: ColorShade): string 
  * @returns The optimal color variant
  */
 export function getSupportedColorVariant(color: string, shade: ColorShade): string {
-  if (shade === 500) return color;
+  if (shade === 500) {
+    return color;
+  }
 
   if (cssSupports.relativeColorSyntax()) {
     return generateRelativeColorSyntax(color, shade);

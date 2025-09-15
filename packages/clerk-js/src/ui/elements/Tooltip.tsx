@@ -186,7 +186,9 @@ const Content = React.forwardRef<
   const context = useTooltipContext();
   const ref = useMergeRefs([context.refs.setFloating, propRef]);
 
-  if (!context.isMounted) return null;
+  if (!context.isMounted) {
+    return null;
+  }
 
   return (
     <FloatingPortal>
