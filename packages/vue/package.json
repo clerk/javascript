@@ -68,11 +68,11 @@
   },
   "devDependencies": {
     "@testing-library/vue": "^8.1.0",
-    "@vitejs/plugin-vue": "^5.2.4",
+    "@vitejs/plugin-vue": "^6.0.1",
     "@vue.ts/tsx-auto-props": "^0.6.0",
-    "unplugin-vue": "^6.2.0",
+    "unplugin-vue": "^7.0.1",
     "vue": "3.5.21",
-    "vue-tsc": "^2.2.12"
+    "vue-tsc": "^3.0.7"
   },
   "peerDependencies": {
     "vue": "^3.2.0"
