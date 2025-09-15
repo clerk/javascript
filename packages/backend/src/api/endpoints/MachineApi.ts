@@ -1,9 +1,12 @@
+import type { ClerkPaginationRequest } from '@clerk/types';
+
 import { joinPaths } from '../../util/path';
 import type { PaginatedResourceResponse } from '../resources/Deserializer';
 import type { Machine } from '../resources/Machine';
 import type { MachineScope } from '../resources/MachineScope';
 import type { MachineSecretKey } from '../resources/MachineSecretKey';
 import { AbstractAPI } from './AbstractApi';
+import type { WithSign } from './util-types';
 
 const basePath = '/machines';
 
@@ -37,11 +40,17 @@ type UpdateMachineParams = {
   defaultTokenTtl?: number;
 };
 
-type GetMachineListParams = {
-  limit?: number;
-  offset?: number;
+type GetMachineListParams = ClerkPaginationRequest<{
+  /**
+   * Sorts machines by name or created_at.
+   * By prepending one of those values with + or -, we can choose to sort in ascending (ASC) or descending (DESC) order.
+   */
+  orderBy?: WithSign<'name' | 'created_at'>;
+  /**
+   * Returns machines that have a ID or name that matches the given query.
+   */
   query?: string;
-};
+}>;
 
 type RotateMachineSecretKeyParams = {
   /**
