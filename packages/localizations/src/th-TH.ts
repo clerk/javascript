@@ -1030,7 +1030,8 @@ export const thTH: LocalizationResource = {
     deletePage: {
       actionDescription: 'พิมพ์ "Delete account" ด้านล่างเพื่อดำเนินการต่อ',
       confirm: 'Delete account',
-      messageLine1: 'คุณแน่ใจหรือไม่ว่าต้องการลบบัญชีของคุณ?',
+      messageLine1:
+        'คุณแน่ใจหรือไม่ว่าต้องการลบบัญชีของคุณจาก Clerk? กรุณาติดต่อเจ้าของแอปพลิเคชันเพื่อลบข้อมูลของคุณออกจากแอปพลิเคชันและบริการอื่นๆ ของพวกเขา',
       messageLine2: 'การดำเนินการนี้จะถาวรและไม่สามารถยกเลิกได้',
       title: 'ลบบัญชี',
     },

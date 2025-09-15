@@ -1028,12 +1028,12 @@ export const nlBE: LocalizationResource = {
       title: 'Verbind externe account',
     },
     deletePage: {
-      actionDescription: 'Type "Delete account" below to continue.',
-      confirm: 'Delete account',
+      actionDescription: 'Typ "Account verwijderen" hieronder om door te gaan.',
+      confirm: 'Account verwijderen',
       messageLine1:
-        'Are you sure you want to delete your account from Clerk? Please contact the application owner to delete your information from their application and other services.',
-      messageLine2: 'This action is permanent and irreversible.',
-      title: 'Delete account',
+        'Bent u zeker dat u uw account van Clerk wilt verwijderen? Gelieve contact op te nemen met de eigenaar van de applicatie om uw informatie uit hun applicatie en andere services te verwijderen.',
+      messageLine2: 'Deze actie is permanent en onherroepelijk.',
+      title: 'Account verwijderen',
     },
     emailAddressPage: {
       emailCode: {

@@ -1034,7 +1034,8 @@ export const isIS: LocalizationResource = {
     deletePage: {
       actionDescription: 'Sláðu inn "Eyða reikningi" hér að neðan til að halda áfram.',
       confirm: 'Eyða reikningi',
-      messageLine1: 'Ertu viss um að þú viljir eyða reikningnum þínum?',
+      messageLine1:
+        'Ertu viss um að þú viljir eyða reikningnum þínum úr Clerk? Vinsamlegast hafðu samband við eiganda forritsins til að eyða upplýsingum þínum úr forriti þeirra og öðrum þjónustum.',
       messageLine2: 'Þessi aðgerð er varanleg og óafturkræf.',
       title: 'Eyða reikningi',
     },
