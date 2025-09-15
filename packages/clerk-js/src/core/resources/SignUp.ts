@@ -36,6 +36,7 @@ import type {
 } from '@clerk/types';
 
 import { debugLogger } from '@/utils/debug';
+import { inIframe } from '@/utils/runtime';
 
 import {
   generateSignatureWithBase,
@@ -53,7 +54,6 @@ import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
 import { createValidatePassword } from '../../utils/passwords/password';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
-import { inIframe } from '../../utils/runtime';
 import {
   clerkInvalidFAPIResponse,
   clerkMissingOptionError,
