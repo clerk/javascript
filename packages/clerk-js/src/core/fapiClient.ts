@@ -250,6 +250,11 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
             // We want to retry only GET requests, as other methods are not idempotent.
             return overwrittenRequestMethod === 'GET' && iterations < maxTries;
           },
+          onBeforeRetry: (iteration: number): void => {
+            if (fetchOpts.headers instanceof Headers) {
+              fetchOpts.headers.set('x-clerk-retry-attempt', iteration.toString());
+            }
+          },
         });
       } else {
         response = new Response('{}', requestInit); // Mock an empty json response
