@@ -227,7 +227,7 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
     // avoid triggering a CORS OPTION request as it currently breaks cookie dropping in Safari.
     const overwrittenRequestMethod = method === 'GET' ? 'GET' : 'POST';
     let response: Response;
-    const urlStr = requestInit.url.toString();
+    const url = requestInit.url;
     const fetchOpts: FapiRequestInit = {
       ...requestInit,
       method: overwrittenRequestMethod,
@@ -237,7 +237,7 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
     try {
       if (beforeRequestCallbacksResult) {
         const maxTries = requestOptions?.fetchMaxTries ?? (isBrowserOnline() ? 4 : 11);
-        response = await retry(() => fetch(urlStr, fetchOpts), {
+        response = await retry(() => fetch(url, fetchOpts), {
           // This retry handles only network errors, not 4xx or 5xx responses,
           // so we want to try once immediately to handle simple network blips.
           // Since fapiClient is responsible for the network layer only,
@@ -251,15 +251,14 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
             return overwrittenRequestMethod === 'GET' && iterations < maxTries;
           },
           onBeforeRetry: (iteration: number): void => {
-            if (fetchOpts.headers instanceof Headers) {
-              fetchOpts.headers.set('x-clerk-retry-attempt', iteration.toString());
-            }
+            url.searchParams.set('_clerk_retry_attempt', iteration.toString());
           },
         });
       } else {
         response = new Response('{}', requestInit); // Mock an empty json response
       }
     } catch (e) {
+      const urlStr = url.toString();
       debugLogger.error('network error', { error: e, url: urlStr, method }, 'fapiClient');
       clerkNetworkError(urlStr, e);
     }

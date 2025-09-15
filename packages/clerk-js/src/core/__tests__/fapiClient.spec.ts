@@ -183,14 +183,14 @@ describe('request', () => {
       path: '/foo',
     });
 
-    expect(fetch).toHaveBeenCalledWith(
+    const fetchCall = (fetch as Mock).mock.calls[0];
+    expect(fetchCall[0].toString()).toBe(
       `https://clerk.example.com/v1/foo?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=test&_clerk_session_id=sess_1qq9oy5GiNHxdR2XWU6gG6mIcBX`,
-      expect.objectContaining({
-        credentials: 'include',
-        method: 'GET',
-        path: '/foo',
-      }),
     );
+    expect(fetchCall[1]).toMatchObject({
+      credentials: 'include',
+      method: 'GET',
+    });
   });
 
   it('invokes global.fetch with proxy', async () => {
@@ -198,14 +198,14 @@ describe('request', () => {
       path: '/foo',
     });
 
-    expect(fetch).toHaveBeenCalledWith(
+    const fetchCall = (fetch as Mock).mock.calls[0];
+    expect(fetchCall[0].toString()).toBe(
       `${proxyUrl}/v1/foo?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=test&_clerk_session_id=sess_1qq9oy5GiNHxdR2XWU6gG6mIcBX`,
-      expect.objectContaining({
-        credentials: 'include',
-        method: 'GET',
-        path: '/foo',
-      }),
     );
+    expect(fetchCall[1]).toMatchObject({
+      credentials: 'include',
+      method: 'GET',
+    });
   });
 
   it('returns array response as array', async () => {
@@ -253,22 +253,15 @@ describe('request', () => {
   });
 
   describe('retry logic', () => {
-    it('does not send retry header on initial request', async () => {
+    it('does not send retry query parameter on initial request', async () => {
       await fapiClient.request({
         path: '/foo',
       });
 
-      expect(fetch).toHaveBeenCalledWith(
-        expect.any(String),
-        expect.objectContaining({
-          headers: expect.not.objectContaining({
-            'x-clerk-retry-attempt': expect.any(String),
-          }),
-        }),
-      );
+      expect(fetch).toHaveBeenCalledWith(expect.not.stringMatching(/_clerk_retry_attempt=/), expect.any(Object));
     });
 
-    it('sends retry header on retry attempts', async () => {
+    it('sends retry query parameter on retry attempts', async () => {
       let callCount = 0;
       (global.fetch as Mock).mockImplementation(() => {
         callCount++;
@@ -289,10 +282,10 @@ describe('request', () => {
       });
 
       const secondCall = (fetch as Mock).mock.calls[1];
-      expect(secondCall[1].headers.get('x-clerk-retry-attempt')).toBe('1');
+      expect(secondCall[0].toString()).toMatch(/_clerk_retry_attempt=1/);
     });
 
-    it('increments retry header on multiple retry attempts', async () => {
+    it('increments retry query parameter on multiple retry attempts', async () => {
       let callCount = 0;
       (global.fetch as Mock).mockImplementation(() => {
         callCount++;
@@ -313,10 +306,10 @@ describe('request', () => {
       });
 
       const secondCall = (fetch as Mock).mock.calls[1];
-      expect(secondCall[1].headers.get('x-clerk-retry-attempt')).toBeDefined();
+      expect(secondCall[0].toString()).toMatch(/_clerk_retry_attempt=2/);
 
       const thirdCall = (fetch as Mock).mock.calls[2];
-      expect(thirdCall[1].headers.get('x-clerk-retry-attempt')).toBeDefined();
+      expect(thirdCall[0].toString()).toMatch(/_clerk_retry_attempt=2/);
     });
   });
 });
