@@ -13,8 +13,8 @@ for (const file of failedFiles) {
     return minimatch(file.filePath, f.path);
   });
   if (matchingFileIndex !== -1) {
-    // update maxSize to the file size, rounded up to the nearest KB
-    bundlewatchConfig.files[matchingFileIndex].maxSize = `${Math.ceil(file.size / 1024)}KB`;
+    // update maxSize to the file size plus 1KB, rounded up to the nearest KB
+    bundlewatchConfig.files[matchingFileIndex].maxSize = `${Math.ceil((file.size + 1024) / 1024)}KB`;
   }
 }
 
