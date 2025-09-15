@@ -1012,7 +1012,7 @@ export const zhCN: LocalizationResource = {
     deletePage: {
       actionDescription: '在下方输入 "删除账户" 以继续。',
       confirm: '删除账户',
-      messageLine1: '您确定要删除您的账户吗？',
+      messageLine1: '您确定要删除您在 Clerk 的账户吗？请联系应用程序所有者以从他们的应用程序和其他服务中删除您的信息。',
       messageLine2: '此操作是永久且不可逆的。',
       title: '删除账户',
     },
