@@ -1,5 +1,17 @@
 # Change Log
 
+## 5.47.0
+
+### Minor Changes
+
+- [Billing Beta] Drop experimental `subscriptions` property from params of `useOrganization()`. Use [`useSubscription()`](https://clerk.com/docs/nextjs/hooks/use-subscription) instead. ([#6738](https://github.com/clerk/javascript/pull/6738)) by [@mauricioabreu](https://github.com/mauricioabreu)
+
+### Patch Changes
+
+- Updated dependencies [[`23948dc`](https://github.com/clerk/javascript/commit/23948dc777ec6a17bafbae59c253a93143b0e105), [`82b84fe`](https://github.com/clerk/javascript/commit/82b84fed5f207673071ba7354a17f4a76e101201), [`54b4b5a`](https://github.com/clerk/javascript/commit/54b4b5a5f811f612fadf5c47ffda94a750c57a5e), [`50a8622`](https://github.com/clerk/javascript/commit/50a8622c3579306f15e5d40e5ea72b4fe4384ef7), [`23948dc`](https://github.com/clerk/javascript/commit/23948dc777ec6a17bafbae59c253a93143b0e105)]:
+  - @clerk/types@4.86.0
+  - @clerk/shared@3.25.0
+
 ## 5.46.2
 
 ### Patch Changes
