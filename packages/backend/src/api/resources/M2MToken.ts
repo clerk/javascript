@@ -1,5 +1,8 @@
 import type { M2MTokenJSON } from './JSON';
 
+/**
+ * The Backend `M2MToken` object holds information about a machine-to-machine token.
+ */
 export class M2MToken {
   constructor(
     readonly id: string,
