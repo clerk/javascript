@@ -31,7 +31,7 @@ describe('Token', () => {
       });
 
       expect(global.fetch).toHaveBeenCalledTimes(1);
-      const [url, options] = (global.fetch as jest.Mock).mock.calls[0];
+      const [url, options] = (global.fetch as Mock).mock.calls[0];
       expect(url.toString()).toContain('https://clerk.example.com/v1/path/to/tokens');
       expect(options).toMatchObject({
         method: 'POST',
@@ -67,7 +67,7 @@ describe('Token', () => {
         const token = await Token.create('/path/to/tokens');
 
         expect(global.fetch).toHaveBeenCalledTimes(1);
-        const [url, options] = (global.fetch as jest.Mock).mock.calls[0];
+        const [url, options] = (global.fetch as Mock).mock.calls[0];
         expect(url.toString()).toContain('https://clerk.example.com/v1/path/to/tokens');
         expect(options).toMatchObject({
           method: 'POST',
@@ -91,7 +91,7 @@ describe('Token', () => {
         );
 
         expect(global.fetch).toHaveBeenCalledTimes(1);
-        const [url, options] = (global.fetch as jest.Mock).mock.calls[0];
+        const [url, options] = (global.fetch as Mock).mock.calls[0];
         expect(url.toString()).toContain('https://clerk.example.com/v1/path/to/tokens');
         expect(options).toMatchObject({
           method: 'POST',
