@@ -20,7 +20,17 @@ export const requestStateContext = createContext<RequestState<any> | null>(null)
  * It checks the request's cookies and headers for a session JWT and, if found,
  * attaches the Auth object to a context.
  *
+ * @requires The `v8_middleware` future flag must be enabled in your config
+ *
  * @example
+ * // react-router.config.ts
+ * export default {
+ *   future: {
+ *     v8_middleware: true,
+ *   },
+ * }
+ *
+ * // app.tsx
  * export const middleware: Route.MiddlewareFunction[] = [clerkMiddleware()]
  */
 export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareFunction<Response> => {
