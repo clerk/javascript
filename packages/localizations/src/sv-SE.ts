@@ -1033,7 +1033,8 @@ export const svSE: LocalizationResource = {
     deletePage: {
       actionDescription: 'Skriv "Radera konto" nedan för att fortsätta.',
       confirm: 'Radera konto',
-      messageLine1: 'Är du säker på att du vill radera ditt konto?',
+      messageLine1:
+        'Är du säker på att du vill radera ditt konto från Clerk? Vänligen kontakta applikationens ägare för att radera din information från deras applikation och andra tjänster.',
       messageLine2: 'Denna åtgärd är permanent och kan inte ångras.',
       title: 'Radera konto',
     },

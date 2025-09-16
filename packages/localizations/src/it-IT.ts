@@ -1040,7 +1040,8 @@ export const itIT: LocalizationResource = {
     deletePage: {
       actionDescription: 'Digita "Elimina account" qui sotto per continuare.',
       confirm: 'Elimina account',
-      messageLine1: 'Sei sicuro di voler eliminare il tuo account?',
+      messageLine1:
+        "Sei sicuro di voler eliminare il tuo account da Clerk? Si prega di contattare il proprietario dell'applicazione per eliminare le tue informazioni dalla loro applicazione e da altri servizi.",
       messageLine2: 'Questa azione è permanente e irreversibile.',
       title: 'Elimina account',
     },
