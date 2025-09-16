@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { inIframe } from '../../../utils/runtime';
-import { BaseResource } from '../Base';
+import { BaseResource } from '../internal';
 import { SignIn } from '../SignIn';
 
 vi.mock('../../../utils/runtime', () => ({
