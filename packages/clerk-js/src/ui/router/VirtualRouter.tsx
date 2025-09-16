@@ -1,4 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
+import type { NavigateOptions } from '@clerk/types';
 import React, { useEffect } from 'react';
 
 import { useClerkModalStateParams } from '../hooks';
@@ -40,11 +41,9 @@ export const VirtualRouter = ({
     removeQueryParam();
   }
 
-  const internalNavigate = (toURL: URL | undefined) => {
-    if (!toURL) {
-      return;
-    }
+  const internalNavigate = async (toURL: URL, _options?: NavigateOptions): Promise<any> => {
     setCurrentURL(toURL);
+    return Promise.resolve();
   };
 
   const getPath = () => currentURL.pathname;
