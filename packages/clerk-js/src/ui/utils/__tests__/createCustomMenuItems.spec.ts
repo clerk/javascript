@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
 import type { CustomMenuItem } from '@clerk/types';
+import { describe, expect, it } from 'vitest';
 
 import { createUserButtonCustomMenuItems as cUBCMI } from '../createCustomMenuItems';
 

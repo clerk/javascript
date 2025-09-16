@@ -1,4 +1,4 @@
-import { vi, beforeEach, describe, it, expect } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { CLERK_SYNCED } from '../../core/constants';
 import { forwardClerkQueryParams, getClerkQueryParam, removeClerkQueryParam } from '../getClerkQueryParam';

@@ -1,4 +1,4 @@
-import { vi, beforeAll, afterAll, beforeEach, describe, test, expect } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { clearCache, cssSupports } from '../cssSupports';
 
