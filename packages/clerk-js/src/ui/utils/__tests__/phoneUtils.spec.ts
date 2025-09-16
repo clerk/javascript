@@ -1,4 +1,5 @@
 import type { PhoneCodeChannel } from '@clerk/types';
+import { describe, expect, it } from 'vitest';
 
 import {
   extractDigits,

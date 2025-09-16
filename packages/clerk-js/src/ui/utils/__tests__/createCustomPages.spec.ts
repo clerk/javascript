@@ -1,4 +1,5 @@
 import type { CustomPage } from '@clerk/types';
+import { describe, expect, it } from 'vitest';
 
 import {
   createOrganizationProfileCustomPages as cOPCP,

@@ -1,3 +1,5 @@
+import { describe, expect, it } from 'vitest';
+
 import { urlDecodeB64, urlEncodeB64 } from '../encoders';
 
 describe('base 64', () => {
