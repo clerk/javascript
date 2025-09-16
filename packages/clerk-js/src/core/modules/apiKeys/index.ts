@@ -2,12 +2,14 @@ import type {
   ApiKeyJSON,
   APIKeyResource,
   APIKeysNamespace,
+  ClerkPaginatedResponse,
   CreateAPIKeyParams,
   GetAPIKeysParams,
   RevokeAPIKeyParams,
 } from '@clerk/types';
 
 import type { FapiRequestInit } from '@/core/fapiClient';
+import { convertPageToOffsetSearchParams } from '@/utils/convertPageToOffsetSearchParams';
 
 import { APIKey, BaseResource, ClerkRuntimeError } from '../../resources/internal';
 
@@ -34,23 +36,26 @@ export class APIKeys implements APIKeysNamespace {
     };
   }
 
-  async getAll(params?: GetAPIKeysParams): Promise<APIKeyResource[]> {
-    return BaseResource.clerk
-      .getFapiClient()
-      .request<{ api_keys: ApiKeyJSON[] }>({
-        ...(await this.getBaseFapiProxyOptions()),
-        method: 'GET',
-        path: '/api_keys',
-        search: {
-          subject: params?.subject ?? BaseResource.clerk.organization?.id ?? BaseResource.clerk.user?.id ?? '',
-          // TODO: (rob) Remove when server-side pagination is implemented.
-          limit: '100',
-        },
-      })
-      .then(res => {
-        const apiKeysJSON = res.payload as unknown as { api_keys: ApiKeyJSON[] };
-        return apiKeysJSON.api_keys.map(json => new APIKey(json));
-      });
+  async getAll(params?: GetAPIKeysParams): Promise<ClerkPaginatedResponse<APIKeyResource>> {
+    return BaseResource._fetch({
+      ...(await this.getBaseFapiProxyOptions()),
+      method: 'GET',
+      path: '/api_keys',
+      search: convertPageToOffsetSearchParams({
+        ...params,
+        subject: params?.subject ?? BaseResource.clerk.organization?.id ?? BaseResource.clerk.user?.id ?? '',
+      }),
+    }).then(res => {
+      const { api_keys: apiKeys, total_count } = res as unknown as {
+        api_keys: ApiKeyJSON[];
+        total_count: number;
+      };
+
+      return {
+        total_count,
+        data: apiKeys.map(apiKey => new APIKey(apiKey)),
+      };
+    });
   }
 
   async getSecret(id: string): Promise<string> {
