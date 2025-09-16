@@ -64,6 +64,8 @@ describe('UserProfile', () => {
 
       render(<UserProfile />, { wrapper });
       await waitFor(() => expect(screen.queryByRole('button', { name: /Billing/i })).toBeNull());
+      expect(fixtures.clerk.billing.getSubscription).not.toHaveBeenCalled();
+      expect(fixtures.clerk.billing.getStatements).not.toHaveBeenCalled();
     });
 
     it('includes Billing when enabled and instance has paid plans', async () => {
@@ -100,6 +102,8 @@ describe('UserProfile', () => {
       render(<UserProfile />, { wrapper });
       const billingElements = await screen.findAllByRole('button', { name: /Billing/i });
       expect(billingElements.length).toBeGreaterThan(0);
+      expect(fixtures.clerk.billing.getSubscription).toHaveBeenCalled();
+      expect(fixtures.clerk.billing.getStatements).toHaveBeenCalled();
     });
 
     it('includes Billing when enabled and user has past statements', async () => {
@@ -116,6 +120,8 @@ describe('UserProfile', () => {
       render(<UserProfile />, { wrapper });
       const billingElements = await screen.findAllByRole('button', { name: /Billing/i });
       expect(billingElements.length).toBeGreaterThan(0);
+      expect(fixtures.clerk.billing.getSubscription).toHaveBeenCalled();
+      expect(fixtures.clerk.billing.getStatements).toHaveBeenCalled();
     });
 
     it('does not include Billing when enabled but no paid plans, no subscription, and no statements', async () => {
@@ -131,6 +137,8 @@ describe('UserProfile', () => {
 
       render(<UserProfile />, { wrapper });
       await waitFor(() => expect(screen.queryByRole('button', { name: /Billing/i })).toBeNull());
+      expect(fixtures.clerk.billing.getSubscription).toHaveBeenCalled();
+      expect(fixtures.clerk.billing.getStatements).toHaveBeenCalled();
     });
   });
 });
