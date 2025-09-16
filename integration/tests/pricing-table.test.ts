@@ -573,8 +573,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await u.po.checkout.waitForMounted();
       await u.po.checkout.closeDrawer();
 
-      // Ensure the checkout fully unmounts before opening again to force revalidation
-      await u.po.checkout.root.waitFor({ state: 'detached' });
+      // Ensure the checkout gets hidden before opening again to force revalidation
+      await u.po.checkout.root.waitFor({ state: 'hidden' });
       await u.po.pricingTable.startCheckout({ planSlug: 'plus', period: 'monthly' });
       await u.po.checkout.waitForMounted();
       await u.po.checkout.fillTestCard();
