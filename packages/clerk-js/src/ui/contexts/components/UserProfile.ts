@@ -34,15 +34,18 @@ export const useUserProfileContext = (): UserProfileContextType => {
   const environment = useEnvironment();
   const { user } = useUser();
 
+  const billingEnabled = environment.commerceSettings.billing.user.enabled;
+
   const subscription = useSubscription();
-  const statements = useStatements();
+  const statements = useStatements(billingEnabled ? undefined : { mode: 'cache' });
 
   const hasNonFreeSubscription = subscription.data?.subscriptionItems.some(item => item.plan.hasBaseFee);
 
   // TODO(@BILLING): Remove this when C1s can disable user billing seperately from the organization billing.
   const shouldShowBilling =
-    // The instance has at lease one visible plan the C2 can choose
-    environment.commerceSettings.billing.user.hasPaidPlans ||
+    (billingEnabled &&
+      // The instance has at lease one visible plan the C2 can choose
+      environment.commerceSettings.billing.user.hasPaidPlans) ||
     // The C2 has a subscription, it can be active or past due, or scheduled for cancellation.
     hasNonFreeSubscription ||
     // The C2 had a subscription in the past
