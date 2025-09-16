@@ -1,5 +1,10 @@
 import { __experimental_useCheckout as useCheckout } from '@clerk/shared/react';
-import type { CommerceMoneyAmount, CommercePaymentSourceResource, ConfirmCheckoutParams } from '@clerk/types';
+import type {
+  CommerceMoneyAmount,
+  CommercePaymentSourceResource,
+  ConfirmCheckoutParams,
+  RemoveFunctions,
+} from '@clerk/types';
 import { useMemo, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';
@@ -26,9 +31,9 @@ const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
 export const CheckoutForm = withCardStateProvider(() => {
   const { checkout } = useCheckout();
 
-  const { id, plan, totals, isImmediatePlanChange, planPeriod, freeTrialEndsAt } = checkout;
+  const { plan, totals, isImmediatePlanChange, planPeriod, freeTrialEndsAt } = checkout;
 
-  if (!id) {
+  if (!plan) {
     return null;
   }
 
@@ -138,10 +143,9 @@ export const CheckoutForm = withCardStateProvider(() => {
 const useCheckoutMutations = () => {
   const { for: _for, onSubscriptionComplete } = useCheckoutContext();
   const { checkout } = useCheckout();
-  const { id, confirm } = checkout;
   const card = useCardState();
 
-  if (!id) {
+  if (checkout.status !== 'needs_confirmation') {
     throw new Error('Checkout not found');
   }
 
@@ -149,11 +153,12 @@ const useCheckoutMutations = () => {
     card.setLoading();
     card.setError(undefined);
 
-    const { data, error } = await confirm(params);
+    const { error } = await checkout.confirm(params);
 
     if (error) {
+      // @ts-expect-error - error is not an Error
       handleError(error, [], card.setError);
-    } else if (data) {
+    } else {
       onSubscriptionComplete?.();
     }
     card.setIdle();
@@ -187,14 +192,14 @@ const useCheckoutMutations = () => {
 
 const CheckoutFormElements = () => {
   const { checkout } = useCheckout();
-  const { id, totals, freeTrialEndsAt } = checkout;
+  const { totals, freeTrialEndsAt } = checkout;
   const { data: paymentSources } = usePaymentMethods();
 
   const [paymentMethodSource, setPaymentMethodSource] = useState<PaymentMethodSource>(() =>
     paymentSources.length > 0 || __BUILD_DISABLE_RHC__ ? 'existing' : 'new',
   );
 
-  if (!id) {
+  if (!totals) {
     return null;
   }
 
@@ -351,9 +356,9 @@ const ExistingPaymentSourceForm = withCardStateProvider(
 
     const { payWithExistingPaymentSource } = useCheckoutMutations();
     const card = useCardState();
-    const [selectedPaymentSource, setSelectedPaymentSource] = useState<CommercePaymentSourceResource | undefined>(
-      paymentSource || paymentSources.find(p => p.isDefault),
-    );
+    const [selectedPaymentSource, setSelectedPaymentSource] = useState<
+      RemoveFunctions<CommercePaymentSourceResource> | undefined
+    >(paymentSource || paymentSources.find(p => p.isDefault));
 
     const options = useMemo(() => {
       return paymentSources.map(source => {

@@ -1,9 +1,13 @@
-import type { CommercePaymentSourceResource } from '@clerk/types';
+import type { CommercePaymentSourceResource, RemoveFunctions } from '@clerk/types';
 
 import { Badge, descriptors, Flex, Icon, localizationKeys, Text } from '../../customizables';
 import { CreditCard, GenericPayment } from '../../icons';
 
-export const PaymentSourceRow = ({ paymentSource }: { paymentSource: CommercePaymentSourceResource }) => {
+export const PaymentSourceRow = ({
+  paymentSource,
+}: {
+  paymentSource: RemoveFunctions<CommercePaymentSourceResource>;
+}) => {
   return (
     <Flex
       sx={{ overflow: 'hidden' }}

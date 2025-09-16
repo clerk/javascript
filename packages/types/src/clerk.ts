@@ -1,4 +1,3 @@
-import type { ClerkAPIResponseError } from './api';
 import type { APIKeysNamespace } from './apiKeys';
 import type {
   APIKeysTheme,
@@ -22,11 +21,10 @@ import type {
 } from './appearance';
 import type { ClientResource } from './client';
 import type {
+  CheckoutFutureResource,
   CommerceBillingNamespace,
-  CommerceCheckoutResource,
   CommercePlanResource,
   CommerceSubscriptionPlanPeriod,
-  ConfirmCheckoutParams,
   ForPayerType,
 } from './commerce';
 import type { CustomMenuItem } from './customMenuItems';
@@ -54,23 +52,45 @@ import type { SessionVerificationLevel } from './sessionVerification';
 import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
 import type { ClientJSONSnapshot, EnvironmentJSONSnapshot } from './snapshots';
-import type { State } from './state';
+import type { FieldError, State } from './state';
 import type { Web3Strategy } from './strategies';
 import type { TelemetryCollector } from './telemetry';
 import type { UserResource } from './user';
 import type { Autocomplete, DeepPartial, DeepSnakeToCamel } from './utils';
 import type { WaitlistResource } from './waitlist';
 
-type __experimental_CheckoutStatus = 'needs_initialization' | 'needs_confirmation' | 'completed';
+interface GlobalErrors {
+  /**
+   * The raw, unparsed errors from the Clerk API.
+   */
+  raw: FieldError[] | null;
+  /**
+   * Parsed errors that are not related to any specific field.
+   */
+  global: FieldError[] | null; // does not include any errors that could be parsed as a field error
+}
 
-export type __experimental_CheckoutCacheState = Readonly<{
-  isStarting: boolean;
-  isConfirming: boolean;
-  error: ClerkAPIResponseError | null;
-  checkout: CommerceCheckoutResource | null;
-  fetchStatus: 'idle' | 'fetching' | 'error';
-  status: __experimental_CheckoutStatus;
-}>;
+/**
+ * The value returned by the `useSignInSignal` hook.
+ */
+export interface CheckoutSignalValue {
+  /**
+   * Represents the errors that occurred during the last fetch of the parent resource.
+   */
+  errors: GlobalErrors;
+  /**
+   * The fetch status of the underlying `SignIn` resource.
+   */
+  fetchStatus: 'idle' | 'fetching';
+  /**
+   * An instance representing the currently active `SignIn`, with new APIs designed specifically for custom flows.
+   */
+  checkout: CheckoutFutureResource;
+}
+
+export interface CheckoutSignal {
+  (): CheckoutSignalValue;
+}
 
 export type __experimental_CheckoutOptions = {
   for?: ForPayerType;
@@ -78,26 +98,7 @@ export type __experimental_CheckoutOptions = {
   planId: string;
 };
 
-type CheckoutResult =
-  | {
-      data: CommerceCheckoutResource;
-      error: null;
-    }
-  | {
-      data: null;
-      error: ClerkAPIResponseError;
-    };
-
-export type __experimental_CheckoutInstance = {
-  confirm: (params: ConfirmCheckoutParams) => Promise<CheckoutResult>;
-  start: () => Promise<CheckoutResult>;
-  clear: () => void;
-  finalize: (params?: { navigate?: SetActiveNavigate }) => Promise<void>;
-  subscribe: (listener: (state: __experimental_CheckoutCacheState) => void) => () => void;
-  getState: () => __experimental_CheckoutCacheState;
-};
-
-type __experimental_CheckoutFunction = (options: __experimental_CheckoutOptions) => __experimental_CheckoutInstance;
+type __experimental_CheckoutFunction = (options: __experimental_CheckoutOptions) => CheckoutSignalValue;
 
 /**
  * @inline
