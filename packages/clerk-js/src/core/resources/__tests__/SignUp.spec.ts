@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { inIframe } from '../../../utils/runtime';
 import { SignUp } from '../SignUp';
+import { BaseResource } from '../Base';
 
 vi.mock('../../../utils/runtime', () => ({
   inIframe: vi.fn(),
@@ -21,6 +22,9 @@ describe('SignUp', () => {
 
     const mockClerk = {
       buildUrlWithAuth: vi.fn((url: string) => `https://clerk.example.com${url}`),
+      session: {
+        id: 'test-session-id',
+      },
       __unstable__environment: {
         displayConfig: {
           captchaOauthBypass: [],
@@ -38,6 +42,9 @@ describe('SignUp', () => {
     };
 
     SignUp.clerk = mockClerk as any;
+
+    // Mock BaseResource.clerk for client ID access
+    BaseResource.clerk = mockClerk as any;
 
     Object.defineProperty(SignUp, 'fapiClient', {
       get: () => mockFapiClient,
@@ -83,7 +90,7 @@ describe('SignUp', () => {
   });
 
   describe('create', () => {
-    it('should set iframeContext to true when CHIPS build and in iframe', async () => {
+    it('should set sessionId to true when CHIPS build and in iframe', async () => {
       global.__BUILD_VARIANT_CHIPS__ = true;
       vi.mocked(inIframe).mockReturnValue(true);
 
@@ -101,12 +108,12 @@ describe('SignUp', () => {
           strategy: 'oauth_google',
           redirectUrl: '/callback',
           identifier: 'test@example.com',
-          iframeContext: true,
+          sessionId: 'test-session-id',
         },
       });
     });
 
-    it('should not set iframeContext when not in iframe', async () => {
+    it('should not set sessionId when not in iframe', async () => {
       vi.mocked(inIframe).mockReturnValue(false);
 
       const params = {
@@ -126,11 +133,11 @@ describe('SignUp', () => {
         },
       });
       expect(mockCreate).toHaveBeenCalledWith(
-        expect.not.objectContaining({ body: expect.objectContaining({ iframeContext: true }) }),
+        expect.not.objectContaining({ body: expect.objectContaining({ sessionId: 'test-session-id' }) }),
       );
     });
 
-    it('should not set iframeContext when not CHIPS build', async () => {
+    it('should not set sessionId when not CHIPS build', async () => {
       global.__BUILD_VARIANT_CHIPS__ = false;
       vi.mocked(inIframe).mockReturnValue(true);
 
@@ -143,13 +150,13 @@ describe('SignUp', () => {
       await signUp.create(params);
 
       expect(mockCreate).toHaveBeenCalledWith(
-        expect.not.objectContaining({ body: expect.objectContaining({ iframeContext: true }) }),
+        expect.not.objectContaining({ body: expect.objectContaining({ sessionId: 'test-session-id' }) }),
       );
     });
   });
 
   describe('update', () => {
-    it('should set iframeContext to true when CHIPS build and in iframe', async () => {
+    it('should set sessionId to true when CHIPS build and in iframe', async () => {
       global.__BUILD_VARIANT_CHIPS__ = true;
       vi.mocked(inIframe).mockReturnValue(true);
 
@@ -166,12 +173,12 @@ describe('SignUp', () => {
           strategy: 'oauth_google',
           redirectUrl: '/callback',
           identifier: 'test@example.com',
-          iframeContext: true,
+          sessionId: 'test-session-id',
         },
       });
     });
 
-    it('should not set iframeContext when not in iframe', async () => {
+    it('should not set sessionId when not in iframe', async () => {
       vi.mocked(inIframe).mockReturnValue(false);
 
       const params = {
@@ -190,11 +197,11 @@ describe('SignUp', () => {
         },
       });
       expect(mockUpdate).toHaveBeenCalledWith(
-        expect.not.objectContaining({ body: expect.objectContaining({ iframeContext: true }) }),
+        expect.not.objectContaining({ body: expect.objectContaining({ sessionId: 'test-session-id' }) }),
       );
     });
 
-    it('should not set iframeContext when not CHIPS build', async () => {
+    it('should not set sessionId when not CHIPS build', async () => {
       global.__BUILD_VARIANT_CHIPS__ = false;
       vi.mocked(inIframe).mockReturnValue(true);
 
@@ -207,13 +214,13 @@ describe('SignUp', () => {
       await signUp.update(params);
 
       expect(mockUpdate).toHaveBeenCalledWith(
-        expect.not.objectContaining({ body: expect.objectContaining({ iframeContext: true }) }),
+        expect.not.objectContaining({ body: expect.objectContaining({ sessionId: 'test-session-id' }) }),
       );
     });
   });
 
   describe('authenticateWithRedirectOrPopup', () => {
-    it('should set iframeContext to true when CHIPS build and in iframe for create flow', async () => {
+    it('should set sessionId to true when CHIPS build and in iframe for create flow', async () => {
       global.__BUILD_VARIANT_CHIPS__ = true;
       vi.mocked(inIframe).mockReturnValue(true);
 
@@ -249,12 +256,12 @@ describe('SignUp', () => {
           emailAddress: undefined,
           legalAccepted: undefined,
           oidcPrompt: undefined,
-          iframeContext: true,
+          sessionId: 'test-session-id',
         },
       });
     });
 
-    it('should set iframeContext to true when CHIPS build and in iframe for update flow', async () => {
+    it('should set sessionId to true when CHIPS build and in iframe for update flow', async () => {
       global.__BUILD_VARIANT_CHIPS__ = true;
       vi.mocked(inIframe).mockReturnValue(true);
 
@@ -289,7 +296,7 @@ describe('SignUp', () => {
           emailAddress: undefined,
           legalAccepted: undefined,
           oidcPrompt: undefined,
-          iframeContext: true,
+          sessionId: 'test-session-id',
         },
       });
     });

@@ -307,7 +307,7 @@ export class SignIn extends BaseResource implements SignInResource {
       };
 
       if (__BUILD_VARIANT_CHIPS__ && inIframe()) {
-        createParams.iframeContext = true;
+        createParams.sessionId = BaseResource.clerk.session?.id;
       }
 
       await this.create(createParams);
@@ -637,7 +637,7 @@ class SignInFuture implements SignInFutureResource {
       const createParams: SignInFutureCreateParams = { ...params };
 
       if (__BUILD_VARIANT_CHIPS__ && inIframe()) {
-        createParams.iframeContext = true;
+        createParams.sessionId = BaseResource.clerk.session?.id;
       }
 
       await this.resource.__internal_basePost({
