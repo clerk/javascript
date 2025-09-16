@@ -191,7 +191,7 @@ const CheckoutFormElements = () => {
   const { data: paymentSources } = usePaymentMethods();
 
   const [paymentMethodSource, setPaymentMethodSource] = useState<PaymentMethodSource>(() =>
-    paymentSources.length > 0 ? 'existing' : 'new',
+    paymentSources.length > 0 || __BUILD_DISABLE_RHC__ ? 'existing' : 'new',
   );
 
   if (!id) {
@@ -204,24 +204,28 @@ const CheckoutFormElements = () => {
       gap={4}
       sx={t => ({ padding: t.space.$4 })}
     >
-      {/* only show if there are payment sources and there is a total due now */}
-      {paymentSources.length > 0 && (totals.totalDueNow.amount > 0 || !!freeTrialEndsAt) && (
-        <SegmentedControl.Root
-          aria-label='Payment method source'
-          value={paymentMethodSource}
-          onChange={value => setPaymentMethodSource(value as PaymentMethodSource)}
-          size='lg'
-          fullWidth
-        >
-          <SegmentedControl.Button
-            value='existing'
-            text={localizationKeys('commerce.paymentMethods')}
-          />
-          <SegmentedControl.Button
-            value='new'
-            text={localizationKeys('commerce.addPaymentMethod')}
-          />
-        </SegmentedControl.Root>
+      {__BUILD_DISABLE_RHC__ ? null : (
+        <>
+          {/* only show if there are payment sources and there is a total due now */}
+          {paymentSources.length > 0 && (totals.totalDueNow.amount > 0 || !!freeTrialEndsAt) && (
+            <SegmentedControl.Root
+              aria-label='Payment method source'
+              value={paymentMethodSource}
+              onChange={value => setPaymentMethodSource(value as PaymentMethodSource)}
+              size='lg'
+              fullWidth
+            >
+              <SegmentedControl.Button
+                value='existing'
+                text={localizationKeys('commerce.paymentMethods')}
+              />
+              <SegmentedControl.Button
+                value='new'
+                text={localizationKeys('commerce.addPaymentMethod')}
+              />
+            </SegmentedControl.Root>
+          )}
+        </>
       )}
 
       {paymentMethodSource === 'existing' && (
@@ -231,7 +235,7 @@ const CheckoutFormElements = () => {
         />
       )}
 
-      {paymentMethodSource === 'new' && <AddPaymentSourceForCheckout />}
+      {__BUILD_DISABLE_RHC__ ? null : paymentMethodSource === 'new' && <AddPaymentSourceForCheckout />}
     </Col>
   );
 };

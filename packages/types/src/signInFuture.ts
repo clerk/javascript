@@ -30,6 +30,12 @@ export type SignInFuturePasswordParams =
       phoneNumber: string;
       identifier?: never;
       email?: never;
+    }
+  | {
+      password: string;
+      phoneNumber?: never;
+      identifier?: never;
+      email?: never;
     };
 
 export interface SignInFutureEmailCodeSendParams {
