@@ -5,8 +5,7 @@
  * @param obj - The object to filter, or any other value
  */
 export function filterUndefinedValues<T>(obj: T): T {
-  // Return non-objects as-is (including FormData, arrays, primitives, etc.)
-  if (!obj || typeof obj !== 'object' || Array.isArray(obj) || obj instanceof FormData) {
+  if (!obj || typeof obj !== 'object' || Object.getPrototypeOf(obj) !== Object.prototype) {
     return obj;
   }
 
