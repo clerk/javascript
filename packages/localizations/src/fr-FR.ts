@@ -81,6 +81,7 @@ export const frFR: LocalizationResource = {
     cancelSubscription: 'Annuler la souscription',
     cancelSubscriptionAccessUntil: "Accès annulé jusqu'au",
     cancelSubscriptionNoCharge: 'Pas de charge',
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: 'Annuler la souscription',
     cannotSubscribeMonthly: 'Ne peut pas souscrire mensuellement',
     cannotSubscribeUnrecoverable: undefined,

@@ -83,6 +83,7 @@ export const ptBR: LocalizationResource = {
     cancelSubscriptionAccessUntil:
       "Você pode continuar usando os recursos de {{plan}} até {{ date | longDate('pt-BR') }}, após o qual você não terá mais acesso.",
     cancelSubscriptionNoCharge: 'Você não será cobrado por esta assinatura.',
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: 'Cancelar assinatura do plano {{plan}}?',
     cannotSubscribeMonthly:
       'Você não pode assinar este plano pagando mensalmente. Para assinar este plano, você precisa escolher pagar anualmente.',

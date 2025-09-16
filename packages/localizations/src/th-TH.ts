@@ -84,6 +84,7 @@ export const thTH: LocalizationResource = {
     cancelSubscriptionAccessUntil:
       "คุณสามารถใช้ฟีเจอร์ '{{plan}}' ต่อไปได้จนถึง {{ date | longDate('th-TH') }} หลังจากนั้นคุณจะไม่สามารถเข้าถึงได้อีก",
     cancelSubscriptionNoCharge: 'คุณจะไม่ถูกเรียกเก็บเงินสำหรับการสมัครสมาชิกนี้',
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: 'ยกเลิกการสมัครสมาชิก {{plan}}?',
     cannotSubscribeMonthly: 'คุณไม่สามารถสมัครแผนนี้โดยการชำระรายเดือน หากต้องการสมัครแผนนี้ คุณต้องเลือกชำระรายปี',
     cannotSubscribeUnrecoverable: 'คุณไม่สามารถสมัครแผนนี้ได้ การสมัครสมาชิกปัจจุบันของคุณมีราคาแพงกว่าแผนนี้',
