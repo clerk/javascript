@@ -1,3 +1,5 @@
+import { describe, it, expect } from 'vitest';
+
 import { ClerkAPIResponseError } from '@clerk/shared/error';
 
 import { isVerificationExpiredError, VerificationErrorMessage, verificationErrorMessage } from '../verification';

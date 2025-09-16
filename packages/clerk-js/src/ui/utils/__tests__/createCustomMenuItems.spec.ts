@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest';
 import type { CustomMenuItem } from '@clerk/types';
 
 import { createUserButtonCustomMenuItems as cUBCMI } from '../createCustomMenuItems';
