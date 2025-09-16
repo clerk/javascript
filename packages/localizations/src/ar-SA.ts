@@ -1027,7 +1027,8 @@ export const arSA: LocalizationResource = {
     deletePage: {
       actionDescription: 'أكتب حذف حساب بالأسفل للمتابعة',
       confirm: 'حذف حساب',
-      messageLine1: 'هل أنت من انك تريد حذف هذا الحساب؟',
+      messageLine1:
+        'هل أنت متأكد من أنك تريد حذف حسابك من Clerk؟ يرجى التواصل مع مالك التطبيق لحذف معلوماتك من تطبيقهم والخدمات الأخرى.',
       messageLine2: 'هذا القرار نهائي ولا يمكن التراجع عنه.',
       title: 'حذف الحساب',
     },
