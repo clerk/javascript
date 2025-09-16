@@ -1,3 +1,5 @@
+import { describe, expect, it } from 'vitest';
+
 import { createCssVariables } from '../createCssVariables';
 import { createVariants } from '../createVariants';
 
