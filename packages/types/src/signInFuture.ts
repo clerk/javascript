@@ -38,7 +38,7 @@ export interface SignInFutureEmailCodeSendParams {
 
 export interface SignInFutureEmailLinkSendParams {
   email: string;
-  redirectUrl: string;
+  verificationUrl: string;
 }
 
 export interface SignInFutureEmailCodeVerifyParams {

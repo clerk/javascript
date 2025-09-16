@@ -724,7 +724,7 @@ class SignInFuture implements SignInFutureResource {
   }
 
   async sendEmailLink(params: SignInFutureEmailLinkSendParams): Promise<{ error: unknown }> {
-    const { email, redirectUrl } = params;
+    const { email, verificationUrl } = params;
     return runAsyncResourceTask(this.resource, async () => {
       if (!this.resource.id) {
         await this.create({ identifier: email });
@@ -738,15 +738,15 @@ class SignInFuture implements SignInFutureResource {
 
       const { emailAddressId } = emailLinkFactor;
 
-      let verifyUrl = redirectUrl;
+      let absoluteVerificationUrl = verificationUrl;
       try {
-        new URL(verifyUrl);
+        new URL(verificationUrl);
       } catch {
-        verifyUrl = window.location.origin + verifyUrl;
+        absoluteVerificationUrl = window.location.origin + verificationUrl;
       }
 
       await this.resource.__internal_basePost({
-        body: { emailAddressId, redirectUrl: verifyUrl, strategy: 'email_link' },
+        body: { emailAddressId, redirectUrl: absoluteVerificationUrl, strategy: 'email_link' },
         action: 'prepare_first_factor',
       });
     });
