@@ -270,7 +270,7 @@ describe('request', () => {
       });
 
       expect(fetch).toHaveBeenCalledWith(
-        expect.any(String),
+        expect.any(URL),
         expect.objectContaining({
           body: 'defined_value=test&null_value=&false_value=false&zero_value=0&empty_string=',
         }),
@@ -289,7 +289,7 @@ describe('request', () => {
       });
 
       expect(fetch).toHaveBeenCalledWith(
-        expect.any(String),
+        expect.any(URL),
         expect.objectContaining({
           body: formData,
         }),
@@ -309,7 +309,7 @@ describe('request', () => {
       });
 
       expect(fetch).toHaveBeenCalledWith(
-        expect.any(String),
+        expect.any(URL),
         expect.objectContaining({
           body: stringBody,
         }),
@@ -324,7 +324,7 @@ describe('request', () => {
       });
 
       expect(fetch).toHaveBeenCalledWith(
-        expect.any(String),
+        expect.any(URL),
         expect.objectContaining({
           body: '',
         }),
@@ -344,7 +344,7 @@ describe('request', () => {
       });
 
       expect(fetch).toHaveBeenCalledWith(
-        expect.any(String),
+        expect.any(URL),
         expect.objectContaining({
           body: '',
         }),
@@ -374,7 +374,7 @@ describe('request', () => {
       } as any);
 
       expect(fetch).toHaveBeenCalledWith(
-        expect.any(String),
+        expect.any(URL),
         expect.objectContaining({
           body: `top_level=value&nested=${encodeURIComponent(expectedNestedJson).replace(/%20/g, '+')}`,
         }),
