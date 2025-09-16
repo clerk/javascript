@@ -2,4 +2,4 @@
 "@clerk/nuxt": minor
 ---
 
-Bump Nuxt dependencies to v4
+Bump `@nuxt/kit` and `@nuxt/schema` to v4
