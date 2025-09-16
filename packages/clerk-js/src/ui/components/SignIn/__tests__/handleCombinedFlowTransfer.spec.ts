@@ -1,11 +1,12 @@
 import type { LoadedClerk, SignUpResource } from '@clerk/types';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { handleCombinedFlowTransfer, hasOptionalFields } from '../handleCombinedFlowTransfer';
 
-// eslint-disable-next-line no-var -- Jest hoists mock calls to the top of the file, so var is needed.
-var mockCompleteSignUpFlow: jest.Mock;
-jest.mock('../lazy-sign-up', () => {
-  mockCompleteSignUpFlow = jest.fn();
+// eslint-disable-next-line no-var -- Vitest hoists mock calls to the top of the file, so var is needed.
+var mockCompleteSignUpFlow: ReturnType<typeof vi.fn>;
+vi.mock('../lazy-sign-up', () => {
+  mockCompleteSignUpFlow = vi.fn();
   return {
     lazyCompleteSignUpFlow: () => {
       return Promise.resolve(mockCompleteSignUpFlow);
@@ -13,19 +14,19 @@ jest.mock('../lazy-sign-up', () => {
   };
 });
 
-const mockNavigate = jest.fn();
-const mockHandleError = jest.fn();
+const mockNavigate = vi.fn();
+const mockHandleError = vi.fn();
 
 describe('handleCombinedFlowTransfer', () => {
   beforeEach(() => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
   });
 
   it('should call completeSignUpFlow', async () => {
     const mockClerk = {
       client: {
         signUp: {
-          create: jest.fn().mockResolvedValue({}),
+          create: vi.fn().mockResolvedValue({}),
           optionalFields: [],
         },
       },
@@ -40,7 +41,7 @@ describe('handleCombinedFlowTransfer', () => {
       clerk: mockClerk as unknown as LoadedClerk,
       afterSignUpUrl: 'https://test.com',
       passwordEnabled: false,
-      navigateOnSetActive: jest.fn(),
+      navigateOnSetActive: vi.fn(),
     });
 
     expect(mockCompleteSignUpFlow).toHaveBeenCalled();
@@ -50,7 +51,7 @@ describe('handleCombinedFlowTransfer', () => {
     const mockClerk = {
       client: {
         signUp: {
-          create: jest.fn().mockImplementation((...args) => Promise.resolve(args)),
+          create: vi.fn().mockImplementation((...args) => Promise.resolve(args)),
           optionalFields: ['phone_number'],
         },
       },
@@ -65,7 +66,7 @@ describe('handleCombinedFlowTransfer', () => {
       clerk: mockClerk as unknown as LoadedClerk,
       afterSignUpUrl: 'https://test.com',
       passwordEnabled: false,
-      navigateOnSetActive: jest.fn(),
+      navigateOnSetActive: vi.fn(),
     });
 
     expect(mockNavigate).not.toHaveBeenCalled();
@@ -77,7 +78,7 @@ describe('handleCombinedFlowTransfer', () => {
     const mockClerk = {
       client: {
         signUp: {
-          create: jest.fn().mockImplementation((...args) => Promise.resolve(args)),
+          create: vi.fn().mockImplementation((...args) => Promise.resolve(args)),
           optionalFields: ['password'],
         },
       },
@@ -92,7 +93,7 @@ describe('handleCombinedFlowTransfer', () => {
       clerk: mockClerk as unknown as LoadedClerk,
       afterSignUpUrl: 'https://test.com',
       passwordEnabled: true,
-      navigateOnSetActive: jest.fn(),
+      navigateOnSetActive: vi.fn(),
     });
 
     expect(mockNavigate).toHaveBeenCalled();
@@ -104,7 +105,7 @@ describe('handleCombinedFlowTransfer', () => {
     const mockClerk = {
       client: {
         signUp: {
-          create: jest.fn().mockImplementation((...args) => Promise.resolve(args)),
+          create: vi.fn().mockImplementation((...args) => Promise.resolve(args)),
           optionalFields: [],
         },
       },
@@ -119,7 +120,7 @@ describe('handleCombinedFlowTransfer', () => {
       clerk: mockClerk as unknown as LoadedClerk,
       afterSignUpUrl: 'https://test.com',
       passwordEnabled: false,
-      navigateOnSetActive: jest.fn(),
+      navigateOnSetActive: vi.fn(),
     });
 
     expect(mockNavigate).toHaveBeenCalled();
@@ -131,7 +132,7 @@ describe('handleCombinedFlowTransfer', () => {
     const mockClerk = {
       client: {
         signUp: {
-          create: jest.fn().mockImplementation((...args) => Promise.resolve(args)),
+          create: vi.fn().mockImplementation((...args) => Promise.resolve(args)),
           optionalFields: ['first_name'],
         },
       },
@@ -146,7 +147,7 @@ describe('handleCombinedFlowTransfer', () => {
       clerk: mockClerk as unknown as LoadedClerk,
       afterSignUpUrl: 'https://test.com',
       passwordEnabled: false,
-      navigateOnSetActive: jest.fn(),
+      navigateOnSetActive: vi.fn(),
     });
 
     expect(mockNavigate).toHaveBeenCalled();

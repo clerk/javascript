@@ -1,5 +1,6 @@
 import { waitFor } from '@testing-library/dom';
 import { renderHook } from '@testing-library/react';
+import { afterEach, describe, expect, it } from 'vitest';
 
 import { useFormattedPhoneNumber } from '../useFormattedPhoneNumber';
 
