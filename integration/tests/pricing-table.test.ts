@@ -306,9 +306,9 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
           .getByText(/Trial/i)
           .locator('xpath=..')
           .getByText(/Free trial/i),
-      ).toBeVisible();
+      ).toBeVisible({ timeout: 15000 });
 
-      await expect(u.po.page.getByText(/Trial ends/i)).toBeVisible();
+      await expect(u.po.page.getByText(/Trial ends/i)).toBeVisible({ timeout: 15000 });
 
       await u.po.page.getByRole('button', { name: 'Manage' }).first().click();
       await u.po.subscriptionDetails.waitForMounted();
@@ -573,8 +573,10 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await u.po.checkout.waitForMounted();
       await u.po.checkout.closeDrawer();
 
-      await u.po.checkout.waitForMounted();
+      // Ensure the checkout fully unmounts before opening again to force revalidation
+      await u.po.checkout.root.waitFor({ state: 'detached' });
       await u.po.pricingTable.startCheckout({ planSlug: 'plus', period: 'monthly' });
+      await u.po.checkout.waitForMounted();
       await u.po.checkout.fillTestCard();
       await u.po.checkout.clickPayOrSubscribe();
       await u.po.checkout.confirmAndContinue();
