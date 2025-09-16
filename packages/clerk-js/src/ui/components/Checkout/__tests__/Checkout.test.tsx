@@ -1047,7 +1047,7 @@ describe('Checkout', () => {
       });
 
       await waitFor(() => {
-        const paymentMethodsButton = queryByRole('Payment Methods');
+        const paymentMethodsButton = queryByRole('button', { name: 'Payment Methods' });
         expect(paymentMethodsButton).toBeNull();
 
         const addPaymentMethodButton = queryByText('Add payment method');
