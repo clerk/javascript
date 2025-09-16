@@ -74,7 +74,7 @@ export const CardClerkAndPagesTag = React.memo(
                 >
                   <>
                     <Text variant='buttonSmall'>Secured by</Text>
-                    <LogoMarkIconLink />
+                    <LogoMarkIconLink sx={{ transform: 'translateY(-1px)' }} />
                   </>
                 </Flex>
               )}
@@ -90,13 +90,14 @@ export const CardClerkAndPagesTag = React.memo(
   }),
 );
 
-const LogoMarkIconLink = () => {
+const LogoMarkIconLink = (props: PropsOfComponent<typeof Link>) => {
   return (
     <Link
       href='https://go.clerk.com/components'
       colorScheme='inherit'
       isExternal
       aria-label='Clerk logo'
+      {...props}
     >
       <Icon
         icon={LogoMark}
