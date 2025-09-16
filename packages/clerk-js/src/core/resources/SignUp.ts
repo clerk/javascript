@@ -144,7 +144,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     let finalParams = { ...params };
 
     if (__BUILD_VARIANT_CHIPS__ && inIframe()) {
-      finalParams.sessionId = BaseResource.clerk.session?.id;
+      finalParams.clientId = BaseResource.clerk.client?.id;
     }
 
     if (!__BUILD_DISABLE_RHC__ && !this.clientBypass() && !this.shouldBypassCaptchaForAttempt(params)) {
@@ -434,7 +434,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     const finalParams = { ...params };
 
     if (__BUILD_VARIANT_CHIPS__ && inIframe()) {
-      finalParams.sessionId = BaseResource.clerk.session?.id;
+      finalParams.clientId = BaseResource.clerk.client?.id;
     }
 
     return this._basePatch({

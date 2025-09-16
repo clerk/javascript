@@ -129,9 +129,9 @@ export type SignInCreateParams = (
       oidcPrompt?: string;
       oidcLoginHint?: string;
       /**
-       * @internal Used to identify the session making the request in iframe context.
+       * @internal Used to identify the client making the request in iframe context.
        */
-      sessionId?: string;
+      clientId?: string;
     }
   | {
       strategy: TicketStrategy;
