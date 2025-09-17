@@ -1577,9 +1577,9 @@ export type UserButtonProps = UserButtonProfileMode & {
   /**
    * If true the `<UserButton />` will only render the popover.
    * Enables developers to implement a custom dialog.
-   * This API is experimental and may change at any moment.
-   * @experimental
+   *
    * @default undefined
+   * @experimental This API is experimental and may change at any moment.
    */
   __experimental_asStandalone?: boolean | ((opened: boolean) => void);
 
@@ -1647,9 +1647,9 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
     /**
      * If true, `<OrganizationSwitcher />` will only render the popover.
      * Enables developers to implement a custom dialog.
-     * This API is experimental and may change at any moment.
-     * @experimental
+     *
      * @default undefined
+     * @experimental This API is experimental and may change at any moment.
      */
     __experimental_asStandalone?: boolean | ((opened: boolean) => void);
 

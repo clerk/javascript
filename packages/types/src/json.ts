@@ -145,8 +145,8 @@ export interface SessionJSON extends ClerkResourceJSON {
   status: SessionStatus;
   /**
    * The tuple represents the minutes that have passed since the last time a first or second factor were verified.
-   * This API is experimental and may change at any moment.
-   * @experimental
+   *
+   * @experimental This API is experimental and may change at any moment.
    */
   factor_verification_age: [firstFactorAge: number, secondFactorAge: number] | null;
   expire_at: number;
