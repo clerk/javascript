@@ -1,5 +1,4 @@
 import { __experimental_useCheckout as useCheckout } from '@clerk/shared/react';
-import { useMemo } from 'react';
 
 import { Alert } from '@/ui/elements/Alert';
 import { Drawer, useDrawerContext } from '@/ui/elements/Drawer';
@@ -42,21 +41,12 @@ export const InvalidPlanScreen = () => {
   const { planPeriod } = useCheckoutContext();
   const { errors } = useCheckout();
 
-  const planFromError = useMemo(() => {
-    const _error = errors?.global?.find(e => e.code === 'invalid_plan_change');
-    // @ts-expect-error - meta is not yet defined
-    return _error?.meta?.plan;
-  }, [errors.global]);
-
-  const isPlanUpgradePossible = useMemo(() => {
-    const _error = errors?.global?.find(e => e.code === 'invalid_plan_change');
-    // @ts-expect-error - meta is not yet defined
-    return _error?.meta?.isPlanUpgradePossible || false;
-  }, [errors.global]);
-
-  if (!planFromError) {
+  const InvalidPlanError = errors?.global?.find(e => e.code === 'invalid_plan_change');
+  if (!InvalidPlanError) {
     return null;
   }
+
+  const { plan: planFromError, isPlanUpgradePossible } = InvalidPlanError?.meta || {};
 
   return (
     <Drawer.Body>
