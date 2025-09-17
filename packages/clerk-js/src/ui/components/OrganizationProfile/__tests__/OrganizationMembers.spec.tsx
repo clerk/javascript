@@ -572,26 +572,21 @@ describe('OrganizationMembers', () => {
 
       fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
 
-      const { container, getByRole, queryByRole, findByRole } = render(<OrganizationMembers />, { wrapper });
+      const { container, queryByRole, findByRole } = render(<OrganizationMembers />, { wrapper });
 
       await waitForLoadingCompleted(container);
 
-      const inviteButton = queryByRole('button', { name: 'Invite' });
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      await userEvent.click(inviteButton!);
-      await waitFor(async () =>
-        expect(await findByRole('heading', { name: /invite new members/i })).toBeInTheDocument(),
-      );
+      const inviteButton = await findByRole('button', { name: 'Invite' });
+      await userEvent.click(inviteButton);
+
+      expect(await findByRole('heading', { name: /invite new members/i })).toBeInTheDocument();
       expect(inviteButton).toBeInTheDocument();
 
-      // Click the cancel button in the invite screen
       const cancelButton = await findByRole('button', { name: 'Cancel' });
       await userEvent.click(cancelButton);
 
-      // Wait for the invite screen to disappear
       await waitForElementToBeRemoved(() => queryByRole('heading', { name: /invite new members/i }));
 
-      // Verify the invite button is back
       expect(await findByRole('button', { name: 'Invite' })).toBeInTheDocument();
     });
   });

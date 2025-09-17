@@ -1,6 +1,6 @@
 import type { PasskeyJSON, PasskeyResource } from '@clerk/types';
 import { act } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { CardStateProvider } from '@/ui/elements/contexts';
 
@@ -162,10 +162,13 @@ describe('PasskeySection', () => {
         { wrapper },
       );
 
-      fixtures.clerk.user?.passkeys[0].delete.mockResolvedValue({
-        object: 'passkey',
-        deleted: true,
-      });
+      const deleteMock = fixtures.clerk.user?.passkeys?.[0]?.delete;
+      if (deleteMock) {
+        vi.mocked(deleteMock).mockResolvedValue({
+          object: 'passkey',
+          deleted: true,
+        });
+      }
 
       const item = getByText(passkeys[0].name);
       const menuButton = getMenuItemFromText(item);
