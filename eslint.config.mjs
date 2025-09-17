@@ -335,6 +335,7 @@ export default tseslint.config([
       jest: pluginJest,
     },
     rules: {
+      '@typescript-eslint/no-non-null-assertion': 'off',
       '@typescript-eslint/unbound-method': 'off',
       'jest/unbound-method': 'error',
     },
