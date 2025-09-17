@@ -1,9 +1,9 @@
 import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router';
-import { rootAuthLoader } from '@clerk/react-router/ssr.server';
+import { clerkMiddleware, rootAuthLoader } from '@clerk/react-router/server';
 import { ClerkProvider } from '@clerk/react-router';
 import type { Route } from './+types/root';
 
-// export const middleware: Route.MiddlewareFunction[] = [clerkMiddleware()];
+export const middleware: Route.MiddlewareFunction[] = [clerkMiddleware()];
 
 export const loader = (args: Route.LoaderArgs) => rootAuthLoader(args);
 
