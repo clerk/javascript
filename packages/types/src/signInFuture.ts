@@ -38,14 +38,27 @@ export type SignInFuturePasswordParams =
       email?: never;
     };
 
-export interface SignInFutureEmailCodeSendParams {
-  email: string;
-}
+export type SignInFutureEmailCodeSendParams =
+  | {
+      emailAddress?: string;
+      emailAddressId?: never;
+    }
+  | {
+      emailAddressId?: string;
+      emailAddress?: never;
+    };
 
-export interface SignInFutureEmailLinkSendParams {
-  email: string;
-  verificationUrl: string;
-}
+export type SignInFutureEmailLinkSendParams =
+  | {
+      emailAddress?: string;
+      verificationUrl: string;
+      emailAddressId?: never;
+    }
+  | {
+      emailAddressId?: string;
+      verificationUrl: string;
+      emailAddress?: never;
+    };
 
 export interface SignInFutureEmailCodeVerifyParams {
   code: string;
@@ -56,10 +69,17 @@ export interface SignInFutureResetPasswordSubmitParams {
   signOutOfOtherSessions?: boolean;
 }
 
-export interface SignInFuturePhoneCodeSendParams {
-  phoneNumber?: string;
-  channel?: PhoneCodeChannel;
-}
+export type SignInFuturePhoneCodeSendParams =
+  | {
+      phoneNumber?: string;
+      channel?: PhoneCodeChannel;
+      phoneNumberId?: never;
+    }
+  | {
+      phoneNumberId: string;
+      channel?: PhoneCodeChannel;
+      phoneNumber?: never;
+    };
 
 export interface SignInFuturePhoneCodeVerifyParams {
   code: string;
