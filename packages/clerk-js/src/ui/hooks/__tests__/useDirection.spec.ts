@@ -1,10 +1,11 @@
 import { renderHook } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useDirection } from '../useDirection';
 
 describe('useDirection', () => {
   const originalWindow = window;
-  const mockGetComputedStyle = jest.fn();
+  const mockGetComputedStyle = vi.fn();
 
   beforeEach(() => {
     // Mock window.getComputedStyle

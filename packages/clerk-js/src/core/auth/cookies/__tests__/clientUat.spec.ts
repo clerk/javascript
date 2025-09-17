@@ -1,33 +1,34 @@
 import { createCookieHandler } from '@clerk/shared/cookie';
 import { addYears } from '@clerk/shared/date';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { inCrossOriginIframe } from '../../../../utils';
 import { getCookieDomain } from '../../getCookieDomain';
 import { getSecureAttribute } from '../../getSecureAttribute';
 import { createClientUatCookie } from '../clientUat';
 
-jest.mock('@clerk/shared/cookie');
-jest.mock('@clerk/shared/date');
-jest.mock('../../../../utils');
-jest.mock('../../getCookieDomain');
-jest.mock('../../getSecureAttribute');
+vi.mock('@clerk/shared/cookie');
+vi.mock('@clerk/shared/date');
+vi.mock('../../../../utils');
+vi.mock('../../getCookieDomain');
+vi.mock('../../getSecureAttribute');
 
 describe('createClientUatCookie', () => {
   const mockCookieSuffix = 'test-suffix';
   const mockExpires = new Date('2024-12-31');
   const mockDomain = 'test.domain';
-  const mockSet = jest.fn();
-  const mockRemove = jest.fn();
-  const mockGet = jest.fn();
+  const mockSet = vi.fn();
+  const mockRemove = vi.fn();
+  const mockGet = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockGet.mockReset();
-    (addYears as jest.Mock).mockReturnValue(mockExpires);
-    (inCrossOriginIframe as jest.Mock).mockReturnValue(false);
-    (getCookieDomain as jest.Mock).mockReturnValue(mockDomain);
-    (getSecureAttribute as jest.Mock).mockReturnValue(true);
-    (createCookieHandler as jest.Mock).mockImplementation(() => ({
+    (addYears as ReturnType<typeof vi.fn>).mockReturnValue(mockExpires);
+    (inCrossOriginIframe as ReturnType<typeof vi.fn>).mockReturnValue(false);
+    (getCookieDomain as ReturnType<typeof vi.fn>).mockReturnValue(mockDomain);
+    (getSecureAttribute as ReturnType<typeof vi.fn>).mockReturnValue(true);
+    (createCookieHandler as ReturnType<typeof vi.fn>).mockImplementation(() => ({
       set: mockSet,
       remove: mockRemove,
       get: mockGet,
@@ -60,7 +61,7 @@ describe('createClientUatCookie', () => {
   });
 
   it('should set cookies with None sameSite in cross-origin context', () => {
-    (inCrossOriginIframe as jest.Mock).mockReturnValue(true);
+    (inCrossOriginIframe as ReturnType<typeof vi.fn>).mockReturnValue(true);
     const cookieHandler = createClientUatCookie(mockCookieSuffix);
     cookieHandler.set({
       id: 'test-client',

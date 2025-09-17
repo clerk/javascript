@@ -1,30 +1,31 @@
 import { createCookieHandler } from '@clerk/shared/cookie';
 import { addYears } from '@clerk/shared/date';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { inCrossOriginIframe } from '../../../../utils';
 import { getSecureAttribute } from '../../getSecureAttribute';
 import { createSessionCookie } from '../session';
 
-jest.mock('@clerk/shared/cookie');
-jest.mock('@clerk/shared/date');
-jest.mock('../../../../utils');
-jest.mock('../../getSecureAttribute');
+vi.mock('@clerk/shared/cookie');
+vi.mock('@clerk/shared/date');
+vi.mock('../../../../utils');
+vi.mock('../../getSecureAttribute');
 
 describe('createSessionCookie', () => {
   const mockCookieSuffix = 'test-suffix';
   const mockToken = 'test-token';
   const mockExpires = new Date('2024-12-31');
-  const mockSet = jest.fn();
-  const mockRemove = jest.fn();
-  const mockGet = jest.fn();
+  const mockSet = vi.fn();
+  const mockRemove = vi.fn();
+  const mockGet = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockGet.mockReset();
-    (addYears as jest.Mock).mockReturnValue(mockExpires);
-    (inCrossOriginIframe as jest.Mock).mockReturnValue(false);
-    (getSecureAttribute as jest.Mock).mockReturnValue(true);
-    (createCookieHandler as jest.Mock).mockImplementation(() => ({
+    (addYears as ReturnType<typeof vi.fn>).mockReturnValue(mockExpires);
+    (inCrossOriginIframe as ReturnType<typeof vi.fn>).mockReturnValue(false);
+    (getSecureAttribute as ReturnType<typeof vi.fn>).mockReturnValue(true);
+    (createCookieHandler as ReturnType<typeof vi.fn>).mockImplementation(() => ({
       set: mockSet,
       remove: mockRemove,
       get: mockGet,
@@ -52,7 +53,7 @@ describe('createSessionCookie', () => {
   });
 
   it('should set cookies with None sameSite in cross-origin context', () => {
-    (inCrossOriginIframe as jest.Mock).mockReturnValue(true);
+    (inCrossOriginIframe as ReturnType<typeof vi.fn>).mockReturnValue(true);
     const cookieHandler = createSessionCookie(mockCookieSuffix);
     cookieHandler.set(mockToken);
 
