@@ -50,6 +50,7 @@ const createUserFixtureHelpers = (baseClient: ClientJSON) => {
     external_accounts?: Array<OAuthProvider | Partial<ExternalAccountJSON>>;
     saml_accounts?: Array<Partial<SamlAccountJSON>>;
     organization_memberships?: Array<string | OrgParams>;
+    tasks?: Array<{ key: 'choose-organization' }>;
   };
 
   const createPublicUserData = (params: WithUserParams) => {
@@ -76,7 +77,7 @@ const createUserFixtureHelpers = (baseClient: ClientJSON) => {
     }
 
     const session = {
-      status: 'active',
+      status: params.tasks?.length ? 'pending' : 'active',
       id: baseClient.sessions.length.toString(),
       object: 'session',
       last_active_organization_id: activeOrganization,
@@ -88,6 +89,8 @@ const createUserFixtureHelpers = (baseClient: ClientJSON) => {
       last_active_token: {
         jwt: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NzU4NzY3OTAsImRhdGEiOiJmb29iYXIiLCJpYXQiOjE2NzU4NzY3MzB9.Z1BC47lImYvaAtluJlY-kBo0qOoAk42Xb-gNrB2SxJg',
       },
+      tasks: params.tasks || null,
+      current_task: params.tasks?.[0] || null,
     } as SessionJSON;
     baseClient.sessions.push(session);
   };
