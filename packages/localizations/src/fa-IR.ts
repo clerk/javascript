@@ -83,6 +83,7 @@ export const faIR: LocalizationResource = {
     cancelSubscriptionAccessUntil:
       "شما می‌توانید تا تاریخ {{ date | longDate('en-US') }} از ویژگی‌های '{{plan}}' استفاده کنید، پس از آن دیگر دسترسی نخواهید داشت.",
     cancelSubscriptionNoCharge: 'برای این اشتراک هیچ هزینه‌ای از شما دریافت نخواهد شد.',
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: 'اشتراک {{plan}} لغو شود؟',
     cannotSubscribeMonthly:
       'شما نمی‌توانید با پرداخت ماهانه در این طرح مشترک شوید. برای عضویت در این طرح، باید پرداخت سالانه را انتخاب کنید.',
@@ -1041,7 +1042,8 @@ export const faIR: LocalizationResource = {
     deletePage: {
       actionDescription: 'برای ادامه، عبارت "Delete account" را در زیر تایپ کنید.',
       confirm: 'حذف حساب',
-      messageLine1: 'آیا مطمئن هستید که می‌خواهید حساب کاربری خود را حذف کنید؟',
+      messageLine1:
+        'آیا مطمئن هستید که می‌خواهید حساب کاربری خود را از Clerk حذف کنید؟ لطفاً با صاحب برنامه تماس بگیرید تا اطلاعات شما را از برنامه آنها و سایر خدمات حذف کنند.',
       messageLine2: 'این اقدام دائمی و غیرقابل برگشت است.',
       title: 'حذف حساب',
     },

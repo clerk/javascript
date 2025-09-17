@@ -81,6 +81,7 @@ export const skSK: LocalizationResource = {
     cancelSubscription: undefined,
     cancelSubscriptionAccessUntil: undefined,
     cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: undefined,
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
@@ -1036,7 +1037,8 @@ export const skSK: LocalizationResource = {
     deletePage: {
       actionDescription: 'Pre pokračovanie napíšte "Zmazať účet".',
       confirm: 'Zmazať účet',
-      messageLine1: 'Ste si istý, že chcete zmazať svoj účet?',
+      messageLine1:
+        'Ste si istý, že chcete zmazať svoj účet z Clerk? Kontaktujte prosím vlastníka aplikácie na vymazanie vašich informácií z ich aplikácie a iných služieb.',
       messageLine2: 'Táto akcia je trvalá a nemôže byť vrátená späť.',
       title: 'Zmazať účet',
     },

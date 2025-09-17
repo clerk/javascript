@@ -212,6 +212,7 @@ export type __internal_LocalizationResource = {
     cancelSubscriptionTitle: LocalizationValue<'plan'>;
     cancelSubscriptionNoCharge: LocalizationValue;
     cancelSubscriptionAccessUntil: LocalizationValue<'plan' | 'date'>;
+    cancelSubscriptionPastDue: LocalizationValue;
     popular: LocalizationValue;
     subscriptionDetails: {
       title: LocalizationValue;

@@ -10,122 +10,62 @@ type WithOptionalOrgType<T> = T & {
 };
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingNamespace {
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   getPaymentAttempts: (params: GetPaymentAttemptsParams) => Promise<ClerkPaginatedResponse<BillingPaymentResource>>;
 
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   getPaymentAttempt: (params: { id: string; orgId?: string }) => Promise<BillingPaymentResource>;
 
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   getPlans: (params?: GetPlansParams) => Promise<ClerkPaginatedResponse<BillingPlanResource>>;
 
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   getPlan: (params: { id: string }) => Promise<BillingPlanResource>;
 
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   getSubscription: (params: GetSubscriptionParams) => Promise<BillingSubscriptionResource>;
 
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   getStatements: (params: GetStatementsParams) => Promise<ClerkPaginatedResponse<BillingStatementResource>>;
 
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   getStatement: (params: { id: string; orgId?: string }) => Promise<BillingStatementResource>;
 
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   startCheckout: (params: CreateCheckoutParams) => Promise<BillingCheckoutResource>;
 }
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export type BillingPayerResourceType = 'org' | 'user';
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export type ForPayerType = 'organization' | 'user';
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export type BillingSubscriptionStatus = 'active' | 'ended' | 'upcoming' | 'past_due';
 
@@ -137,41 +77,21 @@ export type BillingSubscriptionStatus = 'active' | 'ended' | 'upcoming' | 'past_
 export type BillingSubscriptionPlanPeriod = 'month' | 'annual';
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingPaymentSourceMethods {
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   initializePaymentSource: (
     params: Exclude<InitializePaymentSourceParams, 'orgId'>,
   ) => Promise<BillingInitializedPaymentSourceResource>;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   addPaymentSource: (params: Exclude<AddPaymentSourceParams, 'orgId'>) => Promise<BillingPaymentSourceResource>;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   getPaymentSources: (
     params: Exclude<GetPaymentSourcesParams, 'orgId'>,
@@ -179,114 +99,54 @@ export interface BillingPaymentSourceMethods {
 }
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export type GetPlansParams = ClerkPaginationParams<{
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   for?: ForPayerType;
 }>;
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingPlanResource extends ClerkResource {
   id: string;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   name: string;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   fee: BillingMoneyAmount;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   annualFee: BillingMoneyAmount;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   annualMonthlyFee: BillingMoneyAmount;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   description: string;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   isDefault: boolean;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   isRecurring: boolean;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   hasBaseFee: boolean;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    *
    * Specifies the subscriber type this plan is designed for.
    *
@@ -295,57 +155,27 @@ export interface BillingPlanResource extends ClerkResource {
    */
   forPayerType: BillingPayerResourceType;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   publiclyVisible: boolean;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   slug: string;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   avatarUrl: string;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   features: FeatureResource[];
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   freeTrialDays: number | null;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   freeTrialEnabled: boolean;
 }
@@ -353,7 +183,7 @@ export interface BillingPlanResource extends ClerkResource {
 /**
  * The `FeatureResource` type represents a feature of a plan.
  *
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version to avoid breaking changes.
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface FeatureResource extends ClerkResource {
   /**
@@ -385,98 +215,53 @@ export interface FeatureResource extends ClerkResource {
 export type BillingPaymentSourceStatus = 'active' | 'expired' | 'disconnected';
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export type GetPaymentSourcesParams = WithOptionalOrgType<ClerkPaginationParams>;
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export type PaymentGateway = 'stripe' | 'paypal';
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export type InitializePaymentSourceParams = WithOptionalOrgType<{
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   gateway: PaymentGateway;
 }>;
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export type AddPaymentSourceParams = WithOptionalOrgType<{
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   gateway: PaymentGateway;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   paymentToken: string;
 }>;
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export type RemovePaymentSourceParams = WithOptionalOrgType<unknown>;
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export type MakeDefaultPaymentSourceParams = WithOptionalOrgType<unknown>;
 
 /**
  * The `BillingPaymentSourceResource` type represents a payment source for a checkout session.
  *
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version and the clerk-js version to avoid breaking changes.
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingPaymentSourceResource extends ClerkResource {
   /**
@@ -528,222 +313,107 @@ export interface BillingPaymentSourceResource extends ClerkResource {
 }
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingInitializedPaymentSourceResource extends ClerkResource {
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   externalClientSecret: string;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   externalGatewayId: string;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   paymentMethodOrder: string[];
 }
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export type BillingPaymentChargeType = 'checkout' | 'recurring';
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export type BillingPaymentStatus = 'pending' | 'paid' | 'failed';
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingPaymentResource extends ClerkResource {
   id: string;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   amount: BillingMoneyAmount;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   paidAt?: Date;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   failedAt?: Date;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   updatedAt: Date;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   paymentSource: BillingPaymentSourceResource;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   subscriptionItem: BillingSubscriptionItemResource;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   chargeType: BillingPaymentChargeType;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   status: BillingPaymentStatus;
 }
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export type GetPaymentAttemptsParams = WithOptionalOrgType<ClerkPaginationParams>;
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export type GetStatementsParams = WithOptionalOrgType<ClerkPaginationParams>;
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 
 export type BillingStatementStatus = 'open' | 'closed';
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingStatementResource extends ClerkResource {
   id: string;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   totals: BillingStatementTotals;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   status: BillingStatementStatus;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   timestamp: Date;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   groups: BillingStatementGroup[];
 }
@@ -751,7 +421,7 @@ export interface BillingStatementResource extends ClerkResource {
 /**
  * The `BillingStatementGroup` type represents a group of payment items within a statement.
  *
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version and the clerk-js version to avoid breaking changes.
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingStatementGroup {
   /**
@@ -765,282 +435,135 @@ export interface BillingStatementGroup {
 }
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export type GetSubscriptionParams = {
   orgId?: string;
 };
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export type CancelSubscriptionParams = WithOptionalOrgType<unknown>;
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingSubscriptionItemResource extends ClerkResource {
   id: string;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   //TODO(@COMMERCE): should this be nullable ?
   paymentSourceId: string;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   plan: BillingPlanResource;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   planPeriod: BillingSubscriptionPlanPeriod;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   status: BillingSubscriptionStatus;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   createdAt: Date;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   pastDueAt: Date | null;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   periodStart: Date;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   periodEnd: Date | null;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   canceledAt: Date | null;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   amount?: BillingMoneyAmount;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   credit?: {
     /**
-     * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-     * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-     * @example
-     * ```tsx
-     * <ClerkProvider clerkJsVersion="x.x.x" />
-     * ```
+     * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
      */
     amount: BillingMoneyAmount;
   };
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   cancel: (params: CancelSubscriptionParams) => Promise<DeletedObjectResource>;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   isFreeTrial: boolean;
 }
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * The `CommerceSubscriptionResource` type represents a subscription to a plan.
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingSubscriptionResource extends ClerkResource {
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * The unique identifier for the subscription.
    */
   id: string;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * The date when the subscription became active.
    */
   activeAt: Date;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * The date when the subscription was created.
    */
   createdAt: Date;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * Information about the next payment, including the amount and the date it's due. Returns null if there is no upcoming payment.
    */
   nextPayment: {
     /**
-     * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-     * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-     * @example
-     * ```tsx
-     * <ClerkProvider clerkJsVersion="x.x.x" />
-     * ```
+     * The amount of the next payment.
      */
     amount: BillingMoneyAmount;
     /**
-     * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-     * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-     * @example
-     * ```tsx
-     * <ClerkProvider clerkJsVersion="x.x.x" />
-     * ```
+     * The date when the next payment is due.
      */
     date: Date;
   } | null;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
-   *
-   * When at least one subscription item is past due, this property will get populated.
+   * The date when the subscription became past due, or `null` if the subscription is not past due.
    */
   pastDueAt: Date | null;
 
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
-   *
-   * Due to the free plan subscription item, the top level subscription can either be `active` or `past_due`.
+   * The current status of the subscription. Due to the free plan subscription item, the top level subscription can either be `active` or `past_due`.
    */
   status: Extract<BillingSubscriptionStatus, 'active' | 'past_due'>;
 
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * The list of items (plans/features) included in this subscription.
    */
   subscriptionItems: BillingSubscriptionItemResource[];
 
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * The date when the subscription was last updated, or `null` if it hasn't been updated.
    */
   updatedAt: Date | null;
 
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * Whether the payer is eligible for a free trial.
    */
   eligibleForFreeTrial?: boolean;
 }
@@ -1048,7 +571,7 @@ export interface BillingSubscriptionResource extends ClerkResource {
 /**
  * The `BillingMoneyAmount` type represents a monetary value with currency information.
  *
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version and the clerk-js version to avoid breaking changes.
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingMoneyAmount {
   /**
@@ -1072,7 +595,7 @@ export interface BillingMoneyAmount {
 /**
  * The `BillingCheckoutTotals` type represents the total costs, taxes, and other pricing details for a checkout session.
  *
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version and the clerk-js version to avoid breaking changes.
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingCheckoutTotals {
   /**
@@ -1104,36 +627,21 @@ export interface BillingCheckoutTotals {
 /**
  * The `BillingStatementTotals` type represents the total costs, taxes, and other pricing details for a statement.
  *
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version and the clerk-js version to avoid breaking changes.
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface BillingStatementTotals extends Omit<BillingCheckoutTotals, 'totalDueNow'> {}
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export type CreateCheckoutParams = WithOptionalOrgType<{
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   planId: string;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   planPeriod: BillingSubscriptionPlanPeriod;
 }>;
@@ -1141,7 +649,7 @@ export type CreateCheckoutParams = WithOptionalOrgType<{
 /**
  * The `confirm()` method accepts the following parameters. **Only one of `paymentSourceId`, `paymentToken`, or `useTestCard` should be provided.**
  *
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version and the clerk-js version to avoid breaking changes.
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export type ConfirmCheckoutParams =
   | {
@@ -1174,7 +682,7 @@ export type ConfirmCheckoutParams =
 /**
  * The `BillingCheckoutResource` type represents information about a checkout session.
  *
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to pin the SDK version and the clerk-js version to avoid breaking changes.
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingCheckoutResource extends ClerkResource {
   /**
@@ -1226,113 +734,53 @@ export interface BillingCheckoutResource extends ClerkResource {
    */
   freeTrialEndsAt: Date | null;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * The payer associated with the checkout.
    */
   payer: BillingPayerResource;
 }
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingPayerResource extends ClerkResource {
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   id: string;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   createdAt: Date;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   updatedAt: Date;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   imageUrl: string | null;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   userId?: string;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   email?: string;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   firstName?: string;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   lastName?: string;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   organizationId?: string;
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   organizationName?: string;
 }

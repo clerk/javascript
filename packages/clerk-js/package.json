@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "5.92.1",
+  "version": "5.94.0",
   "description": "Clerk JS library",
   "keywords": [
     "clerk",
@@ -38,7 +38,8 @@
     "build:declarations": "tsc -p tsconfig.declarations.json",
     "build:sandbox": "rspack build --config rspack.config.js --env production --env sandbox",
     "build:stats": "rspack build --config rspack.config.js --env production --json=stats.json --env variant=\"clerk.browser\"",
-    "bundlewatch": "pnpm --package=bundlewatch -c dlx \"FORCE_COLOR=1 bundlewatch --config bundlewatch.config.json\"",
+    "bundlewatch": "FORCE_COLOR=1 bundlewatch --config bundlewatch.config.json",
+    "bundlewatch:fix": "node bundlewatch-fix.mjs",
     "clean": "rimraf ./dist",
     "dev": "rspack serve --config rspack.config.js",
     "dev:chips": "rspack serve --config rspack.config.js --env variant=\"clerk.chips.browser\"",
@@ -98,9 +99,11 @@
     "@svgr/webpack": "^6.5.1",
     "@swc/jest": "0.2.39",
     "@types/cloudflare-turnstile": "^0.2.2",
-    "@types/node": "^22.17.2",
+    "@types/node": "^22.18.1",
     "@types/webpack-env": "^1.18.8",
+    "bundlewatch": "^0.4.1",
     "jsdom": "^24.1.3",
+    "minimatch": "^10.0.3",
     "webpack-merge": "^5.10.0"
   },
   "peerDependencies": {

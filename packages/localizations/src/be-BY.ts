@@ -81,6 +81,7 @@ export const beBY: LocalizationResource = {
     cancelSubscription: undefined,
     cancelSubscriptionAccessUntil: undefined,
     cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: undefined,
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
@@ -1037,7 +1038,8 @@ export const beBY: LocalizationResource = {
     deletePage: {
       actionDescription: "Увядзіце 'Выдаліць уліковы запіс' ніжэй, каб працягнуць.",
       confirm: 'Выдаліць уліковы запіс',
-      messageLine1: 'Вы ўпэўнены, што хочаце выдаліць свой уліковы запіс?',
+      messageLine1:
+        'Вы ўпэўнены, што хочаце выдаліць свой уліковы запіс з Clerk? Калі ласка, звярніцеся да ўладальніка дадатка, каб выдаліць вашу інфармацыю з іх дадатка і іншых сэрвісаў.',
       messageLine2: "Гэта дзеянне з'яўляецца бессрочным і неабратным.",
       title: 'Выдаліць уліковы запіс',
     },

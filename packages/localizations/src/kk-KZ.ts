@@ -81,6 +81,7 @@ export const kkKZ: LocalizationResource = {
     cancelSubscription: 'Жазылымды болдырмау',
     cancelSubscriptionAccessUntil: undefined,
     cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: undefined,
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
@@ -1016,7 +1017,8 @@ export const kkKZ: LocalizationResource = {
     deletePage: {
       actionDescription: 'Жалғастыру үшін "Есептік жазбаны жою" деп енгізіңіз.',
       confirm: 'Есептік жазбаны жою',
-      messageLine1: 'Есептік жазбаңызды жойғыңыз келетініне сенімдісіз бе?',
+      messageLine1:
+        'Clerk-тен есептік жазбаңызды жойғыңыз келетініне сенімдісіз бе? Деректеріңізді олардың қолданбасы мен басқа қызметтерден жою үшін қолданба иесімен байланысыңыз.',
       messageLine2: 'Бұл әрекет тұрақты және қайтымсыз.',
       title: 'Есептік жазбаны жою',
     },

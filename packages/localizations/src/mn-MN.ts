@@ -81,6 +81,7 @@ export const mnMN: LocalizationResource = {
     cancelSubscription: undefined,
     cancelSubscriptionAccessUntil: undefined,
     cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: undefined,
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
@@ -1031,7 +1032,8 @@ export const mnMN: LocalizationResource = {
     deletePage: {
       actionDescription: 'Үргэлжлүүлэхийн тулд "Delete account" гэж бичнэ үү.',
       confirm: 'Бүртгэл устгах',
-      messageLine1: 'Та бүртгэлээ устгахдаа итгэлтэй байна уу?',
+      messageLine1:
+        'Та Clerk-ээс бүртгэлээ устгахдаа итгэлтэй байна уу? Таны мэдээллийг тэдний аппликэйшн болон бусад үйлчилгээнээс устгахын тулд аппликэйшний эзэнтэй холбогдоно уу.',
       messageLine2: 'Энэ үйлдэл нь байнгын бөгөөд эргэлт буцалтгүй юм.',
       title: 'Бүртгэл устгах',
     },

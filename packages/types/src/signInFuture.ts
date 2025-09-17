@@ -2,6 +2,7 @@ import type { SetActiveNavigate } from './clerk';
 import type { PhoneCodeChannel } from './phoneCodeChannel';
 import type { SignInFirstFactor, SignInStatus } from './signInCommon';
 import type { OAuthStrategy } from './strategies';
+import type { VerificationResource } from './verification';
 
 export interface SignInFutureCreateParams {
   identifier?: string;
@@ -29,11 +30,35 @@ export type SignInFuturePasswordParams =
       phoneNumber: string;
       identifier?: never;
       email?: never;
+    }
+  | {
+      password: string;
+      phoneNumber?: never;
+      identifier?: never;
+      email?: never;
     };
 
-export interface SignInFutureEmailCodeSendParams {
-  email: string;
-}
+export type SignInFutureEmailCodeSendParams =
+  | {
+      emailAddress?: string;
+      emailAddressId?: never;
+    }
+  | {
+      emailAddressId?: string;
+      emailAddress?: never;
+    };
+
+export type SignInFutureEmailLinkSendParams =
+  | {
+      emailAddress?: string;
+      verificationUrl: string;
+      emailAddressId?: never;
+    }
+  | {
+      emailAddressId?: string;
+      verificationUrl: string;
+      emailAddress?: never;
+    };
 
 export interface SignInFutureEmailCodeVerifyParams {
   code: string;
@@ -44,10 +69,17 @@ export interface SignInFutureResetPasswordSubmitParams {
   signOutOfOtherSessions?: boolean;
 }
 
-export interface SignInFuturePhoneCodeSendParams {
-  phoneNumber?: string;
-  channel?: PhoneCodeChannel;
-}
+export type SignInFuturePhoneCodeSendParams =
+  | {
+      phoneNumber?: string;
+      channel?: PhoneCodeChannel;
+      phoneNumberId?: never;
+    }
+  | {
+      phoneNumberId: string;
+      channel?: PhoneCodeChannel;
+      phoneNumber?: never;
+    };
 
 export interface SignInFuturePhoneCodeVerifyParams {
   code: string;
@@ -105,6 +137,8 @@ export interface SignInFutureResource {
 
   readonly existingSession?: { sessionId: string };
 
+  readonly firstFactorVerification: VerificationResource;
+
   /**
    * Used to supply an identifier for the sign-in attempt. Calling this method will populate data on the sign-in
    * attempt, such as `signIn.resource.supportedFirstFactors`.
@@ -129,6 +163,41 @@ export interface SignInFutureResource {
      * Used to verify a code sent via email to sign-in
      */
     verifyCode: (params: SignInFutureEmailCodeVerifyParams) => Promise<{ error: unknown }>;
+  };
+
+  /**
+   *
+   */
+  emailLink: {
+    /**
+     * Used to send an email link to sign-in
+     */
+    sendLink: (params: SignInFutureEmailLinkSendParams) => Promise<{ error: unknown }>;
+
+    /**
+     * Will wait for verification to complete or expire
+     */
+    waitForVerification: () => Promise<{ error: unknown }>;
+
+    /**
+     * The verification status
+     */
+    verification: {
+      /**
+       * The verification status
+       */
+      status: 'verified' | 'expired' | 'failed' | 'client_mismatch';
+
+      /**
+       * The created session ID
+       */
+      createdSessionId: string;
+
+      /**
+       * Whether the verification was from the same client
+       */
+      verifiedFromTheSameClient: boolean;
+    } | null;
   };
 
   /**

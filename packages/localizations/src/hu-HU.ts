@@ -81,6 +81,7 @@ export const huHU: LocalizationResource = {
     cancelSubscription: undefined,
     cancelSubscriptionAccessUntil: undefined,
     cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: undefined,
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
@@ -1031,7 +1032,8 @@ export const huHU: LocalizationResource = {
     deletePage: {
       actionDescription: 'Írd be, hogy "Delete account" a folytatáshoz.',
       confirm: 'Fiók törlése',
-      messageLine1: 'Biztos vagy benne, hogy törölni szeretnéd a fiókod?',
+      messageLine1:
+        'Biztos vagy benne, hogy törölni szeretnéd a fiókod a Clerk-ből? Kérjük, lépj kapcsolatba az alkalmazás tulajdonosával, hogy töröljék az adataidat az alkalmazásukból és más szolgáltatásaikból.',
       messageLine2: 'Ez a művelet végleges és visszafordíthatatlan.',
       title: 'Fiók törlése',
     },

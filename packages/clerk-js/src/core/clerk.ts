@@ -10,6 +10,7 @@ import { isHttpOrHttps, isValidProxyUrl, proxyUrlToAbsoluteURL } from '@clerk/sh
 import {
   eventPrebuiltComponentMounted,
   eventPrebuiltComponentOpened,
+  eventThemeUsage,
   TelemetryCollector,
 } from '@clerk/shared/telemetry';
 import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
@@ -462,6 +463,11 @@ export class Clerk implements ClerkInterface {
         publishableKey: this.publishableKey,
         ...this.#options.telemetry,
       });
+
+      // Record theme usage telemetry when appearance is provided
+      if (this.#options.appearance) {
+        this.telemetry.record(eventThemeUsage(this.#options.appearance));
+      }
     }
 
     try {
@@ -1152,8 +1158,7 @@ export class Clerk implements ClerkInterface {
   };
 
   /**
-   * @experimental
-   * This API is in early access and may change in future releases.
+   * @experimental This API is in early access and may change in future releases.
    *
    * Mount a api keys component at the target element.
    * @param targetNode Target to mount the APIKeys component.
@@ -1195,8 +1200,7 @@ export class Clerk implements ClerkInterface {
   };
 
   /**
-   * @experimental
-   * This API is in early access and may change in future releases.
+   * @experimental This API is in early access and may change in future releases.
    *
    * Unmount a api keys component from the target element.
    * If there is no component mounted at the target node, results in a noop.

@@ -81,6 +81,7 @@ export const ukUA: LocalizationResource = {
     cancelSubscription: undefined,
     cancelSubscriptionAccessUntil: undefined,
     cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: undefined,
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
@@ -1027,7 +1028,8 @@ export const ukUA: LocalizationResource = {
     deletePage: {
       actionDescription: 'Введіть "Видалити акаунт" нижче, щоб продовжити.',
       confirm: 'Видалити акаунт',
-      messageLine1: 'Ви впевнені, що хочете видалити свій акаунт?',
+      messageLine1:
+        "Ви впевнені, що хочете видалити свій акаунт з Clerk? Будь ласка, зв'яжіться з власником програми, щоб видалити вашу інформацію з їхньої програми та інших сервісів.",
       messageLine2: 'Ця дія є остаточною та незворотною.',
       title: 'Видалити акаунт',
     },
