@@ -81,6 +81,7 @@ export const plPL: LocalizationResource = {
     cancelSubscription: undefined,
     cancelSubscriptionAccessUntil: undefined,
     cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: undefined,
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
@@ -1039,7 +1040,8 @@ export const plPL: LocalizationResource = {
     deletePage: {
       actionDescription: 'Wpisz "Usuń konto" poniżej aby kontynuować.',
       confirm: 'Usuń konto',
-      messageLine1: 'Czy na pewno chcesz usunąć to konto?',
+      messageLine1:
+        'Czy na pewno chcesz usunąć swoje konto z Clerk? Skontaktuj się z właścicielem aplikacji, aby usunąć swoje informacje z ich aplikacji i innych usług.',
       messageLine2: 'Ta operacja jest nieodwracalna i nie można jej cofnąć.',
       title: 'Usuń konto',
     },

@@ -1,5 +1,5 @@
 import type { InstanceType } from '@clerk/types';
-import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
 import { SUPPORTED_FAPI_VERSION } from '../constants';
 import { createFapiClient } from '../fapiClient';
@@ -64,7 +64,7 @@ beforeAll(() => {
 });
 
 beforeEach(() => {
-  (global.fetch as vi.Mock).mockClear();
+  (global.fetch as Mock).mockClear();
 });
 
 afterAll(() => {
@@ -183,14 +183,14 @@ describe('request', () => {
       path: '/foo',
     });
 
-    expect(fetch).toHaveBeenCalledWith(
+    const fetchCall = (fetch as Mock).mock.calls[0];
+    expect(fetchCall[0].toString()).toBe(
       `https://clerk.example.com/v1/foo?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=test&_clerk_session_id=sess_1qq9oy5GiNHxdR2XWU6gG6mIcBX`,
-      expect.objectContaining({
-        credentials: 'include',
-        method: 'GET',
-        path: '/foo',
-      }),
     );
+    expect(fetchCall[1]).toMatchObject({
+      credentials: 'include',
+      method: 'GET',
+    });
   });
 
   it('invokes global.fetch with proxy', async () => {
@@ -198,18 +198,18 @@ describe('request', () => {
       path: '/foo',
     });
 
-    expect(fetch).toHaveBeenCalledWith(
+    const fetchCall = (fetch as Mock).mock.calls[0];
+    expect(fetchCall[0].toString()).toBe(
       `${proxyUrl}/v1/foo?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=test&_clerk_session_id=sess_1qq9oy5GiNHxdR2XWU6gG6mIcBX`,
-      expect.objectContaining({
-        credentials: 'include',
-        method: 'GET',
-        path: '/foo',
-      }),
     );
+    expect(fetchCall[1]).toMatchObject({
+      credentials: 'include',
+      method: 'GET',
+    });
   });
 
   it('returns array response as array', async () => {
-    (global.fetch as vi.Mock).mockResolvedValueOnce(
+    (global.fetch as Mock).mockResolvedValueOnce(
       Promise.resolve<RecursivePartial<Response>>({
         headers: {
           get: vi.fn(() => 'sess_43'),
@@ -226,7 +226,7 @@ describe('request', () => {
   });
 
   it('handles the empty body on 204 response, returning null', async () => {
-    (global.fetch as vi.Mock).mockResolvedValueOnce(
+    (global.fetch as Mock).mockResolvedValueOnce(
       Promise.resolve<RecursivePartial<Response>>({
         status: 204,
         json: () => {
@@ -250,5 +250,66 @@ describe('request', () => {
   describe('for staging or development instances', () => {
     it.todo('appends the __clerk_db_jwt cookie value to the query string');
     it.todo('sets the __clerk_db_jwt cookie from the response Clerk-Cookie header');
+  });
+
+  describe('retry logic', () => {
+    it('does not send retry query parameter on initial request', async () => {
+      await fapiClient.request({
+        path: '/foo',
+      });
+
+      expect(fetch).toHaveBeenCalledWith(expect.not.stringMatching(/_clerk_retry_attempt=/), expect.any(Object));
+    });
+
+    it('sends retry query parameter on retry attempts', async () => {
+      let callCount = 0;
+      (global.fetch as Mock).mockImplementation(() => {
+        callCount++;
+        if (callCount === 1) {
+          return Promise.reject(new Error('Network error'));
+        }
+        return Promise.resolve<RecursivePartial<Response>>({
+          headers: {
+            get: vi.fn(() => 'sess_43'),
+          },
+          json: () => Promise.resolve({ foo: 42 }),
+        });
+      });
+
+      await fapiClient.request({
+        path: '/foo',
+        method: 'GET',
+      });
+
+      const secondCall = (fetch as Mock).mock.calls[1];
+      expect(secondCall[0].toString()).toMatch(/_clerk_retry_attempt=1/);
+    });
+
+    it('increments retry query parameter on multiple retry attempts', async () => {
+      let callCount = 0;
+      (global.fetch as Mock).mockImplementation(() => {
+        callCount++;
+        if (callCount <= 2) {
+          return Promise.reject(new Error('Network error'));
+        }
+        return Promise.resolve<RecursivePartial<Response>>({
+          headers: {
+            get: vi.fn(() => 'sess_43'),
+          },
+          json: () => Promise.resolve({ foo: 42 }),
+        });
+      });
+
+      await fapiClient.request({
+        path: '/foo',
+        method: 'GET',
+      });
+
+      const secondCall = (fetch as Mock).mock.calls[1];
+      expect(secondCall[0].toString()).toMatch(/_clerk_retry_attempt=2/);
+
+      const thirdCall = (fetch as Mock).mock.calls[2];
+      expect(thirdCall[0].toString()).toMatch(/_clerk_retry_attempt=2/);
+    });
   });
 });

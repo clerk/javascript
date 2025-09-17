@@ -81,6 +81,7 @@ export const daDK: LocalizationResource = {
     cancelSubscription: undefined,
     cancelSubscriptionAccessUntil: undefined,
     cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: undefined,
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
@@ -1028,7 +1029,8 @@ export const daDK: LocalizationResource = {
     deletePage: {
       actionDescription: 'Skriv "Slet konto" nedenfor for at fortsætte.',
       confirm: 'Slet konto',
-      messageLine1: 'Er du sikker på, at du vil slette din konto?',
+      messageLine1:
+        'Er du sikker på, at du vil slette din konto fra Clerk? Kontakt venligst applikationsejeren for at slette dine oplysninger fra deres applikation og andre tjenester.',
       messageLine2: 'Denne handling er permanent og kan ikke fortrydes.',
       title: 'Slet konto',
     },

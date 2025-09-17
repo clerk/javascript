@@ -164,7 +164,7 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, config, 
   const swrFetcher =
     !cacheMode && !!fetcher
       ? (cacheKeyParams: Record<string, unknown>) => {
-          if (isSignedIn === false) {
+          if (isSignedIn === false || shouldFetch === false) {
             return null;
           }
           const requestParams = getDifferentKeys(cacheKeyParams, cacheKeys);

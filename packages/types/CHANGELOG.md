@@ -1,5 +1,25 @@
 # Change Log
 
+## 4.87.0
+
+### Minor Changes
+
+- [Experimental] Signal email link support ([#6766](https://github.com/clerk/javascript/pull/6766)) by [@dstaley](https://github.com/dstaley)
+
+- [Billing Beta] Remove deprecated `subscription` attribute from Billing ([#6788](https://github.com/clerk/javascript/pull/6788)) by [@mauricioabreu](https://github.com/mauricioabreu)
+
+### Patch Changes
+
+- Add support for canceling past due subscriptions ([#6783](https://github.com/clerk/javascript/pull/6783)) by [@aeliox](https://github.com/aeliox)
+
+## 4.86.0
+
+### Minor Changes
+
+- [Billing Beta] Removal of Billing experimental methods: `organization.getSubscriptions()` and `billing.getSubscriptions()` ([#6738](https://github.com/clerk/javascript/pull/6738)) by [@mauricioabreu](https://github.com/mauricioabreu)
+
+- [Experimental] Add support for additional params for SignUp ([#6716](https://github.com/clerk/javascript/pull/6716)) by [@dstaley](https://github.com/dstaley)
+
 ## 4.85.0
 
 ### Minor Changes

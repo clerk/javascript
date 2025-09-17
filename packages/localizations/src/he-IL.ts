@@ -81,6 +81,7 @@ export const heIL: LocalizationResource = {
     cancelSubscription: undefined,
     cancelSubscriptionAccessUntil: undefined,
     cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: undefined,
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
@@ -1018,7 +1019,8 @@ export const heIL: LocalizationResource = {
     deletePage: {
       actionDescription: 'הקלד "מחק חשבון" למטה כדי להמשיך.',
       confirm: 'מחק חשבון',
-      messageLine1: 'האם אתה בטוח שאתה רוצה למחוק את החשבון שלך?',
+      messageLine1:
+        'האם אתה בטוח שאתה רוצה למחוק את החשבון שלך מ-Clerk? אנא צור קשר עם בעל האפליקציה כדי למחוק את המידע שלך מהאפליקציה שלהם ומשירותים אחרים.',
       messageLine2: 'פעולה זו היא סופית ובלתי הפיכה.',
       title: 'מחק חשבון',
     },

@@ -81,6 +81,7 @@ export const fiFI: LocalizationResource = {
     cancelSubscription: undefined,
     cancelSubscriptionAccessUntil: undefined,
     cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: undefined,
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
@@ -1031,7 +1032,8 @@ export const fiFI: LocalizationResource = {
     deletePage: {
       actionDescription: 'Kirjoita "Delete account" poistaaksesi tilisi.',
       confirm: 'Poista tili',
-      messageLine1: 'Oletko varma, että haluat poistaa tilisi?',
+      messageLine1:
+        'Oletko varma, että haluat poistaa tilisi Clerkistä? Ota yhteyttä sovelluksen omistajaan poistaaksesi tietosi heidän sovelluksestaan ja muista palveluista.',
       messageLine2: 'Tämä toiminto on pysyvä ja peruuttamaton.',
       title: 'Poista tili',
     },

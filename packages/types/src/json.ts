@@ -626,12 +626,7 @@ export interface WaitlistJSON extends ClerkResourceJSON {
 }
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface FeatureJSON extends ClerkResourceJSON {
   object: 'feature';
@@ -643,12 +638,7 @@ export interface FeatureJSON extends ClerkResourceJSON {
 }
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingPlanJSON extends ClerkResourceJSON {
   object: 'commerce_plan';
@@ -679,12 +669,7 @@ export interface BillingPlanJSON extends ClerkResourceJSON {
 }
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingPaymentSourceJSON extends ClerkResourceJSON {
   object: 'commerce_payment_source';
@@ -699,12 +684,7 @@ export interface BillingPaymentSourceJSON extends ClerkResourceJSON {
 }
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingInitializedPaymentSourceJSON extends ClerkResourceJSON {
   object: 'commerce_payment_source_initialize';
@@ -714,12 +694,7 @@ export interface BillingInitializedPaymentSourceJSON extends ClerkResourceJSON {
 }
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingStatementJSON extends ClerkResourceJSON {
   object: 'commerce_statement';
@@ -731,12 +706,7 @@ export interface BillingStatementJSON extends ClerkResourceJSON {
 }
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingStatementGroupJSON extends ClerkResourceJSON {
   object: 'commerce_statement_group';
@@ -745,12 +715,7 @@ export interface BillingStatementGroupJSON extends ClerkResourceJSON {
 }
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingPaymentJSON extends ClerkResourceJSON {
   object: 'commerce_payment';
@@ -767,12 +732,7 @@ export interface BillingPaymentJSON extends ClerkResourceJSON {
 }
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingSubscriptionItemJSON extends ClerkResourceJSON {
   object: 'commerce_subscription_item';
@@ -798,12 +758,7 @@ export interface BillingSubscriptionItemJSON extends ClerkResourceJSON {
 }
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingSubscriptionJSON extends ClerkResourceJSON {
   object: 'commerce_subscription';
@@ -828,12 +783,7 @@ export interface BillingSubscriptionJSON extends ClerkResourceJSON {
 }
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingMoneyAmountJSON {
   amount: number;
@@ -843,12 +793,7 @@ export interface BillingMoneyAmountJSON {
 }
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingCheckoutTotalsJSON {
   grand_total: BillingMoneyAmountJSON;
@@ -859,23 +804,13 @@ export interface BillingCheckoutTotalsJSON {
 }
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface BillingStatementTotalsJSON extends Omit<BillingCheckoutTotalsJSON, 'total_due_now'> {}
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingCheckoutJSON extends ClerkResourceJSON {
   object: 'commerce_checkout';
@@ -895,12 +830,7 @@ export interface BillingCheckoutJSON extends ClerkResourceJSON {
 }
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingPayerJSON extends ClerkResourceJSON {
   object: 'commerce_payer';

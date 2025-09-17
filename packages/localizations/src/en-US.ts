@@ -72,6 +72,8 @@ export const enUS: LocalizationResource = {
     cancelSubscriptionAccessUntil:
       "You can keep using '{{plan}}' features until {{ date | longDate('en-US') }}, after which you will no longer have access.",
     cancelSubscriptionNoCharge: 'You will not be charged for this subscription.',
+    cancelSubscriptionPastDue:
+      'Your subscription will end immediately and you will lose access to all plan features. You will be asked to pay the past due amount on your next subscription.',
     cancelSubscriptionTitle: 'Cancel {{plan}} Subscription?',
     cannotSubscribeMonthly:
       'You cannot subscribe to this plan by paying monthly. To subscribe to this plan, you need to choose to pay annually.',
@@ -1030,7 +1032,8 @@ export const enUS: LocalizationResource = {
     deletePage: {
       actionDescription: 'Type "Delete account" below to continue.',
       confirm: 'Delete account',
-      messageLine1: 'Are you sure you want to delete your account?',
+      messageLine1:
+        'Are you sure you want to delete your account from Clerk? Please contact the application owner to delete your information from their application and other services.',
       messageLine2: 'This action is permanent and irreversible.',
       title: 'Delete account',
     },

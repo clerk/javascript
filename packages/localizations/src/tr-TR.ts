@@ -81,6 +81,7 @@ export const trTR: LocalizationResource = {
     cancelSubscription: undefined,
     cancelSubscriptionAccessUntil: undefined,
     cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: undefined,
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
@@ -1034,7 +1035,8 @@ export const trTR: LocalizationResource = {
     deletePage: {
       actionDescription: 'Devam etmek için aşağıya “Hesabı sil” yazın.',
       confirm: 'Hesabı sil',
-      messageLine1: 'Hesabınızı silmek istediğinizden emin misiniz?',
+      messageLine1:
+        "Clerk'teki hesabınızı silmek istediğinizden emin misiniz? Bilgilerinizi uygulamalarından ve diğer hizmetlerinden silmek için lütfen uygulama sahibiyle iletişime geçin.",
       messageLine2: 'Bu işlem kalıcıdır ve geri alınamaz.',
       title: 'Hesabı sil',
     },

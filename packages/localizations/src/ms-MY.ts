@@ -81,6 +81,7 @@ export const msMY: LocalizationResource = {
     cancelSubscription: undefined,
     cancelSubscriptionAccessUntil: undefined,
     cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: undefined,
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
@@ -1046,7 +1047,8 @@ export const msMY: LocalizationResource = {
     deletePage: {
       actionDescription: 'Taip "Delete account" di bawah untuk meneruskan.',
       confirm: 'Padam akaun',
-      messageLine1: 'Adakah anda pasti mahu memadam akaun anda?',
+      messageLine1:
+        'Adakah anda pasti mahu memadam akaun anda dari Clerk? Sila hubungi pemilik aplikasi untuk memadam maklumat anda dari aplikasi mereka dan perkhidmatan lain.',
       messageLine2: 'Tindakan ini adalah kekal dan tidak boleh dibatalkan.',
       title: 'Padam akaun',
     },

@@ -1,3 +1,4 @@
+import { inBrowser } from '@clerk/shared/browser';
 import { ClerkWebAuthnError } from '@clerk/shared/error';
 import { Poller } from '@clerk/shared/poller';
 import { deepCamelToSnake, deepSnakeToCamel } from '@clerk/shared/underscore';
@@ -14,11 +15,14 @@ import type {
   AuthenticateWithWeb3Params,
   CreateEmailLinkFlowReturn,
   EmailCodeConfig,
+  EmailCodeFactor,
   EmailLinkConfig,
+  EmailLinkFactor,
   EnterpriseSSOConfig,
   PassKeyConfig,
   PasskeyFactor,
   PhoneCodeConfig,
+  PhoneCodeFactor,
   PrepareFirstFactorParams,
   PrepareSecondFactorParams,
   ResetPasswordEmailCodeFactorConfig,
@@ -31,6 +35,7 @@ import type {
   SignInFutureCreateParams,
   SignInFutureEmailCodeSendParams,
   SignInFutureEmailCodeVerifyParams,
+  SignInFutureEmailLinkSendParams,
   SignInFutureFinalizeParams,
   SignInFutureMFAPhoneCodeVerifyParams,
   SignInFuturePasswordParams,
@@ -61,6 +66,7 @@ import {
   generateSignatureWithMetamask,
   generateSignatureWithOKXWallet,
   getBaseIdentifier,
+  getClerkQueryParam,
   getCoinbaseWalletIdentifier,
   getMetamaskIdentifier,
   getOKXWalletIdentifier,
@@ -139,6 +145,14 @@ export class SignIn extends BaseResource implements SignInResource {
    * of `SignIn`.
    */
   __internal_basePost = this._basePost.bind(this);
+
+  /**
+   * @internal Only used for internal purposes, and is not intended to be used directly.
+   *
+   * This property is used to provide access to underlying Client methods to `SignInFuture`, which wraps an instance
+   * of `SignIn`.
+   */
+  __internal_baseGet = this._baseGet.bind(this);
 
   constructor(data: SignInJSON | SignInJSONSnapshot | null = null) {
     super();
@@ -533,10 +547,43 @@ export class SignIn extends BaseResource implements SignInResource {
   }
 }
 
+type SelectFirstFactorParams =
+  | { strategy: 'email_code'; emailAddressId?: string; phoneNumberId?: never }
+  | { strategy: 'email_link'; emailAddressId?: string; phoneNumberId?: never }
+  | { strategy: 'phone_code'; phoneNumberId?: string; emailAddressId?: never };
+
 class SignInFuture implements SignInFutureResource {
   emailCode = {
     sendCode: this.sendEmailCode.bind(this),
     verifyCode: this.verifyEmailCode.bind(this),
+  };
+
+  emailLink = {
+    sendLink: this.sendEmailLink.bind(this),
+    waitForVerification: this.waitForEmailLinkVerification.bind(this),
+    get verification() {
+      if (!inBrowser()) {
+        return null;
+      }
+
+      const status = getClerkQueryParam('__clerk_status') as 'verified' | 'expired' | 'failed' | 'client_mismatch';
+      const createdSessionId = getClerkQueryParam('__clerk_created_session');
+
+      if (!status || !createdSessionId) {
+        return null;
+      }
+
+      const verifiedFromTheSameClient =
+        status === 'verified' &&
+        typeof SignIn.clerk.client !== 'undefined' &&
+        SignIn.clerk.client.sessions.some(s => s.id === createdSessionId);
+
+      return {
+        status,
+        createdSessionId,
+        verifiedFromTheSameClient,
+      };
+    },
   };
 
   resetPasswordEmailCode = {
@@ -581,6 +628,10 @@ class SignInFuture implements SignInFutureResource {
     }
 
     return undefined;
+  }
+
+  get firstFactorVerification() {
+    return this.resource.firstFactorVerification;
   }
 
   async sendResetPasswordEmailCode(): Promise<{ error: unknown }> {
@@ -649,22 +700,32 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async sendEmailCode(params: SignInFutureEmailCodeSendParams): Promise<{ error: unknown }> {
-    const { email } = params;
+  async sendEmailCode(params: SignInFutureEmailCodeSendParams = {}): Promise<{ error: unknown }> {
+    const { emailAddress, emailAddressId } = params;
+    if (!this.resource.id && emailAddressId) {
+      throw new Error(
+        'signIn.emailCode.sendCode() cannot be called with an emailAddressId if an existing signIn does not exist.',
+      );
+    }
+
+    if (!this.resource.id && !emailAddress) {
+      throw new Error(
+        'signIn.emailCode.sendCode() cannot be called without an emailAddress if an existing signIn does not exist.',
+      );
+    }
+
     return runAsyncResourceTask(this.resource, async () => {
-      if (!this.resource.id) {
-        await this.create({ identifier: email });
+      if (emailAddress) {
+        await this.create({ identifier: emailAddress });
       }
 
-      const emailCodeFactor = this.resource.supportedFirstFactors?.find(f => f.strategy === 'email_code');
-
+      const emailCodeFactor = this.selectFirstFactor({ strategy: 'email_code', emailAddressId });
       if (!emailCodeFactor) {
         throw new Error('Email code factor not found');
       }
 
-      const { emailAddressId } = emailCodeFactor;
       await this.resource.__internal_basePost({
-        body: { emailAddressId, strategy: 'email_code' },
+        body: { emailAddressId: emailCodeFactor.emailAddressId, strategy: 'email_code' },
         action: 'prepare_first_factor',
       });
     });
@@ -680,22 +741,95 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async sendPhoneCode(params: SignInFuturePhoneCodeSendParams): Promise<{ error: unknown }> {
-    const { phoneNumber, channel = 'sms' } = params;
+  async sendEmailLink(params: SignInFutureEmailLinkSendParams): Promise<{ error: unknown }> {
+    const { emailAddress, verificationUrl, emailAddressId } = params;
+    if (!this.resource.id && emailAddressId) {
+      throw new Error(
+        'signIn.emailLink.sendLink() cannot be called with an emailAddressId if an existing signIn does not exist.',
+      );
+    }
+
+    if (!this.resource.id && !emailAddress) {
+      throw new Error(
+        'signIn.emailLink.sendLink() cannot be called without an emailAddress if an existing signIn does not exist.',
+      );
+    }
+
     return runAsyncResourceTask(this.resource, async () => {
-      if (!this.resource.id) {
+      if (emailAddress) {
+        await this.create({ identifier: emailAddress });
+      }
+
+      const emailLinkFactor = this.selectFirstFactor({ strategy: 'email_link', emailAddressId });
+      if (!emailLinkFactor) {
+        throw new Error('Email link factor not found');
+      }
+
+      let absoluteVerificationUrl = verificationUrl;
+      try {
+        new URL(verificationUrl);
+      } catch {
+        absoluteVerificationUrl = window.location.origin + verificationUrl;
+      }
+
+      await this.resource.__internal_basePost({
+        body: {
+          emailAddressId: emailLinkFactor.emailAddressId,
+          redirectUrl: absoluteVerificationUrl,
+          strategy: 'email_link',
+        },
+        action: 'prepare_first_factor',
+      });
+    });
+  }
+
+  async waitForEmailLinkVerification(): Promise<{ error: unknown }> {
+    return runAsyncResourceTask(this.resource, async () => {
+      const { run, stop } = Poller();
+      await new Promise((resolve, reject) => {
+        void run(async () => {
+          try {
+            const res = await this.resource.__internal_baseGet();
+            const status = res.firstFactorVerification.status;
+            if (status === 'verified' || status === 'expired') {
+              stop();
+              resolve(res);
+            }
+          } catch (err) {
+            stop();
+            reject(err);
+          }
+        });
+      });
+    });
+  }
+
+  async sendPhoneCode(params: SignInFuturePhoneCodeSendParams = {}): Promise<{ error: unknown }> {
+    const { phoneNumber, phoneNumberId, channel = 'sms' } = params;
+    if (!this.resource.id && phoneNumberId) {
+      throw new Error(
+        'signIn.phoneCode.sendCode() cannot be called with an phoneNumberId if an existing signIn does not exist.',
+      );
+    }
+
+    if (!this.resource.id && !phoneNumber) {
+      throw new Error(
+        'signIn.phoneCode.sendCode() cannot be called without an phoneNumber if an existing signIn does not exist.',
+      );
+    }
+
+    return runAsyncResourceTask(this.resource, async () => {
+      if (phoneNumber) {
         await this.create({ identifier: phoneNumber });
       }
 
-      const phoneCodeFactor = this.resource.supportedFirstFactors?.find(f => f.strategy === 'phone_code');
-
+      const phoneCodeFactor = this.selectFirstFactor({ strategy: 'phone_code', phoneNumberId });
       if (!phoneCodeFactor) {
         throw new Error('Phone code factor not found');
       }
 
-      const { phoneNumberId } = phoneCodeFactor;
       await this.resource.__internal_basePost({
-        body: { phoneNumberId, strategy: 'phone_code', channel },
+        body: { phoneNumberId: phoneCodeFactor.phoneNumberId, strategy: 'phone_code', channel },
         action: 'prepare_first_factor',
       });
     });
@@ -787,7 +921,66 @@ class SignInFuture implements SignInFutureResource {
         throw new Error('Cannot finalize sign-in without a created session.');
       }
 
+      // Reload the client to prevent an issue where the created session is not picked up.
+      await SignIn.clerk.client?.reload();
+
       await SignIn.clerk.setActive({ session: this.resource.createdSessionId, navigate });
     });
+  }
+
+  private selectFirstFactor(
+    params: Extract<SelectFirstFactorParams, { strategy: 'email_code' }>,
+  ): EmailCodeFactor | null;
+  private selectFirstFactor(
+    params: Extract<SelectFirstFactorParams, { strategy: 'email_link' }>,
+  ): EmailLinkFactor | null;
+  private selectFirstFactor(
+    params: Extract<SelectFirstFactorParams, { strategy: 'phone_code' }>,
+  ): PhoneCodeFactor | null;
+  private selectFirstFactor({
+    strategy,
+    emailAddressId,
+    phoneNumberId,
+  }: SelectFirstFactorParams): EmailCodeFactor | EmailLinkFactor | PhoneCodeFactor | null {
+    if (!this.resource.supportedFirstFactors) {
+      return null;
+    }
+
+    if (emailAddressId) {
+      const factor = this.resource.supportedFirstFactors.find(
+        f => f.strategy === strategy && f.emailAddressId === emailAddressId,
+      ) as EmailCodeFactor | EmailLinkFactor;
+      if (factor) {
+        return factor;
+      }
+    }
+
+    if (phoneNumberId) {
+      const factor = this.resource.supportedFirstFactors.find(
+        f => f.strategy === strategy && f.phoneNumberId === phoneNumberId,
+      ) as PhoneCodeFactor;
+      if (factor) {
+        return factor;
+      }
+    }
+
+    // Try to find a factor that matches the identifier.
+    const factorForIdentifier = this.resource.supportedFirstFactors.find(
+      f => f.strategy === strategy && f.safeIdentifier === this.resource.identifier,
+    ) as EmailCodeFactor | EmailLinkFactor | PhoneCodeFactor;
+    if (factorForIdentifier) {
+      return factorForIdentifier;
+    }
+
+    // If no factor is found matching the identifier, try to find a factor that matches the strategy.
+    const factorForStrategy = this.resource.supportedFirstFactors.find(f => f.strategy === strategy) as
+      | EmailCodeFactor
+      | EmailLinkFactor
+      | PhoneCodeFactor;
+    if (factorForStrategy) {
+      return factorForStrategy;
+    }
+
+    return null;
   }
 }

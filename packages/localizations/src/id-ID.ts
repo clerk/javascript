@@ -81,6 +81,7 @@ export const idID: LocalizationResource = {
     cancelSubscription: undefined,
     cancelSubscriptionAccessUntil: undefined,
     cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: undefined,
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
@@ -1040,7 +1041,8 @@ export const idID: LocalizationResource = {
     deletePage: {
       actionDescription: 'Ketik "Delete account" di bawah untuk melanjutkan.',
       confirm: 'Hapus akun',
-      messageLine1: 'Anda yakin ingin menghapus akun Anda?',
+      messageLine1:
+        'Anda yakin ingin menghapus akun Anda dari Clerk? Silakan hubungi pemilik aplikasi untuk menghapus informasi Anda dari aplikasi mereka dan layanan lainnya.',
       messageLine2: 'Tindakan ini permanen dan tidak dapat dibatalkan.',
       title: 'Hapus akun',
     },
