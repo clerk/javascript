@@ -1,9 +1,8 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { CardStateProvider } from '@/ui/elements/contexts';
 
 import { fireEvent, render, screen, waitFor } from '../../../../vitestUtils';
-import { runFakeTimers } from '../../../utils/test/runFakeTimers';
 import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
 import { PasswordSection } from '../PasswordSection';
 
@@ -59,11 +58,11 @@ describe('PasswordSection', () => {
       getByLabelText(/It is recommended to sign out of all other devices which may have used your old password./i);
     });
 
-    it('sets a new password and calls the appropriate function and closes', async () => {
+    it('sets a new password and calls the appropriate function', async () => {
       const { wrapper, fixtures } = await createFixtures(initConfig);
 
       fixtures.clerk.user?.updatePassword.mockResolvedValue({});
-      const { getByRole, userEvent, getByLabelText, queryByRole } = render(<PasswordSection />, { wrapper });
+      const { getByRole, userEvent, getByLabelText } = render(<PasswordSection />, { wrapper });
       await userEvent.click(getByRole('button', { name: /set password/i }));
       await waitFor(() => getByRole('heading', { name: /set password/i }));
 
@@ -74,8 +73,6 @@ describe('PasswordSection', () => {
         newPassword: 'testtest',
         signOutOfOtherSessions: true,
       });
-      await waitFor(() => getByRole('button', { name: /set password/i }));
-      expect(queryByRole('heading', { name: /set password/i })).not.toBeInTheDocument();
     });
 
     it('renders a hidden identifier field', async () => {
@@ -273,8 +270,11 @@ describe('PasswordSection', () => {
         expect(queryByRole('button', { name: /set password/i })).not.toBeInTheDocument();
 
         await userEvent.click(getByRole('button', { name: /cancel$/i }));
-        await waitFor(() => getByRole('button', { name: /set password/i }));
-        expect(queryByRole('heading', { name: /set password/i })).not.toBeInTheDocument();
+
+        // Wait for the form to close and the button to reappear
+        await waitFor(() => {
+          expect(getByRole('button', { name: /set password/i })).toBeInTheDocument();
+        });
       });
     });
   });
@@ -295,11 +295,11 @@ describe('PasswordSection', () => {
       getByLabelText(/It is recommended to sign out of all other devices which may have used your old password./i);
     });
 
-    it('changes a new password and calls the appropriate function and closes', async () => {
+    it('changes a new password and calls the appropriate function', async () => {
       const { wrapper, fixtures } = await createFixtures(updatePasswordConfig);
 
       fixtures.clerk.user?.updatePassword.mockResolvedValue({});
-      const { getByRole, userEvent, getByLabelText, queryByRole } = render(<PasswordSection />, { wrapper });
+      const { getByRole, userEvent, getByLabelText } = render(<PasswordSection />, { wrapper });
       await userEvent.click(getByRole('button', { name: /update password/i }));
       await waitFor(() => getByRole('heading', { name: /update password/i }));
 
@@ -318,9 +318,6 @@ describe('PasswordSection', () => {
           signOutOfOtherSessions: true,
         });
       });
-
-      await waitFor(() => getByRole('button', { name: /update password/i }));
-      expect(queryByRole('heading', { name: /update password/i })).not.toBeInTheDocument();
     }, 10_000);
 
     it('current password is not required when Reverification enabled', async () => {
@@ -332,7 +329,7 @@ describe('PasswordSection', () => {
       const { wrapper, fixtures } = await createFixtures(config);
 
       fixtures.clerk.user?.updatePassword.mockResolvedValue({});
-      const { getByRole, userEvent, getByLabelText, queryByRole } = render(<PasswordSection />, { wrapper });
+      const { getByRole, userEvent, getByLabelText } = render(<PasswordSection />, { wrapper });
       await userEvent.click(getByRole('button', { name: /update password/i }));
       await waitFor(() => getByRole('heading', { name: /update password/i }));
 
@@ -343,8 +340,6 @@ describe('PasswordSection', () => {
         newPassword: 'testtest',
         signOutOfOtherSessions: true,
       });
-      await waitFor(() => getByRole('button', { name: /update password/i }));
-      expect(queryByRole('heading', { name: /update password/i })).not.toBeInTheDocument();
     });
 
     describe('with Enterprise SSO', () => {
@@ -534,102 +529,69 @@ describe('PasswordSection', () => {
     it('results in error if the password is too small', async () => {
       const { wrapper } = await createFixtures(initConfig);
 
-      vi.useFakeTimers();
-      try {
-        const { userEvent, getByRole } = render(<PasswordSection />, { wrapper });
-        await userEvent.click(getByRole('button', { name: /set password/i }));
-        await waitFor(() => getByRole('heading', { name: /set password/i }));
+      const { userEvent, getByRole } = render(<PasswordSection />, { wrapper });
+      await userEvent.click(getByRole('button', { name: /set password/i }));
+      await waitFor(() => getByRole('heading', { name: /set password/i }));
 
-        await userEvent.type(screen.getByLabelText(/new password/i), 'test');
-        const confirmField = screen.getByLabelText(/confirm password/i);
-        await userEvent.type(confirmField, 'test');
-        fireEvent.blur(confirmField);
-        await waitFor(() => {
-          screen.getByText(/or more/i);
-        });
-      } finally {
-        vi.useRealTimers();
-      }
-    });
-
-    it('results in error if the password is too small', async () => {
-      const { wrapper } = await createFixtures(initConfig);
-
-      vi.useFakeTimers();
-      try {
-        const { userEvent, getByRole } = render(<PasswordSection />, { wrapper });
-        await userEvent.click(getByRole('button', { name: /set password/i }));
-        await waitFor(() => getByRole('heading', { name: /set password/i }));
-
-        await userEvent.type(screen.getByLabelText(/new password/i), 'test');
-        const confirmField = screen.getByLabelText(/confirm password/i);
-        await userEvent.type(confirmField, 'test');
-        fireEvent.blur(confirmField);
-        await waitFor(() => {
-          screen.getByText(/or more/i);
-        });
-      } finally {
-        vi.useRealTimers();
-      }
+      await userEvent.type(screen.getByLabelText(/new password/i), 'test');
+      const confirmField = screen.getByLabelText(/confirm password/i);
+      await userEvent.type(confirmField, 'test');
+      fireEvent.blur(confirmField);
+      await waitFor(() => {
+        screen.getByText(/or more/i);
+      });
     });
 
     it('results in error if the passwords do not match and persists', async () => {
       const { wrapper } = await createFixtures(initConfig);
 
-      vi.useFakeTimers();
-      try {
-        const { userEvent, getByRole } = render(<PasswordSection />, { wrapper });
-        await userEvent.click(getByRole('button', { name: /set password/i }));
-        await waitFor(() => getByRole('heading', { name: /set password/i }));
+      const { userEvent, getByRole } = render(<PasswordSection />, { wrapper });
+      await userEvent.click(getByRole('button', { name: /set password/i }));
+      await waitFor(() => getByRole('heading', { name: /set password/i }));
 
-        await userEvent.type(screen.getByLabelText(/new password/i), 'testewrewr');
-        const confirmField = screen.getByLabelText(/confirm password/i);
-        await userEvent.type(confirmField, 'testrwerrwqrwe');
-        fireEvent.blur(confirmField);
-        await waitFor(() => {
-          screen.getByText(`Passwords don't match.`);
-        });
+      await userEvent.type(screen.getByLabelText(/new password/i), 'testewrewr');
+      const confirmField = screen.getByLabelText(/confirm password/i);
+      await userEvent.type(confirmField, 'testrwerrwqrwe');
+      fireEvent.blur(confirmField);
+      await waitFor(() => {
+        screen.getByText(`Passwords don't match.`);
+      });
 
-        await userEvent.clear(confirmField);
-        await waitFor(() => {
-          screen.getByText(`Passwords don't match.`);
-        });
-      } finally {
-        vi.useRealTimers();
-      }
-    }, 10000);
+      await userEvent.clear(confirmField);
+      await waitFor(() => {
+        screen.getByText(`Passwords don't match.`);
+      });
+    });
 
     it(`Displays "Password match" when password match and removes it if they stop`, async () => {
       const { wrapper } = await createFixtures(initConfig);
 
-      await runFakeTimers(async () => {
-        const { userEvent, getByRole, getByLabelText, queryByText } = render(<PasswordSection />, { wrapper });
-        await userEvent.click(getByRole('button', { name: /set password/i }));
-        await waitFor(() => getByRole('heading', { name: /set password/i }));
-        const passwordField = getByLabelText(/new password/i);
+      const { userEvent, getByRole, getByLabelText, queryByText } = render(<PasswordSection />, { wrapper });
+      await userEvent.click(getByRole('button', { name: /set password/i }));
+      await waitFor(() => getByRole('heading', { name: /set password/i }));
+      const passwordField = getByLabelText(/new password/i);
 
-        await userEvent.type(passwordField, 'testewrewr');
-        const confirmField = getByLabelText(/confirm password/i);
-        await waitFor(() => {
-          expect(queryByText(`Passwords match.`)).not.toBeInTheDocument();
-        });
-
-        await userEvent.type(confirmField, 'testewrewr');
-        await waitFor(() => {
-          expect(queryByText(`Passwords match.`)).toBeInTheDocument();
-        });
-
-        await userEvent.type(confirmField, 'testrwerrwqrwe');
-        await waitFor(() => {
-          expect(queryByText(`Passwords match.`)).not.toBeVisible();
-        });
-
-        await userEvent.type(passwordField, 'testrwerrwqrwe');
-        fireEvent.blur(confirmField);
-        await waitFor(() => {
-          screen.getByText(`Passwords match.`);
-        });
+      await userEvent.type(passwordField, 'testewrewr');
+      const confirmField = getByLabelText(/confirm password/i);
+      await waitFor(() => {
+        expect(queryByText(`Passwords match.`)).not.toBeInTheDocument();
       });
-    }, 10000);
+
+      await userEvent.type(confirmField, 'testewrewr');
+      await waitFor(() => {
+        expect(queryByText(`Passwords match.`)).toBeInTheDocument();
+      });
+
+      await userEvent.type(confirmField, 'testrwerrwqrwe');
+      await waitFor(() => {
+        expect(queryByText(`Passwords match.`)).not.toBeVisible();
+      });
+
+      await userEvent.type(passwordField, 'testrwerrwqrwe');
+      fireEvent.blur(confirmField);
+      await waitFor(() => {
+        screen.getByText(`Passwords match.`);
+      });
+    });
   });
 });

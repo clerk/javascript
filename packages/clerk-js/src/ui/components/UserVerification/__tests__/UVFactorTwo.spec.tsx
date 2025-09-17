@@ -1,5 +1,5 @@
 import { waitFor } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import { render } from '../../../../vitestUtils';
 import { clearFetchCache } from '../../../hooks';
@@ -120,20 +120,14 @@ describe('UserVerificationFactorTwo', () => {
         },
       });
 
-      vi.useFakeTimers();
-      try {
-        const { userEvent, getByLabelText, getByText } = render(<UserVerificationFactorTwo />, { wrapper });
+      const { userEvent, getByLabelText, getByText } = render(<UserVerificationFactorTwo />, { wrapper });
 
-        await waitFor(() => getByText('Verification required'));
+      await waitFor(() => getByText('Verification required'));
 
-        await userEvent.type(getByLabelText(/Enter verification code/i), '123456');
-        vi.runAllTimers();
-        await waitFor(() => {
-          expect(fixtures.clerk.setActive).toHaveBeenCalled();
-        });
-      } finally {
-        vi.useRealTimers();
-      }
+      await userEvent.type(getByLabelText(/Enter verification code/i), '123456');
+      await waitFor(() => {
+        expect(fixtures.clerk.setActive).toHaveBeenCalled();
+      });
     });
   });
 
@@ -159,15 +153,15 @@ describe('UserVerificationFactorTwo', () => {
       });
       fixtures.session?.prepareSecondFactorVerification.mockResolvedValue({});
 
-      const { getByText, getByRole } = render(<UserVerificationFactorTwo />, { wrapper });
+      const { userEvent, getByText, getByRole } = render(<UserVerificationFactorTwo />, { wrapper });
 
       await waitFor(() => {
         getByText('Verification required');
         getByText('Use another method');
       });
 
+      await userEvent.click(getByText('Use another method'));
       await waitFor(() => {
-        getByText('Use another method').click();
         expect(getByRole('button')).toHaveTextContent('Send SMS code to +3069XXXXXXX2');
         expect(getByRole('button')).not.toHaveTextContent('Send SMS code to +3069XXXXXXX1');
       });
@@ -194,7 +188,7 @@ describe('UserVerificationFactorTwo', () => {
       });
       fixtures.session?.prepareSecondFactorVerification.mockResolvedValue({});
 
-      const { getByText, container } = render(<UserVerificationFactorTwo />, { wrapper });
+      const { userEvent, getByText, container } = render(<UserVerificationFactorTwo />, { wrapper });
 
       await waitFor(() => {
         getByText('Verification required');
@@ -203,10 +197,8 @@ describe('UserVerificationFactorTwo', () => {
         getByText('Use another method');
       });
 
-      await waitFor(() => {
-        getByText('Use another method').click();
-        getByText('Send SMS code to +3069XXXXXXX2').click();
-      });
+      await userEvent.click(getByText('Use another method'));
+      await userEvent.click(getByText('Send SMS code to +3069XXXXXXX2'));
 
       await waitFor(() => {
         getByText('Verification required');
@@ -214,8 +206,8 @@ describe('UserVerificationFactorTwo', () => {
         getByText('Use another method');
       });
 
+      await userEvent.click(getByText('Use another method'));
       await waitFor(() => {
-        getByText('Use another method').click();
         expect(container).toHaveTextContent('+3069XXXXXXX1');
       });
     });

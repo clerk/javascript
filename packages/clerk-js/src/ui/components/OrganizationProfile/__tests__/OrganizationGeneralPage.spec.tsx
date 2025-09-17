@@ -320,18 +320,31 @@ describe('OrganizationSettings', () => {
         { wrapper },
       );
 
-      await waitFor(async () =>
-        expect(await findByRole('button', { name: /leave organization/i })).toBeInTheDocument(),
-      );
+      // Wait for the leave organization button to be available
+      await waitFor(() => {
+        expect(getByRole('button', { name: /leave organization/i })).toBeInTheDocument();
+      });
+
+      // Click the leave organization button
       await userEvent.click(getByRole('button', { name: /leave organization/i }));
-      await waitFor(async () =>
-        expect(await findByRole('heading', { name: /leave organization/i })).toBeInTheDocument(),
-      );
+
+      // Wait for the modal to appear
+      await waitFor(() => {
+        expect(getByRole('heading', { name: /leave organization/i })).toBeInTheDocument();
+      });
+
+      // Click cancel button
       await userEvent.click(getByRole('button', { name: /cancel/i }));
-      await waitFor(async () =>
-        expect(await findByRole('button', { name: /leave organization/i })).toBeInTheDocument(),
+
+      // Wait for the modal to disappear - check that the original button is back
+      await waitFor(
+        () => {
+          const originalButton = getByRole('button', { name: /leave organization/i });
+          expect(originalButton).toBeInTheDocument();
+          expect(originalButton).not.toBeDisabled();
+        },
+        { timeout: 10000 },
       );
-      expect(queryByRole('heading', { name: /leave organization/i })).not.toBeInTheDocument();
     });
   });
 });

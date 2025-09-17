@@ -3,10 +3,11 @@ import { matchers } from '@emotion/jest';
 import type { RenderOptions } from '@testing-library/react';
 import { render as _render } from '@testing-library/react';
 import UserEvent from '@testing-library/user-event';
+import { expect, vi } from 'vitest';
 
 expect.extend(matchers);
 
-Element.prototype.scrollIntoView = jest.fn();
+Element.prototype.scrollIntoView = vi.fn();
 
 const render = (ui: React.ReactElement, options?: RenderOptions) => {
   const userEvent = UserEvent.setup({ delay: null });

@@ -329,7 +329,7 @@ describe('SignInStart', () => {
       expect(fixtures.signIn.create).toHaveBeenCalled();
       expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalledWith({
         strategy: 'enterprise_sso',
-        redirectUrl: 'http://localhost/#/sso-callback',
+        redirectUrl: 'http://localhost:3000/#/sso-callback',
         redirectUrlComplete: '/',
         continueSignIn: true,
       });
@@ -353,7 +353,7 @@ describe('SignInStart', () => {
       expect(fixtures.signIn.create).toHaveBeenCalled();
       expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalledWith({
         strategy: 'enterprise_sso',
-        redirectUrl: 'http://localhost/#/sso-callback',
+        redirectUrl: 'http://localhost:3000/#/sso-callback',
         redirectUrlComplete: '/',
         continueSignIn: true,
       });

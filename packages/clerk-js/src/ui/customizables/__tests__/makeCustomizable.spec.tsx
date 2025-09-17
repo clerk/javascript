@@ -5,7 +5,7 @@ import { describe, it, expect } from 'vitest';
 
 import { Box, descriptors } from '..';
 import { AppearanceProvider } from '../AppearanceContext';
-import { knownColors } from './vitestUtils';
+import { computedColors } from './vitestUtils';
 import { InternalThemeProvider } from '../../styledSystem';
 
 describe('Theme used in sx callback', () => {
@@ -24,7 +24,7 @@ describe('Theme used in sx callback', () => {
       </AppearanceProvider>,
     );
 
-    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe(knownColors.blue);
+    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe(computedColors.blue);
   });
 
   it('styles match the theme/appearance', () => {
@@ -42,7 +42,7 @@ describe('Theme used in sx callback', () => {
       </AppearanceProvider>,
     );
 
-    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe(knownColors.red);
+    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe(computedColors.red);
   });
 
   it('styles match the merged result from globalAppearance and appearance', () => {
@@ -61,7 +61,7 @@ describe('Theme used in sx callback', () => {
       </AppearanceProvider>,
     );
 
-    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe(knownColors.red);
+    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe(computedColors.red);
   });
 });
 
@@ -84,7 +84,7 @@ describe('Styles for specific elements', () => {
         />
       </AppearanceProvider>,
     );
-    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe('yellow');
+    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe('rgb(255, 255, 0)');
   });
 
   it('styles propagate to the correct element specified, including overriding styles when loading state is applied', () => {
@@ -115,7 +115,7 @@ describe('Styles for specific elements', () => {
         wrapper,
       },
     );
-    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe('yellow');
+    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe('rgb(255, 255, 0)');
 
     rerender(
       <Box
@@ -124,7 +124,7 @@ describe('Styles for specific elements', () => {
         isLoading
       />,
     );
-    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe('red');
+    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe('rgb(255, 0, 0)');
   });
 
   it('overrides styles when active state is applied', () => {
@@ -153,7 +153,7 @@ describe('Styles for specific elements', () => {
       />,
       { wrapper },
     );
-    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe('yellow');
+    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe('rgb(255, 255, 0)');
 
     rerender(
       <Box
@@ -162,7 +162,7 @@ describe('Styles for specific elements', () => {
         isActive
       />,
     );
-    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe('red');
+    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe('rgb(255, 0, 0)');
   });
 
   it('overrides styles when error state is applied', () => {
@@ -193,7 +193,7 @@ describe('Styles for specific elements', () => {
         wrapper,
       },
     );
-    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe('yellow');
+    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe('rgb(255, 255, 0)');
 
     rerender(
       <Box
@@ -202,7 +202,7 @@ describe('Styles for specific elements', () => {
         hasError
       />,
     );
-    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe('red');
+    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe('rgb(255, 0, 0)');
   });
 
   it('overrides styles when open state is applied', () => {
@@ -236,7 +236,7 @@ describe('Styles for specific elements', () => {
         wrapper,
       },
     );
-    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe('yellow');
+    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe('rgb(255, 255, 0)');
 
     rerender(
       <Box
@@ -245,7 +245,7 @@ describe('Styles for specific elements', () => {
         isOpen
       />,
     );
-    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe('red');
+    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe('rgb(255, 0, 0)');
   });
 
   it('overrides &:disabled styles when loading state is applied', () => {
@@ -278,7 +278,7 @@ describe('Styles for specific elements', () => {
       { wrapper },
     );
 
-    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe('yellow');
+    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe('rgb(255, 255, 0)');
 
     rerender(
       <Box
@@ -287,7 +287,7 @@ describe('Styles for specific elements', () => {
         isLoading
       />,
     );
-    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe('red');
+    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe('rgb(255, 0, 0)');
   });
 
   it('if a class is provided to the element via appearance, it adds the class to the element', () => {

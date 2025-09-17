@@ -55,6 +55,12 @@ export default defineConfig({
     include: ['**/*.spec.?(c|m)[jt]s?(x)'],
     exclude: ['sandbox/**/*.spec.?(c|m)[jt]s?(x)'],
     setupFiles: './vitest.setup.mts',
+    testTimeout: 5000,
+    environmentOptions: {
+      jsdom: {
+        resources: 'usable',
+      },
+    },
   },
   resolve: {
     alias: [{ find: /^@\//, replacement: `${resolve(__dirname, 'src')}/` }],
