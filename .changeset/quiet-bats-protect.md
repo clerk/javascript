@@ -1,5 +1,5 @@
 ---
-'@clerk/react-router': major
+'@clerk/react-router': minor
 ---
 
 Introduce [React Router middleware](https://reactrouter.com/how-to/middleware) support with `clerkMiddleware()` for improved performance and streaming capabilities.
