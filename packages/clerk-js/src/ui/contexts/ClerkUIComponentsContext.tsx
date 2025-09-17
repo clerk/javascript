@@ -21,6 +21,7 @@ import {
   SignInContext,
   SignUpContext,
   SubscriberTypeContext,
+  SubscriptionDetailsContext,
   UserButtonContext,
   UserProfileContext,
   UserVerificationContext,
@@ -117,6 +118,12 @@ export function ComponentContextProvider({
         >
           {children}
         </TaskChooseOrganizationContext.Provider>
+      );
+    case 'SubscriptionDetails':
+      return (
+        <SubscriptionDetailsContext.Provider value={{ componentName, ...props }}>
+          {children}
+        </SubscriptionDetailsContext.Provider>
       );
     default:
       throw new Error(`Unknown component context: ${componentName}`);

@@ -75,6 +75,9 @@ export const mockClerkMethods = (clerk: LoadedClerk): DeepVitestMocked<LoadedCle
       }
     });
   }
+  if (clerkAny.billing) {
+    mockMethodsOf(clerkAny.billing);
+  }
   mockProp(clerkAny, 'navigate');
   mockProp(clerkAny, 'setActive');
   mockProp(clerkAny, 'redirectWithAuth');
