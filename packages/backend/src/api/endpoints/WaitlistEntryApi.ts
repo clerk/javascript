@@ -25,10 +25,17 @@ type WaitlistEntryCreateParams = {
 };
 
 type WaitlistEntryInviteParams = {
+  /**
+   * When true, do not error if an invitation already exists. Default: false.
+   */
   ignoreExisting?: boolean;
 };
 
 export class WaitlistEntryAPI extends AbstractAPI {
+  /**
+   * List waitlist entries.
+   * @param params Optional parameters (e.g., `query`, `status`, `orderBy`).
+   */
   public async list(params: WaitlistEntryListParams = {}) {
     return this.request<PaginatedResourceResponse<WaitlistEntry>>({
       method: 'GET',
@@ -37,6 +44,10 @@ export class WaitlistEntryAPI extends AbstractAPI {
     });
   }
 
+  /**
+   * Create a waitlist entry.
+   * @param params The parameters for creating a waitlist entry.
+   */
   public async create(params: WaitlistEntryCreateParams) {
     return this.request<WaitlistEntry>({
       method: 'POST',
@@ -45,31 +56,44 @@ export class WaitlistEntryAPI extends AbstractAPI {
     });
   }
 
-  public async invite(waitlist_entry_id: string, params: WaitlistEntryInviteParams = {}) {
-    this.requireId(waitlist_entry_id);
+  /**
+   * Invite a waitlist entry.
+   * @param id The waitlist entry ID.
+   * @param params Optional parameters (e.g., `ignoreExisting`).
+   */
+  public async invite(id: string, params: WaitlistEntryInviteParams = {}) {
+    this.requireId(id);
 
     return this.request<WaitlistEntry>({
       method: 'POST',
-      path: joinPaths(basePath, waitlist_entry_id, 'invite'),
+      path: joinPaths(basePath, id, 'invite'),
       bodyParams: params,
     });
   }
 
-  public async reject(waitlist_entry_id: string) {
-    this.requireId(waitlist_entry_id);
+  /**
+   * Reject a waitlist entry.
+   * @param id The waitlist entry ID.
+   */
+  public async reject(id: string) {
+    this.requireId(id);
 
     return this.request<WaitlistEntry>({
       method: 'POST',
-      path: joinPaths(basePath, waitlist_entry_id, 'reject'),
+      path: joinPaths(basePath, id, 'reject'),
     });
   }
 
-  public async delete(waitlist_entry_id: string) {
-    this.requireId(waitlist_entry_id);
+  /**
+   * Delete a waitlist entry.
+   * @param id The waitlist entry ID.
+   */
+  public async delete(id: string) {
+    this.requireId(id);
 
     return this.request<DeletedObject>({
       method: 'DELETE',
-      path: joinPaths(basePath, waitlist_entry_id),
+      path: joinPaths(basePath, id),
     });
   }
 }
