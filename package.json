@@ -84,7 +84,7 @@
     "@testing-library/user-event": "^14.5.2",
     "@types/cross-spawn": "^6.0.6",
     "@types/jest": "^29.3.1",
-    "@types/node": "^22.17.2",
+    "@types/node": "^22.18.1",
     "@types/react": "catalog:react",
     "@types/react-dom": "catalog:react",
     "@vitejs/plugin-react": "^4.5.2",
@@ -150,10 +150,10 @@
     "yalc": "1.0.0-pre.53",
     "zx": "catalog:repo"
   },
-  "packageManager": "pnpm@10.12.4+sha512.5ea8b0deed94ed68691c9bad4c955492705c5eeb8a87ef86bc62c74a26b037b08ff9570f108b2e4dbd1dd1a9186fea925e527f141c648e85af45631074680184",
+  "packageManager": "pnpm@10.16.1",
   "engines": {
     "node": ">=18.17.0",
-    "pnpm": ">=10.12.4"
+    "pnpm": ">=10.16.1"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

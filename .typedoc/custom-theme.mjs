@@ -218,13 +218,19 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
         const customizedModel = model;
         customizedModel.typeParameters = undefined;
 
-        // Extract the Accessors group (if any) and prevent default rendering for it
         const originalGroups = customizedModel.groups;
-        const accessorsGroup = originalGroups?.find(g => g.title === 'Accessors');
-        const groupsWithoutAccessors = originalGroups?.filter(g => g.title !== 'Accessors');
+
+        // When an interface extends another interface, typedoc will generate a "Methods" group
+        // We want to hide this group from being rendered
+        const groupsWithoutMethods = originalGroups?.filter(g => g.title !== 'Methods');
+
+        // Extract the Accessors group (if any) and prevent default rendering for it
+        const accessorsGroup = groupsWithoutMethods?.find(g => g.title === 'Accessors');
+        const groupsWithoutAccessors = groupsWithoutMethods?.filter(g => g.title !== 'Accessors');
 
         customizedModel.groups = groupsWithoutAccessors;
         const nonAccessorOutput = superPartials.memberWithGroups(customizedModel, options);
+
         customizedModel.groups = originalGroups;
 
         /** @type {string[]} */

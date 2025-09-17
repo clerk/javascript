@@ -82,6 +82,7 @@ export const bgBG: LocalizationResource = {
     cancelSubscription: undefined,
     cancelSubscriptionAccessUntil: undefined,
     cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: undefined,
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
@@ -1029,7 +1030,8 @@ export const bgBG: LocalizationResource = {
     deletePage: {
       actionDescription: 'Напишете "Изтриване на акаунта" по-долу, за да продължите.',
       confirm: 'Изтриване на акаунта',
-      messageLine1: 'Сигурни ли сте, че искате да изтриете акаунта си?',
+      messageLine1:
+        'Сигурни ли сте, че искате да изтриете акаунта си от Clerk? Моля, свържете се със собственика на приложението, за да изтриете информацията си от тяхното приложение и други услуги.',
       messageLine2: 'Това действие е перманентно и необратимо.',
       title: 'Изтриване на акаунта',
     },

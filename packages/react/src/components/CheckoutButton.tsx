@@ -7,7 +7,7 @@ import { assertSingleChild, normalizeWithDefaultValue, safeExecute } from '../ut
 import { withClerk } from './withClerk';
 
 /**
- * @experimental A button component that opens the Clerk Checkout drawer when clicked. This component must be rendered
+ * A button component that opens the Clerk Checkout drawer when clicked. This component must be rendered
  * inside a `<SignedIn />` component to ensure the user is authenticated.
  *
  * @example
@@ -43,6 +43,8 @@ import { withClerk } from './withClerk';
  *
  * @throws {Error} When rendered outside of a `<SignedIn />` component
  * @throws {Error} When `for="organization"` is used without an active organization context
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export const CheckoutButton = withClerk(
   ({ clerk, children, ...props }: WithClerkProp<React.PropsWithChildren<__experimental_CheckoutButtonProps>>) => {

@@ -81,6 +81,7 @@ export const hiIN: LocalizationResource = {
     cancelSubscription: undefined,
     cancelSubscriptionAccessUntil: undefined,
     cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: undefined,
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
@@ -1040,7 +1041,8 @@ export const hiIN: LocalizationResource = {
     deletePage: {
       actionDescription: 'जारी रखने के लिए नीचे "Delete account" टाइप करें।',
       confirm: 'खाता हटाएं',
-      messageLine1: 'क्या आप वाकई अपना खाता हटाना चाहते हैं?',
+      messageLine1:
+        'क्या आप वाकई Clerk से अपना खाता हटाना चाहते हैं? कृपया अपनी जानकारी को उनके एप्लिकेशन और अन्य सेवाओं से हटाने के लिए एप्लिकेशन के मालिक से संपर्क करें।',
       messageLine2: 'यह कार्रवाई स्थायी और अपरिवर्तनीय है।',
       title: 'खाता हटाएं',
     },

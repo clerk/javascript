@@ -81,6 +81,7 @@ export const taIN: LocalizationResource = {
     cancelSubscription: undefined,
     cancelSubscriptionAccessUntil: undefined,
     cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: undefined,
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
@@ -1047,7 +1048,8 @@ export const taIN: LocalizationResource = {
     deletePage: {
       actionDescription: 'தொடர கீழே "Delete account" என்று உள்ளிடவும்.',
       confirm: 'கணக்கை நீக்கு',
-      messageLine1: 'உங்கள் கணக்கை நீக்க விரும்புகிறீர்களா?',
+      messageLine1:
+        'Clerk-லிருந்து உங்கள் கணக்கை நீக்க விரும்புகிறீர்களா? உங்கள் தகவலை அவர்களின் பயன்பாடு மற்றும் பிற சேவைகளில் இருந்து நீக்க, பயன்பாட்டின் உரிமையாளரைத் தொடர்பு கொள்ளவும்.',
       messageLine2: 'இந்த செயல் நிரந்தரமானது மற்றும் மாற்ற முடியாதது.',
       title: 'கணக்கை நீக்கு',
     },

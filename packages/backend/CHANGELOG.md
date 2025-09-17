@@ -1,5 +1,55 @@
 # Change Log
 
+## 2.14.1
+
+### Patch Changes
+
+- Added missing `orderBy` field to machines list method ([#6767](https://github.com/clerk/javascript/pull/6767)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Example:
+
+  ```ts
+  clerkClient.machines.list({
+    ...params,
+    orderBy: 'name',
+  });
+  ```
+
+- Add JSDoc around Machine and M2M resource types ([#6774](https://github.com/clerk/javascript/pull/6774)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`bcf24f2`](https://github.com/clerk/javascript/commit/bcf24f2f91913fa0dd3fbf02b3bbef345c4e1ea9), [`1ceedad`](https://github.com/clerk/javascript/commit/1ceedad4bc5bc3d5f01c95185f82ff0f43983cf5), [`de90ede`](https://github.com/clerk/javascript/commit/de90ede82664b58bef9e294498384cf2c99a331e), [`9d4a95c`](https://github.com/clerk/javascript/commit/9d4a95c766396a0bc327fbf0560228bedb4828eb), [`428cd57`](https://github.com/clerk/javascript/commit/428cd57a8581a58a6a42325ec50eb98000068e97)]:
+  - @clerk/types@4.87.0
+  - @clerk/shared@3.26.0
+
+## 2.14.0
+
+### Minor Changes
+
+- Adds the ability to create bulk invitations with `.createInvitationBulk([{...}])` ([#6751](https://github.com/clerk/javascript/pull/6751)) by [@tmilewski](https://github.com/tmilewski)
+
+- Add lastAuthenticationStrategy to API resources ([#6748](https://github.com/clerk/javascript/pull/6748)) by [@tmilewski](https://github.com/tmilewski)
+
+### Patch Changes
+
+- Align create params for Invitation and OrganizationInvitation with backend API ([#6750](https://github.com/clerk/javascript/pull/6750)) by [@tmilewski](https://github.com/tmilewski)
+
+- Add machine secret key rotation BAPI method ([#6760](https://github.com/clerk/javascript/pull/6760)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Usage:
+
+  ```ts
+  clerkClient.machines.rotateSecretKey({
+    machineId: 'mch_xxx',
+    previousTokenTtl: 3600,
+  });
+  ```
+
+- Remove `expired` from `OrganizationInvitationStatus` according to latest Backend API spec ([#6753](https://github.com/clerk/javascript/pull/6753)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`23948dc`](https://github.com/clerk/javascript/commit/23948dc777ec6a17bafbae59c253a93143b0e105), [`82b84fe`](https://github.com/clerk/javascript/commit/82b84fed5f207673071ba7354a17f4a76e101201), [`54b4b5a`](https://github.com/clerk/javascript/commit/54b4b5a5f811f612fadf5c47ffda94a750c57a5e), [`50a8622`](https://github.com/clerk/javascript/commit/50a8622c3579306f15e5d40e5ea72b4fe4384ef7), [`23948dc`](https://github.com/clerk/javascript/commit/23948dc777ec6a17bafbae59c253a93143b0e105)]:
+  - @clerk/types@4.86.0
+  - @clerk/shared@3.25.0
+
 ## 2.13.0
 
 ### Minor Changes

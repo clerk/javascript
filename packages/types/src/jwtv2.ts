@@ -128,9 +128,9 @@ export type VersionedJwtPayload =
     }
   | {
       /**
-       * @experimental
-       *
        * The version of the JWT payload.
+       *
+       * @experimental
        */
       v: 2;
 
@@ -145,9 +145,9 @@ export type VersionedJwtPayload =
       pla?: string;
 
       /**
-       * @experimental - This structure is subject to change.
-       *
        * Active organization information.
+       *
+       * @experimental This structure is subject to change.
        */
       o?: {
         /**

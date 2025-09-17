@@ -1,5 +1,29 @@
 # Change Log
 
+## 2.6.1
+
+### Patch Changes
+
+- Hide flows inside UserProfile and OrganizationProfile that depend on Stripe.js when remotely hosted code is not permitted. ([#6754](https://github.com/clerk/javascript/pull/6754)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`bcf24f2`](https://github.com/clerk/javascript/commit/bcf24f2f91913fa0dd3fbf02b3bbef345c4e1ea9), [`f6f890c`](https://github.com/clerk/javascript/commit/f6f890c0cb71bb840b5a60f4ecfdecb6de0657b1), [`adfed91`](https://github.com/clerk/javascript/commit/adfed91d93abf6fd9823207b39565e2059f02f90), [`1ceedad`](https://github.com/clerk/javascript/commit/1ceedad4bc5bc3d5f01c95185f82ff0f43983cf5), [`de90ede`](https://github.com/clerk/javascript/commit/de90ede82664b58bef9e294498384cf2c99a331e), [`9d4a95c`](https://github.com/clerk/javascript/commit/9d4a95c766396a0bc327fbf0560228bedb4828eb), [`a059017`](https://github.com/clerk/javascript/commit/a059017683580df82224e73c81387d82f484819d), [`428cd57`](https://github.com/clerk/javascript/commit/428cd57a8581a58a6a42325ec50eb98000068e97), [`719856f`](https://github.com/clerk/javascript/commit/719856fee23acde3f9953f48f0a83c3eedf9e429)]:
+  - @clerk/clerk-js@5.94.0
+  - @clerk/clerk-react@5.48.0
+  - @clerk/shared@3.26.0
+
+## 2.6.0
+
+### Minor Changes
+
+- [Billing Beta] Drop experimental `subscriptions` property from params of `useOrganization()`. Use [`useSubscription()`](https://clerk.com/docs/nextjs/hooks/use-subscription) instead. ([#6738](https://github.com/clerk/javascript/pull/6738)) by [@mauricioabreu](https://github.com/mauricioabreu)
+
+### Patch Changes
+
+- Updated dependencies [[`23948dc`](https://github.com/clerk/javascript/commit/23948dc777ec6a17bafbae59c253a93143b0e105), [`7fe00d6`](https://github.com/clerk/javascript/commit/7fe00d67c642ae1fe44a96bd8ab51f7f5845495a), [`b291c98`](https://github.com/clerk/javascript/commit/b291c98641a67a24a6714343884bd366f041e8fa), [`82b84fe`](https://github.com/clerk/javascript/commit/82b84fed5f207673071ba7354a17f4a76e101201), [`54b4b5a`](https://github.com/clerk/javascript/commit/54b4b5a5f811f612fadf5c47ffda94a750c57a5e), [`50a8622`](https://github.com/clerk/javascript/commit/50a8622c3579306f15e5d40e5ea72b4fe4384ef7), [`23948dc`](https://github.com/clerk/javascript/commit/23948dc777ec6a17bafbae59c253a93143b0e105)]:
+  - @clerk/clerk-js@5.93.0
+  - @clerk/shared@3.25.0
+  - @clerk/clerk-react@5.47.0
+
 ## 2.5.31
 
 ### Patch Changes

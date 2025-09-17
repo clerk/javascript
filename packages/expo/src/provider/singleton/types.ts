@@ -19,8 +19,8 @@ export type BuildClerkOptions = {
   /**
    * Note: Passkey support in Expo is currently in a limited rollout phase.
    * If you're interested in using this feature, please contact us for early access or additional details.
-   * This API is experimental and may change at any moment.
-   * @experimental
+   *
+   * @experimental This API is experimental and may change at any moment.
    */
   __experimental_passkeys?: {
     get: ({

@@ -81,6 +81,7 @@ export const jaJP: LocalizationResource = {
     cancelSubscription: undefined,
     cancelSubscriptionAccessUntil: undefined,
     cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: undefined,
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
@@ -1031,7 +1032,8 @@ export const jaJP: LocalizationResource = {
     deletePage: {
       actionDescription: '続行するには下記に「Delete account」を入力してください。',
       confirm: 'アカウント削除',
-      messageLine1: 'アカウントを削除してもよろしいですか？',
+      messageLine1:
+        'Clerk からアカウントを削除してもよろしいですか？あなたの情報をアプリケーションや他のサービスから削除するには、アプリケーションの所有者にお問い合わせください。',
       messageLine2: 'この操作は永久的で取り消すことはできません。',
       title: 'アカウントの削除',
     },
