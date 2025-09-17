@@ -9,7 +9,6 @@
     "typecheck": "react-router typegen && tsc --build --noEmit"
   },
   "dependencies": {
-    "@clerk/react-router": "2.0.0-snapshot.v20250917224107",
     "@react-router/node": "^7.9.1",
     "@react-router/serve": "^7.9.1",
     "isbot": "^5.1.17",
