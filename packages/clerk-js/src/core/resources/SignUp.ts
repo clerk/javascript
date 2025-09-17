@@ -37,6 +37,7 @@ import type {
 } from '@clerk/types';
 
 import { debugLogger } from '@/utils/debug';
+import { inIframe } from '@/utils/runtime';
 
 import {
   generateSignatureWithBase,
@@ -150,6 +151,10 @@ export class SignUp extends BaseResource implements SignUpResource {
     debugLogger.debug('SignUp.create', { id: this.id, strategy: params.strategy });
 
     let finalParams = { ...params };
+
+    if (__BUILD_VARIANT_CHIPS__ && inIframe()) {
+      finalParams.clientId = BaseResource.clerk.client?.id;
+    }
 
     if (!__BUILD_DISABLE_RHC__ && !this.clientBypass() && !this.shouldBypassCaptchaForAttempt(params)) {
       const captchaChallenge = new CaptchaChallenge(SignUp.clerk);
@@ -435,8 +440,14 @@ export class SignUp extends BaseResource implements SignUpResource {
   };
 
   update = (params: SignUpUpdateParams): Promise<SignUpResource> => {
+    const finalParams = { ...params };
+
+    if (__BUILD_VARIANT_CHIPS__ && inIframe()) {
+      finalParams.clientId = BaseResource.clerk.client?.id;
+    }
+
     return this._basePatch({
-      body: normalizeUnsafeMetadata(params),
+      body: normalizeUnsafeMetadata(finalParams),
     });
   };
 

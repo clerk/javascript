@@ -10,6 +10,10 @@ export interface SignInFutureCreateParams {
   redirectUrl?: string;
   actionCompleteRedirectUrl?: string;
   transfer?: boolean;
+  /**
+   * @internal Used to identify the client making the request in iframe context.
+   */
+  clientId?: string;
 }
 
 export type SignInFuturePasswordParams =

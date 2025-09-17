@@ -100,6 +100,10 @@ export type SignUpCreateParams = Partial<
     oidcPrompt: string;
     oidcLoginHint: string;
     channel: PhoneCodeChannel;
+    /**
+     * @internal Used to identify the client making the request in iframe context.
+     */
+    clientId?: string;
   } & Omit<SnakeToCamel<Record<SignUpAttributeField | SignUpVerifiableField, string>>, 'legalAccepted'>
 >;
 

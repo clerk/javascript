@@ -128,6 +128,10 @@ export type SignInCreateParams = (
       identifier?: string;
       oidcPrompt?: string;
       oidcLoginHint?: string;
+      /**
+       * @internal Used to identify the client making the request in iframe context.
+       */
+      clientId?: string;
     }
   | {
       strategy: TicketStrategy;

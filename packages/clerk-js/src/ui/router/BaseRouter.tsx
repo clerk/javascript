@@ -14,7 +14,7 @@ interface BaseRouterProps {
   startPath: string;
   getPath: () => string;
   getQueryString: () => string;
-  internalNavigate: (toURL: URL, options?: NavigateOptions) => Promise<any> | any;
+  internalNavigate: (toURL: URL, options?: NavigateOptions) => Promise<any>;
   refreshEvents?: Array<keyof WindowEventMap>;
   preservedParams?: string[];
   urlStateParam?: {
