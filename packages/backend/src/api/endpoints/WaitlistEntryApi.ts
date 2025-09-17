@@ -25,7 +25,7 @@ type WaitlistEntryCreateParams = {
 };
 
 type WaitlistEntryInviteParams = {
-  ignore_existing?: boolean;
+  ignoreExisting?: boolean;
 };
 
 export class WaitlistEntryAPI extends AbstractAPI {
