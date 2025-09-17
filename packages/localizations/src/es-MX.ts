@@ -82,6 +82,7 @@ export const esMX: LocalizationResource = {
     cancelSubscription: 'Cancelar suscripción',
     cancelSubscriptionAccessUntil: undefined,
     cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: undefined,
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,

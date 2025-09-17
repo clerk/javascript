@@ -84,6 +84,7 @@ export const roRO: LocalizationResource = {
     cancelSubscriptionAccessUntil:
       "Poți folosi în continuare funcțiile „{{plan}}” până la {{ date | longDate('ro-RO') }}, după care nu vei mai avea acces.",
     cancelSubscriptionNoCharge: 'Nu vei fi taxat pentru acest abonament.',
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: 'Anulezi abonamentul {{plan}}?',
     cannotSubscribeMonthly:
       'Nu te poți abona la acest plan cu plată lunară. Pentru acest plan este necesară plata anuală.',

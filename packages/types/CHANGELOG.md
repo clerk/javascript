@@ -1,5 +1,17 @@
 # Change Log
 
+## 4.87.0
+
+### Minor Changes
+
+- [Experimental] Signal email link support ([#6766](https://github.com/clerk/javascript/pull/6766)) by [@dstaley](https://github.com/dstaley)
+
+- [Billing Beta] Remove deprecated `subscription` attribute from Billing ([#6788](https://github.com/clerk/javascript/pull/6788)) by [@mauricioabreu](https://github.com/mauricioabreu)
+
+### Patch Changes
+
+- Add support for canceling past due subscriptions ([#6783](https://github.com/clerk/javascript/pull/6783)) by [@aeliox](https://github.com/aeliox)
+
 ## 4.86.0
 
 ### Minor Changes
