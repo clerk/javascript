@@ -1,6 +1,7 @@
 import { redirect } from 'react-router';
 import { UserProfile } from '@clerk/react-router';
-import { clerkClient, getAuth } from '@clerk/react-router/server';
+import { getAuth } from '@clerk/react-router/ssr.server';
+import { createClerkClient } from '@clerk/react-router/api.server';
 import type { Route } from './+types/protected';
 
 export async function loader(args: Route.LoaderArgs) {
@@ -10,11 +11,10 @@ export async function loader(args: Route.LoaderArgs) {
     return redirect('/sign-in');
   }
 
-  const user = await clerkClient(args).users.getUser(userId);
+  const user = await createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY }).users.getUser(userId);
 
   return {
-    firstName: user.firstName,
-    emailAddress: user.emailAddresses[0].emailAddress,
+    user,
   };
 }
 
@@ -24,8 +24,8 @@ export default function Profile({ loaderData }: Route.ComponentProps) {
       <h1>Protected</h1>
       <UserProfile />
       <ul>
-        <li>First name: {loaderData.firstName}</li>
-        <li>Email: {loaderData.emailAddress}</li>
+        <li>First name: {loaderData.user.firstName}</li>
+        <li>Email: {loaderData.user.emailAddresses[0].emailAddress}</li>
       </ul>
     </div>
   );
