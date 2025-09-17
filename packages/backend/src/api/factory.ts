@@ -54,7 +54,7 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
     betaFeatures: new BetaFeaturesAPI(request),
     blocklistIdentifiers: new BlocklistIdentifierAPI(request),
     /**
-     * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+     * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
      */
     billing: new BillingAPI(request),
     clients: new ClientAPI(request),
