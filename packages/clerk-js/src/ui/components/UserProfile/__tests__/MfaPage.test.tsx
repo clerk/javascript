@@ -253,7 +253,7 @@ describe('MfaPage', () => {
 
       expect(itemButton).toBeDefined();
       await act(async () => {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+         
         await userEvent.click(itemButton!);
       });
       await waitFor(() => getByText(/^regenerate$/i), { timeout: 500 });
@@ -306,7 +306,7 @@ describe('MfaPage', () => {
       expect(itemButton).toBeDefined();
 
       await act(async () => {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+         
         await userEvent.click(itemButton!);
       });
       await waitFor(() => getByText(/^remove$/i), { timeout: 500 });
@@ -340,7 +340,7 @@ describe('MfaPage', () => {
       expect(itemButton).toBeDefined();
 
       await act(async () => {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+         
         await userEvent.click(itemButton!);
       });
       await waitFor(() => getByText(/^remove$/i), { timeout: 500 });
@@ -385,7 +385,7 @@ describe('MfaPage', () => {
       expect(itemButton).toBeDefined();
 
       await act(async () => {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+         
         await userEvent.click(itemButton!);
       });
       await waitFor(() => getByText(/^remove$/i), { timeout: 500 });

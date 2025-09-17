@@ -123,7 +123,7 @@ describe('PhoneSection', () => {
       const item = getByText(number);
       const menuButton = getMenuItemFromText(item);
       await act(async () => {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+         
         await userEvent.click(menuButton!);
       });
 
@@ -146,7 +146,7 @@ describe('PhoneSection', () => {
       const item = getByText(numbers[0]);
       const menuButton = getMenuItemFromText(item);
       await act(async () => {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+         
         await userEvent.click(menuButton!);
       });
 
@@ -171,7 +171,7 @@ describe('PhoneSection', () => {
         const item = getByText(numbers[0]);
         const menuButton = getMenuItemFromText(item);
         await act(async () => {
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+           
           await userEvent.click(menuButton!);
         });
 
@@ -193,7 +193,7 @@ describe('PhoneSection', () => {
         const item = getByText(numbers[0]);
         const menuButton = getMenuItemFromText(item);
         await act(async () => {
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+           
           await userEvent.click(menuButton!);
         });
 
@@ -224,7 +224,7 @@ describe('PhoneSection', () => {
       const item = getByText(numbers[0]);
       const menuButton = getMenuItemFromText(item);
       await act(async () => {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+         
         await userEvent.click(menuButton!);
       });
 
@@ -249,7 +249,7 @@ describe('PhoneSection', () => {
       const item = getByText(numbers[0]);
       const menuButton = getMenuItemFromText(item);
       await act(async () => {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+         
         await userEvent.click(menuButton!);
       });
 

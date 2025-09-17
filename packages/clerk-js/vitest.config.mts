@@ -53,8 +53,8 @@ export default defineConfig({
     },
     environment: 'jsdom',
     globals: false,
-    include: ['**/*.spec.?(c|m)[jt]s?(x)'],
-    exclude: ['sandbox/**/*.spec.?(c|m)[jt]s?(x)'],
+    include: ['**/*.test.?(c|m)[jt]s?(x)'],
+    exclude: ['sandbox/**/*.spec.?(c|m)[jt]s?(x)', 'node_modules/**', 'dist/**'],
     setupFiles: './vitest.setup.mts',
     testTimeout: 5000,
     environmentOptions: {

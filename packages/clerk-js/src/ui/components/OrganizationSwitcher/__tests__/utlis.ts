@@ -8,8 +8,8 @@ import type {
 } from '@clerk/types';
 import { vi } from 'vitest';
 
-import type { FakeOrganizationParams } from '../../CreateOrganization/__tests__/CreateOrganization.spec';
-import { createFakeOrganization } from '../../CreateOrganization/__tests__/CreateOrganization.spec';
+import type { FakeOrganizationParams } from '../../CreateOrganization/__tests__/CreateOrganization.test';
+import { createFakeOrganization } from '../../CreateOrganization/__tests__/CreateOrganization.test';
 
 type FakeOrganizationInvitationParams = {
   id: string;
