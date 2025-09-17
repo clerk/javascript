@@ -371,11 +371,6 @@ export interface CommercePaymentResource extends ClerkResource {
    */
   paymentSource: CommercePaymentSourceResource;
   /**
-   * @deprecated Use `subscriptionItem` instead.
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
-   */
-  subscription: CommerceSubscriptionItemResource;
-  /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   subscriptionItem: CommerceSubscriptionItemResource;
