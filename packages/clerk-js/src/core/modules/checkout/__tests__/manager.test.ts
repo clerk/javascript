@@ -192,13 +192,11 @@ describe('createCheckoutManager', () => {
 
     it('should set isStarting to true during operation', async () => {
       let capturedState: CheckoutCacheState | null = null;
-      const mockOperation: MockedFunction<() => Promise<CommerceCheckoutResource>> = vi
-        .fn()
-        .mockImplementation(async () => {
-          // Capture state while operation is running
-          capturedState = manager.getCacheState();
-          return createMockCheckoutResource();
-        });
+      const mockOperation: MockedFunction<() => Promise<CommerceCheckoutResource>> = vi.fn().mockImplementation(() => {
+        // Capture state while operation is running
+        capturedState = manager.getCacheState();
+        return Promise.resolve(createMockCheckoutResource());
+      });
 
       await manager.executeOperation('start', mockOperation);
 
@@ -296,12 +294,10 @@ describe('createCheckoutManager', () => {
 
     it('should set isConfirming to true during operation', async () => {
       let capturedState: CheckoutCacheState | null = null;
-      const mockOperation: MockedFunction<() => Promise<CommerceCheckoutResource>> = vi
-        .fn()
-        .mockImplementation(async () => {
-          capturedState = manager.getCacheState();
-          return createMockCheckoutResource();
-        });
+      const mockOperation: MockedFunction<() => Promise<CommerceCheckoutResource>> = vi.fn().mockImplementation(() => {
+        capturedState = manager.getCacheState();
+        return Promise.resolve(createMockCheckoutResource());
+      });
 
       await manager.executeOperation('confirm', mockOperation);
 
@@ -525,12 +521,10 @@ describe('createCheckoutManager', () => {
 
       // During operation - fetching
       let capturedState: CheckoutCacheState | null = null;
-      const mockOperation: MockedFunction<() => Promise<CommerceCheckoutResource>> = vi
-        .fn()
-        .mockImplementation(async () => {
-          capturedState = manager.getCacheState();
-          return createMockCheckoutResource();
-        });
+      const mockOperation: MockedFunction<() => Promise<CommerceCheckoutResource>> = vi.fn().mockImplementation(() => {
+        capturedState = manager.getCacheState();
+        return Promise.resolve(createMockCheckoutResource());
+      });
 
       await manager.executeOperation('start', mockOperation);
       expect(capturedState?.fetchStatus).toBe(FETCH_STATUS.FETCHING);

@@ -1,6 +1,5 @@
 // import { vi } from 'vitest';
-import type { LoadedClerk } from '@clerk/types';
-import type { ActiveSessionResource } from '@clerk/types';
+import type { ActiveSessionResource, LoadedClerk } from '@clerk/types';
 import { type Mocked, vi } from 'vitest';
 
 import type { RouteContextValue } from '../../router';

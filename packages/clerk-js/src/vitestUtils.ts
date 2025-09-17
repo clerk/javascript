@@ -1,10 +1,7 @@
-// import { matchers } from '@emotion/jest';
 import type { RenderOptions } from '@testing-library/react';
 import { render as _render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterAll, beforeAll, describe, type SpyInstance, vi } from 'vitest';
-
-// expect.extend(matchers);
+import { afterAll, beforeAll, describe, vi } from 'vitest';
 
 Element.prototype.scrollIntoView = vi.fn();
 
@@ -30,8 +27,8 @@ const render = (ui: React.ReactElement, options?: RenderOptions) => {
  */
 export const mockNativeRuntime = (fn: () => void) => {
   describe('native runtime', () => {
-    let spyDocument: SpyInstance;
-    let spyNavigator: SpyInstance;
+    let spyDocument: ReturnType<typeof vi.spyOn>;
+    let spyNavigator: ReturnType<typeof vi.spyOn>;
 
     beforeAll(() => {
       spyDocument = vi.spyOn(globalThis, 'document', 'get');

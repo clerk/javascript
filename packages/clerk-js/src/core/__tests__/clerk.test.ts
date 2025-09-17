@@ -1468,7 +1468,7 @@ describe('Clerk singleton', () => {
       const sut = new Clerk(productionPublishableKey);
       await sut.load(mockedLoadOptions);
 
-      sut.handleRedirectCallback({
+      await sut.handleRedirectCallback({
         secondFactorUrl: '/custom-2fa',
       });
 
@@ -2053,7 +2053,7 @@ describe('Clerk singleton', () => {
       sut.setActive = mockSetActive;
 
       const redirectUrlComplete = '/redirect-to';
-      sut.handleEmailLinkVerification({ redirectUrlComplete });
+      await sut.handleEmailLinkVerification({ redirectUrlComplete });
 
       await waitFor(() => {
         expect(mockSetActive).toHaveBeenCalledWith({
@@ -2113,7 +2113,7 @@ describe('Clerk singleton', () => {
       sut.setActive = mockSetActive;
 
       const redirectUrlComplete = '/redirect-to';
-      sut.handleEmailLinkVerification({ redirectUrlComplete });
+      await sut.handleEmailLinkVerification({ redirectUrlComplete });
 
       await waitFor(() => {
         expect(mockSetActive).toHaveBeenCalledWith({

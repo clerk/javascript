@@ -1,8 +1,8 @@
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
-import { bindCreateFixtures, render, waitFor } from '@/testUtils';
 import { createFakeUserOrganizationMembership } from '@/ui/components/OrganizationSwitcher/__tests__/utlis';
+import { bindCreateFixtures, render, waitFor } from '@/vitestUtils';
 
 import { TaskChooseOrganization } from '..';
 
