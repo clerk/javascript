@@ -6,7 +6,7 @@ import type { CommercePlanJSON } from './JSON';
 /**
  * The `CommercePlan` object is similar to the [`CommercePlanResource`](/docs/references/javascript/types/commerce-plan-resource) object as it holds information about a plan, as well as methods for managing it. However, the `CommercePlan` object is different in that it is used in the [Backend API](https://clerk.com/docs/reference/backend-api/tag/commerce/get/commerce/plans) and is not directly accessible from the Frontend API.
  *
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export class CommercePlan {
   constructor(

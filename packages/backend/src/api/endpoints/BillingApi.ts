@@ -33,7 +33,7 @@ type ExtendSubscriptionItemFreeTrialParams = {
 
 export class BillingAPI extends AbstractAPI {
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   public async getPlanList(params?: GetOrganizationListParams) {
     return this.request<PaginatedResourceResponse<CommercePlan[]>>({
@@ -44,7 +44,7 @@ export class BillingAPI extends AbstractAPI {
   }
 
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   public async cancelSubscriptionItem(subscriptionItemId: string, params?: CancelSubscriptionItemParams) {
     this.requireId(subscriptionItemId);
@@ -56,7 +56,7 @@ export class BillingAPI extends AbstractAPI {
   }
 
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   public async extendSubscriptionItemFreeTrial(
     subscriptionItemId: string,
@@ -71,7 +71,7 @@ export class BillingAPI extends AbstractAPI {
   }
 
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   public async getOrganizationBillingSubscription(organizationId: string) {
     this.requireId(organizationId);
@@ -82,7 +82,7 @@ export class BillingAPI extends AbstractAPI {
   }
 
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   public async getUserBillingSubscription(userId: string) {
     this.requireId(userId);
