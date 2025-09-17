@@ -1,6 +1,4 @@
-// import { vi } from 'vitest';
 import type { ClerkOptions, ClientJSON, EnvironmentJSON, LoadedClerk } from '@clerk/types';
-import React from 'react';
 import { vi } from 'vitest';
 
 import { FlowMetadataProvider } from '@/ui/elements/contexts';
