@@ -150,7 +150,6 @@ describe('ConnectedAccountsSection ', () => {
       // Still displays a remove button
       const menuButton = item.parentElement?.parentElement?.parentElement?.parentElement?.children?.[1];
       await act(async () => {
-         
         await userEvent.click(menuButton!);
       });
 
@@ -185,7 +184,6 @@ describe('ConnectedAccountsSection ', () => {
       // Still displays a remove button
       const menuButton = item.parentElement?.parentElement?.parentElement?.parentElement?.children?.[1];
       await act(async () => {
-         
         await userEvent.click(menuButton!);
       });
 
@@ -208,7 +206,6 @@ describe('ConnectedAccountsSection ', () => {
       // Still displays a remove button
       const menuButton = item.parentElement?.parentElement?.parentElement?.parentElement?.children?.[1];
       await act(async () => {
-         
         await userEvent.click(menuButton!);
       });
 
@@ -229,7 +226,6 @@ describe('ConnectedAccountsSection ', () => {
       const item = getByText(/github/i);
       const menuButton = item.parentElement?.parentElement?.parentElement?.parentElement?.children?.[1];
       await act(async () => {
-         
         await userEvent.click(menuButton!);
       });
       getByRole('menuitem', { name: /remove/i });
@@ -250,7 +246,6 @@ describe('ConnectedAccountsSection ', () => {
       const item = getByText(/github/i);
       const menuButton = item.parentElement?.parentElement?.parentElement?.parentElement?.children?.[1];
       await act(async () => {
-         
         await userEvent.click(menuButton!);
       });
       getByRole('menuitem', { name: /remove/i });
@@ -268,7 +263,6 @@ describe('ConnectedAccountsSection ', () => {
       const item = getByText(/github/i);
       const menuButton = item.parentElement?.parentElement?.parentElement?.parentElement?.children?.[1];
       await act(async () => {
-         
         await userEvent.click(menuButton!);
       });
       getByRole('menuitem', { name: /remove/i });
@@ -290,7 +284,6 @@ describe('ConnectedAccountsSection ', () => {
       const item = getByText(/google/i);
       const menuButton = item.parentElement?.parentElement?.parentElement?.parentElement?.children?.[1];
       await act(async () => {
-         
         await userEvent.click(menuButton!);
       });
       getByRole('menuitem', { name: /remove/i });

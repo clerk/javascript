@@ -123,7 +123,6 @@ describe('PhoneSection', () => {
       const item = getByText(number);
       const menuButton = getMenuItemFromText(item);
       await act(async () => {
-         
         await userEvent.click(menuButton!);
       });
 
@@ -146,7 +145,6 @@ describe('PhoneSection', () => {
       const item = getByText(numbers[0]);
       const menuButton = getMenuItemFromText(item);
       await act(async () => {
-         
         await userEvent.click(menuButton!);
       });
 
@@ -171,7 +169,6 @@ describe('PhoneSection', () => {
         const item = getByText(numbers[0]);
         const menuButton = getMenuItemFromText(item);
         await act(async () => {
-           
           await userEvent.click(menuButton!);
         });
 
@@ -193,7 +190,6 @@ describe('PhoneSection', () => {
         const item = getByText(numbers[0]);
         const menuButton = getMenuItemFromText(item);
         await act(async () => {
-           
           await userEvent.click(menuButton!);
         });
 
@@ -224,7 +220,6 @@ describe('PhoneSection', () => {
       const item = getByText(numbers[0]);
       const menuButton = getMenuItemFromText(item);
       await act(async () => {
-         
         await userEvent.click(menuButton!);
       });
 
@@ -249,7 +244,6 @@ describe('PhoneSection', () => {
       const item = getByText(numbers[0]);
       const menuButton = getMenuItemFromText(item);
       await act(async () => {
-         
         await userEvent.click(menuButton!);
       });
 

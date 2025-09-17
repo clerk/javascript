@@ -253,7 +253,6 @@ describe('MfaPage', () => {
 
       expect(itemButton).toBeDefined();
       await act(async () => {
-         
         await userEvent.click(itemButton!);
       });
       await waitFor(() => getByText(/^regenerate$/i), { timeout: 500 });
@@ -306,7 +305,6 @@ describe('MfaPage', () => {
       expect(itemButton).toBeDefined();
 
       await act(async () => {
-         
         await userEvent.click(itemButton!);
       });
       await waitFor(() => getByText(/^remove$/i), { timeout: 500 });
@@ -340,7 +338,6 @@ describe('MfaPage', () => {
       expect(itemButton).toBeDefined();
 
       await act(async () => {
-         
         await userEvent.click(itemButton!);
       });
       await waitFor(() => getByText(/^remove$/i), { timeout: 500 });
@@ -385,7 +382,6 @@ describe('MfaPage', () => {
       expect(itemButton).toBeDefined();
 
       await act(async () => {
-         
         await userEvent.click(itemButton!);
       });
       await waitFor(() => getByText(/^remove$/i), { timeout: 500 });

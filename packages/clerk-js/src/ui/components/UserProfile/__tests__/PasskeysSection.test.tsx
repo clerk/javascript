@@ -36,7 +36,7 @@ const getMenuItemFromText = (element: HTMLElement) => {
 describe('PasskeySection', () => {
   it('renders the section', async () => {
     const { wrapper, fixtures } = await createFixtures(withPasskeys);
-     
+
     fixtures.clerk.user!.getSessions.mockReturnValue(Promise.resolve([]));
 
     const { getByText } = render(
@@ -92,7 +92,6 @@ describe('PasskeySection', () => {
       const item = getByText(passkeys[0].name);
       const menuButton = getMenuItemFromText(item);
       await act(async () => {
-         
         await userEvent.click(menuButton!);
       });
 
@@ -115,7 +114,6 @@ describe('PasskeySection', () => {
       const item = getByText(passkeys[0].name);
       const menuButton = getMenuItemFromText(item);
       await act(async () => {
-         
         await userEvent.click(menuButton!);
       });
 
@@ -143,7 +141,6 @@ describe('PasskeySection', () => {
       const item = getByText(passkeys[0].name);
       const menuButton = getMenuItemFromText(item);
       await act(async () => {
-         
         await userEvent.click(menuButton!);
       });
 
@@ -173,7 +170,6 @@ describe('PasskeySection', () => {
       const item = getByText(passkeys[0].name);
       const menuButton = getMenuItemFromText(item);
       await act(async () => {
-         
         await userEvent.click(menuButton!);
       });
 
@@ -198,7 +194,6 @@ describe('PasskeySection', () => {
         const item = getByText(passkeys[0].name);
         const menuButton = getMenuItemFromText(item);
         await act(async () => {
-           
           await userEvent.click(menuButton!);
         });
 
@@ -228,7 +223,6 @@ describe('PasskeySection', () => {
       const item = getByText(passkeys[0].name);
       const menuButton = getMenuItemFromText(item);
       await act(async () => {
-         
         await userEvent.click(menuButton!);
       });
 
