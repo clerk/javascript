@@ -222,6 +222,7 @@ export const SuggestionPreview = withCardStateProvider((props: OrganizationSugge
 });
 
 type UserInvitationSuggestionListProps = { onOrganizationClick: (org: OrganizationResource) => unknown };
+
 export const UserInvitationSuggestionList = (props: UserInvitationSuggestionListProps) => {
   const { onOrganizationClick } = props;
   const { ref, userSuggestions, userInvitations } = useFetchInvitations();
@@ -230,7 +231,16 @@ export const UserInvitationSuggestionList = (props: UserInvitationSuggestionList
 
   // Solve weird bug with swr while running unit tests
   const userInvitationsData = userInvitations.data?.filter(a => !!a) || [];
-  const userSuggestionsData = userSuggestions.data?.filter(a => !!a) || [];
+  const userInvitationsByOrgId = userInvitationsData.map(invitation => invitation.publicOrganizationData.id);
+
+  console.log({ userSuggestions });
+
+  const userSuggestionsData =
+    userSuggestions.data
+      ?.filter(a => !!a)
+      // Filter suggestions that already have an invitation for the same organization
+      .filter(suggestion => !userInvitationsByOrgId.includes(suggestion.publicOrganizationData.id)) || [];
+
   const hasAnyData = userInvitationsData.length > 0 || userSuggestionsData.length > 0;
 
   if (!hasAnyData && !isLoading) {

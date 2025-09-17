@@ -101,8 +101,17 @@ const NotificationCountBadgeSwitcherTrigger = () => {
     membershipRequests: (isDomainsEnabled && canAcceptRequests) || undefined,
   });
 
-  const notificationCount =
-    (userInvitations.count || 0) + (userSuggestions.count || 0) + (membershipRequests?.count || 0);
+  const invitationsCount = userInvitations.count || 0;
+  const invitationsByOrgId = userInvitations.data?.map(invitation => invitation.publicOrganizationData.id) ?? [];
+
+  const suggestionsThatAlreadyHaveInvitationsCount = invitationsCount
+    ? (userSuggestions.data?.filter(suggestion => invitationsByOrgId.includes(suggestion.publicOrganizationData.id))
+        .length ?? 0)
+    : 0;
+  const suggestionsCount = (userSuggestions.count || 0) - suggestionsThatAlreadyHaveInvitationsCount;
+  const membershipRequestsCount = membershipRequests?.count || 0;
+
+  const notificationCount = invitationsCount + suggestionsCount + membershipRequestsCount;
 
   if (!notificationCount) {
     return null;
