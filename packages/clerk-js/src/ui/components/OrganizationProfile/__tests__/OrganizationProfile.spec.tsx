@@ -1,7 +1,6 @@
 import type { CustomPage } from '@clerk/types';
 import React from 'react';
-import {  describe, it, expect, beforeEach, afterEach , vi } from 'vitest';
-
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { render } from '../../../../vitestUtils';
 import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';

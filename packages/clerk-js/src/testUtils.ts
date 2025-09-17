@@ -69,7 +69,6 @@ export const mockWebAuthn = (fn: () => void) => {
   });
 };
 
-export * from './ui/utils/test/runFakeTimers';
 export * from './ui/utils/test/createFixtures';
 // eslint-disable-next-line import/export
 export * from '@testing-library/react';

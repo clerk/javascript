@@ -1,7 +1,6 @@
 import type { ClerkPaginatedResponse, OrganizationDomainResource, OrganizationMembershipResource } from '@clerk/types';
 import userEvent from '@testing-library/user-event';
-import { describe, it, expect } from 'vitest';
-
+import { describe, expect, it } from 'vitest';
 
 import { CardStateProvider } from '@/ui/elements/contexts';
 

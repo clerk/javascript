@@ -88,6 +88,42 @@ if (typeof window !== 'undefined') {
       return null;
     }
   };
+
+  // Mock HTMLCanvasElement.prototype.getContext to prevent errors
+  HTMLCanvasElement.prototype.getContext = vi.fn().mockImplementation(((contextType: string) => {
+    if (contextType === '2d') {
+      return {
+        fillRect: vi.fn(),
+        getImageData: vi.fn(() => ({ data: new Uint8ClampedArray([255, 255, 255, 255]) }) as unknown as ImageData),
+      } as unknown as CanvasRenderingContext2D;
+    }
+    if (contextType === 'webgl' || contextType === 'webgl2') {
+      return {} as unknown as WebGLRenderingContext;
+    }
+    return null;
+  }) as any) as ReturnType<typeof vi.fn>;
+
+  // Mock Element.prototype.animate for auto-animate library
+  Element.prototype.animate = vi.fn().mockImplementation(() => ({
+    cancel: vi.fn(),
+    finish: vi.fn(),
+    pause: vi.fn(),
+    play: vi.fn(),
+    reverse: vi.fn(),
+    updatePlaybackRate: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  }));
+
+  // Mock requestAnimationFrame for auto-animate library
+  global.requestAnimationFrame = vi.fn().mockImplementation((callback: FrameRequestCallback) => {
+    return setTimeout(callback, 16);
+  });
+
+  global.cancelAnimationFrame = vi.fn().mockImplementation((id: number) => {
+    clearTimeout(id);
+  });
 }
 
 // Mock browser-tabs-lock to prevent window access errors in tests

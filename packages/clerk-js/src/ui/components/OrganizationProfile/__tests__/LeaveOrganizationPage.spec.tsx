@@ -1,7 +1,6 @@
 import type { DeletedObjectResource } from '@clerk/types';
 import { waitFor } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
-
+import { describe, expect, it, vi } from 'vitest';
 
 import { CardStateProvider } from '@/ui/elements/contexts';
 

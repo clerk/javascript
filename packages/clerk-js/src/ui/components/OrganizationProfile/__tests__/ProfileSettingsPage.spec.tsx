@@ -1,6 +1,5 @@
 import type { OrganizationResource } from '@clerk/types';
-import { describe, it, expect, vi } from 'vitest';
-
+import { describe, expect, it, vi } from 'vitest';
 
 import { render } from '../../../../vitestUtils';
 import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';

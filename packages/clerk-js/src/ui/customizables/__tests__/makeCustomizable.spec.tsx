@@ -3,7 +3,6 @@ import { render, screen } from '../../../vitestUtils';
 import React from 'react';
 import { describe, it, expect } from 'vitest';
 
-
 import { Box, descriptors } from '..';
 import { AppearanceProvider } from '../AppearanceContext';
 import { knownColors } from './vitestUtils';
@@ -25,7 +24,7 @@ describe('Theme used in sx callback', () => {
       </AppearanceProvider>,
     );
 
-    expect(screen.getByTestId('test')).toHaveStyleRule('background-color', knownColors.blue);
+    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe(knownColors.blue);
   });
 
   it('styles match the theme/appearance', () => {
@@ -43,7 +42,7 @@ describe('Theme used in sx callback', () => {
       </AppearanceProvider>,
     );
 
-    expect(screen.getByTestId('test')).toHaveStyleRule('background-color', knownColors.red);
+    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe(knownColors.red);
   });
 
   it('styles match the merged result from globalAppearance and appearance', () => {
@@ -62,7 +61,7 @@ describe('Theme used in sx callback', () => {
       </AppearanceProvider>,
     );
 
-    expect(screen.getByTestId('test')).toHaveStyleRule('background-color', knownColors.red);
+    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe(knownColors.red);
   });
 });
 
@@ -85,7 +84,7 @@ describe('Styles for specific elements', () => {
         />
       </AppearanceProvider>,
     );
-    expect(screen.getByTestId('test')).toHaveStyleRule('background-color', 'yellow');
+    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe('yellow');
   });
 
   it('styles propagate to the correct element specified, including overriding styles when loading state is applied', () => {

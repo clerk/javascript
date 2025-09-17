@@ -1,8 +1,7 @@
 import type { OrganizationInvitationResource } from '@clerk/types';
 import { waitFor } from '@testing-library/dom';
 import React from 'react';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ClerkAPIResponseError } from '../../../../core/resources';
 import { render } from '../../../../vitestUtils';

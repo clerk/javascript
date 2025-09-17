@@ -1,7 +1,6 @@
 import type { SessionWithActivitiesResource } from '@clerk/types';
 import { within } from '@testing-library/dom';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { render, screen, waitFor } from '../../../../vitestUtils';
 import { clearFetchCache } from '../../../hooks';
@@ -358,7 +357,7 @@ describe('SecurityPage', () => {
     devices.forEach(d => {
       const elem = d.parentElement?.parentElement?.parentElement?.parentElement;
       expect(elem).toBeDefined();
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, jest/unbound-method
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const { getByText } = within(elem!);
       getByText(/107.0.0.0/i);
       getByText(/Athens/i);

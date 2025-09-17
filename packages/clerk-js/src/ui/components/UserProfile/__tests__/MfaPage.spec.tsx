@@ -6,12 +6,11 @@ import type {
   VerificationJSON,
 } from '@clerk/types';
 import { act, waitFor } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
-
+import { describe, expect, it, vi } from 'vitest';
 
 import { CardStateProvider } from '@/ui/elements/contexts';
 
-import { render, runFakeTimers, screen } from '../../../../vitestUtils';
+import { render, screen } from '../../../../vitestUtils';
 import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
 import { MfaSection } from '../MfaSection';
 
@@ -179,7 +178,8 @@ describe('MfaPage', () => {
       fixtures.clerk.user?.createTOTP.mockResolvedValue({} as TOTPResource);
       fixtures.clerk.user?.verifyTOTP.mockResolvedValue({} as TOTPResource);
 
-      await runFakeTimers(async timers => {
+      vi.useFakeTimers();
+      try {
         const { getByText, userEvent, getByRole } = render(<MfaSection />, { wrapper });
         await waitFor(() => getByText('Two-step verification'));
 
@@ -196,11 +196,11 @@ describe('MfaPage', () => {
         await userEvent.click(getByRole('button', { name: /continue/i }));
 
         await userEvent.type(screen.getByRole('textbox', { name: /Enter verification code/i }), '123456');
-        timers.runOnlyPendingTimers();
+        vi.runAllTimers();
         await waitFor(() => {
           expect(fixtures.clerk.user?.verifyTOTP).toHaveBeenCalled();
         });
-        timers.runOnlyPendingTimers();
+        vi.runAllTimers();
         await waitFor(() =>
           expect(
             getByText(
@@ -209,7 +209,9 @@ describe('MfaPage', () => {
           ).toBeInTheDocument(),
         );
         await userEvent.click(getByRole('button', { name: /finish/i }));
-      });
+      } finally {
+        vi.useRealTimers();
+      }
     });
   });
 

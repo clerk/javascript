@@ -1,11 +1,10 @@
-import { describe, it, expect } from 'vitest';
-
+import { describe, expect, it, vi } from 'vitest';
 
 import { CardStateProvider } from '@/ui/elements/contexts';
 
 import { fireEvent, render, screen, waitFor } from '../../../../vitestUtils';
-import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
 import { runFakeTimers } from '../../../utils/test/runFakeTimers';
+import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
 import { PasswordSection } from '../PasswordSection';
 
 const { createFixtures } = bindCreateFixtures('UserProfile');
@@ -535,7 +534,8 @@ describe('PasswordSection', () => {
     it('results in error if the password is too small', async () => {
       const { wrapper } = await createFixtures(initConfig);
 
-      await runFakeTimers(async () => {
+      vi.useFakeTimers();
+      try {
         const { userEvent, getByRole } = render(<PasswordSection />, { wrapper });
         await userEvent.click(getByRole('button', { name: /set password/i }));
         await waitFor(() => getByRole('heading', { name: /set password/i }));
@@ -547,13 +547,16 @@ describe('PasswordSection', () => {
         await waitFor(() => {
           screen.getByText(/or more/i);
         });
-      });
+      } finally {
+        vi.useRealTimers();
+      }
     });
 
     it('results in error if the password is too small', async () => {
       const { wrapper } = await createFixtures(initConfig);
 
-      await runFakeTimers(async () => {
+      vi.useFakeTimers();
+      try {
         const { userEvent, getByRole } = render(<PasswordSection />, { wrapper });
         await userEvent.click(getByRole('button', { name: /set password/i }));
         await waitFor(() => getByRole('heading', { name: /set password/i }));
@@ -565,13 +568,16 @@ describe('PasswordSection', () => {
         await waitFor(() => {
           screen.getByText(/or more/i);
         });
-      });
+      } finally {
+        vi.useRealTimers();
+      }
     });
 
     it('results in error if the passwords do not match and persists', async () => {
       const { wrapper } = await createFixtures(initConfig);
 
-      await runFakeTimers(async () => {
+      vi.useFakeTimers();
+      try {
         const { userEvent, getByRole } = render(<PasswordSection />, { wrapper });
         await userEvent.click(getByRole('button', { name: /set password/i }));
         await waitFor(() => getByRole('heading', { name: /set password/i }));
@@ -588,7 +594,9 @@ describe('PasswordSection', () => {
         await waitFor(() => {
           screen.getByText(`Passwords don't match.`);
         });
-      });
+      } finally {
+        vi.useRealTimers();
+      }
     }, 10000);
 
     it(`Displays "Password match" when password match and removes it if they stop`, async () => {

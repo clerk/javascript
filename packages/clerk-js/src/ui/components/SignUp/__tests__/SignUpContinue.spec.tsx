@@ -2,10 +2,9 @@ import { ClerkAPIResponseError } from '@clerk/shared/error';
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
 import { waitFor } from '@testing-library/dom';
 import React from 'react';
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
-
-import { render, runFakeTimers, screen } from '../../../../vitestUtils';
+import { render, screen } from '../../../../vitestUtils';
 import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
 import { SignUpContinue } from '../SignUpContinue';
 
@@ -162,21 +161,24 @@ describe('SignUpContinue', () => {
       }),
     );
 
-    await runFakeTimers(async timers => {
+    vi.useFakeTimers();
+    try {
       const { userEvent } = render(<SignUpContinue />, { wrapper });
       expect(screen.queryByText(/username/i)).toBeInTheDocument();
       await userEvent.type(screen.getByLabelText(/username/i), 'clerkUser');
-      timers.runOnlyPendingTimers();
+      vi.runAllTimers();
       const button = screen.getByText('Continue');
       await userEvent.click(button);
-      timers.runOnlyPendingTimers();
+      vi.runAllTimers();
 
       await waitFor(() => expect(fixtures.signUp.update).toHaveBeenCalled());
-      timers.runOnlyPendingTimers();
+      vi.runAllTimers();
       await waitFor(() =>
         expect(screen.queryByText(/^Your username must be between 4 and 40 characters long./i)).toBeInTheDocument(),
       );
-    });
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('renders error for existing username', async () => {
@@ -202,21 +204,24 @@ describe('SignUpContinue', () => {
       }),
     );
 
-    await runFakeTimers(async timers => {
+    vi.useFakeTimers();
+    try {
       const { userEvent } = render(<SignUpContinue />, { wrapper });
       expect(screen.queryByText(/username/i)).toBeInTheDocument();
       await userEvent.type(screen.getByLabelText(/username/i), 'clerkUser');
-      timers.runOnlyPendingTimers();
+      vi.runAllTimers();
       const button = screen.getByText('Continue');
       await userEvent.click(button);
-      timers.runOnlyPendingTimers();
+      vi.runAllTimers();
 
       await waitFor(() => expect(fixtures.signUp.update).toHaveBeenCalled());
-      timers.runOnlyPendingTimers();
+      vi.runAllTimers();
       await waitFor(() =>
         expect(screen.queryByText(/^This username is taken. Please try another./i)).toBeInTheDocument(),
       );
-    });
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   describe('Sign in Link', () => {

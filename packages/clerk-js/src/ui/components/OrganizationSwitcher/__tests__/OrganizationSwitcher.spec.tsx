@@ -1,7 +1,6 @@
 import type { MembershipRole } from '@clerk/types';
 import { waitFor } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
-
+import { describe, expect, it } from 'vitest';
 
 import { act, render } from '../../../../vitestUtils';
 import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';

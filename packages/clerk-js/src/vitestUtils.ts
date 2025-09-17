@@ -1,17 +1,16 @@
-// eslint-disable-next-line no-restricted-imports
-import { matchers } from '@emotion/jest';
+// import { matchers } from '@emotion/jest';
 import type { RenderOptions } from '@testing-library/react';
 import { render as _render } from '@testing-library/react';
-import UserEvent from '@testing-library/user-event';
-import { afterAll, beforeAll, describe, expect, type SpyInstance, vi } from 'vitest';
+import userEvent from '@testing-library/user-event';
+import { afterAll, beforeAll, describe, type SpyInstance, vi } from 'vitest';
 
-expect.extend(matchers);
+// expect.extend(matchers);
 
 Element.prototype.scrollIntoView = vi.fn();
 
 const render = (ui: React.ReactElement, options?: RenderOptions) => {
-  const userEvent = UserEvent.setup({ delay: null });
-  return { ..._render(ui, { ...options }), userEvent };
+  const user = userEvent.setup({ delay: null });
+  return { ..._render(ui, { ...options }), userEvent: user };
 };
 
 /**
@@ -70,9 +69,19 @@ export const mockWebAuthn = (fn: () => void) => {
   });
 };
 
-export * from './ui/utils/vitest/runFakeTimers';
 export * from './ui/utils/vitest/createFixtures';
-// eslint-disable-next-line import/export
-export * from '@testing-library/react';
-// eslint-disable-next-line import/export
+// Export everything from @testing-library/react except render, then export our custom render
+export {
+  screen,
+  waitFor,
+  fireEvent,
+  act,
+  cleanup,
+  renderHook,
+  type RenderOptions,
+  type RenderHookOptions,
+  type RenderHookResult,
+  type RenderResult,
+} from '@testing-library/react';
+// Export our custom render function that includes userEvent
 export { render };

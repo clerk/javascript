@@ -1,4 +1,4 @@
-// import { jest } from '@jest/globals';
+// import { vi } from 'vitest';
 import type { LoadedClerk } from '@clerk/types';
 import type { ActiveSessionResource } from '@clerk/types';
 import { type Mocked, vi } from 'vitest';
@@ -15,7 +15,7 @@ type DeepVitestMocked<T> = T extends FunctionLike
       }
     : T;
 
-// Removing jest.Mock type for now, relying on inference
+// Removing vi.Mock type for now, relying on inference
 type MockMap<T = any> = {
   [K in { [K in keyof T]: T[K] extends (...args: any[]) => any ? K : never }[keyof T]]?: ReturnType<typeof vi.fn>;
 };

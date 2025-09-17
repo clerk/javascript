@@ -7,8 +7,7 @@ import type {
   TokenResource,
 } from '@clerk/types';
 import { waitFor } from '@testing-library/dom';
-import { describe, it, test, expect, beforeEach, afterEach, beforeAll, afterAll, vi } from 'vitest';
-
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, test, vi } from 'vitest';
 
 import { mockNativeRuntime } from '../../vitestUtils';
 import type { DevBrowser } from '../auth/devBrowser';
@@ -24,7 +23,6 @@ const mockEnvironmentFetch = vi.fn(() => Promise.resolve({}));
 vi.mock('../resources/Client');
 vi.mock('../resources/Environment');
 
-// Because Jest, don't ask me why...
 vi.mock('../auth/devBrowser', () => ({
   createDevBrowser: (): DevBrowser => ({
     clear: vi.fn(),
@@ -75,7 +73,7 @@ describe('Clerk singleton', () => {
   };
 
   let mockWindowLocation;
-  let mockHref: jest.Mock;
+  let mockHref: ReturnType<typeof vi.fn>;
 
   afterAll(() => {
     Object.defineProperty(global.window, 'location', {
@@ -168,7 +166,7 @@ describe('Clerk singleton', () => {
         getToken: vi.fn(),
         lastActiveToken: { getRawString: () => 'mocked-token' },
       };
-      let eventBusSpy: jest.SpyInstance;
+      let eventBusSpy: ReturnType<typeof vi.spyOn>;
 
       beforeEach(() => {
         eventBusSpy = vi.spyOn(eventBus, 'emit');
@@ -397,7 +395,7 @@ describe('Clerk singleton', () => {
           session: mockSession as any as ActiveSessionResource,
           redirectUrl: '/redirect-url-path',
         });
-        const redirectUrl = new URL((sut.navigate as jest.Mock).mock.calls[0]);
+        const redirectUrl = new URL((sut.navigate as ReturnType<typeof vi.fn>).mock.calls[0]);
         expect(redirectUrl.pathname).toEqual('/v1/client/touch');
         expect(redirectUrl.searchParams.get('redirect_url')).toEqual(`${mockWindowLocation.href}/redirect-url-path`);
       });
@@ -1021,7 +1019,7 @@ describe('Clerk singleton', () => {
           }),
         );
 
-        const mockSignUpCreate = jest
+        const mockSignUpCreate = vi
           .fn()
           .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
 
@@ -1079,7 +1077,7 @@ describe('Clerk singleton', () => {
       );
 
       const mockSetActive = vi.fn();
-      const mockSignUpCreate = jest
+      const mockSignUpCreate = vi
         .fn()
         .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
 
@@ -1138,7 +1136,7 @@ describe('Clerk singleton', () => {
       );
 
       const mockSetActive = vi.fn();
-      const mockSignUpCreate = jest
+      const mockSignUpCreate = vi
         .fn()
         .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
 
@@ -1270,7 +1268,7 @@ describe('Clerk singleton', () => {
       );
 
       const mockSetActive = vi.fn();
-      const mockSignInCreate = jest
+      const mockSignInCreate = vi
         .fn()
         .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
 
@@ -1376,7 +1374,7 @@ describe('Clerk singleton', () => {
       );
 
       const mockSetActive = vi.fn();
-      const mockSignUpCreate = jest
+      const mockSignUpCreate = vi
         .fn()
         .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
 

@@ -1,9 +1,8 @@
-import { describe, it, expect, vi } from 'vitest';
-
+import { describe, expect, it, vi } from 'vitest';
 
 import { render, waitFor } from '../../../../vitestUtils';
 import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
-import { createFakeOrganization } from '../../CreateOrganization/__tests__/CreateOrganization.test';
+import { createFakeOrganization } from '../../CreateOrganization/__tests__/CreateOrganization.spec';
 import {
   createFakeUserOrganizationInvitation,
   createFakeUserOrganizationMembership,

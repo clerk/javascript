@@ -1,9 +1,8 @@
 import React from 'react';
-import { describe, it, expect } from 'vitest';
-
+import { describe, expect, it, vi } from 'vitest';
 
 import { EmailLinkError, EmailLinkErrorCodeStatus } from '../../../../core/resources';
-import { render, runFakeTimers, screen, waitFor } from '../../../../vitestUtils';
+import { render, screen, waitFor } from '../../../../vitestUtils';
 import { SignUpEmailLinkFlowComplete } from '../../../common/EmailLinkCompleteFlowCard';
 import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
 
@@ -24,11 +23,14 @@ describe('SignUpEmailLinkFlowComplete', () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withEmailAddress({ required: true });
     });
-    await runFakeTimers(async timers => {
+    vi.useFakeTimers();
+    try {
       render(<SignUpEmailLinkFlowComplete />, { wrapper });
-      timers.runOnlyPendingTimers();
+      vi.runAllTimers();
       await waitFor(() => expect(fixtures.clerk.handleEmailLinkVerification).toHaveBeenCalled());
-    });
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   describe('Success', () => {
@@ -36,12 +38,15 @@ describe('SignUpEmailLinkFlowComplete', () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withEmailAddress({ required: true });
       });
-      await runFakeTimers(async timers => {
+      vi.useFakeTimers();
+      try {
         render(<SignUpEmailLinkFlowComplete />, { wrapper });
-        timers.runOnlyPendingTimers();
+        vi.runAllTimers();
         await waitFor(() => expect(fixtures.clerk.handleEmailLinkVerification).toHaveBeenCalled());
         screen.getByText(/success/i);
-      });
+      } finally {
+        vi.useRealTimers();
+      }
     });
   });
 
@@ -56,12 +61,15 @@ describe('SignUpEmailLinkFlowComplete', () => {
         }),
       );
 
-      await runFakeTimers(async timers => {
+      vi.useFakeTimers();
+      try {
         render(<SignUpEmailLinkFlowComplete />, { wrapper });
-        timers.runOnlyPendingTimers();
+        vi.runAllTimers();
         await waitFor(() => expect(fixtures.clerk.handleEmailLinkVerification).toHaveBeenCalled());
         screen.getByText(/expired/i);
-      });
+      } finally {
+        vi.useRealTimers();
+      }
     });
 
     it('shows the failed error message when the appropriate error is thrown', async () => {
@@ -73,12 +81,15 @@ describe('SignUpEmailLinkFlowComplete', () => {
           throw new EmailLinkError(EmailLinkErrorCodeStatus.Failed);
         }),
       );
-      await runFakeTimers(async timers => {
+      vi.useFakeTimers();
+      try {
         render(<SignUpEmailLinkFlowComplete />, { wrapper });
-        timers.runOnlyPendingTimers();
+        vi.runAllTimers();
         await waitFor(() => expect(fixtures.clerk.handleEmailLinkVerification).toHaveBeenCalled());
         screen.getByText(/invalid/i);
-      });
+      } finally {
+        vi.useRealTimers();
+      }
     });
   });
 });

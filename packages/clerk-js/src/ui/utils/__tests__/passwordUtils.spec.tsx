@@ -1,10 +1,10 @@
+import { describe, expect, it } from 'vitest';
+
 import { renderHook } from '../../../vitestUtils';
 import { OptionsProvider } from '../../contexts';
 import { useLocalizations } from '../../customizables';
 import { createPasswordError } from '../passwordUtils';
 import { bindCreateFixtures } from '../vitest/createFixtures';
-import { describe, it, expect } from 'vitest';
-
 
 const { createFixtures } = bindCreateFixtures('SignIn');
 

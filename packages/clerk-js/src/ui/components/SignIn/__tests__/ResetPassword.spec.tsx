@@ -1,10 +1,8 @@
 import type { SignInResource } from '@clerk/types';
-import { describe, it, expect } from 'vitest';
-
+import { describe, expect, it, vi } from 'vitest';
 
 import { fireEvent, render, screen, waitFor } from '../../../../vitestUtils';
 import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
-import { runFakeTimers } from '../../../utils/test/runFakeTimers';
 import { ResetPassword } from '../ResetPassword';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
@@ -33,7 +31,8 @@ describe('ResetPassword', () => {
       }),
     );
 
-    await runFakeTimers(async () => {
+    vi.useFakeTimers();
+    try {
       render(<ResetPassword />, { wrapper });
       screen.getByRole('heading', { name: /Set new password/i });
 
@@ -42,7 +41,9 @@ describe('ResetPassword', () => {
       await waitFor(() => {
         screen.getByText(/Your password must contain 8 or more characters/i);
       });
-    });
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('renders a hidden identifier field', async () => {
@@ -115,7 +116,8 @@ describe('ResetPassword', () => {
     it('results in error if the passwords do not match and persists', async () => {
       const { wrapper } = await createFixtures();
 
-      await runFakeTimers(async () => {
+      vi.useFakeTimers();
+      try {
         const { userEvent } = render(<ResetPassword />, { wrapper });
 
         await userEvent.type(screen.getByLabelText(/new password/i), 'testewrewr');
@@ -129,7 +131,9 @@ describe('ResetPassword', () => {
         await waitFor(() => {
           expect(screen.getByText(`Passwords don't match.`)).toBeInTheDocument();
         });
-      });
+      } finally {
+        vi.useRealTimers();
+      }
     }, 10000);
 
     it('navigates to the root page upon pressing the back link', async () => {

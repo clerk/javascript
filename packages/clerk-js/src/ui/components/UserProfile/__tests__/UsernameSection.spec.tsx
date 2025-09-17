@@ -1,7 +1,6 @@
 import type { UserResource } from '@clerk/types';
 import React from 'react';
-import { describe, it, expect } from 'vitest';
-
+import { describe, expect, it } from 'vitest';
 
 import { render, screen, waitFor } from '../../../../vitestUtils';
 import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';

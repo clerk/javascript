@@ -3,7 +3,6 @@ import { render } from '../../../vitestUtils';
 import React from 'react';
 import { describe, it, expect } from 'vitest';
 
-
 import { Box, useAppearance } from '..';
 import { AppearanceProvider } from '../AppearanceContext';
 import { renderHook } from '@testing-library/react';

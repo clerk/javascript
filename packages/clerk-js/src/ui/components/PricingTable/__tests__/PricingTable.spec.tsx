@@ -1,8 +1,8 @@
+import { describe, expect, it, vi } from 'vitest';
+
 import { render, waitFor } from '../../../../vitestUtils';
 import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
 import { PricingTable } from '..';
-import { describe, it, expect, vi } from 'vitest';
-
 
 const { createFixtures } = bindCreateFixtures('PricingTable');
 

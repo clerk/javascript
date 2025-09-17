@@ -1,7 +1,6 @@
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
 import { renderHook } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
-
+import { describe, expect, it } from 'vitest';
 
 import { bindCreateFixtures } from '../../../vitestUtils';
 import { useEnabledThirdPartyProviders } from '../useEnabledThirdPartyProviders';

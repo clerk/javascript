@@ -1,7 +1,6 @@
 import type { ExternalAccountResource } from '@clerk/types';
 import { act, waitFor } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
-
+import { describe, expect, it } from 'vitest';
 
 import { render, screen } from '../../../../vitestUtils';
 import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';

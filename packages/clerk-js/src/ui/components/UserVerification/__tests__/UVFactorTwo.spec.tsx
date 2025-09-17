@@ -1,8 +1,7 @@
 import { waitFor } from '@testing-library/react';
-import { describe, it, expect, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-
-import { render, runFakeTimers } from '../../../../vitestUtils';
+import { render } from '../../../../vitestUtils';
 import { clearFetchCache } from '../../../hooks';
 import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
 import { UserVerificationFactorTwo } from '../UserVerificationFactorTwo';
@@ -121,17 +120,20 @@ describe('UserVerificationFactorTwo', () => {
         },
       });
 
-      await runFakeTimers(async timers => {
+      vi.useFakeTimers();
+      try {
         const { userEvent, getByLabelText, getByText } = render(<UserVerificationFactorTwo />, { wrapper });
 
         await waitFor(() => getByText('Verification required'));
 
         await userEvent.type(getByLabelText(/Enter verification code/i), '123456');
-        timers.runOnlyPendingTimers();
+        vi.runAllTimers();
         await waitFor(() => {
           expect(fixtures.clerk.setActive).toHaveBeenCalled();
         });
-      });
+      } finally {
+        vi.useRealTimers();
+      }
     });
   });
 

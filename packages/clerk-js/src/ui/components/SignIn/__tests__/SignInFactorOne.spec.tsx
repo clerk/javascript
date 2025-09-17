@@ -1,13 +1,11 @@
 import { parseError } from '@clerk/shared/error';
 import type { SignInResource } from '@clerk/types';
 import { waitFor } from '@testing-library/dom';
-import { describe, it, expect, vi } from 'vitest';
-
+import { describe, expect, it, vi } from 'vitest';
 
 import { ClerkAPIResponseError } from '../../../../core/resources';
 import { act, mockWebAuthn, render, screen } from '../../../../vitestUtils';
 import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
-import { runFakeTimers } from '../../../utils/test/runFakeTimers';
 import { SignInFactorOne } from '../SignInFactorOne';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
@@ -84,13 +82,13 @@ describe('SignInFactorOne', () => {
       fixtures.signIn.attemptFirstFactor.mockReturnValueOnce(
         Promise.resolve({ status: 'needs_second_factor' } as SignInResource),
       );
-      await runFakeTimers(async timers => {
-        const { userEvent } = render(<SignInFactorOne />, { wrapper });
+      const { userEvent } = render(<SignInFactorOne />, { wrapper });
 
-        await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
-        timers.runOnlyPendingTimers();
-        await waitFor(() => expect(fixtures.router.navigate).toHaveBeenCalledWith('../factor-two'));
+      await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
+      await act(() => {
+        vi.runOnlyPendingTimers();
       });
+      await waitFor(() => expect(fixtures.router.navigate).toHaveBeenCalledWith('../factor-two'));
     });
 
     it('sets an active session when user submits first factor successfully and second factor does not exist', async () => {
@@ -101,14 +99,14 @@ describe('SignInFactorOne', () => {
       });
       fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
       fixtures.signIn.attemptFirstFactor.mockReturnValueOnce(Promise.resolve({ status: 'complete' } as SignInResource));
-      await runFakeTimers(async timers => {
-        const { userEvent } = render(<SignInFactorOne />, { wrapper });
+      const { userEvent } = render(<SignInFactorOne />, { wrapper });
 
-        await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
-        timers.runOnlyPendingTimers();
-        await waitFor(() => {
-          expect(fixtures.clerk.setActive).toHaveBeenCalled();
-        });
+      await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
+      await act(() => {
+        vi.runOnlyPendingTimers();
+      });
+      await waitFor(() => {
+        expect(fixtures.clerk.setActive).toHaveBeenCalled();
       });
     });
   });
@@ -189,12 +187,10 @@ describe('SignInFactorOne', () => {
             status: 422,
           }),
         );
-        await runFakeTimers(async () => {
-          const { userEvent } = render(<SignInFactorOne />, { wrapper });
-          await userEvent.type(screen.getByLabelText('Password'), '123456');
-          await userEvent.click(screen.getByText('Continue'));
-          await waitFor(() => expect(screen.getByText('Incorrect Password')).toBeDefined());
-        });
+        const { userEvent } = render(<SignInFactorOne />, { wrapper });
+        await userEvent.type(screen.getByLabelText('Password'), '123456');
+        await userEvent.click(screen.getByText('Continue'));
+        await waitFor(() => expect(screen.getByText('Incorrect Password')).toBeDefined());
       });
 
       it('redirects back to sign-in if the user is locked', async () => {
@@ -219,13 +215,11 @@ describe('SignInFactorOne', () => {
             status: 422,
           }),
         );
-        await runFakeTimers(async () => {
-          const { userEvent } = render(<SignInFactorOne />, { wrapper });
-          await userEvent.type(screen.getByLabelText('Password'), '123456');
-          await userEvent.click(screen.getByText('Continue'));
-          await waitFor(() => {
-            expect(fixtures.clerk.__internal_navigateWithError).toHaveBeenCalledWith('..', parseError(errJSON));
-          });
+        const { userEvent } = render(<SignInFactorOne />, { wrapper });
+        await userEvent.type(screen.getByLabelText('Password'), '123456');
+        await userEvent.click(screen.getByText('Continue'));
+        await waitFor(() => {
+          expect(fixtures.clerk.__internal_navigateWithError).toHaveBeenCalledWith('..', parseError(errJSON));
         });
       });
 
@@ -257,22 +251,20 @@ describe('SignInFactorOne', () => {
           }),
         );
 
-        await runFakeTimers(async () => {
-          const { userEvent } = render(<SignInFactorOne />, { wrapper });
-          await userEvent.type(screen.getByLabelText('Password'), '123456');
-          await userEvent.click(screen.getByText('Continue'));
+        const { userEvent } = render(<SignInFactorOne />, { wrapper });
+        await userEvent.type(screen.getByLabelText('Password'), '123456');
+        await userEvent.click(screen.getByText('Continue'));
 
-          await waitFor(() => {
-            screen.getByText('Password compromised');
-            screen.getByText(
-              'This password has been found as part of a breach and can not be used, please reset your password.',
-            );
-            screen.getByText('Or, sign in with another method');
-          });
-
-          await userEvent.click(screen.getByText('Reset your password'));
-          screen.getByText('First, enter the code sent to your email address');
+        await waitFor(() => {
+          screen.getByText('Password compromised');
+          screen.getByText(
+            'This password has been found as part of a breach and can not be used, please reset your password.',
+          );
+          screen.getByText('Or, sign in with another method');
         });
+
+        await userEvent.click(screen.getByText('Reset your password'));
+        screen.getByText('First, enter the code sent to your email address');
       });
 
       it('Prompts the user to reset their password via phone if it has been pwned', async () => {
@@ -303,22 +295,20 @@ describe('SignInFactorOne', () => {
           }),
         );
 
-        await runFakeTimers(async () => {
-          const { userEvent } = render(<SignInFactorOne />, { wrapper });
-          await userEvent.type(screen.getByLabelText('Password'), '123456');
-          await userEvent.click(screen.getByText('Continue'));
+        const { userEvent } = render(<SignInFactorOne />, { wrapper });
+        await userEvent.type(screen.getByLabelText('Password'), '123456');
+        await userEvent.click(screen.getByText('Continue'));
 
-          await waitFor(() => {
-            screen.getByText('Password compromised');
-            screen.getByText(
-              'This password has been found as part of a breach and can not be used, please reset your password.',
-            );
-            screen.getByText('Or, sign in with another method');
-          });
-
-          await userEvent.click(screen.getByText('Reset your password'));
-          screen.getByText('First, enter the code sent to your phone');
+        await waitFor(() => {
+          screen.getByText('Password compromised');
+          screen.getByText(
+            'This password has been found as part of a breach and can not be used, please reset your password.',
+          );
+          screen.getByText('Or, sign in with another method');
         });
+
+        await userEvent.click(screen.getByText('Reset your password'));
+        screen.getByText('First, enter the code sent to your phone');
       });
 
       it('entering a pwned password, then going back and clicking forgot password should result in the correct title', async () => {
@@ -349,31 +339,29 @@ describe('SignInFactorOne', () => {
           }),
         );
 
-        await runFakeTimers(async () => {
-          const { userEvent } = render(<SignInFactorOne />, { wrapper });
-          await userEvent.type(screen.getByLabelText('Password'), '123456');
-          await userEvent.click(screen.getByText('Continue'));
+        const { userEvent } = render(<SignInFactorOne />, { wrapper });
+        await userEvent.type(screen.getByLabelText('Password'), '123456');
+        await userEvent.click(screen.getByText('Continue'));
 
-          await waitFor(() => {
-            screen.getByText('Password compromised');
-            screen.getByText(
-              'This password has been found as part of a breach and can not be used, please reset your password.',
-            );
-            screen.getByText('Or, sign in with another method');
-          });
-
-          // Go back
-          await userEvent.click(screen.getByText('Back'));
-
-          // Choose to reset password via "Forgot password" instead
-          await userEvent.click(screen.getByText(/Forgot password/i));
-          screen.getByText('Forgot Password?');
-          expect(
-            screen.queryByText(
-              'This password has been found as part of a breach and can not be used, please reset your password.',
-            ),
-          ).not.toBeInTheDocument();
+        await waitFor(() => {
+          screen.getByText('Password compromised');
+          screen.getByText(
+            'This password has been found as part of a breach and can not be used, please reset your password.',
+          );
+          screen.getByText('Or, sign in with another method');
         });
+
+        // Go back
+        await userEvent.click(screen.getByText('Back'));
+
+        // Choose to reset password via "Forgot password" instead
+        await userEvent.click(screen.getByText(/Forgot password/i));
+        screen.getByText('Forgot Password?');
+        expect(
+          screen.queryByText(
+            'This password has been found as part of a breach and can not be used, please reset your password.',
+          ),
+        ).not.toBeInTheDocument();
       });
     });
 
@@ -580,11 +568,9 @@ describe('SignInFactorOne', () => {
             status: 422,
           }),
         );
-        await runFakeTimers(async () => {
-          const { userEvent } = render(<SignInFactorOne />, { wrapper });
-          await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
-          await waitFor(() => expect(screen.getByText('Incorrect code')).toBeDefined());
-        });
+        const { userEvent } = render(<SignInFactorOne />, { wrapper });
+        await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
+        await waitFor(() => expect(screen.getByText('Incorrect code')).toBeDefined());
       });
 
       it('redirects back to sign-in if the user is locked', async () => {
@@ -609,11 +595,9 @@ describe('SignInFactorOne', () => {
           }),
         );
 
-        await runFakeTimers(async () => {
-          const { userEvent } = render(<SignInFactorOne />, { wrapper });
-          await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
-          expect(fixtures.clerk.__internal_navigateWithError).toHaveBeenCalledWith('..', parseError(errJSON));
-        });
+        const { userEvent } = render(<SignInFactorOne />, { wrapper });
+        await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
+        expect(fixtures.clerk.__internal_navigateWithError).toHaveBeenCalledWith('..', parseError(errJSON));
       });
     });
 
@@ -689,11 +673,9 @@ describe('SignInFactorOne', () => {
             status: 422,
           }),
         );
-        await runFakeTimers(async () => {
-          const { userEvent } = render(<SignInFactorOne />, { wrapper });
-          await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
-          await waitFor(() => expect(screen.getByText('Incorrect phone code')).toBeDefined());
-        });
+        const { userEvent } = render(<SignInFactorOne />, { wrapper });
+        await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
+        await waitFor(() => expect(screen.getByText('Incorrect phone code')).toBeDefined());
       });
 
       it('redirects back to sign-in if the user is locked', async () => {
@@ -717,12 +699,10 @@ describe('SignInFactorOne', () => {
           }),
         );
 
-        await runFakeTimers(async () => {
-          const { userEvent } = render(<SignInFactorOne />, { wrapper });
-          await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
-          await waitFor(() => {
-            expect(fixtures.clerk.__internal_navigateWithError).toHaveBeenCalledWith('..', parseError(errJSON));
-          });
+        const { userEvent } = render(<SignInFactorOne />, { wrapper });
+        await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
+        await waitFor(() => {
+          expect(fixtures.clerk.__internal_navigateWithError).toHaveBeenCalledWith('..', parseError(errJSON));
         });
       });
     });

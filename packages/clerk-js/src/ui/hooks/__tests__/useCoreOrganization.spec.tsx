@@ -1,6 +1,5 @@
 import { useOrganization } from '@clerk/shared/react';
-import { describe, it, expect } from 'vitest';
-
+import { describe, expect, it } from 'vitest';
 
 import { act, renderHook, waitFor } from '../../../vitestUtils';
 import {

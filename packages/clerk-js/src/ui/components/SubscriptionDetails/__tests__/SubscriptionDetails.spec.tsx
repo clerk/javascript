@@ -1,6 +1,6 @@
-import { Drawer } from '@/ui/elements/Drawer';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
+import { Drawer } from '@/ui/elements/Drawer';
 
 import { render, waitFor } from '../../../../vitestUtils';
 import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';

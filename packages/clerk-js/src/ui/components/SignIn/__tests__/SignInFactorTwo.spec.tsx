@@ -1,12 +1,10 @@
 import { parseError } from '@clerk/shared/error';
 import type { SignInResource } from '@clerk/types';
-import { describe, it, expect, vi } from 'vitest';
-
+import { describe, expect, it, vi } from 'vitest';
 
 import { ClerkAPIResponseError } from '../../../../core/resources';
 import { render, screen, waitFor } from '../../../../vitestUtils';
 import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
-import { runFakeTimers } from '../../../utils/test/runFakeTimers';
 import { SignInFactorTwo } from '../SignInFactorTwo';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
@@ -59,15 +57,18 @@ describe('SignInFactorTwo', () => {
       fixtures.signIn.attemptSecondFactor.mockReturnValueOnce(
         Promise.resolve({ status: 'complete' } as SignInResource),
       );
-      await runFakeTimers(async timers => {
+      vi.useFakeTimers();
+      try {
         const { userEvent } = render(<SignInFactorTwo />, { wrapper });
 
         await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
-        timers.runOnlyPendingTimers();
+        vi.runOnlyPendingTimers();
         await waitFor(() => {
           expect(fixtures.clerk.setActive).toHaveBeenCalled();
         });
-      });
+      } finally {
+        vi.useRealTimers();
+      }
     });
 
     it('redirects to reset-password-success after second factor successfully', async () => {
@@ -126,16 +127,19 @@ describe('SignInFactorTwo', () => {
           f.startSignInFactorTwo({ identifier: '+3012345567890', supportPhoneCode: true, supportTotp: false });
         });
 
-        runFakeTimers(timers => {
+        vi.useFakeTimers();
+        try {
           fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
           const { getByText } = render(<SignInFactorTwo />, { wrapper });
           expect(getByText(/Resend/, { exact: false }).closest('button')).toHaveAttribute('disabled');
-          timers.advanceTimersByTime(15000);
+          vi.advanceTimersByTime(15000);
           expect(getByText(/Resend/, { exact: false }).closest('button')).toHaveAttribute('disabled');
           getByText('(15)', { exact: false });
-          timers.advanceTimersByTime(15000);
+          vi.advanceTimersByTime(15000);
           expect(getByText(/Resend/, { exact: false }).closest('button')).not.toHaveAttribute('disabled');
-        });
+        } finally {
+          vi.useRealTimers();
+        }
       });
 
       it('disables again the resend code button after clicking it', async () => {
@@ -148,15 +152,18 @@ describe('SignInFactorTwo', () => {
         });
         fixtures.signIn.prepareSecondFactor.mockReturnValue(Promise.resolve({} as SignInResource));
 
-        await runFakeTimers(async timers => {
+        vi.useFakeTimers();
+        try {
           const { getByText, userEvent } = render(<SignInFactorTwo />, { wrapper });
           expect(getByText(/Resend/, { exact: false }).closest('button')).toHaveAttribute('disabled');
-          timers.advanceTimersByTime(30000);
+          vi.advanceTimersByTime(30000);
           expect(getByText(/Resend/).closest('button')).not.toHaveAttribute('disabled');
           await userEvent.click(getByText(/Resend/));
-          timers.advanceTimersByTime(1000);
+          vi.advanceTimersByTime(1000);
           expect(getByText(/Resend/, { exact: false }).closest('button')).toHaveAttribute('disabled');
-        });
+        } finally {
+          vi.useRealTimers();
+        }
       });
 
       it('auto submits when typing all the 6 digits of the code', async () => {
@@ -198,11 +205,14 @@ describe('SignInFactorTwo', () => {
             status: 422,
           }),
         );
-        await runFakeTimers(async () => {
+        vi.useFakeTimers();
+        try {
           const { userEvent } = render(<SignInFactorTwo />, { wrapper });
           await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
           await waitFor(() => expect(screen.getByText('Incorrect phone code')).toBeDefined());
-        });
+        } finally {
+          vi.useRealTimers();
+        }
       }, 10000);
 
       it('redirects back to sign-in if the user is locked', async () => {
@@ -228,11 +238,14 @@ describe('SignInFactorTwo', () => {
           }),
         );
 
-        await runFakeTimers(async () => {
+        vi.useFakeTimers();
+        try {
           const { userEvent } = render(<SignInFactorTwo />, { wrapper });
           await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
           expect(fixtures.clerk.__internal_navigateWithError).toHaveBeenCalledWith('..', parseError(errJSON));
-        });
+        } finally {
+          vi.useRealTimers();
+        }
       });
     });
 
@@ -287,11 +300,14 @@ describe('SignInFactorTwo', () => {
             status: 422,
           }),
         );
-        await runFakeTimers(async () => {
+        vi.useFakeTimers();
+        try {
           const { userEvent } = render(<SignInFactorTwo />, { wrapper });
           await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
           await waitFor(() => expect(screen.getByText('Incorrect authenticator code')).toBeDefined());
-        });
+        } finally {
+          vi.useRealTimers();
+        }
       }, 10000);
     });
 
@@ -377,12 +393,15 @@ describe('SignInFactorTwo', () => {
             status: 422,
           }),
         );
-        await runFakeTimers(async () => {
+        vi.useFakeTimers();
+        try {
           const { userEvent, getByLabelText, getByText } = render(<SignInFactorTwo />, { wrapper });
           await userEvent.type(getByLabelText('Backup code'), '123456');
           await userEvent.click(getByText('Continue'));
           await waitFor(() => expect(screen.getByText('Incorrect backup code')).toBeDefined());
-        });
+        } finally {
+          vi.useRealTimers();
+        }
       }, 10000);
 
       it('redirects back to sign-in if the user is locked', async () => {
@@ -411,14 +430,17 @@ describe('SignInFactorTwo', () => {
           }),
         );
 
-        await runFakeTimers(async () => {
+        vi.useFakeTimers();
+        try {
           const { userEvent, getByLabelText, getByText } = render(<SignInFactorTwo />, { wrapper });
           await userEvent.type(getByLabelText('Backup code'), '123456');
           await userEvent.click(getByText('Continue'));
           await waitFor(() => {
             expect(fixtures.clerk.__internal_navigateWithError).toHaveBeenCalledWith('..', parseError(errJSON));
           });
-        });
+        } finally {
+          vi.useRealTimers();
+        }
       });
     });
   });

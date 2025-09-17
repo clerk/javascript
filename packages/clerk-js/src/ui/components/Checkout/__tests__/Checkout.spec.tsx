@@ -1,6 +1,6 @@
-import { Drawer } from '@/ui/elements/Drawer';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
+import { Drawer } from '@/ui/elements/Drawer';
 
 import { render, waitFor } from '../../../../vitestUtils';
 import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
@@ -9,8 +9,8 @@ import { Checkout } from '..';
 const { createFixtures } = bindCreateFixtures('Checkout');
 
 // Mock Payment Element to be ready so the submit button is rendered during tests
-vi.mock('@clerk/shared/react', () => {
-  const actual = jest.requireActual('@clerk/shared/react');
+vi.mock('@clerk/shared/react', async importOriginal => {
+  const actual = await importOriginal();
   return {
     ...actual,
     __experimental_PaymentElementProvider: ({ children }: { children: any }) => children,
