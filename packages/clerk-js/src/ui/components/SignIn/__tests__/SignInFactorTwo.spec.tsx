@@ -138,7 +138,7 @@ describe('SignInFactorTwo', () => {
         });
         fixtures.signIn.prepareSecondFactor.mockReturnValue(Promise.resolve({} as SignInResource));
 
-        const { getByText, userEvent } = render(<SignInFactorTwo />, { wrapper });
+        const { getByText } = render(<SignInFactorTwo />, { wrapper });
         expect(getByText(/Resend/, { exact: false }).closest('button')).toHaveAttribute('disabled');
         // Note: Timer functionality and button state changes are tested in the TimerButton component itself
         // This test verifies the initial disabled state is correct

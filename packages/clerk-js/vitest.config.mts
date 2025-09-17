@@ -5,7 +5,7 @@ import { defineConfig } from 'vitest/config';
 function viteSvgMockPlugin() {
   return {
     name: 'svg-mock',
-    transform(code: string, id: string) {
+    transform(_code: string, id: string) {
       if (id.endsWith('.svg') && process.env.NODE_ENV === 'test') {
         return {
           code: `
@@ -17,6 +17,7 @@ function viteSvgMockPlugin() {
           map: null,
         };
       }
+      return undefined;
     },
   };
 }

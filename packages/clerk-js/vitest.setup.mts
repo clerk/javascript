@@ -92,7 +92,7 @@ if (typeof window !== 'undefined') {
   };
 
   // Mock HTMLCanvasElement.prototype.getContext to prevent errors
-  HTMLCanvasElement.prototype.getContext = vi.fn().mockImplementation(((contextType: string) => {
+  HTMLCanvasElement.prototype.getContext = vi.fn().mockImplementation((contextType: string) => {
     if (contextType === '2d') {
       return {
         fillRect: vi.fn(),
@@ -103,7 +103,7 @@ if (typeof window !== 'undefined') {
       return {} as unknown as WebGLRenderingContext;
     }
     return null;
-  }) as any) as ReturnType<typeof vi.fn>;
+  });
 
   // Mock Element.prototype.animate for auto-animate library
   Element.prototype.animate = vi.fn().mockImplementation(() => ({
