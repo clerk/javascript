@@ -1,5 +1,14 @@
 # Change Log
 
+## 2.4.20
+
+### Patch Changes
+
+- Improve return type of createTheme ([#6778](https://github.com/clerk/javascript/pull/6778)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`bcf24f2`](https://github.com/clerk/javascript/commit/bcf24f2f91913fa0dd3fbf02b3bbef345c4e1ea9), [`de90ede`](https://github.com/clerk/javascript/commit/de90ede82664b58bef9e294498384cf2c99a331e), [`9d4a95c`](https://github.com/clerk/javascript/commit/9d4a95c766396a0bc327fbf0560228bedb4828eb)]:
+  - @clerk/types@4.87.0
+
 ## 2.4.19
 
 ### Patch Changes

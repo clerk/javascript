@@ -1,5 +1,36 @@
 # Change Log
 
+## 5.94.0
+
+### Minor Changes
+
+- [Experimental] Signal email link support ([#6766](https://github.com/clerk/javascript/pull/6766)) by [@dstaley](https://github.com/dstaley)
+
+- Add retry attempt tracking to FAPI client GET requests ([#6777](https://github.com/clerk/javascript/pull/6777)) by [@jacekradko](https://github.com/jacekradko)
+
+  The FAPI client now adds a `_clerk_retry_attempt` query parameter to retry attempts for GET requests, allowing servers to track and handle retry scenarios appropriately. This parameter is only added during retry attempts, not on the initial request.
+
+- [Billing Beta] Remove deprecated `subscription` attribute from Billing ([#6788](https://github.com/clerk/javascript/pull/6788)) by [@mauricioabreu](https://github.com/mauricioabreu)
+
+### Patch Changes
+
+- Fix ArrowButtonBlock truncation within payment sources ([#6764](https://github.com/clerk/javascript/pull/6764)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Hide flows inside UserProfile and OrganizationProfile that depend on Stripe.js when remotely hosted code is not permitted. ([#6754](https://github.com/clerk/javascript/pull/6754)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add support for canceling past due subscriptions ([#6783](https://github.com/clerk/javascript/pull/6783)) by [@aeliox](https://github.com/aeliox)
+
+- Hide payment methods from checkout if the new subscription does not result in an immediate change to the end user's plan. ([#6786](https://github.com/clerk/javascript/pull/6786)) by [@panteliselef](https://github.com/panteliselef)
+
+- Bug fix that allowed `useStatements()`, `usePaymentMethods()` and `usePaymentAttempts()` to fire a request when the billing feature was turned off for the instance. ([#6785](https://github.com/clerk/javascript/pull/6785)) by [@panteliselef](https://github.com/panteliselef)
+
+- Performance improvements for `<Checkout />`. ([#6765](https://github.com/clerk/javascript/pull/6765)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`bcf24f2`](https://github.com/clerk/javascript/commit/bcf24f2f91913fa0dd3fbf02b3bbef345c4e1ea9), [`f7c6b49`](https://github.com/clerk/javascript/commit/f7c6b49cfe5edc7c381fead3a055ddae097dd4b5), [`f070459`](https://github.com/clerk/javascript/commit/f070459a835a47142ee247d6450178779eba0ae6), [`1ceedad`](https://github.com/clerk/javascript/commit/1ceedad4bc5bc3d5f01c95185f82ff0f43983cf5), [`de90ede`](https://github.com/clerk/javascript/commit/de90ede82664b58bef9e294498384cf2c99a331e), [`9d4a95c`](https://github.com/clerk/javascript/commit/9d4a95c766396a0bc327fbf0560228bedb4828eb), [`428cd57`](https://github.com/clerk/javascript/commit/428cd57a8581a58a6a42325ec50eb98000068e97), [`9eac18f`](https://github.com/clerk/javascript/commit/9eac18f0dd59ec5e5ad8c5cb200aa592b24abb58)]:
+  - @clerk/types@4.87.0
+  - @clerk/localizations@3.25.2
+  - @clerk/shared@3.26.0
+
 ## 5.93.0
 
 ### Minor Changes
