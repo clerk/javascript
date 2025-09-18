@@ -6,7 +6,9 @@ import type { Route } from './+types/root';
 // TODO: Uncomment when published
 // export const middleware: Route.MiddlewareFunction[] = [clerkMiddleware()];
 
-export const loader = (args: Route.LoaderArgs) => rootAuthLoader(args);
+export async function loader(args: Route.LoaderArgs) {
+  return rootAuthLoader(args);
+}
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
