@@ -915,8 +915,8 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async ticket(params: SignInFutureTicketParams = {}): Promise<{ error: unknown }> {
-    const ticket = params.ticket ?? getClerkQueryParam('__clerk_ticket');
+  async ticket(params?: SignInFutureTicketParams): Promise<{ error: unknown }> {
+    const ticket = params?.ticket ?? getClerkQueryParam('__clerk_ticket');
     return this.create({ ticket: ticket ?? undefined });
   }
 

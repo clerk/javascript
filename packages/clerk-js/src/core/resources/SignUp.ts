@@ -775,8 +775,8 @@ class SignUpFuture implements SignUpFutureResource {
     });
   }
 
-  async ticket(params: SignUpFutureTicketParams = {}): Promise<{ error: unknown }> {
-    const ticket = params.ticket ?? getClerkQueryParam('__clerk_ticket');
+  async ticket(params?: SignUpFutureTicketParams): Promise<{ error: unknown }> {
+    const ticket = params?.ticket ?? getClerkQueryParam('__clerk_ticket');
     return this.create({ ticket: ticket ?? undefined });
   }
 
