@@ -59,6 +59,7 @@ exports[`Typedoc output > should have a deliberate file structure 1`] = `
   "types/confirm-checkout-params.mdx",
   "types/create-checkout-params.mdx",
   "types/create-organization-params.mdx",
+  "types/deleted-object-resource.mdx",
   "types/element-object-key.mdx",
   "types/elements-config.mdx",
   "types/errors.mdx",
