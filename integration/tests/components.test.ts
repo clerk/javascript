@@ -42,6 +42,12 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('component
       fallback: 'Loading user profile',
     },
     {
+      name: 'UserAvatar',
+      path: '/user-avatar',
+      protected: true,
+      fallback: 'Loading user avatar',
+    },
+    {
       name: 'UserButton',
       path: '/user-button',
       protected: true,

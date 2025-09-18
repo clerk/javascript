@@ -15,6 +15,7 @@ import type {
   SignUpTheme,
   SubscriptionDetailsTheme,
   TaskChooseOrganizationTheme,
+  UserAvatarTheme,
   UserButtonTheme,
   UserProfileTheme,
   UserVerificationTheme,
@@ -406,6 +407,21 @@ export interface Clerk {
    * @param targetNode Target node to unmount the SignUp component from.
    */
   unmountSignUp: (targetNode: HTMLDivElement) => void;
+
+  /**
+   * Mount a user avatar component at the target element.
+   *
+   * @param targetNode Target node to mount the UserButton component.
+   */
+  mountUserAvatar: (targetNode: HTMLDivElement, userAvatarProps?: UserAvatarProps) => void;
+
+  /**
+   * Unmount a user avatar component at the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @param targetNode Target node to unmount the UserAvatar component from.
+   */
+  unmountUserAvatar: (targetNode: HTMLDivElement) => void;
 
   /**
    * Mount a user button component at the target element.
@@ -1621,6 +1637,11 @@ export type UserButtonProps = UserButtonProfileMode & {
    * Provide custom menu actions and links to be rendered inside the UserButton.
    */
   customMenuItems?: CustomMenuItem[];
+};
+
+export type UserAvatarProps = {
+  appearance?: UserAvatarTheme;
+  rounded?: boolean;
 };
 
 type PrimitiveKeys<T> = {

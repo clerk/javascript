@@ -48,6 +48,7 @@ import type {
   TaskChooseOrganizationProps,
   TasksRedirectOptions,
   UnsubscribeCallback,
+  UserAvatarProps,
   UserButtonProps,
   UserProfileProps,
   WaitlistProps,
@@ -132,6 +133,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private preOpenWaitlist?: null | WaitlistProps = null;
   private premountSignInNodes = new Map<HTMLDivElement, SignInProps | undefined>();
   private premountSignUpNodes = new Map<HTMLDivElement, SignUpProps | undefined>();
+  private premountUserAvatarNodes = new Map<HTMLDivElement, UserAvatarProps | undefined>();
   private premountUserProfileNodes = new Map<HTMLDivElement, UserProfileProps | undefined>();
   private premountUserButtonNodes = new Map<HTMLDivElement, UserButtonProps | undefined>();
   private premountOrganizationProfileNodes = new Map<HTMLDivElement, OrganizationProfileProps | undefined>();
@@ -970,6 +972,22 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.clerkjs.unmountSignUp(node);
     } else {
       this.premountSignUpNodes.delete(node);
+    }
+  };
+
+  mountUserAvatar = (node: HTMLDivElement, props?: UserAvatarProps) => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.mountUserAvatar(node, props);
+    } else {
+      this.premountUserAvatarNodes.set(node, props);
+    }
+  };
+
+  unmountUserAvatar = (node: HTMLDivElement) => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.unmountUserAvatar(node);
+    } else {
+      this.premountUserAvatarNodes.delete(node);
     }
   };
 
