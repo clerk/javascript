@@ -123,7 +123,7 @@ export interface SignUpFutureResource {
   /**
    * Used to perform a ticket-based sign-up.
    */
-  ticket: (params: SignUpFutureTicketParams) => Promise<{ error: unknown }>;
+  ticket: (params?: SignUpFutureTicketParams) => Promise<{ error: unknown }>;
 
   /**
    * Used to convert a sign-up with `status === 'complete'` into an active session. Will cause anything observing the

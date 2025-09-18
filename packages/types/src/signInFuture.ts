@@ -273,7 +273,7 @@ export interface SignInFutureResource {
   /**
    * Used to perform a ticket-based sign-in.
    */
-  ticket: (params: SignInFutureTicketParams) => Promise<{ error: unknown }>;
+  ticket: (params?: SignInFutureTicketParams) => Promise<{ error: unknown }>;
 
   /**
    * Used to convert a sign-in with `status === 'complete'` into an active session. Will cause anything observing the
