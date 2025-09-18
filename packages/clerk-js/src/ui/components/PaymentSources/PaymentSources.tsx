@@ -1,5 +1,5 @@
 import { useClerk, useOrganization } from '@clerk/shared/react';
-import type { CommercePaymentSourceResource } from '@clerk/types';
+import type { BillingPaymentSourceResource } from '@clerk/types';
 import { Fragment, useMemo, useRef } from 'react';
 
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
@@ -54,7 +54,7 @@ const RemoveScreen = ({
   paymentSource,
   revalidate,
 }: {
-  paymentSource: CommercePaymentSourceResource;
+  paymentSource: BillingPaymentSourceResource;
   revalidate: () => void;
 }) => {
   const { close } = useActionContext();
@@ -193,7 +193,7 @@ const PaymentSourceMenu = ({
   paymentSource,
   revalidate,
 }: {
-  paymentSource: CommercePaymentSourceResource;
+  paymentSource: BillingPaymentSourceResource;
   revalidate: () => void;
 }) => {
   const { open } = useActionContext();

@@ -1,4 +1,4 @@
-import type { CommercePayerResourceType } from '@clerk/types';
+import type { BillingPayerResourceType } from '@clerk/types';
 import { describe, expect, it, vi } from 'vitest';
 
 import { render, waitFor } from '../../../../vitestUtils';
@@ -75,7 +75,7 @@ describe('SubscriptionsList', () => {
             isDefault: true,
             isRecurring: true,
             hasBaseFee: false,
-            forPayerType: 'user' as CommercePayerResourceType,
+            forPayerType: 'user' as BillingPayerResourceType,
             publiclyVisible: true,
             slug: 'free-plan',
             avatarUrl: '',
@@ -141,7 +141,7 @@ describe('SubscriptionsList', () => {
         isDefault: false,
         isRecurring: true,
         hasBaseFee: true,
-        forPayerType: 'user' as CommercePayerResourceType,
+        forPayerType: 'user' as BillingPayerResourceType,
         publiclyVisible: true,
         slug: 'pro-plan',
         avatarUrl: '',
@@ -205,7 +205,7 @@ describe('SubscriptionsList', () => {
         isDefault: false,
         isRecurring: true,
         hasBaseFee: true,
-        forPayerType: 'user' as CommercePayerResourceType,
+        forPayerType: 'user' as BillingPayerResourceType,
         publiclyVisible: true,
         slug: 'pro-plan',
         avatarUrl: '',
@@ -270,7 +270,7 @@ describe('SubscriptionsList', () => {
         isDefault: false,
         isRecurring: true,
         hasBaseFee: true,
-        forPayerType: 'user' as CommercePayerResourceType,
+        forPayerType: 'user' as BillingPayerResourceType,
         publiclyVisible: true,
         slug: 'pro-plan',
         avatarUrl: '',
@@ -334,7 +334,7 @@ describe('SubscriptionsList', () => {
         isDefault: false,
         isRecurring: true,
         hasBaseFee: true,
-        forPayerType: 'user' as CommercePayerResourceType,
+        forPayerType: 'user' as BillingPayerResourceType,
         publiclyVisible: true,
         slug: 'plus-plan',
         avatarUrl: '',
@@ -370,7 +370,7 @@ describe('SubscriptionsList', () => {
         isDefault: false,
         isRecurring: true,
         hasBaseFee: true,
-        forPayerType: 'user' as CommercePayerResourceType,
+        forPayerType: 'user' as BillingPayerResourceType,
         publiclyVisible: true,
         slug: 'pro-plan',
         avatarUrl: '',

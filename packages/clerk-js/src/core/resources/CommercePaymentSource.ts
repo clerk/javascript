@@ -1,9 +1,9 @@
 import type {
-  CommerceInitializedPaymentSourceJSON,
-  CommerceInitializedPaymentSourceResource,
-  CommercePaymentSourceJSON,
-  CommercePaymentSourceResource,
-  CommercePaymentSourceStatus,
+  BillingInitializedPaymentSourceJSON,
+  BillingInitializedPaymentSourceResource,
+  BillingPaymentSourceJSON,
+  BillingPaymentSourceResource,
+  BillingPaymentSourceStatus,
   DeletedObjectJSON,
   MakeDefaultPaymentSourceParams,
   RemovePaymentSourceParams,
@@ -11,22 +11,22 @@ import type {
 
 import { BaseResource, DeletedObject } from './internal';
 
-export class CommercePaymentSource extends BaseResource implements CommercePaymentSourceResource {
+export class BillingPaymentSource extends BaseResource implements BillingPaymentSourceResource {
   id!: string;
   last4!: string;
   paymentMethod!: string;
   cardType!: string;
   isDefault!: boolean;
   isRemovable!: boolean;
-  status!: CommercePaymentSourceStatus;
+  status!: BillingPaymentSourceStatus;
   walletType: string | undefined;
 
-  constructor(data: CommercePaymentSourceJSON) {
+  constructor(data: BillingPaymentSourceJSON) {
     super();
     this.fromJSON(data);
   }
 
-  protected fromJSON(data: CommercePaymentSourceJSON | null): this {
+  protected fromJSON(data: BillingPaymentSourceJSON | null): this {
     if (!data) {
       return this;
     }
@@ -71,17 +71,17 @@ export class CommercePaymentSource extends BaseResource implements CommercePayme
   }
 }
 
-export class CommerceInitializedPaymentSource extends BaseResource implements CommerceInitializedPaymentSourceResource {
+export class BillingInitializedPaymentSource extends BaseResource implements BillingInitializedPaymentSourceResource {
   externalClientSecret!: string;
   externalGatewayId!: string;
   paymentMethodOrder!: string[];
 
-  constructor(data: CommerceInitializedPaymentSourceJSON) {
+  constructor(data: BillingInitializedPaymentSourceJSON) {
     super();
     this.fromJSON(data);
   }
 
-  protected fromJSON(data: CommerceInitializedPaymentSourceJSON | null): this {
+  protected fromJSON(data: BillingInitializedPaymentSourceJSON | null): this {
     if (!data) {
       return this;
     }

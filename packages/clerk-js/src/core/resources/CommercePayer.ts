@@ -1,10 +1,10 @@
-import type { CommercePayerJSON, CommercePayerResource } from '@clerk/types';
+import type { BillingPayerJSON, BillingPayerResource } from '@clerk/types';
 
 import { unixEpochToDate } from '@/utils/date';
 
 import { BaseResource } from './internal';
 
-export class CommercePayer extends BaseResource implements CommercePayerResource {
+export class BillingPayer extends BaseResource implements BillingPayerResource {
   id!: string;
   createdAt!: Date;
   updatedAt!: Date;
@@ -16,12 +16,12 @@ export class CommercePayer extends BaseResource implements CommercePayerResource
   organizationId?: string;
   organizationName?: string;
 
-  constructor(data: CommercePayerJSON) {
+  constructor(data: BillingPayerJSON) {
     super();
     this.fromJSON(data);
   }
 
-  protected fromJSON(data: CommercePayerJSON | null): this {
+  protected fromJSON(data: BillingPayerJSON | null): this {
     if (!data) {
       return this;
     }

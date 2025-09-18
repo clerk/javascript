@@ -1,5 +1,5 @@
 import { useClerk, useSession } from '@clerk/shared/react';
-import type { CommercePlanResource, CommerceSubscriptionPlanPeriod, PricingTableProps } from '@clerk/types';
+import type { BillingPlanResource, BillingSubscriptionPlanPeriod, PricingTableProps } from '@clerk/types';
 import * as React from 'react';
 
 import { Switch } from '@/ui/elements/Switch';
@@ -26,11 +26,11 @@ import { common, InternalThemeProvider } from '../../styledSystem';
 import { SubscriptionBadge } from '../Subscriptions/badge';
 
 interface PricingTableDefaultProps {
-  plans?: CommercePlanResource[] | null;
-  highlightedPlan?: CommercePlanResource['slug'];
-  planPeriod: CommerceSubscriptionPlanPeriod;
-  setPlanPeriod: (val: CommerceSubscriptionPlanPeriod) => void;
-  onSelect: (plan: CommercePlanResource) => void;
+  plans?: BillingPlanResource[] | null;
+  highlightedPlan?: BillingPlanResource['slug'];
+  planPeriod: BillingSubscriptionPlanPeriod;
+  setPlanPeriod: (val: BillingSubscriptionPlanPeriod) => void;
+  onSelect: (plan: BillingPlanResource) => void;
   isCompact?: boolean;
   props: PricingTableProps;
 }
@@ -89,10 +89,10 @@ export function PricingTableDefault({
  * -----------------------------------------------------------------------------------------------*/
 
 interface CardProps {
-  plan: CommercePlanResource;
-  planPeriod: CommerceSubscriptionPlanPeriod;
-  setPlanPeriod: (p: CommerceSubscriptionPlanPeriod) => void;
-  onSelect: (plan: CommercePlanResource, event?: React.MouseEvent<HTMLElement>) => void;
+  plan: BillingPlanResource;
+  planPeriod: BillingSubscriptionPlanPeriod;
+  setPlanPeriod: (p: BillingSubscriptionPlanPeriod) => void;
+  onSelect: (plan: BillingPlanResource, event?: React.MouseEvent<HTMLElement>) => void;
   isCompact?: boolean;
   props: PricingTableProps;
 }
@@ -290,10 +290,10 @@ function Card(props: CardProps) {
  * -----------------------------------------------------------------------------------------------*/
 
 interface CardHeaderProps {
-  plan: CommercePlanResource;
+  plan: BillingPlanResource;
   isCompact?: boolean;
-  planPeriod: CommerceSubscriptionPlanPeriod;
-  setPlanPeriod: (val: CommerceSubscriptionPlanPeriod) => void;
+  planPeriod: BillingSubscriptionPlanPeriod;
+  setPlanPeriod: (val: BillingSubscriptionPlanPeriod) => void;
   badge?: React.ReactNode;
 }
 
@@ -432,7 +432,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
  * -----------------------------------------------------------------------------------------------*/
 
 interface CardFeaturesListProps {
-  plan: CommercePlanResource;
+  plan: BillingPlanResource;
   /**
    * @default false
    */

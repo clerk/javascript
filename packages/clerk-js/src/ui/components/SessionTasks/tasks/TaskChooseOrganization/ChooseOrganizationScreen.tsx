@@ -231,26 +231,24 @@ const SuggestionPreview = withCardStateProvider((props: OrganizationSuggestionRe
     );
   };
 
-  if (props.status === 'accepted') {
-    return (
-      <Text
-        colorScheme='secondary'
-        localizationKey={localizationKeys('taskChooseOrganization.chooseOrganization.suggestionsAcceptedLabel')}
-      />
-    );
-  }
-
   return (
     <OrganizationPreviewListItem
       organizationData={props.publicOrganizationData}
       elementId='taskChooseOrganization'
       elementDescriptor={descriptors.taskChooseOrganizationPreviewItem}
     >
-      <OrganizationPreviewListItemButton
-        onClick={handleAccept}
-        isLoading={card.isLoading}
-        localizationKey={localizationKeys('taskChooseOrganization.chooseOrganization.action__suggestionsAccept')}
-      />
+      {props.status === 'accepted' ? (
+        <Text
+          colorScheme='secondary'
+          localizationKey={localizationKeys('taskChooseOrganization.chooseOrganization.suggestionsAcceptedLabel')}
+        />
+      ) : (
+        <OrganizationPreviewListItemButton
+          onClick={handleAccept}
+          isLoading={card.isLoading}
+          localizationKey={localizationKeys('taskChooseOrganization.chooseOrganization.action__suggestionsAccept')}
+        />
+      )}
     </OrganizationPreviewListItem>
   );
 });

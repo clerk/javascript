@@ -1,14 +1,14 @@
-import type { CommercePlanResource, GetPlansParams } from '@clerk/types';
+import type { BillingPlanResource, GetPlansParams } from '@clerk/types';
 
 import { useClerkInstanceContext } from '../contexts';
-import { createCommercePaginatedHook } from './createCommerceHook';
+import { createBillingPaginatedHook as createCommercePaginatedHook } from './createCommerceHook';
 
 /**
  * @internal
  */
-export const usePlans = createCommercePaginatedHook<CommercePlanResource, GetPlansParams>({
+export const usePlans = createCommercePaginatedHook<BillingPlanResource, GetPlansParams>({
   hookName: 'usePlans',
-  resourceType: 'commerce-plans',
+  resourceType: 'billing-plans',
   useFetcher: _for => {
     const clerk = useClerkInstanceContext();
     if (!clerk.loaded) {
