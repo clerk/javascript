@@ -78,7 +78,7 @@ export const ArrowBlockButton = React.forwardRef<HTMLButtonElement, ArrowBlockBu
       {(isLoading || leftIcon) && (
         <Flex
           as='span'
-          sx={theme => ({ width: theme.space.$5, height: theme.space.$5, flex: 'none', alignItems: 'center' })}
+          sx={theme => ({ width: theme.space.$4, height: theme.space.$4, flex: 'none', alignItems: 'center' })}
         >
           {isLoading ? (
             <Spinner
@@ -93,7 +93,7 @@ export const ArrowBlockButton = React.forwardRef<HTMLButtonElement, ArrowBlockBu
               icon={leftIcon as React.ComponentType}
               sx={[
                 theme => ({
-                  width: theme.sizes.$5,
+                  width: theme.sizes.$4,
                   // Fixes a bug in Safari where the icon shifts when navigating between routes.
                   transform: 'translateZ(0)',
                 }),
