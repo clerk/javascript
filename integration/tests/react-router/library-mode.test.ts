@@ -5,7 +5,7 @@ import { appConfigs } from '../../presets';
 import type { FakeOrganization, FakeUser } from '../../testUtils';
 import { createTestUtils } from '../../testUtils';
 
-test.describe('Library Mode basic tests for @xreact-router', () => {
+test.describe('Library Mode basic tests for @react-router', () => {
   test.describe.configure({ mode: 'parallel' });
   let app: Application;
   let fakeUser: FakeUser;
