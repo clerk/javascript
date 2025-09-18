@@ -880,8 +880,8 @@ export interface BillingSubscriptionItemJSON extends ClerkResourceJSON {
     date: number;
   } | null;
   amount: BillingMoneyAmountJSON | null;
-  plan: BillingPlanJSON;
-  plan_id: string;
+  plan?: BillingPlanJSON | null;
+  plan_id?: string | null;
 }
 
 /**
@@ -906,24 +906,26 @@ export interface BillingSubscriptionItemWebhookEventJSON extends ClerkResourceJS
   next_payment_amount: number;
   next_payment_date: number;
   amount: BillingMoneyAmountJSON;
-  plan: {
-    id: string;
-    instance_id: string;
-    product_id: string;
-    name: string;
-    slug: string;
-    description?: string;
-    is_default: boolean;
-    is_recurring: boolean;
-    amount: number;
-    period: 'month' | 'annual';
-    interval: number;
-    has_base_fee: boolean;
-    currency: string;
-    annual_monthly_amount: number;
-    publicly_visible: boolean;
-  };
-  plan_id: string;
+  plan?:
+    | {
+      id: string;
+      instance_id: string;
+      product_id: string;
+      name: string;
+      slug: string;
+      description?: string;
+      is_default: boolean;
+      is_recurring: boolean;
+      amount: number;
+      period: 'month' | 'annual';
+      interval: number;
+      has_base_fee: boolean;
+      currency: string;
+      annual_monthly_amount: number;
+      publicly_visible: boolean;
+    }
+    | null;
+  plan_id?: string | null;
 }
 
 /**

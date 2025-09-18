@@ -46,11 +46,11 @@ export class BillingSubscriptionItem {
     /**
      * The plan associated with this subscription item.
      */
-    readonly plan: BillingPlan,
+    readonly plan: BillingPlan | null,
     /**
      * The plan ID.
      */
-    readonly planId: string,
+    readonly planId: string | null,
     /**
      * Unix timestamp (milliseconds) of when the subscription item was created.
      */
@@ -105,6 +105,15 @@ export class BillingSubscriptionItem {
       };
     }
 
+    let plan = null;
+    if (data.plan !== undefined && data.plan !== null) {
+      plan = BillingPlan.fromJSON(data.plan);
+    }
+    let planId = null;
+    if (data.plan_id !== undefined) {
+      planId = data.plan_id;
+    }
+
     return new BillingSubscriptionItem(
       data.id,
       data.status,
@@ -112,8 +121,8 @@ export class BillingSubscriptionItem {
       data.period_start,
       data.next_payment,
       formatAmountJSON(data.amount),
-      BillingPlan.fromJSON(data.plan),
-      data.plan_id,
+      plan,
+      planId,
       data.created_at,
       data.updated_at,
       data.period_end,
