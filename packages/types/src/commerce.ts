@@ -129,15 +129,15 @@ export interface BillingPlanResource extends ClerkResource {
    */
   name: string;
   /**
-   * The price of the plan for a single billing period (usually monthly). For example, `1000` for $10.00.
+   * The monthly price of the plan.
    */
   fee: BillingMoneyAmount;
   /**
-   * The total price for a full year of the plan, in the smallest unit of the currency. For example, `10000` for $100.00.
+   * The annual price of the plan.
    */
   annualFee: BillingMoneyAmount;
   /**
-   * The effective monthly price when billed annually, in the smallest unit of the currency. For example, `833` for $8.33.
+   * The effective monthly price when billed annually.
    */
   annualMonthlyFee: BillingMoneyAmount;
   /**
@@ -341,7 +341,7 @@ export interface BillingInitializedPaymentSourceResource extends ClerkResource {
    */
   externalGatewayId: string;
   /**
-   * TODO(@COMMERCE): document this
+   * The order the payment methods will be displayed in when `<PaymentElement/>` renders.
    */
   paymentMethodOrder: string[];
 }
@@ -530,11 +530,11 @@ export interface BillingSubscriptionItemResource extends ClerkResource {
    */
   amount?: BillingMoneyAmount;
   /**
-   * The credit info for the subscription item, if any.
+   * The credit from a previous purchase that is being applied to the subscription item.
    */
   credit?: {
     /**
-     * The amount of credit applied to the subscription item.
+     * The amount of credit from a previous purchase that is being applied to the subscription item.
      */
     amount: BillingMoneyAmount;
   };
@@ -606,7 +606,7 @@ export interface BillingSubscriptionResource extends ClerkResource {
   updatedAt: Date | null;
 
   /**
-   * Whether the subscription is eligible for a free trial.
+   * Whether the payer is eligible for a free trial.
    */
   eligibleForFreeTrial?: boolean;
 }
