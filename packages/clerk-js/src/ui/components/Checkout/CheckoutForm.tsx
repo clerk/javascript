@@ -1,5 +1,5 @@
 import { __experimental_useCheckout as useCheckout } from '@clerk/shared/react';
-import type { CommerceMoneyAmount, CommercePaymentSourceResource, ConfirmCheckoutParams } from '@clerk/types';
+import type { BillingMoneyAmount, BillingPaymentSourceResource, ConfirmCheckoutParams } from '@clerk/types';
 import { useMemo, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';
@@ -366,8 +366,8 @@ const ExistingPaymentSourceForm = withCardStateProvider(
     totalDueNow,
     paymentSources,
   }: {
-    totalDueNow: CommerceMoneyAmount;
-    paymentSources: CommercePaymentSourceResource[];
+    totalDueNow: BillingMoneyAmount;
+    paymentSources: BillingPaymentSourceResource[];
   }) => {
     const submitLabel = useSubmitLabel();
     const { checkout } = useCheckout();
@@ -375,7 +375,7 @@ const ExistingPaymentSourceForm = withCardStateProvider(
 
     const { payWithExistingPaymentSource } = useCheckoutMutations();
     const card = useCardState();
-    const [selectedPaymentSource, setSelectedPaymentSource] = useState<CommercePaymentSourceResource | undefined>(
+    const [selectedPaymentSource, setSelectedPaymentSource] = useState<BillingPaymentSourceResource | undefined>(
       paymentSource || paymentSources.find(p => p.isDefault),
     );
 
