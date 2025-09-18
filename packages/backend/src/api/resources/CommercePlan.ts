@@ -1,4 +1,4 @@
-import type { CommerceMoneyAmount } from '@clerk/types';
+import type { BillingMoneyAmount } from '@clerk/types';
 
 import { Feature } from './Feature';
 import type { CommercePlanJSON } from './JSON';
@@ -49,15 +49,15 @@ export class CommercePlan {
     /**
      * The monthly fee of the plan.
      */
-    readonly fee: CommerceMoneyAmount,
+    readonly fee: BillingMoneyAmount,
     /**
      * The annual fee of the plan.
      */
-    readonly annualFee: CommerceMoneyAmount,
+    readonly annualFee: BillingMoneyAmount,
     /**
      * The annual fee of the plan on a monthly basis.
      */
-    readonly annualMonthlyFee: CommerceMoneyAmount,
+    readonly annualMonthlyFee: BillingMoneyAmount,
     /**
      * The type of payer for the plan.
      */

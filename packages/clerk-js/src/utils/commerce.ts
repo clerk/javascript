@@ -1,13 +1,13 @@
 import type {
-  CommerceCheckoutTotals,
-  CommerceCheckoutTotalsJSON,
-  CommerceMoneyAmount,
-  CommerceMoneyAmountJSON,
-  CommerceStatementTotals,
-  CommerceStatementTotalsJSON,
+  BillingCheckoutTotals,
+  BillingCheckoutTotalsJSON,
+  BillingMoneyAmount,
+  BillingMoneyAmountJSON,
+  BillingStatementTotals,
+  BillingStatementTotalsJSON,
 } from '@clerk/types';
 
-export const commerceMoneyAmountFromJSON = (data: CommerceMoneyAmountJSON): CommerceMoneyAmount => {
+export const billingMoneyAmountFromJSON = (data: BillingMoneyAmountJSON): BillingMoneyAmount => {
   return {
     amount: data.amount,
     amountFormatted: data.amount_formatted,
@@ -16,30 +16,28 @@ export const commerceMoneyAmountFromJSON = (data: CommerceMoneyAmountJSON): Comm
   };
 };
 
-const hasPastDue = (data: unknown): data is { past_due: CommerceMoneyAmountJSON } => {
+const hasPastDue = (data: unknown): data is { past_due: BillingMoneyAmountJSON } => {
   return typeof data === 'object' && data !== null && 'past_due' in data;
 };
 
-export const commerceTotalsFromJSON = <T extends CommerceStatementTotalsJSON | CommerceCheckoutTotalsJSON>(
+export const billingTotalsFromJSON = <T extends BillingStatementTotalsJSON | BillingCheckoutTotalsJSON>(
   data: T,
-): T extends { total_due_now: CommerceMoneyAmountJSON } ? CommerceCheckoutTotals : CommerceStatementTotals => {
-  const totals: Partial<CommerceCheckoutTotals & CommerceStatementTotals> = {
-    grandTotal: commerceMoneyAmountFromJSON(data.grand_total),
-    subtotal: commerceMoneyAmountFromJSON(data.subtotal),
-    taxTotal: commerceMoneyAmountFromJSON(data.tax_total),
+): T extends { total_due_now: BillingMoneyAmountJSON } ? BillingCheckoutTotals : BillingStatementTotals => {
+  const totals: Partial<BillingCheckoutTotals & BillingStatementTotals> = {
+    grandTotal: billingMoneyAmountFromJSON(data.grand_total),
+    subtotal: billingMoneyAmountFromJSON(data.subtotal),
+    taxTotal: billingMoneyAmountFromJSON(data.tax_total),
   };
 
   if ('total_due_now' in data) {
-    totals.totalDueNow = commerceMoneyAmountFromJSON(data.total_due_now);
+    totals.totalDueNow = billingMoneyAmountFromJSON(data.total_due_now);
   }
   if ('credit' in data) {
-    totals.credit = commerceMoneyAmountFromJSON(data.credit);
+    totals.credit = billingMoneyAmountFromJSON(data.credit);
   }
   if (hasPastDue(data)) {
-    totals.pastDue = commerceMoneyAmountFromJSON(data.past_due);
+    totals.pastDue = billingMoneyAmountFromJSON(data.past_due);
   }
 
-  return totals as T extends { total_due_now: CommerceMoneyAmountJSON }
-    ? CommerceCheckoutTotals
-    : CommerceStatementTotals;
+  return totals as T extends { total_due_now: BillingMoneyAmountJSON } ? BillingCheckoutTotals : BillingStatementTotals;
 };

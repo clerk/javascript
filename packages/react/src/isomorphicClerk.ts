@@ -16,12 +16,12 @@ import type {
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
+  BillingNamespace,
   Clerk,
   ClerkAuthenticateWithWeb3Params,
   ClerkOptions,
   ClerkStatus,
   ClientResource,
-  CommerceBillingNamespace,
   CreateOrganizationParams,
   CreateOrganizationProps,
   DomainOrProxyUrl,
@@ -110,7 +110,7 @@ type IsomorphicLoadedClerk = Without<
   | '__internal_setActiveInProgress'
 > & {
   client: ClientResource | undefined;
-  billing: CommerceBillingNamespace | undefined;
+  billing: BillingNamespace | undefined;
   apiKeys: APIKeysNamespace | undefined;
 };
 
@@ -722,7 +722,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   }
 
-  get billing(): CommerceBillingNamespace | undefined {
+  get billing(): BillingNamespace | undefined {
     return this.clerkjs?.billing;
   }
 
