@@ -59,7 +59,7 @@ export const ArrowBlockButton = React.forwardRef<HTMLButtonElement, ArrowBlockBu
       ref={ref}
       sx={theme => [
         {
-          gap: theme.space.$1,
+          gap: theme.space.$2,
           position: 'relative',
           justifyContent: 'center',
           borderColor: theme.colors.$neutralAlpha100,
