@@ -801,6 +801,7 @@ export interface BillingCheckoutTotalsJSON {
   tax_total: BillingMoneyAmountJSON;
   total_due_now: BillingMoneyAmountJSON;
   credit: BillingMoneyAmountJSON;
+  past_due: BillingMoneyAmountJSON;
 }
 
 /**
