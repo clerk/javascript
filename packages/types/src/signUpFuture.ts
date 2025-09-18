@@ -11,6 +11,7 @@ interface SignUpFutureAdditionalParams {
 
 export interface SignUpFutureCreateParams extends SignUpFutureAdditionalParams {
   transfer?: boolean;
+  ticket?: string;
 }
 
 // This will likely get more properties
@@ -48,6 +49,10 @@ export interface SignUpFutureSSOParams {
    * TODO @revamp-hooks: This should be handled by FAPI instead.
    */
   redirectCallbackUrl: string;
+}
+
+export interface SignUpFutureTicketParams extends SignUpFutureAdditionalParams {
+  ticket: string;
 }
 
 export interface SignUpFutureFinalizeParams {
@@ -116,7 +121,12 @@ export interface SignUpFutureResource {
   sso: (params: SignUpFutureSSOParams) => Promise<{ error: unknown }>;
 
   /**
-   * Used to convert a sign-up with `status === ‘complete’` into an active session. Will cause anything observing the
+   * Used to perform a ticket-based sign-up.
+   */
+  ticket: (params: SignUpFutureTicketParams) => Promise<{ error: unknown }>;
+
+  /**
+   * Used to convert a sign-up with `status === 'complete'` into an active session. Will cause anything observing the
    * session state (such as the `useUser()` hook) to update automatically.
    */
   finalize: (params?: SignUpFutureFinalizeParams) => Promise<{ error: unknown }>;

@@ -10,6 +10,7 @@ export interface SignInFutureCreateParams {
   redirectUrl?: string;
   actionCompleteRedirectUrl?: string;
   transfer?: boolean;
+  ticket?: string;
 }
 
 export type SignInFuturePasswordParams =
@@ -108,6 +109,10 @@ export interface SignInFutureTOTPVerifyParams {
 
 export interface SignInFutureBackupCodeVerifyParams {
   code: string;
+}
+
+export interface SignInFutureTicketParams {
+  ticket: string;
 }
 
 export interface SignInFutureFinalizeParams {
@@ -266,7 +271,12 @@ export interface SignInFutureResource {
   };
 
   /**
-   * Used to convert a sign-in with `status === ‘complete’` into an active session. Will cause anything observing the
+   * Used to perform a ticket-based sign-in.
+   */
+  ticket: (params: SignInFutureTicketParams) => Promise<{ error: unknown }>;
+
+  /**
+   * Used to convert a sign-in with `status === 'complete'` into an active session. Will cause anything observing the
    * session state (such as the `useUser()` hook) to update automatically.
    */
   finalize: (params?: SignInFutureFinalizeParams) => Promise<{ error: unknown }>;
