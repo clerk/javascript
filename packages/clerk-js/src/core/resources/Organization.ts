@@ -28,7 +28,7 @@ import type {
 
 import { convertPageToOffsetSearchParams } from '../../utils/convertPageToOffsetSearchParams';
 import { unixEpochToDate } from '../../utils/date';
-import { addPaymentSource, getPaymentSources, initializePaymentSource } from '../modules/commerce';
+import { addPaymentSource, getPaymentSources, initializePaymentSource } from '../modules/billing';
 import { BaseResource, OrganizationInvitation, OrganizationMembership } from './internal';
 import { OrganizationDomain } from './OrganizationDomain';
 import { OrganizationMembershipRequest } from './OrganizationMembershipRequest';
