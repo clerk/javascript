@@ -1,8 +1,10 @@
 import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router';
 import { rootAuthLoader } from '@clerk/react-router/ssr.server';
 import { ClerkProvider } from '@clerk/react-router';
-
 import type { Route } from './+types/root';
+
+// TODO: Uncomment when published
+// export const middleware: Route.MiddlewareFunction[] = [clerkMiddleware()];
 
 export async function loader(args: Route.LoaderArgs) {
   return rootAuthLoader(args);
