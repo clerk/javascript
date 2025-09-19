@@ -1,5 +1,6 @@
 import { isClerkAPIResponseError, isKnownError, isMetamaskError } from '@clerk/shared/error';
 import { snakeToCamel } from '@clerk/shared/underscore';
+import type { ClerkAPIError } from '@clerk/types';
 import type { MachineContext } from 'xstate';
 import { assign, enqueueActions, setup } from 'xstate';
 
@@ -95,11 +96,11 @@ export const FormMachine = setup({
   on: {
     'ERRORS.SET': {
       actions: enqueueActions(({ enqueue, event }) => {
-        const isClerkAPIError = (err: any) => err && typeof err === 'object' && 'meta' in err;
+        const isClerkAPIError = (err: any): err is ClerkAPIError => 'meta' in err;
 
         if (isKnownError(event.error)) {
           const candidate =
-            (event && event.error && isClerkAPIResponseError(event.error) && event.error.errors) ||
+            (isClerkAPIResponseError(event.error) && event.error.errors) ||
             (Array.isArray(event?.errors) ? event.errors : undefined) ||
             event?.error ||
             [];
