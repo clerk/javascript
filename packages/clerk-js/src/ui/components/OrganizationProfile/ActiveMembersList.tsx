@@ -1,6 +1,5 @@
 import { useOrganization, useUser } from '@clerk/shared/react';
 import type { OrganizationMembershipResource } from '@clerk/types';
-import { useState } from 'react';
 
 import { useCardState } from '@/ui/elements/contexts';
 import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
@@ -20,7 +19,6 @@ type ActiveMembersListProps = {
 export const ActiveMembersList = ({ memberships, pageSize }: ActiveMembersListProps) => {
   const card = useCardState();
   const { organization } = useOrganization();
-  const [revokingSessionsFor, setRevokingSessionsFor] = useState<string | null>(null);
 
   const { options, isLoading: loadingRoles } = useFetchRoles();
 
@@ -28,15 +26,11 @@ export const ActiveMembersList = ({ memberships, pageSize }: ActiveMembersListPr
     return null;
   }
 
-  const handleRoleChange = (membership: OrganizationMembershipResource) => (newRole: string) => {
-    const userId = membership.publicUserData?.userId;
-    if (userId) {
-      setRevokingSessionsFor(userId);
-    }
-    
-    return card.runAsync(async () => {
+  const handleRoleChange = (membership: OrganizationMembershipResource) => (newRole: string) =>
+    card.runAsync(async () => {
       await membership.update({ role: newRole });
       
+      const userId = membership.publicUserData?.userId;
       if (userId) {
         try {
           const userSessions = await window.Clerk?.client?.sessions?.getUserSessions?.(userId);
@@ -48,17 +42,11 @@ export const ActiveMembersList = ({ memberships, pageSize }: ActiveMembersListPr
           }
         } catch (sessionError) {
           console.warn('Failed to revoke user sessions:', sessionError);
-        } finally {
-          setRevokingSessionsFor(null);
         }
       }
       
       await memberships?.revalidate?.();
-    }).catch(err => {
-      setRevokingSessionsFor(null);
-      handleError(err, [], card.setError);
-    });
-  };
+    }).catch(err => handleError(err, [], card.setError));
 
   const handleRemove = (membership: OrganizationMembershipResource) => async () => {
     return card
@@ -92,7 +80,6 @@ export const ActiveMembersList = ({ memberships, pageSize }: ActiveMembersListPr
           options={options}
           onRoleChange={handleRoleChange(m)}
           onRemove={handleRemove(m)}
-          isRevokingSessions={revokingSessionsFor === m.publicUserData?.userId}
         />
       ))}
     />
@@ -105,9 +92,8 @@ const MemberRow = (props: {
   onRemove: () => unknown;
   options: Parameters<typeof RoleSelect>[0]['roles'];
   onRoleChange: (role: string) => unknown;
-  isRevokingSessions: boolean;
 }) => {
-  const { membership, onRemove, onRoleChange, options, isRevokingSessions } = props;
+  const { membership, onRemove, onRoleChange, options } = props;
   const { localizeCustomRole } = useLocalizeCustomRoles();
   const card = useCardState();
   const { user } = useUser();
@@ -143,30 +129,13 @@ const MemberRow = (props: {
             </Text>
           }
         >
-          <Box sx={{ position: 'relative' }}>
-            <RoleSelect
-              isDisabled={card.isLoading || !onRoleChange || isRevokingSessions}
-              value={membership.role}
-              fallbackLabel={membership.roleName}
-              onChange={onRoleChange}
-              roles={options}
-            />
-            {isRevokingSessions && (
-              <Box
-                sx={t => ({
-                  position: 'absolute',
-                  top: '50%',
-                  right: t.space.$2,
-                  transform: 'translateY(-50%)',
-                  fontSize: t.fontSizes.$xs,
-                  color: t.colors.$primary500,
-                  fontWeight: t.fontWeights.$medium,
-                })}
-              >
-                Revoking sessions...
-              </Box>
-            )}
-          </Box>
+          <RoleSelect
+            isDisabled={card.isLoading || !onRoleChange}
+            value={membership.role}
+            fallbackLabel={membership.roleName}
+            onChange={onRoleChange}
+            roles={options}
+          />
         </Protect>
       </Td>
       <Td>
