@@ -41,6 +41,11 @@ const routes = [
     path: '/pricing-table',
     component: () => import('./views/PricingTable.vue'),
   },
+  {
+    name: 'UserAvatar',
+    path: '/user-avatar',
+    component: () => import('./views/UserAvatar.vue'),
+  },
   // This was added for billing tests
   {
     name: 'User',
@@ -72,7 +77,7 @@ const router = createRouter({
 
 router.beforeEach(async (to, _, next) => {
   const { isSignedIn, isLoaded } = useAuth();
-  const authenticatedPages = ['Profile', 'Admin', 'CustomUserProfile', 'CustomOrganizationProfile'];
+  const authenticatedPages = ['Profile', 'Admin', 'CustomUserProfile', 'CustomOrganizationProfile', 'UserAvatar'];
 
   if (!isLoaded.value) {
     await waitForClerkJsLoaded(isLoaded);

@@ -80,6 +80,7 @@ import type {
   TaskChooseOrganizationProps,
   TasksRedirectOptions,
   UnsubscribeCallback,
+  UserAvatarProps,
   UserButtonProps,
   UserProfileProps,
   UserResource,
@@ -859,6 +860,30 @@ export class Clerk implements ClerkInterface {
   };
 
   public unmountSignIn = (node: HTMLDivElement): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted().then(controls =>
+      controls.unmountComponent({
+        node,
+      }),
+    );
+  };
+
+  public mountUserAvatar = (node: HTMLDivElement, props?: UserAvatarProps): void => {
+    this.assertComponentsReady(this.#componentControls);
+    const component = 'UserAvatar';
+    void this.#componentControls.ensureMounted({ preloadHint: component }).then(controls =>
+      controls.mountComponent({
+        name: component,
+        appearanceKey: 'userAvatar',
+        node,
+        props,
+      }),
+    );
+
+    this.telemetry?.record(eventPrebuiltComponentMounted(component, props));
+  };
+
+  public unmountUserAvatar = (node: HTMLDivElement): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls.ensureMounted().then(controls =>
       controls.unmountComponent({

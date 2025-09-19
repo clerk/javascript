@@ -358,6 +358,9 @@ export type ElementsConfig = {
   taskChooseOrganizationCreateOrganizationActionButton: WithOptions;
   taskChooseOrganizationPreviewButton: WithOptions;
 
+  userAvatarBox: WithOptions;
+  userAvatarImage: WithOptions;
+
   // TODO: Test this idea. Instead of userButtonUserPreview, have a userPreview__userButton instead
   // Same for other repeated selectors, eg avatar
   userPreview: WithOptions<UserPreviewId>;
@@ -967,6 +970,7 @@ export type CaptchaAppearanceOptions = {
 export type SignInTheme = Theme;
 export type SignUpTheme = Theme;
 export type UserButtonTheme = Theme;
+export type UserAvatarTheme = Theme;
 export type UserProfileTheme = Theme;
 export type OrganizationSwitcherTheme = Theme;
 export type OrganizationListTheme = Theme;
@@ -1001,6 +1005,10 @@ export type Appearance<T = Theme> = T &
      * Theme overrides that only apply to the `<SignUp/>` component
      */
     signUp?: T;
+    /**
+     * Theme overrides that only apply to the `<UserAvatar/>` component
+     */
+    userAvatar?: T;
     /**
      * Theme overrides that only apply to the `<UserButton/>` component
      */
