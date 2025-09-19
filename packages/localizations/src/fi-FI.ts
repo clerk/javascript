@@ -207,7 +207,7 @@ export const fiFI: LocalizationResource = {
   formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
   formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: undefined,
-  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Delete account',
+  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Poista tili',
   formFieldInputPlaceholder__emailAddress: undefined,
   formFieldInputPlaceholder__emailAddress_username: undefined,
   formFieldInputPlaceholder__emailAddresses: 'esimerkki@domain.fi, esimerkki2@domain.fi',
@@ -1030,7 +1030,7 @@ export const fiFI: LocalizationResource = {
       title: 'Lisää yhdistetty tili',
     },
     deletePage: {
-      actionDescription: 'Kirjoita "Delete account" poistaaksesi tilisi.',
+      actionDescription: 'Kirjoita "Poista tili" poistaaksesi tilisi.',
       confirm: 'Poista tili',
       messageLine1:
         'Oletko varma, että haluat poistaa tilisi Clerkistä? Ota yhteyttä sovelluksen omistajaan poistaaksesi tietosi heidän sovelluksestaan ja muista palveluista.',
