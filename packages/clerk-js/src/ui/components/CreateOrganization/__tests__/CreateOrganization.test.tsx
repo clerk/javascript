@@ -1,9 +1,9 @@
 import type { OrganizationResource } from '@clerk/types';
-import { describe, jest } from '@jest/globals';
 import { waitFor } from '@testing-library/dom';
+import { describe, expect, it, vi } from 'vitest';
 
-import { render } from '../../../../testUtils';
-import { bindCreateFixtures } from '../../../utils/test/createFixtures';
+import { render } from '../../../../vitestUtils';
+import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
 import { CreateOrganization } from '../';
 
 const { createFixtures } = bindCreateFixtures('CreateOrganization');
@@ -35,20 +35,20 @@ export const createFakeOrganization = (params: FakeOrganizationParams): Organiza
     maxAllowedMemberships: params?.maxAllowedMemberships,
     createdAt: params?.createdAt || new Date(),
     updatedAt: new Date(),
-    update: jest.fn() as any,
-    getMemberships: jest.fn() as any,
-    addMember: jest.fn() as any,
-    inviteMember: jest.fn() as any,
-    inviteMembers: jest.fn() as any,
-    updateMember: jest.fn() as any,
-    removeMember: jest.fn() as any,
-    createDomain: jest.fn() as any,
-    getDomain: jest.fn() as any,
-    getDomains: jest.fn() as any,
-    getMembershipRequests: jest.fn() as any,
-    destroy: jest.fn() as any,
-    setLogo: jest.fn() as any,
-    reload: jest.fn() as any,
+    update: vi.fn() as any,
+    getMemberships: vi.fn() as any,
+    addMember: vi.fn() as any,
+    inviteMember: vi.fn() as any,
+    inviteMembers: vi.fn() as any,
+    updateMember: vi.fn() as any,
+    removeMember: vi.fn() as any,
+    createDomain: vi.fn() as any,
+    getDomain: vi.fn() as any,
+    getDomains: vi.fn() as any,
+    getMembershipRequests: vi.fn() as any,
+    destroy: vi.fn() as any,
+    setLogo: vi.fn() as any,
+    reload: vi.fn() as any,
   };
 };
 

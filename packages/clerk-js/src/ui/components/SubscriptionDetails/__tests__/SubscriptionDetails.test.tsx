@@ -1,7 +1,9 @@
+import { describe, expect, it, vi } from 'vitest';
+
 import { Drawer } from '@/ui/elements/Drawer';
 
-import { render, waitFor } from '../../../../testUtils';
-import { bindCreateFixtures } from '../../../utils/test/createFixtures';
+import { render, waitFor } from '../../../../vitestUtils';
+import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
 import { SubscriptionDetails } from '..';
 
 const { createFixtures } = bindCreateFixtures('SubscriptionDetails');
@@ -623,7 +625,7 @@ describe('SubscriptionDetails', () => {
       f.withBilling();
     });
 
-    const cancelSubscriptionMock = jest.fn().mockResolvedValue({});
+    const cancelSubscriptionMock = vi.fn().mockResolvedValue({});
 
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
       activeAt: new Date('2021-01-01'),
@@ -760,9 +762,9 @@ describe('SubscriptionDetails', () => {
       slug: 'annual-plan',
       avatarUrl: '',
       features: [],
-      __internal_toSnapshot: jest.fn(),
+      __internal_toSnapshot: vi.fn(),
       pathRoot: '',
-      reload: jest.fn(),
+      reload: vi.fn(),
     };
 
     const subscription = {
@@ -775,9 +777,9 @@ describe('SubscriptionDetails', () => {
       paymentSourceId: 'src_annual',
       planPeriod: 'annual' as const,
       status: 'active' as const,
-      cancel: jest.fn(),
+      cancel: vi.fn(),
       pathRoot: '',
-      reload: jest.fn(),
+      reload: vi.fn(),
     };
 
     // Mock getSubscriptions to return the canceled subscription
@@ -876,9 +878,9 @@ describe('SubscriptionDetails', () => {
       paymentSourceId: 'src_annual',
       planPeriod: 'annual' as const,
       status: 'active' as const,
-      cancel: jest.fn(),
+      cancel: vi.fn(),
       pathRoot: '',
-      reload: jest.fn(),
+      reload: vi.fn(),
     };
 
     // Mock getSubscriptions to return the annual subscription
@@ -1136,7 +1138,7 @@ describe('SubscriptionDetails', () => {
       f.withBilling();
     });
 
-    const cancelSubscriptionMock = jest.fn().mockResolvedValue({});
+    const cancelSubscriptionMock = vi.fn().mockResolvedValue({});
 
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
       activeAt: new Date('2021-01-01'),

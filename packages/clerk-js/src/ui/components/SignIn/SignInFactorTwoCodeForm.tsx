@@ -49,8 +49,11 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
 
   const prepare = props.prepare
     ? () => {
-        return props
-          .prepare?.()
+        const prepareResult = props.prepare?.();
+        if (!prepareResult) {
+          return Promise.resolve();
+        }
+        return prepareResult
           .then(() => props.onFactorPrepare())
           .catch(err => {
             if (isUserLockedError(err)) {
