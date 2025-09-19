@@ -22,46 +22,23 @@
   },
   "license": "MIT",
   "author": "Clerk",
+  "type": "module",
   "exports": {
     ".": {
-      "import": {
-        "types": "./dist/index.d.mts",
-        "default": "./dist/index.mjs"
-      },
-      "require": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.js"
-      }
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
     },
     "./internal": {
-      "import": {
-        "types": "./dist/internal.d.mts",
-        "default": "./dist/internal.mjs"
-      },
-      "require": {
-        "types": "./dist/internal.d.ts",
-        "default": "./dist/internal.js"
-      }
+      "types": "./dist/internal.d.ts",
+      "default": "./dist/internal.js"
     },
     "./errors": {
-      "import": {
-        "types": "./dist/errors.d.mts",
-        "default": "./dist/errors.mjs"
-      },
-      "require": {
-        "types": "./dist/errors.d.ts",
-        "default": "./dist/errors.js"
-      }
+      "types": "./dist/errors.d.ts",
+      "default": "./dist/errors.js"
     },
     "./experimental": {
-      "import": {
-        "types": "./dist/experimental.d.mts",
-        "default": "./dist/experimental.mjs"
-      },
-      "require": {
-        "types": "./dist/experimental.d.ts",
-        "default": "./dist/experimental.js"
-      }
+      "types": "./dist/experimental.d.ts",
+      "default": "./dist/experimental.js"
     },
     "./package.json": "./package.json"
   },

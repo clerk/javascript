@@ -16,7 +16,7 @@ export default defineConfig(overrideOptions => {
     },
     dts: true,
     onSuccess: shouldPublish ? 'pnpm publish:local' : undefined,
-    format: ['cjs', 'esm'],
+    format: 'esm',
     bundle: true,
     clean: true,
     minify: false,
