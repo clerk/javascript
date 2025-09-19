@@ -1,6 +1,5 @@
 import { isClerkAPIResponseError, isKnownError, isMetamaskError } from '@clerk/shared/error';
 import { snakeToCamel } from '@clerk/shared/underscore';
-import type { ClerkAPIError } from '@clerk/types';
 import type { MachineContext } from 'xstate';
 import { assign, enqueueActions, setup } from 'xstate';
 
@@ -40,7 +39,7 @@ export type FormMachineEvents =
       type: 'FIELD.UPDATE';
       field: Pick<FieldDetails, 'name' | 'value' | 'checked' | 'disabled'>;
     }
-  | { type: 'ERRORS.SET'; error: any }
+  | { type: 'ERRORS.SET'; error: any; errors: any[] }
   | { type: 'ERRORS.CLEAR' }
   | {
       type: 'FIELD.FEEDBACK.SET';
@@ -96,15 +95,22 @@ export const FormMachine = setup({
   on: {
     'ERRORS.SET': {
       actions: enqueueActions(({ enqueue, event }) => {
-        const isClerkAPIError = (err: any): err is ClerkAPIError => 'meta' in err;
+        const isClerkAPIError = (err: any) => err && typeof err === 'object' && 'meta' in err;
 
         if (isKnownError(event.error)) {
+          const candidate =
+            (event && event.error && isClerkAPIResponseError(event.error) && event.error.errors) ||
+            (Array.isArray(event?.errors) ? event.errors : undefined) ||
+            event?.error ||
+            [];
+
+          const errors = Array.isArray(candidate) ? candidate : [candidate];
+
           const fields: Record<string, ClerkElementsFieldError[]> = {};
-          const globalErrors: ClerkElementsError[] = [];
-          const errors = isClerkAPIResponseError(event.error) ? event.error?.errors : [event.error];
+          const globalErrors = [];
 
           for (const error of errors) {
-            const name = isClerkAPIError(error) ? snakeToCamel(error.meta?.paramName) : null;
+            const name = isClerkAPIError(error) ? snakeToCamel(error?.meta?.paramName) : null;
 
             if (!name || isMetamaskError(error)) {
               globalErrors.push(ClerkElementsError.fromAPIError(error));
@@ -140,6 +146,7 @@ export const FormMachine = setup({
         }
       }),
     },
+
     'ERRORS.CLEAR': {
       actions: assign({
         errors: () => [],
