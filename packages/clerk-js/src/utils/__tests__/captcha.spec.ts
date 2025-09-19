@@ -149,7 +149,7 @@ describe('Nonce support', () => {
   describe('CaptchaChallenge nonce integration', () => {
     let mockClerk: any;
 
-    beforeEach(() => {
+    beforeEach(async () => {
       // Mock clerk instance
       mockClerk = {
         __unstable__environment: {

@@ -1,8 +1,8 @@
 import type { EnterpriseAccountJSON } from '@clerk/types';
-import { describe, expect, it } from 'vitest';
+import { describe, it } from '@jest/globals';
 
-import { render, screen, waitFor } from '../../../../vitestUtils';
-import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
+import { render, screen, waitFor } from '../../../../testUtils';
+import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { AccountPage } from '../AccountPage';
 
 const { createFixtures } = bindCreateFixtures('UserProfile');

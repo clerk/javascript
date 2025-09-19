@@ -1,9 +1,9 @@
 import type { ExternalAccountResource } from '@clerk/types';
+import { describe, it } from '@jest/globals';
 import { act, waitFor } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
 
-import { render, screen } from '../../../../vitestUtils';
-import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
+import { render, screen } from '../../../../testUtils';
+import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { ConnectedAccountsSection } from '../ConnectedAccountsSection';
 
 const { createFixtures } = bindCreateFixtures('UserProfile');
@@ -150,6 +150,7 @@ describe('ConnectedAccountsSection ', () => {
       // Still displays a remove button
       const menuButton = item.parentElement?.parentElement?.parentElement?.parentElement?.children?.[1];
       await act(async () => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         await userEvent.click(menuButton!);
       });
 
@@ -184,6 +185,7 @@ describe('ConnectedAccountsSection ', () => {
       // Still displays a remove button
       const menuButton = item.parentElement?.parentElement?.parentElement?.parentElement?.children?.[1];
       await act(async () => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         await userEvent.click(menuButton!);
       });
 
@@ -206,6 +208,7 @@ describe('ConnectedAccountsSection ', () => {
       // Still displays a remove button
       const menuButton = item.parentElement?.parentElement?.parentElement?.parentElement?.children?.[1];
       await act(async () => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         await userEvent.click(menuButton!);
       });
 
@@ -226,6 +229,7 @@ describe('ConnectedAccountsSection ', () => {
       const item = getByText(/github/i);
       const menuButton = item.parentElement?.parentElement?.parentElement?.parentElement?.children?.[1];
       await act(async () => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         await userEvent.click(menuButton!);
       });
       getByRole('menuitem', { name: /remove/i });
@@ -241,38 +245,41 @@ describe('ConnectedAccountsSection ', () => {
     it('removes a connection', async () => {
       const { wrapper, fixtures } = await createFixtures(withConnections);
       fixtures.clerk.user?.externalAccounts[1].destroy.mockResolvedValue();
-      const { userEvent, getByText, getByRole } = render(<ConnectedAccountsSection />, { wrapper });
+      const { userEvent, getByText, getByRole, queryByRole } = render(<ConnectedAccountsSection />, { wrapper });
 
       const item = getByText(/github/i);
       const menuButton = item.parentElement?.parentElement?.parentElement?.parentElement?.children?.[1];
       await act(async () => {
-        await userEvent.click(menuButton!);
-      });
-      getByRole('menuitem', { name: /remove/i });
-      await userEvent.click(getByRole('menuitem', { name: /remove/i }));
-      await waitFor(() => getByRole('heading', { name: /Remove connected account/i }), { timeout: 500 });
-
-      await userEvent.click(getByRole('button', { name: /remove/i }));
-      expect(fixtures.clerk.user?.externalAccounts[1].destroy).toHaveBeenCalled();
-    });
-
-    it('hides screen when when pressing cancel', async () => {
-      const { wrapper } = await createFixtures(withConnections);
-      const { userEvent, getByText, getByRole } = render(<ConnectedAccountsSection />, { wrapper });
-
-      const item = getByText(/github/i);
-      const menuButton = item.parentElement?.parentElement?.parentElement?.parentElement?.children?.[1];
-      await act(async () => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         await userEvent.click(menuButton!);
       });
       getByRole('menuitem', { name: /remove/i });
       await userEvent.click(getByRole('menuitem', { name: /remove/i }));
       await waitFor(() => getByRole('heading', { name: /Remove connected account/i }));
 
-      await userEvent.click(screen.getByRole('button', { name: /cancel/i }));
+      await userEvent.click(getByRole('button', { name: /remove/i }));
+      expect(fixtures.clerk.user?.externalAccounts[1].destroy).toHaveBeenCalled();
 
-      // The cancel button should be clickable
-      expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
+      await waitFor(() =>
+        expect(queryByRole('heading', { name: /Remove connected account/i })).not.toBeInTheDocument(),
+      );
+    });
+
+    it('hides screen when when pressing cancel', async () => {
+      const { wrapper } = await createFixtures(withConnections);
+      const { userEvent, getByText, getByRole, queryByRole } = render(<ConnectedAccountsSection />, { wrapper });
+
+      const item = getByText(/github/i);
+      const menuButton = item.parentElement?.parentElement?.parentElement?.parentElement?.children?.[1];
+      await act(async () => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        await userEvent.click(menuButton!);
+      });
+      getByRole('menuitem', { name: /remove/i });
+      await userEvent.click(getByRole('menuitem', { name: /remove/i }));
+      await waitFor(() => getByRole('heading', { name: /Remove connected account/i }));
+      await userEvent.click(screen.getByRole('button', { name: /cancel$/i }));
+      expect(queryByRole('heading', { name: /Remove connected account/i })).not.toBeInTheDocument();
     });
   });
 
@@ -284,6 +291,7 @@ describe('ConnectedAccountsSection ', () => {
       const item = getByText(/google/i);
       const menuButton = item.parentElement?.parentElement?.parentElement?.parentElement?.children?.[1];
       await act(async () => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         await userEvent.click(menuButton!);
       });
       getByRole('menuitem', { name: /remove/i });
