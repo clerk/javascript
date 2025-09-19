@@ -2,10 +2,4 @@
 "@clerk/nuxt": patch
 ---
 
-Added `<GoogleOneTap />` to auto-imported components
-
-```vue
-<template>
-  <GoogleOneTap />
-</template>
-```
+Fixed incorrect default property values passed to `<GoogleOneTap />` component
