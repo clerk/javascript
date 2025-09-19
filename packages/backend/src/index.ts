@@ -100,9 +100,9 @@ export type {
   PaginatedResponseJSON,
   TestingTokenJSON,
   WebhooksSvixJSON,
-  CommercePlanJSON,
-  CommerceSubscriptionJSON,
-  CommerceSubscriptionItemJSON,
+  BillingPlanJSON,
+  BillingSubscriptionJSON,
+  BillingSubscriptionItemJSON,
 } from './api/resources/JSON';
 
 /**
@@ -145,9 +145,9 @@ export type {
   Token,
   User,
   TestingToken,
-  CommercePlan,
-  CommerceSubscription,
-  CommerceSubscriptionItem,
+  BillingPlan,
+  BillingSubscription,
+  BillingSubscriptionItem,
 } from './api/resources';
 
 /**
@@ -167,9 +167,9 @@ export type {
   WaitlistEntryWebhookEvent,
   WebhookEvent,
   WebhookEventType,
-  CommercePaymentAttemptWebhookEvent,
-  CommerceSubscriptionWebhookEvent,
-  CommerceSubscriptionItemWebhookEvent,
+  BillingPaymentAttemptWebhookEvent,
+  BillingSubscriptionWebhookEvent,
+  BillingSubscriptionItemWebhookEvent,
 } from './api/resources/Webhooks';
 
 /**
