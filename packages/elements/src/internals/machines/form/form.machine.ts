@@ -40,7 +40,7 @@ export type FormMachineEvents =
       type: 'FIELD.UPDATE';
       field: Pick<FieldDetails, 'name' | 'value' | 'checked' | 'disabled'>;
     }
-  | { type: 'ERRORS.SET'; error: any; errors: any[] }
+  | { type: 'ERRORS.SET'; error: any }
   | { type: 'ERRORS.CLEAR' }
   | {
       type: 'FIELD.FEEDBACK.SET';
@@ -99,11 +99,9 @@ export const FormMachine = setup({
         const isClerkAPIError = (err: any): err is ClerkAPIError => 'meta' in err;
 
         if (isKnownError(event.error)) {
-          const candidate =
-            (isClerkAPIResponseError(event.error) && event.error.errors) ||
-            (Array.isArray(event?.errors) ? event.errors : undefined) ||
-            event?.error ||
-            [];
+          const candidate = isClerkAPIResponseError(event.error)
+            ? event.error?.errors || event.error
+            : event?.error || [];
 
           const errors = Array.isArray(candidate) ? candidate : [candidate];
 
