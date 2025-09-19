@@ -1,16 +1,16 @@
 import type { CustomPage } from '@clerk/types';
+import { describe, it } from '@jest/globals';
 import React from 'react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { render } from '../../../../vitestUtils';
-import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
+import { render } from '../../../../testUtils';
+import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { OrganizationProfile } from '../';
 
 const { createFixtures } = bindCreateFixtures('OrganizationProfile');
 
 describe('OrganizationProfile', () => {
-  beforeEach(() => vi.useFakeTimers());
-  afterEach(() => vi.useRealTimers());
+  beforeEach(() => jest.useFakeTimers());
+  afterEach(() => jest.useRealTimers());
   it('includes buttons for the bigger sections', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withOrganizations();

@@ -1,14 +1,14 @@
 import type { BillingMoneyAmount, BillingMoneyAmountJSON } from '@clerk/types';
 
-import { CommercePlan } from './CommercePlan';
-import type { CommerceSubscriptionItemJSON } from './JSON';
+import { BillingPlan } from './CommercePlan';
+import type { BillingSubscriptionItemJSON } from './JSON';
 
 /**
- * The `CommerceSubscriptionItem` object is similar to the [`CommerceSubscriptionItemResource`](/docs/references/javascript/types/commerce-subscription-item-resource) object as it holds information about a subscription item, as well as methods for managing it. However, the `CommerceSubscriptionItem` object is different in that it is used in the [Backend API](https://clerk.com/docs/reference/backend-api/tag/commerce/get/commerce/subscription_items) and is not directly accessible from the Frontend API.
+ * The `BillingSubscriptionItem` object is similar to the [`BillingSubscriptionItemResource`](/docs/references/javascript/types/commerce-subscription-item-resource) object as it holds information about a subscription item, as well as methods for managing it. However, the `BillingSubscriptionItem` object is different in that it is used in the [Backend API](https://clerk.com/docs/reference/backend-api/tag/commerce/get/commerce/subscription_items) and is not directly accessible from the Frontend API.
  *
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
-export class CommerceSubscriptionItem {
+export class BillingSubscriptionItem {
   constructor(
     /**
      * The unique identifier for the subscription item.
@@ -17,7 +17,7 @@ export class CommerceSubscriptionItem {
     /**
      * The status of the subscription item.
      */
-    readonly status: CommerceSubscriptionItemJSON['status'],
+    readonly status: BillingSubscriptionItemJSON['status'],
     /**
      * The plan period for the subscription item.
      */
@@ -46,7 +46,7 @@ export class CommerceSubscriptionItem {
     /**
      * The plan associated with this subscription item.
      */
-    readonly plan: CommercePlan,
+    readonly plan: BillingPlan,
     /**
      * The plan ID.
      */
@@ -89,7 +89,7 @@ export class CommerceSubscriptionItem {
     readonly lifetimePaid?: BillingMoneyAmount | null,
   ) {}
 
-  static fromJSON(data: CommerceSubscriptionItemJSON): CommerceSubscriptionItem {
+  static fromJSON(data: BillingSubscriptionItemJSON): BillingSubscriptionItem {
     function formatAmountJSON(
       amount: BillingMoneyAmountJSON | null | undefined,
     ): BillingMoneyAmount | null | undefined {
@@ -105,14 +105,14 @@ export class CommerceSubscriptionItem {
       };
     }
 
-    return new CommerceSubscriptionItem(
+    return new BillingSubscriptionItem(
       data.id,
       data.status,
       data.plan_period,
       data.period_start,
       data.next_payment,
       formatAmountJSON(data.amount),
-      CommercePlan.fromJSON(data.plan),
+      BillingPlan.fromJSON(data.plan),
       data.plan_id,
       data.created_at,
       data.updated_at,

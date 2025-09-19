@@ -1,11 +1,11 @@
 import type { OrganizationInvitationResource, OrganizationMembershipResource } from '@clerk/types';
+import { describe } from '@jest/globals';
 import { screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { render } from '../../../../vitestUtils';
+import { render } from '../../../../testUtils';
 import { clearFetchCache } from '../../../hooks/useFetch';
-import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
+import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { OrganizationMembers } from '../OrganizationMembers';
 import { createFakeMember, createFakeOrganizationInvitation, createFakeOrganizationMembershipRequest } from './utils';
 
@@ -167,7 +167,7 @@ describe('OrganizationMembers', () => {
       data: [
         {
           pathRoot: '',
-          reload: vi.fn(),
+          reload: jest.fn(),
           id: 'member',
           key: 'member',
           name: 'Member',
@@ -178,7 +178,7 @@ describe('OrganizationMembers', () => {
         },
         {
           pathRoot: '',
-          reload: vi.fn(),
+          reload: jest.fn(),
           id: 'admin',
           key: 'admin',
           name: 'Admin',
@@ -505,7 +505,7 @@ describe('OrganizationMembers', () => {
       data: [
         {
           pathRoot: '',
-          reload: vi.fn(),
+          reload: jest.fn(),
           id: 'member',
           key: 'member',
           name: 'Member',
@@ -516,7 +516,7 @@ describe('OrganizationMembers', () => {
         },
         {
           pathRoot: '',
-          reload: vi.fn(),
+          reload: jest.fn(),
           id: 'admin',
           key: 'admin',
           name: 'Admin',
@@ -561,7 +561,7 @@ describe('OrganizationMembers', () => {
       });
     });
 
-    it.skip('hides the invite screen when user clicks cancel button', async () => {
+    it('hides the invite screen when user clicks cancel button', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withOrganizations();
         f.withUser({
@@ -572,22 +572,21 @@ describe('OrganizationMembers', () => {
 
       fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
 
-      const { container, queryByRole, findByRole } = render(<OrganizationMembers />, { wrapper });
+      const { container, getByRole, queryByRole, findByRole } = render(<OrganizationMembers />, { wrapper });
 
       await waitForLoadingCompleted(container);
 
-      const inviteButton = await findByRole('button', { name: 'Invite' });
-      await userEvent.click(inviteButton);
-
-      expect(await findByRole('heading', { name: /invite new members/i })).toBeInTheDocument();
+      const inviteButton = queryByRole('button', { name: 'Invite' });
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      await userEvent.click(inviteButton!);
+      await waitFor(async () =>
+        expect(await findByRole('heading', { name: /invite new members/i })).toBeInTheDocument(),
+      );
       expect(inviteButton).toBeInTheDocument();
+      await userEvent.click(getByRole('button', { name: 'Cancel' }));
 
-      const cancelButton = await findByRole('button', { name: 'Cancel' });
-      await userEvent.click(cancelButton);
-
-      await waitForElementToBeRemoved(() => queryByRole('heading', { name: /invite new members/i }));
-
-      expect(await findByRole('button', { name: 'Invite' })).toBeInTheDocument();
+      await waitFor(async () => expect(await findByRole('button', { name: 'Invite' })).toBeInTheDocument());
+      expect(queryByRole('heading', { name: /invite new members/i })).not.toBeInTheDocument();
     });
   });
 });

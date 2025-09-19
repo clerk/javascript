@@ -1,12 +1,12 @@
 import type { LoadedClerk } from '@clerk/types';
-import { vi } from 'vitest';
+import { jest } from '@jest/globals';
 
 import type { RouteContextValue } from '../../router';
 
 type FunctionLike = (...args: any) => any;
 
 type DeepJestMocked<T> = T extends FunctionLike
-  ? vi.Mocked<T>
+  ? jest.Mocked<T>
   : T extends object
     ? {
         [k in keyof T]: DeepJestMocked<T[k]>;
@@ -14,7 +14,7 @@ type DeepJestMocked<T> = T extends FunctionLike
     : T;
 
 type MockMap<T = any> = {
-  [K in { [K in keyof T]: T[K] extends (...args: any[]) => any ? K : never }[keyof T]]?: vi.Mock<
+  [K in { [K in keyof T]: T[K] extends (...args: any[]) => any ? K : never }[keyof T]]?: jest.Mock<
     // @ts-expect-error -- the typing seems to be working in practice
     T[K]
   >;
@@ -23,7 +23,7 @@ type MockMap<T = any> = {
 const mockProp = <T>(obj: T, k: keyof T, mocks?: MockMap) => {
   if (typeof obj[k] === 'function') {
     // @ts-ignore
-    obj[k] = mocks?.[k] ?? vi.fn();
+    obj[k] = mocks?.[k] ?? jest.fn();
   }
 };
 
@@ -51,7 +51,7 @@ export const mockClerkMethods = (clerk: LoadedClerk): DeepJestMocked<LoadedClerk
     mockMethodsOf(session, {
       exclude: ['checkAuthorization'],
       mocks: {
-        touch: vi.fn(() => Promise.resolve(session)),
+        touch: jest.fn(() => Promise.resolve(session)),
       },
     });
     mockMethodsOf(session.user);
@@ -81,12 +81,12 @@ export const mockRouteContextValue = ({ queryString = '' }: Partial<DeepJestMock
     currentPath: '',
     queryString,
     queryParams: {},
-    getMatchData: vi.fn(),
-    matches: vi.fn(),
-    baseNavigate: vi.fn(),
-    navigate: vi.fn(() => Promise.resolve(true)),
-    resolve: vi.fn((to: string) => new URL(to, 'https://clerk.com')),
-    refresh: vi.fn(),
+    getMatchData: jest.fn(),
+    matches: jest.fn(),
+    baseNavigate: jest.fn(),
+    navigate: jest.fn(() => Promise.resolve(true)),
+    resolve: jest.fn((to: string) => new URL(to, 'https://clerk.com')),
+    refresh: jest.fn(),
     params: {},
   } as RouteContextValue;
 };

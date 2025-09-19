@@ -1,11 +1,11 @@
-import { renderHook } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
-
-import { render } from '@/vitestUtils';
+// eslint-disable-next-line simple-import-sort/imports
+import { render } from '../../../testUtils';
+import React from 'react';
 
 import { Box, useAppearance } from '..';
 import { AppearanceProvider } from '../AppearanceContext';
-import { knownColors } from './vitestUtils';
+import { renderHook } from '@testing-library/react';
+import { knownColors } from './testUtils';
 
 const themeAColor = 'blue';
 const themeA = {

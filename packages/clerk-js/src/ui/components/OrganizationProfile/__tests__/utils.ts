@@ -10,7 +10,7 @@ import type {
   OrganizationResource,
   PublicUserData,
 } from '@clerk/types';
-import { vi } from 'vitest';
+import { jest } from '@jest/globals';
 
 type FakeMemberParams = {
   id: string;
@@ -26,8 +26,8 @@ type FakeMemberParams = {
 
 export const createFakeMember = (params: FakeMemberParams): OrganizationMembershipResource => {
   return {
-    destroy: vi.fn() as any,
-    update: vi.fn() as any,
+    destroy: jest.fn() as any,
+    update: jest.fn() as any,
     organization: { id: params.orgId } as any as OrganizationResource,
     id: params.id,
     role: params?.role || 'admin',
@@ -70,11 +70,11 @@ export const createFakeDomain = (params: FakeDomainParams): OrganizationDomainRe
     createdAt: params.createdAt || new Date(),
     updatedAt: new Date(),
     affiliationEmailAddress: params.affiliationEmailAddress || null,
-    attemptAffiliationVerification: vi.fn() as any,
-    delete: vi.fn() as any,
-    prepareAffiliationVerification: vi.fn() as any,
-    updateEnrollmentMode: vi.fn() as any,
-    reload: vi.fn() as any,
+    attemptAffiliationVerification: jest.fn() as any,
+    delete: jest.fn() as any,
+    prepareAffiliationVerification: jest.fn() as any,
+    updateEnrollmentMode: jest.fn() as any,
+    reload: jest.fn() as any,
   };
 };
 
@@ -100,8 +100,8 @@ export const createFakeOrganizationInvitation = (params: FakeInvitationParams): 
     status: params.status || 'pending',
     createdAt: params?.createdAt || new Date(),
     updatedAt: new Date(),
-    revoke: vi.fn as any,
-    reload: vi.fn as any,
+    revoke: jest.fn as any,
+    reload: jest.fn as any,
   };
 };
 
@@ -131,8 +131,8 @@ export const createFakeOrganizationMembershipRequest = (
     status: params.status || 'pending',
     createdAt: params?.createdAt || new Date(),
     updatedAt: new Date(),
-    accept: vi.fn as any,
-    reject: vi.fn as any,
-    reload: vi.fn as any,
+    accept: jest.fn as any,
+    reject: jest.fn as any,
+    reload: jest.fn as any,
   };
 };

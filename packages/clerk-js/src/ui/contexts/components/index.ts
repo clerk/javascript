@@ -2,7 +2,6 @@ export * from './SignIn';
 export * from './SignUp';
 export * from './SignOut';
 export * from './SubscriberType';
-export * from './SubscriptionDetails';
 export * from './UserProfile';
 export * from './UserVerification';
 export * from './UserButton';
