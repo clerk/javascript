@@ -44,6 +44,7 @@ import type {
   SignInFutureResetPasswordSubmitParams,
   SignInFutureResource,
   SignInFutureSSOParams,
+  SignInFutureTicketParams,
   SignInFutureTOTPVerifyParams,
   SignInIdentifier,
   SignInJSON,
@@ -912,6 +913,11 @@ class SignInFuture implements SignInFutureResource {
         action: 'attempt_second_factor',
       });
     });
+  }
+
+  async ticket(params?: SignInFutureTicketParams): Promise<{ error: unknown }> {
+    const ticket = params?.ticket ?? getClerkQueryParam('__clerk_ticket');
+    return this.create({ ticket: ticket ?? undefined });
   }
 
   async finalize(params?: SignInFutureFinalizeParams): Promise<{ error: unknown }> {
