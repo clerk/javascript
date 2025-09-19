@@ -48,6 +48,7 @@ export const ERROR_CODES = {
   FORM_PASSWORD_INCORRECT: 'form_password_incorrect',
   INVALID_STRATEGY_FOR_USER: 'strategy_for_user_invalid',
   NOT_ALLOWED_TO_SIGN_UP: 'not_allowed_to_sign_up',
+  SIGN_UP_RESTRICTED_WAITLIST: 'sign_up_restricted_waitlist',
   OAUTH_ACCESS_DENIED: 'oauth_access_denied',
   OAUTH_EMAIL_DOMAIN_RESERVED_BY_SAML: 'oauth_email_domain_reserved_by_saml',
   NOT_ALLOWED_ACCESS: 'not_allowed_access',
