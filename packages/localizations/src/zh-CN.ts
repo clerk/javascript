@@ -1044,7 +1044,7 @@ export const zhCN: LocalizationResource = {
         title: '移除电子邮件地址',
       },
       title: '添加电子邮件地址',
-      verifyTitle: 'Verify email address',
+      verifyTitle: '验证电子邮件地址',
     },
     formButtonPrimary__add: '添加',
     formButtonPrimary__continue: '继续',
