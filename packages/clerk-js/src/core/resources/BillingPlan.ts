@@ -1,6 +1,6 @@
 import type { BillingMoneyAmount, BillingPayerResourceType, BillingPlanJSON, BillingPlanResource } from '@clerk/types';
 
-import { billingMoneyAmountFromJSON } from '@/utils/commerce';
+import { billingMoneyAmountFromJSON } from '@/utils/billing';
 
 import { BaseResource, Feature } from './internal';
 

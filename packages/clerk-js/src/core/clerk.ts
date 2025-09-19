@@ -147,8 +147,8 @@ import type { FapiClient, FapiRequestCallback } from './fapiClient';
 import { createFapiClient } from './fapiClient';
 import { createClientFromJwt } from './jwt-client';
 import { APIKeys } from './modules/apiKeys';
+import { Billing } from './modules/billing';
 import { createCheckoutInstance } from './modules/checkout/instance';
-import { Billing } from './modules/commerce';
 import {
   BaseResource,
   Client,

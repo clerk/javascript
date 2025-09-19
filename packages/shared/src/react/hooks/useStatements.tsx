@@ -1,12 +1,12 @@
 import type { BillingStatementResource, GetStatementsParams } from '@clerk/types';
 
 import { useClerkInstanceContext } from '../contexts';
-import { createBillingPaginatedHook as createCommercePaginatedHook } from './createCommerceHook';
+import { createBillingPaginatedHook } from './createBillingPaginatedHook';
 
 /**
  * @internal
  */
-export const useStatements = createCommercePaginatedHook<BillingStatementResource, GetStatementsParams>({
+export const useStatements = createBillingPaginatedHook<BillingStatementResource, GetStatementsParams>({
   hookName: 'useStatements',
   resourceType: 'billing-statements',
   useFetcher: () => {

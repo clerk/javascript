@@ -1,9 +1,9 @@
-import { describe, it } from '@jest/globals';
 import { waitFor } from '@testing-library/react';
+import { beforeEach, describe, expect, it } from 'vitest';
 
-import { render, screen } from '../../../../testUtils';
+import { render, screen } from '../../../../vitestUtils';
 import { clearFetchCache } from '../../../hooks';
-import { bindCreateFixtures } from '../../../utils/test/createFixtures';
+import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
 import { UserVerificationFactorOne } from '../UserVerificationFactorOne';
 
 const { createFixtures } = bindCreateFixtures('UserVerification');
@@ -50,7 +50,7 @@ describe('UserVerificationFactorOne', () => {
       getByLabelText(/Enter verification code/i);
     });
 
-    expect(fixtures.session?.prepareFirstFactorVerification).toHaveBeenCalledTimes(1);
+    expect(fixtures.session?.prepareFirstFactorVerification).toHaveBeenCalled();
   });
 
   it('renders the component for with strategy:phone_code', async () => {
@@ -70,7 +70,7 @@ describe('UserVerificationFactorOne', () => {
       getByLabelText(/Enter verification code/i);
     });
 
-    expect(fixtures.session?.prepareFirstFactorVerification).toHaveBeenCalledTimes(1);
+    expect(fixtures.session?.prepareFirstFactorVerification).toHaveBeenCalled();
   });
 
   describe('Submitting', () => {

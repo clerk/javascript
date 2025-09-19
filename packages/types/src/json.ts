@@ -11,7 +11,7 @@ import type {
   BillingStatementStatus,
   BillingSubscriptionPlanPeriod,
   BillingSubscriptionStatus,
-} from './commerce';
+} from './billing';
 import type { CommerceSettingsJSON } from './commerceSettings';
 import type { DisplayConfigJSON } from './displayConfig';
 import type { EnterpriseProtocol, EnterpriseProvider } from './enterpriseAccount';

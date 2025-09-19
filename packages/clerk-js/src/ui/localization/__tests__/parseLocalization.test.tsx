@@ -1,9 +1,10 @@
 import React from 'react';
+import { describe, expect, it } from 'vitest';
 
-import { renderHook } from '../../../testUtils';
+import { renderHook } from '../../../vitestUtils';
 import { OptionsProvider } from '../../contexts';
 import { localizationKeys, useLocalizations } from '../../customizables';
-import { bindCreateFixtures } from '../../utils/test/createFixtures';
+import { bindCreateFixtures } from '../../utils/vitest/createFixtures';
 import { defaultResource } from '../defaultEnglishResource';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
