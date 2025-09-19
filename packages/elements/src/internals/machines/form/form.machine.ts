@@ -99,14 +99,13 @@ export const FormMachine = setup({
         const isClerkAPIError = (err: any): err is ClerkAPIError => 'meta' in err;
 
         if (isKnownError(event.error)) {
+          const fields: Record<string, ClerkElementsFieldError[]> = {};
+          const globalErrors: ClerkElementsError[] = [];
           const candidate = isClerkAPIResponseError(event.error)
             ? event.error?.errors || event.error
             : event?.error || [];
 
           const errors = Array.isArray(candidate) ? candidate : [candidate];
-
-          const fields: Record<string, ClerkElementsFieldError[]> = {};
-          const globalErrors = [];
 
           for (const error of errors) {
             const name = isClerkAPIError(error) ? snakeToCamel(error?.meta?.paramName) : null;
