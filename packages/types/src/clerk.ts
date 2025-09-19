@@ -20,7 +20,6 @@ import type {
   UserVerificationTheme,
   WaitlistTheme,
 } from './appearance';
-import type { ClientResource } from './client';
 import type {
   BillingCheckoutResource,
   BillingNamespace,
@@ -28,7 +27,8 @@ import type {
   BillingSubscriptionPlanPeriod,
   ConfirmCheckoutParams,
   ForPayerType,
-} from './commerce';
+} from './billing';
+import type { ClientResource } from './client';
 import type { CustomMenuItem } from './customMenuItems';
 import type { CustomPage } from './customPages';
 import type { InstanceType } from './instance';
