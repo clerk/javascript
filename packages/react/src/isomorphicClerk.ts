@@ -623,6 +623,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.mountUserProfile(node, props);
     });
 
+    this.premountUserAvatarNodes.forEach((props, node) => {
+      clerkjs.mountUserAvatar(node, props);
+    });
+
     this.premountUserButtonNodes.forEach((props, node) => {
       clerkjs.mountUserButton(node, props);
     });

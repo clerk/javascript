@@ -411,7 +411,7 @@ export interface Clerk {
   /**
    * Mount a user avatar component at the target element.
    *
-   * @param targetNode Target node to mount the UserButton component.
+   * @param targetNode Target node to mount the UserAvatar component.
    */
   mountUserAvatar: (targetNode: HTMLDivElement, userAvatarProps?: UserAvatarProps) => void;
 

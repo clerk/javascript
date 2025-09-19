@@ -8,7 +8,7 @@ export const useUserAvatarContext = () => {
   const context = useContext(UserAvatarContext);
 
   if (!context || context.componentName !== 'UserAvatar') {
-    throw new Error('Clerk: useUserAvatarContext called outside ApiKeys.');
+    throw new Error('Clerk: useUserAvatarContext called outside UserAvatar.');
   }
 
   const { componentName, ...ctx } = context;
