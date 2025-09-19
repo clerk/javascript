@@ -2,4 +2,4 @@
 "@clerk/nuxt": patch
 ---
 
-Fixed incorrect default property values passed to `<GoogleOneTap />` component
+Fixed incorrect default prop values passed to `<GoogleOneTap />` component
