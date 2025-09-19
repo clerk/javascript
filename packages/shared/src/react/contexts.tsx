@@ -10,7 +10,6 @@ import type {
   SignedInSessionResource,
   UserResource,
 } from '@clerk/types';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { PropsWithChildren } from 'react';
 import React from 'react';
 
@@ -60,27 +59,24 @@ const OrganizationProvider = ({
   children,
   organization,
   swrConfig,
-  queryClient,
+  // queryClient,
 }: PropsWithChildren<
   OrganizationContextProps & {
     // Exporting inferred types  directly from SWR will result in error while building declarations
     swrConfig?: any;
-    queryClient?: QueryClient;
+    // queryClient?: QueryClient;
   }
 >) => {
-  const [defaultClient] = React.useState(() => new QueryClient());
   return (
-    <QueryClientProvider client={queryClient || defaultClient}>
-      <SWRConfig value={swrConfig}>
-        <OrganizationContextInternal.Provider
-          value={{
-            value: { organization },
-          }}
-        >
-          {children}
-        </OrganizationContextInternal.Provider>
-      </SWRConfig>
-    </QueryClientProvider>
+    <SWRConfig value={swrConfig}>
+      <OrganizationContextInternal.Provider
+        value={{
+          value: { organization },
+        }}
+      >
+        {children}
+      </OrganizationContextInternal.Provider>
+    </SWRConfig>
   );
 };
 

@@ -103,7 +103,7 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
     return clerk.__internal_queryClient;
   }, [queryStatus, clerkStatus]);
 
-  console.log('queryStatus', queryStatus, queryClient);
+  // console.log('queryStatus', queryStatus, queryClient);
 
   return (
     // @ts-expect-error value passed is of type IsomorphicClerk where the context expects LoadedClerk
@@ -113,7 +113,7 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
           <OrganizationProvider
             key={clerkStatus + queryStatus}
             {...organizationCtx.value}
-            queryClient={queryClient}
+            // queryClient={queryClient}
           >
             <AuthContext.Provider value={authCtx}>
               <UserContext.Provider value={userCtx}>

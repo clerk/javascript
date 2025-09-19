@@ -1,6 +1,6 @@
 import type { EnvironmentResource, ForPayerType } from '@clerk/types';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useCallback, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { eventMethodCalled } from '../../telemetry/events';
 import { useSWR } from '../clerk-swr';
@@ -80,6 +80,26 @@ export const useSubscriptionPrev = (params?: UseSubscriptionParams) => {
   };
 };
 
+const useClerkQueryClient = () => {
+  const clerk = useClerkInstanceContext();
+  const [queryStatus, setQueryStatus] = useState('loading');
+  useEffect(() => {
+    // @ts-expect-error - queryClientStatus is not typed
+    clerk.on('queryClientStatus', setQueryStatus);
+    return () => {
+      // @ts-expect-error - queryClientStatus is not typed
+      clerk.off('queryClientStatus', setQueryStatus);
+    };
+  }, [clerk]);
+
+  const queryClient = useMemo(() => {
+    // @ts-expect-error - __internal_queryClient is not typed
+    return clerk.__internal_queryClient;
+  }, [queryStatus, clerk.status]);
+
+  return queryClient;
+};
+
 export const useSubscription = (params?: UseSubscriptionParams) => {
   useAssertWrappedByClerkProvider(hookName);
 
@@ -99,7 +119,9 @@ export const useSubscription = (params?: UseSubscriptionParams) => {
     ? environment?.commerceSettings.billing.organization.enabled
     : environment?.commerceSettings.billing.user.enabled;
 
-  const queryClient = useQueryClient();
+  const queryClient = useClerkQueryClient();
+  // console.log('useInfiniteQuery', useInfiniteQuery);
+  // console.log('useInfiniteQuery', useMutation);
 
   const queryKey = useMemo(() => {
     return [
@@ -111,20 +133,23 @@ export const useSubscription = (params?: UseSubscriptionParams) => {
     ];
   }, [user?.id, isOrganization, organization?.id]);
 
-  const query = useQuery({
-    queryKey,
-    queryFn: ({ queryKey }) => {
-      const obj = queryKey[1] as {
-        args: {
-          orgId?: string;
+  const query = useQuery(
+    {
+      queryKey,
+      queryFn: ({ queryKey }) => {
+        const obj = queryKey[1] as {
+          args: {
+            orgId?: string;
+          };
         };
-      };
-      return clerk.billing.getSubscription(obj.args);
+        return clerk.billing.getSubscription(obj.args);
+      },
+      staleTime: 1_0000 * 60,
+      enabled: Boolean(user?.id && billingEnabled) && clerk.status === 'ready',
+      // placeholderData
     },
-    staleTime: 1_0000 * 60,
-    enabled: Boolean(user?.id && billingEnabled) && clerk.status === 'ready',
-    // placeholderData
-  });
+    queryClient,
+  );
 
   const revalidate = useCallback(() => queryClient.invalidateQueries({ queryKey }), [queryClient, queryKey]);
 
