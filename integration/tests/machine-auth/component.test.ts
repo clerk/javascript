@@ -4,7 +4,10 @@ import { appConfigs } from '../../presets';
 import type { FakeOrganization, FakeUser } from '../../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../../testUtils';
 
-testAgainstRunningApps({ withEnv: [appConfigs.envs.withAPIKeys] })('api keys @generic', ({ app }) => {
+testAgainstRunningApps({
+  withEnv: [appConfigs.envs.withAPIKeys],
+  withPattern: ['withMachine.next.appRouter'],
+})('api keys component @machine', ({ app }) => {
   test.describe.configure({ mode: 'serial' });
 
   let fakeAdmin: FakeUser;

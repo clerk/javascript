@@ -8,7 +8,7 @@ import { patchRequest } from './utils';
 
 export async function authenticateRequest(
   args: LoaderFunctionArgs,
-  opts: AuthenticateRequestOptions,
+  opts: Omit<AuthenticateRequestOptions, 'machineSecretKey'>,
 ): Promise<SignedInState | SignedOutState> {
   const { request } = args;
   const { audience, authorizedParties } = opts;

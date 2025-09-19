@@ -34,7 +34,7 @@ describe('SignInFactorTwo', () => {
       );
       render(<SignInFactorTwo />, { wrapper });
 
-      const inputs = screen.getAllByLabelText(/digit/i);
+      const inputs = screen.getAllByTestId('otp-input-segment');
       expect(inputs.length).toBe(6);
     });
 

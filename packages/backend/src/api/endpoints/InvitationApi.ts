@@ -8,13 +8,19 @@ import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/invitations';
 
+type TemplateSlug = 'invitation' | 'waitlist_invitation';
+
 type CreateParams = {
   emailAddress: string;
-  redirectUrl?: string;
-  publicMetadata?: UserPublicMetadata;
-  notify?: boolean;
+  expiresInDays?: number;
   ignoreExisting?: boolean;
+  notify?: boolean;
+  publicMetadata?: UserPublicMetadata;
+  redirectUrl?: string;
+  templateSlug?: TemplateSlug;
 };
+
+type CreateBulkParams = Array<CreateParams>;
 
 type GetInvitationListParams = ClerkPaginationRequest<{
   /**
@@ -56,6 +62,14 @@ export class InvitationAPI extends AbstractAPI {
     return this.request<Invitation>({
       method: 'POST',
       path: basePath,
+      bodyParams: params,
+    });
+  }
+
+  public async createInvitationBulk(params: CreateBulkParams) {
+    return this.request<Invitation>({
+      method: 'POST',
+      path: joinPaths(basePath, 'bulk'),
       bodyParams: params,
     });
   }

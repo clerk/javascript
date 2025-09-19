@@ -1,5 +1,5 @@
 import { useClerk, useOrganization } from '@clerk/shared/react';
-import type { CommercePaymentSourceResource } from '@clerk/types';
+import type { BillingPaymentSourceResource } from '@clerk/types';
 import { Fragment, useMemo, useRef } from 'react';
 
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
@@ -54,7 +54,7 @@ const RemoveScreen = ({
   paymentSource,
   revalidate,
 }: {
-  paymentSource: CommercePaymentSourceResource;
+  paymentSource: BillingPaymentSourceResource;
   revalidate: () => void;
 }) => {
   const { close } = useActionContext();
@@ -121,6 +121,10 @@ export const PaymentSources = withCardStateProvider(() => {
     return null;
   }
 
+  if (__BUILD_DISABLE_RHC__ && sortedPaymentSources.length === 0) {
+    return null;
+  }
+
   return (
     <ProfileSection.Root
       title={localizationKeys(`${localizationRoot}.billingPage.paymentSourcesSection.title`)}
@@ -162,17 +166,21 @@ export const PaymentSources = withCardStateProvider(() => {
                   </Action.Open>
                 </Fragment>
               ))}
-              <Action.Trigger value='add'>
-                <ProfileSection.ArrowButton
-                  id='paymentSources'
-                  localizationKey={localizationKeys(`${localizationRoot}.billingPage.paymentSourcesSection.add`)}
-                />
-              </Action.Trigger>
-              <Action.Open value='add'>
-                <Action.Card>
-                  <AddScreen onSuccess={revalidatePaymentMethods} />
-                </Action.Card>
-              </Action.Open>
+              {__BUILD_DISABLE_RHC__ ? null : (
+                <>
+                  <Action.Trigger value='add'>
+                    <ProfileSection.ArrowButton
+                      id='paymentSources'
+                      localizationKey={localizationKeys(`${localizationRoot}.billingPage.paymentSourcesSection.add`)}
+                    />
+                  </Action.Trigger>
+                  <Action.Open value='add'>
+                    <Action.Card>
+                      <AddScreen onSuccess={revalidatePaymentMethods} />
+                    </Action.Card>
+                  </Action.Open>
+                </>
+              )}
             </>
           )}
         </ProfileSection.ItemList>
@@ -185,7 +193,7 @@ const PaymentSourceMenu = ({
   paymentSource,
   revalidate,
 }: {
-  paymentSource: CommercePaymentSourceResource;
+  paymentSource: BillingPaymentSourceResource;
   revalidate: () => void;
 }) => {
   const { open } = useActionContext();

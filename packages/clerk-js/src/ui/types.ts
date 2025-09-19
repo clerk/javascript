@@ -12,13 +12,14 @@ import type {
   OrganizationProfileProps,
   OrganizationSwitcherProps,
   PricingTableProps,
+  SessionResource,
   SignInFallbackRedirectUrl,
   SignInForceRedirectUrl,
   SignInProps,
   SignUpFallbackRedirectUrl,
   SignUpForceRedirectUrl,
   SignUpProps,
-  TaskSelectOrganizationProps,
+  TaskChooseOrganizationProps,
   UserButtonProps,
   UserProfileProps,
   WaitlistProps,
@@ -55,7 +56,7 @@ export type AvailableComponentProps =
   | __internal_SubscriptionDetailsProps
   | __internal_PlanDetailsProps
   | APIKeysProps
-  | TaskSelectOrganizationProps;
+  | TaskChooseOrganizationProps;
 
 type ComponentMode = 'modal' | 'mounted';
 type SignInMode = 'modal' | 'redirect';
@@ -136,10 +137,11 @@ export type CheckoutCtx = __internal_CheckoutProps & {
 export type SessionTasksCtx = {
   redirectUrlComplete: string;
   currentTaskContainer?: React.RefObject<HTMLDivElement> | null;
+  navigateOnSetActive: (opts: { session: SessionResource; redirectUrl: string }) => Promise<unknown>;
 };
 
-export type TaskSelectOrganizationCtx = TaskSelectOrganizationProps & {
-  componentName: 'TaskSelectOrganization';
+export type TaskChooseOrganizationCtx = TaskChooseOrganizationProps & {
+  componentName: 'TaskChooseOrganization';
 };
 
 export type OAuthConsentCtx = __internal_OAuthConsentProps & {
@@ -172,5 +174,5 @@ export type AvailableComponentCtx =
   | OAuthConsentCtx
   | SubscriptionDetailsCtx
   | PlanDetailsCtx
-  | TaskSelectOrganizationCtx;
+  | TaskChooseOrganizationCtx;
 export type AvailableComponentName = AvailableComponentCtx['componentName'];

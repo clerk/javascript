@@ -38,7 +38,7 @@ const SDK_METADATA = {
  */
 export const clerkPlugin: Plugin<[PluginOptions]> = {
   install(app, pluginOptions) {
-    const { initialState } = pluginOptions;
+    const { initialState } = pluginOptions || {};
 
     const loaded = shallowRef(false);
     const clerk = shallowRef<Clerk | null>(null);
@@ -118,8 +118,6 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
       sessionCtx,
       userCtx,
       organizationCtx,
-      treatPendingAsSignedOut:
-        options.treatPendingAsSignedOut ?? clerk.value?.__internal_getOption?.('treatPendingAsSignedOut'),
     });
   },
 };

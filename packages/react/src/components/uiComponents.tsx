@@ -9,7 +9,7 @@ import type {
   PricingTableProps,
   SignInProps,
   SignUpProps,
-  TaskSelectOrganizationProps,
+  TaskChooseOrganizationProps,
   UserButtonProps,
   UserProfileProps,
   WaitlistProps,
@@ -81,8 +81,8 @@ type UserButtonPropsWithoutCustomPages = Without<
   userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance'>;
   /**
    * Adding `asProvider` will defer rendering until the `<Outlet />` component is mounted.
-   * This API is experimental and may change at any moment.
-   * @experimental
+   *
+   * @experimental This API is experimental and may change at any moment.
    * @default undefined
    */
   __experimental_asProvider?: boolean;
@@ -99,6 +99,7 @@ type OrganizationSwitcherExportType = typeof _OrganizationSwitcher & {
   /**
    * The `<Outlet />` component can be used in conjunction with `asProvider` in order to control rendering
    * of the `<OrganizationSwitcher />` without affecting its configuration or any custom pages that could be mounted
+   *
    * @experimental This API is experimental and may change at any moment.
    */
   __experimental_Outlet: typeof OrganizationSwitcherOutlet;
@@ -111,8 +112,8 @@ type OrganizationSwitcherPropsWithoutCustomPages = Without<
   organizationProfileProps?: Pick<OrganizationProfileProps, 'appearance'>;
   /**
    * Adding `asProvider` will defer rendering until the `<Outlet />` component is mounted.
-   * This API is experimental and may change at any moment.
-   * @experimental
+   *
+   * @experimental This API is experimental and may change at any moment.
    * @default undefined
    */
   __experimental_asProvider?: boolean;
@@ -256,7 +257,9 @@ const _UserButton = withClerk(
       allowForAnyChildren: !!props.__experimental_asProvider,
     });
     const userProfileProps = Object.assign(props.userProfileProps || {}, { customPages });
-    const { customMenuItems, customMenuItemsPortals } = useUserButtonCustomMenuItems(props.children);
+    const { customMenuItems, customMenuItemsPortals } = useUserButtonCustomMenuItems(props.children, {
+      allowForAnyChildren: !!props.__experimental_asProvider,
+    });
     const sanitizedChildren = useSanitizedChildren(props.children);
 
     const passableProps = {
@@ -577,7 +580,10 @@ export const Waitlist = withClerk(
 
 export const PricingTable = withClerk(
   ({ clerk, component, fallback, ...props }: WithClerkProp<PricingTableProps & FallbackProp>) => {
-    const mountingStatus = useWaitForComponentMount(component);
+    const mountingStatus = useWaitForComponentMount(component, {
+      // This attribute is added to the PricingTable root element after we've successfully fetched the plans asynchronously.
+      selector: '[data-component-status="ready"]',
+    });
     const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
 
     const rendererRootProps = {
@@ -604,8 +610,7 @@ export const PricingTable = withClerk(
 );
 
 /**
- * @experimental
- * This component is in early access and may change in future releases.
+ * @experimental This component is in early access and may change in future releases.
  */
 export const APIKeys = withClerk(
   ({ clerk, component, fallback, ...props }: WithClerkProp<APIKeysProps & FallbackProp>) => {
@@ -635,8 +640,8 @@ export const APIKeys = withClerk(
   { component: 'ApiKeys', renderWhileLoading: true },
 );
 
-export const TaskSelectOrganization = withClerk(
-  ({ clerk, component, fallback, ...props }: WithClerkProp<TaskSelectOrganizationProps & FallbackProp>) => {
+export const TaskChooseOrganization = withClerk(
+  ({ clerk, component, fallback, ...props }: WithClerkProp<TaskChooseOrganizationProps & FallbackProp>) => {
     const mountingStatus = useWaitForComponentMount(component);
     const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
 
@@ -650,8 +655,8 @@ export const TaskSelectOrganization = withClerk(
         {clerk.loaded && (
           <ClerkHostRenderer
             component={component}
-            mount={clerk.mountTaskSelectOrganization}
-            unmount={clerk.unmountTaskSelectOrganization}
+            mount={clerk.mountTaskChooseOrganization}
+            unmount={clerk.unmountTaskChooseOrganization}
             updateProps={(clerk as any).__unstable__updateProps}
             props={props}
             rootProps={rendererRootProps}
@@ -660,5 +665,5 @@ export const TaskSelectOrganization = withClerk(
       </>
     );
   },
-  { component: 'TaskSelectOrganization', renderWhileLoading: true },
+  { component: 'TaskChooseOrganization', renderWhileLoading: true },
 );

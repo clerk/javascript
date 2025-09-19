@@ -204,6 +204,8 @@ export type ElementsConfig = {
   socialButtonsProviderIcon: WithOptions<OAuthProvider | Web3Provider | PhoneCodeChannel, LoadingState>;
   socialButtonsProviderInitialIcon: WithOptions<OAuthProvider | Web3Provider | PhoneCodeChannel, LoadingState>;
 
+  lastAuthenticationStrategyBadge: WithOptions;
+
   enterpriseButtonsProviderIcon: WithOptions<EnterpriseProvider, LoadingState>;
 
   providerIcon: WithOptions<OAuthProvider | Web3Provider | PhoneCodeChannel | SamlIdpSlug, LoadingState>;
@@ -350,6 +352,11 @@ export type ElementsConfig = {
   organizationListPreviewButton: WithOptions;
   organizationListPreviewItemActionButton: WithOptions;
   organizationListCreateOrganizationActionButton: WithOptions;
+
+  taskChooseOrganizationPreviewItem: WithOptions;
+  taskChooseOrganizationPreviewItems: WithOptions;
+  taskChooseOrganizationCreateOrganizationActionButton: WithOptions;
+  taskChooseOrganizationPreviewButton: WithOptions;
 
   // TODO: Test this idea. Instead of userButtonUserPreview, have a userPreview__userButton instead
   // Same for other repeated selectors, eg avatar
@@ -552,6 +559,7 @@ export type ElementsConfig = {
   profileSectionSubtitleText: WithOptions<ProfileSectionId>;
   profileSectionContent: WithOptions<ProfileSectionId>;
   profileSectionPrimaryButton: WithOptions<ProfileSectionId>;
+  profileSectionButtonGroup: WithOptions<ProfileSectionId>;
   profilePage: WithOptions<ProfilePageId>;
 
   // TODO: review
@@ -972,7 +980,7 @@ export type PlanDetailTheme = Theme;
 export type SubscriptionDetailsTheme = Theme;
 export type APIKeysTheme = Theme;
 export type OAuthConsentTheme = Theme;
-export type TaskSelectOrganizationTheme = Theme;
+export type TaskChooseOrganizationTheme = Theme;
 
 type GlobalAppearanceOptions = {
   /**
@@ -1046,7 +1054,7 @@ export type Appearance<T = Theme> = T &
      */
     __internal_oauthConsent?: T;
     /**
-     * Theme overrides that only apply to the `<TaskSelectOrganization />` component
+     * Theme overrides that only apply to the `<TaskChooseOrganization />` component
      */
-    taskSelectOrganization?: T;
+    taskChooseOrganization?: T;
   };

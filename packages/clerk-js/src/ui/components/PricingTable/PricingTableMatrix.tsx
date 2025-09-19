@@ -1,4 +1,4 @@
-import type { CommercePlanResource, CommerceSubscriptionPlanPeriod } from '@clerk/types';
+import type { BillingPlanResource, BillingSubscriptionPlanPeriod } from '@clerk/types';
 import * as React from 'react';
 
 import { Avatar } from '@/ui/elements/Avatar';
@@ -25,11 +25,11 @@ import { Check, InformationCircle } from '../../icons';
 import { common, InternalThemeProvider, mqu, type ThemableCssProp } from '../../styledSystem';
 
 interface PricingTableMatrixProps {
-  plans: CommercePlanResource[] | undefined;
-  highlightedPlan?: CommercePlanResource['slug'];
-  planPeriod: CommerceSubscriptionPlanPeriod;
-  setPlanPeriod: (val: CommerceSubscriptionPlanPeriod) => void;
-  onSelect: (plan: CommercePlanResource, event?: React.MouseEvent<HTMLElement>) => void;
+  plans: BillingPlanResource[] | undefined;
+  highlightedPlan?: BillingPlanResource['slug'];
+  planPeriod: BillingSubscriptionPlanPeriod;
+  setPlanPeriod: (val: BillingSubscriptionPlanPeriod) => void;
+  onSelect: (plan: BillingPlanResource, event?: React.MouseEvent<HTMLElement>) => void;
 }
 
 export function PricingTableMatrix({
@@ -60,7 +60,7 @@ export function PricingTableMatrix({
 
   const gridTemplateColumns = React.useMemo(() => `repeat(${plans.length + 1}, minmax(9.375rem,1fr))`, [plans.length]);
 
-  const renderBillingCycleControls = React.useMemo(() => plans.some(plan => plan.annualMonthlyAmount > 0), [plans]);
+  const renderBillingCycleControls = React.useMemo(() => plans.some(plan => plan.annualMonthlyFee.amount > 0), [plans]);
 
   const getAllFeatures = React.useMemo(() => {
     const featuresSet = new Set<string>();
@@ -140,7 +140,7 @@ export function PricingTableMatrix({
                     <SegmentedControl.Root
                       aria-labelledby={segmentedControlId}
                       value={planPeriod}
-                      onChange={value => setPlanPeriod(value as CommerceSubscriptionPlanPeriod)}
+                      onChange={value => setPlanPeriod(value as BillingSubscriptionPlanPeriod)}
                     >
                       <SegmentedControl.Button
                         value='month'
@@ -157,11 +157,11 @@ export function PricingTableMatrix({
               {plans.map(plan => {
                 const highlight = plan.slug === highlightedPlan;
                 const planFee =
-                  plan.annualMonthlyAmount <= 0
-                    ? plan.amountFormatted
+                  plan.annualMonthlyFee.amount <= 0
+                    ? plan.fee
                     : planPeriod === 'annual'
-                      ? plan.annualMonthlyAmountFormatted
-                      : plan.amountFormatted;
+                      ? plan.annualMonthlyFee
+                      : plan.fee;
 
                 return (
                   <Box
@@ -237,8 +237,8 @@ export function PricingTableMatrix({
                               variant='h2'
                               colorScheme='body'
                             >
-                              {plan.currencySymbol}
-                              {planFee}
+                              {planFee.currencySymbol}
+                              {planFee.amountFormatted}
                             </Text>
                             <Text
                               elementDescriptor={descriptors.pricingTableMatrixFeePeriod}
@@ -253,7 +253,7 @@ export function PricingTableMatrix({
                               })}
                               localizationKey={localizationKeys('commerce.month')}
                             />
-                            {plan.annualMonthlyAmount > 0 ? (
+                            {plan.annualMonthlyFee.amount > 0 ? (
                               <Box
                                 elementDescriptor={descriptors.pricingTableMatrixFeePeriodNotice}
                                 sx={[

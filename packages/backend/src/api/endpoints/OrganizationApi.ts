@@ -164,19 +164,23 @@ type DeleteOrganizationMembershipParams = {
 
 type CreateOrganizationInvitationParams = {
   organizationId: string;
-  inviterUserId?: string;
   emailAddress: string;
   role: OrganizationMembershipRole;
-  redirectUrl?: string;
+  expiresInDays?: number;
+  inviterUserId?: string;
+  privateMetadata?: OrganizationInvitationPrivateMetadata;
   publicMetadata?: OrganizationInvitationPublicMetadata;
+  redirectUrl?: string;
 };
 
 type CreateBulkOrganizationInvitationParams = Array<{
-  inviterUserId?: string;
   emailAddress: string;
   role: OrganizationMembershipRole;
-  redirectUrl?: string;
+  expiresInDays?: number;
+  inviterUserId?: string;
+  privateMetadata?: OrganizationInvitationPrivateMetadata;
   publicMetadata?: OrganizationInvitationPublicMetadata;
+  redirectUrl?: string;
 }>;
 
 type GetOrganizationInvitationListParams = ClerkPaginationRequest<{

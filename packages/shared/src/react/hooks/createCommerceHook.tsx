@@ -1,4 +1,4 @@
-import type { ClerkPaginatedResponse, ClerkResource, ForPayerType } from '@clerk/types';
+import type { ClerkPaginatedResponse, ClerkResource, EnvironmentResource, ForPayerType } from '@clerk/types';
 
 import { eventMethodCalled } from '../../telemetry/events/method-called';
 import {
@@ -45,17 +45,17 @@ export function createCommercePaginatedHook<TResource extends ClerkResource, TPa
   options,
 }: CommerceHookConfig<TResource, TParams>) {
   type HookParams = PaginatedHookConfig<PagesOrInfiniteOptions> & {
-    for: ForPayerType;
+    for?: ForPayerType;
   };
 
   return function useCommerceHook<T extends HookParams>(
     params?: T,
   ): PaginatedResources<TResource, T extends { infinite: true } ? true : false> {
-    const { for: _for, ...paginationParams } = params || ({ for: 'user' } as T);
+    const { for: _for, ...paginationParams } = params || ({} as Partial<T>);
 
     useAssertWrappedByClerkProvider(hookName);
 
-    const fetchFn = useFetcher(_for);
+    const fetchFn = useFetcher(_for || 'user');
 
     const safeValues = useWithSafeValues(paginationParams, {
       initialPage: 1,
@@ -66,6 +66,9 @@ export function createCommercePaginatedHook<TResource extends ClerkResource, TPa
     } as unknown as T);
 
     const clerk = useClerkInstanceContext();
+
+    // @ts-expect-error `__unstable__environment` is not typed
+    const environment = clerk.__unstable__environment as unknown as EnvironmentResource | null | undefined;
     const user = useUserContext();
     const { organization } = useOrganizationContext();
 
@@ -80,9 +83,12 @@ export function createCommercePaginatedHook<TResource extends ClerkResource, TPa
             ...(_for === 'organization' ? { orgId: organization?.id } : {}),
           } as TParams);
 
-    const isClerkLoaded = !!(clerk.loaded && (options?.unauthenticated ? true : user));
+    const isOrganization = _for === 'organization';
+    const billingEnabled = isOrganization
+      ? environment?.commerceSettings.billing.organization.enabled
+      : environment?.commerceSettings.billing.user.enabled;
 
-    const isEnabled = !!hookParams && isClerkLoaded;
+    const isEnabled = !!hookParams && clerk.loaded && !!billingEnabled;
 
     const result = usePagesOrInfinite<TParams, ClerkPaginatedResponse<TResource>>(
       (hookParams || {}) as TParams,
@@ -91,6 +97,7 @@ export function createCommercePaginatedHook<TResource extends ClerkResource, TPa
         keepPreviousData: safeValues.keepPreviousData,
         infinite: safeValues.infinite,
         enabled: isEnabled,
+        ...(options?.unauthenticated ? {} : { isSignedIn: Boolean(user) }),
         __experimental_mode: safeValues.__experimental_mode,
       },
       {
@@ -103,3 +110,6 @@ export function createCommercePaginatedHook<TResource extends ClerkResource, TPa
     return result;
   };
 }
+
+// Billing alias factory for paginated hooks
+export const createBillingPaginatedHook = createCommercePaginatedHook;

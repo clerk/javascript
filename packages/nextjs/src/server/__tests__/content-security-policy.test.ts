@@ -108,11 +108,15 @@ describe('CSP Header Utils', () => {
       const reportHeader = result.headers.find(([name]) => name === 'reporting-endpoints');
 
       expect(cspHeader).toBeDefined();
-      if (!cspHeader) throw new Error('CSP header not found');
+      if (!cspHeader) {
+        throw new Error('CSP header not found');
+      }
       expect(cspHeader[1]).toContain('report-to csp-endpoint');
 
       expect(reportHeader).toBeDefined();
-      if (!reportHeader) throw new Error('Report header not found');
+      if (!reportHeader) {
+        throw new Error('Report header not found');
+      }
       expect(reportHeader[1]).toBe('csp-endpoint="https://example.com/reports"');
     });
 
@@ -172,17 +176,23 @@ describe('CSP Header Utils', () => {
       const reportHeader = result.headers.find(([name]) => name === 'reporting-endpoints');
 
       expect(cspHeader).toBeDefined();
-      if (!cspHeader) throw new Error('CSP header not found');
+      if (!cspHeader) {
+        throw new Error('CSP header not found');
+      }
       expect(cspHeader[1]).toContain('report-to csp-endpoint');
       expect(cspHeader[1]).toContain('https://custom-cdn.com');
       expect(cspHeader[1]).toContain("'strict-dynamic'");
 
       expect(nonceHeader).toBeDefined();
-      if (!nonceHeader) throw new Error('Nonce header not found');
+      if (!nonceHeader) {
+        throw new Error('Nonce header not found');
+      }
       expect(nonceHeader[1]).toMatch(/^[A-Za-z0-9+/=]+$/);
 
       expect(reportHeader).toBeDefined();
-      if (!reportHeader) throw new Error('Report header not found');
+      if (!reportHeader) {
+        throw new Error('Report header not found');
+      }
       expect(reportHeader[1]).toBe('csp-endpoint="https://example.com/reports"');
     });
 
@@ -197,7 +207,9 @@ describe('CSP Header Utils', () => {
       const directives = result.headers[0][1].split('; ');
       const scriptSrcDirective = directives.find(d => d.startsWith('script-src'));
       expect(scriptSrcDirective).toBeDefined();
-      if (!scriptSrcDirective) throw new Error('script-src directive not found');
+      if (!scriptSrcDirective) {
+        throw new Error('script-src directive not found');
+      }
       const scriptSrcValues = scriptSrcDirective.replace('script-src ', '').split(' ');
       expect(scriptSrcValues).toContain("'self'");
       expect(scriptSrcValues).toContain("'unsafe-inline'");
@@ -206,7 +218,9 @@ describe('CSP Header Utils', () => {
 
       const frameSrcDirective = directives.find(d => d.startsWith('frame-src'));
       expect(frameSrcDirective).toBeDefined();
-      if (!frameSrcDirective) throw new Error('frame-src directive not found');
+      if (!frameSrcDirective) {
+        throw new Error('frame-src directive not found');
+      }
       const frameSrcValues = frameSrcDirective.replace('frame-src ', '').split(' ');
       expect(frameSrcValues).toContain("'none'");
       expect(frameSrcValues).toHaveLength(1);
@@ -312,7 +326,9 @@ describe('CSP Header Utils', () => {
       const directives = result.headers[0][1].split('; ');
       const scriptSrcDirective = directives.find(d => d.startsWith('script-src'));
       expect(scriptSrcDirective).toBeDefined();
-      if (!scriptSrcDirective) throw new Error('script-src directive not found');
+      if (!scriptSrcDirective) {
+        throw new Error('script-src directive not found');
+      }
 
       const values = new Set(scriptSrcDirective.replace('script-src ', '').split(' '));
       expect(values).toContain("'self'");
@@ -331,7 +347,9 @@ describe('CSP Header Utils', () => {
       const directives = result.headers[0][1].split('; ');
       const frameSrcDirective = directives.find(d => d.startsWith('frame-src'));
       expect(frameSrcDirective).toBeDefined();
-      if (!frameSrcDirective) throw new Error('frame-src directive not found');
+      if (!frameSrcDirective) {
+        throw new Error('frame-src directive not found');
+      }
 
       const frameSrcValues = frameSrcDirective.replace('frame-src ', '').split(' ');
       expect(frameSrcValues).toContain("'self'");
@@ -364,7 +382,9 @@ describe('CSP Header Utils', () => {
 
       const scriptSrcDirective = directives.find(d => d.startsWith('script-src'));
       expect(scriptSrcDirective).toBeDefined();
-      if (!scriptSrcDirective) throw new Error('script-src directive not found');
+      if (!scriptSrcDirective) {
+        throw new Error('script-src directive not found');
+      }
 
       const scriptSrcValues = scriptSrcDirective.replace('script-src ', '').split(' ');
       expect(scriptSrcValues).toContain("'self'");
@@ -388,13 +408,17 @@ describe('CSP Header Utils', () => {
 
       const baseUriDirective = directives.find(d => d.startsWith('base-uri'));
       expect(baseUriDirective).toBeDefined();
-      if (!baseUriDirective) throw new Error('base-uri directive not found');
+      if (!baseUriDirective) {
+        throw new Error('base-uri directive not found');
+      }
       expect(baseUriDirective).toContain('value1');
       expect(baseUriDirective).toContain('value2');
 
       const manifestSrcDirective = directives.find(d => d.startsWith('manifest-src'));
       expect(manifestSrcDirective).toBeDefined();
-      if (!manifestSrcDirective) throw new Error('manifest-src directive not found');
+      if (!manifestSrcDirective) {
+        throw new Error('manifest-src directive not found');
+      }
       expect(manifestSrcDirective).toContain('value3');
       expect(manifestSrcDirective).toContain('value4');
     });

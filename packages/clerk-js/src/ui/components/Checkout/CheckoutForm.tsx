@@ -1,5 +1,5 @@
-import { __experimental_useCheckout as useCheckout, useOrganization } from '@clerk/shared/react';
-import type { CommerceMoney, CommercePaymentSourceResource, ConfirmCheckoutParams } from '@clerk/types';
+import { __experimental_useCheckout as useCheckout } from '@clerk/shared/react';
+import type { BillingMoneyAmount, BillingPaymentSourceResource, ConfirmCheckoutParams } from '@clerk/types';
 import { useMemo, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';
@@ -13,10 +13,11 @@ import { handleError } from '@/ui/utils/errorHandler';
 
 import { DevOnly } from '../../common/DevOnly';
 import { useCheckoutContext, usePaymentMethods } from '../../contexts';
-import { Box, Button, Col, descriptors, Flex, Form, localizationKeys, Text } from '../../customizables';
+import { Box, Button, Col, descriptors, Flex, Form, localizationKeys, Spinner, Text } from '../../customizables';
 import { ChevronUpDown, InformationCircle } from '../../icons';
 import * as AddPaymentSource from '../PaymentSources/AddPaymentSource';
 import { PaymentSourceRow } from '../PaymentSources/PaymentSourceRow';
+import { SubscriptionBadge } from '../Subscriptions/badge';
 
 type PaymentMethodSource = 'existing' | 'new';
 
@@ -25,7 +26,7 @@ const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
 export const CheckoutForm = withCardStateProvider(() => {
   const { checkout } = useCheckout();
 
-  const { id, plan, totals, isImmediatePlanChange, planPeriod } = checkout;
+  const { id, plan, totals, isImmediatePlanChange, planPeriod, freeTrialEndsAt } = checkout;
 
   if (!id) {
     return null;
@@ -34,6 +35,8 @@ export const CheckoutForm = withCardStateProvider(() => {
   const showCredits = !!totals.credit?.amount && totals.credit.amount > 0;
   const showPastDue = !!totals.pastDue?.amount && totals.pastDue.amount > 0;
   const showDowngradeInfo = !isImmediatePlanChange;
+
+  const fee = planPeriod === 'month' ? plan.fee : plan.annualMonthlyFee;
 
   return (
     <Drawer.Body>
@@ -51,10 +54,15 @@ export const CheckoutForm = withCardStateProvider(() => {
             <LineItems.Title
               title={plan.name}
               description={planPeriod === 'annual' ? localizationKeys('commerce.billedAnnually') : undefined}
+              badge={
+                plan.freeTrialEnabled && freeTrialEndsAt ? (
+                  <SubscriptionBadge subscription={{ status: 'free_trial' }} />
+                ) : null
+              }
             />
             <LineItems.Description
               prefix={planPeriod === 'annual' ? 'x12' : undefined}
-              text={`${plan.currencySymbol}${planPeriod === 'month' ? plan.amountFormatted : plan.annualMonthlyAmountFormatted}`}
+              text={`${fee.currencySymbol}${fee.amountFormatted}`}
               suffix={localizationKeys('commerce.checkout.perMonth')}
             />
           </LineItems.Group>
@@ -85,6 +93,20 @@ export const CheckoutForm = withCardStateProvider(() => {
               <LineItems.Description text={`${totals.pastDue?.currencySymbol}${totals.pastDue?.amountFormatted}`} />
             </LineItems.Group>
           )}
+
+          {!!freeTrialEndsAt && !!plan.freeTrialDays && (
+            <LineItems.Group variant='tertiary'>
+              <LineItems.Title
+                title={localizationKeys('commerce.checkout.totalDueAfterTrial', {
+                  days: plan.freeTrialDays,
+                })}
+              />
+              <LineItems.Description
+                text={`${totals.grandTotal?.currencySymbol}${totals.grandTotal?.amountFormatted}`}
+              />
+            </LineItems.Group>
+          )}
+
           <LineItems.Group borderTop>
             <LineItems.Title title={localizationKeys('commerce.totalDueToday')} />
             <LineItems.Description text={`${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`} />
@@ -114,7 +136,6 @@ export const CheckoutForm = withCardStateProvider(() => {
 });
 
 const useCheckoutMutations = () => {
-  const { organization } = useOrganization();
   const { for: _for, onSubscriptionComplete } = useCheckoutContext();
   const { checkout } = useCheckout();
   const { id, confirm } = checkout;
@@ -128,11 +149,7 @@ const useCheckoutMutations = () => {
     card.setLoading();
     card.setError(undefined);
 
-    const { data, error } = await confirm({
-      ...params,
-      // TODO(@COMMERCE): Come back to this, this should not be needed
-      ...(_for === 'organization' ? { orgId: organization?.id } : {}),
-    });
+    const { data, error } = await confirm(params);
 
     if (error) {
       handleError(error, [], card.setError);
@@ -170,12 +187,37 @@ const useCheckoutMutations = () => {
 
 const CheckoutFormElements = () => {
   const { checkout } = useCheckout();
-  const { id, totals } = checkout;
+  const { id } = checkout;
+
+  const { isLoading } = usePaymentMethods();
+
+  if (!id) {
+    return null;
+  }
+
+  if (isLoading) {
+    return (
+      <Spinner
+        sx={{
+          margin: 'auto',
+        }}
+      />
+    );
+  }
+
+  return <CheckoutFormElementsInternal />;
+};
+
+const CheckoutFormElementsInternal = () => {
+  const { checkout } = useCheckout();
+  const { id, totals, isImmediatePlanChange, freeTrialEndsAt } = checkout;
   const { data: paymentSources } = usePaymentMethods();
 
   const [paymentMethodSource, setPaymentMethodSource] = useState<PaymentMethodSource>(() =>
-    paymentSources.length > 0 ? 'existing' : 'new',
+    paymentSources.length > 0 || __BUILD_DISABLE_RHC__ ? 'existing' : 'new',
   );
+
+  const showPaymentMethods = isImmediatePlanChange && (totals.totalDueNow.amount > 0 || !!freeTrialEndsAt);
 
   if (!id) {
     return null;
@@ -187,24 +229,27 @@ const CheckoutFormElements = () => {
       gap={4}
       sx={t => ({ padding: t.space.$4 })}
     >
-      {/* only show if there are payment sources and there is a total due now */}
-      {paymentSources.length > 0 && totals.totalDueNow.amount > 0 && (
-        <SegmentedControl.Root
-          aria-label='Payment method source'
-          value={paymentMethodSource}
-          onChange={value => setPaymentMethodSource(value as PaymentMethodSource)}
-          size='lg'
-          fullWidth
-        >
-          <SegmentedControl.Button
-            value='existing'
-            text={localizationKeys('commerce.paymentMethods')}
-          />
-          <SegmentedControl.Button
-            value='new'
-            text={localizationKeys('commerce.addPaymentMethod')}
-          />
-        </SegmentedControl.Root>
+      {__BUILD_DISABLE_RHC__ ? null : (
+        <>
+          {paymentSources.length > 0 && showPaymentMethods && (
+            <SegmentedControl.Root
+              aria-label='Payment method source'
+              value={paymentMethodSource}
+              onChange={value => setPaymentMethodSource(value as PaymentMethodSource)}
+              size='lg'
+              fullWidth
+            >
+              <SegmentedControl.Button
+                value='existing'
+                text={localizationKeys('commerce.paymentMethods')}
+              />
+              <SegmentedControl.Button
+                value='new'
+                text={localizationKeys('commerce.addPaymentMethod')}
+              />
+            </SegmentedControl.Root>
+          )}
+        </>
       )}
 
       {paymentMethodSource === 'existing' && (
@@ -214,7 +259,7 @@ const CheckoutFormElements = () => {
         />
       )}
 
-      {paymentMethodSource === 'new' && <AddPaymentSourceForCheckout />}
+      {__BUILD_DISABLE_RHC__ ? null : paymentMethodSource === 'new' && <AddPaymentSourceForCheckout />}
     </Col>
   );
 };
@@ -276,14 +321,31 @@ export const PayWithTestPaymentSource = () => {
   );
 };
 
+const useSubmitLabel = () => {
+  const { checkout } = useCheckout();
+  const { status, freeTrialEndsAt, totals } = checkout;
+
+  if (status === 'needs_initialization') {
+    throw new Error('Clerk: Invalid state');
+  }
+
+  if (freeTrialEndsAt) {
+    return localizationKeys('commerce.startFreeTrial');
+  }
+
+  if (totals.totalDueNow.amount > 0) {
+    return localizationKeys('commerce.pay', {
+      amount: `${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`,
+    });
+  }
+
+  return localizationKeys('commerce.subscribe');
+};
+
 const AddPaymentSourceForCheckout = withCardStateProvider(() => {
   const { addPaymentSourceAndPay } = useCheckoutMutations();
+  const submitLabel = useSubmitLabel();
   const { checkout } = useCheckout();
-  const { id, totals } = checkout;
-
-  if (!id) {
-    return null;
-  }
 
   return (
     <AddPaymentSource.Root
@@ -294,15 +356,7 @@ const AddPaymentSourceForCheckout = withCardStateProvider(() => {
         <PayWithTestPaymentSource />
       </DevOnly>
 
-      {totals.totalDueNow.amount > 0 ? (
-        <AddPaymentSource.FormButton
-          text={localizationKeys('commerce.pay', {
-            amount: `${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`,
-          })}
-        />
-      ) : (
-        <AddPaymentSource.FormButton text={localizationKeys('commerce.subscribe')} />
-      )}
+      <AddPaymentSource.FormButton text={submitLabel} />
     </AddPaymentSource.Root>
   );
 });
@@ -312,15 +366,16 @@ const ExistingPaymentSourceForm = withCardStateProvider(
     totalDueNow,
     paymentSources,
   }: {
-    totalDueNow: CommerceMoney;
-    paymentSources: CommercePaymentSourceResource[];
+    totalDueNow: BillingMoneyAmount;
+    paymentSources: BillingPaymentSourceResource[];
   }) => {
+    const submitLabel = useSubmitLabel();
     const { checkout } = useCheckout();
-    const { paymentSource } = checkout;
+    const { paymentSource, isImmediatePlanChange, freeTrialEndsAt } = checkout;
 
     const { payWithExistingPaymentSource } = useCheckoutMutations();
     const card = useCardState();
-    const [selectedPaymentSource, setSelectedPaymentSource] = useState<CommercePaymentSourceResource | undefined>(
+    const [selectedPaymentSource, setSelectedPaymentSource] = useState<BillingPaymentSourceResource | undefined>(
       paymentSource || paymentSources.find(p => p.isDefault),
     );
 
@@ -338,6 +393,8 @@ const ExistingPaymentSourceForm = withCardStateProvider(
       });
     }, [paymentSources]);
 
+    const showPaymentMethods = isImmediatePlanChange && (totalDueNow.amount > 0 || !!freeTrialEndsAt);
+
     return (
       <Form
         onSubmit={payWithExistingPaymentSource}
@@ -347,7 +404,7 @@ const ExistingPaymentSourceForm = withCardStateProvider(
           rowGap: t.space.$4,
         })}
       >
-        {totalDueNow.amount > 0 ? (
+        {showPaymentMethods ? (
           <Select
             elementId='paymentSource'
             options={options}
@@ -397,17 +454,8 @@ const ExistingPaymentSourceForm = withCardStateProvider(
             width: '100%',
           }}
           isLoading={card.isLoading}
-        >
-          <Text
-            localizationKey={
-              totalDueNow.amount > 0
-                ? localizationKeys('commerce.pay', {
-                    amount: `${totalDueNow.currencySymbol}${totalDueNow.amountFormatted}`,
-                  })
-                : localizationKeys('commerce.subscribe')
-            }
-          />
-        </Button>
+          localizationKey={submitLabel}
+        />
       </Form>
     );
   },

@@ -1,20 +1,20 @@
 import { useClerk } from '@clerk/shared/react';
 import { eventComponentMounted } from '@clerk/shared/telemetry';
-import { useContext, useEffect, useRef } from 'react';
+import type { SessionResource } from '@clerk/types';
+import { useEffect, useRef } from 'react';
 
 import { Card } from '@/ui/elements/Card';
 import { withCardStateProvider } from '@/ui/elements/contexts';
 import { LoadingCardContainer } from '@/ui/elements/LoadingCard';
 
 import { INTERNAL_SESSION_TASK_ROUTE_BY_KEY } from '../../../core/sessionTasks';
-import { SignInContext, SignUpContext } from '../../../ui/contexts';
 import {
   SessionTasksContext,
-  TaskSelectOrganizationContext,
+  TaskChooseOrganizationContext,
   useSessionTasksContext,
 } from '../../contexts/components/SessionTasks';
 import { Route, Switch, useRouter } from '../../router';
-import { TaskSelectOrganization } from './tasks/TaskSelectOrganization';
+import { TaskChooseOrganization } from './tasks/TaskChooseOrganization';
 
 const SessionTasksStart = () => {
   const clerk = useClerk();
@@ -24,7 +24,12 @@ const SessionTasksStart = () => {
   useEffect(() => {
     // Simulates additional latency to avoid a abrupt UI transition when navigating to the next task
     const timeoutId = setTimeout(() => {
-      void clerk.__internal_navigateToTaskIfAvailable({ redirectUrlComplete });
+      const currentTaskKey = clerk.session?.currentTask?.key;
+      if (!currentTaskKey) {
+        return;
+      }
+
+      void navigate(`./${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[currentTaskKey]}`);
     }, 500);
     return () => clearTimeout(timeoutId);
   }, [navigate, clerk, redirectUrlComplete]);
@@ -39,17 +44,17 @@ const SessionTasksStart = () => {
   );
 };
 
-function SessionTaskRoutes(): JSX.Element {
+function SessionTasksRoutes(): JSX.Element {
   const ctx = useSessionTasksContext();
 
   return (
     <Switch>
-      <Route path={INTERNAL_SESSION_TASK_ROUTE_BY_KEY['select-organization']}>
-        <TaskSelectOrganizationContext.Provider
-          value={{ componentName: 'TaskSelectOrganization', redirectUrlComplete: ctx.redirectUrlComplete }}
+      <Route path={INTERNAL_SESSION_TASK_ROUTE_BY_KEY['choose-organization']}>
+        <TaskChooseOrganizationContext.Provider
+          value={{ componentName: 'TaskChooseOrganization', redirectUrlComplete: ctx.redirectUrlComplete }}
         >
-          <TaskSelectOrganization />
-        </TaskSelectOrganizationContext.Provider>
+          <TaskChooseOrganization />
+        </TaskChooseOrganizationContext.Provider>
       </Route>
       <Route index>
         <SessionTasksStart />
@@ -58,18 +63,17 @@ function SessionTaskRoutes(): JSX.Element {
   );
 }
 
+type SessionTasksProps = {
+  redirectUrlComplete: string;
+};
+
 /**
  * @internal
  */
-export const SessionTask = withCardStateProvider(() => {
+export const SessionTasks = withCardStateProvider(({ redirectUrlComplete }: SessionTasksProps) => {
   const clerk = useClerk();
   const { navigate } = useRouter();
-  const signInContext = useContext(SignInContext);
-  const signUpContext = useContext(SignUpContext);
   const currentTaskContainer = useRef<HTMLDivElement>(null);
-
-  const redirectUrlComplete =
-    signInContext?.afterSignInUrl ?? signUpContext?.afterSignUpUrl ?? clerk?.buildAfterSignInUrl();
 
   // If there are no pending tasks, navigate away from the tasks flow.
   // This handles cases where a user with an active session returns to the tasks URL,
@@ -102,9 +106,18 @@ export const SessionTask = withCardStateProvider(() => {
     );
   }
 
+  const navigateOnSetActive = async ({ session }: { session: SessionResource }) => {
+    const currentTask = session.currentTask;
+    if (!currentTask) {
+      return navigate(redirectUrlComplete);
+    }
+
+    return navigate(`./${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[currentTask.key]}`);
+  };
+
   return (
-    <SessionTasksContext.Provider value={{ redirectUrlComplete, currentTaskContainer }}>
-      <SessionTaskRoutes />
+    <SessionTasksContext.Provider value={{ redirectUrlComplete, currentTaskContainer, navigateOnSetActive }}>
+      <SessionTasksRoutes />
     </SessionTasksContext.Provider>
   );
 });

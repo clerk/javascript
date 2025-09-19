@@ -1,5 +1,8 @@
 import type { MachineJSON } from './JSON';
 
+/**
+ * The Backend `Machine` object holds information about a machine.
+ */
 export class Machine {
   constructor(
     readonly id: string,
@@ -9,6 +12,7 @@ export class Machine {
     readonly updatedAt: number,
     readonly scopedMachines: Machine[],
     readonly defaultTokenTtl: number,
+    readonly secretKey?: string,
   ) {}
 
   static fromJSON(data: MachineJSON): Machine {
@@ -31,6 +35,7 @@ export class Machine {
           ),
       ),
       data.default_token_ttl,
+      data.secret_key,
     );
   }
 }

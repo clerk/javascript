@@ -1,21 +1,76 @@
 import { useClerk } from '@clerk/shared/react';
-import type { __internal_PlanDetailsProps, CommercePlanResource, CommerceSubscriptionPlanPeriod } from '@clerk/types';
+import type {
+  __internal_PlanDetailsProps,
+  BillingPlanResource,
+  BillingSubscriptionPlanPeriod,
+  ClerkAPIResponseError,
+} from '@clerk/types';
 import * as React from 'react';
 import { useMemo, useState } from 'react';
 import useSWR from 'swr';
 
+import { Alert } from '@/ui/elements/Alert';
 import { Avatar } from '@/ui/elements/Avatar';
 import { Drawer } from '@/ui/elements/Drawer';
 import { Switch } from '@/ui/elements/Switch';
 
-import { SubscriberTypeContext } from '../../contexts';
-import { Box, Col, descriptors, Flex, Heading, localizationKeys, Span, Spinner, Text } from '../../customizables';
+import { normalizeFormatted, SubscriberTypeContext } from '../../contexts';
+import {
+  Box,
+  Col,
+  descriptors,
+  Flex,
+  Flow,
+  Heading,
+  localizationKeys,
+  Span,
+  Spinner,
+  Text,
+  useLocalizations,
+} from '../../customizables';
 
 export const PlanDetails = (props: __internal_PlanDetailsProps) => {
   return (
-    <Drawer.Content>
-      <PlanDetailsInternal {...props} />
-    </Drawer.Content>
+    <Flow.Root flow='planDetails'>
+      <Flow.Part>
+        <Drawer.Content>
+          <PlanDetailsInternal {...props} />
+        </Drawer.Content>
+      </Flow.Part>
+    </Flow.Root>
+  );
+};
+
+const BodyFiller = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <Drawer.Body
+      sx={t => ({
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flex: 1,
+        overflowY: 'auto',
+        padding: t.space.$4,
+        gap: t.space.$4,
+      })}
+    >
+      {children}
+    </Drawer.Body>
+  );
+};
+
+const PlanDetailsError = ({ error }: { error: ClerkAPIResponseError }) => {
+  const { translateError } = useLocalizations();
+  return (
+    <BodyFiller>
+      <Alert
+        variant='danger'
+        colorScheme='danger'
+      >
+        {translateError(error.errors[0])}
+      </Alert>
+    </BodyFiller>
   );
 };
 
@@ -25,29 +80,34 @@ const PlanDetailsInternal = ({
   initialPlanPeriod = 'month',
 }: __internal_PlanDetailsProps) => {
   const clerk = useClerk();
-  const [planPeriod, setPlanPeriod] = useState<CommerceSubscriptionPlanPeriod>(initialPlanPeriod);
+  const [planPeriod, setPlanPeriod] = useState<BillingSubscriptionPlanPeriod>(initialPlanPeriod);
 
-  const { data: plan, isLoading } = useSWR(
+  const {
+    data: plan,
+    isLoading,
+    error,
+  } = useSWR<BillingPlanResource, ClerkAPIResponseError>(
     planId || initialPlan ? { type: 'plan', id: planId || initialPlan?.id } : null,
     // @ts-expect-error we are handling it above
     () => clerk.billing.getPlan({ id: planId || initialPlan?.id }),
     {
       fallbackData: initialPlan,
+      revalidateOnFocus: false,
+      shouldRetryOnError: false,
+      keepPreviousData: true,
     },
   );
 
   if (isLoading && !initialPlan) {
     return (
-      <Flex
-        justify='center'
-        align='center'
-        sx={{
-          height: '100%',
-        }}
-      >
+      <BodyFiller>
         <Spinner />
-      </Flex>
+      </BodyFiller>
     );
+  }
+
+  if (!plan && error) {
+    return <PlanDetailsError error={error} />;
   }
 
   if (!plan) {
@@ -157,21 +217,25 @@ const PlanDetailsInternal = ({
  * -----------------------------------------------------------------------------------------------*/
 
 interface HeaderProps {
-  plan: CommercePlanResource;
-  planPeriod: CommerceSubscriptionPlanPeriod;
-  setPlanPeriod: (val: CommerceSubscriptionPlanPeriod) => void;
+  plan: BillingPlanResource;
+  planPeriod: BillingSubscriptionPlanPeriod;
+  setPlanPeriod: (val: BillingSubscriptionPlanPeriod) => void;
   closeSlot?: React.ReactNode;
 }
 
 const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
   const { plan, closeSlot, planPeriod, setPlanPeriod } = props;
 
-  const getPlanFee = useMemo(() => {
-    if (plan.annualMonthlyAmount <= 0) {
-      return plan.amountFormatted;
+  const fee = useMemo(() => {
+    if (plan.annualMonthlyFee.amount <= 0) {
+      return plan.fee;
     }
-    return planPeriod === 'annual' ? plan.annualMonthlyAmountFormatted : plan.amountFormatted;
+    return planPeriod === 'annual' ? plan.annualMonthlyFee : plan.fee;
   }, [plan, planPeriod]);
+
+  const feeFormatted = React.useMemo(() => {
+    return normalizeFormatted(fee.amountFormatted);
+  }, [fee.amountFormatted]);
 
   return (
     <Box
@@ -250,8 +314,8 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
             variant='h1'
             colorScheme='body'
           >
-            {plan.currencySymbol}
-            {getPlanFee}
+            {fee.currencySymbol}
+            {feeFormatted}
           </Text>
           <Text
             elementDescriptor={descriptors.planDetailFeePeriod}
@@ -269,7 +333,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
         </>
       </Flex>
 
-      {plan.annualMonthlyAmount > 0 ? (
+      {plan.annualMonthlyFee.amount > 0 ? (
         <Box
           elementDescriptor={descriptors.planDetailPeriodToggle}
           sx={t => ({

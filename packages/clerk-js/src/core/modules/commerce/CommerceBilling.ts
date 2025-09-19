@@ -1,38 +1,34 @@
 import type {
+  BillingCheckoutJSON,
+  BillingNamespace,
+  BillingPaymentJSON,
+  BillingPaymentResource,
+  BillingPlanJSON,
+  BillingPlanResource,
+  BillingStatementJSON,
+  BillingStatementResource,
+  BillingSubscriptionJSON,
+  BillingSubscriptionResource,
   ClerkPaginatedResponse,
-  CommerceBillingNamespace,
-  CommerceCheckoutJSON,
-  CommercePaymentJSON,
-  CommercePaymentResource,
-  CommercePlanJSON,
-  CommercePlanResource,
-  CommerceStatementJSON,
-  CommerceStatementResource,
-  CommerceSubscriptionItemJSON,
-  CommerceSubscriptionItemResource,
-  CommerceSubscriptionJSON,
-  CommerceSubscriptionResource,
   CreateCheckoutParams,
   GetPaymentAttemptsParams,
   GetPlansParams,
   GetStatementsParams,
   GetSubscriptionParams,
-  GetSubscriptionsParams,
 } from '@clerk/types';
 
 import { convertPageToOffsetSearchParams } from '../../../utils/convertPageToOffsetSearchParams';
 import {
   BaseResource,
-  CommerceCheckout,
-  CommercePayment,
-  CommercePlan,
-  CommerceStatement,
-  CommerceSubscription,
-  CommerceSubscriptionItem,
+  BillingCheckout,
+  BillingPayment,
+  BillingPlan,
+  BillingStatement,
+  BillingSubscription,
 } from '../../resources/internal';
 
-export class CommerceBilling implements CommerceBillingNamespace {
-  getPlans = async (params?: GetPlansParams): Promise<ClerkPaginatedResponse<CommercePlanResource>> => {
+export class Billing implements BillingNamespace {
+  getPlans = async (params?: GetPlansParams): Promise<ClerkPaginatedResponse<BillingPlanResource>> => {
     const { for: forParam, ...safeParams } = params || {};
     const searchParams = { ...safeParams, payer_type: forParam === 'organization' ? 'org' : 'user' };
     return await BaseResource._fetch({
@@ -40,52 +36,32 @@ export class CommerceBilling implements CommerceBillingNamespace {
       method: 'GET',
       search: convertPageToOffsetSearchParams(searchParams),
     }).then(res => {
-      const { data: plans, total_count } = res as unknown as ClerkPaginatedResponse<CommercePlanJSON>;
+      const { data: plans, total_count } = res as unknown as ClerkPaginatedResponse<BillingPlanJSON>;
 
       return {
         total_count,
-        data: plans.map(plan => new CommercePlan(plan)),
+        data: plans.map(plan => new BillingPlan(plan)),
       };
     });
   };
 
   // Inconsistent API
-  getPlan = async (params: { id: string }): Promise<CommercePlanResource> => {
+  getPlan = async (params: { id: string }): Promise<BillingPlanResource> => {
     const plan = (await BaseResource._fetch({
       path: `/commerce/plans/${params.id}`,
       method: 'GET',
-    })) as unknown as CommercePlanJSON;
-    return new CommercePlan(plan);
+    })) as unknown as BillingPlanJSON;
+    return new BillingPlan(plan);
   };
 
-  getSubscription = async (params: GetSubscriptionParams): Promise<CommerceSubscriptionResource> => {
+  getSubscription = async (params: GetSubscriptionParams): Promise<BillingSubscriptionResource> => {
     return await BaseResource._fetch({
       path: params.orgId ? `/organizations/${params.orgId}/commerce/subscription` : `/me/commerce/subscription`,
       method: 'GET',
-    }).then(res => new CommerceSubscription(res?.response as CommerceSubscriptionJSON));
+    }).then(res => new BillingSubscription(res?.response as BillingSubscriptionJSON));
   };
 
-  getSubscriptions = async (
-    params: GetSubscriptionsParams,
-  ): Promise<ClerkPaginatedResponse<CommerceSubscriptionItemResource>> => {
-    const { orgId, ...rest } = params;
-
-    return await BaseResource._fetch({
-      path: orgId ? `/organizations/${orgId}/commerce/subscriptions` : `/me/commerce/subscriptions`,
-      method: 'GET',
-      search: convertPageToOffsetSearchParams(rest),
-    }).then(res => {
-      const { data: subscriptions, total_count } =
-        res?.response as unknown as ClerkPaginatedResponse<CommerceSubscriptionItemJSON>;
-
-      return {
-        total_count,
-        data: subscriptions.map(subscription => new CommerceSubscriptionItem(subscription)),
-      };
-    });
-  };
-
-  getStatements = async (params: GetStatementsParams): Promise<ClerkPaginatedResponse<CommerceStatementResource>> => {
+  getStatements = async (params: GetStatementsParams): Promise<ClerkPaginatedResponse<BillingStatementResource>> => {
     const { orgId, ...rest } = params;
 
     return await BaseResource._fetch({
@@ -94,16 +70,16 @@ export class CommerceBilling implements CommerceBillingNamespace {
       search: convertPageToOffsetSearchParams(rest),
     }).then(res => {
       const { data: statements, total_count } =
-        res?.response as unknown as ClerkPaginatedResponse<CommerceStatementJSON>;
+        res?.response as unknown as ClerkPaginatedResponse<BillingStatementJSON>;
 
       return {
         total_count,
-        data: statements.map(statement => new CommerceStatement(statement)),
+        data: statements.map(statement => new BillingStatement(statement)),
       };
     });
   };
 
-  getStatement = async (params: { id: string; orgId?: string }): Promise<CommerceStatementResource> => {
+  getStatement = async (params: { id: string; orgId?: string }): Promise<BillingStatementResource> => {
     const statement = (
       await BaseResource._fetch({
         path: params.orgId
@@ -111,13 +87,13 @@ export class CommerceBilling implements CommerceBillingNamespace {
           : `/me/commerce/statements/${params.id}`,
         method: 'GET',
       })
-    )?.response as unknown as CommerceStatementJSON;
-    return new CommerceStatement(statement);
+    )?.response as unknown as BillingStatementJSON;
+    return new BillingStatement(statement);
   };
 
   getPaymentAttempts = async (
     params: GetPaymentAttemptsParams,
-  ): Promise<ClerkPaginatedResponse<CommercePaymentResource>> => {
+  ): Promise<ClerkPaginatedResponse<BillingPaymentResource>> => {
     const { orgId, ...rest } = params;
 
     return await BaseResource._fetch({
@@ -125,35 +101,35 @@ export class CommerceBilling implements CommerceBillingNamespace {
       method: 'GET',
       search: convertPageToOffsetSearchParams(rest),
     }).then(res => {
-      const { data: payments, total_count } = res as unknown as ClerkPaginatedResponse<CommercePaymentJSON>;
+      const { data: payments, total_count } = res as unknown as ClerkPaginatedResponse<BillingPaymentJSON>;
 
       return {
         total_count,
-        data: payments.map(payment => new CommercePayment(payment)),
+        data: payments.map(payment => new BillingPayment(payment)),
       };
     });
   };
 
-  getPaymentAttempt = async (params: { id: string; orgId?: string }): Promise<CommercePaymentResource> => {
+  getPaymentAttempt = async (params: { id: string; orgId?: string }): Promise<BillingPaymentResource> => {
     const paymentAttempt = (await BaseResource._fetch({
       path: params.orgId
         ? `/organizations/${params.orgId}/commerce/payment_attempts/${params.id}`
         : `/me/commerce/payment_attempts/${params.id}`,
       method: 'GET',
-    })) as unknown as CommercePaymentJSON;
-    return new CommercePayment(paymentAttempt);
+    })) as unknown as BillingPaymentJSON;
+    return new BillingPayment(paymentAttempt);
   };
 
   startCheckout = async (params: CreateCheckoutParams) => {
     const { orgId, ...rest } = params;
     const json = (
-      await BaseResource._fetch<CommerceCheckoutJSON>({
+      await BaseResource._fetch<BillingCheckoutJSON>({
         path: orgId ? `/organizations/${orgId}/commerce/checkouts` : `/me/commerce/checkouts`,
         method: 'POST',
         body: rest as any,
       })
-    )?.response as unknown as CommerceCheckoutJSON;
+    )?.response as unknown as BillingCheckoutJSON;
 
-    return new CommerceCheckout(json, orgId);
+    return new BillingCheckout(json);
   };
 }

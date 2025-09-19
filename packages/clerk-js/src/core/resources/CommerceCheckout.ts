@@ -1,34 +1,39 @@
 import { retry } from '@clerk/shared/retry';
 import type {
-  CommerceCheckoutJSON,
-  CommerceCheckoutResource,
-  CommerceCheckoutTotals,
-  CommerceSubscriptionPlanPeriod,
+  BillingCheckoutJSON,
+  BillingCheckoutResource,
+  BillingCheckoutTotals,
+  BillingPayerResource,
+  BillingSubscriptionPlanPeriod,
   ConfirmCheckoutParams,
 } from '@clerk/types';
 
-import { commerceTotalsFromJSON } from '../../utils';
-import { BaseResource, CommercePaymentSource, CommercePlan, isClerkAPIResponseError } from './internal';
+import { unixEpochToDate } from '@/utils/date';
 
-export class CommerceCheckout extends BaseResource implements CommerceCheckoutResource {
+import { billingTotalsFromJSON } from '../../utils';
+import { BillingPayer } from './CommercePayer';
+import { BaseResource, BillingPaymentSource, BillingPlan, isClerkAPIResponseError } from './internal';
+
+export class BillingCheckout extends BaseResource implements BillingCheckoutResource {
   id!: string;
   externalClientSecret!: string;
   externalGatewayId!: string;
-  paymentSource?: CommercePaymentSource;
-  plan!: CommercePlan;
-  planPeriod!: CommerceSubscriptionPlanPeriod;
+  paymentSource?: BillingPaymentSource;
+  plan!: BillingPlan;
+  planPeriod!: BillingSubscriptionPlanPeriod;
   planPeriodStart!: number | undefined;
-  status!: string;
-  totals!: CommerceCheckoutTotals;
+  status!: 'needs_confirmation' | 'completed';
+  totals!: BillingCheckoutTotals;
   isImmediatePlanChange!: boolean;
+  freeTrialEndsAt!: Date | null;
+  payer!: BillingPayerResource;
 
-  constructor(data: CommerceCheckoutJSON, orgId?: string) {
+  constructor(data: BillingCheckoutJSON) {
     super();
     this.fromJSON(data);
-    this.pathRoot = orgId ? `/organizations/${orgId}/commerce/checkouts` : `/me/commerce/checkouts`;
   }
 
-  protected fromJSON(data: CommerceCheckoutJSON | null): this {
+  protected fromJSON(data: BillingCheckoutJSON | null): this {
     if (!data) {
       return this;
     }
@@ -36,29 +41,29 @@ export class CommerceCheckout extends BaseResource implements CommerceCheckoutRe
     this.id = data.id;
     this.externalClientSecret = data.external_client_secret;
     this.externalGatewayId = data.external_gateway_id;
-    this.paymentSource = data.payment_source ? new CommercePaymentSource(data.payment_source) : undefined;
-    this.plan = new CommercePlan(data.plan);
+    this.paymentSource = data.payment_source ? new BillingPaymentSource(data.payment_source) : undefined;
+    this.plan = new BillingPlan(data.plan);
     this.planPeriod = data.plan_period;
     this.planPeriodStart = data.plan_period_start;
     this.status = data.status;
-    this.totals = commerceTotalsFromJSON(data.totals);
+    this.totals = billingTotalsFromJSON(data.totals);
     this.isImmediatePlanChange = data.is_immediate_plan_change;
+    this.freeTrialEndsAt = data.free_trial_ends_at ? unixEpochToDate(data.free_trial_ends_at) : null;
+    this.payer = new BillingPayer(data.payer);
     return this;
   }
 
   confirm = (params: ConfirmCheckoutParams): Promise<this> => {
-    const { orgId, ...rest } = params;
-
     // Retry confirmation in case of a 500 error
     // This will retry up to 3 times with an increasing delay
     // It retries at 2s, 4s, 6s and 8s
     return retry(
       () =>
         this._basePatch({
-          path: orgId
-            ? `/organizations/${orgId}/commerce/checkouts/${this.id}/confirm`
+          path: this.payer.organizationId
+            ? `/organizations/${this.payer.organizationId}/commerce/checkouts/${this.id}/confirm`
             : `/me/commerce/checkouts/${this.id}/confirm`,
-          body: rest as any,
+          body: params as any,
         }),
       {
         factor: 1.1,

@@ -1,5 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
-import type { CommercePlanResource, CommerceSubscriptionPlanPeriod, PricingTableProps } from '@clerk/types';
+import type { BillingPlanResource, BillingSubscriptionPlanPeriod, PricingTableProps } from '@clerk/types';
 import { useEffect, useMemo, useState } from 'react';
 
 import { Flow } from '@/ui/customizables/Flow';
@@ -12,9 +12,17 @@ const PricingTableRoot = (props: PricingTableProps) => {
   const clerk = useClerk();
   const { mode = 'mounted', signInMode = 'redirect' } = usePricingTableContext();
   const isCompact = mode === 'modal';
-  const { subscriptionItems } = useSubscription();
+  const { data: subscription, subscriptionItems } = useSubscription();
   const { data: plans } = usePlans();
   const { handleSelectPlan } = usePlansContext();
+
+  const plansToRender = useMemo(() => {
+    return clerk.isSignedIn
+      ? subscription // All users in billing-enabled applications have a subscription
+        ? plans
+        : []
+      : plans;
+  }, [clerk.isSignedIn, plans, subscription]);
 
   const defaultPlanPeriod = useMemo(() => {
     if (isCompact) {
@@ -25,7 +33,7 @@ const PricingTableRoot = (props: PricingTableProps) => {
 
       // don't pay attention to the default plan
       const activeSubscription = subscriptionItems?.find(
-        sub => !sub.canceledAtDate && sub.status === 'active' && !sub.plan.isDefault,
+        sub => !sub.canceledAt && sub.status === 'active' && !sub.plan.isDefault,
       );
       if (activeSubscription) {
         return activeSubscription.planPeriod;
@@ -35,13 +43,13 @@ const PricingTableRoot = (props: PricingTableProps) => {
     return 'annual';
   }, [isCompact, subscriptionItems]);
 
-  const [planPeriod, setPlanPeriod] = useState<CommerceSubscriptionPlanPeriod>(defaultPlanPeriod);
+  const [planPeriod, setPlanPeriod] = useState<BillingSubscriptionPlanPeriod>(defaultPlanPeriod);
 
   useEffect(() => {
     setPlanPeriod(defaultPlanPeriod);
   }, [defaultPlanPeriod]);
 
-  const selectPlan = (plan: CommercePlanResource, event?: React.MouseEvent<HTMLElement>) => {
+  const selectPlan = (plan: BillingPlanResource, event?: React.MouseEvent<HTMLElement>) => {
     if (!clerk.isSignedIn) {
       if (signInMode === 'modal') {
         return clerk.openSignIn();
@@ -66,13 +74,14 @@ const PricingTableRoot = (props: PricingTableProps) => {
   return (
     <Flow.Root
       flow='pricingTable'
+      isFlowReady={clerk.isSignedIn ? !!subscription : plans.length > 0}
       sx={{
         width: '100%',
       }}
     >
       {mode !== 'modal' && (props as any).layout === 'matrix' ? (
         <PricingTableMatrix
-          plans={plans}
+          plans={plansToRender}
           planPeriod={planPeriod}
           setPlanPeriod={setPlanPeriod}
           onSelect={selectPlan}
@@ -80,7 +89,7 @@ const PricingTableRoot = (props: PricingTableProps) => {
         />
       ) : (
         <PricingTableDefault
-          plans={plans}
+          plans={plansToRender}
           planPeriod={planPeriod}
           setPlanPeriod={setPlanPeriod}
           onSelect={selectPlan}

@@ -53,11 +53,14 @@ const BillingPageInternal = withCardStateProvider(() => {
             <TabPanel sx={_ => ({ width: '100%', flexDirection: 'column' })}>
               <SubscriptionsList
                 title={localizationKeys('userProfile.billingPage.subscriptionsListSection.title')}
-                arrowButtonText={localizationKeys(
+                switchPlansLabel={localizationKeys(
                   'userProfile.billingPage.subscriptionsListSection.actionLabel__switchPlan',
                 )}
-                arrowButtonEmptyText={localizationKeys(
+                newSubscriptionLabel={localizationKeys(
                   'userProfile.billingPage.subscriptionsListSection.actionLabel__newSubscription',
+                )}
+                manageSubscriptionLabel={localizationKeys(
+                  'userProfile.billingPage.subscriptionsListSection.actionLabel__manageSubscription',
                 )}
               />
               <PaymentSources />

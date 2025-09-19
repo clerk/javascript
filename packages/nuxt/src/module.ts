@@ -78,6 +78,7 @@ export default defineNuxtModule<ModuleOptions>({
       // Private keys available only on within server-side
       clerk: {
         secretKey: undefined,
+        machineSecretKey: undefined,
         jwtKey: undefined,
         webhookSigningSecret: undefined,
       },
@@ -140,6 +141,7 @@ export default defineNuxtModule<ModuleOptions>({
       // Authentication Components
       'SignIn',
       'SignUp',
+      'GoogleOneTap',
       // Unstyled Components
       'SignInButton',
       'SignOutButton',
@@ -153,6 +155,8 @@ export default defineNuxtModule<ModuleOptions>({
       'OrganizationProfile',
       'OrganizationSwitcher',
       'OrganizationList',
+      // Billing Components
+      'PricingTable',
       // Control Components
       'ClerkLoaded',
       'ClerkLoading',
@@ -165,7 +169,6 @@ export default defineNuxtModule<ModuleOptions>({
       'SignedIn',
       'SignedOut',
       'Waitlist',
-      'PricingTable',
     ];
     components.forEach(component => {
       void addComponent({

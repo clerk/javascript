@@ -6,8 +6,8 @@ export type ComponentGuard = (
   options?: ClerkOptions,
 ) => boolean;
 
-export const sessionExistsAndSingleSessionModeEnabled: ComponentGuard = (clerk, environment) => {
-  return !!(clerk.session && environment?.authConfig.singleSessionMode);
+export const isSignedInAndSingleSessionModeEnabled: ComponentGuard = (clerk, environment) => {
+  return !!(clerk.isSignedIn && environment?.authConfig.singleSessionMode);
 };
 
 export const noUserExists: ComponentGuard = clerk => {
@@ -32,14 +32,6 @@ export const disabledOrganizationBillingFeature: ComponentGuard = (_, environmen
 
 export const disabledAllBillingFeatures: ComponentGuard = (_, environment) => {
   return disabledUserBillingFeature(_, environment) && disabledOrganizationBillingFeature(_, environment);
-};
-
-export const hasPaidOrgPlans: ComponentGuard = (_, environment) => {
-  return environment?.commerceSettings.billing.organization.hasPaidPlans || false;
-};
-
-export const hasPaidUserPlans: ComponentGuard = (_, environment) => {
-  return environment?.commerceSettings.billing.user.hasPaidPlans || false;
 };
 
 export const disabledAPIKeysFeature: ComponentGuard = (_, environment) => {

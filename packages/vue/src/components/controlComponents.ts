@@ -37,7 +37,7 @@ export const ClerkLoading = defineComponent((_, { slots }) => {
 });
 
 export const RedirectToSignIn = defineComponent((props: RedirectOptions) => {
-  const { sessionCtx, clientCtx } = useClerkContext();
+  const { sessionCtx, clientCtx } = useClerkContext('RedirectToSignIn');
 
   useClerkLoaded(clerk => {
     const hasSignedInSessions = clientCtx.value?.signedInSessions && clientCtx.value.signedInSessions.length > 0;
@@ -60,16 +60,9 @@ export const RedirectToSignUp = defineComponent((props: RedirectOptions) => {
   return () => null;
 });
 
-export const RedirectToTask = defineComponent((props: RedirectOptions) => {
-  const { sessionCtx } = useClerkContext();
-
+export const RedirectToTasks = defineComponent((props: RedirectOptions) => {
   useClerkLoaded(clerk => {
-    if (!sessionCtx.value) {
-      void clerk.redirectToSignIn(props);
-      return;
-    }
-
-    void clerk.__internal_navigateToTaskIfAvailable();
+    void clerk.redirectToTasks(props);
   });
 
   return () => null;

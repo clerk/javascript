@@ -74,7 +74,9 @@ async function getOutputFileTracingRoot() {
   const root1 = path.parse(p1).root;
   const root2 = path.parse(p2).root;
 
-  if (root1 !== root2) return null;
+  if (root1 !== root2) {
+    return null;
+  }
 
   const parts1 = p1.slice(root1.length).split(path.sep);
   const parts2 = p2.slice(root2.length).split(path.sep);
@@ -82,8 +84,11 @@ async function getOutputFileTracingRoot() {
   const len = Math.min(parts1.length, parts2.length);
   const common = [];
   for (let i = 0; i < len; i++) {
-    if (parts1[i] === parts2[i]) common.push(parts1[i]);
-    else break;
+    if (parts1[i] === parts2[i]) {
+      common.push(parts1[i]);
+    } else {
+      break;
+    }
   }
 
   return common.length ? path.join(root1, ...common) : root1;

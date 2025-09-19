@@ -3,6 +3,8 @@ import { retry } from '@clerk/shared/retry';
 import { camelToSnake } from '@clerk/shared/underscore';
 import type { ClerkAPIErrorJSON, ClientJSON, InstanceType } from '@clerk/types';
 
+import { debugLogger } from '@/utils/debug';
+
 import { buildEmailAddress as buildEmailAddressUtil, buildURL as buildUrlUtil, stringifyQueryParams } from '../utils';
 import { SUPPORTED_FAPI_VERSION } from './constants';
 import { clerkNetworkError } from './errors';
@@ -147,7 +149,10 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
 
     if (options.proxyUrl) {
       const proxyBase = new URL(options.proxyUrl);
-      const proxyPath = proxyBase.pathname.slice(1, proxyBase.pathname.length);
+      let proxyPath = proxyBase.pathname.slice(1);
+      if (proxyPath.endsWith('/')) {
+        proxyPath = proxyPath.slice(0, -1);
+      }
       return buildUrlUtil(
         {
           base: proxyBase.origin,
@@ -222,7 +227,7 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
     // avoid triggering a CORS OPTION request as it currently breaks cookie dropping in Safari.
     const overwrittenRequestMethod = method === 'GET' ? 'GET' : 'POST';
     let response: Response;
-    const urlStr = requestInit.url.toString();
+    const url = requestInit.url;
     const fetchOpts: FapiRequestInit = {
       ...requestInit,
       method: overwrittenRequestMethod,
@@ -232,7 +237,7 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
     try {
       if (beforeRequestCallbacksResult) {
         const maxTries = requestOptions?.fetchMaxTries ?? (isBrowserOnline() ? 4 : 11);
-        response = await retry(() => fetch(urlStr, fetchOpts), {
+        response = await retry(() => fetch(url, fetchOpts), {
           // This retry handles only network errors, not 4xx or 5xx responses,
           // so we want to try once immediately to handle simple network blips.
           // Since fapiClient is responsible for the network layer only,
@@ -245,17 +250,27 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
             // We want to retry only GET requests, as other methods are not idempotent.
             return overwrittenRequestMethod === 'GET' && iterations < maxTries;
           },
+          onBeforeRetry: (iteration: number): void => {
+            // Add the retry attempt to the query string params.
+            // We use params to keep the request simple for CORS.
+            url.searchParams.set('_clerk_retry_attempt', iteration.toString());
+          },
         });
       } else {
         response = new Response('{}', requestInit); // Mock an empty json response
       }
     } catch (e) {
+      const urlStr = url.toString();
+      debugLogger.error('network error', { error: e, url: urlStr, method }, 'fapiClient');
       clerkNetworkError(urlStr, e);
     }
 
     // 204 No Content responses do not have a body so we should not try to parse it
     const json: FapiResponseJSON<T> | null = response.status !== 204 ? await response.json() : null;
     const fapiResponse: FapiResponse<T> = Object.assign(response, { payload: json });
+    if (!response.ok) {
+      debugLogger.error('request failed', { method, path: requestInit.path, status: response.status }, 'fapiClient');
+    }
     await runAfterResponseCallbacks(requestInit, fapiResponse);
     return fapiResponse;
   }

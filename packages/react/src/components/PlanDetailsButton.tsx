@@ -6,7 +6,7 @@ import { assertSingleChild, normalizeWithDefaultValue, safeExecute } from '../ut
 import { withClerk } from './withClerk';
 
 /**
- * @experimental A button component that opens the Clerk Plan Details drawer when clicked. This component is part of
+ * A button component that opens the Clerk Plan Details drawer when clicked. This component is part of
  * Clerk's Billing feature which is available under a public beta.
  *
  * @example
@@ -31,11 +31,12 @@ import { withClerk } from './withClerk';
  * }
  * ```
  *
- * @see https://clerk.com/docs/billing/overview
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export const PlanDetailsButton = withClerk(
   ({ clerk, children, ...props }: WithClerkProp<React.PropsWithChildren<__experimental_PlanDetailsButtonProps>>) => {
     const { plan, planId, initialPlanPeriod, planDetailsProps, ...rest } = props;
+
     children = normalizeWithDefaultValue(children, 'Plan details');
     const child = assertSingleChild(children)('PlanDetailsButton');
 
@@ -49,7 +50,7 @@ export const PlanDetailsButton = withClerk(
         planId,
         initialPlanPeriod,
         ...planDetailsProps,
-      });
+      } as __experimental_PlanDetailsButtonProps);
     };
 
     const wrappedChildClickHandler: React.MouseEventHandler = async e => {
