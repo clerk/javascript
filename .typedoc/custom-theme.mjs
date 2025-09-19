@@ -158,6 +158,12 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
        * @param {{ headingLevel: number }} options
        */
       signatureReturns: (model, options) => {
+        // Check if @hideReturns tag is present - if so, hide the Returns section (e.g. `## Returns`)
+        const hideReturnsTag = model.comment?.getTag('@hideReturns');
+        if (hideReturnsTag) {
+          return '';
+        }
+
         const defaultOutput = superPartials.signatureReturns(model, options);
         const hasReturnsTag = model.comment?.getTag('@returns');
 
