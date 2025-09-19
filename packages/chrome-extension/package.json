@@ -44,10 +44,8 @@
     "lint:attw": "attw --pack . --profile node16",
     "lint:publint": "publint",
     "publish:local": "pnpm yalc push --replace  --sig",
-    "test": "jest",
-    "test:cache:clear": "jest --clearCache --useStderr",
-    "test:ci": "jest --maxWorkers=70%",
-    "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html"
+    "test": "vitest",
+    "test:ci": "vitest run --maxWorkers=70%"
   },
   "dependencies": {
     "@clerk/clerk-js": "workspace:^",
