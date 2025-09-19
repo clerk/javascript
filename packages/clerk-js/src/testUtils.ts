@@ -3,11 +3,10 @@ import { matchers } from '@emotion/jest';
 import type { RenderOptions } from '@testing-library/react';
 import { render as _render } from '@testing-library/react';
 import UserEvent from '@testing-library/user-event';
-import { afterAll, beforeAll, describe, expect, type SpyInstance, vi } from 'vitest';
 
 expect.extend(matchers);
 
-Element.prototype.scrollIntoView = vi.fn();
+Element.prototype.scrollIntoView = jest.fn();
 
 const render = (ui: React.ReactElement, options?: RenderOptions) => {
   const userEvent = UserEvent.setup({ delay: null });
@@ -31,14 +30,14 @@ const render = (ui: React.ReactElement, options?: RenderOptions) => {
  */
 export const mockNativeRuntime = (fn: () => void) => {
   describe('native runtime', () => {
-    let spyDocument: SpyInstance;
-    let spyNavigator: SpyInstance;
+    let spyDocument: jest.SpyInstance;
+    let spyNavigator: jest.SpyInstance;
 
     beforeAll(() => {
-      spyDocument = vi.spyOn(globalThis, 'document', 'get');
+      spyDocument = jest.spyOn(globalThis, 'document', 'get');
       spyDocument.mockReturnValue(undefined);
 
-      spyNavigator = vi.spyOn(globalThis.navigator, 'product', 'get');
+      spyNavigator = jest.spyOn(globalThis.navigator, 'product', 'get');
       spyNavigator.mockReturnValue('ReactNative');
     });
 
@@ -70,8 +69,8 @@ export const mockWebAuthn = (fn: () => void) => {
   });
 };
 
-export * from './ui/utils/vitest/runFakeTimers';
-export * from './ui/utils/vitest/createFixtures';
+export * from './ui/utils/test/runFakeTimers';
+export * from './ui/utils/test/createFixtures';
 // eslint-disable-next-line import/export
 export * from '@testing-library/react';
 // eslint-disable-next-line import/export

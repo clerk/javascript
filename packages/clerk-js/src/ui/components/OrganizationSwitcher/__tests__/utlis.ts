@@ -6,7 +6,7 @@ import type {
   OrganizationSuggestionStatus,
   UserOrganizationInvitationResource,
 } from '@clerk/types';
-import { vi } from 'vitest';
+import { jest } from '@jest/globals';
 
 import type { FakeOrganizationParams } from '../../CreateOrganization/__tests__/CreateOrganization.test';
 import { createFakeOrganization } from '../../CreateOrganization/__tests__/CreateOrganization.test';
@@ -40,8 +40,8 @@ export const createFakeUserOrganizationInvitation = (
     createdAt: params?.createdAt || new Date(),
     updatedAt: new Date(),
     publicMetadata: {},
-    accept: vi.fn() as any,
-    reload: vi.fn() as any,
+    accept: jest.fn() as any,
+    reload: jest.fn() as any,
   };
 };
 
@@ -65,9 +65,9 @@ export const createFakeUserOrganizationMembership = (
     updatedAt: new Date(),
     publicMetadata: {},
     publicUserData: {} as any,
-    update: vi.fn() as any,
-    destroy: vi.fn() as any,
-    reload: vi.fn() as any,
+    update: jest.fn() as any,
+    destroy: jest.fn() as any,
+    reload: jest.fn() as any,
   };
 };
 
@@ -97,7 +97,7 @@ export const createFakeUserOrganizationSuggestion = (
     id: params.id,
     createdAt: params?.createdAt || new Date(),
     updatedAt: new Date(),
-    accept: vi.fn() as any,
-    reload: vi.fn() as any,
+    accept: jest.fn() as any,
+    reload: jest.fn() as any,
   };
 };

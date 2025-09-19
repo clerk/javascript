@@ -1,7 +1,7 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe } from '@jest/globals';
 
-import { render, waitFor } from '../../../../vitestUtils';
-import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
+import { render, waitFor } from '../../../../testUtils';
+import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { createFakeOrganization } from '../../CreateOrganization/__tests__/CreateOrganization.test';
 import {
   createFakeUserOrganizationInvitation,
@@ -143,7 +143,7 @@ describe('OrganizationList', () => {
         },
       });
 
-      invitation.accept = vi.fn().mockResolvedValue(
+      invitation.accept = jest.fn().mockResolvedValue(
         createFakeUserOrganizationInvitation({
           id: '1',
           emailAddress: 'one@clerk.com',

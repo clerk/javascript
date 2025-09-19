@@ -1,5 +1,6 @@
-// import { vi } from 'vitest';
-import type { ActiveSessionResource, LoadedClerk } from '@clerk/types';
+// import { jest } from '@jest/globals';
+import type { LoadedClerk } from '@clerk/types';
+import type { ActiveSessionResource } from '@clerk/types';
 import { type Mocked, vi } from 'vitest';
 
 import type { RouteContextValue } from '../../router';
@@ -14,7 +15,7 @@ type DeepVitestMocked<T> = T extends FunctionLike
       }
     : T;
 
-// Removing vi.Mock type for now, relying on inference
+// Removing jest.Mock type for now, relying on inference
 type MockMap<T = any> = {
   [K in { [K in keyof T]: T[K] extends (...args: any[]) => any ? K : never }[keyof T]]?: ReturnType<typeof vi.fn>;
 };
@@ -73,9 +74,6 @@ export const mockClerkMethods = (clerk: LoadedClerk): DeepVitestMocked<LoadedCle
         sessionAny.user.passkeys?.forEach((m: any) => mockMethodsOf(m));
       }
     });
-  }
-  if (clerkAny.billing) {
-    mockMethodsOf(clerkAny.billing);
   }
   mockProp(clerkAny, 'navigate');
   mockProp(clerkAny, 'setActive');

@@ -11,7 +11,6 @@ import type { ReactNode } from 'react';
 import type { AvailableComponentName, AvailableComponentProps } from '../types';
 import {
   ApiKeysContext,
-  CheckoutContext,
   CreateOrganizationContext,
   GoogleOneTapContext,
   OAuthConsentContext,
@@ -22,7 +21,6 @@ import {
   SignInContext,
   SignUpContext,
   SubscriberTypeContext,
-  SubscriptionDetailsContext,
   UserButtonContext,
   UserProfileContext,
   UserVerificationContext,
@@ -120,14 +118,6 @@ export function ComponentContextProvider({
           {children}
         </TaskChooseOrganizationContext.Provider>
       );
-    case 'SubscriptionDetails':
-      return (
-        <SubscriptionDetailsContext.Provider value={{ componentName, ...props }}>
-          {children}
-        </SubscriptionDetailsContext.Provider>
-      );
-    case 'Checkout':
-      return <CheckoutContext.Provider value={{ componentName, ...props }}>{children}</CheckoutContext.Provider>;
     default:
       throw new Error(`Unknown component context: ${componentName}`);
   }

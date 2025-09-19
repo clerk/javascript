@@ -7,9 +7,8 @@ import type {
   TokenResource,
 } from '@clerk/types';
 import { waitFor } from '@testing-library/dom';
-import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, test, vi } from 'vitest';
 
-import { mockNativeRuntime } from '../../vitestUtils';
+import { mockNativeRuntime } from '../../testUtils';
 import type { DevBrowser } from '../auth/devBrowser';
 import { Clerk } from '../clerk';
 import { eventBus, events } from '../events';
@@ -17,26 +16,27 @@ import type { DisplayConfig, Organization } from '../resources/internal';
 import { BaseResource, Client, EmailLinkErrorCodeStatus, Environment, SignIn, SignUp } from '../resources/internal';
 import { mockJwt } from '../test/fixtures';
 
-const mockClientFetch = vi.fn();
-const mockEnvironmentFetch = vi.fn(() => Promise.resolve({}));
+const mockClientFetch = jest.fn();
+const mockEnvironmentFetch = jest.fn(() => Promise.resolve({}));
 
-vi.mock('../resources/Client');
-vi.mock('../resources/Environment');
+jest.mock('../resources/Client');
+jest.mock('../resources/Environment');
 
-vi.mock('../auth/devBrowser', () => ({
+// Because Jest, don't ask me why...
+jest.mock('../auth/devBrowser', () => ({
   createDevBrowser: (): DevBrowser => ({
-    clear: vi.fn(),
-    setup: vi.fn(),
-    getDevBrowserJWT: vi.fn(() => 'deadbeef'),
-    setDevBrowserJWT: vi.fn(),
-    removeDevBrowserJWT: vi.fn(),
+    clear: jest.fn(),
+    setup: jest.fn(),
+    getDevBrowserJWT: jest.fn(() => 'deadbeef'),
+    setDevBrowserJWT: jest.fn(),
+    removeDevBrowserJWT: jest.fn(),
   }),
 }));
 
-Client.getOrCreateInstance = vi.fn().mockImplementation(() => {
+Client.getOrCreateInstance = jest.fn().mockImplementation(() => {
   return { fetch: mockClientFetch };
 });
-Environment.getInstance = vi.fn().mockImplementation(() => {
+Environment.getInstance = jest.fn().mockImplementation(() => {
   return { fetch: mockEnvironmentFetch };
 });
 
@@ -54,7 +54,7 @@ describe('Clerk singleton', () => {
   const developmentPublishableKey = 'pk_test_Y2xlcmsuYWJjZWYuMTIzNDUuZGV2LmxjbGNsZXJrLmNvbSQ';
   const productionPublishableKey = 'pk_live_Y2xlcmsuYWJjZWYuMTIzNDUucHJvZC5sY2xjbGVyay5jb20k';
 
-  const mockNavigate = vi.fn((to: string) => Promise.resolve(to));
+  const mockNavigate = jest.fn((to: string) => Promise.resolve(to));
   const mockedLoadOptions = { routerDebug: true, routerPush: mockNavigate, routerReplace: mockNavigate };
 
   const mockDisplayConfig = {
@@ -73,7 +73,7 @@ describe('Clerk singleton', () => {
   };
 
   let mockWindowLocation;
-  let mockHref: ReturnType<typeof vi.fn>;
+  let mockHref: jest.Mock;
 
   afterAll(() => {
     Object.defineProperty(global.window, 'location', {
@@ -82,7 +82,7 @@ describe('Clerk singleton', () => {
   });
 
   beforeEach(() => {
-    mockHref = vi.fn();
+    mockHref = jest.fn();
     mockWindowLocation = {
       host: 'test.host',
       hostname: 'test.host',
@@ -159,17 +159,17 @@ describe('Clerk singleton', () => {
     describe('with `active` session status', () => {
       const mockSession = {
         id: '1',
-        remove: vi.fn(),
+        remove: jest.fn(),
         status: 'active',
         user: {},
-        touch: vi.fn(() => Promise.resolve()),
-        getToken: vi.fn(),
+        touch: jest.fn(() => Promise.resolve()),
+        getToken: jest.fn(),
         lastActiveToken: { getRawString: () => 'mocked-token' },
       };
-      let eventBusSpy: ReturnType<typeof vi.spyOn>;
+      let eventBusSpy: jest.SpyInstance;
 
       beforeEach(() => {
-        eventBusSpy = vi.spyOn(eventBus, 'emit');
+        eventBusSpy = jest.spyOn(eventBus, 'emit');
       });
 
       afterEach(() => {
@@ -245,7 +245,7 @@ describe('Clerk singleton', () => {
       });
 
       it('calls __unstable__onAfterSetActive after beforeEmit and session.touch', async () => {
-        const beforeEmitMock = vi.fn();
+        const beforeEmitMock = jest.fn();
         mockSession.touch.mockReturnValueOnce(Promise.resolve());
         mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
 
@@ -263,11 +263,11 @@ describe('Clerk singleton', () => {
       it('calls session.touch -> set cookie -> before emit with touched session on session switch', async () => {
         const mockSession2 = {
           id: '2',
-          remove: vi.fn(),
+          remove: jest.fn(),
           status: 'active',
           user: {},
-          touch: vi.fn(),
-          getToken: vi.fn(),
+          touch: jest.fn(),
+          getToken: jest.fn(),
         };
         mockClientFetch.mockReturnValue(
           Promise.resolve({
@@ -288,7 +288,7 @@ describe('Clerk singleton', () => {
           executionOrder.push('set cookie');
           return 'mocked-token-2';
         });
-        const beforeEmitMock = vi.fn().mockImplementationOnce(() => {
+        const beforeEmitMock = jest.fn().mockImplementationOnce(() => {
           executionOrder.push('before emit');
           return Promise.resolve();
         });
@@ -321,7 +321,7 @@ describe('Clerk singleton', () => {
           return 'mocked-token';
         });
 
-        const beforeEmitMock = vi.fn().mockImplementationOnce(() => {
+        const beforeEmitMock = jest.fn().mockImplementationOnce(() => {
           executionOrder.push('before emit');
           return Promise.resolve();
         });
@@ -353,8 +353,8 @@ describe('Clerk singleton', () => {
               },
             ],
           },
-          touch: vi.fn(),
-          getToken: vi.fn(),
+          touch: jest.fn(),
+          getToken: jest.fn(),
         };
         mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession2] }));
         const sut = new Clerk(productionPublishableKey);
@@ -389,13 +389,13 @@ describe('Clerk singleton', () => {
         );
 
         const sut = new Clerk(productionPublishableKey);
-        sut.navigate = vi.fn();
+        sut.navigate = jest.fn();
         await sut.load();
         await sut.setActive({
           session: mockSession as any as ActiveSessionResource,
           redirectUrl: '/redirect-url-path',
         });
-        const redirectUrl = new URL((sut.navigate as ReturnType<typeof vi.fn>).mock.calls[0]);
+        const redirectUrl = new URL((sut.navigate as jest.Mock).mock.calls[0]);
         expect(redirectUrl.pathname).toEqual('/v1/client/touch');
         expect(redirectUrl.searchParams.get('redirect_url')).toEqual(`${mockWindowLocation.href}/redirect-url-path`);
       });
@@ -413,7 +413,7 @@ describe('Clerk singleton', () => {
         );
 
         const sut = new Clerk(productionPublishableKey);
-        sut.navigate = vi.fn();
+        sut.navigate = jest.fn();
         await sut.load();
         await sut.setActive({
           session: mockSession as any as ActiveSessionResource,
@@ -435,7 +435,7 @@ describe('Clerk singleton', () => {
         );
 
         const sut = new Clerk(productionPublishableKey);
-        sut.navigate = vi.fn();
+        sut.navigate = jest.fn();
         await sut.load();
         await sut.setActive({
           session: mockSession as any as ActiveSessionResource,
@@ -447,7 +447,7 @@ describe('Clerk singleton', () => {
       it('calls `navigate`', async () => {
         mockSession.touch.mockReturnValue(Promise.resolve());
         mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
-        const navigate = vi.fn();
+        const navigate = jest.fn();
 
         const sut = new Clerk(productionPublishableKey);
         await sut.load();
@@ -469,7 +469,7 @@ describe('Clerk singleton', () => {
             executionOrder.push('session.touch');
             return Promise.resolve();
           });
-          const beforeEmitMock = vi.fn().mockImplementationOnce(() => {
+          const beforeEmitMock = jest.fn().mockImplementationOnce(() => {
             executionOrder.push('before emit');
             return Promise.resolve();
           });
@@ -489,15 +489,15 @@ describe('Clerk singleton', () => {
     describe('with `pending` session status', () => {
       const mockSession = {
         id: '1',
-        remove: vi.fn(),
+        remove: jest.fn(),
         status: 'pending',
         user: {},
-        touch: vi.fn(() => Promise.resolve()),
-        getToken: vi.fn(),
+        touch: jest.fn(() => Promise.resolve()),
+        getToken: jest.fn(),
         lastActiveToken: { getRawString: () => 'mocked-token' },
         tasks: [{ key: 'choose-organization' }],
         currentTask: { key: 'choose-organization' },
-        reload: vi.fn(() =>
+        reload: jest.fn(() =>
           Promise.resolve({
             id: '1',
             status: 'pending',
@@ -512,7 +512,7 @@ describe('Clerk singleton', () => {
       let eventBusSpy;
 
       beforeEach(() => {
-        eventBusSpy = vi.spyOn(eventBus, 'emit');
+        eventBusSpy = jest.spyOn(eventBus, 'emit');
       });
 
       afterEach(() => {
@@ -539,7 +539,7 @@ describe('Clerk singleton', () => {
         mockSession.touch.mockReturnValueOnce(Promise.resolve());
         mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
 
-        const onBeforeSetActive = vi.fn();
+        const onBeforeSetActive = jest.fn();
         (window as any).__unstable__onBeforeSetActive = onBeforeSetActive;
 
         const sut = new Clerk(productionPublishableKey);
@@ -552,7 +552,7 @@ describe('Clerk singleton', () => {
         mockSession.touch.mockReturnValueOnce(Promise.resolve());
         mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
 
-        const onAfterSetActive = vi.fn();
+        const onAfterSetActive = jest.fn();
         (window as any).__unstable__onAfterSetActive = onAfterSetActive;
 
         const sut = new Clerk(productionPublishableKey);
@@ -566,7 +566,7 @@ describe('Clerk singleton', () => {
         mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
 
         const sut = new Clerk(productionPublishableKey);
-        sut.navigate = vi.fn();
+        sut.navigate = jest.fn();
         await sut.load({
           taskUrls: {
             'choose-organization': '/choose-organization',
@@ -580,7 +580,7 @@ describe('Clerk singleton', () => {
       it('calls `navigate`', async () => {
         mockSession.touch.mockReturnValue(Promise.resolve());
         mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
-        const navigate = vi.fn();
+        const navigate = jest.fn();
 
         const sut = new Clerk(productionPublishableKey);
         await sut.load();
@@ -593,11 +593,11 @@ describe('Clerk singleton', () => {
     describe('with force organization selection enabled', () => {
       const mockSession = {
         id: '1',
-        remove: vi.fn(),
+        remove: jest.fn(),
         status: 'active',
         user: {},
-        touch: vi.fn(() => Promise.resolve()),
-        getToken: vi.fn(),
+        touch: jest.fn(() => Promise.resolve()),
+        getToken: jest.fn(),
         lastActiveToken: { getRawString: () => 'mocked-token' },
       };
 
@@ -641,8 +641,8 @@ describe('Clerk singleton', () => {
               },
             ],
           },
-          touch: vi.fn(),
-          getToken: vi.fn(),
+          touch: jest.fn(),
+          getToken: jest.fn(),
         };
 
         mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSessionWithOrganization] }));
@@ -680,7 +680,7 @@ describe('Clerk singleton', () => {
           id: '1',
           status,
           user: {},
-          getToken: vi.fn(),
+          getToken: jest.fn(),
           lastActiveToken: { getRawString: () => mockJwt },
         };
 
@@ -698,7 +698,7 @@ describe('Clerk singleton', () => {
           );
 
           // any is intentional here. We simulate a runtime value that should not exist
-          const mockSelectInitialSession = vi.fn(() => undefined) as any;
+          const mockSelectInitialSession = jest.fn(() => undefined) as any;
           const sut = new Clerk(productionPublishableKey);
           await sut.load({
             selectInitialSession: mockSelectInitialSession,
@@ -738,11 +738,11 @@ describe('Clerk singleton', () => {
   });
 
   describe('.signOut()', () => {
-    const mockClientDestroy = vi.fn();
-    const mockClientRemoveSessions = vi.fn();
-    const mockSession1 = { id: '1', remove: vi.fn(), status: 'active', user: {}, getToken: vi.fn() };
-    const mockSession2 = { id: '2', remove: vi.fn(), status: 'active', user: {}, getToken: vi.fn() };
-    const mockSession3 = { id: '2', remove: vi.fn(), status: 'pending', user: {}, getToken: vi.fn() };
+    const mockClientDestroy = jest.fn();
+    const mockClientRemoveSessions = jest.fn();
+    const mockSession1 = { id: '1', remove: jest.fn(), status: 'active', user: {}, getToken: jest.fn() };
+    const mockSession2 = { id: '2', remove: jest.fn(), status: 'active', user: {}, getToken: jest.fn() };
+    const mockSession3 = { id: '2', remove: jest.fn(), status: 'pending', user: {}, getToken: jest.fn() };
 
     beforeEach(() => {
       mockClientDestroy.mockReset();
@@ -780,7 +780,7 @@ describe('Clerk singleton', () => {
       );
 
       const sut = new Clerk(productionPublishableKey);
-      sut.navigate = vi.fn();
+      sut.navigate = jest.fn();
       await sut.load();
       await sut.signOut();
       await waitFor(() => {
@@ -803,7 +803,7 @@ describe('Clerk singleton', () => {
         );
 
         const sut = new Clerk(productionPublishableKey);
-        sut.navigate = vi.fn();
+        sut.navigate = jest.fn();
         await sut.load();
         await sut.signOut();
         await waitFor(() => {
@@ -825,7 +825,7 @@ describe('Clerk singleton', () => {
       );
 
       const sut = new Clerk(productionPublishableKey);
-      sut.navigate = vi.fn();
+      sut.navigate = jest.fn();
       await sut.load();
       await sut.signOut({ sessionId: '2' });
       await waitFor(() => {
@@ -845,7 +845,7 @@ describe('Clerk singleton', () => {
       );
 
       const sut = new Clerk(productionPublishableKey);
-      sut.navigate = vi.fn();
+      sut.navigate = jest.fn();
       await sut.load();
       await sut.signOut({ sessionId: '1' });
       await waitFor(() => {
@@ -865,7 +865,7 @@ describe('Clerk singleton', () => {
       );
 
       const sut = new Clerk(productionPublishableKey);
-      sut.navigate = vi.fn();
+      sut.navigate = jest.fn();
       await sut.load();
       await sut.signOut({ sessionId: '1', redirectUrl: '/after-sign-out' });
       await waitFor(() => {
@@ -881,7 +881,7 @@ describe('Clerk singleton', () => {
     let logSpy;
 
     beforeEach(() => {
-      logSpy = vi.spyOn(console, 'log').mockReturnValue(void 0);
+      logSpy = jest.spyOn(console, 'log').mockReturnValue(void 0);
       sut = new Clerk(productionPublishableKey);
     });
 
@@ -960,7 +960,7 @@ describe('Clerk singleton', () => {
     // need a return value though, so we just mock a resolved promise.
     const originalFetch = global.fetch;
     beforeAll(() => {
-      global.fetch = vi.fn().mockResolvedValue({ json: vi.fn().mockResolvedValue({}) });
+      global.fetch = jest.fn().mockResolvedValue({ json: jest.fn().mockResolvedValue({}) });
     });
 
     afterAll(() => {
@@ -1001,10 +1001,10 @@ describe('Clerk singleton', () => {
 
         const mockResource = {
           ...mockSession,
-          remove: vi.fn(),
-          touch: vi.fn(() => Promise.resolve()),
-          getToken: vi.fn(),
-          reload: vi.fn(() => Promise.resolve(mockSession)),
+          remove: jest.fn(),
+          touch: jest.fn(() => Promise.resolve()),
+          getToken: jest.fn(),
+          reload: jest.fn(() => Promise.resolve(mockSession)),
         };
 
         mockResource.touch.mockReturnValueOnce(Promise.resolve());
@@ -1019,7 +1019,7 @@ describe('Clerk singleton', () => {
           }),
         );
 
-        const mockSignUpCreate = vi
+        const mockSignUpCreate = jest
           .fn()
           .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
 
@@ -1076,8 +1076,8 @@ describe('Clerk singleton', () => {
         }),
       );
 
-      const mockSetActive = vi.fn();
-      const mockSignUpCreate = vi
+      const mockSetActive = jest.fn();
+      const mockSignUpCreate = jest
         .fn()
         .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
 
@@ -1135,8 +1135,8 @@ describe('Clerk singleton', () => {
         }),
       );
 
-      const mockSetActive = vi.fn();
-      const mockSignUpCreate = vi
+      const mockSetActive = jest.fn();
+      const mockSignUpCreate = jest
         .fn()
         .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
 
@@ -1197,7 +1197,7 @@ describe('Clerk singleton', () => {
         }),
       );
 
-      const mockSignUpCreate = vi.fn().mockReturnValue(
+      const mockSignUpCreate = jest.fn().mockReturnValue(
         Promise.resolve(
           new SignUp({
             status: 'missing_requirements',
@@ -1267,8 +1267,8 @@ describe('Clerk singleton', () => {
         }),
       );
 
-      const mockSetActive = vi.fn();
-      const mockSignInCreate = vi
+      const mockSetActive = jest.fn();
+      const mockSignInCreate = jest
         .fn()
         .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
 
@@ -1327,7 +1327,7 @@ describe('Clerk singleton', () => {
         }),
       );
 
-      const mockSetActive = vi.fn();
+      const mockSetActive = jest.fn();
       const sut = new Clerk(productionPublishableKey);
       await sut.load(mockedLoadOptions);
       sut.setActive = mockSetActive;
@@ -1373,8 +1373,8 @@ describe('Clerk singleton', () => {
         }),
       );
 
-      const mockSetActive = vi.fn();
-      const mockSignUpCreate = vi
+      const mockSetActive = jest.fn();
+      const mockSignUpCreate = jest
         .fn()
         .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
 
@@ -1468,7 +1468,7 @@ describe('Clerk singleton', () => {
       const sut = new Clerk(productionPublishableKey);
       await sut.load(mockedLoadOptions);
 
-      await sut.handleRedirectCallback({
+      sut.handleRedirectCallback({
         secondFactorUrl: '/custom-2fa',
       });
 
@@ -1481,11 +1481,11 @@ describe('Clerk singleton', () => {
       const sessionId = 'sess_1yDceUR8SIKtQ0gIOO8fNsW7nhe';
       const mockSession = {
         id: sessionId,
-        remove: vi.fn(),
+        remove: jest.fn(),
         status: 'active',
         user: {},
-        touch: vi.fn(() => Promise.resolve()),
-        getToken: vi.fn(),
+        touch: jest.fn(() => Promise.resolve()),
+        getToken: jest.fn(),
         lastActiveToken: { getRawString: () => 'mocked-token' },
       };
       mockEnvironmentFetch.mockReturnValue(
@@ -1542,11 +1542,11 @@ describe('Clerk singleton', () => {
       const sessionId = 'sess_1yDceUR8SIKtQ0gIOO8fNsW7nhe';
       const mockSession = {
         id: sessionId,
-        remove: vi.fn(),
+        remove: jest.fn(),
         status: 'active',
         user: {},
-        touch: vi.fn(() => Promise.resolve()),
-        getToken: vi.fn(),
+        touch: jest.fn(() => Promise.resolve()),
+        getToken: jest.fn(),
         lastActiveToken: { getRawString: () => 'mocked-token' },
       };
       mockEnvironmentFetch.mockReturnValue(
@@ -1850,7 +1850,7 @@ describe('Clerk singleton', () => {
         }),
       );
 
-      const mockSignInCreate = vi.fn().mockReturnValue(Promise.resolve({ status: 'needs_first_factor' }));
+      const mockSignInCreate = jest.fn().mockReturnValue(Promise.resolve({ status: 'needs_first_factor' }));
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load(mockedLoadOptions);
@@ -1902,7 +1902,7 @@ describe('Clerk singleton', () => {
         }),
       );
 
-      const mockSignUpCreate = vi.fn().mockReturnValue(
+      const mockSignUpCreate = jest.fn().mockReturnValue(
         Promise.resolve(
           new SignUp({
             status: 'missing_requirements',
@@ -1960,7 +1960,7 @@ describe('Clerk singleton', () => {
         }),
       );
 
-      const mockSignInCreate = vi.fn().mockReturnValue(Promise.resolve({ status: 'needs_first_factor' }));
+      const mockSignInCreate = jest.fn().mockReturnValue(Promise.resolve({ status: 'needs_first_factor' }));
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load(mockedLoadOptions);
@@ -1998,7 +1998,7 @@ describe('Clerk singleton', () => {
         }),
       );
 
-      const mockSignInCreate = vi.fn().mockReturnValue(Promise.resolve({ status: 'needs_new_password' }));
+      const mockSignInCreate = jest.fn().mockReturnValue(Promise.resolve({ status: 'needs_new_password' }));
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load(mockedLoadOptions);
@@ -2046,14 +2046,14 @@ describe('Clerk singleton', () => {
           signUp: new SignUp(null),
         }),
       );
-      const mockSetActive = vi.fn();
+      const mockSetActive = jest.fn();
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load(mockedLoadOptions);
       sut.setActive = mockSetActive;
 
       const redirectUrlComplete = '/redirect-to';
-      await sut.handleEmailLinkVerification({ redirectUrlComplete });
+      sut.handleEmailLinkVerification({ redirectUrlComplete });
 
       await waitFor(() => {
         expect(mockSetActive).toHaveBeenCalledWith({
@@ -2075,7 +2075,7 @@ describe('Clerk singleton', () => {
           signUp: new SignUp(null),
         }),
       );
-      const mockSetActive = vi.fn();
+      const mockSetActive = jest.fn();
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load(mockedLoadOptions);
@@ -2106,14 +2106,14 @@ describe('Clerk singleton', () => {
           signIn: new SignIn(null),
         }),
       );
-      const mockSetActive = vi.fn();
+      const mockSetActive = jest.fn();
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load(mockedLoadOptions);
       sut.setActive = mockSetActive;
 
       const redirectUrlComplete = '/redirect-to';
-      await sut.handleEmailLinkVerification({ redirectUrlComplete });
+      sut.handleEmailLinkVerification({ redirectUrlComplete });
 
       await waitFor(() => {
         expect(mockSetActive).toHaveBeenCalledWith({
@@ -2135,7 +2135,7 @@ describe('Clerk singleton', () => {
           signIn: new SignIn(null),
         }),
       );
-      const mockSetActive = vi.fn();
+      const mockSetActive = jest.fn();
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load(mockedLoadOptions);
@@ -2160,7 +2160,7 @@ describe('Clerk singleton', () => {
           signIn: new SignIn(null),
         }),
       );
-      const mockSetActive = vi.fn();
+      const mockSetActive = jest.fn();
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load(mockedLoadOptions);
@@ -2182,7 +2182,7 @@ describe('Clerk singleton', () => {
           signIn: new SignIn(null),
         }),
       );
-      const mockSetActive = vi.fn();
+      const mockSetActive = jest.fn();
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load(mockedLoadOptions);
@@ -2207,7 +2207,7 @@ describe('Clerk singleton', () => {
           signIn: new SignIn(null),
         }),
       );
-      const mockSetActive = vi.fn();
+      const mockSetActive = jest.fn();
       const sut = new Clerk(productionPublishableKey);
       await sut.load(mockedLoadOptions);
       sut.setActive = mockSetActive;
@@ -2230,7 +2230,7 @@ describe('Clerk singleton', () => {
           signIn: new SignIn(null),
         }),
       );
-      const mockSetActive = vi.fn();
+      const mockSetActive = jest.fn();
       const sut = new Clerk(productionPublishableKey);
       await sut.load(mockedLoadOptions);
       sut.setActive = mockSetActive;
@@ -2255,7 +2255,7 @@ describe('Clerk singleton', () => {
           signUp: new SignUp(null),
         }),
       );
-      const mockSetActive = vi.fn();
+      const mockSetActive = jest.fn();
       const sut = new Clerk(productionPublishableKey);
       await sut.load(mockedLoadOptions);
       sut.setActive = mockSetActive;
@@ -2436,7 +2436,7 @@ describe('Clerk singleton', () => {
   describe('Organizations', () => {
     it('getOrganization', async () => {
       // @ts-expect-error - Mocking a protected method
-      BaseResource._fetch = vi.fn().mockResolvedValue({});
+      BaseResource._fetch = jest.fn().mockResolvedValue({});
       const sut = new Clerk(developmentPublishableKey);
 
       await sut.getOrganization('org_id');
@@ -2457,8 +2457,8 @@ describe('Clerk singleton', () => {
     });
 
     it('runs server revalidation hooks when session transitions from `active` to `pending`', async () => {
-      const mockOnBeforeSetActive = vi.fn().mockReturnValue(Promise.resolve());
-      const mockOnAfterSetActive = vi.fn().mockReturnValue(Promise.resolve());
+      const mockOnBeforeSetActive = jest.fn().mockReturnValue(Promise.resolve());
+      const mockOnAfterSetActive = jest.fn().mockReturnValue(Promise.resolve());
       (window as any).__unstable__onBeforeSetActive = mockOnBeforeSetActive;
       (window as any).__unstable__onAfterSetActive = mockOnAfterSetActive;
 

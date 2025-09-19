@@ -1,8 +1,8 @@
 import type { OrganizationResource } from '@clerk/types';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, it } from '@jest/globals';
 
-import { render } from '../../../../vitestUtils';
-import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
+import { render } from '../../../../testUtils';
+import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { ProfileForm } from '../ProfileForm';
 
 const { createFixtures } = bindCreateFixtures('OrganizationProfile');
@@ -16,8 +16,8 @@ describe('OrganizationProfileScreen', () => {
 
     const { getByDisplayValue } = render(
       <ProfileForm
-        onSuccess={vi.fn()}
-        onReset={vi.fn()}
+        onSuccess={jest.fn()}
+        onReset={jest.fn()}
       />,
       { wrapper },
     );
@@ -35,8 +35,8 @@ describe('OrganizationProfileScreen', () => {
 
     const { getByLabelText, userEvent, getByRole } = render(
       <ProfileForm
-        onSuccess={vi.fn()}
-        onReset={vi.fn()}
+        onSuccess={jest.fn()}
+        onReset={jest.fn()}
       />,
       { wrapper },
     );
@@ -57,8 +57,8 @@ describe('OrganizationProfileScreen', () => {
     fixtures.clerk.organization?.update.mockResolvedValue({} as OrganizationResource);
     const { getByDisplayValue, getByLabelText, userEvent, getByRole } = render(
       <ProfileForm
-        onSuccess={vi.fn()}
-        onReset={vi.fn()}
+        onSuccess={jest.fn()}
+        onReset={jest.fn()}
       />,
       { wrapper },
     );
@@ -80,8 +80,8 @@ describe('OrganizationProfileScreen', () => {
     fixtures.clerk.organization?.update.mockResolvedValue({} as OrganizationResource);
     const { getByDisplayValue, getByLabelText, userEvent, getByRole } = render(
       <ProfileForm
-        onSuccess={vi.fn()}
-        onReset={vi.fn()}
+        onSuccess={jest.fn()}
+        onReset={jest.fn()}
       />,
       { wrapper },
     );

@@ -350,6 +350,7 @@ describe('clerkMiddleware(params)', () => {
       })(req, {} as NextFetchEvent);
 
       expect(resp?.status).toEqual(307);
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       expect(new URL(resp!.headers.get('location')!).searchParams.get('redirect_url')).toContain('/protected');
       expect((await clerkClient()).authenticateRequest).toBeCalled();
     });
@@ -367,6 +368,7 @@ describe('clerkMiddleware(params)', () => {
 
       expect(resp?.status).toEqual(307);
       expect(resp?.headers.get('location')).toContain(locationHeader);
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       expect(new URL(resp!.headers.get('location')!).searchParams.get('redirect_url')).toEqual(
         'https://www.clerk.com/hello',
       );
@@ -386,6 +388,7 @@ describe('clerkMiddleware(params)', () => {
 
       expect(resp?.status).toEqual(307);
       expect(resp?.headers.get('location')).toContain(locationHeader);
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       expect(new URL(resp!.headers.get('location')!).searchParams.get('redirect_url')).toBeNull();
       expect((await clerkClient()).authenticateRequest).toBeCalled();
     });

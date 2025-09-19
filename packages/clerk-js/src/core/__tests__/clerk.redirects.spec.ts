@@ -11,6 +11,7 @@ const mockEnvironmentFetch = vi.fn();
 vi.mock('../resources/Client');
 vi.mock('../resources/Environment');
 
+// Because Jest, don't ask me why...
 vi.mock('../auth/devBrowser', () => ({
   createDevBrowser: (): DevBrowser => ({
     clear: vi.fn(),

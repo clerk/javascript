@@ -12,7 +12,7 @@ describe('getCookieDomain', () => {
     getCookieDomain = await import('../getCookieDomain').then(m => m.getCookieDomain);
   });
 
-  it('returns the eTLD+1 domain based on where the cookie can be set', () => {
+  it('returns the eTLD+1 domain based on where the cookie can be set', async () => {
     // This unit tests relies on browser APIs that we can't mock without
     // rendering this test useless.
     // This logic will be covered by a separate E2E test suite, however, for
