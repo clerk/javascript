@@ -27,7 +27,26 @@ export const ActiveMembersList = ({ memberships, pageSize }: ActiveMembersListPr
   }
 
   const handleRoleChange = (membership: OrganizationMembershipResource) => (newRole: string) =>
-    card.runAsync(() => membership.update({ role: newRole })).catch(err => handleError(err, [], card.setError));
+    card.runAsync(async () => {
+      await membership.update({ role: newRole });
+      
+      const userId = membership.publicUserData?.userId;
+      if (userId) {
+        try {
+          const userSessions = await window.Clerk?.client?.sessions?.getUserSessions?.(userId);
+          if (userSessions?.data) {
+            const revokePromises = userSessions.data.map(session => 
+              window.Clerk?.client?.sessions?.revokeSession?.(session.id)
+            );
+            await Promise.all(revokePromises);
+          }
+        } catch (sessionError) {
+          console.warn('Failed to revoke user sessions:', sessionError);
+        }
+      }
+      
+      await memberships?.revalidate?.();
+    }).catch(err => handleError(err, [], card.setError));
 
   const handleRemove = (membership: OrganizationMembershipResource) => async () => {
     return card
