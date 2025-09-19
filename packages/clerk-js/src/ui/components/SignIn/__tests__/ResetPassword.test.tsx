@@ -1,9 +1,8 @@
 import type { SignInResource } from '@clerk/types';
-import { describe, it } from '@jest/globals';
+import { describe, expect, it } from 'vitest';
 
-import { fireEvent, render, screen, waitFor } from '../../../../testUtils';
-import { bindCreateFixtures } from '../../../utils/test/createFixtures';
-import { runFakeTimers } from '../../../utils/test/runFakeTimers';
+import { fireEvent, render, screen, waitFor } from '../../../../vitestUtils';
+import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
 import { ResetPassword } from '../ResetPassword';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
@@ -32,15 +31,13 @@ describe('ResetPassword', () => {
       }),
     );
 
-    await runFakeTimers(async () => {
-      render(<ResetPassword />, { wrapper });
-      screen.getByRole('heading', { name: /Set new password/i });
+    render(<ResetPassword />, { wrapper });
+    screen.getByRole('heading', { name: /Set new password/i });
 
-      const passwordField = screen.getByLabelText(/New password/i);
-      fireEvent.focus(passwordField);
-      await waitFor(() => {
-        screen.getByText(/Your password must contain 8 or more characters/i);
-      });
+    const passwordField = screen.getByLabelText(/New password/i);
+    fireEvent.focus(passwordField);
+    await waitFor(() => {
+      screen.getByText(/Your password must contain 8 or more characters/i);
     });
   });
 
@@ -114,22 +111,20 @@ describe('ResetPassword', () => {
     it('results in error if the passwords do not match and persists', async () => {
       const { wrapper } = await createFixtures();
 
-      await runFakeTimers(async () => {
-        const { userEvent } = render(<ResetPassword />, { wrapper });
+      const { userEvent } = render(<ResetPassword />, { wrapper });
 
-        await userEvent.type(screen.getByLabelText(/new password/i), 'testewrewr');
-        const confirmField = screen.getByLabelText(/confirm password/i);
-        await userEvent.type(confirmField, 'testrwerrwqrwe');
-        await waitFor(() => {
-          expect(screen.getByText(`Passwords don't match.`)).toBeInTheDocument();
-        });
-
-        await userEvent.clear(confirmField);
-        await waitFor(() => {
-          expect(screen.getByText(`Passwords don't match.`)).toBeInTheDocument();
-        });
+      await userEvent.type(screen.getByLabelText(/new password/i), 'testewrewr');
+      const confirmField = screen.getByLabelText(/confirm password/i);
+      await userEvent.type(confirmField, 'testrwerrwqrwe');
+      await waitFor(() => {
+        expect(screen.getByText(`Passwords don't match.`)).toBeInTheDocument();
       });
-    }, 10000);
+
+      await userEvent.clear(confirmField);
+      await waitFor(() => {
+        expect(screen.getByText(`Passwords don't match.`)).toBeInTheDocument();
+      });
+    });
 
     it('navigates to the root page upon pressing the back link', async () => {
       const { wrapper, fixtures } = await createFixtures();

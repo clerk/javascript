@@ -335,6 +335,7 @@ export default tseslint.config([
       jest: pluginJest,
     },
     rules: {
+      '@typescript-eslint/no-non-null-assertion': 'off',
       '@typescript-eslint/unbound-method': 'off',
       'jest/unbound-method': 'error',
     },
@@ -365,7 +366,7 @@ export default tseslint.config([
   },
   {
     name: 'packages/clerk-js - vitest',
-    files: ['packages/clerk-js/src/**/*.spec.{ts,tsx}'],
+    files: ['packages/clerk-js/src/**/*.test.{ts,tsx}'],
     rules: {
       'jest/unbound-method': 'off',
       '@typescript-eslint/unbound-method': 'off',

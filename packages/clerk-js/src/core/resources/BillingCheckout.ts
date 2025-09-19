@@ -11,7 +11,7 @@ import type {
 import { unixEpochToDate } from '@/utils/date';
 
 import { billingTotalsFromJSON } from '../../utils';
-import { BillingPayer } from './CommercePayer';
+import { BillingPayer } from './BillingPayer';
 import { BaseResource, BillingPaymentSource, BillingPlan, isClerkAPIResponseError } from './internal';
 
 export class BillingCheckout extends BaseResource implements BillingCheckoutResource {

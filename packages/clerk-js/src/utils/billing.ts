@@ -16,10 +16,6 @@ export const billingMoneyAmountFromJSON = (data: BillingMoneyAmountJSON): Billin
   };
 };
 
-const hasPastDue = (data: unknown): data is { past_due: BillingMoneyAmountJSON } => {
-  return typeof data === 'object' && data !== null && 'past_due' in data;
-};
-
 export const billingTotalsFromJSON = <T extends BillingStatementTotalsJSON | BillingCheckoutTotalsJSON>(
   data: T,
 ): T extends { total_due_now: BillingMoneyAmountJSON } ? BillingCheckoutTotals : BillingStatementTotals => {
@@ -35,7 +31,7 @@ export const billingTotalsFromJSON = <T extends BillingStatementTotalsJSON | Bil
   if ('credit' in data) {
     totals.credit = billingMoneyAmountFromJSON(data.credit);
   }
-  if (hasPastDue(data)) {
+  if ('past_due' in data) {
     totals.pastDue = billingMoneyAmountFromJSON(data.past_due);
   }
 

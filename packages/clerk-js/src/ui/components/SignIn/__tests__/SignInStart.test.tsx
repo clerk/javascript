@@ -1,14 +1,15 @@
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
 import type { SignInResource } from '@clerk/types';
 import { waitFor } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { CardStateProvider } from '@/ui/elements/contexts';
 
 import { ClerkAPIResponseError } from '../../../../core/resources';
-import { fireEvent, mockWebAuthn, render, screen } from '../../../../testUtils';
+import { fireEvent, mockWebAuthn, render, screen } from '../../../../vitestUtils';
 import { OptionsProvider } from '../../../contexts';
 import { AppearanceProvider } from '../../../customizables';
-import { bindCreateFixtures } from '../../../utils/test/createFixtures';
+import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
 import { SignInStart } from '../SignInStart';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
@@ -17,7 +18,7 @@ describe('SignInStart', () => {
   const originalGetComputedStyle = window.getComputedStyle;
   const originalLocation = window.location;
   const originalHistory = window.history;
-  const mockGetComputedStyle = jest.fn();
+  const mockGetComputedStyle = vi.fn();
 
   beforeEach(() => {
     // Mock window.getComputedStyle
@@ -25,7 +26,7 @@ describe('SignInStart', () => {
     mockGetComputedStyle.mockReturnValue({
       animationName: '',
       pointerEvents: 'auto',
-      getPropertyValue: jest.fn().mockReturnValue(''),
+      getPropertyValue: vi.fn().mockReturnValue(''),
     });
     Object.defineProperty(window, 'getComputedStyle', {
       value: mockGetComputedStyle,
@@ -328,7 +329,7 @@ describe('SignInStart', () => {
       expect(fixtures.signIn.create).toHaveBeenCalled();
       expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalledWith({
         strategy: 'enterprise_sso',
-        redirectUrl: 'http://localhost/#/sso-callback',
+        redirectUrl: 'http://localhost:3000/#/sso-callback',
         redirectUrlComplete: '/',
         continueSignIn: true,
       });
@@ -352,7 +353,7 @@ describe('SignInStart', () => {
       expect(fixtures.signIn.create).toHaveBeenCalled();
       expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalledWith({
         strategy: 'enterprise_sso',
-        redirectUrl: 'http://localhost/#/sso-callback',
+        redirectUrl: 'http://localhost:3000/#/sso-callback',
         redirectUrlComplete: '/',
         continueSignIn: true,
       });
@@ -535,7 +536,7 @@ describe('SignInStart', () => {
       });
       Object.defineProperty(window, 'history', {
         writable: true,
-        value: { replaceState: jest.fn() },
+        value: { replaceState: vi.fn() },
       });
 
       render(
@@ -569,7 +570,7 @@ describe('SignInStart', () => {
       });
       Object.defineProperty(window, 'history', {
         writable: true,
-        value: { replaceState: jest.fn() },
+        value: { replaceState: vi.fn() },
       });
 
       render(

@@ -1,10 +1,10 @@
 import type { SessionWithActivitiesResource } from '@clerk/types';
-import { describe, it } from '@jest/globals';
 import { within } from '@testing-library/dom';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { render, screen, waitFor } from '../../../../testUtils';
+import { render, screen, waitFor } from '../../../../vitestUtils';
 import { clearFetchCache } from '../../../hooks';
-import { bindCreateFixtures } from '../../../utils/test/createFixtures';
+import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
 import { SecurityPage } from '../SecurityPage';
 
 const { createFixtures } = bindCreateFixtures('UserProfile');
@@ -282,7 +282,7 @@ describe('SecurityPage', () => {
         last_name: 'Clerk',
       });
     });
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
     fixtures.clerk.user!.getSessions.mockReturnValue(
       Promise.resolve([
         {
@@ -302,7 +302,7 @@ describe('SecurityPage', () => {
             isMobile: false,
           },
           actor: null,
-          revoke: jest.fn().mockResolvedValue({}),
+          revoke: vi.fn().mockResolvedValue({}),
         } as any as SessionWithActivitiesResource,
         {
           pathRoot: '/me/sessions',
@@ -321,7 +321,7 @@ describe('SecurityPage', () => {
             isMobile: false,
           },
           actor: null,
-          revoke: jest.fn().mockResolvedValue({}),
+          revoke: vi.fn().mockResolvedValue({}),
         } as any as SessionWithActivitiesResource,
         {
           pathRoot: '/me/sessions',
@@ -340,7 +340,7 @@ describe('SecurityPage', () => {
             isMobile: false,
           },
           actor: null,
-          revoke: jest.fn().mockResolvedValue({}),
+          revoke: vi.fn().mockResolvedValue({}),
         } as any as SessionWithActivitiesResource,
       ]),
     );
@@ -357,7 +357,7 @@ describe('SecurityPage', () => {
     devices.forEach(d => {
       const elem = d.parentElement?.parentElement?.parentElement?.parentElement;
       expect(elem).toBeDefined();
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, jest/unbound-method
+
       const { getByText } = within(elem!);
       getByText(/107.0.0.0/i);
       getByText(/Athens/i);
