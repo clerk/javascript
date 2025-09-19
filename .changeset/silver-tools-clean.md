@@ -2,4 +2,4 @@
 '@clerk/testing': minor
 ---
 
-Add `userAvatar.goTo()`, `userAvatar.waitForMounted()`, and `userAvatar.toBeVisible()` testing methods for <UserAvatar />
+Add Playwright testing helpers under unstable page-objects: `userAvatar.goTo()`, `userAvatar.waitForMounted()`, and `userAvatar.toBeVisible()` for <UserAvatar />.
