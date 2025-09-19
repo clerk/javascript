@@ -1,4 +1,4 @@
-import { describe, expect, test, vi, afterEach } from 'vitest';
+import { afterEach, describe, expect, test, vi } from 'vitest';
 import browser from 'webextension-polyfill';
 
 import { BrowserStorageCache, MemoryStorageCache } from '../storage';
@@ -22,6 +22,7 @@ describe('StorageCache', () => {
 
   describe('set', () => {
     test('setting the storage cache', async () => {
+      // eslint-disable-next-line jest/unbound-method -- The Jest ESLint plugin doesn't support Vitest
       const setMock = vi.mocked(browser.storage.local.set).mockResolvedValueOnce(_void);
 
       expect(await BrowserStorageCache.set(KEY, VALUE)).toBe(_void);
@@ -32,6 +33,7 @@ describe('StorageCache', () => {
 
   describe('remove', () => {
     test('removing from the storage cache', async () => {
+      // eslint-disable-next-line jest/unbound-method -- The Jest ESLint plugin doesn't support Vitest
       const removeMock = vi.mocked(browser.storage.local.remove).mockResolvedValueOnce(_void);
 
       expect(await BrowserStorageCache.remove(KEY)).toBe(_void);
@@ -46,6 +48,7 @@ describe('StorageCache', () => {
     });
 
     test('value missing', async () => {
+      // eslint-disable-next-line jest/unbound-method -- The Jest ESLint plugin doesn't support Vitest
       const getMock = vi.mocked(browser.storage.local.get).mockResolvedValue({});
 
       expect(await BrowserStorageCache.get(KEY)).toBeUndefined();
@@ -54,6 +57,7 @@ describe('StorageCache', () => {
     });
 
     test('value exists', async () => {
+      // eslint-disable-next-line jest/unbound-method -- The Jest ESLint plugin doesn't support Vitest
       const getMock = vi.mocked(browser.storage.local.get).mockResolvedValue({ [KEY]: VALUE });
 
       expect(await BrowserStorageCache.get(KEY)).toBe(VALUE);
