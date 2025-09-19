@@ -1,5 +1,7 @@
-import { render, waitFor } from '../../../../testUtils';
-import { bindCreateFixtures } from '../../../utils/test/createFixtures';
+import { describe, expect, it, vi } from 'vitest';
+
+import { render, waitFor } from '../../../../vitestUtils';
+import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
 import { PricingTable } from '..';
 
 const { createFixtures } = bindCreateFixtures('PricingTable');
@@ -37,9 +39,9 @@ describe('PricingTable - trial info', () => {
     features: [] as any[],
     freeTrialEnabled: true,
     freeTrialDays: 14,
-    __internal_toSnapshot: jest.fn(),
+    __internal_toSnapshot: vi.fn(),
     pathRoot: '',
-    reload: jest.fn(),
+    reload: vi.fn(),
   } as const;
 
   it('shows footer notice with trial end date when active subscription is in free trial', async () => {
@@ -73,13 +75,13 @@ describe('PricingTable - trial info', () => {
           planPeriod: 'month' as const,
           status: 'active' as const,
           isFreeTrial: true,
-          cancel: jest.fn(),
+          cancel: vi.fn(),
           pathRoot: '',
-          reload: jest.fn(),
+          reload: vi.fn(),
         },
       ],
       pathRoot: '',
-      reload: jest.fn(),
+      reload: vi.fn(),
     });
 
     const { findByRole, getByText, userEvent } = render(<PricingTable />, { wrapper });
@@ -119,7 +121,7 @@ describe('PricingTable - trial info', () => {
       // No subscription items for the trial plan yet
       subscriptionItems: [],
       pathRoot: '',
-      reload: jest.fn(),
+      reload: vi.fn(),
     });
 
     const { getByRole, getByText } = render(<PricingTable />, { wrapper });
@@ -218,13 +220,13 @@ describe('PricingTable - trial info', () => {
           planPeriod: 'month' as const,
           status: 'upcoming' as const,
           isFreeTrial: false,
-          cancel: jest.fn(),
+          cancel: vi.fn(),
           pathRoot: '',
-          reload: jest.fn(),
+          reload: vi.fn(),
         },
       ],
       pathRoot: '',
-      reload: jest.fn(),
+      reload: vi.fn(),
     });
 
     const { findByRole, getByText, userEvent } = render(<PricingTable />, { wrapper });
@@ -276,9 +278,9 @@ describe('PricingTable - plans visibility', () => {
     features: [] as any[],
     freeTrialEnabled: false,
     freeTrialDays: 0,
-    __internal_toSnapshot: jest.fn(),
+    __internal_toSnapshot: vi.fn(),
     pathRoot: '',
-    reload: jest.fn(),
+    reload: vi.fn(),
   } as const;
 
   it('shows no plans when user is signed in but has no subscription', async () => {
@@ -294,7 +296,7 @@ describe('PricingTable - plans visibility', () => {
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
       subscriptionItems: [],
       pathRoot: '',
-      reload: jest.fn(),
+      reload: vi.fn(),
     } as any);
 
     const { queryByRole } = render(<PricingTable />, { wrapper });
@@ -337,13 +339,13 @@ describe('PricingTable - plans visibility', () => {
           planPeriod: 'month' as const,
           status: 'active' as const,
           isFreeTrial: false,
-          cancel: jest.fn(),
+          cancel: vi.fn(),
           pathRoot: '',
-          reload: jest.fn(),
+          reload: vi.fn(),
         },
       ],
       pathRoot: '',
-      reload: jest.fn(),
+      reload: vi.fn(),
     });
 
     const { getByRole } = render(<PricingTable />, { wrapper });
@@ -463,13 +465,13 @@ describe('PricingTable - plans visibility', () => {
           planPeriod: 'month' as const,
           status: 'active' as const,
           isFreeTrial: false,
-          cancel: jest.fn(),
+          cancel: vi.fn(),
           pathRoot: '',
-          reload: jest.fn(),
+          reload: vi.fn(),
         },
       ],
       pathRoot: '',
-      reload: jest.fn(),
+      reload: vi.fn(),
     });
 
     // Assert the plan heading appears after subscription resolves

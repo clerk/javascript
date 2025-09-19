@@ -1,39 +1,39 @@
 import { retry } from '@clerk/shared/retry';
 import type {
-  CommerceCheckoutJSON,
-  CommerceCheckoutResource,
-  CommerceCheckoutTotals,
-  CommercePayerResource,
-  CommerceSubscriptionPlanPeriod,
+  BillingCheckoutJSON,
+  BillingCheckoutResource,
+  BillingCheckoutTotals,
+  BillingPayerResource,
+  BillingSubscriptionPlanPeriod,
   ConfirmCheckoutParams,
 } from '@clerk/types';
 
 import { unixEpochToDate } from '@/utils/date';
 
-import { commerceTotalsFromJSON } from '../../utils';
-import { CommercePayer } from './CommercePayer';
-import { BaseResource, CommercePaymentSource, CommercePlan, isClerkAPIResponseError } from './internal';
+import { billingTotalsFromJSON } from '../../utils';
+import { BillingPayer } from './BillingPayer';
+import { BaseResource, BillingPaymentSource, BillingPlan, isClerkAPIResponseError } from './internal';
 
-export class CommerceCheckout extends BaseResource implements CommerceCheckoutResource {
+export class BillingCheckout extends BaseResource implements BillingCheckoutResource {
   id!: string;
   externalClientSecret!: string;
   externalGatewayId!: string;
-  paymentSource?: CommercePaymentSource;
-  plan!: CommercePlan;
-  planPeriod!: CommerceSubscriptionPlanPeriod;
+  paymentSource?: BillingPaymentSource;
+  plan!: BillingPlan;
+  planPeriod!: BillingSubscriptionPlanPeriod;
   planPeriodStart!: number | undefined;
   status!: 'needs_confirmation' | 'completed';
-  totals!: CommerceCheckoutTotals;
+  totals!: BillingCheckoutTotals;
   isImmediatePlanChange!: boolean;
   freeTrialEndsAt!: Date | null;
-  payer!: CommercePayerResource;
+  payer!: BillingPayerResource;
 
-  constructor(data: CommerceCheckoutJSON) {
+  constructor(data: BillingCheckoutJSON) {
     super();
     this.fromJSON(data);
   }
 
-  protected fromJSON(data: CommerceCheckoutJSON | null): this {
+  protected fromJSON(data: BillingCheckoutJSON | null): this {
     if (!data) {
       return this;
     }
@@ -41,15 +41,15 @@ export class CommerceCheckout extends BaseResource implements CommerceCheckoutRe
     this.id = data.id;
     this.externalClientSecret = data.external_client_secret;
     this.externalGatewayId = data.external_gateway_id;
-    this.paymentSource = data.payment_source ? new CommercePaymentSource(data.payment_source) : undefined;
-    this.plan = new CommercePlan(data.plan);
+    this.paymentSource = data.payment_source ? new BillingPaymentSource(data.payment_source) : undefined;
+    this.plan = new BillingPlan(data.plan);
     this.planPeriod = data.plan_period;
     this.planPeriodStart = data.plan_period_start;
     this.status = data.status;
-    this.totals = commerceTotalsFromJSON(data.totals);
+    this.totals = billingTotalsFromJSON(data.totals);
     this.isImmediatePlanChange = data.is_immediate_plan_change;
     this.freeTrialEndsAt = data.free_trial_ends_at ? unixEpochToDate(data.free_trial_ends_at) : null;
-    this.payer = new CommercePayer(data.payer);
+    this.payer = new BillingPayer(data.payer);
     return this;
   }
 

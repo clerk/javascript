@@ -1,8 +1,9 @@
-import type { CommercePayerResourceType } from '@clerk/types';
+import type { BillingPayerResourceType } from '@clerk/types';
+import { describe, expect, it, vi } from 'vitest';
 
-import { render, waitFor } from '../../../../testUtils';
+import { render, waitFor } from '../../../../vitestUtils';
 import { localizationKeys } from '../../../customizables';
-import { bindCreateFixtures } from '../../../utils/test/createFixtures';
+import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
 import { SubscriptionsList } from '../SubscriptionsList';
 
 const { createFixtures } = bindCreateFixtures('UserProfile');
@@ -35,7 +36,7 @@ describe('SubscriptionsList', () => {
       updatedAt: null,
       subscriptionItems: [],
       pathRoot: '',
-      reload: jest.fn(),
+      reload: vi.fn(),
     });
 
     const { getByText, queryByText } = render(<SubscriptionsList {...props} />, { wrapper });
@@ -74,7 +75,7 @@ describe('SubscriptionsList', () => {
             isDefault: true,
             isRecurring: true,
             hasBaseFee: false,
-            forPayerType: 'user' as CommercePayerResourceType,
+            forPayerType: 'user' as BillingPayerResourceType,
             publiclyVisible: true,
             slug: 'free-plan',
             avatarUrl: '',
@@ -82,7 +83,7 @@ describe('SubscriptionsList', () => {
             freeTrialDays: null,
             freeTrialEnabled: false,
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
           },
           status: 'active',
           createdAt: new Date('2021-01-01'),
@@ -93,13 +94,13 @@ describe('SubscriptionsList', () => {
           planPeriod: 'month' as const,
           isFreeTrial: false,
           pastDueAt: null,
-          cancel: jest.fn(),
+          cancel: vi.fn(),
           pathRoot: '',
-          reload: jest.fn(),
+          reload: vi.fn(),
         },
       ],
       pathRoot: '',
-      reload: jest.fn(),
+      reload: vi.fn(),
     });
 
     const testProps = {
@@ -140,7 +141,7 @@ describe('SubscriptionsList', () => {
         isDefault: false,
         isRecurring: true,
         hasBaseFee: true,
-        forPayerType: 'user' as CommercePayerResourceType,
+        forPayerType: 'user' as BillingPayerResourceType,
         publiclyVisible: true,
         slug: 'pro-plan',
         avatarUrl: '',
@@ -148,7 +149,7 @@ describe('SubscriptionsList', () => {
         freeTrialDays: 14,
         freeTrialEnabled: true,
         pathRoot: '',
-        reload: jest.fn(),
+        reload: vi.fn(),
       },
       createdAt: new Date('2021-01-01'),
       periodStart: new Date('2021-01-01'),
@@ -159,9 +160,9 @@ describe('SubscriptionsList', () => {
       status: 'active' as const,
       isFreeTrial: true, // This subscription is in a free trial
       pastDueAt: null,
-      cancel: jest.fn(),
+      cancel: vi.fn(),
       pathRoot: '',
-      reload: jest.fn(),
+      reload: vi.fn(),
     };
 
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
@@ -174,7 +175,7 @@ describe('SubscriptionsList', () => {
       updatedAt: null,
       subscriptionItems: [freeTrialSubscription],
       pathRoot: '',
-      reload: jest.fn(),
+      reload: vi.fn(),
     });
 
     const { getByText } = render(<SubscriptionsList {...props} />, { wrapper });
@@ -204,7 +205,7 @@ describe('SubscriptionsList', () => {
         isDefault: false,
         isRecurring: true,
         hasBaseFee: true,
-        forPayerType: 'user' as CommercePayerResourceType,
+        forPayerType: 'user' as BillingPayerResourceType,
         publiclyVisible: true,
         slug: 'pro-plan',
         avatarUrl: '',
@@ -212,7 +213,7 @@ describe('SubscriptionsList', () => {
         freeTrialDays: null,
         freeTrialEnabled: false,
         pathRoot: '',
-        reload: jest.fn(),
+        reload: vi.fn(),
       },
       createdAt: new Date('2021-01-01'),
       periodStart: new Date('2021-01-01'),
@@ -223,9 +224,9 @@ describe('SubscriptionsList', () => {
       status: 'past_due' as const,
       isFreeTrial: false,
       pastDueAt: new Date('2021-01-15'),
-      cancel: jest.fn(),
+      cancel: vi.fn(),
       pathRoot: '',
-      reload: jest.fn(),
+      reload: vi.fn(),
     };
 
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
@@ -238,7 +239,7 @@ describe('SubscriptionsList', () => {
       updatedAt: null,
       subscriptionItems: [pastDueSubscription],
       pathRoot: '',
-      reload: jest.fn(),
+      reload: vi.fn(),
     });
 
     const { getByText, queryByText } = render(<SubscriptionsList {...props} />, { wrapper });
@@ -269,7 +270,7 @@ describe('SubscriptionsList', () => {
         isDefault: false,
         isRecurring: true,
         hasBaseFee: true,
-        forPayerType: 'user' as CommercePayerResourceType,
+        forPayerType: 'user' as BillingPayerResourceType,
         publiclyVisible: true,
         slug: 'pro-plan',
         avatarUrl: '',
@@ -277,7 +278,7 @@ describe('SubscriptionsList', () => {
         freeTrialDays: null,
         freeTrialEnabled: false,
         pathRoot: '',
-        reload: jest.fn(),
+        reload: vi.fn(),
       },
       createdAt: new Date('2021-01-01'),
       periodStart: new Date('2021-01-01'),
@@ -288,9 +289,9 @@ describe('SubscriptionsList', () => {
       status: 'active' as const,
       isFreeTrial: false,
       pastDueAt: null,
-      cancel: jest.fn(),
+      cancel: vi.fn(),
       pathRoot: '',
-      reload: jest.fn(),
+      reload: vi.fn(),
     };
 
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
@@ -303,7 +304,7 @@ describe('SubscriptionsList', () => {
       updatedAt: null,
       subscriptionItems: [activeSubscription],
       pathRoot: '',
-      reload: jest.fn(),
+      reload: vi.fn(),
     });
 
     const { getByText, queryByText } = render(<SubscriptionsList {...props} />, { wrapper });
@@ -333,7 +334,7 @@ describe('SubscriptionsList', () => {
         isDefault: false,
         isRecurring: true,
         hasBaseFee: true,
-        forPayerType: 'user' as CommercePayerResourceType,
+        forPayerType: 'user' as BillingPayerResourceType,
         publiclyVisible: true,
         slug: 'plus-plan',
         avatarUrl: '',
@@ -341,7 +342,7 @@ describe('SubscriptionsList', () => {
         freeTrialDays: null,
         freeTrialEnabled: false,
         pathRoot: '',
-        reload: jest.fn(),
+        reload: vi.fn(),
       },
       createdAt: new Date('2021-01-01'),
       periodStart: new Date('2021-02-01'),
@@ -352,9 +353,9 @@ describe('SubscriptionsList', () => {
       status: 'upcoming' as const,
       isFreeTrial: false,
       pastDueAt: null,
-      cancel: jest.fn(),
+      cancel: vi.fn(),
       pathRoot: '',
-      reload: jest.fn(),
+      reload: vi.fn(),
     };
 
     const activeCanceledSubscription = {
@@ -369,7 +370,7 @@ describe('SubscriptionsList', () => {
         isDefault: false,
         isRecurring: true,
         hasBaseFee: true,
-        forPayerType: 'user' as CommercePayerResourceType,
+        forPayerType: 'user' as BillingPayerResourceType,
         publiclyVisible: true,
         slug: 'pro-plan',
         avatarUrl: '',
@@ -377,7 +378,7 @@ describe('SubscriptionsList', () => {
         freeTrialDays: null,
         freeTrialEnabled: false,
         pathRoot: '',
-        reload: jest.fn(),
+        reload: vi.fn(),
       },
       createdAt: new Date('2021-01-01'),
       periodStart: new Date('2021-01-01'),
@@ -388,9 +389,9 @@ describe('SubscriptionsList', () => {
       status: 'active' as const,
       isFreeTrial: false,
       pastDueAt: null,
-      cancel: jest.fn(),
+      cancel: vi.fn(),
       pathRoot: '',
-      reload: jest.fn(),
+      reload: vi.fn(),
     };
 
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
@@ -403,7 +404,7 @@ describe('SubscriptionsList', () => {
       updatedAt: null,
       subscriptionItems: [activeCanceledSubscription, upcomingSubscription],
       pathRoot: '',
-      reload: jest.fn(),
+      reload: vi.fn(),
     });
 
     const { getByText, queryByText } = render(<SubscriptionsList {...props} />, { wrapper });

@@ -1,40 +1,40 @@
 import type {
+  BillingMoneyAmount,
+  BillingSubscriptionItemJSON,
+  BillingSubscriptionItemResource,
+  BillingSubscriptionJSON,
+  BillingSubscriptionPlanPeriod,
+  BillingSubscriptionResource,
+  BillingSubscriptionStatus,
   CancelSubscriptionParams,
-  CommerceMoneyAmount,
-  CommerceSubscriptionItemJSON,
-  CommerceSubscriptionItemResource,
-  CommerceSubscriptionJSON,
-  CommerceSubscriptionPlanPeriod,
-  CommerceSubscriptionResource,
-  CommerceSubscriptionStatus,
   DeletedObjectJSON,
 } from '@clerk/types';
 
 import { unixEpochToDate } from '@/utils/date';
 
-import { commerceMoneyAmountFromJSON } from '../../utils';
-import { BaseResource, CommercePlan, DeletedObject } from './internal';
+import { billingMoneyAmountFromJSON } from '../../utils';
+import { BaseResource, BillingPlan, DeletedObject } from './internal';
 
-export class CommerceSubscription extends BaseResource implements CommerceSubscriptionResource {
+export class BillingSubscription extends BaseResource implements BillingSubscriptionResource {
   id!: string;
-  status!: Extract<CommerceSubscriptionStatus, 'active' | 'past_due'>;
+  status!: Extract<BillingSubscriptionStatus, 'active' | 'past_due'>;
   activeAt!: Date;
   createdAt!: Date;
   pastDueAt!: Date | null;
   updatedAt!: Date | null;
   nextPayment: {
-    amount: CommerceMoneyAmount;
+    amount: BillingMoneyAmount;
     date: Date;
   } | null = null;
-  subscriptionItems!: CommerceSubscriptionItemResource[];
+  subscriptionItems!: BillingSubscriptionItemResource[];
   eligibleForFreeTrial?: boolean;
 
-  constructor(data: CommerceSubscriptionJSON) {
+  constructor(data: BillingSubscriptionJSON) {
     super();
     this.fromJSON(data);
   }
 
-  protected fromJSON(data: CommerceSubscriptionJSON | null): this {
+  protected fromJSON(data: BillingSubscriptionJSON | null): this {
     if (!data) {
       return this;
     }
@@ -47,47 +47,47 @@ export class CommerceSubscription extends BaseResource implements CommerceSubscr
     this.pastDueAt = data.past_due_at ? unixEpochToDate(data.past_due_at) : null;
     this.nextPayment = data.next_payment
       ? {
-          amount: commerceMoneyAmountFromJSON(data.next_payment.amount),
+          amount: billingMoneyAmountFromJSON(data.next_payment.amount),
           date: unixEpochToDate(data.next_payment.date),
         }
       : null;
-    this.subscriptionItems = (data.subscription_items || []).map(item => new CommerceSubscriptionItem(item));
+    this.subscriptionItems = (data.subscription_items || []).map(item => new BillingSubscriptionItem(item));
     this.eligibleForFreeTrial = this.withDefault(data.eligible_for_free_trial, false);
     return this;
   }
 }
 
-export class CommerceSubscriptionItem extends BaseResource implements CommerceSubscriptionItemResource {
+export class BillingSubscriptionItem extends BaseResource implements BillingSubscriptionItemResource {
   id!: string;
   paymentSourceId!: string;
-  plan!: CommercePlan;
-  planPeriod!: CommerceSubscriptionPlanPeriod;
-  status!: CommerceSubscriptionStatus;
+  plan!: BillingPlan;
+  planPeriod!: BillingSubscriptionPlanPeriod;
+  status!: BillingSubscriptionStatus;
   createdAt!: Date;
   periodStart!: Date;
   periodEnd!: Date | null;
   canceledAt!: Date | null;
   pastDueAt!: Date | null;
   //TODO(@COMMERCE): Why can this be undefined ?
-  amount?: CommerceMoneyAmount;
+  amount?: BillingMoneyAmount;
   credit?: {
-    amount: CommerceMoneyAmount;
+    amount: BillingMoneyAmount;
   };
   isFreeTrial!: boolean;
 
-  constructor(data: CommerceSubscriptionItemJSON) {
+  constructor(data: BillingSubscriptionItemJSON) {
     super();
     this.fromJSON(data);
   }
 
-  protected fromJSON(data: CommerceSubscriptionItemJSON | null): this {
+  protected fromJSON(data: BillingSubscriptionItemJSON | null): this {
     if (!data) {
       return this;
     }
 
     this.id = data.id;
     this.paymentSourceId = data.payment_source_id;
-    this.plan = new CommercePlan(data.plan);
+    this.plan = new BillingPlan(data.plan);
     this.planPeriod = data.plan_period;
     this.status = data.status;
 
@@ -98,9 +98,9 @@ export class CommerceSubscriptionItem extends BaseResource implements CommerceSu
     this.periodEnd = data.period_end ? unixEpochToDate(data.period_end) : null;
     this.canceledAt = data.canceled_at ? unixEpochToDate(data.canceled_at) : null;
 
-    this.amount = data.amount ? commerceMoneyAmountFromJSON(data.amount) : undefined;
+    this.amount = data.amount ? billingMoneyAmountFromJSON(data.amount) : undefined;
     this.credit =
-      data.credit && data.credit.amount ? { amount: commerceMoneyAmountFromJSON(data.credit.amount) } : undefined;
+      data.credit && data.credit.amount ? { amount: billingMoneyAmountFromJSON(data.credit.amount) } : undefined;
 
     this.isFreeTrial = this.withDefault(data.is_free_trial, false);
     return this;

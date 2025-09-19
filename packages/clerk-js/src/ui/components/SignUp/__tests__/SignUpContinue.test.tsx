@@ -2,9 +2,10 @@ import { ClerkAPIResponseError } from '@clerk/shared/error';
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
 import { waitFor } from '@testing-library/dom';
 import React from 'react';
+import { describe, expect, it } from 'vitest';
 
-import { render, runFakeTimers, screen } from '../../../../testUtils';
-import { bindCreateFixtures } from '../../../utils/test/createFixtures';
+import { render, screen } from '../../../../vitestUtils';
+import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
 import { SignUpContinue } from '../SignUpContinue';
 
 const { createFixtures } = bindCreateFixtures('SignUp');
@@ -160,21 +161,16 @@ describe('SignUpContinue', () => {
       }),
     );
 
-    await runFakeTimers(async timers => {
-      const { userEvent } = render(<SignUpContinue />, { wrapper });
-      expect(screen.queryByText(/username/i)).toBeInTheDocument();
-      await userEvent.type(screen.getByLabelText(/username/i), 'clerkUser');
-      timers.runOnlyPendingTimers();
-      const button = screen.getByText('Continue');
-      await userEvent.click(button);
-      timers.runOnlyPendingTimers();
+    const { userEvent } = render(<SignUpContinue />, { wrapper });
+    expect(screen.queryByText(/username/i)).toBeInTheDocument();
+    await userEvent.type(screen.getByLabelText(/username/i), 'clerkUser');
+    const button = screen.getByText('Continue');
+    await userEvent.click(button);
 
-      await waitFor(() => expect(fixtures.signUp.update).toHaveBeenCalled());
-      timers.runOnlyPendingTimers();
-      await waitFor(() =>
-        expect(screen.queryByText(/^Your username must be between 4 and 40 characters long./i)).toBeInTheDocument(),
-      );
-    });
+    await waitFor(() => expect(fixtures.signUp.update).toHaveBeenCalled());
+    await waitFor(() =>
+      expect(screen.queryByText(/^Your username must be between 4 and 40 characters long./i)).toBeInTheDocument(),
+    );
   });
 
   it('renders error for existing username', async () => {
@@ -200,21 +196,16 @@ describe('SignUpContinue', () => {
       }),
     );
 
-    await runFakeTimers(async timers => {
-      const { userEvent } = render(<SignUpContinue />, { wrapper });
-      expect(screen.queryByText(/username/i)).toBeInTheDocument();
-      await userEvent.type(screen.getByLabelText(/username/i), 'clerkUser');
-      timers.runOnlyPendingTimers();
-      const button = screen.getByText('Continue');
-      await userEvent.click(button);
-      timers.runOnlyPendingTimers();
+    const { userEvent } = render(<SignUpContinue />, { wrapper });
+    expect(screen.queryByText(/username/i)).toBeInTheDocument();
+    await userEvent.type(screen.getByLabelText(/username/i), 'clerkUser');
+    const button = screen.getByText('Continue');
+    await userEvent.click(button);
 
-      await waitFor(() => expect(fixtures.signUp.update).toHaveBeenCalled());
-      timers.runOnlyPendingTimers();
-      await waitFor(() =>
-        expect(screen.queryByText(/^This username is taken. Please try another./i)).toBeInTheDocument(),
-      );
-    });
+    await waitFor(() => expect(fixtures.signUp.update).toHaveBeenCalled());
+    await waitFor(() =>
+      expect(screen.queryByText(/^This username is taken. Please try another./i)).toBeInTheDocument(),
+    );
   });
 
   describe('Sign in Link', () => {

@@ -1,4 +1,4 @@
-import type { CommercePaymentResource } from '@clerk/types';
+import type { BillingPaymentResource } from '@clerk/types';
 
 import { DataTable, DataTableRow } from '@/ui/elements/DataTable';
 import { formatDate } from '@/ui/utils/formatDate';
@@ -40,7 +40,7 @@ export const PaymentAttemptsList = () => {
   );
 };
 
-const PaymentAttemptsListRow = ({ paymentAttempt }: { paymentAttempt: CommercePaymentResource }) => {
+const PaymentAttemptsListRow = ({ paymentAttempt }: { paymentAttempt: BillingPaymentResource }) => {
   const { id, amount, failedAt, paidAt, updatedAt, status } = paymentAttempt;
   const { navigate } = useRouter();
   const handleClick = () => {

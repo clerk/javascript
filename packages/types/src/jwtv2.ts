@@ -85,8 +85,8 @@ type JWTPayloadBase = {
 
   /**
    * Factor verification age (fva). The tuple represents the minutes that have passed since the last time a first or second factor were verified.
-   * This API is experimental and may change at any moment.
-   * @experimental
+   *
+   * @experimental This API is experimental and may change at any moment.
    */
   fva?: [fistFactorAge: number, secondFactorAge: number];
 

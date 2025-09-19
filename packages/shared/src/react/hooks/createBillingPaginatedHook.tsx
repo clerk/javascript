@@ -13,7 +13,7 @@ import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 /**
  * @internal
  */
-type CommerceHookConfig<TResource extends ClerkResource, TParams extends PagesOrInfiniteOptions> = {
+type BillingHookConfig<TResource extends ClerkResource, TParams extends PagesOrInfiniteOptions> = {
   hookName: string;
   resourceType: string;
   useFetcher: (
@@ -38,17 +38,17 @@ type CommerceHookConfig<TResource extends ClerkResource, TParams extends PagesOr
  *
  * @internal
  */
-export function createCommercePaginatedHook<TResource extends ClerkResource, TParams extends PagesOrInfiniteOptions>({
+export function createBillingPaginatedHook<TResource extends ClerkResource, TParams extends PagesOrInfiniteOptions>({
   hookName,
   resourceType,
   useFetcher,
   options,
-}: CommerceHookConfig<TResource, TParams>) {
+}: BillingHookConfig<TResource, TParams>) {
   type HookParams = PaginatedHookConfig<PagesOrInfiniteOptions> & {
     for?: ForPayerType;
   };
 
-  return function useCommerceHook<T extends HookParams>(
+  return function useBillingHook<T extends HookParams>(
     params?: T,
   ): PaginatedResources<TResource, T extends { infinite: true } ? true : false> {
     const { for: _for, ...paginationParams } = params || ({} as Partial<T>);
