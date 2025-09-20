@@ -151,6 +151,9 @@ describe('buildUrl(options)', () => {
     );
   });
 
+  // The return value isn't as expected.
+  // The buildUrl function converts an undefined value to the string 'undefined'
+  // and includes it in the search parameters.
   it('parses search params when value is undefined', () => {
     expect(
       fapiClient.buildUrl({
