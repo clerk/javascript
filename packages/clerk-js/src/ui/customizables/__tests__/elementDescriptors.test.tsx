@@ -1,6 +1,7 @@
 // eslint-disable-next-line simple-import-sort/imports
-import { render, screen } from '../../../testUtils';
+import { render, screen } from '../../../vitestUtils';
 import React from 'react';
+import { describe, it, expect } from 'vitest';
 
 import { Box, descriptors } from '..';
 import { AppearanceProvider } from '../AppearanceContext';

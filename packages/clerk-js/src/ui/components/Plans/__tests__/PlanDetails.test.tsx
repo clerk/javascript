@@ -1,7 +1,9 @@
+import { describe, expect, it, vi } from 'vitest';
+
 import { Drawer } from '@/ui/elements/Drawer';
 
-import { render, waitFor } from '../../../../testUtils';
-import { bindCreateFixtures } from '../../../utils/test/createFixtures';
+import { render, waitFor } from '../../../../vitestUtils';
+import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
 import { PlanDetails } from '../PlanDetails';
 
 const { createFixtures } = bindCreateFixtures('UserProfile');
@@ -13,9 +15,9 @@ describe('PlanDetails', () => {
     description: 'Feature 1 Description',
     avatarUrl: 'https://example.com/feature1.png',
     slug: 'feature-1',
-    __internal_toSnapshot: jest.fn(),
+    __internal_toSnapshot: vi.fn(),
     pathRoot: '',
-    reload: jest.fn(),
+    reload: vi.fn(),
   };
 
   const mockFeature2 = {
@@ -24,9 +26,9 @@ describe('PlanDetails', () => {
     description: 'Feature 2 Description',
     avatarUrl: 'https://example.com/feature2.png',
     slug: 'feature-2',
-    __internal_toSnapshot: jest.fn(),
+    __internal_toSnapshot: vi.fn(),
     pathRoot: '',
-    reload: jest.fn(),
+    reload: vi.fn(),
   };
 
   const mockPlan = {
@@ -60,9 +62,9 @@ describe('PlanDetails', () => {
     slug: 'test-plan',
     avatarUrl: 'https://example.com/avatar.png',
     features: [mockFeature, mockFeature2],
-    __internal_toSnapshot: jest.fn(),
+    __internal_toSnapshot: vi.fn(),
     pathRoot: '',
-    reload: jest.fn(),
+    reload: vi.fn(),
   };
 
   it('displays spinner when loading with planId', async () => {

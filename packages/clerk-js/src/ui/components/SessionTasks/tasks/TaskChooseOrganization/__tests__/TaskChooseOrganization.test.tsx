@@ -1,16 +1,27 @@
-import { describe } from '@jest/globals';
 import userEvent from '@testing-library/user-event';
+import { describe, expect, it } from 'vitest';
 
-import { bindCreateFixtures, render, waitFor } from '@/testUtils';
 import { createFakeUserOrganizationMembership } from '@/ui/components/OrganizationSwitcher/__tests__/utlis';
+import { TaskChooseOrganizationContext } from '@/ui/contexts/components/SessionTasks';
+import { bindCreateFixtures, render, waitFor } from '@/vitestUtils';
 
 import { TaskChooseOrganization } from '..';
 
 const { createFixtures } = bindCreateFixtures('TaskChooseOrganization');
 
+const TaskChooseOrganizationWithContext = ({
+  redirectUrlComplete = '/dashboard',
+}: {
+  redirectUrlComplete?: string;
+}) => (
+  <TaskChooseOrganizationContext.Provider value={{ componentName: 'TaskChooseOrganization', redirectUrlComplete }}>
+    <TaskChooseOrganization />
+  </TaskChooseOrganizationContext.Provider>
+);
+
 describe('TaskChooseOrganization', () => {
   it('does not render component without existing session task', async () => {
-    const { wrapper } = await createFixtures(f => {
+    const { wrapper, props } = await createFixtures(f => {
       f.withOrganizations();
       f.withForceOrganizationSelection();
       f.withUser({
@@ -19,7 +30,9 @@ describe('TaskChooseOrganization', () => {
       });
     });
 
-    const { queryByText, queryByRole } = render(<TaskChooseOrganization />, { wrapper });
+    props.setProps({ redirectUrlComplete: '/dashboard' });
+
+    const { queryByText, queryByRole } = render(<TaskChooseOrganizationWithContext />, { wrapper });
 
     await waitFor(() => {
       expect(queryByText('Setup your organization')).not.toBeInTheDocument();
@@ -29,7 +42,7 @@ describe('TaskChooseOrganization', () => {
   });
 
   it('renders component when session task exists', async () => {
-    const { wrapper } = await createFixtures(f => {
+    const { wrapper, props } = await createFixtures(f => {
       f.withOrganizations();
       f.withForceOrganizationSelection();
       f.withUser({
@@ -39,7 +52,9 @@ describe('TaskChooseOrganization', () => {
       });
     });
 
-    const { getByText, getByRole } = render(<TaskChooseOrganization />, { wrapper });
+    props.setProps({ redirectUrlComplete: '/dashboard' });
+
+    const { getByText, getByRole } = render(<TaskChooseOrganizationWithContext />, { wrapper });
 
     await waitFor(() => {
       expect(getByText('Setup your organization')).toBeInTheDocument();
@@ -49,7 +64,7 @@ describe('TaskChooseOrganization', () => {
   });
 
   it('shows create organization screen when user has no existing resources', async () => {
-    const { wrapper } = await createFixtures(f => {
+    const { wrapper, props } = await createFixtures(f => {
       f.withOrganizations();
       f.withForceOrganizationSelection();
       f.withUser({
@@ -59,7 +74,9 @@ describe('TaskChooseOrganization', () => {
       });
     });
 
-    const { getByRole, getByText } = render(<TaskChooseOrganization />, { wrapper });
+    props.setProps({ redirectUrlComplete: '/dashboard' });
+
+    const { getByRole, getByText } = render(<TaskChooseOrganizationWithContext />, { wrapper });
 
     await waitFor(() => {
       expect(getByRole('textbox', { name: /name/i })).toBeInTheDocument();
@@ -68,7 +85,7 @@ describe('TaskChooseOrganization', () => {
   });
 
   it('shows choose organization screen when user has existing organizations', async () => {
-    const { wrapper, fixtures } = await createFixtures(f => {
+    const { wrapper, fixtures, props } = await createFixtures(f => {
       f.withOrganizations();
       f.withForceOrganizationSelection();
       f.withUser({
@@ -78,7 +95,9 @@ describe('TaskChooseOrganization', () => {
       });
     });
 
-    fixtures.clerk.user?.getOrganizationMemberships.mockReturnValueOnce(
+    props.setProps({ redirectUrlComplete: '/dashboard' });
+
+    (fixtures.clerk.user?.getOrganizationMemberships as any).mockReturnValue(
       Promise.resolve({
         data: [
           createFakeUserOrganizationMembership({
@@ -98,7 +117,7 @@ describe('TaskChooseOrganization', () => {
       }),
     );
 
-    const { getByText, queryByRole } = render(<TaskChooseOrganization />, { wrapper });
+    const { getByText, queryByRole } = render(<TaskChooseOrganizationWithContext />, { wrapper });
 
     await waitFor(() => {
       expect(getByText('Existing Org')).toBeInTheDocument();
@@ -108,7 +127,7 @@ describe('TaskChooseOrganization', () => {
   });
 
   it('allows switching between choose and create organization screens', async () => {
-    const { wrapper, fixtures } = await createFixtures(f => {
+    const { wrapper, fixtures, props } = await createFixtures(f => {
       f.withOrganizations();
       f.withForceOrganizationSelection();
       f.withUser({
@@ -118,7 +137,9 @@ describe('TaskChooseOrganization', () => {
       });
     });
 
-    fixtures.clerk.user?.getOrganizationMemberships.mockReturnValueOnce(
+    props.setProps({ redirectUrlComplete: '/dashboard' });
+
+    (fixtures.clerk.user?.getOrganizationMemberships as any).mockReturnValue(
       Promise.resolve({
         data: [
           createFakeUserOrganizationMembership({
@@ -138,7 +159,9 @@ describe('TaskChooseOrganization', () => {
       }),
     );
 
-    const { getByText, getByRole, queryByRole, queryByText } = render(<TaskChooseOrganization />, { wrapper });
+    const { getByText, getByRole, queryByRole, queryByText } = render(<TaskChooseOrganizationWithContext />, {
+      wrapper,
+    });
 
     await waitFor(() => {
       expect(getByText('Existing Org')).toBeInTheDocument();
@@ -167,7 +190,7 @@ describe('TaskChooseOrganization', () => {
   });
 
   it('displays user identifier in sign out section', async () => {
-    const { wrapper } = await createFixtures(f => {
+    const { wrapper, props } = await createFixtures(f => {
       f.withOrganizations();
       f.withForceOrganizationSelection();
       f.withUser({
@@ -177,7 +200,9 @@ describe('TaskChooseOrganization', () => {
       });
     });
 
-    const { getByText } = render(<TaskChooseOrganization />, { wrapper });
+    props.setProps({ redirectUrlComplete: '/dashboard' });
+
+    const { getByText } = render(<TaskChooseOrganizationWithContext />, { wrapper });
 
     await waitFor(() => {
       expect(getByText(/user@test\.com/)).toBeInTheDocument();
@@ -186,7 +211,7 @@ describe('TaskChooseOrganization', () => {
   });
 
   it('handles sign out correctly', async () => {
-    const { wrapper, fixtures } = await createFixtures(f => {
+    const { wrapper, fixtures, props } = await createFixtures(f => {
       f.withOrganizations();
       f.withForceOrganizationSelection();
       f.withUser({
@@ -196,7 +221,9 @@ describe('TaskChooseOrganization', () => {
       });
     });
 
-    const { getByRole } = render(<TaskChooseOrganization />, { wrapper });
+    props.setProps({ redirectUrlComplete: '/dashboard' });
+
+    const { getByRole } = render(<TaskChooseOrganizationWithContext />, { wrapper });
     const signOutButton = getByRole('link', { name: /sign out/i });
 
     await userEvent.click(signOutButton);
@@ -205,7 +232,7 @@ describe('TaskChooseOrganization', () => {
   });
 
   it('renders with username when email is not available', async () => {
-    const { wrapper } = await createFixtures(f => {
+    const { wrapper, props } = await createFixtures(f => {
       f.withOrganizations();
       f.withForceOrganizationSelection();
       f.withUser({
@@ -215,7 +242,9 @@ describe('TaskChooseOrganization', () => {
       });
     });
 
-    const { getByText } = render(<TaskChooseOrganization />, { wrapper });
+    props.setProps({ redirectUrlComplete: '/dashboard' });
+
+    const { getByText } = render(<TaskChooseOrganizationWithContext />, { wrapper });
 
     expect(getByText(/testuser/)).toBeInTheDocument();
   });

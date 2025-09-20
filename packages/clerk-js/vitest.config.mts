@@ -5,7 +5,7 @@ import { defineConfig } from 'vitest/config';
 function viteSvgMockPlugin() {
   return {
     name: 'svg-mock',
-    transform(code: string, id: string) {
+    transform(_code: string, id: string) {
       if (id.endsWith('.svg') && process.env.NODE_ENV === 'test') {
         return {
           code: `
@@ -17,6 +17,7 @@ function viteSvgMockPlugin() {
           map: null,
         };
       }
+      return undefined;
     },
   };
 }
@@ -52,9 +53,15 @@ export default defineConfig({
     },
     environment: 'jsdom',
     globals: false,
-    include: ['**/*.spec.?(c|m)[jt]s?(x)'],
-    exclude: ['sandbox/**/*.spec.?(c|m)[jt]s?(x)'],
+    include: ['**/*.test.?(c|m)[jt]s?(x)'],
+    exclude: ['sandbox/**/*.spec.?(c|m)[jt]s?(x)', 'node_modules/**', 'dist/**'],
     setupFiles: './vitest.setup.mts',
+    testTimeout: 5000,
+    environmentOptions: {
+      jsdom: {
+        resources: 'usable',
+      },
+    },
   },
   resolve: {
     alias: [{ find: /^@\//, replacement: `${resolve(__dirname, 'src')}/` }],
