@@ -1,6 +1,6 @@
 {
   "name": "@clerk/nuxt",
-  "version": "1.8.18",
+  "version": "1.9.0",
   "description": "Clerk SDK for Nuxt",
   "keywords": [
     "clerk",
