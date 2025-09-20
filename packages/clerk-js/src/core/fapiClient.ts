@@ -105,7 +105,20 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
   }
 
   function buildQueryString({ method, path, sessionId, search, rotatingTokenNonce }: FapiRequestInit): string {
-    const searchParams = new URLSearchParams(search as any);
+    const filteredSearch =
+      search && typeof search === 'object'
+        ? Object.keys(search as Record<string, any>).reduce(
+            (acc, key) => {
+              const value = (search as Record<string, any>)[key];
+              if (value !== undefined) {
+                acc[key] = value;
+              }
+              return acc;
+            },
+            {} as Record<string, any>,
+          )
+        : search;
+    const searchParams = new URLSearchParams(filteredSearch as any);
     // the above will parse {key: ['val1','val2']} as key: 'val1,val2' and we need to recreate the array bellow
 
     // Append supported FAPI version to the query string

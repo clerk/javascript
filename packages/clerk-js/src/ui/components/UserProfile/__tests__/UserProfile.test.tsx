@@ -1,8 +1,8 @@
 import type { CustomPage } from '@clerk/types';
-import { describe, it } from '@jest/globals';
+import { describe, expect, it } from 'vitest';
 
-import { render, screen, waitFor } from '../../../../testUtils';
-import { bindCreateFixtures } from '../../../utils/test/createFixtures';
+import { render, screen, waitFor } from '../../../../vitestUtils';
+import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
 import { UserProfile } from '../';
 
 const { createFixtures } = bindCreateFixtures('UserProfile');

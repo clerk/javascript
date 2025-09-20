@@ -60,7 +60,7 @@ beforeAll(() => {
         value: 'http://test.host',
       },
     },
-  ) as Location;
+  ) as any;
 });
 
 beforeEach(() => {
@@ -68,7 +68,7 @@ beforeEach(() => {
 });
 
 afterAll(() => {
-  window.location = oldWindowLocation;
+  window.location = oldWindowLocation as any;
   delete window.Clerk;
   global.fetch = originalFetch;
 });
@@ -144,26 +144,25 @@ describe('buildUrl(options)', () => {
         path: '/foo',
         search: {
           array: ['item1', 'item2'],
-        },
+        } as any,
       }).href,
     ).toBe(
       `https://clerk.example.com/v1/foo?array=item1&array=item2&__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=test`,
     );
   });
 
-  // The return value isn't as expected.
-  // The buildUrl function converts an undefined value to the string 'undefined'
-  // and includes it in the search parameters.
-  it.skip('parses search params when value is undefined', () => {
+  it('parses search params when value is undefined', () => {
     expect(
       fapiClient.buildUrl({
         path: '/foo',
         search: {
           array: ['item1', 'item2'],
           test: undefined,
-        },
+        } as any,
       }).href,
-    ).toBe('https://clerk.example.com/v1/foo?array=item1&array=item2&_clerk_js_version=test');
+    ).toBe(
+      `https://clerk.example.com/v1/foo?array=item1&array=item2&__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=test`,
+    );
   });
 
   const cases = [

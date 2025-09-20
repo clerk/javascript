@@ -1,8 +1,7 @@
-import { describe, it } from '@jest/globals';
+import { describe, expect, it, vi } from 'vitest';
 
-import { render, screen } from '../../../../testUtils';
-import { bindCreateFixtures } from '../../../utils/test/createFixtures';
-import { runFakeTimers } from '../../../utils/test/runFakeTimers';
+import { render, screen } from '../../../../vitestUtils';
+import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
 import { ResetPasswordSuccess } from '../ResetPasswordSuccess';
 
 const { createFixtures: createFixturesWithQuery } = bindCreateFixtures('SignIn', {
@@ -24,21 +23,27 @@ describe('ResetPasswordSuccess', () => {
 
   it('sets active session after 2000 ms', async () => {
     const { wrapper, fixtures } = await createFixturesWithQuery();
-    runFakeTimers(timers => {
+    vi.useFakeTimers();
+    try {
       render(<ResetPasswordSuccess />, { wrapper });
-      timers.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
       expect(fixtures.clerk.setActive).not.toHaveBeenCalled();
-      timers.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
       expect(fixtures.clerk.setActive).toHaveBeenCalled();
-    });
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('does not set a session if createdSessionId is missing', async () => {
     const { wrapper, fixtures } = await createFixtures();
-    runFakeTimers(timers => {
+    vi.useFakeTimers();
+    try {
       render(<ResetPasswordSuccess />, { wrapper });
-      timers.advanceTimersByTime(2000);
+      vi.advanceTimersByTime(2000);
       expect(fixtures.clerk.setActive).not.toHaveBeenCalled();
-    });
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
