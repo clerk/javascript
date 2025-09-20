@@ -1,5 +1,23 @@
 # @clerk/nuxt
 
+## 1.9.0
+
+### Minor Changes
+
+- Bump `@nuxt/kit` and `@nuxt/schema` to v4 ([#6795](https://github.com/clerk/javascript/pull/6795)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Fixed an issue where Nuxt route middleware saw intermediate states during navigation, causing unwanted redirects during sign-in/sign-out flows. ([#6802](https://github.com/clerk/javascript/pull/6802)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Added `<GoogleOneTap />` to auto-imported components. ([#6809](https://github.com/clerk/javascript/pull/6809)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`99922ec`](https://github.com/clerk/javascript/commit/99922ecd0dafe7387b8be52cee79993501f5a95d), [`8d1514a`](https://github.com/clerk/javascript/commit/8d1514a99743ec64d2a05de7f01dd9081e02bd0d), [`a8ba926`](https://github.com/clerk/javascript/commit/a8ba926109704e31b097f3545e61910abc76d99a), [`41e0a41`](https://github.com/clerk/javascript/commit/41e0a4190b33dd2c4bdc0d536bbe83fcf99af9b0), [`1aa9e9f`](https://github.com/clerk/javascript/commit/1aa9e9f10c051319e9ff4b1a0ecd71507bd6a6aa), [`1ad3b92`](https://github.com/clerk/javascript/commit/1ad3b92019361bc3350e429a840aa0dd4d0be089), [`a88ee58`](https://github.com/clerk/javascript/commit/a88ee5827adee0cc8a62246d03a3034d8566fe21), [`d6c7bbb`](https://github.com/clerk/javascript/commit/d6c7bbba23f38c0b3ca7edebb53028a05c7b38e6)]:
+  - @clerk/vue@1.13.3
+  - @clerk/backend@2.15.0
+  - @clerk/shared@3.26.1
+  - @clerk/types@4.88.0
+
 ## 1.8.18
 
 ### Patch Changes
