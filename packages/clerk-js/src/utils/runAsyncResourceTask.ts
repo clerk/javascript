@@ -20,6 +20,7 @@ export async function runAsyncResourceTask<T>(
     return { result, error: null };
   } catch (err) {
     eventBus.emit('resource:error', { resource, error: err });
+    // TODO @userland-errors:
     return { error: err };
   } finally {
     eventBus.emit('resource:fetch', {

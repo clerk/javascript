@@ -104,6 +104,7 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
     return true;
   }
 
+  // TODO @userland-errors:
   function buildQueryString({ method, path, sessionId, search, rotatingTokenNonce }: FapiRequestInit): string {
     const searchParams = new URLSearchParams(search as any);
     // the above will parse {key: ['val1','val2']} as key: 'val1,val2' and we need to recreate the array bellow
@@ -148,6 +149,7 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
     const { path, pathPrefix = 'v1' } = requestInit;
 
     if (options.proxyUrl) {
+      // TODO @userland-errors:
       const proxyBase = new URL(options.proxyUrl);
       let proxyPath = proxyBase.pathname.slice(1);
       if (proxyPath.endsWith('/')) {
@@ -185,6 +187,7 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
     });
   }
 
+  // TODO @userland-errors:
   async function request<T>(
     _requestInit: FapiRequestInit,
     requestOptions?: FapiRequestOptions,
@@ -221,6 +224,7 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
         : body;
     }
 
+    // TODO @userland-errors:
     const beforeRequestCallbacksResult = await runBeforeRequestCallbacks(requestInit);
     // Due to a known Safari bug regarding CORS requests, we are forced to always use GET or POST method.
     // The original HTTP method is used as a query string parameter instead of as an actual method to
@@ -237,6 +241,7 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
     try {
       if (beforeRequestCallbacksResult) {
         const maxTries = requestOptions?.fetchMaxTries ?? (isBrowserOnline() ? 4 : 11);
+        // TODO @userland-errors:
         response = await retry(() => fetch(url, fetchOpts), {
           // This retry handles only network errors, not 4xx or 5xx responses,
           // so we want to try once immediately to handle simple network blips.
@@ -271,6 +276,7 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
     if (!response.ok) {
       debugLogger.error('request failed', { method, path: requestInit.path, status: response.status }, 'fapiClient');
     }
+    // TODO @userland-errors:
     await runAfterResponseCallbacks(requestInit, fapiResponse);
     return fapiResponse;
   }
