@@ -1,5 +1,19 @@
 # Change Log
 
+## 4.88.0
+
+### Minor Changes
+
+- [Experimental] Add support for ticket sign-ins and sign-ups ([#6806](https://github.com/clerk/javascript/pull/6806)) by [@dstaley](https://github.com/dstaley)
+
+- [Billing Beta] Rename types, interfaces and classes that contain `commerce` to use `billing` instead. ([#6757](https://github.com/clerk/javascript/pull/6757)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Update jsdocs mentions of `@experimental` tag. ([#6651](https://github.com/clerk/javascript/pull/6651)) by [@panteliselef](https://github.com/panteliselef)
+
+- [Experimental] Correctly determine destination first factor based on identifier. ([#6789](https://github.com/clerk/javascript/pull/6789)) by [@dstaley](https://github.com/dstaley)
+
 ## 4.87.0
 
 ### Minor Changes
