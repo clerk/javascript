@@ -746,6 +746,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   }
 
+  // TODO @userland-errors:
   __unstable__updateProps = async (props: any): Promise<void> => {
     const clerkjs = await this.#waitForClerkJS();
     // Handle case where accounts has clerk-react@4 installed, but clerk-js@3 is manually loaded

@@ -692,6 +692,7 @@ class SignInFuture implements SignInFutureResource {
     }
 
     return runAsyncResourceTask(this.resource, async () => {
+      // TODO @userland-errors:
       const identifier = params.identifier || params.email || params.phoneNumber;
       const previousIdentifier = this.resource.identifier;
       await this.resource.__internal_basePost({
