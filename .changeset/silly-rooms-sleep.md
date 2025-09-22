@@ -2,4 +2,4 @@
 '@clerk/backend': minor
 ---
 
-Allow subscription item plan and planId to be null.
+[Billing Beta] Update subscription item plan and planId to be null.
