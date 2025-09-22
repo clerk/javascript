@@ -105,7 +105,7 @@ importers:
         version: 10.1.0
       '@testing-library/jest-dom':
         specifier: ^6.4.6
-        version: 6.4.6(@jest/globals@29.7.0)(@types/jest@29.5.12)(jest@29.7.0(@types/node@22.18.6)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@swc/core@1.11.29(@swc/helpers@0.5.17))(@types/node@22.18.6)(typescript@5.8.3)))(vitest@3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.18.6)(jiti@2.5.1)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.10.5(@types/node@22.18.6)(typescript@5.8.3))(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1))
+        version: 6.4.6(@jest/globals@29.7.0)(@types/jest@29.5.12)(jest@29.7.0(@types/node@22.18.6)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@swc/core@1.11.29(@swc/helpers@0.5.17))(@types/node@22.18.6)(typescript@5.8.3)))(vitest@3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.18.6)(jiti@2.5.1)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.11.2(@types/node@22.18.6)(typescript@5.8.3))(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1))
       '@testing-library/react':
         specifier: ^16.0.0
         version: 16.0.0(@testing-library/dom@10.1.0)(@types/react-dom@18.3.7(@types/react@18.3.24))(@types/react@18.3.24)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -132,7 +132,7 @@ importers:
         version: 4.5.2(vite@7.1.5(@types/node@22.18.6)(jiti@2.5.1)(lightningcss@1.27.0)(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1))
       '@vitest/coverage-v8':
         specifier: 3.0.5
-        version: 3.0.5(vitest@3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.18.6)(jiti@2.5.1)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.10.5(@types/node@22.18.6)(typescript@5.8.3))(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1))
+        version: 3.0.5(vitest@3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.18.6)(jiti@2.5.1)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.11.2(@types/node@22.18.6)(typescript@5.8.3))(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1))
       chalk:
         specifier: 4.1.2
         version: 4.1.2
@@ -306,7 +306,7 @@ importers:
         version: 5.33.0(typanion@3.14.0)
       vitest:
         specifier: 3.0.5
-        version: 3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.18.6)(jiti@2.5.1)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.10.5(@types/node@22.18.6)(typescript@5.8.3))(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1)
+        version: 3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.18.6)(jiti@2.5.1)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.11.2(@types/node@22.18.6)(typescript@5.8.3))(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1)
       yalc:
         specifier: 1.0.0-pre.53
         version: 1.0.0-pre.53(patch_hash=2737a4bf8dd6ebdc410626225fe706ae0bb73b142e398279afff04d1b02dfc1f)
@@ -389,8 +389,8 @@ importers:
         specifier: 5.0.0
         version: 5.0.0
       msw:
-        specifier: 2.10.5
-        version: 2.10.5(@types/node@24.3.1)(typescript@5.8.3)
+        specifier: 2.11.2
+        version: 2.11.2(@types/node@24.3.1)(typescript@5.8.3)
       npm-run-all:
         specifier: ^4.1.5
         version: 4.1.5
@@ -399,7 +399,7 @@ importers:
         version: 9.0.2
       vitest-environment-miniflare:
         specifier: 2.14.4
-        version: 2.14.4(vitest@3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@24.3.1)(jiti@2.5.1)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.10.5(@types/node@24.3.1)(typescript@5.8.3))(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1))
+        version: 2.14.4(vitest@3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@24.3.1)(jiti@2.5.1)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.11.2(@types/node@24.3.1)(typescript@5.8.3))(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1))
 
   packages/chrome-extension:
     dependencies:
@@ -1988,9 +1988,6 @@ packages:
   '@bundled-es-modules/statuses@1.0.1':
     resolution: {integrity: sha512-yn7BklA5acgcBr+7w064fGV+SGIFySjCKpqjcWgBAIfrAkY+4GQTJJHQMeT3V/sgz23VTEVV8TtOmkvJAhFVfg==}
 
-  '@bundled-es-modules/tough-cookie@0.1.6':
-    resolution: {integrity: sha512-dvMHbL464C0zI+Yqxbz6kZ5TOEp7GLW+pry/RWndAR8MJQAXZ2rPmIs8tziTZjeIyhSNZgZbCePtfSbdWqStJw==}
-
   '@capsizecss/unpack@2.4.0':
     resolution: {integrity: sha512-GrSU71meACqcmIUxPYOJvGKF0yryjN/L1aCuE9DViCTJI7bfkjgYDPD1zbNDcINJwSSP6UaBZY9GAbYDO7re0Q==}
 
@@ -2758,7 +2755,7 @@ packages:
 
   '@expo/bunyan@4.0.1':
     resolution: {integrity: sha512-+Lla7nYSiHZirgK+U/uYzsLv/X+HaJienbD5AKX1UQZHYfWaP+9uuQluRB4GrEVWF0GZ7vEVp/jzaOT9k/SQlg==}
-    engines: {'0': node >=0.10.0}
+    engines: {node: '>=0.10.0'}
 
   '@expo/cli@0.22.26':
     resolution: {integrity: sha512-I689wc8Fn/AX7aUGiwrh3HnssiORMJtR2fpksX+JIe8Cj/EDleblYMSwRPd0025wrwOV9UN1KM/RuEt/QjCS3Q==}
@@ -10954,8 +10951,8 @@ packages:
   ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
 
-  msw@2.10.5:
-    resolution: {integrity: sha512-0EsQCrCI1HbhpBWd89DvmxY6plmvrM96b0sCIztnvcNHQbXn5vqwm1KlXslo6u4wN9LFGLC1WFjjgljcQhe40A==}
+  msw@2.11.2:
+    resolution: {integrity: sha512-MI54hLCsrMwiflkcqlgYYNJJddY5/+S0SnONvhv1owOplvqohKSQyGejpNdUGyCwgs4IH7PqaNbPw/sKOEze9Q==}
     engines: {node: '>=18'}
     hasBin: true
     peerDependencies:
@@ -12658,6 +12655,9 @@ packages:
     resolution: {integrity: sha512-XQBQ3I8W1Cge0Seh+6gjj03LbmRFWuoszgK9ooCpwYIrhhoO80pfq4cUkU5DkknwfOfFteRwlZ56PYOGYyFWdg==}
     engines: {node: '>= 4'}
 
+  rettime@0.7.0:
+    resolution: {integrity: sha512-LPRKoHnLKd/r3dVxcwO7vhCW+orkOGj9ViueosEBK6ie89CijnfRlhaDhHq/3Hxu4CkWQtxwlBG0mzTQY6uQjw==}
+
   reusify@1.0.4:
     resolution: {integrity: sha512-U9nH88a3fc/ekCF1l0/UP1IosiuIjyTh7hBvXVMHYgVcfGvt897Xguj2UOLDeI5BG2m7/uwyaLVT6fbtCwTyzw==}
     engines: {iojs: '>=1.0.0', node: '>=0.10.0'}
@@ -13647,8 +13647,15 @@ packages:
   tldts-core@6.1.86:
     resolution: {integrity: sha512-Je6p7pkk+KMzMv2XXKmAE3McmolOQFdxkKw0R8EYNr7sELW46JqnNeTX8ybPiQgvg1ymCoF8LXs5fzFaZvJPTA==}
 
+  tldts-core@7.0.15:
+    resolution: {integrity: sha512-YBkp2VfS9VTRMPNL2PA6PMESmxV1JEVoAr5iBlZnB5JG3KUrWzNCB3yNNkRa2FZkqClaBgfNYCp8PgpYmpjkZw==}
+
   tldts@6.1.86:
     resolution: {integrity: sha512-WMi/OQ2axVTf/ykqCQgXiIct+mSQDFdH2fkwhPwgEwvJ1kSzZRiinb0zF2Xb8u4+OqPChmyI6MEu4EezNJz+FQ==}
+    hasBin: true
+
+  tldts@7.0.15:
+    resolution: {integrity: sha512-heYRCiGLhtI+U/D0V8YM3QRwPfsLJiP+HX+YwiHZTnWzjIKC+ZCxQRYlzvOoTEc6KIP62B1VeAN63diGCng2hg==}
     hasBin: true
 
   tmp@0.0.33:
@@ -13687,6 +13694,10 @@ packages:
 
   tough-cookie@5.1.2:
     resolution: {integrity: sha512-FVDYdxtnj0G6Qm/DhNPSb8Ju59ULcup3tuJxkFb5K8Bv2pUXILbf0xZWU8PX8Ov19OXljbUyveOFwRMwkXzO+A==}
+    engines: {node: '>=16'}
+
+  tough-cookie@6.0.0:
+    resolution: {integrity: sha512-kXuRi1mtaKMrsLUxz3sQYvVl37B0Ns6MzfrtV5DvJceE9bPyspOqk9xxv7XbZWcfLWbFmm997vl83qUWVJA64w==}
     engines: {node: '>=16'}
 
   tr46@0.0.3:
@@ -16206,11 +16217,6 @@ snapshots:
   '@bundled-es-modules/statuses@1.0.1':
     dependencies:
       statuses: 2.0.2
-
-  '@bundled-es-modules/tough-cookie@0.1.6':
-    dependencies:
-      '@types/tough-cookie': 4.0.5
-      tough-cookie: 4.1.4
 
   '@capsizecss/unpack@2.4.0':
     dependencies:
@@ -20073,7 +20079,7 @@ snapshots:
       lz-string: 1.5.0
       pretty-format: 27.5.1
 
-  '@testing-library/jest-dom@6.4.6(@jest/globals@29.7.0)(@types/jest@29.5.12)(jest@29.7.0(@types/node@22.18.6)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@swc/core@1.11.29(@swc/helpers@0.5.17))(@types/node@22.18.6)(typescript@5.8.3)))(vitest@3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.18.6)(jiti@2.5.1)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.10.5(@types/node@22.18.6)(typescript@5.8.3))(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1))':
+  '@testing-library/jest-dom@6.4.6(@jest/globals@29.7.0)(@types/jest@29.5.12)(jest@29.7.0(@types/node@22.18.6)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@swc/core@1.11.29(@swc/helpers@0.5.17))(@types/node@22.18.6)(typescript@5.8.3)))(vitest@3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.18.6)(jiti@2.5.1)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.11.2(@types/node@22.18.6)(typescript@5.8.3))(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1))':
     dependencies:
       '@adobe/css-tools': 4.4.0
       '@babel/runtime': 7.27.6
@@ -20087,7 +20093,7 @@ snapshots:
       '@jest/globals': 29.7.0
       '@types/jest': 29.5.12
       jest: 29.7.0(@types/node@22.18.6)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@swc/core@1.11.29(@swc/helpers@0.5.17))(@types/node@22.18.6)(typescript@5.8.3))
-      vitest: 3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.18.6)(jiti@2.5.1)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.10.5(@types/node@22.18.6)(typescript@5.8.3))(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1)
+      vitest: 3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.18.6)(jiti@2.5.1)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.11.2(@types/node@22.18.6)(typescript@5.8.3))(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1)
 
   '@testing-library/react@16.0.0(@testing-library/dom@10.1.0)(@types/react-dom@18.3.7(@types/react@18.3.24))(@types/react@18.3.24)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
@@ -20828,7 +20834,7 @@ snapshots:
       vite: 7.1.5(@types/node@24.3.1)(jiti@2.5.1)(lightningcss@1.27.0)(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1)
       vue: 3.5.21(typescript@5.8.3)
 
-  '@vitest/coverage-v8@3.0.5(vitest@3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.18.6)(jiti@2.5.1)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.10.5(@types/node@22.18.6)(typescript@5.8.3))(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1))':
+  '@vitest/coverage-v8@3.0.5(vitest@3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.18.6)(jiti@2.5.1)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.11.2(@types/node@22.18.6)(typescript@5.8.3))(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1))':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@bcoe/v8-coverage': 1.0.2
@@ -20842,7 +20848,7 @@ snapshots:
       std-env: 3.9.0
       test-exclude: 7.0.1
       tinyrainbow: 2.0.0
-      vitest: 3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.18.6)(jiti@2.5.1)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.10.5(@types/node@22.18.6)(typescript@5.8.3))(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1)
+      vitest: 3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.18.6)(jiti@2.5.1)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.11.2(@types/node@22.18.6)(typescript@5.8.3))(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -20853,22 +20859,22 @@ snapshots:
       chai: 5.1.2
       tinyrainbow: 2.0.0
 
-  '@vitest/mocker@3.0.5(msw@2.10.5(@types/node@22.18.6)(typescript@5.8.3))(vite@6.3.6(@types/node@22.18.6)(jiti@2.5.1)(lightningcss@1.27.0)(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1))':
+  '@vitest/mocker@3.0.5(msw@2.11.2(@types/node@22.18.6)(typescript@5.8.3))(vite@6.3.6(@types/node@22.18.6)(jiti@2.5.1)(lightningcss@1.27.0)(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1))':
     dependencies:
       '@vitest/spy': 3.0.5
       estree-walker: 3.0.3
       magic-string: 0.30.19
     optionalDependencies:
-      msw: 2.10.5(@types/node@22.18.6)(typescript@5.8.3)
+      msw: 2.11.2(@types/node@22.18.6)(typescript@5.8.3)
       vite: 6.3.6(@types/node@22.18.6)(jiti@2.5.1)(lightningcss@1.27.0)(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1)
 
-  '@vitest/mocker@3.0.5(msw@2.10.5(@types/node@24.3.1)(typescript@5.8.3))(vite@6.3.6(@types/node@24.3.1)(jiti@2.5.1)(lightningcss@1.27.0)(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1))':
+  '@vitest/mocker@3.0.5(msw@2.11.2(@types/node@24.3.1)(typescript@5.8.3))(vite@6.3.6(@types/node@24.3.1)(jiti@2.5.1)(lightningcss@1.27.0)(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1))':
     dependencies:
       '@vitest/spy': 3.0.5
       estree-walker: 3.0.3
       magic-string: 0.30.19
     optionalDependencies:
-      msw: 2.10.5(@types/node@24.3.1)(typescript@5.8.3)
+      msw: 2.11.2(@types/node@24.3.1)(typescript@5.8.3)
       vite: 6.3.6(@types/node@24.3.1)(jiti@2.5.1)(lightningcss@1.27.0)(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1)
 
   '@vitest/pretty-format@3.0.5':
@@ -27597,11 +27603,10 @@ snapshots:
 
   ms@2.1.3: {}
 
-  msw@2.10.5(@types/node@22.18.6)(typescript@5.8.3):
+  msw@2.11.2(@types/node@22.18.6)(typescript@5.8.3):
     dependencies:
       '@bundled-es-modules/cookie': 2.0.1
       '@bundled-es-modules/statuses': 1.0.1
-      '@bundled-es-modules/tough-cookie': 0.1.6
       '@inquirer/confirm': 5.1.13(@types/node@22.18.6)
       '@mswjs/interceptors': 0.39.3
       '@open-draft/deferred-promise': 2.2.0
@@ -27614,7 +27619,9 @@ snapshots:
       outvariant: 1.4.3
       path-to-regexp: 6.3.0
       picocolors: 1.1.1
+      rettime: 0.7.0
       strict-event-emitter: 0.5.1
+      tough-cookie: 6.0.0
       type-fest: 4.41.0
       yargs: 17.7.2
     optionalDependencies:
@@ -27623,11 +27630,10 @@ snapshots:
       - '@types/node'
     optional: true
 
-  msw@2.10.5(@types/node@24.3.1)(typescript@5.8.3):
+  msw@2.11.2(@types/node@24.3.1)(typescript@5.8.3):
     dependencies:
       '@bundled-es-modules/cookie': 2.0.1
       '@bundled-es-modules/statuses': 1.0.1
-      '@bundled-es-modules/tough-cookie': 0.1.6
       '@inquirer/confirm': 5.1.13(@types/node@24.3.1)
       '@mswjs/interceptors': 0.39.3
       '@open-draft/deferred-promise': 2.2.0
@@ -27640,7 +27646,9 @@ snapshots:
       outvariant: 1.4.3
       path-to-regexp: 6.3.0
       picocolors: 1.1.1
+      rettime: 0.7.0
       strict-event-emitter: 0.5.1
+      tough-cookie: 6.0.0
       type-fest: 4.41.0
       yargs: 17.7.2
     optionalDependencies:
@@ -29656,6 +29664,8 @@ snapshots:
 
   retry@0.13.1: {}
 
+  rettime@0.7.0: {}
+
   reusify@1.0.4: {}
 
   rfdc@1.4.1: {}
@@ -30802,9 +30812,15 @@ snapshots:
 
   tldts-core@6.1.86: {}
 
+  tldts-core@7.0.15: {}
+
   tldts@6.1.86:
     dependencies:
       tldts-core: 6.1.86
+
+  tldts@7.0.15:
+    dependencies:
+      tldts-core: 7.0.15
 
   tmp@0.0.33:
     dependencies:
@@ -30836,6 +30852,10 @@ snapshots:
   tough-cookie@5.1.2:
     dependencies:
       tldts: 6.1.86
+
+  tough-cookie@6.0.0:
+    dependencies:
+      tldts: 7.0.15
 
   tr46@0.0.3: {}
 
@@ -31809,22 +31829,22 @@ snapshots:
     optionalDependencies:
       vite: 7.1.5(@types/node@24.3.1)(jiti@2.5.1)(lightningcss@1.27.0)(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1)
 
-  vitest-environment-miniflare@2.14.4(vitest@3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@24.3.1)(jiti@2.5.1)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.10.5(@types/node@24.3.1)(typescript@5.8.3))(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1)):
+  vitest-environment-miniflare@2.14.4(vitest@3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@24.3.1)(jiti@2.5.1)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.11.2(@types/node@24.3.1)(typescript@5.8.3))(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1)):
     dependencies:
       '@miniflare/queues': 2.14.4
       '@miniflare/runner-vm': 2.14.4
       '@miniflare/shared': 2.14.4
       '@miniflare/shared-test-environment': 2.14.4
       undici: 5.28.4
-      vitest: 3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@24.3.1)(jiti@2.5.1)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.10.5(@types/node@24.3.1)(typescript@5.8.3))(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1)
+      vitest: 3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@24.3.1)(jiti@2.5.1)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.11.2(@types/node@24.3.1)(typescript@5.8.3))(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1)
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
 
-  vitest@3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.18.6)(jiti@2.5.1)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.10.5(@types/node@22.18.6)(typescript@5.8.3))(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1):
+  vitest@3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.18.6)(jiti@2.5.1)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.11.2(@types/node@22.18.6)(typescript@5.8.3))(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1):
     dependencies:
       '@vitest/expect': 3.0.5
-      '@vitest/mocker': 3.0.5(msw@2.10.5(@types/node@22.18.6)(typescript@5.8.3))(vite@6.3.6(@types/node@22.18.6)(jiti@2.5.1)(lightningcss@1.27.0)(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1))
+      '@vitest/mocker': 3.0.5(msw@2.11.2(@types/node@22.18.6)(typescript@5.8.3))(vite@6.3.6(@types/node@22.18.6)(jiti@2.5.1)(lightningcss@1.27.0)(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1))
       '@vitest/pretty-format': 3.0.5
       '@vitest/runner': 3.0.5
       '@vitest/snapshot': 3.0.5
@@ -31862,10 +31882,10 @@ snapshots:
       - tsx
       - yaml
 
-  vitest@3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@24.3.1)(jiti@2.5.1)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.10.5(@types/node@24.3.1)(typescript@5.8.3))(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1):
+  vitest@3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@24.3.1)(jiti@2.5.1)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.11.2(@types/node@24.3.1)(typescript@5.8.3))(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1):
     dependencies:
       '@vitest/expect': 3.0.5
-      '@vitest/mocker': 3.0.5(msw@2.10.5(@types/node@24.3.1)(typescript@5.8.3))(vite@6.3.6(@types/node@24.3.1)(jiti@2.5.1)(lightningcss@1.27.0)(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1))
+      '@vitest/mocker': 3.0.5(msw@2.11.2(@types/node@24.3.1)(typescript@5.8.3))(vite@6.3.6(@types/node@24.3.1)(jiti@2.5.1)(lightningcss@1.27.0)(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1))
       '@vitest/pretty-format': 3.0.5
       '@vitest/runner': 3.0.5
       '@vitest/snapshot': 3.0.5
