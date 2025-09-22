@@ -904,11 +904,9 @@ class SignInFuture implements SignInFutureResource {
         f => f.strategy === strategy,
       ) as Web3SignatureFactor;
       if (!web3FirstFactor) {
-        // clerkVerifyWeb3WalletCalledBeforeCreate('SignIn');
         throw new Error('Web3 first factor not found');
       }
 
-      // await this.prepareFirstFactor(web3FirstFactor);
       await this.resource.__internal_basePost({
         body: { web3WalletId: web3FirstFactor.web3WalletId, strategy },
         action: 'prepare_first_factor',
@@ -916,8 +914,7 @@ class SignInFuture implements SignInFutureResource {
 
       const { message } = this.firstFactorVerification;
       if (!message) {
-        // clerkVerifyWeb3WalletCalledBeforeCreate('SignIn');
-        throw new Error('Web3 message ??? not found');
+        throw new Error('Web3 nonce not found');
       }
 
       let signature: string;
