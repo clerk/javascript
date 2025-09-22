@@ -423,8 +423,8 @@ importers:
         version: 0.12.0
     devDependencies:
       '@types/chrome':
-        specifier: ^0.1.9
-        version: 0.1.11
+        specifier: ^0.1.12
+        version: 0.1.12
       '@types/webextension-polyfill':
         specifier: ^0.12.3
         version: 0.12.3
@@ -5139,8 +5139,8 @@ packages:
   '@types/chrome@0.0.114':
     resolution: {integrity: sha512-i7qRr74IrxHtbnrZSKUuP5Uvd5EOKwlwJq/yp7+yTPihOXnPhNQO4Z5bqb1XTnrjdbUKEJicaVVbhcgtRijmLA==}
 
-  '@types/chrome@0.1.11':
-    resolution: {integrity: sha512-8KFchpiY51tZaOpojRM9WPkJzr3ZLei1blsR8nkr42XXMKav4GXQgDK/lP1JTP2wsljXhpDDqAsGw9eOgm8G9Q==}
+  '@types/chrome@0.1.12':
+    resolution: {integrity: sha512-jEkxs9GPQHx7g49WjkA8QDNcqODbMGDuBbWQOtjiS/Wf9AiEcDmQMIAgJvC/Xi36WoCVNx584g0Dd9ThJQCAiw==}
 
   '@types/cloudflare-turnstile@0.2.2':
     resolution: {integrity: sha512-3Yf7b1Glci+V2bFWwWBbZkRgTuegp7RDgNTOG4U0UNPB9RV4AWvwqg2/qqLff8G+SwKFNXoXvTkqaRBZrAFdKA==}
@@ -20178,7 +20178,7 @@ snapshots:
       '@types/filesystem': 0.0.32
       '@types/har-format': 1.2.11
 
-  '@types/chrome@0.1.11':
+  '@types/chrome@0.1.12':
     dependencies:
       '@types/filesystem': 0.0.32
       '@types/har-format': 1.2.11
