@@ -272,7 +272,7 @@ function SignUpStartInternal(): JSX.Element {
       } as any);
 
       // Get ticket value from query params if it exists
-      if (!fields.ticket && hasExistingSignUpWithTicket) {
+      if (!formState.ticket.value && hasExistingSignUpWithTicket) {
         const ticketValue = getClerkQueryParam('__clerk_ticket') || getClerkQueryParam('__clerk_invitation_token');
         if (ticketValue) {
           fieldsToSubmit.push({
