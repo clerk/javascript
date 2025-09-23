@@ -1,6 +1,7 @@
 import type { SetActiveNavigate } from './clerk';
 import type { PhoneCodeChannel } from './phoneCodeChannel';
 import type { SignUpIdentificationField, SignUpStatus } from './signUpCommon';
+import { Web3Strategy } from './strategies';
 
 interface SignUpFutureAdditionalParams {
   firstName?: string;
@@ -12,6 +13,7 @@ interface SignUpFutureAdditionalParams {
 export interface SignUpFutureCreateParams extends SignUpFutureAdditionalParams {
   transfer?: boolean;
   ticket?: string;
+  web3Wallet?: string;
 }
 
 // This will likely get more properties
@@ -53,6 +55,12 @@ export interface SignUpFutureSSOParams {
 
 export interface SignUpFutureTicketParams extends SignUpFutureAdditionalParams {
   ticket: string;
+}
+
+export interface SignUpFutureWeb3Params {
+  strategy: Web3Strategy;
+  unsafeMetadata?: SignUpUnsafeMetadata;
+  legalAccepted?: boolean;
 }
 
 export interface SignUpFutureFinalizeParams {
@@ -124,6 +132,11 @@ export interface SignUpFutureResource {
    * Used to perform a ticket-based sign-up.
    */
   ticket: (params?: SignUpFutureTicketParams) => Promise<{ error: unknown }>;
+
+  /**
+   * Used to perform a Web3-based sign-up.
+   */
+  web3: (params: SignUpFutureWeb3Params) => Promise<{ error: unknown }>;
 
   /**
    * Used to convert a sign-up with `status === 'complete'` into an active session. Will cause anything observing the
